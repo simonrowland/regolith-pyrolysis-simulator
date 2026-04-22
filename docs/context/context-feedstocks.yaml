@@ -1,0 +1,371 @@
+# Oxygen Shuttle — Feedstock Compositions
+# All values in wt% oxide (anhydrous basis unless noted)
+
+lunar_mare:
+  source: "Apollo 11/12/15 basaltic soils"
+  confidence: "High (sample return)"
+  SiO2: [43, 46]
+  TiO2: [1.5, 8.0]    # highly variable; low-Ti ~1.5, high-Ti ~8
+  Al2O3: [12, 15]
+  FeO: [15, 18]
+  MgO: [8, 10]
+  CaO: [10, 12]
+  Na2O: [0.3, 0.5]
+  K2O: [0.05, 0.15]
+  Cr2O3: [0.2, 0.5]
+  MnO: [0.15, 0.25]
+  P2O5: [0.05, 0.15]
+  ZrO2: trace
+  REE: [0.01, 0.03]    # wt% total REE oxide
+  native_Fe_wt_pct: ~0.5  # nanophase Fe0
+  volatiles_kg_per_tonne: [0.3, 1.0]  # solar-wind implanted CHNOPS
+
+lunar_highland:
+  source: "Apollo 16 anorthositic soils"
+  confidence: "High (sample return)"
+  SiO2: [44, 46]
+  TiO2: [0.3, 0.6]
+  Al2O3: [25, 28]
+  FeO: [4, 6]
+  MgO: [5, 7]
+  CaO: [14, 17]
+  Na2O: [0.4, 0.6]
+  K2O: [0.05, 0.15]
+  key_feature: "Al2O3 dominant (130-148 kg Al/t); 3-4x less Fe, ~0 Ti vs mare"
+  preferred_for: "Al production, mullite, anorthite, CA cement, near-pure alumina"
+  Mg_shuttle_draw_kg: [100, 115]
+  Mg_inventory_note: "~neutral at >=80% bakeout recovery; mare batches replenish"
+
+# === NEW ENTRIES FOR KREEP-TARGETED PROCESSING ===
+
+lunar_pkt_kreep_average:  # Procellarum KREEP Terrane baseline (KRA)
+  source: "Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
+  confidence: "High (sample return + orbital Th mapping)"
+  SiO2: [49, 52]
+  TiO2: [1.5, 3.0]
+  Al2O3: [14, 18]
+  FeO: [8, 12]
+  MgO: [7, 10]
+  CaO: [9, 11]
+  Na2O: [0.5, 0.9]
+  K2O: [0.5, 1.5]      # 3–30× mare
+  P2O5: [0.5, 1.5]
+  REE: [0.1, 0.8]
+  Zr_ppm: [500, 1500]
+  Th_ppm: [8, 20]
+  key_feature: "Enriched KREEP ejecta; good balance of K-shuttle boost + manageable P"
+  preferred_for: "Early PKT landing sites"
+
+lunar_spa_kreep_influenced:  # South Pole-Aitken with minor KREEP component
+  source: "CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
+  confidence: "Medium (Chang'e-6 + orbital data)"
+  SiO2: [45, 52]
+  TiO2: [0.5, 2.5]
+  Al2O3: [12, 20]
+  FeO: [10, 18]        # more mafic
+  MgO: [8, 14]
+  CaO: [8, 12]
+  Na2O: [0.4, 0.8]
+  K2O: [0.2, 0.8]
+  P2O5: [0.2, 0.8]
+  REE: [0.05, 0.6]
+  Zr_ppm: [200, 800]
+  Th_ppm: [2, 8]
+  key_feature: "Mafic/noritic + mild KREEP; higher Fe/Mg for C2/C4 yields"
+  preferred_for: "Farside diversity + potential mantle samples"
+
+targeted_super_kreep_ore:  # Copernicus rays, Aristarchus, Lalande ejecta, Imbrium enriched strata
+  source: "Apollo 15386-type KREEP basalt + VHK clasts + urKREEP immiscible fractions (mixed noritic breccias)"
+  confidence: "Medium-High (Apollo samples + meteorites + orbital Th mapping)"
+  process_deltas: "Extended C0 with controlled-pO2 Phase 0b (950-1180°C, 0.5-5 mbar O2 flow/sweep/bubbling, 1-4h hold) for selective P volatilization as PO/POx; delays Na/K onset. Dedicated 350-650°C CaO/MgO P-trap in condensation train → 60-90% P capture as phosphate byproduct (no metal contamination). Analog to CI conditioning O2 blow. O2 fully recoverable solar-thermally. Enhances alkali shuttle + premium P/REE/Zr slag valorization."
+  P_capture_kg: [4, 13]   # net to volatiles train
+  preferred_for: "Multi-product ISRU (O2 + metals + P chemicals + REE-Zr ceramic)"
+  SiO2: [48, 53]
+  TiO2: [1.5, 3.5]
+  Al2O3: [13, 17]
+  FeO: [8, 14]
+  MgO: [6, 11]
+  CaO: [9, 12]
+  Na2O: [0.6, 1.3]
+  K2O: [1.2, 2.8]          # 8–50× lunar_mare baseline
+  P2O5: [1.2, 3.5]         # phosphate-rich (merrillite, apatite dominant)
+  Cr2O3: [0.3, 0.7]
+  MnO: [0.15, 0.30]
+  ZrO2: [0.15, 0.45]       # 1500–4000+ ppm Zr
+  REE: [0.6, 2.5]          # total REE oxides, 20–100× mare
+  Th_ppm: [25, 80+]        # ore-grade in hotspots
+  note: "Phosphate cumulates or immiscible fractions yield extreme ends; bulk realistic for shallow mining."
+  key_feature: "Supercharged alkali shuttle stock + premium REE-Zr-P-Th slag byproduct"
+  preferred_for: "Economic valorization of terminal slag (REE extraction, P chemicals)"
+  process_deltas: "C0 extended for P; 3–10× K yield in C1; slag mass/grade dramatically higher"
+
+s_type_asteroid_silicate:
+  source: "H/L/LL ordinary chondrite meteorites; Hayabusa Itokawa sample return"
+  confidence: "High (sample return + thousands of meteorites)"
+  note: "Silicate fraction AFTER magnetic separation of Fe-Ni metal phase"
+  SiO2: [48, 55]
+  TiO2: [0.1, 0.2]
+  Al2O3: [2, 4]
+  FeO: [8, 18]         # H-chondrite 8-10%, LL-chondrite 14-18%
+  MgO: [30, 38]        # 3-4x lunar; olivine-pyroxene mineralogy
+  CaO: [1, 3]
+  Na2O: [0.8, 1.2]     # 2-3x lunar
+  K2O: [0.05, 0.15]
+  Cr2O3: [0.3, 0.6]
+  MnO: [0.2, 0.4]
+  bulk_additions:
+    metallic_FeNi: {wt_pct: [10, 20], note: "already reduced; magnetic separation → 100-200 kg/t at zero energy"}
+    FeS_troilite: {wt_pct: [5, 6], note: "25-30 kg S/t from decomposition at 600-900C"}
+    C: {wt_pct: [0.1, 0.5], note: "1-5 kg C/t"}
+  liquidus_C: [1350, 1450]  # vs 1150-1250 for CMAS; 15-25% more melting energy
+  gravity: "micro-g to milli-g (redesign needed for tapping, injection, condensation)"
+
+m_type_bulk:
+  source: "Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
+  confidence: "LOW (no sample return; Psyche mission arrives Aug 2029)"
+  metallic_phase:
+    mass_kg_per_tonne: ~500
+    Fe: [88, 92]
+    Ni: [5, 10]
+    Co: [0.3, 0.5]
+    S: [0.5, 2]         # from troilite partition
+    P: [0.1, 0.3]
+    note: "natural Invar/Kovar analog; melting + tapping only"
+  silicate_phase:
+    mass_kg_per_tonne: ~500
+    SiO2: [55, 60]
+    MgO: [30, 40]
+    FeO: [2, 5]
+    Al2O3: [1, 3]
+    CaO: [1, 2]
+    Na2O: [0.1, 0.5]     # high uncertainty ±30-50%
+  process: "Melt at 1550-1600C → immiscible separation (7.9 vs 2.8 g/cm3) → tap metal → process silicate per S-type flowchart"
+  pO2_self_buffering: "Fe/FeO equilibrium at 1500C → pO2 ~1e-9 bar (suppresses SiO without external control)"
+
+
+ci_carbonaceous_chondrite:  # Also Ceres and comet nuceli
+  source: "CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
+  confidence: "High (two sample returns 2020/2023)"
+  note: "Bulk composition; ~200-350 kg/t lost as volatiles during extended C0"
+  bulk:
+    H2O_structural: [10, 20]    # in phyllosilicates
+    C: [2, 5]                    # organics + carbonates
+    S: [2, 6]                    # predominantly sulfides
+    SiO2: [22, 28]
+    FeO_plus_Fe2O3: [20, 30]    # mostly as magnetite Fe3O4
+    MgO: [15, 22]
+    Al2O3: [1.5, 3]
+    CaO: [1, 2.5]
+    Na2O: [0.5, 1.0]
+    NiO: [1.2, 1.8]             # high Ni → 3-8% Ni in pyrolysis Fe product
+  anhydrous_silicate_after_degassing:
+    mass_per_tonne: [650, 800]
+    SiO2: [32, 40]
+    FeO: [25, 35]               # all as FeO after conditioning blow
+    MgO: [22, 26]
+    Al2O3: [2, 3]
+    CaO: [1.5, 3]
+    NiO: [1.5, 2.5]
+  degassing_cascade:
+    200-500C: "organic pyrolysis → hydrocarbons, CO2 (char remains)"
+    400-700C: "phyllosilicate dehydroxylation → H2O (serpentine → forsterite + enstatite)"
+    500-900C: "sulfide decomposition → S2 (no reductant needed)"
+    600-800C: "carbonate decomposition → CO2"
+    800-950C: "magnetite reduction by CO → wustite (FeO)"
+    1000-1050C: "conditioning O2 blow (desulf, decarb, re-oxidise incidental Fe)"
+  key_products:
+    H2O_kg: [100, 170]          # uniquely abundant
+    Fe_Ni_alloy_kg: [75, 120]   # from pyrolysis; 3-8% Ni, zero S/C (vapour purified)
+    S_kg: [25, 40]
+    hydrocarbons_kg: [15, 30]
+  indigenous_carbon_sufficient: true  # 30-50 kg C vs 10-27 kg demand; self-cleaning
+  surface_dehydration_note: "Ryugu showed ~50% less H2O than pristine CI meteorites"
+
+cm_carbonaceous_chondrite:
+  note: "Similar to CI but less hydrated, less carbon"
+  H2O_structural: [6, 12]
+  C: [1.5, 3]
+  S: [2, 4]
+  anhydrous_silicate: "similar to CI but slightly higher SiO2, lower FeO"
+
+# === ICY CARBONACEOUS FAMILY ===
+# Broad category covering CI/CM meteorites, Ceres regolith, and comet nuclei.
+# All share identical post-degassing silicate processing (C1–C6 unchanged from CI baseline).
+# Differences are confined to C0 staged degassing + trap cartridges + bonus volatiles.
+# Ceres is the prime long-term mining target ("has everything") and gets its own dedicated entry below.
+
+ceres_regolith:
+  source: "Dawn VIR/GRaND global mapping + 2025 brine/habitability reanalyses"
+  confidence: "Very High (orbital + recent models)"
+  note: "extends: ci_carbonaceous_chondrite — evolved icy carbonaceous dwarf-planet regolith (NH4-clays + brine salts)"
+  H2O_ice_structural_kg_per_tonne: [120, 280]  # variable; poles/bright spots & subsurface brines much higher
+  carbon_content_wt_pct: [15, 20]             # ultra-carbonaceous dark component + organics reservoir
+  key_minerals: "Mg-phyllosilicates, global ammoniated phyllosilicates (NH4-clays), Mg/Ca/Na carbonates, brine salts"
+  anhydrous_silicate_after_degassing: "identical to CI (SiO₂ 32–40, FeO 25–35, MgO 22–26) but slightly Mg-richer"
+  key_feature: "Ammonia-rich + brine-derived salts; highest-accessibility water factory in main belt"
+  preferred_for: "Water + NH₃ propellant/life-support + fertilizer salts + Mg shuttle bootstrapping"
+  adaptations:
+    C0: "Extended staged (6–15 h): organics/NH₃ release 200–500 °C, phyllosilicate dehydroxylation 400–700 °C, carbonate decomposition 600–850 °C, sulfide + conditioning O₂ blow 1000–1050 °C. Add NH₃ trap (200–400 °C) + enhanced carbonate/CO₂ handling."
+  bonus_products:
+    H2O_kg: [120, 250]
+    NH3_kg: [8, 25]
+    carbonate_salts_kg: [15, 40]   # Mg/Ca/Na carbonates for chemistry or cement
+  process_deltas: |
+    Post-C0 silicate processing (C1–C6) identical to CI baseline. Immediate Mg surplus (batch-1 bootstrapping). Higher a(MgO) possible from Mg-carbonates/serpentines. Excellent energy balance. Centigravity environment (0.029 g) simplifies mining vs micro-g bodies. Micro-g adaptations still apply for condensers.
+
+comet_nucleus:
+  source: "Rosetta/67P + other Jupiter-family comets; primitive outer-solar-system analogs"
+  confidence: "High (Rosetta + meteorite/returned sample context)"
+  note: "extends: ci_carbonaceous_chondrite  — Volatile-extreme CI with massive supervolatiles"
+  dust_to_ice_ratio: "4–10 : 1 (porous nucleus ~75 % void)"
+  volatiles_lost_in_C0:
+    H2O_kg_per_tonne: [200, 400]
+    CO_CO2_kg: [50, 150]
+    organics_hydrocarbons_kg: [50, 100]
+    CH4_NH3_HCN_kg: [10, 40]
+    S_kg: [20, 40]
+  anhydrous_silicate_after_degassing: "identical to CI (SiO₂ 32–40, FeO 25–35, MgO 22–26)"
+  key_feature: "Massive propellant factory (CO, CH₄, H₂O, NH₃) + same metals as CI"
+  preferred_for: "Outer-belt/icy-body ISRU: propellant + life-support + Mg shuttle"
+  adaptations:
+    C0: "Extreme staged degassing (10–20+ h): 100–300 °C (supervolatiles + organics), 400–700 °C (H₂O), 500–900 °C (sulfides), 600–800 °C (carbonates), 1000–1050 °C (conditioning O₂ blow). Add CO/CH₄ cold-traps (100–200 °C), NH₃/HCN scrubber (150–300 °C), enhanced SO₂ sorbent."
+  bonus_products:
+    H2O_kg: [200, 350]
+    CO_CH4_propellant_kg: [60, 180]
+    NH3_HCN_kg: [10, 30]
+  process_deltas: |
+    Post-C0 silicate identical to CI → full C1–C6 unchanged (Mg-dominant 55–85+ kg Mg/t).
+    Immediate Mg surplus; highest net propellant yield of any feedstock.
+    Energy: +600–1000 kWh solar-thermal for C0. Micro-g wicking/centrifugal condensers mandatory (already noted for S-type/CI).
+    Terminal slag unchanged. Safety: staged ramp critical to avoid pressure spikes in porous nucleus material.
+
+v_type_vesta_hed:
+  source: "HED meteorites (howardite regolith analogs) + Dawn/Vesta surface"
+  confidence: "Very High (meteorites + Dawn)"
+  SiO2: [47, 52]
+  TiO2: [0.3, 1.0]
+  Al2O3: [10, 18]
+  FeO: [12, 19]
+  MgO: [6, 12]
+  CaO: [8, 13]
+  Na2O: [0.3, 0.6]
+  K2O: [0.05, 0.15]
+  key_feature: "Al- and Ca-rich basaltic crust; lunar_highland analog but higher Fe"
+  preferred_for: "Al production, CA cement, structural CMAS glass, mullite"
+  process_deltas: |
+    Similar to lunar_highland but 2–3× more Fe (C2 yield 50–80 kg/t). Higher Ca excellent for cement. Path B preferred if preserving glass for ceramics. Lower Mg (C4 10–25 kg/t). Early high-value ceramics feedstock.
+
+e_type_enstatite_aubrite:
+  source: "Aubrite meteorites (enstatite achondrites) + inner-belt E-type asteroids"
+  confidence: "High (meteorites)"
+  note: "Extremely reduced, nearly pure enstatite pyroxenite"
+  SiO2: [55, 60]
+  MgO: [35, 40]
+  Al2O3: [1, 4]
+  FeO: [0.1, 1.0]
+  CaO: [0.5, 2.0]
+  Na2O: [0.3, 0.8]
+  S: [1, 3]             # oldhamite, troilite, etc.
+  key_feature: "Ultra-high Mg, near-zero FeO, sulfide-rich"
+  preferred_for: "Mg shuttle stock + sulfur chemicals; refractory enstatite ceramics"
+  process_deltas: |
+    Extreme S-type analog. C0: major sulfur recovery. C2 Fe negligible. C4 **dominant** (120–220 kg Mg/t possible — immediate surplus). Very low liquidus energy. Strong pO₂ self-buffering. Perfect for Mg bootstrapping and high-temperature refractories.
+    
+mars_basalt:
+  source: "Curiosity/Spirit/Opportunity APXS; Phoenix lander"
+  confidence: "High (thousands of APXS analyses across 4 sites; ±1-2 wt% major oxides)"
+  SiO2: [43, 48]
+  TiO2: [0.8, 1.2]
+  Al2O3: [9, 12]
+  FeO_total: [16, 20]   # FeO + Fe2O3
+  MgO: [7, 10]
+  CaO: [6, 8]
+  Na2O: [2.5, 3.5]      # 5-10x lunar!
+  K2O: [0.4, 0.6]       # 5-10x lunar
+  SO3: [5, 7]            # sulfates (CaSO4, MgSO4, FeSO4)
+  Cl: [0.6, 0.8]
+  P2O5: [0.7, 1.0]
+  ClO4: [0.4, 0.6]      # perchlorates (polar soil)
+  environment:
+    surface_pressure_mbar: ~6   # range 0.7 (Olympus Mons) to 11 (Hellas)
+    atmosphere: "96% CO2"
+    constraint: "no deep vacuum possible"
+    advantage: "free CO2 carrier gas; CO2 dissociation → natural pO2 source"
+  adaptations:
+    C1_C2_merged: "single continuous ramp under flowing CO2"
+    carbon_pre_reduction: "C rod injection at 600-1050C for sulfate decomposition (20-40 kg C/t)"
+    condensation_train_additions: "halide trap (650-900C), SO2 sorbent (400-500C), HCl/HF scrubber (200-350C), CO2/CO separator"
+  bonus_products:
+    NaCl_KCl_salts_kg: [6, 10]  # for REE chloride chemistry
+    sulfuric_acid_feedstock_kg: [25, 35]
+    CO_propellant: "from CO2 dissociation + Boudouard"
+
+mars_sulfate_rich:
+  source: "Meridiani Planum soils, Vera Rubin Ridge margins, many polar/sedimentary deposits (Opportunity + orbital)"
+  confidence: "High (MER APXS + Curiosity + orbital)"
+  SiO2: [42, 48]
+  TiO2: [0.7, 1.3]
+  Al2O3: [8, 12]
+  FeO_total: [15, 20]
+  MgO: [6, 11]
+  CaO: [5, 9]
+  Na2O: [2.0, 3.5]
+  K2O: [0.3, 0.7]
+  SO3: [8, 15]          # key delta
+  Cl: [0.5, 1.2]
+  P2O5: [0.6, 1.1]
+  environment:
+    surface_pressure_mbar: ~6
+    atmosphere: "96% CO2"
+  key_feature: "Elevated Ca/Mg/Fe sulfates; highest bonus O₂ and acid potential"
+  preferred_for: "Maximum O₂ + sulfuric acid / REE processing"
+  adaptations:
+    C0: "Extended carbon pre-reduction (30–60 kg C/t); Boudouard self-cleaning"
+  bonus_products:
+    sulfuric_acid_feedstock_kg: [30, 50]
+    O2_extra_kg: [20, 40]
+  process_deltas: "Double SO₂ sorbent load; higher net O₂ from sulfate reduction. C1–C6 identical to baseline. Ideal early chemical production site."
+
+mars_phyllosilicate_clay:
+  source: "Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs (Curiosity/Perseverance)"
+  confidence: "High (rover + CRISM)"
+  SiO2: [43, 49]
+  TiO2: [0.6, 1.1]
+  Al2O3: [12, 18]       # key delta
+  FeO_total: [14, 19]
+  MgO: [7, 12]
+  CaO: [5, 8]
+  Na2O: [2.2, 3.8]
+  K2O: [0.4, 0.8]
+  SO3: [3, 7]
+  Cl: [0.6, 1.0]
+  H2O_structural_kg_per_tonne: [20, 100]
+  key_feature: "Smectite-rich; higher Al and bound water"
+  preferred_for: "Al production, mullite/anorthite ceramics, water yield"
+  adaptations:
+    C0: "Extra dehydroxylation H₂O release"
+  bonus_products:
+    H2O_kg: [20, 80]
+  process_deltas: "More aluminous melt (higher viscosity — induction stirring essential). Easier Al retention in C5/C6; terminal slag ideal for high-Al ceramics. 10–15 % energy savings vs baseline due to lower SiO₂ activity."
+
+mars_perchlorate_rich:
+  source: "Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
+  confidence: "Medium-High (Phoenix + rover APXS)"
+  SiO2: [42, 47]
+  Al2O3: [9, 13]
+  FeO_total: [15, 21]
+  MgO: [6, 10]
+  CaO: [5, 8]
+  Na2O: [2.5, 4.0]
+  K2O: [0.3, 0.7]
+  SO3: [4, 8]
+  Cl: [1.0, 2.5]
+  ClO4: [0.4, 1.5]      # key delta
+  key_feature: "Oxychlorine salts; net early O₂ source"
+  preferred_for: "Early oxidizer + halide salts for REE chloride chemistry"
+  adaptations:
+    C0: "Low-T (<400 °C) perchlorate decomposition → O₂ + Cl⁻ (safety interlocks)"
+  bonus_products:
+    NaCl_KCl_salts_kg: [8, 15]
+    O2_extra_kg: [10, 25]
+  process_deltas: "Halide trap load +50 %. Net O₂ positive in C0. Otherwise fully compatible with baseline Mars flow."

@@ -1,0 +1,195 @@
+/* Lunar Operator Game — Styles */
+
+.operator-layout {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Game header */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+}
+
+.game-controls { display: flex; gap: 6px; align-items: center; }
+
+.game-clock {
+    font-weight: 600;
+    font-size: 14px;
+    margin-left: 12px;
+    padding: 4px 10px;
+    background: var(--bg);
+    border-radius: 4px;
+}
+
+.inventory-bar {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.inv-item { white-space: nowrap; }
+.inv-energy { color: var(--warning); }
+
+/* Refinery grid */
+.refinery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.furnace-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+}
+
+.furnace-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+.furnace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.line-number { font-weight: 600; font-size: 12px; }
+
+.line-status {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.line-status.idle { background: #e5e7eb; color: #6b7280; }
+.line-status.running { background: #d1fae5; color: #065f46; }
+.line-status.decision { background: #fef3c7; color: #92400e; }
+.line-status.complete { background: #dbeafe; color: #1e40af; }
+
+.furnace-body { padding: 8px; }
+
+.mini-temp-bar {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.temp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24, #ef4444);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.line-campaign {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.line-feedstock {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.furnace-footer {
+    padding: 6px 8px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 4px;
+}
+
+.furnace-footer select {
+    flex: 1;
+    font-size: 11px;
+    padding: 3px 4px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+}
+
+.btn-sm {
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+/* Decision queue */
+.decision-queue {
+    margin-bottom: 12px;
+}
+
+.decision-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: var(--radius);
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+/* Line detail panel */
+.line-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.line-detail.hidden { display: none; }
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.detail-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.detail-chart { min-height: 240px; }
+
+/* Products */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .refinery-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 700px) {
+    .refinery-grid { grid-template-columns: repeat(2, 1fr); }
+    .game-header { flex-direction: column; gap: 8px; }
+}

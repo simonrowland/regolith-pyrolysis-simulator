@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Regolith Pyrolysis Simulator{% endblock %}</title>
+
+    <!-- Plotly for interactive charts -->
+    <script src="https://cdn.plot.ly/plotly-2.35.0.min.js" charset="utf-8"></script>
+
+    <!-- HTMX for declarative UI updates -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" crossorigin="anonymous"></script>
+
+    <!-- Socket.IO for real-time simulation push -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="{{ url_for('web.static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <span class="nav-icon">&#9790;</span>
+            Regolith Pyrolysis Simulator
+        </div>
+        <div class="nav-links">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Simulator</a>
+            <a href="/lunar-operator" class="{% if request.path.startswith('/lunar-operator') %}active{% endif %}">Lunar Operator</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
