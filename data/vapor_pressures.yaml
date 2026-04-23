@@ -1,0 +1,200 @@
+# Pure-component vapor pressures for Hertz-Knudsen calculations
+# Antoine equation: log10(P_Pa) = A - B / (T_K + C)
+# Sources: Alcock et al. (1984), Hultgren (1973), NIST-JANAF, Chase (1998)
+#
+# Cross-check targets (from context-thermo.md THERMO-13):
+#   Na at 1600 C (1873 K): several bar (~2-5 bar → 2e5-5e5 Pa)
+#   K  at 1600 C: > Na (more volatile)
+#   Fe at 1500 C: ~0.01-0.1 mbar → 1-10 Pa
+#   Mg at 1600 C: ~0.5 bar → 5e4 Pa
+#   SiO at 1600 C (vacuum): 0.5-2 mbar → 50-200 Pa
+#   Ca at 1484 C (bp): significant above 1500 C
+
+metals:
+  Na:
+    formula: "Na"
+    molar_mass_g_mol: 22.99
+    electrons_per_atom: 1
+    parent_oxide: "Na2O"
+    antoine:
+      # Liquid Na: Alcock et al. 1984
+      A: 10.866
+      B: 5688
+      C: 0
+    valid_range_K: [371, 2000]
+    boiling_point_C: 883
+    condensation_T_C_at_1mbar: 480
+    notes: "Clausius-Clapeyron form (C=0). ΔH_vap ≈ 108.9 kJ/mol."
+
+  K:
+    formula: "K"
+    molar_mass_g_mol: 39.10
+    electrons_per_atom: 1
+    parent_oxide: "K2O"
+    antoine:
+      A: 10.718
+      B: 4961
+      C: 0
+    valid_range_K: [337, 1800]
+    boiling_point_C: 759
+    condensation_T_C_at_1mbar: 420
+    notes: "More volatile than Na. ΔH_vap ≈ 95.0 kJ/mol."
+
+  Mg:
+    formula: "Mg"
+    molar_mass_g_mol: 24.31
+    electrons_per_atom: 2
+    parent_oxide: "MgO"
+    antoine:
+      A: 11.412
+      B: 7813
+      C: 0
+    valid_range_K: [923, 2000]
+    boiling_point_C: 1091
+    condensation_T_C_at_1mbar: 580
+    notes: "ΔH_vap ≈ 149.6 kJ/mol. p_vap ~0.5 bar at 1600°C."
+
+  Fe:
+    formula: "Fe"
+    molar_mass_g_mol: 55.85
+    electrons_per_atom: 2
+    parent_oxide: "FeO"
+    antoine:
+      A: 11.353
+      B: 19710
+      C: 0
+    valid_range_K: [1811, 3135]
+    boiling_point_C: 2862
+    condensation_T_C_at_1mbar: 1250
+    notes: "ΔH_vap ≈ 377.4 kJ/mol. Low vapor pressure at process T."
+
+  Ca:
+    formula: "Ca"
+    molar_mass_g_mol: 40.08
+    electrons_per_atom: 2
+    parent_oxide: "CaO"
+    antoine:
+      A: 11.238
+      B: 9520
+      C: 0
+    valid_range_K: [1115, 1757]
+    boiling_point_C: 1484
+    condensation_T_C_at_1mbar: 780
+    notes: "ΔH_vap ≈ 182.3 kJ/mol. Significant above ~1500°C."
+
+  Al:
+    formula: "Al"
+    molar_mass_g_mol: 26.98
+    electrons_per_atom: 3
+    parent_oxide: "Al2O3"
+    antoine:
+      A: 11.553
+      B: 17340
+      C: 0
+    valid_range_K: [933, 2792]
+    boiling_point_C: 2519
+    condensation_T_C_at_1mbar: 1180
+    notes: "ΔH_vap ≈ 332.0 kJ/mol. Negligible below 2500°C — not pyrolysable."
+
+  Si:
+    formula: "Si"
+    molar_mass_g_mol: 28.09
+    electrons_per_atom: 4
+    parent_oxide: "SiO2"
+    antoine:
+      A: 11.619
+      B: 21590
+      C: 0
+    valid_range_K: [1687, 3538]
+    boiling_point_C: 3265
+    condensation_T_C_at_1mbar: 1400
+    notes: "ΔH_vap ≈ 413.5 kJ/mol. Negligible at process T. Extracted by MRE only."
+
+  Ti:
+    formula: "Ti"
+    molar_mass_g_mol: 47.87
+    electrons_per_atom: 4
+    parent_oxide: "TiO2"
+    antoine:
+      A: 11.650
+      B: 23200
+      C: 0
+    valid_range_K: [1941, 3560]
+    boiling_point_C: 3287
+    condensation_T_C_at_1mbar: 1500
+    notes: "ΔH_vap ≈ 444.3 kJ/mol. Not pyrolysable — extracted by Na shuttle or MRE."
+
+  Cr:
+    formula: "Cr"
+    molar_mass_g_mol: 52.00
+    electrons_per_atom: 3
+    parent_oxide: "Cr2O3"
+    antoine:
+      A: 11.420
+      B: 20730
+      C: 0
+    valid_range_K: [2180, 2944]
+    boiling_point_C: 2671
+    condensation_T_C_at_1mbar: 1280
+    notes: "ΔH_vap ≈ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle."
+
+  Mn:
+    formula: "Mn"
+    molar_mass_g_mol: 54.94
+    electrons_per_atom: 2
+    parent_oxide: "MnO"
+    antoine:
+      A: 11.183
+      B: 14740
+      C: 0
+    valid_range_K: [1519, 2334]
+    boiling_point_C: 2061
+    condensation_T_C_at_1mbar: 1000
+    notes: "ΔH_vap ≈ 282.3 kJ/mol. Moderate volatility, trace amounts."
+
+oxide_vapors:
+  SiO:
+    formula: "SiO"
+    molar_mass_g_mol: 44.08
+    parent_oxide: "SiO2"
+    stoich_oxide_per_vapor: 1.363  # kg SiO₂ consumed per kg SiO evaporated (60.08/44.08)
+    stoich_O2_per_vapor: 0.363    # kg O₂ freed per kg SiO evaporated (16.00/44.08)
+    antoine:
+      # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
+      # Effective vapor pressure depends on a(SiO₂) and pO₂
+      # These are pure-component SiO saturation values
+      A: 11.817
+      B: 18700
+      C: 0
+    valid_range_K: [1400, 2200]
+    condensation_T_C: [900, 1200]
+    condensation_product: "amorphous SiO₂ (disproportionation: 2SiO → Si + SiO₂)"
+    suppression_equation: "p(SiO) = K(T) × a(SiO₂) / √pO₂"
+    suppression_factor_at_1mbar_O2: ">300×"
+    notes: |
+      THE problem species. At hard vacuum (pO₂ ~1e-9 bar), SiO dominates
+      offgas above ~1400°C. At pO₂ = 1 mbar, suppressed >300×.
+      Condenses as adhesive, corrosive amorphous silica below ~1200°C.
+      See [THERMO-1] in context-thermo.md.
+
+  FeO_vapor:
+    formula: "FeO"
+    molar_mass_g_mol: 71.84
+    antoine:
+      A: 11.0
+      B: 22000
+      C: 0
+    valid_range_K: [1800, 3000]
+    notes: "Minor vapor species. Most Fe evaporates as metallic Fe, not FeO."
+
+# Condensation temperature reference (at ~1 mbar partial pressure)
+# Used by condensation train model for species routing
+condensation_reference_at_1mbar:
+  Fe: 1250    # Stage 1
+  SiO: 1050   # Stage 2 (as amorphous SiO₂)
+  Mg: 580     # Stage 3
+  Na: 480     # Stage 3
+  K: 420      # Stage 3
+  Ca: 780     # would condense in Stage 3 if present
+  Mn: 1000    # between Stage 1 and 2
+  Cr: 1280    # Stage 1 (co-deposits with Fe)
