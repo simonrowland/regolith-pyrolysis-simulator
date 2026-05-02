@@ -118,8 +118,6 @@ For a local alphaMELTS install, put the executable here:
 engines/alphamelts/run_alphamelts.command
 ```
 
-This working tree currently has the `engines/alphamelts/` directory shape, but no publishable binary is bundled.
-
 ## Model Status
 
 The simulator includes a fallback Ellingham/Antoine thermodynamic model and can be extended with external melt backends. Results should be read as comparative process estimates, not validated engineering predictions.
@@ -149,5 +147,3 @@ pytest
 - `simulator/evaporation.py` — Hertz-Knudsen evaporation, condensation routing, and melt mass updates.
 - `simulator/extraction.py` — MRE, alkali-shuttle, and Mg-thermite campaign helpers.
 - `web/static/js/simulator-*.js` — browser-side simulator code split by socket setup, charts, tick updates, decisions, and controls.
-
-Local design notes under `docs/` and `docs-private/`, editor settings, virtual environments, and secrets are ignored for GitHub publication.
