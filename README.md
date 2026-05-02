@@ -1,26 +1,28 @@
 # Regolith Pyrolysis Simulator
 
-Interactive simulator for a solar-thermal regolith refinery that uses controlled overhead oxygen pressure to make vacuum pyrolysis and MRE workflows more practical in space.
+Interactive simulator for a solar-thermal regolith refinery that models controlled overhead oxygen pressure to make vacuum pyrolysis and molten regolith electrolysis (MRE) workflows more practical for extracting metals, glass and ceramics from sample reolith feedstock profiles for the Moon, Mars, and asteriods.
 
-The core idea is simple: regolith pyrolysis is attractive because sunlight can provide most of the heat, but hard-vacuum pyrolysis can turn silica into SiO vapor. SiO boiloff can foul ducts, condensers, windows, turbines, and product streams. A small managed oxygen backpressure can suppress SiO formation while still allowing useful volatile and metal extraction. The same pretreatment can also condition melts before molten regolith electrolysis (MRE), reducing volatile load, alkali load, iron load, and corrosive offgas exposure.
+The core idea is simple: regolith pyrolysis is attractive because sunlight can provide most of the heat, but hard-vacuum pyrolysis can turn silica into SiO vapor. SiO boiloff can foul ducts, condensers, windows, turbines, and product streams. A small managed oxygen backpressure can suppress SiO formation while still allowing useful volatile and metal extraction. The same pretreatment can also condition melts before molten regolith electrolysis (MRE), reducing volatile load, alkali load, iron load, and corrosive offgas exposure to make MRE more practical and economical.
 
 This package explores that control problem. It compares hard vacuum, Mars backpressure, pO2-managed pyrolysis, alkali shuttle chemistry, selective Mg extraction, and MRE-like electrolysis as parts of one scalable refining ladder.
 
-It is a process-modeling workbench, not a plant certification tool.
+It is a process-modeling workbench, which computes molten-reolith pyrolysis workflows using alphaMELTS, PetThermoTools, and Ellingham diagrams.
 
 ## Why This Exists
 
-Most regolith oxygen discussions jump straight to MRE or carbothermal reduction. Those processes are useful, but they are electrically intensive and force the whole melt inventory through electrodes, cells, and corrosion-limited hardware.
+Current In-Situ Resource Utilisation (ISRU) literature is focused on MRE, hydrogen reduction, halide reduction, or carbothermal reduction. Those processes are useful, but MRE in particular is electrically-intensive and forces the whole melt inventory through electrodes and corrosion-limited hardware. By using pyrolysis to simply extract alkalis and iron beforehand to condition the melt for MRE, it is possible to save energy and signficantly reduce corrosion. The simulator also shows that end-to-end workflows can extract most of the useful metal content of the sample feedstocks, supporting reoglith pyrolisys as a core, self-bootstrapping path for metals, glass, ceramics and oxygen production in space.
 
-This simulator asks a different question:
+This simulator seeks to answer the question:
 
-> How much useful refining can be done with solar-concentrator heat and pressure control before spending large amounts of electrical power?
+> How much useful refining can be done with solar-concentrator heat by using overhead pressure control, before spending large amounts of electrical power?
 
-The project demonstrates three linked ideas:
+The process model uses geologist-standard melt libraries to demonstrates five linked ideas:
 
-- Overhead pO2 is a process control variable, not just an atmosphere label.
-- SiO boiloff can be suppressed or redirected by pressure management instead of accepted as a hard-vacuum mess.
+- Alkali metals, extracted early and re-injected, are used to shuttle oxygen out of the melt, conditioning the melt for easier processing.
+- Overhead pO2 is a key Ellingham process control variable, working alongside temparature and pressure to offer targeted extraction.
+- SiO boiloff (noted in recent literature) can be suppressed or redirected by pressure management instead of accepted as a hard-vacuum mess.
 - Regolith pyrolysis can be used as MRE pretreatment, producing useful material streams while making later electrolysis less hostile.
+- Ca or Mg thermite-style reduction can further process terminal ceramics, for example to enrich REE in terminal products.
 
 ## What It Models
 
@@ -31,6 +33,7 @@ The simulator tracks a staged refinery path for one-tonne-class feedstock batche
 - SiO suppression: pO2 shifts the SiO2 -> SiO + 1/2 O2 equilibrium and reduces the driving force for silica boiloff.
 - Gas train behavior: overhead pressure, pipe conductance, turbine load, venting, accumulator flow, and ramp throttling.
 - Condensation train products: staged collection of metals, SiO/silica, alkalis, oxygen, salts, and volatile streams.
+- Glass: Production of useful ceramics and various grades of glass
 - MRE comparison: limited or baseline molten regolith electrolysis after thermal pretreatment.
 - Shuttle and thermite steps: Na/K metallothermic cleanup and Mg thermite reduction for aluminum-rich residues.
 
