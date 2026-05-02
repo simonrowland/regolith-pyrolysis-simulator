@@ -1,15 +1,15 @@
 """
-Regolith Pyrolysis Simulator — Application Entry Point
-=======================================================
+Regolith Pyrolysis Simulator — Flask App
+========================================
 
-Starts the Flask + SocketIO web server on port 3000.
+Creates the Flask + SocketIO web application.
 
 Two interfaces:
   /                 — Simulator (full parameter control, engine selection)
   /lunar-operator   — Operator game (multi-line refinery management)
 
 Usage:
-    python app.py
+    python regolith-pyrolysis-run.py
     # Then open http://localhost:3000
 """
 
@@ -71,10 +71,15 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
+def main():
+    """Run the local development server."""
     app = create_app()
     print("Starting Regolith Pyrolysis Simulator on http://localhost:3000")
     print("  Simulator:       http://localhost:3000/")
     print("  Lunar Operator:  http://localhost:3000/lunar-operator")
     socketio.run(app, host='0.0.0.0', port=3000, debug=True,
                  allow_unsafe_werkzeug=True)
+
+
+if __name__ == '__main__':
+    main()

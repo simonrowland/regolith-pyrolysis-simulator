@@ -4,7 +4,8 @@ This guide is for contributors and coding agents that need to find the right fil
 
 ## Entry Points
 
-- `app.py` starts the Flask and Socket.IO server.
+- `regolith-pyrolysis-run.py` starts the local Flask and Socket.IO server.
+- `app.py` creates the Flask application and Socket.IO wiring.
 - `web/templates/simulator.html` defines the main simulator page.
 - `web/static/js/simulator-socket.js` creates the Socket.IO client.
 - `web/static/js/simulator-controls.js` handles user controls and feedstock/additive requests.
@@ -39,4 +40,3 @@ This guide is for contributors and coding agents that need to find the right fil
 ## Testing
 
 Focused tests live under `tests/`. Current smoke coverage checks Stage 0 atmosphere behavior for hard-vacuum and Mars-backpressure feedstocks.
-

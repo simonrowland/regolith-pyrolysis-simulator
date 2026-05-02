@@ -80,11 +80,14 @@ The web app has two entry points:
 
 ## Quick Start
 
+From a source checkout, a virtual environment is recommended so the simulator
+dependencies stay isolated from your system Python:
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python app.py
+python regolith-pyrolysis-run.py
 ```
 
 Then open `http://localhost:3000/`.

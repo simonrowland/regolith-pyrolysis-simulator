@@ -25,7 +25,8 @@ PyrolysisSimulator
 
 ## Main Components
 
-- `app.py` creates the Flask app, registers the simulator and operator-mode routes, and starts Socket.IO.
+- `regolith-pyrolysis-run.py` starts the local web server.
+- `app.py` creates the Flask app, registers the simulator and operator-mode routes, and wires Socket.IO.
 - `web/routes.py` serves the simulator page, feedstock metadata, setpoints, additive estimates, and disclosure-panel partials.
 - `web/events.py` owns live simulator sessions keyed by Socket.IO client ID.
 - `simulator/core.py` owns the `PyrolysisSimulator` lifecycle: loading batches, starting campaigns, advancing hourly steps, handling decisions, and producing snapshots.
@@ -45,4 +46,3 @@ PyrolysisSimulator
 ## Session Model
 
 Each browser connection gets an independent in-memory simulator. The backend runs a background loop that calls `sim.step()`, emits a `simulation_tick`, and pauses when operator decisions are required. This keeps the current application simple and suitable for local exploration, but it is not yet a multi-user production service.
-
