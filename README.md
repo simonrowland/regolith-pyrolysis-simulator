@@ -42,7 +42,7 @@ The result is a live process dashboard rather than a static calculator: temperat
 
 ## Feedstock Scope
 
-The point is not one idealized lunar basalt. The simulator is meant to compare what different space feedstocks make possible.
+While lunar basalt is central to ISRU literature, the simulator is generalised over the characterised small-body, Moon and Mars feedstock types.
 
 ### Lunar Feedstocks
 
@@ -54,7 +54,7 @@ Asteroid cases cover the range of feedstock types, including S-tyle feedstock ve
 
 ### Mars Feedstocks
 
-Mars is not an ambient vacuum, and benefits from additional reduction as a melt conditioning step. Mars basalt, sulfate-rich soils, phyllosilicates, and perchlorate-bearing material run with a CO2 pressure floor. That changes Stage 0, SiO suppression, sulfur/chlorine handling, salt traps, scrubbers, CO/CO2 behavior, and pump requirements. Mars backpressure is therefore modeled as part of the process, not as an afterthought.
+Mars feedstocks benefit from additional reduction as a melt conditioning step. Mars basalt, sulfate-rich soils, phyllosilicates, and perchlorate-bearing material run with a CO2 pressure floor. That changes Stage 0, SiO suppression, sulfur/chlorine handling, salt traps, scrubbers, CO/CO2 behavior, and pump requirements. Mars backpressure is therefore modeled as part of the process, not as an afterthought.
 
 ## Materials the Model Tries to Expose
 
