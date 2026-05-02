@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+{% block title %}Simulator — Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<div class="simulator-layout">
+
+    <!-- Left panel: configuration -->
+    <aside class="config-panel">
+        <h2>Configuration</h2>
+
+        <!-- Process track selection -->
+        <fieldset class="config-group">
+            <legend>Process Track</legend>
+            <label>
+                <input type="radio" name="track" value="pyrolysis" checked>
+                Pyrolysis (C0–C6)
+            </label>
+            <label>
+                <input type="radio" name="track" value="mre_baseline">
+                Standard MRE Baseline
+            </label>
+        </fieldset>
+
+        <!-- Engine selection -->
+        <fieldset class="config-group">
+            <legend>Thermodynamic Engine</legend>
+            <select id="engine-select">
+                <option value="alphamelts">AlphaMELTS</option>
+                <option value="factsage" disabled>FactSAGE (not installed)</option>
+            </select>
+        </fieldset>
+
+        <!-- Feedstock selection -->
+        <fieldset class="config-group">
+            <legend>Feedstock</legend>
+            <select id="feedstock-select">
+                <option value="">Select feedstock...</option>
+                {% for key, fs in feedstocks.items() %}
+                <option value="{{ key }}">{{ fs.label if fs.label is defined else key }}</option>
+                {% endfor %}
+            </select>
+            <div id="feedstock-info"></div>
+        </fieldset>
+
+        <!-- Batch parameters -->
+        <fieldset class="config-group">
+            <legend>Batch Parameters</legend>
+            <label>
+                Batch mass (kg):
+                <input type="number" id="batch-mass" value="1000" min="1" step="100">
+            </label>
+        </fieldset>
+
+        <!-- Additives -->
+        <fieldset class="config-group">
+            <legend>Additives from Inventory (kg)</legend>
+            <div class="additive-grid">
+                <label>Na: <input type="number" id="add-na" value="0" min="0" step="0.1"></label>
+                <label>K: <input type="number" id="add-k" value="0" min="0" step="0.1"></label>
+                <label>Mg: <input type="number" id="add-mg" value="0" min="0" step="1"></label>
+                <label>Ca: <input type="number" id="add-ca" value="0" min="0" step="0.1"></label>
+                <label>C: <input type="number" id="add-c" value="0" min="0" step="0.1"></label>
+            </div>
+        </fieldset>
+
+        <!-- Simulation speed -->
+        <fieldset class="config-group">
+            <legend>Simulation Speed</legend>
+            <label>
+                <input type="radio" name="speed" value="1000" checked>
+                1 sec / simulated hour
+            </label>
+            <label>
+                <input type="radio" name="speed" value="0">
+                As fast as possible
+            </label>
+        </fieldset>
+
+        <!-- Control buttons -->
+        <div class="control-buttons">
+            <button id="btn-start" class="btn btn-primary">Start</button>
+            <button id="btn-pause" class="btn" disabled>Pause</button>
+            <button id="btn-resume" class="btn" disabled>Resume</button>
+        </div>
+    </aside>
+
+    <!-- Main area: charts + results -->
+    <section class="main-area">
+
+        <!-- Status bar -->
+        <div id="status-bar" class="status-bar">
+            <span id="status-text">Ready</span>
+            <span id="status-campaign">—</span>
+            <span id="status-hour">Hour: 0</span>
+            <span id="status-temp">T: — &deg;C</span>
+            <span id="status-mass">Melt: — kg</span>
+            <span id="status-atmosphere">Atmosphere: —</span>
+            <span id="status-ramp" class="status-indicator" style="display:none">THROTTLED</span>
+            <span id="status-vent" class="status-indicator status-danger" style="display:none">VENTING</span>
+        </div>
+
+        <!-- Charts grid -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div id="chart-temperature"></div>
+            </div>
+            <div class="chart-container" style="position:relative">
+                <button id="comp-scale-toggle" class="scale-toggle" title="Toggle log/linear scale">LOG</button>
+                <div id="chart-composition"></div>
+            </div>
+            <div class="chart-container">
+                <div id="chart-pressure"></div>
+            </div>
+            <div class="chart-container">
+                <div id="chart-massflow"></div>
+            </div>
+            <div class="chart-container chart-wide" style="position:relative">
+                <button id="abs-scale-toggle" class="scale-toggle" title="Toggle log/linear scale">LOG</button>
+                <div id="chart-absolute"></div>
+            </div>
+            <div class="chart-container chart-wide">
+                <div id="chart-o2-budget"></div>
+            </div>
+            <div class="chart-container chart-wide">
+                <div id="chart-melt-inventory"></div>
+            </div>
+        </div>
+
+        <!-- Gas Train Status -->
+        <div class="section-card gas-train-card">
+            <h3>Gas Train Status</h3>
+            <div class="gas-train-grid">
+                <div class="gas-train-metric">
+                    <div class="metric-label">Ramp Rate</div>
+                    <div class="metric-value">
+                        <span id="gt-ramp-actual">—</span>
+                        <span class="metric-unit">&deg;C/hr</span>
+                    </div>
+                    <div class="metric-sublabel" id="gt-ramp-nominal">(nominal: —)</div>
+                </div>
+                <div class="gas-train-metric">
+                    <div class="metric-label">Pipe Saturation</div>
+                    <div class="metric-value">
+                        <span id="gt-pipe-sat">—</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-bar"><div id="gt-pipe-bar" class="bar-fill"></div></div>
+                </div>
+                <div class="gas-train-metric">
+                    <div class="metric-label">Turbine Load</div>
+                    <div class="metric-value">
+                        <span id="gt-turbine-load">—</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-bar"><div id="gt-turbine-bar" class="bar-fill"></div></div>
+                </div>
+                <div class="gas-train-metric">
+                    <div class="metric-label">Shaft Power</div>
+                    <div class="metric-value">
+                        <span id="gt-shaft-power">—</span>
+                        <span class="metric-unit">kW</span>
+                    </div>
+                </div>
+                <div class="gas-train-metric">
+                    <div class="metric-label">O&#x2082; Stored</div>
+                    <div class="metric-value">
+                        <span id="gt-o2-stored">—</span>
+                        <span class="metric-unit">kg</span>
+                    </div>
+                </div>
+                <div class="gas-train-metric">
+                    <div class="metric-label">O&#x2082; Vented</div>
+                    <div class="metric-value">
+                        <span id="gt-o2-vented">—</span>
+                        <span class="metric-unit">kg</span>
+                    </div>
+                    <div class="metric-sublabel" id="gt-vent-rate">(0.0 kg/hr)</div>
+                </div>
+            </div>
+            <div id="gt-throttle-reason" class="throttle-reason" style="display:none"></div>
+        </div>
+
+        <!-- Alkali Shuttle Status (C3) -->
+        <div id="shuttle-card" class="section-card shuttle-card" style="display:none">
+            <h3>Alkali Shuttle (C3)</h3>
+            <div class="shuttle-grid">
+                <div class="shuttle-metric">
+                    <div class="metric-label">Phase</div>
+                    <div class="metric-value" id="sh-phase">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Cycle</div>
+                    <div class="metric-value" id="sh-cycle">0</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Injected</div>
+                    <div class="metric-value">
+                        <span id="sh-injected">0.000</span>
+                        <span class="metric-unit">kg/hr</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Oxide Reduced</div>
+                    <div class="metric-value">
+                        <span id="sh-reduced">0.000</span>
+                        <span class="metric-unit">kg/hr</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Metal Produced</div>
+                    <div class="metric-value">
+                        <span id="sh-metal">0.000</span>
+                        <span class="metric-unit">kg/hr</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">K Inventory</div>
+                    <div class="metric-value">
+                        <span id="sh-k-inv">0.00</span>
+                        <span class="metric-unit">kg</span>
+                    </div>
+                    <div class="metric-bar"><div id="sh-k-bar" class="bar-fill"></div></div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Na Inventory</div>
+                    <div class="metric-value">
+                        <span id="sh-na-inv">0.00</span>
+                        <span class="metric-unit">kg</span>
+                    </div>
+                    <div class="metric-bar"><div id="sh-na-bar" class="bar-fill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MRE Electrolysis Status (C5 / MRE_BASELINE) -->
+        <div id="mre-card" class="section-card shuttle-card" style="display:none">
+            <h3>MRE Electrolysis</h3>
+            <div class="shuttle-grid">
+                <div class="shuttle-metric">
+                    <div class="metric-label">Voltage</div>
+                    <div class="metric-value">
+                        <span id="mre-voltage">0.00</span>
+                        <span class="metric-unit">V</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Current (applied)</div>
+                    <div class="metric-value">
+                        <span id="mre-current">0</span>
+                        <span class="metric-unit">A</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Energy (this hr)</div>
+                    <div class="metric-value">
+                        <span id="mre-energy-hr">0</span>
+                        <span class="metric-unit">kWh</span>
+                    </div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Metals (this hr)</div>
+                    <div class="metric-value" id="mre-metals-hr">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Condensation train display -->
+        <div class="section-card">
+            <h3>Condensation Train</h3>
+            <div id="condensation-display" class="train-display">
+                <div class="train-stage" data-stage="vol">
+                    <div class="stage-label">Volatiles</div>
+                    <div class="stage-temp">50–400 &deg;C</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="0">
+                    <div class="stage-label">Hot Duct</div>
+                    <div class="stage-temp">&gt;1400 &deg;C</div>
+                    <div class="stage-mass">—</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="1">
+                    <div class="stage-label">Fe Condenser</div>
+                    <div class="stage-temp">1100–1400 &deg;C</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="2">
+                    <div class="stage-label">SiO Zone</div>
+                    <div class="stage-temp">900–1200 &deg;C</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="3">
+                    <div class="stage-label">Alkali/Mg</div>
+                    <div class="stage-temp">350–700 &deg;C</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="4">
+                    <div class="stage-label">Vortex Filter</div>
+                    <div class="stage-temp">200–350 &deg;C</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="5">
+                    <div class="stage-label">Turbine</div>
+                    <div class="stage-temp">—</div>
+                    <div class="stage-mass">—</div>
+                </div>
+                <div class="train-arrow">&rarr;</div>
+                <div class="train-stage" data-stage="6">
+                    <div class="stage-label">O&#x2082; Store</div>
+                    <div class="stage-temp">~3 bar</div>
+                    <div class="stage-mass">— kg</div>
+                </div>
+            </div>
+
+            <!-- Per-species condensation totals -->
+            <div class="condensation-species">
+                <h4>Collected by Species</h4>
+                <div class="species-grid">
+                    <span>Na: <span id="cond-Na">0.00 kg</span></span>
+                    <span>K: <span id="cond-K">0.00 kg</span></span>
+                    <span>Fe: <span id="cond-Fe">0.00 kg</span></span>
+                    <span>SiO₂: <span id="cond-SiO2">0.00 kg</span></span>
+                    <span>Mg: <span id="cond-Mg">0.00 kg</span></span>
+                    <span>Ca: <span id="cond-Ca">0.00 kg</span></span>
+                    <span>Cr: <span id="cond-Cr">0.00 kg</span></span>
+                    <span>Mn: <span id="cond-Mn">0.00 kg</span></span>
+                    <span>Ti: <span id="cond-Ti">0.00 kg</span></span>
+                    <span>Al: <span id="cond-Al">0.00 kg</span></span>
+                    <span>O₂: <span id="cond-O2">0.00 kg</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Energy & O₂ -->
+        <div class="section-card">
+            <h3>Energy &amp; Oxygen</h3>
+            <div id="energy-display" class="energy-grid">
+                <div>This hour: <span id="energy-hour">0.000 kWh</span></div>
+                <div><strong>Cumulative: <span id="energy-cumulative">0.0 kWh</span></strong></div>
+                <div>O₂ produced: <span id="oxygen-total">0.00 kg</span></div>
+            </div>
+        </div>
+
+        <!-- Mass Balance -->
+        <div class="section-card">
+            <h3>Mass Balance</h3>
+            <div class="energy-grid">
+                <div>Error: <span id="mass-error">0.000%</span></div>
+            </div>
+        </div>
+
+        <!-- Campaign Summaries (populated during simulation) -->
+        <div id="campaign-summaries" class="section-card" style="display:none">
+            <h3>Campaign Summaries</h3>
+        </div>
+
+        <!-- Assumptions disclosure triangles -->
+        <div class="section-card">
+            <h3>Assumptions &amp; Parameters</h3>
+            <div id="assumptions">
+                <details hx-get="/partials/disclosure/furnace"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>Overall Refinery Parameters</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C0"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C0 — Vacuum Bakeoff</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C2A_continuous"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C2A — Continuous Adaptive pN&#x2082; Ramp (Path A)</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C2B"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C2B — pO&#x2082;-Managed Fe Pyrolysis (Path B)</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C3"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C3 — Na/K Metallothermic Polish</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C4"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C4 — Mg Selective Pyrolysis</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C5"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C5 — Limited MRE</summary>
+                    <div>Loading...</div>
+                </details>
+                <details hx-get="/partials/disclosure/C6"
+                         hx-trigger="toggle once"
+                         hx-target="find div">
+                    <summary>C6 — Mg Thermite Reduction</summary>
+                    <div>Loading...</div>
+                </details>
+            </div>
+        </div>
+
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('web.static', filename='js/simulator-socket.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-ticks.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-decisions.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-controls.js') }}"></script>
+{% endblock %}

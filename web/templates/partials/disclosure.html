@@ -1,0 +1,138 @@
+<div class="disclosure-content">
+{% if data %}
+    {% if data.label is defined %}
+    <p><strong>{{ data.label }}</strong></p>
+    {% endif %}
+
+    {% if section == 'C4' %}
+    <div class="campaign-control-inline">
+        <label>
+            Mg pyrolysis ceiling (&deg;C):
+            <input type="number" id="c4-max-temp" value="1670" min="1400" max="1900" step="10"
+                   class="ctrl-param" data-param="c4_max_temp">
+        </label>
+        <div class="config-hint">Higher &rarr; more Mg extracted, but melt freezes as refractories concentrate. Safety cap 1900&deg;C.</div>
+    </div>
+    {% endif %}
+
+    {% if data.temp_range_C is defined %}
+    <details>
+        <summary>Temperature Program (dT/dt)</summary>
+        <table class="param-table">
+            <tr><td>Temperature range</td><td>{{ data.temp_range_C[0] }} – {{ data.temp_range_C[1] }} &deg;C</td></tr>
+            {% if data.dT_dt_C_per_hr is defined %}
+            <tr><td>Ramp rate</td><td>{{ data.dT_dt_C_per_hr }} &deg;C/hr</td></tr>
+            {% endif %}
+            {% if data.duration_h is defined %}
+            <tr><td>Duration</td><td>{{ data.duration_h }} hours</td></tr>
+            {% endif %}
+        </table>
+    </details>
+    {% endif %}
+
+    {% if data.pO2_mbar is defined or data.atmosphere is defined %}
+    <details>
+        <summary>Overhead Pressure (pO&#x2082; range)</summary>
+        <table class="param-table">
+            {% if data.atmosphere is defined %}
+            <tr><td>Atmosphere</td><td>{{ data.atmosphere }}</td></tr>
+            {% endif %}
+            {% if data.pO2_mbar is defined %}
+            <tr><td>pO&#x2082; range</td><td>{{ data.pO2_mbar }} mbar</td></tr>
+            {% endif %}
+            {% if data.p_total_mbar is defined %}
+            <tr><td>Total pressure</td><td>{{ data.p_total_mbar }} mbar</td></tr>
+            {% endif %}
+        </table>
+    </details>
+    {% endif %}
+
+    {% if data.products is defined %}
+    <details>
+        <summary>Products</summary>
+        <table class="param-table">
+            {% for product, info in data.products.items() %}
+            <tr>
+                <td>{{ product }}</td>
+                <td>
+                    {% if info is mapping and info.mass_kg is defined %}
+                        {{ info.mass_kg }} kg
+                    {% elif info is mapping and info.mass_g is defined %}
+                        {{ info.mass_g }} g
+                    {% else %}
+                        {{ info }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </details>
+    {% endif %}
+
+    {% if data.endpoint is defined %}
+    <details>
+        <summary>Endpoint Criteria</summary>
+        <p>{{ data.endpoint }}</p>
+    </details>
+    {% endif %}
+
+    {% if data.notes is defined %}
+    <details>
+        <summary>Notes</summary>
+        <p>{{ data.notes }}</p>
+    </details>
+    {% endif %}
+
+    {% if section in ['C0', 'C2A_continuous', 'C2B', 'C3', 'C4', 'C5', 'C6'] %}
+    <div class="campaign-controls-section">
+        <h4 class="ctrl-heading">Adjust</h4>
+        <div class="campaign-controls" data-campaign="{{ section }}">
+            <div class="ctrl-row">
+                <label>
+                    Ramp rate (&deg;C/hr):
+                    <input type="number" min="1" max="100" step="1"
+                           class="campaign-ctrl" data-field="ramp_rate"
+                           placeholder="default">
+                </label>
+            </div>
+            <div class="ctrl-row">
+                <label>
+                    pO&#x2082; target (mbar):
+                    <select class="campaign-ctrl" data-field="pO2_mbar">
+                        <option value="">Default</option>
+                        <option value="0.001">Hard vacuum (0.001)</option>
+                        <option value="0.2">Low (0.2)</option>
+                        <option value="1.0">Medium (1.0)</option>
+                        <option value="5.0">High (5.0)</option>
+                        <option value="50.0">MRE backpressure (50)</option>
+                    </select>
+                </label>
+            </div>
+            <div class="ctrl-row">
+                <label>
+                    Inductive stirring:
+                    <select class="campaign-ctrl" data-field="stir_factor">
+                        <option value="">Default (6&times;)</option>
+                        <option value="8">High (8&times;)</option>
+                        <option value="6">Medium (6&times;)</option>
+                        <option value="4">Low (4&times;)</option>
+                        <option value="1">Off (1&times;)</option>
+                    </select>
+                </label>
+            </div>
+            <div class="ctrl-row">
+                <label>
+                    Max duration (hrs, 0=default):
+                    <input type="number" min="0" max="100" step="1"
+                           class="campaign-ctrl" data-field="max_hours"
+                           placeholder="default">
+                </label>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+{% else %}
+    <p>No parameters loaded for this section.</p>
+{% endif %}
+</div>

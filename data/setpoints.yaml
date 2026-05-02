@@ -1,0 +1,883 @@
+# ============================================================================
+# Oxygen Shuttle -- Simulator Setpoints & Condensation Train Configuration
+# ============================================================================
+# Single source of truth for the regolith-pyrolysis-simulator.
+# All values for 1-tonne mature low-Ti mare batch unless noted.
+# Yields are practical ranges for typical mare
+#   (Fe ~93 kg/t, Ti ~18 kg/t, SiO2 ~460 kg/t).
+#
+# Source: context-setpoints.yaml v2 + context-core.md + context-thermo.md
+# ============================================================================
+
+# ============================================================================
+# 1. CAMPAIGNS
+# ============================================================================
+campaigns:
+
+  # --------------------------------------------------------------------------
+  # C0 -- Vacuum Bakeoff & Volatile Recovery
+  # --------------------------------------------------------------------------
+  C0:
+    label: "Vacuum Bakeoff & Volatile Recovery"
+    temp_range_C: [20, 950]
+    dT_dt_C_per_hr: 50
+    atmosphere: "hard_vacuum"
+    pO2_mbar: null                       # deep vacuum
+    target_species: ["H2O", "CO2", "S2", "CHNOPS"]
+    products:
+      volatiles:
+        mass_kg: [0.3, 1.0]
+        note: "CHNOPS from solar-wind implantation"
+      native_Fe:
+        mass_kg: 5.0                     # nanophase Fe0, magnetic separation, zero energy
+        note: "nanophase Fe0, magnetic separation, zero energy"
+    endpoint:
+      type: "ir_signal_decay"
+      threshold: 0.05
+    duration_h: "included_in_ramp"
+    notes: >
+      Volatile release complete by ~700 C; alkali onset >900 C
+      (thermally separated). Native Fe separated magnetically at
+      zero additional energy cost.
+
+  # --------------------------------------------------------------------------
+  # C0b -- Standardised P-Cleanup (mild oxidative hold)
+  # --------------------------------------------------------------------------
+  C0b_p_cleanup:
+    label: "Standardised P-Cleanup (Mild Oxidative Hold)"
+    activation_condition: >
+      default_recommended_for_all_lunar OR P2O5_wt_pct > 0.04
+      OR persistent_P_IR_after_1050C_vacuum_hold
+    beneficiation_preferred: true        # avoids absorbing O2 into metallic Fe
+    temp_range_C: [1180, 1320]
+    dT_dt_C_per_hr: null                 # isothermal hold; IR-endpoint controlled
+    atmosphere: "controlled_O2_flow"     # flow/sweep or mild bubbling
+    pO2_mbar: [3.0, 15.0]               # suppresses Na/K/SiO; only volatiles train open
+    target_species: ["PO", "POx"]
+    products:
+      phosphate_salts:
+        mass_kg: [0.2, 12.0]
+        note: "85-98% captured as clean Ca/Mg/alkali phosphates in 350-650 C trap"
+    O2_total_processed_kg_per_kg_P: [0.8, 2.5]
+    O2_net_bound_kg_per_kg_P: [0.15, 0.60]
+    endpoint:
+      type: "ir_signal_decay"
+      threshold: 0.05
+    duration_h: [0.5, 2.5]              # IR endpoint control
+    notes: >
+      Standardised mild oxidative P-cleanup for ALL lunar feedstocks
+      (mare, highland, SPA, PKT, PSR, etc.). Enables higher-T complete P
+      volatilisation with Na/K suppression. IR endpoint for adaptive
+      duration. Minimal overhead on low-P ores; full capability for KREEP.
+      Synergises with pO2-managed philosophy and beneficiation.
+      May need to cool afterwards before hard-vacuum C2A to avoid SiO release.
+
+  # --------------------------------------------------------------------------
+  # C2A -- Continuous Adaptive pN2 Ramp (Path A default)
+  #        Replaces deprecated separate C1 + C2A entries.
+  # --------------------------------------------------------------------------
+  C2A_continuous:
+    label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
+    activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
+    preferred_default: true
+    temp_range_C: [1050, 1600]           # single continuous metered ramp
+    dT_dt_C_per_hr:
+      early_ramp_1050_1320C: [10, 20]    # Na/K and early Fe regime
+      peak_SiO_window_1400_1600C: [5, 10]
+    atmosphere: "recirculating_inert_sweep"
+    carrier_gas: "pN2"                   # optimal; pHe or pAr fallback
+    p_total_mbar: [5, 15]               # optimal 8-12 mbar viscous-flow regime
+    pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
+    pO2_bar: "<1e-8"
+    flow_regime: "viscous"               # Kn << 0.01 at 1-10 mbar
+    target_species: ["Na", "K", "Fe", "SiO"]
+    adaptive_control:
+      law: >
+        Meter dT/dt to keep instantaneous outgassing flux (IR-monitored)
+        <= 60-80% of hot-wall pipe capacity (target 5-12 g/s SiO at peak)
+      sensors: >
+        Stage 0 hot-duct IR: Na 589 nm early, Fe 370 nm mid,
+        SiO 230 nm UV dominant >1400 C; plus upstream pressure
+      induction_stirring: "continuous 4-8x acceleration + 50-80 C cycling"
+    products:
+      Na:
+        mass_g: [2300, 4000]
+        note: "recyclable shuttle stock; quantitative collection"
+      K:
+        mass_g: [800, 1350]
+        note: "recyclable shuttle stock; quantitative collection"
+      Fe:
+        mass_kg: [85, 130]
+        condensation_T_C: [1100, 1400]
+      SiO2_glass:
+        mass_kg: [100, 160]
+        condensation_T_C: [900, 1200]
+        note: "fused silica on removable Stage 2 cartridge"
+      O2:
+        mass_kg: [48, 70]
+        note: "from Fe sorbent reheat"
+    recovery_NaK_pct: [88, 96]
+    SiO_transport_capacity_g_per_s: [7, 16]
+    hertz_knudsen_SiO_flux_g_per_m2s: [60, 70]   # at 1600 C, a(SiO2) ~1
+    endpoint:
+      type: "ir_signal_decay"
+      threshold: 0.05
+      species_monitored: ["Na", "K", "Fe", "SiO"]
+      SiO_target: "target a(SiO2) reduction reached"
+    duration_h: [18, 28]
+    downstream_impact: >
+      C3 cycles halved (0-1 K + 1 Na); C5 MRE scope reduced 20-40%;
+      8-20% shorter full batch
+    notes: >
+      Preferred default Path A implementation. Single continuous solar-thermal
+      ramp; no discrete holds or atmosphere switches. Hot-wall design
+      (Stage 0 duct >1400 C) prevents premature condensation. IR endpoint
+      control allows precise termination when target a(SiO2) reduction
+      is reached. Fully compatible with micro-g adaptations
+      (wicking/centrifugal condensers).
+
+  # --------------------------------------------------------------------------
+  # C2B -- pO2-Managed Fe Pyrolysis (Path B)
+  # --------------------------------------------------------------------------
+  C2B:
+    label: "pO2-Managed Fe Pyrolysis (Path B)"
+    activation_condition: "Path_B -- preserving CMAS glass for Material 1 or terminal ceramics"
+    temp_range_C: [1320, 1480]
+    dT_dt_C_per_hr: null                 # pO2-ramped with temperature
+    atmosphere: "controlled_O2"
+    pO2_mbar: [0.8, 2.3]                # ramped with temperature
+    target_species: ["Fe"]
+    products:
+      Fe:
+        mass_kg: [85, 130]
+      CMAS_glass:
+        note: "preserved in melt for tapping as Material 1"
+    co_partitioning: ["Ni", "Co", "Cu", "P"]   # partition into iron phase
+    product_quality: "low-alloy structural iron"
+    endpoint:
+      type: "ir_signal_decay"
+      threshold: 0.05
+      species_monitored: ["Fe"]
+    duration_h: null                     # IR-controlled
+    notes: >
+      Path B: 8-20% slower overall cycle if leaving SiO2 in the melt for
+      Material 1 or terminal ceramics recipes vs pN2 ramp. Use only when
+      glass preservation is required.
+
+  # --------------------------------------------------------------------------
+  # C3 -- Na/K Metallothermic Polish (Shuttle Cycles)
+  # --------------------------------------------------------------------------
+  C3:
+    label: "Na/K Metallothermic Polish"
+    sequencing: "STRICT K-first then Na (mixed alkali effect)"
+    K_phase:
+      name: "Remaining Fe + Si Conditioning"
+      T_inject_C: [1200, 1350]
+      T_bakeout_C: [1520, 1680]
+      pO2_bakeout_mbar: [0.5, 1.5]
+      K_per_cycle_kg: [18, 28]
+      K_recovery_per_cycle_pct: [75, 90]
+      cycles_after_pathA: [0, 1]
+      cycles_after_pathB: 2
+      targets: "residual Fe + SiO2 activity conditioning"
+      Fe_reduction_per_cycle_pct: [60, 80]
+      Si_conditioned_kg: [20, 40]
+    Na_phase:
+      name: "Ti + Final Conditioning"
+      T_inject_C: [1200, 1350]
+      T_bakeout_C: [1520, 1680]
+      pO2_bakeout_mbar: [0.5, 1.5]
+      Na_total_kg: [80, 140]             # over all cycles
+      Na_recovery_per_cycle_pct: [75, 92]
+      cycles_after_pathA: 1
+      cycles_after_pathB: 2
+      products:
+        Ti:
+          mass_g: [12000, 15000]
+          note: "65-85% of available; Na accessibility is key uncertainty"
+    Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # strongly stabilised in melt
+    delta_G_shift_kJ_per_mol: [50, 80]       # due to low activity coefficient
+    slag_solubility_limit_wt_pct: [8, 12]    # Na2O/K2O oxide equivalent
+    endpoint:
+      type: "pO2_return_to_setpoint"
+      hold_time_min: 30
+      species_monitored: ["Na", "K"]
+    duration_after_pathA_h: [10, 18]
+    duration_after_pathB_h_per_phase: [20, 35]
+    notes: >
+      Three-tier shuttle architecture. Each tier: inject reductant -> reduce
+      target oxide -> tap metal -> pO2 bakeout -> recover reductant.
+      Mixed alkali effect reduces diffusion up to 10x at equimolar --
+      strict K-first, Na-second sequencing mandatory.
+
+  # --------------------------------------------------------------------------
+  # C4 -- Mg Selective Pyrolysis (Branch Two)
+  # --------------------------------------------------------------------------
+  C4:
+    label: "Mg Selective Pyrolysis (Branch Two)"
+    temp_range_C: [1580, 1670]
+    dT_dt_C_per_hr: null                 # IR-controlled
+    atmosphere: "controlled_O2"
+    pO2_mbar: [0.08, 0.35]
+    target_species: ["Mg"]
+    Mg_vapour_pressure_bar_1600C: 0.5
+    prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
+    SiO_gunk_vs_vacuum: "10-40x lower"
+    products:
+      Mg:
+        mass_kg: [18, 42]
+        note: "35-65% of remaining Mg"
+    optional_Ca_harvest:
+      T_C: [1780, 1920]
+      pO2_mbar: [0.03, 0.12]
+      yield_pct: [15, 35]
+      note: "poor selectivity, marginal"
+      requires: "Furnace B at 1950-2050 C for serious Ca depletion"
+    pN2_variant:
+      note: "Under pN2 with pO2->0, MgO decomposition faster (no Le Chatelier)"
+      T_lower_C: [1500, 1580]           # Mg p_vap ~0.1 bar
+      pN2_mbar: [5, 12]
+      contraindication: "if residual SiO2 wanted for ceramics"
+    branch_one_fallback: "Skip C4; Mg electrolysed in C5 MRE"
+    energy_savings_kWh_per_t: [2050, 2750]   # combined Mg pyrolysis + Al thermite vs MRE
+    endpoint:
+      type: "ir_signal_decay"
+      threshold: "background"
+      species_monitored: ["Mg"]
+    duration_h: null                     # IR-controlled
+    notes: >
+      Branch Two preferred: C4 Mg pyrolysis + C6 Mg thermite. MRE <= 1.6 V,
+      ~1200-2000 kWh/t, electrode life 5-10x. Branch One fallback:
+      skip C4, MRE to 2.5 V for Mg+Al+Ca, ~2650-4050 kWh/t,
+      electrode life 2-3x.
+
+  # --------------------------------------------------------------------------
+  # C5 -- Limited MRE Under O2 Backpressure
+  # --------------------------------------------------------------------------
+  C5:
+    label: "Limited MRE Under O2 Backpressure"
+    temp_range_C: [1500, 1650]
+    dT_dt_C_per_hr: null                 # electrochemical; not ramp-driven
+    atmosphere: "O2_backpressure"
+    pO2_bar: [0.01, 0.1]                # total pyrolysis suppression
+    branch_two:
+      max_voltage_V: 1.6                 # or <=1.4 if retaining Ti for C6
+      electrical_kWh_per_t: [600, 1200]
+      targets: "Si as liquid metal (permanently removes SiO source)"
+    branch_one:
+      max_voltage_V: 2.5
+      electrical_kWh_per_t: [2650, 4050]
+      targets: ["Si", "Al", "Mg", "Ca"]
+    Si_Ti_selectivity: >
+      Imperfect; voltage hold at 1.3-1.4 V for high-Si,
+      ramp to 1.5-1.6 V for Ti-rich tap
+    Ti_retention_option: "Stop before Ti sweep -> C6 produces Al-Ti alloy"
+    electrode_materials:
+      anode: "Ir or Pt-alloy"
+      cathode: "Mo or W"
+      life_extension_branch_two: "5-10x"
+      life_extension_branch_one: "2-3x"
+    endpoint:
+      type: "current_decay"
+      threshold_A: 10
+      at_voltage: "target V setpoint"
+    duration_h: null                     # voltage-hold controlled
+    notes: >
+      O2 backpressure provides total pyrolysis suppression during
+      electrolysis. Branch Two is strongly preferred for electrode
+      longevity and energy budget.
+
+  # --------------------------------------------------------------------------
+  # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
+  # --------------------------------------------------------------------------
+  C6:
+    label: "Mg Thermite Reduction (Separate Solar Furnace)"
+    temp_range_C: [1500, 1700]
+    dT_dt_C_per_hr: null                 # reaction-controlled
+    atmosphere: "controlled_O2"          # bakeout atmosphere for Mg recovery
+    pO2_mbar: [0.08, 0.35]              # bakeout pO2
+    target_species: ["Al"]
+    reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
+    delta_G_kJ_per_mol_1600C: -110
+    Mg_density_g_per_cm3: 1.58
+    melt_density_g_per_cm3: [2.5, 2.8]
+    injection: "Mg rods via SiC bottom port; buoyancy-driven reaction column"
+    Mg_stoichiometric_draw_mare_kg: [50, 60]
+    Mg_recovery_per_bakeout_pct: [75, 85]
+    Mg_inventory_balance:
+      mare: "net positive (Mg-surplus)"
+      highland: "~neutral at >=80% recovery"
+      bootstrapping: "3-6 batches of C4 accumulation before first thermite"
+    back_reduction_cascade:
+      reaction: "4Al + 3SiO2 -> 2Al2O3 + 3Si"
+      note: "spontaneous separation by oxide stability"
+    self_terminating_liquidus:
+      ceiling_C: 1700
+      stalls_when: "residual SiO2 + Al2O3 < 15-20%"
+    terminal_slag:
+      mass_kg: [10, 15]
+      REE_wt_pct: [0.5, 1.0]
+      composition: "CaO-MgO with minor SiO2/Al2O3 (synthetic doloma)"
+    endpoint:
+      type: "self_terminating"
+      criterion: "liquidus exceeds 1700 C (residual SiO2+Al2O3 < 15-20%)"
+    duration_h: null                     # self-terminating
+    notes: >
+      Uses separate solar furnace. Self-terminating when residual
+      SiO2+Al2O3 falls below 15-20 wt% (liquidus exceeds ~1700 C).
+      Al-Ti alloy produced if TiO2 was retained from C5.
+      Mg bootstrapping: 3-6 C4 batches to accumulate 150-300 kg
+      inventory before first thermite run.
+
+
+# ============================================================================
+# 2. CONDENSATION TRAIN
+# ============================================================================
+condensation_train:
+
+  # --- Volatiles Train (C0 / C0b products) ---
+  volatiles_train:
+    gate_valve: true                     # isolates from metals train
+    stages:
+      - label: "CHNOPS cold traps"
+        temp_range_C: [50, 400]
+        products: ["H2O", "CO2", "S2", "hydrocarbons"]
+        note: "Solar-wind implanted volatiles from C0"
+      - label: "P-trap (C0b)"
+        temp_range_C: [350, 650]
+        material: "CaO/MgO sorbent bed"
+        products: ["phosphate_salts"]
+        capture_efficiency_pct: [85, 98]
+        note: "Clean Ca/Mg/alkali phosphates; active during C0b only"
+
+  # --- Metals Train (C2A/C2B through C6) ---
+  metals_train:
+
+    stage_0_hot_duct:
+      label: "Hot Duct with IR Spectroscopy"
+      temp_range_C: [1400, 1600]
+      material: "Doloma-REE ceramic (Material 3)"
+      max_service_T_C: 1750
+      ir_spectroscopy:
+        window: "sapphire"
+        monitored_lines:
+          Na: "589 nm"
+          K: "766 nm"
+          Fe: "370 nm"
+          SiO: "230 nm UV"
+        note: "Na 589 nm early, Fe 370 nm mid, SiO 230 nm UV dominant >1400 C"
+      compatibility: "Excellent with alkali and SiO"
+
+    stage_1_fe_condenser:
+      label: "Fe Condenser"
+      temp_range_C: [1100, 1400]
+      coating: "MZO (MgO-ZrO2)"
+      max_service_T_C: 1450
+      product: "liquid Fe draining to sump"
+      compatibility: "liquid Fe compatible"
+
+    stage_2_sio_zone:
+      label: "SiO Condensation Zone"
+      temp_range_C: [900, 1200]
+      material: "fused silica baffles (removable cartridge)"
+      max_service_T_C: 1300
+      product: "fused silica glass (SiO2 on SiO2 -- self-compatible)"
+      note: >
+        Only grams per campaign at >300x suppression under pO2 control;
+        100-160 kg under Path A pN2 sweep.
+      compatibility: "Self-compatible with condensate"
+
+    stage_3_alkali_mg_cyclone:
+      label: "Alkali / Mg Cyclone Separator"
+      temp_range_C: [350, 700]
+      condensation_temperatures_C:
+        Mg: [500, 650]
+        Na: [450, 550]
+        K: [400, 500]
+
+    stage_4_vortex_dust_filter:
+      label: "Vortex Dust Filter"
+      temp_range_C: [200, 350]
+
+    stage_5_turbine_compressor:
+      label: "Turbine-Compressor (Pressure Regulator)"
+      function: "pressure regulator + first-stage O2 compression"
+      control: "turbine speed sets upstream pO2; IR feedback loop"
+
+    stage_6_accumulator:
+      label: "O2 Accumulator"
+      storage: "compressed O2 gas at ~3 bar"
+      compression_energy_kWh_per_t: [15, 30]
+
+
+# ============================================================================
+# 3. DECISION TREE
+# ============================================================================
+decision_tree:
+
+  path_selection:
+    description: "Campaign 2 path choice"
+    options:
+      Path_A:
+        label: "Continuous Adaptive pN2 Ramp (default)"
+        campaign: "C2A_continuous"
+        condition: "SiO2 extraction desired (most feedstocks)"
+        products: ["Fe", "fused_silica_glass"]
+        downstream_effects:
+          - "C3 scope halved (0-1 K + 1 Na cycles)"
+          - "C5 MRE scope reduced 20-40%"
+          - "8-20% shorter full batch cycle"
+        preferred: true
+        note: >
+          Default unless preserving CMAS glass for industrial
+          glass or terminal ceramics recipes
+      Path_B:
+        label: "pO2-Managed Fe Pyrolysis"
+        campaign: "C2B"
+        condition: "CMAS glass preservation required"
+        products: ["Fe", "CMAS_glass_preserved"]
+        downstream_effects:
+          - "C3 full scope required"
+          - "8-20% longer overall cycle"
+
+  branch_selection:
+    description: "Campaign 4+ branch choice"
+    options:
+      Branch_Two:
+        label: "C4 Mg Pyrolysis + C6 Mg Thermite (preferred)"
+        campaigns: ["C4", "C5_limited", "C6"]
+        C5_max_voltage_V: 1.6
+        electrical_kWh_per_t: [1200, 2000]
+        electrode_life_factor: "5-10x"
+        preferred: true
+      Branch_One:
+        label: "Skip C4, Full MRE (fallback)"
+        campaigns: ["C5_full"]
+        C5_max_voltage_V: 2.5
+        electrical_kWh_per_t: [2650, 4050]
+        electrode_life_factor: "2-3x"
+
+  C5_Ti_retention_option:
+    description: "Optional Ti retention in C5"
+    criterion: "Stop MRE before Ti sweep voltage (1.5-1.6 V)"
+    effect: "C6 produces Al-Ti alloy instead of pure Al"
+
+  guidance:
+    - priority: "Maximum throughput / electrode life / fused silica"
+      path: "A"
+      branch: "Two"
+      rationale: "8-20% faster, halved C3, 5-10x electrode life"
+    - priority: "Structural CMAS glass or specific ceramics recipes"
+      path: "B"
+      branch: "Two"
+      rationale: "Preserves melt for direct tapping as Material 1"
+    - priority: "Minimal electrical power budget"
+      path: "A"
+      branch: "Two"
+      rationale: "Lowest total kWh/t"
+    - priority: "Al-Ti alloy production"
+      path: "A or B (stop C5 before Ti)"
+      branch: "Two"
+      rationale: "Retain TiO2 for thermite"
+    - priority: "Bootstrapping phase (first 3-6 batches)"
+      path: "A"
+      branch: "Two"
+      rationale: "Maximises early Mg harvest for C6 inventory"
+
+
+# ============================================================================
+# 4. ENDPOINT CRITERIA
+# ============================================================================
+endpoint_criteria:
+
+  general: >
+    IR spectroscopy (Stage 0 hot-duct sapphire window)
+    + pressure stabilisation + cumulative mass loss.
+    Model-predictive or PID with IR + pressure feedback;
+    induction stirring ensures surface renewal.
+
+  species_lines:
+    Na:
+      wavelength_nm: 589
+    K:
+      wavelength_nm: 766
+    Fe:
+      wavelength_nm: 370
+    SiO:
+      wavelength_nm: 230
+      band: "UV"
+      note: "dominant >1400 C"
+    O2:
+      method: "derived from turbine speed"
+
+  termination_rules:
+    C0:
+      criterion: "volatile IR signals decay to <5% peak"
+    C0b_p_cleanup:
+      criterion: "P-species IR signals decay to <5% peak"
+    C2A_continuous:
+      criterion: >
+        Na/K/Fe signals decay to <5% peak;
+        SiO signal reaches target a(SiO2) reduction
+    C2B:
+      criterion: "Fe signal decays to <5% peak"
+    C3:
+      criterion: "Alkali bakeout pO2 returns to setpoint and holds for 30 min"
+    C4:
+      criterion: "Mg vapor signal decays to background"
+    C5:
+      criterion: "Voltage hold + current decay to <10 A at target V"
+    C6:
+      criterion: >
+        Self-terminating when liquidus >1700 C
+        (residual SiO2+Al2O3 < 15-20%)
+
+  control:
+    method: "Model-predictive or PID"
+    feedback: ["IR_spectroscopy", "pressure"]
+    surface_renewal: "induction stirring (4-8x rate acceleration)"
+
+
+# ============================================================================
+# 5. pO2 CONTROL METHODS
+# ============================================================================
+pO2_control_methods:
+
+  general: >
+    Closed-loop via Stage 5 turbine speed + variable O2 bleed
+    or electrochemical pump.
+
+  precision_mbar: [0.1, 0.3]            # in viscous regime
+  sensors: ["IR-derived pO2", "turbine RPM feedback"]
+
+  methods_by_campaign:
+    C0:
+      method: "hard vacuum (no pO2 control needed)"
+      pO2_bar: null
+    C0b_p_cleanup:
+      method: "controlled O2 flow/sweep or mild bubbling"
+      pO2_mbar: [3.0, 15.0]
+    C2A_continuous:
+      method: "Fe-granule sorbent only (pO2 -> 0)"
+      pO2_bar: "<1e-8"
+    C2B:
+      method: "Fe-granule sorbent + precision O2 micro-bleed to target"
+      pO2_mbar: [0.8, 2.3]
+    C3:
+      method: "Fe-granule sorbent + precision O2 micro-bleed to target"
+      pO2_mbar: [0.5, 1.5]
+    C4:
+      method: "Fe-granule sorbent + precision O2 micro-bleed to target"
+      pO2_mbar: [0.08, 0.35]
+    C5:
+      method: "O2 backpressure from accumulator"
+      pO2_bar: [0.01, 0.1]
+    C6:
+      method: "Fe-granule sorbent + precision O2 micro-bleed to target"
+      pO2_mbar: [0.08, 0.35]
+    Mars_merged:
+      method: "Natural CO2 dissociation + regulated flow"
+      note: "no deep vacuum possible; ~6 mbar surface pressure"
+
+
+# ============================================================================
+# 6. FURNACE
+# ============================================================================
+furnace:
+
+  solar_concentrator:
+    aperture_m2: 100
+    lunar_insolation_W_per_m2: 1361
+    thermal_power_kW: 136
+
+  crucible:
+    diameter_m: 0.5
+    melt_surface_area_m2: 0.2
+
+  hot_wall_pipe:
+    diameter_cm: [10, 20]
+    typical_cm: 12
+
+  bottom_tap:
+    material: "SiC-lined"
+    design: "freeze-valve"
+    function: "drain/injection dual-purpose"
+
+  induction_stirring:
+    rate_acceleration_factor: [4, 8]
+    thermal_cycling_C: [50, 80]
+    note: "continuous; ensures surface renewal for evaporation kinetics"
+
+  melt_viscosity:
+    FeO_fluxed_basalt_Pa_s: [3, 10]      # fresh C2 melt
+    Fe_depleted_aluminosilicate: "higher; better for electrode stability"
+
+  total_batch_time_days: [4, 9]
+  total_electrical_kWh_per_t_branch_two: [1200, 2000]
+
+
+# ============================================================================
+# 7. REFRACTORY COMPATIBILITY
+# ============================================================================
+refractory_compatibility:
+
+  zones:
+    - zone: "Stage 0 hot duct"
+      material: "Doloma-REE ceramic"
+      max_T_C: 1750
+      compatibility: "Excellent with alkali and SiO"
+
+    - zone: "Stage 1 Fe condenser"
+      material: "MZO (MgO-ZrO2) coating"
+      max_T_C: 1450
+      compatibility: "Liquid Fe compatible"
+
+    - zone: "Stage 2 SiO2 capture"
+      material: "Removable fused silica"
+      max_T_C: 1300
+      compatibility: "Self-compatible with condensate"
+
+    - zone: "Main crucible / tap"
+      material: "Mo-lined or SiC freeze-valve"
+      max_T_C: 1700
+      compatibility: "Induction + Mg injection OK"
+
+    - zone: "C5 electrodes"
+      material: "Ir/Pt anode, Mo/W cathode"
+      max_T_C: 1650
+      compatibility: "Branch Two extends life 5-10x"
+
+  general_rule: >
+    Avoid long-term silica exposure to alkali vapors or
+    high pO2 above 1400 C.
+
+
+# ============================================================================
+# 8. MRE VOLTAGE SEQUENCE
+# ============================================================================
+mre_voltage_sequence:
+
+  description: >
+    Electrochemical decomposition voltage sequence for molten regolith
+    electrolysis (C5). Species reduced in order of increasing voltage.
+    Values per mol O2 at ~1600 C.
+
+  electrode_materials:
+    anode: "Ir or Pt-alloy"
+    cathode: "Mo or W"
+
+  sequence:
+    - species: "Na2O"
+      decomposition_V: "<0.5"
+      campaign: "C5 opening"
+      note: "alkali recovery; should be pre-depleted by C3"
+
+    - species: "K2O"
+      decomposition_V: "<0.5"
+      campaign: "C5 opening"
+      note: "alkali recovery; should be pre-depleted by C3"
+
+    - species: "FeO"
+      decomposition_V: 0.6
+      campaign: "C5"
+      note: "should be pre-depleted by C2/C3"
+
+    - species: "Cr2O3"
+      decomposition_V: [0.8, 1.0]
+      campaign: "C5 trace cleanup"
+
+    - species: "V2O5"
+      decomposition_V: [0.8, 1.0]
+      campaign: "C5 trace cleanup"
+
+    - species: "MnO"
+      decomposition_V: [0.8, 1.0]
+      campaign: "C5 trace cleanup"
+
+    - species: "SiO2"
+      decomposition_V: 1.4
+      campaign: "C5 primary target"
+      note: "Si as liquid metal; permanently removes SiO source"
+
+    - species: "TiO2"
+      decomposition_V: 1.5
+      campaign: "C5 sweep"
+      note: "optional -- retain for C6 Al-Ti alloy by stopping before this voltage"
+
+    - species: "Al2O3"
+      decomposition_V: 1.9
+      campaign: "C5 Branch One only"
+
+    - species: "MgO"
+      decomposition_V: 2.2
+      campaign: "C5 Branch One only"
+
+    - species: "CaO"
+      decomposition_V: 2.5
+      campaign: "C5 Branch One only (or dedicated batch)"
+
+  voltage_strategy:
+    branch_two:
+      hold_V: [1.3, 1.4]
+      purpose: "high-Si extraction"
+      ramp_V: [1.5, 1.6]
+      ramp_purpose: "Ti-rich tap"
+      max_V: 1.6
+    branch_one:
+      max_V: 2.5
+      purpose: "Si + Al + Mg + Ca"
+
+
+# ============================================================================
+# 9. THERMODYNAMIC REFERENCE (Ellingham at 1600 C)
+# ============================================================================
+ellingham_1600C:
+  description: "Standard-state delta-G_f per mol O2 at 1600 C (more negative = more stable)"
+  values:
+    Na2O_kJ_per_mol_O2: -320
+    K2O_kJ_per_mol_O2: -320
+    FeO_kJ_per_mol_O2: -370
+    Cr2O3_kJ_per_mol_O2: -500
+    SiO2_kJ_per_mol_O2: -560
+    TiO2_kJ_per_mol_O2: -580
+    Al2O3_kJ_per_mol_O2: -720
+    ZrO2_kJ_per_mol_O2: -780
+    MgO_kJ_per_mol_O2: -830
+    CaO_kJ_per_mol_O2: -900
+  critical_crossing: >
+    MgO (-830) is below Al2O3 (-720) -> Mg can reduce Al2O3.
+    This is the thermodynamic basis for C6 thermite reduction.
+
+
+# ============================================================================
+# 10. VAPOUR PRESSURES (key operating parameters)
+# ============================================================================
+vapour_pressures:
+  description: "Metal vapour pressures at process temperatures"
+  values:
+    - species: "Na"
+      T_C: 1600
+      p_vap: "several bar"
+      note: ">> any pO2 setpoint"
+    - species: "K"
+      T_C: 1600
+      p_vap: "> Na (more volatile)"
+      note: ">> any pO2 setpoint"
+    - species: "Fe"
+      T_C: [1400, 1600]
+      p_vap_mbar: [0.01, 0.1]
+      note: "adequate for selective harvest"
+    - species: "Mg"
+      T_C: 1600
+      p_vap_bar: 0.5
+      note: ">> pO2 setpoints"
+    - species: "Mg"
+      T_C: [1500, 1580]
+      p_vap_bar: 0.1
+      note: "workable under pN2 variant"
+    - species: "Ca"
+      bp_C: 1484
+      note: "significant above ~1500 C"
+    - species: "Al"
+      bp_C: 2519
+      note: "negligible <2500 C; not pyrolysable"
+    - species: "Si"
+      p_vap: "negligible"
+      note: "extracted only by MRE"
+    - species: "SiO"
+      T_C: 1600
+      p_vap_mbar: [0.5, 2.0]
+      condition: "vacuum"
+      note: "the problem species"
+    - species: "SiO"
+      T_C: 1600
+      p_vap_mbar: "<0.005"
+      condition: "1 mbar O2 backpressure"
+      note: "suppressed >300x"
+
+  SiO_suppression:
+    law: "p(SiO) = K(T) * a(SiO2) / sqrt(pO2)"
+    at_hard_vacuum_pO2_bar: 1.0e-9
+    at_1mbar_pO2_bar: 1.0e-3
+    suppression_factor_theoretical: 1000
+    suppression_factor_conservative: 300  # accounts for non-ideality
+
+
+# ============================================================================
+# 11. MASS BALANCE (mare, Branch Two, per tonne)
+# ============================================================================
+mass_balance:
+  feedstock_kg: 1000
+  metals_total_kg: [530, 600]
+  metals_breakdown:
+    Fe_kg: [85, 130]
+    Ti_kg: [12, 15]
+    Mg_kg: [18, 42]
+    Si_kg: [30, 100]
+    Al_kg: [65, 80]
+  O2_kg: [380, 440]
+  terminal_slag_kg: [10, 15]
+  terminal_slag_REE_wt_pct: [0.5, 1.0]
+  process_losses_kg: [5, 15]
+
+
+# ============================================================================
+# 12. KINETIC PARAMETERS
+# ============================================================================
+kinetic_parameters:
+
+  hertz_knudsen:
+    SiO_at_1600C_a_SiO2_unity:
+      flux_g_per_m2s: [60, 70]
+    crucible_0p2_m2:
+      theoretical_max_g_per_s: 13
+    hot_wall_pipe_12cm_10mbar_N2:
+      transport_limit_g_per_s: [7, 16]
+
+  N2_inventory_g: [1, 2]                # in recirculating system
+
+  SiO2_strip_duration_h: [4, 8]         # for 50% SiO2 removal (Path A)
+
+  induction_stirring:
+    acceleration_factor: [4, 8]          # vs static melts
+    thermal_cycling_C: [50, 80]          # continuous surface renewal
+
+  condensation_boiling_points_C:
+    K_bp: 759
+    Na_bp: 883
+
+
+# ============================================================================
+# 13. MRE STEPPED VOLTAGE HOLDS (Simulator control sequence)
+# ============================================================================
+mre_stepped_voltage_holds:
+  description: >
+    Stepped voltage hold schedule for MRE_BASELINE and C5 campaigns.
+    At each voltage step, hold until target species current decays
+    below 5% of applied current, then advance to next step.
+    C5 limited MRE uses only steps up to 1.6 V.
+  sequence:
+    - voltage: 0.6
+      species: [FeO]
+      min_hold_hours: 3
+    - voltage: 0.9
+      species: [Cr2O3]
+      min_hold_hours: 2
+    - voltage: 1.0
+      species: [MnO]
+      min_hold_hours: 2
+    - voltage: 1.4
+      species: [SiO2]
+      min_hold_hours: 5
+    - voltage: 1.5
+      species: [TiO2]
+      min_hold_hours: 3
+    - voltage: 1.9
+      species: [Al2O3]
+      min_hold_hours: 8
+    - voltage: 2.2
+      species: [MgO]
+      min_hold_hours: 5
+    - voltage: 2.5
+      species: [CaO]
+      min_hold_hours: 10

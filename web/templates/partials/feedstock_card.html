@@ -1,0 +1,42 @@
+<div class="feedstock-card">
+    <h4>{{ feedstock.label if feedstock.label is defined else key }}</h4>
+    {% if feedstock.source is defined %}
+    <p class="feedstock-source">Source: {{ feedstock.source }}</p>
+    {% endif %}
+    {% if feedstock.confidence is defined %}
+    <p class="feedstock-confidence">Confidence: {{ feedstock.confidence }}</p>
+    {% endif %}
+
+    {% if feedstock.composition_wt_pct is defined %}
+    <table class="composition-table">
+        <thead>
+            <tr><th>Oxide</th><th>wt%</th>
+            {% if feedstock.composition_ranges is defined %}<th>Range</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for oxide, value in feedstock.composition_wt_pct.items() %}
+            <tr>
+                <td>{{ oxide }}</td>
+                <td>{{ "%.2f"|format(value) }}</td>
+                {% if feedstock.composition_ranges is defined and oxide in feedstock.composition_ranges %}
+                <td class="range">{{ feedstock.composition_ranges[oxide][0] }}–{{ feedstock.composition_ranges[oxide][1] }}</td>
+                {% elif feedstock.composition_ranges is defined %}
+                <td class="range">—</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if feedstock.key_feature is defined %}
+    <p class="feedstock-feature"><strong>Key feature:</strong> {{ feedstock.key_feature }}</p>
+    {% endif %}
+    {% if feedstock.preferred_for is defined %}
+    <p class="feedstock-preferred"><strong>Preferred for:</strong> {{ feedstock.preferred_for }}</p>
+    {% endif %}
+    {% if feedstock.process_notes is defined %}
+    <p class="feedstock-notes"><strong>Process notes:</strong> {{ feedstock.process_notes }}</p>
+    {% endif %}
+</div>
