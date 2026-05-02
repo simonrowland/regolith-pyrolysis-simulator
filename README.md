@@ -8,13 +8,9 @@ This package explores that control problem. It compares hard vacuum, Mars backpr
 
 It is a process-modeling workbench, which computes molten-reolith pyrolysis workflows using alphaMELTS, PetThermoTools, and Ellingham diagrams.
 
+Author: Simon Rowland, simon@simonrowland.com.
+
 ## Why This Exists
-
-Current In-Situ Resource Utilisation (ISRU) literature is focused on MRE, hydrogen reduction, halide reduction, or carbothermal reduction. Those processes are useful, but MRE in particular is electrically-intensive and forces the whole melt inventory through electrodes and corrosion-limited hardware. By using pyrolysis to simply extract alkalis and iron beforehand to condition the melt for MRE, it is possible to save energy and signficantly reduce corrosion. The simulator also shows that end-to-end workflows can extract most of the useful metal content of the sample feedstocks, supporting reoglith pyrolisys as a core, self-bootstrapping path for metals, glass, ceramics and oxygen production in space.
-
-This simulator seeks to answer the question:
-
-> How much useful refining can be done with solar-concentrator heat by using overhead pressure control, before spending large amounts of electrical power?
 
 The process model uses geologist-standard melt libraries to demonstrates five linked ideas:
 
@@ -22,7 +18,11 @@ The process model uses geologist-standard melt libraries to demonstrates five li
 - Overhead pO2 is a key Ellingham process control variable, working alongside temparature and pressure to offer targeted extraction.
 - SiO boiloff (noted in recent literature) can be suppressed or redirected by pressure management instead of accepted as a hard-vacuum mess.
 - Regolith pyrolysis can be used as MRE pretreatment, producing useful material streams while making later electrolysis less hostile.
-- Ca or Mg thermite-style reduction can further process terminal ceramics, for example to enrich REE in terminal products.
+- Mg thermite-style reduction can further process terminal ceramics, for example to enrich REE in terminal products.
+
+Current In-Situ Resource Utilisation (ISRU) literature is focused on MRE, hydrogen reduction, halide reduction, or carbothermal reduction. Those processes are useful, but MRE in particular is electrically-intensive and forces the whole melt inventory through electrodes and corrosion-limited hardware. By using pyrolysis to extract alkalis and iron beforehand to condition the melt for MRE, it is possible to save energy and signficantly reduce corrosion.
+
+This simulator seeks to answer the question: How much useful refining can be done with solar-concentrator heat by using overhead pressure control, before spending large amounts of electrical power? We end-to-end workflows that can extract most of the useful metal content of the sample feedstocks, supporting reoglith pyrolisys as a core, self-bootstrapping path for metals, glass, ceramics, and oxygen production in space.
 
 ## What It Models
 
@@ -30,12 +30,13 @@ The simulator tracks a staged refinery path for one-tonne-class feedstock batche
 
 - Stage 0 bakeoff: water, CO2, sulfur, halides, CHNOPS, perchlorates, and other volatiles.
 - Pressure-managed pyrolysis: Na, K, Fe, Mg, SiO, and oxygen-bearing vapor behavior under hard vacuum, CO2 backpressure, N2 sweep, or pO2 control.
+- Na/K oxygen shuttle loop produces a proportion of fully-reduced metals that can be tapped directly, while improving glass as an intermediate product.
 - SiO suppression: pO2 shifts the SiO2 -> SiO + 1/2 O2 equilibrium and reduces the driving force for silica boiloff.
 - Gas train behavior: overhead pressure, pipe conductance, turbine load, venting, accumulator flow, and ramp throttling.
 - Condensation train products: staged collection of metals, SiO/silica, alkalis, oxygen, salts, and volatile streams.
-- Glass: Production of useful ceramics and various grades of glass
-- MRE comparison: limited or baseline molten regolith electrolysis after thermal pretreatment.
-- Shuttle and thermite steps: Na/K metallothermic cleanup and Mg thermite reduction for aluminum-rich residues.
+- Glass: Production of various grades of glass and a range of useful ceramics, including premium REE-enriched terminal ceramics.
+- MRE comparison: limited or baseline molten regolith electrolysis after pyrolysis pretreatment.
+- Final thermite steps: pyrolysis-extracted Mg can be used to further reduce the refractory ceramic remaining after prior pyrolysis or electrolysis.
 
 The result is a live process dashboard rather than a static calculator: temperature, pressure, evaporation flux, product inventory, oxygen budget, and mass balance evolve through the run.
 
@@ -49,11 +50,11 @@ Lunar mare and highland materials show the baseline tradeoff: oxygen and iron ar
 
 ### Asteroid Feedstocks
 
-Asteroid cases highlight that the "regolith refinery" is not always an oxygen plant first. M-type material can be an Fe-Ni-Co alloy source with silicate byproduct. S-type and C-type material change volatile, sulfur, metal, and magnesium opportunities. The simulator is structured to show which streams are products and which become gas-handling problems.
+Asteroid cases cover the range of feedstock types, including S-tyle feedstock very similar to lunar regolith. M-type material can be an Fe-Ni-Co alloy source with silicate byproduct. C-type material change volatile, sulfur, metal, and magnesium opportunities. The simulator is structured to integrate volatile processing, and to extract sulphates and phosphates in C-type feedstocks early to converge the later pipeline stages into a pure basalt problem.
 
 ### Mars Feedstocks
 
-Mars is not hard vacuum. Mars basalt, sulfate-rich soils, phyllosilicates, and perchlorate-bearing material run with a CO2 pressure floor. That changes Stage 0, SiO suppression, sulfur/chlorine handling, salt traps, scrubbers, CO/CO2 behavior, and pump requirements. Mars backpressure is therefore modeled as part of the process, not as an afterthought.
+Mars is not an ambient vacuum, and benefits from additional reduction as a melt conditioning step. Mars basalt, sulfate-rich soils, phyllosilicates, and perchlorate-bearing material run with a CO2 pressure floor. That changes Stage 0, SiO suppression, sulfur/chlorine handling, salt traps, scrubbers, CO/CO2 behavior, and pump requirements. Mars backpressure is therefore modeled as part of the process, not as an afterthought.
 
 ## Materials the Model Tries to Expose
 
