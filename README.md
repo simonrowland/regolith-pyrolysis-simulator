@@ -139,6 +139,15 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## Public Docs
+
+- [Architecture](docs/architecture.md)
+- [Process Model](docs/process-model.md)
+- [Feedstocks](docs/feedstocks.md)
+- [Melt Backends](docs/melt-backends.md)
+- [Model Limitations](docs/model-limitations.md)
+- [Developer Map](docs/developer-map.md)
+
 ## Source Layout
 
 - `simulator/state.py` — shared constants, enums, and dataclasses.
