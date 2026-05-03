@@ -1,6 +1,6 @@
 # Regolith Pyrolysis Simulator
 
-Interactive simulator for a solar-thermal regolith refinery that models controlled overhead oxygen pressure to make vacuum pyrolysis and molten regolith electrolysis (MRE) workflows more practical for extracting metals, glass and ceramics from sample reolith feedstock profiles for the Moon, Mars, and asteriods.
+Interactive simulator for a solar-thermal regolith refinery that models controlled overhead oxygen pressure to make vacuum pyrolysis and molten regolith electrolysis (MRE) workflows more practical for extracting metals, glass and ceramics from sample regolith feedstock profiles for the Moon, Mars, and asteriods.
 
 The core idea is simple: regolith pyrolysis is attractive because sunlight can provide most of the heat, but hard-vacuum pyrolysis can turn silica into SiO vapor. SiO boiloff can foul ducts, condensers, windows, turbines, and product streams. A small managed oxygen backpressure can suppress SiO formation while still allowing useful volatile and metal extraction. The same pretreatment can also condition melts before molten regolith electrolysis (MRE), reducing volatile load, alkali load, iron load, and corrosive offgas exposure to make MRE more practical and economical.
 
