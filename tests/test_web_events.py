@@ -37,7 +37,7 @@ def test_launcher_does_not_allow_unsafe_werkzeug_on_public_host(monkeypatch):
     call = {}
 
     monkeypatch.setenv("REGOLITH_HOST", "0.0.0.0")
-    monkeypatch.setenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", "1")
+    monkeypatch.delenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", raising=False)
     monkeypatch.delenv("REGOLITH_FLASK_DEBUG", raising=False)
     monkeypatch.setattr(app_module, "create_app", lambda: object())
 
@@ -53,6 +53,13 @@ def test_launcher_does_not_allow_unsafe_werkzeug_on_public_host(monkeypatch):
     assert call["allow_unsafe_werkzeug"] is False
 
 
+def test_launcher_rejects_legacy_unsafe_env(monkeypatch):
+    monkeypatch.setenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", "1")
+
+    with pytest.raises(SystemExit, match="no longer supported"):
+        app_module.main()
+
+
 def test_launcher_rejects_public_debug_host(monkeypatch):
     monkeypatch.setenv("REGOLITH_HOST", "0.0.0.0")
     monkeypatch.setenv("REGOLITH_FLASK_DEBUG", "1")
@@ -66,6 +73,22 @@ def test_launcher_rejects_invalid_port(monkeypatch):
 
     with pytest.raises(SystemExit, match="REGOLITH_PORT"):
         app_module.main()
+
+
+def test_launcher_rejects_out_of_range_port(monkeypatch):
+    monkeypatch.setenv("REGOLITH_PORT", "70000")
+
+    with pytest.raises(SystemExit, match="1..65535"):
+        app_module.main()
+
+
+@pytest.mark.parametrize("host", ["[127.0.0.1", "127.0.0.1]", "[]localhost"])
+def test_loopback_detection_rejects_malformed_brackets(host):
+    assert app_module._is_loopback_host(host) is False
+
+
+def test_loopback_detection_accepts_bracketed_ipv6_loopback():
+    assert app_module._is_loopback_host("[::1]") is True
 
 
 def test_replacing_simulation_state_stops_prior_run():

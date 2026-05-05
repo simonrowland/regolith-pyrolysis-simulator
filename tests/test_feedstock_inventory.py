@@ -374,7 +374,7 @@ def test_stage0_formula_final_temp_cannot_exceed_stage0_range():
         sim.load_batch("comet", mass_kg=1000.0)
 
 
-def test_stage0_atom_mass_fractions_must_sum_to_one():
+def test_stage0_atom_mass_fractions_must_use_known_basis():
     sim = _sim(
         {
             "comet": {
@@ -400,8 +400,53 @@ def test_stage0_atom_mass_fractions_must_sum_to_one():
         }
     )
 
-    with pytest.raises(AccountingError, match="must sum to 1.0"):
+    with pytest.raises(AccountingError, match="must sum to 1, 100, or 1000"):
         sim.load_batch("comet", mass_kg=1000.0)
+
+
+def test_stage0_atom_mass_fractions_accept_percent_basis():
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {"SiO2": 50.0, "organics": 10.0},
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "organics": {
+                        "atom_mass_fractions": {
+                            "C": 74.0,
+                            "H": 9.0,
+                            "O": 12.0,
+                            "N": 5.0,
+                        },
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [50.0, 100.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "percent-basis generic organics inventory",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    sim.load_batch("comet", mass_kg=1000.0)
+
+    assert sim.inventory.stage0_external_inputs_kg["O2"] > 0.0
+
+
+def test_stage0_product_subtraction_fails_when_product_missing():
+    with pytest.raises(AccountingError, match="absent from destination"):
+        PyrolysisSimulator._subtract_species_kg(
+            {"CO2": 1.0},
+            {"SO2": 1.0},
+            context="test oxidation",
+        )
 
 
 def test_anhydrous_silicate_handoff_requires_loud_stage0_profile():

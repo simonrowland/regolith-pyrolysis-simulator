@@ -589,6 +589,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         context: str,
     ) -> Dict[str, float]:
         result: Dict[str, float] = {}
+        missing = {
+            species: kg
+            for species, kg in subtract.items()
+            if float(kg) > 1e-12 and species not in values
+        }
+        if missing:
+            details = ', '.join(
+                f'{species}={float(kg):.6g} kg'
+                for species, kg in sorted(missing.items())
+            )
+            raise AccountingError(
+                f'{context} expected products absent from destination: {details}'
+            )
         for species, kg in values.items():
             remaining = float(kg) - float(subtract.get(species, 0.0))
             if remaining < -1e-8:
@@ -972,10 +985,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'finite and not below the decomposition range'
             )
         if feedstock and 'stage0_temp_range_C' in feedstock:
-            _stage_start, stage_final = cls._validate_temp_range(
+            stage_start, stage_final = cls._validate_temp_range(
                 'stage0_temp_range_C',
                 feedstock['stage0_temp_range_C'],
             )
+            if _temp_start < stage_start - 1e-9 or temp_final > stage_final + 1e-9:
+                raise ValueError(
+                    f'stage0_formula_inventory.{species}.'
+                    'decomposition_temp_range_C must be within stage0_temp_range_C'
+                )
             if final_temp > stage_final + 1e-9:
                 raise ValueError(
                     f'stage0_formula_inventory.{species}.final_temp_C must not '

@@ -336,10 +336,10 @@ def _atoms_from_mass_fractions(
 ) -> dict[str, float]:
     """Convert element mass fractions into atom-count ratios.
 
-    Feedstock-local mixed species are intentionally explicit; accept true
-    fractions only so YAML typos fail instead of being silently renormalized.
+    Feedstock-local mixed species are intentionally explicit; accept common
+    bases only so YAML typos fail instead of being silently renormalized.
     """
-    atoms: dict[str, float] = {}
+    parsed: list[tuple[str, float]] = []
     total_fraction = 0.0
     for element, raw_fraction in mass_fractions.items():
         symbol = str(element).strip()
@@ -352,18 +352,30 @@ def _atoms_from_mass_fractions(
             raise AccountingError(
                 f"mass fraction for {symbol!r} in {species!r} must be positive"
             )
-        atoms[symbol] = atoms.get(symbol, 0.0) + (
-            fraction / ATOMIC_WEIGHTS_G_PER_MOL[symbol]
-        )
+        parsed.append((symbol, fraction))
         total_fraction += fraction
-    if not atoms:
+    if not parsed:
         raise UnknownSpeciesError(
             f"atom_mass_fractions for {species!r} must not be empty"
         )
-    if not math.isclose(total_fraction, 1.0, rel_tol=1e-9, abs_tol=1e-9):
+    basis = next(
+        (
+            candidate
+            for candidate in (1.0, 100.0, 1000.0)
+            if math.isclose(total_fraction, candidate, rel_tol=1e-9, abs_tol=1e-9)
+        ),
+        None,
+    )
+    if basis is None:
         raise AccountingError(
-            f"atom_mass_fractions for {species!r} must sum to 1.0; "
+            f"atom_mass_fractions for {species!r} must sum to 1, 100, or 1000; "
             f"got {total_fraction:.12g}"
+        )
+    atoms: dict[str, float] = {}
+    for symbol, fraction in parsed:
+        normalized = fraction / basis
+        atoms[symbol] = atoms.get(symbol, 0.0) + (
+            normalized / ATOMIC_WEIGHTS_G_PER_MOL[symbol]
         )
     return atoms
 

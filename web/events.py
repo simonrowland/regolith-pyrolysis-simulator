@@ -68,6 +68,19 @@ def _current_simulation_state(
         return state, _sim_locks.get(sid)
 
 
+def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if (
+            state is None
+            or state.get('run_id') != run_id
+            or not state['running']
+        ):
+            return False
+        socketio.emit(event, payload, room=sid)
+        return True
+
+
 def _clear_simulation_state(sid: str) -> None:
     """Stop and remove any active simulation for a client."""
     with _simulations_guard:
@@ -387,42 +400,65 @@ def register_events(socketio):
                         break
                     sim = state['sim']
                     if sim.is_complete():
-                        socketio.emit(
-                            'simulation_complete',
-                            _completion_payload(sim),
-                            room=sid)
-                        state['running'] = False
+                        with _simulations_guard:
+                            current = _simulations.get(sid)
+                            if (
+                                current is None
+                                or current.get('run_id') != run_id
+                                or not current['running']
+                            ):
+                                break
+                            socketio.emit(
+                                'simulation_complete',
+                                _completion_payload(sim),
+                                room=sid)
+                            current['running'] = False
                         break
 
                     snapshot = sim.step()
-
-                state, _ = _current_simulation_state(sid, run_id)
-                if state is None or not state['running']:
-                    break
 
                 tick_data = _tick_payload(
                     sim=sim,
                     snapshot=snapshot,
                     backend_message=backend_message,
                 )
-                socketio.emit('simulation_tick', tick_data, room=sid)
+                if not _emit_if_current(
+                    socketio, sid, run_id, 'simulation_tick', tick_data
+                ):
+                    break
 
                 # Check for campaign completion summary
                 if sim._last_campaign_summary is not None:
-                    socketio.emit('campaign_complete_summary',
-                                  sim._last_campaign_summary, room=sid)
+                    if not _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'campaign_complete_summary',
+                        sim._last_campaign_summary,
+                    ):
+                        break
                     sim._last_campaign_summary = None
 
                 # Check for decision points
                 if sim.paused_for_decision and sim.pending_decision:
                     d = sim.pending_decision
-                    socketio.emit('decision_required', {
+                    decision_payload = {
                         'type': d.decision_type.name,
                         'options': d.options,
                         'recommendation': d.recommendation,
                         'context': d.context,
-                    }, room=sid)
-                    state['paused'] = True
+                    }
+                    with _simulations_guard:
+                        current = _simulations.get(sid)
+                        if (
+                            current is None
+                            or current.get('run_id') != run_id
+                            or not current['running']
+                        ):
+                            break
+                        socketio.emit(
+                            'decision_required', decision_payload, room=sid)
+                        current['paused'] = True
 
                 # Pace the simulation
                 spd = state.get('speed', 1.0)

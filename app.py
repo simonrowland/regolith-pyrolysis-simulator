@@ -80,8 +80,13 @@ def _env_flag(name: str) -> bool:
 def _is_loopback_host(host: str) -> bool:
     if host == 'localhost':
         return True
+    cleaned = host
+    if cleaned.startswith('[') and cleaned.endswith(']'):
+        cleaned = cleaned[1:-1]
+    elif cleaned.startswith('[') or cleaned.endswith(']'):
+        return False
     try:
-        return ipaddress.ip_address(host.strip('[]')).is_loopback
+        return ipaddress.ip_address(cleaned).is_loopback
     except ValueError:
         return False
 
@@ -91,8 +96,17 @@ def _run_config_from_env() -> dict:
     raw_port = os.environ.get('REGOLITH_PORT', '3000')
     try:
         port = int(raw_port)
+        if not 0 < port < 65536:
+            raise ValueError
     except ValueError:
-        sys.exit(f'REGOLITH_PORT must be an integer, got {raw_port!r}')
+        sys.exit(
+            f'REGOLITH_PORT must be an integer in 1..65535, got {raw_port!r}')
+
+    if _env_flag('REGOLITH_ALLOW_UNSAFE_WERKZEUG'):
+        sys.exit(
+            'REGOLITH_ALLOW_UNSAFE_WERKZEUG is no longer supported; '
+            'use a real WSGI server for non-loopback deployments.'
+        )
 
     debug = _env_flag('REGOLITH_FLASK_DEBUG')
     is_loopback = _is_loopback_host(host)
