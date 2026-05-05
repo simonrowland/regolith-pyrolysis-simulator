@@ -22,6 +22,12 @@ from pathlib import Path
 from typing import Dict, Optional
 from urllib.request import urlretrieve
 
+from simulator.melt_backend.factsage import FactSAGEBackend
+from simulator.melt_backend.factsage_config import (
+    FactSAGEConfigError,
+    load_factsage_config,
+)
+
 
 # alphaMELTS download URLs by platform
 ALPHAMELTS_VERSION = '2.3.1'
@@ -73,11 +79,8 @@ class EngineInstaller:
         status['alphaMELTS_binary'] = self._check_binary()
 
         # ChemApp / FactSAGE
-        try:
-            import ChemApp  # noqa: F401
-            status['FactSAGE'] = True
-        except ImportError:
-            status['FactSAGE'] = False
+        status['ChemApp_module'] = self._check_chemapp()
+        status['FactSAGE'] = self._check_factsage_backend()
 
         return status
 
@@ -90,6 +93,25 @@ class EngineInstaller:
 
         # Check system PATH
         return shutil.which('alphamelts') is not None
+
+    def _check_chemapp(self) -> bool:
+        """Check whether a supported ChemApp Python module is importable."""
+        for module_name in ('chemapp.friendly', 'ChemApp'):
+            try:
+                __import__(module_name)
+                return True
+            except ImportError:
+                continue
+        return False
+
+    def _check_factsage_backend(self) -> bool:
+        """Check whether the optional FactSAGE backend is usable now."""
+        try:
+            config = load_factsage_config()
+        except FactSAGEConfigError:
+            return False
+        backend = FactSAGEBackend()
+        return backend.initialize(config)
 
     def install_alphamelts(self, progress_callback=None) -> bool:
         """
@@ -221,7 +243,10 @@ class EngineInstaller:
             lines.append('  alphaMELTS binary: not found')
 
         if status.get('FactSAGE'):
-            lines.append('  FactSAGE/ChemApp: found')
+            lines.append('  FactSAGE/ChemApp: configured and usable')
+        elif status.get('ChemApp_module'):
+            lines.append(
+                '  ChemApp module: found; FactSAGE data file not configured')
         else:
             lines.append('  FactSAGE/ChemApp: not available')
 

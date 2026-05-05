@@ -10,6 +10,11 @@ from flask import request
 from simulator.core import PyrolysisSimulator, CampaignPhase
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.factsage import FactSAGEBackend
+from simulator.melt_backend.factsage_config import (
+    FactSAGEConfigError,
+    load_factsage_config,
+)
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -34,10 +39,193 @@ def _get_backend(backend_name: str):
         backend = AlphaMELTSBackend()
         if backend.initialize({}):
             return backend
+    elif backend_name == 'factsage':
+        backend = FactSAGEBackend()
+        if backend.initialize(_factsage_config()):
+            return backend
     # Fallback to stub
     backend = StubBackend()
     backend.initialize({})
     return backend
+
+
+def _factsage_config():
+    """Load optional FactSAGE config from FACTSAGE_CONFIG."""
+    try:
+        return load_factsage_config()
+    except FactSAGEConfigError as exc:
+        print(f'FactSAGE config error: {exc}')
+        return {}
+
+
+def _start_payload(
+    *,
+    sim,
+    feedstock_key: str,
+    mass_kg: float,
+    backend_requested: str,
+    backend_active: str,
+    backend_message: str,
+):
+    """Build the public start status payload."""
+    return {
+        'status': 'started',
+        'feedstock': feedstock_key,
+        'mass_kg': mass_kg,
+        'backend_requested': backend_requested,
+        'backend_active': backend_active,
+        'backend_message': backend_message,
+    }
+
+
+def _tick_payload(*, sim, snapshot, backend_message: str):
+    """Build the public per-tick payload."""
+    return {
+        'hour': snapshot.hour,
+        'campaign': snapshot.campaign.name,
+        'temperature_C': round(snapshot.temperature_C, 1),
+        'melt_mass_kg': round(snapshot.melt_mass_kg, 1),
+        'composition_wt_pct': {
+            k: round(v, 2) for k, v in snapshot.composition_wt_pct.items()
+        },
+        'raw_inventory_kg': {
+            k: round(v, 3)
+            for k, v in snapshot.inventory.raw_components_kg.items()
+        },
+        'residual_inventory_kg': {
+            k: round(v, 3)
+            for k, v in snapshot.inventory.residual_components_kg.items()
+        },
+        'stage0_products_kg': {
+            k: round(v, 3)
+            for k, v in snapshot.inventory.stage0_products_kg.items()
+        },
+        'drain_tap_kg': {
+            k: round(v, 3)
+            for k, v in snapshot.inventory.drain_tap_kg.items()
+        },
+        'stage0_profile': snapshot.inventory.stage0_profile,
+        'stage0_temp_range_C': [
+            round(v, 1)
+            for v in snapshot.inventory.stage0_temp_range_C
+        ],
+        'cleaned_melt_source': snapshot.inventory.cleaned_melt_source,
+        'carbon_reductant_required_kg': round(
+            snapshot.inventory.carbon_reductant_required_kg, 3),
+        'stage0_mass_balance_delta_kg': round(
+            snapshot.inventory.stage0_mass_balance_delta_kg, 3),
+        'backend_error': getattr(sim, '_last_backend_error', ''),
+        'backend_fallback_active': bool(
+            getattr(sim, '_last_backend_error', '')),
+        'backend_message': (
+            'Built-in fallback active: '
+            f'{sim._last_backend_error}'
+            if getattr(sim, '_last_backend_error', '')
+            else backend_message),
+        'process_buckets_kg': {
+            'gas_volatiles': {
+                k: round(v, 3)
+                for k, v in snapshot.inventory.gas_volatiles_kg.items()
+            },
+            'salt_phase': {
+                k: round(v, 3)
+                for k, v in snapshot.inventory.salt_phase_kg.items()
+            },
+            'sulfide_matte': {
+                k: round(v, 3)
+                for k, v in snapshot.inventory.sulfide_matte_kg.items()
+            },
+            'metal_alloy': {
+                k: round(v, 3)
+                for k, v in snapshot.inventory.metal_alloy_kg.items()
+            },
+            'terminal_slag': {
+                k: round(v, 3)
+                for k, v in (
+                    snapshot.inventory
+                    .terminal_slag_components_kg.items())
+            },
+        },
+        'evap_total_kg_hr': round(snapshot.evap_flux.total_kg_hr, 4),
+        'evap_species': {
+            k: round(v, 4) for k, v in snapshot.evap_flux.species_kg_hr.items()
+        },
+        'pressure_mbar': round(snapshot.overhead.pressure_mbar, 3),
+        'atmosphere': sim.melt.atmosphere.name,
+        'p_total_mbar': round(sim.melt.p_total_mbar, 3),
+        'pO2_mbar': round(sim.melt.pO2_mbar, 6),
+        'ambient_pressure_mbar': round(
+            sim.melt.ambient_pressure_mbar, 3),
+        'ambient_atmosphere': sim.melt.ambient_atmosphere,
+        'condensation': {
+            k: round(v, 3) for k, v in snapshot.condensation_totals.items()
+        },
+        'energy_kWh': round(snapshot.energy.total_kWh, 4),
+        'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
+        'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
+        'mass_balance_error_pct': round(snapshot.mass_balance_error_pct, 3),
+        'ramp_throttled': snapshot.ramp_throttled,
+        'nominal_ramp_rate': round(snapshot.nominal_ramp_rate_C_hr, 2),
+        'actual_ramp_rate': round(snapshot.actual_ramp_rate_C_hr, 2),
+        'throttle_reason': snapshot.throttle_reason,
+        'O2_vented_kg_hr': round(snapshot.O2_vented_kg_hr, 4),
+        'O2_vented_mol_hr': round(snapshot.O2_vented_mol_hr, 4),
+        'O2_vented_cumulative_kg': round(
+            snapshot.O2_vented_cumulative_kg, 2),
+        'O2_stored_kg': round(snapshot.O2_stored_kg, 2),
+        'melt_offgas_O2_stored_kg': round(
+            snapshot.melt_offgas_O2_stored_kg, 2),
+        'melt_offgas_O2_vented_kg': round(
+            snapshot.melt_offgas_O2_vented_kg, 2),
+        'mre_anode_O2_stored_kg': round(snapshot.mre_anode_O2_stored_kg, 2),
+        'melt_offgas_O2_mol_hr': round(snapshot.melt_offgas_O2_mol_hr, 4),
+        'mre_anode_O2_mol_hr': round(snapshot.mre_anode_O2_mol_hr, 4),
+        'turbine_limited': snapshot.overhead.turbine_limited,
+        'turbine_utilization_pct': round(
+            snapshot.overhead.turbine_utilization_pct, 1),
+        'transport_saturation_pct': round(
+            snapshot.overhead.transport_saturation_pct, 1),
+        'turbine_shaft_power_kW': round(snapshot.turbine_shaft_power_kW, 4),
+        'shuttle_phase': snapshot.shuttle_phase,
+        'shuttle_injected_kg_hr': round(snapshot.shuttle_injected_kg_hr, 3),
+        'shuttle_reduced_kg_hr': round(snapshot.shuttle_reduced_kg_hr, 3),
+        'shuttle_metal_produced_kg_hr': round(
+            snapshot.shuttle_metal_produced_kg_hr, 3),
+        'shuttle_K_inventory_kg': round(snapshot.shuttle_K_inventory_kg, 2),
+        'shuttle_Na_inventory_kg': round(snapshot.shuttle_Na_inventory_kg, 2),
+        'shuttle_cycle': snapshot.shuttle_cycle,
+        'mre_voltage_V': round(snapshot.mre_voltage_V, 3),
+        'mre_current_A': round(snapshot.mre_current_A, 1),
+        'mre_metals_kg_hr': {
+            k: round(v, 4) for k, v in snapshot.mre_metals_kg_hr.items()
+        },
+        'mre_energy_kWh': round(snapshot.energy.mre_kWh, 4),
+    }
+
+
+def _completion_payload(sim):
+    final_snapshot = sim._make_snapshot()
+    return {
+        'total_hours': sim.melt.hour,
+        'energy_kWh': sim.energy_cumulative_kWh,
+        'oxygen_kg': sim._oxygen_total_kg(),
+        'oxygen_stored_kg': sim._oxygen_stored_kg(),
+        'oxygen_vented_kg': sim._oxygen_vented_kg(),
+        'mass_in_kg': round(final_snapshot.mass_in_kg, 3),
+        'mass_out_kg': round(final_snapshot.mass_out_kg, 3),
+        'mass_balance_error_pct': round(
+            final_snapshot.mass_balance_error_pct, 6),
+        'residual_inventory_kg': {
+            k: round(v, 3)
+            for k, v in (
+                final_snapshot.inventory.residual_components_kg.items())
+        },
+        'stage0_mass_balance_delta_kg': round(
+            final_snapshot.inventory.stage0_mass_balance_delta_kg, 3),
+        'products': {k: round(v, 2)
+                     for k, v in sim.product_ledger().items()},
+        'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
+    }
 
 
 def register_events(socketio):
@@ -81,8 +269,21 @@ def register_events(socketio):
         setpoints = _load_yaml('setpoints.yaml')
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
 
-        # Create simulator
         backend = _get_backend(backend_name)
+        backend_type = type(backend).__name__
+        backend_message = ''
+        if backend_name == 'factsage' and isinstance(backend, StubBackend):
+            backend_message = 'FactSAGE unavailable; using built-in fallback'
+        elif backend_name == 'factsage':
+            backend_message = (
+                'FactSAGE/ChemApp export active: '
+                f'{backend.capability_summary()}')
+        elif backend_name == 'alphamelts' and isinstance(backend, StubBackend):
+            backend_message = 'AlphaMELTS unavailable; using built-in fallback'
+        else:
+            backend_message = f'Using {backend_type}'
+
+        # Create simulator
         sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
 
         # User-configurable parameters
@@ -119,11 +320,14 @@ def register_events(socketio):
         }
         _sim_locks[sid] = threading.Lock()
 
-        socketio.emit('simulation_status', {
-            'status': 'started',
-            'feedstock': feedstock_key,
-            'mass_kg': mass_kg,
-        }, room=sid)
+        socketio.emit('simulation_status', _start_payload(
+            sim=sim,
+            feedstock_key=feedstock_key,
+            mass_kg=mass_kg,
+            backend_requested=backend_name,
+            backend_active=backend_type,
+            backend_message=backend_message,
+        ), room=sid)
 
         # Start background loop
         def run_loop():
@@ -138,71 +342,20 @@ def register_events(socketio):
                 with _sim_locks[sid]:
                     sim = state['sim']
                     if sim.is_complete():
-                        socketio.emit('simulation_complete', {
-                            'total_hours': sim.melt.hour,
-                            'energy_kWh': sim.energy_cumulative_kWh,
-                            'oxygen_kg': sim.oxygen_cumulative_kg,
-                            'products': {k: round(v, 2)
-                                         for k, v in sim.train.total_by_species().items()},
-                        }, room=sid)
+                        socketio.emit(
+                            'simulation_complete',
+                            _completion_payload(sim),
+                            room=sid)
                         state['running'] = False
                         break
 
                     snapshot = sim.step()
 
-                # Emit tick to client
-                tick_data = {
-                    'hour': snapshot.hour,
-                    'campaign': snapshot.campaign.name,
-                    'temperature_C': round(snapshot.temperature_C, 1),
-                    'melt_mass_kg': round(snapshot.melt_mass_kg, 1),
-                    'composition_wt_pct': {
-                        k: round(v, 2) for k, v in snapshot.composition_wt_pct.items()
-                    },
-                    'evap_total_kg_hr': round(snapshot.evap_flux.total_kg_hr, 4),
-                    'evap_species': {
-                        k: round(v, 4) for k, v in snapshot.evap_flux.species_kg_hr.items()
-                    },
-                    'pressure_mbar': round(snapshot.overhead.pressure_mbar, 3),
-                    'atmosphere': sim.melt.atmosphere.name,
-                    'p_total_mbar': round(sim.melt.p_total_mbar, 3),
-                    'pO2_mbar': round(sim.melt.pO2_mbar, 6),
-                    'ambient_pressure_mbar': round(
-                        sim.melt.ambient_pressure_mbar, 3),
-                    'ambient_atmosphere': sim.melt.ambient_atmosphere,
-                    'condensation': {
-                        k: round(v, 3) for k, v in snapshot.condensation_totals.items()
-                    },
-                    'energy_kWh': round(snapshot.energy.total_kWh, 4),
-                    'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
-                    'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
-                    'mass_balance_error_pct': round(snapshot.mass_balance_error_pct, 3),
-                    # Gas train feedback
-                    'ramp_throttled': snapshot.ramp_throttled,
-                    'nominal_ramp_rate': round(snapshot.nominal_ramp_rate_C_hr, 2),
-                    'actual_ramp_rate': round(snapshot.actual_ramp_rate_C_hr, 2),
-                    'throttle_reason': snapshot.throttle_reason,
-                    'O2_vented_kg_hr': round(snapshot.O2_vented_kg_hr, 4),
-                    'O2_vented_cumulative_kg': round(snapshot.O2_vented_cumulative_kg, 2),
-                    'O2_stored_kg': round(snapshot.O2_stored_kg, 2),
-                    'turbine_limited': snapshot.overhead.turbine_limited,
-                    'turbine_utilization_pct': round(snapshot.overhead.turbine_utilization_pct, 1),
-                    'transport_saturation_pct': round(snapshot.overhead.transport_saturation_pct, 1),
-                    'turbine_shaft_power_kW': round(snapshot.turbine_shaft_power_kW, 4),
-                    # Alkali shuttle (C3)
-                    'shuttle_phase': snapshot.shuttle_phase,
-                    'shuttle_injected_kg_hr': round(snapshot.shuttle_injected_kg_hr, 3),
-                    'shuttle_reduced_kg_hr': round(snapshot.shuttle_reduced_kg_hr, 3),
-                    'shuttle_metal_produced_kg_hr': round(snapshot.shuttle_metal_produced_kg_hr, 3),
-                    'shuttle_K_inventory_kg': round(snapshot.shuttle_K_inventory_kg, 2),
-                    'shuttle_Na_inventory_kg': round(snapshot.shuttle_Na_inventory_kg, 2),
-                    'shuttle_cycle': snapshot.shuttle_cycle,
-                    # MRE electrolysis state
-                    'mre_voltage_V': round(snapshot.mre_voltage_V, 3),
-                    'mre_current_A': round(snapshot.mre_current_A, 1),
-                    'mre_metals_kg_hr': {k: round(v, 4) for k, v in snapshot.mre_metals_kg_hr.items()},
-                    'mre_energy_kWh': round(snapshot.energy.mre_kWh, 4),
-                }
+                tick_data = _tick_payload(
+                    sim=sim,
+                    snapshot=snapshot,
+                    backend_message=backend_message,
+                )
                 socketio.emit('simulation_tick', tick_data, room=sid)
 
                 # Check for campaign completion summary

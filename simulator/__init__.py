@@ -9,6 +9,7 @@ from simulator.core import (
     BatchRecord,
     CondensationTrain,
     EvaporationFlux,
+    ProcessInventory,
     OXIDE_SPECIES,
     METAL_SPECIES,
 )

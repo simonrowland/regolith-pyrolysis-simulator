@@ -25,6 +25,7 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import MeltBackend, EquilibriumResult
 
 
@@ -102,14 +103,27 @@ class AlphaMELTSBackend(MeltBackend):
         return ['Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr']
 
     def equilibrate(self, temperature_C: float,
-                    composition_kg: Dict[str, float],
+                    composition_kg: Optional[Dict[str, float]] = None,
                     fO2_log: float = -9.0,
-                    pressure_bar: float = 1e-6) -> EquilibriumResult:
+                    pressure_bar: float = 1e-6,
+                    *,
+                    composition_mol: Optional[Dict[str, float]] = None
+                    ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
 
         Routes to the appropriate engine based on available mode.
         """
+        if composition_mol is not None:
+            composition_kg = {
+                species: float(mol)
+                * resolve_species_formula(species).molar_mass_kg_per_mol()
+                for species, mol in composition_mol.items()
+                if float(mol) > 0.0
+            }
+        else:
+            composition_kg = dict(composition_kg or {})
+
         if self._mode == 'python_api':
             return self._equilibrate_python(
                 temperature_C, composition_kg, fO2_log, pressure_bar)

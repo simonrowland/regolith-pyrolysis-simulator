@@ -9,25 +9,10 @@ from simulator.state import GAS_CONSTANT
 
 class EquilibriumMixin:
     def _get_equilibrium(self):
-        """
-        Query the melt backend for thermodynamic equilibrium.
-
-        Returns an EquilibriumResult with phase assemblage,
-        activity coefficients, and vapor pressures.  If the
-        backend is unavailable, returns a stub result using
-        Antoine-equation vapor pressures.
-        """
-        if self.backend is not None and self.backend.is_available():
-            return self.backend.equilibrate(
-                temperature_C=self.melt.temperature_C,
-                composition_kg=self.melt.composition_kg,
-                fO2_log=self.melt.fO2_log,
-                pressure_bar=self.melt.p_total_mbar / 1000.0,
-            )
-        else:
-            # Stub: use Antoine equations from vapor_pressures.yaml
-            # with activity = 1.0 (ideal approximation)
-            return self._stub_equilibrium()
+        raise NotImplementedError(
+            "backend equilibrium must be supplied by the simulator class "
+            "using AtomLedger mol inputs"
+        )
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
     #

@@ -13,22 +13,26 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict, List, Tuple
 
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+
 # ============================================================================
 # SECTION 1: CONSTANTS
 # ============================================================================
 
 # --- Oxide species tracked in the melt ---
-# These are the major oxides present in silicate melts.
+# These are the major basaltic oxides plus compatible Ni/Co trace oxides.
 # The simulator tracks their absolute mass (kg) in the melt at each hour.
 OXIDE_SPECIES = [
-    'SiO2', 'TiO2', 'Al2O3', 'FeO', 'MgO',
+    'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO',
     'CaO', 'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5',
+    'NiO', 'CoO',
 ]
 
 # --- Metal products extracted from the melt ---
 # Each metal is obtained by reducing or evaporating its parent oxide.
 METAL_SPECIES = [
     'Na', 'K', 'Fe', 'Mg', 'Si', 'Ti', 'Al', 'Ca', 'Cr', 'Mn',
+    'Ni', 'Co',
 ]
 
 # --- Volatile / gas species ---
@@ -39,19 +43,31 @@ GAS_SPECIES = [
 
 # --- Molar masses (g/mol) ---
 # Used for stoichiometric conversions (oxide → metal + O₂).
+_AW = ATOMIC_WEIGHTS_G_PER_MOL
 MOLAR_MASS = {
     # Oxides
-    'SiO2':  60.08,  'TiO2':  79.87,  'Al2O3': 101.96,
-    'FeO':   71.84,  'MgO':   40.30,  'CaO':   56.08,
-    'Na2O':  61.98,  'K2O':   94.20,  'Cr2O3': 151.99,
-    'MnO':   70.94,  'P2O5':  141.94,
+    'SiO2': _AW['Si'] + 2 * _AW['O'],
+    'TiO2': _AW['Ti'] + 2 * _AW['O'],
+    'Al2O3': 2 * _AW['Al'] + 3 * _AW['O'],
+    'FeO': _AW['Fe'] + _AW['O'],
+    'Fe2O3': 2 * _AW['Fe'] + 3 * _AW['O'],
+    'MgO': _AW['Mg'] + _AW['O'],
+    'CaO': _AW['Ca'] + _AW['O'],
+    'Na2O': 2 * _AW['Na'] + _AW['O'],
+    'K2O': 2 * _AW['K'] + _AW['O'],
+    'Cr2O3': 2 * _AW['Cr'] + 3 * _AW['O'],
+    'MnO': _AW['Mn'] + _AW['O'],
+    'P2O5': 2 * _AW['P'] + 5 * _AW['O'],
+    'NiO': _AW['Ni'] + _AW['O'],
+    'CoO': _AW['Co'] + _AW['O'],
     # Metals
-    'Na': 22.99,  'K':  39.10,  'Fe': 55.85,  'Mg': 24.31,
-    'Si': 28.09,  'Ti': 47.87,  'Al': 26.98,  'Ca': 40.08,
-    'Cr': 52.00,  'Mn': 54.94,
+    'Na': _AW['Na'], 'K': _AW['K'], 'Fe': _AW['Fe'], 'Mg': _AW['Mg'],
+    'Si': _AW['Si'], 'Ti': _AW['Ti'], 'Al': _AW['Al'], 'Ca': _AW['Ca'],
+    'Cr': _AW['Cr'], 'Mn': _AW['Mn'], 'Ni': _AW['Ni'], 'Co': _AW['Co'],
     # Gases
-    'O2': 32.00,  'O':  16.00,  'SiO': 44.08,
-    'N2': 28.01,  'H2O': 18.02, 'CO2': 44.01, 'S2': 64.13,
+    'O2': 2 * _AW['O'], 'O': _AW['O'], 'SiO': _AW['Si'] + _AW['O'],
+    'N2': 2 * _AW['N'], 'H2O': 2 * _AW['H'] + _AW['O'],
+    'CO2': _AW['C'] + 2 * _AW['O'], 'S2': 2 * _AW['S'],
 }
 
 # --- Oxide → Metal mapping ---
@@ -62,6 +78,7 @@ OXIDE_TO_METAL = {
     'Na2O':  ('Na', 2, 1),   # Na₂O  → 2 Na + ½ O₂
     'K2O':   ('K',  2, 1),   # K₂O   → 2 K  + ½ O₂
     'FeO':   ('Fe', 1, 1),   # FeO   → Fe   + ½ O₂
+    'Fe2O3': ('Fe', 2, 3),   # Fe₂O₃ → 2 Fe + 1½ O₂
     'MgO':   ('Mg', 1, 1),   # MgO   → Mg   + ½ O₂
     'SiO2':  ('Si', 1, 2),   # SiO₂  → Si   + O₂
     'TiO2':  ('Ti', 1, 2),   # TiO₂  → Ti   + O₂
@@ -69,6 +86,8 @@ OXIDE_TO_METAL = {
     'CaO':   ('Ca', 1, 1),   # CaO   → Ca   + ½ O₂
     'Cr2O3': ('Cr', 2, 3),   # Cr₂O₃ → 2 Cr + 1½ O₂
     'MnO':   ('Mn', 1, 1),   # MnO   → Mn   + ½ O₂
+    'NiO':   ('Ni', 1, 1),   # NiO   → Ni   + ½ O₂
+    'CoO':   ('Co', 1, 1),   # CoO   → Co   + ½ O₂
 }
 
 # Compute stoichiometric mass ratios once:
@@ -129,6 +148,61 @@ class Atmosphere(Enum):
 # ============================================================================
 # SECTION 3: DATA STRUCTURES
 # ============================================================================
+
+@dataclass
+class ProcessInventory:
+    """
+    Feedstock inventory outside the silicate melt contract.
+
+    MeltState owns only the cleaned melt oxides used by melt backends. This
+    structure keeps raw feedstock provenance, Stage 0 volatile/trap products,
+    and separated salt, sulfide, and metal phase inventories explicit without
+    feeding them into melt equilibrium calculations.
+    """
+    raw_components_kg: Dict[str, float] = field(default_factory=dict)
+    melt_oxide_kg: Dict[str, float] = field(default_factory=dict)
+    residual_components_kg: Dict[str, float] = field(default_factory=dict)
+    stage0_products_kg: Dict[str, float] = field(default_factory=dict)
+    gas_volatiles_kg: Dict[str, float] = field(default_factory=dict)
+    salt_phase_kg: Dict[str, float] = field(default_factory=dict)
+    sulfide_matte_kg: Dict[str, float] = field(default_factory=dict)
+    metal_alloy_kg: Dict[str, float] = field(default_factory=dict)
+    terminal_slag_components_kg: Dict[str, float] = field(default_factory=dict)
+    stage0_profile: str = 'bulk_preservation'
+    cleaned_melt_source: str = 'composition_wt_pct'
+    stage0_temp_range_C: Tuple[float, float] = (20.0, 950.0)
+    carbon_reductant_required_kg: float = 0.0
+    stage0_mass_balance_delta_kg: float = 0.0
+
+    def copy(self) -> 'ProcessInventory':
+        """Return a detached copy for records and snapshots."""
+        return ProcessInventory(
+            raw_components_kg=dict(self.raw_components_kg),
+            melt_oxide_kg=dict(self.melt_oxide_kg),
+            residual_components_kg=dict(self.residual_components_kg),
+            stage0_products_kg=dict(self.stage0_products_kg),
+            gas_volatiles_kg=dict(self.gas_volatiles_kg),
+            salt_phase_kg=dict(self.salt_phase_kg),
+            sulfide_matte_kg=dict(self.sulfide_matte_kg),
+            metal_alloy_kg=dict(self.metal_alloy_kg),
+            terminal_slag_components_kg=dict(
+                self.terminal_slag_components_kg),
+            stage0_profile=self.stage0_profile,
+            cleaned_melt_source=self.cleaned_melt_source,
+            stage0_temp_range_C=tuple(self.stage0_temp_range_C),
+            carbon_reductant_required_kg=self.carbon_reductant_required_kg,
+            stage0_mass_balance_delta_kg=self.stage0_mass_balance_delta_kg,
+        )
+
+    def residual_mass_kg(self) -> float:
+        """Mass outside the current silicate melt calculation."""
+        return sum(self.residual_components_kg.values())
+
+    @property
+    def drain_tap_kg(self) -> Dict[str, float]:
+        """Separated native/alloy metal available to the drain-tap ledger."""
+        return self.metal_alloy_kg
+
 
 @dataclass
 class MeltState:
@@ -254,15 +328,15 @@ class CondensationTrain:
             CondensationStage(1, 'Fe Condenser',
                               (1100, 1400), ['Fe']),
             CondensationStage(2, 'SiO Zone',
-                              (900, 1200), ['SiO2']),
+                              (900, 1200), ['SiO']),
             CondensationStage(3, 'Alkali/Mg Cyclone',
                               (350, 700), ['Na', 'K', 'Mg']),
             CondensationStage(4, 'Vortex Dust Filter',
                               (200, 350), []),
             CondensationStage(5, 'Turbine-Compressor',
                               (50, 200), []),
-            CondensationStage(6, 'O₂ Accumulator',
-                              (20, 50), ['O2']),
+            CondensationStage(6, 'Turbine Outlet Monitor',
+                              (20, 50), []),
         ]
         return CondensationTrain(stages=stages)
 
@@ -308,6 +382,9 @@ class OverheadGas:
     turbine_flow_kg_hr: float = 0.0
     # Mass flow rate through turbine (sets pO₂)
 
+    turbine_flow_mol_hr: float = 0.0
+    # O₂ molar flow through turbine
+
     pipe_conductance_kg_hr: float = 50.0
     # Maximum transport capacity of collection pipe (kg/hr)
     # Depends on pipe diameter, pressure, temperature
@@ -318,6 +395,15 @@ class OverheadGas:
 
     O2_vented_kg_hr: float = 0.0
     # O₂ vented to lunar vacuum this hour (excess beyond turbine max)
+
+    O2_vented_mol_hr: float = 0.0
+    # O₂ molar flow vented this hour
+
+    melt_offgas_O2_mol_hr: float = 0.0
+    # O₂ molar flow generated by melt/offgas chemistry this hour
+
+    mre_anode_O2_mol_hr: float = 0.0
+    # O₂ molar flow generated at MRE anodes this hour
 
     turbine_utilization_pct: float = 0.0
     # Turbine load as % of max O₂ throughput (0-100+)
@@ -360,6 +446,7 @@ class HourSnapshot:
     temperature_C: float = 25.0
     melt_mass_kg: float = 0.0
     composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+    inventory: ProcessInventory = field(default_factory=ProcessInventory)
 
     # Evaporation
     evap_flux: EvaporationFlux = field(default_factory=EvaporationFlux)
@@ -410,6 +497,24 @@ class HourSnapshot:
     O2_stored_kg: float = 0.0
     # Cumulative O₂ in accumulator (compressed to ~3 bar)
 
+    melt_offgas_O2_stored_kg: float = 0.0
+    # Cumulative melt/offgas O₂ in accumulator
+
+    melt_offgas_O2_vented_kg: float = 0.0
+    # Cumulative melt/offgas O₂ vented to vacuum
+
+    mre_anode_O2_stored_kg: float = 0.0
+    # Cumulative MRE anode O₂ stored separately from gas-train throughput
+
+    melt_offgas_O2_mol_hr: float = 0.0
+    # O₂ molar flow generated by melt/offgas chemistry this hour
+
+    mre_anode_O2_mol_hr: float = 0.0
+    # O₂ molar flow generated at MRE anodes this hour
+
+    O2_vented_mol_hr: float = 0.0
+    # O₂ molar flow vented this hour
+
     turbine_shaft_power_kW: float = 0.0
     # Turbine compression power this hour
 
@@ -459,6 +564,7 @@ class BatchRecord:
     feedstock_label: str = ''
     batch_mass_kg: float = 0.0
     additives_kg: Dict[str, float] = field(default_factory=dict)
+    initial_inventory: ProcessInventory = field(default_factory=ProcessInventory)
 
     # History
     snapshots: List[HourSnapshot] = field(default_factory=list)
@@ -473,6 +579,8 @@ class BatchRecord:
     # Final products (kg)
     products_kg: Dict[str, float] = field(default_factory=dict)
     oxygen_total_kg: float = 0.0
+    oxygen_stored_kg: float = 0.0
+    oxygen_vented_kg: float = 0.0
     terminal_slag_kg: float = 0.0
 
     # Energy

@@ -16,6 +16,7 @@ from typing import Dict
 
 from simulator.core import (
     BatchRecord, CondensationTrain, MeltState, OXIDE_SPECIES,
+    ProcessInventory,
 )
 
 
@@ -37,7 +38,9 @@ class MassBalance:
     def check(self, melt: MeltState,
               train: CondensationTrain,
               oxygen_kg: float,
-              volatiles_kg: float = 0.0) -> Dict[str, float]:
+              volatiles_kg: float = 0.0,
+              inventory: ProcessInventory = None,
+              additive_inventory_kg: Dict[str, float] = None) -> Dict[str, float]:
         """
         Check mass conservation.
 
@@ -52,10 +55,27 @@ class MassBalance:
         """
         mass_in = self.input_mass_kg + self.additive_mass_kg
         melt_remaining = melt.total_mass_kg
-        condensed = sum(train.total_by_species().values())
+        train_totals = train.total_by_species()
+        condensed = sum(
+            kg for species, kg in train_totals.items()
+            if species != 'O2')
         volatiles = sum(train.volatiles_collected_kg.values())
+        additive_inventory = sum((additive_inventory_kg or {}).values())
+        stage0_products = 0.0
+        drain_tap = 0.0
+        residual = 0.0
+        terminal_slag = 0.0
+        if inventory is not None:
+            stage0_products = sum(inventory.stage0_products_kg.values())
+            drain_tap = sum(inventory.drain_tap_kg.values())
+            residual = inventory.residual_mass_kg()
+            terminal_slag = sum(inventory.terminal_slag_components_kg.values())
 
-        mass_out = melt_remaining + condensed + oxygen_kg + volatiles
+        mass_out = (
+            melt_remaining + condensed + oxygen_kg + volatiles
+            + stage0_products + drain_tap + residual + terminal_slag
+            + additive_inventory
+        )
 
         error_pct = 0.0
         if mass_in > 0:
@@ -68,6 +88,12 @@ class MassBalance:
             'condensed': condensed,
             'oxygen': oxygen_kg,
             'volatiles': volatiles,
+            'stage0_products': stage0_products,
+            'drain_tap': drain_tap,
+            'residual': residual,
+            'terminal_slag': terminal_slag,
+            'stage0_mass_balance_delta': 0.0,
+            'additive_inventory': additive_inventory,
             'error_pct': error_pct,
         }
 
@@ -78,9 +104,13 @@ class MassBalance:
 
         Returns dict of species → total kg collected.
         """
-        products = dict(train.total_by_species())
+        products = {
+            species: kg for species, kg in train.total_by_species().items()
+            if species != 'O2'
+        }
         products['O2'] = oxygen_kg
-        products.update(train.volatiles_collected_kg)
+        for species, kg in train.volatiles_collected_kg.items():
+            products[species] = products.get(species, 0.0) + kg
         return products
 
     def stage_purity(self, train: CondensationTrain) -> Dict[int, Dict[str, float]]:

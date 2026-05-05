@@ -117,7 +117,7 @@ Currently compatible backend paths:
 - `PetThermoTools` — preferred Python API path for alphaMELTS-family calculations when installed.
 - `VapoRock` — optional vapor-pressure backend if the Python package is importable.
 - `alphaMELTS` binary — subprocess fallback. The app first checks the project-local path `engines/alphamelts/run_alphamelts.command`, then checks for `alphamelts` on `PATH`.
-- `FactSAGE/ChemApp` — stubbed integration point only; requires a commercial license and implementation work before use.
+- `FactSAGE/ChemApp` — optional ChemApp-backed adapter when a licensed local install and `FACTSAGE_CONFIG` mapping to a user-exported `.cst`/`.dat` file are available.
 
 For a local alphaMELTS install, put the executable here:
 

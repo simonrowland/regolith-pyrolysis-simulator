@@ -157,8 +157,8 @@ oxide_vapors:
     formula: "SiO"
     molar_mass_g_mol: 44.08
     parent_oxide: "SiO2"
-    stoich_oxide_per_vapor: 1.363  # kg SiO₂ consumed per kg SiO evaporated (60.08/44.08)
-    stoich_O2_per_vapor: 0.363    # kg O₂ freed per kg SiO evaporated (16.00/44.08)
+    stoich_oxide_per_vapor: 1.3629764065335754  # kg SiO₂ consumed per kg SiO evaporated
+    stoich_O2_per_vapor: 0.3629764065335753    # kg O₂ freed per kg SiO evaporated
     antoine:
       # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
       # Effective vapor pressure depends on a(SiO₂) and pO₂
@@ -169,6 +169,9 @@ oxide_vapors:
     valid_range_K: [1400, 2200]
     condensation_T_C: [900, 1200]
     condensation_product: "amorphous SiO₂ (disproportionation: 2SiO → Si + SiO₂)"
+    condensation_products_mol_per_mol_vapor:
+      Si: 0.5
+      SiO2: 0.5
     suppression_equation: "p(SiO) = K(T) × a(SiO₂) / √pO₂"
     suppression_factor_at_1mbar_O2: ">300×"
     notes: |

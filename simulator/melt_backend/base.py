@@ -10,7 +10,55 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
+
+
+BACKEND_CAPABILITY_KEYS = (
+    'silicate_melt',
+    'gas_volatiles',
+    'salt_phase',
+    'sulfide_matte',
+    'metal_alloy',
+)
+
+DEFAULT_BACKEND_CAPABILITIES = {
+    key: (key == 'silicate_melt')
+    for key in BACKEND_CAPABILITY_KEYS
+}
+
+
+def normalize_backend_capabilities(value: Any = None) -> Dict[str, bool]:
+    """
+    Normalize backend capability config.
+
+    Accepted forms:
+    - None: default silicate melt only
+    - mapping: {"silicate_melt": true, "gas_volatiles": false}
+    - sequence/string: enabled capability names
+    """
+    capabilities = dict(DEFAULT_BACKEND_CAPABILITIES)
+    if value is None:
+        return capabilities
+
+    if isinstance(value, str):
+        raw_items = [(value, True)]
+    elif isinstance(value, Mapping):
+        raw_items = value.items()
+    elif isinstance(value, (list, tuple, set)):
+        raw_items = [(item, True) for item in value]
+    else:
+        raise ValueError('backend capabilities must be a mapping or list')
+
+    for item in raw_items:
+        if isinstance(value, Mapping):
+            name, enabled = item
+        else:
+            name, enabled = item
+        key = str(name).strip()
+        if key not in BACKEND_CAPABILITY_KEYS:
+            raise ValueError(f'unknown backend capability: {key}')
+        capabilities[key] = bool(enabled)
+    return capabilities
 
 
 @dataclass
@@ -19,8 +67,8 @@ class EquilibriumResult:
     Result of a thermodynamic equilibrium calculation.
 
     Returned by MeltBackend.equilibrate() with phase assemblage,
-    activity coefficients, and vapor pressures at the given
-    temperature and composition.
+    species mol inventories where available, kg projections for external
+    reporting, activity coefficients, and vapor pressures.
     """
     temperature_C: float = 0.0
     pressure_bar: float = 0.0
@@ -28,6 +76,8 @@ class EquilibriumResult:
     # Phase assemblage
     phases_present: List[str] = field(default_factory=list)
     phase_masses_kg: Dict[str, float] = field(default_factory=dict)
+    phase_species_mol: Dict[str, Dict[str, float]] = field(default_factory=dict)
+    phase_species_kg: Dict[str, Dict[str, float]] = field(default_factory=dict)
     phase_compositions: Dict[str, Dict[str, float]] = field(default_factory=dict)
 
     # Liquid state
@@ -43,6 +93,9 @@ class EquilibriumResult:
 
     # Oxygen fugacity
     fO2_log: float = -9.0  # log10(fO2 / 1 bar)
+
+    # Backend diagnostics
+    warnings: List[str] = field(default_factory=list)
 
 
 class MeltBackend(ABC):
@@ -69,15 +122,19 @@ class MeltBackend(ABC):
 
     @abstractmethod
     def equilibrate(self, temperature_C: float,
-                    composition_kg: Dict[str, float],
+                    composition_kg: Optional[Dict[str, float]] = None,
                     fO2_log: float = -9.0,
-                    pressure_bar: float = 1e-6) -> EquilibriumResult:
+                    pressure_bar: float = 1e-6,
+                    *,
+                    composition_mol: Optional[Dict[str, float]] = None
+                    ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium at given conditions.
 
         Args:
             temperature_C:   Melt temperature (°C)
-            composition_kg:  Oxide masses in the melt (kg)
+            composition_kg:  External kg projection of melt species
+            composition_mol: Canonical melt species inventory in mol
             fO2_log:         log10(oxygen fugacity / 1 bar)
             pressure_bar:    Total pressure (bar)
 
@@ -88,6 +145,21 @@ class MeltBackend(ABC):
     @abstractmethod
     def get_vapor_species(self) -> List[str]:
         """Return list of vapor species this backend can calculate."""
+
+    def capabilities(self) -> Dict[str, bool]:
+        """Return chemistry/process coverage exposed by this backend."""
+        return dict(DEFAULT_BACKEND_CAPABILITIES)
+
+    def capability_summary(self) -> str:
+        """Human-readable capability status."""
+        enabled = [
+            key.replace('_', ' ')
+            for key, value in self.capabilities().items()
+            if value
+        ]
+        if enabled == ['silicate melt']:
+            return 'silicate melt only'
+        return ', '.join(enabled) if enabled else 'none'
 
 
 class StubBackend(MeltBackend):
@@ -105,8 +177,9 @@ class StubBackend(MeltBackend):
     def is_available(self) -> bool:
         return False  # Signals core.py to use its own stub logic
 
-    def equilibrate(self, temperature_C, composition_kg,
-                    fO2_log=-9.0, pressure_bar=1e-6):
+    def equilibrate(self, temperature_C, composition_kg=None,
+                    fO2_log=-9.0, pressure_bar=1e-6, *,
+                    composition_mol=None):
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,

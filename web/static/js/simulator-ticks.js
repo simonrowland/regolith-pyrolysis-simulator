@@ -11,6 +11,9 @@ socket.on('simulation_tick', (data) => {
     setEl('status-temp', 'T: ' + data.temperature_C.toFixed(0) + ' °C');
     setEl('status-campaign', data.campaign);
     setEl('status-mass', 'Melt: ' + data.melt_mass_kg.toFixed(0) + ' kg');
+    if (data.backend_fallback_active && data.backend_message) {
+        setEl('status-text', data.backend_message);
+    }
     const atmosphereLabel = data.atmosphere === 'CO2_BACKPRESSURE'
         ? 'Mars CO₂: ' + (data.p_total_mbar || 0).toFixed(1) + ' mbar'
         : data.atmosphere === 'HARD_VACUUM'

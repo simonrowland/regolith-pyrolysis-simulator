@@ -31,7 +31,7 @@ Feedback loops modelled:
     [LOOP-1]  Backpressure: overhead partial pressures feed back as
               P_ambient in the HK equation (handled in core.py)
     [LOOP-2]  Turbine capacity: O₂ flow capped at turbine max;
-              excess vented to lunar vacuum
+              excess routed to terminal vacuum vent accounting
     [LOOP-3]  Transport saturation: evap rate / pipe conductance
               feeds back to throttle ΔT/dt (handled in core.py)
 """
@@ -45,6 +45,9 @@ from typing import Optional
 from simulator.core import (
     EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
 )
+from simulator.state import MOLAR_MASS
+
+O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 
 
 class OverheadGasModel:
@@ -65,7 +68,10 @@ class OverheadGasModel:
     def update(self, evap_flux: EvaporationFlux,
                melt: MeltState,
                train: CondensationTrain,
-               turbine_spec=None) -> OverheadGas:
+               turbine_spec=None,
+               actual_O2_kg_hr: float = 0.0,
+               actual_O2_mol_hr: Optional[float] = None,
+               mre_anode_O2_mol_hr: float = 0.0) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
 
@@ -77,6 +83,12 @@ class OverheadGasModel:
                            If provided, enforces turbine max O₂ flow and
                            computes venting, shaft power, and transport
                            saturation metrics.
+            actual_O2_kg_hr: Melt/offgas O₂ produced this hour, kg.
+            actual_O2_mol_hr: Same melt/offgas O₂ flow in mol/hr. If omitted,
+                              it is projected from kg.
+            mre_anode_O2_mol_hr: MRE anode O₂ flow in mol/hr. Recorded as a
+                                 separate source bin and not counted as
+                                 turbine throughput.
 
         Returns:
             Updated OverheadGas with pressure, flow, and feedback data
@@ -137,9 +149,16 @@ class OverheadGasModel:
                 max(0.0, melt.p_total_mbar - melt.pO2_mbar))
 
         # ── Turbine flow + capacity enforcement ─────────── [LOOP-2]
-        # O₂ fraction of the total gas stream (~30% by mass)
-        O2_flow_kg_hr = total_evap_kg_hr * 0.3
+        O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)
+        O2_flow_mol_hr = (
+            max(0.0, float(actual_O2_mol_hr))
+            if actual_O2_mol_hr is not None
+            else O2_flow_kg_hr / O2_KG_PER_MOL
+        )
+        gas.melt_offgas_O2_mol_hr = O2_flow_mol_hr
+        gas.mre_anode_O2_mol_hr = max(0.0, float(mre_anode_O2_mol_hr))
         gas.turbine_flow_kg_hr = O2_flow_kg_hr
+        gas.turbine_flow_mol_hr = O2_flow_mol_hr
 
         if turbine_spec is not None and turbine_spec.max_O2_flow_kg_hr > 0:
             max_O2 = turbine_spec.max_O2_flow_kg_hr
@@ -149,13 +168,16 @@ class OverheadGasModel:
                 O2_flow_kg_hr / max_O2 * 100.0) if max_O2 > 0 else 0.0
 
             if O2_flow_kg_hr > max_O2:
-                # Turbine is overloaded — cap flow and vent excess
+                # Turbine is overloaded: cap compressed flow and vent excess.
                 gas.turbine_limited = True
                 gas.O2_vented_kg_hr = O2_flow_kg_hr - max_O2
+                gas.O2_vented_mol_hr = gas.O2_vented_kg_hr / O2_KG_PER_MOL
                 gas.turbine_flow_kg_hr = max_O2  # Only this much gets compressed
+                gas.turbine_flow_mol_hr = max_O2 / O2_KG_PER_MOL
             else:
                 gas.turbine_limited = False
                 gas.O2_vented_kg_hr = 0.0
+                gas.O2_vented_mol_hr = 0.0
 
             # ── Shaft power calculation ─────────────────────── [EQ-5]
             # W = (γ/(γ-1)) × ṁ × R_specific × T × [(p₂/p₁)^((γ-1)/γ) - 1] / η
@@ -168,6 +190,7 @@ class OverheadGasModel:
             gas.turbine_utilization_pct = 0.0
             gas.turbine_limited = False
             gas.O2_vented_kg_hr = 0.0
+            gas.O2_vented_mol_hr = 0.0
             gas.turbine_shaft_power_kW = O2_flow_kg_hr * 0.02
 
         return gas

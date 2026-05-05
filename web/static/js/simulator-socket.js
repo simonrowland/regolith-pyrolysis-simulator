@@ -14,6 +14,8 @@ socket.on('connect', () => {
 
 socket.on('simulation_status', (data) => {
     const el = document.getElementById('status-text');
-    if (el) el.textContent = data.status;
+    const backend = data.backend_message ? ` — ${data.backend_message}` : '';
+    if (el) el.textContent = `${data.status}${backend}`;
     if (data.message) console.log(data.message);
+    if (data.backend_message) console.log(data.backend_message);
 });

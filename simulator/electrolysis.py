@@ -35,7 +35,8 @@ Physics:
 
 Standard decomposition voltages at ~1600°C (per mol O₂):
     Na₂O:  <0.5 V   K₂O:   <0.5 V   FeO:    0.6 V
-    Cr₂O₃: 0.9 V    MnO:   1.0 V    SiO₂:   1.4 V
+    Fe₂O₃: 0.75 V   Cr₂O₃: 0.9 V    MnO:    1.0 V
+    SiO₂:  1.4 V
     TiO₂:  1.5 V    Al₂O₃: 1.9 V    MgO:    2.2 V
     CaO:   2.5 V
 
@@ -57,6 +58,9 @@ DECOMP_VOLTAGES = {
     'Na2O':  0.5,
     'K2O':   0.5,
     'FeO':   0.6,
+    # Simplified sequential ferric reduction: FeO is favored first; Fe2O3
+    # remains explicit until a fO2-coupled ferric/ferrous melt model lands.
+    'Fe2O3': 0.75,
     'Cr2O3': 0.9,
     'MnO':   1.0,
     'SiO2':  1.4,
@@ -71,6 +75,7 @@ ELECTRONS_PER_OXIDE = {
     'Na2O':  2,   # Na₂O → 2 Na + ½ O₂  (2 electrons)
     'K2O':   2,
     'FeO':   2,   # FeO → Fe + ½ O₂
+    'Fe2O3': 6,   # Fe₂O₃ → 2 Fe + 1½ O₂
     'Cr2O3': 6,   # Cr₂O₃ → 2 Cr + 1½ O₂
     'MnO':   2,
     'SiO2':  4,   # SiO₂ → Si + O₂
@@ -149,8 +154,11 @@ class ElectrolysisModel:
         comp = melt_state.composition_wt_pct()
         result = {
             'oxides_reduced_kg': {},
+            'oxides_reduced_mol': {},
             'metals_produced_kg': {},
+            'metals_produced_mol': {},
             'O2_produced_kg': 0.0,
+            'O2_produced_mol': 0.0,
             'energy_kWh': 0.0,
         }
 
@@ -202,23 +210,31 @@ class ElectrolysisModel:
             # Don't reduce more than available
             available = melt_state.composition_kg.get(oxide, 0.0)
             kg_oxide_reduced = min(kg_oxide_reduced, available)
+            moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
 
             if kg_oxide_reduced > 1e-10:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
+                result['oxides_reduced_mol'][oxide] = moles_reduced
 
                 # Metal produced
                 metal_info = OXIDE_TO_METAL.get(oxide)
                 if metal_info:
                     metal, n_met, n_oxy = metal_info
                     M_metal_gmol = MOLAR_MASS[metal]  # g/mol
-                    moles_oxide = kg_oxide_reduced * 1000.0 / M_oxide_gmol
-                    metal_kg = moles_oxide * n_met * M_metal_gmol / 1000.0
-                    result['metals_produced_kg'][metal] = metal_kg
+                    metal_mol = moles_reduced * n_met
+                    metal_kg = metal_mol * M_metal_gmol / 1000.0
+                    result['metals_produced_kg'][metal] = (
+                        result['metals_produced_kg'].get(metal, 0.0)
+                        + metal_kg)
+                    result['metals_produced_mol'][metal] = (
+                        result['metals_produced_mol'].get(metal, 0.0)
+                        + metal_mol)
 
                     # O₂ produced
-                    M_O_gmol = MOLAR_MASS['O']  # 16.0 g/mol
-                    O2_kg = moles_oxide * n_oxy * M_O_gmol / 1000.0
+                    O2_mol = moles_reduced * n_oxy / 2.0
+                    O2_kg = O2_mol * MOLAR_MASS['O2'] / 1000.0
                     result['O2_produced_kg'] += O2_kg
+                    result['O2_produced_mol'] += O2_mol
 
         # Energy consumed
         result['energy_kWh'] = voltage_V * current_A * 1.0 / 1000.0  # V×A×hr/1000

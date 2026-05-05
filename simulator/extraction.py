@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict
+import math
+from typing import Dict, Mapping
 
 from simulator.state import (
     FARADAY,
@@ -13,6 +14,165 @@ from simulator.state import (
 
 
 class ExtractionMixin:
+    _LEDGER_KG_TOL = 1e-9
+
+    @staticmethod
+    def _positive_ledger_kg(
+        species_kg: Mapping[str, float],
+        tolerance_kg: float = _LEDGER_KG_TOL,
+    ) -> Dict[str, float]:
+        return {
+            str(species): float(kg)
+            for species, kg in species_kg.items()
+            if float(kg) > tolerance_kg
+        }
+
+    @staticmethod
+    def _positive_ledger_mol(
+        species_mol: Mapping[str, float],
+        tolerance_mol: float = 1e-12,
+    ) -> Dict[str, float]:
+        return {
+            str(species): float(mol)
+            for species, mol in species_mol.items()
+            if float(mol) > tolerance_mol
+        }
+
+    def _ledger_account_species_kg(self, account: str, species: str) -> float:
+        return max(
+            0.0,
+            float(self.atom_ledger.kg_by_account(account).get(species, 0.0)),
+        )
+
+    def _process_reagent_inventory_kg(self, species: str) -> float:
+        return self._ledger_account_species_kg(
+            'process.reagent_inventory', species)
+
+    def _record_atom_transition(
+        self,
+        name: str,
+        *,
+        debits: tuple[tuple[str, Mapping[str, float]], ...],
+        credits: tuple[tuple[str, Mapping[str, float]], ...],
+        reason: str,
+    ) -> bool:
+        debit_lots = []
+        for account, species_kg in debits:
+            payload = self._positive_ledger_kg(species_kg)
+            if payload:
+                debit_lots.append(self.atom_ledger.debit(account, payload))
+
+        credit_lots = []
+        for account, species_kg in credits:
+            payload = self._positive_ledger_kg(species_kg)
+            if payload:
+                credit_lots.append(self.atom_ledger.credit(account, payload))
+
+        if not debit_lots and not credit_lots:
+            return False
+        self.atom_ledger.record(
+            name,
+            debits=tuple(debit_lots),
+            credits=tuple(credit_lots),
+            reason=reason,
+        )
+        return True
+
+    def _record_atom_transition_mol(
+        self,
+        name: str,
+        *,
+        debits: tuple[tuple[str, Mapping[str, float]], ...],
+        credits: tuple[tuple[str, Mapping[str, float]], ...],
+        reason: str,
+    ) -> bool:
+        debit_lots = []
+        for account, species_mol in debits:
+            payload = self._positive_ledger_mol(species_mol)
+            if payload:
+                debit_lots.append(self.atom_ledger.debit_mol(account, payload))
+
+        credit_lots = []
+        for account, species_mol in credits:
+            payload = self._positive_ledger_mol(species_mol)
+            if payload:
+                credit_lots.append(self.atom_ledger.credit_mol(account, payload))
+
+        if not debit_lots and not credit_lots:
+            return False
+        self.atom_ledger.record(
+            name,
+            debits=tuple(debit_lots),
+            credits=tuple(credit_lots),
+            reason=reason,
+        )
+        return True
+
+    def _move_ledger_species(
+        self,
+        name: str,
+        debit_account: str,
+        credit_account: str,
+        species: str,
+        kg: float,
+        *,
+        reason: str,
+    ) -> float:
+        kg = max(0.0, float(kg))
+        if kg <= self._LEDGER_KG_TOL:
+            return 0.0
+        self.atom_ledger.move(
+            name,
+            debit_account,
+            credit_account,
+            {species: kg},
+            reason=reason,
+        )
+        return kg
+
+    def _draw_reagent_to_process(self, species: str, requested_kg: float) -> float:
+        requested_kg = max(0.0, float(requested_kg))
+        if requested_kg <= self._LEDGER_KG_TOL:
+            return 0.0
+
+        reservoir = f'reservoir.reagent.{species}'
+        available_kg = self._ledger_account_species_kg(reservoir, species)
+        draw_kg = min(requested_kg, available_kg)
+        if draw_kg <= self._LEDGER_KG_TOL:
+            return 0.0
+        return self._move_ledger_species(
+            f'draw_{species}_reagent_to_process',
+            reservoir,
+            'process.reagent_inventory',
+            species,
+            draw_kg,
+            reason=f'{species} reagent draw from reservoir',
+        )
+
+    def _sync_reagent_counter_from_ledger(self, species: str) -> float:
+        return self._process_reagent_inventory_kg(species)
+
+    def _set_melt_species_projection(self, species: str, kg: float) -> None:
+        self.melt.composition_kg.update({species: max(0.0, float(kg))})
+
+    def _project_extraction_melt(self) -> None:
+        self._project_cleaned_melt_from_atom_ledger()
+
+    def _set_condensed_species_projection(
+        self, stage_idx: int, species: str, kg: float
+    ) -> None:
+        self.train.stages[stage_idx].collected_kg.update(
+            {species: max(0.0, float(kg))})
+
+    def _project_condensed_species(
+        self, stage_idx: int, species: str
+    ) -> None:
+        kg = self._ledger_account_species_kg(
+            'process.condensation_train', species)
+        for stage in self.train.stages:
+            stage.collected_kg.pop(species, None)
+        self._set_condensed_species_projection(stage_idx, species, kg)
+
     def _build_mre_voltage_sequence(self) -> list:
         """Build the stepped voltage hold sequence from setpoints.yaml."""
         # Try to load from setpoints
@@ -100,12 +260,7 @@ class ExtractionMixin:
             current_A=current_A,
             T_C=self.melt.temperature_C,
         )
-
-        # Update melt composition (subtract reduced oxides)
-        for oxide, kg_removed in result.get('oxides_reduced_kg', {}).items():
-            if oxide in self.melt.composition_kg:
-                self.melt.composition_kg[oxide] = max(
-                    0.0, self.melt.composition_kg[oxide] - kg_removed)
+        self._record_mre_ledger_transition(result)
 
         # Route cathode metals to condenser stages (product ledger).    [Step 4]
         # Same pattern as C6 thermite — condenser train serves as the
@@ -118,20 +273,15 @@ class ExtractionMixin:
         for metal, kg_produced in result.get('metals_produced_kg', {}).items():
             if kg_produced > 1e-10:
                 stage_idx = MRE_METAL_STAGE.get(metal, 1)
-                self.train.stages[stage_idx].collected_kg[metal] = (
-                    self.train.stages[stage_idx].collected_kg.get(metal, 0.0)
-                    + kg_produced)
+                self._project_condensed_species(stage_idx, metal)
 
         self._mre_metals_this_hr = dict(result.get('metals_produced_kg', {}))
 
-        self.melt.update_total_mass()
+        self._project_extraction_melt()
 
         # Route anodic O₂ to Stage 6 accumulator (mass balance).       [Step 5]
-        O2_kg = result.get('O2_produced_kg', 0.0)
-        self.oxygen_cumulative_kg += O2_kg
-        if O2_kg > 1e-10:
-            self.train.stages[6].collected_kg['O2'] = (
-                self.train.stages[6].collected_kg.get('O2', 0.0) + O2_kg)
+        O2_kg = max(0.0, float(result.get('O2_produced_kg', 0.0)))
+        self._sync_oxygen_kg_counters()
 
         # Store energy for EnergyTracker (don't add to cumulative).    [Step 6]
         self._mre_energy_this_hr = result.get('energy_kWh', 0.0)
@@ -154,6 +304,48 @@ class ExtractionMixin:
         self.melt.mre_current_A = self._mre_effective_current_A
 
         return O2_kg
+
+    def _record_mre_ledger_transition(self, result: Mapping[str, object]) -> None:
+        oxide_mol = self._positive_ledger_mol(
+            result.get('oxides_reduced_mol', {}))
+        if oxide_mol:
+            metal_mol = self._positive_ledger_mol(
+                result.get('metals_produced_mol', {}))
+            O2_mol = max(0.0, float(result.get('O2_produced_mol', 0.0)))
+            credits_mol: list[tuple[str, Mapping[str, float]]] = []
+            if metal_mol:
+                credits_mol.append(('process.condensation_train', metal_mol))
+            if O2_mol > 1e-12:
+                credits_mol.append(
+                    ('terminal.oxygen_mre_anode_stored', {'O2': O2_mol}))
+            self._record_atom_transition_mol(
+                'mre_electrolysis_reduction',
+                debits=(('process.cleaned_melt', oxide_mol),),
+                credits=tuple(credits_mol),
+                reason='MRE oxide reduction to cathode products and oxygen',
+            )
+            return
+
+        oxides = self._positive_ledger_kg(
+            result.get('oxides_reduced_kg', {}))
+        metals = self._positive_ledger_kg(
+            result.get('metals_produced_kg', {}))
+        O2_kg = max(0.0, float(result.get('O2_produced_kg', 0.0)))
+        if not oxides:
+            return
+
+        credits: list[tuple[str, Mapping[str, float]]] = []
+        if metals:
+            credits.append(('process.condensation_train', metals))
+        if O2_kg > self._LEDGER_KG_TOL:
+            credits.append(('terminal.oxygen_mre_anode_stored', {'O2': O2_kg}))
+
+        self._record_atom_transition(
+            'mre_electrolysis_reduction',
+            debits=(('process.cleaned_melt', oxides),),
+            credits=tuple(credits),
+            reason='MRE oxide reduction to cathode products and oxygen',
+        )
 
     # ------------------------------------------------------------------
     # Alkali Shuttle (C3) — Metallothermic Reduction            [THERMO-5]
@@ -178,19 +370,19 @@ class ExtractionMixin:
         Called once at the start of C3_K and C3_NA phases.
         """
         if campaign == CampaignPhase.C3_K:
-            # Primary source: user-supplied inventory additives
-            self.shuttle_K_inventory_kg = self.record.additives_kg.get('K', 0.0)
-            # Bonus: collect any K condensed during earlier campaigns
-            for stage in self.train.stages:
-                self.shuttle_K_inventory_kg += stage.collected_kg.get('K', 0.0)
+            self._activated_additive_reagents.add('K')
+            self._draw_reagent_to_process(
+                'K', self.record.additives_kg.get('K', 0.0))
+            self._transfer_condensed_species('K')
+            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             self.shuttle_cycle_K = 0
 
         elif campaign == CampaignPhase.C3_NA:
-            # Primary source: user-supplied inventory additives
-            self.shuttle_Na_inventory_kg = self.record.additives_kg.get('Na', 0.0)
-            # Bonus: collect any Na condensed during earlier campaigns
-            for stage in self.train.stages:
-                self.shuttle_Na_inventory_kg += stage.collected_kg.get('Na', 0.0)
+            self._activated_additive_reagents.add('Na')
+            self._draw_reagent_to_process(
+                'Na', self.record.additives_kg.get('Na', 0.0))
+            self._transfer_condensed_species('Na')
+            self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_Na = 0
 
     def _step_shuttle(self):
@@ -319,23 +511,27 @@ class ExtractionMixin:
         K2O_added_kg = (mol_FeO_reduced * MOLAR_MASS['K2O']) / 1000.0
         Fe_produced_kg = (mol_FeO_reduced * MOLAR_MASS['Fe']) / 1000.0
 
-        # Apply to melt
-        self.melt.composition_kg['FeO'] = max(
-            0.0, self.melt.composition_kg.get('FeO', 0.0) - FeO_removed_kg)
-        self.melt.composition_kg['K2O'] = (
-            self.melt.composition_kg.get('K2O', 0.0) + K2O_added_kg)
+        self._record_atom_transition(
+            'c3_k_shuttle_fe_reduction',
+            debits=(
+                ('process.reagent_inventory', {'K': K_used_kg}),
+                ('process.cleaned_melt', {'FeO': FeO_removed_kg}),
+            ),
+            credits=(
+                ('process.cleaned_melt', {'K2O': K2O_added_kg}),
+                ('process.condensation_train', {'Fe': Fe_produced_kg}),
+            ),
+            reason='K shuttle reduction of FeO',
+        )
 
         # Fe produced goes to condenser Stage 1 (liquid Fe drains to sump)
-        stage1 = self.train.stages[1]
-        stage1.collected_kg['Fe'] = (
-            stage1.collected_kg.get('Fe', 0.0) + Fe_produced_kg)
+        self._project_condensed_species(1, 'Fe')
 
         # Deduct K from shuttle inventory
         # (K comes from additives, not from a condenser stage)
-        self.shuttle_K_inventory_kg -= K_used_kg
+        self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
 
-        # Update totals
-        self.melt.update_total_mass()
+        self._project_extraction_melt()
 
         # Track for snapshot
         self._shuttle_injected_this_hr = K_used_kg
@@ -405,12 +601,21 @@ class ExtractionMixin:
             Na2O_from_Cr = (mol_Cr2O3_reduced * 3 * MOLAR_MASS['Na2O']) / 1000.0
             Cr_produced = (mol_Cr2O3_reduced * 2 * MOLAR_MASS['Cr']) / 1000.0
 
-            self.melt.composition_kg['Cr2O3'] = max(
-                0.0, self.melt.composition_kg.get('Cr2O3', 0.0) - Cr2O3_removed)
-            self.melt.composition_kg['Na2O'] = (
-                self.melt.composition_kg.get('Na2O', 0.0) + Na2O_from_Cr)
-            self.train.stages[1].collected_kg['Cr'] = (
-                self.train.stages[1].collected_kg.get('Cr', 0.0) + Cr_produced)
+            self._record_atom_transition(
+                'c3_na_shuttle_cr_reduction',
+                debits=(
+                    ('process.reagent_inventory', {'Na': (
+                        mol_Na_for_Cr * MOLAR_MASS['Na']) / 1000.0}),
+                    ('process.cleaned_melt', {'Cr2O3': Cr2O3_removed}),
+                ),
+                credits=(
+                    ('process.cleaned_melt', {'Na2O': Na2O_from_Cr}),
+                    ('process.condensation_train', {'Cr': Cr_produced}),
+                ),
+                reason='Na shuttle reduction of Cr2O3',
+            )
+
+            self._project_condensed_species(1, 'Cr')
 
             mol_Na -= mol_Na_for_Cr
             Na_used += (mol_Na_for_Cr * MOLAR_MASS['Na']) / 1000.0
@@ -435,12 +640,21 @@ class ExtractionMixin:
             Na2O_from_Ti = (mol_TiO2_reduced * 2 * MOLAR_MASS['Na2O']) / 1000.0
             Ti_produced = (mol_TiO2_reduced * MOLAR_MASS['Ti']) / 1000.0
 
-            self.melt.composition_kg['TiO2'] = max(
-                0.0, self.melt.composition_kg.get('TiO2', 0.0) - TiO2_removed)
-            self.melt.composition_kg['Na2O'] = (
-                self.melt.composition_kg.get('Na2O', 0.0) + Na2O_from_Ti)
-            self.train.stages[1].collected_kg['Ti'] = (
-                self.train.stages[1].collected_kg.get('Ti', 0.0) + Ti_produced)
+            self._record_atom_transition(
+                'c3_na_shuttle_ti_reduction',
+                debits=(
+                    ('process.reagent_inventory', {'Na': (
+                        mol_Na_for_Ti * MOLAR_MASS['Na']) / 1000.0}),
+                    ('process.cleaned_melt', {'TiO2': TiO2_removed}),
+                ),
+                credits=(
+                    ('process.cleaned_melt', {'Na2O': Na2O_from_Ti}),
+                    ('process.condensation_train', {'Ti': Ti_produced}),
+                ),
+                reason='Na shuttle reduction of TiO2',
+            )
+
+            self._project_condensed_species(1, 'Ti')
 
             mol_Na -= mol_Na_for_Ti
             Na_used += (mol_Na_for_Ti * MOLAR_MASS['Na']) / 1000.0
@@ -450,9 +664,9 @@ class ExtractionMixin:
 
         # Deduct Na from shuttle inventory
         # (Na comes from additives, not from a condenser stage)
-        self.shuttle_Na_inventory_kg -= Na_used
+        self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
 
-        self.melt.update_total_mass()
+        self._project_extraction_melt()
 
         # Track for snapshot
         self._shuttle_injected_this_hr = Na_used
@@ -474,12 +688,38 @@ class ExtractionMixin:
         Typical requirement: ~50-60 kg Mg for 1000 kg batch
         (stoichiometric: 3 mol Mg per mol Al₂O₃, with losses).
         """
-        # Primary source: user additives
-        self.thermite_Mg_inventory_kg = self.record.additives_kg.get('Mg', 0.0)
+        self._activated_additive_reagents.add('Mg')
+        self._draw_reagent_to_process(
+            'Mg', self.record.additives_kg.get('Mg', 0.0))
+        self._transfer_condensed_species('Mg')
+        self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
 
-        # Bonus: collect Mg condensed in earlier campaigns (C4 Mg pyrolysis)
+    def _transfer_condensed_species(self, species: str) -> float:
+        """Move recovered condensate into reagent inventory exactly once."""
+        source_account = 'process.condensation_train'
+        recovered_kg = self._ledger_account_species_kg(
+            source_account, species)
+        if recovered_kg <= self._LEDGER_KG_TOL:
+            return 0.0
+        self._move_ledger_species(
+            f'recover_{species}_to_reagent_inventory',
+            source_account,
+            'process.reagent_inventory',
+            species,
+            recovered_kg,
+            reason=f'recovered {species} condensate transfer',
+        )
         for stage in self.train.stages:
-            self.thermite_Mg_inventory_kg += stage.collected_kg.get('Mg', 0.0)
+            kg = stage.collected_kg.get(species, 0.0)
+            if kg > 0.0:
+                stage.collected_kg.update({species: 0.0})
+        if species == 'K':
+            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
+        elif species == 'Na':
+            self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
+        elif species == 'Mg':
+            self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
+        return recovered_kg
 
     def _step_thermite(self):
         """
@@ -558,6 +798,19 @@ class ExtractionMixin:
         MgO_produced_kg = (mol_Al2O3_reduced * 3 * MOLAR_MASS['MgO']) / 1000.0
         Al_produced_kg = (mol_Al2O3_reduced * 2 * MOLAR_MASS['Al']) / 1000.0
 
+        self._record_atom_transition(
+            'c6_mg_thermite_primary',
+            debits=(
+                ('process.reagent_inventory', {'Mg': Mg_consumed_kg}),
+                ('process.cleaned_melt', {'Al2O3': Al2O3_removed_kg}),
+            ),
+            credits=(
+                ('process.cleaned_melt', {'MgO': MgO_produced_kg}),
+                ('process.condensation_train', {'Al': Al_produced_kg}),
+            ),
+            reason='Mg thermite reduction of Al2O3',
+        )
+
         # --- Back-reduction cascade (Al + SiO₂) ---            [THERMO-8]
         # ~30% of freshly produced Al reacts with residual SiO₂:
         #   4Al + 3SiO₂ → 2Al₂O₃ + 3Si
@@ -577,15 +830,21 @@ class ExtractionMixin:
             Si_produced_kg = (mol_SiO2_consumed * MOLAR_MASS['Si']) / 1000.0
             Al_lost_to_back_kg = (mol_Al_consumed * MOLAR_MASS['Al']) / 1000.0
 
-            # Apply back-reduction to melt
-            self.melt.composition_kg['SiO2'] = max(
-                0.0, self.melt.composition_kg.get('SiO2', 0.0) - SiO2_consumed_kg)
-            self.melt.composition_kg['Al2O3'] = (
-                self.melt.composition_kg.get('Al2O3', 0.0) + Al2O3_regenerated_kg)
+            self._record_atom_transition(
+                'c6_al_si_back_reduction',
+                debits=(
+                    ('process.condensation_train', {'Al': Al_lost_to_back_kg}),
+                    ('process.cleaned_melt', {'SiO2': SiO2_consumed_kg}),
+                ),
+                credits=(
+                    ('process.cleaned_melt', {'Al2O3': Al2O3_regenerated_kg}),
+                    ('process.condensation_train', {'Si': Si_produced_kg}),
+                ),
+                reason='Al back-reduction of SiO2 during thermite',
+            )
 
             # Si product → condenser Stage 2
-            self.train.stages[2].collected_kg['Si'] = (
-                self.train.stages[2].collected_kg.get('Si', 0.0) + Si_produced_kg)
+            self._project_condensed_species(2, 'Si')
 
             # Net Al after back-reduction
             Al_produced_kg -= Al_lost_to_back_kg
@@ -593,21 +852,13 @@ class ExtractionMixin:
             # Net Al₂O₃ removal (primary minus regenerated)
             Al2O3_removed_kg -= Al2O3_regenerated_kg
 
-        # --- Apply primary reaction to melt ---
-        self.melt.composition_kg['Al2O3'] = max(
-            0.0, self.melt.composition_kg.get('Al2O3', 0.0) - Al2O3_removed_kg)
-        self.melt.composition_kg['MgO'] = (
-            self.melt.composition_kg.get('MgO', 0.0) + MgO_produced_kg)
-
         # Al product → condenser Stage 1 (liquid metal sump)
-        self.train.stages[1].collected_kg['Al'] = (
-            self.train.stages[1].collected_kg.get('Al', 0.0) + max(0.0, Al_produced_kg))
+        self._project_condensed_species(1, 'Al')
 
         # Deduct Mg from thermite inventory
-        self.thermite_Mg_inventory_kg -= Mg_consumed_kg
+        self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
 
-        # Update melt totals
-        self.melt.update_total_mass()
+        self._project_extraction_melt()
 
         # Track for snapshot / summary
         self._thermite_Al2O3_reduced_this_hr = max(0.0, Al2O3_removed_kg)

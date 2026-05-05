@@ -15,7 +15,7 @@ Train topology (metals train, active C2A onward):
     Stage 3  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
     Stage 4  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 5  Turbine-compressor      — pressure regulation, pO₂ control
-    Stage 6  O₂ accumulator (~3 bar) — compressed O₂ storage
+    Stage 6  Turbine outlet monitor — terminal ledger owns O2 storage
 
 A separate volatiles train handles C0/C0b products and is sealed
 by a gate valve after devolatilisation.
@@ -42,6 +42,7 @@ The Fe → SiO separation (Stage 1 → Stage 2):
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass, field
 from typing import Dict
 
 from simulator.core import (
@@ -77,6 +78,20 @@ STICKING_COEFF = {
 }
 
 
+@dataclass(frozen=True)
+class CondensationRouteResult:
+    """Per-hour routing plan; quantities are projections until ledger credit."""
+
+    remaining_by_species: Dict[str, float] = field(default_factory=dict)
+    condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+
+    def condensed_for_species(self, species: str) -> float:
+        return sum(
+            stage_species.get(species, 0.0)
+            for stage_species in self.condensed_by_stage_species.values()
+        )
+
+
 class CondensationModel:
     """
     Routes evaporated species through the condensation train.
@@ -110,8 +125,12 @@ class CondensationModel:
         added to that stage's collected_kg; the remainder passes
         to the next stage.
 
-        O₂ passes through all stages to the accumulator (Stage 6).
+        O2 terminal storage is handled by the simulator atom ledger.  Stage
+        collection dictionaries are UI projections and are updated only after
+        the simulator commits the matching ledger transition.
         """
+        remaining_by_species = {}
+        condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
 
@@ -133,12 +152,19 @@ class CondensationModel:
 
                 condensed_kg = remaining_kg * eta
                 if condensed_kg > 1e-15:
-                    # Map SiO vapor → SiO₂ solid (disproportionation)
-                    product = 'SiO2' if species == 'SiO' else species
-                    stage.collected_kg[product] = (
-                        stage.collected_kg.get(product, 0.0) + condensed_kg)
+                    stage_species = condensed_by_stage_species.setdefault(
+                        stage.stage_number, {})
+                    stage_species[species] = (
+                        stage_species.get(species, 0.0) + condensed_kg)
 
                 remaining_kg -= condensed_kg
+
+            remaining_by_species[species] = max(0.0, remaining_kg)
+
+        return CondensationRouteResult(
+            remaining_by_species=remaining_by_species,
+            condensed_by_stage_species=condensed_by_stage_species,
+        )
 
     def _condensation_efficiency(self, T_stage_C: float,
                                   T_cond_C: float,
