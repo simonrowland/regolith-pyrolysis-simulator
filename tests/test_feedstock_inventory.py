@@ -202,6 +202,26 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
                 },
                 "stage0_profile": "carbonaceous_degas_cleanup",
                 "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "C": {
+                        "template": "generic_carbonaceous_organic",
+                        "decomposition_temp_range_C": [200.0, 800.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [20.0, 50.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "test generic organic carbon inventory",
+                    },
+                    "hydrocarbons": {
+                        "template": "generic_carbonaceous_hydrocarbon",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [15.0, 30.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "test generic hydrocarbon inventory",
+                    },
+                },
                 "anhydrous_silicate_after_degassing": {
                     "mass_per_tonne_kg": [650, 800],
                     "composition_wt_pct": {
@@ -236,14 +256,79 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     assert "S" not in sim.melt.composition_kg
     assert sim.melt.composition_kg["NiO"] == pytest.approx(15.889148)
 
-    assert inv.gas_volatiles_kg["H2O"] == pytest.approx(154.241645)
-    assert inv.gas_volatiles_kg["C"] == pytest.approx(35.989717)
+    assert inv.gas_volatiles_kg["H2O"] > 154.241645
+    assert "C" not in inv.gas_volatiles_kg
+    assert inv.gas_volatiles_kg["CO2"] > 0.0
+    assert inv.gas_volatiles_kg["N2"] > 0.0
+    assert inv.stage0_external_inputs_kg["O2"] > 0.0
     assert "hydrocarbons" not in inv.gas_volatiles_kg
     assert inv.sulfide_matte_kg["S"] == pytest.approx(41.131105)
     assert "Fe_Ni_alloy" not in inv.metal_alloy_kg
     assert "Fe_Ni_alloy" not in inv.drain_tap_kg
     assert "Fe_Ni_alloy" not in inv.stage0_products_kg
     assert "cleaned_melt_NiO" not in inv.residual_components_kg
+
+
+def test_mixed_organic_stage0_formula_metadata_is_required():
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "organics": 10.0,
+                },
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="stage0_formula_inventory.organics"):
+        sim.load_batch("comet", mass_kg=1000.0)
+
+
+def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "organics": 10.0,
+                },
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "organics": {
+                        "template": "generic_carbonaceous_organic",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [50.0, 100.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "test generic organics inventory",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    sim.load_batch("comet", mass_kg=1000.0)
+    inv = sim.inventory
+
+    assert "organics" not in inv.gas_volatiles_kg
+    assert inv.gas_volatiles_kg["CO2"] > 0.0
+    assert inv.gas_volatiles_kg["H2O"] > 0.0
+    assert inv.gas_volatiles_kg["N2"] > 0.0
+    assert inv.stage0_external_inputs_kg["O2"] > 0.0
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 
 def test_anhydrous_silicate_handoff_requires_loud_stage0_profile():

@@ -168,6 +168,7 @@ class ProcessInventory:
     sulfide_matte_kg: Dict[str, float] = field(default_factory=dict)
     metal_alloy_kg: Dict[str, float] = field(default_factory=dict)
     terminal_slag_components_kg: Dict[str, float] = field(default_factory=dict)
+    stage0_external_inputs_kg: Dict[str, float] = field(default_factory=dict)
     stage0_profile: str = 'bulk_preservation'
     cleaned_melt_source: str = 'composition_wt_pct'
     stage0_temp_range_C: Tuple[float, float] = (20.0, 950.0)
@@ -187,6 +188,7 @@ class ProcessInventory:
             metal_alloy_kg=dict(self.metal_alloy_kg),
             terminal_slag_components_kg=dict(
                 self.terminal_slag_components_kg),
+            stage0_external_inputs_kg=dict(self.stage0_external_inputs_kg),
             stage0_profile=self.stage0_profile,
             cleaned_melt_source=self.cleaned_melt_source,
             stage0_temp_range_C=tuple(self.stage0_temp_range_C),

@@ -123,6 +123,7 @@ class SpeciesFormula:
     elements: Mapping[str, float]
     molar_mass_g_mol: float | None = None
     estimated: bool = False
+    requires_feedstock_metadata: bool = False
     source: str = ""
 
     def __post_init__(self) -> None:
@@ -169,6 +170,11 @@ class SpeciesFormula:
         object.__setattr__(self, "elements", MappingProxyType(dict(sorted(normalized.items()))))
         object.__setattr__(self, "molar_mass_g_mol", derived_molar_mass)
         object.__setattr__(self, "estimated", bool(self.estimated))
+        object.__setattr__(
+            self,
+            "requires_feedstock_metadata",
+            bool(self.requires_feedstock_metadata),
+        )
         object.__setattr__(self, "source", str(self.source or ""))
 
     @classmethod
@@ -183,6 +189,7 @@ class SpeciesFormula:
         *,
         molar_mass_g_mol: float | None = None,
         estimated: bool = False,
+        requires_feedstock_metadata: bool = False,
         source: str = "",
     ) -> "SpeciesFormula":
         return cls(
@@ -190,6 +197,7 @@ class SpeciesFormula:
             elements=atoms,
             molar_mass_g_mol=molar_mass_g_mol,
             estimated=estimated,
+            requires_feedstock_metadata=requires_feedstock_metadata,
             source=source,
         )
 
@@ -253,6 +261,9 @@ def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFor
         return parse_formula(value, species=species)
     if isinstance(value, Mapping):
         estimated = bool(value.get("estimated", False))
+        requires_feedstock_metadata = bool(
+            value.get("requires_feedstock_metadata", False)
+        )
         source = str(value.get("source", ""))
         declared_molar_mass = _declared_molar_mass(value)
         if "atoms" in value:
@@ -264,6 +275,7 @@ def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFor
                 atoms,
                 molar_mass_g_mol=declared_molar_mass,
                 estimated=estimated,
+                requires_feedstock_metadata=requires_feedstock_metadata,
                 source=source,
             )
         if "elements" in value:
@@ -275,6 +287,24 @@ def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFor
                 elements,
                 molar_mass_g_mol=declared_molar_mass,
                 estimated=estimated,
+                requires_feedstock_metadata=requires_feedstock_metadata,
+                source=source,
+            )
+        mass_fractions = (
+            value.get("atom_mass_fractions")
+            or value.get("element_mass_fractions")
+        )
+        if mass_fractions is not None:
+            if not isinstance(mass_fractions, Mapping):
+                raise UnknownSpeciesError(
+                    f"atom_mass_fractions entry for {species!r} must be a mapping"
+                )
+            return SpeciesFormula.from_atoms(
+                species,
+                _atoms_from_mass_fractions(species, mass_fractions),
+                molar_mass_g_mol=declared_molar_mass,
+                estimated=estimated,
+                requires_feedstock_metadata=requires_feedstock_metadata,
                 source=source,
             )
         if "formula" in value:
@@ -284,6 +314,7 @@ def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFor
                 elements=parsed.elements,
                 molar_mass_g_mol=declared_molar_mass,
                 estimated=estimated,
+                requires_feedstock_metadata=requires_feedstock_metadata,
                 source=source,
             )
         if all(str(element) in ATOMIC_WEIGHTS_G_PER_MOL for element in value):
@@ -298,6 +329,37 @@ def load_species_formulas(source: str | Path | Mapping[str, Any]) -> dict[str, S
     entries = _extract_formula_entries(data)
     _validate_case_aliases(entries)
     return {species: coerce_species_formula(species, spec) for species, spec in entries.items()}
+
+
+def _atoms_from_mass_fractions(
+    species: str, mass_fractions: Mapping[str, Any]
+) -> dict[str, float]:
+    """Convert element mass fractions into atom-count ratios.
+
+    The mass basis is arbitrary: fractions, percentages, and per-1000 values all
+    produce the same atom moles per kg because the derived formula unit carries
+    the same total mass basis.
+    """
+    atoms: dict[str, float] = {}
+    for element, raw_fraction in mass_fractions.items():
+        symbol = str(element).strip()
+        if symbol not in ATOMIC_WEIGHTS_G_PER_MOL:
+            raise UnknownSpeciesError(
+                f"unknown atomic weight for element {symbol!r} in {species!r}"
+            )
+        fraction = float(raw_fraction)
+        if not math.isfinite(fraction) or fraction <= 0.0:
+            raise AccountingError(
+                f"mass fraction for {symbol!r} in {species!r} must be positive"
+            )
+        atoms[symbol] = atoms.get(symbol, 0.0) + (
+            fraction / ATOMIC_WEIGHTS_G_PER_MOL[symbol]
+        )
+    if not atoms:
+        raise UnknownSpeciesError(
+            f"atom_mass_fractions for {species!r} must not be empty"
+        )
+    return atoms
 
 
 def resolve_species_formula(

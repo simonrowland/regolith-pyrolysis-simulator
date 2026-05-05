@@ -475,6 +475,23 @@ ci_carbonaceous_chondrite:
   sum_check: 97.25  # bulk; remainder is minor/trace phases
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
+  stage0_formula_inventory:
+    C:
+      template: generic_carbonaceous_organic
+      decomposition_temp_range_C: [200, 800]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [20, 50]
+      offgas_mode: complete_oxidation
+      oxygen_source: controlled_stage0_O2
+      source: "CI bulk C field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+    hydrocarbons:
+      template: generic_carbonaceous_hydrocarbon
+      decomposition_temp_range_C: [200, 500]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [15, 30]
+      offgas_mode: complete_oxidation
+      oxygen_source: controlled_stage0_O2
+      source: "Generic carbonaceous hydrocarbon cleanup bucket; C/H mass fractions approximate sourcebook-style volatile tables when exact organics speciation is unavailable."
   anhydrous_silicate_after_degassing:
     note: "650-800 kg per tonne survives C0; this is the C1-C6 input"
     mass_per_tonne_kg: [650, 800]
@@ -539,6 +556,15 @@ cm_carbonaceous_chondrite:
   sum_check: 91.0   # approximate; source data incomplete for CM oxides
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
+  stage0_formula_inventory:
+    C:
+      template: generic_carbonaceous_organic
+      decomposition_temp_range_C: [200, 800]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [15, 30]
+      offgas_mode: complete_oxidation
+      oxygen_source: controlled_stage0_O2
+      source: "CM bulk C field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Similar to CI but slightly higher SiO2, lower FeO"
     composition_wt_pct:
@@ -587,6 +613,15 @@ ceres_regolith:
   sum_check: 115.25  # bulk with massive C and H2O; volatile-dominated
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
+  stage0_formula_inventory:
+    C:
+      template: generic_carbonaceous_organic
+      decomposition_temp_range_C: [200, 800]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [150, 200]
+      offgas_mode: complete_oxidation
+      oxygen_source: controlled_stage0_O2
+      source: "Ceres carbon content field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26) but slightly Mg-richer"
     composition_wt_pct:
@@ -648,6 +683,54 @@ comet_nucleus:
   sum_check: 113.70  # volatile-dominated; not meaningful to sum to 100%
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
+  stage0_formula_inventory:
+    CO_CO2:
+      atoms:
+        C: 2
+        O: 3
+      decomposition_temp_range_C: [100, 300]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [50, 150]
+      offgas_mode: native_mixture
+      source: "Equal-molar CO/CO2 volatile bucket from comet nucleus source range."
+    organics:
+      template: generic_carbonaceous_organic
+      decomposition_temp_range_C: [200, 500]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [50, 100]
+      offgas_mode: complete_oxidation
+      oxygen_source: controlled_stage0_O2
+      source: "Generic carbonaceous organic cleanup bucket; C/H/O/N mass fractions approximate sourcebook-style volatile tables when exact tar-forming organics speciation is unavailable."
+    CH4_NH3_HCN:
+      atoms:
+        C: 2
+        H: 8
+        N: 2
+      decomposition_temp_range_C: [100, 300]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [10, 40]
+      offgas_mode: native_mixture
+      source: "Equal-molar CH4/NH3/HCN supervolatile bucket from comet nucleus source range."
+    CO_CH4_propellant:
+      atoms:
+        C: 2
+        H: 4
+        O: 1
+      decomposition_temp_range_C: [100, 300]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [60, 180]
+      offgas_mode: native_mixture
+      source: "Equal-molar CO/CH4 propellant bucket from comet nucleus product range."
+    NH3_HCN:
+      atoms:
+        C: 1
+        H: 4
+        N: 2
+      decomposition_temp_range_C: [150, 300]
+      final_temp_C: 1050
+      cap_kg_per_tonne: [10, 30]
+      offgas_mode: native_mixture
+      source: "Equal-molar NH3/HCN scrubber bucket from comet nucleus product range."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26)"
     composition_wt_pct:

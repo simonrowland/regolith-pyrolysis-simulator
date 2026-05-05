@@ -47,6 +47,7 @@ from simulator.accounting import (
     AccountingError,
     AtomLedger,
     LedgerTransition,
+    coerce_species_formula,
     load_species_formulas,
     resolve_species_formula,
 )
@@ -187,7 +188,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.setpoints = setpoints
         self.feedstocks = feedstocks
         self.vapor_pressures = vapor_pressures
-        self.species_formula_registry = self._load_species_formula_registry()
+        self._base_species_formula_registry = self._load_species_formula_registry()
+        self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
 
         # --- Current state ---
@@ -327,6 +329,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise ValueError(f"Unknown feedstock: {feedstock_key}")
 
         additives = additives_kg or {}
+        self.species_formula_registry = self._registry_for_feedstock(fs)
+        self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
         self.inventory = self._build_process_inventory(fs, mass_kg)
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
@@ -406,6 +410,76 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         catalog = Path(__file__).resolve().parents[1] / 'data' / 'species_catalog.yaml'
         return load_species_formulas(catalog)
 
+    def _registry_for_feedstock(self, feedstock: Mapping[str, Any]) -> dict:
+        registry = dict(self._base_species_formula_registry)
+        for species, entry in self._feedstock_formula_entries(feedstock).items():
+            registry[species] = coerce_species_formula(
+                species,
+                self._expand_feedstock_formula_entry(species, entry, registry),
+            )
+        return registry
+
+    @staticmethod
+    def _feedstock_formula_entries(
+        feedstock: Mapping[str, Any]
+    ) -> Dict[str, Mapping[str, Any]]:
+        entries: Dict[str, Mapping[str, Any]] = {}
+        for section_name in (
+            'species_formulas',
+            'formula_inventory',
+            'stage0_formula_inventory',
+        ):
+            section = feedstock.get(section_name) or {}
+            if not isinstance(section, Mapping):
+                raise ValueError(f'{section_name} must be a mapping')
+            for species, entry in section.items():
+                if not isinstance(entry, Mapping):
+                    raise ValueError(
+                        f'{section_name}.{species} must be a mapping')
+                entries[str(species)] = entry
+        return entries
+
+    @staticmethod
+    def _expand_feedstock_formula_entry(
+        species: str,
+        entry: Mapping[str, Any],
+        registry: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        expanded = dict(entry)
+        template = (
+            expanded.pop('template', None)
+            or expanded.pop('generic_formula', None)
+        )
+        has_formula = any(
+            key in expanded
+            for key in (
+                'atoms',
+                'elements',
+                'formula',
+                'atom_mass_fractions',
+                'element_mass_fractions',
+            )
+        )
+        if template:
+            template_key = str(template)
+            template_formula = registry.get(template_key)
+            if template_formula is None:
+                raise ValueError(
+                    f'{species} formula template {template_key!r} is not '
+                    'declared in data/species_catalog.yaml'
+                )
+            if not has_formula:
+                expanded['atoms'] = dict(template_formula.elements)
+            expanded.setdefault(
+                'estimated',
+                bool(getattr(template_formula, 'estimated', False)),
+            )
+            expanded.setdefault(
+                'source',
+                getattr(template_formula, 'source', ''),
+            )
+        return expanded
+
     @staticmethod
     def _positive_species_kg(values: Mapping[str, float]) -> Dict[str, float]:
         return {
@@ -478,6 +552,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _ledger_species_kg(self, values: Mapping[str, float]) -> Dict[str, float]:
         payload: Dict[str, float] = {}
         for species, kg in self._positive_species_kg(values).items():
+            if species not in self.species_formula_registry:
+                raise AccountingError(
+                    f"cannot account species {species!r}; declare its "
+                    "formula in data/species_catalog.yaml or the feedstock "
+                    "formula_inventory"
+                )
             try:
                 resolve_species_formula(species, self.species_formula_registry)
             except AccountingError as exc:
@@ -662,6 +742,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 buckets = self._classify_stage0_components(non_oxide)
                 processed_components = self._processable_stage0_components(raw)
 
+        formula_species = set(raw)
+        formula_species.update(self._bucket_species(buckets))
+        formula_species.update(self._bucket_species(declared_stage0_buckets))
+        self._validate_required_feedstock_formulas(feedstock, formula_species)
+        stage0_external_inputs = self._apply_stage0_offgas_chemistry(
+            feedstock, buckets)
+
         residual = self._residual_components_after_stage0(
             raw, processed_components)
         self._merge_masses(
@@ -673,7 +760,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mass_kg,
             melt,
             buckets,
-            unbacked_declared_stage0_products_kg=unbacked_declared_kg)
+            unbacked_declared_stage0_products_kg=unbacked_declared_kg,
+            stage0_external_inputs_kg=sum(stage0_external_inputs.values()),
+        )
 
         stage0_products = self._stage0_products_from_buckets(buckets)
 
@@ -687,12 +776,171 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             sulfide_matte_kg=buckets['sulfide_matte'],
             metal_alloy_kg=buckets['metal_alloy'],
             terminal_slag_components_kg=buckets['terminal_slag'],
+            stage0_external_inputs_kg=stage0_external_inputs,
             stage0_profile=profile,
             cleaned_melt_source=cleaned_melt_source,
             stage0_temp_range_C=stage0_temp_range,
             carbon_reductant_required_kg=carbon_reductant_kg,
             stage0_mass_balance_delta_kg=stage0_mass_balance_delta_kg,
         )
+
+    @staticmethod
+    def _bucket_species(
+        buckets: Mapping[str, Mapping[str, float]]
+    ) -> set[str]:
+        return {
+            species
+            for bucket in buckets.values()
+            for species, kg in bucket.items()
+            if kg > 0.0
+        }
+
+    def _validate_required_feedstock_formulas(
+        self, feedstock: Mapping[str, Any], species_names: set[str]
+    ) -> None:
+        entries = self._feedstock_formula_entries(feedstock)
+        for species, entry in entries.items():
+            if 'offgas_mode' in entry:
+                self._validate_stage0_formula_metadata(species, entry)
+        for species in sorted(species_names):
+            base_formula = self._base_species_formula_registry.get(species)
+            if not getattr(base_formula, 'requires_feedstock_metadata', False):
+                continue
+            if species not in entries:
+                raise ValueError(
+                    f"{feedstock.get('label', 'feedstock')} uses mixed "
+                    f"species {species!r}; declare "
+                    f"stage0_formula_inventory.{species} with explicit "
+                    "formula and furnace offgas metadata"
+                )
+            self._validate_stage0_formula_metadata(species, entries[species])
+
+    @classmethod
+    def _validate_stage0_formula_metadata(
+        cls, species: str, entry: Mapping[str, Any]
+    ) -> None:
+        has_formula = any(
+            key in entry
+            for key in (
+                'template',
+                'generic_formula',
+                'atoms',
+                'elements',
+                'formula',
+                'atom_mass_fractions',
+                'element_mass_fractions',
+            )
+        )
+        if not has_formula:
+            raise ValueError(
+                f'stage0_formula_inventory.{species} must declare a formula '
+                'or template'
+            )
+        for key in ('decomposition_temp_range_C', 'final_temp_C',
+                    'cap_kg_per_tonne', 'source'):
+            if key not in entry:
+                raise ValueError(
+                    f'stage0_formula_inventory.{species}.{key} is required')
+        _temp_start, temp_final = cls._validate_temp_range(
+            f'stage0_formula_inventory.{species}.decomposition_temp_range_C',
+            entry['decomposition_temp_range_C'],
+        )
+        final_temp = float(entry['final_temp_C'])
+        if not math.isfinite(final_temp) or final_temp < temp_final:
+            raise ValueError(
+                f'stage0_formula_inventory.{species}.final_temp_C must be '
+                'finite and not below the decomposition range'
+            )
+        cap = entry['cap_kg_per_tonne']
+        cap_values = cap if isinstance(cap, (list, tuple)) else [cap]
+        if not cap_values:
+            raise ValueError(
+                f'stage0_formula_inventory.{species}.cap_kg_per_tonne is empty'
+            )
+        for value in cap_values:
+            number = float(value)
+            if not math.isfinite(number) or number <= 0.0:
+                raise ValueError(
+                    f'stage0_formula_inventory.{species}.cap_kg_per_tonne '
+                    'must be positive'
+                )
+
+    @staticmethod
+    def _validate_temp_range(name: str, value: Any) -> Tuple[float, float]:
+        if not isinstance(value, (list, tuple)) or len(value) != 2:
+            raise ValueError(f'{name} must be [start_C, final_C]')
+        start, final = (float(value[0]), float(value[1]))
+        if not math.isfinite(start) or not math.isfinite(final) or final <= start:
+            raise ValueError(f'{name} must increase to a finite final temperature')
+        return start, final
+
+    def _apply_stage0_offgas_chemistry(
+        self,
+        feedstock: Mapping[str, Any],
+        buckets: Dict[str, Dict[str, float]],
+    ) -> Dict[str, float]:
+        entries = self._feedstock_formula_entries(feedstock)
+        external_inputs: Dict[str, float] = {}
+        gas_bucket = buckets.get('gas_volatiles', {})
+        for species, kg in list(gas_bucket.items()):
+            entry = entries.get(species)
+            if not entry:
+                continue
+            mode = str(entry.get('offgas_mode', '')).lower()
+            if mode not in {'complete_oxidation', 'oxidized'}:
+                continue
+            products_kg, oxidant_kg = self._oxidized_stage0_products(
+                species, kg)
+            gas_bucket.pop(species, None)
+            self._merge_masses(gas_bucket, products_kg)
+            if oxidant_kg > 0.0:
+                external_inputs['O2'] = (
+                    external_inputs.get('O2', 0.0) + oxidant_kg)
+        return external_inputs
+
+    def _oxidized_stage0_products(
+        self, species: str, kg: float
+    ) -> Tuple[Dict[str, float], float]:
+        formula = resolve_species_formula(species, self.species_formula_registry)
+        species_mol = float(kg) / formula.molar_mass_kg_per_mol()
+        atom_mol = formula.atom_moles(species_mol)
+        unsupported = set(atom_mol) - {'C', 'H', 'O', 'N'}
+        if unsupported:
+            raise ValueError(
+                f'{species} complete_oxidation does not support atoms: '
+                + ', '.join(sorted(unsupported))
+            )
+
+        products_mol: Dict[str, float] = {}
+        carbon_mol = atom_mol.get('C', 0.0)
+        hydrogen_mol = atom_mol.get('H', 0.0)
+        nitrogen_mol = atom_mol.get('N', 0.0)
+        feed_oxygen_mol = atom_mol.get('O', 0.0)
+
+        if carbon_mol > 0.0:
+            products_mol['CO2'] = carbon_mol
+        if hydrogen_mol > 0.0:
+            products_mol['H2O'] = hydrogen_mol / 2.0
+        if nitrogen_mol > 0.0:
+            products_mol['N2'] = nitrogen_mol / 2.0
+
+        product_oxygen_mol = 2.0 * carbon_mol + hydrogen_mol / 2.0
+        oxygen_deficit_mol = product_oxygen_mol - feed_oxygen_mol
+        oxidant_o2_mol = max(0.0, oxygen_deficit_mol / 2.0)
+        if oxygen_deficit_mol < -1e-12:
+            products_mol['O2'] = products_mol.get('O2', 0.0) + (
+                -oxygen_deficit_mol / 2.0)
+
+        products_kg = {
+            product: mol * resolve_species_formula(
+                product, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for product, mol in products_mol.items()
+            if mol > 0.0
+        }
+        oxidant_kg = oxidant_o2_mol * resolve_species_formula(
+            'O2', self.species_formula_registry).molar_mass_kg_per_mol()
+        return products_kg, oxidant_kg
 
     @classmethod
     def _melt_from_composition(
@@ -892,13 +1140,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buckets: Mapping[str, Mapping[str, float]],
         *,
         unbacked_declared_stage0_products_kg: float = 0.0,
+        stage0_external_inputs_kg: float = 0.0,
     ) -> float:
         accounted = (
             sum(melt.values())
             + cls._bucket_mass(buckets)
             + sum(residual.values())
         )
-        unassigned = batch_mass_kg - accounted
+        unassigned = (
+            batch_mass_kg + float(stage0_external_inputs_kg) - accounted
+        )
         if abs(unassigned) > 1e-6:
             if unassigned < 0.0 and unbacked_declared_stage0_products_kg > 1e-9:
                 detail = (
@@ -1749,7 +2000,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         condensation_totals = self._condensation_totals_with_terminal_oxygen()
         # Mass balance check
         mass_in = self.record.batch_mass_kg + sum(
-            self.record.additives_kg.values())
+            self.record.additives_kg.values()) + sum(
+            self.inventory.stage0_external_inputs_kg.values())
         mass_out = self._flow_mass_out_kg()
         error_pct = 0.0
         if mass_in > 0:

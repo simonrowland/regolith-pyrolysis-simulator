@@ -236,6 +236,12 @@ species:
     category: gas
     estimated: false
     source: Stoichiometric molecular formula from species id.
+  - id: SO2
+    formula: SO2
+    basis: molecular_formula
+    category: gas
+    estimated: false
+    source: Stoichiometric molecular formula from species id.
   - id: H2O
     formula: H2O
     basis: molecular_formula
@@ -332,36 +338,43 @@ species:
       - rare_earth_oxides
     source: Representative trivalent light rare-earth sesquioxide, La2O3; actual REE distribution unavailable in current feedstock keys.
   - id: organics
-    atoms:
-      C: 1
-      H: 2
+    atom_mass_fractions:
+      C: 0.74
+      H: 0.09
+      O: 0.12
+      N: 0.05
     basis: estimated_group_formula
     category: organic_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
-    source: Hydrocarbon-equivalent CH2 surrogate; heteroatom content not specified by current feedstock keys.
+    source: Generic carbonaceous organic volatile mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
   - id: hydrocarbons
-    atoms:
-      C: 1
-      H: 2
+    atom_mass_fractions:
+      C: 0.856
+      H: 0.144
     basis: estimated_group_formula
     category: organic_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: medium
     aliases:
       - hydrocarbons_kg_per_tonne
-    source: Average hydrocarbon/alkane-chain CH2 accounting surrogate.
+    source: Generic carbonaceous hydrocarbon mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
   - id: organics_hydrocarbons
-    atoms:
-      C: 1
-      H: 2
+    atom_mass_fractions:
+      C: 0.80
+      H: 0.11
+      O: 0.07
+      N: 0.02
     basis: estimated_group_formula
     category: organic_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
     aliases:
       - organics_hydrocarbons_kg_per_tonne
-    source: Collapsed organics plus hydrocarbons key mapped to CH2 accounting surrogate.
+    source: Generic carbonaceous organics plus hydrocarbons mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
   - id: carbonate_salts
     atoms:
       Mg: 1
@@ -407,6 +420,7 @@ species:
     basis: estimated_group_formula
     category: gas_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
     aliases:
       - CO_CO2_kg_per_tonne
@@ -424,6 +438,7 @@ species:
     basis: estimated_group_formula
     category: gas_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
     aliases:
       - CH4_NH3_HCN_kg_per_tonne
@@ -443,6 +458,7 @@ species:
     basis: estimated_group_formula
     category: gas_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
     aliases:
       - NH3_HCN_kg_per_tonne
@@ -460,6 +476,7 @@ species:
     basis: estimated_group_formula
     category: gas_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
     aliases:
       - CO_CH4_propellant_kg_per_tonne
@@ -509,3 +526,23 @@ species:
     aliases:
       - FeS_troilite_wt_pct
     source: Troilite formula FeS.
+  - id: generic_carbonaceous_hydrocarbon
+    atom_mass_fractions:
+      C: 0.856
+      H: 0.144
+    basis: generic_template
+    category: organic_group
+    estimated: true
+    uncertainty: medium
+    source: Generic tar-avoidance hydrocarbon bucket; mass fractions approximate simple aliphatic hydrocarbon gas for explicit feedstock formula_inventory references.
+  - id: generic_carbonaceous_organic
+    atom_mass_fractions:
+      C: 0.74
+      H: 0.09
+      O: 0.12
+      N: 0.05
+    basis: generic_template
+    category: organic_group
+    estimated: true
+    uncertainty: high
+    source: Generic carbonaceous-organic bucket for sourcebook-style C/H/O/N mass-fraction accounting when feedstock-specific speciation is unavailable.
