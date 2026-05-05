@@ -92,7 +92,7 @@ from simulator.extraction import ExtractionMixin
 
 STAGE0_GAS_COMPONENTS = {
     'h2o', 'co2', 'co_co2', 'organics', 'ch4_nh3_hcn',
-    'nh3', 'hcn', 'c', 'carbon_content', 'hydrocarbons',
+    'nh3', 'hcn', 'c', 'carbon_content', 'carbonaceous_organic', 'hydrocarbons',
     'organics_hydrocarbons', 'co_ch4_propellant', 'nh3_hcn',
     'o2_extra',
 }
@@ -478,6 +478,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'source',
                 getattr(template_formula, 'source', ''),
             )
+            expanded.setdefault(
+                'requires_feedstock_metadata',
+                bool(getattr(template_formula, 'requires_feedstock_metadata', False)),
+            )
         return expanded
 
     @staticmethod
@@ -497,6 +501,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Seed atom ledger from current kg inventory projections."""
         self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
         label = str(feedstock.get('label', feedstock_key))
+        oxidation_specs, oxidized_offgas_kg = (
+            self._stage0_oxidation_transition_specs(feedstock))
+        terminal_offgas_external = self._subtract_species_kg(
+            self.inventory.gas_volatiles_kg,
+            oxidized_offgas_kg,
+            context=f'{label} Stage 0 oxidation products',
+        )
 
         self._load_ledger_account(
             'process.cleaned_melt',
@@ -510,7 +521,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._load_ledger_account(
             'terminal.offgas',
-            self.inventory.gas_volatiles_kg,
+            terminal_offgas_external,
             source=f'{label} Stage 0 volatiles',
         )
         self._load_ledger_account(
@@ -542,6 +553,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 source=f'batch additive {species}',
             )
 
+        self._record_stage0_oxidation_transitions(label, oxidation_specs)
+
     def _load_ledger_account(
         self, account: str, species_kg: Mapping[str, float], *, source: str
     ) -> None:
@@ -567,6 +580,107 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ) from exc
             payload[species] = kg
         return payload
+
+    @staticmethod
+    def _subtract_species_kg(
+        values: Mapping[str, float],
+        subtract: Mapping[str, float],
+        *,
+        context: str,
+    ) -> Dict[str, float]:
+        result: Dict[str, float] = {}
+        for species, kg in values.items():
+            remaining = float(kg) - float(subtract.get(species, 0.0))
+            if remaining < -1e-8:
+                raise AccountingError(
+                    f'{context} subtracts more {species} than exists '
+                    f'({float(subtract.get(species, 0.0)):.6g} kg > '
+                    f'{float(kg):.6g} kg)'
+                )
+            if remaining > 1e-12:
+                result[species] = remaining
+        return result
+
+    def _stage0_oxidation_transition_specs(
+        self,
+        feedstock: Mapping[str, Any],
+    ) -> Tuple[list[dict], Dict[str, float]]:
+        entries = self._feedstock_formula_entries(feedstock)
+        specs: list[dict] = []
+        product_totals: Dict[str, float] = {}
+        for species, entry in entries.items():
+            mode = str(entry.get('offgas_mode', '')).lower()
+            if mode not in {'complete_oxidation', 'oxidized'}:
+                continue
+            kg = float(self.inventory.raw_components_kg.get(species, 0.0))
+            if kg <= 1e-12:
+                continue
+            products_kg, oxidant_kg = self._oxidized_stage0_products(
+                species, kg)
+            if not products_kg:
+                continue
+            specs.append({
+                'species': species,
+                'feed_kg': kg,
+                'products_kg': products_kg,
+                'oxidant_kg': oxidant_kg,
+            })
+            self._merge_masses(product_totals, products_kg)
+        return specs, product_totals
+
+    def _record_stage0_oxidation_transitions(
+        self,
+        label: str,
+        specs: list[dict],
+    ) -> None:
+        for spec in specs:
+            species = str(spec['species'])
+            feed_kg = float(spec['feed_kg'])
+            products_kg = dict(spec['products_kg'])
+            oxidant_kg = float(spec['oxidant_kg'])
+
+            feed_account = 'process.stage0_volatile_feed'
+            oxidant_account = 'reservoir.stage0_oxidant'
+            self.atom_ledger.load_external(
+                feed_account,
+                {species: feed_kg},
+                source=f'{label} Stage 0 {species} feed',
+            )
+            debits = [
+                self.atom_ledger.debit(
+                    feed_account,
+                    {species: feed_kg},
+                    source=f'{label} Stage 0 {species} feed',
+                )
+            ]
+            if oxidant_kg > 1e-12:
+                self.atom_ledger.load_external(
+                    oxidant_account,
+                    {'O2': oxidant_kg},
+                    source=f'{label} Stage 0 controlled O2 oxidant',
+                )
+                debits.append(
+                    self.atom_ledger.debit(
+                        oxidant_account,
+                        {'O2': oxidant_kg},
+                        source=f'{label} Stage 0 controlled O2 oxidant',
+                    )
+                )
+            self.atom_ledger.record(
+                f'stage0_complete_oxidation_{species}',
+                debits=debits,
+                credits=[
+                    self.atom_ledger.credit(
+                        'terminal.offgas',
+                        products_kg,
+                        source=f'{label} Stage 0 oxidized {species} offgas',
+                    )
+                ],
+                reason=(
+                    'Stage 0 complete oxidation records organic volatile '
+                    'atoms and controlled O2 input explicitly.'
+                ),
+            )
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
@@ -801,7 +915,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         entries = self._feedstock_formula_entries(feedstock)
         for species, entry in entries.items():
             if 'offgas_mode' in entry:
-                self._validate_stage0_formula_metadata(species, entry)
+                self._validate_stage0_formula_metadata(
+                    species, entry, feedstock=feedstock)
         for species in sorted(species_names):
             base_formula = self._base_species_formula_registry.get(species)
             if not getattr(base_formula, 'requires_feedstock_metadata', False):
@@ -813,11 +928,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f"stage0_formula_inventory.{species} with explicit "
                     "formula and furnace offgas metadata"
                 )
-            self._validate_stage0_formula_metadata(species, entries[species])
+            self._validate_stage0_formula_metadata(
+                species, entries[species], feedstock=feedstock)
 
     @classmethod
     def _validate_stage0_formula_metadata(
-        cls, species: str, entry: Mapping[str, Any]
+        cls,
+        species: str,
+        entry: Mapping[str, Any],
+        *,
+        feedstock: Mapping[str, Any] | None = None,
     ) -> None:
         has_formula = any(
             key in entry
@@ -851,6 +971,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'stage0_formula_inventory.{species}.final_temp_C must be '
                 'finite and not below the decomposition range'
             )
+        if feedstock and 'stage0_temp_range_C' in feedstock:
+            _stage_start, stage_final = cls._validate_temp_range(
+                'stage0_temp_range_C',
+                feedstock['stage0_temp_range_C'],
+            )
+            if final_temp > stage_final + 1e-9:
+                raise ValueError(
+                    f'stage0_formula_inventory.{species}.final_temp_C must not '
+                    'exceed stage0_temp_range_C final temperature'
+                )
         cap = entry['cap_kg_per_tonne']
         cap_values = cap if isinstance(cap, (list, tuple)) else [cap]
         if not cap_values:
@@ -1206,12 +1336,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if key in {'hydrocarbons', 'organics_hydrocarbons',
                            'co_ch4_propellant', 'ch4_nh3_hcn'}:
                     backed = backed or bool(
-                        raw_keys & {'c', 'carbon_content', 'organics'}
+                        raw_keys & {'c', 'carbon_content',
+                                    'carbonaceous_organic', 'organics'}
                     )
                 if key in {'nh3', 'nh3_hcn'}:
                     backed = backed or bool(
                         raw_keys & {'nh3', 'ch4_nh3_hcn',
-                                    'c', 'carbon_content', 'organics'}
+                                    'c', 'carbon_content',
+                                    'carbonaceous_organic', 'organics'}
                     )
                 if key in {'sulfuric_acid_feedstock'}:
                     backed = backed or bool(raw_keys & {'so3', 'sulfate',
@@ -1227,7 +1359,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if key == 'carbonate_salts':
                     backed = backed or bool(
                         raw_keys & {'c', 'carbon_content', 'carbonate',
-                                    'carbonates'}
+                                    'carbonaceous_organic', 'carbonates'}
                     )
                 if not backed:
                     unbacked += kg

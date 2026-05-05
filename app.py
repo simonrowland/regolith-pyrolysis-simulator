@@ -13,8 +13,10 @@ Usage:
     # Then open http://localhost:3000
 """
 
+import ipaddress
 import os
 import secrets
+import sys
 from pathlib import Path
 
 from flask import Flask
@@ -71,24 +73,54 @@ def create_app():
     return app
 
 
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, '').lower() in ('1', 'true', 'yes', 'on')
+
+
+def _is_loopback_host(host: str) -> bool:
+    if host == 'localhost':
+        return True
+    try:
+        return ipaddress.ip_address(host.strip('[]')).is_loopback
+    except ValueError:
+        return False
+
+
+def _run_config_from_env() -> dict:
+    host = os.environ.get('REGOLITH_HOST', '127.0.0.1')
+    raw_port = os.environ.get('REGOLITH_PORT', '3000')
+    try:
+        port = int(raw_port)
+    except ValueError:
+        sys.exit(f'REGOLITH_PORT must be an integer, got {raw_port!r}')
+
+    debug = _env_flag('REGOLITH_FLASK_DEBUG')
+    is_loopback = _is_loopback_host(host)
+    if debug and not is_loopback:
+        raise RuntimeError(
+            'REGOLITH_FLASK_DEBUG may only be enabled on a loopback host; '
+            f'got REGOLITH_HOST={host!r}'
+        )
+
+    return {
+        'host': host,
+        'port': port,
+        'debug': debug,
+        'allow_unsafe_werkzeug': is_loopback,
+    }
+
+
 def main():
     """Run the local development server."""
-    host = os.environ.get('REGOLITH_HOST', '127.0.0.1')
-    port = int(os.environ.get('REGOLITH_PORT', '3000'))
-    debug = os.environ.get('REGOLITH_FLASK_DEBUG', '').lower() in (
-        '1', 'true', 'yes', 'on')
-    allow_unsafe_werkzeug = (
-        host in {'127.0.0.1', 'localhost', '::1'}
-        or os.environ.get('REGOLITH_ALLOW_UNSAFE_WERKZEUG', '').lower()
-        in ('1', 'true', 'yes', 'on')
-    )
+    run_config = _run_config_from_env()
+    host = run_config['host']
+    port = run_config['port']
     app = create_app()
     base_url = f"http://{host}:{port}"
     print(f"Starting Regolith Pyrolysis Simulator on {base_url}")
     print(f"  Simulator:       {base_url}/")
     print(f"  Lunar Operator:  {base_url}/lunar-operator")
-    socketio.run(app, host=host, port=port, debug=debug,
-                 allow_unsafe_werkzeug=allow_unsafe_werkzeug)
+    socketio.run(app, **run_config)
 
 
 if __name__ == '__main__':

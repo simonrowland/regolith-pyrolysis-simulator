@@ -336,11 +336,11 @@ def _atoms_from_mass_fractions(
 ) -> dict[str, float]:
     """Convert element mass fractions into atom-count ratios.
 
-    The mass basis is arbitrary: fractions, percentages, and per-1000 values all
-    produce the same atom moles per kg because the derived formula unit carries
-    the same total mass basis.
+    Feedstock-local mixed species are intentionally explicit; accept true
+    fractions only so YAML typos fail instead of being silently renormalized.
     """
     atoms: dict[str, float] = {}
+    total_fraction = 0.0
     for element, raw_fraction in mass_fractions.items():
         symbol = str(element).strip()
         if symbol not in ATOMIC_WEIGHTS_G_PER_MOL:
@@ -355,9 +355,15 @@ def _atoms_from_mass_fractions(
         atoms[symbol] = atoms.get(symbol, 0.0) + (
             fraction / ATOMIC_WEIGHTS_G_PER_MOL[symbol]
         )
+        total_fraction += fraction
     if not atoms:
         raise UnknownSpeciesError(
             f"atom_mass_fractions for {species!r} must not be empty"
+        )
+    if not math.isclose(total_fraction, 1.0, rel_tol=1e-9, abs_tol=1e-9):
+        raise AccountingError(
+            f"atom_mass_fractions for {species!r} must sum to 1.0; "
+            f"got {total_fraction:.12g}"
         )
     return atoms
 

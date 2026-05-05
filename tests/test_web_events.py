@@ -37,7 +37,7 @@ def test_launcher_does_not_allow_unsafe_werkzeug_on_public_host(monkeypatch):
     call = {}
 
     monkeypatch.setenv("REGOLITH_HOST", "0.0.0.0")
-    monkeypatch.delenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", raising=False)
+    monkeypatch.setenv("REGOLITH_ALLOW_UNSAFE_WERKZEUG", "1")
     monkeypatch.delenv("REGOLITH_FLASK_DEBUG", raising=False)
     monkeypatch.setattr(app_module, "create_app", lambda: object())
 
@@ -51,6 +51,21 @@ def test_launcher_does_not_allow_unsafe_werkzeug_on_public_host(monkeypatch):
     assert call["host"] == "0.0.0.0"
     assert call["debug"] is False
     assert call["allow_unsafe_werkzeug"] is False
+
+
+def test_launcher_rejects_public_debug_host(monkeypatch):
+    monkeypatch.setenv("REGOLITH_HOST", "0.0.0.0")
+    monkeypatch.setenv("REGOLITH_FLASK_DEBUG", "1")
+
+    with pytest.raises(RuntimeError, match="loopback host"):
+        app_module.main()
+
+
+def test_launcher_rejects_invalid_port(monkeypatch):
+    monkeypatch.setenv("REGOLITH_PORT", "abc")
+
+    with pytest.raises(SystemExit, match="REGOLITH_PORT"):
+        app_module.main()
 
 
 def test_replacing_simulation_state_stops_prior_run():

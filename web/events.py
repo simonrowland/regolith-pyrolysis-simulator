@@ -54,6 +54,20 @@ def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, thread
         return state, run_lock
 
 
+def _current_simulation_state(
+    sid: str,
+    run_id: str | None = None,
+) -> tuple[dict | None, object | None]:
+    """Return the current simulation state/lock, optionally scoped to one run."""
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if state is None:
+            return None, None
+        if run_id is not None and state.get('run_id') != run_id:
+            return None, None
+        return state, _sim_locks.get(sid)
+
+
 def _clear_simulation_state(sid: str) -> None:
     """Stop and remove any active simulation for a client."""
     with _simulations_guard:
@@ -354,10 +368,9 @@ def register_events(socketio):
         # Start background loop
         def run_loop():
             while True:
-                state = _simulations.get(sid)
+                state, _ = _current_simulation_state(sid, run_id)
                 if (
                     state is None
-                    or state.get('run_id') != run_id
                     or not state['running']
                 ):
                     break
@@ -366,10 +379,9 @@ def register_events(socketio):
                     continue
 
                 with run_lock:
-                    state = _simulations.get(sid)
+                    state, _ = _current_simulation_state(sid, run_id)
                     if (
                         state is None
-                        or state.get('run_id') != run_id
                         or not state['running']
                     ):
                         break
@@ -383,6 +395,10 @@ def register_events(socketio):
                         break
 
                     snapshot = sim.step()
+
+                state, _ = _current_simulation_state(sid, run_id)
+                if state is None or not state['running']:
+                    break
 
                 tick_data = _tick_payload(
                     sim=sim,
@@ -415,11 +431,15 @@ def register_events(socketio):
 
         thread = threading.Thread(target=run_loop, daemon=True)
         thread.start()
+        with _simulations_guard:
+            current = _simulations.get(sid)
+            if current is state and current.get('run_id') == run_id:
+                current['thread'] = thread
 
     @socketio.on('pause_simulation')
     def handle_pause():
         sid = request.sid
-        state = _simulations.get(sid)
+        state, _ = _current_simulation_state(sid)
         if state:
             state['paused'] = True
             socketio.emit('simulation_status', {
@@ -429,7 +449,7 @@ def register_events(socketio):
     @socketio.on('resume_simulation')
     def handle_resume():
         sid = request.sid
-        state = _simulations.get(sid)
+        state, _ = _current_simulation_state(sid)
         if state:
             state['paused'] = False
             socketio.emit('simulation_status', {
@@ -444,9 +464,9 @@ def register_events(socketio):
         data = {'choice': 'A'}  or  {'choice': 'two'}
         """
         sid = request.sid
-        state = _simulations.get(sid)
-        if state and _sim_locks.get(sid):
-            with _sim_locks[sid]:
+        state, lock = _current_simulation_state(sid)
+        if state and lock:
+            with lock:
                 sim = state['sim']
                 if sim.pending_decision:
                     choice = data.get('choice', '')
@@ -467,7 +487,7 @@ def register_events(socketio):
         data = {'param': 'speed', 'value': 0.5}
         """
         sid = request.sid
-        state = _simulations.get(sid)
+        state, lock = _current_simulation_state(sid)
         if not state:
             return
 
@@ -476,24 +496,24 @@ def register_events(socketio):
 
         if param == 'speed':
             state['speed'] = float(value)
-        elif param == 'stir_factor' and _sim_locks.get(sid):
-            with _sim_locks[sid]:
+        elif param == 'stir_factor' and lock:
+            with lock:
                 state['sim'].melt.stir_factor = float(value)
-        elif param == 'pO2_mbar' and _sim_locks.get(sid):
-            with _sim_locks[sid]:
+        elif param == 'pO2_mbar' and lock:
+            with lock:
                 state['sim'].melt.pO2_mbar = float(value)
-        elif param == 'c4_max_temp' and _sim_locks.get(sid):
-            with _sim_locks[sid]:
+        elif param == 'c4_max_temp' and lock:
+            with lock:
                 state['sim'].c4_max_temp_C = float(value)
                 state['sim'].campaign_mgr.c4_max_temp_C = float(value)
-        elif param == 'campaign_override' and _sim_locks.get(sid):
+        elif param == 'campaign_override' and lock:
             # data = {param: 'campaign_override', campaign: 'C2A',
             #         field: 'ramp_rate', value: 10.0}
             campaign_name = data.get('campaign', '')
             field_name = data.get('field', '')
             field_value = data.get('value')
             if campaign_name and field_name:
-                with _sim_locks[sid]:
+                with lock:
                     mgr = state['sim'].campaign_mgr
                     if campaign_name not in mgr.overrides:
                         mgr.overrides[campaign_name] = {}

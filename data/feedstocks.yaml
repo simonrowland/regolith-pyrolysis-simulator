@@ -459,7 +459,7 @@ ci_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.50
     H2O:   15.0    # structural, in phyllosilicates
-    C:      3.5    # organics + carbonates
+    carbonaceous_organic: 3.5  # generic organics + carbonates bucket
     S:      4.0    # predominantly sulfides
   composition_ranges:
     SiO2:  [22, 28]
@@ -470,20 +470,20 @@ ci_carbonaceous_chondrite:
     Na2O:  [0.5, 1.0]
     NiO:   [1.2, 1.8]
     H2O:   [10, 20]
-    C:     [2, 5]
+    carbonaceous_organic: [2, 5]
     S:     [2, 6]
   sum_check: 97.25  # bulk; remainder is minor/trace phases
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
-    C:
+    carbonaceous_organic:
       template: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [20, 50]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "CI bulk C field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "CI carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
     hydrocarbons:
       template: generic_carbonaceous_hydrocarbon
       decomposition_temp_range_C: [200, 500]
@@ -547,24 +547,24 @@ cm_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.5
     H2O:    9.0     # structural, in phyllosilicates
-    C:      2.25    # organics + carbonates
+    carbonaceous_organic: 2.25  # generic organics + carbonates bucket
     S:      3.0     # predominantly sulfides
   composition_ranges:
     H2O:   [6, 12]
-    C:     [1.5, 3]
+    carbonaceous_organic: [1.5, 3]
     S:     [2, 4]
   sum_check: 91.0   # approximate; source data incomplete for CM oxides
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
-    C:
+    carbonaceous_organic:
       template: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [15, 30]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "CM bulk C field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "CM carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Similar to CI but slightly higher SiO2, lower FeO"
     composition_wt_pct:
@@ -605,23 +605,23 @@ ceres_regolith:
     Na2O:   0.75
     NiO:    1.5
     H2O:   20.0    # ice + structural; poles/bright spots much higher
-    C:     17.5    # ultra-carbonaceous dark component + organics
+    carbonaceous_organic: 17.5  # ultra-carbonaceous organics bucket
     S:      3.5
   composition_ranges:
     H2O_ice_structural_kg_per_tonne: [120, 280]
-    carbon_content_wt_pct: [15, 20]
+    carbonaceous_organic_wt_pct: [15, 20]
   sum_check: 115.25  # bulk with massive C and H2O; volatile-dominated
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
-    C:
+    carbonaceous_organic:
       template: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [150, 200]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "Ceres carbon content field represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "Ceres carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26) but slightly Mg-richer"
     composition_wt_pct:

@@ -93,9 +93,9 @@ not already inside a virtual environment, it creates `.venv` and installs
 
 The launcher defaults to `127.0.0.1:3000` with Flask debug mode off. For local
 development only, override with `REGOLITH_HOST`, `REGOLITH_PORT`, or
-`REGOLITH_FLASK_DEBUG=1`. For a public or shared-hosting deployment, run the
-Flask app through the host's WSGI/server integration rather than exposing the
-development server.
+`REGOLITH_FLASK_DEBUG=1`; debug mode is rejected unless the host is loopback.
+For a public or shared-hosting deployment, run the Flask app through the host's
+WSGI/server integration rather than exposing the development server.
 
 ## Installed Dependencies
 
