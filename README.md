@@ -91,6 +91,12 @@ not already inside a virtual environment, it creates `.venv` and installs
 `requirements.txt` there. Then run the command it prints and open
 `http://localhost:3000/`.
 
+The launcher defaults to `127.0.0.1:3000` with Flask debug mode off. For local
+development only, override with `REGOLITH_HOST`, `REGOLITH_PORT`, or
+`REGOLITH_FLASK_DEBUG=1`. For a public or shared-hosting deployment, run the
+Flask app through the host's WSGI/server integration rather than exposing the
+development server.
+
 ## Installed Dependencies
 
 `pip install -r requirements.txt` installs:

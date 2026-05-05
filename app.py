@@ -73,12 +73,22 @@ def create_app():
 
 def main():
     """Run the local development server."""
+    host = os.environ.get('REGOLITH_HOST', '127.0.0.1')
+    port = int(os.environ.get('REGOLITH_PORT', '3000'))
+    debug = os.environ.get('REGOLITH_FLASK_DEBUG', '').lower() in (
+        '1', 'true', 'yes', 'on')
+    allow_unsafe_werkzeug = (
+        host in {'127.0.0.1', 'localhost', '::1'}
+        or os.environ.get('REGOLITH_ALLOW_UNSAFE_WERKZEUG', '').lower()
+        in ('1', 'true', 'yes', 'on')
+    )
     app = create_app()
-    print("Starting Regolith Pyrolysis Simulator on http://localhost:3000")
-    print("  Simulator:       http://localhost:3000/")
-    print("  Lunar Operator:  http://localhost:3000/lunar-operator")
-    socketio.run(app, host='0.0.0.0', port=3000, debug=True,
-                 allow_unsafe_werkzeug=True)
+    base_url = f"http://{host}:{port}"
+    print(f"Starting Regolith Pyrolysis Simulator on {base_url}")
+    print(f"  Simulator:       {base_url}/")
+    print(f"  Lunar Operator:  {base_url}/lunar-operator")
+    socketio.run(app, host=host, port=port, debug=debug,
+                 allow_unsafe_werkzeug=allow_unsafe_werkzeug)
 
 
 if __name__ == '__main__':

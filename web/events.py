@@ -2,6 +2,7 @@
 
 import threading
 import time
+import uuid
 from pathlib import Path
 
 import yaml
@@ -31,6 +32,35 @@ def _load_yaml(filename):
 # Active simulations keyed by session ID
 _simulations: dict = {}
 _sim_locks: dict = {}
+_simulations_guard = threading.Lock()
+
+
+def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, threading.Lock]:
+    """Install one active simulation for a client and stop any prior run."""
+    with _simulations_guard:
+        previous = _simulations.get(sid)
+        if previous is not None:
+            previous['running'] = False
+        run_lock = threading.Lock()
+        state = {
+            'sim': sim,
+            'running': True,
+            'paused': False,
+            'speed': speed,
+            'run_id': uuid.uuid4().hex,
+        }
+        _simulations[sid] = state
+        _sim_locks[sid] = run_lock
+        return state, run_lock
+
+
+def _clear_simulation_state(sid: str) -> None:
+    """Stop and remove any active simulation for a client."""
+    with _simulations_guard:
+        state = _simulations.pop(sid, None)
+        if state is not None:
+            state['running'] = False
+        _sim_locks.pop(sid, None)
 
 
 def _get_backend(backend_name: str):
@@ -239,9 +269,7 @@ def register_events(socketio):
     def handle_disconnect():
         sid = request.sid
         print(f"Client disconnected: {sid}")
-        # Clean up simulation state
-        _simulations.pop(sid, None)
-        _sim_locks.pop(sid, None)
+        _clear_simulation_state(sid)
 
     @socketio.on('start_simulation')
     def handle_start(data):
@@ -311,14 +339,8 @@ def register_events(socketio):
         else:
             sim.start_campaign(CampaignPhase.C0)
 
-        # Store state
-        _simulations[sid] = {
-            'sim': sim,
-            'running': True,
-            'paused': False,
-            'speed': speed,
-        }
-        _sim_locks[sid] = threading.Lock()
+        state, run_lock = _replace_simulation_state(sid, sim, speed)
+        run_id = state['run_id']
 
         socketio.emit('simulation_status', _start_payload(
             sim=sim,
@@ -333,13 +355,24 @@ def register_events(socketio):
         def run_loop():
             while True:
                 state = _simulations.get(sid)
-                if state is None or not state['running']:
+                if (
+                    state is None
+                    or state.get('run_id') != run_id
+                    or not state['running']
+                ):
                     break
                 if state['paused']:
                     time.sleep(0.1)
                     continue
 
-                with _sim_locks[sid]:
+                with run_lock:
+                    state = _simulations.get(sid)
+                    if (
+                        state is None
+                        or state.get('run_id') != run_id
+                        or not state['running']
+                    ):
+                        break
                     sim = state['sim']
                     if sim.is_complete():
                         socketio.emit(
