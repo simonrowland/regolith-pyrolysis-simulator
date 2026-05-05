@@ -80,17 +80,16 @@ The web app has two entry points:
 
 ## Quick Start
 
-From a source checkout, a virtual environment is recommended so the simulator
-dependencies stay isolated from your system Python:
+From a source checkout, run the dependency installer:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python regolith-pyrolysis-run.py
+python3 install-dependencies.py
 ```
 
-Then open `http://localhost:3000/`.
+It uses `uv` when available and falls back to `pip` automatically. If you are
+not already inside a virtual environment, it creates `.venv` and installs
+`requirements.txt` there. Then run the command it prints and open
+`http://localhost:3000/`.
 
 ## Installed Dependencies
 
