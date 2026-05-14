@@ -17,13 +17,13 @@ from __future__ import annotations
 
 from typing import Dict, Iterable, List, Mapping, Tuple
 
-# Canonical MELTS 14-oxide basis. Must match
-# ``simulator.state.OXIDE_SPECIES`` and the basis declared in
-# ``engines/magemin/provider.py::MAGEMinShadowProvider.capability_profile``.
-_MELTS_OXIDE_BASIS: Tuple[str, ...] = (
-    'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
-    'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
-)
+from simulator.state import OXIDE_SPECIES
+
+# Canonical MELTS 14-oxide basis, sourced from
+# ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the
+# basis declared in
+# ``engines/magemin/provider.py::MAGEMinShadowProvider.capability_profile``).
+_MELTS_OXIDE_BASIS: Tuple[str, ...] = tuple(OXIDE_SPECIES)
 _MELTS_OXIDE_SET = frozenset(_MELTS_OXIDE_BASIS)
 
 # Species that disqualify the composition outright (regardless of amount).

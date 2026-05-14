@@ -24,6 +24,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional, Tuple
 
+from engines.magemin.domain import _is_finite
+
 # Tolerances match the binding spec §4 MAGEMin entry.
 LIQUIDUS_TOLERANCE_K = 50.0
 MODAL_TOLERANCE_WT_PCT = 2.0
@@ -244,11 +246,3 @@ def _lookup(obj: Any, key: str) -> Any:
     if isinstance(obj, Mapping):
         return obj.get(key)
     return getattr(obj, key, None)
-
-
-def _is_finite(value: object) -> bool:
-    try:
-        numeric = float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return False
-    return numeric == numeric and numeric not in (float('inf'), float('-inf'))

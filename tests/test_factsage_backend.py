@@ -860,6 +860,80 @@ def test_backend_transition_name_must_match_declared_contract():
         sim._get_equilibrium()
 
 
+def test_cleaned_melt_projection_mass_closes_with_non_oxide_species():
+    """A FactSAGE LIQUID/SOLID phase may carry dissolved metal in
+    process.cleaned_melt. The MeltState projection must keep the full
+    species set so melt.total_mass_kg mass-closes against the ledger
+    account instead of silently dropping the non-oxide remainder."""
+    class OxygenBackend:
+        def __init__(self):
+            self.transition = None
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **kwargs):
+            return EquilibriumResult(ledger_transition=self.transition)
+
+    backend = OxygenBackend()
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "feo": {
+                "label": "FeO",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+
+    # Charge only the FeO that the transition fully consumes, then add the
+    # SiO2 directly: the post-transition cleaned_melt account holds exactly
+    # {'SiO2': 600, 'Fe': 40} kg. FeO -> Fe sheds its O to the overhead gas,
+    # so the FeO charge is the 40 kg Fe target re-oxygenated.
+    fe_mol = 40.0 / (MOLAR_MASS['Fe'] / 1000.0)
+    feo_kg = fe_mol * MOLAR_MASS['FeO'] / 1000.0
+    sim.load_batch("feo", mass_kg=feo_kg)
+    sim.atom_ledger.load_external(
+        'process.cleaned_melt',
+        {'SiO2': 600.0},
+        source='test non-oxide projection SiO2 charge',
+    )
+
+    backend.transition = LedgerTransition(
+        name='factsage_equilibrium_phase_update',
+        debits=(sim.atom_ledger.debit_mol(
+            'process.cleaned_melt', {'FeO': fe_mol}),),
+        credits=(
+            sim.atom_ledger.credit_mol(
+                'process.cleaned_melt', {'Fe': fe_mol}),
+            sim.atom_ledger.credit_mol(
+                'process.overhead_gas', {'O2': fe_mol / 2.0}),
+        ),
+    )
+
+    sim._get_equilibrium()
+
+    ledger_account = sim.atom_ledger.kg_by_account('process.cleaned_melt')
+    assert ledger_account['SiO2'] == pytest.approx(600.0)
+    assert ledger_account['Fe'] == pytest.approx(40.0)
+
+    # The non-oxide Fe mass survives into the MeltState projection.
+    assert sim.melt.composition_kg['Fe'] == pytest.approx(40.0)
+    assert sim.melt.total_mass_kg == pytest.approx(640.0)
+    # The projection mass-closes against the ledger account.
+    assert sum(ledger_account.values()) == pytest.approx(
+        sim.melt.total_mass_kg)
+    # melt_oxide_kg keeps its oxide-only contract.
+    assert 'Fe' not in sim.inventory.melt_oxide_kg
+    assert sim.inventory.melt_oxide_kg['SiO2'] == pytest.approx(600.0)
+    # composition_wt_pct stays oxide-keyed but now divides by the true
+    # melt mass, so SiO2 reads 600/640 rather than an inflated 100%.
+    assert sim.melt.composition_wt_pct()['SiO2'] == pytest.approx(
+        600.0 / 640.0 * 100.0)
+
+
 def test_backend_input_includes_active_process_accounts():
     class RecordingBackend:
         def __init__(self):

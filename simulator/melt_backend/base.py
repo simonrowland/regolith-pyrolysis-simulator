@@ -3,7 +3,9 @@ Melt Backend — Abstract Interface & Data Classes
 =================================================
 
 Defines the abstract MeltBackend interface and EquilibriumResult
-that all thermodynamic backends (AlphaMELTS, FactSAGE, stub) must implement.
+that all thermodynamic backends must implement:
+AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, FactSAGE, and
+StubBackend.
 """
 
 from __future__ import annotations
@@ -50,15 +52,101 @@ def normalize_backend_capabilities(value: Any = None) -> Dict[str, bool]:
         raise ValueError('backend capabilities must be a mapping or list')
 
     for item in raw_items:
-        if isinstance(value, Mapping):
-            name, enabled = item
-        else:
-            name, enabled = item
+        name, enabled = item
         key = str(name).strip()
         if key not in BACKEND_CAPABILITY_KEYS:
             raise ValueError(f'unknown backend capability: {key}')
         capabilities[key] = bool(enabled)
     return capabilities
+
+
+# Cleaned silicate melt is the only ledger account the silicate-oxide
+# adapters (VapoRock, MAGEMin) may consume; every other account is
+# filtered out before the upstream library is called (binding spec §7).
+CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
+
+
+def split_cleaned_melt_account(
+    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+) -> tuple[Dict[str, float], List[str]]:
+    """
+    Extract the cleaned-melt account; report every other account.
+
+    Returns ``(melt_species_mol, dropped_account_names)``.  The
+    silicate-oxide adapters only consume ``process.cleaned_melt``; any
+    other account that carries positive material is reported back so the
+    caller can record a warning (binding spec §7 — these adapters must
+    not receive metal / sulfide / salt / halide accounts).
+    """
+    melt_mol: Dict[str, float] = {}
+    for species, mol in (
+        composition_mol_by_account.get(CLEANED_MELT_ACCOUNT, {}) or {}
+    ).items():
+        value = float(mol)
+        if value > 0.0:
+            melt_mol[str(species)] = melt_mol.get(str(species), 0.0) + value
+
+    dropped: List[str] = []
+    for account, species_mol in composition_mol_by_account.items():
+        if str(account) == CLEANED_MELT_ACCOUNT:
+            continue
+        if any(float(mol) > 0.0 for mol in (species_mol or {}).values()):
+            dropped.append(str(account))
+    return melt_mol, sorted(dropped)
+
+
+def project_melt_to_oxide_wt_pct(
+    *,
+    composition_kg: Optional[Dict[str, float]],
+    composition_mol: Optional[Dict[str, float]],
+    oxide_basis: tuple,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, float]:
+    """
+    Project the simulator's mol/kg melt composition to oxide wt% in the
+    given oxide basis.
+
+    Shared by the silicate-oxide adapters (VapoRock, MAGEMin), whose
+    upstream bases are identical to MELTS for the oxides shared with the
+    simulator, so this is a straight rename + normalisation.  Any species
+    not in ``oxide_basis`` is dropped.
+
+    ``species_formula_registry`` is the simulator's formula registry
+    (threaded through from the layered ABC) used for the mol -> kg
+    projection; ``None`` falls back to the builtin formula table.
+    """
+    from simulator.accounting.formulas import resolve_species_formula
+
+    if composition_mol is not None:
+        kg_by_species: Dict[str, float] = {}
+        for species, mol in composition_mol.items():
+            value = float(mol)
+            if value <= 0.0:
+                continue
+            kg = value * resolve_species_formula(
+                species, species_formula_registry).molar_mass_kg_per_mol()
+            kg_by_species[species] = kg
+    else:
+        kg_by_species = {
+            species: float(value)
+            for species, value in (composition_kg or {}).items()
+            if float(value) > 0.0
+        }
+
+    filtered = {
+        species: kg
+        for species, kg in kg_by_species.items()
+        if species in oxide_basis
+    }
+
+    total = sum(filtered.values())
+    if total <= 0:
+        return {}
+
+    return {
+        species: kg / total * 100.0
+        for species, kg in filtered.items()
+    }
 
 
 @dataclass
@@ -108,9 +196,12 @@ class MeltBackend(ABC):
     Abstract interface for thermodynamic melt calculations.
 
     Implementations wrap different thermodynamic engines:
-    - AlphaMELTS (via PetThermoTools or subprocess)
-    - FactSAGE (via ChemApp)
-    - StubBackend (Antoine vapor pressures, no phase equilibrium)
+    - AlphaMELTSBackend (silicate phase equilibrium via PetThermoTools
+      or subprocess)
+    - VapoRockBackend (vapor-melt equilibrium / vapor-side only)
+    - MAGEMinBackend (silicate phase equilibrium, shadow second opinion)
+    - FactSAGE (multiphase equilibrium via ChemApp)
+    - StubBackend (no phase equilibrium; core.py owns Antoine fallback)
     """
 
     @abstractmethod

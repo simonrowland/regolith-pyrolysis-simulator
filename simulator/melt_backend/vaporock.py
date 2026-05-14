@@ -100,6 +100,8 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    project_melt_to_oxide_wt_pct,
+    split_cleaned_melt_account,
 )
 from simulator.state import OXIDE_SPECIES
 
@@ -123,12 +125,6 @@ _GAS_NAMESPACE_SUFFIX = '_gas'
 # builtin Antoine path and the VapoRock path share keys for the shared
 # volatiles.
 _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
-
-# Cleaned silicate melt is the only ledger account VapoRock may consume.
-# Matches the alphamelts.py contract: every other account is filtered
-# out before the library is called.
-_VAPOROCK_MELT_ACCOUNT = 'process.cleaned_melt'
-
 
 # VapoRock consumes the same oxide basis as MELTS / alphaMELTS.  The
 # 14-oxide simulator basis is a strict subset; project 1:1 by name and
@@ -358,7 +354,7 @@ class VapoRockBackend(MeltBackend):
             return result
 
         if composition_mol_by_account is not None:
-            melt_mol, dropped_accounts = self._melt_account_composition(
+            melt_mol, dropped_accounts = split_cleaned_melt_account(
                 composition_mol_by_account)
             for account in dropped_accounts:
                 result.warnings.append(
@@ -369,9 +365,10 @@ class VapoRockBackend(MeltBackend):
             # overrides any composition_mol passed alongside it.
             composition_mol = melt_mol
 
-        comp_wt = self._project_to_oxide_wt_pct(
+        comp_wt = project_melt_to_oxide_wt_pct(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
+            oxide_basis=_VAPOROCK_OXIDE_BASIS,
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
@@ -415,35 +412,6 @@ class VapoRockBackend(MeltBackend):
         # AtomLedger authority (see the module "Authority posture" note —
         # this adapter is not safe to select as the active backend).
         return result
-
-    @staticmethod
-    def _melt_account_composition(
-        composition_mol_by_account: Mapping[str, Mapping[str, float]],
-    ) -> tuple[Dict[str, float], List[str]]:
-        """
-        Extract the cleaned-melt account; report every other account.
-
-        Returns ``(melt_species_mol, dropped_account_names)``.  VapoRock
-        only consumes ``process.cleaned_melt``; any other account that
-        carries positive material is reported back so the caller can
-        record a warning (binding spec §7 — VapoRock must not receive
-        metal / sulfide / salt / halide accounts).
-        """
-        melt_mol: Dict[str, float] = {}
-        for species, mol in (
-            composition_mol_by_account.get(_VAPOROCK_MELT_ACCOUNT, {}) or {}
-        ).items():
-            value = float(mol)
-            if value > 0.0:
-                melt_mol[str(species)] = melt_mol.get(str(species), 0.0) + value
-
-        dropped: List[str] = []
-        for account, species_mol in composition_mol_by_account.items():
-            if str(account) == _VAPOROCK_MELT_ACCOUNT:
-                continue
-            if any(float(mol) > 0.0 for mol in (species_mol or {}).values()):
-                dropped.append(str(account))
-        return melt_mol, sorted(dropped)
 
     # ------------------------------------------------------------------
     # Library boundary
@@ -572,64 +540,6 @@ class VapoRockBackend(MeltBackend):
     # ------------------------------------------------------------------
     # Composition / result projection
     # ------------------------------------------------------------------
-
-    def _project_to_oxide_wt_pct(
-        self,
-        *,
-        composition_kg: Optional[Dict[str, float]],
-        composition_mol: Optional[Dict[str, float]],
-        species_formula_registry: Optional[Mapping[str, Any]] = None,
-    ) -> Dict[str, float]:
-        """
-        Project the simulator's mol/kg melt composition to the oxide
-        wt% basis VapoRock expects.
-
-        VapoRock's basis is identical to MELTS for the oxides shared
-        with the simulator (the 14-oxide list in ``simulator.state``),
-        so this is a straight rename + normalisation.  Any species not
-        in the VapoRock basis is dropped with a warning.
-
-        ``species_formula_registry`` is the simulator's formula registry
-        (threaded through from the layered ABC) used for the mol -> kg
-        projection; ``None`` falls back to the builtin formula table.
-
-        TODO(vaporock): once the installed VapoRock build is known,
-        confirm whether P2O5 / NiO / CoO are accepted; if not, the
-        drops are silent today.
-        """
-        from simulator.accounting.formulas import resolve_species_formula
-
-        if composition_mol is not None:
-            kg_by_species: Dict[str, float] = {}
-            for species, mol in composition_mol.items():
-                value = float(mol)
-                if value <= 0.0:
-                    continue
-                kg = value * resolve_species_formula(
-                    species, species_formula_registry).molar_mass_kg_per_mol()
-                kg_by_species[species] = kg
-        else:
-            kg_by_species = {
-                species: float(value)
-                for species, value in (composition_kg or {}).items()
-                if float(value) > 0.0
-            }
-
-        # Filter to VapoRock's oxide basis.
-        filtered = {
-            species: kg
-            for species, kg in kg_by_species.items()
-            if species in _VAPOROCK_OXIDE_BASIS
-        }
-
-        total = sum(filtered.values())
-        if total <= 0:
-            return {}
-
-        return {
-            species: kg / total * 100.0
-            for species, kg in filtered.items()
-        }
 
     def _normalize_vapor_pressures(
         self, raw: Any

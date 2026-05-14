@@ -88,14 +88,10 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    project_melt_to_oxide_wt_pct,
+    split_cleaned_melt_account,
 )
 from simulator.state import OXIDE_SPECIES
-
-
-# Cleaned silicate melt is the only ledger account MAGEMin may consume.
-# Matches the alphamelts.py contract: every other account is filtered
-# out before the library is called.
-_MAGEMIN_MELT_ACCOUNT = 'process.cleaned_melt'
 
 
 # MAGEMin operates on the same 14-oxide MELTS basis as alphaMELTS, so
@@ -264,7 +260,7 @@ class MAGEMinBackend(MeltBackend):
             return result
 
         if composition_mol_by_account is not None:
-            melt_mol, dropped_accounts = self._melt_account_composition(
+            melt_mol, dropped_accounts = split_cleaned_melt_account(
                 composition_mol_by_account)
             for account in dropped_accounts:
                 result.warnings.append(
@@ -275,9 +271,10 @@ class MAGEMinBackend(MeltBackend):
             # overrides any composition_mol passed alongside it.
             composition_mol = melt_mol
 
-        comp_wt = self._project_to_oxide_wt_pct(
+        comp_wt = project_melt_to_oxide_wt_pct(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
+            oxide_basis=_MAGEMIN_OXIDE_BASIS,
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
@@ -308,35 +305,6 @@ class MAGEMinBackend(MeltBackend):
         # comparator.
         self._populate_result(result, raw)
         return result
-
-    @staticmethod
-    def _melt_account_composition(
-        composition_mol_by_account: Mapping[str, Mapping[str, float]],
-    ) -> tuple[Dict[str, float], List[str]]:
-        """
-        Extract the cleaned-melt account; report every other account.
-
-        Returns ``(melt_species_mol, dropped_account_names)``.  MAGEMin
-        only consumes ``process.cleaned_melt``; any other account that
-        carries positive material is reported back so the caller can
-        record a warning (binding spec §7 — MAGEMin must not receive
-        metal / sulfide / salt / halide accounts).
-        """
-        melt_mol: Dict[str, float] = {}
-        for species, mol in (
-            composition_mol_by_account.get(_MAGEMIN_MELT_ACCOUNT, {}) or {}
-        ).items():
-            value = float(mol)
-            if value > 0.0:
-                melt_mol[str(species)] = melt_mol.get(str(species), 0.0) + value
-
-        dropped: List[str] = []
-        for account, species_mol in composition_mol_by_account.items():
-            if str(account) == _MAGEMIN_MELT_ACCOUNT:
-                continue
-            if any(float(mol) > 0.0 for mol in (species_mol or {}).values()):
-                dropped.append(str(account))
-        return melt_mol, sorted(dropped)
 
     # ------------------------------------------------------------------
     # Discovery
@@ -525,54 +493,6 @@ class MAGEMinBackend(MeltBackend):
     # ------------------------------------------------------------------
     # Composition projection / result parsing
     # ------------------------------------------------------------------
-
-    def _project_to_oxide_wt_pct(
-        self,
-        *,
-        composition_kg: Optional[Dict[str, float]],
-        composition_mol: Optional[Dict[str, float]],
-        species_formula_registry: Optional[Mapping[str, Any]] = None,
-    ) -> Dict[str, float]:
-        """
-        Project the simulator's mol/kg melt composition to oxide wt%
-        in the 14-oxide MELTS basis MAGEMin consumes.
-
-        ``species_formula_registry`` is the simulator's formula registry
-        (threaded through from the layered ABC) used for the mol -> kg
-        projection; ``None`` falls back to the builtin formula table.
-        """
-        from simulator.accounting.formulas import resolve_species_formula
-
-        if composition_mol is not None:
-            kg_by_species: Dict[str, float] = {}
-            for species, mol in composition_mol.items():
-                value = float(mol)
-                if value <= 0.0:
-                    continue
-                kg = value * resolve_species_formula(
-                    species, species_formula_registry).molar_mass_kg_per_mol()
-                kg_by_species[species] = kg
-        else:
-            kg_by_species = {
-                species: float(value)
-                for species, value in (composition_kg or {}).items()
-                if float(value) > 0.0
-            }
-
-        filtered = {
-            species: kg
-            for species, kg in kg_by_species.items()
-            if species in _MAGEMIN_OXIDE_BASIS
-        }
-
-        total = sum(filtered.values())
-        if total <= 0:
-            return {}
-
-        return {
-            species: kg / total * 100.0
-            for species, kg in filtered.items()
-        }
 
     def _populate_result(
         self, result: EquilibriumResult, raw: Any

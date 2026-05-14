@@ -378,9 +378,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_error = ''
         self._backend_failed = False
 
-        # Convert wt% to absolute kg
-        self.inventory.melt_oxide_kg = dict(self.melt.composition_kg)
-
         self.melt.temperature_C = 25.0
         self.melt.atmosphere = Atmosphere.HARD_VACUUM
         environment = fs.get('environment', {}) or {}
@@ -854,11 +851,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
+        # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
+        # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
+        # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides
+        # would drop that mass and the MeltState projection would no longer
+        # mass-close against the ledger account.
         self.melt.composition_kg = {
+            species: float(kg)
+            for species, kg in ledger_melt.items()
+        }
+        # melt_oxide_kg keeps its oxide-only contract (Stage 0 reload path,
+        # feedstock inventory snapshots); the non-oxide remainder stays in
+        # melt.composition_kg / total_mass_kg only.
+        self.inventory.melt_oxide_kg = {
             oxide: float(ledger_melt.get(oxide, 0.0))
             for oxide in OXIDE_SPECIES
         }
-        self.inventory.melt_oxide_kg = dict(self.melt.composition_kg)
         self.melt.update_total_mass()
 
     def _backend_composition_kg(self) -> Dict[str, float]:

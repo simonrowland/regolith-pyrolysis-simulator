@@ -681,72 +681,6 @@ class AlphaMELTSBackend(MeltBackend):
         with open(path, 'w') as f:
             f.write('\n'.join(lines) + '\n')
 
-    def _write_command_file(self, path: Path, T_C: float):
-        """Write alphaMELTS command sequence."""
-        commands = [
-            '1',      # Read input
-            f'3',     # Set temperature
-            f'{T_C}',
-            '4',      # Execute
-            '0',      # Exit
-        ]
-        with open(path, 'w') as f:
-            f.write('\n'.join(commands) + '\n')
-
-    def _parse_melts_output(self, tmpdir: str, T_C: float,
-                             P_bar: float, fO2_log: float):
-        """Parse alphaMELTS *_tbl.txt output files."""
-        eq = EquilibriumResult(
-            temperature_C=T_C,
-            pressure_bar=P_bar,
-            fO2_log=fO2_log,
-        )
-
-        # Look for phase table output
-        tbl_files = list(Path(tmpdir).glob('*_tbl.txt'))
-        for tbl in tbl_files:
-            try:
-                with open(tbl) as f:
-                    content = f.read()
-                mass_index = None
-                for line in content.split('\n'):
-                    parts = line.strip().split()
-                    if len(parts) < 2:
-                        continue
-                    lower_parts = [part.lower() for part in parts]
-                    for idx, token in enumerate(lower_parts):
-                        if 'mass' in token:
-                            mass_index = idx
-                    phase = parts[0]
-                    phase_key = phase.lower()
-                    if phase_key in (
-                        'temperature', 'pressure', 'mass', 'phase', 'total'
-                    ):
-                        continue
-                    if phase_key[0].isdigit():
-                        continue
-                    try:
-                        if (
-                            mass_index is not None
-                            and mass_index < len(parts)
-                            and mass_index > 0
-                        ):
-                            mass = float(parts[mass_index])
-                        elif len(parts) == 2:
-                            mass = float(parts[1])
-                        else:
-                            numeric = [float(part) for part in parts[1:]]
-                            mass = numeric[-1]
-                    except ValueError:
-                        continue
-                    if mass > 0.0:
-                        eq.phases_present.append(phase)
-                        eq.phase_masses_kg[phase] = mass / 1000.0
-            except OSError:
-                pass
-
-        return eq
-
     def _parse_liquidus_C(self, output: str) -> Optional[float]:
         match = re.search(
             r'Found the liquidus at T\s*=\s*([0-9.+\-Ee]+)\s*\(C\)',
@@ -948,11 +882,8 @@ class AlphaMELTSBackend(MeltBackend):
         for key, value in row.items():
             if not self._is_number(value):
                 continue
-            name = str(key)
-            if name.endswith('_Liq'):
-                oxide = self._canonical_oxide_name(name)
-            else:
-                oxide = self._canonical_oxide_name(name)
+            # _canonical_oxide_name strips a trailing '_Liq' internally.
+            oxide = self._canonical_oxide_name(str(key))
             if oxide == 'FeO_total':
                 oxide = 'FeO'
             if oxide in MELTS_OXIDE_BASIS:

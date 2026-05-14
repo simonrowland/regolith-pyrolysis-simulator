@@ -288,24 +288,6 @@ def test_decompression_path_calls_verified_petthermotools_api():
     assert calls[0]['bulk']['FeOt_Liq'] == pytest.approx(10.0)
 
 
-def test_alphamelts_parser_keeps_valid_melts_mineral_phases(tmp_path):
-    backend = AlphaMELTSBackend()
-    table = tmp_path / 'phase_tbl.txt'
-    table.write_text(
-        'Temperature 1600\n'
-        'Phase T_C P_bar Mass_g Moles\n'
-        'liquid 900.0\n'
-        'plagioclase 1600 1e-6 50.0 0.2\n'
-        'ilmenite 1600 1e-6 10.0 0.05\n'
-    )
-
-    result = backend._parse_melts_output(
-        str(tmp_path), T_C=1600.0, P_bar=1e-6, fO2_log=-9.0)
-
-    assert result.phase_masses_kg['plagioclase'] == pytest.approx(0.05)
-    assert result.phase_masses_kg['ilmenite'] == pytest.approx(0.01)
-
-
 def test_alphamelts_stdout_parser_reports_liquid_fraction_without_ledger_transition():
     backend = AlphaMELTSBackend()
     output = """
