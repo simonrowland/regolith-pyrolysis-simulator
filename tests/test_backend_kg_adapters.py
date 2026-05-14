@@ -2,6 +2,7 @@ import importlib
 
 import pytest
 
+from simulator.accounting import AccountingError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import EquilibriumResult, StubBackend
@@ -28,7 +29,8 @@ class RecordingStubBackend(StubBackend):
         return True
 
     def equilibrate(
-        self, temperature_C, composition_mol, fO2_log=-9.0, pressure_bar=1e-6
+        self, temperature_C, composition_mol, fO2_log=-9.0, pressure_bar=1e-6,
+        species_formula_registry=None,
     ):
         self.calls.append(
             {
@@ -44,7 +46,6 @@ class RecordingStubBackend(StubBackend):
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             liquid_composition_wt_pct={"SiO2": 0.0, "FeO": 100.0},
-            phase_masses_kg={"liquid": 1.0},
         )
 
     def get_vapor_species(self):
@@ -58,7 +59,8 @@ class AtomDeltaBackend(RecordingStubBackend):
         self.LedgerTransition = LedgerTransition
 
     def equilibrate(
-        self, temperature_C, composition_mol, fO2_log=-9.0, pressure_bar=1e-6
+        self, temperature_C, composition_mol, fO2_log=-9.0, pressure_bar=1e-6,
+        species_formula_registry=None,
     ):
         result = super().equilibrate(
             temperature_C,
@@ -67,7 +69,44 @@ class AtomDeltaBackend(RecordingStubBackend):
             pressure_bar=pressure_bar,
         )
         result.ledger_transition = self.LedgerTransition(
-            name="backend_feo_delta",
+            name="factsage_equilibrium_phase_update",
+            debits=(
+                self.MaterialLot(
+                    "process.cleaned_melt",
+                    {"FeO": 71.84},
+                    source="backend atom delta",
+                ),
+            ),
+            credits=(
+                self.MaterialLot(
+                    "process.metal_phase",
+                    {"Fe": 55.84},
+                    source="backend atom delta",
+                ),
+                self.MaterialLot(
+                    "process.overhead_gas",
+                    {"O2": 16.0},
+                    source="backend atom delta",
+                ),
+            ),
+            reason="backend result supplies explicit atom delta",
+        )
+        return result
+
+
+class TerminalizingBackend(AtomDeltaBackend):
+    def equilibrate(
+        self, temperature_C, composition_mol, fO2_log=-9.0, pressure_bar=1e-6,
+        species_formula_registry=None,
+    ):
+        result = super().equilibrate(
+            temperature_C,
+            composition_mol,
+            fO2_log=fO2_log,
+            pressure_bar=pressure_bar,
+        )
+        result.ledger_transition = self.LedgerTransition(
+            name="factsage_equilibrium_phase_update",
             debits=(
                 self.MaterialLot(
                     "process.cleaned_melt",
@@ -87,7 +126,7 @@ class AtomDeltaBackend(RecordingStubBackend):
                     source="backend atom delta",
                 ),
             ),
-            reason="backend result supplies explicit atom delta",
+            reason="backend result illegally terminalizes material",
         )
         return result
 
@@ -158,7 +197,7 @@ def test_backend_result_applies_as_atom_delta():
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "FeO"
     ] == pytest.approx(328.16)
-    assert sim.atom_ledger.kg_by_account("terminal.drain_tap_material")[
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")[
         "Fe"
     ] == pytest.approx(55.84)
     oxygen_partition = sim._oxygen_terminal_partition_kg()
@@ -169,6 +208,17 @@ def test_backend_result_applies_as_atom_delta():
     assert sim.melt.composition_kg["SiO2"] == pytest.approx(600.0)
     assert sim.melt.composition_kg["FeO"] == pytest.approx(328.16)
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
+
+
+def test_backend_result_cannot_credit_terminal_accounts():
+    MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
+    LedgerTransition = _required_attr("simulator.accounting", "LedgerTransition")
+    backend = TerminalizingBackend(MaterialLot, LedgerTransition)
+    sim = _sim(backend)
+    sim.load_batch("oxide", mass_kg=1000.0)
+
+    with pytest.raises(AccountingError, match="may only touch"):
+        sim._get_equilibrium()
 
 
 def test_backend_composition_uses_empty_ledger_not_stale_melt_kg():

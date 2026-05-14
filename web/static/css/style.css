@@ -614,6 +614,45 @@ details details {
     font-size: 12px;
 }
 
+.debug-mode-note {
+    margin-top: 6px;
+    color: var(--warning);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.debug-panel {
+    border-color: var(--warning);
+}
+
+.debug-panel h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.debug-panel h3::after {
+    content: "DEBUG";
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--warning);
+    color: white;
+    font-size: 10px;
+}
+
+.debug-json-comment {
+    max-height: 360px;
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #111827;
+    color: #d1fae5;
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
     .simulator-layout {

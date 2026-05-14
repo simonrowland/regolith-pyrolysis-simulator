@@ -217,7 +217,7 @@ class EvaporationMixin:
             ))
         if O2_kg > 1e-12:
             credits.append(self.atom_ledger.credit(
-                'terminal.oxygen_melt_offgas_stored',
+                'process.overhead_gas',
                 {'O2': O2_kg},
                 source=f'{species} oxygen coproduct',
             ))
@@ -393,11 +393,27 @@ class EvaporationMixin:
                 "valid elemental stoich fallback"
             )
         kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
+        oxide_per_product = 1.0 / kg_product_per_kg_oxide
+        O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
+        if not math.isclose(
+            oxide_per_product,
+            1.0 + O2_per_product,
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise AccountingError(
+                f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
+            )
+        self._validate_evaporation_stoich_atoms(
+            parent_oxide,
+            species,
+            oxide_per_product,
+            O2_per_product,
+        )
         return {
             'parent_oxide': parent_oxide,
-            'oxide_per_product_kg': 1.0 / kg_product_per_kg_oxide,
-            'O2_per_product_kg': (
-                kg_O2_per_kg_oxide / kg_product_per_kg_oxide),
+            'oxide_per_product_kg': oxide_per_product,
+            'O2_per_product_kg': O2_per_product,
         }
 
     def _validate_evaporation_stoich_atoms(

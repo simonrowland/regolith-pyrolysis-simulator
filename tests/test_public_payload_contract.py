@@ -84,6 +84,7 @@ def test_tick_payload_keeps_existing_kg_keys():
         "O2_vented_kg_hr",
         "O2_vented_cumulative_kg",
         "O2_stored_kg",
+        "stage0_O2_stored_kg",
         "melt_offgas_O2_stored_kg",
         "melt_offgas_O2_vented_kg",
         "mre_anode_O2_stored_kg",

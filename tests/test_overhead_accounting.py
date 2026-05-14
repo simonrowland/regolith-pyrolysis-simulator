@@ -2,6 +2,7 @@ import types
 
 import pytest
 
+import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
@@ -115,11 +116,13 @@ def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
 
-    assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_stored")[
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "O2"
     ] == pytest.approx(16.0)
-    assert sim._oxygen_total_kg() == pytest.approx(16.0)
-    assert sim.oxygen_cumulative_kg == pytest.approx(16.0)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_stored").get("O2", 0.0) == pytest.approx(0.0)
+    assert sim._oxygen_total_kg() == pytest.approx(0.0)
+    assert sim.oxygen_cumulative_kg == pytest.approx(0.0)
     assert all("O2" not in stage.collected_kg for stage in sim.train.stages)
 
 
@@ -134,9 +137,10 @@ def test_o2_venting_moves_between_terminal_ledger_accounts():
         sim.melt,
         sim.train,
         turbine_spec=turbine,
-        actual_O2_kg_hr=sim._oxygen_total_kg(),
+        actual_O2_kg_hr=sim.atom_ledger.kg_by_account(
+            "process.overhead_gas")["O2"],
     )
-    sim._debit_vented_oxygen(overhead.O2_vented_kg_hr)
+    sim._route_melt_offgas_oxygen_to_terminal(overhead.O2_vented_kg_hr)
 
     assert overhead.O2_vented_kg_hr == pytest.approx(6.0)
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_stored")[
@@ -160,6 +164,27 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
 
     sim.step()
 
+    assert sim._oxygen_total_kg() == pytest.approx(16.0)
+
+
+def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
+    sim = _gas_train_sim()
+    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._get_turbine_spec = lambda: types.SimpleNamespace(
+        max_O2_flow_kg_hr=10.0)
+
+    sim.step()
+
+    assert sim.overhead.O2_vented_kg_hr == pytest.approx(6.0)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(10.0)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    )["O2"] == pytest.approx(6.0)
     assert sim._oxygen_total_kg() == pytest.approx(16.0)
 
 
@@ -347,6 +372,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
+    sim._route_melt_offgas_oxygen_to_terminal(0.0)
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)
@@ -404,6 +430,7 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
+    sim._route_melt_offgas_oxygen_to_terminal(0.0)
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)
@@ -418,3 +445,11 @@ def test_condensation_route_cannot_return_more_remaining_vapor_than_input():
 
     with pytest.raises(AccountingError, match="unphysical remaining"):
         sim._credit_evaporation_transition("SiO", 100.0, 100.1, sp_data)
+
+
+def test_elemental_stoich_fallback_is_mass_and_atom_checked(monkeypatch):
+    sim = _gas_train_sim()
+    monkeypatch.setitem(evaporation_module.STOICH_RATIOS, "FeO", (0.70, 0.25))
+
+    with pytest.raises(AccountingError, match="STOICH_RATIOS"):
+        sim._evaporation_stoich("Fe", {"parent_oxide": "FeO"})

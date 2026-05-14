@@ -4,8 +4,12 @@ import app as app_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from web.events import (
+    BackendUnavailableError,
     _clear_simulation_state,
     _completion_payload,
+    _current_simulation_state,
+    _emit_if_current,
+    _get_backend,
     _replace_simulation_state,
     _sim_locks,
     _simulations,
@@ -91,6 +95,19 @@ def test_loopback_detection_accepts_bracketed_ipv6_loopback():
     assert app_module._is_loopback_host("[::1]") is True
 
 
+def test_alphamelts_backend_selection_fails_closed(monkeypatch):
+    class UnavailableAlphaMELTS:
+        def initialize(self, config):
+            return False
+
+    monkeypatch.setattr("web.events.AlphaMELTSBackend",
+                        UnavailableAlphaMELTS)
+
+    with pytest.raises(BackendUnavailableError,
+                       match="AlphaMELTS unavailable"):
+        _get_backend("alphamelts")
+
+
 def test_replacing_simulation_state_stops_prior_run():
     sid = "test-replace"
     try:
@@ -105,6 +122,39 @@ def test_replacing_simulation_state_stops_prior_run():
         assert _simulations[sid] is second
         assert _sim_locks[sid] is second_lock
         assert first_lock is not second_lock
+    finally:
+        _clear_simulation_state(sid)
+
+
+def test_stale_run_id_cannot_emit_after_restart():
+    sid = "test-stale-run"
+
+    class Recorder:
+        def __init__(self):
+            self.emitted = []
+
+        def emit(self, event, payload, room=None):
+            self.emitted.append((event, payload, room))
+
+    try:
+        first, _ = _replace_simulation_state(sid, object(), speed=0.0)
+        second, _ = _replace_simulation_state(sid, object(), speed=0.0)
+        recorder = Recorder()
+
+        state, lock = _current_simulation_state(sid, first["run_id"])
+        assert state is None
+        assert lock is None
+        assert _emit_if_current(
+            recorder, sid, first["run_id"], "simulation_tick", {"stale": True}
+        ) is False
+        assert recorder.emitted == []
+
+        assert _emit_if_current(
+            recorder, sid, second["run_id"], "simulation_tick", {"fresh": True}
+        ) is True
+        assert recorder.emitted == [
+            ("simulation_tick", {"fresh": True}, sid)
+        ]
     finally:
         _clear_simulation_state(sid)
 

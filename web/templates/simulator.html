@@ -25,6 +25,7 @@
         <fieldset class="config-group">
             <legend>Thermodynamic Engine</legend>
             <select id="engine-select">
+                <option value="stub" selected>Built-in fallback</option>
                 <option value="alphamelts">AlphaMELTS</option>
                 <option value="factsage">FactSAGE/ChemApp (if configured)</option>
             </select>
@@ -38,7 +39,17 @@
                 {% for key, fs in feedstocks.items() %}
                 <option value="{{ key }}">{{ fs.label if fs.label is defined else key }}</option>
                 {% endfor %}
+                {% if debug_mode and debug_feedstocks %}
+                <optgroup label="Debug test feedstocks">
+                    {% for key, fs in debug_feedstocks.items() %}
+                    <option value="{{ key }}" data-debug-feedstock="true">{{ fs.label if fs.label is defined else key }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endif %}
             </select>
+            {% if debug_mode %}
+            <div class="debug-mode-note">Debug feedstocks enabled</div>
+            {% endif %}
             <div id="feedstock-info"></div>
         </fieldset>
 
@@ -353,6 +364,15 @@
                 <div>Error: <span id="mass-error">0.000%</span></div>
             </div>
         </div>
+
+        {% if debug_mode %}
+        <div id="debug-inventory-panel" class="section-card debug-panel">
+            <h3>Debug Inventory JSON</h3>
+            <pre id="debug-inventory-json" class="debug-json-comment">/* debug_inventory
+Start a simulation to populate process inventory JSON.
+*/</pre>
+        </div>
+        {% endif %}
 
         <!-- Campaign Summaries (populated during simulation) -->
         <div id="campaign-summaries" class="section-card" style="display:none">

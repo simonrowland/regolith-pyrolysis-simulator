@@ -52,6 +52,7 @@ def create_app():
         static_folder='web/static',
     )
     app.config['SECRET_KEY'] = _load_secret_key()
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
     # Register simulator web blueprint
     from web.routes import bp as web_bp

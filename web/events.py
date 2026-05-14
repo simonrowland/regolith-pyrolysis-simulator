@@ -1,7 +1,6 @@
 """SocketIO event handlers for the simulator interface."""
 
 import threading
-import time
 import uuid
 from pathlib import Path
 
@@ -16,6 +15,7 @@ from simulator.melt_backend.factsage_config import (
     FactSAGEConfigError,
     load_factsage_config,
 )
+from web.feedstock_data import load_visible_feedstocks
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -33,6 +33,17 @@ def _load_yaml(filename):
 _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
+
+
+def _safe_log(message: str) -> None:
+    try:
+        print(message)
+    except OSError:
+        pass
+
+
+class BackendUnavailableError(RuntimeError):
+    """Requested backend is required for this run but is unavailable."""
 
 
 def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, threading.Lock]:
@@ -77,8 +88,8 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
             or not state['running']
         ):
             return False
-        socketio.emit(event, payload, room=sid)
-        return True
+    socketio.emit(event, payload, room=sid)
+    return True
 
 
 def _clear_simulation_state(sid: str) -> None:
@@ -96,6 +107,8 @@ def _get_backend(backend_name: str):
         backend = AlphaMELTSBackend()
         if backend.initialize({}):
             return backend
+        raise BackendUnavailableError(
+            'AlphaMELTS unavailable; run install-dependencies.py')
     elif backend_name == 'factsage':
         backend = FactSAGEBackend()
         if backend.initialize(_factsage_config()):
@@ -111,7 +124,7 @@ def _factsage_config():
     try:
         return load_factsage_config()
     except FactSAGEConfigError as exc:
-        print(f'FactSAGE config error: {exc}')
+        _safe_log(f'FactSAGE config error: {exc}')
         return {}
 
 
@@ -230,6 +243,7 @@ def _tick_payload(*, sim, snapshot, backend_message: str):
         'O2_vented_cumulative_kg': round(
             snapshot.O2_vented_cumulative_kg, 2),
         'O2_stored_kg': round(snapshot.O2_stored_kg, 2),
+        'stage0_O2_stored_kg': round(snapshot.stage0_O2_stored_kg, 2),
         'melt_offgas_O2_stored_kg': round(
             snapshot.melt_offgas_O2_stored_kg, 2),
         'melt_offgas_O2_vented_kg': round(
@@ -290,12 +304,12 @@ def register_events(socketio):
 
     @socketio.on('connect')
     def handle_connect():
-        print(f"Client connected: {request.sid}")
+        _safe_log(f"Client connected: {request.sid}")
 
     @socketio.on('disconnect')
     def handle_disconnect():
         sid = request.sid
-        print(f"Client disconnected: {sid}")
+        _safe_log(f"Client disconnected: {sid}")
         _clear_simulation_state(sid)
 
     @socketio.on('start_simulation')
@@ -320,21 +334,27 @@ def register_events(socketio):
         speed = float(data.get('speed', 1.0))
 
         # Load data files
-        feedstocks = _load_yaml('feedstocks.yaml')
+        feedstocks = load_visible_feedstocks()
         setpoints = _load_yaml('setpoints.yaml')
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
 
-        backend = _get_backend(backend_name)
+        try:
+            backend = _get_backend(backend_name)
+        except BackendUnavailableError as exc:
+            socketio.emit('simulation_status', {
+                'status': 'error', 'message': str(exc),
+            }, room=sid)
+            return
         backend_type = type(backend).__name__
         backend_message = ''
-        if backend_name == 'factsage' and isinstance(backend, StubBackend):
+        if backend_name == 'stub':
+            backend_message = 'Using built-in fallback'
+        elif backend_name == 'factsage' and isinstance(backend, StubBackend):
             backend_message = 'FactSAGE unavailable; using built-in fallback'
         elif backend_name == 'factsage':
             backend_message = (
                 'FactSAGE/ChemApp export active: '
                 f'{backend.capability_summary()}')
-        elif backend_name == 'alphamelts' and isinstance(backend, StubBackend):
-            backend_message = 'AlphaMELTS unavailable; using built-in fallback'
         else:
             backend_message = f'Using {backend_type}'
 
@@ -388,7 +408,7 @@ def register_events(socketio):
                 ):
                     break
                 if state['paused']:
-                    time.sleep(0.1)
+                    socketio.sleep(0.1)
                     continue
 
                 with run_lock:
@@ -400,6 +420,7 @@ def register_events(socketio):
                         break
                     sim = state['sim']
                     if sim.is_complete():
+                        completion_payload = None
                         with _simulations_guard:
                             current = _simulations.get(sid)
                             if (
@@ -408,14 +429,33 @@ def register_events(socketio):
                                 or not current['running']
                             ):
                                 break
-                            socketio.emit(
-                                'simulation_complete',
-                                _completion_payload(sim),
-                                room=sid)
+                            completion_payload = _completion_payload(sim)
                             current['running'] = False
+                        socketio.emit(
+                            'simulation_complete',
+                            completion_payload,
+                            room=sid)
                         break
 
-                    snapshot = sim.step()
+                    try:
+                        snapshot = sim.step()
+                    except Exception as exc:
+                        _safe_log(f'Simulation loop failed: {exc}')
+                        with _simulations_guard:
+                            current = _simulations.get(sid)
+                            if (
+                                current is None
+                                or current.get('run_id') != run_id
+                            ):
+                                break
+                            current['running'] = False
+                            current['paused'] = False
+                        socketio.emit('simulation_status', {
+                            'status': 'error',
+                            'message': str(exc),
+                            'backend_message': backend_message,
+                        }, room=sid)
+                        break
 
                 tick_data = _tick_payload(
                     sim=sim,
@@ -448,6 +488,7 @@ def register_events(socketio):
                         'recommendation': d.recommendation,
                         'context': d.context,
                     }
+                    emit_decision = False
                     with _simulations_guard:
                         current = _simulations.get(sid)
                         if (
@@ -456,17 +497,18 @@ def register_events(socketio):
                             or not current['running']
                         ):
                             break
+                        current['paused'] = True
+                        emit_decision = True
+                    if emit_decision:
                         socketio.emit(
                             'decision_required', decision_payload, room=sid)
-                        current['paused'] = True
 
                 # Pace the simulation
                 spd = state.get('speed', 1.0)
                 if spd > 0:
-                    time.sleep(spd)
+                    socketio.sleep(spd)
 
-        thread = threading.Thread(target=run_loop, daemon=True)
-        thread.start()
+        thread = socketio.start_background_task(run_loop)
         with _simulations_guard:
             current = _simulations.get(sid)
             if current is state and current.get('run_id') == run_id:

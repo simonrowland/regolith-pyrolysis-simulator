@@ -38,12 +38,13 @@ Units:
 
 from __future__ import annotations
 
+import inspect
 import math
-import re
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 from simulator.accounting import (
+    AccountPolicy,
     AccountingError,
     AtomLedger,
     LedgerTransition,
@@ -79,6 +80,7 @@ from simulator.state import (
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
+from simulator.melt_backend.base import StubBackend
 
 # ============================================================================
 # SECTIONS 1-3: CONSTANTS, ENUMS, AND STATE MODELS
@@ -95,6 +97,12 @@ STAGE0_GAS_COMPONENTS = {
     'nh3', 'hcn', 'c', 'carbon_content', 'carbonaceous_organic', 'hydrocarbons',
     'organics_hydrocarbons', 'co_ch4_propellant', 'nh3_hcn',
     'o2_extra',
+}
+STRICT_STAGE0_FORMULA_COMPONENTS = {
+    'organics',
+    'hydrocarbons',
+    'organics_hydrocarbons',
+    'carbonaceous_organic',
 }
 STAGE0_SALT_COMPONENTS = {
     'cl', 'f', 'clo4', 'so3', 'nacl', 'kcl', 'salt', 'salts',
@@ -115,10 +123,13 @@ STAGE0_TERMINAL_SLAG_COMPONENTS = {
     'rare_earth_oxide', 'rare_earth_oxides', 'th', 'tho2', 'u', 'uo2',
 }
 OXYGEN_SPECIES = 'O2'
+FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
+OXYGEN_STAGE0_ACCOUNT = 'terminal.oxygen_stage0_stored'
 OXYGEN_MELT_OFFGAS_ACCOUNT = 'terminal.oxygen_melt_offgas_stored'
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = 'terminal.oxygen_melt_offgas_vented_to_vacuum'
 OXYGEN_MRE_ANODE_ACCOUNT = 'terminal.oxygen_mre_anode_stored'
 OXYGEN_STORED_ACCOUNTS = (
+    OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
 )
@@ -130,15 +141,29 @@ FLOW_MASS_ACCOUNTS = (
     'process.raw_feedstock',
     'process.condensation_train',
     'process.overhead_gas',
+    'process.metal_phase',
     'process.reagent_inventory',
     'terminal.offgas',
     'terminal.stage0_salt_phase',
     'terminal.stage0_sulfide_matte',
     'terminal.drain_tap_material',
     'terminal.slag',
+    OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
+)
+BACKEND_REACTIVE_ACCOUNTS = (
+    'process.cleaned_melt',
+    'process.metal_phase',
+    'process.overhead_gas',
+)
+BACKEND_LEDGER_TRANSITION_NAMES = (
+    'factsage_equilibrium_phase_update',
+)
+BACKEND_ACCOUNT_SCOPED_ONLY = (
+    'process.metal_phase',
+    'process.overhead_gas',
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
@@ -185,12 +210,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.backend = melt_backend
         self._last_backend_error = ''
         self._backend_failed = False
+        self._stage0_carbon_cleanup_specs: list[dict] = []
+        self._stage0_perchlorate_cleanup_specs: list[dict] = []
         self.setpoints = setpoints
         self.feedstocks = feedstocks
         self.vapor_pressures = vapor_pressures
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
-        self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
+        self.atom_ledger = self._new_atom_ledger()
 
         # --- Current state ---
         self.melt = MeltState()
@@ -328,10 +355,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if fs is None:
             raise ValueError(f"Unknown feedstock: {feedstock_key}")
 
-        additives = additives_kg or {}
+        additives = dict(additives_kg or {})
+        ledger_additives = dict(additives)
         self.species_formula_registry = self._registry_for_feedstock(fs)
-        self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
+        self.atom_ledger = self._new_atom_ledger()
         self.inventory = self._build_process_inventory(fs, mass_kg)
+        self._stage0_carbon_cleanup_specs = []
+        self._stage0_perchlorate_cleanup_specs = []
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
             required_carbon_kg > 1e-12
@@ -342,8 +372,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"{required_carbon_kg:.6g} kg C reductant for Stage 0 "
                 "carbon cleanup; supply additives_kg={'C': ...}"
             )
-        self._seed_atom_ledger(feedstock_key, fs, additives)
-        self._consume_stage0_carbon_reductant()
+        self._apply_stage0_carbon_reductant_reactions(fs, ledger_additives)
+        self._apply_stage0_perchlorate_reactions(fs)
+        self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
         self._last_backend_error = ''
         self._backend_failed = False
@@ -447,7 +478,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Dict[str, Any]:
         expanded = dict(entry)
         template = (
-            expanded.pop('template', None)
+            expanded.pop('template_formula', None)
+            or expanded.pop('template', None)
             or expanded.pop('generic_formula', None)
         )
         has_formula = any(
@@ -492,6 +524,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if float(kg) > 1e-12
         }
 
+    def _backend_account_policies(self) -> tuple[AccountPolicy, ...]:
+        provider = getattr(self.backend, 'ledger_account_policies', None)
+        if not callable(provider):
+            return ()
+        return tuple(provider())
+
+    def _new_atom_ledger(self) -> AtomLedger:
+        return AtomLedger(
+            registry=self.species_formula_registry,
+            account_policies=self._backend_account_policies(),
+        )
+
     def _seed_atom_ledger(
         self,
         feedstock_key: str,
@@ -499,14 +543,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         additives_kg: Mapping[str, float],
     ) -> None:
         """Seed atom ledger from current kg inventory projections."""
-        self.atom_ledger = AtomLedger(registry=self.species_formula_registry)
+        self.atom_ledger = self._new_atom_ledger()
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
             self._stage0_oxidation_transition_specs(feedstock))
+        carbon_specs = list(self._stage0_carbon_cleanup_specs)
+        carbon_offgas_kg: Dict[str, float] = {}
+        for spec in carbon_specs:
+            self._merge_masses(carbon_offgas_kg, spec['products_kg'])
+        perchlorate_specs = list(self._stage0_perchlorate_cleanup_specs)
+        perchlorate_salt_kg: Dict[str, float] = {}
+        for spec in perchlorate_specs:
+            self._merge_masses(perchlorate_salt_kg, spec['salt_products_kg'])
+        generated_offgas_kg = dict(oxidized_offgas_kg)
+        self._merge_masses(generated_offgas_kg, carbon_offgas_kg)
         terminal_offgas_external = self._subtract_species_kg(
             self.inventory.gas_volatiles_kg,
-            oxidized_offgas_kg,
+            generated_offgas_kg,
             context=f'{label} Stage 0 oxidation products',
+        )
+        terminal_salt_external = self._subtract_species_kg(
+            self.inventory.salt_phase_kg,
+            perchlorate_salt_kg,
+            context=f'{label} Stage 0 salt products',
         )
 
         self._load_ledger_account(
@@ -526,7 +585,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._load_ledger_account(
             'terminal.stage0_salt_phase',
-            self.inventory.salt_phase_kg,
+            terminal_salt_external,
             source=f'{label} Stage 0 salt phase',
         )
         self._load_ledger_account(
@@ -554,6 +613,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         self._record_stage0_oxidation_transitions(label, oxidation_specs)
+        self._record_stage0_carbon_cleanup_transitions(label, carbon_specs)
+        self._record_stage0_perchlorate_cleanup_transitions(
+            label, perchlorate_specs)
 
     def _load_ledger_account(
         self, account: str, species_kg: Mapping[str, float], *, source: str
@@ -679,20 +741,117 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         source=f'{label} Stage 0 controlled O2 oxidant',
                     )
                 )
-            self.atom_ledger.record(
-                f'stage0_complete_oxidation_{species}',
-                debits=debits,
-                credits=[
+            oxygen_kg = max(0.0, float(products_kg.pop(OXYGEN_SPECIES, 0.0)))
+            credits = []
+            if products_kg:
+                credits.append(
                     self.atom_ledger.credit(
                         'terminal.offgas',
                         products_kg,
                         source=f'{label} Stage 0 oxidized {species} offgas',
                     )
-                ],
+                )
+            if oxygen_kg > 1e-12:
+                credits.append(
+                    self.atom_ledger.credit(
+                        OXYGEN_STAGE0_ACCOUNT,
+                        {OXYGEN_SPECIES: oxygen_kg},
+                        source=f'{label} Stage 0 oxidized {species} oxygen',
+                    )
+                )
+            self.atom_ledger.record(
+                f'stage0_complete_oxidation_{species}',
+                debits=debits,
+                credits=credits,
                 reason=(
                     'Stage 0 complete oxidation records organic volatile '
                     'atoms and controlled O2 input explicitly.'
                 ),
+            )
+
+    def _record_stage0_carbon_cleanup_transitions(
+        self,
+        label: str,
+        specs: list[dict],
+    ) -> None:
+        for spec in specs:
+            debits = []
+            for account, species_kg in spec['debits']:
+                payload = self._ledger_species_kg(species_kg)
+                if not payload:
+                    continue
+                self.atom_ledger.load_external(
+                    account,
+                    payload,
+                    source=f"{label} {spec['name']} feed",
+                )
+                debits.append(
+                    self.atom_ledger.debit(
+                        account,
+                        payload,
+                        source=f"{label} {spec['name']} feed",
+                    )
+                )
+            if not debits:
+                continue
+            self.atom_ledger.record(
+                spec['name'],
+                debits=debits,
+                credits=[
+                    self.atom_ledger.credit(
+                        'terminal.offgas',
+                        spec['products_kg'],
+                        source=f"{label} {spec['name']} offgas",
+                    )
+                ],
+                reason='Stage 0 carbon cleanup uses explicit atom reactions.',
+            )
+
+    def _record_stage0_perchlorate_cleanup_transitions(
+        self,
+        label: str,
+        specs: list[dict],
+    ) -> None:
+        for spec in specs:
+            debits = []
+            for account, species_kg in spec['debits']:
+                payload = self._ledger_species_kg(species_kg)
+                if not payload:
+                    continue
+                self.atom_ledger.load_external(
+                    account,
+                    payload,
+                    source=f"{label} {spec['name']} feed",
+                )
+                debits.append(
+                    self.atom_ledger.debit(
+                        account,
+                        payload,
+                        source=f"{label} {spec['name']} feed",
+                    )
+                )
+            if not debits:
+                continue
+            credits = []
+            salt_products = self._ledger_species_kg(spec['salt_products_kg'])
+            if salt_products:
+                credits.append(self.atom_ledger.credit(
+                    'terminal.stage0_salt_phase',
+                    salt_products,
+                    source=f"{label} {spec['name']} salt product",
+                ))
+            oxygen_products = self._ledger_species_kg(spec['oxygen_products_kg'])
+            if oxygen_products:
+                credits.append(self.atom_ledger.credit(
+                    OXYGEN_STAGE0_ACCOUNT,
+                    oxygen_products,
+                    source=f"{label} {spec['name']} oxygen product",
+                ))
+            self.atom_ledger.record(
+                spec['name'],
+                debits=debits,
+                credits=credits,
+                reason='Stage 0 perchlorate cleanup uses explicit atom reactions.',
             )
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
@@ -713,12 +872,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
 
     def _backend_composition_mol(self) -> Dict[str, float]:
-        ledger_melt = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        totals: Dict[str, float] = {}
+        for species_mol in self._backend_composition_mol_by_account().values():
+            for species, mol in species_mol.items():
+                totals[species] = totals.get(species, 0.0) + mol
         return {
             species: mol
-            for species, raw_mol in ledger_melt.items()
-            if (mol := float(raw_mol)) > 0.0
+            for species, mol in totals.items()
+            if mol > 0.0
         }
+
+    def _backend_composition_mol_by_account(
+        self,
+    ) -> Dict[str, Dict[str, float]]:
+        composition: Dict[str, Dict[str, float]] = {}
+        for account in BACKEND_REACTIVE_ACCOUNTS:
+            species_mol = {
+                species: mol
+                for species, raw_mol in self.atom_ledger.mol_by_account(
+                    account).items()
+                if (mol := float(raw_mol)) > 0.0
+            }
+            if species_mol:
+                composition[account] = species_mol
+        return composition
+
+    def _validate_backend_account_scope_support(
+        self,
+        composition_by_account: Mapping[str, Mapping[str, float]],
+    ) -> None:
+        if self._backend_accepts_kwarg('composition_mol_by_account'):
+            return
+        unsupported = {
+            account: sorted(species_mol)
+            for account, species_mol in composition_by_account.items()
+            if account in BACKEND_ACCOUNT_SCOPED_ONLY and species_mol
+        }
+        if unsupported:
+            raise AccountingError(
+                'backend must accept composition_mol_by_account before '
+                f'consuming account-scoped metal/gas inputs; got {unsupported}'
+            )
 
     def _get_equilibrium(self):
         """
@@ -727,66 +921,343 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Kg composition remains available as an adapter projection for legacy
         helper surfaces, but MeltState kg is not authoritative.
         """
-        if (
-            self._backend_failed
-            or self.backend is None
-            or not self.backend.is_available()
-        ):
+        if self.backend is None:
+            return self._stub_equilibrium()
+        if self._backend_failed:
+            if not self._backend_allows_stub_fallback():
+                raise RuntimeError(
+                    self._last_backend_error
+                    or 'configured backend is disabled after failure'
+                )
+            return self._stub_equilibrium()
+        if not self.backend.is_available():
+            if not self._backend_allows_stub_fallback():
+                raise RuntimeError(
+                    self._last_backend_error
+                    or f'{type(self.backend).__name__} is unavailable'
+                )
             return self._stub_equilibrium()
 
         try:
-            result = self.backend.equilibrate(
-                temperature_C=self.melt.temperature_C,
-                composition_mol=self._backend_composition_mol(),
-                fO2_log=self.melt.fO2_log,
-                pressure_bar=self.melt.p_total_mbar / 1000.0,
-            )
+            backend_composition_by_account = (
+                self._backend_composition_mol_by_account())
+            self._validate_backend_account_scope_support(
+                backend_composition_by_account)
+            backend_kwargs = {
+                'temperature_C': self.melt.temperature_C,
+                'composition_mol': self._backend_composition_mol(),
+                'species_formula_registry': self.species_formula_registry,
+                'fO2_log': self.melt.fO2_log,
+                'pressure_bar': self.melt.p_total_mbar / 1000.0,
+            }
+            if self._backend_accepts_kwarg('composition_mol_by_account'):
+                backend_kwargs['composition_mol_by_account'] = (
+                    backend_composition_by_account)
+            result = self.backend.equilibrate(**backend_kwargs)
         except AccountingError:
             raise
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
+            if not self._backend_allows_stub_fallback():
+                raise
             return self._stub_equilibrium()
         except ValueError as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
+            if not self._backend_allows_stub_fallback():
+                raise
             return self._stub_equilibrium()
 
         transition = getattr(result, 'ledger_transition', None)
+        if transition is None and self._equilibrium_result_has_phase_species(result):
+            self._last_backend_error = (
+                'backend returned post-equilibrium phase material without an '
+                'AtomLedger transition'
+            )
+            self._disable_backend_after_failure()
+            if not self._backend_allows_stub_fallback():
+                raise RuntimeError(self._last_backend_error)
+            return self._stub_equilibrium()
         if transition is not None:
+            self._validate_backend_ledger_transition(transition)
             self.atom_ledger.apply(transition)
             self._project_cleaned_melt_from_atom_ledger()
         return result
+
+    def _backend_accepts_kwarg(self, name: str) -> bool:
+        try:
+            signature = inspect.signature(self.backend.equilibrate)
+        except (TypeError, ValueError):
+            return False
+        return name in signature.parameters
+
+    def _backend_allows_stub_fallback(self) -> bool:
+        return (
+            self.backend is None
+            or isinstance(self.backend, StubBackend)
+        )
 
     def _disable_backend_after_failure(self) -> None:
         self._backend_failed = True
         if self.backend is not None and hasattr(self.backend, '_available'):
             setattr(self.backend, '_available', False)
 
-    def _consume_stage0_carbon_reductant(self) -> None:
+    @staticmethod
+    def _equilibrium_result_has_phase_species(result: Any) -> bool:
+        for attr in ('phase_species_mol', 'phase_species_kg'):
+            phase_species = getattr(result, attr, None)
+            if not phase_species:
+                continue
+            for species in phase_species.values():
+                if any(float(amount) > 0.0 for amount in dict(species).values()):
+                    return True
+        phase_masses = getattr(result, 'phase_masses_kg', None)
+        if phase_masses and any(
+            float(amount) > 0.0 for amount in dict(phase_masses).values()
+        ):
+            return True
+        return False
+
+    def _apply_stage0_carbon_reductant_reactions(
+        self,
+        feedstock: Mapping[str, Any],
+        additives_kg: Dict[str, float],
+    ) -> None:
         required_kg = max(0.0, float(
             self.inventory.carbon_reductant_required_kg))
         if required_kg <= 1e-12:
             return
-        available_kg = self.atom_ledger.kg_by_account(
-            'reservoir.reagent.C').get('C', 0.0)
+        reaction_ids = self._stage0_carbon_cleanup_reaction_ids(feedstock)
+        if not reaction_ids:
+            raise AccountingError(
+                'Stage 0 carbon cleanup requires explicit '
+                'stage0_carbon_cleanup.reactions'
+            )
+        self._validate_stage0_carbon_reaction_order(reaction_ids)
+        available_kg = max(0.0, float(additives_kg.get('C', 0.0)))
         if available_kg + 1e-12 < required_kg:
             raise AccountingError(
                 f"Stage 0 carbon cleanup requires {required_kg:.6g} kg C; "
                 f"only {available_kg:.6g} kg is available"
             )
-        self.atom_ledger.apply(
-            LedgerTransition.move(
-                'stage0_carbon_cleanup_reductant',
-                'reservoir.reagent.C',
-                'terminal.offgas',
-                {'C': required_kg},
-                reason=(
-                    'Stage 0 carbon cleanup reductant consumed as '
-                    'carbon-bearing offgas equivalent'
-                ),
+        carbon_mol_remaining = required_kg / resolve_species_formula(
+            'C', self.species_formula_registry).molar_mass_kg_per_mol()
+
+        specs: list[dict] = []
+        for reaction_id in reaction_ids:
+            if reaction_id == 'sulfate_so3_to_so2_co':
+                carbon_mol_remaining = self._apply_stage0_sulfate_carbon_reaction(
+                    carbon_mol_remaining, specs)
+            elif reaction_id == 'co2_boudouard_to_co':
+                if not self._has_stage0_co2_source(feedstock):
+                    raise AccountingError(
+                        'co2_boudouard_to_co requires a declared CO2 atmosphere '
+                        'or stage0_carbon_cleanup.co2_source'
+                    )
+                carbon_mol_remaining = self._apply_stage0_boudouard_reaction(
+                    carbon_mol_remaining, specs)
+            else:
+                raise AccountingError(
+                    f'unsupported Stage 0 carbon cleanup reaction {reaction_id!r}'
+                )
+
+        carbon_kg_remaining = carbon_mol_remaining * resolve_species_formula(
+            'C', self.species_formula_registry).molar_mass_kg_per_mol()
+        if carbon_kg_remaining > 1e-9:
+            raise AccountingError(
+                'Stage 0 carbon cleanup reactions do not consume required C: '
+                f'{carbon_kg_remaining:.6g} kg remains'
             )
+
+        additives_kg['C'] = max(0.0, available_kg - required_kg)
+        if additives_kg['C'] <= 1e-12:
+            additives_kg.pop('C', None)
+        self._stage0_carbon_cleanup_specs = specs
+
+    @staticmethod
+    def _validate_stage0_carbon_reaction_order(reaction_ids: list[str]) -> None:
+        if (
+            'sulfate_so3_to_so2_co' in reaction_ids
+            and 'co2_boudouard_to_co' in reaction_ids
+            and reaction_ids.index('co2_boudouard_to_co')
+            < reaction_ids.index('sulfate_so3_to_so2_co')
+        ):
+            raise AccountingError(
+                'stage0_carbon_cleanup.reactions must run '
+                'sulfate_so3_to_so2_co before co2_boudouard_to_co'
+            )
+
+    @staticmethod
+    def _has_stage0_co2_source(feedstock: Mapping[str, Any]) -> bool:
+        cleanup = feedstock.get('stage0_carbon_cleanup') or {}
+        if isinstance(cleanup, Mapping) and cleanup.get('co2_source'):
+            return True
+        environment = feedstock.get('environment') or {}
+        atmosphere = str(feedstock.get('atmosphere') or '')
+        if isinstance(environment, Mapping):
+            atmosphere = str(environment.get('atmosphere') or atmosphere)
+        return 'co2' in atmosphere.lower()
+
+    @classmethod
+    def _stage0_carbon_cleanup_reaction_ids(
+        cls, feedstock: Mapping[str, Any]
+    ) -> list[str]:
+        cleanup = feedstock.get('stage0_carbon_cleanup') or {}
+        if not isinstance(cleanup, Mapping):
+            raise ValueError('stage0_carbon_cleanup must be a mapping')
+        raw_reactions = cleanup.get('reactions') or []
+        if not isinstance(raw_reactions, (list, tuple)):
+            raise ValueError('stage0_carbon_cleanup.reactions must be a list')
+        reactions: list[str] = []
+        for item in raw_reactions:
+            if isinstance(item, Mapping):
+                reaction_id = str(item.get('id', '')).strip()
+            else:
+                reaction_id = str(item).strip()
+            if reaction_id:
+                reactions.append(reaction_id)
+        return reactions
+
+    def _apply_stage0_sulfate_carbon_reaction(
+        self, carbon_mol_remaining: float, specs: list[dict]
+    ) -> float:
+        if carbon_mol_remaining <= 1e-12:
+            return 0.0
+        so3_kg = max(0.0, float(self.inventory.salt_phase_kg.get('SO3', 0.0)))
+        if so3_kg <= 1e-12:
+            return carbon_mol_remaining
+
+        molar = {
+            species: resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for species in ('C', 'SO3', 'SO2', 'CO')
+        }
+        extent_mol = min(carbon_mol_remaining, so3_kg / molar['SO3'])
+        if extent_mol <= 1e-12:
+            return carbon_mol_remaining
+
+        so3_consumed_kg = extent_mol * molar['SO3']
+        c_consumed_kg = extent_mol * molar['C']
+        products_kg = {
+            'SO2': extent_mol * molar['SO2'],
+            'CO': extent_mol * molar['CO'],
+        }
+        self._decrease_inventory_species(
+            self.inventory.salt_phase_kg, 'SO3', so3_consumed_kg)
+        self._decrease_inventory_species(
+            self.inventory.stage0_products_kg, 'SO3', so3_consumed_kg)
+        self._merge_masses(self.inventory.gas_volatiles_kg, products_kg)
+        self._merge_masses(self.inventory.stage0_products_kg, products_kg)
+        specs.append({
+            'name': 'stage0_sulfate_carbon_cleanup',
+            'debits': (
+                ('process.stage0_salt_feed', {'SO3': so3_consumed_kg}),
+                ('process.stage0_carbon_reductant', {'C': c_consumed_kg}),
+            ),
+            'products_kg': products_kg,
+        })
+        return carbon_mol_remaining - extent_mol
+
+    def _apply_stage0_boudouard_reaction(
+        self, carbon_mol_remaining: float, specs: list[dict]
+    ) -> float:
+        if carbon_mol_remaining <= 1e-12:
+            return 0.0
+        molar = {
+            species: resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for species in ('C', 'CO2', 'CO')
+        }
+        c_consumed_kg = carbon_mol_remaining * molar['C']
+        co2_input_kg = carbon_mol_remaining * molar['CO2']
+        products_kg = {'CO': 2.0 * carbon_mol_remaining * molar['CO']}
+        self.inventory.stage0_external_inputs_kg['CO2'] = (
+            self.inventory.stage0_external_inputs_kg.get('CO2', 0.0)
+            + co2_input_kg
         )
+        self._merge_masses(self.inventory.gas_volatiles_kg, products_kg)
+        self._merge_masses(self.inventory.stage0_products_kg, products_kg)
+        specs.append({
+            'name': 'stage0_boudouard_carbon_cleanup',
+            'debits': (
+                ('process.stage0_carbon_reductant', {'C': c_consumed_kg}),
+                ('reservoir.stage0_process_gas', {'CO2': co2_input_kg}),
+            ),
+            'products_kg': products_kg,
+        })
+        return 0.0
+
+    def _apply_stage0_perchlorate_reactions(
+        self,
+        feedstock: Mapping[str, Any],
+    ) -> None:
+        cleanup = feedstock.get('stage0_perchlorate_cleanup') or {}
+        if not cleanup:
+            return
+        if not isinstance(cleanup, Mapping):
+            raise ValueError('stage0_perchlorate_cleanup must be a mapping')
+        raw_reactions = cleanup.get('reactions') or []
+        if not isinstance(raw_reactions, (list, tuple)):
+            raise ValueError('stage0_perchlorate_cleanup.reactions must be a list')
+        reactions = [str(item.get('id', '') if isinstance(item, Mapping) else item)
+                     for item in raw_reactions]
+        supported_reactions = {'perchlorate_to_chloride_o2'}
+        for reaction_id in reactions:
+            if reaction_id not in supported_reactions:
+                raise AccountingError(
+                    f"stage0_perchlorate_cleanup.reactions contains "
+                    f"unsupported reaction {reaction_id!r}"
+                )
+        if 'perchlorate_to_chloride_o2' not in reactions:
+            raise AccountingError(
+                'stage0_perchlorate_cleanup.reactions must include '
+                'perchlorate_to_chloride_o2'
+            )
+        clo4_kg = max(0.0, float(self.inventory.salt_phase_kg.get('ClO4', 0.0)))
+        if clo4_kg <= 1e-12:
+            return
+
+        molar = {
+            species: resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for species in ('ClO4', 'Cl', 'O2')
+        }
+        extent_mol = clo4_kg / molar['ClO4']
+        salt_products_kg = {'Cl': extent_mol * molar['Cl']}
+        oxygen_products_kg = {'O2': 2.0 * extent_mol * molar['O2']}
+        self._decrease_inventory_species(
+            self.inventory.salt_phase_kg, 'ClO4', clo4_kg)
+        self._decrease_inventory_species(
+            self.inventory.stage0_products_kg, 'ClO4', clo4_kg)
+        self._merge_masses(self.inventory.salt_phase_kg, salt_products_kg)
+        self._merge_masses(self.inventory.stage0_products_kg, salt_products_kg)
+        specs = [{
+            'name': 'stage0_perchlorate_cleanup',
+            'debits': (
+                ('process.stage0_perchlorate_feed', {'ClO4': clo4_kg}),
+            ),
+            'salt_products_kg': salt_products_kg,
+            'oxygen_products_kg': oxygen_products_kg,
+        }]
+        self._stage0_perchlorate_cleanup_specs = specs
+
+    @staticmethod
+    def _decrease_inventory_species(
+        values: Dict[str, float], species: str, kg: float
+    ) -> None:
+        remaining = float(values.get(species, 0.0)) - float(kg)
+        if remaining < -1e-8:
+            raise AccountingError(
+                f'Stage 0 reaction consumes more {species} than available'
+            )
+        if remaining > 1e-12:
+            values[species] = remaining
+        else:
+            values.pop(species, None)
 
     def _build_process_inventory(
         self, feedstock: Mapping[str, Any], mass_kg: float
@@ -932,14 +1403,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     species, entry, feedstock=feedstock)
         for species in sorted(species_names):
             base_formula = self._base_species_formula_registry.get(species)
-            if not getattr(base_formula, 'requires_feedstock_metadata', False):
+            requires_local_metadata = (
+                self._normalized_component_key(species)
+                in STRICT_STAGE0_FORMULA_COMPONENTS
+            ) or bool(getattr(base_formula, 'requires_feedstock_metadata', False))
+            if not requires_local_metadata:
                 continue
             if species not in entries:
                 raise ValueError(
                     f"{feedstock.get('label', 'feedstock')} uses mixed "
                     f"species {species!r}; declare "
                     f"stage0_formula_inventory.{species} with explicit "
-                    "formula and furnace offgas metadata"
+                    "formula/template_formula and furnace offgas metadata"
                 )
             self._validate_stage0_formula_metadata(
                 species, entries[species], feedstock=feedstock)
@@ -952,11 +1427,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         feedstock: Mapping[str, Any] | None = None,
     ) -> None:
+        legacy_template_keys = [
+            key for key in ('template', 'generic_formula') if key in entry
+        ]
+        if legacy_template_keys:
+            raise ValueError(
+                f'stage0_formula_inventory.{species} must use '
+                'template_formula instead of '
+                + ', '.join(sorted(legacy_template_keys))
+            )
         has_formula = any(
             key in entry
             for key in (
-                'template',
-                'generic_formula',
+                'template_formula',
                 'atoms',
                 'elements',
                 'formula',
@@ -967,10 +1450,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not has_formula:
             raise ValueError(
                 f'stage0_formula_inventory.{species} must declare a formula '
-                'or template'
+                'or template_formula'
             )
         for key in ('decomposition_temp_range_C', 'final_temp_C',
-                    'cap_kg_per_tonne', 'source'):
+                    'cap_kg_per_tonne', 'offgas_mode', 'source'):
             if key not in entry:
                 raise ValueError(
                     f'stage0_formula_inventory.{species}.{key} is required')
@@ -1012,6 +1495,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'stage0_formula_inventory.{species}.cap_kg_per_tonne '
                     'must be positive'
                 )
+        offgas_mode = str(entry['offgas_mode']).lower()
+        if offgas_mode not in {'complete_oxidation', 'oxidized',
+                               'native_mixture'}:
+            raise ValueError(
+                f'stage0_formula_inventory.{species}.offgas_mode is unknown'
+            )
+        needs_oxygen_source = offgas_mode in {'complete_oxidation', 'oxidized'}
+        if needs_oxygen_source and not entry.get('oxygen_source'):
+            raise ValueError(
+                f'stage0_formula_inventory.{species}.oxygen_source is required'
+            )
 
     @staticmethod
     def _validate_temp_range(name: str, value: Any) -> Tuple[float, float]:
@@ -1225,7 +1719,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Dict[str, Dict[str, float]]:
         buckets = cls._empty_stage0_buckets()
         seen = set()
-        for section_name in ('key_products', 'bonus_products',
+        for section_name in ('declared_stage0_products',
                              'structural_water'):
             for raw_name, raw_value in (
                 (feedstock.get(section_name, {}) or {}).items()
@@ -1249,22 +1743,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _carbon_reductant_required_kg(
         cls, feedstock: Mapping[str, Any], batch_mass_kg: float
     ) -> float:
-        notes = str(feedstock.get('process_notes', '') or '')
-        marker = re.compile(
-            r'(?P<low>\d+(?:\.\d+)?)'
-            r'(?:\s*(?:-|–|—|to|/)\s*(?P<high>\d+(?:\.\d+)?))?'
-            r'\s*kg\s*C\s*/\s*t',
-            re.IGNORECASE,
-        )
-        match = marker.search(notes)
-        if match is None:
+        raw_value = feedstock.get('stage0_carbon_reductant_kg_per_tonne')
+        cleanup = feedstock.get('stage0_carbon_cleanup') or {}
+        if not isinstance(cleanup, Mapping):
+            raise ValueError('stage0_carbon_cleanup must be a mapping')
+        if raw_value is None:
+            raw_value = cleanup.get('carbon_reductant_kg_per_tonne')
+        if raw_value is None:
+            if cls._uses_mars_carbon_cleanup(feedstock):
+                raise ValueError(
+                    'mars_carbon_cleanup requires explicit '
+                    'stage0_carbon_cleanup.carbon_reductant_kg_per_tonne'
+                )
             return 0.0
-        try:
-            low = float(match.group('low'))
-            high = float(match.group('high') or low)
-        except ValueError:
-            return 0.0
-        kg_per_tonne = (low + high) / 2.0
+        kg_per_tonne = cls._representative_number(raw_value)
+        if kg_per_tonne is None or kg_per_tonne < 0.0:
+            raise ValueError(
+                'stage0_carbon_cleanup.carbon_reductant_kg_per_tonne '
+                'must be a non-negative number or [low, high] range'
+            )
         return batch_mass_kg * kg_per_tonne / 1000.0
 
     @classmethod
@@ -1610,6 +2107,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'terminal.stage0_salt_phase',
             'terminal.stage0_sulfide_matte',
             'terminal.drain_tap_material',
+            'process.metal_phase',
             'process.condensation_train',
             'process.overhead_gas',
         ):
@@ -1639,7 +2137,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         accounts = set(FLOW_MASS_ACCOUNTS)
         accounts.update(
             account for account in totals
-            if account.startswith('reservoir.reagent.')
+            if account.startswith('reservoir.')
         )
         return sum(float(totals.get(account, 0.0)) for account in accounts)
 
@@ -1681,6 +2179,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'stored': stored_kg,
             'vented': vented_kg,
             'total': stored_kg + vented_kg,
+            'stage0_stored': stored_by_source.get(
+                OXYGEN_STAGE0_ACCOUNT, 0.0),
             'melt_offgas_stored': stored_by_source.get(
                 OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
             'mre_anode_stored': stored_by_source.get(
@@ -1726,7 +2226,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species: float(kg)
             for species, kg in self.atom_ledger.kg_by_account(
                 'process.overhead_gas').items()
-            if kg > 1e-12
+            if kg > 1e-12 and species != OXYGEN_SPECIES
         }
 
     def _drain_overhead_gas_to_terminal(self) -> None:
@@ -1742,6 +2242,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason='overhead vapor stream leaves current-tick gas volume',
             )
         )
+
+    def _route_overhead_oxygen_to_terminal(self, vented_kg: float) -> None:
+        vented_kg = max(0.0, float(vented_kg))
+        overhead_kg = self._ledger_o2_kg('process.overhead_gas')
+        if overhead_kg <= OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            return
+        if vented_kg > overhead_kg + OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            raise AccountingError(
+                f"cannot vent {vented_kg:.12g} kg O2; only "
+                f"{overhead_kg:.12g} kg is in process.overhead_gas"
+            )
+        if vented_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            self.atom_ledger.apply(
+                LedgerTransition.move(
+                    'vent_overhead_oxygen',
+                    'process.overhead_gas',
+                    OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
+                    {OXYGEN_SPECIES: vented_kg},
+                    reason='overhead O2 vented to vacuum by gas train',
+                )
+            )
+        stored_kg = max(0.0, overhead_kg - vented_kg)
+        if stored_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            self.atom_ledger.apply(
+                LedgerTransition.move(
+                    'store_overhead_oxygen',
+                    'process.overhead_gas',
+                    OXYGEN_MELT_OFFGAS_ACCOUNT,
+                    {OXYGEN_SPECIES: stored_kg},
+                    reason='overhead O2 stored by gas train',
+                )
+            )
+        self._sync_oxygen_kg_counters()
+
+    def _route_melt_offgas_oxygen_to_terminal(self, vented_kg: float) -> None:
+        """Route this tick's melt/offgas O2 through current interim sinks."""
+        vented_remaining_kg = max(0.0, float(vented_kg))
+        overhead_kg = self._ledger_o2_kg('process.overhead_gas')
+        if overhead_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            overhead_vented_kg = min(vented_remaining_kg, overhead_kg)
+            self._route_overhead_oxygen_to_terminal(overhead_vented_kg)
+            vented_remaining_kg -= overhead_vented_kg
+        if vented_remaining_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            self._debit_vented_oxygen(vented_remaining_kg)
 
     def _debit_vented_oxygen(self, vented_kg: float) -> None:
         vented_kg = max(0.0, float(vented_kg))
@@ -1765,6 +2309,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for stage in self.train.stages:
             stage.collected_kg.pop(OXYGEN_SPECIES, None)
         self._sync_oxygen_kg_counters()
+
+    def _validate_backend_ledger_transition(
+        self, transition: LedgerTransition
+    ) -> None:
+        if transition.name not in BACKEND_LEDGER_TRANSITION_NAMES:
+            raise AccountingError(
+                'backend equilibrium transition name must be one of '
+                f'{list(BACKEND_LEDGER_TRANSITION_NAMES)}; got '
+                f'{transition.name!r}'
+            )
+        allowed_accounts = set(BACKEND_REACTIVE_ACCOUNTS) | {FO2_BUFFER_ACCOUNT}
+        forbidden_accounts = sorted({
+            str(lot.account)
+            for lot in tuple(transition.debits) + tuple(transition.credits)
+            if str(lot.account) not in allowed_accounts
+        })
+        if forbidden_accounts:
+            raise AccountingError(
+                'backend equilibrium transition may only touch '
+                f'{sorted(allowed_accounts)}; got {forbidden_accounts}'
+            )
+        touches_fo2_buffer = any(
+            str(lot.account) == FO2_BUFFER_ACCOUNT
+            for lot in tuple(transition.debits) + tuple(transition.credits)
+        )
+        if touches_fo2_buffer and not self.atom_ledger.account_policy(
+            FO2_BUFFER_ACCOUNT).allow_negative:
+            raise AccountingError(
+                f'{FO2_BUFFER_ACCOUNT} requires an explicit backend account '
+                'policy before backend equilibrium may debit or credit it'
+            )
 
     def _unspent_additive_reagents_kg(self) -> Dict[str, float]:
         reagents = (
@@ -1912,7 +2487,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Pass the turbine spec so overhead model can enforce capacity limits,
         # compute O₂ venting, and calculate transport saturation.
         turbine_spec = self._get_turbine_spec()
-        melt_offgas_O2_kg_hr = max(0.0, self._melt_offgas_O2_kg_this_hr)
+        melt_offgas_O2_kg_hr = max(
+            0.0,
+            self._ledger_o2_kg('process.overhead_gas'),
+            self._melt_offgas_O2_kg_this_hr,
+        )
         self.overhead = self.overhead_model.update(
             evap_flux,
             self.melt,
@@ -1924,7 +2503,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._mre_anode_O2_kg_this_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL))
 
         # Track cumulative O₂ vented and stored
-        self._debit_vented_oxygen(self.overhead.O2_vented_kg_hr)
+        self._route_melt_offgas_oxygen_to_terminal(
+            self.overhead.O2_vented_kg_hr)
         self._drain_overhead_gas_to_terminal()
         self._sync_oxygen_kg_counters()
 
@@ -2180,6 +2760,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             O2_vented_mol_hr=self.overhead.O2_vented_mol_hr,
             O2_vented_cumulative_kg=oxygen_partition['vented'],
             O2_stored_kg=oxygen_partition['stored'],
+            stage0_O2_stored_kg=oxygen_partition['stage0_stored'],
             melt_offgas_O2_stored_kg=oxygen_partition['melt_offgas_stored'],
             melt_offgas_O2_vented_kg=oxygen_partition['melt_offgas_vented'],
             mre_anode_O2_stored_kg=oxygen_partition['mre_anode_stored'],

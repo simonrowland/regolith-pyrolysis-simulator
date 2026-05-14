@@ -4,6 +4,13 @@ from pathlib import Path
 from flask import Blueprint, render_template, jsonify, request
 import yaml
 
+from web.feedstock_data import (
+    debug_feedstocks_enabled,
+    get_visible_feedstock,
+    load_feedstock_groups,
+    load_visible_feedstocks,
+)
+
 bp = Blueprint('web', __name__,
                template_folder='templates',
                static_folder='static')
@@ -22,18 +29,19 @@ def _load_yaml(filename):
 @bp.route('/')
 def simulator():
     """Main simulator interface."""
-    feedstocks = _load_yaml('feedstocks.yaml')
-    return render_template('simulator.html', feedstocks=feedstocks)
+    feedstocks, debug_feedstocks = load_feedstock_groups()
+    return render_template(
+        'simulator.html',
+        feedstocks=feedstocks,
+        debug_feedstocks=debug_feedstocks,
+        debug_mode=debug_feedstocks_enabled(),
+    )
 
 
 @bp.route('/api/feedstocks')
 def get_feedstocks():
     """Return available feedstocks as JSON."""
-    feedstocks = _load_yaml('feedstocks.yaml')
-    custom = _load_yaml('custom_compositions.yaml')
-    if custom:
-        feedstocks.update(custom)
-    return jsonify(feedstocks)
+    return jsonify(load_visible_feedstocks(include_custom=True))
 
 
 @bp.route('/api/setpoints')
@@ -45,9 +53,7 @@ def get_setpoints():
 @bp.route('/api/feedstock/<key>')
 def get_feedstock(key):
     """Return a single feedstock's details."""
-    feedstocks = _load_yaml('feedstocks.yaml')
-    custom = _load_yaml('custom_compositions.yaml')
-    data = feedstocks.get(key) or (custom.get(key) if custom else None)
+    data = get_visible_feedstock(key, include_custom=True)
     if data is None:
         return jsonify({'error': 'Feedstock not found'}), 404
     return jsonify(data)
@@ -56,9 +62,7 @@ def get_feedstock(key):
 @bp.route('/partials/feedstock-card/<key>')
 def feedstock_card(key):
     """HTMX partial: composition table for a feedstock."""
-    feedstocks = _load_yaml('feedstocks.yaml')
-    custom = _load_yaml('custom_compositions.yaml')
-    data = feedstocks.get(key) or (custom.get(key) if custom else None)
+    data = get_visible_feedstock(key, include_custom=True)
     if data is None:
         return '<p>Feedstock not found.</p>', 404
     return render_template('partials/feedstock_card.html',
@@ -80,9 +84,7 @@ def additive_calc(key):
       Ca — default 0 (extracted, not added)
       C  — for feedstocks with P₂O₅ or SO₃: C_kg = P₂O₅_kg × 0.5 + SO₃_kg × 0.3
     """
-    feedstocks = _load_yaml('feedstocks.yaml')
-    custom = _load_yaml('custom_compositions.yaml')
-    fs = feedstocks.get(key) or (custom.get(key) if custom else None)
+    fs = get_visible_feedstock(key, include_custom=True)
     if fs is None:
         return jsonify({'error': 'Feedstock not found'}), 404
 

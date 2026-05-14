@@ -1,0 +1,46 @@
+# Synthetic low-melt feedstocks for UI/accounting sanity tests.
+# Loaded only when REGOLITH_DEBUG_FEEDSTOCKS or REGOLITH_FLASK_DEBUG is enabled.
+# Keep these to oxides expected to be molten by roughly 1400 C in simplified
+# sanity runs; high-liquidus controls like pure SiO2 belong elsewhere.
+
+debug_pure_feo:
+  label: "DEBUG - Pure FeO 1400C Melt"
+  source: "Synthetic debug-only composition"
+  confidence: "Synthetic"
+  key_feature: "Single-oxide FeO batch near its melt point"
+  preferred_for: "Fe reduction, cathode-metal, and oxygen-account sanity checks"
+  process_notes: "Low-liquidus iron oxide probe; no silicate dilution, so all nonzero inventory should trace back to FeO chemistry."
+  composition_wt_pct:
+    FeO: 100.0
+
+debug_pure_na2o:
+  label: "DEBUG - Pure Na2O 1400C Melt"
+  source: "Synthetic debug-only composition"
+  confidence: "Synthetic"
+  key_feature: "Low-melting single-oxide sodium probe"
+  preferred_for: "MRE voltage, sodium cathode-metal, alkali volatility, and anode-oxygen sanity checks"
+  process_notes: "Artificial alkali oxide pot; debug-only probe for early-voltage electrolysis and alkali accounting, not a plausible regolith feedstock."
+  composition_wt_pct:
+    Na2O: 100.0
+
+debug_pure_k2o:
+  label: "DEBUG - Pure K2O 1400C Melt"
+  source: "Synthetic debug-only composition"
+  confidence: "Synthetic"
+  key_feature: "Low-melting single-oxide potassium probe"
+  preferred_for: "Potassium cathode-metal, alkali volatility, and anode-oxygen sanity checks"
+  process_notes: "Artificial alkali oxide pot; useful for checking K routing without silicate dilution."
+  composition_wt_pct:
+    K2O: 100.0
+
+debug_low_melt_oxide_mix:
+  label: "DEBUG - FeO/Na2O/K2O 1400C Pot"
+  source: "Synthetic debug-only composition"
+  confidence: "Synthetic"
+  key_feature: "Low-melt mixed metal-oxide batch"
+  preferred_for: "Mixed Fe/alkali product routing, oxygen accounting, and debug JSON sanity checks around 1400 C"
+  process_notes: "Simple low-melt oxide pot: avoids high-liquidus SiO2 and ferric-only controls while exercising multiple metal product paths."
+  composition_wt_pct:
+    FeO: 70.0
+    Na2O: 20.0
+    K2O: 10.0

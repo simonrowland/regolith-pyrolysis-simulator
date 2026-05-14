@@ -4,7 +4,7 @@ import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
-from simulator.accounting import AccountingError
+from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase
 
@@ -204,7 +204,7 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
                 "stage0_temp_range_C": [20.0, 1050.0],
                 "stage0_formula_inventory": {
                     "carbonaceous_organic": {
-                        "template": "generic_carbonaceous_organic",
+                        "template_formula": "generic_carbonaceous_organic",
                         "decomposition_temp_range_C": [200.0, 800.0],
                         "final_temp_C": 1050.0,
                         "cap_kg_per_tonne": [20.0, 50.0],
@@ -213,7 +213,7 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
                         "source": "test generic organic carbonaceous inventory",
                     },
                     "hydrocarbons": {
-                        "template": "generic_carbonaceous_hydrocarbon",
+                        "template_formula": "generic_carbonaceous_hydrocarbon",
                         "decomposition_temp_range_C": [200.0, 500.0],
                         "final_temp_C": 1050.0,
                         "cap_kg_per_tonne": [15.0, 30.0],
@@ -233,7 +233,7 @@ def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
                         "NiO": 2.0,
                     },
                 },
-                "key_products": {
+                "potential_products": {
                     "H2O_kg_per_tonne": [100, 170],
                     "Fe_Ni_alloy_kg_per_tonne": [75, 120],
                     "S_kg_per_tonne": [25, 40],
@@ -291,6 +291,102 @@ def test_mixed_organic_stage0_formula_metadata_is_required():
         sim.load_batch("comet", mass_kg=1000.0)
 
 
+def test_global_organic_surrogates_are_templates_only():
+    sim = _sim({})
+    registry = sim._base_species_formula_registry
+
+    for species in ("organics", "hydrocarbons", "organics_hydrocarbons"):
+        assert species not in registry
+
+    for species in (
+        "generic_carbonaceous_organic",
+        "generic_carbonaceous_hydrocarbon",
+    ):
+        assert registry[species].requires_feedstock_metadata
+
+
+@pytest.mark.parametrize(
+    "species", ["hydrocarbons", "organics_hydrocarbons"])
+def test_strict_organic_stage0_formula_metadata_is_required(species):
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {
+                    "SiO2": 90.0,
+                    species: 10.0,
+                },
+                "stage0_temp_range_C": [20.0, 1050.0],
+            }
+        }
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=f"stage0_formula_inventory.{species}",
+    ):
+        sim.load_batch("comet", mass_kg=1000.0)
+
+
+def test_stage0_formula_template_key_must_be_loud():
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {"SiO2": 50.0, "organics": 10.0},
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "organics": {
+                        "template": "generic_carbonaceous_organic",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [50.0, 100.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "legacy template key",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="template_formula"):
+        sim.load_batch("comet", mass_kg=1000.0)
+
+
+def test_stage0_formula_offgas_mode_is_required():
+    sim = _sim(
+        {
+            "comet": {
+                "label": "Comet",
+                "composition_wt_pct": {"SiO2": 50.0, "organics": 10.0},
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "organics": {
+                        "template_formula": "generic_carbonaceous_organic",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [50.0, 100.0],
+                        "oxygen_source": "controlled_stage0_O2",
+                        "source": "missing offgas mode",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="offgas_mode"):
+        sim.load_batch("comet", mass_kg=1000.0)
+
+
 def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
     sim = _sim(
         {
@@ -304,7 +400,7 @@ def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
                 "stage0_temp_range_C": [20.0, 1050.0],
                 "stage0_formula_inventory": {
                     "organics": {
-                        "template": "generic_carbonaceous_organic",
+                        "template_formula": "generic_carbonaceous_organic",
                         "decomposition_temp_range_C": [200.0, 500.0],
                         "final_temp_C": 1050.0,
                         "cap_kg_per_tonne": [50.0, 100.0],
@@ -344,6 +440,51 @@ def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 
+def test_stage0_complete_oxidation_routes_surplus_o2_to_stage0_terminal():
+    sim = _sim(
+        {
+            "peroxide": {
+                "label": "Peroxide-rich feed",
+                "composition_wt_pct": {
+                    "SiO2": 99.0,
+                    "h2o2": 1.0,
+                },
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 1050.0],
+                "stage0_formula_inventory": {
+                    "h2o2": {
+                        "formula": "H2O2",
+                        "decomposition_temp_range_C": [200.0, 500.0],
+                        "final_temp_C": 1050.0,
+                        "cap_kg_per_tonne": [1.0, 20.0],
+                        "offgas_mode": "complete_oxidation",
+                        "oxygen_source": "intrinsic_feed_oxygen",
+                        "source": "test peroxide inventory",
+                    },
+                },
+                "anhydrous_silicate_after_degassing": {
+                    "composition_wt_pct": {"SiO2": 100.0},
+                },
+            }
+        }
+    )
+
+    sim.load_batch("peroxide", mass_kg=1000.0)
+    products, oxidant_kg = sim._oxidized_stage0_products(
+        "h2o2", sim.inventory.raw_components_kg["h2o2"])
+    stage0_o2_kg = products["O2"]
+    snapshot = sim._make_snapshot()
+
+    assert oxidant_kg == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("terminal.offgas").get(
+        "O2", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_stage0_stored"
+    )["O2"] == pytest.approx(stage0_o2_kg)
+    assert snapshot.stage0_O2_stored_kg == pytest.approx(stage0_o2_kg)
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
+
+
 def test_stage0_formula_final_temp_cannot_exceed_stage0_range():
     sim = _sim(
         {
@@ -354,7 +495,7 @@ def test_stage0_formula_final_temp_cannot_exceed_stage0_range():
                 "stage0_temp_range_C": [20.0, 900.0],
                 "stage0_formula_inventory": {
                     "organics": {
-                        "template": "generic_carbonaceous_organic",
+                        "template_formula": "generic_carbonaceous_organic",
                         "decomposition_temp_range_C": [200.0, 500.0],
                         "final_temp_C": 1050.0,
                         "cap_kg_per_tonne": [50.0, 100.0],
@@ -490,9 +631,16 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
                     "Cl": 0.85,
                     "P2O5": 0.85,
                 },
-                "bonus_products": {
+                "potential_products": {
                     "sulfuric_acid_feedstock_kg_per_tonne": [30, 50],
                     "O2_extra_kg_per_tonne": [20, 40],
+                },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": [
+                        "sulfate_so3_to_so2_co",
+                        "co2_boudouard_to_co",
+                    ],
                 },
                 "process_notes": (
                     "Extended carbon pre-reduction (30-60 kg C/t); "
@@ -510,19 +658,38 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     assert inv.carbon_reductant_required_kg == pytest.approx(45.0)
     assert sim.atom_ledger.kg_by_account(
         "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0)
-    assert sim.atom_ledger.kg_by_account(
-        "terminal.offgas")["C"] == pytest.approx(45.0)
+    terminal_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    assert terminal_offgas.get("C", 0.0) == pytest.approx(0.0)
+    molar = {
+        species: resolve_species_formula(
+            species, sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species in ("C", "SO3", "SO2", "CO2", "CO")
+    }
+    so3_initial_kg = inv.raw_components_kg["SO3"]
+    sulfate_extent_mol = so3_initial_kg / molar["SO3"]
+    c_to_sulfate_kg = sulfate_extent_mol * molar["C"]
+    boudouard_extent_mol = (45.0 - c_to_sulfate_kg) / molar["C"]
+    assert terminal_offgas["SO2"] == pytest.approx(
+        sulfate_extent_mol * molar["SO2"])
+    assert terminal_offgas["CO"] == pytest.approx(
+        sulfate_extent_mol * molar["CO"]
+        + 2.0 * boudouard_extent_mol * molar["CO"]
+    )
+    assert inv.stage0_external_inputs_kg["CO2"] == pytest.approx(
+        boudouard_extent_mol * molar["CO2"])
     assert "unspent_C_reagent" not in sim.product_ledger()
     assert sim.melt.ambient_pressure_mbar == pytest.approx(6.0)
     assert sim.melt.ambient_atmosphere == "96% CO2"
     assert "SO3" not in sim.melt.composition_kg
     assert "Cl" not in sim.melt.composition_kg
-    assert inv.salt_phase_kg["SO3"] == pytest.approx(109.056425)
+    assert inv.salt_phase_kg.get("SO3", 0.0) == pytest.approx(0.0)
     assert inv.salt_phase_kg["Cl"] == pytest.approx(8.060692)
     assert "sulfuric_acid_feedstock" not in inv.salt_phase_kg
     assert "O2_extra" not in inv.gas_volatiles_kg
     assert "SO3" not in inv.residual_components_kg
     assert "Cl" not in inv.residual_components_kg
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 
 def test_mars_carbon_cleanup_requires_carbon_additive():
@@ -536,6 +703,10 @@ def test_mars_carbon_cleanup_requires_carbon_additive():
                     "FeO": 17.5,
                     "SO3": 11.5,
                 },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": ["sulfate_so3_to_so2_co"],
+                },
                 "process_notes": "carbon pre-reduction (30-60 kg C/t)",
             }
         }
@@ -543,6 +714,134 @@ def test_mars_carbon_cleanup_requires_carbon_additive():
 
     with pytest.raises(AccountingError, match="requires .* kg C"):
         sim.load_batch("mars", mass_kg=1000.0)
+
+
+def test_stage0_carbon_cleanup_rejects_misordered_boudouard():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Misordered carbon cleanup",
+                "stage0_profile": "mars_carbon_cleanup",
+                "environment": {"atmosphere": "96% CO2"},
+                "composition_wt_pct": {"SiO2": 90.0, "SO3": 10.0},
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": 20.0,
+                    "reactions": [
+                        "co2_boudouard_to_co",
+                        "sulfate_so3_to_so2_co",
+                    ],
+                },
+            }
+        }
+    )
+
+    with pytest.raises(AccountingError, match="sulfate_so3_to_so2_co before"):
+        sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 20.0})
+
+
+def test_boudouard_cleanup_requires_declared_co2_source():
+    sim = _sim(
+        {
+            "bad": {
+                "label": "No CO2 source",
+                "stage0_profile": "mars_carbon_cleanup",
+                "composition_wt_pct": {"SiO2": 100.0},
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": 10.0,
+                    "reactions": ["co2_boudouard_to_co"],
+                },
+            }
+        }
+    )
+
+    with pytest.raises(AccountingError, match="CO2"):
+        sim.load_batch("bad", mass_kg=1000.0, additives_kg={"C": 10.0})
+
+
+def test_sulfate_only_cleanup_fails_if_required_carbon_remains():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Sulfate-only carbon cleanup",
+                "stage0_profile": "mars_carbon_cleanup",
+                "composition_wt_pct": {"SiO2": 99.0, "SO3": 1.0},
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": 20.0,
+                    "reactions": ["sulfate_so3_to_so2_co"],
+                },
+            }
+        }
+    )
+
+    with pytest.raises(AccountingError, match="do not consume required C"):
+        sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 20.0})
+
+
+def test_perchlorate_cleanup_routes_o2_to_oxygen_ledger():
+    sim = _sim(
+        {
+            "perchlorate": {
+                "label": "Perchlorate",
+                "composition_wt_pct": {
+                    "SiO2": 99.0,
+                    "ClO4": 1.0,
+                },
+                "stage0_perchlorate_cleanup": {
+                    "reactions": ["perchlorate_to_chloride_o2"],
+                },
+            }
+        }
+    )
+
+    sim.load_batch("perchlorate", mass_kg=1000.0)
+    sim.atom_ledger.assert_balanced()
+    molar = {
+        species: resolve_species_formula(
+            species, sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species in ("ClO4", "Cl", "O2")
+    }
+    clo4_kg = sim.inventory.raw_components_kg["ClO4"]
+    extent_mol = clo4_kg / molar["ClO4"]
+
+    assert sim.inventory.salt_phase_kg.get("ClO4", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")[
+        "Cl"
+    ] == pytest.approx(extent_mol * molar["Cl"])
+    stage0_o2_kg = 2.0 * extent_mol * molar["O2"]
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_stage0_stored"
+    )["O2"] == pytest.approx(stage0_o2_kg)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    ).get("O2", 0.0) == pytest.approx(0.0)
+    snapshot = sim._make_snapshot()
+    assert snapshot.stage0_O2_stored_kg == pytest.approx(stage0_o2_kg)
+    assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(0.0)
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
+
+
+def test_perchlorate_cleanup_rejects_unknown_reaction():
+    sim = _sim(
+        {
+            "perchlorate": {
+                "label": "Perchlorate",
+                "composition_wt_pct": {
+                    "SiO2": 99.0,
+                    "ClO4": 1.0,
+                },
+                "stage0_perchlorate_cleanup": {
+                    "reactions": [
+                        "perchlorate_to_chloride_o2",
+                        "perchlorate_to_chlorate_o2",
+                    ],
+                },
+            }
+        }
+    )
+
+    with pytest.raises(AccountingError, match="unsupported reaction"):
+        sim.load_batch("perchlorate", mass_kg=1000.0)
 
 
 def test_co2_atmosphere_without_carbon_intent_does_not_select_carbon_cleanup():
@@ -574,7 +873,7 @@ def test_declared_stage0_product_requires_matching_source_species():
             "bad_declared_product": {
                 "label": "Bad declared product",
                 "composition_wt_pct": {"SiO2": 99.0, "Fe": 1.0},
-                "key_products": {"Ni_kg_per_tonne": 50.0},
+                "declared_stage0_products": {"Ni_kg_per_tonne": 50.0},
             }
         }
     )
@@ -584,21 +883,35 @@ def test_declared_stage0_product_requires_matching_source_species():
 
 
 @pytest.mark.parametrize(
-    ("notes", "expected_kg"),
+    ("kg_per_tonne", "expected_kg"),
     [
-        ("carbon pre-reduction (30-60 kg C/t)", 45.0),
-        ("carbon pre-reduction (30–60 kg C/t)", 45.0),
-        ("carbon pre-reduction 30 to 60 kg C/t", 45.0),
-        ("carbon pre-reduction 45 kg C/t", 45.0),
+        ([30, 60], 45.0),
+        (45.0, 45.0),
+        (0.0, 0.0),
     ],
 )
-def test_carbon_reductant_parser_accepts_common_range_formats(
-    notes, expected_kg
+def test_carbon_reductant_requirement_uses_explicit_yaml(
+    kg_per_tonne, expected_kg
 ):
-    feedstock = {"process_notes": notes}
+    feedstock = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": kg_per_tonne,
+        },
+    }
 
     assert PyrolysisSimulator._carbon_reductant_required_kg(
         feedstock, 1000.0) == pytest.approx(expected_kg)
+
+
+def test_mars_carbon_cleanup_rejects_prose_only_carbon_requirement():
+    feedstock = {
+        "stage0_profile": "mars_carbon_cleanup",
+        "process_notes": "carbon pre-reduction (30-60 kg C/t)",
+    }
+
+    with pytest.raises(ValueError, match="carbon_reductant_kg_per_tonne"):
+        PyrolysisSimulator._carbon_reductant_required_kg(feedstock, 1000.0)
 
 
 def test_bulk_additions_share_batch_mass_without_stage0_balance_plug():
@@ -677,7 +990,7 @@ def test_recovered_reagent_transfer_debits_condenser_product():
 
     assert before.mass_balance_error_pct == pytest.approx(0.0)
     assert after.mass_balance_error_pct == pytest.approx(0.0)
-    assert sim.train.stages[3].collected_kg["K"] == pytest.approx(2.0)
+    assert sim.train.total_by_species().get("K", 0.0) == pytest.approx(0.0)
     assert sim.shuttle_K_inventory_kg == pytest.approx(0.0)
     assert "unspent_K_reagent" not in sim.product_ledger()
 
@@ -686,8 +999,9 @@ def test_recovered_reagent_transfer_debits_condenser_product():
         {"K": 2.0},
         source="test recovered K condensate",
     )
+    sim.train.stages[3].collected_kg["K"] = 2.0
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
-    assert sim.train.stages[3].collected_kg["K"] == pytest.approx(0.0)
+    assert sim.train.stages[3].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim.shuttle_K_inventory_kg == pytest.approx(2.0)
     assert sim.product_ledger()["unspent_K_reagent"] == pytest.approx(2.0)
 
@@ -725,6 +1039,7 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
     assert snapshot.oxygen_produced_kg == pytest.approx(5.0)
     assert snapshot.O2_stored_kg == pytest.approx(2.0)
     assert snapshot.O2_vented_cumulative_kg == pytest.approx(3.0)
+    assert snapshot.stage0_O2_stored_kg == pytest.approx(0.0)
     assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(2.0)
     assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(3.0)
     assert snapshot.mre_anode_O2_stored_kg == pytest.approx(0.0)
@@ -768,6 +1083,7 @@ def test_mre_anode_o2_snapshot_bin_is_separate_from_melt_offgas():
 
     assert snapshot.oxygen_produced_kg == pytest.approx(4.0)
     assert snapshot.O2_stored_kg == pytest.approx(4.0)
+    assert snapshot.stage0_O2_stored_kg == pytest.approx(0.0)
     assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(0.0)
     assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(0.0)
     assert snapshot.mre_anode_O2_stored_kg == pytest.approx(4.0)
@@ -788,7 +1104,7 @@ def test_composition_ranges_do_not_create_stage0_products():
                 "composition_ranges": {
                     "H2O_ice_structural_kg_per_tonne": [120, 280],
                 },
-                "bonus_products": {
+                "potential_products": {
                     "H2O_kg_per_tonne": [120, 250],
                 },
             }

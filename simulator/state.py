@@ -499,6 +499,9 @@ class HourSnapshot:
     O2_stored_kg: float = 0.0
     # Cumulative O₂ in accumulator (compressed to ~3 bar)
 
+    stage0_O2_stored_kg: float = 0.0
+    # Cumulative Stage 0 low-temperature O₂ stored separately from melt offgas
+
     melt_offgas_O2_stored_kg: float = 0.0
     # Cumulative melt/offgas O₂ in accumulator
 

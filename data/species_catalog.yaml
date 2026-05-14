@@ -337,44 +337,6 @@ species:
     aliases:
       - rare_earth_oxides
     source: Representative trivalent light rare-earth sesquioxide, La2O3; actual REE distribution unavailable in current feedstock keys.
-  - id: organics
-    atom_mass_fractions:
-      C: 0.74
-      H: 0.09
-      O: 0.12
-      N: 0.05
-    basis: estimated_group_formula
-    category: organic_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    source: Generic carbonaceous organic volatile mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
-  - id: hydrocarbons
-    atom_mass_fractions:
-      C: 0.856
-      H: 0.144
-    basis: estimated_group_formula
-    category: organic_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: medium
-    aliases:
-      - hydrocarbons_kg_per_tonne
-    source: Generic carbonaceous hydrocarbon mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
-  - id: organics_hydrocarbons
-    atom_mass_fractions:
-      C: 0.80
-      H: 0.11
-      O: 0.07
-      N: 0.02
-    basis: estimated_group_formula
-    category: organic_group
-    estimated: true
-    requires_feedstock_metadata: true
-    uncertainty: high
-    aliases:
-      - organics_hydrocarbons_kg_per_tonne
-    source: Generic carbonaceous organics plus hydrocarbons mass fractions; feedstocks must explicitly opt in with decomposition and offgas metadata.
   - id: carbonate_salts
     atoms:
       Mg: 1
@@ -533,8 +495,9 @@ species:
     basis: generic_template
     category: organic_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: medium
-    source: Generic tar-avoidance hydrocarbon bucket; mass fractions approximate simple aliphatic hydrocarbon gas for explicit feedstock formula_inventory references.
+    source: Generic tar-avoidance hydrocarbon template; feedstocks must opt in through stage0_formula_inventory.template_formula with decomposition and offgas metadata.
   - id: generic_carbonaceous_organic
     atom_mass_fractions:
       C: 0.74
@@ -544,5 +507,6 @@ species:
     basis: generic_template
     category: organic_group
     estimated: true
+    requires_feedstock_metadata: true
     uncertainty: high
-    source: Generic carbonaceous-organic bucket for sourcebook-style C/H/O/N mass-fraction accounting when feedstock-specific speciation is unavailable.
+    source: Generic carbonaceous-organic template; feedstocks must opt in through stage0_formula_inventory.template_formula with decomposition and offgas metadata.

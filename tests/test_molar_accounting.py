@@ -233,13 +233,13 @@ def test_snapshot_mass_balance_uses_explicit_flow_accounts():
     assert snapshot.mass_balance_error_pct == pytest.approx(0.1)
 
 
-def test_stage0_bonus_products_require_explicit_credit_or_source():
+def test_declared_stage0_products_require_explicit_credit_or_source():
     sim = _sim(
         {
             "bad_bonus": {
                 "label": "Bad hidden credit",
                 "composition_wt_pct": {"SiO2": 100.0},
-                "bonus_products": {"H2O_kg_per_tonne": 5.0},
+                "declared_stage0_products": {"H2O_kg_per_tonne": 5.0},
             }
         }
     )

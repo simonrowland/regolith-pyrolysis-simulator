@@ -97,6 +97,11 @@ class EquilibriumResult:
     # Backend diagnostics
     warnings: List[str] = field(default_factory=list)
 
+    # Optional atom-conserving redistribution emitted by thermodynamic backends.
+    # Backends that report phase species after equilibrium must provide this so
+    # AtomLedger remains authoritative.
+    ledger_transition: Any | None = None
+
 
 class MeltBackend(ABC):
     """
@@ -126,7 +131,11 @@ class MeltBackend(ABC):
                     fO2_log: float = -9.0,
                     pressure_bar: float = 1e-6,
                     *,
-                    composition_mol: Optional[Dict[str, float]] = None
+                    composition_mol: Optional[Dict[str, float]] = None,
+                    composition_mol_by_account: Optional[
+                        Mapping[str, Mapping[str, float]]
+                    ] = None,
+                    species_formula_registry: Optional[Mapping[str, Any]] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium at given conditions.
@@ -135,6 +144,9 @@ class MeltBackend(ABC):
             temperature_C:   Melt temperature (°C)
             composition_kg:  External kg projection of melt species
             composition_mol: Canonical melt species inventory in mol
+            composition_mol_by_account:
+                              Canonical per-ledger-account species inventory
+            species_formula_registry: Simulator formula registry for kg adapters
             fO2_log:         log10(oxygen fugacity / 1 bar)
             pressure_bar:    Total pressure (bar)
 
@@ -149,6 +161,10 @@ class MeltBackend(ABC):
     def capabilities(self) -> Dict[str, bool]:
         """Return chemistry/process coverage exposed by this backend."""
         return dict(DEFAULT_BACKEND_CAPABILITIES)
+
+    def ledger_account_policies(self) -> tuple[Any, ...]:
+        """Return backend-required AtomLedger account policies."""
+        return ()
 
     def capability_summary(self) -> str:
         """Human-readable capability status."""
@@ -179,7 +195,8 @@ class StubBackend(MeltBackend):
 
     def equilibrate(self, temperature_C, composition_kg=None,
                     fO2_log=-9.0, pressure_bar=1e-6, *,
-                    composition_mol=None):
+                    composition_mol=None, composition_mol_by_account=None,
+                    species_formula_registry=None):
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,

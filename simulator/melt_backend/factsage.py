@@ -19,6 +19,7 @@ import threading
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple
 
+from simulator.accounting import AccountPolicy, LedgerTransition, MaterialLot
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import (
@@ -30,22 +31,31 @@ from simulator.state import OXIDE_SPECIES
 
 
 SIMULATOR_OXIDES = tuple(OXIDE_SPECIES)
+FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
 
 DEFAULT_COMPONENT_MAP = {oxide: oxide for oxide in SIMULATOR_OXIDES}
 
 DEFAULT_SPECIES_MAP = {
+    'O2': 'O2',
     'Na': 'Na',
     'K': 'K',
     'Fe': 'Fe',
     'Mg': 'Mg',
     'Ca': 'Ca',
+    'Al': 'Al',
+    'Ti': 'Ti',
+    'Cr': 'Cr',
+    'Mn': 'Mn',
+    'Si': 'Si',
     'SiO': 'SiO',
 }
 
 DEFAULT_PHASE_MAP = {
     'liquid': ('LIQUID', 'SLAG', 'MELT'),
     'gas': ('GAS', 'VAPOR'),
+    'metal': ('METAL', 'ALLOY'),
 }
+VALID_PHASE_ROLES = {'liquid', 'gas', 'solid', 'metal'}
 
 SUPPORTED_AMOUNT_UNITS = {
     'kg',
@@ -179,12 +189,28 @@ class FactSAGEBackend(MeltBackend):
     def capabilities(self) -> Dict[str, bool]:
         return dict(self._capabilities)
 
+    def ledger_account_policies(self) -> tuple[AccountPolicy, ...]:
+        if not self._config:
+            return ()
+        if not self._control_fO2_enabled():
+            return ()
+        return (
+            AccountPolicy.reservoir(
+                FO2_BUFFER_ACCOUNT,
+                {'O2': self._fo2_buffer_credit_limit_kg()},
+            ),
+        )
+
     def equilibrate(self, temperature_C: float,
                     composition_kg: Optional[Dict[str, float]] = None,
                     fO2_log: float = -9.0,
                     pressure_bar: float = 1e-6,
                     *,
-                    composition_mol: Optional[Dict[str, float]] = None
+                    composition_mol: Optional[Dict[str, float]] = None,
+                    composition_mol_by_account: Optional[
+                        Mapping[str, Mapping[str, float]]
+                    ] = None,
+                    species_formula_registry: Optional[Mapping[str, Any]] = None,
                     ) -> EquilibriumResult:
         if not self.is_available():
             return self._empty_result(temperature_C, pressure_bar, fO2_log)
@@ -192,15 +218,47 @@ class FactSAGEBackend(MeltBackend):
         self._warnings = []
         try:
             with self._chemapp_lock:
-                formula_amounts, component_amounts = self._convert_composition(
-                    composition_mol=composition_mol,
-                    composition_kg=composition_kg,
+                account_composition_mol = self._aggregate_account_composition_mol(
+                    composition_mol_by_account)
+                configured_composition_mol = (
+                    account_composition_mol
+                    if composition_mol_by_account is not None
+                    else composition_mol
                 )
+                input_composition_mol = self._input_composition_mol(
+                    composition_mol=configured_composition_mol,
+                    composition_kg=composition_kg,
+                    species_formula_registry=species_formula_registry,
+                )
+                if composition_mol_by_account is not None:
+                    formula_amounts, component_amounts = (
+                        self._convert_account_composition(
+                            composition_mol_by_account,
+                            species_formula_registry=species_formula_registry,
+                        )
+                    )
+                else:
+                    formula_amounts, component_amounts = (
+                        self._convert_composition(
+                            composition_mol=configured_composition_mol,
+                            composition_kg=composition_kg,
+                            species_formula_registry=species_formula_registry,
+                        )
+                    )
+                self._declare_fugacity_controlled_oxygen(formula_amounts)
                 self._set_incoming_amounts(formula_amounts, component_amounts)
                 self._set_conditions(temperature_C, pressure_bar, fO2_log)
                 raw_result = self._run_equilibrium()
-                return self._parse_result(
-                    raw_result, temperature_C, pressure_bar, fO2_log)
+                result = self._parse_result(
+                    raw_result, temperature_C, pressure_bar, fO2_log,
+                    species_formula_registry=species_formula_registry)
+                result.ledger_transition = self._ledger_transition_from_result(
+                    input_composition_mol,
+                    result,
+                    input_mol_by_account=composition_mol_by_account,
+                    species_formula_registry=species_formula_registry,
+                )
+                return result
         except AccountingError:
             raise
         except (RuntimeError, ValueError, OSError, ArithmeticError) as exc:
@@ -290,12 +348,19 @@ class FactSAGEBackend(MeltBackend):
         eq.set_eq_T(temperature_K)
         eq.set_eq_P(pressure)
 
-        if not self._config.get('control_fO2', True):
+        if not self._control_fO2_enabled():
             return
 
         oxygen_phase = str(self._config.get('oxygen_phase', 'GAS'))
         oxygen_species = str(self._config.get('oxygen_species', 'O2'))
         oxygen_fugacity_bar = 10.0 ** float(fO2_log)
+        oxygen_phase_role = self._phase_role(oxygen_phase)
+        if oxygen_phase_role != 'gas':
+            raise RuntimeError(
+                'FactSAGE control_fO2 requires oxygen_phase to resolve to '
+                f'phase role gas before set_eq_AC_pc; {oxygen_phase!r} '
+                f'resolved to {oxygen_phase_role!r}'
+            )
 
         # ChemApp documents AC for gas constituents as fugacity in the
         # active pressure unit, so this is the closest direct fO2 control.
@@ -339,6 +404,14 @@ class FactSAGEBackend(MeltBackend):
                 component_names.update(str(component) for component in mapping)
             else:
                 formula_names.add(str(mapping))
+        formula_names.update(
+            str(species)
+            for species in self._species_map.values()
+            if species is not None and str(species)
+        )
+        oxygen_species = str(self._config.get('oxygen_species', 'O2'))
+        if oxygen_species:
+            formula_names.add(oxygen_species)
         return sorted(formula_names), sorted(component_names)
 
     def _run_equilibrium(self) -> Any:
@@ -368,6 +441,7 @@ class FactSAGEBackend(MeltBackend):
         *,
         composition_mol: Optional[Dict[str, float]] = None,
         composition_kg: Optional[Dict[str, float]] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         formula_amounts: Dict[str, float] = {}
         component_amounts: Dict[str, float] = {}
@@ -379,9 +453,11 @@ class FactSAGEBackend(MeltBackend):
             if raw_value <= 0:
                 continue
             amount = (
-                self._configured_amount_from_mol(str(oxide), raw_value)
+                self._configured_amount_from_mol(
+                    str(oxide), raw_value, species_formula_registry)
                 if source_is_mol
-                else self._configured_amount_from_kg(str(oxide), raw_value)
+                else self._configured_amount_from_kg(
+                    str(oxide), raw_value, species_formula_registry)
             )
 
             mapping = self._component_map.get(oxide)
@@ -405,13 +481,313 @@ class FactSAGEBackend(MeltBackend):
 
         return formula_amounts, component_amounts
 
+    def _convert_account_composition(
+        self,
+        composition_mol_by_account: Mapping[str, Mapping[str, float]],
+        *,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> Tuple[Dict[str, float], Dict[str, float]]:
+        formula_amounts: Dict[str, float] = {}
+        component_amounts: Dict[str, float] = {}
+
+        for account, species_mol in (composition_mol_by_account or {}).items():
+            account_s = str(account)
+            positive_species = {
+                str(species): float(mol)
+                for species, mol in (species_mol or {}).items()
+                if float(mol) > 0.0
+            }
+            if not positive_species:
+                continue
+
+            if account_s == 'process.cleaned_melt':
+                account_formula, account_components = self._convert_composition(
+                    composition_mol=positive_species,
+                    species_formula_registry=species_formula_registry,
+                )
+                for formula, amount in account_formula.items():
+                    formula_amounts[formula] = (
+                        formula_amounts.get(formula, 0.0) + amount)
+                for component, amount in account_components.items():
+                    component_amounts[component] = (
+                        component_amounts.get(component, 0.0) + amount)
+                continue
+
+            if account_s in {'process.metal_phase', 'process.overhead_gas'}:
+                for species, mol in positive_species.items():
+                    target = self._input_species_name(species)
+                    amount = self._configured_amount_from_mol(
+                        species, mol, species_formula_registry)
+                    formula_amounts[target] = (
+                        formula_amounts.get(target, 0.0) + amount)
+                continue
+
+            raise ValueError(
+                f'FactSAGE cannot consume account {account_s!r}; expected '
+                'process.cleaned_melt, process.metal_phase, or '
+                'process.overhead_gas'
+            )
+
+        if not formula_amounts and not component_amounts:
+            raise ValueError('No positive melt composition supplied')
+
+        return formula_amounts, component_amounts
+
+    def _declare_fugacity_controlled_oxygen(
+        self, formula_amounts: Dict[str, float]
+    ) -> None:
+        if 'open_oxygen_mol' in self._config:
+            raise ValueError(
+                'open_oxygen_mol is not supported until FactSAGE ledger '
+                'transitions debit an explicit fO2 buffer reservoir'
+            )
+        if not self._control_fO2_enabled():
+            return
+        self._fo2_buffer_credit_limit_kg()
+        oxygen_species = str(self._config.get('oxygen_species', 'O2'))
+        formula_amounts.setdefault(oxygen_species, 0.0)
+
+    def _control_fO2_enabled(self) -> bool:
+        if 'control_fO2' not in self._config:
+            raise ValueError(
+                'FactSAGE config must explicitly declare control_fO2 true '
+                'or false; silent fO2 behavior is not allowed'
+            )
+        return bool(self._config.get('control_fO2'))
+
+    def _fo2_buffer_credit_limit_kg(self) -> float:
+        kg_limit = self._config.get('fo2_buffer_credit_limit_kg')
+        mol_limit = self._config.get('fo2_buffer_credit_limit_mol')
+        if kg_limit is None and mol_limit is None:
+            raise ValueError(
+                'control_fO2 requires fo2_buffer_credit_limit_kg or '
+                'fo2_buffer_credit_limit_mol for reservoir.fo2_buffer'
+            )
+        total_kg = 0.0
+        if kg_limit is not None:
+            total_kg += float(kg_limit)
+        if mol_limit is not None:
+            total_kg += (
+                float(mol_limit)
+                * resolve_species_formula('O2').molar_mass_kg_per_mol()
+            )
+        if not math.isfinite(total_kg) or total_kg <= 0.0:
+            raise ValueError('fO2 buffer credit limit must be finite and positive')
+        return total_kg
+
+    def _input_composition_mol(
+        self,
+        *,
+        composition_mol: Optional[Dict[str, float]],
+        composition_kg: Optional[Dict[str, float]],
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> Dict[str, float]:
+        if composition_mol is not None:
+            return {
+                str(species): float(mol)
+                for species, mol in composition_mol.items()
+                if float(mol) > 0.0
+            }
+        result: Dict[str, float] = {}
+        for species, kg in (composition_kg or {}).items():
+            kg_value = float(kg)
+            if kg_value <= 0.0:
+                continue
+            formula = resolve_species_formula(
+                str(species), species_formula_registry)
+            result[str(species)] = kg_value / formula.molar_mass_kg_per_mol()
+        return result
+
+    @staticmethod
+    def _aggregate_account_composition_mol(
+        composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]]
+    ) -> Optional[Dict[str, float]]:
+        if composition_mol_by_account is None:
+            return None
+        result: Dict[str, float] = {}
+        for species_mol in composition_mol_by_account.values():
+            for species, mol in (species_mol or {}).items():
+                mol_value = float(mol)
+                if mol_value <= 0.0:
+                    continue
+                species_s = str(species)
+                result[species_s] = result.get(species_s, 0.0) + mol_value
+        return result or None
+
+    def _ledger_transition_from_result(
+        self,
+        input_mol: Mapping[str, float],
+        result: EquilibriumResult,
+        *,
+        input_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> Optional[LedgerTransition]:
+        if not result.phase_species_mol:
+            return None
+        debit_payloads_by_account: Dict[str, Dict[str, float]] = {}
+        if input_mol_by_account is not None:
+            for account, species_mol in input_mol_by_account.items():
+                payload: Dict[str, float] = {}
+                for species, mol in (species_mol or {}).items():
+                    mol_value = float(mol)
+                    if mol_value > 0.0:
+                        payload[str(species)] = (
+                            payload.get(str(species), 0.0) + mol_value)
+                if payload:
+                    debit_payloads_by_account[str(account)] = payload
+        if not debit_payloads_by_account:
+            debit_payloads_by_account['process.cleaned_melt'] = {
+                str(species): float(mol)
+                for species, mol in input_mol.items()
+                if float(mol) > 0.0
+            }
+        debit_payload: Dict[str, float] = {}
+        for species_mol in debit_payloads_by_account.values():
+            for species, mol in species_mol.items():
+                debit_payload[species] = debit_payload.get(species, 0.0) + mol
+        if not debit_payload:
+            return None
+
+        phase_output_mol: Dict[str, float] = {}
+        credits_by_account: Dict[str, Dict[str, float]] = {}
+        for phase_name, species_mol in result.phase_species_mol.items():
+            for species, mol in species_mol.items():
+                mol_value = float(mol)
+                if mol_value > 0.0:
+                    phase_output_mol[str(species)] = (
+                        phase_output_mol.get(str(species), 0.0) + mol_value
+                    )
+                    account = self._ledger_account_for_phase_species(
+                        phase_name, str(species))
+                    payload = credits_by_account.setdefault(account, {})
+                    payload[str(species)] = payload.get(str(species), 0.0) + mol_value
+
+        extra_debits, extra_credits = self._fo2_buffer_lots(
+            debit_payload,
+            phase_output_mol,
+            species_formula_registry,
+        )
+        credits = []
+        for account, species_mol in sorted(credits_by_account.items()):
+            payload = {
+                species: mol
+                for species, mol in species_mol.items()
+                if mol > 0.0
+            }
+            if payload:
+                credits.append(self._material_lot_mol(
+                    account, payload, species_formula_registry))
+        if not credits:
+            return None
+        return LedgerTransition(
+            name='factsage_equilibrium_phase_update',
+            debits=tuple(
+                self._material_lot_mol(
+                    account,
+                    species_mol,
+                    species_formula_registry,
+                )
+                for account, species_mol in sorted(
+                    debit_payloads_by_account.items())
+            ) + tuple(extra_debits),
+            credits=tuple(credits) + tuple(extra_credits),
+            reason='FactSAGE equilibrium phase species projected into AtomLedger',
+        )
+
+    def _fo2_buffer_lots(
+        self,
+        input_mol: Mapping[str, float],
+        output_mol: Mapping[str, float],
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> tuple[tuple[MaterialLot, ...], tuple[MaterialLot, ...]]:
+        if not bool(self._config.get('control_fO2', False)):
+            return (), ()
+
+        input_atoms = self._atom_moles_for_species_mol(
+            input_mol, species_formula_registry)
+        output_atoms = self._atom_moles_for_species_mol(
+            output_mol, species_formula_registry)
+        oxygen_delta_mol = (
+            output_atoms.get('O', 0.0) - input_atoms.get('O', 0.0)
+        )
+        if abs(oxygen_delta_mol) <= 1e-9:
+            return (), ()
+
+        o2_mol = abs(oxygen_delta_mol) / 2.0
+        lot = self._material_lot_mol(
+            FO2_BUFFER_ACCOUNT,
+            {'O2': o2_mol},
+            species_formula_registry,
+        )
+        if oxygen_delta_mol > 0.0:
+            return (lot,), ()
+        return (), (lot,)
+
+    @staticmethod
+    def _atom_moles_for_species_mol(
+        species_mol: Mapping[str, float],
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> Dict[str, float]:
+        atoms: Dict[str, float] = {}
+        for species, mol in species_mol.items():
+            formula = resolve_species_formula(
+                str(species), species_formula_registry)
+            for element, atom_mol in formula.atom_moles(float(mol)).items():
+                atoms[element] = atoms.get(element, 0.0) + atom_mol
+        return atoms
+
+    def _ledger_account_for_phase_species(
+        self, phase_name: str, species: str
+    ) -> str:
+        role = self._phase_role(phase_name)
+        if role is None:
+            raise ValueError(
+                f'FactSAGE phase {phase_name!r} has no explicit phase_map role'
+            )
+        if role in ('liquid', 'solid'):
+            return 'process.cleaned_melt'
+        if role == 'gas':
+            return 'process.overhead_gas'
+        if role == 'metal':
+            return 'process.metal_phase'
+        raise ValueError(
+            f'FactSAGE phase {phase_name!r} has unsupported role {role!r}'
+        )
+
+    def _material_lot_mol(
+        self,
+        account: str,
+        species_mol: Mapping[str, float],
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> MaterialLot:
+        payload = {
+            species: self._species_mol_to_kg(
+                species, mol, species_formula_registry)
+            for species, mol in species_mol.items()
+            if float(mol) > 0.0
+        }
+        return MaterialLot(
+            account,
+            payload,
+            source='FactSAGE equilibrium',
+            meta={
+                'amount_basis': 'mol',
+                'species_mol': dict(species_mol),
+            },
+        )
+
     # ------------------------------------------------------------------
     # Result parsing
     # ------------------------------------------------------------------
 
     def _parse_result(self, raw_result: Any, temperature_C: float,
                       pressure_bar: float,
-                      fO2_log: float) -> EquilibriumResult:
+                      fO2_log: float,
+                      *,
+                      species_formula_registry: Optional[
+                          Mapping[str, Any]] = None) -> EquilibriumResult:
         eq = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -424,7 +800,8 @@ class FactSAGEBackend(MeltBackend):
         liquid_components: Dict[str, float] = {}
 
         for phase_name, phase_state in phases:
-            species_mol, species_kg = self._phase_species_amounts(phase_state)
+            species_mol, species_kg = self._phase_species_amounts(
+                phase_state, species_formula_registry)
             phase_mass_kg = (
                 sum(species_kg.values())
                 if species_kg
@@ -555,7 +932,9 @@ class FactSAGEBackend(MeltBackend):
         }
 
     def _phase_species_amounts(
-        self, phase_state: Any
+        self,
+        phase_state: Any,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         direct_mol = self._get_mapping(phase_state, 'species_mol')
         if direct_mol:
@@ -565,7 +944,8 @@ class FactSAGEBackend(MeltBackend):
                 if float(mol) > 0.0
             }
             return species_mol, {
-                species: self._species_mol_to_kg(species, mol)
+                species: self._species_mol_to_kg(
+                    species, mol, species_formula_registry)
                 for species, mol in species_mol.items()
             }
 
@@ -587,7 +967,7 @@ class FactSAGEBackend(MeltBackend):
                     f'{name!r}'
                 )
             mol, kg = self._amount_to_species_mol_kg(
-                simulator_species, amount)
+                simulator_species, amount, species_formula_registry)
             if mol <= 0.0 or kg <= 0.0:
                 continue
             species_mol[simulator_species] = (
@@ -734,6 +1114,9 @@ class FactSAGEBackend(MeltBackend):
             key_s = str(key)
             if isinstance(value, (list, tuple, set)):
                 role = key_s.lower()
+                if role not in VALID_PHASE_ROLES:
+                    raise ValueError(
+                        f'FactSAGE phase role {role!r} is not supported')
                 for phase_name in value:
                     self._phase_roles[self._normal_name(str(phase_name))] = role
             else:
@@ -741,7 +1124,11 @@ class FactSAGEBackend(MeltBackend):
                 if value_s.lower() in ('liquid', 'gas', 'solid', 'metal'):
                     self._phase_roles[self._normal_name(key_s)] = value_s.lower()
                 else:
-                    self._phase_roles[self._normal_name(value_s)] = key_s.lower()
+                    role = key_s.lower()
+                    if role not in VALID_PHASE_ROLES:
+                        raise ValueError(
+                            f'FactSAGE phase role {role!r} is not supported')
+                    self._phase_roles[self._normal_name(value_s)] = role
 
     def _resolve_datafile_path(self, config: Mapping[str, Any]) -> Optional[Path]:
         raw_path = (
@@ -765,6 +1152,17 @@ class FactSAGEBackend(MeltBackend):
             f'{simulator_species}(G)',
         }
         return [name for name in names if name]
+
+    def _input_species_name(self, simulator_species: str) -> str:
+        mapping = self._species_map.get(simulator_species)
+        if mapping is not None:
+            return str(mapping)
+        oxygen_species = str(self._config.get('oxygen_species', 'O2'))
+        if simulator_species == oxygen_species:
+            return oxygen_species
+        raise ValueError(
+            f'No FactSAGE species mapping for species {simulator_species!r}'
+        )
 
     def _simulator_species_for_backend_name(
         self, backend_name: str
@@ -803,6 +1201,8 @@ class FactSAGEBackend(MeltBackend):
             return 'liquid'
         if 'gas' in normalized or 'vapor' in normalized:
             return 'gas'
+        if 'metal' in normalized or 'alloy' in normalized:
+            return 'metal'
         return None
 
     # ------------------------------------------------------------------
@@ -870,10 +1270,13 @@ class FactSAGEBackend(MeltBackend):
         )
 
     def _amount_to_species_mol_kg(
-        self, species: str, amount: float
+        self,
+        species: str,
+        amount: float,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
     ) -> Tuple[float, float]:
         amount_value = float(amount)
-        formula = resolve_species_formula(species)
+        formula = resolve_species_formula(species, species_formula_registry)
         kg_per_mol = formula.molar_mass_kg_per_mol()
         if self._amount_unit in ('mol', 'mole', 'moles'):
             mol = amount_value
@@ -881,14 +1284,26 @@ class FactSAGEBackend(MeltBackend):
         kg = self._amount_to_kg(amount_value)
         return kg / kg_per_mol, kg
 
-    def _configured_amount_from_mol(self, species: str, mol: float) -> float:
+    def _configured_amount_from_mol(
+        self,
+        species: str,
+        mol: float,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> float:
         mol_value = float(mol)
         if self._amount_unit in ('mol', 'mole', 'moles'):
             return mol_value
-        kg = self._species_mol_to_kg(species, mol_value)
-        return self._configured_amount_from_kg(species, kg)
+        kg = self._species_mol_to_kg(
+            species, mol_value, species_formula_registry)
+        return self._configured_amount_from_kg(
+            species, kg, species_formula_registry)
 
-    def _configured_amount_from_kg(self, species: str, kg: float) -> float:
+    def _configured_amount_from_kg(
+        self,
+        species: str,
+        kg: float,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> float:
         kg_value = float(kg)
         if self._amount_unit in ('kg', 'kilogram', 'kilograms'):
             return kg_value
@@ -897,7 +1312,7 @@ class FactSAGEBackend(MeltBackend):
         if self._amount_unit in ('tonne', 'tonnes', 'metric_ton'):
             return kg_value / 1000.0
         if self._amount_unit in ('mol', 'mole', 'moles'):
-            formula = resolve_species_formula(species)
+            formula = resolve_species_formula(species, species_formula_registry)
             return kg_value / formula.molar_mass_kg_per_mol()
         raise RuntimeError(
             f'FactSAGE amount unit {self._amount_unit!r} is not supported; '
@@ -905,8 +1320,12 @@ class FactSAGEBackend(MeltBackend):
         )
 
     @staticmethod
-    def _species_mol_to_kg(species: str, mol: float) -> float:
-        formula = resolve_species_formula(species)
+    def _species_mol_to_kg(
+        species: str,
+        mol: float,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+    ) -> float:
+        formula = resolve_species_formula(species, species_formula_registry)
         return float(mol) * formula.molar_mass_kg_per_mol()
 
     @staticmethod

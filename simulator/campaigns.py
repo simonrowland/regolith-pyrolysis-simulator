@@ -43,6 +43,18 @@ class CampaignManager:
         #                     'stir_factor': 8.0, 'max_hours': 25}}
         self.overrides: Dict[str, dict] = {}
 
+    @staticmethod
+    def _is_noninteractive_test_batch(record: BatchRecord) -> bool:
+        return str(getattr(record, 'feedstock_key', '')).startswith('debug_')
+
+    @staticmethod
+    def _record_auto_decision(record: BatchRecord,
+                              decision_type: DecisionType,
+                              choice: str) -> None:
+        decision = (decision_type, choice)
+        if decision not in record.decisions:
+            record.decisions.append(decision)
+
     # ------------------------------------------------------------------
     # Campaign configuration
     # ------------------------------------------------------------------
@@ -348,6 +360,10 @@ class CampaignManager:
         elif current == CampaignPhase.C0B:
             # Seal volatiles train gate valve
             # Decision needed: Path A or B
+            if self._is_noninteractive_test_batch(record):
+                record.path = 'A'
+                self._record_auto_decision(record, DecisionType.PATH_AB, 'A')
+                return CampaignPhase.C2A
             return None  # Triggers PATH_AB decision
 
         elif current == CampaignPhase.C2A:
@@ -364,6 +380,11 @@ class CampaignManager:
 
         elif current == CampaignPhase.C3_NA:
             # After C3 → Branch decision needed
+            if self._is_noninteractive_test_batch(record):
+                record.branch = 'two'
+                self._record_auto_decision(
+                    record, DecisionType.BRANCH_ONE_TWO, 'two')
+                return CampaignPhase.C4
             return None  # Triggers BRANCH_ONE_TWO decision
 
         elif current == CampaignPhase.C4:
@@ -373,6 +394,10 @@ class CampaignManager:
         elif current == CampaignPhase.C5:
             # After C5 → C6 decision (need Mg inventory)
             if record.branch == 'two':
+                if self._is_noninteractive_test_batch(record):
+                    self._record_auto_decision(
+                        record, DecisionType.C6_PROCEED, 'yes')
+                    return CampaignPhase.C6
                 return None  # Triggers C6_PROCEED decision
             else:
                 return CampaignPhase.COMPLETE

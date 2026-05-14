@@ -20,13 +20,17 @@ fraction, and P_pure_i(T) is the Antoine vapor pressure.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import MeltBackend, EquilibriumResult
+
+
+ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 
 
 class AlphaMELTSBackend(MeltBackend):
@@ -40,6 +44,7 @@ class AlphaMELTSBackend(MeltBackend):
     def __init__(self):
         self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
         self._engine_path: Optional[Path] = None
+        self._binary_path: Optional[Path] = None
         self._pet_available = False
         self._vaporock_available = False
 
@@ -56,7 +61,6 @@ class AlphaMELTSBackend(MeltBackend):
         try:
             import PetThermoTools  # noqa: F401
             self._pet_available = True
-            self._mode = 'python_api'
         except ImportError:
             self._pet_available = False
 
@@ -68,12 +72,15 @@ class AlphaMELTSBackend(MeltBackend):
             self._vaporock_available = False
 
         # Try binary
-        if not self._pet_available:
+        if self._mode is None:
             # Check project engines/ directory
             project_root = Path(__file__).parent.parent.parent
-            engine_path = project_root / 'engines' / 'alphamelts' / 'run_alphamelts.command'
-            if engine_path.exists():
-                self._engine_path = engine_path
+            engine_root = project_root / 'engines' / 'alphamelts'
+            engine_path = engine_root / 'run_alphamelts.command'
+            binary_path = self._find_project_binary(engine_root)
+            if engine_path.exists() or binary_path is not None:
+                self._engine_path = engine_path if engine_path.exists() else binary_path
+                self._binary_path = binary_path
                 self._mode = 'subprocess'
             else:
                 # Check system PATH
@@ -83,11 +90,34 @@ class AlphaMELTSBackend(MeltBackend):
                         capture_output=True, text=True, timeout=5)
                     if result.returncode == 0:
                         self._engine_path = Path('alphamelts')
+                        self._binary_path = Path('alphamelts')
                         self._mode = 'subprocess'
                 except (FileNotFoundError, subprocess.TimeoutExpired):
                     pass
 
         return self._mode is not None
+
+    def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
+        if not engine_root.exists():
+            return None
+        binary_names = (
+            'alphamelts2',
+            'alphamelts_macos',
+            'alphamelts_linux',
+            'alphamelts_win64.exe',
+        )
+        for name in binary_names:
+            direct = engine_root / name
+            if direct.exists():
+                return direct
+        for child in sorted(engine_root.iterdir()):
+            if not child.is_dir():
+                continue
+            for name in binary_names:
+                candidate = child / name
+                if candidate.exists():
+                    return candidate
+        return None
 
     def is_available(self) -> bool:
         return self._mode is not None
@@ -98,7 +128,7 @@ class AlphaMELTSBackend(MeltBackend):
             return [
                 'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
                 'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
-                'O2', 'O', 'SiO2_gas', 'Fe2O3_gas',
+                'O2', 'O', 'SiO2', 'Fe2O3',
             ]
         return ['Na', 'K', 'Fe', 'Mg', 'Ca', 'SiO', 'Mn', 'Cr']
 
@@ -107,17 +137,44 @@ class AlphaMELTSBackend(MeltBackend):
                     fO2_log: float = -9.0,
                     pressure_bar: float = 1e-6,
                     *,
-                    composition_mol: Optional[Dict[str, float]] = None
+                    composition_mol: Optional[Dict[str, float]] = None,
+                    composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]] = None,
+                    species_formula_registry: Optional[Mapping[str, object]] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
 
         Routes to the appropriate engine based on available mode.
         """
+        if composition_mol_by_account is not None:
+            unsupported = {
+                str(account): sorted(
+                    str(species)
+                    for species, mol in (species_mol or {}).items()
+                    if float(mol) > 0.0
+                )
+                for account, species_mol in composition_mol_by_account.items()
+                if str(account) != 'process.cleaned_melt'
+            }
+            unsupported = {account: species for account, species in unsupported.items()
+                           if species}
+            if unsupported:
+                raise ValueError(
+                    'AlphaMELTS accepts only process.cleaned_melt input until '
+                    f'metal/gas account mappings are implemented; got {unsupported}'
+                )
+            composition_mol = {}
+            for species_mol in composition_mol_by_account.values():
+                for species, mol in species_mol.items():
+                    composition_mol[species] = (
+                        composition_mol.get(species, 0.0) + float(mol))
         if composition_mol is not None:
             composition_kg = {
                 species: float(mol)
-                * resolve_species_formula(species).molar_mass_kg_per_mol()
+                * resolve_species_formula(
+                    species,
+                    species_formula_registry,
+                ).molar_mass_kg_per_mol()
                 for species, mol in composition_mol.items()
                 if float(mol) > 0.0
             }
@@ -152,6 +209,12 @@ class AlphaMELTSBackend(MeltBackend):
         try:
             from PetThermoTools import Path as PTPath
             from PetThermoTools.GenFuncs import load
+            _ = load
+
+            raise RuntimeError(
+                'AlphaMELTS Python API absolute fO2 control is not wired; '
+                'backend disabled instead of using fO2_log as a buffer offset'
+            )
 
             # Convert composition to wt% for MELTS input
             total = sum(composition_kg.values())
@@ -202,12 +265,8 @@ class AlphaMELTSBackend(MeltBackend):
             return eq
 
         except Exception as e:
-            # Fall back to empty result on any PetThermoTools error
-            return EquilibriumResult(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-            )
+            self._mode = None
+            raise RuntimeError(f'AlphaMELTS Python equilibrium failed: {e}') from e
 
     # ------------------------------------------------------------------
     # Subprocess mode
@@ -233,30 +292,50 @@ class AlphaMELTSBackend(MeltBackend):
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
             melts_path = Path(tmpdir) / 'input.melts'
+            calculation_temperature_C = max(
+                float(temperature_C), ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C)
             self._write_melts_file(melts_path, comp_wt,
-                                    temperature_C, pressure_bar)
+                                    calculation_temperature_C, pressure_bar)
 
-            # Write command file
-            cmd_path = Path(tmpdir) / 'commands.txt'
-            self._write_command_file(cmd_path, temperature_C)
+            binary = self._binary_path or self._engine_path
+            if binary is None:
+                raise RuntimeError('AlphaMELTS subprocess binary is not configured')
+            menu_input = '1\ninput.melts\n3\n2\nx\n'
+            env = os.environ.copy()
+            env.setdefault('ALPHAMELTS_CALC_MODE', 'MELTS')
 
-            # Run alphaMELTS
+            # Run alphaMELTS directly. The alphaMELTS 2 app runner only
+            # emits *_tbl.txt for path-style runs; single-point equilibria
+            # report the stable phase assemblage on stdout.
             try:
                 result = subprocess.run(
-                    [str(self._engine_path), '-f', str(cmd_path)],
+                    [str(binary), '1'],
                     cwd=tmpdir,
+                    input=menu_input,
                     capture_output=True, text=True,
-                    timeout=10,
+                    timeout=20,
+                    env=env,
                 )
-            except (subprocess.TimeoutExpired, FileNotFoundError):
-                return EquilibriumResult(
-                    temperature_C=temperature_C,
-                    pressure_bar=pressure_bar,
+            except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
+                self._mode = None
+                raise RuntimeError(
+                    f'AlphaMELTS subprocess equilibrium failed: {exc}'
+                ) from exc
+
+            if result.returncode != 0:
+                self._mode = None
+                raise RuntimeError(
+                    'AlphaMELTS subprocess equilibrium failed: '
+                    f'{result.stderr or result.stdout}'
                 )
 
-            # Parse output
-            return self._parse_melts_output(tmpdir, temperature_C,
-                                             pressure_bar, fO2_log)
+            return self._parse_single_point_stdout(
+                f'{result.stdout}\n{result.stderr}',
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                total_input_kg=total,
+            )
 
     def _write_melts_file(self, path: Path, comp_wt: dict,
                            T_C: float, P_bar: float):
@@ -268,8 +347,7 @@ class AlphaMELTSBackend(MeltBackend):
                 melts_name = oxide.replace('2O3', '2O3').replace('2O', '2O')
                 lines.append(f'Initial Composition: {melts_name} {wt:.4f}')
         lines.append(f'Initial Temperature: {T_C:.1f}')
-        lines.append(f'Initial Pressure: {max(P_bar * 10, 1):.1f}')  # bars→MPa? MELTS uses bars
-        lines.append('Mode: Isobaric')
+        lines.append(f'Initial Pressure: {max(P_bar, 1):.1f}')
 
         with open(path, 'w') as f:
             f.write('\n'.join(lines) + '\n')
@@ -301,20 +379,107 @@ class AlphaMELTSBackend(MeltBackend):
             try:
                 with open(tbl) as f:
                     content = f.read()
-                # Minimal parsing — extract phase names and masses
+                mass_index = None
                 for line in content.split('\n'):
                     parts = line.strip().split()
-                    if len(parts) >= 2 and parts[0] not in ('Temperature', 'Pressure'):
-                        try:
-                            mass = float(parts[-1])
-                            phase = parts[0]
-                            eq.phases_present.append(phase)
-                            eq.phase_masses_kg[phase] = mass / 1000.0
-                        except ValueError:
-                            pass
+                    if len(parts) < 2:
+                        continue
+                    lower_parts = [part.lower() for part in parts]
+                    for idx, token in enumerate(lower_parts):
+                        if 'mass' in token:
+                            mass_index = idx
+                    phase = parts[0]
+                    phase_key = phase.lower()
+                    if phase_key in (
+                        'temperature', 'pressure', 'mass', 'phase', 'total'
+                    ):
+                        continue
+                    if phase_key[0].isdigit():
+                        continue
+                    try:
+                        if (
+                            mass_index is not None
+                            and mass_index < len(parts)
+                            and mass_index > 0
+                        ):
+                            mass = float(parts[mass_index])
+                        elif len(parts) == 2:
+                            mass = float(parts[1])
+                        else:
+                            numeric = [float(part) for part in parts[1:]]
+                            mass = numeric[-1]
+                    except ValueError:
+                        continue
+                    if mass > 0.0:
+                        eq.phases_present.append(phase)
+                        eq.phase_masses_kg[phase] = mass / 1000.0
             except OSError:
                 pass
 
+        return eq
+
+    def _parse_liquidus_C(self, output: str) -> Optional[float]:
+        match = re.search(
+            r'Found the liquidus at T\s*=\s*([0-9.+\-Ee]+)\s*\(C\)',
+            output,
+        )
+        if match is None:
+            return None
+        return float(match.group(1))
+
+    def _parse_single_point_stdout(self, output: str, *, temperature_C: float,
+                                   pressure_bar: float, fO2_log: float,
+                                   total_input_kg: float) -> EquilibriumResult:
+        if not re.search(r'<> Stable .+ assemblage achieved\.', output):
+            raise RuntimeError(
+                'AlphaMELTS subprocess produced no stable assemblage verdict'
+            )
+
+        eq = EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+        liquidus_C = self._parse_liquidus_C(output)
+        if liquidus_C is not None:
+            eq.warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
+        lines = output.splitlines()
+
+        for idx, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith('liquid:'):
+                if 'liquid' not in eq.phases_present:
+                    eq.phases_present.append('liquid')
+                headers = stripped.split(':', 1)[1].split()
+                if idx + 1 < len(lines):
+                    values = lines[idx + 1].split()
+                    if len(values) >= 2 and values[1] == 'g':
+                        for oxide, raw in zip(headers, values[2:]):
+                            try:
+                                eq.liquid_composition_wt_pct[oxide] = float(raw)
+                            except ValueError:
+                                continue
+
+            phase_match = re.match(
+                r'^([A-Za-z][A-Za-z0-9_\-]*):\s+'
+                r'([0-9.+\-Ee]+)\s+g\b',
+                stripped,
+            )
+            if phase_match:
+                phase = phase_match.group(1)
+                if phase != 'liquid' and phase not in eq.phases_present:
+                    eq.phases_present.append(phase)
+
+            melt_match = re.search(
+                r'Melt fraction\s*=\s*([0-9.+\-Ee]+)', stripped)
+            if melt_match:
+                eq.liquid_fraction = max(
+                    0.0, min(1.0, float(melt_match.group(1))))
+
+        if not eq.phases_present:
+            raise RuntimeError(
+                'AlphaMELTS subprocess produced no parseable phase assemblage'
+            )
         return eq
 
     # ------------------------------------------------------------------

@@ -477,7 +477,7 @@ ci_carbonaceous_chondrite:
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
     carbonaceous_organic:
-      template: generic_carbonaceous_organic
+      template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [20, 50]
@@ -485,7 +485,7 @@ ci_carbonaceous_chondrite:
       oxygen_source: controlled_stage0_O2
       source: "CI carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
     hydrocarbons:
-      template: generic_carbonaceous_hydrocarbon
+      template_formula: generic_carbonaceous_hydrocarbon
       decomposition_temp_range_C: [200, 500]
       final_temp_C: 1050
       cap_kg_per_tonne: [15, 30]
@@ -517,7 +517,7 @@ ci_carbonaceous_chondrite:
     step_4: "600-800C: carbonate decomposition -> CO2"
     step_5: "800-950C: magnetite reduction by CO -> wustite (FeO)"
     step_6: "1000-1050C: conditioning O2 blow (desulf, decarb, re-oxidise incidental Fe)"
-  key_products:
+  potential_products:
     H2O_kg_per_tonne: [100, 170]
     Fe_Ni_alloy_kg_per_tonne: [75, 120]   # 3-8% Ni, zero S/C (vapour purified)
     S_kg_per_tonne: [25, 40]
@@ -558,7 +558,7 @@ cm_carbonaceous_chondrite:
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
     carbonaceous_organic:
-      template: generic_carbonaceous_organic
+      template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [15, 30]
@@ -615,7 +615,7 @@ ceres_regolith:
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
     carbonaceous_organic:
-      template: generic_carbonaceous_organic
+      template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
       cap_kg_per_tonne: [150, 200]
@@ -640,7 +640,7 @@ ceres_regolith:
       NiO:   [1.5, 2.5]
     sum_check: 97.75
   key_minerals: "Mg-phyllosilicates, global ammoniated phyllosilicates (NH4-clays), Mg/Ca/Na carbonates, brine salts"
-  bonus_products:
+  potential_products:
     H2O_kg_per_tonne: [120, 250]
     NH3_kg_per_tonne: [8, 25]
     carbonate_salts_kg_per_tonne: [15, 40]   # Mg/Ca/Na carbonates
@@ -694,7 +694,7 @@ comet_nucleus:
       offgas_mode: native_mixture
       source: "Equal-molar CO/CO2 volatile bucket from comet nucleus source range."
     organics:
-      template: generic_carbonaceous_organic
+      template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 500]
       final_temp_C: 1050
       cap_kg_per_tonne: [50, 100]
@@ -748,7 +748,7 @@ comet_nucleus:
       CaO:   [1.5, 3]
       NiO:   [1.5, 2.5]
     sum_check: 96.75
-  bonus_products:
+  potential_products:
     H2O_kg_per_tonne: [200, 350]
     CO_CH4_propellant_kg_per_tonne: [60, 180]
     NH3_HCN_kg_per_tonne: [10, 30]
@@ -772,6 +772,14 @@ comet_nucleus:
 mars_basalt:
   label: "Mars Basalt (General)"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carbon_cleanup:
+    carbon_reductant_kg_per_tonne: [20, 40]
+    reactions:
+      - sulfate_so3_to_so2_co
+      - co2_boudouard_to_co
+  stage0_perchlorate_cleanup:
+    reactions:
+      - perchlorate_to_chloride_o2
   source: "Curiosity/Spirit/Opportunity APXS; Phoenix lander"
   confidence: "High"
   note: >
@@ -811,7 +819,7 @@ mars_basalt:
     atmosphere: "96% CO2"
     constraint: "no deep vacuum possible"
     advantage: "free CO2 carrier gas; CO2 dissociation -> natural pO2 source"
-  bonus_products:
+  potential_products:
     NaCl_KCl_salts_kg_per_tonne: [6, 10]
     sulfuric_acid_feedstock_kg_per_tonne: [25, 35]
     CO_propellant: "from CO2 dissociation + Boudouard"
@@ -826,6 +834,11 @@ mars_basalt:
 mars_sulfate_rich:
   label: "Mars Sulfate-Rich Soil"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carbon_cleanup:
+    carbon_reductant_kg_per_tonne: [30, 60]
+    reactions:
+      - sulfate_so3_to_so2_co
+      - co2_boudouard_to_co
   source: "Meridiani Planum soils, Vera Rubin Ridge margins, polar/sedimentary deposits"
   confidence: "High"
   note: >
@@ -860,7 +873,7 @@ mars_sulfate_rich:
   environment:
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
-  bonus_products:
+  potential_products:
     sulfuric_acid_feedstock_kg_per_tonne: [30, 50]
     O2_extra_kg_per_tonne: [20, 40]
   key_feature: "Elevated Ca/Mg/Fe sulfates; highest bonus O2 and acid potential"
@@ -873,6 +886,9 @@ mars_sulfate_rich:
 mars_phyllosilicate_clay:
   label: "Mars Phyllosilicate Clay"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carbon_cleanup:
+    carbon_reductant_kg_per_tonne: 0
+    reactions: []
   source: "Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs"
   confidence: "High"
   note: >
@@ -907,7 +923,7 @@ mars_phyllosilicate_clay:
     atmosphere: "96% CO2"
   structural_water:
     H2O_kg_per_tonne: [20, 100]
-  bonus_products:
+  potential_products:
     H2O_kg_per_tonne: [20, 80]
   key_feature: "Smectite-rich; higher Al and bound water than basalt baseline"
   preferred_for: "Al production, mullite/anorthite ceramics, water yield"
@@ -919,6 +935,9 @@ mars_phyllosilicate_clay:
 
 mars_perchlorate_rich:
   label: "Mars Perchlorate-Rich Soil"
+  stage0_perchlorate_cleanup:
+    reactions:
+      - perchlorate_to_chloride_o2
   source: "Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
   confidence: "Medium-High"
   note: >
@@ -952,7 +971,7 @@ mars_perchlorate_rich:
   environment:
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
-  bonus_products:
+  potential_products:
     NaCl_KCl_salts_kg_per_tonne: [8, 15]
     O2_extra_kg_per_tonne: [10, 25]
   key_feature: "Oxychlorine salts; net early O2 source from low-T perchlorate decomposition"

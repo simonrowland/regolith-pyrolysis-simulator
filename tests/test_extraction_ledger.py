@@ -22,6 +22,12 @@ def _sim(feedstocks):
     )
 
 
+def _assert_product_matches_account(sim, account, species):
+    account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
+    assert account_kg > 0.0
+    assert sim.product_ledger()[species] == pytest.approx(account_kg)
+
+
 def test_mre_reduction_records_atom_ledger_transition():
     sim = _sim(
         {
@@ -63,14 +69,58 @@ def test_mre_reduction_records_atom_ledger_transition():
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "FeO"
     ] == pytest.approx(999.0)
-    assert sim.atom_ledger.kg_by_account("process.condensation_train")[
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")[
         "Fe"
     ] == pytest.approx(fe_kg)
+    assert sim.product_ledger()["Fe"] == pytest.approx(fe_kg)
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")[
         "O2"
     ] == pytest.approx(o2_kg)
     assert sim.train.stages[1].collected_kg["Fe"] == pytest.approx(fe_kg)
+    assert sim._mre_metals_this_hr["Fe"] == pytest.approx(fe_kg)
     assert sim._oxygen_stored_kg() == pytest.approx(o2_kg)
+
+
+def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
+    sim = _sim(
+        {
+            "feo": {
+                "label": "FeO",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        }
+    )
+    sim.load_batch("feo", mass_kg=1000.0)
+
+    feo_removed_kg = 1.0
+    feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    fe_kg = feo_removed_kg * MOLAR_MASS["Fe"] / MOLAR_MASS["FeO"]
+
+    class FixedElectrolysis:
+        def step_hour(self, **_kwargs):
+            return {
+                "oxides_reduced_kg": {"FeO": feo_removed_kg},
+                "oxides_reduced_mol": {"FeO": feo_removed_mol},
+                "metals_produced_kg": {"Fe": fe_kg},
+                "metals_produced_mol": {"Fe": feo_removed_mol},
+                "O2_produced_kg": 0.0,
+                "O2_produced_mol": feo_removed_mol / 2.0,
+                "energy_kWh": 1.25,
+            }
+
+    sim._electrolysis_model = FixedElectrolysis()
+    sim.melt.campaign = CampaignPhase.C5
+    sim._mre_voltage_sequence = [{"voltage": 0.6, "min_hold_hours": 1}]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+    sim._mre_effective_current_A = 100.0
+
+    produced_kg = sim._step_mre()
+
+    ledger_kg = sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_mre_anode_stored")["O2"]
+    assert produced_kg == pytest.approx(ledger_kg)
+    assert produced_kg > 0.0
 
 
 def test_condensed_species_projection_does_not_double_count_across_stages():
@@ -92,8 +142,32 @@ def test_condensed_species_projection_does_not_double_count_across_stages():
 
     sim._project_condensed_species(1, "Fe")
 
-    assert sim.train.stages[1].collected_kg["Fe"] == pytest.approx(2.0)
-    assert "Fe" not in sim.train.stages[2].collected_kg
+    assert sim.train.stages[1].collected_kg["Fe"] == pytest.approx(1.0)
+    assert sim.train.stages[2].collected_kg["Fe"] == pytest.approx(1.0)
+    assert sim.train.total_by_species()["Fe"] == pytest.approx(2.0)
+
+
+def test_condensed_species_projection_delta_cannot_exceed_ledger_total():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=1000.0)
+    sim.atom_ledger.load_external(
+        "process.condensation_train",
+        {"Fe": 2.0},
+        source="test condensed Fe",
+    )
+    sim.train.stages[2].collected_kg["Fe"] = 1.0
+
+    sim._project_condensed_species(1, "Fe", delta_kg=2.0)
+
+    assert sim.train.stages[1].collected_kg["Fe"] == pytest.approx(1.0)
+    assert sim.train.stages[2].collected_kg["Fe"] == pytest.approx(1.0)
     assert sim.train.total_by_species()["Fe"] == pytest.approx(2.0)
 
 
@@ -166,9 +240,29 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "K2O"
     ] > 0.0
-    assert sim.atom_ledger.kg_by_account("process.condensation_train")[
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")[
         "Fe"
     ] == pytest.approx(sim.train.stages[1].collected_kg["Fe"])
+    _assert_product_matches_account(sim, "process.metal_phase", "Fe")
+
+
+def test_na_shuttle_metals_are_reported_from_process_metal_phase():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"Cr2O3": 1.0, "TiO2": 99.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 60.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+    sim._shuttle_inject_Na()
+
+    sim.atom_ledger.assert_balanced()
+    _assert_product_matches_account(sim, "process.metal_phase", "Cr")
+    _assert_product_matches_account(sim, "process.metal_phase", "Ti")
 
 
 def test_recovered_condensate_transfers_once_to_reagent_inventory():
@@ -185,7 +279,7 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
 
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
-    assert sim.train.stages[3].collected_kg["K"] == pytest.approx(2.0)
+    assert sim.train.total_by_species().get("K", 0.0) == pytest.approx(0.0)
     assert sim.shuttle_K_inventory_kg == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.condensation_train").get(
         "K", 0.0
@@ -199,10 +293,11 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
         {"K": 2.0},
         source="test recovered K condensate",
     )
+    sim.train.stages[3].collected_kg["K"] = 2.0
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
 
     assert sim._transfer_condensed_species("K") == pytest.approx(0.0)
-    assert sim.train.stages[3].collected_kg["K"] == pytest.approx(0.0)
+    assert sim.train.stages[3].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.reagent_inventory")[
         "K"
     ] == pytest.approx(2.0)
@@ -235,3 +330,5 @@ def test_mg_thermite_debits_process_reagent_inventory():
     )
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["MgO"] > 0.0
     assert sim.train.stages[1].collected_kg["Al"] > 0.0
+    _assert_product_matches_account(sim, "process.metal_phase", "Al")
+    _assert_product_matches_account(sim, "process.metal_phase", "Si")

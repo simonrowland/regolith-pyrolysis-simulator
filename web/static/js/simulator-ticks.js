@@ -124,6 +124,7 @@ socket.on('simulation_tick', (data) => {
 
     // Mass balance
     setEl('mass-error', data.mass_balance_error_pct.toFixed(3) + '%');
+    updateDebugInventoryComment(data);
 
     // --- O₂ Budget chart ---
     if (!o2BudgetInitialized) initO2BudgetChart();
@@ -255,4 +256,52 @@ function updateBar(barId, pct) {
     bar.classList.remove('bar-warning', 'bar-danger');
     if (pct > 120) bar.classList.add('bar-danger');
     else if (pct > 80) bar.classList.add('bar-warning');
+}
+
+function updateDebugInventoryComment(data) {
+    const panel = document.getElementById('debug-inventory-json');
+    if (!panel) return;
+
+    const feedstockEl = document.getElementById('feedstock-select');
+    const massEl = document.getElementById('batch-mass');
+    const payload = {
+        run: {
+            feedstock: feedstockEl ? feedstockEl.value : null,
+            batch_mass_kg: massEl ? Number(massEl.value) : null,
+            hour: data.hour,
+            campaign: data.campaign,
+            temperature_C: data.temperature_C,
+            melt_mass_kg: data.melt_mass_kg,
+            mass_balance_error_pct: data.mass_balance_error_pct,
+        },
+        process_inventory_kg: {
+            cleaned_melt_oxide_projection: data.composition_wt_pct || {},
+            raw_inventory: data.raw_inventory_kg || {},
+            residual_inventory: data.residual_inventory_kg || {},
+            stage0_products: data.stage0_products_kg || {},
+            drain_tap: data.drain_tap_kg || {},
+            buckets: data.process_buckets_kg || {},
+            condensation: data.condensation || {},
+        },
+        oxygen_accounts_kg: {
+            total: data.oxygen_kg || 0,
+            stored_total: data.O2_stored_kg || 0,
+            vented_total: data.O2_vented_cumulative_kg || 0,
+            stage0_stored: data.stage0_O2_stored_kg || 0,
+            melt_offgas_stored: data.melt_offgas_O2_stored_kg || 0,
+            melt_offgas_vented: data.melt_offgas_O2_vented_kg || 0,
+            mre_anode_stored: data.mre_anode_O2_stored_kg || 0,
+        },
+        backend: {
+            message: data.backend_message || '',
+            error: data.backend_error || '',
+            fallback_active: Boolean(data.backend_fallback_active),
+        },
+    };
+
+    panel.textContent = [
+        '/* debug_inventory',
+        JSON.stringify(payload, null, 2),
+        '*/',
+    ].join('\n');
 }

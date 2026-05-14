@@ -5,6 +5,11 @@
 // --- Control buttons ---
 
 document.getElementById('btn-start').addEventListener('click', () => {
+    if (!socket.connected) {
+        document.getElementById('status-text').textContent = 'Connection not ready';
+        return;
+    }
+
     const feedstock = document.getElementById('feedstock-select').value;
     if (!feedstock) {
         alert('Please select a feedstock first.');

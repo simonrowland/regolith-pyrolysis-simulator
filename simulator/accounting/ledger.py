@@ -30,6 +30,7 @@ TERMINAL_DEBIT_EXCEPTIONS = {
     ): frozenset({"O2"}),
 }
 TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
+    "terminal.oxygen_stage0_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_vented_to_vacuum": frozenset({"O2"}),
     "terminal.oxygen_mre_anode_stored": frozenset({"O2"}),
