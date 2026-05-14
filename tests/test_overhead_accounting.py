@@ -567,39 +567,39 @@ def _sio_o2_train_sim():
     return sim
 
 
-def test_sio_suppression_and_o2_driving_force_use_same_po2():
-    """Finding 2 [P2]: the SiO √pO₂ suppression in _stub_equilibrium and
-    the O₂ ambient driving force in _calculate_evaporation must reference
-    ONE canonical pO2_effective_bar -- not the commanded setpoint on one
-    side and the actual overhead holdup on the other."""
+def test_sio_suppression_uses_commanded_po2():
+    """The SiO √pO₂ suppression in _stub_equilibrium references the
+    commanded pO₂ from _commanded_pO2_bar. This is the *commanded*
+    setpoint, NOT the AtomLedger O₂ holdup: overhead.composition['O2'] is
+    itself max(gas O2, setpoint) written by overhead.py."""
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
 
-    # C2B-style controlled-O₂ atmosphere: a commanded setpoint sitting
-    # ABOVE the current overhead O₂ holdup (holdup lags by the overhead
-    # transport lag). 1.5 mbar setpoint vs 0.1 mbar actual holdup.
+    # C2B-style controlled-O₂ atmosphere. overhead.composition['O2'] here
+    # plays the role of the value overhead.py would have written:
+    # max(gas O2, setpoint). 1.5 mbar.
     sim.melt.campaign = CampaignPhase.C2B
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
-    sim.overhead.composition = {"O2": 0.1}
+    sim.overhead.composition = {"O2": 1.5}
 
     setpoint_bar = sim.melt.pO2_mbar / 1000.0
-    holdup_bar = sim.overhead.composition["O2"] / 1000.0
 
-    # Spy on the canonical helper: both code paths must route through it.
-    real_effective = sim._effective_pO2_bar
+    # Spy on the commanded-pO₂ helper: the equilibrium path routes
+    # through it.
+    real_commanded = sim._commanded_pO2_bar
     calls = []
 
-    def _spy_effective():
-        value = real_effective()
+    def _spy_commanded():
+        value = real_commanded()
         calls.append(value)
         return value
 
-    sim._effective_pO2_bar = _spy_effective
+    sim._commanded_pO2_bar = _spy_commanded
 
     # --- Equilibrium path: pO₂ feeding the SiO √pO₂ suppression ---
     equilibrium = sim._stub_equilibrium()
-    assert calls, "_stub_equilibrium must consult _effective_pO2_bar"
+    assert calls, "_stub_equilibrium must consult _commanded_pO2_bar"
     pO2_equilibrium_bar = 10.0 ** equilibrium.fO2_log
     # _stub_equilibrium sets fO2_log = log10(pO2) from the same pO2_bar it
     # feeds the SiO √pO₂ suppression, so fO2_log faithfully probes it.
@@ -607,44 +607,72 @@ def test_sio_suppression_and_o2_driving_force_use_same_po2():
     # SiO vapor pressure was actually emitted (suppression path exercised).
     assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
 
-    # --- Evaporation path: pO₂ feeding the O₂ ambient driving force ---
-    # _calculate_evaporation resolves pO2_effective once, up front, before
-    # the species loop -- so the O₂ ambient driving force is built on it.
+    # The commanded pO₂ under active O₂ control is the setpoint.
+    assert pO2_equilibrium_bar == pytest.approx(setpoint_bar)
+
+    sim._commanded_pO2_bar = real_commanded
+
+
+def test_evaporation_does_not_consult_commanded_po2():
+    """The turbine-control feedback loop is NOT wired: _calculate_evaporation
+    iterates only metal + oxide vapor species (never an 'O2' key), so it has
+    no O₂ ambient driving force to floor and never consults the commanded
+    pO₂ helper. Pins the Finding 2 dead-branch removal."""
+    sim = _sio_o2_train_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.overhead.composition = {"O2": 1.5}
+
+    real_commanded = sim._commanded_pO2_bar
+    calls = []
+
+    def _spy_commanded():
+        calls.append(True)
+        return real_commanded()
+
+    sim._commanded_pO2_bar = _spy_commanded
+    equilibrium = sim._stub_equilibrium()
     calls.clear()
     flux = sim._calculate_evaporation(equilibrium)
-    assert calls, "_calculate_evaporation must consult _effective_pO2_bar"
-    pO2_evaporation_bar = calls[0]
+    sim._commanded_pO2_bar = real_commanded
+
     assert flux is not None
-
-    # The single shared canonical value: actual holdup floored at the
-    # commanded setpoint because the atmosphere is actively O₂-controlled.
-    assert pO2_evaporation_bar == pytest.approx(setpoint_bar)
-    assert pO2_evaporation_bar > holdup_bar  # floor is doing its job
-
-    # The SAME pO₂ feeds the SiO suppression and the O₂ ambient term --
-    # one shared pO2_effective_bar, not setpoint on one side / holdup on
-    # the other. This is the consistency the finding requires.
-    assert pO2_equilibrium_bar == pytest.approx(pO2_evaporation_bar)
-
-    # The O₂ ambient driving force in Hertz-Knudsen is that canonical pO₂
-    # converted to Pa (evaporation.py: pO2_effective_Pa = pO2_bar x 1e5).
-    sim._effective_pO2_bar = real_effective
-    expected_pO2_effective_Pa = setpoint_bar * 1.0e5
-    assert sim._effective_pO2_bar() * 1.0e5 == pytest.approx(
-        expected_pO2_effective_Pa)
+    assert not calls, (
+        "_calculate_evaporation must not consult _commanded_pO2_bar -- the "
+        "O₂ ambient driving force branch was dead and is removed"
+    )
 
 
-def test_effective_po2_has_no_synthetic_floor_in_hard_vacuum():
+def test_equilibrium_does_not_emit_o2_vapor_species():
+    """_stub_equilibrium only ever writes metal + oxide vapors (SiO,
+    FeO_vapor) into vapor_pressures_Pa -- never an 'O2' key. This pins the
+    Finding 2 dead-branch removal in _calculate_evaporation: the
+    `if species == 'O2'` ambient-pressure branch was unreachable because
+    'O2' is never a vapor species. Do not re-add it."""
+    sim = _sio_o2_train_sim()
+    sim.melt.temperature_C = 1600.0
+
+    equilibrium = sim._get_equilibrium()
+
+    assert "O2" not in equilibrium.vapor_pressures_Pa
+    # The suppression path is still exercised: a real oxide vapor is there.
+    assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
+
+
+def test_commanded_po2_has_no_synthetic_floor_in_hard_vacuum():
     """An uncontrolled hard-vacuum run must NOT get a synthetic setpoint
-    floor on pO₂ -- the setpoint only floors under active O₂ control."""
+    floor on pO₂ -- the setpoint only floors under active O₂ control. Under
+    HARD_VACUUM the commanded pO₂ is the numerical vacuum floor for the
+    whole campaign (the turbine-control feedback loop is not wired)."""
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.HARD_VACUUM
     sim.melt.pO2_mbar = 1.5  # stale/irrelevant setpoint under hard vacuum
     sim.overhead.composition = {"O2": 0.0}
 
     # Only the numerical divide-by-zero guard applies, never the setpoint.
-    assert sim._effective_pO2_bar() == pytest.approx(1e-9)
+    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
 
     # Under active O₂ control the same setpoint DOES floor the value.
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    assert sim._effective_pO2_bar() == pytest.approx(1.5 / 1000.0)
+    assert sim._commanded_pO2_bar() == pytest.approx(1.5 / 1000.0)

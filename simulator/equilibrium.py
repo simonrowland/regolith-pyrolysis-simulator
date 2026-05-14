@@ -29,28 +29,41 @@ class EquilibriumMixin:
             "using AtomLedger mol inputs"
         )
 
-    def _effective_pO2_bar(self) -> float:
+    def _commanded_pO2_bar(self) -> float:
         """
-        Authoritative oxygen partial pressure (bar) for this hour.
+        Commanded oxygen partial pressure (bar) for this hour.
 
-        ONE canonical pO₂ feeds BOTH the SiO √pO₂ suppression factor in
-        ``_stub_equilibrium`` AND the O₂ ambient driving force in
-        ``_calculate_evaporation``.  Keeping them on a shared value closes
-        the turbine-control feedback loop: the pO₂ that suppresses SiO is
-        the same pO₂ whose O₂ coproduct is credited to the overhead gas.
+        This is the *commanded* pO₂ -- NOT the AtomLedger O₂ holdup.  ONE
+        value feeds BOTH the SiO √pO₂ suppression factor in
+        ``_stub_equilibrium`` AND (currently) the O₂ ambient driving force
+        in ``_calculate_evaporation``, so the two code paths never disagree
+        on pO₂.
 
         Resolution:
-          - The *actual* overhead O₂ partial pressure
-            (``overhead.composition['O2']``) is canonical -- it is the
-            real gas inventory tracked by the AtomLedger, and it can lag
-            the commanded setpoint by the 1-hour overhead transport lag
-            or sit below it after a vent.
-          - The commanded setpoint (``melt.pO2_mbar``) is applied only as
-            a *floor*, and only when the atmosphere is an actively
-            O₂-controlled mode (turbine + bleed holding the setpoint).
-            An uncontrolled hard-vacuum / pN₂ run gets no synthetic floor.
+          - ``overhead.composition['O2']`` is itself
+            ``max(gas O2, melt.pO2_mbar)`` written by ``overhead.py`` --
+            structurally the commanded setpoint, not a tracked gas
+            inventory.  (The melt-evaporation O₂ coproduct is credited to
+            ``terminal.oxygen_melt_offgas_stored``, never to
+            ``process.overhead_gas``, and ``process.overhead_gas`` is
+            drained to ``terminal.offgas`` every tick.)
+          - The commanded setpoint (``melt.pO2_mbar``) is applied again as
+            an explicit *floor*, and only when the atmosphere is an
+            actively O₂-controlled mode (turbine + bleed holding the
+            setpoint).  An uncontrolled HARD_VACUUM / PN2_SWEEP run gets no
+            synthetic floor -- its effective pO₂ collapses to the
+            numerical vacuum floor below for the whole campaign.
           - A hard numerical floor (``_PO2_VACUUM_FLOOR_BAR``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
+
+        NOT WIRED: the turbine-control feedback loop -- melt-released O₂
+        accumulating in a finite headspace and self-suppressing SiO -- is
+        NOT modelled.  Melt-offgas O₂ goes to
+        ``terminal.oxygen_melt_offgas_stored``; ``process.overhead_gas`` is
+        drained every tick; there is no finite-headspace pO₂ accumulation.
+        A proper finite-headspace pO₂ model (volume / pressure /
+        temperature / bleed / storage coupling) is tracked as a separate
+        goal, FINITE-HEADSPACE-PO2-MODEL.  See docs/model-limitations.md.
         """
         pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
@@ -167,14 +180,23 @@ class EquilibriumMixin:
 
         # --- Determine the oxygen partial pressure (bar) ---
         #
-        # pO2_effective_bar is the AUTHORITATIVE pO₂ for the hour: the
-        # actual overhead O₂ holdup (canonical per the AtomLedger),
-        # floored at the commanded setpoint only under active O₂ control.
-        # The SAME value feeds the SiO √pO₂ suppression below and the O₂
-        # ambient driving force in evaporation.py::_calculate_evaporation,
-        # so the SiO₂ → SiO + ½O₂ coupling and the turbine-control loop
-        # stay consistent.  See EquilibriumMixin._effective_pO2_bar.
-        pO2_bar = self._effective_pO2_bar()
+        # pO2_bar is the COMMANDED pO₂ for the hour -- NOT the AtomLedger
+        # O₂ holdup.  overhead.composition['O2'] is itself max(gas O2,
+        # setpoint) written by overhead.py, so this is structurally the
+        # setpoint, floored again at the setpoint only under active O₂
+        # control, then at the numerical vacuum floor.  The same value
+        # feeds the SiO √pO₂ suppression below.
+        #
+        # NOT WIRED: the turbine-control feedback loop -- melt-released O₂
+        # accumulating in a finite headspace and self-suppressing SiO -- is
+        # NOT modelled.  Under HARD_VACUUM / PN2_SWEEP the commanded pO₂ is
+        # the numerical vacuum floor for the whole campaign, no matter how
+        # much O₂ the melt sheds (that O₂ goes to
+        # terminal.oxygen_melt_offgas_stored, and process.overhead_gas is
+        # drained every tick).  A finite-headspace pO₂ model is a separate
+        # goal: FINITE-HEADSPACE-PO2-MODEL.  See _commanded_pO2_bar and
+        # docs/model-limitations.md.
+        pO2_bar = self._commanded_pO2_bar()
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
