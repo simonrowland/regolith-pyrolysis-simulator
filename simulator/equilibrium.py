@@ -4,7 +4,22 @@ from __future__ import annotations
 
 import math
 
-from simulator.state import GAS_CONSTANT
+from simulator.state import GAS_CONSTANT, Atmosphere
+
+# Atmosphere modes where a turbine/bleed loop actively holds a commanded pO₂
+# setpoint. Only in these modes may the setpoint act as a floor on the
+# effective pO₂ -- an uncontrolled hard-vacuum / pN₂ run must not get a
+# synthetic O₂ floor.
+_O2_CONTROLLED_ATMOSPHERES = frozenset({
+    Atmosphere.CONTROLLED_O2,
+    Atmosphere.CONTROLLED_O2_FLOW,
+    Atmosphere.O2_BACKPRESSURE,
+})
+
+# Numerical floor on pO₂ (bar). This is a divide-by-zero guard for the
+# 1/√pO₂ SiO suppression and the K/pO₂ Ellingham term -- NOT a synthetic
+# setpoint. ~10⁻⁹ bar is also the physical lunar hard-vacuum reference.
+_PO2_VACUUM_FLOOR_BAR = 1e-9
 
 
 class EquilibriumMixin:
@@ -13,6 +28,34 @@ class EquilibriumMixin:
             "backend equilibrium must be supplied by the simulator class "
             "using AtomLedger mol inputs"
         )
+
+    def _effective_pO2_bar(self) -> float:
+        """
+        Authoritative oxygen partial pressure (bar) for this hour.
+
+        ONE canonical pO₂ feeds BOTH the SiO √pO₂ suppression factor in
+        ``_stub_equilibrium`` AND the O₂ ambient driving force in
+        ``_calculate_evaporation``.  Keeping them on a shared value closes
+        the turbine-control feedback loop: the pO₂ that suppresses SiO is
+        the same pO₂ whose O₂ coproduct is credited to the overhead gas.
+
+        Resolution:
+          - The *actual* overhead O₂ partial pressure
+            (``overhead.composition['O2']``) is canonical -- it is the
+            real gas inventory tracked by the AtomLedger, and it can lag
+            the commanded setpoint by the 1-hour overhead transport lag
+            or sit below it after a vent.
+          - The commanded setpoint (``melt.pO2_mbar``) is applied only as
+            a *floor*, and only when the atmosphere is an actively
+            O₂-controlled mode (turbine + bleed holding the setpoint).
+            An uncontrolled hard-vacuum / pN₂ run gets no synthetic floor.
+          - A hard numerical floor (``_PO2_VACUUM_FLOOR_BAR``) guards the
+            1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
+        """
+        pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
+        if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+            pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
+        return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
     #
@@ -124,16 +167,14 @@ class EquilibriumMixin:
 
         # --- Determine the oxygen partial pressure (bar) ---
         #
-        # The pO₂ at the melt surface enters the decomposition
-        # equilibrium.  We use the highest of:
-        #   - Actual overhead O₂ (from gas transport model)
-        #   - Campaign setpoint pO₂ (turbine-managed)
-        #   - Hard vacuum floor (10⁻⁹ bar ≈ lunar surface)
-        pO2_bar = max(
-            self.overhead.composition.get('O2', 0.0) / 1000.0,
-            self.melt.pO2_mbar / 1000.0,
-            1e-9,
-        )
+        # pO2_effective_bar is the AUTHORITATIVE pO₂ for the hour: the
+        # actual overhead O₂ holdup (canonical per the AtomLedger),
+        # floored at the commanded setpoint only under active O₂ control.
+        # The SAME value feeds the SiO √pO₂ suppression below and the O₂
+        # ambient driving force in evaporation.py::_calculate_evaporation,
+        # so the SiO₂ → SiO + ½O₂ coupling and the turbine-control loop
+        # stay consistent.  See EquilibriumMixin._effective_pO2_bar.
+        pO2_bar = self._effective_pO2_bar()
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()

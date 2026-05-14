@@ -6,7 +6,12 @@ import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
-from simulator.state import CampaignPhase, EvaporationFlux, MOLAR_MASS
+from simulator.state import (
+    Atmosphere,
+    CampaignPhase,
+    EvaporationFlux,
+    MOLAR_MASS,
+)
 
 
 def _gas_train_sim():
@@ -526,3 +531,120 @@ def test_elemental_stoich_fallback_is_mass_and_atom_checked(monkeypatch):
 
     with pytest.raises(AccountingError, match="STOICH_RATIOS"):
         sim._evaporation_stoich("Fe", {"parent_oxide": "FeO"})
+
+
+def _sio_o2_train_sim():
+    """SiO + O2 train with explicit Antoine data so the builtin
+    _stub_equilibrium actually emits a SiO vapor pressure and the
+    SiO √pO₂ suppression path is exercised."""
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
+        {
+            "metals": {},
+            "oxide_vapors": {
+                "SiO": {
+                    "parent_oxide": "SiO2",
+                    "molar_mass_g_mol": MOLAR_MASS["SiO"],
+                    "antoine": {"A": 11.817, "B": 18700, "C": 0},
+                    "valid_range_K": [1400, 2200],
+                    "stoich_oxide_per_vapor": (
+                        MOLAR_MASS["SiO2"] / MOLAR_MASS["SiO"]),
+                    "stoich_O2_per_vapor": (
+                        0.5 * MOLAR_MASS["O2"] / MOLAR_MASS["SiO"]),
+                    "condensation_products_mol_per_mol_vapor": {
+                        "Si": 0.5,
+                        "SiO2": 0.5,
+                    },
+                },
+            },
+        },
+    )
+    sim.load_batch("silica", mass_kg=1000.0)
+    return sim
+
+
+def test_sio_suppression_and_o2_driving_force_use_same_po2():
+    """Finding 2 [P2]: the SiO √pO₂ suppression in _stub_equilibrium and
+    the O₂ ambient driving force in _calculate_evaporation must reference
+    ONE canonical pO2_effective_bar -- not the commanded setpoint on one
+    side and the actual overhead holdup on the other."""
+    sim = _sio_o2_train_sim()
+    sim.melt.temperature_C = 1600.0
+
+    # C2B-style controlled-O₂ atmosphere: a commanded setpoint sitting
+    # ABOVE the current overhead O₂ holdup (holdup lags by the overhead
+    # transport lag). 1.5 mbar setpoint vs 0.1 mbar actual holdup.
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.overhead.composition = {"O2": 0.1}
+
+    setpoint_bar = sim.melt.pO2_mbar / 1000.0
+    holdup_bar = sim.overhead.composition["O2"] / 1000.0
+
+    # Spy on the canonical helper: both code paths must route through it.
+    real_effective = sim._effective_pO2_bar
+    calls = []
+
+    def _spy_effective():
+        value = real_effective()
+        calls.append(value)
+        return value
+
+    sim._effective_pO2_bar = _spy_effective
+
+    # --- Equilibrium path: pO₂ feeding the SiO √pO₂ suppression ---
+    equilibrium = sim._stub_equilibrium()
+    assert calls, "_stub_equilibrium must consult _effective_pO2_bar"
+    pO2_equilibrium_bar = 10.0 ** equilibrium.fO2_log
+    # _stub_equilibrium sets fO2_log = log10(pO2) from the same pO2_bar it
+    # feeds the SiO √pO₂ suppression, so fO2_log faithfully probes it.
+    assert pO2_equilibrium_bar == pytest.approx(calls[0])
+    # SiO vapor pressure was actually emitted (suppression path exercised).
+    assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
+
+    # --- Evaporation path: pO₂ feeding the O₂ ambient driving force ---
+    # _calculate_evaporation resolves pO2_effective once, up front, before
+    # the species loop -- so the O₂ ambient driving force is built on it.
+    calls.clear()
+    flux = sim._calculate_evaporation(equilibrium)
+    assert calls, "_calculate_evaporation must consult _effective_pO2_bar"
+    pO2_evaporation_bar = calls[0]
+    assert flux is not None
+
+    # The single shared canonical value: actual holdup floored at the
+    # commanded setpoint because the atmosphere is actively O₂-controlled.
+    assert pO2_evaporation_bar == pytest.approx(setpoint_bar)
+    assert pO2_evaporation_bar > holdup_bar  # floor is doing its job
+
+    # The SAME pO₂ feeds the SiO suppression and the O₂ ambient term --
+    # one shared pO2_effective_bar, not setpoint on one side / holdup on
+    # the other. This is the consistency the finding requires.
+    assert pO2_equilibrium_bar == pytest.approx(pO2_evaporation_bar)
+
+    # The O₂ ambient driving force in Hertz-Knudsen is that canonical pO₂
+    # converted to Pa (evaporation.py: pO2_effective_Pa = pO2_bar x 1e5).
+    sim._effective_pO2_bar = real_effective
+    expected_pO2_effective_Pa = setpoint_bar * 1.0e5
+    assert sim._effective_pO2_bar() * 1.0e5 == pytest.approx(
+        expected_pO2_effective_Pa)
+
+
+def test_effective_po2_has_no_synthetic_floor_in_hard_vacuum():
+    """An uncontrolled hard-vacuum run must NOT get a synthetic setpoint
+    floor on pO₂ -- the setpoint only floors under active O₂ control."""
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.pO2_mbar = 1.5  # stale/irrelevant setpoint under hard vacuum
+    sim.overhead.composition = {"O2": 0.0}
+
+    # Only the numerical divide-by-zero guard applies, never the setpoint.
+    assert sim._effective_pO2_bar() == pytest.approx(1e-9)
+
+    # Under active O₂ control the same setpoint DOES floor the value.
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    assert sim._effective_pO2_bar() == pytest.approx(1.5 / 1000.0)

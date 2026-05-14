@@ -54,6 +54,17 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {})
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
+        # pO2_effective_bar is the AUTHORITATIVE pO₂ for the hour, shared
+        # with equilibrium.py::_stub_equilibrium (where it sets the SiO
+        # √pO₂ suppression).  Using the same value for the O₂ ambient
+        # driving force keeps the SiO₂ → SiO + ½O₂ mass coupling and the
+        # turbine-control feedback loop consistent: the pO₂ that
+        # physically suppresses SiO is the pO₂ its O₂ coproduct feeds.
+        # The actual overhead O₂ holdup is canonical (AtomLedger); the
+        # commanded setpoint is only a floor, and only under active
+        # O₂ control.  See EquilibriumMixin._effective_pO2_bar.
+        pO2_effective_Pa = self._effective_pO2_bar() * 1.0e5
+
         for species, P_sat_Pa in vapor_pressures.items():
             if P_sat_Pa <= 0:
                 continue
@@ -74,9 +85,13 @@ class EvaporationMixin:
             # if evaporation outpaces transport.
             P_ambient_Pa = self.overhead.composition.get(species, 0.0) * 100.0  # mbar → Pa
 
-            # For controlled-atmosphere species, also floor at the setpoint
-            if species == 'O2' and self.melt.pO2_mbar > 0.001:
-                P_ambient_Pa = max(P_ambient_Pa, self.melt.pO2_mbar * 100.0)
+            # O₂ ambient backpressure uses the authoritative pO2_effective
+            # (actual overhead O₂ holdup, floored at the commanded setpoint
+            # only under active O₂ control) -- the SAME pO₂ that drives the
+            # SiO √pO₂ suppression in equilibrium.py, so the two code paths
+            # never disagree on pO₂.
+            if species == 'O2':
+                P_ambient_Pa = max(P_ambient_Pa, pO2_effective_Pa)
 
             # Hertz-Knudsen mass flux (kg/s per m²)        [HK-1]
             denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)

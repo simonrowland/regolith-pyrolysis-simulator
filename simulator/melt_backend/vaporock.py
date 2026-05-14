@@ -159,10 +159,24 @@ class VapoRockBackend(MeltBackend):
     state rather than producing one.
 
     Configuration (all optional):
-        database_path:     filesystem path to a custom VapoRock thermo
-                           database, if the installed build supports it.
-        temperature_units: 'C' (default) or 'K'.
-        pressure_units:    'bar' (default) or 'Pa'.
+        database_path:        filesystem path to a custom VapoRock thermo
+                              database, if the installed build supports it.
+        temperature_units:    'C' (default) or 'K'.
+        pressure_units:       'bar' (default) or 'Pa' — the unit of the
+                              *input* total pressure passed to VapoRock.
+        vapor_pressure_units: 'bar' (default) or 'Pa' — the unit of the
+                              partial pressures the upstream build
+                              *returns* from a plain dict result.  The
+                              0.1.x line returns bar, so 'bar' is the
+                              documented default.  This is NOT inferred:
+                              the dict result path mirrors the FactSAGE
+                              ``amount_unit`` explicit-declaration pattern
+                              because a basalt-analog melt can legitimately
+                              have a dominant partial pressure below
+                              1000 Pa, and a magnitude heuristic would
+                              misclassify an already-Pa result and inflate
+                              it 1e5x.  (The ``System.eval_gas_abundances``
+                              log10(bar) path is unambiguous and unaffected.)
     """
 
     name = 'vaporock'
@@ -174,6 +188,7 @@ class VapoRockBackend(MeltBackend):
         self._database_path: Optional[str] = None
         self._temperature_units: str = 'C'
         self._pressure_units: str = 'bar'
+        self._vapor_pressure_units: str = 'bar'
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
 
@@ -217,6 +232,21 @@ class VapoRockBackend(MeltBackend):
             return False
         self._pressure_units = pressure_units
 
+        # Output-side unit for the plain-dict result path.  Fail closed on
+        # an unrecognised value rather than guessing: the dict path used to
+        # infer the unit from magnitude, which inflates an already-Pa
+        # sub-1e3 result 1e5x (see _normalize_vapor_pressures).
+        vapor_pressure_units = str(
+            self._config.get('vapor_pressure_units') or 'bar').strip()
+        if vapor_pressure_units not in ('bar', 'Pa'):
+            self._last_error = (
+                f'VapoRock vapor_pressure_units {vapor_pressure_units!r} '
+                "not supported; declare 'bar' or 'Pa' explicitly"
+            )
+            self._warnings.append(self._last_error)
+            return False
+        self._vapor_pressure_units = vapor_pressure_units
+
         module = self._import_vaporock()
         if module is None:
             return False
@@ -229,23 +259,28 @@ class VapoRockBackend(MeltBackend):
         return self._available
 
     def get_vapor_species(self) -> List[str]:
-        # Reflect the 34-species VapoRock vapor model in the SAME
-        # vocabulary ``_strip_gas_suffix`` emits: gas species whose bare
-        # spelling collides with a melt oxide in OXIDE_SPECIES carry the
-        # "_gas" namespace (FeO_gas, MgO_gas, CaO_gas, MnO_gas, SiO2_gas,
-        # Fe2O3_gas); every other species (Na, SiO, Al2O, Ti2O3, ...) is
-        # already disjoint from the oxide basis and stays bare.  This list
-        # must stay in sync with the normalizer; the simulator filters on
-        # availability anyway.
-        return [
+        # Reflect the VapoRock vapor model in the SAME vocabulary
+        # ``_strip_gas_suffix`` emits.  The oxide-colliding bucket is
+        # derived programmatically from the SAME ``OXIDE_SPECIES`` set the
+        # normalizer keys on, so the advertised list cannot drift from
+        # what ``_strip_gas_suffix`` actually emits: if VapoRock returns
+        # ``TiO2(g)``/``Al2O3(g)`` the normalizer emits ``TiO2_gas`` /
+        # ``Al2O3_gas`` and those names are advertised here too.  The
+        # genuinely-non-colliding bare species (Na, SiO, Al2O, ...) are
+        # already disjoint from the oxide basis and stay hand-curated; the
+        # simulator filters on availability anyway.
+        bare_species = [
             'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-            'SiO', 'FeO_gas', 'MgO_gas', 'CaO_gas', 'AlO', 'TiO', 'NaO',
-            'KO', 'CrO', 'MnO_gas',
-            'SiO2_gas', 'Al2O', 'Fe2O3_gas', 'Ti2O3',
+            'SiO', 'AlO', 'TiO', 'NaO', 'KO', 'CrO',
+            'Al2O', 'Ti2O3',
             'O2', 'O',
             'Na2', 'K2', 'NaOH', 'KOH',
             'Si2', 'Mg2', 'Ca2',
         ]
+        oxide_colliding = [
+            ox + _GAS_NAMESPACE_SUFFIX for ox in OXIDE_SPECIES
+        ]
+        return bare_species + oxide_colliding
 
     def capabilities(self) -> Dict[str, bool]:
         """
@@ -358,7 +393,7 @@ class VapoRockBackend(MeltBackend):
         )
 
         try:
-            raw = self._call_vaporock(
+            vapor_pressures_Pa = self._call_vaporock(
                 composition_wt_pct=comp_wt,
                 temperature=temperature_value,
                 pressure=pressure_value,
@@ -370,7 +405,10 @@ class VapoRockBackend(MeltBackend):
             result.warnings.append(message)
             return result
 
-        result.vapor_pressures_Pa = self._normalize_vapor_pressures(raw)
+        # _call_vaporock already returns a finished species -> Pa dict
+        # (declared-unit dict path or unambiguous log10(bar) path); do not
+        # re-scale here or an already-Pa result is inflated 1e5x.
+        result.vapor_pressures_Pa = vapor_pressures_Pa
         # phases_present is intentionally left empty — VapoRock is
         # vapor-side only and does not return a silicate-phase
         # assemblage.  ledger_transition is left None: VapoRock holds no
@@ -451,6 +489,15 @@ class VapoRockBackend(MeltBackend):
         order of preference.  Add new candidates here rather than
         changing the call shape in ``equilibrate``.
 
+        Returns a finished ``species → Pa`` dict regardless of which
+        entry point answered: the loosely-typed candidate-function
+        results go through ``_normalize_vapor_pressures`` (which applies
+        the explicitly-declared ``vapor_pressure_units``), and the
+        ``System.eval_gas_abundances`` path goes through
+        ``_log10_bar_pressures_to_pa`` (log10(bar), unambiguous).  Both
+        unit conversions happen here so ``equilibrate`` never
+        double-scales an already-Pa result.
+
         TODO(vaporock): pin to a single documented entry point once
         the upstream package has a stable Python API.  Today the
         published interface is loosely documented in the README and
@@ -470,24 +517,24 @@ class VapoRockBackend(MeltBackend):
             if fn is None:
                 continue
             try:
-                return fn(
+                return self._normalize_vapor_pressures(fn(
                     composition=composition_wt_pct,
                     T_C=temperature if self._temperature_units == 'C' else None,
                     T_K=temperature if self._temperature_units == 'K' else None,
                     P_bar=pressure if self._pressure_units == 'bar' else None,
                     P_Pa=pressure if self._pressure_units == 'Pa' else None,
                     log_fO2=fO2_log,
-                )
+                ))
             except TypeError as exc:
                 # Older builds use positional / shorter signatures.
                 # Fall back to a minimal call before declaring failure.
                 last_attr_error = exc
                 try:
-                    return fn(
+                    return self._normalize_vapor_pressures(fn(
                         composition_wt_pct,
                         temperature,
                         fO2_log,
-                    )
+                    ))
                 except Exception as inner_exc:  # noqa: BLE001
                     last_attr_error = inner_exc
                     continue
@@ -509,6 +556,8 @@ class VapoRockBackend(MeltBackend):
                     else temperature + 273.15
                 )
                 logP = eval_gas_abundances(temperature_K, fO2_log)
+                # log10(bar) result is unit-unambiguous; convert directly
+                # without the declared-unit dict path.
                 return self._log10_bar_pressures_to_pa(logP)
             except Exception as exc:  # noqa: BLE001 - upstream boundary
                 last_attr_error = exc
@@ -591,7 +640,13 @@ class VapoRockBackend(MeltBackend):
 
         The upstream API has historically returned ``{species: P_bar}``
         but newer builds may emit Pa directly.  The simulator's contract
-        is Pa, so we infer the unit and scale.
+        is Pa, so the result is scaled by the explicitly-declared
+        ``vapor_pressure_units`` config key — the unit is **not** inferred.
+        A magnitude heuristic (``max() < 1e3`` ⇒ bar) misclassifies a
+        legitimate already-Pa result whose dominant partial pressure is
+        below 1000 Pa (e.g. ~200 Pa SiO over a basalt analog at 1600 C)
+        and inflates it 1e5x into Hertz-Knudsen.  This mirrors the
+        FactSAGE ``amount_unit`` explicit-declaration pattern.
         """
         if raw is None:
             return {}
@@ -617,9 +672,6 @@ class VapoRockBackend(MeltBackend):
         if not isinstance(raw, dict):
             return {}
 
-        # Heuristic: if the largest pressure is below 1e3 we assume bar
-        # (typical vapor pressures < 1 bar) and scale to Pa.  If values
-        # already look like Pa (max ≥ 1e3) we leave them.
         try:
             float_values = [float(v) for v in raw.values()]
         except (TypeError, ValueError):
@@ -628,7 +680,8 @@ class VapoRockBackend(MeltBackend):
         if not float_values:
             return {}
 
-        scale = 1e5 if max(float_values) < 1e3 else 1.0
+        # Scale by the explicitly-declared output unit; never guess.
+        scale = 1e5 if self._vapor_pressure_units == 'bar' else 1.0
         pressures: Dict[str, float] = {}
         for species, value in raw.items():
             pressure = float(value) * scale

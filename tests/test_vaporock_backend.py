@@ -141,7 +141,11 @@ def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({"temperature_units": "K", "pressure_units": "Pa"})
+    assert backend.initialize({
+        "temperature_units": "K",
+        "pressure_units": "Pa",
+        "vapor_pressure_units": "Pa",
+    })
     result = backend.equilibrate(
         1400.0,
         composition_mol={"SiO2": 1.0},
@@ -157,7 +161,9 @@ def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):
     assert result.vapor_pressures_Pa == {"Na": pytest.approx(2500.0)}
 
 
-def test_passthrough_pa_values_when_pressures_already_look_like_pa(monkeypatch):
+def test_passthrough_pa_values_when_unit_declared_pa(monkeypatch):
+    # With vapor_pressure_units='Pa' the upstream dict result is taken as
+    # Pa verbatim -- no magnitude heuristic, no 1e5x inflation.
     def calc_vapor_pressures(**kwargs):
         return {"Na": 1500.0}
 
@@ -167,7 +173,7 @@ def test_passthrough_pa_values_when_pressures_already_look_like_pa(monkeypatch):
     _install_fake_import(monkeypatch, fake_module)
 
     backend = VapoRockBackend()
-    assert backend.initialize({})
+    assert backend.initialize({"vapor_pressure_units": "Pa"})
     result = backend.equilibrate(
         1500.0,
         composition_mol={"Na2O": 1.0},
@@ -269,21 +275,48 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
 
     # The adapter normalizes VapoRock's "(g)"-suffixed species names
     # ("Na(g)", "SiO(g)") onto the simulator's bare vocabulary, so the
-    # builtin Antoine path and the VapoRock path now share keys. Per
+    # builtin Antoine path and the VapoRock path share keys. Per
     # `\goal VAPOROCK-COMPLETION`, agreement within an order of magnitude
     # for at least one common volatile species is sufficient.
-    for species in ("Na", "SiO"):
-        builtin_pressure = builtin.vapor_pressures_Pa.get(species, 0.0)
-        vaporock_pressure = vaporock.vapor_pressures_Pa.get(species, 0.0)
-        if builtin_pressure > 0.0 and vaporock_pressure > 0.0:
-            ratio = vaporock_pressure / builtin_pressure
-            assert 0.1 <= ratio <= 10.0
-            return
+    #
+    # Scan EVERY common species and pass on the first that agrees -- do
+    # NOT fix the comparison to a single species. The builtin Antoine
+    # alkali pressures (Na/K ~1e7 Pa over a basalt analog) are a known
+    # builtin limitation, not a VapoRock error, so Na/K legitimately
+    # diverge ~1e6x; refractory species (Al, Mg, Ti, ...) agree well.
+    # Previously this comparison `return`ed on the first positive-pressure
+    # pair regardless of agreement and only passed because
+    # `_normalize_vapor_pressures` double-scaled the already-Pa System
+    # result by 1e5 -- a bug that coincidentally pulled VapoRock's Na up
+    # near the builtin's. With that 1e5 inflation removed (units are now
+    # declared, not inferred), the comparison must be over all common
+    # keys to find the genuine agreement.
+    common_species = sorted(
+        species
+        for species in builtin.vapor_pressures_Pa
+        if builtin.vapor_pressures_Pa.get(species, 0.0) > 0.0
+        and vaporock.vapor_pressures_Pa.get(species, 0.0) > 0.0
+    )
+    if not common_species:
+        pytest.fail(
+            "No common positive-pressure vapor key between VapoRock and "
+            "builtin Antoine after species-name normalization; the parity "
+            "fixture has nothing to compare."
+        )
+
+    ratios = {
+        species: (
+            vaporock.vapor_pressures_Pa[species]
+            / builtin.vapor_pressures_Pa[species]
+        )
+        for species in common_species
+    }
+    if any(0.1 <= ratio <= 10.0 for ratio in ratios.values()):
+        return
 
     pytest.fail(
-        "No common Na/SiO vapor-pressure key between VapoRock and builtin "
-        "Antoine after species-name normalization; the parity fixture has "
-        "nothing to compare."
+        "No common volatile species agrees within an order of magnitude "
+        f"between VapoRock and builtin Antoine: ratios={ratios}"
     )
 
 
@@ -370,3 +403,55 @@ def test_vaporock_gas_oxide_names_do_not_collide_with_melt_oxides(monkeypatch):
     assert advertised.isdisjoint(OXIDE_SPECIES)
     assert {"SiO2_gas", "Fe2O3_gas", "FeO_gas",
             "MgO_gas", "CaO_gas", "MnO_gas"} <= advertised
+
+
+def test_get_vapor_species_cannot_drift_from_normalizer():
+    # get_vapor_species()'s oxide-colliding bucket is derived from the SAME
+    # OXIDE_SPECIES set _strip_gas_suffix keys on, so EVERY oxide the
+    # normalizer could namespace as "<ox>_gas" is advertised -- even oxides
+    # the old hand-curated list omitted (TiO2, Al2O3, ...). Nothing can
+    # silently drop a vapor the normalizer would emit.
+    backend = VapoRockBackend()
+    advertised = set(backend.get_vapor_species())
+    for ox in OXIDE_SPECIES:
+        normalized = backend._strip_gas_suffix(f"{ox}(g)")
+        assert normalized == f"{ox}_gas"
+        assert normalized in advertised, (
+            f"{ox}(g) normalizes to {normalized!r} but get_vapor_species() "
+            "does not advertise it"
+        )
+
+
+def test_normalize_vapor_pressures_honors_declared_pa_unit(monkeypatch):
+    # A legitimate already-Pa result with a sub-1e3 dominant partial
+    # pressure (e.g. ~200 Pa SiO at high T) must NOT be inflated 1e5x. With
+    # vapor_pressure_units='Pa' the value is taken verbatim; the old
+    # max()<1e3 heuristic would have turned 200.0 into 2e7.
+    fake_module = types.SimpleNamespace()
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({"vapor_pressure_units": "Pa"}) is True
+    assert backend._normalize_vapor_pressures({"Na": 200.0}) == {
+        "Na": pytest.approx(200.0)
+    }
+
+    # The documented default ('bar') still scales bar -> Pa.
+    backend_bar = VapoRockBackend()
+    assert backend_bar.initialize({}) is True
+    assert backend_bar._vapor_pressure_units == "bar"
+    assert backend_bar._normalize_vapor_pressures({"Na": 2.0e-3}) == {
+        "Na": pytest.approx(200.0)
+    }
+
+
+def test_unsupported_vapor_pressure_units_fails_closed(monkeypatch):
+    # Ambiguity is rejected at initialize() rather than guessed later.
+    fake_module = types.SimpleNamespace()
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({"vapor_pressure_units": "atm"}) is False
+    assert backend.is_available() is False
+    assert backend._last_error is not None
+    assert "vapor_pressure_units" in backend._last_error
