@@ -71,7 +71,26 @@ Desktop.ini
 *.log
 logs/
 instance/
-engines/
+# Engine binary installs (NOT source trees — engines/<name>/{provider,domain,parity}.py
+# are git-tracked; only the binary install artifacts below stay ignored).
+engines/*/bin/
+engines/*/data/
+engines/*/lib/
+engines/*/share/
+engines/alphamelts/run_alphamelts.command
+engines/alphamelts/Melts-rhyolite-public*
+engines/alphamelts/alphamelts-app-*
+engines/alphamelts/*.zip
+engines/alphamelts/*.dylib
+engines/alphamelts/*.so
+engines/alphamelts/*.dll
+engines/magemin/MAGEMin
+engines/magemin/MAGEMin.exe
+engines/magemin/libMAGEMin.*
+engines/factsage/*.cst
+engines/factsage/*.dat
+engines/factsage/*.lic
+engines/factsage/*license*
 config/factsage.local.json
 config/*.cst
 config/*.dat
@@ -80,6 +99,7 @@ config/*license*
 
 # Private working notes
 docs-private/
+AGENTS.md
 
 # Claude Code
 .claude/

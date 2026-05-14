@@ -10,7 +10,7 @@ The simulator checks melt backends in this order:
 2. Project-local alphaMELTS binary at `engines/alphamelts/run_alphamelts.command`.
 3. `alphamelts` executable on `PATH`.
 
-The VapoRock wrapper checks whether the `VapoRock` Python package is importable.
+The VapoRock wrapper checks whether the canonical `vaporock` Python package is importable, with legacy `VapoRock` import fallback for older local installs.
 
 The FactSAGE/ChemApp backend is optional. It imports ChemApp only during initialization and falls back to the built-in Ellingham/Antoine path when unavailable. This fallback is adequate for process sequencing and feedstock comparison.
 
@@ -32,7 +32,21 @@ Install optional Python melt tooling with:
 pip install -e ".[melts]"
 ```
 
-The `melts` extra currently includes `PetThermoTools`. VapoRock may be installed separately if needed.
+The `melts` extra currently includes `PetThermoTools`. The `vapor` extra installs the upstream VapoRock source tag because no PyPI release is available.
+
+## VapoRock adapter notes
+
+`simulator/melt_backend/vaporock.py` imports VapoRock lazily inside `initialize()`. It tries canonical lowercase `vaporock` first, then legacy uppercase `VapoRock`; import failure marks the backend unavailable and returns warnings instead of crashing the simulator.
+
+The adapter receives the cleaned silicate melt only. It projects mol-native simulator oxide inventory into VapoRock oxide wt% over the simulator `OXIDE_SPECIES` basis; metal, sulfide, salt, and halide accounts are not passed to VapoRock.
+
+The documented upstream path is `vaporock.System().set_melt_comp(...)` followed by `eval_gas_abundances(T, logfO2)`. The adapter also probes legacy helper names used by older forks. System log10(bar) output is converted to Pa.
+
+`EquilibriumResult.vapor_pressures_Pa` is the primary output. VapoRock does not mutate `AtomLedger`, does not produce phase assemblages, and does not own evaporation flux or ledger transitions before the VAPOROCK-AUTHORITY-PROMOTION goal.
+
+For legacy helper outputs, pressure values with max `< 1e3` are treated as bar and scaled to Pa; larger values are treated as already-Pa. `capabilities()` keeps `vapor_melt_equilibrium=True` as a VapoRock instance-level extension, leaving `DEFAULT_BACKEND_CAPABILITIES` at the canonical five shared keys.
+
+See `docs-private/chemistry-engine-binding-spec-2026-05-14.md` §4 for the VapoRock input/output contract.
 
 ## AlphaMELTS Adapter Notes
 
