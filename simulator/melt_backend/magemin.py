@@ -24,16 +24,20 @@ License: see upstream MAGEMin repository (Riel et al.).  Cite:
 Intended call site
 ------------------
 This adapter is intended to run in **shadow mode** alongside alphaMELTS
-inside ``simulator/core.py::_get_equilibrium`` so that liquidus and
-modal predictions can be cross-checked.  Parity tolerance for the
-shadow comparison is:
+so that liquidus and modal predictions can be cross-checked.  Parity
+tolerance for the shadow comparison is:
 
     - liquidus temperature ±50 K
     - modal abundance ±2 wt%
 
-A divergence outside that envelope is logged as a warning on the
-``EquilibriumResult`` (the simulator continues with the authoritative
-backend).
+A divergence outside that envelope is logged as a warning (the simulator
+continues with the authoritative backend).
+
+**Not yet wired into any active call site** — nothing instantiates
+``MAGEMinBackend`` outside the test suite, and ``_get_equilibrium`` has
+no shadow/multiplexer runner that would call it alongside alphaMELTS.
+That runner is future work (see the chemistry-kernel carve-out goal and
+``engines/magemin/`` for the kernel-shadow scaffold).
 
 Capabilities
 ------------
@@ -48,16 +52,28 @@ installed.
 Authority posture
 -----------------
 MAGEMin is **shadow / diagnostic** for ``SILICATE_LIQUIDUS`` and
-``SILICATE_EQUILIBRIUM`` — it runs alongside the authoritative alphaMELTS
-path, never instead of it (binding spec §3 authority matrix).  It
-conforms to the layered ``MeltBackend`` ABC the same way ``alphamelts.py``
-does: ``equilibrate()`` accepts ``composition_mol_by_account`` +
-``species_formula_registry``; ``ledger_account_policies()`` returns no
-ledger-authoritative policy; ``EquilibriumResult.ledger_transition`` is
-never populated, so ``simulator/core.py`` treats every MAGEMin result as
-diagnostic and never applies it to ``AtomLedger``.  MAGEMin consumes only
-the cleaned silicate melt — non-melt ledger accounts (gas, metal, salt,
-sulfide, halide) are filtered out before the library is called.
+``SILICATE_EQUILIBRIUM`` — when a shadow runner exists it is to run
+alongside the authoritative alphaMELTS path, never instead of it
+(binding spec §3 authority matrix).  ``ledger_account_policies()``
+returns no ledger-authoritative policy and ``equilibrate()`` never
+populates ``EquilibriumResult.ledger_transition``: MAGEMin has no
+``AtomLedger`` authority and must not be granted any.
+
+"Diagnostic" here does NOT mean "harmless if selected as the active
+backend."  ``equilibrate()`` populates ``phase_masses_kg`` with a
+post-equilibrium phase assemblage but leaves ``ledger_transition`` as
+``None`` — and ``simulator/core.py::_get_equilibrium`` *rejects* exactly
+that combination, raising ``RuntimeError`` ("backend returned
+post-equilibrium phase material without an AtomLedger transition").  So
+selecting ``MAGEMinBackend`` as the active melt backend fails closed by
+design; it is not silently ignored.  The honest consumer for MAGEMin is
+a dedicated shadow comparator (see ``engines/magemin/parity.py``) that
+diff-checks its result against the authoritative engine without routing
+it through ``_get_equilibrium`` as an authoritative phase solver.
+
+MAGEMin consumes only the cleaned silicate melt — non-melt ledger
+accounts (gas, metal, salt, sulfide, halide) are filtered out before the
+library is called.
 """
 
 from __future__ import annotations
@@ -225,9 +241,14 @@ class MAGEMinBackend(MeltBackend):
         ``phase_masses_kg``, ``liquid_fraction``, and
         ``liquid_composition_wt_pct``.
 
-        MAGEMin is **shadow / diagnostic**:
-        ``EquilibriumResult.ledger_transition`` is left ``None`` so the
-        simulator never applies the result to ``AtomLedger``.
+        ``EquilibriumResult.ledger_transition`` is left ``None``: MAGEMin
+        holds no ``AtomLedger`` authority.  Because this method still
+        populates ``phase_masses_kg`` with a phase assemblage, a result
+        from this adapter is **not** safe to feed through
+        ``simulator/core.py::_get_equilibrium`` as the active backend —
+        that path rejects a populated phase result with no ledger
+        transition and fails closed (see the module "Authority posture"
+        note).  The result is only meaningful to a shadow comparator.
 
         On library error returns an empty result with a warning rather
         than raising.
@@ -279,8 +300,12 @@ class MAGEMinBackend(MeltBackend):
             result.warnings.append(message)
             return result
 
-        # ledger_transition is left None: MAGEMin is shadow / diagnostic,
-        # never ledger-authoritative.
+        # ledger_transition is left None: MAGEMin holds no AtomLedger
+        # authority.  _populate_result fills phase_masses_kg, so a result
+        # from this adapter fails closed if routed through
+        # core.py::_get_equilibrium as the active backend (see the module
+        # "Authority posture" note) — it is only valid for a shadow
+        # comparator.
         self._populate_result(result, raw)
         return result
 

@@ -171,14 +171,24 @@ class MAGEMinParityComparator:
 
 
 def _extract_liquidus_K(result: Any) -> Optional[float]:
-    """Pull a liquidus temperature (Kelvin) from a result-shaped object."""
+    """Pull a liquidus temperature (Kelvin) from a result-shaped object.
+
+    Only explicit ``liquidus_*`` fields are accepted.  The equilibration
+    temperature (``temperature_C`` on an ``EquilibriumResult``) is
+    deliberately NOT a fallback: it is the temperature the melt was
+    *equilibrated at*, not its liquidus.  Treating it as a liquidus would
+    make two results equilibrated at the same T report
+    ``liquidus_T_delta_K = 0`` / ``agreement = True`` — a silent false
+    positive.  When neither side reports a real liquidus, returning
+    ``None`` routes the comparator into its conservative "cannot evaluate
+    parity" branch (``agreement = False``).
+    """
     if result is None:
         return None
 
-    # Try common attribute / dict keys.
+    # Try common attribute / dict keys.  Liquidus-only — see docstring.
     candidates_K = ('liquidus_T_K', 'T_liquidus_K', 'liquidus_temperature_K')
-    candidates_C = ('liquidus_T_C', 'T_liquidus_C', 'liquidus_temperature_C',
-                    'temperature_C')
+    candidates_C = ('liquidus_T_C', 'T_liquidus_C', 'liquidus_temperature_C')
 
     for key in candidates_K:
         value = _lookup(result, key)

@@ -188,6 +188,79 @@ def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
     assert sim._oxygen_total_kg() == pytest.approx(16.0)
 
 
+def test_overhead_o2_not_double_counted_across_ticks():
+    # Two consecutive steps with evaporation O2. Tick 1's overhead O2 is
+    # left undrained (drain stubbed out), so it carries into tick 2's
+    # process.overhead_gas holdup. The turbine/vent decision must be fed
+    # the ledger holdup itself -- never holdup max()'d with a per-tick
+    # production counter, which would let carried-over O2 read as fresh
+    # throughput. The invariant: over tick 2, turbine throughput + vent
+    # equals the ledger O2 delta into the terminal accounts.
+    sim = _gas_train_sim()
+    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._get_turbine_spec = lambda: types.SimpleNamespace(
+        max_O2_flow_kg_hr=10.0)
+
+    def _terminal_o2_kg():
+        return sum(
+            sim.atom_ledger.kg_by_account(acct).get("O2", 0.0)
+            for acct in (
+                "terminal.oxygen_stage0_stored",
+                "terminal.oxygen_melt_offgas_stored",
+                "terminal.oxygen_melt_offgas_vented_to_vacuum",
+                "terminal.oxygen_mre_anode_stored",
+            )
+        )
+
+    # Tick 1: leave the melt/offgas O2 sitting in process.overhead_gas.
+    drained = sim._route_melt_offgas_oxygen_to_terminal
+    sim._route_melt_offgas_oxygen_to_terminal = lambda vented_kg: None
+    sim.step()
+    sim._route_melt_offgas_oxygen_to_terminal = drained
+
+    carried_over_kg = sim.atom_ledger.kg_by_account(
+        "process.overhead_gas")["O2"]
+    assert carried_over_kg == pytest.approx(16.0)
+
+    # Capture the O2 quantity the turbine model is actually fed on tick 2,
+    # and the ledger holdup that exists at that instant.
+    seen = {}
+    real_update = sim.overhead_model.update
+
+    def _spy_update(*args, **kwargs):
+        seen["fed_kg"] = kwargs["actual_O2_kg_hr"]
+        seen["holdup_kg"] = sim._ledger_o2_kg("process.overhead_gas")
+        return real_update(*args, **kwargs)
+
+    sim.overhead_model.update = _spy_update
+
+    terminal_before = _terminal_o2_kg()
+    sim.step()
+    sim.overhead_model.update = real_update
+
+    # The turbine sees exactly the finite ledger holdup -- carried-over O2
+    # plus this tick's production -- and nothing else.
+    assert seen["fed_kg"] == pytest.approx(seen["holdup_kg"])
+    assert seen["fed_kg"] > carried_over_kg  # tick-2 production also present
+
+    # Invariant: throughput + vent over tick 2 equals the ledger O2 delta
+    # into terminal accounts (not holdup + per-tick production summed).
+    o2_per_mol = MOLAR_MASS["O2"] / 1000.0
+    throughput_mol_hr = (
+        sim.overhead.turbine_flow_mol_hr + sim.overhead.O2_vented_mol_hr)
+    terminal_delta_kg = _terminal_o2_kg() - terminal_before
+
+    assert throughput_mol_hr * o2_per_mol == pytest.approx(terminal_delta_kg)
+    assert terminal_delta_kg == pytest.approx(seen["holdup_kg"])
+    # Carried-over O2 flowed through exactly once -- not double-counted.
+    assert sim.atom_ledger.kg_by_account(
+        "process.overhead_gas").get("O2", 0.0) == pytest.approx(0.0)
+
+
 def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
     sim = _sio_train_sim()
     flux = EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0)

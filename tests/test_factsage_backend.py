@@ -816,7 +816,10 @@ def test_backend_overhead_o2_stays_in_process_headspace_until_gas_tick():
     assert sim.atom_ledger.kg_by_account(
         'terminal.oxygen_melt_offgas_stored').get(
             'O2', 0.0) == pytest.approx(0.0)
-    assert sim._melt_offgas_O2_kg_this_hr == pytest.approx(0.0)
+    # The turbine-feed authority is the ledger holdup, which sees exactly
+    # the backend O2 credit and nothing else (no separate per-tick tally).
+    assert sim._ledger_o2_kg(
+        'process.overhead_gas') == pytest.approx(expected_o2_kg)
 
 
 def test_backend_transition_name_must_match_declared_contract():

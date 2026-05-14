@@ -13,6 +13,7 @@ from simulator.melt_backend.base import (
     StubBackend,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
+from simulator.state import OXIDE_SPECIES
 
 
 def _install_fake_import(monkeypatch, fake_module):
@@ -284,3 +285,88 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         "Antoine after species-name normalization; the parity fixture has "
         "nothing to compare."
     )
+
+
+def test_vaporock_as_active_backend_fails_closed_with_clear_message():
+    # VapoRock is not wired into any active call site. If someone DOES
+    # select it as the active melt backend, core.py must fail closed with
+    # a clear message rather than silently proceeding -- the adapter
+    # docstring's "diagnostic" claim only holds for a dedicated vapor-side
+    # consumer, never for the authoritative _get_equilibrium path.
+    sim = PyrolysisSimulator(
+        VapoRockBackend(),
+        {"campaigns": {}},
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"SiO2": 100.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("oxide", mass_kg=1.0)
+
+    # A bare VapoRockBackend() is un-initialized (the simulator
+    # constructor never calls initialize()), so is_available() is False
+    # and core.py refuses to fall back to the stub for a non-stub
+    # backend.
+    with pytest.raises(RuntimeError, match="VapoRockBackend is unavailable"):
+        sim.step()
+
+
+def test_vaporock_gas_oxide_names_do_not_collide_with_melt_oxides(monkeypatch):
+    # VapoRock returns gas species with a "(g)" suffix; stripping it
+    # naively maps SiO2(g)/Fe2O3(g) onto the SAME strings as the condensed
+    # melt oxides in OXIDE_SPECIES. The normalizer must namespace those so
+    # a downstream vapor consumer cannot conflate gaseous SiO2 with melt
+    # SiO2 (which would break SiO2 -> SiO + 1/2 O2 stoichiometry).
+    def calc_vapor_pressures(**kwargs):
+        return {
+            "SiO2(g)": 1.0e-4,
+            "Fe2O3(g)": 2.0e-4,
+            "FeO(g)": 3.0e-4,
+            "MgO(g)": 4.0e-4,
+            "CaO(g)": 5.0e-4,
+            "MnO(g)": 6.0e-4,
+            # Non-oxide gas species stay bare so the builtin Antoine path
+            # and the VapoRock path still share keys.
+            "Na(g)": 7.0e-4,
+            "SiO(g)": 8.0e-4,
+            "Al2O(g)": 9.0e-4,
+        }
+
+    fake_module = types.SimpleNamespace(
+        calc_vapor_pressures=calc_vapor_pressures
+    )
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({}) is True
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "FeO": 0.2},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    keys = set(result.vapor_pressures_Pa)
+    # The whole point: no normalized vapor key is also a melt oxide name.
+    assert keys.isdisjoint(OXIDE_SPECIES), (
+        f"gas keys collide with melt oxides: {keys & set(OXIDE_SPECIES)}"
+    )
+    # Oxide-colliding gas species are namespaced with _gas.
+    assert "SiO2_gas" in keys
+    assert "Fe2O3_gas" in keys
+    assert "FeO_gas" in keys
+    assert "MgO_gas" in keys
+    assert "CaO_gas" in keys
+    assert "MnO_gas" in keys
+    # Non-oxide gas species stay bare.
+    assert "Na" in keys
+    assert "SiO" in keys
+    assert "Al2O" in keys
+    # get_vapor_species() advertises exactly the normalizer's vocabulary.
+    advertised = set(backend.get_vapor_species())
+    assert advertised.isdisjoint(OXIDE_SPECIES)
+    assert {"SiO2_gas", "Fe2O3_gas", "FeO_gas",
+            "MgO_gas", "CaO_gas", "MnO_gas"} <= advertised

@@ -47,25 +47,45 @@ installed.
 
 Authority posture
 -----------------
-VapoRock is **diagnostic** for ``VAPOR_PRESSURE`` until the
-``VAPOROCK-AUTHORITY-PROMOTION`` goal promotes it.  It conforms to the
-layered ``MeltBackend`` ABC the same way ``alphamelts.py`` does:
-``equilibrate()`` accepts ``composition_mol_by_account`` +
-``species_formula_registry``; ``ledger_account_policies()`` returns no
-ledger-authoritative policy; ``EquilibriumResult.ledger_transition`` is
-never populated, so ``simulator/core.py`` treats every VapoRock result
-as diagnostic and never applies it to ``AtomLedger``.  VapoRock consumes
-only the cleaned silicate melt — non-melt ledger accounts (gas, metal,
-salt, sulfide, halide) are filtered out before the library is called.
+VapoRock is **not yet wired into any active call site** — nothing
+instantiates ``VapoRockBackend`` outside the test suite.  The
+shadow/multiplexer runner described under "Intended call sites" above is
+still future work (see the chemistry-kernel carve-out goal).
+
+If this adapter *were* selected as the active melt backend today, it
+would NOT silently produce a usable equilibrium: ``equilibrate()``
+returns only ``vapor_pressures_Pa`` (no silicate phase assemblage, no
+``ledger_transition``), so ``simulator/core.py::_get_equilibrium`` would
+either fail closed — an un-initialized backend raises ``RuntimeError``
+("VapoRockBackend is unavailable") — or, with the upstream library
+present, hand back a vapor-only result that has no melt phases for the
+rest of the step to consume.  Either way "diagnostic" means "not safe to
+select as the authoritative backend," not "gracefully ignored."  The
+honest place for VapoRock is behind a dedicated vapor-side shadow
+consumer that reads ``vapor_pressures_Pa`` without routing the adapter
+through ``_get_equilibrium`` as a phase solver.
+
+``EquilibriumResult.ledger_transition`` is never populated and
+``ledger_account_policies()`` returns no ledger-authoritative policy:
+VapoRock has no ``AtomLedger`` authority and must not be granted any
+until the ``VAPOROCK-AUTHORITY-PROMOTION`` goal (and even then only for
+``VAPOR_PRESSURE``).  ``equilibrate()`` consumes only the cleaned
+silicate melt — non-melt ledger accounts (gas, metal, salt, sulfide,
+halide) are filtered out before the library is called.
 
 Species-name normalization
 --------------------------
 The installed VapoRock build (``vaporock.System().eval_gas_abundances``)
 returns every gas species with a ``(g)`` phase suffix — ``Na(g)``,
-``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``, etc.  The simulator's
-vocabulary uses bare names (``Na``, ``SiO``, ...).  ``_strip_gas_suffix``
-reconciles the two so ``EquilibriumResult.vapor_pressures_Pa`` keys match
-the simulator basis.
+``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``, etc.
+``_strip_gas_suffix`` reconciles these onto a vocabulary that is
+provably disjoint from the condensed melt oxides: a gas species whose
+bare spelling collides with an ``OXIDE_SPECIES`` member is namespaced
+with ``_gas`` (``SiO2(g) -> SiO2_gas``, ``FeO(g) -> FeO_gas``); every
+other gas species is returned bare (``Na(g) -> Na``).  Without this a
+downstream vapor consumer keying ``vapor_pressures_Pa`` by species would
+conflate gaseous SiO2 with melt SiO2 and break the atom-explicit
+``SiO2 -> SiO + 1/2 O2`` stoichiometry.
 """
 
 from __future__ import annotations
@@ -84,11 +104,25 @@ from simulator.melt_backend.base import (
 from simulator.state import OXIDE_SPECIES
 
 
-# VapoRock gas-species names carry a "(g)" phase suffix; the simulator
-# uses bare names.  This pattern strips a trailing "(g)" (with optional
-# surrounding whitespace) so "Na(g)" -> "Na", "SiO2(g)" -> "SiO2".  A
-# name without the suffix is passed through unchanged.
+# VapoRock gas-species names carry a "(g)" phase suffix.  This pattern
+# matches a trailing "(g)" (with optional surrounding whitespace) so the
+# normalizer can recognise and strip the explicit gas marker.
 _GAS_SUFFIX_RE = re.compile(r'\s*\(\s*g\s*\)\s*$', re.IGNORECASE)
+
+# Suffix appended to a normalized gas-species name whose bare spelling
+# would otherwise collide with a condensed melt oxide in OXIDE_SPECIES
+# (e.g. gaseous SiO2 vs. melt SiO2).  Keeping the gas vocabulary disjoint
+# from the oxide basis stops a downstream vapor consumer from conflating
+# "SiO2(g)" with melt SiO2 and breaking the atom-explicit
+# SiO2 -> SiO + 1/2 O2 stoichiometry.
+_GAS_NAMESPACE_SUFFIX = '_gas'
+
+# Gas species whose bare name collides with a condensed melt oxide.  Only
+# these get the "_gas" namespace; every other vapor species (Na, SiO, O2,
+# Al2O, ...) is already disjoint from OXIDE_SPECIES and stays bare so the
+# builtin Antoine path and the VapoRock path share keys for the shared
+# volatiles.
+_OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
 
 # Cleaned silicate melt is the only ledger account VapoRock may consume.
 # Matches the alphamelts.py contract: every other account is filtered
@@ -195,14 +229,19 @@ class VapoRockBackend(MeltBackend):
         return self._available
 
     def get_vapor_species(self) -> List[str]:
-        # Reflect the 34-species VapoRock vapor model.  This list must
-        # stay in sync with whatever the installed library actually
-        # returns; the simulator filters on availability anyway.
+        # Reflect the 34-species VapoRock vapor model in the SAME
+        # vocabulary ``_strip_gas_suffix`` emits: gas species whose bare
+        # spelling collides with a melt oxide in OXIDE_SPECIES carry the
+        # "_gas" namespace (FeO_gas, MgO_gas, CaO_gas, MnO_gas, SiO2_gas,
+        # Fe2O3_gas); every other species (Na, SiO, Al2O, Ti2O3, ...) is
+        # already disjoint from the oxide basis and stays bare.  This list
+        # must stay in sync with the normalizer; the simulator filters on
+        # availability anyway.
         return [
             'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-            'SiO', 'FeO', 'MgO', 'CaO', 'AlO', 'TiO', 'NaO', 'KO',
-            'CrO', 'MnO',
-            'SiO2_gas', 'Al2O', 'Fe2O3_gas', 'Ti2O3_gas',
+            'SiO', 'FeO_gas', 'MgO_gas', 'CaO_gas', 'AlO', 'TiO', 'NaO',
+            'KO', 'CrO', 'MnO_gas',
+            'SiO2_gas', 'Al2O', 'Fe2O3_gas', 'Ti2O3',
             'O2', 'O',
             'Na2', 'K2', 'NaOH', 'KOH',
             'Si2', 'Mg2', 'Ca2',
@@ -262,14 +301,16 @@ class VapoRockBackend(MeltBackend):
         projected to oxide wt% in the 14-oxide simulator basis (a strict
         subset of the MELTS basis VapoRock expects).
 
-        VapoRock is **diagnostic**: ``EquilibriumResult.ledger_transition``
-        is left ``None`` so the simulator never applies the result to
-        ``AtomLedger``.
+        ``EquilibriumResult.ledger_transition`` is left ``None`` and no
+        phase assemblage is reported: VapoRock holds no ``AtomLedger``
+        authority.  This is **not** the same as "the result is harmless
+        if selected as the active backend" — see the module-level
+        "Authority posture" note.  The result is only meaningful to a
+        dedicated vapor-side consumer that reads ``vapor_pressures_Pa``.
 
         On any library error the method returns an empty
         ``EquilibriumResult`` and appends a one-line warning rather
-        than raising — the simulator can then degrade to its
-        Antoine-equation stub path.
+        than raising.
         """
         result = EquilibriumResult(
             temperature_C=temperature_C,
@@ -332,8 +373,9 @@ class VapoRockBackend(MeltBackend):
         result.vapor_pressures_Pa = self._normalize_vapor_pressures(raw)
         # phases_present is intentionally left empty — VapoRock is
         # vapor-side only and does not return a silicate-phase
-        # assemblage.  ledger_transition is left None: VapoRock is
-        # diagnostic, never ledger-authoritative.
+        # assemblage.  ledger_transition is left None: VapoRock holds no
+        # AtomLedger authority (see the module "Authority posture" note —
+        # this adapter is not safe to select as the active backend).
         return result
 
     @staticmethod
@@ -602,8 +644,10 @@ class VapoRockBackend(MeltBackend):
         indexed by ``species_name`` (one column, the temperature) whose
         values are log10(partial pressure / bar).  Species names carry a
         ``(g)`` phase suffix; ``_strip_gas_suffix`` maps them onto the
-        simulator's bare-name vocabulary.  ``-inf`` rows (species with no
-        thermodynamic data, e.g. Cr gases in some builds) drop out.
+        simulator's collision-free vocabulary (oxide-colliding gas names
+        namespaced with ``_gas``, the rest bare).  ``-inf`` rows (species
+        with no thermodynamic data, e.g. Cr gases in some builds) drop
+        out.
         """
         if raw is None:
             return {}
@@ -637,14 +681,35 @@ class VapoRockBackend(MeltBackend):
     @staticmethod
     def _strip_gas_suffix(species: Any) -> str:
         """
-        Map a VapoRock gas-species name onto the simulator's vocabulary.
+        Map a VapoRock gas-species name onto a collision-free simulator
+        vocabulary.
 
         VapoRock labels every gas species with a ``(g)`` phase suffix
-        (``Na(g)``, ``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``...);
-        the simulator uses bare names (``Na``, ``SiO``, ...).  This
-        strips a trailing ``(g)`` and surrounding whitespace.  A name
-        with no suffix is returned unchanged, so the normalization is
-        safe for mocked / legacy result dicts that already use bare
-        names.
+        (``Na(g)``, ``SiO(g)``, ``O2(g)``, ``SiO2(g)``, ``Al2O(g)``...).
+        Naively stripping the suffix would map ``SiO2(g)`` and
+        ``Fe2O3(g)`` onto ``SiO2`` / ``Fe2O3`` — the *exact* strings used
+        for the condensed melt oxides in ``OXIDE_SPECIES``.  A downstream
+        consumer keying ``vapor_pressures_Pa`` by species would then
+        conflate gaseous SiO2 with melt SiO2 and silently break the
+        atom-explicit ``SiO2 -> SiO + 1/2 O2`` stoichiometry.
+
+        To keep the gas vocabulary provably disjoint from the oxide
+        basis, a species that arrives with the explicit ``(g)`` marker
+        AND whose bare spelling is a member of ``OXIDE_SPECIES`` is
+        namespaced with ``_gas`` (``SiO2(g) -> SiO2_gas``,
+        ``FeO(g) -> FeO_gas``).  Every other gas species — ``Na``,
+        ``SiO``, ``O2``, ``Al2O``, ... — is already disjoint from the
+        oxide basis and is returned bare, so the builtin Antoine path
+        and the VapoRock path still share keys for the shared volatiles.
+
+        A name with no ``(g)`` marker is returned unchanged (stripped of
+        surrounding whitespace only): the marker is VapoRock's explicit
+        "this is a gas" signal, so mocked / legacy result dicts that
+        already use bare names are passed through untouched.
         """
-        return _GAS_SUFFIX_RE.sub('', str(species)).strip()
+        raw = str(species)
+        stripped = _GAS_SUFFIX_RE.sub('', raw).strip()
+        had_gas_marker = stripped != raw.strip()
+        if had_gas_marker and stripped in _OXIDE_COLLIDING_GAS_SPECIES:
+            return stripped + _GAS_NAMESPACE_SUFFIX
+        return stripped

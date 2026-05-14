@@ -233,7 +233,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Gas train feedback state ---
         self.O2_vented_cumulative_kg = 0.0      # Total O₂ vented to vacuum
         self.O2_stored_cumulative_kg = 0.0      # Total O₂ in accumulator
-        self._melt_offgas_O2_kg_this_hr = 0.0
         self._mre_anode_O2_kg_this_hr = 0.0
         self._last_nominal_ramp = 0.0           # Campaign ramp before throttle
         self._last_actual_ramp = 0.0            # Ramp after throttle applied
@@ -417,7 +416,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.oxygen_cumulative_kg = 0.0
         self.O2_vented_cumulative_kg = 0.0
         self.O2_stored_cumulative_kg = 0.0
-        self._melt_offgas_O2_kg_this_hr = 0.0
         self._mre_anode_O2_kg_this_hr = 0.0
         self._last_nominal_ramp = 0.0
         self._last_actual_ramp = 0.0
@@ -2414,7 +2412,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.paused_for_decision:
             # Return current state without advancing
             return self._make_snapshot()
-        self._melt_offgas_O2_kg_this_hr = 0.0
         self._mre_anode_O2_kg_this_hr = 0.0
 
         # --- 2. Temperature ramp ---
@@ -2487,11 +2484,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Pass the turbine spec so overhead model can enforce capacity limits,
         # compute O₂ venting, and calculate transport saturation.
         turbine_spec = self._get_turbine_spec()
-        melt_offgas_O2_kg_hr = max(
-            0.0,
-            self._ledger_o2_kg('process.overhead_gas'),
-            self._melt_offgas_O2_kg_this_hr,
-        )
+        # The AtomLedger is the canonical quantity authority (see AGENTS.md),
+        # so the turbine/vent decision is fed strictly the actual finite O2
+        # holdup in process.overhead_gas. This is NOT max()'d with a per-tick
+        # production counter: the holdup already includes this tick's
+        # evaporation O2 coproduct (credited in evaporation.py) plus any O2
+        # carried over from prior ticks not yet drained. max()-ing the two
+        # overlapping quantities would let the turbine see carried-over O2 as
+        # fresh throughput, or mask the case where holdup < this-hour output.
+        melt_offgas_O2_kg_hr = self._ledger_o2_kg('process.overhead_gas')
         self.overhead = self.overhead_model.update(
             evap_flux,
             self.melt,

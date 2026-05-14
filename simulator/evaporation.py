@@ -234,8 +234,6 @@ class EvaporationMixin:
             credits=tuple(credits),
             reason='evaporation and gas-train routing',
         )
-        if O2_kg > 1e-12:
-            self._melt_offgas_O2_kg_this_hr += O2_kg
         return condensed_kg
 
     def _condensed_products_for_vapor(

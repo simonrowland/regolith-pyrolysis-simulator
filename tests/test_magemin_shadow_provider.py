@@ -224,6 +224,31 @@ def test_parity_phase_only_in_shadow_flagged():
     assert report.phases_only_in_authoritative == ()
 
 
+def test_parity_does_not_treat_equilibration_temperature_as_liquidus():
+    # `temperature_C` on an EquilibriumResult is the temperature the melt
+    # was equilibrated AT -- not its liquidus. The comparator must not
+    # fall back to it: two results equilibrated at the same T would
+    # otherwise report liquidus_T_delta_K = 0 / agreement = True, a
+    # silent false positive. With no real liquidus on either side the
+    # conservative "cannot evaluate parity" branch must fire instead.
+    comp = MAGEMinParityComparator()
+    auth = {'temperature_C': 1600.0}
+    shadow = {'temperature_C': 1600.0}
+
+    report = comp.compare(auth, shadow)
+
+    assert report.agreement is False
+    assert report.liquidus_T_delta_K is None
+    assert any('cannot evaluate parity' in w for w in report.warnings)
+
+    # An explicit liquidus field IS still honored.
+    auth_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1350.0}
+    shadow_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1340.0}
+    real_report = comp.compare(auth_real, shadow_real)
+    assert real_report.liquidus_T_delta_K == pytest.approx(10.0)
+    assert real_report.agreement is True
+
+
 # ----------------------------------------------------------------------
 # Provider dispatch
 # ----------------------------------------------------------------------

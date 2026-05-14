@@ -17,6 +17,12 @@ from simulator.accounting.exceptions import (
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_species_formula
 from simulator.accounting.lots import MaterialLot
 
+# Per-transition mass-closure slack. Deliberately loose: a single backend
+# or evaporation transition may legitimately close a few grams short/long.
+# It bounds ONE transition only -- it does not bound cumulative drift across
+# a many-hundred-transition batch. That gap is guarded separately by
+# tests/test_mass_balance.py::test_cumulative_transition_mass_closure_bounded,
+# which sums abs(debit-credit) over a full C0->C6 run against a tight bound.
 DEFAULT_MASS_TOLERANCE_KG = 2e-2
 DEFAULT_ATOM_TOLERANCE_MOL = 1e-6
 DEFAULT_RELATIVE_TOLERANCE = 1e-9
