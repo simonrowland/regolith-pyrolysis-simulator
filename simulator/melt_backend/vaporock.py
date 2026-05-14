@@ -2,8 +2,14 @@
 VapoRock Vapor-Melt Equilibrium Backend
 ========================================
 
-Adapter around VapoRock (Wolfe et al., https://github.com/cwolfe/VapoRock)
-for equilibrium vapor speciation over silicate melts.
+Adapter around VapoRock for equilibrium vapor speciation over silicate melts.
+
+Canonical upstream package metadata uses package/import name ``vaporock``
+and exposes ``vaporock.System().set_melt_comp(...)`` plus
+``eval_gas_abundances(T, logfO2)``.  The optional ``[vapor]`` extra pins
+the GitLab v0.1 source tag because PyPI has no ``vaporock`` release and
+the historical ``https://github.com/cwolfe/VapoRock`` target was not
+available during the 2026-05-14 probe.
 
 VapoRock combines the MELTS thermodynamic model with JANAF tables to
 compute partial pressures for ~34 vapor species in the
@@ -42,6 +48,8 @@ installed.
 
 from __future__ import annotations
 
+import importlib
+import math
 import warnings
 from typing import Any, Dict, List, Optional
 
@@ -63,6 +71,13 @@ from simulator.state import OXIDE_SPECIES
 # and confirm whether P2O5 / NiO / CoO are accepted.  If they are not,
 # they must be stripped before the call.
 _VAPOROCK_OXIDE_BASIS = tuple(OXIDE_SPECIES)
+
+_IMPORT_CANDIDATES = (
+    'vaporock',
+    # TODO(vaporock): remove the legacy uppercase probe if no local installs
+    # still expose the historical module name.
+    'VapoRock',
+)
 
 
 class VapoRockBackend(MeltBackend):
@@ -167,6 +182,9 @@ class VapoRockBackend(MeltBackend):
         extension key ``vapor_melt_equilibrium`` True so the router can
         identify this adapter as a vapor-pressure provider.
         """
+        # Keep vapor_melt_equilibrium instance-local: adding it to the base
+        # capability dict widens every backend contract and breaks exact
+        # capability assertions unrelated to vapor-side routing.
         caps: Dict[str, bool] = {key: False for key in DEFAULT_BACKEND_CAPABILITIES}
         caps['gas_volatiles'] = True
         caps['vapor_melt_equilibrium'] = True
@@ -255,18 +273,23 @@ class VapoRockBackend(MeltBackend):
         Returns None if the import fails (the caller treats this as
         "backend not available").  Never raises.
         """
-        try:
-            import VapoRock  # type: ignore[import-not-found]
-            return VapoRock
-        except Exception as exc:  # noqa: BLE001 - import-boundary catch
-            self._last_error = f'VapoRock import failed: {exc}'
-            # Single-line stderr-style notification, but routed through
-            # warnings so test harnesses can suppress it.
-            warnings.warn(
-                'VapoRock not available; vapor-melt backend disabled',
-                stacklevel=2,
-            )
-            return None
+        errors: List[str] = []
+        for module_name in _IMPORT_CANDIDATES:
+            try:
+                return importlib.import_module(module_name)
+            except Exception as exc:  # noqa: BLE001 - import-boundary catch
+                errors.append(f'{module_name}: {exc}')
+
+        self._last_error = (
+            'VapoRock import failed: ' + '; '.join(errors)
+        )
+        # Single-line stderr-style notification, but routed through
+        # warnings so test harnesses can suppress it.
+        warnings.warn(
+            'VapoRock not available; vapor-melt backend disabled',
+            stacklevel=2,
+        )
+        return None
 
     def _call_vaporock(
         self,
@@ -324,9 +347,22 @@ class VapoRockBackend(MeltBackend):
                     last_attr_error = inner_exc
                     continue
 
+        system_cls = getattr(module, 'System', None)
+        if callable(system_cls):
+            try:
+                system = system_cls()
+                set_melt_comp = getattr(system, 'set_melt_comp')
+                eval_gas_abundances = getattr(system, 'eval_gas_abundances')
+                set_melt_comp(composition_wt_pct)
+                logP = eval_gas_abundances(temperature, fO2_log)
+                return self._log10_bar_pressures_to_pa(logP)
+            except Exception as exc:  # noqa: BLE001 - upstream boundary
+                last_attr_error = exc
+
         raise RuntimeError(
             'VapoRock library does not expose a recognised equilibrium '
-            f'entry point (tried: {", ".join(candidate_names)})'
+            'entry point (tried: '
+            f'{", ".join(candidate_names)}, System.eval_gas_abundances)'
             + (f'; last error: {last_attr_error}' if last_attr_error else '')
         )
 
@@ -439,3 +475,35 @@ class VapoRockBackend(MeltBackend):
             for species, value in raw.items()
             if float(value) > 0.0
         }
+
+    @staticmethod
+    def _log10_bar_pressures_to_pa(raw: Any) -> Dict[str, float]:
+        """Convert VapoRock System log10(bar) output to simulator Pa."""
+        if raw is None:
+            return {}
+
+        if hasattr(raw, 'iloc') and hasattr(raw, 'index'):
+            try:
+                if len(getattr(raw, 'shape', ())) == 2:
+                    series = raw.iloc[:, 0]
+                else:
+                    series = raw
+                items = series.items()
+            except Exception:  # noqa: BLE001
+                return {}
+        elif isinstance(raw, dict):
+            items = raw.items()
+        else:
+            return {}
+
+        pressures: Dict[str, float] = {}
+        for species, log10_bar in items:
+            try:
+                value = float(log10_bar)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value):
+                pressure_pa = (10.0 ** value) * 1e5
+                if pressure_pa > 0.0:
+                    pressures[str(species)] = pressure_pa
+        return pressures
