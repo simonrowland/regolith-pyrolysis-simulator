@@ -34,6 +34,14 @@ pip install -e ".[melts]"
 
 The `melts` extra currently includes `PetThermoTools`. VapoRock may be installed separately if needed.
 
+## AlphaMELTS Adapter Notes
+
+- Python path imports `petthermotools` and preloads `meltsdynamic.MELTSdynamic` during initialization.
+- Inputs are gated to `process.cleaned_melt` silicate oxides and normalized to the 14-oxide MELTS basis.
+- Gas, metal, salt, sulfide, halide, and low-major-oxide material is rejected before the engine.
+- `FeO_total` requires `QFM`, `NNO`, `IW`, `HM`, or configured `Fe3Fet`; no silent split.
+- `fO2_offset` is buffer-relative, and parsed results fill diagnostics only; AlphaMELTS emits no ledger transition.
+
 ## FactSAGE / ChemApp
 
 FactSAGE support lives in `simulator/melt_backend/factsage.py`. ChemApp is imported only inside backend initialization, so the repo still imports, runs, and tests without FactSAGE, ChemApp, licenses, or local thermodynamic data.
