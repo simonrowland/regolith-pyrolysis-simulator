@@ -15,6 +15,7 @@ This guide is for contributors and coding agents that need to find the right fil
 
 - `simulator/core.py` owns `PyrolysisSimulator`, batch lifecycle, campaign transitions, decisions, and snapshots.
 - `simulator/state.py` owns constants, enums, and dataclasses.
+- `simulator/decision_tree.py` routes operator decisions (Path A/B, Branch one/two, C6 yes/no, etc.).
 - `simulator/equilibrium.py` owns fallback thermodynamic equilibrium and vapor-pressure estimates.
 - `simulator/evaporation.py` owns Hertz-Knudsen evaporation, condensation routing, and melt composition updates.
 - `simulator/extraction.py` owns MRE, alkali shuttle, and Mg thermite helper methods.
@@ -30,6 +31,24 @@ This guide is for contributors and coding agents that need to find the right fil
 - `simulator/mass_balance.py` checks input and output accounting.
 - `simulator/persistence.py` handles YAML persistence.
 
+## Accounting
+
+- `simulator/accounting/__init__.py` re-exports the public ledger API.
+- `simulator/accounting/ledger.py` owns `AtomLedger`, the canonical mol-native store; per-transition `validate_conservation()`; `assert_balanced()`.
+- `simulator/accounting/formulas.py` owns the species formula registry and oxide/molecule atom counts.
+- `simulator/accounting/lots.py` provides lot-tracking helpers.
+- `simulator/accounting/exceptions.py` defines `UnbalancedTransitionError` and related errors.
+
+## Backends
+
+- `simulator/melt_backend/base.py` defines `MeltBackend` ABC, `EquilibriumResult` DTO, and `StubBackend` fallback.
+- `simulator/melt_backend/alphamelts.py` wires PetThermoTools and subprocess paths.
+- `simulator/melt_backend/factsage.py` wraps ChemApp via lazy import; requires license and .cst.
+- `simulator/melt_backend/vaporock.py` provides the vapor-pressure helper.
+- `simulator/melt_backend/installer.py` installs engine binaries and dependencies.
+- `simulator/melt_backend/factsage_config.py` loads FactSAGE configuration.
+- `simulator/melt_backend/factsage_doctor.py` runs FactSAGE diagnostics.
+
 ## Data
 
 - `data/feedstocks.yaml` is the main feedstock library.
@@ -39,4 +58,15 @@ This guide is for contributors and coding agents that need to find the right fil
 
 ## Testing
 
-Focused tests live under `tests/`. Current smoke coverage checks Stage 0 atmosphere behavior for hard-vacuum and Mars-backpressure feedstocks.
+- `tests/test_mass_balance.py` checks input/output mass accounting and process-inventory totals.
+- `tests/test_molar_accounting.py` enforces the mol-native accounting contract across modules.
+- `tests/test_extraction_ledger.py` verifies MRE/alkali/thermite extractions update the ledger correctly.
+- `tests/test_overhead_accounting.py` exercises gas-train mass and lot bookkeeping under load.
+- `tests/test_reagent_reservoirs.py` checks reagent reservoir lots and ledger contracts.
+- `tests/test_stage0_atmosphere.py` covers Stage 0 hard-vacuum and Mars-backpressure feedstocks.
+- `tests/test_feedstock_inventory.py` validates feedstock inventory loading and balance enforcement.
+- `tests/test_factsage_backend.py` exercises the FactSAGE backend with mocked ChemApp.
+- `tests/test_backend_kg_adapters.py` checks backend kg adapters against the mol-native contract.
+- `tests/test_public_payload_contract.py` pins the public Socket.IO payload contract.
+- `tests/test_web_events.py` covers web event handlers, launcher defaults, and simulation restarts.
+- `tests/test_artifact_guards.py` ensures local FactSAGE exports and licenses stay gitignored.
