@@ -746,11 +746,74 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._chem_registry.register_idempotent(provider, list(intents))
 
+        # Register the AlphaMELTS diagnostic provider when the active
+        # backend is an AlphaMELTSBackend (\goal ALPHAMELTS-DIAGNOSTIC-GATE,
+        # #8). The provider wraps the today-hook adapter; if the user has
+        # selected a different backend (Stub / FactSAGE / MAGEMin / VapoRock)
+        # nothing is registered for SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM
+        # and the kernel raises ProviderUnavailableError for those intents
+        # -- the equilibrium call site at simulator/equilibrium.py guards
+        # the dispatch on registry membership.
+        self._register_alphamelts_provider_if_available()
+
         return ChemistryKernel(
             ledger=self.atom_ledger,
             registry=self._chem_registry,
             species_formula_registry=self.species_formula_registry,
         )
+
+    def _register_alphamelts_provider_if_available(self) -> None:
+        """Register AlphaMELTSProvider when the active backend supports it.
+
+        \\goal ALPHAMELTS-DIAGNOSTIC-GATE (#8): AlphaMELTS is registered
+        as the authoritative (diagnostic-only) provider for
+        SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. The provider wraps the
+        live :class:`AlphaMELTSBackend` instance so the subprocess and
+        PetThermoTools paths stay owned by the today-hook adapter (goal
+        #1 hardened it; this goal only adds the kernel envelope around
+        it). The registration is conditional because:
+
+        * Only one authoritative provider may exist per intent
+          (:class:`ProviderRegistry` enforces this).
+        * Users may select a different backend (Stub / FactSAGE / etc.);
+          registering AlphaMELTS unconditionally would crash when the
+          backend is not an AlphaMELTSBackend (the provider would have
+          nowhere to delegate).
+
+        The duck-typed check (presence of ``_mode``, ``is_available``,
+        ``get_engine_version``) lets the registration accept future
+        AlphaMELTS subclasses without a hard isinstance gate.
+        """
+        backend = self.backend
+        if backend is None:
+            return
+        if not self._is_alphamelts_backend(backend):
+            return
+        from engines.alphamelts import AlphaMELTSProvider
+
+        provider = AlphaMELTSProvider(backend=backend)
+        self._chem_registry.register_idempotent(
+            provider,
+            [
+                ChemistryIntent.SILICATE_LIQUIDUS,
+                ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ],
+        )
+
+    @staticmethod
+    def _is_alphamelts_backend(backend: Any) -> bool:
+        """Duck-type check for the AlphaMELTSBackend class.
+
+        Avoids a hard import on ``simulator.melt_backend.alphamelts`` at
+        registration time (the adapter has optional dependencies). The
+        check matches the class name on the instance's MRO; this is the
+        same idiom used elsewhere in this module for VapoRock /
+        FactSAGE backend detection.
+        """
+        for cls in type(backend).__mro__:
+            if cls.__name__ == 'AlphaMELTSBackend':
+                return True
+        return False
 
     # ------------------------------------------------------------------
     # F-B1: Dispatch helpers
@@ -1589,7 +1652,68 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
+        # SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM intents -- kernel
+        # diagnostic.
+        #
+        # \goal ALPHAMELTS-DIAGNOSTIC-GATE (#8). When the active backend
+        # is an AlphaMELTSBackend the kernel-registered AlphaMELTSProvider
+        # owns SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM and attaches a
+        # LiquidusDiagnostics payload to ``result.alphamelts_diagnostics``
+        # for trace + UI. The provider is diagnostic-only:
+        # ``IntentResult.transition`` is ALWAYS None -- it cannot mutate
+        # the ledger. The legacy backend equilibration above remains the
+        # canonical compute path; this hook records a kernel-side view
+        # of the same call (the provider delegates to the same adapter
+        # instance), so the data flows through one engine, not two.
+        self._attach_post_equilibrium_alphamelts_diagnostic(result)
         return result
+
+    def _attach_post_equilibrium_alphamelts_diagnostic(self, result) -> None:
+        """Dispatch SILICATE_LIQUIDUS via the kernel and attach the diagnostic.
+
+        Belongs to \\goal ALPHAMELTS-DIAGNOSTIC-GATE (#8). Runs after
+        the backend equilibration and the VAPOR_PRESSURE / SulfSat
+        hooks. Behaviour:
+
+          - If no provider is registered for SILICATE_LIQUIDUS (the
+            active backend is not AlphaMELTS), this method is a no-op.
+            The kernel raises :class:`ProviderUnavailableError` in that
+            case; we catch and skip so non-AlphaMELTS users are
+            unaffected.
+          - Otherwise dispatch the intent through the kernel. The
+            provider runs the same backend instance the legacy path
+            just used and returns a LiquidusDiagnostics payload.
+          - Attach the diagnostic dict to
+            ``result.alphamelts_diagnostics`` (a free-form attribute the
+            EquilibriumResult dataclass does not reserve, so the
+            simulator gains visibility without changing the legacy
+            shape).
+          - The dispatch is read-only -- the provider never builds a
+            LedgerTransitionProposal. No commit_batch follows.
+        """
+        from simulator.chemistry.kernel.errors import (
+            ProviderUnavailableError as _ProviderUnavailableError,
+        )
+
+        # Both intents share the provider; SILICATE_LIQUIDUS is the
+        # "find the liquidus" call. SILICATE_EQUILIBRIUM is dispatched
+        # separately by call sites that need the full phase assemblage
+        # (none today; reserved for future migrations).
+        try:
+            kernel_result = self._dispatch_only(
+                ChemistryIntent.SILICATE_LIQUIDUS,
+                control_inputs={},
+            )
+        except _ProviderUnavailableError:
+            # No provider registered -> backend is not AlphaMELTS.
+            # Silent no-op so non-AlphaMELTS users keep their existing
+            # equilibrium-result shape. F-A4 no-op counter is not bumped
+            # here because the dispatch never reached a provider.
+            return
+        diagnostic = dict(kernel_result.diagnostic or {})
+        # Stash on a free-form attribute so the legacy
+        # EquilibriumResult dataclass stays backwards-compatible.
+        setattr(result, 'alphamelts_diagnostics', diagnostic)
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
         """Replace ``result.vapor_pressures_Pa`` with the kernel dispatch.
