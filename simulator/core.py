@@ -449,15 +449,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._apply_stage0_perchlorate_reactions(fs)
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
-        # Rebind the chemistry kernel to the freshly seeded ledger +
-        # registry. _seed_atom_ledger creates the ledger, so the kernel
-        # rebuild must come after. The provider registry persists; only
-        # the kernel facade is rebuilt per batch.
-        self._chem_kernel = self._build_chemistry_kernel()
-        # Per-batch diagnostic state must start clean -- the planner's
-        # shadow trace would otherwise accumulate without bound across
-        # campaigns / loop sessions.
-        self._chem_kernel.clear_shadow_trace()
+        # NOTE: ``_seed_atom_ledger`` now rebuilds ``self._chem_kernel``
+        # to point at the freshly created ledger (the STAGE0_PRETREATMENT
+        # intent flip needs the kernel up BEFORE the Stage 0 cleanup
+        # transitions are recorded -- so the rebuild moved into
+        # ``_seed_atom_ledger`` directly after the ``_new_atom_ledger``
+        # reset).  Provider registry persists; only the kernel facade
+        # is rebuilt per batch.
         self._last_backend_error = ''
         self._last_backend_status = 'ok'
         self._backend_failed = False
@@ -641,6 +639,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.metallothermic_step import (
             BuiltinMetallothermicStepProvider,
         )
+        from engines.builtin.stage0_pretreatment import (
+            BuiltinStage0PretreatmentProvider,
+        )
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
         # Each ``register_idempotent`` call is a no-op on subsequent
@@ -719,6 +720,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             BuiltinMetallothermicStepProvider(),
             [ChemistryIntent.METALLOTHERMIC_STEP],
         )
+        # STAGE0_PRETREATMENT -- FIFTH (and final builtin) authoritative
+        # ledger-mutating intent (volatile / salt / sulfide / halide
+        # cleanup, binding spec §2). Provider debits the Stage 0 feed /
+        # reservoir buckets (process.stage0_volatile_feed,
+        # process.stage0_salt_feed, process.stage0_carbon_reductant,
+        # process.stage0_perchlorate_feed, reservoir.stage0_oxidant,
+        # reservoir.stage0_process_gas) and credits the Stage 0 sinks
+        # (terminal.offgas, terminal.stage0_salt_phase,
+        # terminal.oxygen_stage0_stored).  Per-call inputs
+        # (reaction_family, plus the legacy spec payload: species /
+        # feed_kg / products_kg / oxidant_kg / debits /
+        # salt_products_kg / oxygen_products_kg) arrive via
+        # control_inputs from _record_stage0_*_transitions.  Single
+        # intent, four reaction families via discriminator
+        # (complete_oxidation, sulfate_carbon, boudouard, perchlorate)
+        # -- one dispatch per legacy spec entry preserves the legacy
+        # one-transition-per-spec shape so each chemical reaction is a
+        # single atom-balanced LedgerTransition.
+        #
+        # The SulfSat post-equilibrium gate (PySulfSat) stays where it
+        # was wired in by goal #4 (simulator/melt_backend/sulfsat.py +
+        # core.py::_attach_post_equilibrium_sulfsat); the Stage 0 flip
+        # changes ONLY where the cleanup transitions are built, not
+        # where the SulfSat diagnostic attaches.
+        self._chem_registry.register_idempotent(
+            BuiltinStage0PretreatmentProvider(),
+            [ChemistryIntent.STAGE0_PRETREATMENT],
+        )
         return ChemistryKernel(
             ledger=self.atom_ledger,
             registry=self._chem_registry,
@@ -731,8 +760,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
         additives_kg: Mapping[str, float],
     ) -> None:
-        """Seed atom ledger from current kg inventory projections."""
+        """Seed atom ledger from current kg inventory projections.
+
+        The STAGE0_PRETREATMENT intent flip routes the Stage 0 cleanup
+        transitions through ``self._chem_kernel`` -- so the kernel
+        facade MUST be rebuilt to point at the freshly created ledger
+        BEFORE ``_record_stage0_*_transitions`` runs.  Build the kernel
+        immediately after the ledger reset; ``load_batch`` no longer
+        rebuilds it after :meth:`_seed_atom_ledger` returns.
+        """
         self.atom_ledger = self._new_atom_ledger()
+        self._chem_kernel = self._build_chemistry_kernel()
+        # Per-batch diagnostic state must start clean -- the planner's
+        # shadow trace would otherwise accumulate without bound across
+        # campaigns / loop sessions.
+        self._chem_kernel.clear_shadow_trace()
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
             self._stage0_oxidation_transition_specs(feedstock))
@@ -902,65 +944,77 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         label: str,
         specs: list[dict],
     ) -> None:
+        """Kernel-route the Stage 0 complete-oxidation transitions.
+
+        STAGE0_PRETREATMENT intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) seventh flip.  The
+        :class:`BuiltinStage0PretreatmentProvider` mirrors the legacy
+        ``complete_oxidation`` stoichiometry line-for-line and emits
+        one :class:`LedgerTransitionProposal` per spec entry
+        (per-species) debiting ``process.stage0_volatile_feed`` (and
+        ``reservoir.stage0_oxidant`` when O2-deficient) and crediting
+        ``terminal.offgas`` (CO2/H2O/N2) + ``terminal.oxygen_stage0_stored``
+        (O2 coproduct when the feed is O2-surplus, e.g. peroxides).
+        :meth:`ChemistryKernel.commit_batch` is the sole writable path
+        into the ledger for this intent after the flip; the legacy
+        ``self.atom_ledger.record`` direct mutation is gone.
+
+        The ``load_external`` calls are kept here -- they bring source
+        mass IN to the process accounts from the feedstock inventory
+        (legacy seeding semantics), which is distinct from the
+        chemistry-transition payload the kernel commits.
+        """
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_COMPLETE_OXIDATION,
+        )
+
+        feed_account = 'process.stage0_volatile_feed'
+        oxidant_account = 'reservoir.stage0_oxidant'
         for spec in specs:
             species = str(spec['species'])
             feed_kg = float(spec['feed_kg'])
             products_kg = dict(spec['products_kg'])
             oxidant_kg = float(spec['oxidant_kg'])
 
-            feed_account = 'process.stage0_volatile_feed'
-            oxidant_account = 'reservoir.stage0_oxidant'
+            # Seed the feed + oxidant accounts (legacy
+            # load_external semantics; the proposal layer expects the
+            # accounts to hold material before it debits them).
             self.atom_ledger.load_external(
                 feed_account,
                 {species: feed_kg},
                 source=f'{label} Stage 0 {species} feed',
             )
-            debits = [
-                self.atom_ledger.debit(
-                    feed_account,
-                    {species: feed_kg},
-                    source=f'{label} Stage 0 {species} feed',
-                )
-            ]
             if oxidant_kg > 1e-12:
                 self.atom_ledger.load_external(
                     oxidant_account,
                     {'O2': oxidant_kg},
                     source=f'{label} Stage 0 controlled O2 oxidant',
                 )
-                debits.append(
-                    self.atom_ledger.debit(
-                        oxidant_account,
-                        {'O2': oxidant_kg},
-                        source=f'{label} Stage 0 controlled O2 oxidant',
-                    )
-                )
-            oxygen_kg = max(0.0, float(products_kg.pop(OXYGEN_SPECIES, 0.0)))
-            credits = []
-            if products_kg:
-                credits.append(
-                    self.atom_ledger.credit(
-                        'terminal.offgas',
-                        products_kg,
-                        source=f'{label} Stage 0 oxidized {species} offgas',
-                    )
-                )
-            if oxygen_kg > 1e-12:
-                credits.append(
-                    self.atom_ledger.credit(
-                        OXYGEN_STAGE0_ACCOUNT,
-                        {OXYGEN_SPECIES: oxygen_kg},
-                        source=f'{label} Stage 0 oxidized {species} oxygen',
-                    )
-                )
-            self.atom_ledger.record(
-                f'stage0_complete_oxidation_{species}',
-                debits=debits,
-                credits=credits,
-                reason=(
-                    'Stage 0 complete oxidation records organic volatile '
-                    'atoms and controlled O2 input explicitly.'
-                ),
+
+            kernel_result = self._chem_kernel.dispatch(
+                ChemistryIntent.STAGE0_PRETREATMENT,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_COMPLETE_OXIDATION,
+                    'species': species,
+                    'feed_kg': feed_kg,
+                    'products_kg': products_kg,
+                    'oxidant_kg': oxidant_kg,
+                },
+            )
+            proposal = kernel_result.transition
+            if proposal is None:
+                continue
+            # commit_batch is the ONLY writable path into the AtomLedger
+            # for the Stage 0 complete-oxidation transition after this
+            # flip. The kernel re-validates intent authority, the account
+            # filter, and atom balance against the registry's authoritative
+            # provider for STAGE0_PRETREATMENT (defence in depth matching
+            # the prior authoritative-intent flips).  No direct
+            # self.atom_ledger.record happens from this method anymore.
+            self._chem_kernel.commit_batch(
+                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     def _record_stage0_carbon_cleanup_transitions(
@@ -968,8 +1022,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         label: str,
         specs: list[dict],
     ) -> None:
+        """Kernel-route Stage 0 carbon cleanup transitions.
+
+        STAGE0_PRETREATMENT intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) seventh flip.  Each
+        spec is dispatched as either ``sulfate_carbon`` (SO3 + C ->
+        SO2 + CO) or ``boudouard`` (C + CO2 -> 2 CO) family based on
+        the legacy spec name; the provider emits a
+        :class:`LedgerTransitionProposal` debiting the spec's feed
+        accounts and crediting ``terminal.offgas`` with the reactions'
+        products.  :meth:`ChemistryKernel.commit_batch` is the sole
+        writable path into the ledger for this intent after the flip;
+        the legacy ``self.atom_ledger.record`` direct mutation is gone.
+
+        The ``load_external`` calls are kept here for legacy seeding
+        semantics (process.stage0_salt_feed,
+        process.stage0_carbon_reductant, reservoir.stage0_process_gas)
+        -- bringing source mass IN from the feedstock inventory is
+        distinct from the chemistry-transition payload the kernel
+        commits.
+        """
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_BOUDOUARD,
+            REACTION_FAMILY_SULFATE_CARBON,
+        )
+
+        # Map legacy spec names to provider reaction-family
+        # discriminators.  The provider rejects anything outside
+        # VALID_REACTION_FAMILIES as ``unsupported``; the map below
+        # mirrors the two carbon-cleanup reaction IDs the legacy
+        # ``_stage0_carbon_cleanup_reaction_ids`` validates exactly.
+        SPEC_FAMILY = {
+            'stage0_sulfate_carbon_cleanup': REACTION_FAMILY_SULFATE_CARBON,
+            'stage0_boudouard_carbon_cleanup': REACTION_FAMILY_BOUDOUARD,
+        }
+
         for spec in specs:
-            debits = []
+            name = str(spec.get('name') or '')
+            family = SPEC_FAMILY.get(name)
+            if family is None:
+                raise AccountingError(
+                    f'unsupported Stage 0 carbon cleanup spec {name!r}'
+                )
+            # Seed source accounts (legacy load_external semantics).
+            debits_payload: list[tuple[str, dict[str, float]]] = []
             for account, species_kg in spec['debits']:
                 payload = self._ledger_species_kg(species_kg)
                 if not payload:
@@ -977,28 +1073,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.atom_ledger.load_external(
                     account,
                     payload,
-                    source=f"{label} {spec['name']} feed",
+                    source=f"{label} {name} feed",
                 )
-                debits.append(
-                    self.atom_ledger.debit(
-                        account,
-                        payload,
-                        source=f"{label} {spec['name']} feed",
-                    )
-                )
-            if not debits:
+                debits_payload.append((str(account), dict(payload)))
+            if not debits_payload:
                 continue
-            self.atom_ledger.record(
-                spec['name'],
-                debits=debits,
-                credits=[
-                    self.atom_ledger.credit(
-                        'terminal.offgas',
-                        spec['products_kg'],
-                        source=f"{label} {spec['name']} offgas",
-                    )
-                ],
-                reason='Stage 0 carbon cleanup uses explicit atom reactions.',
+
+            kernel_result = self._chem_kernel.dispatch(
+                ChemistryIntent.STAGE0_PRETREATMENT,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
+                control_inputs={
+                    'reaction_family': family,
+                    'debits': tuple(debits_payload),
+                    'products_kg': dict(spec.get('products_kg') or {}),
+                },
+            )
+            proposal = kernel_result.transition
+            if proposal is None:
+                continue
+            self._chem_kernel.commit_batch(
+                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     def _record_stage0_perchlorate_cleanup_transitions(
@@ -1006,8 +1101,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         label: str,
         specs: list[dict],
     ) -> None:
+        """Kernel-route Stage 0 perchlorate cleanup transitions.
+
+        STAGE0_PRETREATMENT intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) seventh flip.  Each
+        spec is dispatched as ``perchlorate`` family (ClO4 -> Cl +
+        2 O2) -- the provider emits a :class:`LedgerTransitionProposal`
+        debiting ``process.stage0_perchlorate_feed`` (ClO4) and
+        crediting ``terminal.stage0_salt_phase`` (Cl) + ``terminal.
+        oxygen_stage0_stored`` (O2).
+        :meth:`ChemistryKernel.commit_batch` is the sole writable path
+        into the ledger for this intent after the flip; the legacy
+        ``self.atom_ledger.record`` direct mutation is gone.
+
+        The ``load_external`` call is kept here for legacy seeding
+        semantics (process.stage0_perchlorate_feed) -- bringing source
+        mass IN from the salt-phase inventory is distinct from the
+        chemistry-transition payload the kernel commits.
+        """
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_PERCHLORATE,
+        )
+
         for spec in specs:
-            debits = []
+            debits_payload: list[tuple[str, dict[str, float]]] = []
             for account, species_kg in spec['debits']:
                 payload = self._ledger_species_kg(species_kg)
                 if not payload:
@@ -1017,35 +1134,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     payload,
                     source=f"{label} {spec['name']} feed",
                 )
-                debits.append(
-                    self.atom_ledger.debit(
-                        account,
-                        payload,
-                        source=f"{label} {spec['name']} feed",
-                    )
-                )
-            if not debits:
+                debits_payload.append((str(account), dict(payload)))
+            if not debits_payload:
                 continue
-            credits = []
-            salt_products = self._ledger_species_kg(spec['salt_products_kg'])
-            if salt_products:
-                credits.append(self.atom_ledger.credit(
-                    'terminal.stage0_salt_phase',
-                    salt_products,
-                    source=f"{label} {spec['name']} salt product",
-                ))
-            oxygen_products = self._ledger_species_kg(spec['oxygen_products_kg'])
-            if oxygen_products:
-                credits.append(self.atom_ledger.credit(
-                    OXYGEN_STAGE0_ACCOUNT,
-                    oxygen_products,
-                    source=f"{label} {spec['name']} oxygen product",
-                ))
-            self.atom_ledger.record(
-                spec['name'],
-                debits=debits,
-                credits=credits,
-                reason='Stage 0 perchlorate cleanup uses explicit atom reactions.',
+
+            kernel_result = self._chem_kernel.dispatch(
+                ChemistryIntent.STAGE0_PRETREATMENT,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_PERCHLORATE,
+                    'debits': tuple(debits_payload),
+                    'salt_products_kg': dict(
+                        spec.get('salt_products_kg') or {}),
+                    'oxygen_products_kg': dict(
+                        spec.get('oxygen_products_kg') or {}),
+                },
+            )
+            proposal = kernel_result.transition
+            if proposal is None:
+                continue
+            self._chem_kernel.commit_batch(
+                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     # ------------------------------------------------------------------

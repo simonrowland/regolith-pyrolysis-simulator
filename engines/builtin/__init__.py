@@ -40,15 +40,25 @@ NOT loop back through ``simulator/__init__.py``.
 from engines.builtin.condensation_route import (
     BuiltinCondensationRouteProvider,
 )
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
+)
+from engines.builtin.metallothermic_step import (
+    BuiltinMetallothermicStepProvider,
+)
+from engines.builtin.stage0_pretreatment import (
+    BuiltinStage0PretreatmentProvider,
 )
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
 __all__ = [
     "BuiltinCondensationRouteProvider",
+    "BuiltinElectrolysisStepProvider",
     "BuiltinEvaporationFluxProvider",
     "BuiltinEvaporationTransitionProvider",
+    "BuiltinMetallothermicStepProvider",
+    "BuiltinStage0PretreatmentProvider",
     "BuiltinVaporPressureProvider",
 ]
