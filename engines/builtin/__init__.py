@@ -16,6 +16,11 @@ Public exports:
 - :class:`BuiltinEvaporationTransitionProvider` -- authoritative provider
   for ``ChemistryIntent.EVAPORATION_TRANSITION`` (mol-native
   debit/credit pair; the first ledger-mutating intent in the migration).
+- :class:`BuiltinCondensationRouteProvider` -- authoritative provider
+  for ``ChemistryIntent.CONDENSATION_ROUTE`` (mol-native
+  debit overhead_gas / credit condensation_train; the second
+  ledger-mutating intent in the migration, owns SiO disproportionation
+  on deposition).
 
 Package-init cycle convention (binding for every provider in this
 package): the providers must NOT top-level-import
@@ -32,6 +37,9 @@ method bodies (``dispatch`` and helpers in ``_common.py``) and let
 NOT loop back through ``simulator/__init__.py``.
 """
 
+from engines.builtin.condensation_route import (
+    BuiltinCondensationRouteProvider,
+)
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
@@ -39,6 +47,7 @@ from engines.builtin.evaporation_transition import (
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
 __all__ = [
+    "BuiltinCondensationRouteProvider",
     "BuiltinEvaporationFluxProvider",
     "BuiltinEvaporationTransitionProvider",
     "BuiltinVaporPressureProvider",

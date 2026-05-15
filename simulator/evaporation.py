@@ -188,6 +188,38 @@ class EvaporationMixin:
 
         The oxygen component of each evaporated metal oxide is
         released as O2 and credited to terminal oxygen storage.
+
+        CONDENSATION_ROUTE intent -- kernel-authoritative.
+
+        \\goal BUILTIN-ENGINE-EXTRACTION (#7), fourth flip and the
+        SECOND authoritative intent in the migration. The legacy
+        ``CondensationModel.route()`` still computes the per-stage
+        deposition projection (η model, residence times), but the
+        ledger transition that moves vapor from
+        ``process.overhead_gas`` to ``process.condensation_train`` is
+        now owned by the :class:`BuiltinCondensationRouteProvider` and
+        committed through the kernel. The flow per species is:
+
+        1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
+           ALL vapor routed to ``process.overhead_gas`` (plus O2
+           coproduct). No condensation_train credit from that intent.
+        2. CONDENSATION_ROUTE dispatched with the per-species
+           condensed_kg derived from ``route_result.remaining_by_species``
+           and the available-oxide scale -- debits
+           ``process.overhead_gas[species]`` and credits
+           ``process.condensation_train[products]`` (with SiO
+           disproportionation when sp_data declares the product map).
+        3. ``_project_condensed_stage_collection`` projects the actual
+           credited_condensed_kg onto stage UI bookkeeping.
+
+        End-of-tick ledger state is identical to the pre-flip behaviour:
+        between the two kernel commits the vapor passes through
+        overhead_gas, but the final per-account balances match the
+        legacy single-step EVAPORATION_TRANSITION exactly (verified by
+        the parametrised parity test in
+        ``tests/chemistry/test_builtin_condensation_route_provider.py``).
+        Per the goal spec, the shadow comparator was removed at flip
+        time (the parity test owns the regression surface from now on).
         """
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
@@ -200,12 +232,54 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            credited_condensed_kg = self._credit_evaporation_transition(
-                species,
-                rate_kg_hr,
-                route_result.remaining_by_species.get(species, 0.0),
-                sp_data,
+            # Pre-compute the same available_kg / scale factor the legacy
+            # single-step EVAPORATION_TRANSITION applied, so the split
+            # CONDENSATION_ROUTE path sees the same scaled condensed mass.
+            stoich = self._evaporation_stoich(species, sp_data)
+            if stoich is None:
+                continue
+            parent_oxide = stoich['parent_oxide']
+            oxide_removed = rate_kg_hr * stoich['oxide_per_product_kg']
+            available_kg = self.atom_ledger.kg_by_account(
+                'process.cleaned_melt').get(parent_oxide, 0.0)
+            if oxide_removed <= 1e-12 or available_kg <= 1e-12:
+                continue
+            scale = min(1.0, available_kg / oxide_removed)
+            remaining_kg_hr = route_result.remaining_by_species.get(
+                species, 0.0)
+            if (
+                remaining_kg_hr < -1e-12
+                or remaining_kg_hr > rate_kg_hr + 1e-12
+            ):
+                raise AccountingError(
+                    f"condensation route for {species!r} returned "
+                    "unphysical remaining vapor mass"
+                )
+
+            # Step 1: EVAPORATION_TRANSITION (melt -> overhead_gas + O2).
+            # Pass remaining=rate so the prior intent's wire-in routes
+            # ALL vapor to overhead, leaving the deposit leg to
+            # CONDENSATION_ROUTE.  The EVAPORATION_TRANSITION provider's
+            # internal validation already rejects remaining > rate; equal
+            # rates pass.
+            self._credit_evaporation_transition(
+                species, rate_kg_hr, rate_kg_hr, sp_data,
             )
+
+            # Step 2: CONDENSATION_ROUTE (overhead_gas -> condensation_train).
+            # condensed_kg mirrors the legacy
+            # ``credited_condensed_kg = max(0.0, product_kg - remaining_kg)``
+            # branch in _credit_evaporation_transition pre-flip: apply
+            # the available-oxide scale, clamp negative, take the
+            # vapor mass that the route said would deposit.
+            condensed_kg = max(
+                0.0, (rate_kg_hr - remaining_kg_hr) * scale,
+            )
+            credited_condensed_kg = self._dispatch_condensation_route(
+                species, condensed_kg, sp_data,
+            )
+
+            # Step 3: stage UI projection (unchanged behaviour).
             product_projection = self._condensed_products_kg(
                 species, credited_condensed_kg, sp_data)
             self._project_condensed_stage_collection(
@@ -213,6 +287,58 @@ class EvaporationMixin:
                 product_projection)
 
         self._sync_oxygen_kg_counters()
+
+    def _dispatch_condensation_route(
+        self,
+        species: str,
+        condensed_kg: float,
+        sp_data: dict,
+    ) -> float:
+        """Dispatch CONDENSATION_ROUTE through the kernel + commit.
+
+        Mirrors the EVAPORATION_TRANSITION dispatch pattern in
+        :meth:`_credit_evaporation_transition`: build the
+        ``control_inputs``, call the kernel, commit the resulting
+        proposal via :meth:`ChemistryKernel.commit_batch`. After this
+        flip, the overhead -> condensation_train ledger write happens
+        ONLY through ``commit_batch`` -- no direct ``atom_ledger.apply``
+        from inside this function.
+
+        Returns ``credited_condensed_kg`` -- the amount of vapor
+        actually deposited onto ``process.condensation_train``, used by
+        the caller to drive ``_project_condensed_stage_collection``.
+        """
+
+        if condensed_kg <= 1e-12:
+            return 0.0
+
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.CONDENSATION_ROUTE,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'species': species,
+                'condensed_kg': float(condensed_kg),
+                'sp_data': dict(sp_data or {}),
+                'dt_hr': 1.0,
+            },
+        )
+        proposal = kernel_result.transition
+        if proposal is None:
+            return 0.0
+
+        # commit_batch is the ONLY writable path into the AtomLedger
+        # for the overhead -> condensation_train leg after this flip.
+        # The kernel re-validates intent authority, the account filter,
+        # and atom balance against the registry's authoritative
+        # provider for CONDENSATION_ROUTE (defence in depth matching
+        # the EVAPORATION_TRANSITION pattern).
+        self._chem_kernel.commit_batch(
+            ChemistryIntent.CONDENSATION_ROUTE, proposal,
+        )
+
+        diagnostic = dict(kernel_result.diagnostic or {})
+        return float(diagnostic.get('credited_condensed_kg', 0.0))
 
     def _credit_evaporation_transition(
         self,

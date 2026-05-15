@@ -626,6 +626,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Lazy import to break the package-init cycle (see header comment
         # on the chemistry-kernel imports above).
+        from engines.builtin.condensation_route import (
+            BuiltinCondensationRouteProvider,
+        )
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -661,6 +664,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._chem_registry.register_idempotent(
             BuiltinEvaporationTransitionProvider(),
             [ChemistryIntent.EVAPORATION_TRANSITION],
+        )
+        # CONDENSATION_ROUTE -- SECOND authoritative ledger-mutating
+        # intent. Provider emits LedgerTransitionProposal that debits
+        # process.overhead_gas (vapor) and credits
+        # process.condensation_train (deposit, with SiO disproportionation
+        # to Si + SiO2 when sp_data declares the product map). Per-call
+        # inputs (species, condensed_kg, sp_data, dt_hr) arrive via
+        # control_inputs from _route_to_condensation; the legacy
+        # CondensationModel.route() projection is consumed at the caller
+        # to derive per-species condensed_kg before dispatch.
+        self._chem_registry.register_idempotent(
+            BuiltinCondensationRouteProvider(),
+            [ChemistryIntent.CONDENSATION_ROUTE],
         )
         return ChemistryKernel(
             ledger=self.atom_ledger,
