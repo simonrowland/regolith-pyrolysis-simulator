@@ -21,6 +21,21 @@ License: see upstream MAGEMin repository (Riel et al.).  Cite:
     Riel N. et al., "MAGEMin, an efficient Gibbs energy minimizer
     for geodynamic modelling," G-cubed (paper).
 
+Python bridge
+-------------
+MAGEMin has **no pure-PyPI package** — the clone ships zero Python
+files, no ``setup.py``, no ``pyproject.toml``.  Its primary interface is
+Julia (``MAGEMin_C.jl``); from Python it is reached either through that
+Julia bridge or by driving the compiled ``MAGEMin`` binary over a
+subprocess.  This adapter's supported, default path is **subprocess**:
+``initialize()`` locates the compiled binary (sibling clone
+``../MAGEMin/MAGEMin`` or ``engines/magemin/{,bin/}MAGEMin``) and
+``_call_magemin`` invokes it with ``--Verb=0`` single-point arguments,
+parsing the compact ``Phase :`` / ``Mode :`` stdout block.  The optional
+``pymagemin`` / ``julia`` bridges are still probed first if a caller has
+them installed, but the binary is the canonical route.  See
+``pyproject.toml`` ``[magemin]`` for the build path.
+
 Intended call site
 ------------------
 This adapter is intended to run in **shadow mode** alongside alphaMELTS
@@ -80,6 +95,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import subprocess
 import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
@@ -118,13 +134,16 @@ class MAGEMinBackend(MeltBackend):
         database:          MAGEMin internal database identifier (e.g.
                            ``'ig'`` for the igneous database).  Defaults
                            to ``'ig'``.
-        python_bridge:     ``'ctypes'`` or ``'julia'``.  Defaults to
-                           autodetect — the adapter prefers the
-                           ``pymagemin`` Python package when present,
-                           otherwise tries ``ctypes`` against the
-                           shared library shipped with the binary, and
-                           finally falls back to the ``julia`` bridge
-                           if PyJulia is installed.
+        python_bridge:     ``'subprocess'``, ``'pymagemin'``, ``'ctypes'``
+                           or ``'julia'``.  Defaults to autodetect — the
+                           adapter prefers the ``pymagemin`` Python
+                           package when present, then ``ctypes`` against
+                           the shared library shipped with the binary,
+                           then the ``julia`` bridge if PyJulia is
+                           installed, and finally falls back to driving
+                           the compiled ``MAGEMin`` binary over a
+                           subprocess.  Subprocess is the supported
+                           default because MAGEMin has no PyPI package.
     """
 
     name = 'magemin'
@@ -133,7 +152,8 @@ class MAGEMinBackend(MeltBackend):
         self._available: bool = False
         self._config: Dict[str, Any] = {}
         self._database: str = 'ig'
-        self._bridge: Optional[str] = None  # 'pymagemin' | 'ctypes' | 'julia'
+        # 'subprocess' | 'pymagemin' | 'ctypes' | 'julia'
+        self._bridge: Optional[str] = None
         self._magemin_module: Optional[Any] = None
         self._binary_path: Optional[Path] = None
         self._warnings: List[str] = []
@@ -147,9 +167,12 @@ class MAGEMinBackend(MeltBackend):
         """
         Detect MAGEMin and stash configuration.
 
-        Returns True only if **both** the MAGEMin binary AND its Python
-        bridge are present.  Either missing leaves ``is_available()``
-        False so the simulator can route around it.
+        Returns True if the compiled MAGEMin binary is present.  The
+        binary is always usable through the ``subprocess`` bridge; the
+        ``pymagemin`` / ``ctypes`` / ``julia`` bridges are preferred when
+        a caller has them installed but are not required.  A missing
+        binary leaves ``is_available()`` False so the simulator can route
+        around it.
         """
         self._available = False
         self._warnings = []
@@ -169,14 +192,16 @@ class MAGEMinBackend(MeltBackend):
 
         bridge, module = self._import_magemin_bridge(
             requested=self._config.get('python_bridge'))
-        if bridge is None or module is None:
+        if bridge is None:
+            # Should not happen: _import_magemin_bridge always returns the
+            # subprocess bridge when a binary was located.  Guard anyway.
             self._warn(
-                'MAGEMin Python bridge not available '
-                '(tried pymagemin, ctypes, julia); backend disabled'
+                'MAGEMin binary located but no usable bridge resolved; '
+                'backend disabled'
             )
             return False
         self._bridge = bridge
-        self._magemin_module = module
+        self._magemin_module = module  # None for the subprocess bridge
 
         self._available = True
         return True
@@ -255,7 +280,10 @@ class MAGEMinBackend(MeltBackend):
             fO2_log=fO2_log,
         )
 
-        if not self._available or self._magemin_module is None:
+        # The subprocess bridge has no Python module (the binary is the
+        # bridge); the other bridges do.  Either way the backend must be
+        # available with a resolved bridge.
+        if not self._available or self._bridge is None:
             result.warnings.append('MAGEMin backend not initialized')
             return result
 
@@ -313,12 +341,15 @@ class MAGEMinBackend(MeltBackend):
     @staticmethod
     def _locate_binary(explicit: Optional[Any]) -> Optional[Path]:
         """
-        Find the MAGEMin binary.
+        Find the compiled MAGEMin binary.
 
         Order of preference:
-            1. explicit path from config
-            2. ``engines/magemin/MAGEMin`` relative to repo root
-            3. ``MAGEMin`` on the system PATH
+            1. explicit path from config (``binary_path``)
+            2. ``engines/magemin/{,bin/}MAGEMin`` relative to repo root
+            3. ``../MAGEMin/MAGEMin`` — a sibling clone built in place
+               (the documented build location, see ``pyproject.toml``
+               ``[magemin]``)
+            4. ``MAGEMin`` on the system PATH
         """
         if explicit:
             path = Path(str(explicit)).expanduser()
@@ -330,6 +361,8 @@ class MAGEMinBackend(MeltBackend):
         candidates = [
             project_root / 'engines' / 'magemin' / 'MAGEMin',
             project_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
+            # Sibling clone built in place — see pyproject.toml [magemin].
+            project_root.parent / 'MAGEMin' / 'MAGEMin',
         ]
         for candidate in candidates:
             if candidate.exists() and os.access(candidate, os.X_OK):
@@ -345,18 +378,32 @@ class MAGEMinBackend(MeltBackend):
         self, *, requested: Optional[Any]
     ) -> Tuple[Optional[str], Optional[Any]]:
         """
-        Lazy-import the Python bridge to MAGEMin.
+        Resolve the bridge to MAGEMin.
 
-        Returns ``(bridge_name, module)`` on success, ``(None, None)``
-        if no usable bridge is installed.  Never raises.
+        Returns ``(bridge_name, module)``.  ``module`` is the imported
+        Python module for the ``pymagemin`` / ``ctypes`` / ``julia``
+        bridges, and ``None`` for the ``subprocess`` bridge (the compiled
+        binary is the bridge — there is nothing to import).  Returns
+        ``('subprocess', None)`` as the final fallback whenever a binary
+        was located, so a built MAGEMin is always usable even with no
+        Python package installed.  Returns ``(None, None)`` only if no
+        bridge at all can be resolved.  Never raises.
 
-        TODO(magemin): once the upstream Python entry point stabilises,
-        collapse this to a single named import.  Today the published
-        bridges are:
-            - ``pymagemin``: third-party ctypes wrapper.
-            - direct ``ctypes`` against ``libMAGEMin.so`` shipped with
-              the binary.
-            - ``julia`` bridge via ``MAGEMin.jl`` for PyJulia users.
+        MAGEMin has no PyPI package, so the published bridges are:
+            - ``subprocess``: drive the compiled ``MAGEMin`` binary
+              directly (the supported default).
+            - ``pymagemin``: third-party ctypes wrapper (rare).
+            - direct ``ctypes`` against ``libMAGEMin.so``/``.dylib``
+              shipped with the binary.
+            - ``julia`` bridge via ``MAGEMin_C.jl`` for PyJulia /
+              juliacall users.
+
+        Autodetect order is ``pymagemin -> julia -> subprocess``.
+        ``ctypes`` is deliberately NOT auto-selected: its struct
+        marshaling is unimplemented (``_call_magemin`` raises for it), so
+        auto-preferring it over the working subprocess path would break a
+        binary that is actually usable.  ``ctypes`` is reachable only via
+        an explicit ``python_bridge="ctypes"`` config.
         """
         normalised = (str(requested).lower().strip()
                       if requested is not None else None)
@@ -369,27 +416,33 @@ class MAGEMinBackend(MeltBackend):
                 if normalised == 'pymagemin':
                     self._last_error = f'pymagemin import failed: {exc}'
 
-        if normalised in (None, 'ctypes'):
+        # ctypes only when explicitly requested — see docstring.
+        if normalised == 'ctypes':
             ctypes_module = self._try_ctypes_bridge()
             if ctypes_module is not None:
                 return 'ctypes', ctypes_module
-            if normalised == 'ctypes':
-                self._last_error = (
-                    'MAGEMin ctypes bridge unavailable '
-                    '(libMAGEMin shared library not found)'
-                )
+            self._last_error = (
+                'MAGEMin ctypes bridge unavailable '
+                '(libMAGEMin shared library not found)'
+            )
 
         if normalised in (None, 'julia'):
             try:
                 import julia  # type: ignore[import-not-found]
                 # PyJulia is heavy — only flag as available if the
-                # MAGEMin.jl package import succeeds.
+                # MAGEMin_C.jl package import succeeds.
                 from julia import Main as JuliaMain  # noqa: F401
-                JuliaMain.eval('import MAGEMin')  # may raise
+                JuliaMain.eval('import MAGEMin_C')  # may raise
                 return 'julia', julia
             except Exception as exc:  # noqa: BLE001
                 if normalised == 'julia':
                     self._last_error = f'julia bridge import failed: {exc}'
+
+        # Subprocess fallback: the binary located in initialize() is
+        # itself the bridge.  This is the supported default — MAGEMin
+        # ships no PyPI package, so a built binary must always be usable.
+        if normalised in (None, 'subprocess') and self._binary_path is not None:
+            return 'subprocess', None
 
         warnings.warn(
             'MAGEMin not available; silicate-melt shadow backend disabled',
@@ -429,6 +482,36 @@ class MAGEMinBackend(MeltBackend):
     # Library call
     # ------------------------------------------------------------------
 
+    # MAGEMin's igneous (``ig``) database ``--Bulk`` order.  See the
+    # binary's ``--help``: 'ig' expects
+    #   SiO2, Al2O3, CaO, MgO, FeOt, K2O, Na2O, TiO2, O, Cr2O3, H2O
+    # FeOt is *total* iron — the simulator's FeO + Fe2O3 are folded into
+    # it, and ``O`` is the free redox component (left at 0; fO2 is set by
+    # the ``--buffer`` argument instead).
+    _IG_BULK_ORDER: Tuple[str, ...] = (
+        'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O', 'TiO2',
+        'O', 'Cr2O3', 'H2O',
+    )
+
+    # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
+    # works in absolute log10(fO2); MAGEMin's single-point CLI takes a
+    # named buffer, so absent an explicit buffer config the adapter uses
+    # ``qfm`` (the closest analog for the simulator's reducing regimes)
+    # and records that substitution as a warning upstream.
+    _BUFFER_CHOICES: frozenset = frozenset({
+        'qfm', 'mw', 'qif', 'nno', 'hm', 'cco',
+    })
+
+    @staticmethod
+    def _pressure_bar_to_GPa(pressure_bar: float) -> float:
+        """Convert pressure from bar to GPa.  1 GPa = 10000 bar."""
+        return float(pressure_bar) / 1.0e4
+
+    @staticmethod
+    def _GPa_to_kbar(pressure_GPa: float) -> float:
+        """Convert pressure from GPa to kilobar.  1 GPa = 10 kbar."""
+        return float(pressure_GPa) * 10.0
+
     def _call_magemin(
         self,
         composition_wt_pct: Dict[str, float],
@@ -439,16 +522,21 @@ class MAGEMinBackend(MeltBackend):
         """
         Invoke MAGEMin via whichever bridge ``initialize`` selected.
 
-        TODO(magemin): the call shape below assumes a high-level
-        ``pymagemin.minimize`` / ``MAGEMin.run`` entry point that
-        consumes oxide wt%, temperature in C, pressure in kbar, and
-        log fO2.  Confirm the exact signature once an install is
-        available; the ``RuntimeError`` raised on missing entry points
-        is the explicit fail signal the simulator already handles.
+        The supported default is the ``subprocess`` bridge, which drives
+        the compiled ``MAGEMin`` binary directly.  The optional
+        ``pymagemin`` / ``julia`` bridges assume a high-level
+        ``minimize`` / ``single_point_minimization`` entry point.
+
+        Pressure unit handling: the binding-spec contract (§4) is in GPa,
+        whereas the MAGEMin binary's CLI takes kilobar.  ``pressure_bar``
+        is converted ``bar -> GPa`` (1 GPa = 10000 bar) and then
+        ``GPa -> kbar`` (1 GPa = 10 kbar) at the binary boundary, with
+        both steps named so the conversion is auditable.
         """
         module = self._magemin_module
         temperature_K = temperature_C + 273.15
-        pressure_kbar = pressure_bar / 1000.0  # MAGEMin convention
+        pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
+        pressure_kbar = self._GPa_to_kbar(pressure_GPa)
 
         if self._bridge == 'pymagemin':
             for name in ('minimize', 'run', 'equilibrium'):
@@ -459,6 +547,7 @@ class MAGEMinBackend(MeltBackend):
                     composition=composition_wt_pct,
                     T_C=temperature_C,
                     T_K=temperature_K,
+                    P_GPa=pressure_GPa,
                     P_kbar=pressure_kbar,
                     log_fO2=fO2_log,
                     database=self._database,
@@ -468,7 +557,7 @@ class MAGEMinBackend(MeltBackend):
             JuliaMain = module.Main  # type: ignore[attr-defined]
             # The Julia bridge expects a dict of oxide wt% and returns
             # a struct.  This is a thin wrapper — full marshaling is
-            # the responsibility of MAGEMin.jl.
+            # the responsibility of MAGEMin_C.jl.
             return JuliaMain.MAGEMin.single_point_minimization(
                 composition_wt_pct,
                 temperature_K,
@@ -484,11 +573,191 @@ class MAGEMinBackend(MeltBackend):
             # back to alphaMELTS rather than silently returning empty.
             raise RuntimeError(
                 'MAGEMin ctypes bridge marshaling is not implemented; '
-                'install pymagemin or configure python_bridge="julia"'
+                'use the default subprocess bridge or configure '
+                'python_bridge="julia"'
+            )
+
+        if self._bridge == 'subprocess':
+            return self._call_magemin_subprocess(
+                composition_wt_pct=composition_wt_pct,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
             )
 
         raise RuntimeError(
             f'MAGEMin bridge {self._bridge!r} has no recognised entry point')
+
+    def _call_magemin_subprocess(
+        self,
+        *,
+        composition_wt_pct: Dict[str, float],
+        temperature_C: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> Dict[str, Any]:
+        """
+        Drive the compiled MAGEMin binary for one single-point call.
+
+        Builds the ``--Verb=0`` argument vector, runs the binary, and
+        parses the compact ``Phase :`` / ``Mode :`` stdout block into the
+        ``{'phases': {name: {'mass_kg': ...}}}`` shape ``_populate_result``
+        already understands.  The buffer pseudo-phase (``qfm`` etc.) the
+        binary echoes back is dropped — it is a control row, not a
+        material phase.
+
+        Raises ``RuntimeError`` on a non-zero exit, a timeout, or an
+        unparseable stdout — the explicit fail signal ``equilibrate()``
+        converts into an empty result + warning.
+        """
+        if self._binary_path is None:
+            raise RuntimeError('MAGEMin subprocess bridge has no binary path')
+
+        bulk = self._build_ig_bulk_vector(composition_wt_pct)
+        buffer_name = self._resolve_buffer()
+
+        args = [
+            str(self._binary_path),
+            '--Verb=0',
+            f'--db={self._database}',
+            f'--Temp={temperature_C:.6f}',
+            f'--Pres={pressure_kbar:.6f}',
+            '--sys_in=wt',
+            '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk),
+        ]
+        if buffer_name is not None:
+            args.append(f'--buffer={buffer_name}')
+
+        timeout_s = float(self._config.get('timeout_s', 60.0))
+        try:
+            completed = subprocess.run(  # noqa: S603 - args are adapter-built
+                args,
+                cwd=str(self._binary_path.parent),
+                capture_output=True,
+                text=True,
+                timeout=timeout_s,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(
+                f'MAGEMin binary timed out after {timeout_s:g}s'
+            ) from exc
+        except OSError as exc:
+            raise RuntimeError(
+                f'MAGEMin binary could not be executed: {exc}'
+            ) from exc
+
+        if completed.returncode != 0:
+            stderr = (completed.stderr or '').strip()
+            raise RuntimeError(
+                f'MAGEMin binary exited {completed.returncode}: '
+                f'{stderr or "no stderr"}'
+            )
+
+        phases = self._parse_subprocess_stdout(completed.stdout or '')
+        if not phases:
+            raise RuntimeError(
+                'MAGEMin binary produced no parseable Phase/Mode block'
+            )
+        return {'phases': phases}
+
+    def _build_ig_bulk_vector(
+        self, composition_wt_pct: Mapping[str, float]
+    ) -> List[float]:
+        """
+        Project the simulator's 14-oxide wt% onto MAGEMin's ``ig`` bulk
+        order, folding FeO + Fe2O3 into the single FeOt (total iron)
+        component and zeroing the free ``O`` redox component (fO2 is set
+        by ``--buffer``).  Oxides outside the ``ig`` system (MnO, P2O5,
+        NiO, CoO) are dropped — the ``ig`` database does not model them.
+        """
+        feo = float(composition_wt_pct.get('FeO', 0.0) or 0.0)
+        fe2o3 = float(composition_wt_pct.get('Fe2O3', 0.0) or 0.0)
+        # Fe2O3 -> FeO-equivalent mass: each Fe2O3 (159.69 g/mol) carries
+        # 2 Fe; 2 FeO is 143.45 g/mol.  Total-iron-as-FeOt convention.
+        feot = feo + fe2o3 * (143.45 / 159.69)
+
+        vector: List[float] = []
+        for component in self._IG_BULK_ORDER:
+            if component == 'FeOt':
+                vector.append(feot)
+            elif component == 'O':
+                vector.append(0.0)
+            else:
+                vector.append(
+                    float(composition_wt_pct.get(component, 0.0) or 0.0))
+        return vector
+
+    def _resolve_buffer(self) -> Optional[str]:
+        """
+        Resolve the MAGEMin ``--buffer`` argument from config.
+
+        The simulator carries absolute log10(fO2); MAGEMin's single-point
+        CLI takes a named buffer instead.  An explicit ``fO2_buffer``
+        config value is honoured if valid; otherwise this returns
+        ``'qfm'`` as the default analog.  An invalid configured buffer is
+        recorded as a warning and falls back to ``qfm``.
+        """
+        configured = self._config.get('fO2_buffer')
+        if configured is None:
+            return 'qfm'
+        name = str(configured).lower().strip()
+        if name in self._BUFFER_CHOICES:
+            return name
+        self._warn(
+            f'MAGEMin: unknown fO2_buffer {configured!r}; '
+            'falling back to qfm'
+        )
+        return 'qfm'
+
+    @staticmethod
+    def _parse_subprocess_stdout(stdout: str) -> Dict[str, Dict[str, float]]:
+        """
+        Parse the compact MAGEMin ``--Verb=0`` ``Phase :`` / ``Mode :``
+        block.
+
+        The binary prints, e.g.::
+
+             Phase :       ol      liq      spl      qfm
+             Mode  :  0.02491  0.96156  0.00213  0.01140
+
+        Mode values are mass fractions of the system.  The buffer
+        pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
+        a control row, not a material phase.  Returns
+        ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis (the
+        adapter only needs relative masses for ``liquid_fraction`` and
+        modal parity).
+        """
+        phase_line: Optional[str] = None
+        mode_line: Optional[str] = None
+        for line in stdout.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('Phase :') or stripped.startswith('Phase:'):
+                phase_line = stripped.split(':', 1)[1]
+            elif stripped.startswith('Mode :') or stripped.startswith('Mode:'):
+                mode_line = stripped.split(':', 1)[1]
+            elif stripped.startswith('Mode  :'):
+                mode_line = stripped.split(':', 1)[1]
+        if phase_line is None or mode_line is None:
+            return {}
+
+        names = phase_line.split()
+        values = mode_line.split()
+        if not names or len(names) != len(values):
+            return {}
+
+        phases: Dict[str, Dict[str, float]] = {}
+        for name, raw in zip(names, values):
+            if name.lower() in MAGEMinBackend._BUFFER_CHOICES:
+                continue  # buffer control row, not a phase
+            try:
+                fraction = float(raw)
+            except ValueError:
+                continue
+            if fraction <= 0.0:
+                continue
+            phases[name] = {'mass_kg': fraction}
+        return phases
 
     # ------------------------------------------------------------------
     # Composition projection / result parsing

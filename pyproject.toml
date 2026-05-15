@@ -18,6 +18,33 @@ vapor = [
     # Canonical upstream package/import name is "vaporock"; no PyPI release.
     "vaporock @ git+https://gitlab.com/ENKI-portal/vaporock.git@v0.1#subdirectory=src",
 ]
+# MAGEMin (https://github.com/ComputationalThermodynamics/MAGEMin) is a
+# compiled C/Fortran Gibbs-energy minimiser. There is NO pure-PyPI MAGEMin
+# package: the clone ships zero Python files, no setup.py, no pyproject.toml.
+# Its primary interface is Julia (`MAGEMin_C.jl`); from Python it is reached
+# via the Julia bridge or by driving the compiled `MAGEMin` binary directly.
+# So `[magemin]` is a documented build path, not a fake pin (mirrors how the
+# alphaMELTS binary is documented in docs/melt-backends.md rather than pinned).
+#
+# Build path:
+#   1. Clone + build MAGEMin v1.9.3 (see its README "Manual compilation":
+#      needs MPICH, LAPACKE, NLopt; `make all` produces `MAGEMin` +
+#      `libMAGEMin.dylib`/`.so`). The simulator reads the binary as a sibling
+#      clone at `../MAGEMin/MAGEMin` or from `engines/magemin/{,bin/}MAGEMin`.
+#   2. simulator/melt_backend/magemin.py drives that binary over subprocess
+#      (the only bridge that runs today) — no Python package install needed.
+#   3. Optional Julia bridge: `pip install juliacall` then add `MAGEMin_C`
+#      from the Julia REPL (`] add MAGEMin_C`). The adapter probes a `julia`
+#      bridge but the subprocess path is the supported default.
+# See docs/melt-backends.md "MAGEMin adapter notes" and
+# docs-private/chemistry-engine-binding-spec-2026-05-14.md §4.
+magemin = [
+    # juliacall is the only pip-installable piece of the MAGEMin Python
+    # path, and only for the optional Julia bridge. The MAGEMin binary
+    # itself is built from source per the comment block above. Commented
+    # out by default: the supported path is the compiled binary + subprocess.
+    # "juliacall>=0.9,<0.10",
+]
 dev = ["pytest>=8.0"]
 
 [tool.pytest.ini_options]
