@@ -133,11 +133,16 @@ tenth account; the declared set is the first-line gate.  Every legacy
 
 from __future__ import annotations
 
-from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    build_atom_balance_proof,
+    diagnostic_control_audit,
+    dispatch_reaction_family,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -245,36 +250,38 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        reaction_family = str(controls.get("reaction_family") or "")
-        if reaction_family not in VALID_REACTION_FAMILIES:
-            return IntentResult(
-                intent=ChemistryIntent.STAGE0_PRETREATMENT,
-                status="unsupported",
-                diagnostic={
-                    "reason": (
-                        f"reaction_family {reaction_family!r} not in "
-                        f"{sorted(VALID_REACTION_FAMILIES)}"
-                    ),
-                },
-            )
+
+        # Reaction-family early-exit shared with metallothermic_step.
+        # Stage 0 cleanup is stoich-only -- the legacy
+        # _record_stage0_oxidation_transitions / _record_stage0_carbon_*
+        # / _record_stage0_perchlorate_* paths do not consult fO2 either.
+        family_reject = dispatch_reaction_family(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            controls,
+            VALID_REACTION_FAMILIES,
+        )
+        if family_reject is not None:
+            return family_reject
+        reaction_family = str(controls["reaction_family"])
+        control_audit = diagnostic_control_audit(request, include_fO2=False)
 
         registry = request.account_view.species_formula_registry
 
         if reaction_family == REACTION_FAMILY_COMPLETE_OXIDATION:
             return self._dispatch_complete_oxidation(
-                controls, registry, resolve_species_formula,
+                controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_SULFATE_CARBON:
             return self._dispatch_sulfate_carbon(
-                controls, registry, resolve_species_formula,
+                controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
             return self._dispatch_boudouard(
-                controls, registry, resolve_species_formula,
+                controls, registry, resolve_species_formula, control_audit,
             )
         # reaction_family == REACTION_FAMILY_PERCHLORATE
         return self._dispatch_perchlorate(
-            controls, registry, resolve_species_formula,
+            controls, registry, resolve_species_formula, control_audit,
         )
 
     # ------------------------------------------------------------------
@@ -292,6 +299,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         controls: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         species = str(controls.get("species") or "")
         feed_kg = float(controls.get("feed_kg") or 0.0)
@@ -300,7 +308,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not species:
             return self._out_of_domain(
-                "complete_oxidation requires a species name"
+                "complete_oxidation requires a species name",
+                control_audit=control_audit,
             )
         if feed_kg <= 1e-12 and not products_kg:
             # Legacy ``_stage0_oxidation_transition_specs`` filters out
@@ -309,7 +318,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             # species that has no Stage 0 oxidation profile -- a
             # mismatched lunar/Mars dispatch.
             return self._out_of_domain(
-                f"complete_oxidation has no spec for species {species!r}"
+                f"complete_oxidation has no spec for species {species!r}",
+                control_audit=control_audit,
             )
 
         # Convert kg payloads to mol via the same registry the kernel
@@ -322,7 +332,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         mol_feed = feed_kg / feed_formula.molar_mass_kg_per_mol()
         if mol_feed <= 0.0:
             return self._out_of_domain(
-                f"complete_oxidation feed_kg {feed_kg!r} non-positive"
+                f"complete_oxidation feed_kg {feed_kg!r} non-positive",
+                control_audit=control_audit,
             )
 
         # Separate O2 from the products: the legacy
@@ -366,10 +377,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         if not credits:
             return self._empty_result(
                 f"complete_oxidation skipped: no positive products for "
-                f"{species!r}"
+                f"{species!r}",
+                control_audit=control_audit,
             )
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -382,6 +394,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_COMPLETE_OXIDATION,
                 "species": species,
@@ -403,11 +416,13 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         controls: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         return self._dispatch_offgas_reaction(
             controls,
             registry,
             resolve_species_formula,
+            control_audit,
             family=REACTION_FAMILY_SULFATE_CARBON,
             reason="stage0_sulfate_carbon_cleanup",
         )
@@ -422,11 +437,13 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         controls: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         return self._dispatch_offgas_reaction(
             controls,
             registry,
             resolve_species_formula,
+            control_audit,
             family=REACTION_FAMILY_BOUDOUARD,
             reason="stage0_boudouard_carbon_cleanup",
         )
@@ -436,6 +453,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         controls: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
         *,
         family: str,
         reason: str,
@@ -454,7 +472,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not debits_payload or not products_kg:
             return self._out_of_domain(
-                f"{family} has no spec (empty debits or products)"
+                f"{family} has no spec (empty debits or products)",
+                control_audit=control_audit,
             )
 
         debits_mol: dict[str, dict[str, float]] = {}
@@ -464,7 +483,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 account, species_kg = entry
             except (TypeError, ValueError):
                 return self._out_of_domain(
-                    f"{family} debit entry malformed: {entry!r}"
+                    f"{family} debit entry malformed: {entry!r}",
+                    control_audit=control_audit,
                 )
             account = str(account)
             mol_for_account: dict[str, float] = {}
@@ -484,7 +504,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not debits_mol:
             return self._empty_result(
-                f"{family} skipped: all debits zero after threshold"
+                f"{family} skipped: all debits zero after threshold",
+                control_audit=control_audit,
             )
 
         credits_mol: dict[str, dict[str, float]] = {}
@@ -502,10 +523,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not credits_mol:
             return self._empty_result(
-                f"{family} skipped: no positive offgas products"
+                f"{family} skipped: no positive offgas products",
+                control_audit=control_audit,
             )
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits_mol, credits_mol, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -518,6 +540,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": family,
                 "debits_kg": debits_kg,
@@ -538,6 +561,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         controls: Mapping[str, Any],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         debits_payload = controls.get("debits") or ()
         salt_products_kg = dict(controls.get("salt_products_kg") or {})
@@ -545,7 +569,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not debits_payload or (not salt_products_kg and not oxygen_products_kg):
             return self._out_of_domain(
-                "perchlorate has no spec (empty debits or products)"
+                "perchlorate has no spec (empty debits or products)",
+                control_audit=control_audit,
             )
 
         debits_mol: dict[str, dict[str, float]] = {}
@@ -555,7 +580,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 account, species_kg = entry
             except (TypeError, ValueError):
                 return self._out_of_domain(
-                    f"perchlorate debit entry malformed: {entry!r}"
+                    f"perchlorate debit entry malformed: {entry!r}",
+                    control_audit=control_audit,
                 )
             account = str(account)
             mol_for_account: dict[str, float] = {}
@@ -575,7 +601,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not debits_mol:
             return self._empty_result(
-                "perchlorate skipped: all debits zero after threshold"
+                "perchlorate skipped: all debits zero after threshold",
+                control_audit=control_audit,
             )
 
         credits_mol: dict[str, dict[str, float]] = {}
@@ -603,10 +630,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
 
         if not credits_mol:
             return self._empty_result(
-                "perchlorate skipped: no positive products"
+                "perchlorate skipped: no positive products",
+                control_audit=control_audit,
             )
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits_mol, credits_mol, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -619,6 +647,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_PERCHLORATE,
                 "debits_kg": debits_kg,
@@ -632,17 +661,18 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _empty_result(reason: str) -> IntentResult:
+    def _empty_result(reason: str, *, control_audit=None) -> IntentResult:
         """Benign no-op skip (zero-mass spec from legacy projection)."""
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
             transition=None,
+            control_audit=control_audit,
             diagnostic={"reason_skipped": reason},
         )
 
     @staticmethod
-    def _out_of_domain(reason: str) -> IntentResult:
+    def _out_of_domain(reason: str, *, control_audit=None) -> IntentResult:
         """Feedstock has no Stage 0 profile for the requested family.
 
         Distinct from a benign skip: the spec is structurally absent
@@ -653,6 +683,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="out_of_domain",
             transition=None,
+            control_audit=control_audit,
             diagnostic={"reason_out_of_domain": reason},
             warnings=(reason,),
         )
@@ -664,16 +695,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         registry: Mapping[str, Any],
         resolve_species_formula,
     ) -> dict[str, float]:
-        """Element-by-element ``credit - debit`` atom moles.
-
-        Provider's claim, matched by the kernel's
-        :func:`validate_atom_balance` at commit time. Each entry should
-        be ~0 (within the kernel's atom-tolerance) for a balanced
-        proposal; any non-zero entry surfaces as
-        :class:`AtomBalanceError`.  Same shape as the prior
-        authoritative providers (EVAPORATION_TRANSITION,
-        CONDENSATION_ROUTE, ELECTROLYSIS_STEP, METALLOTHERMIC_STEP) for
-        cross-provider consistency.
+        """Delegate to the shared :func:`build_atom_balance_proof` helper.
 
         Atom balance for the Stage 0 reaction families (independent
         re-derivation per binding spec):
@@ -681,9 +703,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         * ``complete_oxidation`` (CH4 example: ``CH4 + 2 O2 ->
           CO2 + 2 H2O``) -- C: -1 + 1 = 0; H: -4 + 4 = 0;
           O: -4 + 4 = 0.  Other organics (NH3 -> N2/H2O, etc.) close
-          by the same elemental accounting.  The legacy
-          ``_oxidized_stage0_products`` projection already balances
-          C/H/N/O before the provider sees it; the proof re-derives.
+          by the same elemental accounting.
         * ``sulfate_carbon`` (``2 SO3 + C -> 2 SO2 + CO``) -- S:
           -2 + 2 = 0; C: -1 + 1 = 0; O: -7 + 7 = 0.
         * ``boudouard`` (``C + CO2 -> 2 CO``) -- C: -2 + 2 = 0;
@@ -694,15 +714,6 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         Net per element: 0 for every reaction.
         """
 
-        net: dict[str, float] = defaultdict(float)
-        for side, sign in ((debits, -1.0), (credits, +1.0)):
-            for _account, species_mol in dict(side or {}).items():
-                for sp, mol in dict(species_mol or {}).items():
-                    if mol <= 0.0:
-                        continue
-                    formula = resolve_species_formula(str(sp), registry)
-                    for element, atoms in formula.atom_moles(
-                        float(mol)
-                    ).items():
-                        net[str(element)] += sign * float(atoms)
-        return dict(net)
+        return build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula
+        )

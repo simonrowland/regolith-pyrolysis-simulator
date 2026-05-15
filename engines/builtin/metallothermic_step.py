@@ -110,11 +110,17 @@ account; the declared set is the first-line gate.
 
 from __future__ import annotations
 
-from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    build_atom_balance_proof,
+    composition_kg_from_account_view,
+    diagnostic_control_audit,
+    dispatch_reaction_family,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -194,24 +200,23 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        reaction_family = str(controls.get("reaction_family") or "")
-        if reaction_family not in VALID_REACTION_FAMILIES:
-            return IntentResult(
-                intent=ChemistryIntent.METALLOTHERMIC_STEP,
-                status="unsupported",
-                diagnostic={
-                    "reason": (
-                        f"reaction_family {reaction_family!r} not in "
-                        f"{sorted(VALID_REACTION_FAMILIES)}"
-                    ),
-                },
-            )
+
+        # Reaction-family early-exit: shared with stage0_pretreatment.py.
+        # The metallothermic shuttles run solubility-limit + reagent-mass
+        # arithmetic only; no fO2 dependency (legacy _shuttle_inject_K /
+        # _shuttle_inject_Na / _step_thermite do not consult fO2 either).
+        # Audit reports T/P verbatim with the diagnostic-only note.
+        family_reject = dispatch_reaction_family(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            controls,
+            VALID_REACTION_FAMILIES,
+        )
+        if family_reject is not None:
+            return family_reject
+        reaction_family = str(controls["reaction_family"])
+        control_audit = diagnostic_control_audit(request, include_fO2=False)
 
         registry = request.account_view.species_formula_registry
-        melt_mol = dict(
-            request.account_view.accounts.get("process.cleaned_melt", {})
-            or {}
-        )
         metal_mol = dict(
             request.account_view.accounts.get("process.metal_phase", {})
             or {}
@@ -219,11 +224,13 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         # Project the melt's kg view from the mol account (the legacy
         # path reads self.melt.composition_kg, which is the simulator's
-        # projection of process.cleaned_melt).  Mirrors
-        # composition_wt_pct_from_account_view but we need the kg dict
-        # directly for the solubility-limit math, so re-derive here.
-        composition_kg, total_kg = self._kg_view(
-            melt_mol, registry, resolve_species_formula
+        # projection of process.cleaned_melt).  Same projection the
+        # _common.composition_wt_pct_from_account_view helper produces
+        # internally; the kg dict + total_kg pair is the shape the C3
+        # solubility-limit math reads.
+        composition_kg, total_kg = composition_kg_from_account_view(
+            request.account_view,
+            "process.cleaned_melt",
         )
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
 
@@ -236,6 +243,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 MOLAR_MASS,
                 registry,
                 resolve_species_formula,
+                control_audit,
             )
         if reaction_family == REACTION_FAMILY_C3_NA:
             return self._dispatch_c3_na(
@@ -246,6 +254,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 MOLAR_MASS,
                 registry,
                 resolve_species_formula,
+                control_audit,
             )
         # reaction_family == REACTION_FAMILY_C6_MG
         back_reduction = bool(controls.get("back_reduction") or False)
@@ -257,6 +266,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 MOLAR_MASS,
                 registry,
                 resolve_species_formula,
+                control_audit,
             )
         return self._dispatch_c6_mg_primary(
             composition_kg,
@@ -265,6 +275,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             MOLAR_MASS,
             registry,
             resolve_species_formula,
+            control_audit,
         )
 
     # ------------------------------------------------------------------
@@ -281,17 +292,20 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         K_available_kg = float(controls.get("reagent_available_kg") or 0.0)
         if K_available_kg <= 0.01:
             return self._empty_result(
                 "c3_k_shuttle skipped: K reagent below 0.01 kg threshold",
+                control_audit=control_audit,
             )
 
         K2O_current_pct = composition_wt_pct.get("K2O", 0.0)
         if K2O_current_pct >= self.K2O_SOLUBILITY_WT_PCT:
             return self._empty_result(
                 "c3_k_shuttle skipped: K2O above 10 wt% solubility limit",
+                control_audit=control_audit,
             )
 
         # Solubility headroom: K2O_max_kg = total_melt * 10% - K2O_current
@@ -323,6 +337,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if K_inject_kg < 0.001:
             return self._empty_result(
                 "c3_k_shuttle skipped: injection floor (<0.001 kg K)",
+                control_audit=control_audit,
             )
 
         # Stoichiometric integration in mol space, line-for-line with the
@@ -343,6 +358,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if mol_FeO_reduced <= 0.0:
             return self._empty_result(
                 "c3_k_shuttle skipped: no FeO reducible after stoich cap",
+                control_audit=control_audit,
             )
 
         # Reaction 2 K + FeO -> K2O + Fe.  Per mol:
@@ -364,7 +380,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         FeO_removed_kg = mol_FeO_reduced * molar_mass["FeO"] / 1000.0
         Fe_produced_kg = mol_FeO_reduced * molar_mass["Fe"] / 1000.0
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -377,6 +393,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C3_K,
                 "reagent_consumed_kg": K_used_kg,
@@ -407,17 +424,20 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         Na_available_kg = float(controls.get("reagent_available_kg") or 0.0)
         if Na_available_kg <= 0.01:
             return self._empty_result(
                 "c3_na_shuttle skipped: Na reagent below 0.01 kg threshold",
+                control_audit=control_audit,
             )
 
         Na2O_current_pct = composition_wt_pct.get("Na2O", 0.0)
         if Na2O_current_pct >= self.NA2O_SOLUBILITY_WT_PCT:
             return self._empty_result(
                 "c3_na_shuttle skipped: Na2O above 10 wt% solubility limit",
+                control_audit=control_audit,
             )
 
         Na2O_max_kg = max(
@@ -439,6 +459,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if Na_inject_kg < 0.001:
             return self._empty_result(
                 "c3_na_shuttle skipped: injection floor (<0.001 kg Na)",
+                control_audit=control_audit,
             )
 
         mol_Na = Na_inject_kg / molar_mass["Na"] * 1000.0
@@ -486,6 +507,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if total_Na_used_mol <= 0.0:
             return self._empty_result(
                 "c3_na_shuttle skipped: no oxide accepted Na reduction",
+                control_audit=control_audit,
             )
 
         # Build mol-native proposal.  Both reactions converge on the
@@ -526,7 +548,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         Cr_produced_kg = total_Cr_produced_mol * molar_mass["Cr"] / 1000.0
         Ti_produced_kg = total_Ti_produced_mol * molar_mass["Ti"] / 1000.0
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -539,6 +561,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C3_NA,
                 "reagent_consumed_kg": Na_used_kg,
@@ -571,6 +594,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         import math
 
@@ -578,12 +602,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if Mg_available_kg <= 0.01:
             return self._empty_result(
                 "c6_mg_thermite skipped: Mg reagent below 0.01 kg threshold",
+                control_audit=control_audit,
             )
 
         Al2O3_available_kg = composition_kg.get("Al2O3", 0.0)
         if Al2O3_available_kg < 0.01:
             return self._empty_result(
                 "c6_mg_thermite skipped: Al2O3 below 0.01 kg threshold",
+                control_audit=control_audit,
             )
 
         # Mg injection rate factor: 0.20 * exp(-0.05 * wt%MgO), clamped
@@ -602,6 +628,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if mol_Al2O3_reduced < 0.001:
             return self._empty_result(
                 "c6_mg_thermite skipped: <0.001 mol Al2O3 reducible",
+                control_audit=control_audit,
             )
         mol_Mg_used = mol_Al2O3_reduced * 3.0
         mol_MgO_produced = mol_Al2O3_reduced * 3.0
@@ -622,7 +649,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         MgO_produced_kg = mol_MgO_produced * molar_mass["MgO"] / 1000.0
         Al_produced_kg = mol_Al_produced * molar_mass["Al"] / 1000.0
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -635,6 +662,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C6_MG,
                 "back_reduction": False,
@@ -661,6 +689,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
         resolve_species_formula,
+        control_audit,
     ) -> IntentResult:
         mol_Al_produced = float(controls.get("mol_Al_produced") or 0.0)
         SiO2_available_kg = composition_kg.get("SiO2", 0.0)
@@ -671,6 +700,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if SiO2_available_kg <= 0.1 or Al_produced_kg <= 0.01:
             return self._empty_result(
                 "c6_back_reduction skipped: SiO2 <= 0.1 kg or Al <= 0.01 kg",
+                control_audit=control_audit,
             )
 
         # Legacy:
@@ -695,6 +725,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if mol_SiO2_consumed <= 0.0:
             return self._empty_result(
                 "c6_back_reduction skipped: SiO2 consumed = 0 after stoich cap",
+                control_audit=control_audit,
             )
 
         debits = {
@@ -714,7 +745,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         )
         Si_produced_kg = mol_Si_produced * molar_mass["Si"] / 1000.0
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
         proposal = LedgerTransitionProposal(
@@ -727,6 +758,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C6_MG,
                 "back_reduction": True,
@@ -740,36 +772,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     # ------------------------------------------------------------------
     # Helpers shared with the other authoritative providers.
     # ------------------------------------------------------------------
-
-    @staticmethod
-    def _kg_view(
-        melt_mol: Mapping[str, float],
-        registry: Mapping[str, Any],
-        resolve_species_formula,
-    ) -> tuple[dict[str, float], float]:
-        """Project the cleaned_melt mol view into kg-per-species + total kg.
-
-        Mirrors :meth:`MeltState.composition_kg` projection used by the
-        legacy code path.  The legacy reads ``self.melt.composition_kg``
-        directly; the provider reproduces that projection from its
-        :class:`ProviderAccountView`.
-        """
-
-        composition_kg: dict[str, float] = {}
-        total_kg = 0.0
-        for species, mol in dict(melt_mol or {}).items():
-            mol_val = float(mol)
-            if mol_val <= 0.0:
-                continue
-            formula = resolve_species_formula(str(species), registry)
-            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
-            if mass_kg <= 0.0:
-                continue
-            composition_kg[str(species)] = (
-                composition_kg.get(str(species), 0.0) + mass_kg
-            )
-            total_kg += mass_kg
-        return composition_kg, total_kg
 
     @staticmethod
     def _wt_pct_from_kg(
@@ -786,11 +788,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         return {sp: (kg / total_kg) * 100.0 for sp, kg in composition_kg.items()}
 
     @staticmethod
-    def _empty_result(reason: str) -> IntentResult:
+    def _empty_result(reason: str, *, control_audit=None) -> IntentResult:
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=None,
+            control_audit=control_audit,
             diagnostic={"reason_skipped": reason},
         )
 
@@ -801,16 +804,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         registry: Mapping[str, Any],
         resolve_species_formula,
     ) -> dict[str, float]:
-        """Element-by-element ``credit - debit`` atom moles.
-
-        Provider's claim, matched by the kernel's
-        :func:`validate_atom_balance` at commit time. Each entry should
-        be ~0 (within the kernel's atom-tolerance) for a balanced
-        proposal; any non-zero entry surfaces as
-        :class:`AtomBalanceError`.  Same shape as the prior
-        authoritative providers (EVAPORATION_TRANSITION,
-        CONDENSATION_ROUTE, ELECTROLYSIS_STEP) for cross-provider
-        consistency.
+        """Delegate to the shared :func:`build_atom_balance_proof` helper.
 
         Atom balance for the five reactions:
 
@@ -830,15 +824,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         independently so the net stays 0 as well.
         """
 
-        net: dict[str, float] = defaultdict(float)
-        for side, sign in ((debits, -1.0), (credits, +1.0)):
-            for _account, species_mol in dict(side or {}).items():
-                for sp, mol in dict(species_mol or {}).items():
-                    if mol <= 0.0:
-                        continue
-                    formula = resolve_species_formula(str(sp), registry)
-                    for element, atoms in formula.atom_moles(
-                        float(mol)
-                    ).items():
-                        net[str(element)] += sign * float(atoms)
-        return dict(net)
+        return build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula
+        )

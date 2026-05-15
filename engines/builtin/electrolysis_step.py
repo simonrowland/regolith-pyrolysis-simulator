@@ -74,12 +74,17 @@ from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    build_atom_balance_proof,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
 )
 from simulator.chemistry.kernel.dto import (
+    ControlAudit,
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
@@ -137,6 +142,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        # Build the audit once; every return path threads it through.
+        # Anode-fO2 is fixed at log10(1.0) = 0.0 by the pure-O2 evolution
+        # boundary condition (see _build_control_audit docstring).
+        control_audit = self._build_control_audit(request)
+
         controls = unpack_controls(request)
         voltage_V = float(controls.get("voltage_V") or 0.0)
         current_A = float(controls.get("current_A") or 0.0)
@@ -155,7 +165,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             request.account_view.accounts.get("process.cleaned_melt", {}) or {}
         )
         if not melt_mol:
-            return self._empty_result(diagnostic_skipped="empty melt")
+            return self._empty_result(
+                diagnostic_skipped="empty melt", request=request,
+            )
 
         registry = request.account_view.species_formula_registry
         composition_kg: dict[str, float] = {}
@@ -192,6 +204,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic=diagnostic,
             )
 
@@ -224,6 +237,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic=diagnostic,
             )
 
@@ -239,6 +253,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic=diagnostic,
             )
 
@@ -347,6 +362,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic=diagnostic,
             )
 
@@ -358,7 +374,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 "O2": O2_mol_total,
             }
 
-        atom_proof = self._build_atom_balance_proof(
+        atom_proof = build_atom_balance_proof(
             debits_mol, credits_mol, registry, resolve_species_formula,
         )
 
@@ -373,6 +389,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             intent=ChemistryIntent.ELECTROLYSIS_STEP,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic=diagnostic,
         )
 
@@ -413,15 +430,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         registry: Mapping[str, Any],
         resolve_species_formula,
     ) -> dict[str, float]:
-        """Element-by-element ``credit - debit`` atom moles.
-
-        Provider's claim, matched by the kernel's
-        :func:`validate_atom_balance` at commit time. Each entry should
-        be ~0 (within the kernel's atom-tolerance) for a balanced
-        proposal; any non-zero entry surfaces as
-        :class:`AtomBalanceError`.  Same shape as the
-        EVAPORATION_TRANSITION / CONDENSATION_ROUTE providers' proofs
-        for cross-provider consistency.
+        """Delegate to the shared :func:`build_atom_balance_proof` helper.
 
         Atom balance for MRE: ``MO_n -> M + (n/2) O2`` -- one mol of
         ``MO_n`` carries one M atom and n O atoms; the credit side has
@@ -430,19 +439,62 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         active for the Fe metal credit) sum each side independently.
         """
 
-        net: dict[str, float] = defaultdict(float)
-        for side, sign in ((debits, -1.0), (credits, +1.0)):
-            for _account, species_mol in dict(side or {}).items():
-                for sp, mol in dict(species_mol or {}).items():
-                    if mol <= 0.0:
-                        continue
-                    formula = resolve_species_formula(str(sp), registry)
-                    for element, atoms in formula.atom_moles(float(mol)).items():
-                        net[str(element)] += sign * float(atoms)
-        return dict(net)
+        return build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula
+        )
 
     @staticmethod
-    def _empty_result(*, diagnostic_skipped: str = "") -> IntentResult:
+    def _build_control_audit(
+        request: "IntentRequest",
+        *,
+        applied_anode_fO2_log: float = 0.0,
+    ) -> ControlAudit:
+        """Build the ELECTROLYSIS_STEP control audit.
+
+        The MRE cell holds the cathode at the applied voltage and strips
+        anode O2 into ``terminal.oxygen_mre_anode_stored``; the anode
+        gas activity is pure O2 (log10(fO2/bar) = 0.0 by construction).
+        T and P are passed through unchanged -- the provider does not
+        compute an updated melt temperature or pressure.
+
+        When the caller does not pin ``request.fO2_log`` (the standard
+        case from :meth:`ExtractionMixin._step_mre`), the kernel's
+        :func:`validate_control_audit` ignores the fO2 field per its
+        ``requested_value is None`` guard.  Reporting the applied value
+        as ``0.0`` is still useful as a diagnostic / forensic record
+        even when the validator skips it.
+        """
+
+        requested = {
+            "temperature_C": float(request.temperature_C),
+            "pressure_bar": float(request.pressure_bar),
+            "fO2_log": (
+                float(request.fO2_log)
+                if request.fO2_log is not None
+                else None
+            ),
+        }
+        applied = dict(requested)
+        applied["fO2_log"] = float(applied_anode_fO2_log)
+        # Note documents the deliberate anode-fO2 fixing so a future
+        # drift between request.fO2_log and applied is explained even
+        # when the validator's None-guard would silently accept it.
+        return ControlAudit(
+            requested=requested,
+            applied=applied,
+            notes=(
+                "anode evolves pure O2 -> applied fO2_log=0.0 by "
+                "construction; T/P/V/I passed through unchanged",
+            ),
+        )
+
+    @classmethod
+    def _empty_result(
+        cls,
+        *,
+        diagnostic_skipped: str = "",
+        request: "IntentRequest | None" = None,
+    ) -> IntentResult:
         diag: dict[str, Any] = {
             "oxides_reduced_kg": {},
             "oxides_reduced_mol": {},
@@ -458,5 +510,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             intent=ChemistryIntent.ELECTROLYSIS_STEP,
             status="ok",
             transition=None,
+            control_audit=(
+                cls._build_control_audit(request) if request is not None else None
+            ),
             diagnostic=diag,
         )

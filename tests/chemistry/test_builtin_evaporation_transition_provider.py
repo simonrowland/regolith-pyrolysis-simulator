@@ -523,3 +523,138 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
             f"evap transition {trans.name} has unbalanced mass: "
             f"debit={debit_kg:.6g} credit={credit_kg:.6g}"
         )
+
+
+# ---------------------------------------------------------------------------
+# 7. Lock-in regression: per-intent attribution under scale<1 + remaining=rate
+#
+# Locks in the milestone-review trace: when the caller passes
+# ``remaining_kg_hr = rate_kg_hr`` (the convention in
+# ``simulator/evaporation.py:259-267``), the available-oxide scale that
+# applies inside the provider (``scale = min(1, available_kg/oxide_removed)``)
+# scales product_kg AND remaining_kg in lockstep, so
+# ``condensed_kg = product_kg - remaining_kg = 0`` regardless of the scale
+# factor.  EVAPORATION_TRANSITION therefore credits ONLY the overhead_gas
+# (vapor + O2 coproduct); the deposit leg is owned by CONDENSATION_ROUTE.
+#
+# A milestone reviewer flagged a suspected per-intent attribution bug here.
+# Hand-trace (rate=100, dt=1, oxide_per=2, available=60, remaining=100):
+#   oxide_removed = 100 * 1 * 2 = 200
+#   product_kg    = 100 * 1     = 100
+#   scale         = min(1, 60/200) = 0.30
+#   oxide_removed *= scale -> 60
+#   product_kg    *= scale -> 30
+#   remaining_kg  = 100 * 1 * 0.30 = 30   (also scaled, line 197 in provider)
+#   condensed_kg  = max(0, 30 - 30) = 0   (lockstep cancellation)
+# So the proposal's credits MUST NOT contain process.condensation_train --
+# the deposit leg lives in CONDENSATION_ROUTE.  The atom-balance closure
+# is the deciding test: end-to-end smoke runs above close to <1e-6 kg
+# cumulative imbalance, confirming the per-intent split is the correct
+# attribution.
+
+
+def test_scale_less_than_one_attribution_locks_in_overhead_only(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Drive the provider with ``available_kg << oxide_removed`` so the
+    available-oxide scale clamps; verify the proposal only credits
+    ``process.overhead_gas`` (vapor + O2) and NOT
+    ``process.condensation_train``.  Locks in the documented per-intent
+    contract that CONDENSATION_ROUTE owns the deposit leg when the
+    caller wires ``remaining_kg_hr = rate_kg_hr``.
+    """
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinEvaporationTransitionProvider()
+
+    rate_kg_hr = 100.0
+    oxide_per_product_kg = 2.0
+    O2_per_product_kg = 0.347
+    available_kg = 60.0  # << rate_kg_hr * oxide_per_product_kg (= 200)
+
+    # Build a registry-backed view; the provider reads species_formula_registry
+    # off it for the mol/kg projection.
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"Na2O": 100.0},
+            "process.overhead_gas": {},
+            "process.condensation_train": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "stoich": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": oxide_per_product_kg,
+                "O2_per_product_kg": O2_per_product_kg,
+            },
+            "sp_data": {},
+            "rate_kg_hr": rate_kg_hr,
+            # The caller's convention: remaining=rate -> the EVAPORATION
+            # provider sees a zero deposit fraction inside its own
+            # bookkeeping. The deposit leg is CONDENSATION_ROUTE's job.
+            "remaining_kg_hr": rate_kg_hr,
+            "dt_hr": 1.0,
+            "available_kg": available_kg,
+        },
+    )
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    proposal = result.transition
+
+    # Per-intent attribution lock-in: condensation_train MUST NOT be in
+    # credits.  EVAPORATION_TRANSITION's job is the melt -> overhead_gas
+    # leg only when the caller wires remaining=rate.
+    assert "process.condensation_train" not in proposal.credits, (
+        "EVAPORATION_TRANSITION leaked a deposit credit; "
+        "CONDENSATION_ROUTE owns process.condensation_train"
+    )
+    assert "process.overhead_gas" in proposal.credits, (
+        "EVAPORATION_TRANSITION must credit overhead_gas under scale<1"
+    )
+
+    # Overhead credit equals the *scaled* per-species vapor + O2 mass.
+    # Scale = 60/200 = 0.30 => product_kg = 30, O2_kg = 100*1*0.347*0.30 = 10.41.
+    # Convert kg -> mol via the registry.
+    from simulator.accounting.formulas import resolve_species_formula
+    mw_na = resolve_species_formula(
+        "Na", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    mw_o2 = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    expected_scale = 0.30
+    expected_vapor_kg = rate_kg_hr * 1.0 * expected_scale
+    expected_o2_kg = (
+        rate_kg_hr * 1.0 * O2_per_product_kg * expected_scale
+    )
+
+    overhead_credit = dict(proposal.credits["process.overhead_gas"])
+    # remaining_kg = 100*1*0.30 = 30 (== product_kg post-scale), so the
+    # condensed_kg = max(0, product_kg - remaining_kg) = 0 inside the
+    # provider, and the overhead leg carries the full vapor mass.
+    assert overhead_credit["Na"] == pytest.approx(
+        expected_vapor_kg / mw_na, rel=1e-12
+    )
+    assert overhead_credit["O2"] == pytest.approx(
+        expected_o2_kg / mw_o2, rel=1e-12
+    )
+
+    # Sanity: the diagnostic reports credited_condensed_kg=0 so a future
+    # caller's scaling-of-the-deposit-leg path stays unambiguous.
+    diag = dict(result.diagnostic or {})
+    assert diag.get("credited_condensed_kg") == pytest.approx(0.0, abs=1e-12)
+    assert diag.get("applied_scale") == pytest.approx(expected_scale, rel=1e-12)

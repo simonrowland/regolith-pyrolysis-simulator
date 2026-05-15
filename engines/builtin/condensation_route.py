@@ -62,11 +62,15 @@ this with :class:`AccountFilterViolation`).
 from __future__ import annotations
 
 import math
-from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    build_atom_balance_proof,
+    diagnostic_control_audit,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -117,12 +121,18 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        # Condensation routing is pure mol bookkeeping; the engine has no
+        # independent T/P/fO2 control loop. Applied == requested verbatim
+        # with the diagnostic-only note.
+        control_audit = diagnostic_control_audit(request)
+
         controls = unpack_controls(request)
         species = str(controls.get("species") or "")
         if not species:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="unsupported",
+                control_audit=control_audit,
                 diagnostic={"reason": "missing 'species' control input"},
             )
 
@@ -140,6 +150,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic={
                     "credited_condensed_kg": 0.0,
                     "reason_skipped": "below numerical floor",
@@ -164,6 +175,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic={"credited_condensed_kg": 0.0},
             )
 
@@ -187,7 +199,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # surface, matched against the kernel's authoritative count).
         # For SiO disproportionation: -1 SiO (1 Si, 1 O) + 0.5 Si + 0.5
         # SiO2 (0.5 Si, 1 O) -> net zero per element.
-        atom_proof: dict[str, float] = self._build_atom_balance_proof(
+        atom_proof: dict[str, float] = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
 
@@ -202,6 +214,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             intent=ChemistryIntent.CONDENSATION_ROUTE,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "credited_condensed_kg": float(condensed_kg),
             },
@@ -264,30 +277,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 product_mol[str(product)] = mol
         return product_mol
 
+    @staticmethod
     def _build_atom_balance_proof(
-        self,
         debits: Mapping[str, Mapping[str, float]],
         credits: Mapping[str, Mapping[str, float]],
         registry: Mapping[str, Any],
         resolve_species_formula,
     ) -> dict[str, float]:
-        """Element-by-element ``credit - debit`` atom moles.
+        """Delegate to the shared :func:`build_atom_balance_proof` helper."""
 
-        Provider's claim, matched by the kernel's
-        :func:`validate_atom_balance` at commit time. Each entry should
-        be ~0 (within the kernel's atom-tolerance) for a balanced
-        proposal; any non-zero entry surfaces as :class:`AtomBalanceError`.
-        Same shape as the EVAPORATION_TRANSITION provider's proof for
-        cross-provider consistency.
-        """
-
-        net: dict[str, float] = defaultdict(float)
-        for side, sign in ((debits, -1.0), (credits, +1.0)):
-            for _account, species_mol in dict(side or {}).items():
-                for sp, mol in dict(species_mol or {}).items():
-                    if mol <= 0.0:
-                        continue
-                    formula = resolve_species_formula(str(sp), registry)
-                    for element, atoms in formula.atom_moles(float(mol)).items():
-                        net[str(element)] += sign * float(atoms)
-        return dict(net)
+        return build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula
+        )

@@ -49,7 +49,11 @@ from __future__ import annotations
 
 import math
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    diagnostic_control_audit,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
@@ -88,6 +92,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        # Kinetic flux math runs against the request's T/P/fO2 directly;
+        # no independent feedback. Diagnostic-only audit.
+        control_audit = diagnostic_control_audit(request)
+
         T_C = request.temperature_C
         T_K = T_C + 273.15
         if T_K < 400:
@@ -96,6 +104,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 status="ok",
+                control_audit=control_audit,
                 diagnostic={"evaporation_flux_kg_hr": {}},
             )
 
@@ -158,6 +167,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             intent=ChemistryIntent.EVAPORATION_FLUX,
             status="ok",
             transition=None,
+            control_audit=control_audit,
             diagnostic={
                 "evaporation_flux_kg_hr": flux_kg_hr,
                 "temperature_C": T_C,

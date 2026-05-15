@@ -66,11 +66,15 @@ is credited with the uncondensed vapor + the O2 coproduct.
 from __future__ import annotations
 
 import math
-from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
-from engines.builtin._common import reject_wrong_intent, unpack_controls
+from engines.builtin._common import (
+    build_atom_balance_proof,
+    diagnostic_control_audit,
+    reject_wrong_intent,
+    unpack_controls,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -122,12 +126,19 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        # The evaporation transition is pure kg/mol bookkeeping against the
+        # caller's flux + stoich -- the engine has no independent feedback
+        # on T/P/fO2, so applied == requested verbatim with the
+        # diagnostic-only note.
+        control_audit = diagnostic_control_audit(request)
+
         controls = unpack_controls(request)
         species = str(controls.get("species") or "")
         if not species:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
+                control_audit=control_audit,
                 diagnostic={"reason": "missing 'species' control input"},
             )
 
@@ -139,6 +150,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
+                control_audit=control_audit,
                 diagnostic={
                     "reason": (
                         "stoich must carry parent_oxide and positive "
@@ -165,6 +177,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic={
                     "credited_condensed_kg": 0.0,
                     "reason_skipped": (
@@ -187,6 +200,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
+                control_audit=control_audit,
                 diagnostic={
                     "reason": (
                         f"condensation route for {species!r} returned "
@@ -199,6 +213,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
+                control_audit=control_audit,
                 diagnostic={
                     "reason": (
                         f"condensation route for {species!r} exceeds "
@@ -257,6 +272,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="ok",
                 transition=None,
+                control_audit=control_audit,
                 diagnostic={"credited_condensed_kg": 0.0},
             )
 
@@ -266,7 +282,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # surface, matched against the kernel's authoritative count).
         # Mirrors _validate_evaporation_stoich_atoms which the legacy
         # caller runs against the same numbers.
-        atom_proof: dict[str, float] = self._build_atom_balance_proof(
+        atom_proof: dict[str, float] = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula,
         )
 
@@ -281,6 +297,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             intent=ChemistryIntent.EVAPORATION_TRANSITION,
             status="ok",
             transition=proposal,
+            control_audit=control_audit,
             diagnostic={
                 "credited_condensed_kg": float(condensed_kg),
                 "applied_scale": float(scale),
@@ -345,28 +362,15 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 product_mol[str(product)] = mol
         return product_mol
 
+    @staticmethod
     def _build_atom_balance_proof(
-        self,
         debits: Mapping[str, Mapping[str, float]],
         credits: Mapping[str, Mapping[str, float]],
         registry: Mapping[str, Any],
         resolve_species_formula,
     ) -> dict[str, float]:
-        """Element-by-element ``credit - debit`` atom moles.
+        """Delegate to the shared :func:`build_atom_balance_proof` helper."""
 
-        Provider's claim, matched by the kernel's
-        :func:`validate_atom_balance` at commit time. Each entry should
-        be ~0 (within the kernel's atom-tolerance) for a balanced
-        proposal; any non-zero entry surfaces as :class:`AtomBalanceError`.
-        """
-
-        net: dict[str, float] = defaultdict(float)
-        for side, sign in ((debits, -1.0), (credits, +1.0)):
-            for _account, species_mol in dict(side or {}).items():
-                for sp, mol in dict(species_mol or {}).items():
-                    if mol <= 0.0:
-                        continue
-                    formula = resolve_species_formula(str(sp), registry)
-                    for element, atoms in formula.atom_moles(float(mol)).items():
-                        net[str(element)] += sign * float(atoms)
-        return dict(net)
+        return build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula
+        )

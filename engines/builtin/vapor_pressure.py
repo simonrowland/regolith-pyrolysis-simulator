@@ -33,6 +33,7 @@ from typing import Any
 
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
+    diagnostic_control_audit,
     reject_wrong_intent,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
@@ -91,6 +92,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
+        # The Antoine + Ellingham math runs verbatim against the request's
+        # T/P/fO2 with no independent feedback. Audit reports applied ==
+        # requested with the diagnostic-only note documented in
+        # diagnostic_control_audit.
+        control_audit = diagnostic_control_audit(request)
+
         T_C = request.temperature_C
         T_K = T_C + 273.15
         if T_K < 400:
@@ -100,6 +107,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             return IntentResult(
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
+                control_audit=control_audit,
                 diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
             )
 
@@ -181,6 +189,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             intent=ChemistryIntent.VAPOR_PRESSURE,
             status="ok",
             transition=None,
+            control_audit=control_audit,
             diagnostic={
                 "vapor_pressures_Pa": vapor_pressures,
                 "activities": activities,

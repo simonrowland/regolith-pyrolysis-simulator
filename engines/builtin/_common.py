@@ -13,11 +13,13 @@ cycle that prevents top-level imports is documented in
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import (
+    ControlAudit,
     IntentRequest,
     IntentResult,
     ProviderAccountView,
@@ -120,3 +122,162 @@ def composition_wt_pct_from_account_view(
         if species in OXIDE_SPECIES:
             comp_wt[species] = (kg / total_kg) * 100.0
     return comp_wt
+
+
+def composition_kg_from_account_view(
+    view: ProviderAccountView,
+    account: str,
+    *,
+    registry: Mapping[str, Any] | None = None,
+) -> tuple[dict[str, float], float]:
+    """Project a mol account view onto ``(kg_by_species, total_kg)``.
+
+    Mirrors :meth:`MeltState.composition_kg`: the per-species kg dict and
+    the running total used by every provider whose math needs both a kg
+    projection AND a total mass (e.g. the C3/C6 metallothermic solubility
+    limits in ``metallothermic_step.py``).
+
+    Fail-closed on unregistered species (raises :class:`AccountingError`
+    via :func:`resolve_species_formula`); zero or negative entries are
+    skipped silently, matching the legacy
+    :meth:`MeltState.composition_kg` projection. Pair with
+    :func:`composition_wt_pct_from_account_view` when a provider needs
+    both views (the wt-percent helper above re-derives the kg view; the
+    factoring of the kg view through this function lets a caller that
+    needs ``total_kg`` directly skip the wt% pass).
+    """
+
+    # Lazy import: mirrors composition_wt_pct_from_account_view.
+    from simulator.accounting.formulas import resolve_species_formula
+
+    species_mol = dict(view.accounts.get(account, {}) or {})
+    species_registry = (
+        view.species_formula_registry if registry is None else registry
+    )
+    composition_kg: dict[str, float] = {}
+    total_kg = 0.0
+    for species, mol in species_mol.items():
+        mol_val = float(mol)
+        if mol_val <= 0.0:
+            continue
+        formula = resolve_species_formula(str(species), species_registry)
+        mass_kg = mol_val * formula.molar_mass_kg_per_mol()
+        if mass_kg <= 0.0:
+            continue
+        composition_kg[str(species)] = (
+            composition_kg.get(str(species), 0.0) + mass_kg
+        )
+        total_kg += mass_kg
+    return composition_kg, total_kg
+
+
+def build_atom_balance_proof(
+    debits: Mapping[str, Mapping[str, float]],
+    credits: Mapping[str, Mapping[str, float]],
+    registry: Mapping[str, Any],
+    resolve_species_formula,
+) -> dict[str, float]:
+    """Element-by-element ``credit - debit`` atom moles for a proposal.
+
+    Single canonical source-of-truth for the per-provider proof: every
+    authoritative provider (EVAPORATION_TRANSITION, CONDENSATION_ROUTE,
+    ELECTROLYSIS_STEP, METALLOTHERMIC_STEP, STAGE0_PRETREATMENT)
+    delegates to this helper so the proof shape stays uniform and
+    cross-checks reliably against the kernel's
+    :func:`validate_atom_balance` (which re-computes the same sum from
+    its kg-native :class:`LedgerTransition` projection inside
+    :data:`PROOF_CROSSCHECK_TOLERANCE_MOL`).
+
+    The function takes ``resolve_species_formula`` as a parameter (not
+    an import) to preserve the lazy-import discipline the providers
+    follow -- the package-init cycle that motivates lazy imports is
+    described in ``engines/builtin/__init__.py``. Callers pass in the
+    same callable they already import inside their ``dispatch`` body.
+
+    Each entry should be ~0 (within the kernel's atom-tolerance) for a
+    balanced proposal; any non-zero entry surfaces as
+    :class:`AtomBalanceError` at commit time.
+    """
+
+    net: dict[str, float] = defaultdict(float)
+    for side, sign in ((debits, -1.0), (credits, +1.0)):
+        for _account, species_mol in dict(side or {}).items():
+            for sp, mol in dict(species_mol or {}).items():
+                if mol <= 0.0:
+                    continue
+                formula = resolve_species_formula(str(sp), registry)
+                for element, atoms in formula.atom_moles(
+                    float(mol)
+                ).items():
+                    net[str(element)] += sign * float(atoms)
+    return dict(net)
+
+
+def dispatch_reaction_family(
+    intent: ChemistryIntent,
+    controls: Mapping[str, Any],
+    valid_families: Iterable[str],
+) -> IntentResult | None:
+    """Early-exit guard for providers that branch on a ``reaction_family``.
+
+    Returns ``None`` when the ``controls['reaction_family']`` value is in
+    ``valid_families``; otherwise returns an ``unsupported``
+    :class:`IntentResult` ready to be returned from ``dispatch``.
+
+    Centralises the boilerplate shared by ``metallothermic_step.py`` and
+    ``stage0_pretreatment.py`` so adding a new reaction family touches
+    one place and stays a string-literal contract with the caller.
+    """
+
+    family = str(controls.get("reaction_family") or "")
+    valid_set = frozenset(valid_families)
+    if family in valid_set:
+        return None
+    return IntentResult(
+        intent=intent,
+        status="unsupported",
+        diagnostic={
+            "reason": (
+                f"reaction_family {family!r} not in {sorted(valid_set)}"
+            ),
+        },
+    )
+
+
+def diagnostic_control_audit(
+    request: IntentRequest,
+    *,
+    include_fO2: bool = True,
+    note: str = (
+        "diagnostic only -- engine has no independent T/P/fO2 feedback"
+    ),
+) -> ControlAudit:
+    """Build a :class:`ControlAudit` whose ``applied`` mirrors ``requested``.
+
+    For providers that run pure math against the request's T/P/fO2 with
+    no independent control loop (every builtin provider except
+    ELECTROLYSIS_STEP, which has its own anode-oxygen activity), the
+    applied controls exactly equal the requested controls. The note
+    documents that the audit is informational, not feedback.
+
+    Setting ``include_fO2=False`` is appropriate for providers that have
+    no fO2 dependency at all (e.g. the metallothermic shuttles read
+    solubility limits + reagent mass; they ignore fO2 entirely). In that
+    case ``fO2_log`` is omitted from the audit dicts.
+    """
+
+    requested: dict[str, Any] = {
+        "temperature_C": float(request.temperature_C),
+        "pressure_bar": float(request.pressure_bar),
+    }
+    if include_fO2:
+        requested["fO2_log"] = (
+            float(request.fO2_log)
+            if request.fO2_log is not None
+            else None
+        )
+    return ControlAudit(
+        requested=requested,
+        applied=dict(requested),
+        notes=(note,),
+    )
