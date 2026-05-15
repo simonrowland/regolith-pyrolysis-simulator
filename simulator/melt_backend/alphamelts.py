@@ -359,10 +359,12 @@ class AlphaMELTSBackend(MeltBackend):
 
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         if not raw_comp_wt:
+            # No melt oxides supplied - the engine has nothing valid to act on.
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                status='out_of_domain',
             )
         domain_rejection = self._domain_gate(
             raw_comp_wt,
@@ -382,11 +384,13 @@ class AlphaMELTSBackend(MeltBackend):
             return self._equilibrate_subprocess(
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
         else:
+            # No PetThermoTools, no binary -- the engine is not present.
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 warnings=warnings,
+                status='unavailable',
             )
 
     def _unsupported_accounts(
@@ -456,6 +460,7 @@ class AlphaMELTSBackend(MeltBackend):
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             warnings=['DomainGate rejected: ' + '; '.join(reasons)],
+            status='out_of_domain',
         )
 
     def _is_non_oxide_species_name(self, name: str) -> bool:
@@ -699,11 +704,13 @@ class AlphaMELTSBackend(MeltBackend):
                 'AlphaMELTS subprocess produced no stable assemblage verdict'
             )
 
+        # The binary ran to completion with a stable assemblage - status 'ok'.
         eq = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             warnings=list(warnings or []),
+            status='ok',
         )
         liquidus_C = self._parse_liquidus_C(output)
         if liquidus_C is not None:
@@ -751,11 +758,13 @@ class AlphaMELTSBackend(MeltBackend):
                                      pressure_bar: float, fO2_log: float,
                                      comp_wt: dict, warnings=None
                                      ) -> EquilibriumResult:
+        # PetThermoTools returned a result object - status 'ok'.
         eq = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             warnings=list(warnings or []),
+            status='ok',
         )
         run_result = self._select_petthermotools_run(results)
         conditions = self._first_row_mapping(run_result.get('Conditions', {}))

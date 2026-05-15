@@ -75,6 +75,53 @@ def test_unavailable_equilibrate_returns_empty_result_with_warning():
     assert result.vapor_pressures_Pa == {}
     assert result.phases_present == []
     assert result.warnings == ["VapoRock backend not initialized"]
+    assert result.status == "unavailable"
+
+
+def test_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
+    # A composition with no oxides in VapoRock's basis (only native Fe /
+    # sulfide / halide species) collapses to an empty wt% projection. The
+    # adapter labels this 'out_of_domain' -- the engine has nothing valid
+    # to act on, not a runtime convergence failure.
+    fake_module = types.SimpleNamespace(
+        calc_vapor_pressures=lambda **_: {"Na": 1.0}
+    )
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({}) is True
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Fe": 1.0, "FeS": 0.5, "NaCl": 0.2},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "out_of_domain"
+    assert any("empty melt composition" in w for w in result.warnings)
+
+
+def test_library_exception_marks_status_not_converged(monkeypatch):
+    # A library-boundary exception is caught and surfaced as a warning on
+    # an otherwise-empty result; the result is labelled 'not_converged'
+    # (the engine ran but did not produce a usable answer).
+    def boom(**_):
+        raise RuntimeError("upstream vaporock convergence failure")
+
+    fake_module = types.SimpleNamespace(calc_vapor_pressures=boom)
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({}) is True
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "not_converged"
+    assert any("VapoRock equilibrate failed" in w for w in result.warnings)
 
 
 def test_capability_extension_is_instance_local():
@@ -126,6 +173,7 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
         "Na": pytest.approx(10.0),
         "SiO": pytest.approx(0.1),
     }
+    assert result.status == "ok"
 
 
 def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):

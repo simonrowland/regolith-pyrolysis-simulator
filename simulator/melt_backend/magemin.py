@@ -284,6 +284,7 @@ class MAGEMinBackend(MeltBackend):
         # bridge); the other bridges do.  Either way the backend must be
         # available with a resolved bridge.
         if not self._available or self._bridge is None:
+            result.status = 'unavailable'
             result.warnings.append('MAGEMin backend not initialized')
             return result
 
@@ -306,6 +307,8 @@ class MAGEMinBackend(MeltBackend):
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
+            # No oxide species in MAGEMin's basis after the account split.
+            result.status = 'out_of_domain'
             result.warnings.append(
                 'MAGEMin received empty melt composition; returning empty '
                 'equilibrium result'
@@ -320,8 +323,11 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
             )
         except Exception as exc:  # noqa: BLE001 - library-boundary catch
+            # MAGEMin is present but the minimisation did not produce a
+            # usable result.
             message = f'MAGEMin equilibrate failed: {exc}'
             self._last_error = message
+            result.status = 'not_converged'
             result.warnings.append(message)
             return result
 
@@ -331,6 +337,7 @@ class MAGEMinBackend(MeltBackend):
         # core.py::_get_equilibrium as the active backend (see the module
         # "Authority posture" note) — it is only valid for a shadow
         # comparator.
+        result.status = 'ok'
         self._populate_result(result, raw)
         return result
 

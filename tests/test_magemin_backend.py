@@ -163,6 +163,7 @@ def test_magemin_absent_equilibrate_returns_empty_result_with_warning(
     assert result.ledger_transition is None
     assert result.warnings
     assert any("not initialized" in w for w in result.warnings)
+    assert result.status == "unavailable"
 
 
 # ----------------------------------------------------------------------
@@ -298,6 +299,7 @@ def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     assert result.ledger_transition is None
     assert result.temperature_C == pytest.approx(1350.0)
     assert result.pressure_bar == pytest.approx(2000.0)
+    assert result.status == "ok"
 
 
 def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
@@ -324,6 +326,7 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
     assert result.phases_present == []
     assert result.ledger_transition is None
     assert any("synthetic MAGEMin failure" in w for w in result.warnings)
+    assert result.status == "not_converged"
 
 
 def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
@@ -480,3 +483,27 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases():
     ]
     assert crystalline, result.phases_present
     assert result.ledger_transition is None
+
+
+def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
+    # A composition with no species in MAGEMin's 14-oxide basis (only
+    # native Fe / sulfide / halide) collapses to an empty wt% projection.
+    # The adapter labels this 'out_of_domain' -- the engine has nothing
+    # valid to act on, not a runtime convergence failure.
+    fake_module = types.SimpleNamespace(minimize=lambda **_: {"phases": {}})
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Fe": 1.0, "FeS": 0.5, "NaCl": 0.2},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "out_of_domain"
+    assert any("empty melt composition" in w for w in result.warnings)

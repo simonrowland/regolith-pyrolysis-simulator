@@ -788,10 +788,13 @@ class FactSAGEBackend(MeltBackend):
                       *,
                       species_formula_registry: Optional[
                           Mapping[str, Any]] = None) -> EquilibriumResult:
+        # ChemApp returned an equilibrium result object; this is the
+        # success path.
         eq = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            status='ok',
         )
 
         phases = self._extract_phases(raw_result)
@@ -1349,8 +1352,11 @@ class FactSAGEBackend(MeltBackend):
     @staticmethod
     def _empty_result(temperature_C: float, pressure_bar: float,
                       fO2_log: float) -> EquilibriumResult:
+        # Returned only when ChemApp / the FactSAGE data file is not
+        # available for this call.
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            status='unavailable',
         )

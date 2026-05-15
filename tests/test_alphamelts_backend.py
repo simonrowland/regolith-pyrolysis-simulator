@@ -89,6 +89,7 @@ def test_alphamelts_rejects_metal_and_gas_account_inputs():
         "DomainGate rejected: unsupported ledger accounts present: "
         "process.metal_phase=['Fe'], process.overhead_gas=['O2']"
     ]
+    assert result.status == 'out_of_domain'
 
 
 def test_alphamelts_capabilities_surface_engine_version(monkeypatch):
@@ -181,6 +182,7 @@ def test_domain_gate_rejects_non_silicate_or_non_oxide_inputs():
         'DomainGate rejected: SiO2 90.000 wt% outside [30, 80]; '
         'major oxide sum 90.000 wt% <= 95; non-oxide species present: Fe'
     ]
+    assert result.status == 'out_of_domain'
 
 
 def test_petthermotools_result_parser_uses_verified_schema():
@@ -314,6 +316,7 @@ olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
     assert result.phase_masses_kg == {}
     assert result.warnings == ["AlphaMELTS liquidus_C=1220.310"]
     assert result.ledger_transition is None
+    assert result.status == 'ok'
 
 
 def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
@@ -376,3 +379,44 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
 
     assert snapshot.hour == 1
     assert elapsed_s < 5.0
+
+
+def test_no_mode_marks_status_unavailable():
+    # An AlphaMELTSBackend with no python_api or subprocess mode reaches
+    # the explicit "no engine present" return path in equilibrate(); the
+    # result is labelled 'unavailable'.
+    backend = AlphaMELTSBackend()
+    assert backend._mode is None  # default state
+
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg={
+            'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0,
+            'MgO': 10.0, 'CaO': 10.0, 'Na2O': 5.0,
+        },
+        fO2_log=-9.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == 'unavailable'
+
+
+def test_petthermotools_result_parser_marks_status_ok():
+    # _parse_petthermotools_result is the success path of the python_api
+    # mode -- a parsed PetThermoTools result must be labelled 'ok'.
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0},
+        'liquid1_prop': {'mass': 100.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0},
+    )
+
+    assert result.status == 'ok'

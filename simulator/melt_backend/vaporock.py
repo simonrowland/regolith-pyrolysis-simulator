@@ -350,6 +350,7 @@ class VapoRockBackend(MeltBackend):
         )
 
         if not self._available or self._vaporock is None:
+            result.status = 'unavailable'
             result.warnings.append('VapoRock backend not initialized')
             return result
 
@@ -372,6 +373,9 @@ class VapoRockBackend(MeltBackend):
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
+            # No oxide species in VapoRock's basis after the account
+            # split; the vapor-melt solver has nothing valid to consume.
+            result.status = 'out_of_domain'
             result.warnings.append(
                 'VapoRock received empty melt composition; returning empty '
                 'equilibrium result'
@@ -397,14 +401,17 @@ class VapoRockBackend(MeltBackend):
                 fO2_log=fO2_log,
             )
         except Exception as exc:  # noqa: BLE001 - library-boundary catch
+            # VapoRock is present but the call did not produce a usable result.
             message = f'VapoRock equilibrate failed: {exc}'
             self._last_error = message
+            result.status = 'not_converged'
             result.warnings.append(message)
             return result
 
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
         # re-scale here or an already-Pa result is inflated 1e5x.
+        result.status = 'ok'
         result.vapor_pressures_Pa = vapor_pressures_Pa
         # phases_present is intentionally left empty — VapoRock is
         # vapor-side only and does not return a silicate-phase

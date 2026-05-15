@@ -209,6 +209,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         self.backend = melt_backend
         self._last_backend_error = ''
+        # Per-call outcome of the most recent EquilibriumResult
+        # ('ok' / 'not_converged' / 'out_of_domain' / 'unavailable').
+        # Descriptive only - no control-flow branch reads this.
+        self._last_backend_status = 'ok'
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
@@ -376,6 +380,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
         self._last_backend_error = ''
+        self._last_backend_status = 'ok'
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -926,23 +931,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         Kg composition remains available as an adapter projection for legacy
         helper surfaces, but MeltState kg is not authoritative.
+
+        ``EquilibriumResult.status`` is recorded on
+        ``_last_backend_status`` for diagnostics.  It is descriptive only:
+        the fallback decisions below are still driven by ``is_available()``
+        and the raised-exception handlers, exactly as before.  Status
+        surfaces existing state at the consumption point; it does not
+        introduce a new control-flow branch.
         """
         if self.backend is None:
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
         if self._backend_failed:
             if not self._backend_allows_stub_fallback():
                 raise RuntimeError(
                     self._last_backend_error
                     or 'configured backend is disabled after failure'
                 )
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
         if not self.backend.is_available():
             if not self._backend_allows_stub_fallback():
                 raise RuntimeError(
                     self._last_backend_error
                     or f'{type(self.backend).__name__} is unavailable'
                 )
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
 
         try:
             backend_composition_by_account = (
@@ -967,13 +979,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._disable_backend_after_failure()
             if not self._backend_allows_stub_fallback():
                 raise
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
         except ValueError as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
             if not self._backend_allows_stub_fallback():
                 raise
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
 
         transition = getattr(result, 'ledger_transition', None)
         if transition is None and self._equilibrium_result_has_phase_species(result):
@@ -984,11 +996,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._disable_backend_after_failure()
             if not self._backend_allows_stub_fallback():
                 raise RuntimeError(self._last_backend_error)
-            return self._stub_equilibrium()
+            return self._record_equilibrium_status(self._stub_equilibrium())
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
             self.atom_ledger.apply(transition)
             self._project_cleaned_melt_from_atom_ledger()
+        return self._record_equilibrium_status(result)
+
+    def _record_equilibrium_status(self, result):
+        """Record the per-call backend outcome; returns ``result`` unchanged."""
+        self._last_backend_status = getattr(result, 'status', 'ok')
         return result
 
     def _backend_accepts_kwarg(self, name: str) -> bool:

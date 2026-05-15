@@ -170,9 +170,13 @@ class EquilibriumMixin:
 
         T_K = self.melt.temperature_C + 273.15
         if T_K < 400:
+            # Builtin path ran and correctly found no significant
+            # evaporation below 400 K - a converged 'ok' outcome, not a
+            # failure or an unavailable engine.
             return EquilibriumResult(
                 temperature_C=self.melt.temperature_C,
                 pressure_bar=self.melt.p_total_mbar / 1000.0,
+                status='ok',
             )
 
         vapor_pressures = {}
@@ -343,4 +347,5 @@ class EquilibriumMixin:
             vapor_pressures_Pa=vapor_pressures,
             activity_coefficients=activities,
             fO2_log=math.log10(max(pO2_bar, 1e-20)),
+            status='ok',
         )

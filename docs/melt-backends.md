@@ -2,6 +2,10 @@
 
 The simulator can run without external thermodynamic software. The fallback path combines simplified Ellingham equilibrium logic with Antoine vapor-pressure data, which is useful for comparative exploration but not for validated melt chemistry.
 
+## Per-call result status
+
+`EquilibriumResult.status` records the per-call backend outcome: `'ok'` (engine ran and produced a usable result), `'not_converged'` (engine ran but did not produce one), `'out_of_domain'` (a DomainGate or account filter rejected the input), or `'unavailable'` (engine / library / binary absent for this call). It is descriptive only — `core.py::_get_equilibrium` continues to drive fallback decisions from `is_available()` and the raised-exception handlers, and surfaces the most recent value on `_last_backend_status` for diagnostics.
+
 ## Backend Order
 
 The simulator checks melt backends in this order:

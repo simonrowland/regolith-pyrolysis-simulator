@@ -190,6 +190,20 @@ class EquilibriumResult:
     # AtomLedger remains authoritative.
     ledger_transition: Any | None = None
 
+    # Per-call backend outcome.  Unlike engine identity (known from the
+    # user's backend selection at web/events.py::_get_backend) and intent
+    # authority (an engine x intent lookup against the binding-spec matrix),
+    # status is a genuinely per-call runtime signal:
+    #
+    #   'ok'            - the engine ran and produced a usable result.
+    #   'not_converged' - the engine ran but did not converge / produce one.
+    #   'out_of_domain' - a DomainGate / account filter rejected the input.
+    #   'unavailable'   - the engine/library/binary is absent for this call.
+    #
+    # status is descriptive: it surfaces existing state at the consumption
+    # point and never gates a new control-flow branch.
+    status: str = 'ok'
+
 
 class MeltBackend(ABC):
     """
@@ -288,10 +302,13 @@ class StubBackend(MeltBackend):
                     fO2_log=-9.0, pressure_bar=1e-6, *,
                     composition_mol=None, composition_mol_by_account=None,
                     species_formula_registry=None):
+        # The stub wraps no real engine; is_available() is False and
+        # core.py runs its own Ellingham/Antoine path instead.
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            status='unavailable',
         )
 
     def get_vapor_species(self):

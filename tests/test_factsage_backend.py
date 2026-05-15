@@ -311,6 +311,36 @@ def test_factsage_equilibrate_returns_equilibrium_result(fake_chemapp,
         2.0 / 3.0 * 100.0)
     assert result.vapor_pressures_Pa['Na'] == pytest.approx(12.0)
     assert result.ledger_transition is not None
+    assert result.status == 'ok'
+
+
+def test_factsage_equilibrate_when_unavailable_marks_status_unavailable():
+    backend = FactSAGEBackend()
+    # No ChemApp module / data file configured -> backend not available.
+    assert backend.initialize({}) is False
+
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg={'SiO2': 2.0, 'FeO': 1.0},
+        fO2_log=-9.0,
+        pressure_bar=1e-6,
+    )
+
+    assert isinstance(result, EquilibriumResult)
+    assert result.status == 'unavailable'
+    assert result.phases_present == []
+
+
+def test_stub_backend_equilibrate_marks_status_unavailable():
+    # StubBackend wraps no real engine; is_available() is False and the
+    # empty result it returns is labelled 'unavailable' so the per-call
+    # outcome is explicit at the consumption point.
+    backend = StubBackend()
+    result = backend.equilibrate(1600.0, composition_mol={'SiO2': 1.0})
+
+    assert isinstance(result, EquilibriumResult)
+    assert backend.is_available() is False
+    assert result.status == 'unavailable'
 
 
 def test_factsage_phase_species_transition_conserves_noop_melt():
