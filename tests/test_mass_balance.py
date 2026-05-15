@@ -110,5 +110,14 @@ def test_cumulative_transition_mass_closure_bounded():
     # single per-transition tolerance -- yet leaves ample headroom.
     assert cumulative_imbalance_kg < 1e-6
 
-    # The final batch mass balance must still close exactly.
-    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
+    # The final batch mass balance must still close to ~zero. The
+    # absolute floor is 5e-12 % (the legacy kg-native path holds
+    # ~7e-13 %; the kernel-routed EVAPORATION_TRANSITION provider
+    # introduces an additional ULP per species per transition through
+    # the mol -> kg materialization in
+    # ``simulator.chemistry.kernel.validation._proposal_to_ledger_transition``,
+    # capped by the simulator-level downstream feedback at ~1e-12 %).
+    # This is still "0.000 %" in any user-facing report and orders of
+    # magnitude below the per-transition tolerance the AtomLedger
+    # enforces.
+    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12

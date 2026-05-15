@@ -625,6 +625,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
+        from engines.builtin.evaporation_transition import (
+            BuiltinEvaporationTransitionProvider,
+        )
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
         # Re-register the authoritative VAPOR_PRESSURE provider once per
@@ -649,6 +652,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._chem_registry.register(
                 BuiltinEvaporationFluxProvider(),
                 [ChemistryIntent.EVAPORATION_FLUX],
+            )
+        # EVAPORATION_TRANSITION -- third intent flip of
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7). FIRST authoritative
+        # ledger-mutating intent in the migration: the provider emits a
+        # LedgerTransitionProposal and the kernel's commit_batch actually
+        # writes the AtomLedger. Per-call inputs (rate_kg_hr,
+        # remaining_kg_hr, stoich, sp_data, dt_hr, available_kg) arrive
+        # via control_inputs from _credit_evaporation_transition.
+        if self._chem_registry.authoritative_for(
+            ChemistryIntent.EVAPORATION_TRANSITION
+        ) is None:
+            self._chem_registry.register(
+                BuiltinEvaporationTransitionProvider(),
+                [ChemistryIntent.EVAPORATION_TRANSITION],
             )
         return ChemistryKernel(
             ledger=self.atom_ledger,

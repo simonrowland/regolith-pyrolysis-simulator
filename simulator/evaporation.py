@@ -221,15 +221,45 @@ class EvaporationMixin:
         remaining_kg_hr: float,
         sp_data: dict,
     ) -> float:
+        """Apply the per-species melt -> vapor transition via the kernel.
+
+        EVAPORATION_TRANSITION intent -- kernel-authoritative.
+
+        \\goal BUILTIN-ENGINE-EXTRACTION (#7), third flip and the FIRST
+        authoritative intent in the migration. The
+        BuiltinEvaporationTransitionProvider builds a
+        :class:`LedgerTransitionProposal` (debit cleaned_melt, credit
+        overhead_gas + condensation_train); the kernel's commit_batch
+        applies it to the AtomLedger after re-validating atom balance
+        and the account-filter. This method:
+
+        1. Validates the input stoich and condensation-route output the
+           same way the legacy code did (the AccountingError surface
+           lives in the caller, not inside the stateless provider --
+           matching the EVAPORATION_FLUX pattern).
+        2. Computes the parent-oxide availability cap from the ledger
+           projection (this used to live inline; the provider receives
+           it via ``available_kg``).
+        3. Dispatches EVAPORATION_TRANSITION through the kernel and
+           commits the resulting proposal. After this flip,
+           ``self.atom_ledger.apply(...)`` no longer fires from inside
+           this method -- ``self._chem_kernel.commit_batch(...)`` is the
+           only writable path.
+
+        Returns:
+            ``credited_condensed_kg`` -- the amount of vapor that
+            condensed onto ``process.condensation_train``, used by the
+            caller to drive stage-collection bookkeeping.
+        """
+
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
             return 0.0
 
         parent_oxide = stoich['parent_oxide']
-        oxide_removed = rate_kg_hr * stoich['oxide_per_product_kg']
-        product_kg = rate_kg_hr
-        O2_kg = rate_kg_hr * stoich['O2_per_product_kg']
-        product_species = species
+        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
+        product_kg = rate_kg_per_tick
 
         if oxide_removed <= 1e-12:
             return 0.0
@@ -239,66 +269,48 @@ class EvaporationMixin:
         if available_kg <= 1e-12:
             return 0.0
 
-        scale = min(1.0, available_kg / oxide_removed)
-        oxide_removed *= scale
-        product_kg *= scale
-        O2_kg *= scale
+        # Mirror the legacy validation: the AccountingError surface is
+        # owned by the caller, not the provider. The provider receives
+        # already-validated inputs (this matches the EVAPORATION_FLUX
+        # flip pattern in _calculate_evaporation).
         if remaining_kg_hr < -1e-12 or remaining_kg_hr > rate_kg_hr + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * scale
-        if remaining_kg > product_kg + 1e-12:
+        scale = min(1.0, available_kg / oxide_removed)
+        remaining_kg = max(0.0, remaining_kg_hr) * 1.0 * scale
+        if remaining_kg > product_kg * scale + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
             )
-        condensed_kg = max(0.0, product_kg - remaining_kg)
-        condensed_product_mol, condensed_products_kg = (
-            self._condensed_products_for_vapor(
-                product_species, condensed_kg, sp_data)
-        )
 
-        credits = []
-        if condensed_kg > 1e-12:
-            if condensed_product_mol:
-                credits.append(self.atom_ledger.credit_mol(
-                    'process.condensation_train',
-                    condensed_product_mol,
-                    source=f'{species} condensation',
-                ))
-            else:
-                credits.append(self.atom_ledger.credit(
-                    'process.condensation_train',
-                    condensed_products_kg,
-                    source=f'{species} condensation',
-                ))
-        if remaining_kg > 1e-12:
-            credits.append(self.atom_ledger.credit(
-                'process.overhead_gas',
-                {product_species: remaining_kg},
-                source=f'{species} uncondensed vapor',
-            ))
-        if O2_kg > 1e-12:
-            credits.append(self.atom_ledger.credit(
-                'process.overhead_gas',
-                {'O2': O2_kg},
-                source=f'{species} oxygen coproduct',
-            ))
-        if not credits:
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.EVAPORATION_TRANSITION,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'species': species,
+                'stoich': dict(stoich),
+                'sp_data': dict(sp_data or {}),
+                'rate_kg_hr': float(rate_kg_hr),
+                'remaining_kg_hr': float(remaining_kg_hr),
+                'dt_hr': 1.0,
+                'available_kg': float(available_kg),
+            },
+        )
+        proposal = kernel_result.transition
+        if proposal is None:
             return 0.0
 
-        self.atom_ledger.transfer(
-            f'evaporate_{species}_{self.melt.hour}',
-            debits=(self.atom_ledger.debit(
-                'process.cleaned_melt',
-                {parent_oxide: oxide_removed},
-                source=f'{species} evaporation',
-            ),),
-            credits=tuple(credits),
-            reason='evaporation and gas-train routing',
-        )
-        return condensed_kg
+        # commit_batch is the ONLY writable path into the AtomLedger
+        # after this flip. The kernel re-validates atom balance + the
+        # account filter and translates the mol-native proposal into a
+        # canonical LedgerTransition before applying it.
+        self._chem_kernel.commit_batch(proposal)
+
+        diagnostic = dict(kernel_result.diagnostic or {})
+        return float(diagnostic.get('credited_condensed_kg', 0.0))
 
     def _condensed_products_for_vapor(
         self, species: str, condensed_kg: float, sp_data: dict
