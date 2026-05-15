@@ -1,0 +1,462 @@
+"""Tests for the BuiltinVaporPressureProvider — first intent flip of
+\\goal BUILTIN-ENGINE-EXTRACTION (#7).
+
+Covers:
+
+* Unit: the provider returns the same vapor pressures as the legacy
+  :meth:`EquilibriumMixin._stub_equilibrium` for a known composition + T.
+* Unit: the kernel filter actually scopes the provider's account view to
+  the single declared account (``process.cleaned_melt``).
+* Unit: capability profile declares ``VAPOR_PRESSURE`` only and is
+  authoritative for it.
+* Shadow parity: across a multi-step simulation run on lunar + Mars +
+  asteroid feedstocks, the legacy ``_stub_equilibrium`` and the kernel
+  dispatch agree species-by-species within 1e-9 Pa (relative + absolute
+  floor). This is the parity gate that justified the flip; it stays in
+  the suite as a regression guard against future intent flips that touch
+  the same call site.
+"""
+
+from __future__ import annotations
+
+import math
+from pathlib import Path
+
+import pytest
+import yaml
+
+from engines.builtin.vapor_pressure import (
+    BuiltinVaporPressureProvider,
+    _ELLINGHAM_THERMO,
+)
+from simulator.accounting.ledger import AtomLedger
+from simulator.chemistry.kernel import (
+    ChemistryIntent,
+    ChemistryKernel,
+    IntentRequest,
+    ProviderRegistry,
+)
+from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import StubBackend
+from simulator.state import CampaignPhase, DecisionType
+
+
+DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+_VP_TOLERANCE_REL = 1e-9
+_VP_TOLERANCE_ABS_PA = 1e-9
+
+
+def _load_yaml(name: str) -> dict:
+    return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+@pytest.fixture(scope="module")
+def vapor_pressure_data() -> dict:
+    return _load_yaml("vapor_pressures.yaml")
+
+
+@pytest.fixture(scope="module")
+def feedstocks_data() -> dict:
+    return _load_yaml("feedstocks.yaml")
+
+
+@pytest.fixture(scope="module")
+def setpoints_data() -> dict:
+    return _load_yaml("setpoints.yaml")
+
+
+def _build_sim(
+    feedstock_key: str,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    *,
+    additives_kg: dict | None = None,
+) -> PyrolysisSimulator:
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend, setpoints_data, feedstocks_data, vapor_pressure_data
+    )
+    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives_kg)
+    return sim
+
+
+# ---------------------------------------------------------------------------
+# 1. Capability profile
+# ---------------------------------------------------------------------------
+
+
+def test_provider_declares_only_vapor_pressure_intent(vapor_pressure_data):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    profile = provider.capability_profile()
+
+    assert profile.intents == frozenset({ChemistryIntent.VAPOR_PRESSURE})
+    assert profile.is_authoritative_for == frozenset(
+        {ChemistryIntent.VAPOR_PRESSURE}
+    )
+    # No other intent is authorised.
+    for intent in ChemistryIntent:
+        if intent is ChemistryIntent.VAPOR_PRESSURE:
+            assert profile.is_authoritative(intent)
+        else:
+            assert not profile.is_authoritative(intent)
+
+
+def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    profile = provider.capability_profile()
+    assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
+
+
+# ---------------------------------------------------------------------------
+# 2. Kernel filter scopes the account view
+# ---------------------------------------------------------------------------
+
+
+def test_kernel_filters_provider_to_cleaned_melt_only(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Even when other accounts hold material, the provider must see only
+    ``process.cleaned_melt`` — the kernel account filter is the enforcer."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    # Seed an unrelated account so the filter has something to drop.
+    sim.atom_ledger.load_external(
+        "process.metal_phase", {"Fe": 0.5}, source="test seed"
+    )
+
+    seen_accounts: list[frozenset[str]] = []
+    original_dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def _spying_dispatch(self, request):
+        seen_accounts.append(frozenset(request.account_view.accounts))
+        return original_dispatch(self, request)
+
+    BuiltinVaporPressureProvider.dispatch = _spying_dispatch
+    try:
+        sim._chem_kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=1400.0,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 1e-9},
+        )
+    finally:
+        BuiltinVaporPressureProvider.dispatch = original_dispatch
+
+    assert seen_accounts, "provider was never dispatched"
+    for accounts in seen_accounts:
+        assert accounts == frozenset({"process.cleaned_melt"}), (
+            "kernel filter leaked an undeclared account into the provider"
+        )
+
+
+# ---------------------------------------------------------------------------
+# 3. Provider returns the same values as the legacy stub for a known input
+# ---------------------------------------------------------------------------
+
+
+def test_provider_matches_legacy_stub_for_known_lunar_composition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Direct unit-level parity: build a simulator, advance into a campaign
+    where the melt has been heated above the 400 K early-exit, then assert
+    every species emitted by the legacy path is reproduced by the kernel
+    within tolerance."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    # Step a few hours to heat the melt; both paths short-circuit below
+    # 400 K, so an exact match before the ramp is uninteresting.
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    while sim.melt.temperature_C < 600.0:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+
+    legacy_result = sim._stub_equilibrium()
+    kernel_result = sim._chem_kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+    )
+    kernel_vp = dict(
+        (kernel_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
+    )
+
+    assert legacy_result.vapor_pressures_Pa, (
+        "legacy stub returned no vapor pressures — the test fixture is not "
+        "exercising the path it claims to cover"
+    )
+    for species, legacy_value in legacy_result.vapor_pressures_Pa.items():
+        kernel_value = kernel_vp.get(species, 0.0)
+        tol = max(
+            _VP_TOLERANCE_ABS_PA,
+            _VP_TOLERANCE_REL * max(abs(legacy_value), abs(kernel_value)),
+        )
+        assert abs(kernel_value - legacy_value) <= tol, (
+            f"vapor pressure for {species!r} disagrees: legacy={legacy_value:.6g} Pa "
+            f"kernel={kernel_value:.6g} Pa (tol={tol:.3g} Pa)"
+        )
+
+    # Every species the kernel emits must also appear in the legacy
+    # output — otherwise we have a one-sided divergence the loop above
+    # would miss.
+    assert set(kernel_vp) <= set(legacy_result.vapor_pressures_Pa), (
+        f"kernel emitted species the legacy stub did not: "
+        f"{set(kernel_vp) - set(legacy_result.vapor_pressures_Pa)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4. Shadow-parity smoke run across lunar + Mars + asteroid feedstocks
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "feedstock_key, additives_kg",
+    [
+        ("lunar_mare_low_ti", None),
+        ("mars_basalt", {"C": 60.0}),
+        ("s_type_asteroid_silicate", None),
+    ],
+)
+def test_shadow_parity_across_short_simulation_run(
+    feedstock_key,
+    additives_kg,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """For each feedstock, drive the simulator through the C0-into-C2A
+    handoff and assert the legacy stub and the kernel dispatch agree at
+    every step within tolerance.
+
+    This is the parity gate that justified flipping the VAPOR_PRESSURE
+    intent. Keeping it in the suite catches future regressions if a
+    later intent flip changes the kernel call shape.
+    """
+
+    sim = _build_sim(
+        feedstock_key,
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg=additives_kg,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    worst_delta_pa = 0.0
+    while not sim.is_complete() and steps < 60:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+
+        # Compare the legacy and kernel paths at this tick.
+        T_C = sim.melt.temperature_C
+        if T_C + 273.15 < 400:
+            continue
+        legacy_result = sim._stub_equilibrium()
+        kernel_result = sim._chem_kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=T_C,
+            pressure_bar=sim.melt.p_total_mbar / 1000.0,
+            control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        )
+        kernel_vp = dict(
+            (kernel_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
+        )
+        legacy_vp = dict(legacy_result.vapor_pressures_Pa or {})
+        for species in set(legacy_vp) | set(kernel_vp):
+            legacy_value = float(legacy_vp.get(species, 0.0))
+            kernel_value = float(kernel_vp.get(species, 0.0))
+            delta = abs(legacy_value - kernel_value)
+            tol = max(
+                _VP_TOLERANCE_ABS_PA,
+                _VP_TOLERANCE_REL * max(abs(legacy_value), abs(kernel_value)),
+            )
+            worst_delta_pa = max(worst_delta_pa, delta)
+            assert delta <= tol, (
+                f"parity broke for {species!r} at step {steps} "
+                f"(T={T_C:.1f} C, feedstock={feedstock_key}): "
+                f"legacy={legacy_value:.6g} Pa kernel={kernel_value:.6g} Pa "
+                f"delta={delta:.6g} Pa tol={tol:.6g} Pa"
+            )
+
+    assert steps > 0, f"smoke run for {feedstock_key} executed zero steps"
+    # Sanity: the worst-case observed delta must be at most the largest
+    # tolerance band the loop allowed. This is implied by the per-tick
+    # assertion but pinned explicitly so the test is self-documenting
+    # about what "parity" meant numerically.
+    assert worst_delta_pa <= 1.0, (
+        f"worst observed parity delta {worst_delta_pa:.6g} Pa is "
+        f"suspiciously large for a refactor-only change"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 5. The flip is wired: result.vapor_pressures_Pa traces back to the kernel
+# ---------------------------------------------------------------------------
+
+
+def test_get_equilibrium_returns_kernel_vapor_pressures(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """After a successful equilibrium call, the EquilibriumResult's
+    vapor_pressures_Pa must match what the kernel dispatch would return.
+
+    Belt-and-braces: catches a future refactor that bypasses the kernel
+    in the legacy path."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    while sim.melt.temperature_C < 700.0:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+
+    result = sim._get_equilibrium()
+    kernel_dispatch = sim._chem_kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+    )
+    kernel_vp = dict(
+        (kernel_dispatch.diagnostic or {}).get("vapor_pressures_Pa") or {}
+    )
+
+    # If the kernel produced any vapor pressures, the equilibrium result
+    # must mirror them — this is exactly the flip.
+    if kernel_vp:
+        assert set(result.vapor_pressures_Pa) == set(kernel_vp)
+        for species, kernel_value in kernel_vp.items():
+            assert result.vapor_pressures_Pa[species] == pytest.approx(
+                kernel_value
+            )
+
+
+# ---------------------------------------------------------------------------
+# 6. The provider returns transition=None (VAPOR_PRESSURE is diagnostic)
+# ---------------------------------------------------------------------------
+
+
+def test_provider_emits_no_ledger_transition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """VAPOR_PRESSURE owns no ledger mutation — that belongs to
+    EVAPORATION_TRANSITION. The provider must always leave the result
+    transition None."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    # Heat the melt and dispatch.
+    while sim.melt.temperature_C < 700.0:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+    )
+    assert result.transition is None, (
+        "VAPOR_PRESSURE is diagnostic per binding spec §3 — provider must "
+        "never emit a LedgerTransitionProposal"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 7. Below 400 K, both paths return an empty vapor-pressure dict
+# ---------------------------------------------------------------------------
+
+
+def test_provider_short_circuits_below_400_k(vapor_pressure_data):
+    """The legacy stub returns an empty result below 400 K (no
+    significant evaporation). The provider must do the same so the
+    pre-heat hours of every batch stay numerically identical."""
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0, "FeO": 1.0}},
+        species_formula_registry={},
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=view,
+        temperature_C=25.0,  # Well below 400 K
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+    result = provider.dispatch(request)
+    assert result.status == "ok"
+    assert (result.diagnostic or {}).get("vapor_pressures_Pa") == {}

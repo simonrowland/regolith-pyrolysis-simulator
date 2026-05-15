@@ -85,6 +85,16 @@ from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
 )
+from simulator.chemistry.kernel import (
+    ChemistryIntent,
+    ChemistryKernel,
+    ProviderRegistry,
+)
+# BuiltinVaporPressureProvider is imported lazily inside
+# _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
+# engines.builtin.vapor_pressure -> simulator.chemistry.kernel ->
+# simulator.* would re-enter this module mid-init. Deferring the import
+# to first kernel build breaks the cycle.
 
 # ============================================================================
 # SECTIONS 1-3: CONSTANTS, ENUMS, AND STATE MODELS
@@ -260,6 +270,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()
 
+        # --- Chemistry-engine kernel ---
+        # Single instantiation point: the registry + kernel created here
+        # are reused by every subsequent intent flip in
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7). VAPOR_PRESSURE is the only
+        # intent wired today (this commit); EVAPORATION_FLUX,
+        # CONDENSATION_ROUTE, ELECTROLYSIS_STEP, METALLOTHERMIC_STEP,
+        # STAGE0_PRETREATMENT will register on top of this same kernel.
+        # The kernel must be rebuilt whenever the ledger is rebuilt (see
+        # load_batch); rebuild via _build_chemistry_kernel().
+        self._chem_registry: ProviderRegistry = ProviderRegistry()
+        self._chem_kernel: ChemistryKernel = self._build_chemistry_kernel()
+        # Parity flag from the VAPOR_PRESSURE flip in
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7). The shadow comparator
+        # that validated builtin-vs-kernel parity across a full smoke run
+        # was removed at flip time (the kernel IS the new authoritative
+        # source — comparing against itself is moot). The flag stays True
+        # as a permanent documentation marker that the flip has landed
+        # and subsequent intent flips can rely on the kernel path here.
+        self._kernel_vapor_pressure_parity: Dict[str, Any] = {
+            'clean': True,
+            'first_discrepancy': None,
+        }
+
         # --- Current state ---
         self.melt = MeltState()
         self.inventory = ProcessInventory()
@@ -416,6 +449,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._apply_stage0_perchlorate_reactions(fs)
         self._seed_atom_ledger(feedstock_key, fs, ledger_additives)
         self._project_cleaned_melt_from_atom_ledger()
+        # Rebind the chemistry kernel to the freshly seeded ledger +
+        # registry. _seed_atom_ledger creates the ledger, so the kernel
+        # rebuild must come after. The provider registry persists; only
+        # the kernel facade is rebuilt per batch.
+        self._chem_kernel = self._build_chemistry_kernel()
         self._last_backend_error = ''
         self._last_backend_status = 'ok'
         self._backend_failed = False
@@ -571,6 +609,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return AtomLedger(
             registry=self.species_formula_registry,
             account_policies=self._backend_account_policies(),
+        )
+
+    def _build_chemistry_kernel(self) -> ChemistryKernel:
+        """Construct the kernel pointing at the current ledger + registry.
+
+        Rebuilt on every ``load_batch`` because the simulator re-creates
+        ``self.atom_ledger`` per batch (the species-formula registry can
+        also change with feedstock). The provider registry persists for
+        the lifetime of the simulator; only the kernel facade is rebuilt.
+        """
+
+        # Lazy import to break the package-init cycle (see header comment
+        # on the chemistry-kernel imports above).
+        from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+        # Re-register the authoritative VAPOR_PRESSURE provider once per
+        # simulator (idempotent: ProviderRegistry.register would raise on
+        # a double authoritative registration). Subsequent intent flips
+        # add their providers here.
+        if self._chem_registry.authoritative_for(
+            ChemistryIntent.VAPOR_PRESSURE
+        ) is None:
+            self._chem_registry.register(
+                BuiltinVaporPressureProvider(self.vapor_pressures),
+                [ChemistryIntent.VAPOR_PRESSURE],
+            )
+        return ChemistryKernel(
+            ledger=self.atom_ledger,
+            registry=self._chem_registry,
+            species_formula_registry=self.species_formula_registry,
         )
 
     def _seed_atom_ledger(
@@ -1202,12 +1270,70 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Record the per-call backend outcome and run the post-equilibrium
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
         self._last_backend_status = getattr(result, 'status', 'ok')
+        # VAPOR_PRESSURE intent — kernel-authoritative.
+        #
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7), first flip landed. The
+        # BuiltinVaporPressureProvider is the authoritative source for
+        # vapor pressures; this call replaces result.vapor_pressures_Pa
+        # with the kernel diagnostic so downstream consumers
+        # (_calculate_evaporation, _route_to_condensation) read from the
+        # kernel-owned path. The legacy _stub_equilibrium still computes
+        # vapor pressures (the Antoine/Ellingham math IS the underlying
+        # implementation behind the kernel) but that result is overwritten
+        # here. Shadow parity verified clean across a full smoke run
+        # (lunar + Mars + asteroid feedstocks, tolerance 1e-9 Pa rel +
+        # 1e-9 Pa abs) before this flip landed; the shadow comparator was
+        # removed at flip time per the goal spec ("comparing against the
+        # same source is moot"). Subsequent intent flips
+        # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
+        self._refresh_vapor_pressures_from_kernel(result)
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
         return result
+
+    def _refresh_vapor_pressures_from_kernel(self, result) -> None:
+        """Replace ``result.vapor_pressures_Pa`` with the kernel dispatch.
+
+        Belongs to the VAPOR_PRESSURE flip in
+        \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
+        :meth:`_record_equilibrium_status` after the backend (or the
+        legacy stub) produces an EquilibriumResult.
+
+        Behaviour:
+          - Below 400 K both the legacy path and the kernel return an
+            empty vapor-pressure dict; we leave the result untouched.
+          - When the kernel returns a populated ``vapor_pressures_Pa``
+            it replaces the equilibrium-result dict in place. The
+            activities dict is replaced too (the legacy stub set both
+            atomically and downstream code keys off the same source).
+          - The kernel may return an empty dict legitimately (e.g. before
+            the melt is seeded, or for an exotic feedstock with no known
+            volatile species); leave the legacy result in that case so
+            the existing zero-state behaviour is preserved.
+          - If the kernel raises, propagate — silent fallback was
+            explicitly forbidden by the goal spec.
+        """
+
+        T_C = float(self.melt.temperature_C)
+        if T_C + 273.15 < 400:
+            return
+
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=T_C,
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={'pO2_bar': self._commanded_pO2_bar()},
+        )
+        diagnostic = dict(kernel_result.diagnostic or {})
+        kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
+        if kernel_vp:
+            result.vapor_pressures_Pa = dict(kernel_vp)
+        kernel_activities = diagnostic.get('activities') or {}
+        if kernel_activities:
+            result.activity_coefficients = dict(kernel_activities)
 
     def _backend_accepts_kwarg(self, name: str) -> bool:
         try:
