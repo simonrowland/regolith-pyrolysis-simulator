@@ -53,11 +53,39 @@ This guide is for contributors and coding agents that need to find the right fil
 ## Engine Source Trees
 
 - `engines/__init__.py` documents the chemistry-engine refactor: kernel-shadow provider source lives here; today-hook adapters stay in `simulator/melt_backend/`.
+- `engines/builtin/` is the live authoritative chemistry plane — seven kernel-registered `ChemistryProvider` classes that own every builtin intent. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
+  - `engines/builtin/_common.py` provides shared helpers: `reject_wrong_intent`, `unpack_controls`, and `composition_wt_pct_from_account_view` (fail-closed via `UnknownSpeciesError`, mirroring `_load_ledger_account`).
+  - `engines/builtin/README.md` documents the migration plan and per-provider conventions.
+
+  Provider to intent mapping (registered by `PyrolysisSimulator._build_chemistry_kernel` in `simulator/core.py`):
+
+  | Provider module | Class | `ChemistryIntent` | Authority | Declared accounts |
+  |-----------------|-------|-------------------|-----------|-------------------|
+  | `engines/builtin/vapor_pressure.py` | `BuiltinVaporPressureProvider` | `VAPOR_PRESSURE` | authoritative, diagnostic (no transition) | `process.cleaned_melt` |
+  | `engines/builtin/evaporation_flux.py` | `BuiltinEvaporationFluxProvider` | `EVAPORATION_FLUX` | authoritative, diagnostic (no transition) | `process.cleaned_melt` |
+  | `engines/builtin/evaporation_transition.py` | `BuiltinEvaporationTransitionProvider` | `EVAPORATION_TRANSITION` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.overhead_gas`, `process.condensation_train` |
+  | `engines/builtin/condensation_route.py` | `BuiltinCondensationRouteProvider` | `CONDENSATION_ROUTE` | authoritative, ledger-mutating | `process.overhead_gas`, `process.condensation_train` |
+  | `engines/builtin/electrolysis_step.py` | `BuiltinElectrolysisStepProvider` | `ELECTROLYSIS_STEP` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.metal_phase`, `terminal.oxygen_mre_anode_stored` |
+  | `engines/builtin/metallothermic_step.py` | `BuiltinMetallothermicStepProvider` | `METALLOTHERMIC_STEP` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.metal_phase`, `process.reagent_inventory` |
+  | `engines/builtin/stage0_pretreatment.py` | `BuiltinStage0PretreatmentProvider` | `STAGE0_PRETREATMENT` | authoritative, ledger-mutating | nine Stage 0 feed/sink accounts (`process.stage0_*`, `reservoir.stage0_*`, `terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.oxygen_stage0_stored`) |
+
 - `engines/magemin/__init__.py` re-exports the MAGEMin shadow scaffold (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
 - `engines/magemin/provider.py` is the forward-declared `MAGEMinShadowProvider` scaffold; not yet wired and `dispatch()` raises `NotImplementedError` pending the kernel carve-out.
 - `engines/magemin/domain.py` is the `MAGEMinDomainGate` composition-range gate (14-oxide MELTS basis).
 - `engines/magemin/parity.py` is the `MAGEMinParityComparator` shadow-vs-authoritative comparator (±50 K liquidus, ±2 wt% modal).
 - `engines/magemin/README.md` documents the deliberate two-path split: the `simulator/melt_backend/magemin.py` today-hook adapter is the live call site, while `engines/magemin/` is the kernel-shadow provider scaffold that delegates to it.
+
+## Chemistry Kernel
+
+- `simulator/chemistry/kernel/__init__.py` is the public kernel surface: `ChemistryKernel`, `ChemistryProvider`, `ProviderRegistry`, intents, DTOs, and the kernel error hierarchy.
+- `simulator/chemistry/kernel/planner.py` owns `ChemistryKernel.commit_batch` — the sole authorized writer to `AtomLedger`. Every provider-emitted `LedgerTransitionProposal` passes through three validation gates here: `validate_intent_authority`, `validate_proposal_accounts`, `validate_atom_balance`.
+- `simulator/chemistry/kernel/validation.py` implements those gates plus `validate_control_audit`.
+- `simulator/chemistry/kernel/registry.py` is `ProviderRegistry` (with `register_idempotent`); routes intents to authoritative + shadow providers.
+- `simulator/chemistry/kernel/account_filters.py` builds a scoped `ProviderAccountView` from the live `AtomLedger` before any provider sees it.
+- `simulator/chemistry/kernel/capabilities.py` defines `ChemistryIntent` and `CapabilityProfile`.
+- `simulator/chemistry/kernel/dto.py` defines the request/result DTOs (`IntentRequest`, `IntentResult`, `LedgerTransitionProposal`, `ControlAudit`, `ProviderAccountView`).
+- `simulator/chemistry/kernel/provider.py` defines the `ChemistryProvider` ABC.
+- `simulator/chemistry/kernel/errors.py` defines `KernelError` and the per-gate error subclasses.
 
 ## Data
 

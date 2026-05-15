@@ -43,6 +43,10 @@ PyrolysisSimulator
 - `data/vapor_pressures.yaml` defines pure-component vapor-pressure data used by the fallback model.
 - `data/custom_compositions.yaml` and `data/test_runs.yaml` are local mutable placeholders.
 
+## Chemistry kernel routing
+
+The simulator's chemistry plane is centralized in the `ChemistryKernel` facade at `simulator/chemistry/kernel/`. Each builtin chemistry operation — vapor pressure, evaporation flux, evaporation transition, condensation route, electrolysis step, metallothermic step, Stage 0 pretreatment — is implemented as a `ChemistryProvider` under `engines/builtin/` and registered against the kernel via `ProviderRegistry.register_idempotent` during `PyrolysisSimulator._build_chemistry_kernel`. The kernel's `commit_batch(intent, proposal)` method is the sole authorized writer to `AtomLedger`; no `simulator/*.py` module mutates the ledger directly. Every proposal passes three validation gates inside `commit_batch` before any debit or credit lands: intent authority (the registered provider must own the intent), account scope (every account on either side must appear in the provider's `CapabilityProfile.declared_accounts`), and atom balance (debits and credits must reconcile element-by-element within `1e-12 mol`). The provider receives a pre-filtered `ProviderAccountView` containing only its declared accounts, so account-scope leaks are caught both at the read side (the filter) and the write side (the commit gate). Provider-to-intent mapping is documented in `docs/developer-map.md` under "Engine Source Trees".
+
 ## Session Model
 
 Each browser connection gets an independent in-memory simulator. The backend runs a background loop that calls `sim.step()`, emits a `simulation_tick`, and pauses when operator decisions are required. This keeps the current application simple and suitable for local exploration, but it is not yet a multi-user production service.

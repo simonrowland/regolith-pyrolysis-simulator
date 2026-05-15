@@ -33,8 +33,6 @@ Covers:
 
 from __future__ import annotations
 
-from collections import defaultdict
-
 import pytest
 
 from engines.builtin.metallothermic_step import (
@@ -55,7 +53,7 @@ from simulator.state import (
     CampaignPhase,
     DecisionType,
 )
-from tests.chemistry.conftest import _build_sim
+from tests.chemistry.conftest import _atom_check, _build_sim
 
 
 # ---------------------------------------------------------------------------
@@ -372,24 +370,6 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 # ---------------------------------------------------------------------------
 
 
-def _atom_check(proposal, registry, *, tol=1e-12):
-    """Independent atom-balance re-derivation.  Returns the worst
-    absolute net per element.
-    """
-    from simulator.accounting.formulas import resolve_species_formula
-
-    net = defaultdict(float)
-    for side, sign in ((proposal.debits, -1.0), (proposal.credits, +1.0)):
-        for _account, species_mol in side.items():
-            for sp, mol in species_mol.items():
-                formula = resolve_species_formula(sp, registry)
-                for element, atoms in formula.atom_moles(float(mol)).items():
-                    net[element] += sign * float(atoms)
-    worst = max((abs(v) for v in net.values()), default=0.0)
-    assert worst < tol, f"atom-balance net: {dict(net)}; worst {worst}"
-    return dict(net)
-
-
 def test_c3_k_shuttle_matches_legacy_stoich(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -476,7 +456,7 @@ def test_c3_k_shuttle_matches_legacy_stoich(
     )
 
     # Independent atom check: net per element ~ 0.
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
 def test_c3_na_shuttle_combined_cr_ti_matches_legacy_stoich(
@@ -583,7 +563,7 @@ def test_c3_na_shuttle_combined_cr_ti_matches_legacy_stoich(
         expected_Ti_total, abs=1e-12, rel=1e-12
     )
 
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
 def test_c6_mg_thermite_primary_matches_legacy_stoich(
@@ -671,7 +651,7 @@ def test_c6_mg_thermite_primary_matches_legacy_stoich(
         mol_Al2O3_reduced * 2.0, abs=1e-12, rel=1e-12
     )
 
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
 def test_c6_back_reduction_matches_legacy_stoich(
@@ -752,7 +732,7 @@ def test_c6_back_reduction_matches_legacy_stoich(
         mol_SiO2_consumed, abs=1e-12, rel=1e-12
     )
 
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
 def test_provider_short_circuits_on_empty_reagent(

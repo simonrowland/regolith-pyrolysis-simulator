@@ -39,8 +39,6 @@ Covers:
 
 from __future__ import annotations
 
-from collections import defaultdict
-
 import pytest
 
 from engines.builtin.stage0_pretreatment import (
@@ -57,7 +55,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from tests.chemistry.conftest import _build_sim
+from tests.chemistry.conftest import _atom_check, _build_sim
 
 
 # ---------------------------------------------------------------------------
@@ -460,24 +458,6 @@ def test_provider_returns_out_of_domain_for_complete_oxidation_without_species(
 # ---------------------------------------------------------------------------
 
 
-def _atom_check(proposal, registry, *, tol=1e-9):
-    """Independent atom-balance re-derivation.  Returns the worst
-    absolute net per element.
-    """
-    from simulator.accounting.formulas import resolve_species_formula
-
-    net = defaultdict(float)
-    for side, sign in ((proposal.debits, -1.0), (proposal.credits, +1.0)):
-        for _account, species_mol in side.items():
-            for sp, mol in species_mol.items():
-                formula = resolve_species_formula(sp, registry)
-                for element, atoms in formula.atom_moles(float(mol)).items():
-                    net[element] += sign * float(atoms)
-    worst = max((abs(v) for v in net.values()), default=0.0)
-    assert worst < tol, f"atom-balance net: {dict(net)}; worst {worst}"
-    return dict(net)
-
-
 def test_perchlorate_matches_legacy_stoich(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -534,7 +514,7 @@ def test_perchlorate_matches_legacy_stoich(
     proposal = result.transition
     assert proposal is not None
     # Atom balance closes independently.
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     # Cl mol matches extent_mol exactly within IEEE round-off.
     cl_mol = proposal.credits["terminal.stage0_salt_phase"]["Cl"]
     assert abs(cl_mol - extent_mol) < 1e-12
@@ -607,7 +587,7 @@ def test_sulfate_carbon_matches_legacy_stoich(
     assert result.status == "ok"
     proposal = result.transition
     assert proposal is not None
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     so2_mol = proposal.credits["terminal.offgas"]["SO2"]
     co_mol = proposal.credits["terminal.offgas"]["CO"]
     # Expected: SO2 = extent_mol = 2.0; CO = extent_mol = 2.0.
@@ -671,7 +651,7 @@ def test_boudouard_matches_legacy_stoich(
     assert result.status == "ok"
     proposal = result.transition
     assert proposal is not None
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     co_mol = proposal.credits["terminal.offgas"]["CO"]
     # Expected: CO = 2 * extent_mol = 6.0.
     assert abs(co_mol - 2.0 * extent_mol) < 1e-12
@@ -739,7 +719,7 @@ def test_complete_oxidation_matches_legacy_stoich(
     assert result.status == "ok"
     proposal = result.transition
     assert proposal is not None
-    _atom_check(proposal, sim.species_formula_registry)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     # CO2 mol = 1.0; H2O mol = 2.0.
     co2_mol = proposal.credits["terminal.offgas"]["CO2"]
     h2o_mol = proposal.credits["terminal.offgas"]["H2O"]
