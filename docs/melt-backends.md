@@ -8,15 +8,22 @@ The simulator can run without external thermodynamic software. The fallback path
 
 ## Backend Order
 
-The simulator checks melt backends in this order:
+`web/events.py::_get_backend` is the single source of truth for active-backend selection. The active-backend eligibility policy
+(see `\goal BACKEND-DEFAULT-SWITCH`, 2026-05-14) is:
 
-1. `PetThermoTools` Python package.
-2. Project-local alphaMELTS binary at `engines/alphamelts/run_alphamelts.command`.
-3. `alphamelts` executable on `PATH`.
+1. **AlphaMELTS** is probed first. If `is_available()` (PetThermoTools or the project-local `alphamelts` binary at `engines/alphamelts/run_alphamelts.command`, or `alphamelts` on `PATH`) — selected as the active backend.
+2. **FactSAGE / ChemApp** is probed second under the strict-config gate: `FACTSAGE_CONFIG` must point at a JSON that loads, declares a ChemApp module + `.cst` datafile, and `FactSAGEBackend.initialize()` must return True. Without a strict config FactSAGE stays diagnostic-only and selection drops to the `StubBackend` fallback. The user's explicit `factsage` choice is never silently replaced with a different primary.
+3. **`StubBackend`** is the always-available fallback (built-in Ellingham/Antoine path inside `simulator/core.py`).
 
-The VapoRock wrapper checks whether the canonical `vaporock` Python package is importable, with legacy `VapoRock` import fallback for older local installs.
+**`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active backend.** Both adapters are integrated but not yet wired into a multi-intent dispatcher; selecting either as the active `MeltBackend` would fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. Their honest call sites are the dedicated shadow / diagnostic consumers (e.g. `engines/magemin/parity.py`). Promotion of either to the active path is gated on `\goal CHEMISTRY-KERNEL-CARVE-OUT`, which introduces the multi-intent dispatcher that can register them per-intent without routing them through `_get_equilibrium` as a phase solver.
 
-The FactSAGE/ChemApp backend is optional. It imports ChemApp only during initialization and falls back to the built-in Ellingham/Antoine path when unavailable. This fallback is adequate for process sequencing and feedstock comparison.
+There is **no silent cross-backend fallback at runtime**. If the selected primary throws inside `_get_equilibrium` after selection, the existing fail-closed path in `simulator/core.py` handles it; `_get_backend` does not re-probe a different primary mid-run.
+
+On every selection `_get_backend` emits one log line of the form
+`engine selection: <BackendClassName> (capabilities: silicate_melt=..., gas_volatiles=...) -- VapoRock/MAGEMin not eligible until kernel`
+so the active-backend choice is visible in the launcher's normal stdout stream.
+
+The VapoRock wrapper still checks whether the canonical `vaporock` Python package is importable (with legacy `VapoRock` import fallback for older local installs); this only affects shadow / diagnostic consumers, not active-backend selection.
 
 ## Local alphaMELTS Path
 

@@ -25,9 +25,10 @@
         <fieldset class="config-group">
             <legend>Thermodynamic Engine</legend>
             <select id="engine-select">
-                <option value="stub" selected>Built-in fallback</option>
-                <option value="alphamelts">AlphaMELTS</option>
+                <option value="auto" selected>Auto (AlphaMELTS preferred)</option>
+                <option value="alphamelts">AlphaMELTS (strict)</option>
                 <option value="factsage">FactSAGE/ChemApp (if configured)</option>
+                <option value="stub">Built-in fallback</option>
             </select>
         </fieldset>
 

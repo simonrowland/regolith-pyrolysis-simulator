@@ -18,6 +18,20 @@ from simulator.melt_backend.factsage_config import (
 from web.feedstock_data import load_visible_feedstocks
 
 
+# Active-backend eligibility policy (\goal BACKEND-DEFAULT-SWITCH).
+#
+# AlphaMELTS and FactSAGE (with strict config) are the only engines wired as
+# the simulator's authoritative MeltBackend today.  VapoRock and MAGEMin are
+# adapter-complete but vapor-side / shadow-only — neither populates
+# EquilibriumResult.ledger_transition.  Selecting them as the active backend
+# would trip simulator/core.py::_get_equilibrium's fail-closed reject
+# ("backend returned post-equilibrium phase material without an AtomLedger
+# transition" / "VapoRockBackend is unavailable" before its first
+# equilibrate call).  They are gated to shadow / diagnostic consumers until
+# \goal CHEMISTRY-KERNEL-CARVE-OUT introduces a multi-intent dispatcher.
+INELIGIBLE_ACTIVE_BACKENDS = ('vaporock', 'magemin')
+
+
 DATA_DIR = Path(__file__).parent.parent / 'data'
 
 
@@ -102,21 +116,134 @@ def _clear_simulation_state(sid: str) -> None:
 
 
 def _get_backend(backend_name: str):
-    """Create and initialize the requested melt backend."""
-    if backend_name == 'alphamelts':
-        backend = AlphaMELTSBackend()
-        if backend.initialize({}):
+    """
+    Create and initialize the active melt backend.
+
+    Eligibility policy (\\goal BACKEND-DEFAULT-SWITCH):
+
+    * ``'alphamelts'`` — strict probe; raise ``BackendUnavailableError`` if
+      PetThermoTools or the alphaMELTS binary is not reachable.
+    * ``'factsage'`` — strict probe under the configured strict-config gate
+      (a real ``FACTSAGE_CONFIG`` JSON + ChemApp + ``.cst`` data file); on
+      gate failure, fall back to ``StubBackend`` so the simulator stays
+      diagnostic-without-strict-config (existing semantics).
+    * ``'vaporock'`` / ``'magemin'`` — explicitly **refused**.  Both
+      adapters are not wired into a multi-intent dispatcher yet; selecting
+      either as the active ``MeltBackend`` would fail closed inside
+      ``simulator/core.py::_get_equilibrium`` (their populated
+      ``phase_masses_kg`` + ``ledger_transition=None`` returns trip the
+      "backend returned post-equilibrium phase material without an
+      AtomLedger transition" reject).  Promotion is blocked on
+      ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
+    * ``'auto'`` / ``'stub'`` / unknown — autodetect chain: probe
+      AlphaMELTS first, then FactSAGE-with-strict-config, falling back to
+      ``StubBackend`` as the always-available primary fallback.  No silent
+      cross-backend fallback at runtime: if the selected primary throws
+      inside ``_get_equilibrium`` after selection, ``core.py``'s
+      fail-closed path handles it without re-routing here.
+    """
+    name = (backend_name or '').strip().lower()
+
+    if name in INELIGIBLE_ACTIVE_BACKENDS:
+        # VapoRock/MAGEMin are not eligible as the active MeltBackend until
+        # the kernel carve-out lands a multi-intent dispatcher (see module
+        # docstring on INELIGIBLE_ACTIVE_BACKENDS).  Refuse explicitly here
+        # rather than let the user discover the failure inside
+        # _get_equilibrium's fail-closed reject.
+        backend_label = 'VapoRock' if name == 'vaporock' else 'MAGEMin'
+        raise BackendUnavailableError(
+            f'{backend_label} is not eligible as the active melt backend '
+            'until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent '
+            'dispatcher; select alphamelts, factsage, or auto.'
+        )
+
+    if name == 'alphamelts':
+        backend = _try_alphamelts()
+        if backend is not None:
+            _emit_engine_selection_log(backend)
             return backend
         raise BackendUnavailableError(
             'AlphaMELTS unavailable; run install-dependencies.py')
-    elif backend_name == 'factsage':
-        backend = FactSAGEBackend()
-        if backend.initialize(_factsage_config()):
+
+    if name == 'factsage':
+        backend = _try_factsage()
+        if backend is not None:
+            _emit_engine_selection_log(backend)
             return backend
-    # Fallback to stub
+        # FactSAGE stays diagnostic-without-strict-config: drop to Stub
+        # (existing behaviour) rather than autodetect AlphaMELTS — the user
+        # asked for FactSAGE explicitly, so silently substituting a
+        # different primary would be the wrong kind of fallback.
+        backend = _stub_backend()
+        _emit_engine_selection_log(backend)
+        return backend
+
+    # Autodetect chain ('auto', 'stub', or unknown):
+    # AlphaMELTS -> FactSAGE-with-strict-config -> Stub.
+    backend = _try_alphamelts()
+    if backend is not None:
+        _emit_engine_selection_log(backend)
+        return backend
+    backend = _try_factsage()
+    if backend is not None:
+        _emit_engine_selection_log(backend)
+        return backend
+    backend = _stub_backend()
+    _emit_engine_selection_log(backend)
+    return backend
+
+
+def _try_alphamelts():
+    """Probe AlphaMELTS; return the initialized backend or None."""
+    backend = AlphaMELTSBackend()
+    if backend.initialize({}) and backend.is_available():
+        return backend
+    return None
+
+
+def _try_factsage():
+    """Probe FactSAGE under the strict-config gate; return None on failure.
+
+    The strict-config gate is: FACTSAGE_CONFIG points at a JSON config that
+    loads, declares a real ChemApp module + ``.cst`` datafile, and the
+    backend's own ``initialize()`` returns True.  An empty/missing config
+    means no strict config -> ``initialize({})`` fails its
+    ``_resolve_datafile_path`` check -> we return None.
+    """
+    config = _factsage_config()
+    backend = FactSAGEBackend()
+    if backend.initialize(config) and backend.is_available():
+        return backend
+    return None
+
+
+def _stub_backend():
+    """Initialize and return a StubBackend (always available)."""
     backend = StubBackend()
     backend.initialize({})
     return backend
+
+
+def _emit_engine_selection_log(backend) -> None:
+    """Emit the one-line engine-selection log.
+
+    Format:
+        ``engine selection: <name> (capabilities: silicate_melt=...,
+         gas_volatiles=...) -- VapoRock/MAGEMin not eligible until kernel``
+
+    Matches the launcher's existing ``print`` style so it appears in normal
+    ``regolith-pyrolysis-run.py`` output without a logging-config dance.
+    """
+    name = type(backend).__name__
+    caps = backend.capabilities()
+    cap_str = ', '.join(
+        f'{key}={"true" if caps.get(key) else "false"}'
+        for key in ('silicate_melt', 'gas_volatiles')
+    )
+    _safe_log(
+        f'engine selection: {name} (capabilities: {cap_str}) -- '
+        'VapoRock/MAGEMin not eligible until kernel'
+    )
 
 
 def _factsage_config():
@@ -329,7 +456,10 @@ def register_events(socketio):
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
         mass_kg = float(data.get('mass_kg', 1000))
-        backend_name = data.get('backend', 'stub')
+        # Default is 'auto' (AlphaMELTS-preferred autodetect per
+        # \goal BACKEND-DEFAULT-SWITCH), not 'stub'.  Explicit UI choices
+        # ('alphamelts', 'factsage', 'stub') are still honoured.
+        backend_name = data.get('backend', 'auto')
         track = data.get('track', 'pyrolysis')
         speed = float(data.get('speed', 1.0))
 
@@ -347,11 +477,13 @@ def register_events(socketio):
             return
         backend_type = type(backend).__name__
         backend_message = ''
-        if backend_name == 'stub':
-            backend_message = 'Using built-in fallback'
-        elif backend_name == 'factsage' and isinstance(backend, StubBackend):
-            backend_message = 'FactSAGE unavailable; using built-in fallback'
-        elif backend_name == 'factsage':
+        if isinstance(backend, StubBackend):
+            if backend_name == 'factsage':
+                backend_message = (
+                    'FactSAGE unavailable; using built-in fallback')
+            else:
+                backend_message = 'Using built-in fallback'
+        elif backend_name == 'factsage' or backend_type == 'FactSAGEBackend':
             backend_message = (
                 'FactSAGE/ChemApp export active: '
                 f'{backend.capability_summary()}')
