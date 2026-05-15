@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import math
-from typing import Dict, Mapping
+from typing import Dict
 
 from simulator.state import (
     FARADAY,
     MOLAR_MASS,
-    STOICH_RATIOS,
     CampaignPhase,
 )
 
@@ -16,27 +14,10 @@ from simulator.state import (
 class ExtractionMixin:
     _LEDGER_KG_TOL = 1e-9
 
-    @staticmethod
-    def _positive_ledger_kg(
-        species_kg: Mapping[str, float],
-        tolerance_kg: float = _LEDGER_KG_TOL,
-    ) -> Dict[str, float]:
-        return {
-            str(species): float(kg)
-            for species, kg in species_kg.items()
-            if float(kg) > tolerance_kg
-        }
-
-    @staticmethod
-    def _positive_ledger_mol(
-        species_mol: Mapping[str, float],
-        tolerance_mol: float = 1e-12,
-    ) -> Dict[str, float]:
-        return {
-            str(species): float(mol)
-            for species, mol in species_mol.items()
-            if float(mol) > tolerance_mol
-        }
+    # ``_positive_ledger_kg`` and ``_positive_ledger_mol`` were removed
+    # alongside ``_record_atom_transition`` when the METALLOTHERMIC_STEP
+    # flip (``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) 6/7) replaced
+    # their only call sites with ``ChemistryKernel.commit_batch``.
 
     def _ledger_account_species_kg(self, account: str, species: str) -> float:
         return max(
@@ -48,65 +29,11 @@ class ExtractionMixin:
         return self._ledger_account_species_kg(
             'process.reagent_inventory', species)
 
-    def _record_atom_transition(
-        self,
-        name: str,
-        *,
-        debits: tuple[tuple[str, Mapping[str, float]], ...],
-        credits: tuple[tuple[str, Mapping[str, float]], ...],
-        reason: str,
-    ) -> bool:
-        debit_lots = []
-        for account, species_kg in debits:
-            payload = self._positive_ledger_kg(species_kg)
-            if payload:
-                debit_lots.append(self.atom_ledger.debit(account, payload))
-
-        credit_lots = []
-        for account, species_kg in credits:
-            payload = self._positive_ledger_kg(species_kg)
-            if payload:
-                credit_lots.append(self.atom_ledger.credit(account, payload))
-
-        if not debit_lots and not credit_lots:
-            return False
-        self.atom_ledger.record(
-            name,
-            debits=tuple(debit_lots),
-            credits=tuple(credit_lots),
-            reason=reason,
-        )
-        return True
-
-    def _record_atom_transition_mol(
-        self,
-        name: str,
-        *,
-        debits: tuple[tuple[str, Mapping[str, float]], ...],
-        credits: tuple[tuple[str, Mapping[str, float]], ...],
-        reason: str,
-    ) -> bool:
-        debit_lots = []
-        for account, species_mol in debits:
-            payload = self._positive_ledger_mol(species_mol)
-            if payload:
-                debit_lots.append(self.atom_ledger.debit_mol(account, payload))
-
-        credit_lots = []
-        for account, species_mol in credits:
-            payload = self._positive_ledger_mol(species_mol)
-            if payload:
-                credit_lots.append(self.atom_ledger.credit_mol(account, payload))
-
-        if not debit_lots and not credit_lots:
-            return False
-        self.atom_ledger.record(
-            name,
-            debits=tuple(debit_lots),
-            credits=tuple(credit_lots),
-            reason=reason,
-        )
-        return True
+    # ``_record_atom_transition`` and ``_record_atom_transition_mol``
+    # were removed when the METALLOTHERMIC_STEP flip
+    # (``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) 6/7) replaced their
+    # only call sites with ``ChemistryKernel.commit_batch``.  No other
+    # caller used them.
 
     def _move_ledger_species(
         self,
@@ -507,78 +434,52 @@ class ExtractionMixin:
 
         K₂O solubility limit: 8-12 wt% in the silicate melt.
         K injection spread over 3 injection hours per cycle.
+
+        METALLOTHERMIC_STEP intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) sixth flip and the
+        FOURTH authoritative ledger-mutating intent in the migration.
+        The :class:`BuiltinMetallothermicStepProvider` mirrors the
+        legacy K-shuttle stoichiometry line-for-line and emits a
+        :class:`LedgerTransitionProposal` debiting
+        ``process.reagent_inventory`` (K consumed) +
+        ``process.cleaned_melt`` (FeO reduced) and crediting
+        ``process.cleaned_melt`` (K₂O coproduct) +
+        ``process.metal_phase`` (Fe produced).
+        :meth:`ChemistryKernel.commit_batch` is the sole writable path
+        into the ledger for this intent after the flip; the legacy
+        ``self._record_atom_transition`` direct mutation is gone.
         """
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_K
+
         if self.shuttle_K_inventory_kg <= 0.01:
             return  # No K available
 
-        # --- Solubility check ---
-        # K₂O already in melt + what we'd add must stay < 10 wt% (midpoint)
-        K2O_SOLUBILITY_WT_PCT = 10.0
-        comp_wt = self.melt.composition_wt_pct()
-        K2O_current_pct = comp_wt.get('K2O', 0.0)
-        if K2O_current_pct >= K2O_SOLUBILITY_WT_PCT:
-            return  # Melt saturated in K₂O — wait for bakeout
-
-        # How much K₂O can we add before hitting the limit?
-        # K₂O_max = total_melt × solubility_fraction - K₂O_current
-        total_melt = self.melt.total_mass_kg
-        K2O_max_kg = (total_melt * K2O_SOLUBILITY_WT_PCT / 100.0
-                      - self.melt.composition_kg.get('K2O', 0.0))
-        K2O_max_kg = max(0.0, K2O_max_kg)
-
-        # Convert K₂O capacity to K capacity: 1 kg K₂O ← 0.831 kg K
-        # (2 × 39.10 / 94.20 = 0.830)
-        K_for_K2O_limit_kg = K2O_max_kg * (2 * MOLAR_MASS['K'] / MOLAR_MASS['K2O'])
-
-        # --- FeO available ---
-        FeO_available = self.melt.composition_kg.get('FeO', 0.0)
-        # 1 kg K reduces 0.919 kg FeO
-        K_for_FeO_kg = FeO_available / (MOLAR_MASS['FeO'] / (2 * MOLAR_MASS['K']))
-
-        # --- K injection this hour ---
-        # Spread injection over 3 hours per cycle
-        # Use up to 1/3 of available K per injection hour
-        K_available_this_hr = self.shuttle_K_inventory_kg / 3.0
-
-        # Take the minimum of all constraints
-        K_inject = min(K_available_this_hr, K_for_K2O_limit_kg, K_for_FeO_kg)
-        K_inject = max(0.0, K_inject)
-
-        if K_inject < 0.001:
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C3_K,
+                'reagent_available_kg': float(
+                    self.shuttle_K_inventory_kg),
+                'dt_hr': 1.0,
+            },
+        )
+        diagnostic = dict(kernel_result.diagnostic or {})
+        proposal = kernel_result.transition
+        if proposal is None:
             return
 
-        # --- Stoichiometric conversion ---
-        # Primarily reduce FeO (thermodynamically preferred)       [THERMO-3]
-        # K₂O is less stable (ΔG°f –320) than FeO (–370), but the
-        # very low activity coefficient of K₂O in the silicate melt
-        # (γ ~10⁻², shift ~50-80 kJ/mol) makes K → FeO reduction
-        # thermodynamically accessible.
-
-        # Molar quantities
-        mol_K = K_inject / MOLAR_MASS['K'] * 1000.0  # g→mol
-        mol_FeO_available = (FeO_available / MOLAR_MASS['FeO']) * 1000.0
-
-        # Reaction: 2K + FeO → K₂O + Fe
-        mol_FeO_reduced = min(mol_K / 2.0, mol_FeO_available)
-        mol_K_used = mol_FeO_reduced * 2.0
-
-        # Mass changes
-        K_used_kg = (mol_K_used * MOLAR_MASS['K']) / 1000.0
-        FeO_removed_kg = (mol_FeO_reduced * MOLAR_MASS['FeO']) / 1000.0
-        K2O_added_kg = (mol_FeO_reduced * MOLAR_MASS['K2O']) / 1000.0
-        Fe_produced_kg = (mol_FeO_reduced * MOLAR_MASS['Fe']) / 1000.0
-
-        self._record_atom_transition(
-            'c3_k_shuttle_fe_reduction',
-            debits=(
-                ('process.reagent_inventory', {'K': K_used_kg}),
-                ('process.cleaned_melt', {'FeO': FeO_removed_kg}),
-            ),
-            credits=(
-                ('process.cleaned_melt', {'K2O': K2O_added_kg}),
-                ('process.metal_phase', {'Fe': Fe_produced_kg}),
-            ),
-            reason='K shuttle reduction of FeO',
+        # commit_batch is the ONLY writable path into the AtomLedger
+        # for the C3 K-shuttle transition after this flip. The kernel
+        # re-validates intent authority, the account filter, and atom
+        # balance against the registry's authoritative provider for
+        # METALLOTHERMIC_STEP (defence in depth matching the prior
+        # authoritative-intent flips).  No direct self.atom_ledger.apply
+        # / .record happens from this method anymore.
+        self._chem_kernel.commit_batch(
+            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
         )
 
         # Fe produced goes to condenser Stage 1 (liquid Fe drains to sump)
@@ -591,10 +492,13 @@ class ExtractionMixin:
 
         self._project_extraction_melt()
 
-        # Track for snapshot
-        self._shuttle_injected_this_hr = K_used_kg
-        self._shuttle_reduced_this_hr = FeO_removed_kg
-        self._shuttle_metal_this_hr = Fe_produced_kg
+        # Track for snapshot -- same shape as pre-flip kg counters.
+        self._shuttle_injected_this_hr = float(
+            diagnostic.get('reagent_consumed_kg', 0.0))
+        self._shuttle_reduced_this_hr = float(
+            diagnostic.get('oxide_reduced_kg', 0.0))
+        self._shuttle_metal_this_hr = float(
+            diagnostic.get('metal_produced_kg', 0.0))
 
     def _shuttle_inject_Na(self):
         """
@@ -612,126 +516,63 @@ class ExtractionMixin:
 
         Na₂O solubility limit: 8-12 wt% in the silicate melt.
         Activity coefficient γ(Na₂O) ≈ 10⁻² to 10⁻³ in CMAS.    [THERMO-10]
+
+        METALLOTHERMIC_STEP intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) sixth flip.  The
+        provider bundles the two-reaction (Cr2O3 + TiO2) atom-balanced
+        path the legacy code recorded as two separate transitions into
+        a single :class:`LedgerTransitionProposal` so the kernel
+        commits one atom-balanced :class:`LedgerTransition` per
+        dispatch.  The diagnostic exposes per-oxide / per-metal kg so
+        the snapshot retains the legacy total counters.
         """
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from engines.builtin.metallothermic_step import REACTION_FAMILY_C3_NA
+
         if self.shuttle_Na_inventory_kg <= 0.01:
             return
 
-        # --- Solubility check ---
-        Na2O_SOLUBILITY_WT_PCT = 10.0
-        comp_wt = self.melt.composition_wt_pct()
-        Na2O_current_pct = comp_wt.get('Na2O', 0.0)
-        if Na2O_current_pct >= Na2O_SOLUBILITY_WT_PCT:
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C3_NA,
+                'reagent_available_kg': float(
+                    self.shuttle_Na_inventory_kg),
+                'dt_hr': 1.0,
+            },
+        )
+        diagnostic = dict(kernel_result.diagnostic or {})
+        proposal = kernel_result.transition
+        if proposal is None:
             return
 
-        total_melt = self.melt.total_mass_kg
-        Na2O_max_kg = (total_melt * Na2O_SOLUBILITY_WT_PCT / 100.0
-                       - self.melt.composition_kg.get('Na2O', 0.0))
-        Na2O_max_kg = max(0.0, Na2O_max_kg)
-        Na_for_Na2O_limit_kg = Na2O_max_kg * (2 * MOLAR_MASS['Na'] / MOLAR_MASS['Na2O'])
+        self._chem_kernel.commit_batch(
+            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
+        )
 
-        # --- Available targets ---
-        TiO2_available = self.melt.composition_kg.get('TiO2', 0.0)
-        Cr2O3_available = self.melt.composition_kg.get('Cr2O3', 0.0)
+        # Cr / Ti products go to condenser Stage 1 (liquid-metal sump).
+        # Project both unconditionally; the projection helper is a
+        # no-op when the metal_phase account doesn't carry the species.
+        self._project_condensed_species(
+            1, 'Cr', source_account='process.metal_phase')
+        self._project_condensed_species(
+            1, 'Ti', source_account='process.metal_phase')
 
-        # Na injection this hour (spread over 3 hrs)
-        Na_available_this_hr = self.shuttle_Na_inventory_kg / 3.0
-        Na_inject = min(Na_available_this_hr, Na_for_Na2O_limit_kg)
-        Na_inject = max(0.0, Na_inject)
-
-        if Na_inject < 0.001:
-            return
-
-        mol_Na = Na_inject / MOLAR_MASS['Na'] * 1000.0
-
-        total_Na2O_added = 0.0
-        total_metal_produced = 0.0
-        total_oxide_reduced = 0.0
-        Na_used = 0.0
-
-        # --- First reduce Cr₂O₃ (easier: ΔG°f –500 vs Na₂O –320) ---
-        if Cr2O3_available > 0.01 and mol_Na > 0.1:
-            mol_Cr2O3 = (Cr2O3_available / MOLAR_MASS['Cr2O3']) * 1000.0
-            # 6Na + Cr₂O₃ → 3Na₂O + 2Cr
-            mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
-            mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
-
-            Cr2O3_removed = (mol_Cr2O3_reduced * MOLAR_MASS['Cr2O3']) / 1000.0
-            Na2O_from_Cr = (mol_Cr2O3_reduced * 3 * MOLAR_MASS['Na2O']) / 1000.0
-            Cr_produced = (mol_Cr2O3_reduced * 2 * MOLAR_MASS['Cr']) / 1000.0
-
-            self._record_atom_transition(
-                'c3_na_shuttle_cr_reduction',
-                debits=(
-                    ('process.reagent_inventory', {'Na': (
-                        mol_Na_for_Cr * MOLAR_MASS['Na']) / 1000.0}),
-                    ('process.cleaned_melt', {'Cr2O3': Cr2O3_removed}),
-                ),
-                credits=(
-                    ('process.cleaned_melt', {'Na2O': Na2O_from_Cr}),
-                    ('process.metal_phase', {'Cr': Cr_produced}),
-                ),
-                reason='Na shuttle reduction of Cr2O3',
-            )
-
-            self._project_condensed_species(
-                1, 'Cr', source_account='process.metal_phase')
-
-            mol_Na -= mol_Na_for_Cr
-            Na_used += (mol_Na_for_Cr * MOLAR_MASS['Na']) / 1000.0
-            total_Na2O_added += Na2O_from_Cr
-            total_metal_produced += Cr_produced
-            total_oxide_reduced += Cr2O3_removed
-
-        # --- Then reduce TiO₂ (harder: ΔG°f –580, uncertain access) ---
-        # Apply 75% reduction efficiency to account for accessibility
-        # uncertainty (the highest-priority experimental question)  [THERMO-10]
-        TI_ACCESSIBILITY = 0.75
-        if TiO2_available > 0.01 and mol_Na > 0.1:
-            mol_TiO2 = (TiO2_available / MOLAR_MASS['TiO2']) * 1000.0
-            # 2Na + TiO₂ → Na₂O + Ti (simplified; actually needs 4Na for full reduction)
-            # Actually: TiO₂ has 2 oxygens, needs 4Na to fully reduce:
-            # 4Na + TiO₂ → 2Na₂O + Ti
-            mol_TiO2_accessible = mol_TiO2 * TI_ACCESSIBILITY
-            mol_TiO2_reduced = min(mol_Na / 4.0, mol_TiO2_accessible)
-            mol_Na_for_Ti = mol_TiO2_reduced * 4.0
-
-            TiO2_removed = (mol_TiO2_reduced * MOLAR_MASS['TiO2']) / 1000.0
-            Na2O_from_Ti = (mol_TiO2_reduced * 2 * MOLAR_MASS['Na2O']) / 1000.0
-            Ti_produced = (mol_TiO2_reduced * MOLAR_MASS['Ti']) / 1000.0
-
-            self._record_atom_transition(
-                'c3_na_shuttle_ti_reduction',
-                debits=(
-                    ('process.reagent_inventory', {'Na': (
-                        mol_Na_for_Ti * MOLAR_MASS['Na']) / 1000.0}),
-                    ('process.cleaned_melt', {'TiO2': TiO2_removed}),
-                ),
-                credits=(
-                    ('process.cleaned_melt', {'Na2O': Na2O_from_Ti}),
-                    ('process.metal_phase', {'Ti': Ti_produced}),
-                ),
-                reason='Na shuttle reduction of TiO2',
-            )
-
-            self._project_condensed_species(
-                1, 'Ti', source_account='process.metal_phase')
-
-            mol_Na -= mol_Na_for_Ti
-            Na_used += (mol_Na_for_Ti * MOLAR_MASS['Na']) / 1000.0
-            total_Na2O_added += Na2O_from_Ti
-            total_metal_produced += Ti_produced
-            total_oxide_reduced += TiO2_removed
-
-        # Deduct Na from shuttle inventory
-        # (Na comes from additives, not from a condenser stage)
+        # Deduct Na from shuttle inventory (drawn from the ledger so
+        # the counter stays in sync with the kernel-committed debit).
         self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
 
         self._project_extraction_melt()
 
-        # Track for snapshot
-        self._shuttle_injected_this_hr = Na_used
-        self._shuttle_reduced_this_hr = total_oxide_reduced
-        self._shuttle_metal_this_hr = total_metal_produced
+        # Track for snapshot -- same shape as pre-flip kg counters.
+        self._shuttle_injected_this_hr = float(
+            diagnostic.get('reagent_consumed_kg', 0.0))
+        self._shuttle_reduced_this_hr = float(
+            diagnostic.get('oxide_reduced_kg', 0.0))
+        self._shuttle_metal_this_hr = float(
+            diagnostic.get('metal_produced_kg', 0.0))
 
     # ------------------------------------------------------------------
     # Mg Thermite Reduction (C6)                                [THERMO-7]
@@ -808,7 +649,23 @@ class ExtractionMixin:
             - Al metal → collected in condenser Stage 1 (liquid metal sump)
             - Si metal → collected in condenser Stage 2 (if back-reduction occurs)
             - MgO remains in the melt/slag
+
+        METALLOTHERMIC_STEP intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) sixth flip.  The
+        provider dispatches the primary thermite reaction first; the
+        back-reduction (a chemically distinct reaction the legacy
+        recorded as its own transition) is a second dispatch on the
+        same intent so each chemical step stays a single atom-balanced
+        :class:`LedgerTransition`.  The two dispatches share state
+        through the ``mol_Al_produced`` control input that flows from
+        the primary's diagnostic into the back-reduction's request --
+        the back-reduction consumes
+        ``BACK_REDUCTION_FRACTION = 0.30`` of the matched primary's
+        freshly-produced Al kg.
         """
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from engines.builtin.metallothermic_step import REACTION_FAMILY_C6_MG
+
         self._thermite_Al2O3_reduced_this_hr = 0.0
         self._thermite_Al_produced_this_hr = 0.0
         self._thermite_Mg_consumed_this_hr = 0.0
@@ -816,110 +673,82 @@ class ExtractionMixin:
         if self.thermite_Mg_inventory_kg <= 0.01:
             return  # No Mg available
 
-        Al2O3_available = self.melt.composition_kg.get('Al2O3', 0.0)
-        if Al2O3_available < 0.01:
-            return  # Nothing to reduce
-
-        # --- Kinetic rate model ---
-        # Mg injection rate decreases as MgO accumulates in the slag.
-        # At start: up to 20% of remaining Mg per hour
-        # As MgO builds up: rate decreases (higher slag viscosity)
-        comp_wt = self.melt.composition_wt_pct()
-        MgO_pct = comp_wt.get('MgO', 0.0)
-
-        # Rate factor: drops as MgO increases (starts high, decays)
-        # At 0% MgO → rate_factor = 0.20 (20% of inventory/hr)
-        # At 30% MgO → rate_factor ≈ 0.05 (slag getting stiff)
-        # At 50% MgO → rate_factor ≈ 0.01 (nearly frozen)
-        rate_factor = 0.20 * math.exp(-0.05 * MgO_pct)
-        rate_factor = max(0.01, min(0.25, rate_factor))
-
-        Mg_available_this_hr = self.thermite_Mg_inventory_kg * rate_factor
-
-        # --- Stoichiometric constraints ---
-        # 3Mg + Al₂O₃ → 3MgO + 2Al
-        # Moles: 3 mol Mg per 1 mol Al₂O₃
-        mol_Mg = Mg_available_this_hr / MOLAR_MASS['Mg'] * 1000.0  # g → mol
-        mol_Al2O3_available = (Al2O3_available / MOLAR_MASS['Al2O3']) * 1000.0
-
-        # Mg is the limiting reagent (3 mol Mg per mol Al₂O₃)
-        mol_Al2O3_reduced = min(mol_Mg / 3.0, mol_Al2O3_available)
-        mol_Mg_used = mol_Al2O3_reduced * 3.0
-
-        if mol_Al2O3_reduced < 0.001:
+        # ------------------------------------------------------------------
+        # Pass 1: primary thermite reaction (3 Mg + Al2O3 -> 3 MgO + 2 Al).
+        # ------------------------------------------------------------------
+        primary_result = self._chem_kernel.dispatch(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C6_MG,
+                'reagent_available_kg': float(
+                    self.thermite_Mg_inventory_kg),
+                'dt_hr': 1.0,
+            },
+        )
+        primary_diag = dict(primary_result.diagnostic or {})
+        primary_proposal = primary_result.transition
+        if primary_proposal is None:
             return
 
-        # --- Mass changes ---
-        Mg_consumed_kg = (mol_Mg_used * MOLAR_MASS['Mg']) / 1000.0
-        Al2O3_removed_kg = (mol_Al2O3_reduced * MOLAR_MASS['Al2O3']) / 1000.0
-        MgO_produced_kg = (mol_Al2O3_reduced * 3 * MOLAR_MASS['MgO']) / 1000.0
-        Al_produced_kg = (mol_Al2O3_reduced * 2 * MOLAR_MASS['Al']) / 1000.0
-
-        self._record_atom_transition(
-            'c6_mg_thermite_primary',
-            debits=(
-                ('process.reagent_inventory', {'Mg': Mg_consumed_kg}),
-                ('process.cleaned_melt', {'Al2O3': Al2O3_removed_kg}),
-            ),
-            credits=(
-                ('process.cleaned_melt', {'MgO': MgO_produced_kg}),
-                ('process.metal_phase', {'Al': Al_produced_kg}),
-            ),
-            reason='Mg thermite reduction of Al2O3',
+        self._chem_kernel.commit_batch(
+            ChemistryIntent.METALLOTHERMIC_STEP, primary_proposal,
         )
 
-        # --- Back-reduction cascade (Al + SiO₂) ---            [THERMO-8]
-        # ~30% of freshly produced Al reacts with residual SiO₂:
-        #   4Al + 3SiO₂ → 2Al₂O₃ + 3Si
-        BACK_REDUCTION_FRACTION = 0.30
-        SiO2_available = self.melt.composition_kg.get('SiO2', 0.0)
-        if SiO2_available > 0.1 and Al_produced_kg > 0.01:
-            mol_Al_for_back = (Al_produced_kg * BACK_REDUCTION_FRACTION
-                               / MOLAR_MASS['Al'] * 1000.0)
-            mol_SiO2_available = (SiO2_available / MOLAR_MASS['SiO2']) * 1000.0
-            # 4Al + 3SiO₂ → 2Al₂O₃ + 3Si
-            mol_SiO2_consumed = min(mol_Al_for_back * 3.0 / 4.0, mol_SiO2_available)
-            mol_Al_consumed = mol_SiO2_consumed * 4.0 / 3.0
+        Mg_consumed_kg = float(primary_diag.get('reagent_consumed_kg', 0.0))
+        Al2O3_removed_kg = float(primary_diag.get('oxide_reduced_kg', 0.0))
+        Al_produced_kg = float(primary_diag.get('metal_produced_kg', 0.0))
+        mol_Al_produced = float(primary_diag.get('mol_Al_produced', 0.0))
 
-            SiO2_consumed_kg = (mol_SiO2_consumed * MOLAR_MASS['SiO2']) / 1000.0
-            Al2O3_regenerated_kg = (mol_SiO2_consumed * 2.0 / 3.0
-                                    * MOLAR_MASS['Al2O3']) / 1000.0
-            Si_produced_kg = (mol_SiO2_consumed * MOLAR_MASS['Si']) / 1000.0
-            Al_lost_to_back_kg = (mol_Al_consumed * MOLAR_MASS['Al']) / 1000.0
-
-            self._record_atom_transition(
-                'c6_al_si_back_reduction',
-                debits=(
-                    ('process.metal_phase', {'Al': Al_lost_to_back_kg}),
-                    ('process.cleaned_melt', {'SiO2': SiO2_consumed_kg}),
-                ),
-                credits=(
-                    ('process.cleaned_melt', {'Al2O3': Al2O3_regenerated_kg}),
-                    ('process.metal_phase', {'Si': Si_produced_kg}),
-                ),
-                reason='Al back-reduction of SiO2 during thermite',
+        # ------------------------------------------------------------------
+        # Pass 2: back-reduction cascade (4 Al + 3 SiO2 -> 2 Al2O3 + 3 Si),
+        # if SiO2 / Al gates open.  The provider re-runs its own gate
+        # internally; this method just orchestrates the second dispatch
+        # and updates the local kg counters.
+        # ------------------------------------------------------------------
+        back_result = self._chem_kernel.dispatch(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C6_MG,
+                'back_reduction': True,
+                'mol_Al_produced': mol_Al_produced,
+                'reagent_available_kg': 0.0,
+                'dt_hr': 1.0,
+            },
+        )
+        back_diag = dict(back_result.diagnostic or {})
+        back_proposal = back_result.transition
+        if back_proposal is not None:
+            self._chem_kernel.commit_batch(
+                ChemistryIntent.METALLOTHERMIC_STEP, back_proposal,
             )
 
             # Si product → condenser Stage 2
             self._project_condensed_species(
                 2, 'Si', source_account='process.metal_phase')
 
-            # Net Al after back-reduction
+            # Net Al / Al2O3 deltas after back-reduction (legacy
+            # snapshot semantics: counters track NET removed Al2O3 and
+            # NET produced Al).
+            Al_lost_to_back_kg = float(back_diag.get('Al_consumed_kg', 0.0))
+            Al2O3_regenerated_kg = float(
+                back_diag.get('Al2O3_regenerated_kg', 0.0))
             Al_produced_kg -= Al_lost_to_back_kg
-
-            # Net Al₂O₃ removal (primary minus regenerated)
             Al2O3_removed_kg -= Al2O3_regenerated_kg
 
         # Al product → condenser Stage 1 (liquid metal sump)
         self._project_condensed_species(
             1, 'Al', source_account='process.metal_phase')
 
-        # Deduct Mg from thermite inventory
+        # Deduct Mg from thermite inventory.
         self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
 
         self._project_extraction_melt()
 
-        # Track for snapshot / summary
+        # Track for snapshot / summary (matches pre-flip counter shape).
         self._thermite_Al2O3_reduced_this_hr = max(0.0, Al2O3_removed_kg)
         self._thermite_Al_produced_this_hr = max(0.0, Al_produced_kg)
         self._thermite_Mg_consumed_this_hr = Mg_consumed_kg

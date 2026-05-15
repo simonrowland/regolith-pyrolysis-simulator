@@ -638,6 +638,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.evaporation_transition import (
             BuiltinEvaporationTransitionProvider,
         )
+        from engines.builtin.metallothermic_step import (
+            BuiltinMetallothermicStepProvider,
+        )
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
         # Each ``register_idempotent`` call is a no-op on subsequent
@@ -696,6 +699,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._chem_registry.register_idempotent(
             BuiltinElectrolysisStepProvider(),
             [ChemistryIntent.ELECTROLYSIS_STEP],
+        )
+        # METALLOTHERMIC_STEP -- FOURTH authoritative ledger-mutating
+        # intent (Na/K shuttle + Mg thermite, binding spec §2). Provider
+        # debits process.reagent_inventory (alkali/Mg consumed) +
+        # process.cleaned_melt (oxide reduced) and credits
+        # process.cleaned_melt (alkali-oxide / MgO / regenerated Al2O3)
+        # + process.metal_phase (Fe/Cr/Ti/Al/Si).  Per-call inputs
+        # (reaction_family, reagent_available_kg, dt_hr, optional
+        # back_reduction + mol_Al_produced for the C6 cascade) arrive
+        # via control_inputs from _shuttle_inject_K / _shuttle_inject_Na
+        # / _step_thermite.  Single intent, three reaction families via
+        # discriminator (c3_k_shuttle, c3_na_shuttle, c6_mg_thermite);
+        # the C6 back-reduction is a second dispatch on the same intent
+        # so each chemical reaction stays a single atom-balanced
+        # LedgerTransition, matching the legacy two-transition shape
+        # for the thermite + cascade pair.
+        self._chem_registry.register_idempotent(
+            BuiltinMetallothermicStepProvider(),
+            [ChemistryIntent.METALLOTHERMIC_STEP],
         )
         return ChemistryKernel(
             ledger=self.atom_ledger,
