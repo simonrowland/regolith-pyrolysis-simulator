@@ -114,13 +114,13 @@ from simulator.state import OXIDE_SPECIES
 # the simulator's ``OXIDE_SPECIES`` list is the canonical projection
 # target.  Upstream MAGEMin spells the oxides in standard chemistry
 # notation; the simulator already uses the same spellings so this is a
-# 1:1 rename.
+# 1:1 rename; pass ``OXIDE_SPECIES`` directly to the projection helper
+# rather than rebinding a private alias that hides the identity.
 #
 # TODO(magemin): once an actual MAGEMin install is available, verify the
 # exact oxide-name spellings the upstream library expects (the C-level
 # ``MAGEMin_init_db`` documents an oxide list; the Python wrappers may
 # remap).  Today this adapter assumes 1:1 with ``OXIDE_SPECIES``.
-_MAGEMIN_OXIDE_BASIS: Tuple[str, ...] = tuple(OXIDE_SPECIES)
 
 
 class MAGEMinBackend(MeltBackend):
@@ -274,25 +274,24 @@ class MAGEMinBackend(MeltBackend):
         On library error returns an empty result with a warning rather
         than raising.
         """
-        result = EquilibriumResult(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-        )
-
         # The subprocess bridge has no Python module (the binary is the
         # bridge); the other bridges do.  Either way the backend must be
         # available with a resolved bridge.
         if not self._available or self._bridge is None:
-            result.status = 'unavailable'
-            result.warnings.append('MAGEMin backend not initialized')
-            return result
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='unavailable',
+                warnings=['MAGEMin backend not initialized'],
+            )
 
+        prior_warnings: List[str] = []
         if composition_mol_by_account is not None:
             melt_mol, dropped_accounts = split_cleaned_melt_account(
                 composition_mol_by_account)
             for account in dropped_accounts:
-                result.warnings.append(
+                prior_warnings.append(
                     'MAGEMin is silicate-only; ignored non-melt ledger '
                     f'account {account}'
                 )
@@ -303,17 +302,22 @@ class MAGEMinBackend(MeltBackend):
         comp_wt = project_melt_to_oxide_wt_pct(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
-            oxide_basis=_MAGEMIN_OXIDE_BASIS,
+            oxide_basis=tuple(OXIDE_SPECIES),
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
-            result.status = 'out_of_domain'
-            result.warnings.append(
-                'MAGEMin received empty melt composition; returning empty '
-                'equilibrium result'
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    'MAGEMin received empty melt composition; returning empty '
+                    'equilibrium result',
+                ],
             )
-            return result
 
         try:
             raw = self._call_magemin(
@@ -327,9 +331,13 @@ class MAGEMinBackend(MeltBackend):
             # usable result.
             message = f'MAGEMin equilibrate failed: {exc}'
             self._last_error = message
-            result.status = 'not_converged'
-            result.warnings.append(message)
-            return result
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='not_converged',
+                warnings=[*prior_warnings, message],
+            )
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
         # authority.  _populate_result fills phase_masses_kg, so a result
@@ -337,7 +345,19 @@ class MAGEMinBackend(MeltBackend):
         # core.py::_get_equilibrium as the active backend (see the module
         # "Authority posture" note) — it is only valid for a shadow
         # comparator.
-        result.status = 'ok'
+        all_warnings = list(prior_warnings)
+        if isinstance(raw, dict):
+            buffer_warnings = raw.get('buffer_warnings') or []
+            for line in buffer_warnings:
+                if line not in all_warnings:
+                    all_warnings.append(line)
+        result = EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status='ok',
+            warnings=all_warnings,
+        )
         self._populate_result(result, raw)
         return result
 
@@ -613,6 +633,13 @@ class MAGEMinBackend(MeltBackend):
         binary echoes back is dropped — it is a control row, not a
         material phase.
 
+        The caller's absolute ``fO2_log`` is honoured by translating it
+        into MAGEMin's ``--buffer + --buffer_n`` form via
+        ``_resolve_buffer`` (O'Neill 1987 QFM calibration); the
+        substitution warning is returned alongside the parsed phase
+        block so ``equilibrate`` can surface it on the
+        ``EquilibriumResult``.
+
         Raises ``RuntimeError`` on a non-zero exit, a timeout, or an
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
@@ -621,7 +648,9 @@ class MAGEMinBackend(MeltBackend):
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
 
         bulk = self._build_ig_bulk_vector(composition_wt_pct)
-        buffer_name = self._resolve_buffer()
+        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
+            temperature_C=temperature_C, fO2_log=fO2_log,
+        )
 
         args = [
             str(self._binary_path),
@@ -631,9 +660,9 @@ class MAGEMinBackend(MeltBackend):
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk),
+            f'--buffer={buffer_name}',
+            f'--buffer_n={buffer_n:.6f}',
         ]
-        if buffer_name is not None:
-            args.append(f'--buffer={buffer_name}')
 
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
@@ -666,7 +695,7 @@ class MAGEMinBackend(MeltBackend):
             raise RuntimeError(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
-        return {'phases': phases}
+        return {'phases': phases, 'buffer_warnings': buffer_warnings}
 
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]
@@ -695,27 +724,93 @@ class MAGEMinBackend(MeltBackend):
                     float(composition_wt_pct.get(component, 0.0) or 0.0))
         return vector
 
-    def _resolve_buffer(self) -> Optional[str]:
+    @staticmethod
+    def _qfm_logfo2_oneill(temperature_C: float) -> float:
         """
-        Resolve the MAGEMin ``--buffer`` argument from config.
+        Absolute log10(fO2) of the QFM buffer at ``temperature_C``.
 
-        The simulator carries absolute log10(fO2); MAGEMin's single-point
-        CLI takes a named buffer instead.  An explicit ``fO2_buffer``
-        config value is honoured if valid; otherwise this returns
-        ``'qfm'`` as the default analog.  An invalid configured buffer is
-        recorded as a warning and falls back to ``qfm``.
+        O'Neill (1987) formulation: ``logfO2_QFM = 8.58 - 25050 / T_K``.
+        Same fit PySulfSat uses (see
+        ``simulator/melt_backend/sulfsat.py::_qfm_logfo2_oneill``); keep
+        the two in sync.
+        """
+        T_K = float(temperature_C) + 273.15
+        return 8.58 - 25050.0 / T_K
+
+    def _resolve_buffer(
+        self, *, temperature_C: float, fO2_log: float,
+    ) -> Tuple[str, float, List[str]]:
+        """
+        Translate the caller's absolute log10(fO2) into a MAGEMin
+        ``(buffer_name, buffer_n, warnings)`` triple.
+
+        The simulator carries absolute log10(fO2); MAGEMin's CLI takes a
+        named buffer name PLUS a numeric ``buffer_n`` offset (the same
+        ΔQFM idiom used elsewhere in this codebase) — see MAGEMin's
+        ``examples/MAGEMin_C_single_point_with_buffer.jl`` and the
+        ``pp_min_function.c`` Gibbs-energy correction
+        ``z_b.T * 0.019145 * gv.buffer_n``.  The substitution must
+        honour the caller's absolute value: this method computes
+        ``delta = fO2_log - QFM(T)`` and returns it as the buffer
+        offset so the subprocess receives the requested fO2 instead of
+        silently snapping to the named buffer.
+
+        An explicit ``fO2_buffer`` config (one of the legacy named
+        buffers ``qfm``, ``mw``, ``qif``, ``nno``, ``hm``, ``cco``)
+        overrides the offset-translation path and is passed through
+        with ``buffer_n=0.0`` for backwards compatibility — the
+        substitution warning still names the buffer so callers can
+        spot mismatches.  Today only ``qfm`` has a calibration table
+        here; configuring any other buffer keeps the legacy "named
+        buffer only" behaviour but is flagged as a warning so the
+        caller knows their absolute fO2 was NOT honoured.
+
+        Returns:
+            (buffer_name, buffer_n, warnings)
+            - buffer_name: one of ``_BUFFER_CHOICES``
+            - buffer_n: numeric offset for ``--buffer_n=...``
+            - warnings: human-readable lines that ``equilibrate`` must
+              surface on the EquilibriumResult so the caller cannot
+              miss the substitution.
         """
         configured = self._config.get('fO2_buffer')
-        if configured is None:
-            return 'qfm'
-        name = str(configured).lower().strip()
-        if name in self._BUFFER_CHOICES:
-            return name
-        self._warn(
-            f'MAGEMin: unknown fO2_buffer {configured!r}; '
-            'falling back to qfm'
+        warnings_out: List[str] = []
+        if configured is not None:
+            name = str(configured).lower().strip()
+            if name not in self._BUFFER_CHOICES:
+                warnings_out.append(
+                    f'MAGEMin: unknown fO2_buffer {configured!r}; '
+                    'falling back to qfm with offset translation'
+                )
+                name = 'qfm'
+            if name == 'qfm':
+                # An explicit qfm config still benefits from offset
+                # translation against the caller's fO2_log.
+                buffer_n = float(fO2_log) - self._qfm_logfo2_oneill(temperature_C)
+                warnings_out.append(
+                    f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
+                    f'{temperature_C:.2f} C to --buffer=qfm '
+                    f'--buffer_n={buffer_n:.4f} '
+                    "(O'Neill 1987 QFM calibration)"
+                )
+                return 'qfm', buffer_n, warnings_out
+            warnings_out.append(
+                f'MAGEMin: configured fO2_buffer={name!r} has no offset '
+                f'calibration in this adapter; passing --buffer={name} '
+                f'with --buffer_n=0 so the absolute fO2_log={fO2_log:.4f} '
+                'is NOT honoured'
+            )
+            return name, 0.0, warnings_out
+
+        # Default path: translate fO2_log into qfm + offset.
+        buffer_n = float(fO2_log) - self._qfm_logfo2_oneill(temperature_C)
+        warnings_out.append(
+            f'MAGEMin: translated absolute fO2_log={fO2_log:.4f} at '
+            f'{temperature_C:.2f} C to --buffer=qfm '
+            f'--buffer_n={buffer_n:.4f} '
+            "(O'Neill 1987 QFM calibration)"
         )
-        return 'qfm'
+        return 'qfm', buffer_n, warnings_out
 
     @staticmethod
     def _parse_subprocess_stdout(stdout: str) -> Dict[str, Dict[str, float]]:

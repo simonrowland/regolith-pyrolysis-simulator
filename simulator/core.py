@@ -454,6 +454,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # rebuild must come after. The provider registry persists; only
         # the kernel facade is rebuilt per batch.
         self._chem_kernel = self._build_chemistry_kernel()
+        # Per-batch diagnostic state must start clean -- the planner's
+        # shadow trace would otherwise accumulate without bound across
+        # campaigns / loop sessions.
+        self._chem_kernel.clear_shadow_trace()
         self._last_backend_error = ''
         self._last_backend_status = 'ok'
         self._backend_failed = False
@@ -630,43 +634,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
-        # Re-register the authoritative VAPOR_PRESSURE provider once per
-        # simulator (idempotent: ProviderRegistry.register would raise on
-        # a double authoritative registration). Subsequent intent flips
-        # add their providers here.
-        if self._chem_registry.authoritative_for(
-            ChemistryIntent.VAPOR_PRESSURE
-        ) is None:
-            self._chem_registry.register(
-                BuiltinVaporPressureProvider(self.vapor_pressures),
-                [ChemistryIntent.VAPOR_PRESSURE],
-            )
-        # EVAPORATION_FLUX -- second intent flip of
-        # \goal BUILTIN-ENGINE-EXTRACTION (#7). Stateless provider; the
-        # per-call inputs (vapor pressures, overhead partials, surface
-        # area, stoich) arrive via control_inputs from
-        # _calculate_evaporation.
-        if self._chem_registry.authoritative_for(
-            ChemistryIntent.EVAPORATION_FLUX
-        ) is None:
-            self._chem_registry.register(
-                BuiltinEvaporationFluxProvider(),
-                [ChemistryIntent.EVAPORATION_FLUX],
-            )
-        # EVAPORATION_TRANSITION -- third intent flip of
-        # \goal BUILTIN-ENGINE-EXTRACTION (#7). FIRST authoritative
-        # ledger-mutating intent in the migration: the provider emits a
-        # LedgerTransitionProposal and the kernel's commit_batch actually
-        # writes the AtomLedger. Per-call inputs (rate_kg_hr,
-        # remaining_kg_hr, stoich, sp_data, dt_hr, available_kg) arrive
-        # via control_inputs from _credit_evaporation_transition.
-        if self._chem_registry.authoritative_for(
-            ChemistryIntent.EVAPORATION_TRANSITION
-        ) is None:
-            self._chem_registry.register(
-                BuiltinEvaporationTransitionProvider(),
-                [ChemistryIntent.EVAPORATION_TRANSITION],
-            )
+        # Each ``register_idempotent`` call is a no-op on subsequent
+        # batches once the simulator has registered the provider for
+        # that intent (the registry persists; only the kernel facade is
+        # rebuilt per batch).  Conflicting authoritative registrations
+        # for an intent still raise -- idempotence covers "same
+        # provider, same authority", never silent provider swaps.
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7) flips:
+        self._chem_registry.register_idempotent(
+            BuiltinVaporPressureProvider(self.vapor_pressures),
+            [ChemistryIntent.VAPOR_PRESSURE],
+        )
+        # EVAPORATION_FLUX -- stateless; per-call inputs (vapor
+        # pressures, overhead partials, surface area, stoich) arrive
+        # via control_inputs from _calculate_evaporation.
+        self._chem_registry.register_idempotent(
+            BuiltinEvaporationFluxProvider(),
+            [ChemistryIntent.EVAPORATION_FLUX],
+        )
+        # EVAPORATION_TRANSITION -- FIRST authoritative ledger-mutating
+        # intent in the migration. Provider emits LedgerTransitionProposal;
+        # kernel's commit_batch writes the AtomLedger.  Per-call inputs
+        # (rate_kg_hr, remaining_kg_hr, stoich, sp_data, dt_hr,
+        # available_kg) arrive via control_inputs from
+        # _credit_evaporation_transition.
+        self._chem_registry.register_idempotent(
+            BuiltinEvaporationTransitionProvider(),
+            [ChemistryIntent.EVAPORATION_TRANSITION],
+        )
         return ChemistryKernel(
             ledger=self.atom_ledger,
             registry=self._chem_registry,

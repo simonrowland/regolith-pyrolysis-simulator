@@ -94,6 +94,76 @@ class ProviderRegistry:
                 if provider not in shadows:
                     shadows.append(provider)
 
+    def register_idempotent(
+        self,
+        provider: ChemistryProvider,
+        intents: Iterable[ChemistryIntent],
+        *,
+        shadow: bool = False,
+    ) -> None:
+        """Register ``provider`` only if it is not already attached.
+
+        Sister of :meth:`register` for call sites that may run multiple
+        times per simulator lifetime (e.g. ``_build_chemistry_kernel``
+        rebuilds the kernel facade on every batch but keeps the
+        registry).  Semantics:
+
+        * If no provider is registered against an intent yet, register
+          this one (authoritative or shadow per ``shadow``).
+        * If THIS provider is already registered authoritatively for
+          the intent, no-op.
+        * If a DIFFERENT provider holds authority for the intent and
+          ``shadow=False``, raise :class:`KernelError`.  Idempotent
+          re-registration is for "same provider, same authority", not
+          "swap providers silently".
+        * Shadow registrations no-op if ``provider`` already appears
+          in the shadow list for the intent; otherwise append.
+
+        The non-idempotent :meth:`register` still raises on any
+        repeat authoritative attempt, even with the same provider.
+        Callers wanting idempotence must opt in explicitly.
+        """
+
+        # Compare by ``provider_id`` rather than object identity: call
+        # sites that rebuild kernels per batch (e.g.
+        # ``_build_chemistry_kernel``) construct a fresh provider
+        # instance every time but the registry's authority is keyed on
+        # provider identity (the ``CapabilityProfile.provider_id``).  An
+        # idempotent call with the same provider_id is the "already
+        # registered" path; a different provider_id is a swap attempt
+        # and must raise.
+        new_id = provider.capability_profile().provider_id
+        intent_list = list(intents)
+        to_register: list[ChemistryIntent] = []
+        for intent in intent_list:
+            if not isinstance(intent, ChemistryIntent):
+                raise KernelError(
+                    f"intent {intent!r} is not a ChemistryIntent enum value"
+                )
+            if not shadow:
+                existing = self._authoritative.get(intent)
+                if existing is not None:
+                    existing_id = existing.capability_profile().provider_id
+                    if existing_id == new_id:
+                        continue
+                    raise KernelError(
+                        f"register_idempotent: conflicting authoritative "
+                        f"registration for {intent.value!r}: "
+                        f"{existing_id!r} already holds it, refusing to swap "
+                        f"in {new_id!r}"
+                    )
+                to_register.append(intent)
+            else:
+                shadow_ids = {
+                    p.capability_profile().provider_id
+                    for p in self._shadows.get(intent, ())
+                }
+                if new_id in shadow_ids:
+                    continue
+                to_register.append(intent)
+        if to_register:
+            self.register(provider, to_register, shadow=shadow)
+
     def authoritative_for(
         self, intent: ChemistryIntent
     ) -> Optional[ChemistryProvider]:

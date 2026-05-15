@@ -20,15 +20,14 @@ Covers:
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pytest
-import yaml
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     _ELLINGHAM_THERMO,
 )
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -37,50 +36,12 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase, DecisionType
+from tests.chemistry.conftest import _build_sim
 
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 1e-9
-
-
-def _load_yaml(name: str) -> dict:
-    return yaml.safe_load((DATA_DIR / name).read_text())
-
-
-@pytest.fixture(scope="module")
-def vapor_pressure_data() -> dict:
-    return _load_yaml("vapor_pressures.yaml")
-
-
-@pytest.fixture(scope="module")
-def feedstocks_data() -> dict:
-    return _load_yaml("feedstocks.yaml")
-
-
-@pytest.fixture(scope="module")
-def setpoints_data() -> dict:
-    return _load_yaml("setpoints.yaml")
-
-
-def _build_sim(
-    feedstock_key: str,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-    *,
-    additives_kg: dict | None = None,
-) -> PyrolysisSimulator:
-    backend = StubBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend, setpoints_data, feedstocks_data, vapor_pressure_data
-    )
-    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives_kg)
-    return sim
 
 
 # ---------------------------------------------------------------------------
@@ -460,3 +421,42 @@ def test_provider_short_circuits_below_400_k(vapor_pressure_data):
     result = provider.dispatch(request)
     assert result.status == "ok"
     assert (result.diagnostic or {}).get("vapor_pressures_Pa") == {}
+
+
+# ---------------------------------------------------------------------------
+# 8. Fail-closed on an unregistered species in process.cleaned_melt
+# ---------------------------------------------------------------------------
+
+
+def test_vapor_pressure_provider_raises_on_unregistered_species_in_view(
+    vapor_pressure_data,
+):
+    """An unresolvable species in ``process.cleaned_melt`` must raise.
+
+    The legacy provider used to ``continue`` past species whose formula
+    could not be resolved, silently biasing the activity proxy by
+    dropping their mass from ``total_kg``. The fail-closed behaviour
+    aligns the provider with :meth:`PyrolysisSimulator._load_ledger_account`,
+    which already raises :class:`AccountingError` on the same condition
+    at Stage 0. Both paths into the ledger now have the same surface.
+    """
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    # registry is intentionally empty so even SiO2 has no resolvable
+    # formula -- the provider must reject the view, not silently drop
+    # the unknown species and emit an activity-biased result.
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0, "UNOBTAINIUM": 1.0}},
+        species_formula_registry={},
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=view,
+        temperature_C=1500.0,  # Above the 400 K early-exit
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    with pytest.raises(AccountingError):
+        provider.dispatch(request)

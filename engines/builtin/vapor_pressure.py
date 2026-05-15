@@ -2,7 +2,7 @@
 
 Kernel-registered provider that owns the ``VAPOR_PRESSURE`` intent. Mirrors
 the math in :meth:`simulator.equilibrium.EquilibriumMixin._stub_equilibrium`
-exactly — this is a refactor of where the computation lives, not a
+exactly -- this is a refactor of where the computation lives, not a
 re-derivation of how it works. The provider:
 
 - reads ``process.cleaned_melt`` from the account view (the only account it
@@ -14,14 +14,14 @@ re-derivation of how it works. The provider:
   request's ``temperature_C`` and the caller-supplied commanded ``pO2_bar``
   (via ``control_inputs``),
 - returns an :class:`IntentResult` with ``transition=None`` (diagnostic;
-  VAPOR_PRESSURE owns no ledger mutation — that belongs to
+  VAPOR_PRESSURE owns no ledger mutation -- that belongs to
   ``EVAPORATION_TRANSITION``) and a ``vapor_pressures_Pa`` diagnostic.
 
 Authority: authoritative for ``VAPOR_PRESSURE`` per binding spec §3 until
 ``\\goal VAPOROCK-AUTHORITY-PROMOTION`` (#10) lands.
 
 Account declaration: ``process.cleaned_melt`` only. The provider must not
-see gas / metal / sulfide / salt accounts — the kernel filter enforces
+see gas / metal / sulfide / salt accounts -- the kernel filter enforces
 this. Mirrors the same constraint AlphaMELTS will have (binding spec §7).
 """
 
@@ -31,17 +31,16 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from engines.builtin._common import (
+    composition_wt_pct_from_account_view,
+    reject_wrong_intent,
+)
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
-# simulator.accounting.formulas + simulator.state are lazy-imported in
-# the methods below. Importing them at module load would create a cycle:
-# simulator/__init__.py -> simulator.core -> engines.builtin.vapor_pressure
-# -> simulator.accounting.formulas (which goes through simulator/__init__).
 
-
-# Mirrors EquilibriumMixin._ELLINGHAM_THERMO — the canonical table.
+# Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     'Na': (-836.0, -0.275, 4, 2),
@@ -83,27 +82,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        # Lazy import to break the package-init cycle described in this
-        # module's header.
+        # Lazy import: simulator.state pulls in simulator/__init__ which
+        # re-enters this module during package init -- see
+        # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT
 
-        if request.intent is not ChemistryIntent.VAPOR_PRESSURE:
-            # Defence in depth: the registry shouldn't route a non-VP
-            # intent to this provider, but if it does, surface that as a
-            # planner-level unsupported result rather than a silent
-            # mis-answer.
-            return IntentResult(
-                intent=request.intent,
-                status="unsupported",
-                diagnostic={"reason": f"provider only serves {ChemistryIntent.VAPOR_PRESSURE.value!r}"},
-            )
+        wrong_intent = reject_wrong_intent(request, ChemistryIntent.VAPOR_PRESSURE)
+        if wrong_intent is not None:
+            return wrong_intent
 
         T_C = request.temperature_C
         T_K = T_C + 273.15
         if T_K < 400:
             # Mirrors _stub_equilibrium: below 400 K, no significant
             # evaporation. Return an empty vapor-pressure dict with an
-            # 'ok' status — this is a converged outcome, not a failure.
+            # 'ok' status -- this is a converged outcome, not a failure.
             return IntentResult(
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
@@ -111,7 +104,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         pO2_bar = self._resolve_pO2_bar(request)
-        comp_wt = self._composition_wt_pct_from_view(request.account_view)
+        comp_wt = composition_wt_pct_from_account_view(
+            request.account_view, self.DECLARED_ACCOUNT
+        )
 
         vapor_pressures: dict[str, float] = {}
         activities: dict[str, float] = {}
@@ -215,45 +210,3 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if request.fO2_log is not None:
             return max(10.0 ** float(request.fO2_log), 1e-9)
         return 1e-9
-
-    def _composition_wt_pct_from_view(self, view) -> dict[str, float]:
-        """Convert the cleaned-melt mol view into weight-percent oxides.
-
-        Mirrors :meth:`MeltState.composition_wt_pct` so the activity proxy
-        (a_oxide = wt fraction) matches the legacy
-        :meth:`_stub_equilibrium` exactly.
-        """
-
-        # Lazy imports to break the package-init cycle (see module header).
-        from simulator.accounting.formulas import resolve_species_formula
-        from simulator.state import OXIDE_SPECIES
-
-        species_mol = dict(view.accounts.get(self.DECLARED_ACCOUNT, {}) or {})
-        registry = view.species_formula_registry
-        kg_by_species: dict[str, float] = {}
-        total_kg = 0.0
-        for species, mol in species_mol.items():
-            try:
-                formula = resolve_species_formula(species, registry)
-            except Exception:
-                # An unknown species in the registry means we can't weight
-                # it — skip rather than crash, matching the legacy path's
-                # tolerance for unconventional species in cleaned_melt.
-                continue
-            mass_kg = float(mol) * formula.molar_mass_kg_per_mol()
-            if mass_kg <= 0.0:
-                continue
-            kg_by_species[species] = kg_by_species.get(species, 0.0) + mass_kg
-            total_kg += mass_kg
-
-        comp_wt: dict[str, float] = {sp: 0.0 for sp in OXIDE_SPECIES}
-        if total_kg <= 0.0:
-            return comp_wt
-        for species, kg in kg_by_species.items():
-            # Only the OXIDE_SPECIES list ends up in composition_wt_pct().
-            # Other ledger material in cleaned_melt (rare) contributes to
-            # the total but not to oxide activity — same as the legacy
-            # MeltState.composition_wt_pct over OXIDE_SPECIES.
-            if species in OXIDE_SPECIES:
-                comp_wt[species] = (kg / total_kg) * 100.0
-        return comp_wt

@@ -23,10 +23,8 @@ Covers:
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pytest
-import yaml
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import (
@@ -36,54 +34,17 @@ from simulator.chemistry.kernel import (
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _EVAPORATION_COEFFICIENT_ALPHA
-from simulator.melt_backend.base import StubBackend
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
     CampaignPhase,
     DecisionType,
 )
+from tests.chemistry.conftest import _build_sim
 
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
-
-
-def _load_yaml(name: str) -> dict:
-    return yaml.safe_load((DATA_DIR / name).read_text())
-
-
-@pytest.fixture(scope="module")
-def vapor_pressure_data() -> dict:
-    return _load_yaml("vapor_pressures.yaml")
-
-
-@pytest.fixture(scope="module")
-def feedstocks_data() -> dict:
-    return _load_yaml("feedstocks.yaml")
-
-
-@pytest.fixture(scope="module")
-def setpoints_data() -> dict:
-    return _load_yaml("setpoints.yaml")
-
-
-def _build_sim(
-    feedstock_key: str,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-    *,
-    additives_kg: dict | None = None,
-) -> PyrolysisSimulator:
-    backend = StubBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend, setpoints_data, feedstocks_data, vapor_pressure_data
-    )
-    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives_kg)
-    return sim
 
 
 def _legacy_hertz_knudsen_flux(

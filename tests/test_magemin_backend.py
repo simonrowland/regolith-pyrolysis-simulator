@@ -507,3 +507,154 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
 
     assert result.status == "out_of_domain"
     assert any("empty melt composition" in w for w in result.warnings)
+
+
+def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
+    # MAGEMin's CLI only accepts a named buffer plus a numeric `buffer_n`
+    # offset (see ``MAGEMin/examples/MAGEMin_C_single_point_with_buffer.jl``),
+    # so the adapter must translate the caller's absolute log10(fO2) into
+    # `--buffer=qfm --buffer_n=<delta>` using the O'Neill (1987) QFM
+    # calibration. The previous "silently substitute qfm and ignore the
+    # absolute value" path made a Mars reducing campaign at fO2_log=-12
+    # land at QFM (~ -6 at 1450 C in the O'Neill fit) -- a multi-decade
+    # error -- without any warning to the caller. This test pins the
+    # honest translation: the binary receives the offset that reproduces
+    # the requested absolute fO2, and the EquilibriumResult.warnings
+    # surfaces the substitution so a downstream consumer cannot miss it.
+    captured: dict = {}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ""
+        stdout = (
+            "Phase : liq qfm\n"
+            "Mode  : 1.000 0.000\n"
+        )
+
+    def fake_subprocess_run(args, **kwargs):
+        captured["args"] = list(args)
+        return FakeCompleted()
+
+    # Force the subprocess bridge directly: stub the binary discovery so
+    # initialize() picks up the subprocess path without needing a real
+    # MAGEMin install.
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(
+        magemin_module.subprocess, "run", fake_subprocess_run
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({}) is True
+    assert backend._bridge == "subprocess"
+
+    # Mars-reducing analog: T = 1450 C, fO2_log = -12 (well below QFM).
+    result = backend.equilibrate(
+        1450.0,
+        composition_mol={"SiO2": 5.0, "MgO": 3.0, "FeO": 1.0},
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+    )
+
+    # The substitution result is OK (the subprocess ran), but the
+    # warnings record the absolute -> buffer-offset translation in
+    # detail so a downstream consumer cannot miss it.
+    assert "args" in captured, "subprocess.run was not invoked"
+    args = captured["args"]
+    buffer_args = [a for a in args if a.startswith("--buffer")]
+    # Both --buffer and --buffer_n must be passed so the absolute fO2
+    # is honoured rather than silently snapped to QFM.
+    assert any(a == "--buffer=qfm" for a in buffer_args), buffer_args
+    buffer_n_args = [a for a in buffer_args if a.startswith("--buffer_n=")]
+    assert len(buffer_n_args) == 1, buffer_args
+    buffer_n = float(buffer_n_args[0].split("=", 1)[1])
+    # O'Neill 1987: logfo2_QFM = 8.58 - 25050 / T_K. At T_C = 1450,
+    # T_K = 1723.15, QFM ~ 8.58 - 14.537 = -5.957. So delta should be
+    # ~-12 - (-5.957) = -6.043. Allow generous tolerance for the
+    # calibration fit.
+    expected_offset = -12.0 - (8.58 - 25050.0 / (1450.0 + 273.15))
+    assert buffer_n == pytest.approx(expected_offset, abs=0.05), (
+        f"buffer_n={buffer_n} should approximate {expected_offset}"
+    )
+    # Once the offset round-trips through QFM(T) we recover the
+    # requested absolute fO2_log within calibration accuracy.
+    recovered_fo2_log = buffer_n + (8.58 - 25050.0 / (1450.0 + 273.15))
+    assert recovered_fo2_log == pytest.approx(-12.0, abs=0.05)
+    # The warning chain must explicitly name the substitution so the
+    # caller knows their absolute fO2 was translated, not ignored.
+    substitution_warnings = [
+        w for w in result.warnings if "fO2_log" in w and "qfm" in w
+    ]
+    assert substitution_warnings, result.warnings
+    assert any("-12.0" in w for w in substitution_warnings), substitution_warnings
+
+
+def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
+    # An unrecognised fO2_buffer config still drives the subprocess bridge,
+    # but the adapter MUST surface the substitution as a warning rather
+    # than silently swapping in 'qfm' (which would hide the requested fO2
+    # mismatch from the caller). The previous _resolve_buffer routed the
+    # warning into self._warnings, never reaching EquilibriumResult.
+    captured: dict = {}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ""
+        stdout = "Phase : liq\nMode  : 1.000\n"
+
+    def fake_subprocess_run(args, **kwargs):
+        captured["args"] = list(args)
+        return FakeCompleted()
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(
+        magemin_module.subprocess, "run", fake_subprocess_run
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({"fO2_buffer": "qfm-2"})  # invalid: includes offset
+
+    result = backend.equilibrate(
+        1450.0,
+        composition_mol={"SiO2": 5.0, "MgO": 3.0},
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+    )
+
+    assert any("qfm-2" in w and "qfm" in w for w in result.warnings), (
+        result.warnings
+    )
+
+
+def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
+    # Pin the O'Neill 1987 calibration math: at T = 1450 C (T_K = 1723.15),
+    # logfo2_QFM should be ~-5.96. The conversion is load-bearing for the
+    # A5 honest-substitution path; a wrong constant would silently shift
+    # every Mars reducing fO2 by ~6 decades.
+    qfm_at_1450C = MAGEMinBackend._qfm_logfo2_oneill(1450.0)
+    expected = 8.58 - 25050.0 / (1450.0 + 273.15)
+    assert qfm_at_1450C == pytest.approx(expected, abs=1e-9)
+    assert -7.0 < qfm_at_1450C < -5.0, qfm_at_1450C

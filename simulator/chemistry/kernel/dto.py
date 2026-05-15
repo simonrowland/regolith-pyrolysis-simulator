@@ -85,6 +85,10 @@ class LedgerTransitionProposal:
     debits: Mapping[str, Mapping[str, float]]
     credits: Mapping[str, Mapping[str, float]]
     reason: str = ""
+    # Optional provider self-check: element -> claimed net credit-debit
+    # mol.  :func:`validate_atom_balance` no-ops if empty; populated
+    # entries are cross-checked against the kernel's computed atom
+    # totals within :data:`PROOF_CROSSCHECK_TOLERANCE_MOL`.
     atom_balance_proof: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:

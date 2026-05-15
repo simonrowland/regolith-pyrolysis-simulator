@@ -315,6 +315,81 @@ def test_unknown_backend_name_falls_through_to_autodetect(
 
 
 # ---------------------------------------------------------------------------
+# Case-folding policy
+# ---------------------------------------------------------------------------
+#
+# ``_get_backend`` does ``name = (backend_name or '').strip().lower()`` for
+# ALL backend names. The refusal parametrize below covers case variants of
+# the ineligible backends, but the case-folding line itself is load-bearing
+# for every backend name: if it were ever broken (e.g. removed
+# ``.lower()``), an uppercase explicit request would fall through to the
+# autodetect chain instead of routing to the eligible backend the caller
+# asked for. Pin the eligible names here so the case-folding contract is
+# covered for every name the selector accepts.
+
+
+@pytest.mark.parametrize(
+    'name',
+    ['alphamelts', 'AlphaMELTS', 'ALPHAMELTS', ' alphamelts '],
+)
+def test_explicit_alphamelts_request_is_case_insensitive_raises_when_unavailable(
+        monkeypatch, name):
+    # With AlphaMELTS unavailable, an explicit request (in any case) must
+    # raise BackendUnavailableError instead of silently falling through to
+    # the autodetect chain. If case-folding is broken in `_get_backend`,
+    # the uppercase variants miss the `if name == 'alphamelts':` branch
+    # and fall into autodetect, returning Stub -- this test catches that.
+    _install_fakes(monkeypatch,
+                   alphamelts_available=False,
+                   factsage_available=False)
+
+    with pytest.raises(BackendUnavailableError,
+                       match='AlphaMELTS unavailable'):
+        _get_backend(name)
+
+
+@pytest.mark.parametrize(
+    'name',
+    ['factsage', 'FactSAGE', 'FACTSAGE', ' factsage '],
+)
+def test_explicit_factsage_request_is_case_insensitive(
+        monkeypatch, name, captured_logs):
+    # An explicit FactSAGE request without a strict config must drop to
+    # Stub regardless of case. If case-folding is broken the uppercase
+    # variants miss the `if name == 'factsage':` branch and fall through
+    # to autodetect, which would pick AlphaMELTS (available=True) -- a
+    # silent substitution this test catches.
+    _install_fakes(monkeypatch,
+                   alphamelts_available=True,
+                   factsage_available=True,
+                   factsage_strict_config=False)
+
+    backend = _get_backend(name)
+
+    assert isinstance(backend, StubBackend), backend
+
+
+@pytest.mark.parametrize(
+    'name',
+    ['auto', 'Auto', 'AUTO', ' auto '],
+)
+def test_autodetect_request_is_case_insensitive(
+        monkeypatch, name, captured_logs):
+    # 'auto' is in the unknown-fall-through bucket, but the case-folding
+    # is still load-bearing: with case-folding broken AND a backend
+    # request that happens to match a literal branch by coincidence
+    # (no ineligibility check), the policy would not raise. Pin the
+    # autodetect path with the eligible backend resolved.
+    _install_fakes(monkeypatch,
+                   alphamelts_available=True,
+                   factsage_available=False)
+
+    backend = _get_backend(name)
+
+    assert isinstance(backend, _FakeAlphaMELTS)
+
+
+# ---------------------------------------------------------------------------
 # Explicit refusal of vaporock / magemin as the active backend
 # ---------------------------------------------------------------------------
 

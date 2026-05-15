@@ -27,9 +27,15 @@ from simulator.chemistry.kernel.errors import (
     ProviderUnavailableError,
     UnauthorizedIntentError,
 )
-from simulator.chemistry.kernel.planner import ChemistryKernel, Planner
+from simulator.chemistry.kernel.planner import ChemistryKernel
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.chemistry.kernel.registry import ProviderRegistry
+
+# Planner is an internal seam between ChemistryKernel and the registry;
+# downstream callers use ChemistryKernel directly. Tests that need to
+# poke the seam import it explicitly via
+# ``simulator.chemistry.kernel.planner.Planner`` -- keeping it off the
+# package surface stops accidental dependence in non-kernel code.
 
 __all__ = (
     # DTOs
@@ -45,7 +51,6 @@ __all__ = (
     # Kernel runtime
     "ChemistryKernel",
     "ProviderRegistry",
-    "Planner",
     # Errors
     "KernelError",
     "UnauthorizedIntentError",

@@ -54,9 +54,17 @@ from simulator.chemistry.kernel.validation import (
 class Planner:
     """Routes a single :class:`IntentRequest` to authoritative + shadows."""
 
+    #: Cap on retained shadow-trace entries; the buffer drops the oldest
+    #: record once this is exceeded.  The kernel is instantiated once per
+    #: simulator and reused across an entire campaign / loop, so an
+    #: unbounded list would leak memory.  Tune via
+    #: :meth:`set_shadow_trace_cap`.
+    DEFAULT_SHADOW_TRACE_CAP: int = 10_000
+
     def __init__(self, registry: ProviderRegistry) -> None:
         self._registry = registry
         self._shadow_trace: list[dict[str, Any]] = []
+        self._shadow_trace_cap: int = Planner.DEFAULT_SHADOW_TRACE_CAP
 
     @property
     def registry(self) -> ProviderRegistry:
@@ -68,10 +76,39 @@ class Planner:
 
         Populated by every call to :meth:`dispatch`; only shadow
         provider results are recorded here -- the authoritative result
-        is the return value.
+        is the return value.  Capped at
+        :attr:`DEFAULT_SHADOW_TRACE_CAP` entries; older records are
+        dropped FIFO when the cap is exceeded.  Call
+        :meth:`clear_shadow_trace` to reset, e.g. between batches.
         """
 
         return tuple(self._shadow_trace)
+
+    @property
+    def shadow_trace_cap(self) -> int:
+        return self._shadow_trace_cap
+
+    def set_shadow_trace_cap(self, cap: int) -> None:
+        """Configure the ring-buffer cap; ``0`` disables retention."""
+
+        if int(cap) < 0:
+            raise ValueError("shadow_trace_cap must be non-negative")
+        self._shadow_trace_cap = int(cap)
+        if len(self._shadow_trace) > self._shadow_trace_cap:
+            # Trim from the front so the most recent records survive.
+            overflow = len(self._shadow_trace) - self._shadow_trace_cap
+            del self._shadow_trace[:overflow]
+
+    def clear_shadow_trace(self) -> None:
+        """Drop every retained shadow-trace entry.
+
+        Called from :meth:`PyrolysisSimulator.load_batch` so per-batch
+        diagnostics start clean and the kernel does not accumulate
+        unbounded state across long-running web sessions or
+        ``\\goal``-driven loops.
+        """
+
+        self._shadow_trace.clear()
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
         """Run the authoritative + shadow providers for ``request``.
@@ -93,7 +130,7 @@ class Planner:
 
         for shadow in self._registry.shadows_for(request.intent):
             shadow_result = shadow.dispatch(request)
-            self._shadow_trace.append(
+            self._append_shadow_trace(
                 {
                     "provider_id": shadow.capability_profile().provider_id,
                     "intent": request.intent.value,
@@ -108,6 +145,14 @@ class Planner:
             # authoritative.
 
         return authoritative.dispatch(request)
+
+    def _append_shadow_trace(self, record: dict[str, Any]) -> None:
+        if self._shadow_trace_cap == 0:
+            return
+        self._shadow_trace.append(record)
+        if len(self._shadow_trace) > self._shadow_trace_cap:
+            # FIFO drop of the oldest record.
+            del self._shadow_trace[0]
 
 
 class ChemistryKernel:
@@ -143,6 +188,11 @@ class ChemistryKernel:
     @property
     def species_formula_registry(self) -> Mapping[str, Any]:
         return dict(self._species_formula_registry)
+
+    def clear_shadow_trace(self) -> None:
+        """Pass-through to :meth:`Planner.clear_shadow_trace`."""
+
+        self._planner.clear_shadow_trace()
 
     def dispatch(
         self,
@@ -218,20 +268,59 @@ class ChemistryKernel:
 
         return result
 
-    def commit_batch(self, proposal: LedgerTransitionProposal) -> LedgerTransition:
+    def commit_batch(
+        self,
+        intent: ChemistryIntent,
+        proposal: LedgerTransitionProposal,
+    ) -> LedgerTransition:
         """Apply ``proposal`` to the ledger -- the ONLY writable path.
 
-        Re-runs the atom-balance validator against the current registry
-        (defence in depth: even if a provider produced a balanced
-        proposal, an out-of-band registry change between dispatch and
-        commit must not slip through), translates the proposal into a
-        canonical :class:`LedgerTransition`, and applies it via
+        Re-runs the full pre-commit validator stack against the current
+        registry (defence in depth: the proposal DTO is in the public
+        surface, so a replay harness or future shadow tool may submit
+        one off the dispatch path -- atom balance alone is not enough
+        gate).  In order:
+
+        1. :func:`validate_intent_authority` -- the registry's
+           authoritative provider for ``intent`` must declare it in its
+           ``is_authoritative_for`` set.
+        2. :func:`validate_proposal_accounts` -- every account touched
+           must be in the authoritative provider's
+           :attr:`CapabilityProfile.declared_accounts`.
+        3. :func:`validate_atom_balance` -- conservation gate.
+
+        Translates the validated proposal into a canonical
+        :class:`LedgerTransition` and applies it via
         :meth:`AtomLedger.apply`.
+
+        Args:
+            intent: The :class:`ChemistryIntent` this proposal was
+                produced for. Re-validation looks up the authoritative
+                provider via the registry; mismatched or unauthoritative
+                intents raise :class:`ProviderUnavailableError` /
+                :class:`UnauthorizedIntentError`.
+            proposal: The :class:`LedgerTransitionProposal` to commit.
 
         Returns the applied :class:`LedgerTransition` so callers can
         record it in their trace.  Raises :class:`ProposalRejected` on
-        any pre-commit failure.
+        any pre-commit failure other than the kernel's own invariant
+        violations (which surface as their original
+        :class:`KernelError` subclasses).
         """
+
+        provider = self._registry.authoritative_for(intent)
+        if provider is None:
+            raise ProviderUnavailableError(
+                f"no authoritative provider registered for intent {intent.value!r}; "
+                "cannot commit proposal"
+            )
+        profile = provider.capability_profile()
+        # Re-check intent authority + account-filter at commit time so
+        # an off-path proposal (replay, future API, hand-built test)
+        # cannot bypass the dispatch-time gates.  Defence in depth
+        # matches the docstring contract.
+        validate_intent_authority(intent, profile)
+        validate_proposal_accounts(proposal, profile.declared_accounts)
 
         try:
             validate_atom_balance(proposal, self._species_formula_registry)

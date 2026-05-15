@@ -19,7 +19,7 @@ from typing import Any
 
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.chemistry.kernel.errors import AccountFilterViolation
+from simulator.chemistry.kernel.errors import AccountFilterViolation, KernelError
 
 
 def build_provider_account_view(
@@ -44,16 +44,20 @@ def build_provider_account_view(
         view, even if the ledger currently holds material in them.
 
     Raises:
-        AccountFilterViolation: ``declared_accounts`` is empty.  A
-            provider that requests no accounts cannot meaningfully be
-            handed any state; this is treated as a registration error
-            rather than silently returning an empty view.
+        KernelError: ``declared_accounts`` is empty.  A provider that
+            requests no accounts cannot meaningfully be handed any
+            state; this is a registration / configuration error, not
+            a cross-account read/write violation, so it surfaces as
+            the broader :class:`KernelError` rather than
+            :class:`AccountFilterViolation` (which is reserved for an
+            authorised provider actually touching an undeclared
+            account).
     """
 
     if not isinstance(declared_accounts, frozenset):
         declared_accounts = frozenset(declared_accounts or ())
     if not declared_accounts:
-        raise AccountFilterViolation(
+        raise KernelError(
             "provider declared no accounts; cannot build a non-empty ProviderAccountView"
         )
 

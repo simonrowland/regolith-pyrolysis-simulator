@@ -304,10 +304,16 @@ class EvaporationMixin:
             return 0.0
 
         # commit_batch is the ONLY writable path into the AtomLedger
-        # after this flip. The kernel re-validates atom balance + the
-        # account filter and translates the mol-native proposal into a
-        # canonical LedgerTransition before applying it.
-        self._chem_kernel.commit_batch(proposal)
+        # after this flip. The kernel re-validates intent authority,
+        # the account filter, and atom balance against the registry's
+        # authoritative provider for ``intent`` (defence in depth: the
+        # proposal DTO is in the public surface, so the commit gate
+        # cannot delegate validation to the dispatch path), then
+        # translates the mol-native proposal into a canonical
+        # LedgerTransition before applying it.
+        self._chem_kernel.commit_batch(
+            ChemistryIntent.EVAPORATION_TRANSITION, proposal
+        )
 
         diagnostic = dict(kernel_result.diagnostic or {})
         return float(diagnostic.get('credited_condensed_kg', 0.0))

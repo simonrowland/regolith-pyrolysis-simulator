@@ -128,15 +128,15 @@ _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
 
 # VapoRock consumes the same oxide basis as MELTS / alphaMELTS.  The
 # 14-oxide simulator basis is a strict subset; project 1:1 by name and
-# drop any oxide VapoRock does not declare.  If the upstream library
-# extends its basis, this map is the only place to update.
+# drop any oxide VapoRock does not declare.
 #
 # Verified 2026-05-15 against the installed VapoRock package: oxide
 # spellings in ``vaporock/chemistry.py::OXIDE_MOLWT`` match
 # ``simulator.state.OXIDE_SPECIES`` 1:1 (SiO2, TiO2, Al2O3, Fe2O3,
 # Cr2O3, FeO, MnO, MgO, NiO, CoO, CaO, Na2O, K2O, P2O5 plus H2O/CO2 the
-# simulator does not pass through this adapter).
-_VAPOROCK_OXIDE_BASIS = tuple(OXIDE_SPECIES)
+# simulator does not pass through this adapter).  ``OXIDE_SPECIES`` is
+# passed directly to ``project_melt_to_oxide_wt_pct`` rather than via a
+# private alias that just rebinds the same list.
 
 # Verified 2026-05-15: the installed VapoRock package exposes the
 # lowercase ``vaporock`` module name; the uppercase ``VapoRock`` probe
@@ -347,22 +347,21 @@ class VapoRockBackend(MeltBackend):
         ``EquilibriumResult`` and appends a one-line warning rather
         than raising.
         """
-        result = EquilibriumResult(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-        )
-
         if not self._available or self._vaporock is None:
-            result.status = 'unavailable'
-            result.warnings.append('VapoRock backend not initialized')
-            return result
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='unavailable',
+                warnings=['VapoRock backend not initialized'],
+            )
 
+        prior_warnings: List[str] = []
         if composition_mol_by_account is not None:
             melt_mol, dropped_accounts = split_cleaned_melt_account(
                 composition_mol_by_account)
             for account in dropped_accounts:
-                result.warnings.append(
+                prior_warnings.append(
                     'VapoRock is vapor-side; ignored non-melt ledger '
                     f'account {account}'
                 )
@@ -373,18 +372,23 @@ class VapoRockBackend(MeltBackend):
         comp_wt = project_melt_to_oxide_wt_pct(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
-            oxide_basis=_VAPOROCK_OXIDE_BASIS,
+            oxide_basis=tuple(OXIDE_SPECIES),
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
             # No oxide species in VapoRock's basis after the account
             # split; the vapor-melt solver has nothing valid to consume.
-            result.status = 'out_of_domain'
-            result.warnings.append(
-                'VapoRock received empty melt composition; returning empty '
-                'equilibrium result'
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    'VapoRock received empty melt composition; returning empty '
+                    'equilibrium result',
+                ],
             )
-            return result
 
         temperature_value = (
             temperature_C + 273.15
@@ -408,21 +412,30 @@ class VapoRockBackend(MeltBackend):
             # VapoRock is present but the call did not produce a usable result.
             message = f'VapoRock equilibrate failed: {exc}'
             self._last_error = message
-            result.status = 'not_converged'
-            result.warnings.append(message)
-            return result
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='not_converged',
+                warnings=[*prior_warnings, message],
+            )
 
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
         # re-scale here or an already-Pa result is inflated 1e5x.
-        result.status = 'ok'
-        result.vapor_pressures_Pa = vapor_pressures_Pa
         # phases_present is intentionally left empty — VapoRock is
         # vapor-side only and does not return a silicate-phase
         # assemblage.  ledger_transition is left None: VapoRock holds no
         # AtomLedger authority (see the module "Authority posture" note —
         # this adapter is not safe to select as the active backend).
-        return result
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status='ok',
+            warnings=list(prior_warnings),
+            vapor_pressures_Pa=vapor_pressures_Pa,
+        )
 
     # ------------------------------------------------------------------
     # Library boundary

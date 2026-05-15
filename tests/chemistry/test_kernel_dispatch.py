@@ -23,11 +23,13 @@ from simulator.chemistry.kernel import (
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
-    Planner,
     ProviderRegistry,
     ProviderUnavailableError,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+# Planner is an internal seam, intentionally not on the package's
+# public surface; tests reach for it via the module-qualified path.
+from simulator.chemistry.kernel.planner import Planner
 
 
 def _make_request(intent: ChemistryIntent) -> IntentRequest:
@@ -189,3 +191,69 @@ def test_registry_allows_multiple_shadows():
     registry.register(_ShadowProvider(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
     shadows = registry.shadows_for(ChemistryIntent.VAPOR_PRESSURE)
     assert len(shadows) == 2
+
+
+# ---------------------------------------------------------------------------
+# Shadow-trace memory hygiene: the trace must be clearable and capped, so
+# long-running web sessions / loop campaigns don't accumulate unbounded
+# diagnostic state.  The kernel is instantiated once per simulator and
+# reused across many batches.
+
+
+def test_shadow_trace_bounded_or_clearable():
+    """``clear_shadow_trace`` drops every retained record after many dispatches."""
+
+    registry = ProviderRegistry()
+    registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(_ShadowProvider(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+    planner = Planner(registry)
+
+    for _ in range(50):
+        planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+    assert len(planner.shadow_trace) == 50
+
+    planner.clear_shadow_trace()
+    assert planner.shadow_trace == ()
+
+    # Cleared state still accepts new dispatches.
+    planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+    assert len(planner.shadow_trace) == 1
+
+
+def test_shadow_trace_ring_buffer_honoured():
+    """When the cap is exceeded the planner drops oldest records FIFO."""
+
+    registry = ProviderRegistry()
+    registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(_ShadowProvider(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+    planner = Planner(registry)
+    planner.set_shadow_trace_cap(5)
+
+    for _ in range(20):
+        planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+
+    # Cap honoured: never more than 5 entries even after 20 dispatches.
+    assert len(planner.shadow_trace) == 5
+    # Most recent records survived (FIFO drop kept the newest).
+    assert planner.shadow_trace_cap == 5
+
+
+def test_chemistry_kernel_clear_shadow_trace_passthrough():
+    """``ChemistryKernel.clear_shadow_trace`` clears the underlying planner."""
+
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    registry = ProviderRegistry()
+    registry.register(_AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(_ShadowProvider(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+
+    kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        declared_accounts=frozenset({"process.cleaned_melt"}),
+    )
+    assert kernel.planner.shadow_trace != ()
+    kernel.clear_shadow_trace()
+    assert kernel.planner.shadow_trace == ()

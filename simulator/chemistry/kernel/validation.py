@@ -46,6 +46,16 @@ _CONTROL_TOLERANCE_ABS = {
 }
 _CONTROL_TOLERANCE_REL = 1e-9
 
+# Proof cross-check tolerance is intentionally TIGHT (12 orders of
+# magnitude below the conservation gate at
+# :data:`simulator.accounting.ledger.DEFAULT_ATOM_TOLERANCE_MOL` =
+# 1e-6).  The provider's ``atom_balance_proof`` is a self-declared
+# bookkeeping claim, not a numerical estimate; if it disagrees with the
+# kernel's element-by-element atom count by more than floating-point
+# round-off, the provider has a real internal inconsistency that must
+# surface, not be hidden by a loose tolerance.
+PROOF_CROSSCHECK_TOLERANCE_MOL = 1e-12
+
 
 def validate_intent_authority(
     intent: ChemistryIntent, profile: CapabilityProfile
@@ -110,7 +120,12 @@ def validate_atom_balance(
     # Also check the provider's own ``atom_balance_proof`` (if any)
     # against the computed atom counts.  This is a sanity check: a
     # provider that does its own bookkeeping should agree with the
-    # ledger's bookkeeping element-by-element.
+    # ledger's bookkeeping element-by-element.  Tighter than the
+    # broader :data:`DEFAULT_ATOM_TOLERANCE_MOL` conservation gate --
+    # the proof claim is a provider self-check, not a numerical
+    # estimate, so it should match the kernel's computed atoms within
+    # floating-point round-off (mirrors
+    # :data:`DEFAULT_BALANCE_TOLERANCE_KG`).
     if proposal.atom_balance_proof:
         debit_atoms = transition.debit_atom_moles(registry)
         credit_atoms = transition.credit_atom_moles(registry)
@@ -119,7 +134,7 @@ def validate_atom_balance(
             if not math.isclose(
                 float(claimed),
                 actual,
-                abs_tol=1e-6,
+                abs_tol=PROOF_CROSSCHECK_TOLERANCE_MOL,
                 rel_tol=1e-9,
             ):
                 raise AtomBalanceError(

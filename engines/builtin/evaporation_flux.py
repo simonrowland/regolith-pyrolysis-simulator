@@ -48,16 +48,11 @@ the VAPOR_PRESSURE provider declares, and the same one the legacy
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
-from typing import Any
 
+from engines.builtin._common import reject_wrong_intent, unpack_controls
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
-
-# simulator.state is lazy-imported inside dispatch() to break the cycle
-# simulator/__init__.py -> simulator.core -> engines.builtin.evaporation_flux
-# -> simulator.state. The VAPOR_PRESSURE provider follows the same pattern.
 
 
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
@@ -82,23 +77,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        # Lazy import to break the package-init cycle described in the
-        # module header.
+        # Lazy import: simulator.state pulls in simulator/__init__ which
+        # re-enters this module during package init -- see
+        # engines/builtin/__init__.py for the cycle description.
         from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
-        if request.intent is not ChemistryIntent.EVAPORATION_FLUX:
-            # Defence in depth -- the registry shouldn't route a non-FLUX
-            # intent here, but surface it cleanly if it ever does.
-            return IntentResult(
-                intent=request.intent,
-                status="unsupported",
-                diagnostic={
-                    "reason": (
-                        f"provider only serves "
-                        f"{ChemistryIntent.EVAPORATION_FLUX.value!r}"
-                    ),
-                },
-            )
+        wrong_intent = reject_wrong_intent(
+            request, ChemistryIntent.EVAPORATION_FLUX
+        )
+        if wrong_intent is not None:
+            return wrong_intent
 
         T_C = request.temperature_C
         T_K = T_C + 273.15
@@ -111,7 +99,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 diagnostic={"evaporation_flux_kg_hr": {}},
             )
 
-        controls = request.control_inputs or {}
+        controls = unpack_controls(request)
         vapor_pressures = dict(controls.get("vapor_pressures_Pa") or {})
         overhead_partials = dict(controls.get("overhead_partials_Pa") or {})
         molar_masses_kg_mol = dict(controls.get("molar_mass_kg_mol") or {})

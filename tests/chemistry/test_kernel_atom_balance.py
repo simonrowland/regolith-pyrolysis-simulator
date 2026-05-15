@@ -54,6 +54,43 @@ def test_proof_disagreeing_with_actual_atoms_rejected():
         validate_atom_balance(proposal, species_formula_registry={})
 
 
+def test_atom_balance_proof_mismatch_within_old_tolerance_now_rejected():
+    """Proof cross-check tolerance is now ``PROOF_CROSSCHECK_TOLERANCE_MOL``
+    (1e-12) -- tighter than the broader conservation gate at
+    ``DEFAULT_ATOM_TOLERANCE_MOL`` (1e-6).
+
+    A proof claim that disagrees with truth by 5e-7 mol used to pass
+    silently at the old ``abs_tol=1e-6``.  After A2, the proof
+    cross-check rejects any disagreement above 1e-12 mol -- the proof
+    is a provider self-bookkeeping claim, not a numerical estimate.
+    """
+
+    # The proposal itself is atom-balanced (1 mol SiO2 debit ==
+    # 1 mol SiO2 credit), so the conservation gate passes.  But the
+    # provider's claim of net +5e-7 mol O disagrees with truth (0 mol)
+    # by 5e-7 -- 5 orders of magnitude above the new tight tolerance.
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"SiO2": 1.0}},
+        credits={"process.overhead_gas": {"SiO2": 1.0}},
+        reason="proof_tolerance_test",
+        atom_balance_proof={"O": 5e-7},  # 0.5 microMol claimed; actual = 0
+    )
+    with pytest.raises(AtomBalanceError):
+        validate_atom_balance(proposal, species_formula_registry={})
+
+
+def test_atom_balance_proof_within_tight_tolerance_passes():
+    """A proof claim within ``PROOF_CROSSCHECK_TOLERANCE_MOL`` (1e-12) is OK."""
+
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"SiO2": 1.0}},
+        credits={"process.overhead_gas": {"SiO2": 1.0}},
+        reason="proof_tight_ok",
+        atom_balance_proof={"O": 1e-15},  # well below 1e-12 cross-check
+    )
+    validate_atom_balance(proposal, species_formula_registry={})
+
+
 # ---------------------------------------------------------------------------
 # A mock provider whose proposal is balanced -- the commit path actually
 # applies it to the ledger and the ledger remains balanced afterwards.
@@ -103,7 +140,9 @@ def test_balanced_provider_proposal_commits_via_kernel():
     )
     assert result.transition is not None
 
-    transition = kernel.commit_batch(result.transition)
+    transition = kernel.commit_batch(
+        ChemistryIntent.EVAPORATION_TRANSITION, result.transition
+    )
     assert transition is not None
     ledger.assert_balanced()
     # The 0.1 mol of SiO2 should now be in process.overhead_gas, not

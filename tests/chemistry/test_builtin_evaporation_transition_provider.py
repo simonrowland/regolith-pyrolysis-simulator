@@ -25,10 +25,8 @@ Covers:
 from __future__ import annotations
 
 import math
-from pathlib import Path
 
 import pytest
-import yaml
 
 from engines.builtin.evaporation_transition import (
     BuiltinEvaporationTransitionProvider,
@@ -41,47 +39,8 @@ from simulator.chemistry.kernel import (
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase, DecisionType
-
-
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-
-
-def _load_yaml(name: str) -> dict:
-    return yaml.safe_load((DATA_DIR / name).read_text())
-
-
-@pytest.fixture(scope="module")
-def vapor_pressure_data() -> dict:
-    return _load_yaml("vapor_pressures.yaml")
-
-
-@pytest.fixture(scope="module")
-def feedstocks_data() -> dict:
-    return _load_yaml("feedstocks.yaml")
-
-
-@pytest.fixture(scope="module")
-def setpoints_data() -> dict:
-    return _load_yaml("setpoints.yaml")
-
-
-def _build_sim(
-    feedstock_key: str,
-    vapor_pressure_data,
-    feedstocks_data,
-    setpoints_data,
-    *,
-    additives_kg: dict | None = None,
-) -> PyrolysisSimulator:
-    backend = StubBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend, setpoints_data, feedstocks_data, vapor_pressure_data
-    )
-    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives_kg)
-    return sim
+from tests.chemistry.conftest import _build_sim
 
 
 # ---------------------------------------------------------------------------
@@ -214,7 +173,9 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(bad_proposal)
+        sim._chem_kernel.commit_batch(
+            ChemistryIntent.EVAPORATION_TRANSITION, bad_proposal
+        )
 
 
 def test_kernel_commit_accepts_balanced_proposal(
@@ -249,7 +210,9 @@ def test_kernel_commit_accepts_balanced_proposal(
     )
 
     # Should not raise.
-    sim._chem_kernel.commit_batch(balanced_proposal)
+    sim._chem_kernel.commit_batch(
+        ChemistryIntent.EVAPORATION_TRANSITION, balanced_proposal
+    )
 
 
 # ---------------------------------------------------------------------------

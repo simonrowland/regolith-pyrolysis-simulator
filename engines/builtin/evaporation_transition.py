@@ -70,6 +70,7 @@ from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any
 
+from engines.builtin._common import reject_wrong_intent, unpack_controls
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -80,11 +81,6 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-
-# simulator.accounting.formulas is lazy-imported in dispatch() to break
-# the package-init cycle: simulator/__init__.py -> simulator.core ->
-# engines.builtin.evaporation_transition -> simulator.accounting.formulas
-# (which loops through simulator/__init__.py).
 
 
 class BuiltinEvaporationTransitionProvider(ChemistryProvider):
@@ -114,26 +110,19 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        # Lazy import to break the package-init cycle described in the
-        # module header.
+        # Lazy import: simulator.accounting.formulas pulls in
+        # simulator/__init__ which re-enters this module during package
+        # init -- see engines/builtin/__init__.py for the cycle
+        # description.
         from simulator.accounting.formulas import resolve_species_formula
 
-        if request.intent is not ChemistryIntent.EVAPORATION_TRANSITION:
-            # Defence in depth: the registry shouldn't route a non-
-            # transition intent here, but surface it cleanly if it ever
-            # does.
-            return IntentResult(
-                intent=request.intent,
-                status="unsupported",
-                diagnostic={
-                    "reason": (
-                        f"provider only serves "
-                        f"{ChemistryIntent.EVAPORATION_TRANSITION.value!r}"
-                    ),
-                },
-            )
+        wrong_intent = reject_wrong_intent(
+            request, ChemistryIntent.EVAPORATION_TRANSITION
+        )
+        if wrong_intent is not None:
+            return wrong_intent
 
-        controls = request.control_inputs or {}
+        controls = unpack_controls(request)
         species = str(controls.get("species") or "")
         if not species:
             return IntentResult(

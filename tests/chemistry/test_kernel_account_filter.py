@@ -14,6 +14,7 @@ from simulator.chemistry.kernel import (
     AccountFilterViolation,
     CapabilityProfile,
     ChemistryIntent,
+    KernelError,
     ProviderAccountView,
 )
 from simulator.chemistry.kernel.account_filters import build_provider_account_view
@@ -70,14 +71,23 @@ def test_filter_blocks_undeclared_overhead_gas():
     assert "process.overhead_gas" not in view.accounts
 
 
-def test_filter_empty_declared_accounts_raises():
+def test_filter_empty_declared_accounts_raises_kernel_error():
+    """Empty declared_accounts is a registration/config error, not a
+    cross-account violation -- surfaces as the broader
+    :class:`KernelError`, NOT :class:`AccountFilterViolation`.
+    """
+
     ledger = _ledger_with_accounts()
-    with pytest.raises(AccountFilterViolation):
+    with pytest.raises(KernelError) as exc_info:
         build_provider_account_view(
             ledger,
             frozenset(),
             species_formula_registry={},
         )
+    # Reserve AccountFilterViolation for actual undeclared-account
+    # reads/writes: empty declarations must NOT raise the narrower
+    # subclass.
+    assert not isinstance(exc_info.value, AccountFilterViolation)
 
 
 def test_filter_declared_but_empty_account_appears_as_empty_dict():
