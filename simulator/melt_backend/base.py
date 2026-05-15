@@ -204,6 +204,16 @@ class EquilibriumResult:
     # point and never gates a new control-flow branch.
     status: str = 'ok'
 
+    # Optional sulfur-saturation gate (SULFUR_SATURATION_GATE intent) result,
+    # attached by ``simulator/core.py::_get_equilibrium`` after a backend
+    # equilibration succeeds and Stage 0 sulfide/sulfate inventory is
+    # non-zero.  Typed as ``Any`` to avoid an import cycle between this
+    # module and ``simulator.melt_backend.sulfsat``; the concrete type is
+    # ``simulator.melt_backend.sulfsat.SulfurSaturationResult``.  Backends
+    # do not populate this themselves — the SulfSat gate runs *outside*
+    # the backend (it is a post-equilibrium gate, not a ``MeltBackend``).
+    sulfur_saturation: Any | None = None
+
 
 class MeltBackend(ABC):
     """

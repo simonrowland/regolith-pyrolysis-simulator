@@ -65,6 +65,17 @@ The melt model receives the cleaned oxide inventory, while Stage 0 products,
 drain-tap metal, terminal-slag ceramic components, and unresolved residuals
 remain outside `MeltState`.
 
+The Stage 0 sulfate/sulfide bucketing is refined by an optional sulfur-saturation
+gate backed by PySulfSat: when the `[sulfur]` extra is installed and the cleaned
+melt composition falls inside the SCSS (Smythe 2017) and SCAS (Chowdhury &
+Dasgupta 2019) calibration windows, the gate reports SCSS, SCAS, and the
+S6+/S2- partitioning fraction (Jugo 2010) so the sulfide- and sulfate-bearing
+shares can be apportioned against the model's saturation caps. The gate never
+mutates the atom ledger; when PySulfSat is absent or the composition is
+out-of-range, Stage 0 falls back to the builtin sulfate/sulfide bucketing with a
+warning recorded on the gate result so the diagnostic surfaces in the UI and
+telemetry.
+
 ## Why Pretreatment Matters for MRE
 
 MRE remains an important comparison path, but direct electrolysis pushes the full melt inventory through electrical hardware and corrosion-limited cells. Thermal pretreatment can remove or reduce volatile, alkali, sulfur, halide, iron, and gas-handling burdens before MRE. The model therefore treats pyrolysis and MRE as composable steps, not only as competing oxygen-production technologies.

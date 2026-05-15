@@ -81,6 +81,10 @@ from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.sulfsat import (
+    SulfSatGate,
+    SulfurSaturationResult,
+)
 
 # ============================================================================
 # SECTIONS 1-3: CONSTANTS, ENUMS, AND STATE MODELS
@@ -172,6 +176,25 @@ STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
 STAGE0_CARBON_CLEANUP_TEMP_RANGE_C = (20.0, 1050.0)
 DEFAULT_CARBONACEOUS_MELT_KG_PER_TONNE = 725.0
 
+# Atomic mass of sulfur (g/mol) used by the SulfSat gate when projecting
+# Stage 0 sulfide / sulfate inventories onto a per-million melt-mass
+# concentration. Kept local to avoid importing the periodic-table mass
+# table at module load.
+_SULFUR_ATOMIC_MASS_G_PER_MOL = 32.065
+# Sulfur mass fraction of the common sulfate / sulfide carriers Stage 0
+# tracks: SO3 (S/SO3 = 32/80), FeS / oldhamite-style sulfides (S/FeS
+# ~= 0.36, close enough for an order-of-magnitude S_input_ppm). These
+# are blended into a single S_input_ppm estimate; the gate itself
+# normalises composition and is insensitive to small errors in this
+# starting concentration.
+_SULFUR_FRACTION_BY_CARRIER = {
+    'SO3': 32.065 / 80.063,
+    'SO4': 32.065 / 96.062,
+    'FeS': 32.065 / 87.911,
+    'CaS': 32.065 / 72.143,
+    'S': 1.0,
+}
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -216,6 +239,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
+        # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
+        # the optional [sulfur] extra is absent, the gate stays
+        # un-initialised and ``is_available()`` returns False, which
+        # causes the Stage 0 + post-equilibrium hooks below to record
+        # an 'unavailable' result and fall back to builtin partitioning.
+        # The gate itself never emits a LedgerTransition (binding spec
+        # §4 — it is a diagnostic gate, not a writer).
+        self._sulfsat_gate = SulfSatGate()
+        self._sulfsat_gate.initialize({})
+        # Latest SulfurSaturationResult captured by either the Stage 0
+        # hook (``_record_stage0_sulfsat_result``) or the post-equilibrium
+        # hook in ``_get_equilibrium``. Available to the UI / diagnostics
+        # without forcing a recompute. None until the first call.
+        self._last_sulfur_saturation_result: SulfurSaturationResult | None = None
         self.setpoints = setpoints
         self.feedstocks = feedstocks
         self.vapor_pressures = vapor_pressures
@@ -616,6 +653,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._record_stage0_carbon_cleanup_transitions(label, carbon_specs)
         self._record_stage0_perchlorate_cleanup_transitions(
             label, perchlorate_specs)
+        # SULFUR_SATURATION_GATE — Stage 0 hook. Refines the sulfate /
+        # sulfide partitioning diagnostic when PySulfSat is available;
+        # otherwise records an 'unavailable' result so the builtin Stage
+        # 0 bucketing remains authoritative.
+        self._run_stage0_sulfsat_gate()
 
     def _load_ledger_account(
         self, account: str, species_kg: Mapping[str, float], *, source: str
@@ -854,6 +896,159 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason='Stage 0 perchlorate cleanup uses explicit atom reactions.',
             )
 
+    # ------------------------------------------------------------------
+    # SULFUR_SATURATION_GATE — PySulfSat hook
+    # ------------------------------------------------------------------
+
+    def _stage0_sulfur_input_ppm(self) -> float:
+        """
+        Estimate the total-S concentration (ppm by cleaned-melt mass)
+        carried in the Stage 0 sulfate / sulfide inventory.
+
+        ``inventory.salt_phase_kg`` may carry SO3 / SO4 from carbonaceous
+        feedstocks; ``inventory.sulfide_matte_kg`` carries FeS / oldhamite
+        / elemental S. Both are folded onto an equivalent S mass and
+        divided by the cleaned-melt mass to give a per-million-of-melt
+        concentration the gate can use as ``S_input_ppm``. Returns 0 when
+        Stage 0 produced no sulfur-bearing inventory.
+        """
+        melt_total_kg = sum(self.inventory.melt_oxide_kg.values())
+        if melt_total_kg <= 0.0:
+            return 0.0
+        sulfur_kg = 0.0
+        for source in (
+            self.inventory.salt_phase_kg,
+            self.inventory.sulfide_matte_kg,
+        ):
+            for species, kg in source.items():
+                if kg is None or float(kg) <= 0.0:
+                    continue
+                fraction = _SULFUR_FRACTION_BY_CARRIER.get(
+                    str(species),
+                    None,
+                )
+                if fraction is None:
+                    key = str(species).lower()
+                    # Best-effort fallback: any *S-bearing* component
+                    # name (sulfate / sulfide variants) contributes its
+                    # full mass as the upper bound on the S input — the
+                    # gate clamps against SCSS/SCAS afterwards.
+                    if 'so3' in key or 'so4' in key or 'sulfate' in key:
+                        fraction = _SULFUR_FRACTION_BY_CARRIER['SO3']
+                    elif 'sulfide' in key or 'fes' in key or 'cas' in key:
+                        fraction = _SULFUR_FRACTION_BY_CARRIER['FeS']
+                    elif key == 's' or key.startswith('s_'):
+                        fraction = 1.0
+                    else:
+                        continue
+                sulfur_kg += float(kg) * fraction
+        if sulfur_kg <= 0.0:
+            return 0.0
+        return (sulfur_kg / melt_total_kg) * 1.0e6
+
+    def _melt_oxide_wt_pct(self) -> Dict[str, float]:
+        """Return cleaned-melt oxide composition in wt% (zero-total safe)."""
+        total = sum(self.inventory.melt_oxide_kg.values())
+        if total <= 0.0:
+            return {}
+        return {
+            species: (kg / total) * 100.0
+            for species, kg in self.inventory.melt_oxide_kg.items()
+            if kg > 0.0
+        }
+
+    def _run_stage0_sulfsat_gate(self) -> None:
+        """
+        Run the SULFUR_SATURATION_GATE at the end of Stage 0.
+
+        Records the result on ``self._last_sulfur_saturation_result`` so
+        the UI / diagnostics can read the SCSS / SCAS / S6+ partitioning
+        without re-running the gate. The result never mutates the atom
+        ledger; Stage 0 keeps its builtin sulfate / sulfide bucketing
+        authoritative. When the gate reports ``out_of_range`` the
+        warning is preserved on the result; the caller is expected to
+        log it but not redirect inventory.
+        """
+        s_input_ppm = self._stage0_sulfur_input_ppm()
+        if s_input_ppm <= 0.0:
+            self._last_sulfur_saturation_result = None
+            return
+        comp_wt = self._melt_oxide_wt_pct()
+        if not comp_wt:
+            self._last_sulfur_saturation_result = None
+            return
+        # The Stage 0 reload pinpoints the melt at room temperature; the
+        # SCSS / SCAS empirical fits are calibrated above ~1000 K. Using
+        # a representative liquidus temperature (1473 K) for the Stage 0
+        # diagnostic keeps the gate output meaningful before the melt
+        # has been heated, without claiming a temperature it has not
+        # reached. Post-equilibrium calls override this with the actual
+        # melt T.
+        T_K = 1473.0
+        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        fO2_log = float(self.melt.fO2_log)
+        self._last_sulfur_saturation_result = (
+            self._sulfsat_gate.compute_sulfur_saturation(
+                liquid_comp_wt=comp_wt,
+                T_K=T_K,
+                P_bar=P_bar,
+                fO2_log=fO2_log,
+                S_input_ppm=s_input_ppm,
+            )
+        )
+
+    def _attach_post_equilibrium_sulfsat(
+        self, result: 'Any'
+    ) -> None:
+        """
+        Post-equilibrium SULFUR_SATURATION_GATE hook.
+
+        Called from ``_get_equilibrium`` after a successful backend
+        equilibration. If Stage 0 sulfide / sulfate inventory is
+        non-zero, calls the gate at the melt's current T / P / fO2 and
+        attaches the result to ``result.sulfur_saturation`` (and
+        ``self._last_sulfur_saturation_result``). When the gate reports
+        ``out_of_range`` or ``unavailable`` the warning is appended to
+        ``result.warnings`` so existing diagnostic surfaces (UI,
+        telemetry) pick it up without a schema change. The atom ledger
+        is never mutated here — the gate has no ledger authority
+        (binding spec §4 forbids it).
+        """
+        s_input_ppm = self._stage0_sulfur_input_ppm()
+        if s_input_ppm <= 0.0:
+            return
+        comp_wt = self._melt_oxide_wt_pct()
+        if not comp_wt:
+            return
+        T_K = float(self.melt.temperature_C) + 273.15
+        if T_K <= 0.0:
+            return
+        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
+        fO2_log = float(self.melt.fO2_log)
+        sulfur_result = self._sulfsat_gate.compute_sulfur_saturation(
+            liquid_comp_wt=comp_wt,
+            T_K=T_K,
+            P_bar=P_bar,
+            fO2_log=fO2_log,
+            S_input_ppm=s_input_ppm,
+        )
+        self._last_sulfur_saturation_result = sulfur_result
+        try:
+            result.sulfur_saturation = sulfur_result
+        except AttributeError:
+            # Older EquilibriumResult variants (test fakes) may not have
+            # the field; the gate's diagnostic still lives on the
+            # simulator and the test-suite mocks can pick it up there.
+            pass
+        if sulfur_result.calibration_status != 'in_range':
+            warnings_list = getattr(result, 'warnings', None)
+            if isinstance(warnings_list, list):
+                for note in sulfur_result.warnings:
+                    warnings_list.append(
+                        f'SulfSat gate ({sulfur_result.calibration_status}): '
+                        f'{note}'
+                    )
+
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
         # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
@@ -1004,8 +1199,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return self._record_equilibrium_status(result)
 
     def _record_equilibrium_status(self, result):
-        """Record the per-call backend outcome; returns ``result`` unchanged."""
+        """Record the per-call backend outcome and run the post-equilibrium
+        SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
         self._last_backend_status = getattr(result, 'status', 'ok')
+        # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
+        # Stage 0 left sulfide / sulfate inventory behind; otherwise
+        # short-circuits without touching PySulfSat. Never mutates the
+        # ledger (the gate has no LedgerTransition authority).
+        self._attach_post_equilibrium_sulfsat(result)
         return result
 
     def _backend_accepts_kwarg(self, name: str) -> bool:

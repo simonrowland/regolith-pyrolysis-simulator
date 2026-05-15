@@ -45,6 +45,13 @@ magemin = [
     # out by default: the supported path is the compiled binary + subprocess.
     # "juliacall>=0.9,<0.10",
 ]
+# PySulfSat (https://github.com/PennyWieser/PySulfSat) is the
+# SULFUR_SATURATION_GATE engine. Pinned at the canonical lowercase PyPI
+# distribution name. The 1.0.x line is the published series at the time
+# of this integration (verified via `pip show PySulfSat` against the
+# editable install from `install-engines.py`, which clones the upstream
+# repository as a sibling and installs it via `pip install -e`).
+sulfur = ["pysulfsat>=1.0,<2"]
 dev = ["pytest>=8.0"]
 
 [tool.pytest.ini_options]
