@@ -629,6 +629,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.condensation_route import (
             BuiltinCondensationRouteProvider,
         )
+        from engines.builtin.electrolysis_step import (
+            BuiltinElectrolysisStepProvider,
+        )
         from engines.builtin.evaporation_flux import (
             BuiltinEvaporationFluxProvider,
         )
@@ -677,6 +680,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._chem_registry.register_idempotent(
             BuiltinCondensationRouteProvider(),
             [ChemistryIntent.CONDENSATION_ROUTE],
+        )
+        # ELECTROLYSIS_STEP -- THIRD authoritative ledger-mutating
+        # intent (MRE: Nernst voltage, Faraday's law, current
+        # efficiency). Provider debits process.cleaned_melt (oxide
+        # consumed), credits process.metal_phase (cathode metal) and
+        # terminal.oxygen_mre_anode_stored (anode O2 in its own bin --
+        # distinct from melt-offgas and Stage 0 per AGENTS.md #6).
+        # Per-call inputs (voltage_V, current_A, dt_hr) arrive via
+        # control_inputs from _step_mre; the melt composition flows
+        # through the kernel's ProviderAccountView so the provider
+        # stays stateless.  Energy stays in the provider's diagnostic
+        # (NOT in the ledger) -- consumed by EnergyTracker via the
+        # _mre_energy_this_hr counter as before.
+        self._chem_registry.register_idempotent(
+            BuiltinElectrolysisStepProvider(),
+            [ChemistryIntent.ELECTROLYSIS_STEP],
         )
         return ChemistryKernel(
             ledger=self.atom_ledger,

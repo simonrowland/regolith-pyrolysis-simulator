@@ -234,8 +234,28 @@ class ExtractionMixin:
                                  Each species substantially extracted before advancing.
                                  Higher current (3000 A) for faster throughput.
 
+        ELECTROLYSIS_STEP intent -- kernel-authoritative since
+        ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) fifth flip and the
+        THIRD authoritative ledger-mutating intent. The
+        :class:`BuiltinElectrolysisStepProvider` mirrors
+        :meth:`ElectrolysisModel.step_hour` Nernst / Faraday / current-
+        efficiency math exactly; the provider emits a
+        :class:`LedgerTransitionProposal` debiting
+        ``process.cleaned_melt`` (oxide consumed) and crediting
+        ``process.metal_phase`` (cathode metals) +
+        ``terminal.oxygen_mre_anode_stored`` (anode O2 -- its OWN bin
+        per AGENTS.md #6, distinct from melt-offgas / Stage-0 / overhead
+        headspace).  :meth:`ChemistryKernel.commit_batch` is the sole
+        writable path into the ledger for this intent after the flip;
+        the legacy :meth:`_record_mre_ledger_transition` is gone (the
+        ledger write happens INSIDE the kernel commit, not in this
+        method).  Energy stays in the provider's diagnostic (not in
+        the ledger) and routes to :class:`EnergyTracker` via the
+        existing ``_mre_energy_this_hr`` counter, same as pre-flip.
+
         Returns O₂ produced this hour (kg).
         """
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import ELECTRONS_PER_OXIDE
 
         # --- Voltage and current selection (stepped holds) ---         [Step 9]
@@ -283,12 +303,23 @@ class ExtractionMixin:
 
             current_A = 100.0
 
-        result = self.electrolysis_model.step_hour(
-            melt_state=self.melt,
-            voltage_V=voltage_V,
-            current_A=current_A,
-            T_C=self.melt.temperature_C,
+        # Capture metal/O2 balances BEFORE the kernel commit so the
+        # cathode delta routing into condenser stages stays accurate
+        # (matches pre-flip behaviour: routing keys off the per-tick
+        # increment in process.metal_phase, not the legacy result dict).
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.ELECTROLYSIS_STEP,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'voltage_V': float(voltage_V),
+                'current_A': float(current_A),
+                'dt_hr': 1.0,
+            },
         )
+        diagnostic = dict(kernel_result.diagnostic or {})
+        result = diagnostic  # legacy variable name -- same shape as step_hour's dict.
+
         produced_metals = set(result.get('metals_produced_kg', {}) or {})
         produced_metals.update(result.get('metals_produced_mol', {}) or {})
         metal_before_kg = {
@@ -298,7 +329,20 @@ class ExtractionMixin:
         }
         o2_before_kg = self._ledger_account_species_kg(
             'terminal.oxygen_mre_anode_stored', 'O2')
-        self._record_mre_ledger_transition(result)
+
+        # commit_batch is the ONLY writable path into the AtomLedger
+        # for the MRE oxide -> metal + anode O2 transition after this
+        # flip. The kernel re-validates intent authority, the account
+        # filter, and atom balance against the registry's authoritative
+        # provider for ELECTROLYSIS_STEP (defence in depth matching the
+        # EVAPORATION_TRANSITION / CONDENSATION_ROUTE patterns).  No
+        # direct self.atom_ledger.apply / .record happens from this
+        # method anymore.
+        proposal = kernel_result.transition
+        if proposal is not None:
+            self._chem_kernel.commit_batch(
+                ChemistryIntent.ELECTROLYSIS_STEP, proposal,
+            )
 
         # Route cathode metals to condenser stages (product ledger).    [Step 4]
         # Same pattern as C6 thermite — condenser train serves as the
@@ -359,48 +403,6 @@ class ExtractionMixin:
         self.melt.mre_current_A = self._mre_effective_current_A
 
         return O2_kg
-
-    def _record_mre_ledger_transition(self, result: Mapping[str, object]) -> None:
-        oxide_mol = self._positive_ledger_mol(
-            result.get('oxides_reduced_mol', {}))
-        if oxide_mol:
-            metal_mol = self._positive_ledger_mol(
-                result.get('metals_produced_mol', {}))
-            O2_mol = max(0.0, float(result.get('O2_produced_mol', 0.0)))
-            credits_mol: list[tuple[str, Mapping[str, float]]] = []
-            if metal_mol:
-                credits_mol.append(('process.metal_phase', metal_mol))
-            if O2_mol > 1e-12:
-                credits_mol.append(
-                    ('terminal.oxygen_mre_anode_stored', {'O2': O2_mol}))
-            self._record_atom_transition_mol(
-                'mre_electrolysis_reduction',
-                debits=(('process.cleaned_melt', oxide_mol),),
-                credits=tuple(credits_mol),
-                reason='MRE oxide reduction to cathode products and oxygen',
-            )
-            return
-
-        oxides = self._positive_ledger_kg(
-            result.get('oxides_reduced_kg', {}))
-        metals = self._positive_ledger_kg(
-            result.get('metals_produced_kg', {}))
-        O2_kg = max(0.0, float(result.get('O2_produced_kg', 0.0)))
-        if not oxides:
-            return
-
-        credits: list[tuple[str, Mapping[str, float]]] = []
-        if metals:
-            credits.append(('process.metal_phase', metals))
-        if O2_kg > self._LEDGER_KG_TOL:
-            credits.append(('terminal.oxygen_mre_anode_stored', {'O2': O2_kg}))
-
-        self._record_atom_transition(
-            'mre_electrolysis_reduction',
-            debits=(('process.cleaned_melt', oxides),),
-            credits=tuple(credits),
-            reason='MRE oxide reduction to cathode products and oxygen',
-        )
 
     # ------------------------------------------------------------------
     # Alkali Shuttle (C3) — Metallothermic Reduction            [THERMO-5]

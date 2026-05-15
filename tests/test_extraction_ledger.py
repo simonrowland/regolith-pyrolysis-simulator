@@ -1,5 +1,15 @@
 import pytest
 
+from simulator.chemistry.kernel.capabilities import (
+    CapabilityProfile,
+    ChemistryIntent,
+)
+from simulator.chemistry.kernel.dto import (
+    IntentRequest,
+    IntentResult,
+    LedgerTransitionProposal,
+)
+from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import ElectrolysisModel
 from simulator.melt_backend.base import StubBackend
@@ -22,6 +32,112 @@ def _sim(feedstocks):
     )
 
 
+class _FixedElectrolysisStepProvider(ChemistryProvider):
+    """Test double for ``BuiltinElectrolysisStepProvider``.
+
+    Returns a fixed :class:`LedgerTransitionProposal` (built from
+    ``oxide_mol`` / ``metal_mol`` / ``O2_mol`` constructor args) so the
+    tests can assert ``_step_mre``'s ledger / routing behaviour with
+    deterministic numbers, the same way the legacy
+    ``FixedElectrolysis.step_hour`` did before the ELECTROLYSIS_STEP
+    intent was kernel-flipped.
+    """
+
+    name = "test-fixed-electrolysis-step"
+
+    DECLARED_ACCOUNTS = frozenset({
+        "process.cleaned_melt",
+        "process.metal_phase",
+        "terminal.oxygen_mre_anode_stored",
+    })
+
+    def __init__(
+        self,
+        *,
+        oxide_species: str,
+        oxide_mol: float,
+        metal_species: str,
+        metal_mol: float,
+        O2_mol: float,
+        oxide_kg: float,
+        metal_kg: float,
+        O2_kg: float,
+        energy_kWh: float,
+    ) -> None:
+        self._oxide_species = oxide_species
+        self._oxide_mol = float(oxide_mol)
+        self._metal_species = metal_species
+        self._metal_mol = float(metal_mol)
+        self._O2_mol = float(O2_mol)
+        self._oxide_kg = float(oxide_kg)
+        self._metal_kg = float(metal_kg)
+        self._O2_kg = float(O2_kg)
+        self._energy_kWh = float(energy_kWh)
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id="test-fixed-electrolysis-step",
+            intents=frozenset({ChemistryIntent.ELECTROLYSIS_STEP}),
+            is_authoritative_for=frozenset(
+                {ChemistryIntent.ELECTROLYSIS_STEP}
+            ),
+            declared_accounts=self.DECLARED_ACCOUNTS,
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        debits: dict[str, dict[str, float]] = {
+            "process.cleaned_melt": {self._oxide_species: self._oxide_mol},
+        }
+        credits: dict[str, dict[str, float]] = {}
+        if self._metal_mol > 0.0:
+            credits["process.metal_phase"] = {
+                self._metal_species: self._metal_mol,
+            }
+        if self._O2_mol > 0.0:
+            credits["terminal.oxygen_mre_anode_stored"] = {
+                "O2": self._O2_mol,
+            }
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason="mre_electrolysis_reduction",
+        )
+        diagnostic = {
+            "oxides_reduced_kg": {self._oxide_species: self._oxide_kg},
+            "oxides_reduced_mol": {self._oxide_species: self._oxide_mol},
+            "metals_produced_kg": {self._metal_species: self._metal_kg},
+            "metals_produced_mol": {self._metal_species: self._metal_mol},
+            "O2_produced_kg": self._O2_kg,
+            "O2_produced_mol": self._O2_mol,
+            "energy_kWh": self._energy_kWh,
+        }
+        return IntentResult(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            status="ok",
+            transition=proposal,
+            diagnostic=diagnostic,
+        )
+
+
+def _install_fixed_mre_provider(sim, **kwargs) -> None:
+    """Replace the authoritative ELECTROLYSIS_STEP provider in-place.
+
+    The kernel registry is rebuilt per ``load_batch`` but the
+    underlying ``ProviderRegistry`` persists.  Overwriting the
+    authoritative entry directly is the test-time path the kernel
+    contract does NOT offer publicly (``register_idempotent`` rejects a
+    different-provider-id swap by design).  Test-only -- production
+    code never goes through this seam.
+    """
+
+    provider = _FixedElectrolysisStepProvider(**kwargs)
+    # ``register_idempotent`` rejects a provider_id swap. Reach into the
+    # registry's internal store -- this is documented test-only access.
+    sim._chem_registry._authoritative[ChemistryIntent.ELECTROLYSIS_STEP] = (
+        provider
+    )
+
+
 def _assert_product_matches_account(sim, account, species):
     account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
     assert account_kg > 0.0
@@ -29,6 +145,15 @@ def _assert_product_matches_account(sim, account, species):
 
 
 def test_mre_reduction_records_atom_ledger_transition():
+    """After the ELECTROLYSIS_STEP kernel flip, ``_step_mre``'s ledger
+    behaviour comes from a :class:`BuiltinElectrolysisStepProvider`
+    proposal committed via :meth:`ChemistryKernel.commit_batch`. We
+    inject a test double provider with deterministic numbers (the
+    kernel-aware equivalent of the pre-flip ``FixedElectrolysis`` mock)
+    and verify the same ledger / routing invariants the legacy test
+    enforced.
+    """
+
     sim = _sim(
         {
             "feo": {
@@ -43,20 +168,21 @@ def test_mre_reduction_records_atom_ledger_transition():
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
     fe_kg = feo_removed_kg * MOLAR_MASS["Fe"] / MOLAR_MASS["FeO"]
     o2_kg = feo_removed_kg * MOLAR_MASS["O"] / MOLAR_MASS["FeO"]
+    o2_mol = feo_removed_mol / 2.0
 
-    class FixedElectrolysis:
-        def step_hour(self, **_kwargs):
-            return {
-                "oxides_reduced_kg": {"FeO": feo_removed_kg},
-                "oxides_reduced_mol": {"FeO": feo_removed_mol},
-                "metals_produced_kg": {"Fe": fe_kg},
-                "metals_produced_mol": {"Fe": feo_removed_mol},
-                "O2_produced_kg": o2_kg,
-                "O2_produced_mol": feo_removed_mol / 2.0,
-                "energy_kWh": 1.25,
-            }
+    _install_fixed_mre_provider(
+        sim,
+        oxide_species="FeO",
+        oxide_mol=feo_removed_mol,
+        metal_species="Fe",
+        metal_mol=feo_removed_mol,
+        O2_mol=o2_mol,
+        oxide_kg=feo_removed_kg,
+        metal_kg=fe_kg,
+        O2_kg=o2_kg,
+        energy_kWh=1.25,
+    )
 
-    sim._electrolysis_model = FixedElectrolysis()
     sim.melt.campaign = CampaignPhase.C5
     sim._mre_voltage_sequence = [{"voltage": 0.6, "min_hold_hours": 1}]
     sim._mre_voltage_step_idx = 0
@@ -82,6 +208,17 @@ def test_mre_reduction_records_atom_ledger_transition():
 
 
 def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
+    """``_step_mre`` returns the O2 kg delta read back from the ledger
+    after the kernel commits the proposal. The legacy test injected a
+    ``step_hour`` mock that returned 0 in ``O2_produced_kg`` but
+    non-zero in ``O2_produced_mol``; after the kernel flip the proposal
+    is mol-native (the kg is derived at commit time via
+    ``mol * MW``), so the test is naturally rephrased: the test
+    double's proposal credits O2 in mol, the kernel commits via the
+    registry's MW path, and ``_step_mre`` reads back the kg delta from
+    ``terminal.oxygen_mre_anode_stored``.
+    """
+
     sim = _sim(
         {
             "feo": {
@@ -95,20 +232,28 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     feo_removed_kg = 1.0
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
     fe_kg = feo_removed_kg * MOLAR_MASS["Fe"] / MOLAR_MASS["FeO"]
+    o2_mol = feo_removed_mol / 2.0
+    # The pre-flip test passed O2_produced_kg=0 but O2_produced_mol=non-zero;
+    # _step_mre then read O2 kg from the ledger. After the kernel flip the
+    # proposal is mol-native so the kg-vs-mol mismatch the legacy test
+    # constructed is no longer expressible -- the kg is derived from mol
+    # at commit time. The behavioural assertion (returned == ledger
+    # readback) still holds.
+    o2_kg_from_mol = o2_mol * MOLAR_MASS["O2"] / 1000.0
 
-    class FixedElectrolysis:
-        def step_hour(self, **_kwargs):
-            return {
-                "oxides_reduced_kg": {"FeO": feo_removed_kg},
-                "oxides_reduced_mol": {"FeO": feo_removed_mol},
-                "metals_produced_kg": {"Fe": fe_kg},
-                "metals_produced_mol": {"Fe": feo_removed_mol},
-                "O2_produced_kg": 0.0,
-                "O2_produced_mol": feo_removed_mol / 2.0,
-                "energy_kWh": 1.25,
-            }
+    _install_fixed_mre_provider(
+        sim,
+        oxide_species="FeO",
+        oxide_mol=feo_removed_mol,
+        metal_species="Fe",
+        metal_mol=feo_removed_mol,
+        O2_mol=o2_mol,
+        oxide_kg=feo_removed_kg,
+        metal_kg=fe_kg,
+        O2_kg=0.0,  # diagnostic only -- not used by post-flip _step_mre
+        energy_kWh=1.25,
+    )
 
-    sim._electrolysis_model = FixedElectrolysis()
     sim.melt.campaign = CampaignPhase.C5
     sim._mre_voltage_sequence = [{"voltage": 0.6, "min_hold_hours": 1}]
     sim._mre_voltage_step_idx = 0
@@ -121,6 +266,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
         "terminal.oxygen_mre_anode_stored")["O2"]
     assert produced_kg == pytest.approx(ledger_kg)
     assert produced_kg > 0.0
+    assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
 def test_condensed_species_projection_does_not_double_count_across_stages():
