@@ -239,6 +239,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_backend: A MeltBackend instance (AlphaMELTS, stub, etc.)
                           for thermodynamic equilibrium calculations.
             setpoints:    Campaign parameters loaded from setpoints.yaml.
+                          May contain a top-level ``chemistry_kernel``
+                          block whose ``allow_fallback_vapor`` flag
+                          opts the kernel into demoting a missing
+                          VapoRock to the builtin Antoine fallback (goal
+                          #10 ``VAPOROCK-AUTHORITY-PROMOTION``); the
+                          flag defaults to ``False`` (loud
+                          :class:`ProviderUnavailableError` instead of
+                          silent fallback).
             feedstocks:   Feedstock compositions from feedstocks.yaml.
             vapor_pressures: Antoine parameters from vapor_pressures.yaml.
         """
@@ -286,6 +294,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # :meth:`_require_chem_kernel`).
         self._chem_registry: ProviderRegistry = ProviderRegistry()
         self._chem_kernel: Optional[ChemistryKernel] = None
+        # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock is the
+        # authoritative VAPOR_PRESSURE provider; the builtin Antoine
+        # provider is registered as fallback.  The kernel only retries
+        # the fallback when the user opted in via
+        # ``setpoints['chemistry_kernel']['allow_fallback_vapor'] =
+        # True`` -- the default is loud
+        # :class:`ProviderUnavailableError` if VapoRock is missing.
+        kernel_config = setpoints.get('chemistry_kernel', {}) or {}
+        self._allow_fallback_vapor: bool = bool(
+            kernel_config.get('allow_fallback_vapor', False)
+        )
         # F-A4: counter for CONDENSATION_ROUTE (and other) dispatches
         # where the kernel returned ``transition is None``.  A replay
         # tool sees how many no-op dispatches happened without polluting
@@ -627,28 +646,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # F-B7: Table-driven builtin provider registration.
     #
     # Each row is ``(import_module, class_name, [intents],
-    # needs_vapor_pressures, doc)``.  Mirrors the seven kernel-authoritative
+    # needs_vapor_pressures, doc)``.  Mirrors the kernel-authoritative
     # builtin intents wired by ``\goal BUILTIN-ENGINE-EXTRACTION`` (#7);
     # the ordering matches the historical straight-line block so any
     # reviewer diff stays stable.  Adding a builtin engine = one new row
     # here; no changes to ``_build_chemistry_kernel`` itself.
     #
-    # ``needs_vapor_pressures`` is the lone provider-injection flag --
-    # VAPOR_PRESSURE is the only builtin that needs simulator-owned data
-    # (vapor_pressures.yaml).  Everything else is stateless and consumes
-    # per-call inputs via control_inputs.
+    # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` moved VAPOR_PRESSURE out
+    # of this authoritative-only table: VapoRock is registered
+    # authoritative separately, and the builtin Antoine provider is
+    # registered as the fallback slot.  See
+    # ``_register_vapor_pressure_pair`` for the wiring.  The six
+    # remaining authoritative builtins (EVAPORATION_FLUX,
+    # EVAPORATION_TRANSITION, CONDENSATION_ROUTE, ELECTROLYSIS_STEP,
+    # METALLOTHERMIC_STEP, STAGE0_PRETREATMENT) are unchanged.
+    #
+    # ``needs_vapor_pressures`` is retained for forward-compatibility
+    # in case a future authoritative builtin needs the same
+    # simulator-owned data; today no row sets it.  Everything in this
+    # table is stateless and consumes per-call inputs via control_inputs.
     # ------------------------------------------------------------------
     _BUILTIN_PROVIDER_REGISTRATIONS: tuple[
         tuple[str, str, tuple[ChemistryIntent, ...], bool, str], ...
     ] = (
-        (
-            'engines.builtin.vapor_pressure',
-            'BuiltinVaporPressureProvider',
-            (ChemistryIntent.VAPOR_PRESSURE,),
-            True,
-            'VAPOR_PRESSURE -- vapor_pressures.yaml-driven Antoine '
-            'projection (READ-ONLY: no LedgerTransitionProposal).',
-        ),
         (
             'engines.builtin.evaporation_flux',
             'BuiltinEvaporationFluxProvider',
@@ -746,6 +766,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._chem_registry.register_idempotent(provider, list(intents))
 
+        # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock takes the
+        # authoritative VAPOR_PRESSURE slot; the builtin Antoine provider
+        # is demoted to the fallback slot.  The pair is wired separately
+        # from the builtin-registration loop because the authority swap
+        # involves two slots, two providers, and a config-driven fallback
+        # opt-in that the loop's single ``register_idempotent`` call
+        # cannot express.
+        self._register_vapor_pressure_pair()
+
         # Register the AlphaMELTS diagnostic provider when the active
         # backend is an AlphaMELTSBackend (\goal ALPHAMELTS-DIAGNOSTIC-GATE,
         # #8). The provider wraps the today-hook adapter; if the user has
@@ -765,10 +794,69 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the trace.
         self._register_magemin_shadow_if_available()
 
+        # Goal #10: thread the per-intent fallback opt-in into the
+        # kernel so ``ChemistryKernel.dispatch`` knows when to retry the
+        # builtin Antoine fallback after a VapoRock
+        # ``ProviderUnavailableError``.  The default (flag absent /
+        # False) keeps silent fallback forbidden.
+        allow_fallback_intents: frozenset[ChemistryIntent] = frozenset(
+            (ChemistryIntent.VAPOR_PRESSURE,)
+            if self._allow_fallback_vapor
+            else ()
+        )
+
         return ChemistryKernel(
             ledger=self.atom_ledger,
             registry=self._chem_registry,
             species_formula_registry=self.species_formula_registry,
+            allow_fallback_intents=allow_fallback_intents,
+        )
+
+    def _register_vapor_pressure_pair(self) -> None:
+        """Wire the authoritative + fallback VAPOR_PRESSURE pair.
+
+        Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock becomes
+        authoritative; the builtin Antoine/Ellingham provider is
+        registered in the registry's fallback slot so the kernel can
+        retry it when (a) VapoRock raises
+        :class:`ProviderUnavailableError` AND (b) the simulator opted
+        into fallback via ``allow_fallback_vapor`` in
+        ``setpoints['chemistry_kernel']``.
+
+        Both registrations are idempotent: ``_build_chemistry_kernel``
+        is rebuilt per batch but the registry persists for the lifetime
+        of the simulator, so the second batch's call is a no-op.  A
+        conflicting registration (e.g. a different VapoRock build
+        registered under the same provider_id) raises -- silent swaps
+        are forbidden, matching the rest of the kernel posture.
+        """
+
+        from engines.builtin.vapor_pressure import (
+            BuiltinVaporPressureProvider,
+        )
+        from engines.vaporock import VapoRockProvider
+
+        # VapoRockProvider receives the same vapor_pressures.yaml
+        # payload the builtin reads.  The provider uses the payload's
+        # ``metals`` + ``oxide_vapors`` keys to filter its (richer)
+        # output back onto the species universe the downstream
+        # EVAPORATION_FLUX step has parent_oxide + Antoine metadata
+        # for.  Without this filter VapoRock's ~30-species output
+        # crashes the per-species stoichiometry validator and breaks
+        # the mass-balance hard constraint.
+        vaporock_provider = VapoRockProvider(
+            vapor_pressure_data=self.vapor_pressures,
+        )
+        self._chem_registry.register_idempotent(
+            vaporock_provider,
+            [ChemistryIntent.VAPOR_PRESSURE],
+        )
+
+        builtin_provider = BuiltinVaporPressureProvider(self.vapor_pressures)
+        self._chem_registry.register_idempotent(
+            builtin_provider,
+            [ChemistryIntent.VAPOR_PRESSURE],
+            fallback=True,
         )
 
     def _register_alphamelts_provider_if_available(self) -> None:

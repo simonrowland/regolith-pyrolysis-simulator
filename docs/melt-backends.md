@@ -15,15 +15,15 @@ The simulator can run without external thermodynamic software. The fallback path
 2. **FactSAGE / ChemApp** is probed second under the strict-config gate: `FACTSAGE_CONFIG` must point at a JSON that loads, declares a ChemApp module + `.cst` datafile, and `FactSAGEBackend.initialize()` must return True. Without a strict config FactSAGE stays diagnostic-only and selection drops to the `StubBackend` fallback. The user's explicit `factsage` choice is never silently replaced with a different primary.
 3. **`StubBackend`** is the always-available fallback (built-in Ellingham/Antoine path inside `simulator/core.py`).
 
-**`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active backend.** Both adapters are integrated but not yet registered as `ChemistryProvider`s against the kernel at `simulator/chemistry/kernel/`; selecting either as the active `MeltBackend` would fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. Their honest call sites are the dedicated shadow / diagnostic consumers (e.g. `engines/magemin/parity.py`). The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and the seven builtin intents are now kernel-routed; promotion of VapoRock and MAGEMin to active-backend status is the next step, gated on `\goal MAGEMIN-SHADOW-PARITY` and `\goal VAPOROCK-AUTHORITY-PROMOTION` which register them as kernel providers per intent without routing them through `_get_equilibrium` as a phase solver.
+**`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active `MeltBackend`.** Their honest call sites are now per-intent kernel `ChemistryProvider` registrations (VapoRock authoritative for `VAPOR_PRESSURE` under `\goal VAPOROCK-AUTHORITY-PROMOTION`; MAGEMin shadow for `SILICATE_LIQUIDUS` / `SILICATE_EQUILIBRIUM` under `\goal MAGEMIN-SHADOW-PARITY`), not the active-backend `_get_equilibrium` path. Selecting either as the active `MeltBackend` would still fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and is the canonical home for VapoRock's `VAPOR_PRESSURE` ownership; see the "VapoRock authority promotion (goal #10)" section below.
 
 There is **no silent cross-backend fallback at runtime**. If the selected primary throws inside `_get_equilibrium` after selection, the existing fail-closed path in `simulator/core.py` handles it; `_get_backend` does not re-probe a different primary mid-run.
 
 On every selection `_get_backend` emits one log line of the form
 `engine selection: <BackendClassName> (capabilities: silicate_melt=..., gas_volatiles=...) -- VapoRock/MAGEMin not eligible until kernel`
-so the active-backend choice is visible in the launcher's normal stdout stream.
+so the active-backend choice is visible in the launcher's normal stdout stream. The log line's wording predates the goal-#9 / goal-#10 kernel-provider promotions; the message refers to active-`MeltBackend` eligibility (still gated), not to kernel `ChemistryProvider` registration (which VapoRock and MAGEMin now have via `engines/vaporock` and `engines/magemin`).
 
-The VapoRock wrapper still checks whether the canonical `vaporock` Python package is importable (with legacy `VapoRock` import fallback for older local installs); this only affects shadow / diagnostic consumers, not active-backend selection.
+The VapoRock wrapper still checks whether the canonical `vaporock` Python package is importable (with legacy `VapoRock` import fallback for older local installs); this controls whether the kernel-registered `VapoRockProvider` reports available at dispatch time -- when it does not, `\goal VAPOROCK-AUTHORITY-PROMOTION` requires the kernel to either raise `ProviderUnavailableError` (default) or delegate to the registered builtin Antoine fallback (opt-in via `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True`).
 
 ## Local alphaMELTS Path
 
@@ -53,11 +53,37 @@ The adapter receives the cleaned silicate melt only. It projects mol-native simu
 
 The documented upstream path is `vaporock.System().set_melt_comp(...)` followed by `eval_gas_abundances(T, logfO2)`. The adapter also probes legacy helper names used by older forks. System log10(bar) output is converted to Pa.
 
-`EquilibriumResult.vapor_pressures_Pa` is the primary output. VapoRock does not mutate `AtomLedger`, does not produce phase assemblages, and does not own evaporation flux or ledger transitions before the VAPOROCK-AUTHORITY-PROMOTION goal.
+`EquilibriumResult.vapor_pressures_Pa` is the primary output. VapoRock does not mutate `AtomLedger` directly; it owns the `VAPOR_PRESSURE` intent at the kernel level after `\goal VAPOROCK-AUTHORITY-PROMOTION` (#10), but the intent itself is read-only -- the downstream `EVAPORATION_TRANSITION` provider consumes the vapor-pressure dict and produces the ledger transition.
 
 For legacy helper outputs, pressure values with max `< 1e3` are treated as bar and scaled to Pa; larger values are treated as already-Pa. `capabilities()` keeps `vapor_melt_equilibrium=True` as a VapoRock instance-level extension, leaving `DEFAULT_BACKEND_CAPABILITIES` at the canonical five shared keys.
 
 See `docs-private/chemistry-engine-binding-spec-2026-05-14.md` §4 for the VapoRock input/output contract.
+
+### VapoRock authority promotion (goal #10)
+
+Under `\goal VAPOROCK-AUTHORITY-PROMOTION` (2026-05-15), `engines/vaporock/provider.py::VapoRockProvider` is registered as the **authoritative** `ChemistryProvider` for the `VAPOR_PRESSURE` intent in `simulator/core.py::_build_chemistry_kernel`. The original `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is demoted to the registry's **fallback** slot (a new slot added to `simulator/chemistry/kernel/registry.py` for this goal).
+
+The fallback only runs when both of these hold:
+
+1. The authoritative `VapoRockProvider` raised `ProviderUnavailableError` at dispatch time (the upstream `vaporock` library is missing on the host), and
+2. The simulator was constructed with `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True`. The flag is read at `PyrolysisSimulator.__init__` and threaded into `ChemistryKernel.allow_fallback_intents`.
+
+Otherwise the kernel re-raises `ProviderUnavailableError` -- **silent fallback is forbidden**.
+
+When the fallback path fires, the kernel tags the result's `diagnostic` map with `kernel_fallback_used = 'builtin-vapor-pressure'` so trace consumers can tell the authoritative slot did not answer.
+
+The authority swap is visible on a single read of `sim._chem_registry.capability_summary()`:
+
+```python
+>>> sim._chem_registry.capability_summary()['vapor_pressure']
+{'authoritative': 'vaporock', 'fallback': 'builtin-vapor-pressure', 'shadows': ()}
+```
+
+The six other kernel-authoritative builtins (`EVAPORATION_FLUX`, `EVAPORATION_TRANSITION`, `CONDENSATION_ROUTE`, `ELECTROLYSIS_STEP`, `METALLOTHERMIC_STEP`, `STAGE0_PRETREATMENT`) are unchanged by the swap; their `authoritative` slot still names the `builtin-<intent>` provider.
+
+The `VapoRockProvider` filters its output to the species universe `data/vapor_pressures.yaml` declares (the intersection of the YAML's `metals` section with `engines.builtin.vapor_pressure._ELLINGHAM_THERMO` keys, plus the entire `oxide_vapors` section). VapoRock's broader ~30-species output (`O2`, `Si2`, `Al2O2`, ...) is a richer chemistry surface than the downstream `EVAPORATION_FLUX` step is wired for; pinning the filter to the builtin's effective species set keeps the mass balance hard constraint (0.000%) intact across the swap. Future work can widen this set as the downstream stoichiometry validators learn each new species.
+
+Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` binds the five acceptance scenarios (available + no flag, unavailable + no flag, unavailable + flag, available + flag, capability_summary truth). `tests/chemistry/test_kernel_registry.py` covers the registry's new fallback semantics (mutual exclusivity with shadow, authority-capable requirement, idempotent re-registration).
 
 ## AlphaMELTS Adapter Notes
 

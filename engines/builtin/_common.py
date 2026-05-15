@@ -194,10 +194,34 @@ def build_atom_balance_proof(
     described in ``engines/builtin/__init__.py``. Callers pass in the
     same callable they already import inside their ``dispatch`` body.
 
-    Each entry should be ~0 (within the kernel's atom-tolerance) for a
-    balanced proposal; any non-zero entry surfaces as
-    :class:`AtomBalanceError` at commit time.
+    The returned dict only contains elements whose mol-native net is
+    measurably non-zero relative to the kernel's
+    :data:`PROOF_CROSSCHECK_TOLERANCE_MOL` floor.  Mol-native arithmetic
+    can produce an exact ``0.0`` for elements that genuinely cancel
+    (typical: a species's stoichiometric atoms on the debit side
+    perfectly offsetting the same species on the credit side); these
+    entries carry no information the kernel's broader
+    :data:`DEFAULT_ATOM_TOLERANCE_MOL` conservation gate doesn't
+    already enforce, and including them as ``claimed=0`` invites a
+    false :class:`AtomBalanceError` when the kernel's kg-projected
+    re-derivation lands at ULP precision for a large enough flux (the
+    canonical example is SiO disproportionation under VapoRock's
+    larger SiO output -- goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``).
+    Filtering at the helper layer keeps the proof's contract honest
+    ("entries the provider made a deliberate non-trivial claim
+    about") and matches the docstring's "should be ~0 within atom
+    tolerance" intent.
     """
+
+    # Floor for the "trivially zero by construction" filter: 1e-15 mol
+    # is two orders below :data:`PROOF_CROSSCHECK_TOLERANCE_MOL` (1e-12)
+    # so genuinely-cancelled entries are dropped, while any
+    # provider-introduced imbalance large enough to break the cross-
+    # check stays in the proof.  Setting the floor at the proof's own
+    # tolerance would mask provider bugs that exactly hit the limit;
+    # two orders of slack lets the kernel raise on a real imbalance
+    # while filtering out IEEE-754-noise sums.
+    _TRIVIAL_ZERO_MOL = 1e-15
 
     net: dict[str, float] = defaultdict(float)
     for side, sign in ((debits, -1.0), (credits, +1.0)):
@@ -210,7 +234,11 @@ def build_atom_balance_proof(
                     float(mol)
                 ).items():
                     net[str(element)] += sign * float(atoms)
-    return dict(net)
+    return {
+        element: value
+        for element, value in dict(net).items()
+        if abs(value) > _TRIVIAL_ZERO_MOL
+    }
 
 
 def dispatch_reaction_family(

@@ -1,28 +1,43 @@
 """Builtin VAPOR_PRESSURE provider (Antoine + Ellingham).
 
-Kernel-registered provider that owns the ``VAPOR_PRESSURE`` intent. Mirrors
-the math in :meth:`simulator.equilibrium.EquilibriumMixin._stub_equilibrium`
-exactly -- this is a refactor of where the computation lives, not a
-re-derivation of how it works. The provider:
+Kernel-registered provider that originally owned the ``VAPOR_PRESSURE``
+intent (goal #7 ``BUILTIN-ENGINE-EXTRACTION``) and was demoted to the
+**fallback** slot under goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``.
+:class:`engines.vaporock.provider.VapoRockProvider` is now the
+authoritative provider; the kernel consults this builtin only when
+VapoRock is unavailable AND the simulator was constructed with
+``allow_fallback_vapor=True`` (the flag is read at
+:meth:`PyrolysisSimulator.__init__` time and threaded into
+:class:`ChemistryKernel.allow_fallback_intents`).
 
-- reads ``process.cleaned_melt`` from the account view (the only account it
-  declares),
-- looks up Antoine coefficients from the ``vapor_pressures.yaml`` payload
-  passed at construction time,
+The provider:
+
+- reads ``process.cleaned_melt`` from the account view (the only
+  account it declares),
+- looks up Antoine coefficients from the ``vapor_pressures.yaml``
+  payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with pure-metal
-  Antoine vaporization to compute per-species saturation pressures at the
-  request's ``temperature_C`` and the caller-supplied commanded ``pO2_bar``
-  (via ``control_inputs``),
-- returns an :class:`IntentResult` with ``transition=None`` (diagnostic;
-  VAPOR_PRESSURE owns no ledger mutation -- that belongs to
-  ``EVAPORATION_TRANSITION``) and a ``vapor_pressures_Pa`` diagnostic.
+  Antoine vaporization to compute per-species saturation pressures at
+  the request's ``temperature_C`` and the caller-supplied commanded
+  ``pO2_bar`` (via ``control_inputs``),
+- returns an :class:`IntentResult` with ``transition=None``
+  (diagnostic; VAPOR_PRESSURE owns no ledger mutation -- that belongs
+  to ``EVAPORATION_TRANSITION``) and a ``vapor_pressures_Pa``
+  diagnostic.
 
-Authority: authoritative for ``VAPOR_PRESSURE`` per binding spec §3 until
-``\\goal VAPOROCK-AUTHORITY-PROMOTION`` (#10) lands.
+The :class:`CapabilityProfile` still declares the intent as
+authority-capable so the registry will accept this provider in the
+fallback slot (a fallback that is not authority-capable would only
+produce diagnostic shadow output -- legal but useless as a real
+backup).  Registry slot vs. capability is intentionally separate: the
+profile says "I CAN be authoritative"; the kernel wiring decides
+whether this build session actually uses this provider as the
+authority or as fallback.
 
-Account declaration: ``process.cleaned_melt`` only. The provider must not
-see gas / metal / sulfide / salt accounts -- the kernel filter enforces
-this. Mirrors the same constraint AlphaMELTS will have (binding spec §7).
+Account declaration: ``process.cleaned_melt`` only.  The provider must
+not see gas / metal / sulfide / salt accounts -- the kernel filter
+enforces this.  Mirrors the same constraint AlphaMELTS has (binding
+spec §7).
 """
 
 from __future__ import annotations
@@ -57,9 +72,19 @@ _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
 
 
 class BuiltinVaporPressureProvider(ChemistryProvider):
-    """Authoritative ``VAPOR_PRESSURE`` provider (Antoine + Ellingham).
+    """Fallback ``VAPOR_PRESSURE`` provider (Antoine + Ellingham).
 
-    See module docstring. ``vapor_pressure_data`` is the parsed
+    See module docstring.  Originally registered as authoritative
+    under goal #7 and demoted to the fallback slot under goal #10
+    when VapoRock took over the authoritative role.  The provider
+    still declares VAPOR_PRESSURE in
+    :attr:`CapabilityProfile.is_authoritative_for` so the registry's
+    fallback slot accepts it (an authority-capable provider sitting
+    in the fallback slot can take over the authoritative role
+    cleanly when VapoRock is unavailable and the simulator opted in
+    via ``allow_fallback_vapor=True``).
+
+    ``vapor_pressure_data`` is the parsed
     ``data/vapor_pressures.yaml`` payload (keys: ``metals``,
     ``oxide_vapors``).
     """

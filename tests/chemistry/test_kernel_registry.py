@@ -197,3 +197,133 @@ def test_register_idempotent_rejects_non_intent_value():
     registry = ProviderRegistry()
     with pytest.raises(KernelError):
         registry.register_idempotent(_IdemProviderA(), ["not_an_intent"])
+
+
+# ---------------------------------------------------------------------
+# Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: fallback slot semantics
+# ---------------------------------------------------------------------
+
+
+def test_fallback_slot_accepts_authority_capable_provider():
+    """A provider with authority capability may sit in the fallback slot.
+
+    Goal #10 binds this surface: the builtin Antoine provider is
+    demoted from authoritative to fallback for VAPOR_PRESSURE.  Its
+    :class:`CapabilityProfile` keeps ``is_authoritative_for`` populated
+    so the registry's fallback slot accepts it.
+    """
+
+    registry = ProviderRegistry()
+    registry.register_idempotent(
+        _IdemProviderB(), [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    fallback = registry.fallback_for(ChemistryIntent.VAPOR_PRESSURE)
+    assert fallback is not None
+    assert fallback.capability_profile().provider_id == 'idem_b'
+    # The authoritative slot is independent and still empty.
+    assert registry.authoritative_for(ChemistryIntent.VAPOR_PRESSURE) is None
+
+
+def test_fallback_rejects_shadow_only_provider():
+    """A shadow-only provider (empty ``is_authoritative_for``) is not a
+    legal fallback -- the fallback must be able to step in as the
+    authoritative answer when the authoritative provider is missing.
+    """
+
+    registry = ProviderRegistry()
+    with pytest.raises(KernelError, match='cannot be fallback'):
+        registry.register(
+            _IdemShadow(),
+            [ChemistryIntent.VAPOR_PRESSURE],
+            fallback=True,
+        )
+
+
+def test_fallback_and_authoritative_cannot_be_same_provider_object():
+    """The same provider object cannot hold both slots for an intent."""
+
+    registry = ProviderRegistry()
+    provider = _IdemProviderA()
+    registry.register(provider, [ChemistryIntent.VAPOR_PRESSURE])
+    with pytest.raises(KernelError, match='already the authoritative'):
+        registry.register(
+            provider, [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+        )
+
+
+def test_authoritative_and_fallback_cannot_be_same_provider_object():
+    """Mirror of the above: registering as fallback first must block
+    a subsequent authoritative registration for the same intent.
+    """
+
+    registry = ProviderRegistry()
+    provider = _IdemProviderA()
+    registry.register(
+        provider, [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    with pytest.raises(KernelError, match='already the fallback'):
+        registry.register(provider, [ChemistryIntent.VAPOR_PRESSURE])
+
+
+def test_register_rejects_shadow_and_fallback_simultaneously():
+    """``shadow=True`` and ``fallback=True`` are mutually exclusive."""
+
+    registry = ProviderRegistry()
+    with pytest.raises(KernelError, match='mutually exclusive'):
+        registry.register(
+            _IdemProviderA(),
+            [ChemistryIntent.VAPOR_PRESSURE],
+            shadow=True,
+            fallback=True,
+        )
+
+
+def test_fallback_idempotent_re_register_is_noop():
+    """Calling twice with the same fallback provider must not raise."""
+
+    registry = ProviderRegistry()
+    provider = _IdemProviderB()
+    registry.register_idempotent(
+        provider, [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    registry.register_idempotent(
+        provider, [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    fallback = registry.fallback_for(ChemistryIntent.VAPOR_PRESSURE)
+    assert fallback is provider
+
+
+def test_fallback_idempotent_raises_on_different_provider_id():
+    """A DIFFERENT provider for the same fallback slot must NOT silently
+    swap in, mirroring the authoritative-slot contract.
+    """
+
+    registry = ProviderRegistry()
+    registry.register_idempotent(
+        _IdemProviderA(), [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    with pytest.raises(KernelError, match='conflicting fallback'):
+        registry.register_idempotent(
+            _IdemProviderB(),
+            [ChemistryIntent.VAPOR_PRESSURE],
+            fallback=True,
+        )
+
+
+def test_capability_summary_keys_match_registered_intents():
+    """The summary surfaces every registered intent with its slot state."""
+
+    registry = ProviderRegistry()
+    registry.register(_IdemProviderA(), [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(
+        _IdemProviderB(), [ChemistryIntent.VAPOR_PRESSURE], fallback=True
+    )
+    registry.register(
+        _IdemShadow(), [ChemistryIntent.VAPOR_PRESSURE], shadow=True
+    )
+    summary = registry.capability_summary()
+    assert set(summary.keys()) == {ChemistryIntent.VAPOR_PRESSURE.value}
+    entry = summary[ChemistryIntent.VAPOR_PRESSURE.value]
+    assert entry['authoritative'] == 'idem_a'
+    assert entry['fallback'] == 'idem_b'
+    assert entry['shadows'] == ('idem_shadow',)

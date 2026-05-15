@@ -266,11 +266,24 @@ class ChemistryKernel:
         ledger: AtomLedger,
         registry: ProviderRegistry,
         species_formula_registry: Mapping[str, Any],
+        *,
+        allow_fallback_intents: Optional[frozenset[ChemistryIntent]] = None,
     ) -> None:
         self._ledger = ledger
         self._registry = registry
         self._species_formula_registry = dict(species_formula_registry or {})
         self._planner = Planner(registry)
+        # Set of intents the kernel is allowed to retry against the
+        # registered fallback provider when the authoritative provider
+        # raises :class:`ProviderUnavailableError`.  Goal #10
+        # ``VAPOROCK-AUTHORITY-PROMOTION`` binds this surface: silent
+        # fallback is forbidden, so the kernel only consults the
+        # fallback when the caller has explicitly opted in for the
+        # intent (typically via a per-intent simulator config flag like
+        # ``allow_fallback_vapor``).
+        self._allow_fallback_intents: frozenset[ChemistryIntent] = frozenset(
+            allow_fallback_intents or ()
+        )
 
     @property
     def planner(self) -> Planner:
@@ -283,6 +296,12 @@ class ChemistryKernel:
     @property
     def species_formula_registry(self) -> Mapping[str, Any]:
         return dict(self._species_formula_registry)
+
+    @property
+    def allow_fallback_intents(self) -> frozenset[ChemistryIntent]:
+        """Intents the kernel may retry against the registered fallback."""
+
+        return self._allow_fallback_intents
 
     def clear_shadow_trace(self) -> None:
         """Pass-through to :meth:`Planner.clear_shadow_trace`."""
@@ -312,11 +331,20 @@ class ChemistryKernel:
                 :class:`CapabilityProfile`.
 
         Returns the authoritative provider's :class:`IntentResult`
-        AFTER it has passed every kernel validator.
+        AFTER it has passed every kernel validator.  If the
+        authoritative provider raises
+        :class:`ProviderUnavailableError` AND ``intent`` is in
+        :attr:`allow_fallback_intents` AND a fallback is registered,
+        the dispatch is retried against the fallback provider; the
+        fallback result is returned with a ``kernel_fallback_used``
+        diagnostic key surfaced for trace consumers.
 
         Raises:
             ProviderUnavailableError: No authoritative provider for
-                ``intent``.
+                ``intent``, or the authoritative provider raised
+                ``ProviderUnavailableError`` and either no fallback is
+                registered or the caller did not opt into fallback for
+                this intent.
             UnauthorizedIntentError, AccountFilterViolation,
             AtomBalanceError, ControlAuditMismatch: One of the
             validators rejected the authoritative result.
@@ -327,6 +355,61 @@ class ChemistryKernel:
             raise ProviderUnavailableError(
                 f"no authoritative provider registered for intent {intent.value!r}"
             )
+
+        try:
+            return self._dispatch_through_provider(
+                intent,
+                provider,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                control_inputs=control_inputs,
+                declared_accounts=declared_accounts,
+                role="authoritative",
+            )
+        except ProviderUnavailableError:
+            # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: authority swap
+            # without silent fallback.  The kernel only consults the
+            # registered fallback when the caller opted in for THIS
+            # intent.  Otherwise re-raise -- the contract is loud
+            # failure, not a quiet downgrade.
+            fallback = self._registry.fallback_for(intent)
+            if fallback is None or intent not in self._allow_fallback_intents:
+                raise
+            return self._dispatch_through_provider(
+                intent,
+                fallback,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                control_inputs=control_inputs,
+                declared_accounts=declared_accounts,
+                role="fallback",
+            )
+
+    def _dispatch_through_provider(
+        self,
+        intent: ChemistryIntent,
+        provider: ChemistryProvider,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        control_inputs: Optional[Mapping[str, Any]],
+        declared_accounts: Optional[frozenset[str]],
+        role: str,
+    ) -> IntentResult:
+        """Build the IntentRequest, dispatch, and validate.
+
+        Shared implementation between the authoritative path and the
+        fallback retry path.  ``role`` is ``"authoritative"`` or
+        ``"fallback"``; it controls which planner call is made
+        (authoritative path runs the full shadow + parity sweep;
+        fallback runs a bare ``provider.dispatch`` because the planner's
+        shadow trace was already populated by the authoritative attempt
+        that raised) and is surfaced as a diagnostic key so trace
+        consumers can tell which slot answered.
+        """
 
         profile = provider.capability_profile()
         if declared_accounts is None:
@@ -346,7 +429,18 @@ class ChemistryKernel:
             fO2_log=fO2_log,
             control_inputs=control_inputs or {},
         )
-        result = self._planner.dispatch(request)
+        if role == "authoritative":
+            result = self._planner.dispatch(request)
+        else:
+            # Fallback path -- bypass the planner's authoritative dispatch
+            # (which would re-raise ``ProviderUnavailableError``) and call
+            # the fallback provider directly.  Shadows are not re-run on
+            # the fallback retry: the authoritative attempt already
+            # appended their per-provider records to the trace before it
+            # raised, and re-running them against the fallback would
+            # pollute the trace with parity records the planner never
+            # had a chance to produce in the first place.
+            result = provider.dispatch(request)
 
         if result.intent != intent:
             raise KernelError(
@@ -361,6 +455,25 @@ class ChemistryKernel:
         if result.control_audit is not None:
             validate_control_audit(result.control_audit, request)
 
+        # Tag the result so a trace consumer can tell whether the
+        # authoritative or the fallback provider answered.  The kernel
+        # adds the marker only on the fallback path -- a successful
+        # authoritative dispatch returns the provider's result
+        # unchanged so the existing test suite's diagnostic-equality
+        # assertions do not need a per-intent waiver.
+        if role == "fallback":
+            tagged_diagnostic = dict(result.diagnostic or {})
+            tagged_diagnostic["kernel_fallback_used"] = (
+                profile.provider_id
+            )
+            result = IntentResult(
+                intent=result.intent,
+                status=result.status,
+                transition=result.transition,
+                control_audit=result.control_audit,
+                diagnostic=tagged_diagnostic,
+                warnings=result.warnings,
+            )
         return result
 
     def commit_batch(
