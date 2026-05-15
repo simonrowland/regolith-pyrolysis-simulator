@@ -17,10 +17,12 @@ Public exports:
 from engines.magemin.domain import MAGEMinDomainGate
 from engines.magemin.parity import MAGEMinParityComparator, ParityReport
 from engines.magemin.provider import MAGEMinShadowProvider
+from engines.magemin.result import MAGEMinShadowDiagnostics
 
 __all__ = [
     'MAGEMinDomainGate',
     'MAGEMinParityComparator',
+    'MAGEMinShadowDiagnostics',
     'MAGEMinShadowProvider',
     'ParityReport',
 ]

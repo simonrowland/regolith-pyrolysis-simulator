@@ -117,6 +117,16 @@ class Planner:
         Shadow results are appended to :attr:`shadow_trace` for the
         caller (typically :class:`ChemistryKernel`) to surface.
 
+        After the authoritative dispatch completes, each shadow that
+        exposes a :meth:`parity_compare` method is given a chance to
+        compare its result against the authoritative one.  When a
+        parity comparator reports disagreement, a ``parity_warning``
+        record is appended to :attr:`shadow_trace` (in addition to the
+        per-shadow result record).  Disagreement is NEVER a
+        :class:`KernelError` -- the shadow's only job is to flag
+        suspicion, not to block dispatch.  Goal #9
+        ``MAGEMIN-SHADOW-PARITY`` binds this contract.
+
         Raises:
             ProviderUnavailableError: No authoritative provider is
                 registered for ``request.intent``.
@@ -128,10 +138,14 @@ class Planner:
                 f"no authoritative provider registered for intent {request.intent.value!r}"
             )
 
-        for shadow in self._registry.shadows_for(request.intent):
+        shadows = self._registry.shadows_for(request.intent)
+        shadow_results: list[tuple[ChemistryProvider, IntentResult]] = []
+        for shadow in shadows:
             shadow_result = shadow.dispatch(request)
+            shadow_results.append((shadow, shadow_result))
             self._append_shadow_trace(
                 {
+                    "event": "shadow_dispatch",
                     "provider_id": shadow.capability_profile().provider_id,
                     "intent": request.intent.value,
                     "result": shadow_result,
@@ -144,7 +158,45 @@ class Planner:
             # path because the shadow isn't registered as
             # authoritative.
 
-        return authoritative.dispatch(request)
+        authoritative_result = authoritative.dispatch(request)
+
+        # Parity pass: each shadow that exposes ``parity_compare`` gets
+        # to weigh its result against the authoritative one.  The
+        # comparator returns a per-provider report; only disagreement
+        # produces a ``parity_warning`` event in the trace.  Goal #9
+        # forbids silent averaging -- both numbers stay visible on the
+        # warning record.
+        for shadow, shadow_result in shadow_results:
+            comparator = getattr(shadow, "parity_compare", None)
+            if not callable(comparator):
+                continue
+            try:
+                report = comparator(authoritative_result, shadow_result)
+            except Exception as exc:  # noqa: BLE001 -- never block dispatch
+                self._append_shadow_trace(
+                    {
+                        "event": "parity_error",
+                        "provider_id": shadow.capability_profile().provider_id,
+                        "intent": request.intent.value,
+                        "error": repr(exc),
+                    }
+                )
+                continue
+            if report is None:
+                continue
+            if getattr(report, "agreement", True):
+                continue
+            self._append_shadow_trace(
+                self._build_parity_warning_record(
+                    shadow=shadow,
+                    intent=request.intent,
+                    report=report,
+                    authoritative_result=authoritative_result,
+                    shadow_result=shadow_result,
+                )
+            )
+
+        return authoritative_result
 
     def _append_shadow_trace(self, record: dict[str, Any]) -> None:
         if self._shadow_trace_cap == 0:
@@ -153,6 +205,49 @@ class Planner:
         if len(self._shadow_trace) > self._shadow_trace_cap:
             # FIFO drop of the oldest record.
             del self._shadow_trace[0]
+
+    @staticmethod
+    def _build_parity_warning_record(
+        *,
+        shadow: ChemistryProvider,
+        intent: ChemistryIntent,
+        report: Any,
+        authoritative_result: IntentResult,
+        shadow_result: IntentResult,
+    ) -> dict[str, Any]:
+        """Project a parity report into a trace event.
+
+        The record schema is stable: trace consumers (debug UI, parity
+        tests) pin on these keys.  Goal #9 binds the wording (``event ==
+        'parity_warning'``).  The authoritative and shadow numbers are
+        both retained verbatim so silent averaging is impossible: any
+        disagreement is auditable from the trace alone.
+        """
+
+        auth_diag = dict(getattr(authoritative_result, "diagnostic", {}) or {})
+        shadow_diag = dict(getattr(shadow_result, "diagnostic", {}) or {})
+
+        warnings_tuple = tuple(getattr(report, "warnings", ()) or ())
+
+        return {
+            "event": "parity_warning",
+            "provider_id": shadow.capability_profile().provider_id,
+            "intent": intent.value,
+            "agreement": False,
+            "liquidus_T_delta_K": getattr(report, "liquidus_T_delta_K", None),
+            "mode_pct_max_delta": getattr(report, "mode_pct_max_delta", None),
+            "phases_only_in_authoritative": tuple(
+                getattr(report, "phases_only_in_authoritative", ()) or ()
+            ),
+            "phases_only_in_shadow": tuple(
+                getattr(report, "phases_only_in_shadow", ()) or ()
+            ),
+            "warnings": warnings_tuple,
+            "authoritative_liquidus_T_K": auth_diag.get("liquidus_T_K"),
+            "shadow_liquidus_T_K": shadow_diag.get("liquidus_T_K"),
+            "authoritative_status": getattr(authoritative_result, "status", None),
+            "shadow_status": getattr(shadow_result, "status", None),
+        }
 
 
 class ChemistryKernel:

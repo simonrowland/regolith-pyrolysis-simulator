@@ -755,6 +755,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # -- the equilibrium call site at simulator/equilibrium.py guards
         # the dispatch on registry membership.
         self._register_alphamelts_provider_if_available()
+        # Register the MAGEMin SHADOW provider for the same two intents
+        # (\goal MAGEMIN-SHADOW-PARITY, #9).  Only registered when an
+        # authoritative provider already exists for the intent -- the
+        # registry's shadow slot is fine without authority, but a shadow
+        # with no authoritative counterpart can never run (the planner
+        # raises ProviderUnavailableError on dispatch), so we save the
+        # work and avoid a misleading "shadow registered" surface in
+        # the trace.
+        self._register_magemin_shadow_if_available()
 
         return ChemistryKernel(
             ledger=self.atom_ledger,
@@ -814,6 +823,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if cls.__name__ == 'AlphaMELTSBackend':
                 return True
         return False
+
+    def _register_magemin_shadow_if_available(self) -> None:
+        """Register MAGEMinShadowProvider as a kernel shadow when possible.
+
+        \\goal MAGEMIN-SHADOW-PARITY (#9): MAGEMin runs as a shadow
+        alongside the authoritative SILICATE_LIQUIDUS /
+        SILICATE_EQUILIBRIUM provider (AlphaMELTS today). The shadow
+        provider is constructed lazily -- it does not require a live
+        MAGEMin binary at registration time, and returns
+        ``status='unavailable'`` cleanly when the binary is absent.
+
+        We only register the shadow when there is already an
+        authoritative provider for those intents. A shadow without an
+        authoritative counterpart is dead weight: the planner raises
+        :class:`ProviderUnavailableError` before any shadow can run.
+        Skipping the registration keeps the trace consumer's view of
+        "is MAGEMin live in this batch?" honest.
+
+        Goal-spec checklist 1 binds this -- ``engines/magemin/provider.py``
+        registers as shadow provider for the two intents.
+        """
+        intents = (
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        )
+        # Only register when an authoritative provider already exists
+        # (AlphaMELTS or any future SILICATE_LIQUIDUS owner).  Skip
+        # otherwise: the shadow has no one to parity-check against.
+        if not any(
+            self._chem_registry.authoritative_for(intent) is not None
+            for intent in intents
+        ):
+            return
+        from engines.magemin import MAGEMinShadowProvider
+
+        provider = MAGEMinShadowProvider()
+        self._chem_registry.register_idempotent(
+            provider,
+            list(intents),
+            shadow=True,
+        )
 
     # ------------------------------------------------------------------
     # F-B1: Dispatch helpers

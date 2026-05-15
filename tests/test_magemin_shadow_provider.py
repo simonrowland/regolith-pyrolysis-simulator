@@ -1,10 +1,9 @@
-"""Tests for the MAGEMin kernel-shadow provider scaffold.
+"""Tests for the MAGEMin kernel-shadow provider.
 
-See ``engines/magemin/README.md`` and
-``docs-private/codex-goal-queue-2026-05-14.md`` (\\goal
-MAGEMIN-SHADOW-PARITY) for the contract these tests defend.
+See ``engines/magemin/README.md``, ``engines/magemin/parity.py`` and
+goal #9 ``MAGEMIN-SHADOW-PARITY`` for the contract these tests defend.
 
-These tests cover the scaffold ONLY:
+These tests cover:
 
 - :class:`MAGEMinDomainGate.validate` accepts basalt, rejects regolith
   laced with halides + native Fe.
@@ -12,24 +11,35 @@ These tests cover the scaffold ONLY:
   for identical synthetic results.
 - :class:`MAGEMinParityComparator.compare` returns ``agreement=False``
   with a warning for a synthetic 100 K liquidus delta.
-- :class:`MAGEMinShadowProvider.dispatch` raises ``NotImplementedError``
-  with a kernel-pointer message.
+- :class:`MAGEMinShadowProvider.capability_profile` declares shadow
+  intent surface (empty ``is_authoritative_for``).
+- :class:`MAGEMinShadowProvider.dispatch` is now wired through the
+  kernel; the writer-purity contract (transition=None always) is
+  enforced by tests at the dispatch level.
 
-Kernel-shape tests (account view filtering, intent authority enforcement,
-atom-balance gating) live under ``\\goal CHEMISTRY-KERNEL-CARVE-OUT`` and
-are deliberately out of scope here.
+Cross-engine parity tests (the planner running authoritative +
+MAGEMin shadow alongside, with parity warnings appearing in the
+shadow trace) live under
+``tests/chemistry/test_magemin_shadow.py``.
 """
 
 from __future__ import annotations
+
+import ast
+import inspect
+from pathlib import Path
 
 import pytest
 
 from engines.magemin import (
     MAGEMinDomainGate,
     MAGEMinParityComparator,
+    MAGEMinShadowDiagnostics,
     MAGEMinShadowProvider,
     ParityReport,
 )
+import engines.magemin.provider as provider_module
+from simulator.chemistry.kernel.capabilities import ChemistryIntent
 
 
 # ----------------------------------------------------------------------
@@ -58,7 +68,7 @@ def _basalt_wt_pct() -> dict:
 
 
 def _hostile_regolith_wt_pct() -> dict:
-    """Regolith with native Fe + halides — must fail the domain gate."""
+    """Regolith with native Fe + halides -- must fail the domain gate."""
     return {
         'SiO2': 45.0,
         'Al2O3': 12.0,
@@ -85,7 +95,6 @@ def test_domain_gate_rejects_halides_and_native_metals():
     assert valid is False
     assert warnings, 'expected at least one warning for hostile regolith'
     joined = ' '.join(warnings)
-    # The combined warnings must call out the forbidden species explicitly.
     assert 'non-oxide species present' in joined
     assert 'Fe' in joined  # native Fe flagged
     assert 'NaCl' in joined  # halide flagged
@@ -106,9 +115,8 @@ def test_domain_gate_does_not_raise_on_unparseable_values():
 
 def test_domain_gate_flags_sio2_outside_range():
     composition = _basalt_wt_pct()
-    # Push SiO2 above the 80 wt% upper bound (rhyolite+).
     composition['SiO2'] = 88.0
-    composition['Al2O3'] = 3.0  # rebalance roughly; remaining oxides still sum > 95.
+    composition['Al2O3'] = 3.0
     composition['FeO'] = 2.0
     composition['MgO'] = 1.0
     valid, warnings = MAGEMinDomainGate.validate(composition)
@@ -160,7 +168,7 @@ def test_parity_100K_liquidus_delta_disagrees():
         phase_modes_wt_pct={'liquid': 75.0, 'olivine': 15.0, 'cpx': 10.0},
     )
     shadow = _synthetic_result(
-        liquidus_T_K=1350.0,  # 100 K below authoritative — twice tolerance.
+        liquidus_T_K=1350.0,
         phase_modes_wt_pct={'liquid': 75.0, 'olivine': 15.0, 'cpx': 10.0},
     )
     report = comp.compare(auth, shadow)
@@ -168,20 +176,18 @@ def test_parity_100K_liquidus_delta_disagrees():
     assert report.liquidus_T_delta_K == pytest.approx(100.0)
     assert report.warnings, 'expected at least one warning'
     assert any('liquidus delta' in w for w in report.warnings)
-    # The comparator must not silently average — both numbers stay visible.
     joined = ' '.join(report.warnings)
     assert '+100' in joined.replace(' ', '') or '100.0' in joined
 
 
 def test_parity_50K_liquidus_at_tolerance_agrees():
-    # The tolerance is inclusive: a delta exactly at the boundary is fine.
     comp = MAGEMinParityComparator()
     auth = _synthetic_result(
         liquidus_T_K=1450.0,
         phase_modes_wt_pct={'liquid': 100.0},
     )
     shadow = _synthetic_result(
-        liquidus_T_K=1400.0,  # exactly 50 K below — at tolerance.
+        liquidus_T_K=1400.0,
         phase_modes_wt_pct={'liquid': 100.0},
     )
     report = comp.compare(auth, shadow)
@@ -199,7 +205,6 @@ def test_parity_modal_disagreement_above_tolerance():
     shadow = _synthetic_result(
         liquidus_T_K=1450.0,
         phase_modes_wt_pct={'liquid': 70.0, 'olivine': 20.0, 'cpx': 10.0},
-        # 5 wt% disagreement on liquid and olivine — above 2 wt% tolerance.
     )
     report = comp.compare(auth, shadow)
     assert report.agreement is False
@@ -216,7 +221,6 @@ def test_parity_phase_only_in_shadow_flagged():
     shadow = _synthetic_result(
         liquidus_T_K=1450.0,
         phase_modes_wt_pct={'liquid': 75.0, 'olivine': 15.0, 'spinel': 10.0},
-        # spinel appears only in shadow at 10 wt%, well above tolerance.
     )
     report = comp.compare(auth, shadow)
     assert report.agreement is False
@@ -225,12 +229,6 @@ def test_parity_phase_only_in_shadow_flagged():
 
 
 def test_parity_does_not_treat_equilibration_temperature_as_liquidus():
-    # `temperature_C` on an EquilibriumResult is the temperature the melt
-    # was equilibrated AT -- not its liquidus. The comparator must not
-    # fall back to it: two results equilibrated at the same T would
-    # otherwise report liquidus_T_delta_K = 0 / agreement = True, a
-    # silent false positive. With no real liquidus on either side the
-    # conservative "cannot evaluate parity" branch must fire instead.
     comp = MAGEMinParityComparator()
     auth = {'temperature_C': 1600.0}
     shadow = {'temperature_C': 1600.0}
@@ -241,7 +239,6 @@ def test_parity_does_not_treat_equilibration_temperature_as_liquidus():
     assert report.liquidus_T_delta_K is None
     assert any('cannot evaluate parity' in w for w in report.warnings)
 
-    # An explicit liquidus field IS still honored.
     auth_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1350.0}
     shadow_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1340.0}
     real_report = comp.compare(auth_real, shadow_real)
@@ -250,43 +247,112 @@ def test_parity_does_not_treat_equilibration_temperature_as_liquidus():
 
 
 # ----------------------------------------------------------------------
-# Provider dispatch
+# Provider capability profile (post-promotion to kernel ABC)
 # ----------------------------------------------------------------------
 
 
-def test_provider_intent_surface():
-    provider = MAGEMinShadowProvider()
-    intents = provider.intents()
-    assert intents == frozenset({'SILICATE_LIQUIDUS', 'SILICATE_EQUILIBRIUM'})
-
-
-def test_provider_is_never_authoritative():
-    provider = MAGEMinShadowProvider()
-    for intent in ('SILICATE_LIQUIDUS', 'SILICATE_EQUILIBRIUM',
-                   'VAPOR_PRESSURE', 'EVAPORATION_FLUX'):
-        assert provider.is_authoritative_for(intent) is False
-
-
-def test_provider_does_not_emit_ledger_transition():
-    provider = MAGEMinShadowProvider()
-    assert provider.emits_ledger_transition() is False
-
-
-def test_provider_capability_profile_advertises_shadow_only():
+def test_provider_capability_profile_declares_silicate_intent_set():
     profile = MAGEMinShadowProvider().capability_profile()
-    assert profile['engine'] == 'magemin'
-    assert profile['authoritative_intents'] == frozenset()
-    assert profile['shadow_intents'] == frozenset(
-        {'SILICATE_LIQUIDUS', 'SILICATE_EQUILIBRIUM'}
+    assert profile.intents == frozenset({
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    })
+
+
+def test_provider_capability_profile_has_no_authoritative_intents():
+    """Goal #9 binds this -- MAGEMin is shadow-only, forever."""
+    profile = MAGEMinShadowProvider().capability_profile()
+    assert profile.is_authoritative_for == frozenset()
+    for intent in (
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    ):
+        assert not profile.is_authoritative(intent)
+
+
+def test_provider_declares_only_cleaned_melt_account():
+    profile = MAGEMinShadowProvider().capability_profile()
+    assert profile.declared_accounts == frozenset({'process.cleaned_melt'})
+
+
+def test_provider_does_not_declare_non_silicate_intents():
+    """Defence in depth: only the two silicate intents are dispatchable."""
+    profile = MAGEMinShadowProvider().capability_profile()
+    for intent in ChemistryIntent:
+        if intent in (
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ):
+            assert profile.can_dispatch(intent)
+        else:
+            assert not profile.can_dispatch(intent)
+
+
+# ----------------------------------------------------------------------
+# Writer-purity: provider module must NOT import LedgerTransitionProposal
+# ----------------------------------------------------------------------
+
+
+def test_no_ledger_transition_import():
+    """AST walk -- goal #9 forbids any LedgerTransitionProposal reference.
+
+    A shadow provider that imported the proposal DTO would be one
+    refactor away from accidentally constructing one. The kernel's
+    writer-purity invariant would catch the resulting commit attempt
+    at runtime, but blocking the import at the module-source level
+    closes the door before it can be opened.
+    """
+    source_path = Path(inspect.getsourcefile(provider_module))
+    tree = ast.parse(source_path.read_text())
+
+    bad_names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                name = alias.name
+                if 'LedgerTransition' in name:
+                    bad_names.add(name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                if 'LedgerTransition' in alias.name:
+                    bad_names.add(alias.name)
+        elif isinstance(node, ast.Attribute):
+            # Catches ``module.LedgerTransitionProposal`` qualified refs.
+            if 'LedgerTransition' in node.attr:
+                bad_names.add(node.attr)
+        elif isinstance(node, ast.Name):
+            if 'LedgerTransition' in node.id:
+                bad_names.add(node.id)
+    assert not bad_names, (
+        f'provider module references {sorted(bad_names)}; '
+        'MAGEMin shadow provider must NOT import LedgerTransition*'
     )
-    assert profile['pressure_unit'] == 'GPa'
 
 
-def test_dispatch_raises_not_implemented_with_clear_message():
-    provider = MAGEMinShadowProvider()
-    with pytest.raises(NotImplementedError) as exc_info:
-        provider.dispatch(object())
-    message = str(exc_info.value)
-    assert 'chemistry kernel' in message.lower()
-    assert 'CHEMISTRY-KERNEL-CARVE-OUT' in message
-    assert 'MAGEMIN-SHADOW-PARITY' in message
+def test_provider_diagnostic_shape_matches_alphamelts_keys():
+    """Parity comparator looks up the same keys on both engines.
+
+    Goal #9 binds the shadow trace to record an apples-to-apples
+    comparison. The parity comparator (engines/magemin/parity.py)
+    pulls ``liquidus_T_K`` / ``liquidus_T_C`` / ``phase_modes_wt_pct``
+    from each side; the diagnostic projections on both providers MUST
+    expose the same keys.
+    """
+    diag = MAGEMinShadowDiagnostics(
+        liquidus_T_K=1700.0,
+        liquidus_T_C=1426.85,
+        phases_present=('liquid',),
+        phase_modes_wt_pct={'liquid': 100.0},
+    ).as_diagnostic()
+    for key in (
+        'liquidus_T_K',
+        'liquidus_T_C',
+        'phases_present',
+        'phase_modes_wt_pct',
+        'liquid_composition_wt_pct',
+        'mode',
+        'engine_version',
+        'backend_status',
+        'backend_warnings',
+    ):
+        assert key in diag, f'diagnostic missing key {key!r}'

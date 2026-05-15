@@ -1,164 +1,576 @@
-"""MAGEMin kernel-shadow provider scaffold.
+"""MAGEMin kernel-shadow provider.
 
-This module declares the intent surface the chemistry kernel will require
-when ``\\goal CHEMISTRY-KERNEL-CARVE-OUT`` lands. Until then this is a
-scaffold: it forward-declares the provider shape, does not register with
-any kernel, and delegates real chemistry calls to the today-hook adapter
-in :mod:`simulator.melt_backend.magemin`.
+Promoted from the original scaffold to a kernel-registered SHADOW
+provider under goal #9 ``MAGEMIN-SHADOW-PARITY``. The provider:
+
+- declares the :data:`SILICATE_LIQUIDUS` + :data:`SILICATE_EQUILIBRIUM`
+  intent set (the pair MAGEMin shadows AlphaMELTS on per the binding
+  spec authority matrix),
+- declares ``process.cleaned_melt`` as its sole accessible account; the
+  kernel filter drops every other account before dispatch (same
+  silicate-oxide isolation contract AlphaMELTS uses),
+- runs the :class:`MAGEMinDomainGate` on the cleaned-melt composition
+  before delegating to the today-hook adapter,
+- delegates to :mod:`simulator.melt_backend.magemin.MAGEMinBackend`
+  for the chemistry (subprocess + Julia / pymagemin paths owned by the
+  adapter; this module orchestrates dispatch only),
+- returns a :class:`MAGEMinShadowDiagnostics` payload on
+  :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
+  MAGEMin is **shadow-only** (no ledger authority, ever).
 
 Authority posture
 -----------------
-MAGEMin is **shadow-only** for ``SILICATE_LIQUIDUS`` and
-``SILICATE_EQUILIBRIUM`` (see
-``docs-private/chemistry-engine-binding-spec-2026-05-14.md`` §3). It must
-never emit a ``LedgerTransitionProposal``. The provider's
-``is_authoritative_for(intent)`` always returns ``False``.
+MAGEMin is registered with the :class:`ProviderRegistry` as a SHADOW
+for both intents. The provider's
+:attr:`CapabilityProfile.is_authoritative_for` is an empty frozenset --
+this is the kernel-level binding that prevents accidental authority
+grants. The kernel's planner runs the authoritative provider AND every
+shadow on each dispatch; only the authoritative result becomes a
+``LedgerTransition``. Shadow results land on
+``Planner.shadow_trace`` as ``{provider_id, intent, result}`` records,
+and the planner additionally appends a ``parity_warning`` event when
+the per-provider parity comparator reports disagreement (goal #9
+checklist 3).
 
-Reconciliation
---------------
-The today-hook (``simulator.melt_backend.magemin.MAGEMinBackend``) is the
-*only* place where MAGEMin chemistry is actually executed today. This
-provider stub adds a kernel-shape envelope around that call so that when
-the kernel exists, both adapter and provider share a single call site —
-not two parallel chemistry paths.
+This module MUST NOT import :class:`LedgerTransitionProposal` from
+anywhere -- not even for type hints. The
+``test_magemin_shadow_provider.py::test_no_ledger_transition_import``
+test enforces this with an AST walk over the module source. The
+writer-purity invariant in ``tests/chemistry/test_writer_purity.py``
+catches any accidental ledger write attempt at runtime.
 
-See ``\\goal MAGEMIN-SHADOW-PARITY`` in
-``docs-private/codex-goal-queue-2026-05-14.md`` for the promotion plan.
+Parity tolerances (binding spec §4 MAGEMin):
+
+    |T_liquidus_authoritative - T_liquidus_shadow| <= 50 K
+    |mode_pct per phase|                            <= 2 wt%
 """
 
 from __future__ import annotations
 
-from typing import Any, FrozenSet, Optional
+from typing import Any, Mapping, Optional
 
-# TODO(kernel): replace with `from simulator.chemistry.kernel.provider import ChemistryProvider`
-# and `from simulator.chemistry.kernel.capabilities import ChemistryIntent, CapabilityProfile`
-# once \goal CHEMISTRY-KERNEL-CARVE-OUT lands (see
-# docs-private/codex-goal-queue-2026-05-14.md).
-# Until then, this stub class declares the intent surface kernel will require:
-#   - intents() -> set[ChemistryIntent]
-#   - capability_profile() -> CapabilityProfile
-#   - account_view_filter(view) -> view
-#   - dispatch(request) -> IntentResult
-#   - emits LedgerTransitionProposal? -> False (shadow-only)
-
-
-# String literals stand in for the ChemistryIntent enum until the kernel lands.
-# The strings here MUST stay in lock-step with the enum names introduced by
-# \goal CHEMISTRY-KERNEL-CARVE-OUT (simulator/chemistry/kernel/capabilities.py).
-_SILICATE_LIQUIDUS = 'SILICATE_LIQUIDUS'
-_SILICATE_EQUILIBRIUM = 'SILICATE_EQUILIBRIUM'
+from engines.magemin.domain import MAGEMinDomainGate
+from engines.magemin.parity import MAGEMinParityComparator, ParityReport
+from engines.magemin.result import MAGEMinShadowDiagnostics
+from simulator.chemistry.kernel.capabilities import (
+    CapabilityProfile,
+    ChemistryIntent,
+)
+from simulator.chemistry.kernel.dto import (
+    ControlAudit,
+    IntentRequest,
+    IntentResult,
+)
+from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
-class MAGEMinShadowProvider:
-    """Kernel-shadow provider stub for MAGEMin.
+# Intent set: SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. Matches the
+# authoritative AlphaMELTSProvider intent set so the planner runs
+# MAGEMin alongside AlphaMELTS for every dispatch of either intent.
+_INTENTS = frozenset({
+    ChemistryIntent.SILICATE_LIQUIDUS,
+    ChemistryIntent.SILICATE_EQUILIBRIUM,
+})
 
-    Today this class is not wired into anything — it documents the intent
-    surface and delegates to the today-hook adapter. Post-kernel it will
-    subclass ``ChemistryProvider`` and register with the kernel as a
-    shadow for ``SILICATE_LIQUIDUS`` and ``SILICATE_EQUILIBRIUM``.
+# Sole declared account: silicate-oxide melt (binding spec §7 isolation).
+# Same constraint as AlphaMELTS -- MAGEMin operates on silicate-oxide
+# bulk only, no gas / metal / salt / sulfide. The kernel filter blocks
+# every other account before dispatch.
+_DECLARED_ACCOUNT = 'process.cleaned_melt'
+
+# Note attached to the ControlAudit for every dispatch. MAGEMin is
+# shadow-only -- it consumes T / P / fO2 as inputs but never enforces
+# them on the ledger (no ledger writes at all). Same posture as
+# AlphaMELTS's ``"diagnostic, not enforced"`` note; we use a distinct
+# wording so trace consumers can tell shadow from diagnostic.
+_SHADOW_AUDIT_NOTE = 'shadow, not enforced'
+
+
+class MAGEMinShadowProvider(ChemistryProvider):
+    """Shadow-only provider for MAGEMin via the kernel.
+
+    See module docstring. The provider is constructed with an optional
+    live :class:`simulator.melt_backend.magemin.MAGEMinBackend` instance;
+    if omitted, the provider lazily constructs one on first dispatch
+    (matching the legacy "today-hook reconciliation" behaviour the
+    scaffold documented). The lazy path lets the provider register at
+    kernel-build time without forcing a MAGEMin binary probe -- the probe
+    happens on first dispatch and surfaces ``status='unavailable'`` if
+    no binary is reachable.
+
+    ``backend`` may be ``None`` -- in that case :meth:`dispatch` lazily
+    constructs a :class:`MAGEMinBackend` and calls ``initialize({})``;
+    if the binary is absent the result carries ``status='unavailable'``
+    with an empty :class:`MAGEMinShadowDiagnostics`. This matches the
+    kernel's ``status='unavailable'`` vocabulary for absent engines.
     """
 
     name = 'magemin-shadow'
 
-    def __init__(self) -> None:
-        self._adapter: Optional[Any] = None  # lazy MAGEMinBackend
+    PROVIDER_ID = 'magemin-shadow'
+    DECLARED_ACCOUNT = _DECLARED_ACCOUNT
 
-    def intents(self) -> FrozenSet[str]:
-        """Intents this provider claims (shadow authority only)."""
-        return frozenset({_SILICATE_LIQUIDUS, _SILICATE_EQUILIBRIUM})
+    def __init__(self, backend: Optional[Any] = None) -> None:
+        # Lazy adapter: the provider must be importable / registerable
+        # without the MAGEMin binary being present. The first dispatch
+        # constructs and initialises the adapter; if that fails the
+        # dispatch returns ``status='unavailable'`` cleanly.
+        self._backend: Optional[Any] = backend
+        self._backend_initialised: bool = backend is not None
+        self._parity_comparator: MAGEMinParityComparator = MAGEMinParityComparator()
 
-    def is_authoritative_for(self, intent: str) -> bool:  # noqa: ARG002
-        """MAGEMin is shadow-only. Always returns False.
-
-        Promotion is gated by ``\\goal MAGEMIN-SHADOW-PARITY``: parity
-        tolerance ±50 K liquidus / ±2 wt% modal vs alphaMELTS, validated
-        on at least one lunar + one Mars + one asteroid feedstock. Even
-        after that gate passes, this provider stays shadow — alphaMELTS
-        retains authority per the binding spec §3 authority matrix.
-        """
-        return False
-
-    def emits_ledger_transition(self) -> bool:
-        """Shadow providers never emit ledger transitions."""
-        return False
-
-    def account_view_filter(self, view: Any) -> Any:
-        """Filter the kernel-supplied account view before dispatch.
-
-        Today this is a passthrough — the kernel hasn't been carved out
-        yet, so there is no ``ProviderAccountView`` type to constrain.
-        When ``\\goal CHEMISTRY-KERNEL-CARVE-OUT`` lands, this method
-        must drop every account except ``process.cleaned_melt`` (same
-        constraint as alphaMELTS — MAGEMin operates on silicate-oxide
-        bulk only, no gas/metal/salt/sulfide).
-        """
-        return view
-
-    def capability_profile(self) -> dict:
-        """Report the capability surface MAGEMin advertises.
-
-        Returned as a plain dict until ``CapabilityProfile`` lands in
-        ``simulator.chemistry.kernel.capabilities``. Field names match
-        the planned dataclass so the post-kernel migration is purely
-        mechanical.
-        """
-        return {
-            'engine': 'magemin',
-            'engine_version': 'unknown',
-            'intents': sorted(self.intents()),
-            'authoritative_intents': frozenset(),
-            'shadow_intents': self.intents(),
-            'oxide_basis': (
-                'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
-                'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
-            ),
-            'pressure_unit': 'GPa',
-            'temperature_unit': 'K',
-        }
-
-    def dispatch(self, request: Any) -> Any:
-        """Execute a kernel intent request. Not implemented until kernel lands.
-
-        Once ``\\goal CHEMISTRY-KERNEL-CARVE-OUT`` lands this method will:
-
-        1. Validate ``request.intent`` is in :meth:`intents`.
-        2. Validate ``request.account_view`` is filtered (silicate-only).
-        3. Call :meth:`delegate_to_adapter` to run MAGEMin via the
-           today-hook.
-        4. Wrap the ``EquilibriumResult`` in an ``IntentResult`` with
-           ``ledger_transition=None`` (shadow-only) and parity-comparison
-           metadata for the kernel trace.
-
-        See ``\\goal MAGEMIN-SHADOW-PARITY`` for the promotion plan.
-        """
-        raise NotImplementedError(
-            'MAGEMinShadowProvider.dispatch() requires the chemistry kernel '
-            '(simulator.chemistry.kernel). The kernel has not been carved out '
-            'yet — see \\goal CHEMISTRY-KERNEL-CARVE-OUT and '
-            '\\goal MAGEMIN-SHADOW-PARITY in '
-            'docs-private/codex-goal-queue-2026-05-14.md. Until then, the '
-            'simulator should call simulator.melt_backend.magemin.MAGEMinBackend '
-            'directly via the existing MeltBackend interface.'
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.PROVIDER_ID,
+            intents=_INTENTS,
+            # SHADOW-ONLY: empty authoritative set. Kernel registry will
+            # reject any attempt to register this provider as
+            # authoritative (``register(shadow=False)`` raises) because
+            # ``CapabilityProfile.is_authoritative_for`` is empty.
+            is_authoritative_for=frozenset(),
+            declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 
-    def delegate_to_adapter(self, *args: Any, **kwargs: Any) -> Any:
-        """Reconciliation point: provider and adapter share one call site.
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        """Run MAGEMin for ``request.intent``; return a shadow diagnostic.
 
-        The provider does not own a second copy of MAGEMin call logic. It
-        forwards to the today-hook adapter (``MAGEMinBackend.equilibrate``)
-        and, post-kernel, wraps the result in a kernel-shape envelope.
+        See module docstring for the contract. The provider:
 
-        The import is deliberately lazy because
-        ``simulator.melt_backend.magemin`` may be undergoing concurrent
-        edits in another worktree; importing at module load would create
-        a hard dependency on the adapter's import-time surface.
+        1. Validates the intent is one it serves (defence in depth --
+           the kernel registry already routes correctly).
+        2. Builds the ControlAudit with ``applied == requested`` and
+           the shadow note.
+        3. Runs :class:`MAGEMinDomainGate`. If rejected, returns
+           ``status='out_of_domain'`` with the warnings recorded.
+        4. Lazily initialises the adapter; if the MAGEMin binary is
+           absent, returns ``status='unavailable'``.
+        5. Calls the adapter's :meth:`equilibrate`.
+        6. Projects the adapter's :class:`EquilibriumResult` into a
+           :class:`MAGEMinShadowDiagnostics`.
+        7. Returns the :class:`IntentResult` with ``transition=None``.
         """
-        if self._adapter is None:
-            # TODO(reconciliation): once \goal MAGEMIN-SHADOW-PARITY lands,
-            # this adapter instance is constructed/owned by the kernel
-            # registry rather than the provider. For now it's lazy so the
-            # provider module is importable even if the adapter is being
-            # rewritten.
+        # Defence in depth: the registry routes only declared intents
+        # here, but a future caller bypassing the registry must hit a
+        # clean ``unsupported`` instead of a silent mis-answer.
+        if request.intent not in _INTENTS:
+            return IntentResult(
+                intent=request.intent,
+                status='unsupported',
+                diagnostic={
+                    'reason': (
+                        'MAGEMinShadowProvider serves SILICATE_LIQUIDUS + '
+                        'SILICATE_EQUILIBRIUM only'
+                    ),
+                },
+            )
+
+        control_audit = self._build_control_audit(request)
+
+        composition_mol_by_account = self._composition_from_view(request)
+        composition_wt_pct = self._composition_wt_pct(
+            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+            request.account_view.species_formula_registry,
+        )
+
+        # Run the domain gate even when the adapter is None so callers
+        # see a meaningful rejection (rather than a silent
+        # 'unavailable' surface that hides the input issue).
+        valid, gate_warnings = MAGEMinDomainGate.validate(composition_wt_pct)
+        if not valid:
+            return IntentResult(
+                intent=request.intent,
+                status='out_of_domain',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=MAGEMinShadowDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='out_of_domain',
+                    backend_warnings=tuple(gate_warnings),
+                ).as_diagnostic(),
+                warnings=tuple(gate_warnings),
+            )
+
+        backend = self._ensure_backend()
+        if backend is None or not self._backend_available(backend):
+            return IntentResult(
+                intent=request.intent,
+                status='unavailable',
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=MAGEMinShadowDiagnostics(
+                    mode='unavailable',
+                    engine_version=self._engine_version(),
+                    backend_status='unavailable',
+                ).as_diagnostic(),
+                warnings=(
+                    'MAGEMin adapter not available (binary not located '
+                    'and no Python bridge importable)',
+                ),
+            )
+
+        equilibrium = self._run_backend(
+            backend,
+            request,
+            composition_mol_by_account=composition_mol_by_account,
+        )
+        diagnostics = self._project_equilibrium(
+            equilibrium,
+            mode=self._mode_label(backend),
+            engine_version=self._engine_version(),
+        )
+
+        backend_status = diagnostics.backend_status
+        kernel_status = backend_status if backend_status in (
+            'ok', 'not_converged', 'out_of_domain', 'unavailable'
+        ) else 'ok'
+
+        return IntentResult(
+            intent=request.intent,
+            status=kernel_status,
+            transition=None,  # SHADOW-ONLY -- always None.
+            control_audit=control_audit,
+            diagnostic=diagnostics.as_diagnostic(),
+            warnings=tuple(diagnostics.backend_warnings),
+        )
+
+    # ------------------------------------------------------------------
+    # Parity hook (called by the planner after authoritative dispatch).
+    # ------------------------------------------------------------------
+
+    def parity_compare(
+        self,
+        authoritative_result: Any,
+        shadow_result: Any,
+    ) -> Optional[ParityReport]:
+        """Compare authoritative vs shadow results; return a parity report.
+
+        The :class:`Planner` calls this after the authoritative provider
+        has run, passing the authoritative :class:`IntentResult` and the
+        shadow's :class:`IntentResult`. Returning a
+        :class:`ParityReport` with ``agreement=False`` triggers a
+        ``parity_warning`` entry in the shadow trace. Returning ``None``
+        skips the parity record entirely (e.g. when either side
+        reported ``unavailable`` / ``out_of_domain``).
+
+        The comparison runs on the ``diagnostic`` dict of each result;
+        the comparator already accepts a duck-typed mapping with the
+        documented keys (``liquidus_T_K`` / ``liquidus_T_C`` /
+        ``phase_modes_wt_pct``).
+        """
+        if authoritative_result is None or shadow_result is None:
+            return None
+        auth_diag = self._extract_diagnostic(authoritative_result)
+        shadow_diag = self._extract_diagnostic(shadow_result)
+        # Both sides must have produced a usable diagnostic. If either
+        # came back with ``status='unavailable'`` / ``'out_of_domain'``
+        # the parity check is meaningless -- skip and let the
+        # individual statuses surface in the trace.
+        auth_status = self._extract_status(authoritative_result)
+        shadow_status = self._extract_status(shadow_result)
+        skippable = {'unavailable', 'out_of_domain', 'unsupported'}
+        if auth_status in skippable or shadow_status in skippable:
+            return None
+        return self._parity_comparator.compare(auth_diag, shadow_diag)
+
+    @staticmethod
+    def _extract_diagnostic(result: Any) -> Mapping[str, Any]:
+        if isinstance(result, Mapping):
+            return dict(result.get('diagnostic') or result)
+        diagnostic = getattr(result, 'diagnostic', None)
+        if diagnostic is None:
+            return {}
+        return dict(diagnostic)
+
+    @staticmethod
+    def _extract_status(result: Any) -> str:
+        if isinstance(result, Mapping):
+            return str(result.get('status', 'ok'))
+        return str(getattr(result, 'status', 'ok'))
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _build_control_audit(self, request: IntentRequest) -> ControlAudit:
+        """ControlAudit with applied=requested and 'shadow' note.
+
+        MAGEMin consumes T / P / fO2 as inputs but never enforces them
+        (it has no ledger authority). The audit records the values
+        verbatim with the shadow note so a trace consumer sees the
+        engine ran but didn't enforce.
+        """
+        requested = {
+            'temperature_C': float(request.temperature_C),
+            'pressure_bar': float(request.pressure_bar),
+            'fO2_log': (
+                float(request.fO2_log) if request.fO2_log is not None else None
+            ),
+        }
+        return ControlAudit(
+            requested=requested,
+            applied=dict(requested),
+            notes=(_SHADOW_AUDIT_NOTE,),
+        )
+
+    def _composition_from_view(self, request: IntentRequest) -> dict:
+        """Extract account -> species_mol from the account view."""
+        accounts = request.account_view.accounts
+        result: dict = {}
+        for account in (self.DECLARED_ACCOUNT,):
+            species_mol = dict(accounts.get(account, {}) or {})
+            result[account] = {
+                str(sp): float(mol)
+                for sp, mol in species_mol.items()
+                if _is_finite(mol) and float(mol) > 0.0
+            }
+        return result
+
+    def _composition_wt_pct(
+        self,
+        species_mol: Mapping[str, float],
+        species_formula_registry: Mapping[str, Any],
+    ) -> dict:
+        """Project mol -> wt% for the domain gate."""
+        if not species_mol:
+            return {}
+        from simulator.accounting.formulas import resolve_species_formula
+
+        kg_by_species: dict = {}
+        total_kg = 0.0
+        for species, mol in species_mol.items():
+            mol_val = float(mol)
+            if mol_val <= 0.0:
+                continue
+            try:
+                formula = resolve_species_formula(species, species_formula_registry)
+            except Exception:
+                continue
+            mass_kg = mol_val * formula.molar_mass_kg_per_mol()
+            if mass_kg <= 0.0:
+                continue
+            kg_by_species[str(species)] = (
+                kg_by_species.get(str(species), 0.0) + mass_kg
+            )
+            total_kg += mass_kg
+        if total_kg <= 0.0:
+            return {}
+        return {
+            species: kg / total_kg * 100.0
+            for species, kg in kg_by_species.items()
+        }
+
+    def _ensure_backend(self) -> Optional[Any]:
+        """Return the live adapter, lazily constructing it on first use.
+
+        The construction is wrapped in a broad ``except`` because
+        importing :class:`MAGEMinBackend` should not crash the provider
+        when MAGEMin is unavailable -- the provider must fall through
+        to ``status='unavailable'`` cleanly.
+        """
+        if self._backend is not None:
+            if not self._backend_initialised:
+                try:
+                    self._backend.initialize({})
+                except Exception:
+                    pass
+                self._backend_initialised = True
+            return self._backend
+        try:
             from simulator.melt_backend.magemin import MAGEMinBackend
-            self._adapter = MAGEMinBackend()
-        return self._adapter.equilibrate(*args, **kwargs)
+            backend = MAGEMinBackend()
+            backend.initialize({})
+        except Exception:
+            self._backend = None
+            return None
+        self._backend = backend
+        self._backend_initialised = True
+        return backend
+
+    @staticmethod
+    def _backend_available(backend: Any) -> bool:
+        is_avail = getattr(backend, 'is_available', None)
+        if callable(is_avail):
+            try:
+                return bool(is_avail())
+            except Exception:
+                return False
+        return False
+
+    def _run_backend(
+        self,
+        backend: Any,
+        request: IntentRequest,
+        *,
+        composition_mol_by_account: dict,
+    ) -> Any:
+        """Call the adapter's :meth:`equilibrate`.
+
+        Returns the adapter's :class:`EquilibriumResult` (or None on
+        catastrophic failure). The adapter itself converts failure into
+        an ``EquilibriumResult`` with ``status='not_converged'``
+        rather than raising, so the broad except here is a final
+        safety net for unexpected exceptions only.
+        """
+        species_registry = dict(
+            request.account_view.species_formula_registry or {}
+        )
+        try:
+            return backend.equilibrate(
+                temperature_C=float(request.temperature_C),
+                pressure_bar=float(request.pressure_bar),
+                fO2_log=(
+                    float(request.fO2_log)
+                    if request.fO2_log is not None
+                    else -9.0
+                ),
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+        except Exception:
+            return None
+
+    @staticmethod
+    def _mode_label(backend: Any) -> str:
+        """Report which bridge the adapter is using.
+
+        Mirrors :class:`AlphaMELTSProvider`'s 'mode' label (one of
+        ``'petthermotools'`` / ``'subprocess'``). The MAGEMin adapter
+        exposes the same posture via ``_bridge``; we surface it so a
+        trace consumer can tell which path produced the answer.
+        """
+        return str(getattr(backend, '_bridge', None) or 'unavailable')
+
+    def _engine_version(self) -> str:
+        if self._backend is None:
+            return 'unavailable'
+        getter = getattr(self._backend, 'get_engine_version', None)
+        if callable(getter):
+            try:
+                return str(getter())
+            except Exception:
+                return 'unavailable'
+        return 'unavailable'
+
+    @staticmethod
+    def _project_equilibrium(
+        equilibrium: Any,
+        *,
+        mode: str,
+        engine_version: str,
+    ) -> MAGEMinShadowDiagnostics:
+        """Convert an adapter :class:`EquilibriumResult` to MAGEMin
+        diagnostics.
+
+        Mirrors :func:`engines.alphamelts.parser.
+        project_equilibrium_to_diagnostics` so the parity comparator
+        receives matching shapes from both engines.
+        """
+        if equilibrium is None:
+            return MAGEMinShadowDiagnostics(
+                mode=mode,
+                engine_version=engine_version,
+                backend_status='unavailable',
+            )
+
+        warnings = tuple(
+            str(w) for w in (getattr(equilibrium, 'warnings', ()) or ())
+        )
+        phases_present = tuple(
+            str(p) for p in (
+                getattr(equilibrium, 'phases_present', ()) or ()
+            )
+        )
+        phase_masses_kg = {
+            str(k): float(v)
+            for k, v in dict(
+                getattr(equilibrium, 'phase_masses_kg', {}) or {}
+            ).items()
+            if _is_finite(v) and float(v) > 0.0
+        }
+        liquid_comp = {
+            str(k): float(v)
+            for k, v in dict(
+                getattr(equilibrium, 'liquid_composition_wt_pct', {}) or {}
+            ).items()
+            if _is_finite(v)
+        }
+        liquid_fraction_raw = getattr(equilibrium, 'liquid_fraction', None)
+        liquid_fraction = (
+            float(liquid_fraction_raw)
+            if liquid_fraction_raw is not None and _is_finite(liquid_fraction_raw)
+            else None
+        )
+
+        # Modal abundance: project per-phase mass onto wt% summing to 100.
+        # Same projection AlphaMELTS uses; the parity comparator looks up
+        # ``phase_modes_wt_pct`` directly.
+        total = sum(phase_masses_kg.values())
+        if total > 0:
+            phase_modes_wt_pct = {
+                phase: mass / total * 100.0
+                for phase, mass in phase_masses_kg.items()
+            }
+        else:
+            phase_modes_wt_pct = {}
+
+        # Liquidus: the today-hook adapter does not currently surface a
+        # structured liquidus_T_K field. Fall back to the equilibration
+        # temperature ONLY when there is unambiguous evidence we are at
+        # liquidus (``liquid_fraction == 1.0`` from a known single-phase
+        # MAGEMin run). Otherwise leave it None and let the parity
+        # comparator hit its conservative "cannot evaluate" branch.
+        liquidus_T_K = _safe_attr_float(equilibrium, 'liquidus_T_K')
+        liquidus_T_C: Optional[float] = None
+        if liquidus_T_K is not None:
+            liquidus_T_C = liquidus_T_K - 273.15
+        else:
+            # Fall back to a structured liquidus_T_C if the adapter ever
+            # adds one.
+            liquidus_T_C = _safe_attr_float(equilibrium, 'liquidus_T_C')
+            if liquidus_T_C is not None:
+                liquidus_T_K = liquidus_T_C + 273.15
+
+        backend_status = str(getattr(equilibrium, 'status', 'ok') or 'ok')
+
+        return MAGEMinShadowDiagnostics(
+            liquidus_T_K=liquidus_T_K,
+            liquidus_T_C=liquidus_T_C,
+            phases_present=phases_present,
+            phase_modes_wt_pct=phase_modes_wt_pct,
+            liquid_composition_wt_pct=liquid_comp,
+            phase_masses_kg=phase_masses_kg,
+            liquid_fraction=liquid_fraction,
+            mode=mode,
+            engine_version=engine_version,
+            backend_status=backend_status,
+            backend_warnings=warnings,
+        )
+
+
+def _is_finite(value: Any) -> bool:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return False
+    if numeric != numeric:
+        return False
+    if numeric in (float('inf'), float('-inf')):
+        return False
+    return True
+
+
+def _safe_attr_float(obj: Any, name: str) -> Optional[float]:
+    value = getattr(obj, name, None)
+    if value is None:
+        return None
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not _is_finite(result):
+        return None
+    return result
+
+
+__all__ = ('MAGEMinShadowProvider',)
