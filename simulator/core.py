@@ -622,6 +622,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Lazy import to break the package-init cycle (see header comment
         # on the chemistry-kernel imports above).
+        from engines.builtin.evaporation_flux import (
+            BuiltinEvaporationFluxProvider,
+        )
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
         # Re-register the authoritative VAPOR_PRESSURE provider once per
@@ -634,6 +637,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._chem_registry.register(
                 BuiltinVaporPressureProvider(self.vapor_pressures),
                 [ChemistryIntent.VAPOR_PRESSURE],
+            )
+        # EVAPORATION_FLUX -- second intent flip of
+        # \goal BUILTIN-ENGINE-EXTRACTION (#7). Stateless provider; the
+        # per-call inputs (vapor pressures, overhead partials, surface
+        # area, stoich) arrive via control_inputs from
+        # _calculate_evaporation.
+        if self._chem_registry.authoritative_for(
+            ChemistryIntent.EVAPORATION_FLUX
+        ) is None:
+            self._chem_registry.register(
+                BuiltinEvaporationFluxProvider(),
+                [ChemistryIntent.EVAPORATION_FLUX],
             )
         return ChemistryKernel(
             ledger=self.atom_ledger,

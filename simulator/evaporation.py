@@ -6,6 +6,7 @@ import math
 from collections import defaultdict
 
 from simulator.accounting import AccountingError, resolve_species_formula
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -13,6 +14,12 @@ from simulator.state import (
     STOICH_RATIOS,
     EvaporationFlux,
 )
+
+
+# Evaporation coefficient (conservative mean, ~0.1-1.0 for metals).
+# Pulled out as a module constant so the kernel-dispatch caller and any
+# future shadow-parity guard share one source.
+_EVAPORATION_COEFFICIENT_ALPHA = 0.5
 
 
 class EvaporationMixin:
@@ -39,6 +46,21 @@ class EvaporationMixin:
         when pO₂ is elevated, the equilibrium vapor pressure of SiO
         drops by the factor √(pO₂), reducing the driving force.
 
+        EVAPORATION_FLUX intent -- kernel-authoritative.
+
+        \\goal BUILTIN-ENGINE-EXTRACTION (#7), second flip. The
+        BuiltinEvaporationFluxProvider is the authoritative source for
+        per-species kg/hr fluxes; this method builds the auxiliary maps
+        the provider needs (vapor pressures, overhead partials, stoich,
+        available oxide masses, molar masses, melt geometry) and routes
+        the loop to ``kernel.dispatch(EVAPORATION_FLUX, ...)``. The
+        legacy Hertz-Knudsen loop body lives inside the provider now;
+        this method owns the precompute + the result projection. Shadow
+        parity is the parametrised test in
+        ``tests/chemistry/test_builtin_evaporation_flux_provider.py``;
+        per the goal spec, the shadow comparator was removed at flip
+        time (comparing against the same source is moot).
+
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
@@ -48,64 +70,108 @@ class EvaporationMixin:
         if T_K < 400:  # Below any significant evaporation
             return flux
 
-        vapor_pressures = equilibrium.vapor_pressures_Pa
-        alpha = 0.5  # Evaporation coefficient (conservative mean)
+        vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        if not vapor_pressures:
+            return flux
 
-        metals_data = self.vapor_pressures.get('metals', {})
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
+        # Precompute the auxiliary maps the provider consumes via
+        # control_inputs. This keeps the provider stateless: every
+        # piece of caller-owned state (yaml lookups, stoich validation,
+        # available-mass cap, overhead backpressure) arrives in the
+        # request, so the provider holds no simulator references.
+        (
+            molar_masses_kg_mol,
+            stoich_by_species,
+            available_oxide_kg,
+        ) = self._build_evaporation_aux_maps(vapor_pressures)
 
-        for species, P_sat_Pa in vapor_pressures.items():
-            if P_sat_Pa <= 0:
-                continue
+        # Overhead backpressure (Pa)                       [LOOP-1]
+        # Uses the PREVIOUS hour's overhead partial pressures as
+        # backpressure. High evap -> high overhead P -> reduced driving
+        # force -> lower evap next hour. Note: process.overhead_gas is
+        # drained to terminal.offgas every tick, so this backpressure
+        # is the within-tick vapour partial pressure only -- there is
+        # no multi-tick finite-headspace accumulation (see
+        # equilibrium.py::_commanded_pO2_bar, FINITE-HEADSPACE-PO2-MODEL).
+        overhead_partials_Pa = {
+            species: self.overhead.composition.get(species, 0.0) * 100.0
+            for species in vapor_pressures
+        }
 
-            # Get species data from metals or oxide_vapors section
+        kernel_result = self._chem_kernel.dispatch(
+            ChemistryIntent.EVAPORATION_FLUX,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs={
+                'vapor_pressures_Pa': vapor_pressures,
+                'overhead_partials_Pa': overhead_partials_Pa,
+                'molar_mass_kg_mol': molar_masses_kg_mol,
+                'stoich_by_species': stoich_by_species,
+                'available_oxide_kg': available_oxide_kg,
+                'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+                'stir_factor': float(self.melt.stir_factor),
+                'alpha': _EVAPORATION_COEFFICIENT_ALPHA,
+            },
+        )
+        diagnostic = dict(kernel_result.diagnostic or {})
+        flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
+        for species, rate_kg_hr in flux_kg_hr.items():
+            if rate_kg_hr > 1e-12:
+                flux.species_kg_hr[species] = float(rate_kg_hr)
+
+        flux.update_totals()
+        return flux
+
+    def _build_evaporation_aux_maps(
+        self, vapor_pressures: dict,
+    ) -> tuple[dict, dict, dict]:
+        """Precompute per-species auxiliary inputs for EVAPORATION_FLUX.
+
+        Returns ``(molar_masses_kg_mol, stoich_by_species,
+        available_oxide_kg)``.
+
+        These three maps are everything the kernel provider needs that
+        cannot be derived from the request DTOs alone: the
+        ``vapor_pressures.yaml`` payload + the simulator's stoich
+        validation (which raises ``AccountingError`` -- a caller-owned
+        surface that does NOT belong inside the stateless provider).
+
+        Side effects: This method intentionally invokes
+        :meth:`_evaporation_stoich` for each species, which raises
+        AccountingError on missing/inconsistent metadata. Preserving
+        that error surface in the caller (not the provider) matches the
+        legacy behaviour exactly -- the parity tests would otherwise
+        observe a different error class.
+        """
+
+        molar_masses_kg_mol: dict[str, float] = {}
+        stoich_by_species: dict[str, dict] = {}
+        available_oxide_kg: dict[str, float] = {}
+
+        metals_data = self.vapor_pressures.get('metals', {}) or {}
+        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
+
+        for species in vapor_pressures:
             sp_data = metals_data.get(species, {})
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            M_kg_mol = sp_data.get('molar_mass_g_mol',
-                                    MOLAR_MASS.get(species, 50.0)) / 1000.0
+            M_g_mol = sp_data.get('molar_mass_g_mol',
+                                  MOLAR_MASS.get(species, 50.0))
+            molar_masses_kg_mol[species] = M_g_mol / 1000.0
 
-            # Ambient partial pressure (Pa)                    [LOOP-1]
-            # Uses the PREVIOUS hour's overhead partial pressures as
-            # backpressure.  High evap → high overhead P → reduced driving
-            # force → lower evap next hour.  Note: process.overhead_gas is
-            # drained to terminal.offgas every tick, so this backpressure
-            # is the within-tick vapour partial pressure only -- there is
-            # no multi-tick finite-headspace accumulation (see
-            # equilibrium.py::_commanded_pO2_bar, FINITE-HEADSPACE-PO2-MODEL).
-            P_ambient_Pa = self.overhead.composition.get(species, 0.0) * 100.0  # mbar → Pa
-
-            # Hertz-Knudsen mass flux (kg/s per m²)        [HK-1]
-            denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
-            J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) / denominator
-
-            if J_kg_s_m2 <= 0:
-                continue
-
-            # Total rate = flux × surface area × stirring × time
-            rate_kg_hr = (J_kg_s_m2
-                          * self.melt.melt_surface_area_m2
-                          * self.melt.stir_factor
-                          * 3600.0)  # s → hr
-
-            # Don't evaporate more than is available in the melt
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
                 raise AccountingError(
                     f"vapor species {species!r} requires parent_oxide "
                     "metadata before evaporation flux can be emitted"
                 )
-            available_kg = self.melt.composition_kg.get(parent_oxide, 0.0)
             stoich = self._evaporation_stoich(species, sp_data)
-            max_product_kg = available_kg / stoich['oxide_per_product_kg']
-            rate_kg_hr = min(rate_kg_hr, max_product_kg)
+            stoich_by_species[species] = dict(stoich)
+            available_oxide_kg[species] = self.melt.composition_kg.get(
+                parent_oxide, 0.0)
 
-            if rate_kg_hr > 1e-12:
-                flux.species_kg_hr[species] = rate_kg_hr
-
-        flux.update_totals()
-        return flux
+        return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
     def _route_to_condensation(self, evap_flux: EvaporationFlux):
         """
