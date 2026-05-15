@@ -98,10 +98,12 @@ class EvaporationMixin:
             for species in vapor_pressures
         }
 
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
+        # The dispatch-only helper centralises melt-derived T/P plumbing
+        # so this call site stays in lock-step with the rest of the
+        # simulator's kernel callers.
+        kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'vapor_pressures_Pa': vapor_pressures,
                 'overhead_partials_Pa': overhead_partials_Pa,
@@ -296,13 +298,13 @@ class EvaporationMixin:
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
-        Mirrors the EVAPORATION_TRANSITION dispatch pattern in
-        :meth:`_credit_evaporation_transition`: build the
-        ``control_inputs``, call the kernel, commit the resulting
-        proposal via :meth:`ChemistryKernel.commit_batch`. After this
-        flip, the overhead -> condensation_train ledger write happens
-        ONLY through ``commit_batch`` -- no direct ``atom_ledger.apply``
-        from inside this function.
+        F-B1 (Cluster B): the dispatch + commit interleave collapsed
+        into :meth:`_dispatch_and_commit`.  The overhead ->
+        condensation_train ledger write still happens ONLY through
+        ``commit_batch`` (the helper's only writable path); a no-op
+        dispatch (kernel returned ``transition is None``) increments
+        the F-A4 ``_chem_no_op_dispatch_count`` counter so a replay
+        tool can distinguish "kernel skipped" from "called and no-op".
 
         Returns ``credited_condensed_kg`` -- the amount of vapor
         actually deposited onto ``process.condensation_train``, used by
@@ -312,10 +314,8 @@ class EvaporationMixin:
         if condensed_kg <= 1e-12:
             return 0.0
 
-        kernel_result = self._chem_kernel.dispatch(
+        kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
@@ -323,19 +323,8 @@ class EvaporationMixin:
                 'dt_hr': 1.0,
             },
         )
-        proposal = kernel_result.transition
-        if proposal is None:
+        if kernel_result.transition is None:
             return 0.0
-
-        # commit_batch is the ONLY writable path into the AtomLedger
-        # for the overhead -> condensation_train leg after this flip.
-        # The kernel re-validates intent authority, the account filter,
-        # and atom balance against the registry's authoritative
-        # provider for CONDENSATION_ROUTE (defence in depth matching
-        # the EVAPORATION_TRANSITION pattern).
-        self._chem_kernel.commit_batch(
-            ChemistryIntent.CONDENSATION_ROUTE, proposal,
-        )
 
         diagnostic = dict(kernel_result.diagnostic or {})
         return float(diagnostic.get('credited_condensed_kg', 0.0))
@@ -411,10 +400,13 @@ class EvaporationMixin:
                 f"condensation route for {species!r} exceeds credited vapor"
             )
 
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: dispatch + commit through the shared helper.  The
+        # kernel's commit_batch path is still the ONLY writable entry
+        # into the AtomLedger for EVAPORATION_TRANSITION; the helper
+        # re-runs the full pre-commit validator stack inside
+        # commit_batch (defence in depth).
+        kernel_result = self._dispatch_and_commit(
             ChemistryIntent.EVAPORATION_TRANSITION,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'species': species,
                 'stoich': dict(stoich),
@@ -425,21 +417,8 @@ class EvaporationMixin:
                 'available_kg': float(available_kg),
             },
         )
-        proposal = kernel_result.transition
-        if proposal is None:
+        if kernel_result.transition is None:
             return 0.0
-
-        # commit_batch is the ONLY writable path into the AtomLedger
-        # after this flip. The kernel re-validates intent authority,
-        # the account filter, and atom balance against the registry's
-        # authoritative provider for ``intent`` (defence in depth: the
-        # proposal DTO is in the public surface, so the commit gate
-        # cannot delegate validation to the dispatch path), then
-        # translates the mol-native proposal into a canonical
-        # LedgerTransition before applying it.
-        self._chem_kernel.commit_batch(
-            ChemistryIntent.EVAPORATION_TRANSITION, proposal
-        )
 
         diagnostic = dict(kernel_result.diagnostic or {})
         return float(diagnostic.get('credited_condensed_kg', 0.0))

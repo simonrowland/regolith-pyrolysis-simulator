@@ -230,14 +230,16 @@ class ExtractionMixin:
 
             current_A = 100.0
 
-        # Capture metal/O2 balances BEFORE the kernel commit so the
-        # cathode delta routing into condenser stages stays accurate
-        # (matches pre-flip behaviour: routing keys off the per-tick
-        # increment in process.metal_phase, not the legacy result dict).
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: dispatch + commit split via the _dispatch_only /
+        # _commit_proposal helper pair so the per-account balance
+        # snapshot can sit between them.  We need the pre-commit metal
+        # / O2 totals to route the per-tick cathode delta into the
+        # condenser stages (matches pre-flip behaviour: routing keys
+        # off the per-tick increment in process.metal_phase, not the
+        # legacy result dict).  commit_batch is still the ONLY writable
+        # path into the AtomLedger for ELECTROLYSIS_STEP.
+        kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'voltage_V': float(voltage_V),
                 'current_A': float(current_A),
@@ -257,19 +259,15 @@ class ExtractionMixin:
         o2_before_kg = self._ledger_account_species_kg(
             'terminal.oxygen_mre_anode_stored', 'O2')
 
-        # commit_batch is the ONLY writable path into the AtomLedger
-        # for the MRE oxide -> metal + anode O2 transition after this
-        # flip. The kernel re-validates intent authority, the account
-        # filter, and atom balance against the registry's authoritative
-        # provider for ELECTROLYSIS_STEP (defence in depth matching the
-        # EVAPORATION_TRANSITION / CONDENSATION_ROUTE patterns).  No
-        # direct self.atom_ledger.apply / .record happens from this
-        # method anymore.
         proposal = kernel_result.transition
         if proposal is not None:
-            self._chem_kernel.commit_batch(
+            self._commit_proposal(
                 ChemistryIntent.ELECTROLYSIS_STEP, proposal,
             )
+        else:
+            # F-A4: no-op dispatch counter mirrors the
+            # _dispatch_and_commit helper's behaviour at split sites.
+            self._chem_no_op_dispatch_count += 1
 
         # Route cathode metals to condenser stages (product ledger).    [Step 4]
         # Same pattern as C6 thermite — condenser train serves as the
@@ -455,10 +453,11 @@ class ExtractionMixin:
         if self.shuttle_K_inventory_kg <= 0.01:
             return  # No K available
 
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: dispatch + commit through the shared helper.  The
+        # kernel's commit_batch path is still the ONLY writable entry
+        # into the AtomLedger for METALLOTHERMIC_STEP.
+        kernel_result = self._dispatch_and_commit(
             ChemistryIntent.METALLOTHERMIC_STEP,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_K,
                 'reagent_available_kg': float(
@@ -467,20 +466,8 @@ class ExtractionMixin:
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
-        proposal = kernel_result.transition
-        if proposal is None:
+        if kernel_result.transition is None:
             return
-
-        # commit_batch is the ONLY writable path into the AtomLedger
-        # for the C3 K-shuttle transition after this flip. The kernel
-        # re-validates intent authority, the account filter, and atom
-        # balance against the registry's authoritative provider for
-        # METALLOTHERMIC_STEP (defence in depth matching the prior
-        # authoritative-intent flips).  No direct self.atom_ledger.apply
-        # / .record happens from this method anymore.
-        self._chem_kernel.commit_batch(
-            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
-        )
 
         # Fe produced goes to condenser Stage 1 (liquid Fe drains to sump)
         self._project_condensed_species(
@@ -532,10 +519,9 @@ class ExtractionMixin:
         if self.shuttle_Na_inventory_kg <= 0.01:
             return
 
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: dispatch + commit through the shared helper.
+        kernel_result = self._dispatch_and_commit(
             ChemistryIntent.METALLOTHERMIC_STEP,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_NA,
                 'reagent_available_kg': float(
@@ -544,13 +530,8 @@ class ExtractionMixin:
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
-        proposal = kernel_result.transition
-        if proposal is None:
+        if kernel_result.transition is None:
             return
-
-        self._chem_kernel.commit_batch(
-            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
-        )
 
         # Cr / Ti products go to condenser Stage 1 (liquid-metal sump).
         # Project both unconditionally; the projection helper is a
@@ -675,11 +656,15 @@ class ExtractionMixin:
 
         # ------------------------------------------------------------------
         # Pass 1: primary thermite reaction (3 Mg + Al2O3 -> 3 MgO + 2 Al).
+        #
+        # F-B1: the _dispatch_only / _commit_proposal split lets the
+        # caller gate the commit on a "primary produced a proposal"
+        # check.  When the kernel returns ``transition is None`` we
+        # short-circuit BEFORE the back-reduction pass (no primary
+        # means nothing for the cascade to consume).
         # ------------------------------------------------------------------
-        primary_result = self._chem_kernel.dispatch(
+        primary_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'reagent_available_kg': float(
@@ -690,9 +675,11 @@ class ExtractionMixin:
         primary_diag = dict(primary_result.diagnostic or {})
         primary_proposal = primary_result.transition
         if primary_proposal is None:
+            # F-A4: counter mirrors the _dispatch_and_commit helper.
+            self._chem_no_op_dispatch_count += 1
             return
 
-        self._chem_kernel.commit_batch(
+        self._commit_proposal(
             ChemistryIntent.METALLOTHERMIC_STEP, primary_proposal,
         )
 
@@ -705,12 +692,13 @@ class ExtractionMixin:
         # Pass 2: back-reduction cascade (4 Al + 3 SiO2 -> 2 Al2O3 + 3 Si),
         # if SiO2 / Al gates open.  The provider re-runs its own gate
         # internally; this method just orchestrates the second dispatch
-        # and updates the local kg counters.
+        # and updates the local kg counters.  Split helpers again: the
+        # cascade may legitimately return ``transition is None`` (no
+        # SiO2 to back-reduce), which still needs to drive the Al
+        # snapshot bookkeeping below.
         # ------------------------------------------------------------------
-        back_result = self._chem_kernel.dispatch(
+        back_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'back_reduction': True,
@@ -722,9 +710,17 @@ class ExtractionMixin:
         back_diag = dict(back_result.diagnostic or {})
         back_proposal = back_result.transition
         if back_proposal is not None:
-            self._chem_kernel.commit_batch(
+            self._commit_proposal(
                 ChemistryIntent.METALLOTHERMIC_STEP, back_proposal,
             )
+        else:
+            # F-A4: no-op dispatch counter mirrors the
+            # _dispatch_and_commit helper.  A SiO2-poor melt or an
+            # Al-depleted state legitimately yields no back-reduction
+            # transition; the counter lets a replay tool see that the
+            # second dispatch fired and returned no-op rather than was
+            # skipped at the caller.
+            self._chem_no_op_dispatch_count += 1
 
             # Si product → condenser Stage 2
             self._project_condensed_species(

@@ -88,6 +88,8 @@ from simulator.melt_backend.sulfsat import (
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
+    IntentResult,
+    LedgerTransitionProposal,
     ProviderRegistry,
 )
 # BuiltinVaporPressureProvider is imported lazily inside
@@ -271,16 +273,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.atom_ledger = self._new_atom_ledger()
 
         # --- Chemistry-engine kernel ---
-        # Single instantiation point: the registry + kernel created here
-        # are reused by every subsequent intent flip in
-        # \goal BUILTIN-ENGINE-EXTRACTION (#7). VAPOR_PRESSURE is the only
-        # intent wired today (this commit); EVAPORATION_FLUX,
-        # CONDENSATION_ROUTE, ELECTROLYSIS_STEP, METALLOTHERMIC_STEP,
-        # STAGE0_PRETREATMENT will register on top of this same kernel.
-        # The kernel must be rebuilt whenever the ledger is rebuilt (see
-        # load_batch); rebuild via _build_chemistry_kernel().
+        # Per F-B6 (Cluster B cleanup): the kernel facade is built lazily
+        # by :meth:`_seed_atom_ledger` (triggered from :meth:`load_batch`).
+        # Constructing it at __init__ time against an empty ledger was a
+        # wasted build whose shadow trace baseline did not match the one
+        # the post-load_batch kernel started with (only _seed_atom_ledger
+        # called ``clear_shadow_trace``).  The provider registry IS
+        # lifetime-scoped and stays here -- it persists across batches
+        # and is reused by every kernel rebuild.
+        #
+        # Any dispatch attempt before ``load_batch`` raises (see
+        # :meth:`_require_chem_kernel`).
         self._chem_registry: ProviderRegistry = ProviderRegistry()
-        self._chem_kernel: ChemistryKernel = self._build_chemistry_kernel()
+        self._chem_kernel: Optional[ChemistryKernel] = None
+        # F-A4: counter for CONDENSATION_ROUTE (and other) dispatches
+        # where the kernel returned ``transition is None``.  A replay
+        # tool sees how many no-op dispatches happened without polluting
+        # the planner's shadow trace.  Reset by ``_seed_atom_ledger``.
+        self._chem_no_op_dispatch_count: int = 0
         # Parity flag from the VAPOR_PRESSURE flip in
         # \goal BUILTIN-ENGINE-EXTRACTION (#7). The shadow comparator
         # that validated builtin-vs-kernel parity across a full smoke run
@@ -613,6 +623,84 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             account_policies=self._backend_account_policies(),
         )
 
+    # ------------------------------------------------------------------
+    # F-B7: Table-driven builtin provider registration.
+    #
+    # Each row is ``(import_module, class_name, [intents],
+    # needs_vapor_pressures, doc)``.  Mirrors the seven kernel-authoritative
+    # builtin intents wired by ``\goal BUILTIN-ENGINE-EXTRACTION`` (#7);
+    # the ordering matches the historical straight-line block so any
+    # reviewer diff stays stable.  Adding a builtin engine = one new row
+    # here; no changes to ``_build_chemistry_kernel`` itself.
+    #
+    # ``needs_vapor_pressures`` is the lone provider-injection flag --
+    # VAPOR_PRESSURE is the only builtin that needs simulator-owned data
+    # (vapor_pressures.yaml).  Everything else is stateless and consumes
+    # per-call inputs via control_inputs.
+    # ------------------------------------------------------------------
+    _BUILTIN_PROVIDER_REGISTRATIONS: tuple[
+        tuple[str, str, tuple[ChemistryIntent, ...], bool, str], ...
+    ] = (
+        (
+            'engines.builtin.vapor_pressure',
+            'BuiltinVaporPressureProvider',
+            (ChemistryIntent.VAPOR_PRESSURE,),
+            True,
+            'VAPOR_PRESSURE -- vapor_pressures.yaml-driven Antoine '
+            'projection (READ-ONLY: no LedgerTransitionProposal).',
+        ),
+        (
+            'engines.builtin.evaporation_flux',
+            'BuiltinEvaporationFluxProvider',
+            (ChemistryIntent.EVAPORATION_FLUX,),
+            False,
+            'EVAPORATION_FLUX -- Hertz-Knudsen-Langmuir per-species '
+            'flux (READ-ONLY).',
+        ),
+        (
+            'engines.builtin.evaporation_transition',
+            'BuiltinEvaporationTransitionProvider',
+            (ChemistryIntent.EVAPORATION_TRANSITION,),
+            False,
+            'EVAPORATION_TRANSITION -- AUTHORITATIVE: debits '
+            'cleaned_melt, credits overhead_gas + condensation_train.',
+        ),
+        (
+            'engines.builtin.condensation_route',
+            'BuiltinCondensationRouteProvider',
+            (ChemistryIntent.CONDENSATION_ROUTE,),
+            False,
+            'CONDENSATION_ROUTE -- AUTHORITATIVE: debits overhead_gas, '
+            'credits condensation_train with SiO disproportionation.',
+        ),
+        (
+            'engines.builtin.electrolysis_step',
+            'BuiltinElectrolysisStepProvider',
+            (ChemistryIntent.ELECTROLYSIS_STEP,),
+            False,
+            'ELECTROLYSIS_STEP -- AUTHORITATIVE: MRE Nernst/Faraday; '
+            'debits cleaned_melt, credits metal_phase + '
+            'terminal.oxygen_mre_anode_stored.',
+        ),
+        (
+            'engines.builtin.metallothermic_step',
+            'BuiltinMetallothermicStepProvider',
+            (ChemistryIntent.METALLOTHERMIC_STEP,),
+            False,
+            'METALLOTHERMIC_STEP -- AUTHORITATIVE: Na/K shuttle + Mg '
+            'thermite (single intent, three reaction families).',
+        ),
+        (
+            'engines.builtin.stage0_pretreatment',
+            'BuiltinStage0PretreatmentProvider',
+            (ChemistryIntent.STAGE0_PRETREATMENT,),
+            False,
+            'STAGE0_PRETREATMENT -- AUTHORITATIVE: volatile/salt/'
+            'sulfide/halide cleanup (single intent, four reaction '
+            'families).',
+        ),
+    )
+
     def _build_chemistry_kernel(self) -> ChemistryKernel:
         """Construct the kernel pointing at the current ledger + registry.
 
@@ -620,139 +708,169 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ``self.atom_ledger`` per batch (the species-formula registry can
         also change with feedstock). The provider registry persists for
         the lifetime of the simulator; only the kernel facade is rebuilt.
+
+        F-B7 (Cluster B): replaces the prior 7-call straight-line
+        ``register_idempotent`` block with the
+        :data:`_BUILTIN_PROVIDER_REGISTRATIONS` table.  Same provider
+        set, same registration order, same authority -- the table is
+        the single source of truth so a new builtin engine adds one
+        row instead of a new ``register_idempotent`` call.
+
+        Each ``register_idempotent`` invocation is a no-op on subsequent
+        batches once the simulator has registered the provider for the
+        intent (the registry persists; only the kernel facade is rebuilt
+        per batch).  Conflicting authoritative registrations for an
+        intent still raise -- idempotence covers "same provider, same
+        authority", never silent provider swaps.
         """
 
-        # Lazy import to break the package-init cycle (see header comment
-        # on the chemistry-kernel imports above).
-        from engines.builtin.condensation_route import (
-            BuiltinCondensationRouteProvider,
-        )
-        from engines.builtin.electrolysis_step import (
-            BuiltinElectrolysisStepProvider,
-        )
-        from engines.builtin.evaporation_flux import (
-            BuiltinEvaporationFluxProvider,
-        )
-        from engines.builtin.evaporation_transition import (
-            BuiltinEvaporationTransitionProvider,
-        )
-        from engines.builtin.metallothermic_step import (
-            BuiltinMetallothermicStepProvider,
-        )
-        from engines.builtin.stage0_pretreatment import (
-            BuiltinStage0PretreatmentProvider,
-        )
-        from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        # Lazy imports break the package-init cycle (see header comment
+        # on the chemistry-kernel imports above): doing the imports
+        # inside the loop keeps the registration table the single
+        # source of truth for which builtins exist.
+        import importlib
 
-        # Each ``register_idempotent`` call is a no-op on subsequent
-        # batches once the simulator has registered the provider for
-        # that intent (the registry persists; only the kernel facade is
-        # rebuilt per batch).  Conflicting authoritative registrations
-        # for an intent still raise -- idempotence covers "same
-        # provider, same authority", never silent provider swaps.
-        # \goal BUILTIN-ENGINE-EXTRACTION (#7) flips:
-        self._chem_registry.register_idempotent(
-            BuiltinVaporPressureProvider(self.vapor_pressures),
-            [ChemistryIntent.VAPOR_PRESSURE],
-        )
-        # EVAPORATION_FLUX -- stateless; per-call inputs (vapor
-        # pressures, overhead partials, surface area, stoich) arrive
-        # via control_inputs from _calculate_evaporation.
-        self._chem_registry.register_idempotent(
-            BuiltinEvaporationFluxProvider(),
-            [ChemistryIntent.EVAPORATION_FLUX],
-        )
-        # EVAPORATION_TRANSITION -- FIRST authoritative ledger-mutating
-        # intent in the migration. Provider emits LedgerTransitionProposal;
-        # kernel's commit_batch writes the AtomLedger.  Per-call inputs
-        # (rate_kg_hr, remaining_kg_hr, stoich, sp_data, dt_hr,
-        # available_kg) arrive via control_inputs from
-        # _credit_evaporation_transition.
-        self._chem_registry.register_idempotent(
-            BuiltinEvaporationTransitionProvider(),
-            [ChemistryIntent.EVAPORATION_TRANSITION],
-        )
-        # CONDENSATION_ROUTE -- SECOND authoritative ledger-mutating
-        # intent. Provider emits LedgerTransitionProposal that debits
-        # process.overhead_gas (vapor) and credits
-        # process.condensation_train (deposit, with SiO disproportionation
-        # to Si + SiO2 when sp_data declares the product map). Per-call
-        # inputs (species, condensed_kg, sp_data, dt_hr) arrive via
-        # control_inputs from _route_to_condensation; the legacy
-        # CondensationModel.route() projection is consumed at the caller
-        # to derive per-species condensed_kg before dispatch.
-        self._chem_registry.register_idempotent(
-            BuiltinCondensationRouteProvider(),
-            [ChemistryIntent.CONDENSATION_ROUTE],
-        )
-        # ELECTROLYSIS_STEP -- THIRD authoritative ledger-mutating
-        # intent (MRE: Nernst voltage, Faraday's law, current
-        # efficiency). Provider debits process.cleaned_melt (oxide
-        # consumed), credits process.metal_phase (cathode metal) and
-        # terminal.oxygen_mre_anode_stored (anode O2 in its own bin --
-        # distinct from melt-offgas and Stage 0 per AGENTS.md #6).
-        # Per-call inputs (voltage_V, current_A, dt_hr) arrive via
-        # control_inputs from _step_mre; the melt composition flows
-        # through the kernel's ProviderAccountView so the provider
-        # stays stateless.  Energy stays in the provider's diagnostic
-        # (NOT in the ledger) -- consumed by EnergyTracker via the
-        # _mre_energy_this_hr counter as before.
-        self._chem_registry.register_idempotent(
-            BuiltinElectrolysisStepProvider(),
-            [ChemistryIntent.ELECTROLYSIS_STEP],
-        )
-        # METALLOTHERMIC_STEP -- FOURTH authoritative ledger-mutating
-        # intent (Na/K shuttle + Mg thermite, binding spec §2). Provider
-        # debits process.reagent_inventory (alkali/Mg consumed) +
-        # process.cleaned_melt (oxide reduced) and credits
-        # process.cleaned_melt (alkali-oxide / MgO / regenerated Al2O3)
-        # + process.metal_phase (Fe/Cr/Ti/Al/Si).  Per-call inputs
-        # (reaction_family, reagent_available_kg, dt_hr, optional
-        # back_reduction + mol_Al_produced for the C6 cascade) arrive
-        # via control_inputs from _shuttle_inject_K / _shuttle_inject_Na
-        # / _step_thermite.  Single intent, three reaction families via
-        # discriminator (c3_k_shuttle, c3_na_shuttle, c6_mg_thermite);
-        # the C6 back-reduction is a second dispatch on the same intent
-        # so each chemical reaction stays a single atom-balanced
-        # LedgerTransition, matching the legacy two-transition shape
-        # for the thermite + cascade pair.
-        self._chem_registry.register_idempotent(
-            BuiltinMetallothermicStepProvider(),
-            [ChemistryIntent.METALLOTHERMIC_STEP],
-        )
-        # STAGE0_PRETREATMENT -- FIFTH (and final builtin) authoritative
-        # ledger-mutating intent (volatile / salt / sulfide / halide
-        # cleanup, binding spec §2). Provider debits the Stage 0 feed /
-        # reservoir buckets (process.stage0_volatile_feed,
-        # process.stage0_salt_feed, process.stage0_carbon_reductant,
-        # process.stage0_perchlorate_feed, reservoir.stage0_oxidant,
-        # reservoir.stage0_process_gas) and credits the Stage 0 sinks
-        # (terminal.offgas, terminal.stage0_salt_phase,
-        # terminal.oxygen_stage0_stored).  Per-call inputs
-        # (reaction_family, plus the legacy spec payload: species /
-        # feed_kg / products_kg / oxidant_kg / debits /
-        # salt_products_kg / oxygen_products_kg) arrive via
-        # control_inputs from _record_stage0_*_transitions.  Single
-        # intent, four reaction families via discriminator
-        # (complete_oxidation, sulfate_carbon, boudouard, perchlorate)
-        # -- one dispatch per legacy spec entry preserves the legacy
-        # one-transition-per-spec shape so each chemical reaction is a
-        # single atom-balanced LedgerTransition.
-        #
-        # The SulfSat post-equilibrium gate (PySulfSat) stays where it
-        # was wired in by goal #4 (simulator/melt_backend/sulfsat.py +
-        # core.py::_attach_post_equilibrium_sulfsat); the Stage 0 flip
-        # changes ONLY where the cleanup transitions are built, not
-        # where the SulfSat diagnostic attaches.
-        self._chem_registry.register_idempotent(
-            BuiltinStage0PretreatmentProvider(),
-            [ChemistryIntent.STAGE0_PRETREATMENT],
-        )
+        for (
+            module_path,
+            class_name,
+            intents,
+            needs_vapor_pressures,
+            _doc,
+        ) in self._BUILTIN_PROVIDER_REGISTRATIONS:
+            provider_cls = getattr(
+                importlib.import_module(module_path), class_name)
+            provider = (
+                provider_cls(self.vapor_pressures)
+                if needs_vapor_pressures
+                else provider_cls()
+            )
+            self._chem_registry.register_idempotent(provider, list(intents))
+
         return ChemistryKernel(
             ledger=self.atom_ledger,
             registry=self._chem_registry,
             species_formula_registry=self.species_formula_registry,
         )
+
+    # ------------------------------------------------------------------
+    # F-B1: Dispatch helpers
+    #
+    # The pre-cleanup code repeated the
+    #   kernel_result = self._chem_kernel.dispatch(intent, T=..., P=...,
+    #       control_inputs={...})
+    #   proposal = kernel_result.transition
+    #   if proposal is not None:
+    #       self._chem_kernel.commit_batch(intent, proposal)
+    # idiom at 9 ledger-mutating call sites across simulator/{core,
+    # evaporation,extraction}.py, and the temperature/pressure pull
+    # from ``self.melt`` was identical at every site.  Two helpers
+    # collapse the boilerplate while preserving the pre/post bookkeeping
+    # interleave that the MRE + thermite back-reduction need.
+    #
+    # ``_dispatch_and_commit`` covers the 9 simple sites; it dispatches
+    # the intent, commits the proposal if one was returned, increments
+    # the F-A4 no-op counter when the kernel skipped, and returns the
+    # ``IntentResult`` so callers can read diagnostics.
+    #
+    # ``_dispatch_only`` + ``_commit_proposal`` are the split form: the
+    # MRE site needs to capture per-account balances BEFORE the commit
+    # (so the post-commit delta isolates THIS tick's transfer), and the
+    # thermite back-reduction needs to gate the commit on a separate
+    # condition.  Both call sites use the split helpers so the
+    # bookkeeping can sit between them.
+    #
+    # Read-only intents (VAPOR_PRESSURE, EVAPORATION_FLUX) skip the
+    # commit entirely; ``_dispatch_only`` handles them too -- the
+    # helper is the single gateway into ``self._chem_kernel.dispatch``
+    # from every simulator call site.
+    # ------------------------------------------------------------------
+    def _require_chem_kernel(self) -> ChemistryKernel:
+        """Return the active kernel; raise if no batch has been loaded.
+
+        F-B6 (Cluster B): ``__init__`` no longer pre-builds a kernel
+        against an empty ledger; ``load_batch -> _seed_atom_ledger``
+        is the single construction point.  Catching the pre-load
+        dispatch path here turns the failure into a clear
+        ``RuntimeError`` instead of an ``AttributeError`` on ``None``.
+        """
+        kernel = self._chem_kernel
+        if kernel is None:
+            raise RuntimeError(
+                'ChemistryKernel has not been built yet; '
+                'PyrolysisSimulator.load_batch must run before any '
+                'kernel dispatch (the kernel is constructed lazily by '
+                '_seed_atom_ledger, which load_batch invokes).'
+            )
+        return kernel
+
+    def _dispatch_only(
+        self,
+        intent: ChemistryIntent,
+        *,
+        control_inputs: Mapping[str, Any],
+    ) -> IntentResult:
+        """Dispatch one intent through the kernel with melt-derived controls.
+
+        Pulls ``temperature_C`` and ``pressure_bar`` from ``self.melt``
+        so every site quotes the same source-of-truth state (no
+        per-site re-derivation drift).  Returns the ``IntentResult``
+        unchanged -- including ``transition``, ``diagnostic``,
+        ``warnings``.
+
+        F-B1: this is the dispatch half of the pre/post-interleave
+        split.  Use :meth:`_dispatch_and_commit` instead when the site
+        does NOT need bookkeeping between dispatch and commit.
+        """
+        kernel = self._require_chem_kernel()
+        return kernel.dispatch(
+            intent,
+            temperature_C=float(self.melt.temperature_C),
+            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            control_inputs=control_inputs,
+        )
+
+    def _commit_proposal(
+        self,
+        intent: ChemistryIntent,
+        proposal: LedgerTransitionProposal,
+    ) -> None:
+        """Commit a proposal returned by :meth:`_dispatch_only`.
+
+        F-B1: the commit half of the pre/post-interleave split.  The
+        kernel re-runs the full pre-commit validator stack inside
+        ``commit_batch`` (defence in depth) so this helper stays a
+        thin pass-through.
+        """
+        kernel = self._require_chem_kernel()
+        kernel.commit_batch(intent, proposal)
+
+    def _dispatch_and_commit(
+        self,
+        intent: ChemistryIntent,
+        *,
+        control_inputs: Mapping[str, Any],
+    ) -> IntentResult:
+        """Dispatch + (if a proposal is returned) commit, in one call.
+
+        F-B1: the simple-site helper covering the 9 dispatch+commit
+        callers.  If the provider returns ``transition is None`` the
+        per-batch ``_chem_no_op_dispatch_count`` is bumped (F-A4) so a
+        replay tool can distinguish "kernel skipped" from "called and
+        no-op".  The caller still owns post-commit projection /
+        snapshot bookkeeping; the helper only handles the kernel-facing
+        plumbing.
+        """
+        result = self._dispatch_only(intent, control_inputs=control_inputs)
+        proposal = result.transition
+        if proposal is None:
+            # F-A4: counter ticks once per "called and no-op" dispatch.
+            # Cheap (single int increment); the planner's shadow trace
+            # stays untouched so existing trace replay tools keep their
+            # current invariants.
+            self._chem_no_op_dispatch_count += 1
+            return result
+        self._commit_proposal(intent, proposal)
+        return result
 
     def _seed_atom_ledger(
         self,
@@ -775,6 +893,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # shadow trace would otherwise accumulate without bound across
         # campaigns / loop sessions.
         self._chem_kernel.clear_shadow_trace()
+        # F-A4: the per-batch no-op dispatch counter mirrors the shadow
+        # trace lifetime -- a fresh batch starts from zero.
+        self._chem_no_op_dispatch_count = 0
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
             self._stage0_oxidation_transition_specs(feedstock))
@@ -991,10 +1112,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     source=f'{label} Stage 0 controlled O2 oxidant',
                 )
 
-            kernel_result = self._chem_kernel.dispatch(
+            # F-B1: dispatch + commit through the shared helper.  The
+            # kernel's commit_batch path is still the ONLY writable
+            # entry into the AtomLedger for STAGE0_PRETREATMENT.
+            self._dispatch_and_commit(
                 ChemistryIntent.STAGE0_PRETREATMENT,
-                temperature_C=float(self.melt.temperature_C),
-                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_COMPLETE_OXIDATION,
                     'species': species,
@@ -1002,19 +1124,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'products_kg': products_kg,
                     'oxidant_kg': oxidant_kg,
                 },
-            )
-            proposal = kernel_result.transition
-            if proposal is None:
-                continue
-            # commit_batch is the ONLY writable path into the AtomLedger
-            # for the Stage 0 complete-oxidation transition after this
-            # flip. The kernel re-validates intent authority, the account
-            # filter, and atom balance against the registry's authoritative
-            # provider for STAGE0_PRETREATMENT (defence in depth matching
-            # the prior authoritative-intent flips).  No direct
-            # self.atom_ledger.record happens from this method anymore.
-            self._chem_kernel.commit_batch(
-                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     def _record_stage0_carbon_cleanup_transitions(
@@ -1079,21 +1188,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not debits_payload:
                 continue
 
-            kernel_result = self._chem_kernel.dispatch(
+            # F-B1: dispatch + commit through the shared helper.
+            self._dispatch_and_commit(
                 ChemistryIntent.STAGE0_PRETREATMENT,
-                temperature_C=float(self.melt.temperature_C),
-                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
                 control_inputs={
                     'reaction_family': family,
                     'debits': tuple(debits_payload),
                     'products_kg': dict(spec.get('products_kg') or {}),
                 },
-            )
-            proposal = kernel_result.transition
-            if proposal is None:
-                continue
-            self._chem_kernel.commit_batch(
-                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     def _record_stage0_perchlorate_cleanup_transitions(
@@ -1138,10 +1240,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not debits_payload:
                 continue
 
-            kernel_result = self._chem_kernel.dispatch(
+            # F-B1: dispatch + commit through the shared helper.
+            self._dispatch_and_commit(
                 ChemistryIntent.STAGE0_PRETREATMENT,
-                temperature_C=float(self.melt.temperature_C),
-                pressure_bar=max(self.melt.p_total_mbar / 1000.0, 1.0e-6),
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_PERCHLORATE,
                     'debits': tuple(debits_payload),
@@ -1150,12 +1251,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'oxygen_products_kg': dict(
                         spec.get('oxygen_products_kg') or {}),
                 },
-            )
-            proposal = kernel_result.transition
-            if proposal is None:
-                continue
-            self._chem_kernel.commit_batch(
-                ChemistryIntent.STAGE0_PRETREATMENT, proposal,
             )
 
     # ------------------------------------------------------------------
@@ -1456,6 +1551,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return self._record_equilibrium_status(self._stub_equilibrium())
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
+            # WRITER-EXEMPT: backend-equilibrium ledger transition
+            # (validated against BACKEND_LEDGER_TRANSITION_NAMES +
+            # BACKEND_REACTIVE_ACCOUNTS allowlists by
+            # _validate_backend_ledger_transition above; see
+            # binding-spec §3 -- the legacy equilibrium-backend path
+            # owns its own LedgerTransition vocabulary and writes
+            # directly).  The writer-purity test recognises this exact
+            # call as a tagged exemption.
             self.atom_ledger.apply(transition)
             self._project_cleaned_melt_from_atom_ledger()
         return self._record_equilibrium_status(result)
@@ -1515,10 +1618,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if T_C + 273.15 < 400:
             return
 
-        kernel_result = self._chem_kernel.dispatch(
+        # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
+        # The dispatch-only helper still routes melt-derived T/P through
+        # the same single path the rest of the simulator uses.
+        kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
-            temperature_C=T_C,
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             control_inputs={'pO2_bar': self._commanded_pO2_bar()},
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -2773,18 +2877,72 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg > 1e-12 and species != OXYGEN_SPECIES
         }
 
+    # ------------------------------------------------------------------
+    # F-A2: Terminal-routing writer (single chemistry-exempt entry point).
+    #
+    # The four interim-to-terminal account moves below are NOT chemistry
+    # transitions -- they shuffle already-balanced species between
+    # process / terminal accounts (overhead_gas -> terminal.offgas;
+    # overhead_gas -> OXYGEN_MELT_OFFGAS_ACCOUNT;
+    # overhead_gas -> OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT;
+    # OXYGEN_MELT_OFFGAS_ACCOUNT -> OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT).
+    # They share the ``LedgerTransition.move`` shape, so a single helper
+    # centralises the writer-purity exemption to one labelled spot --
+    # ``tests/chemistry/test_writer_purity.py`` enforces this as the
+    # ONLY ``atom_ledger.apply`` writer in ``simulator/`` outside the
+    # kernel and melt_backend subtrees.
+    #
+    # Binding spec §3: the chemistry kernel owns the commit_batch path
+    # for atom-balanced chemistry transitions; the move-shaped
+    # transfers below are vocabulary-preserving routing and do NOT
+    # require a ChemistryProvider authoritative for any intent.
+    # ------------------------------------------------------------------
+    # WRITER-EXEMPT: terminal-routing move (no chemistry transition); see
+    # binding-spec §3.  This is the SINGLE atom_ledger.apply path used by
+    # the simulator's interim-to-terminal account routing helpers; the
+    # writer purity test asserts no other tagged call sites exist
+    # outside simulator/chemistry/kernel/ and simulator/melt_backend/.
+    def _drain_to_terminal(
+        self,
+        name: str,
+        source_account: str,
+        target_account: str,
+        species_kg: Mapping[str, float],
+        *,
+        reason: str,
+    ) -> None:
+        """Route ``species_kg`` from ``source_account`` to ``target_account``.
+
+        Single chemistry-exempt writer for the four terminal-routing
+        sites (`_drain_overhead_gas_to_terminal`,
+        `_route_overhead_oxygen_to_terminal` × 2 internal moves,
+        `_debit_vented_oxygen`).  All four sites previously called
+        ``self.atom_ledger.apply(LedgerTransition.move(...))`` directly;
+        the helper centralises the exemption so the writer-purity test
+        can audit one spot instead of four.
+        """
+        # WRITER-EXEMPT: terminal-routing move (no chemistry transition);
+        # see binding-spec §3.
+        self.atom_ledger.apply(
+            LedgerTransition.move(
+                name,
+                source_account,
+                target_account,
+                dict(species_kg),
+                reason=reason,
+            )
+        )
+
     def _drain_overhead_gas_to_terminal(self) -> None:
         gas_kg = self._overhead_gas_totals()
         if not gas_kg:
             return
-        self.atom_ledger.apply(
-            LedgerTransition.move(
-                f'drain_overhead_gas_{self.melt.hour}',
-                'process.overhead_gas',
-                'terminal.offgas',
-                gas_kg,
-                reason='overhead vapor stream leaves current-tick gas volume',
-            )
+        self._drain_to_terminal(
+            f'drain_overhead_gas_{self.melt.hour}',
+            'process.overhead_gas',
+            'terminal.offgas',
+            gas_kg,
+            reason='overhead vapor stream leaves current-tick gas volume',
         )
 
     def _route_overhead_oxygen_to_terminal(self, vented_kg: float) -> None:
@@ -2798,25 +2956,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"{overhead_kg:.12g} kg is in process.overhead_gas"
             )
         if vented_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            self.atom_ledger.apply(
-                LedgerTransition.move(
-                    'vent_overhead_oxygen',
-                    'process.overhead_gas',
-                    OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
-                    {OXYGEN_SPECIES: vented_kg},
-                    reason='overhead O2 vented to vacuum by gas train',
-                )
+            self._drain_to_terminal(
+                'vent_overhead_oxygen',
+                'process.overhead_gas',
+                OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
+                {OXYGEN_SPECIES: vented_kg},
+                reason='overhead O2 vented to vacuum by gas train',
             )
         stored_kg = max(0.0, overhead_kg - vented_kg)
         if stored_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            self.atom_ledger.apply(
-                LedgerTransition.move(
-                    'store_overhead_oxygen',
-                    'process.overhead_gas',
-                    OXYGEN_MELT_OFFGAS_ACCOUNT,
-                    {OXYGEN_SPECIES: stored_kg},
-                    reason='overhead O2 stored by gas train',
-                )
+            self._drain_to_terminal(
+                'store_overhead_oxygen',
+                'process.overhead_gas',
+                OXYGEN_MELT_OFFGAS_ACCOUNT,
+                {OXYGEN_SPECIES: stored_kg},
+                reason='overhead O2 stored by gas train',
             )
         self._sync_oxygen_kg_counters()
 
@@ -2841,14 +2995,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"cannot vent {vented_kg:.12g} kg O2; only "
                 f"{stored_kg:.12g} kg is in {OXYGEN_MELT_OFFGAS_ACCOUNT}"
             )
-        self.atom_ledger.apply(
-            LedgerTransition.move(
-                'vent_terminal_oxygen',
-                OXYGEN_MELT_OFFGAS_ACCOUNT,
-                OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
-                {OXYGEN_SPECIES: vented_kg},
-                reason='O2 vented to vacuum',
-            )
+        self._drain_to_terminal(
+            'vent_terminal_oxygen',
+            OXYGEN_MELT_OFFGAS_ACCOUNT,
+            OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
+            {OXYGEN_SPECIES: vented_kg},
+            reason='O2 vented to vacuum',
         )
         for stage in self.train.stages:
             stage.collected_kg.pop(OXYGEN_SPECIES, None)
