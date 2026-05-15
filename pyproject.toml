@@ -57,3 +57,20 @@ dev = ["pytest>=8.0"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+# Explicit package layout. Auto-discovery works for this repo today, but
+# enumerating the simulator subpackages here documents the on-disk tree
+# (and pins what counts as "the simulator") -- especially useful as the
+# `simulator.chemistry.kernel` scaffold lands ahead of any wiring.
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "simulator*",
+    "simulator.accounting*",
+    "simulator.melt_backend*",
+    "simulator.chemistry*",
+    "simulator.chemistry.kernel*",
+    "engines*",
+    "web*",
+]
+exclude = ["tests*", "docs*", "docs-private*", ".claude*"]
