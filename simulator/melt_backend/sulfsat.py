@@ -25,6 +25,14 @@ The underlying PySulfSat (`Wieser & Gleeson 2023`) calls are:
 * :func:`PySulfSat.calculate_fo2_QFM_buffers` — computes the absolute
   logfO2 of QFM at given T, P; subtract the simulator's absolute
   ``fO2_log`` from QFM (O'Neill 1987 formulation) to obtain ΔQFM.
+* :func:`PySulfSat.convert_fo2_to_fe_partition` — Kress & Carmichael
+  (1991) ``ln(XFe2O3/XFeO)`` fit used to derive ``Fe3Fet_Liq`` from the
+  absolute fO2, T, P, and bulk composition. Smythe 2017 SCSS requires
+  this column; the adapter mirrors the AlphaMELTS redox-policy pattern
+  (``simulator/melt_backend/alphamelts.py``) by accepting an explicit
+  operator-set ``Fe3Fet_Liq`` and falling back to Kress-Carmichael when
+  the operator did not pin a value. There is no silent default — if
+  both paths fail the result is tagged ``out_of_range``.
 
 The simulator passes the cleaned-melt oxide composition in wt%; the
 adapter renames the oxide keys onto PySulfSat's ``*_Liq`` vocabulary
@@ -216,6 +224,7 @@ class SulfSatGate:
         P_bar: float,
         fO2_log: float,
         S_input_ppm: float,
+        Fe3Fet_Liq: Optional[float] = None,
     ) -> SulfurSaturationResult:
         """
         Run SCSS/SCAS + Jugo (2010) S6+/S_total on the given melt state.
@@ -229,6 +238,27 @@ class SulfSatGate:
         empty composition, or a non-numeric ``T_K`` / ``P_bar`` all
         return a deterministic ``'unavailable'`` result rather than
         raising.
+
+        Redox policy
+        ------------
+        Smythe 2017 SCSS requires a ``Fe3Fet_Liq`` column. The gate
+        mirrors the AlphaMELTS redox-policy pattern in
+        ``simulator/melt_backend/alphamelts.py``:
+
+        * If the caller passes an explicit ``Fe3Fet_Liq`` (operator
+          override), it is used verbatim after clamping to ``[0, 1]``.
+        * Otherwise the ratio is derived from ``fO2_log`` + ``T_K`` +
+          ``P_bar`` + composition via PySulfSat's
+          ``convert_fo2_to_fe_partition`` (Kress & Carmichael 1991).
+        * If the derivation raises or produces a non-finite ratio (e.g.
+          zero-iron melt or out-of-calibration extrapolation), the
+          result is tagged ``calibration_status='out_of_range'`` with an
+          explicit warning. Fe3Fet_Liq=0 is passed to SCSS so the call
+          completes, but the caller is expected to honour the status.
+
+        There is no silent default — every redox decision is either
+        operator-explicit or attributed to the Kress-Carmichael fit, and
+        the failure mode is loudly flagged rather than swallowed.
         """
         warnings_list: List[str] = []
 
@@ -258,16 +288,40 @@ class SulfSatGate:
                 calibration_status='unavailable',
             )
 
+        operator_fe3fet: Optional[float] = None
+        if Fe3Fet_Liq is not None:
+            try:
+                operator_fe3fet = float(Fe3Fet_Liq)
+            except (TypeError, ValueError) as exc:
+                return SulfurSaturationResult(
+                    warnings=[f'invalid Fe3Fet_Liq={Fe3Fet_Liq!r}: {exc!r}'],
+                    calibration_status='unavailable',
+                )
+            if not 0.0 <= operator_fe3fet <= 1.0:
+                return SulfurSaturationResult(
+                    warnings=[
+                        f'Fe3Fet_Liq={operator_fe3fet} outside [0, 1]'
+                    ],
+                    calibration_status='unavailable',
+                )
+
         in_range, range_warnings = self._check_calibration_range(liquid_comp_wt)
         warnings_list.extend(range_warnings)
         calibration_status = 'in_range' if in_range else 'out_of_range'
 
         try:
-            scss_ppm, scas_ppm, s6_fraction = self._run_pysulfsat(
+            (
+                scss_ppm,
+                scas_ppm,
+                s6_fraction,
+                redox_warnings,
+                redox_in_range,
+            ) = self._run_pysulfsat(
                 liquid_comp_wt=liquid_comp_wt,
                 T_K=T_K_f,
                 P_bar=P_bar_f,
                 fO2_log=fO2_log_f,
+                operator_fe3fet=operator_fe3fet,
             )
         except Exception as exc:  # noqa: BLE001 — upstream library boundary
             return SulfurSaturationResult(
@@ -275,6 +329,10 @@ class SulfSatGate:
                 + [f'PySulfSat call failed: {exc!r}'],
                 calibration_status='unavailable',
             )
+
+        warnings_list.extend(redox_warnings)
+        if not redox_in_range:
+            calibration_status = 'out_of_range'
 
         s_in_sulfide_ppm, s_in_sulfate_ppm = self._partition_input_S(
             S_input_ppm=S_input_ppm_f,
@@ -346,15 +404,34 @@ class SulfSatGate:
         T_K: float,
         P_bar: float,
         fO2_log: float,
-    ) -> tuple[float, float, float]:
+        operator_fe3fet: Optional[float],
+    ) -> tuple[float, float, float, List[str], bool]:
         """
         Call PySulfSat's SCSS / SCAS / S6 routines.
 
-        Returns ``(SCSS_ppm, SCAS_ppm, S6_fraction)``. Wrapped in
-        ``warnings.catch_warnings`` so RuntimeWarnings from divisions on
-        all-zero columns do not pollute pytest output (the upstream
-        library is well-behaved but emits warnings when SCAS is asked
-        about an unhydrous melt, which is the simulator's default).
+        Returns ``(SCSS_ppm, SCAS_ppm, S6_fraction, redox_warnings,
+        redox_in_range)``. Wrapped in ``warnings.catch_warnings`` so
+        RuntimeWarnings from divisions on all-zero columns do not
+        pollute pytest output (the upstream library is well-behaved but
+        emits warnings when SCAS is asked about an unhydrous melt, which
+        is the simulator's default).
+
+        ``Fe3Fet_Liq`` resolution
+        ------------------------
+        Smythe 2017 SCSS requires the ``Fe3Fet_Liq`` column. We resolve
+        it before the SCSS call so the upstream library does not raise:
+
+        * ``operator_fe3fet`` non-None -> used verbatim (clamped above).
+        * otherwise -> PySulfSat's ``convert_fo2_to_fe_partition`` with
+          ``model='Kress1991'`` (Kress & Carmichael 1991,
+          doi:10.1007/BF00307281) on the absolute ``fO2 = 10**fO2_log``
+          (bar).
+
+        If the derivation raises or returns a non-finite value the
+        result is tagged ``out_of_range`` with an explicit warning and
+        Fe3Fet_Liq=0 is passed to SCSS purely to keep the call alive —
+        the caller honours the status and falls back to the builtin
+        path.
         """
         df = self._build_dataframe(liquid_comp_wt)
         P_kbar = max(P_bar, 1e-9) / 1000.0
@@ -362,13 +439,21 @@ class SulfSatGate:
 
         ss = self._module
 
+        fe3fet_value, redox_warnings, redox_in_range = self._resolve_fe3fet(
+            df=df,
+            T_K=T_K,
+            P_kbar=P_kbar,
+            fO2_log=fO2_log,
+            operator_fe3fet=operator_fe3fet,
+        )
+        df['Fe3Fet_Liq'] = fe3fet_value
+
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             # Smythe 2017 SCSS; Fe_FeNiCu_Sulf=0.65 is the canonical
             # MORB-like sulfide default used in PySulfSat's tutorial.
-            # Fe3Fet_Liq is left at the library default; the SCSS model
-            # is Fe-redox-aware but the simulator passes its absolute
-            # fO2 separately into the Jugo S6+ partitioning step.
+            # Fe3Fet_Liq is either operator-set or Kress-Carmichael-
+            # derived (see _resolve_fe3fet) — never a silent default.
             scss_df = ss.calculate_S2017_SCSS(
                 df=df,
                 T_K=T_K,
@@ -393,7 +478,91 @@ class SulfSatGate:
         scas_ppm = max(0.0, scas_ppm)
         s6_fraction = min(1.0, max(0.0, s6_fraction))
 
-        return scss_ppm, scas_ppm, s6_fraction
+        return scss_ppm, scas_ppm, s6_fraction, redox_warnings, redox_in_range
+
+    def _resolve_fe3fet(
+        self,
+        *,
+        df: Any,
+        T_K: float,
+        P_kbar: float,
+        fO2_log: float,
+        operator_fe3fet: Optional[float],
+    ) -> tuple[float, List[str], bool]:
+        """
+        Resolve ``Fe3Fet_Liq`` for the SCSS call.
+
+        Returns ``(fe3fet, warnings, in_range)``. ``in_range`` is False
+        when the derivation could not produce a usable ratio (operator
+        absent + fit failed / non-finite); ``fe3fet`` is 0.0 in that
+        degenerate case so the SCSS call can complete, but the caller
+        honours ``calibration_status='out_of_range'``.
+
+        The Kress-Carmichael path uses PySulfSat's
+        ``convert_fo2_to_fe_partition`` which expects:
+
+        * a one-row DataFrame in the ``*_Liq`` schema (FeOt_Liq +
+          oxide_Liq columns) with a ``Sample_ID_Liq`` column the
+          function drops internally during renormalization,
+        * ``fo2`` as an absolute value (bar), i.e. ``10**fO2_log``,
+        * ``T_K`` in Kelvin and ``P_kbar`` in kbar.
+
+        Zero-FeOt melts are a degenerate boundary case: there is no
+        iron to partition, the fit returns NaN, and we report
+        ``Fe3Fet_Liq=0`` without flagging out-of-range (the SCSS result
+        is meaningless either way because the model is keyed on
+        Fe-cation fractions).
+        """
+        if operator_fe3fet is not None:
+            ratio = min(1.0, max(0.0, float(operator_fe3fet)))
+            return ratio, [], True
+
+        feot = float(df['FeOt_Liq'].iloc[0]) if 'FeOt_Liq' in df.columns else 0.0
+        if feot <= 0.0:
+            # Zero iron -> no redox to partition. Not a silent default:
+            # there is genuinely nothing to derive a ratio FROM.
+            return 0.0, [], True
+
+        ss = self._module
+        try:
+            df_for_fit = df.copy()
+            df_for_fit['Sample_ID_Liq'] = 'SulfSatGate'
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                fit_result = ss.convert_fo2_to_fe_partition(
+                    liq_comps=df_for_fit,
+                    T_K=T_K,
+                    P_kbar=P_kbar,
+                    model='Kress1991',
+                    fo2=10.0 ** float(fO2_log),
+                )
+            ratio = float(fit_result['Fe3Fet_Liq'].iloc[0])
+        except Exception as exc:  # noqa: BLE001 — upstream library boundary
+            return (
+                0.0,
+                [
+                    'Kress-Carmichael 1991 Fe3+/SumFe fit failed '
+                    f'(T_K={T_K}, fO2_log={fO2_log}): {exc!r}; '
+                    'no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range'
+                ],
+                False,
+            )
+
+        if not (ratio == ratio) or ratio < 0.0 or ratio > 1.0:
+            # NaN / out-of-range -> the fit produced no usable answer.
+            # Tag and warn instead of fabricating a default.
+            return (
+                0.0,
+                [
+                    'Kress-Carmichael 1991 Fe3+/SumFe fit produced non-finite or '
+                    f'out-of-range ratio {ratio!r} '
+                    f'(T_K={T_K}, fO2_log={fO2_log}); '
+                    'no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range'
+                ],
+                False,
+            )
+
+        return ratio, [], True
 
     def _build_dataframe(
         self, liquid_comp_wt: Mapping[str, float]

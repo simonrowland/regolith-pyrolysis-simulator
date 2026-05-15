@@ -104,13 +104,19 @@ def _make_fake_pysulfsat(
     scss_ppm: float = 1200.0,
     scas_ppm: float = 2500.0,
     s6_fraction: float = 0.40,
+    fe3fet_liq: float = 0.15,
 ) -> types.ModuleType:
     """
-    Return a stand-in ``PySulfSat`` module exposing the three symbols the
+    Return a stand-in ``PySulfSat`` module exposing the four symbols the
     gate consumes (``calculate_S2017_SCSS``, ``calculate_CD2019_SCAS``,
-    ``calculate_S6St_Jugo2010_eq10``). Values are deterministic; the test
-    asserts they propagate untouched into every
-    ``SulfurSaturationResult`` field.
+    ``calculate_S6St_Jugo2010_eq10``, ``convert_fo2_to_fe_partition``).
+    Values are deterministic; the test asserts they propagate untouched
+    into every ``SulfurSaturationResult`` field.
+
+    ``convert_fo2_to_fe_partition`` is the Kress-Carmichael 1991 fit the
+    gate falls back to when the caller does not pin ``Fe3Fet_Liq``
+    explicitly. The fake returns a fixed ratio so the redox-policy path
+    is exercised without depending on the upstream library's numerics.
     """
     import pandas as pd
 
@@ -125,9 +131,16 @@ def _make_fake_pysulfsat(
     def _calc_s6(deltaQFM=None):
         return s6_fraction
 
+    def _convert_fo2(*, liq_comps, T_K, P_kbar, model='Kress1991',
+                     fo2, renorm=False, fo2_offset=0):
+        out = liq_comps.copy()
+        out['Fe3Fet_Liq'] = fe3fet_liq
+        return out
+
     fake.calculate_S2017_SCSS = _calc_scss
     fake.calculate_CD2019_SCAS = _calc_scas
     fake.calculate_S6St_Jugo2010_eq10 = _calc_s6
+    fake.convert_fo2_to_fe_partition = _convert_fo2
     return fake
 
 
@@ -337,7 +350,121 @@ def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# 5. Live PySulfSat smoke test (single composition, single assertion path)
+# 5. Fe3Fet redox-policy paths (operator override + Kress-Carmichael fallback)
+# ---------------------------------------------------------------------------
+
+
+def test_operator_fe3fet_override_takes_precedence(monkeypatch):
+    """
+    Explicit ``Fe3Fet_Liq`` on the call path bypasses the Kress-Carmichael
+    fallback and is forwarded to the SCSS call after being clamped to
+    [0, 1] (mirrors the AlphaMELTS redox-policy pattern).
+    """
+    captured: Dict[str, Any] = {}
+    fake = _make_fake_pysulfsat()
+
+    def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
+        import pandas as pd
+        captured['Fe3Fet_Liq'] = float(df['Fe3Fet_Liq'].iloc[0])
+        return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [1200.0]})
+
+    def _convert_fo2(**kwargs):
+        captured['kress_called'] = True
+        raise AssertionError('Kress-Carmichael must not run when operator pins ratio')
+
+    fake.calculate_S2017_SCSS = _calc_scss
+    fake.convert_fo2_to_fe_partition = _convert_fo2
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+        Fe3Fet_Liq=0.25,
+    )
+
+    assert captured.get('kress_called') is None
+    assert captured['Fe3Fet_Liq'] == pytest.approx(0.25)
+    assert result.calibration_status == 'in_range'
+
+
+def test_kress_carmichael_fallback_when_no_operator_ratio(monkeypatch):
+    """
+    Without an operator ratio the gate derives Fe3Fet_Liq from
+    ``convert_fo2_to_fe_partition`` (Kress-Carmichael 1991) and forwards
+    the derived value to SCSS.
+    """
+    captured: Dict[str, Any] = {}
+    fake = _make_fake_pysulfsat(fe3fet_liq=0.18)
+
+    def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
+        import pandas as pd
+        captured['Fe3Fet_Liq'] = float(df['Fe3Fet_Liq'].iloc[0])
+        return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [1200.0]})
+
+    fake.calculate_S2017_SCSS = _calc_scss
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+    )
+
+    assert captured['Fe3Fet_Liq'] == pytest.approx(0.18)
+    assert result.calibration_status == 'in_range'
+
+
+def test_kress_carmichael_failure_tags_out_of_range(monkeypatch):
+    """
+    If neither operator-set nor Kress-Carmichael yields a usable ratio,
+    the result is tagged ``out_of_range`` with an explicit warning -
+    not silently filled with a fabricated default.
+    """
+    fake = _make_fake_pysulfsat()
+
+    def _convert_fo2(**kwargs):
+        raise RuntimeError('upstream fit blew up')
+
+    fake.convert_fo2_to_fe_partition = _convert_fo2
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+    )
+
+    assert result.calibration_status == 'out_of_range'
+    assert any('Kress-Carmichael' in w for w in result.warnings)
+
+
+def test_invalid_operator_fe3fet_returns_unavailable(monkeypatch):
+    """Out-of-range operator ratios are loudly rejected, not clamped."""
+    fake = _make_fake_pysulfsat()
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+        Fe3Fet_Liq=1.5,
+    )
+
+    assert result.calibration_status == 'unavailable'
+    assert any('Fe3Fet_Liq' in w for w in result.warnings)
+
+
+# ---------------------------------------------------------------------------
+# 6. Live PySulfSat smoke test (single composition, single assertion path)
 # ---------------------------------------------------------------------------
 
 

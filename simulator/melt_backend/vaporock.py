@@ -131,16 +131,20 @@ _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
 # drop any oxide VapoRock does not declare.  If the upstream library
 # extends its basis, this map is the only place to update.
 #
-# TODO(vaporock): verify the exact oxide-name spellings expected by the
-# installed VapoRock build (some forks use 'Al2O3' vs 'Al₂O₃', etc.)
-# and confirm whether P2O5 / NiO / CoO are accepted.  If they are not,
-# they must be stripped before the call.
+# Verified 2026-05-15 against the installed VapoRock package: oxide
+# spellings in ``vaporock/chemistry.py::OXIDE_MOLWT`` match
+# ``simulator.state.OXIDE_SPECIES`` 1:1 (SiO2, TiO2, Al2O3, Fe2O3,
+# Cr2O3, FeO, MnO, MgO, NiO, CoO, CaO, Na2O, K2O, P2O5 plus H2O/CO2 the
+# simulator does not pass through this adapter).
 _VAPOROCK_OXIDE_BASIS = tuple(OXIDE_SPECIES)
 
+# Verified 2026-05-15: the installed VapoRock package exposes the
+# lowercase ``vaporock`` module name; the uppercase ``VapoRock`` probe
+# is retained for the historical pre-rename installs documented in the
+# project README. Drop the uppercase fallback if it is ever observed to
+# resolve to a stale install in CI.
 _IMPORT_CANDIDATES = (
     'vaporock',
-    # TODO(vaporock): remove the legacy uppercase probe if no local installs
-    # still expose the historical module name.
     'VapoRock',
 )
 
@@ -473,11 +477,13 @@ class VapoRockBackend(MeltBackend):
         unit conversions happen here so ``equilibrate`` never
         double-scales an already-Pa result.
 
-        TODO(vaporock): pin to a single documented entry point once
-        the upstream package has a stable Python API.  Today the
-        published interface is loosely documented in the README and
-        these candidates are the union observed across the 0.1.x
-        line.
+        Verified 2026-05-15 against the installed VapoRock build: none
+        of the four legacy top-level functions are present; the
+        canonical entry point is ``System.eval_gas_abundances`` (see
+        the second half of this method).  The candidate-name loop is
+        retained as a defensive fallback for historical 0.1.x installs
+        that exposed top-level functions instead of the ``System``
+        class — it is a no-op on the current build but harmless.
         """
         module = self._vaporock
         candidate_names = (
