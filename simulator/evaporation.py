@@ -86,17 +86,17 @@ class EvaporationMixin:
         ) = self._build_evaporation_aux_maps(vapor_pressures)
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the PREVIOUS hour's overhead partial pressures as
-        # backpressure. High evap -> high overhead P -> reduced driving
-        # force -> lower evap next hour. Note: process.overhead_gas is
-        # drained to terminal.offgas every tick, so this backpressure
-        # is the within-tick vapour partial pressure only -- there is
-        # no multi-tick finite-headspace accumulation (see
-        # equilibrium.py::_commanded_pO2_bar, FINITE-HEADSPACE-PO2-MODEL).
+        # Uses the previous hour's overhead partial pressures as
+        # backpressure. With finite headspace enabled, gas pO2 also feeds
+        # oxide-vapor reaction suppression inside the flux provider.
         overhead_partials_Pa = {
             species: self.overhead.composition.get(species, 0.0) * 100.0
             for species in vapor_pressures
         }
+        intrinsic_pO2_bar = 10.0 ** self._compute_intrinsic_melt_fO2()
+        gas_pO2_bar = (
+            self._commanded_pO2_bar()
+        )
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
         # The dispatch-only helper centralises melt-derived T/P plumbing
@@ -107,6 +107,8 @@ class EvaporationMixin:
             control_inputs={
                 'vapor_pressures_Pa': vapor_pressures,
                 'overhead_partials_Pa': overhead_partials_Pa,
+                'gas_pO2_bar': gas_pO2_bar,
+                'intrinsic_pO2_bar': intrinsic_pO2_bar,
                 'molar_mass_kg_mol': molar_masses_kg_mol,
                 'stoich_by_species': stoich_by_species,
                 'available_oxide_kg': available_oxide_kg,

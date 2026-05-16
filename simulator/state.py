@@ -381,6 +381,18 @@ class OverheadGas:
     composition: Dict[str, float] = field(default_factory=dict)
     # Partial pressures in mbar
 
+    headspace_volume_m3: float = 0.0
+    # Gas-occupied volume between melt surface and turbine inlet
+
+    headspace_temperature_K: float = 0.0
+    # Gas temperature used for finite-headspace ideal-gas pressure
+
+    bleed_conductance_kg_s_per_bar: float = 0.0
+    # Headspace bleed conductance coefficient
+
+    p_downstream_bar: float = 0.0
+    # Downstream sink pressure for the bleed model
+
     turbine_flow_kg_hr: float = 0.0
     # Mass flow rate through turbine (sets pO₂)
 

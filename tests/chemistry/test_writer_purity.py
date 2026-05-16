@@ -1,11 +1,10 @@
 """Writer-purity invariant: only the kernel writes the AtomLedger.
 
 After ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) all chemistry-transition
-ledger writes flow through :meth:`ChemistryKernel.commit_batch`.  A
-narrow set of NON-chemistry writers (terminal routing moves, the
-backend-equilibrium transition) is permitted under the binding-spec §3
-exemption -- the F-A2 cleanup labels each tagged call site so this
-test can enforce "no new unwhitelisted writer can be introduced".
+ledger writes flow through :meth:`ChemistryKernel.commit_batch`.  The
+finite-headspace pO2 migration moved terminal routing into the
+OVERHEAD_BLEED provider, so the only remaining simulator-side exemption is
+the backend-equilibrium transition.
 
 The audit walks every Python module under ``simulator/`` excluding
 ``simulator/chemistry/kernel/`` (which IS the writer the kernel uses
@@ -47,16 +46,8 @@ _EXEMPT_SUBDIRS = (
 # reviewer cannot silently strip the label without the test catching
 # it.
 #
-# Mirrors F-A2:
-#   * simulator/core.py: backend-equilibrium ledger transition (legacy
-#     backend writes its own LedgerTransition).
-#   * simulator/core.py: ``_drain_to_terminal`` -- the single chemistry-
-#     exempt entry point for the four terminal-routing move-shaped
-#     transfers (overhead_gas -> terminal.offgas; overhead_gas <->
-#     melt_offgas oxygen accounts).
 _WRITER_EXEMPT_CALLS = (
     ("simulator/core.py", "backend-equilibrium"),
-    ("simulator/core.py", "terminal-routing move"),
 )
 
 

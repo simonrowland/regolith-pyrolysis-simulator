@@ -48,6 +48,10 @@ from engines.builtin.evaporation_transition import (
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
 )
+from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+from engines.builtin.overhead_gas_equilibrium import (
+    BuiltinOverheadGasEquilibriumProvider,
+)
 from engines.builtin.stage0_pretreatment import (
     BuiltinStage0PretreatmentProvider,
 )
@@ -59,6 +63,8 @@ __all__ = [
     "BuiltinEvaporationFluxProvider",
     "BuiltinEvaporationTransitionProvider",
     "BuiltinMetallothermicStepProvider",
+    "BuiltinOverheadBleedProvider",
+    "BuiltinOverheadGasEquilibriumProvider",
     "BuiltinStage0PretreatmentProvider",
     "BuiltinVaporPressureProvider",
 ]

@@ -132,6 +132,7 @@ class PlantDesign:
     turbine: TurbineSpec = field(default_factory=TurbineSpec)
     volatiles_train: VolatilesTrainSpec = field(default_factory=VolatilesTrainSpec)
     buffer_tank: BufferTankSpec = field(default_factory=BufferTankSpec)
+    headspace_volume_m3: float = 0.0
 
 
 class EquipmentDesigner:
@@ -171,6 +172,15 @@ class EquipmentDesigner:
         # ~10 g/s per tonne at peak SiO window
         peak_evap_kg_s = mass_kg * 10e-3 / 1000.0
         design.pipe = self.size_collection_pipe(peak_evap_kg_s)
+        pipe_volume_m3 = (
+            math.pi * design.pipe.diameter_m**2 / 4.0
+            * design.pipe.length_m
+        )
+        crucible_freeboard_m3 = (
+            design.crucible.volume_m3
+            * design.crucible.freeboard_pct / 100.0
+        )
+        design.headspace_volume_m3 = crucible_freeboard_m3 + pipe_volume_m3
 
         design.turbine = self.size_turbine(mass_kg)
         design.volatiles_train = self.size_volatiles_train(mass_kg, feedstock)

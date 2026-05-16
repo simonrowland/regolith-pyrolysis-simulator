@@ -114,6 +114,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         molar_masses_kg_mol = dict(controls.get("molar_mass_kg_mol") or {})
         stoich_by_species = dict(controls.get("stoich_by_species") or {})
         available_oxide_kg = dict(controls.get("available_oxide_kg") or {})
+        gas_pO2_bar = max(
+            1.0e-30, float(controls.get("gas_pO2_bar", 0.0) or 0.0)
+        )
+        intrinsic_pO2_bar = max(
+            1.0e-30,
+            float(controls.get("intrinsic_pO2_bar", gas_pO2_bar)
+                  or gas_pO2_bar),
+        )
 
         melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
         stir_factor = float(controls.get("stir_factor", 0.0))
@@ -133,9 +141,22 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if M_kg_mol is None or M_kg_mol <= 0.0:
                 M_kg_mol = MOLAR_MASS.get(species, 50.0) / 1000.0
 
-            P_ambient_Pa = float(overhead_partials.get(species, 0.0))
+            stoich = stoich_by_species.get(species) or {}
+            O2_per_product_kg = max(
+                0.0, float(stoich.get("O2_per_product_kg") or 0.0)
+            )
+            if O2_per_product_kg > 0.0:
+                o2_molar_mass = MOLAR_MASS.get("O2", 32.0) / 1000.0
+                oxygen_mol_per_product_mol = (
+                    O2_per_product_kg * M_kg_mol / o2_molar_mass
+                )
+                pO2_factor = (intrinsic_pO2_bar / gas_pO2_bar) ** (
+                    oxygen_mol_per_product_mol
+                )
+                P_sat_Pa *= max(1.0e-12, min(1.0e12, pO2_factor))
 
             # Hertz-Knudsen mass flux (kg/s per m^2).            [HK-1]
+            P_ambient_Pa = float(overhead_partials.get(species, 0.0))
             denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
             J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) / denominator
 
@@ -147,7 +168,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             # Cap at parent-oxide availability (same as legacy: don't
             # evaporate more parent oxide than the melt actually holds).
-            stoich = stoich_by_species.get(species) or {}
             oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
             if oxide_per_product_kg <= 0.0:
                 # Caller didn't supply stoich for this species -- skip
@@ -171,5 +191,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             diagnostic={
                 "evaporation_flux_kg_hr": flux_kg_hr,
                 "temperature_C": T_C,
+                "gas_pO2_bar": gas_pO2_bar,
+                "intrinsic_pO2_bar": intrinsic_pO2_bar,
             },
         )

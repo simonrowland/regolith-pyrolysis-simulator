@@ -61,7 +61,8 @@ class CampaignManager:
 
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """
-        Set melt atmosphere and process parameters for a campaign.
+        Set gas-side atmosphere and process parameters for a campaign.
+        ``melt.fO2_log`` is engine-computed from melt composition per tick.
 
         Called when starting a new campaign phase.
         """
@@ -75,7 +76,6 @@ class CampaignManager:
                 melt.atmosphere = Atmosphere.HARD_VACUUM
                 melt.p_total_mbar = 0.0
             melt.pO2_mbar = 0.0
-            melt.fO2_log = -9.0
 
         elif campaign == CampaignPhase.C0B:
             melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
@@ -86,7 +86,6 @@ class CampaignManager:
             melt.atmosphere = Atmosphere.PN2_SWEEP
             melt.pO2_mbar = 0.0   # Fe-granule sorbent keeps pO₂ → 0
             melt.p_total_mbar = 10.0  # midpoint of [5, 15] mbar N₂
-            melt.fO2_log = -8.0
 
         elif campaign == CampaignPhase.C2B:
             melt.atmosphere = Atmosphere.CONTROLLED_O2

@@ -1,16 +1,163 @@
 {
-  "schema_version": "1.0.0",
+  "error_message": "",
+  "final_state": {
+    "process.cleaned_melt": {
+      "Al2O3": 194.7904626186858,
+      "CaO": 318.75764907752085,
+      "FeO": 3317.611626757464,
+      "MgO": 4730.673003672124,
+      "NiO": 212.7249255099346,
+      "SiO2": 4760.397189073026
+    },
+    "process.stage0_volatile_feed": {},
+    "reservoir.stage0_oxidant": {},
+    "terminal.offgas": {
+      "CO2": 2217.333339896868,
+      "H2O": 10168.053989141901,
+      "N2": 64.23523456780607
+    },
+    "terminal.stage0_sulfide_matte": {
+      "S": 1282.9415283361689
+    }
+  },
+  "per_hour_summary": [
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 35.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 1,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 45.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 2,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 55.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 3,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 65.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 4,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 75.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 5,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 85.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 6,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 95.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 7,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 105.0,
+      "campaign": "C2B",
+      "condensation_train_kg": {},
+      "hour": 8,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.0015
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.0015,
+      "T_C": 115.0,
+      "campaign": "C3_K",
+      "condensation_train_kg": {},
+      "hour": 9,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.001
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.001,
+      "T_C": 165.0,
+      "campaign": "C3_K",
+      "condensation_train_kg": {},
+      "hour": 10,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.001
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.001,
+      "T_C": 215.0,
+      "campaign": "C3_K",
+      "condensation_train_kg": {},
+      "hour": 11,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.001
+    },
+    {
+      "O2_yield_kg_cumulative": 0.0,
+      "P_total_bar": 0.001,
+      "T_C": 265.0,
+      "campaign": "C3_K",
+      "condensation_train_kg": {},
+      "hour": 12,
+      "mass_balance_pct": 2.0815230051100523e-14,
+      "metal_yields_kg": {},
+      "pO2_bar": 0.001
+    }
+  ],
   "run_metadata": {
-    "schema_version": "1.0.0",
-    "feedstock_id": "ci_carbonaceous_chondrite",
-    "campaign": "C2B",
-    "hours_requested": 12,
-    "hours_completed": 12,
-    "mass_kg": 1000.0,
     "additives_kg": {},
-    "track": "pyrolysis",
     "backend": "stub",
-    "started_at_utc": "2026-05-15T00:00:00Z",
+    "campaign": "C2B",
     "engines_used": {
       "active": {
         "condensation_route": "builtin-condensation-route",
@@ -18,10 +165,11 @@
         "evaporation_flux": "builtin-evaporation-flux",
         "evaporation_transition": "builtin-evaporation-transition",
         "metallothermic_step": "builtin-metallothermic-step",
+        "overhead_bleed": "builtin-overhead-bleed",
+        "overhead_gas_equilibrium": "builtin-overhead-gas-equilibrium",
         "stage0_pretreatment": "builtin-stage0-pretreatment",
         "vapor_pressure": "vaporock"
       },
-      "requested": {},
       "registry": {
         "condensation_route": {
           "authoritative": "builtin-condensation-route",
@@ -48,6 +196,16 @@
           "fallback": null,
           "shadows": []
         },
+        "overhead_bleed": {
+          "authoritative": "builtin-overhead-bleed",
+          "fallback": null,
+          "shadows": []
+        },
+        "overhead_gas_equilibrium": {
+          "authoritative": "builtin-overhead-gas-equilibrium",
+          "fallback": null,
+          "shadows": []
+        },
         "stage0_pretreatment": {
           "authoritative": "builtin-stage0-pretreatment",
           "fallback": null,
@@ -58,165 +216,19 @@
           "fallback": "builtin-vapor-pressure",
           "shadows": []
         }
-      }
+      },
+      "requested": {}
     },
-    "kernel_commit_sha": "goal-18-fixture"
+    "feedstock_id": "ci_carbonaceous_chondrite",
+    "hours_completed": 12,
+    "hours_requested": 12,
+    "kernel_commit_sha": "goal-18-fixture",
+    "mass_kg": 1000.0,
+    "schema_version": "1.0.0",
+    "started_at_utc": "2026-05-15T00:00:00Z",
+    "track": "pyrolysis"
   },
-  "final_state": {
-    "process.cleaned_melt": {
-      "Al2O3": 194.7904626186858,
-      "CaO": 318.75764907752085,
-      "FeO": 3317.611626757464,
-      "MgO": 4730.673003672124,
-      "NiO": 212.7249255099346,
-      "SiO2": 4760.397189073026
-    },
-    "process.stage0_volatile_feed": {},
-    "reservoir.stage0_oxidant": {},
-    "terminal.offgas": {
-      "CO2": 2217.333339896868,
-      "H2O": 10168.053989141901,
-      "N2": 64.23523456780607
-    },
-    "terminal.stage0_sulfide_matte": {
-      "S": 1282.9415283361689
-    }
-  },
-  "per_hour_summary": [
-    {
-      "hour": 1,
-      "campaign": "C2B",
-      "T_C": 35.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 2,
-      "campaign": "C2B",
-      "T_C": 45.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 3,
-      "campaign": "C2B",
-      "T_C": 55.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 4,
-      "campaign": "C2B",
-      "T_C": 65.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 5,
-      "campaign": "C2B",
-      "T_C": 75.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 6,
-      "campaign": "C2B",
-      "T_C": 85.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 7,
-      "campaign": "C2B",
-      "T_C": 95.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 8,
-      "campaign": "C2B",
-      "T_C": 105.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.0015,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 9,
-      "campaign": "C3_K",
-      "T_C": 115.0,
-      "P_total_bar": 0.0015,
-      "pO2_bar": 0.001,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 10,
-      "campaign": "C3_K",
-      "T_C": 165.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 11,
-      "campaign": "C3_K",
-      "T_C": 215.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    },
-    {
-      "hour": 12,
-      "campaign": "C3_K",
-      "T_C": 265.0,
-      "P_total_bar": 0.001,
-      "pO2_bar": 0.001,
-      "mass_balance_pct": 2.0815230051100523e-14,
-      "O2_yield_kg_cumulative": 0.0,
-      "metal_yields_kg": {},
-      "condensation_train_kg": {}
-    }
-  ],
+  "schema_version": "1.0.0",
   "shadow_trace": [],
-  "status": "ok",
-  "error_message": ""
+  "status": "ok"
 }

@@ -881,3 +881,31 @@ mre_stepped_voltage_holds:
     - voltage: 2.5
       species: [CaO]
       min_hold_hours: 10
+
+
+# ============================================================================
+# 14. OVERHEAD FINITE HEADSPACE (migration toggle)
+# ============================================================================
+overhead_headspace:
+  # Default false preserves legacy one-tick drain and commanded-pO2 behavior.
+  enabled: false
+
+  # null derives from crucible freeboard + pipe interior on PlantDesign.
+  volume_m3: null
+
+  # "melt" tracks melt T; "lumped" applies a simple colder gas zone.
+  temperature_model: "melt"
+  temperature_offset_K: null
+
+  # Phase 1 uses the existing Poiseuille pipe conductance model.
+  bleed_model: "poiseuille"
+  conductance_kg_s_per_bar: null
+
+  # null derives from the campaign atmosphere/setpoint.
+  downstream_pressure_bar: null
+
+  # Per-campaign override pattern:
+  # campaigns:
+  #   C0:
+  #     overhead_headspace:
+  #       enabled: true

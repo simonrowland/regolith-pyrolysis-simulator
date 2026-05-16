@@ -1020,17 +1020,14 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
     )
 
     sim.load_batch("oxide", mass_kg=1000.0)
-    with pytest.raises(AccountingError):
-        sim._debit_vented_oxygen(0.1)
-
     sim.atom_ledger.load_external(
-        "terminal.oxygen_melt_offgas_stored",
+        "process.overhead_gas",
         {"O2": 5.0},
         source="test stored oxygen",
     )
     sim.train.stages[1].collected_kg["O2"] = 1.5
     sim.train.stages[4].collected_kg["O2"] = 3.5
-    sim._debit_vented_oxygen(3.0)
+    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=3.0)
     snapshot = sim._make_snapshot()
     sim.melt.campaign = CampaignPhase.COMPLETE
     sim._finalize_record()

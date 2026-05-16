@@ -503,16 +503,11 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     sim.melt.pO2_mbar = 1e-6
 
     # ------------------------------------------------------------------
-    # Regime A: intrinsic fO2 (IW buffer) -- literature comparison
+    # Regime A: intrinsic fO2 (IW-like) -- literature comparison
     # ------------------------------------------------------------------
-    # VapoRock's chemistry.redox_buffer(T_K=1873.15, buffer='IW') returns
-    # log10(fO2/bar) = -7.977 (verified 2026-05-16). This is the
-    # canonical fO2 regime for tholeiitic basalt melt-vapor literature
-    # (SF2004 Table 9, Sossi-Fegley 2018 Fig 3): MAGMA's self-consistent
-    # fO2 for Williams tholeiite lands within ~0.5 decade of IW. We hard
-    # -code -7.98 so this test does not depend on a live VapoRock-
-    # internal symbol; the value is documented and cross-checked.
-    fO2_log_iw = -7.98
+    fO2_log_iw = sim._compute_intrinsic_melt_fO2(
+        sim.melt.temperature_C + 273.15
+    )
 
     vaporock_iw = backend.equilibrate(
         sim.melt.temperature_C,
@@ -558,53 +553,29 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     )
 
     # ------------------------------------------------------------------
-    # Regime B: simulator default (vacuum-floor fO2 = -9) -- operating
-    # point validation. Documents the 1-decade SiO inflation versus IW.
+    # Regime B: simulator default now uses intrinsic melt fO2. Gas pO2 is
+    # consumed by EVAPORATION_FLUX, not by VAPOR_PRESSURE.
     # ------------------------------------------------------------------
     builtin = sim._stub_equilibrium()
-    assert builtin.fO2_log == -9.0, (
-        f"HARD_VACUUM equilibrium expected to pin fO2_log at the vacuum "
-        f"floor (-9); got {builtin.fO2_log}"
-    )
+    assert builtin.fO2_log == pytest.approx(fO2_log_iw, abs=0.05)
 
-    vaporock_vac = backend.equilibrate(
+    vaporock_builtin = backend.equilibrate(
         sim.melt.temperature_C,
         composition_mol=sim._backend_composition_mol(),
         fO2_log=builtin.fO2_log,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
     )
 
-    if not vaporock_vac.vapor_pressures_Pa:
+    if not vaporock_builtin.vapor_pressures_Pa:
         pytest.skip(
-            "VapoRock returned no vapor pressures at vacuum floor"
+            "VapoRock returned no vapor pressures at simulator intrinsic fO2"
         )
 
-    # At fO2_log = -9 (vacuum floor, ~1 decade more reducing than IW
-    # for this basalt at 1873.15 K), p(SiO) is inflated by ~sqrt(10)
-    # vs the IW regime. Expected ~1.16 Pa; allow [0.3, 5.0] Pa for
-    # numerical / activity-model spread.
-    p_sio_vac = vaporock_vac.vapor_pressures_Pa.get("SiO", 0.0)
-    assert 0.3 <= p_sio_vac <= 5.0, (
-        f"VapoRock p(SiO) at vacuum floor (logfO2={builtin.fO2_log}) = "
-        f"{p_sio_vac:.4e} Pa is outside the expected [0.3, 5.0] Pa "
-        f"range. This is the simulator's HARD_VACUUM operating point, "
-        f"which conflates gas pO2 with melt fO2 (see \\goal "
-        f"FINITE-HEADSPACE-PO2-MODEL #17). The 1-decade SiO inflation "
-        f"versus IW is expected; a value outside this range indicates "
-        f"VapoRock has shifted regime."
-    )
-
-    # Sanity: vacuum-floor SiO should be roughly sqrt(10) higher than
-    # IW SiO (the 1/√fO2 relation in SiO₂(melt) → SiO(g) + ½O₂(g)).
-    # This pins the fO2 dependence as an explicit invariant.
-    ratio = p_sio_vac / p_sio_iw if p_sio_iw > 0.0 else float("nan")
-    assert 1.5 <= ratio <= 7.0, (
-        f"VapoRock p(SiO) vacuum / IW ratio = {ratio:.3f} is outside the "
-        f"expected sqrt(10)≈3.16 range [1.5, 7.0]. The 1/√fO2 "
-        f"dependence is the load-bearing physics of the SiO₂(melt) → "
-        f"SiO(g) + ½O₂(g) equilibrium; a ratio outside this range "
-        f"indicates the equilibrium constant or activity model has "
-        f"shifted unexpectedly."
+    p_sio_builtin = vaporock_builtin.vapor_pressures_Pa.get("SiO", 0.0)
+    ratio = p_sio_builtin / p_sio_iw if p_sio_iw > 0.0 else float("nan")
+    assert 0.8 <= ratio <= 1.25, (
+        f"VapoRock p(SiO) simulator-intrinsic / IW ratio = {ratio:.3f}; "
+        f"VAPOR_PRESSURE should no longer use the gas vacuum floor as melt fO2"
     )
 
 

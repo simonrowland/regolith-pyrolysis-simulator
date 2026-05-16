@@ -145,7 +145,11 @@ def test_o2_venting_moves_between_terminal_ledger_accounts():
         actual_O2_kg_hr=sim.atom_ledger.kg_by_account(
             "process.overhead_gas")["O2"],
     )
-    sim._route_melt_offgas_oxygen_to_terminal(overhead.O2_vented_kg_hr)
+    sim._dispatch_overhead_bleed(
+        turbine_spec=turbine,
+        force_drain_all=True,
+        o2_vented_kg=overhead.O2_vented_kg_hr,
+    )
 
     assert overhead.O2_vented_kg_hr == pytest.approx(6.0)
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_stored")[
@@ -222,10 +226,10 @@ def test_overhead_o2_not_double_counted_across_ticks():
         )
 
     # Tick 1: leave the melt/offgas O2 sitting in process.overhead_gas.
-    drained = sim._route_melt_offgas_oxygen_to_terminal
-    sim._route_melt_offgas_oxygen_to_terminal = lambda vented_kg: None
+    drained = sim._dispatch_overhead_bleed
+    sim._dispatch_overhead_bleed = lambda *args, **kwargs: None
     sim.step()
-    sim._route_melt_offgas_oxygen_to_terminal = drained
+    sim._dispatch_overhead_bleed = drained
 
     carried_over_kg = sim.atom_ledger.kg_by_account(
         "process.overhead_gas")["O2"]
@@ -450,7 +454,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
-    sim._route_melt_offgas_oxygen_to_terminal(0.0)
+    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=0.0)
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)
@@ -508,7 +512,7 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
-    sim._route_melt_offgas_oxygen_to_terminal(0.0)
+    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=0.0)
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)
@@ -600,29 +604,27 @@ def test_sio_suppression_uses_commanded_po2():
     # --- Equilibrium path: pO₂ feeding the SiO √pO₂ suppression ---
     equilibrium = sim._stub_equilibrium()
     assert calls, "_stub_equilibrium must consult _commanded_pO2_bar"
-    pO2_equilibrium_bar = 10.0 ** equilibrium.fO2_log
-    # _stub_equilibrium sets fO2_log = log10(pO2) from the same pO2_bar it
-    # feeds the SiO √pO₂ suppression, so fO2_log faithfully probes it.
-    assert pO2_equilibrium_bar == pytest.approx(calls[0])
+    intrinsic_pO2_bar = 10.0 ** equilibrium.fO2_log
+    # fO2_log is now the melt-intrinsic Kress91 surface.  The SiO
+    # suppression still consumes the commanded gas pO2 via the helper spy.
+    assert intrinsic_pO2_bar != pytest.approx(calls[0])
     # SiO vapor pressure was actually emitted (suppression path exercised).
     assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
 
     # The commanded pO₂ under active O₂ control is the setpoint.
-    assert pO2_equilibrium_bar == pytest.approx(setpoint_bar)
+    assert calls[0] == pytest.approx(setpoint_bar)
 
     sim._commanded_pO2_bar = real_commanded
 
 
-def test_evaporation_does_not_consult_commanded_po2():
-    """The turbine-control feedback loop is NOT wired: _calculate_evaporation
-    iterates only metal + oxide vapor species (never an 'O2' key), so it has
-    no O₂ ambient driving force to floor and never consults the commanded
-    pO₂ helper. Pins the Finding 2 dead-branch removal."""
+def test_evaporation_flux_consults_commanded_po2_for_oxide_vapors():
+    """EVAPORATION_FLUX consumes gas pO2 for oxide-vapor suppression."""
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
     sim.overhead.composition = {"O2": 1.5}
+    sim._overhead_headspace_config["enabled"] = True
 
     real_commanded = sim._commanded_pO2_bar
     calls = []
@@ -638,10 +640,7 @@ def test_evaporation_does_not_consult_commanded_po2():
     sim._commanded_pO2_bar = real_commanded
 
     assert flux is not None
-    assert not calls, (
-        "_calculate_evaporation must not consult _commanded_pO2_bar -- the "
-        "O₂ ambient driving force branch was dead and is removed"
-    )
+    assert calls, "_calculate_evaporation must feed gas pO2 to the flux provider"
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():

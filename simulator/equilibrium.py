@@ -33,11 +33,9 @@ class EquilibriumMixin:
         """
         Commanded oxygen partial pressure (bar) for this hour.
 
-        This is the *commanded* pO₂ -- NOT the AtomLedger O₂ holdup.  ONE
-        value feeds BOTH the SiO √pO₂ suppression factor in
-        ``_stub_equilibrium`` AND (currently) the O₂ ambient driving force
-        in ``_calculate_evaporation``, so the two code paths never disagree
-        on pO₂.
+        Toggle-off preserves the legacy commanded-pO₂ path. Toggle-on reads
+        the finite-headspace O₂ partial pressure from the
+        OVERHEAD_GAS_EQUILIBRIUM diagnostic provider.
 
         Resolution:
           - ``overhead.composition['O2']`` is itself
@@ -56,15 +54,22 @@ class EquilibriumMixin:
           - A hard numerical floor (``_PO2_VACUUM_FLOOR_BAR``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
 
-        NOT WIRED: the turbine-control feedback loop -- melt-released O₂
-        accumulating in a finite headspace and self-suppressing SiO -- is
-        NOT modelled.  Melt-offgas O₂ goes to
-        ``terminal.oxygen_melt_offgas_stored``; ``process.overhead_gas`` is
-        drained every tick; there is no finite-headspace pO₂ accumulation.
-        A proper finite-headspace pO₂ model (volume / pressure /
-        temperature / bleed / storage coupling) is tracked as a separate
-        goal, FINITE-HEADSPACE-PO2-MODEL.  See docs/model-limitations.md.
+        With finite headspace enabled, melt-offgas O₂ remains in
+        ``process.overhead_gas`` until the OVERHEAD_BLEED provider moves it
+        to melt-offgas terminal bins, so this helper sees real carried
+        headspace pO₂ instead of a synthetic vacuum-floor setpoint.
         """
+        enabled = getattr(self, '_overhead_headspace_enabled', lambda: False)()
+        if enabled:
+            diagnostic = getattr(
+                self, '_overhead_gas_equilibrium_diagnostic', lambda: {}
+            )()
+            partials = dict(diagnostic.get('partial_pressures_bar') or {})
+            return max(
+                float(partials.get('O2', diagnostic.get('p_O2_bar', 0.0)) or 0.0),
+                _PO2_VACUUM_FLOOR_BAR,
+            )
+
         pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
@@ -346,6 +351,10 @@ class EquilibriumMixin:
             pressure_bar=self.melt.p_total_mbar / 1000.0,
             vapor_pressures_Pa=vapor_pressures,
             activity_coefficients=activities,
-            fO2_log=math.log10(max(pO2_bar, 1e-20)),
+            fO2_log=getattr(
+                self,
+                '_compute_intrinsic_melt_fO2',
+                lambda: math.log10(max(pO2_bar, 1e-20)),
+            )(),
             status='ok',
         )

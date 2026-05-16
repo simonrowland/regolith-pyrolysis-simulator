@@ -183,6 +183,15 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
+DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
+    'enabled': False,
+    'volume_m3': None,
+    'temperature_model': 'melt',
+    'temperature_offset_K': None,
+    'bleed_model': 'poiseuille',
+    'conductance_kg_s_per_bar': None,
+    'downstream_pressure_bar': None,
+}
 BACKEND_FALLBACK_EXCEPTIONS = (RuntimeError, ImportError)
 STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
 STAGE0_CARBON_CLEANUP_TEMP_RANGE_C = (20.0, 1050.0)
@@ -321,6 +330,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'clean': True,
             'first_discrepancy': None,
         }
+        self._overhead_headspace_config = (
+            self._resolve_overhead_headspace_config()
+        )
+        self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
+        self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
 
         # --- Current state ---
         self.melt = MeltState()
@@ -419,7 +433,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def overhead_model(self):
         if self._overhead_model is None:
             from simulator.overhead import OverheadGasModel
-            self._overhead_model = OverheadGasModel()
+            self._overhead_model = OverheadGasModel(
+                self._overhead_headspace_config)
         return self._overhead_model
 
     @property
@@ -503,6 +518,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or '')
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
+        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
         self.melt.campaign = CampaignPhase.IDLE
         self.melt.hour = 0
         self.melt.campaign_hour = 0
@@ -511,6 +527,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Reset condensation train
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
+        self._last_overhead_gas_equilibrium = {}
+        self._last_vapor_pressure_diagnostic = {}
+        self._equipment = None
+        self._configure_overhead_headspace()
 
         # Record
         self.record = BatchRecord(
@@ -718,6 +738,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'STAGE0_PRETREATMENT -- AUTHORITATIVE: volatile/salt/'
             'sulfide/halide cleanup (single intent, four reaction '
             'families).',
+        ),
+        (
+            'engines.builtin.overhead_gas_equilibrium',
+            'BuiltinOverheadGasEquilibriumProvider',
+            (ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,),
+            False,
+            'OVERHEAD_GAS_EQUILIBRIUM -- READ-ONLY: finite headspace '
+            'partial pressures from process.overhead_gas.',
+        ),
+        (
+            'engines.builtin.overhead_bleed',
+            'BuiltinOverheadBleedProvider',
+            (ChemistryIntent.OVERHEAD_BLEED,),
+            False,
+            'OVERHEAD_BLEED -- AUTHORITATIVE: pure-move routing from '
+            'overhead_gas to terminal offgas / melt-offgas O2 bins.',
         ),
     )
 
@@ -1009,6 +1045,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         intent: ChemistryIntent,
         *,
         control_inputs: Mapping[str, Any],
+        fO2_log: Optional[float] = None,
     ) -> IntentResult:
         """Dispatch one intent through the kernel with melt-derived controls.
 
@@ -1027,6 +1064,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             intent,
             temperature_C=float(self.melt.temperature_C),
             pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            fO2_log=fO2_log,
             control_inputs=control_inputs,
         )
 
@@ -1072,6 +1110,165 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return result
         self._commit_proposal(intent, proposal)
         return result
+
+    def _resolve_overhead_headspace_config(
+        self, campaign: Optional[CampaignPhase] = None
+    ) -> Dict[str, Any]:
+        config = dict(DEFAULT_OVERHEAD_HEADSPACE_CONFIG)
+        config.update(dict(self.setpoints.get('overhead_headspace', {}) or {}))
+        campaign_key = campaign.name if campaign is not None else None
+        if campaign_key:
+            campaign_cfg = (
+                self.setpoints.get('campaigns', {}) or {}
+            ).get(campaign_key, {}) or {}
+            config.update(dict(campaign_cfg.get('overhead_headspace', {}) or {}))
+            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            config.update(
+                dict(runtime_override.get('overhead_headspace', {}) or {})
+            )
+        return config
+
+    def _configure_overhead_headspace(
+        self, campaign: Optional[CampaignPhase] = None
+    ) -> None:
+        self._overhead_headspace_config = (
+            self._resolve_overhead_headspace_config(campaign)
+        )
+        if self._overhead_model is not None:
+            self._overhead_model.configure_headspace(
+                self._overhead_headspace_config)
+
+    def _overhead_headspace_enabled(self) -> bool:
+        return bool(self._overhead_headspace_config.get('enabled', False))
+
+    def _headspace_volume_m3(self) -> float:
+        configured = self._overhead_headspace_config.get('volume_m3')
+        if configured is not None:
+            return max(0.0, float(configured))
+        equipment = self._equipment
+        if equipment is not None:
+            return max(0.0, float(getattr(equipment, 'headspace_volume_m3', 0.0)))
+        return 0.085
+
+    def _headspace_temperature_K(self) -> float:
+        melt_T_K = float(self.melt.temperature_C) + 273.15
+        offset = self._overhead_headspace_config.get('temperature_offset_K')
+        if offset is not None:
+            return max(1.0, melt_T_K + float(offset))
+        model = str(
+            self._overhead_headspace_config.get('temperature_model') or 'melt'
+        )
+        if model == 'lumped':
+            return max(1.0, melt_T_K - 100.0)
+        return max(1.0, melt_T_K)
+
+    def _headspace_downstream_pressure_bar(self) -> float:
+        configured = self._overhead_headspace_config.get(
+            'downstream_pressure_bar')
+        if configured is not None:
+            return max(0.0, float(configured))
+        atmosphere_name = getattr(self.melt.atmosphere, 'name', '')
+        if atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            return max(0.0, float(self.melt.pO2_mbar) / 1000.0)
+        return 0.0
+
+    def _headspace_bleed_conductance_kg_s_per_bar(self) -> float:
+        configured = self._overhead_headspace_config.get(
+            'conductance_kg_s_per_bar')
+        if configured is not None:
+            return max(0.0, float(configured))
+        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        return max(
+            0.0,
+            float(self.overhead_model._pipe_conductance(
+                p_mean_Pa, self.melt.temperature_C)),
+        )
+
+    def _overhead_holdup_mol(self) -> Dict[str, float]:
+        return {
+            species: float(mol)
+            for species, mol in self.atom_ledger.mol_by_account(
+                'process.overhead_gas').items()
+            if float(mol) > 0.0
+        }
+
+    def _overhead_gas_equilibrium_diagnostic(self) -> Dict[str, Any]:
+        if self._chem_kernel is None:
+            return {}
+        result = self._dispatch_only(
+            ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,
+            control_inputs={
+                'headspace_volume_m3': self._headspace_volume_m3(),
+                'headspace_temperature_K': self._headspace_temperature_K(),
+            },
+        )
+        diagnostic = dict(result.diagnostic or {})
+        self._last_overhead_gas_equilibrium = diagnostic
+        return diagnostic
+
+    def _dispatch_overhead_bleed(
+        self,
+        *,
+        turbine_spec=None,
+        force_drain_all: bool = False,
+        o2_vented_kg: Optional[float] = None,
+    ) -> IntentResult:
+        diagnostic = self._overhead_gas_equilibrium_diagnostic()
+        controls: Dict[str, Any] = {
+            'headspace_volume_m3': self._headspace_volume_m3(),
+            'headspace_temperature_K': self._headspace_temperature_K(),
+            'bleed_conductance_kg_s_per_bar': (
+                self._headspace_bleed_conductance_kg_s_per_bar()
+            ),
+            'p_total_bar': float(diagnostic.get('p_total_bar', 0.0) or 0.0),
+            'p_downstream_bar': self._headspace_downstream_pressure_bar(),
+            'dt_hr': 1.0,
+            'force_drain_all': bool(force_drain_all),
+            'max_o2_flow_kg_hr': float(
+                getattr(turbine_spec, 'max_O2_flow_kg_hr', 0.0) or 0.0
+            ),
+        }
+        if o2_vented_kg is not None:
+            controls['o2_vented_kg'] = max(0.0, float(o2_vented_kg))
+        result = self._dispatch_and_commit(
+            ChemistryIntent.OVERHEAD_BLEED,
+            control_inputs=controls,
+        )
+        if (result.diagnostic or {}).get('bled_o2_mol', 0.0) > 0.0:
+            for stage in self.train.stages:
+                stage.collected_kg.pop(OXYGEN_SPECIES, None)
+        self._sync_oxygen_kg_counters()
+        return result
+
+    def _compute_intrinsic_melt_fO2(
+        self, temperature_K: Optional[float] = None
+    ) -> float:
+        T_K = (
+            float(temperature_K)
+            if temperature_K is not None
+            else float(self.melt.temperature_C) + 273.15
+        )
+        if T_K <= 0.0:
+            return -9.0
+        comp = self._melt_oxide_wt_pct()
+        feo = max(0.0, float(comp.get('FeO', 0.0)))
+        fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0)))
+        alkali = max(0.0, float(comp.get('Na2O', 0.0))) + max(
+            0.0, float(comp.get('K2O', 0.0)))
+        # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
+        # matching the Phase 1 contract's Kress91 basalt reference. The
+        # composition term is intentionally small until an explicit Fe3+/Fe2+
+        # policy lands.
+        log_iw = -27215.0 / T_K + 6.57
+        redox_offset = 0.0
+        if feo > 0.0 and fe2o3 > 0.0:
+            redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
+        redox_offset += min(0.15, alkali * 0.01)
+        return max(-9.0, min(0.0, log_iw + redox_offset))
 
     def _seed_atom_ledger(
         self,
@@ -1544,7 +1741,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # melt T.
         T_K = 1473.0
         P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
-        fO2_log = float(self.melt.fO2_log)
+        fO2_log = self._compute_intrinsic_melt_fO2(T_K)
+        self.melt.fO2_log = fO2_log
         self._last_sulfur_saturation_result = (
             self._sulfsat_gate.compute_sulfur_saturation(
                 liquid_comp_wt=comp_wt,
@@ -1582,7 +1780,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if T_K <= 0.0:
             return
         P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
-        fO2_log = float(self.melt.fO2_log)
+        fO2_log = self._compute_intrinsic_melt_fO2(T_K)
+        self.melt.fO2_log = fO2_log
         sulfur_result = self._sulfsat_gate.compute_sulfur_saturation(
             liquid_comp_wt=comp_wt,
             T_K=T_K,
@@ -1714,11 +1913,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._backend_composition_mol_by_account())
             self._validate_backend_account_scope_support(
                 backend_composition_by_account)
+            intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+            self.melt.fO2_log = intrinsic_fO2_log
             backend_kwargs = {
                 'temperature_C': self.melt.temperature_C,
                 'composition_mol': self._backend_composition_mol(),
                 'species_formula_registry': self.species_formula_registry,
-                'fO2_log': self.melt.fO2_log,
+                'fO2_log': intrinsic_fO2_log,
                 'pressure_bar': self.melt.p_total_mbar / 1000.0,
             }
             if self._backend_accepts_kwarg('composition_mol_by_account'):
@@ -1886,8 +2087,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={'pO2_bar': self._commanded_pO2_bar()},
+            fO2_log=self._compute_intrinsic_melt_fO2(),
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._last_vapor_pressure_diagnostic = diagnostic
         kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
         if kernel_vp:
             result.vapor_pressures_Pa = dict(kernel_vp)
@@ -2981,6 +3184,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
+        self._configure_overhead_headspace(campaign)
+        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -3139,135 +3344,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg > 1e-12 and species != OXYGEN_SPECIES
         }
 
-    # ------------------------------------------------------------------
-    # F-A2: Terminal-routing writer (single chemistry-exempt entry point).
-    #
-    # The four interim-to-terminal account moves below are NOT chemistry
-    # transitions -- they shuffle already-balanced species between
-    # process / terminal accounts (overhead_gas -> terminal.offgas;
-    # overhead_gas -> OXYGEN_MELT_OFFGAS_ACCOUNT;
-    # overhead_gas -> OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT;
-    # OXYGEN_MELT_OFFGAS_ACCOUNT -> OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT).
-    # They share the ``LedgerTransition.move`` shape, so a single helper
-    # centralises the writer-purity exemption to one labelled spot --
-    # ``tests/chemistry/test_writer_purity.py`` enforces this as the
-    # ONLY ``atom_ledger.apply`` writer in ``simulator/`` outside the
-    # kernel and melt_backend subtrees.
-    #
-    # Binding spec §3: the chemistry kernel owns the commit_batch path
-    # for atom-balanced chemistry transitions; the move-shaped
-    # transfers below are vocabulary-preserving routing and do NOT
-    # require a ChemistryProvider authoritative for any intent.
-    # ------------------------------------------------------------------
-    # WRITER-EXEMPT: terminal-routing move (no chemistry transition); see
-    # binding-spec §3.  This is the SINGLE atom_ledger.apply path used by
-    # the simulator's interim-to-terminal account routing helpers; the
-    # writer purity test asserts no other tagged call sites exist
-    # outside simulator/chemistry/kernel/ and simulator/melt_backend/.
-    def _drain_to_terminal(
-        self,
-        name: str,
-        source_account: str,
-        target_account: str,
-        species_kg: Mapping[str, float],
-        *,
-        reason: str,
-    ) -> None:
-        """Route ``species_kg`` from ``source_account`` to ``target_account``.
-
-        Single chemistry-exempt writer for the four terminal-routing
-        sites (`_drain_overhead_gas_to_terminal`,
-        `_route_overhead_oxygen_to_terminal` × 2 internal moves,
-        `_debit_vented_oxygen`).  All four sites previously called
-        ``self.atom_ledger.apply(LedgerTransition.move(...))`` directly;
-        the helper centralises the exemption so the writer-purity test
-        can audit one spot instead of four.
-        """
-        # WRITER-EXEMPT: terminal-routing move (no chemistry transition);
-        # see binding-spec §3.
-        self.atom_ledger.apply(
-            LedgerTransition.move(
-                name,
-                source_account,
-                target_account,
-                dict(species_kg),
-                reason=reason,
-            )
-        )
-
-    def _drain_overhead_gas_to_terminal(self) -> None:
-        gas_kg = self._overhead_gas_totals()
-        if not gas_kg:
-            return
-        self._drain_to_terminal(
-            f'drain_overhead_gas_{self.melt.hour}',
-            'process.overhead_gas',
-            'terminal.offgas',
-            gas_kg,
-            reason='overhead vapor stream leaves current-tick gas volume',
-        )
-
-    def _route_overhead_oxygen_to_terminal(self, vented_kg: float) -> None:
-        vented_kg = max(0.0, float(vented_kg))
-        overhead_kg = self._ledger_o2_kg('process.overhead_gas')
-        if overhead_kg <= OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            return
-        if vented_kg > overhead_kg + OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            raise AccountingError(
-                f"cannot vent {vented_kg:.12g} kg O2; only "
-                f"{overhead_kg:.12g} kg is in process.overhead_gas"
-            )
-        if vented_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            self._drain_to_terminal(
-                'vent_overhead_oxygen',
-                'process.overhead_gas',
-                OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
-                {OXYGEN_SPECIES: vented_kg},
-                reason='overhead O2 vented to vacuum by gas train',
-            )
-        stored_kg = max(0.0, overhead_kg - vented_kg)
-        if stored_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            self._drain_to_terminal(
-                'store_overhead_oxygen',
-                'process.overhead_gas',
-                OXYGEN_MELT_OFFGAS_ACCOUNT,
-                {OXYGEN_SPECIES: stored_kg},
-                reason='overhead O2 stored by gas train',
-            )
-        self._sync_oxygen_kg_counters()
-
-    def _route_melt_offgas_oxygen_to_terminal(self, vented_kg: float) -> None:
-        """Route this tick's melt/offgas O2 through current interim sinks."""
-        vented_remaining_kg = max(0.0, float(vented_kg))
-        overhead_kg = self._ledger_o2_kg('process.overhead_gas')
-        if overhead_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            overhead_vented_kg = min(vented_remaining_kg, overhead_kg)
-            self._route_overhead_oxygen_to_terminal(overhead_vented_kg)
-            vented_remaining_kg -= overhead_vented_kg
-        if vented_remaining_kg > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            self._debit_vented_oxygen(vented_remaining_kg)
-
-    def _debit_vented_oxygen(self, vented_kg: float) -> None:
-        vented_kg = max(0.0, float(vented_kg))
-        if vented_kg <= OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            return
-        stored_kg = self._ledger_o2_kg(OXYGEN_MELT_OFFGAS_ACCOUNT)
-        if vented_kg > stored_kg + OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            raise AccountingError(
-                f"cannot vent {vented_kg:.12g} kg O2; only "
-                f"{stored_kg:.12g} kg is in {OXYGEN_MELT_OFFGAS_ACCOUNT}"
-            )
-        self._drain_to_terminal(
-            'vent_terminal_oxygen',
-            OXYGEN_MELT_OFFGAS_ACCOUNT,
-            OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
-            {OXYGEN_SPECIES: vented_kg},
-            reason='O2 vented to vacuum',
-        )
-        for stage in self.train.stages:
-            stage.collected_kg.pop(OXYGEN_SPECIES, None)
-        self._sync_oxygen_kg_counters()
-
     def _validate_backend_ledger_transition(
         self, transition: LedgerTransition
     ) -> None:
@@ -3376,6 +3452,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 2. Temperature ramp ---
         self._update_temperature()
+        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
 
         # --- 3. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,
@@ -3452,7 +3529,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # carried over from prior ticks not yet drained. max()-ing the two
         # overlapping quantities would let the turbine see carried-over O2 as
         # fresh throughput, or mask the case where holdup < this-hour output.
-        melt_offgas_O2_kg_hr = self._ledger_o2_kg('process.overhead_gas')
+        finite_headspace_enabled = self._overhead_headspace_enabled()
+        bleed_result = None
+        if finite_headspace_enabled:
+            bleed_result = self._dispatch_overhead_bleed(
+                turbine_spec=turbine_spec)
+            bleed_diag = dict(bleed_result.diagnostic or {})
+            melt_offgas_O2_kg_hr = float(
+                bleed_diag.get('bled_o2_kg', 0.0) or 0.0)
+        else:
+            melt_offgas_O2_kg_hr = self._ledger_o2_kg(
+                'process.overhead_gas')
         self.overhead = self.overhead_model.update(
             evap_flux,
             self.melt,
@@ -3461,12 +3548,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
             actual_O2_mol_hr=melt_offgas_O2_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL,
             mre_anode_O2_mol_hr=(
-                self._mre_anode_O2_kg_this_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL))
+                self._mre_anode_O2_kg_this_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL),
+            overhead_holdup_mol=self._overhead_holdup_mol(),
+            existing_gas=self.overhead,
+            headspace_volume_m3=self._headspace_volume_m3(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+            bleed_conductance_kg_s_per_bar=(
+                self._headspace_bleed_conductance_kg_s_per_bar()))
 
         # Track cumulative O₂ vented and stored
-        self._route_melt_offgas_oxygen_to_terminal(
-            self.overhead.O2_vented_kg_hr)
-        self._drain_overhead_gas_to_terminal()
+        if not finite_headspace_enabled:
+            self._dispatch_overhead_bleed(
+                turbine_spec=turbine_spec,
+                force_drain_all=True,
+                o2_vented_kg=self.overhead.O2_vented_kg_hr,
+            )
         self._sync_oxygen_kg_counters()
 
         # --- 8. Energy ---
@@ -3628,6 +3724,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.record.batch_mass_kg, feedstock)
             # Also store volatiles train spec for Loop 4 throttle
             self._volatiles_train_spec = self._equipment.volatiles_train
+            self.overhead_model.pipe_diameter_m = self._equipment.pipe.diameter_m
+            self.overhead_model.pipe_length_m = self._equipment.pipe.length_m
         return self._equipment.turbine
 
     # ------------------------------------------------------------------

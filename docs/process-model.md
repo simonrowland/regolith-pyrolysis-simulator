@@ -38,6 +38,13 @@ including `NiO` and `CoO`. Raw water, organics/carbon, sulfur,
 halides/perchlorates, salts, native metals, sulfides, and refractory trace
 extras are routed into explicit inventory buckets.
 
+With `overhead_headspace.enabled: true`, evaporation transitions route
+melt-released vapor and its O2 coproduct through `process.overhead_gas` before
+`OVERHEAD_BLEED` moves material to terminal accounts. The four O2 terminal bins
+remain distinct: Stage 0, MRE anode, stored melt offgas, and vented melt
+offgas. With the toggle OFF, the legacy drain-each-tick behavior is preserved
+through the same kernel-committed bleed provider.
+
 ## Stage 0 Preprocessing Contract
 
 Stage 0 is the preprocessing transform between raw feedstock inventory and

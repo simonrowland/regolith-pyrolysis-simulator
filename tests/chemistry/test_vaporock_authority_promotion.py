@@ -371,7 +371,7 @@ def test_capability_summary_reports_authority_swap(
         'fallback slot for VAPOR_PRESSURE must be the builtin Antoine '
         'provider after goal #10 demotion'
     )
-    # The six other authoritative builtins from goal #7 stay
+    # The other authoritative builtins stay
     # authoritative; capability_summary is a single read of the
     # post-swap state and must show every kernel-registered intent.
     expected_builtin_intents = {
@@ -381,6 +381,8 @@ def test_capability_summary_reports_authority_swap(
         'electrolysis_step': 'builtin-electrolysis-step',
         'metallothermic_step': 'builtin-metallothermic-step',
         'stage0_pretreatment': 'builtin-stage0-pretreatment',
+        'overhead_gas_equilibrium': 'builtin-overhead-gas-equilibrium',
+        'overhead_bleed': 'builtin-overhead-bleed',
     }
     for intent, expected_provider_id in expected_builtin_intents.items():
         entry = summary.get(intent)
