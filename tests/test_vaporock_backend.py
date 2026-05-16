@@ -1,4 +1,3 @@
-import math
 import types
 import warnings
 from pathlib import Path
@@ -45,148 +44,20 @@ def _expected_wt_pct(composition_mol):
     }
 
 
-_KRESS91_IW_FO2_LOG = {
-    1700.0: -7.46,
-    1900.0: -7.46
-    + (1900.0 - 1700.0) * ((-7.98) - (-7.46)) / (1873.15 - 1700.0),
-}
-
-_CALIBRATION_FEEDSTOCKS = {
-    "tholeiite": {
-        "label": "SF2004 tholeiite",
-        "composition_wt_pct": {
-            "SiO2": 51.55,
-            "TiO2": 1.73,
-            "Al2O3": 14.72,
-            "FeO": 13.69,
-            "MgO": 4.76,
-            "CaO": 8.97,
-            "Na2O": 3.21,
-            "K2O": 0.78,
-        },
-    },
-    "lunar_mare_basalt_12022_proxy": {
-        "label": "Sossi-Fegley 2018 lunar basalt 12022 proxy",
-        "composition_wt_pct": {
-            "SiO2": 44.5,
-            "TiO2": 1.5,
-            "Al2O3": 13.5,
-            "FeO": 16.5,
-            "MgO": 9.0,
-            "CaO": 11.0,
-            "Na2O": 0.4,
-            "K2O": 0.10,
-            "MnO": 0.20,
-            "P2O5": 0.10,
-            "Cr2O3": 0.35,
-        },
-    },
-    "eac1a": {
-        "label": "Sesko 2022 EAC-1A simulant",
-        "composition_wt_pct": {
-            "SiO2": 44.41,
-            "Fe2O3": 12.20,
-            "FeO": 0.0,
-            "MgO": 12.09,
-            "CaO": 10.98,
-            "Al2O3": 12.80,
-            "TiO2": 2.44,
-            "MnO": 0.20,
-            "Na2O": 2.95,
-            "K2O": 1.32,
-            "P2O5": 0.61,
-        },
-    },
-}
-
-_CALIBRATION_ANCHORS = (
-    ("tholeiite@1700:SiO", "tholeiite", 1700.0, "SiO", 1.662438153753647e-4),
-    ("tholeiite@1700:Na", "tholeiite", 1700.0, "Na", 0.5957559572686721),
-    ("tholeiite@1700:SiO2", "tholeiite", 1700.0, "SiO2", 2.0014513226977964e-5),
-    ("tholeiite@1700:O2", "tholeiite", 1700.0, "O2", 0.14694523879497493),
-    ("tholeiite@1700:Mg", "tholeiite", 1700.0, "Mg", 5.1612454784145e-6),
-    ("tholeiite@1900:SiO", "tholeiite", 1900.0, "SiO", 0.013071481606333745),
-    ("tholeiite@1900:Na", "tholeiite", 1900.0, "Na", 6.084089513520194),
-    ("tholeiite@1900:SiO2", "tholeiite", 1900.0, "SiO2", 0.0011874748337263735),
-    ("tholeiite@1900:O2", "tholeiite", 1900.0, "O2", 1.4786209582187064),
-    ("tholeiite@1900:Mg", "tholeiite", 1900.0, "Mg", 0.00028464670729431936),
-    (
-        "lunar_mare_basalt_12022_proxy@1700:SiO",
-        "lunar_mare_basalt_12022_proxy",
-        1700.0,
-        "SiO",
-        0.03890853546156492,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1700:Na",
-        "lunar_mare_basalt_12022_proxy",
-        1700.0,
-        "Na",
-        0.01205844483976841,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1700:O2",
-        "lunar_mare_basalt_12022_proxy",
-        1700.0,
-        "O2",
-        10.0 ** _KRESS91_IW_FO2_LOG[1700.0] * 1e5,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1700:Mg",
-        "lunar_mare_basalt_12022_proxy",
-        1700.0,
-        "Mg",
-        0.01859260480345491,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1900:SiO",
-        "lunar_mare_basalt_12022_proxy",
-        1900.0,
-        "SiO",
-        0.15489766962984006,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1900:Na",
-        "lunar_mare_basalt_12022_proxy",
-        1900.0,
-        "Na",
-        0.017033006065935375,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1900:O2",
-        "lunar_mare_basalt_12022_proxy",
-        1900.0,
-        "O2",
-        10.0 ** _KRESS91_IW_FO2_LOG[1900.0] * 1e5,
-    ),
-    (
-        "lunar_mare_basalt_12022_proxy@1900:Mg",
-        "lunar_mare_basalt_12022_proxy",
-        1900.0,
-        "Mg",
-        0.03709712370144295,
-    ),
-    ("eac1a@1700:O2", "eac1a", 1700.0, "O2",
-     10.0 ** _KRESS91_IW_FO2_LOG[1700.0] * 1e5),
-    ("eac1a@1900:O2", "eac1a", 1900.0, "O2",
-     10.0 ** _KRESS91_IW_FO2_LOG[1900.0] * 1e5),
-)
-
-_KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR = {
-    "tholeiite@1700:O2": 1.8,
-    "tholeiite@1700:Mg": 1.4,
-    "tholeiite@1900:SiO": 2.1,
-    "tholeiite@1900:O2": 3.4,
-    "tholeiite@1900:Mg": 2.3,
-    "lunar_mare_basalt_12022_proxy@1700:SiO": 1.7,
-    "lunar_mare_basalt_12022_proxy@1700:Na": 1.8,
-    "lunar_mare_basalt_12022_proxy@1700:Mg": 2.4,
-    "lunar_mare_basalt_12022_proxy@1900:Na": 3.2,
-}
-
-
-def _calibration_pressure(pressures, species):
-    return pressures.get(species, pressures.get(f"{species}_gas"))
+# §25 calibration grid retired here under \\goal CHEMISTRY-E2E-TEST-REGIME
+# (chunk 20/Phase-A): the (T, melt, species, reference_Pa) anchor table
+# and the per-anchor max-error envelope now live in
+# ``tests/chemistry/corpus_fixtures.py`` (the table) and
+# ``tests/chemistry/test_corpus_anchored_parity.py`` (the envelope), so
+# the corpus-driven framework owns the residual story. The framework's
+# §25-cohort acceptance is invoked from this file via
+# ``test_vaporock_iw_literature_grid_residuals_are_explicit`` below as a
+# thin shim that delegates to the new corpus-anchored test machinery —
+# the §25 v1 behaviour (grid evaluated at intrinsic IW fO2, residuals
+# capped to documented envelope, new failures rejected) is preserved
+# bit-for-bit, and a new ``benchmark-fixture.yaml`` in the corpus auto-
+# extends the test surface (see
+# ``tests/chemistry/test_corpus_anchored_parity.py::test_loader_auto_extends_to_new_fixture``).
 
 
 def test_missing_vaporock_import_marks_backend_unavailable(monkeypatch):
@@ -580,15 +451,22 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
 
 
 def test_vaporock_iw_literature_grid_residuals_are_explicit():
-    """Evaluate every covered calibration-grid cell at intrinsic IW fO2.
+    """§25 calibration grid: thin shim into the corpus-anchored framework.
 
-    The goal #25 grid is not fully converged yet. This test still exercises
-    all covered cells and fails only for new residuals or known residuals that
-    get worse than the documented envelope. Missing literature cells stay in
-    docs-private/vapor-pressure-calibration-blockers.md rather than being
-    synthesized here.
+    \\goal CHEMISTRY-E2E-TEST-REGIME (chunk 20/Phase-A) retired the
+    hardcoded grid that used to live here in favour of the framework
+    at :mod:`tests.chemistry.corpus_fixtures` +
+    :mod:`tests.chemistry.test_corpus_anchored_parity`. This test stays
+    in place so the §25 cohort acceptance is invocable as a single
+    pytest entry, but the residual envelope, the (T, melt, species)
+    table, and the dispatch path all live in the framework now.
+
+    The shim asserts the framework's evaluation reproduces the §25 v1
+    baseline (11 of 30 pass at 1-decade) and that no new failure has
+    been introduced. It does NOT re-implement the grid: a new corpus
+    extension or engine fix changes the framework's report, not this
+    file.
     """
-
     backend = VapoRockBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
@@ -600,65 +478,67 @@ def test_vaporock_iw_literature_grid_residuals_are_explicit():
     vapor_pressures = yaml.safe_load(
         (repo_root / "data" / "vapor_pressures.yaml").read_text()
     )
+    feedstocks = yaml.safe_load(
+        (repo_root / "data" / "feedstocks.yaml").read_text()
+    )
+    setpoints = yaml.safe_load(
+        (repo_root / "data" / "setpoints.yaml").read_text()
+    )
 
-    failures = {}
-    evaluated = 0
-    for anchor_id, feedstock_key, T_K, species, reference_Pa in (
-        _CALIBRATION_ANCHORS
-    ):
-        sim = PyrolysisSimulator(
-            StubBackend(),
-            {"campaigns": {}},
-            {feedstock_key: _CALIBRATION_FEEDSTOCKS[feedstock_key]},
-            vapor_pressures,
-        )
-        sim.load_batch(feedstock_key, mass_kg=1000.0)
-        result = backend.equilibrate(
-            T_K - 273.15,
-            composition_mol=sim._backend_composition_mol(),
-            fO2_log=_KRESS91_IW_FO2_LOG[T_K],
-            pressure_bar=1e-12,
-        )
-        if not result.vapor_pressures_Pa:
-            pytest.skip("VapoRock returned no vapor pressures for IW grid")
+    # Local import keeps the framework dependency confined to this
+    # delegating test — tests/test_vaporock_backend.py's adapter unit
+    # tests above do not need the framework.
+    from tests.chemistry.test_corpus_anchored_parity import (
+        KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR,
+        _evaluate_grid_25,
+    )
 
-        observed_Pa = _calibration_pressure(
-            result.vapor_pressures_Pa, species
-        )
-        assert observed_Pa is not None and observed_Pa > 0.0, (
-            f"{anchor_id} missing {species} pressure from VapoRock "
-            f"result keys {sorted(result.vapor_pressures_Pa)}"
-        )
+    report = _evaluate_grid_25(
+        "vaporock",
+        vapor_pressure_data=vapor_pressures,
+        setpoints_data_root=setpoints,
+        feedstocks_data_root=feedstocks,
+    )
+    assert len(report) == 30, (
+        f"corpus framework returned {len(report)} grid anchors; expected 30"
+    )
 
-        evaluated += 1
-        error_decades = abs(math.log10(observed_Pa / reference_Pa))
-        if error_decades > 1.0:
-            failures[anchor_id] = error_decades
-
-    assert evaluated == len(_CALIBRATION_ANCHORS)
-
+    failures = {
+        anchor_id: entry
+        for anchor_id, entry in report.items()
+        if entry["status"] == "fail"
+    }
     unexpected = {
-        anchor_id: error
-        for anchor_id, error in failures.items()
-        if anchor_id not in _KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR
+        anchor_id: entry
+        for anchor_id, entry in failures.items()
+        if anchor_id not in KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR
     }
     assert not unexpected, (
         "new calibration-grid residuals above 1 decade: "
         + ", ".join(
-            f"{anchor_id}={error:.2f}" for anchor_id, error in unexpected.items()
+            f"{anchor_id}={entry['error_decades']:.2f}"
+            for anchor_id, entry in unexpected.items()
         )
     )
 
     worsened = {
-        anchor_id: error
-        for anchor_id, error in failures.items()
-        if error > _KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR[anchor_id]
+        anchor_id: entry
+        for anchor_id, entry in failures.items()
+        if entry["error_decades"]
+        > KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR[anchor_id]
     }
     assert not worsened, (
         "known calibration residuals worsened: "
         + ", ".join(
-            f"{anchor_id}={error:.2f}" for anchor_id, error in worsened.items()
+            f"{anchor_id}={entry['error_decades']:.2f}"
+            for anchor_id, entry in worsened.items()
         )
+    )
+
+    passing = sum(1 for e in report.values() if e["status"] == "pass")
+    assert passing >= 11, (
+        f"§25 v1 baseline regressed: framework reports {passing} of 30 "
+        f"passing; baseline is 11"
     )
 
 
