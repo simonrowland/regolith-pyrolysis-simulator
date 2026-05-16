@@ -135,7 +135,17 @@ def _force_vaporock_available(sim: PyrolysisSimulator) -> VapoRockProvider:
                 pressure_bar=1e-6,
                 fO2_log=-9.0,
                 status='ok',
-                vapor_pressures_Pa={'Na': 1234.5, 'SiO': 67.8},
+                # The SiO value is anchored to the SF2004 Table 9
+                # back-solve (0.0131 Pa for tholeiitic basalt at 1900 K).
+                # The earlier placeholder of 67.8 Pa was chosen to match
+                # the builtin Antoine's wrong 33 Pa scale and would
+                # mask any future literature-anchored validation of the
+                # authoritative-path output. Anchored value chosen
+                # 2026-05-16 per \\goal VAPOROCK-SIO-DIVERGENCE (chunk
+                # 24/Phase-2) -- see docs-private/sio-parity-
+                # investigation-2026-05-16.md for the literature
+                # derivation.
+                vapor_pressures_Pa={'Na': 1234.5, 'SiO': 0.0131},
             )
 
     fake = _FakeBackend()
@@ -190,7 +200,7 @@ def test_vaporock_available_no_flag_dispatches_through_vaporock(
     # the provider's filter keeps both (both are in the YAML's
     # metals/oxide_vapors sections), so they appear in the diagnostic.
     vapor = dict(result.diagnostic.get('vapor_pressures_Pa') or {})
-    assert vapor == {'Na': pytest.approx(1234.5), 'SiO': pytest.approx(67.8)}
+    assert vapor == {'Na': pytest.approx(1234.5), 'SiO': pytest.approx(0.0131)}
     assert 'kernel_fallback_used' not in dict(result.diagnostic or {})
 
 
@@ -328,7 +338,7 @@ def test_flag_does_not_override_authoritative_when_vaporock_available(
     # authoritative path produced the result.
     vapor = dict(result.diagnostic.get('vapor_pressures_Pa') or {})
     assert vapor.get('Na') == pytest.approx(1234.5)
-    assert vapor.get('SiO') == pytest.approx(67.8)
+    assert vapor.get('SiO') == pytest.approx(0.0131)
     assert 'kernel_fallback_used' not in dict(result.diagnostic or {})
 
 
