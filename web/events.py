@@ -15,6 +15,27 @@ from simulator.melt_backend.factsage_config import (
     FactSAGEConfigError,
     load_factsage_config,
 )
+# Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
+# runner share ONE per-hour summary builder so the web emit shape stays
+# a strict superset of the CLI fixture shape, and a future physics
+# drift in one path cannot diverge from the other.  The web stream
+# does NOT call :meth:`PyrolysisRun.iter_hours` directly because the
+# UI requires operator-controlled decision routing (``make_decision``
+# round-trip + pause semantics), whereas ``iter_hours`` auto-applies
+# the recommendation -- correct for an unattended CLI run, wrong for
+# the operator interface.  Instead the web stream:
+#
+#   * builds its own simulator (preserving the legacy ``auto`` /
+#     ``alphamelts`` / ``factsage`` backend autodetect chain that the
+#     runner intentionally does not export -- the CLI path is strict
+#     about backend selection so a fixture re-run cannot silently swap
+#     engines);
+#   * advances it one step at a time;
+#   * calls ``build_per_hour_summary`` for the runner-format frame and
+#     emits it as a SocketIO ``per_hour_summary`` event alongside the
+#     legacy ``simulation_tick`` payload, so any client that speaks the
+#     runner schema sees the same numbers the CLI writes to a fixture.
+from simulator.runner import build_per_hour_summary
 from web.feedstock_data import load_visible_feedstocks
 
 
@@ -530,7 +551,17 @@ def register_events(socketio):
             backend_message=backend_message,
         ), room=sid)
 
-        # Start background loop
+        # Start background loop.  The step body uses
+        # ``simulator.runner.build_per_hour_summary`` so the live
+        # SocketIO stream's per-hour shape stays a strict superset of
+        # the CLI runner's golden-fixture shape -- the same goal #18
+        # contract documented in docs/runner-output-schema.md.  The
+        # web stream keeps the operator in charge of decisions
+        # (decisions are routed through ``make_decision`` rather than
+        # auto-applied), so this loop does NOT use
+        # ``PyrolysisRun.iter_hours``: that helper auto-applies the
+        # recommendation, which is correct for unattended CLI runs but
+        # wrong for the UI's "pause + ask the operator" semantics.
         def run_loop():
             while True:
                 state, _ = _current_simulation_state(sid, run_id)
@@ -596,6 +627,20 @@ def register_events(socketio):
                 )
                 if not _emit_if_current(
                     socketio, sid, run_id, 'simulation_tick', tick_data
+                ):
+                    break
+
+                # Goal #18 parity event.  Emit the runner-format
+                # per-hour summary alongside the legacy
+                # ``simulation_tick`` so any downstream consumer that
+                # speaks the runner schema (CLI golden tests, future
+                # streaming clients) sees the same numbers the CLI
+                # commits to a fixture.  Failure to find the active
+                # session is treated identically to the tick path so
+                # the stream tears down cleanly.
+                per_hour = build_per_hour_summary(sim=sim, snapshot=snapshot)
+                if not _emit_if_current(
+                    socketio, sid, run_id, 'per_hour_summary', per_hour
                 ):
                     break
 
