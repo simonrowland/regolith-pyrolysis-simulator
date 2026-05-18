@@ -180,6 +180,51 @@ oxide_vapors:
       Condenses as adhesive, corrosive amorphous silica below ~1200°C.
       See [THERMO-1] in context-thermo.md.
 
+  CrO2:
+    formula: "CrO2"
+    molar_mass_g_mol: 83.9961
+    parent_oxide: "Cr2O3"
+    stoich_oxide_per_vapor: 0.9047574827878914  # kg Cr2O3 consumed per kg CrO2 evaporated
+    stoich_O2_per_vapor: -0.09524251721210866  # kg O2 consumed per kg CrO2 evaporated
+    antoine:
+      # Fallback fit to VapoRock JANAF0 CrO2(g) output over 1500-2200 K:
+      # log10(P_Pa) = A - B/T_K + 0.5 log10(a_Cr2O3) + 0.25 log10(pO2_bar)
+      A: 12.9245114
+      B: 23732.9593
+      C: 0
+    oxide_activity_exponent: 0.5
+    pO2_exponent: 0.25
+    pO2_reference_bar: 1.0
+    valid_range_K: [1500, 2200]
+    vaporock_janaf0_shomate:
+      source_file: "../VapoRock/src/vaporock/data/JANAF0-vapor-data.csv"
+      source_row: 34
+      species_name: "CrO2(g)"
+      valid_range_K: [1100, 6000]
+      A: 57.85928
+      B: 0.190282
+      C: -0.038347
+      D: 0.002643
+      E: -2.578022
+      F: -99.71476
+      G: 328.5921
+      H: -75.312
+      source: JANAF coefficients shipped by VapoRock.
+    condensation_T_C: [1100, 1300]
+    condensation_setpoint_C: 1250
+    condensation_product: "Cr2O3(s) harvest with O2 coproduct: CrO2 -> 0.5 Cr2O3 + 0.25 O2"
+    condensation_products_mol_per_mol_vapor:
+      Cr2O3: 0.5
+      O2: 0.25
+    condensation_product_accounts:
+      Cr2O3: "terminal.chromium_condensed_oxide_stored"
+      O2: "process.overhead_gas"
+    notes: |
+      Option A engineering path: CrO2(g) is collected as stable Cr2O3 in a
+      dedicated high-temperature Cr oxide stage between Fe and SiO. Sossi-Moon
+      fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
+      supplies CrO2(g) thermochemistry over 1100-6000 K.
+
   FeO_vapor:
     formula: "FeO"
     molar_mass_g_mol: 71.84
@@ -201,3 +246,4 @@ condensation_reference_at_1mbar:
   Ca: 780     # would condense in Stage 3 if present
   Mn: 1000    # between Stage 1 and 2
   Cr: 1280    # Stage 1 (co-deposits with Fe)
+  CrO2: 1250  # Dedicated Cr oxide stage; condenses as Cr2O3 + O2

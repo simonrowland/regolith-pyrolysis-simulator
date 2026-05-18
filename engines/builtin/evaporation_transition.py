@@ -187,6 +187,18 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             )
 
         scale = min(1.0, available_kg / oxide_removed)
+        if O2_kg < -1e-12:
+            registry = request.account_view.species_formula_registry
+            o2_formula = resolve_species_formula("O2", registry)
+            available_o2_mol = (
+                request.account_view.accounts.get("process.overhead_gas", {})
+                .get("O2", 0.0)
+            )
+            available_o2_kg = (
+                float(available_o2_mol)
+                * o2_formula.molar_mass_kg_per_mol()
+            )
+            scale = min(scale, max(0.0, available_o2_kg / abs(O2_kg)))
         oxide_removed *= scale
         product_kg *= scale
         O2_kg *= scale
@@ -266,6 +278,12 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             )
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
+        if O2_kg < -1e-12:
+            o2_formula = resolve_species_formula("O2", registry)
+            overhead_debit = debits.setdefault("process.overhead_gas", {})
+            overhead_debit["O2"] = (
+                abs(O2_kg) / o2_formula.molar_mass_kg_per_mol()
+            )
 
         if not debits and not credits:
             return IntentResult(

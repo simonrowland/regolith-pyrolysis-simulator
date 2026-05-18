@@ -12,9 +12,9 @@ provider receives the per-species condensed-mass projection via
 
 The provider:
 
-- reads ``process.overhead_gas`` and ``process.condensation_train``
-  from the account view -- the two accounts the deposition leg
-  touches (debit vapor from overhead, credit deposits to the train).
+- reads ``process.overhead_gas``, ``process.condensation_train``, and
+  declared product bins from the account view -- the accounts the
+  deposition leg touches (debit vapor from overhead, credit deposits).
   ``process.cleaned_melt`` is NOT in the declared set: the
   EVAPORATION_TRANSITION provider already owns the melt -> overhead
   leg in the same tick; this provider works on the overhead vapor
@@ -92,10 +92,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     """
 
     name = "builtin-condensation-route"
+    CHROMIUM_CONDENSED_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 
     DECLARED_ACCOUNTS = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        CHROMIUM_CONDENSED_ACCOUNT,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -183,15 +185,14 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # Build the mol-native proposal. Per-account species_mol dicts:
         #   debits:  process.overhead_gas         -> {species: mol}
         #   credits: process.condensation_train   -> {product: mol, ...}
+        #            or product-specific accounts declared in sp_data
         # ------------------------------------------------------------------
         vapor_formula = resolve_species_formula(species, registry)
         vapor_mol = condensed_kg / vapor_formula.molar_mass_kg_per_mol()
         debits: dict[str, dict[str, float]] = {
             "process.overhead_gas": {species: vapor_mol},
         }
-        credits: dict[str, dict[str, float]] = {
-            "process.condensation_train": dict(condensed_product_mol),
-        }
+        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
 
         # Atom-balance proof: element-by-element net (credit - debit).
         # Must be zero element-by-element (the kernel re-checks this
@@ -276,6 +277,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             if mol > 0.0:
                 product_mol[str(product)] = mol
         return product_mol
+
+    def _credits_by_product_account(
+        self,
+        condensed_product_mol: Mapping[str, float],
+        sp_data: Mapping[str, Any],
+    ) -> dict[str, dict[str, float]]:
+        product_accounts = dict(
+            sp_data.get("condensation_product_accounts") or {}
+        )
+        credits: dict[str, dict[str, float]] = {}
+        for product, mol in condensed_product_mol.items():
+            account = str(
+                product_accounts.get(product) or "process.condensation_train"
+            )
+            if account not in self.DECLARED_ACCOUNTS:
+                account = "process.condensation_train"
+            species_mol = credits.setdefault(account, {})
+            species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
+        return credits
 
     @staticmethod
     def _build_atom_balance_proof(

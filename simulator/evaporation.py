@@ -249,6 +249,16 @@ class EvaporationMixin:
             if oxide_removed <= 1e-12 or available_kg <= 1e-12:
                 continue
             scale = min(1.0, available_kg / oxide_removed)
+            O2_per_product_kg = float(stoich.get('O2_per_product_kg', 0.0))
+            if O2_per_product_kg < 0.0:
+                required_o2_kg = rate_kg_hr * abs(O2_per_product_kg)
+                available_o2_kg = self.atom_ledger.kg_by_account(
+                    'process.overhead_gas').get('O2', 0.0)
+                if required_o2_kg > 1e-12:
+                    scale = min(
+                        scale,
+                        max(0.0, available_o2_kg / required_o2_kg),
+                    )
             remaining_kg_hr = route_result.remaining_by_species.get(
                 species, 0.0)
             if (
@@ -448,6 +458,15 @@ class EvaporationMixin:
     ) -> dict:
         _product_mol, product_kg = self._condensed_products_for_vapor(
             species, condensed_kg, sp_data)
+        product_accounts = dict(
+            (sp_data or {}).get('condensation_product_accounts') or {}
+        )
+        if product_accounts:
+            product_kg = {
+                product: kg
+                for product, kg in product_kg.items()
+                if product_accounts.get(product) != 'process.overhead_gas'
+            }
         return product_kg
 
     def _condensation_product_mol_ratios(
@@ -535,11 +554,10 @@ class EvaporationMixin:
                 )
             oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
             O2_per_product = float(sp_data['stoich_O2_per_vapor'])
-            if oxide_per_product <= 0.0 or O2_per_product < 0.0:
+            if oxide_per_product <= 0.0:
                 raise AccountingError(
                     f"vapor species {species!r} from {parent_oxide!r} "
-                    "requires positive stoich_oxide_per_vapor and "
-                    "non-negative stoich_O2_per_vapor"
+                    "requires positive stoich_oxide_per_vapor"
                 )
             if not math.isclose(
                 oxide_per_product,
@@ -616,9 +634,14 @@ class EvaporationMixin:
         product_atoms = self._atom_moles_for_kg(product_species, 1.0)
         for element, moles in product_atoms.items():
             credit_atoms[element] += moles
-        oxygen_atoms = self._atom_moles_for_kg('O2', O2_per_product_kg)
-        for element, moles in oxygen_atoms.items():
-            credit_atoms[element] += moles
+        if O2_per_product_kg >= 0.0:
+            oxygen_atoms = self._atom_moles_for_kg('O2', O2_per_product_kg)
+            for element, moles in oxygen_atoms.items():
+                credit_atoms[element] += moles
+        else:
+            oxygen_atoms = self._atom_moles_for_kg('O2', abs(O2_per_product_kg))
+            for element, moles in oxygen_atoms.items():
+                debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
 
         for element in set(debit_atoms) | set(credit_atoms):
             debit = debit_atoms.get(element, 0.0)

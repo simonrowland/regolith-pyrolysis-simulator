@@ -23,8 +23,8 @@ The Oxygen Shuttle extracts metals + O₂ from regolith in six campaigns:
 
 Two condensation trains branch from the crucible:
     Volatiles train (C0/C0b) — sealed by gate valve after devolatilisation
-    Metals train (C2A onward) — linear 7-stage: hot duct → Fe → SiO →
-        alkali/Mg cyclone → vortex filter → turbine → O₂ accumulator
+    Metals train (C2A onward) — linear 8-stage: hot duct → Fe → Cr oxide →
+        SiO → alkali/Mg cyclone → vortex filter → turbine → O₂ accumulator
 
 Units:
     Temperature     °C
@@ -144,6 +144,7 @@ OXYGEN_STAGE0_ACCOUNT = 'terminal.oxygen_stage0_stored'
 OXYGEN_MELT_OFFGAS_ACCOUNT = 'terminal.oxygen_melt_offgas_stored'
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = 'terminal.oxygen_melt_offgas_vented_to_vacuum'
 OXYGEN_MRE_ANODE_ACCOUNT = 'terminal.oxygen_mre_anode_stored'
+CHROMIUM_CONDENSED_OXIDE_ACCOUNT = 'terminal.chromium_condensed_oxide_stored'
 OXYGEN_STORED_ACCOUNTS = (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -164,6 +165,7 @@ FLOW_MASS_ACCOUNTS = (
     'terminal.stage0_sulfide_matte',
     'terminal.drain_tap_material',
     'terminal.slag',
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -223,7 +225,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     This is the main simulation engine.  It manages:
     - Melt state evolution (composition, temperature)
     - Evaporation kinetics (Hertz-Knudsen with stirring)
-    - Condensation routing (7-stage train)
+    - Condensation routing (8-stage train)
     - Overhead gas dynamics and turbine control
     - Energy tracking
     - Campaign progression and endpoint detection
@@ -3222,6 +3224,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'terminal.stage0_salt_phase',
             'terminal.stage0_sulfide_matte',
             'terminal.drain_tap_material',
+            CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
             'process.metal_phase',
             'process.condensation_train',
             'process.overhead_gas',
@@ -3484,7 +3487,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._shuttle_phase = ''
 
         # --- 5. Condensation routing ---
-        # Send evaporated species through the 7-stage train.
+        # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
         if evap_flux.total_kg_hr > 0:
             self._route_to_condensation(evap_flux)

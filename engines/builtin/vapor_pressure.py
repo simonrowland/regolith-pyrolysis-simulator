@@ -199,11 +199,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if parent_oxide:
                 a_ox = comp_wt.get(parent_oxide, 0.0) / 100.0
                 activities[name] = a_ox
-                P_sat *= max(a_ox, 0.0)
+                activity_exponent = float(
+                    data.get('oxide_activity_exponent', 1.0)
+                )
+                P_sat *= max(a_ox, 0.0) ** activity_exponent
+
+            pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
+            if pO2_exponent:
+                pO2_reference_bar = max(
+                    1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
+                )
+                P_sat *= (pO2_bar / pO2_reference_bar) ** pO2_exponent
 
             # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
             # 1e-9 bar (lunar hard vacuum).
-            if name == 'SiO' and pO2_bar > 1e-9:
+            if name == 'SiO' and not pO2_exponent and pO2_bar > 1e-9:
                 suppression = math.sqrt(1e-9 / pO2_bar)
                 P_sat *= suppression
 

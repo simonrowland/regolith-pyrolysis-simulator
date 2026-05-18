@@ -90,7 +90,7 @@ campaigns:
     pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
     pO2_bar: "<1e-8"
     flow_regime: "viscous"               # Kn << 0.01 at 1-10 mbar
-    target_species: ["Na", "K", "Fe", "SiO"]
+    target_species: ["Na", "K", "Fe", "CrO2", "SiO"]
     adaptive_control:
       law: >
         Meter dT/dt to keep instantaneous outgassing flux (IR-monitored)
@@ -335,6 +335,27 @@ campaigns:
 # ============================================================================
 condensation_train:
 
+  condensation_temperatures_C:
+    CrO2: 1250
+
+  condensation_temperature_sources:
+    CrO2: >-
+      Option A Cr2O3 harvest setpoint. VapoRock JANAF0 has CrO2(g)
+      thermochemistry valid from 1100-6000 K; the Sossi-Moon Cr fixture records
+      CrO2(g) as the relevant Cr vapor above 1500 K. 1250 C sits inside the
+      user-directed 1100-1300 C Cr stage and below the Fe-condenser midpoint so
+      the dedicated Cr stage captures the vapor.
+
+  stages:
+    - stage_number: 2
+      key: "stage_2_cr_oxide_harvest"
+      label: "Cr Oxide Harvester"
+      temp_range_C: [1100, 1300]
+      target_species: ["Cr", "CrO2"]
+      product: "Cr2O3"
+      terminal_account: "terminal.chromium_condensed_oxide_stored"
+      note: "Dedicated physical Cr product stream; CrO2(g) disproportionates to Cr2O3(s) + O2(g)."
+
   # --- Volatiles Train (C0 / C0b products) ---
   volatiles_train:
     gate_valve: true                     # isolates from metals train
@@ -376,7 +397,17 @@ condensation_train:
       product: "liquid Fe draining to sump"
       compatibility: "liquid Fe compatible"
 
-    stage_2_sio_zone:
+    stage_2_cr_oxide_harvest:
+      label: "Cr Oxide Harvester"
+      temp_range_C: [1100, 1300]
+      material: "MZO-lined removable chromia cartridge"
+      max_service_T_C: 1450
+      product: "Cr2O3-rich chromium oxide concentrate"
+      target_species: ["Cr", "CrO2"]
+      terminal_account: "terminal.chromium_condensed_oxide_stored"
+      compatibility: "Cr2O3-stable hot oxide harvest before SiO baffles"
+
+    stage_3_sio_zone:
       label: "SiO Condensation Zone"
       temp_range_C: [900, 1200]
       material: "fused silica baffles (removable cartridge)"
@@ -387,7 +418,7 @@ condensation_train:
         100-160 kg under Path A pN2 sweep.
       compatibility: "Self-compatible with condensate"
 
-    stage_3_alkali_mg_cyclone:
+    stage_4_alkali_mg_cyclone:
       label: "Alkali / Mg Cyclone Separator"
       temp_range_C: [350, 700]
       condensation_temperatures_C:
@@ -395,16 +426,16 @@ condensation_train:
         Na: [450, 550]
         K: [400, 500]
 
-    stage_4_vortex_dust_filter:
+    stage_5_vortex_dust_filter:
       label: "Vortex Dust Filter"
       temp_range_C: [200, 350]
 
-    stage_5_turbine_compressor:
+    stage_6_turbine_compressor:
       label: "Turbine-Compressor (Pressure Regulator)"
       function: "pressure regulator + first-stage O2 compression"
       control: "turbine speed sets upstream pO2; IR feedback loop"
 
-    stage_6_accumulator:
+    stage_7_accumulator:
       label: "O2 Accumulator"
       storage: "compressed O2 gas at ~3 bar"
       compression_energy_kWh_per_t: [15, 30]

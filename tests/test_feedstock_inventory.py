@@ -128,6 +128,29 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert sim.record.products_kg["metallic_FeNi"] == pytest.approx(137.614679)
 
 
+def test_stage0_keeps_cr2o3_in_cleaned_silicate_melt():
+    sim = _sim(
+        {
+            "chromia": {
+                "label": "Chromia-bearing silicate",
+                "composition_wt_pct": {
+                    "SiO2": 99.65,
+                    "Cr2O3": 0.35,
+                },
+            },
+        }
+    )
+
+    sim.load_batch("chromia", mass_kg=1000.0)
+
+    assert sim.melt.composition_kg["Cr2O3"] == pytest.approx(3.5)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
+        "Cr2O3"
+    ] == pytest.approx(3.5)
+    assert "Cr2O3" not in sim.inventory.residual_components_kg
+    assert "Cr2O3" not in sim.inventory.stage0_products_kg
+
+
 def test_inventory_is_visible_on_record_and_snapshot():
     sim = _sim(
         {

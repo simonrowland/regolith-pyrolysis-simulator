@@ -271,7 +271,7 @@ class VapoRockBackend(MeltBackend):
         # simulator filters on availability anyway.
         bare_species = [
             'Na', 'K', 'Fe', 'Mg', 'Ca', 'Si', 'Al', 'Ti', 'Cr', 'Mn',
-            'SiO', 'AlO', 'TiO', 'NaO', 'KO', 'CrO',
+            'SiO', 'AlO', 'TiO', 'NaO', 'KO', 'CrO', 'CrO2',
             'Al2O', 'Ti2O3',
             'O2', 'O',
             'Na2', 'K2', 'NaOH', 'KOH',

@@ -5,15 +5,15 @@ ledger-mutating intent in the migration.
 Covers:
 
 * Capability profile: provider is authoritative for
-  ``CONDENSATION_ROUTE`` and declares the two accounts the deposition
-  leg touches (``process.overhead_gas``, ``process.condensation_train``).
+  ``CONDENSATION_ROUTE`` and declares the accounts the deposition
+  leg touches (overhead, condensation train, dedicated product bins).
   Notably ``process.cleaned_melt`` is NOT declared here -- the melt
   -> overhead leg is the EVAPORATION_TRANSITION provider's
   responsibility.
 * Wrong-intent rejection: the provider returns an ``unsupported``
   ``IntentResult`` if dispatched against an intent it does not serve.
 * Account filter: the kernel filter scopes the provider's view to the
-  two declared accounts only.
+  declared condensation accounts only.
 * Atom-balance gate: a malformed proposal that does NOT conserve atoms
   (SiO disproportionation with missing O coproduct) is rejected at
   ``ChemistryKernel.commit_batch`` with :class:`AtomBalanceError`.
@@ -72,8 +72,8 @@ def test_provider_declares_only_condensation_route_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_two_condensation_accounts():
-    """The deposition leg is strictly overhead_gas -> condensation_train.
+def test_provider_declares_condensation_accounts():
+    """The deposition leg is overhead_gas -> condensation_train/product bins.
 
     Declaring ``process.cleaned_melt`` here would be an account-scope
     leak: the melt -> overhead leg belongs to the EVAPORATION_TRANSITION
@@ -86,6 +86,7 @@ def test_provider_declares_two_condensation_accounts():
     assert profile.declared_accounts == frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "terminal.chromium_condensed_oxide_stored",
     })
     assert "process.cleaned_melt" not in profile.declared_accounts
 
@@ -135,7 +136,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY the
-    two declared condensation accounts. The kernel account filter is the
+    declared condensation accounts. The kernel account filter is the
     enforcer (binding spec §7); a cleaned-melt seed must NOT cross the
     boundary into this provider's view."""
 
@@ -176,6 +177,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     expected = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "terminal.chromium_condensed_oxide_stored",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
@@ -570,8 +572,14 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
     registry = sim.atom_ledger.registry
     cumulative_imbalance_kg = 0.0
     for trans in condensation_transitions:
-        # Strict account scoping: debit side overhead_gas only,
-        # credit side condensation_train only.
+        # Strict account scoping: debit side overhead_gas only; credit side
+        # may return product to condensation_train, dedicated terminal product
+        # bins, or O2 coproduct to overhead_gas.
+        allowed_credit_accounts = {
+            "process.condensation_train",
+            "process.overhead_gas",
+            "terminal.chromium_condensed_oxide_stored",
+        }
         for lot in trans.debits:
             assert lot.account == "process.overhead_gas", (
                 f"condense transition {trans.name} debits unexpected "
@@ -579,10 +587,10 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
                 "process.overhead_gas"
             )
         for lot in trans.credits:
-            assert lot.account == "process.condensation_train", (
+            assert lot.account in allowed_credit_accounts, (
                 f"condense transition {trans.name} credits unexpected "
-                f"account {lot.account!r}; expected only "
-                "process.condensation_train"
+                f"account {lot.account!r}; expected one of "
+                f"{sorted(allowed_credit_accounts)}"
             )
         # Per-transition mass closure: tight 1 mg bound.
         debit_kg = trans.debit_mass_kg(registry)

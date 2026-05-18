@@ -62,6 +62,39 @@ def _sio_train_sim():
     return sim
 
 
+def _cro2_train_sim():
+    backend = StubBackend()
+    backend.initialize({})
+    cr2o3_mw = MOLAR_MASS["Cr2O3"]
+    cro2_mw = MOLAR_MASS["CrO2"]
+    o2_mw = MOLAR_MASS["O2"]
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"chromia": {"label": "Chromia", "composition_wt_pct": {"Cr2O3": 100.0}}},
+        {
+            "metals": {},
+            "oxide_vapors": {
+                "CrO2": {
+                    "parent_oxide": "Cr2O3",
+                    "stoich_oxide_per_vapor": 0.5 * cr2o3_mw / cro2_mw,
+                    "stoich_O2_per_vapor": -0.25 * o2_mw / cro2_mw,
+                    "condensation_products_mol_per_mol_vapor": {
+                        "Cr2O3": 0.5,
+                        "O2": 0.25,
+                    },
+                    "condensation_product_accounts": {
+                        "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                        "O2": "process.overhead_gas",
+                    },
+                },
+            },
+        },
+    )
+    sim.load_batch("chromia", mass_kg=1000.0)
+    return sim
+
+
 def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
     backend = StubBackend()
     backend.initialize({})
@@ -485,6 +518,28 @@ def test_explicit_vapor_stoich_must_conserve_atoms_not_just_mass():
 
     with pytest.raises(AccountingError, match="conserve .* atoms"):
         sim._route_to_condensation(flux)
+
+
+def test_cro2_condenses_to_terminal_chromium_oxide_account():
+    sim = _cro2_train_sim()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test pO2 buffer"
+    )
+    flux = EvaporationFlux(species_kg_hr={"CrO2": 1.0}, total_kg_hr=1.0)
+
+    sim._route_to_condensation(flux)
+    sim._update_melt_composition(flux)
+
+    chromium = sim.atom_ledger.kg_by_account(
+        "terminal.chromium_condensed_oxide_stored"
+    )
+    train = sim.atom_ledger.kg_by_account("process.condensation_train")
+    stage_totals = sim.train.total_by_species()
+
+    assert chromium["Cr2O3"] > 0.9
+    assert "Cr2O3" not in train
+    assert stage_totals["Cr2O3"] == pytest.approx(chromium["Cr2O3"])
+    assert stage_totals.get("O2", 0.0) == pytest.approx(0.0)
 
 
 def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():

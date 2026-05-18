@@ -4,18 +4,19 @@ Condensation Train Model
 
 ★ TIER 2: SCIENTIST-READABLE ★
 
-Models vapor flow through the 7-stage metals condensation train.
+Models vapor flow through the 8-stage metals condensation train.
 Each stage operates at a fixed temperature range and preferentially
 collects species whose condensation temperature falls within that range.
 
 Train topology (metals train, active C2A onward):
     Stage 0  Hot duct (>1400°C)      — IR spectroscopy, no condensation
     Stage 1  Fe condenser (1100-1400°C) — liquid Fe drains to sump
-    Stage 2  SiO zone (900-1200°C)   — fused silica on removable baffles
-    Stage 3  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
-    Stage 4  Vortex dust filter (200-350°C) — entrained particle capture
-    Stage 5  Turbine-compressor      — pressure regulation, pO₂ control
-    Stage 6  Turbine outlet monitor — terminal ledger owns O2 storage
+    Stage 2  Cr oxide harvester (1100-1300°C) — Cr2O3 product cartridge
+    Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles
+    Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
+    Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
+    Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
+    Stage 7  Turbine outlet monitor — terminal ledger owns O2 storage
 
 A separate volatiles train handles C0/C0b products and is sealed
 by a gate valve after devolatilisation.
@@ -55,6 +56,7 @@ from simulator.core import (
 CONDENSATION_TEMPS_C = {
     'Fe':  1250,
     'SiO': 1050,   # condenses as amorphous SiO₂ (disproportionation)
+    'CrO2': 1250,  # condenses as Cr2O3 + O2 in the dedicated Cr stage
     'Mg':  580,
     'Na':  480,
     'K':   420,
@@ -69,6 +71,7 @@ CONDENSATION_TEMPS_C = {
 STICKING_COEFF = {
     'Fe':  0.9,
     'SiO': 0.7,    # SiO → SiO₂ disproportionation is not instantaneous
+    'CrO2': 0.9,
     'Mg':  0.8,
     'Na':  0.95,
     'K':   0.95,
@@ -109,11 +112,12 @@ class CondensationModel:
         self.residence_time_s = {
             0: 0.5,    # Hot duct — fast transit
             1: 5.0,    # Fe condenser — baffles slow the flow
-            2: 4.0,    # SiO zone — removable baffles
-            3: 3.0,    # Cyclone — vortex residence
-            4: 2.0,    # Dust filter
-            5: 0.2,    # Turbine — very fast
-            6: 0.0,    # Accumulator — no condensation
+            2: 240.0,  # Cr oxide harvester — dedicated hot cartridge
+            3: 4.0,    # SiO zone — removable baffles
+            4: 3.0,    # Cyclone — vortex residence
+            5: 2.0,    # Dust filter
+            6: 0.2,    # Turbine — very fast
+            7: 0.0,    # Accumulator — no condensation
         }
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
@@ -140,6 +144,8 @@ class CondensationModel:
             for stage in self.train.stages:
                 if remaining_kg <= 1e-15:
                     break
+                if _cr_stage_isolation_blocks(stage, species):
+                    continue
 
                 # Calculate condensation efficiency               [COND-1]
                 eta = self._condensation_efficiency(
@@ -210,3 +216,10 @@ def _stage_midpoint(stage: CondensationStage) -> float:
     """Midpoint temperature of a stage."""
     lo, hi = stage.temp_range_C
     return (lo + hi) / 2.0
+
+
+def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
+    chromium_stage = 'CrO2' in stage.target_species
+    if species in {'Cr', 'CrO2'}:
+        return not chromium_stage
+    return chromium_stage

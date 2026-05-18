@@ -38,7 +38,7 @@ METAL_SPECIES = [
 # --- Volatile / gas species ---
 # Tracked in the overhead gas and condensation train.
 GAS_SPECIES = [
-    'O2', 'SiO', 'N2', 'H2O', 'CO2', 'S2',
+    'O2', 'SiO', 'CrO2', 'N2', 'H2O', 'CO2', 'S2',
 ]
 
 # --- Molar masses (g/mol) ---
@@ -66,6 +66,7 @@ MOLAR_MASS = {
     'Cr': _AW['Cr'], 'Mn': _AW['Mn'], 'Ni': _AW['Ni'], 'Co': _AW['Co'],
     # Gases
     'O2': 2 * _AW['O'], 'O': _AW['O'], 'SiO': _AW['Si'] + _AW['O'],
+    'CrO2': _AW['Cr'] + 2 * _AW['O'],
     'N2': 2 * _AW['N'], 'H2O': 2 * _AW['H'] + _AW['O'],
     'CO2': _AW['C'] + 2 * _AW['O'], 'S2': 2 * _AW['S'],
 }
@@ -294,15 +295,16 @@ class CondensationStage:
 @dataclass
 class CondensationTrain:
     """
-    The complete metals condensation train (7 stages, indexed 0-6).
+    The complete metals condensation train (8 stages, indexed 0-7).
 
     Stage 0: Hot duct (>1400°C) — IR spectroscopy, no condensation
     Stage 1: Fe condenser (1100-1400°C)
-    Stage 2: SiO zone (900-1200°C) — removable fused silica baffles
-    Stage 3: Alkali/Mg cyclone (350-700°C)
-    Stage 4: Vortex dust filter (200-350°C)
-    Stage 5: Turbine/compressor — pressure regulation
-    Stage 6: O₂ accumulator (~3 bar)
+    Stage 2: Cr oxide harvester (1100-1300°C)
+    Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
+    Stage 4: Alkali/Mg cyclone (350-700°C)
+    Stage 5: Vortex dust filter (200-350°C)
+    Stage 6: Turbine/compressor — pressure regulation
+    Stage 7: O₂ accumulator (~3 bar)
 
     The volatiles train (C0/C0b) is handled separately and sealed
     after devolatilisation.
@@ -323,21 +325,23 @@ class CondensationTrain:
 
     @staticmethod
     def create_default() -> 'CondensationTrain':
-        """Build the standard 7-stage metals train."""
+        """Build the standard 8-stage metals train."""
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
                               (1400, 1600), []),
             CondensationStage(1, 'Fe Condenser',
                               (1100, 1400), ['Fe']),
-            CondensationStage(2, 'SiO Zone',
+            CondensationStage(2, 'Cr Oxide Harvester',
+                              (1100, 1300), ['Cr', 'CrO2']),
+            CondensationStage(3, 'SiO Zone',
                               (900, 1200), ['SiO']),
-            CondensationStage(3, 'Alkali/Mg Cyclone',
+            CondensationStage(4, 'Alkali/Mg Cyclone',
                               (350, 700), ['Na', 'K', 'Mg']),
-            CondensationStage(4, 'Vortex Dust Filter',
+            CondensationStage(5, 'Vortex Dust Filter',
                               (200, 350), []),
-            CondensationStage(5, 'Turbine-Compressor',
+            CondensationStage(6, 'Turbine-Compressor',
                               (50, 200), []),
-            CondensationStage(6, 'Turbine Outlet Monitor',
+            CondensationStage(7, 'Turbine Outlet Monitor',
                               (20, 50), []),
         ]
         return CondensationTrain(stages=stages)
