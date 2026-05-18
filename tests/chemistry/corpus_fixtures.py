@@ -28,6 +28,8 @@ Schema contract (from `_shared/extraction-prompt-template.md` and the
   selects the composition.
 - ``expected.oxygen_fugacity_bar_by_body.<body>``: per-body, per-T fO2
   anchors (VF2013).
+- ``expected.vapor_atomic_ratios_to_Na.<composition>.<element>``:
+  atomic-ratio anchors for ``OVERHEAD_GAS_EQUILIBRIUM`` cohort tests.
 - For single-feedstock fixtures, fO2 is sourced from a grid-level Kress91
   IW table (the same convention §25 v1 used). The loader carries this
   table inline so the corpus YAML stays canonical (no fO2 numbers
@@ -150,6 +152,38 @@ class CorpusAnchor:
         return f"{self.melt_id}@{int(self.T_K)}K:{self.species}"
 
 
+@dataclass(frozen=True)
+class AtomicRatioAnchor:
+    """A single gas-phase atomic ratio relative to another element.
+
+    SF2004 Table 8 reports metal atom ratios in the vapor relative to
+    sodium at 1900 K. The anchor carries the melt composition so the
+    cohort can seed the simulator exactly like the partial-pressure
+    anchors, even though the current overhead provider only consumes
+    the already-populated ``process.overhead_gas`` ledger account.
+    """
+
+    paper_id: str
+    melt_id: str
+    composition_key: str
+    T_K: float
+    numerator_element: str
+    denominator_element: str
+    expected_ratio: float
+    tolerance_decades: float
+    source: str
+    composition_wt_pct: Mapping[str, float] = field(
+        default_factory=dict
+    )
+
+    @property
+    def anchor_id(self) -> str:
+        return (
+            f"{self.melt_id}@{int(self.T_K)}K:"
+            f"{self.numerator_element}/{self.denominator_element}"
+        )
+
+
 # ---------------------------------------------------------------------
 # Fixture discovery
 # ---------------------------------------------------------------------
@@ -231,6 +265,30 @@ def _entry_to_anchor_seed(
     return (T_K, p_Pa, tol)
 
 
+def _atomic_ratio_seed(
+    element: str,
+    payload: Any,
+    default_tolerance_decades: float = 0.05,
+) -> tuple[float, float, str] | None:
+    """Project an atomic-ratio payload into ``(ratio, tolerance, source)``."""
+
+    source = ""
+    if isinstance(payload, Mapping):
+        ratio = _coerce_float(payload.get("value"))
+        tol = _coerce_float(payload.get("tolerance_decades"))
+        source = str(payload.get("source") or "")
+    else:
+        ratio = _coerce_float(payload)
+        tol = None
+    if ratio is None or ratio <= 0.0:
+        return None
+    if tol is None or tol <= 0.0:
+        tol = default_tolerance_decades
+    if not source:
+        source = f"atomic ratio row {element}"
+    return (float(ratio), float(tol), source)
+
+
 # ---------------------------------------------------------------------
 # Single-feedstock vs multi-melt projection
 # ---------------------------------------------------------------------
@@ -277,6 +335,70 @@ def _multi_melt_compositions(
         if comp:
             out[str(body)] = comp
     return out
+
+
+# SF2004 Table 8 carries five composition columns, but the
+# simulator-native fixture's top-level feedstock is the tholeiite column
+# only. Keep the Table 5 rows here so the atomic-ratio cohort can
+# construct every Table 8 melt while still reading the ratios themselves
+# from the corpus fixture.
+SF2004_TABLE_5_COMPOSITIONS: dict[str, dict[str, float]] = {
+    "tholeiite": {
+        "SiO2": 50.71,
+        "MgO": 4.68,
+        "Al2O3": 14.48,
+        "TiO2": 1.70,
+        "Fe2O3": 4.89,
+        "FeO": 9.07,
+        "CaO": 8.83,
+        "Na2O": 3.16,
+        "K2O": 0.77,
+    },
+    "alkali_basalt": {
+        "SiO2": 44.80,
+        "MgO": 11.07,
+        "Al2O3": 13.86,
+        "TiO2": 1.96,
+        "Fe2O3": 2.91,
+        "FeO": 9.63,
+        "CaO": 10.16,
+        "Na2O": 3.19,
+        "K2O": 1.09,
+    },
+    "komatiite": {
+        "SiO2": 47.10,
+        "MgO": 29.60,
+        "Al2O3": 4.04,
+        "TiO2": 0.24,
+        "Fe2O3": 12.80,
+        "FeO": 0.0,
+        "CaO": 5.44,
+        "Na2O": 0.46,
+        "K2O": 0.09,
+    },
+    "dunite": {
+        "SiO2": 40.20,
+        "MgO": 43.20,
+        "Al2O3": 0.80,
+        "TiO2": 0.20,
+        "Fe2O3": 1.90,
+        "FeO": 11.90,
+        "CaO": 0.80,
+        "Na2O": 0.30,
+        "K2O": 0.10,
+    },
+    "type_B1_CAI": {
+        "SiO2": 29.10,
+        "MgO": 10.20,
+        "Al2O3": 29.60,
+        "TiO2": 1.30,
+        "Fe2O3": 0.0,
+        "FeO": 0.60,
+        "CaO": 28.80,
+        "Na2O": 0.18,
+        "K2O": 0.10,
+    },
+}
 
 
 def _multi_melt_fO2_log(
@@ -426,6 +548,115 @@ def load_all_corpus_anchors(
                     )
 
     return anchors
+
+
+def _atomic_ratio_compositions(
+    paper_id: str,
+    expected: Mapping[str, Any],
+    default_label: str,
+    default_comp: Mapping[str, float],
+) -> dict[str, dict[str, float]]:
+    compositions = _multi_melt_compositions(expected)
+    if paper_id == "schaefer-fegley-2004-io-lava":
+        compositions.update({
+            key: dict(value)
+            for key, value in SF2004_TABLE_5_COMPOSITIONS.items()
+        })
+    if default_comp:
+        compositions.setdefault(default_label, dict(default_comp))
+    return compositions
+
+
+def load_all_atomic_ratio_anchors(
+    *,
+    repo_root: Path | None = None,
+) -> list[AtomicRatioAnchor]:
+    """Walk the corpus and return gas-phase atomic-ratio anchors."""
+
+    anchors: list[AtomicRatioAnchor] = []
+    for path in _list_fixture_paths(repo_root):
+        try:
+            data = yaml.safe_load(path.read_text())
+        except (yaml.YAMLError, OSError):
+            continue
+        if not isinstance(data, Mapping):
+            continue
+        paper_id = str(data.get("paper_id") or path.parent.name)
+        expected = data.get("expected") or {}
+        if not isinstance(expected, Mapping):
+            continue
+        ratio_block = expected.get("vapor_atomic_ratios_to_Na") or {}
+        if not isinstance(ratio_block, Mapping):
+            continue
+
+        feedstock = data.get("feedstock") or {}
+        if not isinstance(feedstock, Mapping):
+            feedstock = {}
+        default_comp = _composition_wt_pct(feedstock)
+        default_label = str(feedstock.get("key") or paper_id)
+        compositions = _atomic_ratio_compositions(
+            paper_id,
+            expected,
+            default_label,
+            default_comp,
+        )
+
+        T_K = _coerce_float(ratio_block.get("T_K"))
+        if T_K is None:
+            continue
+        metadata_keys = {
+            "T_K",
+            "fractional_vaporization_pct",
+            "notes",
+            "note",
+            "source",
+            "tolerance_decades",
+        }
+        default_tol = _coerce_float(ratio_block.get("tolerance_decades"))
+        if default_tol is None or default_tol <= 0.0:
+            default_tol = 0.05
+
+        for composition_key, ratios in ratio_block.items():
+            if composition_key in metadata_keys:
+                continue
+            if not isinstance(ratios, Mapping):
+                continue
+            composition = compositions.get(str(composition_key))
+            if not composition:
+                continue
+            for element, payload in ratios.items():
+                if str(element).lower() in ("note", "notes", "source"):
+                    continue
+                seed = _atomic_ratio_seed(
+                    str(element),
+                    payload,
+                    default_tolerance_decades=default_tol,
+                )
+                if seed is None:
+                    continue
+                ratio, tol, source = seed
+                anchors.append(
+                    AtomicRatioAnchor(
+                        paper_id=paper_id,
+                        melt_id=f"{paper_id}:{composition_key}",
+                        composition_key=str(composition_key),
+                        T_K=T_K,
+                        numerator_element=str(element),
+                        denominator_element="Na",
+                        expected_ratio=ratio,
+                        tolerance_decades=tol,
+                        source=source,
+                        composition_wt_pct=dict(composition),
+                    )
+                )
+    return anchors
+
+
+def sf2004_table8_atomic_ratio_anchors() -> list[AtomicRatioAnchor]:
+    return [
+        anchor for anchor in load_all_atomic_ratio_anchors()
+        if anchor.paper_id == "schaefer-fegley-2004-io-lava"
+    ]
 
 
 # ---------------------------------------------------------------------
@@ -609,8 +840,11 @@ def grid_25_anchors() -> list[CorpusAnchor]:
 
 
 __all__ = (
+    "AtomicRatioAnchor",
     "CorpusAnchor",
     "GRID_25_FEEDSTOCKS",
     "grid_25_anchors",
+    "load_all_atomic_ratio_anchors",
     "load_all_corpus_anchors",
+    "sf2004_table8_atomic_ratio_anchors",
 )

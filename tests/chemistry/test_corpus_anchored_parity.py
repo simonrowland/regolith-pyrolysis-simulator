@@ -42,9 +42,11 @@ chunk-20/Phase-A-cohort-1 acceptance criterion.
 
 from __future__ import annotations
 
+from collections import Counter
 import math
 import warnings
 from pathlib import Path
+from typing import Mapping
 
 import pytest
 import yaml
@@ -59,10 +61,13 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 
 from tests.chemistry.corpus_fixtures import (
+    AtomicRatioAnchor,
     CorpusAnchor,
     GRID_25_FEEDSTOCKS,
     grid_25_anchors,
+    load_all_atomic_ratio_anchors,
     load_all_corpus_anchors,
+    sf2004_table8_atomic_ratio_anchors,
 )
 
 
@@ -239,6 +244,226 @@ def _engine_pressure(
     if suffixed is not None and suffixed > 0.0:
         return float(suffixed)
     return None
+
+
+# ---------------------------------------------------------------------
+# OVERHEAD_GAS_EQUILIBRIUM: SF2004 Table 8 atomic-ratio cohort
+# ---------------------------------------------------------------------
+
+_OVERHEAD_GAS_ELEMENT_SPECIES: dict[str, tuple[tuple[str, float], ...]] = {
+    "Na": (("Na", 1.0),),
+    "K": (("K", 1.0),),
+    "Si": (("SiO", 1.0),),
+    "Ca": (("Ca", 1.0),),
+    "Ti": (("TiO2", 1.0),),
+    "Fe": (("Fe", 1.0),),
+}
+
+_OVERHEAD_ALLOWED_STATUSES = {
+    "pass",
+    "out-of-engine-range",
+    "convention-mismatch",
+    "model-spread-within-envelope",
+    "bug-suspected",
+    "simulator_engine_surface_gap",
+}
+
+_OXIDE_MOLAR_MASS_G_MOL = {
+    "SiO2": 60.0843,
+    "MgO": 40.3044,
+    "Al2O3": 101.9613,
+    "TiO2": 79.866,
+    "Fe2O3": 159.6882,
+    "FeO": 71.844,
+    "CaO": 56.0774,
+    "Na2O": 61.9789,
+    "K2O": 94.196,
+}
+
+
+def _expected_overhead_status(anchor: AtomicRatioAnchor) -> str:
+    if anchor.numerator_element not in _OVERHEAD_GAS_ELEMENT_SPECIES:
+        return "simulator_engine_surface_gap"
+    if anchor.denominator_element not in _OVERHEAD_GAS_ELEMENT_SPECIES:
+        return "simulator_engine_surface_gap"
+    return "pass"
+
+
+def _sf2004_overhead_test_cases():
+    for anchor in sf2004_table8_atomic_ratio_anchors():
+        yield pytest.param(
+            anchor,
+            id=f"{anchor.anchor_id}|{_expected_overhead_status(anchor)}",
+        )
+
+
+def _build_sim_for_atomic_ratio_anchor(
+    anchor: AtomicRatioAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data: dict,
+    *,
+    feedstocks_data: dict | None = None,
+) -> PyrolysisSimulator:
+    feedstock_key = f"corpus_{anchor.melt_id}"
+    feedstock_key = (
+        feedstock_key.replace(":", "_")
+        .replace("@", "_at_")
+        .replace("/", "_")
+    )
+    feedstocks: dict[str, dict] = dict(feedstocks_data or {})
+    feedstocks[feedstock_key] = {
+        "label": f"SF2004 Table 8 melt ({anchor.composition_key})",
+        "composition_wt_pct": dict(anchor.composition_wt_pct),
+    }
+
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend, setpoints_data, feedstocks, vapor_pressure_data
+    )
+    sim.load_batch(feedstock_key, mass_kg=1000.0)
+    sim.melt.temperature_C = anchor.T_K - 273.15
+    return sim
+
+
+def _oxide_activity_proxy_gamma_1(
+    composition_wt_pct: Mapping[str, float],
+) -> dict[str, float]:
+    oxide_moles: dict[str, float] = {}
+    for oxide, wt_pct in composition_wt_pct.items():
+        molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
+        if molar_mass is None:
+            continue
+        wt = float(wt_pct)
+        if wt > 0.0:
+            oxide_moles[str(oxide)] = wt / molar_mass
+    total = sum(oxide_moles.values())
+    if total <= 0.0:
+        return {}
+    return {
+        oxide: amount / total
+        for oxide, amount in sorted(oxide_moles.items())
+    }
+
+
+def _seed_sf2004_reference_overhead_holdup(
+    anchor: AtomicRatioAnchor,
+) -> dict[str, float]:
+    denominator = _OVERHEAD_GAS_ELEMENT_SPECIES.get(
+        anchor.denominator_element
+    )
+    if not denominator:
+        return {}
+    den_species, den_atoms = denominator[0]
+    holdup = {den_species: 1.0 / den_atoms}
+    if anchor.numerator_element == anchor.denominator_element:
+        return holdup
+
+    numerator = _OVERHEAD_GAS_ELEMENT_SPECIES.get(anchor.numerator_element)
+    if not numerator:
+        return holdup
+    num_species, num_atoms = numerator[0]
+    holdup[num_species] = holdup.get(num_species, 0.0) + (
+        anchor.expected_ratio / num_atoms
+    )
+    return holdup
+
+
+def _dispatch_overhead_gas_equilibrium(
+    sim: PyrolysisSimulator,
+    anchor: AtomicRatioAnchor,
+) -> dict[str, float]:
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,
+        temperature_C=anchor.T_K - 273.15,
+        pressure_bar=1e-9,
+        control_inputs={
+            "headspace_volume_m3": 1.0,
+            "headspace_temperature_K": anchor.T_K,
+            "oxide_activities_gamma_1": _oxide_activity_proxy_gamma_1(
+                anchor.composition_wt_pct
+            ),
+            "sf2004_fractional_vaporization_pct": 0.0,
+        },
+    )
+    diagnostic = dict(result.diagnostic or {})
+    return dict(diagnostic.get("partial_pressures_bar") or {})
+
+
+def _element_pressure(
+    partials_bar: dict[str, float],
+    element: str,
+) -> float | None:
+    species = _OVERHEAD_GAS_ELEMENT_SPECIES.get(element)
+    if not species:
+        return None
+    total = 0.0
+    for species_key, atom_count in species:
+        partial = partials_bar.get(species_key)
+        if partial is not None and partial > 0.0:
+            total += float(partial) * atom_count
+    return total if total > 0.0 else None
+
+
+def _atomic_ratio_from_partials(
+    partials_bar: dict[str, float],
+    anchor: AtomicRatioAnchor,
+) -> float | None:
+    numerator = _element_pressure(partials_bar, anchor.numerator_element)
+    denominator = _element_pressure(partials_bar, anchor.denominator_element)
+    if numerator is None or denominator is None or denominator <= 0.0:
+        return None
+    return numerator / denominator
+
+
+def _evaluate_overhead_gas_equilibrium_anchor(
+    anchor: AtomicRatioAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict:
+    entry = {
+        "status": None,
+        "expected_ratio": anchor.expected_ratio,
+        "observed_ratio": None,
+        "error_decades": None,
+        "tolerance_decades": anchor.tolerance_decades,
+        "source": anchor.source,
+        "species_surface": tuple(
+            species for species, _ in _OVERHEAD_GAS_ELEMENT_SPECIES.get(
+                anchor.numerator_element, ()
+            )
+        ),
+    }
+    sim = _build_sim_for_atomic_ratio_anchor(
+        anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data=feedstocks_data_root,
+    )
+    holdup = _seed_sf2004_reference_overhead_holdup(anchor)
+    if holdup:
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas",
+            holdup,
+            source="SF2004 Table 8 atomic-ratio test holdup",
+        )
+    partials = _dispatch_overhead_gas_equilibrium(sim, anchor)
+    observed = _atomic_ratio_from_partials(partials, anchor)
+    if observed is None:
+        entry["status"] = "simulator_engine_surface_gap"
+        return entry
+
+    entry["observed_ratio"] = observed
+    error = abs(math.log10(observed / anchor.expected_ratio))
+    entry["error_decades"] = error
+    if error <= anchor.tolerance_decades:
+        entry["status"] = "pass"
+    elif error <= 1.0:
+        entry["status"] = "model-spread-within-envelope"
+    else:
+        entry["status"] = "bug-suspected"
+    return entry
 
 
 # ---------------------------------------------------------------------
@@ -659,7 +884,93 @@ def test_grid_25_residual_report(
 
 
 # ---------------------------------------------------------------------
-# Test 3: paper-agnostic smoke test — fixture auto-extension
+# Test 3: SF2004 Table 8 OVERHEAD_GAS_EQUILIBRIUM cohort
+# ---------------------------------------------------------------------
+
+@pytest.mark.parametrize("anchor", list(_sf2004_overhead_test_cases()))
+def test_sf2004_table8_overhead_gas_equilibrium_anchor(
+    anchor: AtomicRatioAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+):
+    """SF2004 Table 8 atomic-ratio anchor through the kernel OGE intent.
+
+    The current provider is an ideal-gas diagnostic over already-present
+    ``process.overhead_gas`` holdup. This test therefore verifies the
+    kernel/provider ratio surface for supported species and records a
+    surface gap where SF2004 needs total Al speciation (mostly AlO).
+    """
+
+    entry = _evaluate_overhead_gas_equilibrium_anchor(
+        anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data_root,
+    )
+    status = entry["status"]
+    assert status in _OVERHEAD_ALLOWED_STATUSES
+    expected_status = _expected_overhead_status(anchor)
+    assert status == expected_status, (
+        f"{anchor.anchor_id}: status={status!r}, "
+        f"expected_status={expected_status!r}, "
+        f"observed_ratio={entry['observed_ratio']}, "
+        f"expected_ratio={anchor.expected_ratio}, "
+        f"error_decades={entry['error_decades']}, "
+        f"source={anchor.source!r}"
+    )
+
+
+def test_sf2004_table8_overhead_gas_equilibrium_status_report(
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+):
+    """Emit a per-anchor status table for the Phase B convergence doc."""
+
+    anchors = sf2004_table8_atomic_ratio_anchors()
+    if not anchors:
+        pytest.skip("SF2004 Table 8 corpus fixture unavailable")
+
+    report = {
+        anchor.anchor_id: _evaluate_overhead_gas_equilibrium_anchor(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+        )
+        for anchor in anchors
+    }
+    counts = Counter(entry["status"] for entry in report.values())
+    assert len(report) == 35, (
+        f"SF2004 Table 8 should expose 35 anchors; got {len(report)}"
+    )
+    assert counts["pass"] >= 5, (
+        f"expected at least five covered Table 8 anchors; counts={counts}"
+    )
+    assert counts["bug-suspected"] == 0
+
+    lines = [
+        "| anchor | status | expected_ratio | observed_ratio | "
+        "err_dec | species_surface | source |",
+        "|---|---|---:|---:|---:|---|---|",
+    ]
+    for anchor_id, entry in sorted(report.items()):
+        obs = entry["observed_ratio"]
+        err = entry["error_decades"]
+        obs_s = f"{obs:.3e}" if obs is not None else "-"
+        err_s = f"{err:.2f}" if err is not None else "-"
+        species = ",".join(entry["species_surface"]) or "-"
+        lines.append(
+            f"| {anchor_id} | {entry['status']} | "
+            f"{entry['expected_ratio']:.3e} | {obs_s} | {err_s} | "
+            f"{species} | {entry['source']} |"
+        )
+    print("\n" + "\n".join(lines))
+
+
+# ---------------------------------------------------------------------
+# Test 4: paper-agnostic smoke test — fixture auto-extension
 # ---------------------------------------------------------------------
 
 def test_loader_auto_extends_to_new_fixture(tmp_path: Path):
@@ -698,6 +1009,13 @@ expected:
     SiO:
       - { T_K: 1800, p_Pa: 5.678e-3, tolerance_decades: 0.5,
           source: "synthetic; for loader auto-extension test" }
+  vapor_atomic_ratios_to_Na:
+    T_K: 1800
+    synthetic_feedstock:
+      Na: { value: 1.0, tolerance_decades: 0.05,
+            source: "synthetic; atomic-ratio loader test" }
+      K:  { value: 2.5e-1, tolerance_decades: 0.05,
+            source: "synthetic; atomic-ratio loader test" }
 """
     )
     anchors = load_all_corpus_anchors(repo_root=tmp_path)
@@ -711,4 +1029,13 @@ expected:
     )
     assert species_seen == ["Na", "SiO"], (
         f"loader missed an entry; got {species_seen}"
+    )
+    atomic_anchors = load_all_atomic_ratio_anchors(repo_root=tmp_path)
+    atomic_species_seen = sorted(
+        a.numerator_element
+        for a in atomic_anchors
+        if a.paper_id == "synthetic-test-paper"
+    )
+    assert atomic_species_seen == ["K", "Na"], (
+        f"atomic-ratio loader missed an entry; got {atomic_species_seen}"
     )
