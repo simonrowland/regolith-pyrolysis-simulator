@@ -256,6 +256,7 @@ def _engine_pressure(
 _OVERHEAD_GAS_ELEMENT_SPECIES: dict[str, tuple[tuple[str, float], ...]] = {
     "Na": (("Na", 1.0),),
     "K": (("K", 1.0),),
+    "Al": (("AlO", 1.0), ("Al", 1.0)),
     "Si": (("SiO", 1.0),),
     "Ca": (("Ca", 1.0),),
     "Ti": (("TiO2", 1.0),),
