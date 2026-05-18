@@ -62,12 +62,15 @@ from simulator.melt_backend.base import StubBackend
 
 from tests.chemistry.corpus_fixtures import (
     AtomicRatioAnchor,
+    CJOlivineKEMSAnchor,
     CorpusAnchor,
     GRID_25_FEEDSTOCKS,
     grid_25_anchors,
     load_all_atomic_ratio_anchors,
+    load_all_cj_olivine_kems_anchors,
     load_all_corpus_anchors,
     sf2004_table8_atomic_ratio_anchors,
+    _kress91_iw_log_fO2,
 )
 
 
@@ -970,7 +973,343 @@ def test_sf2004_table8_overhead_gas_equilibrium_status_report(
 
 
 # ---------------------------------------------------------------------
-# Test 4: paper-agnostic smoke test — fixture auto-extension
+# Test 4: CJ2015 olivine KEMS VAPOR_PRESSURE + EVAPORATION_FLUX cohort
+# ---------------------------------------------------------------------
+
+_CJ_OLIVINE_ALLOWED_STATUSES = {
+    "pass",
+    "out-of-engine-range",
+    "convention-mismatch",
+    "model-spread-within-envelope",
+    "bug-suspected",
+}
+
+_CJ_PRESSURE_MODEL_SPREAD_ENVELOPE_DECADES = 2.7
+
+
+def _cj_olivine_kems_test_cases():
+    for anchor in load_all_cj_olivine_kems_anchors():
+        yield pytest.param(
+            anchor,
+            id=f"cohort_3|{anchor.anchor_id}|{anchor.intent}",
+        )
+
+
+def _cj_anchor_as_corpus_anchor(anchor: CJOlivineKEMSAnchor) -> CorpusAnchor:
+    expected_Pa = (
+        float(anchor.expected_Pa)
+        if anchor.expected_Pa is not None
+        else 1.0
+    )
+    return CorpusAnchor(
+        paper_id=anchor.paper_id,
+        melt_id=anchor.melt_id,
+        T_K=anchor.T_K,
+        fO2_log=_kress91_iw_log_fO2(anchor.T_K),
+        species=anchor.species,
+        expected_Pa=expected_Pa,
+        tolerance_decades=anchor.tolerance_decades,
+        source=anchor.source,
+        composition_wt_pct=dict(anchor.composition_wt_pct),
+    )
+
+
+def _evaluate_cj_vapor_pressure_anchor(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict:
+    entry = {
+        "status": None,
+        "expected_Pa": anchor.expected_Pa,
+        "observed_Pa": None,
+        "expected_alpha": None,
+        "observed_alpha": None,
+        "error_decades": None,
+        "alpha_abs_error": None,
+        "tolerance_decades": anchor.tolerance_decades,
+        "alpha_absolute_uncertainty": None,
+        "source": anchor.source,
+    }
+    if anchor.expected_Pa is None or anchor.expected_Pa <= 0.0:
+        entry["status"] = "out-of-engine-range"
+        return entry
+    if anchor.T_K > VAPOROCK_MAX_VALID_T_K:
+        entry["status"] = "out-of-engine-range"
+        return entry
+
+    corpus_anchor = _cj_anchor_as_corpus_anchor(anchor)
+    try:
+        sim = _build_sim_for_anchor(
+            corpus_anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            engine="vaporock",
+            feedstocks_data=feedstocks_data_root,
+        )
+        vapor = _dispatch_vapor_pressure(sim, corpus_anchor)
+    except ProviderUnavailableError:
+        entry["status"] = "out-of-engine-range"
+        return entry
+
+    observed_Pa = _engine_pressure(vapor, anchor.species)
+    if observed_Pa is None:
+        entry["status"] = "out-of-engine-range"
+        return entry
+
+    entry["observed_Pa"] = observed_Pa
+    error = abs(math.log10(observed_Pa / anchor.expected_Pa))
+    entry["error_decades"] = error
+    if error <= anchor.tolerance_decades:
+        entry["status"] = "pass"
+    elif error <= _CJ_PRESSURE_MODEL_SPREAD_ENVELOPE_DECADES:
+        entry["status"] = "model-spread-within-envelope"
+    else:
+        entry["status"] = "bug-suspected"
+    return entry
+
+
+def _cj_flux_alpha_ratio(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> float | None:
+    corpus_anchor = _cj_anchor_as_corpus_anchor(anchor)
+    sim = _build_sim_for_anchor(
+        corpus_anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        engine="vaporock",
+        feedstocks_data=feedstocks_data_root,
+    )
+    vapor_pressures = {anchor.species: float(anchor.expected_Pa or 0.0)}
+    (
+        molar_masses_kg_mol,
+        stoich_by_species,
+        available_oxide_kg,
+    ) = sim._build_evaporation_aux_maps(vapor_pressures)
+
+    def flux_for(alpha: float) -> float | None:
+        result = sim._chem_kernel.dispatch(
+            ChemistryIntent.EVAPORATION_FLUX,
+            temperature_C=anchor.T_K - 273.15,
+            pressure_bar=1e-12,
+            control_inputs={
+                "vapor_pressures_Pa": vapor_pressures,
+                "overhead_partials_Pa": {},
+                "gas_pO2_bar": 1e-12,
+                "intrinsic_pO2_bar": 1e-12,
+                "molar_mass_kg_mol": molar_masses_kg_mol,
+                "stoich_by_species": stoich_by_species,
+                "available_oxide_kg": available_oxide_kg,
+                "melt_surface_area_m2": 1e-6,
+                "stir_factor": 1.0,
+                "alpha": alpha,
+            },
+        )
+        flux = dict(
+            (result.diagnostic or {}).get("evaporation_flux_kg_hr") or {}
+        )
+        value = flux.get(anchor.species)
+        return float(value) if value is not None and value > 0.0 else None
+
+    unit_flux = flux_for(1.0)
+    lit_flux = flux_for(float(anchor.expected_alpha or 0.0))
+    if unit_flux is None or lit_flux is None or unit_flux <= 0.0:
+        return None
+    return lit_flux / unit_flux
+
+
+def _evaluate_cj_alpha_anchor(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict:
+    entry = {
+        "status": None,
+        "expected_Pa": anchor.expected_Pa,
+        "observed_Pa": None,
+        "expected_alpha": anchor.expected_alpha,
+        "observed_alpha": None,
+        "error_decades": None,
+        "alpha_abs_error": None,
+        "tolerance_decades": anchor.tolerance_decades,
+        "alpha_absolute_uncertainty": anchor.alpha_absolute_uncertainty,
+        "source": anchor.source,
+    }
+    if (
+        anchor.expected_alpha is None
+        or anchor.expected_alpha <= 0.0
+        or anchor.expected_Pa is None
+        or anchor.expected_Pa <= 0.0
+    ):
+        entry["status"] = "out-of-engine-range"
+        return entry
+
+    try:
+        observed_alpha = _cj_flux_alpha_ratio(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+        )
+    except Exception:
+        observed_alpha = None
+    if observed_alpha is None:
+        entry["status"] = "out-of-engine-range"
+        return entry
+
+    entry["observed_alpha"] = observed_alpha
+    abs_error = abs(observed_alpha - anchor.expected_alpha)
+    entry["alpha_abs_error"] = abs_error
+    if anchor.measurement_species == "Fe+":
+        entry["status"] = "convention-mismatch"
+    elif abs_error <= float(anchor.alpha_absolute_uncertainty or 0.0):
+        entry["status"] = "pass"
+    elif abs_error <= 0.005:
+        entry["status"] = "model-spread-within-envelope"
+    else:
+        entry["status"] = "bug-suspected"
+    return entry
+
+
+def _evaluate_cj_olivine_kems_anchor(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict:
+    if anchor.intent == "VAPOR_PRESSURE":
+        return _evaluate_cj_vapor_pressure_anchor(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+        )
+    if anchor.intent == "EVAPORATION_FLUX":
+        return _evaluate_cj_alpha_anchor(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+        )
+    return {
+        "status": "bug-suspected",
+        "expected_Pa": anchor.expected_Pa,
+        "observed_Pa": None,
+        "expected_alpha": anchor.expected_alpha,
+        "observed_alpha": None,
+        "error_decades": None,
+        "alpha_abs_error": None,
+        "tolerance_decades": anchor.tolerance_decades,
+        "alpha_absolute_uncertainty": anchor.alpha_absolute_uncertainty,
+        "source": anchor.source,
+    }
+
+
+@pytest.mark.parametrize("anchor", list(_cj_olivine_kems_test_cases()))
+def test_cj_olivine_kems_cohort(
+    anchor: CJOlivineKEMSAnchor,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+    vaporock_available: bool,
+):
+    """CJ2015 olivine pressure + alpha anchors through kernel intents."""
+
+    if anchor.intent == "VAPOR_PRESSURE" and not vaporock_available:
+        pytest.skip("VapoRock optional dependency unavailable")
+    entry = _evaluate_cj_olivine_kems_anchor(
+        anchor,
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data_root,
+    )
+    status = entry["status"]
+    assert status in _CJ_OLIVINE_ALLOWED_STATUSES
+    assert status != "bug-suspected", (
+        f"{anchor.anchor_id}: status={status!r}, "
+        f"expected_Pa={entry['expected_Pa']}, "
+        f"observed_Pa={entry['observed_Pa']}, "
+        f"expected_alpha={entry['expected_alpha']}, "
+        f"observed_alpha={entry['observed_alpha']}, "
+        f"error_decades={entry['error_decades']}, "
+        f"alpha_abs_error={entry['alpha_abs_error']}, "
+        f"source={anchor.source!r}"
+    )
+
+
+def test_cj_olivine_kems_cohort_3_status_report(
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+    vaporock_available: bool,
+):
+    """Emit per-anchor status table for the Phase B cohort-3 doc."""
+
+    anchors = load_all_cj_olivine_kems_anchors()
+    if not anchors:
+        pytest.skip("CJ2015 olivine KEMS fixture unavailable")
+    if not vaporock_available:
+        pytest.skip("VapoRock optional dependency unavailable")
+
+    shape = Counter((a.intent, a.quantity, a.species) for a in anchors)
+    assert len(anchors) >= 12
+    assert shape[("EVAPORATION_FLUX", "alpha", "Fe")] >= 5
+    assert shape[("EVAPORATION_FLUX", "alpha", "SiO")] >= 5
+    pressure_count = sum(
+        count for (intent, quantity, _species), count in shape.items()
+        if intent == "VAPOR_PRESSURE" and quantity == "partial_pressure_Pa"
+    )
+    assert pressure_count >= 2
+
+    report = {
+        anchor.anchor_id: _evaluate_cj_olivine_kems_anchor(
+            anchor,
+            vapor_pressure_data,
+            setpoints_data_root,
+            feedstocks_data_root,
+        )
+        for anchor in anchors
+    }
+    counts = Counter(entry["status"] for entry in report.values())
+    assert counts["bug-suspected"] == 0
+
+    lines = [
+        "| anchor | status | expected_Pa | observed_Pa | err_dec | "
+        "expected_alpha | observed_alpha | alpha_abs_err | source |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---|",
+    ]
+    for anchor_id, entry in sorted(report.items()):
+        exp = entry["expected_Pa"]
+        obs = entry["observed_Pa"]
+        err = entry["error_decades"]
+        alpha = entry["expected_alpha"]
+        obs_alpha = entry["observed_alpha"]
+        alpha_err = entry["alpha_abs_error"]
+        exp_s = f"{exp:.3e}" if exp is not None else "-"
+        obs_s = f"{obs:.3e}" if obs is not None else "-"
+        err_s = f"{err:.2f}" if err is not None else "-"
+        alpha_s = f"{alpha:.3f}" if alpha is not None else "-"
+        obs_alpha_s = (
+            f"{obs_alpha:.3f}" if obs_alpha is not None else "-"
+        )
+        alpha_err_s = (
+            f"{alpha_err:.2e}" if alpha_err is not None else "-"
+        )
+        lines.append(
+            f"| {anchor_id} | {entry['status']} | {exp_s} | "
+            f"{obs_s} | {err_s} | {alpha_s} | {obs_alpha_s} | "
+            f"{alpha_err_s} | {entry['source']} |"
+        )
+    print("\n" + "\n".join(lines))
+
+
+# ---------------------------------------------------------------------
+# Test 5: paper-agnostic smoke test — fixture auto-extension
 # ---------------------------------------------------------------------
 
 def test_loader_auto_extends_to_new_fixture(tmp_path: Path):

@@ -184,6 +184,42 @@ class AtomicRatioAnchor:
         )
 
 
+@dataclass(frozen=True)
+class CJOlivineKEMSAnchor:
+    """Costa-Jacobson 2015 olivine KEMS coupled pressure/flux anchor."""
+
+    paper_id: str
+    melt_id: str
+    intent: str
+    quantity: str
+    cell_key: str
+    cell_label: str
+    T_K: float
+    species: str
+    measurement_species: str
+    expected_Pa: float | None
+    tolerance_decades: float
+    expected_alpha: float | None
+    alpha_absolute_uncertainty: float | None
+    source: str
+    coefficient_A: float | None
+    coefficient_B_1e3K: float | None
+    composition_wt_pct: Mapping[str, float] = field(
+        default_factory=dict
+    )
+
+    @property
+    def anchor_id(self) -> str:
+        if self.quantity == "alpha":
+            quantity = f"alpha({self.measurement_species})"
+        else:
+            quantity = f"p({self.species})"
+        return (
+            f"{self.melt_id}:{self.cell_label}@{int(self.T_K)}K:"
+            f"{quantity}"
+        )
+
+
 # ---------------------------------------------------------------------
 # Fixture discovery
 # ---------------------------------------------------------------------
@@ -287,6 +323,34 @@ def _atomic_ratio_seed(
     if not source:
         source = f"atomic ratio row {element}"
     return (float(ratio), float(tol), source)
+
+
+def _fixture_intents(expected: Mapping[str, Any]) -> set[str]:
+    raw = expected.get("intents_exercised")
+    values: list[Any]
+    if isinstance(raw, str):
+        values = [raw]
+    elif isinstance(raw, list):
+        values = raw
+    else:
+        values = []
+    intents = {str(value).upper() for value in values}
+
+    # Backfill older fixtures that predate explicit intent routing. The
+    # explicit field wins when present; this only preserves auto-extension
+    # for the current corpus and synthetic fixtures.
+    if not intents:
+        if (
+            expected.get("vapor_partial_pressures_Pa")
+            or expected.get("vapor_partial_pressures_Pa_by_species")
+            or expected.get("clausius_clapeyron_equations")
+        ):
+            intents.add("VAPOR_PRESSURE")
+        if expected.get("vaporization_coefficients"):
+            intents.add("EVAPORATION_FLUX")
+        if expected.get("vapor_atomic_ratios_to_Na"):
+            intents.add("OVERHEAD_GAS_EQUILIBRIUM")
+    return intents
 
 
 # ---------------------------------------------------------------------
@@ -660,6 +724,253 @@ def sf2004_table8_atomic_ratio_anchors() -> list[AtomicRatioAnchor]:
 
 
 # ---------------------------------------------------------------------
+# Costa-Jacobson 2015 olivine KEMS coupled pressure/flux cohort
+# ---------------------------------------------------------------------
+
+_CJ_OLIVINE_CELL_LABELS = {
+    "ir_cell": "Ir",
+    "mo_cell": "Mo",
+    "re_cell_piacente_1975": "Re",
+}
+
+
+def _cc_pressure_pa(coefficients: Mapping[str, Any], T_K: float) -> float | None:
+    """Evaluate ``log10(P/kPa) = A - B*1000/T`` as Pa."""
+    A = _coerce_float(coefficients.get("A"))
+    B = _coerce_float(coefficients.get("B_1e3K"))
+    if A is None or B is None or T_K <= 0.0:
+        return None
+    return (10.0 ** (A - (B * 1000.0 / T_K))) * 1000.0
+
+
+def _cc_tolerance_decades(coefficients: Mapping[str, Any]) -> float:
+    sigma = _coerce_float(coefficients.get("A_sigma"))
+    if sigma is None or sigma <= 0.0:
+        sigma = 0.15
+    return float(sigma)
+
+
+def _cj_pressure_temperatures(expected: Mapping[str, Any]) -> list[float]:
+    temperatures: set[float] = set()
+    for block_name in (
+        "vapor_partial_pressures_Pa",
+        "vapor_partial_pressures_Pa_by_species",
+    ):
+        block = expected.get(block_name) or {}
+        if not isinstance(block, Mapping):
+            continue
+        for entries in block.values():
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, Mapping):
+                    continue
+                T_K = _coerce_float(entry.get("T_K"))
+                if T_K is not None:
+                    temperatures.add(T_K)
+    return sorted(temperatures)
+
+
+def _emit_cj_olivine_pressure_grid(
+    *,
+    paper_id: str,
+    melt_id: str,
+    expected: Mapping[str, Any],
+    composition: Mapping[str, float],
+) -> list[CJOlivineKEMSAnchor]:
+    cc = expected.get("clausius_clapeyron_equations") or {}
+    if not isinstance(cc, Mapping):
+        return []
+    temperatures = _cj_pressure_temperatures(expected)
+    if not temperatures:
+        temperatures = [1700.0, 1800.0, 1900.0, 2000.0]
+
+    anchors: list[CJOlivineKEMSAnchor] = []
+    for cell_key, cell_label in _CJ_OLIVINE_CELL_LABELS.items():
+        cell = cc.get(cell_key) or {}
+        if not isinstance(cell, Mapping):
+            continue
+        for species in ("Mg", "SiO", "Fe"):
+            coefficients = cell.get(species) or {}
+            if not isinstance(coefficients, Mapping):
+                continue
+            A = _coerce_float(coefficients.get("A"))
+            B = _coerce_float(coefficients.get("B_1e3K"))
+            tolerance = _cc_tolerance_decades(coefficients)
+            for T_K in temperatures:
+                pressure = _cc_pressure_pa(coefficients, T_K)
+                if pressure is None or pressure <= 0.0:
+                    continue
+                anchors.append(
+                    CJOlivineKEMSAnchor(
+                        paper_id=paper_id,
+                        melt_id=melt_id,
+                        intent="VAPOR_PRESSURE",
+                        quantity="partial_pressure_Pa",
+                        cell_key=cell_key,
+                        cell_label=cell_label,
+                        T_K=T_K,
+                        species=species,
+                        measurement_species=species,
+                        expected_Pa=pressure,
+                        tolerance_decades=tolerance,
+                        expected_alpha=None,
+                        alpha_absolute_uncertainty=None,
+                        source=(
+                            f"Costa-Jacobson 2015 {cell_label}-cell "
+                            f"C-C equation for {species}"
+                        ),
+                        coefficient_A=A,
+                        coefficient_B_1e3K=B,
+                        composition_wt_pct=dict(composition),
+                    )
+                )
+    return anchors
+
+
+def _emit_cj_olivine_alpha_grid(
+    *,
+    paper_id: str,
+    melt_id: str,
+    expected: Mapping[str, Any],
+    composition: Mapping[str, float],
+) -> list[CJOlivineKEMSAnchor]:
+    cc = expected.get("clausius_clapeyron_equations") or {}
+    coeffs = expected.get("vaporization_coefficients") or {}
+    if not isinstance(cc, Mapping) or not isinstance(coeffs, Mapping):
+        return []
+
+    anchors: list[CJOlivineKEMSAnchor] = []
+    for species, entries in coeffs.items():
+        if not isinstance(entries, list):
+            continue
+        measurement_species = f"{species}+"
+        for entry in entries:
+            if not isinstance(entry, Mapping):
+                continue
+            T_K = _coerce_float(entry.get("T_K"))
+            alpha = _coerce_float(entry.get("alpha"))
+            uncertainty = _coerce_float(
+                entry.get("alpha_absolute_uncertainty")
+            )
+            if T_K is None or alpha is None or alpha <= 0.0:
+                continue
+            if uncertainty is None or uncertainty <= 0.0:
+                uncertainty = 0.002
+            for cell_key, cell_label in _CJ_OLIVINE_CELL_LABELS.items():
+                cell = cc.get(cell_key) or {}
+                if not isinstance(cell, Mapping):
+                    continue
+                coefficients = cell.get(str(species)) or {}
+                if not isinstance(coefficients, Mapping):
+                    continue
+                pressure = _cc_pressure_pa(coefficients, T_K)
+                if pressure is None or pressure <= 0.0:
+                    continue
+                anchors.append(
+                    CJOlivineKEMSAnchor(
+                        paper_id=paper_id,
+                        melt_id=melt_id,
+                        intent="EVAPORATION_FLUX",
+                        quantity="alpha",
+                        cell_key=cell_key,
+                        cell_label=cell_label,
+                        T_K=T_K,
+                        species=str(species),
+                        measurement_species=measurement_species,
+                        expected_Pa=pressure,
+                        tolerance_decades=_cc_tolerance_decades(
+                            coefficients
+                        ),
+                        expected_alpha=alpha,
+                        alpha_absolute_uncertainty=uncertainty,
+                        source=(
+                            f"{entry.get('source') or 'alpha digitization'}; "
+                            f"{cell_label}-cell C-C pressure basis"
+                        ),
+                        coefficient_A=_coerce_float(coefficients.get("A")),
+                        coefficient_B_1e3K=_coerce_float(
+                            coefficients.get("B_1e3K")
+                        ),
+                        composition_wt_pct=dict(composition),
+                    )
+                )
+    return anchors
+
+
+def _emit_cj_olivine_kems_grid(
+    *,
+    paper_id: str,
+    melt_id: str,
+    expected: Mapping[str, Any],
+    composition: Mapping[str, float],
+) -> list[CJOlivineKEMSAnchor]:
+    intents = _fixture_intents(expected)
+    anchors: list[CJOlivineKEMSAnchor] = []
+    if "VAPOR_PRESSURE" in intents:
+        anchors.extend(
+            _emit_cj_olivine_pressure_grid(
+                paper_id=paper_id,
+                melt_id=melt_id,
+                expected=expected,
+                composition=composition,
+            )
+        )
+    if "EVAPORATION_FLUX" in intents:
+        anchors.extend(
+            _emit_cj_olivine_alpha_grid(
+                paper_id=paper_id,
+                melt_id=melt_id,
+                expected=expected,
+                composition=composition,
+            )
+        )
+    return anchors
+
+
+def load_all_cj_olivine_kems_anchors(
+    *,
+    repo_root: Path | None = None,
+) -> list[CJOlivineKEMSAnchor]:
+    """Walk fixtures and emit olivine-coupled KEMS pressure/flux anchors."""
+
+    anchors: list[CJOlivineKEMSAnchor] = []
+    for path in _list_fixture_paths(repo_root):
+        try:
+            data = yaml.safe_load(path.read_text())
+        except (yaml.YAMLError, OSError):
+            continue
+        if not isinstance(data, Mapping):
+            continue
+        expected = data.get("expected") or {}
+        if not isinstance(expected, Mapping):
+            continue
+        if (
+            not expected.get("clausius_clapeyron_equations")
+            or not expected.get("vaporization_coefficients")
+        ):
+            continue
+
+        feedstock = data.get("feedstock") or {}
+        if not isinstance(feedstock, Mapping):
+            feedstock = {}
+        composition = _composition_wt_pct(feedstock)
+        if not composition:
+            continue
+        paper_id = str(data.get("paper_id") or path.parent.name)
+        melt_label = str(feedstock.get("key") or paper_id)
+        anchors.extend(
+            _emit_cj_olivine_kems_grid(
+                paper_id=paper_id,
+                melt_id=f"{paper_id}:{melt_label}",
+                expected=expected,
+                composition=composition,
+            )
+        )
+    return anchors
+
+
+# ---------------------------------------------------------------------
 # §25 grid acceptance subset
 # ---------------------------------------------------------------------
 #
@@ -841,9 +1152,11 @@ def grid_25_anchors() -> list[CorpusAnchor]:
 
 __all__ = (
     "AtomicRatioAnchor",
+    "CJOlivineKEMSAnchor",
     "CorpusAnchor",
     "GRID_25_FEEDSTOCKS",
     "grid_25_anchors",
+    "load_all_cj_olivine_kems_anchors",
     "load_all_atomic_ratio_anchors",
     "load_all_corpus_anchors",
     "sf2004_table8_atomic_ratio_anchors",
