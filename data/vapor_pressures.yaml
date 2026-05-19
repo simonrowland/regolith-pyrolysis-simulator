@@ -16,6 +16,11 @@ metals:
     molar_mass_g_mol: 22.99
     electrons_per_atom: 1
     parent_oxide: "Na2O"
+    evaporation_alpha:
+      value: 1.0
+      source: "SF2004 Table 10 Na(g) over silicate"
+      T_band_K: [1700, 2273]
+      envelope: [0.9, 1.0]
     antoine:
       # Liquid Na: Alcock et al. 1984
       A: 10.866
@@ -31,6 +36,11 @@ metals:
     molar_mass_g_mol: 39.10
     electrons_per_atom: 1
     parent_oxide: "K2O"
+    evaporation_alpha:
+      value: 1.0
+      source: "SF2004 Table 10 K(g) over silicate (analogous to Na)"
+      T_band_K: [1700, 2273]
+      envelope: [0.9, 1.0]
     antoine:
       A: 10.718
       B: 4961
@@ -45,6 +55,11 @@ metals:
     molar_mass_g_mol: 24.31
     electrons_per_atom: 2
     parent_oxide: "MgO"
+    evaporation_alpha:
+      value: 0.8
+      source: "SF2004 Table 10 Mg(liq)"
+      T_band_K: [1873, 2373]
+      envelope: [0.6, 1.0]
     antoine:
       A: 11.412
       B: 7813
@@ -59,6 +74,11 @@ metals:
     molar_mass_g_mol: 55.85
     electrons_per_atom: 2
     parent_oxide: "FeO"
+    evaporation_alpha:
+      value: 0.5
+      source: "SF2004 Table 10 Fe(liq)"
+      T_band_K: [1873, 2373]
+      envelope: [0.3, 0.7]
     antoine:
       A: 11.353
       B: 19710
@@ -159,6 +179,11 @@ oxide_vapors:
     parent_oxide: "SiO2"
     stoich_oxide_per_vapor: 1.3629764065335754  # kg SiO₂ consumed per kg SiO evaporated
     stoich_O2_per_vapor: 0.3629764065335753    # kg O₂ freed per kg SiO evaporated
+    evaporation_alpha:
+      value: 0.04
+      source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990"
+      T_band_K: [1873, 2373]
+      envelope: [0.003, 0.048]
     antoine:
       # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
       # Effective vapor pressure depends on a(SiO₂) and pO₂

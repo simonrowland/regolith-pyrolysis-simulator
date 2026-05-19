@@ -33,7 +33,7 @@ from simulator.chemistry.kernel import (
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
-from simulator.evaporation import _EVAPORATION_COEFFICIENT_ALPHA
+from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -65,7 +65,9 @@ def _legacy_hertz_knudsen_flux(
     if T_K < 400 or not vapor_pressures_Pa:
         return flux
 
-    alpha = _EVAPORATION_COEFFICIENT_ALPHA
+    alpha_by_species = _load_evaporation_alpha_by_species(
+        sim.vapor_pressures
+    )
     metals_data = sim.vapor_pressures.get('metals', {}) or {}
     oxide_vapors_data = sim.vapor_pressures.get('oxide_vapors', {}) or {}
     intrinsic_pO2_bar = max(
@@ -101,6 +103,7 @@ def _legacy_hertz_knudsen_flux(
             P_sat_Pa *= max(1.0e-12, min(1.0e12, pO2_factor))
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
         denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
+        alpha = alpha_by_species.get(species, 1.0)
         J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) / denominator
         if J_kg_s_m2 <= 0:
             continue
@@ -190,7 +193,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
                 'available_oxide_kg': {},
                 'melt_surface_area_m2': 0.2,
                 'stir_factor': 6.0,
-                'alpha': _EVAPORATION_COEFFICIENT_ALPHA,
+                'alpha': {},
             },
         )
     finally:
