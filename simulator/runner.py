@@ -60,7 +60,10 @@ SIO_YIELD_CAMPAIGN = "C2A_continuous"
 SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
     SIO_YIELD_CAMPAIGN: "C2A",
 }
-SIO_ALPHA_PROVENANCE = "placeholder; pending Phase 1 α surface"
+SIO_ALPHA_PROVENANCE = (
+    "Phase 1 α surface (commit fc2d40b); "
+    "SF2004 Table 10 SiO2(liq) Hashimoto 1990"
+)
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 SIO_YIELD_STAGE_KEYS: dict[int, str] = {
     1: "stage_1_fe_condenser_impurity",
@@ -760,10 +763,19 @@ def build_sio_yield_report(
             f"got {campaign!r}"
         )
 
-    from simulator.evaporation import _EVAPORATION_COEFFICIENT_ALPHA
+    from simulator.evaporation import _load_evaporation_alpha_by_species
 
     feedstocks = _load_yaml(DATA_DIR / "feedstocks.yaml")
     feedstock = feedstocks.get(feedstock_id, {})
+    alpha_by_species = _load_evaporation_alpha_by_species(
+        _load_yaml(DATA_DIR / "vapor_pressures.yaml")
+    )
+    try:
+        sio_alpha_value = alpha_by_species["SiO"]
+    except KeyError as exc:
+        raise RunnerError(
+            "SiO evaporation alpha missing from data/vapor_pressures.yaml"
+        ) from exc
     stage0_carbon_kg = _required_stage0_carbon_kg(feedstock, float(mass_kg))
     additives_kg = {}
     if stage0_carbon_kg > 1.0e-12:
@@ -834,7 +846,7 @@ def build_sio_yield_report(
     report = {
         "feedstock_id": feedstock_id,
         "campaign": SIO_YIELD_CAMPAIGN,
-        "alpha_SiO": _clean_report_float(_EVAPORATION_COEFFICIENT_ALPHA),
+        "alpha_SiO": _clean_report_float(sio_alpha_value),
         "alpha_provenance": SIO_ALPHA_PROVENANCE,
         "sio_evolved_kg": _clean_report_float(sio_evolved_kg),
         "sio_to_silica_fume_kg": sio_to_silica_fume_kg,

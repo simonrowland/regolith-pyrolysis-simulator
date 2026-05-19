@@ -36,3 +36,18 @@ pytest tests/test_mass_balance.py -q
 `mars_basalt` carries Stage 0 carbon-cleanup metadata, so the report path
 supplies the catalog midpoint carbon reductant required by `load_batch` before
 starting the C2A slice.
+
+## α=0.04 refresh
+
+Phase 1 commit `fc2d40b` replaced the placeholder SiO evaporation coefficient
+with the YAML-backed alpha surface:
+`SF2004 Table 10 SiO2(liq), Hashimoto 1990`.
+
+| feedstock | α | SiO evolved kg | SiO yield pct of feedstock | delta from α=0.5 baseline | stage 1 SiO2 kg | stage 3 SiO2 kg | stage 4 SiO2 kg | stage 5 SiO2 kg | terminal/carryover kg | verdict |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| `lunar_mare_low_ti` | 0.04 | 3.73034175962 | 0.373034175962 | 12.1804374743× lower | 0.0 | 0.0 | 1.65257779038 | 0.573067427922 | 0.447315569628 | below industrial-Si envelope (order-of-magnitude regime check, not 1-decade fidelity) |
+| `mars_basalt` | 0.04 | 3.82535373379 | 0.382535373379 | 12.1856724947× lower | 0.0 | 0.0 | 1.69466902181 | 0.587663481358 | 0.458708717517 | below industrial-Si envelope (order-of-magnitude regime check, not 1-decade fidelity) |
+
+New verdict: the Phase 1 alpha surface drops C2A SiO yield by roughly 12x for
+both feedstocks. That preserves the silica-fume comparison as an order-of-
+magnitude regime check and keeps the result below the industrial-Si envelope.

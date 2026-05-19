@@ -61,9 +61,10 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
 
     _assert_golden_close(actual, expected)
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
-    assert actual["alpha_SiO"] == pytest.approx(0.5)
+    assert actual["alpha_SiO"] == pytest.approx(0.04)
     assert actual["alpha_provenance"] == (
-        "placeholder; pending Phase 1 \u03b1 surface"
+        "Phase 1 \u03b1 surface (commit fc2d40b); "
+        "SF2004 Table 10 SiO2(liq) Hashimoto 1990"
     )
     assert "order-of-magnitude regime check" in actual["verdict"]
     assert "not 1-decade fidelity" in actual["verdict"]
