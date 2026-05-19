@@ -1348,12 +1348,142 @@ def grid_25_anchors(
     return anchors
 
 
+_GRID_25_SIO_T_MIN_K = 1673.0
+_GRID_25_SIO_T_MAX_K = 4000.0
+_GRID_25_SIO_PAPER_ORDER = {
+    "cj2015": 0,
+    "sof2018-mineru": 1,
+    "sf2004": 2,
+    "vf2013-moon": 3,
+    "vf2013-mars": 4,
+    "vf2013-bse": 5,
+}
+
+_GRID_25_SIO_VF_COMPOSITION_KEYS = {
+    "vf2013-moon": "Moon_bulk_silicate_moon",
+    "vf2013-mars": "Mars_bulk_silicate_mars",
+    "vf2013-bse": "BSE_bulk_silicate_earth",
+}
+
+
+def _grid_25_sio_paper_tag(anchor: CorpusAnchor) -> str | None:
+    if anchor.species != "SiO":
+        return None
+    if not (
+        _GRID_25_SIO_T_MIN_K
+        <= anchor.T_K
+        <= _GRID_25_SIO_T_MAX_K
+    ):
+        return None
+    if anchor.paper_id == "costa-jacobson-2015-olivine-kems":
+        if "Ir-cell C-C eqn" in anchor.source:
+            return "cj2015"
+        return None
+    if anchor.paper_id == "sossi-fegley-2018-volatility":
+        if anchor.T_K > 1973.0:
+            return None
+        if "MinerU Fig 3" in anchor.source:
+            return "sof2018-mineru"
+        return None
+    if anchor.paper_id == "schaefer-fegley-2004-io-lava":
+        if int(anchor.T_K) in (1700, 1900):
+            return "sf2004"
+        return None
+    if anchor.paper_id == "visscher-fegley-2013-debris-disks":
+        if "Moon" in anchor.source:
+            return "vf2013-moon"
+        if "Mars" in anchor.source:
+            return "vf2013-mars"
+        if "BSE" in anchor.source:
+            return "vf2013-bse"
+    return None
+
+
+def _grid_25_sio_vf_composition(
+    paper_tag: str,
+    repo_root: Path | None,
+) -> dict[str, float]:
+    composition_key = _GRID_25_SIO_VF_COMPOSITION_KEYS.get(paper_tag)
+    if composition_key is None:
+        return {}
+    path = (
+        _corpus_root(repo_root)
+        / "visscher-fegley-2013-debris-disks"
+        / "benchmark-fixture.yaml"
+    )
+    try:
+        data = yaml.safe_load(path.read_text())
+    except (yaml.YAMLError, OSError) as exc:
+        raise RuntimeError(
+            f"cannot load §25-bis-SiO VF2013 fixture: {path}"
+        ) from exc
+    if not isinstance(data, Mapping):
+        raise RuntimeError(
+            f"§25-bis-SiO VF2013 fixture is not a mapping: {path}"
+        )
+    expected = data.get("expected") or {}
+    if not isinstance(expected, Mapping):
+        raise RuntimeError(
+            f"§25-bis-SiO VF2013 fixture lacks mapping expected block: {path}"
+        )
+    composition = dict(
+        _multi_melt_compositions(expected).get(composition_key) or {}
+    )
+    composition.pop("ZnO", None)
+    return composition
+
+
+def grid_25_sio_anchors(
+    *,
+    repo_root: Path | None = None,
+) -> list[CorpusAnchor]:
+    """Return the §25-bis SiO(g) T-sweep benchmark cohort."""
+
+    anchors: list[CorpusAnchor] = []
+    for anchor in load_all_corpus_anchors(repo_root=repo_root):
+        paper_tag = _grid_25_sio_paper_tag(anchor)
+        if paper_tag is None:
+            continue
+        composition = dict(anchor.composition_wt_pct)
+        if anchor.paper_id == "visscher-fegley-2013-debris-disks":
+            composition = _grid_25_sio_vf_composition(paper_tag, repo_root)
+            if not composition:
+                continue
+        anchors.append(
+            CorpusAnchor(
+                paper_id="grid-25-sio",
+                melt_id=f"grid-25-sio:{paper_tag}",
+                T_K=anchor.T_K,
+                fO2_log=anchor.fO2_log,
+                species="SiO",
+                expected_Pa=anchor.expected_Pa,
+                tolerance_decades=anchor.tolerance_decades,
+                source=(
+                    f"§25-bis-SiO from {anchor.paper_id} "
+                    f"({anchor.melt_id}); {anchor.source}"
+                ),
+                composition_wt_pct=composition,
+            )
+        )
+    return sorted(
+        anchors,
+        key=lambda anchor: (
+            _GRID_25_SIO_PAPER_ORDER[
+                anchor.melt_id.removeprefix("grid-25-sio:")
+            ],
+            anchor.T_K,
+            anchor.expected_Pa,
+        ),
+    )
+
+
 __all__ = (
     "AtomicRatioAnchor",
     "CJOlivineKEMSAnchor",
     "CorpusAnchor",
     "GRID_25_FEEDSTOCKS",
     "grid_25_anchors",
+    "grid_25_sio_anchors",
     "load_all_cj_olivine_kems_anchors",
     "load_all_atomic_ratio_anchors",
     "load_all_corpus_anchors",

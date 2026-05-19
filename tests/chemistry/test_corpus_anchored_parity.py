@@ -66,6 +66,7 @@ from tests.chemistry.corpus_fixtures import (
     CorpusAnchor,
     GRID_25_FEEDSTOCKS,
     grid_25_anchors,
+    grid_25_sio_anchors,
     load_all_atomic_ratio_anchors,
     load_all_cj_olivine_kems_anchors,
     load_all_corpus_anchors,
@@ -915,6 +916,186 @@ def test_grid_25_residual_report(
         ("grid_25_residual_table", "\n".join(lines))
     )
     # Print also so `pytest -s` shows the table inline.
+    print("\n" + "\n".join(lines))
+
+
+# ---------------------------------------------------------------------
+# Test 2b: §25-bis-SiO T-sweep acceptance gate
+# ---------------------------------------------------------------------
+
+GRID_25_SIO_TAG_COUNTS = {
+    "cj2015": 4,
+    "sof2018-mineru": 4,
+    "sf2004": 2,
+    "vf2013-moon": 5,
+    "vf2013-mars": 5,
+    "vf2013-bse": 5,
+}
+GRID_25_SIO_TOTAL_ANCHORS = sum(GRID_25_SIO_TAG_COUNTS.values())
+GRID_25_SIO_PASS_BASELINE = 1
+GRID_25_SIO_MODEL_SPREAD_ENVELOPE_DECADES = 2.5
+GRID_25_SIO_BODY_COMPOSITION_ENVELOPE_DECADES = 3.5
+GRID_25_SIO_ALLOWED_STATUSES = {
+    "pass",
+    "model-spread-within-envelope",
+    "body-composition-spread",
+    "out-of-engine-T-range",
+}
+
+
+def _evaluate_grid_25_sio(
+    engine: str,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict[str, dict]:
+    report: dict[str, dict] = {}
+    for anchor in grid_25_sio_anchors():
+        key = anchor.anchor_id
+        entry = {
+            "status": None,
+            "T_K": anchor.T_K,
+            "melt_id": anchor.melt_id,
+            "expected_Pa": anchor.expected_Pa,
+            "observed_Pa": None,
+            "error_decades": None,
+            "tolerance_decades": anchor.tolerance_decades,
+            "source": anchor.source,
+            "engine": engine,
+        }
+        if not math.isfinite(anchor.expected_Pa):
+            entry["status"] = "blocked-on-missing-data"
+            report[key] = entry
+            continue
+        if _is_out_of_engine_range(anchor, engine):
+            entry["status"] = "out-of-engine-T-range"
+            report[key] = entry
+            continue
+        try:
+            sim = _build_sim_for_anchor(
+                anchor,
+                vapor_pressure_data,
+                setpoints_data_root,
+                engine=engine,
+                feedstocks_data=feedstocks_data_root,
+            )
+            vapor = _dispatch_vapor_pressure(sim, anchor)
+        except ProviderUnavailableError:
+            entry["status"] = "skipped"
+            report[key] = entry
+            continue
+        observed_Pa = _engine_pressure(vapor, anchor.species)
+        if observed_Pa is None:
+            entry["status"] = "missing_species"
+            report[key] = entry
+            continue
+        entry["observed_Pa"] = observed_Pa
+        error = abs(math.log10(observed_Pa / anchor.expected_Pa))
+        entry["error_decades"] = error
+        if error <= anchor.tolerance_decades:
+            entry["status"] = "pass"
+        elif (
+            anchor.melt_id.startswith("grid-25-sio:vf2013-")
+            and int(anchor.T_K) == 2000
+            and error <= GRID_25_SIO_BODY_COMPOSITION_ENVELOPE_DECADES
+        ):
+            entry["status"] = "body-composition-spread"
+        elif error <= GRID_25_SIO_MODEL_SPREAD_ENVELOPE_DECADES:
+            entry["status"] = "model-spread-within-envelope"
+        else:
+            entry["status"] = "bug-suspected"
+        report[key] = entry
+    return report
+
+
+@pytest.fixture(scope="module")
+def grid_25_sio_vaporock_report(
+    vaporock_available: bool,
+    vapor_pressure_data: dict,
+    setpoints_data_root: dict,
+    feedstocks_data_root: dict,
+) -> dict[str, dict]:
+    if not vaporock_available:
+        pytest.skip("VapoRock optional dependency unavailable")
+    return _evaluate_grid_25_sio(
+        "vaporock",
+        vapor_pressure_data,
+        setpoints_data_root,
+        feedstocks_data_root,
+    )
+
+
+def test_grid_25_sio_cohort_passes_acceptance_gate(
+    grid_25_sio_vaporock_report: dict[str, dict],
+):
+    """§25-bis-SiO acceptance: corpus T-sweep remains classified."""
+
+    counts = Counter(
+        entry["status"] for entry in grid_25_sio_vaporock_report.values()
+    )
+    total = sum(counts.values())
+    assert total == GRID_25_SIO_TOTAL_ANCHORS, (
+        f"§25-bis-SiO grid must have {GRID_25_SIO_TOTAL_ANCHORS} anchors; "
+        f"got {total}: {dict(counts)}"
+    )
+    tag_counts = Counter(
+        entry["melt_id"].removeprefix("grid-25-sio:")
+        for entry in grid_25_sio_vaporock_report.values()
+    )
+    assert dict(tag_counts) == GRID_25_SIO_TAG_COUNTS, (
+        f"§25-bis-SiO tag shape drifted: {dict(tag_counts)}"
+    )
+
+    unexpected = {
+        anchor_id: entry
+        for anchor_id, entry in grid_25_sio_vaporock_report.items()
+        if entry["status"] not in GRID_25_SIO_ALLOWED_STATUSES
+    }
+    assert not unexpected, (
+        "§25-bis-SiO cohort has unclassified anchor(s). "
+        "Do not widen the 1-decade pass tolerance; classify or investigate.\n  "
+        + "\n  ".join(
+            f"{anchor_id}: status={entry['status']!r}, "
+            f"observed={entry['observed_Pa']}, "
+            f"expected={entry['expected_Pa']}, "
+            f"err={entry['error_decades']}, source={entry['source']!r}"
+            for anchor_id, entry in unexpected.items()
+        )
+    )
+
+    passing = counts["pass"]
+    assert passing >= GRID_25_SIO_PASS_BASELINE, (
+        f"§25-bis-SiO PASSING COUNT REGRESSED: {passing} of {total} "
+        f"anchors pass at 1-decade, but baseline is "
+        f"{GRID_25_SIO_PASS_BASELINE}. Counts: {dict(counts)}."
+    )
+
+
+def test_grid_25_sio_residual_report(
+    grid_25_sio_vaporock_report: dict[str, dict],
+    request: pytest.FixtureRequest,
+):
+    """Emit per-anchor §25-bis-SiO status table for convergence docs."""
+
+    lines = [
+        "| anchor | status | T_K | expected_Pa | observed_Pa | "
+        "err_dec | source |",
+        "|---|---|---:|---:|---:|---:|---|",
+    ]
+    for anchor_id, entry in sorted(grid_25_sio_vaporock_report.items()):
+        exp = entry["expected_Pa"]
+        obs = entry["observed_Pa"]
+        err = entry["error_decades"]
+        exp_s = f"{exp:.3e}" if math.isfinite(exp) else "-"
+        obs_s = f"{obs:.3e}" if obs is not None else "-"
+        err_s = f"{err:.2f}" if err is not None else "-"
+        lines.append(
+            f"| {anchor_id} | {entry['status']} | {entry['T_K']:.0f} | "
+            f"{exp_s} | {obs_s} | {err_s} | {entry['source']} |"
+        )
+    request.node.user_properties.append(
+        ("grid_25_sio_residual_table", "\n".join(lines))
+    )
     print("\n" + "\n".join(lines))
 
 
