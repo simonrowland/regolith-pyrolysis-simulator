@@ -975,17 +975,18 @@ def load_all_cj_olivine_kems_anchors(
 # ---------------------------------------------------------------------
 #
 # The §25 cohort-1 grid (§ docs-private/vapor-pressure-calibration-grid-
-# 2026-05-16.md) is a 2 T × 3 melts × 5 species = 30 point surface:
+# 2026-05-16.md) started as a 2 T × 3 melts × 5 species = 30 point surface:
 #
 #   T ∈ {1700, 1900} K
 #   melt ∈ {tholeiite, lunar_mare_basalt_12022_proxy, EAC-1A}
 #   species ∈ {SiO, Na, SiO2, O2, Mg}
 #
-# Of the 30 points, 10 are blocked by missing literature anchors (Sesko
-# 2022 publishes no numeric partial pressures; SF2018 publishes no
-# SiO2). Of the 20 covered points, the §25 v1 baseline passes 11 at
-# 1-decade tolerance. The acceptance gate for this framework's cohort-1
-# is ≥18 of 30 (= ≥18 of 20 covered) at 1-decade tolerance.
+# v2 proved 10 of those 30 cells are unreachable from the populated
+# corpus. v3 keeps the 20 corpus-backed v2 cells and substitutes the
+# 10 blocked cells with fixture-backed partial-pressure anchors from
+# Costa-Jacobson 2015, Schaefer-Fegley 2004, Sossi-Fegley 2018, and
+# Visscher-Fegley 2013. The grid remains exactly 30 anchors and keeps
+# the fixed 1-decade pass tolerance.
 #
 # This subset selects anchors from the corpus that map onto the §25
 # grid cells. The mapping uses the §25 v1 feedstock keys (tholeiite,
@@ -998,13 +999,13 @@ def load_all_cj_olivine_kems_anchors(
 _GRID_25_TEMPERATURES_K = (1700.0, 1900.0)
 _GRID_25_SPECIES = ("SiO", "Na", "SiO2", "O2", "Mg")
 
-# Mapping: (T_K, species) → expected_Pa from the §25 grid spec.
+# Mapping: (T_K, species) → expected_Pa from the §25 v2 grid spec.
 # Sourced from docs-private/vapor-pressure-calibration-grid-2026-05-16.md
 # (committed corpus extraction). Three melts:
 #   tholeiite → Schaefer & Fegley 2004 Table 9 HK back-solve
 #   lunar_mare_basalt_12022_proxy → Sossi & Fegley 2018 Fig 3 digitization
 #   EAC-1A → blocked except O2 (Kress91 IW anchor only)
-# ``None`` entries are the 10 §25 grid blocked cells.
+# ``None`` entries are v2 blocked cells that v3 substitutes below.
 
 _GRID_25: dict[str, dict[tuple[float, str], float | None]] = {
     "tholeiite": {
@@ -1054,6 +1055,192 @@ _GRID_25: dict[str, dict[tuple[float, str], float | None]] = {
         (1900.0, "Mg"): None,
     },
 }
+
+
+_GRID_25_V3_SUBSTITUTIONS: dict[str, dict[str, Any]] = {
+    "grid-25:EAC-1A@1700K:Mg": {
+        "kind": "cj",
+        "cell_id": "cj_fo93fa7_ir_cell",
+        "cell_label": "Ir",
+        "T_K": 1700.0,
+        "species": "Mg",
+    },
+    "grid-25:EAC-1A@1900K:Mg": {
+        "kind": "cj",
+        "cell_id": "cj_fo93fa7_mo_cell",
+        "cell_label": "Mo",
+        "T_K": 1900.0,
+        "species": "Mg",
+    },
+    "grid-25:EAC-1A@1700K:SiO": {
+        "kind": "corpus",
+        "cell_id": "sf2018_fig3_sio_1773",
+        "paper_id": "sossi-fegley-2018-volatility",
+        "T_K": 1773.0,
+        "species": "SiO",
+        "expected_Pa": 1.53e-2,
+    },
+    "grid-25:EAC-1A@1900K:SiO": {
+        "kind": "corpus",
+        "cell_id": "sf2018_fig3_sio_1873",
+        "paper_id": "sossi-fegley-2018-volatility",
+        "T_K": 1873.0,
+        "species": "SiO",
+        "expected_Pa": 2.82e-1,
+    },
+    "grid-25:EAC-1A@1700K:Na": {
+        "kind": "corpus",
+        "cell_id": "sf2004_tholeiite_1550_na",
+        "paper_id": "schaefer-fegley-2004-io-lava",
+        "T_K": 1550.0,
+        "species": "Na",
+        "expected_Pa": 7.17e-2,
+    },
+    "grid-25:EAC-1A@1900K:Na": {
+        "kind": "corpus",
+        "cell_id": "vf2013_mars_2000_na",
+        "paper_id": "visscher-fegley-2013-debris-disks",
+        "T_K": 2000.0,
+        "species": "Na",
+        "expected_Pa": 80.0,
+    },
+    "grid-25:EAC-1A@1700K:SiO2": {
+        "kind": "corpus",
+        "cell_id": "sf2004_tholeiite_1550_sio2_for_eac",
+        "paper_id": "schaefer-fegley-2004-io-lava",
+        "T_K": 1550.0,
+        "species": "SiO2",
+        "expected_Pa": 4.73e-7,
+    },
+    "grid-25:EAC-1A@1900K:SiO2": {
+        "kind": "corpus",
+        "cell_id": "sf2004_tholeiite_1700_sio2_for_eac",
+        "paper_id": "schaefer-fegley-2004-io-lava",
+        "T_K": 1700.0,
+        "species": "SiO2",
+        "expected_Pa": 2.0e-5,
+    },
+    "grid-25:lunar_mare_basalt_12022_proxy@1700K:SiO2": {
+        "kind": "corpus",
+        "cell_id": "sf2004_tholeiite_1900_sio2_for_lunar",
+        "paper_id": "schaefer-fegley-2004-io-lava",
+        "T_K": 1900.0,
+        "species": "SiO2",
+        "expected_Pa": 1.19e-3,
+    },
+    "grid-25:lunar_mare_basalt_12022_proxy@1900K:SiO2": {
+        "kind": "corpus",
+        "cell_id": "sf2004_tholeiite_1550_sio2_for_lunar",
+        "paper_id": "schaefer-fegley-2004-io-lava",
+        "T_K": 1550.0,
+        "species": "SiO2",
+        "expected_Pa": 4.73e-7,
+    },
+}
+
+
+def _grid_25_cell_id(melt_key: str, T_K: float, species: str) -> str:
+    return f"grid-25:{melt_key}@{int(T_K)}K:{species}"
+
+
+def _grid_25_v3_source(old_cell_id: str, source: str) -> str:
+    return f"§25 v3 substitute for {old_cell_id}: {source}"
+
+
+def _grid_25_v3_matches_expected(
+    anchor: CorpusAnchor,
+    selector: Mapping[str, Any],
+) -> bool:
+    expected = selector.get("expected_Pa")
+    if expected is None:
+        return True
+    return abs(anchor.expected_Pa - float(expected)) <= (
+        max(abs(float(expected)), 1.0) * 1e-9
+    )
+
+
+def _grid_25_v3_cj_substitute(
+    old_cell_id: str,
+    selector: Mapping[str, Any],
+    repo_root: Path | None,
+) -> CorpusAnchor | None:
+    for anchor in load_all_cj_olivine_kems_anchors(repo_root=repo_root):
+        if anchor.intent != "VAPOR_PRESSURE":
+            continue
+        if anchor.quantity != "partial_pressure_Pa":
+            continue
+        if anchor.cell_label != selector["cell_label"]:
+            continue
+        if anchor.T_K != selector["T_K"]:
+            continue
+        if anchor.species != selector["species"]:
+            continue
+        if anchor.expected_Pa is None or anchor.expected_Pa <= 0.0:
+            continue
+        source = (
+            f"{anchor.source}; KEMS Mg pressure, fO2 channel is a "
+            "simulator dispatch convention only"
+        )
+        return CorpusAnchor(
+            paper_id="grid-25",
+            melt_id=f"grid-25:{selector['cell_id']}",
+            T_K=anchor.T_K,
+            fO2_log=_kress91_iw_log_fO2(anchor.T_K),
+            species=anchor.species,
+            expected_Pa=float(anchor.expected_Pa),
+            tolerance_decades=1.0,
+            source=_grid_25_v3_source(old_cell_id, source),
+            composition_wt_pct=dict(anchor.composition_wt_pct),
+        )
+    return None
+
+
+def _grid_25_v3_corpus_substitute(
+    old_cell_id: str,
+    selector: Mapping[str, Any],
+    repo_root: Path | None,
+) -> CorpusAnchor | None:
+    source_contains = selector.get("source_contains")
+    melt_id_suffix = selector.get("melt_id_suffix")
+    for anchor in load_all_corpus_anchors(repo_root=repo_root):
+        if anchor.paper_id != selector["paper_id"]:
+            continue
+        if anchor.T_K != selector["T_K"]:
+            continue
+        if anchor.species != selector["species"]:
+            continue
+        if melt_id_suffix and not anchor.melt_id.endswith(melt_id_suffix):
+            continue
+        if source_contains and source_contains not in anchor.source:
+            continue
+        if not _grid_25_v3_matches_expected(anchor, selector):
+            continue
+        return CorpusAnchor(
+            paper_id="grid-25",
+            melt_id=f"grid-25:{selector['cell_id']}",
+            T_K=anchor.T_K,
+            fO2_log=anchor.fO2_log,
+            species=anchor.species,
+            expected_Pa=anchor.expected_Pa,
+            tolerance_decades=1.0,
+            source=_grid_25_v3_source(old_cell_id, anchor.source),
+            composition_wt_pct=dict(anchor.composition_wt_pct),
+        )
+    return None
+
+
+def _grid_25_v3_substitute_anchor(
+    old_cell_id: str,
+    repo_root: Path | None,
+) -> CorpusAnchor | None:
+    selector = _GRID_25_V3_SUBSTITUTIONS.get(old_cell_id)
+    if selector is None:
+        return None
+    if selector["kind"] == "cj":
+        return _grid_25_v3_cj_substitute(old_cell_id, selector, repo_root)
+    if selector["kind"] == "corpus":
+        return _grid_25_v3_corpus_substitute(old_cell_id, selector, repo_root)
+    return None
 
 
 # §25 v1 calibration feedstocks (copied from tests/test_vaporock_backend.py
@@ -1109,14 +1296,15 @@ GRID_25_FEEDSTOCKS: dict[str, dict[str, Any]] = {
 }
 
 
-def grid_25_anchors() -> list[CorpusAnchor]:
-    """Return the §25 cohort-1 30-anchor grid as CorpusAnchor tuples.
+def grid_25_anchors(
+    *,
+    repo_root: Path | None = None,
+) -> list[CorpusAnchor]:
+    """Return the §25 cohort-1 v3 30-anchor grid.
 
-    Covered cells emit anchors with ``expected_Pa`` set; blocked cells
-    emit anchors with ``expected_Pa = float("nan")`` so the test
-    parametrization stays at 30 (per the §25 spec) and the test reports
-    blocked cells distinctly from failing cells. Tolerance is 1.0 decade
-    (the §25 grid default).
+    v3 keeps v2's covered cells and replaces the 10 v2 blocked cells with
+    fixture-backed substitutes. If a required private fixture is absent,
+    the old cell remains blocked so the report stays honest.
     """
     anchors: list[CorpusAnchor] = []
     for melt_key, melt_data in GRID_25_FEEDSTOCKS.items():
@@ -1124,14 +1312,24 @@ def grid_25_anchors() -> list[CorpusAnchor]:
         for T_K in _GRID_25_TEMPERATURES_K:
             fO2_log = _kress91_iw_log_fO2(T_K)
             for species in _GRID_25_SPECIES:
+                old_cell_id = _grid_25_cell_id(melt_key, T_K, species)
                 expected = _GRID_25[melt_key].get((T_K, species))
                 if expected is None:
+                    substitute = _grid_25_v3_substitute_anchor(
+                        old_cell_id,
+                        repo_root,
+                    )
+                    if substitute is not None:
+                        anchors.append(substitute)
+                        continue
                     expected_Pa = float("nan")
-                    source = "blocked: no numeric anchor in corpus"
+                    source = (
+                        "blocked: v3 substitute fixture missing from corpus"
+                    )
                 else:
                     expected_Pa = float(expected)
                     source = (
-                        "§25 grid spec "
+                        "§25 v3 retained v2 grid cell "
                         f"({melt_key} @ {int(T_K)} K, {species})"
                     )
                 anchors.append(

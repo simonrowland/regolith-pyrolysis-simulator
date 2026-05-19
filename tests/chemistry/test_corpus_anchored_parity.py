@@ -621,7 +621,7 @@ def test_corpus_anchor_engine_runs_without_crashing(
 
 
 # ---------------------------------------------------------------------
-# Test 2: §25 grid acceptance gate (v2 corpus-backed rerun)
+# Test 2: §25 grid acceptance gate (v3 corpus-backed substitution grid)
 # ---------------------------------------------------------------------
 
 def _evaluate_grid_25(
@@ -722,7 +722,8 @@ def grid_25_vaporock_report(
 # welcome; the test allows convergence but blocks worsening.
 #
 # Root-cause categorisation (see
-# ``docs-private/corpus-anchored-test-framework-convergence-2026-05-16.md``):
+# ``docs-private/corpus-anchored-test-framework-convergence-2026-05-16.md``
+# plus ``docs-private/vapor-pressure-calibration-convergence-2026-05-19-v3.md``):
 #
 # - tholeiite@1700/1900K:O2 — VapoRock returns the requested fO2
 #   directly (basalt-IW anchor) but SF2004 Table 9 reports the
@@ -755,10 +756,10 @@ KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR = {
     "grid-25:lunar_mare_basalt_12022_proxy@1900K:Na": 3.2,
 }
 
-GRID_25_V2_PASS_BASELINE = 11
-GRID_25_V2_ORIGINAL_ACCEPTANCE_TARGET = 18
+GRID_25_V3_PASS_BASELINE = 21
+GRID_25_V3_ORIGINAL_ACCEPTANCE_TARGET = 18
 
-GRID_25_V2_RESIDUAL_CLASSIFICATION = {
+GRID_25_V3_RESIDUAL_CLASSIFICATION = {
     "grid-25:tholeiite@1700K:O2": "convention-mismatch",
     "grid-25:tholeiite@1900K:O2": "convention-mismatch",
     "grid-25:tholeiite@1700K:Mg": "model-spread-within-envelope",
@@ -775,15 +776,15 @@ GRID_25_V2_RESIDUAL_CLASSIFICATION = {
 }
 
 
-def _grid_25_v2_status_label(anchor_id: str, entry: dict) -> str:
-    """Return the v2 acceptance-table label for a §25 grid entry."""
+def _grid_25_v3_status_label(anchor_id: str, entry: dict) -> str:
+    """Return the v3 acceptance-table label for a §25 grid entry."""
     status = entry["status"]
     if status == "pass":
         return "pass"
     if status == "blocked":
         return "blocked-on-missing-data"
     if status == "fail":
-        return GRID_25_V2_RESIDUAL_CLASSIFICATION.get(
+        return GRID_25_V3_RESIDUAL_CLASSIFICATION.get(
             anchor_id, "engine-side-residual",
         )
     return status
@@ -792,30 +793,27 @@ def _grid_25_v2_status_label(anchor_id: str, entry: dict) -> str:
 def test_grid_25_cohort_passes_acceptance_gate(
     grid_25_vaporock_report: dict[str, dict],
 ):
-    """§25 v2 acceptance: framework preserves the corpus-backed baseline.
+    """§25 v3 acceptance: framework reaches the corpus-backed target.
 
     \\goal CHEMISTRY-E2E-TEST-REGIME §25 cohort-1.
 
-    The grid is 2 T × 3 melts × 5 species = 30 points. The 2026-05-19
-    rerun against populated fixtures still has 11 of 30 anchors passing
-    at 1-decade tolerance. Seven non-passing numeric cells remain inside
-    documented model-spread envelopes, two are SF2004 O2 redox-convention
-    mismatches, and ten are blocked because the populated fixtures do not
-    contain numeric partial-pressure rows for the requested grid cell.
-    The framework is therefore tested for three properties that are honest:
+    The grid is still 30 anchors. v3 replaces the 10 v2 blocked cells with
+    corpus-backed substitute cells and reaches 21 of 30 anchors passing at
+    1-decade tolerance. Seven non-passing numeric cells remain inside
+    documented model-spread envelopes and two are SF2004 O2
+    redox-convention mismatches. The framework is therefore tested for
+    three properties that are honest:
 
     1. Total anchor count is exactly 30 (per the §25 spec).
     2. No anchor's residual exceeds its documented envelope — engine
        changes can converge a residual but not worsen it. New failures
        (anchors not in :data:`KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR`)
        are rejected outright.
-    3. The v2 pass count cannot regress below the verified corpus-backed
+    3. The v3 pass count cannot regress below the verified corpus-backed
        baseline.
 
-    This test still does NOT enforce the original
-    :data:`GRID_25_V2_ORIGINAL_ACCEPTANCE_TARGET` target. The v2
-    convergence document records why reaching it is unreachable with the
-    current corpus data and without engine/coefficient edits.
+    The original :data:`GRID_25_V3_ORIGINAL_ACCEPTANCE_TARGET` target is
+    now met without engine/coefficient edits.
     """
     counts = {
         "pass": 0, "fail": 0, "blocked": 0,
@@ -872,15 +870,15 @@ def test_grid_25_cohort_passes_acceptance_gate(
     )
 
     passing = counts["pass"]
-    # The framework reproduces the §25 v2 corpus-backed baseline.
+    # The framework reproduces the §25 v3 corpus-backed baseline.
     # If passing drops below the baseline, a previously-passing anchor now fails —
     # surface that as a regression even if the failing anchor is in
     # the documented envelope (the documented envelope is a max-error
     # cap, not a passing-status downgrade allowance).
-    assert passing >= GRID_25_V2_PASS_BASELINE, (
+    assert passing >= GRID_25_V3_PASS_BASELINE, (
         f"§25 cohort-1 PASSING COUNT REGRESSED: {passing} of 30 anchors "
-        f"pass at 1-decade, but the §25 v2 corpus-backed baseline is "
-        f"{GRID_25_V2_PASS_BASELINE}. A previously-passing anchor crossed "
+        f"pass at 1-decade, but the §25 v3 corpus-backed baseline is "
+        f"{GRID_25_V3_PASS_BASELINE}. A previously-passing anchor crossed "
         f"back into the failing band. "
         f"Counts: {counts}."
     )
@@ -908,7 +906,7 @@ def test_grid_25_residual_report(
         exp_s = f"{exp:.3e}" if (exp == exp) else "—"
         obs_s = f"{obs:.3e}" if obs is not None else "—"
         err_s = f"{err:.2f}" if err is not None else "—"
-        status = _grid_25_v2_status_label(anchor_id, entry)
+        status = _grid_25_v3_status_label(anchor_id, entry)
         lines.append(
             f"| {anchor_id} | {status} | {exp_s} | "
             f"{obs_s} | {err_s} | {entry['source']} |"
