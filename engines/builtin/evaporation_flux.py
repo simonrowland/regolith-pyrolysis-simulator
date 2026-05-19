@@ -20,7 +20,8 @@ works. The provider:
   ``request.control_inputs['overhead_partials_Pa']``,
 - reads melt surface area, stir factor, evaporation coefficient via
   ``control_inputs['melt_surface_area_m2']``,
-  ``control_inputs['stir_factor']``, ``control_inputs['alpha']``,
+  ``control_inputs['stir_factor']``, ``control_inputs['alpha']``
+  (a per-species mapping),
 - reads per-species stoichiometry and available parent-oxide mass via
   ``control_inputs['stoich_by_species']`` and
   ``control_inputs['available_oxide_kg']`` (precomputed by the caller --
@@ -48,6 +49,7 @@ the VAPOR_PRESSURE provider declares, and the same one the legacy
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 
 from engines.builtin._common import (
     diagnostic_control_audit,
@@ -57,6 +59,20 @@ from engines.builtin._common import (
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+
+
+_DEFAULT_EVAPORATION_ALPHA = 1.0
+
+
+def _coerce_alpha_by_species(alpha_control) -> dict[str, float]:
+    if isinstance(alpha_control, Mapping):
+        return {
+            str(species): float(value)
+            for species, value in alpha_control.items()
+        }
+    if alpha_control is None:
+        return {}
+    return {"*": float(alpha_control)}
 
 
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
@@ -125,11 +141,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
         melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
         stir_factor = float(controls.get("stir_factor", 0.0))
-        alpha = float(controls.get("alpha", 0.5))
+        alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
 
         flux_kg_hr: dict[str, float] = {}
+        alpha_used_by_species: dict[str, float] = {}
 
         for species, P_sat_Pa in vapor_pressures.items():
+            alpha = alpha_by_species.get(
+                species,
+                alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
+            )
+            alpha_used_by_species[species] = alpha
             if P_sat_Pa <= 0:
                 continue
 
@@ -190,6 +212,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "evaporation_flux_kg_hr": flux_kg_hr,
+                "alpha_used_by_species": alpha_used_by_species,
                 "temperature_C": T_C,
                 "gas_pO2_bar": gas_pO2_bar,
                 "intrinsic_pO2_bar": intrinsic_pO2_bar,

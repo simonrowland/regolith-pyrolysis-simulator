@@ -65,6 +65,7 @@ from tests.chemistry.corpus_fixtures import (
     CJOlivineKEMSAnchor,
     CorpusAnchor,
     GRID_25_FEEDSTOCKS,
+    alpha_envelope_anchors,
     grid_25_anchors,
     grid_25_sio_anchors,
     load_all_atomic_ratio_anchors,
@@ -941,6 +942,26 @@ GRID_25_SIO_ALLOWED_STATUSES = {
     "body-composition-spread",
     "out-of-engine-T-range",
 }
+
+
+def test_grid_alpha_kinetic_envelope():
+    """Alpha surface sanity only: value inside literature envelope."""
+
+    anchors = alpha_envelope_anchors()
+    assert anchors, "no evaporation_alpha blocks found in vapor_pressures.yaml"
+
+    failures = [
+        anchor
+        for anchor in anchors
+        if not (anchor.envelope[0] <= anchor.value <= anchor.envelope[1])
+    ]
+    assert not failures, (
+        "evaporation_alpha value outside envelope: "
+        + ", ".join(
+            f"{anchor.species}={anchor.value} not in {anchor.envelope}"
+            for anchor in failures
+        )
+    )
 
 
 def _evaluate_grid_25_sio(

@@ -153,6 +153,17 @@ class CorpusAnchor:
 
 
 @dataclass(frozen=True)
+class AlphaEnvelopeAnchor:
+    """A YAML-backed evaporation-alpha value plus its literature envelope."""
+
+    species: str
+    value: float
+    source: str
+    T_band_K: tuple[float, float]
+    envelope: tuple[float, float]
+
+
+@dataclass(frozen=True)
 class AtomicRatioAnchor:
     """A single gas-phase atomic ratio relative to another element.
 
@@ -228,6 +239,7 @@ class CJOlivineKEMSAnchor:
 # a missing tree (no anchors yielded) without raising, so chemistry-suite
 # tests that do not consume the framework still run on a fresh checkout.
 _CORPUS_SUBPATH = "docs-private/deep-research/literature"
+_ALPHA_DATA_GROUPS = ("metals", "oxide_vapors")
 
 
 def _corpus_root(repo_root: Path | None = None) -> Path:
@@ -252,6 +264,13 @@ def _list_fixture_paths(repo_root: Path | None = None) -> list[Path]:
     if not root.exists():
         return []
     return sorted(root.glob("*/benchmark-fixture.yaml"))
+
+
+def _vapor_pressure_path(repo_root: Path | None = None) -> Path:
+    if repo_root is not None:
+        return Path(repo_root) / "data" / "vapor_pressures.yaml"
+    here = Path(__file__).resolve()
+    return here.parents[2] / "data" / "vapor_pressures.yaml"
 
 
 # ---------------------------------------------------------------------
@@ -279,6 +298,64 @@ def _coerce_float(value: Any) -> float | None:
     if math.isnan(v) or math.isinf(v):
         return None
     return v
+
+
+def alpha_envelope_anchors(
+    *,
+    repo_root: Path | None = None,
+) -> list[AlphaEnvelopeAnchor]:
+    """Return every YAML evaporation-alpha value with source and envelope."""
+
+    data = yaml.safe_load(_vapor_pressure_path(repo_root).read_text()) or {}
+    anchors: list[AlphaEnvelopeAnchor] = []
+    for group_name in _ALPHA_DATA_GROUPS:
+        group = data.get(group_name, {}) or {}
+        if not isinstance(group, Mapping):
+            continue
+        for species, species_data in group.items():
+            if not isinstance(species_data, Mapping):
+                continue
+            if "evaporation_alpha" not in species_data:
+                continue
+            alpha_data = species_data.get("evaporation_alpha")
+            if not isinstance(alpha_data, Mapping):
+                raise ValueError(
+                    f"evaporation_alpha for {species!r} must be a mapping"
+                )
+
+            value = _coerce_float(alpha_data.get("value"))
+            envelope_raw = alpha_data.get("envelope") or ()
+            t_band_raw = alpha_data.get("T_band_K") or ()
+            if (
+                value is None
+                or not isinstance(envelope_raw, list)
+                or not isinstance(t_band_raw, list)
+                or len(envelope_raw) != 2
+                or len(t_band_raw) != 2
+            ):
+                raise ValueError(
+                    f"evaporation_alpha for {species!r} needs value, "
+                    "two-entry T_band_K, and two-entry envelope"
+                )
+
+            envelope = tuple(_coerce_float(v) for v in envelope_raw)
+            t_band = tuple(_coerce_float(v) for v in t_band_raw)
+            if any(v is None for v in envelope + t_band):
+                raise ValueError(
+                    f"evaporation_alpha for {species!r} has non-numeric "
+                    "T_band_K or envelope"
+                )
+
+            anchors.append(
+                AlphaEnvelopeAnchor(
+                    species=str(species),
+                    value=value,
+                    source=str(alpha_data.get("source") or ""),
+                    T_band_K=(float(t_band[0]), float(t_band[1])),
+                    envelope=(float(envelope[0]), float(envelope[1])),
+                )
+            )
+    return sorted(anchors, key=lambda anchor: anchor.species)
 
 
 def _entry_to_anchor_seed(
@@ -1478,10 +1555,12 @@ def grid_25_sio_anchors(
 
 
 __all__ = (
+    "AlphaEnvelopeAnchor",
     "AtomicRatioAnchor",
     "CJOlivineKEMSAnchor",
     "CorpusAnchor",
     "GRID_25_FEEDSTOCKS",
+    "alpha_envelope_anchors",
     "grid_25_anchors",
     "grid_25_sio_anchors",
     "load_all_cj_olivine_kems_anchors",

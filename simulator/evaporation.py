@@ -16,10 +16,24 @@ from simulator.state import (
 )
 
 
-# Evaporation coefficient (conservative mean, ~0.1-1.0 for metals).
-# Pulled out as a module constant so the kernel-dispatch caller and any
-# future shadow-parity guard share one source.
-_EVAPORATION_COEFFICIENT_ALPHA = 0.5
+_DEFAULT_EVAPORATION_ALPHA = 1.0
+_EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+
+
+def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, float]:
+    """Load per-species Hertz-Knudsen alpha values from vapor pressure data."""
+
+    alpha_by_species: dict[str, float] = {}
+    for group_name in _EVAPORATION_ALPHA_GROUPS:
+        group = vapor_pressure_data.get(group_name, {}) or {}
+        for species, species_data in group.items():
+            if not isinstance(species_data, dict):
+                continue
+            alpha_data = species_data.get("evaporation_alpha") or {}
+            if not isinstance(alpha_data, dict) or "value" not in alpha_data:
+                continue
+            alpha_by_species[species] = float(alpha_data["value"])
+    return alpha_by_species
 
 
 class EvaporationMixin:
@@ -114,7 +128,9 @@ class EvaporationMixin:
                 'available_oxide_kg': available_oxide_kg,
                 'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
                 'stir_factor': float(self.melt.stir_factor),
-                'alpha': _EVAPORATION_COEFFICIENT_ALPHA,
+                'alpha': _load_evaporation_alpha_by_species(
+                    self.vapor_pressures
+                ),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
