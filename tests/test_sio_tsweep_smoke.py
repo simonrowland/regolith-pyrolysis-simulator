@@ -1,0 +1,95 @@
+import csv
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+
+FEEDSTOCKS = ("lunar_mare_low_ti", "mars_basalt")
+EXPECTED_COLUMNS = (
+    "cell_id",
+    "T_low_C",
+    "T_hold_C",
+    "ramp_C_per_hr",
+    "sio_yield_pct_of_feedstock",
+    "terminal_offgas_escape_pct",
+    "stage3_silica_kg",
+    "mass_balance_err_pct",
+)
+MASS_BALANCE_LIMIT_PCT = 5.0e-12
+
+
+def _run_tsweep(tmp_path: Path, feedstock: str, label: str, *grid_args: str):
+    output_dir = tmp_path / feedstock / label
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner.sio_tsweep",
+            "--feedstock",
+            feedstock,
+            "--output-dir",
+            str(output_dir),
+            *grid_args,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return output_dir
+
+
+def _read_index(output_dir: Path):
+    with (output_dir / "index.csv").open(newline="") as f:
+        return list(csv.DictReader(f))
+
+
+@pytest.mark.parametrize("feedstock", FEEDSTOCKS)
+def test_sio_tsweep_cli_smoke_2x2x2_grid(tmp_path, feedstock):
+    output_dir = _run_tsweep(
+        tmp_path,
+        feedstock,
+        "grid",
+        "--t-low-grid",
+        "1050,1100",
+        "--t-hold-grid",
+        "1400,1500",
+        "--ramp-grid",
+        "5,10",
+    )
+
+    rows = _read_index(output_dir)
+    assert len(rows) == 8
+    assert tuple(rows[0]) == EXPECTED_COLUMNS
+    assert len(list(output_dir.glob("*.json"))) == 8
+    for row in rows:
+        assert float(row["mass_balance_err_pct"]) <= MASS_BALANCE_LIMIT_PCT
+
+
+@pytest.mark.parametrize("feedstock", FEEDSTOCKS)
+def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
+    metrics = []
+    for index in range(3):
+        output_dir = _run_tsweep(
+            tmp_path,
+            feedstock,
+            f"deterministic-{index}",
+            "--t-low-grid",
+            "1050",
+            "--t-hold-grid",
+            "1400",
+            "--ramp-grid",
+            "5",
+        )
+        cell_path = output_dir / "tl1050_th1400_r5.json"
+        cell_doc = json.loads(cell_path.read_text())
+        metrics.append(cell_doc["metrics"])
+        assert cell_doc["diagnostics"]["mass_balance_error_pct"] <= (
+            MASS_BALANCE_LIMIT_PCT
+        )
+
+    assert metrics[1] == metrics[0]
+    assert metrics[2] == metrics[0]
