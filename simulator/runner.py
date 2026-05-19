@@ -26,9 +26,11 @@ schema-shape assertion in ``tests/test_runner_smoke.py``.
 from __future__ import annotations
 
 import argparse
+import csv
 import dataclasses
 import importlib.abc
 import importlib.machinery
+import itertools
 import json
 import math
 import subprocess
@@ -71,6 +73,18 @@ SIO_YIELD_STAGE_KEYS: dict[int, str] = {
     4: "stage_4_alkali_mg_carryover",
     5: "stage_5_dust_filter_carryover",
 }
+SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
+SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
+SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
+SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR: tuple[float, ...] = (5.0, 10.0, 15.0)
+SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT = 5.0e-12
+SIO_TSWEEP_GAP_A_BAND = "1200-1673K low-T extrapolation"
+SIO_TSWEEP_WARNING_TEXT = (
+    "Recipe T_hold in Gap A (1200-1673K low-T extrapolation); promote "
+    "Tickler #4 SIO-TRANGE-EXTENSION-OPERATIONAL Phase A "
+    "(Cardiff/Matchett/Tsuchiyama/Steurer extraction) before relying on "
+    "this recommendation operationally."
+)
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -695,6 +709,40 @@ def _clean_report_float(value: float) -> float:
     return float(f"{value:.12g}")
 
 
+def _format_sweep_float(value: float) -> str:
+    if not math.isfinite(value):
+        raise RunnerError(f"non-finite sweep value: {value!r}")
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:g}".replace(".", "p")
+
+
+def _c_to_display_k(value_c: float) -> int:
+    return int(round(float(value_c) + 273.15))
+
+
+def _warning_sticker_fires(t_hold_c: float) -> bool:
+    return _c_to_display_k(t_hold_c) <= 1673
+
+
+def _parse_float_grid(raw: str, *, label: str) -> tuple[float, ...]:
+    values: list[float] = []
+    for item in raw.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            value = float(item)
+        except ValueError as exc:
+            raise RunnerError(f"{label} contains non-numeric value {item!r}") from exc
+        if not math.isfinite(value):
+            raise RunnerError(f"{label} contains non-finite value {item!r}")
+        values.append(value)
+    if not values:
+        raise RunnerError(f"{label} must contain at least one value")
+    return tuple(values)
+
+
 def _industrial_sio_verdict(yield_pct: float) -> str:
     low, high = SIO_INDUSTRIAL_BENCHMARK_PCT
     if yield_pct < low:
@@ -732,14 +780,42 @@ def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],
         raise RunnerError(f"invalid Stage 0 carbon cleanup metadata: {exc}") from exc
 
 
-def _prepare_sio_campaign_start(sim: PyrolysisSimulator) -> None:
+def _prepare_sio_campaign_start(
+    sim: PyrolysisSimulator,
+    *,
+    t_low_c: float | None = None,
+    t_hold_c: float | None = None,
+    ramp_c_per_hr: float | None = None,
+) -> None:
     campaign_cfg = (
         (sim.setpoints.get("campaigns", {}) or {}).get(SIO_YIELD_CAMPAIGN, {})
         or {}
     )
     temp_range = campaign_cfg.get("temp_range_C") or []
-    if temp_range:
+    if t_low_c is not None:
+        sim.melt.temperature_C = float(t_low_c)
+    elif temp_range:
         sim.melt.temperature_C = max(sim.melt.temperature_C, float(temp_range[0]))
+
+    if ramp_c_per_hr is not None:
+        sim.campaign_mgr.overrides.setdefault("C2A", {})["ramp_rate"] = (
+            float(ramp_c_per_hr)
+        )
+
+    if t_hold_c is None:
+        return
+
+    base_get_temp_target = sim.campaign_mgr.get_temp_target
+
+    def _sio_twindow_temp_target(campaign, campaign_hour, melt):
+        target, ramp_rate = base_get_temp_target(campaign, campaign_hour, melt)
+        if campaign == CampaignPhase.C2A:
+            if ramp_c_per_hr is not None:
+                ramp_rate = float(ramp_c_per_hr)
+            return (float(t_hold_c), ramp_rate)
+        return (target, ramp_rate)
+
+    sim.campaign_mgr.get_temp_target = _sio_twindow_temp_target
 
 
 def build_sio_yield_report(
@@ -749,6 +825,9 @@ def build_sio_yield_report(
     hours: int = 24,
     mass_kg: float = 1000.0,
     include_diagnostics: bool = False,
+    t_low_c: float | None = None,
+    t_hold_c: float | None = None,
+    ramp_c_per_hr: float | None = None,
 ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, float]]:
     """Run the C2A SiO yield slice and return the golden-file report."""
 
@@ -781,6 +860,10 @@ def build_sio_yield_report(
     if stage0_carbon_kg > 1.0e-12:
         additives_kg["C"] = stage0_carbon_kg
 
+    setpoints_overrides: dict[str, dict] = {}
+    if ramp_c_per_hr is not None:
+        setpoints_overrides["C2A"] = {"ramp_rate": float(ramp_c_per_hr)}
+
     base_run = PyrolysisRun(
         feedstock_id=feedstock_id,
         campaign=campaign,
@@ -792,9 +875,15 @@ def build_sio_yield_report(
         engines={"vapor_pressure": "builtin-antoine"},
         allow_fallback_vapor=True,
         force_builtin_vapor_pressure=True,
+        setpoints_overrides=setpoints_overrides,
     )
     sim = base_run._build_sim()
-    _prepare_sio_campaign_start(sim)
+    _prepare_sio_campaign_start(
+        sim,
+        t_low_c=t_low_c,
+        t_hold_c=t_hold_c,
+        ramp_c_per_hr=ramp_c_per_hr,
+    )
     initial_balances = sim.atom_ledger.mol_by_account()
     initial_sio2_mol = float(
         initial_balances.get("process.cleaned_melt", {}).get("SiO2", 0.0)
@@ -870,6 +959,342 @@ def build_sio_yield_report(
         }
         return report, diagnostics
     return report
+
+
+def _sio_tsweep_cell_id(
+    t_low_c: float,
+    t_hold_c: float,
+    ramp_c_per_hr: float,
+) -> str:
+    return (
+        f"tl{_format_sweep_float(t_low_c)}_"
+        f"th{_format_sweep_float(t_hold_c)}_"
+        f"r{_format_sweep_float(ramp_c_per_hr)}"
+    )
+
+
+def _sio_tsweep_row(
+    *,
+    cell_id: str,
+    t_low_c: float,
+    t_hold_c: float,
+    ramp_c_per_hr: float,
+    report: Mapping[str, Any],
+    diagnostics: Mapping[str, float],
+    mass_kg: float,
+) -> dict[str, Any]:
+    stage3_silica_kg = float(
+        report.get("sio_to_silica_fume_kg", {}).get(
+            "stage_3_sio_zone_product", 0.0
+        )
+    )
+    terminal_offgas_kg = float(
+        report.get("sio_to_silica_fume_kg", {}).get(
+            "terminal_offgas_escape", 0.0
+        )
+    )
+    return {
+        "cell_id": cell_id,
+        "T_low_C": _clean_report_float(float(t_low_c)),
+        "T_hold_C": _clean_report_float(float(t_hold_c)),
+        "ramp_C_per_hr": _clean_report_float(float(ramp_c_per_hr)),
+        "sio_yield_pct_of_feedstock": _clean_report_float(
+            float(report["sio_yield_pct_of_feedstock"])
+        ),
+        "terminal_offgas_escape_pct": _clean_report_float(
+            terminal_offgas_kg / float(mass_kg) * 100.0
+        ),
+        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "mass_balance_err_pct": _clean_report_float(
+            abs(float(diagnostics.get("mass_balance_error_pct", 0.0)))
+        ),
+    }
+
+
+def _sort_sio_tsweep_rows(rows: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            -float(row["sio_yield_pct_of_feedstock"]),
+            float(row["mass_balance_err_pct"]),
+            float(row["T_hold_C"]),
+            float(row["ramp_C_per_hr"]),
+            float(row["T_low_C"]),
+        ),
+    )
+
+
+def _recommend_sio_tsweep_rows(
+    rows: list[Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], list[Mapping[str, Any]]]:
+    closing_rows = [
+        row
+        for row in _sort_sio_tsweep_rows(rows)
+        if float(row["mass_balance_err_pct"]) <= SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT
+    ]
+    if not closing_rows:
+        raise RunnerError(
+            "no SiO T-window sweep cells close mass balance at "
+            f"{SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT:g}%"
+        )
+    return closing_rows[0], closing_rows[1:4]
+
+
+def _sio_tsweep_table(rows: list[Mapping[str, Any]]) -> str:
+    headers = (
+        "rank",
+        "cell_id",
+        "T_low_C",
+        "T_hold_C",
+        "ramp_C_per_hr",
+        "sio_yield_pct_of_feedstock",
+        "terminal_offgas_escape_pct",
+        "stage3_silica_kg",
+        "mass_balance_err_pct",
+    )
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for rank, row in enumerate(_sort_sio_tsweep_rows(rows), start=1):
+        values = [
+            str(rank),
+            str(row["cell_id"]),
+            f"{float(row['T_low_C']):g}",
+            f"{float(row['T_hold_C']):g}",
+            f"{float(row['ramp_C_per_hr']):g}",
+            f"{float(row['sio_yield_pct_of_feedstock']):.12g}",
+            f"{float(row['terminal_offgas_escape_pct']):.12g}",
+            f"{float(row['stage3_silica_kg']):.12g}",
+            f"{float(row['mass_balance_err_pct']):.12g}",
+        ]
+        lines.append("| " + " | ".join(values) + " |")
+    return "\n".join(lines)
+
+
+def _format_sio_tsweep_triple(row: Mapping[str, Any]) -> str:
+    return (
+        f"(T_low={float(row['T_low_C']):g} C, "
+        f"T_hold={float(row['T_hold_C']):g} C, "
+        f"ramp={float(row['ramp_C_per_hr']):g} C/hr)"
+    )
+
+
+def build_sio_tsweep_report_markdown(
+    *,
+    feedstock_id: str,
+    rows: list[Mapping[str, Any]],
+) -> str:
+    recommended, alternates = _recommend_sio_tsweep_rows(rows)
+    warning_fired = _warning_sticker_fires(float(recommended["T_hold_C"]))
+    lines = [
+        f"# SiO T-Window Sweep - {feedstock_id}",
+        "",
+        "Date: 2026-05-19",
+        "",
+        "Scope: Phase 3 Stage 3 SiO setpoint characterization for "
+        "`data/setpoints.yaml` C2A_continuous operator review. Engine-only "
+        "outputs stay inside the [1323, 2400 K] authority band and the "
+        "recipe [1050, 1600 C] envelope.",
+        "",
+        "Caveat: alpha_SiO = 0.04 from the Phase 1 alpha surface "
+        "(commit `fc2d40b`). Stage 3 is post-Cr v2 "
+        "(commit `bb52c62`) and reports `stage_3_sio_zone_product`.",
+        "",
+        "## Recommendation",
+        "",
+        f"Recommended triple: `{_format_sio_tsweep_triple(recommended)}`",
+        "",
+        f"Yield: {float(recommended['sio_yield_pct_of_feedstock']):.12g}% "
+        "of feedstock.",
+        "",
+        f"Mass balance error: {float(recommended['mass_balance_err_pct']):.12g}%.",
+        "",
+        "## Best Alternates",
+        "",
+        "| rank | cell_id | triple | yield_pct | mass_balance_err_pct |",
+        "|---:|---|---|---:|---:|",
+    ]
+    for rank, row in enumerate(alternates, start=1):
+        lines.append(
+            "| "
+            f"{rank} | {row['cell_id']} | `{_format_sio_tsweep_triple(row)}` | "
+            f"{float(row['sio_yield_pct_of_feedstock']):.12g} | "
+            f"{float(row['mass_balance_err_pct']):.12g} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Sweep Table",
+            "",
+            _sio_tsweep_table(rows),
+            "",
+            "## Coverage Gap",
+            "",
+            f"Coverage gap checked: {SIO_TSWEEP_GAP_A_BAND}.",
+        ]
+    )
+    if warning_fired:
+        lines.extend(["", f"WARNING: {SIO_TSWEEP_WARNING_TEXT}"])
+    else:
+        lines.extend(
+            [
+                "",
+                "WARNING sticker: not fired for this recommendation. Tickler #4 "
+                "remains a monitor for any future recommended T_hold in Gap A.",
+            ]
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def build_sio_tsweep_convergence_markdown(
+    feedstock_rows: Mapping[str, list[Mapping[str, Any]]],
+) -> str:
+    lines = [
+        "# SiO T-Window Sweep Convergence",
+        "",
+        "Date: 2026-05-19",
+        "",
+        "Scope: Phase 3 Stage 3 SiO T-window recommendations for "
+        "`data/setpoints.yaml` C2A_continuous. Operator review gate only; "
+        "`data/setpoints.yaml` is intentionally unchanged.",
+        "",
+        "Commit chain: Phase 1 alpha surface `fc2d40b`; Phase 2 goldens "
+        "refresh landed in controller baseline `a2ab138`.",
+        "",
+        "Caveat: alpha_SiO = 0.04. Stage 3 is post-Cr v2 "
+        "(commit `bb52c62`). Reports are engine-only in [1323, 2400 K] "
+        "and recipe-only in [1050, 1600 C].",
+        "",
+        "Warning-sticker logic: fire when rounded T_hold_K <= 1673 K "
+        "(1400 C boundary included), because the recommendation is inside "
+        f"{SIO_TSWEEP_GAP_A_BAND}. If fired, promote Tickler #4 "
+        "SIO-TRANGE-EXTENSION-OPERATIONAL Phase A.",
+        "",
+    ]
+    for feedstock_id, rows in feedstock_rows.items():
+        recommended, alternates = _recommend_sio_tsweep_rows(rows)
+        warning_fired = _warning_sticker_fires(float(recommended["T_hold_C"]))
+        lines.extend(
+            [
+                f"## {feedstock_id}",
+                "",
+                f"Recommended: `{_format_sio_tsweep_triple(recommended)}`",
+                "",
+                f"Yield: {float(recommended['sio_yield_pct_of_feedstock']):.12g}%",
+                "",
+                f"Mass balance error: "
+                f"{float(recommended['mass_balance_err_pct']):.12g}%",
+                "",
+                f"WARNING sticker fired: {str(warning_fired).lower()}",
+                "",
+                "| rank | cell_id | triple | yield_pct | mass_balance_err_pct |",
+                "|---:|---|---|---:|---:|",
+            ]
+        )
+        for rank, row in enumerate(alternates, start=1):
+            lines.append(
+                "| "
+                f"{rank} | {row['cell_id']} | "
+                f"`{_format_sio_tsweep_triple(row)}` | "
+                f"{float(row['sio_yield_pct_of_feedstock']):.12g} | "
+                f"{float(row['mass_balance_err_pct']):.12g} |"
+            )
+        if warning_fired:
+            lines.extend(["", f"WARNING: {SIO_TSWEEP_WARNING_TEXT}", ""])
+        else:
+            lines.append("")
+    return "\n".join(lines)
+
+
+def run_sio_tsweep(
+    *,
+    feedstock_id: str,
+    t_low_grid_c: tuple[float, ...],
+    t_hold_grid_c: tuple[float, ...],
+    ramp_grid_c_per_hr: tuple[float, ...],
+    output_dir: Path,
+    campaign: str = SIO_YIELD_CAMPAIGN,
+    hours: int = 24,
+    mass_kg: float = 1000.0,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, Any]] = []
+    for t_low_c, t_hold_c, ramp_c_per_hr in itertools.product(
+        t_low_grid_c, t_hold_grid_c, ramp_grid_c_per_hr
+    ):
+        cell_id = _sio_tsweep_cell_id(t_low_c, t_hold_c, ramp_c_per_hr)
+        report, diagnostics = build_sio_yield_report(
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+            hours=hours,
+            mass_kg=mass_kg,
+            include_diagnostics=True,
+            t_low_c=t_low_c,
+            t_hold_c=t_hold_c,
+            ramp_c_per_hr=ramp_c_per_hr,
+        )
+        row = _sio_tsweep_row(
+            cell_id=cell_id,
+            t_low_c=t_low_c,
+            t_hold_c=t_hold_c,
+            ramp_c_per_hr=ramp_c_per_hr,
+            report=report,
+            diagnostics=diagnostics,
+            mass_kg=mass_kg,
+        )
+        cell_doc = {
+            "schema_version": SIO_TSWEEP_SCHEMA_VERSION,
+            "feedstock_id": feedstock_id,
+            "campaign": SIO_YIELD_CAMPAIGN,
+            "cell_id": cell_id,
+            "T_low_C": row["T_low_C"],
+            "T_hold_C": row["T_hold_C"],
+            "ramp_C_per_hr": row["ramp_C_per_hr"],
+            "metrics": row,
+            "report": report,
+            "diagnostics": {
+                "sio_terminal_closure_error_pct": _clean_report_float(
+                    float(diagnostics.get("closure_error_pct", 0.0))
+                ),
+                "mass_balance_error_pct": row["mass_balance_err_pct"],
+            },
+        }
+        with (output_dir / f"{cell_id}.json").open("w") as f:
+            json.dump(cell_doc, f, indent=2, sort_keys=False)
+            f.write("\n")
+        rows.append(row)
+
+    fieldnames = [
+        "cell_id",
+        "T_low_C",
+        "T_hold_C",
+        "ramp_C_per_hr",
+        "sio_yield_pct_of_feedstock",
+        "terminal_offgas_escape_pct",
+        "stage3_silica_kg",
+        "mass_balance_err_pct",
+    ]
+    with (output_dir / "index.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    recommended, alternates = _recommend_sio_tsweep_rows(rows)
+    return {
+        "schema_version": SIO_TSWEEP_SCHEMA_VERSION,
+        "feedstock_id": feedstock_id,
+        "campaign": SIO_YIELD_CAMPAIGN,
+        "cell_count": len(rows),
+        "rows": rows,
+        "recommended": dict(recommended),
+        "alternates": [dict(row) for row in alternates],
+        "warning_sticker_fired": _warning_sticker_fires(
+            float(recommended["T_hold_C"])
+        ),
+        "output_dir": str(output_dir),
+    }
 
 
 # ----------------------------------------------------------------------
@@ -1109,13 +1534,125 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
     return 0
 
 
+def build_sio_tsweep_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="python -m simulator.runner.sio_tsweep",
+        description="Run the C2A SiO T-window sweep and write cell JSON/index CSV.",
+    )
+    parser.add_argument(
+        "--feedstock",
+        required=True,
+        choices=SIO_YIELD_FEEDSTOCKS,
+        help="Feedstock ID to run",
+    )
+    parser.add_argument(
+        "--campaign",
+        default=SIO_YIELD_CAMPAIGN,
+        choices=(SIO_YIELD_CAMPAIGN, "C2A"),
+        help="SiO campaign alias (default: C2A_continuous)",
+    )
+    parser.add_argument(
+        "--hours",
+        type=int,
+        default=24,
+        help="Hours of simulated wallclock to advance per cell",
+    )
+    parser.add_argument(
+        "--mass-kg",
+        type=float,
+        default=1000.0,
+        help="Batch feedstock mass in kg (default: 1000)",
+    )
+    parser.add_argument(
+        "--t-low-grid",
+        default=",".join(
+            _format_sweep_float(value) for value in SIO_TSWEEP_DEFAULT_T_LOW_GRID_C
+        ),
+        help="Comma-separated T_low grid in C",
+    )
+    parser.add_argument(
+        "--t-hold-grid",
+        default=",".join(
+            _format_sweep_float(value) for value in SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C
+        ),
+        help="Comma-separated T_hold grid in C",
+    )
+    parser.add_argument(
+        "--ramp-grid",
+        default=",".join(
+            _format_sweep_float(value)
+            for value in SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR
+        ),
+        help="Comma-separated ramp grid in C/hr",
+    )
+    parser.add_argument(
+        "--output-dir",
+        required=True,
+        help="Directory to write cell JSON files plus index.csv",
+    )
+    parser.add_argument(
+        "--report-output",
+        help="Optional Markdown report path for this feedstock",
+    )
+    parser.add_argument(
+        "--summary-output",
+        help="Optional JSON summary path with recommendation metadata",
+    )
+    return parser
+
+
+def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
+    parser = build_sio_tsweep_arg_parser()
+    args = parser.parse_args(argv)
+
+    try:
+        summary = run_sio_tsweep(
+            feedstock_id=args.feedstock,
+            campaign=args.campaign,
+            hours=int(args.hours),
+            mass_kg=float(args.mass_kg),
+            t_low_grid_c=_parse_float_grid(
+                args.t_low_grid, label="--t-low-grid"
+            ),
+            t_hold_grid_c=_parse_float_grid(
+                args.t_hold_grid, label="--t-hold-grid"
+            ),
+            ramp_grid_c_per_hr=_parse_float_grid(
+                args.ramp_grid, label="--ramp-grid"
+            ),
+            output_dir=Path(args.output_dir),
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    if args.report_output:
+        report_path = Path(args.report_output)
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(
+            build_sio_tsweep_report_markdown(
+                feedstock_id=args.feedstock,
+                rows=summary["rows"],
+            )
+        )
+    if args.summary_output:
+        summary_path = Path(args.summary_output)
+        summary_path.parent.mkdir(parents=True, exist_ok=True)
+        with summary_path.open("w") as f:
+            json.dump(summary, f, indent=2, sort_keys=False)
+            f.write("\n")
+    return 0
+
+
 class _SiOYieldModuleLoader(importlib.abc.Loader):
+    def __init__(self, main_name: str = "main_sio_yield") -> None:
+        self._main_name = main_name
+
     def get_code(self, fullname: str):
         source = (
-            "from simulator.runner import main_sio_yield\n"
-            "raise SystemExit(main_sio_yield())\n"
+            f"from simulator.runner import {self._main_name}\n"
+            f"raise SystemExit({self._main_name}())\n"
         )
-        return compile(source, "<simulator.runner.sio_yield>", "exec")
+        return compile(source, f"<{fullname}>", "exec")
 
     def create_module(self, spec):  # noqa: D401
         return None
@@ -1126,13 +1663,18 @@ class _SiOYieldModuleLoader(importlib.abc.Loader):
 
 class _SiOYieldModuleFinder(importlib.abc.MetaPathFinder):
     _sio_yield_finder = True
+    _ENTRYPOINTS = {
+        "simulator.runner.sio_yield": "main_sio_yield",
+        "simulator.runner.sio_tsweep": "main_sio_tsweep",
+    }
 
     def find_spec(self, fullname: str, path=None, target=None):
-        if fullname != "simulator.runner.sio_yield":
+        main_name = self._ENTRYPOINTS.get(fullname)
+        if main_name is None:
             return None
         return importlib.machinery.ModuleSpec(
             fullname,
-            _SiOYieldModuleLoader(),
+            _SiOYieldModuleLoader(main_name),
             is_package=False,
         )
 
