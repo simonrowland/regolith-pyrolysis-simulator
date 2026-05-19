@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import importlib.abc
+import importlib.machinery
 import json
 import math
 import subprocess
@@ -43,12 +45,29 @@ from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
 )
-from simulator.state import HourSnapshot
+from simulator.state import HourSnapshot, MOLAR_MASS
 
 # Public schema version pinned by docs/runner-output-schema.md.
 RUNNER_SCHEMA_VERSION = "1.0.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+SIO_YIELD_FEEDSTOCKS: tuple[str, ...] = (
+    "lunar_mare_low_ti",
+    "mars_basalt",
+)
+SIO_YIELD_CAMPAIGN = "C2A_continuous"
+SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
+    SIO_YIELD_CAMPAIGN: "C2A",
+}
+SIO_ALPHA_PROVENANCE = "placeholder; pending Phase 1 α surface"
+SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
+SIO_YIELD_STAGE_KEYS: dict[int, str] = {
+    1: "stage_1_fe_condenser_impurity",
+    3: "stage_3_sio_zone_product",
+    4: "stage_4_alkali_mg_carryover",
+    5: "stage_5_dust_filter_carryover",
+}
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -184,6 +203,8 @@ class PyrolysisRun:
     backend_name: str = "stub"
     setpoints_overrides: dict[str, dict] = field(default_factory=dict)
     track: str = "pyrolysis"
+    allow_fallback_vapor: bool = False
+    force_builtin_vapor_pressure: bool = False
     feedstocks_path: Optional[Path] = None
     setpoints_path: Optional[Path] = None
     vapor_pressures_path: Optional[Path] = None
@@ -329,6 +350,11 @@ class PyrolysisRun:
 
         feedstocks = self._load_feedstocks()
         setpoints = self._load_setpoints()
+        if self.allow_fallback_vapor or self.force_builtin_vapor_pressure:
+            setpoints = dict(setpoints)
+            kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+            kernel_config["allow_fallback_vapor"] = True
+            setpoints["chemistry_kernel"] = kernel_config
         vapor_pressures = self._load_vapor_pressures()
         if self.feedstock_id not in feedstocks:
             raise RunnerError(
@@ -347,8 +373,13 @@ class PyrolysisRun:
         except ValueError as exc:
             raise RunnerError(f"load_batch failed: {exc}") from exc
 
+        if self.force_builtin_vapor_pressure:
+            _force_builtin_vapor_pressure(sim)
+
+        campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
+            self.campaign, self.campaign)
         try:
-            campaign_phase = CampaignPhase[self.campaign]
+            campaign_phase = CampaignPhase[campaign_name]
         except KeyError as exc:
             valid = ", ".join(member.name for member in CampaignPhase)
             raise RunnerError(
@@ -633,6 +664,203 @@ def _final_state_from_ledger(sim: PyrolysisSimulator) -> dict[str, dict[str, flo
 
 
 # ----------------------------------------------------------------------
+# SiO yield report
+# ----------------------------------------------------------------------
+
+
+def _force_builtin_vapor_pressure(sim: PyrolysisSimulator) -> None:
+    """Route VAPOR_PRESSURE through the builtin fallback for stable goldens."""
+
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+    registry = sim._chem_registry
+    provider = registry.authoritative_for(ChemistryIntent.VAPOR_PRESSURE)
+    if provider is None:
+        return
+
+    backend = getattr(provider, "_backend", None)
+    if backend is not None and hasattr(backend, "is_available"):
+        backend.is_available = lambda: False  # type: ignore[assignment]
+    provider._ensure_backend = lambda: backend  # type: ignore[method-assign]
+
+
+def _clean_report_float(value: float) -> float:
+    if not math.isfinite(value):
+        raise RunnerError(f"non-finite SiO yield value: {value!r}")
+    if abs(value) < 1.0e-15:
+        return 0.0
+    return float(f"{value:.12g}")
+
+
+def _industrial_sio_verdict(yield_pct: float) -> str:
+    low, high = SIO_INDUSTRIAL_BENCHMARK_PCT
+    if yield_pct < low:
+        bucket = "below"
+    elif yield_pct > high:
+        bucket = "above"
+    else:
+        bucket = "within"
+    return (
+        f"{bucket} industrial-Si envelope "
+        "(order-of-magnitude regime check, not 1-decade fidelity)"
+    )
+
+
+def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
+    by_stage = {stage.stage_number: stage for stage in sim.train.stages}
+    return {
+        key: _clean_report_float(
+            by_stage.get(stage_number).collected_kg.get("SiO2", 0.0)
+            if by_stage.get(stage_number) is not None
+            else 0.0
+        )
+        for stage_number, key in SIO_YIELD_STAGE_KEYS.items()
+    }
+
+
+def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],
+                               mass_kg: float) -> float:
+    try:
+        return float(
+            PyrolysisSimulator._carbon_reductant_required_kg(
+                feedstock, mass_kg)
+        )
+    except Exception as exc:  # noqa: BLE001 -- surface as runner config error
+        raise RunnerError(f"invalid Stage 0 carbon cleanup metadata: {exc}") from exc
+
+
+def _prepare_sio_campaign_start(sim: PyrolysisSimulator) -> None:
+    campaign_cfg = (
+        (sim.setpoints.get("campaigns", {}) or {}).get(SIO_YIELD_CAMPAIGN, {})
+        or {}
+    )
+    temp_range = campaign_cfg.get("temp_range_C") or []
+    if temp_range:
+        sim.melt.temperature_C = max(sim.melt.temperature_C, float(temp_range[0]))
+
+
+def build_sio_yield_report(
+    *,
+    feedstock_id: str,
+    campaign: str = SIO_YIELD_CAMPAIGN,
+    hours: int = 24,
+    mass_kg: float = 1000.0,
+    include_diagnostics: bool = False,
+) -> dict[str, Any] | tuple[dict[str, Any], dict[str, float]]:
+    """Run the C2A SiO yield slice and return the golden-file report."""
+
+    if feedstock_id not in SIO_YIELD_FEEDSTOCKS:
+        raise RunnerError(
+            "SiO yield report supports feedstocks "
+            f"{', '.join(SIO_YIELD_FEEDSTOCKS)}; got {feedstock_id!r}"
+        )
+    if campaign not in (SIO_YIELD_CAMPAIGN, "C2A"):
+        raise RunnerError(
+            f"SiO yield report supports campaign {SIO_YIELD_CAMPAIGN!r}; "
+            f"got {campaign!r}"
+        )
+
+    from simulator.evaporation import _EVAPORATION_COEFFICIENT_ALPHA
+
+    feedstocks = _load_yaml(DATA_DIR / "feedstocks.yaml")
+    feedstock = feedstocks.get(feedstock_id, {})
+    stage0_carbon_kg = _required_stage0_carbon_kg(feedstock, float(mass_kg))
+    additives_kg = {}
+    if stage0_carbon_kg > 1.0e-12:
+        additives_kg["C"] = stage0_carbon_kg
+
+    base_run = PyrolysisRun(
+        feedstock_id=feedstock_id,
+        campaign=campaign,
+        hours=int(hours),
+        mass_kg=float(mass_kg),
+        backend_name="stub",
+        track="pyrolysis",
+        additives_kg=additives_kg,
+        engines={"vapor_pressure": "builtin-antoine"},
+        allow_fallback_vapor=True,
+        force_builtin_vapor_pressure=True,
+    )
+    sim = base_run._build_sim()
+    _prepare_sio_campaign_start(sim)
+    initial_balances = sim.atom_ledger.mol_by_account()
+    initial_sio2_mol = float(
+        initial_balances.get("process.cleaned_melt", {}).get("SiO2", 0.0)
+    )
+
+    run = dataclasses.replace(base_run, simulator=sim)
+    result = run.run()
+    if result.get("status") == "failed":
+        raise RunnerError(str(result.get("error_message", "SiO run failed")))
+
+    final_state = result.get("final_state", {})
+    cleaned_melt = final_state.get("process.cleaned_melt", {})
+    condensation_train = final_state.get("process.condensation_train", {})
+    terminal_offgas: dict[str, float] = {}
+    for account_name in ("process.overhead_gas", "terminal.offgas"):
+        for species, mol in final_state.get(account_name, {}).items():
+            terminal_offgas[species] = (
+                terminal_offgas.get(species, 0.0) + float(mol)
+            )
+
+    final_sio2_mol = float(cleaned_melt.get("SiO2", 0.0))
+    sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
+    si_terminal_mol = float(condensation_train.get("Si", 0.0))
+    sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
+    sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
+    terminal_mol = si_terminal_mol + sio2_terminal_mol + sio_escape_mol
+    if sio_evaporated_mol > 0.0:
+        closure_error_pct = abs(
+            sio_evaporated_mol - terminal_mol
+        ) / sio_evaporated_mol * 100.0
+    else:
+        closure_error_pct = 0.0
+
+    sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
+    sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
+    sio_yield_pct = sio_evolved_kg / float(mass_kg) * 100.0
+
+    sio_to_silica_fume_kg = _stage_silica_fume_kg(sim)
+    reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
+    downstream_sio2_kg = sum(
+        stage.collected_kg.get("SiO2", 0.0)
+        for stage in sim.train.stages
+        if stage.stage_number not in reported_stage_numbers
+    )
+    sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
+        downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
+    )
+
+    report = {
+        "feedstock_id": feedstock_id,
+        "campaign": SIO_YIELD_CAMPAIGN,
+        "alpha_SiO": _clean_report_float(_EVAPORATION_COEFFICIENT_ALPHA),
+        "alpha_provenance": SIO_ALPHA_PROVENANCE,
+        "sio_evolved_kg": _clean_report_float(sio_evolved_kg),
+        "sio_to_silica_fume_kg": sio_to_silica_fume_kg,
+        "sio_yield_pct_of_feedstock": _clean_report_float(sio_yield_pct),
+        "industrial_benchmark_pct": list(SIO_INDUSTRIAL_BENCHMARK_PCT),
+        "verdict": _industrial_sio_verdict(sio_yield_pct),
+    }
+
+    if include_diagnostics:
+        diagnostics = {
+            "sio_evaporated_mol": sio_evaporated_mol,
+            "si_terminal_mol": si_terminal_mol,
+            "sio2_terminal_mol": sio2_terminal_mol,
+            "sio_escape_mol": sio_escape_mol,
+            "closure_error_pct": closure_error_pct,
+            "mass_balance_error_pct": float(
+                (result.get("per_hour_summary") or [{}])[-1].get(
+                    "mass_balance_pct", 0.0
+                )
+            ),
+        }
+        return report, diagnostics
+    return report
+
+
+# ----------------------------------------------------------------------
 # JSON helpers
 # ----------------------------------------------------------------------
 
@@ -808,6 +1036,107 @@ def main(argv: Optional[list[str]] = None) -> int:
         f.write("\n")
 
     return 0 if result["status"] != "failed" else 1
+
+
+def build_sio_yield_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="python -m simulator.runner.sio_yield",
+        description="Generate the C2A SiO yield / silica-fume report JSON.",
+    )
+    parser.add_argument(
+        "--feedstock",
+        required=True,
+        choices=SIO_YIELD_FEEDSTOCKS,
+        help="Feedstock ID to run",
+    )
+    parser.add_argument(
+        "--campaign",
+        default=SIO_YIELD_CAMPAIGN,
+        choices=(SIO_YIELD_CAMPAIGN, "C2A"),
+        help="SiO campaign alias (default: C2A_continuous)",
+    )
+    parser.add_argument(
+        "--hours",
+        type=int,
+        default=24,
+        help="Hours of simulated wallclock to advance",
+    )
+    parser.add_argument(
+        "--mass-kg",
+        type=float,
+        default=1000.0,
+        help="Batch feedstock mass in kg (default: 1000)",
+    )
+    parser.add_argument(
+        "--output",
+        required=True,
+        help="Path to write the SiO yield report JSON",
+    )
+    return parser
+
+
+def main_sio_yield(argv: Optional[list[str]] = None) -> int:
+    parser = build_sio_yield_arg_parser()
+    args = parser.parse_args(argv)
+
+    try:
+        report = build_sio_yield_report(
+            feedstock_id=args.feedstock,
+            campaign=args.campaign,
+            hours=int(args.hours),
+            mass_kg=float(args.mass_kg),
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w") as f:
+        json.dump(report, f, indent=2, sort_keys=False)
+        f.write("\n")
+    return 0
+
+
+class _SiOYieldModuleLoader(importlib.abc.Loader):
+    def get_code(self, fullname: str):
+        source = (
+            "from simulator.runner import main_sio_yield\n"
+            "raise SystemExit(main_sio_yield())\n"
+        )
+        return compile(source, "<simulator.runner.sio_yield>", "exec")
+
+    def create_module(self, spec):  # noqa: D401
+        return None
+
+    def exec_module(self, module) -> None:
+        return None
+
+
+class _SiOYieldModuleFinder(importlib.abc.MetaPathFinder):
+    _sio_yield_finder = True
+
+    def find_spec(self, fullname: str, path=None, target=None):
+        if fullname != "simulator.runner.sio_yield":
+            return None
+        return importlib.machinery.ModuleSpec(
+            fullname,
+            _SiOYieldModuleLoader(),
+            is_package=False,
+        )
+
+
+def _install_sio_yield_entrypoint() -> None:
+    if __name__ != "simulator.runner":
+        return
+    globals()["__path__"] = []
+    if not any(
+        getattr(finder, "_sio_yield_finder", False)
+        for finder in sys.meta_path
+    ):
+        sys.meta_path.insert(0, _SiOYieldModuleFinder())
+
+
+_install_sio_yield_entrypoint()
 
 
 if __name__ == "__main__":  # pragma: no cover
