@@ -49,6 +49,7 @@ from typing import Dict
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
+from simulator.state import MOLAR_MASS
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C)
@@ -93,6 +94,15 @@ class CondensationRouteResult:
             stage_species.get(species, 0.0)
             for stage_species in self.condensed_by_stage_species.values()
         )
+
+    def silica_fume_fraction_of_feedstock(self, feedstock_kg: float) -> float:
+        """Return SiO-derived SiO2 condensate mass divided by feedstock mass."""
+
+        if feedstock_kg <= 0.0:
+            return 0.0
+        sio_condensed_kg = self.condensed_for_species('SiO')
+        sio_to_sio2 = 0.5 * MOLAR_MASS['SiO2'] / MOLAR_MASS['SiO']
+        return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
 
 
 class CondensationModel:

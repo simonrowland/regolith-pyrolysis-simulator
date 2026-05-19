@@ -6,6 +6,7 @@ import yaml
 from simulator.core import PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import StubBackend
+from simulator.runner import build_sio_yield_report
 from simulator.state import (
     CampaignPhase,
     CondensationTrain,
@@ -69,6 +70,10 @@ def test_cumulative_transition_mass_closure_bounded():
     feedstocks = _load_data_yaml("feedstocks.yaml")
     setpoints = _load_data_yaml("setpoints.yaml")
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
+    setpoints = dict(setpoints)
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel_config["allow_fallback_vapor"] = True
+    setpoints["chemistry_kernel"] = kernel_config
 
     backend = StubBackend()
     backend.initialize({})
@@ -121,3 +126,24 @@ def test_cumulative_transition_mass_closure_bounded():
     # magnitude below the per-transition tolerance the AtomLedger
     # enforces.
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+
+
+def test_sio_disproportionation_closes():
+    for feedstock_id in ("lunar_mare_low_ti", "mars_basalt"):
+        _, diagnostics = build_sio_yield_report(
+            feedstock_id=feedstock_id,
+            include_diagnostics=True,
+        )
+        terminal_mol = (
+            diagnostics["si_terminal_mol"]
+            + diagnostics["sio2_terminal_mol"]
+            + diagnostics["sio_escape_mol"]
+        )
+        if diagnostics["sio_evaporated_mol"] <= 0.0:
+            closure_error_pct = 0.0
+        else:
+            closure_error_pct = abs(
+                diagnostics["sio_evaporated_mol"] - terminal_mol
+            ) / diagnostics["sio_evaporated_mol"] * 100.0
+
+        assert closure_error_pct < 5e-12
