@@ -10,13 +10,9 @@ from flask import request
 from simulator.backends import (
     BackendSelectionPolicy,
     BackendUnavailableError,
-    INELIGIBLE_ACTIVE_BACKENDS,
-    SimulatorBuildConfig,
-    build_simulator,
     emit_web_engine_selection_log,
     resolve_backend,
 )
-from simulator.core import CampaignPhase
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.factsage import FactSAGEBackend
@@ -24,27 +20,16 @@ from simulator.melt_backend.factsage_config import (
     FactSAGEConfigError,
     load_factsage_config,
 )
+from simulator.session import (
+    DecisionPolicy,
+    SimSession,
+    SimSessionConfig,
+    drive_session,
+)
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
-# runner share ONE per-hour summary builder so the web emit shape stays
-# a strict superset of the CLI fixture shape, and a future physics
-# drift in one path cannot diverge from the other.  The web stream
-# does NOT call :meth:`PyrolysisRun.iter_hours` directly because the
-# UI requires operator-controlled decision routing (``make_decision``
-# round-trip + pause semantics), whereas ``iter_hours`` auto-applies
-# the recommendation -- correct for an unattended CLI run, wrong for
-# the operator interface.  Instead the web stream:
-#
-#   * builds its own simulator (preserving the legacy ``auto`` /
-#     ``alphamelts`` / ``factsage`` backend autodetect chain that the
-#     runner intentionally does not export -- the CLI path is strict
-#     about backend selection so a fixture re-run cannot silently swap
-#     engines);
-#   * advances it one step at a time;
-#   * calls ``build_per_hour_summary`` for the runner-format frame and
-#     emits it as a SocketIO ``per_hour_summary`` event alongside the
-#     legacy ``simulation_tick`` payload, so any client that speaks the
-#     runner schema sees the same numbers the CLI writes to a fixture.
-from simulator.runner import build_per_hour_summary
+# runner share ONE per-hour summary builder.  ``SimSession.advance()``
+# owns that runner-format summary and returns it in ``StepResult``; this
+# adapter only emits it alongside the legacy ``simulation_tick`` payload.
 from web.feedstock_data import load_visible_feedstocks
 
 
@@ -72,7 +57,11 @@ def _safe_log(message: str) -> None:
         pass
 
 
-def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, threading.Lock]:
+def _replace_simulation_state(
+    sid: str,
+    session,
+    speed: float,
+) -> tuple[dict, threading.Lock]:
     """Install one active simulation for a client and stop any prior run."""
     with _simulations_guard:
         previous = _simulations.get(sid)
@@ -80,7 +69,7 @@ def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, thread
             previous['running'] = False
         run_lock = threading.Lock()
         state = {
-            'sim': sim,
+            'session': session,
             'running': True,
             'paused': False,
             'speed': speed,
@@ -179,6 +168,25 @@ def _factsage_config():
         return {}
 
 
+def _backend_name_for_session(backend) -> str:
+    """Map the web-selected backend instance to SimSession strict name."""
+    backend_type = type(backend).__name__
+    if isinstance(backend, AlphaMELTSBackend) or backend_type == 'AlphaMELTSBackend':
+        return 'alphamelts'
+    if isinstance(backend, FactSAGEBackend) or backend_type == 'FactSAGEBackend':
+        return 'factsage'
+    return 'stub'
+
+
+def _decision_payload(decision):
+    return {
+        'type': decision.decision_type.name,
+        'options': list(decision.options),
+        'recommendation': decision.recommendation,
+        'context': decision.context,
+    }
+
+
 def _start_payload(
     *,
     sim,
@@ -199,7 +207,7 @@ def _start_payload(
     }
 
 
-def _tick_payload(*, sim, snapshot, backend_message: str):
+def _tick_payload(*, sim, snapshot, backend_message: str, backend_error: str = ''):
     """Build the public per-tick payload."""
     return {
         'hour': snapshot.hour,
@@ -235,13 +243,12 @@ def _tick_payload(*, sim, snapshot, backend_message: str):
             snapshot.inventory.carbon_reductant_required_kg, 3),
         'stage0_mass_balance_delta_kg': round(
             snapshot.inventory.stage0_mass_balance_delta_kg, 3),
-        'backend_error': getattr(sim, '_last_backend_error', ''),
-        'backend_fallback_active': bool(
-            getattr(sim, '_last_backend_error', '')),
+        'backend_error': backend_error,
+        'backend_fallback_active': bool(backend_error),
         'backend_message': (
             'Built-in fallback active: '
-            f'{sim._last_backend_error}'
-            if getattr(sim, '_last_backend_error', '')
+            f'{backend_error}'
+            if backend_error
             else backend_message),
         'process_buckets_kg': {
             'gas_volatiles': {
@@ -350,6 +357,169 @@ def _completion_payload(sim):
     }
 
 
+def _start_background_loop(
+    socketio,
+    sid: str,
+    run_id: str,
+    run_lock,
+    backend_message: str,
+):
+    def run_loop():
+        while True:
+            state, _ = _current_simulation_state(sid, run_id)
+            if (
+                state is None
+                or not state['running']
+            ):
+                break
+            if state['paused']:
+                socketio.sleep(0.1)
+                continue
+
+            step_result = None
+            decision_payload = None
+            with run_lock:
+                state, _ = _current_simulation_state(sid, run_id)
+                if (
+                    state is None
+                    or not state['running']
+                ):
+                    break
+                session = state['session']
+                sim = session.simulator
+                if session.is_complete():
+                    completion_payload = _completion_payload(sim)
+                    if not _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'simulation_complete',
+                        completion_payload,
+                    ):
+                        break
+                    with _simulations_guard:
+                        current = _simulations.get(sid)
+                        if (
+                            current is not None
+                            and current.get('run_id') == run_id
+                        ):
+                            current['running'] = False
+                    break
+
+                try:
+                    for step_result in drive_session(
+                        session,
+                        1,
+                        DecisionPolicy.OPERATOR,
+                    ):
+                        break
+                    if step_result is None:
+                        decision = session.pending_decision()
+                        if decision is not None:
+                            decision_payload = _decision_payload(decision)
+                except Exception as exc:
+                    _safe_log(f'Simulation loop failed: {exc}')
+                    error_payload = {
+                        'status': 'error',
+                        'message': str(exc),
+                        'backend_message': backend_message,
+                    }
+                    if not _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'simulation_status',
+                        error_payload,
+                    ):
+                        break
+                    with _simulations_guard:
+                        current = _simulations.get(sid)
+                        if (
+                            current is not None
+                            and current.get('run_id') == run_id
+                        ):
+                            current['running'] = False
+                            current['paused'] = False
+                    break
+
+            if step_result is None:
+                if decision_payload is None:
+                    break
+                with _simulations_guard:
+                    current = _simulations.get(sid)
+                    if (
+                        current is None
+                        or current.get('run_id') != run_id
+                        or not current['running']
+                    ):
+                        break
+                    current['paused'] = True
+                _emit_if_current(
+                    socketio, sid, run_id, 'decision_required', decision_payload
+                )
+                break
+
+            sim = session.simulator
+            tick_data = _tick_payload(
+                sim=sim,
+                snapshot=step_result.snapshot,
+                backend_message=backend_message,
+                backend_error=step_result.backend_error,
+            )
+            if not _emit_if_current(
+                socketio, sid, run_id, 'simulation_tick', tick_data
+            ):
+                break
+
+            if not _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'per_hour_summary',
+                step_result.per_hour_summary,
+            ):
+                break
+
+            if step_result.campaign_summary is not None:
+                if not _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'campaign_complete_summary',
+                    step_result.campaign_summary,
+                ):
+                    break
+
+            if step_result.decision_event is not None:
+                with _simulations_guard:
+                    current = _simulations.get(sid)
+                    if (
+                        current is None
+                        or current.get('run_id') != run_id
+                        or not current['running']
+                    ):
+                        break
+                    current['paused'] = True
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'decision_required',
+                    step_result.decision_event,
+                )
+                break
+
+            spd = state.get('speed', 1.0)
+            if spd > 0:
+                socketio.sleep(spd)
+
+    thread = socketio.start_background_task(run_loop)
+    with _simulations_guard:
+        current = _simulations.get(sid)
+        if current is not None and current.get('run_id') == run_id:
+            current['thread'] = thread
+
+
 def register_events(socketio):
     """Register all SocketIO events for the simulator UI."""
 
@@ -414,212 +584,87 @@ def register_events(socketio):
         else:
             backend_message = f'Using {backend_type}'
 
-        # Create simulator
-        sim = build_simulator(
-            SimulatorBuildConfig(
-                backend=backend,
-                setpoints=setpoints,
-                feedstocks=feedstocks,
-                vapor_pressures=vapor_pressures,
-            )
-        )
-
         # User-configurable parameters
         c4_max_temp = float(data.get('c4_max_temp_C', 1670))
-        sim.c4_max_temp_C = c4_max_temp
 
         # Additives from inventory (Na, K, Mg, Ca, C)
         raw_additives = data.get('additives', {})
         additives_kg = {k: float(v) for k, v in raw_additives.items()
                         if float(v) > 0}
 
+        session = SimSession()
         try:
-            sim.load_batch(feedstock_key, mass_kg,
-                           additives_kg=additives_kg)
-        except ValueError as e:
+            session.start(
+                SimSessionConfig(
+                    feedstock_id=feedstock_key,
+                    feedstocks=feedstocks,
+                    setpoints=setpoints,
+                    vapor_pressures=vapor_pressures,
+                    backend_name=_backend_name_for_session(backend),
+                    backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+                    mass_kg=mass_kg,
+                    additives_kg=additives_kg,
+                    track=track,
+                    c4_max_temp=c4_max_temp,
+                    unavailable_error_cls=BackendUnavailableError,
+                )
+            )
+        except BackendUnavailableError as e:
             socketio.emit('simulation_status', {
                 'status': 'error', 'message': str(e),
             }, room=sid)
             return
+        sim = session.simulator
 
-        # Start first campaign
-        if track == 'mre_baseline':
-            sim.start_campaign(CampaignPhase.C0)
-            sim.record.track = 'mre_baseline'
-        else:
-            sim.start_campaign(CampaignPhase.C0)
-
-        state, run_lock = _replace_simulation_state(sid, sim, speed)
+        state, run_lock = _replace_simulation_state(sid, session, speed)
         run_id = state['run_id']
+        state['backend_message'] = backend_message
 
-        socketio.emit('simulation_status', _start_payload(
-            sim=sim,
-            feedstock_key=feedstock_key,
-            mass_kg=mass_kg,
-            backend_requested=backend_name,
-            backend_active=backend_type,
-            backend_message=backend_message,
-        ), room=sid)
-
-        # Start background loop.  The step body uses
-        # ``simulator.runner.build_per_hour_summary`` so the live
-        # SocketIO stream's per-hour shape stays a strict superset of
-        # the CLI runner's golden-fixture shape -- the same goal #18
-        # contract documented in docs/runner-output-schema.md.  The
-        # web stream keeps the operator in charge of decisions
-        # (decisions are routed through ``make_decision`` rather than
-        # auto-applied), so this loop does NOT use
-        # ``PyrolysisRun.iter_hours``: that helper auto-applies the
-        # recommendation, which is correct for unattended CLI runs but
-        # wrong for the UI's "pause + ask the operator" semantics.
-        def run_loop():
-            while True:
-                state, _ = _current_simulation_state(sid, run_id)
-                if (
-                    state is None
-                    or not state['running']
-                ):
-                    break
-                if state['paused']:
-                    socketio.sleep(0.1)
-                    continue
-
-                with run_lock:
-                    state, _ = _current_simulation_state(sid, run_id)
-                    if (
-                        state is None
-                        or not state['running']
-                    ):
-                        break
-                    sim = state['sim']
-                    if sim.is_complete():
-                        completion_payload = None
-                        with _simulations_guard:
-                            current = _simulations.get(sid)
-                            if (
-                                current is None
-                                or current.get('run_id') != run_id
-                                or not current['running']
-                            ):
-                                break
-                            completion_payload = _completion_payload(sim)
-                            current['running'] = False
-                        socketio.emit(
-                            'simulation_complete',
-                            completion_payload,
-                            room=sid)
-                        break
-
-                    try:
-                        snapshot = sim.step()
-                    except Exception as exc:
-                        _safe_log(f'Simulation loop failed: {exc}')
-                        with _simulations_guard:
-                            current = _simulations.get(sid)
-                            if (
-                                current is None
-                                or current.get('run_id') != run_id
-                            ):
-                                break
-                            current['running'] = False
-                            current['paused'] = False
-                        socketio.emit('simulation_status', {
-                            'status': 'error',
-                            'message': str(exc),
-                            'backend_message': backend_message,
-                        }, room=sid)
-                        break
-
-                tick_data = _tick_payload(
-                    sim=sim,
-                    snapshot=snapshot,
-                    backend_message=backend_message,
-                )
-                if not _emit_if_current(
-                    socketio, sid, run_id, 'simulation_tick', tick_data
-                ):
-                    break
-
-                # Goal #18 parity event.  Emit the runner-format
-                # per-hour summary alongside the legacy
-                # ``simulation_tick`` so any downstream consumer that
-                # speaks the runner schema (CLI golden tests, future
-                # streaming clients) sees the same numbers the CLI
-                # commits to a fixture.  Failure to find the active
-                # session is treated identically to the tick path so
-                # the stream tears down cleanly.
-                per_hour = build_per_hour_summary(sim=sim, snapshot=snapshot)
-                if not _emit_if_current(
-                    socketio, sid, run_id, 'per_hour_summary', per_hour
-                ):
-                    break
-
-                # Check for campaign completion summary
-                if sim._last_campaign_summary is not None:
-                    if not _emit_if_current(
-                        socketio,
-                        sid,
-                        run_id,
-                        'campaign_complete_summary',
-                        sim._last_campaign_summary,
-                    ):
-                        break
-                    sim._last_campaign_summary = None
-
-                # Check for decision points
-                if sim.paused_for_decision and sim.pending_decision:
-                    d = sim.pending_decision
-                    decision_payload = {
-                        'type': d.decision_type.name,
-                        'options': d.options,
-                        'recommendation': d.recommendation,
-                        'context': d.context,
-                    }
-                    emit_decision = False
-                    with _simulations_guard:
-                        current = _simulations.get(sid)
-                        if (
-                            current is None
-                            or current.get('run_id') != run_id
-                            or not current['running']
-                        ):
-                            break
-                        current['paused'] = True
-                        emit_decision = True
-                    if emit_decision:
-                        socketio.emit(
-                            'decision_required', decision_payload, room=sid)
-
-                # Pace the simulation
-                spd = state.get('speed', 1.0)
-                if spd > 0:
-                    socketio.sleep(spd)
-
-        thread = socketio.start_background_task(run_loop)
-        with _simulations_guard:
-            current = _simulations.get(sid)
-            if current is state and current.get('run_id') == run_id:
-                current['thread'] = thread
+        _emit_if_current(
+            socketio,
+            sid,
+            run_id,
+            'simulation_status',
+            _start_payload(
+                sim=sim,
+                feedstock_key=feedstock_key,
+                mass_kg=mass_kg,
+                backend_requested=backend_name,
+                backend_active=backend_type,
+                backend_message=backend_message,
+            ),
+        )
+        _start_background_loop(socketio, sid, run_id, run_lock, backend_message)
 
     @socketio.on('pause_simulation')
     def handle_pause():
         sid = request.sid
         state, _ = _current_simulation_state(sid)
         if state:
+            state['session'].pause()
             state['paused'] = True
-            socketio.emit('simulation_status', {
-                'status': 'paused',
-            }, room=sid)
+            _emit_if_current(
+                socketio,
+                sid,
+                state['run_id'],
+                'simulation_status',
+                {'status': 'paused'},
+            )
 
     @socketio.on('resume_simulation')
     def handle_resume():
         sid = request.sid
         state, _ = _current_simulation_state(sid)
         if state:
+            state['session'].resume()
             state['paused'] = False
-            socketio.emit('simulation_status', {
-                'status': 'resumed',
-            }, room=sid)
+            _emit_if_current(
+                socketio,
+                sid,
+                state['run_id'],
+                'simulation_status',
+                {'status': 'resumed'},
+            )
 
     @socketio.on('make_decision')
     def handle_decision(data):
@@ -631,18 +676,33 @@ def register_events(socketio):
         sid = request.sid
         state, lock = _current_simulation_state(sid)
         if state and lock:
+            resume_loop = False
             with lock:
-                sim = state['sim']
-                if sim.pending_decision:
+                session = state['session']
+                if session.pending_decision():
                     choice = data.get('choice', '')
-                    sim.apply_decision(
-                        sim.pending_decision.decision_type, choice)
-            # Resume after decision
+                    session.decide(choice)
+                    resume_loop = True
+                session.resume()
             state['paused'] = False
-            socketio.emit('simulation_status', {
-                'status': 'decision_applied',
-                'choice': data.get('choice'),
-            }, room=sid)
+            _emit_if_current(
+                socketio,
+                sid,
+                state['run_id'],
+                'simulation_status',
+                {
+                    'status': 'decision_applied',
+                    'choice': data.get('choice'),
+                },
+            )
+            if resume_loop:
+                _start_background_loop(
+                    socketio,
+                    sid,
+                    state['run_id'],
+                    lock,
+                    state.get('backend_message', ''),
+                )
 
     @socketio.on('adjust_parameter')
     def handle_parameter_change(data):
@@ -663,14 +723,13 @@ def register_events(socketio):
             state['speed'] = float(value)
         elif param == 'stir_factor' and lock:
             with lock:
-                state['sim'].melt.stir_factor = float(value)
+                state['session'].adjust('stir_factor', value)
         elif param == 'pO2_mbar' and lock:
             with lock:
-                state['sim'].melt.pO2_mbar = float(value)
+                state['session'].adjust('pO2_mbar', value)
         elif param == 'c4_max_temp' and lock:
             with lock:
-                state['sim'].c4_max_temp_C = float(value)
-                state['sim'].campaign_mgr.c4_max_temp_C = float(value)
+                state['session'].adjust('c4_max_temp', value)
         elif param == 'campaign_override' and lock:
             # data = {param: 'campaign_override', campaign: 'C2A',
             #         field: 'ramp_rate', value: 10.0}
@@ -679,21 +738,21 @@ def register_events(socketio):
             field_value = data.get('value')
             if campaign_name and field_name:
                 with lock:
-                    mgr = state['sim'].campaign_mgr
-                    if campaign_name not in mgr.overrides:
-                        mgr.overrides[campaign_name] = {}
-                    mgr.overrides[campaign_name][field_name] = float(field_value)
-                    # Apply stir_factor immediately if currently in that campaign
-                    if (field_name == 'stir_factor'
-                            and state['sim'].melt.campaign.name == campaign_name):
-                        state['sim'].melt.stir_factor = float(field_value)
-                    # Apply pO₂ immediately if currently in that campaign
-                    if (field_name == 'pO2_mbar'
-                            and state['sim'].melt.campaign.name == campaign_name):
-                        state['sim'].melt.pO2_mbar = float(field_value)
+                    state['session'].adjust(
+                        'campaign_override',
+                        field_value,
+                        campaign=campaign_name,
+                        field=field_name,
+                    )
 
-        socketio.emit('simulation_status', {
-            'status': 'parameter_adjusted',
-            'param': param,
-            'value': value,
-        }, room=sid)
+        _emit_if_current(
+            socketio,
+            sid,
+            state['run_id'],
+            'simulation_status',
+            {
+                'status': 'parameter_adjusted',
+                'param': param,
+                'value': value,
+            },
+        )
