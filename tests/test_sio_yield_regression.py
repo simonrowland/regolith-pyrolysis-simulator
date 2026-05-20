@@ -81,6 +81,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     _assert_golden_close(actual, expected)
     assert actual["sio_evolved_kg"] == BASELINE_SIO_EVOLVED_KG[feedstock]
     assert expected["sio_evolved_kg"] == BASELINE_SIO_EVOLVED_KG[feedstock]
+    assert "wall_deposit_kg" in actual
+    assert "fouling_rate" in actual
     placement = actual["sio_to_silica_fume_kg"]
     assert placement["stage_3_sio_zone_product"] > 0.0
     assert (
@@ -110,6 +112,47 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
     assert route.remaining_by_species["SiO"] == pytest.approx(
         0.11006692746967289
     )
+    assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
+
+
+def test_route_destinations_sum_to_evolved_budget():
+    model = CondensationModel(CondensationTrain.create_default())
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    destinations = (
+        route.condensed_for_species("SiO")
+        + route.wall_deposit_by_species.get("SiO", 0.0)
+        + route.remaining_by_species["SiO"]
+    )
+    assert destinations == pytest.approx(1.0)
+
+
+def test_cold_liner_routes_sio_to_wall_deposit_bucket():
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    assert route.wall_deposit_by_species["SiO"] > 0.0
+    destinations = (
+        route.condensed_for_species("SiO")
+        + route.wall_deposit_by_species["SiO"]
+        + route.remaining_by_species["SiO"]
+    )
+    assert destinations == pytest.approx(1.0)
 
 
 def test_hkl_sampling_uses_actual_stage_band_not_material_defaults():

@@ -137,6 +137,7 @@ def test_sio_disproportionation_closes():
         terminal_mol = (
             diagnostics["si_terminal_mol"]
             + diagnostics["sio2_terminal_mol"]
+            + diagnostics["sio_wall_mol"]
             + diagnostics["sio_escape_mol"]
         )
         if diagnostics["sio_evaporated_mol"] <= 0.0:
@@ -147,3 +148,27 @@ def test_sio_disproportionation_closes():
             ) / diagnostics["sio_evaporated_mol"] * 100.0
 
         assert closure_error_pct < 5e-12
+
+
+def test_sio_destination_split_closes_with_wall_deposit():
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        include_diagnostics=True,
+    )
+
+    destinations_mol = (
+        diagnostics["si_terminal_mol"]
+        + diagnostics["sio2_terminal_mol"]
+        + diagnostics["sio_wall_mol"]
+        + diagnostics["sio_escape_mol"]
+    )
+    if diagnostics["sio_evaporated_mol"] <= 0.0:
+        closure_error_pct = 0.0
+    else:
+        closure_error_pct = abs(
+            diagnostics["sio_evaporated_mol"] - destinations_mol
+        ) / diagnostics["sio_evaporated_mol"] * 100.0
+
+    assert closure_error_pct < 5e-12
+    assert "wall_deposit_kg" in report
+    assert "fouling_rate" in report

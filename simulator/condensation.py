@@ -43,7 +43,7 @@ The Fe → SiO separation (Stage 1 → Stage 2):
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict
@@ -61,6 +61,10 @@ AVOGADRO_MOL = 6.02214076e23
 REGIME_FACTOR_KN_PLACEHOLDER = 1.0
 HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
+WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
+WALL_DEPOSIT_FRACTION_KEY = '_wall_deposit_fraction'
+WALL_DEPOSIT_ACCOUNT_KEY = '_wall_deposit_account'
+DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C)
@@ -112,6 +116,7 @@ class CondensationRouteResult:
 
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -138,8 +143,21 @@ class CondensationModel:
     temperature relative to the species' condensation temperature.
     """
 
-    def __init__(self, train: CondensationTrain):
+    def __init__(
+        self,
+        train: CondensationTrain,
+        vapor_pressure_data: MutableMapping[str, Any] | None = None,
+        wall_surface_area_m2: float | None = None,
+        wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
+    ):
         self.train = train
+        self.vapor_pressure_data = vapor_pressure_data
+        self.wall_surface_area_m2 = (
+            float(wall_surface_area_m2)
+            if wall_surface_area_m2 is not None
+            else _default_pipe_surface_area_m2()
+        )
+        self.wall_temperature_C = float(wall_temperature_C)
 
         # Default residence time per stage (seconds)
         # In a real design, this comes from equipment sizing
@@ -169,8 +187,10 @@ class CondensationModel:
         """
         remaining_by_species = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
+        wall_deposit_by_species: Dict[str, float] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
+            self._record_runtime_wall_fraction(species, 0.0)
 
             T_cond = _species_condensation_temperature_C(species)
             hkl_condensed_by_stage: Dict[int, float] = {}
@@ -200,24 +220,47 @@ class CondensationModel:
                 remaining_kg -= condensed_kg
 
             hkl_condensed_total_kg = sum(hkl_condensed_by_stage.values())
+            wall_hkl_kg = self._wall_deposit_candidate_kg(
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond,
+                melt_temperature_C=float(getattr(melt, 'temperature_C', T_cond)),
+            )
+            hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
                 rate_kg_hr,
                 self.train.stages,
                 self.residence_time_s,
             )
-            if hkl_condensed_total_kg <= 1e-15:
+            if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
-                scale = capture_budget_kg / hkl_condensed_total_kg
-                for stage_number, hkl_stage_kg in hkl_condensed_by_stage.items():
-                    condensed_kg = hkl_stage_kg * scale
-                    if condensed_kg <= 1e-15:
-                        continue
-                    stage_species = condensed_by_stage_species.setdefault(
-                        stage_number, {})
-                    stage_species[species] = (
-                        stage_species.get(species, 0.0) + condensed_kg)
+                wall_deposit_kg = capture_budget_kg * (
+                    wall_hkl_kg / hkl_sink_total_kg
+                )
+                if wall_deposit_kg > 1e-15:
+                    wall_deposit_by_species[species] = (
+                        wall_deposit_by_species.get(species, 0.0)
+                        + wall_deposit_kg
+                    )
+                wall_fraction = (
+                    wall_deposit_kg / capture_budget_kg
+                    if capture_budget_kg > 0.0 else 0.0
+                )
+                self._record_runtime_wall_fraction(species, wall_fraction)
+
+                baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
+                if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
+                    scale = baffle_budget_kg / hkl_condensed_total_kg
+                    for stage_number, hkl_stage_kg in hkl_condensed_by_stage.items():
+                        condensed_kg = hkl_stage_kg * scale
+                        if condensed_kg <= 1e-15:
+                            continue
+                        stage_species = condensed_by_stage_species.setdefault(
+                            stage_number, {})
+                        stage_species[species] = (
+                            stage_species.get(species, 0.0) + condensed_kg)
 
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
@@ -225,7 +268,56 @@ class CondensationModel:
         return CondensationRouteResult(
             remaining_by_species=remaining_by_species,
             condensed_by_stage_species=condensed_by_stage_species,
+            wall_deposit_by_species=wall_deposit_by_species,
         )
+
+    def _wall_deposit_candidate_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+    ) -> float:
+        if rate_kg_hr <= 0.0 or self.wall_surface_area_m2 <= 0.0:
+            return 0.0
+        alpha_s = _wall_alpha_s(species)
+        if alpha_s <= 0.0:
+            return 0.0
+
+        P_local_pa = _local_wall_species_pressure_pa(
+            species, melt_temperature_C, T_cond_C,
+        )
+        if P_local_pa <= 0.0:
+            return 0.0
+
+        T_ref_K = max(T_cond_C + 273.15, 1.0)
+        reference_flux = _hkl_impingement_flux_mol_m2_s(
+            species, P_local_pa, T_ref_K,
+        )
+        if reference_flux <= 0.0:
+            return 0.0
+
+        T_wall_K = max(self.wall_temperature_C + 273.15, 1.0)
+        flux = _hkl_surface_deposition_flux_mol_m2_s(
+            species, P_local_pa, T_wall_K, alpha_s,
+        )
+        if flux <= 0.0:
+            return 0.0
+
+        residence_s = float(self.residence_time_s.get(0, 0.5))
+        rate_s_inv = (
+            flux / reference_flux
+        ) * max(0.0, self.wall_surface_area_m2)
+        eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
+        return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
+
+    def _record_runtime_wall_fraction(self, species: str, fraction: float) -> None:
+        data = _mutable_species_vapor_data(self.vapor_pressure_data, species)
+        if data is None:
+            return
+        data[WALL_DEPOSIT_FRACTION_KEY] = max(0.0, min(1.0, float(fraction)))
+        data[WALL_DEPOSIT_ACCOUNT_KEY] = WALL_DEPOSIT_ACCOUNT
 
     def _condensation_efficiency(
         self,
@@ -338,6 +430,72 @@ def _stage_alpha_s(stage: CondensationStage, species: str) -> float:
     return max(0.0, min(1.0, alpha_s))
 
 
+def _wall_material_config() -> Mapping[str, Any]:
+    surfaces = MATERIALS_DATA.get('wall_surfaces', {}) or {}
+    if not isinstance(surfaces, Mapping):
+        return {}
+    config = surfaces.get('interstage_duct', {}) or {}
+    return config if isinstance(config, Mapping) else {}
+
+
+def _wall_alpha_s(species: str) -> float:
+    config = _wall_material_config()
+    alpha_by_species = config.get('alpha_s_by_species', {}) or {}
+    value = (
+        alpha_by_species.get(species)
+        if isinstance(alpha_by_species, Mapping)
+        else None
+    )
+    if value is None:
+        liner_material = config.get('liner_material')
+        material_config = _liner_material_config(str(liner_material or ''))
+        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
+        if isinstance(material_alpha, Mapping):
+            value = material_alpha.get(species)
+    if value is None:
+        value = STICKING_COEFF.get(species, 0.8)
+    try:
+        alpha_s = float(value)
+    except (TypeError, ValueError):
+        alpha_s = 0.0
+    if not math.isfinite(alpha_s):
+        return 0.0
+    return max(0.0, min(1.0, alpha_s))
+
+
+def _liner_material_config(material: str) -> Mapping[str, Any]:
+    materials = MATERIALS_DATA.get('liner_materials', {}) or {}
+    if not isinstance(materials, Mapping):
+        return {}
+    config = materials.get(material, {}) or {}
+    return config if isinstance(config, Mapping) else {}
+
+
+def _default_pipe_surface_area_m2() -> float:
+    from simulator.equipment import PipeSpec
+
+    pipe = PipeSpec()
+    if pipe.surface_area_m2 > 0.0:
+        return float(pipe.surface_area_m2)
+    return math.pi * float(pipe.diameter_m) * float(pipe.length_m)
+
+
+def _mutable_species_vapor_data(
+    vapor_pressure_data: MutableMapping[str, Any] | None,
+    species: str,
+) -> MutableMapping[str, Any] | None:
+    if vapor_pressure_data is None:
+        return None
+    for family in ('metals', 'oxide_vapors'):
+        family_data = vapor_pressure_data.get(family, {})
+        if not isinstance(family_data, MutableMapping):
+            continue
+        data = family_data.get(species)
+        if isinstance(data, MutableMapping):
+            return data
+    return None
+
+
 def _antoine_psat_pa(species: str, T_K: float) -> float | None:
     data = _species_vapor_data(species)
     antoine = data.get('antoine', {}) if isinstance(data, Mapping) else {}
@@ -362,6 +520,17 @@ def _local_species_pressure_pa(species: str, T_cond_C: float) -> float:
         return P_local_pa
     # Existing condensation temperatures are documented at ~1 mbar.
     return 100.0
+
+
+def _local_wall_species_pressure_pa(
+    species: str,
+    melt_temperature_C: float,
+    fallback_T_cond_C: float,
+) -> float:
+    P_source_pa = _antoine_psat_pa(species, melt_temperature_C + 273.15)
+    if P_source_pa is not None and P_source_pa > 0.0:
+        return P_source_pa
+    return _local_species_pressure_pa(species, fallback_T_cond_C)
 
 
 def _molecular_mass_kg_per_molecule(species: str) -> float:
