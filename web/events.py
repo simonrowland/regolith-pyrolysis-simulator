@@ -7,7 +7,16 @@ from pathlib import Path
 import yaml
 from flask import request
 
-from simulator.core import PyrolysisSimulator, CampaignPhase
+from simulator.backends import (
+    BackendSelectionPolicy,
+    BackendUnavailableError,
+    INELIGIBLE_ACTIVE_BACKENDS,
+    SimulatorBuildConfig,
+    build_simulator,
+    emit_web_engine_selection_log,
+    resolve_backend,
+)
+from simulator.core import CampaignPhase
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.factsage import FactSAGEBackend
@@ -39,20 +48,6 @@ from simulator.runner import build_per_hour_summary
 from web.feedstock_data import load_visible_feedstocks
 
 
-# Active-backend eligibility policy (\goal BACKEND-DEFAULT-SWITCH).
-#
-# AlphaMELTS and FactSAGE (with strict config) are the only engines wired as
-# the simulator's authoritative MeltBackend today.  VapoRock and MAGEMin are
-# adapter-complete but vapor-side / shadow-only — neither populates
-# EquilibriumResult.ledger_transition.  Selecting them as the active backend
-# would trip simulator/core.py::_get_equilibrium's fail-closed reject
-# ("backend returned post-equilibrium phase material without an AtomLedger
-# transition" / "VapoRockBackend is unavailable" before its first
-# equilibrate call).  They are gated to shadow / diagnostic consumers until
-# \goal CHEMISTRY-KERNEL-CARVE-OUT introduces a multi-intent dispatcher.
-INELIGIBLE_ACTIVE_BACKENDS = ('vaporock', 'magemin')
-
-
 DATA_DIR = Path(__file__).parent.parent / 'data'
 
 
@@ -75,10 +70,6 @@ def _safe_log(message: str) -> None:
         print(message)
     except OSError:
         pass
-
-
-class BackendUnavailableError(RuntimeError):
-    """Requested backend is required for this run but is unavailable."""
 
 
 def _replace_simulation_state(sid: str, sim, speed: float) -> tuple[dict, threading.Lock]:
@@ -163,107 +154,19 @@ def _get_backend(backend_name: str):
       inside ``_get_equilibrium`` after selection, ``core.py``'s
       fail-closed path handles it without re-routing here.
     """
-    name = (backend_name or '').strip().lower()
-
-    if name in INELIGIBLE_ACTIVE_BACKENDS:
-        # VapoRock/MAGEMin are not eligible as the active MeltBackend until
-        # the kernel carve-out lands a multi-intent dispatcher (see module
-        # docstring on INELIGIBLE_ACTIVE_BACKENDS).  Refuse explicitly here
-        # rather than let the user discover the failure inside
-        # _get_equilibrium's fail-closed reject.
-        backend_label = 'VapoRock' if name == 'vaporock' else 'MAGEMin'
-        raise BackendUnavailableError(
-            f'{backend_label} is not eligible as the active melt backend '
-            'until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent '
-            'dispatcher; select alphamelts, factsage, or auto.'
-        )
-
-    if name == 'alphamelts':
-        backend = _try_alphamelts()
-        if backend is not None:
-            _emit_engine_selection_log(backend)
-            return backend
-        raise BackendUnavailableError(
-            'AlphaMELTS unavailable; run install-dependencies.py')
-
-    if name == 'factsage':
-        backend = _try_factsage()
-        if backend is not None:
-            _emit_engine_selection_log(backend)
-            return backend
-        # FactSAGE stays diagnostic-without-strict-config: drop to Stub
-        # (existing behaviour) rather than autodetect AlphaMELTS — the user
-        # asked for FactSAGE explicitly, so silently substituting a
-        # different primary would be the wrong kind of fallback.
-        backend = _stub_backend()
-        _emit_engine_selection_log(backend)
-        return backend
-
-    # Autodetect chain ('auto', 'stub', or unknown):
-    # AlphaMELTS -> FactSAGE-with-strict-config -> Stub.
-    backend = _try_alphamelts()
-    if backend is not None:
-        _emit_engine_selection_log(backend)
-        return backend
-    backend = _try_factsage()
-    if backend is not None:
-        _emit_engine_selection_log(backend)
-        return backend
-    backend = _stub_backend()
-    _emit_engine_selection_log(backend)
-    return backend
-
-
-def _try_alphamelts():
-    """Probe AlphaMELTS; return the initialized backend or None."""
-    backend = AlphaMELTSBackend()
-    if backend.initialize({}) and backend.is_available():
-        return backend
-    return None
-
-
-def _try_factsage():
-    """Probe FactSAGE under the strict-config gate; return None on failure.
-
-    The strict-config gate is: FACTSAGE_CONFIG points at a JSON config that
-    loads, declares a real ChemApp module + ``.cst`` datafile, and the
-    backend's own ``initialize()`` returns True.  An empty/missing config
-    means no strict config -> ``initialize({})`` fails its
-    ``_resolve_datafile_path`` check -> we return None.
-    """
-    config = _factsage_config()
-    backend = FactSAGEBackend()
-    if backend.initialize(config) and backend.is_available():
-        return backend
-    return None
-
-
-def _stub_backend():
-    """Initialize and return a StubBackend (always available)."""
-    backend = StubBackend()
-    backend.initialize({})
-    return backend
-
-
-def _emit_engine_selection_log(backend) -> None:
-    """Emit the one-line engine-selection log.
-
-    Format:
-        ``engine selection: <name> (capabilities: silicate_melt=...,
-         gas_volatiles=...) -- VapoRock/MAGEMin not eligible until kernel``
-
-    Matches the launcher's existing ``print`` style so it appears in normal
-    ``regolith-pyrolysis-run.py`` output without a logging-config dance.
-    """
-    name = type(backend).__name__
-    caps = backend.capabilities()
-    cap_str = ', '.join(
-        f'{key}={"true" if caps.get(key) else "false"}'
-        for key in ('silicate_melt', 'gas_volatiles')
-    )
-    _safe_log(
-        f'engine selection: {name} (capabilities: {cap_str}) -- '
-        'VapoRock/MAGEMin not eligible until kernel'
+    return resolve_backend(
+        backend_name,
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        unavailable_error_cls=BackendUnavailableError,
+        log_selection=lambda backend: emit_web_engine_selection_log(
+            backend, _safe_log
+        ),
+        log_message=_safe_log,
+        alphamelts_backend_cls=AlphaMELTSBackend,
+        factsage_backend_cls=FactSAGEBackend,
+        stub_backend_cls=StubBackend,
+        factsage_config_loader=_factsage_config,
+        factsage_config_error_cls=FactSAGEConfigError,
     )
 
 
@@ -512,7 +415,14 @@ def register_events(socketio):
             backend_message = f'Using {backend_type}'
 
         # Create simulator
-        sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+        sim = build_simulator(
+            SimulatorBuildConfig(
+                backend=backend,
+                setpoints=setpoints,
+                feedstocks=feedstocks,
+                vapor_pressures=vapor_pressures,
+            )
+        )
 
         # User-configurable parameters
         c4_max_temp = float(data.get('c4_max_temp_C', 1670))

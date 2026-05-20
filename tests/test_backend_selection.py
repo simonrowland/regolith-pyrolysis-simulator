@@ -23,6 +23,7 @@ from typing import Optional
 import pytest
 
 import web.events as events
+from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.base import StubBackend
 from web.events import BackendUnavailableError, _get_backend
 
@@ -105,6 +106,51 @@ def captured_logs(monkeypatch):
     lines: list[str] = []
     monkeypatch.setattr(events, '_safe_log', lines.append)
     return lines
+
+
+def test_shared_resolver_requires_explicit_policy():
+    with pytest.raises(TypeError):
+        resolve_backend('stub')
+
+
+def test_runner_strict_rejects_auto():
+    with pytest.raises(BackendUnavailableError, match='auto backend selection'):
+        resolve_backend('auto', BackendSelectionPolicy.RUNNER_STRICT)
+
+
+def test_runner_strict_keeps_legacy_exact_name_matching():
+    with pytest.raises(BackendUnavailableError, match="unknown backend 'Auto'"):
+        resolve_backend('Auto', BackendSelectionPolicy.RUNNER_STRICT)
+
+
+def test_web_autodetect_policy_preserves_probe_order():
+    calls: list[str] = []
+
+    def make_alphamelts():
+        calls.append('alphamelts')
+        return _FakeAlphaMELTS(available=False)
+
+    def make_factsage():
+        calls.append('factsage')
+        return _FakeFactSAGE(available=False)
+
+    def make_stub():
+        calls.append('stub')
+        return StubBackend()
+
+    backend = resolve_backend(
+        'auto',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=make_alphamelts,
+        factsage_backend_cls=make_factsage,
+        stub_backend_cls=make_stub,
+        factsage_config_loader=lambda: {},
+        factsage_config_error_cls=BackendUnavailableError,
+        log_selection=lambda selected: None,
+    )
+
+    assert isinstance(backend, StubBackend)
+    assert calls == ['alphamelts', 'factsage', 'stub']
 
 
 # ---------------------------------------------------------------------------
