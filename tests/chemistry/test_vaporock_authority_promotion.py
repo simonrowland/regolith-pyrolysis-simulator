@@ -20,6 +20,7 @@ five scenarios are deterministic regardless of the host environment.
 
 from __future__ import annotations
 
+import types
 from pathlib import Path
 from typing import Any
 
@@ -130,7 +131,7 @@ def _force_vaporock_available(sim: PyrolysisSimulator) -> VapoRockProvider:
         def equilibrate(self, **_: Any):
             from simulator.melt_backend.base import EquilibriumResult
 
-            return EquilibriumResult(
+            result = EquilibriumResult(
                 temperature_C=1500.0,
                 pressure_bar=1e-6,
                 fO2_log=-9.0,
@@ -145,8 +146,20 @@ def _force_vaporock_available(sim: PyrolysisSimulator) -> VapoRockProvider:
                 # 24/Phase-2) -- see docs-private/sio-parity-
                 # investigation-2026-05-16.md for the literature
                 # derivation.
-                vapor_pressures_Pa={'Na': 1234.5, 'SiO': 0.0131},
+                vapor_pressures_Pa={
+                    'Na': 1234.5,
+                    'SiO': 0.0131,
+                    'O2': 1e-4,
+                    'Si2': 1e-7,
+                    'SiO2_gas': 1e-9,
+                },
             )
+            setattr(
+                result,
+                'vaporock_full_speciation_Pa',
+                dict(result.vapor_pressures_Pa),
+            )
+            return result
 
     fake = _FakeBackend()
     provider._backend = fake
@@ -202,6 +215,54 @@ def test_vaporock_available_no_flag_dispatches_through_vaporock(
     vapor = dict(result.diagnostic.get('vapor_pressures_Pa') or {})
     assert vapor == {'Na': pytest.approx(1234.5), 'SiO': pytest.approx(0.0131)}
     assert 'kernel_fallback_used' not in dict(result.diagnostic or {})
+
+
+def test_vaporock_full_speciation_stays_out_of_evaporation_flux(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        allow_fallback_vapor=False,
+    )
+    _force_vaporock_available(sim)
+    sim.melt.temperature_C = 1500.0
+
+    result = sim._get_equilibrium()
+    assert result.vapor_pressures_Pa == {
+        'Na': pytest.approx(1234.5),
+        'SiO': pytest.approx(0.0131),
+    }
+    diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
+    full = dict(diagnostic.get('vaporock_full_speciation_Pa') or {})
+    assert full['O2'] == pytest.approx(1e-4)
+    assert full['Si2'] == pytest.approx(1e-7)
+    assert full['SiO2_gas'] == pytest.approx(1e-9)
+
+    captured: dict[str, dict] = {}
+    original_dispatch_only = sim._dispatch_only
+
+    def _spy_dispatch_only(intent, *args, **kwargs):
+        if intent == ChemistryIntent.EVAPORATION_FLUX:
+            captured['vapor_pressures_Pa'] = dict(
+                kwargs['control_inputs']['vapor_pressures_Pa']
+            )
+            return types.SimpleNamespace(
+                diagnostic={'evaporation_flux_kg_hr': {}}
+            )
+        return original_dispatch_only(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', _spy_dispatch_only)
+    sim._calculate_evaporation(result)
+
+    assert captured['vapor_pressures_Pa'] == {
+        'Na': pytest.approx(1234.5),
+        'SiO': pytest.approx(0.0131),
+    }
+    assert 'O2' not in captured['vapor_pressures_Pa']
+    assert 'Si2' not in captured['vapor_pressures_Pa']
+    assert 'SiO2_gas' not in captured['vapor_pressures_Pa']
 
 
 # ---------------------------------------------------------------------
@@ -463,6 +524,7 @@ def test_vaporock_diagnostics_payload_round_trips():
     payload = diag.as_diagnostic()
     assert set(payload.keys()) == {
         'vapor_pressures_Pa',
+        'vaporock_full_speciation_Pa',
         'activities',
         'pO2_bar',
         'mode',
@@ -471,4 +533,5 @@ def test_vaporock_diagnostics_payload_round_trips():
         'backend_warnings',
     }
     assert payload['vapor_pressures_Pa'] == {'Na': 100.0}
+    assert payload['vaporock_full_speciation_Pa'] == {}
     assert payload['backend_warnings'] == ('hello',)

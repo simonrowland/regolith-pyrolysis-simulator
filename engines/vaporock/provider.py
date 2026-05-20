@@ -369,6 +369,20 @@ class VapoRockProvider(ChemistryProvider):
         raw_vapor = dict(
             getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
         )
+        raw_full_speciation = dict(
+            getattr(
+                equilibrium,
+                'vaporock_full_speciation_Pa',
+                raw_vapor,
+            ) or {}
+        )
+        vaporock_full_speciation_Pa: dict[str, float] = {}
+        for species, value in raw_full_speciation.items():
+            if not _is_finite(value):
+                continue
+            pressure = float(value)
+            if pressure > 0.0:
+                vaporock_full_speciation_Pa[str(species)] = pressure
         vapor_pressures_Pa: dict[str, float] = {}
         # Mirror the builtin Antoine path's vanishing-pressure floor
         # (``P_effective_Pa > 1e-15``): species at sub-femtopascal
@@ -400,6 +414,7 @@ class VapoRockProvider(ChemistryProvider):
         )
         return VapoRockDiagnostics(
             vapor_pressures_Pa=vapor_pressures_Pa,
+            vaporock_full_speciation_Pa=vaporock_full_speciation_Pa,
             activities={},  # VapoRock has no per-oxide activity surface
             pO2_bar=pO2_bar,
             mode=mode,
