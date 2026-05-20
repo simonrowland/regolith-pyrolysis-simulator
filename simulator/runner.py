@@ -67,12 +67,14 @@ SIO_ALPHA_PROVENANCE = (
     "SF2004 Table 10 SiO2(liq) Hashimoto 1990"
 )
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
+WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
 SIO_YIELD_STAGE_KEYS: dict[int, str] = {
     1: "stage_1_fe_condenser_impurity",
     3: "stage_3_sio_zone_product",
     4: "stage_4_alkali_mg_carryover",
     5: "stage_5_dust_filter_carryover",
 }
+SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
 SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
 SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
@@ -769,6 +771,101 @@ def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
     }
 
 
+def _kg_by_species_from_mol_state(
+    state: Mapping[str, Mapping[str, float]],
+    account: str,
+) -> dict[str, float]:
+    species_mol = state.get(account, {})
+    kg_by_species: dict[str, float] = {}
+    for species, mol in sorted(species_mol.items()):
+        molar_mass_g_mol = MOLAR_MASS.get(species)
+        if molar_mass_g_mol is None:
+            continue
+        kg = float(mol) * (molar_mass_g_mol / 1000.0)
+        if abs(kg) > 1e-12:
+            kg_by_species[species] = _clean_report_float(kg)
+    return kg_by_species
+
+
+def _wall_deposit_report_kg(
+    state: Mapping[str, Mapping[str, float]],
+) -> dict[str, float]:
+    wall_deposit_kg = _kg_by_species_from_mol_state(
+        state, WALL_DEPOSIT_ACCOUNT,
+    )
+    for species in SIO_WALL_DEPOSIT_SPECIES:
+        wall_deposit_kg.setdefault(species, 0.0)
+    return {
+        species: wall_deposit_kg[species]
+        for species in sorted(wall_deposit_kg)
+    }
+
+
+def _wall_liner_resinter_config() -> dict[str, Any]:
+    materials = _load_yaml(DATA_DIR / "materials.yaml")
+    surface = (
+        materials.get("wall_surfaces", {})
+        .get("interstage_duct", {})
+        if isinstance(materials.get("wall_surfaces", {}), Mapping)
+        else {}
+    )
+    liner_material = str(surface.get("liner_material") or "")
+    liner_cfg = (
+        materials.get("liner_materials", {}).get(liner_material, {})
+        if isinstance(materials.get("liner_materials", {}), Mapping)
+        else {}
+    )
+    return {
+        "liner_material": liner_material,
+        "resinter_threshold_kg": liner_cfg.get("resinter_threshold_kg"),
+        "resinter_threshold_basis": liner_cfg.get("resinter_threshold_basis"),
+        "fast_fouling_campaign_threshold": int(
+            liner_cfg.get("fast_fouling_campaign_threshold") or 10
+        ),
+    }
+
+
+def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]:
+    cfg = _wall_liner_resinter_config()
+    positive = {
+        species: float(kg)
+        for species, kg in wall_deposit_kg.items()
+        if float(kg) > 0.0
+    }
+    dominant_species = max(positive, key=positive.get) if positive else "none"
+    dominant_kg = positive.get(dominant_species, 0.0) if dominant_species else 0.0
+    threshold = cfg.get("resinter_threshold_kg")
+    fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    if dominant_kg <= 0.0:
+        campaigns_to_resinter: float | str = "infinite"
+        verdict = "slow-fouling"
+    elif threshold is None:
+        campaigns_to_resinter = (
+            f"resinter_threshold_kg / {dominant_kg:.12g}"
+        )
+        verdict = (
+            "threshold-parametric: fast-fouling if campaigns_to_resinter "
+            f"< {fast_n}, else slow-fouling"
+        )
+    else:
+        campaigns_to_resinter = float(threshold) / dominant_kg
+        verdict = (
+            "fast-fouling"
+            if campaigns_to_resinter < fast_n
+            else "slow-fouling"
+        )
+    return {
+        "liner_material": cfg["liner_material"],
+        "dominant_species": dominant_species,
+        "wall_deposit_kg_per_campaign": _clean_report_float(dominant_kg),
+        "resinter_threshold_kg": threshold,
+        "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
+        "campaigns_to_resinter": campaigns_to_resinter,
+        "fast_fouling_campaign_threshold": fast_n,
+        "verdict": verdict,
+    }
+
+
 def _required_stage0_carbon_kg(feedstock: Mapping[str, Any],
                                mass_kg: float) -> float:
     try:
@@ -897,6 +994,7 @@ def build_sio_yield_report(
     final_state = result.get("final_state", {})
     cleaned_melt = final_state.get("process.cleaned_melt", {})
     condensation_train = final_state.get("process.condensation_train", {})
+    wall_deposit = final_state.get(WALL_DEPOSIT_ACCOUNT, {})
     terminal_offgas: dict[str, float] = {}
     for account_name in ("process.overhead_gas", "terminal.offgas"):
         for species, mol in final_state.get(account_name, {}).items():
@@ -908,8 +1006,14 @@ def build_sio_yield_report(
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
     si_terminal_mol = float(condensation_train.get("Si", 0.0))
     sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
+    sio_wall_mol = float(wall_deposit.get("SiO", 0.0))
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
-    terminal_mol = si_terminal_mol + sio2_terminal_mol + sio_escape_mol
+    terminal_mol = (
+        si_terminal_mol
+        + sio2_terminal_mol
+        + sio_wall_mol
+        + sio_escape_mol
+    )
     if sio_evaporated_mol > 0.0:
         closure_error_pct = abs(
             sio_evaporated_mol - terminal_mol
@@ -931,6 +1035,8 @@ def build_sio_yield_report(
     sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
         downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
     )
+    wall_deposit_kg = _wall_deposit_report_kg(final_state)
+    wall_fouling = _wall_fouling_report(wall_deposit_kg)
 
     report = {
         "feedstock_id": feedstock_id,
@@ -939,6 +1045,8 @@ def build_sio_yield_report(
         "alpha_provenance": SIO_ALPHA_PROVENANCE,
         "sio_evolved_kg": _clean_report_float(sio_evolved_kg),
         "sio_to_silica_fume_kg": sio_to_silica_fume_kg,
+        "wall_deposit_kg": wall_deposit_kg,
+        "fouling_rate": wall_fouling,
         "sio_yield_pct_of_feedstock": _clean_report_float(sio_yield_pct),
         "industrial_benchmark_pct": list(SIO_INDUSTRIAL_BENCHMARK_PCT),
         "verdict": _industrial_sio_verdict(sio_yield_pct),
@@ -949,6 +1057,7 @@ def build_sio_yield_report(
             "sio_evaporated_mol": sio_evaporated_mol,
             "si_terminal_mol": si_terminal_mol,
             "sio2_terminal_mol": sio2_terminal_mol,
+            "sio_wall_mol": sio_wall_mol,
             "sio_escape_mol": sio_escape_mol,
             "closure_error_pct": closure_error_pct,
             "mass_balance_error_pct": float(

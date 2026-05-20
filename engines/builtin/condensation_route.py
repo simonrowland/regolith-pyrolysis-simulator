@@ -12,7 +12,8 @@ provider receives the per-species condensed-mass projection via
 
 The provider:
 
-- reads ``process.overhead_gas``, ``process.condensation_train``, and
+- reads ``process.overhead_gas``, ``process.condensation_train``,
+  ``process.wall_deposit``, and
   declared product bins from the account view -- the accounts the
   deposition leg touches (debit vapor from overhead, credit deposits).
   ``process.cleaned_melt`` is NOT in the declared set: the
@@ -32,17 +33,20 @@ The provider:
   * ``sp_data`` -- the raw ``vapor_pressures.yaml`` metadata for the
     species (used only to look up
     ``condensation_products_mol_per_mol_vapor`` for the disproportionation
-    branch; the provider re-uses the same product map the legacy path
-    builds in :meth:`_condensed_products_for_vapor` -- the canonical
-    SiO -> Si + SiO2 split lives here),
+    branch plus the runtime ``_wall_deposit_fraction`` destination split;
+    the provider re-uses the same product map the legacy path builds in
+    :meth:`_condensed_products_for_vapor` -- the canonical SiO -> Si +
+    SiO2 split lives here),
   * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes).
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
-``credited_condensed_kg`` diagnostic so the caller can drive
-``_project_condensed_stage_collection`` after the kernel commits.
+``credited_condensed_kg`` diagnostic for the baffle/product mass so the
+caller can drive ``_project_condensed_stage_collection`` after the kernel
+commits. ``credited_wall_deposit_kg`` carries the fouling mass credited to
+``process.wall_deposit`` in the same mol-native proposal.
 
 Authority: authoritative for ``CONDENSATION_ROUTE`` per binding spec
 §3. This is the SECOND authoritative ledger-mutating intent in the
@@ -51,12 +55,13 @@ engages atom-balance validation at dispatch time AND again at commit
 time.
 
 Account declaration: ``process.overhead_gas``,
-``process.condensation_train``. The deposition leg is strictly an
-overhead -> train transfer; declaring ``process.cleaned_melt`` here
-would be an account-scope leak (the melt is the EVAPORATION_TRANSITION
-provider's responsibility, not ours). The provider must declare every
-account the proposal touches (``validate_proposal_accounts`` enforces
-this with :class:`AccountFilterViolation`).
+``process.condensation_train``, and ``process.wall_deposit``. The
+deposition leg is strictly an overhead -> destination transfer; declaring
+``process.cleaned_melt`` here would be an account-scope leak (the melt is
+the EVAPORATION_TRANSITION provider's responsibility, not ours). The
+provider must declare every account the proposal touches
+(``validate_proposal_accounts`` enforces this with
+:class:`AccountFilterViolation`).
 """
 
 from __future__ import annotations
@@ -81,6 +86,11 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.condensation import (
+    WALL_DEPOSIT_ACCOUNT,
+    WALL_DEPOSIT_ACCOUNT_KEY,
+    WALL_DEPOSIT_FRACTION_KEY,
+)
 
 
 class BuiltinCondensationRouteProvider(ChemistryProvider):
@@ -97,6 +107,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     DECLARED_ACCOUNTS = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
     })
 
@@ -167,12 +178,18 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # ``_condensation_product_mol_ratios`` / ``_condensed_products_for_vapor``
         # in simulator/evaporation.py exactly -- this is a refactor of
         # where the math lives, not a re-derivation.
+        wall_fraction = self._wall_deposit_fraction(sp_data)
+        wall_deposit_kg = condensed_kg * wall_fraction
+        baffle_condensed_kg = max(0.0, condensed_kg - wall_deposit_kg)
         condensed_product_mol = self._condensed_product_mol(
-            species, condensed_kg, sp_data, registry,
+            species, baffle_condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
+        wall_deposit_mol = self._wall_deposit_mol(
+            species, wall_deposit_kg, registry, resolve_species_formula,
+        )
 
-        if not condensed_product_mol:
+        if not condensed_product_mol and wall_deposit_mol <= 0.0:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
@@ -193,6 +210,16 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "process.overhead_gas": {species: vapor_mol},
         }
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        if wall_deposit_mol > 0.0:
+            account = str(
+                sp_data.get(WALL_DEPOSIT_ACCOUNT_KEY) or WALL_DEPOSIT_ACCOUNT
+            )
+            if account not in self.DECLARED_ACCOUNTS:
+                account = WALL_DEPOSIT_ACCOUNT
+            species_mol = credits.setdefault(account, {})
+            species_mol[species] = (
+                species_mol.get(species, 0.0) + wall_deposit_mol
+            )
 
         # Atom-balance proof: element-by-element net (credit - debit).
         # Must be zero element-by-element (the kernel re-checks this
@@ -217,7 +244,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             transition=proposal,
             control_audit=control_audit,
             diagnostic={
-                "credited_condensed_kg": float(condensed_kg),
+                "credited_condensed_kg": float(baffle_condensed_kg),
+                "credited_wall_deposit_kg": float(wall_deposit_kg),
             },
         )
 
@@ -296,6 +324,30 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             species_mol = credits.setdefault(account, {})
             species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
         return credits
+
+    @staticmethod
+    def _wall_deposit_fraction(sp_data: Mapping[str, Any]) -> float:
+        value = sp_data.get(WALL_DEPOSIT_FRACTION_KEY, 0.0)
+        try:
+            fraction = float(value)
+        except (TypeError, ValueError):
+            return 0.0
+        if not math.isfinite(fraction):
+            return 0.0
+        return max(0.0, min(1.0, fraction))
+
+    @staticmethod
+    def _wall_deposit_mol(
+        species: str,
+        wall_deposit_kg: float,
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+    ) -> float:
+        if wall_deposit_kg <= 0.0:
+            return 0.0
+        vapor_formula = resolve_species_formula(species, registry)
+        vapor_mol = wall_deposit_kg / vapor_formula.molar_mass_kg_per_mol()
+        return max(0.0, vapor_mol)
 
     @staticmethod
     def _build_atom_balance_proof(

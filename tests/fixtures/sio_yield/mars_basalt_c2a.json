@@ -11,6 +11,23 @@
     "stage_5_dust_filter_carryover": 0.0460116207675,
     "terminal_offgas_escape": 0.422370681276
   },
+  "wall_deposit_kg": {
+    "Fe": 0.0,
+    "K": 0.0,
+    "Mg": 0.0,
+    "Na": 0.0,
+    "SiO": 0.0
+  },
+  "fouling_rate": {
+    "liner_material": "hot_wall_refractory_liner",
+    "dominant_species": "none",
+    "wall_deposit_kg_per_campaign": 0.0,
+    "resinter_threshold_kg": null,
+    "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
+    "campaigns_to_resinter": "infinite",
+    "fast_fouling_campaign_threshold": 10,
+    "verdict": "slow-fouling"
+  },
   "sio_yield_pct_of_feedstock": 0.382535373379,
   "industrial_benchmark_pct": [
     8,

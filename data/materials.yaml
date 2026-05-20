@@ -21,42 +21,65 @@ default_alpha_s_by_species: &default_alpha_s_by_species
 
 stages:
   0:
+    structural_material: refractory_shell
     liner_material: hot_duct_refractory_liner
     temp_range_C: [1400, 1600]
     max_service_T_C: 1600
     alpha_s_by_species: *default_alpha_s_by_species
   1:
+    structural_material: refractory_shell
     liner_material: fe_condenser_liner
     temp_range_C: [1100, 1400]
     max_service_T_C: 1400
     alpha_s_by_species: *default_alpha_s_by_species
   2:
+    structural_material: refractory_shell
     liner_material: cr_oxide_cartridge_liner
     temp_range_C: [1100, 1300]
     max_service_T_C: 1300
     alpha_s_by_species: *default_alpha_s_by_species
   3:
+    structural_material: refractory_shell
     liner_material: fused_silica_baffles
     temp_range_C: [900, 1200]
     max_service_T_C: 1200
     alpha_s_by_species: *default_alpha_s_by_species
   4:
+    structural_material: refractory_shell
     liner_material: alkali_mg_cyclone_liner
     temp_range_C: [350, 700]
     max_service_T_C: 700
     alpha_s_by_species: *default_alpha_s_by_species
   5:
+    structural_material: refractory_shell
     liner_material: vortex_dust_filter_liner
     temp_range_C: [200, 350]
     max_service_T_C: 350
     alpha_s_by_species: *default_alpha_s_by_species
   6:
+    structural_material: metallic_pressure_shell
     liner_material: turbine_compressor_liner
     temp_range_C: [50, 200]
     max_service_T_C: 200
     alpha_s_by_species: *default_alpha_s_by_species
   7:
+    structural_material: metallic_pressure_shell
     liner_material: turbine_outlet_monitor_liner
     temp_range_C: [20, 50]
     max_service_T_C: 50
     alpha_s_by_species: *default_alpha_s_by_species
+
+wall_surfaces:
+  interstage_duct:
+    structural_material: refractory_shell
+    liner_material: hot_wall_refractory_liner
+    surface_model: lumped_collection_pipe
+    alpha_s_by_species: *default_alpha_s_by_species
+
+liner_materials:
+  hot_wall_refractory_liner:
+    max_service_T_C: 1600
+    alpha_s_by_species: *default_alpha_s_by_species
+    resinter_threshold_kg: null
+    resinter_threshold_basis: configurable_parameter_no_sourced_default
+    fast_fouling_campaign_threshold: 10

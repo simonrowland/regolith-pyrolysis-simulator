@@ -145,6 +145,7 @@ OXYGEN_MELT_OFFGAS_ACCOUNT = 'terminal.oxygen_melt_offgas_stored'
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = 'terminal.oxygen_melt_offgas_vented_to_vacuum'
 OXYGEN_MRE_ANODE_ACCOUNT = 'terminal.oxygen_mre_anode_stored'
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = 'terminal.chromium_condensed_oxide_stored'
+WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 OXYGEN_STORED_ACCOUNTS = (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -157,6 +158,7 @@ FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     'process.raw_feedstock',
     'process.condensation_train',
+    WALL_DEPOSIT_ACCOUNT,
     'process.overhead_gas',
     'process.metal_phase',
     'process.reagent_inventory',
@@ -428,7 +430,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def condensation_model(self):
         if self._condensation_model is None:
             from simulator.condensation import CondensationModel
-            self._condensation_model = CondensationModel(self.train)
+            self._condensation_model = CondensationModel(
+                self.train,
+                vapor_pressure_data=self.vapor_pressures,
+                wall_temperature_C=self.overhead_model.pipe_temperature_C,
+            )
         return self._condensation_model
 
     @property

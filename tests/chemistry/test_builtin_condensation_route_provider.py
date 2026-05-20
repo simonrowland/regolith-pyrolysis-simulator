@@ -86,6 +86,7 @@ def test_provider_declares_condensation_accounts():
     assert profile.declared_accounts == frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
     })
     assert "process.cleaned_melt" not in profile.declared_accounts
@@ -177,6 +178,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     expected = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
     })
     for accounts in seen_accounts:
@@ -452,6 +454,82 @@ def test_provider_emits_expected_proposal_for_sio_disproportionation(
         assert abs(net) < 1e-9, (
             f"atom_balance_proof[{element!r}] = {net} is not zero"
         )
+
+
+def test_provider_splits_baffle_product_from_wall_deposit(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.overhead_gas": {"SiO": 10.0},
+            "process.condensation_train": {},
+            "process.wall_deposit": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    from simulator.accounting.formulas import resolve_species_formula
+    mw_sio = resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    condensed_kg = 0.44
+    wall_fraction = 0.25
+    expected_sio_mol = condensed_kg / mw_sio
+    sp_data = {
+        "condensation_products_mol_per_mol_vapor": {
+            "Si": 0.5,
+            "SiO2": 0.5,
+        },
+        "_wall_deposit_fraction": wall_fraction,
+        "_wall_deposit_account": "process.wall_deposit",
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=view,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "SiO",
+            "condensed_kg": condensed_kg,
+            "sp_data": sp_data,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    proposal = result.transition
+    baffle_mol = expected_sio_mol * (1.0 - wall_fraction)
+    wall_mol = expected_sio_mol * wall_fraction
+    assert proposal.debits["process.overhead_gas"]["SiO"] == pytest.approx(
+        expected_sio_mol, rel=1e-12
+    )
+    assert proposal.credits["process.condensation_train"]["Si"] == pytest.approx(
+        0.5 * baffle_mol, rel=1e-12
+    )
+    assert proposal.credits["process.condensation_train"]["SiO2"] == pytest.approx(
+        0.5 * baffle_mol, rel=1e-12
+    )
+    assert proposal.credits["process.wall_deposit"]["SiO"] == pytest.approx(
+        wall_mol, rel=1e-12
+    )
+    assert result.diagnostic["credited_condensed_kg"] == pytest.approx(
+        condensed_kg * (1.0 - wall_fraction), rel=1e-12
+    )
+    assert result.diagnostic["credited_wall_deposit_kg"] == pytest.approx(
+        condensed_kg * wall_fraction, rel=1e-12
+    )
+    for element, net in dict(proposal.atom_balance_proof).items():
+        assert abs(net) < 1e-9
 
 
 def test_provider_skips_below_numerical_floor(

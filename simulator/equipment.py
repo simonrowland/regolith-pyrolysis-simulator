@@ -63,6 +63,7 @@ class PipeSpec:
     """Collection pipe sizing."""
     diameter_m: float = 0.12
     length_m: float = 1.0
+    surface_area_m2: float = math.pi * 0.12 * 1.0
     conductance_kg_s: float = 0.0
     max_transport_g_s: float = 0.0
 
@@ -284,6 +285,7 @@ class EquipmentDesigner:
         return PipeSpec(
             diameter_m=d,
             length_m=L,
+            surface_area_m2=math.pi * d * L,
             conductance_kg_s=C_mass,
             max_transport_g_s=C_mass * 1000.0,
         )
