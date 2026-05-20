@@ -27,12 +27,12 @@ vapor = [
 # alphaMELTS binary is documented in docs/melt-backends.md rather than pinned).
 #
 # Build path:
-#   1. Clone + build MAGEMin v1.9.3 (see its README "Manual compilation":
-#      needs MPICH, LAPACKE, NLopt; `make all` produces `MAGEMin` +
-#      `libMAGEMin.dylib`/`.so`). The simulator reads the binary as a sibling
-#      clone at `../MAGEMin/MAGEMin` or from `engines/magemin/{,bin/}MAGEMin`.
-#   2. simulator/melt_backend/magemin.py drives that binary over subprocess
-#      (the only bridge that runs today) — no Python package install needed.
+#   1. Clone + build MAGEMin v1.9.3 outside synced repo storage (for example
+#      ~/.local/src/MAGEMin; see its README "Manual compilation": needs MPICH,
+#      LAPACKE/Accelerate, NLopt; `make all` produces `MAGEMin`).
+#   2. Copy the executable to `engines/magemin/bin/MAGEMin`. That ignored path
+#      is the adapter's canonical subprocess auto-detect location; no Python
+#      package install is needed.
 #   3. Optional Julia bridge: `pip install juliacall` then add `MAGEMin_C`
 #      from the Julia REPL (`] add MAGEMin_C`). The adapter probes a `julia`
 #      bridge but the subprocess path is the supported default.

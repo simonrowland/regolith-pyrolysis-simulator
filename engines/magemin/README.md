@@ -37,3 +37,7 @@ averages (binding spec §7).
 Compiled `MAGEMin` binary + libs under `engines/magemin/bin/` and
 `engines/magemin/lib/` are gitignored. Only the provider/domain/parity
 Python modules here are tracked.
+
+Canonical local subprocess path: `engines/magemin/bin/MAGEMin`. Build the
+MAGEMin source tree outside synced repo storage, then copy only the executable
+to that path so `simulator/melt_backend/magemin.py::initialize()` finds it.
