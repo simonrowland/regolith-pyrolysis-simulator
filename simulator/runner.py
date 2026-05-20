@@ -5,16 +5,16 @@ non-streaming run path.  Two consumers:
 
 * The ``python -m simulator.runner`` CLI emits a fully-specified JSON
   result document via :class:`PyrolysisRun`.
-* ``web/events.py`` reuses the same internals (loader, decision
-  auto-apply, per-hour summary builder) so the SocketIO live stream
-  yields the same per-hour shape the CLI commits to fixtures.
+* ``SimSession`` owns the command core; this runner uses its AUTO_APPLY
+  driver and emits the fully-specified JSON result document.
 
 Goal #18 ``JSON-RUNNER-HARNESS`` invariants this module owns:
 
 * No new physics: the runner orchestrates ``PyrolysisSimulator.step``;
   it never reaches into the kernel commit path or the ledger directly.
-* No branching of the physics path: web vs CLI both call
-  :meth:`PyrolysisRun.run` or :meth:`PyrolysisRun.iter_hours`.
+* No branching of the physics path: batch surfaces drive
+  :class:`simulator.session.SimSession`, which orchestrates
+  ``PyrolysisSimulator.step``.
 * Deterministic JSON output: any wall-clock fields (``started_at_utc``,
   ``kernel_commit_sha``) accept caller-supplied overrides so golden
   fixtures stay stable across machines and time.
@@ -38,20 +38,23 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Mapping, Optional
+from typing import Any, Mapping, Optional
 
 import yaml
 
 from simulator.backends import (
     BackendSelectionPolicy,
-    SimulatorBuildConfig,
-    build_simulator,
-    resolve_backend,
 )
 from simulator.core import (
     BACKEND_FALLBACK_EXCEPTIONS,
     CampaignPhase,
     PyrolysisSimulator,
+)
+from simulator.session import (
+    DecisionPolicy,
+    SimSession,
+    SimSessionConfig,
+    drive_session,
 )
 from simulator.state import HourSnapshot, MOLAR_MASS
 
@@ -261,11 +264,6 @@ class PyrolysisRun:
     # values.  Production CLI invocations leave both empty and pick up
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
-    # Pre-built simulator handle for the web-stream path: when set,
-    # ``iter_hours`` reuses the existing simulator without rebuilding
-    # it.  CLI / golden-file paths always rebuild via ``_build_sim``.
-    simulator: Optional[PyrolysisSimulator] = None
-
     # ------------------------------------------------------------------
     # Run entry points
     # ------------------------------------------------------------------
@@ -279,15 +277,29 @@ class PyrolysisRun:
         diff failure reasons without parsing stderr.
         """
 
-        sim = self._build_sim()
+        session = self._start_session()
+        return self._run_session(session)
+
+    def _start_session(self) -> SimSession:
+        session = SimSession()
+        session.start(self._session_config())
+        return session
+
+    def _run_session(self, session: SimSession) -> dict:
+        sim = session.simulator
         per_hour: list[dict] = []
         operator_decisions: list[dict] = []
         status = "ok"
         error_message = ""
 
         try:
-            for frame in self._step_loop(sim, operator_decisions):
-                per_hour.append(frame["per_hour_summary"])
+            for result in drive_session(
+                session,
+                self.hours,
+                DecisionPolicy.AUTO_APPLY,
+                operator_decisions=operator_decisions,
+            ):
+                per_hour.append(result.per_hour_summary)
             # Status semantics:
             #   * "ok"      -- the run consumed its full hour budget and
             #                  the simulator is either mid-batch or
@@ -307,95 +319,21 @@ class PyrolysisRun:
             error_message = f"{type(exc).__name__}: {exc}"
 
         shadow_trace = self._collect_shadow_trace(sim, operator_decisions)
-        return self._build_output(
+        document = self._build_output(
             sim=sim,
             per_hour=per_hour,
             shadow_trace=shadow_trace,
             status=status,
             error_message=error_message,
         )
-
-    def iter_hours(
-        self,
-        sim: Optional[PyrolysisSimulator] = None,
-    ) -> Iterator[dict]:
-        """Yield ``{snapshot, per_hour_summary}`` once per simulated hour.
-
-        Used by the SocketIO live stream so the web UI sees the same
-        per-hour summary that the CLI commits to its output document.
-        When ``sim`` is provided the caller is the web stream and owns
-        the simulator's lifecycle (so decisions, pause, parameter
-        adjustments flow through the SocketIO handlers).  When ``sim``
-        is ``None`` we own the simulator (CLI path).
-
-        Each yielded dict carries:
-
-        * ``snapshot`` -- the raw :class:`HourSnapshot` (web stream
-          uses this to build its tick payload).
-        * ``per_hour_summary`` -- the runner-format per-hour entry.
-        * ``operator_decision`` (optional) -- present on the frame that
-          auto-applied a decision, so the web stream can emit a
-          ``decision_required`` event after the tick (preserving its
-          existing semantics).
-        """
-
-        sim = sim or self._build_sim()
-        operator_decisions: list[dict] = []
-        for frame in self._step_loop(sim, operator_decisions):
-            yield frame
+        session._set_result_document(document)
+        return document
 
     # ------------------------------------------------------------------
-    # Step orchestration
+    # Session construction
     # ------------------------------------------------------------------
 
-    def _step_loop(
-        self,
-        sim: PyrolysisSimulator,
-        operator_decisions: list[dict],
-    ) -> Iterator[dict]:
-        """Drive ``sim.step()`` for up to ``self.hours`` hours.
-
-        Auto-applies any pending decision using
-        ``DecisionPoint.recommendation``; each application appends an
-        ``operator_decision`` record to ``operator_decisions`` so the
-        runner can emit it via shadow_trace.
-        """
-
-        for _ in range(self.hours):
-            if sim.is_complete():
-                return
-            if sim.paused_for_decision and sim.pending_decision is not None:
-                decision = sim.pending_decision
-                choice = decision.recommendation or (
-                    decision.options[0] if decision.options else ""
-                )
-                event = {
-                    "event": "operator_decision",
-                    "hour": sim.melt.hour,
-                    "decision_type": decision.decision_type.name,
-                    "choice": choice,
-                    "recommendation": decision.recommendation,
-                    "options": list(decision.options),
-                    "context": decision.context,
-                }
-                operator_decisions.append(event)
-                sim.apply_decision(decision.decision_type, choice)
-                if sim.is_complete():
-                    return
-            snapshot = sim.step()
-            yield {
-                "snapshot": snapshot,
-                "per_hour_summary": build_per_hour_summary(sim, snapshot),
-            }
-
-    # ------------------------------------------------------------------
-    # Simulator construction
-    # ------------------------------------------------------------------
-
-    def _build_sim(self) -> PyrolysisSimulator:
-        if self.simulator is not None:
-            return self.simulator
-
+    def _session_config(self) -> SimSessionConfig:
         feedstocks = self._load_feedstocks()
         setpoints = self._load_setpoints()
         if self.allow_fallback_vapor or self.force_builtin_vapor_pressure:
@@ -404,65 +342,26 @@ class PyrolysisRun:
             kernel_config["allow_fallback_vapor"] = True
             setpoints["chemistry_kernel"] = kernel_config
         vapor_pressures = self._load_vapor_pressures()
-        if self.feedstock_id not in feedstocks:
-            raise RunnerError(
-                f"unknown feedstock {self.feedstock_id!r}; expected one of "
-                f"{sorted(feedstocks)[:5]}..."
-            )
-
-        backend = self._build_backend()
-        sim = build_simulator(
-            SimulatorBuildConfig(
-                backend=backend,
-                setpoints=setpoints,
-                feedstocks=feedstocks,
-                vapor_pressures=vapor_pressures,
-            )
-        )
-        try:
-            sim.load_batch(
-                self.feedstock_id,
-                self.mass_kg,
-                additives_kg=dict(self.additives_kg),
-            )
-        except ValueError as exc:
-            raise RunnerError(f"load_batch failed: {exc}") from exc
-
-        if self.force_builtin_vapor_pressure:
-            _force_builtin_vapor_pressure(sim)
-
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
             self.campaign, self.campaign)
-        try:
-            campaign_phase = CampaignPhase[campaign_name]
-        except KeyError as exc:
-            valid = ", ".join(member.name for member in CampaignPhase)
-            raise RunnerError(
-                f"unknown campaign {self.campaign!r}; valid options: {valid}"
-            ) from exc
-
-        if self.track == "mre_baseline":
-            sim.record.track = "mre_baseline"
-        sim.start_campaign(campaign_phase)
-
-        # Apply setpoints overrides through the campaign manager's
-        # public override map.  Numeric coercion keeps the runner
-        # tolerant of YAML-loaded values that arrive as strings.
-        for camp, overrides in self.setpoints_overrides.items():
-            if not isinstance(overrides, Mapping):
-                raise RunnerError(
-                    f"setpoints_overrides[{camp!r}] must be a mapping"
-                )
-            target = sim.campaign_mgr.overrides.setdefault(str(camp), {})
-            for field_name, value in overrides.items():
-                target[str(field_name)] = float(value)
-        return sim
-
-    def _build_backend(self):
-        return resolve_backend(
-            self.backend_name,
-            BackendSelectionPolicy.RUNNER_STRICT,
+        return SimSessionConfig(
+            feedstock_id=self.feedstock_id,
+            feedstocks=feedstocks,
+            setpoints=setpoints,
+            vapor_pressures=vapor_pressures,
+            campaign=campaign_name,
+            backend_name=self.backend_name,
+            backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+            mass_kg=self.mass_kg,
+            additives_kg=dict(self.additives_kg),
+            setpoints_overrides=dict(self.setpoints_overrides),
+            track=self.track,
             unavailable_error_cls=RunnerError,
+            force_builtin_vapor_pressure=(
+                _force_builtin_vapor_pressure
+                if self.force_builtin_vapor_pressure
+                else None
+            ),
         )
 
     def _load_feedstocks(self) -> dict:
@@ -1013,7 +912,8 @@ def build_sio_yield_report(
         force_builtin_vapor_pressure=True,
         setpoints_overrides=setpoints_overrides,
     )
-    sim = base_run._build_sim()
+    session = base_run._start_session()
+    sim = session.simulator
     _prepare_sio_campaign_start(
         sim,
         t_low_c=t_low_c,
@@ -1030,8 +930,7 @@ def build_sio_yield_report(
         initial_balances.get("process.cleaned_melt", {}).get("SiO2", 0.0)
     )
 
-    run = dataclasses.replace(base_run, simulator=sim)
-    result = run.run()
+    result = base_run._run_session(session)
     if result.get("status") == "failed":
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
 
