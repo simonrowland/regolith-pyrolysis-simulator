@@ -42,6 +42,12 @@ from typing import Any, Iterator, Mapping, Optional
 
 import yaml
 
+from simulator.backends import (
+    BackendSelectionPolicy,
+    SimulatorBuildConfig,
+    build_simulator,
+    resolve_backend,
+)
 from simulator.core import (
     BACKEND_FALLBACK_EXCEPTIONS,
     CampaignPhase,
@@ -405,7 +411,14 @@ class PyrolysisRun:
             )
 
         backend = self._build_backend()
-        sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+        sim = build_simulator(
+            SimulatorBuildConfig(
+                backend=backend,
+                setpoints=setpoints,
+                feedstocks=feedstocks,
+                vapor_pressures=vapor_pressures,
+            )
+        )
         try:
             sim.load_batch(
                 self.feedstock_id,
@@ -446,42 +459,11 @@ class PyrolysisRun:
         return sim
 
     def _build_backend(self):
-        from simulator.melt_backend.base import StubBackend
-
-        if self.backend_name in ("", "stub"):
-            backend = StubBackend()
-            backend.initialize({})
-            return backend
-        if self.backend_name == "alphamelts":
-            from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-
-            backend = AlphaMELTSBackend()
-            if backend.initialize({}) and backend.is_available():
-                return backend
-            raise RunnerError(
-                "AlphaMELTS unavailable; rerun with --backend=stub or "
-                "install via install-dependencies.py"
-            )
-        if self.backend_name == "factsage":
-            from simulator.melt_backend.factsage import FactSAGEBackend
-            from simulator.melt_backend.factsage_config import (
-                FactSAGEConfigError,
-                load_factsage_config,
-            )
-
-            try:
-                config = load_factsage_config()
-            except FactSAGEConfigError as exc:
-                raise RunnerError(
-                    f"FactSAGE config error: {exc}; rerun with --backend=stub"
-                ) from exc
-            backend = FactSAGEBackend()
-            if backend.initialize(config) and backend.is_available():
-                return backend
-            raise RunnerError(
-                "FactSAGE unavailable; rerun with --backend=stub"
-            )
-        raise RunnerError(f"unknown backend {self.backend_name!r}")
+        return resolve_backend(
+            self.backend_name,
+            BackendSelectionPolicy.RUNNER_STRICT,
+            unavailable_error_cls=RunnerError,
+        )
 
     def _load_feedstocks(self) -> dict:
         path = self.feedstocks_path or (DATA_DIR / "feedstocks.yaml")
