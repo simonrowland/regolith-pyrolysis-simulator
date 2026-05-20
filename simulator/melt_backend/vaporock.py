@@ -402,7 +402,7 @@ class VapoRockBackend(MeltBackend):
         )
 
         try:
-            vapor_pressures_Pa = self._call_vaporock(
+            vaporock_full_speciation_Pa = self._call_vaporock(
                 composition_wt_pct=comp_wt,
                 temperature=temperature_value,
                 pressure=pressure_value,
@@ -428,14 +428,20 @@ class VapoRockBackend(MeltBackend):
         # assemblage.  ledger_transition is left None: VapoRock holds no
         # AtomLedger authority (see the module "Authority posture" note —
         # this adapter is not safe to select as the active backend).
-        return EquilibriumResult(
+        result = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             status='ok',
             warnings=list(prior_warnings),
-            vapor_pressures_Pa=vapor_pressures_Pa,
+            vapor_pressures_Pa=dict(vaporock_full_speciation_Pa),
         )
+        setattr(
+            result,
+            'vaporock_full_speciation_Pa',
+            dict(vaporock_full_speciation_Pa),
+        )
+        return result
 
     # ------------------------------------------------------------------
     # Library boundary

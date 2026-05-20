@@ -9,6 +9,13 @@
 #   Mg at 1600 C: ~0.5 bar → 5e4 Pa
 #   SiO at 1600 C (vacuum): 0.5-2 mbar → 50-200 Pa
 #   Ca at 1484 C (bp): significant above 1500 C
+#
+# VapoRock structural-species note (2026-05-20): K and O2 should be
+# treated as VapoRock-authoritative when VapoRock is available. Antoine
+# entries here are fallback-only approximations and intentionally narrower
+# than VapoRock's full JANAF gas speciation. O2 is not listed as an
+# evaporating species because it has no single parent oxide; VapoRock may
+# expose it through the read-only vaporock_full_speciation_Pa diagnostic.
 
 metals:
   Na:
@@ -48,7 +55,11 @@ metals:
     valid_range_K: [337, 1800]
     boiling_point_C: 759
     condensation_T_C_at_1mbar: 420
-    notes: "More volatile than Na. ΔH_vap ≈ 95.0 kJ/mol."
+    notes: |
+      More volatile than Na. ΔH_vap ≈ 95.0 kJ/mol.
+      VapoRock-authoritative structural species when VapoRock is available;
+      Antoine coefficients are fallback-only approximations, not a refit to
+      the full VapoRock composition/fO2 response.
 
   Mg:
     formula: "Mg"

@@ -1162,6 +1162,16 @@ def build_sio_yield_report(
                 operating_entry.get("regime_factor", 1.0) or 1.0
             ),
         }
+        vapor_pressure_diagnostic = dict(
+            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+        )
+        vaporock_full_speciation = dict(
+            vapor_pressure_diagnostic.get("vaporock_full_speciation_Pa") or {}
+        )
+        if vaporock_full_speciation:
+            diagnostics["vaporock_full_speciation_Pa"] = (
+                vaporock_full_speciation
+            )
         return report, diagnostics
     return report
 

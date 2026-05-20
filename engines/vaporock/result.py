@@ -12,7 +12,10 @@ of this class (projected to a plain dict) on
 Schema (matches the shape downstream evaporation expects from the
 builtin Antoine path so the swap is invisible to consumers):
 
-* ``vapor_pressures_Pa`` -- ``species -> Pa`` map.
+* ``vapor_pressures_Pa`` -- filtered ``species -> Pa`` map consumed by
+  the evaporation path.
+* ``vaporock_full_speciation_Pa`` -- unfiltered VapoRock gas speciation
+  map for diagnostics, benchmarks, and cross-engine analysis only.
 * ``activities`` -- ``species -> activity`` map (matches the
   Builtin-side ``a_oxide`` proxy; left empty for VapoRock which has
   no per-oxide activity surface).
@@ -40,6 +43,9 @@ class VapoRockDiagnostics:
     """Frozen diagnostic payload returned by :class:`VapoRockProvider`."""
 
     vapor_pressures_Pa: Mapping[str, float] = field(default_factory=dict)
+    vaporock_full_speciation_Pa: Mapping[str, float] = field(
+        default_factory=dict
+    )
     activities: Mapping[str, float] = field(default_factory=dict)
     pO2_bar: float = 0.0
     mode: str = 'unavailable'
@@ -62,6 +68,16 @@ class VapoRockDiagnostics:
             {
                 str(k): float(v)
                 for k, v in dict(self.activities or {}).items()
+            },
+        )
+        object.__setattr__(
+            self,
+            'vaporock_full_speciation_Pa',
+            {
+                str(k): float(v)
+                for k, v in dict(
+                    self.vaporock_full_speciation_Pa or {}
+                ).items()
             },
         )
         object.__setattr__(self, 'pO2_bar', float(self.pO2_bar))
