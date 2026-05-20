@@ -109,6 +109,7 @@ SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     },
 }
 SIO_SLOW_FOULING_WALL_DEPOSIT_KG = 1.0e-6
+SIO_WALL_SWEEP_EVOLVED_REL_TOL = 1.0e-6
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -1586,7 +1587,7 @@ def _sio_wall_sweep_thresholds(
         ]
         crossing = None
         for row in sorted(mode_rows, key=lambda item: float(item["liner_temperature_C"])):
-            if float(row["total_wall_deposit_kg"]) <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG:
+            if float(row["sio_wall_deposit_kg"]) <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG:
                 crossing = row
                 break
         thresholds[f"{feedstock_id}:{pO2_mode}"] = {
@@ -1594,8 +1595,57 @@ def _sio_wall_sweep_thresholds(
                 None if crossing is None else crossing["liner_temperature_C"]
             ),
             "slow_fouling_wall_deposit_kg": SIO_SLOW_FOULING_WALL_DEPOSIT_KG,
+            "basis": "sio_wall_deposit_kg",
         }
     return thresholds
+
+
+def _sio_wall_sweep_evolved_guard(
+    rows: list[Mapping[str, Any]],
+) -> dict[str, Any]:
+    checks: dict[str, dict[str, Any]] = {}
+    keys = sorted({(str(row["feedstock_id"]), str(row["pO2_mode"])) for row in rows})
+    max_relative_delta = 0.0
+
+    for feedstock_id, pO2_mode in keys:
+        mode_rows = [
+            row
+            for row in rows
+            if row["feedstock_id"] == feedstock_id
+            and row["pO2_mode"] == pO2_mode
+        ]
+        values = [float(row["sio_evolved_kg"]) for row in mode_rows]
+        evolved_min = min(values)
+        evolved_max = max(values)
+        denominator = max(abs(evolved_min), abs(evolved_max), 1.0e-300)
+        relative_delta = (evolved_max - evolved_min) / denominator
+        max_relative_delta = max(max_relative_delta, relative_delta)
+        checks[f"{feedstock_id}:{pO2_mode}"] = {
+            "evolved_min_kg": _clean_report_float(evolved_min),
+            "evolved_max_kg": _clean_report_float(evolved_max),
+            "relative_delta": _clean_report_float(relative_delta),
+            "passed": relative_delta <= SIO_WALL_SWEEP_EVOLVED_REL_TOL,
+        }
+
+    failed = [key for key, check in checks.items() if not check["passed"]]
+    if failed:
+        raise RunnerError(
+            "SiO evolved kg changed across wall temperature at fixed "
+            f"feedstock+pO2 mode beyond {SIO_WALL_SWEEP_EVOLVED_REL_TOL:g}: "
+            + ", ".join(failed)
+        )
+
+    # Phase 3-bis full sweep: no_suppress evolved kg was byte-identical
+    # across 1050-1600 C while wall deposit moved ~1.05e-2 kg to zero.
+    # Cross-pO2 deltas are allowed because the sqrt(pO2) suppression mode
+    # is meant to hold SiO in the melt and change evaporation.
+    return {
+        "scope": "fixed_feedstock_and_pO2_mode_wall_T_only",
+        "relative_tolerance": SIO_WALL_SWEEP_EVOLVED_REL_TOL,
+        "pO2_mode_allowed_to_differ": True,
+        "max_relative_delta": _clean_report_float(max_relative_delta),
+        "checks": checks,
+    }
 
 
 def _sio_wall_sweep_table(rows: list[Mapping[str, Any]]) -> str:
@@ -1640,6 +1690,7 @@ def _sio_wall_sweep_table(rows: list[Mapping[str, Any]]) -> str:
 def build_sio_wall_sweep_report_markdown(summary: Mapping[str, Any]) -> str:
     rows = list(summary.get("rows", []))
     thresholds = summary.get("thresholds", {})
+    evolved_guard = summary.get("evolved_invariant_guard", {})
     lines = [
         "# SiO Wall-Deposit Sweep",
         "",
@@ -1650,7 +1701,8 @@ def build_sio_wall_sweep_report_markdown(summary: Mapping[str, Any]) -> str:
         "Regime factor: Kn/(Kn + 0.01), with Kn = mean_free_path / pipe_diameter.",
         "",
         "Slow-fouling threshold: "
-        f"{SIO_SLOW_FOULING_WALL_DEPOSIT_KG:.1e} kg total wall deposit per campaign.",
+        f"{SIO_SLOW_FOULING_WALL_DEPOSIT_KG:.1e} kg SiO wall deposit per campaign. "
+        "Non-SiO condensate and liner chemical attack are outside this SiO-fouling verdict.",
         "",
         "## Thresholds",
         "",
@@ -1661,6 +1713,32 @@ def build_sio_wall_sweep_report_markdown(summary: Mapping[str, Any]) -> str:
         threshold = value.get("threshold_liner_temperature_C")
         rendered = "not crossed" if threshold is None else f"{float(threshold):g}"
         lines.append(f"| {key} | {rendered} |")
+    lines.extend(
+        [
+            "",
+            "## Evolved-Total Guard",
+            "",
+            "Wall-T invariance is checked only at fixed feedstock+pO2 mode; "
+            "pO2 modes are allowed to differ because suppression changes evaporation.",
+            "",
+            "| case | evolved_min_kg | evolved_max_kg | relative_delta | passed |",
+            "|---|---:|---:|---:|---|",
+        ]
+    )
+    for key, value in sorted(evolved_guard.get("checks", {}).items()):
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    key,
+                    f"{float(value['evolved_min_kg']):.12g}",
+                    f"{float(value['evolved_max_kg']):.12g}",
+                    f"{float(value['relative_delta']):.3e}",
+                    str(bool(value["passed"])),
+                )
+            )
+            + " |"
+        )
     lines.extend(["", "## Sweep Table", "", _sio_wall_sweep_table(rows), ""])
     return "\n".join(lines)
 
@@ -1741,12 +1819,14 @@ def run_sio_wall_sweep(
         writer.writerows(rows)
 
     thresholds = _sio_wall_sweep_thresholds(rows)
+    evolved_invariant_guard = _sio_wall_sweep_evolved_guard(rows)
     return {
         "schema_version": SIO_WALL_SWEEP_SCHEMA_VERSION,
         "campaign": SIO_YIELD_CAMPAIGN,
         "cell_count": len(rows),
         "rows": _sort_sio_wall_sweep_rows(rows),
         "thresholds": thresholds,
+        "evolved_invariant_guard": evolved_invariant_guard,
         "output_dir": str(output_dir),
     }
 

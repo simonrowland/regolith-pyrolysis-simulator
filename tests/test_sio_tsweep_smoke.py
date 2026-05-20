@@ -126,7 +126,7 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
             "--wall-t-grid",
             "1100,1500",
             "--pO2-modes",
-            "no_suppress",
+            "no_suppress,o2_1mbar",
             "--output-dir",
             str(output_dir),
             "--summary-output",
@@ -141,9 +141,25 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
 
     assert completed.returncode == 0, completed.stderr
     rows = _read_index(output_dir)
-    assert len(rows) == 2
+    assert len(rows) == 4
     assert tuple(rows[0]) == EXPECTED_WALL_COLUMNS
     assert summary_path.exists()
     assert "SiO Wall-Deposit Sweep" in report_path.read_text()
     for row in rows:
         assert float(row["mass_balance_err_pct"]) <= MASS_BALANCE_LIMIT_PCT
+
+    summary = json.loads(summary_path.read_text())
+    guard = summary["evolved_invariant_guard"]
+    assert guard["relative_tolerance"] == pytest.approx(1.0e-6)
+    assert guard["pO2_mode_allowed_to_differ"] is True
+    assert guard["checks"]["lunar_mare_low_ti:no_suppress"]["passed"] is True
+    assert guard["checks"]["lunar_mare_low_ti:o2_1mbar"]["passed"] is True
+    thresholds = summary["thresholds"]
+    assert thresholds["lunar_mare_low_ti:no_suppress"]["basis"] == "sio_wall_deposit_kg"
+    assert thresholds["lunar_mare_low_ti:o2_1mbar"]["threshold_liner_temperature_C"] == 1100.0
+    evolved_by_mode = {
+        row["pO2_mode"]: float(row["sio_evolved_kg"])
+        for row in rows
+        if row["liner_temperature_C"] == "1100.0"
+    }
+    assert evolved_by_mode["o2_1mbar"] < evolved_by_mode["no_suppress"] * 1.0e-5
