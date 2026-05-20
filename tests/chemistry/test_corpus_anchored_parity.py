@@ -23,8 +23,9 @@ Why we replace the registry's provider before dispatch
 The default :class:`VapoRockProvider` instantiated by
 ``PyrolysisSimulator.__init__`` is constructed with the
 ``data/vapor_pressures.yaml`` payload, which restricts the diagnostic
-``vapor_pressures_Pa`` surface to the species ``EVAPORATION_FLUX``
-knows how to consume (Na, K, Mg, Fe, Ca, Al, Cr, Mn, Ti, SiO, FeO_vapor).
+``vapor_pressures_Pa`` surface to the metal and declared oxide-vapor
+species ``EVAPORATION_FLUX`` knows how to consume (for example SiO and
+CrO2, with Fe represented by metallic Fe rather than FeO vapor).
 That filter is correct for production — emitting a broader species set
 crashes the downstream stoichiometry validator — but the §25 grid asks
 for SiO2 and O2 partial pressures too, which the filter drops. The test
