@@ -261,16 +261,6 @@ oxide_vapors:
       fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
       supplies CrO2(g) thermochemistry over 1100-6000 K.
 
-  FeO_vapor:
-    formula: "FeO"
-    molar_mass_g_mol: 71.84
-    antoine:
-      A: 11.0
-      B: 22000
-      C: 0
-    valid_range_K: [1800, 3000]
-    notes: "Minor vapor species. Most Fe evaporates as metallic Fe, not FeO."
-
 # Condensation temperature reference (at ~1 mbar partial pressure)
 # Used by condensation train model for species routing
 condensation_reference_at_1mbar:

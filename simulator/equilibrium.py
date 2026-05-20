@@ -301,10 +301,11 @@ class EquilibriumMixin:
                 vapor_pressures[species] = P_effective_Pa
 
         # ================================================================
-        # OXIDE VAPOR SPECIES (SiO, FeO_vapor)                   [THERMO-8]
+        # OXIDE VAPOR SPECIES (SiO, CrO2)                        [THERMO-8]
         # ================================================================
         #
-        # These evaporate as oxide gases, not as metals.
+        # These evaporate as oxide gases, not as metals. Fe is intentionally
+        # modeled through the metallic-Fe path above, not as FeO vapor.
         # SiO₂(melt) → SiO(g) + ½O₂(g), with p(SiO) ∝ 1/√pO₂.
         # The Antoine equation gives the reference vapor pressure,
         # then the √pO₂ suppression and oxide activity are applied.

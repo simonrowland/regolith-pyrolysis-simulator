@@ -699,8 +699,8 @@ def test_evaporation_flux_consults_commanded_po2_for_oxide_vapors():
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():
-    """_stub_equilibrium only ever writes metal + oxide vapors (SiO,
-    FeO_vapor) into vapor_pressures_Pa -- never an 'O2' key. This pins the
+    """_stub_equilibrium only ever writes metal + declared oxide vapors
+    into vapor_pressures_Pa -- never an 'O2' key. This pins the
     Finding 2 dead-branch removal in _calculate_evaporation: the
     `if species == 'O2'` ambient-pressure branch was unreachable because
     'O2' is never a vapor species. Do not re-add it."""
