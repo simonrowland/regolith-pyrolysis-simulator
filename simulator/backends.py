@@ -133,6 +133,15 @@ def _resolve_web_autodetect(
             "dispatcher; select alphamelts, factsage, or auto."
         )
 
+    # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
+    # only 'auto'/''/unknown fall through to the AlphaMELTS->FactSAGE->Stub
+    # autodetect chain. (Previously 'stub' silently autodetected, so a caller
+    # asking for the deterministic stub got AlphaMELTS when it was available.)
+    if name == "stub":
+        backend = _stub_backend(stub_backend_cls)
+        _log_selection(backend, log_selection, log_message)
+        return backend
+
     if name == "alphamelts":
         backend = _try_alphamelts(alphamelts_backend_cls)
         if backend is not None:
