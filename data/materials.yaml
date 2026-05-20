@@ -1,0 +1,62 @@
+# Minimal liner-material surface data for Chunk A of the SiO wall-deposit
+# campaign. Values intentionally preserve the pre-existing train constants:
+# temp_range_C mirrors CondensationTrain.create_default(), and alpha_s values
+# are migrated from simulator/condensation.py STICKING_COEFF at baseline
+# 251481c. Do not tune these as golden fixtures.
+#
+# max_service_T_C is recorded for the liner/surface contract and defaults to
+# the stage high temperature in Chunk A. Chunk C owns pressure coupling and
+# operational material-temperature sequencing.
+
+default_alpha_s_by_species: &default_alpha_s_by_species
+  Fe: 0.9
+  SiO: 0.7
+  CrO2: 0.9
+  Mg: 0.8
+  Na: 0.95
+  K: 0.95
+  Ca: 0.85
+  Mn: 0.85
+  Cr: 0.9
+
+stages:
+  0:
+    liner_material: hot_duct_refractory_liner
+    temp_range_C: [1400, 1600]
+    max_service_T_C: 1600
+    alpha_s_by_species: *default_alpha_s_by_species
+  1:
+    liner_material: fe_condenser_liner
+    temp_range_C: [1100, 1400]
+    max_service_T_C: 1400
+    alpha_s_by_species: *default_alpha_s_by_species
+  2:
+    liner_material: cr_oxide_cartridge_liner
+    temp_range_C: [1100, 1300]
+    max_service_T_C: 1300
+    alpha_s_by_species: *default_alpha_s_by_species
+  3:
+    liner_material: fused_silica_baffles
+    temp_range_C: [900, 1200]
+    max_service_T_C: 1200
+    alpha_s_by_species: *default_alpha_s_by_species
+  4:
+    liner_material: alkali_mg_cyclone_liner
+    temp_range_C: [350, 700]
+    max_service_T_C: 700
+    alpha_s_by_species: *default_alpha_s_by_species
+  5:
+    liner_material: vortex_dust_filter_liner
+    temp_range_C: [200, 350]
+    max_service_T_C: 350
+    alpha_s_by_species: *default_alpha_s_by_species
+  6:
+    liner_material: turbine_compressor_liner
+    temp_range_C: [50, 200]
+    max_service_T_C: 200
+    alpha_s_by_species: *default_alpha_s_by_species
+  7:
+    liner_material: turbine_outlet_monitor_liner
+    temp_range_C: [20, 50]
+    max_service_T_C: 50
+    alpha_s_by_species: *default_alpha_s_by_species
