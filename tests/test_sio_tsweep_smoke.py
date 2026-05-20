@@ -18,6 +18,23 @@ EXPECTED_COLUMNS = (
     "stage3_silica_kg",
     "mass_balance_err_pct",
 )
+EXPECTED_WALL_COLUMNS = (
+    "cell_id",
+    "feedstock_id",
+    "pO2_mode",
+    "pO2_mbar",
+    "liner_temperature_C",
+    "overhead_pressure_mbar",
+    "knudsen_number",
+    "regime_factor",
+    "sio_wall_deposit_kg",
+    "total_wall_deposit_kg",
+    "stage3_silica_kg",
+    "sio_evolved_kg",
+    "sio_yield_pct_of_feedstock",
+    "mass_balance_err_pct",
+    "closure_error_pct",
+)
 MASS_BALANCE_LIMIT_PCT = 5.0e-12
 
 
@@ -93,3 +110,40 @@ def test_sio_tsweep_single_cell_deterministic(tmp_path, feedstock):
 
     assert metrics[1] == metrics[0]
     assert metrics[2] == metrics[0]
+
+
+def test_sio_wall_sweep_cli_smoke(tmp_path):
+    output_dir = tmp_path / "wall-sweep"
+    summary_path = tmp_path / "wall-summary.json"
+    report_path = tmp_path / "wall-report.md"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner.sio_wall_sweep",
+            "--feedstocks",
+            "lunar_mare_low_ti",
+            "--wall-t-grid",
+            "1100,1500",
+            "--pO2-modes",
+            "no_suppress",
+            "--output-dir",
+            str(output_dir),
+            "--summary-output",
+            str(summary_path),
+            "--report-output",
+            str(report_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    rows = _read_index(output_dir)
+    assert len(rows) == 2
+    assert tuple(rows[0]) == EXPECTED_WALL_COLUMNS
+    assert summary_path.exists()
+    assert "SiO Wall-Deposit Sweep" in report_path.read_text()
+    for row in rows:
+        assert float(row["mass_balance_err_pct"]) <= MASS_BALANCE_LIMIT_PCT

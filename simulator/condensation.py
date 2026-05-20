@@ -58,13 +58,15 @@ from simulator.state import MOLAR_MASS
 
 BOLTZMANN_CONSTANT_J_K = 1.380649e-23
 AVOGADRO_MOL = 6.02214076e23
-REGIME_FACTOR_KN_PLACEHOLDER = 1.0
 HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_FRACTION_KEY = '_wall_deposit_fraction'
 WALL_DEPOSIT_ACCOUNT_KEY = '_wall_deposit_account'
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
+DEFAULT_PIPE_DIAMETER_M = 0.12
+N2_COLLISION_DIAMETER_M = 3.7e-10
+CONTINUUM_BUFFER_KN = 0.01
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C)
@@ -158,6 +160,12 @@ class CondensationModel:
             else _default_pipe_surface_area_m2()
         )
         self.wall_temperature_C = float(wall_temperature_C)
+        self.overhead_pressure_mbar = 0.0
+        self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        self.gas_temperature_C = float(wall_temperature_C)
+        self.knudsen_number = math.inf
+        self.regime_factor = 1.0
+        self.operating_history: list[dict[str, float | str]] = []
 
         # Default residence time per stage (seconds)
         # In a real design, this comes from equipment sizing
@@ -171,6 +179,48 @@ class CondensationModel:
             6: 0.2,    # Turbine — very fast
             7: 0.0,    # Accumulator — no condensation
         }
+
+    def configure_operating_conditions(
+        self,
+        *,
+        wall_temperature_C: float | None = None,
+        overhead_pressure_mbar: float | None = None,
+        pipe_diameter_m: float | None = None,
+        gas_temperature_C: float | None = None,
+        campaign_name: str | None = None,
+        campaign_hour: float | None = None,
+    ) -> None:
+        """Update tick-local wall and Knudsen conditions for cached models."""
+
+        if wall_temperature_C is not None:
+            self.wall_temperature_C = float(wall_temperature_C)
+        if pipe_diameter_m is not None:
+            self.pipe_diameter_m = max(1.0e-9, float(pipe_diameter_m))
+        if gas_temperature_C is not None:
+            self.gas_temperature_C = float(gas_temperature_C)
+        elif wall_temperature_C is not None:
+            self.gas_temperature_C = float(wall_temperature_C)
+        if overhead_pressure_mbar is not None:
+            self.overhead_pressure_mbar = max(0.0, float(overhead_pressure_mbar))
+        pressure_pa = self.overhead_pressure_mbar * 100.0
+        gas_temperature_K = max(self.gas_temperature_C + 273.15, 1.0)
+        self.knudsen_number = _knudsen_number(
+            pressure_pa,
+            gas_temperature_K,
+            self.pipe_diameter_m,
+        )
+        self.regime_factor = _knudsen_regime_factor(self.knudsen_number)
+        if overhead_pressure_mbar is not None:
+            self.operating_history.append(
+                {
+                    "campaign": str(campaign_name or ""),
+                    "campaign_hour": 0.0 if campaign_hour is None else float(campaign_hour),
+                    "wall_temperature_C": float(self.wall_temperature_C),
+                    "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
+                    "knudsen_number": float(self.knudsen_number),
+                    "regime_factor": float(self.regime_factor),
+                }
+            )
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
@@ -300,7 +350,7 @@ class CondensationModel:
 
         T_wall_K = max(self.wall_temperature_C + 273.15, 1.0)
         flux = _hkl_surface_deposition_flux_mol_m2_s(
-            species, P_local_pa, T_wall_K, alpha_s,
+            species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
         )
         if flux <= 0.0:
             return 0.0
@@ -568,6 +618,7 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     P_local_pa: float,
     T_surface_K: float,
     alpha_s: float,
+    regime_factor: float = 1.0,
 ) -> float:
     P_sat_pa = _antoine_psat_pa(species, T_surface_K)
     if P_sat_pa is None:
@@ -575,14 +626,52 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
-    # Chunk C replaces this constant with pressure/Knudsen coupling.
     return (
         alpha_s
-        * REGIME_FACTOR_KN_PLACEHOLDER
+        * max(0.0, min(1.0, float(regime_factor)))
         * _hkl_impingement_flux_mol_m2_s(
             species, driving_pressure_pa, T_surface_K,
         )
     )
+
+
+def _mean_free_path_m(
+    pressure_pa: float,
+    T_K: float,
+    molecular_diameter_m: float = N2_COLLISION_DIAMETER_M,
+) -> float:
+    if pressure_pa <= 0.0:
+        return math.inf
+    if T_K <= 0.0 or molecular_diameter_m <= 0.0:
+        return 0.0
+    denominator = (
+        math.sqrt(2.0)
+        * math.pi
+        * molecular_diameter_m ** 2
+        * pressure_pa
+    )
+    if denominator <= 0.0:
+        return math.inf
+    return BOLTZMANN_CONSTANT_J_K * T_K / denominator
+
+
+def _knudsen_number(
+    pressure_pa: float,
+    T_K: float,
+    characteristic_length_m: float,
+) -> float:
+    if characteristic_length_m <= 0.0:
+        return math.inf
+    return _mean_free_path_m(pressure_pa, T_K) / characteristic_length_m
+
+
+def _knudsen_regime_factor(knudsen_number: float) -> float:
+    if not math.isfinite(knudsen_number):
+        return 1.0
+    if knudsen_number <= 0.0:
+        return 0.0
+    factor = knudsen_number / (knudsen_number + CONTINUUM_BUFFER_KN)
+    return max(0.0, min(1.0, factor))
 
 
 def _pressure_isolated_capture_budget_kg(

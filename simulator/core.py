@@ -195,6 +195,7 @@ DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'bleed_model': 'poiseuille',
     'conductance_kg_s_per_bar': None,
     'downstream_pressure_bar': None,
+    'liner_temperature_C': 1500.0,
 }
 BACKEND_FALLBACK_EXCEPTIONS = (RuntimeError, ImportError)
 STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
@@ -1169,6 +1170,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if model == 'lumped':
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
+
+    def _configure_condensation_operating_conditions(
+        self,
+        evap_flux: EvaporationFlux,
+    ) -> None:
+        transport = self.overhead_model.estimate_transport_state(
+            evap_flux,
+            self.melt,
+        )
+        self.condensation_model.configure_operating_conditions(
+            wall_temperature_C=transport['pipe_temperature_C'],
+            overhead_pressure_mbar=transport['pressure_mbar'],
+            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            gas_temperature_C=transport['pipe_temperature_C'],
+            campaign_name=getattr(self.melt.campaign, 'name', ''),
+            campaign_hour=float(self.melt.campaign_hour),
+        )
 
     def _headspace_downstream_pressure_bar(self) -> float:
         configured = self._overhead_headspace_config.get(
@@ -3496,6 +3514,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Send evaporated species through the 8-stage train.
         # Each stage collects species based on its temperature.
         if evap_flux.total_kg_hr > 0:
+            self._configure_condensation_operating_conditions(evap_flux)
             self._route_to_condensation(evap_flux)
 
         # --- 6. Update melt composition ---

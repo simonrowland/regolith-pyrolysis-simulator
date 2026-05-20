@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 
 from simulator.core import (
     EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
@@ -48,6 +48,7 @@ from simulator.core import (
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
+DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 
 
 class OverheadGasModel:
@@ -67,14 +68,27 @@ class OverheadGasModel:
         'bleed_model': 'poiseuille',
         'conductance_kg_s_per_bar': None,
         'downstream_pressure_bar': None,
+        'liner_temperature_C': DEFAULT_PIPE_TEMPERATURE_C,
     }
 
     def __init__(self, headspace_config: Optional[Mapping] = None):
         # Pipe geometry (default for 1-tonne batch)
         self.pipe_diameter_m = 0.12      # 12 cm
         self.pipe_length_m = 1.0         # crucible to first condenser
-        self.pipe_temperature_C = 1500   # hot-walled
+        self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C
+        self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C
         self.configure_headspace(headspace_config or {})
+
+    @property
+    def pipe_temperature_C(self) -> float:
+        """Current liner temperature after applying the active recipe schedule."""
+
+        return float(self._pipe_temperature_C)
+
+    @pipe_temperature_C.setter
+    def pipe_temperature_C(self, value: float) -> None:
+        self._pipe_temperature_C = max(0.0, float(value))
+        self._liner_temperature_config = self._pipe_temperature_C
 
     def configure_headspace(self, config: Mapping) -> None:
         merged = dict(self.DEFAULT_HEADSPACE_CONFIG)
@@ -86,6 +100,154 @@ class OverheadGasModel:
         self._bleed_model = str(merged.get('bleed_model') or 'poiseuille')
         self._conductance_override = merged.get('conductance_kg_s_per_bar')
         self._downstream_pressure_override = merged.get('downstream_pressure_bar')
+        self._liner_temperature_config = merged.get(
+            'liner_temperature_C',
+            merged.get('pipe_temperature_C', DEFAULT_PIPE_TEMPERATURE_C),
+        )
+        self._pipe_temperature_C = self.resolve_pipe_temperature_C()
+
+    def resolve_pipe_temperature_C(self, melt: Optional[MeltState] = None) -> float:
+        """Resolve scalar or scheduled liner temperature for the current tick."""
+
+        value = self._resolve_liner_temperature_value(
+            self._liner_temperature_config,
+            melt,
+        )
+        self._pipe_temperature_C = max(0.0, float(value))
+        return self._pipe_temperature_C
+
+    def estimate_transport_state(
+        self,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+    ) -> dict[str, float]:
+        """Estimate pipe pressure/capacity with the existing Poiseuille model."""
+
+        pipe_temperature_C = self.resolve_pipe_temperature_C(melt)
+        total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
+        p_mean_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        # Preserve the existing gas-transport path: Poiseuille conductance has
+        # historically used melt/gas temperature. The liner trajectory controls
+        # wall deposition and Kn diagnostics without changing evaporation totals.
+        conductance_temperature_C = float(melt.temperature_C)
+        conductance = self._pipe_conductance(p_mean_Pa, conductance_temperature_C)
+        pipe_conductance_kg_hr = conductance * 3600.0
+        if pipe_conductance_kg_hr > 0.0:
+            pipe_capacity_used_pct = (
+                total_evap_kg_hr / pipe_conductance_kg_hr * 100.0
+            )
+        else:
+            pipe_capacity_used_pct = 999.0 if total_evap_kg_hr > 0.0 else 0.0
+        if conductance > 0.0:
+            vapor_pressure_mbar = (total_evap_kg_hr / 3600.0) / conductance * 10.0
+        else:
+            vapor_pressure_mbar = 0.0
+        pressure_mbar = max(vapor_pressure_mbar, float(melt.p_total_mbar))
+        return {
+            'pipe_temperature_C': pipe_temperature_C,
+            'conductance_temperature_C': conductance_temperature_C,
+            'p_mean_Pa': p_mean_Pa,
+            'conductance_kg_s_per_bar': conductance,
+            'pipe_conductance_kg_hr': pipe_conductance_kg_hr,
+            'pipe_capacity_used_pct': pipe_capacity_used_pct,
+            'vapor_pressure_mbar': vapor_pressure_mbar,
+            'pressure_mbar': pressure_mbar,
+        }
+
+    def _resolve_liner_temperature_value(
+        self,
+        config: Any,
+        melt: Optional[MeltState],
+    ) -> float:
+        if isinstance(config, (int, float)):
+            return float(config)
+        if not isinstance(config, Mapping):
+            return DEFAULT_PIPE_TEMPERATURE_C
+
+        default_C = self._optional_float(
+            config.get('default_C'),
+            DEFAULT_PIPE_TEMPERATURE_C,
+        )
+        schedule = config.get('schedule', ())
+        if isinstance(schedule, Mapping):
+            schedule = schedule.get('segments', ())
+        if not isinstance(schedule, (list, tuple)):
+            return default_C
+
+        campaign_name = ''
+        campaign_hour = 0.0
+        absolute_hour = 0.0
+        if melt is not None:
+            campaign = getattr(melt, 'campaign', None)
+            campaign_name = str(getattr(campaign, 'name', campaign) or '')
+            campaign_hour = self._optional_float(
+                getattr(melt, 'campaign_hour', 0.0), 0.0)
+            absolute_hour = self._optional_float(getattr(melt, 'hour', 0.0), 0.0)
+
+        selected = None
+        for segment in schedule:
+            if not isinstance(segment, Mapping):
+                continue
+            if not self._campaign_matches(segment.get('campaign'), campaign_name):
+                continue
+            hour_basis = str(segment.get('hour_basis') or 'campaign')
+            hour = absolute_hour if hour_basis == 'absolute' else campaign_hour
+            start_hour = self._optional_float(
+                segment.get('from_campaign_hour', segment.get('start_hour')),
+                0.0,
+            )
+            end_raw = segment.get('to_campaign_hour', segment.get('end_hour'))
+            end_hour = None if end_raw is None else self._optional_float(end_raw, 0.0)
+            if hour < start_hour:
+                continue
+            if end_hour is not None and hour > end_hour:
+                selected = segment
+                continue
+            return self._interpolate_liner_segment(segment, hour, start_hour, end_hour)
+
+        if isinstance(selected, Mapping):
+            return self._optional_float(
+                selected.get('end_C', selected.get('start_C')),
+                default_C,
+            )
+        return default_C
+
+    @staticmethod
+    def _optional_float(value: Any, default: float) -> float:
+        try:
+            result = float(value)
+        except (TypeError, ValueError):
+            return float(default)
+        if not math.isfinite(result):
+            return float(default)
+        return result
+
+    @staticmethod
+    def _campaign_matches(configured: Any, campaign_name: str) -> bool:
+        if configured in (None, '', '*'):
+            return True
+        if isinstance(configured, str):
+            return configured == campaign_name
+        if isinstance(configured, (list, tuple, set)):
+            return campaign_name in {str(item) for item in configured}
+        return False
+
+    def _interpolate_liner_segment(
+        self,
+        segment: Mapping,
+        hour: float,
+        start_hour: float,
+        end_hour: Optional[float],
+    ) -> float:
+        start_C = self._optional_float(
+            segment.get('start_C', segment.get('temperature_C')),
+            DEFAULT_PIPE_TEMPERATURE_C,
+        )
+        end_C = self._optional_float(segment.get('end_C'), start_C)
+        if end_hour is None or end_hour <= start_hour:
+            return end_C
+        fraction = max(0.0, min(1.0, (hour - start_hour) / (end_hour - start_hour)))
+        return start_C + (end_C - start_C) * fraction
 
     def update(self, evap_flux: EvaporationFlux,
                melt: MeltState,
@@ -128,10 +290,9 @@ class OverheadGasModel:
         total_evap_kg_hr = evap_flux.total_kg_hr
 
         # ── Pipe conductance limit ──────────────────────── [PIPE-1]
-        p_mean_Pa = max(melt.p_total_mbar * 100.0, 1.0)  # at least 1 Pa
-        conductance = self._pipe_conductance(p_mean_Pa,
-                                               melt.temperature_C)
-        gas.pipe_conductance_kg_hr = conductance * 3600.0  # kg/s → kg/hr
+        transport_state = self.estimate_transport_state(evap_flux, melt)
+        conductance = transport_state['conductance_kg_s_per_bar']
+        gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']
         finite_conductance = self._resolve_bleed_conductance(
             conductance,
             bleed_conductance_kg_s_per_bar,
@@ -146,11 +307,7 @@ class OverheadGasModel:
         # ── Transport saturation ────────────────────────── [LOOP-3]
         # How much of the pipe capacity is being used.
         # >100% means evaporation exceeds transport → triggers ΔT/dt throttle.
-        if gas.pipe_conductance_kg_hr > 0:
-            gas.transport_saturation_pct = (
-                total_evap_kg_hr / gas.pipe_conductance_kg_hr * 100.0)
-        else:
-            gas.transport_saturation_pct = 999.0 if total_evap_kg_hr > 0 else 0.0
+        gas.transport_saturation_pct = transport_state['pipe_capacity_used_pct']
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0
 
@@ -171,13 +328,8 @@ class OverheadGasModel:
         # Total pressure may include a non-condensable background gas
         # such as Mars CO2; product partial pressures should not inherit
         # that background pressure.
-        if conductance > 0:
-            vapor_pressure_mbar = (
-                (total_evap_kg_hr / 3600.0) / conductance * 10.0)
-        else:
-            vapor_pressure_mbar = 0.0
-
-        gas.pressure_mbar = max(vapor_pressure_mbar, melt.p_total_mbar)
+        vapor_pressure_mbar = transport_state['vapor_pressure_mbar']
+        gas.pressure_mbar = transport_state['pressure_mbar']
 
         # ── Product partial pressures (proportional to evaporation rates) ──
         if total_evap_kg_hr > 0:

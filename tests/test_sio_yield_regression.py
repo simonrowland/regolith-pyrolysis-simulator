@@ -7,7 +7,10 @@ import pytest
 
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel
+from simulator.overhead import OverheadGasModel
+from simulator.runner import build_sio_yield_report
 from simulator.state import (
+    CampaignPhase,
     CondensationStage,
     CondensationTrain,
     EvaporationFlux,
@@ -153,6 +156,129 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
         + route.remaining_by_species["SiO"]
     )
     assert destinations == pytest.approx(1.0)
+
+
+def test_cached_condensation_model_uses_updated_liner_temperature():
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+
+    cold_route = model.route(flux, melt)
+    model.configure_operating_conditions(
+        wall_temperature_C=1650.0,
+        overhead_pressure_mbar=10.0,
+        pipe_diameter_m=0.12,
+    )
+    hot_route = model.route(flux, melt)
+
+    assert cold_route.wall_deposit_by_species["SiO"] > 0.0
+    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) < (
+        cold_route.wall_deposit_by_species["SiO"]
+    )
+
+
+def test_knudsen_regime_factor_rises_toward_ballistic():
+    viscous_kn = condensation_module._knudsen_number(
+        pressure_pa=1000.0,
+        T_K=1773.15,
+        characteristic_length_m=0.12,
+    )
+    ballistic_kn = condensation_module._knudsen_number(
+        pressure_pa=0.1,
+        T_K=1773.15,
+        characteristic_length_m=0.12,
+    )
+
+    assert viscous_kn < 0.01
+    assert ballistic_kn > 1.0
+    assert condensation_module._knudsen_regime_factor(viscous_kn) < 0.1
+    assert condensation_module._knudsen_regime_factor(ballistic_kn) > 0.99
+
+
+def test_low_pressure_ballistic_regime_increases_wall_deposit():
+    train = CondensationTrain.create_default()
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+
+    viscous = CondensationModel(train, wall_temperature_C=1100.0)
+    viscous.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1100.0,
+    )
+    ballistic = CondensationModel(train, wall_temperature_C=1100.0)
+    ballistic.configure_operating_conditions(
+        overhead_pressure_mbar=0.001,
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1100.0,
+    )
+
+    viscous_route = viscous.route(flux, melt)
+    ballistic_route = ballistic.route(flux, melt)
+
+    assert ballistic.regime_factor > viscous.regime_factor
+    assert ballistic_route.wall_deposit_by_species["SiO"] > (
+        viscous_route.wall_deposit_by_species["SiO"]
+    )
+
+
+def test_liner_temperature_schedule_is_recipe_controllable():
+    model = OverheadGasModel(
+        {
+            "liner_temperature_C": {
+                "default_C": 1500.0,
+                "schedule": [
+                    {
+                        "campaign": "C2A",
+                        "from_campaign_hour": 0,
+                        "to_campaign_hour": 4,
+                        "start_C": 1100,
+                        "end_C": 1600,
+                    },
+                    {
+                        "campaign": "C2A",
+                        "from_campaign_hour": 4,
+                        "start_C": 1600,
+                        "end_C": 1600,
+                    },
+                ],
+            }
+        }
+    )
+    melt = MeltState()
+    melt.campaign = CampaignPhase.C2A
+
+    melt.campaign_hour = 0
+    assert model.resolve_pipe_temperature_C(melt) == pytest.approx(1100.0)
+    melt.campaign_hour = 2
+    assert model.resolve_pipe_temperature_C(melt) == pytest.approx(1350.0)
+    melt.campaign_hour = 8
+    assert model.resolve_pipe_temperature_C(melt) == pytest.approx(1600.0)
+
+
+def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
+    no_suppress = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        t_low_c=1500.0,
+        t_hold_c=1500.0,
+        liner_temperature_c=1500.0,
+    )
+    o2_mode = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        t_low_c=1500.0,
+        t_hold_c=1500.0,
+        liner_temperature_c=1500.0,
+        pO2_mbar=1.0,
+    )
+
+    assert o2_mode["sio_evolved_kg"] < no_suppress["sio_evolved_kg"] * 1.0e-5
 
 
 def test_hkl_sampling_uses_actual_stage_band_not_material_defaults():
