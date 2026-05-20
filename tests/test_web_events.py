@@ -3,6 +3,7 @@ import pytest
 import app as app_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
+from simulator.session import drive_auto_apply
 from web.events import (
     BackendUnavailableError,
     _clear_simulation_state,
@@ -189,3 +190,79 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert payload["mass_balance_error_pct"] == pytest.approx(0.0)
     assert payload["stage0_mass_balance_delta_kg"] == pytest.approx(0.0)
     assert "residual_inventory_kg" in payload
+
+
+def test_web_pause_resume_is_result_neutral(monkeypatch):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+
+    def start_web_session():
+        before = set(_simulations)
+        client = app_module.socketio.test_client(app)
+        assert client.is_connected()
+        client.get_received()
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        state, _ = _current_simulation_state(sid)
+        assert state is not None
+        return client, sid, state
+
+    clients = []
+    try:
+        paused_client, paused_sid, paused_state = start_web_session()
+        clients.append(paused_client)
+        paused_client.emit("pause_simulation")
+        paused_client.emit("resume_simulation")
+        paused_client.get_received()
+        assert paused_state["paused"] is False
+
+        unpaused_client, unpaused_sid, unpaused_state = start_web_session()
+        clients.append(unpaused_client)
+
+        paused_results = [
+            result.per_hour_summary
+            for result in drive_auto_apply(paused_state["session"], 3)
+        ]
+        unpaused_results = [
+            result.per_hour_summary
+            for result in drive_auto_apply(unpaused_state["session"], 3)
+        ]
+
+        assert paused_results == unpaused_results
+        assert (
+            paused_state["session"].simulator.product_ledger()
+            == unpaused_state["session"].simulator.product_ledger()
+        )
+    finally:
+        for client in clients:
+            client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)

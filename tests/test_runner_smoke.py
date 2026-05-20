@@ -424,9 +424,9 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         assert isinstance(entry["O2_yield_kg_cumulative"], (int, float))
 
 
-def test_web_per_hour_summary_event_uses_runner_builder():
-    """Regression: ``web/events.py`` emits the SocketIO
-    ``per_hour_summary`` event by calling
+def test_session_per_hour_summary_event_uses_runner_builder():
+    """Regression: ``SimSession`` emits the SocketIO
+    ``per_hour_summary`` source value by calling
     :func:`simulator.runner.build_per_hour_summary`, NOT a parallel
     implementation.
 
@@ -440,16 +440,24 @@ def test_web_per_hour_summary_event_uses_runner_builder():
     transport so it stays runnable without a real socketio loop.
     """
 
-    web_events = Path(__file__).resolve().parent.parent / "web" / "events.py"
-    source = web_events.read_text()
-    assert "from simulator.runner import build_per_hour_summary" in source, (
-        "web/events.py must import build_per_hour_summary from the runner "
-        "module so the SocketIO stream cannot drift from the CLI runner "
-        "schema (goal #18)."
+    session_core = (
+        Path(__file__).resolve().parent.parent
+        / "simulator"
+        / "session.py"
     )
-    assert "build_per_hour_summary(sim=sim, snapshot=snapshot)" in source, (
-        "web/events.py must call build_per_hour_summary inside the run "
-        "loop; bypassing it lets a refactor open a per-hour shape gap."
+    source = session_core.read_text()
+    assert "def _build_per_hour_summary" in source, (
+        "SimSession must own the per-hour summary handoff so web/events.py "
+        "can stay a thin SocketIO adapter."
+    )
+    assert "from simulator.runner import build_per_hour_summary" in source, (
+        "simulator/session.py must import build_per_hour_summary from the "
+        "runner module so the SocketIO stream cannot drift from the CLI "
+        "runner schema (goal #18)."
+    )
+    assert "return build_per_hour_summary(sim, snapshot)" in source, (
+        "SimSession must call build_per_hour_summary inside its StepResult "
+        "builder; bypassing it lets a refactor open a per-hour shape gap."
     )
 
 
