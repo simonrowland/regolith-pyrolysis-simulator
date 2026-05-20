@@ -332,13 +332,16 @@ def test_explicit_factsage_request_falls_to_stub_without_strict_config(
     assert isinstance(backend, StubBackend)
 
 
-def test_explicit_stub_request_uses_autodetect_chain(
+def test_explicit_stub_request_pins_stub_backend(
         monkeypatch, captured_logs):
-    """``backend='stub'`` follows the new autodetect policy.
+    """``backend='stub'`` deterministically pins StubBackend (D1 fix).
 
-    This is the legacy default; the new active-backend policy prefers
-    AlphaMELTS when available rather than honouring the old 'stub'
-    default literally.
+    An explicit 'stub' request must NOT autodetect: even when AlphaMELTS
+    is available, asking for the deterministic stub returns StubBackend.
+    Only 'auto'/'' /unknown follow the autodetect chain. (Bug D1: 'stub'
+    previously routed through autodetect and returned AlphaMELTS when it
+    was installed, so a caller asking for a deterministic backend silently
+    got AlphaMELTS.)
     """
     _install_fakes(monkeypatch,
                    alphamelts_available=True,
@@ -346,7 +349,41 @@ def test_explicit_stub_request_uses_autodetect_chain(
 
     backend = _get_backend('stub')
 
-    assert isinstance(backend, _FakeAlphaMELTS)
+    assert isinstance(backend, StubBackend)
+    assert any('engine selection: StubBackend' in line
+               for line in captured_logs)
+
+
+def test_web_autodetect_stub_bypasses_primary_probes():
+    """Under WEB_AUTODETECT, 'stub' returns StubBackend without probing
+    AlphaMELTS or FactSAGE (D1 fix at the resolver level)."""
+    calls: list[str] = []
+
+    def make_alphamelts():
+        calls.append('alphamelts')
+        return _FakeAlphaMELTS(available=True)
+
+    def make_factsage():
+        calls.append('factsage')
+        return _FakeFactSAGE(available=True)
+
+    def make_stub():
+        calls.append('stub')
+        return StubBackend()
+
+    backend = resolve_backend(
+        'stub',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=make_alphamelts,
+        factsage_backend_cls=make_factsage,
+        stub_backend_cls=make_stub,
+        factsage_config_loader=lambda: {},
+        factsage_config_error_cls=BackendUnavailableError,
+        log_selection=lambda selected: None,
+    )
+
+    assert isinstance(backend, StubBackend)
+    assert calls == ['stub']  # primaries never probed
 
 
 def test_unknown_backend_name_falls_through_to_autodetect(
