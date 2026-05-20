@@ -1,0 +1,334 @@
+"""Synchronous command core for one simulator session."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Callable, Iterable, Mapping
+
+from simulator.backends import (
+    BackendSelectionPolicy,
+    SimulatorBuildConfig,
+    build_simulator,
+    resolve_backend,
+)
+from simulator.core import CampaignPhase, PyrolysisSimulator
+from simulator.state import DecisionPoint, HourSnapshot
+
+
+class DecisionPolicy(Enum):
+    """Driver-loop decision routing mode.
+
+    ``advance()`` does not consult this enum. It is policy-free; drivers decide
+    whether a pending decision should be applied or surfaced to an operator.
+    """
+
+    AUTO_APPLY = "auto-apply"
+    OPERATOR = "operator"
+
+
+@dataclass(frozen=True)
+class SimSessionConfig:
+    """Inputs required to start a simulator session."""
+
+    feedstock_id: str
+    feedstocks: Mapping[str, Any]
+    setpoints: Mapping[str, Any]
+    vapor_pressures: Mapping[str, Any]
+    campaign: str = "C0"
+    backend_name: str = "stub"
+    backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
+    mass_kg: float = 1000.0
+    additives_kg: Mapping[str, float] = field(default_factory=dict)
+    setpoints_overrides: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=dict
+    )
+    track: str = "pyrolysis"
+    c4_max_temp: float | None = None
+    unavailable_error_cls: type[Exception] = RuntimeError
+    force_builtin_vapor_pressure: Callable[[PyrolysisSimulator], None] | None = None
+    result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
+
+
+@dataclass(frozen=True)
+class StepResult:
+    """Read-only projections captured immediately after one simulator step."""
+
+    snapshot: HourSnapshot
+    per_hour_summary: dict[str, Any]
+    campaign_summary: dict[str, Any] | None = None
+    decision_event: dict[str, Any] | None = None
+    backend_error: str = ""
+
+
+class SimSession:
+    """Lock-free, synchronous wrapper around ``PyrolysisSimulator``.
+
+    The web adapter owns locking and pacing. This core only performs command
+    verbs against a single simulator instance.
+    """
+
+    def __init__(self) -> None:
+        self._sim: PyrolysisSimulator | None = None
+        self._config: SimSessionConfig | None = None
+        self._paused = False
+        self._step_results: list[StepResult] = []
+        self._operator_decisions: list[dict[str, Any]] = []
+        self._result_document: Mapping[str, Any] | None = None
+
+    @property
+    def simulator(self) -> PyrolysisSimulator:
+        return self._require_sim()
+
+    def start(self, config: SimSessionConfig) -> "SimSession":
+        """Build, load, and start a simulator from explicit config."""
+
+        backend = resolve_backend(
+            config.backend_name,
+            config.backend_policy,
+            unavailable_error_cls=config.unavailable_error_cls,
+        )
+        if config.feedstock_id not in config.feedstocks:
+            expected = sorted(config.feedstocks)[:5]
+            raise config.unavailable_error_cls(
+                f"unknown feedstock {config.feedstock_id!r}; expected one of "
+                f"{expected}..."
+            )
+
+        sim = build_simulator(
+            SimulatorBuildConfig(
+                backend=backend,
+                setpoints=config.setpoints,
+                feedstocks=config.feedstocks,
+                vapor_pressures=config.vapor_pressures,
+            )
+        )
+
+        try:
+            sim.load_batch(
+                config.feedstock_id,
+                config.mass_kg,
+                additives_kg=dict(config.additives_kg),
+            )
+        except ValueError as exc:
+            raise config.unavailable_error_cls(
+                f"load_batch failed: {exc}"
+            ) from exc
+
+        if config.force_builtin_vapor_pressure is not None:
+            config.force_builtin_vapor_pressure(sim)
+
+        if config.c4_max_temp is not None:
+            sim.c4_max_temp_C = float(config.c4_max_temp)
+            sim.campaign_mgr.c4_max_temp_C = float(config.c4_max_temp)
+
+        campaign_phase = self._campaign_phase(config.campaign, config)
+        if config.track == "mre_baseline":
+            sim.record.track = "mre_baseline"
+        sim.start_campaign(campaign_phase)
+
+        for campaign, overrides in config.setpoints_overrides.items():
+            if not isinstance(overrides, Mapping):
+                raise config.unavailable_error_cls(
+                    f"setpoints_overrides[{campaign!r}] must be a mapping"
+                )
+            target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
+            for field_name, value in overrides.items():
+                target[str(field_name)] = float(value)
+
+        self._sim = sim
+        self._config = config
+        self._paused = False
+        self._step_results = []
+        self._operator_decisions = []
+        self._result_document = None
+        return self
+
+    def advance(self) -> StepResult:
+        """Run exactly one policy-free simulator step."""
+
+        sim = self._require_sim()
+        snapshot = sim.step()
+        campaign_summary = getattr(sim, "_last_campaign_summary", None)
+        backend_error = str(getattr(sim, "_last_backend_error", "") or "")
+        sim._last_campaign_summary = None
+        decision = (
+            sim.pending_decision
+            if getattr(sim, "paused_for_decision", False)
+            and sim.pending_decision is not None
+            else None
+        )
+        result = StepResult(
+            snapshot=snapshot,
+            per_hour_summary=self._build_per_hour_summary(sim, snapshot),
+            campaign_summary=campaign_summary,
+            decision_event=_decision_event(decision) if decision else None,
+            backend_error=backend_error,
+        )
+        self._step_results.append(result)
+        return result
+
+    def decide(self, choice: str) -> None:
+        sim = self._require_sim()
+        decision = sim.pending_decision
+        if decision is None:
+            raise RuntimeError("no pending decision")
+        sim.apply_decision(decision.decision_type, choice)
+
+    def pending_decision(self) -> DecisionPoint | None:
+        return self._require_sim().pending_decision
+
+    def adjust(self, param: str, value: Any, **kw: Any) -> None:
+        sim = self._require_sim()
+        if param == "stir_factor":
+            sim.melt.stir_factor = float(value)
+        elif param == "pO2_mbar":
+            sim.melt.pO2_mbar = float(value)
+        elif param == "c4_max_temp":
+            sim.c4_max_temp_C = float(value)
+            sim.campaign_mgr.c4_max_temp_C = float(value)
+        elif param == "campaign_override":
+            campaign_name = str(kw.get("campaign", ""))
+            field_name = str(kw.get("field", ""))
+            if not campaign_name or not field_name:
+                raise ValueError(
+                    "campaign_override requires campaign and field keywords"
+                )
+            target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
+            target[field_name] = float(value)
+            if field_name == "stir_factor" and sim.melt.campaign.name == campaign_name:
+                sim.melt.stir_factor = float(value)
+            if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
+                sim.melt.pO2_mbar = float(value)
+        else:
+            raise ValueError(f"unsupported session adjustment {param!r}")
+
+    def pause(self) -> None:
+        self._paused = True
+
+    def resume(self) -> None:
+        self._paused = False
+
+    def is_complete(self) -> bool:
+        return self._require_sim().is_complete()
+
+    def snapshot(self) -> HourSnapshot:
+        return self._require_sim()._make_snapshot()
+
+    def result_document(self) -> Mapping[str, Any]:
+        if self._result_document is not None:
+            return self._result_document
+        if self._config and self._config.result_document_factory is not None:
+            return self._config.result_document_factory(self)
+        raise RuntimeError("no result document has been recorded")
+
+    def per_hour_summaries(self) -> list[dict[str, Any]]:
+        return [result.per_hour_summary for result in self._step_results]
+
+    def operator_decisions(self) -> list[dict[str, Any]]:
+        return list(self._operator_decisions)
+
+    def _record_operator_decision(self, event: dict[str, Any]) -> None:
+        self._operator_decisions.append(event)
+
+    def _set_result_document(self, document: Mapping[str, Any]) -> None:
+        self._result_document = document
+
+    def _require_sim(self) -> PyrolysisSimulator:
+        if self._sim is None:
+            raise RuntimeError("session has not been started")
+        return self._sim
+
+    def _campaign_phase(
+        self,
+        campaign_name: str,
+        config: SimSessionConfig,
+    ) -> CampaignPhase:
+        try:
+            return CampaignPhase[campaign_name]
+        except KeyError as exc:
+            valid = ", ".join(member.name for member in CampaignPhase)
+            raise config.unavailable_error_cls(
+                f"unknown campaign {campaign_name!r}; valid options: {valid}"
+            ) from exc
+
+    @staticmethod
+    def _build_per_hour_summary(
+        sim: PyrolysisSimulator,
+        snapshot: HourSnapshot,
+    ) -> dict[str, Any]:
+        from simulator.runner import build_per_hour_summary
+
+        return build_per_hour_summary(sim, snapshot)
+
+
+def drive_auto_apply(
+    session: SimSession,
+    hours: int,
+    *,
+    operator_decisions: list[dict[str, Any]] | None = None,
+) -> Iterable[StepResult]:
+    """AUTO_APPLY driver loop for batch-runner surfaces."""
+
+    return drive_session(
+        session,
+        hours,
+        DecisionPolicy.AUTO_APPLY,
+        operator_decisions=operator_decisions,
+    )
+
+
+def drive_session(
+    session: SimSession,
+    hours: int,
+    policy: DecisionPolicy,
+    *,
+    operator_decisions: list[dict[str, Any]] | None = None,
+) -> Iterable[StepResult]:
+    """Drive a session under a policy outside ``advance()``."""
+
+    for _ in range(int(hours)):
+        if session.is_complete():
+            return
+        decision = session.pending_decision()
+        if decision is not None and policy is DecisionPolicy.OPERATOR:
+            return
+        if decision is not None and policy is DecisionPolicy.AUTO_APPLY:
+            choice = decision.recommendation or (
+                decision.options[0] if decision.options else ""
+            )
+            event = _operator_decision_event(session.simulator, decision, choice)
+            session._record_operator_decision(event)
+            if operator_decisions is not None:
+                operator_decisions.append(event)
+            session.decide(choice)
+            if session.is_complete():
+                return
+        elif decision is not None:
+            raise ValueError(f"unsupported decision policy {policy!r}")
+        yield session.advance()
+
+
+def _decision_event(decision: DecisionPoint) -> dict[str, Any]:
+    return {
+        "type": decision.decision_type.name,
+        "options": list(decision.options),
+        "recommendation": decision.recommendation,
+        "context": decision.context,
+    }
+
+
+def _operator_decision_event(
+    sim: PyrolysisSimulator,
+    decision: DecisionPoint,
+    choice: str,
+) -> dict[str, Any]:
+    return {
+        "event": "operator_decision",
+        "hour": sim.melt.hour,
+        "decision_type": decision.decision_type.name,
+        "choice": choice,
+        "recommendation": decision.recommendation,
+        "options": list(decision.options),
+        "context": decision.context,
+    }
