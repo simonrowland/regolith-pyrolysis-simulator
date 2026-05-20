@@ -87,6 +87,28 @@ SIO_TSWEEP_WARNING_TEXT = (
     "(Cardiff/Matchett/Tsuchiyama/Steurer extraction) before relying on "
     "this recommendation operationally."
 )
+SIO_WALL_SWEEP_SCHEMA_VERSION = "sio-wall-sweep-v1"
+SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C: tuple[float, ...] = (
+    1100.0,
+    1300.0,
+    1500.0,
+    1650.0,
+)
+SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
+    "no_suppress",
+    "o2_1mbar",
+)
+SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
+    "no_suppress": {
+        "label": "C2A no-suppress SiO extraction",
+        "pO2_mbar": None,
+    },
+    "o2_1mbar": {
+        "label": "1 mbar pO2 glass / clean-alkali mode",
+        "pO2_mbar": 1.0,
+    },
+}
+SIO_SLOW_FOULING_WALL_DEPOSIT_KG = 1.0e-6
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -915,6 +937,38 @@ def _prepare_sio_campaign_start(
     sim.campaign_mgr.get_temp_target = _sio_twindow_temp_target
 
 
+def _apply_sio_wall_sweep_controls(
+    sim: PyrolysisSimulator,
+    *,
+    liner_temperature_c: float | None = None,
+    pO2_mbar: float | None = None,
+) -> None:
+    runtime_override = sim.campaign_mgr.overrides.setdefault("C2A", {})
+    if pO2_mbar is not None:
+        pO2_value = max(0.0, float(pO2_mbar))
+        runtime_override["pO2_mbar"] = pO2_value
+        sim.melt.pO2_mbar = pO2_value
+        sim.melt.p_total_mbar = max(float(sim.melt.p_total_mbar), pO2_value)
+        sim.overhead.composition["O2"] = max(
+            float(sim.overhead.composition.get("O2", 0.0)),
+            pO2_value,
+        )
+        sim.melt.fO2_log = sim._compute_intrinsic_melt_fO2()
+
+    if liner_temperature_c is None:
+        return
+    overhead_cfg = dict(runtime_override.get("overhead_headspace", {}) or {})
+    overhead_cfg["liner_temperature_C"] = float(liner_temperature_c)
+    runtime_override["overhead_headspace"] = overhead_cfg
+    sim._configure_overhead_headspace(CampaignPhase.C2A)
+    if sim._condensation_model is not None:
+        sim.condensation_model.configure_operating_conditions(
+            wall_temperature_C=float(liner_temperature_c),
+            pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
+            gas_temperature_C=float(liner_temperature_c),
+        )
+
+
 def build_sio_yield_report(
     *,
     feedstock_id: str,
@@ -925,6 +979,8 @@ def build_sio_yield_report(
     t_low_c: float | None = None,
     t_hold_c: float | None = None,
     ramp_c_per_hr: float | None = None,
+    liner_temperature_c: float | None = None,
+    pO2_mbar: float | None = None,
 ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, float]]:
     """Run the C2A SiO yield slice and return the golden-file report."""
 
@@ -980,6 +1036,11 @@ def build_sio_yield_report(
         t_low_c=t_low_c,
         t_hold_c=t_hold_c,
         ramp_c_per_hr=ramp_c_per_hr,
+    )
+    _apply_sio_wall_sweep_controls(
+        sim,
+        liner_temperature_c=liner_temperature_c,
+        pO2_mbar=pO2_mbar,
     )
     initial_balances = sim.atom_ledger.mol_by_account()
     initial_sio2_mol = float(
@@ -1053,6 +1114,19 @@ def build_sio_yield_report(
     }
 
     if include_diagnostics:
+        condensation_model = sim.condensation_model
+        operating_history = list(
+            getattr(condensation_model, "operating_history", []) or []
+        )
+        c2a_history = [
+            entry for entry in operating_history
+            if entry.get("campaign") == "C2A"
+        ]
+        operating_entry = (
+            c2a_history[-1]
+            if c2a_history
+            else (operating_history[-1] if operating_history else {})
+        )
         diagnostics = {
             "sio_evaporated_mol": sio_evaporated_mol,
             "si_terminal_mol": si_terminal_mol,
@@ -1064,6 +1138,27 @@ def build_sio_yield_report(
                 (result.get("per_hour_summary") or [{}])[-1].get(
                     "mass_balance_pct", 0.0
                 )
+            ),
+            "wall_deposit_total_kg": sum(float(v) for v in wall_deposit_kg.values()),
+            "final_overhead_pressure_mbar": float(sim.overhead.pressure_mbar),
+            "final_liner_temperature_C": float(sim.overhead_model.pipe_temperature_C),
+            "final_knudsen_number": float(
+                getattr(condensation_model, "knudsen_number", 0.0)
+            ),
+            "final_regime_factor": float(
+                getattr(condensation_model, "regime_factor", 1.0)
+            ),
+            "wall_deposit_overhead_pressure_mbar": float(
+                operating_entry.get("overhead_pressure_mbar", 0.0) or 0.0
+            ),
+            "wall_deposit_liner_temperature_C": float(
+                operating_entry.get("wall_temperature_C", 0.0) or 0.0
+            ),
+            "wall_deposit_knudsen_number": float(
+                operating_entry.get("knudsen_number", 0.0) or 0.0
+            ),
+            "wall_deposit_regime_factor": float(
+                operating_entry.get("regime_factor", 1.0) or 1.0
             ),
         }
         return report, diagnostics
@@ -1402,6 +1497,256 @@ def run_sio_tsweep(
         "warning_sticker_fired": _warning_sticker_fires(
             float(recommended["T_hold_C"])
         ),
+        "output_dir": str(output_dir),
+    }
+
+
+def _sio_wall_sweep_cell_id(
+    feedstock_id: str,
+    pO2_mode: str,
+    liner_temperature_c: float,
+) -> str:
+    return (
+        f"{feedstock_id}_{pO2_mode}_"
+        f"wall{_format_sweep_float(liner_temperature_c)}"
+    )
+
+
+def _sio_wall_sweep_row(
+    *,
+    cell_id: str,
+    feedstock_id: str,
+    pO2_mode: str,
+    pO2_mbar: float | None,
+    liner_temperature_c: float,
+    report: Mapping[str, Any],
+    diagnostics: Mapping[str, float],
+) -> dict[str, Any]:
+    wall_deposit = report.get("wall_deposit_kg", {})
+    sio_wall_kg = float(wall_deposit.get("SiO", 0.0))
+    total_wall_kg = sum(float(value) for value in wall_deposit.values())
+    stage3_silica_kg = float(
+        report.get("sio_to_silica_fume_kg", {}).get(
+            "stage_3_sio_zone_product", 0.0
+        )
+    )
+    return {
+        "cell_id": cell_id,
+        "feedstock_id": feedstock_id,
+        "pO2_mode": pO2_mode,
+        "pO2_mbar": None if pO2_mbar is None else _clean_report_float(pO2_mbar),
+        "liner_temperature_C": _clean_report_float(liner_temperature_c),
+        "overhead_pressure_mbar": _clean_report_float(
+            float(diagnostics.get("wall_deposit_overhead_pressure_mbar", 0.0))
+        ),
+        "knudsen_number": _clean_report_float(
+            float(diagnostics.get("wall_deposit_knudsen_number", 0.0))
+        ),
+        "regime_factor": _clean_report_float(
+            float(diagnostics.get("wall_deposit_regime_factor", 1.0))
+        ),
+        "sio_wall_deposit_kg": _clean_report_float(sio_wall_kg),
+        "total_wall_deposit_kg": _clean_report_float(total_wall_kg),
+        "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
+        "sio_evolved_kg": _clean_report_float(float(report["sio_evolved_kg"])),
+        "sio_yield_pct_of_feedstock": _clean_report_float(
+            float(report["sio_yield_pct_of_feedstock"])
+        ),
+        "mass_balance_err_pct": _clean_report_float(
+            abs(float(diagnostics.get("mass_balance_error_pct", 0.0)))
+        ),
+        "closure_error_pct": _clean_report_float(
+            abs(float(diagnostics.get("closure_error_pct", 0.0)))
+        ),
+    }
+
+
+def _sort_sio_wall_sweep_rows(
+    rows: list[Mapping[str, Any]],
+) -> list[Mapping[str, Any]]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            str(row["feedstock_id"]),
+            str(row["pO2_mode"]),
+            float(row["liner_temperature_C"]),
+        ),
+    )
+
+
+def _sio_wall_sweep_thresholds(
+    rows: list[Mapping[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    thresholds: dict[str, dict[str, Any]] = {}
+    keys = sorted({(str(row["feedstock_id"]), str(row["pO2_mode"])) for row in rows})
+    for feedstock_id, pO2_mode in keys:
+        mode_rows = [
+            row for row in rows
+            if row["feedstock_id"] == feedstock_id and row["pO2_mode"] == pO2_mode
+        ]
+        crossing = None
+        for row in sorted(mode_rows, key=lambda item: float(item["liner_temperature_C"])):
+            if float(row["total_wall_deposit_kg"]) <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG:
+                crossing = row
+                break
+        thresholds[f"{feedstock_id}:{pO2_mode}"] = {
+            "threshold_liner_temperature_C": (
+                None if crossing is None else crossing["liner_temperature_C"]
+            ),
+            "slow_fouling_wall_deposit_kg": SIO_SLOW_FOULING_WALL_DEPOSIT_KG,
+        }
+    return thresholds
+
+
+def _sio_wall_sweep_table(rows: list[Mapping[str, Any]]) -> str:
+    headers = (
+        "feedstock",
+        "pO2_mode",
+        "liner_T_C",
+        "p_overhead_mbar",
+        "Kn",
+        "regime_factor",
+        "SiO_wall_kg",
+        "total_wall_kg",
+        "sio_evolved_kg",
+        "mass_balance_err_pct",
+    )
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for row in _sort_sio_wall_sweep_rows(rows):
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    str(row["feedstock_id"]),
+                    str(row["pO2_mode"]),
+                    f"{float(row['liner_temperature_C']):g}",
+                    f"{float(row['overhead_pressure_mbar']):.12g}",
+                    f"{float(row['knudsen_number']):.12g}",
+                    f"{float(row['regime_factor']):.12g}",
+                    f"{float(row['sio_wall_deposit_kg']):.12g}",
+                    f"{float(row['total_wall_deposit_kg']):.12g}",
+                    f"{float(row['sio_evolved_kg']):.12g}",
+                    f"{float(row['mass_balance_err_pct']):.12g}",
+                ]
+            )
+            + " |"
+        )
+    return "\n".join(lines)
+
+
+def build_sio_wall_sweep_report_markdown(summary: Mapping[str, Any]) -> str:
+    rows = list(summary.get("rows", []))
+    thresholds = summary.get("thresholds", {})
+    lines = [
+        "# SiO Wall-Deposit Sweep",
+        "",
+        "Date: 2026-05-19",
+        "",
+        "Scope: Phase 3-bis wall_deposit versus liner temperature and pO2 mode.",
+        "",
+        "Regime factor: Kn/(Kn + 0.01), with Kn = mean_free_path / pipe_diameter.",
+        "",
+        "Slow-fouling threshold: "
+        f"{SIO_SLOW_FOULING_WALL_DEPOSIT_KG:.1e} kg total wall deposit per campaign.",
+        "",
+        "## Thresholds",
+        "",
+        "| case | threshold_liner_T_C |",
+        "|---|---:|",
+    ]
+    for key, value in sorted(thresholds.items()):
+        threshold = value.get("threshold_liner_temperature_C")
+        rendered = "not crossed" if threshold is None else f"{float(threshold):g}"
+        lines.append(f"| {key} | {rendered} |")
+    lines.extend(["", "## Sweep Table", "", _sio_wall_sweep_table(rows), ""])
+    return "\n".join(lines)
+
+
+def run_sio_wall_sweep(
+    *,
+    feedstock_ids: tuple[str, ...],
+    wall_t_grid_c: tuple[float, ...],
+    pO2_modes: tuple[str, ...],
+    output_dir: Path,
+    campaign: str = SIO_YIELD_CAMPAIGN,
+    hours: int = 24,
+    mass_kg: float = 1000.0,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, Any]] = []
+    for feedstock_id, pO2_mode, liner_temperature_c in itertools.product(
+        feedstock_ids, pO2_modes, wall_t_grid_c
+    ):
+        if pO2_mode not in SIO_WALL_SWEEP_PO2_MODE_CONFIG:
+            raise RunnerError(f"unknown pO2 mode {pO2_mode!r}")
+        mode_config = SIO_WALL_SWEEP_PO2_MODE_CONFIG[pO2_mode]
+        pO2_mbar = mode_config["pO2_mbar"]
+        cell_id = _sio_wall_sweep_cell_id(
+            feedstock_id, pO2_mode, liner_temperature_c
+        )
+        report, diagnostics = build_sio_yield_report(
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+            hours=hours,
+            mass_kg=mass_kg,
+            include_diagnostics=True,
+            liner_temperature_c=liner_temperature_c,
+            pO2_mbar=pO2_mbar,
+        )
+        row = _sio_wall_sweep_row(
+            cell_id=cell_id,
+            feedstock_id=feedstock_id,
+            pO2_mode=pO2_mode,
+            pO2_mbar=pO2_mbar,
+            liner_temperature_c=liner_temperature_c,
+            report=report,
+            diagnostics=diagnostics,
+        )
+        cell_doc = {
+            "schema_version": SIO_WALL_SWEEP_SCHEMA_VERSION,
+            "cell_id": cell_id,
+            "mode_label": mode_config["label"],
+            "metrics": row,
+            "report": report,
+            "diagnostics": diagnostics,
+        }
+        with (output_dir / f"{cell_id}.json").open("w") as f:
+            json.dump(cell_doc, f, indent=2, sort_keys=False)
+            f.write("\n")
+        rows.append(row)
+
+    fieldnames = [
+        "cell_id",
+        "feedstock_id",
+        "pO2_mode",
+        "pO2_mbar",
+        "liner_temperature_C",
+        "overhead_pressure_mbar",
+        "knudsen_number",
+        "regime_factor",
+        "sio_wall_deposit_kg",
+        "total_wall_deposit_kg",
+        "stage3_silica_kg",
+        "sio_evolved_kg",
+        "sio_yield_pct_of_feedstock",
+        "mass_balance_err_pct",
+        "closure_error_pct",
+    ]
+    with (output_dir / "index.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    thresholds = _sio_wall_sweep_thresholds(rows)
+    return {
+        "schema_version": SIO_WALL_SWEEP_SCHEMA_VERSION,
+        "campaign": SIO_YIELD_CAMPAIGN,
+        "cell_count": len(rows),
+        "rows": _sort_sio_wall_sweep_rows(rows),
+        "thresholds": thresholds,
         "output_dir": str(output_dir),
     }
 
@@ -1752,6 +2097,115 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
     return 0
 
 
+def build_sio_wall_sweep_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="python -m simulator.runner.sio_wall_sweep",
+        description=(
+            "Run the Phase 3-bis SiO wall-deposit sweep over liner T and pO2 mode."
+        ),
+    )
+    parser.add_argument(
+        "--feedstocks",
+        default=",".join(SIO_YIELD_FEEDSTOCKS),
+        help="Comma-separated feedstock IDs to run",
+    )
+    parser.add_argument(
+        "--campaign",
+        default=SIO_YIELD_CAMPAIGN,
+        choices=(SIO_YIELD_CAMPAIGN, "C2A"),
+        help="SiO campaign alias (default: C2A_continuous)",
+    )
+    parser.add_argument(
+        "--hours",
+        type=int,
+        default=24,
+        help="Hours of simulated wallclock to advance per cell",
+    )
+    parser.add_argument(
+        "--mass-kg",
+        type=float,
+        default=1000.0,
+        help="Batch feedstock mass in kg (default: 1000)",
+    )
+    parser.add_argument(
+        "--wall-t-grid",
+        default=",".join(
+            _format_sweep_float(value)
+            for value in SIO_WALL_SWEEP_DEFAULT_WALL_T_GRID_C
+        ),
+        help="Comma-separated liner temperature grid in C",
+    )
+    parser.add_argument(
+        "--pO2-modes",
+        default=",".join(SIO_WALL_SWEEP_DEFAULT_PO2_MODES),
+        help="Comma-separated modes: no_suppress,o2_1mbar",
+    )
+    parser.add_argument(
+        "--output-dir",
+        required=True,
+        help="Directory to write cell JSON files plus index.csv",
+    )
+    parser.add_argument(
+        "--report-output",
+        help="Optional Markdown report path",
+    )
+    parser.add_argument(
+        "--summary-output",
+        help="Optional JSON summary path with thresholds",
+    )
+    return parser
+
+
+def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
+    parser = build_sio_wall_sweep_arg_parser()
+    args = parser.parse_args(argv)
+    feedstock_ids = tuple(
+        item.strip() for item in str(args.feedstocks).split(",") if item.strip()
+    )
+    invalid_feedstocks = sorted(set(feedstock_ids) - set(SIO_YIELD_FEEDSTOCKS))
+    if invalid_feedstocks:
+        parser.error(
+            "SiO wall sweep supports feedstocks "
+            f"{', '.join(SIO_YIELD_FEEDSTOCKS)}; got {invalid_feedstocks}"
+        )
+    pO2_modes = tuple(
+        item.strip() for item in str(args.pO2_modes).split(",") if item.strip()
+    )
+    invalid_modes = sorted(set(pO2_modes) - set(SIO_WALL_SWEEP_PO2_MODE_CONFIG))
+    if invalid_modes:
+        parser.error(
+            "unknown pO2 mode(s) "
+            f"{invalid_modes}; expected {sorted(SIO_WALL_SWEEP_PO2_MODE_CONFIG)}"
+        )
+
+    try:
+        summary = run_sio_wall_sweep(
+            feedstock_ids=feedstock_ids,
+            campaign=args.campaign,
+            hours=int(args.hours),
+            mass_kg=float(args.mass_kg),
+            wall_t_grid_c=_parse_float_grid(
+                args.wall_t_grid, label="--wall-t-grid"
+            ),
+            pO2_modes=pO2_modes,
+            output_dir=Path(args.output_dir),
+        )
+    except RunnerError as exc:
+        parser.error(str(exc))
+
+    if args.report_output:
+        report_path = Path(args.report_output)
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(build_sio_wall_sweep_report_markdown(summary))
+    if args.summary_output:
+        summary_path = Path(args.summary_output)
+        summary_path.parent.mkdir(parents=True, exist_ok=True)
+        with summary_path.open("w") as f:
+            json.dump(summary, f, indent=2, sort_keys=False)
+            f.write("\n")
+    return 0
+
+
 class _SiOYieldModuleLoader(importlib.abc.Loader):
     def __init__(self, main_name: str = "main_sio_yield") -> None:
         self._main_name = main_name
@@ -1775,6 +2229,7 @@ class _SiOYieldModuleFinder(importlib.abc.MetaPathFinder):
     _ENTRYPOINTS = {
         "simulator.runner.sio_yield": "main_sio_yield",
         "simulator.runner.sio_tsweep": "main_sio_tsweep",
+        "simulator.runner.sio_wall_sweep": "main_sio_wall_sweep",
     }
 
     def find_spec(self, fullname: str, path=None, target=None):

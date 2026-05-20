@@ -928,6 +928,22 @@ overhead_headspace:
   temperature_model: "melt"
   temperature_offset_K: null
 
+  # Hot-wall liner trajectory. Scalar values hold a constant wall T; schedule
+  # entries linearly interpolate over campaign_hour. C2A preheats the liner
+  # before the >1400 C SiO release window so cold-wall fouling is explicit.
+  liner_temperature_C:
+    default_C: 1500
+    schedule:
+      - campaign: "C2A"
+        from_campaign_hour: 0
+        to_campaign_hour: 6
+        start_C: 1200
+        end_C: 1650
+      - campaign: "C2A"
+        from_campaign_hour: 6
+        start_C: 1650
+        end_C: 1650
+
   # Phase 1 uses the existing Poiseuille pipe conductance model.
   bleed_model: "poiseuille"
   conductance_kg_s_per_bar: null

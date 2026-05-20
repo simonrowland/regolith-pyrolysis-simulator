@@ -594,7 +594,8 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
       transitions (so we know the kernel-committed CONDENSATION_ROUTE
       path actually fired across the campaign),
     * each condensation-route transition strictly debits overhead_gas
-      and credits condensation_train (no cleaned_melt touch),
+      and credits only declared condensation destinations (no cleaned_melt
+      touch),
     * each transition closes mass within a tight 1 mg per-transition
       tolerance,
     * the cumulative per-transition mass imbalance stays within a tight
@@ -656,6 +657,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
         allowed_credit_accounts = {
             "process.condensation_train",
             "process.overhead_gas",
+            "process.wall_deposit",
             "terminal.chromium_condensed_oxide_stored",
         }
         for lot in trans.debits:
