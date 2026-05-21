@@ -5,7 +5,7 @@
     --surface: #ffffff;
     --border: #dee2e6;
     --text: #212529;
-    --text-secondary: #6c757d;
+    --text-secondary: #5f656b;
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
     --accent: #059669;
@@ -23,6 +23,7 @@ body {
     color: var(--text);
     line-height: 1.5;
     font-size: 14px;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Navigation */
@@ -663,5 +664,25 @@ details details {
     }
     .charts-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Form controls inherit the app font */
+input, select, button, textarea { font-family: inherit; }
+
+/* Visible keyboard focus */
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
