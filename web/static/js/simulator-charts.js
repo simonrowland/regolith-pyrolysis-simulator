@@ -102,16 +102,22 @@ function initO2BudgetChart() {
             x: [], y: [], mode: 'lines', name: 'O₂ Stored',
             line: { color: '#2563eb', width: 2 },
             fill: 'tozeroy', fillcolor: 'rgba(37,99,235,0.15)',
+            hovertemplate: 'O₂ Stored: %{y:.2f} kg<extra></extra>',
         },
         {
-            x: [], y: [], mode: 'lines', name: 'O₂ Vented',
+            // Line sits at stored+vented so the shaded band reads as vented;
+            // customdata carries the true vented value so hover reports vented,
+            // not the cumulative sum.
+            x: [], y: [], customdata: [], mode: 'lines', name: 'O₂ Vented',
             line: { color: '#dc2626', width: 2 },
             fill: 'tonexty', fillcolor: 'rgba(220,38,38,0.15)',
+            hovertemplate: 'O₂ Vented: %{customdata:.2f} kg<extra></extra>',
         },
         {
             x: [], y: [], mode: 'lines', name: 'Shaft Power',
             line: { color: '#f59e0b', width: 2, dash: 'dot' },
             yaxis: 'y2',
+            hovertemplate: 'Shaft: %{y:.1f} kW<extra></extra>',
         },
     ], {
         ...chartLayout,
