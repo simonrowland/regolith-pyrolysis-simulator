@@ -72,8 +72,9 @@ accent. Keep the palette ≤12 non-gray colors.
   reflow instead of forcing horizontal overflow.
 - Section content uses bordered `.section-card` panels; the condensation train is a
   horizontal `overflow-x: auto` strip.
-- **Debt:** spacing is still raw px (no `--space-*` scale, no `rem`). Future work:
-  tokenize to an 8px scale and convert to `rem` for user font-scaling.
+- **Spacing scale:** `--space-1..8` (rem-based, so spacing scales with the user's
+  font size). All padding/margin/gap reference tokens, not raw px. Charts are
+  Plotly `responsive:true`, so they re-fit the container on load/resize.
 
 ## Motion
 
@@ -103,9 +104,8 @@ from the chart/condensation-train internals — low priority given the usage.
 
 ## Known debt (prioritized for future design passes)
 
-1. Spacing tokens (`--space-*`) + `rem` conversion; sweep raw px.
-2. `game.css` (Lunar Operator, currently a hidden stub) hardcodes ~10 hex chip
-   colors — tokenize and dedupe against the shared vars.
-3. Full mobile polish (eliminate residual overflow; consider mobile nav).
-4. Optional explicit light/dark toggle (currently OS-driven only).
-5. Status-indicator badge contrast.
+1. `game.css` (Lunar Operator, hidden stub) hardcodes ~10 hex chip colors —
+   tokenize and dedupe against the shared vars.
+2. Optional explicit light/dark toggle (theme is OS-driven only today).
+3. Delightful motion + performance polish (self-host the CDN deps for offline +
+   lazy-load) — the last lever to a clean A.
