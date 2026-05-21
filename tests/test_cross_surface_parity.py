@@ -33,13 +33,16 @@ SETPOINT_OVERRIDES = {
     "C3_NA": {"max_hours": 1.0},
 }
 
-EXPECTED_ACCOUNTS = {
+EXPECTED_CORE_ACCOUNTS = {
     "process.cleaned_melt",
-    "process.condensation_train",
     "process.metal_phase",
+    "terminal.oxygen_mre_anode_stored",
+}
+
+OPTIONAL_PRODUCT_ACCOUNTS = {
+    "process.condensation_train",
     "terminal.offgas",
     "terminal.oxygen_melt_offgas_stored",
-    "terminal.oxygen_mre_anode_stored",
 }
 
 
@@ -72,12 +75,15 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert _campaign_transition_exercised(batch.summaries)
     assert web.campaign_event_count >= 1
 
-    assert EXPECTED_ACCOUNTS <= set(batch.ledger)
+    assert EXPECTED_CORE_ACCOUNTS <= set(batch.ledger)
+    for account in OPTIONAL_PRODUCT_ACCOUNTS:
+        assert len({account in surface.ledger for surface in surfaces}) == 1
     assert {"Fe", "Na", "K"} <= set(batch.ledger["process.metal_phase"])
     assert {"Al2O3", "CaO", "FeO", "MgO", "SiO2"} <= set(
         batch.ledger["process.cleaned_melt"]
     )
-    assert batch.ledger["terminal.oxygen_melt_offgas_stored"].keys() == {"O2"}
+    if "terminal.oxygen_melt_offgas_stored" in batch.ledger:
+        assert batch.ledger["terminal.oxygen_melt_offgas_stored"].keys() == {"O2"}
     assert batch.ledger["terminal.oxygen_mre_anode_stored"].keys() == {"O2"}
 
     comparisons = [

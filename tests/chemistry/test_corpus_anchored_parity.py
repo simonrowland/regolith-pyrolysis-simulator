@@ -521,11 +521,10 @@ def _grid_25_test_cases():
 #   them as "out of range" rather than "fail" in the convergence
 #   narrative so the residual story stays honest.
 # - Builtin Antoine: per-species saturation fits, not equilibrium gas
-#   speciation. Equilibrium-coupled vapor species (SiO, O2, all
-#   compound oxide vapors) cannot be honestly reproduced by an Antoine
-#   fit (see §24 closeout + chunk-25 convergence rejection). We tag
-#   those anchors so the test report distinguishes "engine outside
-#   its documented domain" from "engine has a bug".
+#   speciation. The 2026-05-20 fallback refit gives SiO an explicit
+#   VapoRock-anchored envelope over Kress91 IW conditions, so SiO stays
+#   in-domain for this diagnostic. SiO2/O2 and other compound/ionic
+#   vapor species remain structural and out of the builtin domain.
 #
 # Tags do NOT silence the assertion — the residual is still reported.
 # The §25 grid-25 cohort acceptance counts only in-domain anchors that
@@ -539,10 +538,10 @@ def _is_out_of_engine_range(anchor: CorpusAnchor, engine: str) -> bool:
     if engine == "vaporock":
         return anchor.T_K > VAPOROCK_MAX_VALID_T_K
     if engine == "builtin-antoine":
-        # Builtin Antoine has no honest path to SiO / SiO2 / O2 over
-        # silicate melts — those are equilibrium-coupled. Pure metal
-        # vaporization (Na/K/Mg/Fe/Ca/Al/Mn/Cr/Ti) is in-domain.
-        if anchor.species in ("SiO", "SiO2", "O2", "FeO", "NaO",
+        # Builtin Antoine has no honest path to SiO2 / O2 over silicate
+        # melts — those are structural. SiO is covered by the VapoRock-
+        # anchored fallback refit; pure metal vaporization is in-domain.
+        if anchor.species in ("SiO2", "O2", "FeO", "NaO",
                               "Na_plus", "K_plus", "O"):
             return True
     return False
