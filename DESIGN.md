@@ -92,9 +92,10 @@ list properties explicitly.
   (announcing every simulated hour would flood a screen reader).
 - `:focus-visible` ring on all interactive elements (never `outline: none` without
   a replacement).
-- Contrast: body ~12:1; muted labels ≥4.5:1 in both themes.
-- **Debt:** status-indicator badges (THROTTLED/VENTING) have marginal white-on-amber
-  contrast; mobile touch targets are desktop-density (this is a desktop-primary tool).
+- Contrast: body ~12:1; muted labels ≥4.5:1; status badges (THROTTLED/VENTING/
+  DEBUG) ≥4.6:1 — all in both themes (amber badges use dark text; VENTING uses
+  dark text in dark mode, white on red in light).
+- **Note:** mobile touch targets are desktop-density (this is a desktop-primary tool).
 
 ## Responsive
 
