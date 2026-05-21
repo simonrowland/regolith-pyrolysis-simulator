@@ -43,6 +43,11 @@ class CampaignManager:
         #                     'stir_factor': 8.0, 'max_hours': 25}}
         self.overrides: Dict[str, dict] = {}
 
+    _CONFIG_KEY_BY_PHASE = {
+        CampaignPhase.C2A: 'C2A_continuous',
+        CampaignPhase.C2A_STAGED: 'C2A_staged',
+    }
+
     @staticmethod
     def _is_noninteractive_test_batch(record: BatchRecord) -> bool:
         return str(getattr(record, 'feedstock_key', '')).startswith('debug_')
@@ -54,6 +59,28 @@ class CampaignManager:
         decision = (decision_type, choice)
         if decision not in record.decisions:
             record.decisions.append(decision)
+
+    def _campaign_config_key(self, campaign: CampaignPhase) -> str:
+        return self._CONFIG_KEY_BY_PHASE.get(campaign, campaign.name)
+
+    def _campaign_config(self, campaign: CampaignPhase) -> dict:
+        cfg = self.campaigns.get(self._campaign_config_key(campaign), {})
+        return cfg if isinstance(cfg, dict) else {}
+
+    def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
+        merged: dict = {}
+        for key in (self._campaign_config_key(campaign), campaign.name):
+            ovr = self.overrides.get(key, {})
+            if isinstance(ovr, dict):
+                merged.update(ovr)
+        return merged
+
+    @staticmethod
+    def _float(value, default: float) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
 
     # ------------------------------------------------------------------
     # Campaign configuration
@@ -82,7 +109,7 @@ class CampaignManager:
             melt.pO2_mbar = 9.0  # midpoint of [3, 15]
             melt.p_total_mbar = 9.0
 
-        elif campaign == CampaignPhase.C2A:
+        elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
             melt.atmosphere = Atmosphere.PN2_SWEEP
             melt.pO2_mbar = 0.0   # Fe-granule sorbent keeps pO₂ → 0
             melt.p_total_mbar = 10.0  # midpoint of [5, 15] mbar N₂
@@ -118,7 +145,7 @@ class CampaignManager:
             melt.p_total_mbar = 50.0
 
         # Apply runtime overrides (pO₂, stir_factor)
-        ovr = self.overrides.get(campaign.name, {})
+        ovr = self._campaign_overrides(campaign)
         if 'pO2_mbar' in ovr:
             melt.pO2_mbar = float(ovr['pO2_mbar'])
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
@@ -162,6 +189,35 @@ class CampaignManager:
             else:
                 return (1600.0, 7.5)   # peak SiO window — slower
 
+        elif campaign == CampaignPhase.C2A_STAGED:
+            cfg = self._campaign_config(campaign)
+            stages = cfg.get('stages', [])
+            if not isinstance(stages, list) or not stages:
+                return (1750.0, 150.0)
+            hour = max(0, int(campaign_hour))
+            elapsed = 0
+            selected = stages[-1]
+            for stage in stages:
+                if not isinstance(stage, dict):
+                    continue
+                duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
+                if hour < elapsed + duration:
+                    selected = stage
+                    break
+                elapsed += duration
+
+            target = self._float(selected.get('target_C'), 1750.0)
+            if selected.get('name') == 'fe_hot_hold':
+                ovr = self._campaign_overrides(campaign)
+                target = self._float(
+                    ovr.get('hold_temp_C'),
+                    self._float(cfg.get('default_hold_T_C'), target),
+                )
+                ceiling = self._float(cfg.get('furnace_ceiling_C'), 1800.0)
+                target = min(target, ceiling)
+            ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
+            return (target, ramp)
+
         elif campaign == CampaignPhase.C2B:
             # Ramp 1320 → 1480°C (pO₂-controlled)
             return (1480.0, 10.0)
@@ -169,11 +225,15 @@ class CampaignManager:
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             # Alkali shuttle: inject at 1200-1350°C, bakeout at 1520-1680°C
             # Alternate between injection T and bakeout T
+            ovr = self._campaign_overrides(campaign)
+            inject_target = self._float(ovr.get('inject_target_C'), 1275.0)
+            bakeout_target = self._float(ovr.get('bakeout_target_C'), 1600.0)
+            ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
             cycle_period = 6  # hours per inject-bakeout cycle
             if campaign_hour % cycle_period < 3:
-                return (1275.0, 50.0)  # injection phase
+                return (inject_target, ramp_rate)  # injection phase
             else:
-                return (1600.0, 50.0)  # bakeout phase
+                return (bakeout_target, ramp_rate)  # bakeout phase
 
         elif campaign == CampaignPhase.C4:
             # Mg pyrolysis at 1580 up to user-configurable max T
@@ -201,7 +261,7 @@ class CampaignManager:
                               target_T: Optional[float],
                               ramp_rate: float) -> Tuple[Optional[float], float]:
         """Apply runtime ramp rate override if set."""
-        ovr = self.overrides.get(campaign.name, {})
+        ovr = self._campaign_overrides(campaign)
         if 'ramp_rate' in ovr:
             ramp_rate = float(ovr['ramp_rate'])
         return (target_T, ramp_rate)
@@ -235,7 +295,7 @@ class CampaignManager:
         campaign = melt.campaign
 
         # Check user-specified max_hours override first
-        ovr = self.overrides.get(campaign.name, {})
+        ovr = self._campaign_overrides(campaign)
         if 'max_hours' in ovr:
             max_h = float(ovr['max_hours'])
             if max_h > 0 and melt.campaign_hour >= max_h:
@@ -263,6 +323,19 @@ class CampaignManager:
             if melt.campaign_hour >= 30:
                 return True
 
+        elif campaign == CampaignPhase.C2A_STAGED:
+            cfg = self._campaign_config(campaign)
+            stages = cfg.get('stages', [])
+            total_hours = 0
+            if isinstance(stages, list):
+                for stage in stages:
+                    if isinstance(stage, dict):
+                        total_hours += max(
+                            1, int(self._float(stage.get('duration_h'), 1.0)))
+            total_hours = total_hours or 9
+            if melt.campaign_hour + 1 >= total_hours:
+                return True
+
         elif campaign == CampaignPhase.C2B:
             # Fe pyrolysis — shorter than C2A
             fe_rate = evap_flux.species_kg_hr.get('Fe', 0.0)
@@ -272,6 +345,13 @@ class CampaignManager:
                 return True
 
         elif campaign == CampaignPhase.C3_K:
+            if record.path == 'A_staged':
+                staged_hours = int(self._float(
+                    self._campaign_overrides(campaign).get('staged_duration_h'),
+                    3.0,
+                ))
+                if melt.campaign_hour >= max(1, staged_hours):
+                    return True
             # K shuttle: 0-1 cycles after Path A, 2 after Path B
             max_hours = 12 if record.path == 'A' else 25
             if melt.campaign_hour >= max_hours:
@@ -369,11 +449,33 @@ class CampaignManager:
             # After Path A C2A → C3 (K phase)
             return CampaignPhase.C3_K
 
+        elif current == CampaignPhase.C2A_STAGED:
+            # Staged Path A cools before handing the residual FeO to K shuttle.
+            cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+            k_stage = cfg.get('k_shuttle_stage', {})
+            if isinstance(k_stage, dict):
+                c3 = self.overrides.setdefault('C3_K', {})
+                target = self._float(k_stage.get('target_C'), 1150.0)
+                c3.setdefault('inject_target_C', target)
+                c3.setdefault('bakeout_target_C', target)
+                c3.setdefault(
+                    'ramp_rate',
+                    self._float(k_stage.get('ramp_rate_C_per_hr'), 600.0),
+                )
+                c3.setdefault(
+                    'staged_duration_h',
+                    self._float(k_stage.get('duration_h'), 3.0),
+                )
+            record.path = 'A_staged'
+            return CampaignPhase.C3_K
+
         elif current == CampaignPhase.C2B:
             # After Path B C2B → C3 (K phase)
             return CampaignPhase.C3_K
 
         elif current == CampaignPhase.C3_K:
+            if record.path == 'A_staged':
+                return CampaignPhase.COMPLETE
             # K phase → Na phase
             return CampaignPhase.C3_NA
 
@@ -417,11 +519,12 @@ class CampaignManager:
         if current == CampaignPhase.C0B:
             return DecisionPoint(
                 decision_type=DecisionType.PATH_AB,
-                options=['A', 'B'],
+                options=['A', 'A_staged', 'B'],
                 recommendation='A',
                 context=(
-                    'Path A: Continuous pN₂ ramp extracts Na/K/Fe/SiO₂ '
-                    '(8-20% faster, halved C3, fused silica product). '
+                    'Path A: Continuous pN₂ ramp extracts Na/K/Fe/SiO₂. '
+                    'Path A_staged: staged pN₂ ramp separates alkali, '
+                    'SiO, hot Fe hold, then cool K shuttle. '
                     'Path B: pO₂-managed Fe-only pyrolysis preserving '
                     'CMAS glass for tapping as Material 1.'
                 ),

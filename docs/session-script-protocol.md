@@ -51,6 +51,9 @@ quit
 `--additive=SPECIES=KG`. Session-only startup operands are
 `--c4-max-temp=<C>` and repeated `--setpoint=CAMPAIGN.FIELD=VALUE`, which map
 to `SimSessionConfig.c4_max_temp` and `setpoints_overrides`.
+Campaign aliases include `C2A_continuous` -> `C2A` and
+`C2A_staged` -> `C2A_STAGED`; `C2A_staged.hold_temp_C` is the staged hot-hold
+operator knob.
 
 The default backend is `stub`. Backend resolution uses
 `BackendSelectionPolicy.RUNNER_STRICT`, matching the deterministic runner path.
@@ -177,7 +180,7 @@ is `decision_required`:
   "steps": [{...}],
   "decision": {
     "type": "PATH_AB",
-    "options": ["A", "B"],
+    "options": ["A", "A_staged", "B"],
     "recommendation": "B",
     "context": "choose route"
   }
