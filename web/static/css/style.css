@@ -1,6 +1,7 @@
 /* Regolith Pyrolysis Simulator — Light Theme */
 
 :root {
+    color-scheme: light dark;
     --bg: #f8f9fa;
     --surface: #ffffff;
     --border: #dee2e6;
@@ -702,4 +703,24 @@ input, select, button, textarea { font-family: inherit; }
     border-radius: var(--radius);
     color: var(--text-secondary);
     font-size: var(--fs-sm);
+}
+
+/* Dark theme — follows OS preference; matches the lunar (moon) brand. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0e1116;
+        --surface: #161b22;
+        --border: #2d333b;
+        --text: #e6edf3;
+        --text-secondary: #9aa4af;
+        --primary: #4d90ec;
+        --primary-hover: #5b9bf5;
+        --accent: #2ea868;
+        --danger: #f06262;
+        --warning: #e0a44a;
+        --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    /* Filled primary surfaces need dark text on the lighter accent. */
+    .btn-primary,
+    .nav-links a.active { color: #0e1116; }
 }
