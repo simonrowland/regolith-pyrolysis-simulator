@@ -400,9 +400,10 @@
   {
     "event": "decision_required",
     "payload": {
-      "context": "Path A: Continuous pN\u2082 ramp extracts Na/K/Fe/SiO\u2082 (8-20% faster, halved C3, fused silica product). Path B: pO\u2082-managed Fe-only pyrolysis preserving CMAS glass for tapping as Material 1.",
+      "context": "Path A: Continuous pN\u2082 ramp extracts Na/K/Fe/SiO\u2082. Path A_staged: staged pN\u2082 ramp separates alkali, SiO, hot Fe hold, then cool K shuttle. Path B: pO\u2082-managed Fe-only pyrolysis preserving CMAS glass for tapping as Material 1.",
       "options": [
         "A",
+        "A_staged",
         "B"
       ],
       "recommendation": "A",

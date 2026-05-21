@@ -118,6 +118,7 @@ class CampaignPhase(Enum):
     C0 = auto()               # Vacuum bakeoff
     C0B = auto()              # P-cleanup (mild oxidative hold)
     C2A = auto()              # Continuous adaptive pN₂ ramp (Path A)
+    C2A_STAGED = auto()       # Staged pN₂ bakeout (Path A staged)
     C2B = auto()              # pO₂-managed Fe pyrolysis (Path B)
     C3_K = auto()             # Alkali shuttle — K phase
     C3_NA = auto()            # Alkali shuttle — Na phase

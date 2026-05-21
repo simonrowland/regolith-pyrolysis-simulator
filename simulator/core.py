@@ -3492,7 +3492,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
         if self.melt.campaign in (CampaignPhase.C0, CampaignPhase.C0B,
-                                   CampaignPhase.C2A, CampaignPhase.C2B,
+                                   CampaignPhase.C2A,
+                                   CampaignPhase.C2A_STAGED,
+                                   CampaignPhase.C2B,
                                    CampaignPhase.C3_K, CampaignPhase.C3_NA,
                                    CampaignPhase.C4):
             evap_flux = self._calculate_evaporation(equilibrium)
@@ -3779,9 +3781,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.start_campaign(CampaignPhase.C0)
 
         elif decision_type == DecisionType.PATH_AB:
-            self.record.path = choice  # 'A' or 'B'
+            self.record.path = choice  # 'A', 'A_staged', or 'B'
             if choice == 'A':
                 self.start_campaign(CampaignPhase.C2A)
+            elif choice == 'A_staged':
+                self.start_campaign(CampaignPhase.C2A_STAGED)
             else:
                 self.start_campaign(CampaignPhase.C2B)
 

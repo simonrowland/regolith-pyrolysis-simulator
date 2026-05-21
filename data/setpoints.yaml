@@ -136,6 +136,108 @@ campaigns:
       is reached. Fully compatible with micro-g adaptations
       (wicking/centrifugal condensers).
 
+  C2A_staged:
+    label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool K Shuttle"
+    activation_condition: "Path_A_staged AND sequential_product_collection"
+    preferred_default: false
+    temp_range_C: [1250, 1750]
+    furnace_ceiling_C: 1800
+    default_hold_T_C: 1750
+    atmosphere: "recirculating_inert_sweep"
+    carrier_gas: "pN2"
+    p_total_mbar: [5, 15]
+    pO2_mbar: null
+    pO2_bar: "<1e-8"
+    flow_regime: "viscous"
+    target_species: ["Na", "K", "SiO", "Fe"]
+    operator_knobs:
+      hold_temp_C:
+        via: "adjust campaign_override C2A_staged hold_temp_C <C>"
+        default_C: 1750
+        bounds_C: [1650, 1800]
+        role: "cycle-time lever; not a thermal-yield ceiling breaker"
+      K_additive_kg:
+        via: "start --additive=K=<kg> or SimSessionConfig.additives_kg"
+        default_kg: 26
+        role: "cool residual-FeO shuttle dose; yield-ceiling lever"
+    stages:
+      - name: alkali_early_fe
+        target_C: 1250
+        ramp_rate_C_per_hr: 600
+        duration_h: 4
+        target_species: ["Na", "K"]
+        endpoint:
+          type: "flux_decay_or_duration"
+          threshold_kg_hr: 0.02
+          species_monitored: ["Na", "K"]
+        verification:
+          lunar_mare_low_ti_kg_per_1000kg:
+            Na: 3.05
+            K: 0.11
+            Fe: 0.00
+            SiO: 0.00
+      - name: sio_window
+        target_C: 1600
+        ramp_rate_C_per_hr: 175
+        duration_h: 3
+        target_species: ["SiO", "minor_Fe"]
+        endpoint:
+          type: "SiO_pulse_then_flux_decay_or_duration"
+          threshold_kg_hr: 0.05
+          species_monitored: ["SiO", "Fe", "Mg"]
+        verification:
+          note: >
+            Engine ladder shows Fe/SiO/Mg overlap above ~1600 C; this stage
+            isolates the first SiO pulse but cannot make a pure SiO window.
+      - name: fe_hot_hold
+        target_C: 1750
+        ramp_rate_C_per_hr: 150
+        duration_h: 1
+        target_species: ["Fe"]
+        endpoint:
+          type: "FeO_residual_or_duration"
+          FeO_residual_kg_target: [20, 24]
+          thermal_Fe_depletion_pct: [86, 88]
+        verification:
+          lunar_mare_low_ti_kg_per_1000kg:
+            Fe_thermal_total: 116.2
+            FeO_residual: 20.3
+            thermal_Fe_pct: 88.0
+      - name: cool_for_k_shuttle
+        target_C: 1150
+        ramp_rate_C_per_hr: 600
+        duration_h: 1
+        target_species: ["residual_FeO"]
+        endpoint:
+          type: "temperature_gate_for_K_shuttle"
+          max_temperature_C: 1200
+    k_shuttle_stage:
+      campaign: "C3_K"
+      target_C: 1150
+      ramp_rate_C_per_hr: 600
+      duration_h: 3
+      additive: "K"
+      recommended_K_kg: 26
+      K2O_solubility_cap_wt_pct: 10
+      reaction: "2K + FeO -> K2O + Fe"
+      endpoint:
+        type: "residual_FeO_reduction_or_K_dose_exhausted"
+        Fe_total_pct_target_min: 90
+      known_model_limit: >
+        The builtin K shuttle is temperature-independent. The staged recipe
+        cools below the ~1200 C Ellingham crossover before C3_K for physical
+        fidelity, but no engine T-gate is enforced here.
+    downstream_impact: >
+      Adds an operator-selectable Path A staged route without changing
+      C2A_continuous. K shuttle stops after the cool K phase for S2; Na/Mg
+      deepening remains S4/engine-fidelity work.
+    notes: >
+      Setpoints were derived from the corrected vapor ladder under the main
+      venv with VapoRock available: alkalis dominate <=1350 C, SiO starts to
+      overlap Fe/Mg near 1600 C, and one 1750 C hot hold leaves residual FeO
+      for the cooler K shuttle. Hold temperature is exposed as a knob capped
+      at the alumina/doloma furnace ceiling of ~1800 C.
+
   # --------------------------------------------------------------------------
   # C2B -- pO2-Managed Fe Pyrolysis (Path B)
   # --------------------------------------------------------------------------

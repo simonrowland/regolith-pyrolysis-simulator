@@ -400,7 +400,12 @@ class ExtractionMixin:
 
         campaign = self.melt.campaign
         cycle_period = 6  # hours per inject-bakeout cycle
-        is_injection = (self.melt.campaign_hour % cycle_period) < 3
+        # Staged C2A enters C3_K at the end of the cool-down tick, so the
+        # first real shuttle tick starts with campaign_hour == 1.
+        if campaign == CampaignPhase.C3_K and self.record.path == 'A_staged':
+            is_injection = self.melt.campaign_hour <= 3
+        else:
+            is_injection = (self.melt.campaign_hour % cycle_period) < 3
 
         if is_injection:
             self._shuttle_phase = 'inject'

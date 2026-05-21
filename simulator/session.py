@@ -244,6 +244,11 @@ class SimSession:
         campaign_name: str,
         config: SimSessionConfig,
     ) -> CampaignPhase:
+        aliases = {
+            "C2A_continuous": "C2A",
+            "C2A_staged": "C2A_STAGED",
+        }
+        campaign_name = aliases.get(campaign_name, campaign_name)
         try:
             return CampaignPhase[campaign_name]
         except KeyError as exc:
