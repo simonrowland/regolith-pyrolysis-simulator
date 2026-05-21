@@ -25,9 +25,12 @@ GOLDENS = (
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
 
+# Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
+# so evolved SiO dropped ~4700x to the activity-corrected magnitude.
+# Was {lunar: 3.7303230676, mars: 3.82533227031} pre-refit.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 3.7303230676,
-    "mars_basalt": 3.82533227031,
+    "lunar_mare_low_ti": 0.000786562093217,
+    "mars_basalt": 0.000849721244282,
 }
 
 BASELINE_STAGE4_SIO2_KG = {

@@ -11,7 +11,17 @@ from simulator.runner import build_sio_yield_report
 
 
 MAX_BALANCE_ERR_PCT = 5.0e-12
-PHASE3BIS_SIO_EVOLVED_KG = 3.7303230676
+# Chain closure is a RELATIVE residual normalized by the SiO chain magnitude.
+# After the 2026-05-20 Antoine P_sat refit (builtin SiO fallback brought down to
+# match VapoRock), the SiO flows shrank ~4700x, so the float64 precision floor of
+# this relative metric rose above the global mass-balance bound. The
+# magnitude-robust closure guard is ``terminal_mol == approx(sio_evaporated_mol)``
+# below; this caps the relative residual well below any physical effect.
+MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-9
+# Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
+# C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
+# to the VapoRock-consistent activity-corrected value.
+PHASE3BIS_SIO_EVOLVED_KG = 0.000786562093217
 
 
 @lru_cache(maxsize=None)
@@ -37,7 +47,7 @@ def test_sio_chain_closes_evolved_to_stage_wall_and_terminal_products():
     )
 
     assert terminal_mol == pytest.approx(diagnostics["sio_evaporated_mol"])
-    assert abs(diagnostics["closure_error_pct"]) <= MAX_BALANCE_ERR_PCT
+    assert abs(diagnostics["closure_error_pct"]) <= MAX_CHAIN_CLOSURE_ERR_PCT
     assert abs(diagnostics["mass_balance_error_pct"]) <= MAX_BALANCE_ERR_PCT
 
 

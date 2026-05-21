@@ -6,8 +6,10 @@ Anchors:
   expected 2.820e-1 Pa, observed 3.824e-1 Pa, pass inside 1 dex.
 * ``tests.chemistry.corpus_fixtures``: lunar mare basalt 12022 proxy
   SiO at 1900 K, expected 1.5490e-1 Pa.
-* Historical guard: builtin Antoine is expected to sit about 1.4 dex
-  above VapoRock at 1873 K for this melt/fO2 regime.
+* Post-refit guard: after the 2026-05-20 Antoine P_sat refit, the builtin
+  SiO fallback was fitted to VapoRock, so the two now AGREE at 1873 K
+  (within the fit residual band, max 0.113 dex on the grid). The historical
+  ~1.4 dex divergence was the defect the refit corrected.
 """
 
 from __future__ import annotations
@@ -98,7 +100,7 @@ def test_vaporock_sio_pressure_stays_inside_literature_envelope(
     assert expected_pa / ONE_DECADE <= observed_pa <= expected_pa * ONE_DECADE
 
 
-def test_vaporock_vs_antoine_divergence_is_expected_one_point_four_dex():
+def test_vaporock_vs_antoine_agree_after_psat_refit():
     vapor_pressure_data = _load_vapor_pressure_data()
     sim = _build_lunar_12022_sim(vapor_pressure_data)
     backend = _vaporock_backend_or_skip()
@@ -120,7 +122,9 @@ def test_vaporock_vs_antoine_divergence_is_expected_one_point_four_dex():
         request
     ).diagnostic["vapor_pressures_Pa"]["SiO"]
 
-    assert math.log10(antoine_pa / vaporock_pa) == pytest.approx(1.40, abs=0.08)
+    # Post-refit the builtin SiO fallback agrees with VapoRock at 1873 K;
+    # abs band covers the max 0.113 dex grid fit residual (observed ~-0.01 dex).
+    assert math.log10(antoine_pa / vaporock_pa) == pytest.approx(0.0, abs=0.15)
 
 
 def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():

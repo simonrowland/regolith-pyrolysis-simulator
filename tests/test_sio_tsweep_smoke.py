@@ -162,4 +162,8 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
         for row in rows
         if row["liner_temperature_C"] == "1100.0"
     }
-    assert evolved_by_mode["o2_1mbar"] < evolved_by_mode["no_suppress"] * 1.0e-5
+    # pO2 suppression still drops SiO release by >10,000x. Post 2026-05-20
+    # Antoine refit the no_suppress magnitude is ~4700x smaller, shifting the
+    # suppression ratio from <1e-5 to ~2.7e-5; the strong-suppression intent
+    # holds (observed o2_1mbar/no_suppress ~2.7e-5, well under 1e-4).
+    assert evolved_by_mode["o2_1mbar"] < evolved_by_mode["no_suppress"] * 1.0e-4
