@@ -72,6 +72,27 @@ def _staged_metrics(sim) -> tuple[float, ...]:
     )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Premise (thermal Fe plateaus at an ~86% ceiling that the Na/K shuttle then "
+        "breaks) is an artifact of the OLD forward-Euler evaporation integrator, which "
+        "over-extracted by dumping the whole pool when flux*dt>pool. The sub-tick "
+        "analytic depletion (2026-05-21, merged b84a4af) is PHYSICS-CORRECT (codex "
+        "review b2ndlns3w: no regression, conservation proven, integration-only) and "
+        "shows there is NO real thermal ceiling -- with enough dwell FeO depletes "
+        "toward ~0. That full-depletion is itself UNPHYSICAL because the evaporation "
+        "flux is not gated on liquidus/liquid_fraction (pre-existing model gap: "
+        "core.py:3487/3500 gate only on campaign+temperature; AlphaMELTS liquidus is "
+        "diagnostic-only, core.py:2026-2028): as Na2O/K2O/SiO2/FeO (melting-point "
+        "depressants) boil off, liquidus rises and at fixed furnace T the pot freezes, "
+        "trapping a residual floor. Re-enabling this acceptance requires the "
+        "liquidus-gating follow-up chunk (gate flux on SILICATE_LIQUIDUS/"
+        "liquid_fraction before EVAPORATION_FLUX) to establish the real freezing-floor "
+        "residual and the shuttle's residual-clearing role. Do NOT retune to ~100% or "
+        "to the floorless finite-cut value -- both are artifacts."
+    ),
+)
 def test_c2a_staged_recipe_separates_products_and_k_shuttle_breaks_fe_ceiling():
     sim = _run_staged()
     products = sim.product_ledger()
