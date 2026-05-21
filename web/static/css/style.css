@@ -79,6 +79,9 @@ body {
     margin: 0 auto;
 }
 
+/* Let the flexible column shrink instead of forcing horizontal overflow. */
+.main-area { min-width: 0; }
+
 /* Config panel */
 .config-panel {
     background: var(--surface);
@@ -193,6 +196,7 @@ body {
     border-radius: var(--radius);
     padding: 8px;
     min-height: 280px;
+    min-width: 0;
 }
 
 /* Log/linear scale toggle button overlaid on charts */
