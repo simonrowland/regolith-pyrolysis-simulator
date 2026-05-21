@@ -736,5 +736,12 @@ input, select, button, textarea { font-family: inherit; }
     }
     /* Filled primary surfaces need dark text on the lighter accent. */
     .btn-primary,
-    .nav-links a.active { color: #0e1116; }
+    .nav-links a.active,
+    .status-indicator.status-danger { color: #0e1116; }
+    /* Theme the hardcoded warning banner for dark mode. */
+    .throttle-reason {
+        background: #3a2e0a;
+        border-color: #6b5413;
+        color: #f0c674;
+    }
 }
