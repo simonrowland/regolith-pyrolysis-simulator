@@ -13,6 +13,12 @@
     --warning: #d97706;
     --radius: 6px;
     --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* Type scale */
+    --fs-xs: 11px;
+    --fs-sm: 13px;
+    --fs-base: 15px;
+    --fs-lg: 16px;
+    --fs-xl: 18px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +28,7 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.5;
-    font-size: 14px;
+    font-size: var(--fs-base);
     font-variant-numeric: tabular-nums;
 }
 
@@ -84,7 +90,7 @@ body {
 }
 
 .config-panel h2 {
-    font-size: 15px;
+    font-size: var(--fs-xl);
     margin-bottom: 12px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
@@ -227,7 +233,7 @@ body {
 }
 
 .section-card h3 {
-    font-size: 14px;
+    font-size: var(--fs-lg);
     margin-bottom: 10px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
