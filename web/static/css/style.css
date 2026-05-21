@@ -692,3 +692,14 @@ input, select, button, textarea { font-family: inherit; }
         scroll-behavior: auto !important;
     }
 }
+
+/* Empty-state guidance banner (charts area, pre-run) */
+.empty-hint {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+}
