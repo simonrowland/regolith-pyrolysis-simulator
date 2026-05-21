@@ -1,14 +1,13 @@
 # Pure-component vapor pressures for Hertz-Knudsen calculations
 # Antoine equation: log10(P_Pa) = A - B / (T_K + C)
-# Sources: Alcock et al. (1984), Hultgren (1973), NIST-JANAF, Chase (1998)
+# Sources: legacy pure-component constants plus 2026-05-20 fallback refits
+# to VapoRock over Kress91 IW operating conditions. The builtin provider is
+# a fallback; VapoRock remains authoritative when available.
 #
-# Cross-check targets (from context-thermo.md THERMO-13):
-#   Na at 1600 C (1873 K): several bar (~2-5 bar → 2e5-5e5 Pa)
-#   K  at 1600 C: > Na (more volatile)
-#   Fe at 1500 C: ~0.01-0.1 mbar → 1-10 Pa
-#   Mg at 1600 C: ~0.5 bar → 5e4 Pa
-#   SiO at 1600 C (vacuum): 0.5-2 mbar → 50-200 Pa
-#   Ca at 1484 C (bp): significant above 1500 C
+# Fitted fallback residuals vs VapoRock on the 1400-1900 K Kress91 IW grid:
+#   SiO max 0.113 dex; Na max 0.121 dex; Mg max 0.203 dex.
+#   Fe max 0.023 dex on the basalt single-reference grid.
+#   K is structural and single-reference fallback-only, max residual 1.469 dex.
 #
 # VapoRock structural-species note (2026-05-20): K and O2 should be
 # treated as VapoRock-authoritative when VapoRock is available. Antoine
@@ -29,14 +28,14 @@ metals:
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
     antoine:
-      # Liquid Na: Alcock et al. 1984
-      A: 10.866
-      B: 5688
+      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
+      A: 8.477035
+      B: 11265.231371
       C: 0
-    valid_range_K: [371, 2000]
+    valid_range_K: [1400, 1900]
     boiling_point_C: 883
     condensation_T_C_at_1mbar: 480
-    notes: "Clausius-Clapeyron form (C=0). ΔH_vap ≈ 108.9 kJ/mol."
+    notes: "Builtin fallback effective curve; max residual 0.121 dex vs VapoRock on the Kress91 IW fit grid."
 
   K:
     formula: "K"
@@ -49,17 +48,20 @@ metals:
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
     antoine:
-      A: 10.718
+      # Structural fallback only: A shifted to match VapoRock for
+      # lunar_mare_low_ti at 1773.15 K, Kress91 IW. Not a broad K fit.
+      A: 3.869571
       B: 4961
       C: 0
-    valid_range_K: [337, 1800]
+    valid_range_K: [1400, 1900]
     boiling_point_C: 759
     condensation_T_C_at_1mbar: 420
     notes: |
-      More volatile than Na. ΔH_vap ≈ 95.0 kJ/mol.
       VapoRock-authoritative structural species when VapoRock is available;
-      Antoine coefficients are fallback-only approximations, not a refit to
-      the full VapoRock composition/fO2 response.
+      Antoine coefficients are fallback-only approximations, not a refit.
+      Single-reference fallback matches lunar_mare_low_ti at 1773.15 K,
+      Kress91 IW (VapoRock K = 9.55e-02 Pa); broad-grid residual remains
+      structural (max 1.469 dex).
 
   Mg:
     formula: "Mg"
@@ -72,13 +74,14 @@ metals:
       T_band_K: [1873, 2373]
       envelope: [0.10, 0.21]
     antoine:
-      A: 11.412
-      B: 7813
+      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
+      A: 10.628931
+      B: 6788.644019
       C: 0
-    valid_range_K: [923, 2000]
+    valid_range_K: [1400, 1900]
     boiling_point_C: 1091
     condensation_T_C_at_1mbar: 580
-    notes: "ΔH_vap ≈ 149.6 kJ/mol. p_vap ~0.5 bar at 1600°C."
+    notes: "Builtin fallback effective curve; max residual 0.203 dex vs VapoRock on the Kress91 IW fit grid."
 
   Fe:
     formula: "Fe"
@@ -91,13 +94,18 @@ metals:
       T_band_K: [1873, 2373]
       envelope: [0.011, 0.020]
     antoine:
-      A: 11.353
-      B: 19710
+      # Basalt single-reference fallback fit to VapoRock, 1400-1900 K,
+      # Kress91 IW, lunar_mare_low_ti + mars_basalt only.
+      A: 12.404333
+      B: 19156.973681
       C: 0
-    valid_range_K: [1811, 3135]
+    valid_range_K: [1400, 1900]
     boiling_point_C: 2862
     condensation_T_C_at_1mbar: 1250
-    notes: "ΔH_vap ≈ 377.4 kJ/mol. Low vapor pressure at process T."
+    notes: |
+      Basalt single-reference fallback; max residual 0.023 dex vs VapoRock
+      on lunar_mare_low_ti + mars_basalt. Broad-feedstock Fe remains
+      structurally activity-dependent.
 
   Ca:
     formula: "Ca"
@@ -198,9 +206,9 @@ oxide_vapors:
     antoine:
       # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
       # Effective vapor pressure depends on a(SiO₂) and pO₂
-      # These are pure-component SiO saturation values
-      A: 11.817
-      B: 18700
+      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
+      A: 22.117682
+      B: 40638.351545
       C: 0
     valid_range_K: [1400, 2200]
     condensation_T_C: [900, 1200]
@@ -215,6 +223,8 @@ oxide_vapors:
       offgas above ~1400°C. At pO₂ = 1 mbar, suppressed >300×.
       Condenses as adhesive, corrosive amorphous silica below ~1200°C.
       See [THERMO-1] in context-thermo.md.
+      Builtin fallback max residual 0.113 dex vs VapoRock on the Kress91 IW
+      fit grid; extrapolation keeps prior runtime coverage to 2200 K.
 
   CrO2:
     formula: "CrO2"
