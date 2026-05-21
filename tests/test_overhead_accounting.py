@@ -14,7 +14,7 @@ from simulator.state import (
 )
 
 
-def _gas_train_sim():
+def _gas_train_sim(mass_kg=100.0):
     backend = StubBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -30,7 +30,7 @@ def _gas_train_sim():
             "oxide_vapors": {},
         },
     )
-    sim.load_batch("oxide", mass_kg=100.0)
+    sim.load_batch("oxide", mass_kg=mass_kg)
     return sim
 
 
@@ -93,6 +93,10 @@ def _cro2_train_sim():
     )
     sim.load_batch("chromia", mass_kg=1000.0)
     return sim
+
+
+def _bypass_analytic_depletion(sim):
+    sim._apply_analytic_evaporation_depletion = lambda flux: flux
 
 
 def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
@@ -203,6 +207,7 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
+    _bypass_analytic_depletion(sim)
 
     sim.step()
 
@@ -216,6 +221,7 @@ def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
+    _bypass_analytic_depletion(sim)
     sim._get_turbine_spec = lambda: types.SimpleNamespace(
         max_O2_flow_kg_hr=10.0)
 
@@ -238,12 +244,13 @@ def test_overhead_o2_not_double_counted_across_ticks():
     # production counter, which would let carried-over O2 read as fresh
     # throughput. The invariant: over tick 2, turbine throughput + vent
     # equals the ledger O2 delta into the terminal accounts.
-    sim = _gas_train_sim()
+    sim = _gas_train_sim(mass_kg=200.0)
     flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
+    _bypass_analytic_depletion(sim)
     sim._get_turbine_spec = lambda: types.SimpleNamespace(
         max_O2_flow_kg_hr=10.0)
 
@@ -335,6 +342,7 @@ def test_step_drains_uncondensed_overhead_vapor_each_tick():
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
+    _bypass_analytic_depletion(sim)
     sim._get_turbine_spec = lambda: types.SimpleNamespace(
         max_O2_flow_kg_hr=1.0e9)
 
@@ -600,7 +608,7 @@ def _sio_o2_train_sim():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        {"campaigns": {}, "chemistry_kernel": {"allow_fallback_vapor": True}},
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},

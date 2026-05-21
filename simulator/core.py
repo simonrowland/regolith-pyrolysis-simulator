@@ -3498,6 +3498,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                                    CampaignPhase.C3_K, CampaignPhase.C3_NA,
                                    CampaignPhase.C4):
             evap_flux = self._calculate_evaporation(equilibrium)
+            evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
 
         # --- 4b. Alkali shuttle injection (C3 only) ---        [THERMO-5]
         # During C3, the shuttle cycle alternates between injection

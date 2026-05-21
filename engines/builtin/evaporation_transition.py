@@ -34,10 +34,8 @@ a re-derivation of the stoich math (which still routes through
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes),
   * ``available_kg`` -- the parent-oxide kg currently held in
-    ``process.cleaned_melt`` (the same value
-    ``atom_ledger.kg_by_account('process.cleaned_melt')[parent_oxide]``
-    returns at the time of dispatch; passed in to keep the provider
-    stateless about ledger projections).
+    ``process.cleaned_melt``. Grouped analytic depletion already applied
+    before dispatch; this only preserves the no-stock short-circuit.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 :class:`LedgerTransitionProposal` (per-species debit/credit pair) and a
@@ -165,9 +163,9 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
 
-        # Mirror legacy line-for-line. Negative dt_hr or species the
-        # caller flagged should never reach here; if they do, surface as
-        # 'ok' with no transition (matches legacy short-circuit returns).
+        # Negative dt_hr or species the caller flagged should never reach
+        # here; if they do, surface as 'ok' with no transition (matches
+        # legacy short-circuit returns).
         oxide_removed = rate_kg_hr * dt_hr * oxide_per_product_kg
         product_kg = rate_kg_hr * dt_hr
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
@@ -186,22 +184,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 },
             )
 
-        scale = min(1.0, available_kg / oxide_removed)
-        if O2_kg < -1e-12:
-            registry = request.account_view.species_formula_registry
-            o2_formula = resolve_species_formula("O2", registry)
-            available_o2_mol = (
-                request.account_view.accounts.get("process.overhead_gas", {})
-                .get("O2", 0.0)
-            )
-            available_o2_kg = (
-                float(available_o2_mol)
-                * o2_formula.molar_mass_kg_per_mol()
-            )
-            scale = min(scale, max(0.0, available_o2_kg / abs(O2_kg)))
-        oxide_removed *= scale
-        product_kg *= scale
-        O2_kg *= scale
+        scale = 1.0
 
         # Sanity-check the condensation route's verdict. The caller
         # already raises AccountingError on the same conditions before
@@ -220,7 +203,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                     ),
                 },
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr * scale
+        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
         if remaining_kg > product_kg + 1e-12:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,

@@ -113,12 +113,6 @@ def _legacy_hertz_knudsen_flux(
             * sim.melt.stir_factor
             * 3600.0
         )
-        parent_oxide = sp_data.get('parent_oxide', '')
-        if not parent_oxide:
-            continue
-        available_kg = sim.melt.composition_kg.get(parent_oxide, 0.0)
-        max_product_kg = available_kg / stoich['oxide_per_product_kg']
-        rate_kg_hr = min(rate_kg_hr, max_product_kg)
         if rate_kg_hr > 1e-12:
             flux[species] = rate_kg_hr
     return flux
