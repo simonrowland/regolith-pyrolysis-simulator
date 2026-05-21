@@ -4,13 +4,18 @@
 
 // --- Plotly Chart Initialization ---
 
+// Theme-aware chart colours, matched to prefers-color-scheme at load.
+const chartDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const chartFontColor = chartDark ? '#e6edf3' : '#212529';
+const chartGrid = chartDark ? '#2d333b' : '#e9ecef';
+
 const chartLayout = {
     margin: { t: 30, r: 20, b: 40, l: 55 },
     paper_bgcolor: 'transparent',
     plot_bgcolor: 'transparent',
-    font: { size: 11, family: '-apple-system, sans-serif' },
-    xaxis: { title: 'Hour', gridcolor: '#e9ecef' },
-    yaxis: { gridcolor: '#e9ecef' },
+    font: { size: 11, family: '"IBM Plex Sans", -apple-system, sans-serif', color: chartFontColor },
+    xaxis: { title: 'Hour', gridcolor: chartGrid },
+    yaxis: { gridcolor: chartGrid },
 };
 const chartConfig = { responsive: true, displayModeBar: false };
 
