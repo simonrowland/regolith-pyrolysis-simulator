@@ -239,6 +239,9 @@ class CJOlivineKEMSAnchor:
 # a missing tree (no anchors yielded) without raising, so chemistry-suite
 # tests that do not consume the framework still run on a fresh checkout.
 _CORPUS_SUBPATH = "docs-private/deep-research/literature"
+# Distributed (tracked) cohort: the anchor YAMLs the shipped unit tests need so
+# they pass in worktrees/CI without the gitignored research corpus above.
+_TESTS_CORPUS_SUBPATH = "tests/fixtures/corpus"
 _ALPHA_DATA_GROUPS = ("metals", "oxide_vapors")
 
 
@@ -257,13 +260,45 @@ def _corpus_root(repo_root: Path | None = None) -> Path:
     return here.parents[2] / _CORPUS_SUBPATH
 
 
+def _tests_corpus_root(repo_root: Path | None = None) -> Path:
+    """Tracked, distributed cohort root (``tests/fixtures/corpus``).
+
+    Holds the anchor YAMLs the shipped unit tests need so they pass in
+    worktrees/CI without the gitignored research corpus. Takes precedence
+    over the private corpus for any paper present in both.
+    """
+    base = (
+        Path(repo_root)
+        if repo_root is not None
+        else Path(__file__).resolve().parents[2]
+    )
+    return base / _TESTS_CORPUS_SUBPATH
+
+
+def _resolve_paper_fixture(
+    paper_dirname: str, repo_root: Path | None = None
+) -> Path:
+    """Resolve one paper's fixture: tracked cohort first, else the private
+    research corpus. Returns the private path as the default so a missing
+    fixture's error message points at the expected corpus location."""
+    for root in (_tests_corpus_root(repo_root), _corpus_root(repo_root)):
+        candidate = root / paper_dirname / "benchmark-fixture.yaml"
+        if candidate.exists():
+            return candidate
+    return _corpus_root(repo_root) / paper_dirname / "benchmark-fixture.yaml"
+
+
 def _list_fixture_paths(repo_root: Path | None = None) -> list[Path]:
-    """Return absolute paths of every ``benchmark-fixture.yaml`` under
-    the corpus, sorted for deterministic parametrize ids."""
-    root = _corpus_root(repo_root)
-    if not root.exists():
-        return []
-    return sorted(root.glob("*/benchmark-fixture.yaml"))
+    """Return absolute paths of every ``benchmark-fixture.yaml`` across the
+    distributed (tracked) cohort and the private research corpus, deduped by
+    paper directory (tracked cohort wins), sorted for deterministic ids."""
+    by_paper: dict[str, Path] = {}
+    for root in (_tests_corpus_root(repo_root), _corpus_root(repo_root)):
+        if not root.exists():
+            continue
+        for path in sorted(root.glob("*/benchmark-fixture.yaml")):
+            by_paper.setdefault(path.parent.name, path)
+    return [by_paper[name] for name in sorted(by_paper)]
 
 
 def _vapor_pressure_path(repo_root: Path | None = None) -> Path:
@@ -1483,10 +1518,8 @@ def _grid_25_sio_vf_composition(
     composition_key = _GRID_25_SIO_VF_COMPOSITION_KEYS.get(paper_tag)
     if composition_key is None:
         return {}
-    path = (
-        _corpus_root(repo_root)
-        / "visscher-fegley-2013-debris-disks"
-        / "benchmark-fixture.yaml"
+    path = _resolve_paper_fixture(
+        "visscher-fegley-2013-debris-disks", repo_root
     )
     try:
         data = yaml.safe_load(path.read_text())

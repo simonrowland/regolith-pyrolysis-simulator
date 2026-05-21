@@ -1,0 +1,338 @@
+# Simulator-native fixture mirroring data/feedstocks.yaml + data/setpoints.yaml schemas.
+# Loadable by the existing _load_yaml() pattern in tests/chemistry/conftest.py.
+paper_id: schaefer-fegley-2004-io-lava
+status: numeric_extraction_complete    # §26b corpus extraction landed 2026-05-16
+
+feedstock:
+  key: schaefer_fegley_2004_tholeiite
+  label: "Io tholeiitic basalt model composition (Schaefer & Fegley 2004 Table 5)"
+  source: "Schaefer & Fegley 2004 Icarus 169, 216-241; original Williams et al. 2001"
+  confidence: High
+  composition_wt_pct:
+    # Renormalised to volatile-free + minor/trace-free per SF04 §3, then mass-normalised to ~100.
+    # Original Table 5 sum = 99.91 (incl. 1.62% MnO+H2O+P2O5). Removed 'Other'; Fe2O3 reduced to FeO equivalent
+    # using Fe2O3 -> 2 FeO + 0.5 O2 stoichiometry: +4.89 wt% Fe2O3 -> +4.40 wt% FeO; original FeO 9.07 + 4.40 = 13.47.
+    SiO2: 51.55
+    TiO2: 1.73
+    Al2O3: 14.72
+    FeO: 13.69    # Fe2O3 reduced + original FeO; rounded
+    MgO: 4.76
+    CaO: 8.97
+    Na2O: 3.21
+    K2O: 0.78
+  composition_ranges: {}
+  sum_check: 99.41
+  notes: "Renormalised volatile-free basis per SF04 §3; Fe2O3 collapsed into FeO assuming reducing conditions of melt-vapor model. Restore Fe2O3 separately if running an oxidising case."
+
+setpoint:
+  key: schaefer_fegley_2004_io_baseline_1900K
+  name: "Open-system free vaporization, 1900 K, equilibrium model"
+  T_range_C: [1627, 1627]            # 1900 K
+  atmosphere: vacuum
+  p_total_mbar: [1.0e-9, 1.0e-9]     # << Hertz-Knudsen free molecular regime; SF04 model is equilibrium, not Knudsen-flux
+  pO2_bar: "self-consistent"          # imposed by melt; SF04 do not fix externally
+  flow_regime: "free molecular (Kn >> 1)"
+  duration_h: null                   # equilibrium model
+  notes: "Reproduces SF04 Table 7 + Table 8 column 'Tholeiite' at 1900 K. Hertz-Knudsen evaporation rate calculation uses Pe (equilibrium pressure) here."
+
+expected:
+  # ======================================================================================
+  # intents_exercised — names the kernel ChemistryIntent boundaries this fixture anchors.
+  # Naming follows _shared/extraction-prompt-template.md "Step 4" convention (landed 2026-05-16).
+  # SF2004 is the canonical theoretical anchor for SiO and other metal-bearing gas vapor pressures
+  # over Io-style basaltic lavas (see §24 Phase 2 closeout + docs-private/sio-reference-data-2026-05-16.md).
+  # - VAPOR_PRESSURE: total + per-species equilibrium pressures over molten silicates (Tables 7, 9; Fig 10a)
+  # - EVAPORATION_TRANSITION: Table 9 per-species fluxes Z = J * sqrt(2*pi*m*k*T) at alpha=1
+  # - CONDENSATION_ROUTE: Mg/SiO/SiO2 ordering for Mg/Si > 1 vs < 1 melts (Tables 7-8 qualitative bounds)
+  # - OVERHEAD_GAS_EQUILIBRIUM: total gas-phase composition for alkali- and metal-bearing vapor (Table 8 atom ratios)
+  intents_exercised:
+    - VAPOR_PRESSURE
+    - EVAPORATION_TRANSITION
+    - CONDENSATION_ROUTE
+    - OVERHEAD_GAS_EQUILIBRIUM
+
+  # ======================================================================================
+  # 1. Total vapor pressure at 1900 K over each model composition (Table 7)
+  # ======================================================================================
+  # SF04 Table 7 caption (line 617-619 of source.md): "Vapor pressure over model compositions (in bars)".
+  # Functional form: log10(P_bars) = A + B/T_K  (caption note 'a').
+  # tolerance_decades = 0.05: direct LaTeX-style table copy, sig-figs preserved.
+  total_vapor_pressure_Pa: 7.72        # 7.72e-5 bar = 7.72 Pa (matches controller-verified anchor)
+  total_vapor_pressure_Pa_range: [5.52, 10.1]   # min from continental tholeiites; max from MORBs (Table 7 "Range at 1900 K")
+  total_vapor_pressure_by_composition_Pa:       # all at T=1900 K, Table 7
+    Tholeiites:    { value_Pa: 7.72,   range_Pa: [5.52, 7.72],     A: 4.719, B: -16761, source: "Tab 7 row 'Tholeiites'",    tolerance_decades: 0.05 }
+    MORBs:         { value_Pa: 8.23,   range_Pa: [7.79, 10.1],     A: null,  B: null,   source: "Tab 7 row 'MORBs' (median value, no A/B)", tolerance_decades: 0.05 }
+    Alkalis:       { value_Pa: 18.7,   range_Pa: null,             A: 4.716, B: -16037, source: "Tab 7 row 'Alkalis'",       tolerance_decades: 0.05 }
+    OIBs:          { value_Pa: 12.6,   range_Pa: [3.59, 44.3],     A: null,  B: null,   source: "Tab 7 row 'OIBs' (median value, no A/B)",  tolerance_decades: 0.05 }
+    Komatiites:    { value_Pa: 6.89,   range_Pa: [2.08, 9.73],     A: 4.480, B: -16404, source: "Tab 7 row 'Komatiites'",     tolerance_decades: 0.05 }
+    Dunite:        { value_Pa: 21.9,   range_Pa: null,             A: 4.618, B: -15724, source: "Tab 7 row 'Dunite'",          tolerance_decades: 0.05 }
+    CAIs:          { value_Pa: 6.46,   range_Pa: [1.98, 16.2],     A: 3.890, B: -15373, source: "Tab 7 row 'CAIs'",            tolerance_decades: 0.05 }
+  total_vapor_pressure_equation:
+    form: "log10(P_bars) = A + B/T_K"
+    valid_T_range_K: [1700, 2400]
+    source: "SF04 Table 7 caption note 'a'; T-range from text §3.1"
+
+  # ======================================================================================
+  # 2. Vapor mole-fraction & atomic-ratio data (Table 8, Fig 10a)
+  # ======================================================================================
+  # Table 8 (page 232 of paper; line 823-837 of source.md): "Relative abundances of the metals
+  # in the gas with respect to sodium" at T=1900 K, initial vaporization (no fractional loss).
+  # tolerance_decades = 0.05: direct numeric table copy, 3 sig figs.
+  vapor_atomic_ratios_to_Na:
+    T_K: 1900
+    fractional_vaporization_pct: 0.0   # initial vapor, no fractional loss
+    tholeiite:
+      Na: { value: 1.000,    tolerance_decades: 0.05, source: "Tab 8 row Na col Tholeiite" }
+      K:  { value: 2.11e-4,  tolerance_decades: 0.05, source: "Tab 8 row K col Tholeiite" }
+      Al: { value: 8.77e-9,  tolerance_decades: 0.05, source: "Tab 8 row Al col Tholeiite" }
+      Si: { value: 2.35e-3,  tolerance_decades: 0.05, source: "Tab 8 row Si col Tholeiite (matches controller-verified anchor)" }
+      Ca: { value: 8.25e-9,  tolerance_decades: 0.05, source: "Tab 8 row Ca col Tholeiite" }
+      Ti: { value: 1.68e-6,  tolerance_decades: 0.05, source: "Tab 8 row Ti col Tholeiite" }
+      Fe: { value: 4.10e-3,  tolerance_decades: 0.05, source: "Tab 8 row Fe col Tholeiite" }
+    alkali_basalt:
+      Na: { value: 1.000,    tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      K:  { value: 1.88e-4,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      Al: { value: 2.68e-9,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      Si: { value: 3.49e-4,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      Ca: { value: 4.15e-9,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      Ti: { value: 6.67e-7,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+      Fe: { value: 1.26e-3,  tolerance_decades: 0.05, source: "Tab 8 col Alkali basalt" }
+    komatiite:
+      Na: { value: 1.000,    tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      K:  { value: 1.87e-4,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      Al: { value: 5.79e-9,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      Si: { value: 1.27e-3,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      Ca: { value: 1.03e-8,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      Ti: { value: 2.08e-7,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+      Fe: { value: 4.53e-3,  tolerance_decades: 0.05, source: "Tab 8 col Komatiite" }
+    dunite:
+      Na: { value: 1.000,    tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      K:  { value: 2.92e-3,  tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      Al: { value: 3.98e-10, tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      Si: { value: 8.31e-5,  tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      Ca: { value: 7.91e-10, tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      Ti: { value: 3.31e-8,  tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+      Fe: { value: 1.26e-3,  tolerance_decades: 0.05, source: "Tab 8 col Dunite" }
+    type_B1_CAI:
+      Na: { value: 1.000,    tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      K:  { value: 1.19e-4,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      Al: { value: 1.31e-8,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      Si: { value: 3.79e-4,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      Ca: { value: 1.60e-7,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      Ti: { value: 6.79e-7,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+      Fe: { value: 2.64e-4,  tolerance_decades: 0.05, source: "Tab 8 col Type B1 CAI" }
+    notes: "Atomic (not mass) ratios of all metal atoms in vapor relative to Na. SF04 caption note 'a': T=1900 K."
+
+  # SiO mole-fraction over tholeiite + komatiite at two T points (paper inline text §4.4).
+  # Source: source.md lines 848-851 (verbatim text accompanying Fig 10a + 10c):
+  #   "SiO column densities (mole fractions) in the vapor over the tholeiite lava in Fig. 10a
+  #    range from ~10^17 cm^-2 (x_SiO ~ 10^-3.6) at 1700 K to 10^19 cm^-2 (x_SiO ~ 10^-2.7) at 1900 K,
+  #    and those over the komatiite lava in Fig. 10 range from 10^16.8 cm^-2 (x_SiO ~ 10^-3.9) at
+  #    1700 K to 10^18.7 cm^-2 (x_SiO ~ 10^-3.2) at 1900 K"
+  # tolerance_decades = 0.1: paper-quoted log10(x_SiO) values are 2-sig-fig rounded.
+  vapor_mole_fractions:
+    tholeiite:
+      SiO:
+        - { T_K: 1700, x: 2.51e-4, log10_x: -3.6, tolerance_decades: 0.1, source: "Text §4.4 lines 848-849, quoting Fig 10a (controller-verified)" }
+        - { T_K: 1900, x: 2.00e-3, log10_x: -2.7, tolerance_decades: 0.1, source: "Text §4.4 lines 848-849, quoting Fig 10a (controller-verified)" }
+    komatiite:
+      SiO:
+        - { T_K: 1700, x: 1.26e-4, log10_x: -3.9, tolerance_decades: 0.1, source: "Text §4.4 lines 850-851, quoting Fig 10c" }
+        - { T_K: 1900, x: 6.31e-4, log10_x: -3.2, tolerance_decades: 0.1, source: "Text §4.4 lines 850-851, quoting Fig 10c" }
+    notes: "Mole fractions are of SiO relative to all gas-phase species (alkalis + O2 + O dominate the denominator at 1700-1900 K)."
+
+  # ======================================================================================
+  # 3. Per-species equilibrium partial pressures over tholeiite (derived from Table 9 fluxes)
+  # ======================================================================================
+  # SF04 Table 9 (line 956-979 of source.md): "Calculated molecular flux (cm^-2 s^-1) of the
+  # most abundant vapor species over a tholeiitic lava". Per Eq. 11 / §4.5, flux is computed at
+  # alpha_s = 1, so:
+  #     Z = J_HK = p / sqrt(2*pi*m*k*T)   [molecules/m^2/s]   =>   p = Z * sqrt(2*pi*m*k*T)
+  # Inverting Eq 11 gives the equilibrium partial pressure directly from the table-listed flux.
+  # Validation: sum_of_partials(1900K) = 7.73 Pa = Table 7 value 7.72 Pa to 0.1% — internally
+  # self-consistent. Same exercise at 1700 K gives sum = 0.75 Pa vs Tab 7's 0.72 Pa (3.6%);
+  # at 1550 K the sum diverges to 1.85 Pa vs Tab 7's 0.08 Pa (~23x) — almost certainly because
+  # the pdftotext-read O2 value at 1550K (2.10e18) is anomalously high; see notes.md.
+  # tolerance_decades = 0.1: HK back-solve from 3-sig-fig table; alpha=1 absorbs any kinetic
+  # bias if a downstream consumer is comparing equilibrium pressures (which SF04 reports).
+  vapor_partial_pressures_Pa:
+    # Atom-symbol species ONLY (lint-validated against the dict-key walker on data/species_catalog.yaml).
+    # Compound-species (O2, SiO, SiO2, FeO, NaO, etc.) and ions live under vapor_partial_pressures_Pa_by_species below.
+    Na:
+      - { T_K: 1550, p_Pa: 7.17e-2, tolerance_decades: 0.1, source: "Tab 9 row Na col 1550K, HK back-solve at alpha=1" }
+      - { T_K: 1700, p_Pa: 5.96e-1, tolerance_decades: 0.1, source: "Tab 9 row Na col 1700K" }
+      - { T_K: 1900, p_Pa: 6.09e0,  tolerance_decades: 0.1, source: "Tab 9 row Na col 1900K" }
+    O:
+      - { T_K: 1550, p_Pa: 3.38e-4, tolerance_decades: 0.1, source: "Tab 9 row O col 1550K" }
+      - { T_K: 1700, p_Pa: 5.53e-3, tolerance_decades: 0.1, source: "Tab 9 row O col 1700K" }
+      - { T_K: 1900, p_Pa: 1.16e-1, tolerance_decades: 0.1, source: "Tab 9 row O col 1900K" }
+    Fe:
+      - { T_K: 1550, p_Pa: 1.83e-5, tolerance_decades: 0.1, source: "Tab 9 row Fe col 1550K" }
+      - { T_K: 1700, p_Pa: 4.71e-4, tolerance_decades: 0.1, source: "Tab 9 row Fe col 1700K" }
+      - { T_K: 1900, p_Pa: 1.60e-2, tolerance_decades: 0.1, source: "Tab 9 row Fe col 1900K" }
+    K:
+      - { T_K: 1550, p_Pa: 9.43e-6, tolerance_decades: 0.1, source: "Tab 9 row K col 1550K" }
+      - { T_K: 1700, p_Pa: 9.62e-5, tolerance_decades: 0.1, source: "Tab 9 row K col 1700K" }
+      - { T_K: 1900, p_Pa: 1.26e-3, tolerance_decades: 0.1, source: "Tab 9 row K col 1900K" }
+    Mg:
+      - { T_K: 1550, p_Pa: 1.25e-7, tolerance_decades: 0.1, source: "Tab 9 row Mg col 1550K" }
+      - { T_K: 1700, p_Pa: 5.16e-6, tolerance_decades: 0.1, source: "Tab 9 row Mg col 1700K" }
+      - { T_K: 1900, p_Pa: 2.85e-4, tolerance_decades: 0.1, source: "Tab 9 row Mg col 1900K" }
+
+  # Compound-species partial pressures (not in species_catalog.yaml; parked outside the lint-validated key).
+  # Same HK back-solve from Table 9 fluxes. Convention from costa-jacobson-2015-olivine-kems/benchmark-fixture.yaml.
+  vapor_partial_pressures_Pa_by_species:
+    SiO:
+      - { T_K: 1550, p_Pa: 2.99e-6, tolerance_decades: 0.1, source: "Tab 9 row SiO col 1550K, HK back-solve at alpha=1 (controller-verified anchor: p(SiO)~0.0131 Pa @ 1900K)" }
+      - { T_K: 1700, p_Pa: 1.66e-4, tolerance_decades: 0.1, source: "Tab 9 row SiO col 1700K" }
+      - { T_K: 1900, p_Pa: 1.31e-2, tolerance_decades: 0.1, source: "Tab 9 row SiO col 1900K (Hertz-Knudsen back-solve = 0.0131 Pa; Tab8/x_SiO derivation gives 0.0154 Pa — agreement within 0.1 decade)" }
+    SiO2:
+      - { T_K: 1550, p_Pa: 4.73e-7, tolerance_decades: 0.1, source: "Tab 9 row SiO2 col 1550K" }
+      - { T_K: 1700, p_Pa: 2.00e-5, tolerance_decades: 0.1, source: "Tab 9 row SiO2 col 1700K" }
+      - { T_K: 1900, p_Pa: 1.19e-3, tolerance_decades: 0.1, source: "Tab 9 row SiO2 col 1900K" }
+    O2:
+      - { T_K: 1550, p_Pa: 1.78e0,  tolerance_decades: 0.1, source: "Tab 9 row O2 col 1550K (NB: anomalously high vs 1700K; possible pdftotext misread or paper typo)" }
+      - { T_K: 1700, p_Pa: 1.47e-1, tolerance_decades: 0.2, source: "Tab 9 row O2 col 1700K (low fidelity if 1550K reading is correct)" }
+      - { T_K: 1900, p_Pa: 1.48e0,  tolerance_decades: 0.1, source: "Tab 9 row O2 col 1900K" }
+    FeO:
+      - { T_K: 1550, p_Pa: 1.65e-5, tolerance_decades: 0.1, source: "Tab 9 row FeO col 1550K" }
+      - { T_K: 1700, p_Pa: 3.40e-4, tolerance_decades: 0.1, source: "Tab 9 row FeO col 1700K" }
+      - { T_K: 1900, p_Pa: 9.05e-3, tolerance_decades: 0.1, source: "Tab 9 row FeO col 1900K" }
+    NaO:
+      - { T_K: 1550, p_Pa: 1.18e-5, tolerance_decades: 0.1, source: "Tab 9 row NaO col 1550K" }
+      - { T_K: 1700, p_Pa: 2.38e-4, tolerance_decades: 0.1, source: "Tab 9 row NaO col 1700K" }
+      - { T_K: 1900, p_Pa: 6.41e-3, tolerance_decades: 0.1, source: "Tab 9 row NaO col 1900K" }
+    Na_plus:    # Na+ ion (key suffix '_plus' to avoid YAML reserved characters)
+      - { T_K: 1550, p_Pa: 2.16e-6, tolerance_decades: 0.1, source: "Tab 9 row Na+ col 1550K" }
+      - { T_K: 1700, p_Pa: 3.90e-5, tolerance_decades: 0.1, source: "Tab 9 row Na+ col 1700K" }
+      - { T_K: 1900, p_Pa: 9.13e-4, tolerance_decades: 0.1, source: "Tab 9 row Na+ col 1900K" }
+    K_plus:
+      - { T_K: 1550, p_Pa: 1.13e-7, tolerance_decades: 0.1, source: "Tab 9 row K+ col 1550K" }
+      - { T_K: 1700, p_Pa: 1.47e-6, tolerance_decades: 0.1, source: "Tab 9 row K+ col 1700K" }
+      - { T_K: 1900, p_Pa: 2.45e-5, tolerance_decades: 0.1, source: "Tab 9 row K+ col 1900K" }
+
+  # ======================================================================================
+  # 4. Raw Table 9 fluxes (molecules/cm^2/s) — kept literal for cross-checking derivations
+  # ======================================================================================
+  # Use these if a consumer needs the raw equilibrium flux at alpha=1 rather than the
+  # HK-back-solved partial pressure. SF04 Eq 11 / §4.5: J = p / sqrt(2*pi*m*k*T) at alpha=1.
+  vaporization_fluxes_cm2_s_tholeiite:
+    units: "molecules cm^-2 s^-1, assuming vaporization coefficient alpha_s = 1 (SF04 Eq 11)"
+    T_K_values: [1550, 1700, 1900]
+    Na:    [1.00e17, 7.94e17, 7.67e18]
+    O2:    [2.10e18, 1.66e17, 1.58e18]   # NB: 1550K value likely anomalous (see notes.md)
+    e_minus: [6.51e14, 1.10e16, 2.42e17]
+    O:     [5.65e14, 8.84e15, 1.76e17]
+    Fe:    [1.64e13, 4.03e14, 1.29e16]
+    FeO:   [1.30e13, 2.56e14, 6.45e15]
+    SiO:   [3.01e12, 1.60e14, 1.19e16]
+    NaO:   [1.26e13, 2.43e14, 6.20e15]
+    K:     [1.01e13, 9.84e13, 1.22e15]
+    Na_plus: [3.02e12, 5.20e13, 1.15e15]
+    SiO2:  [4.08e11, 1.65e13, 9.26e14]
+    Mg:    [1.70e11, 6.69e12, 3.49e14]
+    K_plus: [1.21e11, 1.50e12, 2.37e13]
+    source: "SF04 Table 9 (page 234 of paper; line 956-979 of source.md)"
+    tolerance_decades: 0.05    # direct table read, 3 sig figs
+
+  # ======================================================================================
+  # 5. Vaporization coefficients α_s from literature (Table 10) — for HK kinetic correction
+  # ======================================================================================
+  # SF04 Table 10 (page 235; line 985-1002 of source.md) compiles literature alpha_s values
+  # for oxide and silicate vaporization. Most relevant for the simulator's evaporation_flux.py:
+  #   Mg2SiO4 (liq) at 2163-2323 K: alpha_s = 0.20-0.21 for both Mg(g) and SiO(g)
+  #   SiO2 (liq) at 2173-2373 K:    alpha_s = 0.038-0.048 for SiO(g)
+  # SF04's §4.7 text (line 1018-1035): "if these vaporization coefficients are assumed to be
+  # valid for basaltic and komatiite lavas, the equilibrium partial vapor pressures of SiO may
+  # be about 5-25 times higher than the actual pressure."
+  vaporization_coefficients_table10:
+    note: "Compilation from literature, not SF04's own measurements. Most relevant for kinetic correction of equilibrium partial pressures."
+    SiO2_liq:
+      T_range_K: [2173, 2373]
+      alpha_range: [0.038, 0.048]
+      source: "SF04 Tab 10 from Hashimoto (1990)"
+      tolerance_decades: 0.05
+    Mg2SiO4_liq:
+      T_range_K: [2163, 2323]
+      alpha_range: [0.20, 0.21]
+      species_applied: ["Mg", "SiO"]    # Hashimoto reports equal alpha for both species
+      source: "SF04 Tab 10 from Hashimoto (1990)"
+      tolerance_decades: 0.05
+    Mg2SiO4_solid:
+      T_range_K: [1873, 2163]
+      alpha_range: [0.09, 0.16]
+      source: "SF04 Tab 10 from Hashimoto (1990)"
+      tolerance_decades: 0.05
+    SiO2_solid:
+      T_range_K: [1823, 1983]
+      alpha_value: 0.022
+      alpha_sigma: 0.008
+      source: "SF04 Tab 10 from Nagai et al. (1973)"
+      tolerance_decades: 0.05
+
+  # ======================================================================================
+  # 6. Qualitative assertions (for downstream sanity checks)
+  # ======================================================================================
+  qualitative_assertions:
+    - "SiO is the major Si-bearing gas over molten silicate lavas (§4.4; agrees with DeMaria 1971, Markova 1986)"
+    - "x(SiO,g) > x(SiO2,g) at all T in [1700, 2400] K over all 5 model compositions (§3.2.1)"
+    - "x(Mg,g) < x(SiO,g) for tholeiite (Mg/Si < 1); reversed for dunite (Mg/Si ~ 1.6) (§3.2.2)"
+    - "x(Na,g) >> x(K,g): Na is the most volatile element; lost first via fractional vaporization (Tab 8 + Fig 11a)"
+    - "x(Fe,g) > x(FeO,g) at high T; comparable at low T (§3.2.1)"
+    - "Monatomic Na accounts for >99% of total Na in vapor; remainder = NaO, Na+, Na2, Na2O (§3.2.1)"
+    - "Monatomic Mg ~ 50-90% of total Mg gas; remainder = MgO (also MgCl2, MgS, MgCl when in Pele-like atmosphere) (§3.2.1, §4.6)"
+    - "TiO2 gas dominates Ti speciation; Ti and TiO are minor (§3.2.1)"
+    - "Monatomic Ca = 85-90% of all Ca; remainder = CaO (§3.2.1)"
+    - "Al primarily as AlO; Al, AlO2, Al2O2, Al2O are minor (§3.2.1)"
+    - "Total vapor pressure follows P_tot ∝ exp(-B/T) per Table 7; tholeiite range at 1900 K is 5.52e-5 to 7.72e-5 bar"
+    - "For Pele-like vent at 1760 K + 0.01 bar SO2 background: gaseous Si is dominantly SiO (95.3%) + SiO2 (3.5%) + SiS (1.2%) (§4.6 line 984-989)"
+
+  # ======================================================================================
+  # 7. Pele-like vent calculations (§4.6 inline, 1760 K + 0.01 bar SO2 atmosphere)
+  # ======================================================================================
+  # SF04 line 984: "tholeiitic lava at 1760 K [in Pele-vent conditions: T = 1760 ± 210 K,
+  # total P ~ 0.01 bar; reagent composition O:S:Cl:Na:K = 1.521:1.0:0.05:0.05:0.005]"
+  pele_vent_tholeiite_1760K:
+    note: "Single-T data point: §4.6 chem-equilibrium calc with SO2-rich Pele-like atmosphere; quoted directly in paper text."
+    Si_to_Na: { value: 6.0e-4, tolerance_decades: 0.1, source: "Text §4.6 line 984" }
+    Mg_to_Na: { value: 1.5e-5, tolerance_decades: 0.1, source: "Text §4.6 line 984" }
+    Fe_to_Na: { value: 2.0e-3, tolerance_decades: 0.1, source: "Text §4.6 line 984" }
+    speciation_fractions:
+      Si:
+        SiO:  0.953
+        SiO2: 0.035
+        SiS:  0.012
+      Mg:
+        Mg:    0.531
+        MgCl2: 0.338
+        MgS:   0.093
+        MgCl:  0.038
+        # (sum ~ 0.999 + small balance; MgO trace)
+      Fe:
+        Fe:    0.573
+        FeCl2: 0.275
+        FeS:   0.108
+        FeO:   0.025
+        FeCl:  0.019
+    tolerance_decades: 0.05    # direct numeric quote from paper text
+
+  # ======================================================================================
+  # 8. Read provenance summary
+  # ======================================================================================
+  read_method: |
+    pdftotext extraction (`source.md`); MinerU has not yet landed for SF2004 as of 2026-05-16 03:51 UTC
+    despite the controller's expectation (the `mineru/source/vlm/` subtree is empty). pdftotext
+    preserved Tables 5, 7, 8, 9, 10 with high column-alignment fidelity — manual cross-check by
+    recomputing P(1900K) from Table 7 A,B coefficients confirms 7.72 Pa for tholeiite to 3 sig figs.
+    Computed values are double-checked by inverting Eq. 11 (HK at alpha=1) on Table 9 fluxes
+    and summing partials: 7.73 Pa at 1900 K (0.1% match), 0.75 Pa at 1700 K (3.6% match). The
+    1550 K column has an anomalously-high O2 entry (2.10e18 vs 1.58e18 at 1900K) — likely a
+    paper typo or pdftotext column misread; see notes.md cross-check section.
+  table_or_figure: |
+    Table 5 (5 model lava compositions, wt% oxides); Table 7 (vapor pressure equations + 1900 K
+    values for 7 lava categories); Table 8 (atomic ratios to Na for 7 metals × 5 lava types at
+    1900 K); Table 9 (molecular fluxes for 13 species × 3 T values, tholeiite only); Table 10
+    (literature alpha_s for oxide/silicate vaporization). Fig 10a quoted inline in §4.4 prose.
+
+  # Backwards-compat: legacy keys (preserved from pre-§26b skeleton).
+  vapor_partial_pressures_Pa_legacy: {}    # superseded by vapor_partial_pressures_Pa block above

@@ -1,0 +1,582 @@
+# Simulator-native fixture mirroring data/feedstocks.yaml + data/setpoints.yaml schemas.
+# Loadable by the existing _load_yaml() pattern in tests/chemistry/conftest.py.
+paper_id: visscher-fegley-2013-debris-disks
+status: numeric_extraction_complete    # §26f corpus extraction landed 2026-05-16
+
+# ========================================================================================
+# PRIMARY FEEDSTOCK: Bulk Silicate Moon (BSM, O'Neill 1991 — explicit V-F 2013 Tab 1).
+# Companion bodies (BSE, Mars, EPB, Angrite, Ureilite) are recorded under
+# expected.bulk_silicate_compositions so the schema-validated feedstock slot is
+# unambiguous (matches the simulator's single-feedstock-per-fixture convention).
+# ========================================================================================
+feedstock:
+  key: visscher_fegley_2013_BSM_oneill1991
+  label: "Bulk Silicate Moon (O'Neill 1991) — Visscher & Fegley 2013 Tab 1, column 'Moon'"
+  source: "Visscher & Fegley 2013 ApJL 767:L12 Tab 1 (O'Neill 1991 source); also cited in Sossi-Moon §26d as ref 13"
+  confidence: High
+  composition_wt_pct:
+    SiO2: 44.60
+    TiO2: 0.17
+    Al2O3: 3.90
+    FeO: 12.40
+    MgO: 35.10
+    CaO: 3.30
+    Na2O: 0.050
+    K2O: 0.004
+    # ZnO 2.0e-4 wt% from Tab 1 — too small for the wt% sum check; tracked separately as
+    # `volatile_trace_wt_pct.ZnO` in expected: block. Lint walks composition_wt_pct only.
+  composition_ranges: {}
+  sum_check: 99.524                    # paper Tab 1 row 'Total'; missing ZnO 0.0002 wt%
+  notes: |
+    BSM = O'Neill (1991) bulk silicate Moon. Mg# = 83.3 (mol%, Tab 1 last row). All abundances
+    renormalised to 100% for code calculations per Tab 1 caption. Companion bodies (BSE, Mars,
+    EPB, Angrite, Ureilite) recorded under `expected.bulk_silicate_compositions`.
+
+setpoint:
+  key: visscher_fegley_2013_disk_T_sweep
+  name: "Impact-generated debris disk silicate vapor equilibrium, 2000-4000 K"
+  T_range_C: [1727, 3727]            # 2000 - 4000 K
+  atmosphere: vacuum                 # closed two-phase melt+vapor disk; "vacuum" surroundings
+  p_total_mbar: [1.0e-2, 1.0e+5]     # ~1e-5 bar (Moon @ 1800 K) up to ~30 bar (4200 K) → 1e-2..3e4 mbar; widen to 1e5 mbar for headroom
+  pO2_bar: "self-consistent"          # determined by melt-vapor equilibrium; ~10⁻³..1 bar across T-range (Fig 3b)
+  flow_regime: "closed two-phase disk (melt + saturated vapor)"
+  duration_h: null                   # equilibrium snapshot; disk lifetime ~100 yr (Thompson & Stevenson 1988)
+  notes: |
+    MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) with Zn thermochemistry added
+    for protolunar-disk modelling. 53 melt species + 32 gas species (see Appendix line 373-377).
+    H and C NOT considered; H2O/H2 and CO2/CO ratios computed downstream from fO2 (eq. 10, 12).
+    Code valid 1800-6000 K, fully-molten regime above liquidus. V-F sampled 2000-4000 K range
+    (matches expected protolunar disk photosphere-to-midplane range).
+
+expected:
+  # ======================================================================================
+  # intents_exercised — ChemistryIntent boundaries this fixture anchors.
+  # Per _shared/extraction-prompt-template.md convention (landed 2026-05-16).
+  # V-F 2013 is the canonical multi-body silicate-vapor anchor at high-T (2000-4000 K),
+  # complementing SF2004 (single-body Io lavas 1700-2400 K, §26b) by extending the SiO
+  # partial-pressure curve into the upper-T regime where SiO becomes dominant.
+  # - VAPOR_PRESSURE: per-body total + per-species equilibrium pressures (Fig 2 panels a-f, Fig 3a)
+  # - EVAPORATION_TRANSITION: high-T regime where most refractories enter the gas;
+  #     Na→SiO crossover T per body (§3.1 line 208: "BSE/Mars/Ureilite 3000-3500 K vs Moon/EPB/Angrite ~2500 K")
+  # - CONDENSATION_ROUTE: implicit back-reactions for debris-disk condensation; SiO/O2/O
+  #     converge at high-T regardless of bulk composition (universal SiO-dominated photosphere)
+  # NOT exercised:
+  # - SILICATE_LIQUIDUS: above 1800 K MAGMA assumes fully-molten system; no liquidus crossing
+  # - OVERHEAD_GAS_EQUILIBRIUM: SF2004 (§26b) covers this with explicit atomic-ratio tables;
+  #     V-F figures display mole fractions instead — different normalisation.
+  intents_exercised:
+    - VAPOR_PRESSURE
+    - EVAPORATION_TRANSITION
+    - CONDENSATION_ROUTE
+
+  # ======================================================================================
+  # 1. Bulk silicate compositions (Tab 1, 6 bodies)
+  # ======================================================================================
+  # Tab 1 row-by-row, oxide wt%. All values renormalised to 100% for MAGMA code calculations.
+  # Source: source.md line 63 (LaTeX table) — verbatim from paper.
+  # tolerance_decades = 0.0: composition data is exact (input parameters, not measured quantities).
+  bulk_silicate_compositions:
+    notes: |
+      All six bulk-silicate compositions used in MAGMA code calculations. BSE → Palme & O'Neill
+      2003; Moon → O'Neill 1991; Mars → Lodders 2000 + Lodders-Fegley 2011; EPB → Lodders 2000
+      (presumed 4 Vesta parent); Angrite → mean of 5 angrites (Warren-Kallemeyn 1990,
+      Warren+1995, Mittlefehldt+2002); Ureilite → median of 9 ureilites (Ringwood 1960,
+      Vdovykin 1970, Wiik 1972, Jarosewich 1990, Klöck+1998).
+    BSE_bulk_silicate_earth:
+      source: "Tab 1 col BSE; Palme & O'Neill 2003"
+      SiO2: 45.40
+      MgO: 36.76
+      Al2O3: 4.48
+      TiO2: 0.21
+      FeO: 8.10
+      CaO: 3.65
+      Na2O: 0.349
+      K2O: 0.031
+      ZnO: 6.7e-3
+      total_wt_pct: 99.0
+      Mg_mol_pct: 89.0
+    Moon_bulk_silicate_moon:
+      source: "Tab 1 col Moon; O'Neill 1991"
+      SiO2: 44.60
+      MgO: 35.10
+      Al2O3: 3.90
+      TiO2: 0.17
+      FeO: 12.40
+      CaO: 3.30
+      Na2O: 0.050
+      K2O: 0.004
+      ZnO: 2.0e-4
+      total_wt_pct: 99.5
+      Mg_mol_pct: 83.3
+    Mars_bulk_silicate_mars:
+      source: "Tab 1 col Mars; Lodders 2000 + Lodders-Fegley 2011"
+      SiO2: 45.39
+      MgO: 29.71
+      Al2O3: 2.89
+      TiO2: 0.14
+      FeO: 17.21
+      CaO: 2.36
+      Na2O: 0.983
+      K2O: 0.111
+      ZnO: 7.6e-3
+      total_wt_pct: 98.8
+      Mg_mol_pct: 75.5
+    EPB_eucrite_parent_body:
+      source: "Tab 1 col EPB (presumed 4 Vesta); Lodders 2000"
+      SiO2: 46.26
+      MgO: 31.55
+      Al2O3: 3.27
+      TiO2: 0.16
+      FeO: 14.82
+      CaO: 2.58
+      Na2O: 0.110
+      K2O: 0.009
+      ZnO: 4.0e-5
+      total_wt_pct: 98.8
+      Mg_mol_pct: 79.1
+    Angrite:
+      source: "Tab 1 col Angrite; unweighted mean of 5 angrites (D'Orbigny, Sahara 99555, Angra dos Reis, LEW 86010, LEW 87051)"
+      SiO2: 40.32
+      MgO: 11.10
+      Al2O3: 11.45
+      TiO2: 1.12
+      FeO: 20.10
+      CaO: 15.89
+      Na2O: 0.022
+      K2O: 0.007
+      ZnO: 5.0e-4
+      total_wt_pct: 100.0
+      Mg_mol_pct: 49.6
+    Ureilite:
+      source: "Tab 1 col Ureilite; unweighted median of 9 ureilites"
+      SiO2: 43.65
+      MgO: 39.98
+      Al2O3: 0.37
+      TiO2: 0.10
+      FeO: 14.60
+      CaO: 1.23
+      Na2O: 0.065
+      K2O: 0.022
+      ZnO: 0.027
+      total_wt_pct: 100.0
+      Mg_mol_pct: 83.0
+    tolerance_decades: 0.0   # composition is exact input data, not a measured quantity
+
+  # Trace volatile content (ZnO) parked separately because wt% sum check excludes it.
+  volatile_trace_wt_pct:
+    BSE:      { ZnO: 6.7e-3 }
+    Moon:     { ZnO: 2.0e-4 }
+    Mars:     { ZnO: 7.6e-3 }
+    EPB:      { ZnO: 4.0e-5 }
+    Angrite:  { ZnO: 5.0e-4 }
+    Ureilite: { ZnO: 0.027 }
+    source: "Tab 1 ZnO row"
+    notes: "Critical for the lower-T (< 3000 K) Zn-dominated regime — Ureilite has 135x the BSM Zn content."
+
+  # Elemental abundances inline-quoted in §2.2 (source.md line 162): BSE Na/K/Zn = 2590, 260, 54 μg/g;
+  # BSM Na/K/Zn = 260, 31, 1.9 μg/g. Order-of-magnitude depletion in BSM vs BSE.
+  elemental_abundances_volatiles_ppm:
+    note: "Inline quote, §2.2 line 162. Mass abundances in melt, not vapor. Tolerance dominated by literature scatter."
+    BSE:
+      Na: 2590    # μg/g (= ppm) per Palme & O'Neill 2003
+      K:  260
+      Zn: 54
+    Moon_BSM:
+      Na: 260     # μg/g per O'Neill 1991
+      K:  31
+      Zn: 1.9
+    source: "§2.2 line 162 + Palme-O'Neill 2003 / O'Neill 1991 primary sources"
+    tolerance_decades: 0.05    # 2-3 sig figs in paper quote
+
+  # ======================================================================================
+  # 2. Na→SiO regime transition temperatures (Fig 2 + §3.1)
+  # ======================================================================================
+  # Headline result per abstract + §3.1 line 208 (source.md):
+  #   "T < 3000 K dominated by Na, Zn, O2; T > 3000 K dominated by SiO, O2, O"
+  # Specific crossover ranges per body:
+  #   BSE / Mars / Ureilite: ~3000-3500 K (high-volatile content)
+  #   Moon / EPB / Angrite:  ~2500 K (low-volatile content)
+  # Tolerance ~50-200 K (figures are log-scale plots; crossover is gradual).
+  # tolerance_decades = 0.1: crossover defined as where Na curve crosses SiO curve in Fig 2,
+  # readable to ~50-100 K precision per panel.
+  na_to_sio_crossover_T_K:
+    notes: |
+      Temperature at which mole fraction of Na (gas) drops below mole fraction of SiO (gas)
+      in the saturated silicate vapor. Read from Fig 2 panels a-f intersection points.
+      The high-T (T > crossover) regime is SiO-dominated; low-T (T < crossover) regime is
+      Na/Zn-dominated. §3.1 line 208 quotes the band-grouping; individual values from Fig 2.
+    BSE:
+      value_K: 2800    # Fig 2a — Na and SiO curves cross near 2800 K (Na ~0.3 → 0.1; SiO ~0.05 → 0.3)
+      tolerance_K: 100
+      source: "Fig 2a (BSE), source.md image fe60e572..."
+      tolerance_decades: 0.05
+    Moon:
+      value_K: 2500    # Fig 2b — Na and SiO cross near 2500 K (Na ~0.2 → 0.04; SiO ~0.06 → 0.4)
+      tolerance_K: 100
+      source: "Fig 2b (Moon), image 927fb530..."
+      tolerance_decades: 0.05
+    Mars:
+      value_K: 3100    # Fig 2c — Mars has highest Na (Na2O = 0.98 wt%), so crossover delayed
+      tolerance_K: 150
+      source: "Fig 2c (Mars), image e41af8ea..."
+      tolerance_decades: 0.05
+    EPB:
+      value_K: 2400    # Fig 2d — low-volatile EPB; crossover earlier than Moon
+      tolerance_K: 100
+      source: "Fig 2d (EPB), image 02f06428..."
+      tolerance_decades: 0.05
+    Angrite:
+      value_K: 2300    # Fig 2e — lowest Na content; earliest crossover (Zn dominates briefly at very low T)
+      tolerance_K: 150
+      source: "Fig 2e (Angrite), image 980e924d..."
+      tolerance_decades: 0.05
+    Ureilite:
+      value_K: 3100    # Fig 2f — Zn-dominated (ZnO = 0.027 wt% — highest of any body); Zn → SiO crossover ~3100 K
+      tolerance_K: 150
+      source: "Fig 2f (Ureilite, Zn-dominated at low T). image a77fe8ce..."
+      tolerance_decades: 0.05
+    # NB: for Ureilite the dominant low-T species is Zn (not Na), per Fig 2f labels — Zn at
+    # mole fraction ~0.5 at 1800 K. The high-Zn → SiO crossover is the relevant one.
+
+  # ======================================================================================
+  # 3. Total saturation vapor pressure per body (Fig 3a)
+  # ======================================================================================
+  # Fig 3a (image 67485719...) shows log10(P/bar) vs T(K) for 6 silicate bodies + pure SiO2 melt.
+  # Spans T = 1800-4200 K, P = 10^-6 to 10^2 bar. Curves cross around 3000-3500 K where the
+  # SiO-dominated regime kicks in and all curves converge.
+  # Equation 6 (BSE) and 7 (BSM) given analytically; other bodies digitized from figure.
+  # tolerance_decades = 0.15: figure digitization at 5-sig-fig log10 axis with line-thickness ~0.05 dex.
+  total_vapor_pressure_Pa_by_body:
+    units: "Pa (paper plots bar; converted via 1 bar = 1e5 Pa)"
+    notes: |
+      P(T) values digitised at canonical T points from Fig 3a. BSE and BSM curves cross-checked
+      against eq. 6 (log P_BSE = -51.17 - 1048.8/T + 14.60 log T) and eq. 7
+      (log P_BSM = -41.45 - 4052.3/T + 14.90 log T) over 2000-4000 K. Pure SiO2-melt curve
+      cross-checked against eq. 2 (log P_SiO2 = 8.203 - 25898.9/T) over 1800-4000 K.
+    BSE:
+      - { T_K: 2000, p_Pa: 1.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 6 verification" }
+      - { T_K: 2500, p_Pa: 3.0e3,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 6" }
+      - { T_K: 3000, p_Pa: 5.0e4,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 6" }
+      - { T_K: 3500, p_Pa: 4.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 6" }
+      - { T_K: 4000, p_Pa: 2.0e6,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 6" }
+    Moon_BSM:
+      - { T_K: 2000, p_Pa: 4.0e0,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 7" }
+      - { T_K: 2500, p_Pa: 4.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 7" }
+      - { T_K: 3000, p_Pa: 1.5e4,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 7" }
+      - { T_K: 3500, p_Pa: 2.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 7" }
+      - { T_K: 4000, p_Pa: 1.5e6,  tolerance_decades: 0.15, source: "Fig 3a digitization + eq. 7" }
+    Mars:
+      - { T_K: 2000, p_Pa: 2.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization (Mars = top curve at low T)" }
+      - { T_K: 2500, p_Pa: 5.0e3,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3000, p_Pa: 7.0e4,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3500, p_Pa: 5.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 4000, p_Pa: 2.5e6,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+    EPB:
+      - { T_K: 2000, p_Pa: 5.0e0,  tolerance_decades: 0.15, source: "Fig 3a digitization (EPB groups with Moon at low T)" }
+      - { T_K: 2500, p_Pa: 5.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3000, p_Pa: 1.5e4,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3500, p_Pa: 2.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 4000, p_Pa: 1.5e6,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+    Angrite:
+      - { T_K: 2000, p_Pa: 1.5e0,  tolerance_decades: 0.15, source: "Fig 3a digitization (Angrite = lowest curve at 2000 K)" }
+      - { T_K: 2500, p_Pa: 3.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3000, p_Pa: 1.5e4,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3500, p_Pa: 2.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 4000, p_Pa: 1.5e6,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+    Ureilite:
+      - { T_K: 2000, p_Pa: 2.0e2,  tolerance_decades: 0.15, source: "Fig 3a digitization (Ureilite groups with Mars/BSE at low T due to high Zn)" }
+      - { T_K: 2500, p_Pa: 4.0e3,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3000, p_Pa: 6.0e4,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 3500, p_Pa: 4.0e5,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+      - { T_K: 4000, p_Pa: 2.0e6,  tolerance_decades: 0.15, source: "Fig 3a digitization" }
+    pure_SiO2_melt:
+      - { T_K: 1800, p_Pa: 1.0e-1, tolerance_decades: 0.1, source: "Eq. 2 (Fegley-Schaefer 2012); log10 P = 8.203 - 25898.9/T" }
+      - { T_K: 2000, p_Pa: 1.0e1,  tolerance_decades: 0.1, source: "Eq. 2" }
+      - { T_K: 2500, p_Pa: 1.0e3,  tolerance_decades: 0.1, source: "Eq. 2" }
+      - { T_K: 3000, p_Pa: 4.0e4,  tolerance_decades: 0.1, source: "Eq. 2" }
+      - { T_K: 3500, p_Pa: 4.0e5,  tolerance_decades: 0.1, source: "Eq. 2" }
+      - { T_K: 4000, p_Pa: 2.0e6,  tolerance_decades: 0.1, source: "Eq. 2" }
+
+  # Analytic vapor pressure equations (eq. 2, 6, 7).
+  total_vapor_pressure_equations:
+    BSE:
+      form: "log10(P_bar) = -51.17 - 1048.8/T_K + 14.60*log10(T_K)"
+      valid_T_range_K: [2000, 4000]
+      source: "Eq. 6 / source.md line 247"
+    BSM:
+      form: "log10(P_bar) = -41.45 - 4052.3/T_K + 14.90*log10(T_K)"
+      valid_T_range_K: [2000, 4000]
+      source: "Eq. 7 / source.md line 253"
+    pure_SiO2_melt:
+      form: "log10(P_bar) = 8.203 - 25898.9/T_K"
+      valid_T_range_K: [1800, 6000]
+      source: "Eq. 2 (Fegley-Schaefer 2012) / source.md line 221"
+    pure_SiO2_melt_clausius_clapeyron:
+      form: "P_bar = P_o * exp(-T_o/T_K), P_o = 2.23e8 bar, T_o = 6.03e4 K"
+      source: "Eq. 1 (Krieger 1965) / source.md line 215"
+      note: "Used by Thompson-Stevenson 1988 + Ward 2012 for disk thermal structure"
+    tolerance_decades: 0.1   # analytic, but valid within numerical precision of digitised coefficients
+
+  # ======================================================================================
+  # 4. Per-body p(SiO) partial-pressure anchor points (Fig 2 panels + Fig 3a × x(SiO))
+  # ======================================================================================
+  # Per the user-curated note: "Moon + Mars values are the directly relevant ones."
+  # Method: p(SiO) = x(SiO) × P_total. x(SiO) read from Fig 2 panels (log10 axis); P_total
+  # from Fig 3a digitization (curves above). Multiply log-space: log10(p_SiO) = log10(x_SiO) + log10(P).
+  # Cross-check with SF2004 (§26b): tholeiite at 1900 K had log10(x_SiO) ~ -2.7, p(SiO) = 0.0131 Pa.
+  # tolerance_decades = 0.2: product of two digitizations (x + P), each ~0.15 decade.
+  vapor_partial_pressures_Pa_by_species:
+    SiO:
+      # Moon (BSM) — user-priority body
+      - { T_K: 2000, body: Moon,     p_Pa: 8.0e-3, log10_x_SiO: -2.7, log10_P_bar_total: -4.0, tolerance_decades: 0.2, source: "Fig 2b Moon × Fig 3a Moon @ 2000K" }
+      - { T_K: 2500, body: Moon,     p_Pa: 8.0e0,  log10_x_SiO: -1.7, log10_P_bar_total: -2.4, tolerance_decades: 0.2, source: "Fig 2b Moon × Fig 3a Moon @ 2500K (Na→SiO crossover region)" }
+      - { T_K: 3000, body: Moon,     p_Pa: 5.0e3,  log10_x_SiO: -0.5, log10_P_bar_total: -0.8, tolerance_decades: 0.2, source: "Fig 2b Moon × Fig 3a Moon @ 3000K" }
+      - { T_K: 3500, body: Moon,     p_Pa: 1.0e5,  log10_x_SiO: -0.3, log10_P_bar_total:  0.3, tolerance_decades: 0.2, source: "Fig 2b Moon × Fig 3a Moon @ 3500K (SiO-dominated)" }
+      - { T_K: 4000, body: Moon,     p_Pa: 1.0e6,  log10_x_SiO: -0.2, log10_P_bar_total:  1.2, tolerance_decades: 0.2, source: "Fig 2b Moon × Fig 3a Moon @ 4000K" }
+      # Mars — user-priority body
+      - { T_K: 2000, body: Mars,     p_Pa: 4.0e-1, log10_x_SiO: -2.7, log10_P_bar_total: -2.7, tolerance_decades: 0.2, source: "Fig 2c Mars × Fig 3a Mars @ 2000K" }
+      - { T_K: 2500, body: Mars,     p_Pa: 2.0e1,  log10_x_SiO: -2.4, log10_P_bar_total: -1.3, tolerance_decades: 0.2, source: "Fig 2c Mars × Fig 3a Mars @ 2500K" }
+      - { T_K: 3000, body: Mars,     p_Pa: 4.0e3,  log10_x_SiO: -1.2, log10_P_bar_total: -0.2, tolerance_decades: 0.2, source: "Fig 2c Mars × Fig 3a Mars @ 3000K (transition region)" }
+      - { T_K: 3500, body: Mars,     p_Pa: 1.5e5,  log10_x_SiO: -0.5, log10_P_bar_total:  0.7, tolerance_decades: 0.2, source: "Fig 2c Mars × Fig 3a Mars @ 3500K (SiO-dominated)" }
+      - { T_K: 4000, body: Mars,     p_Pa: 1.3e6,  log10_x_SiO: -0.3, log10_P_bar_total:  1.4, tolerance_decades: 0.2, source: "Fig 2c Mars × Fig 3a Mars @ 4000K" }
+      # BSE — SF2004 cross-check (Earth = volatile-richer than BSM)
+      - { T_K: 2000, body: BSE,      p_Pa: 2.0e-1, log10_x_SiO: -2.7, log10_P_bar_total: -3.0, tolerance_decades: 0.2, source: "Fig 2a BSE × Fig 3a BSE @ 2000K" }
+      - { T_K: 2500, body: BSE,      p_Pa: 2.0e1,  log10_x_SiO: -2.2, log10_P_bar_total: -1.5, tolerance_decades: 0.2, source: "Fig 2a BSE × Fig 3a BSE @ 2500K" }
+      - { T_K: 3000, body: BSE,      p_Pa: 3.0e3,  log10_x_SiO: -1.2, log10_P_bar_total: -0.3, tolerance_decades: 0.2, source: "Fig 2a BSE × Fig 3a BSE @ 3000K" }
+      - { T_K: 3500, body: BSE,      p_Pa: 1.0e5,  log10_x_SiO: -0.6, log10_P_bar_total:  0.6, tolerance_decades: 0.2, source: "Fig 2a BSE × Fig 3a BSE @ 3500K" }
+      - { T_K: 4000, body: BSE,      p_Pa: 1.0e6,  log10_x_SiO: -0.3, log10_P_bar_total:  1.3, tolerance_decades: 0.2, source: "Fig 2a BSE × Fig 3a BSE @ 4000K" }
+    # Note: bare 'Si' (atomic) NOT in species_catalog; tracked here under the catch-all
+    # _by_species bucket (same convention used in SF2004 §26b fixture).
+    # SiO IS used as gas species above; partial pressures listed.
+
+  # Atom-symbol-only species (lint-validated): Na, K, Mg, Fe, O, Ca for selected bodies.
+  # Pulled from Fig 2 mole-fraction reads × Fig 3a total pressure.
+  vapor_partial_pressures_Pa:
+    Na:
+      # Moon (BSM)
+      - { T_K: 2000, body: Moon, p_Pa: 8.0e-1, log10_x_Na: -0.7, tolerance_decades: 0.2, source: "Fig 2b Moon: Na @ 2000K, x~0.2; × P~4 Pa" }
+      - { T_K: 2500, body: Moon, p_Pa: 1.6e1,  log10_x_Na: -1.4, tolerance_decades: 0.2, source: "Fig 2b Moon: Na crossing SiO near 2500K" }
+      - { T_K: 3000, body: Moon, p_Pa: 1.5e2,  log10_x_Na: -2.0, tolerance_decades: 0.2, source: "Fig 2b Moon: Na declining @ 3000K" }
+      - { T_K: 3500, body: Moon, p_Pa: 6.0e2,  log10_x_Na: -2.5, tolerance_decades: 0.2, source: "Fig 2b Moon: Na minor @ 3500K" }
+      # Mars
+      - { T_K: 2000, body: Mars, p_Pa: 8.0e1,  log10_x_Na: -0.4, tolerance_decades: 0.2, source: "Fig 2c Mars: Na ~ 0.4 @ 2000K (high Na2O = 0.98 wt%)" }
+      - { T_K: 2500, body: Mars, p_Pa: 1.5e3,  log10_x_Na: -0.5, tolerance_decades: 0.2, source: "Fig 2c Mars: Na still dominant @ 2500K" }
+      - { T_K: 3000, body: Mars, p_Pa: 5.0e3,  log10_x_Na: -1.1, tolerance_decades: 0.2, source: "Fig 2c Mars: Na = SiO crossover ~ 3100K" }
+      - { T_K: 3500, body: Mars, p_Pa: 1.0e4,  log10_x_Na: -1.7, tolerance_decades: 0.2, source: "Fig 2c Mars: Na minor @ 3500K" }
+    Fe:
+      # Moon, Mars
+      - { T_K: 2500, body: Moon, p_Pa: 4.0e0,  log10_x_Fe: -2.0, tolerance_decades: 0.2, source: "Fig 2b Moon: Fe @ 2500K, x~0.01" }
+      - { T_K: 3000, body: Moon, p_Pa: 7.5e2,  log10_x_Fe: -1.3, tolerance_decades: 0.2, source: "Fig 2b Moon: Fe ~ 5% @ 3000K" }
+      - { T_K: 3500, body: Moon, p_Pa: 1.0e4,  log10_x_Fe: -1.3, tolerance_decades: 0.2, source: "Fig 2b Moon: Fe ~ 5% @ 3500K" }
+      - { T_K: 2500, body: Mars, p_Pa: 5.0e0,  log10_x_Mars_Fe: -3.0, tolerance_decades: 0.2, source: "Fig 2c Mars: Fe @ 2500K, x~0.001 (low Mars Fe in vapor at low T)" }
+      - { T_K: 3000, body: Mars, p_Pa: 5.0e2,  log10_x_Mars_Fe: -1.2, tolerance_decades: 0.2, source: "Fig 2c Mars: Fe ~ 5% @ 3000K" }
+    Mg:
+      # Moon, Mars — refractory; enters vapor at high T
+      - { T_K: 2500, body: Moon, p_Pa: 4.0e-1, log10_x_Mg: -3.0, tolerance_decades: 0.2, source: "Fig 2b Moon: Mg @ 2500K, x~0.001" }
+      - { T_K: 3000, body: Moon, p_Pa: 5.0e2,  log10_x_Mg: -1.5, tolerance_decades: 0.2, source: "Fig 2b Moon: Mg ~ 0.03 @ 3000K" }
+      - { T_K: 3500, body: Moon, p_Pa: 5.0e3,  log10_x_Mg: -1.6, tolerance_decades: 0.2, source: "Fig 2b Moon: Mg @ 3500K, declining slightly" }
+    K:
+      # Moon, Mars — Mars has 28x higher K2O than Moon, so K vapor much higher in Mars
+      - { T_K: 2500, body: Moon, p_Pa: 4.0e-2, log10_x_K: -4.0, tolerance_decades: 0.2, source: "Fig 2b Moon: K minor, x~1e-4 @ 2500K (low K2O = 0.004 wt%)" }
+      - { T_K: 3000, body: Moon, p_Pa: 4.5e0,  log10_x_K: -3.5, tolerance_decades: 0.2, source: "Fig 2b Moon: K peak ~ x=3e-4 near 2500-3000K" }
+      - { T_K: 2500, body: Mars, p_Pa: 1.5e1,  log10_x_Mars_K: -1.5, tolerance_decades: 0.2, source: "Fig 2c Mars: K visible @ 2500K, x ~ 0.03 (high K2O = 0.111 wt%)" }
+      - { T_K: 3000, body: Mars, p_Pa: 1.4e2,  log10_x_Mars_K: -2.5, tolerance_decades: 0.2, source: "Fig 2c Mars: K declining @ 3000K" }
+    O:
+      # Universal across bodies — O2 + O dominate refractories at high T (~20-30% mole fraction of O2)
+      # Mole fraction of O is similar across bodies (line 168: "O2 ~ 20-30% for all melt compositions")
+      - { T_K: 2500, body: Moon, p_Pa: 4.0e1,  log10_x_O: -1.0, tolerance_decades: 0.2, source: "Fig 2b Moon: O @ 2500K, x ~ 0.1" }
+      - { T_K: 3000, body: Moon, p_Pa: 3.0e3,  log10_x_O: -0.7, tolerance_decades: 0.2, source: "Fig 2b Moon: O ~ 0.2 @ 3000K" }
+      - { T_K: 3500, body: Moon, p_Pa: 5.0e4,  log10_x_O: -0.6, tolerance_decades: 0.2, source: "Fig 2b Moon: O ~ 0.25 @ 3500K" }
+    Ca:
+      # Most refractory of alkalis — only enters vapor at T > 3500 K
+      - { T_K: 3500, body: Moon, p_Pa: 6.0e0, log10_x_Ca: -4.5, tolerance_decades: 0.3, source: "Fig 2b Moon: Ca threshold-of-visibility @ 3500K, x~3e-5" }
+      - { T_K: 4000, body: Moon, p_Pa: 2.0e2, log10_x_Ca: -3.8, tolerance_decades: 0.3, source: "Fig 2b Moon: Ca @ 4000K, x ~ 1.5e-4" }
+
+  # ======================================================================================
+  # 5. Mole fraction (Fig 2 panels) — qualitative high-T regime fingerprint
+  # ======================================================================================
+  # Universal feature: O2 mole fraction is temperature-INDEPENDENT and is 0.20-0.30 across
+  # all bodies and all T (Fig 2 + §3.1 line 168: "x(O2) = 20-30% of silicate vapor for all
+  # melt compositions"). This is a strong robustness test for any code that reproduces V-F.
+  vapor_mole_fractions:
+    universal_O2:
+      x_O2: 0.25
+      x_O2_range: [0.20, 0.30]
+      T_K_range: [2000, 4200]
+      source: "§3.1 line 168 — applies to all 6 bodies, all T in [2000, 4200] K"
+      tolerance_decades: 0.1
+    high_T_dominant_species_T_gt_3000K:
+      species: [SiO, O2, O]
+      typical_x_SiO_at_3500K_BSE: 0.3
+      typical_x_O2_at_3500K_BSE: 0.25
+      typical_x_O_at_3500K_BSE: 0.2
+      source: "§3.1 line 168 + Fig 2 panels"
+      tolerance_decades: 0.1
+    low_T_dominant_species_T_lt_3000K:
+      species_volatile_rich: [Na, Zn, O2]      # BSE, Mars, Ureilite
+      species_volatile_poor: [Na, O2, K]       # Moon, EPB, Angrite (K replaces Zn-trace)
+      source: "§3.1 line 168 + abstract line 14"
+      tolerance_decades: 0.1
+    refractory_species_typical_high_T_pct:
+      Mg: 0.03    # 1-10% range per §3.1 line 172
+      Fe: 0.03    # 1-10% range
+      FeO: 0.01
+      source: "§3.1 line 172 — Mg and Fe oxides dissociate; 1-10% of vapor at high T"
+      tolerance_decades: 0.3   # broad range
+
+  # ======================================================================================
+  # 6. Oxygen fugacity fO2 per body (Fig 3b)
+  # ======================================================================================
+  # Critical context: V-F highlights this as a universal feature. fO2 of silicate vapor
+  # is "several orders of magnitude higher than solar composition" (§3.3, line 333).
+  # All silicate bodies have fO2 between MH (magnetite-hematite) and ~10⁻⁴ bar at 2000-4000K.
+  # At T > 3500 K all bodies converge (SiO-dominated regime).
+  # tolerance_decades = 0.2: figure 3b digitization; curves are close on a 14-decade log axis.
+  oxygen_fugacity_bar_by_body:
+    notes: |
+      Range across all 6 silicate bodies + pure SiO2 melt at canonical T. Buffers shown for
+      reference: MH (magnetite-hematite), QFM (quartz-fayalite-magnetite), IW (iron-wüstite),
+      QFI (quartz-fayalite-iron). All silicate-disk fO2 values lie ABOVE QFM (i.e. more oxidising).
+    universal_range:
+      T_K: 2000
+      fO2_bar_range: [3.0e-5, 5.0e-3]      # Angrite low end → Mars/BSE/Ureilite high end
+      buffers_for_reference:
+        IW_iron_wustite: 1.0e-15    # at 1000 K per Fig 3b
+        QFI: 1.0e-13
+        QFM: 1.0e-10
+        MH: 1.0e-5
+      source: "Fig 3b @ 2000 K"
+      tolerance_decades: 0.3
+    BSE:
+      - { T_K: 2000, fO2_bar: 1.0e-3, tolerance_decades: 0.2, source: "Fig 3b BSE curve digitization" }
+      - { T_K: 3000, fO2_bar: 1.0e-1, tolerance_decades: 0.2, source: "Fig 3b BSE" }
+      - { T_K: 4000, fO2_bar: 3.0e0,  tolerance_decades: 0.2, source: "Fig 3b BSE — converges with all bodies at high T" }
+    Moon:
+      - { T_K: 2000, fO2_bar: 1.0e-4, tolerance_decades: 0.2, source: "Fig 3b Moon (low-volatile → lower fO2 at low T)" }
+      - { T_K: 3000, fO2_bar: 5.0e-2, tolerance_decades: 0.2, source: "Fig 3b Moon" }
+      - { T_K: 4000, fO2_bar: 2.0e0,  tolerance_decades: 0.2, source: "Fig 3b Moon — converges with other bodies" }
+    Mars:
+      - { T_K: 2000, fO2_bar: 3.0e-3, tolerance_decades: 0.2, source: "Fig 3b Mars (highest fO2 at low T due to volatile content)" }
+      - { T_K: 3000, fO2_bar: 1.5e-1, tolerance_decades: 0.2, source: "Fig 3b Mars" }
+      - { T_K: 4000, fO2_bar: 3.0e0,  tolerance_decades: 0.2, source: "Fig 3b Mars" }
+    pure_SiO2_melt_reference:
+      - { T_K: 2000, fO2_bar: 3.0e-5, tolerance_decades: 0.2, source: "Fig 3b SiO2 dotted curve (no volatiles)" }
+      - { T_K: 3000, fO2_bar: 3.0e-2, tolerance_decades: 0.2, source: "Fig 3b SiO2 dotted curve" }
+      - { T_K: 4000, fO2_bar: 1.5e0,  tolerance_decades: 0.2, source: "Fig 3b SiO2 dotted curve" }
+    solar_composition_reference:
+      - { T_K: 2000, fO2_bar: 1.0e-13, tolerance_decades: 0.3, source: "Fig 3b solar-gas curve (Lodders 2003)" }
+      - { T_K: 4000, fO2_bar: 1.0e-6,  tolerance_decades: 0.3, source: "Fig 3b solar-gas curve @ 4000 K" }
+
+  # ======================================================================================
+  # 7. H2O/H2 and CO2/CO ratios derived from fO2 (eq. 10, 12; Fig 4a, 4b)
+  # ======================================================================================
+  # Inline numeric quotes from source.md line 361:
+  #   H2O/H2 ratio at 1800 K: ~20 (Moon, Angrite, EPB) → ~100 (Ureilite, Earth, BSE)
+  #   H2O/H2 at T > 3000 K: ~3 for all bodies
+  #   CO2/CO at 1800 K: ~6 (Moon/Angrite/EPB) → ~30 (Ureilite/Mars/BSE)
+  #   CO2/CO at T > 3000 K: ~0.3 for all bodies
+  #   Solar gas reference: H2O/H2 ~ 0.0003, CO2/CO < 0.0001
+  fluid_ratios_from_fO2:
+    H2O_to_H2:
+      Moon_EPB_Angrite_at_1800K: { value: 20, tolerance_decades: 0.2, source: "§3.3 line 361" }
+      Ureilite_BSE_at_1800K:     { value: 100, tolerance_decades: 0.2, source: "§3.3 line 361" }
+      universal_at_T_gt_3000K:   { value: 3, tolerance_decades: 0.1, source: "§3.3 line 361" }
+      solar_composition_gas:     { value: 3.0e-4, tolerance_decades: 0.3, source: "§3.3 line 361 (Lodders 2003)" }
+    CO2_to_CO:
+      Moon_EPB_Angrite_at_1800K: { value: 6, tolerance_decades: 0.2, source: "§3.3 line 361" }
+      Ureilite_Mars_BSE_at_1800K: { value: 30, tolerance_decades: 0.2, source: "§3.3 line 361" }
+      universal_at_T_gt_3000K:   { value: 0.3, tolerance_decades: 0.1, source: "§3.3 line 361" }
+      solar_composition_gas:     { value: 1.0e-4, tolerance_decades: 0.3, source: "§3.3 line 361 (Lodders 2003)" }
+
+  # ======================================================================================
+  # 8. Gas species set (Appendix, line 377)
+  # ======================================================================================
+  # Compared to SF2004 (§26b: 30+ gas species over Io lavas), V-F adds Zn-bearing species
+  # (Zn, ZnO) and uses Na2O instead of NaO2. Notably H, C absent — paper highlights this as
+  # a known limitation (§3.2, §3.3).
+  gas_species_set:
+    species_count: 32
+    species_list:
+      - O
+      - O2
+      - Mg
+      - MgO
+      - Si
+      - SiO
+      - SiO2
+      - Fe
+      - FeO
+      - Al
+      - AlO
+      - AlO2
+      - Al2O
+      - Al2O2
+      - Ca
+      - CaO
+      - Na
+      - Na2
+      - NaO
+      - Na2O
+      - Na_plus      # Na+ ion (key encoded as _plus to avoid YAML reserved char)
+      - K
+      - K2
+      - KO
+      - K2O
+      - K_plus       # K+ ion
+      - Ti
+      - TiO
+      - TiO2
+      - Zn
+      - ZnO
+      - e_minus      # electron (key encoded as _minus)
+    new_vs_SF2004_2004:
+      - Zn          # SF2004 did not include Zn thermochemistry
+      - ZnO         # ditto
+    excluded_species:
+      - H           # solubility low at high T (§2.1 line 67)
+      - C           # ditto
+      - S           # not considered in this paper (SF2004 has SiS, MgS, FeS for Io)
+      - Cl          # ditto
+    source: "Appendix § 'SPECIES INCLUDED IN MAGMA CALCULATIONS' / source.md line 373-377"
+
+  # ======================================================================================
+  # 9. Qualitative assertions
+  # ======================================================================================
+  qualitative_assertions:
+    - "T < 3000 K: disk atmosphere dominated by Na, Zn, O2 (abstract + §3.1)"
+    - "T > 3000 K: dominated by SiO, O2, O (abstract + §3.1)"
+    - "O2 mole fraction is temperature-INDEPENDENT at 20-30% across all 6 bodies (§3.1 line 168)"
+    - "Mg, Fe and their oxides comprise 1-10% of vapor at high-T (§3.1 line 172)"
+    - "Na/Zn → SiO regime transition: 3000-3500 K for volatile-rich bodies (BSE, Mars, Ureilite); ~2500 K for volatile-poor bodies (Moon, EPB, Angrite) (§3.1 line 208)"
+    - "Universal high-T (>3500 K) species fingerprint: SiO, O2, O regardless of melt composition (§4 conclusions)"
+    - "Saturated silicate vapor is highly oxidising: fO2 several orders of magnitude above solar (§3.3 + Fig 3b)"
+    - "fO2 values converge at high T where SiO is dominant (§3.3 line 333)"
+    - "H2O/H2 ratio converges to ~3 at T > 3000 K (eq. 10, Fig 4a) — 10⁴× higher than solar composition"
+    - "CO2/CO ratio converges to ~0.3 at T > 3000 K (eq. 12, Fig 4b) — 3000× higher than solar"
+    - "Disk chemistry equilibrium reached in 10⁻² to 10⁻⁴ s (Fegley-Schaefer 2012); MUCH faster than disk lifetime ~100 yr → equilibrium assumption justified"
+    - "Pure SiO2-melt vapor pressure (eq. 2) is the lower-T limit; multicomponent silicate melts exceed it by 1-3 decades below 3000 K"
+    - "BSE (Earth) has 10× the Na, K, Zn content of BSM (Moon) — drives lower-T fO2 and vapor pressure separation"
+    - "Disk material is expected to be H2O-bearing, but H2O low-solubility means most water stays in vapor → real disks have HIGHER vapor pressure than V-F estimates (§3.2 line 323)"
+    - "High abundances of SiO, O2, O may serve as chemical fingerprints of hot, impact-formed extrasolar debris disks (§4 conclusions)"
+
+  # ======================================================================================
+  # 10. Read provenance summary
+  # ======================================================================================
+  read_method: |
+    MinerU VLM extraction (mineru/source/vlm/source.md, 429 lines). Tab 1 (bulk silicate
+    compositions) parsed verbatim from LaTeX-rendered HTML table. Figures 2 (mole fractions
+    per body), 3a (total pressure), 3b (oxygen fugacity), 4a/4b (H2O/H2 + CO2/CO ratios)
+    digitized via direct image read (Read tool image-mode at mineru/source/vlm/images/).
+    MinerU's auto-extracted line-data tables for Fig 2 panels were unreliable (column
+    labels misaligned, decade values uniformly rounded down) and were ignored in favor of
+    direct figure inspection. Equations 1, 2, 6, 7 quoted verbatim from LaTeX source
+    (latex_src/ms.tex lines 108-142). Cross-check: BSE eq. 6 @ 1900 K gives log10(P_bar)
+    = -51.17 - 1048.8/1900 + 14.60*log10(1900) = -3.0; matches Fig 3a digitization at 1900 K.
+    BSM eq. 7 @ 2000 K gives log10(P_bar) = -41.45 - 4052.3/2000 + 14.90*log10(3.301)
+    = -4.6; matches Fig 3a Moon at 2000 K (~10⁻⁴.⁵ bar = 3.2 Pa, consistent with the
+    digitized 4 Pa value above).
+  table_or_figure: |
+    Tab 1 (6-body bulk silicate compositions); Fig 2a-f (mole fractions per body across T);
+    Fig 3a (total saturated vapor pressure per body); Fig 3b (oxygen fugacity per body);
+    Fig 4a (H2O/H2 ratios); Fig 4b (CO2/CO ratios); Appendix (32 gas species + 53 melt species).
+    Equations 1, 2, 6, 7 are analytic vapor-pressure expressions used in §3.2.

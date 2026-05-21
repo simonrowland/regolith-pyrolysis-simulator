@@ -1,0 +1,222 @@
+# Simulator-native fixture. Sossi & Fegley 2018 is a review, not a single experiment;
+# the fixture below picks the most directly testable lunar-basalt sub-case (Fig 3) and
+# the activity-coefficient lookup (Table 2) as a separate reference dataset.
+paper_id: sossi-fegley-2018-volatility
+
+# Primary fixture: lunar basalt vapor pressures (Fig 3 data)
+feedstock:
+  key: sossi_fegley_2018_lunar_basalt_fig3
+  label: "Lunar basalt (composition not specified in SoF18; use simulator's lunar_mare_low_ti as proxy)"
+  source: "Sossi & Fegley 2018 Rev. Mineral. Geochem. 84, 393-459, Fig. 3"
+  confidence: Medium
+  composition_wt_pct:
+    # SoF18 do not give the composition; using a lunar mare basalt-like composition
+    # consistent with simulator data/feedstocks.yaml lunar_mare_low_ti as proxy.
+    # If matching SoF18 exactly is required, defer to whichever Apollo basalt SoF18 cite (TBD from full paper read).
+    SiO2: 44.5
+    TiO2: 1.5
+    Al2O3: 13.5
+    FeO: 16.5
+    MgO: 9.0
+    CaO: 11.0
+    Na2O: 0.4
+    K2O: 0.10
+    MnO: 0.20
+    P2O5: 0.10
+    Cr2O3: 0.35
+  composition_ranges: {}
+  sum_check: 97.15
+  notes: "Composition is the simulator's lunar_mare_low_ti, used as a proxy. SoF18 Fig. 3 may have used a different Apollo basalt; if matching SoF18 figure exactly, look up which Apollo basalt they cite in figure caption."
+
+setpoint:
+  key: sossi_fegley_2018_lunar_basalt_evap_sweep
+  name: "Equilibrium vapor pressures over lunar basalt, T sweep 1500-2000 K"
+  T_range_C: [1227, 1727]    # 1500-2000 K
+  atmosphere: vacuum
+  p_total_mbar: [1.0e-9, 1.0e-9]
+  pO2_bar: "self-consistent (per Fig 4)"
+  flow_regime: "free molecular (Kn >> 1)"
+  duration_h: null
+  notes: "Reproduces SoF18 Fig 3 partial pressures and Fig 4 fO2 trajectory over the same T range."
+
+expected:
+  intents_exercised: [VAPOR_PRESSURE, EVAPORATION_TRANSITION]
+  qualitative_assertions:
+    - "log10(p_SiO) > log10(p_SiO2) at all T in [1500, 2000] K above lunar basalt"
+    - "log10(p_Na) > log10(p_K) (Na more volatile than K despite K being more volatile as pure metal — melt activity dominates)"
+    - "Self-consistent log fO2 falls between IW and IW-2 buffers across this T range (Fig 4)"
+
+  # Pure-end-member gas species sets (Table 1 extraction).
+  # Bold-type primary gas listed first; descending order per Table 1 convention.
+  # O2 is always present per SoF18 Table 1 footnote (source.md line 217) but not enumerated
+  # per-oxide in the table — record it as the implicit oxidant for every set below.
+  gas_species_sets:
+    SiO2_melt:
+      species_descending: [SiO, SiO2, Si, O2]
+      primary: SiO
+      T_K_range: [1800, 2200]
+      source: "SoF18 Table 1 row SiO2 (cristobalite/l), 1996 K; refs Brewer&Mastick 1951, Porter 1955c, Nesmeyanov&Firsova 1960, Nagai 1973, Zmbov 1973, Kazenas 1985, Shornikov 1998"
+    MgO_melt:
+      species_descending: [Mg, MgO, O2]
+      primary: Mg
+      T_K_range: [1573, 2160]
+      source: "SoF18 Table 1 row MgO(s), 3100 K; refs Porter 1955b, Alcock&Peleg 1967, Farber&Srivastava 1976b, Sata 1978, Kazenas 1983"
+    FeO_melt:
+      species_descending: [Fe, FeO, O2]
+      primary: Fe
+      T_K_range: [1543, 1950]
+      source: "SoF18 Table 1 row Fe1-xO wüstite (s/l), 1650-1776 K; refs Brewer&Mastick 1951, Washburn 1963, Chizikov 1971, Shchedrin 1978, Kazenas&Tagirov 1995"
+    CaO_melt:
+      species_descending: [Ca, CaO, O2]
+      primary: Ca
+      T_K_range: [1500, 2227]
+      source: "SoF18 Table 1 row CaO(s), 3172 K; refs Farber&Srivastava 1976a, Sata 1982, Samoilova&Kazenas 1995"
+    Al2O3_melt:
+      species_descending: [Al, AlO, Al2O, AlO2, Al2O2, O2]
+      primary_set: [Al, AlO, Al2O]   # SoF18 lists 3 co-primary species in bold for Al2O3
+      T_K_range: [1500, 4700]
+      source: "SoF18 Table 1 row α-Al2O3(s,l), 2327 K; refs Brewer&Searcy 1951, Porter 1955a, Drowart 1960, Farber 1972a, Chervonnyi 1977/2010, Paule 1976, Ho&Burns 1980, Milushin 1987, Hastie 2000"
+    TiO2_melt:
+      species_descending: [TiO2, TiO, Ti, O2]
+      primary_set: [TiO2, TiO]   # ~ (co-primary per Table 1)
+      T_K_range: [1850, 2540]
+      source: "SoF18 Table 1 row TiO2 (rutile,l), 2143 K; refs Berkowitz 1957d, Gilles 1968, Semenov 1969"
+    Na2O_melt:
+      species_descending: [Na, Na2O, NaO, NaO2, O2]
+      primary: Na
+      T_K_range: [873, 1304]
+      source: "SoF18 Table 1 row Na2O(s), 1405 K; refs Hildenbrand&Murad 1970, Piacente 1972, Hildenbrand&Lau 1993, Popovic 2012"
+    K2O_melt:
+      species_descending: [K, K2O, KO, K2O2, K2, KO2, O2]
+      primary: K
+      T_K_range: [580, 3000]
+      source: "SoF18 Table 1 row K2O(s,l), 1013 K; refs Ehlert 1977, Simmons 1977, Byker 1979, Lamoreaux&Hildenbrand 1984"
+    MnO_melt:
+      species_descending: [Mn, MnO, MnO2, O2]
+      primary: Mn
+      T_K_range: [1535, 1999]
+      source: "SoF18 Table 1 row MnO(s), 2115 K; refs Brewer&Mastick 1951, Kazenas 1984b, Hildenbrand&Lau 1994, Matraszek 2004"
+    Cr2O3_melt:
+      species_descending: [Cr, CrO, CrO2, CrO3, O2]
+      primary: Cr
+      T_K_range: [1690, 2059]
+      source: "SoF18 Table 1 row Cr2O3(s), 2603 K; refs Grimley 1961, Chizikov 1972"
+    ZnO_melt:
+      species_descending: [Zn, ZnO, O2]
+      primary: Zn
+      T_K_range: [1023, 1632]
+      source: "SoF18 Table 1 row ZnO(s), 2248 K; refs Anthrop&Searcy 1964, Hoenig 1964, Kodera 1968, Kazenas 1984"
+    NiO_melt:
+      species_descending: [Ni, NiO, O2]
+      primary: Ni
+      T_K_range: [1400, 1816]
+      source: "SoF18 Table 1 row NiO(s), 2228 K; refs Brewer&Mastick 1951, Grimley 1961b, Kodera 1968, Kazenas&Tagirov 1995"
+    gas_species_sets_notes: |
+      Source: SoF18 Table 1 (~80 pure binary metal oxides). O2 listed as universally
+      present per Table 1 footnote (source.md line 217). 'primary' = bold-typed
+      most-abundant species in Table 1; 'primary_set' used where Table 1 indicates
+      ≥2 co-primary species (e.g., 'TiO2 ~ TiO' for rutile/l). Species_descending
+      order follows Table 1 (bold first, then descending abundance).
+      Subset extracted: 12 oxides covering the major silicate components relevant
+      to lunar/Mars/asteroid feedstocks. Full 77-oxide table available in
+      source.md line 221 if a broader cross-check is needed in a future pass.
+
+  # Fig 3 lunar basalt 12022 SiO partial pressure curve (digitized from Fig 3).
+  # Y-axis of Fig 3 is log10(p(M^xO_x/2) / X(M^(x+n)O_(x+n)/2)) in atm; converted to
+  # p in Pa using X_SiO2(12022_proxy) = 0.4765 (mole fraction from composition_wt_pct above)
+  # and 101325 Pa/atm. Graphical readout uncertainty ~0.2 dex (~factor 1.6x) per user
+  # curation. fO2 buffer per Fig 4 ≈ FMQ+0.5 at 1396-1499 K (DeMaria 1971 measurement
+  # range); extrapolated FMQ-relative at higher T per Fig 4 caption.
+  #
+  # Convention from costa-jacobson-2015-olivine-kems and schaefer-fegley-2004-io-lava
+  # fixtures: only atom-symbol species (Si, O, Fe, ...) live under the canonical
+  # `vapor_partial_pressures_Pa:` key — that key is lint-validated against
+  # data/species_catalog.yaml via a dict-key walker that misses list-item ids
+  # (lint walker traverses dict keys only, not list-item id values).
+  # Compound species (SiO, SiO2, O2, FeO, ...) live under `vapor_partial_pressures_Pa_by_species`,
+  # same payload, key not validated.
+  vapor_partial_pressures_Pa: {}    # SiO is a compound species → lives under _by_species below
+  vapor_partial_pressures_Pa_by_species:
+    SiO:
+      - { T_K: 1673, p_Pa: 2.42e-3, tolerance_decades: 0.2, source: "Fig 3 SiO curve, extrapolated below curve start (~1700K); log10(p/X)=-7.30, X_SiO2=0.4765, atm→Pa" }
+      - { T_K: 1773, p_Pa: 1.53e-2, tolerance_decades: 0.2, source: "Fig 3 SiO curve digitized; log10(p/X)=-6.50, X_SiO2=0.4765, atm→Pa" }
+      - { T_K: 1873, p_Pa: 9.63e-2, tolerance_decades: 0.2, source: "Fig 3 SiO curve digitized; log10(p/X)=-5.70, X_SiO2=0.4765, atm→Pa" }
+      - { T_K: 1973, p_Pa: 4.83e-1, tolerance_decades: 0.2, source: "Fig 3 SiO curve digitized; log10(p/X)=-5.00, X_SiO2=0.4765, atm→Pa" }
+      # ---- v3 additions (direct MinerU Fig 3 image digitization, 2026-05-16) ----
+      # Fig 3 plots one SiO curve for the DeMaria et al. 1971 lunar basalt 12022
+      # KEMS path. It does not plot controlled-fO2 buffer families; fO2_buffer
+      # records that absence rather than fabricating IW/IW±2 curves.
+      - { T_K: 1573, fO2_buffer: "not_plotted_in_fig3; DeMaria1971_KEMS_self_consistent", p_Pa: 2.54e-3, tolerance_decades: 0.2, extraction: "figure-digitization-of-Fig-3", supersedes_v2: null, source: "MinerU Fig 3 JPEG 71992d154dda4ddbb02da24ad09d1beee990262ecfda584a28b58abdd8c4a6c4.jpg; SiO line-fit extrapolated 37 K below visible segment; log10(p/X)=-7.28, X_SiO2=0.4765, atm_to_Pa" }
+      - { T_K: 1673, fO2_buffer: "not_plotted_in_fig3; DeMaria1971_KEMS_self_consistent", p_Pa: 1.23e-2, tolerance_decades: 0.15, extraction: "figure-digitization-of-Fig-3", supersedes_v2: "1673 K p_Pa=2.42e-3 tolerance_decades=0.2", source: "MinerU Fig 3 JPEG 71992d154dda4ddbb02da24ad09d1beee990262ecfda584a28b58abdd8c4a6c4.jpg; local SiO pixels; log10(p/X)=-6.59, X_SiO2=0.4765, atm_to_Pa" }
+      - { T_K: 1773, fO2_buffer: "not_plotted_in_fig3; DeMaria1971_KEMS_self_consistent", p_Pa: 5.81e-2, tolerance_decades: 0.15, extraction: "figure-digitization-of-Fig-3", supersedes_v2: "1773 K p_Pa=1.53e-2 tolerance_decades=0.2", source: "MinerU Fig 3 JPEG 71992d154dda4ddbb02da24ad09d1beee990262ecfda584a28b58abdd8c4a6c4.jpg; local SiO pixels; log10(p/X)=-5.92, X_SiO2=0.4765, atm_to_Pa" }
+      - { T_K: 1873, fO2_buffer: "not_plotted_in_fig3; DeMaria1971_KEMS_self_consistent", p_Pa: 2.82e-1, tolerance_decades: 0.15, extraction: "figure-digitization-of-Fig-3", supersedes_v2: "1873 K p_Pa=9.63e-2 tolerance_decades=0.2", source: "MinerU Fig 3 JPEG 71992d154dda4ddbb02da24ad09d1beee990262ecfda584a28b58abdd8c4a6c4.jpg; local SiO pixels; log10(p/X)=-5.23, X_SiO2=0.4765, atm_to_Pa" }
+      - { T_K: 1973, fO2_buffer: "not_plotted_in_fig3; DeMaria1971_KEMS_self_consistent", p_Pa: 1.35, tolerance_decades: 0.15, extraction: "figure-digitization-of-Fig-3", supersedes_v2: "1973 K p_Pa=4.83e-1 tolerance_decades=0.2", source: "MinerU Fig 3 JPEG 71992d154dda4ddbb02da24ad09d1beee990262ecfda584a28b58abdd8c4a6c4.jpg; local SiO pixels; log10(p/X)=-4.55, X_SiO2=0.4765, atm_to_Pa" }
+    notes: |
+      Fig 3 is presented as log10(p_i/X_i) in atm (normalized ratio of partial
+      pressure to mole fraction of source oxide in melt). Converted to absolute
+      p_Pa using X_SiO2 = 0.4765 from this fixture's composition_wt_pct entries
+      and 101325 Pa/atm. Note 1573 K (12022 liquidus) is OMITTED: SiO curve in
+      Fig 3 does not extend below ~1700 K (sub-liquidus regime, per SoF18 text
+      line 333: "Lunar basalt 12022 has a liquidus temperature of ≈1300°C
+      (1573 K)"). fO2 inferred from Fig 4: ≈FMQ+0.5 over 1396-1499 K (DeMaria
+      1971 measurement); buffer trajectory crosses ~FMQ-1.5 at ≈1900 K per the
+      SiO2-SiO line of Kazenas 1985.
+  read_method: "Fig 3 (log-log plot of p_i/X_i vs T, atm) + Fig 4 (log fO2 vs T); ~0.2 dex (~factor 1.6x) graphical uncertainty; SiO curve only digitized in v2 — Na/K/Fe/Mg/Ca/Al/Ti/Cr deferred"
+  table_or_figure: "Figs 3, 4 (Fig 3 primary); Tables 1, 2 (reference data sub-blocks)"
+
+# Secondary reference dataset: activity coefficients (Table 2)
+# The simulator's chemistry kernel can be probed for γ_oxide values using its melt model;
+# values produced should fall within these envelopes for the listed composition class + T.
+activity_coefficient_envelopes:
+  # oxide_simulator_key: { T_K_min, T_K_max, gamma_min, gamma_max, melt_class }
+  # ---- v1 entries (PRESERVED unchanged) ----
+  AlO1.5: {T_K_min: 1573, T_K_max: 1773, gamma_min: 0.28, gamma_max: 0.37, melt_class: "CMAS (An-Di)"}
+  CaO:    {T_K_min: 1873, T_K_max: 1873, gamma_min: 0.001, gamma_max: 0.15, melt_class: "CMAS basicity 0.55-0.65"}
+  FeO:    {T_K_min: 1573, T_K_max: 1923, gamma_min: 0.5, gamma_max: 2.5, melt_class: "CMAS / FCMAS"}
+  KO0.5:  {T_K_min: 1573, T_K_max: 1573, gamma_min: 6.3e-5, gamma_max: 7.1e-4, melt_class: "KFCAS w/ KAlSiO4 saturation"}
+  MgO:    {T_K_min: 1873, T_K_max: 1873, gamma_min: 0.25, gamma_max: 4.0, melt_class: "CMAS basicity 0.55-0.65"}
+  MnO:    {T_K_min: 1823, T_K_max: 1923, gamma_min: 0.5, gamma_max: 7.2, melt_class: "FCMS(P) / CAS"}
+  NaO0.5: {T_K_min: 1623, T_K_max: 1673, gamma_min: 8.4e-4, gamma_max: 2.2e-3, melt_class: "CMAS / CMS"}
+  SiO2:   {T_K_min: 1573, T_K_max: 1773, gamma_min: 0.9, gamma_max: 1.1, melt_class: "CMAS (An-Di)"}
+  TiO2:   {T_K_min: 1573, T_K_max: 1773, gamma_min: 1.5, gamma_max: 1.7, melt_class: "CMAS"}
+
+  # ---- v2 additions (Table 2 augmentation, 2026-05-16) ----
+  # Trace / chalcophile / siderophile oxides extracted from SoF18 Table 2 (source.md line 280).
+  # Naming convention: oxide id matches Table 2's column 'Oxide' (single-cation reduced form, e.g. AlO1.5
+  # not Al2O3, where the paper uses that convention). For FeO/NaO0.5 multiple Table 2 rows differ by
+  # melt class — recorded as separate keyed entries with a "_NN" suffix where needed to preserve all rows.
+  AsO1.5: {T_K_min: 1573, T_K_max: 1573, gamma_min: 0.03, gamma_max: 0.56, melt_class: "FCS", ref: "Chen & Jahanshahi 2010"}
+  BiO1.5: {T_K_min: 1573, T_K_max: 1573, gamma_min: 0.3, gamma_max: 0.5, melt_class: "FCS", ref: "Paulina et al. 2013"}
+  CoO_a:  {T_K_min: 1573, T_K_max: 1873, gamma_min: 0.5, gamma_max: 2.2, melt_class: "(F)CMAS", ref: "Holzheid et al. 1997"}
+  CoO_b:  {T_K_min: 1673, T_K_max: 1673, gamma_min: 0.8, gamma_max: 1.8, melt_class: "CMAS", ref: "O'Neill & Eggins 2002; O'Neill & Berry 2006"}
+  CrO:    {T_K_min: 1773, T_K_max: 1773, gamma_min: 1.9, gamma_max: 7.2, melt_class: "CAS", ref: "Pretorius & Muan 1992"}
+  CrO1.5: {T_K_min: 1773, T_K_max: 1773, gamma_min: 23, gamma_max: 42, melt_class: "CAS", ref: "Pretorius & Muan 1992"}
+  CuO0.5_a: {T_K_min: 1573, T_K_max: 1573, gamma_min: 9, gamma_max: 11, melt_class: "(F)CMAS", ref: "Holzheid & Lodders 2001"}
+  CuO0.5_b: {T_K_min: 1923, T_K_max: 1923, gamma_min: 3.5, gamma_max: 3.5, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  # Extra FeO rows (preserved FeO above is a paper-wide envelope; these are the specific Table 2 rows)
+  FeO_SKAnF: {T_K_min: 1600, T_K_max: 1600, gamma_min: 0.6, gamma_max: 2.3, melt_class: "SKAnF", ref: "Doyle 1988"}
+  FeO_FCMAS: {T_K_min: 1573, T_K_max: 1873, gamma_min: 1.2, gamma_max: 2.1, melt_class: "(F)CMAS", ref: "Holzheid et al. 1997"}
+  FeO_CMAS:  {T_K_min: 1673, T_K_max: 1673, gamma_min: 0.9, gamma_max: 1.8, melt_class: "CMAS", ref: "O'Neill & Eggins 2002"}
+  GeO:    {T_K_min: 1423, T_K_max: 1523, gamma_min: 1.44, gamma_max: 2.55, melt_class: "FCAS", ref: "Yan & Swinbourne 2013"}
+  GeO2:   {T_K_min: 1573, T_K_max: 1573, gamma_min: 0.24, gamma_max: 1.50, melt_class: "FCMS", ref: "Shuva et al. 2016"}
+  InO1.5: {T_K_min: 1923, T_K_max: 1923, gamma_min: 0.02, gamma_max: 0.02, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  MoO2_a: {T_K_min: 1673, T_K_max: 1673, gamma_min: 67, gamma_max: 227, melt_class: "CMAS", ref: "O'Neill & Eggins 2002"}
+  MoO2_b: {T_K_min: 1923, T_K_max: 1923, gamma_min: 5, gamma_max: 100, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  MoO3:   {T_K_min: 1673, T_K_max: 1673, gamma_min: 0.1, gamma_max: 0.8, melt_class: "CMAS", ref: "O'Neill & Eggins 2002"}
+  # Extra NaO0.5 row (preserved NaO0.5 above is Mathieu 2011 specifically; this is Mathieu 2008)
+  NaO0.5_Mathieu2008: {T_K_min: 1623, T_K_max: 1623, gamma_min: 1.0e-3, gamma_max: 1.0e-3, melt_class: "CMAS", ref: "Mathieu et al. 2008"}
+  NiO_a:  {T_K_min: 1573, T_K_max: 1873, gamma_min: 1.3, gamma_max: 3.5, melt_class: "(F)CMAS", ref: "Holzheid et al. 1997"}
+  NiO_b:  {T_K_min: 1673, T_K_max: 1673, gamma_min: 2.0, gamma_max: 4.3, melt_class: "CMAS", ref: "O'Neill & Eggins 2002; O'Neill & Berry 2006"}
+  NiO_c:  {T_K_min: 1923, T_K_max: 1923, gamma_min: 1.5, gamma_max: 3.0, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  PO2.5:  {T_K_min: 1823, T_K_max: 1923, gamma_min: 1.0e-10, gamma_max: 1.0e-6, melt_class: "CMFS", ref: "Turkdogan 2000"}
+  PbO:    {T_K_min: 1923, T_K_max: 1923, gamma_min: 0.22, gamma_max: 0.22, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  SnO:    {T_K_min: 1573, T_K_max: 1573, gamma_min: 5.0, gamma_max: 6.2, melt_class: "FCS", ref: "Takeda & Yazawa 1989"}
+  V2O3_1900: {T_K_min: 1900, T_K_max: 1900, gamma_min: 1.2, gamma_max: 20.8, melt_class: "CMAS", ref: "Wang et al. 2010"}
+  V2O3_2000: {T_K_min: 2000, T_K_max: 2000, gamma_min: 0.3, gamma_max: 5.2, melt_class: "CMAS", ref: "Wang et al. 2010"}
+  V2O3_2100: {T_K_min: 2100, T_K_max: 2100, gamma_min: 0.05, gamma_max: 1.65, melt_class: "CMAS", ref: "Wang et al. 2010"}
+  WO2:    {T_K_min: 1673, T_K_max: 1673, gamma_min: 7.4, gamma_max: 45, melt_class: "CMAS", ref: "O'Neill et al. 2008"}
+  WO3_a:  {T_K_min: 1673, T_K_max: 1673, gamma_min: 0.02, gamma_max: 0.3, melt_class: "CMAS", ref: "O'Neill et al. 2008"}
+  WO3_b:  {T_K_min: 1923, T_K_max: 1923, gamma_min: 0.001, gamma_max: 0.05, melt_class: "CMAS", ref: "Wood & Wade 2013"}
+  ZnO:    {T_K_min: 1673, T_K_max: 1823, gamma_min: 0.25, gamma_max: 0.58, melt_class: "CAS", ref: "Reyes & Gaskell 1983"}
+
+  read_method: "Table 2 numeric values, high confidence; v2 additions verified against MinerU source.md line 280 (2026-05-16)"

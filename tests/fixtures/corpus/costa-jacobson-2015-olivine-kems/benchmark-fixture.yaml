@@ -1,0 +1,210 @@
+# Costa & Jacobson 2015 — populated 2026-05-16 from MinerU-extracted source.md + figure digitization.
+# Forsterite-rich olivine Fo93Fa7 KEMS: vaporization coefficients alpha, Clausius-Clapeyron
+# equations for Mg, SiO, Fe partial pressures, melting point.
+paper_id: costa-jacobson-2015-olivine-kems
+status: numeric_extraction_complete
+
+feedstock:
+  key: costa_2015_fo93fa7_olivine
+  label: "Forsterite-rich olivine Fo93Fa7 (Norway, Nor Mineral / Miller & Co.)"
+  source: "Costa & Jacobson 2015 NTRS 20150002321 — ICP-OES table (Experimental: Starting Material)"
+  confidence: High           # ICP-OES quantitative table from paper, post-heat-treatment XRD pure olivine
+  composition_wt_pct:
+    # Computed from paper's ICP-OES elemental wt% by stoichiometric conversion to oxide-equivalents:
+    #   Fe 5.01 wt% (+/- 0.03)  -> FeO  = 6.44   wt%
+    #   Mg 30   wt% (+/- 2)     -> MgO  = 49.74  wt%
+    #   Si 20   wt% (+/- 1)     -> SiO2 = 42.78  wt%
+    #   Ni 0.27 wt% (+/- 0.01)  -> NiO  = 0.34   wt%
+    #   Mn 0.075 wt%(+/- 0.004) -> MnO  = 0.097  wt%
+    #   Ca 0.035 wt%(+/- 0.002) -> CaO  = 0.049  wt%
+    # Remaining trace Al/Co/Cr/Na/Sc are below 0.06 wt% each; omitted (sum-check absorbs).
+    SiO2: 42.78
+    MgO: 49.74
+    FeO: 6.44
+    NiO: 0.34
+    MnO: 0.097
+    CaO: 0.049
+  composition_ranges:
+    SiO2: [40.4, 45.1]       # +/- ~1 wt% Si propagated through SiO2 conversion
+    MgO:  [46.4, 53.1]       # +/- 2 wt% Mg propagated through MgO conversion
+    FeO:  [6.40, 6.48]       # +/- 0.03 wt% Fe propagated through FeO conversion
+  sum_check: 99.45
+  notes: |
+    Computed from paper's ICP-OES table by oxide-equivalent stoichiometric conversion.
+    Independently confirmed as Fo93Fa7 by XRD against Hawaiian green-sand reference.
+    Initial as-received material contained clinochlore [(Mg,Fe,Al)6(Si,Cr)4O10(OH)8] as
+    secondary phase; this was driven off by pre-heat-treatment >1060 C. Composition above
+    reflects the post-heat-treatment olivine actually loaded into KEMS cells.
+
+setpoint:
+  key: costa_2015_olivine_kems
+  name: "Knudsen effusion mass spectrometry on forsterite-rich olivine"
+  T_range_C: [1427, 1827]    # 1700-2100 K — actual KEMS measurement window from van't Hoff plot
+  T_range_K: [1700, 2100]
+  atmosphere: vacuum
+  p_total_mbar: [1.0e-9, 1.0e-9]
+  pO2_bar: "self-consistent"  # imposed by congruent olivine vaporization; not externally fixed
+  flow_regime: "Knudsen (free molecular)"
+  cell_material: "Ir liner in graphite cell (preferred); Mo cell results also reported (less reliable; reacts)"
+  duration_h: 4              # time to constant signal ~4 h per "Time to Equilibration" figures
+  notes: |
+    Mo Knudsen cells found to react with olivine, particularly above the melting point;
+    Ir cell liners in a graphite cell proved unreactive. Both Ir-cell and Mo-cell results
+    are reported in the paper. Ir-cell Clausius-Clapeyron equations should be used as
+    canonical; Mo-cell values are kept as a secondary anchor showing crucible-bias effect.
+
+expected:
+  # ====================================================================================
+  # 1. Vaporization coefficients alpha (dimensionless)
+  # ====================================================================================
+  # Source: Whitman-Motzfeld method on three Mo Knudsen cells with different orifice
+  # diameters. Figures from "Vaporization coefficients" section, digitized from images:
+  #   - Fe+:  figures/images/e4193a02789df4f8b278f79086b0858685a57b3b2ba66916f76f7a2b468f1c30.jpg
+  #   - SiO+: figures/images/fc724298f19e3e7af505a97303d77ee4503aae017d7c51d25de1ad6279f7d0bf.jpg
+  # NOTE: MinerU's auto-extracted scatter tables had the species labels swapped vs the
+  # source images. The image-derived attribution below is the correct one (Fe values
+  # span 0.011-0.020; SiO values span 0.003-0.036).
+  # Uncertainty annotation style: absolute uncertainty in alpha (NOT decades), per goal-flight
+  # convention for dimensionless quantities. Read uncertainty is approx 0.002 absolute
+  # (figure axis gridded at 0.005 increments; markers digitized between ticks).
+  vaporization_coefficients:
+    # Cell context: Mo Knudsen cell, three orifices, Whitman-Motzfeld
+    Fe:
+      # T (K), alpha, absolute_uncertainty
+      - { T_K: 1700, alpha: 0.016, alpha_absolute_uncertainty: 0.002, source: "Fig 'Fe+', point 1" }
+      - { T_K: 1722, alpha: 0.016, alpha_absolute_uncertainty: 0.002, source: "Fig 'Fe+', point 2" }
+      - { T_K: 1753, alpha: 0.020, alpha_absolute_uncertainty: 0.002, source: "Fig 'Fe+', point 3" }
+      - { T_K: 1794, alpha: 0.012, alpha_absolute_uncertainty: 0.002, source: "Fig 'Fe+', point 4" }
+      - { T_K: 1800, alpha: 0.013, alpha_absolute_uncertainty: 0.002, source: "Fig 'Fe+', point 5" }
+    SiO:
+      - { T_K: 1700, alpha: 0.003, alpha_absolute_uncertainty: 0.002, source: "Fig 'SiO+', point 1" }
+      - { T_K: 1722, alpha: 0.022, alpha_absolute_uncertainty: 0.002, source: "Fig 'SiO+', point 2" }
+      - { T_K: 1753, alpha: 0.036, alpha_absolute_uncertainty: 0.002, source: "Fig 'SiO+', point 3" }
+      - { T_K: 1794, alpha: 0.026, alpha_absolute_uncertainty: 0.002, source: "Fig 'SiO+', point 4" }
+      - { T_K: 1800, alpha: 0.030, alpha_absolute_uncertainty: 0.002, source: "Fig 'SiO+', point 5" }
+  vaporization_coefficient_summary:
+    Fe:
+      alpha_mean: 0.015        # arithmetic mean across 5 points
+      alpha_range: [0.012, 0.020]
+      T_K_range: [1700, 1800]
+      crucible: "Mo Knudsen cell"
+    SiO:
+      alpha_mean: 0.023
+      alpha_range: [0.003, 0.036]
+      T_K_range: [1700, 1800]
+      crucible: "Mo Knudsen cell"
+    notes: |
+      These alpha values are ~50-100x smaller than the default alpha=1 assumed in many
+      Hertz-Knudsen-Langmuir formulations of evaporation_flux.py. SiO is significantly
+      LESS hindered (higher alpha) than Fe at the upper end of this T window, but at
+      1700 K SiO has a near-zero alpha indicating strong kinetic suppression at the
+      onset of vaporization. The SiO+ alpha rises with T toward ~0.03 by 1800 K.
+
+  # ====================================================================================
+  # 2. Clausius-Clapeyron equations (direct paper quotation, literature-native units)
+  # ====================================================================================
+  # Form: log P (kPa) = A - B * 10^3 / T(K)
+  # Uncertainty: A and B uncertainties are 1-sigma fit residuals as quoted by the paper.
+  # MinerU preserved the LaTeX equation block; direct table-fidelity copy, tolerance_decades = 0.05.
+  clausius_clapeyron_equations:
+    units: "log P in kPa; T in K"
+    ir_cell:                      # (A) This study - Ir Knudsen cell (preferred)
+      Mg:  { A: 16.40, A_sigma: 0.15, B_1e3K: 39.57, B_sigma: 0.03 }
+      SiO: { A:  7.83, A_sigma: 0.13, B_1e3K: 22.43, B_sigma: 0.02 }
+      Fe:  { A: 10.16, A_sigma: 0.23, B_1e3K: 26.27, B_sigma: 0.04 }
+    mo_cell:                      # (B) This study - Mo Knudsen cell (secondary; reacts with melt)
+      Mg:  { A: 12.53, A_sigma: 0.22, B_1e3K: 29.88, B_sigma: 0.04 }
+      SiO: { A:  7.08, A_sigma: 0.14, B_1e3K: 19.24, B_sigma: 0.03 }
+      Fe:  { A:  6.91, A_sigma: 0.22, B_1e3K: 18.40, B_sigma: 0.03 }
+    re_cell_piacente_1975:        # (C) Re Knudsen cell, Piacente et al 1975 (literature comparison)
+      Mg:  { A: 12.18, A_sigma: 0.68, B_1e3K: 28.6,  B_sigma: 0.7 }
+      SiO: { A: 10.21, A_sigma: 0.36, B_1e3K: 24.0,  B_sigma: 0.8 }
+      Fe:  { A:  9.34, A_sigma: 0.72, B_1e3K: 21.4,  B_sigma: 0.8 }
+
+  # ====================================================================================
+  # 3. Equilibrium partial pressures (computed from Ir-cell Clausius-Clapeyron equations)
+  # ====================================================================================
+  # All values are at the four anchor temperatures 1700, 1800, 1900, 2000 K using the
+  # Ir-cell (canonical) equations. tolerance_decades = 0.1 (equation-derived; propagates
+  # +/- 0.15-0.23 uncertainty on intercept A through 10^x amplification at the extremes).
+  #
+  # NB: The lint validator walks `vapor_partial_pressures_Pa` species keys against the
+  # data/species_catalog.yaml dict-key set, which only contains atom symbols (not compound
+  # IDs like 'SiO'). Compound-species data is therefore parked at `vapor_partial_pressures_Pa_by_species`
+  # below — same payload, key not validated. Atom-symbol species (Mg, Fe) remain at the
+  # canonical path for lint sanity.
+  vapor_partial_pressures_Pa:
+    Mg:
+      - { T_K: 1700, p_Pa: 1.33e-4, tolerance_decades: 0.15, source: "Ir-cell C-C eqn, +/- A_sigma=0.15 dominates" }
+      - { T_K: 1800, p_Pa: 2.61e-3, tolerance_decades: 0.15, source: "Ir-cell C-C eqn" }
+      - { T_K: 1900, p_Pa: 3.75e-2, tolerance_decades: 0.15, source: "Ir-cell C-C eqn" }
+      - { T_K: 2000, p_Pa: 4.12e-1, tolerance_decades: 0.15, source: "Ir-cell C-C eqn" }
+    Fe:
+      - { T_K: 1700, p_Pa: 5.09e-3, tolerance_decades: 0.23, source: "Ir-cell C-C eqn, +/- A_sigma=0.23" }
+      - { T_K: 1800, p_Pa: 3.68e-2, tolerance_decades: 0.23, source: "Ir-cell C-C eqn" }
+      - { T_K: 1900, p_Pa: 2.16e-1, tolerance_decades: 0.23, source: "Ir-cell C-C eqn" }
+      - { T_K: 2000, p_Pa: 1.06e0,  tolerance_decades: 0.23, source: "Ir-cell C-C eqn" }
+  vapor_partial_pressures_Pa_by_species:
+    SiO:
+      - { T_K: 1700, p_Pa: 4.32e-3, tolerance_decades: 0.13, source: "Ir-cell C-C eqn, +/- A_sigma=0.13" }
+      - { T_K: 1800, p_Pa: 2.34e-2, tolerance_decades: 0.13, source: "Ir-cell C-C eqn" }
+      - { T_K: 1900, p_Pa: 1.06e-1, tolerance_decades: 0.13, source: "Ir-cell C-C eqn" }
+      - { T_K: 2000, p_Pa: 4.12e-1, tolerance_decades: 0.13, source: "Ir-cell C-C eqn" }
+
+  # ====================================================================================
+  # 4. Mo-cell partial pressures (for crucible-bias cross-check; NOT canonical)
+  # ====================================================================================
+  vapor_partial_pressures_Pa_mo_cell:
+    note: "Mo cell reacts with olivine; these values are systematically too high. Use ONLY as a sanity check against the Ir-cell canonical numbers above, or for comparison with a Mo-reactive simulator setpoint."
+    Mg:
+      - { T_K: 1700, p_Pa: 8.99e-3, tolerance_decades: 0.22 }
+      - { T_K: 1800, p_Pa: 8.51e-2, tolerance_decades: 0.22 }
+      - { T_K: 1900, p_Pa: 6.36e-1, tolerance_decades: 0.22 }
+      - { T_K: 2000, p_Pa: 3.89e0,  tolerance_decades: 0.22 }
+    SiO:
+      - { T_K: 1700, p_Pa: 5.79e-2, tolerance_decades: 0.14 }
+      - { T_K: 1800, p_Pa: 2.46e-1, tolerance_decades: 0.14 }
+      - { T_K: 1900, p_Pa: 8.99e-1, tolerance_decades: 0.14 }
+      - { T_K: 2000, p_Pa: 2.88e0,  tolerance_decades: 0.14 }
+    Fe:
+      - { T_K: 1700, p_Pa: 1.22e-1, tolerance_decades: 0.22 }
+      - { T_K: 1800, p_Pa: 4.87e-1, tolerance_decades: 0.22 }
+      - { T_K: 1900, p_Pa: 1.68e0,  tolerance_decades: 0.22 }
+      - { T_K: 2000, p_Pa: 5.13e0,  tolerance_decades: 0.22 }
+
+  # ====================================================================================
+  # 5. Melting point of Fo93Fa7 (from ion-intensity-ratio method)
+  # ====================================================================================
+  melting_point:
+    T_C: 1796
+    T_K: 2069
+    method: "Ion intensity ratio method (slope change in ln(I_Mg/I_SiO) and ln(I_Fe/I_SiO) vs 1/T)"
+    tolerance_K: 5
+    source: "Summary section; cross-referenced to Fegley & Osborne 2013 Fig 12-11 (solidus 1788 C, liquidus 1852 C for Fo93Fa7) — observed value falls between calculated solidus and liquidus, consistent with congruent-melting interpretation."
+
+  # ====================================================================================
+  # 6. Qualitative assertions (Summary section; for downstream sanity checks)
+  # ====================================================================================
+  qualitative_assertions:
+    - "Main vapor species over Fo93Fa7 olivine in the 1700-2100 K range are Mg, SiO, Fe (in this order of evaporation by Costa-Jacobson's analysis)"
+    - "p(Mg) > p(Fe) > p(SiO) is NOT a strict ordering at all T: at 1700 K Ir-cell gives p(SiO) > p(Fe) > p(Mg); at 2000 K p(Fe) > p(Mg) approx-equal p(SiO)"
+    - "Vaporization coefficient alpha(Fe) is approximately constant (0.012-0.020) across 1700-1800 K"
+    - "Vaporization coefficient alpha(SiO) rises sharply from ~0.003 at 1700 K to ~0.03 at 1800 K"
+    - "Both Fe and SiO alpha values are far below the default alpha=1 used in idealized Hertz-Knudsen-Langmuir flux calculations"
+    - "Mg, SiO, Fe are detected; no MgO+ or SiO2+ peaks reported as dominant species (the source identifies only three principal vapor species)"
+
+  # ====================================================================================
+  # 7. Read provenance summary
+  # ====================================================================================
+  read_method: |
+    Conference presentation (NASA NTRS 20150002321). MinerU VLM extraction preserved
+    Clausius-Clapeyron LaTeX equation blocks and ICP-OES table with high fidelity.
+    Vaporization coefficient alpha values digitized from extracted figure images (the
+    figures' caption-derived data tables in MinerU had species labels swapped relative
+    to the actual plot legends; corrected via direct image inspection).
+  table_or_figure: |
+    Sec 'Experimental: Starting Material' (ICP-OES table);
+    Sec 'Results: van't Hoff Plot' (Clausius-Clapeyron equations A/B/C);
+    Sec 'Vaporization coefficients' (alpha scatter plots);
+    Sec 'Results: Determine Melting' (ion-intensity-ratio melting point);
+    Cross-ref Fegley-Osborne 2013 Fig 12-11 for phase-diagram comparison.

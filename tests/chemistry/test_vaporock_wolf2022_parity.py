@@ -19,13 +19,24 @@ from simulator.melt_backend.vaporock import VapoRockBackend
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FIXTURE_PATH = (
-    REPO_ROOT
-    / "docs-private"
-    / "deep-research"
-    / "literature"
-    / "wolf-2022-vaporock"
-    / "benchmark-fixture.yaml"
+_FIXTURE_RELPATH = Path("wolf-2022-vaporock") / "benchmark-fixture.yaml"
+# Tracked distributed cohort first (tests/fixtures/corpus), else the gitignored
+# private research corpus. Default to the tracked path so a missing-fixture
+# error points at the location shipped with the suite.
+FIXTURE_PATH = next(
+    (
+        p
+        for p in (
+            REPO_ROOT / "tests" / "fixtures" / "corpus" / _FIXTURE_RELPATH,
+            REPO_ROOT
+            / "docs-private"
+            / "deep-research"
+            / "literature"
+            / _FIXTURE_RELPATH,
+        )
+        if p.exists()
+    ),
+    REPO_ROOT / "tests" / "fixtures" / "corpus" / _FIXTURE_RELPATH,
 )
 
 
