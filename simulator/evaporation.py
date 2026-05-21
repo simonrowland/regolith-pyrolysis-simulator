@@ -193,6 +193,120 @@ class EvaporationMixin:
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
+    def _apply_analytic_evaporation_depletion(
+        self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
+    ) -> EvaporationFlux:
+        """Apply sub-tick first-order depletion to raw HKL evaporation rates."""
+        if dt_hr <= 0.0 or not evap_flux.species_kg_hr:
+            return evap_flux
+
+        metals_data = self.vapor_pressures.get('metals', {}) or {}
+        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
+        cleaned_melt_kg = self.atom_ledger.kg_by_account(
+            'process.cleaned_melt')
+        parent_groups: dict[str, list[dict]] = defaultdict(list)
+
+        for species in sorted(evap_flux.species_kg_hr):
+            raw_rate_kg_hr = float(evap_flux.species_kg_hr.get(species, 0.0))
+            if raw_rate_kg_hr <= 1e-12:
+                continue
+            sp_data = metals_data.get(species, {})
+            if not sp_data:
+                sp_data = oxide_vapors_data.get(species, {})
+            stoich = self._evaporation_stoich(species, sp_data)
+            parent_oxide = stoich['parent_oxide']
+            oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
+            parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
+            if parent_draw_kg_hr <= 1e-12:
+                continue
+            parent_groups[parent_oxide].append({
+                'species': species,
+                'sp_data': sp_data,
+                'stoich': stoich,
+                'raw_rate_kg_hr': raw_rate_kg_hr,
+                'parent_draw_kg_hr': parent_draw_kg_hr,
+            })
+
+        effective_rates: dict[str, float] = {}
+        max_fraction = math.nextafter(1.0, 0.0)
+        for parent_oxide in sorted(parent_groups):
+            entries = parent_groups[parent_oxide]
+            available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            total_parent_draw_kg_hr = sum(
+                entry['parent_draw_kg_hr'] for entry in entries)
+            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
+                continue
+            k_hr = total_parent_draw_kg_hr / available_parent_kg
+            depletion_fraction = -math.expm1(-k_hr * dt_hr)
+            depletion_fraction = max(
+                0.0, min(max_fraction, depletion_fraction))
+            parent_draw_kg = available_parent_kg * depletion_fraction
+            for entry in entries:
+                share = entry['parent_draw_kg_hr'] / total_parent_draw_kg_hr
+                product_kg = (
+                    parent_draw_kg
+                    * share
+                    / float(entry['stoich']['oxide_per_product_kg'])
+                )
+                if product_kg > 1e-12:
+                    effective_rates[entry['species']] = product_kg / dt_hr
+
+        self._apply_shared_o2_reactant_depletion(
+            effective_rates, parent_groups, dt_hr)
+
+        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
+        smoothed.update_totals()
+        return smoothed
+
+    def _apply_shared_o2_reactant_depletion(
+        self,
+        effective_rates: dict[str, float],
+        parent_groups: dict[str, list[dict]],
+        dt_hr: float,
+    ) -> None:
+        o2_draws: list[tuple[str, float]] = []
+        for parent_oxide in sorted(parent_groups):
+            for entry in parent_groups[parent_oxide]:
+                species = entry['species']
+                rate_kg_hr = float(effective_rates.get(species, 0.0))
+                O2_per_product_kg = float(
+                    entry['stoich'].get('O2_per_product_kg', 0.0))
+                if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
+                    o2_draws.append(
+                        (species, rate_kg_hr * abs(O2_per_product_kg)))
+        total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
+        if total_o2_draw_kg_hr <= 1e-12:
+            return
+
+        available_o2_kg = self.atom_ledger.kg_by_account(
+            'process.overhead_gas').get('O2', 0.0)
+        if available_o2_kg <= 1e-12:
+            for species, _draw in o2_draws:
+                effective_rates.pop(species, None)
+            return
+
+        max_fraction = math.nextafter(1.0, 0.0)
+        k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
+        depletion_fraction = -math.expm1(-k_hr * dt_hr)
+        depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
+        allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
+        by_species_draw = dict(o2_draws)
+        for species, required_o2_kg_hr in o2_draws:
+            if required_o2_kg_hr <= 1e-12:
+                continue
+            allowed_draw_kg = (
+                allowed_o2_draw_kg
+                * required_o2_kg_hr
+                / total_o2_draw_kg_hr
+            )
+            current_rate = float(effective_rates.get(species, 0.0))
+            allowed_rate = current_rate * (
+                allowed_draw_kg / by_species_draw[species])
+            if allowed_rate <= 1e-12:
+                effective_rates.pop(species, None)
+            else:
+                effective_rates[species] = min(current_rate, allowed_rate)
+
     def _route_to_condensation(self, evap_flux: EvaporationFlux):
         """
         Route evaporated species through the condensation train.
@@ -223,9 +337,9 @@ class EvaporationMixin:
         1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
            ALL vapor routed to ``process.overhead_gas`` (plus O2
            coproduct). No condensation_train credit from that intent.
-        2. CONDENSATION_ROUTE dispatched with the per-species
-           condensed_kg derived from ``route_result.remaining_by_species``
-           and the available-oxide scale -- debits
+        2. CONDENSATION_ROUTE dispatched with the analytically smoothed
+           per-species condensed_kg derived from
+           ``route_result.remaining_by_species`` -- debits
            ``process.overhead_gas[species]`` and credits
            ``process.condensation_train[products]`` (with SiO
            disproportionation when sp_data declares the product map).
@@ -252,29 +366,13 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            # Pre-compute the same available_kg / scale factor the legacy
-            # single-step EVAPORATION_TRANSITION applied, so the split
-            # CONDENSATION_ROUTE path sees the same scaled condensed mass.
             stoich = self._evaporation_stoich(species, sp_data)
             if stoich is None:
                 continue
-            parent_oxide = stoich['parent_oxide']
-            oxide_removed = rate_kg_hr * stoich['oxide_per_product_kg']
             available_kg = self.atom_ledger.kg_by_account(
-                'process.cleaned_melt').get(parent_oxide, 0.0)
-            if oxide_removed <= 1e-12 or available_kg <= 1e-12:
+                'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
+            if available_kg <= 1e-12:
                 continue
-            scale = min(1.0, available_kg / oxide_removed)
-            O2_per_product_kg = float(stoich.get('O2_per_product_kg', 0.0))
-            if O2_per_product_kg < 0.0:
-                required_o2_kg = rate_kg_hr * abs(O2_per_product_kg)
-                available_o2_kg = self.atom_ledger.kg_by_account(
-                    'process.overhead_gas').get('O2', 0.0)
-                if required_o2_kg > 1e-12:
-                    scale = min(
-                        scale,
-                        max(0.0, available_o2_kg / required_o2_kg),
-                    )
             remaining_kg_hr = route_result.remaining_by_species.get(
                 species, 0.0)
             if (
@@ -299,11 +397,10 @@ class EvaporationMixin:
             # Step 2: CONDENSATION_ROUTE (overhead_gas -> condensation_train).
             # condensed_kg mirrors the legacy
             # ``credited_condensed_kg = max(0.0, product_kg - remaining_kg)``
-            # branch in _credit_evaporation_transition pre-flip: apply
-            # the available-oxide scale, clamp negative, take the
-            # vapor mass that the route said would deposit.
+            # branch in _credit_evaporation_transition pre-flip: clamp
+            # negative, take the vapor mass the route said would deposit.
             condensed_kg = max(
-                0.0, (rate_kg_hr - remaining_kg_hr) * scale,
+                0.0, rate_kg_hr - remaining_kg_hr,
             )
             credited_condensed_kg = self._dispatch_condensation_route(
                 species, condensed_kg, sp_data,
@@ -380,9 +477,8 @@ class EvaporationMixin:
            same way the legacy code did (the AccountingError surface
            lives in the caller, not inside the stateless provider --
            matching the EVAPORATION_FLUX pattern).
-        2. Computes the parent-oxide availability cap from the ledger
-           projection (this used to live inline; the provider receives
-           it via ``available_kg``).
+        2. Receives an analytically smoothed rate whose parent-oxide and
+           shared-O2 availability caps have already been applied.
         3. Dispatches EVAPORATION_TRANSITION through the kernel and
            commits the resulting proposal. After this flip,
            ``self.atom_ledger.apply(...)`` no longer fires from inside
@@ -421,9 +517,8 @@ class EvaporationMixin:
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        scale = min(1.0, available_kg / oxide_removed)
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0 * scale
-        if remaining_kg > product_kg * scale + 1e-12:
+        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+        if remaining_kg > product_kg + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
             )

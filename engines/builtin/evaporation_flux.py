@@ -8,8 +8,8 @@ computed, not a re-derivation of how the Hertz-Knudsen-Langmuir equation
 works. The provider:
 
 - reads ``process.cleaned_melt`` from the account view (only declared
-  account; satisfies binding-spec §4 even though the flux math operates
-  on caller-supplied auxiliary data),
+  account; satisfies binding-spec §4 even though analytic depletion and
+  availability capping happen in the simulator integration layer),
 - reads T from ``request.temperature_C``,
 - reads per-species vapor pressures via
   ``request.control_inputs['vapor_pressures_Pa']`` -- caller passes them
@@ -188,19 +188,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             # Rate over the melt opening + stirring uplift.       [HK-1]
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * stir_factor * 3600.0
 
-            # Cap at parent-oxide availability (same as legacy: don't
-            # evaporate more parent oxide than the melt actually holds).
+            # Stoich is still required so the integration layer can apply
+            # parent-grouped analytic depletion after raw HKL emission.
             oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
             if oxide_per_product_kg <= 0.0:
                 # Caller didn't supply stoich for this species -- skip
-                # rather than emit a flux we can't cap. Matches the
+                # rather than emit a flux we can't deplete. Matches the
                 # legacy AccountingError surface (the caller raises
                 # there); here we skip silently since the kernel-level
                 # error surface is owned by the caller.
                 continue
-            parent_oxide_kg = float(available_oxide_kg.get(species, 0.0))
-            max_product_kg = parent_oxide_kg / oxide_per_product_kg
-            rate_kg_hr = min(rate_kg_hr, max_product_kg)
 
             if rate_kg_hr > 1e-12:
                 flux_kg_hr[species] = rate_kg_hr

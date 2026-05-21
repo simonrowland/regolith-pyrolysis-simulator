@@ -8,6 +8,7 @@ This project is a comparative process simulator. It is not a validated engineeri
 - Oxide activities are approximated when external melt backends are unavailable.
 - Heat transfer is simplified: solar concentration is assumed to maintain target temperatures rather than fully modeling radiative, conductive, and convective losses.
 - Pipe conductance and turbine behavior are simplified feedback controls, not detailed CFD or turbomachinery design.
+- Evaporation depletion is a one-hour analytic integration model: the HKL driving force and vapor pressures are evaluated once at the start of the tick, then parent-oxide and shared-O2 pools deplete as first-order reservoirs within that tick. This smooths the time integration but is not a new thermodynamic equilibrium solve.
 - Finite overhead headspace pO2 is available behind `overhead_headspace.enabled` and defaults OFF. When enabled, only melt-released evaporation O2 is held in `process.overhead_gas`, converted to ideal-gas partial pressures, then bled through the existing Poiseuille pipe conductance model. Stage 0 oxygen and MRE anode oxygen still bypass the headspace. Molecular-flow conductance and validated hardware control remain out of scope.
 - Condensation routing is a staged engineering approximation.
 - MRE behavior is a reduced voltage/current/product model, not a full electrochemical cell simulator.

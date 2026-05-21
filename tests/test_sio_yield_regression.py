@@ -29,8 +29,8 @@ GOLDENS = (
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
 # Was {lunar: 3.7303230676, mars: 3.82533227031} pre-refit.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.000786562093217,
-    "mars_basalt": 0.000849721244282,
+    "lunar_mare_low_ti": 0.000786538104529,
+    "mars_basalt": 0.000848707296777,
 }
 
 BASELINE_STAGE4_SIO2_KG = {
