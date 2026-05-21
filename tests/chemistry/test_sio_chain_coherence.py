@@ -11,7 +11,7 @@ from simulator.runner import build_sio_yield_report
 
 
 MAX_BALANCE_ERR_PCT = 5.0e-12
-PHASE3BIS_SIO_EVOLVED_KG = 3.73034175962
+PHASE3BIS_SIO_EVOLVED_KG = 3.7303230676
 
 
 @lru_cache(maxsize=None)

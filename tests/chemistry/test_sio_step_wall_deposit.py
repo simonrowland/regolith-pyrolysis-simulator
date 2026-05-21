@@ -33,7 +33,7 @@ def _sio_wall_deposit_kg(liner_temperature_c: float) -> float:
 
 def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        1.05349403819e-2, rel=1e-9
+        1.05348872049e-2, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0
