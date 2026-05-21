@@ -26,8 +26,8 @@ GOLDENS = (
 )
 
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 3.73034175962,
-    "mars_basalt": 3.82535373379,
+    "lunar_mare_low_ti": 3.7303230676,
+    "mars_basalt": 3.82533227031,
 }
 
 BASELINE_STAGE4_SIO2_KG = {

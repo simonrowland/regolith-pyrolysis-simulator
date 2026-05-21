@@ -25,7 +25,7 @@ metals:
     parent_oxide: "Na2O"
     evaporation_alpha:
       value: 1.0
-      source: "SF2004 Table 10 Na(g) over silicate"
+      source: "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
     antoine:
@@ -45,7 +45,7 @@ metals:
     parent_oxide: "K2O"
     evaporation_alpha:
       value: 1.0
-      source: "SF2004 Table 10 K(g) over silicate (analogous to Na)"
+      source: "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy to Na; Sossi & Fegley 2018 liquids commonly near unity"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
     antoine:
@@ -67,10 +67,10 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MgO"
     evaporation_alpha:
-      value: 0.8
-      source: "SF2004 Table 10 Mg(liq)"
+      value: 0.20
+      source: "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
       T_band_K: [1873, 2373]
-      envelope: [0.6, 1.0]
+      envelope: [0.10, 0.21]
     antoine:
       A: 11.412
       B: 7813
@@ -86,10 +86,10 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "FeO"
     evaporation_alpha:
-      value: 0.5
-      source: "SF2004 Table 10 Fe(liq)"
+      value: 0.02
+      source: "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
       T_band_K: [1873, 2373]
-      envelope: [0.3, 0.7]
+      envelope: [0.011, 0.020]
     antoine:
       A: 11.353
       B: 19710
@@ -192,7 +192,7 @@ oxide_vapors:
     stoich_O2_per_vapor: 0.3629764065335753    # kg O₂ freed per kg SiO evaporated
     evaporation_alpha:
       value: 0.04
-      source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990"
+      source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
       T_band_K: [1873, 2373]
       envelope: [0.003, 0.048]
     antoine:

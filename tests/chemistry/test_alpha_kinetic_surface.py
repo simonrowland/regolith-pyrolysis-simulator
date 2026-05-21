@@ -21,8 +21,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 EXPECTED_ALPHA_BY_SPECIES = {
     "SiO": 0.04,
-    "Fe": 0.5,
-    "Mg": 0.8,
+    "Fe": 0.02,
+    "Mg": 0.20,
     "Na": 1.0,
     "K": 1.0,
 }
