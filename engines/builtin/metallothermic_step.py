@@ -12,10 +12,12 @@ kinetic / accessibility constants flow through verbatim:
 
 * C3 K-shuttle: ``2 K + FeO -> K2O + Fe`` (K2O saturated at 10 wt% melt,
   K injected up to 1/3 of inventory per hour).
-* C3 Na-shuttle: ``6 Na + Cr2O3 -> 3 Na2O + 2 Cr`` (Cr2O3 reduced first;
-  ``ΔG°f -500`` vs Na2O ``-320``); then ``4 Na + TiO2 -> 2 Na2O + Ti``
-  with 0.75 accessibility factor (highest-priority experimental
-  question -- legacy comment ``[THERMO-10]``). Na2O saturated at 10 wt%.
+* C3 Na-shuttle: stage-aware targets.  The Cr stage preserves the legacy
+  ``6 Na + Cr2O3 -> 3 Na2O + 2 Cr`` first, then
+  ``4 Na + TiO2 -> 2 Na2O + Ti`` with 0.75 accessibility factor
+  (highest-priority experimental question -- legacy comment
+  ``[THERMO-10]``).  Cool Fe-cleanup may instead request
+  ``2 Na + FeO -> Na2O + Fe``. Na2O saturated at 10 wt%.
 * C6 Mg thermite primary: ``3 Mg + Al2O3 -> 3 MgO + 2 Al``. Mg consumed
   per Arrhenius-style rate factor ``0.20 * exp(-0.05 * wt%MgO)`` (clamped
   to ``[0.01, 0.25]``).
@@ -29,8 +31,7 @@ covers the two reaction families.  The provider receives a
 ``reaction_family`` discriminator in ``control_inputs`` -- valid values:
 
 * ``'c3_k_shuttle'`` -- C3 K-shuttle injection (single primary reaction).
-* ``'c3_na_shuttle'`` -- C3 Na-shuttle injection (Cr2O3 first, then
-  TiO2 with accessibility factor).
+* ``'c3_na_shuttle'`` -- C3 Na-shuttle injection (stage-aware target set).
 * ``'c6_mg_thermite'`` -- C6 Mg thermite primary + Al-SiO2 back-reduction
   cascade in one call.
 
@@ -100,8 +101,8 @@ Account declaration: ``process.cleaned_melt`` (debit oxides being
 reduced + credit alkali-oxide / MgO / regenerated Al2O3 coproducts),
 ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals + debit Al on
 back-reduction), ``process.reagent_inventory`` (debit K/Na/Mg consumed).
-Every account named in any of the five legacy ``_record_atom_transition``
-calls inside ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
+Every account named in the legacy ``_record_atom_transition`` calls
+inside ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
 ``_step_thermite`` lands in this set.  The hardened kernel account-
 filter (since commit ``a259f80``) will raise
 :class:`AccountFilterViolation` if a future refactor adds a fourth
@@ -121,6 +122,7 @@ from engines.builtin._common import (
     reject_wrong_intent,
     unpack_controls,
 )
+from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -144,6 +146,18 @@ VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_C3_NA,
     REACTION_FAMILY_C6_MG,
 })
+
+NA_TARGET_FEO_CLEANUP = "feo_cleanup"
+NA_TARGET_CR_TI = "cr_ti"
+NA_STAGE_TARGETS = {
+    NA_TARGET_FEO_CLEANUP: ("FeO",),
+    NA_TARGET_CR_TI: ("Cr2O3", "TiO2"),
+}
+NA_TARGET_TO_METAL = {
+    "FeO": "Fe",
+    "Cr2O3": "Cr",
+    "TiO2": "Ti",
+}
 
 
 class BuiltinMetallothermicStepProvider(ChemistryProvider):
@@ -250,6 +264,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
+                request.temperature_C,
                 controls,
                 MOLAR_MASS,
                 registry,
@@ -405,7 +420,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
     # ------------------------------------------------------------------
     # C3 Na-shuttle dispatch.  Mirrors _shuttle_inject_Na line-for-line
-    # (see simulator/extraction.py); reduces Cr2O3 first, then TiO2.
+    # for the default Cr/Ti stage; cool Fe-cleanup can request FeO as
+    # the only target.
     # The legacy code split this into TWO _record_atom_transition calls,
     # one per oxide.  The provider emits a SINGLE proposal that bundles
     # the (possibly-two) reactions atom-balanced; this matches the
@@ -420,6 +436,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_kg: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
         total_kg: float,
+        temperature_C: float,
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
@@ -449,6 +466,11 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             Na2O_max_kg * (2 * molar_mass["Na"] / molar_mass["Na2O"])
         )
 
+        target_stage, target_priority, thermo_audit = (
+            self._resolve_na_target_priority(controls, temperature_C)
+        )
+
+        FeO_available_kg = composition_kg.get("FeO", 0.0)
         TiO2_available_kg = composition_kg.get("TiO2", 0.0)
         Cr2O3_available_kg = composition_kg.get("Cr2O3", 0.0)
 
@@ -467,42 +489,62 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # Accumulators -- both reactions write into a single proposal.
         total_Na_used_mol = 0.0
         total_Na2O_added_mol = 0.0
+        total_FeO_removed_mol = 0.0
         total_Cr2O3_removed_mol = 0.0
         total_TiO2_removed_mol = 0.0
+        total_Fe_produced_mol = 0.0
         total_Cr_produced_mol = 0.0
         total_Ti_produced_mol = 0.0
 
-        # --- Reaction 1: 6 Na + Cr2O3 -> 3 Na2O + 2 Cr ------------------
-        if Cr2O3_available_kg > 0.01 and mol_Na > 0.1:
-            mol_Cr2O3 = (
-                Cr2O3_available_kg / molar_mass["Cr2O3"] * 1000.0
-            )
-            mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
-            mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
-            mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
-            mol_Cr_produced = mol_Cr2O3_reduced * 2.0
+        for target in target_priority:
+            if target == "FeO":
+                if FeO_available_kg > 0.01 and mol_Na > 0.1:
+                    mol_FeO = (
+                        FeO_available_kg / molar_mass["FeO"] * 1000.0
+                    )
+                    mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO)
+                    mol_Na_for_Fe = mol_FeO_reduced * 2.0
+                    mol_Na2O_from_Fe = mol_FeO_reduced
+                    mol_Fe_produced = mol_FeO_reduced
 
-            total_Na_used_mol += mol_Na_for_Cr
-            total_Na2O_added_mol += mol_Na2O_from_Cr
-            total_Cr2O3_removed_mol += mol_Cr2O3_reduced
-            total_Cr_produced_mol += mol_Cr_produced
-            mol_Na -= mol_Na_for_Cr
+                    total_Na_used_mol += mol_Na_for_Fe
+                    total_Na2O_added_mol += mol_Na2O_from_Fe
+                    total_FeO_removed_mol += mol_FeO_reduced
+                    total_Fe_produced_mol += mol_Fe_produced
+                    mol_Na -= mol_Na_for_Fe
+            elif target == "Cr2O3":
+                if Cr2O3_available_kg > 0.01 and mol_Na > 0.1:
+                    mol_Cr2O3 = (
+                        Cr2O3_available_kg / molar_mass["Cr2O3"] * 1000.0
+                    )
+                    mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
+                    mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
+                    mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
+                    mol_Cr_produced = mol_Cr2O3_reduced * 2.0
 
-        # --- Reaction 2: 4 Na + TiO2 -> 2 Na2O + Ti  (75 % accessibility)
-        if TiO2_available_kg > 0.01 and mol_Na > 0.1:
-            mol_TiO2 = (
-                TiO2_available_kg / molar_mass["TiO2"] * 1000.0
-            )
-            mol_TiO2_accessible = mol_TiO2 * self.TI_ACCESSIBILITY
-            mol_TiO2_reduced = min(mol_Na / 4.0, mol_TiO2_accessible)
-            mol_Na_for_Ti = mol_TiO2_reduced * 4.0
-            mol_Na2O_from_Ti = mol_TiO2_reduced * 2.0
-            mol_Ti_produced = mol_TiO2_reduced
+                    total_Na_used_mol += mol_Na_for_Cr
+                    total_Na2O_added_mol += mol_Na2O_from_Cr
+                    total_Cr2O3_removed_mol += mol_Cr2O3_reduced
+                    total_Cr_produced_mol += mol_Cr_produced
+                    mol_Na -= mol_Na_for_Cr
+            elif target == "TiO2":
+                if TiO2_available_kg > 0.01 and mol_Na > 0.1:
+                    mol_TiO2 = (
+                        TiO2_available_kg / molar_mass["TiO2"] * 1000.0
+                    )
+                    mol_TiO2_accessible = mol_TiO2 * self.TI_ACCESSIBILITY
+                    mol_TiO2_reduced = min(
+                        mol_Na / 4.0, mol_TiO2_accessible
+                    )
+                    mol_Na_for_Ti = mol_TiO2_reduced * 4.0
+                    mol_Na2O_from_Ti = mol_TiO2_reduced * 2.0
+                    mol_Ti_produced = mol_TiO2_reduced
 
-            total_Na_used_mol += mol_Na_for_Ti
-            total_Na2O_added_mol += mol_Na2O_from_Ti
-            total_TiO2_removed_mol += mol_TiO2_reduced
-            total_Ti_produced_mol += mol_Ti_produced
+                    total_Na_used_mol += mol_Na_for_Ti
+                    total_Na2O_added_mol += mol_Na2O_from_Ti
+                    total_TiO2_removed_mol += mol_TiO2_reduced
+                    total_Ti_produced_mol += mol_Ti_produced
+                    mol_Na -= mol_Na_for_Ti
 
         if total_Na_used_mol <= 0.0:
             return self._empty_result(
@@ -517,6 +559,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "process.reagent_inventory": {"Na": total_Na_used_mol},
             "process.cleaned_melt": {},
         }
+        if total_FeO_removed_mol > 0.0:
+            debits["process.cleaned_melt"]["FeO"] = total_FeO_removed_mol
         if total_Cr2O3_removed_mol > 0.0:
             debits["process.cleaned_melt"]["Cr2O3"] = total_Cr2O3_removed_mol
         if total_TiO2_removed_mol > 0.0:
@@ -528,6 +572,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "process.cleaned_melt": {"Na2O": total_Na2O_added_mol},
             "process.metal_phase": {},
         }
+        if total_Fe_produced_mol > 0.0:
+            credits["process.metal_phase"]["Fe"] = total_Fe_produced_mol
         if total_Cr_produced_mol > 0.0:
             credits["process.metal_phase"]["Cr"] = total_Cr_produced_mol
         if total_Ti_produced_mol > 0.0:
@@ -539,12 +585,16 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # mol back to kg via (mol * M_gmol / 1000.0) -- same shape as
         # the legacy ``_shuttle_*_this_hr`` counters.
         Na_used_kg = total_Na_used_mol * molar_mass["Na"] / 1000.0
+        FeO_removed_kg = (
+            total_FeO_removed_mol * molar_mass["FeO"] / 1000.0
+        )
         Cr2O3_removed_kg = (
             total_Cr2O3_removed_mol * molar_mass["Cr2O3"] / 1000.0
         )
         TiO2_removed_kg = (
             total_TiO2_removed_mol * molar_mass["TiO2"] / 1000.0
         )
+        Fe_produced_kg = total_Fe_produced_mol * molar_mass["Fe"] / 1000.0
         Cr_produced_kg = total_Cr_produced_mol * molar_mass["Cr"] / 1000.0
         Ti_produced_kg = total_Ti_produced_mol * molar_mass["Ti"] / 1000.0
 
@@ -564,14 +614,25 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C3_NA,
+                "target_stage": target_stage,
+                "target_priority": list(target_priority),
+                "thermo_priority": list(thermo_audit["priority"]),
+                "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
+                "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
                 "reagent_consumed_kg": Na_used_kg,
-                "oxide_reduced_kg": Cr2O3_removed_kg + TiO2_removed_kg,
-                "metal_produced_kg": Cr_produced_kg + Ti_produced_kg,
+                "oxide_reduced_kg": (
+                    FeO_removed_kg + Cr2O3_removed_kg + TiO2_removed_kg
+                ),
+                "metal_produced_kg": (
+                    Fe_produced_kg + Cr_produced_kg + Ti_produced_kg
+                ),
                 "per_oxide_reduced_kg": {
+                    "FeO": FeO_removed_kg,
                     "Cr2O3": Cr2O3_removed_kg,
                     "TiO2": TiO2_removed_kg,
                 },
                 "per_metal_produced_kg": {
+                    "Fe": Fe_produced_kg,
                     "Cr": Cr_produced_kg,
                     "Ti": Ti_produced_kg,
                 },
@@ -806,9 +867,11 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     ) -> dict[str, float]:
         """Delegate to the shared :func:`build_atom_balance_proof` helper.
 
-        Atom balance for the five reactions:
+        Atom balance for the six reactions:
 
         * ``2 K + FeO -> K2O + Fe`` -- K: -2 + 2 = 0; Fe: -1 + 1 = 0;
+          O: -1 + 1 = 0.
+        * ``2 Na + FeO -> Na2O + Fe`` -- Na: -2 + 2 = 0; Fe: -1 + 1 = 0;
           O: -1 + 1 = 0.
         * ``6 Na + Cr2O3 -> 3 Na2O + 2 Cr`` -- Na: -6 + 6 = 0; Cr:
           -2 + 2 = 0; O: -3 + 3 = 0.
@@ -820,10 +883,87 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
           -3 + 3 = 0; O: -6 + 6 = 0.
 
         Net per element: 0 for every reaction. The combined
-        C3 Na-shuttle (Cr2O3 + TiO2) bundle sums each side
-        independently so the net stays 0 as well.
+        C3 Na-shuttle bundle sums each side independently so the net
+        stays 0 as well.
         """
 
         return build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula
         )
+
+    @classmethod
+    def _resolve_na_target_priority(
+        cls,
+        controls: Mapping[str, Any],
+        temperature_C: float,
+    ) -> tuple[str, tuple[str, ...], dict[str, Any]]:
+        requested_targets = controls.get("target_oxides")
+        if requested_targets is not None:
+            target_set = cls._normalize_na_targets(requested_targets)
+            target_stage = str(
+                controls.get("na_target_stage") or "explicit"
+            )
+        else:
+            target_stage = str(
+                controls.get("na_target_stage")
+                or controls.get("target_stage")
+                or NA_TARGET_CR_TI
+            )
+            target_set = NA_STAGE_TARGETS.get(
+                target_stage,
+                NA_STAGE_TARGETS[NA_TARGET_CR_TI],
+            )
+
+        thermo_priority, thermo_audit = cls._na_thermo_priority(
+            target_set,
+            temperature_C,
+        )
+        return target_stage, thermo_priority, thermo_audit
+
+    @staticmethod
+    def _normalize_na_targets(raw_targets: Any) -> tuple[str, ...]:
+        if isinstance(raw_targets, str):
+            candidates = [part.strip() for part in raw_targets.split(",")]
+        else:
+            candidates = [str(part).strip() for part in raw_targets]
+        targets = tuple(
+            target for target in candidates if target in NA_TARGET_TO_METAL
+        )
+        return targets or NA_STAGE_TARGETS[NA_TARGET_CR_TI]
+
+    @staticmethod
+    def _delta_g_kj_per_mol_o2(metal: str, temperature_C: float) -> float:
+        dH_f, dS_f, _n_M, _n_ox = _ELLINGHAM_THERMO[metal]
+        return dH_f - (float(temperature_C) + 273.15) * dS_f
+
+    @classmethod
+    def _na_thermo_priority(
+        cls,
+        targets: tuple[str, ...],
+        temperature_C: float,
+    ) -> tuple[tuple[str, ...], dict[str, Any]]:
+        delta_g: dict[str, float] = {
+            "Na2O": cls._delta_g_kj_per_mol_o2("Na", temperature_C)
+        }
+        margin: dict[str, float] = {}
+        for oxide in targets:
+            metal = NA_TARGET_TO_METAL[oxide]
+            delta_g[oxide] = cls._delta_g_kj_per_mol_o2(
+                metal,
+                temperature_C,
+            )
+            margin[oxide] = delta_g[oxide] - delta_g["Na2O"]
+
+        index = {oxide: idx for idx, oxide in enumerate(targets)}
+        priority = tuple(
+            sorted(
+                targets,
+                key=lambda oxide: (delta_g[oxide], -index[oxide]),
+                reverse=True,
+            )
+        )
+        return priority, {
+            "priority": priority,
+            "deltaG": delta_g,
+            "margin": margin,
+        }

@@ -357,6 +357,12 @@ class ExtractionMixin:
                 'K', self.record.additives_kg.get('K', 0.0))
             self._transfer_condensed_species('K')
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
+            na_additive_kg = self.record.additives_kg.get('Na', 0.0)
+            if na_additive_kg > self._LEDGER_KG_TOL:
+                self._activated_additive_reagents.add('Na')
+                self._draw_reagent_to_process('Na', na_additive_kg)
+                self._transfer_condensed_species('Na')
+                self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_K = 0
 
         elif campaign == CampaignPhase.C3_NA:
@@ -411,6 +417,7 @@ class ExtractionMixin:
             self._shuttle_phase = 'inject'
             if campaign == CampaignPhase.C3_K:
                 self._shuttle_inject_K()
+                self._shuttle_inject_Na(target_stage='feo_cleanup')
             elif campaign == CampaignPhase.C3_NA:
                 self._shuttle_inject_Na()
         else:
@@ -485,18 +492,19 @@ class ExtractionMixin:
         self._project_extraction_melt()
 
         # Track for snapshot -- same shape as pre-flip kg counters.
-        self._shuttle_injected_this_hr = float(
+        self._shuttle_injected_this_hr += float(
             diagnostic.get('reagent_consumed_kg', 0.0))
-        self._shuttle_reduced_this_hr = float(
+        self._shuttle_reduced_this_hr += float(
             diagnostic.get('oxide_reduced_kg', 0.0))
-        self._shuttle_metal_this_hr = float(
+        self._shuttle_metal_this_hr += float(
             diagnostic.get('metal_produced_kg', 0.0))
 
-    def _shuttle_inject_Na(self):
+    def _shuttle_inject_Na(self, target_stage: str = 'cr_ti'):
         """
-        Na-shuttle injection: reduce TiO₂ (primary) + Cr₂O₃.
+        Na-shuttle injection: reduce stage-selected oxides.
 
         Reactions:                                               [THERMO-5]
+            2Na + FeO → Na₂O + Fe(l)   [cool Fe-cleanup only]
             2Na + TiO₂ → Na₂O + Ti(l)   [accessibility uncertain]
             6Na + Cr₂O₃ → 3Na₂O + 2Cr(l)
 
@@ -529,6 +537,7 @@ class ExtractionMixin:
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_NA,
+                'na_target_stage': target_stage,
                 'reagent_available_kg': float(
                     self.shuttle_Na_inventory_kg),
                 'dt_hr': 1.0,
@@ -538,9 +547,11 @@ class ExtractionMixin:
         if kernel_result.transition is None:
             return
 
-        # Cr / Ti products go to condenser Stage 1 (liquid-metal sump).
-        # Project both unconditionally; the projection helper is a
+        # Reduced metals go to condenser Stage 1 (liquid-metal sump).
+        # Project unconditionally; the projection helper is a
         # no-op when the metal_phase account doesn't carry the species.
+        self._project_condensed_species(
+            1, 'Fe', source_account='process.metal_phase')
         self._project_condensed_species(
             1, 'Cr', source_account='process.metal_phase')
         self._project_condensed_species(
@@ -553,11 +564,11 @@ class ExtractionMixin:
         self._project_extraction_melt()
 
         # Track for snapshot -- same shape as pre-flip kg counters.
-        self._shuttle_injected_this_hr = float(
+        self._shuttle_injected_this_hr += float(
             diagnostic.get('reagent_consumed_kg', 0.0))
-        self._shuttle_reduced_this_hr = float(
+        self._shuttle_reduced_this_hr += float(
             diagnostic.get('oxide_reduced_kg', 0.0))
-        self._shuttle_metal_this_hr = float(
+        self._shuttle_metal_this_hr += float(
             diagnostic.get('metal_produced_kg', 0.0))
 
     # ------------------------------------------------------------------

@@ -160,6 +160,10 @@ campaigns:
         via: "start --additive=K=<kg> or SimSessionConfig.additives_kg"
         default_kg: 26
         role: "cool residual-FeO shuttle dose; yield-ceiling lever"
+      Na_additive_kg:
+        via: "start --additive=Na=<kg> or SimSessionConfig.additives_kg"
+        default_kg: 12
+        role: "cool residual-FeO shuttle broadening dose; additive bank seed"
     stages:
       - name: alkali_early_fe
         target_C: 1250
@@ -216,21 +220,26 @@ campaigns:
       target_C: 1150
       ramp_rate_C_per_hr: 600
       duration_h: 3
-      additive: "K"
+      additive: "K+Na"
       recommended_K_kg: 26
+      recommended_Na_kg: 12
       K2O_solubility_cap_wt_pct: 10
-      reaction: "2K + FeO -> K2O + Fe"
+      Na2O_solubility_cap_wt_pct: 10
+      reactions:
+        - "2K + FeO -> K2O + Fe"
+        - "2Na + FeO -> Na2O + Fe"
       endpoint:
-        type: "residual_FeO_reduction_or_K_dose_exhausted"
+        type: "residual_FeO_reduction_or_alkali_dose_exhausted"
         Fe_total_pct_target_min: 90
       known_model_limit: >
-        The builtin K shuttle is temperature-independent. The staged recipe
-        cools below the ~1200 C Ellingham crossover before C3_K for physical
-        fidelity, but no engine T-gate is enforced here.
+        The builtin K/Na FeO shuttle is temperature-independent. The staged
+        recipe cools below ~1200 C before C3_K for physical fidelity against
+        the K (~1216 C) and Na (~1331 C) FeO crossover estimates, but no engine
+        T-gate is enforced here.
     downstream_impact: >
       Adds an operator-selectable Path A staged route without changing
-      C2A_continuous. K shuttle stops after the cool K phase for S2; Na/Mg
-      deepening remains S4/engine-fidelity work.
+      C2A_continuous. The cool alkali shuttle uses additive/recycled K and Na
+      for residual FeO cleanup; Mg remains a product and is not spent on FeO.
     notes: >
       Setpoints were derived from the corrected vapor ladder under the main
       venv with VapoRock available: alkalis dominate <=1350 C, SiO starts to
