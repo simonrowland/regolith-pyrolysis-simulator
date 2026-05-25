@@ -107,6 +107,10 @@ from simulator.melt_backend.base import (
     project_melt_to_oxide_wt_pct,
     split_cleaned_melt_account,
 )
+from simulator.melt_backend.liquidus import (
+    LiquidusSolidusResult,
+    find_liquidus_solidus_by_fraction,
+)
 from simulator.state import OXIDE_SPECIES
 
 
@@ -360,6 +364,69 @@ class MAGEMinBackend(MeltBackend):
         )
         self._populate_result(result, raw)
         return result
+
+    def find_liquidus_solidus(
+        self,
+        composition_kg: Optional[Dict[str, float]] = None,
+        fO2_log: float = -9.0,
+        pressure_bar: float = 1e-6,
+        *,
+        composition_mol: Optional[Dict[str, float]] = None,
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ] = None,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+        min_T_C: float = 400.0,
+        max_T_C: float = 2200.0,
+        scan_step_C: float = 50.0,
+        tolerance_C: float = 2.0,
+    ) -> LiquidusSolidusResult:
+        """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
+        if not self._available or self._bridge is None:
+            return LiquidusSolidusResult(
+                status='unavailable',
+                warnings=('MAGEMin backend not initialized',),
+            )
+
+        sample_warnings: list[str] = []
+
+        def sample_fraction(temperature_C: float) -> float:
+            result = self.equilibrate(
+                float(temperature_C),
+                composition_kg=composition_kg,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+            )
+            if result.status != 'ok':
+                warning = '; '.join(result.warnings) or result.status
+                raise RuntimeError(warning)
+            for warning in result.warnings:
+                if warning.startswith('MAGEMin: translated absolute fO2_log'):
+                    continue
+                if warning not in sample_warnings:
+                    sample_warnings.append(warning)
+            return float(result.liquid_fraction)
+
+        result = find_liquidus_solidus_by_fraction(
+            sample_fraction,
+            min_T_C=min_T_C,
+            max_T_C=max_T_C,
+            scan_step_C=scan_step_C,
+            tolerance_C=tolerance_C,
+        )
+        warnings_out = [*result.warnings, *sample_warnings[:6]]
+        return LiquidusSolidusResult(
+            liquidus_T_C=result.liquidus_T_C,
+            liquidus_T_K=result.liquidus_T_K,
+            solidus_T_C=result.solidus_T_C,
+            status=result.status,
+            warnings=tuple(warnings_out),
+            samples=result.samples,
+            iterations=result.iterations,
+        )
 
     # ------------------------------------------------------------------
     # Discovery

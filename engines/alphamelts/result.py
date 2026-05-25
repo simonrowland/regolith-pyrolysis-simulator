@@ -15,6 +15,8 @@ caller wants for trace + UI:
   parsed / not available).
 * ``liquidus_T_K``         -- same liquidus temperature in K for
   MAGEMin parity traces.
+* ``solidus_T_C``          -- solidus temperature in C (None if not
+  parsed / not available).
 * ``phases_present``       -- ordered tuple of phase names reported by
   the engine.
 * ``phase_modes_wt_pct``   -- modal abundance per phase (wt%), normalised
@@ -66,6 +68,7 @@ class LiquidusDiagnostics:
 
     liquidus_T_C: Optional[float] = None
     liquidus_T_K: Optional[float] = None
+    solidus_T_C: Optional[float] = None
     phases_present: Tuple[str, ...] = ()
     phase_modes_wt_pct: Mapping[str, float] = field(default_factory=dict)
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
@@ -122,6 +125,8 @@ class LiquidusDiagnostics:
             object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
         if self.liquidus_T_C is None and self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+        if self.solidus_T_C is not None:
+            object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
         if self.fO2_log is not None:
             object.__setattr__(self, 'fO2_log', float(self.fO2_log))
 

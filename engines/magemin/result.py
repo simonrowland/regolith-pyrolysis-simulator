@@ -15,8 +15,8 @@ kernel-level DTO stays a mapping (matching the kernel contract in
 
 This module deliberately mirrors :class:`engines.alphamelts.result.
 LiquidusDiagnostics` so :class:`engines.magemin.parity.MAGEMinParityComparator`
-can compare the two via the same ``liquidus_T_K`` / ``phase_modes_wt_pct``
-keys without any reshape glue.
+    can compare the two via the same ``liquidus_T_K`` / ``phase_modes_wt_pct``
+    keys without any reshape glue.
 """
 
 from __future__ import annotations
@@ -49,6 +49,7 @@ class MAGEMinShadowDiagnostics:
 
     liquidus_T_K: Optional[float] = None
     liquidus_T_C: Optional[float] = None
+    solidus_T_C: Optional[float] = None
     phases_present: Tuple[str, ...] = ()
     phase_modes_wt_pct: Mapping[str, float] = field(default_factory=dict)
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
@@ -95,6 +96,8 @@ class MAGEMinShadowDiagnostics:
             object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
         if self.liquidus_T_C is not None:
             object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
+        if self.solidus_T_C is not None:
+            object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
         if self.liquid_fraction is not None:
             object.__setattr__(self, 'liquid_fraction', float(self.liquid_fraction))
 

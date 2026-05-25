@@ -7,10 +7,9 @@ Covers goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` checklist:
 2. DomainGate rejects metal-only / gas-only / halide-only compositions
    (checklist item 2 / 4 / acceptance gate "DomainGate rejects
    metal/gas/halide compositions in tests").
-3. Provider returns :class:`LiquidusDiagnostics` from both PetThermoTools
-   and subprocess paths (checklist 3, acceptance gate "Subprocess +
-   PetThermoTools paths both produce LiquidusDiagnostics for at least
-   one lunar feedstock").
+3. Provider returns :class:`LiquidusDiagnostics` from PetThermoTools for
+   the liquidus finder and keeps subprocess liquidus unavailable rather
+   than fabricating a number.
 4. :attr:`IntentResult.transition` is ALWAYS ``None`` (checklist 5,
    acceptance gate "No LedgerTransition emitted").
 5. The provider module does NOT import ``LedgerTransition`` /
@@ -43,6 +42,7 @@ from engines.alphamelts import (
     AlphaMELTSProvider,
     LiquidusDiagnostics,
 )
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
@@ -156,10 +156,18 @@ class _FakeAlphaMELTSBackend:
     ``tests/test_alphamelts_backend.py``.
     """
 
-    def __init__(self, *, mode: str, equilibrium: SimpleNamespace) -> None:
+    def __init__(
+        self,
+        *,
+        mode: str,
+        equilibrium: SimpleNamespace,
+        finder_result: LiquidusSolidusResult | None = None,
+    ) -> None:
         self._mode = mode
         self._equilibrium = equilibrium
+        self._finder_result = finder_result
         self.calls: list[dict] = []
+        self.finder_calls: list[dict] = []
         self.is_available_calls = 0
 
     def is_available(self) -> bool:
@@ -172,6 +180,19 @@ class _FakeAlphaMELTSBackend:
     def equilibrate(self, **kwargs):
         self.calls.append(kwargs)
         return self._equilibrium
+
+    def find_liquidus_solidus(self, **kwargs):
+        self.finder_calls.append(kwargs)
+        if self._mode != 'python_api':
+            return LiquidusSolidusResult(
+                status='unavailable',
+                warnings=('fake AlphaMELTS finder requires python_api mode',),
+            )
+        return self._finder_result or LiquidusSolidusResult(
+            liquidus_T_C=1305.0,
+            solidus_T_C=1000.0,
+            status='ok',
+        )
 
 
 def _build_equilibrium_for_basalt(
@@ -354,18 +375,17 @@ def test_provider_returns_liquidus_diagnostics_for_python_api_path():
     diagnostic = dict(result.diagnostic or {})
     assert diagnostic['mode'] == 'petthermotools'
     assert diagnostic['liquidus_T_C'] == pytest.approx(1305.0)
-    assert 'liquid' in tuple(diagnostic['phases_present'])
-    assert diagnostic['phase_modes_wt_pct']['liquid'] == pytest.approx(80.0)
-    # Adapter received the cleaned-melt composition.
-    assert backend.calls, 'backend was never called'
-    call_kwargs = backend.calls[0]
-    assert call_kwargs['temperature_C'] == 1400.0
+    assert diagnostic['solidus_T_C'] == pytest.approx(1000.0)
+    # Liquidus intent runs the finder, not the single-T equilibrium path.
+    assert backend.finder_calls, 'backend finder was never called'
+    assert not backend.calls
+    call_kwargs = backend.finder_calls[0]
     assert (
         'process.cleaned_melt' in call_kwargs['composition_mol_by_account']
     )
 
 
-def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
+def test_provider_reports_liquidus_unavailable_for_subprocess_path():
     backend = _FakeAlphaMELTSBackend(
         mode='subprocess',
         equilibrium=_build_equilibrium_for_basalt(liquidus_C=1280.0),
@@ -376,11 +396,13 @@ def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
         composition_mol=_basalt_species_mol(),
     )
     result = provider.dispatch(request)
-    assert result.status == 'ok'
+    assert result.status == 'unavailable'
     assert result.transition is None
     diagnostic = dict(result.diagnostic or {})
     assert diagnostic['mode'] == 'subprocess'
-    assert diagnostic['liquidus_T_C'] == pytest.approx(1280.0)
+    assert diagnostic['liquidus_T_C'] is None
+    assert diagnostic['solidus_T_C'] is None
+    assert any('requires python_api' in warning for warning in result.warnings)
 
 
 def test_provider_handles_silicate_equilibrium_intent():
@@ -682,6 +704,7 @@ def test_liquidus_diagnostics_is_frozen_and_carries_no_transition_field():
     """
     diagnostic = LiquidusDiagnostics(
         liquidus_T_C=1305.0,
+        solidus_T_C=1000.0,
         phases_present=('liquid', 'olivine'),
     )
     # frozen: assignment must raise.
@@ -689,6 +712,7 @@ def test_liquidus_diagnostics_is_frozen_and_carries_no_transition_field():
         diagnostic.liquidus_T_C = 1400.0  # type: ignore[misc]
     # No transition field is reserved.
     payload = diagnostic.as_diagnostic()
+    assert payload['solidus_T_C'] == pytest.approx(1000.0)
     for forbidden in ('transition', 'ledger_transition', 'proposal'):
         assert forbidden not in payload
 

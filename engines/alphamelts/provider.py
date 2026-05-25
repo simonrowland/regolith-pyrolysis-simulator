@@ -63,6 +63,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 
 
 # Intent set: SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. The goal queue
@@ -132,11 +133,11 @@ class AlphaMELTSProvider(ChemistryProvider):
            the diagnostic note.
         3. Runs :class:`AlphaMELTSDomainGate`. If rejected, returns
            ``status='out_of_domain'`` with the warnings recorded.
-        4. Selects the python_api / subprocess path on the live
-           adapter; if neither is available, returns
-           ``status='unavailable'``.
-        5. Projects the adapter's :class:`EquilibriumResult` into a
-           :class:`LiquidusDiagnostics`.
+        4. Branches by intent: ``SILICATE_LIQUIDUS`` runs the
+           liquidus/solidus finder; ``SILICATE_EQUILIBRIUM`` keeps the
+           single-T equilibration path.
+        5. Projects the adapter result into a
+            :class:`LiquidusDiagnostics`.
         6. Returns the :class:`IntentResult` with ``transition=None``.
         """
         # Defence in depth: the registry routes only declared intents
@@ -203,10 +204,16 @@ class AlphaMELTSProvider(ChemistryProvider):
                 ),
             )
 
-        mode, equilibrium = self._run_backend(
-            request,
-            composition_mol_by_account=composition_mol_by_account,
-        )
+        if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
+            mode, equilibrium = self._run_liquidus_finder(
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
+        else:
+            mode, equilibrium = self._run_backend(
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
         diagnostics = project_equilibrium_to_diagnostics(
             equilibrium,
             mode=mode,
@@ -371,6 +378,41 @@ class AlphaMELTSProvider(ChemistryProvider):
         # _backend_available returned True so this branch should never
         # fire; treat it as unavailable defensively.
         return 'unavailable', None
+
+    def _run_liquidus_finder(
+        self,
+        request: IntentRequest,
+        *,
+        composition_mol_by_account: dict,
+    ) -> tuple:
+        finder = getattr(self._backend, 'find_liquidus_solidus', None)
+        if not callable(finder):
+            return 'unavailable', LiquidusSolidusResult(
+                status='unavailable',
+                warnings=('AlphaMELTS backend has no liquidus finder',),
+            )
+        if python_api_available(self._backend):
+            mode = 'petthermotools'
+        elif subprocess_available(self._backend):
+            mode = 'subprocess'
+        else:
+            mode = 'unavailable'
+        species_registry = dict(
+            request.account_view.species_formula_registry or {}
+        )
+        try:
+            result = finder(
+                pressure_bar=request.pressure_bar,
+                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            result = LiquidusSolidusResult(
+                status='not_converged',
+                warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
+            )
+        return mode, result
 
     def _engine_version(self) -> str:
         if self._backend is None:

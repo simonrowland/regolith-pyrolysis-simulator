@@ -112,6 +112,54 @@ def test_magemin_equilibrate_never_emits_ledger_transition(monkeypatch):
     assert backend.ledger_account_policies() == ()
 
 
+def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
+    def minimize(**kwargs):
+        temperature_C = float(kwargs["T_C"])
+        frac = max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
+        phases = {}
+        if frac > 0.0:
+            phases["liq"] = {"mass_kg": frac}
+        if frac < 1.0:
+            phases["ol"] = {"mass_kg": 1.0 - frac}
+        return {"phases": phases}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({}) is True
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "ok"
+    assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
+    assert result.liquidus_T_K == pytest.approx(result.liquidus_T_C + 273.15)
+
+
+def test_magemin_liquidus_finder_unavailable_without_backend():
+    backend = MAGEMinBackend()
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "unavailable"
+    assert "not initialized" in " ".join(result.warnings)
+
+
 # ----------------------------------------------------------------------
 # Mocked-absent path: no MAGEMin binary, no bridge.
 # ----------------------------------------------------------------------
@@ -483,6 +531,82 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases():
     ]
     assert crystalline, result.phases_present
     assert result.ledger_transition is None
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
+    """Apollo low-Ti mare basalt sample 12009 begins crystallizing near 1230 C.
+
+    Reference: Walker et al. 1971, Experimental petrology of Apollo 12 basalts,
+    part 1, sample 12009. This feedstock is only an Apollo 12/15 low-Ti soil
+    analog, so the test checks a sane bracket rather than a forced retune.
+    """
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({})
+    if not available:
+        pytest.skip("MAGEMin binary present but backend failed to initialize")
+
+    result = backend.find_liquidus_solidus(
+        composition_kg={
+            "SiO2": 44.5,
+            "TiO2": 1.5,
+            "Al2O3": 13.5,
+            "FeO": 16.5,
+            "MgO": 9.0,
+            "CaO": 11.0,
+            "Na2O": 0.4,
+            "K2O": 0.10,
+            "Cr2O3": 0.35,
+            "MnO": 0.20,
+            "P2O5": 0.10,
+        },
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+
+    assert result.status == "ok", result.warnings
+    assert 900.0 <= result.solidus_T_C <= 1100.0
+    assert 1200.0 <= result.liquidus_T_C <= 1450.0
+    assert result.liquidus_T_C >= result.solidus_T_C
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+@pytest.mark.parametrize(
+    ("name", "composition_kg", "reference_C"),
+    [
+        ("forsterite", {"MgO": 57.276, "SiO2": 42.724}, 1890.0),
+        ("diopside", {"CaO": 25.9, "MgO": 18.6, "SiO2": 55.5}, 1391.5),
+        ("anorthite", {"CaO": 20.16, "Al2O3": 36.65, "SiO2": 43.19}, 1553.0),
+    ],
+)
+def test_magemin_live_pure_endmember_references_documented_xfail(
+    name,
+    composition_kg,
+    reference_C,
+):
+    """Pure endmember melting references for any future calibrated engine.
+
+    Forsterite 2163 K follows Akimoto et al. 1981; diopside 1391.5 C and
+    anorthite 1553 C are standard Di-An calibration values. The MAGEMin `ig`
+    subprocess path here is calibrated for natural igneous systems and the L1
+    probe showed these pure endmembers are not reliable acceptance targets.
+    """
+    pytest.xfail(
+        f"MAGEMin ig subprocess is not accepted for pure {name} "
+        f"endmember liquidus {reference_C:g} C"
+    )
 
 
 def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
