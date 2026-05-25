@@ -107,6 +107,7 @@ def project_equilibrium_to_diagnostics(
             liquidus_T_C + 273.15 if liquidus_T_C is not None else
             _safe_attr_float(equilibrium_result, 'liquidus_T_K')
         ),
+        solidus_T_C=_safe_attr_float(equilibrium_result, 'solidus_T_C'),
         phases_present=phases_present,
         phase_modes_wt_pct=phase_modes,
         phase_masses_kg=phase_masses,

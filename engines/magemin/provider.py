@@ -62,6 +62,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 
 
 # Intent set: SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. Matches the
@@ -211,11 +212,18 @@ class MAGEMinShadowProvider(ChemistryProvider):
                 ),
             )
 
-        equilibrium = self._run_backend(
-            backend,
-            request,
-            composition_mol_by_account=composition_mol_by_account,
-        )
+        if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
+            equilibrium = self._run_liquidus_finder(
+                backend,
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
+        else:
+            equilibrium = self._run_backend(
+                backend,
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
         diagnostics = self._project_equilibrium(
             equilibrium,
             mode=self._mode_label(backend),
@@ -432,6 +440,40 @@ class MAGEMinShadowProvider(ChemistryProvider):
         except Exception:
             return None
 
+    def _run_liquidus_finder(
+        self,
+        backend: Any,
+        request: IntentRequest,
+        *,
+        composition_mol_by_account: dict,
+    ) -> Any:
+        finder = getattr(backend, 'find_liquidus_solidus', None)
+        if not callable(finder):
+            return self._run_backend(
+                backend,
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
+        species_registry = dict(
+            request.account_view.species_formula_registry or {}
+        )
+        try:
+            return finder(
+                pressure_bar=float(request.pressure_bar),
+                fO2_log=(
+                    float(request.fO2_log)
+                    if request.fO2_log is not None
+                    else -9.0
+                ),
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            return LiquidusSolidusResult(
+                status='not_converged',
+                warnings=(f'MAGEMin liquidus finder failed: {exc}',),
+            )
+
     @staticmethod
     def _mode_label(backend: Any) -> str:
         """Report which bridge the adapter is using.
@@ -532,12 +574,14 @@ class MAGEMinShadowProvider(ChemistryProvider):
             liquidus_T_C = _safe_attr_float(equilibrium, 'liquidus_T_C')
             if liquidus_T_C is not None:
                 liquidus_T_K = liquidus_T_C + 273.15
+        solidus_T_C = _safe_attr_float(equilibrium, 'solidus_T_C')
 
         backend_status = str(getattr(equilibrium, 'status', 'ok') or 'ok')
 
         return MAGEMinShadowDiagnostics(
             liquidus_T_K=liquidus_T_K,
             liquidus_T_C=liquidus_T_C,
+            solidus_T_C=solidus_T_C,
             phases_present=phases_present,
             phase_modes_wt_pct=phase_modes_wt_pct,
             liquid_composition_wt_pct=liquid_comp,

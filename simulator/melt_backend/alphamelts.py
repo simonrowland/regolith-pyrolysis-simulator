@@ -40,6 +40,10 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import MeltBackend, EquilibriumResult
+from simulator.melt_backend.liquidus import (
+    LiquidusSolidusResult,
+    find_liquidus_solidus_by_fraction,
+)
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
@@ -393,6 +397,109 @@ class AlphaMELTSBackend(MeltBackend):
                 status='unavailable',
             )
 
+    def find_liquidus_solidus(self,
+                              composition_kg: Optional[Dict[str, float]] = None,
+                              fO2_log: float = -9.0,
+                              pressure_bar: float = 1e-6,
+                              *,
+                              composition_mol: Optional[Dict[str, float]] = None,
+                              composition_mol_by_account: Optional[
+                                  Mapping[str, Mapping[str, float]]
+                              ] = None,
+                              species_formula_registry: Optional[
+                                  Mapping[str, object]
+                              ] = None,
+                              min_T_C: float = 400.0,
+                              max_T_C: float = 2200.0,
+                              scan_step_C: float = 50.0,
+                              tolerance_C: float = 2.0,
+                              ) -> LiquidusSolidusResult:
+        """Find solidus/liquidus when the PetThermoTools findLiq path is live."""
+        if self._mode != 'python_api':
+            return LiquidusSolidusResult(
+                status='unavailable',
+                warnings=(
+                    'AlphaMELTS liquidus finder requires PetThermoTools '
+                    'python_api mode',
+                ),
+            )
+
+        comp_wt_result = self._composition_for_liquidus_finder(
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            min_T_C=min_T_C,
+        )
+        if isinstance(comp_wt_result, LiquidusSolidusResult):
+            return comp_wt_result
+        comp_wt = comp_wt_result
+
+        ptt_liquidus_C, ptt_warnings = self._find_petthermotools_liquidus_C(
+            comp_wt,
+            pressure_bar=pressure_bar,
+            seed_T_C=max(min_T_C, ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C),
+        )
+        if ptt_liquidus_C is None:
+            return LiquidusSolidusResult(
+                status='unavailable',
+                warnings=(
+                    *ptt_warnings,
+                    'AlphaMELTS liquidus finder unavailable: '
+                    'PetThermoTools findLiq did not return a temperature',
+                ),
+            )
+
+        sample_warnings: list[str] = []
+
+        def sample_fraction(temperature_C: float) -> float:
+            result = self.equilibrate(
+                float(temperature_C),
+                composition_kg=composition_kg,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+            )
+            if result.status != 'ok':
+                warning = '; '.join(result.warnings) or result.status
+                raise RuntimeError(warning)
+            for warning in result.warnings:
+                if warning not in sample_warnings:
+                    sample_warnings.append(warning)
+            return float(result.liquid_fraction)
+
+        result = find_liquidus_solidus_by_fraction(
+            sample_fraction,
+            min_T_C=min_T_C,
+            max_T_C=max_T_C,
+            scan_step_C=scan_step_C,
+            tolerance_C=tolerance_C,
+        )
+        warnings_out = [*ptt_warnings, *result.warnings, *sample_warnings[:6]]
+        if (
+            result.status == 'ok'
+            and result.liquidus_T_C is not None
+            and abs(result.liquidus_T_C - ptt_liquidus_C) > max(5.0, tolerance_C * 2.0)
+        ):
+            warnings_out.append(
+                'PetThermoTools findLiq differs from frac_M bisection: '
+                f'findLiq={ptt_liquidus_C:.3f} C, '
+                f'bisection={result.liquidus_T_C:.3f} C'
+            )
+        return LiquidusSolidusResult(
+            liquidus_T_C=result.liquidus_T_C,
+            liquidus_T_K=result.liquidus_T_K,
+            solidus_T_C=result.solidus_T_C,
+            status=result.status,
+            warnings=tuple(warnings_out),
+            samples=result.samples,
+            iterations=result.iterations,
+        )
+
     def _unsupported_accounts(
         self,
         composition_mol_by_account: Mapping[str, Mapping[str, float]],
@@ -607,6 +714,159 @@ class AlphaMELTSBackend(MeltBackend):
             'CO2_Liq': 0.0,
             'Fe3Fet_Liq': max(0.0, min(1.0, fe3fet)),
         }
+
+    def _composition_for_liquidus_finder(
+        self,
+        *,
+        composition_kg: Optional[Dict[str, float]],
+        composition_mol: Optional[Dict[str, float]],
+        composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]],
+        species_formula_registry: Optional[Mapping[str, object]],
+        pressure_bar: float,
+        fO2_log: float,
+        min_T_C: float,
+    ) -> dict | LiquidusSolidusResult:
+        if composition_mol_by_account is not None:
+            unsupported = self._unsupported_accounts(composition_mol_by_account)
+            if unsupported:
+                return LiquidusSolidusResult(
+                    status='out_of_domain',
+                    warnings=(
+                        'unsupported ledger accounts present: '
+                        + ', '.join(
+                            f'{account}={species}'
+                            for account, species in sorted(unsupported.items())
+                        ),
+                    ),
+                )
+            composition_mol = {}
+            for species, mol in composition_mol_by_account.get(
+                'process.cleaned_melt', {}
+            ).items():
+                composition_mol[species] = (
+                    composition_mol.get(species, 0.0) + float(mol))
+        if composition_mol is not None:
+            composition_kg = {
+                species: float(mol)
+                * resolve_species_formula(
+                    species,
+                    species_formula_registry,
+                ).molar_mass_kg_per_mol()
+                for species, mol in composition_mol.items()
+                if float(mol) > 0.0
+            }
+        else:
+            composition_kg = dict(composition_kg or {})
+
+        raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
+        if not raw_comp_wt:
+            return LiquidusSolidusResult(
+                status='out_of_domain',
+                warnings=('AlphaMELTS liquidus finder received no melt oxides',),
+            )
+        domain_rejection = self._domain_gate(
+            raw_comp_wt,
+            temperature_C=min_T_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+        if domain_rejection is not None:
+            return LiquidusSolidusResult(
+                status='out_of_domain',
+                warnings=tuple(domain_rejection.warnings),
+            )
+        try:
+            return self._normalize_composition_to_melts_basis(raw_comp_wt)
+        except ValueError as exc:
+            return LiquidusSolidusResult(
+                status='out_of_domain',
+                warnings=(f'AlphaMELTS composition rejected: {exc}',),
+            )
+
+    def _find_petthermotools_liquidus_C(
+        self,
+        comp_wt: Mapping[str, float],
+        *,
+        pressure_bar: float,
+        seed_T_C: float,
+    ) -> tuple[Optional[float], tuple[str, ...]]:
+        try:
+            ptt = self._require_petthermotools_runtime()
+        except ImportError as exc:
+            return None, (f'PetThermoTools runtime unavailable: {exc}',)
+        ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
+        find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
+        find_liq = getattr(ptt, 'findLiq', None)
+        try:
+            if callable(find_liq_melts):
+                raw = find_liq_melts(
+                    P_bar=max(pressure_bar, 1e-6),
+                    Model=self._model,
+                    T_C_init=float(seed_T_C),
+                    comp=ptt_comp,
+                    melts=self._pet_melts,
+                    fO2_buffer=self._redox_buffer,
+                    fO2_offset=self._fo2_offset,
+                    Step=50.0,
+                )
+            elif callable(find_liq):
+                raw = find_liq(
+                    None,
+                    0,
+                    Model=self._model,
+                    P_bar=max(pressure_bar, 1e-6),
+                    T_initial_C=float(seed_T_C),
+                    comp=ptt_comp,
+                    fO2_buffer=self._redox_buffer,
+                    fO2_offset=self._fo2_offset,
+                )
+            else:
+                return None, ('PetThermoTools findLiq API not found',)
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            return None, (f'PetThermoTools findLiq failed: {exc}',)
+        return self._extract_temperature_C(raw), ()
+
+    def _extract_temperature_C(self, raw: Any) -> Optional[float]:
+        if raw is None:
+            return None
+        if self._is_number(raw):
+            return float(raw)
+        if isinstance(raw, Mapping):
+            for key in (
+                'T_Liq',
+                'T_liq',
+                'T_liquidus_C',
+                'liquidus_T_C',
+                'Liquidus',
+                'liquidus',
+                'T_C',
+                'T',
+            ):
+                if key in raw and self._is_number(raw[key]):
+                    return float(raw[key])
+            for value in raw.values():
+                found = self._extract_temperature_C(value)
+                if found is not None:
+                    return found
+        if isinstance(raw, (tuple, list)):
+            for value in raw:
+                found = self._extract_temperature_C(value)
+                if found is not None:
+                    return found
+        for key in (
+            'T_Liq',
+            'T_liq',
+            'T_liquidus_C',
+            'liquidus_T_C',
+            'Liquidus',
+            'liquidus',
+            'T_C',
+            'T',
+        ):
+            value = getattr(raw, key, None)
+            if value is not None and self._is_number(value):
+                return float(value)
+        return None
 
     # ------------------------------------------------------------------
     # Subprocess mode
