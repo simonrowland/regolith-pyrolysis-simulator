@@ -12,8 +12,8 @@ provider under goal #9 ``MAGEMIN-SHADOW-PARITY``. The provider:
 - runs the :class:`MAGEMinDomainGate` on the cleaned-melt composition
   before delegating to the today-hook adapter,
 - delegates to :mod:`simulator.melt_backend.magemin.MAGEMinBackend`
-  for the chemistry (subprocess + Julia / pymagemin paths owned by the
-  adapter; this module orchestrates dispatch only),
+  for the chemistry with ``python_bridge='subprocess'`` pinned for
+  shadow determinism,
 - returns a :class:`MAGEMinShadowDiagnostics` payload on
   :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
   MAGEMin is **shadow-only** (no ledger authority, ever).
@@ -77,6 +77,7 @@ _INTENTS = frozenset({
 # bulk only, no gas / metal / salt / sulfide. The kernel filter blocks
 # every other account before dispatch.
 _DECLARED_ACCOUNT = 'process.cleaned_melt'
+_SHADOW_BACKEND_CONFIG = {'python_bridge': 'subprocess'}
 
 # Note attached to the ControlAudit for every dispatch. MAGEMin is
 # shadow-only -- it consumes T / P / fO2 as inputs but never enforces
@@ -99,7 +100,8 @@ class MAGEMinShadowProvider(ChemistryProvider):
     no binary is reachable.
 
     ``backend`` may be ``None`` -- in that case :meth:`dispatch` lazily
-    constructs a :class:`MAGEMinBackend` and calls ``initialize({})``;
+    constructs a :class:`MAGEMinBackend` and calls
+    ``initialize({'python_bridge': 'subprocess'})``;
     if the binary is absent the result carries ``status='unavailable'``
     with an empty :class:`MAGEMinShadowDiagnostics`. This matches the
     kernel's ``status='unavailable'`` vocabulary for absent engines.
@@ -371,7 +373,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
         if self._backend is not None:
             if not self._backend_initialised:
                 try:
-                    self._backend.initialize({})
+                    self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
                 except Exception:
                     pass
                 self._backend_initialised = True
@@ -379,7 +381,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
         try:
             from simulator.melt_backend.magemin import MAGEMinBackend
             backend = MAGEMinBackend()
-            backend.initialize({})
+            backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception:
             self._backend = None
             return None

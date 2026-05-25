@@ -34,6 +34,10 @@ from types import SimpleNamespace
 import pytest
 
 import engines.alphamelts.provider as provider_module
+from engines.alphamelts.parser import (
+    diagnostics_to_equilibrium,
+    project_equilibrium_to_diagnostics,
+)
 from engines.alphamelts import (
     AlphaMELTSDomainGate,
     AlphaMELTSProvider,
@@ -187,8 +191,10 @@ def _build_equilibrium_for_basalt(
     return SimpleNamespace(
         phases_present=['liquid', 'olivine'],
         phase_masses_kg={'liquid': 0.8, 'olivine': 0.2},
+        liquid_fraction=0.8,
         liquid_composition_wt_pct=dict(_basalt_wt_pct()),
         activity_coefficients={'SiO2': 0.95, 'FeO': 1.1},
+        fO2_log=-8.25,
         status=status,
         warnings=[f'AlphaMELTS liquidus_C={liquidus_C:.3f}'],
         vapor_pressures_Pa={},
@@ -392,6 +398,34 @@ def test_provider_handles_silicate_equilibrium_intent():
     assert result.intent == ChemistryIntent.SILICATE_EQUILIBRIUM
     assert result.transition is None
     assert (result.diagnostic or {}).get('mode') == 'petthermotools'
+
+
+def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
+    legacy = _build_equilibrium_for_basalt(liquidus_C=1290.0)
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+
+    result = diagnostics_to_equilibrium(
+        diagnostics,
+        {
+            'temperature_C': 1425.0,
+            'pressure_bar': 1e-6,
+            'fO2_log': -7.9,
+        },
+    )
+
+    assert result.temperature_C == pytest.approx(1425.0)
+    assert result.pressure_bar == pytest.approx(1e-6)
+    assert result.phases_present == ['liquid', 'olivine']
+    assert result.phase_masses_kg == pytest.approx({'liquid': 0.8, 'olivine': 0.2})
+    assert result.liquid_fraction == pytest.approx(0.8)
+    assert result.liquid_composition_wt_pct == pytest.approx(_basalt_wt_pct())
+    assert result.activity_coefficients == pytest.approx({'SiO2': 0.95, 'FeO': 1.1})
+    assert result.fO2_log == pytest.approx(-8.25)
+    assert result.ledger_transition is None
 
 
 def test_provider_rejects_unsupported_intent_with_status_unsupported():
