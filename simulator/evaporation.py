@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from collections.abc import Mapping
+from typing import Any
 
 from simulator.accounting import AccountingError, resolve_species_formula
-from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -18,6 +20,8 @@ from simulator.state import (
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+_FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
+_FREEZE_GATE_EPSILON = 1.0e-12
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, float]:
@@ -135,12 +139,327 @@ class EvaporationMixin:
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
+        liquid_fraction_factor = 1.0
+        if flux_kg_hr and self._freeze_gate_enabled():
+            liquid_fraction_factor = self._freeze_gate_liquid_fraction_factor()
+            if liquid_fraction_factor <= _FREEZE_GATE_EPSILON:
+                flux.update_totals()
+                return flux
         for species, rate_kg_hr in flux_kg_hr.items():
-            if rate_kg_hr > 1e-12:
-                flux.species_kg_hr[species] = float(rate_kg_hr)
+            gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
+            if gated_rate_kg_hr > 1e-12:
+                flux.species_kg_hr[species] = gated_rate_kg_hr
 
         flux.update_totals()
         return flux
+
+    def _freeze_gate_liquid_fraction_factor(self) -> float:
+        curve = self._freeze_gate_curve()
+        factor = self._interpolate_freeze_gate_curve(
+            curve,
+            float(self.melt.temperature_C),
+        )
+        self._last_freeze_gate_diagnostic = {
+            'enabled': True,
+            'source': curve['source'],
+            'solidus_T_C': curve['solidus_T_C'],
+            'liquidus_T_C': curve['liquidus_T_C'],
+            'liquid_fraction': factor,
+        }
+        return factor
+
+    def _freeze_gate_curve(self) -> dict[str, Any]:
+        key = self._freeze_gate_cache_key()
+        cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
+        if cache and cache.get('key') == key:
+            return dict(cache['curve'])
+
+        reasons: list[str] = []
+        curve = self._freeze_gate_curve_from_ec_dispatch(reasons)
+        if curve is None:
+            curve = self._freeze_gate_curve_from_backend_liquidus(reasons)
+        if curve is None:
+            curve = self._freeze_gate_curve_from_kernel_liquidus(reasons)
+        if curve is None:
+            detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
+            raise RuntimeError(
+                'freeze_gate.enabled requires a liquid_fraction(T) source; '
+                'no liquidus engine produced usable solidus/liquidus bounds. '
+                f'{detail}'
+            )
+
+        self._freeze_gate_liquid_fraction_cache = {
+            'key': key,
+            'curve': dict(curve),
+        }
+        return curve
+
+    def _freeze_gate_cache_key(self) -> tuple:
+        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        composition_key = tuple(
+            sorted(
+                (str(species), round(float(mol), 12))
+                for species, mol in cleaned_mol.items()
+                if abs(float(mol)) > _FREEZE_GATE_EPSILON
+            )
+        )
+        return (composition_key,)
+
+    def _freeze_gate_curve_from_ec_dispatch(
+        self,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+                control_inputs={},
+            )
+        except ProviderUnavailableError as exc:
+            reasons.append(f'EC unavailable: {exc}')
+            return None
+
+        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+        status = str(
+            getattr(result, 'status', None)
+            or diagnostic.get('backend_status')
+            or 'unavailable'
+        )
+        path = tuple(diagnostic.get('liquid_fraction_path') or ())
+        if status != 'ok' or not path:
+            reasons.append(
+                'EC table unavailable: '
+                f"status={status}, path_points={len(path)}"
+            )
+            return None
+        curve = self._freeze_gate_curve_from_path(
+            path,
+            solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+            liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
+            source='equilibrium_crystallization',
+        )
+        if curve is None:
+            reasons.append('EC table invalid: missing monotone T/fraction path')
+        return curve
+
+    def _freeze_gate_curve_from_backend_liquidus(
+        self,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        finder = getattr(self.backend, 'find_liquidus_solidus', None)
+        if not callable(finder):
+            reasons.append('backend liquidus finder unavailable')
+            return None
+        try:
+            result = finder(
+                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+                fO2_log=float(self._compute_intrinsic_melt_fO2()),
+                composition_mol_by_account={
+                    _FREEZE_GATE_ACCOUNT: self.atom_ledger.mol_by_account(
+                        _FREEZE_GATE_ACCOUNT
+                    )
+                },
+                species_formula_registry=dict(
+                    getattr(self, 'species_formula_registry', {}) or {}
+                ),
+            )
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            reasons.append(f'backend liquidus finder failed: {exc}')
+            return None
+        return self._freeze_gate_curve_from_liquidus_result(
+            result,
+            source='liquidus_solidus:backend',
+            reasons=reasons,
+        )
+
+    def _freeze_gate_curve_from_kernel_liquidus(
+        self,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.SILICATE_LIQUIDUS,
+                control_inputs={},
+                fO2_log=float(self._compute_intrinsic_melt_fO2()),
+            )
+        except ProviderUnavailableError as exc:
+            reasons.append(f'kernel liquidus unavailable: {exc}')
+            return None
+
+        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+        status = str(
+            getattr(result, 'status', None)
+            or diagnostic.get('backend_status')
+            or 'unavailable'
+        )
+        if status != 'ok':
+            reasons.append(f'kernel liquidus unavailable: status={status}')
+            return None
+        return self._freeze_gate_curve_from_bounds(
+            solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+            liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
+            source='liquidus_solidus:kernel',
+            reasons=reasons,
+        )
+
+    def _freeze_gate_curve_from_liquidus_result(
+        self,
+        result: Any,
+        *,
+        source: str,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        status = str(getattr(result, 'status', 'unavailable'))
+        if status != 'ok':
+            warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
+            reasons.append(
+                f'{source} unavailable: status={status}'
+                + (f', warnings={warnings}' if warnings else '')
+            )
+            return None
+
+        solidus_T_C = self._optional_float(getattr(result, 'solidus_T_C', None))
+        liquidus_T_C = self._optional_float(getattr(result, 'liquidus_T_C', None))
+        samples = []
+        for sample in tuple(getattr(result, 'samples', ()) or ()):
+            samples.append({
+                'temperature_C': getattr(sample, 'temperature_C', None),
+                'liquid_fraction': getattr(sample, 'frac_M', None),
+            })
+        if samples:
+            curve = self._freeze_gate_curve_from_path(
+                samples,
+                solidus_T_C=solidus_T_C,
+                liquidus_T_C=liquidus_T_C,
+                source=source,
+            )
+            if curve is not None:
+                return curve
+        return self._freeze_gate_curve_from_bounds(
+            solidus_T_C=solidus_T_C,
+            liquidus_T_C=liquidus_T_C,
+            source=source,
+            reasons=reasons,
+        )
+
+    def _freeze_gate_curve_from_bounds(
+        self,
+        *,
+        solidus_T_C: float | None,
+        liquidus_T_C: float | None,
+        source: str,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        if (
+            solidus_T_C is None
+            or liquidus_T_C is None
+            or not solidus_T_C < liquidus_T_C
+        ):
+            reasons.append(f'{source} invalid bounds')
+            return None
+        return {
+            'source': source,
+            'solidus_T_C': solidus_T_C,
+            'liquidus_T_C': liquidus_T_C,
+            'path': (
+                (solidus_T_C, 0.0),
+                (liquidus_T_C, 1.0),
+            ),
+        }
+
+    def _freeze_gate_curve_from_path(
+        self,
+        path: tuple,
+        *,
+        solidus_T_C: float | None,
+        liquidus_T_C: float | None,
+        source: str,
+    ) -> dict[str, Any] | None:
+        points: list[tuple[float, float]] = []
+        for point in path:
+            if isinstance(point, Mapping):
+                temperature_C = point.get('temperature_C', point.get('T_C'))
+                liquid_fraction = point.get('liquid_fraction')
+            else:
+                temperature_C = getattr(point, 'temperature_C', None)
+                liquid_fraction = getattr(point, 'liquid_fraction', None)
+            temperature_C = self._optional_float(temperature_C)
+            liquid_fraction = self._optional_float(liquid_fraction)
+            if temperature_C is None or liquid_fraction is None:
+                continue
+            points.append(
+                (temperature_C, max(0.0, min(1.0, liquid_fraction)))
+            )
+        if solidus_T_C is None and points:
+            solidus_T_C = min(T for T, _ in points)
+        if liquidus_T_C is None and points:
+            liquidus_T_C = max(T for T, _ in points)
+        if (
+            solidus_T_C is None
+            or liquidus_T_C is None
+            or not solidus_T_C < liquidus_T_C
+        ):
+            return None
+        dedup: dict[float, float] = {}
+        for temperature_C, liquid_fraction in sorted(points):
+            dedup[temperature_C] = liquid_fraction
+        dedup[solidus_T_C] = 0.0
+        dedup[liquidus_T_C] = 1.0
+        ordered = tuple(sorted(dedup.items()))
+        if len(ordered) < 2:
+            return None
+        previous = ordered[0][1]
+        for _, liquid_fraction in ordered[1:]:
+            if liquid_fraction + 1.0e-9 < previous:
+                return None
+            previous = liquid_fraction
+        return {
+            'source': source,
+            'solidus_T_C': solidus_T_C,
+            'liquidus_T_C': liquidus_T_C,
+            'path': ordered,
+        }
+
+    @staticmethod
+    def _interpolate_freeze_gate_curve(
+        curve: Mapping[str, Any],
+        temperature_C: float,
+    ) -> float:
+        solidus_T_C = float(curve['solidus_T_C'])
+        liquidus_T_C = float(curve['liquidus_T_C'])
+        if temperature_C <= solidus_T_C:
+            return 0.0
+        if temperature_C >= liquidus_T_C:
+            return 1.0
+        path = tuple(curve.get('path') or ())
+        previous_T, previous_fraction = path[0]
+        for next_T, next_fraction in path[1:]:
+            previous_T = float(previous_T)
+            next_T = float(next_T)
+            if previous_T <= temperature_C <= next_T:
+                span = max(next_T - previous_T, _FREEZE_GATE_EPSILON)
+                weight = (temperature_C - previous_T) / span
+                return max(
+                    0.0,
+                    min(
+                        1.0,
+                        float(previous_fraction)
+                        + (float(next_fraction) - float(previous_fraction))
+                        * weight,
+                    ),
+                )
+            previous_T, previous_fraction = next_T, next_fraction
+        span = max(liquidus_T_C - solidus_T_C, _FREEZE_GATE_EPSILON)
+        return max(0.0, min(1.0, (temperature_C - solidus_T_C) / span))
+
+    @staticmethod
+    def _optional_float(value: Any) -> float | None:
+        try:
+            parsed = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(parsed):
+            return None
+        return parsed
 
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,

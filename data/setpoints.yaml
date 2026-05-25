@@ -1062,8 +1062,23 @@ overhead_headspace:
   # null derives from the campaign atmosphere/setpoint.
   downstream_pressure_bar: null
 
+# Per-campaign override pattern:
+# campaigns:
+#   C0:
+#     overhead_headspace:
+#       enabled: true
+
+
+# ============================================================================
+# 15. EVAPORATION FREEZE GATE (migration toggle)
+# ============================================================================
+freeze_gate:
+  # Default false preserves existing evaporation recipes and goldens.
+  # Later milestone flips this on with golden regeneration.
+  enabled: false
+
   # Per-campaign override pattern:
   # campaigns:
-  #   C0:
-  #     overhead_headspace:
+  #   C2A:
+  #     freeze_gate:
   #       enabled: true

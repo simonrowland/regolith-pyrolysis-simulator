@@ -197,6 +197,9 @@ DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'downstream_pressure_bar': None,
     'liner_temperature_C': 1500.0,
 }
+DEFAULT_FREEZE_GATE_CONFIG = {
+    'enabled': False,
+}
 BACKEND_FALLBACK_EXCEPTIONS = (RuntimeError, ImportError)
 STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
 STAGE0_CARBON_CLEANUP_TEMP_RANGE_C = (20.0, 1050.0)
@@ -338,6 +341,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._overhead_headspace_config = (
             self._resolve_overhead_headspace_config()
         )
+        self._freeze_gate_config = self._resolve_freeze_gate_config()
+        self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
+        self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
 
@@ -540,6 +546,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic = {}
         self._equipment = None
         self._configure_overhead_headspace()
+        self._configure_freeze_gate()
 
         # Record
         self.record = BatchRecord(
@@ -1151,6 +1158,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _overhead_headspace_enabled(self) -> bool:
         return bool(self._overhead_headspace_config.get('enabled', False))
+
+    def _resolve_freeze_gate_config(
+        self, campaign: Optional[CampaignPhase] = None
+    ) -> Dict[str, Any]:
+        config = dict(DEFAULT_FREEZE_GATE_CONFIG)
+        config.update(dict(self.setpoints.get('freeze_gate', {}) or {}))
+        campaign_key = campaign.name if campaign is not None else None
+        if campaign_key:
+            campaign_cfg = (
+                self.setpoints.get('campaigns', {}) or {}
+            ).get(campaign_key, {}) or {}
+            config.update(dict(campaign_cfg.get('freeze_gate', {}) or {}))
+            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            config.update(dict(runtime_override.get('freeze_gate', {}) or {}))
+        return config
+
+    def _configure_freeze_gate(
+        self, campaign: Optional[CampaignPhase] = None
+    ) -> None:
+        self._freeze_gate_config = self._resolve_freeze_gate_config(campaign)
+        self._freeze_gate_liquid_fraction_cache = None
+        self._last_freeze_gate_diagnostic = {}
+
+    def _freeze_gate_enabled(self) -> bool:
+        return bool(self._freeze_gate_config.get('enabled', False))
 
     def _headspace_volume_m3(self) -> float:
         configured = self._overhead_headspace_config.get('volume_m3')
@@ -3184,6 +3216,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
         self._configure_overhead_headspace(campaign)
+        self._configure_freeze_gate(campaign)
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
 
         # Initialize shuttle inventory when entering C3 phases
