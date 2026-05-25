@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Callable, Optional, Tuple
+import math
+from dataclasses import dataclass, field
+from typing import Callable, Mapping, Optional, Tuple
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,59 @@ class LiquidusSolidusResult:
             object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
+        object.__setattr__(self, 'samples', tuple(self.samples))
+        object.__setattr__(self, 'iterations', int(self.iterations))
+
+
+@dataclass(frozen=True)
+class LiquidFractionPathPoint:
+    temperature_C: float
+    liquid_fraction: float
+    liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, 'temperature_C', float(self.temperature_C))
+        object.__setattr__(
+            self,
+            'liquid_fraction',
+            _clamp_fraction(self.liquid_fraction),
+        )
+        object.__setattr__(
+            self,
+            'liquid_composition_wt_pct',
+            _coerce_composition(self.liquid_composition_wt_pct),
+        )
+
+
+@dataclass(frozen=True)
+class EquilibriumCrystallizationPathResult:
+    liquidus_T_C: Optional[float] = None
+    liquidus_T_K: Optional[float] = None
+    solidus_T_C: Optional[float] = None
+    status: str = 'unavailable'
+    warnings: Tuple[str, ...] = ()
+    liquid_fraction_path: Tuple[LiquidFractionPathPoint, ...] = ()
+    samples: Tuple[MeltFractionSample, ...] = ()
+    iterations: int = 0
+
+    def __post_init__(self) -> None:
+        if self.liquidus_T_C is not None:
+            object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
+        if self.liquidus_T_K is not None:
+            object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
+        if self.liquidus_T_K is None and self.liquidus_T_C is not None:
+            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+        if self.liquidus_T_C is None and self.liquidus_T_K is not None:
+            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+        if self.solidus_T_C is not None:
+            object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
+        object.__setattr__(self, 'status', str(self.status))
+        object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
+        object.__setattr__(
+            self,
+            'liquid_fraction_path',
+            tuple(_coerce_path_point(p) for p in self.liquid_fraction_path),
+        )
         object.__setattr__(self, 'samples', tuple(self.samples))
         object.__setattr__(self, 'iterations', int(self.iterations))
 
@@ -170,6 +224,71 @@ def find_liquidus_solidus_by_fraction(
     )
 
 
+def build_equilibrium_crystallization_path(
+    sample_liquid_state: Callable[[float], tuple[float, Mapping[str, float]]],
+    *,
+    solidus_T_C: float,
+    liquidus_T_C: float,
+    grid_step_C: float = 50.0,
+    max_points: int = 41,
+    monotonicity_tolerance: float = 2.0e-2,
+) -> EquilibriumCrystallizationPathResult:
+    """Build a monotone liquid-fraction path over solidus -> liquidus."""
+    samples: list[MeltFractionSample] = []
+    path: list[LiquidFractionPathPoint] = []
+    try:
+        solidus_T = float(solidus_T_C)
+        liquidus_T = float(liquidus_T_C)
+        if not solidus_T <= liquidus_T:
+            return EquilibriumCrystallizationPathResult(
+                status='not_converged',
+                warnings=('invalid EC interval: solidus_T_C exceeds liquidus_T_C',),
+            )
+        temperatures = _temperature_grid(
+            solidus_T,
+            liquidus_T,
+            grid_step_C=grid_step_C,
+            max_points=max_points,
+        )
+        for temperature_C in temperatures:
+            raw_fraction, raw_composition = sample_liquid_state(float(temperature_C))
+            fraction_point = _monotone_point(
+                MeltFractionSample(
+                    float(temperature_C),
+                    _clamp_fraction(raw_fraction),
+                ),
+                samples,
+                tolerance=monotonicity_tolerance,
+            )
+            samples.append(fraction_point)
+            samples.sort(key=lambda p: p.temperature_C)
+            path.append(
+                LiquidFractionPathPoint(
+                    temperature_C=fraction_point.temperature_C,
+                    liquid_fraction=fraction_point.frac_M,
+                    liquid_composition_wt_pct=_coerce_composition(raw_composition),
+                )
+            )
+    except Exception as exc:  # noqa: BLE001 - engine sampler boundary
+        return EquilibriumCrystallizationPathResult(
+            liquidus_T_C=liquidus_T_C,
+            solidus_T_C=solidus_T_C,
+            status='not_converged',
+            warnings=(f'equilibrium crystallization path failed: {exc}',),
+            liquid_fraction_path=tuple(path),
+            samples=tuple(samples),
+            iterations=len(samples),
+        )
+    return EquilibriumCrystallizationPathResult(
+        liquidus_T_C=liquidus_T,
+        solidus_T_C=solidus_T,
+        status='ok',
+        liquid_fraction_path=tuple(path),
+        samples=tuple(samples),
+        iterations=len(samples),
+    )
+
+
 def _bisect_solidus(
     sample: Callable[[float], MeltFractionSample],
     low: MeltFractionSample,
@@ -246,9 +365,69 @@ def _monotone_point(
 
 def _clamp_fraction(value: float) -> float:
     frac = float(value)
-    if frac != frac or frac in (float('inf'), float('-inf')):
+    if not math.isfinite(frac):
         raise RuntimeError(f'invalid frac_M value: {value!r}')
     return max(0.0, min(1.0, frac))
+
+
+def _temperature_grid(
+    solidus_T_C: float,
+    liquidus_T_C: float,
+    *,
+    grid_step_C: float,
+    max_points: int,
+) -> Tuple[float, ...]:
+    step = float(grid_step_C)
+    point_cap = int(max_points)
+    if step <= 0.0:
+        raise RuntimeError('invalid EC grid_step_C: must be positive')
+    if point_cap < 2:
+        raise RuntimeError('invalid EC max_points: must be at least 2')
+    span = float(liquidus_T_C) - float(solidus_T_C)
+    if span == 0.0:
+        return (float(solidus_T_C),)
+    intervals = min(max(1, math.ceil(span / step)), point_cap - 1)
+    return tuple(
+        float(solidus_T_C) + span * index / intervals
+        for index in range(intervals + 1)
+    )
+
+
+def _coerce_path_point(point: object) -> LiquidFractionPathPoint:
+    if isinstance(point, LiquidFractionPathPoint):
+        return point
+    if isinstance(point, Mapping):
+        temperature_C = point.get('temperature_C')
+        if temperature_C is None:
+            temperature_C = point.get('T_C', point.get('T'))
+        return LiquidFractionPathPoint(
+            temperature_C=float(temperature_C),
+            liquid_fraction=float(point.get('liquid_fraction')),
+            liquid_composition_wt_pct=point.get(
+                'liquid_composition_wt_pct', {}
+            ),
+        )
+    return LiquidFractionPathPoint(
+        temperature_C=float(getattr(point, 'temperature_C')),
+        liquid_fraction=float(getattr(point, 'liquid_fraction')),
+        liquid_composition_wt_pct=getattr(
+            point,
+            'liquid_composition_wt_pct',
+            {},
+        ),
+    )
+
+
+def _coerce_composition(composition: Mapping[str, float]) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for species, value in dict(composition or {}).items():
+        amount = float(value)
+        if not math.isfinite(amount):
+            raise RuntimeError(
+                f'invalid liquid_composition_wt_pct value for {species}: {value!r}'
+            )
+        result[str(species)] = amount
+    return result
 
 
 def _not_converged(message: str) -> LiquidusSolidusResult:
@@ -256,7 +435,10 @@ def _not_converged(message: str) -> LiquidusSolidusResult:
 
 
 __all__ = (
+    'EquilibriumCrystallizationPathResult',
+    'LiquidFractionPathPoint',
     'LiquidusSolidusResult',
     'MeltFractionSample',
+    'build_equilibrium_crystallization_path',
     'find_liquidus_solidus_by_fraction',
 )

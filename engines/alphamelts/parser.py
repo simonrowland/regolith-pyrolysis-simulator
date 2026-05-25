@@ -113,6 +113,7 @@ def project_equilibrium_to_diagnostics(
         phase_masses_kg=phase_masses,
         liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=liquid_comp,
+        liquid_fraction_path=_liquid_fraction_path(equilibrium_result),
         activity_coefficients=activities,
         fO2_log=fO2_log,
         mode=mode,
@@ -175,6 +176,34 @@ def _phase_modes_wt_pct(masses_kg: Mapping[str, float]) -> Dict[str, float]:
         for phase, mass_kg in masses_kg.items()
         if _is_finite(mass_kg) and float(mass_kg) > 0.0
     }
+
+
+def _liquid_fraction_path(equilibrium_result: Any) -> Tuple[Dict[str, Any], ...]:
+    path = []
+    for point in tuple(getattr(equilibrium_result, 'liquid_fraction_path', ()) or ()):
+        if isinstance(point, Mapping):
+            temperature_C = point.get('temperature_C')
+            if temperature_C is None:
+                temperature_C = point.get('T_C', point.get('T'))
+            liquid_fraction = point.get('liquid_fraction')
+            composition = point.get('liquid_composition_wt_pct', {})
+        else:
+            temperature_C = getattr(point, 'temperature_C')
+            liquid_fraction = getattr(point, 'liquid_fraction')
+            composition = getattr(point, 'liquid_composition_wt_pct', {})
+        try:
+            path.append({
+                'temperature_C': float(temperature_C),
+                'liquid_fraction': float(liquid_fraction),
+                'liquid_composition_wt_pct': {
+                    str(k): float(v)
+                    for k, v in dict(composition or {}).items()
+                    if _is_finite(v)
+                },
+            })
+        except (TypeError, ValueError):
+            continue
+    return tuple(path)
 
 
 def _control_float(

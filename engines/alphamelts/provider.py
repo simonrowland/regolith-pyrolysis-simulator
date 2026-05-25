@@ -3,9 +3,9 @@
 First third-party adapter promoted to the kernel plane (goal #8
 ``ALPHAMELTS-DIAGNOSTIC-GATE``). The provider:
 
-- declares the :data:`SILICATE_LIQUIDUS` + :data:`SILICATE_EQUILIBRIUM`
-  intent set (matching the binding-spec authority matrix for
-  AlphaMELTS),
+- declares the AlphaMELTS silicate diagnostic intent set
+  (``SILICATE_LIQUIDUS``, ``SILICATE_EQUILIBRIUM``, and
+  ``EQUILIBRIUM_CRYSTALLIZATION``),
 - declares ``process.cleaned_melt`` as its sole accessible account; the
   kernel filter drops every other account before dispatch (checklist
   item 4),
@@ -25,7 +25,7 @@ enforces this with an AST walk over the module source.
 
 Authority posture
 -----------------
-AlphaMELTS is registered as the **authoritative** provider for both
+AlphaMELTS is registered as the **authoritative** provider for these
 intents in the registry sense (so the kernel can dispatch to it), but
 the provider's :meth:`dispatch` never builds a
 :class:`LedgerTransitionProposal`. The :class:`IntentResult` always has
@@ -63,17 +63,20 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.melt_backend.liquidus import LiquidusSolidusResult
+from simulator.melt_backend.liquidus import (
+    EquilibriumCrystallizationPathResult,
+    LiquidusSolidusResult,
+    build_equilibrium_crystallization_path,
+)
 
 
-# Intent set: SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. The goal queue
-# §8 text mentions FREEZE_PATH, but the binding-spec authority matrix
-# and the MAGEMin shadow provider both list this pair; the bracketed
-# reviewer note in the goal spec resolves the discrepancy in favour of
-# the LIQUIDUS / EQUILIBRIUM pair.
+# Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
+# only SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM; EC needs residual liquid
+# composition, so it remains AlphaMELTS-only.
 _INTENTS = frozenset({
     ChemistryIntent.SILICATE_LIQUIDUS,
     ChemistryIntent.SILICATE_EQUILIBRIUM,
+    ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
 })
 
 # Sole declared account: silicate-oxide melt (binding-spec §7 isolation).
@@ -134,8 +137,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         3. Runs :class:`AlphaMELTSDomainGate`. If rejected, returns
            ``status='out_of_domain'`` with the warnings recorded.
         4. Branches by intent: ``SILICATE_LIQUIDUS`` runs the
-           liquidus/solidus finder; ``SILICATE_EQUILIBRIUM`` keeps the
-           single-T equilibration path.
+           liquidus/solidus finder; ``EQUILIBRIUM_CRYSTALLIZATION`` builds
+           the monotone liquid-fraction table; ``SILICATE_EQUILIBRIUM``
+           keeps the single-T equilibration path.
         5. Projects the adapter result into a
             :class:`LiquidusDiagnostics`.
         6. Returns the :class:`IntentResult` with ``transition=None``.
@@ -150,7 +154,8 @@ class AlphaMELTSProvider(ChemistryProvider):
                 diagnostic={
                     'reason': (
                         'AlphaMELTSProvider serves SILICATE_LIQUIDUS + '
-                        'SILICATE_EQUILIBRIUM only'
+                        'SILICATE_EQUILIBRIUM + '
+                        'EQUILIBRIUM_CRYSTALLIZATION only'
                     ),
                 },
             )
@@ -206,6 +211,11 @@ class AlphaMELTSProvider(ChemistryProvider):
 
         if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
             mode, equilibrium = self._run_liquidus_finder(
+                request,
+                composition_mol_by_account=composition_mol_by_account,
+            )
+        elif request.intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
+            mode, equilibrium = self._run_equilibrium_crystallization_path(
                 request,
                 composition_mol_by_account=composition_mol_by_account,
             )
@@ -413,6 +423,119 @@ class AlphaMELTSProvider(ChemistryProvider):
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
             )
         return mode, result
+
+    def _run_equilibrium_crystallization_path(
+        self,
+        request: IntentRequest,
+        *,
+        composition_mol_by_account: dict,
+    ) -> tuple:
+        if python_api_available(self._backend):
+            mode = 'petthermotools'
+        elif subprocess_available(self._backend):
+            return 'subprocess', EquilibriumCrystallizationPathResult(
+                status='unavailable',
+                warnings=(
+                    'AlphaMELTS equilibrium crystallization requires '
+                    'PetThermoTools python_api mode with residual liquid '
+                    'composition; subprocess path is not EC-capable',
+                ),
+            )
+        else:
+            return 'unavailable', EquilibriumCrystallizationPathResult(
+                status='unavailable',
+                warnings=(
+                    'AlphaMELTS equilibrium crystallization requires '
+                    'PetThermoTools python_api mode with residual liquid '
+                    'composition',
+                ),
+            )
+
+        finder = getattr(self._backend, 'find_liquidus_solidus', None)
+        if not callable(finder):
+            return mode, EquilibriumCrystallizationPathResult(
+                status='unavailable',
+                warnings=('AlphaMELTS backend has no liquidus finder',),
+            )
+        species_registry = dict(
+            request.account_view.species_formula_registry or {}
+        )
+        try:
+            bounds = finder(
+                pressure_bar=request.pressure_bar,
+                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            return mode, EquilibriumCrystallizationPathResult(
+                status='not_converged',
+                warnings=(f'AlphaMELTS EC liquidus finder failed: {exc}',),
+            )
+        if (
+            bounds.status != 'ok'
+            or bounds.solidus_T_C is None
+            or bounds.liquidus_T_C is None
+        ):
+            return mode, EquilibriumCrystallizationPathResult(
+                liquidus_T_C=bounds.liquidus_T_C,
+                liquidus_T_K=bounds.liquidus_T_K,
+                solidus_T_C=bounds.solidus_T_C,
+                status=bounds.status,
+                warnings=tuple(bounds.warnings) or (
+                    'AlphaMELTS EC liquidus/solidus bounds unavailable',
+                ),
+                samples=bounds.samples,
+                iterations=bounds.iterations,
+            )
+
+        sample_warnings: list[str] = []
+
+        def sample_liquid_state(temperature_C: float) -> tuple[float, dict]:
+            result = equilibrate_via_python_api(
+                self._backend,
+                temperature_C=float(temperature_C),
+                pressure_bar=request.pressure_bar,
+                fO2_log=(
+                    request.fO2_log if request.fO2_log is not None else -9.0
+                ),
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+            if getattr(result, 'status', 'ok') != 'ok':
+                warning = '; '.join(getattr(result, 'warnings', ()) or ())
+                raise RuntimeError(warning or str(getattr(result, 'status')))
+            composition = dict(
+                getattr(result, 'liquid_composition_wt_pct', {}) or {}
+            )
+            if not composition:
+                raise RuntimeError(
+                    'AlphaMELTS EC sample lacks residual liquid composition'
+                )
+            for warning in getattr(result, 'warnings', ()) or ():
+                if warning not in sample_warnings:
+                    sample_warnings.append(str(warning))
+            return float(getattr(result, 'liquid_fraction')), composition
+
+        path = build_equilibrium_crystallization_path(
+            sample_liquid_state,
+            solidus_T_C=bounds.solidus_T_C,
+            liquidus_T_C=bounds.liquidus_T_C,
+        )
+        return mode, EquilibriumCrystallizationPathResult(
+            liquidus_T_C=path.liquidus_T_C,
+            liquidus_T_K=path.liquidus_T_K,
+            solidus_T_C=path.solidus_T_C,
+            status=path.status,
+            warnings=(
+                *tuple(bounds.warnings),
+                *tuple(path.warnings),
+                *tuple(sample_warnings[:6]),
+            ),
+            liquid_fraction_path=path.liquid_fraction_path,
+            samples=path.samples,
+            iterations=bounds.iterations + path.iterations,
+        )
 
     def _engine_version(self) -> str:
         if self._backend is None:

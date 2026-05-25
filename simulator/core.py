@@ -909,11 +909,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         \\goal ALPHAMELTS-DIAGNOSTIC-GATE (#8): AlphaMELTS is registered
         as the authoritative (diagnostic-only) provider for
-        SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. The provider wraps the
-        live :class:`AlphaMELTSBackend` instance so the subprocess and
-        PetThermoTools paths stay owned by the today-hook adapter (goal
-        #1 hardened it; this goal only adds the kernel envelope around
-        it). The registration is conditional because:
+        SILICATE_LIQUIDUS, SILICATE_EQUILIBRIUM, and
+        EQUILIBRIUM_CRYSTALLIZATION. The provider wraps the live
+        :class:`AlphaMELTSBackend` instance so the subprocess and
+        PetThermoTools paths stay owned by the today-hook adapter (goal #1
+        hardened it; this goal only adds the kernel envelope around it).
+        The registration is conditional because:
 
         * Only one authoritative provider may exist per intent
           (:class:`ProviderRegistry` enforces this).
@@ -939,6 +940,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             [
                 ChemistryIntent.SILICATE_LIQUIDUS,
                 ChemistryIntent.SILICATE_EQUILIBRIUM,
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
             ],
         )
 

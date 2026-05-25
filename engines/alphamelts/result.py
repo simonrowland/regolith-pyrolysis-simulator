@@ -25,6 +25,7 @@ caller wants for trace + UI:
   projection, copied through for diagnostic-only reconstruction.
 * ``liquid_fraction``      -- legacy ``EquilibriumResult`` liquid fraction.
 * ``liquid_composition_wt_pct`` -- liquid-phase oxide composition (wt%).
+* ``liquid_fraction_path`` -- EC path points over solidus -> liquidus.
 * ``activity_coefficients`` -- per-species activity coefficients the
   engine returned (None when absent).
 * ``fO2_log``              -- oxygen fugacity reported by the adapter
@@ -74,6 +75,7 @@ class LiquidusDiagnostics:
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
     liquid_fraction: float = 1.0
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
+    liquid_fraction_path: Tuple[Mapping[str, Any], ...] = ()
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
     fO2_log: Optional[float] = None
     mode: str = 'unavailable'
@@ -106,6 +108,11 @@ class LiquidusDiagnostics:
         )
         object.__setattr__(
             self,
+            'liquid_fraction_path',
+            _coerce_liquid_fraction_path(self.liquid_fraction_path),
+        )
+        object.__setattr__(
+            self,
             'activity_coefficients',
             {
                 str(k): float(v)
@@ -133,6 +140,30 @@ class LiquidusDiagnostics:
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""
         return asdict(self)
+
+
+def _coerce_liquid_fraction_path(path: Tuple[Mapping[str, Any], ...]) -> Tuple[Dict[str, Any], ...]:
+    points = []
+    for point in tuple(path or ()):
+        if isinstance(point, Mapping):
+            temperature_C = point.get('temperature_C')
+            if temperature_C is None:
+                temperature_C = point.get('T_C', point.get('T'))
+            liquid_fraction = point.get('liquid_fraction')
+            composition = point.get('liquid_composition_wt_pct', {})
+        else:
+            temperature_C = getattr(point, 'temperature_C')
+            liquid_fraction = getattr(point, 'liquid_fraction')
+            composition = getattr(point, 'liquid_composition_wt_pct', {})
+        points.append({
+            'temperature_C': float(temperature_C),
+            'liquid_fraction': float(liquid_fraction),
+            'liquid_composition_wt_pct': {
+                str(k): float(v)
+                for k, v in dict(composition or {}).items()
+            },
+        })
+    return tuple(points)
 
 
 __all__ = ('LiquidusDiagnostics',)
