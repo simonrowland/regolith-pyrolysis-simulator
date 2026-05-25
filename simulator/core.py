@@ -1941,6 +1941,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 backend_composition_by_account)
             intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
             self.melt.fO2_log = intrinsic_fO2_log
+            request_controls = {
+                'temperature_C': self.melt.temperature_C,
+                'pressure_bar': self.melt.p_total_mbar / 1000.0,
+                'fO2_log': intrinsic_fO2_log,
+            }
+            if (
+                self._chem_registry.authoritative_for(
+                    ChemistryIntent.SILICATE_EQUILIBRIUM
+                ) is not None
+            ):
+                from engines.alphamelts.parser import (
+                    diagnostics_to_equilibrium,
+                )
+                from engines.alphamelts.result import LiquidusDiagnostics
+
+                kernel_result = self._dispatch_only(
+                    ChemistryIntent.SILICATE_EQUILIBRIUM,
+                    control_inputs={},
+                    fO2_log=intrinsic_fO2_log,
+                )
+                if kernel_result.transition is not None:
+                    raise RuntimeError(
+                        'SILICATE_EQUILIBRIUM returned a ledger transition; '
+                        'silicate equilibrium is diagnostic-only'
+                    )
+                diagnostic = dict(kernel_result.diagnostic or {})
+                result = diagnostics_to_equilibrium(
+                    LiquidusDiagnostics(**diagnostic),
+                    request_controls,
+                )
+                setattr(result, 'alphamelts_diagnostics', diagnostic)
+                return self._record_equilibrium_status(result)
             backend_kwargs = {
                 'temperature_C': self.melt.temperature_C,
                 'composition_mol': self._backend_composition_mol(),
@@ -2017,68 +2049,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
-        # SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM intents -- kernel
-        # diagnostic.
-        #
-        # \goal ALPHAMELTS-DIAGNOSTIC-GATE (#8). When the active backend
-        # is an AlphaMELTSBackend the kernel-registered AlphaMELTSProvider
-        # owns SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM and attaches a
-        # LiquidusDiagnostics payload to ``result.alphamelts_diagnostics``
-        # for trace + UI. The provider is diagnostic-only:
-        # ``IntentResult.transition`` is ALWAYS None -- it cannot mutate
-        # the ledger. The legacy backend equilibration above remains the
-        # canonical compute path; this hook records a kernel-side view
-        # of the same call (the provider delegates to the same adapter
-        # instance), so the data flows through one engine, not two.
-        self._attach_post_equilibrium_alphamelts_diagnostic(result)
         return result
-
-    def _attach_post_equilibrium_alphamelts_diagnostic(self, result) -> None:
-        """Dispatch SILICATE_LIQUIDUS via the kernel and attach the diagnostic.
-
-        Belongs to \\goal ALPHAMELTS-DIAGNOSTIC-GATE (#8). Runs after
-        the backend equilibration and the VAPOR_PRESSURE / SulfSat
-        hooks. Behaviour:
-
-          - If no provider is registered for SILICATE_LIQUIDUS (the
-            active backend is not AlphaMELTS), this method is a no-op.
-            The kernel raises :class:`ProviderUnavailableError` in that
-            case; we catch and skip so non-AlphaMELTS users are
-            unaffected.
-          - Otherwise dispatch the intent through the kernel. The
-            provider runs the same backend instance the legacy path
-            just used and returns a LiquidusDiagnostics payload.
-          - Attach the diagnostic dict to
-            ``result.alphamelts_diagnostics`` (a free-form attribute the
-            EquilibriumResult dataclass does not reserve, so the
-            simulator gains visibility without changing the legacy
-            shape).
-          - The dispatch is read-only -- the provider never builds a
-            LedgerTransitionProposal. No commit_batch follows.
-        """
-        from simulator.chemistry.kernel.errors import (
-            ProviderUnavailableError as _ProviderUnavailableError,
-        )
-
-        # Both intents share the provider; SILICATE_LIQUIDUS is the
-        # "find the liquidus" call. SILICATE_EQUILIBRIUM is dispatched
-        # separately by call sites that need the full phase assemblage
-        # (none today; reserved for future migrations).
-        try:
-            kernel_result = self._dispatch_only(
-                ChemistryIntent.SILICATE_LIQUIDUS,
-                control_inputs={},
-            )
-        except _ProviderUnavailableError:
-            # No provider registered -> backend is not AlphaMELTS.
-            # Silent no-op so non-AlphaMELTS users keep their existing
-            # equilibrium-result shape. F-A4 no-op counter is not bumped
-            # here because the dispatch never reached a provider.
-            return
-        diagnostic = dict(kernel_result.diagnostic or {})
-        # Stash on a free-form attribute so the legacy
-        # EquilibriumResult dataclass stays backwards-compatible.
-        setattr(result, 'alphamelts_diagnostics', diagnostic)
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
         """Replace ``result.vapor_pressures_Pa`` with the kernel dispatch.

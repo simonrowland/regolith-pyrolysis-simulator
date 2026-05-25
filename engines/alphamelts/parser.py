@@ -1,4 +1,4 @@
-"""Projection from :class:`EquilibriumResult` to :class:`LiquidusDiagnostics`.
+"""Projection between ``EquilibriumResult`` and ``LiquidusDiagnostics``.
 
 The today-hook adapter (:mod:`simulator.melt_backend.alphamelts`)
 returns the simulator's legacy :class:`EquilibriumResult` shape; the
@@ -80,7 +80,12 @@ def project_equilibrium_to_diagnostics(
     phases_present = tuple(
         str(p) for p in (getattr(equilibrium_result, 'phases_present', ()) or ())
     )
-    phase_modes = _phase_modes_wt_pct(equilibrium_result)
+    phase_masses = _phase_masses_kg(equilibrium_result)
+    phase_modes = _phase_modes_wt_pct(phase_masses)
+    liquid_fraction = _safe_attr_float(equilibrium_result, 'liquid_fraction')
+    if liquid_fraction is None:
+        liquid_fraction = 1.0
+    fO2_log = _safe_attr_float(equilibrium_result, 'fO2_log')
     liquid_comp = {
         str(k): float(v)
         for k, v in dict(
@@ -98,10 +103,17 @@ def project_equilibrium_to_diagnostics(
 
     return LiquidusDiagnostics(
         liquidus_T_C=liquidus_T_C,
+        liquidus_T_K=(
+            liquidus_T_C + 273.15 if liquidus_T_C is not None else
+            _safe_attr_float(equilibrium_result, 'liquidus_T_K')
+        ),
         phases_present=phases_present,
         phase_modes_wt_pct=phase_modes,
+        phase_masses_kg=phase_masses,
+        liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=liquid_comp,
         activity_coefficients=activities,
+        fO2_log=fO2_log,
         mode=mode,
         engine_version=engine_version,
         backend_status=str(getattr(equilibrium_result, 'status', 'ok')),
@@ -109,14 +121,48 @@ def project_equilibrium_to_diagnostics(
     )
 
 
-def _phase_modes_wt_pct(equilibrium_result: Any) -> Dict[str, float]:
+def diagnostics_to_equilibrium(
+    diagnostics: LiquidusDiagnostics,
+    request_controls: Mapping[str, Any],
+) -> 'EquilibriumResult':
+    """Rebuild legacy ``EquilibriumResult`` from a kernel diagnostic."""
+    from simulator.melt_backend.base import EquilibriumResult
+
+    controls = dict(request_controls or {})
+    fO2_log = diagnostics.fO2_log
+    if fO2_log is None:
+        fO2_log = _control_float(controls, 'fO2_log', -9.0)
+    return EquilibriumResult(
+        temperature_C=_control_float(controls, 'temperature_C', 0.0),
+        pressure_bar=_control_float(controls, 'pressure_bar', 0.0),
+        phases_present=list(diagnostics.phases_present),
+        phase_masses_kg=dict(diagnostics.phase_masses_kg),
+        liquid_fraction=float(diagnostics.liquid_fraction),
+        liquid_composition_wt_pct=dict(diagnostics.liquid_composition_wt_pct),
+        activity_coefficients=dict(diagnostics.activity_coefficients),
+        fO2_log=float(fO2_log),
+        warnings=list(diagnostics.backend_warnings),
+        status=str(diagnostics.backend_status),
+    )
+
+
+def _phase_masses_kg(equilibrium_result: Any) -> Dict[str, float]:
+    return {
+        str(phase): float(mass_kg)
+        for phase, mass_kg in dict(
+            getattr(equilibrium_result, 'phase_masses_kg', {}) or {}
+        ).items()
+        if _is_finite(mass_kg) and float(mass_kg) > 0.0
+    }
+
+
+def _phase_modes_wt_pct(masses_kg: Mapping[str, float]) -> Dict[str, float]:
     """Project per-phase masses (kg) onto wt% summing to 100.
 
     Mirrors what the legacy parity comparator
     (:class:`MAGEMinParityComparator`) treats as ``phase_modes_wt_pct``.
     Returns an empty dict if no phase-mass data is available.
     """
-    masses_kg = dict(getattr(equilibrium_result, 'phase_masses_kg', {}) or {})
     total = sum(
         float(m) for m in masses_kg.values()
         if _is_finite(m) and float(m) > 0.0
@@ -128,6 +174,21 @@ def _phase_modes_wt_pct(equilibrium_result: Any) -> Dict[str, float]:
         for phase, mass_kg in masses_kg.items()
         if _is_finite(mass_kg) and float(mass_kg) > 0.0
     }
+
+
+def _control_float(
+    controls: Mapping[str, Any],
+    name: str,
+    default: float,
+) -> float:
+    value = controls.get(name, default)
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    if not _is_finite(result):
+        return float(default)
+    return result
 
 
 def _extract_liquidus_from_warnings(warnings: Tuple[str, ...]) -> Optional[float]:
@@ -166,4 +227,4 @@ def _is_finite(value: Any) -> bool:
     return True
 
 
-__all__ = ('project_equilibrium_to_diagnostics',)
+__all__ = ('diagnostics_to_equilibrium', 'project_equilibrium_to_diagnostics')

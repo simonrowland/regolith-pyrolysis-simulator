@@ -13,13 +13,20 @@ caller wants for trace + UI:
 
 * ``liquidus_T_C``         -- liquidus temperature in C (None if not
   parsed / not available).
+* ``liquidus_T_K``         -- same liquidus temperature in K for
+  MAGEMin parity traces.
 * ``phases_present``       -- ordered tuple of phase names reported by
   the engine.
 * ``phase_modes_wt_pct``   -- modal abundance per phase (wt%), normalised
   to 100 across the reported phases.
+* ``phase_masses_kg``      -- legacy ``EquilibriumResult`` phase-mass
+  projection, copied through for diagnostic-only reconstruction.
+* ``liquid_fraction``      -- legacy ``EquilibriumResult`` liquid fraction.
 * ``liquid_composition_wt_pct`` -- liquid-phase oxide composition (wt%).
 * ``activity_coefficients`` -- per-species activity coefficients the
   engine returned (None when absent).
+* ``fO2_log``              -- oxygen fugacity reported by the adapter
+  when available.
 * ``mode``                 -- which AlphaMELTS path produced the result:
   ``'petthermotools'``, ``'subprocess'``, or ``'unavailable'``.
 * ``engine_version``       -- whatever the adapter reported.
@@ -58,10 +65,14 @@ class LiquidusDiagnostics:
     """
 
     liquidus_T_C: Optional[float] = None
+    liquidus_T_K: Optional[float] = None
     phases_present: Tuple[str, ...] = ()
     phase_modes_wt_pct: Mapping[str, float] = field(default_factory=dict)
+    phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
+    liquid_fraction: float = 1.0
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
+    fO2_log: Optional[float] = None
     mode: str = 'unavailable'
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
@@ -76,6 +87,12 @@ class LiquidusDiagnostics:
             'phase_modes_wt_pct',
             {str(k): float(v) for k, v in dict(self.phase_modes_wt_pct or {}).items()},
         )
+        object.__setattr__(
+            self,
+            'phase_masses_kg',
+            {str(k): float(v) for k, v in dict(self.phase_masses_kg or {}).items()},
+        )
+        object.__setattr__(self, 'liquid_fraction', float(self.liquid_fraction))
         object.__setattr__(
             self,
             'liquid_composition_wt_pct',
@@ -99,6 +116,14 @@ class LiquidusDiagnostics:
         object.__setattr__(self, 'backend_status', str(self.backend_status))
         if self.liquidus_T_C is not None:
             object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
+        if self.liquidus_T_K is not None:
+            object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
+        if self.liquidus_T_K is None and self.liquidus_T_C is not None:
+            object.__setattr__(self, 'liquidus_T_K', self.liquidus_T_C + 273.15)
+        if self.liquidus_T_C is None and self.liquidus_T_K is not None:
+            object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
+        if self.fO2_log is not None:
+            object.__setattr__(self, 'fO2_log', float(self.fO2_log))
 
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""

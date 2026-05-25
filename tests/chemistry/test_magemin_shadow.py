@@ -127,6 +127,7 @@ class _FakeMAGEMinBackend:
         self._engine_version = engine_version
         self._bridge = bridge
         self.calls: list[dict] = []
+        self.initialize_configs: list[dict] = []
 
     def is_available(self) -> bool:
         return self._is_available
@@ -135,6 +136,7 @@ class _FakeMAGEMinBackend:
         return self._engine_version
 
     def initialize(self, config: dict) -> bool:
+        self.initialize_configs.append(dict(config or {}))
         return self._is_available
 
     def equilibrate(self, **kwargs):
@@ -324,6 +326,23 @@ def test_planner_returns_authoritative_result_only():
     ]
     assert len(shadow_records) == 1
     assert shadow_records[0]['provider_id'] == 'magemin-shadow'
+
+
+def test_shadow_backend_initialization_pins_subprocess_bridge():
+    fake_backend = _FakeMAGEMinBackend(
+        equilibrium=_FakeEquilibriumResult(liquidus_T_K=1700.0),
+        is_available=False,
+    )
+    shadow = MAGEMinShadowProvider(backend=fake_backend)
+    shadow._backend_initialised = False
+
+    result = shadow.dispatch(
+        _make_request(ChemistryIntent.SILICATE_EQUILIBRIUM))
+
+    assert result.status == 'unavailable'
+    assert fake_backend.initialize_configs == [
+        {'python_bridge': 'subprocess'},
+    ]
 
 
 def test_kernel_dispatch_does_not_commit_shadow_transitions():
