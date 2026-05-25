@@ -2,7 +2,7 @@
 
 Covers goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` checklist:
 
-1. Capability profile declares SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM
+1. Capability profile declares the AlphaMELTS silicate diagnostic intents
    and only ``process.cleaned_melt``.
 2. DomainGate rejects metal-only / gas-only / halide-only compositions
    (checklist item 2 / 4 / acceptance gate "DomainGate rejects
@@ -162,10 +162,12 @@ class _FakeAlphaMELTSBackend:
         mode: str,
         equilibrium: SimpleNamespace,
         finder_result: LiquidusSolidusResult | None = None,
+        equilibrate_func=None,
     ) -> None:
         self._mode = mode
         self._equilibrium = equilibrium
         self._finder_result = finder_result
+        self._equilibrate_func = equilibrate_func
         self.calls: list[dict] = []
         self.finder_calls: list[dict] = []
         self.is_available_calls = 0
@@ -179,6 +181,8 @@ class _FakeAlphaMELTSBackend:
 
     def equilibrate(self, **kwargs):
         self.calls.append(kwargs)
+        if self._equilibrate_func is not None:
+            return self._equilibrate_func(**kwargs)
         return self._equilibrium
 
     def find_liquidus_solidus(self, **kwargs):
@@ -234,6 +238,7 @@ def test_provider_declares_silicate_intent_set():
     assert profile.intents == frozenset({
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
     })
 
 
@@ -251,6 +256,7 @@ def test_provider_authoritative_for_silicate_intents():
     for intent in (
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
     ):
         assert profile.is_authoritative(intent)
 
@@ -268,6 +274,7 @@ def test_provider_does_not_declare_non_silicate_intents():
         if intent in (
             ChemistryIntent.SILICATE_LIQUIDUS,
             ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
         ):
             assert profile.can_dispatch(intent)
         else:
@@ -757,9 +764,13 @@ def test_provider_can_be_registered_as_authoritative():
     registry.register(provider, [
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
     ])
     assert registry.authoritative_for(ChemistryIntent.SILICATE_LIQUIDUS) is provider
     assert registry.authoritative_for(ChemistryIntent.SILICATE_EQUILIBRIUM) is provider
+    assert registry.authoritative_for(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    ) is provider
 
 
 def test_provider_rejects_authoritative_registration_for_other_intent():

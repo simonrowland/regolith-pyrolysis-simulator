@@ -3,9 +3,10 @@
 Goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` promotes AlphaMELTS from the
 today-hook adapter scaffolding (``simulator.melt_backend.alphamelts``)
 into kernel-registered provider posture. AlphaMELTS is **diagnostic
-only** for the SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM intents -- the
-provider never emits a :class:`LedgerTransitionProposal`. See the
-binding-spec §3 authority matrix.
+only** for the SILICATE_LIQUIDUS, SILICATE_EQUILIBRIUM, and
+EQUILIBRIUM_CRYSTALLIZATION intents -- the provider never emits a
+:class:`LedgerTransitionProposal`. See the binding-spec §3 authority
+matrix.
 
 Public exports:
 
