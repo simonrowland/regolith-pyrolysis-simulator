@@ -16,14 +16,9 @@ PetThermoTools 0.4.5 schema verified from installed source:
   composition tables, and ``<phase>_prop`` tables.
 * ``fO2_offset`` is a delta from ``fO2_buffer``. The simulator's absolute
   ``fO2_log`` is not passed as an offset.
-
-Vapor pressures are computed by combining MELTS activity coefficients with
-pure-component Antoine equations:
-
-    P_i_sat = gamma_i * x_i * P_pure_i(T)
-
-where gamma_i is the activity coefficient from MELTS, x_i is the parent-oxide
-mole fraction, and P_pure_i(T) is the Antoine vapor pressure.
+* MELTS/ThermoEngine chemical-potential output must be converted to
+  thermodynamic activity as ``a_i = exp((mu_i - mu_i0) / RT)``. Activity is
+  absent when the live path does not supply both ``mu`` and ``mu0``.
 """
 
 from __future__ import annotations
@@ -68,7 +63,27 @@ FE3_TO_FEOT_FACTOR = 0.8998
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
+    'chemical_potentials', 'chem_potentials', 'mu', 'mu_oxides',
+    'oxide_mu', 'standard_chemical_potentials', 'pure_chemical_potentials',
+    'reference_chemical_potentials', 'mu0', 'mu0_oxides', 'oxide_mu0',
 }
+GAS_CONSTANT_J_PER_MOL_K = 8.31446261815324
+
+
+def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
+    """Convert chemical potential to pure-endmember-referenced activity."""
+    mu_val = float(mu)
+    mu0_val = float(mu0)
+    T_val = float(T_K)
+    if not (
+        math.isfinite(mu_val)
+        and math.isfinite(mu0_val)
+        and math.isfinite(T_val)
+    ):
+        raise ValueError('chemical potentials and temperature must be finite')
+    if T_val <= 0.0:
+        raise ValueError('temperature must be positive')
+    return math.exp((mu_val - mu0_val) / (GAS_CONSTANT_J_PER_MOL_K * T_val))
 
 
 class AlphaMELTSBackend(MeltBackend):
@@ -665,7 +680,8 @@ class AlphaMELTSBackend(MeltBackend):
                 eq.vapor_pressures_Pa = self._get_vaporock_pressures(
                     temperature_C, comp_wt, fO2_log)
             else:
-                # Use activities × pure-component Antoine
+                # Use activity × pure-component Antoine only when the
+                # chemical-potential convention supplied real activities.
                 eq.vapor_pressures_Pa = self._activities_times_antoine(
                     temperature_C, eq.activity_coefficients, comp_wt)
 
@@ -1066,10 +1082,13 @@ class AlphaMELTSBackend(MeltBackend):
         else:
             eq.liquid_composition_wt_pct = dict(comp_wt)
 
-        eq.activity_coefficients = self._extract_activity_coefficients(run_result)
+        eq.activity_coefficients = self._extract_activities_from_chemical_potentials(
+            run_result,
+            temperature_C=temperature_C,
+        )
         if not eq.activity_coefficients:
             eq.warnings.append(
-                'PetThermoTools activities absent; '
+                'PetThermoTools chemical potentials absent; '
                 'activity-scaled Antoine fallback skipped'
             )
         return eq
@@ -1159,15 +1178,67 @@ class AlphaMELTSBackend(MeltBackend):
                 composition[oxide] = float(value)
         return composition
 
-    def _extract_activity_coefficients(self, results: Mapping[str, object]) -> dict:
-        for key in ('activities', 'Activities', 'activity_coefficients'):
-            if key in results and isinstance(results[key], Mapping):
-                return {
+    def _extract_activities_from_chemical_potentials(
+        self,
+        results: Mapping[str, object],
+        *,
+        temperature_C: float,
+    ) -> dict:
+        mu = self._extract_potential_mapping(
+            results,
+            (
+                'chemical_potentials',
+                'chem_potentials',
+                'mu',
+                'mu_oxides',
+                'oxide_mu',
+            ),
+            ('_mu', '_chemical_potential'),
+        )
+        mu0 = self._extract_potential_mapping(
+            results,
+            (
+                'standard_chemical_potentials',
+                'pure_chemical_potentials',
+                'reference_chemical_potentials',
+                'mu0',
+                'mu0_oxides',
+                'oxide_mu0',
+            ),
+            ('_mu0', '_pure_mu', '_standard_mu', '_reference_mu'),
+        )
+        if not mu or not mu0:
+            return {}
+        T_K = float(temperature_C) + 273.15
+        activities: Dict[str, float] = {}
+        for species, mu_i in mu.items():
+            if species not in mu0:
+                continue
+            try:
+                activity = activity_from_chem_potential(mu_i, mu0[species], T_K)
+            except (OverflowError, ValueError):
+                continue
+            if activity > 0.0 and math.isfinite(activity):
+                activities[str(species)] = activity
+        return activities
+
+    def _extract_potential_mapping(
+        self,
+        results: Mapping[str, object],
+        keys: tuple[str, ...],
+        suffixes: tuple[str, ...],
+    ) -> dict:
+        for key in keys:
+            if key in results:
+                row = self._first_row_mapping(results[key])
+                mapped = {
                     str(species): float(value)
-                    for species, value in results[key].items()
+                    for species, value in row.items()
                     if self._is_number(value)
                 }
-        activities: Dict[str, float] = {}
+                if mapped:
+                    return mapped
+        potentials: Dict[str, float] = {}
         for key, value in results.items():
             name = str(key)
             if not name.endswith('_prop'):
@@ -1177,13 +1248,14 @@ class AlphaMELTSBackend(MeltBackend):
                 if not self._is_number(prop_value):
                     continue
                 prop = str(prop_name)
-                if prop.lower() == 'activity':
-                    phase = name[:-5]
-                    activities[phase] = float(prop_value)
-                elif prop.lower().endswith('_activity'):
-                    species = prop[:-9]
-                    activities[species] = float(prop_value)
-        return activities
+                prop_lower = prop.lower()
+                for suffix in suffixes:
+                    if prop_lower.endswith(suffix):
+                        species = prop[: -len(suffix)]
+                        if species:
+                            potentials[species] = float(prop_value)
+                        break
+        return potentials
 
     def decompression_path(self, T_C: float, P_start_bar: float,
                            P_end_bar: float, dp_bar: float, *,
@@ -1308,45 +1380,40 @@ class AlphaMELTSBackend(MeltBackend):
 
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,
-                                    comp_wt: dict) -> Dict[str, float]:
+                                    _comp_wt: dict) -> Dict[str, float]:
         """
-        Compute vapor pressures as activity × pure-component P(T).
+        Compute vapor pressures as thermodynamic activity × pure-component P(T).
 
-        Fallback when VapoRock is not available.  Uses Antoine
-        equation parameters from vapor_pressures.yaml (loaded
-        separately by the simulator).
+        Fallback when VapoRock is not available. Uses Antoine equation
+        parameters from vapor_pressures.yaml. Activities must already be
+        pure-endmember-referenced values from
+        ``activity_from_chem_potential(mu, mu0, T_K)``.
 
-        P_i = γ_i × x_i × P_pure_i(T)
+        P_i = a_i × P_pure_i(T)
 
-        where gamma_i comes from MELTS and x_i is the parent-oxide mole
-        fraction. If activities are unavailable, no pressure is emitted.
+        If activities are unavailable, no pressure is emitted.
         """
         if not activities:
             return {}
         table = self._load_vapor_pressure_table()
         if not table:
             return {}
-        oxide_mole_fractions = self._oxide_mole_fractions(comp_wt)
         T_K = float(T_C) + 273.15
         pressures: Dict[str, float] = {}
-        for species, raw_gamma in activities.items():
-            if not self._is_number(raw_gamma):
+        for species, raw_activity in activities.items():
+            if not self._is_number(raw_activity):
                 continue
             spec = table.get(str(species))
             if not spec:
                 continue
-            parent_oxide = spec.get('parent_oxide')
-            if not parent_oxide or parent_oxide not in oxide_mole_fractions:
-                continue
             coeffs = spec.get('antoine') or {}
             if not all(key in coeffs for key in ('A', 'B', 'C')):
                 continue
-            gamma_i = float(raw_gamma)
-            x_i = oxide_mole_fractions[parent_oxide]
+            activity_i = float(raw_activity)
             p_pure_i = 10.0 ** (
                 float(coeffs['A']) - float(coeffs['B']) / (T_K + float(coeffs['C']))
             )
-            p_i = gamma_i * x_i * p_pure_i
+            p_i = activity_i * p_pure_i
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
         return pressures

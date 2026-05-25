@@ -1064,6 +1064,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         control_inputs: Mapping[str, Any],
         fO2_log: Optional[float] = None,
+        fe_redox_policy: str = 'intrinsic',
     ) -> IntentResult:
         """Dispatch one intent through the kernel with melt-derived controls.
 
@@ -1083,6 +1084,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C=float(self.melt.temperature_C),
             pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
             fO2_log=fO2_log,
+            fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs,
         )
 
@@ -1979,6 +1981,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'temperature_C': self.melt.temperature_C,
                 'pressure_bar': self.melt.p_total_mbar / 1000.0,
                 'fO2_log': intrinsic_fO2_log,
+                'fe_redox_policy': 'intrinsic',
             }
             if (
                 self._chem_registry.authoritative_for(
@@ -1994,6 +1997,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ChemistryIntent.SILICATE_EQUILIBRIUM,
                     control_inputs={},
                     fO2_log=intrinsic_fO2_log,
+                    fe_redox_policy='intrinsic',
                 )
                 if kernel_result.transition is not None:
                     raise RuntimeError(

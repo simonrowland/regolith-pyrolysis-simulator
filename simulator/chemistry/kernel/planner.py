@@ -315,6 +315,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float] = None,
+        fe_redox_policy: str = "intrinsic",
         control_inputs: Optional[Mapping[str, Any]] = None,
         declared_accounts: Optional[frozenset[str]] = None,
     ) -> IntentResult:
@@ -363,6 +364,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
                 role="authoritative",
@@ -382,6 +384,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
                 role="fallback",
@@ -395,6 +398,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float],
+        fe_redox_policy: str,
         control_inputs: Optional[Mapping[str, Any]],
         declared_accounts: Optional[frozenset[str]],
         role: str,
@@ -427,6 +431,7 @@ class ChemistryKernel:
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs or {},
         )
         if role == "authoritative":

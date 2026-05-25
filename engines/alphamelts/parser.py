@@ -37,6 +37,9 @@ def project_equilibrium_to_diagnostics(
     *,
     mode: str,
     engine_version: str,
+    fe_redox_policy: str = 'intrinsic',
+    applied_fe3fet: Optional[float] = None,
+    intrinsic_fO2_log: Optional[float] = None,
 ) -> LiquidusDiagnostics:
     """Convert an :class:`EquilibriumResult` into :class:`LiquidusDiagnostics`.
 
@@ -65,6 +68,9 @@ def project_equilibrium_to_diagnostics(
             mode=mode,
             engine_version=engine_version,
             backend_status='unavailable',
+            fe_redox_policy=fe_redox_policy,
+            applied_fe3fet=applied_fe3fet,
+            intrinsic_fO2_log=intrinsic_fO2_log,
         )
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
@@ -116,6 +122,9 @@ def project_equilibrium_to_diagnostics(
         liquid_fraction_path=_liquid_fraction_path(equilibrium_result),
         activity_coefficients=activities,
         fO2_log=fO2_log,
+        fe_redox_policy=fe_redox_policy,
+        applied_fe3fet=applied_fe3fet,
+        intrinsic_fO2_log=intrinsic_fO2_log,
         mode=mode,
         engine_version=engine_version,
         backend_status=str(getattr(equilibrium_result, 'status', 'ok')),

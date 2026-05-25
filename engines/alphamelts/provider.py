@@ -172,6 +172,10 @@ class AlphaMELTSProvider(ChemistryProvider):
             composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
             request.account_view.species_formula_registry,
         )
+        redox_diagnostic = self._redox_diagnostic(
+            request,
+            composition_mol_by_account.get(self.DECLARED_ACCOUNT, {}),
+        )
 
         # Run the domain gate even when the adapter is None so callers
         # see a meaningful rejection (rather than a silent
@@ -188,6 +192,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                     engine_version=self._engine_version(),
                     backend_status='out_of_domain',
                     backend_warnings=tuple(gate_warnings),
+                    **redox_diagnostic,
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
             )
@@ -202,6 +207,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                     mode='unavailable',
                     engine_version=self._engine_version(),
                     backend_status='unavailable',
+                    **redox_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
                     'AlphaMELTS adapter not available '
@@ -228,6 +234,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             equilibrium,
             mode=mode,
             engine_version=self._engine_version(),
+            **redox_diagnostic,
         )
 
         backend_status = diagnostics.backend_status
@@ -270,12 +277,39 @@ class AlphaMELTSProvider(ChemistryProvider):
             'fO2_log': (
                 float(request.fO2_log) if request.fO2_log is not None else None
             ),
+            'fe_redox_policy': request.fe_redox_policy,
         }
         return ControlAudit(
             requested=requested,
             applied=dict(requested),
             notes=(_DIAGNOSTIC_AUDIT_NOTE,),
         )
+
+    def _redox_diagnostic(
+        self,
+        request: IntentRequest,
+        species_mol: Mapping[str, float],
+    ) -> dict:
+        intrinsic_fO2_log = request.control_inputs.get(
+            'intrinsic_fO2_log',
+            request.fO2_log,
+        )
+        return {
+            'fe_redox_policy': request.fe_redox_policy,
+            'applied_fe3fet': self._applied_fe3fet(species_mol),
+            'intrinsic_fO2_log': (
+                float(intrinsic_fO2_log)
+                if intrinsic_fO2_log is not None else None
+            ),
+        }
+
+    def _applied_fe3fet(self, species_mol: Mapping[str, float]) -> Optional[float]:
+        feo_mol = max(0.0, float((species_mol or {}).get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float((species_mol or {}).get('Fe2O3', 0.0) or 0.0))
+        total_fe_mol = feo_mol + 2.0 * fe2o3_mol
+        if total_fe_mol <= 0.0:
+            return None
+        return (2.0 * fe2o3_mol) / total_fe_mol
 
     def _composition_from_view(
         self, request: IntentRequest

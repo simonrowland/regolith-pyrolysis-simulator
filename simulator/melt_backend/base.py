@@ -156,7 +156,7 @@ class EquilibriumResult:
 
     Returned by MeltBackend.equilibrate() with phase assemblage,
     species mol inventories where available, kg projections for external
-    reporting, activity coefficients, and vapor pressures.
+    reporting, thermodynamic activities, and vapor pressures.
     """
     temperature_C: float = 0.0
     pressure_bar: float = 0.0
@@ -176,7 +176,7 @@ class EquilibriumResult:
     # Vapor pressures (Pa) for each volatile species
     vapor_pressures_Pa: Dict[str, float] = field(default_factory=dict)
 
-    # Activity coefficients in the melt
+    # Thermodynamic activities in the melt. Field name is legacy.
     activity_coefficients: Dict[str, float] = field(default_factory=dict)
 
     # Oxygen fugacity

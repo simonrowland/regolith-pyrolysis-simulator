@@ -26,10 +26,13 @@ caller wants for trace + UI:
 * ``liquid_fraction``      -- legacy ``EquilibriumResult`` liquid fraction.
 * ``liquid_composition_wt_pct`` -- liquid-phase oxide composition (wt%).
 * ``liquid_fraction_path`` -- EC path points over solidus -> liquidus.
-* ``activity_coefficients`` -- per-species activity coefficients the
-  engine returned (None when absent).
+* ``activity_coefficients`` -- legacy field name for per-species
+  thermodynamic activities (None when chemical potentials are absent).
 * ``fO2_log``              -- oxygen fugacity reported by the adapter
   when available.
+* ``fe_redox_policy``      -- request policy used for the Fe split.
+* ``applied_fe3fet``       -- applied Fe3+/sumFe ratio in the cleaned melt.
+* ``intrinsic_fO2_log``    -- simulator intrinsic fO2 passed to the request.
 * ``mode``                 -- which AlphaMELTS path produced the result:
   ``'petthermotools'``, ``'subprocess'``, or ``'unavailable'``.
 * ``engine_version``       -- whatever the adapter reported.
@@ -78,6 +81,9 @@ class LiquidusDiagnostics:
     liquid_fraction_path: Tuple[Mapping[str, Any], ...] = ()
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
     fO2_log: Optional[float] = None
+    fe_redox_policy: str = 'intrinsic'
+    applied_fe3fet: Optional[float] = None
+    intrinsic_fO2_log: Optional[float] = None
     mode: str = 'unavailable'
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
@@ -122,6 +128,7 @@ class LiquidusDiagnostics:
         object.__setattr__(self, 'phases_present', tuple(str(p) for p in self.phases_present))
         object.__setattr__(self, 'backend_warnings', tuple(str(w) for w in self.backend_warnings))
         object.__setattr__(self, 'mode', str(self.mode))
+        object.__setattr__(self, 'fe_redox_policy', str(self.fe_redox_policy))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
         if self.liquidus_T_C is not None:
@@ -136,6 +143,10 @@ class LiquidusDiagnostics:
             object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
         if self.fO2_log is not None:
             object.__setattr__(self, 'fO2_log', float(self.fO2_log))
+        if self.applied_fe3fet is not None:
+            object.__setattr__(self, 'applied_fe3fet', float(self.applied_fe3fet))
+        if self.intrinsic_fO2_log is not None:
+            object.__setattr__(self, 'intrinsic_fO2_log', float(self.intrinsic_fO2_log))
 
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""

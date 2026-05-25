@@ -130,6 +130,7 @@ def _make_request(
     temperature_C: float = 1400.0,
     pressure_bar: float = 1.0,
     fO2_log: float = -9.0,
+    fe_redox_policy: str = 'intrinsic',
 ) -> IntentRequest:
     """Build an IntentRequest with a ``process.cleaned_melt``-only view."""
     view = ProviderAccountView(
@@ -142,8 +143,15 @@ def _make_request(
         temperature_C=temperature_C,
         pressure_bar=pressure_bar,
         fO2_log=fO2_log,
+        fe_redox_policy=fe_redox_policy,
         control_inputs={},
     )
+
+
+def _fe3fet_from_species_mol(species_mol: dict) -> float:
+    feo = float(species_mol.get('FeO', 0.0))
+    fe2o3 = float(species_mol.get('Fe2O3', 0.0))
+    return (2.0 * fe2o3) / (feo + 2.0 * fe2o3)
 
 
 class _FakeAlphaMELTSBackend:
@@ -426,7 +434,13 @@ def test_provider_handles_silicate_equilibrium_intent():
     result = provider.dispatch(request)
     assert result.intent == ChemistryIntent.SILICATE_EQUILIBRIUM
     assert result.transition is None
-    assert (result.diagnostic or {}).get('mode') == 'petthermotools'
+    diagnostic = result.diagnostic or {}
+    assert diagnostic.get('mode') == 'petthermotools'
+    assert diagnostic['fe_redox_policy'] == 'intrinsic'
+    assert diagnostic['intrinsic_fO2_log'] == pytest.approx(-9.0)
+    assert diagnostic['applied_fe3fet'] == pytest.approx(
+        _fe3fet_from_species_mol(_basalt_species_mol())
+    )
 
 
 def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
@@ -614,6 +628,7 @@ def test_provider_control_audit_records_diagnostic_note():
     assert audit.requested['temperature_C'] == 1500.0
     assert audit.requested['pressure_bar'] == 1e-6
     assert audit.requested['fO2_log'] == -10.5
+    assert audit.requested['fe_redox_policy'] == 'intrinsic'
     assert 'diagnostic, not enforced' in audit.notes
 
 
@@ -720,6 +735,9 @@ def test_liquidus_diagnostics_is_frozen_and_carries_no_transition_field():
     # No transition field is reserved.
     payload = diagnostic.as_diagnostic()
     assert payload['solidus_T_C'] == pytest.approx(1000.0)
+    assert payload['fe_redox_policy'] == 'intrinsic'
+    assert payload['applied_fe3fet'] is None
+    assert payload['intrinsic_fO2_log'] is None
     for forbidden in ('transition', 'ledger_transition', 'proposal'):
         assert forbidden not in payload
 

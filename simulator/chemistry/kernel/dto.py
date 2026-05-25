@@ -143,6 +143,7 @@ class IntentRequest:
     temperature_C: float
     pressure_bar: float
     fO2_log: Optional[float] = None
+    fe_redox_policy: str = "intrinsic"
     control_inputs: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -154,6 +155,7 @@ class IntentRequest:
         object.__setattr__(self, "pressure_bar", float(self.pressure_bar))
         if self.fO2_log is not None:
             object.__setattr__(self, "fO2_log", float(self.fO2_log))
+        object.__setattr__(self, "fe_redox_policy", str(self.fe_redox_policy))
         object.__setattr__(self, "control_inputs", _freeze_str_any(self.control_inputs))
 
 
