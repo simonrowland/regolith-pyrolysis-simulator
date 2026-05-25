@@ -6,9 +6,60 @@ from types import SimpleNamespace
 
 import pytest
 
-from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
+from simulator.chemistry.kernel import (
+    CapabilityProfile,
+    ChemistryIntent,
+    ChemistryProvider,
+    IntentResult,
+    ProviderUnavailableError,
+)
 from simulator.melt_backend.base import EquilibriumResult
 from tests.chemistry.conftest import _build_sim
+
+_CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
+
+
+class _FakeMAGEMinShadowLiquidusProvider(ChemistryProvider):
+    name = 'magemin-shadow'
+
+    def __init__(self, *, status: str = 'ok') -> None:
+        self.status = status
+        self.requests = []
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id='magemin-shadow',
+            intents=frozenset({
+                ChemistryIntent.SILICATE_LIQUIDUS,
+                ChemistryIntent.SILICATE_EQUILIBRIUM,
+            }),
+            is_authoritative_for=frozenset(),
+            declared_accounts=frozenset({_CLEANED_MELT_ACCOUNT}),
+        )
+
+    def dispatch(self, request) -> IntentResult:
+        self.requests.append(request)
+        assert request.intent is ChemistryIntent.SILICATE_LIQUIDUS
+        assert _CLEANED_MELT_ACCOUNT in request.account_view.accounts
+        assert request.account_view.accounts[_CLEANED_MELT_ACCOUNT]
+        if self.status != 'ok':
+            return IntentResult(
+                intent=ChemistryIntent.SILICATE_LIQUIDUS,
+                status=self.status,
+                transition=None,
+                diagnostic={'backend_status': self.status},
+                warnings=('MAGEMin unavailable in test',),
+            )
+        return IntentResult(
+            intent=ChemistryIntent.SILICATE_LIQUIDUS,
+            status='ok',
+            transition=None,
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
 
 
 def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
@@ -136,6 +187,12 @@ def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
         enabled=True,
     )
     sim.melt.temperature_C = 1150.0
+    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
+    shadow = _FakeMAGEMinShadowLiquidusProvider(status='unavailable')
+    monkeypatch.setattr(
+        'engines.magemin.MAGEMinShadowProvider',
+        lambda: shadow,
+    )
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
@@ -183,6 +240,14 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
         enabled=True,
     )
     sim.melt.temperature_C = 1150.0
+    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
+    # Block the gate's lazy MAGEMin-shadow re-registration too, so "no engine"
+    # is faithfully simulated regardless of whether a real MAGEMin binary is
+    # present in the test environment (it is in MAIN, absent in worktrees/CI).
+    monkeypatch.setattr(
+        'engines.magemin.MAGEMinShadowProvider',
+        lambda: _FakeMAGEMinShadowLiquidusProvider(status='unavailable'),
+    )
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
@@ -195,3 +260,48 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
     with pytest.raises(RuntimeError, match='freeze_gate.enabled requires'):
         sim._calculate_evaporation(_equilibrium())
+
+
+def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    shadow = _FakeMAGEMinShadowLiquidusProvider()
+    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
+    monkeypatch.setattr(
+        'engines.magemin.MAGEMinShadowProvider',
+        lambda: shadow,
+    )
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+            )
+        raise ProviderUnavailableError(f'{intent.value} provider absent')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    rates = []
+    for temperature_C in (950.0, 1150.0, 1400.0):
+        sim.melt.temperature_C = temperature_C
+        flux = sim._calculate_evaporation(_equilibrium())
+        rates.append(flux.species_kg_hr.get('Na', 0.0))
+
+    assert rates == pytest.approx([0.0, 5.0, 10.0])
+    assert len(shadow.requests) == 1
+    assert shadow.requests[0].account_view.accounts[_CLEANED_MELT_ACCOUNT]
+    assert shadow.requests[0].pressure_bar == pytest.approx(
+        float(sim.melt.p_total_mbar) / 1000.0,
+    )
+    assert sim._last_freeze_gate_diagnostic['source'] == (
+        'liquidus_solidus:magemin-shadow'
+    )
