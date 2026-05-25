@@ -8,7 +8,12 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.accounting import AccountingError, resolve_species_formula
-from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
+from simulator.chemistry.kernel import (
+    ChemistryIntent,
+    IntentRequest,
+    ProviderUnavailableError,
+)
+from simulator.chemistry.kernel.account_filters import build_provider_account_view
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -181,6 +186,8 @@ class EvaporationMixin:
         if curve is None:
             curve = self._freeze_gate_curve_from_kernel_liquidus(reasons)
         if curve is None:
+            curve = self._freeze_gate_curve_from_magemin_shadow(reasons)
+        if curve is None:
             detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
             raise RuntimeError(
                 'freeze_gate.enabled requires a liquid_fraction(T) source; '
@@ -300,6 +307,120 @@ class EvaporationMixin:
             source='liquidus_solidus:kernel',
             reasons=reasons,
         )
+
+    def _freeze_gate_curve_from_magemin_shadow(
+        self,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        registry = getattr(self, '_chem_registry', None)
+        shadows_for = getattr(registry, 'shadows_for', None)
+        if not callable(shadows_for):
+            reasons.append('MAGEMin shadow unavailable: registry absent')
+            return None
+
+        shadow = self._registered_magemin_shadow(registry, reasons)
+        if shadow is None:
+            return None
+
+        try:
+            profile = shadow.capability_profile()
+            account_view = build_provider_account_view(
+                self.atom_ledger,
+                frozenset(getattr(profile, 'declared_accounts', ()) or ()),
+                dict(getattr(self, 'species_formula_registry', {}) or {}),
+            )
+            request = IntentRequest(
+                intent=ChemistryIntent.SILICATE_LIQUIDUS,
+                account_view=account_view,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+                fO2_log=float(self._compute_intrinsic_melt_fO2()),
+                control_inputs={},
+            )
+            result = shadow.dispatch(request)
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            reasons.append(f'MAGEMin shadow failed: {exc}')
+            return None
+
+        if getattr(result, 'transition', None) is not None:
+            reasons.append('MAGEMin shadow invalid: returned ledger transition')
+            return None
+
+        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+        status = str(
+            getattr(result, 'status', None)
+            or diagnostic.get('backend_status')
+            or 'unavailable'
+        )
+        if status != 'ok':
+            warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
+            backend_status = diagnostic.get('backend_status')
+            reasons.append(
+                'MAGEMin shadow unavailable: '
+                f'status={status}, backend_status={backend_status}'
+                + (f', warnings={warnings}' if warnings else '')
+            )
+            return None
+        return self._freeze_gate_curve_from_bounds(
+            solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+            liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
+            source='liquidus_solidus:magemin-shadow',
+            reasons=reasons,
+        )
+
+    def _registered_magemin_shadow(
+        self,
+        registry: Any,
+        reasons: list[str],
+    ) -> Any | None:
+        shadow = self._find_magemin_shadow(
+            registry.shadows_for(ChemistryIntent.SILICATE_LIQUIDUS)
+        )
+        if shadow is not None:
+            return shadow
+
+        register = getattr(registry, 'register_idempotent', None)
+        if not callable(register):
+            reasons.append('MAGEMin shadow unavailable: registry cannot register')
+            return None
+        try:
+            from engines.magemin import MAGEMinShadowProvider
+
+            provider = MAGEMinShadowProvider()
+            register(
+                provider,
+                [
+                    ChemistryIntent.SILICATE_LIQUIDUS,
+                    ChemistryIntent.SILICATE_EQUILIBRIUM,
+                ],
+                shadow=True,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional provider boundary
+            reasons.append(f'MAGEMin shadow registration failed: {exc}')
+            return None
+
+        shadow = self._find_magemin_shadow(
+            registry.shadows_for(ChemistryIntent.SILICATE_LIQUIDUS)
+        )
+        if shadow is None:
+            reasons.append('MAGEMin shadow unavailable: not registered')
+        return shadow
+
+    @staticmethod
+    def _find_magemin_shadow(shadows: tuple) -> Any | None:
+        for candidate in shadows:
+            profile_getter = getattr(candidate, 'capability_profile', None)
+            if not callable(profile_getter):
+                continue
+            try:
+                profile = profile_getter()
+            except Exception:
+                continue
+            provider_id = str(getattr(profile, 'provider_id', '') or '')
+            name = str(getattr(candidate, 'name', '') or '')
+            if provider_id == 'magemin-shadow' or name == 'magemin-shadow':
+                return candidate
+        return None
 
     def _freeze_gate_curve_from_liquidus_result(
         self,
