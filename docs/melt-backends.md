@@ -87,7 +87,10 @@ Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` binds the 
 
 ## AlphaMELTS Adapter Notes
 
-- Python path imports `petthermotools` and preloads `meltsdynamic.MELTSdynamic` during initialization.
+- Transport selection is `thermoengine` -> `python_api` -> `subprocess` when
+  available. `thermoengine` is a transport behind the existing
+  `AlphaMELTSProvider`, not a new provider or authority.
+- The PetThermoTools fallback imports `petthermotools` and preloads `meltsdynamic.MELTSdynamic` during initialization.
 - Inputs are gated to `process.cleaned_melt` silicate oxides and normalized to the 14-oxide MELTS basis.
 - Gas, metal, salt, sulfide, halide, and low-major-oxide material is rejected before the engine.
 - `FeO_total` requires `QFM`, `NNO`, `IW`, `HM`, or configured `Fe3Fet`; no silent split.
@@ -106,7 +109,11 @@ where `mu_i` is the melt chemical potential in J/mol and `mu_i0` is the pure-end
 
 Do not interpret a MELTS chemical potential as an activity coefficient `gamma`, and do not compute `P_i = gamma_i * x_i * P_i0` from a chemical-potential engine. That mixes conventions: the mole-fraction term is already embedded in the activity defined by `mu - mu0`. The error is silent and can be O(10^n) in vapor pressure because it exponentiates through `RT`.
 
-The current PetThermoTools path does not expose a verified live `mu/mu0` pair, so `simulator/melt_backend/alphamelts.py` reports activities absent instead of emitting a guessed gamma-like number. VapoRock remains the vapor authority and performs its own `mu -> a` conversion internally; the AlphaMELTS activity field is diagnostic/future ThermoEngine plumbing only.
+ThermoEngine mode populates the AlphaMELTS activity field from live `mu/mu0`
+API calls. The PetThermoTools fallback still reports activities absent unless
+it exposes a verified live `mu/mu0` pair. VapoRock remains the vapor authority
+and performs its own `mu -> a` conversion internally; the AlphaMELTS activity
+field is diagnostic transport metadata, not ledger authority.
 
 ## MAGEMin adapter notes
 

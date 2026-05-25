@@ -12,7 +12,7 @@ First third-party adapter promoted to the kernel plane (goal #8
 - runs the :class:`AlphaMELTSDomainGate` on the cleaned-melt
   composition before delegating to the today-hook adapter,
 - delegates to :mod:`simulator.melt_backend.alphamelts.AlphaMELTSBackend`
-  for the chemistry (subprocess + PetThermoTools paths owned by the
+  for the chemistry (ThermoEngine + PetThermoTools + subprocess paths owned by the
   adapter; this module orchestrates path selection only),
 - returns a :class:`LiquidusDiagnostics` payload on
   :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
@@ -52,6 +52,10 @@ from engines.alphamelts.result import LiquidusDiagnostics
 from engines.alphamelts.subprocess_runner import (
     equilibrate_via_subprocess,
     subprocess_available,
+)
+from engines.alphamelts.thermoengine import (
+    equilibrate_via_thermoengine,
+    thermoengine_available,
 )
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
@@ -95,8 +99,8 @@ class AlphaMELTSProvider(ChemistryProvider):
     :class:`simulator.melt_backend.alphamelts.AlphaMELTSBackend`
     instance (typically the same one the simulator already holds for
     the legacy ``MeltBackend.equilibrate`` path); ``initialize()``
-    must already have run so ``backend._mode`` reflects the available
-    path.
+        must already have run so ``backend._mode`` reflects the available
+        transport path.
 
     ``backend`` may be ``None`` -- in that case :meth:`dispatch`
     returns ``status='unavailable'`` with an empty
@@ -210,8 +214,8 @@ class AlphaMELTSProvider(ChemistryProvider):
                     **redox_diagnostic,
                 ).as_diagnostic(),
                 warnings=(
-                    'AlphaMELTS adapter not available '
-                    '(neither PetThermoTools nor subprocess binary loaded)',
+                'AlphaMELTS adapter not available '
+                '(no ThermoEngine, PetThermoTools, or subprocess transport)',
                 ),
             )
 
@@ -389,16 +393,26 @@ class AlphaMELTSProvider(ChemistryProvider):
         *,
         composition_mol_by_account: dict,
     ) -> tuple:
-        """Select the path (python_api / subprocess) and run.
+        """Select the transport path and run.
 
         Returns ``(mode_label, equilibrium_result)``. ``mode_label`` is
-        ``'petthermotools'`` or ``'subprocess'``; the
+        ``'thermoengine'``, ``'petthermotools'``, or ``'subprocess'``; the
         :class:`LiquidusDiagnostics` ``mode`` field surfaces this so a
         trace consumer can tell which path produced the answer.
         """
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+        if thermoengine_available(self._backend):
+            equilibrium = equilibrate_via_thermoengine(
+                self._backend,
+                temperature_C=request.temperature_C,
+                pressure_bar=request.pressure_bar,
+                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+            return 'thermoengine', equilibrium
         if python_api_available(self._backend):
             equilibrium = equilibrate_via_python_api(
                 self._backend,
@@ -435,7 +449,9 @@ class AlphaMELTSProvider(ChemistryProvider):
                 status='unavailable',
                 warnings=('AlphaMELTS backend has no liquidus finder',),
             )
-        if python_api_available(self._backend):
+        if thermoengine_available(self._backend):
+            mode = 'thermoengine'
+        elif python_api_available(self._backend):
             mode = 'petthermotools'
         elif subprocess_available(self._backend):
             mode = 'subprocess'
@@ -464,8 +480,12 @@ class AlphaMELTSProvider(ChemistryProvider):
         *,
         composition_mol_by_account: dict,
     ) -> tuple:
-        if python_api_available(self._backend):
+        if thermoengine_available(self._backend):
+            mode = 'thermoengine'
+            equilibrate_transport = equilibrate_via_thermoengine
+        elif python_api_available(self._backend):
             mode = 'petthermotools'
+            equilibrate_transport = equilibrate_via_python_api
         elif subprocess_available(self._backend):
             return 'subprocess', EquilibriumCrystallizationPathResult(
                 status='unavailable',
@@ -526,7 +546,7 @@ class AlphaMELTSProvider(ChemistryProvider):
         sample_warnings: list[str] = []
 
         def sample_liquid_state(temperature_C: float) -> tuple[float, dict]:
-            result = equilibrate_via_python_api(
+            result = equilibrate_transport(
                 self._backend,
                 temperature_C=float(temperature_C),
                 pressure_bar=request.pressure_bar,

@@ -12,6 +12,8 @@ from simulator.melt_backend.alphamelts import (
     activity_from_chem_potential,
 )
 from simulator.melt_backend.base import EquilibriumResult
+from engines.alphamelts.thermoengine import ThermoEngineTransport
+from engines.magemin.parity import MAGEMinParityComparator
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -190,6 +192,40 @@ def test_alphamelts_initialize_requires_petthermotools_payload(monkeypatch):
         backend.initialize({'mode': 'python_api'})
 
 
+def test_alphamelts_initialize_prefers_thermoengine_when_available(monkeypatch):
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(self, *, model_name, activity_converter):
+            self.model_name = model_name
+            self.activity_converter = activity_converter
+
+        def initialize(self):
+            return True
+
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+
+    assert backend.initialize({}) is True
+    assert backend._mode == 'thermoengine'
+    assert backend.get_engine_version() == 'thermoengine fake'
+
+
+def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+
+    assert backend.initialize({'mode': 'subprocess'}) is True
+    assert backend._mode == 'subprocess'
+
+
 def test_normalize_composition_to_melts_basis_drops_and_renormalizes():
     backend = AlphaMELTSBackend()
 
@@ -336,6 +372,138 @@ def test_petthermotools_result_parser_converts_mu_to_activity():
     })
 
 
+def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
+    class FakeLiquidPhase:
+        endmember_names = ['Na']
+
+        def chem_potential(self, T_K, P_bar, mol=None):
+            assert mol == [[1.0]]
+            return [[-900.0]]
+
+        def gibbs_energy(self, T_K, P_bar, mol=None):
+            assert mol == [[1.0]]
+            return [-1000.0]
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._liq_phase = FakeLiquidPhase()
+
+    activities = transport._activities_from_chemical_potentials(
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        component_mole_fraction={'Na': 1.0},
+        comp_wt={},
+    )
+
+    assert activities == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+    })
+
+
+def test_thermoengine_transport_equilibrates_live_when_installed():
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({'mode': 'thermoengine'})
+    except ImportError as exc:
+        pytest.skip(f'ThermoEngine transport unavailable: {exc}')
+    if not available:
+        pytest.skip('ThermoEngine transport unavailable')
+
+    result = backend.equilibrate(
+        temperature_C=1200.0,
+        composition_kg={
+            'SiO2': 490.0,
+            'TiO2': 15.0,
+            'Al2O3': 140.0,
+            'FeO': 100.0,
+            'Fe2O3': 10.0,
+            'MgO': 90.0,
+            'CaO': 110.0,
+            'Na2O': 25.0,
+            'K2O': 8.0,
+            'Cr2O3': 2.0,
+            'MnO': 2.0,
+            'P2O5': 3.0,
+        },
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert backend._mode == 'thermoengine'
+    assert result.ledger_transition is None
+    assert result.phases_present
+    assert result.phase_masses_kg
+    assert 0.0 <= result.liquid_fraction <= 1.0
+    assert result.activity_coefficients
+    assert 'SiO2' in result.activity_coefficients
+    assert result.activity_coefficients['SiO2'] > 0.0
+    assert result.fe_redox_split['FeO_wt_pct'] > 0.0
+    assert result.fe_redox_split['Fe2O3_wt_pct'] > 0.0
+
+
+def test_thermoengine_transport_shadow_parity_against_subprocess_when_available():
+    thermo = AlphaMELTSBackend()
+    try:
+        thermo_ok = thermo.initialize({'mode': 'thermoengine'})
+    except ImportError as exc:
+        pytest.skip(f'ThermoEngine transport unavailable: {exc}')
+    if not thermo_ok:
+        pytest.skip('ThermoEngine transport unavailable')
+
+    subprocess_backend = AlphaMELTSBackend()
+    try:
+        subprocess_ok = subprocess_backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f'AlphaMELTS subprocess transport unavailable: {exc}')
+    if not subprocess_ok:
+        pytest.skip('AlphaMELTS subprocess transport unavailable')
+
+    composition_kg = {
+        'SiO2': 490.0,
+        'TiO2': 15.0,
+        'Al2O3': 140.0,
+        'FeO': 100.0,
+        'Fe2O3': 10.0,
+        'MgO': 90.0,
+        'CaO': 110.0,
+        'Na2O': 25.0,
+        'K2O': 8.0,
+        'Cr2O3': 2.0,
+        'MnO': 2.0,
+        'P2O5': 3.0,
+    }
+    thermo_result = thermo.equilibrate(
+        temperature_C=1200.0,
+        composition_kg=composition_kg,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    subprocess_result = subprocess_backend.equilibrate(
+        temperature_C=1200.0,
+        composition_kg=composition_kg,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    if not subprocess_result.phase_masses_kg:
+        pytest.skip('AlphaMELTS subprocess did not report modal phase masses')
+
+    def canonical_modes(result):
+        return {
+            'phase_masses_kg': {
+                str(phase).lower(): mass
+                for phase, mass in result.phase_masses_kg.items()
+            },
+        }
+
+    report = MAGEMinParityComparator().compare(
+        canonical_modes(thermo_result),
+        canonical_modes(subprocess_result),
+    )
+    assert report.agreement, report.warnings
+
+
 def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     backend = AlphaMELTSBackend()
 
@@ -441,7 +609,10 @@ olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
     assert result.liquid_fraction == pytest.approx(0.921889)
     assert result.liquid_composition_wt_pct["SiO2"] == pytest.approx(46.49)
     assert result.phases_present == ["liquid", "olivine"]
-    assert result.phase_masses_kg == {}
+    assert result.phase_masses_kg == {
+        "liquid": pytest.approx(0.0903451),
+        "olivine": pytest.approx(0.007654887),
+    }
     assert result.warnings == ["AlphaMELTS liquidus_C=1220.310"]
     assert result.ledger_transition is None
     assert result.status == 'ok'
@@ -462,7 +633,11 @@ def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
 
 def test_project_local_alphamelts_reports_liquidus_when_installed():
     backend = AlphaMELTSBackend()
-    if not backend.initialize({}):
+    try:
+        available = backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f"project-local alphaMELTS app is not installed: {exc}")
+    if not available:
         pytest.skip("project-local alphaMELTS app is not installed")
 
     result = backend.equilibrate(
@@ -489,7 +664,11 @@ def test_project_local_alphamelts_reports_liquidus_when_installed():
 
 def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     backend = AlphaMELTSBackend()
-    if not backend.initialize({}):
+    try:
+        available = backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f"project-local alphaMELTS app is not installed: {exc}")
+    if not available:
         pytest.skip("project-local alphaMELTS app is not installed")
 
     sim = PyrolysisSimulator(
@@ -510,7 +689,7 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
 
 
 def test_no_mode_marks_status_unavailable():
-    # An AlphaMELTSBackend with no python_api or subprocess mode reaches
+    # An AlphaMELTSBackend with no thermoengine, python_api, or subprocess mode reaches
     # the explicit "no engine present" return path in equilibrate(); the
     # result is labelled 'unavailable'.
     backend = AlphaMELTSBackend()

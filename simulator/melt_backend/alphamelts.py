@@ -4,8 +4,9 @@ AlphaMELTS Backend
 
 Wraps alphaMELTS for thermodynamic equilibrium calculations via:
 
-1. Python API (preferred): petthermotools -> alphaMELTS for Python
-2. Subprocess fallback: write .melts files, run binary, parse stdout/tables
+1. ThermoEngine transport (preferred): ENKI MELTS API, including μ output
+2. Python API fallback: petthermotools -> alphaMELTS for Python
+3. Subprocess fallback: write .melts files, run binary, parse stdout/tables
 
 PetThermoTools 0.4.5 schema verified from installed source:
 
@@ -39,6 +40,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
+from engines.alphamelts.thermoengine import ThermoEngineTransport
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
@@ -90,14 +92,16 @@ class AlphaMELTSBackend(MeltBackend):
     """
     AlphaMELTS thermodynamic backend.
 
-    Tries PetThermoTools Python API first, falls back to
+    Tries ThermoEngine first, then PetThermoTools Python API, then
     subprocess mode if the binary is available.
     """
 
     def __init__(self):
-        self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
+        self._mode: Optional[str] = None  # 'thermoengine', 'python_api', or 'subprocess'
         self._engine_path: Optional[Path] = None
         self._binary_path: Optional[Path] = None
+        self._thermoengine_transport: Optional[ThermoEngineTransport] = None
+        self._thermoengine_import_error: Optional[BaseException] = None
         self._pet_available = False
         self._pet_module = None
         self._pet_melts = None
@@ -117,12 +121,23 @@ class AlphaMELTSBackend(MeltBackend):
         """
         Detect available alphaMELTS interfaces.
 
-        Checks in order:
-        1. PetThermoTools Python package
-        2. alphaMELTS binary in engines/alphamelts/
-        3. alphaMELTS on system PATH
+        Checks in order unless ``mode`` pins a transport:
+        1. ThermoEngine Python package
+        2. PetThermoTools Python package
+        3. alphaMELTS binary in engines/alphamelts/
+        4. alphaMELTS on system PATH
         """
         config = self._alphamelts_config(config)
+        requested_mode = self._normalize_mode(config.get('mode'))
+        self._mode = None
+        self._engine_path = None
+        self._binary_path = None
+        self._engine_version = None
+        self._thermoengine_transport = None
+        self._pet_available = False
+        self._pet_module = None
+        self._pet_melts = None
+        self._pet_payload_preloaded = False
         self._redox_buffer = self._normalize_redox_buffer(
             config.get('fO2_buffer', config.get('redox_buffer')))
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
@@ -130,29 +145,50 @@ class AlphaMELTSBackend(MeltBackend):
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
         self._model = str(config.get('model', self._model))
         self._timeout_s = float(config.get('timeout_s', self._timeout_s))
+        require_thermoengine = requested_mode == 'thermoengine'
         require_petthermotools = bool(
             config.get('require_petthermotools')
-            or str(config.get('mode', '')).lower() == 'python_api'
+            or requested_mode == 'python_api'
         )
+        require_subprocess = requested_mode == 'subprocess'
 
-        # Try PetThermoTools
-        try:
-            self._pet_module = self._import_petthermotools()
-            self._engine_version = self.get_engine_version()
-            self._preload_petthermotools_payload(self._pet_module)
-            self._pet_available = True
-            self._mode = 'python_api'
-        except ImportError:
-            self._pet_available = False
-            self._pet_module = None
-            self._pet_melts = None
-            self._pet_payload_preloaded = False
-            self._pet_import_error = ImportError(
-                'PetThermoTools Python path unavailable: '
-                'petthermotools and meltsdynamic must both import'
-            )
-            if require_petthermotools:
-                raise self._pet_import_error
+        if requested_mode in (None, 'thermoengine'):
+            try:
+                self._thermoengine_transport = ThermoEngineTransport(
+                    model_name=self._model,
+                    activity_converter=activity_from_chem_potential,
+                )
+                self._thermoengine_transport.initialize()
+                self._thermoengine_import_error = None
+                self._engine_version = self._thermoengine_transport.engine_version
+                self._mode = 'thermoengine'
+            except Exception as exc:  # noqa: BLE001 - optional engine boundary
+                self._thermoengine_transport = None
+                self._thermoengine_import_error = exc
+                if require_thermoengine:
+                    raise ImportError(
+                        'ThermoEngine transport unavailable: '
+                        f'{exc}'
+                    ) from exc
+
+        if self._mode is None and requested_mode in (None, 'python_api'):
+            try:
+                self._pet_module = self._import_petthermotools()
+                self._engine_version = None
+                self._preload_petthermotools_payload(self._pet_module)
+                self._pet_available = True
+                self._mode = 'python_api'
+            except ImportError:
+                self._pet_available = False
+                self._pet_module = None
+                self._pet_melts = None
+                self._pet_payload_preloaded = False
+                self._pet_import_error = ImportError(
+                    'PetThermoTools Python path unavailable: '
+                    'petthermotools and meltsdynamic must both import'
+                )
+                if require_petthermotools:
+                    raise self._pet_import_error
 
         # Try VapoRock
         try:
@@ -162,7 +198,7 @@ class AlphaMELTSBackend(MeltBackend):
             self._vaporock_available = False
 
         # Try binary
-        if self._mode is None:
+        if self._mode is None and requested_mode in (None, 'subprocess'):
             # Check project engines/ directory
             project_root = Path(__file__).parent.parent.parent
             engine_root = project_root / 'engines' / 'alphamelts'
@@ -184,6 +220,8 @@ class AlphaMELTSBackend(MeltBackend):
                         self._mode = 'subprocess'
                 except (FileNotFoundError, subprocess.TimeoutExpired):
                     pass
+            if self._mode is None and require_subprocess:
+                raise ImportError('AlphaMELTS subprocess transport unavailable')
 
         return self._mode is not None
 
@@ -196,6 +234,21 @@ class AlphaMELTSBackend(MeltBackend):
             merged.update(nested)
             return merged
         return dict(config)
+
+    def _normalize_mode(self, value) -> Optional[str]:
+        if value is None or value == '' or str(value).lower() == 'auto':
+            return None
+        mode = str(value).strip().lower()
+        aliases = {
+            'petthermotools': 'python_api',
+            'ptt': 'python_api',
+            'python': 'python_api',
+            'binary': 'subprocess',
+        }
+        mode = aliases.get(mode, mode)
+        if mode not in {'thermoengine', 'python_api', 'subprocess'}:
+            raise ValueError(f'unsupported AlphaMELTS mode: {value}')
+        return mode
 
     def _optional_float(self, value) -> Optional[float]:
         if value is None or value == '':
@@ -280,6 +333,9 @@ class AlphaMELTSBackend(MeltBackend):
 
     def get_engine_version(self) -> str:
         if self._engine_version:
+            return self._engine_version
+        if self._thermoengine_transport is not None:
+            self._engine_version = self._thermoengine_transport.engine_version
             return self._engine_version
         if self._pet_module is not None:
             version = getattr(self._pet_module, '__version__', None)
@@ -379,7 +435,7 @@ class AlphaMELTSBackend(MeltBackend):
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         if not raw_comp_wt:
             # No melt oxides supplied - the engine has nothing valid to act on.
-            return EquilibriumResult(
+            return self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -396,7 +452,10 @@ class AlphaMELTSBackend(MeltBackend):
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         warnings = list(self._last_normalization_warnings)
 
-        if self._mode == 'python_api':
+        if self._mode == 'thermoengine':
+            return self._equilibrate_thermoengine(
+                temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
+        elif self._mode == 'python_api':
             return self._equilibrate_python(
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
         elif self._mode == 'subprocess':
@@ -404,7 +463,7 @@ class AlphaMELTSBackend(MeltBackend):
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
         else:
             # No PetThermoTools, no binary -- the engine is not present.
-            return EquilibriumResult(
+            return self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -429,13 +488,13 @@ class AlphaMELTSBackend(MeltBackend):
                               scan_step_C: float = 50.0,
                               tolerance_C: float = 2.0,
                               ) -> LiquidusSolidusResult:
-        """Find solidus/liquidus when the PetThermoTools findLiq path is live."""
-        if self._mode != 'python_api':
+        """Find solidus/liquidus when a liquid-fraction transport is live."""
+        if self._mode not in {'python_api', 'thermoengine'}:
             return LiquidusSolidusResult(
                 status='unavailable',
                 warnings=(
-                    'AlphaMELTS liquidus finder requires PetThermoTools '
-                    'python_api mode',
+                    'AlphaMELTS liquidus finder requires ThermoEngine or '
+                    'PetThermoTools python_api mode',
                 ),
             )
 
@@ -452,20 +511,23 @@ class AlphaMELTSBackend(MeltBackend):
             return comp_wt_result
         comp_wt = comp_wt_result
 
-        ptt_liquidus_C, ptt_warnings = self._find_petthermotools_liquidus_C(
-            comp_wt,
-            pressure_bar=pressure_bar,
-            seed_T_C=max(min_T_C, ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C),
-        )
-        if ptt_liquidus_C is None:
-            return LiquidusSolidusResult(
-                status='unavailable',
-                warnings=(
-                    *ptt_warnings,
-                    'AlphaMELTS liquidus finder unavailable: '
-                    'PetThermoTools findLiq did not return a temperature',
-                ),
+        ptt_liquidus_C: Optional[float] = None
+        ptt_warnings: tuple[str, ...] = ()
+        if self._mode == 'python_api':
+            ptt_liquidus_C, ptt_warnings = self._find_petthermotools_liquidus_C(
+                comp_wt,
+                pressure_bar=pressure_bar,
+                seed_T_C=max(min_T_C, ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C),
             )
+            if ptt_liquidus_C is None:
+                return LiquidusSolidusResult(
+                    status='unavailable',
+                    warnings=(
+                        *ptt_warnings,
+                        'AlphaMELTS liquidus finder unavailable: '
+                        'PetThermoTools findLiq did not return a temperature',
+                    ),
+                )
 
         sample_warnings: list[str] = []
 
@@ -496,9 +558,12 @@ class AlphaMELTSBackend(MeltBackend):
         )
         warnings_out = [*ptt_warnings, *result.warnings, *sample_warnings[:6]]
         if (
+            ptt_liquidus_C is not None
+            and
             result.status == 'ok'
             and result.liquidus_T_C is not None
-            and abs(result.liquidus_T_C - ptt_liquidus_C) > max(5.0, tolerance_C * 2.0)
+            and abs(result.liquidus_T_C - ptt_liquidus_C)
+            > max(5.0, tolerance_C * 2.0)
         ):
             warnings_out.append(
                 'PetThermoTools findLiq differs from frac_M bisection: '
@@ -530,6 +595,35 @@ class AlphaMELTSBackend(MeltBackend):
         }
         return {account: species for account, species in unsupported.items()
                 if species}
+
+    def _emit_equilibrium_result(
+        self,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: float,
+        phases_present: Optional[List[str]] = None,
+        phase_masses_kg: Optional[Mapping[str, float]] = None,
+        liquid_fraction: float = 1.0,
+        liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
+        activity_coefficients: Optional[Mapping[str, float]] = None,
+        vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
+        warnings: Optional[List[str]] = None,
+        status: str = 'ok',
+    ) -> EquilibriumResult:
+        return EquilibriumResult(
+            temperature_C=float(temperature_C),
+            pressure_bar=float(pressure_bar),
+            fO2_log=float(fO2_log),
+            phases_present=list(phases_present or []),
+            phase_masses_kg=dict(phase_masses_kg or {}),
+            liquid_fraction=float(liquid_fraction),
+            liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
+            activity_coefficients=dict(activity_coefficients or {}),
+            vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
+            warnings=list(warnings or []),
+            status=str(status),
+        )
 
     def _composition_kg_to_wt_pct(self, composition_kg: Mapping[str, float]) -> dict:
         total = sum(float(value) for value in composition_kg.values()
@@ -577,7 +671,7 @@ class AlphaMELTSBackend(MeltBackend):
     def _domain_gate_result(self, temperature_C: float, pressure_bar: float,
                             fO2_log: float,
                             reasons: List[str]) -> EquilibriumResult:
-        return EquilibriumResult(
+        return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
@@ -641,6 +735,57 @@ class AlphaMELTSBackend(MeltBackend):
             oxide: normalized_basis[oxide] / total * 100.0
             for oxide in MELTS_OXIDE_BASIS
         }
+
+    # ------------------------------------------------------------------
+    # ThermoEngine mode
+    # ------------------------------------------------------------------
+
+    def _equilibrate_thermoengine(self, temperature_C, comp_wt,
+                                  fO2_log, pressure_bar, warnings=None):
+        """Use ENKI ThermoEngine MELTS for equilibrium + first-class μ."""
+        if self._thermoengine_transport is None:
+            self._mode = None
+            raise ImportError('ThermoEngine transport not initialized')
+        try:
+            payload = self._thermoengine_transport.equilibrate(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                comp_wt=comp_wt,
+                warnings=tuple(warnings or ()),
+            )
+            status = 'ok' if payload.phases_present else 'not_converged'
+            vapor_pressures = (
+                self._get_vaporock_pressures(temperature_C, comp_wt, fO2_log)
+                if self._vaporock_available else
+                self._activities_times_antoine(
+                    temperature_C,
+                    payload.activity_coefficients,
+                    comp_wt,
+                )
+            )
+            eq = self._emit_equilibrium_result(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                phases_present=list(payload.phases_present),
+                phase_masses_kg=payload.phase_masses_kg,
+                liquid_fraction=payload.liquid_fraction,
+                liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
+                activity_coefficients=payload.activity_coefficients,
+                vapor_pressures_Pa=vapor_pressures,
+                warnings=list(payload.warnings),
+                status=status,
+            )
+            eq.fe_redox_split = dict(payload.fe_redox_split)
+            return eq
+        except ImportError:
+            self._mode = None
+            raise
+        except Exception as e:
+            self._mode = None
+            raise RuntimeError(
+                f'ThermoEngine equilibrium failed: {e}'
+            ) from e
 
     # ------------------------------------------------------------------
     # Python API mode (PetThermoTools)
@@ -981,7 +1126,7 @@ class AlphaMELTSBackend(MeltBackend):
             )
 
         # The binary ran to completion with a stable assemblage - status 'ok'.
-        eq = EquilibriumResult(
+        eq = self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
@@ -1002,6 +1147,10 @@ class AlphaMELTSBackend(MeltBackend):
                 if idx + 1 < len(lines):
                     values = lines[idx + 1].split()
                     if len(values) >= 2 and values[1] == 'g':
+                        try:
+                            eq.phase_masses_kg['liquid'] = float(values[0]) / 1000.0
+                        except ValueError:
+                            pass
                         for oxide, raw in zip(headers, values[2:]):
                             try:
                                 eq.liquid_composition_wt_pct[oxide] = float(raw)
@@ -1017,6 +1166,12 @@ class AlphaMELTSBackend(MeltBackend):
                 phase = phase_match.group(1)
                 if phase != 'liquid' and phase not in eq.phases_present:
                     eq.phases_present.append(phase)
+                try:
+                    mass_g = float(phase_match.group(2))
+                except ValueError:
+                    mass_g = 0.0
+                if mass_g > 0.0:
+                    eq.phase_masses_kg[phase] = mass_g / 1000.0
 
             melt_match = re.search(
                 r'Melt fraction\s*=\s*([0-9.+\-Ee]+)', stripped)
@@ -1035,7 +1190,7 @@ class AlphaMELTSBackend(MeltBackend):
                                      comp_wt: dict, warnings=None
                                      ) -> EquilibriumResult:
         # PetThermoTools returned a result object - status 'ok'.
-        eq = EquilibriumResult(
+        eq = self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,

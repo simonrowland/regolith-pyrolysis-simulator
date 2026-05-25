@@ -7,9 +7,9 @@ Covers goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` checklist:
 2. DomainGate rejects metal-only / gas-only / halide-only compositions
    (checklist item 2 / 4 / acceptance gate "DomainGate rejects
    metal/gas/halide compositions in tests").
-3. Provider returns :class:`LiquidusDiagnostics` from PetThermoTools for
-   the liquidus finder and keeps subprocess liquidus unavailable rather
-   than fabricating a number.
+3. Provider returns :class:`LiquidusDiagnostics` from ThermoEngine or
+   PetThermoTools for the liquidus finder and keeps subprocess liquidus
+   unavailable rather than fabricating a number.
 4. :attr:`IntentResult.transition` is ALWAYS ``None`` (checklist 5,
    acceptance gate "No LedgerTransition emitted").
 5. The provider module does NOT import ``LedgerTransition`` /
@@ -155,9 +155,10 @@ def _fe3fet_from_species_mol(species_mol: dict) -> float:
 
 
 class _FakeAlphaMELTSBackend:
-    """Light backend stand-in to drive both python_api and subprocess paths.
+    """Light backend stand-in to drive all AlphaMELTS transport paths.
 
-    Constructed with ``mode`` set to ``'python_api'`` or ``'subprocess'``
+    Constructed with ``mode`` set to ``'thermoengine'``, ``'python_api'``,
+    or ``'subprocess'``
     and a canned :class:`EquilibriumResult`-shaped return value. The
     provider treats the adapter as duck-typed so this stand-in is
     sufficient; the goal #1 hardened adapter is exercised separately by
@@ -182,7 +183,7 @@ class _FakeAlphaMELTSBackend:
 
     def is_available(self) -> bool:
         self.is_available_calls += 1
-        return self._mode in {'python_api', 'subprocess'}
+        return self._mode in {'thermoengine', 'python_api', 'subprocess'}
 
     def get_engine_version(self) -> str:
         return f'fake-alphamelts {self._mode}'
@@ -195,10 +196,13 @@ class _FakeAlphaMELTSBackend:
 
     def find_liquidus_solidus(self, **kwargs):
         self.finder_calls.append(kwargs)
-        if self._mode != 'python_api':
+        if self._mode not in {'thermoengine', 'python_api'}:
             return LiquidusSolidusResult(
                 status='unavailable',
-                warnings=('fake AlphaMELTS finder requires python_api mode',),
+                warnings=(
+                    'fake AlphaMELTS finder requires thermoengine or '
+                    'python_api mode',
+                ),
             )
         return self._finder_result or LiquidusSolidusResult(
             liquidus_T_C=1305.0,
@@ -400,6 +404,25 @@ def test_provider_returns_liquidus_diagnostics_for_python_api_path():
     )
 
 
+def test_provider_returns_liquidus_diagnostics_for_thermoengine_path():
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        composition_mol=_basalt_species_mol(),
+    )
+    result = provider.dispatch(request)
+    assert result.status == 'ok'
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert diagnostic['mode'] == 'thermoengine'
+    assert diagnostic['liquidus_T_C'] == pytest.approx(1305.0)
+    assert backend.finder_calls
+
+
 def test_provider_reports_liquidus_unavailable_for_subprocess_path():
     backend = _FakeAlphaMELTSBackend(
         mode='subprocess',
@@ -417,7 +440,7 @@ def test_provider_reports_liquidus_unavailable_for_subprocess_path():
     assert diagnostic['mode'] == 'subprocess'
     assert diagnostic['liquidus_T_C'] is None
     assert diagnostic['solidus_T_C'] is None
-    assert any('requires python_api' in warning for warning in result.warnings)
+    assert any('requires' in warning for warning in result.warnings)
 
 
 def test_provider_handles_silicate_equilibrium_intent():
@@ -756,7 +779,7 @@ def test_provider_returns_unavailable_when_backend_marked_unavailable():
         mode='unavailable',
         equilibrium=_build_equilibrium_for_basalt(),
     )
-    # The fake's is_available returns False when mode is not python_api / subprocess.
+    # The fake's is_available returns False when mode is not a known transport.
     provider = AlphaMELTSProvider(backend=backend)
     request = _make_request(
         ChemistryIntent.SILICATE_LIQUIDUS,

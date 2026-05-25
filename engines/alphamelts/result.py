@@ -34,7 +34,8 @@ caller wants for trace + UI:
 * ``applied_fe3fet``       -- applied Fe3+/sumFe ratio in the cleaned melt.
 * ``intrinsic_fO2_log``    -- simulator intrinsic fO2 passed to the request.
 * ``mode``                 -- which AlphaMELTS path produced the result:
-  ``'petthermotools'``, ``'subprocess'``, or ``'unavailable'``.
+  ``'thermoengine'``, ``'petthermotools'``, ``'subprocess'``, or
+  ``'unavailable'``.
 * ``engine_version``       -- whatever the adapter reported.
 * ``backend_status``       -- ``EquilibriumResult.status`` from the
   adapter (the kernel-level status on the :class:`IntentResult` is a
