@@ -92,6 +92,21 @@ Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` binds the 
 - Gas, metal, salt, sulfide, halide, and low-major-oxide material is rejected before the engine.
 - `FeO_total` requires `QFM`, `NNO`, `IW`, `HM`, or configured `Fe3Fet`; no silent split.
 - `fO2_offset` is buffer-relative, and parsed results fill diagnostics only; AlphaMELTS emits no ledger transition.
+- Silicate requests carry `fe_redox_policy='intrinsic'` by default. Today that means the simulator derives intrinsic `fO2_log` from the cleaned melt composition and surfaces the applied `Fe3Fet` split on `LiquidusDiagnostics`; it does not run a Kress91 ferric/ferrous glass model.
+
+### MELTS activity convention
+
+MELTS/ThermoEngine activity data is a chemical-potential surface. The correct pure-endmember convention is:
+
+```text
+a_i = exp((mu_i - mu_i0) / (R T))
+```
+
+where `mu_i` is the melt chemical potential in J/mol and `mu_i0` is the pure-endmember reference at the same `T,P` (`gibbs_energy(T, P, pure_oxide)`). This is the VapoRock convention: its gas abundance path builds `ln(a)` from `(mu - mu0) / RT` before evaluating vapor reactions.
+
+Do not interpret a MELTS chemical potential as an activity coefficient `gamma`, and do not compute `P_i = gamma_i * x_i * P_i0` from a chemical-potential engine. That mixes conventions: the mole-fraction term is already embedded in the activity defined by `mu - mu0`. The error is silent and can be O(10^n) in vapor pressure because it exponentiates through `RT`.
+
+The current PetThermoTools path does not expose a verified live `mu/mu0` pair, so `simulator/melt_backend/alphamelts.py` reports activities absent instead of emitting a guessed gamma-like number. VapoRock remains the vapor authority and performs its own `mu -> a` conversion internally; the AlphaMELTS activity field is diagnostic/future ThermoEngine plumbing only.
 
 ## MAGEMin adapter notes
 

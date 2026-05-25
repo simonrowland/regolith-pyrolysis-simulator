@@ -1,3 +1,4 @@
+import math
 import time
 import types
 from pathlib import Path
@@ -6,7 +7,10 @@ import pytest
 import yaml
 
 from simulator.core import CampaignPhase, PyrolysisSimulator
-from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.alphamelts import (
+    AlphaMELTSBackend,
+    activity_from_chem_potential,
+)
 from simulator.melt_backend.base import EquilibriumResult
 
 
@@ -274,31 +278,91 @@ def test_petthermotools_result_parser_uses_verified_schema():
     }
     assert result.liquid_fraction == pytest.approx(0.8)
     assert result.liquid_composition_wt_pct['SiO2'] == pytest.approx(50.0)
-    assert result.activity_coefficients == {'Na': 2.0}
+    assert result.activity_coefficients == {}
+    assert result.warnings == [
+        'PetThermoTools chemical potentials absent; '
+        'activity-scaled Antoine fallback skipped'
+    ]
     assert result.ledger_transition is None
 
 
-def test_activities_times_antoine_computes_gamma_x_ppure_from_yaml():
+@pytest.mark.parametrize(
+    ('mu', 'mu0', 'temperature_K', 'expected'),
+    [
+        (-1000.0, -1000.0, 1800.0, 1.0),
+        (-900.0, -1000.0, 1800.0, math.exp(100.0 / (8.31446261815324 * 1800.0))),
+        (-1100.0, -1000.0, 1800.0, math.exp(-100.0 / (8.31446261815324 * 1800.0))),
+    ],
+)
+def test_activity_from_chem_potential_matches_vaporock_convention(
+    mu,
+    mu0,
+    temperature_K,
+    expected,
+):
+    assert activity_from_chem_potential(mu, mu0, temperature_K) == pytest.approx(
+        expected
+    )
+
+
+def test_activity_from_chem_potential_is_monotone_in_mu():
+    low = activity_from_chem_potential(-1100.0, -1000.0, 1800.0)
+    equal = activity_from_chem_potential(-1000.0, -1000.0, 1800.0)
+    high = activity_from_chem_potential(-900.0, -1000.0, 1800.0)
+    assert low < equal < high
+
+
+def test_petthermotools_result_parser_converts_mu_to_activity():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'liquid1_prop': {'mass': 80.0},
+        'chemical_potentials': {'Na': -900.0, 'K': -1050.0},
+        'pure_chemical_potentials': {'Na': -1000.0, 'K': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
+        'K': activity_from_chem_potential(-1050.0, -1000.0, 1800.0),
+    })
+
+
+def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     backend = AlphaMELTSBackend()
 
     pressures = backend._activities_times_antoine(
         1600.0,
         {'Na': 2.0, 'K': 1.0, 'unknown': 10.0},
-        {'Na2O': 5.0, 'K2O': 1.0, 'SiO2': 94.0},
+        {'SiO2': 100.0},
+    )
+    table = _load_data('vapor_pressures.yaml')['metals']
+    T_K = 1600.0 + 273.15
+    expected_na = 2.0 * 10.0 ** (
+        table['Na']['antoine']['A']
+        - table['Na']['antoine']['B'] / (T_K + table['Na']['antoine']['C'])
     )
 
     assert set(pressures) == {'Na', 'K'}
-    assert pressures['Na'] > 0.0
+    assert pressures['Na'] == pytest.approx(expected_na)
     assert pressures['K'] > 0.0
 
 
-def test_activities_times_antoine_returns_empty_without_parent_oxide_activity():
+def test_activities_times_antoine_returns_empty_without_species_activity():
     backend = AlphaMELTSBackend()
 
     assert backend._activities_times_antoine(
         1600.0,
-        {'Na': 2.0},
-        {'SiO2': 100.0},
+        {},
+        {'Na2O': 100.0},
     ) == {}
 
 
