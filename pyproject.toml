@@ -3,6 +3,17 @@ name = "regolith-pyrolysis-simulator"
 version = "0.1.0"
 description = "Oxygen Shuttle regolith refinery simulator for lunar and Mars feedstocks"
 requires-python = ">=3.10"
+# The full model suite is REQUIRED for the simulator to function with
+# physics-honest activity coefficients and partial pressures:
+#   - vaporock: authoritative VAPOR_PRESSURE provider (γ_M corrections live
+#     here; no fallback Antoine math reproduces VapoRock without it).
+#   - petthermotools: provides AlphaMELTS / ThermoEngine path for melt
+#     equilibria (the canonical SILICATE_EQUILIBRIUM authority).
+#   - MAGEMin: required as a compiled C/Fortran binary at
+#     `engines/magemin/bin/MAGEMin` (see comment block below). The
+#     SILICATE_LIQUIDUS shadow + GATE_LIQUID_FRACTION authoritative-fallback.
+# Only FactSAGE / ChemApp remains optional (it requires a paid license; the
+# multiphase strict-config path stays diagnostic-only without it).
 dependencies = [
     "flask>=3.0",
     "flask-socketio>=5.3",
@@ -10,14 +21,13 @@ dependencies = [
     "plotly>=5.18",
     "numpy>=1.26",
     "scipy>=1.12",
-]
-
-[project.optional-dependencies]
-melts = ["petthermotools>=0.4.5,<0.5"]
-vapor = [
+    "petthermotools>=0.4.5,<0.5",
     # Canonical upstream package/import name is "vaporock"; no PyPI release.
     "vaporock @ git+https://gitlab.com/ENKI-portal/vaporock.git@v0.1#subdirectory=src",
 ]
+
+[project.optional-dependencies]
+# Optional extras for paths NOT required by the default operational chain.
 # MAGEMin (https://github.com/ComputationalThermodynamics/MAGEMin) is a
 # compiled C/Fortran Gibbs-energy minimiser. There is NO pure-PyPI MAGEMin
 # package: the clone ships zero Python files, no setup.py, no pyproject.toml.
