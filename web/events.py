@@ -354,6 +354,9 @@ def _completion_payload(sim):
         'products': {k: round(v, 2)
                      for k, v in sim.product_ledger().items()},
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
+        'terminal_rump_kg': sim._terminal_slag_kg(),
+        'terminal_rump_by_species': sim._terminal_rump_by_species(),
+        'terminal_rump_by_class': sim._terminal_rump_by_class(),
     }
 
 

@@ -1,3 +1,5 @@
+import shlex
+
 import pytest
 
 from simulator.chemistry.kernel.capabilities import (
@@ -13,12 +15,14 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import ElectrolysisModel
 from simulator.melt_backend.base import StubBackend
+from simulator.session_cli import SessionScriptRunner
 from simulator.state import (
     MOLAR_MASS,
     OXIDE_TO_METAL,
     CampaignPhase,
     MeltState,
 )
+from web.events import _completion_payload
 
 
 def _sim(feedstocks):
@@ -30,6 +34,24 @@ def _sim(feedstocks):
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _run_session_script(lines: list[str]):
+    runner = SessionScriptRunner()
+    for line in lines:
+        runner.execute(shlex.split(line), line)
+    return runner.session._sim
+
+
+def _run_c2a_staged():
+    return _run_session_script([
+        (
+            "start --feedstock=lunar_mare_low_ti --campaign=C2A_staged "
+            "--additive=K=26.0"
+        ),
+        "adjust campaign_override C2A_staged hold_temp_C 1750.0",
+        "advance 30",
+    ])
 
 
 class _FixedElectrolysisStepProvider(ChemistryProvider):
@@ -582,3 +604,37 @@ def test_mg_thermite_debits_process_reagent_inventory():
     assert sim.train.stages[2].collected_kg["Si"] == pytest.approx(
         metal_phase_si_kg
     )
+
+
+def test_c2a_staged_payload_exposes_terminal_rump_composition():
+    sim = _run_c2a_staged()
+
+    payload = _completion_payload(sim)
+
+    assert {
+        "terminal_rump_kg",
+        "terminal_rump_by_species",
+        "terminal_rump_by_class",
+    } <= payload.keys()
+    assert "terminal_slag_kg" in payload
+
+    total_kg = payload["terminal_rump_kg"]
+    by_species = payload["terminal_rump_by_species"]
+    by_class = payload["terminal_rump_by_class"]
+
+    assert total_kg > 0.0
+    assert by_species
+    assert set(by_class) == {
+        "refractory_oxides",
+        "silicate_residual",
+        "unextracted_metals",
+        "other",
+    }
+
+    species_total_kg = sum(by_species.values())
+    class_total_kg = sum(by_class.values())
+    species_error_pct = abs(species_total_kg - total_kg) / total_kg * 100.0
+    class_error_pct = abs(class_total_kg - total_kg) / total_kg * 100.0
+
+    assert species_error_pct <= 5e-12
+    assert class_error_pct <= 5e-12
