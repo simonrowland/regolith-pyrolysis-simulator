@@ -56,6 +56,20 @@ from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
+# Vapor-pressure convention contract (`data/vapor_pressures.yaml`):
+# - Metals with `fit_target: pure_component_psat` have raw Antoine evaluated as
+#   `P_sat_pure`, then multiplied by Ellingham `a_M` -- single-counted.
+# - Metals with `fit_target: pseudo_psat_backsolved_from_vaporock` have raw
+#   Antoine evaluated as a pseudo-standard term such that
+#   `a_M * 10^(A-B/T) ~= VapoRock_partial_pressure` on the calibration grid.
+#   The convention is single-counted by construction but assumes proximity to
+#   that grid.
+# - Oxide vapors with `fit_target: standard_reaction_term` use raw Antoine as
+#   a ΔG-equivalent term, consumed with explicit oxide-activity + pO2
+#   exponents -- single-counted via explicit reaction stoichiometry.
+# This metadata documents the existing math only; dispatch below does not
+# branch on `fit_target`.
+#
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {

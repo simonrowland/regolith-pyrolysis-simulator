@@ -83,6 +83,8 @@ The six other kernel-authoritative builtins (`EVAPORATION_FLUX`, `EVAPORATION_TR
 
 The `VapoRockProvider` filters its output to the species universe `data/vapor_pressures.yaml` declares (the intersection of the YAML's `metals` section with `engines.builtin.vapor_pressure._ELLINGHAM_THERMO` keys, plus the entire `oxide_vapors` section). VapoRock's broader ~30-species output (`O2`, `Si2`, `Al2O2`, ...) is a richer chemistry surface than the downstream `EVAPORATION_FLUX` step is wired for; pinning the filter to the builtin's effective species set keeps the mass balance hard constraint (0.000%) intact across the swap. Future work can widen this set as the downstream stoichiometry validators learn each new species.
 
+The fallback Antoine convention is schema-bound in `data/vapor_pressures_schema.md`: each YAML row declares whether its raw Antoine term is `pure_component_psat`, `pseudo_psat_backsolved_from_vaporock`, or `standard_reaction_term`. This keeps Ellingham activity, VapoRock back-solve provenance, and oxide-vapor reaction exponents auditable without changing fallback math.
+
 Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` binds the five acceptance scenarios (available + no flag, unavailable + no flag, unavailable + flag, available + flag, capability_summary truth). `tests/chemistry/test_kernel_registry.py` covers the registry's new fallback semantics (mutual exclusivity with shadow, authority-capable requirement, idempotent re-registration).
 
 ## AlphaMELTS Adapter Notes
