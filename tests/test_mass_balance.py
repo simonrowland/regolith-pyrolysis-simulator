@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -14,15 +15,60 @@ from simulator.state import (
     MeltState,
     ProcessInventory,
 )
+from tests.chemistry.conftest import _build_sim
 
 
 SIO_CLOSURE_MAX_REL_PCT = 5e-12
 SIO_CLOSURE_MAX_ABS_MOL = 2e-12
+MASS_BALANCE_CLOSURE_MAX_PCT = 5e-12
+CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG = 1e-9
 
 
 def _load_data_yaml(name):
     return yaml.safe_load(
         (Path(__file__).parent.parent / "data" / name).read_text())
+
+
+def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
+    setpoints = dict(setpoints_data)
+    gate = dict(setpoints.get("freeze_gate", {}) or {})
+    gate["enabled"] = enabled
+    setpoints["freeze_gate"] = gate
+    return setpoints
+
+
+def _install_liquidus_stub(sim) -> None:
+    sim.backend.find_liquidus_solidus = lambda **_: SimpleNamespace(
+        status="ok",
+        solidus_T_C=1000.0,
+        liquidus_T_C=1300.0,
+    )
+
+
+def _cumulative_transition_imbalance_kg(sim) -> float:
+    registry = sim.atom_ledger.registry
+    return sum(
+        abs(t.debit_mass_kg(registry) - t.credit_mass_kg(registry))
+        for t in sim.atom_ledger.transitions
+    )
+
+
+def _external_input_mass_kg(sim) -> float:
+    registry = sim.atom_ledger.registry
+    return sum(
+        lot.total_mass_kg(registry) for lot in sim.atom_ledger.external_loads
+    )
+
+
+def _run_c2a_staged_to_completion(sim) -> int:
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    steps = 0
+    while not sim.is_complete() and steps < 500:
+        assert not sim.paused_for_decision
+        sim.step()
+        steps += 1
+    assert sim.is_complete()
+    return steps
 
 
 def test_mass_balance_counts_process_inventory_without_o2_double_count():
@@ -62,6 +108,79 @@ def test_product_summary_sums_duplicate_volatile_species():
 
     assert products["H2O"] == pytest.approx(5.0)
     assert products["O2"] == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(
+    "freeze_gate_enabled",
+    (False, True),
+    ids=("freeze_gate_off", "freeze_gate_on"),
+)
+def test_c2a_staged_freeze_gate_on_closes_mass_balance(
+    monkeypatch,
+    freeze_gate_enabled,
+):
+    feedstocks = _load_data_yaml("feedstocks.yaml")
+    setpoints = _set_freeze_gate(
+        _load_data_yaml("setpoints.yaml"),
+        enabled=freeze_gate_enabled,
+    )
+    vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressures,
+        feedstocks,
+        setpoints,
+        additives_kg={"K": 26.0, "Na": 12.0},
+    )
+    _install_liquidus_stub(sim)
+
+    liquid_fractions = []
+    original_liquid_fraction = sim._freeze_gate_liquid_fraction_factor
+
+    def record_liquid_fraction():
+        liquid_fraction = original_liquid_fraction()
+        liquid_fractions.append(liquid_fraction)
+        return liquid_fraction
+
+    monkeypatch.setattr(
+        sim,
+        "_freeze_gate_liquid_fraction_factor",
+        record_liquid_fraction,
+    )
+
+    steps = _run_c2a_staged_to_completion(sim)
+
+    assert steps == 12
+    transition_names = {
+        getattr(transition, "name", "")
+        for transition in sim.atom_ledger.transitions
+    }
+    assert any(name.startswith("evaporate_") for name in transition_names)
+    assert any(name.startswith("condense_") for name in transition_names)
+    assert "overhead_bleed" in transition_names
+
+    snapshot_mass_balance_error_pct = abs(
+        sim._make_snapshot().mass_balance_error_pct
+    )
+    assert snapshot_mass_balance_error_pct < MASS_BALANCE_CLOSURE_MAX_PCT
+    assert (
+        _cumulative_transition_imbalance_kg(sim)
+        < CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG
+    )
+
+    external_input_mass = _external_input_mass_kg(sim)
+    destination_mass = sum(sim.atom_ledger.total_kg_by_account().values())
+    destination_error_pct = (
+        abs(destination_mass - external_input_mass)
+        / external_input_mass
+        * 100.0
+    )
+    assert destination_error_pct < MASS_BALANCE_CLOSURE_MAX_PCT
+
+    if freeze_gate_enabled:
+        assert any(liquid_fraction < 1.0 for liquid_fraction in liquid_fractions)
+    else:
+        assert liquid_fractions == []
 
 
 def test_cumulative_transition_mass_closure_bounded():
