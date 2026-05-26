@@ -14,6 +14,7 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.melt_backend.base import EquilibriumResult
+from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 
 _CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
@@ -161,14 +162,18 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
     rates = []
+    factors = []
     for temperature_C in (950.0, 1150.0, 1400.0):
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
         rates.append(flux.species_kg_hr.get('Na', 0.0))
+        factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
+    assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
     assert ec_calls == 1
+    assert sim._freeze_gate_cache_rebuild_count == 1
     assert sim._last_freeze_gate_diagnostic['source'] == (
         'equilibrium_crystallization'
     )
@@ -305,3 +310,63 @@ def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
     assert sim._last_freeze_gate_diagnostic['source'] == (
         'liquidus_solidus:magemin-shadow'
     )
+
+
+def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1600.0
+    original_dispatch = sim._dispatch_only
+    ec_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal ec_calls
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
+            )
+        if intent is ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
+            ec_calls += 1
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                    'liquid_fraction_path': (
+                        {'temperature_C': 1000.0, 'liquid_fraction': 0.0},
+                        {'temperature_C': 1150.0, 'liquid_fraction': 0.5},
+                        {'temperature_C': 1300.0, 'liquid_fraction': 1.0},
+                    ),
+                },
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+
+    factors = []
+    balance_errors = []
+    cache_ids = []
+    for _ in range(10):
+        snapshot = sim.step()
+        factors.append(sim._last_freeze_gate_diagnostic['liquid_fraction'])
+        balance_errors.append(abs(snapshot.mass_balance_error_pct))
+        cache_ids.append(id(sim._freeze_gate_liquid_fraction_cache))
+
+    cache_rebuild_count = sim._freeze_gate_cache_rebuild_count
+    assert cache_rebuild_count <= 2
+    assert ec_calls == cache_rebuild_count
+    assert len(set(cache_ids)) <= 2
+    assert factors == [1.0] * 10
+    assert max(balance_errors) <= 5e-12
