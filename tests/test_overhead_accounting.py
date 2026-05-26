@@ -608,7 +608,13 @@ def _sio_o2_train_sim():
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
-        {"campaigns": {}, "chemistry_kernel": {"allow_fallback_vapor": True}},
+        {
+            "campaigns": {},
+            "chemistry_kernel": {
+                "allow_fallback_vapor": True,
+                "allow_unmeasured_alpha_fallback": True,
+            },
+        },
         {"silica": {"label": "Silica", "composition_wt_pct": {"SiO2": 100.0}}},
         {
             "metals": {},
