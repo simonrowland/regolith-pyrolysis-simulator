@@ -1005,7 +1005,7 @@ def test_recovered_reagent_transfer_debits_condenser_product():
     )
 
     sim.load_batch("oxide", mass_kg=1000.0)
-    sim.train.stages[3].collected_kg["K"] = 2.0
+    sim.train.stages[4].collected_kg["K"] = 2.0
     before = sim._make_snapshot()
 
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
@@ -1022,9 +1022,9 @@ def test_recovered_reagent_transfer_debits_condenser_product():
         {"K": 2.0},
         source="test recovered K condensate",
     )
-    sim.train.stages[3].collected_kg["K"] = 2.0
+    sim.train.stages[4].collected_kg["K"] = 2.0
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
-    assert sim.train.stages[3].collected_kg.get("K", 0.0) == pytest.approx(0.0)
+    assert sim.train.stages[4].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim.shuttle_K_inventory_kg == pytest.approx(2.0)
     assert sim.product_ledger()["unspent_K_reagent"] == pytest.approx(2.0)
 

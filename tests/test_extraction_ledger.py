@@ -541,7 +541,7 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
         }
     )
     sim.load_batch("oxide", mass_kg=1000.0)
-    sim.train.stages[3].collected_kg["K"] = 2.0
+    sim.train.stages[4].collected_kg["K"] = 2.0
 
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
@@ -559,11 +559,11 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
         {"K": 2.0},
         source="test recovered K condensate",
     )
-    sim.train.stages[3].collected_kg["K"] = 2.0
+    sim.train.stages[4].collected_kg["K"] = 2.0
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
 
     assert sim._transfer_condensed_species("K") == pytest.approx(0.0)
-    assert sim.train.stages[3].collected_kg.get("K", 0.0) == pytest.approx(0.0)
+    assert sim.train.stages[4].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.reagent_inventory")[
         "K"
     ] == pytest.approx(2.0)
@@ -595,15 +595,10 @@ def test_mg_thermite_debits_process_reagent_inventory():
         sim.atom_ledger.kg_by_account("process.reagent_inventory")["Mg"]
     )
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["MgO"] > 0.0
-    assert sim.train.stages[1].collected_kg["Al"] > 0.0
     _assert_product_matches_account(sim, "process.metal_phase", "Al")
     _assert_product_matches_account(sim, "process.metal_phase", "Si")
-    metal_phase_si_kg = sim.atom_ledger.kg_by_account("process.metal_phase")[
-        "Si"
-    ]
-    assert sim.train.stages[2].collected_kg["Si"] == pytest.approx(
-        metal_phase_si_kg
-    )
+    assert sim.train.total_by_species().get("Al", 0.0) == pytest.approx(0.0)
+    assert sim.train.total_by_species().get("Si", 0.0) == pytest.approx(0.0)
 
 
 def test_c2a_staged_payload_exposes_terminal_rump_composition():

@@ -13,6 +13,7 @@ from simulator.backends import (
     emit_web_engine_selection_log,
     resolve_backend,
 )
+from simulator.condensation import stage_purity_report
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.factsage import FactSAGEBackend
@@ -288,6 +289,7 @@ def _tick_payload(*, sim, snapshot, backend_message: str, backend_error: str = '
         'condensation': {
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
+        'stage_purity_report': stage_purity_report(sim.train),
         'energy_kWh': round(snapshot.energy.total_kWh, 4),
         'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
         'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
@@ -357,6 +359,7 @@ def _completion_payload(sim):
         'terminal_rump_kg': sim._terminal_slag_kg(),
         'terminal_rump_by_species': sim._terminal_rump_by_species(),
         'terminal_rump_by_class': sim._terminal_rump_by_class(),
+        'stage_purity_report': stage_purity_report(sim.train),
     }
 
 

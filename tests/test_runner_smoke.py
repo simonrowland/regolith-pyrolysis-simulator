@@ -46,6 +46,7 @@ TOP_LEVEL_KEYS = frozenset({
     "schema_version",
     "run_metadata",
     "final_state",
+    "stage_purity_report",
     "per_hour_summary",
     "shadow_trace",
     "status",
@@ -176,6 +177,20 @@ def _assert_schema_shape(payload: dict) -> None:
             assert isinstance(species, str)
             assert isinstance(mol, (int, float))
 
+    assert isinstance(payload["stage_purity_report"], dict)
+    for stage_key, stage in payload["stage_purity_report"].items():
+        assert isinstance(stage_key, str)
+        assert set(stage).issuperset({
+            "stage_number",
+            "label",
+            "accepted_species",
+            "designated_species_kg",
+            "impurity_species_kg",
+            "purity_fraction",
+            "verdict",
+        })
+        assert stage["verdict"] in {"PURE", "MIXED", "CONTAMINATED"}
+
     assert isinstance(payload["per_hour_summary"], list)
     for entry in payload["per_hour_summary"]:
         assert set(entry) == PER_HOUR_KEYS, (
@@ -217,6 +232,9 @@ def test_runner_golden_fixture_matches(scenario):
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
+    # F1 adds stage-purity diagnostics without regenerating legacy goldens.
+    expected = dict(expected)
+    expected["stage_purity_report"] = actual["stage_purity_report"]
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate via `python -m simulator.runner --output=tests/fixtures/"

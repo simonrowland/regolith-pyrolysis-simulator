@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Dict
 
+from simulator.condensation_routing import product_stage_number
 from simulator.state import (
     FARADAY,
     MOLAR_MASS,
@@ -263,6 +264,24 @@ class ExtractionMixin:
         )
         self._set_condensed_species_projection(stage_idx, species, current + add_kg)
 
+    def _project_extraction_product(
+        self,
+        recipe: str,
+        species: str,
+        delta_kg: float | None = None,
+        *,
+        source_account: str = 'process.metal_phase',
+    ) -> None:
+        stage_idx = product_stage_number(recipe, species)
+        if stage_idx is None:
+            return
+        self._project_condensed_species(
+            stage_idx,
+            species,
+            delta_kg=delta_kg,
+            source_account=source_account,
+        )
+
     def _build_mre_voltage_sequence(self) -> list:
         """Build the stepped voltage hold sequence from setpoints.yaml."""
         # Try to load from setpoints
@@ -403,14 +422,9 @@ class ExtractionMixin:
             # _dispatch_and_commit helper's behaviour at split sites.
             self._chem_no_op_dispatch_count += 1
 
-        # Route cathode metals to condenser stages (product ledger).    [Step 4]
-        # Same pattern as C6 thermite — condenser train serves as the
-        # product accumulator for all extraction methods.
-        MRE_METAL_STAGE = {
-            'Fe': 1, 'Cr': 1, 'Mn': 1, 'Al': 1,  # Dense metals → Stage 1
-            'Si': 2, 'Ti': 2,                       # Si/Ti → Stage 2
-            'Mg': 3, 'Ca': 3, 'Na': 3, 'K': 3,     # Light metals → Stage 3
-        }
+        # Route cathode metals through the canonical registry.  Metal-phase
+        # destinations stay in process.metal_phase; only true condenser
+        # destinations receive a stage UI projection.
         mre_metal_deltas_kg: Dict[str, float] = {}
         for metal in produced_metals:
             delta_kg = (
@@ -420,12 +434,11 @@ class ExtractionMixin:
             )
             if delta_kg > 1e-10:
                 mre_metal_deltas_kg[metal] = delta_kg
-                stage_idx = MRE_METAL_STAGE.get(metal, 1)
-                self._project_condensed_species(
-                    stage_idx,
+                self._project_extraction_product(
+                    'MRE',
                     metal,
-                    delta_kg=delta_kg,
                     source_account='process.metal_phase',
+                    delta_kg=delta_kg,
                 )
 
         self._mre_metals_this_hr = dict(sorted(mre_metal_deltas_kg.items()))
@@ -615,9 +628,9 @@ class ExtractionMixin:
         if kernel_result.transition is None:
             return
 
-        # Fe produced goes to condenser Stage 1 (liquid Fe drains to sump)
-        self._project_condensed_species(
-            1, 'Fe', source_account='process.metal_phase')
+        # Fe produced goes to its canonical product destination.
+        self._project_extraction_product(
+            'C3', 'Fe', source_account='process.metal_phase')
 
         # Deduct K from shuttle inventory
         # (K comes from additives, not from a condenser stage)
@@ -681,15 +694,12 @@ class ExtractionMixin:
         if kernel_result.transition is None:
             return
 
-        # Reduced metals go to condenser Stage 1 (liquid-metal sump).
-        # Project unconditionally; the projection helper is a
-        # no-op when the metal_phase account doesn't carry the species.
-        self._project_condensed_species(
-            1, 'Fe', source_account='process.metal_phase')
-        self._project_condensed_species(
-            1, 'Cr', source_account='process.metal_phase')
-        self._project_condensed_species(
-            1, 'Ti', source_account='process.metal_phase')
+        # Reduced metals use the canonical recipe product registry.  Cr routes
+        # to the dedicated Cr stage; Ti stays as a metal-phase product unless a
+        # future accepted physical condenser is added.
+        for metal in ('Fe', 'Cr', 'Ti'):
+            self._project_extraction_product(
+                'C3', metal, source_account='process.metal_phase')
 
         # Deduct Na from shuttle inventory (drawn from the ledger so
         # the counter stays in sync with the kernel-committed debit).
@@ -870,9 +880,10 @@ class ExtractionMixin:
                     'process.metal_phase', 'Si')
                 - back_si_before_kg
             )
-            # Provider credited Si to process.metal_phase; project to UI.
-            self._project_condensed_species(
-                2, 'Si', metal_phase_delta,
+            # Provider credited Si to process.metal_phase; the registry keeps
+            # Si as a metal-phase product instead of minting a condenser stage.
+            self._project_extraction_product(
+                'C6', 'Si', metal_phase_delta,
                 source_account='process.metal_phase')
         else:
             # F-A4: no-op dispatch counter mirrors the
@@ -892,9 +903,9 @@ class ExtractionMixin:
             Al_produced_kg -= Al_lost_to_back_kg
             Al2O3_removed_kg -= Al2O3_regenerated_kg
 
-        # Al product → condenser Stage 1 (liquid metal sump)
-        self._project_condensed_species(
-            1, 'Al', source_account='process.metal_phase')
+        # Al product remains in the metal-phase product account.
+        self._project_extraction_product(
+            'C6', 'Al', source_account='process.metal_phase')
 
         # Deduct Mg from thermite inventory.
         self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')

@@ -53,6 +53,11 @@ import yaml
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
+from simulator.condensation_routing import (
+    STAGE_KEY_BY_NUMBER,
+    accepted_species_for_stage_number,
+    is_designated_for_stage,
+)
 from simulator.state import MOLAR_MASS
 
 
@@ -119,6 +124,7 @@ class CondensationRouteResult:
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
+    impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -238,6 +244,7 @@ class CondensationModel:
         remaining_by_species = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
+        impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
             self._record_runtime_wall_fraction(species, 0.0)
@@ -250,7 +257,6 @@ class CondensationModel:
                     break
                 if _cr_stage_isolation_blocks(stage, species):
                     continue
-
                 # Calculate band-aware H-K-L deposition efficiency [COND-2]
                 eta = self._condensation_efficiency(
                     stage=stage,
@@ -311,6 +317,13 @@ class CondensationModel:
                             stage_number, {})
                         stage_species[species] = (
                             stage_species.get(species, 0.0) + condensed_kg)
+                        if not is_designated_for_stage(species, stage_number):
+                            stage_impurity = (
+                                impurity_by_stage_species.setdefault(
+                                    stage_number, {}))
+                            stage_impurity[species] = (
+                                stage_impurity.get(species, 0.0)
+                                + condensed_kg)
 
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
@@ -319,6 +332,7 @@ class CondensationModel:
             remaining_by_species=remaining_by_species,
             condensed_by_stage_species=condensed_by_stage_species,
             wall_deposit_by_species=wall_deposit_by_species,
+            impurity_by_stage_species=impurity_by_stage_species,
         )
 
     def _wall_deposit_candidate_kg(
@@ -723,3 +737,53 @@ def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     if species in {'Cr', 'CrO2'}:
         return not chromium_stage
     return chromium_stage
+
+
+def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
+    """Classify each stage's accumulated product as designated or impurity."""
+
+    report: dict[str, dict[str, Any]] = {}
+    for stage in train.stages:
+        stage_number = int(stage.stage_number)
+        stage_key = STAGE_KEY_BY_NUMBER.get(
+            stage_number, f'stage_{stage_number}')
+        accepted_species = accepted_species_for_stage_number(stage_number)
+        designated_species_kg: dict[str, float] = {}
+        impurity_species_kg: dict[str, float] = {}
+        for species, kg in sorted(stage.collected_kg.items()):
+            kg = float(kg)
+            if abs(kg) <= 1e-12:
+                continue
+            if is_designated_for_stage(species, stage_number):
+                designated_species_kg[species] = kg
+            else:
+                impurity_species_kg[species] = kg
+
+        designated_kg = sum(designated_species_kg.values())
+        impurity_kg = sum(impurity_species_kg.values())
+        total_kg = designated_kg + impurity_kg
+        purity_fraction = 1.0 if total_kg <= 1e-12 else designated_kg / total_kg
+        if purity_fraction > 0.95:
+            verdict = 'PURE'
+        elif purity_fraction >= 0.80:
+            verdict = 'MIXED'
+        else:
+            verdict = 'CONTAMINATED'
+
+        report[stage_key] = {
+            'stage_number': stage_number,
+            'label': stage.label,
+            'accepted_species': sorted(accepted_species),
+            'designated_species_kg': designated_species_kg,
+            'impurity_species_kg': impurity_species_kg,
+            'designated_kg': designated_kg,
+            'impurity_kg': impurity_kg,
+            'total_kg': total_kg,
+            'purity_fraction': purity_fraction,
+            'verdict': verdict,
+            'warning': (
+                'non-designated condensate present'
+                if impurity_kg > 1e-12 else ''
+            ),
+        }
+    return report
