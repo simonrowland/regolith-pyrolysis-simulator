@@ -103,6 +103,7 @@ def find_liquidus_solidus_by_fraction(
     solid_epsilon: float = 1.0e-3,
     liquid_epsilon: float = 1.0e-3,
     monotonicity_tolerance: float = 2.0e-2,
+    monotone_smoothing_max: float = 5.0e-1,
     max_bisection_iterations: int = 32,
 ) -> LiquidusSolidusResult:
     """Bracket and bisect solidus/liquidus on monotone melt fraction."""
@@ -123,6 +124,7 @@ def find_liquidus_solidus_by_fraction(
     liquid_threshold = 1.0 - float(liquid_epsilon)
     solid_threshold = float(solid_epsilon)
     samples: list[MeltFractionSample] = []
+    smoothing_warnings: list[str] = []
     iterations = 0
 
     def sample(T_C: float) -> MeltFractionSample:
@@ -132,6 +134,8 @@ def find_liquidus_solidus_by_fraction(
             MeltFractionSample(float(T_C), frac),
             samples,
             tolerance=monotonicity_tolerance,
+            smoothing_max=monotone_smoothing_max,
+            warnings=smoothing_warnings,
         )
         samples.append(point)
         samples.sort(key=lambda p: p.temperature_C)
@@ -177,7 +181,7 @@ def find_liquidus_solidus_by_fraction(
         if missing:
             return LiquidusSolidusResult(
                 status='not_converged',
-                warnings=tuple(missing),
+                warnings=tuple([*smoothing_warnings, *missing]),
                 samples=tuple(samples),
                 iterations=iterations,
             )
@@ -203,7 +207,10 @@ def find_liquidus_solidus_by_fraction(
     except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
         return LiquidusSolidusResult(
             status='not_converged',
-            warnings=(f'liquidus finder failed: {exc}',),
+            warnings=tuple([
+                *smoothing_warnings,
+                f'liquidus finder failed: {exc}',
+            ]),
             samples=tuple(samples),
             iterations=iterations,
         )
@@ -211,7 +218,10 @@ def find_liquidus_solidus_by_fraction(
     if liquidus.temperature_C < solidus.temperature_C:
         return LiquidusSolidusResult(
             status='not_converged',
-            warnings=('liquidus below solidus after bisection',),
+            warnings=tuple([
+                *smoothing_warnings,
+                'liquidus below solidus after bisection',
+            ]),
             samples=tuple(samples),
             iterations=iterations,
         )
@@ -219,6 +229,7 @@ def find_liquidus_solidus_by_fraction(
         liquidus_T_C=liquidus.temperature_C,
         solidus_T_C=solidus.temperature_C,
         status='ok',
+        warnings=tuple(smoothing_warnings),
         samples=tuple(samples),
         iterations=iterations,
     )
@@ -232,10 +243,12 @@ def build_equilibrium_crystallization_path(
     grid_step_C: float = 50.0,
     max_points: int = 41,
     monotonicity_tolerance: float = 2.0e-2,
+    monotone_smoothing_max: float = 5.0e-1,
 ) -> EquilibriumCrystallizationPathResult:
     """Build a monotone liquid-fraction path over solidus -> liquidus."""
     samples: list[MeltFractionSample] = []
     path: list[LiquidFractionPathPoint] = []
+    smoothing_warnings: list[str] = []
     try:
         solidus_T = float(solidus_T_C)
         liquidus_T = float(liquidus_T_C)
@@ -259,6 +272,8 @@ def build_equilibrium_crystallization_path(
                 ),
                 samples,
                 tolerance=monotonicity_tolerance,
+                smoothing_max=monotone_smoothing_max,
+                warnings=smoothing_warnings,
             )
             samples.append(fraction_point)
             samples.sort(key=lambda p: p.temperature_C)
@@ -274,7 +289,10 @@ def build_equilibrium_crystallization_path(
             liquidus_T_C=liquidus_T_C,
             solidus_T_C=solidus_T_C,
             status='not_converged',
-            warnings=(f'equilibrium crystallization path failed: {exc}',),
+            warnings=tuple([
+                *smoothing_warnings,
+                f'equilibrium crystallization path failed: {exc}',
+            ]),
             liquid_fraction_path=tuple(path),
             samples=tuple(samples),
             iterations=len(samples),
@@ -283,6 +301,7 @@ def build_equilibrium_crystallization_path(
         liquidus_T_C=liquidus_T,
         solidus_T_C=solidus_T,
         status='ok',
+        warnings=tuple(smoothing_warnings),
         liquid_fraction_path=tuple(path),
         samples=tuple(samples),
         iterations=len(samples),
@@ -338,29 +357,75 @@ def _monotone_point(
     samples: list[MeltFractionSample],
     *,
     tolerance: float,
+    smoothing_max: float,
+    warnings: list[str],
 ) -> MeltFractionSample:
     lower = [p for p in samples if p.temperature_C < point.temperature_C]
     upper = [p for p in samples if p.temperature_C > point.temperature_C]
     frac = point.frac_M
     if lower:
         low = max(lower, key=lambda p: p.temperature_C)
-        if frac < low.frac_M - tolerance:
+        drop = low.frac_M - frac
+        if drop > smoothing_max:
             raise RuntimeError(
                 'non-monotone frac_M(T): '
                 f'{point.temperature_C:.3f} C gives {frac:.6g} below '
                 f'{low.temperature_C:.3f} C value {low.frac_M:.6g}'
             )
+        if drop > tolerance:
+            warnings.append(
+                _smoothing_warning(
+                    point.temperature_C,
+                    raw=frac,
+                    clamped=low.frac_M,
+                    magnitude=drop,
+                    direction='below',
+                    reference=low,
+                )
+            )
+        # Three bands: tiny engine jitter stays silent, moderate MAGEMin
+        # dips smooth to the physical cummax envelope, gross drops still trip
+        # the engine-broken canary.
         frac = max(frac, low.frac_M)
     if upper:
         high = min(upper, key=lambda p: p.temperature_C)
-        if frac > high.frac_M + tolerance:
+        rise = frac - high.frac_M
+        if rise > smoothing_max:
             raise RuntimeError(
                 'non-monotone frac_M(T): '
                 f'{point.temperature_C:.3f} C gives {frac:.6g} above '
                 f'{high.temperature_C:.3f} C value {high.frac_M:.6g}'
             )
+        if rise > tolerance:
+            warnings.append(
+                _smoothing_warning(
+                    point.temperature_C,
+                    raw=frac,
+                    clamped=high.frac_M,
+                    magnitude=rise,
+                    direction='above',
+                    reference=high,
+                )
+            )
         frac = min(frac, high.frac_M)
     return MeltFractionSample(point.temperature_C, frac)
+
+
+def _smoothing_warning(
+    temperature_C: float,
+    *,
+    raw: float,
+    clamped: float,
+    magnitude: float,
+    direction: str,
+    reference: MeltFractionSample,
+) -> str:
+    return (
+        'smoothed non-monotone frac_M(T): '
+        f'{temperature_C:.3f} C raw {raw:.6g} clamped to {clamped:.6g}; '
+        f'delta={magnitude:.6g} {direction} '
+        f'{reference.temperature_C:.3f} C value {reference.frac_M:.6g}'
+    )
 
 
 def _clamp_fraction(value: float) -> float:

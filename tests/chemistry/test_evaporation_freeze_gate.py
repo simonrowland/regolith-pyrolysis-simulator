@@ -263,8 +263,12 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
-    with pytest.raises(RuntimeError, match='freeze_gate.enabled requires'):
+    with pytest.raises(RuntimeError, match='freeze_gate.enabled requires') as exc:
         sim._calculate_evaporation(_equilibrium())
+    assert 'MAGEMin shadow unavailable' in str(exc.value)
+    assert 'no liquidus engine produced usable solidus/liquidus bounds' in str(
+        exc.value
+    )
 
 
 def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
