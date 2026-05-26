@@ -129,8 +129,8 @@ def test_table_builder_clamps_small_engine_noise_but_rejects_gross_nonmonotone()
 
     gross = {
         1000.0: 0.0,
-        1100.0: 0.50,
-        1200.0: 0.20,
+        1100.0: 1.0,
+        1200.0: 0.0,
         1300.0: 1.0,
     }
     failed = build_equilibrium_crystallization_path(
@@ -142,6 +142,43 @@ def test_table_builder_clamps_small_engine_noise_but_rejects_gross_nonmonotone()
     )
     assert failed.status == 'not_converged'
     assert any('non-monotone frac_M' in warning for warning in failed.warnings)
+
+
+def test_table_builder_smooths_magemin_scale_nonmonotone_dip():
+    # 0.09 / 0.33 / 0.05 MAGEMin frac_M dips were observed in the
+    # 2026-05-26 freeze-gate flip blast-radius on lunar/mars C2A cases.
+    fractions = {
+        1000.0: 0.0,
+        1050.0: 0.25,
+        1100.0: 0.5,
+        1150.0: 0.75,
+        1200.0: 0.98,
+        1250.0: 0.98075,
+        1300.0: 0.890898,
+        1350.0: 0.99,
+        1400.0: 1.0,
+        1450.0: 1.0,
+        1500.0: 0.670427,
+        1550.0: 0.945697,
+        1600.0: 1.0,
+    }
+    result = build_equilibrium_crystallization_path(
+        lambda T: (fractions[float(T)], {'Na2O': 1.0, 'K2O': 0.1}),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1600.0,
+        grid_step_C=50.0,
+        monotonicity_tolerance=0.02,
+    )
+
+    assert result.status == 'ok'
+    path = {p.temperature_C: p.liquid_fraction for p in result.liquid_fraction_path}
+    assert path[1300.0] == pytest.approx(0.98075)
+    assert path[1500.0] == pytest.approx(1.0)
+    assert path[1550.0] == pytest.approx(1.0)
+    assert any('smoothed non-monotone frac_M' in w for w in result.warnings)
+    assert any('1300.000 C raw 0.890898' in w for w in result.warnings)
+    assert any('1500.000 C raw 0.670427' in w for w in result.warnings)
+    assert any('1550.000 C raw 0.945697' in w for w in result.warnings)
 
 
 class _FakeECAlphaMELTSBackend:

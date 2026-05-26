@@ -7,6 +7,26 @@ import pytest
 from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
 
 
+def _piecewise_fraction(anchors: dict[float, float]):
+    ordered = sorted((float(T), float(frac)) for T, frac in anchors.items())
+
+    def sample(temperature_C: float) -> float:
+        T = float(temperature_C)
+        if T <= ordered[0][0]:
+            return ordered[0][1]
+        for (left_T, left_frac), (right_T, right_frac) in zip(
+            ordered,
+            ordered[1:],
+        ):
+            if T <= right_T:
+                span = right_T - left_T
+                weight = (T - left_T) / span
+                return left_frac + (right_frac - left_frac) * weight
+        return ordered[-1][1]
+
+    return sample
+
+
 def test_liquidus_finder_bisects_monotone_fraction_curve():
     def frac_M(temperature_C: float) -> float:
         return max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
@@ -51,11 +71,44 @@ def test_liquidus_finder_is_deterministic():
     assert first == second
 
 
+def test_liquidus_finder_smooths_magemin_scale_nonmonotone_dip():
+    # 0.09 / 0.33 / 0.05 MAGEMin frac_M dips were observed in the
+    # 2026-05-26 freeze-gate flip blast-radius on lunar/mars C2A cases.
+    result = find_liquidus_solidus_by_fraction(
+        _piecewise_fraction({
+            1000.0: 0.0,
+            1100.0: 0.5,
+            1200.0: 0.98,
+            1250.0: 0.98075,
+            1300.0: 0.890898,
+            1350.0: 0.99,
+            1400.0: 1.0,
+            1450.0: 1.0,
+            1500.0: 0.670427,
+            1550.0: 0.945697,
+            1600.0: 1.0,
+        }),
+        min_T_C=1000.0,
+        max_T_C=1600.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.solidus_T_C is not None
+    assert result.liquidus_T_C is not None
+    assert result.liquidus_T_C >= result.solidus_T_C
+    assert any('smoothed non-monotone frac_M' in w for w in result.warnings)
+    assert any('1300.000 C raw 0.890898' in w for w in result.warnings)
+    assert any('1500.000 C raw 0.670427' in w for w in result.warnings)
+    assert any('1550.000 C raw 0.945697' in w for w in result.warnings)
+
+
 def test_liquidus_finder_guards_non_monotone_fraction_curve():
     values = {
         800.0: 0.0,
-        900.0: 0.4,
-        1000.0: 0.2,
+        900.0: 1.0,
+        1000.0: 0.0,
         1100.0: 1.0,
     }
 
