@@ -375,6 +375,10 @@ def test_shadow_parity_across_short_simulation_run(
     intent flips that touch the same call site.
     """
 
+    setpoints_data = dict(setpoints_data)
+    kernel_config = dict(setpoints_data.get("chemistry_kernel", {}) or {})
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints_data["chemistry_kernel"] = kernel_config
     sim = _build_sim(
         feedstock_key,
         vapor_pressure_data,

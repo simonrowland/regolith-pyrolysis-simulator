@@ -62,6 +62,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
+_NONTRIVIAL_FLUX_KG_HR = 1.0e-12
 
 
 def _coerce_alpha_by_species(alpha_control) -> dict[str, float]:
@@ -73,6 +74,30 @@ def _coerce_alpha_by_species(alpha_control) -> dict[str, float]:
     if alpha_control is None:
         return {}
     return {"*": float(alpha_control)}
+
+
+def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple[float, float]]:
+    if not isinstance(alpha_envelope_control, Mapping):
+        return {}
+
+    envelopes: dict[str, tuple[float, float]] = {}
+    for species, envelope in alpha_envelope_control.items():
+        if not isinstance(envelope, (list, tuple)) or len(envelope) != 2:
+            continue
+        low, high = float(envelope[0]), float(envelope[1])
+        envelopes[str(species)] = (low, high)
+    return envelopes
+
+
+def _flux_uncertainty_pct(
+    alpha: float,
+    envelope: tuple[float, float] | None,
+) -> float | None:
+    if envelope is None or alpha <= 0.0:
+        return None
+    low, high = envelope
+    relative_span = max(abs(alpha - low), abs(high - alpha)) / alpha
+    return relative_span * 100.0
 
 
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
@@ -142,16 +167,21 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
         stir_factor = float(controls.get("stir_factor", 0.0))
         alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
+        alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
+            controls.get("alpha_envelope")
+        )
+        allow_unmeasured_alpha_fallback = bool(
+            controls.get("allow_unmeasured_alpha_fallback", False)
+        )
 
         flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
+        flux_uncertainty_pct: dict[str, float] = {}
+        unmeasured_alpha_fallback_species: list[str] = []
+        missing_alpha: dict[str, dict[str, float | str]] = {}
 
         for species, P_sat_Pa in vapor_pressures.items():
-            alpha = alpha_by_species.get(
-                species,
-                alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
-            )
-            alpha_used_by_species[species] = alpha
+            P_sat_Pa = float(P_sat_Pa)
             if P_sat_Pa <= 0:
                 continue
 
@@ -164,6 +194,15 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 M_kg_mol = MOLAR_MASS.get(species, 50.0) / 1000.0
 
             stoich = stoich_by_species.get(species) or {}
+            oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
+            if oxide_per_product_kg <= 0.0:
+                # Caller didn't supply stoich for this species -- skip
+                # rather than emit a flux we can't deplete. Matches the
+                # legacy AccountingError surface (the caller raises
+                # there); here we skip silently since the kernel-level
+                # error surface is owned by the caller.
+                continue
+
             O2_per_product_kg = max(
                 0.0, float(stoich.get("O2_per_product_kg") or 0.0)
             )
@@ -179,8 +218,54 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             # Hertz-Knudsen mass flux (kg/s per m^2).            [HK-1]
             P_ambient_Pa = float(overhead_partials.get(species, 0.0))
+            net_pressure_Pa = P_sat_Pa - P_ambient_Pa
+            if net_pressure_Pa <= 0:
+                continue
+
             denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
-            J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) / denominator
+            alpha_is_unmeasured = (
+                species not in alpha_by_species
+                and "*" not in alpha_by_species
+            )
+            alpha = alpha_by_species.get(
+                species,
+                alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
+            )
+
+            baseline_rate_kg_hr = (
+                net_pressure_Pa / denominator
+                * melt_surface_area_m2
+                * stir_factor
+                * 3600.0
+            )
+            available_parent_kg = float(available_oxide_kg.get(species, 0.0) or 0.0)
+            if (
+                alpha_is_unmeasured
+                and not allow_unmeasured_alpha_fallback
+                and available_parent_kg > 1.0e-12
+                and baseline_rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR
+            ):
+                missing_alpha[species] = {
+                    "policy": "fail_loud_missing_alpha",
+                    "fallback_control": "chemistry_kernel.allow_unmeasured_alpha_fallback",
+                    "p_sat_Pa": P_sat_Pa,
+                    "p_ambient_Pa": P_ambient_Pa,
+                    "baseline_alpha_1_rate_kg_hr": baseline_rate_kg_hr,
+                }
+                continue
+
+            if alpha_is_unmeasured:
+                unmeasured_alpha_fallback_species.append(species)
+
+            alpha_used_by_species[species] = alpha
+            uncertainty_pct = _flux_uncertainty_pct(
+                alpha,
+                alpha_envelope_by_species.get(species),
+            )
+            if uncertainty_pct is not None:
+                flux_uncertainty_pct[species] = uncertainty_pct
+
+            J_kg_s_m2 = alpha * net_pressure_Pa / denominator
 
             if J_kg_s_m2 <= 0:
                 continue
@@ -188,30 +273,47 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             # Rate over the melt opening + stirring uplift.       [HK-1]
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * stir_factor * 3600.0
 
-            # Stoich is still required so the integration layer can apply
-            # parent-grouped analytic depletion after raw HKL emission.
-            oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
-            if oxide_per_product_kg <= 0.0:
-                # Caller didn't supply stoich for this species -- skip
-                # rather than emit a flux we can't deplete. Matches the
-                # legacy AccountingError surface (the caller raises
-                # there); here we skip silently since the kernel-level
-                # error surface is owned by the caller.
-                continue
-
-            if rate_kg_hr > 1e-12:
+            if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
                 flux_kg_hr[species] = rate_kg_hr
+
+        if missing_alpha:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="unavailable",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "alpha_used_by_species": alpha_used_by_species,
+                    "flux_uncertainty_pct": flux_uncertainty_pct,
+                    "missing_alpha": missing_alpha,
+                    "temperature_C": T_C,
+                    "gas_pO2_bar": gas_pO2_bar,
+                    "intrinsic_pO2_bar": intrinsic_pO2_bar,
+                },
+                warnings=(
+                    "missing evaporation_alpha for sampled species: "
+                    + ", ".join(sorted(missing_alpha)),
+                ),
+            )
+
+        diagnostic = {
+            "evaporation_flux_kg_hr": flux_kg_hr,
+            "alpha_used_by_species": alpha_used_by_species,
+            "flux_uncertainty_pct": flux_uncertainty_pct,
+            "temperature_C": T_C,
+            "gas_pO2_bar": gas_pO2_bar,
+            "intrinsic_pO2_bar": intrinsic_pO2_bar,
+        }
+        if unmeasured_alpha_fallback_species:
+            diagnostic["unmeasured_alpha_fallback_species"] = sorted(
+                unmeasured_alpha_fallback_species
+            )
 
         return IntentResult(
             intent=ChemistryIntent.EVAPORATION_FLUX,
             status="ok",
             transition=None,
             control_audit=control_audit,
-            diagnostic={
-                "evaporation_flux_kg_hr": flux_kg_hr,
-                "alpha_used_by_species": alpha_used_by_species,
-                "temperature_C": T_C,
-                "gas_pO2_bar": gas_pO2_bar,
-                "intrinsic_pO2_bar": intrinsic_pO2_bar,
-            },
+            diagnostic=diagnostic,
         )
