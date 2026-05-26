@@ -15,6 +15,15 @@
 # than VapoRock's full JANAF gas speciation. O2 is not listed as an
 # evaporating species because it has no single parent oxide; VapoRock may
 # expose it through the read-only vaporock_full_speciation_Pa diagnostic.
+#
+# Evaporation alpha policy:
+# - evaporation_alpha blocks carry HKL alpha value, citation, temperature
+#   context, uncertainty envelope, and confidence tier.
+# - tier 2 values are proxy or conditional proxies, not direct regolith-melt
+#   measurements.
+# - tier 3 species intentionally carry no alpha value. Runtime evaporation
+#   refuses nonzero flux for those species unless the operator explicitly opts
+#   into unmeasured alpha=1.0 fallback for prototyping.
 
 metals:
   Na:
@@ -34,6 +43,7 @@ metals:
       source: "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
+      tier: 2
     antoine:
       # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
       A: 8.477035
@@ -61,6 +71,7 @@ metals:
       source: "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy to Na; Sossi & Fegley 2018 liquids commonly near unity"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
+      tier: 2
     antoine:
       # Structural fallback only: A shifted to match VapoRock for
       # lunar_mare_low_ti at 1773.15 K, Kress91 IW. Not a broad K fit.
@@ -94,6 +105,7 @@ metals:
       source: "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
       T_band_K: [1873, 2373]
       envelope: [0.10, 0.21]
+      tier: 2
     antoine:
       # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
       A: 10.628931
@@ -121,6 +133,7 @@ metals:
       source: "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
       T_band_K: [1873, 2373]
       envelope: [0.011, 0.020]
+      tier: 2
     antoine:
       # Basalt single-reference fallback fit to VapoRock, 1400-1900 K,
       # Kress91 IW, lunar_mare_low_ti + mars_basalt only.
@@ -142,6 +155,13 @@ metals:
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
     source: "rough legacy ΔH_vap approximation, unvalidated"
+    evaporation_alpha:
+      value: 0.90
+      source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
+      T_band_K: [2278, 2278]
+      envelope: [0.48, 1.20]
+      tier: 2
+      tag: "proxy"
     antoine:
       A: 11.238
       B: 9520
@@ -158,6 +178,13 @@ metals:
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
     source: "CRC/CR2 pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
+    evaporation_alpha:
+      value: 0.30
+      source: "Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
+      T_band_K: [1700, 2273]
+      envelope: [0.03, 1.00]
+      tier: 2
+      tag: "broad_proxy"
     antoine:
       A: 11.553
       B: 17340
@@ -175,6 +202,13 @@ metals:
     fit_target: "pure_component_psat"
     consumer_status: "inactive"
     source: "rough legacy ΔH_vap approximation, inactive and unvalidated"
+    evaporation_alpha:
+      value: 1.0
+      source: "Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
+      T_band_K: [1687, 3538]
+      envelope: [0.84, 1.00]
+      tier: 2
+      tag: "pure_elemental_only"
     antoine:
       A: 11.619
       B: 21590
@@ -191,6 +225,13 @@ metals:
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
     source: "CRC/CR2 pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
+    evaporation_alpha:
+      value: 0.80
+      source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
+      T_band_K: [2278, 2278]
+      envelope: [0.39, 1.00]
+      tier: 2
+      tag: "proxy"
     antoine:
       A: 11.650
       B: 23200
@@ -207,6 +248,10 @@ metals:
     parent_oxide: "Cr2O3"
     fit_target: "pure_component_psat"
     source: "rough legacy ΔH_vap approximation, unvalidated"
+    evaporation_alpha_policy:
+      tier: 3
+      policy: "fail_loud_missing_alpha"
+      source: "Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found"
     antoine:
       A: 11.420
       B: 20730
@@ -223,6 +268,10 @@ metals:
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
     source: "rough legacy ΔH_vap approximation, unvalidated"
+    evaporation_alpha_policy:
+      tier: 3
+      policy: "fail_loud_missing_alpha"
+      source: "Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted"
     antoine:
       A: 11.183
       B: 14740
@@ -251,6 +300,7 @@ oxide_vapors:
       source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
       T_band_K: [1873, 2373]
       envelope: [0.003, 0.048]
+      tier: 2
     antoine:
       # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
       # Effective vapor pressure depends on a(SiO₂) and pO₂
@@ -286,6 +336,10 @@ oxide_vapors:
       basis: "VapoRock fallback fit to JANAF0 CrO2(g) output"
     stoich_oxide_per_vapor: 0.9047574827878914  # kg Cr2O3 consumed per kg CrO2 evaporated
     stoich_O2_per_vapor: -0.09524251721210866  # kg O2 consumed per kg CrO2 evaporated
+    evaporation_alpha_policy:
+      tier: 3
+      policy: "fail_loud_missing_alpha"
+      source: "Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted"
     antoine:
       # Fallback fit to VapoRock JANAF0 CrO2(g) output over 1500-2200 K:
       # log10(P_Pa) = A - B/T_K + 0.5 log10(a_Cr2O3) + 0.25 log10(pO2_bar)

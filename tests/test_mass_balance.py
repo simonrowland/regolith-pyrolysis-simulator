@@ -196,6 +196,7 @@ def test_cumulative_transition_mass_closure_bounded():
     setpoints = dict(setpoints)
     kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
     kernel_config["allow_fallback_vapor"] = True
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
     setpoints["chemistry_kernel"] = kernel_config
 
     backend = StubBackend()
@@ -256,6 +257,7 @@ def test_sio_disproportionation_closes():
         _, diagnostics = build_sio_yield_report(
             feedstock_id=feedstock_id,
             include_diagnostics=True,
+            allow_unmeasured_alpha_fallback=True,
         )
         _assert_sio_destination_closure(diagnostics)
 
@@ -264,6 +266,7 @@ def test_sio_destination_split_closes_with_wall_deposit():
     report, diagnostics = build_sio_yield_report(
         feedstock_id="lunar_mare_low_ti",
         include_diagnostics=True,
+        allow_unmeasured_alpha_fallback=True,
     )
 
     _assert_sio_destination_closure(diagnostics)

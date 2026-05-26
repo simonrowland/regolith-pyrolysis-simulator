@@ -255,6 +255,7 @@ class PyrolysisRun:
     setpoints_overrides: dict[str, dict] = field(default_factory=dict)
     track: str = "pyrolysis"
     allow_fallback_vapor: bool = False
+    allow_unmeasured_alpha_fallback: bool = False
     force_builtin_vapor_pressure: bool = False
     feedstocks_path: Optional[Path] = None
     setpoints_path: Optional[Path] = None
@@ -336,10 +337,17 @@ class PyrolysisRun:
     def _session_config(self) -> SimSessionConfig:
         feedstocks = self._load_feedstocks()
         setpoints = self._load_setpoints()
-        if self.allow_fallback_vapor or self.force_builtin_vapor_pressure:
+        if (
+            self.allow_fallback_vapor
+            or self.force_builtin_vapor_pressure
+            or self.allow_unmeasured_alpha_fallback
+        ):
             setpoints = dict(setpoints)
             kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
-            kernel_config["allow_fallback_vapor"] = True
+            if self.allow_fallback_vapor or self.force_builtin_vapor_pressure:
+                kernel_config["allow_fallback_vapor"] = True
+            if self.allow_unmeasured_alpha_fallback:
+                kernel_config["allow_unmeasured_alpha_fallback"] = True
             setpoints["chemistry_kernel"] = kernel_config
         vapor_pressures = self._load_vapor_pressures()
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
@@ -863,6 +871,7 @@ def build_sio_yield_report(
     ramp_c_per_hr: float | None = None,
     liner_temperature_c: float | None = None,
     pO2_mbar: float | None = None,
+    allow_unmeasured_alpha_fallback: bool = False,
 ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, float]]:
     """Run the C2A SiO yield slice and return the golden-file report."""
 
@@ -909,6 +918,7 @@ def build_sio_yield_report(
         additives_kg=additives_kg,
         engines={"vapor_pressure": "builtin-antoine"},
         allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         force_builtin_vapor_pressure=True,
         setpoints_overrides=setpoints_overrides,
     )

@@ -60,6 +60,30 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, f
     return alpha_by_species
 
 
+def _load_evaporation_alpha_envelope_by_species(
+    vapor_pressure_data: dict,
+) -> dict[str, tuple[float, float]]:
+    """Load per-species alpha envelopes for flux uncertainty diagnostics."""
+
+    envelope_by_species: dict[str, tuple[float, float]] = {}
+    for group_name in _EVAPORATION_ALPHA_GROUPS:
+        group = vapor_pressure_data.get(group_name, {}) or {}
+        for species, species_data in group.items():
+            if not isinstance(species_data, dict):
+                continue
+            alpha_data = species_data.get("evaporation_alpha") or {}
+            if not isinstance(alpha_data, dict):
+                continue
+            envelope = alpha_data.get("envelope") or ()
+            if not isinstance(envelope, (list, tuple)) or len(envelope) != 2:
+                continue
+            envelope_by_species[species] = (
+                float(envelope[0]),
+                float(envelope[1]),
+            )
+    return envelope_by_species
+
+
 class EvaporationMixin:
     def _calculate_evaporation(self, equilibrium) -> EvaporationFlux:
         """
@@ -140,6 +164,9 @@ class EvaporationMixin:
         # The dispatch-only helper centralises melt-derived T/P plumbing
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
+        kernel_config = dict(
+            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+        )
         kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
             control_inputs={
@@ -155,9 +182,23 @@ class EvaporationMixin:
                 'alpha': _load_evaporation_alpha_by_species(
                     self.vapor_pressures
                 ),
+                'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
+                    self.vapor_pressures
+                ),
+                'allow_unmeasured_alpha_fallback': bool(
+                    kernel_config.get('allow_unmeasured_alpha_fallback', False)
+                ),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._last_evaporation_flux_diagnostic = diagnostic
+        if str(kernel_result.status) != 'ok' and 'missing_alpha' in diagnostic:
+            missing = ', '.join(sorted(diagnostic['missing_alpha']))
+            raise ProviderUnavailableError(
+                "missing evaporation_alpha for sampled species: "
+                f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
+                "for alpha=1.0 prototype fallback"
+            )
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():

@@ -361,6 +361,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
+        self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._rump_expectation_warnings: list[str] = []
 
         # --- Current state ---
