@@ -4,8 +4,9 @@ First third-party adapter promoted to the kernel plane (goal #8
 ``ALPHAMELTS-DIAGNOSTIC-GATE``). The provider:
 
 - declares the AlphaMELTS silicate diagnostic intent set
-  (``SILICATE_LIQUIDUS``, ``SILICATE_EQUILIBRIUM``, and
-  ``EQUILIBRIUM_CRYSTALLIZATION``),
+  (``SILICATE_LIQUIDUS``, ``SILICATE_EQUILIBRIUM``,
+  ``EQUILIBRIUM_CRYSTALLIZATION``, and
+  ``GATE_LIQUID_FRACTION``),
 - declares ``process.cleaned_melt`` as its sole accessible account; the
   kernel filter drops every other account before dispatch (checklist
   item 4),
@@ -75,12 +76,13 @@ from simulator.melt_backend.liquidus import (
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
-# only SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM; EC needs residual liquid
-# composition, so it remains AlphaMELTS-only.
+# only SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM; the gate intent consumes
+# the same EC liquid-fraction table when AlphaMELTS is available.
 _INTENTS = frozenset({
     ChemistryIntent.SILICATE_LIQUIDUS,
     ChemistryIntent.SILICATE_EQUILIBRIUM,
     ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ChemistryIntent.GATE_LIQUID_FRACTION,
 })
 
 # Sole declared account: silicate-oxide melt (binding-spec §7 isolation).
@@ -159,7 +161,8 @@ class AlphaMELTSProvider(ChemistryProvider):
                     'reason': (
                         'AlphaMELTSProvider serves SILICATE_LIQUIDUS + '
                         'SILICATE_EQUILIBRIUM + '
-                        'EQUILIBRIUM_CRYSTALLIZATION only'
+                        'EQUILIBRIUM_CRYSTALLIZATION + '
+                        'GATE_LIQUID_FRACTION only'
                     ),
                 },
             )
@@ -224,7 +227,10 @@ class AlphaMELTSProvider(ChemistryProvider):
                 request,
                 composition_mol_by_account=composition_mol_by_account,
             )
-        elif request.intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
+        elif request.intent in (
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        ):
             mode, equilibrium = self._run_equilibrium_crystallization_path(
                 request,
                 composition_mol_by_account=composition_mol_by_account,

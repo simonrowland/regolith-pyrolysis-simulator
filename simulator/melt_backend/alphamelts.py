@@ -70,6 +70,20 @@ PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'reference_chemical_potentials', 'mu0', 'mu0_oxides', 'oxide_mu0',
 }
 GAS_CONSTANT_J_PER_MOL_K = 8.31446261815324
+ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
+    'Na': ('Na', 'Na2O', 'NaAlSi3O8'),
+    'K': ('K', 'K2O', 'KAlSi3O8'),
+    'Mg': ('Mg', 'MgO', 'Mg2SiO4', 'MgSiO3'),
+    'Fe': ('Fe', 'FeO', 'Fe2SiO4', 'FeSiO3'),
+    'Ca': ('Ca', 'CaO', 'CaSiO3', 'CaMgSi2O6', 'CaAl2Si2O8'),
+    'Al': ('Al', 'Al2O3', 'CaAl2Si2O8', 'NaAlSi3O8', 'KAlSi3O8'),
+    'Si': ('Si', 'SiO2', 'CaSiO3', 'Mg2SiO4', 'MgSiO3'),
+    'SiO': ('SiO', 'SiO2', 'CaSiO3', 'Mg2SiO4', 'MgSiO3'),
+    'Ti': ('Ti', 'TiO2'),
+    'Cr': ('Cr', 'Cr2O3', 'CrO2'),
+    'CrO2': ('CrO2', 'Cr2O3'),
+    'Mn': ('Mn', 'MnO'),
+}
 
 
 def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
@@ -1555,11 +1569,11 @@ class AlphaMELTSBackend(MeltBackend):
             return {}
         T_K = float(T_C) + 273.15
         pressures: Dict[str, float] = {}
-        for species, raw_activity in activities.items():
-            if not self._is_number(raw_activity):
+        for species, spec in table.items():
+            raw_activity = self._activity_for_vapor_species(species, activities)
+            if raw_activity is None:
                 continue
-            spec = table.get(str(species))
-            if not spec:
+            if not self._is_number(raw_activity):
                 continue
             coeffs = spec.get('antoine') or {}
             if not all(key in coeffs for key in ('A', 'B', 'C')):
@@ -1572,6 +1586,16 @@ class AlphaMELTSBackend(MeltBackend):
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
         return pressures
+
+    @staticmethod
+    def _activity_for_vapor_species(species: str, activities: dict) -> Optional[float]:
+        # ThermoEngine reports liquid oxide/endmember activities, not vapor
+        # species activities. Direct vapor keys win; mapped oxide/endmember
+        # keys are proxy activities for this non-authoritative fallback.
+        for key in ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(str(species), (str(species),)):
+            if key in activities:
+                return activities[key]
+        return None
 
     def _load_vapor_pressure_table(self) -> dict:
         if self._vapor_pressure_table is not None:

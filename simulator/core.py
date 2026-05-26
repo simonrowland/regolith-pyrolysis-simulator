@@ -846,15 +846,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the trace.
         self._register_magemin_shadow_if_available()
 
-        # Goal #10: thread the per-intent fallback opt-in into the
-        # kernel so ``ChemistryKernel.dispatch`` knows when to retry the
-        # builtin Antoine fallback after a VapoRock
-        # ``ProviderUnavailableError``.  The default (flag absent /
-        # False) keeps silent fallback forbidden.
+        # Goal #10 and FG4: thread per-intent fallback opt-ins into the
+        # kernel. VAPOR_PRESSURE fallback stays config-gated; the freeze
+        # gate's scalar liquid-fraction intent opts into its explicit
+        # MAGEMin fallback slot because that intent exists only to answer
+        # the gate's narrow liquid_fraction(T) question.
+        allow_fallback = {ChemistryIntent.GATE_LIQUID_FRACTION}
+        if self._allow_fallback_vapor:
+            allow_fallback.add(ChemistryIntent.VAPOR_PRESSURE)
         allow_fallback_intents: frozenset[ChemistryIntent] = frozenset(
-            (ChemistryIntent.VAPOR_PRESSURE,)
-            if self._allow_fallback_vapor
-            else ()
+            allow_fallback
         )
 
         return ChemistryKernel(
@@ -965,6 +966,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if cls.__name__ == 'AlphaMELTSBackend':
                 return True
         return False
+
+    def _register_freeze_gate_liquid_fraction_providers(self) -> None:
+        """Register providers for the freeze gate scalar intent on demand."""
+        if self._is_alphamelts_backend(self.backend):
+            from engines.alphamelts import AlphaMELTSProvider
+
+            self._chem_registry.register_idempotent(
+                AlphaMELTSProvider(backend=self.backend),
+                [ChemistryIntent.GATE_LIQUID_FRACTION],
+            )
+        from engines.magemin import MAGEMinShadowProvider
+
+        provider = MAGEMinShadowProvider()
+        self._chem_registry.register_idempotent(
+            provider,
+            [ChemistryIntent.GATE_LIQUID_FRACTION],
+            fallback=True,
+        )
 
     def _register_magemin_shadow_if_available(self) -> None:
         """Register MAGEMinShadowProvider as a kernel shadow when possible.

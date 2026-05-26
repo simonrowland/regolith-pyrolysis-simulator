@@ -524,6 +524,28 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     assert pressures['K'] > 0.0
 
 
+def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
+    backend = AlphaMELTSBackend()
+
+    pressures = backend._activities_times_antoine(
+        1600.0,
+        {
+            'SiO2': 0.4,
+            'Na2O': 0.2,
+            'KAlSi3O8': 0.1,
+            'CaSiO3': 0.3,
+            'Mg2SiO4': 0.5,
+            'Al2O3': 0.6,
+        },
+        {'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+    )
+
+    assert {'Na', 'K', 'Si', 'SiO', 'Ca', 'Mg', 'Al'} <= set(pressures)
+    assert all(pressures[species] > 0.0 for species in (
+        'Na', 'K', 'Si', 'SiO', 'Ca', 'Mg', 'Al',
+    ))
+
+
 def test_activities_times_antoine_returns_empty_without_species_activity():
     backend = AlphaMELTSBackend()
 

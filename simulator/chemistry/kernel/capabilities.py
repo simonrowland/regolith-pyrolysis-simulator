@@ -24,6 +24,7 @@ class ChemistryIntent(str, Enum):
     SILICATE_LIQUIDUS = "silicate_liquidus"
     SILICATE_EQUILIBRIUM = "silicate_equilibrium"
     EQUILIBRIUM_CRYSTALLIZATION = "equilibrium_crystallization"
+    GATE_LIQUID_FRACTION = "gate_liquid_fraction"
     FRACTIONAL_CRYSTALLIZATION = "fractional_crystallization"
     DECOMPRESSION_PATH = "decompression_path"
     VAPOR_PRESSURE = "vapor_pressure"

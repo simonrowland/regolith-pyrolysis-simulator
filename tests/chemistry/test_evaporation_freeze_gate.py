@@ -20,7 +20,7 @@ from tests.chemistry.conftest import _build_sim
 _CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
 
 
-class _FakeMAGEMinShadowLiquidusProvider(ChemistryProvider):
+class _FakeMAGEMinGateFallbackProvider(ChemistryProvider):
     name = 'magemin-shadow'
 
     def __init__(self, *, status: str = 'ok') -> None:
@@ -33,26 +33,29 @@ class _FakeMAGEMinShadowLiquidusProvider(ChemistryProvider):
             intents=frozenset({
                 ChemistryIntent.SILICATE_LIQUIDUS,
                 ChemistryIntent.SILICATE_EQUILIBRIUM,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
             }),
-            is_authoritative_for=frozenset(),
+            is_authoritative_for=frozenset({
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+            }),
             declared_accounts=frozenset({_CLEANED_MELT_ACCOUNT}),
         )
 
     def dispatch(self, request) -> IntentResult:
         self.requests.append(request)
-        assert request.intent is ChemistryIntent.SILICATE_LIQUIDUS
+        assert request.intent is ChemistryIntent.GATE_LIQUID_FRACTION
         assert _CLEANED_MELT_ACCOUNT in request.account_view.accounts
         assert request.account_view.accounts[_CLEANED_MELT_ACCOUNT]
         if self.status != 'ok':
             return IntentResult(
-                intent=ChemistryIntent.SILICATE_LIQUIDUS,
+                intent=ChemistryIntent.GATE_LIQUID_FRACTION,
                 status=self.status,
                 transition=None,
                 diagnostic={'backend_status': self.status},
                 warnings=('MAGEMin unavailable in test',),
             )
         return IntentResult(
-            intent=ChemistryIntent.SILICATE_LIQUIDUS,
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
             status='ok',
             transition=None,
             diagnostic={
@@ -61,6 +64,27 @@ class _FakeMAGEMinShadowLiquidusProvider(ChemistryProvider):
                 'liquidus_T_C': 1300.0,
             },
         )
+
+
+class _UnavailableGateProvider(ChemistryProvider):
+    name = 'alphamelts-gate-unavailable'
+
+    def __init__(self) -> None:
+        self.requests = []
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id='alphamelts-gate-unavailable',
+            intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
+            is_authoritative_for=frozenset({
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+            }),
+            declared_accounts=frozenset({_CLEANED_MELT_ACCOUNT}),
+        )
+
+    def dispatch(self, request) -> IntentResult:
+        self.requests.append(request)
+        raise ProviderUnavailableError('AlphaMELTS gate unavailable in test')
 
 
 def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
@@ -134,16 +158,16 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         setpoints_data,
         enabled=True,
     )
-    ec_calls = 0
+    gate_calls = 0
 
     def fake_dispatch(intent, *args, **kwargs):
-        nonlocal ec_calls
+        nonlocal gate_calls
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
-        if intent is ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
-            ec_calls += 1
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls += 1
             return SimpleNamespace(
                 status='ok',
                 diagnostic={
@@ -172,11 +196,65 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     assert rates == pytest.approx([0.0, 5.0, 10.0])
     assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
-    assert ec_calls == 1
+    assert gate_calls == 1
     assert sim._freeze_gate_cache_rebuild_count == 1
     assert sim._last_freeze_gate_diagnostic['source'] == (
-        'equilibrium_crystallization'
+        'gate_liquid_fraction'
     )
+
+
+def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1150.0
+    sim.backend.find_liquidus_solidus = None
+    expected_fO2 = sim._compute_intrinsic_melt_fO2()
+    captured = []
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+            )
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            captured.append((intent, kwargs))
+            return SimpleNamespace(
+                status='unavailable',
+                diagnostic={'backend_status': 'unavailable'},
+            )
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            captured.append((intent, kwargs))
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                },
+            )
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    flux = sim._calculate_evaporation(_equilibrium())
+
+    assert flux.species_kg_hr['Na'] == pytest.approx(5.0)
+    assert [intent for intent, _ in captured] == [
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        ChemistryIntent.SILICATE_LIQUIDUS,
+    ]
+    for _, kwargs in captured:
+        assert kwargs['fO2_log'] == expected_fO2
+        assert kwargs['fe_redox_policy'] == 'intrinsic'
 
 
 def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
@@ -192,20 +270,17 @@ def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
         enabled=True,
     )
     sim.melt.temperature_C = 1150.0
-    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
-    shadow = _FakeMAGEMinShadowLiquidusProvider(status='unavailable')
-    monkeypatch.setattr(
-        'engines.magemin.MAGEMinShadowProvider',
-        lambda: shadow,
-    )
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
-        if intent is ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
-            raise ProviderUnavailableError('EC provider absent')
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(
+                status='unavailable',
+                diagnostic={'backend_status': 'unavailable'},
+            )
         raise AssertionError(f'unexpected dispatch: {intent}')
 
     def fake_liquidus_finder(**kwargs):
@@ -245,14 +320,7 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
         enabled=True,
     )
     sim.melt.temperature_C = 1150.0
-    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
-    # Block the gate's lazy MAGEMin-shadow re-registration too, so "no engine"
-    # is faithfully simulated regardless of whether a real MAGEMin binary is
-    # present in the test environment (it is in MAIN, absent in worktrees/CI).
-    monkeypatch.setattr(
-        'engines.magemin.MAGEMinShadowProvider',
-        lambda: _FakeMAGEMinShadowLiquidusProvider(status='unavailable'),
-    )
+    sim.backend.find_liquidus_solidus = None
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
@@ -265,13 +333,13 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
     with pytest.raises(RuntimeError, match='freeze_gate.enabled requires') as exc:
         sim._calculate_evaporation(_equilibrium())
-    assert 'MAGEMin shadow unavailable' in str(exc.value)
+    assert 'gate_liquid_fraction provider absent' in str(exc.value)
     assert 'no liquidus engine produced usable solidus/liquidus bounds' in str(
         exc.value
     )
 
 
-def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
+def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -283,19 +351,27 @@ def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
         setpoints_data,
         enabled=True,
     )
-    shadow = _FakeMAGEMinShadowLiquidusProvider()
-    sim._chem_registry._shadows[ChemistryIntent.SILICATE_LIQUIDUS] = []
+    authoritative = _UnavailableGateProvider()
+    fallback = _FakeMAGEMinGateFallbackProvider()
+    sim._chem_registry._authoritative[
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ] = authoritative
+    sim._chem_registry._fallback[
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ] = fallback
     monkeypatch.setattr(
-        'engines.magemin.MAGEMinShadowProvider',
-        lambda: shadow,
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
     )
+    original_dispatch = sim._dispatch_only
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
-        raise ProviderUnavailableError(f'{intent.value} provider absent')
+        return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
@@ -306,13 +382,15 @@ def test_freeze_gate_enabled_reaches_magemin_shadow_liquidus(
         rates.append(flux.species_kg_hr.get('Na', 0.0))
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
-    assert len(shadow.requests) == 1
-    assert shadow.requests[0].account_view.accounts[_CLEANED_MELT_ACCOUNT]
-    assert shadow.requests[0].pressure_bar == pytest.approx(
+    assert len(authoritative.requests) == 1
+    assert len(fallback.requests) == 1
+    assert fallback.requests[0].intent is ChemistryIntent.GATE_LIQUID_FRACTION
+    assert fallback.requests[0].account_view.accounts[_CLEANED_MELT_ACCOUNT]
+    assert fallback.requests[0].pressure_bar == pytest.approx(
         float(sim.melt.p_total_mbar) / 1000.0,
     )
     assert sim._last_freeze_gate_diagnostic['source'] == (
-        'liquidus_solidus:magemin-shadow'
+        'gate_liquid_fraction:fallback:magemin-shadow'
     )
 
 
@@ -331,16 +409,16 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = 1600.0
     original_dispatch = sim._dispatch_only
-    ec_calls = 0
+    gate_calls = 0
 
     def fake_dispatch(intent, *args, **kwargs):
-        nonlocal ec_calls
+        nonlocal gate_calls
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
             )
-        if intent is ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
-            ec_calls += 1
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls += 1
             return SimpleNamespace(
                 status='ok',
                 diagnostic={
@@ -370,7 +448,35 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
 
     cache_rebuild_count = sim._freeze_gate_cache_rebuild_count
     assert cache_rebuild_count <= 2
-    assert ec_calls == cache_rebuild_count
+    assert gate_calls == cache_rebuild_count
     assert len(set(cache_ids)) <= 2
     assert factors == [1.0] * 10
     assert max(balance_errors) <= 5e-12
+
+
+def test_freeze_gate_cache_key_includes_pressure_and_fo2(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+
+    baseline = sim._freeze_gate_cache_key(pressure_bar=1.00, fO2_log=-9.0)
+    same = sim._freeze_gate_cache_key(pressure_bar=1.004, fO2_log=-9.04)
+    different_pressure = sim._freeze_gate_cache_key(
+        pressure_bar=1.02,
+        fO2_log=-9.0,
+    )
+    different_fO2 = sim._freeze_gate_cache_key(
+        pressure_bar=1.00,
+        fO2_log=-8.9,
+    )
+
+    assert same == baseline
+    assert different_pressure != baseline
+    assert different_fO2 != baseline

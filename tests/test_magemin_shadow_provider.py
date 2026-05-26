@@ -12,7 +12,7 @@ These tests cover:
 - :class:`MAGEMinParityComparator.compare` returns ``agreement=False``
   with a warning for a synthetic 100 K liquidus delta.
 - :class:`MAGEMinShadowProvider.capability_profile` declares shadow
-  intent surface (empty ``is_authoritative_for``).
+  intent surface plus the gate fallback authority.
 - :class:`MAGEMinShadowProvider.dispatch` is now wired through the
   kernel; the writer-purity contract (transition=None always) is
   enforced by tests at the dispatch level.
@@ -256,18 +256,22 @@ def test_provider_capability_profile_declares_silicate_intent_set():
     assert profile.intents == frozenset({
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
     })
 
 
-def test_provider_capability_profile_has_no_authoritative_intents():
-    """Goal #9 binds this -- MAGEMin is shadow-only, forever."""
+def test_provider_capability_profile_authority_limited_to_gate_intent():
+    """MAGEMin stays shadow-only for full silicate-state intents."""
     profile = MAGEMinShadowProvider().capability_profile()
-    assert profile.is_authoritative_for == frozenset()
+    assert profile.is_authoritative_for == frozenset({
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    })
     for intent in (
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
     ):
         assert not profile.is_authoritative(intent)
+    assert profile.is_authoritative(ChemistryIntent.GATE_LIQUID_FRACTION)
 
 
 def test_provider_declares_only_cleaned_melt_account():
@@ -275,13 +279,14 @@ def test_provider_declares_only_cleaned_melt_account():
     assert profile.declared_accounts == frozenset({'process.cleaned_melt'})
 
 
-def test_provider_does_not_declare_non_silicate_intents():
-    """Defence in depth: only the two silicate intents are dispatchable."""
+def test_provider_does_not_declare_unrelated_intents():
+    """Defence in depth: only silicate shadows plus gate fallback dispatch."""
     profile = MAGEMinShadowProvider().capability_profile()
     for intent in ChemistryIntent:
         if intent in (
             ChemistryIntent.SILICATE_LIQUIDUS,
             ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
         ):
             assert profile.can_dispatch(intent)
         else:
