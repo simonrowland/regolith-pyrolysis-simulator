@@ -1,17 +1,16 @@
 """Writer-purity invariant: only the kernel writes the AtomLedger.
 
 After ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) all chemistry-transition
-ledger writes flow through :meth:`ChemistryKernel.commit_batch`.  The
-finite-headspace pO2 migration moved terminal routing into the
-OVERHEAD_BLEED provider, so the only remaining simulator-side exemption is
-the backend-equilibrium transition.
+ledger writes flow through :meth:`ChemistryKernel.commit_batch`.  The only
+remaining simulator-side exemptions are seed-time ``load_external`` calls,
+the backend-equilibrium transition, and the atom-balanced reagent shuttle.
 
 The audit walks every Python module under ``simulator/`` excluding
 ``simulator/chemistry/kernel/`` (which IS the writer the kernel uses
 internally) and ``simulator/melt_backend/`` (the backend ABC owns its
-own ledger plumbing).  Every ``atom_ledger.apply(...)`` reference is
-checked against the whitelist; any unwhitelisted writer fails the
-test.
+own ledger plumbing).  Every direct ``atom_ledger`` writer reference is
+checked against the seed-time rule or the whitelist; any unwhitelisted
+writer fails the test.
 
 The whitelist below mirrors the F-A2 ``# WRITER-EXEMPT:`` comments in
 ``simulator/core.py``.  Each entry is ``(module path, AST node line)``
@@ -48,6 +47,26 @@ _EXEMPT_SUBDIRS = (
 #
 _WRITER_EXEMPT_CALLS = (
     ("simulator/core.py", "backend-equilibrium"),
+    # _move_ledger_species: atom-balanced reagent shuttle between accounts.
+    ("simulator/extraction.py", "shuttle-reagent-move"),
+)
+
+_ATOM_LEDGER_WRITER_METHODS = (
+    "apply",
+    "load_external",
+    "move",
+    "transfer",
+)
+
+# ``load_external`` is legitimate only while constructing the per-batch
+# ledger from already-computed inventory projections.  These helpers are
+# invoked from ``_seed_atom_ledger``; post-init direct loads must fail loud.
+_SEED_LOAD_EXTERNAL_CONTEXTS = (
+    ("simulator/core.py", "_load_ledger_account"),
+    ("simulator/core.py", "_record_stage0_carbon_cleanup_transitions"),
+    ("simulator/core.py", "_record_stage0_oxidation_transitions"),
+    ("simulator/core.py", "_record_stage0_perchlorate_cleanup_transitions"),
+    ("simulator/core.py", "_seed_atom_ledger"),
 )
 
 
@@ -68,26 +87,59 @@ def _iter_python_files() -> list[Path]:
     return sorted(files)
 
 
-def _find_apply_calls(tree: ast.AST) -> list[ast.Call]:
-    """Return every ``<...>.atom_ledger.apply(...)`` call node."""
+def _parent_map(tree: ast.AST) -> dict[ast.AST, ast.AST]:
+    parents: dict[ast.AST, ast.AST] = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            parents[child] = parent
+    return parents
 
-    calls: list[ast.Call] = []
+
+def _enclosing_function_name(
+    parents: dict[ast.AST, ast.AST], node: ast.AST
+) -> str | None:
+    current = node
+    while current in parents:
+        current = parents[current]
+        if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            return current.name
+    return None
+
+
+def _is_seed_load_external_call(
+    path: Path, parents: dict[ast.AST, ast.AST], node: ast.AST
+) -> bool:
+    context = _enclosing_function_name(parents, node)
+    return (_normalise(path), context) in _SEED_LOAD_EXTERNAL_CONTEXTS
+
+
+def _find_atom_ledger_writer_calls(
+    path: Path, tree: ast.AST
+) -> list[tuple[ast.Call, str]]:
+    """Return every non-seed ``<...>.atom_ledger.<writer>(...)`` call."""
+
+    parents = _parent_map(tree)
+    calls: list[tuple[ast.Call, str]] = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
         func = node.func
         if not isinstance(func, ast.Attribute):
             continue
-        if func.attr != "apply":
+        if func.attr not in _ATOM_LEDGER_WRITER_METHODS:
             continue
-        # ``<expr>.atom_ledger.apply(...)`` -- the receiver of ``.apply``
-        # must itself be ``<expr>.atom_ledger``.
+        # ``<expr>.atom_ledger.apply(...)`` -- the receiver of the writer
+        # method must itself be ``<expr>.atom_ledger``.
         receiver = func.value
         if not isinstance(receiver, ast.Attribute):
             continue
         if receiver.attr != "atom_ledger":
             continue
-        calls.append(node)
+        if func.attr == "load_external" and _is_seed_load_external_call(
+            path, parents, node
+        ):
+            continue
+        calls.append((node, func.attr))
     return calls
 
 
@@ -113,8 +165,8 @@ def _normalise(module_path: Path) -> str:
     return str(module_path.relative_to(_REPO_ROOT))
 
 
-def test_atom_ledger_apply_writers_are_all_whitelisted():
-    """Every ``atom_ledger.apply`` site outside ``simulator/chemistry/
+def test_atom_ledger_direct_writers_are_all_whitelisted():
+    """Every direct ``atom_ledger`` writer outside ``simulator/chemistry/
     kernel/`` and ``simulator/melt_backend/`` must be:
 
       1. listed in :data:`_WRITER_EXEMPT_CALLS` (with a description that
@@ -130,29 +182,30 @@ def test_atom_ledger_apply_writers_are_all_whitelisted():
     new terminal-routing move).
     """
 
-    found: list[tuple[str, int, str]] = []
+    found: list[tuple[str, int, str, str]] = []
     for path in _iter_python_files():
         source = path.read_text()
         tree = ast.parse(source, filename=str(path))
-        calls = _find_apply_calls(tree)
+        calls = _find_atom_ledger_writer_calls(path, tree)
         if not calls:
             continue
         source_lines = source.splitlines()
-        for call in calls:
+        for call, method in calls:
             ok, marker = _has_writer_exempt_marker(
                 source_lines, call.lineno
             )
             assert ok, (
-                f"unwhitelisted atom_ledger.apply at "
+                f"unwhitelisted atom_ledger.{method} at "
                 f"{_normalise(path)}:{call.lineno} -- new chemistry "
                 "ledger writes MUST go through "
-                "ChemistryKernel.commit_batch.  If this is a non-"
-                "chemistry terminal-routing move, add a "
+                "ChemistryKernel.commit_batch.  load_external is only "
+                "allowed for seed-time bulk loads.  If this is a non-"
+                "chemistry atom-balanced account move, add a "
                 "'# WRITER-EXEMPT: ...' comment AND a whitelist entry "
                 "in tests/chemistry/test_writer_purity.py."
             )
             assert marker is not None
-            found.append((_normalise(path), call.lineno, marker))
+            found.append((_normalise(path), call.lineno, method, marker))
 
     # Each whitelist entry must be backed by at least one actual call
     # site whose marker contains the expected substring.  Catches the
@@ -161,7 +214,7 @@ def test_atom_ledger_apply_writers_are_all_whitelisted():
     for module_path, expected_marker_substring in _WRITER_EXEMPT_CALLS:
         matches = [
             (path, lineno)
-            for (path, lineno, marker) in found
+            for (path, lineno, _method, marker) in found
             if path == module_path
             and expected_marker_substring in marker
         ]
