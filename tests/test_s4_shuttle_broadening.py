@@ -112,7 +112,7 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced():
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
-def test_na_cr_stage_preserves_existing_cr_ti_priority():
+def test_na_cr_stage_refuses_cr_ti_with_negative_margins():
     sim = _build_provider_sim()
     provider = BuiltinMetallothermicStepProvider()
     view = ProviderAccountView(
@@ -142,14 +142,15 @@ def test_na_cr_stage_preserves_existing_cr_ti_priority():
     result = provider.dispatch(request)
     proposal = result.transition
 
-    assert proposal is not None
+    assert result.status == "refused"
+    assert proposal is None
     assert result.diagnostic["target_stage"] == "cr_ti"
     assert result.diagnostic["target_priority"] == ["Cr2O3", "TiO2"]
-    assert "FeO" not in proposal.debits["process.cleaned_melt"]
-    assert "Fe" not in proposal.credits["process.metal_phase"]
-    assert proposal.debits["process.cleaned_melt"]["Cr2O3"] > 0.0
-    assert proposal.debits["process.cleaned_melt"]["TiO2"] > 0.0
-    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+    assert result.diagnostic["accepted_targets"] == []
+    refused = result.diagnostic["refused_targets"]
+    assert set(refused) == {"Cr2O3", "TiO2"}
+    assert refused["Cr2O3"]["margin_kJ_per_mol_O2"] < 0.0
+    assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
 
 
 def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():

@@ -370,7 +370,45 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 # ---------------------------------------------------------------------------
 
 
-def test_c3_k_shuttle_matches_legacy_stoich(
+def test_reduction_margin_kj_per_mol_o2_uses_ellingham_difference():
+    provider = BuiltinMetallothermicStepProvider()
+
+    margin = provider._reduction_margin_kj_per_mol_o2("Na", "FeO", 1150.0)
+
+    assert margin == pytest.approx(33.9, abs=0.1)
+
+
+def test_crossover_temperature_C_reports_physical_roots_only():
+    provider = BuiltinMetallothermicStepProvider()
+
+    assert provider._crossover_temperature_C("K", "Fe") == pytest.approx(
+        1215.9,
+        abs=0.1,
+    )
+    assert provider._crossover_temperature_C("Na", "Ti") is None
+
+
+def test_refused_result_has_policy_refusal_shape():
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider._refused_result(
+        "thermodynamic_margin_nonpositive",
+        reductant="K",
+        target_oxide="FeO",
+        temperature_C=1275.0,
+        margin_kJ_per_mol_O2=-8.1,
+        crossover_temperature_C=1215.9,
+        control_audit=None,
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "thermodynamic_margin_nonpositive"
+    assert result.diagnostic["target_oxide"] == "FeO"
+    assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
+
+
+def test_c3_k_shuttle_accepts_low_temperature_feo_and_matches_legacy_stoich(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Drive the provider with a pure-FeO melt + K reagent inventory at
@@ -410,7 +448,7 @@ def test_c3_k_shuttle_matches_legacy_stoich(
     request = IntentRequest(
         intent=ChemistryIntent.METALLOTHERMIC_STEP,
         account_view=view,
-        temperature_C=1300.0,
+        temperature_C=1150.0,
         pressure_bar=1e-6,
         control_inputs={
             "reaction_family": REACTION_FAMILY_C3_K,
@@ -420,6 +458,7 @@ def test_c3_k_shuttle_matches_legacy_stoich(
     )
     result = provider.dispatch(request)
     proposal = result.transition
+    assert result.status == "ok"
     assert proposal is not None
     assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_K
 
@@ -459,15 +498,84 @@ def test_c3_k_shuttle_matches_legacy_stoich(
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
 
 
-def test_c3_na_shuttle_combined_cr_ti_matches_legacy_stoich(
+@pytest.mark.parametrize("temperature_C", [1275.0, 1300.0])
+def test_c3_k_shuttle_refuses_feo_above_crossover(
+    temperature_C, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    FeO_kg = 100.0
+    FeO_mol = FeO_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": FeO_mol},
+            "process.metal_phase": {},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=view,
+        temperature_C=temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_K,
+            "reagent_available_kg": 30.0,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["target_oxide"] == "FeO"
+    assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
+
+
+def test_shuttle_refuses_K_FeO_above_crossover_via_kernel(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Drive the provider with a Cr2O3 + TiO2 melt + Na reagent.  The
-    Na shuttle should reduce Cr2O3 first (priority by ΔG°f), then any
-    leftover Na hits TiO2 with the 0.75 accessibility factor.  The
-    provider's atom-balanced proposal must sum the two reactions
-    exactly the same way the legacy code recorded them as two
-    successive transitions.
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": 100.0 / (MOLAR_MASS["FeO"] / 1000.0)},
+        source="test seed",
+    )
+
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.METALLOTHERMIC_STEP,
+        temperature_C=1275.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_K,
+            "reagent_available_kg": 30.0,
+            "dt_hr": 1.0,
+        },
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["target_oxide"] == "FeO"
+    assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
+
+
+def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Cr/Ti remain ordered for diagnostics, but both are refused at C3 T.
     """
 
     sim = _build_sim(
@@ -510,60 +618,16 @@ def test_c3_na_shuttle_combined_cr_ti_matches_legacy_stoich(
     )
     result = provider.dispatch(request)
     proposal = result.transition
-    assert proposal is not None
+    assert result.status == "refused"
+    assert proposal is None
     assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_NA
-
-    # Legacy re-derivation, line-for-line. total_kg, Na2O current pct
-    # both 0; Na2O_max_kg = 0.10 * total_kg.  K_for_Na2O_limit dominates
-    # only when total_kg is small (here = 50 kg -> 5 kg Na2O -> ~3.4
-    # kg Na). Na_inject = min(10 kg / 1 hr, 3.4 kg) = 3.4 kg.
-    total_kg = Cr2O3_kg + TiO2_kg
-    Na2O_max_kg = total_kg * 0.10
-    Na_for_Na2O_limit = Na2O_max_kg * (
-        2 * MOLAR_MASS["Na"] / MOLAR_MASS["Na2O"]
-    )
-    Na_inject_legacy = min(Na_reagent_kg / 3.0, Na_for_Na2O_limit)
-    mol_Na_initial = Na_inject_legacy / MOLAR_MASS["Na"] * 1000.0
-
-    # Reaction 1: 6 Na + Cr2O3 -> 3 Na2O + 2 Cr.
-    mol_Cr2O3_available = Cr2O3_kg / MOLAR_MASS["Cr2O3"] * 1000.0
-    mol_Cr2O3_reduced = min(mol_Na_initial / 6.0, mol_Cr2O3_available)
-    mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
-    mol_Na_after_Cr = mol_Na_initial - mol_Na_for_Cr
-
-    # Reaction 2: 4 Na + TiO2 -> 2 Na2O + Ti (0.75 accessibility).
-    mol_TiO2_total = TiO2_kg / MOLAR_MASS["TiO2"] * 1000.0
-    mol_TiO2_accessible = mol_TiO2_total * 0.75
-    mol_TiO2_reduced = min(
-        mol_Na_after_Cr / 4.0, mol_TiO2_accessible
-    )
-    mol_Na_for_Ti = mol_TiO2_reduced * 4.0
-
-    expected_Na_total = mol_Na_for_Cr + mol_Na_for_Ti
-    expected_Na2O_total = mol_Cr2O3_reduced * 3.0 + mol_TiO2_reduced * 2.0
-    expected_Cr_total = mol_Cr2O3_reduced * 2.0
-    expected_Ti_total = mol_TiO2_reduced
-
-    assert proposal.debits["process.reagent_inventory"]["Na"] == pytest.approx(
-        expected_Na_total, abs=1e-12, rel=1e-12
-    )
-    assert proposal.debits["process.cleaned_melt"]["Cr2O3"] == pytest.approx(
-        mol_Cr2O3_reduced, abs=1e-12, rel=1e-12
-    )
-    assert proposal.debits["process.cleaned_melt"]["TiO2"] == pytest.approx(
-        mol_TiO2_reduced, abs=1e-12, rel=1e-12
-    )
-    assert proposal.credits["process.cleaned_melt"]["Na2O"] == pytest.approx(
-        expected_Na2O_total, abs=1e-12, rel=1e-12
-    )
-    assert proposal.credits["process.metal_phase"]["Cr"] == pytest.approx(
-        expected_Cr_total, abs=1e-12, rel=1e-12
-    )
-    assert proposal.credits["process.metal_phase"]["Ti"] == pytest.approx(
-        expected_Ti_total, abs=1e-12, rel=1e-12
-    )
-
-    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+    assert result.diagnostic["target_stage"] == "cr_ti"
+    assert result.diagnostic["target_priority"] == ["Cr2O3", "TiO2"]
+    assert result.diagnostic["accepted_targets"] == []
+    refused = result.diagnostic["refused_targets"]
+    assert set(refused) == {"Cr2O3", "TiO2"}
+    assert refused["Cr2O3"]["margin_kJ_per_mol_O2"] < 0.0
+    assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
 
 
 def test_c6_mg_thermite_primary_matches_legacy_stoich(

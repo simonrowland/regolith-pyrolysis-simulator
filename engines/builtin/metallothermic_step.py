@@ -153,10 +153,15 @@ NA_STAGE_TARGETS = {
     NA_TARGET_FEO_CLEANUP: ("FeO",),
     NA_TARGET_CR_TI: ("Cr2O3", "TiO2"),
 }
-NA_TARGET_TO_METAL = {
+TARGET_OXIDE_TO_METAL = {
     "FeO": "Fe",
+    "MnO": "Mn",
     "Cr2O3": "Cr",
     "TiO2": "Ti",
+}
+NA_TARGET_TO_METAL = {
+    oxide: TARGET_OXIDE_TO_METAL[oxide]
+    for oxide in ("FeO", "Cr2O3", "TiO2")
 }
 
 
@@ -217,9 +222,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         # Reaction-family early-exit: shared with stage0_pretreatment.py.
         # The metallothermic shuttles run solubility-limit + reagent-mass
-        # arithmetic only; no fO2 dependency (legacy _shuttle_inject_K /
-        # _shuttle_inject_Na / _step_thermite do not consult fO2 either).
-        # Audit reports T/P verbatim with the diagnostic-only note.
+        # arithmetic behind a temperature-dependent Ellingham acceptance gate.
+        # No fO2 dependency: legacy _shuttle_inject_K / _shuttle_inject_Na /
+        # _step_thermite do not consult fO2 either.
         family_reject = dispatch_reaction_family(
             ChemistryIntent.METALLOTHERMIC_STEP,
             controls,
@@ -253,6 +258,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
+                request.temperature_C,
                 controls,
                 MOLAR_MASS,
                 registry,
@@ -303,6 +309,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_kg: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
         total_kg: float,
+        temperature_C: float,
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
@@ -352,6 +359,22 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if K_inject_kg < 0.001:
             return self._empty_result(
                 "c3_k_shuttle skipped: injection floor (<0.001 kg K)",
+                control_audit=control_audit,
+            )
+
+        margin = self._reduction_margin_kj_per_mol_o2(
+            "K",
+            "FeO",
+            temperature_C,
+        )
+        if margin <= 0.0:
+            return self._refused_result(
+                "thermodynamic_margin_nonpositive",
+                reductant="K",
+                target_oxide="FeO",
+                temperature_C=temperature_C,
+                margin_kJ_per_mol_O2=margin,
+                crossover_temperature_C=self._crossover_temperature_C("K", "Fe"),
                 control_audit=control_audit,
             )
 
@@ -495,58 +518,117 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         total_Fe_produced_mol = 0.0
         total_Cr_produced_mol = 0.0
         total_Ti_produced_mol = 0.0
+        accepted_targets: list[str] = []
+        refused_targets: dict[str, dict[str, Any]] = {}
 
         for target in target_priority:
             if target == "FeO":
-                if FeO_available_kg > 0.01 and mol_Na > 0.1:
-                    mol_FeO = (
-                        FeO_available_kg / molar_mass["FeO"] * 1000.0
-                    )
-                    mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO)
-                    mol_Na_for_Fe = mol_FeO_reduced * 2.0
-                    mol_Na2O_from_Fe = mol_FeO_reduced
-                    mol_Fe_produced = mol_FeO_reduced
+                if FeO_available_kg <= 0.01 or mol_Na <= 0.1:
+                    continue
+                margin = self._reduction_margin_kj_per_mol_o2(
+                    "Na", target, temperature_C
+                )
+                if margin <= 0.0:
+                    refused_targets[target] = {
+                        "margin_kJ_per_mol_O2": margin,
+                        "crossover_temperature_C": self._crossover_temperature_C(
+                            "Na",
+                            TARGET_OXIDE_TO_METAL[target],
+                        ),
+                    }
+                    continue
 
-                    total_Na_used_mol += mol_Na_for_Fe
-                    total_Na2O_added_mol += mol_Na2O_from_Fe
-                    total_FeO_removed_mol += mol_FeO_reduced
-                    total_Fe_produced_mol += mol_Fe_produced
-                    mol_Na -= mol_Na_for_Fe
+                mol_FeO = FeO_available_kg / molar_mass["FeO"] * 1000.0
+                mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO)
+                mol_Na_for_Fe = mol_FeO_reduced * 2.0
+                mol_Na2O_from_Fe = mol_FeO_reduced
+                mol_Fe_produced = mol_FeO_reduced
+
+                total_Na_used_mol += mol_Na_for_Fe
+                total_Na2O_added_mol += mol_Na2O_from_Fe
+                total_FeO_removed_mol += mol_FeO_reduced
+                total_Fe_produced_mol += mol_Fe_produced
+                mol_Na -= mol_Na_for_Fe
+                accepted_targets.append(target)
             elif target == "Cr2O3":
-                if Cr2O3_available_kg > 0.01 and mol_Na > 0.1:
-                    mol_Cr2O3 = (
-                        Cr2O3_available_kg / molar_mass["Cr2O3"] * 1000.0
-                    )
-                    mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
-                    mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
-                    mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
-                    mol_Cr_produced = mol_Cr2O3_reduced * 2.0
+                if Cr2O3_available_kg <= 0.01 or mol_Na <= 0.1:
+                    continue
+                margin = self._reduction_margin_kj_per_mol_o2(
+                    "Na", target, temperature_C
+                )
+                if margin <= 0.0:
+                    refused_targets[target] = {
+                        "margin_kJ_per_mol_O2": margin,
+                        "crossover_temperature_C": self._crossover_temperature_C(
+                            "Na",
+                            TARGET_OXIDE_TO_METAL[target],
+                        ),
+                    }
+                    continue
 
-                    total_Na_used_mol += mol_Na_for_Cr
-                    total_Na2O_added_mol += mol_Na2O_from_Cr
-                    total_Cr2O3_removed_mol += mol_Cr2O3_reduced
-                    total_Cr_produced_mol += mol_Cr_produced
-                    mol_Na -= mol_Na_for_Cr
+                mol_Cr2O3 = Cr2O3_available_kg / molar_mass["Cr2O3"] * 1000.0
+                mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
+                mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
+                mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
+                mol_Cr_produced = mol_Cr2O3_reduced * 2.0
+
+                total_Na_used_mol += mol_Na_for_Cr
+                total_Na2O_added_mol += mol_Na2O_from_Cr
+                total_Cr2O3_removed_mol += mol_Cr2O3_reduced
+                total_Cr_produced_mol += mol_Cr_produced
+                mol_Na -= mol_Na_for_Cr
+                accepted_targets.append(target)
             elif target == "TiO2":
-                if TiO2_available_kg > 0.01 and mol_Na > 0.1:
-                    mol_TiO2 = (
-                        TiO2_available_kg / molar_mass["TiO2"] * 1000.0
-                    )
-                    mol_TiO2_accessible = mol_TiO2 * self.TI_ACCESSIBILITY
-                    mol_TiO2_reduced = min(
-                        mol_Na / 4.0, mol_TiO2_accessible
-                    )
-                    mol_Na_for_Ti = mol_TiO2_reduced * 4.0
-                    mol_Na2O_from_Ti = mol_TiO2_reduced * 2.0
-                    mol_Ti_produced = mol_TiO2_reduced
+                if TiO2_available_kg <= 0.01 or mol_Na <= 0.1:
+                    continue
+                margin = self._reduction_margin_kj_per_mol_o2(
+                    "Na", target, temperature_C
+                )
+                if margin <= 0.0:
+                    refused_targets[target] = {
+                        "margin_kJ_per_mol_O2": margin,
+                        "crossover_temperature_C": self._crossover_temperature_C(
+                            "Na",
+                            TARGET_OXIDE_TO_METAL[target],
+                        ),
+                    }
+                    continue
 
-                    total_Na_used_mol += mol_Na_for_Ti
-                    total_Na2O_added_mol += mol_Na2O_from_Ti
-                    total_TiO2_removed_mol += mol_TiO2_reduced
-                    total_Ti_produced_mol += mol_Ti_produced
-                    mol_Na -= mol_Na_for_Ti
+                mol_TiO2 = TiO2_available_kg / molar_mass["TiO2"] * 1000.0
+                mol_TiO2_accessible = mol_TiO2 * self.TI_ACCESSIBILITY
+                mol_TiO2_reduced = min(
+                    mol_Na / 4.0, mol_TiO2_accessible
+                )
+                mol_Na_for_Ti = mol_TiO2_reduced * 4.0
+                mol_Na2O_from_Ti = mol_TiO2_reduced * 2.0
+                mol_Ti_produced = mol_TiO2_reduced
+
+                total_Na_used_mol += mol_Na_for_Ti
+                total_Na2O_added_mol += mol_Na2O_from_Ti
+                total_TiO2_removed_mol += mol_TiO2_reduced
+                total_Ti_produced_mol += mol_Ti_produced
+                mol_Na -= mol_Na_for_Ti
+                accepted_targets.append(target)
 
         if total_Na_used_mol <= 0.0:
+            if refused_targets:
+                return IntentResult(
+                    intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                    status="refused",
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic={
+                        "reason_refused": "thermodynamic_margin_nonpositive",
+                        "reaction_family": REACTION_FAMILY_C3_NA,
+                        "target_stage": target_stage,
+                        "target_priority": list(target_priority),
+                        "thermo_priority": list(thermo_audit["priority"]),
+                        "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
+                        "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
+                        "accepted_targets": accepted_targets,
+                        "refused_targets": refused_targets,
+                    },
+                )
             return self._empty_result(
                 "c3_na_shuttle skipped: no oxide accepted Na reduction",
                 control_audit=control_audit,
@@ -619,6 +701,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "thermo_priority": list(thermo_audit["priority"]),
                 "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
                 "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
+                "accepted_targets": accepted_targets,
+                "refused_targets": refused_targets,
                 "reagent_consumed_kg": Na_used_kg,
                 "oxide_reduced_kg": (
                     FeO_removed_kg + Cr2O3_removed_kg + TiO2_removed_kg
@@ -856,6 +940,65 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             transition=None,
             control_audit=control_audit,
             diagnostic={"reason_skipped": reason},
+        )
+
+    @classmethod
+    def _reduction_margin_kj_per_mol_o2(
+        cls,
+        reductant: str,
+        target_oxide: str,
+        temperature_C: float,
+    ) -> float:
+        target_metal = TARGET_OXIDE_TO_METAL[target_oxide]
+        return cls._delta_g_kj_per_mol_o2(
+            target_metal,
+            temperature_C,
+        ) - cls._delta_g_kj_per_mol_o2(reductant, temperature_C)
+
+    @classmethod
+    def _crossover_temperature_C(
+        cls,
+        reductant: str,
+        target_metal: str,
+    ) -> float | None:
+        target_dH, target_dS, _target_n_M, _target_n_ox = _ELLINGHAM_THERMO[
+            target_metal
+        ]
+        reductant_dH, reductant_dS, _red_n_M, _red_n_ox = _ELLINGHAM_THERMO[
+            reductant
+        ]
+        entropy_delta = target_dS - reductant_dS
+        if abs(entropy_delta) <= 1e-12:
+            return None
+        root_K = (target_dH - reductant_dH) / entropy_delta
+        if root_K <= 0.0:
+            return None
+        return root_K - 273.15
+
+    @staticmethod
+    def _refused_result(
+        reason: str,
+        *,
+        reductant: str,
+        target_oxide: str,
+        temperature_C: float,
+        margin_kJ_per_mol_O2: float,
+        crossover_temperature_C: float | None,
+        control_audit=None,
+    ) -> IntentResult:
+        return IntentResult(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            status="refused",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reason_refused": reason,
+                "reductant": reductant,
+                "target_oxide": target_oxide,
+                "temperature_C": float(temperature_C),
+                "margin_kJ_per_mol_O2": float(margin_kJ_per_mol_O2),
+                "crossover_temperature_C": crossover_temperature_C,
+            },
         )
 
     @staticmethod
