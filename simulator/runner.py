@@ -50,6 +50,7 @@ from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
 )
+from simulator.condensation import stage_purity_report
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -471,6 +472,7 @@ class PyrolysisRun:
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
+            "stage_purity_report": stage_purity_report(sim.train),
             "per_hour_summary": per_hour,
             "shadow_trace": shadow_trace,
             "status": status,

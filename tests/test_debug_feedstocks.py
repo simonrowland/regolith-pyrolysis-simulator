@@ -147,5 +147,5 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
         "terminal.oxygen_mre_anode_stored"
     )["O2"]
     assert mre_oxygen == pytest.approx(oxygen_kg)
-    assert sim.train.stages[3].collected_kg["Na"] > 0.0
+    assert sim.train.stages[4].collected_kg["Na"] > 0.0
     sim.atom_ledger.assert_balanced()

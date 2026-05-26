@@ -39,6 +39,7 @@ stderr.
   "schema_version": "1.0.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
+  "stage_purity_report": {...}, // see "Stage purity report"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed",
@@ -121,6 +122,31 @@ schema-shape assertion.
   treat missing keys as 0.0.
 * Every account named by `FLOW_MASS_ACCOUNTS` plus every reservoir
   account ever credited during the run is present.
+
+## Stage purity report
+
+```jsonc
+"stage_purity_report": {
+  "stage_1_fe_condenser": {
+    "stage_number": 1,
+    "label": "Fe Condenser",
+    "accepted_species": ["Fe"],
+    "designated_species_kg": {"Fe": 12.345},
+    "impurity_species_kg": {"SiO2": 0.123},
+    "designated_kg": 12.345,
+    "impurity_kg": 0.123,
+    "total_kg": 12.468,
+    "purity_fraction": 0.9901,
+    "verdict": "PURE" | "MIXED" | "CONTAMINATED",
+    "warning": ""
+  }
+}
+```
+
+* Sourced from `simulator.condensation.stage_purity_report()`.
+* Accepted species come from `simulator/condensation_routing.py`.
+* Verdict thresholds: `PURE` when purity is above 95%, `MIXED`
+  from 80-95%, and `CONTAMINATED` below 80%.
 
 ## Per-hour summary
 

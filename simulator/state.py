@@ -14,6 +14,7 @@ from enum import Enum, auto
 from typing import Dict, List, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.condensation_routing import target_species_for_stage_number
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -331,13 +332,17 @@ class CondensationTrain:
             CondensationStage(0, 'Hot Duct (IR)',
                               (1400, 1600), []),
             CondensationStage(1, 'Fe Condenser',
-                              (1100, 1400), ['Fe']),
+                              (1100, 1400),
+                              target_species_for_stage_number(1)),
             CondensationStage(2, 'Cr Oxide Harvester',
-                              (1100, 1300), ['Cr', 'CrO2']),
+                              (1100, 1300),
+                              target_species_for_stage_number(2)),
             CondensationStage(3, 'SiO Zone',
-                              (900, 1200), ['SiO']),
+                              (900, 1200),
+                              target_species_for_stage_number(3)),
             CondensationStage(4, 'Alkali/Mg Cyclone',
-                              (350, 700), ['Na', 'K', 'Mg']),
+                              (350, 700),
+                              target_species_for_stage_number(4)),
             CondensationStage(5, 'Vortex Dust Filter',
                               (200, 350), []),
             CondensationStage(6, 'Turbine-Compressor',
