@@ -346,6 +346,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
+        self._rump_expectation_warnings: list[str] = []
 
         # --- Current state ---
         self.melt = MeltState()
@@ -544,6 +545,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.overhead = OverheadGas()
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
+        self._rump_expectation_warnings = []
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
@@ -3463,6 +3465,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if delta > 0.001:
                 species_extracted[sp] = round(delta, 3)
 
+        rump_expectation = self._rump_expectation_diagnostic(campaign_name)
+        warning = rump_expectation.get('warning')
+        if warning:
+            self._rump_expectation_warnings.append(str(warning))
+
         return {
             'campaign': campaign_name,
             'duration_h': duration_h,
@@ -3474,6 +3481,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'O2_kg': round(
                 self._oxygen_total_kg() - self._campaign_start_O2, 2),
             'species_extracted': species_extracted,
+            'rump_expectation': rump_expectation,
         }
 
     # ------------------------------------------------------------------

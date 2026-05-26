@@ -1,0 +1,140 @@
+# Concepts
+
+This document explains the physical and chemical basis for the simulator's process model. It is the *why* companion to the *how-to* content in [`docs/recipe-playbook.md`](recipe-playbook.md).
+
+## What this simulator is for
+
+The simulator is a workbench for testing whether solar-thermal regolith refining can do most useful work — metals, silica glass, ceramics, and O₂ — using pressure and temperature as control variables, before committing large electrical loads to molten regolith electrolysis (MRE). Current ISRU literature treats regolith primarily as a single-output oxygen source and routes the full melt inventory through electrode hardware. The premise here is different: overhead pressure control plus a staged thermal ramp can pull alkalis, iron, silicon-bearing vapors, and magnesium out of regolith in a chosen sequence, into useful product forms, with the residue conditioned for whatever comes next. The simulator is the means to test whether that sequencing works and to make the full materials ledger — not just O₂ — visible.
+
+## The four product classes
+
+A full-sequence run on a silicate feedstock yields four product classes. Which ones come out and in what form depends on recipe choices; the last is physically unavoidable only on routes that do not deliberately consume the refractory oxides.
+
+1. **Metals + O₂** — the main extraction targets. Na and K condense in Stage 4 (alkali cyclone), Fe condenses in Stage 1 (Fe condenser), Mg in Stage 4, Al via Mg thermite in C6. Disproportionation and reduction reactions release O₂, accumulated at the terminal as the by-product of extracting metal from oxide. This is the sequence the default recipe (C0 → C2A → C3 → C4 → C5 → C6) is designed to deliver.
+
+2. **Pure silica glass** — Stage 3 fused-silica baffles capture SiO on-demand. The trigger is switching overhead gas cover from pO₂ hold to pN₂ sweep (Path A, C2A_continuous). Under pO₂ control SiO is suppressed >300× at 1 mbar; under pN₂ sweep it evolves freely and condenses as high-purity fused silica on the Stage 3 removable cartridge. The silica comes out when the operator chooses to allow it, not whenever the melt is hot.
+
+3. **Industrial mixed glass** — an early-tap option. Stop the sequence after alkali and Fe extraction, before the SiO release window; tap the remaining melt. The result is a Ca–Mg–Al–Si silicate glass — less selective than the full sequence, but demonstrating recipe flexibility.
+
+4. **Refractory ceramic (the rump)** — conditional on recipe choice; see `CLAUDE.md` §5. In Branch Two default extraction, Ca, REEs, un-thermited Al₂O₃, TiO₂, and other oxides with very large negative Ellingham values do not vaporise at any temperature the furnace itself can sustain. In that route, the rump is the oxide-stability floor and becomes the natural feedstock for hot-duct liners and refractory furnace components. In Branch One C5/MRE routes, the operator can additionally consume Ca/Al/Mg/Si by electrolysis or thermite, so the remaining rump is a recipe outcome that must be checked against the ledger rather than assumed.
+
+## The three levers
+
+The extraction sequence is driven by three control axes acting on the Ellingham diagram (ΔG of oxidation vs T). The axes are pO₂, pN₂, and temperature.
+
+### pO₂
+
+pO₂ is inside the SiO₂ ⇌ SiO + ½ O₂ equilibrium directly. The suppression law is:
+
+```
+p(SiO) = K(T) × a(SiO₂) / √pO₂
+```
+
+At hard vacuum (pO₂ ~ 1×10⁻⁹ bar) SiO vapor pressure at 1600 °C reaches 0.5–2 mbar, which is a significant fouling flux. At 1 mbar pO₂, SiO is suppressed ~300× conservatively (1000× theoretical) to <0.005 mbar — effectively zero transport toward the condenser stages.
+
+The pO₂ selectivity law implemented in the builtin model applies species-specific suppression exponents. A more negative exponent means stronger pO₂ sensitivity:
+
+| Species | pO₂ exponent | Interpretation |
+|---|---|---|
+| Na, K | −0.25 | Weakly suppressed by pO₂; volatile at any pO₂ above vacuum |
+| Fe, Mg, SiO, Ca | −0.5 | Standard stoichiometric suppression |
+| Al, Cr | −0.75 | Stronger suppression; not practically extractable by pyrolysis alone |
+| Ti | −1.0 | Strongly suppressed; not pyrolysable at any practical pO₂ setpoint |
+
+<!-- TODO: verify that these are the exact exponents coded in simulator/equilibrium.py; the values cited here match CLAUDE.md but should be checked against the implementation. -->
+
+pO₂ is controlled actively via Fe-granule oxygen sorbent and precision O₂ micro-bleed, with turbine-speed feedback. Precision in the viscous regime is ±0.1–0.3 mbar (`data/setpoints.yaml` §5).
+
+### pN₂ (sweep gas)
+
+pN₂ is the overhead sweep gas. The canonical symbol is N₂ but any inert works — Ar, or CO₂ as a natural choice on Mars feedstocks. Its primary role is transport control: it keeps the Knudsen number well below 0.01 so evolved vapor is swept toward designated condensers rather than crossing the pipe ballistically and landing on whatever cold surface it encounters first.
+
+The target band is **5–15 mbar**, typically 8–12 mbar, which keeps the mean-free-path short relative to the pipe diameter (12 cm typical for a hot-wall Stage 0 duct, per `data/setpoints.yaml` §6). Below this viscous-flow band, molecules travel ballistically and cold-wall fouling becomes effectively uncontrolled regardless of gas chemistry. Above it, the sweep gas begins to dilute vapor concentrations and reduces the thermodynamic driving force at the condenser.
+
+The pN₂ setpoint is calibrated against the mean-free-path equation (`Kn = λ / L ≪ 0.01`), not chosen by feel.
+
+### Temperature
+
+Temperature determines which species are above their vapor-pressure threshold at a given moment. The fundamental sequence is driven by vapor pressures:
+
+- **Na, K**: volatile by 1250–1350 °C (vapor pressures >> any pO₂ setpoint above hard vacuum)
+- **Fe**: 0.01–0.1 mbar at 1400–1600 °C — adequate for selective harvest
+- **SiO**: 0.5–2 mbar at 1600 °C under vacuum; the problem species for fouling
+- **Mg**: ~0.5 bar at 1600 °C — highly volatile once conditions allow
+- **Al**: boiling point 2519 °C; negligible vapor pressure at any furnace-survivable temperature; MRE only
+- **Ca**: significant above ~1500 °C but poor selectivity vs other species present at that temperature; extraction marginal
+
+The practical implication is that temperature alone sequences Na/K → Fe → SiO (overlapping) → Mg cleanly in time, but Ca, Al, and Ti are below their practical vapor threshold at any temperature the crucible survives. The rump is the physical residue of that floor only for routes that did not later consume those oxides by C5/MRE or C6 thermite.
+
+## The alkali shuttle
+
+Na and K sit low on the Ellingham diagram — they have high oxygen affinity, meaning Na₂O and K₂O are thermodynamically more stable per mole O₂ than FeO, Cr₂O₃, or MnO. Elemental Na and K therefore spontaneously strip oxygen from those oxides:
+
+```
+2K + FeO → K₂O + Fe
+2Na + FeO → Na₂O + Fe
+```
+
+This is the alkali shuttle: alkalis evolved during C2 (or dosed externally) are condensed in Stage 4, then looped back into the melt as reductants in C3. The alkali is consumed as a reducing agent, the target oxide is stripped to metal, and the alkali oxide dissolves into the melt — where, at bakeout temperature, it re-evaporates and is recovered again. The same alkali inventory recycles across multiple cycles before final product recovery.
+
+The shuttle serves two distinct roles:
+
+1. **Oxygen reductant**: it chemically frees Fe from FeO, and similarly reduces Cr₂O₃ and MnO — oxides that are moderately stable but less stable than the alkali oxides. This is what allows >90% Fe extraction at temperatures below what thermal evaporation alone achieves for the residual FeO.
+
+2. **Selectivity tool**: Fe and SiO vapor-pressure windows overlap in the ~1500–1700 °C band, and pO₂ alone cannot separate them (both require low pO₂ or vacuum, so the SiO₂ ⇌ SiO + ½O₂ lever is the same for both). The shuttle reduces FeO chemically at a temperature where SiO activity is lower, allowing Fe to be extracted at a different point in the sequence and keeping condenser stages clean.
+
+Honest limits: the builtin shuttle reactions are temperature-independent in the current model. The `C2A_staged` recipe cools below ~1200 °C before the C3 K-shuttle dose for physical fidelity against the approximate K (~1216 °C) and Na (~1331 °C) FeO crossover temperatures, but the engine does not enforce a temperature gate. See `docs/model-limitations.md` for the explicit caveat. The shuttle also cannot chemically free Ca, Mg (in the main melt), Al, or Ti — those oxides are more stable than Na₂O/K₂O and the reactions do not proceed spontaneously.
+
+## Hot walls and viscous flow as design invariants
+
+Two engineering requirements must hold for the recipe to work at all, regardless of how the three levers are set.
+
+**Hot walls upstream of the designated condenser.** Stage 0 duct and upstream piping are maintained above ~1400 °C (doloma-REE ceramic, max service temperature 1750 °C; `data/setpoints.yaml` §7). A cold spot upstream of the designated condenser means the vapor condenses on the pipe wall rather than reaching Stage 1 (Fe), Stage 3 (SiO), or Stage 4 (alkali/Mg). Wall deposits of SiO on ceramic piping are particularly invasive: SiO disproportionates to Si + SiO₂ on cold surfaces, and the silica reacts with refractory oxides at high temperature. Na and K deposits on cold transfer ducts are the second-worst class.
+
+**Buffer gas in the viscous-flow regime.** The 5–15 mbar pN₂ band is not a target — it is a physical requirement for directional vapor transport. Below this band, the mean-free-path exceeds the pipe diameter and molecules travel ballistically to whatever cold surface they encounter. The mbar setpoint is calibrated from `Kn = λ / L ≪ 0.01`, where λ is the gas mean-free-path and L is pipe diameter.
+
+Neither invariant is a recipe knob. Both are preconditions that must hold for the extraction sequence to reach the designated condenser stages rather than coating the pipe.
+
+## Wall deposits as instrumentation
+
+The simulator tracks `wall_deposit_kg` per species as a mol-native ledger account. This is the fraction of evolved vapor that lands on walls instead of reaching the designated condenser, parameterized by gas-phase conditions (pN₂ / Knudsen regime) and wall temperature. The per-species breakdown exposes which species is the fouling problem at a given operating point.
+
+The operational target is not zero deposited mass but long-term operation without re-sintering. A run that completes once and then requires furnace rebuild before the next batch is not a working recipe. The `wall_deposit_kg` account exists to make the fouling story legible without running physical hardware.
+
+## The two failure modes
+
+Any recipe that does not avoid both failure modes simultaneously is not a working recipe.
+
+**Incomplete extraction** — the run ends with most of the target species still in the melt. Temperature did not reach threshold, or the sequence did not run long enough. Outcome: no selective products, a melt full of mixed cations, the refractory rump never reached because the non-refractory species were never removed.
+
+**Furnace coating** — Na, SiO, Fe, or Mg vapor condenses on cold pipe walls or pressure-vessel internals instead of reaching the designated condenser stage. Outcome: the furnace is coated, and the deposit reacts with the refractory at temperature. In practice the furnace must be re-sintered before the next run, which destroys operational continuity.
+
+A ~100 % extraction target is an *and* condition with a near-zero wall-deposit target. Neither alone suffices.
+
+## Stage 0 cleanup as simplifier
+
+Stage 0 (C0 and optional C0b) removes everything that is not a clean silicate oxide before the main extraction sequence begins. For lunar feedstocks this means CHNOPS volatiles, nanophase Fe⁰ (magnetically separated), native metals, sulfides, and salts. For Mars feedstocks it also covers perchlorates, halides, and sulfates, via a CO₂-backed carbon cleanup that runs to 1050 °C. For carbonaceous asteroid bodies (CI, CM, Ceres, comets), the Stage 0 degassing cascade removes water, organics, sulfides, and carbonates, leaving a dehydrated anhydrous silicate at roughly 650–800 kg per original tonne.
+
+The result in every case is that the C1–C6 extraction sequence operates on a clean silicate-melt equivalent. Downstream chemistry only needs to know silicate-melt physics; Stage 0 absorbs all feedstock variability into explicit product buckets. The messy feedstock becomes a standard problem by the time C2A starts.
+
+See [`docs/process-model.md`](process-model.md) for the Stage 0 contract in detail, and [`docs/feedstocks.md`](feedstocks.md) for the feedstock inventory categories.
+
+## Pyrolysis as MRE pretreatment
+
+Pyrolysis and MRE are not competing technologies in this model — they are composable steps. MRE is electrically intensive and pushes the full melt through corrosive electrodes. Removing alkalis, Fe, volatiles, and halides before the electrolysis cell reduces both the electrochemical load (fewer species to reduce) and corrosion exposure (alkali and sulfur are particularly hostile to electrode materials). The C5 campaign (limited MRE under O₂ backpressure, max 1.6 V Branch Two) operates on a melt that has already had its most reactive components removed — electrodes last 5–10× longer, and the electrical energy budget is 600–1200 kWh/t versus 2650–4050 kWh/t for full-scope MRE without pretreatment. See `data/setpoints.yaml` §8 for the MRE voltage sequence.
+
+The `MRE_BASELINE` track in the simulator models full electrolysis without pyrolysis pretreatment, as a comparison point.
+
+## What this simulator does not model
+
+The simulator is a comparative process estimator, not a validated engineering design. Key limitations:
+
+- **Heat transfer is simplified.** Solar concentration is assumed to maintain target temperatures; radiative, conductive, and convective losses are not fully modelled.
+- **Kress91 Fe³⁺/Fe²⁺ redox** (fO₂-coupled ferric/ferrous glass model) is not yet implemented. The intrinsic fO₂ is derived from cleaned melt composition as a diagnostic surface only.
+- **Metal-phase settling and drain-tap are not modelled.** Reduced metal accumulates in `process.metal_phase` indefinitely; gravitational settling of dense metal out of the melt is not simulated.
+- **Finite overhead headspace** (toggle `overhead_headspace.enabled`) defaults OFF. When ON, evaporation O₂ is held in `process.overhead_gas` and bled through a Poiseuille conductance model; molecular-flow conductance and validated hardware control are out of scope.
+- **The builtin shuttle reactions are temperature-independent.** See `docs/model-limitations.md`.
+
+For the full list, see [`docs/model-limitations.md`](model-limitations.md).
+
+The truth-seeking discipline for this project: when the model disagrees with reference data, the correct response is investigation, not parameter-tuning to force agreement. See `CLAUDE.md` §1 for the project mandate.
