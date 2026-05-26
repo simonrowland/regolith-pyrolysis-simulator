@@ -57,6 +57,14 @@ dev = ["pytest>=8.0"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# Parallelize across cores via pytest-xdist + bound per-test runtime via
+# pytest-timeout. Without these, the full gate took ~10 min serial and
+# routinely exceeded the 1500s sandbox tool window of in-flight codex-acp
+# workers (which silently invoke `pytest` on top of their chunk subset).
+# `-n auto` uses all available cores; `--timeout=300` kills any test that
+# silently hangs past 5 min. Workers can still override with `-n0` for
+# debugging serial behavior.
+addopts = "-n auto --timeout=300"
 
 # Explicit package layout. Auto-discovery works for this repo today, but
 # enumerating the simulator subpackages here documents the on-disk tree
