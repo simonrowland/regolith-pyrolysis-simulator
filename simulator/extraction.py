@@ -13,6 +13,16 @@ from simulator.state import (
 
 class ExtractionMixin:
     _LEDGER_KG_TOL = 1e-9
+    _RUMP_EXPECTATION_TOL_KG = 1e-6
+    _RUMP_ELEMENT_SPECIES = {
+        'Si': ('SiO2',),
+        'Al': ('Al2O3',),
+        'Mg': ('MgO',),
+        'Ca': ('CaO',),
+        'Ti': ('TiO2',),
+        'REE': ('REE_oxides',),
+    }
+    _C5_BRANCH_ONE_TARGET_CANDIDATES = frozenset({'Si', 'Al', 'Mg', 'Ca'})
 
     # ``_positive_ledger_kg`` and ``_positive_ledger_mol`` were removed
     # alongside ``_record_atom_transition`` when the METALLOTHERMIC_STEP
@@ -28,6 +38,128 @@ class ExtractionMixin:
     def _process_reagent_inventory_kg(self, species: str) -> float:
         return self._ledger_account_species_kg(
             'process.reagent_inventory', species)
+
+    def _rump_element_kg(self, element: str) -> float:
+        species_names = self._RUMP_ELEMENT_SPECIES.get(element, ())
+        total = 0.0
+        for account in ('process.cleaned_melt', 'terminal.slag'):
+            species_kg = self.atom_ledger.kg_by_account(account)
+            for species in species_names:
+                total += max(0.0, float(species_kg.get(species, 0.0)))
+        return total
+
+    def _initial_rump_element_kg(self, element: str) -> float:
+        species_names = self._RUMP_ELEMENT_SPECIES.get(element, ())
+        initial_inventory = getattr(self.record, 'initial_inventory', None)
+        sources = []
+        if initial_inventory is not None:
+            sources.extend((
+                getattr(initial_inventory, 'melt_oxide_kg', {}),
+                getattr(initial_inventory, 'terminal_slag_components_kg', {}),
+            ))
+        sources.append(getattr(self, '_campaign_start_composition', {}))
+        total = 0.0
+        for source in sources:
+            for species in species_names:
+                total += max(0.0, float(source.get(species, 0.0)))
+        return total
+
+    def _actual_rump_elements_kg(self) -> Dict[str, float]:
+        return {
+            element: kg
+            for element in sorted(self._RUMP_ELEMENT_SPECIES)
+            if (kg := self._rump_element_kg(element)) > self._RUMP_EXPECTATION_TOL_KG
+        }
+
+    def _normalise_c5_target_elements(self, targets) -> set[str]:
+        if targets is None:
+            return set()
+        if isinstance(targets, str):
+            target_items = [targets]
+        else:
+            target_items = list(targets)
+
+        normalised: set[str] = set()
+        for item in target_items:
+            text = str(item)
+            for element, species_names in self._RUMP_ELEMENT_SPECIES.items():
+                if element in text or any(species in text for species in species_names):
+                    normalised.add(element)
+        return normalised & self._C5_BRANCH_ONE_TARGET_CANDIDATES
+
+    def _configured_c5_target_elements(self) -> set[str]:
+        campaigns = self.setpoints.get('campaigns', {}) or {}
+        c5_cfg = campaigns.get('C5', {}) or {}
+        if not isinstance(c5_cfg, dict):
+            c5_cfg = {}
+
+        target_elements = self._normalise_c5_target_elements(
+            c5_cfg.get('c5_targets'))
+        branch_key = (
+            'branch_one'
+            if getattr(self.record, 'branch', '') == 'one'
+            else 'branch_two'
+        )
+        branch_cfg = c5_cfg.get(branch_key, {}) or {}
+        if isinstance(branch_cfg, dict):
+            target_elements.update(self._normalise_c5_target_elements(
+                branch_cfg.get('c5_targets')))
+            target_elements.update(self._normalise_c5_target_elements(
+                branch_cfg.get('targets')))
+
+        if getattr(self.record, 'branch', '') == 'one' and not target_elements:
+            target_elements.update(self._C5_BRANCH_ONE_TARGET_CANDIDATES)
+        return target_elements
+
+    def _expected_rump_sets_for_campaign(self, campaign) -> tuple[set[str], set[str]]:
+        campaign_name = getattr(campaign, 'name', str(campaign))
+        expected: set[str] = set()
+        targeted: set[str] = set()
+
+        if campaign_name in {'C2A', 'C2A_STAGED'}:
+            expected.update({'Ca', 'Al', 'REE', 'Ti'})
+        elif campaign_name == 'C5':
+            targeted.update(self._configured_c5_target_elements())
+            if getattr(self.record, 'branch', '') == 'one':
+                expected.update(self._C5_BRANCH_ONE_TARGET_CANDIDATES - targeted)
+        elif campaign_name == 'C6':
+            targeted.add('Al')
+            expected.update({'Ca', 'REE'})
+        elif campaign_name == 'MRE_BASELINE':
+            targeted.update({'Ca', 'Al', 'Mg', 'Si'})
+            expected.add('REE')
+
+        expected = {
+            element
+            for element in expected
+            if self._initial_rump_element_kg(element) > self._RUMP_EXPECTATION_TOL_KG
+        }
+        targeted = {
+            element
+            for element in targeted
+            if self._initial_rump_element_kg(element) > self._RUMP_EXPECTATION_TOL_KG
+        }
+        return expected, targeted
+
+    def _rump_expectation_diagnostic(self, campaign=None) -> dict:
+        campaign = campaign or self.melt.campaign
+        campaign_name = getattr(campaign, 'name', str(campaign))
+        expected, targeted = self._expected_rump_sets_for_campaign(campaign)
+        actual = self._actual_rump_elements_kg()
+        missing = sorted(element for element in expected if element not in actual)
+        diagnostic = {
+            'campaign': campaign_name,
+            'actual_rump_elements_kg': actual,
+            'expected_unconsumed_rump_elements': sorted(expected),
+            'targeted_rump_elements': sorted(targeted),
+            'missing_expected_rump_elements': missing,
+        }
+        if missing:
+            diagnostic['warning'] = (
+                f"{campaign_name} expected rump elements missing: "
+                f"{', '.join(missing)}"
+            )
+        return diagnostic
 
     # ``_record_atom_transition`` and ``_record_atom_transition_mol``
     # were removed when the METALLOTHERMIC_STEP flip
