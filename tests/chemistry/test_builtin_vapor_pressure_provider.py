@@ -27,6 +27,7 @@ from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     _ELLINGHAM_THERMO,
 )
+from simulator.equilibrium import EquilibriumMixin
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.kernel import (
@@ -42,6 +43,23 @@ from tests.chemistry.conftest import _build_sim
 
 _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 1e-9
+
+_V1C_JANAF_ELLINGHAM = {
+    "Na": (-1135.130, -0.537417, 4, 2),
+    "K": (-975.838, -0.520580, 4, 2),
+    "Fe": (-538.946, -0.125272, 2, 2),
+    "Cr": (-748.076, -0.168676, 4 / 3, 2 / 3),
+    "Mg": (-1342.444, -0.336009, 2, 2),
+    "Ca": (-1285.155, -0.222295, 2, 2),
+    "Al": (-1126.073, -0.218805, 4 / 3, 2 / 3),
+    "Ti": (-939.632, -0.177149, 1, 1),
+    "Mn": (-770.0, -0.165, 2, 2),
+}
+
+
+def test_ellingham_table_matches_v1c_janaf_refit():
+    assert _ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
+    assert EquilibriumMixin._ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
 
 
 # ---------------------------------------------------------------------------

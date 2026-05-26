@@ -371,21 +371,34 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 
 
 def test_reduction_margin_kj_per_mol_o2_uses_ellingham_difference():
+    # Margin under V1c-constants JANAF Ellingham refit:
+    # Na/FeO @ 1150 C = +9.6 kJ/mol O2 (was +33.9 under pre-V1c table).
+    # Na/Fe crossover dropped from 1331 C to 1173 C per JANAF refit;
+    # 1150 C remains barely positive but the window has narrowed.
     provider = BuiltinMetallothermicStepProvider()
 
     margin = provider._reduction_margin_kj_per_mol_o2("Na", "FeO", 1150.0)
 
-    assert margin == pytest.approx(33.9, abs=0.1)
+    assert margin == pytest.approx(9.6, abs=0.1)
 
 
 def test_crossover_temperature_C_reports_physical_roots_only():
+    # K/Fe crossover under V1c-constants JANAF refit dropped from 1216 C
+    # to 832 C (V1c-NEEDS-RECIPE-RETUNE finding: K shuttle no longer
+    # viable in default 1150-1600 C melt window).
+    # Na/Ti gains a physical (but very low-T) crossover under JANAF at
+    # 269.5 C; in practice still refused because no melt operates that
+    # cold, but the helper now reports it as a real root.
     provider = BuiltinMetallothermicStepProvider()
 
     assert provider._crossover_temperature_C("K", "Fe") == pytest.approx(
-        1215.9,
-        abs=0.1,
+        832.0,
+        abs=0.5,
     )
-    assert provider._crossover_temperature_C("Na", "Ti") is None
+    assert provider._crossover_temperature_C("Na", "Ti") == pytest.approx(
+        269.5,
+        abs=0.5,
+    )
 
 
 def test_refused_result_has_policy_refusal_shape():
@@ -408,6 +421,17 @@ def test_refused_result_has_policy_refusal_shape():
     assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
 
 
+@pytest.mark.xfail(
+    reason=(
+        "K shuttle no longer viable in any practical melt T window under "
+        "V1c-constants JANAF Ellingham (K/Fe crossover dropped to 832 C). "
+        "1150 C is now refused. V1c-recipe-retune (task #33) deprecates the "
+        "K shuttle path; replaced operationally by Na-only shuttle at the "
+        "C2A_staged cool window. Test kept for documentation pending recipe "
+        "retune chunk."
+    ),
+    strict=True,
+)
 def test_c3_k_shuttle_accepts_low_temperature_feo_and_matches_legacy_stoich(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
