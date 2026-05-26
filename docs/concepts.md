@@ -18,6 +18,48 @@ A full-sequence run on a silicate feedstock yields four product classes. Which o
 
 4. **Refractory ceramic (the rump)** — conditional on recipe choice; see `CLAUDE.md` §5. In Branch Two default extraction, Ca, REEs, un-thermited Al₂O₃, TiO₂, and other oxides with very large negative Ellingham values do not vaporise at any temperature the furnace itself can sustain. In that route, the rump is the oxide-stability floor and becomes the natural feedstock for hot-duct liners and refractory furnace components. In Branch One C5/MRE routes, the operator can additionally consume Ca/Al/Mg/Si by electrolysis or thermite, so the remaining rump is a recipe outcome that must be checked against the ledger rather than assumed.
 
+## Two senses of "Ellingham" in this project
+
+The word "Ellingham" appears throughout this codebase and means two related but operationally distinct things. Both come from the same underlying plot (the Ellingham–Richardson diagram of ΔG_f° per mol O₂ vs T), but they answer different questions about a recipe.
+
+**Sense 1 — Oxygen-affinity ladder (reduction ordering).** At a given T, the species whose oxide is more stable per mol O₂ has higher oxygen affinity. Read at fixed T, the ladder tells you which metal can chemically reduce which oxide. This is the operative concept for the **alkali shuttle** and **Mg thermite**:
+- Na₂O more stable than FeO at 1150 °C → Na can take O from FeO (`2 Na + FeO → Na₂O + Fe`).
+- MgO more stable than Al₂O₃ per mol O₂ → Mg can take O from Al₂O₃ (C6 thermite).
+- Ranking at moderate T: Ca > Mg > Al > Ti > Mn > Cr > Fe > Na > K (per V1c JANAF refit). The Fe/Na/K corner is unstable across T — the K/Fe crossover sits at 832 °C, Na/Fe at 1173 °C, so above those Ts the ladder inverts and the shuttle no longer drives the reduction.
+
+This sense is sometimes called the "naive Ellingham" because it ignores pressure. It is correct as far as it goes — for picking a reductant at a given T.
+
+**Sense 2 — Pressure-modified Ellingham (evolution under vacuum).** The same diagram modified for non-standard pO₂. Each oxide's dissociation threshold drops as pO₂ falls, but with a species-specific slope set by the reaction stoichiometry:
+
+```
+d log(a_M) / d log(pO₂) = −1 / n_M
+```
+
+where `n_M` is the moles of metal per mole O₂ in the formation reaction. The slopes:
+
+| Species | Formation (per mol O₂) | n_M | pO₂ slope |
+|---|---|---:|---:|
+| Na, K | 4 M + O₂ → 2 M₂O | 4 | −0.25 |
+| Fe, Mg, Ca | 2 M + O₂ → 2 MO | 2 | −0.50 |
+| Cr, Al | (4/3) M + O₂ → (2/3) M₂O₃ | 4/3 | −0.75 |
+| Ti | M + O₂ → MO₂ | 1 | −1.00 |
+
+A drop of 11 decades in pO₂ (1 atm → ntorr) scales metal activity by ~560× for Na/K, ~3×10⁵× for Fe/Mg/Ca, ~5.6×10⁸× for Cr/Al, and ~10¹¹× for Ti. **Vacuum helps the more-oxidized species most.** This is what unlocks the "full ladder is accessible at solar-furnace temperatures" claim in `CLAUDE.md` §4 — without low pO₂, none of these activities would be high enough to drive evaporation at temperatures the crucible can survive.
+
+**Sense 2 does not, by itself, predict evolution order.** Evolution is `P_eff = a_M × P_sat`, and `P_sat` (pure-metal vapor pressure) varies by ~13 orders of magnitude across the metal set at recipe T (Na/K: ~10⁶ Pa at 1500 K; Fe: ~10⁻¹; Ti: ~10⁻⁹). So Na/K evolve first despite their *shallowest* pO₂ slopes — because they are *volatile elements* whose pure-metal P_sat at moderate T is enormous, swamping the activity differences. Fe needs ~1700–1900 °C before its `P_sat × a_M` becomes meaningful; Ca/Al/Ti are below the volatility floor at any furnace-survivable T.
+
+### Which sense applies where
+
+| Operational question | Sense | Inputs |
+|---|---|---|
+| Will Na reduce FeO at this T? | 1 — affinity ladder | ΔG(T) of the two oxides at fixed pO₂ |
+| Will Fe (already reduced) evaporate from the melt at this T and pO₂? | 2 — pressure-modified | a_M(T, pO₂) × P_sat(T) |
+| At what T does the shuttle become physically defended? | 1 — ladder crossover | T where ΔG_red = ΔG_target |
+| In what order do species come out as T rises? | 2 + Antoine | dominant: P_sat ordering |
+| Can low pO₂ alone unlock Ti or Ca? | 2 — slope analysis + P_sat floor | requires *both* favourable slope *and* P_sat at recipe T |
+
+When this documentation says "Ellingham diagram" generically, it usually means the underlying plot; the two senses above describe how the plot is read.
+
 ## The three levers
 
 The extraction sequence is driven by three control axes acting on the Ellingham diagram (ΔG of oxidation vs T). The axes are pO₂, pN₂, and temperature.
