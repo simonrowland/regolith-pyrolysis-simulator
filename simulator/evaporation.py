@@ -27,6 +27,21 @@ _DEFAULT_EVAPORATION_ALPHA = 1.0
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
+_FREEZE_GATE_FRACTION_QUANTUM = 0.001
+_FREEZE_GATE_TRACE_FRACTION_CUTOFF = 0.001
+_FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
+    'SiO2',
+    'Al2O3',
+    'FeO',
+    'MgO',
+    'CaO',
+    'Na2O',
+    'K2O',
+    'TiO2',
+    'Cr2O3',
+    'MnO',
+    'P2O5',
+))
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, float]:
@@ -199,18 +214,44 @@ class EvaporationMixin:
             'key': key,
             'curve': dict(curve),
         }
+        self._freeze_gate_cache_rebuild_count = (
+            int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
+        )
         return curve
 
     def _freeze_gate_cache_key(self) -> tuple:
         cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
-        composition_key = tuple(
-            sorted(
-                (str(species), round(float(mol), 12))
-                for species, mol in cleaned_mol.items()
-                if abs(float(mol)) > _FREEZE_GATE_EPSILON
+        relevant_mol: dict[str, float] = {}
+        for species, mol in cleaned_mol.items():
+            species_key = str(species)
+            if species_key not in _FREEZE_GATE_COMPOSITION_SPECIES:
+                continue
+            mol_value = float(mol)
+            if mol_value > _FREEZE_GATE_EPSILON:
+                relevant_mol[species_key] = mol_value
+
+        total_mol = sum(relevant_mol.values())
+        if total_mol <= _FREEZE_GATE_EPSILON:
+            return ('oxide_mol_fraction_v1', ())
+
+        # Liquidus is stable to small per-tick evaporation drift; 0.1 mol-%
+        # bins (0.001 fraction quantum) sit comfortably above mole-fraction
+        # float-arithmetic jitter while still well inside the L1 finder ±30 K
+        # tolerance, and still rebuild for campaign-scale major-oxide
+        # composition shifts.
+        composition_key = []
+        for species, mol in relevant_mol.items():
+            fraction = mol / total_mol
+            if fraction < _FREEZE_GATE_TRACE_FRACTION_CUTOFF:
+                continue
+            quantized_fraction = (
+                round(fraction / _FREEZE_GATE_FRACTION_QUANTUM)
+                * _FREEZE_GATE_FRACTION_QUANTUM
             )
-        )
-        return (composition_key,)
+            if quantized_fraction <= 0.0:
+                continue
+            composition_key.append((species, round(quantized_fraction, 6)))
+        return ('oxide_mol_fraction_v1', tuple(sorted(composition_key)))
 
     def _freeze_gate_curve_from_ec_dispatch(
         self,
