@@ -22,6 +22,13 @@ metals:
     molar_mass_g_mol: 22.99
     electrons_per_atom: 1
     parent_oxide: "Na2O"
+    fit_target: "pseudo_psat_backsolved_from_vaporock"
+    backsolve:
+      feedstock_grid: "seven-feedstock lunar/mars grid"
+      fO2_convention: "Kress91 IW"
+      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
+      target: "VapoRock partial pressure on the grid"
+      residual_dex: 0.121
     evaporation_alpha:
       value: 1.0
       source: "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
@@ -42,6 +49,13 @@ metals:
     molar_mass_g_mol: 39.10
     electrons_per_atom: 1
     parent_oxide: "K2O"
+    fit_target: "pseudo_psat_backsolved_from_vaporock"
+    backsolve:
+      feedstock_grid: "lunar_mare_low_ti single-reference calibration"
+      fO2_convention: "Kress91 IW"
+      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
+      target: "VapoRock K = 9.55e-02 Pa at 1773.15 K"
+      residual_dex: 1.469
     evaporation_alpha:
       value: 1.0
       source: "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy to Na; Sossi & Fegley 2018 liquids commonly near unity"
@@ -68,6 +82,13 @@ metals:
     molar_mass_g_mol: 24.31
     electrons_per_atom: 2
     parent_oxide: "MgO"
+    fit_target: "pseudo_psat_backsolved_from_vaporock"
+    backsolve:
+      feedstock_grid: "seven-feedstock lunar/mars grid"
+      fO2_convention: "Kress91 IW"
+      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
+      target: "VapoRock partial pressure on the grid"
+      residual_dex: 0.203
     evaporation_alpha:
       value: 0.20
       source: "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
@@ -88,6 +109,13 @@ metals:
     molar_mass_g_mol: 55.85
     electrons_per_atom: 2
     parent_oxide: "FeO"
+    fit_target: "pseudo_psat_backsolved_from_vaporock"
+    backsolve:
+      feedstock_grid: "lunar_mare_low_ti + mars_basalt basalt grid"
+      fO2_convention: "Kress91 IW"
+      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
+      target: "VapoRock partial pressure on the basalt grid"
+      residual_dex: 0.023
     evaporation_alpha:
       value: 0.02
       source: "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
@@ -112,6 +140,8 @@ metals:
     molar_mass_g_mol: 40.08
     electrons_per_atom: 2
     parent_oxide: "CaO"
+    fit_target: "pure_component_psat"
+    source: "rough legacy ΔH_vap approximation, unvalidated"
     antoine:
       A: 11.238
       B: 9520
@@ -126,6 +156,8 @@ metals:
     molar_mass_g_mol: 26.98
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
+    fit_target: "pure_component_psat"
+    source: "CRC/CR2 pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
     antoine:
       A: 11.553
       B: 17340
@@ -140,6 +172,9 @@ metals:
     molar_mass_g_mol: 28.09
     electrons_per_atom: 4
     parent_oxide: "SiO2"
+    fit_target: "pure_component_psat"
+    consumer_status: "inactive"
+    source: "rough legacy ΔH_vap approximation, inactive and unvalidated"
     antoine:
       A: 11.619
       B: 21590
@@ -154,6 +189,8 @@ metals:
     molar_mass_g_mol: 47.87
     electrons_per_atom: 4
     parent_oxide: "TiO2"
+    fit_target: "pure_component_psat"
+    source: "CRC/CR2 pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
     antoine:
       A: 11.650
       B: 23200
@@ -168,6 +205,8 @@ metals:
     molar_mass_g_mol: 52.00
     electrons_per_atom: 3
     parent_oxide: "Cr2O3"
+    fit_target: "pure_component_psat"
+    source: "rough legacy ΔH_vap approximation, unvalidated"
     antoine:
       A: 11.420
       B: 20730
@@ -182,6 +221,8 @@ metals:
     molar_mass_g_mol: 54.94
     electrons_per_atom: 2
     parent_oxide: "MnO"
+    fit_target: "pure_component_psat"
+    source: "rough legacy ΔH_vap approximation, unvalidated"
     antoine:
       A: 11.183
       B: 14740
@@ -196,6 +237,13 @@ oxide_vapors:
     formula: "SiO"
     molar_mass_g_mol: 44.08
     parent_oxide: "SiO2"
+    fit_target: "pseudo_psat_backsolved_from_vaporock"
+    backsolve:
+      feedstock_grid: "seven-feedstock lunar/mars grid"
+      fO2_convention: "Kress91 IW"
+      activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
+      target: "VapoRock partial pressure on the grid"
+      residual_dex: 0.113
     stoich_oxide_per_vapor: 1.3629764065335754  # kg SiO₂ consumed per kg SiO evaporated
     stoich_O2_per_vapor: 0.3629764065335753    # kg O₂ freed per kg SiO evaporated
     evaporation_alpha:
@@ -230,6 +278,12 @@ oxide_vapors:
     formula: "CrO2"
     molar_mass_g_mol: 83.9961
     parent_oxide: "Cr2O3"
+    fit_target: "standard_reaction_term"
+    reaction:
+      formula: "0.5 Cr2O3(s/l) + 0.25 O2(g) -> CrO2(g)"
+      exponent_oxide: 0.5
+      exponent_pO2: 0.25
+      basis: "VapoRock fallback fit to JANAF0 CrO2(g) output"
     stoich_oxide_per_vapor: 0.9047574827878914  # kg Cr2O3 consumed per kg CrO2 evaporated
     stoich_O2_per_vapor: -0.09524251721210866  # kg O2 consumed per kg CrO2 evaporated
     antoine:
