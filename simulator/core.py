@@ -187,6 +187,21 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
+TERMINAL_RUMP_ACCOUNTS = (
+    'process.cleaned_melt',
+    'terminal.slag',
+)
+TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
+    'CaO',
+    'MgO',
+    'Al2O3',
+    'TiO2',
+    'Cr2O3',
+    'REE_oxides',
+})
+TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({'SiO2'})
+TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({'Fe', 'Ni', 'Co', 'Mn'})
+TERMINAL_RUMP_CLASS_TOLERANCE_PCT = 5e-12
 DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'enabled': False,
     'volume_m3': None,
@@ -3301,6 +3316,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.atom_ledger.total_kg_by_account('process.cleaned_melt')
             + self.atom_ledger.total_kg_by_account('terminal.slag')
         )
+
+    def _terminal_rump_by_species(self) -> Dict[str, float]:
+        species_kg: Dict[str, float] = {}
+        for account in TERMINAL_RUMP_ACCOUNTS:
+            self._merge_masses(
+                species_kg,
+                self.atom_ledger.kg_by_account(account),
+            )
+        return {
+            species: kg
+            for species, kg in sorted(species_kg.items())
+            if kg > 0.0
+        }
+
+    def _terminal_rump_by_class(self) -> Dict[str, float]:
+        by_species = self._terminal_rump_by_species()
+        by_class = {
+            'refractory_oxides': 0.0,
+            'silicate_residual': 0.0,
+            'unextracted_metals': 0.0,
+            'other': 0.0,
+        }
+        for species, kg in by_species.items():
+            if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
+                category = 'refractory_oxides'
+            elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
+                category = 'silicate_residual'
+            elif species in TERMINAL_RUMP_UNEXTRACTED_METALS:
+                category = 'unextracted_metals'
+            else:
+                category = 'other'
+            by_class[category] += kg
+
+        total_kg = self._terminal_slag_kg()
+        class_total_kg = sum(by_class.values())
+        if total_kg > 0.0:
+            error_pct = abs(class_total_kg - total_kg) / total_kg * 100.0
+        else:
+            error_pct = 0.0 if class_total_kg == 0.0 else math.inf
+        if error_pct > TERMINAL_RUMP_CLASS_TOLERANCE_PCT:
+            raise AccountingError(
+                'terminal rump class mass does not match terminal rump total: '
+                f'{class_total_kg:.15g} kg vs {total_kg:.15g} kg '
+                f'({error_pct:.15g} pct)'
+            )
+        return by_class
 
     def _ledger_total_mass_kg(self) -> float:
         return sum(self.atom_ledger.total_kg_by_account().values())
