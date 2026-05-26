@@ -85,8 +85,17 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     expected = json.loads((FIXTURE_DIR / golden_name).read_text())
 
     _assert_golden_close(actual, expected)
-    assert actual["sio_evolved_kg"] == BASELINE_SIO_EVOLVED_KG[feedstock]
-    assert expected["sio_evolved_kg"] == BASELINE_SIO_EVOLVED_KG[feedstock]
+    # Strict-equality on a baseline float caught FP-jitter (~1e-12 absolute,
+    # ~1e-9 relative) introduced by F4 rump-payload assembly + S1b shuttle
+    # gate after the post-2026-05-20 refit established the baseline. The
+    # numbers themselves are still physics-honest (≤5e-12 % mass closure
+    # held in Review E + E2 default-on test). Loosen to relative tolerance.
+    assert actual["sio_evolved_kg"] == pytest.approx(
+        BASELINE_SIO_EVOLVED_KG[feedstock], rel=1e-8
+    )
+    assert expected["sio_evolved_kg"] == pytest.approx(
+        BASELINE_SIO_EVOLVED_KG[feedstock], rel=1e-8
+    )
     assert "wall_deposit_kg" in actual
     assert "fouling_rate" in actual
     placement = actual["sio_to_silica_fume_kg"]
