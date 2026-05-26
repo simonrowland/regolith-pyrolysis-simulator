@@ -133,6 +133,7 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
         calls.append(intent)
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 7.5}},
             )
         raise AssertionError(f'unexpected liquidus dispatch: {intent}')
@@ -164,6 +165,7 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         nonlocal gate_calls
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
@@ -223,6 +225,7 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
@@ -274,6 +277,7 @@ def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
@@ -325,6 +329,7 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
         raise ProviderUnavailableError(f'{intent.value} provider absent')
@@ -369,6 +374,7 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
         return original_dispatch(intent, *args, **kwargs)
@@ -415,6 +421,7 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         nonlocal gate_calls
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
+                status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:

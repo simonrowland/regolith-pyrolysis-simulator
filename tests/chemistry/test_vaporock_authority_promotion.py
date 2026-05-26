@@ -249,7 +249,8 @@ def test_vaporock_full_speciation_stays_out_of_evaporation_flux(
                 kwargs['control_inputs']['vapor_pressures_Pa']
             )
             return types.SimpleNamespace(
-                diagnostic={'evaporation_flux_kg_hr': {}}
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {}},
             )
         return original_dispatch_only(intent, *args, **kwargs)
 

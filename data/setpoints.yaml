@@ -1095,3 +1095,22 @@ freeze_gate:
   #   C2A:
   #     freeze_gate:
   #       enabled: true
+
+
+# ============================================================================
+# 16. CHEMISTRY KERNEL POLICY FLAGS
+# ============================================================================
+# Project-level defaults for kernel behaviours that the engine code defaults
+# to fail-loud on. Engine policy stays strict; this section makes operational
+# overrides explicit + auditable in one place.
+chemistry_kernel:
+  # V1e-impl TIER-3 fail-loud (engine policy: refuse if a species without
+  # measured evaporation_alpha is sampled). Cr, CrO2, and Mn currently lack
+  # measured α in the literature (per V1e-audit) and are routinely sampled in
+  # default lunar/Mars extraction recipes (Cr2O3 trace ~0.3-0.5 wt%; CrO2(g)
+  # is a real VapoRock species). Setting this true makes production use α=1.0
+  # as the HK upper-bound placeholder for those species, with the fallback
+  # status surfaced in the evaporation flux diagnostic so the operator sees
+  # which species are using it. V1e-followon (task #36) is the post-0.5.0
+  # work to either measure α or refine the placeholder policy.
+  allow_unmeasured_alpha_fallback: true

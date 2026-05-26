@@ -79,6 +79,11 @@ def _build_sim(
         setpoints_data = dict(setpoints_data)
         kernel_cfg = dict(setpoints_data.get('chemistry_kernel', {}) or {})
         kernel_cfg['allow_fallback_vapor'] = True
+        # V1e-impl TIER-3 fail-loud (Cr/CrO2/Mn missing measured alpha)
+        # requires opt-in for fallback path tests. Mirrors the per-species
+        # measured-alpha policy: production stays fail-loud; test fixtures
+        # that exercise the fallback chain opt in to alpha=1.0 prototype.
+        kernel_cfg['allow_unmeasured_alpha_fallback'] = True
         setpoints_data['chemistry_kernel'] = kernel_cfg
     sim = PyrolysisSimulator(
         backend, setpoints_data, feedstocks_data, vapor_pressure_data
