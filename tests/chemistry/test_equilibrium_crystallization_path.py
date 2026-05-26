@@ -279,14 +279,15 @@ def test_provider_rejects_ec_sample_without_residual_liquid_composition():
     assert any('lacks residual liquid composition' in w for w in result.warnings)
 
 
-def test_live_alphamelts_ec_path_runs_only_with_live_python_api_transport():
+@pytest.mark.parametrize('mode', ('thermoengine', 'python_api'))
+def test_live_alphamelts_ec_path_runs_with_live_transport(mode):
     backend = AlphaMELTSBackend()
-    if not backend.initialize({}) or getattr(backend, '_mode', None) != 'python_api':
-        pytest.skip(
-            'AlphaMELTS EC requires live PetThermoTools python_api residual-'
-            'liquid transport; empirical residual-enrichment validation '
-            'deferred to L5 ThermoEngine'
-        )
+    try:
+        available = backend.initialize({'mode': mode})
+    except ImportError as exc:
+        pytest.skip(f'AlphaMELTS EC {mode} transport unavailable: {exc}')
+    if not available or getattr(backend, '_mode', None) != mode:
+        pytest.skip(f'AlphaMELTS EC {mode} transport unavailable')
 
     provider = AlphaMELTSProvider(backend=backend)
     result = provider.dispatch(

@@ -4,8 +4,7 @@ Promoted from the original scaffold to a kernel-registered SHADOW
 provider under goal #9 ``MAGEMIN-SHADOW-PARITY``. The provider:
 
 - declares the :data:`SILICATE_LIQUIDUS` + :data:`SILICATE_EQUILIBRIUM`
-  intent set (the pair MAGEMin shadows AlphaMELTS on per the binding
-  spec authority matrix),
+  shadow intent set and :data:`GATE_LIQUID_FRACTION` fallback intent,
 - declares ``process.cleaned_melt`` as its sole accessible account; the
   kernel filter drops every other account before dispatch (same
   silicate-oxide isolation contract AlphaMELTS uses),
@@ -16,16 +15,16 @@ provider under goal #9 ``MAGEMIN-SHADOW-PARITY``. The provider:
   shadow determinism,
 - returns a :class:`MAGEMinShadowDiagnostics` payload on
   :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
-  MAGEMin is **shadow-only** (no ledger authority, ever).
+  MAGEMin has no ledger-write authority.
 
 Authority posture
 -----------------
 MAGEMin is registered with the :class:`ProviderRegistry` as a SHADOW
-for both intents. The provider's
-:attr:`CapabilityProfile.is_authoritative_for` is an empty frozenset --
-this is the kernel-level binding that prevents accidental authority
-grants. The kernel's planner runs the authoritative provider AND every
-shadow on each dispatch; only the authoritative result becomes a
+for the full silicate-state intents. It is authority-capable only for
+``GATE_LIQUID_FRACTION``, where the fallback slot answers the gate's
+narrow scalar liquid_fraction(T) question without granting ledger-write
+authority. The kernel's planner runs the authoritative provider AND every
+shadow on each silicate dispatch; only the authoritative result becomes a
 ``LedgerTransition``. Shadow results land on
 ``Planner.shadow_trace`` as ``{provider_id, intent, result}`` records,
 and the planner additionally appends a ``parity_warning`` event when
@@ -65,13 +64,13 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 
 
-# Intent set: SILICATE_LIQUIDUS + SILICATE_EQUILIBRIUM. Matches the
-# authoritative AlphaMELTSProvider intent set so the planner runs
-# MAGEMin alongside AlphaMELTS for every dispatch of either intent.
+# Intent set: silicate parity shadows plus the freeze-gate scalar fallback.
 _INTENTS = frozenset({
     ChemistryIntent.SILICATE_LIQUIDUS,
     ChemistryIntent.SILICATE_EQUILIBRIUM,
+    ChemistryIntent.GATE_LIQUID_FRACTION,
 })
+_FALLBACK_INTENTS = frozenset({ChemistryIntent.GATE_LIQUID_FRACTION})
 
 # Sole declared account: silicate-oxide melt (binding spec §7 isolation).
 # Same constraint as AlphaMELTS -- MAGEMin operates on silicate-oxide
@@ -89,7 +88,7 @@ _SHADOW_AUDIT_NOTE = 'shadow, not enforced'
 
 
 class MAGEMinShadowProvider(ChemistryProvider):
-    """Shadow-only provider for MAGEMin via the kernel.
+    """MAGEMin provider for silicate shadows and gate fallback.
 
     See module docstring. The provider is constructed with an optional
     live :class:`simulator.melt_backend.magemin.MAGEMinBackend` instance;
@@ -126,16 +125,15 @@ class MAGEMinShadowProvider(ChemistryProvider):
         return CapabilityProfile(
             provider_id=self.PROVIDER_ID,
             intents=_INTENTS,
-            # SHADOW-ONLY: empty authoritative set. Kernel registry will
-            # reject any attempt to register this provider as
-            # authoritative (``register(shadow=False)`` raises) because
-            # ``CapabilityProfile.is_authoritative_for`` is empty.
-            is_authoritative_for=frozenset(),
+            # Authority-capable only for the gate's scalar fallback
+            # intent. SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM remain
+            # shadow-only parity surfaces.
+            is_authoritative_for=_FALLBACK_INTENTS,
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        """Run MAGEMin for ``request.intent``; return a shadow diagnostic.
+        """Run MAGEMin for ``request.intent``; return a diagnostic.
 
         See module docstring for the contract. The provider:
 
@@ -162,7 +160,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
                 diagnostic={
                     'reason': (
                         'MAGEMinShadowProvider serves SILICATE_LIQUIDUS + '
-                        'SILICATE_EQUILIBRIUM only'
+                        'SILICATE_EQUILIBRIUM + GATE_LIQUID_FRACTION only'
                     ),
                 },
             )
@@ -212,7 +210,10 @@ class MAGEMinShadowProvider(ChemistryProvider):
                 ),
             )
 
-        if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
+        if request.intent in (
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        ):
             equilibrium = self._run_liquidus_finder(
                 backend,
                 request,
@@ -238,7 +239,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
         return IntentResult(
             intent=request.intent,
             status=kernel_status,
-            transition=None,  # SHADOW-ONLY -- always None.
+            transition=None,
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
             warnings=tuple(diagnostics.backend_warnings),

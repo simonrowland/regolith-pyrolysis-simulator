@@ -227,11 +227,10 @@ def _make_request(
 
 
 def test_provider_registers_as_shadow_for_silicate_intents():
-    """The provider's capability profile MUST be empty-authoritative
-    so the registry routes it as a shadow.
+    """Silicate intents stay shadow-only in the provider capability profile.
 
     Defence in depth: even ``register(shadow=False)`` raises if the
-    provider does not declare itself authoritative.
+    provider does not declare itself authoritative for the silicate intent.
     """
     registry = ProviderRegistry()
     shadow = MAGEMinShadowProvider()
@@ -252,8 +251,8 @@ def test_registry_rejects_promoting_magemin_to_authoritative():
     """Goal-spec forbidden: 'Granting MAGEMin ledger authority.'
 
     The kernel registry enforces this -- ``CapabilityProfile.
-    is_authoritative_for`` is empty for MAGEMin, so the
-    ``register(shadow=False)`` path raises.
+    is_authoritative_for`` excludes the full silicate-state intents, so
+    the ``register(shadow=False)`` path raises for those intents.
     """
     registry = ProviderRegistry()
     shadow = MAGEMinShadowProvider()

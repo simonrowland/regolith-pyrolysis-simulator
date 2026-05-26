@@ -334,11 +334,11 @@ class ChemistryKernel:
         Returns the authoritative provider's :class:`IntentResult`
         AFTER it has passed every kernel validator.  If the
         authoritative provider raises
-        :class:`ProviderUnavailableError` AND ``intent`` is in
-        :attr:`allow_fallback_intents` AND a fallback is registered,
-        the dispatch is retried against the fallback provider; the
-        fallback result is returned with a ``kernel_fallback_used``
-        diagnostic key surfaced for trace consumers.
+        :class:`ProviderUnavailableError`, returns ``status='unavailable'``,
+        or is absent AND ``intent`` is in :attr:`allow_fallback_intents`
+        AND a fallback is registered, the dispatch is retried against the
+        fallback provider; the fallback result is returned with a
+        ``kernel_fallback_used`` diagnostic key surfaced for trace consumers.
 
         Raises:
             ProviderUnavailableError: No authoritative provider for
@@ -353,12 +353,25 @@ class ChemistryKernel:
 
         provider = self._registry.authoritative_for(intent)
         if provider is None:
-            raise ProviderUnavailableError(
-                f"no authoritative provider registered for intent {intent.value!r}"
+            fallback = self._registry.fallback_for(intent)
+            if fallback is None or intent not in self._allow_fallback_intents:
+                raise ProviderUnavailableError(
+                    f"no authoritative provider registered for intent {intent.value!r}"
+                )
+            return self._dispatch_through_provider(
+                intent,
+                fallback,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                fe_redox_policy=fe_redox_policy,
+                control_inputs=control_inputs,
+                declared_accounts=declared_accounts,
+                role="fallback",
             )
 
         try:
-            return self._dispatch_through_provider(
+            result = self._dispatch_through_provider(
                 intent,
                 provider,
                 temperature_C=temperature_C,
@@ -368,6 +381,22 @@ class ChemistryKernel:
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
                 role="authoritative",
+            )
+            if str(result.status) != "unavailable":
+                return result
+            fallback = self._registry.fallback_for(intent)
+            if fallback is None or intent not in self._allow_fallback_intents:
+                return result
+            return self._dispatch_through_provider(
+                intent,
+                fallback,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                fe_redox_policy=fe_redox_policy,
+                control_inputs=control_inputs,
+                declared_accounts=declared_accounts,
+                role="fallback",
             )
         except ProviderUnavailableError:
             # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: authority swap

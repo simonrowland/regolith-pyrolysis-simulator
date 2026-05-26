@@ -2,10 +2,10 @@
 
 Each intent has at most ONE authoritative provider (whose result
 becomes a :class:`LedgerTransitionProposal`), at most ONE fallback
-provider (used only when the authoritative provider raises
-:class:`ProviderUnavailableError` AND the caller opted into fallback for
-that intent), and any number of shadow providers (whose results are
-recorded for trace and parity testing but never committed).  Conflicting
+provider (used only when the authoritative provider is absent/unavailable
+AND the caller opted into fallback for that intent), and any number of
+shadow providers (whose results are recorded for trace and parity testing
+but never committed).  Conflicting
 authoritative or fallback registrations raise :class:`KernelError`.
 
 The fallback slot was added under \\goal VAPOROCK-AUTHORITY-PROMOTION
@@ -68,9 +68,9 @@ class ProviderRegistry:
                 this intent.  At most one fallback per intent; the same
                 provider cannot be both authoritative and fallback for
                 the same intent.  ``ChemistryKernel.dispatch`` consults
-                the fallback only when the authoritative provider
-                raises :class:`ProviderUnavailableError` and the caller
-                opted into fallback for that intent.
+                the fallback only when the authoritative provider is
+                absent/unavailable and the caller opted into fallback
+                for that intent.
 
         Raises:
             KernelError: An authoritative / fallback provider is
@@ -264,9 +264,8 @@ class ProviderRegistry:
     ) -> Optional[ChemistryProvider]:
         """Return the fallback provider for ``intent``, or None.
 
-        Only consulted when the authoritative provider raises
-        :class:`ProviderUnavailableError` AND the caller opted into
-        fallback for the intent (see
+        Only consulted when the authoritative provider is absent/unavailable
+        AND the caller opted into fallback for the intent (see
         :meth:`ChemistryKernel.dispatch`).
         """
 

@@ -251,6 +251,7 @@ def test_provider_declares_silicate_intent_set():
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
         ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
     })
 
 
@@ -269,6 +270,7 @@ def test_provider_authoritative_for_silicate_intents():
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
         ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
     ):
         assert profile.is_authoritative(intent)
 
@@ -280,13 +282,14 @@ def test_provider_declares_only_cleaned_melt_account():
 
 
 def test_provider_does_not_declare_non_silicate_intents():
-    """Defence in depth: only the two silicate intents are dispatchable."""
+    """Defence in depth: only AlphaMELTS silicate/gate intents dispatch."""
     profile = AlphaMELTSProvider(backend=None).capability_profile()
     for intent in ChemistryIntent:
         if intent in (
             ChemistryIntent.SILICATE_LIQUIDUS,
             ChemistryIntent.SILICATE_EQUILIBRIUM,
             ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
         ):
             assert profile.can_dispatch(intent)
         else:
@@ -806,11 +809,15 @@ def test_provider_can_be_registered_as_authoritative():
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
         ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
     ])
     assert registry.authoritative_for(ChemistryIntent.SILICATE_LIQUIDUS) is provider
     assert registry.authoritative_for(ChemistryIntent.SILICATE_EQUILIBRIUM) is provider
     assert registry.authoritative_for(
         ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    ) is provider
+    assert registry.authoritative_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
     ) is provider
 
 

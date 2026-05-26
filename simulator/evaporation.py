@@ -10,10 +10,8 @@ from typing import Any
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.chemistry.kernel import (
     ChemistryIntent,
-    IntentRequest,
     ProviderUnavailableError,
 )
-from simulator.chemistry.kernel.account_filters import build_provider_account_view
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -28,6 +26,8 @@ _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
 _FREEZE_GATE_FRACTION_QUANTUM = 0.001
+_FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
+_FREEZE_GATE_FO2_LOG_QUANTUM = 0.1
 _FREEZE_GATE_TRACE_FRACTION_CUTOFF = 0.001
 _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'SiO2',
@@ -189,19 +189,32 @@ class EvaporationMixin:
         return factor
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
-        key = self._freeze_gate_cache_key()
+        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        fO2_log = float(self._compute_intrinsic_melt_fO2())
+        key = self._freeze_gate_cache_key(
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         if cache and cache.get('key') == key:
             return dict(cache['curve'])
 
         reasons: list[str] = []
-        curve = self._freeze_gate_curve_from_ec_dispatch(reasons)
+        curve = self._freeze_gate_curve_from_gate_dispatch(
+            reasons,
+            fO2_log=fO2_log,
+        )
         if curve is None:
-            curve = self._freeze_gate_curve_from_backend_liquidus(reasons)
+            curve = self._freeze_gate_curve_from_backend_liquidus(
+                reasons,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+            )
         if curve is None:
-            curve = self._freeze_gate_curve_from_kernel_liquidus(reasons)
-        if curve is None:
-            curve = self._freeze_gate_curve_from_magemin_shadow(reasons)
+            curve = self._freeze_gate_curve_from_kernel_liquidus(
+                reasons,
+                fO2_log=fO2_log,
+            )
         if curve is None:
             detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
             raise RuntimeError(
@@ -219,7 +232,12 @@ class EvaporationMixin:
         )
         return curve
 
-    def _freeze_gate_cache_key(self) -> tuple:
+    def _freeze_gate_cache_key(
+        self,
+        *,
+        pressure_bar: float,
+        fO2_log: float,
+    ) -> tuple:
         cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
         relevant_mol: dict[str, float] = {}
         for species, mol in cleaned_mol.items():
@@ -230,40 +248,68 @@ class EvaporationMixin:
             if mol_value > _FREEZE_GATE_EPSILON:
                 relevant_mol[species_key] = mol_value
 
-        total_mol = sum(relevant_mol.values())
-        if total_mol <= _FREEZE_GATE_EPSILON:
-            return ('oxide_mol_fraction_v1', ())
-
         # Liquidus is stable to small per-tick evaporation drift; 0.1 mol-%
         # bins (0.001 fraction quantum) sit comfortably above mole-fraction
         # float-arithmetic jitter while still well inside the L1 finder ±30 K
         # tolerance, and still rebuild for campaign-scale major-oxide
         # composition shifts.
         composition_key = []
-        for species, mol in relevant_mol.items():
-            fraction = mol / total_mol
-            if fraction < _FREEZE_GATE_TRACE_FRACTION_CUTOFF:
-                continue
-            quantized_fraction = (
-                round(fraction / _FREEZE_GATE_FRACTION_QUANTUM)
-                * _FREEZE_GATE_FRACTION_QUANTUM
-            )
-            if quantized_fraction <= 0.0:
-                continue
-            composition_key.append((species, round(quantized_fraction, 6)))
-        return ('oxide_mol_fraction_v1', tuple(sorted(composition_key)))
+        total_mol = sum(relevant_mol.values())
+        if total_mol > _FREEZE_GATE_EPSILON:
+            for species, mol in relevant_mol.items():
+                fraction = mol / total_mol
+                if fraction < _FREEZE_GATE_TRACE_FRACTION_CUTOFF:
+                    continue
+                quantized_fraction = (
+                    round(fraction / _FREEZE_GATE_FRACTION_QUANTUM)
+                    * _FREEZE_GATE_FRACTION_QUANTUM
+                )
+                if quantized_fraction <= 0.0:
+                    continue
+                composition_key.append((species, round(quantized_fraction, 6)))
+        pressure_bucket = (
+            round(float(pressure_bar) / _FREEZE_GATE_PRESSURE_BAR_QUANTUM)
+            * _FREEZE_GATE_PRESSURE_BAR_QUANTUM
+        )
+        fO2_bucket = (
+            round(float(fO2_log) / _FREEZE_GATE_FO2_LOG_QUANTUM)
+            * _FREEZE_GATE_FO2_LOG_QUANTUM
+        )
+        # Pressure is bucketed at 0.01 bar and fO2 at 0.1 log unit: coarse
+        # enough to absorb per-tick float noise, fine enough to split
+        # overhead-pressure and campaign/redox control changes.
+        return (
+            'oxide_mol_fraction_p_fO2_v2',
+            round(pressure_bucket, 6),
+            round(fO2_bucket, 6),
+            tuple(sorted(composition_key)),
+        )
 
-    def _freeze_gate_curve_from_ec_dispatch(
+    def _freeze_gate_curve_from_gate_dispatch(
         self,
         reasons: list[str],
+        *,
+        fO2_log: float,
     ) -> dict[str, Any] | None:
+        register_gate_providers = getattr(
+            self,
+            '_register_freeze_gate_liquid_fraction_providers',
+            None,
+        )
+        if callable(register_gate_providers):
+            try:
+                register_gate_providers()
+            except Exception as exc:  # noqa: BLE001 - optional provider boundary
+                reasons.append(f'gate provider registration failed: {exc}')
         try:
             result = self._dispatch_only(
-                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
                 control_inputs={},
+                fO2_log=fO2_log,
+                fe_redox_policy='intrinsic',
             )
         except ProviderUnavailableError as exc:
-            reasons.append(f'EC unavailable: {exc}')
+            reasons.append(f'gate liquid fraction unavailable: {exc}')
             return None
 
         diagnostic = dict(getattr(result, 'diagnostic', None) or {})
@@ -273,25 +319,39 @@ class EvaporationMixin:
             or 'unavailable'
         )
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
-        if status != 'ok' or not path:
+        source = 'gate_liquid_fraction'
+        fallback_provider = diagnostic.get('kernel_fallback_used')
+        if fallback_provider:
+            source = f'gate_liquid_fraction:fallback:{fallback_provider}'
+        if status != 'ok':
             reasons.append(
-                'EC table unavailable: '
-                f"status={status}, path_points={len(path)}"
+                'gate liquid fraction unavailable: '
+                f'status={status}'
             )
             return None
-        curve = self._freeze_gate_curve_from_path(
-            path,
+        if path:
+            curve = self._freeze_gate_curve_from_path(
+                path,
+                solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
+                liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
+                source=source,
+            )
+            if curve is not None:
+                return curve
+            reasons.append('gate liquid fraction table invalid')
+        return self._freeze_gate_curve_from_bounds(
             solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
             liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
-            source='equilibrium_crystallization',
+            source=source,
+            reasons=reasons,
         )
-        if curve is None:
-            reasons.append('EC table invalid: missing monotone T/fraction path')
-        return curve
 
     def _freeze_gate_curve_from_backend_liquidus(
         self,
         reasons: list[str],
+        *,
+        pressure_bar: float,
+        fO2_log: float,
     ) -> dict[str, Any] | None:
         finder = getattr(self.backend, 'find_liquidus_solidus', None)
         if not callable(finder):
@@ -299,8 +359,8 @@ class EvaporationMixin:
             return None
         try:
             result = finder(
-                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
-                fO2_log=float(self._compute_intrinsic_melt_fO2()),
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
                 composition_mol_by_account={
                     _FREEZE_GATE_ACCOUNT: self.atom_ledger.mol_by_account(
                         _FREEZE_GATE_ACCOUNT
@@ -322,12 +382,15 @@ class EvaporationMixin:
     def _freeze_gate_curve_from_kernel_liquidus(
         self,
         reasons: list[str],
+        *,
+        fO2_log: float,
     ) -> dict[str, Any] | None:
         try:
             result = self._dispatch_only(
                 ChemistryIntent.SILICATE_LIQUIDUS,
                 control_inputs={},
-                fO2_log=float(self._compute_intrinsic_melt_fO2()),
+                fO2_log=fO2_log,
+                fe_redox_policy='intrinsic',
             )
         except ProviderUnavailableError as exc:
             reasons.append(f'kernel liquidus unavailable: {exc}')
@@ -348,120 +411,6 @@ class EvaporationMixin:
             source='liquidus_solidus:kernel',
             reasons=reasons,
         )
-
-    def _freeze_gate_curve_from_magemin_shadow(
-        self,
-        reasons: list[str],
-    ) -> dict[str, Any] | None:
-        registry = getattr(self, '_chem_registry', None)
-        shadows_for = getattr(registry, 'shadows_for', None)
-        if not callable(shadows_for):
-            reasons.append('MAGEMin shadow unavailable: registry absent')
-            return None
-
-        shadow = self._registered_magemin_shadow(registry, reasons)
-        if shadow is None:
-            return None
-
-        try:
-            profile = shadow.capability_profile()
-            account_view = build_provider_account_view(
-                self.atom_ledger,
-                frozenset(getattr(profile, 'declared_accounts', ()) or ()),
-                dict(getattr(self, 'species_formula_registry', {}) or {}),
-            )
-            request = IntentRequest(
-                intent=ChemistryIntent.SILICATE_LIQUIDUS,
-                account_view=account_view,
-                temperature_C=float(self.melt.temperature_C),
-                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
-                fO2_log=float(self._compute_intrinsic_melt_fO2()),
-                control_inputs={},
-            )
-            result = shadow.dispatch(request)
-        except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            reasons.append(f'MAGEMin shadow failed: {exc}')
-            return None
-
-        if getattr(result, 'transition', None) is not None:
-            reasons.append('MAGEMin shadow invalid: returned ledger transition')
-            return None
-
-        diagnostic = dict(getattr(result, 'diagnostic', None) or {})
-        status = str(
-            getattr(result, 'status', None)
-            or diagnostic.get('backend_status')
-            or 'unavailable'
-        )
-        if status != 'ok':
-            warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
-            backend_status = diagnostic.get('backend_status')
-            reasons.append(
-                'MAGEMin shadow unavailable: '
-                f'status={status}, backend_status={backend_status}'
-                + (f', warnings={warnings}' if warnings else '')
-            )
-            return None
-        return self._freeze_gate_curve_from_bounds(
-            solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
-            liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
-            source='liquidus_solidus:magemin-shadow',
-            reasons=reasons,
-        )
-
-    def _registered_magemin_shadow(
-        self,
-        registry: Any,
-        reasons: list[str],
-    ) -> Any | None:
-        shadow = self._find_magemin_shadow(
-            registry.shadows_for(ChemistryIntent.SILICATE_LIQUIDUS)
-        )
-        if shadow is not None:
-            return shadow
-
-        register = getattr(registry, 'register_idempotent', None)
-        if not callable(register):
-            reasons.append('MAGEMin shadow unavailable: registry cannot register')
-            return None
-        try:
-            from engines.magemin import MAGEMinShadowProvider
-
-            provider = MAGEMinShadowProvider()
-            register(
-                provider,
-                [
-                    ChemistryIntent.SILICATE_LIQUIDUS,
-                    ChemistryIntent.SILICATE_EQUILIBRIUM,
-                ],
-                shadow=True,
-            )
-        except Exception as exc:  # noqa: BLE001 - optional provider boundary
-            reasons.append(f'MAGEMin shadow registration failed: {exc}')
-            return None
-
-        shadow = self._find_magemin_shadow(
-            registry.shadows_for(ChemistryIntent.SILICATE_LIQUIDUS)
-        )
-        if shadow is None:
-            reasons.append('MAGEMin shadow unavailable: not registered')
-        return shadow
-
-    @staticmethod
-    def _find_magemin_shadow(shadows: tuple) -> Any | None:
-        for candidate in shadows:
-            profile_getter = getattr(candidate, 'capability_profile', None)
-            if not callable(profile_getter):
-                continue
-            try:
-                profile = profile_getter()
-            except Exception:
-                continue
-            provider_id = str(getattr(profile, 'provider_id', '') or '')
-            name = str(getattr(candidate, 'name', '') or '')
-            if provider_id == 'magemin-shadow' or name == 'magemin-shadow':
-                return candidate
-        return None
 
     def _freeze_gate_curve_from_liquidus_result(
         self,
