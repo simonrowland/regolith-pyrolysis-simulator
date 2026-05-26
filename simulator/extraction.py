@@ -725,10 +725,21 @@ class ExtractionMixin:
         )
         back_diag = dict(back_result.diagnostic or {})
         back_proposal = back_result.transition
+        back_si_before_kg = self._ledger_account_species_kg(
+            'process.metal_phase', 'Si')
         if back_proposal is not None:
             self._commit_proposal(
                 ChemistryIntent.METALLOTHERMIC_STEP, back_proposal,
             )
+            metal_phase_delta = (
+                self._ledger_account_species_kg(
+                    'process.metal_phase', 'Si')
+                - back_si_before_kg
+            )
+            # Provider credited Si to process.metal_phase; project to UI.
+            self._project_condensed_species(
+                2, 'Si', metal_phase_delta,
+                source_account='process.metal_phase')
         else:
             # F-A4: no-op dispatch counter mirrors the
             # _dispatch_and_commit helper.  A SiO2-poor melt or an
@@ -737,10 +748,6 @@ class ExtractionMixin:
             # second dispatch fired and returned no-op rather than was
             # skipped at the caller.
             self._chem_no_op_dispatch_count += 1
-
-            # Si product → condenser Stage 2
-            self._project_condensed_species(
-                2, 'Si', source_account='process.metal_phase')
 
             # Net Al / Al2O3 deltas after back-reduction (legacy
             # snapshot semantics: counters track NET removed Al2O3 and

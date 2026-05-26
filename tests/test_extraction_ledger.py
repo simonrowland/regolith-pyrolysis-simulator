@@ -478,3 +478,9 @@ def test_mg_thermite_debits_process_reagent_inventory():
     assert sim.train.stages[1].collected_kg["Al"] > 0.0
     _assert_product_matches_account(sim, "process.metal_phase", "Al")
     _assert_product_matches_account(sim, "process.metal_phase", "Si")
+    metal_phase_si_kg = sim.atom_ledger.kg_by_account("process.metal_phase")[
+        "Si"
+    ]
+    assert sim.train.stages[2].collected_kg["Si"] == pytest.approx(
+        metal_phase_si_kg
+    )
