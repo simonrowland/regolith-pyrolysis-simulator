@@ -48,6 +48,8 @@ class ExtractionMixin:
         kg = max(0.0, float(kg))
         if kg <= self._LEDGER_KG_TOL:
             return 0.0
+        # WRITER-EXEMPT: shuttle-reagent-move -- atom-balanced reagent
+        # shuttle between ledger accounts, outside chemistry transitions.
         self.atom_ledger.move(
             name,
             debit_account,
