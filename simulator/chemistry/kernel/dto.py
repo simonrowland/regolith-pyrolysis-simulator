@@ -167,8 +167,10 @@ class IntentResult:
     authoritative providers populate it.  ``diagnostic`` is free-form
     metadata for trace and UI (phases present, liquidus margin, parity
     deltas, ...).  ``status`` follows the planner-level vocabulary:
-    ``ok`` / ``not_converged`` / ``out_of_domain`` / ``unavailable`` /
-    ``unsupported``.
+    ``ok`` / ``refused`` / ``not_converged`` / ``out_of_domain`` /
+    ``unavailable`` / ``unsupported``.  ``refused`` is a policy refusal:
+    dispatch met the provider, but the request violates a physics/regime gate
+    (for example, reductant margin <= 0).
     """
 
     intent: ChemistryIntent
