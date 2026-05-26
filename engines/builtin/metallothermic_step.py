@@ -1079,6 +1079,22 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         dH_f, dS_f, _n_M, _n_ox = _ELLINGHAM_THERMO[metal]
         return dH_f - (float(temperature_C) + 273.15) * dS_f
 
+    @staticmethod
+    def _crossover_temperature_C(reagent_metal: str, target_metal: str) -> float:
+        """Return the oxide-stability crossover temperature in Celsius.
+
+        V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
+        K/Fe = 832.0 C, Na/Fe = 1173.4 C, Na/Cr = 776.5 C,
+        Na/Ti = 269.5 C. Above a pair's crossover, the reagent oxide is
+        less stable than the target oxide, so reduction is thermodynamically
+        disfavored; current recipe gates remain handled outside this helper.
+        """
+        dH_reagent, dS_reagent, _n_M, _n_ox = _ELLINGHAM_THERMO[reagent_metal]
+        dH_target, dS_target, _n_M, _n_ox = _ELLINGHAM_THERMO[target_metal]
+        return (
+            (dH_reagent - dH_target) / (dS_reagent - dS_target)
+        ) - 273.15
+
     @classmethod
     def _na_thermo_priority(
         cls,

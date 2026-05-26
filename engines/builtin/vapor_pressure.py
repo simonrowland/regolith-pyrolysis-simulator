@@ -73,15 +73,17 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
-    'Na': (-836.0, -0.275, 4, 2),
-    'K':  (-740.0, -0.225, 4, 2),
-    'Fe': (-536.0, -0.088, 2, 2),
+    # V1c JANAF high-T refit over 1100-1700 K. Mn remains legacy
+    # pending the source decision tracked in task #37.
+    'Na': (-1135.130, -0.537417, 4, 2),
+    'K':  (-975.838, -0.520580, 4, 2),
+    'Fe': (-538.946, -0.125272, 2, 2),
     'Mn': (-770.0, -0.165, 2, 2),
-    'Cr': (-756.0, -0.137, 4/3, 2/3),
-    'Mg': (-1200.0, -0.198, 2, 2),
-    'Ca': (-1270.0, -0.198, 2, 2),
-    'Al': (-1120.0, -0.214, 4/3, 2/3),
-    'Ti': (-945.0, -0.195, 1, 1),
+    'Cr': (-748.076, -0.168676, 4/3, 2/3),
+    'Mg': (-1342.444, -0.336009, 2, 2),
+    'Ca': (-1285.155, -0.222295, 2, 2),
+    'Al': (-1126.073, -0.218805, 4/3, 2/3),
+    'Ti': (-939.632, -0.177149, 1, 1),
 }
 
 
