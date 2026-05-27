@@ -53,11 +53,12 @@ _V1C_JANAF_ELLINGHAM = {
     "Ca": (-1285.155, -0.222295, 2, 2),
     "Al": (-1126.073, -0.218805, 4 / 3, 2 / 3),
     "Ti": (-939.632, -0.177149, 1, 1),
-    # Mn updated 2026-05-27 (post-0.5.0) from legacy to NIST-JANAF
-    # standard-formation values at 298 K (Chase 1998, Mn-008). See
+    # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
+    # anchored on Mn(l) above the solid→liquid transition at 1517 K
+    # (Chase 1998, Mn-008 + phase transition data). See
     # simulator/equilibrium.py::_ELLINGHAM_THERMO for the full
-    # rationale + high-T-refit deferral note.
-    "Mn": (-770.440, -0.149752, 2, 2),
+    # rationale.
+    "Mn": (-794.540, -0.165650, 2, 2),
 }
 
 

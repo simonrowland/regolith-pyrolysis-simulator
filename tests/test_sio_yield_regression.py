@@ -32,8 +32,13 @@ GOLDENS = (
 # raise-on-unavailable: lunar shifted 0.00078662141565 -> 0.000786620599287
 # (PPM-scale FP roundoff drift from the Mn entry change altering
 # _stub_equilibrium iteration order); mars unchanged.
+# Post-0.5.1 Phase A2 (2026-05-27) Mn high-T linear refit (Mn(l) basis):
+# tiny FP roundoff again, lunar 0.000786620599287 -> 0.000786620612837;
+# mars unchanged. Mn doesn't itself evaporate in this recipe band; the
+# drift is purely from the Mn entry's effect on _stub_equilibrium
+# dict-iteration order rounding.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.000786620599287,
+    "lunar_mare_low_ti": 0.000786620612837,
     "mars_basalt": 0.000850874178948,
 }
 

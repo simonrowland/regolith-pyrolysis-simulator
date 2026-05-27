@@ -26,7 +26,10 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-8
 # altering _stub_equilibrium iteration order. 0.00078662141565 ->
 # 0.000786620599287 (rel ~1e-6). No physics change; pure FP noise from a
 # documented thermo-table update.
-PHASE3BIS_SIO_EVOLVED_KG = 0.000786620599287
+# Post-0.5.1 Phase A2 (2026-05-27) Mn high-T linear refit (Mn(l) basis):
+# tiny FP roundoff again, 0.000786620599287 -> 0.000786620612837 (rel
+# ~1.7e-8). Same root cause (Mn entry rounding); same character.
+PHASE3BIS_SIO_EVOLVED_KG = 0.000786620612837
 
 
 @lru_cache(maxsize=None)

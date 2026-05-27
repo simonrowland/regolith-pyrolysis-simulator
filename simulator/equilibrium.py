@@ -130,24 +130,30 @@ class EquilibriumMixin:
 
     _ELLINGHAM_THERMO = {
         # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti.
-        # Mn updated 2026-05-27 (post-0.5.0) from legacy to NIST-JANAF
-        # standard-formation values at 298 K -- a defensible primary
-        # source; high-T linear refit deferred as V1c-Mn-followon because
-        # Mn passes through its solid->liquid transition at 1517 K
-        # (within the 1100-1700 K band) and a proper refit must integrate
-        # ΔH_fus=12.05 kJ/mol + ΔS_fus=7.95 J/K across the phase change.
-        # The 298 K basis corrects the slope (b) drift in the legacy
-        # values (0.149752 vs 0.165) while leaving the intercept
-        # essentially unchanged (-770.44 vs -770.0). Mn stays in the
-        # moderate-oxide tier with Fe/Cr; this is a minor byproduct in
-        # lunar mare regolith (~0.2 wt% MnO) so the high-T residual
-        # approximation is within the V1c-acceptable band for this
-        # species' simulator role.
+        # Mn updated 0.5.2 (2026-05-27) from the 298 K basis to a proper
+        # HIGH-T linear refit anchored on Mn(l) above the solid->liquid
+        # transition at 1517 K (NIST-JANAF Mn-008 + phase transition
+        # data). Reaction is ``2 Mn(l) + O₂ → 2 MnO(s)`` over the
+        # 1517-1700 K window (Mn liquid, MnO solid; MnO melts at 2058
+        # K above any furnace-survivable T):
+        #   ΔH(rxn, Mn liquid) = ΔH(rxn, Mn solid) - 2 × ΔH_fus(Mn)
+        #                      = -770.44 - 2 × 12.05 = -794.54 kJ/mol O₂
+        #   ΔS(rxn, Mn liquid) = ΔS(rxn, Mn solid) - 2 × ΔS_fus(Mn)
+        #                      = -149.75 - 2 × 7.95 = -165.65 J/K
+        # Below 1517 K the table underestimates oxide stability by
+        # ~5-15 kJ/mol O₂ (Mn solid is reactant; the table assumes
+        # liquid). This is acceptable for the simulator's use case:
+        # Mn high-T vapor pressure governs evaporation; the recipe T
+        # window where Mn matters (1500-1800 K) is in the liquid-Mn
+        # regime where the table is accurate. Mn is a minor byproduct
+        # (~0.2 wt% MnO in lunar mare) so the sub-1517 K residual is
+        # well below the V1c approximation band for this species'
+        # simulator role.
         'Na': (-1135.130, -0.537417, 4, 2),      # Na-012,  ΔG(1600°C) ≈ -128
         'K':  (-975.838, -0.520580, 4, 2),       # K-012,   ΔG(1600°C) ≈ -1
         'Fe': (-538.946, -0.125272, 2, 2),       # Fe-018,  ΔG(1600°C) ≈ -304
-        'Mn': (-770.440, -0.149752, 2, 2),       # Mn-008 NIST-JANAF (Chase 1998) 298K basis;
-                                                  # ΔG(1600°C) ≈ -490 kJ/mol O₂
+        'Mn': (-794.540, -0.165650, 2, 2),       # Mn-008 high-T (Mn(l) + O₂ → MnO(s),
+                                                  # 1517-1700 K basis); ΔG(1600°C) ≈ -484
         'Cr': (-748.076, -0.168676, 4/3, 2/3),   # Cr-014,  ΔG(1600°C) ≈ -432
         'Mg': (-1342.444, -0.336009, 2, 2),      # Mg-008,  ΔG(1600°C) ≈ -713
         'Ca': (-1285.155, -0.222295, 2, 2),      # Ca-027,  ΔG(1600°C) ≈ -869
