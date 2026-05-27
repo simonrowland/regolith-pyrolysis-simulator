@@ -12,10 +12,10 @@ The simulated process is organized as staged campaigns:
 - `C0b` mild oxidative cleanup for phosphorus and volatile residues.
 - `C2A` low-pO2 or sweep-gas pyrolysis for Fe and SiO-bearing flows.
 - `C2B` pO2-managed Fe pyrolysis that preserves more silica-rich glass.
-- `C3` Na/K metallothermic shuttle chemistry for residual Fe, Ti, Cr, and Si conditioning.
+- `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. Legacy `C3_K` and Cr/Ti targets are refused by the S1b engine gate under the V1c JANAF Ellingham refit and recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 - `C4` selective Mg pyrolysis.
 - `C5` limited MRE for Si and selected metals.
-- `C6` Mg thermite reduction for aluminum-rich residues.
+- `C6` Mg thermite reduction for aluminum-rich residues; equilibrium default below the ~1573 °C Mg/Al crossover.
 - `MRE_BASELINE` full electrolysis comparison path.
 
 ## What the Simulator Tracks
@@ -23,13 +23,16 @@ The simulated process is organized as staged campaigns:
 Each hourly step updates:
 
 - Melt temperature and composition.
-- Vapor pressures and evaporation fluxes.
+- Vapor pressures and evaporation fluxes; provenance per species is recorded in `vapor_pressure_source_report` (one of `vaporock`, `thermoengine`, `alphamelts_python_api`, `alphamelts_text`, `builtin_fallback`, `kernel_diagnostic`).
 - Overhead gas pressure and partial pressures.
-- Pipe transport saturation and ramp throttling.
+- Pipe transport saturation, ramp throttling, and per-pipe-segment wall temperatures + cold-spot diagnostics (F2). The `knudsen_regime_diagnostic` in `run_metadata` exposes the transport-regime check per segment.
 - Turbine load, O2 compression, venting, and accumulator inventory, with
   melt/offgas O2 and MRE anode O2 kept as separate mol bins.
-- Condensed products by species.
+- Condensed products by species, plus a `stage_purity_report` exposing designated-vs-impurity mass per stage (F1 canonical species → stage registry).
+- Wall deposits per species (`wall_deposit_kg`) — sole-written via `commit_batch` inside the ≤5×10⁻¹² % mass-balance closure; parameterised by pN₂ / Knudsen regime and per-segment wall T.
+- Per-species rump composition + by-class rump composition (F4) on the terminal payload.
 - MRE voltage, current, metal production, and electrical energy.
+- Shuttle dispatch outcomes — accepted steps mutate the ledger; refused steps land in `shuttle_refusal_history` with the engine's structured diagnostic.
 - Total mass balance and cumulative products.
 
 The batch preserves a raw feedstock inventory outside `MeltState`. Melt

@@ -85,17 +85,20 @@ Path B deliberately holds pO₂ high enough to suppress SiO while still extracti
 
 Source: `data/setpoints.yaml` lines 251–277.
 
-### C3 — Na/K Metallothermic Polish
+### C3_NA — Na Metallothermic Polish (post-V1c default)
 
-**Temperature**: inject 1200–1350 °C, bakeout 1520–1680 °C.  
+**Temperature**: inject 1050–1150 °C (cool window), bakeout 1520–1680 °C.  
 **Atmosphere**: Fe-granule sorbent + precision O₂ micro-bleed (pO₂ 0.5–1.5 mbar bakeout).  
-**Sequencing**: K-first, then Na (strict; mixed alkali effect reduces diffusion up to 10× at equimolar).
+**Reductant**: Na only.  
+**Status**: legacy C3 was a mixed Na/K shuttle; under the V1c JANAF refit the K phase is refused at any practical melt T (K/Fe crossover ~832 °C) and the engine `status="refused"` is recorded in `shuttle_refusal_history`. The surviving recipe is Na-only.
 
-The three-tier shuttle architecture: inject reductant → reduce target oxide → tap metal → pO₂ bakeout → recover reductant. K cycles handle residual Fe and SiO₂ activity conditioning; Na cycles handle Ti and final conditioning.
+The shuttle architecture is one tier per injection: inject Na → reduce FeO at 1050–1150 °C → tap Fe metal → pO₂ bakeout → recover Na. The shuttle does not chemically reduce Cr, Ti, or Mn at C3 temperatures — those targets are refused by the executable thermodynamic gate (S1b). Si conditioning is a melt-activity side effect of Na₂O accumulation, not a separate cycle.
 
-Cycles after Path A: 0–1 K + 1 Na. Cycles after Path B: 2 K + 2 Na. Na₂O solubility cap in melt is 8–12 wt%.
+Cycles after Path A: 1 Na. Cycles after Path B: 2 Na (Path B preserved more FeO and SiO₂ in the melt, so the post-C2B shuttle has more work). Na₂O solubility cap in the melt is 8–12 wt%.
 
-Source: `data/setpoints.yaml` lines 279–322.
+Honest limit: the Na/Fe crossover is 1173.4 °C, leaving a thin positive margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.
+
+Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for backward compat with goldens; the engine resolves the surviving phases at dispatch).
 
 ### C4 — Selective Mg Pyrolysis (Branch Two)
 
@@ -209,4 +212,6 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 - **Rump approaching 10–15 kg**: the refractory floor is being reached after a full C0–C6 sequence on low-Ti mare.
 - **`wall_deposit_kg[SiO]` growing fast**: the pN₂ sweep is insufficient or a cold wall is upstream of Stage 3. Check pN₂ setpoint and liner temperature schedule (see `data/setpoints.yaml` §14 `overhead_headspace.liner_temperature_C`).
 - **Fe yield plateau around 88–90 % in C2A_staged**: expected thermal extraction limit; residual FeO (20–24 kg) is the shuttle's feed. This is correct behavior, not a failure.
-- **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when K/Na additives are not loaded. Confirm `--additive=K=26` and `--additive=Na=12` are present for C2A_staged, or that shuttle stock has accumulated from prior C2 cycles.
+- **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when the Na additive is not loaded. Confirm `--additive=Na=12` is present for C2A_staged, or that Na shuttle stock has accumulated from prior C2 cycles. (`--additive=K=...` is accepted but ignored by the post-V1c shuttle gate; it will not raise Fe yield.)
+
+**`shuttle_refusal_history` non-empty in the runner output**: at least one shuttle step was refused by the S1b T-acceptance gate. Each entry names the campaign, hour, melt T, and the engine's thermodynamic margin. Common cause: inject T above the species-pair crossover (Na/Fe @ 1173.4 °C, K/Fe @ 832 °C). The whole-run `status` stays `ok` or `partial` for per-step refusals; only `KnudsenRegimeRefusal`-class halts escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md) §"Shuttle refusal history".

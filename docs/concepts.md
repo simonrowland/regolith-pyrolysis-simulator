@@ -74,16 +74,16 @@ p(SiO) = K(T) × a(SiO₂) / √pO₂
 
 At hard vacuum (pO₂ ~ 1×10⁻⁹ bar) SiO vapor pressure at 1600 °C reaches 0.5–2 mbar, which is a significant fouling flux. At 1 mbar pO₂, SiO is suppressed ~300× conservatively (1000× theoretical) to <0.005 mbar — effectively zero transport toward the condenser stages.
 
-The pO₂ selectivity law implemented in the builtin model applies species-specific suppression exponents. A more negative exponent means stronger pO₂ sensitivity:
+The species-specific pO₂ slopes derived from Sense 2 above govern *how strongly vacuum amplifies each oxide's activity*:
 
-| Species | pO₂ exponent | Interpretation |
-|---|---|---|
-| Na, K | −0.25 | Weakly suppressed by pO₂; volatile at any pO₂ above vacuum |
-| Fe, Mg, SiO, Ca | −0.5 | Standard stoichiometric suppression |
-| Al, Cr | −0.75 | Stronger suppression; not practically extractable by pyrolysis alone |
-| Ti | −1.0 | Strongly suppressed; not pyrolysable at any practical pO₂ setpoint |
+| Species | Sense-2 slope `d log(a_M) / d log(pO₂)` | Interpretation |
+|---|---:|---|
+| Na, K | −0.25 | Weakly amplified by vacuum; volatile at any pO₂ above hard vacuum because pure-metal `P_sat` is enormous |
+| Fe, Mg, Ca | −0.5 | Standard stoichiometric amplification |
+| Cr, Al | −0.75 | Strongly amplified; combined with low `P_sat` these are still not practically pyrolysable but vacuum helps a lot |
+| Ti | −1.0 | Maximum vacuum amplification, but `P_sat × a_M` still below threshold at any furnace-survivable T |
 
-<!-- TODO: verify that these are the exact exponents coded in simulator/equilibrium.py; the values cited here match CLAUDE.md but should be checked against the implementation. -->
+These are the Sense-2 ladder slopes (theoretical, from stoichiometry). The builtin fallback uses `pO2_exponent` per-species in `data/vapor_pressures.yaml` (currently set only for the SiO₂ ⇌ SiO + ½ O₂ branch, where pO₂ is *the* lever); for the metal/oxide species the authoritative `VapoRockProvider` computes the full `a_M(T, pO₂)` internally and the table above is exposition only.
 
 pO₂ is controlled actively via Fe-granule oxygen sorbent and precision O₂ micro-bleed, with turbine-speed feedback. Precision in the viscous regime is ±0.1–0.3 mbar (`data/setpoints.yaml` §5).
 
@@ -174,7 +174,7 @@ The simulator is a comparative process estimator, not a validated engineering de
 - **Kress91 Fe³⁺/Fe²⁺ redox** (fO₂-coupled ferric/ferrous glass model) is not yet implemented. The intrinsic fO₂ is derived from cleaned melt composition as a diagnostic surface only.
 - **Metal-phase settling and drain-tap are not modelled.** Reduced metal accumulates in `process.metal_phase` indefinitely; gravitational settling of dense metal out of the melt is not simulated.
 - **Finite overhead headspace** (toggle `overhead_headspace.enabled`) defaults OFF. When ON, evaporation O₂ is held in `process.overhead_gas` and bled through a Poiseuille conductance model; molecular-flow conductance and validated hardware control are out of scope.
-- **The builtin shuttle reactions are temperature-independent.** See `docs/model-limitations.md`.
+- **The S1b shuttle T-acceptance gate is strict but the shuttle reactions themselves are temperature-independent inside the gate.** The engine refuses dispatch when the dispatch-T thermodynamic margin is non-positive (and records the refusal verbatim in `shuttle_refusal_history`), but it does not interpolate yields across the crossover band. See `docs/model-limitations.md`.
 
 For the full list, see [`docs/model-limitations.md`](model-limitations.md).
 

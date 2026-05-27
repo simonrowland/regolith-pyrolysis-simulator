@@ -1,6 +1,6 @@
 # Melt Chemistry Backends
 
-The simulator can run without external thermodynamic software. The fallback path combines simplified Ellingham equilibrium logic with Antoine vapor-pressure data, which is useful for comparative exploration but not for validated melt chemistry.
+In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools / AlphaMELTS for `SILICATE_EQUILIBRIUM`, MAGEMin for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION` — is the always-on production path; `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. The pure-Antoine × Ellingham fallback is retained as a documented diagnostic path, gated behind `chemistry_kernel.allow_fallback_vapor: true` and the upstream `vaporock` import being unavailable; without both, the kernel re-raises rather than silently downgrading. FactSAGE / ChemApp remains the only license-gated optional engine.
 
 ## Per-call result status
 
@@ -37,13 +37,7 @@ The `engines/` directory is ignored by git so local licensed or platform-specifi
 
 ## Python Packages
 
-Install optional Python melt tooling with:
-
-```bash
-pip install -e ".[melts]"
-```
-
-The `melts` extra currently includes `PetThermoTools`. The `vapor` extra installs the upstream VapoRock source tag because no PyPI release is available.
+`vaporock` and `petthermotools` are declared in `[project.dependencies]` and are installed by the standard `pip install -e .` (and by `install-dependencies.py`). The VapoRock dependency is pinned to the upstream GitLab source tag because no PyPI release is available — `pyproject.toml` carries the canonical pin. Optional extras (`[magemin]`, `[sulfur]`, `[dev]`) install diagnostic engines and test tooling that are not on the production hot path.
 
 ## VapoRock adapter notes
 
@@ -65,10 +59,10 @@ Under `\goal VAPOROCK-AUTHORITY-PROMOTION` (2026-05-15), `engines/vaporock/provi
 
 The fallback only runs when both of these hold:
 
-1. The authoritative `VapoRockProvider` raised `ProviderUnavailableError` at dispatch time (the upstream `vaporock` library is missing on the host), and
+1. The authoritative `VapoRockProvider` raised `ProviderUnavailableError` at dispatch time (the upstream `vaporock` library is missing on the host — uncommon in 0.5.0 since `vaporock` is in `[project.dependencies]`, but possible on partially-provisioned dev hosts), and
 2. The simulator was constructed with `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True`. The flag is read at `PyrolysisSimulator.__init__` and threaded into `ChemistryKernel.allow_fallback_intents`.
 
-Otherwise the kernel re-raises `ProviderUnavailableError` -- **silent fallback is forbidden**.
+Otherwise the kernel re-raises `ProviderUnavailableError` -- **silent fallback is forbidden**. The pure-Antoine × Ellingham chain is ~124× off VapoRock at lunar mare 1500 °C IW for K (γ_K lives inside VapoRock and cannot be reproduced by `a_M × P_sat` alone), so the fallback is a diagnostic surface, not an operational substitute.
 
 When the fallback path fires, the kernel tags the result's `diagnostic` map with `kernel_fallback_used = 'builtin-vapor-pressure'` so trace consumers can tell the authoritative slot did not answer.
 

@@ -22,7 +22,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **C2B** — pO₂-managed Fe pyrolysis (Path B); preserves CMAS glass in the melt. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
-**C3** — legacy alkali metallothermic polish campaign. Under the V1c JANAF refit, K/FeO is refused in the practical melt window and Na/FeO survives only as a cool ~1150 °C cleanup; Cr/Ti targets are refused at C3 temperatures. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+**C3 (C3_NA, C3_K)** — alkali metallothermic polish campaign family. Under the V1c JANAF refit, the surviving recipe is **C3_NA** (Na-only at the cool 1150 °C window); **C3_K** is refused by the S1b engine gate at any practical melt T (K/Fe crossover ~832 °C), and Cr/Ti targets are refused at C3 temperatures. Refused dispatches are recorded in `shuttle_refusal_history`. Source: `data/setpoints.yaml` §1 `C3:`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **C4** — selective Mg pyrolysis campaign (Branch Two preferred). Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
@@ -40,13 +40,15 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **FactSAGE / ChemApp** — multiphase equilibrium engine (strict-config authoritative for full gas/metal/slag equilibrium). Requires a licensed local install and a user-exported `.cst`/`.dat` datafile. Stays diagnostic-only without a strict config. See [`docs/melt-backends.md`](melt-backends.md).
 
-**Freeze-gate** — evaporation flux multiplier on `liquid_fraction(T)` that prevents sub-solidus evaporation. Currently default OFF (`freeze_gate.enabled: false` in `data/setpoints.yaml` §15); the default-on flip is gated on a milestone review of the blast-radius categorization (see `docs-private/`). See `data/setpoints.yaml:1076`.
+**Freeze-gate** — evaporation flux multiplier on `liquid_fraction(T)` that suppresses sub-liquidus evaporation. Default OFF (`freeze_gate.enabled: false` in `data/setpoints.yaml` §15); the default-on flip is deferred post-0.5.0 pending a blast-radius review across the recipe catalog. The plumbing (kernel intent `GATE_LIQUID_FRACTION`, MAGEMin liquid-fraction shadow, ThermoEngine activity threading) landed in 0.5.0 ready for the flip.
 
 **HKL (Hertz-Knudsen-Langmuir)** — the evaporation flux equation relating surface vapor pressure, temperature, and molecular weight to a kinetic evaporation rate. Implemented in `simulator/evaporation.py`. The simulator evaluates HKL once per tick at tick-start conditions and integrates depletion analytically within the tick.
 
 **Hot wall** — upstream pipe and duct maintained above ~1400 °C to prevent premature condensation before vapor reaches its designated condenser stage. The design invariant that makes directional extraction possible. See [`docs/concepts.md`](concepts.md).
 
 **Knudsen number (Kn)** — `λ / L` where λ is mean-free-path and L is pipe diameter. Must be ≪ 0.01 (viscous-flow regime) for directional vapor transport. The 5–15 mbar pN₂ band is calibrated to maintain this. See [`docs/concepts.md`](concepts.md).
+
+**Knudsen-regime refusal** — whole-run halt emitted by F3's `KnudsenRegimeRefusal` when any pipe segment Kn ≥ 10 under a campaign that requires viscous flow. Reported on `run_metadata.knudsen_regime_diagnostic` (`status`, `regime`, per-segment array) and escalates the runner's top-level `status` to `"refused"`. The band-integration HKL flux also applies `regime_factor = Kn / (Kn + 0.01)` so under-pressure runs report a physics-honest attenuated yield rather than a free-molecular ceiling.
 
 **Kress91** — the fO₂-coupled Fe³⁺/Fe²⁺ melt redox model (Kress & Carmichael 1991). Not yet implemented; Fe²⁺/Fe³⁺ partitioning is a diagnostic estimate only in current builds. See [`docs/model-limitations.md`](model-limitations.md).
 
@@ -62,7 +64,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Mush** — partially molten temperature region between solidus and liquidus where melt and crystals coexist. Relevant to freeze-gate behavior and melt viscosity estimates.
 
-**Overhead** — gas headspace above the melt; carries total pressure, partial pressures, and sweep gas composition. The `overhead_headspace.enabled` toggle (default OFF) controls whether evaporation O₂ is routed through `process.overhead_gas` before bleeding to terminal accounts. See `data/setpoints.yaml:1032`.
+**Overhead** — gas headspace above the melt; carries total pressure, partial pressures, and sweep gas composition. The `overhead_headspace.enabled` toggle (default OFF) controls whether evaporation O₂ is routed through `process.overhead_gas` before bleeding to terminal accounts. Source: `data/setpoints.yaml` §14.
 
 **pN₂** — sweep gas partial pressure (canonical symbol — N₂, Ar, or CO₂ on Mars feedstocks); controls viscous-flow transport. Target band 5–15 mbar. See [`docs/concepts.md`](concepts.md).
 
@@ -76,13 +78,17 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Rump** — terminal refractory ceramic residue after full extraction sequence: Ca-rich, Al-residual, REE (0.5–1.0 wt%), Ti. Approximately 10–15 kg per tonne for a low-Ti mare feedstock after C6. Not a recipe choice — a physical floor from oxide stability. See [`docs/concepts.md`](concepts.md).
 
-**Shuttle** — Na/K loop that reduces target oxides metallothermically (K + FeO → K₂O + Fe; Na + FeO → Na₂O + Fe) and recycles alkali back into the melt as O₂ is baked out. Dual role: oxygen reductant and selectivity tool. See [`docs/concepts.md`](concepts.md).
+**Shuttle** — Na/K loop that reduces target oxides metallothermically (Na + FeO → Na₂O + Fe is the surviving recipe post-V1c; the analogous K reaction is engine-refused) and recycles alkali back into the melt as O₂ is baked out. Dual role: oxygen reductant and selectivity tool. See [`docs/concepts.md`](concepts.md) §"The alkali shuttle".
+
+**Shuttle refusal** — engine-level rejection of a metallothermic step when the dispatch-T thermodynamic margin is non-positive (S1b T-acceptance gate, post-V1c-JANAF). Each refusal is recorded as one entry in the runner output's `shuttle_refusal_history` with `campaign`, `hour`, `temperature_C`, and the engine's structured diagnostic. Per-step refusals leave the run `status` at `ok` or `partial`; only whole-run halts (e.g. `KnudsenRegimeRefusal`) escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md).
 
 **SiO suppression law** — `p(SiO) = K(T) × a(SiO₂) / √pO₂`; suppression factor ~300× conservative at 1 mbar pO₂ vs hard vacuum. Source: `data/setpoints.yaml:940`.
 
 **Solidus** — temperature below which a melt is fully crystalline on cooling; the lower boundary of the mush region.
 
 **Stage 0** — pretreatment cycle (C0 ± C0b) that converts raw feedstock to a cleaned silicate melt. Removes volatiles, halides, sulfates, perchlorates, organics, native metals, and sulfides. See [`docs/process-model.md`](process-model.md).
+
+**Stage purity report** — per-stage breakdown of designated vs impurity species mass on the condensation train, sourced from `simulator.condensation.stage_purity_report()` (canonical registry in `simulator/condensation_routing.py`). Verdict thresholds: `PURE` ≥95 % designated, `MIXED` 80–95 %, `CONTAMINATED` <80 %. Exposed verbatim on the runner output's top-level `stage_purity_report` field. See [`docs/runner-output-schema.md`](runner-output-schema.md).
 
 **StubBackend** — the always-available fallback melt backend using the builtin Ellingham/Antoine path; selected when neither AlphaMELTS nor FactSAGE are configured. See [`docs/melt-backends.md`](melt-backends.md).
 
