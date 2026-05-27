@@ -366,6 +366,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._rump_expectation_warnings: list[str] = []
+        # Shuttle-physics-gate refusals: the post-V1c JANAF Ellingham +
+        # S1b shuttle T-acceptance gate refuses K→FeO at any practical
+        # melt T and Na→FeO above the 1173 °C crossover.  When the
+        # engine returns ``status='refused'`` the extraction caller
+        # records the structured diagnostic here so the recipe's
+        # silent no-op cannot mask an invalid operating regime.
+        # Autoreview r3 P2 (2026-05-27): the prior code treated any
+        # transition-less kernel result the same -- benign skip and
+        # thermodynamic refusal were indistinguishable.
+        self._last_shuttle_refusal_diagnostic: Dict[str, Any] = {}
+        self._shuttle_refusal_history: list[Dict[str, Any]] = []
 
         # --- Current state ---
         self.melt = MeltState()
@@ -565,6 +576,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._rump_expectation_warnings = []
+        self._last_shuttle_refusal_diagnostic = {}
+        self._shuttle_refusal_history = []
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()

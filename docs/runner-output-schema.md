@@ -41,6 +41,7 @@ stderr.
   "final_state": {...},         // see "Final state"
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
+  "shuttle_refusal_history": [...], // see "Shuttle refusal history"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed" | "refused",
@@ -180,6 +181,44 @@ schema-shape assertion.
   `builtin_fallback`, or `kernel_diagnostic`.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
+
+## Shuttle refusal history
+
+```jsonc
+"shuttle_refusal_history": [
+  {
+    "reaction_family": "C3_K",                 // "C3_K" | "C3_NA"
+    "reagent": "K",                            // "K" | "Na"
+    "hour": 24,                                // batch hour (absolute)
+    "campaign_hour": 4,                        // hours into current campaign
+    "campaign": "C3_K",                        // CampaignPhase.name
+    "temperature_C": 1275.0,                   // melt T at the refused step
+    "target_stage": "feo_cleanup",             // Na-shuttle only
+    "diagnostic": {                            // engine-emitted detail
+      "reason_refused": "thermodynamic_margin_nonpositive",
+      "thermo_deltaG_kJ_per_mol_O2": -52.2,
+      "k_reduction_margin_kJ_per_mol_O2": -125.7,
+      "accepted_targets": [],
+      "refused_targets": ["FeO"]
+    }
+  }
+]
+```
+
+* Empty list when no shuttle step was refused. Every entry is one C3
+  K-shuttle (`C3_K`) or Na-shuttle (`C3_NA`) dispatch that the S1b
+  shuttle T-acceptance gate rejected (thermodynamic margin ≤ 0 at the
+  current melt T per the post-V1c JANAF Ellingham crossovers).
+* Sourced from `simulator/extraction.py::_shuttle_inject_K` /
+  `_shuttle_inject_Na`; accumulated on
+  `PyrolysisSimulator._shuttle_refusal_history` and surfaced verbatim
+  here so an operator can see WHICH recipe step the engine refused and
+  WHY (autoreview r3 P2, 2026-05-27 — previously refusal vs benign
+  no-op were indistinguishable to downstream consumers).
+* Status remains `ok` / `partial` when only individual shuttle steps
+  are refused (the recipe can still complete; the C3 cleanup target is
+  what suffers). `status='refused'` is reserved for whole-run refusals
+  that cannot continue, e.g. `KnudsenRegimeRefusal`.
 
 ## Per-hour summary
 

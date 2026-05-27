@@ -634,6 +634,26 @@ class ExtractionMixin:
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         if kernel_result.transition is None:
+            # Distinguish thermodynamic refusal from benign no-op.  The
+            # S1b shuttle T-acceptance gate (engine layer) emits
+            # ``status='refused'`` with a structured diagnostic
+            # (margin, target stage, refused targets) when the recipe
+            # operating regime is outside the species-pair crossover
+            # band; the legacy code below treated this the same as
+            # ``status='ok'`` with no transition, silently masking an
+            # invalid recipe step (autoreview r3 P2, 2026-05-27).
+            if getattr(kernel_result, 'status', '') == 'refused':
+                refusal_record = {
+                    'reaction_family': REACTION_FAMILY_C3_K,
+                    'reagent': 'K',
+                    'hour': int(self.melt.hour),
+                    'campaign_hour': int(self.melt.campaign_hour),
+                    'campaign': self.melt.campaign.name,
+                    'temperature_C': float(self.melt.temperature_C),
+                    'diagnostic': diagnostic,
+                }
+                self._last_shuttle_refusal_diagnostic = refusal_record
+                self._shuttle_refusal_history.append(refusal_record)
             return
 
         # Fe produced goes to its canonical product destination.
@@ -700,6 +720,21 @@ class ExtractionMixin:
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         if kernel_result.transition is None:
+            # See ``_shuttle_inject_K`` for the rationale; mirror the
+            # refusal-vs-benign-no-op split (autoreview r3 P2, 2026-05-27).
+            if getattr(kernel_result, 'status', '') == 'refused':
+                refusal_record = {
+                    'reaction_family': REACTION_FAMILY_C3_NA,
+                    'reagent': 'Na',
+                    'target_stage': target_stage,
+                    'hour': int(self.melt.hour),
+                    'campaign_hour': int(self.melt.campaign_hour),
+                    'campaign': self.melt.campaign.name,
+                    'temperature_C': float(self.melt.temperature_C),
+                    'diagnostic': diagnostic,
+                }
+                self._last_shuttle_refusal_diagnostic = refusal_record
+                self._shuttle_refusal_history.append(refusal_record)
             return
 
         # Reduced metals use the canonical recipe product registry.  Cr routes

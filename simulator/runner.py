@@ -507,12 +507,24 @@ class PyrolysisRun:
             run_metadata["knudsen_regime_diagnostic"] = _json_safe(
                 knudsen_diagnostic)
 
+        # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
+        # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle
+        # kernel dispatch is accumulated on
+        # ``sim._shuttle_refusal_history``.  Surface it as an explicit
+        # top-level field so operators see the recipe step the
+        # thermodynamic gate rejected -- silently dropping the dispatch
+        # used to leave the run looking ``ok``/`partial`` with the C3
+        # cleanup quietly missing.  Empty list when no refusals.
+        shuttle_refusal_history = list(
+            getattr(sim, "_shuttle_refusal_history", []) or [])
+
         return {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
+            "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
             "per_hour_summary": per_hour,
             "shadow_trace": shadow_trace,
             "status": status,

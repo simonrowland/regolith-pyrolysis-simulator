@@ -48,6 +48,7 @@ TOP_LEVEL_KEYS = frozenset({
     "final_state",
     "stage_purity_report",
     "vapor_pressure_source_report",
+    "shuttle_refusal_history",
     "per_hour_summary",
     "shadow_trace",
     "status",
@@ -274,6 +275,10 @@ def test_runner_golden_fixture_matches(scenario):
     expected["vapor_pressure_source_report"] = actual[
         "vapor_pressure_source_report"
     ]
+    # Autoreview r3 P2 (2026-05-27): shuttle_refusal_history is always
+    # emitted (empty list when no refusals); patch from live actual so
+    # legacy goldens that pre-date the field don't need regeneration.
+    expected["shuttle_refusal_history"] = actual["shuttle_refusal_history"]
     if "reason" in actual:
         expected["reason"] = actual["reason"]
     assert actual == expected, (

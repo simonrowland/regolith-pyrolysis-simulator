@@ -539,6 +539,69 @@ def test_shuttle_refuses_K_FeO_above_crossover_via_kernel(
     assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
 
 
+def test_extraction_records_shuttle_refusal_diagnostic(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Autoreview r3 P2 (2026-05-27): the ``_shuttle_inject_K`` caller
+    used to swallow ``status='refused'`` indistinguishably from a
+    benign no-op.  Now every refused dispatch must record on
+    ``sim._last_shuttle_refusal_diagnostic`` and
+    ``sim._shuttle_refusal_history`` so downstream consumers can see
+    the recipe step the engine rejected.
+    """
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    # Seed the melt with FeO so the shuttle has something to attempt.
+    sim.atom_ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": 100.0 / (MOLAR_MASS["FeO"] / 1000.0)},
+        source="refusal recording test seed",
+    )
+    # Seed reagent inventory so the shuttle gate (which requires
+    # ``shuttle_K_inventory_kg > 0.01``) actually fires the kernel
+    # dispatch -- without K to inject the function early-returns
+    # before the engine sees the operating regime.
+    sim.atom_ledger.load_external(
+        "process.reagent_inventory",
+        {"K": 30.0 / (MOLAR_MASS["K"] / 1000.0)},
+        source="refusal recording test seed",
+    )
+    sim.shuttle_K_inventory_kg = sim._sync_reagent_counter_from_ledger("K")
+    # Park the melt above the K/FeO crossover (post-V1c JANAF
+    # crossover is ~832 °C; this is well above so refusal is
+    # deterministic).
+    sim.melt.temperature_C = 1275.0
+    sim.melt.campaign = CampaignPhase.C3_K
+    sim.melt.hour = 24
+    sim.melt.campaign_hour = 4
+
+    # Pre-condition: no refusals recorded yet.
+    assert sim._shuttle_refusal_history == []
+    assert sim._last_shuttle_refusal_diagnostic == {}
+
+    sim._shuttle_inject_K()
+
+    # Post-condition: the refusal IS visible to downstream consumers.
+    assert len(sim._shuttle_refusal_history) == 1
+    refusal = sim._shuttle_refusal_history[0]
+    assert refusal["reaction_family"] == REACTION_FAMILY_C3_K
+    assert refusal["reagent"] == "K"
+    assert refusal["hour"] == 24
+    assert refusal["campaign_hour"] == 4
+    assert refusal["campaign"] == CampaignPhase.C3_K.name
+    assert refusal["temperature_C"] == pytest.approx(1275.0)
+    diag = refusal["diagnostic"]
+    assert diag.get("target_oxide") == "FeO"
+    assert diag.get("margin_kJ_per_mol_O2", 0.0) < 0.0
+    # The "last" attribute mirrors the most recent record.
+    assert sim._last_shuttle_refusal_diagnostic == refusal
+
+
 def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
