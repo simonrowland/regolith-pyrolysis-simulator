@@ -62,7 +62,16 @@ magemin = [
 # editable install from `install-engines.py`, which clones the upstream
 # repository as a sibling and installs it via `pip install -e`).
 sulfur = ["pysulfsat>=1.0,<2"]
-dev = ["pytest>=8.0"]
+# dev includes the pytest plugins the project-level [tool.pytest.ini_options]
+# addopts depends on (`-n auto` needs pytest-xdist; `--timeout=300` needs
+# pytest-timeout). Without these declared, a clean checkout doing
+# `pip install -e .[dev]` would let pytest abort during argument parsing
+# before any test runs. Per autoreview 2026-05-27 finding.
+dev = [
+    "pytest>=8.0",
+    "pytest-xdist>=3.8",
+    "pytest-timeout>=2.4",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
