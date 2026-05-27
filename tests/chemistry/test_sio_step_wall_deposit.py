@@ -71,8 +71,17 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # released mass redistributes downstream through the train; total
     # SiO budget conserved. The fouling-threshold structure (deposit at
     # 1050 C, none at 1400/1500 C) is unchanged.
+    # Pre-0.5.1 autoreview P2 (2026-05-27): the viscous mass-transfer
+    # ideal-gas denominator now uses BULK gas T (`self.gas_temperature_C`)
+    # instead of the wall surface T -- which overstated the flux in
+    # cold-wall scenarios (e.g. 1050 C liner against 1700 C bulk).
+    # Net effect: 1050 C wall deposit climbs slightly to
+    # 6.7529006436e-06 (~+4.5% vs the prior wall-T-in-denominator
+    # value). Direction is physics-honest: at colder walls, gas T no
+    # longer enters the denominator, so the flux is no longer
+    # under-divided.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.46501781604e-06, rel=1e-9
+        6.7529006436e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

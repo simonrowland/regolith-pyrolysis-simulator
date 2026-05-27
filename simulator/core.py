@@ -337,9 +337,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # True`` -- the default is loud
         # :class:`ProviderUnavailableError` if VapoRock is missing.
         kernel_config = setpoints.get('chemistry_kernel', {}) or {}
-        self._allow_fallback_vapor: bool = bool(
-            kernel_config.get('allow_fallback_vapor', False)
-        )
+        # Codex challenge pre-0.5.1 P2 (2026-05-27): a plain ``bool(...)``
+        # coerces the strings ``"false"``, ``"no"``, ``"0"`` to True
+        # (any non-empty string is truthy in Python). Setpoints come
+        # from YAML which preserves intended bool types, but a
+        # programmatic ``setpoints_overrides`` mapping or a hand-typed
+        # config can easily pass a string here -- silently opting the
+        # run into fallback mode against operator intent. Explicit
+        # string-aware coercion: known false-y strings are False; bool
+        # values pass through; anything else falls back to ``bool(...)``
+        # for backward compat with int/list/dict overrides.
+        _fallback_raw = kernel_config.get('allow_fallback_vapor', False)
+        if isinstance(_fallback_raw, str):
+            self._allow_fallback_vapor: bool = (
+                _fallback_raw.strip().lower()
+                not in {'', 'false', '0', 'no', 'off', 'none'}
+            )
+        else:
+            self._allow_fallback_vapor: bool = bool(_fallback_raw)
         # F-A4: counter for CONDENSATION_ROUTE (and other) dispatches
         # where the kernel returned ``transition is None``.  A replay
         # tool sees how many no-op dispatches happened without polluting
@@ -2250,25 +2265,66 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             #   - status='unavailable' AND allow_fallback_vapor=True:
             #     keep backend with an explicit warning entry on the
             #     diagnostic (this is the documented fallback path).
-            kernel_status = str(
-                getattr(kernel_result, 'status', 'ok') or 'ok'
-            ).lower()
-            if kernel_status in {'unavailable', 'failed'}:
+            # Codex challenge pre-0.5.1 P1 (2026-05-27): malformed
+            # status (None / "") must not authorise backend fallback.
+            # The prior ``getattr(..., 'status', 'ok') or 'ok'`` form
+            # treated missing OR empty status as success -- so any
+            # provider that returned ``status=None`` (broken adapter)
+            # or ``status=""`` (uninitialised) would silently appear
+            # ``ok`` to the gate. Materialise the raw status first so
+            # we can distinguish "missing/empty" from "ok".
+            raw_status = getattr(kernel_result, 'status', None)
+            if raw_status is None or str(raw_status).strip() == '':
+                kernel_status = 'unknown'
+            else:
+                kernel_status = str(raw_status).strip().lower()
+            # Autoreview pre-0.5.1 P1 (2026-05-27): the prior version only
+            # caught {'unavailable', 'failed'}, but the VapoRock provider
+            # also emits 'not_converged' and 'out_of_domain' (per
+            # engines/vaporock/provider.py:211 the canonical kernel
+            # status vocabulary is ``ok | not_converged | out_of_domain
+            # | unavailable``). When kernel_vp is empty AND status is
+            # ANY non-'ok' value, the run is silently downgrading to the
+            # backend surface -- exactly what the r8 fix was meant to
+            # prevent. Invert the check: anything non-'ok' (including
+            # the new 'unknown' bucket for malformed status) with no
+            # kernel pressures is a failure mode under
+            # allow_fallback_vapor=False.
+            if kernel_status != 'ok':
                 if not self._allow_fallback_vapor:
+                    # Codex challenge pre-0.5.1 P2 (2026-05-27): keep the
+                    # exception message bounded so operator logs stay
+                    # readable. Surface the status + the diagnostic keys
+                    # only; full diagnostic dict is on
+                    # ``self._last_vapor_pressure_diagnostic`` for the
+                    # caller that wants the full dump.
+                    diagnostic_keys = sorted(diagnostic.keys())
                     raise RuntimeError(
                         f"Authoritative VAPOR_PRESSURE dispatch returned "
                         f"status={kernel_status!r} with no pressures and "
                         f"allow_fallback_vapor=False; refusing to silently "
-                        f"continue on backend vapor pressures. Diagnostic: "
-                        f"{diagnostic!r}"
+                        f"continue on backend vapor pressures. Diagnostic "
+                        f"keys: {diagnostic_keys!r}"
                     )
-                diagnostic.setdefault(
-                    'kernel_vapor_pressure_warnings', []
-                ).append(
+                # Codex challenge pre-0.5.1 P2 (2026-05-27): defensive
+                # warning-append. The diagnostic dict is free-form per
+                # the provider contract, so the
+                # ``kernel_vapor_pressure_warnings`` slot may already
+                # hold a non-list value (None, str, etc.); coerce to
+                # list before appending.
+                existing_warnings = diagnostic.get(
+                    'kernel_vapor_pressure_warnings')
+                if not isinstance(existing_warnings, list):
+                    existing_warnings = (
+                        [existing_warnings]
+                        if existing_warnings is not None else []
+                    )
+                existing_warnings.append(
                     f"VAPOR_PRESSURE returned status={kernel_status!r}; "
                     f"falling back to backend vapor pressures under "
                     f"allow_fallback_vapor=True."
                 )
+                diagnostic['kernel_vapor_pressure_warnings'] = existing_warnings
             if backend_sources:
                 result.vapor_pressures_source = dict(backend_sources)
             diagnostic['vapor_pressures_source'] = dict(

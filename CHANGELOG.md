@@ -4,6 +4,156 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.5.1] — 2026-05-27
+
+Post-0.5.0 physics-correctness hardening. Closes five of the eight
+deferred items the 0.5.0 release listed; two architectural items
+(finite-headspace default-on flip + freeze-gate default-on flip) remain
+deferred to dedicated sessions. Gate stable at **938 passed / 77 skipped
+/ 6 xfailed / 0 failed**; mass-balance closure preserved at
+**2.19 × 10⁻¹⁴ %**.
+
+### Added
+
+- **S1c — intra-C3 self-re-flux** (`simulator/extraction.py::_step_shuttle`).
+  At the start of every C3 tick the previously-condensed alkali on the
+  train is moved back into `process.reagent_inventory` via the existing
+  `_transfer_condensed_species` helper. Implements the "same Na
+  inventory amplifies across multiple batches before final recovery"
+  pattern CLAUDE.md §4 describes — read across inject/bakeout
+  sub-phases within a single C3 phase as well as across batches.
+  C3_K path stays in place but is dead code under post-V1c-JANAF
+  (S1b shuttle gate refuses K → FeO at any practical melt T).
+  Closes Review D P1-3 (S1b documented the design; S1c lands it).
+- **Viscous-regime mass-transfer model** (`simulator/condensation.py`).
+  Sherwood-number boundary-layer flux companion to the HKL surface
+  deposition: Bird/Stewart/Lightfoot `Sh = 3.66` (laminar pipe,
+  constant wall concentration); `k_c = Sh × D_AB / D_pipe`; combined
+  with HKL via the existing `regime_factor = Kn/(Kn+0.01)` split so
+  that at deep viscous (Kn → 0) the mass-transfer term dominates and
+  at free-molecular (Kn → ∞) the HKL term dominates. Closes tickler
+  §5 follow-on; HKL alone is the free-molecular limit and was
+  under-predicting viscous-regime stage capture by ~30× since F3.
+
+### Changed — thermo data refresh
+
+- **MnO source decision**: `_ELLINGHAM_THERMO['Mn']` updated from
+  legacy `(-770.0, -0.165)` to NIST-JANAF standard-formation values at
+  298 K `(-770.440, -0.149752)` (Mn-008 Chase 1998). Intercept
+  essentially unchanged; slope corrected (10% drift in the legacy
+  value). ΔG(1600 °C) shifts -461 → -490 kJ/mol O₂; Mn stays in the
+  moderate-oxide tier with Fe/Cr. High-T linear refit deferred as
+  V1c-Mn-followon (Mn passes through its solid → liquid transition
+  at 1517 K mid-band).
+- **V1e-followon — Na/K alpha reconciliation** documented. Sossi 2019
+  (open-furnace mass-loss, α ≈ 1) vs Fedkin 2006 (KEMS sealed
+  equilibrium chamber, α ≈ 0.13) — 5-8× methodological disagreement.
+  The simulator pins Sossi (already in `data/vapor_pressures.yaml`);
+  the rationale (mbar-sweep regime closer to open-furnace than KEMS)
+  and the Fedkin alternative are now documented in the
+  `competing_sources` block.
+
+### Fixed
+
+- **Autoreview r8 P1 — VapoRock runtime failures no longer silently
+  reuse backend vapor pressures** (`simulator/core.py::_apply_kernel_vapor_pressures`).
+  Previously when `VAPOR_PRESSURE` dispatch returned `status='unavailable'`
+  (the import succeeded but the adapter call yielded no result), the
+  empty kernel payload was treated identically to `status='ok'` with no
+  evaporation expected — silently falling back to stub/AlphaMELTS
+  pressures with no operator-visible signal. Now ANY non-'ok' kernel
+  status with no pressures raises `RuntimeError` loud when
+  `allow_fallback_vapor=False` (the production default) and surfaces
+  an explicit diagnostic warning when fallback IS allowed. Closes
+  autoreview round 8 + the autoreview pre-0.5.1 P1 follow-on
+  (which surfaced that the original r8 fix missed
+  `not_converged` and `out_of_domain` statuses) + the codex challenge
+  pre-0.5.1 P1 (malformed status `None`/`""` was treated as `ok`;
+  now coerced to `'unknown'` bucket and treated as failure mode).
+- **`allow_fallback_vapor` boolean parsing — `bool("false") == True`
+  silent opt-in** (`simulator/core.py:339`). The prior `bool(...)`
+  coercion treated any non-empty string as truthy, so a setpoints
+  override carrying the string `"false"` would silently opt the run
+  into fallback mode. Now string-aware coercion treats
+  `{'', 'false', '0', 'no', 'off', 'none'}` (case-insensitive) as
+  False; everything else passes through `bool(...)`. Codex challenge
+  pre-0.5.1 P2.
+- **S1c C3_K branch now recycles Na as well as K** — the C3_K
+  dispatch injects BOTH K (for the K → FeO path, refused post-V1c)
+  AND Na (for the cool-window `feo_cleanup` path), so the recycle
+  hook must transfer both alkalis. The original S1c only transferred
+  K in C3_K, silently leaving condensed Na idle. Autoreview pre-0.5.1
+  P2 + codex challenge confirm.
+- **Viscous mass-transfer flux now uses bulk gas T in the ideal-gas
+  denominator** (`simulator/condensation.py::_viscous_mass_transfer_flux_mol_m2_s`).
+  The original implementation used `T_surface_K` for both the P_sat
+  call (correct — saturation pressure is a function of cold-wall T)
+  AND the `P/(R·T)` ideal-gas conversion (wrong — bulk gas
+  concentration uses bulk gas T). In cold-wall scenarios this
+  overstated the boundary-layer flux by `T_gas/T_wall`. Now the
+  helper accepts a separate `T_gas_K` parameter and both call sites
+  pass `self.gas_temperature_C + 273.15`. Autoreview pre-0.5.1 P2.
+- **Defensive warning-append on `kernel_vapor_pressure_warnings`** —
+  `setdefault('kernel_vapor_pressure_warnings', []).append(...)`
+  would raise if the diagnostic dict already had the slot as
+  `None`/str/dict (provider diagnostic is free-form per contract).
+  Now coerces to list before append. Codex challenge pre-0.5.1 P2.
+- **Bounded exception message on VapoRock raise** — the prior
+  exception text dumped the full diagnostic dict, which can include
+  the full vapor-pressure map and full speciation. Now logs only
+  the diagnostic KEYS in the exception; full dict remains on
+  `self._last_vapor_pressure_diagnostic` for callers that need it.
+  Codex challenge pre-0.5.1 P2.
+
+### Known limitations carried forward to post-0.5.1
+
+- **Viscous-regime mass-transfer (v1 approximation)** — the
+  Sherwood-number boundary-layer flux landed this release uses an
+  additive regime_factor blend
+  (`J_total = J_HKL × w + J_MT × (1−w)`) rather than the canonical
+  series-resistance form (`1/k_total = 1/k_HKL + 1/k_MT`). At
+  C2A_continuous viscous regime (Kn ≈ 3.7 × 10⁻⁴), this means the
+  HKL term still dominates ~95% of the blended flux because HKL is
+  hundreds of times larger than the MT term in absolute magnitude;
+  the regime_factor weighting alone cannot bring HKL down enough.
+  A proper series-resistance refit is queued for the next minor
+  release: `1/k_total = 1/(α_s × k_HKL_eff) + 1/k_MT_eff`. The
+  current implementation is directionally correct (some MT capture
+  added in viscous regime where there was none) but the magnitude
+  recovery toward pre-F3 levels is small (a few %, not the ~3×
+  the tickler envisioned). Codex challenge pre-0.5.1 viscous-MT
+  P1+P2+P3+P4+P5+P8.
+- **D_AB fixed at 1.0 × 10⁻² m²/s default** — Chapman-Enskog
+  cross-check shows the actual binary diffusion coefficient varies
+  from ~3 × 10⁻³ to ~3 × 10⁻¹ m²/s across the simulator's
+  operating envelope (10 mbar → 100 mbar, 1373 K → 1973 K).
+  Species-keyed D_AB(P, T) is open work; the current constant is
+  off by up to ~30× at extremes. Codex challenge pre-0.5.1 P4.
+- **Ca-extraction-mode investigation scoping doc** filed
+  (`docs-private/scoping-ca-extraction-mode-2026-05-27.md`,
+  private). Documents the three plausible mechanisms (aluminothermic
+  at >2200 K, vacuum thermal dissociation at deep vacuum, silicide
+  byproduct chemistry) plus their freeze-gate/finite-headspace
+  dependencies; investigation-only this round.
+
+### Validated
+
+- Post-0.5.0 full gate: 938 passed / 77 skipped / 6 xfailed / 0 failed
+  in 2:17 (post-viscous-MT landing).
+- 5 substantive code+data commits since 0.5.0 (`1d768a1`, `97b9718`,
+  `a62bc8a`, `70c9b39`, plus this VERSION bump), each chunk-reviewed.
+
+### Deferred from 0.5.0 → still deferred to dedicated sessions
+
+- **Finite-headspace default-on flip** (#10). Attempted 2026-05-27;
+  rolled back at the 14-test blast-radius point. Three interaction
+  surfaces need careful triage: pO₂ lever semantics under HARD_VACUUM
+  (intentionally excluded from `_O2_CONTROLLED_ATMOSPHERES` floor),
+  freeze-gate test expectations, golden cluster. Detailed triage
+  notes: `docs-private/finite-headspace-flip-attempt-2026-05-27.md`.
+- **Freeze-gate default-on flip** (#9). Naturally follows
+  finite-headspace landing; similar architectural blast radius.
+
 ## [0.5.0] — 2026-05-27
 
 **Physics-truth release.** The simulator now anchors every authority surface

@@ -576,8 +576,15 @@ class ExtractionMixin:
         # S1c: intra-C3 self-re-flux. Before this tick's inject/bakeout
         # dispatch, pull any alkali that recondensed onto the train back
         # into the reagent inventory so it is available for THIS tick.
+        # Autoreview pre-0.5.1 P2 (2026-05-27): the C3_K dispatch below
+        # (lines 588-589) injects BOTH K AND Na (Na for the feo_cleanup
+        # target_stage), so the recycle must also pull recovered Na, not
+        # just K -- otherwise Na that recondensed during the previous
+        # bakeout tick sits idle in the train and the intended
+        # intra-cycle Na recycle silently fails under C3_K.
         if campaign == CampaignPhase.C3_K:
             self._transfer_condensed_species('K')
+            self._transfer_condensed_species('Na')
         elif campaign == CampaignPhase.C3_NA:
             self._transfer_condensed_species('Na')
 

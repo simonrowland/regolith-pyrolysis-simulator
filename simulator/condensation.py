@@ -757,9 +757,14 @@ class CondensationModel:
         # number boundary-layer term carries the deposition. Combine via
         # regime_factor weighting so that HKL dominates at high Kn and
         # mass-transfer dominates at low Kn, with a smooth transition.
+        # T_surface_K (wall) feeds P_sat; T_gas_K (bulk) feeds the
+        # ideal-gas denominator in the boundary-layer flux per autoreview
+        # pre-0.5.1 P2 (2026-05-27).
+        T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
         flux = _combined_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
             pipe_diameter_m=self.pipe_diameter_m,
+            T_gas_K=T_gas_K,
         )
         if flux <= 0.0:
             return 0.0
@@ -873,9 +878,14 @@ class CondensationModel:
             # combined-flux blend as the wall-deposit candidate path so
             # the stage-condensation band integration honors viscous
             # boundary-layer physics where HKL is unphysical.
+            # T_surface_K (stage T-band sample) drives P_sat; T_gas_K
+            # (bulk gas) drives the ideal-gas denominator per
+            # autoreview pre-0.5.1 P2.
+            T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
             flux = _combined_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, alpha_s, self.regime_factor,
                 pipe_diameter_m=self.pipe_diameter_m,
+                T_gas_K=T_gas_K,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -1097,6 +1107,7 @@ def _viscous_mass_transfer_flux_mol_m2_s(
     pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
     sherwood: float = DEFAULT_SHERWOOD_LAMINAR,
     diffusion_coefficient_m2_s: float = DEFAULT_BINARY_DIFFUSION_M2_S,
+    T_gas_K: float | None = None,
 ) -> float:
     """Boundary-layer mass-transfer flux of ``species`` to a cooled wall.
 
@@ -1132,9 +1143,22 @@ def _viscous_mass_transfer_flux_mol_m2_s(
     driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
-    T_gas_K = max(T_surface_K, 1.0)
+    # Autoreview pre-0.5.1 P2 (2026-05-27): the ideal-gas conversion
+    # ``P / (R * T)`` MUST use the BULK GAS temperature, not the wall
+    # surface temperature. The two diverge in cold-wall scenarios
+    # (wall at 1050 C, bulk gas at 1700 C); using T_surface here
+    # overstated the boundary-layer flux by ``T_gas/T_wall`` whenever
+    # the wall was cold. ``T_surface_K`` stays in P_sat (where it
+    # belongs: saturation pressure is a function of the cold-surface
+    # T). Callers that don't supply T_gas_K still get the old
+    # behavior (T_gas := T_surface) so the change is backward-safe.
+    effective_T_gas_K = max(
+        float(T_gas_K) if T_gas_K is not None else T_surface_K, 1.0)
     k_c_m_s = sherwood * diffusion_coefficient_m2_s / pipe_diameter_m
-    return k_c_m_s * driving_pressure_pa / (GAS_CONSTANT_J_MOL_K * T_gas_K)
+    return (
+        k_c_m_s * driving_pressure_pa
+        / (GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
+    )
 
 
 def _combined_deposition_flux_mol_m2_s(
@@ -1144,6 +1168,7 @@ def _combined_deposition_flux_mol_m2_s(
     alpha_s: float,
     regime_factor: float,
     pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
+    T_gas_K: float | None = None,
 ) -> float:
     """Combine HKL + viscous-mass-transfer fluxes via ``regime_factor``.
 
@@ -1176,6 +1201,7 @@ def _combined_deposition_flux_mol_m2_s(
         _viscous_mass_transfer_flux_mol_m2_s(
             species, P_local_pa, T_surface_K,
             pipe_diameter_m=pipe_diameter_m,
+            T_gas_K=T_gas_K,
         )
         if weight_mt > 0.0
         else 0.0
