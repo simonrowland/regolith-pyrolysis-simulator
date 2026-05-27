@@ -80,8 +80,17 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # value). Direction is physics-honest: at colder walls, gas T no
     # longer enters the denominator, so the flux is no longer
     # under-divided.
+    # 0.5.2 Phase A1 (2026-05-27): Chapman-Enskog D_AB replaces the
+    # legacy 1e-2 m²/s constant. At the SiO/N2 typical operating
+    # point (10 mbar, ~1973 K bulk gas) the proper D_AB ≈ 4.97e-2
+    # m²/s -- ~5× higher than the constant. Net effect on the 1050 C
+    # cold-liner wall deposit: 6.7529006436e-06 → 6.9806097730e-06
+    # (~+3.4% relative). Direction is physics-honest: higher D_AB
+    # means more boundary-layer mass-transfer in viscous regime,
+    # which is exactly the gap the viscous-MT model was meant to
+    # close.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.7529006436e-06, rel=1e-9
+        6.9806097730e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

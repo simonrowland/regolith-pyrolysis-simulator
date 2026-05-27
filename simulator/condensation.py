@@ -121,8 +121,118 @@ COLD_SPOT_MARGIN_C = 25.0
 # and documents the regime; species-specific refinements are open
 # work (tickler §5 follow-on).
 DEFAULT_SHERWOOD_LAMINAR = 3.66
+# 0.5.2: DEFAULT_BINARY_DIFFUSION_M2_S replaced by per-species
+# Chapman-Enskog computation via _chapman_enskog_d_ab_m2_s. The constant
+# remains as a documented anchor value for the historical operating
+# point (SiO/N2 at 10 mbar, 1700 C) so reviewers can quickly orient.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
 GAS_CONSTANT_J_MOL_K = 8.314462618
+
+# Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
+# Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
+# Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
+# Table E.1 for noble gases + Na/K/Ca; remaining species use the Svehla
+# 1962 (NASA TR R-132) or Hirschfelder/Curtiss/Bird canonical estimates.
+# Vapor-phase Fe/Cr/Mn/Al/Ti are estimates from atomic radii + Lennard-
+# Jones rule-of-thumb (σ ≈ 1.18 × r_vdW, ε/k_B ≈ 1.3 × T_boiling) since
+# direct kinetic-theory measurements for transition-metal vapor are
+# sparse. The Chapman-Enskog result is moderately sensitive to σ (Ω_D
+# ~constant in the high-T limit, D_AB ∝ 1/σ_AB²) and weakly sensitive
+# to ε (collision integral Ω_D varies <30% across the simulator's T
+# range). At the typical C2A operating point (10 mbar, 1973 K) the
+# computed D_AB for SiO/N2 is ~0.042 m²/s vs the legacy 0.01 constant
+# (4× higher) -- bringing the viscous-MT term into a more honest
+# absolute magnitude.
+_LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
+    # (sigma Angstrom, eps/k_B K, M g/mol)
+    'N2':  (3.798, 71.4,   28.014),  # BSL Table E.1 (canonical)
+    'Ar':  (3.542, 93.3,   39.948),  # BSL Table E.1
+    'CO2': (3.941, 195.2,  44.010),  # BSL Table E.1
+    'O2':  (3.467, 106.7,  31.998),  # BSL Table E.1
+    'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
+    'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
+    'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
+    'Fe':  (2.940, 6026.0, 55.845),  # Estimated (transition-metal vapor)
+    'Mg':  (3.060, 1614.0, 24.305),  # Estimated
+    'Mn':  (2.950, 1100.0, 54.938),  # Estimated
+    'Cr':  (2.880, 6000.0, 51.996),  # Estimated
+    'Al':  (2.940, 3093.0, 26.982),  # Estimated
+    'Ti':  (2.890, 6000.0, 47.867),  # Estimated
+    'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
+}
+
+DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+
+
+def _neufeld_collision_integral_omega_d(T_star: float) -> float:
+    """Neufeld 1972 correlation for the dimensionless collision integral
+    ``Ω_D`` as a function of the reduced temperature
+    ``T* = k_B * T / ε_AB``. Accurate to ≲0.3% across the typical
+    pyrolysis temperature range (T* ~3-50 for transition-metal vapor in
+    N2 at 1500-2000 K).
+
+    Reference: Neufeld, P.D., Janzen, A.R., Aziz, R.A.,
+    "Empirical equations to calculate 16 of the transport collision
+    integrals for the Lennard-Jones (12-6) potential",
+    J. Chem. Phys. 57, 1100 (1972).
+    """
+    if T_star <= 0.0:
+        return 1.0
+    return (
+        1.06036 / (T_star ** 0.1561)
+        + 0.193 / math.exp(0.47635 * T_star)
+        + 1.03587 / math.exp(1.52996 * T_star)
+        + 1.76474 / math.exp(3.89411 * T_star)
+    )
+
+
+def _chapman_enskog_d_ab_m2_s(
+    species: str,
+    T_K: float,
+    pressure_pa: float,
+    carrier: str = DEFAULT_CARRIER_GAS,
+) -> float:
+    """Binary diffusion coefficient ``D_AB`` for ``species`` in
+    ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
+
+    Standard kinetic-theory form (Bird/Stewart/Lightfoot Eq 17.3-10):
+
+        D_AB [cm²/s] = 0.00266 * T^1.5 / (P[atm] * M_AB^0.5 * σ_AB² * Ω_D)
+
+    where:
+        T in Kelvin
+        P in atmospheres (1 atm = 101325 Pa)
+        M_AB = 2 / (1/M_A + 1/M_B)   (reduced molecular mass, g/mol)
+        σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
+        Ω_D  = Neufeld collision integral at T* = T * k_B / ε_AB
+
+    Returns 0 on unknown species (caller falls back to the legacy
+    constant via the explicit ``diffusion_coefficient_m2_s`` parameter
+    on the flux callers).
+    """
+    species_params = _LENNARD_JONES_PARAMS.get(species)
+    carrier_params = _LENNARD_JONES_PARAMS.get(carrier)
+    if species_params is None or carrier_params is None:
+        return 0.0
+    if T_K <= 0.0 or pressure_pa <= 0.0:
+        return 0.0
+    sigma_a, eps_a, M_a = species_params
+    sigma_b, eps_b, M_b = carrier_params
+    sigma_ab = 0.5 * (sigma_a + sigma_b)            # Angstrom
+    eps_ab = math.sqrt(eps_a * eps_b)               # K
+    M_ab_reduced = 2.0 / (1.0 / M_a + 1.0 / M_b)    # g/mol
+    T_star = T_K / eps_ab
+    omega_d = _neufeld_collision_integral_omega_d(T_star)
+    pressure_atm = pressure_pa / 101325.0
+    if pressure_atm <= 0.0:
+        return 0.0
+    # cm²/s by formula, then convert to m²/s (1 cm² = 1e-4 m²)
+    D_AB_cm2_s = (
+        0.00266 * (T_K ** 1.5)
+        / (pressure_atm * math.sqrt(M_ab_reduced)
+           * (sigma_ab ** 2) * omega_d)
+    )
+    return D_AB_cm2_s * 1.0e-4
 
 
 class KnudsenRegime(Enum):
@@ -759,12 +869,15 @@ class CondensationModel:
         # mass-transfer dominates at low Kn, with a smooth transition.
         # T_surface_K (wall) feeds P_sat; T_gas_K (bulk) feeds the
         # ideal-gas denominator in the boundary-layer flux per autoreview
-        # pre-0.5.1 P2 (2026-05-27).
+        # pre-0.5.1 P2 (2026-05-27). overhead_pressure_pa feeds the
+        # Chapman-Enskog D_AB(T, P) per 0.5.2 Phase A1.
         T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
+        overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
         flux = _combined_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
             pipe_diameter_m=self.pipe_diameter_m,
             T_gas_K=T_gas_K,
+            overhead_pressure_pa=overhead_pressure_pa,
         )
         if flux <= 0.0:
             return 0.0
@@ -880,12 +993,15 @@ class CondensationModel:
             # boundary-layer physics where HKL is unphysical.
             # T_surface_K (stage T-band sample) drives P_sat; T_gas_K
             # (bulk gas) drives the ideal-gas denominator per
-            # autoreview pre-0.5.1 P2.
+            # autoreview pre-0.5.1 P2. overhead_pressure_pa feeds the
+            # Chapman-Enskog D_AB(T, P) per 0.5.2 Phase A1.
             T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
+            overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             flux = _combined_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, alpha_s, self.regime_factor,
                 pipe_diameter_m=self.pipe_diameter_m,
                 T_gas_K=T_gas_K,
+                overhead_pressure_pa=overhead_pressure_pa,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -1106,8 +1222,10 @@ def _viscous_mass_transfer_flux_mol_m2_s(
     T_surface_K: float,
     pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
     sherwood: float = DEFAULT_SHERWOOD_LAMINAR,
-    diffusion_coefficient_m2_s: float = DEFAULT_BINARY_DIFFUSION_M2_S,
+    diffusion_coefficient_m2_s: float | None = None,
     T_gas_K: float | None = None,
+    overhead_pressure_pa: float | None = None,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> float:
     """Boundary-layer mass-transfer flux of ``species`` to a cooled wall.
 
@@ -1135,8 +1253,6 @@ def _viscous_mass_transfer_flux_mol_m2_s(
     """
     if pipe_diameter_m <= 0.0 or sherwood <= 0.0:
         return 0.0
-    if diffusion_coefficient_m2_s <= 0.0:
-        return 0.0
     P_sat_pa = _antoine_psat_pa(species, T_surface_K)
     if P_sat_pa is None:
         return 0.0
@@ -1154,7 +1270,30 @@ def _viscous_mass_transfer_flux_mol_m2_s(
     # behavior (T_gas := T_surface) so the change is backward-safe.
     effective_T_gas_K = max(
         float(T_gas_K) if T_gas_K is not None else T_surface_K, 1.0)
-    k_c_m_s = sherwood * diffusion_coefficient_m2_s / pipe_diameter_m
+    # 0.5.2 Phase A1 (2026-05-27): use the Chapman-Enskog binary
+    # diffusion coefficient when the caller does not supply an
+    # explicit override AND the overhead pressure is known. Fall
+    # back to the legacy constant only when the species or carrier is
+    # missing from the LJ table or pressure is unknown. Codex
+    # pre-0.5.1 P4 quantified the gap: at 10 mbar / 1973 K the actual
+    # D_AB is ~3-4× the constant 1e-2; at higher pressures the
+    # constant is ~30× too high. Per-call Chapman-Enskog closes that
+    # gap directly.
+    if diffusion_coefficient_m2_s is not None:
+        d_ab_m2_s = float(diffusion_coefficient_m2_s)
+    elif overhead_pressure_pa is not None and overhead_pressure_pa > 0.0:
+        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
+            species, effective_T_gas_K,
+            float(overhead_pressure_pa),
+            carrier=carrier_gas,
+        )
+        if d_ab_m2_s <= 0.0:
+            d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
+    else:
+        d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
+    if d_ab_m2_s <= 0.0:
+        return 0.0
+    k_c_m_s = sherwood * d_ab_m2_s / pipe_diameter_m
     return (
         k_c_m_s * driving_pressure_pa
         / (GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
@@ -1169,6 +1308,8 @@ def _combined_deposition_flux_mol_m2_s(
     regime_factor: float,
     pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
     T_gas_K: float | None = None,
+    overhead_pressure_pa: float | None = None,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> float:
     """Combine HKL + viscous-mass-transfer fluxes via ``regime_factor``.
 
@@ -1202,6 +1343,8 @@ def _combined_deposition_flux_mol_m2_s(
             species, P_local_pa, T_surface_K,
             pipe_diameter_m=pipe_diameter_m,
             T_gas_K=T_gas_K,
+            overhead_pressure_pa=overhead_pressure_pa,
+            carrier_gas=carrier_gas,
         )
         if weight_mt > 0.0
         else 0.0
