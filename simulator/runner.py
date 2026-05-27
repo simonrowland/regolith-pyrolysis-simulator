@@ -1981,6 +1981,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         result = run.run()
     except RunnerError as exc:
+        # Autoreview r5 P2 (2026-05-27): the failure envelope MUST
+        # match the schema version it advertises. Any top-level key
+        # the happy-path output emits has to be present here too
+        # (with an empty/zero default) so downstream consumers don't
+        # have to special-case failed runs. Keep this dict in lockstep
+        # with `RunnerOrchestrator._build_output` keys + the
+        # ``TOP_LEVEL_KEYS`` set in tests/test_runner_smoke.py.
         result = {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": {
@@ -2008,6 +2015,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 "summary": {},
                 "total_species": 0,
             },
+            "shuttle_refusal_history": [],
             "per_hour_summary": [],
             "shadow_trace": [],
             "status": "failed",

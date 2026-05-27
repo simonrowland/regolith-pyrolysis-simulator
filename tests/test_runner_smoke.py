@@ -422,6 +422,17 @@ def test_runner_failure_envelope_for_unknown_feedstock(tmp_path):
     payload = json.loads(output.read_text())
     assert payload["status"] == "failed"
     assert "unknown feedstock" in payload["error_message"].lower()
+    # Autoreview r5 P2 (2026-05-27): the failed envelope MUST advertise
+    # the SAME top-level shape as a successful run; downstream
+    # consumers diffing the schema shouldn't have to special-case
+    # failures. Pin to the happy-path TOP_LEVEL_KEYS set.
+    assert set(payload) == TOP_LEVEL_KEYS, (
+        f"failure envelope shape drift: extra={set(payload) - TOP_LEVEL_KEYS} "
+        f"missing={TOP_LEVEL_KEYS - set(payload)}"
+    )
+    assert payload["shuttle_refusal_history"] == []
+    assert payload["per_hour_summary"] == []
+    assert payload["shadow_trace"] == []
 
 
 def test_runner_engines_yaml_optional_load(tmp_path):

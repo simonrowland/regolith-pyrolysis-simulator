@@ -4,6 +4,16 @@ pyyaml>=6.0
 plotly>=5.18
 numpy>=1.26
 scipy>=1.12
+# Required thermochemistry engines (mirrored from pyproject.toml [project]
+# dependencies). install-dependencies.py runs `pip install -r requirements.txt`
+# (not `pip install -e .`), so any deps that exist only in pyproject.toml are
+# silently skipped on a fresh checkout and the default production chain fails
+# at first dispatch with ProviderUnavailableError. Keep this list in lockstep
+# with pyproject.toml [project.dependencies].
+# Autoreview r5 P1 (2026-05-27): omitting these here meant the documented
+# installer flow could not produce a working VAPOR_PRESSURE authority.
+petthermotools>=0.4.5,<0.5
+vaporock @ git+https://gitlab.com/ENKI-portal/vaporock.git@v0.1#subdirectory=src
 # Pytest plugins required by [tool.pytest.ini_options] addopts in pyproject.toml
 # (`-n auto` needs pytest-xdist; `--timeout=300` needs pytest-timeout). Without
 # these, `pytest` aborts during argument parsing before any test runs.
