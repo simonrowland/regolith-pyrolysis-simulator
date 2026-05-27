@@ -13,7 +13,7 @@ from simulator.backends import (
     emit_web_engine_selection_log,
     resolve_backend,
 )
-from simulator.condensation import stage_purity_report
+from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.factsage import FactSAGEBackend
@@ -360,7 +360,17 @@ def _completion_payload(sim):
         'terminal_rump_by_species': sim._terminal_rump_by_species(),
         'terminal_rump_by_class': sim._terminal_rump_by_class(),
         'stage_purity_report': stage_purity_report(sim.train),
+        'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }
+
+
+def _knudsen_regime_diagnostic_from_sim(sim):
+    condensation_model = getattr(sim, '_condensation_model', None)
+    if condensation_model is None:
+        return {}
+    diagnostic = getattr(
+        condensation_model, 'last_knudsen_regime_diagnostic', {}) or {}
+    return dict(diagnostic) if isinstance(diagnostic, dict) else {}
 
 
 def _start_background_loop(
@@ -423,6 +433,32 @@ def _start_background_loop(
                         decision = session.pending_decision()
                         if decision is not None:
                             decision_payload = _decision_payload(decision)
+                except KnudsenRegimeRefusal as exc:
+                    _safe_log(f'Simulation refused: {exc.reason}')
+                    error_payload = {
+                        'status': 'refused',
+                        'reason': exc.reason,
+                        'message': exc.reason,
+                        'knudsen_regime_diagnostic': dict(exc.diagnostic),
+                        'backend_message': backend_message,
+                    }
+                    if not _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'simulation_status',
+                        error_payload,
+                    ):
+                        break
+                    with _simulations_guard:
+                        current = _simulations.get(sid)
+                        if (
+                            current is not None
+                            and current.get('run_id') == run_id
+                        ):
+                            current['running'] = False
+                            current['paused'] = False
+                    break
                 except Exception as exc:
                     _safe_log(f'Simulation loop failed: {exc}')
                     error_payload = {

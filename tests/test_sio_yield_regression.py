@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from simulator import condensation as condensation_module
-from simulator.condensation import CondensationModel
+from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
 from simulator.runner import build_sio_yield_report
 from simulator.state import (
@@ -274,7 +274,7 @@ def test_knudsen_regime_factor_rises_toward_ballistic():
     assert condensation_module._knudsen_regime_factor(ballistic_kn) > 0.99
 
 
-def test_low_pressure_ballistic_regime_increases_wall_deposit():
+def test_low_pressure_free_molecular_regime_refuses_condensation():
     train = CondensationTrain.create_default()
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -288,18 +288,19 @@ def test_low_pressure_ballistic_regime_increases_wall_deposit():
     )
     ballistic = CondensationModel(train, wall_temperature_C=1100.0)
     ballistic.configure_operating_conditions(
-        overhead_pressure_mbar=0.001,
+        overhead_pressure_mbar=1.0e-6,
         pipe_diameter_m=0.12,
         gas_temperature_C=1100.0,
     )
 
     viscous_route = viscous.route(flux, melt)
-    ballistic_route = ballistic.route(flux, melt)
 
     assert ballistic.regime_factor > viscous.regime_factor
-    assert ballistic_route.wall_deposit_by_species["SiO"] > (
-        viscous_route.wall_deposit_by_species["SiO"]
-    )
+    assert viscous_route.knudsen_regime_diagnostic["status"] == "ok"
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        ballistic.route(flux, melt)
+    assert exc_info.value.reason == "knudsen_outside_viscous_flow"
+    assert exc_info.value.diagnostic["status"] == "refused"
 
 
 def test_liner_temperature_schedule_is_recipe_controllable():

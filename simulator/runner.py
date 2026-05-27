@@ -51,7 +51,10 @@ from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
 )
-from simulator.condensation import stage_purity_report
+from simulator.condensation import (
+    KnudsenRegimeRefusal,
+    stage_purity_report,
+)
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -199,6 +202,19 @@ def _resolve_kernel_commit_sha() -> str:
     return result.stdout.strip() or "unknown"
 
 
+def _knudsen_regime_diagnostic_from_sim(
+    sim: PyrolysisSimulator,
+) -> dict[str, Any]:
+    condensation_model = getattr(sim, "_condensation_model", None)
+    if condensation_model is None:
+        return {}
+    diagnostic = getattr(
+        condensation_model, "last_knudsen_regime_diagnostic", {}) or {}
+    if not isinstance(diagnostic, Mapping):
+        return {}
+    return dict(diagnostic)
+
+
 def _load_engines_config(path: Optional[Path]) -> dict:
     """Load the optional engines config file.
 
@@ -298,6 +314,8 @@ class PyrolysisRun:
         operator_decisions: list[dict] = []
         status = "ok"
         error_message = ""
+        reason = ""
+        refusal_diagnostic: dict[str, Any] = {}
 
         try:
             for result in drive_session(
@@ -318,6 +336,11 @@ class PyrolysisRun:
             #   * "failed"  -- set in the except blocks below.
             if sim.melt.hour < self.hours:
                 status = "partial"
+        except KnudsenRegimeRefusal as exc:
+            status = "refused"
+            reason = exc.reason
+            error_message = exc.reason
+            refusal_diagnostic = dict(exc.diagnostic)
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
             status = "failed"
             error_message = f"backend failure: {exc}"
@@ -332,6 +355,8 @@ class PyrolysisRun:
             shadow_trace=shadow_trace,
             status=status,
             error_message=error_message,
+            reason=reason,
+            refusal_diagnostic=refusal_diagnostic,
         )
         session._set_result_document(document)
         return document
@@ -439,6 +464,8 @@ class PyrolysisRun:
         shadow_trace: list[dict],
         status: str,
         error_message: str,
+        reason: str = "",
+        refusal_diagnostic: Mapping[str, Any] | None = None,
     ) -> dict:
         metadata_overrides = dict(self.run_metadata_overrides)
         started_at_utc = metadata_overrides.pop(
@@ -472,6 +499,13 @@ class PyrolysisRun:
             run_metadata[str(key)] = value
 
         final_state = _final_state_from_ledger(sim)
+        knudsen_diagnostic = dict(
+            refusal_diagnostic
+            or _knudsen_regime_diagnostic_from_sim(sim)
+        )
+        if knudsen_diagnostic:
+            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
+                knudsen_diagnostic)
 
         return {
             "schema_version": RUNNER_SCHEMA_VERSION,
@@ -482,6 +516,7 @@ class PyrolysisRun:
             "per_hour_summary": per_hour,
             "shadow_trace": shadow_trace,
             "status": status,
+            "reason": reason,
             "error_message": error_message,
         }
 
@@ -993,7 +1028,7 @@ def build_sio_yield_report(
     )
 
     result = base_run._run_session(session)
-    if result.get("status") == "failed":
+    if result.get("status") in {"failed", "refused"}:
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
 
     final_state = result.get("final_state", {})
@@ -1964,6 +1999,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             "per_hour_summary": [],
             "shadow_trace": [],
             "status": "failed",
+            "reason": "",
             "error_message": f"RunnerError: {exc}",
         }
 
@@ -1973,7 +2009,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         json.dump(result, f, indent=2, sort_keys=False)
         f.write("\n")
 
-    return 0 if result["status"] != "failed" else 1
+    return 0 if result["status"] not in {"failed", "refused"} else 1
 
 
 def build_sio_yield_arg_parser() -> argparse.ArgumentParser:

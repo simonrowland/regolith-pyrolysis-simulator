@@ -45,6 +45,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
 
@@ -79,7 +80,27 @@ DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
 N2_COLLISION_DIAMETER_M = 3.7e-10
 CONTINUUM_BUFFER_KN = 0.01
+VISCOUS_KNUDSEN_MAX = CONTINUUM_BUFFER_KN
+FREE_MOLECULAR_KNUDSEN_MIN = 10.0
+KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
+KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 COLD_SPOT_MARGIN_C = 25.0
+
+
+class KnudsenRegime(Enum):
+    VISCOUS = 'viscous'
+    TRANSITIONAL = 'transitional'
+    FREE_MOLECULAR = 'free_molecular'
+
+
+class KnudsenRegimeRefusal(RuntimeError):
+    """Raised when viscous-flow condensation assumptions are invalid."""
+
+    reason = KNUDSEN_REFUSAL_REASON
+
+    def __init__(self, diagnostic: Mapping[str, Any]):
+        self.diagnostic = dict(diagnostic)
+        super().__init__(KNUDSEN_REFUSAL_REASON)
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C)
@@ -136,6 +157,7 @@ class CondensationRouteResult:
         default_factory=dict)
     impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     cold_spot_warnings: tuple[str, ...] = ()
+    knudsen_regime_diagnostic: Dict[str, Any] = field(default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -182,6 +204,9 @@ class CondensationModel:
         self.gas_temperature_C = float(wall_temperature_C)
         self.knudsen_number = math.inf
         self.regime_factor = 1.0
+        self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
+        self._knudsen_policy_configured = False
+        self._viscous_flow_required = True
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
@@ -190,6 +215,7 @@ class CondensationModel:
             'warnings': [],
             'findings': [],
         }
+        self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.cold_spot_history: list[dict[str, Any]] = []
         self.operating_history: list[dict[str, Any]] = []
 
@@ -229,6 +255,9 @@ class CondensationModel:
             self.gas_temperature_C = float(wall_temperature_C)
         if overhead_pressure_mbar is not None:
             self.overhead_pressure_mbar = max(0.0, float(overhead_pressure_mbar))
+            self._knudsen_policy_configured = True
+            self._viscous_flow_required = _campaign_requires_viscous_flow(
+                campaign_name)
         pressure_pa = self.overhead_pressure_mbar * 100.0
         gas_temperature_K = max(self.gas_temperature_C + 273.15, 1.0)
         self.knudsen_number = _knudsen_number(
@@ -237,6 +266,7 @@ class CondensationModel:
             self.pipe_diameter_m,
         )
         self.regime_factor = _knudsen_regime_factor(self.knudsen_number)
+        self.knudsen_regime = classify_knudsen_regime(self.knudsen_number)
         if pipe_segment_temperatures_C is not None:
             self._apply_pipe_segment_temperatures(pipe_segment_temperatures_C)
         elif wall_temperature_C is not None:
@@ -244,6 +274,7 @@ class CondensationModel:
                 segment.name: float(wall_temperature_C)
                 for segment in self.pipe_segments
             })
+        self.last_knudsen_regime_diagnostic = self._current_knudsen_diagnostic()
         if overhead_pressure_mbar is not None:
             self.operating_history.append(
                 {
@@ -259,7 +290,13 @@ class CondensationModel:
                     },
                     "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
                     "knudsen_number": float(self.knudsen_number),
+                    "knudsen_regime": self.knudsen_regime.value,
                     "regime_factor": float(self.regime_factor),
+                    "knudsen_warnings": tuple(
+                        self.last_knudsen_regime_diagnostic.get(
+                            "warnings", ())),
+                    "knudsen_regime_diagnostic": dict(
+                        self.last_knudsen_regime_diagnostic),
                 }
             )
 
@@ -330,6 +367,7 @@ class CondensationModel:
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
+        knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
             evap_flux.species_kg_hr,
@@ -461,7 +499,45 @@ class CondensationModel:
             wall_deposit_by_segment_species=wall_deposit_by_segment_species,
             impurity_by_stage_species=impurity_by_stage_species,
             cold_spot_warnings=cold_spot_warnings,
+            knudsen_regime_diagnostic=knudsen_diagnostic,
         )
+
+    def _current_knudsen_diagnostic(self) -> dict[str, Any]:
+        diagnostic = knudsen_regime_diagnostic(
+            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            gas_temperature_C=self.gas_temperature_C,
+            pipe_diameter_m=self.pipe_diameter_m,
+            pipe_segments=self.pipe_segments,
+            regime_factor=self.regime_factor,
+        )
+        if self._knudsen_policy_configured:
+            if not self._viscous_flow_required:
+                relaxed = dict(diagnostic)
+                relaxed['status'] = 'ok'
+                relaxed['reason'] = ''
+                relaxed['warnings'] = []
+                relaxed['viscous_flow_required'] = False
+                return relaxed
+            diagnostic['viscous_flow_required'] = True
+            return diagnostic
+        unconfigured = dict(diagnostic)
+        unconfigured['status'] = 'unconfigured'
+        unconfigured['reason'] = 'knudsen_policy_unconfigured'
+        return unconfigured
+
+    def _enforce_knudsen_regime(self) -> dict[str, Any]:
+        diagnostic = self._current_knudsen_diagnostic()
+        self.last_knudsen_regime_diagnostic = diagnostic
+        if not self._knudsen_policy_configured:
+            return diagnostic
+        if diagnostic.get('status') == 'refused':
+            raise KnudsenRegimeRefusal(diagnostic)
+        warnings = tuple(diagnostic.get('warnings', ()))
+        if warnings and self.operating_history:
+            self.operating_history[-1]['knudsen_warnings'] = warnings
+            self.operating_history[-1]['knudsen_regime_diagnostic'] = dict(
+                diagnostic)
+        return diagnostic
 
     def _wall_deposit_candidate_kg(
         self,
@@ -699,7 +775,7 @@ class CondensationModel:
                 )
             T_surface_K = max(T_surface_C + 273.15, 1.0)
             flux = _hkl_surface_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, alpha_s,
+                species, P_local_pa, T_surface_K, alpha_s, self.regime_factor,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -951,6 +1027,127 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
         return 0.0
     factor = knudsen_number / (knudsen_number + CONTINUUM_BUFFER_KN)
     return max(0.0, min(1.0, factor))
+
+
+def classify_knudsen_regime(knudsen_number: float) -> KnudsenRegime:
+    if not math.isfinite(knudsen_number):
+        return KnudsenRegime.FREE_MOLECULAR
+    if knudsen_number < VISCOUS_KNUDSEN_MAX:
+        return KnudsenRegime.VISCOUS
+    if knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN:
+        return KnudsenRegime.TRANSITIONAL
+    return KnudsenRegime.FREE_MOLECULAR
+
+
+def knudsen_regime_diagnostic(
+    *,
+    overhead_pressure_mbar: float,
+    gas_temperature_C: float,
+    pipe_diameter_m: float,
+    pipe_segments: list[PipeSegment] | None = None,
+    regime_factor: float | None = None,
+) -> dict[str, Any]:
+    pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
+    gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
+    fallback_diameter_m = max(1.0e-9, float(pipe_diameter_m))
+    mean_free_path_m = _mean_free_path_m(pressure_pa, gas_temperature_K)
+
+    segments: list[dict[str, Any]] = []
+    source_segments = list(pipe_segments or ())
+    if not source_segments:
+        source_segments = [
+            PipeSegment(
+                name='default_pipe',
+                upstream_stage='',
+                downstream_stage='',
+                wall_temperature_C=float(gas_temperature_C),
+                length_m=0.0,
+                inner_diameter_m=fallback_diameter_m,
+            )
+        ]
+
+    worst_regime = KnudsenRegime.VISCOUS
+    severity = {
+        KnudsenRegime.VISCOUS: 0,
+        KnudsenRegime.TRANSITIONAL: 1,
+        KnudsenRegime.FREE_MOLECULAR: 2,
+    }
+    for segment in source_segments:
+        diameter_m = max(
+            1.0e-9,
+            float(getattr(segment, 'inner_diameter_m', fallback_diameter_m)),
+        )
+        knudsen_number = _knudsen_number(
+            pressure_pa, gas_temperature_K, diameter_m)
+        regime = classify_knudsen_regime(knudsen_number)
+        if severity[regime] > severity[worst_regime]:
+            worst_regime = regime
+        segments.append({
+            'name': str(getattr(segment, 'name', 'default_pipe')),
+            'knudsen_number': _finite_or_none(knudsen_number),
+            'regime': regime.value,
+            'characteristic_length_m': diameter_m,
+        })
+
+    global_knudsen_number = _knudsen_number(
+        pressure_pa, gas_temperature_K, fallback_diameter_m)
+    global_regime = classify_knudsen_regime(global_knudsen_number)
+    if severity[global_regime] > severity[worst_regime]:
+        worst_regime = global_regime
+
+    warnings: list[str] = []
+    status = 'ok'
+    reason = ''
+    if worst_regime is KnudsenRegime.FREE_MOLECULAR:
+        status = 'refused'
+        reason = KNUDSEN_REFUSAL_REASON
+        warnings.append(
+            'Knudsen number is outside viscous-flow validity; '
+            'condensation routing refused.'
+        )
+    elif worst_regime is KnudsenRegime.TRANSITIONAL:
+        status = 'warning'
+        reason = KNUDSEN_TRANSITION_REASON
+        warnings.append(
+            'Knudsen number is transitional; surface deposition carries '
+            'extra uncertainty and uses the continuity correction.'
+        )
+
+    return {
+        'status': status,
+        'reason': reason,
+        'regime': worst_regime.value,
+        'knudsen_number': _finite_or_none(global_knudsen_number),
+        'mean_free_path_m': _finite_or_none(mean_free_path_m),
+        'overhead_pressure_mbar': max(0.0, float(overhead_pressure_mbar)),
+        'gas_temperature_C': float(gas_temperature_C),
+        'pipe_diameter_m': fallback_diameter_m,
+        'regime_factor': (
+            _knudsen_regime_factor(global_knudsen_number)
+            if regime_factor is None else float(regime_factor)
+        ),
+        'segments': segments,
+        'warnings': warnings,
+    }
+
+
+def _finite_or_none(value: float) -> float | None:
+    value = float(value)
+    return value if math.isfinite(value) else None
+
+
+def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
+    if campaign_name is None:
+        return True
+    name = str(campaign_name)
+    if not name:
+        return True
+    return name in {
+        'C2A',
+        'C2A_continuous',
+        'C2A_STAGED',
+        'C2A_staged',
+    }
 
 
 def _pressure_isolated_capture_budget_kg(
