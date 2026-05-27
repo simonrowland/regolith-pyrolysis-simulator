@@ -170,6 +170,69 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
     assert destinations == pytest.approx(1.0)
 
 
+def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    segment_total = sum(
+        species_kg.get("SiO", 0.0)
+        for species_kg in route.wall_deposit_by_segment_species.values()
+    )
+    assert segment_total == pytest.approx(
+        route.wall_deposit_by_species["SiO"]
+    )
+    assert set(route.wall_deposit_by_segment_species).issubset({
+        segment.name for segment in model.pipe_segments
+    })
+
+
+def test_intentional_pipe_cold_spot_flags_and_increases_wall_deposit():
+    train = CondensationTrain.create_default()
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+
+    hot = CondensationModel(train, wall_temperature_C=1500.0)
+    hot.configure_operating_conditions(
+        wall_temperature_C=1500.0,
+        pipe_segment_temperatures_C={
+            segment.name: (
+                1030.0 if segment.name == "stage_0_to_stage_1" else 1800.0
+            )
+            for segment in hot.pipe_segments
+        },
+    )
+    cold = CondensationModel(train, wall_temperature_C=1500.0)
+    cold.configure_operating_conditions(
+        wall_temperature_C=1500.0,
+        pipe_segment_temperatures_C={
+            segment.name: (
+                900.0 if segment.name == "stage_0_to_stage_1" else 1800.0
+            )
+            for segment in cold.pipe_segments
+        },
+    )
+
+    hot_route = hot.route(flux, melt)
+    cold_route = cold.route(flux, melt)
+
+    assert not hot_route.cold_spot_warnings
+    assert cold_route.cold_spot_warnings
+    assert "stage_0_to_stage_1" in cold_route.cold_spot_warnings[0]
+    assert cold_route.wall_deposit_by_species["SiO"] > (
+        hot_route.wall_deposit_by_species.get("SiO", 0.0)
+    )
+
+
 def test_cached_condensation_model_uses_updated_liner_temperature():
     model = CondensationModel(
         CondensationTrain.create_default(),

@@ -56,9 +56,14 @@ from simulator.core import (
 from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
+    designated_stage_number,
     is_designated_for_stage,
 )
-from simulator.state import MOLAR_MASS
+from simulator.state import (
+    MOLAR_MASS,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    PipeSegment,
+)
 
 
 BOLTZMANN_CONSTANT_J_K = 1.380649e-23
@@ -66,12 +71,15 @@ AVOGADRO_MOL = 6.02214076e23
 HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
+WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 WALL_DEPOSIT_FRACTION_KEY = '_wall_deposit_fraction'
 WALL_DEPOSIT_ACCOUNT_KEY = '_wall_deposit_account'
+WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY = '_wall_deposit_segment_fractions'
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
 N2_COLLISION_DIAMETER_M = 3.7e-10
 CONTINUUM_BUFFER_KN = 0.01
+COLD_SPOT_MARGIN_C = 25.0
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C)
@@ -124,7 +132,10 @@ class CondensationRouteResult:
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
+    wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = field(
+        default_factory=dict)
     impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    cold_spot_warnings: tuple[str, ...] = ()
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -171,7 +182,16 @@ class CondensationModel:
         self.gas_temperature_C = float(wall_temperature_C)
         self.knudsen_number = math.inf
         self.regime_factor = 1.0
-        self.operating_history: list[dict[str, float | str]] = []
+        self.pipe_segments = self._build_default_pipe_segments(
+            float(wall_temperature_C))
+        self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
+        self.last_cold_spot_diagnostic: dict[str, Any] = {
+            'has_cold_spot': False,
+            'warnings': [],
+            'findings': [],
+        }
+        self.cold_spot_history: list[dict[str, Any]] = []
+        self.operating_history: list[dict[str, Any]] = []
 
         # Default residence time per stage (seconds)
         # In a real design, this comes from equipment sizing
@@ -193,6 +213,7 @@ class CondensationModel:
         overhead_pressure_mbar: float | None = None,
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
+        pipe_segment_temperatures_C: Mapping[str, float] | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
     ) -> None:
@@ -216,17 +237,80 @@ class CondensationModel:
             self.pipe_diameter_m,
         )
         self.regime_factor = _knudsen_regime_factor(self.knudsen_number)
+        if pipe_segment_temperatures_C is not None:
+            self._apply_pipe_segment_temperatures(pipe_segment_temperatures_C)
+        elif wall_temperature_C is not None:
+            self._apply_pipe_segment_temperatures({
+                segment.name: float(wall_temperature_C)
+                for segment in self.pipe_segments
+            })
         if overhead_pressure_mbar is not None:
             self.operating_history.append(
                 {
                     "campaign": str(campaign_name or ""),
-                    "campaign_hour": 0.0 if campaign_hour is None else float(campaign_hour),
+                    "campaign_hour": (
+                        0.0 if campaign_hour is None
+                        else float(campaign_hour)
+                    ),
                     "wall_temperature_C": float(self.wall_temperature_C),
+                    "pipe_segment_temperatures_C": {
+                        segment.name: float(segment.wall_temperature_C)
+                        for segment in self.pipe_segments
+                    },
                     "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
                     "knudsen_number": float(self.knudsen_number),
                     "regime_factor": float(self.regime_factor),
                 }
             )
+
+    def _build_default_pipe_segments(
+        self,
+        wall_temperature_C: float,
+    ) -> list[PipeSegment]:
+        stages = sorted(self.train.stages, key=lambda stage: stage.stage_number)
+        if len(stages) < 2:
+            return []
+        diameter_m = max(1.0e-9, float(self.pipe_diameter_m))
+        total_length_m = (
+            max(0.0, float(self.wall_surface_area_m2))
+            / (math.pi * diameter_m)
+        )
+        length_m = total_length_m / float(len(stages) - 1)
+        segments: list[PipeSegment] = []
+        for upstream, downstream in zip(stages, stages[1:]):
+            segments.append(PipeSegment(
+                name=(
+                    f'stage_{upstream.stage_number}'
+                    f'_to_stage_{downstream.stage_number}'
+                ),
+                upstream_stage=f'stage_{upstream.stage_number}',
+                downstream_stage=f'stage_{downstream.stage_number}',
+                wall_temperature_C=float(wall_temperature_C),
+                length_m=length_m,
+                inner_diameter_m=diameter_m,
+            ))
+        return segments
+
+    def _apply_pipe_segment_temperatures(
+        self,
+        temperatures_C: Mapping[str, float],
+    ) -> None:
+        if not self.pipe_segments:
+            self.pipe_segments = self._build_default_pipe_segments(
+                self.wall_temperature_C)
+        updated: list[PipeSegment] = []
+        for segment in self.pipe_segments:
+            raw_temperature = temperatures_C.get(
+                segment.name, self.wall_temperature_C)
+            updated.append(PipeSegment(
+                name=segment.name,
+                upstream_stage=segment.upstream_stage,
+                downstream_stage=segment.downstream_stage,
+                wall_temperature_C=max(0.0, float(raw_temperature)),
+                length_m=segment.length_m,
+                inner_diameter_m=segment.inner_diameter_m,
+            ))
+        self.pipe_segments = updated
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
@@ -244,13 +328,28 @@ class CondensationModel:
         remaining_by_species = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
+        wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
+        diagnostic = cold_spot_diagnostic(
+            self.pipe_segments,
+            evap_flux.species_kg_hr,
+            margin_C=self.cold_spot_margin_C,
+        )
+        self.last_cold_spot_diagnostic = diagnostic
+        self.cold_spot_history.append(diagnostic)
+        cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
+        if self.operating_history:
+            self.operating_history[-1]['cold_spot_warning_count'] = len(
+                cold_spot_warnings)
+            self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
+
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
-            self._record_runtime_wall_fraction(species, 0.0)
+            self._record_runtime_wall_fraction(species, 0.0, {})
 
             T_cond = _species_condensation_temperature_C(species)
             hkl_condensed_by_stage: Dict[int, float] = {}
+            remaining_after_stage: Dict[int, float] = {}
 
             for stage in self.train.stages:
                 if remaining_kg <= 1e-15:
@@ -274,14 +373,22 @@ class CondensationModel:
                         + condensed_kg)
 
                 remaining_kg -= condensed_kg
+                remaining_after_stage[stage.stage_number] = max(
+                    0.0, remaining_kg)
 
             hkl_condensed_total_kg = sum(hkl_condensed_by_stage.values())
-            wall_hkl_kg = self._wall_deposit_candidate_kg(
+            segment_supply = self._segment_supply_by_name(
+                rate_kg_hr,
+                remaining_after_stage,
+            )
+            wall_hkl_by_segment = self._wall_deposit_candidates_by_segment_kg(
                 species=species,
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond,
                 melt_temperature_C=float(getattr(melt, 'temperature_C', T_cond)),
+                supply_by_segment_kg=segment_supply,
             )
+            wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
@@ -300,11 +407,30 @@ class CondensationModel:
                         wall_deposit_by_species.get(species, 0.0)
                         + wall_deposit_kg
                     )
+                    segment_deposits = _allocate_total_by_weights(
+                        wall_deposit_kg,
+                        wall_hkl_by_segment,
+                    )
+                    for segment_name, segment_kg in segment_deposits.items():
+                        if segment_kg <= 1e-15:
+                            continue
+                        segment_species = (
+                            wall_deposit_by_segment_species.setdefault(
+                                segment_name, {}))
+                        segment_species[species] = (
+                            segment_species.get(species, 0.0) + segment_kg)
                 wall_fraction = (
                     wall_deposit_kg / capture_budget_kg
                     if capture_budget_kg > 0.0 else 0.0
                 )
-                self._record_runtime_wall_fraction(species, wall_fraction)
+                segment_fractions = _wall_segment_account_fractions(
+                    wall_deposit_by_segment_species,
+                    species,
+                    wall_deposit_kg,
+                    self.pipe_segments,
+                )
+                self._record_runtime_wall_fraction(
+                    species, wall_fraction, segment_fractions)
 
                 baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
                 if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
@@ -332,7 +458,9 @@ class CondensationModel:
             remaining_by_species=remaining_by_species,
             condensed_by_stage_species=condensed_by_stage_species,
             wall_deposit_by_species=wall_deposit_by_species,
+            wall_deposit_by_segment_species=wall_deposit_by_segment_species,
             impurity_by_stage_species=impurity_by_stage_species,
+            cold_spot_warnings=cold_spot_warnings,
         )
 
     def _wall_deposit_candidate_kg(
@@ -343,7 +471,103 @@ class CondensationModel:
         T_cond_C: float,
         melt_temperature_C: float,
     ) -> float:
-        if rate_kg_hr <= 0.0 or self.wall_surface_area_m2 <= 0.0:
+        return self._wall_deposit_candidate_for_surface_kg(
+            species=species,
+            rate_kg_hr=rate_kg_hr,
+            T_cond_C=T_cond_C,
+            melt_temperature_C=melt_temperature_C,
+            wall_temperature_C=self.wall_temperature_C,
+            surface_area_m2=self.wall_surface_area_m2,
+        )
+
+    def _wall_deposit_candidates_by_segment_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+        supply_by_segment_kg: Mapping[str, float],
+    ) -> Dict[str, float]:
+        if rate_kg_hr <= 0.0 or not self.pipe_segments:
+            return {}
+        temperatures = {
+            float(segment.wall_temperature_C)
+            for segment in self.pipe_segments
+        }
+        if len(temperatures) == 1:
+            wall_temperature_C = next(iter(temperatures))
+            total_candidate = self._wall_deposit_candidate_for_surface_kg(
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                wall_temperature_C=wall_temperature_C,
+                surface_area_m2=self.wall_surface_area_m2,
+            )
+            return _allocate_total_by_weights(
+                total_candidate,
+                {
+                    segment.name: segment.surface_area_m2
+                    for segment in self.pipe_segments
+                },
+            )
+
+        pipe_segments = self._mixed_temperature_wall_candidate_segments(species)
+        if not pipe_segments:
+            return {}
+        candidates: Dict[str, float] = {}
+        for segment in pipe_segments:
+            supply_kg = min(
+                max(0.0, float(supply_by_segment_kg.get(
+                    segment.name, rate_kg_hr))),
+                rate_kg_hr,
+            )
+            candidates[segment.name] = self._wall_deposit_candidate_for_surface_kg(
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                wall_temperature_C=segment.wall_temperature_C,
+                surface_area_m2=segment.surface_area_m2,
+            )
+            candidates[segment.name] = min(candidates[segment.name], supply_kg)
+        total = sum(candidates.values())
+        if total > rate_kg_hr > 0.0:
+            scale = rate_kg_hr / total
+            candidates = {
+                name: value * scale
+                for name, value in candidates.items()
+            }
+        return candidates
+
+    def _mixed_temperature_wall_candidate_segments(
+        self,
+        species: str,
+    ) -> list[PipeSegment]:
+        target_stage_number = designated_stage_number(species)
+        if target_stage_number is None:
+            return []
+        segments: list[PipeSegment] = []
+        for segment in self.pipe_segments:
+            downstream_number = _segment_stage_number(segment.downstream_stage)
+            if downstream_number is None:
+                continue
+            if downstream_number <= target_stage_number:
+                segments.append(segment)
+        return segments
+
+    def _wall_deposit_candidate_for_surface_kg(
+        self,
+        *,
+        species: str,
+        rate_kg_hr: float,
+        T_cond_C: float,
+        melt_temperature_C: float,
+        wall_temperature_C: float,
+        surface_area_m2: float,
+    ) -> float:
+        if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
             return 0.0
         alpha_s = _wall_alpha_s(species)
         if alpha_s <= 0.0:
@@ -362,7 +586,7 @@ class CondensationModel:
         if reference_flux <= 0.0:
             return 0.0
 
-        T_wall_K = max(self.wall_temperature_C + 273.15, 1.0)
+        T_wall_K = max(float(wall_temperature_C) + 273.15, 1.0)
         flux = _hkl_surface_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
         )
@@ -372,16 +596,57 @@ class CondensationModel:
         residence_s = float(self.residence_time_s.get(0, 0.5))
         rate_s_inv = (
             flux / reference_flux
-        ) * max(0.0, self.wall_surface_area_m2)
+        ) * max(0.0, float(surface_area_m2))
         eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
         return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
 
-    def _record_runtime_wall_fraction(self, species: str, fraction: float) -> None:
+    def _segment_supply_by_name(
+        self,
+        rate_kg_hr: float,
+        remaining_after_stage: Mapping[int, float],
+    ) -> Dict[str, float]:
+        supply: Dict[str, float] = {}
+        for segment in self.pipe_segments:
+            upstream_number = _segment_stage_number(segment.upstream_stage)
+            if upstream_number is None:
+                supply[segment.name] = max(0.0, float(rate_kg_hr))
+            else:
+                prior_numbers = [
+                    stage_number
+                    for stage_number in remaining_after_stage
+                    if stage_number <= upstream_number
+                ]
+                default_supply = (
+                    remaining_after_stage[max(prior_numbers)]
+                    if prior_numbers else rate_kg_hr
+                )
+                supply[segment.name] = max(
+                    0.0,
+                    min(
+                        float(rate_kg_hr),
+                        float(remaining_after_stage.get(
+                            upstream_number, default_supply)),
+                    ),
+                )
+        return supply
+
+    def _record_runtime_wall_fraction(
+        self,
+        species: str,
+        fraction: float,
+        segment_fractions: Mapping[str, float] | None = None,
+    ) -> None:
         data = _mutable_species_vapor_data(self.vapor_pressure_data, species)
         if data is None:
             return
         data[WALL_DEPOSIT_FRACTION_KEY] = max(0.0, min(1.0, float(fraction)))
         data[WALL_DEPOSIT_ACCOUNT_KEY] = WALL_DEPOSIT_ACCOUNT
+        data[WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY] = {
+            str(account): max(0.0, min(1.0, float(segment_fraction)))
+            for account, segment_fraction in dict(
+                segment_fractions or {}).items()
+            if float(segment_fraction) > 0.0
+        }
 
     def _condensation_efficiency(
         self,
@@ -737,6 +1002,111 @@ def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     if species in {'Cr', 'CrO2'}:
         return not chromium_stage
     return chromium_stage
+
+
+def _allocate_total_by_weights(
+    total: float,
+    weights: Mapping[str, float],
+) -> Dict[str, float]:
+    if total <= 0.0:
+        return {}
+    positive = [
+        (str(name), float(weight))
+        for name, weight in weights.items()
+        if float(weight) > 0.0
+    ]
+    weight_total = sum(weight for _, weight in positive)
+    if weight_total <= 0.0:
+        return {}
+    allocated: Dict[str, float] = {}
+    running = 0.0
+    for name, weight in positive[:-1]:
+        value = float(total) * weight / weight_total
+        allocated[name] = value
+        running += value
+    last_name = positive[-1][0]
+    allocated[last_name] = max(0.0, float(total) - running)
+    return allocated
+
+
+def _wall_segment_account_fractions(
+    wall_deposit_by_segment_species: Mapping[str, Mapping[str, float]],
+    species: str,
+    wall_deposit_kg: float,
+    pipe_segments: list[PipeSegment],
+) -> Dict[str, float]:
+    if wall_deposit_kg <= 0.0:
+        return {}
+    segment_by_name = {segment.name: segment for segment in pipe_segments}
+    fractions: Dict[str, float] = {}
+    for segment_name, species_kg in wall_deposit_by_segment_species.items():
+        segment_kg = float(species_kg.get(species, 0.0))
+        if segment_kg <= 0.0:
+            continue
+        segment = segment_by_name.get(segment_name)
+        if segment is None:
+            continue
+        fractions[segment.wall_deposit_account] = segment_kg / wall_deposit_kg
+    return _allocate_total_by_weights(1.0, fractions)
+
+
+def _segment_stage_number(stage_name: str) -> int | None:
+    try:
+        return int(str(stage_name).rsplit('_', 1)[-1])
+    except (TypeError, ValueError):
+        return None
+
+
+def cold_spot_diagnostic(
+    pipe_segments: list[PipeSegment],
+    vapor_species_kg_hr: Mapping[str, float],
+    *,
+    margin_C: float = COLD_SPOT_MARGIN_C,
+) -> dict[str, Any]:
+    """Flag pipe segments colder than a flowing species' landing threshold."""
+
+    findings: list[dict[str, Any]] = []
+    for species, raw_kg_hr in vapor_species_kg_hr.items():
+        kg_hr = float(raw_kg_hr)
+        if kg_hr <= 1e-15:
+            continue
+        target_stage_number = designated_stage_number(species)
+        if target_stage_number is None:
+            continue
+        condensation_T_C = _species_condensation_temperature_C(species)
+        threshold_C = condensation_T_C - float(margin_C)
+        for segment in pipe_segments:
+            downstream_number = _segment_stage_number(segment.downstream_stage)
+            if downstream_number is None:
+                continue
+            if downstream_number > target_stage_number:
+                continue
+            wall_T_C = float(segment.wall_temperature_C)
+            if wall_T_C >= threshold_C:
+                continue
+            findings.append({
+                'segment': segment.name,
+                'account': segment.wall_deposit_account,
+                'species': str(species),
+                'kg_hr': kg_hr,
+                'wall_temperature_C': wall_T_C,
+                'condensation_temperature_C': condensation_T_C,
+                'margin_C': float(margin_C),
+                'target_stage_number': target_stage_number,
+                'warning': (
+                    f'cold spot {segment.name}: {species} sees '
+                    f'{wall_T_C:.1f} C before stage {target_stage_number}; '
+                    f'threshold {threshold_C:.1f} C'
+                ),
+            })
+
+    warnings = [str(finding['warning']) for finding in findings]
+    return {
+        'has_cold_spot': bool(findings),
+        'margin_C': float(margin_C),
+        'warnings': warnings,
+        'findings': findings,
+    }
 
 
 def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:

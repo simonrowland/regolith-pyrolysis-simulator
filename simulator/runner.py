@@ -57,7 +57,11 @@ from simulator.session import (
     SimSessionConfig,
     drive_session,
 )
-from simulator.state import HourSnapshot, MOLAR_MASS
+from simulator.state import (
+    HourSnapshot,
+    MOLAR_MASS,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+)
 
 # Public schema version pinned by docs/runner-output-schema.md.
 RUNNER_SCHEMA_VERSION = "1.0.0"
@@ -707,6 +711,11 @@ def _wall_deposit_report_kg(
     wall_deposit_kg = _kg_by_species_from_mol_state(
         state, WALL_DEPOSIT_ACCOUNT,
     )
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        for species, kg in _kg_by_species_from_mol_state(
+            state, account,
+        ).items():
+            wall_deposit_kg[species] = wall_deposit_kg.get(species, 0.0) + kg
     for species in SIO_WALL_DEPOSIT_SPECIES:
         wall_deposit_kg.setdefault(species, 0.0)
     return {
@@ -851,6 +860,7 @@ def _apply_sio_wall_sweep_controls(
         return
     overhead_cfg = dict(runtime_override.get("overhead_headspace", {}) or {})
     overhead_cfg["liner_temperature_C"] = float(liner_temperature_c)
+    overhead_cfg["pipe_segment_temperatures_C"] = float(liner_temperature_c)
     runtime_override["overhead_headspace"] = overhead_cfg
     sim._configure_overhead_headspace(CampaignPhase.C2A)
     if sim._condensation_model is not None:
@@ -858,6 +868,10 @@ def _apply_sio_wall_sweep_controls(
             wall_temperature_C=float(liner_temperature_c),
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
             gas_temperature_C=float(liner_temperature_c),
+            pipe_segment_temperatures_C={
+                segment.name: float(liner_temperature_c)
+                for segment in sim.condensation_model.pipe_segments
+            },
         )
 
 
@@ -1053,6 +1067,14 @@ def build_sio_yield_report(
             ),
             "wall_deposit_regime_factor": float(
                 operating_entry.get("regime_factor", 1.0) or 1.0
+            ),
+            "wall_deposit_pipe_segment_temperatures_C": dict(
+                operating_entry.get("pipe_segment_temperatures_C", {}) or {}
+            ),
+            "cold_spot_diagnostic": dict(
+                getattr(
+                    condensation_model, "last_cold_spot_diagnostic", {}
+                ) or {}
             ),
         }
         vapor_pressure_diagnostic = dict(

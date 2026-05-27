@@ -74,6 +74,7 @@ from simulator.state import (
     OXIDE_SPECIES,
     OXIDE_TO_METAL,
     OverheadGas,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     ProcessInventory,
     STOICH_RATIOS,
 )
@@ -159,6 +160,7 @@ FLOW_MASS_ACCOUNTS = (
     'process.raw_feedstock',
     'process.condensation_train',
     WALL_DEPOSIT_ACCOUNT,
+    *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     'process.overhead_gas',
     'process.metal_phase',
     'process.reagent_inventory',
@@ -1257,6 +1259,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_pressure_mbar=transport['pressure_mbar'],
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             gas_temperature_C=transport['pipe_temperature_C'],
+            pipe_segment_temperatures_C=(
+                self.overhead_model.resolve_pipe_segment_temperatures_C(
+                    [
+                        segment.name
+                        for segment in self.condensation_model.pipe_segments
+                    ],
+                    self.melt,
+                )
+            ),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )

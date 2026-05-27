@@ -90,6 +90,8 @@ from simulator.condensation import (
     WALL_DEPOSIT_ACCOUNT,
     WALL_DEPOSIT_ACCOUNT_KEY,
     WALL_DEPOSIT_FRACTION_KEY,
+    WALL_DEPOSIT_SEGMENT_ACCOUNTS,
+    WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY,
 )
 
 
@@ -109,6 +111,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         "process.condensation_train",
         WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
+        *WALL_DEPOSIT_SEGMENT_ACCOUNTS,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -211,15 +214,13 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         }
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
         if wall_deposit_mol > 0.0:
-            account = str(
-                sp_data.get(WALL_DEPOSIT_ACCOUNT_KEY) or WALL_DEPOSIT_ACCOUNT
-            )
-            if account not in self.DECLARED_ACCOUNTS:
-                account = WALL_DEPOSIT_ACCOUNT
-            species_mol = credits.setdefault(account, {})
-            species_mol[species] = (
-                species_mol.get(species, 0.0) + wall_deposit_mol
-            )
+            for account, account_mol in self._wall_deposit_mol_by_account(
+                wall_deposit_mol, sp_data,
+            ).items():
+                species_mol = credits.setdefault(account, {})
+                species_mol[species] = (
+                    species_mol.get(species, 0.0) + account_mol
+                )
 
         # Atom-balance proof: element-by-element net (credit - debit).
         # Must be zero element-by-element (the kernel re-checks this
@@ -246,6 +247,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             diagnostic={
                 "credited_condensed_kg": float(baffle_condensed_kg),
                 "credited_wall_deposit_kg": float(wall_deposit_kg),
+                "credited_wall_deposit_accounts_kg": {
+                    account: float(wall_deposit_kg) * float(fraction)
+                    for account, fraction in (
+                        self._wall_deposit_account_fractions(sp_data).items()
+                    )
+                },
             },
         )
 
@@ -335,6 +342,58 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if not math.isfinite(fraction):
             return 0.0
         return max(0.0, min(1.0, fraction))
+
+    @classmethod
+    def _wall_deposit_account_fractions(
+        cls,
+        sp_data: Mapping[str, Any],
+    ) -> dict[str, float]:
+        raw_segment_fractions = sp_data.get(
+            WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY, {})
+        if isinstance(raw_segment_fractions, Mapping):
+            fractions: dict[str, float] = {}
+            for account, raw_fraction in raw_segment_fractions.items():
+                account_name = str(account)
+                if account_name not in cls.DECLARED_ACCOUNTS:
+                    continue
+                try:
+                    fraction = float(raw_fraction)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(fraction) and fraction > 0.0:
+                    fractions[account_name] = fraction
+            total = sum(fractions.values())
+            if total > 0.0:
+                return {
+                    account: fraction / total
+                    for account, fraction in fractions.items()
+                }
+
+        account = str(
+            sp_data.get(WALL_DEPOSIT_ACCOUNT_KEY) or WALL_DEPOSIT_ACCOUNT
+        )
+        if account not in cls.DECLARED_ACCOUNTS:
+            account = WALL_DEPOSIT_ACCOUNT
+        return {account: 1.0}
+
+    @classmethod
+    def _wall_deposit_mol_by_account(
+        cls,
+        wall_deposit_mol: float,
+        sp_data: Mapping[str, Any],
+    ) -> dict[str, float]:
+        fractions = cls._wall_deposit_account_fractions(sp_data)
+        if wall_deposit_mol <= 0.0 or not fractions:
+            return {}
+        credited: dict[str, float] = {}
+        running_mol = 0.0
+        items = list(fractions.items())
+        for account, fraction in items[:-1]:
+            account_mol = wall_deposit_mol * fraction
+            credited[account] = account_mol
+            running_mol += account_mol
+        credited[items[-1][0]] = max(0.0, wall_deposit_mol - running_mol)
+        return credited
 
     @staticmethod
     def _wall_deposit_mol(

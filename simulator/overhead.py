@@ -69,6 +69,7 @@ class OverheadGasModel:
         'conductance_kg_s_per_bar': None,
         'downstream_pressure_bar': None,
         'liner_temperature_C': DEFAULT_PIPE_TEMPERATURE_C,
+        'pipe_segment_temperatures_C': None,
     }
 
     def __init__(self, headspace_config: Optional[Mapping] = None):
@@ -77,6 +78,7 @@ class OverheadGasModel:
         self.pipe_length_m = 1.0         # crucible to first condenser
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C
         self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C
+        self._pipe_segment_temperature_config: Any = None
         self.configure_headspace(headspace_config or {})
 
     @property
@@ -89,6 +91,7 @@ class OverheadGasModel:
     def pipe_temperature_C(self, value: float) -> None:
         self._pipe_temperature_C = max(0.0, float(value))
         self._liner_temperature_config = self._pipe_temperature_C
+        self._pipe_segment_temperature_config = self._pipe_temperature_C
 
     def configure_headspace(self, config: Mapping) -> None:
         merged = dict(self.DEFAULT_HEADSPACE_CONFIG)
@@ -104,6 +107,10 @@ class OverheadGasModel:
             'liner_temperature_C',
             merged.get('pipe_temperature_C', DEFAULT_PIPE_TEMPERATURE_C),
         )
+        self._pipe_segment_temperature_config = merged.get(
+            'pipe_segment_temperatures_C',
+            self._liner_temperature_config,
+        )
         self._pipe_temperature_C = self.resolve_pipe_temperature_C()
 
     def resolve_pipe_temperature_C(self, melt: Optional[MeltState] = None) -> float:
@@ -115,6 +122,44 @@ class OverheadGasModel:
         )
         self._pipe_temperature_C = max(0.0, float(value))
         return self._pipe_temperature_C
+
+    def resolve_pipe_segment_temperatures_C(
+        self,
+        segment_names: list[str] | tuple[str, ...],
+        melt: Optional[MeltState] = None,
+    ) -> dict[str, float]:
+        """Resolve per-segment wall temperatures for the active recipe."""
+
+        base_C = self.resolve_pipe_temperature_C(melt)
+        config = self._pipe_segment_temperature_config
+        if config in (None, ''):
+            return {str(name): base_C for name in segment_names}
+        if isinstance(config, (int, float)) or not isinstance(config, Mapping):
+            value = self._resolve_liner_temperature_value(config, melt)
+            return {str(name): max(0.0, float(value)) for name in segment_names}
+        if 'segments' not in config:
+            value = self._resolve_liner_temperature_value(config, melt)
+            return {str(name): max(0.0, float(value)) for name in segment_names}
+
+        default_config = config.get('default_C', base_C)
+        default_C = self._resolve_liner_temperature_value(default_config, melt)
+        segments = config.get('segments', {}) or {}
+        if not isinstance(segments, Mapping):
+            segments = {}
+
+        resolved: dict[str, float] = {}
+        for raw_name in segment_names:
+            name = str(raw_name)
+            segment_config = segments.get(name)
+            if segment_config is None:
+                resolved[name] = max(0.0, float(default_C))
+            else:
+                resolved[name] = max(
+                    0.0,
+                    float(self._resolve_liner_temperature_value(
+                        segment_config, melt)),
+                )
+        return resolved
 
     def estimate_transport_state(
         self,
@@ -224,12 +269,19 @@ class OverheadGasModel:
 
     @staticmethod
     def _campaign_matches(configured: Any, campaign_name: str) -> bool:
+        aliases = {
+            'C2A': {'C2A', 'C2A_continuous'},
+            'C2A_STAGED': {'C2A_STAGED', 'C2A_staged'},
+            'C3_K': {'C3_K', 'C3'},
+            'C3_NA': {'C3_NA', 'C3'},
+        }
+        campaign_names = aliases.get(campaign_name, {campaign_name})
         if configured in (None, '', '*'):
             return True
         if isinstance(configured, str):
-            return configured == campaign_name
+            return configured in campaign_names
         if isinstance(configured, (list, tuple, set)):
-            return campaign_name in {str(item) for item in configured}
+            return bool(campaign_names & {str(item) for item in configured})
         return False
 
     def _interpolate_liner_segment(
