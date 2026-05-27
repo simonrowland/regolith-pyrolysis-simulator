@@ -176,6 +176,9 @@ class EquilibriumResult:
     # Vapor pressures (Pa) for each volatile species
     vapor_pressures_Pa: Dict[str, float] = field(default_factory=dict)
 
+    # Per-species source for ``vapor_pressures_Pa`` values.
+    vapor_pressures_source: Dict[str, str] = field(default_factory=dict)
+
     # Thermodynamic activities in the melt. Field name is legacy.
     activity_coefficients: Dict[str, float] = field(default_factory=dict)
 

@@ -622,6 +622,7 @@ class AlphaMELTSBackend(MeltBackend):
         liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         activity_coefficients: Optional[Mapping[str, float]] = None,
         vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
+        vapor_pressures_source: Optional[Mapping[str, str]] = None,
         warnings: Optional[List[str]] = None,
         status: str = 'ok',
     ) -> EquilibriumResult:
@@ -635,6 +636,7 @@ class AlphaMELTSBackend(MeltBackend):
             liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
             activity_coefficients=dict(activity_coefficients or {}),
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
+            vapor_pressures_source=dict(vapor_pressures_source or {}),
             warnings=list(warnings or []),
             status=str(status),
         )
@@ -768,15 +770,17 @@ class AlphaMELTSBackend(MeltBackend):
                 warnings=tuple(warnings or ()),
             )
             status = 'ok' if payload.phases_present else 'not_converged'
-            vapor_pressures = (
-                self._get_vaporock_pressures(temperature_C, comp_wt, fO2_log)
-                if self._vaporock_available else
-                self._activities_times_antoine(
+            if self._vaporock_available:
+                vapor_pressures = self._get_vaporock_pressures(
+                    temperature_C, comp_wt, fO2_log)
+                vapor_pressure_source = 'vaporock'
+            else:
+                vapor_pressures = self._activities_times_antoine(
                     temperature_C,
                     payload.activity_coefficients,
                     comp_wt,
                 )
-            )
+                vapor_pressure_source = 'thermoengine'
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -787,6 +791,10 @@ class AlphaMELTSBackend(MeltBackend):
                 liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
                 activity_coefficients=payload.activity_coefficients,
                 vapor_pressures_Pa=vapor_pressures,
+                vapor_pressures_source={
+                    species: vapor_pressure_source
+                    for species in vapor_pressures
+                },
                 warnings=list(payload.warnings),
                 status=status,
             )
@@ -838,11 +846,17 @@ class AlphaMELTSBackend(MeltBackend):
             if self._vaporock_available:
                 eq.vapor_pressures_Pa = self._get_vaporock_pressures(
                     temperature_C, comp_wt, fO2_log)
+                source = 'vaporock'
             else:
                 # Use activity × pure-component Antoine only when the
                 # chemical-potential convention supplied real activities.
                 eq.vapor_pressures_Pa = self._activities_times_antoine(
                     temperature_C, eq.activity_coefficients, comp_wt)
+                source = 'alphamelts_python_api'
+            eq.vapor_pressures_source = {
+                species: source
+                for species in eq.vapor_pressures_Pa
+            }
 
             return eq
 

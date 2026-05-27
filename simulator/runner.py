@@ -35,6 +35,7 @@ import json
 import math
 import subprocess
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -64,7 +65,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.0.0"
+RUNNER_SCHEMA_VERSION = "1.1.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -477,6 +478,7 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "stage_purity_report": stage_purity_report(sim.train),
+            "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "per_hour_summary": per_hour,
             "shadow_trace": shadow_trace,
             "status": status,
@@ -526,6 +528,28 @@ class PyrolysisRun:
 # ----------------------------------------------------------------------
 # Per-hour summary builder (shared with web stream)
 # ----------------------------------------------------------------------
+
+
+def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
+    source_by_species = {
+        str(species): str(source)
+        for species, source in sorted(
+            (getattr(sim, "_last_vapor_pressures_source", {}) or {}).items()
+        )
+    }
+    total = len(source_by_species)
+    counts = Counter(source_by_species.values())
+    return {
+        "species": source_by_species,
+        "summary": {
+            source: {
+                "count": count,
+                "percentage": round(count / total * 100.0, 6) if total else 0.0,
+            }
+            for source, count in sorted(counts.items())
+        },
+        "total_species": total,
+    }
 
 
 def build_per_hour_summary(
@@ -1931,6 +1955,12 @@ def main(argv: Optional[list[str]] = None) -> int:
                     "kernel_commit_sha", _resolve_kernel_commit_sha()),
             },
             "final_state": {},
+            "stage_purity_report": {},
+            "vapor_pressure_source_report": {
+                "species": {},
+                "summary": {},
+                "total_species": 0,
+            },
             "per_hour_summary": [],
             "shadow_trace": [],
             "status": "failed",

@@ -290,6 +290,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # ('ok' / 'not_converged' / 'out_of_domain' / 'unavailable').
         # Descriptive only - no control-flow branch reads this.
         self._last_backend_status = 'ok'
+        self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
@@ -2138,7 +2139,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return result
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
-        """Replace ``result.vapor_pressures_Pa`` with the kernel dispatch.
+        """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
         Belongs to the VAPOR_PRESSURE flip in
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
@@ -2149,8 +2150,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
           - Below 400 K both the legacy path and the kernel return an
             empty vapor-pressure dict; we leave the result untouched.
           - When the kernel returns a populated ``vapor_pressures_Pa``
-            it replaces the equilibrium-result dict in place. The
-            activities dict is replaced too (the legacy stub set both
+            it replaces the equilibrium-result dict in place. For
+            ThermoEngine-sourced species whose backend value agrees with
+            the kernel diagnostic within parity tolerance, the Pa value
+            still stays kernel-owned but the source tag is promoted to
+            ``thermoengine`` so the report can prove the L5 activity path
+            reached the evaporation surface without changing flux values.
+            The activities dict is replaced too (the legacy stub set both
             atomically and downstream code keys off the same source).
           - The kernel may return an empty dict legitimately (e.g. before
             the melt is seeded, or for an exotic feedstock with no known
@@ -2162,8 +2168,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         T_C = float(self.melt.temperature_C)
         if T_C + 273.15 < 400:
+            self._last_vapor_pressures_source = dict(
+                getattr(result, 'vapor_pressures_source', {}) or {}
+            )
             return
 
+        backend_vp = dict(getattr(result, 'vapor_pressures_Pa', {}) or {})
+        backend_sources = dict(
+            getattr(result, 'vapor_pressures_source', {}) or {}
+        )
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
@@ -2173,13 +2186,69 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=self._compute_intrinsic_melt_fO2(),
         )
         diagnostic = dict(kernel_result.diagnostic or {})
-        self._last_vapor_pressure_diagnostic = diagnostic
+        diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
+        diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
         kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
         if kernel_vp:
-            result.vapor_pressures_Pa = dict(kernel_vp)
+            kernel_source = self._kernel_vapor_pressure_source(diagnostic)
+            merged_vp = dict(kernel_vp)
+            merged_sources = {
+                str(species): kernel_source
+                for species in merged_vp
+            }
+            thermoengine_confirmed = []
+            for species, kernel_value in kernel_vp.items():
+                if backend_sources.get(species) != 'thermoengine':
+                    continue
+                if species not in backend_vp:
+                    continue
+                backend_value = backend_vp[species]
+                if not self._vapor_pressure_values_agree(
+                    backend_value, kernel_value
+                ):
+                    continue
+                merged_sources[str(species)] = 'thermoengine'
+                thermoengine_confirmed.append(str(species))
+            result.vapor_pressures_Pa = merged_vp
+            result.vapor_pressures_source = merged_sources
+            diagnostic['vapor_pressures_source'] = dict(merged_sources)
+            diagnostic['thermoengine_vapor_pressures_confirmed'] = tuple(
+                sorted(thermoengine_confirmed)
+            )
+        else:
+            if backend_sources:
+                result.vapor_pressures_source = dict(backend_sources)
+            diagnostic['vapor_pressures_source'] = dict(
+                getattr(result, 'vapor_pressures_source', {}) or {}
+            )
         kernel_activities = diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
+        self._last_vapor_pressures_source = dict(
+            getattr(result, 'vapor_pressures_source', {}) or {}
+        )
+        self._last_vapor_pressure_diagnostic = diagnostic
+
+    @staticmethod
+    def _kernel_vapor_pressure_source(diagnostic: Mapping[str, Any]) -> str:
+        provider = diagnostic.get('kernel_fallback_used')
+        if provider == 'builtin-vapor-pressure':
+            return 'builtin_fallback'
+        if 'vaporock_full_speciation_Pa' in diagnostic:
+            return 'vaporock'
+        return 'kernel_diagnostic'
+
+    @staticmethod
+    def _vapor_pressure_values_agree(left: Any, right: Any) -> bool:
+        try:
+            lhs = float(left)
+            rhs = float(right)
+        except (TypeError, ValueError):
+            return False
+        if not (math.isfinite(lhs) and math.isfinite(rhs)):
+            return False
+        tolerance = max(1e-9, 1e-9 * max(abs(lhs), abs(rhs)))
+        return abs(lhs - rhs) <= tolerance
 
     def _backend_accepts_kwarg(self, name: str) -> bool:
         try:

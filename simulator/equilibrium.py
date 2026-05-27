@@ -378,6 +378,10 @@ class EquilibriumMixin:
             temperature_C=self.melt.temperature_C,
             pressure_bar=self.melt.p_total_mbar / 1000.0,
             vapor_pressures_Pa=vapor_pressures,
+            vapor_pressures_source={
+                species: 'builtin_fallback'
+                for species in vapor_pressures
+            },
             activity_coefficients=activities,
             fO2_log=getattr(
                 self,
