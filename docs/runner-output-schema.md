@@ -6,7 +6,7 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.0.0`
+**Schema version:** `1.1.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Run the CLI as:
@@ -36,10 +36,11 @@ stderr.
 
 ```jsonc
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "stage_purity_report": {...}, // see "Stage purity report"
+  "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed",
@@ -55,7 +56,7 @@ schema-shape assertion.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -147,6 +148,29 @@ schema-shape assertion.
 * Accepted species come from `simulator/condensation_routing.py`.
 * Verdict thresholds: `PURE` when purity is above 95%, `MIXED`
   from 80-95%, and `CONTAMINATED` below 80%.
+
+## Vapor pressure source report
+
+```jsonc
+"vapor_pressure_source_report": {
+  "species": {
+    "Na": "thermoengine",
+    "K": "builtin_fallback"
+  },
+  "summary": {
+    "thermoengine": {"count": 1, "percentage": 50.0},
+    "builtin_fallback": {"count": 1, "percentage": 50.0}
+  },
+  "total_species": 2
+}
+```
+
+* Sourced from `EquilibriumResult.vapor_pressures_source` after the
+  post-equilibrium kernel refresh. Values are one of `thermoengine`,
+  `alphamelts_python_api`, `alphamelts_text`, `vaporock`,
+  `builtin_fallback`, or `kernel_diagnostic`.
+* Percentages are species-count percentages for the latest vapor
+  pressure surface used by the evaporation path.
 
 ## Per-hour summary
 

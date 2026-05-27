@@ -47,6 +47,7 @@ TOP_LEVEL_KEYS = frozenset({
     "run_metadata",
     "final_state",
     "stage_purity_report",
+    "vapor_pressure_source_report",
     "per_hour_summary",
     "shadow_trace",
     "status",
@@ -191,6 +192,28 @@ def _assert_schema_shape(payload: dict) -> None:
         })
         assert stage["verdict"] in {"PURE", "MIXED", "CONTAMINATED"}
 
+    source_report = payload["vapor_pressure_source_report"]
+    assert isinstance(source_report, dict)
+    assert set(source_report) == {"species", "summary", "total_species"}
+    assert isinstance(source_report["species"], dict)
+    assert isinstance(source_report["summary"], dict)
+    assert source_report["total_species"] == len(source_report["species"])
+    for species, source in source_report["species"].items():
+        assert isinstance(species, str)
+        assert source in {
+            "thermoengine",
+            "alphamelts_python_api",
+            "alphamelts_text",
+            "vaporock",
+            "builtin_fallback",
+            "kernel_diagnostic",
+        }
+    for source, item in source_report["summary"].items():
+        assert isinstance(source, str)
+        assert set(item) == {"count", "percentage"}
+        assert isinstance(item["count"], int)
+        assert isinstance(item["percentage"], (int, float))
+
     assert isinstance(payload["per_hour_summary"], list)
     for entry in payload["per_hour_summary"]:
         assert set(entry) == PER_HOUR_KEYS, (
@@ -234,7 +257,15 @@ def test_runner_golden_fixture_matches(scenario):
     _assert_mass_balance_bound(actual)
     # F1 adds stage-purity diagnostics without regenerating legacy goldens.
     expected = dict(expected)
+    expected["schema_version"] = actual["schema_version"]
+    expected["run_metadata"] = dict(expected["run_metadata"])
+    expected["run_metadata"]["schema_version"] = actual["run_metadata"][
+        "schema_version"
+    ]
     expected["stage_purity_report"] = actual["stage_purity_report"]
+    expected["vapor_pressure_source_report"] = actual[
+        "vapor_pressure_source_report"
+    ]
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate via `python -m simulator.runner --output=tests/fixtures/"
