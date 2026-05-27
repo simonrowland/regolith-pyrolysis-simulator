@@ -567,29 +567,64 @@ class CondensationModel:
     ) -> Dict[str, float]:
         if rate_kg_hr <= 0.0 or not self.pipe_segments:
             return {}
+        # Autoreview r7 P2 (2026-05-27): the equal-temperature fast
+        # path used to allocate the wall-deposit candidate across
+        # ``self.pipe_segments`` -- every segment, including segments
+        # downstream of the species' designated condenser stage that
+        # cannot physically see this species' vapor.  The
+        # mixed-temperature branch already restricts to upstream-only
+        # candidates via ``_mixed_temperature_wall_candidate_segments``
+        # AND caps by per-segment supply; the equal-T branch must use
+        # the same gate or it credits species to wall-deposit accounts
+        # they cannot physically reach (mass balance still closes, but
+        # the per-segment ledger and the F1 stage-routing-purity
+        # report both become non-stage-honest).
+        reachable_segments = self._mixed_temperature_wall_candidate_segments(species)
+        if not reachable_segments:
+            return {}
         temperatures = {
             float(segment.wall_temperature_C)
-            for segment in self.pipe_segments
+            for segment in reachable_segments
         }
         if len(temperatures) == 1:
             wall_temperature_C = next(iter(temperatures))
+            # Per-segment surface area cap on the equal-T candidate so
+            # the total is bounded by what the reachable segments can
+            # physically collect, not the original full-train rate.
+            reachable_surface_m2 = sum(
+                max(0.0, float(segment.surface_area_m2))
+                for segment in reachable_segments
+            )
             total_candidate = self._wall_deposit_candidate_for_surface_kg(
                 species=species,
                 rate_kg_hr=rate_kg_hr,
                 T_cond_C=T_cond_C,
                 melt_temperature_C=melt_temperature_C,
                 wall_temperature_C=wall_temperature_C,
-                surface_area_m2=self.wall_surface_area_m2,
+                surface_area_m2=reachable_surface_m2,
             )
-            return _allocate_total_by_weights(
+            candidates = _allocate_total_by_weights(
                 total_candidate,
                 {
                     segment.name: segment.surface_area_m2
-                    for segment in self.pipe_segments
+                    for segment in reachable_segments
                 },
             )
+            # Per-segment supply cap: mirror the mixed-temperature
+            # branch's invariant that no segment claims more than its
+            # available vapor supply after upstream condensation.
+            for segment in reachable_segments:
+                supply_kg = min(
+                    max(0.0, float(supply_by_segment_kg.get(
+                        segment.name, rate_kg_hr))),
+                    rate_kg_hr,
+                )
+                if segment.name in candidates:
+                    candidates[segment.name] = min(
+                        candidates[segment.name], supply_kg)
+            return candidates
 
-        pipe_segments = self._mixed_temperature_wall_candidate_segments(species)
+        pipe_segments = reachable_segments
         if not pipe_segments:
             return {}
         candidates: Dict[str, float] = {}

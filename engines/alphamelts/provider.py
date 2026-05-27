@@ -568,14 +568,31 @@ class AlphaMELTSProvider(ChemistryProvider):
             composition = dict(
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )
-            if not composition:
+            liquid_fraction = float(getattr(result, 'liquid_fraction'))
+            # Autoreview r7 P2 (2026-05-27): the EC path samples the
+            # solidus-to-liquidus grid INCLUDING endpoints.  Post r4
+            # ThermoEngine fix (the bulk_wt fabrication for subsolidus
+            # states was removed), a valid solidus / subsolidus sample
+            # reports ``liquid_fraction == 0`` with an EMPTY
+            # ``liquid_composition_wt_pct`` -- the right signal for a
+            # no-liquid endpoint.  This branch previously raised
+            # unconditionally when composition was empty, turning a
+            # legitimate zero-liquid endpoint into a ``not_converged``
+            # status and breaking the EQUILIBRIUM_CRYSTALLIZATION /
+            # GATE_LIQUID_FRACTION result.  Now we only treat an empty
+            # composition as a sample error when the engine ALSO
+            # reports residual liquid; zero-liquid endpoints pass
+            # through with an empty composition dict and the
+            # downstream path-builder handles them.
+            if not composition and liquid_fraction > 0.0:
                 raise RuntimeError(
-                    'AlphaMELTS EC sample lacks residual liquid composition'
+                    'AlphaMELTS EC sample lacks residual liquid '
+                    f'composition despite liquid_fraction={liquid_fraction!r}'
                 )
             for warning in getattr(result, 'warnings', ()) or ():
                 if warning not in sample_warnings:
                     sample_warnings.append(str(warning))
-            return float(getattr(result, 'liquid_fraction')), composition
+            return liquid_fraction, composition
 
         path = build_equilibrium_crystallization_path(
             sample_liquid_state,
