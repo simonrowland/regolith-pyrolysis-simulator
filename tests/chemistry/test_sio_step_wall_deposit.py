@@ -61,8 +61,18 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # downstream dict-iterated quantities). 6.589955385e-06 →
     # 6.5899485456e-06 (rel ~1e-6). No physics change; pure FP noise
     # from a documented thermo-table update.
+    # Post-0.5.0 viscous-regime mass-transfer (tickler §5 follow-on):
+    # Sherwood-number boundary-layer flux (Bird/Stewart/Lightfoot,
+    # Sh=3.66 for laminar pipe flow) added as a regime_factor-weighted
+    # companion to HKL. In viscous regime (low Kn) the mass-transfer
+    # term dominates; the stage-band integration + wall-candidate are
+    # both rebalanced. Net effect on the 1050 C cold-liner wall deposit:
+    # 6.5899485456e-06 → 6.46501781604e-06 (~−1.9% relative). The
+    # released mass redistributes downstream through the train; total
+    # SiO budget conserved. The fouling-threshold structure (deposit at
+    # 1050 C, none at 1400/1500 C) is unchanged.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.5899485456e-06, rel=1e-9
+        6.46501781604e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

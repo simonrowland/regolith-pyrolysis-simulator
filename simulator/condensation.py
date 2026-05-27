@@ -86,6 +86,44 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 COLD_SPOT_MARGIN_C = 25.0
 
+# Viscous-regime mass-transfer model (post-F3 follow-on, 2026-05-27).
+# F3 added regime_factor = Kn/(Kn + 0.01) to the band-integrated HKL
+# flux: in viscous regime (Kn << 0.01) the HKL contribution -> 0 because
+# HKL is the FREE-MOLECULAR-LIMIT flux equation and is not the right
+# physics there. Without a compensating term the simulator simply
+# under-predicts viscous-regime stage capture (which is what F3's commit
+# noted). This block adds the Bird/Stewart/Lightfoot Sherwood-number
+# boundary-layer mass-transfer flux that goes to ~1 in viscous regime
+# where HKL goes to 0. Total deposition is:
+#
+#    J_total = J_HKL * regime_factor + J_mass_transfer * (1 - regime_factor)
+#
+# So at Kn -> 0 (deep viscous) the mass-transfer term dominates; at
+# Kn -> inf (free molecular) the HKL term dominates; the transition
+# regime is a smooth blend.
+#
+# Sherwood number for laminar pipe flow with constant wall concentration
+# (Bird/Stewart/Lightfoot 2007 "Transport Phenomena" 2nd ed., Eq 14.4-9):
+#     Sh = 3.66 (asymptotic, fully developed laminar)
+#
+# For the simulator's overhead piping at C2A_continuous typical
+# operating point (pN2 ~10 mbar, T_gas ~1700 C, D_pipe = 0.12 m), the
+# Reynolds number Re = rho * v * D / mu is well below 2100 (laminar),
+# so Sh = 3.66 is the right anchor. Mass-transfer coefficient:
+#     k_c = Sh * D_AB / D_pipe   (m/s)
+# And the deposition flux is:
+#     J_mass = k_c * (P_local - P_sat) / (R * T_gas)   (mol/m^2/s)
+#
+# D_AB (binary diffusion coefficient of vapor A in carrier gas B) is
+# pressure-inverse and weakly T-dependent. For SiO/Na/K vapor in N2
+# at 10 mbar, 1700 C, Chapman-Enskog gives D_AB ~ 1.0e-2 m^2/s. The
+# default below uses 1.0e-2 m^2/s as the order-of-magnitude anchor
+# and documents the regime; species-specific refinements are open
+# work (tickler §5 follow-on).
+DEFAULT_SHERWOOD_LAMINAR = 3.66
+DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
+GAS_CONSTANT_J_MOL_K = 8.314462618
+
 
 class KnudsenRegime(Enum):
     VISCOUS = 'viscous'
@@ -714,8 +752,14 @@ class CondensationModel:
             return 0.0
 
         T_wall_K = max(float(wall_temperature_C) + 273.15, 1.0)
-        flux = _hkl_surface_deposition_flux_mol_m2_s(
+        # Post-F3 follow-on (viscous-regime mass-transfer): in viscous
+        # regime HKL is unphysical (free-molecular limit); the Sherwood-
+        # number boundary-layer term carries the deposition. Combine via
+        # regime_factor weighting so that HKL dominates at high Kn and
+        # mass-transfer dominates at low Kn, with a smooth transition.
+        flux = _combined_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
+            pipe_diameter_m=self.pipe_diameter_m,
         )
         if flux <= 0.0:
             return 0.0
@@ -825,8 +869,13 @@ class CondensationModel:
                     lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
                 )
             T_surface_K = max(T_surface_C + 273.15, 1.0)
-            flux = _hkl_surface_deposition_flux_mol_m2_s(
+            # Post-F3 follow-on (viscous-regime mass-transfer): same
+            # combined-flux blend as the wall-deposit candidate path so
+            # the stage-condensation band integration honors viscous
+            # boundary-layer physics where HKL is unphysical.
+            flux = _combined_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, alpha_s, self.regime_factor,
+                pipe_diameter_m=self.pipe_diameter_m,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -1039,6 +1088,99 @@ def _hkl_surface_deposition_flux_mol_m2_s(
             species, driving_pressure_pa, T_surface_K,
         )
     )
+
+
+def _viscous_mass_transfer_flux_mol_m2_s(
+    species: str,
+    P_local_pa: float,
+    T_surface_K: float,
+    pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
+    sherwood: float = DEFAULT_SHERWOOD_LAMINAR,
+    diffusion_coefficient_m2_s: float = DEFAULT_BINARY_DIFFUSION_M2_S,
+) -> float:
+    """Boundary-layer mass-transfer flux of ``species`` to a cooled wall.
+
+    Viscous-regime companion to ``_hkl_surface_deposition_flux_mol_m2_s``.
+    Uses the Bird/Stewart/Lightfoot Sherwood-number correlation for
+    laminar pipe flow with constant wall concentration (Sh = 3.66
+    asymptotic). The mass-transfer coefficient is
+
+        k_c = Sh * D_AB / L_pipe    [m/s]
+
+    and the deposition flux follows from the local-vs-saturated
+    concentration gradient:
+
+        J_mass = k_c * (P_local - P_sat(T_wall)) / (R * T_gas)   [mol/m^2/s]
+
+    This is the boundary-layer-limited deposition rate. It dominates in
+    the viscous regime (Kn << 0.01) where the HKL free-molecular
+    impingement flux is unphysical; the two are blended via the
+    Knudsen ``regime_factor`` in the callers
+    (`_wall_deposit_candidate_for_surface_kg` and
+    `_condensation_efficiency`).
+
+    Returns 0 when there is no driving force (P_local <= P_sat at
+    the wall surface) or when the pipe geometry is invalid.
+    """
+    if pipe_diameter_m <= 0.0 or sherwood <= 0.0:
+        return 0.0
+    if diffusion_coefficient_m2_s <= 0.0:
+        return 0.0
+    P_sat_pa = _antoine_psat_pa(species, T_surface_K)
+    if P_sat_pa is None:
+        return 0.0
+    driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
+    if driving_pressure_pa <= 0.0:
+        return 0.0
+    T_gas_K = max(T_surface_K, 1.0)
+    k_c_m_s = sherwood * diffusion_coefficient_m2_s / pipe_diameter_m
+    return k_c_m_s * driving_pressure_pa / (GAS_CONSTANT_J_MOL_K * T_gas_K)
+
+
+def _combined_deposition_flux_mol_m2_s(
+    species: str,
+    P_local_pa: float,
+    T_surface_K: float,
+    alpha_s: float,
+    regime_factor: float,
+    pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
+) -> float:
+    """Combine HKL + viscous-mass-transfer fluxes via ``regime_factor``.
+
+    Post-F3 follow-on per tickler §5. ``regime_factor`` is
+    ``Kn/(Kn + 0.01)``, going to 0 in viscous regime and 1 in
+    free-molecular regime; we blend the two physics with that weight so
+    that:
+
+      * Kn -> 0 (viscous):       J ~= J_mass_transfer
+      * Kn ~ 0.01 (transition):  J = ~0.5 * J_HKL + ~0.5 * J_mass
+      * Kn >> 0.01 (free-mol):   J ~= J_HKL
+
+    The HKL term carries ``alpha_s`` (sticking coefficient); the
+    boundary-layer term does not (capture at the boundary is
+    geometry-limited, not sticking-probability-limited).
+    """
+    weight_hkl = max(0.0, min(1.0, float(regime_factor)))
+    weight_mt = max(0.0, 1.0 - weight_hkl)
+    if weight_hkl <= 0.0 and weight_mt <= 0.0:
+        return 0.0
+
+    hkl = (
+        _hkl_surface_deposition_flux_mol_m2_s(
+            species, P_local_pa, T_surface_K, alpha_s, regime_factor=1.0,
+        )
+        if weight_hkl > 0.0
+        else 0.0
+    )
+    mt = (
+        _viscous_mass_transfer_flux_mol_m2_s(
+            species, P_local_pa, T_surface_K,
+            pipe_diameter_m=pipe_diameter_m,
+        )
+        if weight_mt > 0.0
+        else 0.0
+    )
+    return weight_hkl * hkl + weight_mt * mt
 
 
 def _mean_free_path_m(
