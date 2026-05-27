@@ -61,6 +61,7 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
     try:
         equilibrium = sim._get_equilibrium()
         flux = sim._calculate_evaporation(equilibrium)
+        flux = sim._apply_analytic_evaporation_depletion(flux)
         sim._route_to_condensation(flux)
         sim._update_melt_composition(flux)
     except AccountingError as exc:

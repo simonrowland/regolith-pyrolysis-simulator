@@ -223,7 +223,8 @@ class CampaignManager:
             return (1480.0, 10.0)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            # Alkali shuttle: inject at 1200-1350°C, bakeout at 1520-1680°C
+            # Legacy C3 alternates injection/bakeout. V1c staged Na cleanup
+            # overrides both targets to the cool FeO window near 1150 C.
             # Alternate between injection T and bakeout T
             ovr = self._campaign_overrides(campaign)
             inject_target = self._float(ovr.get('inject_target_C'), 1275.0)
@@ -248,8 +249,8 @@ class CampaignManager:
             return (1575.0, 5.0)
 
         elif campaign == CampaignPhase.C6:
-            # Mg thermite at 1500-1700°C
-            return (1600.0, 10.0)
+            # Mg/Al crossover is ~1573 C under V1c JANAF constants.
+            return (1500.0, 10.0)
 
         elif campaign == CampaignPhase.MRE_BASELINE:
             # Standard MRE: heat to melting then hold
@@ -450,24 +451,27 @@ class CampaignManager:
             return CampaignPhase.C3_K
 
         elif current == CampaignPhase.C2A_STAGED:
-            # Staged Path A cools before handing the residual FeO to K shuttle.
+            # Staged Path A cools before handing residual FeO to the V1c
+            # Na-only cleanup window. K/FeO is refused at this temperature.
             cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
-            k_stage = cfg.get('k_shuttle_stage', {})
-            if isinstance(k_stage, dict):
-                c3 = self.overrides.setdefault('C3_K', {})
-                target = self._float(k_stage.get('target_C'), 1150.0)
+            na_stage = cfg.get('na_shuttle_stage', {})
+            if not isinstance(na_stage, dict):
+                na_stage = cfg.get('k_shuttle_stage', {})
+            if isinstance(na_stage, dict):
+                c3 = self.overrides.setdefault('C3_NA', {})
+                target = self._float(na_stage.get('target_C'), 1150.0)
                 c3.setdefault('inject_target_C', target)
                 c3.setdefault('bakeout_target_C', target)
                 c3.setdefault(
                     'ramp_rate',
-                    self._float(k_stage.get('ramp_rate_C_per_hr'), 600.0),
+                    self._float(na_stage.get('ramp_rate_C_per_hr'), 600.0),
                 )
                 c3.setdefault(
                     'staged_duration_h',
-                    self._float(k_stage.get('duration_h'), 3.0),
+                    self._float(na_stage.get('duration_h'), 3.0),
                 )
             record.path = 'A_staged'
-            return CampaignPhase.C3_K
+            return CampaignPhase.C3_NA
 
         elif current == CampaignPhase.C2B:
             # After Path B C2B → C3 (K phase)
@@ -524,7 +528,7 @@ class CampaignManager:
                 context=(
                     'Path A: Continuous pN₂ ramp extracts Na/K/Fe/SiO₂. '
                     'Path A_staged: staged pN₂ ramp separates alkali, '
-                    'SiO, hot Fe hold, then cool K shuttle. '
+                    'SiO, hot Fe hold, then cool Na cleanup. '
                     'Path B: pO₂-managed Fe-only pyrolysis preserving '
                     'CMAS glass for tapping as Material 1.'
                 ),

@@ -10,7 +10,7 @@ The simulator is a workbench for testing whether solar-thermal regolith refining
 
 A full-sequence run on a silicate feedstock yields four product classes. Which ones come out and in what form depends on recipe choices; the last is physically unavoidable only on routes that do not deliberately consume the refractory oxides.
 
-1. **Metals + O₂** — the main extraction targets. Na and K condense in Stage 4 (alkali cyclone), Fe condenses in Stage 1 (Fe condenser), Mg in Stage 4, Al via Mg thermite in C6. Disproportionation and reduction reactions release O₂, accumulated at the terminal as the by-product of extracting metal from oxide. This is the sequence the default recipe (C0 → C2A → C3 → C4 → C5 → C6) is designed to deliver.
+1. **Metals + O₂** — the main extraction targets. Na and K condense in Stage 4 (alkali cyclone), Fe condenses in Stage 1 (Fe condenser), Mg in Stage 4, Al via Mg thermite in C6. Under the V1c JANAF refit, Na can clean residual FeO only in the cool ~1150 °C window; K is a volatile product/recyclable alkali stock, not a practical FeO reductant in the melt window. Disproportionation and reduction reactions release O₂, accumulated at the terminal as the by-product of extracting metal from oxide. This is the sequence the default recipe (C0 → C2A → C3 → C4 → C5 → C6) is designed to deliver.
 
 2. **Pure silica glass** — Stage 3 fused-silica baffles capture SiO on-demand. The trigger is switching overhead gas cover from pO₂ hold to pN₂ sweep (Path A, C2A_continuous). Under pO₂ control SiO is suppressed >300× at 1 mbar; under pN₂ sweep it evolves freely and condenses as high-purity fused silica on the Stage 3 removable cartridge. The silica comes out when the operator chooses to allow it, not whenever the melt is hot.
 
@@ -24,7 +24,7 @@ The word "Ellingham" appears throughout this codebase and means two related but 
 
 **Sense 1 — Oxygen-affinity ladder (reduction ordering).** At a given T, the species whose oxide is more stable per mol O₂ has higher oxygen affinity. Read at fixed T, the ladder tells you which metal can chemically reduce which oxide. This is the operative concept for the **alkali shuttle** and **Mg thermite**:
 - Na₂O more stable than FeO at 1150 °C → Na can take O from FeO (`2 Na + FeO → Na₂O + Fe`).
-- MgO more stable than Al₂O₃ per mol O₂ → Mg can take O from Al₂O₃ (C6 thermite).
+- MgO more stable than Al₂O₃ per mol O₂ below the ~1573 °C V1c crossover → Mg can take O from Al₂O₃ (C6 thermite). Above that crossover, C6 needs a kinetic/local-heating basis, not standard-state equilibrium alone.
 - Ranking at moderate T: Ca > Mg > Al > Ti > Mn > Cr > Fe > Na > K (per V1c JANAF refit). The Fe/Na/K corner is unstable across T — the K/Fe crossover sits at 832 °C, Na/Fe at 1173 °C, so above those Ts the ladder inverts and the shuttle no longer drives the reduction.
 
 This sense is sometimes called the "naive Ellingham" because it ignores pressure. It is correct as far as it goes — for picking a reductant at a given T.
@@ -110,22 +110,21 @@ The practical implication is that temperature alone sequences Na/K → Fe → Si
 
 ## The alkali shuttle
 
-Na and K sit low on the Ellingham diagram — they have high oxygen affinity, meaning Na₂O and K₂O are thermodynamically more stable per mole O₂ than FeO, Cr₂O₃, or MnO. Elemental Na and K therefore spontaneously strip oxygen from those oxides:
+Na and K sit low on the Ellingham diagram at low temperature, but the V1c JANAF refit moves the practical melt-window story. Na₂O is still more stable than FeO at 1150 °C, so elemental Na can strip oxygen from residual FeO in a narrow cool cleanup window. K₂O crosses FeO near 832 °C, below practical melt operation; K is therefore refused as a FeO reductant in the staged recipe.
 
 ```
-2K + FeO → K₂O + Fe
 2Na + FeO → Na₂O + Fe
 ```
 
-This is the alkali shuttle: alkalis evolved during C2 (or dosed externally) are condensed in Stage 4, then looped back into the melt as reductants in C3. The alkali is consumed as a reducing agent, the target oxide is stripped to metal, and the alkali oxide dissolves into the melt — where, at bakeout temperature, it re-evaporates and is recovered again. The same alkali inventory recycles across multiple cycles before final product recovery.
+This is the surviving alkali shuttle: alkalis evolved during C2 (or dosed externally) are condensed in Stage 4, then Na can be looped back into the melt as the cool FeO reductant. The alkali is consumed as a reducing agent, the target oxide is stripped to metal, and the alkali oxide dissolves into the melt — where, at bakeout temperature, it re-evaporates and is recovered again. The same alkali inventory recycles across multiple cycles before final product recovery.
 
 The shuttle serves two distinct roles:
 
-1. **Oxygen reductant**: it chemically frees Fe from FeO, and similarly reduces Cr₂O₃ and MnO — oxides that are moderately stable but less stable than the alkali oxides. This is what allows >90% Fe extraction at temperatures below what thermal evaporation alone achieves for the residual FeO.
+1. **Oxygen reductant**: Na chemically frees Fe from FeO only below the Na/Fe crossover. Cr₂O₃, TiO₂, and MnO are refused in the current C3 temperature window by the executable thermodynamic gate.
 
 2. **Selectivity tool**: Fe and SiO vapor-pressure windows overlap in the ~1500–1700 °C band, and pO₂ alone cannot separate them (both require low pO₂ or vacuum, so the SiO₂ ⇌ SiO + ½O₂ lever is the same for both). The shuttle reduces FeO chemically at a temperature where SiO activity is lower, allowing Fe to be extracted at a different point in the sequence and keeping condenser stages clean.
 
-Honest limits: the builtin shuttle reactions are temperature-independent in the current model. The `C2A_staged` recipe cools below ~1200 °C before the C3 K-shuttle dose for physical fidelity against the approximate K (~1216 °C) and Na (~1331 °C) FeO crossover temperatures, but the engine does not enforce a temperature gate. See `docs/model-limitations.md` for the explicit caveat. The shuttle also cannot chemically free Ca, Mg (in the main melt), Al, or Ti — those oxides are more stable than Na₂O/K₂O and the reactions do not proceed spontaneously.
+Honest limits: the `C2A_staged` recipe cools to 1150 °C for Na FeO cleanup because the V1c JANAF Na/Fe crossover is 1173.4 °C, leaving only a thin positive margin. K/FeO is refused above its 832 °C crossover, and Cr/Ti targets are refused at C3 temperatures. See `docs/model-limitations.md` for the explicit caveat. The shuttle also cannot chemically free Ca, Mg (in the main melt), Al, or Ti — those oxides are more stable than the available alkali-oxide path in the process window.
 
 ## Hot walls and viscous flow as design invariants
 

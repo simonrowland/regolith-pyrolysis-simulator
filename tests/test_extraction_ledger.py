@@ -502,16 +502,6 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
     _assert_product_matches_account(sim, "process.metal_phase", "Fe")
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Post-S1b shuttle T-gate: Na->Cr/Ti reductions now correctly refused "
-        "(negative Ellingham margin); the original Cr/Ti assertions no "
-        "longer reflect physics. Needs targeted rewrite via S1b follow-on "
-        "(should use a FeO-bearing feed + explicit cool T, OR assert "
-        "diagnostic refused_targets sign-flipped). Tracked separately."
-    ),
-    strict=False,
-)
 def test_na_shuttle_metals_are_reported_from_process_metal_phase():
     sim = _sim(
         {

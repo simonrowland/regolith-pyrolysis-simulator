@@ -20,9 +20,10 @@ campaigns:
   # - C0b: CMAS-rich melt after P cleanup + refractory inert slag.
   # - C2A_continuous: Fe/alkali/SiO-depleted Ca-Mg-Al-Ti-Cr-REE rump with residual SiO2.
   # - C2A_staged: staged Path A rump; same class target as C2A_continuous,
-  #   with cool alkali shuttle reducing residual Fe before later campaigns.
+  #   with V1c cool Na cleanup reducing residual Fe before later campaigns.
   # - C2B: Fe-depleted CMAS glass/ceramic stock; SiO2 intentionally retained.
-  # - C3: alkali-shuttle-polished Ca-Mg-Al-Si-Ti-Cr-REE rump with lower Fe/Ti.
+  # - C3: legacy alkali-shuttle polish; K and hot Na FeO claims are deprecated
+  #   under V1c JANAF and executable reducers must pass the temperature gate.
   # - C4: Branch Two Mg-depleted Ca-Al-Ti-Cr-REE rump with residual SiO2.
   # - C5: Branch Two limited-MRE target is Ca/Al/REE ceramic rump.
   # - C6: Mg-thermite target is Ca/REE terminal slag after Al extraction.
@@ -150,7 +151,7 @@ campaigns:
       (wicking/centrifugal condensers).
 
   C2A_staged:
-    label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool K Shuttle"
+    label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool Na Cleanup"
     activation_condition: "Path_A_staged AND sequential_product_collection"
     preferred_default: false
     temp_range_C: [1250, 1750]
@@ -169,14 +170,10 @@ campaigns:
         default_C: 1750
         bounds_C: [1650, 1800]
         role: "cycle-time lever; not a thermal-yield ceiling breaker"
-      K_additive_kg:
-        via: "start --additive=K=<kg> or SimSessionConfig.additives_kg"
-        default_kg: 26
-        role: "cool residual-FeO shuttle dose; yield-ceiling lever"
       Na_additive_kg:
         via: "start --additive=Na=<kg> or SimSessionConfig.additives_kg"
         default_kg: 12
-        role: "cool residual-FeO shuttle broadening dose; additive bank seed"
+        role: "V1c cool residual-FeO cleanup dose; thin +9.6 kJ/mol O2 margin at 1150 C"
     stages:
       - name: alkali_early_fe
         target_C: 1250
@@ -220,44 +217,46 @@ campaigns:
             Fe_thermal_total: 116.2
             FeO_residual: 20.3
             thermal_Fe_pct: 88.0
-      - name: cool_for_k_shuttle
+      - name: cool_for_na_shuttle
         target_C: 1150
         ramp_rate_C_per_hr: 600
         duration_h: 1
         target_species: ["residual_FeO"]
         endpoint:
-          type: "temperature_gate_for_K_shuttle"
-          max_temperature_C: 1200
-    k_shuttle_stage:
-      campaign: "C3_K"
+          type: "temperature_gate_for_Na_FeO_cleanup"
+          max_temperature_C: 1150
+    na_shuttle_stage:
+      campaign: "C3_NA"
       target_C: 1150
       ramp_rate_C_per_hr: 600
       duration_h: 3
-      additive: "K+Na"
-      recommended_K_kg: 26
+      additive: "Na"
       recommended_Na_kg: 12
-      K2O_solubility_cap_wt_pct: 10
       Na2O_solubility_cap_wt_pct: 10
+      V1c_JANAF_margin_kJ_per_mol_O2:
+        Na_FeO_1150C: 9.6
+        Na_FeO_crossover_C: 1173.4
+        K_FeO_1150C: -125.7
+        K_FeO_crossover_C: 832.0
       reactions:
-        - "2K + FeO -> K2O + Fe"
         - "2Na + FeO -> Na2O + Fe"
       endpoint:
         type: "residual_FeO_reduction_or_alkali_dose_exhausted"
         Fe_total_pct_target_min: 90
       known_model_limit: >
-        The builtin K/Na FeO shuttle is temperature-independent. The staged
-        recipe cools below ~1200 C before C3_K for physical fidelity against
-        the K (~1216 C) and Na (~1331 C) FeO crossover estimates, but no engine
-        T-gate is enforced here.
+        V1c JANAF removes K/FeO from practical melt temperatures (K/Fe
+        crossover 832 C). The staged cleanup is now Na-only at 1150 C, inside
+        a narrow Na/FeO window with about +9.6 kJ/mol O2 margin and a 1173.4 C
+        crossover. Do not retune upward without new thermodynamic evidence.
     downstream_impact: >
       Adds an operator-selectable Path A staged route without changing
-      C2A_continuous. The cool alkali shuttle uses additive/recycled K and Na
-      for residual FeO cleanup; Mg remains a product and is not spent on FeO.
+      C2A_continuous. The cool Na cleanup uses additive/recycled Na for
+      residual FeO cleanup; K remains a volatile product, not a FeO reductant.
     notes: >
       Setpoints were derived from the corrected vapor ladder under the main
       venv with VapoRock available: alkalis dominate <=1350 C, SiO starts to
       overlap Fe/Mg near 1600 C, and one 1750 C hot hold leaves residual FeO
-      for the cooler K shuttle. Hold temperature is exposed as a knob capped
+      for the cooler Na cleanup. Hold temperature is exposed as a knob capped
       at the alumina/doloma furnace ceiling of ~1800 C.
 
   # --------------------------------------------------------------------------
@@ -292,23 +291,28 @@ campaigns:
   # C3 -- Na/K Metallothermic Polish (Shuttle Cycles)
   # --------------------------------------------------------------------------
   C3:
-    label: "Na/K Metallothermic Polish"
-    sequencing: "STRICT K-first then Na (mixed alkali effect)"
+    label: "Deprecated Na/K Metallothermic Polish"
+    V1c_JANAF_status: >
+      K/FeO is refused throughout practical melt temperatures (formal
+      crossover 832 C). Na/FeO survives only below 1173.4 C and is therefore
+      used only by the C2A_staged 1150 C FeO cleanup override. Default C3
+      Cr/Ti reductions remain refused by the executable temperature gate.
+    sequencing: "legacy K-first then Na; physics gate may refuse all targets"
     K_phase:
-      name: "Remaining Fe + Si Conditioning"
-      T_inject_C: [1200, 1350]
+      name: "Deprecated K FeO reduction diagnostic"
+      T_inject_C: [760, 820]
       T_bakeout_C: [1520, 1680]
       pO2_bakeout_mbar: [0.5, 1.5]
       K_per_cycle_kg: [18, 28]
       K_recovery_per_cycle_pct: [75, 90]
       cycles_after_pathA: [0, 1]
       cycles_after_pathB: 2
-      targets: "residual Fe + SiO2 activity conditioning"
-      Fe_reduction_per_cycle_pct: [60, 80]
+      targets: "formal low-T K/Fe diagnostic only; not a practical melt recipe"
+      Fe_reduction_per_cycle_pct: [0, 0]
       Si_conditioned_kg: [20, 40]
     Na_phase:
-      name: "Ti + Final Conditioning"
-      T_inject_C: [1200, 1350]
+      name: "Cool Fe cleanup or refused Cr/Ti diagnostic"
+      T_inject_C: [1050, 1150]
       T_bakeout_C: [1520, 1680]
       pO2_bakeout_mbar: [0.5, 1.5]
       Na_total_kg: [80, 140]             # over all cycles
@@ -416,13 +420,21 @@ campaigns:
   # --------------------------------------------------------------------------
   C6:
     label: "Mg Thermite Reduction (Separate Solar Furnace)"
-    temp_range_C: [1500, 1700]
+    temp_range_C: [1450, 1550]
+    default_hold_T_C: 1500
     dT_dt_C_per_hr: null                 # reaction-controlled
     atmosphere: "controlled_O2"          # bakeout atmosphere for Mg recovery
     pO2_mbar: [0.08, 0.35]              # bakeout pO2
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
-    delta_G_kJ_per_mol_1600C: -110
+    V1c_JANAF_margin_kJ_per_mol_O2:
+      Mg_Al_1500C: 8.6
+      Mg_Al_crossover_C: 1573.0
+      Mg_Al_1600C: -3.2
+    kinetic_driven_above_crossover: true
+    kinetic_note: >
+      Operation above 1573 C must be justified by local thermite heating or
+      kinetic exotherm, not by V1c standard-state Mg/Al equilibrium alone.
     Mg_density_g_per_cm3: 1.58
     melt_density_g_per_cm3: [2.5, 2.8]
     injection: "Mg rods via SiC bottom port; buoyancy-driven reaction column"
@@ -884,24 +896,26 @@ mre_voltage_sequence:
 
 
 # ============================================================================
-# 9. THERMODYNAMIC REFERENCE (Ellingham at 1600 C)
+# 9. THERMODYNAMIC REFERENCE (V1c JANAF refit)
 # ============================================================================
-ellingham_1600C:
-  description: "Standard-state delta-G_f per mol O2 at 1600 C (more negative = more stable)"
-  values:
-    Na2O_kJ_per_mol_O2: -320
-    K2O_kJ_per_mol_O2: -320
-    FeO_kJ_per_mol_O2: -370
-    Cr2O3_kJ_per_mol_O2: -500
-    SiO2_kJ_per_mol_O2: -560
-    TiO2_kJ_per_mol_O2: -580
-    Al2O3_kJ_per_mol_O2: -720
-    ZrO2_kJ_per_mol_O2: -780
-    MgO_kJ_per_mol_O2: -830
-    CaO_kJ_per_mol_O2: -900
-  critical_crossing: >
-    MgO (-830) is below Al2O3 (-720) -> Mg can reduce Al2O3.
-    This is the thermodynamic basis for C6 thermite reduction.
+ellingham_V1c_reference:
+  description: >
+    V1c JANAF-fit ordering for recipe gates. More-negative delta-G_f per mol O2
+    means the oxide is more stable; reduction requires the reagent oxide to sit
+    below the target oxide at the recipe temperature.
+  moderate_T_ordering: "Ca > Mg > Al > Ti > Mn > Cr > Fe > Na > K"
+  key_crossovers_C:
+    K_FeO: 832.0
+    Na_FeO: 1173.4
+    Mg_Al2O3: 1573.0
+  recipe_implications:
+    alkali_shuttle: >
+      K/FeO is gone in the melt window. Na/FeO survives only as a thin cool
+      window at 1150 C and is refused above the 1173.4 C crossover.
+    C6_thermite: >
+      Mg/Al2O3 is favorable at 1500 C (+8.6 kJ/mol O2 margin) but flips
+      slightly negative by 1600 C (-3.2 kJ/mol O2). Keep the default below the
+      crossover unless a kinetic/local-heating basis is explicitly invoked.
 
 
 # ============================================================================
