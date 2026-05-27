@@ -307,7 +307,10 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
         DecisionType.BRANCH_ONE_TWO: "two",
         DecisionType.C6_PROCEED: "yes",
     }
-    while sim.melt.temperature_C < 700.0:
+    # V1c JANAF constants suppress the old 700 C trickle below the
+    # legacy loop's reporting floor; 1000 C keeps this a low-flux parity case
+    # while still exercising real species output.
+    while sim.melt.temperature_C < 1000.0:
         if sim.paused_for_decision:
             decision = sim.pending_decision
             choice = decision_choice.get(decision.decision_type)

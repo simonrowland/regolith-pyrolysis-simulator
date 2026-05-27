@@ -421,30 +421,9 @@ def test_refused_result_has_policy_refusal_shape():
     assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
 
 
-@pytest.mark.xfail(
-    reason=(
-        "K shuttle no longer viable in any practical melt T window under "
-        "V1c-constants JANAF Ellingham (K/Fe crossover dropped to 832 C). "
-        "1150 C is now refused. V1c-recipe-retune (task #33) deprecates the "
-        "K shuttle path; replaced operationally by Na-only shuttle at the "
-        "C2A_staged cool window. Test kept for documentation pending recipe "
-        "retune chunk."
-    ),
-    strict=True,
-)
-def test_c3_k_shuttle_accepts_low_temperature_feo_and_matches_legacy_stoich(
+def test_c3_k_shuttle_refuses_1150c_feo_after_v1c_janaf_refit(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Drive the provider with a pure-FeO melt + K reagent inventory at
-    a known composition and compare its proposal mol values against the
-    legacy ``_shuttle_inject_K`` stoichiometry (2 K + FeO -> K2O + Fe).
-
-    The provider is a refactor of where the proposal is built; the
-    stoichiometric math is mirrored line-for-line, so the delta should
-    be exactly zero modulo IEEE-754 round-off on the same operand
-    sequence.
-    """
-
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,
@@ -452,9 +431,6 @@ def test_c3_k_shuttle_accepts_low_temperature_feo_and_matches_legacy_stoich(
         setpoints_data,
     )
 
-    # Set up a pure-FeO melt with a known mol load so the K-shuttle
-    # solubility / FeO availability gates are easily comparable to the
-    # legacy arithmetic.
     FeO_kg = 100.0
     FeO_mol = FeO_kg / (MOLAR_MASS["FeO"] / 1000.0)
     melt_mol = {"FeO": FeO_mol}
@@ -481,45 +457,12 @@ def test_c3_k_shuttle_accepts_low_temperature_feo_and_matches_legacy_stoich(
         },
     )
     result = provider.dispatch(request)
-    proposal = result.transition
-    assert result.status == "ok"
-    assert proposal is not None
-    assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_K
-
-    # Independent legacy derivation. Mirrors _shuttle_inject_K line-by-
-    # line at this composition.  total_kg = FeO_kg (pure FeO melt);
-    # K2O wt% = 0 < 10 (solubility limit not hit). K2O_max_kg =
-    # total_kg * 0.10. K_for_K2O_limit = K2O_max_kg * (2 * M_K / M_K2O).
-    # K_for_FeO = FeO_available_kg / (M_FeO / (2 * M_K)).
-    # K_inject = min(K_available_kg / 3, K_for_K2O_limit, K_for_FeO).
-    total_kg = FeO_kg
-    K2O_max_kg = total_kg * 0.10
-    K_for_K2O_limit = K2O_max_kg * (2 * MOLAR_MASS["K"] / MOLAR_MASS["K2O"])
-    K_for_FeO = FeO_kg / (MOLAR_MASS["FeO"] / (2 * MOLAR_MASS["K"]))
-    K_inject_legacy = min(K_reagent_kg / 3.0, K_for_K2O_limit, K_for_FeO)
-    mol_K_legacy = K_inject_legacy / MOLAR_MASS["K"] * 1000.0
-    mol_FeO_available_legacy = FeO_kg / MOLAR_MASS["FeO"] * 1000.0
-    mol_FeO_reduced_legacy = min(
-        mol_K_legacy / 2.0, mol_FeO_available_legacy
-    )
-    mol_K_used_legacy = mol_FeO_reduced_legacy * 2.0
-
-    # Mol-native comparison (kernel proposal values).
-    assert proposal.debits["process.reagent_inventory"]["K"] == pytest.approx(
-        mol_K_used_legacy, abs=1e-12, rel=1e-12
-    )
-    assert proposal.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
-        mol_FeO_reduced_legacy, abs=1e-12, rel=1e-12
-    )
-    assert proposal.credits["process.cleaned_melt"]["K2O"] == pytest.approx(
-        mol_FeO_reduced_legacy, abs=1e-12, rel=1e-12
-    )
-    assert proposal.credits["process.metal_phase"]["Fe"] == pytest.approx(
-        mol_FeO_reduced_legacy, abs=1e-12, rel=1e-12
-    )
-
-    # Independent atom check: net per element ~ 0.
-    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "thermodynamic_margin_nonpositive"
+    assert result.diagnostic["reductant"] == "K"
+    assert result.diagnostic["target_oxide"] == "FeO"
+    assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
 
 
 @pytest.mark.parametrize("temperature_C", [1275.0, 1300.0])

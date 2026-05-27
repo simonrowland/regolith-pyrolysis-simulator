@@ -553,9 +553,12 @@ class ExtractionMixin:
 
         campaign = self.melt.campaign
         cycle_period = 6  # hours per inject-bakeout cycle
-        # Staged C2A enters C3_K at the end of the cool-down tick, so the
-        # first real shuttle tick starts with campaign_hour == 1.
-        if campaign == CampaignPhase.C3_K and self.record.path == 'A_staged':
+        # Staged C2A enters the cool Na cleanup at the end of the cooldown
+        # tick, so the first real shuttle tick starts with campaign_hour == 1.
+        if (
+            campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA)
+            and self.record.path == 'A_staged'
+        ):
             is_injection = self.melt.campaign_hour <= 3
         else:
             is_injection = (self.melt.campaign_hour % cycle_period) < 3
@@ -566,7 +569,12 @@ class ExtractionMixin:
                 self._shuttle_inject_K()
                 self._shuttle_inject_Na(target_stage='feo_cleanup')
             elif campaign == CampaignPhase.C3_NA:
-                self._shuttle_inject_Na()
+                target_stage = (
+                    'feo_cleanup'
+                    if self.record.path == 'A_staged'
+                    else 'cr_ti'
+                )
+                self._shuttle_inject_Na(target_stage=target_stage)
         else:
             self._shuttle_phase = 'bakeout'
             # Bakeout is handled by normal evaporation (K/Na have high
