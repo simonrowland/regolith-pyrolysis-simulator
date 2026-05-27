@@ -2229,6 +2229,46 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sorted(thermoengine_confirmed)
             )
         else:
+            # Autoreview r8 P1 (2026-05-27, post-0.5.0): the prior code
+            # silently kept the pre-kernel backend vapor-pressure
+            # surface whenever the kernel returned no pressures --
+            # treating ``status='unavailable'`` (the authoritative
+            # VapoRock import succeeded but the adapter call yielded no
+            # result) identically to ``status='ok'`` with no
+            # evaporation expected. Under ``allow_fallback_vapor=False``
+            # that is a silent downgrade: the run continues on
+            # stub/AlphaMELTS pressures with no operator-visible
+            # signal. Now we distinguish:
+            #
+            #   - status='ok' / empty kernel_vp: legit (e.g. melt
+            #     below evaporation threshold or oxide-only system);
+            #     keep backend, no escalation.
+            #   - status='unavailable' / 'failed' AND
+            #     allow_fallback_vapor=False: raise loud so the
+            #     operator sees the missing authoritative dispatch
+            #     instead of inheriting silently.
+            #   - status='unavailable' AND allow_fallback_vapor=True:
+            #     keep backend with an explicit warning entry on the
+            #     diagnostic (this is the documented fallback path).
+            kernel_status = str(
+                getattr(kernel_result, 'status', 'ok') or 'ok'
+            ).lower()
+            if kernel_status in {'unavailable', 'failed'}:
+                if not self._allow_fallback_vapor:
+                    raise RuntimeError(
+                        f"Authoritative VAPOR_PRESSURE dispatch returned "
+                        f"status={kernel_status!r} with no pressures and "
+                        f"allow_fallback_vapor=False; refusing to silently "
+                        f"continue on backend vapor pressures. Diagnostic: "
+                        f"{diagnostic!r}"
+                    )
+                diagnostic.setdefault(
+                    'kernel_vapor_pressure_warnings', []
+                ).append(
+                    f"VAPOR_PRESSURE returned status={kernel_status!r}; "
+                    f"falling back to backend vapor pressures under "
+                    f"allow_fallback_vapor=True."
+                )
             if backend_sources:
                 result.vapor_pressures_source = dict(backend_sources)
             diagnostic['vapor_pressures_source'] = dict(

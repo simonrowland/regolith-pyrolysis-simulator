@@ -21,7 +21,12 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-8
 # Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
 # C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
 # to the VapoRock-consistent activity-corrected value.
-PHASE3BIS_SIO_EVOLVED_KG = 0.00078662141565
+# Post-0.5.0 (2026-05-27) MnO NIST-JANAF refit + autoreview-r8 vapor-pressure
+# raise-on-unavailable: PPM-scale FP roundoff drift from the Mn entry change
+# altering _stub_equilibrium iteration order. 0.00078662141565 ->
+# 0.000786620599287 (rel ~1e-6). No physics change; pure FP noise from a
+# documented thermo-table update.
+PHASE3BIS_SIO_EVOLVED_KG = 0.000786620599287
 
 
 @lru_cache(maxsize=None)

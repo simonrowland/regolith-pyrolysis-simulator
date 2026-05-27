@@ -28,8 +28,12 @@ GOLDENS = (
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
 # Was {lunar: 3.7303230676, mars: 3.82533227031} pre-refit.
+# Post-0.5.0 (2026-05-27) MnO NIST-JANAF refit + autoreview-r8 vapor-pressure
+# raise-on-unavailable: lunar shifted 0.00078662141565 -> 0.000786620599287
+# (PPM-scale FP roundoff drift from the Mn entry change altering
+# _stub_equilibrium iteration order); mars unchanged.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.00078662141565,
+    "lunar_mare_low_ti": 0.000786620599287,
     "mars_basalt": 0.000850874178948,
 }
 

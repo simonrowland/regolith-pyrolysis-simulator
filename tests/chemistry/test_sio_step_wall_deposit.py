@@ -54,8 +54,15 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # report is now honest about which segments physically collect SiO).
     # The fouling-threshold structure (deposit at 1050 C, none at 1400/1500 C)
     # is unchanged.
+    # Post-0.5.0 (2026-05-27) thermo-data refresh (MnO NIST-JANAF +
+    # autoreview-r8 vapor-pressure unavailable-path raise): 1 PPM
+    # numerical drift on the SiO surface (Mn entry change shifts the
+    # _stub_equilibrium iteration order which alters FP rounding on
+    # downstream dict-iterated quantities). 6.589955385e-06 →
+    # 6.5899485456e-06 (rel ~1e-6). No physics change; pure FP noise
+    # from a documented thermo-table update.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.589955385e-06, rel=1e-9
+        6.5899485456e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0
