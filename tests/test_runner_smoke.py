@@ -51,6 +51,7 @@ TOP_LEVEL_KEYS = frozenset({
     "per_hour_summary",
     "shadow_trace",
     "status",
+    "reason",
     "error_message",
 })
 
@@ -231,7 +232,8 @@ def _assert_schema_shape(payload: dict) -> None:
         # event types the runner surfaces today.
         assert "event" in event
 
-    assert payload["status"] in ("ok", "partial", "failed")
+    assert payload["status"] in ("ok", "partial", "failed", "refused")
+    assert isinstance(payload["reason"], str)
     assert isinstance(payload["error_message"], str)
 
 
@@ -255,17 +257,25 @@ def test_runner_golden_fixture_matches(scenario):
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
-    # F1 adds stage-purity diagnostics without regenerating legacy goldens.
+    # F1 adds stage-purity diagnostics, E3 adds vapor-pressure source provenance,
+    # F3 adds Knudsen regime diagnostic. None of these regenerate legacy goldens;
+    # we patch them in from the live actual on every assertion.
     expected = dict(expected)
     expected["schema_version"] = actual["schema_version"]
     expected["run_metadata"] = dict(expected["run_metadata"])
     expected["run_metadata"]["schema_version"] = actual["run_metadata"][
         "schema_version"
     ]
+    if "knudsen_regime_diagnostic" in actual["run_metadata"]:
+        expected["run_metadata"]["knudsen_regime_diagnostic"] = (
+            actual["run_metadata"]["knudsen_regime_diagnostic"]
+        )
     expected["stage_purity_report"] = actual["stage_purity_report"]
     expected["vapor_pressure_source_report"] = actual[
         "vapor_pressure_source_report"
     ]
+    if "reason" in actual:
+        expected["reason"] = actual["reason"]
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate via `python -m simulator.runner --output=tests/fixtures/"

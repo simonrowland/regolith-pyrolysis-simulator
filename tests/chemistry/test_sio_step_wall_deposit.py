@@ -34,10 +34,18 @@ def _sio_wall_deposit_kg(liner_temperature_c: float) -> float:
 def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # Post 2026-05-20 Antoine refit: builtin SiO P_sat dropped ~4700x to the
     # VapoRock-consistent value, so the 1050 C cold-liner deposit fell from
-    # 1.05348872049e-2 kg to 2.24808480214e-06 kg. The fouling-threshold
-    # structure (deposit at 1050 C, none at 1400/1500 C) is unchanged.
+    # 1.05348872049e-2 kg to 2.24808480214e-06 kg.
+    # Post-F3 (Knudsen regime enforcement, 2026-05-27): the band-integration
+    # HKL flux in `_condensation_efficiency` now applies `regime_factor(Kn)`
+    # consistent with the existing docstring (was a code/doc inconsistency).
+    # In viscous regime stage-3 HKL is attenuated → less SiO captured at the
+    # stage → MORE SiO reaches the walls. Wall deposit at 1050 C climbed
+    # from 2.24808480214e-06 to 1.517228591109e-05 kg (~6.75x). Total SiO
+    # budget conserved; routing redistributed by the physics-consistent fix.
+    # The fouling-threshold structure (deposit at 1050 C, none at 1400/1500 C)
+    # is unchanged.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        2.24808480214e-06, rel=1e-9
+        1.517228591109e-05, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

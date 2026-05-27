@@ -28,7 +28,7 @@ python -m simulator.runner \
 
 The runner always writes a JSON document to `--output` and exits `0`
 when the run completes (`status: ok` or `partial`) or `1` when the run
-fails (`status: failed`).  A `status: failed` envelope is still a
+fails (`status: failed` or `refused`).  A non-ok envelope is still a
 well-formed JSON document so downstream pipelines never need to parse
 stderr.
 
@@ -43,8 +43,9 @@ stderr.
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
-  "status": "ok" | "partial" | "failed",
-  "error_message": ""           // populated when status == "failed"
+  "status": "ok" | "partial" | "failed" | "refused",
+  "reason": "",                 // machine-readable refusal reason, if any
+  "error_message": ""           // populated when status != "ok"
 }
 ```
 
@@ -84,7 +85,13 @@ schema-shape assertion.
       ...
     }
   },
-  "kernel_commit_sha": "882250f10c..."        // repo HEAD; "unknown" off-tree
+  "kernel_commit_sha": "882250f10c...",       // repo HEAD; "unknown" off-tree
+  "knudsen_regime_diagnostic": {              // present after condensation routing
+    "status": "ok" | "warning" | "refused",
+    "reason": "",
+    "regime": "viscous" | "transitional" | "free_molecular",
+    "segments": [...]
+  }
 }
 ```
 
@@ -97,6 +104,8 @@ schema-shape assertion.
   Goal #10 uses to audit the VapoRock authority swap.
 * Any extra keys passed via `run_metadata_overrides` are forwarded
   verbatim; the runner does not interpret them.
+* `knudsen_regime_diagnostic` reports the transport-regime check for
+  the condensation train when a run reaches condensation routing.
 
 ## Final state
 
