@@ -205,12 +205,23 @@ class VapoRockProvider(ChemistryProvider):
             engine_version=self._engine_version(backend),
             allowed_species=self._allowed_species,
         )
-        kernel_status = (
-            diagnostics.backend_status
-            if diagnostics.backend_status
-            in ('ok', 'not_converged', 'out_of_domain', 'unavailable')
-            else 'ok'
-        )
+        # 0.5.2 Phase A3 (2026-05-27): pass through unrecognised backend
+        # statuses verbatim rather than coercing them to 'ok'. The old
+        # whitelist silently sanitised any non-vocabulary status (e.g.,
+        # 'timeout', 'partial', 'no_data', 'failed', '' from a broken
+        # adapter) into 'ok' -- defeating the core-level loud-fail gate
+        # that simulator/core.py::_apply_kernel_vapor_pressures relies
+        # on. Codex challenge r8 P1+P2 flagged this as a hidden silent
+        # downgrade path. The core gate already accepts ANY non-'ok'
+        # status with no pressures as a failure mode (post-0.5.1) so
+        # passing the raw status through is safe and operator-visible.
+        # The retained whitelist behaviour: empty/None status maps to
+        # 'unknown' so the diagnostic carries an explicit signal.
+        raw_status = diagnostics.backend_status
+        if raw_status is None or str(raw_status).strip() == '':
+            kernel_status = 'unknown'
+        else:
+            kernel_status = str(raw_status).strip().lower()
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
