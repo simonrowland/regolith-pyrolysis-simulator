@@ -46,7 +46,11 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.state import CampaignPhase, DecisionType
+from simulator.state import (
+    CampaignPhase,
+    DecisionType,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+)
 from tests.chemistry.conftest import _build_sim
 
 
@@ -88,6 +92,7 @@ def test_provider_declares_condensation_accounts():
         "process.condensation_train",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     })
     assert "process.cleaned_melt" not in profile.declared_accounts
 
@@ -180,6 +185,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.condensation_train",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
@@ -532,6 +538,76 @@ def test_provider_splits_baffle_product_from_wall_deposit(
         assert abs(net) < 1e-9
 
 
+def test_provider_routes_wall_deposit_to_segment_accounts(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    first_account, second_account = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[:2]
+    view = ProviderAccountView(
+        accounts={
+            "process.overhead_gas": {"SiO": 10.0},
+            "process.condensation_train": {},
+            "process.wall_deposit": {},
+            first_account: {},
+            second_account: {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    from simulator.accounting.formulas import resolve_species_formula
+    mw_sio = resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    condensed_kg = 0.44
+    wall_fraction = 0.25
+    sp_data = {
+        "condensation_products_mol_per_mol_vapor": {
+            "Si": 0.5,
+            "SiO2": 0.5,
+        },
+        "_wall_deposit_fraction": wall_fraction,
+        "_wall_deposit_segment_fractions": {
+            first_account: 0.75,
+            second_account: 0.25,
+        },
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=view,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "SiO",
+            "condensed_kg": condensed_kg,
+            "sp_data": sp_data,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    proposal = result.transition
+    wall_mol = condensed_kg * wall_fraction / mw_sio
+    assert "process.wall_deposit" not in proposal.credits
+    assert proposal.credits[first_account]["SiO"] == pytest.approx(
+        wall_mol * 0.75, rel=1e-12
+    )
+    assert proposal.credits[second_account]["SiO"] == pytest.approx(
+        wall_mol * 0.25, rel=1e-12
+    )
+    assert result.diagnostic["credited_wall_deposit_accounts_kg"][
+        first_account
+    ] == pytest.approx(condensed_kg * wall_fraction * 0.75)
+
+
 def test_provider_skips_below_numerical_floor(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -659,6 +735,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
             "process.overhead_gas",
             "process.wall_deposit",
             "terminal.chromium_condensed_oxide_stored",
+            *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
         }
         for lot in trans.debits:
             assert lot.account == "process.overhead_gas", (

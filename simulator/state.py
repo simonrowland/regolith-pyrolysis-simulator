@@ -9,6 +9,7 @@ simulation loop.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict, List, Tuple
@@ -292,6 +293,45 @@ class CondensationStage:
         if total <= 0:
             return 0.0
         return (self.collected_kg.get(species, 0.0) / total) * 100.0
+
+
+PIPE_SEGMENT_NAMES = tuple(
+    f'stage_{stage_number}_to_stage_{stage_number + 1}'
+    for stage_number in range(7)
+)
+PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
+PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
+    f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
+    for name in PIPE_SEGMENT_NAMES
+)
+
+
+@dataclass(frozen=True)
+class PipeSegment:
+    """Interstage pipe segment where cold-wall deposition can occur."""
+
+    name: str
+    upstream_stage: str
+    downstream_stage: str
+    wall_temperature_C: float
+    length_m: float
+    inner_diameter_m: float
+
+    @property
+    def surface_area_m2(self) -> float:
+        """Cylindrical wall area for the segment."""
+
+        return (
+            math.pi
+            * max(0.0, float(self.inner_diameter_m))
+            * max(0.0, float(self.length_m))
+        )
+
+    @property
+    def wall_deposit_account(self) -> str:
+        """Ledger account used for this segment's wall deposit."""
+
+        return f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{self.name}'
 
 
 @dataclass

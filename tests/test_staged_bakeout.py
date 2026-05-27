@@ -3,7 +3,8 @@ import shlex
 import pytest
 
 from simulator.session_cli import SessionScriptRunner
-from simulator.state import STOICH_RATIOS
+from simulator.runner import SIO_SLOW_FOULING_WALL_DEPOSIT_KG
+from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, STOICH_RATIOS
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
@@ -168,3 +169,23 @@ def test_c2a_staged_is_deterministic_and_beats_c2a_continuous():
     assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0)
     assert staged_silica > continuous_silica
     assert sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg")) < 1e-6
+
+
+def test_c2a_staged_pipework_has_no_upstream_cold_spot():
+    sim = _run_staged()
+    cold_spot_history = list(
+        getattr(sim.condensation_model, "cold_spot_history", []) or []
+    )
+    warnings = [
+        warning
+        for diagnostic in cold_spot_history
+        for warning in diagnostic.get("warnings", [])
+    ]
+    segment_wall_kg = sum(
+        sim.atom_ledger.total_kg_by_account(account)
+        for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
+    )
+
+    assert warnings == []
+    assert segment_wall_kg <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG
+    assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT
