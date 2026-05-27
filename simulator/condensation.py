@@ -599,14 +599,30 @@ class CondensationModel:
                     segment.name, rate_kg_hr))),
                 rate_kg_hr,
             )
+            # Autoreview r4 P2 (2026-05-27): pass ``supply_kg`` as the
+            # rate budget for THIS segment, not the original full-train
+            # ``rate_kg_hr``.  After an upstream condenser has removed
+            # most vapor, the downstream segment sees only ``supply_kg``,
+            # and the candidate's ``min(rate_kg_hr, rate_kg_hr * eta)``
+            # cap previously over-stated downstream candidates which
+            # then survived the per-segment ``min(.., supply_kg)`` floor
+            # at full ``supply_kg`` for any eta >= supply_kg/rate_kg_hr.
+            # That inflated the wall-deposit weights and diverted
+            # capture budget from designated condenser stages into
+            # wall-deposit accounts whenever per-segment temperatures
+            # differed.
             candidates[segment.name] = self._wall_deposit_candidate_for_surface_kg(
                 species=species,
-                rate_kg_hr=rate_kg_hr,
+                rate_kg_hr=supply_kg,
                 T_cond_C=T_cond_C,
                 melt_temperature_C=melt_temperature_C,
                 wall_temperature_C=segment.wall_temperature_C,
                 surface_area_m2=segment.surface_area_m2,
             )
+            # ``rate_kg_hr=supply_kg`` already caps the candidate at
+            # ``supply_kg``; the explicit floor stays as defence in
+            # depth in case the candidate function loosens its return
+            # bound later.
             candidates[segment.name] = min(candidates[segment.name], supply_kg)
         total = sum(candidates.values())
         if total > rate_kg_hr > 0.0:

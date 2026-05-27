@@ -147,28 +147,51 @@ class ThermoEngineTransport:
             max(0.0, min(1.0, liquid_mass_kg / total_mass_kg))
             if total_mass_kg > 0.0 else 0.0
         )
-        liquid_comp = (
-            self._finite_mapping(
-                melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt')
-            )
-            if liquid_phase else {}
-        )
-        if not liquid_comp:
-            liquid_comp = dict(bulk_wt)
+        # Autoreview r4 P2 (2026-05-27): only emit a liquid composition
+        # / activities / Fe-redox split when ThermoEngine actually
+        # reports a liquid phase.  The prior code fell back to the
+        # bulk-oxide composition whenever ``liquid_comp`` was empty,
+        # which (a) fabricated a liquid composition for subsolidus or
+        # fully crystallized assemblages, then (b) derived activities
+        # and Fe redox from that fabrication, breaking the
+        # liquid_fraction-driven freeze-gate diagnostic (callers could
+        # not distinguish a real liquid from a fabricated one).  Now
+        # the bulk-fallback only fires when a liquid phase IS reported
+        # but the composition API returned an incomplete payload, and
+        # the situation surfaces as a warning so it is auditable.
+        extra_warnings: tuple[str, ...] = ()
+        if liquid_phase:
+            liquid_comp = self._finite_mapping(
+                melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt'))
+            if not liquid_comp:
+                liquid_comp = dict(bulk_wt)
+                extra_warnings = (
+                    'ThermoEngine reported liquid phase '
+                    f'{liquid_phase!r} but composition_of_phase returned '
+                    'an empty payload; falling back to bulk composition.',
+                )
+            liquid_components = self._finite_mapping(
+                melts.get_composition_of_phase(root, liquid_phase, 'component'))
+        else:
+            # No liquid phase: leave composition + activities + Fe redox
+            # empty.  Subsolidus / fully crystallized states surface as
+            # ``liquid_fraction=0`` with an empty ``liquid_composition_wt_pct``,
+            # which is exactly what downstream consumers (freeze-gate,
+            # evaporation flux gate) need to refuse evaporation cleanly.
+            liquid_comp = {}
+            liquid_components = {}
 
-        liquid_components = (
-            self._finite_mapping(
-                melts.get_composition_of_phase(root, liquid_phase, 'component')
+        if liquid_phase and liquid_comp:
+            activities = self._activities_from_chemical_potentials(
+                temperature_C=float(temperature_C),
+                pressure_bar=float(pressure_bar),
+                component_mole_fraction=liquid_components,
+                comp_wt=liquid_comp,
             )
-            if liquid_phase else {}
-        )
-        activities = self._activities_from_chemical_potentials(
-            temperature_C=float(temperature_C),
-            pressure_bar=float(pressure_bar),
-            component_mole_fraction=liquid_components,
-            comp_wt=liquid_comp,
-        )
-        fe_redox_split = self._fe_redox_split(liquid_comp)
+            fe_redox_split = self._fe_redox_split(liquid_comp)
+        else:
+            activities = {}
+            fe_redox_split = {}
 
         return ThermoEnginePayload(
             phases_present=phases,
@@ -177,7 +200,9 @@ class ThermoEngineTransport:
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
             fe_redox_split=fe_redox_split,
-            warnings=tuple(warnings) + (f'ThermoEngine status: {status_text}',),
+            warnings=tuple(warnings) + extra_warnings + (
+                f'ThermoEngine status: {status_text}',
+            ),
         )
 
     def _activities_from_chemical_potentials(
