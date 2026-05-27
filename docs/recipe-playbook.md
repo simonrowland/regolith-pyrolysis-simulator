@@ -59,19 +59,18 @@ An alternative to C2A_continuous that uses explicit stage holds for sequential p
 1. **alkali_early_fe** — ramp to 1250 °C, 600 °C/hr, 4 h: Na and K.
 2. **sio_window** — ramp to 1600 °C, 175 °C/hr, 3 h: SiO with minor Fe co-evolution.
 3. **fe_hot_hold** — ramp to 1750 °C, 150 °C/hr, 1 h: Fe thermal depletion to ~88 % (residual FeO ~20–24 kg).
-4. **cool_for_k_shuttle** — cool to 1150 °C before C3_K shuttle dose.
+4. **cool_for_na_shuttle** — cool to 1150 °C before C3_NA (Na-only) shuttle dose. The K shuttle is no longer used at this stage under V1c-JANAF Ellingham: K/Fe crossover dropped to ~832 °C, well below any practical melt T, so engine refuses K→FeO reduction. C2A_staged now advances to C3_NA (not C3_K) and uses Na as the sole reductant in the cool window where Na/Fe margin is still positive (Na/Fe crossover @ 1173 °C).
 
 **Operator knobs** (via session script):
 
 | Knob | Default | Command form | Role |
 |---|---|---|---|
 | `hold_temp_C` | 1750 | `adjust campaign_override C2A_staged hold_temp_C <C>` | Cycle-time lever; bounds 1650–1800 °C |
-| `K_additive_kg` | 26 | `start --additive=K=<kg>` | Yield-ceiling lever for cool K shuttle |
-| `Na_additive_kg` | 12 | `start --additive=Na=<kg>` | Broadening dose for cool shuttle |
+| `Na_additive_kg` | 12 | `start --additive=Na=<kg>` | Yield-ceiling lever for cool Na shuttle |
 
 Note on `hold_temp_C`: this is a cycle-time lever, not a thermal-yield ceiling breaker. Running hotter within the 1650–1800 °C bounds increases the thermal Fe extraction fraction but does not remove the physical FeO floor that requires the shuttle.
 
-**Known model limit**: the builtin K/Na shuttle is temperature-independent. The staged recipe cools below 1200 °C before C3_K to maintain physical fidelity against the approximate K (~1216 °C) and Na (~1331 °C) FeO crossover temperatures, but no engine temperature gate is enforced. See `docs/model-limitations.md`.
+**Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per V1c-JANAF) and refuses Na→FeO above the 1173 °C crossover. The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
 
 Source: `data/setpoints.yaml` lines 139–248.
 
@@ -167,7 +166,7 @@ Sequence: **C0 → C0b → C2A_continuous → C3 → C4 → C5 (Branch Two) → 
 
 - C0b is recommended for all lunar feedstocks even at low P₂O₅; it adds only 0.5–2.5 h and prevents P carryover into C2.
 - C2A_continuous at Path A extracts Na, K, Fe, and SiO in a single ramp; this halves C3 scope and reduces C5.
-- C3 K-shuttle cleans residual FeO; Na phase handles Ti conditioning.
+- C3_NA (Na-only post-V1c) cleans residual FeO at the cool ~1150 °C window; the legacy K-shuttle path is refused by the engine under V1c-JANAF and is no longer used here.
 - C4 extracts Mg thermally (18–42 kg/t); accumulate over 3–6 batches before first C6 run.
 - C5 Branch Two at max 1.6 V removes Si by electrolysis, permanently eliminating the SiO source from the melt.
 - C6 thermite yields 65–80 kg Al/t; terminal slag (10–15 kg/t, 0.5–1 wt% REE) is the refractory ceramic rump.
@@ -181,7 +180,7 @@ Objective: preserve the CMAS melt for direct tapping as structural glass or cera
 Sequence: **C0 → C0b → C2B (Path B) → partial C3 → early melt tap**
 
 - C2B at pO₂ 0.8–2.3 mbar extracts Fe while holding SiO₂ in the melt.
-- A partial C3 K-shuttle cleans residual FeO (full 2-cycle scope; Path B does not pre-deplete).
+- A partial C3_NA shuttle cleans residual FeO at the cool window (full 2-cycle scope; Path B does not pre-deplete). The K-shuttle path is not used post-V1c — see §C2A_staged.
 - Tap the melt before the SiO release window.
 - The result is a Ca–Mg–Al–Si glass with controlled alkali content.
 
@@ -199,9 +198,9 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 
 ## Tuning advice
 
-**Hold temperature in C2A_staged** (`hold_temp_C`, default 1750 °C): a cycle-time lever. Running hotter within the 1650–1800 °C bounds shortens the time to reach target Fe depletion but does not raise the extraction ceiling — the K-shuttle stage handles the residual FeO floor regardless. Do not expect higher hold temperatures to substitute for the shuttle dose.
+**Hold temperature in C2A_staged** (`hold_temp_C`, default 1750 °C): a cycle-time lever. Running hotter within the 1650–1800 °C bounds shortens the time to reach target Fe depletion but does not raise the extraction ceiling — the C3_NA cool-window shuttle handles the residual FeO floor regardless. Do not expect higher hold temperatures to substitute for the shuttle dose.
 
-**Alkali dose** (`K_additive_kg`, default 26 kg; `Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool K-shuttle stage. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O/K₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5.
+**Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but ignored by the post-V1c shuttle gate, which refuses K→FeO at any practical melt T.)
 
 **pN₂ setpoint** (5–15 mbar band): controls viscous-flow regime and transport capacity. The transport limit for the hot-wall pipe at 8–12 mbar is 7–16 g/s SiO. Reducing pN₂ below ~5 mbar risks transitioning into the molecular-flow regime where directional sweep fails and cold-wall fouling increases sharply.
 
