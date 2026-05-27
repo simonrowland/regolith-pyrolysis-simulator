@@ -545,6 +545,26 @@ class ExtractionMixin:
         oxides to liquid metal.
 
         Key constraint: Na₂O/K₂O slag solubility is 8-12 wt% per cycle.
+
+        S1c self-re-flux (2026-05-27, post-0.5.0): at the start of every
+        C3 tick we transfer any alkali that recondensed onto the
+        condensation train back into ``process.reagent_inventory``. The
+        previous tick's recovered alkali becomes available to this
+        tick's injection, which is the intra-batch shuttle
+        amplification CLAUDE.md §4 describes ("Same Na inventory
+        amplifies across multiple batches before final recovery" — read
+        across the bakeout/inject within a single C3 phase as well).
+        Pre-S1c the shuttle was single-charge + start-of-phase
+        recovery; intra-cycle recycle simply wasn't wired. This is the
+        honest implementation of Review D P1-3 (S1b documented the
+        design as the cheap-doc; S1c lands the actual mechanism).
+
+        ``_transfer_condensed_species`` is a no-op when the train holds
+        zero recovered alkali, so the early-phase first-tick behavior
+        is unchanged. Post-V1c the K shuttle is refused at any
+        practical melt T (S1b gate), so the C3_K recycle is dead code
+        in practice; we keep the call for the unlikely case where a
+        future recipe opens a window in which K → FeO is positive.
         """
         # Reset per-hour tracking
         self._shuttle_injected_this_hr = 0.0
@@ -552,6 +572,15 @@ class ExtractionMixin:
         self._shuttle_metal_this_hr = 0.0
 
         campaign = self.melt.campaign
+
+        # S1c: intra-C3 self-re-flux. Before this tick's inject/bakeout
+        # dispatch, pull any alkali that recondensed onto the train back
+        # into the reagent inventory so it is available for THIS tick.
+        if campaign == CampaignPhase.C3_K:
+            self._transfer_condensed_species('K')
+        elif campaign == CampaignPhase.C3_NA:
+            self._transfer_condensed_species('Na')
+
         cycle_period = 6  # hours per inject-bakeout cycle
         # Staged C2A enters the cool Na cleanup at the end of the cooldown
         # tick, so the first real shuttle tick starts with campaign_hour == 1.

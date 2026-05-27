@@ -220,3 +220,101 @@ def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():
     assert _max_mass_balance_pct(broadened) < MASS_BALANCE_MAX_PCT
     assert _cumulative_transition_imbalance_kg(broadened) < 1e-6
     assert round(k_only_recovery, 10) < round(broadened_recovery, 10)
+
+
+def test_s1c_step_shuttle_recycles_condensed_na_into_reagent_inventory():
+    """S1c (2026-05-27, post-0.5.0): intra-C3 self-re-flux. The shuttle
+    used to recover condensed alkali only at start-of-phase (per
+    `_init_shuttle_inventory`); intra-cycle the alkali that recondensed
+    on the train sat idle. CLAUDE.md §4 says ``the same Na inventory
+    amplifies across multiple batches before final recovery`` -- read
+    across the inject/bakeout sub-phases within a single C3 phase as
+    well. This test exercises the hook directly: seed the
+    condensation train with Na, place the sim in C3_NA, call
+    ``_step_shuttle()`` once, and assert the Na transferred back into
+    ``process.reagent_inventory`` (via the canonical
+    ``_transfer_condensed_species`` helper).
+    """
+    from simulator.state import CampaignPhase
+
+    sim = _build_provider_sim()
+    # Seed the condensation train with 5 kg of recovered Na, as if the
+    # previous bakeout tick had condensed it back onto the train.
+    # ``load_external`` takes species_kg (kg) directly, not mol.
+    seeded_kg = 5.0
+    sim.atom_ledger.load_external(
+        "process.condensation_train",
+        {"Na": seeded_kg},
+        source="s1c test seed",
+    )
+    # Park the sim at the start of a C3_NA tick.  The cool-window
+    # Na/Fe margin is positive at 1150 °C (post-V1c-JANAF), so the
+    # shuttle inject path is reachable.
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.record.path = "A_staged"
+    sim.melt.temperature_C = 1150.0
+    sim.melt.hour = 24
+    sim.melt.campaign_hour = 1
+
+    # Pre-condition: train holds the seed, reagent_inventory empty.
+    pre_train_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train").get("Na", 0.0)
+    pre_reagent_kg = sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory").get("Na", 0.0)
+    assert pre_train_kg == pytest.approx(seeded_kg, rel=1e-9)
+    assert pre_reagent_kg == pytest.approx(0.0, abs=1e-12)
+
+    # Total Na atoms in the system pre-tick (across all accounts):
+    # elemental Na + Na bound up in Na2O (the feedstock starts with
+    # some Na2O in the silicate melt). ``kg_by_account()`` with no
+    # args returns the full ``{account: {species: kg}}`` mapping.
+    na_in_na2o_per_kg = MOLAR_MASS["Na"] * 2 / MOLAR_MASS["Na2O"]
+    pre_full = sim.atom_ledger.kg_by_account()
+    pre_total_na_kg = sum(
+        balances.get("Na", 0.0)
+        + balances.get("Na2O", 0.0) * na_in_na2o_per_kg
+        for balances in pre_full.values()
+    )
+
+    sim._step_shuttle()
+
+    # Post-condition: train drained back to 0 (the recycle moved the
+    # condensed Na out of condensation_train). Reagent_inventory holds
+    # the residual that was NOT consumed by this tick's FeO reduction
+    # (the feedstock provides residual FeO via the default melt
+    # composition; the shuttle inject path is positive-margin at 1150 °C
+    # so SOME of the recycled Na is consumed in the same tick).
+    post_train_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train").get("Na", 0.0)
+    post_reagent_kg = sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory").get("Na", 0.0)
+    assert post_train_kg == pytest.approx(0.0, abs=1e-9), (
+        "S1c recycle should drain the condensation_train Na completely "
+        f"(saw {post_train_kg!r})"
+    )
+    # The recycle DID happen (reagent saw the move); the strict
+    # invariant is that the train is empty + total Na is conserved.
+    assert post_reagent_kg > 0.0, (
+        "S1c recycle should leave at least some Na in reagent_inventory "
+        "(any consumption by inject must be <= the seed)"
+    )
+
+    # Mass conservation: total Na atoms across all accounts unchanged
+    # after the tick. The recycle is a within-system move (train ->
+    # reagent_inventory); inject moves Na out of reagent_inventory and
+    # into cleaned_melt as Na2O, so the Na ATOM count is conserved
+    # across (Na + the Na portion of Na2O). Within FP tolerance.
+    post_full = sim.atom_ledger.kg_by_account()
+    post_total_na_kg = sum(
+        balances.get("Na", 0.0)
+        + balances.get("Na2O", 0.0) * na_in_na2o_per_kg
+        for balances in post_full.values()
+    )
+    assert post_total_na_kg == pytest.approx(pre_total_na_kg, rel=1e-9), (
+        f"S1c recycle/inject combo must conserve Na atoms; "
+        f"pre={pre_total_na_kg!r} post={post_total_na_kg!r}"
+    )
+
+    # Atom-balance + cumulative imbalance still tight (the move
+    # transition is mass-conserving by construction).
+    assert _cumulative_transition_imbalance_kg(sim) < 1e-9
