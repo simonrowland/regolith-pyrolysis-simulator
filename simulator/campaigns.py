@@ -359,6 +359,25 @@ class CampaignManager:
                 return True
 
         elif campaign == CampaignPhase.C3_NA:
+            # Autoreview r6 P2 (2026-05-27): the V1c-recipe-retune
+            # migration retargeted ``C2A_STAGED -> C3_NA`` (was
+            # ``C2A_STAGED -> C3_K`` pre-V1c) and the
+            # ``na_shuttle_stage`` override now sets
+            # ``staged_duration_h`` as the cool cleanup endpoint.  The
+            # C3_K branch above honors the override via the
+            # ``record.path == 'A_staged'`` check; this branch did not,
+            # so staged runs (``record.path == 'A_staged'``) fell into
+            # the ``else`` arm of the ternary and ran C3_NA for the
+            # default 35 hours instead of the intended ~3-hour cool
+            # cleanup.  Mirror the C3_K handling so the staged endpoint
+            # is honored at its configured value.
+            if record.path == 'A_staged':
+                staged_hours = int(self._float(
+                    self._campaign_overrides(campaign).get('staged_duration_h'),
+                    3.0,
+                ))
+                if melt.campaign_hour >= max(1, staged_hours):
+                    return True
             # Na shuttle: 1 cycle after Path A, 2 after Path B
             max_hours = 18 if record.path == 'A' else 35
             if melt.campaign_hour >= max_hours:
