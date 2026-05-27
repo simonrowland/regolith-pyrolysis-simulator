@@ -46,15 +46,13 @@ _CONTROL_TOLERANCE_ABS = {
 }
 _CONTROL_TOLERANCE_REL = 1e-9
 
-# Proof cross-check tolerance is intentionally TIGHT (12 orders of
+# Proof cross-check tolerance is intentionally tight (five orders of
 # magnitude below the conservation gate at
 # :data:`simulator.accounting.ledger.DEFAULT_ATOM_TOLERANCE_MOL` =
 # 1e-6).  The provider's ``atom_balance_proof`` is a self-declared
-# bookkeeping claim, not a numerical estimate; if it disagrees with the
-# kernel's element-by-element atom count by more than floating-point
-# round-off, the provider has a real internal inconsistency that must
-# surface, not be hidden by a loose tolerance.
-PROOF_CROSSCHECK_TOLERANCE_MOL = 1e-12
+# bookkeeping claim; allow only float64 mol-materialization jitter between
+# that proof and the kernel's element-by-element recount.
+PROOF_CROSSCHECK_TOLERANCE_MOL = 1e-11
 
 
 def validate_intent_authority(

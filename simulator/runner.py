@@ -724,6 +724,18 @@ def _wall_deposit_report_kg(
     }
 
 
+def _wall_deposit_mol_by_species(
+    state: Mapping[str, Mapping[str, float]],
+) -> dict[str, float]:
+    wall_deposit_mol = dict(state.get(WALL_DEPOSIT_ACCOUNT, {}) or {})
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        for species, mol in (state.get(account, {}) or {}).items():
+            wall_deposit_mol[species] = (
+                wall_deposit_mol.get(species, 0.0) + float(mol)
+            )
+    return wall_deposit_mol
+
+
 def _wall_liner_resinter_config() -> dict[str, Any]:
     materials = _load_yaml(DATA_DIR / "materials.yaml")
     surface = (
@@ -963,7 +975,7 @@ def build_sio_yield_report(
     final_state = result.get("final_state", {})
     cleaned_melt = final_state.get("process.cleaned_melt", {})
     condensation_train = final_state.get("process.condensation_train", {})
-    wall_deposit = final_state.get(WALL_DEPOSIT_ACCOUNT, {})
+    wall_deposit = _wall_deposit_mol_by_species(final_state)
     terminal_offgas: dict[str, float] = {}
     for account_name in ("process.overhead_gas", "terminal.offgas"):
         for species, mol in final_state.get(account_name, {}).items():

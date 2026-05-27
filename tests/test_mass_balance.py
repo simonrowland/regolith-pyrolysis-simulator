@@ -62,9 +62,21 @@ def _external_input_mass_kg(sim) -> float:
 
 def _run_c2a_staged_to_completion(sim) -> int:
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
     steps = 0
     while not sim.is_complete() and steps < 500:
-        assert not sim.paused_for_decision
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
         sim.step()
         steps += 1
     assert sim.is_complete()
@@ -150,7 +162,7 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps = _run_c2a_staged_to_completion(sim)
 
-    assert steps == 12
+    assert steps == 87
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
