@@ -44,6 +44,23 @@ metals:
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
       tier: 2
+      # V1e-followon (2026-05-27, post-0.5.0): Na/K alpha reconciliation.
+      # Sossi 2019 (open furnace, mass-loss method) reports alpha_e ~ 1
+      # (near-ideal). Fedkin et al. 2006 LPSC (KEMS / Knudsen effusion
+      # mass spec, sealed equilibrium chamber) reports alpha_e ~ 0.13 for
+      # Na -- about 8x lower. The disagreement is methodological:
+      # KEMS measures evaporation flux against an equilibrium reservoir
+      # (HKL denominator dominated by re-condensation); open-furnace
+      # measures net loss to a swept volume (no back-flux). The
+      # simulator recipes run at ~mbar overhead with continuous sweep
+      # gas, which is closer to the open-furnace regime than the KEMS
+      # chamber. Pin to Sossi 2019. Operators wanting Fedkin's
+      # conservative value can override via setpoints (see
+      # data/setpoints.yaml chemistry_kernel block).
+      competing_sources:
+        - source: "Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber"
+          value: 0.13
+          regime: "sealed equilibrium chamber; not representative of mbar-sweep pyrolysis"
     antoine:
       # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
       A: 8.477035

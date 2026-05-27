@@ -129,12 +129,25 @@ class EquilibriumMixin:
     #   n_ox = moles of oxide per mol O₂ in the decomposition reaction
 
     _ELLINGHAM_THERMO = {
-        # V1c JANAF high-T refit over 1100-1700 K. Mn remains legacy
-        # pending the source decision tracked in task #37.
+        # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti.
+        # Mn updated 2026-05-27 (post-0.5.0) from legacy to NIST-JANAF
+        # standard-formation values at 298 K -- a defensible primary
+        # source; high-T linear refit deferred as V1c-Mn-followon because
+        # Mn passes through its solid->liquid transition at 1517 K
+        # (within the 1100-1700 K band) and a proper refit must integrate
+        # ΔH_fus=12.05 kJ/mol + ΔS_fus=7.95 J/K across the phase change.
+        # The 298 K basis corrects the slope (b) drift in the legacy
+        # values (0.149752 vs 0.165) while leaving the intercept
+        # essentially unchanged (-770.44 vs -770.0). Mn stays in the
+        # moderate-oxide tier with Fe/Cr; this is a minor byproduct in
+        # lunar mare regolith (~0.2 wt% MnO) so the high-T residual
+        # approximation is within the V1c-acceptable band for this
+        # species' simulator role.
         'Na': (-1135.130, -0.537417, 4, 2),      # Na-012,  ΔG(1600°C) ≈ -128
         'K':  (-975.838, -0.520580, 4, 2),       # K-012,   ΔG(1600°C) ≈ -1
         'Fe': (-538.946, -0.125272, 2, 2),       # Fe-018,  ΔG(1600°C) ≈ -304
-        'Mn': (-770.0, -0.165, 2, 2),            # legacy MnO, ΔG(1600°C) ≈ -461
+        'Mn': (-770.440, -0.149752, 2, 2),       # Mn-008 NIST-JANAF (Chase 1998) 298K basis;
+                                                  # ΔG(1600°C) ≈ -490 kJ/mol O₂
         'Cr': (-748.076, -0.168676, 4/3, 2/3),   # Cr-014,  ΔG(1600°C) ≈ -432
         'Mg': (-1342.444, -0.336009, 2, 2),      # Mg-008,  ΔG(1600°C) ≈ -713
         'Ca': (-1285.155, -0.222295, 2, 2),      # Ca-027,  ΔG(1600°C) ≈ -869

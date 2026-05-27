@@ -73,12 +73,16 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
-    # V1c JANAF high-T refit over 1100-1700 K. Mn remains legacy
-    # pending the source decision tracked in task #37.
+    # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti.
+    # Mn updated 2026-05-27 (post-0.5.0) from legacy to NIST-JANAF
+    # standard-formation values at 298 K (Mn-008, Chase 1998); high-T
+    # linear refit deferred as V1c-Mn-followon (Mn passes solid->liquid
+    # at 1517 K mid-band, needs ΔH_fus + ΔS_fus integration). See the
+    # full rationale in simulator/equilibrium.py::_ELLINGHAM_THERMO.
     'Na': (-1135.130, -0.537417, 4, 2),
     'K':  (-975.838, -0.520580, 4, 2),
     'Fe': (-538.946, -0.125272, 2, 2),
-    'Mn': (-770.0, -0.165, 2, 2),
+    'Mn': (-770.440, -0.149752, 2, 2),  # Mn-008 NIST-JANAF 298K basis
     'Cr': (-748.076, -0.168676, 4/3, 2/3),
     'Mg': (-1342.444, -0.336009, 2, 2),
     'Ca': (-1285.155, -0.222295, 2, 2),
