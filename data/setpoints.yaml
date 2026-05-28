@@ -471,8 +471,29 @@ campaigns:
 # ============================================================================
 condensation_train:
 
+  # 0.5.4.1 B1-tunable (CW3 follow-on, 2026-05-28): per-species
+  # condensation temperature overrides. The simulator's hardcoded
+  # ``simulator/condensation.py::CONDENSATION_TEMPS_C`` carries the
+  # in-source defaults; values here OVERRIDE the in-source defaults
+  # via
+  # ``apply_setpoints_condensation_temperature_overrides`` (called
+  # once at sim load time). All values below match the in-source
+  # defaults — no behavior shift from a fresh checkout. Operators
+  # who want to retune (e.g., move SiO from the recipe midpoint to
+  # the cold-baffle anchor) edit here; YAML is canonical for the
+  # operator surface.
   condensation_temperatures_C:
+    Fe:   1250
+    SiO:  1050   # ENGINEERING MIDPOINT of the 900-1200 C SiO zone
     CrO2: 1250
+    Mg:    580
+    Na:    480
+    K:     420
+    Ca:    780
+    Mn:   1000
+    Cr:   1280
+    Al:   1180
+    Ti:   1500
 
   condensation_temperature_sources:
     CrO2: >-

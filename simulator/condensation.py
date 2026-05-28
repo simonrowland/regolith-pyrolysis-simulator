@@ -1387,6 +1387,68 @@ def _species_vapor_data(species: str) -> Mapping[str, Any]:
     return {}
 
 
+def apply_setpoints_condensation_temperature_overrides(
+    setpoints: Mapping[str, Any] | None,
+) -> dict[str, float]:
+    """0.5.4.1 B1-tunable (CW3 follow-on, 2026-05-28): merge
+    operator-supplied per-species condensation temperatures from
+    ``data/setpoints.yaml § condensation_train.condensation_temperatures_C``
+    into the module-level ``CONDENSATION_TEMPS_C`` fallback dict.
+
+    Returns the snapshot of the original (pre-merge) module dict so
+    callers can restore in a ``try`` / ``finally`` when needed (mainly
+    useful for tests that swap setpoints across runs in the same
+    process).
+
+    Per the worker recommendation on B1 (codex /review scan
+    ``docs-private/reviews/2026-05-28-b1-e2a-scan/codex-scan.txt``):
+    the hardcoded SiO=1050 °C value is the recipe MIDPOINT of the
+    documented 900-1200 °C Stage 3 SiO zone, NOT a literature-derived
+    T_cond. Operators retune via this YAML seam without code edits.
+
+    Schema (per ``data/setpoints.yaml``):
+
+      condensation_train:
+        condensation_temperatures_C:
+          SiO: 1050
+          Fe:  1250
+          ...
+
+    - Non-finite / non-coercible entries are skipped (defensive).
+    - Species not present in the YAML keep their fallback value.
+    - Idempotent: calling twice with the same setpoints leaves the
+      module dict in the same state.
+    """
+    snapshot = dict(CONDENSATION_TEMPS_C)
+    if not setpoints:
+        return snapshot
+    block = (
+        (setpoints.get('condensation_train', {}) or {})
+        .get('condensation_temperatures_C', {}) or {}
+    )
+    if not isinstance(block, Mapping):
+        return snapshot
+    for species, value in block.items():
+        try:
+            T_C = float(value)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(T_C):
+            continue
+        CONDENSATION_TEMPS_C[str(species)] = T_C
+    return snapshot
+
+
+def restore_condensation_temperature_overrides(
+    snapshot: Mapping[str, float],
+) -> None:
+    """Restore the module-level ``CONDENSATION_TEMPS_C`` dict to a
+    prior snapshot (from
+    ``apply_setpoints_condensation_temperature_overrides``)."""
+    CONDENSATION_TEMPS_C.clear()
+    CONDENSATION_TEMPS_C.update(snapshot)
+
+
 def _species_condensation_temperature_C(species: str) -> float:
     if species in CONDENSATION_TEMPS_C:
         return float(CONDENSATION_TEMPS_C[species])

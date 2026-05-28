@@ -483,7 +483,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     @property
     def condensation_model(self):
         if self._condensation_model is None:
-            from simulator.condensation import CondensationModel
+            from simulator.condensation import (
+                CondensationModel,
+                apply_setpoints_condensation_temperature_overrides,
+            )
+            # 0.5.4.1 B1-tunable (CW3 follow-on): merge any operator-
+            # supplied per-species condensation temperatures from
+            # ``data/setpoints.yaml § condensation_train.
+            # condensation_temperatures_C`` into the module-level
+            # fallback dict before the model is built. Idempotent on
+            # repeat calls (re-applying the same setpoints leaves the
+            # dict identical). See
+            # ``simulator.condensation.apply_setpoints_condensation_
+            # temperature_overrides`` for the schema + defensive
+            # contract.
+            apply_setpoints_condensation_temperature_overrides(
+                self.setpoints
+            )
             self._condensation_model = CondensationModel(
                 self.train,
                 vapor_pressure_data=self.vapor_pressures,
