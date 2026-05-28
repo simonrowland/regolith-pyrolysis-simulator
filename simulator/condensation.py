@@ -15,8 +15,13 @@ Train topology (metals train, active C2A onward):
     Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
              SiO capture here is *operator-controlled*: under default
              C2A conditions with ``stir_factor = 6`` the series-resistance
-             flux (0.5.2 Phase B) routes the majority of evolved SiO to
-             this stage; the absolute capture remains rate-cap-driven by
+             flux (0.5.2 Phase B) increases the designated Stage 3
+             allocation by ~+14.8% over the v1 additive blend (per
+             ``tests/fixtures/sio_yield/*_c2a.json`` regen — Stage 3
+             still receives less than Stage 4 alkali/Mg carryover in
+             absolute terms, but the allocation shift is monotonically
+             toward Stage 3's designated SiO destination). The absolute
+             total capture remains rate-cap-driven by
              ``_pressure_isolated_capture_budget_kg``. Sub-laminar
              stir_factor or pO₂ hold suppresses Stage 3 capture and
              passes SiO downstream (silica fume) or holds it in melt.
