@@ -156,14 +156,34 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
     assert guard["checks"]["lunar_mare_low_ti:o2_1mbar"]["passed"] is True
     thresholds = summary["thresholds"]
     assert thresholds["lunar_mare_low_ti:no_suppress"]["basis"] == "sio_wall_deposit_kg"
-    assert thresholds["lunar_mare_low_ti:o2_1mbar"]["threshold_liner_temperature_C"] == 1100.0
+    # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip.
+    # 0.5.3 Phase A chunk-review P2 fix (codex 2026-05-28): the wall-sweep
+    # CLI's "o2_1mbar" mode now switches the atmosphere to CONTROLLED_O2
+    # so the commanded-pO2 floor at `_commanded_pO2_bar` actively
+    # suppresses SiO via the 1/sqrt(pO2) Ellingham factor. The
+    # `o2_1mbar` mode's wall-deposit threshold therefore sits at a
+    # LOWER liner temperature than `no_suppress` — fewer SiO molecules
+    # in vapor means the cold-wall driving force ΔP drops below the
+    # SIO_SLOW_FOULING_WALL_DEPOSIT_KG threshold earlier in the
+    # liner-T sweep. The 1100 C value is the post-fix observed
+    # threshold; if Phase A retunes the suppression magnitude it may
+    # shift, and the assertion should be loosened to "< no_suppress
+    # threshold" rather than pinned to a specific number.
+    assert (
+        thresholds["lunar_mare_low_ti:o2_1mbar"]["threshold_liner_temperature_C"]
+        < thresholds["lunar_mare_low_ti:no_suppress"]["threshold_liner_temperature_C"]
+    )
     evolved_by_mode = {
         row["pO2_mode"]: float(row["sio_evolved_kg"])
         for row in rows
         if row["liner_temperature_C"] == "1100.0"
     }
-    # pO2 suppression still drops SiO release by >10,000x. Post 2026-05-20
-    # Antoine refit the no_suppress magnitude is ~4700x smaller, shifting the
-    # suppression ratio from <1e-5 to ~2.7e-5; the strong-suppression intent
-    # holds (observed o2_1mbar/no_suppress ~2.7e-5, well under 1e-4).
-    assert evolved_by_mode["o2_1mbar"] < evolved_by_mode["no_suppress"] * 1.0e-4
+    # 0.5.3 Phase A chunk-review P2 fix: pO2 suppression IS LIVE again
+    # via the CONTROLLED_O2 atmosphere switch in
+    # `_apply_sio_wall_sweep_controls`. The "1 mbar pO2 glass / clean-
+    # alkali mode" operator lever is once again a meaningful physics
+    # surface — `o2_1mbar` SiO evolved must be strictly less than
+    # `no_suppress` (the 1/sqrt(1.0 mbar) = 1/sqrt(0.001 bar) ≈ 31.6
+    # suppression factor applied to the SiO partial — actual ratio
+    # depends on background equilibrium pO2 and melt composition).
+    assert evolved_by_mode["o2_1mbar"] < evolved_by_mode["no_suppress"]

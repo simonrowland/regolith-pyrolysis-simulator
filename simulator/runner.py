@@ -62,6 +62,7 @@ from simulator.session import (
     drive_session,
 )
 from simulator.state import (
+    Atmosphere,
     HourSnapshot,
     MOLAR_MASS,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
@@ -937,6 +938,19 @@ def _apply_sio_wall_sweep_controls(
             float(sim.overhead.composition.get("O2", 0.0)),
             pO2_value,
         )
+        # Phase A chunk-review P2 (codex 2026-05-28): the wall-sweep
+        # "1 mbar pO2 glass / clean-alkali mode" lever needs the
+        # commanded-pO2 floor (equilibrium.py / overhead.py finite-
+        # headspace branch) to actively suppress SiO via the
+        # 1/sqrt(pO2) Ellingham factor. That floor only fires in the
+        # ``_O2_CONTROLLED_ATMOSPHERES`` family. Under the default
+        # C2A PN2_SWEEP atmosphere with finite headspace default-on,
+        # operator pO2_mbar=1.0 produced NO suppression because the
+        # holdup-derived O2 partial dominated. Switch atmosphere to
+        # CONTROLLED_O2 when the wall-sweep operator commands a pO2
+        # — this is the design-intent semantic of "1 mbar pO2 glass"
+        # (operator is dosing oxygen, NOT just sweeping with N2).
+        sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         sim.melt.fO2_log = sim._compute_intrinsic_melt_fO2()
 
     if liner_temperature_c is None:

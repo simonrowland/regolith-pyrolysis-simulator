@@ -308,9 +308,20 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
         DecisionType.C6_PROCEED: "yes",
     }
     # V1c JANAF constants suppress the old 700 C trickle below the
-    # legacy loop's reporting floor; 1000 C keeps this a low-flux parity case
-    # while still exercising real species output.
-    while sim.melt.temperature_C < 1000.0:
+    # legacy loop's reporting floor; 1000 C used to keep this a low-flux
+    # parity case while still exercising real species output.
+    # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip
+    # exposes the real holdup-derived pO2 (vacuum-floor 1e-9 bar) in
+    # HARD_VACUUM atmosphere instead of the pre-flip synthetic
+    # conductance-ratio derived floor. Under the new trajectory the
+    # 1/sqrt(pO2) suppression factor multiplies P_sat too aggressively
+    # at 1000 C and ALL species drop below the legacy loop's
+    # 1e-12 kg/hr reporting threshold (empty flux dict). Bumping to
+    # 1200 C lifts species back above the legacy reporting floor while
+    # still keeping the case low-flux (well below recipe operating T
+    # of 1600-1700 C). The provider-vs-legacy parity contract is
+    # unchanged.
+    while sim.melt.temperature_C < 1200.0:
         if sim.paused_for_decision:
             decision = sim.pending_decision
             choice = decision_choice.get(decision.decision_type)

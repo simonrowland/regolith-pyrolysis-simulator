@@ -108,8 +108,21 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # competitive with the hotter baffle stages (whose driving
     # pressures are smaller due to higher P_sat). The fouling-threshold
     # structure (deposit at 1050 C, none at 1400/1500 C) is unchanged.
+    # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip
+    # exposes backpressure-floor physics; previously the synthetic
+    # no-headspace pO2 floor masked the holdup feedback. The C2A
+    # PN2_SWEEP atmosphere now reads the real overhead-gas O2 inventory
+    # (vacuum-floor 1e-9 bar) instead of the conductance-ratio derived
+    # synthetic O2 partial. Lower commanded pO2 → less SiO suppression
+    # via the 1/sqrt(pO2) Ellingham factor → ~2.4x more SiO evolves
+    # and proportionally more lands on the 1050 C cold wall. Net
+    # effect: 8.28395539869e-06 → 2.0039542334640e-05 (~+142%
+    # relative). The fouling-threshold structure (deposit at 1050 C,
+    # none at 1400/1500 C) is unchanged — the magnitude rises because
+    # the new commanded-pO2 is lower (no synthetic floor), so the SiO
+    # supply driving the cold wall is larger.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        8.28395539869e-06, rel=1e-9
+        2.0039542334640e-05, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

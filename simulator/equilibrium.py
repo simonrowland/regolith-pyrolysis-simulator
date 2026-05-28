@@ -65,10 +65,19 @@ class EquilibriumMixin:
                 self, '_overhead_gas_equilibrium_diagnostic', lambda: {}
             )()
             partials = dict(diagnostic.get('partial_pressures_bar') or {})
-            return max(
-                float(partials.get('O2', diagnostic.get('p_O2_bar', 0.0)) or 0.0),
-                _PO2_VACUUM_FLOOR_BAR,
+            pO2_bar = float(
+                partials.get('O2', diagnostic.get('p_O2_bar', 0.0)) or 0.0
             )
+            # 0.5.3 Phase A1 (2026-05-28): under finite-headspace ON, the
+            # holdup-derived O2 partial pressure replaces the synthetic
+            # commanded-pO2 setpoint from the legacy no-headspace branch.
+            # Re-apply melt.pO2_mbar as a floor in actively-controlled
+            # atmospheres so a recipe pO2 setpoint still gates SiO suppression
+            # via 1/sqrt(pO2). Uncontrolled HARD_VACUUM / PN2_SWEEP runs get
+            # NO synthetic floor — they collapse to _PO2_VACUUM_FLOOR_BAR.
+            if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+                pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
+            return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
 
         pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:

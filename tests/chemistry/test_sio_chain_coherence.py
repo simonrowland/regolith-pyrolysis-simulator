@@ -29,7 +29,18 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-8
 # Post-0.5.1 Phase A2 (2026-05-27) Mn high-T linear refit (Mn(l) basis):
 # tiny FP roundoff again, 0.000786620599287 -> 0.000786620612837 (rel
 # ~1.7e-8). Same root cause (Mn entry rounding); same character.
-PHASE3BIS_SIO_EVOLVED_KG = 0.000786620612837
+# 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip exposes
+# backpressure-floor physics; previously the synthetic no-headspace
+# pO2 floor masked the holdup feedback. The C2A PN2_SWEEP atmosphere
+# now reads the real overhead-gas O2 inventory (vacuum-floor 1e-9 bar)
+# instead of the conductance-ratio derived synthetic O2 partial.
+# Lower commanded pO2 → less SiO suppression via 1/sqrt(pO2) → ~2.5x
+# more SiO evolves. 0.000786620612837 → 0.00193652062882 (~+146%
+# relative). The wall-temperature INVARIANCE of evolved SiO holds
+# under finite-headspace ON (the holdup-derived O2 partial is the
+# same across liner temperatures since C2A pO2_mbar=0 and no
+# wall-T-dependent O2 source is active in C2A).
+PHASE3BIS_SIO_EVOLVED_KG = 0.00193652062882
 
 
 @lru_cache(maxsize=None)

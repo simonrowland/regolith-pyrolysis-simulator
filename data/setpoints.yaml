@@ -1056,8 +1056,11 @@ mre_stepped_voltage_holds:
 # 14. OVERHEAD FINITE HEADSPACE (migration toggle)
 # ============================================================================
 overhead_headspace:
-  # Default false preserves legacy one-tick drain and commanded-pO2 behavior.
-  enabled: false
+  # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Per docs-private/
+  # goal-finite-headspace-2026-05-21.md Q1 pinned decision — finite headspace
+  # is DEFAULT-ON GLOBALLY; every campaign gets the backpressure-floor
+  # physics. Goldens regenerated to reflect the new default.
+  enabled: true
 
   # null derives from crucible freeboard + pipe interior on PlantDesign.
   volume_m3: null

@@ -61,7 +61,14 @@ class OverheadGasModel:
     """
 
     DEFAULT_HEADSPACE_CONFIG = {
-        'enabled': False,
+        # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Hard-vacuum
+        # P_ambient=0 is no longer the default — every campaign now sees the
+        # finite-headspace backpressure floor (per docs-private/goal-finite-
+        # headspace-2026-05-21.md Q1 pinned decision). Synthetic O2 floor from
+        # melt.pO2_mbar is re-applied below in _update_finite_headspace so a
+        # controlled-O2 recipe setpoint is preserved across the holdup-derived
+        # partial-pressure overwrite.
+        'enabled': True,
         'volume_m3': None,
         'temperature_model': 'melt',
         'temperature_offset_K': None,
@@ -479,6 +486,32 @@ class OverheadGasModel:
             gas.composition['N2'] = max(
                 gas.composition.get('N2', 0.0),
                 max(0.0, melt.p_total_mbar - melt.pO2_mbar))
+
+        # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
+        # no-headspace branch (above) writes `gas.composition['O2'] = max(...,
+        # melt.pO2_mbar)` so a recipe pO2 setpoint always survives. Without the
+        # mirror here, the holdup-derived O2 partial would override the setpoint
+        # for actively-controlled atmospheres. Only apply in O2-controlled modes:
+        # an uncontrolled HARD_VACUUM / PN2_SWEEP run must NOT get a synthetic
+        # O2 floor (matches the design intent at equilibrium.py:9-12).
+        #
+        # Phase A chunk-review P1 (codex 2026-05-28): also raise the reported
+        # total pressure to at least the commanded pO2 floor. Pre-fix the
+        # holdup-derived total could be 0.0 mbar while the O2 partial was
+        # forced to e.g. 1.5 mbar — an impossible gas state (P_total < pO2).
+        # The runner fixture ``ci_carbonaceous_chondrite_C2B_12h.json`` carried
+        # ``P_total_bar=0`` with ``pO2_bar=0.0015`` as visible evidence. Fix
+        # mirrors the CO2_BACKPRESSURE / PN2_SWEEP branches above: when the
+        # commanded atmosphere demands a non-zero pO2, the reported total
+        # must accommodate it.
+        if atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        } and melt.pO2_mbar > 0.001:
+            gas.composition['O2'] = max(
+                gas.composition.get('O2', 0.0), melt.pO2_mbar)
+            gas.pressure_mbar = max(gas.pressure_mbar, melt.pO2_mbar)
 
         self._update_turbine_fields(
             gas,

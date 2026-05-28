@@ -114,6 +114,22 @@ def _build_freeze_gate_sim(
     )
 
 
+# 0.5.3 Phase A1 (2026-05-28): under finite-headspace default-on, the
+# _calculate_evaporation call chain reads _commanded_pO2_bar →
+# _overhead_gas_equilibrium_diagnostic → _dispatch_only(OVERHEAD_GAS_EQUILIBRIUM).
+# The freeze-gate tests below monkeypatch _dispatch_only with mock
+# evaporation/gate/liquidus stubs; they now also need to absorb the
+# OVERHEAD_GAS_EQUILIBRIUM diagnostic dispatch (empty diagnostic is fine —
+# _commanded_pO2_bar falls back to the vacuum floor in HARD_VACUUM, which
+# matches the test sims' default atmosphere). The mass-balance / freeze-gate
+# behavior under test is unchanged by the empty pO2 diagnostic; this is a
+# pure test-plumbing patch, NOT a freeze-gate physics shift.
+_OVERHEAD_GAS_EQUILIBRIUM_STUB = SimpleNamespace(
+    status='ok',
+    diagnostic={},
+)
+
+
 def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
     monkeypatch,
     vapor_pressure_data,
@@ -136,6 +152,11 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
                 status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 7.5}},
             )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            # 0.5.3 Phase A1: finite-headspace default-on routes pO2 through
+            # the diagnostic. Empty diagnostic → vacuum-floor pO2; the
+            # freeze-gate physics under test is unaffected.
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise AssertionError(f'unexpected liquidus dispatch: {intent}')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
@@ -143,7 +164,15 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
     flux = sim._calculate_evaporation(_equilibrium())
 
     assert sim._freeze_gate_enabled() is False
-    assert calls == [ChemistryIntent.EVAPORATION_FLUX]
+    # 0.5.3 Phase A1: under finite-headspace default-on, the dispatch list
+    # additionally includes OVERHEAD_GAS_EQUILIBRIUM (called from
+    # _commanded_pO2_bar → _overhead_gas_equilibrium_diagnostic). The
+    # EVAPORATION_FLUX call still happens once. Filter to the
+    # gate-relevant intent to keep the freeze-gate-default-off
+    # assertion: no liquidus/gate calls fire when the gate is OFF.
+    assert ChemistryIntent.EVAPORATION_FLUX in calls
+    assert ChemistryIntent.GATE_LIQUID_FRACTION not in calls
+    assert ChemistryIntent.SILICATE_LIQUIDUS not in calls
     assert flux.species_kg_hr['Na'] == pytest.approx(7.5)
 
 
@@ -183,6 +212,10 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
                     ),
                 },
             )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            # 0.5.3 Phase A1: finite-headspace default-on routes pO2
+            # through the diagnostic; empty stub → vacuum-floor pO2.
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise AssertionError(f'unexpected dispatch: {intent}')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
@@ -244,6 +277,10 @@ def test_freeze_gate_dispatches_intrinsic_fo2_to_gate_and_kernel_liquidus(
                     'liquidus_T_C': 1300.0,
                 },
             )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            # 0.5.3 Phase A1: finite-headspace default-on routes pO2
+            # through the diagnostic; empty stub → vacuum-floor pO2.
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise AssertionError(f'unexpected dispatch: {intent}')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
@@ -285,6 +322,10 @@ def test_freeze_gate_enabled_falls_back_to_liquidus_samples(
                 status='unavailable',
                 diagnostic={'backend_status': 'unavailable'},
             )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            # 0.5.3 Phase A1: finite-headspace default-on routes pO2
+            # through the diagnostic; empty stub → vacuum-floor pO2.
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise AssertionError(f'unexpected dispatch: {intent}')
 
     def fake_liquidus_finder(**kwargs):
@@ -332,6 +373,13 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
                 status='ok',
                 diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
             )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            # 0.5.3 Phase A1: finite-headspace default-on routes pO2
+            # through the diagnostic. Stub it so the freeze-gate
+            # ProviderUnavailableError path can be exercised cleanly —
+            # the test is asserting the gate-engine-absent behavior,
+            # not the overhead-gas-equilibrium-absent behavior.
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
         raise ProviderUnavailableError(f'{intent.value} provider absent')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
