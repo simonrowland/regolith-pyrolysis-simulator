@@ -192,6 +192,37 @@ def test_real_setpoints_yaml_produces_same_dict_as_fallback():
     assert CONDENSATION_TEMPS_C['CrO2'] == pre_state['CrO2']
 
 
+def test_species_condensation_temp_reads_yaml_override_end_to_end():
+    """0.5.4.1 morning-review P2 #3 (codex 2026-05-28) refutation:
+    the reviewer claimed B1-tunable's YAML override doesn't flow
+    through to ``_species_condensation_temperature_C``. This test
+    confirms it does — the override mutates the module-level
+    ``CONDENSATION_TEMPS_C`` dict, and the reader reads from that
+    dict at line 1391.
+
+    Path traced:
+    1. ``PyrolysisSimulator.condensation_model`` property
+       calls ``apply_setpoints_condensation_temperature_overrides(
+       self.setpoints)``.
+    2. That mutates ``CONDENSATION_TEMPS_C`` in place.
+    3. ``_species_condensation_temperature_C(species)`` at
+       ``simulator/condensation.py:1391`` checks
+       ``if species in CONDENSATION_TEMPS_C:`` and returns
+       ``float(CONDENSATION_TEMPS_C[species])``.
+
+    Override flows through end-to-end."""
+    from simulator.condensation import _species_condensation_temperature_C
+
+    apply_setpoints_condensation_temperature_overrides({
+        'condensation_train': {
+            'condensation_temperatures_C': {'SiO': 1099.0},
+        },
+    })
+    # The canonical reader sees the YAML override, not the original
+    # 1050 fallback.
+    assert _species_condensation_temperature_C('SiO') == 1099.0
+
+
 def test_simulator_construction_applies_setpoints_overrides():
     """End-to-end: a PyrolysisSimulator built from a setpoints dict
     with a custom SiO Tcond reads the override when the

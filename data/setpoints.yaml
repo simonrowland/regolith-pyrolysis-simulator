@@ -891,10 +891,14 @@ mre_voltage_sequence:
       campaign: "C5 trace cleanup"
       min_hold_hours: 2
 
-    - species: "V2O5"
-      decomposition_V: [0.8, 1.0]
-      campaign: "C5 trace cleanup"
-      min_hold_hours: 2
+    # V2O5 entry intentionally omitted (0.5.4.1 morning-review P1 fix,
+    # 2026-05-28): V is not in simulator/state.py OXIDE_SPECIES /
+    # OXIDE_TO_METAL / MOLAR_MASS / electrolysis.py decomposition
+    # voltage tables. Including V2O5 in the YAML ladder caused
+    # _step_mre to silently no-op for the species — operator-visible
+    # "running" lie with zero cleanup output. Add V2O5 here once
+    # full V vector landing support lands (vapor-pressure data +
+    # MOLAR_MASS + OXIDE_TO_METAL + ELECTRONS_PER_OXIDE etc.).
 
     - species: "MnO"
       decomposition_V: [0.8, 1.0]

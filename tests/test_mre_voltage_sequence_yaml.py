@@ -252,6 +252,78 @@ def test_build_yaml_path_sorted_by_voltage_ascending():
 # 4. Integration: real setpoints.yaml from disk
 # ---------------------------------------------------------------------------
 
+def test_yaml_ladder_species_all_supported_by_simulator_tables():
+    """0.5.4.1 morning-review P2 #2 (codex 2026-05-28): every species
+    in ``data/setpoints.yaml § mre_voltage_sequence.sequence`` MUST
+    be supported by the simulator's accompanying oxide tables
+    (``simulator/state.py::OXIDE_SPECIES``,
+    ``simulator/state.py::OXIDE_TO_METAL``,
+    ``simulator/state.py::MOLAR_MASS``,
+    ``simulator/electrolysis.py``'s per-species energy tables).
+
+    Originally surfaced by morning P1: V2O5 was added to the YAML
+    ladder but absent from the OXIDE_SPECIES table, causing
+    ``_step_mre`` to silently no-op for the species while the
+    operator's UI showed "C5 cleanup running" with zero output.
+
+    This test is a SUPPORT MATRIX guard: future YAML edits that add
+    a species fail loudly here BEFORE the recipe ships a silent
+    no-op. Adding a new species to the YAML now requires landing
+    the matching simulator-table entries too."""
+    from pathlib import Path
+    import yaml
+    from simulator.state import (
+        MOLAR_MASS,
+        OXIDE_SPECIES,
+        OXIDE_TO_METAL,
+    )
+
+    repo_root = Path(__file__).resolve().parent.parent
+    setpoints = yaml.safe_load(
+        (repo_root / "data" / "setpoints.yaml").read_text()
+    )
+    entries = (
+        (setpoints.get('mre_voltage_sequence', {}) or {})
+        .get('sequence', []) or []
+    )
+    yaml_species = sorted({
+        str(entry.get('species'))
+        for entry in entries
+        if isinstance(entry, dict) and entry.get('species')
+    })
+    assert yaml_species, "YAML mre_voltage_sequence carries no species"
+
+    missing_from_oxide_species = [
+        sp for sp in yaml_species if sp not in OXIDE_SPECIES
+    ]
+    missing_from_oxide_to_metal = [
+        sp for sp in yaml_species if sp not in OXIDE_TO_METAL
+    ]
+    missing_from_molar_mass = [
+        sp for sp in yaml_species if sp not in MOLAR_MASS
+    ]
+
+    assert not missing_from_oxide_species, (
+        f"YAML mre_voltage_sequence carries species not in "
+        f"simulator/state.py::OXIDE_SPECIES: "
+        f"{missing_from_oxide_species}. Recipe would claim cleanup "
+        f"but produce nothing (silent no-op). Either add to "
+        f"OXIDE_SPECIES + supporting tables or remove from YAML."
+    )
+    assert not missing_from_oxide_to_metal, (
+        f"YAML mre_voltage_sequence carries species not in "
+        f"simulator/state.py::OXIDE_TO_METAL: "
+        f"{missing_from_oxide_to_metal}. Cannot derive the metal "
+        f"product from the oxide; electrolysis would silently skip."
+    )
+    assert not missing_from_molar_mass, (
+        f"YAML mre_voltage_sequence carries species not in "
+        f"simulator/state.py::MOLAR_MASS: "
+        f"{missing_from_molar_mass}. Cannot convert mass to mol; "
+        f"electrolysis math would silently skip the species."
+    )
+
+
 def test_build_with_real_setpoints_yaml_returns_published_shape():
     """End-to-end: load the actual project setpoints.yaml and verify
     the resulting ladder makes physical sense. Voltage values cover
