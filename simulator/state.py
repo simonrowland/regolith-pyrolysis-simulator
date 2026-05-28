@@ -10,6 +10,7 @@ simulation loop.
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Dict, List, Tuple
@@ -187,6 +188,12 @@ def clamp_stir_factor(value: float) -> float:
     return max(0.0, min(float(MAX_STIR_FACTOR), raw))
 
 
+# Set of valid StirState dict-input keys for the typo audit in
+# ``clamp_stir_state``. Keep in lockstep with the ``StirState``
+# dataclass fields below.
+_KNOWN_STIR_STATE_KEYS = frozenset(('axial', 'radial'))
+
+
 @dataclass
 class StirState:
     """Two-axis induction-stirring state (0.5.3 Phase B).
@@ -290,6 +297,23 @@ def clamp_stir_state(value: Any) -> StirState:
         # baseline keeps that lever explicit.
         raw_axial = value.get('axial', 1.0)
         raw_radial = value.get('radial', 1.0)
+        # Typo audit (0.5.4 W2, 0.5.3 Phase B P3 #2 deferral): silently
+        # dropping unknown keys lets an operator typo like
+        # ``{'radail': 8}`` evaporate without trace — operator thinks
+        # they dialed radial up to 8, simulator runs with radial=1.0
+        # (laminar Sh). Surface unknown keys via UserWarning so the
+        # misconfiguration is audit-visible. Behaviour unchanged: any
+        # extras are still ignored, only the warning is new.
+        unknown_keys = set(value.keys()) - _KNOWN_STIR_STATE_KEYS
+        if unknown_keys:
+            warnings.warn(
+                f"clamp_stir_state: ignoring unknown StirState keys "
+                f"{sorted(unknown_keys)}; valid keys are "
+                f"{sorted(_KNOWN_STIR_STATE_KEYS)}. "
+                f"Common typos: 'radail' → 'radial', 'axail' → 'axial'.",
+                UserWarning,
+                stacklevel=2,
+            )
         return StirState(
             axial=clamp_stir_factor(raw_axial),
             radial=clamp_stir_factor(raw_radial),

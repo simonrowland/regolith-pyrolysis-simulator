@@ -59,20 +59,27 @@ BASELINE_SIO_EVOLVED_KG = {
     "mars_basalt": 0.00209489954469,
 }
 
-# 0.5.3 Phase A1 (2026-05-28): the stage_4 alkali_mg_carryover SiO2
-# baseline asserts BELOW the stage 3 product. Under the new physics, the
-# absolute Stage 4 SiO2 carryover ALSO shifts since more SiO evolves.
-# Per the existing test (line 113), the assertion is `<
-# BASELINE_STAGE4_SIO2_KG`; the loosened baseline below preserves the
-# directional intent (Stage 4 carryover stays well below Stage 3
-# product) while accommodating the new total Si budget. The legacy
-# values 1.65257779038 / 1.69466902181 sat above the legacy stage_3
-# magnitude (~1 kg); the new physics shifts the regime to ~1.94 mg
-# evolved (1000x less), so the Stage 4 absolute baseline shrinks by
-# the same factor. Set above the live stage_4 carryover with margin.
+# 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
+# default `StirState(radial=1.0)` (laminar gas-side Sherwood) produces
+# Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
+# "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off
+# (operators bump `stir_state.radial > 1.0` for Stage 3 dominance,
+# or retune Stage 3 temps). This is physics-honest: the +146% SiO
+# release from synthetic→holdup pO2 saturates Stage 3's laminar Sh
+# capture cap and overflows downstream. The two assertions below
+# pin both:
+#   1. Absolute ceiling on Stage 4 (regression catch — runaway), and
+#   2. Stage 4 > Stage 3 ordering invariant (forces CHANGELOG update
+#      if defaults change in a way that restores Stage 3 dominance).
+# Both fixtures (2026-05-28): stage_3 ≈ 3.0e-4 kg,
+# stage_4 ≈ 5.1e-4 kg (lunar) / 5.5e-4 kg (mars).
+# Predecessor history (for legacy reviewers): pre-Phase-A1 values were
+# 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
+# magnitude; the post-flip regime is ~1.94 mg total SiO evolved
+# (1000x less absolute mass, with relative routing inverted).
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 0.01,  # well above live 5.08e-4 kg
-    "mars_basalt": 0.01,        # well above live 5.50e-4 kg
+    "lunar_mare_low_ti": 0.01,  # absolute ceiling; live ~5.07e-4 kg
+    "mars_basalt": 0.01,        # absolute ceiling; live ~5.49e-4 kg
 }
 
 
@@ -136,10 +143,20 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     assert "wall_deposit_kg" in actual
     assert "fouling_rate" in actual
     placement = actual["sio_to_silica_fume_kg"]
-    assert placement["stage_3_sio_zone_product"] > 0.0
-    assert (
-        placement["stage_4_alkali_mg_carryover"]
-        < BASELINE_STAGE4_SIO2_KG[feedstock]
+    stage_3 = placement["stage_3_sio_zone_product"]
+    stage_4 = placement["stage_4_alkali_mg_carryover"]
+    assert stage_3 > 0.0
+    assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
+    # 0.5.3 Phase A1 routing-trade-off invariant: under default
+    # `StirState(radial=1.0)` laminar gas-side Sherwood + finite-headspace
+    # ON, Stage 4 SiO carryover > Stage 3 SiO zone product on this
+    # feedstock. Documented as "Known limitation" in CHANGELOG 0.5.3.
+    # Pinned so a future defaults change (e.g., radial→2.0 globally,
+    # or a Stage 3 temp retune) that restores Stage 3 dominance forces
+    # both this assertion update AND a CHANGELOG entry.
+    assert stage_4 > stage_3, (
+        f"Phase A1 SiO routing trade-off changed: stage_3={stage_3:.3e} "
+        f"stage_4={stage_4:.3e} for {feedstock}. Update CHANGELOG."
     )
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
     assert actual["alpha_SiO"] == pytest.approx(0.04)

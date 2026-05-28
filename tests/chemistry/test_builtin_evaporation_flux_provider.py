@@ -455,3 +455,136 @@ def test_shadow_parity_across_short_simulation_run(
         f"worst observed parity delta {worst_delta_kg_hr:.6g} kg/hr is "
         f"suspiciously large for a refactor-only change"
     )
+
+
+# ---------------------------------------------------------------------------
+# 7. W3 (0.5.4): defensive clamp on stir_factor / stir_state dict input
+# ---------------------------------------------------------------------------
+#
+# The canonical sim path through ``simulator.evaporation`` pre-clamps the
+# stir_factor before it lands in the IntentRequest. Direct-provider callers
+# (ACP probes, ad-hoc dispatch, tests) bypass that path; W3 adds an
+# idempotent inner clamp in the provider so the contract holds regardless
+# of who built the request.
+
+
+def _w3_dispatch_with_stir(stir_control) -> float:
+    """Helper: dispatch the provider with a custom ``stir_factor`` control
+    and return the realised stir factor as observed in the H-K-L flux
+    multiplication. We infer the factor by comparing the realised Na flux
+    to the laminar baseline (stir=1.0) — H-K-L is strictly linear in
+    stir_factor when α/M/T/P_sat are held fixed."""
+
+    provider = BuiltinEvaporationFluxProvider()
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0, "Na2O": 1.0}},
+        species_formula_registry={},
+    )
+
+    def _flux_for(stir):
+        request = IntentRequest(
+            intent=ChemistryIntent.EVAPORATION_FLUX,
+            account_view=view,
+            temperature_C=1500.0,
+            pressure_bar=1e-6,
+            fO2_log=None,
+            control_inputs={
+                'vapor_pressures_Pa': {'Na': 100.0},
+                'overhead_partials_Pa': {},
+                'molar_mass_kg_mol': {'Na': 0.023},
+                'stoich_by_species': {
+                    'Na': {
+                        'parent_oxide': 'Na2O',
+                        'oxide_per_product_kg': 1.347,
+                        'O2_per_product_kg': 0.347,
+                    },
+                },
+                'available_oxide_kg': {'Na': 10.0},
+                'melt_surface_area_m2': 0.2,
+                'stir_factor': stir,
+                'alpha': 0.5,
+            },
+        )
+        result = provider.dispatch(request)
+        return float(
+            result.diagnostic.get('evaporation_flux_kg_hr', {}).get('Na', 0.0)
+        )
+
+    baseline = _flux_for(1.0)
+    realised = _flux_for(stir_control)
+    if baseline <= 0.0:
+        return 0.0
+    return realised / baseline
+
+
+def test_provider_clamps_dict_axial_nan_to_zero():
+    """``{"axial": NaN}`` is a degenerate operator-write (or a poisoned
+    upstream computation). W3: clamp_stir_factor maps NaN → 0.0, so
+    H-K-L flux is halted instead of propagating NaN downstream."""
+
+    realised_ratio = _w3_dispatch_with_stir({"axial": float("nan")})
+    # Realised stir = 0.0 → realised flux = 0 = ratio 0.0
+    assert realised_ratio == 0.0
+
+
+def test_provider_clamps_dict_axial_negative_to_zero():
+    """Negative stir is unphysical and reads as a halt-evap signal per
+    ``clamp_stir_factor`` (the lower bound is 0.0). The provider must
+    not silently pass through a negative multiplier — which would
+    invert the flux sign and break mass balance."""
+
+    realised_ratio = _w3_dispatch_with_stir({"axial": -5.0})
+    assert realised_ratio == 0.0
+
+
+def test_provider_clamps_dict_axial_over_max_to_ceiling():
+    """``{"axial": 1000}`` exceeds the ``MAX_STIR_FACTOR=10.0``
+    operator-facing ceiling (melt-flying-out-of-the-pot physical bound).
+    Provider must clamp to MAX so the realised flux ratio is 10.0,
+    not 1000x the laminar baseline."""
+
+    realised_ratio = _w3_dispatch_with_stir({"axial": 1000.0})
+    # H-K-L flux is linear in stir; ratio of (stir=10) to (stir=1) is 10.0.
+    assert realised_ratio == pytest.approx(10.0, rel=1e-9)
+
+
+def test_provider_clamps_scalar_legacy_input_too():
+    """Legacy single-axis scalar caller must get the same defensive
+    clamp — pre-W3, the scalar branch went straight through
+    ``float(...)`` with only a TypeError/ValueError fallback. Now
+    NaN/inf/over-MAX all funnel through clamp_stir_factor."""
+
+    # NaN → 0.0
+    assert _w3_dispatch_with_stir(float("nan")) == 0.0
+    # Over MAX → MAX
+    assert _w3_dispatch_with_stir(500.0) == pytest.approx(10.0, rel=1e-9)
+    # Negative → 0.0
+    assert _w3_dispatch_with_stir(-3.0) == 0.0
+
+
+def test_provider_clamps_bool_input_to_zero():
+    """Codex chunk-review P3: bool is a Python int subclass; a YAML/
+    JSON deserialiser that hands ``True`` would otherwise coerce to
+    1.0 (laminar baseline) and ``False`` to 0.0 (halt). Both lies
+    silently. ``clamp_stir_factor`` rejects bool explicitly, so the
+    direct-provider path must too. Pin both values: True → 0.0
+    (halt-evap), False → 0.0 (halt-evap), unambiguous audit trail."""
+
+    # Both bool values must hit halt-evap rather than silently
+    # coerce to the float values 1.0 / 0.0.
+    assert _w3_dispatch_with_stir(True) == 0.0
+    assert _w3_dispatch_with_stir(False) == 0.0
+
+
+def test_provider_canonical_path_is_idempotent_under_clamp():
+    """An already-sanitised scalar (e.g., 6.0) must pass through the
+    clamp untouched — the canonical sim path through
+    ``simulator/evaporation.py::_pack_controls`` pre-clamps, so this
+    second clamp is defense in depth, not a behaviour change. The
+    realised ratio for stir=6 must be exactly 6.0."""
+
+    assert _w3_dispatch_with_stir(6.0) == pytest.approx(6.0, rel=1e-9)
+    # Dict form, valid axial: same idempotency.
+    assert _w3_dispatch_with_stir({"axial": 4.0}) == pytest.approx(
+        4.0, rel=1e-9
+    )

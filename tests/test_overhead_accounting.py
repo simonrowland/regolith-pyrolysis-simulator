@@ -744,3 +744,235 @@ def test_commanded_po2_has_no_synthetic_floor_in_hard_vacuum():
     # Under active O₂ control the same setpoint DOES floor the value.
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     assert sim._commanded_pO2_bar() == pytest.approx(1.5 / 1000.0)
+
+
+# ---------------------------------------------------------------------------
+# 0.5.4 W4 — Phase A commanded-pO2 floor: full atmosphere × headspace
+# decision matrix (0.5.3 Phase A P3 deferral)
+# ---------------------------------------------------------------------------
+#
+# Phase A introduced the commanded-pO2 floor in TWO places, each gated on
+# the atmosphere being in ``_O2_CONTROLLED_ATMOSPHERES``:
+#
+#  1. ``simulator/equilibrium.py::_commanded_pO2_bar`` — the value read
+#     by the SiO suppression path (1/√pO2 Ellingham) and the metal-
+#     activity-from-fO2 math. Both branches (headspace ON / OFF) apply
+#     the floor only in CONTROLLED_O2 / CONTROLLED_O2_FLOW /
+#     O2_BACKPRESSURE.
+#  2. ``simulator/overhead.py::_update_finite_headspace`` — the writer
+#     that ensures the gas inventory and reported P_total honour a
+#     non-trivial commanded setpoint. Only fires under the same three
+#     atmospheres + ``melt.pO2_mbar > 0.001``.
+#
+# Phase A landed both via integration-level tests (golden-fixture regen).
+# W4 adds explicit branch unit tests pinning the decision matrix so any
+# future change to the atmosphere set or the threshold trips a focused
+# unit-test failure rather than a fixture-regen surprise.
+
+
+_O2_FLOORED = (
+    Atmosphere.CONTROLLED_O2,
+    Atmosphere.CONTROLLED_O2_FLOW,
+    Atmosphere.O2_BACKPRESSURE,
+)
+_O2_NOT_FLOORED = (
+    Atmosphere.HARD_VACUUM,
+    Atmosphere.PN2_SWEEP,
+    Atmosphere.CO2_BACKPRESSURE,
+)
+
+
+def test_phase_a_atmosphere_partition_covers_all_enum_values():
+    """Self-guard against future ``Atmosphere`` enum additions silently
+    missing the matrix. Adding a new atmosphere value MUST be paired
+    with a routing decision in W4's decision matrix; this test trips
+    the coverage gap loudly. Codex chunk-review P3 — pin the
+    invariant explicitly."""
+    full_set = set(_O2_FLOORED) | set(_O2_NOT_FLOORED)
+    assert full_set == set(Atmosphere), (
+        f"W4 atmosphere partition out of sync with Atmosphere enum: "
+        f"missing {set(Atmosphere) - full_set}, "
+        f"extra {full_set - set(Atmosphere)}"
+    )
+
+
+def _force_headspace_branch(sim, *, enabled: bool, diagnostic_o2_bar: float = 0.0):
+    """Helper: pin the two `_commanded_pO2_bar` branches.
+
+    The Phase A flip routes through `_overhead_headspace_enabled()`
+    (reads `_overhead_headspace_config['enabled']`) AND, on the ON
+    branch, through `_overhead_gas_equilibrium_diagnostic()` for the
+    holdup-derived O₂ partial.
+
+    For `enabled=False`: the helper falls through to the
+    `overhead.composition.get('O2', ...)` path. Caller still controls
+    `sim.overhead.composition` for that branch.
+
+    For `enabled=True`: the helper monkey-patches the diagnostic
+    method to return a chosen holdup-derived O₂ partial in bar so
+    we can test the post-flip branch without booting the full
+    OVERHEAD_GAS_EQUILIBRIUM provider.
+    """
+    sim._overhead_headspace_config = {"enabled": enabled}
+    if enabled:
+        sim._overhead_gas_equilibrium_diagnostic = lambda: {
+            "partial_pressures_bar": {"O2": float(diagnostic_o2_bar)},
+            "p_O2_bar": float(diagnostic_o2_bar),
+        }
+
+
+@pytest.mark.parametrize("headspace_enabled", [False, True])
+@pytest.mark.parametrize("atmosphere", _O2_FLOORED)
+def test_commanded_po2_floored_in_o2_controlled_atmospheres(
+    atmosphere, headspace_enabled
+):
+    """Decision matrix row — for each of the three O₂-controlled
+    atmospheres AND for BOTH headspace branches (ON / OFF),
+    ``melt.pO2_mbar`` is applied as a floor on the commanded pO₂ read
+    by ``_commanded_pO2_bar``. Codex chunk-review P2 fix: covers
+    both equilibrium.py:62-80 (headspace ON, holdup-derived) AND
+    equilibrium.py:82-85 (legacy, gas.composition['O2'] reads)."""
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = atmosphere
+    sim.melt.pO2_mbar = 1.5
+    sim.overhead.composition = {"O2": 0.0}
+    _force_headspace_branch(sim, enabled=headspace_enabled,
+                            diagnostic_o2_bar=0.0)
+    # 1.5 mbar setpoint = 0.0015 bar floor; numerical 1e-9 bar guard
+    # is dwarfed; holdup-derived 0.0 bar is dwarfed; setpoint wins
+    # in both branches.
+    assert sim._commanded_pO2_bar() == pytest.approx(1.5 / 1000.0)
+
+
+@pytest.mark.parametrize("headspace_enabled", [False, True])
+@pytest.mark.parametrize("atmosphere", _O2_NOT_FLOORED)
+def test_commanded_po2_no_synthetic_floor_outside_o2_control(
+    atmosphere, headspace_enabled
+):
+    """Decision matrix complement — for each non-O₂-controlled
+    atmosphere AND for BOTH headspace branches, the setpoint is NOT
+    applied as a floor. Effective pO₂ collapses to ``max(holdup-or-
+    gas-composition-O₂, 1e-9 bar)``. Codex chunk-review P2 fix:
+    exercises both branches; a stale ``pO2_mbar=1.5`` setpoint under
+    HARD_VACUUM / PN2_SWEEP / CO2_BACKPRESSURE is ignored regardless
+    of headspace toggle (turbine-control feedback loop not wired in
+    these modes)."""
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = atmosphere
+    sim.melt.pO2_mbar = 1.5  # stale/irrelevant
+    sim.overhead.composition = {"O2": 0.0}
+    _force_headspace_branch(sim, enabled=headspace_enabled,
+                            diagnostic_o2_bar=0.0)
+    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
+
+
+def test_commanded_po2_overhead_composition_o2_carried_when_above_setpoint():
+    """The legacy (headspace-OFF) branch reads ``gas.composition['O2']``
+    as the primary value and only uses ``melt.pO2_mbar`` as a floor.
+    Whichever is higher wins. This is the decision-matrix corner where
+    the holdup-derived O₂ exceeds the setpoint — the actual holdup
+    drives the answer, the setpoint is just a lower bound."""
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 0.5            # 0.0005 bar floor
+    sim.overhead.composition = {"O2": 10.0}  # 0.01 bar holdup, above floor
+    # max(0.01, 0.0005) = 0.01 bar
+    assert sim._commanded_pO2_bar() == pytest.approx(0.01)
+
+
+def test_commanded_po2_numerical_floor_when_all_inputs_zero():
+    """All three inputs at zero: composition['O2']=0, melt.pO2_mbar=0,
+    atmosphere = O₂-controlled. The setpoint floor is 0 (no-op); only
+    the ``_PO2_VACUUM_FLOOR_BAR=1e-9`` numerical guard remains. This
+    is the divide-by-zero guard for the 1/√pO₂ SiO suppression and
+    the K/pO₂ Ellingham term — NOT a recipe synthetic floor."""
+    sim = _sio_o2_train_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 0.0
+    sim.overhead.composition = {"O2": 0.0}
+    assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
+
+
+@pytest.mark.parametrize("atmosphere", _O2_FLOORED)
+def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
+    """Phase A chunk-review P1 invariant (commit 03c1c45): under
+    finite-headspace ON + O₂-controlled atmosphere + non-trivial
+    setpoint, ``gas.pressure_mbar`` must be at least ``melt.pO2_mbar``
+    so the reported total pressure never falls below the O₂ partial
+    pressure (impossible gas state otherwise). Drives the existing
+    ``OverheadGasModel`` via the canonical positional signature
+    ``update(evap_flux, melt, train, ...)``."""
+    from simulator.state import (
+        CondensationTrain,
+        EvaporationFlux,
+        MeltState,
+    )
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState()
+    melt.atmosphere = atmosphere
+    melt.pO2_mbar = 1.5
+    melt.temperature_C = 1500.0
+    train = CondensationTrain.create_default()
+    flux = EvaporationFlux()
+
+    model = OverheadGasModel({
+        "overhead_headspace": {"enabled": True},
+        "headspace_volume_m3": 1.0,
+        "headspace_temperature_K": 1773.15,
+    })
+    gas = model.update(flux, melt, train)
+
+    # Under the documented invariant, both O2 partial and total must
+    # be at the setpoint (or higher). P_total < pO2 is impossible.
+    assert gas.composition.get("O2", 0.0) >= 1.5, (
+        f"O2 floor not applied for {atmosphere}: "
+        f"got {gas.composition.get('O2', 0.0)}"
+    )
+    assert gas.pressure_mbar >= 1.5, (
+        f"P_total fell below pO2 floor for {atmosphere}: "
+        f"P_total={gas.pressure_mbar} < pO2=1.5"
+    )
+    assert gas.pressure_mbar >= gas.composition["O2"]
+
+
+@pytest.mark.parametrize("atmosphere", _O2_NOT_FLOORED)
+def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
+    """Decision matrix complement — under non-O₂-controlled
+    atmospheres, the Phase A commanded-pO2 floor block in
+    ``simulator/overhead.py`` (lines 507-514) does NOT fire on
+    ``gas.composition['O2']``. Operator must explicitly switch
+    atmosphere to CONTROLLED_O2 to make the setpoint stick (mirror at
+    session.py / runner.py wall-sweep / campaigns.py). A bare
+    ``pO2_mbar=1.5`` set under PN2_SWEEP / HARD_VACUUM /
+    CO2_BACKPRESSURE leaves the O₂ partial near vacuum."""
+    from simulator.state import (
+        CondensationTrain,
+        EvaporationFlux,
+        MeltState,
+    )
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState()
+    melt.atmosphere = atmosphere
+    melt.pO2_mbar = 1.5  # stale/intentionally ignored under non-O2 modes
+    melt.temperature_C = 1500.0
+    train = CondensationTrain.create_default()
+    flux = EvaporationFlux()
+
+    model = OverheadGasModel({
+        "overhead_headspace": {"enabled": True},
+        "headspace_volume_m3": 1.0,
+        "headspace_temperature_K": 1773.15,
+    })
+    gas = model.update(flux, melt, train)
+
+    # The Phase A P1 commanded-pO2 floor block (overhead.py:507-514)
+    # MUST NOT have fired for these atmospheres. The O2 partial stays
+    # well below the stale 1.5 mbar setpoint (CO2_BACKPRESSURE may
+    # write its own ambient CO2 floor into pressure_mbar, but the O2
+    # entry specifically does not get the synthetic setpoint).
+    assert gas.composition.get("O2", 0.0) < 1.5, (
+        f"O2 floor leaked into non-O2-controlled atmosphere {atmosphere}: "
+        f"got {gas.composition.get('O2', 0.0)} expected < 1.5"
+    )

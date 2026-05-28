@@ -181,6 +181,81 @@ def test_clamp_stir_state_returns_fresh_instance_does_not_alias():
 
 
 # ---------------------------------------------------------------------------
+# clamp_stir_state: typo audit on dict input (0.5.4 W2)
+# ---------------------------------------------------------------------------
+
+def test_clamp_stir_state_typo_radail_emits_warning():
+    """0.5.4 W2 (0.5.3 Phase B P3 #2 deferral): a dict typo like
+    ``{'radail': 8}`` (transposed letters of 'radial') silently
+    evaporates pre-W2 — operator thinks radial=8 is live, simulator
+    runs with radial=1.0 laminar Sh. The audit emits a UserWarning
+    naming the unknown key + valid keys + the obvious 'radail/axail'
+    typo hint. Behaviour unchanged: unknown key still ignored, only
+    the warning is new."""
+    with pytest.warns(UserWarning, match=r"radail"):
+        state = clamp_stir_state({"radail": 8.0})
+    # Behaviour unchanged: typo'd key is still ignored, radial stays
+    # at the partial-dict default (laminar 1.0).
+    assert state.axial == 1.0
+    assert state.radial == 1.0
+
+
+def test_clamp_stir_state_valid_keys_only_no_warning():
+    """The audit must NOT trigger on the canonical inputs (full dict,
+    partial dict, empty dict). pytest's ``warns`` context with
+    ``WarningsChecker`` would fail if any UserWarning is emitted —
+    asserting absence via ``warnings.catch_warnings``."""
+    import warnings
+    for canonical in (
+        {"axial": 6.0, "radial": 4.0},
+        {"axial": 8.0},
+        {"radial": 3.0},
+        {},
+    ):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", UserWarning)
+            # If a UserWarning fires here it gets promoted to an
+            # exception via the filter — failing the test loudly.
+            clamp_stir_state(canonical)
+
+
+def test_clamp_stir_state_typo_multiple_unknowns_listed_in_warning():
+    """When the dict has several unknowns (e.g. operator pasted a YAML
+    block that mixed in adjacent setpoints), the warning lists ALL of
+    them sorted so the operator can correct the misconfiguration in
+    one pass."""
+    with pytest.warns(UserWarning) as captured:
+        state = clamp_stir_state({
+            "axial": 6.0,
+            "radail": 8.0,        # typo for radial
+            "amplitude_Hz": 50.0,  # operator pasted from setpoints
+            "phase_deg": 90.0,
+        })
+    # Behaviour: 'axial' honoured (6.0), 'radial' defaults to 1.0
+    # (laminar) since the typo'd key didn't write radial.
+    assert state.axial == 6.0
+    assert state.radial == 1.0
+    # All unknown keys named in the warning, sorted for stable text.
+    message = str(captured[0].message)
+    for unknown in ("radail", "amplitude_Hz", "phase_deg"):
+        assert unknown in message
+    # The valid keys are also surfaced so the operator sees the
+    # canonical schema next to the typo.
+    assert "axial" in message and "radial" in message
+
+
+def test_clamp_stir_state_typo_warning_does_not_break_normal_path():
+    """Defense-in-depth check: even when the warning fires, the
+    function still returns a valid ``StirState``. The warning is
+    advisory only; it MUST NOT mutate behaviour or raise."""
+    with pytest.warns(UserWarning):
+        state = clamp_stir_state({"radail": 8.0, "axial": 5.0})
+    assert isinstance(state, StirState)
+    assert state.axial == 5.0
+    assert state.radial == 1.0  # default; typo key ignored
+
+
+# ---------------------------------------------------------------------------
 # MeltState.stir_factor property: backward-compat alias to stir_state.axial
 # ---------------------------------------------------------------------------
 
