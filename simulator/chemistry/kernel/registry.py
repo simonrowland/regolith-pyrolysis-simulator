@@ -259,6 +259,48 @@ class ProviderRegistry:
 
         return self._authoritative.get(intent)
 
+    def replace_for_test(
+        self,
+        intent: ChemistryIntent,
+        provider: Optional[ChemistryProvider],
+    ) -> Optional[ChemistryProvider]:
+        """Swap the authoritative provider for ``intent``; return prior.
+
+        0.5.4.1 B3 / M1 historical-audit closure (2026-05-28). Test
+        seam ONLY -- production code paths must not use this. Tests
+        previously reached into ``sim._chem_registry._authoritative``
+        and mutated the private dict directly (see e.g.
+        ``tests/test_extraction_ledger.py``); that pattern silently
+        breaks if the registry internals are renamed or moved to a
+        tuple-keyed scheme. This public seam encapsulates the swap
+        without changing any production semantics:
+
+        - Pass a ``ChemistryProvider`` to install it as the new
+          authoritative provider for ``intent``. The caller is
+          responsible for ensuring the provider's
+          ``CapabilityProfile.is_authoritative_for`` includes the
+          intent (or the caller is intentionally bypassing that
+          check for an isolated test scenario; this method does NOT
+          re-validate, matching the prior direct-dict-mutation
+          contract).
+        - Pass ``None`` to clear the authoritative slot for the
+          intent. The caller may then re-register via the canonical
+          ``register(...)`` path. Returns whatever was previously in
+          the slot (or ``None`` if it was empty), so the test can
+          restore the prior state in a ``try`` / ``finally`` block.
+
+        Method name explicitly carries ``_for_test`` so a future
+        code-review can flag any production caller. Method docstring
+        is the canonical reference for this contract.
+        """
+
+        previous = self._authoritative.get(intent)
+        if provider is None:
+            self._authoritative.pop(intent, None)
+        else:
+            self._authoritative[intent] = provider
+        return previous
+
     def fallback_for(
         self, intent: ChemistryIntent
     ) -> Optional[ChemistryProvider]:

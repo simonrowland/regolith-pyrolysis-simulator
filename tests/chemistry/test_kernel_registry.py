@@ -327,3 +327,104 @@ def test_capability_summary_keys_match_registered_intents():
     assert entry['authoritative'] == 'idem_a'
     assert entry['fallback'] == 'idem_b'
     assert entry['shadows'] == ('idem_shadow',)
+
+
+# ---------------------------------------------------------------------------
+# 0.5.4.1 B3 (M1 historical-audit closure): public replace_for_test seam
+# ---------------------------------------------------------------------------
+
+def test_replace_for_test_swaps_authoritative_provider():
+    """The public test-seam swaps the authoritative provider for an
+    intent and returns the prior provider so the caller can restore
+    in a try/finally. Replaces the prior pattern of directly
+    mutating ``registry._authoritative[intent]`` which would break
+    silently if the registry internals were renamed."""
+
+    registry = ProviderRegistry()
+    a = _IdemProviderA()
+    b = _IdemProviderB()
+    registry.register_idempotent(a, [ChemistryIntent.VAPOR_PRESSURE])
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is a
+
+    prior = registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, b
+    )
+    assert prior is a
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is b
+
+    # Restore via the same seam.
+    restored_prior = registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, prior
+    )
+    assert restored_prior is b
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is a
+
+
+def test_replace_for_test_with_none_clears_authoritative_slot():
+    """Passing ``provider=None`` clears the authoritative slot; the
+    caller can then re-register via the canonical
+    ``register(...)`` path. Returns the prior provider (or
+    ``None`` if the slot was empty)."""
+
+    registry = ProviderRegistry()
+    a = _IdemProviderA()
+    registry.register_idempotent(a, [ChemistryIntent.VAPOR_PRESSURE])
+
+    prior = registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, None
+    )
+    assert prior is a
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is None
+
+    # Idempotent: clearing an already-empty slot returns None and
+    # doesn't raise.
+    prior2 = registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, None
+    )
+    assert prior2 is None
+
+
+def test_replace_for_test_returns_none_when_slot_was_empty():
+    """The first call to the seam (when no authoritative provider was
+    registered) returns ``None`` for the prior slot, matching the
+    private-dict get-default pattern."""
+
+    registry = ProviderRegistry()
+    a = _IdemProviderA()
+    prior = registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, a
+    )
+    assert prior is None
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is a
+
+
+def test_replace_for_test_skips_capability_validation_intentionally():
+    """The seam DOES NOT re-validate that the provider's
+    ``CapabilityProfile.is_authoritative_for`` includes the intent.
+    This matches the prior direct-dict-mutation contract and lets
+    tests deliberately install a shadow-only provider as
+    authoritative for an isolated scenario. Documented behaviour;
+    the seam name carries ``_for_test`` so a future review can flag
+    any production caller."""
+
+    registry = ProviderRegistry()
+    shadow_only = _IdemShadow()
+    # Shadow-only provider has ``is_authoritative_for=frozenset()``,
+    # so canonical register() rejects it for authoritative. The
+    # seam intentionally bypasses the check.
+    registry.replace_for_test(
+        ChemistryIntent.VAPOR_PRESSURE, shadow_only
+    )
+    assert registry.authoritative_for(
+        ChemistryIntent.VAPOR_PRESSURE
+    ) is shadow_only

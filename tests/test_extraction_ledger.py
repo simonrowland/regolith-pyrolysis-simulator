@@ -153,10 +153,15 @@ def _install_fixed_mre_provider(sim, **kwargs) -> None:
     """
 
     provider = _FixedElectrolysisStepProvider(**kwargs)
-    # ``register_idempotent`` rejects a provider_id swap. Reach into the
-    # registry's internal store -- this is documented test-only access.
-    sim._chem_registry._authoritative[ChemistryIntent.ELECTROLYSIS_STEP] = (
-        provider
+    # ``register_idempotent`` rejects a provider_id swap, so this test
+    # uses the dedicated ``replace_for_test`` seam on ProviderRegistry
+    # (0.5.4.1 B3 / M1 closure: replaces the prior direct
+    # ``_chem_registry._authoritative[...] = provider`` private-dict
+    # mutation, which would break silently if the registry internals
+    # were renamed). Method name carries ``_for_test`` so a future
+    # code-review can flag any production caller.
+    sim._chem_registry.replace_for_test(
+        ChemistryIntent.ELECTROLYSIS_STEP, provider
     )
 
 
