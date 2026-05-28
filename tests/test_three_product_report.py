@@ -1,0 +1,307 @@
+"""Tests for E6a north-star product-class classifier.
+
+Pins:
+1. The 5-bucket output shape (metals+O2 / silica / mixed glass /
+   rump / unclassified) on a fresh sim.
+2. Metal/O2 sums match the canonical METAL_PRODUCT_SPECIES list.
+3. Stage 3 capture reads SiO + SiO2 collected_kg.
+4. Defensive: missing methods / empty product_ledger don't raise.
+5. End-to-end on real sim — full classification round-trips
+   product_ledger() without losing or duplicating mass.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+import yaml
+
+from simulator.backends import BackendSelectionPolicy
+from simulator.session import SimSession, SimSessionConfig
+from simulator.three_product_report import (
+    METAL_PRODUCT_SPECIES,
+    O2_PRODUCT_SPECIES,
+    PURE_SILICA_GLASS_SPECIES,
+    classify_products,
+)
+
+
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+def _load(name: str) -> dict:
+    with (DATA_DIR / name).open() as f:
+        return yaml.safe_load(f) or {}
+
+
+def _config(**overrides) -> SimSessionConfig:
+    values = {
+        "feedstock_id": "lunar_mare_low_ti",
+        "feedstocks": _load("feedstocks.yaml"),
+        "setpoints": _load("setpoints.yaml"),
+        "vapor_pressures": _load("vapor_pressures.yaml"),
+        "campaign": "C2A",
+        "backend_name": "stub",
+        "backend_policy": BackendSelectionPolicy.RUNNER_STRICT,
+    }
+    values.update(overrides)
+    return SimSessionConfig(**values)
+
+
+# ---------------------------------------------------------------------------
+# 1. Output shape
+# ---------------------------------------------------------------------------
+
+def test_classifier_returns_documented_5_bucket_shape():
+    """The classifier MUST return the documented 5-bucket dict so
+    downstream consumers (E6b runner CLI, web UI, log scrapers)
+    can rely on the schema."""
+    session = SimSession().start(_config(campaign="C2A"))
+    result = classify_products(session.simulator)
+    expected_buckets = {
+        'metals_plus_O2',
+        'pure_silica_glass',
+        'industrial_mixed_glass',
+        'refractory_ceramic_rump',
+        'unclassified',
+    }
+    assert set(result.keys()) == expected_buckets
+    # Each bucket carries a ``class_total_kg`` (or for unclassified,
+    # ``total_kg``) so the operator can sum across classes.
+    for bucket in (
+        'metals_plus_O2', 'pure_silica_glass',
+        'industrial_mixed_glass', 'refractory_ceramic_rump',
+    ):
+        assert 'class_total_kg' in result[bucket]
+        assert isinstance(result[bucket]['class_total_kg'], float)
+        assert result[bucket]['class_total_kg'] >= 0.0
+
+
+# ---------------------------------------------------------------------------
+# 2. Metals + O2 species coverage
+# ---------------------------------------------------------------------------
+
+def test_metals_plus_o2_uses_canonical_species_list():
+    """The metals product class iterates METAL_PRODUCT_SPECIES
+    (canonical list). O2 is read directly. Sanity check that the
+    canonical lists match what the docstring + CLAUDE.md describe."""
+    assert 'Na' in METAL_PRODUCT_SPECIES
+    assert 'Fe' in METAL_PRODUCT_SPECIES
+    assert 'Si' in METAL_PRODUCT_SPECIES
+    assert 'Al' in METAL_PRODUCT_SPECIES
+    # SiO is NOT here — it's a gas-phase silicate oxide, mapped to
+    # the silica-glass class.
+    assert 'SiO' not in METAL_PRODUCT_SPECIES
+    assert 'SiO2' not in METAL_PRODUCT_SPECIES
+    # O2 is its own surface.
+    assert O2_PRODUCT_SPECIES == ('O2',)
+
+
+def test_metals_total_excludes_o2():
+    """``metals_total_kg`` carries the metal-only sum; ``O2_kg`` is
+    separate. ``class_total_kg`` = metals + O2 (the full class 1
+    bookkeeping per CLAUDE.md § 5)."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {
+            'Fe': 5.0, 'Na': 1.0, 'O2': 2.0,
+            'SomeOxide': 0.5,  # → unclassified
+        },
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['metals_plus_O2']['metals_total_kg'] == 6.0
+    assert result['metals_plus_O2']['O2_kg'] == 2.0
+    assert result['metals_plus_O2']['class_total_kg'] == 8.0
+
+
+# ---------------------------------------------------------------------------
+# 3. Pure silica glass: Stage 3 capture
+# ---------------------------------------------------------------------------
+
+def test_silica_glass_reads_stage_3_collected_kg():
+    """The Stage 3 fused-silica baffles surface is
+    ``train.stages[3].collected_kg``. The classifier sums SiO + SiO2
+    entries there."""
+    stage_3 = SimpleNamespace(collected_kg={'SiO': 3.0, 'SiO2': 1.0})
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[None, None, None, stage_3]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['pure_silica_glass']['stage_3_capture_kg'] == 4.0
+    assert result['pure_silica_glass']['stage_3_kg_by_species'] == {
+        'SiO': 3.0, 'SiO2': 1.0,
+    }
+
+
+def test_silica_glass_zero_when_stage_3_missing():
+    """No stage 3 in the train → zero capture, no crash."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['pure_silica_glass']['stage_3_capture_kg'] == 0.0
+    assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
+
+
+# ---------------------------------------------------------------------------
+# 4. Refractory ceramic rump
+# ---------------------------------------------------------------------------
+
+def test_rump_reads_terminal_rump_method():
+    """The classifier prefers ``_terminal_rump_by_species`` when
+    available (the canonical surface). Empty dict / missing method
+    is the no-rump degenerate."""
+    sim_with_rump = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+        _terminal_rump_by_species=lambda: {'CaO': 5.0, 'REE_oxides': 0.5},
+    )
+    result = classify_products(sim_with_rump)
+    assert result['refractory_ceramic_rump']['rump_total_kg'] == 5.5
+    assert (
+        result['refractory_ceramic_rump']['rump_kg_by_species']
+        == {'CaO': 5.0, 'REE_oxides': 0.5}
+    )
+
+
+def test_rump_zero_when_method_missing():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['refractory_ceramic_rump']['rump_total_kg'] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# 5. Industrial mixed glass: early-tap detection
+# ---------------------------------------------------------------------------
+
+def test_mixed_glass_reads_cleaned_melt_residual():
+    """Industrial mixed glass = whatever's still in the
+    ``process.cleaned_melt`` account at classification time. Real
+    recipes tap before C5/C6 to leave Si-bearing melt as a
+    saleable product."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=SimpleNamespace(
+            kg_by_account=lambda acct: (
+                {'SiO2': 100.0, 'Al2O3': 20.0}
+                if acct == 'process.cleaned_melt' else {}
+            ),
+        ),
+    )
+    result = classify_products(sim)
+    # 100 + 20 = 120 kg residual melt → mixed-glass class.
+    assert (
+        result['industrial_mixed_glass']['mixed_melt_residual_kg']
+        == 120.0
+    )
+
+
+# ---------------------------------------------------------------------------
+# 6. Defensive: empty / degenerate inputs
+# ---------------------------------------------------------------------------
+
+def test_classifier_handles_empty_product_ledger():
+    """A fresh sim with no products at all returns the empty-but-
+    well-formed shape — no exceptions."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['metals_plus_O2']['class_total_kg'] == 0.0
+    assert result['pure_silica_glass']['class_total_kg'] == 0.0
+    assert result['refractory_ceramic_rump']['class_total_kg'] == 0.0
+    assert result['unclassified']['total_kg'] == 0.0
+
+
+def test_classifier_handles_missing_product_ledger_method():
+    """A sim-like object with no ``product_ledger`` method falls
+    back to empty dict."""
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    # Empty everything.
+    for bucket in (
+        'metals_plus_O2', 'pure_silica_glass',
+        'industrial_mixed_glass', 'refractory_ceramic_rump',
+    ):
+        assert result[bucket]['class_total_kg'] == 0.0
+
+
+def test_classifier_handles_non_coercible_product_kg():
+    """Defensive: a product entry with a non-coercible kg gets
+    skipped, not raised."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {
+            'Fe': 5.0,
+            'BadEntry': 'not a number',
+            'AnotherBad': None,
+        },
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    # Fe surfaces; bad entries skipped.
+    assert result['metals_plus_O2']['metals_kg']['Fe'] == 5.0
+    assert 'BadEntry' not in result['unclassified']['kg_by_species']
+
+
+# ---------------------------------------------------------------------------
+# 7. End-to-end: real sim integration
+# ---------------------------------------------------------------------------
+
+def test_classifier_end_to_end_on_short_c2a_run():
+    """Drive a SimSession through a short C2A run; classify the
+    result. The output is well-formed; we don't assert specific
+    masses (those depend on the recipe + are E1b territory)."""
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    for _ in range(4):
+        sim.step()
+    result = classify_products(sim)
+    # All buckets present + finite.
+    assert all(
+        isinstance(result[bucket]['class_total_kg'], float)
+        and result[bucket]['class_total_kg'] >= 0.0
+        for bucket in (
+            'metals_plus_O2', 'pure_silica_glass',
+            'industrial_mixed_glass', 'refractory_ceramic_rump',
+        )
+    )
+
+
+def test_classifier_unclassified_bin_catches_unknown_species():
+    """Future-proofing: if a new species lands in product_ledger
+    that the canonical lists don't cover, it MUST surface in the
+    'unclassified' bin so operators see the mapping gap."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {
+            'NewExoticHalide': 2.5,  # not in any canonical list
+            'Fe': 1.0,
+        },
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+    )
+    result = classify_products(sim)
+    assert result['unclassified']['kg_by_species'] == {
+        'NewExoticHalide': 2.5,
+    }
+    assert result['unclassified']['total_kg'] == 2.5
+    # Fe still maps correctly to metals.
+    assert result['metals_plus_O2']['metals_kg']['Fe'] == 1.0

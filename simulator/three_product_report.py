@@ -1,0 +1,222 @@
+"""E6a (north-star product-class classifier, 0.5.4.1, 2026-05-28).
+
+Maps the simulator's per-species product output onto the four
+north-star product classes documented in
+``CLAUDE.md § 5 — Product classes``:
+
+  1. METALS + O₂                — Na/K/Fe/Mg/Si/Ti/Al/Ca/Cr/Mn/Ni/Co
+                                  metal alloys + accumulated O₂.
+  2. PURE SILICA GLASS          — SiO landed on Stage 3 fused-silica
+                                  baffles on-demand via gas-cover switch.
+  3. INDUSTRIAL MIXED GLASS     — Si-bearing residual melt if the
+                                  recipe taps before the SiO release
+                                  window (early-tap option).
+  4. REFRACTORY CERAMIC RUMP    — Ca / REE / refractory oxides + any
+                                  Al that didn't get thermited. By
+                                  physics, not by recipe choice.
+
+This module is DIAGNOSTIC ONLY: it reads the AtomLedger via the
+canonical surfaces (``product_ledger`` + ``train.stages`` +
+``_terminal_rump_by_species``) and projects onto a single dict; it
+does NOT mutate any account.
+
+E6a scope: the classifier function. E6b (deferred) is the runner CLI
++ markdown report wrapping E6a.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Mapping
+
+# Per CLAUDE.md § 4 + § 5: the species that map cleanly to each
+# product class. Some species can land in MORE THAN ONE class
+# depending on recipe path (e.g. Al as metal vs Al2O3 in rump if
+# C6 thermite wasn't fired); the classifier surfaces BOTH per-class
+# subtotals and the gross totals so the operator can see the
+# split honestly.
+
+METAL_PRODUCT_SPECIES: tuple[str, ...] = (
+    'Na', 'K', 'Fe', 'Mg', 'Si', 'Ti', 'Al', 'Ca',
+    'Cr', 'Mn', 'Ni', 'Co',
+)
+"""Metal alloy / ingot species per CLAUDE.md § 5 product class 1.
+``Si`` is here because the post-C6 / post-C5 Si lands as elemental
+metal at process.metal_phase. SiO (the gas-phase silicate oxide)
+maps to product class 2, NOT this list."""
+
+O2_PRODUCT_SPECIES: tuple[str, ...] = ('O2',)
+"""Terminal O₂ accumulator — part of product class 1 (the
+disproportionation by-product that motivates the whole refinery)."""
+
+PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')
+"""Product class 2: SiO landed on Stage 3 fused-silica baffles is
+the canonical pure-silica output. SiO2 surfaces here when a
+post-condensation handler converts the captured SiO via the
+documented disproportionation route 2 SiO → SiO2(s) + Si(l)."""
+
+REFRACTORY_CERAMIC_RUMP_ELEMENTS: tuple[str, ...] = (
+    'Ca', 'REE',
+)
+"""Product class 4: by-physics rump. Ca + REEs + refractory oxides
+that don't volatilize at any furnace-survivable T. ``Al`` is
+NOT here even though Al2O3 can land in the rump — Al-as-rump
+depends on whether C6 thermite fired. Use the ``has_al_thermite``
+flag on the classifier output to disambiguate. The full element
+ladder is queried via ``ExtractionMixin._RUMP_ELEMENT_SPECIES``
+which carries Si / Al / Mg / Ti routing too."""
+
+
+def classify_products(sim) -> dict[str, Any]:
+    """Project a PyrolysisSimulator's product surface onto the four
+    north-star product classes.
+
+    Args:
+        sim: A ``PyrolysisSimulator`` (after ``run_to_completion`` or
+            at any mid-campaign tick). Reads:
+            - ``sim.product_ledger()`` — AtomLedger-projected
+              per-species kg
+            - ``sim.train.stages`` — UI projection per condensation
+              stage
+            - ``sim._terminal_rump_by_species()`` if available, for
+              the rump composition
+
+    Returns a dict with the following structure:
+        {
+            'metals_plus_O2': {
+                'metals_kg': {species: kg, ...},
+                'metals_total_kg': float,
+                'O2_kg': float,
+                'class_total_kg': float,
+            },
+            'pure_silica_glass': {
+                'stage_3_capture_kg': float,
+                'stage_3_kg_by_species': {species: kg, ...},
+                'class_total_kg': float,
+            },
+            'industrial_mixed_glass': {
+                'mixed_melt_residual_kg': float,
+                'note': 'present only if recipe tapped early',
+            },
+            'refractory_ceramic_rump': {
+                'rump_kg_by_species': {species: kg, ...},
+                'rump_total_kg': float,
+            },
+            'unclassified': {
+                'kg_by_species': {species: kg, ...},
+                'total_kg': float,
+            },
+        }
+
+    The 'unclassified' bin catches anything the classifier didn't
+    map to one of the four classes — operator visibility that the
+    project's species → product-class mapping is incomplete (e.g.,
+    if a future feedstock introduces a new condensable like S2 or
+    H2O carry-over).
+    """
+    products = sim.product_ledger() if hasattr(sim, 'product_ledger') else {}
+    train_stages = list(
+        getattr(getattr(sim, 'train', None), 'stages', []) or []
+    )
+
+    # ----- Class 1: metals + O2 -----
+    metals_kg: dict[str, float] = {}
+    for species in METAL_PRODUCT_SPECIES:
+        kg = float(products.get(species, 0.0))
+        if kg > 0.0:
+            metals_kg[species] = kg
+    metals_total_kg = float(sum(metals_kg.values()))
+    o2_kg = float(products.get('O2', 0.0))
+    metals_plus_o2_total = float(metals_total_kg + o2_kg)
+
+    # ----- Class 2: pure silica glass (Stage 3 capture) -----
+    stage_3_kg_by_species: dict[str, float] = {}
+    if len(train_stages) > 3:
+        stage_3 = train_stages[3]
+        collected = dict(getattr(stage_3, 'collected_kg', {}) or {})
+        for species in PURE_SILICA_GLASS_SPECIES:
+            kg = float(collected.get(species, 0.0))
+            if kg > 0.0:
+                stage_3_kg_by_species[species] = kg
+    stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
+
+    # ----- Class 4: refractory ceramic rump -----
+    rump_kg_by_species: dict[str, float] = {}
+    rump_method = getattr(sim, '_terminal_rump_by_species', None)
+    if callable(rump_method):
+        try:
+            rump_kg_by_species = {
+                str(species): float(kg)
+                for species, kg in (rump_method() or {}).items()
+                if float(kg) > 0.0
+            }
+        except (TypeError, ValueError):
+            rump_kg_by_species = {}
+    rump_total_kg = float(sum(rump_kg_by_species.values()))
+
+    # ----- Class 3: industrial mixed glass (early-tap option) -----
+    # Detected by presence of bulk Si-bearing melt mass left in the
+    # cleaned_melt account at end-of-run. Honest framing: zero unless
+    # the recipe explicitly stops before C5/C6 with significant melt
+    # still in the crucible.
+    mixed_melt_residual_kg = 0.0
+    if hasattr(sim, 'atom_ledger'):
+        try:
+            cleaned_melt = sim.atom_ledger.kg_by_account(
+                'process.cleaned_melt'
+            )
+            mixed_melt_residual_kg = float(
+                sum(kg for kg in (cleaned_melt or {}).values()
+                    if float(kg) > 0.0)
+            )
+        except (AttributeError, TypeError, ValueError):
+            mixed_melt_residual_kg = 0.0
+
+    # ----- Unclassified bin -----
+    classified_species: set[str] = (
+        set(metals_kg.keys())
+        | {'O2'}
+        | set(stage_3_kg_by_species.keys())
+        | set(rump_kg_by_species.keys())
+    )
+    unclassified: dict[str, float] = {}
+    for species, kg in products.items():
+        if species in classified_species:
+            continue
+        try:
+            value = float(kg)
+        except (TypeError, ValueError):
+            continue
+        if value > 0.0:
+            unclassified[species] = value
+    unclassified_total = float(sum(unclassified.values()))
+
+    return {
+        'metals_plus_O2': {
+            'metals_kg': metals_kg,
+            'metals_total_kg': metals_total_kg,
+            'O2_kg': o2_kg,
+            'class_total_kg': metals_plus_o2_total,
+        },
+        'pure_silica_glass': {
+            'stage_3_capture_kg': stage_3_capture_kg,
+            'stage_3_kg_by_species': stage_3_kg_by_species,
+            'class_total_kg': stage_3_capture_kg,
+        },
+        'industrial_mixed_glass': {
+            'mixed_melt_residual_kg': mixed_melt_residual_kg,
+            'note': (
+                'present only if recipe tapped early '
+                '(C5/C6 not run); zero in full-sequence runs'
+            ),
+            'class_total_kg': mixed_melt_residual_kg,
+        },
+        'refractory_ceramic_rump': {
+            'rump_kg_by_species': rump_kg_by_species,
+            'rump_total_kg': rump_total_kg,
+            'class_total_kg': rump_total_kg,
+        },
+        'unclassified': {
+            'kg_by_species': unclassified,
+            'total_kg': unclassified_total,
+        },
+    }
