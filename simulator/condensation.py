@@ -398,6 +398,18 @@ class KnudsenRegimeRefusal(RuntimeError):
 #     when an individual species has no setpoints override.
 CONDENSATION_TEMPS_C = {
     'Fe':  1250,
+    # SiO: ENGINEERING MIDPOINT of the documented 900-1200 °C Stage 3
+    # SiO zone (per ``data/setpoints.yaml § condensation_train.stages
+    # [3].temp_range_C`` and ``data/vapor_pressures.yaml § SiO.
+    # condensation_T_C: [900, 1200]``), NOT a literature-derived
+    # T_cond. 0.5.4.1 B1 (CW3 historical-audit closure, 2026-05-28):
+    # corpus scan (Cardiff 2007 / Matchett 2006 / Tsuchiyama 1998 /
+    # Sesko 2022 / Schaefer-Fegley 2004) confirms NO paper independently
+    # pins 1050 °C as the SiO cold-wall condensation temperature; the
+    # 900-1200 °C zone is the engineering target for SiO → amorphous
+    # SiO₂ disproportionation per the recipe playbook. Operators
+    # retune via setpoints YAML; see worker scan at
+    # ``docs-private/reviews/2026-05-28-b1-e2a-scan/codex-scan.txt``.
     'SiO': 1050,   # condenses as amorphous SiO₂ (disproportionation)
     'CrO2': 1250,  # condenses as Cr2O3 + O2 in the dedicated Cr stage
     'Mg':  580,
