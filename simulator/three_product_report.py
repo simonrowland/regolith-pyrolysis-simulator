@@ -66,7 +66,7 @@ ladder is queried via ``ExtractionMixin._RUMP_ELEMENT_SPECIES``
 which carries Si / Al / Mg / Ti routing too."""
 
 
-def classify_products(sim) -> dict[str, Any]:
+def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     """Project a PyrolysisSimulator's product surface onto the four
     north-star product classes.
 
@@ -79,6 +79,22 @@ def classify_products(sim) -> dict[str, Any]:
               stage
             - ``sim._terminal_rump_by_species()`` if available, for
               the rump composition
+        early_tap_mode: When ``True``, the classifier reports the
+            current ``process.cleaned_melt`` residual as the
+            ``industrial_mixed_glass`` product class — the operator
+            has decided to tap the melt before the C5/C6 sequence
+            (the early-tap product class 3 per CLAUDE.md § 5).
+            When ``False`` (the default), the mixed-glass bucket is
+            zeroed; mid-run readings of ``cleaned_melt`` are NOT
+            product output (the melt is sitting in the crucible
+            waiting for the next campaign).
+
+            Per evening-4commits review P2 #2 (2026-05-28): the
+            initial E6a implementation treated any non-zero
+            ``cleaned_melt`` as mixed-glass output, reproducing
+            "1000 kg" at C2A/C5 hour 4 — wrong semantic. Adding
+            this explicit operator-intent gate prevents the false
+            attribution.
 
     Returns a dict with the following structure:
         {
@@ -155,11 +171,13 @@ def classify_products(sim) -> dict[str, Any]:
 
     # ----- Class 3: industrial mixed glass (early-tap option) -----
     # Detected by presence of bulk Si-bearing melt mass left in the
-    # cleaned_melt account at end-of-run. Honest framing: zero unless
-    # the recipe explicitly stops before C5/C6 with significant melt
-    # still in the crucible.
+    # cleaned_melt account WHEN THE OPERATOR HAS DECLARED EARLY-TAP
+    # INTENT (the ``early_tap_mode`` arg). Pre-evening-review the
+    # bucket counted any cleaned_melt at any tick — reproduced 1000
+    # kg at C2A/C5 hour 4, which is the entire melt sitting in the
+    # crucible waiting for C5/C6, NOT a "mixed glass product".
     mixed_melt_residual_kg = 0.0
-    if hasattr(sim, 'atom_ledger'):
+    if early_tap_mode and hasattr(sim, 'atom_ledger'):
         try:
             cleaned_melt = sim.atom_ledger.kg_by_account(
                 'process.cleaned_melt'
@@ -204,9 +222,11 @@ def classify_products(sim) -> dict[str, Any]:
         },
         'industrial_mixed_glass': {
             'mixed_melt_residual_kg': mixed_melt_residual_kg,
+            'early_tap_mode': bool(early_tap_mode),
             'note': (
-                'present only if recipe tapped early '
-                '(C5/C6 not run); zero in full-sequence runs'
+                'present only when operator declared early-tap '
+                'via early_tap_mode=True; zero by default — '
+                'mid-run cleaned_melt is NOT a product class'
             ),
             'class_total_kg': mixed_melt_residual_kg,
         },

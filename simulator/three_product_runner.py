@@ -77,6 +77,7 @@ def run(
     hours: int,
     data_dir: Path | None = None,
     backend_name: str = "stub",
+    early_tap_mode: bool = False,
 ) -> dict[str, Any]:
     """Programmatic entry point: build the session, run for
     ``hours`` ticks (or until completion), classify the resulting
@@ -92,6 +93,10 @@ def run(
             to the project's ``data/`` next to ``simulator/``.
         backend_name: Backend to select; ``"stub"`` is the default
             for runs without AlphaMELTS/MAGEMin installed.
+        early_tap_mode: Pass-through to ``classify_products``; when
+            True the residual ``cleaned_melt`` mass surfaces as the
+            ``industrial_mixed_glass`` product class. Default False
+            zeros out the bucket (mid-run melt is NOT a product).
 
     Returns:
         The 5-bucket classification dict from ``classify_products``.
@@ -107,7 +112,7 @@ def run(
     while ticks < hours and not sim.is_complete():
         sim.step()
         ticks += 1
-    return classify_products(sim)
+    return classify_products(sim, early_tap_mode=early_tap_mode)
 
 
 def _classification_to_json(
@@ -189,6 +194,14 @@ def _build_argparser() -> argparse.ArgumentParser:
                         ))
     parser.add_argument("--backend", default="stub",
                         help="melt backend name (default: stub)")
+    parser.add_argument("--early-tap", action="store_true",
+                        help=(
+                            "operator declares early-tap intent: "
+                            "the residual cleaned_melt mass at end "
+                            "of run surfaces as the industrial "
+                            "mixed-glass product class. Default "
+                            "OFF — mid-run melt is NOT a product."
+                        ))
     return parser
 
 
@@ -200,6 +213,7 @@ def main(argv: list[str] | None = None) -> int:
         hours=args.hours,
         data_dir=args.data_dir,
         backend_name=args.backend,
+        early_tap_mode=args.early_tap,
     )
     body = _emit_report(
         classification,

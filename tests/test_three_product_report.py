@@ -186,11 +186,12 @@ def test_rump_zero_when_method_missing():
 # 5. Industrial mixed glass: early-tap detection
 # ---------------------------------------------------------------------------
 
-def test_mixed_glass_reads_cleaned_melt_residual():
-    """Industrial mixed glass = whatever's still in the
-    ``process.cleaned_melt`` account at classification time. Real
-    recipes tap before C5/C6 to leave Si-bearing melt as a
-    saleable product."""
+def test_mixed_glass_zero_by_default_even_with_cleaned_melt():
+    """Per evening-4commits review P2 #2: ``cleaned_melt`` at any
+    mid-run tick is NOT a mixed-glass product — it's the melt
+    sitting in the crucible waiting for the next campaign. The
+    classifier MUST default to zero for this bucket unless the
+    operator explicitly declares early-tap intent."""
     sim = SimpleNamespace(
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
@@ -202,10 +203,39 @@ def test_mixed_glass_reads_cleaned_melt_residual():
         ),
     )
     result = classify_products(sim)
-    # 100 + 20 = 120 kg residual melt → mixed-glass class.
+    # Default behaviour: mixed-glass bucket zeroed — operator hasn't
+    # declared early-tap intent.
+    assert (
+        result['industrial_mixed_glass']['mixed_melt_residual_kg']
+        == 0.0
+    )
+    assert (
+        result['industrial_mixed_glass']['early_tap_mode'] is False
+    )
+
+
+def test_mixed_glass_counts_cleaned_melt_only_in_early_tap_mode():
+    """With ``early_tap_mode=True``, the cleaned_melt residual IS
+    the mixed-glass product (operator has chosen to tap before
+    C5/C6). 100 + 20 = 120 kg residual melt → 120 kg mixed-glass
+    when the explicit intent flag is on."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=SimpleNamespace(
+            kg_by_account=lambda acct: (
+                {'SiO2': 100.0, 'Al2O3': 20.0}
+                if acct == 'process.cleaned_melt' else {}
+            ),
+        ),
+    )
+    result = classify_products(sim, early_tap_mode=True)
     assert (
         result['industrial_mixed_glass']['mixed_melt_residual_kg']
         == 120.0
+    )
+    assert (
+        result['industrial_mixed_glass']['early_tap_mode'] is True
     )
 
 

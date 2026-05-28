@@ -143,6 +143,47 @@ def test_cli_invalid_format_raises():
     assert exc_info.value.code != 0
 
 
+def test_run_default_early_tap_mode_zeroes_mixed_glass():
+    """The runner's default ``run()`` call (no ``early_tap_mode``)
+    must zero the mixed-glass bucket — even a mid-C2A run with
+    1000 kg in ``process.cleaned_melt`` is NOT product output
+    (evening-4commits review P2 #2)."""
+    result = run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=4,  # mid-C2A; cleaned_melt is still in the crucible
+    )
+    assert (
+        result['industrial_mixed_glass']['mixed_melt_residual_kg']
+        == 0.0
+    )
+    assert (
+        result['industrial_mixed_glass']['early_tap_mode'] is False
+    )
+
+
+def test_run_early_tap_mode_surfaces_cleaned_melt(tmp_path):
+    """With ``--early-tap``, the runner surfaces the
+    ``cleaned_melt`` residual as the mixed-glass product. End-to-end
+    CLI invocation."""
+    output = tmp_path / "report.json"
+    import json
+    rc = main([
+        "--feedstock", "lunar_mare_low_ti",
+        "--campaign", "C2A",
+        "--hours", "4",
+        "--output", str(output),
+        "--format", "json",
+        "--early-tap",
+    ])
+    assert rc == 0
+    payload = json.loads(output.read_text())
+    mixed = payload["classification"]["industrial_mixed_glass"]
+    assert mixed["early_tap_mode"] is True
+    # cleaned_melt should be non-zero at this point in a real run.
+    assert mixed["mixed_melt_residual_kg"] > 0.0
+
+
 def test_run_with_missing_data_dir_falls_back_to_default():
     """When ``data_dir`` is omitted, the runner uses the project's
     default ``data/`` directory automatically. Pin this so a future
