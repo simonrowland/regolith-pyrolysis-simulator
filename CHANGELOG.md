@@ -4,6 +4,44 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.5.3] — 2026-05-28
+
+Physics-correctness sweep over 0.5.2. Two file-disjoint chunks dispatched as
+parallel background workers; each chunk passed independent codex chunk-review
+(Phase A: 1 P1 + 1 P2 + 1 P3; Phase B: 2 P1 + 1 P2 + 2 P3) with all P1+P2
+findings fixed inline.
+
+### Changed — finite-headspace default-on (Phase A)
+
+- **`simulator/overhead.py::DEFAULT_HEADSPACE_CONFIG['enabled']`** + **`data/setpoints.yaml § overhead_headspace.enabled`** flipped to `True`/`true`. Pre-flip the simulator wrote a synthetic conductance-ratio-derived `gas.composition['O2']` whenever the recipe pO₂ setpoint was set under any atmosphere, which masked the real holdup-feedback the finite-headspace model was meant to surface. User-pinned per `Q1 DEFAULT-ON GLOBALLY` in `docs-private/goal-finite-headspace-2026-05-21.md` (private).
+- **Commanded-pO₂ floor mirror** at `simulator/overhead.py::_update_finite_headspace` + `simulator/equilibrium.py::_commanded_pO2_bar`. When atmosphere is in the `_O2_CONTROLLED_ATMOSPHERES` family (`CONTROLLED_O2` / `CONTROLLED_O2_FLOW` / `O2_BACKPRESSURE`), recipe `melt.pO2_mbar` survives the holdup overwrite. `HARD_VACUUM` and `PN2_SWEEP` are deliberately excluded — an uncontrolled run gets the real trajectory rather than a synthetic floor.
+- **Wall-sweep CLI atmosphere switch** at `simulator/runner.py::_apply_sio_wall_sweep_controls`. Operator commanding pO₂ via the wall-sweep mode now also switches `melt.atmosphere` to `CONTROLLED_O2`, restoring the SiO suppression lever ("1 mbar pO₂ glass / clean-alkali mode") that became a no-op under finite-headspace default-on with a PN2_SWEEP base atmosphere (Phase A chunk-review P2 fix).
+- **`P_total ≥ pO2` invariant** at `simulator/overhead.py`. Pre-fix the controlled-O₂ floor wrote `gas.composition['O2']` to the commanded pO₂ but left `gas.pressure_mbar` at the holdup-derived value (often 0.0 mbar), creating an impossible gas state. The floor now also raises the reported total pressure to honour the commanded pO₂ (Phase A chunk-review P1 fix).
+
+### Net behaviour shift (Phase A)
+
+- SiO yield at C2A with default stirring: **+146% evolved** (real holdup-derived vacuum-floor pO₂ vs synthetic floor) per regenerated `lunar_mare_low_ti_c2a.json` / `mars_basalt_c2a.json` fixtures.
+- C2A wall-deposit at 1050 °C cold liner: `8.28e-06 → 2.00e-05 kg` (+142%) per `test_sio_step_wall_deposit.py:89` numeric pin update. Fouling-threshold structure (deposit at 1050 °C, none at 1400/1500 °C) unchanged.
+- Mass-balance closure stays ≤5×10⁻¹² % per tick (max observed 6.59×10⁻¹³ %).
+
+### Changed — 2-axis turbulent stirring (Phase B, user-requested)
+
+- **`simulator/state.py::StirState`** dataclass replaces the scalar `MeltState.stir_factor` field. `StirState(axial=6.0, radial=1.0)` decomposes induction stirring into two physically distinct axes:
+  - **Axial** (vertical EM stirring) drives melt-side surface renewal → linear multiplier on the H-K-L evaporation rate at `engines/builtin/evaporation_flux.py`. Default `6.0` preserves the 0.5.2 C2A operator-tuned stirring intensity.
+  - **Radial** (in-plane EM vortex) drives gas-side bulk-to-wall mass-transport → stir-Sherwood enhancement at `simulator/condensation.py::_stirring_enhanced_sherwood`. Default `1.0` is the laminar pipe asymptote (Sh = 3.66, no stirring).
+  - Office-hours framing rationale: this maps directly to industrial multi-coil EM stirrer design where each coil winds gets independent phase control; pre-0.5.3 the single scalar `stir_factor` drove BOTH consumers, leaving operators with no way to tune one without the other.
+- **`clamp_stir_state(value)`** helper accepts dict / scalar / `StirState` / `bool` / `None` / non-finite inputs, routes each axis through `clamp_stir_factor` (the per-axis operator-boundary clamp to `[0.0, MAX_STIR_FACTOR=10.0]`). Mapping inputs with missing axis keys default the missing axis to `1.0` (laminar baseline) — partial dicts signal "operator only meant to touch one axis".
+- **`MeltState.stir_factor`** preserved as a property+setter aliasing `stir_state.axial` (backward-compat for pre-0.5.3 attribute-read/write callers). Construction-time `MeltState(stir_factor=X)` is NOT supported in 0.5.3+ (TypeError); migrate to `StirState(axial=X)` or post-construction `melt.stir_factor = X`.
+- **Operator boundary writers** (`simulator/session.py`, `simulator/campaigns.py`) accept the legacy scalar `stir_factor` (→ axial only) AND a new `stir_state` dict / dataclass (→ both axes via `clamp_stir_state`). Campaign YAML override precedence is per-axis: when both `stir_factor` and `stir_state` are supplied, `stir_state.axial` wins only when explicitly named in the dict; otherwise the `stir_factor` value carries through (Phase B chunk-review P2 fix).
+- **`CondensationModel.radial_stir_factor`** initialised to `None` (not-configured sentinel). Legacy direct-construction callers (`configure_operating_conditions(stir_factor=X)` without `radial_stir_factor=`) get the pre-0.5.3 Sh-enhancement behaviour via the helper's `radial_stir_factor is None → fall back to stir_factor` branch. The operating-history snapshot distinguishes `radial_stir_factor: None` (never configured) from `radial_stir_factor: 0.0` (explicit halt signal) (Phase B chunk-review P1 fix).
+- **Per-axis `MAX_STIR_FACTOR`**. The 10× "melt-flying-out-of-the-pot" ceiling now applies to each axis independently — industrial multi-coil EM stirrers carry independent budgets per axis, so the ceiling is set by the worst single axis, not the L2 sum.
+
+### Carried forward — deferred follow-ons (P3s, tracked in `docs-private/`)
+
+- Phase A branch-test coverage gap for the floor split (`equilibrium.py` controlled vs HARD_VACUUM/PN2_SWEEP).
+- Phase B P3 #1: mapping-axial defensive clamp in `engines/builtin/evaporation_flux.py`.
+- Phase B P3 #2: extra `stir_state` dict-key audit (typo handling).
+
 ## [0.5.2] — 2026-05-27
 
 Physics-correctness sweep over 0.5.1. Phase A landed three controller-direct
