@@ -185,6 +185,97 @@ def test_session_adjust_clamps_absurd_stir_factor_to_physical_ceiling():
     assert sim.campaign_mgr.overrides["C2A"]["stir_factor"] == pytest.approx(0.0)
 
 
+def test_session_adjust_campaign_override_po2_switches_atmosphere_to_controlled_o2():
+    """0.5.4 W5 (post-push P2, codex review + codex challenge
+    convergent 2026-05-28): the campaign-override write path for
+    ``field="pO2_mbar"`` must mirror the direct-adjust
+    ``"pO2_mbar"`` path and switch ``melt.atmosphere`` to
+    ``CONTROLLED_O2`` when the operator commands a positive pO2 on
+    the active campaign. Pre-W5 the override wrote the setpoint but
+    left the atmosphere in PN2_SWEEP, so the commanded-pO2 floor
+    didn't fire under finite-headspace ON (only triggers in
+    ``_O2_CONTROLLED_ATMOSPHERES``). This pins the convergent
+    fix-pattern shared with Phase A wall-sweep + Phase C direct
+    adjust."""
+    from simulator.state import Atmosphere
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    # Pre-condition: PN2_SWEEP is the default atmosphere on C2A.
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.0
+
+    # Positive pO2 via campaign_override → switch atmosphere
+    session.adjust(
+        "campaign_override", 1.0,
+        campaign="C2A", field="pO2_mbar",
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.atmosphere == Atmosphere.CONTROLLED_O2, (
+        "campaign_override pO2_mbar must switch atmosphere to "
+        "CONTROLLED_O2 so the commanded-pO2 floor + 1/sqrt(pO2) "
+        "Ellingham SiO suppression go live (post-push P2)"
+    )
+    # Overrides dict also carries the value (re-entry consistency).
+    assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(1.0)
+
+
+def test_session_adjust_campaign_override_po2_zero_leaves_atmosphere_alone():
+    """W5 complement: pO2=0 is the operator CLEARING the setpoint, not
+    requesting controlled-O2. Atmosphere must stay where it is — the
+    direct-adjust path documents this contract; campaign_override
+    must mirror it. A reset-to-zero is not a covert mode change."""
+    from simulator.state import Atmosphere
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    # Set a non-default atmosphere first (any non-CONTROLLED_O2 mode)
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 1.0
+
+    # Clearing the setpoint via override
+    session.adjust(
+        "campaign_override", 0.0,
+        campaign="C2A", field="pO2_mbar",
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(0.0)
+    # Atmosphere NOT switched — operator only cleared the setpoint.
+    assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+
+
+def test_session_adjust_campaign_override_po2_inactive_campaign_skips_live_update():
+    """W5 invariant: the atmosphere-switch fix is gated on the
+    override targeting the ACTIVE campaign (``sim.melt.campaign.name
+    == campaign_name``). An override targeting a different campaign
+    must NOT touch ``melt.atmosphere`` or ``melt.pO2_mbar`` — only
+    write to the overrides dict for the future campaign transition.
+    Mirrors the existing live-update gate logic; documented so a
+    future refactor doesn't accidentally apply a future-campaign
+    setpoint live."""
+    from simulator.state import Atmosphere
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.0
+    before_atm = sim.melt.atmosphere
+    before_pO2 = sim.melt.pO2_mbar
+
+    # Override targeting C2B (NOT the active C2A)
+    session.adjust(
+        "campaign_override", 1.0,
+        campaign="C2B", field="pO2_mbar",
+    )
+
+    # Active-campaign melt state untouched.
+    assert sim.melt.atmosphere == before_atm
+    assert sim.melt.pO2_mbar == pytest.approx(before_pO2)
+    # Future-campaign overrides dict still gets the value.
+    assert sim.campaign_mgr.overrides["C2B"]["pO2_mbar"] == pytest.approx(1.0)
+
+
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():
     """0.5.3 Phase B: ``session.adjust("stir_state", {axial, radial})``
     is the canonical 2-axis writer. Drives both axes through

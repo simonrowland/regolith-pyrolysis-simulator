@@ -188,6 +188,27 @@ class EquilibriumResult:
     # Backend diagnostics
     warnings: List[str] = field(default_factory=list)
 
+    # Optional liquidus temperature (°C) for this composition + pressure.
+    # Populated by backends that compute a liquidus alongside the per-T
+    # equilibration (e.g., AlphaMELTS subprocess parses one from its
+    # findLiq output; ThermoEngine python_api gets one from
+    # PetThermoTools.findLiq). Read by the AlphaMELTS provider's diagnostic
+    # projection (``engines/alphamelts/parser.py``) and by C6 termination /
+    # freeze-margin diagnostics.
+    #
+    # 0.5.4 W6 (M3 historical-audit closure, 2026-05-28): pre-W6, the
+    # AlphaMELTS subprocess path wrote the value ONLY as a warning string
+    # (``eq.warnings.append('AlphaMELTS liquidus_C=...')``) which downstream
+    # consumers had to regex-parse out. The structured field is the
+    # canonical source going forward; the warning is still emitted for
+    # legacy log consumers but the field is what kernel + provider read.
+    # Field name mirrors ``LiquidusSolidusResult.liquidus_T_C`` in
+    # ``simulator/melt_backend/liquidus.py`` — that dataclass remains the
+    # canonical surface for the *dedicated* liquidus-finder workflow; this
+    # field carries the per-equilibration liquidus only when a backend
+    # opportunistically computes one alongside the equilibration request.
+    liquidus_T_C: Optional[float] = None
+
     # Optional atom-conserving redistribution emitted by thermodynamic backends.
     # Backends that report phase species after equilibrium must provide this so
     # AtomLedger remains authoritative.

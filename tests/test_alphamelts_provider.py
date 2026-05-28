@@ -510,6 +510,88 @@ def test_provider_rejects_unsupported_intent_with_status_unsupported():
 
 
 # ---------------------------------------------------------------------------
+# 0.5.4 W6 (M3 historical-audit closure): structured liquidus_T_C field
+# preferred over the legacy warning-string regex
+# ---------------------------------------------------------------------------
+
+def test_parser_prefers_structured_liquidus_field_over_warning_regex():
+    """Pre-W6 the diagnostic projection extracted liquidus from the
+    ``AlphaMELTS liquidus_C=...`` warning string. W6 adds the
+    structured ``EquilibriumResult.liquidus_T_C`` field and flips the
+    precedence: structured first, warning regex as legacy fallback.
+    Pinned with a synthetic ``EquilibriumResult`` where the field and
+    the warning disagree — the structured value MUST win."""
+
+    legacy = SimpleNamespace(
+        phases_present=['liquid', 'olivine'],
+        phase_masses_kg={'liquid': 0.8, 'olivine': 0.2},
+        liquid_fraction=0.8,
+        liquid_composition_wt_pct=dict(_basalt_wt_pct()),
+        activity_coefficients={'SiO2': 0.95, 'FeO': 1.1},
+        fO2_log=-8.25,
+        status='ok',
+        warnings=['AlphaMELTS liquidus_C=1305.000'],   # legacy fallback
+        liquidus_T_C=1290.0,                            # new structured field
+        vapor_pressures_Pa={},
+        ledger_transition=None,
+    )
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+    # Structured field wins; warning string ignored.
+    assert diagnostics.liquidus_T_C == pytest.approx(1290.0)
+
+
+def test_parser_falls_back_to_warning_regex_when_field_missing():
+    """Backward-compat invariant: existing backends that emit only the
+    warning string (no structured ``liquidus_T_C`` attr) still surface
+    a usable liquidus through the legacy regex path. This is the
+    pre-W6 behaviour, preserved as a fallback."""
+
+    legacy = SimpleNamespace(
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct=dict(_basalt_wt_pct()),
+        activity_coefficients={},
+        fO2_log=-9.0,
+        status='ok',
+        warnings=['AlphaMELTS liquidus_C=1287.500'],
+        # NO liquidus_T_C attribute — legacy backend shape.
+        vapor_pressures_Pa={},
+        ledger_transition=None,
+    )
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+    # Warning regex still extracts the value when field is absent.
+    assert diagnostics.liquidus_T_C == pytest.approx(1287.5)
+
+
+def test_alphamelts_writer_populates_structured_field_and_warning():
+    """Round-trip: the AlphaMELTS subprocess writer (W6) MUST populate
+    BOTH the structured ``EquilibriumResult.liquidus_T_C`` field AND
+    keep emitting the legacy ``AlphaMELTS liquidus_C=...`` warning
+    string so legacy log consumers reading raw warnings remain
+    unaffected. This is the writer-side half of the W6 contract;
+    the reader-side preference is pinned above."""
+
+    from simulator.melt_backend.base import EquilibriumResult
+
+    # Field default is None (no opportunistic liquidus computed).
+    eq_no_liquidus = EquilibriumResult()
+    assert eq_no_liquidus.liquidus_T_C is None
+
+    # Field accepts float; the dataclass shape is unchanged otherwise.
+    eq_with_liquidus = EquilibriumResult(liquidus_T_C=1305.5)
+    assert eq_with_liquidus.liquidus_T_C == 1305.5
+
+
+# ---------------------------------------------------------------------------
 # 4. transition=None always (checklist 5)
 # ---------------------------------------------------------------------------
 

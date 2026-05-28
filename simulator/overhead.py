@@ -50,6 +50,75 @@ from simulator.state import GAS_CONSTANT, MOLAR_MASS
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 
+# 0.5.4 W7 (CW5 historical-audit closure, 2026-05-28): default
+# mean molar mass for the pipe-conductance ideal-gas density when
+# the live species mixture is unavailable (e.g., zero-flux warmup
+# tick or a legacy test calling ``_pipe_conductance`` directly).
+# 0.040 kg/mol matches the historical hardcoded value ("mix of SiO,
+# Fe, Na vapors ~40 g/mol"), preserved as the fallback so the
+# fail-closed path keeps the pre-W7 behaviour bit-identical. Real
+# recipe runs span M_avg ≈ 0.023-0.046 kg/mol (alkali sweep early
+# → SiO mid → O2 late) — that's a factor-of-2 in conductance, so
+# the live mixture is the canonical source going forward.
+DEFAULT_PIPE_M_AVG_KG_MOL = 0.040
+
+
+def _mean_molar_mass_kg_mol(
+    species_kg: Optional[Mapping[str, float]],
+) -> float:
+    """Mole-weighted mean molar mass of a species mixture, kg/mol.
+
+    Computed as ``Σ(kg_i) / Σ(kg_i / M_i)`` — the molar-fraction-
+    weighted average molar mass, equivalent to ``1 / Σ(w_i / M_i)``
+    where ``w_i`` is the mass fraction of species i. The ideal-gas
+    density ``ρ = p M / (R T)`` uses this M_avg directly (M is the
+    mole-weighted average molar mass for a gas mixture).
+
+    Used by ``OverheadGasModel._pipe_conductance`` to derive the live
+    pipe-conductance density from the actual gas composition (or
+    incoming evaporation flux) instead of the legacy hardcoded
+    ~0.040 kg/mol guess.
+
+    Args:
+        species_kg: mapping of species symbol → mass (kg). Per-tick
+            evap flux ``species_kg_hr`` or per-tick gas inventory
+            both shape correctly here — only the ratios matter, the
+            time unit cancels. ``None`` or empty mapping → fall
+            back to ``DEFAULT_PIPE_M_AVG_KG_MOL`` (preserves the
+            pre-W7 behaviour for zero-flux warmup ticks and any
+            legacy caller that didn't pass species).
+
+    Returns:
+        Mean molar mass in kg/mol, in the range ~0.018 (pure H2O)
+        to ~0.197 (pure Au), or the documented fallback when the
+        mixture is empty / unresolvable. Always finite + positive
+        (no NaN / inf escape; species without an entry in
+        ``MOLAR_MASS`` are skipped rather than contaminating the
+        denominator).
+    """
+    if not species_kg:
+        return DEFAULT_PIPE_M_AVG_KG_MOL
+    total_kg = 0.0
+    total_mol = 0.0
+    for species, kg in species_kg.items():
+        try:
+            mass = float(kg)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(mass) or mass <= 0.0:
+            continue
+        molar_mass_g_mol = MOLAR_MASS.get(species)
+        if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+            # Unknown species — skip rather than poison the mean.
+            # The fallback covers the "all unknown" degenerate case
+            # via total_mol == 0 below.
+            continue
+        total_kg += mass
+        total_mol += mass / (molar_mass_g_mol / 1000.0)
+    if total_mol <= 0.0 or total_kg <= 0.0:
+        return DEFAULT_PIPE_M_AVG_KG_MOL
+    return total_kg / total_mol
+
 
 class OverheadGasModel:
     """
@@ -182,7 +251,18 @@ class OverheadGasModel:
         # historically used melt/gas temperature. The liner trajectory controls
         # wall deposition and Kn diagnostics without changing evaporation totals.
         conductance_temperature_C = float(melt.temperature_C)
-        conductance = self._pipe_conductance(p_mean_Pa, conductance_temperature_C)
+        # 0.5.4 W7 (CW5): pass the live evap-flux mixture so the
+        # ideal-gas density in ``_pipe_conductance`` uses the actual
+        # mole-weighted M_avg (~0.023-0.046 kg/mol across a recipe)
+        # rather than the legacy 0.040 hardcoded magic number.
+        # ``evap_flux.species_kg_hr`` is the steady-state pipe
+        # composition; the time unit cancels in the mole-fraction
+        # weighting.
+        conductance = self._pipe_conductance(
+            p_mean_Pa,
+            conductance_temperature_C,
+            species_kg_for_M_avg=evap_flux.species_kg_hr,
+        )
         pipe_conductance_kg_hr = conductance * 3600.0
         if pipe_conductance_kg_hr > 0.0:
             pipe_capacity_used_pct = (
@@ -629,8 +709,13 @@ class OverheadGasModel:
             return max(0.0, float(melt.pO2_mbar) / 1000.0)
         return 0.0
 
-    def _pipe_conductance(self, p_mean_Pa: float,
-                           T_C: float) -> float:
+    def _pipe_conductance(
+        self,
+        p_mean_Pa: float,
+        T_C: float,
+        *,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+    ) -> float:
         """
         Poiseuille conductance of the collection pipe.
 
@@ -642,9 +727,25 @@ class OverheadGasModel:
         Args:
             p_mean_Pa: Mean pressure in the pipe (Pa)
             T_C:       Pipe temperature (°C)
+            species_kg_for_M_avg: optional mapping of species → mass
+                for deriving the live mole-weighted M_avg. Pass the
+                evap-flux species mass-rate to track real-recipe
+                composition. ``None`` / empty falls back to
+                ``DEFAULT_PIPE_M_AVG_KG_MOL`` (~0.040 kg/mol) which
+                matches the historical hardcoded value.
 
         Returns:
             Conductance in kg/s (mass flow per unit pressure drop)
+
+        0.5.4 W7 (CW5 historical-audit closure): the mass-conductance
+        density used to derive a hardcoded ``M_avg = 0.040 kg/mol``
+        "mix of SiO, Fe, Na vapors ~40 g/mol" magic number. Real
+        recipes span ~0.023 (alkali sweep, Na ~23 g/mol) to ~0.046
+        (Fe vapor, ~56 g/mol mixed with O2 ~32) — a factor-of-2 in
+        conductance that pre-W7 was hidden behind the placeholder.
+        The mole-weighted average is computed from the passed
+        species mixture; legacy callers without the kwarg get the
+        documented fallback.
         """
         d = self.pipe_diameter_m
         L = self.pipe_length_m
@@ -659,7 +760,7 @@ class OverheadGasModel:
 
         # Convert to mass conductance (kg/s)
         # Using ideal gas: ρ = p × M / (R × T)
-        M_avg = 0.040  # kg/mol (mix of SiO, Fe, Na vapors ~40 g/mol)
+        M_avg = _mean_molar_mass_kg_mol(species_kg_for_M_avg)
         rho = p_mean_Pa * M_avg / (8.314 * T_K)
 
         return C_vol * rho

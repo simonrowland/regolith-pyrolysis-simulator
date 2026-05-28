@@ -1163,6 +1163,14 @@ class AlphaMELTSBackend(MeltBackend):
         )
         liquidus_C = self._parse_liquidus_C(output)
         if liquidus_C is not None:
+            # 0.5.4 W6 (M3 historical-audit closure): write the value to
+            # the structured ``EquilibriumResult.liquidus_T_C`` field AND
+            # keep emitting the warning string for legacy log consumers.
+            # The structured field is the canonical source going forward
+            # (preferred by ``engines/alphamelts/parser.py``'s diagnostic
+            # projection); the warning preserves the audit trail for
+            # operators reading the raw warnings list.
+            eq.liquidus_T_C = float(liquidus_C)
             eq.warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
         lines = output.splitlines()
 

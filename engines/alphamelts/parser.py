@@ -75,13 +75,14 @@ def project_equilibrium_to_diagnostics(
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
 
-    liquidus_T_C = _extract_liquidus_from_warnings(warnings)
+    # 0.5.4 W6 (M3 historical-audit closure, 2026-05-28): prefer the
+    # structured ``EquilibriumResult.liquidus_T_C`` field; fall back to
+    # the legacy ``AlphaMELTS liquidus_C=`` warning-string regex for
+    # consumers / backends that haven't migrated yet. Pre-W6 the
+    # ordering was reversed because no backend exposed the field.
+    liquidus_T_C = _safe_attr_float(equilibrium_result, 'liquidus_T_C')
     if liquidus_T_C is None:
-        # The PetThermoTools / subprocess paths may surface liquidus
-        # via different attributes in the future; the today-hook adapter
-        # writes it as a warning string, so the warning scan is the
-        # canonical source until the adapter grows a structured field.
-        liquidus_T_C = _safe_attr_float(equilibrium_result, 'liquidus_T_C')
+        liquidus_T_C = _extract_liquidus_from_warnings(warnings)
 
     phases_present = tuple(
         str(p) for p in (getattr(equilibrium_result, 'phases_present', ()) or ())

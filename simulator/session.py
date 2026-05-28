@@ -274,7 +274,28 @@ class SimSession:
             else:
                 target[field_name] = float(value)
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
-                sim.melt.pO2_mbar = float(value)
+                # 0.5.4 W5 (post-push P2 convergent finding, codex
+                # review + codex challenge 2026-05-28): mirror the
+                # direct-adjust ``"pO2_mbar"`` atmosphere-switch fix
+                # on this campaign-override write path. Pre-W5 a
+                # ``session.adjust("campaign_override",
+                # campaign="C2A", field="pO2_mbar", value=1.0)``
+                # call wrote the melt setpoint but left
+                # ``melt.atmosphere`` in (e.g.) ``PN2_SWEEP``, so the
+                # commanded-pO2 floor never fired under
+                # finite-headspace ON (only triggers in
+                # ``_O2_CONTROLLED_ATMOSPHERES``). Now: when the
+                # operator commands a positive pO2 via the campaign-
+                # override write path, also switch atmosphere to
+                # CONTROLLED_O2 so the 1/sqrt(pO2) Ellingham SiO
+                # suppression becomes live. ``value == 0`` leaves
+                # atmosphere alone (clearing the setpoint, NOT
+                # requesting controlled-O2).
+                new_pO2 = float(value)
+                sim.melt.pO2_mbar = new_pO2
+                if new_pO2 > 0.0:
+                    from simulator.state import Atmosphere
+                    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
 
