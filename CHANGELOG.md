@@ -7,9 +7,10 @@ so minor versions may carry significant changes.
 ## [Unreleased]
 
 Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
-release boundary; commits land on `main` between pushes. 13 commits in
+release boundary; commits land on `main` between pushes. 18 commits in
 the range, all reviewed by codex / `gstack /review` per chunk-review
-protocol + the midflight cumulative review (HOLD-MAJOR → fixed inline).
+protocol + midflight cumulative review (HOLD-MAJOR → fixed inline) +
+post-batch morning review (HOLD, V2O5 P1 → fixed inline).
 
 ### Added — defensive guards + structured seams
 
@@ -83,6 +84,41 @@ protocol + the midflight cumulative review (HOLD-MAJOR → fixed inline).
   W8 + E3 HourSnapshot diagnostic surfaces
 - **B4 / CJ2015** — already-tracked corpus fixture confirmed has
   `intents_exercised` field (closure)
+
+### Added — north-star product classifier (E6)
+
+- **E6a** — `simulator/three_product_report.py::classify_products(sim)`
+  projects `PyrolysisSimulator.product_ledger()` output onto the four
+  north-star product classes documented in `CLAUDE.md § 5`: metals + O₂,
+  pure silica glass (Stage 3 capture), industrial mixed glass
+  (cleaned_melt residual), refractory ceramic rump (by physics). 5-bucket
+  output dict with `unclassified` future-proofing bin.
+- **E6b** — `simulator/three_product_report_markdown.py::format_three_product_markdown`
+  human-readable markdown report wrapping the E6a classifier. 1-line
+  totals snapshot + per-class expansion + per-species kg breakdown.
+  Operator-noise reduction: unclassified section appears only when
+  non-empty; sub-noise values render as `—`; values <1 kg use scientific
+  notation. 13+13 tests across the E6 series.
+
+### Fixed — morning review findings (post-batch HOLD)
+
+- **Morning P1 — `data/setpoints.yaml`**: V2O5 had been included in the
+  published MRE voltage ladder via B5, but V is absent from
+  `simulator/state.py::OXIDE_SPECIES` / `OXIDE_TO_METAL` / `MOLAR_MASS`
+  + `simulator/electrolysis.py` energy tables. `_step_mre` was silently
+  no-op'ing on V2O5 — operator-visible "running" lie with zero output.
+  V2O5 removed; YAML carries an explicit comment explaining the
+  prerequisite work for re-adding.
+- **Morning P2 — `tests/test_mre_voltage_sequence_yaml.py`**: NEW
+  YAML-vs-tables support matrix test (`test_yaml_ladder_species_all_
+  supported_by_simulator_tables`) guards future YAML edits — adding a
+  species to the YAML now requires landing the matching simulator
+  tables, fail-loud at test time before the recipe ships a silent no-op.
+- **Morning P2 — `tests/test_condensation_temperature_overrides.py`**:
+  NEW end-to-end propagation test refutes the reviewer's concern that
+  B1-tunable's YAML override didn't flow through to
+  `_species_condensation_temperature_C`; documents the canonical
+  read path through the mutated `CONDENSATION_TEMPS_C` module dict.
 
 ## [0.5.4] — 2026-05-28
 
