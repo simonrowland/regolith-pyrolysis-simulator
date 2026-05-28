@@ -212,7 +212,23 @@ class SimSession:
             # "set the stirring state to this", not "merge".
             sim.melt.stir_state = clamp_stir_state(value)
         elif param == "pO2_mbar":
-            sim.melt.pO2_mbar = float(value)
+            # 0.5.3 Phase C milestone review P2 (codex 2026-05-28):
+            # commanding a positive pO2 under PN2_SWEEP or HARD_VACUUM
+            # is a no-op for SiO suppression because the commanded-pO2
+            # floor in equilibrium.py / overhead.py only fires in the
+            # _O2_CONTROLLED_ATMOSPHERES family. Mirroring the wall-sweep
+            # CLI's Phase A P2 fix: when the operator commands a
+            # positive pO2 via session.adjust("pO2_mbar", x>0), also
+            # switch melt.atmosphere to CONTROLLED_O2 so the
+            # 1/sqrt(pO2) Ellingham SiO suppression becomes live. A
+            # value of 0 leaves the atmosphere alone (operator clearing
+            # the setpoint, NOT requesting controlled-O2).
+            new_pO2 = float(value)
+            sim.melt.pO2_mbar = new_pO2
+            if new_pO2 > 0.0:
+                # Only import locally to avoid a top-level cycle.
+                from simulator.state import Atmosphere
+                sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         elif param == "c4_max_temp":
             sim.c4_max_temp_C = float(value)
             sim.campaign_mgr.c4_max_temp_C = float(value)

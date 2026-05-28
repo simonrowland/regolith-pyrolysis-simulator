@@ -36,11 +36,21 @@ findings fixed inline.
 - **`CondensationModel.radial_stir_factor`** initialised to `None` (not-configured sentinel). Legacy direct-construction callers (`configure_operating_conditions(stir_factor=X)` without `radial_stir_factor=`) get the pre-0.5.3 Sh-enhancement behaviour via the helper's `radial_stir_factor is None → fall back to stir_factor` branch. The operating-history snapshot distinguishes `radial_stir_factor: None` (never configured) from `radial_stir_factor: 0.0` (explicit halt signal) (Phase B chunk-review P1 fix).
 - **Per-axis `MAX_STIR_FACTOR`**. The 10× "melt-flying-out-of-the-pot" ceiling now applies to each axis independently — industrial multi-coil EM stirrers carry independent budgets per axis, so the ceiling is set by the worst single axis, not the L2 sum.
 
+### Known limitation — Stage 4 SiO carryover exceeds Stage 3 product in C2A baseline
+
+Under default C2A conditions with `stir_state = StirState(axial=6.0, radial=1.0)`, the Phase A finite-headspace flip surfaces +146% more SiO into the gas phase than 0.5.2 did. Most of that extra SiO still carries over downstream past the designated Stage 3 SiO zone into Stage 4 (alkali/Mg cyclone) at C2A — `tests/fixtures/sio_yield/lunar_mare_low_ti_c2a.json` shows `stage_4_alkali_mg_carryover ≈ 5.07e-4 > stage_3_sio_zone_product ≈ 3.00e-4 kg`. Mars fixture similar. This is a **routing trade-off**, not a physics regression: Phase B's 2-axis split lets the operator drive Stage 3 capture up by raising `stir_state.radial` (the gas-side Sherwood enhancement directly amplifies cold-wall mass-transport), or by tuning Stage 3 temperatures down to widen the cold-wall ΔP. The F1 stage-routing-purity ledger still reports the per-stage breakdown honestly; mass balance closure stays ≤5×10⁻¹² %. Default retune to force Stage 3 dominance was rejected per the project "no fudging" mandate — the +146% SiO yield is the physics-correct answer, and the routing limitation belongs in the recipe surface, not in the simulator defaults. Phase C milestone codex review (2026-05-28) P2.
+
+### Fixed — milestone review (Phase C)
+
+- **`simulator/runner.py::_build_per_hour_summary`** (P1): per-hour summary used to mix two gas-state sources — `P_total_bar` from the holdup-derived snapshot, `pO2_bar` from the live commanded `melt.pO2_mbar` setpoint. Under finite-headspace + HARD_VACUUM/PN2_SWEEP, a commanded setpoint could exist without the floor firing (atmosphere excluded), producing impossible `P_total < pO2` lines in the audit trail. Both fields now read from the same overhead-gas snapshot composition.
+- **`simulator/session.py::SimSession.adjust("pO2_mbar", x)`** (P2): operator commanding positive pO₂ via `session.adjust("pO2_mbar")` now also switches `melt.atmosphere` to `CONTROLLED_O2` so the 1/√pO₂ Ellingham SiO suppression becomes live (mirrors the wall-sweep CLI Phase A P2 fix for the generic operator-API path). `pO2_mbar=0` leaves atmosphere alone (operator clearing the setpoint, NOT requesting controlled-O₂).
+
 ### Carried forward — deferred follow-ons (P3s, tracked in `docs-private/`)
 
 - Phase A branch-test coverage gap for the floor split (`equilibrium.py` controlled vs HARD_VACUUM/PN2_SWEEP).
 - Phase B P3 #1: mapping-axial defensive clamp in `engines/builtin/evaporation_flux.py`.
 - Phase B P3 #2: extra `stir_state` dict-key audit (typo handling).
+- Phase C P3: `MeltState(stir_factor=X)` constructor-shape compat broken (intentional API break, documented above).
 
 ## [0.5.2] — 2026-05-27
 

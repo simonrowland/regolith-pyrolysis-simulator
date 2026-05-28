@@ -621,8 +621,23 @@ def build_per_hour_summary(
     * ``condensation_train_kg``: dict of cumulative condensation totals
     """
 
+    # 0.5.3 Phase C milestone review P1 (codex 2026-05-28): the per-hour
+    # summary used to mix two different gas-state sources — `P_total_bar`
+    # came from the snapshot overhead (holdup-derived under finite-
+    # headspace) while `pO2_bar` came from the live commanded `melt.
+    # pO2_mbar` setpoint. Under finite-headspace + HARD_VACUUM /
+    # PN2_SWEEP, the commanded setpoint can exist (operator's intent)
+    # but the floor doesn't fire (atmosphere excluded), so the live
+    # `melt.pO2_mbar` painted a non-zero pO2 onto a vacuum-floor
+    # `P_total_bar` — visible in `lunar_mare_low_ti_C0_24h.json` hour 19
+    # as `P_total_bar=6.14e-9, pO2_bar=0.009`. Honest fix: read BOTH
+    # from the same overhead-gas snapshot composition; `melt.pO2_mbar`
+    # is the operator's *intent* and belongs in a different surface
+    # if exposed at all.
     p_total_bar = float(snapshot.overhead.pressure_mbar) * _MBAR_TO_BAR
-    pO2_bar = float(sim.melt.pO2_mbar) * _MBAR_TO_BAR
+    pO2_bar = (
+        float(snapshot.overhead.composition.get('O2', 0.0)) * _MBAR_TO_BAR
+    )
 
     products = sim.product_ledger()
     metal_yields = {
