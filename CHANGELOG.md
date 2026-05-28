@@ -4,6 +4,51 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.5.4] — 2026-05-28
+
+D5/D6 cleanup wave: defensive hardening + historical-audit closures + post-push
+P2 fix. Eight chunks (W1–W8) bundled into four commits (Wave 1 + Wave 2 + Wave 3
++ milestone-review fixes). No physics-shifting feature work; no fixture regen
+required. Mass-balance closure ≤5×10⁻¹² % invariant unaffected.
+
+Three reviewers (Wave 1 chunk-review codex + R1 milestone codex /review + R2
+milestone codex /challenge) converged clean post-fix: 0 P0/P1 remaining, all
+P2s fixed inline, deferred P3s tracked in `docs-private/`.
+
+### Changed — atmosphere switch on campaign-override pO2 (post-push P2 + milestone P1)
+
+- **`simulator/session.py::SimSession.adjust("campaign_override", …, field="pO2_mbar")`** (W5, post-push P2). Mirror of the Phase C P2 direct-adjust fix on the campaign-override write path: when the operator commands a positive pO₂ via this path on the active campaign, also switch `melt.atmosphere` to `CONTROLLED_O2` so the 1/√pO₂ Ellingham SiO suppression goes live. `pO2_mbar = 0` leaves atmosphere alone (clearing the setpoint, NOT requesting controlled-O₂). Inactive-campaign overrides write to the dict only — no live melt touch.
+- **`simulator/campaigns.py::configure_campaign()`** (milestone-review P1, codex /challenge unique finding). Future-campaign `campaign_override pO2_mbar` was being applied at campaign-transition time without the atmosphere switch — the same class of bug as the active-path fix above, on a different code path. Same fix pattern applied: when the stored override pO2 is positive, switch atmosphere to `CONTROLLED_O2` after the bare pO2 write. This closes the last remaining `melt.pO2_mbar` writer that could leave atmosphere stale in a non-O2-controlled mode.
+
+### Added — `EquilibriumResult.liquidus_T_C` structured field (W6, M3 historical-audit closure)
+
+- **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** — new `Optional[float]` field. Populated by backends that compute a liquidus alongside the per-T equilibration; `LiquidusSolidusResult` (in `simulator/melt_backend/liquidus.py`) remains the canonical surface for the dedicated liquidus-finder workflow.
+- **`simulator/melt_backend/alphamelts.py`** — AlphaMELTS subprocess parser now writes the value to BOTH the structured field AND the legacy `AlphaMELTS liquidus_C=...` warning string. Backward-compat: any external log consumer that scrapes raw warnings remains unaffected.
+- **`engines/alphamelts/parser.py::project_equilibrium_to_diagnostics`** — flipped precedence to prefer the structured `liquidus_T_C` field, falling back to the legacy warning regex. Pre-W6 the parser had a comment anticipating exactly this migration ("today-hook adapter writes it as a warning string ... until the adapter grows a structured field").
+
+### Changed — live mole-weighted M_avg for pipe conductance (W7, CW5 historical-audit closure)
+
+- **`simulator/overhead.py::_mean_molar_mass_kg_mol(species_kg)`** — new module-private helper. Mole-weighted mean molar mass `Σ kg_i / Σ (kg_i / M_i)` from a species→kg mapping (or fallback to `DEFAULT_PIPE_M_AVG_KG_MOL = 0.040` when input is empty / None / all-unknown). Defensive against NaN, non-coercible, and zero / negative kg entries.
+- **`simulator/overhead.py::OverheadGasModel._pipe_conductance`** gains an optional `species_kg_for_M_avg` kwarg. `estimate_transport_state` threads `evap_flux.species_kg_hr` through so the ideal-gas density uses the live mole-weighted average instead of the legacy hardcoded `M_avg = 0.040` "mix of SiO, Fe, Na vapors ~40 g/mol" placeholder. Real recipes span M_avg ≈ 0.023 (alkali sweep, Na-dominant) to ~0.046 (Fe vapor mid) — a factor-of-2 swing the placeholder was hiding. Backward-compat: callers without the kwarg get the documented fallback bit-for-bit.
+
+### Added — metal-projection drift audit (W8, M2 historical-audit closure)
+
+- **`simulator/extraction.py::ExtractionMixin._audit_metal_projection_drift()`** — per-species drift between `process.metal_phase` (AtomLedger account) and the sum across `train.stages[*].collected_kg` (UI projection). Iterates the UNION of species across both surfaces (milestone P2 fix), so projection-only stale states surface with negative drift instead of being silently invisible.
+- **`HourSnapshot.metal_projection_drift_kg`** — new `Dict[str, float]` field carrying the audit dict. Diagnostic only; the global `mass_balance_error_pct ≤ 5e-12 %` invariant remains the hard gate. Empty dict means in sync across both surfaces.
+
+### Hardening — defensive clamps + audits + branch coverage
+
+- **`engines/builtin/evaporation_flux.py`** (W3): direct-provider callers (ACP probes, tests, ad-hoc IntentRequest construction) bypassed the canonical `simulator/evaporation.py::_pack_controls` clamp on `stir_factor`. Now both dict-form (`{"axial": …}`) and scalar paths apply `clamp_stir_factor` defensively. Main sim path unchanged (clamps were already idempotent).
+- **`simulator/state.py::clamp_stir_state`** (W2): UserWarning naming unknown dict keys + valid schema + obvious typo hint (e.g., `{'radail': 8}` → "Common typos: 'radail' → 'radial'"). Behaviour unchanged; only the warning is new.
+- **`tests/test_overhead_accounting.py`** (W4): parametrized branch unit tests covering the full 6-atmosphere × 2-headspace decision matrix for the Phase A commanded-pO₂ floor, plus an `_O2_FLOORED | _O2_NOT_FLOORED == set(Atmosphere)` partition guard so future enum additions can't silently miss matrix coverage.
+- **`tests/test_sio_yield_regression.py`** (W1): rewrote the stale Stage 4 < Stage 3 SiO comment block to be honest about the post-0.5.3-Phase-A routing trade-off (Stage 4 > Stage 3 under default `radial=1.0`). Added an explicit ordering invariant assertion so a future defaults change that restores Stage 3 dominance forces a CHANGELOG update.
+
+### Carried forward — deferred follow-ons (P3s, tracked in `docs-private/`)
+
+- W8 audit completeness: future "union-key audit" with explicit projection-only coverage already landed inline as the milestone-review P2 fix; downstream integration coverage on the real-run paths (W7 live M_avg + W5 pO2 switch) remains mostly indirect via golden fixtures, defer to 0.5.5.
+- `_pipe_conductance` `T_K ≤ 0` numerical edge-case hardening — pre-existing, low priority.
+- Phase D feature flips deferred to dedicated sessions (D2 class-4 stochastic flip-on sim → D3 freeze-gate default-on flip; D4 class-2 cross-engine consistency).
+
 ## [0.5.3] — 2026-05-28
 
 Physics-correctness sweep over 0.5.2. Two file-disjoint chunks dispatched as
