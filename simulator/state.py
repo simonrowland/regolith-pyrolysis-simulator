@@ -896,6 +896,21 @@ class HourSnapshot:
     shuttle_cycle: int = 0
     # Current inject-bakeout cycle number within the C3 phase
 
+    # --- Metal-projection drift audit (0.5.4 W8 / M2 closure) ---
+    metal_projection_drift_kg: Dict[str, float] = field(default_factory=dict)
+    # Per-species drift (ledger_kg - projection_kg) for metal species
+    # whose ``process.metal_phase`` account (canonical AtomLedger entry)
+    # differs from the sum across
+    # ``train.stages[*].collected_kg`` (UI projection) by more than
+    # ``ExtractionMixin._LEDGER_KG_TOL = 1e-9 kg``. Diagnostic only —
+    # the global ≤5e-12 % closure on ``mass_balance_error_pct`` remains
+    # the hard gate. Empty dict means all metal species are in sync (or
+    # absent). Drift typically arises in transit-of-flight ticks where
+    # a recipe has credited metal to the ledger but the projection
+    # sweep hasn't run yet; the steady-state expectation is that
+    # values converge to zero within ~1-2 ticks for a stable campaign.
+    # M2 historical-audit closure (2026-05-28).
+
 
 @dataclass
 class DecisionPoint:

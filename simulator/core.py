@@ -4200,4 +4200,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_voltage_V=self._mre_voltage_V,
             mre_current_A=self._mre_current_A,
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
+            # 0.5.4 W8 (M2 historical-audit closure): per-species drift
+            # between ``process.metal_phase`` ledger and the
+            # ``train.stages[*].collected_kg`` UI projection. Empty dict
+            # means all metals in sync. Diagnostic only — the global
+            # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
+            metal_projection_drift_kg=self._audit_metal_projection_drift(),
         )

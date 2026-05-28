@@ -236,6 +236,49 @@ class ExtractionMixin:
             for stage in self.train.stages
         )
 
+    def _audit_metal_projection_drift(self) -> Dict[str, float]:
+        """0.5.4 W8 (M2 historical-audit closure, 2026-05-28):
+        per-species drift between ``process.metal_phase`` (the
+        canonical AtomLedger metal account) and the UI projection
+        sum across ``train.stages[*].collected_kg``.
+
+        Returns a dict ``{species: drift_kg}`` for metal species
+        where the absolute drift exceeds ``_LEDGER_KG_TOL``. Sign
+        convention: ``ledger_kg - projection_kg`` — positive when
+        the ledger account exceeds the UI projection (some metal
+        has been credited but not yet projected; the normal
+        steady-state drift direction), zero when in sync. Negative
+        values should never appear in practice because
+        ``_project_condensed_species`` line 248-250 already clears
+        the projection if it overshoots the ledger; the audit
+        surface still includes them honestly so an operator-visible
+        bug would be audit-visible rather than silent.
+
+        Diagnostic only — does NOT raise on drift. The ≤5e-12 %
+        global mass-balance closure invariant
+        (``HourSnapshot.mass_balance_error_pct``) remains the hard
+        gate; this per-species view gives earlier-warning visibility
+        when ledger ↔ UI drift opens up. Audit dict carried on
+        ``HourSnapshot.metal_projection_drift_kg`` so external tools
+        + tests can read it without touching simulator internals.
+        """
+        ledger_metals = self.atom_ledger.kg_by_account('process.metal_phase')
+        if not ledger_metals:
+            return {}
+        drift: Dict[str, float] = {}
+        for species, kg in ledger_metals.items():
+            try:
+                ledger_kg = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if not (ledger_kg == ledger_kg):  # NaN guard
+                continue
+            projected_kg = self._condensed_species_projected_kg(species)
+            delta = ledger_kg - projected_kg
+            if abs(delta) > self._LEDGER_KG_TOL:
+                drift[species] = delta
+        return drift
+
     def _project_condensed_species(
         self,
         stage_idx: int,
