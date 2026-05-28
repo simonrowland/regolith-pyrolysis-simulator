@@ -165,7 +165,24 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
 
         melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
-        stir_factor = float(controls.get("stir_factor", 0.0))
+        # 0.5.3 Phase B: stir_factor accepts either a scalar (legacy
+        # axial-only signal from a pre-Phase-B caller) or a mapping
+        # with an ``axial`` key (new 2-axis caller; see
+        # ``simulator/state.py::StirState``). Evaporation H-K-L is
+        # driven by the AXIAL axis only — vertical EM stirring renews
+        # the melt-side surface, which is what the linear multiplier
+        # encodes. The radial axis drives the gas-side boundary-layer
+        # Sherwood in ``simulator/condensation.py``; it does NOT enter
+        # here. A mapping without ``axial`` falls back to 0.0 (halt-
+        # evap signal, mirrors the pre-Phase-B "no key" semantics).
+        _stir_control = controls.get("stir_factor", 0.0)
+        if isinstance(_stir_control, Mapping):
+            stir_factor = float(_stir_control.get("axial", 0.0) or 0.0)
+        else:
+            try:
+                stir_factor = float(_stir_control)
+            except (TypeError, ValueError):
+                stir_factor = 0.0
         alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
             controls.get("alpha_envelope")

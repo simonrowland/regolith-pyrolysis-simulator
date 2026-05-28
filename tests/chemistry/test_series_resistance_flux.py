@@ -243,3 +243,170 @@ def test_series_flux_below_saturation_returns_zero():
     # At T_surface = 5000 K the SiO P_sat is astronomical and dominates
     # any realistic P_local.
     assert _call(P_local_pa=1.0, T_surface_K=5000.0) == 0.0
+
+
+# ---------------------------------------------------------------------------
+# 0.5.3 Phase B 2-axis stirring: which axis drives the Sherwood path
+#
+# The series-resistance flux reads the RADIAL axis as the Sh driver
+# (in-plane EM stirring creates the gas-side boundary-layer vortex
+# that reduces bulk-to-wall mass-transport resistance). The AXIAL
+# axis drives a different consumer (the H-K-L linear multiplier in
+# ``engines/builtin/evaporation_flux.py``); it represents melt-side
+# surface renewal and is NOT consumed by this helper.
+#
+# Backward-compat: when only the legacy positional ``stir_factor`` is
+# supplied (no ``radial_stir_factor`` kwarg), it behaves as the
+# radial equivalent — pre-0.5.3 callers + direct-call unit tests
+# stay green.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "radial,expected_sh_input",
+    [
+        (0.0, 1.0),     # halt-evap signal: clamps to 0, Sh physics
+                        # floors at laminar baseline (sh_input=1)
+        (1.0, 1.0),     # no-stir laminar baseline
+        (4.0, 4.0),     # mid-range industrial stir
+        (6.0, 6.0),     # legacy C2A default (now lives on axial,
+                        # but if explicitly routed to radial drives Sh)
+        (10.0, 10.0),   # MAX_STIR_FACTOR ceiling
+    ],
+)
+def test_stir_sherwood_radial_kwarg_drives_sh_enhancement(
+    radial, expected_sh_input,
+):
+    """0.5.3 Phase B: ``radial_stir_factor`` is the canonical Sh
+    driver. Each value clamps via ``clamp_stir_factor`` and feeds
+    ``Sh = 3.66 * sqrt(max(1.0, radial))``. Halt-evap (0.0) maps
+    to the laminar baseline via the physics floor."""
+    sh = _stirring_enhanced_sherwood(radial_stir_factor=radial)
+    assert sh == pytest.approx(3.66 * math.sqrt(expected_sh_input))
+
+
+def test_stir_sherwood_radial_kwarg_wins_over_legacy_positional():
+    """0.5.3 Phase B precedence rule: when BOTH the legacy positional
+    ``stir_factor`` AND the new ``radial_stir_factor`` kwarg are
+    supplied, the radial kwarg wins. This guards against a pre-Phase-B
+    caller's positional value silently dominating a new 2-axis caller
+    that also wants to set the legacy field for audit-history
+    continuity. The condensation-model call site does exactly this:
+    ``stir_factor=self.stir_factor, radial_stir_factor=self.radial_stir_factor``."""
+    # Legacy positional = 6 (would give Sh ~= 8.97 if alone);
+    # explicit radial = 1 (laminar baseline) MUST win.
+    sh = _stirring_enhanced_sherwood(6.0, radial_stir_factor=1.0)
+    assert sh == pytest.approx(3.66)
+    # The reverse: legacy positional = 1, radial = 6 — radial wins
+    # again, Sh climbs.
+    sh2 = _stirring_enhanced_sherwood(1.0, radial_stir_factor=6.0)
+    assert sh2 == pytest.approx(3.66 * math.sqrt(6.0))
+
+
+def test_stir_sherwood_both_none_returns_laminar_baseline():
+    """No driving input on either axis (positional ``stir_factor``
+    nor ``radial_stir_factor``) → caller didn't touch Sh at all →
+    no-stir laminar baseline ``Sh = 3.66``. Distinct from
+    ``radial=0`` (halt-evap signal also maps to baseline via the
+    physics floor, but with the operator audit recording the
+    explicit halt)."""
+    assert _stirring_enhanced_sherwood() == pytest.approx(3.66)
+    assert _stirring_enhanced_sherwood(None) == pytest.approx(3.66)
+    assert _stirring_enhanced_sherwood(radial_stir_factor=None) == pytest.approx(
+        3.66
+    )
+
+
+@pytest.mark.parametrize(
+    "axial,radial,expected_sh_factor",
+    [
+        # Axis-isolation table: vary radial holding axial fixed.
+        # Expected Sh input = max(1.0, radial).
+        (6.0, 0.0, 1.0),   # axial=6 (evap), radial=halt → Sh floor
+        (6.0, 1.0, 1.0),   # axial=6, radial=1 → no-stir Sh
+        (6.0, 4.0, 4.0),   # axial=6, radial=4 → mid Sh
+        (6.0, 6.0, 6.0),   # axial=6, radial=6 → match
+        (6.0, 10.0, 10.0), # axial=6, radial=10 → MAX
+        # And vice-versa: vary axial holding radial fixed at 1.0
+        # (the Phase B default). Axial MUST NOT affect Sh.
+        (0.0, 1.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (4.0, 1.0, 1.0),
+        (6.0, 1.0, 1.0),
+        (10.0, 1.0, 1.0),
+    ],
+)
+def test_series_flux_sh_path_reads_radial_not_axial(
+    axial, radial, expected_sh_factor,
+):
+    """0.5.3 Phase B axis isolation: the series-resistance flux's
+    Sh path responds to ``radial_stir_factor`` only. Holding radial
+    fixed at the no-stir baseline (1.0), no value of axial (0..10)
+    shifts the flux through the Sh path. Holding axial fixed (at
+    the legacy C2A default 6.0), varying radial (0..10) drives the
+    Sh enhancement up by sqrt(radial).
+
+    This is the load-bearing axis-separation guarantee: the
+    evaporation consumer reads axial (linear H-K-L multiplier), the
+    condensation consumer reads radial (Sh enhancement). Cross-
+    contamination here would re-introduce the pre-Phase-B
+    double-counting where a single scalar drove both consumers.
+
+    NOTE: the helper has no AXIAL kwarg — we test axial isolation by
+    confirming that holding radial fixed gives a flux that does not
+    depend on the *legacy positional* ``stir_factor`` either (since
+    the radial kwarg has precedence). The positional path is the
+    pre-Phase-B "scalar" entrypoint preserved for backward-compat.
+    """
+    # Use the legacy positional slot to inject the "axial-ish" value
+    # the way a pre-Phase-B caller would have — the radial kwarg's
+    # precedence rule means it gets dominated when radial is explicit.
+    flux_with_radial = _call(
+        regime_factor=0.0,  # viscous: Sh maximally matters
+        stir_factor=axial,
+        radial_stir_factor=radial,
+    )
+    # Reference: pure-radial path (no axial signal).
+    flux_radial_only = _call(
+        regime_factor=0.0,
+        stir_factor=1.0,
+        radial_stir_factor=radial,
+    )
+    # Equal: axial value DOES NOT shift the Sh path.
+    assert flux_with_radial == pytest.approx(flux_radial_only, rel=1e-12)
+    # And the absolute Sh factor matches the expected sqrt(radial).
+    flux_reference = _call(
+        regime_factor=0.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+    )
+    # In viscous limit k_total ≈ k_MT ∝ Sh, so the flux ratio is
+    # bounded by the Sherwood enhancement (within the series-
+    # resistance correction).
+    if expected_sh_factor > 1.0:
+        ratio = flux_with_radial / flux_reference
+        # Ratio should approach sqrt(expected_sh_factor) but be
+        # mildly attenuated by the series resistance with k_HKL.
+        assert 1.0 < ratio < math.sqrt(expected_sh_factor) + 0.1
+
+
+def test_series_flux_zero_radial_with_high_axial_still_floors_at_laminar():
+    """Edge case: operator explicitly halts the radial axis
+    (``radial=0``, perhaps to silence Sh enhancement during a
+    diagnostic) while leaving axial high (still driving evap
+    surface renewal). The Sh path MUST floor at the laminar
+    baseline — NOT collapse to zero, NOT inherit the high axial
+    value. This pins the physics floor on the gas-side boundary
+    layer."""
+    flux = _call(
+        regime_factor=0.0,
+        stir_factor=10.0,
+        radial_stir_factor=0.0,
+    )
+    flux_baseline = _call(
+        regime_factor=0.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+    )
+    # halt-radial flux equals no-stir baseline (Sh physics floor).
+    assert flux == pytest.approx(flux_baseline, rel=1e-12)

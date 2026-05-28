@@ -13,7 +13,12 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
-from simulator.state import DecisionPoint, HourSnapshot, clamp_stir_factor
+from simulator.state import (
+    DecisionPoint,
+    HourSnapshot,
+    clamp_stir_factor,
+    clamp_stir_state,
+)
 
 
 class DecisionPolicy(Enum):
@@ -185,7 +190,27 @@ class SimSession:
             # consumer subsystems (evaporation linear multiplier +
             # condensation series-resistance Sherwood) see the same
             # bounded value.
-            sim.melt.stir_factor = clamp_stir_factor(value)
+            #
+            # 0.5.3 Phase B (2-axis stirring): the legacy scalar
+            # ``stir_factor`` writes ONLY the axial axis (operator
+            # signalled a single-axis intent). The radial axis is
+            # untouched and stays at its current value. Use
+            # ``adjust("stir_state", {axial, radial})`` to drive both
+            # axes; this scalar path is preserved for backward-compat
+            # with pre-0.5.3 web UIs and campaign auto-tuners.
+            sim.melt.stir_state.axial = clamp_stir_factor(value)
+        elif param == "stir_state":
+            # 0.5.3 Phase B: canonical 2-axis writer. Accepts a dict
+            # ({axial, radial}), an existing ``StirState``, or — for
+            # convenience — a scalar that maps to axial-only (same
+            # semantics as the legacy ``stir_factor`` path). Both axes
+            # go through ``clamp_stir_state`` so the operator-boundary
+            # contract carries component-wise (per-axis clamp,
+            # non-finite/bool fail-closed, partial dict defaults to
+            # 1.0 on the missing axis). Replaces the whole
+            # ``melt.stir_state`` instance — operator-facing intent is
+            # "set the stirring state to this", not "merge".
+            sim.melt.stir_state = clamp_stir_state(value)
         elif param == "pO2_mbar":
             sim.melt.pO2_mbar = float(value)
         elif param == "c4_max_temp":
@@ -212,8 +237,24 @@ class SimSession:
                 target[field_name] = clamp_stir_factor(value)
                 if sim.melt.campaign.name == campaign_name:
                     # Live-update the melt field too if this override
-                    # targets the currently-active campaign.
+                    # targets the currently-active campaign. The
+                    # legacy ``stir_factor`` write touches AXIAL only
+                    # (via the backward-compat property setter on
+                    # MeltState).
                     sim.melt.stir_factor = target[field_name]
+            elif field_name == "stir_state":
+                # 0.5.3 Phase B: canonical 2-axis campaign override.
+                # Stored as a StirState dataclass in the overrides
+                # dict so any re-entry path (e.g.
+                # ``CampaignManager._apply_overrides``) sees the
+                # clamped 2-axis value rather than a scalar that the
+                # legacy path would silently mis-route. Live-update
+                # the melt too if the override targets the active
+                # campaign.
+                clamped = clamp_stir_state(value)
+                target[field_name] = clamped
+                if sim.melt.campaign.name == campaign_name:
+                    sim.melt.stir_state = clamped
             else:
                 target[field_name] = float(value)
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:

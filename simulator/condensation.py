@@ -187,8 +187,10 @@ DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 
 
 def _stirring_enhanced_sherwood(
-    stir_factor: float,
+    stir_factor: float | None = None,
     sherwood_laminar: float = DEFAULT_SHERWOOD_LAMINAR,
+    *,
+    radial_stir_factor: float | None = None,
 ) -> float:
     """Enhanced Sherwood number for induction-stirred gas-pipe boundary
     layer.
@@ -198,28 +200,59 @@ def _stirring_enhanced_sherwood(
     Stewart/Lightfoot Eq 14.4-9). Induction stirring on the melt
     creates surface waves + vigorous convection in the gas just above
     the melt, which enhances bulk-to-wall mass transfer. Without
-    stirring (``stir_factor=1``) the laminar value applies. With
-    operator stirring (``stir_factor`` 4-8 per `setpoints.yaml §C2A
-    induction_stirring`), Sh increases by the rough square-root of
-    stir_factor — a mild forced-convection correction in the Frössling
-    style (`Sh = 2 + 0.6 Re^0.5 Sc^0.33`) without committing to a
-    particular pipe-vs-tank correlation (the geometry is hybrid).
+    stirring (factor=1) the laminar value applies. With operator
+    stirring (factor 4-8 per `setpoints.yaml §C2A induction_stirring`),
+    Sh increases by the rough square-root of the factor — a mild
+    forced-convection correction in the Frössling style
+    (`Sh = 2 + 0.6 Re^0.5 Sc^0.33`) without committing to a particular
+    pipe-vs-tank correlation (the geometry is hybrid).
 
-    Constrained: ``stir_factor`` is clamped to ``[1.0, MAX_STIR_FACTOR]``
-    (=10.0) at the helper boundary — this is the OPERATOR-CONTROLLED
-    knob capped by the "melt-flying-out-of-the-pot" upper bound.
-    Anything beyond that breaks the gas-side boundary-layer assumption
-    AND the recipe setpoints; the clamp keeps physics defensible even
-    under a bad campaign override.
+    0.5.3 Phase B (2-axis stirring) — which axis drives Sh:
 
-    Returns: Sh in the range [``sherwood_laminar``, ~11.6] for
-    operator stir_factor in [0, MAX_STIR_FACTOR].
+    The Sherwood enhancement reads the RADIAL stirring axis (in-plane
+    EM stirring drives the gas-side boundary-layer vortex, which is
+    what reduces the bulk-to-wall mass-transport resistance). The
+    axial axis drives a different consumer (the H-K-L linear
+    multiplier in ``engines/builtin/evaporation_flux.py``) — it
+    represents vertical melt-side surface renewal, not gas-side
+    boundary-layer transport. Mixing them up would double-count the
+    same physical knob.
+
+    Signature contract (post-0.5.3):
+
+    - ``radial_stir_factor`` (kwarg): canonical 2-axis caller path.
+      Pass ``melt.stir_state.radial`` through
+      ``CondensationModel.configure_operating_conditions`` →
+      ``_series_resistance_deposition_flux_mol_m2_s`` → here.
+    - ``stir_factor`` (positional): legacy scalar entry point preserved
+      for backward-compat with pre-0.5.3 callers AND for direct-call
+      unit tests that exercise the BSL Sh = 3.66·√stir_factor relation
+      without going through the 2-axis ``StirState``. Historically this
+      WAS the Sh driver, so treating it as the radial equivalent when
+      no ``radial_stir_factor`` is supplied keeps every legacy caller
+      and test green.
+    - Precedence: ``radial_stir_factor`` wins if both are supplied
+      (the new explicit kwarg cannot be silently overridden by a
+      stale positional fallback).
+    - Both ``None``: caller didn't drive Sh at all → no-stir laminar
+      baseline (``Sh = 3.66``).
+
+    Constrained: the driving factor is clamped to ``[0.0,
+    MAX_STIR_FACTOR]`` at the operator boundary, with a Sh physics
+    floor at 1.0 (laminar baseline never collapses to zero). Anything
+    beyond ``MAX_STIR_FACTOR`` breaks the gas-side boundary-layer
+    assumption AND the recipe setpoints; the clamp keeps physics
+    defensible even under a bad campaign override.
+
+    Returns: Sh in the range [``sherwood_laminar``, ~11.6] for the
+    driving radial factor in [0, MAX_STIR_FACTOR].
 
     Two-tier clamp (codex /code-review max-effort, Phase B):
 
     - ``clamp_stir_factor`` is the OPERATOR-facing clamp ``[0, 10]``.
-      It preserves the "halt evap" signal for the evaporation
-      consumer at ``stir_factor=0`` AND maps non-finite/bool/etc to 0.
+      It preserves the "halt evap" signal at the source for the
+      evaporation consumer at ``axial=0`` AND maps non-finite/bool/
+      etc to 0.
     - This helper applies its OWN physics floor at ``1.0`` so that
       Sherwood never drops below the BSL laminar-pipe asymptote
       ``Sh = 3.66`` regardless of operator value. Without stirring
@@ -228,14 +261,25 @@ def _stirring_enhanced_sherwood(
 
     Net mapping for the Sherwood path:
 
-    - stir_factor = 0 (halt evap signal): Sh = 3.66 (laminar baseline)
-    - stir_factor = 1 (no stir): Sh = 3.66 (matches)
-    - stir_factor = 6 (C2A default): Sh ≈ 9.0
-    - stir_factor = 10 (operator ceiling): Sh ≈ 11.6
-    - stir_factor = 100 or NaN: clamped/sanitized at the operator
-      boundary, then Sh = 3.66 (defensive baseline)
+    - factor = 0 (halt-evap signal): Sh = 3.66 (laminar baseline)
+    - factor = 1 (no radial stir): Sh = 3.66 (matches)
+    - factor = 6 (legacy C2A scalar default): Sh ≈ 9.0
+    - factor = 10 (operator ceiling): Sh ≈ 11.6
+    - factor = 100 or NaN: clamped/sanitised at the operator boundary,
+      then Sh = 3.66 (defensive baseline)
     """
-    operator_value = clamp_stir_factor(stir_factor)
+    # Precedence: explicit ``radial_stir_factor`` wins over the legacy
+    # positional ``stir_factor``. Both None → no-stir baseline (1.0).
+    if radial_stir_factor is not None:
+        operator_value = clamp_stir_factor(radial_stir_factor)
+    elif stir_factor is not None:
+        # Legacy scalar caller: pre-0.5.3 ``stir_factor`` historically
+        # drove Sh, so map it to the same operator-bounded value as
+        # the new radial path would. Pre-Phase-B tests + direct call
+        # sites in this module stay green via this fallback.
+        operator_value = clamp_stir_factor(stir_factor)
+    else:
+        operator_value = 1.0
     # Physics floor: Sherwood must not drop below the laminar
     # asymptote. ``operator_value=0`` (halt-evap signal) maps here
     # to Sh = sherwood_laminar, not Sh = 0.
@@ -464,6 +508,24 @@ class CondensationModel:
         # rather than coupling here avoids importing state.py for what
         # is properly an operator-boundary concern.
         self.stir_factor = 1.0
+        # 0.5.3 Phase B (2-axis stirring): the radial axis is the
+        # canonical Sh driver. Constructor default ``None`` is the
+        # explicit "not configured" sentinel — the deposition helper
+        # (``_stirring_enhanced_sherwood``) falls back to the legacy
+        # ``stir_factor`` when ``radial_stir_factor is None``, which
+        # preserves pre-Phase-B Sh-enhancement semantics for legacy
+        # callers that only pass ``stir_factor`` to
+        # ``configure_operating_conditions``.
+        #
+        # Phase B chunk-review P1 (codex 2026-05-28): the previous
+        # default of ``1.0`` made the radial axis ALWAYS take precedence
+        # in the deposition call (per helper precedence: explicit
+        # radial wins over stir_factor) so a legacy
+        # ``configure_operating_conditions(stir_factor=6)`` call left
+        # Sh stuck at the laminar 3.66 baseline — silently broke the
+        # documented 0.5.2 backward-compat. The ``None`` sentinel lets
+        # the helper's fallback fire.
+        self.radial_stir_factor: float | None = None
         self.knudsen_number = math.inf
         self.regime_factor = 1.0
         self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
@@ -503,15 +565,29 @@ class CondensationModel:
         gas_temperature_C: float | None = None,
         pipe_segment_temperatures_C: Mapping[str, float] | None = None,
         stir_factor: float | None = None,
+        radial_stir_factor: float | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
     ) -> None:
         """Update tick-local wall and Knudsen conditions for cached models.
 
-        ``stir_factor`` (when provided) updates the induction-stirring knob
-        consumed by the series-resistance flux's Sherwood enhancement. Defaults
-        to ``1.0`` (no stirring) when unset; recipes wire ``melt.stir_factor``
-        through ``core._configure_condensation_operating_conditions``.
+        ``stir_factor`` (when provided): legacy 0.5.2 single-axis input.
+        Kept for backward-compat with direct callers and pre-Phase-B
+        test fixtures. Pre-0.5.3 this WAS the Sh driver; post-0.5.3 it
+        is preserved as an audit-history record (``operating_history``
+        snapshots it alongside ``radial_stir_factor``).
+
+        ``radial_stir_factor`` (when provided, 0.5.3 Phase B): canonical
+        2-axis input. Drives the series-resistance flux's Sherwood
+        enhancement (gas-side in-plane vortex mixing → reduced bulk-
+        to-wall transport resistance). Defaults to ``1.0`` (no-stir
+        laminar baseline, ``Sh = 3.66``) when unset; recipes wire
+        ``melt.stir_state.radial`` through
+        ``core._configure_condensation_operating_conditions``. The
+        AXIAL axis lives on ``melt.stir_state.axial`` and drives a
+        DIFFERENT consumer (the H-K-L linear multiplier in
+        ``engines/builtin/evaporation_flux.py``); it is not consumed
+        here.
         """
 
         if wall_temperature_C is not None:
@@ -565,6 +641,35 @@ class CondensationModel:
                     rel_tol=1e-12,
                     abs_tol=0.0,
                 )
+        # 0.5.3 Phase B: radial axis capture + clamp + audit. Mirrors
+        # the stir_factor block above, since the same defensive
+        # contract applies (operator boundary clamp, non-finite/bool
+        # fail-closed, requested-vs-applied audit trail). Kept as a
+        # parallel block (not refactored into a shared helper) because
+        # the operating_history snapshot keys are different
+        # (radial_stir_factor / radial_stir_factor_clamped /
+        # radial_stir_factor_requested) and inlining keeps the audit
+        # surface explicit for a downstream auditor scanning the file.
+        _radial_stir_factor_requested: float | None = None
+        _radial_stir_factor_clamped: bool = False
+        if radial_stir_factor is not None:
+            if not isinstance(radial_stir_factor, bool):
+                try:
+                    _coerced = float(radial_stir_factor)
+                except (TypeError, ValueError):
+                    _coerced = None
+                if _coerced is not None and math.isfinite(_coerced):
+                    _radial_stir_factor_requested = _coerced
+            self.radial_stir_factor = clamp_stir_factor(radial_stir_factor)
+            if _radial_stir_factor_requested is None:
+                _radial_stir_factor_clamped = True
+            else:
+                _radial_stir_factor_clamped = not math.isclose(
+                    _radial_stir_factor_requested,
+                    self.radial_stir_factor,
+                    rel_tol=1e-12,
+                    abs_tol=0.0,
+                )
         if overhead_pressure_mbar is not None:
             self.overhead_pressure_mbar = max(0.0, float(overhead_pressure_mbar))
             self._knudsen_policy_configured = True
@@ -599,6 +704,7 @@ class CondensationModel:
             for x in (
                 overhead_pressure_mbar,
                 stir_factor,
+                radial_stir_factor,
                 wall_temperature_C,
                 pipe_diameter_m,
                 gas_temperature_C,
@@ -620,6 +726,24 @@ class CondensationModel:
                 "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
                 "stir_factor": float(self.stir_factor),
                 "stir_factor_clamped": bool(_stir_factor_clamped),
+                # 0.5.3 Phase B: radial axis carried in the snapshot
+                # alongside the legacy ``stir_factor`` field so a
+                # downstream auditor can read both axes' applied values.
+                # ``radial_stir_factor_requested`` is added below ONLY
+                # when the caller explicitly supplied it, mirroring the
+                # ``stir_factor_requested`` convention. The applied
+                # ``radial_stir_factor`` is ``None`` (not 0.0) when the
+                # caller never configured radial — distinguishes "no-
+                # configure, falls back to legacy stir_factor for Sh"
+                # from "explicit radial=0 halt signal" in the audit
+                # trail. Phase B chunk-review P1 fix (codex 2026-05-28).
+                "radial_stir_factor": (
+                    float(self.radial_stir_factor)
+                    if self.radial_stir_factor is not None
+                    else None
+                ),
+                "radial_stir_factor_clamped": bool(
+                    _radial_stir_factor_clamped),
                 "knudsen_number": float(self.knudsen_number),
                 "knudsen_regime": self.knudsen_regime.value,
                 "regime_factor": float(self.regime_factor),
@@ -638,6 +762,17 @@ class CondensationModel:
                 snapshot["stir_factor_requested"] = (
                     float(_stir_factor_requested)
                     if math.isfinite(_stir_factor_requested)
+                    else None
+                )
+            # 0.5.3 Phase B: mirror the requested-record convention on
+            # the radial axis. Omission semantics: no record → operator
+            # did not touch the radial axis this tick (which is the
+            # majority case for pre-Phase-B campaign overrides that
+            # only carry the legacy scalar ``stir_factor``).
+            if _radial_stir_factor_requested is not None:
+                snapshot["radial_stir_factor_requested"] = (
+                    float(_radial_stir_factor_requested)
+                    if math.isfinite(_radial_stir_factor_requested)
                     else None
                 )
             self.operating_history.append(snapshot)
@@ -1074,7 +1209,16 @@ class CondensationModel:
         flux = _series_resistance_deposition_flux_mol_m2_s(
             species, P_local_pa, T_wall_K, alpha_s,
             pipe_diameter_m=self.pipe_diameter_m,
+            # 0.5.3 Phase B: pass BOTH axes. Pre-Phase-B
+            # ``self.stir_factor`` is kept for audit-history continuity
+            # but ``radial_stir_factor`` is the canonical Sh driver
+            # (the helper precedence below honours that). When the
+            # caller drives only the legacy axis (direct unit tests),
+            # ``self.radial_stir_factor`` stays at its constructor
+            # default of 1.0 and the helper falls back to the legacy
+            # ``stir_factor`` per the documented precedence rule.
             stir_factor=self.stir_factor,
+            radial_stir_factor=self.radial_stir_factor,
             regime_factor=self.regime_factor,
             T_gas_K=T_gas_K,
             overhead_pressure_pa=overhead_pressure_pa,
@@ -1202,7 +1346,12 @@ class CondensationModel:
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, alpha_s,
                 pipe_diameter_m=self.pipe_diameter_m,
+                # 0.5.3 Phase B: pass both axes (see twin call above
+                # in ``_wall_deposit_candidate_for_surface_kg`` for the
+                # precedence rationale; the helper reads radial as the
+                # Sh driver, legacy stir_factor as audit-history).
                 stir_factor=self.stir_factor,
+                radial_stir_factor=self.radial_stir_factor,
                 regime_factor=self.regime_factor,
                 T_gas_K=T_gas_K,
                 overhead_pressure_pa=overhead_pressure_pa,
@@ -1445,6 +1594,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
     T_gas_K: float | None = None,
     overhead_pressure_pa: float | None = None,
     carrier_gas: str = DEFAULT_CARRIER_GAS,
+    *,
+    radial_stir_factor: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -1550,7 +1701,16 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # state); fail closed. Codex pre-0.5.2 Phase B P1.
         return 0.0
     effective_T_gas_K = max(_t_gas_raw, 1.0)
-    sherwood_eff = _stirring_enhanced_sherwood(stir_factor)
+    # 0.5.3 Phase B: Sh enhancement reads the RADIAL stirring axis
+    # (in-plane EM stirring drives gas-side bulk-to-wall transport).
+    # Backward-compat: if the caller passes only the legacy positional
+    # ``stir_factor`` (pre-Phase-B path, or a unit test exercising the
+    # BSL Sh relation directly), the helper treats it as the radial
+    # equivalent — see ``_stirring_enhanced_sherwood`` doc.
+    sherwood_eff = _stirring_enhanced_sherwood(
+        stir_factor,
+        radial_stir_factor=radial_stir_factor,
+    )
     if (overhead_pressure_pa is not None
             and math.isfinite(overhead_pressure_pa)
             and overhead_pressure_pa > 0.0):

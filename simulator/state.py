@@ -12,7 +12,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
@@ -117,6 +117,13 @@ STEFAN_BOLTZMANN = 5.670374e-8  # W/(m²·K⁴)
 # stirring``; 10× is the empirical ceiling beyond which the melt surface
 # breaks up). All override paths use ``clamp_stir_factor`` so both
 # consumers honour this ceiling.
+#
+# Phase B (0.5.3 2-axis stirring): the same ``MAX_STIR_FACTOR`` ceiling
+# applies PER-AXIS to ``StirState.axial`` and ``StirState.radial``.
+# Industrial multi-coil EM stirrers carry independent budgets on each
+# axis — the melt-surface-breakup ceiling is set by total kinetic
+# energy injected at the worst single axis, not the L2 sum. A
+# component-wise clamp is the right operator-boundary contract.
 MAX_STIR_FACTOR = 10.0
 
 
@@ -159,6 +166,13 @@ def clamp_stir_factor(value: float) -> float:
     Python pitfall guard: ``min(MAX, NaN) == MAX`` and ``max(0.0, NaN)
     == NaN`` make a naive ``max(0.0, min(MAX, x))`` an attack surface;
     the explicit ``math.isfinite`` check covers it.
+
+    Phase B (0.5.3 2-axis stirring): this scalar helper is preserved as
+    the per-axis operator-boundary clamp. ``clamp_stir_state`` (below)
+    is the companion 2-axis helper that applies ``clamp_stir_factor``
+    component-wise to ``StirState.axial`` and ``StirState.radial``.
+    Scalar inputs to ``clamp_stir_state`` map to the axial axis only
+    (backward-compat with the 0.5.2 single-axis writer surface).
     """
     # bool is a subclass of int; reject explicitly before float()
     # would otherwise coerce True->1.0 / False->0.0.
@@ -171,6 +185,123 @@ def clamp_stir_factor(value: float) -> float:
     if not math.isfinite(raw):
         return 0.0
     return max(0.0, min(float(MAX_STIR_FACTOR), raw))
+
+
+@dataclass
+class StirState:
+    """Two-axis induction-stirring state (0.5.3 Phase B).
+
+    Industrial multi-coil EM stirrers expose two independent control
+    axes that map to physically distinct mixing modes:
+
+    - ``axial``: vertical EM stirring. Drives bottom-to-surface
+      circulation in the melt → surface renewal → linear H-K-L
+      evaporation-flux multiplier (consumer:
+      ``engines/builtin/evaporation_flux.py``). Default 6.0 preserves
+      the 0.5.2 single-axis C2A setpoint (mid-band of the documented
+      ``data/setpoints.yaml § induction_stirring`` 4-8× window).
+    - ``radial``: horizontal / azimuthal EM stirring. Drives in-plane
+      vortex in the gas just above the melt → gas-side boundary-layer
+      Sherwood enhancement (consumer:
+      ``simulator/condensation.py::_stirring_enhanced_sherwood``).
+      Default 1.0 = no-stir laminar baseline (``Sh = 3.66``, BSL
+      Eq 14.4-9). Operator can dial up to 10× per-axis.
+
+    Per-axis ``MAX_STIR_FACTOR = 10.0`` ceiling. Each axis preserves
+    the scalar 0.5.2 semantics when the other is at its default
+    (axial=1.0 OR radial=1.0 → laminar baseline on that consumer).
+
+    Backward-compat (deprecation cycle, 0.5.3 → 0.5.4):
+
+    - ``MeltState.stir_factor`` property reads ``stir_state.axial`` and
+      writes ``stir_state.axial``. Scalar operator-override paths
+      (``simulator/session.py::SimSession.adjust("stir_factor", ...)``,
+      ``simulator/campaigns.py`` overrides) keep accepting a scalar →
+      mapped to ``axial`` only. New ``session.adjust("stir_state",
+      {axial, radial})`` path drives both axes. 0.5.4 may remove the
+      scalar path entirely once campaigns migrate; this dataclass +
+      helper land first so the seam is stable.
+
+    Design rationale (B1 office-hours, 2026-05-28): axial × radial
+    decomposition (option 1) was selected over mean/turbulence (option
+    2) and Re/f_renewal (option 3) because it maps directly to
+    industrial multi-coil EM stirrer design, preserves the scalar
+    interpretation when one axis is at 1.0, and cleanly separates the
+    melt-side surface-renewal effect (evap H-K-L) from the gas-side
+    boundary-layer effect (condensation Sh).
+    """
+
+    axial: float = 6.0
+    radial: float = 1.0
+
+
+def clamp_stir_state(value: Any) -> StirState:
+    """Return ``value`` coerced to a defensively-bounded ``StirState``.
+
+    The operator-boundary 2-axis companion to ``clamp_stir_factor``.
+    Accepts the union of input shapes the 0.5.3 writer surface
+    produces and routes each axis through ``clamp_stir_factor`` so the
+    fail-closed semantics carry component-wise:
+
+    - ``StirState``: each axis re-clamped independently (idempotent
+      for already-valid input; sanitises a hand-constructed instance
+      whose axes drift out of range).
+    - ``Mapping`` (e.g. dict from YAML override or
+      ``session.adjust("stir_state", ...)``): pull ``axial`` and
+      ``radial`` keys (default 1.0 = laminar baseline if a key is
+      missing, since a partial dict signals the operator only meant to
+      touch one axis). Each value clamped via ``clamp_stir_factor``.
+    - Scalar (float-coercible): legacy single-axis writer → mapped to
+      ``axial`` only, ``radial`` set to ``1.0`` (laminar baseline).
+      This is the backward-compat path for 0.5.2 callers that pass a
+      bare float through ``session.adjust("stir_factor", ...)`` or a
+      campaign override with ``'stir_factor': <float>``.
+    - ``bool``: explicitly rejected (bool is a Python int subclass; the
+      coercion would silently lie ``True``→1.0 / ``False``→0.0). Both
+      axes fail-closed to 0.0.
+    - Non-finite (NaN, ±inf) or non-numeric inputs: each axis
+      fail-closed to 0.0 (mirrors ``clamp_stir_factor``).
+    - ``None``: both axes fail-closed to 0.0 (corrupt-state recovery).
+
+    Returns a fresh ``StirState`` instance — never mutates the caller's
+    dict / dataclass. Both axes are guaranteed to be finite floats in
+    ``[0.0, MAX_STIR_FACTOR]``.
+    """
+
+    # Reject bool BEFORE the Mapping / scalar branches (bool is not a
+    # Mapping and would coerce through float() via the scalar branch
+    # otherwise — same defensive contract as clamp_stir_factor).
+    if isinstance(value, bool):
+        return StirState(axial=0.0, radial=0.0)
+    if value is None:
+        return StirState(axial=0.0, radial=0.0)
+    if isinstance(value, StirState):
+        return StirState(
+            axial=clamp_stir_factor(value.axial),
+            radial=clamp_stir_factor(value.radial),
+        )
+    # Mapping check uses collections.abc.Mapping for duck-typing
+    # YAML-loaded dicts, OrderedDict, etc.
+    from collections.abc import Mapping as _Mapping
+    if isinstance(value, _Mapping):
+        # Missing keys default to 1.0 (laminar baseline). A dict
+        # carrying only one axis signals "operator only meant to
+        # tweak this axis" — preserving the other as the no-stir
+        # baseline keeps that lever explicit.
+        raw_axial = value.get('axial', 1.0)
+        raw_radial = value.get('radial', 1.0)
+        return StirState(
+            axial=clamp_stir_factor(raw_axial),
+            radial=clamp_stir_factor(raw_radial),
+        )
+    # Scalar fallback: any float-coercible value lands on the axial
+    # axis (legacy 0.5.2 single-axis writer surface). Non-coercible
+    # inputs (e.g. arbitrary object) map to fail-closed 0.0 via the
+    # inner clamp_stir_factor.
+    return StirState(
+        axial=clamp_stir_factor(value),
+        radial=1.0,
+    )
 
 
 # ============================================================================
@@ -304,25 +435,36 @@ class MeltState:
     campaign_hour: int = 0          # Hours since current campaign started
 
     # --- Stirring ---
-    stir_factor: float = 6.0
+    stir_state: 'StirState' = field(default_factory=StirState)
     # Induction stirring acceleration factor (4-8×, hard-clamped at
-    # ``MAX_STIR_FACTOR``). Used by TWO subsystems:
+    # ``MAX_STIR_FACTOR`` per-axis). 0.5.3 Phase B: replaced the
+    # single-scalar ``stir_factor`` field with a 2-axis ``StirState``
+    # dataclass (axial × radial). The legacy ``stir_factor`` attribute
+    # is preserved as a property below that aliases to
+    # ``stir_state.axial`` for the deprecation cycle. Two subsystems
+    # consume the axes:
     #
-    #   1. ``engines/builtin/evaporation_flux.py``: linear multiplier on
-    #      the Hertz-Knudsen evaporation rate (surface renewal + thermal
-    #      cycling boost).
-    #   2. ``simulator/condensation.py`` (0.5.2 Phase B): drives the
-    #      stir-enhanced Sherwood number ``Sh = 3.66·√stir_factor`` in
-    #      the series-resistance boundary-layer flux.
+    #   1. ``engines/builtin/evaporation_flux.py``: reads ``axial`` as
+    #      the linear multiplier on the Hertz-Knudsen evaporation rate
+    #      (surface renewal + thermal cycling boost from vertical EM
+    #      stirring drives melt-side surface refresh).
+    #   2. ``simulator/condensation.py`` (Phase B 0.5.3 split): reads
+    #      ``radial`` for the stir-enhanced Sherwood number
+    #      ``Sh = 3.66·√radial`` in the series-resistance
+    #      boundary-layer flux (gas-side in-plane vortex drives bulk-
+    #      to-wall mass transport).
     #
-    # Both consumers honour ``MAX_STIR_FACTOR``; override paths
+    # Both consumers honour ``MAX_STIR_FACTOR`` per-axis; override paths
     # (``simulator/campaigns.py`` campaign overrides, ``simulator/
-    # session.py`` ``session.adjust(...)``) all funnel through
-    # ``clamp_stir_factor`` so a bad override cannot inflate either
-    # consumer beyond the documented physical ceiling. Pre-0.5.2 the
-    # evaporation path silently accepted arbitrary multipliers; codex
-    # /review concern-diverse subagent flagged the clamp-asymmetry
-    # (Phase B P1).
+    # session.py`` ``session.adjust(...)``) funnel through
+    # ``clamp_stir_factor`` (per-axis) and ``clamp_stir_state`` (whole
+    # dataclass) so a bad override cannot inflate either consumer
+    # beyond the documented physical ceiling. Pre-0.5.2 the evaporation
+    # path silently accepted arbitrary multipliers; codex /review
+    # concern-diverse subagent flagged the clamp-asymmetry (Phase B
+    # P1). 0.5.3 B1 office-hours framing chose option 1 (axial × radial)
+    # over options 2 (mean/turbulence) and 3 (Re/f_renewal) — see
+    # ``StirState`` doc for the rationale.
 
     # --- MRE state (for endpoint detection) ---
     mre_voltage_V: float = 0.0
@@ -332,6 +474,51 @@ class MeltState:
     # --- Derived quantities (set by step()) ---
     total_mass_kg: float = 0.0
     melt_surface_area_m2: float = 0.2  # Crucible opening
+
+    @property
+    def stir_factor(self) -> float:
+        """Backward-compat alias for ``stir_state.axial`` (0.5.3 Phase B).
+
+        Pre-0.5.3 ``MeltState.stir_factor`` was the scalar induction-
+        stirring field; 0.5.3 split it into ``StirState`` (axial ×
+        radial). The legacy attribute is preserved as a property so
+        operator code, golden fixtures, and legacy callers that read
+        ``melt.stir_factor`` keep working through the deprecation
+        cycle. The property maps to ``stir_state.axial`` because the
+        scalar value historically drove BOTH consumers; in the 2-axis
+        split the axial axis carries the evaporation H-K-L multiplier
+        (legacy 6.0 default) while the radial axis defaults to 1.0
+        (laminar Sherwood baseline). 0.5.4 may remove this property
+        once campaigns / operator UIs migrate to ``stir_state``
+        directly.
+        """
+        return self.stir_state.axial
+
+    @stir_factor.setter
+    def stir_factor(self, value: float) -> None:
+        """Backward-compat setter: writes ``stir_state.axial``.
+
+        Does NOT clamp — clamping is the operator-boundary writer's
+        responsibility (``simulator/session.py``,
+        ``simulator/campaigns.py`` both pre-clamp via
+        ``clamp_stir_factor``). Pre-0.5.3 the field was a bare float
+        with no setter clamp either; preserving that contract keeps
+        legacy attribute-set patterns byte-compatible
+        (``melt.stir_factor = 6.0`` post-construction).
+
+        **Construction-time legacy compat is NOT supported** (Phase B
+        chunk-review P1 honesty fix): ``MeltState(stir_factor=X)`` was
+        never a tested construction shape and raises ``TypeError`` in
+        0.5.3+ because the dataclass ``__init__`` exposes
+        ``stir_state``, not ``stir_factor``. Legacy callers that
+        constructed MeltState with a scalar stir_factor kwarg must
+        migrate to either (a) construct then attribute-assign
+        ``MeltState(...).stir_factor = X``, or (b) pass an explicit
+        ``stir_state=StirState(axial=X)``. No known callers do this in
+        the current tree; the deprecation surface is read-via-property
+        + write-via-setter only.
+        """
+        self.stir_state.axial = float(value)
 
     def composition_wt_pct(self) -> Dict[str, float]:
         """Current composition as weight percent."""

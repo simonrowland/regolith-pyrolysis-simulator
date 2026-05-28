@@ -185,7 +185,26 @@ class EvaporationMixin:
                 # conditions``. Both consumers now see the same
                 # operator-bounded value, including the fail-closed 0.0
                 # for non-finite / bool / corrupt-state inputs.
-                'stir_factor': clamp_stir_factor(self.melt.stir_factor),
+                #
+                # 0.5.3 Phase B (2-axis stirring): Evaporation H-K-L is
+                # driven by the AXIAL axis only (vertical EM stirring
+                # renews the melt surface). The radial axis lives on
+                # ``self.melt.stir_state.radial`` and drives the gas-
+                # side Sherwood enhancement in ``simulator/
+                # condensation.py`` via a separate keyword in
+                # ``CondensationModel.configure_operating_conditions``.
+                # We pass a scalar here (just the clamped axial value)
+                # rather than the full dict so the provider's existing
+                # scalar-stir_factor signature stays the canonical
+                # contract — the kernel provider also accepts a
+                # ``{'axial': ...}`` mapping for forward-compat with
+                # future callers that want to push both axes through
+                # the same control_inputs slot. ``melt.stir_factor`` is
+                # the backward-compat property that aliases
+                # ``stir_state.axial`` (see ``simulator/state.py``).
+                'stir_factor': clamp_stir_factor(
+                    self.melt.stir_state.axial,
+                ),
                 'alpha': _load_evaporation_alpha_by_species(
                     self.vapor_pressures
                 ),

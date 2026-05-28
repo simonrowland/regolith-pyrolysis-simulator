@@ -1310,8 +1310,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # melt) maps to the fail-closed default rather than raising
             # ``TypeError`` on ``float(None)``. Codex /code-review
             # max-effort, Phase B.
+            #
+            # 0.5.3 Phase B (2-axis stirring): split the single scalar
+            # ``stir_factor`` into ``stir_state.axial`` (evap H-K-L
+            # multiplier) + ``stir_state.radial`` (Sh enhancement).
+            # The legacy ``stir_factor=`` kwarg on condensation carries
+            # the axial value for audit-history continuity (the legacy
+            # field is preserved on ``CondensationModel`` so a
+            # downstream auditor can compare requested vs applied per
+            # axis); ``radial_stir_factor=`` carries the canonical Sh
+            # driver. Both run through ``clamp_stir_factor`` per-axis
+            # — see ``simulator/state.py::clamp_stir_state`` for the
+            # 2-axis defensive contract.
             stir_factor=clamp_stir_factor(
-                getattr(self.melt, 'stir_factor', None)
+                getattr(
+                    getattr(self.melt, 'stir_state', None),
+                    'axial',
+                    None,
+                )
+            ),
+            radial_stir_factor=clamp_stir_factor(
+                getattr(
+                    getattr(self.melt, 'stir_state', None),
+                    'radial',
+                    None,
+                )
             ),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),

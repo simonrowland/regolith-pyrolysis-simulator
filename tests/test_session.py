@@ -185,6 +185,113 @@ def test_session_adjust_clamps_absurd_stir_factor_to_physical_ceiling():
     assert sim.campaign_mgr.overrides["C2A"]["stir_factor"] == pytest.approx(0.0)
 
 
+def test_session_adjust_stir_state_writes_canonical_2_axis_state():
+    """0.5.3 Phase B: ``session.adjust("stir_state", {axial, radial})``
+    is the canonical 2-axis writer. Drives both axes through
+    ``clamp_stir_state``, replacing the whole ``melt.stir_state``
+    dataclass. Operator intent: "set the stirring state to this".
+    Legacy ``session.adjust("stir_factor", ...)`` writes axial only
+    (backward-compat for pre-Phase-B web UI / auto-tuner callers)."""
+    from simulator.state import MAX_STIR_FACTOR, StirState
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    # Full 2-axis dict
+    session.adjust("stir_state", {"axial": 4.0, "radial": 6.0})
+    assert sim.melt.stir_state == StirState(axial=4.0, radial=6.0)
+    assert sim.melt.stir_factor == 4.0  # legacy property still reads axial
+
+    # Partial dict — missing axis defaults to 1.0 (laminar baseline)
+    session.adjust("stir_state", {"radial": 8.0})
+    assert sim.melt.stir_state.axial == 1.0
+    assert sim.melt.stir_state.radial == 8.0
+
+    # Scalar through stir_state path → axial only (same semantics as
+    # the legacy stir_factor path, but the user used the new field)
+    session.adjust("stir_state", 5.0)
+    assert sim.melt.stir_state.axial == 5.0
+    assert sim.melt.stir_state.radial == 1.0
+
+    # Per-axis clamping: both axes honour MAX_STIR_FACTOR independently
+    session.adjust("stir_state", {"axial": 100.0, "radial": 250.0})
+    assert sim.melt.stir_state.axial == MAX_STIR_FACTOR
+    assert sim.melt.stir_state.radial == MAX_STIR_FACTOR
+
+    # bool / non-finite on a single axis fails closed on that axis only
+    session.adjust("stir_state", {"axial": float("nan"), "radial": 4.0})
+    assert sim.melt.stir_state.axial == 0.0
+    assert sim.melt.stir_state.radial == 4.0
+    session.adjust("stir_state", {"axial": True, "radial": False})
+    # Whole-dict bool would still pass through the per-axis branch:
+    # bool keys are individually rejected per-axis (mirrors
+    # clamp_stir_factor's bool defensive rejection).
+    assert sim.melt.stir_state.axial == 0.0
+    assert sim.melt.stir_state.radial == 0.0
+
+
+def test_session_adjust_legacy_stir_factor_touches_axial_only():
+    """0.5.3 Phase B: the legacy ``session.adjust("stir_factor", x)``
+    path must NOT silently inflate the radial axis. Pre-0.5.3 the
+    scalar drove BOTH consumers (evap + condensation); 0.5.3 splits
+    them, and the operator-intent reading is that a pre-Phase-B
+    caller using the legacy scalar API only meant to dial the
+    melt-side (axial) consumer. Radial stays at its current value
+    (the Phase B default ``1.0``, laminar Sh baseline)."""
+    from simulator.state import StirState
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    # Pin starting state
+    assert sim.melt.stir_state == StirState(axial=6.0, radial=1.0)
+
+    session.adjust("stir_factor", 8.0)
+    assert sim.melt.stir_state.axial == 8.0
+    assert sim.melt.stir_state.radial == 1.0  # untouched
+
+    # Dial radial via the new 2-axis path, then check the legacy
+    # path still only writes axial
+    session.adjust("stir_state", {"axial": 8.0, "radial": 6.0})
+    assert sim.melt.stir_state.radial == 6.0
+    # Legacy stir_factor write must NOT clobber radial back to 1.0
+    session.adjust("stir_factor", 4.0)
+    assert sim.melt.stir_state.axial == 4.0
+    assert sim.melt.stir_state.radial == 6.0
+
+
+def test_session_adjust_campaign_override_stir_state_field():
+    """0.5.3 Phase B: ``campaign_override`` accepts ``field="stir_state"``
+    with a dict / StirState / scalar value. Stored as a clamped
+    StirState in the overrides dict so any re-entry path
+    (CampaignManager._apply_overrides) sees the 2-axis value rather
+    than a scalar that would silently take the legacy mis-route."""
+    from simulator.state import StirState
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    session.adjust(
+        "campaign_override", {"axial": 4.0, "radial": 8.0},
+        campaign="C2A", field="stir_state",
+    )
+    override = sim.campaign_mgr.overrides["C2A"]["stir_state"]
+    assert isinstance(override, StirState)
+    assert override.axial == 4.0 and override.radial == 8.0
+    # Active-campaign live update
+    assert sim.melt.stir_state == StirState(axial=4.0, radial=8.0)
+
+    # Above-ceiling values clamp on each axis
+    session.adjust(
+        "campaign_override", {"axial": 250.0, "radial": 99.0},
+        campaign="C2A", field="stir_state",
+    )
+    from simulator.state import MAX_STIR_FACTOR
+    override2 = sim.campaign_mgr.overrides["C2A"]["stir_state"]
+    assert override2.axial == MAX_STIR_FACTOR
+    assert override2.radial == MAX_STIR_FACTOR
+
+
 def test_advance_is_policy_free_and_surfaces_decision_without_applying():
     assert DecisionPolicy.AUTO_APPLY is not DecisionPolicy.OPERATOR
     decision = DecisionPoint(

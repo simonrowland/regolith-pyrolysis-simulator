@@ -15,9 +15,10 @@ Each campaign has:
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Dict, List, Optional, Tuple
 
-from simulator.state import clamp_stir_factor
+from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
     DecisionPoint, DecisionType, EvaporationFlux, MeltState,
@@ -150,12 +151,52 @@ class CampaignManager:
         if 'pO2_mbar' in ovr:
             melt.pO2_mbar = float(ovr['pO2_mbar'])
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
-        if 'stir_factor' in ovr:
+        # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis
+        # merge precedence. Before this fix, when an operator passed
+        # BOTH ``{stir_factor: 6, stir_state: {radial: 8}}``, the whole-
+        # ``stir_state`` write erased the explicit axial=6 (because
+        # ``clamp_stir_state({radial: 8})`` defaults the missing axial
+        # to 1.0 laminar). That's not what the operator meant — they
+        # asked for axial=6 (from stir_factor) AND radial=8 (from
+        # stir_state.radial). Resolve per-axis instead of whole-dict:
+        #
+        #   1. ``stir_factor`` (if present) sets the axial axis.
+        #   2. ``stir_state`` (if present) sets the radial axis, AND
+        #      overrides axial ONLY if it explicitly carries an axial
+        #      key. Otherwise axial keeps the stir_factor value from
+        #      step 1 (or the prior melt.stir_state.axial if neither
+        #      override is supplied).
+        has_stir_factor = 'stir_factor' in ovr
+        has_stir_state = 'stir_state' in ovr
+        if has_stir_factor:
             # 0.5.2 Phase B P1: route through ``clamp_stir_factor`` so
-            # campaign YAML overrides honour ``MAX_STIR_FACTOR`` on BOTH
-            # consumer subsystems (evaporation linear multiplier +
-            # condensation series-resistance Sherwood).
+            # campaign YAML overrides honour ``MAX_STIR_FACTOR``.
+            # 0.5.3 Phase B: ``stir_factor`` field touches AXIAL only
+            # (via the backward-compat property setter on MeltState).
             melt.stir_factor = clamp_stir_factor(ovr['stir_factor'])
+        if has_stir_state:
+            raw_state = ovr['stir_state']
+            new_state = clamp_stir_state(raw_state)
+            # Per-axis merge: when both override fields are present and
+            # ``stir_state`` does NOT explicitly carry axial, preserve
+            # the ``stir_factor``-set axial. The dict-shape check is
+            # the only reliable "did the operator mention axial?"
+            # signal we have — a StirState or scalar input is
+            # whole-dataclass-replaces by design.
+            if (has_stir_factor
+                    and isinstance(raw_state, Mapping)
+                    and 'axial' not in raw_state):
+                # Keep the axial value just set by stir_factor; replace
+                # only radial from stir_state. Construct a fresh
+                # StirState to honour the dataclass invariants.
+                melt.stir_state = StirState(
+                    axial=melt.stir_state.axial,
+                    radial=new_state.radial,
+                )
+            else:
+                # Either no concurrent stir_factor, or stir_state
+                # explicitly named axial — whole-dataclass replace.
+                melt.stir_state = new_state
 
     # ------------------------------------------------------------------
     # Temperature ramp
