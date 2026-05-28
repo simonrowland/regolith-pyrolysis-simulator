@@ -13,18 +13,21 @@ Train topology (metals train, active C2A onward):
     Stage 1  Fe condenser (1100-1400°C) — liquid Fe drains to sump
     Stage 2  Cr oxide harvester (1100-1300°C) — Cr2O3 product cartridge
     Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
-             SiO capture here is *operator-controlled*: under default
-             C2A conditions with ``stir_factor = 6`` the series-resistance
-             flux (0.5.2 Phase B) increases the designated Stage 3
-             allocation by ~+14.8% over the v1 additive blend (per
-             ``tests/fixtures/sio_yield/*_c2a.json`` regen — Stage 3
-             still receives less than Stage 4 alkali/Mg carryover in
-             absolute terms, but the allocation shift is monotonically
-             toward Stage 3's designated SiO destination). The absolute
-             total capture remains rate-cap-driven by
-             ``_pressure_isolated_capture_budget_kg``. Sub-laminar
-             stir_factor or pO₂ hold suppresses Stage 3 capture and
-             passes SiO downstream (silica fume) or holds it in melt.
+             SiO capture here is *operator-controlled*. Under default
+             0.5.3 conditions with ``StirState(axial=6.0, radial=1.0)``
+             — the axial axis drives evaporation H-K-L surface renewal
+             and the radial axis drives gas-side Sherwood enhancement —
+             Stage 4 alkali/Mg carryover continues to receive more SiO
+             than Stage 3 in absolute terms (a routing trade-off
+             documented in the 0.5.3 CHANGELOG "Known limitation"
+             section; operators raise ``stir_state.radial`` above 1.0
+             to amplify the gas-side cold-wall mass transport into
+             Stage 3, or retune Stage 3 temperatures down to widen the
+             cold-wall ΔP). The absolute total capture remains
+             rate-cap-driven by ``_pressure_isolated_capture_budget_kg``.
+             Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
+             Stage 3 capture and passes SiO downstream (silica fume)
+             or holds it in the melt.
     Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
