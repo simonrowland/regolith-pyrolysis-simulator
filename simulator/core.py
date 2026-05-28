@@ -64,6 +64,7 @@ from simulator.state import (
     CondensationTrain,
     DecisionPoint,
     DecisionType,
+    clamp_stir_factor,
     EnergyRecord,
     EvaporationFlux,
     GAS_SPECIES,
@@ -1296,6 +1297,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ],
                     self.melt,
                 )
+            ),
+            # 0.5.2 Phase B (series-resistance + stir-Sherwood): the
+            # induction-stirring knob lives on the melt state, set by
+            # campaign overrides (``simulator/campaigns.py:152``) and
+            # defaults to ``6.0`` for the standard 4-8× range. Pass it
+            # through so the boundary-layer flux uses the enhanced
+            # Sherwood rather than the laminar 3.66 asymptote. Route
+            # via ``clamp_stir_factor`` for symmetry with the operator-
+            # boundary writers in campaigns.py / session.py and so a
+            # ``None`` field (corrupt-state recovery, partially-built
+            # melt) maps to the fail-closed default rather than raising
+            # ``TypeError`` on ``float(None)``. Codex /code-review
+            # max-effort, Phase B.
+            stir_factor=clamp_stir_factor(
+                getattr(self.melt, 'stir_factor', None)
             ),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),

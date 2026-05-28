@@ -89,8 +89,27 @@ def test_wall_deposit_crosses_fast_to_slow_fouling_threshold_at_1400c():
     # means more boundary-layer mass-transfer in viscous regime,
     # which is exactly the gap the viscous-MT model was meant to
     # close.
+    # 0.5.2 Phase B (2026-05-27): viscous-regime mass transfer
+    # replaced with the canonical series-resistance form
+    # ``1/k_total = 1/(α_s·k_HKL) + (1−f)/k_MT`` (Bird/Stewart/Lightfoot),
+    # and the Sherwood number now scales with the operator's induction
+    # stirring power (``Sh_eff = 3.66 · √stir_factor``, Frössling
+    # style; ``stir_factor=6`` default at C2A → Sh ≈ 9.0). The codex
+    # P0 #1 challenge had flagged the v1 additive blend
+    # ``f·J_HKL + (1−f)·J_MT`` as wrong physics in viscous regime
+    # (HKL absolute magnitude dominated the blend at 95%); the series
+    # form is regime-correct at both limits without a hand-tuned weight
+    # curve. The free-molecular branch still degenerates to pure HKL
+    # via the ``(1−f)`` boundary-layer weight. Net effect on the 1050 C
+    # cold-liner wall deposit: 6.9806097730e-06 → 8.28395539869e-06
+    # (~+18.7% relative). Direction is physics-honest: the cold wall's
+    # ΔP is large (P_sat ≈ 0) and stir-enhanced k_MT roughly doubles
+    # the wall-flux candidate; series resistance keeps the cold wall
+    # competitive with the hotter baffle stages (whose driving
+    # pressures are smaller due to higher P_sat). The fouling-threshold
+    # structure (deposit at 1050 C, none at 1400/1500 C) is unchanged.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.9806097730e-06, rel=1e-9
+        8.28395539869e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

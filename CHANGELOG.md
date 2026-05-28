@@ -4,6 +4,106 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.5.2] — 2026-05-27
+
+Physics-correctness sweep over 0.5.1. Phase A landed three controller-direct
+commits (`ed7ef76`, `5e22bf8`, `e54d12d`) covering Chapman-Enskog `D_AB(T, P)`,
+the Mn high-T linear refit on the Mn(l) basis, the VapoRock provider status
+pass-through, and the `fit_target` convention docs. Phase B (this commit) is
+the user-directed unlock: replace the v1 additive viscous-MT blend with the
+canonical Bird/Stewart/Lightfoot series-resistance composition and lift the
+Sherwood number off the laminar pipe asymptote via operator-controlled
+induction stirring.
+
+### Changed — viscous-regime mass-transfer canonical form (Phase B)
+
+- **Series-resistance deposition flux**
+  (`simulator/condensation.py::_series_resistance_deposition_flux_mol_m2_s`).
+  Replaces the v1 additive blend `f·J_HKL + (1−f)·J_MT`. The new form is
+  `1/k_total = 1/(α_s·k_HKL) + (1−f)/k_MT`, where `f = regime_factor =
+  Kn/(Kn+0.01)`. The `(1−f)` factor weights the boundary-layer resistance
+  OUT in free-molecular regime (no continuum boundary layer) so the
+  series form degenerates cleanly to pure HKL when `f → 1`, and weighted
+  IN in viscous regime (where gas-phase diffusion is rate-limiting). The
+  pre-0.5.2 codex P0 #1 challenge had flagged the additive blend as
+  wrong physics at C2A viscous regime — HKL's absolute magnitude
+  dominated 95% of the blend even at the small regime-factor weight,
+  because HKL is the *free-molecular impingement* limit (essentially
+  unbounded by gas-phase transport). The series form rate-limits at the
+  slower of the two physical mechanisms, which is the canonical
+  Bird/Stewart/Lightfoot treatment of coupled resistances.
+- **Induction-stirring-enhanced Sherwood number**
+  (`simulator/condensation.py::_stirring_enhanced_sherwood`).
+  `Sh_eff = Sh_laminar × √stir_factor`, a Frössling-style forced-convection
+  correction that does not commit to a specific pipe-vs-tank correlation
+  (the geometry is hybrid melt-on-pot + duct-to-baffles). With
+  `stir_factor = 1` (no stirring) the laminar asymptote `Sh = 3.66`
+  applies; with C2A default `stir_factor = 6` (`setpoints.yaml § C2A
+  induction_stirring: continuous 4-8× acceleration`), `Sh_eff ≈ 9`;
+  hard-clamped at `MAX_STIR_FACTOR = 10.0` by the "melt-flying-out-of-
+  the-pot" upper bound (both the helper and `configure_operating_
+  conditions` apply the clamp so a bad campaign override cannot
+  silently inflate Sh — codex pre-0.5.2 Phase B P2). **Scope**: Phase
+  B affects the **stage-vs-wall allocation** of the per-tick capture,
+  not the absolute total capture (the latter is still governed by
+  `_pressure_isolated_capture_budget_kg`, which is rate-cap-driven,
+  not flux-derived). Net effect at C2A viscous regime: within the
+  capture budget, more SiO lands at the designated Stage 3 condenser
+  (+14.8% allocation shift per the regenerated
+  `lunar_mare_low_ti_c2a.json` / `mars_basalt_c2a.json` fixtures) and
+  less escapes downstream, because the series-resistance + stir-Sh
+  flux balances better between stage capture and wall deposition than
+  the v1 additive blend did. Replacing the rate-cap with a
+  series-resistance-derived budget is queued for a follow-on release.
+- **`melt.stir_factor` wired through to the condensation model**.
+  `simulator/core.py::_configure_condensation_operating_conditions` now
+  passes `stir_factor=float(getattr(self.melt, 'stir_factor', 1.0))`
+  into `CondensationModel.configure_operating_conditions(...)`. The
+  operating-history snapshot records the per-tick value so a downstream
+  audit can correlate Sh enhancement with the recipe campaign override
+  (`simulator/campaigns.py:152`).
+
+### Changed — Phase A (already in this minor; recap from `ed7ef76`/`5e22bf8`/`e54d12d`)
+
+- **Per-species Chapman-Enskog binary diffusion** replaces the legacy
+  `1e-2 m²/s` constant in the boundary-layer flux. Adds the Neufeld
+  1972 collision-integral correlation and a 14-species Lennard-Jones
+  table (Na, K, Ca, Fe, Mg, Mn, Cr, Al, Ti, SiO + N₂/Ar/CO₂/O₂ carriers).
+  At the SiO/N₂ typical operating point (10 mbar, ~1973 K bulk gas)
+  the proper `D_AB ≈ 5 × 10⁻²` m²/s — about 5× the constant; at higher
+  pressures the constant overshoots by ~30×.
+- **Mn high-T linear Ellingham refit on the Mn(l) basis** for the
+  1517-1700 K liquid-phase window. The pre-0.5.2 fit used a
+  Mn(s)-derived linearisation and missed the 12.05 kJ/mol fusion
+  enthalpy. Updated entry in both `simulator/equilibrium.py` and
+  `engines/builtin/vapor_pressure.py`.
+- **VapoRock provider status pass-through**
+  (`engines/vaporock/provider.py:208-222`). Removes a silent whitelist
+  coercion that mapped unrecognised backend statuses (`timeout`,
+  `partial`, `no_data`, `failed`, empty) to `'ok'`. Raw status now
+  passes through verbatim (lowercased + stripped); the core-level
+  VapoRock-unavailable gate already refuses any non-`ok` status with
+  empty pressures under `allow_fallback_vapor=False`.
+- **Vapor-pressure `fit_target` convention documented**
+  (`docs/model-limitations.md`). Two modes: `pure_component_psat`
+  (Fe / Mg / Ca / Al / Ti / Mn / Cr) where Antoine reproduces pure-metal
+  `P_sat` and the melt vapor partial is `a_M(l)·P_sat`; and
+  `pseudo_psat_backsolved_from_vaporock` (Na / K / Cr / Mn) where the
+  Antoine coefficient A is back-solved on a VapoRock calibration grid
+  so that `a_M·P_sat_pseudo ≈ P_metal_VapoRock` at the calibration
+  point. Both modes are single-counted by construction.
+
+### Verified — non-issues
+
+- **S1c stale reagent carryover after C3_NA → C4**. Codex S1c challenge
+  flagged this as a state-contamination / accounting risk. Verified
+  that `_unspent_additive_reagents_kg()` at `simulator/core.py:3687`
+  already accounts for the carryover via `process.reagent_inventory`
+  + `reservoir.reagent.<species>` lookups and reports under
+  `unspent_<reagent>_reagent` in the product ledger. Codex correctly
+  characterised this as "not mass-breaking; state-contamination /
+  accounting risk" — but accounting is honest. No code change.
+
 ## [0.5.1] — 2026-05-27
 
 Post-0.5.0 physics-correctness hardening. Closes five of the eight

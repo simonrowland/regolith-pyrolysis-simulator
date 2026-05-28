@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
 
+from simulator.state import clamp_stir_factor
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
     DecisionPoint, DecisionType, EvaporationFlux, MeltState,
@@ -150,7 +151,11 @@ class CampaignManager:
             melt.pO2_mbar = float(ovr['pO2_mbar'])
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
         if 'stir_factor' in ovr:
-            melt.stir_factor = float(ovr['stir_factor'])
+            # 0.5.2 Phase B P1: route through ``clamp_stir_factor`` so
+            # campaign YAML overrides honour ``MAX_STIR_FACTOR`` on BOTH
+            # consumer subsystems (evaporation linear multiplier +
+            # condensation series-resistance Sherwood).
+            melt.stir_factor = clamp_stir_factor(ovr['stir_factor'])
 
     # ------------------------------------------------------------------
     # Temperature ramp

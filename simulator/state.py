@@ -109,6 +109,69 @@ FARADAY = 96485.3321          # C/mol (for electrolysis)
 GAS_CONSTANT = 8.31446        # J/(mol·K)
 STEFAN_BOLTZMANN = 5.670374e-8  # W/(m²·K⁴)
 
+# Operator-controlled induction-stirring ceiling. See ``MeltState.
+# stir_factor`` doc for the two consumer subsystems (evaporation +
+# condensation). The "melt-flying-out-of-the-pot" upper bound — typical
+# industrial ceiling for 1-tonne crucible induction stirring (the recipe
+# setpoint window is 4-8× per ``data/setpoints.yaml § induction_
+# stirring``; 10× is the empirical ceiling beyond which the melt surface
+# breaks up). All override paths use ``clamp_stir_factor`` so both
+# consumers honour this ceiling.
+MAX_STIR_FACTOR = 10.0
+
+
+def clamp_stir_factor(value: float) -> float:
+    """Return ``value`` clamped to the operator-facing range
+    ``[0.0, MAX_STIR_FACTOR]``, mapping non-finite (NaN, +/-inf) inputs
+    and ``bool`` to the fail-closed default ``0.0``.
+
+    Two consumer subsystems disagree on the meaning of the lower bound:
+
+    - ``engines/builtin/evaporation_flux.py``: linear multiplier on
+      H-K-L evaporation flux. ``stir_factor=0`` is a LEGITIMATE
+      operator signal meaning "halt evaporation" (debug pause, manual
+      hold). Pre-Phase B this halt path was operator-accessible and
+      the simulator preserved it; this helper preserves it too.
+    - ``simulator/condensation.py``: drives the Sherwood-enhancement
+      ``Sh_eff = 3.66 × √stir_factor`` in the series-resistance flux.
+      Sherwood physics has its OWN floor at ``Sh = 3.66`` (laminar
+      pipe asymptote, BSL Eq 14.4-9); a ``stir_factor=0`` here must
+      not collapse Sh to zero. That physics floor lives in
+      ``_stirring_enhanced_sherwood`` so this canonical helper can
+      keep the operator-facing convention intact.
+
+    Defensive behaviour (codex /code-review max-effort sweep,
+    pre-0.5.2 Phase B):
+
+    - Non-finite (NaN, +/-inf) → ``0.0``. An upstream numerical
+      instability poisoning ``melt.stir_factor`` halts evaporation
+      rather than silently propagating NaN into the ledger.
+      ``_stirring_enhanced_sherwood`` then floors Sh at the laminar
+      baseline, so condensation stays defined.
+    - ``bool`` rejected → ``0.0``. ``True`` would coerce to ``1.0``
+      (the laminar-baseline no-stir) and ``False`` to ``0.0`` — both
+      kill stirring silently when a YAML/JSON deserialiser hands a
+      boolean. Reject so the misconfiguration is at least
+      audit-visible (operating-history records the 0.0 with
+      ``stir_factor_clamped: True``).
+    - Non-numeric strings or other unconvertible inputs → ``0.0``.
+
+    Python pitfall guard: ``min(MAX, NaN) == MAX`` and ``max(0.0, NaN)
+    == NaN`` make a naive ``max(0.0, min(MAX, x))`` an attack surface;
+    the explicit ``math.isfinite`` check covers it.
+    """
+    # bool is a subclass of int; reject explicitly before float()
+    # would otherwise coerce True->1.0 / False->0.0.
+    if isinstance(value, bool):
+        return 0.0
+    try:
+        raw = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(raw):
+        return 0.0
+    return max(0.0, min(float(MAX_STIR_FACTOR), raw))
+
 
 # ============================================================================
 # SECTION 2: ENUMERATIONS
@@ -242,9 +305,24 @@ class MeltState:
 
     # --- Stirring ---
     stir_factor: float = 6.0
-    # Induction stirring acceleration factor (4-8×).
-    # Multiplies the Hertz-Knudsen evaporation rate to account
-    # for continuous surface renewal and thermal cycling.
+    # Induction stirring acceleration factor (4-8×, hard-clamped at
+    # ``MAX_STIR_FACTOR``). Used by TWO subsystems:
+    #
+    #   1. ``engines/builtin/evaporation_flux.py``: linear multiplier on
+    #      the Hertz-Knudsen evaporation rate (surface renewal + thermal
+    #      cycling boost).
+    #   2. ``simulator/condensation.py`` (0.5.2 Phase B): drives the
+    #      stir-enhanced Sherwood number ``Sh = 3.66·√stir_factor`` in
+    #      the series-resistance boundary-layer flux.
+    #
+    # Both consumers honour ``MAX_STIR_FACTOR``; override paths
+    # (``simulator/campaigns.py`` campaign overrides, ``simulator/
+    # session.py`` ``session.adjust(...)``) all funnel through
+    # ``clamp_stir_factor`` so a bad override cannot inflate either
+    # consumer beyond the documented physical ceiling. Pre-0.5.2 the
+    # evaporation path silently accepted arbitrary multipliers; codex
+    # /review concern-diverse subagent flagged the clamp-asymmetry
+    # (Phase B P1).
 
     # --- MRE state (for endpoint detection) ---
     mre_voltage_V: float = 0.0

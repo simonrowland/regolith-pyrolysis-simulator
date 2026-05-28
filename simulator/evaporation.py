@@ -18,6 +18,7 @@ from simulator.state import (
     OXIDE_TO_METAL,
     STOICH_RATIOS,
     EvaporationFlux,
+    clamp_stir_factor,
 )
 
 
@@ -178,7 +179,13 @@ class EvaporationMixin:
                 'stoich_by_species': stoich_by_species,
                 'available_oxide_kg': available_oxide_kg,
                 'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
-                'stir_factor': float(self.melt.stir_factor),
+                # 0.5.2 Phase B (codex /code-review max-effort, E2):
+                # Route through ``clamp_stir_factor`` for symmetry with
+                # ``simulator/core.py::_configure_condensation_operating_
+                # conditions``. Both consumers now see the same
+                # operator-bounded value, including the fail-closed 0.0
+                # for non-finite / bool / corrupt-state inputs.
+                'stir_factor': clamp_stir_factor(self.melt.stir_factor),
                 'alpha': _load_evaporation_alpha_by_species(
                     self.vapor_pressures
                 ),

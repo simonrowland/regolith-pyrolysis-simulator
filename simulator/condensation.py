@@ -12,7 +12,14 @@ Train topology (metals train, active C2A onward):
     Stage 0  Hot duct (>1400°C)      — IR spectroscopy, no condensation
     Stage 1  Fe condenser (1100-1400°C) — liquid Fe drains to sump
     Stage 2  Cr oxide harvester (1100-1300°C) — Cr2O3 product cartridge
-    Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles
+    Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
+             SiO capture here is *operator-controlled*: under default
+             C2A conditions with ``stir_factor = 6`` the series-resistance
+             flux (0.5.2 Phase B) routes the majority of evolved SiO to
+             this stage; the absolute capture remains rate-cap-driven by
+             ``_pressure_isolated_capture_budget_kg``. Sub-laminar
+             stir_factor or pO₂ hold suppresses Stage 3 capture and
+             passes SiO downstream (silica fume) or holds it in melt.
     Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
@@ -61,9 +68,11 @@ from simulator.condensation_routing import (
     is_designated_for_stage,
 )
 from simulator.state import (
+    MAX_STIR_FACTOR,
     MOLAR_MASS,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     PipeSegment,
+    clamp_stir_factor,
 )
 
 
@@ -163,6 +172,71 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 
+# ``MAX_STIR_FACTOR`` + ``clamp_stir_factor`` are canonical in
+# ``simulator/state.py`` (where ``MeltState.stir_factor`` lives). They
+# are imported here so the condensation Sherwood-enhancement honours the
+# same ceiling as the evaporation linear-multiplier consumer at
+# ``engines/builtin/evaporation_flux.py``. See ``MeltState.stir_factor``
+# doc for the two-consumer rationale and the codex/gstack reviewer
+# trail that surfaced the clamp-asymmetry P1.
+
+
+def _stirring_enhanced_sherwood(
+    stir_factor: float,
+    sherwood_laminar: float = DEFAULT_SHERWOOD_LAMINAR,
+) -> float:
+    """Enhanced Sherwood number for induction-stirred gas-pipe boundary
+    layer.
+
+    For an unstirred, fully-developed laminar pipe flow with constant
+    wall concentration the asymptotic Sherwood number is 3.66 (Bird/
+    Stewart/Lightfoot Eq 14.4-9). Induction stirring on the melt
+    creates surface waves + vigorous convection in the gas just above
+    the melt, which enhances bulk-to-wall mass transfer. Without
+    stirring (``stir_factor=1``) the laminar value applies. With
+    operator stirring (``stir_factor`` 4-8 per `setpoints.yaml §C2A
+    induction_stirring`), Sh increases by the rough square-root of
+    stir_factor — a mild forced-convection correction in the Frössling
+    style (`Sh = 2 + 0.6 Re^0.5 Sc^0.33`) without committing to a
+    particular pipe-vs-tank correlation (the geometry is hybrid).
+
+    Constrained: ``stir_factor`` is clamped to ``[1.0, MAX_STIR_FACTOR]``
+    (=10.0) at the helper boundary — this is the OPERATOR-CONTROLLED
+    knob capped by the "melt-flying-out-of-the-pot" upper bound.
+    Anything beyond that breaks the gas-side boundary-layer assumption
+    AND the recipe setpoints; the clamp keeps physics defensible even
+    under a bad campaign override.
+
+    Returns: Sh in the range [``sherwood_laminar``, ~11.6] for
+    operator stir_factor in [0, MAX_STIR_FACTOR].
+
+    Two-tier clamp (codex /code-review max-effort, Phase B):
+
+    - ``clamp_stir_factor`` is the OPERATOR-facing clamp ``[0, 10]``.
+      It preserves the "halt evap" signal for the evaporation
+      consumer at ``stir_factor=0`` AND maps non-finite/bool/etc to 0.
+    - This helper applies its OWN physics floor at ``1.0`` so that
+      Sherwood never drops below the BSL laminar-pipe asymptote
+      ``Sh = 3.66`` regardless of operator value. Without stirring
+      the gas-side boundary layer still has finite natural-convection
+      transport; ``Sh = 0`` is unphysical.
+
+    Net mapping for the Sherwood path:
+
+    - stir_factor = 0 (halt evap signal): Sh = 3.66 (laminar baseline)
+    - stir_factor = 1 (no stir): Sh = 3.66 (matches)
+    - stir_factor = 6 (C2A default): Sh ≈ 9.0
+    - stir_factor = 10 (operator ceiling): Sh ≈ 11.6
+    - stir_factor = 100 or NaN: clamped/sanitized at the operator
+      boundary, then Sh = 3.66 (defensive baseline)
+    """
+    operator_value = clamp_stir_factor(stir_factor)
+    # Physics floor: Sherwood must not drop below the laminar
+    # asymptote. ``operator_value=0`` (halt-evap signal) maps here
+    # to Sh = sherwood_laminar, not Sh = 0.
+    sh_input = max(1.0, operator_value)
+    return float(sherwood_laminar) * math.sqrt(sh_input)
+
 
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:
     """Neufeld 1972 correlation for the dimensionless collision integral
@@ -251,8 +325,25 @@ class KnudsenRegimeRefusal(RuntimeError):
         super().__init__(KNUDSEN_REFUSAL_REASON)
 
 
-# Condensation temperatures at ~1 mbar partial pressure (°C)
-# Used to determine where each species preferentially deposits.
+# Condensation temperatures at ~1 mbar partial pressure (°C).
+# Used to determine where each species preferentially deposits in the
+# routing logic (``_species_condensation_temperature_C``).
+#
+# Sources (historical cheap-win audit CW3, 2026-05-27 — these had been
+# uncited bare numbers, misleading anyone retuning the routing surface):
+#   - Fe / SiO / Mg / Na / K / Ca / Mn / Cr / Al / Ti default values
+#     are the routing setpoints curated in ``data/setpoints.yaml §
+#     condensation_temperature_sources`` (operator-tuned for the
+#     pressure-vessel-internal pipe-geometry against published P_sat
+#     vs T curves).
+#   - SiO 1050 °C is the conservative gas-phase disproportionation
+#     onset for SiO(g) → 0.5 SiO2(s) + 0.5 Si(s) at low pO₂ per
+#     Schick (1960) / Nuth-Donn (1982) thermodynamic re-analysis; the
+#     1 mbar partial pressure level is the Stage-3 condenser operating
+#     point in `data/setpoints.yaml`.
+#   - Future agents: prefer `data/setpoints.yaml` overrides when
+#     adjusting these per recipe. This dict is the in-process default
+#     when an individual species has no setpoints override.
 CONDENSATION_TEMPS_C = {
     'Fe':  1250,
     'SiO': 1050,   # condenses as amorphous SiO₂ (disproportionation)
@@ -350,6 +441,24 @@ class CondensationModel:
         self.overhead_pressure_mbar = 0.0
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.gas_temperature_C = float(wall_temperature_C)
+        # Induction-stirring intensity — recipe-controlled per
+        # ``setpoints.yaml § induction_stirring``. Constructor default
+        # is ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``), NOT the
+        # ``MeltState.stir_factor = 6.0`` default. The two are
+        # intentionally different: ``MeltState`` is the operator-facing
+        # field carrying the C2A recipe value, ``CondensationModel`` is
+        # a transport object whose flux helpers reduce to honest
+        # no-stir physics until ``configure_operating_conditions(
+        # stir_factor=...)`` pushes the recipe value through. Direct-
+        # construction callers (typically unit tests) MUST call
+        # ``configure_operating_conditions`` before ``route()`` for the
+        # series-resistance branch to engage; otherwise ``regime_factor
+        # = 1.0`` (free-molecular default) collapses the form back to
+        # pure HKL. gstack /review subagent flagged this Phase B P3 as
+        # a footgun for future direct-construction tests; documenting
+        # rather than coupling here avoids importing state.py for what
+        # is properly an operator-boundary concern.
+        self.stir_factor = 1.0
         self.knudsen_number = math.inf
         self.regime_factor = 1.0
         self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
@@ -388,10 +497,17 @@ class CondensationModel:
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
         pipe_segment_temperatures_C: Mapping[str, float] | None = None,
+        stir_factor: float | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
     ) -> None:
-        """Update tick-local wall and Knudsen conditions for cached models."""
+        """Update tick-local wall and Knudsen conditions for cached models.
+
+        ``stir_factor`` (when provided) updates the induction-stirring knob
+        consumed by the series-resistance flux's Sherwood enhancement. Defaults
+        to ``1.0`` (no stirring) when unset; recipes wire ``melt.stir_factor``
+        through ``core._configure_condensation_operating_conditions``.
+        """
 
         if wall_temperature_C is not None:
             self.wall_temperature_C = float(wall_temperature_C)
@@ -401,6 +517,49 @@ class CondensationModel:
             self.gas_temperature_C = float(gas_temperature_C)
         elif wall_temperature_C is not None:
             self.gas_temperature_C = float(wall_temperature_C)
+        # Track requested vs applied stir for the operating-history audit.
+        # Codex + gstack reviewers (Phase B P3): the canonical clamp at
+        # ``clamp_stir_factor`` is silent — a downstream auditor reading
+        # the history can't otherwise tell "operator chose 10.0" from
+        # "operator chose 100, got clamped". Record both.
+        _stir_factor_requested: float | None = None
+        _stir_factor_clamped: bool = False
+        if stir_factor is not None:
+            # Capture the as-requested numeric value if it's coercible.
+            # Non-finite (NaN/+/-inf), bool, and non-numeric inputs all
+            # land at ``_stir_factor_requested = None`` so the snapshot
+            # explicitly says "no numeric request" rather than lying
+            # about it.
+            if not isinstance(stir_factor, bool):
+                try:
+                    _coerced = float(stir_factor)
+                except (TypeError, ValueError):
+                    _coerced = None
+                if _coerced is not None and math.isfinite(_coerced):
+                    _stir_factor_requested = _coerced
+            # Canonical clamp from ``simulator/state.py``. The operator
+            # override paths in ``simulator/campaigns.py`` and
+            # ``simulator/session.py`` use the SAME helper, so the value
+            # carried on ``melt.stir_factor`` and the value reflected
+            # here are consistent.
+            self.stir_factor = clamp_stir_factor(stir_factor)
+            # ``_stir_factor_clamped`` MUST be True whenever
+            # ``clamp_stir_factor`` modified the input — including
+            # non-finite/bool/non-numeric cases where the sanitisation
+            # IS the clamp event. Pre-0.5.2 code-review max-effort
+            # caught the earlier short-circuit that hid these from
+            # auditors.
+            if _stir_factor_requested is None:
+                # Non-finite / bool / non-numeric / None all hit the
+                # defensive 0.0 path; report as clamped.
+                _stir_factor_clamped = True
+            else:
+                _stir_factor_clamped = not math.isclose(
+                    _stir_factor_requested,
+                    self.stir_factor,
+                    rel_tol=1e-12,
+                    abs_tol=0.0,
+                )
         if overhead_pressure_mbar is not None:
             self.overhead_pressure_mbar = max(0.0, float(overhead_pressure_mbar))
             self._knudsen_policy_configured = True
@@ -423,30 +582,60 @@ class CondensationModel:
                 for segment in self.pipe_segments
             })
         self.last_knudsen_regime_diagnostic = self._current_knudsen_diagnostic()
-        if overhead_pressure_mbar is not None:
-            self.operating_history.append(
-                {
-                    "campaign": str(campaign_name or ""),
-                    "campaign_hour": (
-                        0.0 if campaign_hour is None
-                        else float(campaign_hour)
-                    ),
-                    "wall_temperature_C": float(self.wall_temperature_C),
-                    "pipe_segment_temperatures_C": {
-                        segment.name: float(segment.wall_temperature_C)
-                        for segment in self.pipe_segments
-                    },
-                    "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
-                    "knudsen_number": float(self.knudsen_number),
-                    "knudsen_regime": self.knudsen_regime.value,
-                    "regime_factor": float(self.regime_factor),
-                    "knudsen_warnings": tuple(
-                        self.last_knudsen_regime_diagnostic.get(
-                            "warnings", ())),
-                    "knudsen_regime_diagnostic": dict(
-                        self.last_knudsen_regime_diagnostic),
-                }
+        # gstack reviewer Phase B P2: previously this snapshot was gated
+        # ONLY on ``overhead_pressure_mbar is not None``, so a caller that
+        # tweaked wall temperatures or stir_factor without supplying a
+        # pressure (e.g. ``runner._apply_sio_wall_sweep_controls``) left
+        # zero audit trail. Broadened to fire when any operating-condition
+        # input changed this call. Mass-balance closure stays honest by
+        # the same path.
+        _snapshot_inputs_changed = any(
+            x is not None
+            for x in (
+                overhead_pressure_mbar,
+                stir_factor,
+                wall_temperature_C,
+                pipe_diameter_m,
+                gas_temperature_C,
+                pipe_segment_temperatures_C,
             )
+        )
+        if _snapshot_inputs_changed:
+            snapshot: dict[str, Any] = {
+                "campaign": str(campaign_name or ""),
+                "campaign_hour": (
+                    0.0 if campaign_hour is None
+                    else float(campaign_hour)
+                ),
+                "wall_temperature_C": float(self.wall_temperature_C),
+                "pipe_segment_temperatures_C": {
+                    segment.name: float(segment.wall_temperature_C)
+                    for segment in self.pipe_segments
+                },
+                "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
+                "stir_factor": float(self.stir_factor),
+                "stir_factor_clamped": bool(_stir_factor_clamped),
+                "knudsen_number": float(self.knudsen_number),
+                "knudsen_regime": self.knudsen_regime.value,
+                "regime_factor": float(self.regime_factor),
+                "knudsen_warnings": tuple(
+                    self.last_knudsen_regime_diagnostic.get(
+                        "warnings", ())),
+                "knudsen_regime_diagnostic": dict(
+                    self.last_knudsen_regime_diagnostic),
+            }
+            # Record the as-requested stir_factor only when it was passed
+            # this call; otherwise the field is intentionally omitted so
+            # downstream auditors can distinguish "no override this tick"
+            # from "override that survived the clamp" from "override that
+            # got clamped down".
+            if _stir_factor_requested is not None:
+                snapshot["stir_factor_requested"] = (
+                    float(_stir_factor_requested)
+                    if math.isfinite(_stir_factor_requested)
+                    else None
+                )
+            self.operating_history.append(snapshot)
 
     def _build_default_pipe_segments(
         self,
@@ -862,20 +1051,26 @@ class CondensationModel:
             return 0.0
 
         T_wall_K = max(float(wall_temperature_C) + 273.15, 1.0)
-        # Post-F3 follow-on (viscous-regime mass-transfer): in viscous
-        # regime HKL is unphysical (free-molecular limit); the Sherwood-
-        # number boundary-layer term carries the deposition. Combine via
-        # regime_factor weighting so that HKL dominates at high Kn and
-        # mass-transfer dominates at low Kn, with a smooth transition.
-        # T_surface_K (wall) feeds P_sat; T_gas_K (bulk) feeds the
-        # ideal-gas denominator in the boundary-layer flux per autoreview
-        # pre-0.5.1 P2 (2026-05-27). overhead_pressure_pa feeds the
-        # Chapman-Enskog D_AB(T, P) per 0.5.2 Phase A1.
+        # 0.5.2 Phase B (series-resistance + stir-Sherwood): the v1
+        # additive blend at C2A viscous regime let HKL leak ~95% of the
+        # flux because the regime-factor weight (~3e-4) was too small to
+        # offset the HKL absolute-magnitude lead. Codex P0 #1 challenge
+        # called this out as wrong physics; the canonical form is series
+        # resistance (Bird/Stewart/Lightfoot):
+        #     1/k_total = 1/(alpha_s * k_HKL) + 1/k_MT
+        # which is regime-correct at both limits (HKL at low P, MT at
+        # high P) without a hand-tuned weight curve. Induction stirring
+        # amplifies k_MT via Sherwood enhancement (Frössling-style
+        # sqrt(stir_factor)). T_surface_K (wall) feeds P_sat; T_gas_K
+        # (bulk) feeds the ideal-gas denominator. overhead_pressure_pa
+        # feeds the Chapman-Enskog D_AB(T, P) per Phase A1.
         T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
         overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
-        flux = _combined_deposition_flux_mol_m2_s(
-            species, P_local_pa, T_wall_K, alpha_s, self.regime_factor,
+        flux = _series_resistance_deposition_flux_mol_m2_s(
+            species, P_local_pa, T_wall_K, alpha_s,
             pipe_diameter_m=self.pipe_diameter_m,
+            stir_factor=self.stir_factor,
+            regime_factor=self.regime_factor,
             T_gas_K=T_gas_K,
             overhead_pressure_pa=overhead_pressure_pa,
         )
@@ -987,19 +1182,23 @@ class CondensationModel:
                     lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
                 )
             T_surface_K = max(T_surface_C + 273.15, 1.0)
-            # Post-F3 follow-on (viscous-regime mass-transfer): same
-            # combined-flux blend as the wall-deposit candidate path so
-            # the stage-condensation band integration honors viscous
-            # boundary-layer physics where HKL is unphysical.
-            # T_surface_K (stage T-band sample) drives P_sat; T_gas_K
-            # (bulk gas) drives the ideal-gas denominator per
-            # autoreview pre-0.5.1 P2. overhead_pressure_pa feeds the
-            # Chapman-Enskog D_AB(T, P) per 0.5.2 Phase A1.
+            # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
+            # series-resistance form as the wall-deposit candidate path so
+            # the stage-condensation band integration honors the canonical
+            # mass-transfer composition (Bird/Stewart/Lightfoot) rather
+            # than the v1 additive blend. T_surface_K (stage T-band
+            # sample) drives P_sat; T_gas_K (bulk gas) drives the
+            # ideal-gas denominator. overhead_pressure_pa feeds the
+            # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
+            # amplifies the boundary-layer Sherwood per the operator's
+            # induction-stirring power.
             T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
-            flux = _combined_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, alpha_s, self.regime_factor,
+            flux = _series_resistance_deposition_flux_mol_m2_s(
+                species, P_local_pa, T_surface_K, alpha_s,
                 pipe_diameter_m=self.pipe_diameter_m,
+                stir_factor=self.stir_factor,
+                regime_factor=self.regime_factor,
                 T_gas_K=T_gas_K,
                 overhead_pressure_pa=overhead_pressure_pa,
             )
@@ -1216,140 +1415,184 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     )
 
 
-def _viscous_mass_transfer_flux_mol_m2_s(
+# Note: ``_viscous_mass_transfer_flux_mol_m2_s`` and
+# ``_combined_deposition_flux_mol_m2_s`` (the v1 additive-blend
+# pair from 0.5.0 → 0.5.1) were removed in 0.5.2 Phase B. They had
+# zero remaining callers after both production call sites switched
+# to the canonical Bird/Stewart/Lightfoot series-resistance form
+# (``_series_resistance_deposition_flux_mol_m2_s`` below). Codex
+# /code-review max-effort flagged the orphan helpers as
+# maintenance-drift risk; removal keeps the viscous-MT physics in
+# exactly one place. The legacy additive-blend physics is fully
+# described in the 0.5.2 CHANGELOG entry + the docstring of
+# ``_series_resistance_deposition_flux_mol_m2_s`` if a future
+# investigator needs to reproduce the pre-Phase-B fluxes.
+
+
+def _series_resistance_deposition_flux_mol_m2_s(
     species: str,
     P_local_pa: float,
     T_surface_K: float,
+    alpha_s: float,
     pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
-    sherwood: float = DEFAULT_SHERWOOD_LAMINAR,
-    diffusion_coefficient_m2_s: float | None = None,
+    stir_factor: float = 1.0,
+    regime_factor: float = 0.0,
     T_gas_K: float | None = None,
     overhead_pressure_pa: float | None = None,
     carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> float:
-    """Boundary-layer mass-transfer flux of ``species`` to a cooled wall.
+    """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
+    form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
+    where ``f = regime_factor = Kn/(Kn+0.01)`` weights the boundary-layer
+    resistance OUT in free-molecular regime (no continuum boundary layer).
 
-    Viscous-regime companion to ``_hkl_surface_deposition_flux_mol_m2_s``.
-    Uses the Bird/Stewart/Lightfoot Sherwood-number correlation for
-    laminar pipe flow with constant wall concentration (Sh = 3.66
-    asymptotic). The mass-transfer coefficient is
+    Replaces the v1 *additive-blend*
+    ``f·J_HKL + (1−f)·J_MT`` of 0.5.1's post-F3 viscous-regime model.
+    The codex challenge against the v1 blend at C2A viscous regime correctly
+    observed that:
 
-        k_c = Sh * D_AB / L_pipe    [m/s]
+      * the additive form let HKL contribute its absolute magnitude (which
+        is hundreds of × the MT flux in viscous regime),
+      * so even with the regime-factor weight of ~3×10⁻⁴ the resulting flux
+        was dominated by HKL leakage (~95% of blended flux per the codex
+        worked example),
+      * which is wrong physics — in the viscous boundary-layer limit the
+        rate-limiting step IS gas-phase diffusion through the boundary layer.
 
-    and the deposition flux follows from the local-vs-saturated
-    concentration gradient:
+    The series-resistance form is the canonical mass-transfer composition:
+    a flux must pass through both resistances sequentially, so the slower
+    process limits the total. The ``(1 − f)`` factor on the MT term encodes
+    that the boundary-layer resistance only exists when there IS a continuum
+    boundary layer (viscous regime); in free-molecular regime molecules cross
+    the gas ballistically and only HKL applies. Limits:
 
-        J_mass = k_c * (P_local - P_sat(T_wall)) / (R * T_gas)   [mol/m^2/s]
+      * Free-molecular (Kn ≫ 0.01, f → 1): MT resistance → 0,
+        ``1/k_total → 1/k_HKL``, ``J → J_HKL`` (correct: no boundary layer).
+      * Viscous (Kn ≪ 0.01, f → 0): k_MT ≪ k_HKL, ``1/k_total → 1/k_MT``,
+        ``J → J_MT`` (correct: boundary layer rate-limits).
+      * Transition: smooth, with both resistances active. Operationally F3
+        refuses pure transition regime, so callers don't actually evaluate
+        deep in this band; the smoothness is a safety property, not a
+        recipe regime.
 
-    This is the boundary-layer-limited deposition rate. It dominates in
-    the viscous regime (Kn << 0.01) where the HKL free-molecular
-    impingement flux is unphysical; the two are blended via the
-    Knudsen ``regime_factor`` in the callers
-    (`_wall_deposit_candidate_for_surface_kg` and
-    `_condensation_efficiency`).
+    Stir factor enhances the Sherwood number (and hence k_MT) per the
+    operator's induction-stirring power. At ``stir_factor=1`` (no stirring)
+    Sh = 3.66 (laminar pipe asymptote, BSL Eq 14.4-9). At ``stir_factor=6``
+    (default C2A setpoint, see ``setpoints.yaml § induction_stirring``)
+    Sh ≈ 9.0. At ``stir_factor=10`` (industrial upper bound — "melt about
+    to fly out of the pot") Sh ≈ 11.6. See
+    ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
-    Returns 0 when there is no driving force (P_local <= P_sat at
-    the wall surface) or when the pipe geometry is invalid.
+    Returns 0 when there is no driving force (``P_local <= P_sat`` at
+    ``T_surface``) or when the pipe geometry is degenerate.
     """
-    if pipe_diameter_m <= 0.0 or sherwood <= 0.0:
+    # Defensive input validation: any non-finite or non-physical input
+    # in this hot path silently propagates through the rate-coefficient
+    # math and out the other side as NaN/inf fluxes that poison the
+    # downstream ledger. Codex pre-0.5.2 Phase B P1 (NaN propagation +
+    # regime_factor escape route). Fail closed at the gate.
+    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0:
+        return 0.0
+    if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
+            and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):
         return 0.0
     P_sat_pa = _antoine_psat_pa(species, T_surface_K)
-    if P_sat_pa is None:
+    if P_sat_pa is None or not math.isfinite(P_sat_pa):
         return 0.0
     driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
-    # Autoreview pre-0.5.1 P2 (2026-05-27): the ideal-gas conversion
-    # ``P / (R * T)`` MUST use the BULK GAS temperature, not the wall
-    # surface temperature. The two diverge in cold-wall scenarios
-    # (wall at 1050 C, bulk gas at 1700 C); using T_surface here
-    # overstated the boundary-layer flux by ``T_gas/T_wall`` whenever
-    # the wall was cold. ``T_surface_K`` stays in P_sat (where it
-    # belongs: saturation pressure is a function of the cold-surface
-    # T). Callers that don't supply T_gas_K still get the old
-    # behavior (T_gas := T_surface) so the change is backward-safe.
-    effective_T_gas_K = max(
-        float(T_gas_K) if T_gas_K is not None else T_surface_K, 1.0)
-    # 0.5.2 Phase A1 (2026-05-27): use the Chapman-Enskog binary
-    # diffusion coefficient when the caller does not supply an
-    # explicit override AND the overhead pressure is known. Fall
-    # back to the legacy constant only when the species or carrier is
-    # missing from the LJ table or pressure is unknown. Codex
-    # pre-0.5.1 P4 quantified the gap: at 10 mbar / 1973 K the actual
-    # D_AB is ~3-4× the constant 1e-2; at higher pressures the
-    # constant is ~30× too high. Per-call Chapman-Enskog closes that
-    # gap directly.
-    if diffusion_coefficient_m2_s is not None:
-        d_ab_m2_s = float(diffusion_coefficient_m2_s)
-    elif overhead_pressure_pa is not None and overhead_pressure_pa > 0.0:
+
+    # k_HKL per Pa: α_s × (1 / √(2π·m·k_B·T_surface)) / N_A. Extract the
+    # per-Pa rate coefficient by calling the unit-pressure impingement-flux
+    # helper.
+    k_hkl_per_pa = alpha_s * _hkl_impingement_flux_mol_m2_s(
+        species, 1.0, T_surface_K,
+    )
+    if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
+        return 0.0
+
+    # Sanitise ``regime_factor`` BEFORE computing mt_weight. NaN or
+    # out-of-range values previously could route the helper into the
+    # pure-HKL early-return branch even in viscous regime (codex
+    # pre-0.5.2 Phase B P1): e.g. ``regime_factor=2.0`` made
+    # ``1.0 - 2.0 = -1.0`` → ``max(0.0, -1.0) = 0.0`` → free-mol
+    # shortcut fires and returns the unbounded HKL flux. Clamp to
+    # ``[0.0, 1.0]`` and treat non-finite as viscous (``f=0.0``) so the
+    # series-resistance branch carries.
+    try:
+        _f = float(regime_factor)
+    except (TypeError, ValueError):
+        _f = 0.0
+    if not math.isfinite(_f):
+        _f = 0.0
+    _f = max(0.0, min(1.0, _f))
+    mt_weight = 1.0 - _f
+
+    # Free-molecular shortcut: when the regime weight collapses the MT
+    # resistance to zero, the series reduces to pure HKL. Skip the MT
+    # branch entirely (avoids spurious dependence on the legacy fallback
+    # D_AB constant in tests that don't configure overhead pressure).
+    if mt_weight <= 0.0:
+        return k_hkl_per_pa * driving_pressure_pa
+
+    # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk) sets
+    # the ideal-gas denominator; T_surface (wall) sets the saturation
+    # pressure (already consumed by the driving_pressure_pa above).
+    _t_gas_raw = float(T_gas_K) if T_gas_K is not None else T_surface_K
+    if not math.isfinite(_t_gas_raw):
+        # NaN/inf bulk gas T poisons k_MT (and is not a recoverable
+        # state); fail closed. Codex pre-0.5.2 Phase B P1.
+        return 0.0
+    effective_T_gas_K = max(_t_gas_raw, 1.0)
+    sherwood_eff = _stirring_enhanced_sherwood(stir_factor)
+    if (overhead_pressure_pa is not None
+            and math.isfinite(overhead_pressure_pa)
+            and overhead_pressure_pa > 0.0):
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
             species, effective_T_gas_K,
             float(overhead_pressure_pa),
             carrier=carrier_gas,
         )
-        if d_ab_m2_s <= 0.0:
+        if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
             d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
     else:
         d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
-    if d_ab_m2_s <= 0.0:
+    if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
+        # MT diffusion coefficient invalid (species/carrier missing
+        # from the LJ table AND the legacy fallback constant also
+        # zeroed — pathological). In viscous regime where the
+        # boundary-layer rate-limits, an invalid k_MT means INFINITE
+        # boundary-layer resistance, not "HKL escapes the gate" — so
+        # fail closed. Pure free-molecular (``mt_weight == 0``) already
+        # returned the pure-HKL value above before reaching this
+        # branch. Codex pre-0.5.2 Phase B P1+P2.
         return 0.0
-    k_c_m_s = sherwood * d_ab_m2_s / pipe_diameter_m
-    return (
-        k_c_m_s * driving_pressure_pa
-        / (GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
+    k_mt_per_pa = (
+        sherwood_eff * d_ab_m2_s
+        / (pipe_diameter_m * GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
     )
-
-
-def _combined_deposition_flux_mol_m2_s(
-    species: str,
-    P_local_pa: float,
-    T_surface_K: float,
-    alpha_s: float,
-    regime_factor: float,
-    pipe_diameter_m: float = DEFAULT_PIPE_DIAMETER_M,
-    T_gas_K: float | None = None,
-    overhead_pressure_pa: float | None = None,
-    carrier_gas: str = DEFAULT_CARRIER_GAS,
-) -> float:
-    """Combine HKL + viscous-mass-transfer fluxes via ``regime_factor``.
-
-    Post-F3 follow-on per tickler §5. ``regime_factor`` is
-    ``Kn/(Kn + 0.01)``, going to 0 in viscous regime and 1 in
-    free-molecular regime; we blend the two physics with that weight so
-    that:
-
-      * Kn -> 0 (viscous):       J ~= J_mass_transfer
-      * Kn ~ 0.01 (transition):  J = ~0.5 * J_HKL + ~0.5 * J_mass
-      * Kn >> 0.01 (free-mol):   J ~= J_HKL
-
-    The HKL term carries ``alpha_s`` (sticking coefficient); the
-    boundary-layer term does not (capture at the boundary is
-    geometry-limited, not sticking-probability-limited).
-    """
-    weight_hkl = max(0.0, min(1.0, float(regime_factor)))
-    weight_mt = max(0.0, 1.0 - weight_hkl)
-    if weight_hkl <= 0.0 and weight_mt <= 0.0:
+    if not math.isfinite(k_mt_per_pa) or k_mt_per_pa <= 0.0:
+        # Same fail-closed rationale.
         return 0.0
 
-    hkl = (
-        _hkl_surface_deposition_flux_mol_m2_s(
-            species, P_local_pa, T_surface_K, alpha_s, regime_factor=1.0,
-        )
-        if weight_hkl > 0.0
-        else 0.0
-    )
-    mt = (
-        _viscous_mass_transfer_flux_mol_m2_s(
-            species, P_local_pa, T_surface_K,
-            pipe_diameter_m=pipe_diameter_m,
-            T_gas_K=T_gas_K,
-            overhead_pressure_pa=overhead_pressure_pa,
-            carrier_gas=carrier_gas,
-        )
-        if weight_mt > 0.0
-        else 0.0
-    )
-    return weight_hkl * hkl + weight_mt * mt
+    # Series resistance with regime-weighted boundary-layer term. The
+    # MT resistance ``1/k_MT`` is scaled DOWN by ``mt_weight`` (i.e.,
+    # the apparent k_MT is INFLATED in free-molecular regime to make
+    # the boundary-layer resistance negligible). At ``mt_weight=1``
+    # (viscous) the form is pure series-resistance; at ``mt_weight=0``
+    # (free-molecular, handled by the early return above) it would be
+    # pure HKL.
+    inv_k_total = 1.0 / k_hkl_per_pa + mt_weight / k_mt_per_pa
+    if not math.isfinite(inv_k_total) or inv_k_total <= 0.0:
+        return 0.0
+    flux = driving_pressure_pa / inv_k_total
+    if not math.isfinite(flux):
+        # Belt-and-suspenders: a non-finite product (e.g., +inf / +inf
+        # → NaN) still escapes the per-branch checks above on some
+        # platforms. Fail closed at the exit.
+        return 0.0
+    return flux
 
 
 def _mean_free_path_m(

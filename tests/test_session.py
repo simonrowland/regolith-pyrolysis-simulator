@@ -134,6 +134,57 @@ def test_adjust_handles_only_session_parameters_with_live_override_effects():
         session.adjust("speed", 0.0)
 
 
+def test_session_adjust_clamps_absurd_stir_factor_to_physical_ceiling():
+    """Operator-boundary clamp: a wildly out-of-range ``stir_factor``
+    override (e.g. an auto-tuner that proposes ``100`` because it
+    monotonically improves yield) MUST NOT slosh the melt right out of
+    its pot. The canonical ``clamp_stir_factor`` ceiling is the
+    "melt-flying-out-of-the-pot" upper bound (``MAX_STIR_FACTOR = 10``,
+    per ``simulator/state.py``); session.adjust + campaign_override
+    both route through it. 0.5.2 Phase B P1."""
+    from simulator.state import MAX_STIR_FACTOR
+
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    session.adjust("stir_factor", 100.0)
+    assert sim.melt.stir_factor == pytest.approx(MAX_STIR_FACTOR)
+
+    session.adjust(
+        "campaign_override", 250.0,
+        campaign="C2A", field="stir_factor",
+    )
+    assert sim.melt.stir_factor == pytest.approx(MAX_STIR_FACTOR)
+    # codex autoreview-r2 P3: overrides dict must also carry the
+    # CLAMPED value (was pre-coerced to raw float before this fix,
+    # leaving re-entry paths inconsistent with the operator contract).
+    assert sim.campaign_mgr.overrides["C2A"]["stir_factor"] == pytest.approx(
+        MAX_STIR_FACTOR
+    )
+
+    # Sub-laminar (legitimate "halve evap" operator control) passes through
+    # unchanged — only the upper ceiling slosh-guard fires.
+    session.adjust("stir_factor", 0.5)
+    assert sim.melt.stir_factor == pytest.approx(0.5)
+
+    # Negative values clamp to the fail-closed 0.0 (halt-evap signal).
+    session.adjust("stir_factor", -1.0)
+    assert sim.melt.stir_factor == pytest.approx(0.0)
+
+    # Bool / string corrupt-input on the campaign_override path collapses
+    # to 0.0 (fail-closed) instead of raising or lying via float coercion.
+    session.adjust(
+        "campaign_override", True,
+        campaign="C2A", field="stir_factor",
+    )
+    assert sim.campaign_mgr.overrides["C2A"]["stir_factor"] == pytest.approx(0.0)
+    session.adjust(
+        "campaign_override", "bogus",
+        campaign="C2A", field="stir_factor",
+    )
+    assert sim.campaign_mgr.overrides["C2A"]["stir_factor"] == pytest.approx(0.0)
+
+
 def test_advance_is_policy_free_and_surfaces_decision_without_applying():
     assert DecisionPolicy.AUTO_APPLY is not DecisionPolicy.OPERATOR
     decision = DecisionPoint(

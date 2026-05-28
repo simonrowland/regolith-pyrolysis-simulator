@@ -13,7 +13,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
-from simulator.state import DecisionPoint, HourSnapshot
+from simulator.state import DecisionPoint, HourSnapshot, clamp_stir_factor
 
 
 class DecisionPolicy(Enum):
@@ -181,7 +181,11 @@ class SimSession:
     def adjust(self, param: str, value: Any, **kw: Any) -> None:
         sim = self._require_sim()
         if param == "stir_factor":
-            sim.melt.stir_factor = float(value)
+            # 0.5.2 Phase B P1: clamp at the operator boundary so both
+            # consumer subsystems (evaporation linear multiplier +
+            # condensation series-resistance Sherwood) see the same
+            # bounded value.
+            sim.melt.stir_factor = clamp_stir_factor(value)
         elif param == "pO2_mbar":
             sim.melt.pO2_mbar = float(value)
         elif param == "c4_max_temp":
@@ -195,9 +199,23 @@ class SimSession:
                     "campaign_override requires campaign and field keywords"
                 )
             target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
-            target[field_name] = float(value)
-            if field_name == "stir_factor" and sim.melt.campaign.name == campaign_name:
-                sim.melt.stir_factor = float(value)
+            if field_name == "stir_factor":
+                # 0.5.2 Phase B codex autoreview-r2 P3: route the
+                # campaign_override write through ``clamp_stir_factor``
+                # BEFORE the float() coercion below, otherwise
+                # ``True``/``False`` silently become ``1.0``/``0.0``
+                # (lying bool→float) and ``"bad"`` raises ValueError
+                # here instead of taking the fail-closed defensive
+                # path. The overrides dict carries the canonical
+                # clamped value so any re-entry path applies the
+                # operator-bounded contract.
+                target[field_name] = clamp_stir_factor(value)
+                if sim.melt.campaign.name == campaign_name:
+                    # Live-update the melt field too if this override
+                    # targets the currently-active campaign.
+                    sim.melt.stir_factor = target[field_name]
+            else:
+                target[field_name] = float(value)
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 sim.melt.pO2_mbar = float(value)
         else:
