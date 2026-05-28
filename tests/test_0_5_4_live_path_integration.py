@@ -229,6 +229,72 @@ def test_w5_zero_po2_override_does_not_switch_atmosphere():
     assert sim.melt.pO2_mbar == pytest.approx(0.0)
 
 
+# ---------------------------------------------------------------------------
+# E7 — runner / web/events.py pO2 cross-layer integration
+# ---------------------------------------------------------------------------
+
+def test_e7_direct_session_adjust_po2_flips_atmosphere_live():
+    """E7: the canonical web-handler path
+    ``web/events.py:769-771`` calls ``state['session'].adjust(
+    'pO2_mbar', value)`` for the operator UI lever. Integration
+    check that the 0.5.3 Phase C P2 fix-pattern is live on the
+    direct-adjust path (W5 covered campaign_override; this covers
+    the path the production web UI actually uses)."""
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+    session.adjust("pO2_mbar", 2.5)
+
+    # Direct-adjust atmosphere switch (Phase C milestone P2 fix at
+    # simulator/session.py:228) lives end-to-end through the
+    # SimSession boundary.
+    assert sim.melt.atmosphere == Atmosphere.CONTROLLED_O2
+    assert sim.melt.pO2_mbar == pytest.approx(2.5)
+
+
+def test_e7_direct_session_adjust_zero_po2_preserves_atmosphere():
+    """E7 complement: the web handler's pO2=0 lever (operator
+    clearing the setpoint, not requesting controlled-O2) MUST
+    leave the atmosphere alone. Three-way invariant across:
+    - direct adjust (Phase C P2 fix)
+    - campaign_override (W5)
+    - configure_campaign transition (milestone P1)
+    All preserve PN2_SWEEP on a pO2=0 write."""
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+    session.adjust("pO2_mbar", 0.0)
+
+    # No atmosphere change on a clearing-write.
+    assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+    assert sim.melt.pO2_mbar == pytest.approx(0.0)
+
+
+def test_e7_post_adjust_run_keeps_atmosphere_through_subsequent_ticks():
+    """E7: the W5 atmosphere switch is sticky — it should remain
+    CONTROLLED_O2 across subsequent ticks until the operator
+    explicitly changes it. Ensures the W5 fix doesn't accidentally
+    revert on a tick where the campaign manager re-applies
+    defaults."""
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    session.adjust("pO2_mbar", 1.0)
+    assert sim.melt.atmosphere == Atmosphere.CONTROLLED_O2
+
+    # Run a couple of ticks; atmosphere should stay CONTROLLED_O2.
+    for _ in range(3):
+        sim.step()
+    assert sim.melt.atmosphere == Atmosphere.CONTROLLED_O2, (
+        "Phase C P2 atmosphere switch was not sticky across ticks — "
+        "campaign-manager defaults may be overwriting the operator's "
+        "lever after the fact"
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(1.0)
+
+
 def test_w5_milestone_p1_transition_path_lives_in_session_driven_run():
     """A1: the milestone-review P1 fix (campaign-override pO2 stored
     for a future campaign, then applied via configure_campaign at
