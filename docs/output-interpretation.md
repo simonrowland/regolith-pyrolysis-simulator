@@ -54,3 +54,11 @@ The evaporation diagnostic includes `flux_uncertainty_pct`, a per-species map de
 ## Mass balance
 
 `per_hour_summary[i].mass_balance_pct` is `|mass_in − mass_out| / mass_in × 100`, computed against the atom ledger. The invariant the goldens pin is below `5×10⁻¹² %` at every tick under the full default-on stack (`tests/test_mass_balance.py`). The 0.5.0 closure under default-on `freeze_gate` + V1c-JANAF + V1e-impl + S1b + F1–F6 + E3 is `2.19×10⁻¹⁴ %`. Drifts above `5×10⁻¹² %` should be treated as regressions.
+
+## Per-tick HourSnapshot diagnostics (0.5.4+)
+
+The 0.5.4 release added two earlier-warning diagnostic surfaces to every `HourSnapshot`:
+
+- **`metal_projection_drift_kg`** (W8 / M2 closure) — per-species `ledger_kg - projection_kg` for metal species whose `process.metal_phase` AtomLedger account differs from the sum across `train.stages[*].collected_kg` (UI projection) by more than `1×10⁻⁹ kg`. Empty dict means all metals are in sync across both surfaces. Negative values surface a projection-only stale state (UI carries phantom kg with no ledger backing) — that case is rare in production but `union_iteration` (post-push P2 fix) makes it visible rather than silent. Complements the global `mass_balance_error_pct` ≤5×10⁻¹² % gate with per-species visibility.
+
+- **`knudsen_regime_summary`** (0.5.4.1 E3) — per-tick Knudsen-regime visibility from the latest condensation pass. Carries `status` (`ok` / `warning` / `refused`), `knudsen_number` (float), `knudsen_regime` (`viscous` / `transition` / `free_molecular`), `regime_factor` (F3 viscous-flow attenuation), and `warnings` (operator-facing strings when Kn approaches the boundary). Complements the F3 hard refusal at `Kn ≥ 10` with earlier-warning visibility so operators can lower ramp rates or adjust pN₂ sweep proactively. Empty dict on ticks that didn't trigger a condensation route.
