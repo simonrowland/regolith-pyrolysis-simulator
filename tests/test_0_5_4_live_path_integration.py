@@ -206,10 +206,18 @@ def test_w5_campaign_override_po2_switches_atmosphere_live_in_a_real_session():
     # equilibrium.py _O2_CONTROLLED_ATMOSPHERES branch (per the
     # Phase A + W5 fix-pattern).
     sim.step()
-    # No assertion-failure at the engine level confirms the path
-    # is live; the snapshot atmosphere reads what we set.
     snap = session.snapshot()
     assert snap.campaign == CampaignPhase.C2A
+    # Midflight-review P2 hardening (2026-05-28): assert the
+    # commanded pO2 actually propagates through to the overhead
+    # state, not just the campaign identity. The W5 wire claim is
+    # "atmosphere → pO2 floor → commanded value reaches the gas
+    # state". Pin the gas-side observable directly.
+    assert sim.overhead.composition.get("O2", 0.0) >= 1.0, (
+        "W5 wire: commanded pO2 = 1.0 mbar should propagate to "
+        "overhead.composition['O2'] via the CONTROLLED_O2 floor "
+        f"(Phase A P1 invariant); got {sim.overhead.composition.get('O2', 0.0)}"
+    )
 
 
 def test_w5_zero_po2_override_does_not_switch_atmosphere():

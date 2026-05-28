@@ -646,6 +646,17 @@ def build_per_hour_summary(
         if abs(products.get(species, 0.0)) > 1e-12
     }
 
+    # 0.5.4.1 midflight-review P2 (2026-05-28): the per-tick
+    # Knudsen-regime summary (E3) is exposed on HourSnapshot via
+    # ``snapshot.knudsen_regime_summary`` — adding it to the runner
+    # per-hour summary output requires coordinated fixture regen
+    # for `lunar_mare_low_ti_C0_24h`, `mars_basalt_C2A_12h`, and
+    # `ci_carbonaceous_chondrite_C2B_12h`. Deferred to the
+    # morning gate so the regen can be reviewed alongside the
+    # decision on B5 hold-hours + Na/K/V species addition. The
+    # snapshot-level surface is already accessible to in-process
+    # consumers and the web UI; this just defers the JSON-output
+    # propagation.
     return {
         "hour": int(snapshot.hour),
         "campaign": snapshot.campaign.name,

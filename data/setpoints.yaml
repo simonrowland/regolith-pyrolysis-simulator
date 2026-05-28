@@ -833,55 +833,79 @@ mre_voltage_sequence:
     anode: "Ir or Pt-alloy"
     cathode: "Mo or W"
 
+  # 0.5.4.1 B5 hardening (midflight P1 fix, 2026-05-28): explicit
+  # ``min_hold_hours`` per species so the YAML-driven ladder
+  # reproduces the historical hardcoded MRE_BASELINE step-advance
+  # behavior. Pre-hardening, the Python builder defaulted
+  # unspecified species to 3h, shifting Al2O3 / MgO / CaO hold-
+  # hours from their legacy values (8 / 5 / 10). Now the YAML
+  # carries the canonical hold-hours; the Python fallback ladder
+  # (simulator/extraction.py::_MRE_VOLTAGE_LADDER_FALLBACK)
+  # remains in lockstep for the missing-YAML path. Na2O / K2O /
+  # V2O5 are present in the YAML but ABSENT from the Python
+  # fallback — operators running with the YAML get the full 11-
+  # species ladder; tests built on the fallback see the 8-species
+  # subset.
   sequence:
     - species: "Na2O"
       decomposition_V: "<0.5"
       campaign: "C5 opening"
+      min_hold_hours: 2
       note: "alkali recovery; should be pre-depleted by C3"
 
     - species: "K2O"
       decomposition_V: "<0.5"
       campaign: "C5 opening"
+      min_hold_hours: 2
       note: "alkali recovery; should be pre-depleted by C3"
 
     - species: "FeO"
       decomposition_V: 0.6
       campaign: "C5"
+      min_hold_hours: 3
       note: "should be pre-depleted by C2/C3"
 
     - species: "Cr2O3"
       decomposition_V: [0.8, 1.0]
       campaign: "C5 trace cleanup"
+      min_hold_hours: 2
 
     - species: "V2O5"
       decomposition_V: [0.8, 1.0]
       campaign: "C5 trace cleanup"
+      min_hold_hours: 2
 
     - species: "MnO"
       decomposition_V: [0.8, 1.0]
       campaign: "C5 trace cleanup"
+      min_hold_hours: 2
 
     - species: "SiO2"
       decomposition_V: 1.4
       campaign: "C5 primary target"
+      min_hold_hours: 5
       note: "Si as liquid metal; permanently removes SiO source"
 
     - species: "TiO2"
       decomposition_V: 1.5
       campaign: "C5 sweep"
+      min_hold_hours: 3
       note: "optional -- retain for C6 Al-Ti alloy by stopping before this voltage"
 
     - species: "Al2O3"
       decomposition_V: 1.9
       campaign: "C5 Branch One only"
+      min_hold_hours: 8
 
     - species: "MgO"
       decomposition_V: 2.2
       campaign: "C5 Branch One only"
+      min_hold_hours: 5
 
     - species: "CaO"
       decomposition_V: 2.5
       campaign: "C5 Branch One only (or dedicated batch)"
+      min_hold_hours: 10
 
   voltage_strategy:
     branch_two:

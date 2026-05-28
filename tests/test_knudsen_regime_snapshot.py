@@ -62,35 +62,50 @@ def test_snapshot_has_knudsen_regime_summary_field():
 def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     """After a few ticks of C2A_continuous, the condensation route
     has fired at least once → the summary carries the documented
-    fields. Each field is JSON-serialisable / dataclass-friendly."""
+    fields. Each field is JSON-serialisable / dataclass-friendly.
+
+    Midflight-review P2 hardening (2026-05-28): FORCE the diagnostic
+    populated by directly invoking ``condensation_model.route(...)``
+    before reading the snapshot, instead of relying on the C2A
+    integration path firing the route within 4 ticks (which it
+    doesn't in stub-backend mode). The test now actually exercises
+    the populated-summary code path instead of passing vacuously."""
+    from simulator.state import EvaporationFlux
+
     session = SimSession().start(_config(campaign="C2A"))
-    for _ in range(4):
-        session.simulator.step()
-    snap = session.snapshot()
+    sim = session.simulator
+    # Force a condensation route so the Kn diagnostic actually
+    # populates. Without this, the summary stays {} through a
+    # short C2A warmup and the original assertions were vacuous.
+    sim.melt.temperature_C = 1500.0
+    model = sim.condensation_model
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+    model.route(flux, sim.melt)
+    snap = sim._make_snapshot()
     summary = snap.knudsen_regime_summary
-    # Once the condensation route fires, the diagnostic is non-empty.
-    if summary:
-        # Documented canonical fields (each optional but typed when present)
-        if 'status' in summary:
-            assert isinstance(summary['status'], str)
-        if 'knudsen_number' in summary:
-            assert isinstance(summary['knudsen_number'], float)
-            # Real-recipe Kn is well below the F3 refusal threshold (10).
-            assert summary['knudsen_number'] >= 0.0
-        if 'knudsen_regime' in summary:
-            assert isinstance(summary['knudsen_regime'], str)
-            assert summary['knudsen_regime'] in (
-                'viscous', 'transition', 'free_molecular'
-            )
-        if 'regime_factor' in summary:
-            assert isinstance(summary['regime_factor'], float)
-            assert 0.0 <= summary['regime_factor'] <= 1.0
-        if 'warnings' in summary:
-            # Tuple of strings (immutable; matches the diagnostic
-            # source contract).
-            assert isinstance(summary['warnings'], tuple)
-            for w in summary['warnings']:
-                assert isinstance(w, str)
+    # Now non-empty — the test must actually pin field shapes.
+    assert summary, (
+        "Knudsen diagnostic should populate after a condensation route; "
+        "midflight P2 fix made this assertion non-vacuous"
+    )
+    # Canonical field shapes.
+    assert 'status' in summary
+    assert isinstance(summary['status'], str)
+    assert 'knudsen_number' in summary
+    assert isinstance(summary['knudsen_number'], float)
+    assert summary['knudsen_number'] >= 0.0
+    assert 'knudsen_regime' in summary
+    assert isinstance(summary['knudsen_regime'], str)
+    assert summary['knudsen_regime'] in (
+        'viscous', 'transition', 'free_molecular'
+    )
+    assert 'regime_factor' in summary
+    assert isinstance(summary['regime_factor'], float)
+    assert 0.0 <= summary['regime_factor'] <= 1.0
+    assert 'warnings' in summary
+    assert isinstance(summary['warnings'], tuple)
+    for w in summary['warnings']:
+        assert isinstance(w, str)
 
 
 def test_snapshot_knudsen_summary_is_json_serialisable():
