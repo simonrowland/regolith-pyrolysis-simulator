@@ -496,6 +496,21 @@ class CondensationModel:
     ):
         self.train = train
         self.vapor_pressure_data = vapor_pressure_data
+        # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
+        # per-instance per-species condensation temperatures so each
+        # CondensationModel can carry its own setpoints overrides
+        # without cross-contaminating the module-level
+        # ``CONDENSATION_TEMPS_C`` dict. Multi-tenant servers
+        # (``web/events.py`` per-SID, ``runner.py`` per-run
+        # setpoints_path) need this isolation. Initialised from the
+        # module-level fallback; ``apply_setpoints_overrides`` later
+        # merges YAML values into this instance dict only — the
+        # module dict is no longer the canonical production-path
+        # source-of-truth (it remains the fallback for callers
+        # that don't pass an instance).
+        self.condensation_temperatures_C: dict[str, float] = dict(
+            CONDENSATION_TEMPS_C
+        )
         self.wall_surface_area_m2 = (
             float(wall_surface_area_m2)
             if wall_surface_area_m2 is not None
@@ -792,6 +807,46 @@ class CondensationModel:
                 )
             self.operating_history.append(snapshot)
 
+    def apply_setpoints_overrides(
+        self, setpoints: Mapping[str, Any] | None,
+    ) -> None:
+        """0.5.4.1 review-cluster-C (P2 #1): instance-isolated
+        version of the module-level ``apply_setpoints_condensation_
+        temperature_overrides``. Reads per-species condensation
+        temperatures from
+        ``setpoints['condensation_train']['condensation_temperatures_C']``
+        and merges into ``self.condensation_temperatures_C`` —
+        WITHOUT touching the process-global
+        ``CONDENSATION_TEMPS_C`` fallback dict.
+
+        This is the canonical production seam: each
+        ``CondensationModel`` instance carries its own setpoints
+        overrides, so multi-tenant servers (``web/events.py`` per-
+        SID, ``runner.py`` per-run setpoints_path) can build sims
+        with different setpoints in the same Python interpreter
+        without cross-contamination.
+
+        Same parse contract as the legacy module-level helper:
+        non-finite / non-coercible entries skipped; idempotent;
+        partial overrides keep other species at the fallback.
+        """
+        if not setpoints:
+            return
+        block = (
+            (setpoints.get('condensation_train', {}) or {})
+            .get('condensation_temperatures_C', {}) or {}
+        )
+        if not isinstance(block, Mapping):
+            return
+        for species, value in block.items():
+            try:
+                T_C = float(value)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(T_C):
+                continue
+            self.condensation_temperatures_C[str(species)] = T_C
+
     def _build_default_pipe_segments(
         self,
         wall_temperature_C: float,
@@ -877,7 +932,9 @@ class CondensationModel:
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
             self._record_runtime_wall_fraction(species, 0.0, {})
 
-            T_cond = _species_condensation_temperature_C(species)
+            T_cond = _species_condensation_temperature_C(
+                species, temps=self.condensation_temperatures_C
+            )
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
 
@@ -1465,9 +1522,24 @@ def restore_condensation_temperature_overrides(
     CONDENSATION_TEMPS_C.update(snapshot)
 
 
-def _species_condensation_temperature_C(species: str) -> float:
-    if species in CONDENSATION_TEMPS_C:
-        return float(CONDENSATION_TEMPS_C[species])
+def _species_condensation_temperature_C(
+    species: str,
+    *,
+    temps: Mapping[str, float] | None = None,
+) -> float:
+    """0.5.4.1 review-cluster-C (P2 #1): accept an optional
+    instance-level ``temps`` mapping so each ``CondensationModel``
+    can isolate its overrides from the module-level fallback dict.
+    When ``temps`` is None (legacy / test-only callers), falls back
+    to the process-global ``CONDENSATION_TEMPS_C`` dict; when
+    provided, the instance dict takes precedence. Production paths
+    (inside ``CondensationModel.route()``) pass
+    ``self.condensation_temperatures_C``; legacy module-level
+    callers pass nothing and get the previous behaviour.
+    """
+    source = temps if temps is not None else CONDENSATION_TEMPS_C
+    if species in source:
+        return float(source[species])
     data = _species_vapor_data(species)
     try:
         return float(data.get('condensation_T_C_at_1mbar', 500.0))

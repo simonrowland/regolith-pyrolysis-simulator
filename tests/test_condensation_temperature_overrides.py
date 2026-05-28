@@ -223,6 +223,85 @@ def test_species_condensation_temp_reads_yaml_override_end_to_end():
     assert _species_condensation_temperature_C('SiO') == 1099.0
 
 
+def test_instance_apply_setpoints_overrides_isolates_per_model():
+    """0.5.4.1 review-cluster-C (P2 #1): the new
+    ``CondensationModel.apply_setpoints_overrides`` instance method
+    MUST NOT mutate the module-level ``CONDENSATION_TEMPS_C`` dict.
+    Two CondensationModel instances with different setpoints can
+    coexist in the same Python interpreter without cross-
+    contamination (multi-tenant requirement)."""
+    from simulator.condensation import CondensationModel
+    from simulator.state import CondensationTrain
+
+    pre_module_dict = dict(CONDENSATION_TEMPS_C)
+
+    model_a = CondensationModel(CondensationTrain.create_default())
+    model_b = CondensationModel(CondensationTrain.create_default())
+
+    model_a.apply_setpoints_overrides({
+        'condensation_train': {
+            'condensation_temperatures_C': {'SiO': 920.0},
+        },
+    })
+    model_b.apply_setpoints_overrides({
+        'condensation_train': {
+            'condensation_temperatures_C': {'SiO': 1180.0},
+        },
+    })
+
+    # Each instance carries its own dict — no cross-contamination.
+    assert model_a.condensation_temperatures_C['SiO'] == 920.0
+    assert model_b.condensation_temperatures_C['SiO'] == 1180.0
+    # Module-level dict UNTOUCHED by the instance method.
+    assert CONDENSATION_TEMPS_C == pre_module_dict, (
+        "instance apply_setpoints_overrides MUST NOT mutate the "
+        "module-level CONDENSATION_TEMPS_C fallback dict"
+    )
+
+
+def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
+    """End-to-end: a fresh PyrolysisSimulator built with custom
+    setpoints applies the override on the CondensationModel
+    instance, NOT the module dict. Two sims with different SiO
+    Tcond values keep their values independently."""
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import StubBackend
+
+    pre_module_dict = dict(CONDENSATION_TEMPS_C)
+
+    def _build(sio_override: float) -> PyrolysisSimulator:
+        b = StubBackend()
+        b.initialize({})
+        return PyrolysisSimulator(
+            b,
+            {
+                'campaigns': {},
+                'condensation_train': {
+                    'condensation_temperatures_C': {
+                        'SiO': sio_override,
+                    },
+                },
+            },
+            {'x': {'label': 'X', 'composition_wt_pct': {'SiO2': 100}}},
+            {'metals': {}, 'oxide_vapors': {}},
+        )
+
+    sim_a = _build(940.0)
+    sim_b = _build(1190.0)
+
+    _ = sim_a.condensation_model
+    _ = sim_b.condensation_model
+
+    assert sim_a.condensation_model.condensation_temperatures_C['SiO'] == 940.0
+    assert sim_b.condensation_model.condensation_temperatures_C['SiO'] == 1190.0
+    # Module dict completely untouched.
+    assert CONDENSATION_TEMPS_C == pre_module_dict, (
+        "PyrolysisSimulator condensation_model property MUST NOT "
+        "mutate the module-level dict (was the cross-contamination "
+        "footgun reported in evening-4commits review P2 #1)"
+    )
+
+
 def test_simulator_construction_applies_setpoints_overrides():
     """End-to-end: a PyrolysisSimulator built from a setpoints dict
     with a custom SiO Tcond reads the override when the
@@ -248,6 +327,11 @@ def test_simulator_construction_applies_setpoints_overrides():
         {'metals': {}, 'oxide_vapors': {}},
     )
     # Trigger condensation_model build; the property apply path
-    # runs the override.
+    # runs the override on the INSTANCE dict (post-cluster-C, the
+    # module-level dict is no longer mutated by the production
+    # path — instance isolation is the new contract).
     _ = sim.condensation_model
-    assert CONDENSATION_TEMPS_C['SiO'] == 980.0
+    assert (
+        sim.condensation_model.condensation_temperatures_C['SiO']
+        == 980.0
+    )
