@@ -7,7 +7,7 @@ so minor versions may carry significant changes.
 ## [Unreleased]
 
 Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
-release boundary; commits land on `main` between pushes. 18 commits in
+release boundary; commits land on `main` between pushes. 20 commits in
 the range, all reviewed by codex / `gstack /review` per chunk-review
 protocol + midflight cumulative review (HOLD-MAJOR → fixed inline) +
 post-batch morning review (HOLD, V2O5 P1 → fixed inline).
@@ -99,6 +99,14 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
   Operator-noise reduction: unclassified section appears only when
   non-empty; sub-noise values render as `—`; values <1 kg use scientific
   notation. 13+13 tests across the E6 series.
+- **E6c** — `simulator/three_product_runner.py` runner CLI wrapping E6a +
+  E6b. Argparse entry point `python -m simulator.three_product_runner
+  --feedstock <id> --campaign <label> --hours <N> --output <path>
+  --format {markdown,json}`. Programmatic `run(...)` entry point for
+  test + library use. JSON output carries metadata header
+  (`feedstock_id`, `campaign`). 8 tests covering markdown / JSON
+  output, subprocess invocation, `--hours 0` baseline, argparse
+  rejection of invalid formats.
 
 ### Fixed — morning review findings (post-batch HOLD)
 

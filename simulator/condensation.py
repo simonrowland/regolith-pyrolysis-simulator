@@ -1418,6 +1418,22 @@ def apply_setpoints_condensation_temperature_overrides(
     - Species not present in the YAML keep their fallback value.
     - Idempotent: calling twice with the same setpoints leaves the
       module dict in the same state.
+
+    **Module-state caveat (multi-tenant)**: this helper mutates the
+    module-level ``CONDENSATION_TEMPS_C`` dict in place. In a single-
+    sim-per-process layout (the default for tests + standalone runs)
+    this is safe — pytest-xdist gives each worker its own Python
+    process, so module state is isolated. In a multi-tenant server
+    that builds multiple ``PyrolysisSimulator`` instances with
+    *different* setpoints inside one interpreter, the LAST call to
+    this helper wins; previously-built sims that cached their
+    ``condensation_model`` property won't pick up the new values
+    either. If multi-tenant use ever lands, the fix shape is to
+    move the dict onto ``CondensationModel`` as an instance
+    attribute and have ``_species_condensation_temperature_C``
+    read from that instance. Tracked in
+    ``docs-private/goal-deferred-and-roadmap-2026-05-28.md`` for
+    the F2 web UI thin-driver chunk.
     """
     snapshot = dict(CONDENSATION_TEMPS_C)
     if not setpoints:
