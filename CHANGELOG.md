@@ -24,8 +24,10 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
   wired through `data/setpoints.yaml § mre_voltage_sequence.sequence`
   with the canonical fallback ladder. Midflight P1: hardened YAML with
   explicit `min_hold_hours` per species matching legacy hardcoded values.
-  Published YAML now adds Na2O / K2O / V2O5 to the default ladder — user
-  gate Q1 documents the choice.
+  Published YAML now adds Na2O / K2O to the default ladder — Q1 documents
+  the choice. V2O5 was initially added but removed in the morning P1
+  fix (see "Fixed" section) because V is absent from the supporting
+  simulator tables.
 - **B1-tunable / CW3** — `simulator/condensation.py::apply_setpoints_condensation_temperature_overrides`
   merges operator-supplied per-species condensation temperatures from
   `data/setpoints.yaml § condensation_train.condensation_temperatures_C`
@@ -48,7 +50,7 @@ post-batch morning review (HOLD, V2O5 P1 → fixed inline).
   `min_hold_hours` per species so the YAML-driven ladder reproduces
   the historical hardcoded MRE_BASELINE step-advance behavior
   (Al2O3=8, MgO=5, CaO=10 vs the default-3 silent shift).
-- **Milestone P1 — campaigns.py:172**: future-campaign
+- **Milestone P1 — `simulator/campaigns.py:172`**: future-campaign
   `campaign_override pO2_mbar` was being applied at
   `configure_campaign()` transition time without the W5 atmosphere
   switch. Now mirrors the active-path fix.

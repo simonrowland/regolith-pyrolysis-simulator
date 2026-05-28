@@ -862,11 +862,16 @@ mre_voltage_sequence:
   # hours from their legacy values (8 / 5 / 10). Now the YAML
   # carries the canonical hold-hours; the Python fallback ladder
   # (simulator/extraction.py::_MRE_VOLTAGE_LADDER_FALLBACK)
-  # remains in lockstep for the missing-YAML path. Na2O / K2O /
-  # V2O5 are present in the YAML but ABSENT from the Python
-  # fallback — operators running with the YAML get the full 11-
-  # species ladder; tests built on the fallback see the 8-species
-  # subset.
+  # remains in lockstep for the missing-YAML path. Na2O / K2O are
+  # present in the YAML but ABSENT from the Python fallback —
+  # operators running with the YAML get the 10-species ladder;
+  # tests built on the fallback see the 8-species subset.
+  # V2O5 was an early member of the YAML but was REMOVED in the
+  # 0.5.4.1 morning-review P1 fix because V is absent from the
+  # supporting simulator tables (state.py OXIDE_SPECIES /
+  # OXIDE_TO_METAL / MOLAR_MASS + electrolysis.py DECOMP_VOLTAGES /
+  # ELECTRONS_PER_OXIDE). Re-add via the same place once full V
+  # support lands.
   sequence:
     - species: "Na2O"
       decomposition_V: "<0.5"

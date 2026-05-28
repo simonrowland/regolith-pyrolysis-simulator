@@ -462,8 +462,8 @@ class ExtractionMixin:
     # carry an explicit value. Sourced from the same fallback ladder
     # above (so YAML-without-hours behaves identically to the fallback
     # for those species). For species the YAML adds but the fallback
-    # doesn't cover (e.g., V2O5, Na2O, K2O in the published YAML),
-    # the default below applies.
+    # doesn't cover (e.g., Na2O / K2O in the published YAML), the
+    # default below applies.
     _MRE_DEFAULT_MIN_HOLD_HOURS = 3
 
     def _build_mre_voltage_sequence(self) -> list:

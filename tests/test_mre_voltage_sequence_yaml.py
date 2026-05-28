@@ -265,17 +265,27 @@ def test_yaml_ladder_species_all_supported_by_simulator_tables():
     ladder but absent from the OXIDE_SPECIES table, causing
     ``_step_mre`` to silently no-op for the species while the
     operator's UI showed "C5 cleanup running" with zero output.
+    V2O5 has since been removed from the YAML pending full V
+    support landing.
 
     This test is a SUPPORT MATRIX guard: future YAML edits that add
     a species fail loudly here BEFORE the recipe ships a silent
     no-op. Adding a new species to the YAML now requires landing
-    the matching simulator-table entries too."""
+    the matching simulator-table entries too — including the
+    electrolysis-gating tables ``DECOMP_VOLTAGES`` and
+    ``ELECTRONS_PER_OXIDE`` (per evening-4commits review P2 #3:
+    the prior version of this test only checked the state.py
+    inventory tables, missing the electrolysis gate)."""
     from pathlib import Path
     import yaml
     from simulator.state import (
         MOLAR_MASS,
         OXIDE_SPECIES,
         OXIDE_TO_METAL,
+    )
+    from simulator.electrolysis import (
+        DECOMP_VOLTAGES,
+        ELECTRONS_PER_OXIDE,
     )
 
     repo_root = Path(__file__).resolve().parent.parent
@@ -302,6 +312,12 @@ def test_yaml_ladder_species_all_supported_by_simulator_tables():
     missing_from_molar_mass = [
         sp for sp in yaml_species if sp not in MOLAR_MASS
     ]
+    missing_from_decomp_voltages = [
+        sp for sp in yaml_species if sp not in DECOMP_VOLTAGES
+    ]
+    missing_from_electrons_per_oxide = [
+        sp for sp in yaml_species if sp not in ELECTRONS_PER_OXIDE
+    ]
 
     assert not missing_from_oxide_species, (
         f"YAML mre_voltage_sequence carries species not in "
@@ -322,6 +338,22 @@ def test_yaml_ladder_species_all_supported_by_simulator_tables():
         f"{missing_from_molar_mass}. Cannot convert mass to mol; "
         f"electrolysis math would silently skip the species."
     )
+    assert not missing_from_decomp_voltages, (
+        f"YAML mre_voltage_sequence carries species not in "
+        f"simulator/electrolysis.py::DECOMP_VOLTAGES: "
+        f"{missing_from_decomp_voltages}. Cannot gate reduction "
+        f"at the threshold voltage; electrolysis would silently "
+        f"skip the species even when the operator hits its voltage "
+        f"step (evening-4commits review P2 #3)."
+    )
+    assert not missing_from_electrons_per_oxide, (
+        f"YAML mre_voltage_sequence carries species not in "
+        f"simulator/electrolysis.py::ELECTRONS_PER_OXIDE: "
+        f"{missing_from_electrons_per_oxide}. Cannot compute the "
+        f"Faradaic current → metal mass conversion; per-tick "
+        f"electrolysis math would default to 2 electrons/oxide "
+        f"silently — operator-visible lie if the actual n differs."
+    )
 
 
 def test_build_with_real_setpoints_yaml_returns_published_shape():
@@ -340,7 +372,11 @@ def test_build_with_real_setpoints_yaml_returns_published_shape():
     seq = sim._build_mre_voltage_sequence()
     species_set = {entry["species"][0] for entry in seq}
     # The published YAML carries entries the hardcoded fallback
-    # didn't have (Na2O / K2O / V2O5); the wired YAML surfaces them.
+    # didn't have (Na2O / K2O); the wired YAML surfaces them.
+    # V2O5 was present in early-2026-05-28 published YAML but was
+    # removed by the morning-review P1 fix; the support-matrix
+    # test above prevents it from re-appearing without backing
+    # simulator-table entries.
     assert "Na2O" in species_set
     assert "K2O" in species_set
     voltages = [entry["voltage"] for entry in seq]
