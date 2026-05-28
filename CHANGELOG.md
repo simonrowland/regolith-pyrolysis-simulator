@@ -4,6 +4,41 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [Unreleased]
+
+Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
+release boundary; commits are accumulating on `main` between pushes.
+
+### Fixed — post-push review findings
+
+- **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** — moved
+  to the END of the dataclass to preserve positional-constructor ABI for
+  external callers. Initial 0.5.4 placement (between `warnings` and
+  `ledger_transition`) silently shifted positional indices for
+  `ledger_transition`, `status`, and `sulfur_saturation`. Post-push codex
+  /review P2 (2026-05-28).
+
+### Added — A2: `_pipe_conductance` defensive guards
+
+- **`simulator/overhead.py::OverheadGasModel._pipe_conductance`** — fail-closed
+  to `0.0` on `T_K <= 0`, `L <= 0`, `d <= 0`, and clamp negative `p_mean_Pa` to
+  `0`. Pre-A2 these unreachable-in-real-recipe inputs would have raised
+  `ZeroDivisionError` (on T_K=0) or returned a complex result (on T_K<0,
+  via the fractional exponent in the Sutherland viscosity model). Originated
+  as P3 in the 0.5.4 codex /challenge adversarial sweep; closed in 0.5.4.1
+  rather than 0.5.4 itself because the post-push reviewer noted the prior
+  CHANGELOG deferral was inconsistent with shipping the code on main.
+
+### Hygiene — B3: public `ProviderRegistry.replace_for_test` seam (M1 closure)
+
+- **`simulator/chemistry/kernel/registry.py::ProviderRegistry.replace_for_test`**
+  — dedicated public test-seam for swapping the authoritative provider for an
+  intent. Replaces the prior pattern of mutating
+  `registry._authoritative[intent] = provider` directly. Closes the M1
+  historical-audit item (`docs-private/audits/2026-05-27-p3-historical-audit.txt`).
+  `tests/test_extraction_ledger.py` migrated to the new seam (no behaviour
+  change).
+
 ## [0.5.4] — 2026-05-28
 
 D5/D6 cleanup wave: defensive hardening + historical-audit closures + post-push
