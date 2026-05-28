@@ -263,16 +263,41 @@ class ExtractionMixin:
         + tests can read it without touching simulator internals.
         """
         ledger_metals = self.atom_ledger.kg_by_account('process.metal_phase')
-        if not ledger_metals:
+        # 0.5.4 milestone-review P2 (codex /challenge 2026-05-28):
+        # iterate the UNION of species across both ledger and
+        # projection, not just ledger keys. Pre-fix, an empty ledger
+        # with stale phantom Fe lingering in
+        # ``train.stages[*].collected_kg`` returned ``{}`` —
+        # contradicting the "empty dict means in sync" semantics
+        # documented on ``HourSnapshot.metal_projection_drift_kg``.
+        # The projection-only stale state surfaces now with negative
+        # drift (ledger_kg - projection_kg < 0), giving operators
+        # visibility into the legitimately rare but operator-visible
+        # failure mode where a ledger debit landed without a paired
+        # projection clear (e.g., a hand-mutation of train.stages
+        # bypassed ``_clear_condensed_species_projection``).
+        projection_species: set[str] = set()
+        for stage in self.train.stages:
+            for species, value in stage.collected_kg.items():
+                try:
+                    if float(value) > 0.0:
+                        projection_species.add(species)
+                except (TypeError, ValueError):
+                    continue
+        union_species = set(ledger_metals.keys()) | projection_species
+        if not union_species:
             return {}
         drift: Dict[str, float] = {}
-        for species, kg in ledger_metals.items():
+        for species in union_species:
+            raw = ledger_metals.get(species, 0.0)
             try:
-                ledger_kg = float(kg)
+                ledger_kg = float(raw)
             except (TypeError, ValueError):
                 continue
             if not (ledger_kg == ledger_kg):  # NaN guard
                 continue
+            if ledger_kg < 0.0:
+                ledger_kg = 0.0
             projected_kg = self._condensed_species_projected_kg(species)
             delta = ledger_kg - projected_kg
             if abs(delta) > self._LEDGER_KG_TOL:

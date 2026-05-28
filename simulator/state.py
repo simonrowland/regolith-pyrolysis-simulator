@@ -902,14 +902,18 @@ class HourSnapshot:
     # whose ``process.metal_phase`` account (canonical AtomLedger entry)
     # differs from the sum across
     # ``train.stages[*].collected_kg`` (UI projection) by more than
-    # ``ExtractionMixin._LEDGER_KG_TOL = 1e-9 kg``. Diagnostic only —
+    # ``ExtractionMixin._LEDGER_KG_TOL = 1e-9 kg``. The audit iterates
+    # the UNION of species across both surfaces (0.5.4
+    # milestone-review P2 fix, codex /challenge 2026-05-28) so a
+    # projection-only stale state (UI carries phantom kg with no
+    # ledger backing) surfaces with negative drift. Diagnostic only —
     # the global ≤5e-12 % closure on ``mass_balance_error_pct`` remains
-    # the hard gate. Empty dict means all metal species are in sync (or
-    # absent). Drift typically arises in transit-of-flight ticks where
-    # a recipe has credited metal to the ledger but the projection
-    # sweep hasn't run yet; the steady-state expectation is that
-    # values converge to zero within ~1-2 ticks for a stable campaign.
-    # M2 historical-audit closure (2026-05-28).
+    # the hard gate. Empty dict means all metal species are in sync
+    # across BOTH surfaces. Drift typically arises in transit-of-
+    # flight ticks where a recipe has credited metal to the ledger
+    # but the projection sweep hasn't run yet; the steady-state
+    # expectation is that values converge to zero within ~1-2 ticks
+    # for a stable campaign. M2 historical-audit closure (2026-05-28).
 
 
 @dataclass

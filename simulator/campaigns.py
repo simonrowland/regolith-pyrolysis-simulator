@@ -149,8 +149,31 @@ class CampaignManager:
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
         if 'pO2_mbar' in ovr:
-            melt.pO2_mbar = float(ovr['pO2_mbar'])
+            # 0.5.4 W5 milestone-review P1 (codex /challenge
+            # 2026-05-28): mirror the active-path atmosphere switch
+            # at ``simulator/session.py:276-298`` here too. Pre-fix
+            # an operator who set
+            # ``session.adjust("campaign_override",
+            # campaign="C2A", field="pO2_mbar", value=1.0)`` while
+            # C0 was active stored the override correctly (active
+            # campaign C0 unaffected), but when C2A later became
+            # active via ``configure_campaign()`` the override was
+            # applied as a bare ``melt.pO2_mbar`` write — without
+            # switching ``melt.atmosphere`` away from the C2A
+            # default ``PN2_SWEEP``. Result: commanded-pO2 floor
+            # stays disabled because PN2_SWEEP isn't in
+            # ``_O2_CONTROLLED_ATMOSPHERES``. Now: a positive
+            # override pO2 forces atmosphere to CONTROLLED_O2 at
+            # transition time too, restoring the SiO suppression
+            # lever's transition-time consistency with the
+            # active-path fix.  ``pO2_mbar == 0`` leaves atmosphere
+            # alone (operator clearing the setpoint, NOT requesting
+            # controlled-O2).
+            override_pO2 = float(ovr['pO2_mbar'])
+            melt.pO2_mbar = override_pO2
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
+            if override_pO2 > 0.0:
+                melt.atmosphere = Atmosphere.CONTROLLED_O2
         # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis
         # merge precedence. Before this fix, when an operator passed
         # BOTH ``{stir_factor: 6, stir_state: {radial: 8}}``, the whole-

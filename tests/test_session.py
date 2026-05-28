@@ -276,6 +276,83 @@ def test_session_adjust_campaign_override_po2_inactive_campaign_skips_live_updat
     assert sim.campaign_mgr.overrides["C2B"]["pO2_mbar"] == pytest.approx(1.0)
 
 
+def test_campaign_transition_applies_stored_po2_override_with_atmosphere_switch():
+    """0.5.4 milestone-review P1 fix (codex /challenge 2026-05-28):
+    when a future-campaign override is STORED while a different
+    campaign is active, the ``configure_campaign()`` application
+    path at campaign transition time MUST mirror the active-path
+    atmosphere switch (which is gated on positive pO2).
+
+    Pre-fix: storing ``campaign_override pO2_mbar=1.0`` for C2A
+    while C0 was active wrote the dict correctly, but when C2A
+    later became active via ``configure_campaign()`` the override
+    applied as a bare ``melt.pO2_mbar`` write — leaving
+    ``melt.atmosphere = PN2_SWEEP`` (the default for C2A). The
+    commanded-pO2 floor never fired because PN2_SWEEP isn't in
+    ``_O2_CONTROLLED_ATMOSPHERES``.
+
+    Now: after configure_campaign(C2A), both the pO2 AND the
+    atmosphere reflect the operator's intent."""
+    from simulator.state import Atmosphere, CampaignPhase, MeltState
+
+    session = SimSession().start(_config(campaign="C0"))
+    sim = session.simulator
+
+    # Store an override for the inactive C2A campaign.
+    session.adjust(
+        "campaign_override", 1.5,
+        campaign="C2A", field="pO2_mbar",
+    )
+    # Active C0 untouched (verified in the prior test).
+    # Stored in overrides dict, ready for application.
+    assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(1.5)
+
+    # Now transition to C2A via configure_campaign — the stored
+    # override should be applied AND the atmosphere should switch
+    # to CONTROLLED_O2.
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    # Override pO2 applied.
+    assert sim.melt.pO2_mbar == pytest.approx(1.5)
+    # Atmosphere switched (this is the P1 fix).
+    assert sim.melt.atmosphere == Atmosphere.CONTROLLED_O2, (
+        "campaigns.py:149 configure_campaign() must switch atmosphere "
+        "to CONTROLLED_O2 when an override pO2 > 0 is applied — "
+        "otherwise the commanded-pO2 floor stays disabled because "
+        "the C2A default atmosphere PN2_SWEEP isn't in "
+        "_O2_CONTROLLED_ATMOSPHERES (milestone-review P1)"
+    )
+
+
+def test_campaign_transition_zero_po2_override_leaves_atmosphere_at_default():
+    """W5 P1 complement: ``pO2_mbar = 0`` is the operator CLEARING
+    the setpoint, NOT requesting controlled-O2. The transition-time
+    application must leave the default atmosphere alone in that
+    case (same semantics as the active-path direct adjust)."""
+    from simulator.state import Atmosphere, CampaignPhase
+
+    session = SimSession().start(_config(campaign="C0"))
+    sim = session.simulator
+
+    # Store a clear-the-setpoint override.
+    session.adjust(
+        "campaign_override", 0.0,
+        campaign="C2A", field="pO2_mbar",
+    )
+    assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(0.0)
+
+    # Transition to C2A.
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    # pO2 set to 0 by override.
+    assert sim.melt.pO2_mbar == pytest.approx(0.0)
+    # Atmosphere stays at C2A's documented default (PN2_SWEEP) —
+    # operator only cleared the setpoint, not requested CONTROLLED_O2.
+    assert sim.melt.atmosphere == Atmosphere.PN2_SWEEP
+
+
 def test_session_adjust_stir_state_writes_canonical_2_axis_state():
     """0.5.3 Phase B: ``session.adjust("stir_state", {axial, radial})``
     is the canonical 2-axis writer. Drives both axes through

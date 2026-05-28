@@ -228,6 +228,55 @@ def test_audit_skips_non_coercible_ledger_entry():
     assert audit.get('Fe') == pytest.approx(0.02)
 
 
+def test_audit_clamps_negative_ledger_to_zero_then_subtracts():
+    """Negative ledger entry (corrupt) → clamped to 0 for the drift
+    math (matching ``kg_by_account``'s ``max(0, kg)`` convention
+    elsewhere). The resulting drift is `0 - projection_kg`."""
+    target = _make_audit_target(
+        metal_phase_kg={'Fe': -0.01},
+        train_kg_by_stage=[{'Fe': 0.02}, {}],
+    )
+    audit = target._audit_metal_projection_drift()
+    # Ledger Fe clamps to 0 → drift = 0 - 0.02 = -0.02.
+    assert audit['Fe'] == pytest.approx(-0.02)
+
+
+# ---------------------------------------------------------------------------
+# 4b. Milestone-review P2 fix: union-iteration catches projection-only drift
+# ---------------------------------------------------------------------------
+
+def test_audit_surfaces_projection_only_state_as_negative_drift():
+    """0.5.4 milestone-review P2 fix (codex /challenge 2026-05-28):
+    when the ledger is empty but the UI projection still carries
+    stale kg (e.g., a hand-mutation of train.stages bypassed
+    ``_clear_condensed_species_projection``), the audit MUST
+    surface the drift with negative sign (``ledger - projection
+    < 0``). Pre-fix the audit iterated ledger keys only and missed
+    this failure mode, contradicting the documented "empty dict =
+    in sync" snapshot semantics."""
+    target = _make_audit_target(
+        metal_phase_kg={},               # empty ledger
+        train_kg_by_stage=[{'Fe': 0.05}, {}],  # phantom projection
+    )
+    audit = target._audit_metal_projection_drift()
+    assert 'Fe' in audit, (
+        "projection-only stale state must surface (union-iteration)"
+    )
+    assert audit['Fe'] == pytest.approx(-0.05)
+
+
+def test_audit_negative_delta_on_phantom_projection_with_partial_ledger():
+    """Mixed case: ledger has Fe=0.02 but projection has Fe=0.05 →
+    drift = ledger - projection = -0.03 (projection overshoot).
+    Surfaced with negative sign per documented convention."""
+    target = _make_audit_target(
+        metal_phase_kg={'Fe': 0.02},
+        train_kg_by_stage=[{'Fe': 0.05}, {}],
+    )
+    audit = target._audit_metal_projection_drift()
+    assert audit['Fe'] == pytest.approx(-0.03)
+
+
 # ---------------------------------------------------------------------------
 # 5. End-to-end snapshot integration on a real simulator
 # ---------------------------------------------------------------------------
