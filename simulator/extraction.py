@@ -350,28 +350,163 @@ class ExtractionMixin:
             source_account=source_account,
         )
 
+    def _parse_mre_voltage_sequence_yaml(self) -> list:
+        """0.5.4.1 B5 (CW1 closure): parse ``setpoints['mre_voltage_
+        sequence']['sequence']`` into the Python ladder shape. Returns
+        a sorted list of ``{voltage, species, min_hold_hours}`` dicts,
+        or an empty list if YAML is missing / malformed / empty after
+        filtering. The caller falls back to
+        ``_MRE_VOLTAGE_LADDER_FALLBACK`` on empty.
+
+        Parsing is conservative — any individual unparseable entry is
+        skipped rather than crashing the whole sequence. Defensive
+        against operator typos / partial YAML blocks; designed to
+        degrade to the fallback ladder gracefully.
+        """
+        block = (
+            (self.setpoints or {}).get('mre_voltage_sequence', {})
+            or {}
+        )
+        entries = block.get('sequence', []) or []
+        if not isinstance(entries, list):
+            return []
+        parsed: list = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            species = entry.get('species')
+            if not species or not isinstance(species, str):
+                continue
+            raw_V = entry.get('decomposition_V')
+            voltage = self._coerce_mre_decomposition_voltage(raw_V)
+            if voltage is None:
+                continue
+            raw_hold = entry.get(
+                'min_hold_hours', self._MRE_DEFAULT_MIN_HOLD_HOURS
+            )
+            try:
+                min_hold = max(0, int(raw_hold))
+            except (TypeError, ValueError):
+                min_hold = self._MRE_DEFAULT_MIN_HOLD_HOURS
+            parsed.append({
+                'voltage': float(voltage),
+                'species': [str(species)],
+                'min_hold_hours': min_hold,
+            })
+        parsed.sort(key=lambda e: e['voltage'])
+        return parsed
+
+    @staticmethod
+    def _coerce_mre_decomposition_voltage(value) -> float | None:
+        """Coerce a YAML ``decomposition_V`` value to a single float
+        per the parsing rules documented on
+        ``_build_mre_voltage_sequence``. Returns None on
+        unparseable / non-finite input."""
+        import math as _math
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            # bool is an int subclass; explicit reject so True doesn't
+            # quietly coerce to 1.0 V.
+            return None
+        if isinstance(value, (int, float)):
+            voltage = float(value)
+            return voltage if _math.isfinite(voltage) else None
+        if isinstance(value, (list, tuple)):
+            # Range [low, high] → midpoint.
+            if len(value) != 2:
+                return None
+            try:
+                low = float(value[0])
+                high = float(value[1])
+            except (TypeError, ValueError):
+                return None
+            if not (_math.isfinite(low) and _math.isfinite(high)):
+                return None
+            return 0.5 * (low + high)
+        if isinstance(value, str):
+            stripped = value.strip()
+            # Tolerate ``<X`` / ``>X`` / ``~X`` / ``±X`` prefixes.
+            for prefix in ('<', '>', '~', '±'):
+                if stripped.startswith(prefix):
+                    stripped = stripped[len(prefix):].strip()
+                    break
+            try:
+                voltage = float(stripped)
+            except (TypeError, ValueError):
+                return None
+            return voltage if _math.isfinite(voltage) else None
+        return None
+
+    # 0.5.4.1 B5 (CW1 historical-audit closure, 2026-05-28):
+    # canonical FALLBACK ladder used by ``_build_mre_voltage_sequence``
+    # when ``setpoints['mre_voltage_sequence']['sequence']`` is missing
+    # or unparseable. Pre-B5 this list was inline and the YAML
+    # ``data/setpoints.yaml § mre_voltage_sequence.sequence`` block
+    # documented the same data but was never read — operators
+    # tweaking the YAML saw zero effect. B5 wires the YAML through,
+    # so this list is now the fallback / golden ground truth, NOT
+    # the only source-of-truth.
+    _MRE_VOLTAGE_LADDER_FALLBACK = (
+        {'voltage': 0.6, 'species': ('FeO',), 'min_hold_hours': 3},
+        {'voltage': 0.9, 'species': ('Cr2O3',), 'min_hold_hours': 2},
+        {'voltage': 1.0, 'species': ('MnO',), 'min_hold_hours': 2},
+        {'voltage': 1.4, 'species': ('SiO2',), 'min_hold_hours': 5},
+        {'voltage': 1.5, 'species': ('TiO2',), 'min_hold_hours': 3},
+        {'voltage': 1.9, 'species': ('Al2O3',), 'min_hold_hours': 8},
+        {'voltage': 2.2, 'species': ('MgO',), 'min_hold_hours': 5},
+        {'voltage': 2.5, 'species': ('CaO',), 'min_hold_hours': 10},
+    )
+
+    # Default ``min_hold_hours`` per species used when YAML doesn't
+    # carry an explicit value. Sourced from the same fallback ladder
+    # above (so YAML-without-hours behaves identically to the fallback
+    # for those species). For species the YAML adds but the fallback
+    # doesn't cover (e.g., V2O5, Na2O, K2O in the published YAML),
+    # the default below applies.
+    _MRE_DEFAULT_MIN_HOLD_HOURS = 3
+
     def _build_mre_voltage_sequence(self) -> list:
         """Build the stepped voltage hold sequence (Ellingham ladder).
 
-        Currently hard-coded against the FeO/Cr2O3/MnO/SiO2/TiO2/Al2O3/
-        MgO/CaO decomposition voltages. The historical
-        ``self.setpoints.get('mre_voltage_sequence', {})`` read-then-
-        discard pattern (deleted in 0.5.2 audit pass) suggested YAML
-        retuning was wired through when it wasn't. To re-enable YAML
-        override of this ladder, replace the hard-coded return below
-        with an explicit setpoints lookup plus fallback. Historical
-        cheap-win audit CW1 (``docs-private/audits/
-        2026-05-27-p3-historical-audit.txt``).
+        0.5.4.1 B5 wired the YAML setpoint
+        ``setpoints['mre_voltage_sequence']['sequence']`` (was previously
+        dead config — operators saw zero effect from YAML edits). Now:
+
+        - If the YAML block is present and at least one entry parses
+          cleanly, return the YAML-derived ladder.
+        - Otherwise fall back to ``_MRE_VOLTAGE_LADDER_FALLBACK``.
+
+        YAML schema (per ``data/setpoints.yaml § mre_voltage_sequence
+        .sequence``): each entry has ``species`` (single string),
+        ``decomposition_V`` (scalar OR ``[low, high]`` range OR string
+        like ``"<0.5"``), optional ``campaign`` (informational),
+        optional ``note`` (informational), and optional
+        ``min_hold_hours`` (else falls back to
+        ``_MRE_DEFAULT_MIN_HOLD_HOURS``).
+
+        Parsing rules:
+        - Range ``[low, high]`` → use the mean (operator can pin
+          midpoint by setting equal values).
+        - String ``"<X"`` → parse as ``X`` (operator-warning that the
+          actual is below; midpoint not encoded). Strings ``">X"``
+          similarly parse as ``X``. Other strings → skip entry.
+        - Non-finite / non-coercible voltage → skip entry.
+        - Empty / missing ``species`` → skip entry.
+
+        Entries are sorted by voltage ascending so the C5 prefix-filter
+        (``voltage <= 1.6``) works on the resulting list without
+        reordering. Closes CW1 historical-audit item
+        (``docs-private/audits/2026-05-27-p3-historical-audit.txt``).
         """
+        sequence = self._parse_mre_voltage_sequence_yaml()
+        if sequence:
+            return sequence
         return [
-            {'voltage': 0.6, 'species': ['FeO'], 'min_hold_hours': 3},
-            {'voltage': 0.9, 'species': ['Cr2O3'], 'min_hold_hours': 2},
-            {'voltage': 1.0, 'species': ['MnO'], 'min_hold_hours': 2},
-            {'voltage': 1.4, 'species': ['SiO2'], 'min_hold_hours': 5},
-            {'voltage': 1.5, 'species': ['TiO2'], 'min_hold_hours': 3},
-            {'voltage': 1.9, 'species': ['Al2O3'], 'min_hold_hours': 8},
-            {'voltage': 2.2, 'species': ['MgO'], 'min_hold_hours': 5},
-            {'voltage': 2.5, 'species': ['CaO'], 'min_hold_hours': 10},
+            {'voltage': entry['voltage'],
+             'species': list(entry['species']),
+             'min_hold_hours': entry['min_hold_hours']}
+            for entry in self._MRE_VOLTAGE_LADDER_FALLBACK
         ]
 
     def _step_mre(self) -> float:
