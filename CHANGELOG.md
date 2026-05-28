@@ -7,37 +7,82 @@ so minor versions may carry significant changes.
 ## [Unreleased]
 
 Post-0.5.4 hardening + audit closures. Will land as `0.5.4.1` on the next
-release boundary; commits are accumulating on `main` between pushes.
+release boundary; commits land on `main` between pushes. 13 commits in
+the range, all reviewed by codex / `gstack /review` per chunk-review
+protocol + the midflight cumulative review (HOLD-MAJOR → fixed inline).
+
+### Added — defensive guards + structured seams
+
+- **A2** — `simulator/overhead.py::OverheadGasModel._pipe_conductance`
+  fail-closed on `T_K <= 0`, `L <= 0`, `d <= 0`, negative `p_mean_Pa`.
+  Closes the 0.5.4 codex /challenge P3.
+- **B3 / M1** — `simulator/chemistry/kernel/registry.py::ProviderRegistry.replace_for_test`
+  public test-seam replacing direct `_authoritative` mutation.
+  `tests/test_extraction_ledger.py` migrated.
+- **B5 / CW1** — `simulator/extraction.py::_build_mre_voltage_sequence`
+  wired through `data/setpoints.yaml § mre_voltage_sequence.sequence`
+  with the canonical fallback ladder. Midflight P1: hardened YAML with
+  explicit `min_hold_hours` per species matching legacy hardcoded values.
+  Published YAML now adds Na2O / K2O / V2O5 to the default ladder — user
+  gate Q1 documents the choice.
+- **B1-tunable / CW3** — `simulator/condensation.py::apply_setpoints_condensation_temperature_overrides`
+  merges operator-supplied per-species condensation temperatures from
+  `data/setpoints.yaml § condensation_train.condensation_temperatures_C`
+  into the in-source fallback dict. Idempotent on first sim build.
+  SiO=1050 °C is now explicitly documented as the engineering midpoint
+  of the documented 900-1200 °C zone, NOT a literature-derived constant
+  (per codex /review corpus scan).
+- **E3** — `HourSnapshot.knudsen_regime_summary` field carrying per-tick
+  Knudsen-regime visibility from the latest condensation route
+  (`status` / `knudsen_number` / `knudsen_regime` / `regime_factor` /
+  `warnings`). Complements the F3 hard refusal at `Kn ≥ 10` with
+  earlier-warning visibility.
 
 ### Fixed — post-push review findings
 
-- **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** — moved
-  to the END of the dataclass to preserve positional-constructor ABI for
-  external callers. Initial 0.5.4 placement (between `warnings` and
-  `ledger_transition`) silently shifted positional indices for
-  `ledger_transition`, `status`, and `sulfur_saturation`. Post-push codex
-  /review P2 (2026-05-28).
+- **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** —
+  moved to the END of the dataclass to preserve positional-constructor
+  ABI. Post-push codex /review P2.
+- **Midflight P1 — B5 hold-hours**: published YAML now carries explicit
+  `min_hold_hours` per species so the YAML-driven ladder reproduces
+  the historical hardcoded MRE_BASELINE step-advance behavior
+  (Al2O3=8, MgO=5, CaO=10 vs the default-3 silent shift).
+- **Milestone P1 — campaigns.py:172**: future-campaign
+  `campaign_override pO2_mbar` was being applied at
+  `configure_campaign()` transition time without the W5 atmosphere
+  switch. Now mirrors the active-path fix.
 
-### Added — A2: `_pipe_conductance` defensive guards
+### Added — coverage
 
-- **`simulator/overhead.py::OverheadGasModel._pipe_conductance`** — fail-closed
-  to `0.0` on `T_K <= 0`, `L <= 0`, `d <= 0`, and clamp negative `p_mean_Pa` to
-  `0`. Pre-A2 these unreachable-in-real-recipe inputs would have raised
-  `ZeroDivisionError` (on T_K=0) or returned a complex result (on T_K<0,
-  via the fractional exponent in the Sutherland viscosity model). Originated
-  as P3 in the 0.5.4 codex /challenge adversarial sweep; closed in 0.5.4.1
-  rather than 0.5.4 itself because the post-push reviewer noted the prior
-  CHANGELOG deferral was inconsistent with shipping the code on main.
+- **A1** — W5 + W7 + W8 live-path integration tests
+  (`tests/test_0_5_4_live_path_integration.py`)
+- **W4** — Phase A atmosphere × headspace branch-test matrix
+  (`tests/test_overhead_accounting.py`, parametrized; partition guard)
+- **E1a** — north-star recipe-correctness baseline diagnostic harness
+  (`tests/test_north_star_baseline.py`; mass-balance hard gate;
+  threshold tightening deferred to E1b post-Phase-D)
+- **E7** — `web/events.py` pO2 cross-layer integration tests
+  (direct `session.adjust("pO2_mbar")` lever)
+- **B1-tunable tests** — apply/restore round-trip + defensive paths
+  + end-to-end simulator construction
+  (`tests/test_condensation_temperature_overrides.py`)
+- **W3** — evap-engine defensive axial-clamp on dict input + bool
+- **W2** — `clamp_stir_state` UserWarning on unknown dict keys
+- **B5 / MRE voltage sequence YAML** parsing + fallback tests
+  (`tests/test_mre_voltage_sequence_yaml.py`)
 
-### Hygiene — B3: public `ProviderRegistry.replace_for_test` seam (M1 closure)
+### Hygiene — docs
 
-- **`simulator/chemistry/kernel/registry.py::ProviderRegistry.replace_for_test`**
-  — dedicated public test-seam for swapping the authoritative provider for an
-  intent. Replaces the prior pattern of mutating
-  `registry._authoritative[intent] = provider` directly. Closes the M1
-  historical-audit item (`docs-private/audits/2026-05-27-p3-historical-audit.txt`).
-  `tests/test_extraction_ledger.py` migrated to the new seam (no behaviour
-  change).
+- **W1 / F1** — `tests/test_sio_yield_regression.py` Stage 4 SiO routing
+  invariant rewritten honest to post-Phase-A flip (Stage 4 > Stage 3
+  under default `radial=1.0` per CHANGELOG 0.5.3 "Known limitation")
+- **B2 / CW4** — `simulator/condensation.py` Stage 3 docstring polish
+  for post-0.5.3 routing (uses canonical `StirState(axial=6.0, radial=1.0)`
+  vocabulary; honest about the routing trade-off)
+- **E8 partial** — `docs/output-interpretation.md` documents the new
+  W8 + E3 HourSnapshot diagnostic surfaces
+- **B4 / CJ2015** — already-tracked corpus fixture confirmed has
+  `intents_exercised` field (closure)
 
 ## [0.5.4] — 2026-05-28
 
