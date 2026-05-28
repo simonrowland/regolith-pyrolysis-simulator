@@ -283,13 +283,18 @@ class ExtractionMixin:
         )
 
     def _build_mre_voltage_sequence(self) -> list:
-        """Build the stepped voltage hold sequence from setpoints.yaml."""
-        # Try to load from setpoints
-        mre_seq = self.setpoints.get('mre_voltage_sequence', {})
-        if isinstance(mre_seq, dict):
-            # The setpoints has it under a nested structure
-            pass
-        # Hard-coded default matching the Ellingham decomposition ladder
+        """Build the stepped voltage hold sequence (Ellingham ladder).
+
+        Currently hard-coded against the FeO/Cr2O3/MnO/SiO2/TiO2/Al2O3/
+        MgO/CaO decomposition voltages. The historical
+        ``self.setpoints.get('mre_voltage_sequence', {})`` read-then-
+        discard pattern (deleted in 0.5.2 audit pass) suggested YAML
+        retuning was wired through when it wasn't. To re-enable YAML
+        override of this ladder, replace the hard-coded return below
+        with an explicit setpoints lookup plus fallback. Historical
+        cheap-win audit CW1 (``docs-private/audits/
+        2026-05-27-p3-historical-audit.txt``).
+        """
         return [
             {'voltage': 0.6, 'species': ['FeO'], 'min_hold_hours': 3},
             {'voltage': 0.9, 'species': ['Cr2O3'], 'min_hold_hours': 2},

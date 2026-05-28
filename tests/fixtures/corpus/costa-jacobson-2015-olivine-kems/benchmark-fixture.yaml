@@ -54,6 +54,14 @@ setpoint:
     canonical; Mo-cell values are kept as a secondary anchor showing crucible-bias effect.
 
 expected:
+  # intents_exercised — names the kernel ChemistryIntent boundaries this
+  # fixture anchors. Added 2026-05-27 historical cheap-win CW2 (sibling
+  # corpus fixtures wolf-2022, sossi-fegley-2018, visscher-fegley-2013,
+  # schaefer-fegley-2004 all carry this field; CJ2015 was the only one
+  # missing it).
+  intents_exercised:
+    - VAPOR_PRESSURE
+    - EVAPORATION_FLUX
   # ====================================================================================
   # 1. Vaporization coefficients alpha (dimensionless)
   # ====================================================================================
