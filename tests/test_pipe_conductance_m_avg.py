@@ -207,6 +207,79 @@ def test_pipe_conductance_fe_vapor_higher_density_than_legacy():
     assert ratio > 1.0
 
 
+# ---------------------------------------------------------------------------
+# 4b. A2 (0.5.4.1): defensive input guards on T_K, L, d, p_mean_Pa
+# ---------------------------------------------------------------------------
+
+def test_pipe_conductance_zero_kelvin_returns_zero_no_crash():
+    """T_K=0 (T_C=-273.15) is unreachable in valid recipes but a
+    poisoned input MUST NOT raise ZeroDivisionError on the density
+    divide. Fail-closed to 0.0 conductance instead."""
+    model = _make_model()
+    # T_C = -273.15 → T_K = 0
+    result = model._pipe_conductance(1000.0, -273.15)
+    assert result == 0.0
+
+
+def test_pipe_conductance_below_absolute_zero_returns_zero_no_complex():
+    """T_K < 0 (T_C < -273.15) would otherwise return a complex
+    number from ``(T_K / 300.0) ** 0.7`` (fractional exponent of
+    negative). Pre-A2 the ZeroDivisionError caught the T_K=0 case
+    but the T_K<0 path would have leaked complex values into the
+    snapshot. Fail-closed to 0.0."""
+    model = _make_model()
+    result = model._pipe_conductance(1000.0, -500.0)
+    assert result == 0.0
+    assert isinstance(result, float)
+
+
+def test_pipe_conductance_zero_pipe_geometry_returns_zero():
+    """Degenerate pipe geometry (L=0 or d=0) → zero conductance.
+    A monkey-patched test sim could set this; guard catches it."""
+    model = _make_model()
+    saved_L = model.pipe_length_m
+    saved_d = model.pipe_diameter_m
+    try:
+        model.pipe_length_m = 0.0
+        assert model._pipe_conductance(1000.0, 1500.0) == 0.0
+        model.pipe_length_m = saved_L
+        model.pipe_diameter_m = 0.0
+        assert model._pipe_conductance(1000.0, 1500.0) == 0.0
+    finally:
+        model.pipe_length_m = saved_L
+        model.pipe_diameter_m = saved_d
+
+
+def test_pipe_conductance_negative_pressure_clamps_to_zero():
+    """Negative pressure is unphysical; guard clamps to 0. With p=0
+    the conductance equation produces 0 mass flow regardless of
+    other inputs. Mass-balance honesty: never return negative
+    conductance."""
+    model = _make_model()
+    result = model._pipe_conductance(-1000.0, 1500.0)
+    assert result == 0.0
+
+
+def test_pipe_conductance_legal_inputs_still_work_after_guards():
+    """Backward-compat: a legitimate call (positive T, positive
+    geometry, positive p) returns the same conductance as before
+    the A2 guards. Regression check that the guards didn't change
+    the canonical path."""
+    model = _make_model()
+    # Reference value computed manually:
+    p_Pa = 1000.0
+    T_C = 1500.0
+    T_K = T_C + 273.15
+    eta = 1.8e-5 * (T_K / 300.0) ** 0.7
+    C_vol = math.pi * model.pipe_diameter_m ** 4 * p_Pa / (
+        128.0 * eta * model.pipe_length_m
+    )
+    rho = p_Pa * DEFAULT_PIPE_M_AVG_KG_MOL / (8.314 * T_K)
+    expected = C_vol * rho
+    actual = model._pipe_conductance(p_Pa, T_C)
+    assert actual == pytest.approx(expected, rel=1e-12)
+
+
 def test_estimate_transport_state_threads_evap_flux_species_through():
     """End-to-end: ``estimate_transport_state`` calls
     ``_pipe_conductance`` with ``evap_flux.species_kg_hr`` so the

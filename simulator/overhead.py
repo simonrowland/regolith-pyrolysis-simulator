@@ -750,9 +750,24 @@ class OverheadGasModel:
         d = self.pipe_diameter_m
         L = self.pipe_length_m
 
+        # 0.5.4.1 A2 (0.5.4 post-push adversarial R2 P3): defensive
+        # input guards. Pre-A2, T_K <= 0 (T_C <= -273.15) raised
+        # ZeroDivisionError on the density divide AND a complex result
+        # from the fractional exponent ``(T_K / 300.0) ** 0.7`` when
+        # T_K is negative. Both are unreachable in valid recipes
+        # (the pipe is always above ambient), but a numerical
+        # instability or a bad test setup could poison the input;
+        # fail-closed to 0.0 conductance rather than propagating a
+        # complex / NaN / exception downstream. Also guard L, d <= 0
+        # (degenerate pipe geometry; conductance is 0). p_mean_Pa
+        # < 0 is unphysical; clamp to 0.
+        T_K = T_C + 273.15
+        if T_K <= 0.0 or L <= 0.0 or d <= 0.0:
+            return 0.0
+        p_mean_Pa = max(0.0, float(p_mean_Pa))
+
         # Dynamic viscosity of gas mixture (approximate as N₂-like)
         # η ≈ 4e-5 Pa·s at 1500°C (increases with T for gases)
-        T_K = T_C + 273.15
         eta = 1.8e-5 * (T_K / 300.0) ** 0.7  # Sutherland approximation
 
         # Volumetric conductance (m³/s)
