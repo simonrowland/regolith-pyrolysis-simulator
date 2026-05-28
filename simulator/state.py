@@ -896,6 +896,29 @@ class HourSnapshot:
     shuttle_cycle: int = 0
     # Current inject-bakeout cycle number within the C3 phase
 
+    # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
+    knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)
+    # Per-tick Knudsen-regime visibility surface. Carries the
+    # canonical fields from ``CondensationModel.
+    # last_knudsen_regime_diagnostic``:
+    #
+    #   - ``status`` (str): ``ok`` / ``warning`` / ``refused``
+    #   - ``knudsen_number`` (float): the actual Kn at this tick's
+    #     condensation pass
+    #   - ``knudsen_regime`` (str): ``viscous`` / ``transition`` /
+    #     ``free_molecular``
+    #   - ``regime_factor`` (float): the F3 viscous-flow attenuation
+    #     factor (1 → pure viscous; 0 → pure ballistic)
+    #   - ``warnings`` (tuple[str, ...]): operator-facing strings
+    #     when Kn approaches the boundary (e.g., ``Kn=5e-3 near the
+    #     0.01 viscous-flow cutoff``); empty when state is clean
+    #
+    # Complements the F3 hard refusal at ``Kn ≥ 10`` with earlier-
+    # warning visibility: an operator who sees the warning surface
+    # before the refusal fires can lower ramp rates / adjust pN2
+    # sweep proactively. Empty dict on ticks that didn't trigger a
+    # condensation route (degenerate case).
+
     # --- Metal-projection drift audit (0.5.4 W8 / M2 closure) ---
     metal_projection_drift_kg: Dict[str, float] = field(default_factory=dict)
     # Per-species drift (ledger_kg - projection_kg) for metal species

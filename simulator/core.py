@@ -4143,6 +4143,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # Snapshot construction
     # ------------------------------------------------------------------
 
+    def _latest_knudsen_summary(self) -> Dict[str, Any]:
+        """0.5.4.1 E3: project the latest Knudsen-regime diagnostic
+        from the condensation model into the snapshot-facing summary
+        dict shape documented on ``HourSnapshot.
+        knudsen_regime_summary``.
+
+        Returns an empty dict when the condensation model hasn't
+        run yet (degenerate tick — e.g., a pre-C2A warmup before any
+        evap flux fires). Otherwise pulls the canonical fields off
+        ``CondensationModel.last_knudsen_regime_diagnostic`` and
+        normalises into a JSON-serialisable shape so the snapshot
+        round-trips cleanly through ``runner.py`` output.
+        """
+        model = self._condensation_model
+        if model is None:
+            return {}
+        diag = dict(getattr(model, 'last_knudsen_regime_diagnostic', {}) or {})
+        if not diag:
+            return {}
+        # Project the diagnostic into the documented summary shape.
+        summary: Dict[str, Any] = {}
+        if 'status' in diag:
+            summary['status'] = str(diag['status'])
+        # Knudsen number from the model directly (more reliable than
+        # parsing it back out of the diagnostic).
+        kn = getattr(model, 'knudsen_number', None)
+        if kn is not None:
+            try:
+                summary['knudsen_number'] = float(kn)
+            except (TypeError, ValueError):
+                pass
+        regime = getattr(model, 'knudsen_regime', None)
+        if regime is not None:
+            summary['knudsen_regime'] = getattr(
+                regime, 'value', str(regime)
+            )
+        regime_factor = getattr(model, 'regime_factor', None)
+        if regime_factor is not None:
+            try:
+                summary['regime_factor'] = float(regime_factor)
+            except (TypeError, ValueError):
+                pass
+        warnings = diag.get('warnings', ())
+        summary['warnings'] = tuple(str(w) for w in warnings)
+        return summary
+
     def _make_snapshot(self) -> HourSnapshot:
         """Build an HourSnapshot from current state."""
         oxygen_partition = self._oxygen_terminal_partition_kg()
@@ -4206,4 +4252,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # means all metals in sync. Diagnostic only — the global
             # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
             metal_projection_drift_kg=self._audit_metal_projection_drift(),
+            # 0.5.4.1 E3: Knudsen-regime warning sticker from the
+            # latest condensation pass. Empty dict on ticks that
+            # didn't trigger a condensation route.
+            knudsen_regime_summary=self._latest_knudsen_summary(),
         )
