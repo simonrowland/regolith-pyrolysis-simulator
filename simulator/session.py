@@ -67,6 +67,7 @@ class SimSessionConfig:
     campaign: str = "C0"
     backend_name: str = "stub"
     backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
+    hours: int = 0
     mass_kg: float = 1000.0
     additives_kg: Mapping[str, float] = field(default_factory=dict)
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None

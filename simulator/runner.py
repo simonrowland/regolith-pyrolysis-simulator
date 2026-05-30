@@ -28,7 +28,6 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
-import dataclasses
 import importlib.abc
 import importlib.machinery
 import itertools
@@ -49,19 +48,16 @@ from simulator.backends import (
 )
 from simulator.config import ConfigBundle, load_config_bundle
 from simulator.core import (
-    BACKEND_FALLBACK_EXCEPTIONS,
     CampaignPhase,
     PyrolysisSimulator,
 )
 from simulator.condensation import (
-    KnudsenRegimeRefusal,
     stage_purity_report,
 )
+from simulator.run_executor import RunExecution, RunExecutor, _json_safe
 from simulator.session import (
-    DecisionPolicy,
     SimSession,
     SimSessionConfig,
-    drive_session,
 )
 from simulator.state import (
     Atmosphere,
@@ -362,8 +358,11 @@ class PyrolysisRun:
         diff failure reasons without parsing stderr.
         """
 
-        session = self._start_session()
-        return self._run_session(session)
+        config = self._session_config()
+        execution = RunExecutor().execute(config)
+        document = self._build_output(execution)
+        execution.session._set_result_document(document)
+        return document
 
     def _start_session(self) -> SimSession:
         session = SimSession()
@@ -371,56 +370,9 @@ class PyrolysisRun:
         return session
 
     def _run_session(self, session: SimSession) -> dict:
-        sim = session.simulator
-        per_hour: list[dict] = []
-        operator_decisions: list[dict] = []
-        status = "ok"
-        error_message = ""
-        reason = ""
-        refusal_diagnostic: dict[str, Any] = {}
-
-        try:
-            for result in drive_session(
-                session,
-                self.hours,
-                DecisionPolicy.AUTO_APPLY,
-                operator_decisions=operator_decisions,
-            ):
-                per_hour.append(result.per_hour_summary)
-            # Status semantics:
-            #   * "ok"      -- the run consumed its full hour budget and
-            #                  the simulator is either mid-batch or
-            #                  exactly at the campaign endpoint.
-            #   * "partial" -- the simulator finished mid-batch (either
-            #                  the campaign closed early or operator
-            #                  decisions consumed iteration slots
-            #                  without advancing the hour counter).
-            #   * "failed"  -- set in the except blocks below.
-            if sim.melt.hour < self.hours:
-                status = "partial"
-        except KnudsenRegimeRefusal as exc:
-            status = "refused"
-            reason = exc.reason
-            error_message = exc.reason
-            refusal_diagnostic = dict(exc.diagnostic)
-        except BACKEND_FALLBACK_EXCEPTIONS as exc:
-            status = "failed"
-            error_message = f"backend failure: {exc}"
-        except Exception as exc:  # noqa: BLE001 -- envelope the error
-            status = "failed"
-            error_message = f"{type(exc).__name__}: {exc}"
-
-        shadow_trace = self._collect_shadow_trace(sim, operator_decisions)
-        document = self._build_output(
-            sim=sim,
-            per_hour=per_hour,
-            shadow_trace=shadow_trace,
-            status=status,
-            error_message=error_message,
-            reason=reason,
-            refusal_diagnostic=refusal_diagnostic,
-        )
-        session._set_result_document(document)
+        execution = RunExecutor().execute_session(session, hours=int(self.hours))
+        document = self._build_output(execution)
+        execution.session._set_result_document(document)
         return document
 
     # ------------------------------------------------------------------
@@ -455,6 +407,7 @@ class PyrolysisRun:
             campaign=campaign_name,
             backend_name=self.backend_name,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+            hours=int(self.hours),
             mass_kg=self.mass_kg,
             additives_kg=dict(self.additives_kg),
             runtime_campaign_overrides=dict(self.runtime_campaign_overrides),
@@ -494,54 +447,11 @@ class PyrolysisRun:
     # Output assembly
     # ------------------------------------------------------------------
 
-    def _collect_shadow_trace(
-        self,
-        sim: PyrolysisSimulator,
-        operator_decisions: list[dict],
-    ) -> list[dict]:
-        events: list[dict] = list(operator_decisions)
-        kernel = getattr(sim, "_chem_kernel", None)
-        if kernel is None:
-            return events
-        # ``ChemistryKernel.planner`` is the public property; fall back
-        # to the private slot as a forward-compatible safety net in
-        # case a future refactor renames the property without breaking
-        # the underlying attribute (e.g. dataclass conversion).  The
-        # runner is not allowed to assume kernel internals, so neither
-        # attribute is a hard requirement.
-        planner = getattr(kernel, "planner", None) or getattr(
-            kernel, "_planner", None
-        )
-        if planner is None:
-            return events
-        shadow_trace = getattr(planner, "shadow_trace", None)
-        if shadow_trace is None:
-            return events
-        try:
-            kernel_events = list(shadow_trace)
-        except TypeError:
-            kernel_events = []
-        # Only surface ``parity_warning`` entries -- the bulk shadow
-        # dispatch records are noise for the operator-facing JSON.
-        for record in kernel_events:
-            if not isinstance(record, Mapping):
-                continue
-            event_type = record.get("event")
-            if event_type in ("parity_warning", "parity_error"):
-                events.append(_json_safe(dict(record)))
-        return events
-
     def _build_output(
         self,
-        *,
-        sim: PyrolysisSimulator,
-        per_hour: list[dict],
-        shadow_trace: list[dict],
-        status: str,
-        error_message: str,
-        reason: str = "",
-        refusal_diagnostic: Mapping[str, Any] | None = None,
+        execution: RunExecution,
     ) -> dict:
+        sim = execution.simulator
         metadata_overrides = dict(self.run_metadata_overrides)
         started_at_utc = metadata_overrides.pop(
             "started_at_utc",
@@ -575,7 +485,7 @@ class PyrolysisRun:
 
         final_state = _final_state_from_ledger(sim)
         knudsen_diagnostic = dict(
-            refusal_diagnostic
+            execution.refusal_diagnostic
             or _knudsen_regime_diagnostic_from_sim(sim)
         )
         if knudsen_diagnostic:
@@ -600,11 +510,11 @@ class PyrolysisRun:
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
-            "per_hour_summary": per_hour,
-            "shadow_trace": shadow_trace,
-            "status": status,
-            "reason": reason,
-            "error_message": error_message,
+            "per_hour_summary": list(execution.per_hour),
+            "shadow_trace": list(execution.shadow_trace),
+            "status": execution.status,
+            "reason": execution.reason,
+            "error_message": execution.error_message,
         }
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -1966,31 +1876,6 @@ def run_sio_wall_sweep(
         "evolved_invariant_guard": evolved_invariant_guard,
         "output_dir": str(output_dir),
     }
-
-
-# ----------------------------------------------------------------------
-# JSON helpers
-# ----------------------------------------------------------------------
-
-
-def _json_safe(value: Any) -> Any:
-    """Recursively convert ``value`` into a JSON-serialisable form."""
-
-    if isinstance(value, Mapping):
-        return {str(k): _json_safe(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple, set, frozenset)):
-        return [_json_safe(item) for item in value]
-    if isinstance(value, (str, bool)) or value is None:
-        return value
-    if isinstance(value, (int, float)):
-        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
-            return str(value)
-        return value
-    if dataclasses.is_dataclass(value):
-        return _json_safe(dataclasses.asdict(value))
-    # Enums, IntentResult-like wrappers -- fall back to repr so the
-    # shadow_trace stays informative without leaking object identity.
-    return repr(value)
 
 
 # ----------------------------------------------------------------------

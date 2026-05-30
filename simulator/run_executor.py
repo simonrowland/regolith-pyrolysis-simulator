@@ -1,0 +1,160 @@
+"""Structured in-process runner execution surface."""
+
+from __future__ import annotations
+
+import dataclasses
+import math
+from dataclasses import dataclass, field
+from typing import Any, Mapping
+
+from simulator.condensation import KnudsenRegimeRefusal
+from simulator.core import BACKEND_FALLBACK_EXCEPTIONS, PyrolysisSimulator
+from simulator.session import (
+    DecisionPolicy,
+    SimSession,
+    SimSessionConfig,
+    drive_session,
+)
+from simulator.state import HourSnapshot
+from simulator.trace import PhysicsTrace
+
+
+@dataclass(frozen=True)
+class RunExecution:
+    """Structured result of one simulator run before JSON projection."""
+
+    session: SimSession
+    simulator: PyrolysisSimulator
+    snapshots: tuple[HourSnapshot, ...]
+    trace: PhysicsTrace
+    per_hour: tuple[dict[str, Any], ...] = ()
+    operator_decisions: tuple[dict[str, Any], ...] = ()
+    shadow_trace: tuple[dict[str, Any], ...] = ()
+    status: str = "ok"
+    error_message: str = ""
+    reason: str = ""
+    refusal_diagnostic: Mapping[str, Any] = field(default_factory=dict)
+
+
+class RunExecutor:
+    """Drive a configured session and return structured execution data."""
+
+    def execute(self, config: SimSessionConfig) -> RunExecution:
+        session = SimSession()
+        session.start(config)
+        return self.execute_session(session, hours=int(config.hours))
+
+    def execute_session(self, session: SimSession, *, hours: int) -> RunExecution:
+        sim = session.simulator
+        per_hour: list[dict[str, Any]] = []
+        operator_decisions: list[dict[str, Any]] = []
+        status = "ok"
+        error_message = ""
+        reason = ""
+        refusal_diagnostic: dict[str, Any] = {}
+        hours = int(hours)
+
+        try:
+            for result in drive_session(
+                session,
+                hours,
+                DecisionPolicy.AUTO_APPLY,
+                operator_decisions=operator_decisions,
+            ):
+                per_hour.append(result.per_hour_summary)
+            # Status semantics:
+            #   * "ok"      -- the run consumed its full hour budget and
+            #                  the simulator is either mid-batch or
+            #                  exactly at the campaign endpoint.
+            #   * "partial" -- the simulator finished mid-batch (either
+            #                  the campaign closed early or operator
+            #                  decisions consumed iteration slots
+            #                  without advancing the hour counter).
+            #   * "failed"  -- set in the except blocks below.
+            if sim.melt.hour < hours:
+                status = "partial"
+        except KnudsenRegimeRefusal as exc:
+            status = "refused"
+            reason = exc.reason
+            error_message = exc.reason
+            refusal_diagnostic = dict(exc.diagnostic)
+        except BACKEND_FALLBACK_EXCEPTIONS as exc:
+            status = "failed"
+            error_message = f"backend failure: {exc}"
+        except Exception as exc:  # noqa: BLE001 -- envelope the error
+            status = "failed"
+            error_message = f"{type(exc).__name__}: {exc}"
+
+        shadow_trace = _collect_shadow_trace(sim, operator_decisions)
+        trace = PhysicsTrace.from_simulator(sim)
+        snapshots = tuple(getattr(sim.record, "snapshots", ()))
+        return RunExecution(
+            session=session,
+            simulator=sim,
+            snapshots=snapshots,
+            trace=trace,
+            per_hour=tuple(per_hour),
+            operator_decisions=tuple(operator_decisions),
+            shadow_trace=tuple(shadow_trace),
+            status=status,
+            error_message=error_message,
+            reason=reason,
+            refusal_diagnostic=refusal_diagnostic,
+        )
+
+
+def _collect_shadow_trace(
+    sim: PyrolysisSimulator,
+    operator_decisions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    events: list[dict[str, Any]] = list(operator_decisions)
+    kernel = getattr(sim, "_chem_kernel", None)
+    if kernel is None:
+        return events
+    # ``ChemistryKernel.planner`` is the public property; fall back
+    # to the private slot as a forward-compatible safety net in
+    # case a future refactor renames the property without breaking
+    # the underlying attribute (e.g. dataclass conversion).  The
+    # runner is not allowed to assume kernel internals, so neither
+    # attribute is a hard requirement.
+    planner = getattr(kernel, "planner", None) or getattr(
+        kernel, "_planner", None
+    )
+    if planner is None:
+        return events
+    shadow_trace = getattr(planner, "shadow_trace", None)
+    if shadow_trace is None:
+        return events
+    try:
+        kernel_events = list(shadow_trace)
+    except TypeError:
+        kernel_events = []
+    # Only surface ``parity_warning`` entries -- the bulk shadow
+    # dispatch records are noise for the operator-facing JSON.
+    for record in kernel_events:
+        if not isinstance(record, Mapping):
+            continue
+        event_type = record.get("event")
+        if event_type in ("parity_warning", "parity_error"):
+            events.append(_json_safe(dict(record)))
+    return events
+
+
+def _json_safe(value: Any) -> Any:
+    """Recursively convert ``value`` into a JSON-serialisable form."""
+
+    if isinstance(value, Mapping):
+        return {str(k): _json_safe(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, (str, bool)) or value is None:
+        return value
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+            return str(value)
+        return value
+    if dataclasses.is_dataclass(value):
+        return _json_safe(dataclasses.asdict(value))
+    # Enums, IntentResult-like wrappers -- fall back to repr so the
+    # shadow_trace stays informative without leaking object identity.
+    return repr(value)
