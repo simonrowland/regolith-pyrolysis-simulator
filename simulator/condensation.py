@@ -65,8 +65,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
 
-import yaml
-
+from simulator.config import load_config_bundle
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
@@ -434,17 +433,9 @@ STICKING_COEFF = {
 }
 
 
-def _load_yaml_data(filename: str) -> Dict[str, Any]:
-    path = DATA_DIR / filename
-    if not path.exists():
-        return {}
-    with path.open('r', encoding='utf-8') as f:
-        loaded = yaml.safe_load(f) or {}
-    return loaded if isinstance(loaded, dict) else {}
-
-
-VAPOR_PRESSURE_DATA = _load_yaml_data('vapor_pressures.yaml')
-MATERIALS_DATA = _load_yaml_data('materials.yaml')
+_CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
+VAPOR_PRESSURE_DATA = _CONFIG_BUNDLE.vapor_pressures
+MATERIALS_DATA = _CONFIG_BUNDLE.materials
 
 
 @dataclass(frozen=True)

@@ -46,6 +46,7 @@ import yaml
 from simulator.backends import (
     BackendSelectionPolicy,
 )
+from simulator.config import ConfigBundle, load_config_bundle
 from simulator.core import (
     BACKEND_FALLBACK_EXCEPTIONS,
     CampaignPhase,
@@ -367,8 +368,9 @@ class PyrolysisRun:
     # ------------------------------------------------------------------
 
     def _session_config(self) -> SimSessionConfig:
-        feedstocks = self._load_feedstocks()
-        setpoints = self._load_setpoints()
+        bundle = self._load_config_bundle()
+        feedstocks = bundle.feedstocks
+        setpoints = bundle.setpoints
         if (
             self.allow_fallback_vapor
             or self.force_builtin_vapor_pressure
@@ -381,7 +383,7 @@ class PyrolysisRun:
             if self.allow_unmeasured_alpha_fallback:
                 kernel_config["allow_unmeasured_alpha_fallback"] = True
             setpoints["chemistry_kernel"] = kernel_config
-        vapor_pressures = self._load_vapor_pressures()
+        vapor_pressures = bundle.vapor_pressures
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
             self.campaign, self.campaign)
         return SimSessionConfig(
@@ -403,6 +405,17 @@ class PyrolysisRun:
                 else None
             ),
         )
+
+    def _load_config_bundle(self) -> ConfigBundle:
+        try:
+            return load_config_bundle(
+                DATA_DIR,
+                feedstocks_path=self.feedstocks_path,
+                setpoints_path=self.setpoints_path,
+                vapor_pressures_path=self.vapor_pressures_path,
+            )
+        except FileNotFoundError as exc:
+            raise RunnerError(str(exc)) from exc
 
     def _load_feedstocks(self) -> dict:
         path = self.feedstocks_path or (DATA_DIR / "feedstocks.yaml")
@@ -841,7 +854,7 @@ def _wall_deposit_mol_by_species(
 
 
 def _wall_liner_resinter_config() -> dict[str, Any]:
-    materials = _load_yaml(DATA_DIR / "materials.yaml")
+    materials = load_config_bundle(DATA_DIR).materials
     surface = (
         materials.get("wall_surfaces", {})
         .get("interstage_duct", {})
@@ -1033,10 +1046,17 @@ def build_sio_yield_report(
 
     from simulator.evaporation import _load_evaporation_alpha_by_species
 
-    feedstocks = _load_yaml(DATA_DIR / "feedstocks.yaml")
+    try:
+        bundle = load_config_bundle(DATA_DIR)
+    except FileNotFoundError as exc:
+        # Error-contract parity with _load_config_bundle (runner.py:417) and the
+        # legacy _load_yaml path: main_sio_yield() only catches RunnerError, so a
+        # missing config file must surface as RunnerError, not FileNotFoundError.
+        raise RunnerError(str(exc)) from exc
+    feedstocks = bundle.feedstocks
     feedstock = feedstocks.get(feedstock_id, {})
     alpha_by_species = _load_evaporation_alpha_by_species(
-        _load_yaml(DATA_DIR / "vapor_pressures.yaml")
+        bundle.vapor_pressures
     )
     try:
         sio_alpha_value = alpha_by_species["SiO"]

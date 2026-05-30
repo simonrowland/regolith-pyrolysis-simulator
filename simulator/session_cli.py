@@ -11,7 +11,8 @@ import sys
 from typing import Any, Iterable, Mapping, TextIO
 
 from simulator.backends import BackendSelectionPolicy
-from simulator.runner import DATA_DIR, RunnerError, _load_yaml, build_per_hour_summary
+from simulator.config import load_config_bundle
+from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import DecisionPoint
 
@@ -67,11 +68,15 @@ class SessionScriptRunner:
             parsed.setpoint,
             parsed.setpoints_overrides,
         )
+        try:
+            bundle = load_config_bundle(DATA_DIR)
+        except FileNotFoundError as exc:
+            raise RunnerError(str(exc)) from exc
         config = SimSessionConfig(
             feedstock_id=parsed.feedstock,
-            feedstocks=_load_yaml(DATA_DIR / "feedstocks.yaml"),
-            setpoints=_load_yaml(DATA_DIR / "setpoints.yaml"),
-            vapor_pressures=_load_yaml(DATA_DIR / "vapor_pressures.yaml"),
+            feedstocks=bundle.feedstocks,
+            setpoints=bundle.setpoints,
+            vapor_pressures=bundle.vapor_pressures,
             campaign=parsed.campaign,
             backend_name=parsed.backend,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
@@ -415,4 +420,3 @@ def _write_frame(out: TextIO, frame: dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
