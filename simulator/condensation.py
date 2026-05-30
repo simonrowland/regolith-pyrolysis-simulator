@@ -57,6 +57,7 @@ The Fe → SiO separation (Stage 1 → Stage 2):
 
 from __future__ import annotations
 
+import copy
 import math
 from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass, field
@@ -90,9 +91,6 @@ HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
-WALL_DEPOSIT_FRACTION_KEY = '_wall_deposit_fraction'
-WALL_DEPOSIT_ACCOUNT_KEY = '_wall_deposit_account'
-WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY = '_wall_deposit_segment_fractions'
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
 N2_COLLISION_DIAMETER_M = 3.7e-10
@@ -458,6 +456,10 @@ class CondensationRouteResult:
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
     wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = field(
         default_factory=dict)
+    wall_deposit_fraction_by_species: Dict[str, float] = field(
+        default_factory=dict)
+    wall_deposit_account_fractions_by_species: Dict[
+        str, Dict[str, float]] = field(default_factory=dict)
     impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     cold_spot_warnings: tuple[str, ...] = ()
     knudsen_regime_diagnostic: Dict[str, Any] = field(default_factory=dict)
@@ -495,7 +497,7 @@ class CondensationModel:
         wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
     ):
         self.train = train
-        self.vapor_pressure_data = vapor_pressure_data
+        self.vapor_pressure_data = copy.deepcopy(vapor_pressure_data)
         # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
         # per-instance per-species condensation temperatures so each
         # CondensationModel can carry its own setpoints overrides
@@ -913,6 +915,9 @@ class CondensationModel:
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
+        wall_deposit_fraction_by_species: Dict[str, float] = {}
+        wall_deposit_account_fractions_by_species: Dict[
+            str, Dict[str, float]] = {}
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
@@ -930,7 +935,8 @@ class CondensationModel:
 
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
-            self._record_runtime_wall_fraction(species, 0.0, {})
+            wall_deposit_fraction_by_species[species] = 0.0
+            wall_deposit_account_fractions_by_species[species] = {}
 
             T_cond = _species_condensation_temperature_C(
                 species, temps=self.condensation_temperatures_C
@@ -1016,8 +1022,9 @@ class CondensationModel:
                     wall_deposit_kg,
                     self.pipe_segments,
                 )
-                self._record_runtime_wall_fraction(
-                    species, wall_fraction, segment_fractions)
+                wall_deposit_fraction_by_species[species] = wall_fraction
+                wall_deposit_account_fractions_by_species[species] = dict(
+                    segment_fractions)
 
                 baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
                 if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
@@ -1046,6 +1053,9 @@ class CondensationModel:
             condensed_by_stage_species=condensed_by_stage_species,
             wall_deposit_by_species=wall_deposit_by_species,
             wall_deposit_by_segment_species=wall_deposit_by_segment_species,
+            wall_deposit_fraction_by_species=wall_deposit_fraction_by_species,
+            wall_deposit_account_fractions_by_species=(
+                wall_deposit_account_fractions_by_species),
             impurity_by_stage_species=impurity_by_stage_species,
             cold_spot_warnings=cold_spot_warnings,
             knudsen_regime_diagnostic=knudsen_diagnostic,
@@ -1335,24 +1345,6 @@ class CondensationModel:
                 )
         return supply
 
-    def _record_runtime_wall_fraction(
-        self,
-        species: str,
-        fraction: float,
-        segment_fractions: Mapping[str, float] | None = None,
-    ) -> None:
-        data = _mutable_species_vapor_data(self.vapor_pressure_data, species)
-        if data is None:
-            return
-        data[WALL_DEPOSIT_FRACTION_KEY] = max(0.0, min(1.0, float(fraction)))
-        data[WALL_DEPOSIT_ACCOUNT_KEY] = WALL_DEPOSIT_ACCOUNT
-        data[WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY] = {
-            str(account): max(0.0, min(1.0, float(segment_fraction)))
-            for account, segment_fraction in dict(
-                segment_fractions or {}).items()
-            if float(segment_fraction) > 0.0
-        }
-
     def _condensation_efficiency(
         self,
         *,
@@ -1627,22 +1619,6 @@ def _default_pipe_surface_area_m2() -> float:
     if pipe.surface_area_m2 > 0.0:
         return float(pipe.surface_area_m2)
     return math.pi * float(pipe.diameter_m) * float(pipe.length_m)
-
-
-def _mutable_species_vapor_data(
-    vapor_pressure_data: MutableMapping[str, Any] | None,
-    species: str,
-) -> MutableMapping[str, Any] | None:
-    if vapor_pressure_data is None:
-        return None
-    for family in ('metals', 'oxide_vapors'):
-        family_data = vapor_pressure_data.get(family, {})
-        if not isinstance(family_data, MutableMapping):
-            continue
-        data = family_data.get(species)
-        if isinstance(data, MutableMapping):
-            return data
-    return None
 
 
 def _antoine_psat_pa(species: str, T_K: float) -> float | None:

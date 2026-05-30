@@ -33,10 +33,11 @@ The provider:
   * ``sp_data`` -- the raw ``vapor_pressures.yaml`` metadata for the
     species (used only to look up
     ``condensation_products_mol_per_mol_vapor`` for the disproportionation
-    branch plus the runtime ``_wall_deposit_fraction`` destination split;
-    the provider re-uses the same product map the legacy path builds in
+    branch; the provider re-uses the same product map the legacy path builds in
     :meth:`_condensed_products_for_vapor` -- the canonical SiO -> Si +
     SiO2 split lives here),
+  * ``wall_deposit_fraction`` and ``wall_deposit_account_fractions`` -- the
+    same-tick wall split carried from ``CondensationRouteResult``,
   * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes).
@@ -88,10 +89,7 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.condensation import (
     WALL_DEPOSIT_ACCOUNT,
-    WALL_DEPOSIT_ACCOUNT_KEY,
-    WALL_DEPOSIT_FRACTION_KEY,
     WALL_DEPOSIT_SEGMENT_ACCOUNTS,
-    WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY,
 )
 
 
@@ -181,7 +179,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # ``_condensation_product_mol_ratios`` / ``_condensed_products_for_vapor``
         # in simulator/evaporation.py exactly -- this is a refactor of
         # where the math lives, not a re-derivation.
-        wall_fraction = self._wall_deposit_fraction(sp_data)
+        wall_fraction = self._wall_deposit_fraction(controls)
         wall_deposit_kg = condensed_kg * wall_fraction
         baffle_condensed_kg = max(0.0, condensed_kg - wall_deposit_kg)
         condensed_product_mol = self._condensed_product_mol(
@@ -215,7 +213,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
         if wall_deposit_mol > 0.0:
             for account, account_mol in self._wall_deposit_mol_by_account(
-                wall_deposit_mol, sp_data,
+                wall_deposit_mol, controls,
             ).items():
                 species_mol = credits.setdefault(account, {})
                 species_mol[species] = (
@@ -250,7 +248,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "credited_wall_deposit_accounts_kg": {
                     account: float(wall_deposit_kg) * float(fraction)
                     for account, fraction in (
-                        self._wall_deposit_account_fractions(sp_data).items()
+                        self._wall_deposit_account_fractions(controls).items()
                     )
                 },
             },
@@ -333,8 +331,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         return credits
 
     @staticmethod
-    def _wall_deposit_fraction(sp_data: Mapping[str, Any]) -> float:
-        value = sp_data.get(WALL_DEPOSIT_FRACTION_KEY, 0.0)
+    def _wall_deposit_fraction(controls: Mapping[str, Any]) -> float:
+        value = controls.get("wall_deposit_fraction", 0.0)
         try:
             fraction = float(value)
         except (TypeError, ValueError):
@@ -346,10 +344,10 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     @classmethod
     def _wall_deposit_account_fractions(
         cls,
-        sp_data: Mapping[str, Any],
+        controls: Mapping[str, Any],
     ) -> dict[str, float]:
-        raw_segment_fractions = sp_data.get(
-            WALL_DEPOSIT_SEGMENT_FRACTIONS_KEY, {})
+        raw_segment_fractions = controls.get(
+            "wall_deposit_account_fractions", {})
         if isinstance(raw_segment_fractions, Mapping):
             fractions: dict[str, float] = {}
             for account, raw_fraction in raw_segment_fractions.items():
@@ -369,20 +367,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     for account, fraction in fractions.items()
                 }
 
-        account = str(
-            sp_data.get(WALL_DEPOSIT_ACCOUNT_KEY) or WALL_DEPOSIT_ACCOUNT
-        )
-        if account not in cls.DECLARED_ACCOUNTS:
-            account = WALL_DEPOSIT_ACCOUNT
-        return {account: 1.0}
+        return {WALL_DEPOSIT_ACCOUNT: 1.0}
 
     @classmethod
     def _wall_deposit_mol_by_account(
         cls,
         wall_deposit_mol: float,
-        sp_data: Mapping[str, Any],
+        controls: Mapping[str, Any],
     ) -> dict[str, float]:
-        fractions = cls._wall_deposit_account_fractions(sp_data)
+        fractions = cls._wall_deposit_account_fractions(controls)
         if wall_deposit_mol <= 0.0 or not fractions:
             return {}
         credited: dict[str, float] = {}

@@ -54,6 +54,61 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
+EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
+    "lunar_mare_low_ti": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "Cr": 1.0321913941431029e-11,
+            "CrO2": 1.5492571877751392e-08,
+            "Na": 3.9818900039887004e-05,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Cr": 1.0321913941431029e-11,
+            "CrO2": 1.5492571877751392e-08,
+            "Na": 3.9818900039887004e-05,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Na": 3.9818900039887004e-05,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Na": 3.981890003988704e-05,
+        },
+    },
+    "mars_basalt": {},
+    "s_type_asteroid_silicate": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "Cr": 4.586092638380313e-11,
+            "CrO2": 6.38952682146612e-09,
+            "Fe": 1.173097718261446e-05,
+            "K": 0.0006306215592452855,
+            "Mg": 1.4929651804991315e-05,
+            "Mn": 3.724244422063805e-07,
+            "Na": 0.010177828000361737,
+            "SiO": 1.327152386034298e-06,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Cr": 4.586092638380313e-11,
+            "CrO2": 6.38952682146612e-09,
+            "K": 0.0006306215592452855,
+            "Mg": 1.4929651804991315e-05,
+            "Mn": 3.724244422063805e-07,
+            "Na": 0.010177828000361737,
+            "SiO": 1.327152386034298e-06,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "K": 0.0006306215592452855,
+            "Mg": 1.4929651804991315e-05,
+            "Na": 0.010177828000361737,
+            "SiO": 1.3271523860342983e-06,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "K": 0.0006306215592452857,
+            "Mg": 1.4929651804991314e-05,
+            "Na": 0.01017782800036174,
+        },
+    },
+}
+
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------
@@ -493,8 +548,6 @@ def test_provider_splits_baffle_product_from_wall_deposit(
             "Si": 0.5,
             "SiO2": 0.5,
         },
-        "_wall_deposit_fraction": wall_fraction,
-        "_wall_deposit_account": "process.wall_deposit",
     }
     request = IntentRequest(
         intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -505,6 +558,8 @@ def test_provider_splits_baffle_product_from_wall_deposit(
             "species": "SiO",
             "condensed_kg": condensed_kg,
             "sp_data": sp_data,
+            "wall_deposit_fraction": wall_fraction,
+            "wall_deposit_account_fractions": {},
             "dt_hr": 1.0,
         },
     )
@@ -571,11 +626,6 @@ def test_provider_routes_wall_deposit_to_segment_accounts(
             "Si": 0.5,
             "SiO2": 0.5,
         },
-        "_wall_deposit_fraction": wall_fraction,
-        "_wall_deposit_segment_fractions": {
-            first_account: 0.75,
-            second_account: 0.25,
-        },
     }
     request = IntentRequest(
         intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -586,6 +636,11 @@ def test_provider_routes_wall_deposit_to_segment_accounts(
             "species": "SiO",
             "condensed_kg": condensed_kg,
             "sp_data": sp_data,
+            "wall_deposit_fraction": wall_fraction,
+            "wall_deposit_account_fractions": {
+                first_account: 0.75,
+                second_account: 0.25,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -894,6 +949,14 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
     assert train_credit_kg > 1e-9, (
         "condensation route deposited zero mass on train across the "
         "entire batch"
+    )
+    wall_segment_deposits_kg = {}
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        species_kg = sim.atom_ledger.kg_by_account(account)
+        if species_kg:
+            wall_segment_deposits_kg[account] = dict(sorted(species_kg.items()))
+    assert wall_segment_deposits_kg == (
+        EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG[feedstock_key]
     )
 
     # Final assertion: end-of-batch closure stays tight (same bound as

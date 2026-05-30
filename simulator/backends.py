@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Mapping, TypeVar
@@ -47,9 +48,9 @@ def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
 
     return PyrolysisSimulator(
         config.backend,
-        config.setpoints,
-        config.feedstocks,
-        config.vapor_pressures,
+        copy.deepcopy(config.setpoints),
+        copy.deepcopy(config.feedstocks),
+        copy.deepcopy(config.vapor_pressures),
     )
 
 

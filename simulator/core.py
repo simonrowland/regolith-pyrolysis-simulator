@@ -39,6 +39,7 @@ Units:
 from __future__ import annotations
 
 import inspect
+import copy
 import math
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
@@ -309,9 +310,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # hook in ``_get_equilibrium``. Available to the UI / diagnostics
         # without forcing a recompute. None until the first call.
         self._last_sulfur_saturation_result: SulfurSaturationResult | None = None
-        self.setpoints = setpoints
-        self.feedstocks = feedstocks
-        self.vapor_pressures = vapor_pressures
+        self.setpoints = copy.deepcopy(setpoints)
+        self.feedstocks = copy.deepcopy(feedstocks)
+        self.vapor_pressures = copy.deepcopy(vapor_pressures)
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()

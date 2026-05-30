@@ -900,7 +900,7 @@ class EvaporationMixin:
                 0.0, rate_kg_hr - remaining_kg_hr,
             )
             credited_condensed_kg = self._dispatch_condensation_route(
-                species, condensed_kg, sp_data,
+                species, condensed_kg, sp_data, route_result,
             )
 
             # Step 3: stage UI projection (unchanged behaviour).
@@ -917,6 +917,7 @@ class EvaporationMixin:
         species: str,
         condensed_kg: float,
         sp_data: dict,
+        route_result,
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
@@ -942,6 +943,13 @@ class EvaporationMixin:
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
+                'wall_deposit_fraction': float(
+                    route_result.wall_deposit_fraction_by_species.get(
+                        species, 0.0)),
+                'wall_deposit_account_fractions': dict(
+                    route_result
+                    .wall_deposit_account_fractions_by_species
+                    .get(species, {})),
                 'dt_hr': 1.0,
             },
         )
