@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import yaml
 import pytest
 
@@ -15,6 +17,14 @@ from simulator.runner import PyrolysisRun
 FEEDSTOCK = "lunar_mare_low_ti"
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
 PRODUCT_TARGET = ("campaigns", "C0b_p_cleanup", "products", "oxygen_kg")
+SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
+
+
+def _lookup_setpoint(root: dict, dotted_path: str):
+    node = root
+    for segment in dotted_path.split("."):
+        node = node[segment]
+    return node
 
 
 def test_unknown_setpoint_path_is_denied_by_default() -> None:
@@ -80,11 +90,12 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
             PO2_DEFAULT: 10.0,
             ("campaigns", "C2A_continuous", "duration_h"): [20, 24],
         }
-    ).validated()
+    )
 
-    nested = patch.to_nested()
+    schema = RecipeSchema()
+    nested = schema.to_setpoints_patch(patch)
     loaded = yaml.safe_load(yaml.safe_dump(nested, sort_keys=True))
-    assert RecipePatch.from_nested(loaded).values == patch.values
+    assert RecipePatch.from_nested(loaded).values == patch.validated(schema).values
 
     run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
     config = run._session_config()
@@ -123,6 +134,42 @@ def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
     extended = RecipeSchema(forbidden_prefixes=("campaigns.C0",))
     assert extended.is_forbidden(("campaigns", "C0"))
     assert extended.is_forbidden(PRODUCT_TARGET)
+
+
+def test_knob_bounds_source_provenance_is_honest() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    range_sourced = 0
+    engineering_envelopes = 0
+
+    for spec in RecipeSchema().allowlist:
+        if spec.bounds_source.startswith("setpoints:"):
+            yaml_path = spec.bounds_source.removeprefix("setpoints:")
+            yaml_value = _lookup_setpoint(setpoints, yaml_path)
+            assert isinstance(yaml_value, list), (
+                f"{'.'.join(spec.path)} cites scalar YAML as bounds_source; "
+                "scalar nominal knobs must use engineering_envelope"
+            )
+            assert len(yaml_value) == 2
+            assert spec.low is not None
+            assert spec.high is not None
+            assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
+            range_sourced += 1
+        else:
+            assert spec.bounds_source.startswith("engineering_envelope"), (
+                f"{'.'.join(spec.path)} bounds_source must be setpoints: range "
+                "or engineering_envelope"
+            )
+            engineering_envelopes += 1
+
+    assert range_sourced + engineering_envelopes == len(RecipeSchema().allowlist)
+    assert engineering_envelopes > 0
+
+
+def test_to_setpoints_patch_validates_before_rendering_forbidden_paths() -> None:
+    patch = RecipePatch({("campaigns", "C2A", "products", "x"): 1.0})
+
+    with pytest.raises(RecipeValidationError, match="forbidden recipe path"):
+        RecipeSchema().to_setpoints_patch(patch)
 
 
 def test_dotted_path_segment_is_rejected() -> None:

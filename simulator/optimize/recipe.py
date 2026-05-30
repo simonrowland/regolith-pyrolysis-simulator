@@ -101,7 +101,11 @@ class RecipeSchema:
             low=10,
             high=100,
             units="C/hr",
-            bounds_source="setpoints:campaigns.C0.dT_dt_C_per_hr",
+            # Wider ramp sweep around 50 C/hr nominal probes throughput vs thermal lag.
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C0.dT_dt_C_per_hr=50"
+            ),
         ),
         _knob(
             "campaigns.C0b_p_cleanup.temp_range_C",
@@ -206,14 +210,22 @@ class RecipeSchema:
             low=300,
             high=900,
             units="C/hr",
-            bounds_source="setpoints:campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
+            # Sweep around 600 C/hr nominal spans slower capture and faster Na release.
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr=600"
+            ),
         ),
         _knob(
             "campaigns.C2A_staged.na_shuttle_stage.duration_h",
             low=1,
             high=6,
             units="h",
-            bounds_source="setpoints:campaigns.C2A_staged.na_shuttle_stage.duration_h",
+            # Duration sweep around 3 h nominal covers under/over-hold Na shuttle cases.
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.na_shuttle_stage.duration_h=3"
+            ),
         ),
         _knob(
             "campaigns.C2B.temp_range_C",
@@ -277,7 +289,11 @@ class RecipeSchema:
             low=15,
             high=60,
             units="min",
-            bounds_source="setpoints:campaigns.C3.endpoint.hold_time_min",
+            # Endpoint hold sweep around 30 min nominal tests equilibration margin.
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C3.endpoint.hold_time_min=30"
+            ),
         ),
         _knob(
             "campaigns.C3.duration_after_pathA_h",
@@ -347,14 +363,22 @@ class RecipeSchema:
             low=10,
             high=100,
             units="mbar",
-            bounds_source="setpoints:campaigns.C5.pO2_bar",
+            # Default mbar sweep is the C5 bar range converted for runner setpoints.
+            bounds_source=(
+                "engineering_envelope converted from setpoints.yaml range "
+                "campaigns.C5.pO2_bar=[0.01, 0.1] bar to mbar default"
+            ),
         ),
         _knob(
             "campaigns.C5.p_total_mbar_default",
             low=10,
             high=100,
             units="mbar",
-            bounds_source="setpoints:campaigns.C5.pO2_bar",
+            # Total-pressure default follows the converted C5 pO2 bar sweep.
+            bounds_source=(
+                "engineering_envelope converted from setpoints.yaml range "
+                "campaigns.C5.pO2_bar=[0.01, 0.1] bar to total mbar default"
+            ),
         ),
         _knob(
             "campaigns.C6.temp_range_C",
@@ -462,6 +486,10 @@ class RecipeSchema:
             for prefix in dotted_prefixes
         )
 
+    def to_setpoints_patch(self, patch: "RecipePatch") -> dict[str, Any]:
+        """Validate then render the optimizer-facing setpoints patch."""
+        return patch.validated(self).to_nested()
+
 
 @dataclass(frozen=True)
 class RecipePatch:
@@ -504,6 +532,7 @@ class RecipePatch:
         return cls(flat)
 
     def to_nested(self) -> dict[str, Any]:
+        """Render values only; UNVALIDATED. Use RecipeSchema.to_setpoints_patch()."""
         nested: dict[str, Any] = {}
         for path, value in sorted(self.values.items()):
             cursor: dict[str, Any] = nested
