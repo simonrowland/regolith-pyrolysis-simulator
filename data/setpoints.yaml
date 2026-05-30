@@ -67,6 +67,8 @@ campaigns:
     dT_dt_C_per_hr: null                 # isothermal hold; IR-endpoint controlled
     atmosphere: "controlled_O2_flow"     # flow/sweep or mild bubbling
     pO2_mbar: [3.0, 15.0]               # suppresses Na/K/SiO; only volatiles train open
+    pO2_mbar_default: 9.0
+    p_total_mbar_default: 9.0
     target_species: ["PO", "POx"]
     products:
       phosphate_salts:
@@ -102,6 +104,8 @@ campaigns:
     carrier_gas: "pN2"                   # optimal; pHe or pAr fallback
     p_total_mbar: [5, 15]               # optimal 8-12 mbar viscous-flow regime
     pO2_mbar: null                       # <1e-5 mbar; maintained by Fe-granule sorbent
+    pO2_mbar_default: 0.0
+    p_total_mbar_default: 10.0
     pO2_bar: "<1e-8"
     flow_regime: "viscous"               # Kn << 0.01 at 1-10 mbar
     target_species: ["Na", "K", "Fe", "CrO2", "SiO"]
@@ -161,6 +165,8 @@ campaigns:
     carrier_gas: "pN2"
     p_total_mbar: [5, 15]
     pO2_mbar: null
+    pO2_mbar_default: 0.0
+    p_total_mbar_default: 10.0
     pO2_bar: "<1e-8"
     flow_regime: "viscous"
     target_species: ["Na", "K", "SiO", "Fe"]
@@ -269,6 +275,8 @@ campaigns:
     dT_dt_C_per_hr: null                 # pO2-ramped with temperature
     atmosphere: "controlled_O2"
     pO2_mbar: [0.8, 2.3]                # ramped with temperature
+    pO2_mbar_default: 1.5
+    p_total_mbar_default: 1.5
     target_species: ["Fe"]
     products:
       Fe:
@@ -297,6 +305,8 @@ campaigns:
       crossover 832 C). Na/FeO survives only below 1173.4 C and is therefore
       used only by the C2A_staged 1150 C FeO cleanup override. Default C3
       Cr/Ti reductions remain refused by the executable temperature gate.
+    pO2_mbar_default: 1.0
+    p_total_mbar_default: 1.0
     sequencing: "legacy K-first then Na; physics gate may refuse all targets"
     K_phase:
       name: "Deprecated K FeO reduction diagnostic"
@@ -347,6 +357,8 @@ campaigns:
     dT_dt_C_per_hr: null                 # IR-controlled
     atmosphere: "controlled_O2"
     pO2_mbar: [0.08, 0.35]
+    pO2_mbar_default: 0.2
+    p_total_mbar_default: 0.2
     target_species: ["Mg"]
     Mg_vapour_pressure_bar_1600C: 0.5
     prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
@@ -388,6 +400,8 @@ campaigns:
     dT_dt_C_per_hr: null                 # electrochemical; not ramp-driven
     atmosphere: "O2_backpressure"
     pO2_bar: [0.01, 0.1]                # total pyrolysis suppression
+    pO2_mbar_default: 50.0
+    p_total_mbar_default: 50.0
     branch_two:
       max_voltage_V: 1.6                 # or <=1.4 if retaining Ti for C6
       electrical_kWh_per_t: [600, 1200]
@@ -415,6 +429,10 @@ campaigns:
       electrolysis. Branch Two is strongly preferred for electrode
       longevity and energy budget.
 
+  mre_baseline:
+    pO2_mbar_default: 50.0
+    p_total_mbar_default: 50.0
+
   # --------------------------------------------------------------------------
   # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
   # --------------------------------------------------------------------------
@@ -425,6 +443,8 @@ campaigns:
     dT_dt_C_per_hr: null                 # reaction-controlled
     atmosphere: "controlled_O2"          # bakeout atmosphere for Mg recovery
     pO2_mbar: [0.08, 0.35]              # bakeout pO2
+    pO2_mbar_default: 0.2
+    p_total_mbar_default: 0.2
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
     V1c_JANAF_margin_kJ_per_mol_O2:

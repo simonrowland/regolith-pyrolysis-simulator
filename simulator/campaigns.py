@@ -46,8 +46,12 @@ class CampaignManager:
         self.overrides: Dict[str, dict] = {}
 
     _CONFIG_KEY_BY_PHASE = {
+        CampaignPhase.C0B: 'C0b_p_cleanup',
         CampaignPhase.C2A: 'C2A_continuous',
         CampaignPhase.C2A_STAGED: 'C2A_staged',
+        CampaignPhase.C3_K: 'C3',
+        CampaignPhase.C3_NA: 'C3',
+        CampaignPhase.MRE_BASELINE: 'mre_baseline',
     }
 
     @staticmethod
@@ -79,10 +83,12 @@ class CampaignManager:
 
     @staticmethod
     def _float(value, default: float) -> float:
+        if value is None:
+            return default
         try:
             return float(value)
-        except (TypeError, ValueError):
-            return default
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'Invalid numeric campaign setpoint: {value!r}') from exc
 
     # ------------------------------------------------------------------
     # Campaign configuration
@@ -107,44 +113,52 @@ class CampaignManager:
             melt.pO2_mbar = 0.0
 
         elif campaign == CampaignPhase.C0B:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
-            melt.pO2_mbar = 9.0  # midpoint of [3, 15]
-            melt.p_total_mbar = 9.0
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 9.0)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 9.0)
 
         elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.PN2_SWEEP
-            melt.pO2_mbar = 0.0   # Fe-granule sorbent keeps pO₂ → 0
-            melt.p_total_mbar = 10.0  # midpoint of [5, 15] mbar N₂
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.0)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 10.0)
 
         elif campaign == CampaignPhase.C2B:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = 1.5   # midpoint of [0.8, 2.3]
-            melt.p_total_mbar = 1.5
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 1.5)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 1.5)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = 1.0   # midpoint of [0.5, 1.5]
-            melt.p_total_mbar = 1.0
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 1.0)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 1.0)
 
         elif campaign == CampaignPhase.C4:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = 0.2   # midpoint of [0.08, 0.35]
-            melt.p_total_mbar = 0.2
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.2)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 0.2)
 
         elif campaign == CampaignPhase.C5:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
-            melt.pO2_mbar = 50.0  # 0.05 bar midpoint of [0.01, 0.1]
-            melt.p_total_mbar = 50.0
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 50.0)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 50.0)
 
         elif campaign == CampaignPhase.C6:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = 0.2
-            melt.p_total_mbar = 0.2
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.2)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 0.2)
 
         elif campaign == CampaignPhase.MRE_BASELINE:
+            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
-            melt.pO2_mbar = 50.0
-            melt.p_total_mbar = 50.0
+            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 50.0)
+            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 50.0)
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
