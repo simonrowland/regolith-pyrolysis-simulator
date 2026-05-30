@@ -8,6 +8,13 @@ to local YAML files.  Single-user, file-based storage.
 Files:
     data/custom_compositions.yaml — user-created feedstock compositions
     data/test_runs.yaml           — saved simulation run history
+
+LEGACY BOUNDARY (R-F7): this is the single-user, file-based UI store for custom
+feedstocks + manual run history. It is NOT the recipe optimizer's run cache. The
+optimizer's content-addressed run store is the separate ``results_store.py``
+(Phase O / O-P2b3-4: sqlite/WAL keyed by the EvalSpec SHA-256, which includes the
+feedstock_recipe_digest so a feedstock composition edit invalidates only that
+feedstock's cache). Do not extend this module for optimizer use.
 """
 
 from __future__ import annotations
