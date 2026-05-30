@@ -561,6 +561,12 @@ class PyrolysisRun:
             capability = registry.capability_summary()
         except AttributeError:
             capability = {}
+        internal_intents = {"backend_equilibrium"}
+        capability = {
+            intent: slots
+            for intent, slots in capability.items()
+            if intent not in internal_intents
+        }
         active = {
             intent: slots["authoritative"]
             for intent, slots in capability.items()

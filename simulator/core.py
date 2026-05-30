@@ -834,6 +834,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'OVERHEAD_BLEED -- AUTHORITATIVE: pure-move routing from '
             'overhead_gas to terminal offgas / melt-offgas O2 bins.',
         ),
+        (
+            'engines.builtin.backend_equilibrium',
+            'BuiltinBackendEquilibriumProvider',
+            (ChemistryIntent.BACKEND_EQUILIBRIUM,),
+            False,
+            'BACKEND_EQUILIBRIUM -- AUTHORITATIVE: validates existing '
+            'backend LedgerTransition objects before kernel commit.',
+        ),
     )
 
     def _build_chemistry_kernel(self) -> ChemistryKernel:
@@ -2178,15 +2186,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return self._record_equilibrium_status(self._stub_equilibrium())
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
-            # WRITER-EXEMPT: backend-equilibrium ledger transition
-            # (validated against BACKEND_LEDGER_TRANSITION_NAMES +
-            # BACKEND_REACTIVE_ACCOUNTS allowlists by
-            # _validate_backend_ledger_transition above; see
-            # binding-spec §3 -- the legacy equilibrium-backend path
-            # owns its own LedgerTransition vocabulary and writes
-            # directly).  The writer-purity test recognises this exact
-            # call as a tagged exemption.
-            self.atom_ledger.apply(transition)
+            self._require_chem_kernel().commit_validated_transition(
+                ChemistryIntent.BACKEND_EQUILIBRIUM,
+                transition,
+            )
             self._project_cleaned_melt_from_atom_ledger()
         return self._record_equilibrium_status(result)
 

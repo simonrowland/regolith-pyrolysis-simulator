@@ -36,6 +36,7 @@ class ChemistryIntent(str, Enum):
     STAGE0_PRETREATMENT = "stage0_pretreatment"
     OVERHEAD_GAS_EQUILIBRIUM = "overhead_gas_equilibrium"
     OVERHEAD_BLEED = "overhead_bleed"
+    BACKEND_EQUILIBRIUM = "backend_equilibrium"
     SULFUR_SATURATION_GATE = "sulfur_saturation_gate"
     T_P_VALIDATION = "t_p_validation"
 

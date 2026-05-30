@@ -1,9 +1,9 @@
 """Writer-purity invariant: only the kernel writes the AtomLedger.
 
 After ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) all chemistry-transition
-ledger writes flow through :meth:`ChemistryKernel.commit_batch`.  The only
-remaining simulator-side exemptions are seed-time ``load_external`` calls,
-the backend-equilibrium transition, and the atom-balanced reagent shuttle.
+ledger writes flow through the ChemistryKernel.  The only remaining
+simulator-side exemptions are seed-time ``load_external`` calls and the
+atom-balanced reagent shuttle.
 
 The audit walks every Python module under ``simulator/`` excluding
 ``simulator/chemistry/kernel/`` (which IS the writer the kernel uses
@@ -28,11 +28,10 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _SIMULATOR_ROOT = _REPO_ROOT / "simulator"
 
 # Directories under simulator/ where atom_ledger.apply IS the legitimate
-# writer (the kernel commits through them; the backend ABC writes its
-# own legacy equilibrium-transition path).  Files under these subtrees
-# are skipped entirely by the audit -- the writer-purity invariant
-# applies to the SIMULATOR call sites, not to the engine that owns
-# commit_batch.
+# writer (the kernel commits through them; the backend ABC builds
+# backend-local transitions).  Files under these subtrees are skipped
+# entirely by the audit -- the writer-purity invariant applies to the
+# SIMULATOR call sites, not to the kernel writer internals.
 _EXEMPT_SUBDIRS = (
     _SIMULATOR_ROOT / "chemistry" / "kernel",
     _SIMULATOR_ROOT / "melt_backend",
@@ -46,7 +45,6 @@ _EXEMPT_SUBDIRS = (
 # it.
 #
 _WRITER_EXEMPT_CALLS = (
-    ("simulator/core.py", "backend-equilibrium"),
     # _move_ledger_species: atom-balanced reagent shuttle between accounts.
     ("simulator/extraction.py", "shuttle-reagent-move"),
 )

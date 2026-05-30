@@ -852,6 +852,75 @@ def test_backend_overhead_o2_stays_in_process_headspace_until_gas_tick():
         'process.overhead_gas') == pytest.approx(expected_o2_kg)
 
 
+def test_backend_equilibrium_kernel_commit_matches_direct_apply_transition():
+    class OxygenBackend:
+        def __init__(self):
+            self.transition = None
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **kwargs):
+            return EquilibriumResult(ledger_transition=self.transition)
+
+    def new_sim(backend):
+        sim = PyrolysisSimulator(
+            backend,
+            {"campaigns": {}},
+            {
+                "feo": {
+                    "label": "FeO",
+                    "composition_wt_pct": {"FeO": 100.0},
+                }
+            },
+            {"metals": {}, "oxide_vapors": {}},
+        )
+        sim.load_batch("feo", mass_kg=1.0)
+        return sim
+
+    def transition_for(ledger):
+        return LedgerTransition(
+            name='factsage_equilibrium_phase_update',
+            debits=(ledger.debit_mol(
+                'process.cleaned_melt', {'FeO': 1.0}),),
+            credits=(
+                ledger.credit_mol(
+                    'process.cleaned_melt',
+                    {'Fe': 1.0},
+                    source='FactSAGE equilibrium',
+                    meta={'amount_basis': 'mol', 'species_mol': {'Fe': 1.0}},
+                ),
+                ledger.credit_mol(
+                    'process.overhead_gas',
+                    {'O2': 0.5},
+                    source='FactSAGE equilibrium',
+                    meta={'amount_basis': 'mol', 'species_mol': {'O2': 0.5}},
+                ),
+            ),
+            reason='FactSAGE equilibrium phase species projected into AtomLedger',
+        )
+
+    direct_sim = new_sim(OxygenBackend())
+    direct_transition = direct_sim.atom_ledger.apply(
+        transition_for(direct_sim.atom_ledger)
+    )
+
+    backend = OxygenBackend()
+    sim = new_sim(backend)
+    backend.transition = transition_for(sim.atom_ledger)
+
+    sim._get_equilibrium()
+
+    assert sim.atom_ledger.transitions[-1] == direct_transition
+    actual = sim.atom_ledger.mol_by_account()
+    expected = direct_sim.atom_ledger.mol_by_account()
+    assert set(actual) == set(expected)
+    for account, expected_species in expected.items():
+        assert set(actual[account]) == set(expected_species)
+        for species, mol in expected_species.items():
+            assert actual[account][species] == pytest.approx(mol)
+
+
 def test_backend_transition_name_must_match_declared_contract():
     class UnexpectedNameBackend:
         def __init__(self):

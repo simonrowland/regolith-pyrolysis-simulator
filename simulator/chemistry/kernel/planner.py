@@ -253,8 +253,10 @@ class Planner:
 class ChemistryKernel:
     """Top-level kernel: filters, dispatches, validates, commits.
 
-    The kernel owns the only writable path into the
-    :class:`AtomLedger` -- :meth:`commit_batch`.  Providers receive
+    The kernel owns the only writable paths into the
+    :class:`AtomLedger` -- :meth:`commit_batch` (provider proposals) and
+    :meth:`commit_validated_transition` (pre-built backend transitions,
+    run through the same authority/account/atom-balance gates).  Providers receive
     only :class:`IntentRequest` instances (whose
     :class:`ProviderAccountView` is already filtered), and may return
     :class:`IntentResult` instances; they have no way to reach the
@@ -574,6 +576,55 @@ class ChemistryKernel:
         transition = _proposal_to_ledger_transition(
             proposal, self._species_formula_registry
         )
+        try:
+            return self._ledger.apply(transition)
+        except Exception as exc:  # noqa: BLE001
+            raise ProposalRejected(str(exc)) from exc
+
+    def commit_validated_transition(
+        self,
+        intent: ChemistryIntent,
+        transition: LedgerTransition,
+    ) -> LedgerTransition:
+        """Validate and apply an already-materialized ledger transition.
+
+        This is the narrow legacy-backend chokepoint: it runs the same
+        authority, declared-account, and atom-balance gates as
+        :meth:`commit_batch`, then applies the original transition inside
+        the kernel so lot source/meta/reason stay byte-identical to the
+        backend output.
+        """
+
+        proposal = LedgerTransitionProposal(
+            debits={
+                lot.account: lot.species_moles_for(
+                    self._species_formula_registry
+                )
+                for lot in transition.debits
+            },
+            credits={
+                lot.account: lot.species_moles_for(
+                    self._species_formula_registry
+                )
+                for lot in transition.credits
+            },
+            reason=transition.name,
+        )
+        provider = self._registry.authoritative_for(intent)
+        if provider is None:
+            raise ProviderUnavailableError(
+                f"no authoritative provider registered for intent "
+                f"{intent.value!r}; cannot commit transition"
+            )
+        profile = provider.capability_profile()
+        validate_intent_authority(intent, profile)
+        validate_proposal_accounts(proposal, profile.declared_accounts)
+        try:
+            validate_atom_balance(proposal, self._species_formula_registry)
+        except KernelError:
+            raise
+        except Exception as exc:  # noqa: BLE001 -- surface as ProposalRejected
+            raise ProposalRejected(str(exc)) from exc
         try:
             return self._ledger.apply(transition)
         except Exception as exc:  # noqa: BLE001

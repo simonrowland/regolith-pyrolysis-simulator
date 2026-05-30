@@ -1,4 +1,6 @@
-"""Kernel invariant: :meth:`ChemistryKernel.commit_batch` is the sole writer.
+"""Kernel invariant: the ChemistryKernel commit chokepoints
+(:meth:`commit_batch` and :meth:`commit_validated_transition`) are the
+only writers into the AtomLedger.
 
 The kernel never exposes the :class:`AtomLedger` to providers.  The
 provider ABC carries no ledger reference, the
@@ -15,7 +17,7 @@ from __future__ import annotations
 import inspect
 import pytest
 
-from simulator.accounting.ledger import AtomLedger
+from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
     CapabilityProfile,
@@ -111,6 +113,28 @@ class _CommitProvider(ChemistryProvider):
         )
 
 
+class _BackendEquilibriumProvider(ChemistryProvider):
+    name = "backend_equilibrium_provider"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.name,
+            intents=frozenset({ChemistryIntent.BACKEND_EQUILIBRIUM}),
+            is_authoritative_for=frozenset({
+                ChemistryIntent.BACKEND_EQUILIBRIUM
+            }),
+            declared_accounts=frozenset(
+                {"process.cleaned_melt", "process.overhead_gas"}
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=ChemistryIntent.BACKEND_EQUILIBRIUM,
+            status="unsupported",
+        )
+
+
 def test_commit_batch_is_sole_writer_and_applies_transition():
     ledger = AtomLedger()
     ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
@@ -143,6 +167,46 @@ def test_commit_batch_is_sole_writer_and_applies_transition():
         0.25, rel=1e-9
     )
     ledger.assert_balanced()
+
+
+def test_commit_validated_transition_preserves_original_transition_identity():
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"FeO": 1.0})
+    registry = ProviderRegistry()
+    registry.register(
+        _BackendEquilibriumProvider(),
+        [ChemistryIntent.BACKEND_EQUILIBRIUM],
+    )
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    transition = LedgerTransition(
+        name="factsage_equilibrium_phase_update",
+        debits=(ledger.debit_mol("process.cleaned_melt", {"FeO": 1.0}),),
+        credits=(
+            ledger.credit_mol(
+                "process.cleaned_melt",
+                {"Fe": 1.0},
+                source="FactSAGE equilibrium",
+                meta={"amount_basis": "mol", "species_mol": {"Fe": 1.0}},
+            ),
+            ledger.credit_mol(
+                "process.overhead_gas",
+                {"O2": 0.5},
+                source="FactSAGE equilibrium",
+                meta={"amount_basis": "mol", "species_mol": {"O2": 0.5}},
+            ),
+        ),
+        reason="FactSAGE equilibrium phase species projected into AtomLedger",
+    )
+
+    applied = kernel.commit_validated_transition(
+        ChemistryIntent.BACKEND_EQUILIBRIUM,
+        transition,
+    )
+
+    assert applied == transition
+    assert ledger.transitions[-1] == transition
+    assert ledger.mol_by_account("process.cleaned_melt")["Fe"] == pytest.approx(1.0)
+    assert ledger.mol_by_account("process.overhead_gas")["O2"] == pytest.approx(0.5)
 
 
 def test_commit_batch_rejects_unbalanced_proposal():
