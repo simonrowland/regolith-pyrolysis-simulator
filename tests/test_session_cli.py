@@ -182,7 +182,14 @@ def test_adjust_variadic_campaign_override_and_scalar_forms_parse():
         "value": 1.5,
     }
     assert frames[2]["param"] == "pO2_mbar"
-    assert frames[3]["snapshot"]["pO2_bar"] == 0.001
+    # pO2_bar is honestly overhead-derived (0.5.3 Phase C P1 fix in
+    # build_per_hour_summary): it reads snapshot.overhead.composition['O2'], NOT
+    # the commanded melt.pO2_mbar intent. A freshly-started C2A session has not
+    # advanced, so no O2 sits in the overhead yet -> pO2_bar == 0.0 regardless of
+    # the `adjust pO2_mbar 1.0` operator intent. Asserting 0.0 (not the legacy
+    # 0.001) guards against regressing to the old melt.pO2_mbar-painted-onto-a-
+    # vacuum-floor behavior that the Phase C fix deliberately removed.
+    assert frames[3]["snapshot"]["pO2_bar"] == 0.0
 
 
 def test_run_subcommand_matches_runner_byte_for_byte(tmp_path: Path):
