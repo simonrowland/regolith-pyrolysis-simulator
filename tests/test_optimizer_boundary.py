@@ -25,6 +25,11 @@ def _imported_modules(path: Path) -> set[str]:
             modules.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
             modules.add(node.module)
+            # Also catch `from simulator import mass_balance`: ast records
+            # module="simulator" + name="mass_balance"; the forbidden module is
+            # module + "." + name.
+            for alias in node.names:
+                modules.add(f"{node.module}.{alias.name}")
     return modules
 
 
@@ -40,3 +45,16 @@ def test_optimizer_does_not_import_legacy_mass_balance_or_persistence() -> None:
         "Use the R-F3 PhysicsTrace / accounting.queries scoring surface and the "
         "(Phase-O) results_store.py, not legacy mass_balance/persistence."
     )
+
+
+def test_boundary_guard_detects_from_package_import_form(tmp_path) -> None:
+    # The guard must catch BOTH `import simulator.mass_balance` AND
+    # `from simulator import mass_balance` (ast: module="simulator",
+    # name="mass_balance"). Exit-review P3 (2026-05-30).
+    snippet = tmp_path / "snip.py"
+    snippet.write_text(
+        "from simulator import mass_balance\nimport simulator.persistence\n"
+    )
+    detected = _imported_modules(snippet)
+    assert "simulator.mass_balance" in detected
+    assert "simulator.persistence" in detected
