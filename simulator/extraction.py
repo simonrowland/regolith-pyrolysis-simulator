@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Dict
 
+from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import product_stage_number
 from simulator.state import (
     FARADAY,
@@ -41,13 +42,7 @@ class ExtractionMixin:
             'process.reagent_inventory', species)
 
     def _rump_element_kg(self, element: str) -> float:
-        species_names = self._RUMP_ELEMENT_SPECIES.get(element, ())
-        total = 0.0
-        for account in ('process.cleaned_melt', 'terminal.slag'):
-            species_kg = self.atom_ledger.kg_by_account(account)
-            for species in species_names:
-                total += max(0.0, float(species_kg.get(species, 0.0)))
-        return total
+        return AccountingQueries(self).rump_element_kg(element)
 
     def _initial_rump_element_kg(self, element: str) -> float:
         species_names = self._RUMP_ELEMENT_SPECIES.get(element, ())
@@ -66,11 +61,7 @@ class ExtractionMixin:
         return total
 
     def _actual_rump_elements_kg(self) -> Dict[str, float]:
-        return {
-            element: kg
-            for element in sorted(self._RUMP_ELEMENT_SPECIES)
-            if (kg := self._rump_element_kg(element)) > self._RUMP_EXPECTATION_TOL_KG
-        }
+        return AccountingQueries(self).actual_rump_elements_kg()
 
     def _normalise_c5_target_elements(self, targets) -> set[str]:
         if targets is None:

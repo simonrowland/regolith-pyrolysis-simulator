@@ -44,8 +44,19 @@ import math
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 
+from simulator.account_ids import (
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    OXYGEN_MELT_OFFGAS_ACCOUNT,
+    OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
+    OXYGEN_MRE_ANODE_ACCOUNT,
+    OXYGEN_SPECIES,
+    OXYGEN_STAGE0_ACCOUNT,
+    OXYGEN_STORED_ACCOUNTS,
+    OXYGEN_VENTED_ACCOUNTS,
+)
 from simulator.accounting import (
     AccountPolicy,
+    AccountingQueries,
     AccountingError,
     AtomLedger,
     LedgerTransition,
@@ -141,22 +152,8 @@ STAGE0_TERMINAL_SLAG_COMPONENTS = {
     'zro2', 'ree', 'ree_oxide', 'ree_oxides', 'rare_earths',
     'rare_earth_oxide', 'rare_earth_oxides', 'th', 'tho2', 'u', 'uo2',
 }
-OXYGEN_SPECIES = 'O2'
 FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
-OXYGEN_STAGE0_ACCOUNT = 'terminal.oxygen_stage0_stored'
-OXYGEN_MELT_OFFGAS_ACCOUNT = 'terminal.oxygen_melt_offgas_stored'
-OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = 'terminal.oxygen_melt_offgas_vented_to_vacuum'
-OXYGEN_MRE_ANODE_ACCOUNT = 'terminal.oxygen_mre_anode_stored'
-CHROMIUM_CONDENSED_OXIDE_ACCOUNT = 'terminal.chromium_condensed_oxide_stored'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
-OXYGEN_STORED_ACCOUNTS = (
-    OXYGEN_STAGE0_ACCOUNT,
-    OXYGEN_MELT_OFFGAS_ACCOUNT,
-    OXYGEN_MRE_ANODE_ACCOUNT,
-)
-OXYGEN_VENTED_ACCOUNTS = (
-    OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
-)
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     'process.raw_feedstock',
@@ -405,6 +402,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record = BatchRecord()
         self.energy_cumulative_kWh = 0.0
         self.oxygen_cumulative_kg = 0.0
+        self._last_condensed_by_stage_species_delta: Dict[
+            Tuple[int, str], float] = {}
+        self._last_wall_deposit_by_segment_species_delta: Dict[
+            Tuple[str, str], float] = {}
+        self._last_impurity_delta: Dict[Tuple[int, str], float] = {}
 
         # --- Gas train feedback state ---
         self.O2_vented_cumulative_kg = 0.0      # Total O₂ vented to vacuum
@@ -3533,28 +3535,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         The atom ledger is the source of truth. Condenser stage dictionaries are
         UI projections and must not mint product mass.
         """
-        products: Dict[str, float] = {}
-        for account in (
-            'terminal.offgas',
-            'terminal.stage0_salt_phase',
-            'terminal.stage0_sulfide_matte',
-            'terminal.drain_tap_material',
-            CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
-            'process.metal_phase',
-            'process.condensation_train',
-            'process.overhead_gas',
-        ):
-            self._merge_masses(
-                products,
-                {
-                    species: kg
-                    for species, kg in self.atom_ledger.kg_by_account(
-                        account).items()
-                    if species != OXYGEN_SPECIES
-                },
-            )
-        self._merge_masses(products, self._unspent_additive_reagents_kg())
-        return products
+        return AccountingQueries(self).product_ledger()
 
     def _terminal_slag_kg(self) -> float:
         return (
@@ -3563,50 +3544,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _terminal_rump_by_species(self) -> Dict[str, float]:
-        species_kg: Dict[str, float] = {}
-        for account in TERMINAL_RUMP_ACCOUNTS:
-            self._merge_masses(
-                species_kg,
-                self.atom_ledger.kg_by_account(account),
-            )
-        return {
-            species: kg
-            for species, kg in sorted(species_kg.items())
-            if kg > 0.0
-        }
+        return AccountingQueries(self).terminal_rump_by_species()
 
     def _terminal_rump_by_class(self) -> Dict[str, float]:
-        by_species = self._terminal_rump_by_species()
-        by_class = {
-            'refractory_oxides': 0.0,
-            'silicate_residual': 0.0,
-            'unextracted_metals': 0.0,
-            'other': 0.0,
-        }
-        for species, kg in by_species.items():
-            if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
-                category = 'refractory_oxides'
-            elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
-                category = 'silicate_residual'
-            elif species in TERMINAL_RUMP_UNEXTRACTED_METALS:
-                category = 'unextracted_metals'
-            else:
-                category = 'other'
-            by_class[category] += kg
-
-        total_kg = self._terminal_slag_kg()
-        class_total_kg = sum(by_class.values())
-        if total_kg > 0.0:
-            error_pct = abs(class_total_kg - total_kg) / total_kg * 100.0
-        else:
-            error_pct = 0.0 if class_total_kg == 0.0 else math.inf
-        if error_pct > TERMINAL_RUMP_CLASS_TOLERANCE_PCT:
-            raise AccountingError(
-                'terminal rump class mass does not match terminal rump total: '
-                f'{class_total_kg:.15g} kg vs {total_kg:.15g} kg '
-                f'({error_pct:.15g} pct)'
-            )
-        return by_class
+        return AccountingQueries(self).terminal_rump_by_class()
 
     def _ledger_total_mass_kg(self) -> float:
         return sum(self.atom_ledger.total_kg_by_account().values())
@@ -3644,29 +3585,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _oxygen_terminal_partition_kg(self) -> Dict[str, float]:
-        stored_by_source = {
-            account: self._ledger_o2_kg(account)
-            for account in OXYGEN_STORED_ACCOUNTS
-        }
-        vented_by_source = {
-            account: self._ledger_o2_kg(account)
-            for account in OXYGEN_VENTED_ACCOUNTS
-        }
-        stored_kg = sum(stored_by_source.values())
-        vented_kg = sum(vented_by_source.values())
-        return {
-            'stored': stored_kg,
-            'vented': vented_kg,
-            'total': stored_kg + vented_kg,
-            'stage0_stored': stored_by_source.get(
-                OXYGEN_STAGE0_ACCOUNT, 0.0),
-            'melt_offgas_stored': stored_by_source.get(
-                OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
-            'mre_anode_stored': stored_by_source.get(
-                OXYGEN_MRE_ANODE_ACCOUNT, 0.0),
-            'melt_offgas_vented': vented_by_source.get(
-                OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0),
-        }
+        return AccountingQueries(self).oxygen_terminal_partition_kg()
 
     def _sync_oxygen_kg_counters(
         self, partition: Optional[Mapping[str, float]] = None
@@ -3686,19 +3605,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return self._oxygen_terminal_partition_kg()['total']
 
     def _condensation_totals_with_terminal_oxygen(self) -> Dict[str, float]:
-        totals = {
-            species: float(kg)
-            for species, kg in self.atom_ledger.kg_by_account(
-                'process.condensation_train').items()
-            if kg > 1e-12
-        }
-        oxygen_partition = self._oxygen_terminal_partition_kg()
-        melt_offgas_stored = oxygen_partition['melt_offgas_stored']
-        if melt_offgas_stored > OXYGEN_ACCOUNTING_TOLERANCE_KG:
-            totals[OXYGEN_SPECIES] = melt_offgas_stored
-        else:
-            totals.pop(OXYGEN_SPECIES, None)
-        return totals
+        return AccountingQueries(self).condensation_totals_with_terminal_oxygen()
 
     def _overhead_gas_totals(self) -> Dict[str, float]:
         return {
@@ -3814,6 +3721,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Returns:
             HourSnapshot with full system state at this hour
         """
+        self._last_condensed_by_stage_species_delta = {}
+        self._last_wall_deposit_by_segment_species_delta = {}
+        self._last_impurity_delta = {}
+
         # --- 1. Decision check ---
         if self.paused_for_decision:
             # Return current state without advancing
@@ -4227,6 +4138,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             inventory=self.inventory.copy(),
             overhead=self.overhead,
             condensation_totals=condensation_totals,
+            condensed_by_stage_species_delta=dict(
+                self._last_condensed_by_stage_species_delta),
+            wall_deposit_by_segment_species_delta=dict(
+                self._last_wall_deposit_by_segment_species_delta),
+            impurity_delta=dict(self._last_impurity_delta),
             energy_cumulative_kWh=self.energy_cumulative_kWh,
             oxygen_produced_kg=oxygen_partition['total'],
             mass_in_kg=mass_in,

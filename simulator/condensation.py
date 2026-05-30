@@ -65,6 +65,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
 
+from simulator.accounting.queries import (
+    wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
+    wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
+    wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
+)
 from simulator.config import load_config_bundle
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
@@ -1097,13 +1102,12 @@ class CondensationModel:
         T_cond_C: float,
         melt_temperature_C: float,
     ) -> float:
-        return self._wall_deposit_candidate_for_surface_kg(
+        return query_wall_deposit_candidate_kg(
+            self,
             species=species,
             rate_kg_hr=rate_kg_hr,
             T_cond_C=T_cond_C,
             melt_temperature_C=melt_temperature_C,
-            wall_temperature_C=self.wall_temperature_C,
-            surface_area_m2=self.wall_surface_area_m2,
         )
 
     def _wall_deposit_candidates_by_segment_kg(
@@ -1115,108 +1119,14 @@ class CondensationModel:
         melt_temperature_C: float,
         supply_by_segment_kg: Mapping[str, float],
     ) -> Dict[str, float]:
-        if rate_kg_hr <= 0.0 or not self.pipe_segments:
-            return {}
-        # Autoreview r7 P2 (2026-05-27): the equal-temperature fast
-        # path used to allocate the wall-deposit candidate across
-        # ``self.pipe_segments`` -- every segment, including segments
-        # downstream of the species' designated condenser stage that
-        # cannot physically see this species' vapor.  The
-        # mixed-temperature branch already restricts to upstream-only
-        # candidates via ``_mixed_temperature_wall_candidate_segments``
-        # AND caps by per-segment supply; the equal-T branch must use
-        # the same gate or it credits species to wall-deposit accounts
-        # they cannot physically reach (mass balance still closes, but
-        # the per-segment ledger and the F1 stage-routing-purity
-        # report both become non-stage-honest).
-        reachable_segments = self._mixed_temperature_wall_candidate_segments(species)
-        if not reachable_segments:
-            return {}
-        temperatures = {
-            float(segment.wall_temperature_C)
-            for segment in reachable_segments
-        }
-        if len(temperatures) == 1:
-            wall_temperature_C = next(iter(temperatures))
-            # Per-segment surface area cap on the equal-T candidate so
-            # the total is bounded by what the reachable segments can
-            # physically collect, not the original full-train rate.
-            reachable_surface_m2 = sum(
-                max(0.0, float(segment.surface_area_m2))
-                for segment in reachable_segments
-            )
-            total_candidate = self._wall_deposit_candidate_for_surface_kg(
-                species=species,
-                rate_kg_hr=rate_kg_hr,
-                T_cond_C=T_cond_C,
-                melt_temperature_C=melt_temperature_C,
-                wall_temperature_C=wall_temperature_C,
-                surface_area_m2=reachable_surface_m2,
-            )
-            candidates = _allocate_total_by_weights(
-                total_candidate,
-                {
-                    segment.name: segment.surface_area_m2
-                    for segment in reachable_segments
-                },
-            )
-            # Per-segment supply cap: mirror the mixed-temperature
-            # branch's invariant that no segment claims more than its
-            # available vapor supply after upstream condensation.
-            for segment in reachable_segments:
-                supply_kg = min(
-                    max(0.0, float(supply_by_segment_kg.get(
-                        segment.name, rate_kg_hr))),
-                    rate_kg_hr,
-                )
-                if segment.name in candidates:
-                    candidates[segment.name] = min(
-                        candidates[segment.name], supply_kg)
-            return candidates
-
-        pipe_segments = reachable_segments
-        if not pipe_segments:
-            return {}
-        candidates: Dict[str, float] = {}
-        for segment in pipe_segments:
-            supply_kg = min(
-                max(0.0, float(supply_by_segment_kg.get(
-                    segment.name, rate_kg_hr))),
-                rate_kg_hr,
-            )
-            # Autoreview r4 P2 (2026-05-27): pass ``supply_kg`` as the
-            # rate budget for THIS segment, not the original full-train
-            # ``rate_kg_hr``.  After an upstream condenser has removed
-            # most vapor, the downstream segment sees only ``supply_kg``,
-            # and the candidate's ``min(rate_kg_hr, rate_kg_hr * eta)``
-            # cap previously over-stated downstream candidates which
-            # then survived the per-segment ``min(.., supply_kg)`` floor
-            # at full ``supply_kg`` for any eta >= supply_kg/rate_kg_hr.
-            # That inflated the wall-deposit weights and diverted
-            # capture budget from designated condenser stages into
-            # wall-deposit accounts whenever per-segment temperatures
-            # differed.
-            candidates[segment.name] = self._wall_deposit_candidate_for_surface_kg(
-                species=species,
-                rate_kg_hr=supply_kg,
-                T_cond_C=T_cond_C,
-                melt_temperature_C=melt_temperature_C,
-                wall_temperature_C=segment.wall_temperature_C,
-                surface_area_m2=segment.surface_area_m2,
-            )
-            # ``rate_kg_hr=supply_kg`` already caps the candidate at
-            # ``supply_kg``; the explicit floor stays as defence in
-            # depth in case the candidate function loosens its return
-            # bound later.
-            candidates[segment.name] = min(candidates[segment.name], supply_kg)
-        total = sum(candidates.values())
-        if total > rate_kg_hr > 0.0:
-            scale = rate_kg_hr / total
-            candidates = {
-                name: value * scale
-                for name, value in candidates.items()
-            }
-        return candidates
+        return query_wall_deposit_candidates_by_segment_kg(
+            self,
+            species=species,
+            rate_kg_hr=rate_kg_hr,
+            T_cond_C=T_cond_C,
+            melt_temperature_C=melt_temperature_C,
+            supply_by_segment_kg=supply_by_segment_kg,
+        )
 
     def _mixed_temperature_wall_candidate_segments(
         self,
@@ -1244,67 +1154,15 @@ class CondensationModel:
         wall_temperature_C: float,
         surface_area_m2: float,
     ) -> float:
-        if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
-            return 0.0
-        alpha_s = _wall_alpha_s(species)
-        if alpha_s <= 0.0:
-            return 0.0
-
-        P_local_pa = _local_wall_species_pressure_pa(
-            species, melt_temperature_C, T_cond_C,
+        return query_wall_deposit_candidate_for_surface_kg(
+            self,
+            species=species,
+            rate_kg_hr=rate_kg_hr,
+            T_cond_C=T_cond_C,
+            melt_temperature_C=melt_temperature_C,
+            wall_temperature_C=wall_temperature_C,
+            surface_area_m2=surface_area_m2,
         )
-        if P_local_pa <= 0.0:
-            return 0.0
-
-        T_ref_K = max(T_cond_C + 273.15, 1.0)
-        reference_flux = _hkl_impingement_flux_mol_m2_s(
-            species, P_local_pa, T_ref_K,
-        )
-        if reference_flux <= 0.0:
-            return 0.0
-
-        T_wall_K = max(float(wall_temperature_C) + 273.15, 1.0)
-        # 0.5.2 Phase B (series-resistance + stir-Sherwood): the v1
-        # additive blend at C2A viscous regime let HKL leak ~95% of the
-        # flux because the regime-factor weight (~3e-4) was too small to
-        # offset the HKL absolute-magnitude lead. Codex P0 #1 challenge
-        # called this out as wrong physics; the canonical form is series
-        # resistance (Bird/Stewart/Lightfoot):
-        #     1/k_total = 1/(alpha_s * k_HKL) + 1/k_MT
-        # which is regime-correct at both limits (HKL at low P, MT at
-        # high P) without a hand-tuned weight curve. Induction stirring
-        # amplifies k_MT via Sherwood enhancement (Frössling-style
-        # sqrt(stir_factor)). T_surface_K (wall) feeds P_sat; T_gas_K
-        # (bulk) feeds the ideal-gas denominator. overhead_pressure_pa
-        # feeds the Chapman-Enskog D_AB(T, P) per Phase A1.
-        T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
-        overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
-        flux = _series_resistance_deposition_flux_mol_m2_s(
-            species, P_local_pa, T_wall_K, alpha_s,
-            pipe_diameter_m=self.pipe_diameter_m,
-            # 0.5.3 Phase B: pass BOTH axes. Pre-Phase-B
-            # ``self.stir_factor`` is kept for audit-history continuity
-            # but ``radial_stir_factor`` is the canonical Sh driver
-            # (the helper precedence below honours that). When the
-            # caller drives only the legacy axis (direct unit tests),
-            # ``self.radial_stir_factor`` stays at its constructor
-            # default of 1.0 and the helper falls back to the legacy
-            # ``stir_factor`` per the documented precedence rule.
-            stir_factor=self.stir_factor,
-            radial_stir_factor=self.radial_stir_factor,
-            regime_factor=self.regime_factor,
-            T_gas_K=T_gas_K,
-            overhead_pressure_pa=overhead_pressure_pa,
-        )
-        if flux <= 0.0:
-            return 0.0
-
-        residence_s = float(self.residence_time_s.get(0, 0.5))
-        rate_s_inv = (
-            flux / reference_flux
-        ) * max(0.0, float(surface_area_m2))
-        eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
-        return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
 
     def _segment_supply_by_name(
         self,

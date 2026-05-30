@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Dict
 
+from simulator.accounting.queries import stage_purity as query_stage_purity
 from simulator.core import (
     BatchRecord, CondensationTrain, MeltState, OXIDE_SPECIES,
     ProcessInventory,
@@ -119,13 +120,4 @@ class MassBalance:
 
         Returns dict of stage_number → {species: purity_pct}.
         """
-        result = {}
-        for stage in train.stages:
-            total = stage.total_collected_kg()
-            if total <= 0:
-                continue
-            purities = {}
-            for sp, kg in stage.collected_kg.items():
-                purities[sp] = (kg / total) * 100.0
-            result[stage.stage_number] = purities
-        return result
+        return query_stage_purity(train)

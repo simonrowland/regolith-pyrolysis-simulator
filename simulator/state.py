@@ -578,10 +578,9 @@ class CondensationStage:
 
     def purity_pct(self, species: str) -> float:
         """Purity of a specific species in this stage's product."""
-        total = self.total_collected_kg()
-        if total <= 0:
-            return 0.0
-        return (self.collected_kg.get(species, 0.0) / total) * 100.0
+        from simulator.accounting.queries import condensation_stage_purity_pct
+
+        return condensation_stage_purity_pct(self, species)
 
 
 PIPE_SEGMENT_NAMES = tuple(
@@ -809,6 +808,11 @@ class HourSnapshot:
 
     # Condensation (cumulative totals at this hour)
     condensation_totals: Dict[str, float] = field(default_factory=dict)
+    condensed_by_stage_species_delta: Dict[Tuple[int, str], float] = field(
+        default_factory=dict)
+    wall_deposit_by_segment_species_delta: Dict[Tuple[str, str], float] = field(
+        default_factory=dict)
+    impurity_delta: Dict[Tuple[int, str], float] = field(default_factory=dict)
 
     # Energy
     energy: EnergyRecord = field(default_factory=EnergyRecord)

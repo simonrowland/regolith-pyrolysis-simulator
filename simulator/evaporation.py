@@ -16,6 +16,7 @@ from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
     OXIDE_TO_METAL,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
     STOICH_RATIOS,
     EvaporationFlux,
     clamp_stir_factor,
@@ -957,7 +958,32 @@ class EvaporationMixin:
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._record_wall_deposit_delta(species, diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
+
+    def _record_wall_deposit_delta(
+        self,
+        species: str,
+        diagnostic: Mapping[str, Any],
+    ) -> None:
+        # Delta provenance is the committed, post-validation kernel credit.
+        # CondensationRouteResult is only the pre-commit projection; Phase-O
+        # coating gates need the deposition that actually landed in the ledger.
+        accounts_kg = diagnostic.get('credited_wall_deposit_accounts_kg') or {}
+        if not isinstance(accounts_kg, Mapping):
+            return
+        for account, kg in accounts_kg.items():
+            amount = max(0.0, float(kg))
+            if amount <= 1e-12:
+                continue
+            account_name = str(account)
+            if account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
+                segment = account_name[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
+            else:
+                segment = account_name
+            key = (segment, species)
+            deltas = self._last_wall_deposit_by_segment_species_delta
+            deltas[key] = deltas.get(key, 0.0) + amount
 
     def _credit_evaporation_transition(
         self,
@@ -1306,10 +1332,23 @@ class EvaporationMixin:
             stage = stages_by_number.get(stage_number)
             if stage is None:
                 continue
+            is_impurity = (
+                route_result.impurity_by_stage_species
+                .get(stage_number, {})
+                .get(species, 0.0)
+                > 0.0
+            )
             for product, product_fraction in product_scale.items():
                 stage_product_kg = projected_kg * product_fraction
                 if stage_product_kg <= 1e-12:
                     continue
+                delta_key = (stage_number, product)
+                deltas = self._last_condensed_by_stage_species_delta
+                deltas[delta_key] = deltas.get(delta_key, 0.0) + stage_product_kg
+                if is_impurity:
+                    impurity = self._last_impurity_delta
+                    impurity[delta_key] = (
+                        impurity.get(delta_key, 0.0) + stage_product_kg)
                 stage.collected_kg.update({
                     product: (
                         stage.collected_kg.get(product, 0.0)

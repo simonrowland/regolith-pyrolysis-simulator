@@ -1,0 +1,95 @@
+"""Structured in-process physics trace for optimizer scoring."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import Any, Mapping
+
+from simulator.accounting.queries import AccountingQueries, stage_purity
+from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
+
+
+def _freeze_mapping(values: Mapping[Any, Any]) -> Mapping[Any, Any]:
+    return MappingProxyType(dict(values))
+
+
+def _freeze_nested_mapping(
+    values: Mapping[Any, Mapping[Any, Any]],
+) -> Mapping[Any, Mapping[Any, Any]]:
+    return MappingProxyType({
+        key: _freeze_mapping(inner)
+        for key, inner in values.items()
+    })
+
+
+@dataclass(frozen=True)
+class PhysicsTrace:
+    """Read-only scoring surface.
+
+    Snapshot delta maps are per tick. Cumulative maps are running sums of those
+    deltas or final ledger projections; gates consume deltas when timing matters.
+    """
+
+    snapshots: tuple[HourSnapshot, ...] = ()
+    product_ledger_kg: Mapping[str, float] = field(default_factory=dict)
+    terminal_rump_by_species_kg: Mapping[str, float] = field(default_factory=dict)
+    terminal_rump_by_class_kg: Mapping[str, float] = field(default_factory=dict)
+    oxygen_terminal_partition_kg: Mapping[str, float] = field(default_factory=dict)
+    condensation_totals_kg: Mapping[str, float] = field(default_factory=dict)
+    wall_deposit_by_segment_species_kg: Mapping[
+        tuple[str, str], float] = field(default_factory=dict)
+    stage_purity_pct: Mapping[int, Mapping[str, float]] = field(
+        default_factory=dict)
+    condensed_by_stage_species_delta: tuple[
+        Mapping[tuple[int, str], float], ...] = ()
+    wall_deposit_by_segment_species_delta: tuple[
+        Mapping[tuple[str, str], float], ...] = ()
+    impurity_delta: tuple[Mapping[tuple[int, str], float], ...] = ()
+
+    @classmethod
+    def from_simulator(cls, sim: Any) -> "PhysicsTrace":
+        queries = AccountingQueries(sim)
+        snapshots = tuple(getattr(sim.record, "snapshots", ()))
+        return cls(
+            snapshots=snapshots,
+            product_ledger_kg=_freeze_mapping(queries.product_ledger()),
+            terminal_rump_by_species_kg=_freeze_mapping(
+                queries.terminal_rump_by_species()),
+            terminal_rump_by_class_kg=_freeze_mapping(
+                queries.terminal_rump_by_class()),
+            oxygen_terminal_partition_kg=_freeze_mapping(
+                queries.oxygen_terminal_partition_kg()),
+            condensation_totals_kg=_freeze_mapping(
+                queries.condensation_totals_with_terminal_oxygen()),
+            wall_deposit_by_segment_species_kg=(
+                _freeze_mapping(wall_deposit_by_segment_species_kg(
+                    sim.atom_ledger))),
+            stage_purity_pct=_freeze_nested_mapping(stage_purity(sim.train)),
+            condensed_by_stage_species_delta=tuple(
+                _freeze_mapping(snapshot.condensed_by_stage_species_delta)
+                for snapshot in snapshots
+            ),
+            wall_deposit_by_segment_species_delta=tuple(
+                _freeze_mapping(
+                    snapshot.wall_deposit_by_segment_species_delta)
+                for snapshot in snapshots
+            ),
+            impurity_delta=tuple(
+                _freeze_mapping(snapshot.impurity_delta)
+                for snapshot in snapshots
+            ),
+        )
+
+
+def wall_deposit_by_segment_species_kg(ledger: Any) -> dict[tuple[str, str], float]:
+    result: dict[tuple[str, str], float] = {}
+    for account, species_kg in ledger.kg_by_account().items():
+        if not str(account).startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
+            continue
+        segment = str(account)[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
+        for species, kg in species_kg.items():
+            amount = float(kg)
+            if amount > 1e-12:
+                result[(segment, species)] = amount
+    return result
