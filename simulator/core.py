@@ -343,7 +343,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # coerces the strings ``"false"``, ``"no"``, ``"0"`` to True
         # (any non-empty string is truthy in Python). Setpoints come
         # from YAML which preserves intended bool types, but a
-        # programmatic ``setpoints_overrides`` mapping or a hand-typed
+        # programmatic setpoints patch or a hand-typed
         # config can easily pass a string here -- silently opting the
         # run into fallback mode against operator intent. Explicit
         # string-aware coercion: known false-y strings are False; bool

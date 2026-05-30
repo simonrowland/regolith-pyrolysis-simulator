@@ -26,6 +26,7 @@ schema-shape assertion in ``tests/test_runner_smoke.py``.
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import dataclasses
 import importlib.abc
@@ -250,6 +251,56 @@ def _load_engines_config(path: Optional[Path]) -> dict:
     return {str(intent): str(provider) for intent, provider in engines.items()}
 
 
+def _deep_merge_setpoints(
+    base: Mapping[str, Any],
+    patch: Mapping[str, Any],
+    *,
+    _top_level: bool = True,
+) -> dict[str, Any]:
+    # Match the str(key) coercion the merge applies below, so a non-string
+    # top-level key that stringifies to "chemistry_kernel" cannot slip past
+    # this guard and overwrite kernel config.
+    if _top_level and any(str(key) == "chemistry_kernel" for key in patch):
+        raise RunnerError(
+            "setpoints_patch may not contain top-level 'chemistry_kernel'; "
+            "use fallback flags instead"
+        )
+    merged = dict(base)
+    for key, value in patch.items():
+        current = merged.get(key)
+        if isinstance(current, Mapping) and isinstance(value, Mapping):
+            merged[str(key)] = _deep_merge_setpoints(
+                current, value, _top_level=False
+            )
+        else:
+            merged[str(key)] = copy.deepcopy(value)
+    return merged
+
+
+def _canonical_runtime_campaign_overrides(
+    *,
+    runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None,
+    setpoints_overrides: Mapping[str, Mapping[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
+    if (
+        runtime_campaign_overrides is not None
+        and setpoints_overrides is not None
+        and dict(runtime_campaign_overrides) != dict(setpoints_overrides)
+    ):
+        raise ValueError(
+            "runtime_campaign_overrides conflicts with deprecated "
+            "setpoints_overrides alias"
+        )
+    source = (
+        runtime_campaign_overrides
+        if runtime_campaign_overrides is not None
+        else setpoints_overrides
+    )
+    if source is None:
+        return {}
+    return {str(campaign): dict(fields) for campaign, fields in source.items()}
+
+
 # ----------------------------------------------------------------------
 # Public dataclass: runner configuration
 # ----------------------------------------------------------------------
@@ -262,11 +313,10 @@ class PyrolysisRun:
     Attributes mirror the Goal #18 CHECKLIST exactly so the CLI flags
     map 1:1 to dataclass fields.
 
-    ``setpoints_overrides`` is a mapping ``{campaign_name: {field:
-    value}}`` -- written straight onto ``CampaignManager.overrides``
-    after batch load.  Today the runner only forwards what the
-    simulator already accepts via the existing web's
-    ``campaign_override`` path; no new override fields are introduced.
+    ``setpoints_patch`` is a compile-time deep merge onto the base
+    setpoints before simulator construction. ``runtime_campaign_overrides``
+    is a mapping ``{campaign_name: {field: value}}`` -- written straight
+    onto ``CampaignManager.overrides`` after batch load.
     """
 
     feedstock_id: str
@@ -276,7 +326,9 @@ class PyrolysisRun:
     additives_kg: dict[str, float] = field(default_factory=dict)
     mass_kg: float = 1000.0
     backend_name: str = "stub"
-    setpoints_overrides: dict[str, dict] = field(default_factory=dict)
+    setpoints_patch: Mapping[str, Any] = field(default_factory=dict)
+    runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
+    setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
     track: str = "pyrolysis"
     allow_fallback_vapor: bool = False
     allow_unmeasured_alpha_fallback: bool = False
@@ -289,6 +341,14 @@ class PyrolysisRun:
     # values.  Production CLI invocations leave both empty and pick up
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        overrides = _canonical_runtime_campaign_overrides(
+            runtime_campaign_overrides=self.runtime_campaign_overrides,
+            setpoints_overrides=self.setpoints_overrides,
+        )
+        self.runtime_campaign_overrides = overrides
+        self.setpoints_overrides = overrides
     # ------------------------------------------------------------------
     # Run entry points
     # ------------------------------------------------------------------
@@ -370,7 +430,8 @@ class PyrolysisRun:
     def _session_config(self) -> SimSessionConfig:
         bundle = self._load_config_bundle()
         feedstocks = bundle.feedstocks
-        setpoints = bundle.setpoints
+        setpoints = copy.deepcopy(bundle.setpoints)
+        setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
         if (
             self.allow_fallback_vapor
             or self.force_builtin_vapor_pressure
@@ -396,7 +457,7 @@ class PyrolysisRun:
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             mass_kg=self.mass_kg,
             additives_kg=dict(self.additives_kg),
-            setpoints_overrides=dict(self.setpoints_overrides),
+            runtime_campaign_overrides=dict(self.runtime_campaign_overrides),
             track=self.track,
             unavailable_error_cls=RunnerError,
             force_builtin_vapor_pressure=(
@@ -1069,9 +1130,11 @@ def build_sio_yield_report(
     if stage0_carbon_kg > 1.0e-12:
         additives_kg["C"] = stage0_carbon_kg
 
-    setpoints_overrides: dict[str, dict] = {}
+    runtime_campaign_overrides: dict[str, dict] = {}
     if ramp_c_per_hr is not None:
-        setpoints_overrides["C2A"] = {"ramp_rate": float(ramp_c_per_hr)}
+        runtime_campaign_overrides["C2A"] = {
+            "ramp_rate": float(ramp_c_per_hr),
+        }
 
     base_run = PyrolysisRun(
         feedstock_id=feedstock_id,
@@ -1085,7 +1148,7 @@ def build_sio_yield_report(
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         force_builtin_vapor_pressure=True,
-        setpoints_overrides=setpoints_overrides,
+        runtime_campaign_overrides=runtime_campaign_overrides,
     )
     session = base_run._start_session()
     sim = session.simulator
@@ -1966,6 +2029,29 @@ def _parse_engine_pairs(items: list[str]) -> dict[str, str]:
     return parsed
 
 
+def _parse_runtime_campaign_overrides_json(
+    raw_json: str | None,
+    *,
+    flag_name: str,
+) -> dict[str, dict[str, float]] | None:
+    if raw_json is None:
+        return None
+    loaded = json.loads(raw_json)
+    if not isinstance(loaded, Mapping):
+        raise RunnerError(f"{flag_name} must decode to an object")
+    parsed: dict[str, dict[str, float]] = {}
+    for campaign, fields in loaded.items():
+        if not isinstance(fields, Mapping):
+            raise RunnerError(
+                f"{flag_name}[{campaign!r}] must decode to an object"
+            )
+        parsed[str(campaign)] = {
+            str(field): float(value)
+            for field, value in fields.items()
+        }
+    return parsed
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m simulator.runner",
@@ -2001,6 +2087,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         metavar="SPECIES=KG",
                         help="Additive injection (e.g. --additive=C=30). "
                              "Multiple permitted.")
+    parser.add_argument("--runtime-campaign-overrides", default=None,
+                        help="JSON runtime per-campaign overrides")
+    parser.add_argument("--setpoints-overrides", default=None,
+                        help="Deprecated alias for "
+                             "--runtime-campaign-overrides")
     parser.add_argument("--output", required=True,
                         help="Path to write the JSON result document")
     parser.add_argument("--started-at-utc", default=None,
@@ -2025,6 +2116,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         merged = {**file_engines, **engine_overrides}
     else:
         merged = engine_overrides
+    runtime_campaign_overrides = _canonical_runtime_campaign_overrides(
+        runtime_campaign_overrides=_parse_runtime_campaign_overrides_json(
+            args.runtime_campaign_overrides,
+            flag_name="--runtime-campaign-overrides",
+        ),
+        setpoints_overrides=_parse_runtime_campaign_overrides_json(
+            args.setpoints_overrides,
+            flag_name="--setpoints-overrides",
+        ),
+    )
 
     metadata_overrides: dict[str, Any] = {}
     if args.started_at_utc:
@@ -2040,6 +2141,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         additives_kg=additives,
         mass_kg=float(args.mass_kg),
         backend_name=args.backend,
+        runtime_campaign_overrides=runtime_campaign_overrides,
         track=args.track,
         run_metadata_overrides=metadata_overrides,
     )

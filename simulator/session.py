@@ -21,6 +21,30 @@ from simulator.state import (
 )
 
 
+def _canonical_runtime_campaign_overrides(
+    *,
+    runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None,
+    setpoints_overrides: Mapping[str, Mapping[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
+    if (
+        runtime_campaign_overrides is not None
+        and setpoints_overrides is not None
+        and dict(runtime_campaign_overrides) != dict(setpoints_overrides)
+    ):
+        raise ValueError(
+            "runtime_campaign_overrides conflicts with deprecated "
+            "setpoints_overrides alias"
+        )
+    source = (
+        runtime_campaign_overrides
+        if runtime_campaign_overrides is not None
+        else setpoints_overrides
+    )
+    if source is None:
+        return {}
+    return {str(campaign): dict(fields) for campaign, fields in source.items()}
+
+
 class DecisionPolicy(Enum):
     """Driver-loop decision routing mode.
 
@@ -45,14 +69,21 @@ class SimSessionConfig:
     backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
     mass_kg: float = 1000.0
     additives_kg: Mapping[str, float] = field(default_factory=dict)
-    setpoints_overrides: Mapping[str, Mapping[str, Any]] = field(
-        default_factory=dict
-    )
+    runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
+    setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
     track: str = "pyrolysis"
     c4_max_temp: float | None = None
     unavailable_error_cls: type[Exception] = RuntimeError
     force_builtin_vapor_pressure: Callable[[PyrolysisSimulator], None] | None = None
     result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
+
+    def __post_init__(self) -> None:
+        overrides = _canonical_runtime_campaign_overrides(
+            runtime_campaign_overrides=self.runtime_campaign_overrides,
+            setpoints_overrides=self.setpoints_overrides,
+        )
+        object.__setattr__(self, "runtime_campaign_overrides", overrides)
+        object.__setattr__(self, "setpoints_overrides", overrides)
 
 
 @dataclass(frozen=True)
@@ -132,10 +163,10 @@ class SimSession:
             sim.record.track = "mre_baseline"
         sim.start_campaign(campaign_phase)
 
-        for campaign, overrides in config.setpoints_overrides.items():
+        for campaign, overrides in config.runtime_campaign_overrides.items():
             if not isinstance(overrides, Mapping):
                 raise config.unavailable_error_cls(
-                    f"setpoints_overrides[{campaign!r}] must be a mapping"
+                    f"runtime_campaign_overrides[{campaign!r}] must be a mapping"
                 )
             target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
             for field_name, value in overrides.items():

@@ -64,9 +64,10 @@ class SessionScriptRunner:
     def _start(self, args: list[str]) -> dict[str, Any]:
         parsed = _start_parser().parse_args(_normalize_start_args(args))
         additives = _parse_kv_pairs(parsed.additive)
-        setpoints_overrides = _parse_setpoint_overrides(
+        runtime_campaign_overrides = _parse_setpoint_overrides(
             parsed.setpoint,
             parsed.setpoints_overrides,
+            parsed.runtime_campaign_overrides,
         )
         try:
             bundle = load_config_bundle(DATA_DIR)
@@ -82,7 +83,7 @@ class SessionScriptRunner:
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             mass_kg=float(parsed.mass_kg),
             additives_kg=additives,
-            setpoints_overrides=setpoints_overrides,
+            runtime_campaign_overrides=runtime_campaign_overrides,
             track=parsed.track,
             c4_max_temp=parsed.c4_max_temp,
             unavailable_error_cls=RunnerError,
@@ -299,6 +300,7 @@ def _start_parser() -> argparse.ArgumentParser:
     parser.add_argument("--c4-max-temp", dest="c4_max_temp", type=float, default=None)
     parser.add_argument("--setpoint", action="append", default=[])
     parser.add_argument("--setpoints-overrides", default=None)
+    parser.add_argument("--runtime-campaign-overrides", default=None)
     return parser
 
 
@@ -317,6 +319,8 @@ def _normalize_start_args(args: list[str]) -> list[str]:
         "setpoint": "setpoint",
         "setpoints_overrides": "setpoints-overrides",
         "setpoints-overrides": "setpoints-overrides",
+        "runtime_campaign_overrides": "runtime-campaign-overrides",
+        "runtime-campaign-overrides": "runtime-campaign-overrides",
     }
     i = 0
     while i < len(args):
@@ -356,21 +360,26 @@ def _parse_kv_pairs(items: list[str]) -> dict[str, float]:
 
 def _parse_setpoint_overrides(
     setpoints: list[str],
-    raw_json: str | None,
+    legacy_raw_json: str | None,
+    runtime_raw_json: str | None,
 ) -> dict[str, dict[str, float]]:
     overrides: dict[str, dict[str, float]] = {}
-    if raw_json:
-        loaded = json.loads(raw_json)
-        if not isinstance(loaded, Mapping):
-            raise ValueError("--setpoints-overrides must decode to an object")
-        for campaign, fields in loaded.items():
-            if not isinstance(fields, Mapping):
-                raise ValueError(
-                    f"setpoints_overrides[{campaign!r}] must be an object"
-                )
-            target = overrides.setdefault(str(campaign), {})
-            for field, value in fields.items():
-                target[str(field)] = float(value)
+    legacy = _parse_override_json(
+        legacy_raw_json,
+        flag_name="--setpoints-overrides",
+    )
+    runtime = _parse_override_json(
+        runtime_raw_json,
+        flag_name="--runtime-campaign-overrides",
+    )
+    if legacy is not None and runtime is not None and legacy != runtime:
+        raise ValueError(
+            "--runtime-campaign-overrides conflicts with deprecated "
+            "--setpoints-overrides alias"
+        )
+    parsed_json = runtime if runtime is not None else legacy
+    if parsed_json:
+        overrides.update(parsed_json)
     for item in setpoints:
         if "=" not in item or "." not in item.split("=", 1)[0]:
             raise ValueError(
@@ -383,6 +392,26 @@ def _parse_setpoint_overrides(
                 f"expected CAMPAIGN.FIELD=FLOAT setpoint, got {item!r}"
             )
         overrides.setdefault(campaign, {})[field] = float(value)
+    return overrides
+
+
+def _parse_override_json(
+    raw_json: str | None,
+    *,
+    flag_name: str,
+) -> dict[str, dict[str, float]] | None:
+    if not raw_json:
+        return None
+    loaded = json.loads(raw_json)
+    if not isinstance(loaded, Mapping):
+        raise ValueError(f"{flag_name} must decode to an object")
+    overrides: dict[str, dict[str, float]] = {}
+    for campaign, fields in loaded.items():
+        if not isinstance(fields, Mapping):
+            raise ValueError(f"{flag_name}[{campaign!r}] must be an object")
+        target = overrides.setdefault(str(campaign), {})
+        for field, value in fields.items():
+            target[str(field)] = float(value)
     return overrides
 
 
