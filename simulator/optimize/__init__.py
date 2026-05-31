@@ -17,6 +17,14 @@ from simulator.optimize.recipe import (
     allowlist_version,
     recipe_schema_version,
 )
+from simulator.optimize.evalspec import (
+    EvalSpec,
+    cache_key,
+    canonical_evalspec_json,
+    canonical_feedstock_recipe_json,
+    current_code_version,
+    feedstock_recipe_digest,
+)
 from simulator.optimize.doe import (
     DEPENDENCY_FREE_LHC_SAMPLER,
     FIDELITY_CORRELATION_METRICS,
@@ -38,6 +46,7 @@ from simulator.optimize.physics import (
 
 __all__ = [
     "DEPENDENCY_FREE_LHC_SAMPLER",
+    "EvalSpec",
     "FIDELITY_CORRELATION_METRICS",
     "KeyPath",
     "KnobSpec",
@@ -54,6 +63,11 @@ __all__ = [
     "GateMargin",
     "active_sampler_name",
     "allowlist_version",
+    "cache_key",
+    "canonical_evalspec_json",
+    "canonical_feedstock_recipe_json",
+    "current_code_version",
+    "feedstock_recipe_digest",
     "PhysicsConstraintSet",
     "recipe_schema_version",
     "sample_recipe_patches",

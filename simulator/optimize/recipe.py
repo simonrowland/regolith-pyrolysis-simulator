@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
-import json
 import math
 from fnmatch import fnmatchcase
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
+
+from simulator.optimize.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
 
@@ -575,12 +576,7 @@ class RecipePatch:
             {"path": list(path), "value": _normalize_value(value)}
             for path, value in sorted(self.values.items())
         ]
-        return json.dumps(
-            entries,
-            allow_nan=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        )
+        return canonical_json_dumps(entries)
 
 
 def _normalize_key_path(path: Any) -> KeyPath:
