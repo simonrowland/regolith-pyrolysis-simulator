@@ -14,6 +14,7 @@ from simulator.optimize.evaluate import (
     FailureCategory,
     evaluate,
 )
+from simulator.optimize.objective import objective_definitions
 from simulator.optimize.recipe import RecipePatch
 from simulator.state import CampaignPhase, HourSnapshot
 
@@ -267,6 +268,17 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert infeasible.objectives is None
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+
+
+def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
+    definitions = objective_definitions(PROFILE)
+
+    assert [(definition.metric, definition.sense, definition.ordinal) for definition in definitions] == [
+        ("pure_silica_glass_kg", "maximize", 0),
+        ("oxygen_kg", "maximize", 1),
+        ("energy_kWh", "minimize", 2),
+        ("duration_h", "minimize", 3),
+    ]
 
 
 def test_missing_objective_output_on_feasible_run_aborts_as_engine_bug() -> None:

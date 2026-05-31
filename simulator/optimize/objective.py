@@ -11,6 +11,15 @@ from simulator.three_product_report import classify_products
 
 
 _MISSING = object()
+VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
+_OBJECTIVE_SENSE_ALIASES = {
+    "min": "minimize",
+    "minimum": "minimize",
+    "minimize": "minimize",
+    "max": "maximize",
+    "maximum": "maximize",
+    "maximize": "maximize",
+}
 
 
 class ObjectiveProfileError(ValueError):
@@ -26,12 +35,16 @@ class ObjectiveDefinition:
     metric: str
     sense: str
     units: str = ""
+    ordinal: int = 0
 
     def __post_init__(self) -> None:
-        if self.sense not in {"max", "min"}:
-            raise ObjectiveProfileError("objective sense must be 'max' or 'min'")
         if not self.metric:
             raise ObjectiveProfileError("objective metric is required")
+        object.__setattr__(self, "sense", normalize_objective_sense(self.sense))
+        ordinal = int(self.ordinal)
+        if ordinal < 0:
+            raise ObjectiveProfileError("objective ordinal must be non-negative")
+        object.__setattr__(self, "ordinal", ordinal)
 
 
 @dataclass(frozen=True)
@@ -40,13 +53,21 @@ class ObjectiveValue:
     sense: str
     value: float
     units: str = ""
+    ordinal: int = 0
 
     def __post_init__(self) -> None:
+        if not self.metric:
+            raise ObjectiveProfileError("objective metric is required")
+        object.__setattr__(self, "sense", normalize_objective_sense(self.sense))
         if not math.isfinite(float(self.value)):
             raise ObjectiveComputationError(
                 f"objective {self.metric!r} produced non-finite value"
             )
         object.__setattr__(self, "value", float(self.value))
+        ordinal = int(self.ordinal)
+        if ordinal < 0:
+            raise ObjectiveProfileError("objective ordinal must be non-negative")
+        object.__setattr__(self, "ordinal", ordinal)
 
 
 @dataclass(frozen=True)
@@ -68,7 +89,7 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
         raise ObjectiveProfileError("profile.objectives must be a non-empty list")
 
     definitions: list[ObjectiveDefinition] = []
-    for raw in raw_objectives:
+    for ordinal, raw in enumerate(raw_objectives):
         if not isinstance(raw, Mapping):
             raise ObjectiveProfileError("each objective must be a mapping")
         definitions.append(
@@ -76,6 +97,7 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
                 metric=str(raw.get("metric", "")),
                 sense=str(raw.get("sense", "")),
                 units=str(raw.get("units", "")),
+                ordinal=ordinal,
             )
         )
     return tuple(definitions)
@@ -98,10 +120,20 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
             sense=definition.sense,
             value=_metric_value(definition.metric, sim, product_ledger, product_classes),
             units=definition.units,
+            ordinal=definition.ordinal,
         )
         for definition in definitions
     )
     return ObjectiveVector(values)
+
+
+def normalize_objective_sense(sense: str) -> str:
+    normalized = _OBJECTIVE_SENSE_ALIASES.get(str(sense).strip().lower())
+    if normalized is None:
+        raise ObjectiveProfileError(
+            "objective sense must be 'minimize' or 'maximize'"
+        )
+    return normalized
 
 
 def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:

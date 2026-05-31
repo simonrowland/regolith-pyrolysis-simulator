@@ -61,6 +61,12 @@ from simulator.optimize.evaluate import (
     ScoredResult,
     evaluate,
 )
+from simulator.optimize.results_store import (
+    SCHEMA_VERSION as RESULT_STORE_SCHEMA_VERSION,
+    ResultStore,
+    ResultStoreSchemaError,
+    ResultsStore,
+)
 
 __all__ = [
     "DEPENDENCY_FREE_LHC_SAMPLER",
@@ -90,6 +96,10 @@ __all__ = [
     "ObjectiveVector",
     "RunReference",
     "ScoredResult",
+    "ResultStore",
+    "ResultStoreSchemaError",
+    "ResultsStore",
+    "RESULT_STORE_SCHEMA_VERSION",
     "active_sampler_name",
     "allowlist_version",
     "cache_key",

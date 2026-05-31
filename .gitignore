@@ -71,6 +71,12 @@ Desktop.ini
 *.log
 logs/
 instance/
+runs/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*-wal
+*-shm
 # Engine binary installs (NOT source trees — engines/<name>/{provider,domain,parity}.py
 # are git-tracked; only the binary install artifacts below stay ignored).
 engines/*/bin/
