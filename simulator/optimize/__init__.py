@@ -27,6 +27,14 @@ from simulator.optimize.doe import (
     active_sampler_name,
     sample_recipe_patches,
 )
+from simulator.optimize.physics import (
+    GATE_ORDER,
+    PHYSICS_GATE_VERSION,
+    FeasibilityResult,
+    GateMargin,
+    PhysicsConstraintSet,
+    ThresholdSpec,
+)
 
 __all__ = [
     "DEPENDENCY_FREE_LHC_SAMPLER",
@@ -40,8 +48,14 @@ __all__ = [
     "DoeSpec",
     "FidelityCorrelationProtocol",
     "FidelityCorrelationResult",
+    "GATE_ORDER",
+    "PHYSICS_GATE_VERSION",
+    "FeasibilityResult",
+    "GateMargin",
     "active_sampler_name",
     "allowlist_version",
+    "PhysicsConstraintSet",
     "recipe_schema_version",
     "sample_recipe_patches",
+    "ThresholdSpec",
 ]
