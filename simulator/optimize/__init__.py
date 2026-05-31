@@ -35,14 +35,6 @@ from simulator.optimize.doe import (
     active_sampler_name,
     sample_recipe_patches,
 )
-from simulator.optimize.fidelity import run_fidelity_correlation
-from simulator.optimize.determinism import (
-    THREAD_ENV_VARS,
-    assert_deterministic,
-    deterministic_result_view,
-    pin_seeds,
-    pin_worker_env,
-)
 from simulator.optimize.physics import (
     GATE_ORDER,
     PHYSICS_GATE_VERSION,
@@ -60,26 +52,47 @@ from simulator.optimize.objective import (
     compute_objectives,
     objective_definitions,
 )
-from simulator.optimize.evaluate import (
-    BackendUnavailableAbort,
-    EngineBugAbort,
-    EvaluationAbort,
-    FailureCategory,
-    RunReference,
-    ScoredResult,
-    evaluate,
-)
-from simulator.optimize.results_store import (
-    SCHEMA_VERSION as RESULT_STORE_SCHEMA_VERSION,
-    ResultStore,
-    ResultStoreSchemaError,
-    ResultsStore,
-)
-from simulator.optimize.pool import (
-    PoolEvaluationRequest,
-    evaluate_batch,
-    evaluate_in_process_pool,
-)
+from simulator.optimize.strategy import Candidate, RandomStrategy, Strategy
+
+_LAZY_EXPORTS = {
+    "BackendUnavailableAbort": "simulator.optimize.evaluate",
+    "EngineBugAbort": "simulator.optimize.evaluate",
+    "EvaluationAbort": "simulator.optimize.evaluate",
+    "FailureCategory": "simulator.optimize.evaluate",
+    "RunReference": "simulator.optimize.evaluate",
+    "ScoredResult": "simulator.optimize.evaluate",
+    "evaluate": "simulator.optimize.evaluate",
+    "RESULT_STORE_SCHEMA_VERSION": "simulator.optimize.results_store",
+    "ResultStore": "simulator.optimize.results_store",
+    "ResultStoreSchemaError": "simulator.optimize.results_store",
+    "ResultsStore": "simulator.optimize.results_store",
+    "PoolEvaluationRequest": "simulator.optimize.pool",
+    "evaluate_batch": "simulator.optimize.pool",
+    "evaluate_in_process_pool": "simulator.optimize.pool",
+    "run_fidelity_correlation": "simulator.optimize.fidelity",
+    "THREAD_ENV_VARS": "simulator.optimize.determinism",
+    "assert_deterministic": "simulator.optimize.determinism",
+    "deterministic_result_view": "simulator.optimize.determinism",
+    "pin_seeds": "simulator.optimize.determinism",
+    "pin_worker_env": "simulator.optimize.determinism",
+}
+
+
+def __getattr__(name: str) -> object:
+    try:
+        module_name = _LAZY_EXPORTS[name]
+    except KeyError as exc:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from exc
+
+    from importlib import import_module
+
+    module = import_module(module_name)
+    if name == "RESULT_STORE_SCHEMA_VERSION":
+        value = getattr(module, "SCHEMA_VERSION")
+    else:
+        value = getattr(module, name)
+    globals()[name] = value
+    return value
 
 __all__ = [
     "DEPENDENCY_FREE_LHC_SAMPLER",
@@ -100,6 +113,7 @@ __all__ = [
     "FeasibilityResult",
     "GateMargin",
     "BackendUnavailableAbort",
+    "Candidate",
     "EngineBugAbort",
     "EvaluationAbort",
     "FailureCategory",
@@ -114,6 +128,7 @@ __all__ = [
     "ResultStoreSchemaError",
     "ResultsStore",
     "RESULT_STORE_SCHEMA_VERSION",
+    "RandomStrategy",
     "active_sampler_name",
     "assert_deterministic",
     "allowlist_version",
@@ -128,6 +143,7 @@ __all__ = [
     "objective_definitions",
     "PhysicsConstraintSet",
     "PoolEvaluationRequest",
+    "Strategy",
     "pin_seeds",
     "pin_worker_env",
     "recipe_schema_version",

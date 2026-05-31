@@ -19,6 +19,8 @@ from simulator.optimize.recipe import KeyPath, RecipePatch, RecipeSchema
 
 SCIPY_SOBOL_SAMPLER = "scipy-sobol"
 DEPENDENCY_FREE_LHC_SAMPLER = "dependency-free-lhc"
+SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER, DEPENDENCY_FREE_LHC_SAMPLER)
+STREAMING_SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER,)
 
 FIDELITY_CORRELATION_METRICS: tuple[str, ...] = (
     "spearman_rank_correlation",
@@ -236,7 +238,8 @@ def sample_recipe_patches(
     active_schema = schema or RecipeSchema()
     _validate_positive_int("n_samples", n_samples)
     _validate_seed(seed)
-    active_sampler = sampler_name or active_sampler_name()
+    active_sampler = active_sampler_name() if sampler_name is None else sampler_name
+    _validate_sampler_name(active_sampler)
 
     specs = tuple(
         spec for spec in active_schema.allowlist if not active_schema.is_forbidden(spec.path)
@@ -257,6 +260,37 @@ def sample_recipe_patches(
     return tuple(patches)
 
 
+def sample_recipe_patch_at_index(
+    schema: RecipeSchema | None = None,
+    *,
+    index: int,
+    seed: int,
+    sampler_name: str | None = None,
+) -> RecipePatch:
+    """Sample one validated RecipePatch at a stable global sequence index."""
+
+    active_schema = schema or RecipeSchema()
+    _validate_non_negative_int("index", index)
+    _validate_seed(seed)
+    active_sampler = active_sampler_name() if sampler_name is None else sampler_name
+    _validate_sampler_name(active_sampler)
+
+    specs = tuple(
+        spec for spec in active_schema.allowlist if not active_schema.is_forbidden(spec.path)
+    )
+    if len(specs) != len(active_schema.allowlist):
+        raise ValueError("RecipeSchema allowlist contains forbidden paths")
+    if not specs:
+        return RecipePatch({}).validated(active_schema)
+
+    point = _unit_hypercube_point(len(specs), index, seed, active_sampler)
+    values = {
+        spec.path: _map_unit_value(spec, unit_value)
+        for spec, unit_value in zip(specs, point, strict=True)
+    }
+    return RecipePatch(values).validated(active_schema)
+
+
 def active_sampler_name() -> str:
     return SCIPY_SOBOL_SAMPLER if _scipy_sobol_available() else DEPENDENCY_FREE_LHC_SAMPLER
 
@@ -270,6 +304,20 @@ def _unit_hypercube_points(
         return _scipy_sobol_points(dimensions, n_samples, seed)
     if sampler_name == DEPENDENCY_FREE_LHC_SAMPLER:
         return _dependency_free_lhc_points(dimensions, n_samples, seed)
+    raise ValueError(f"unsupported DOE sampler {sampler_name!r}")
+
+
+def _unit_hypercube_point(
+    dimensions: int, index: int, seed: int, sampler_name: str
+) -> tuple[float, ...]:
+    if sampler_name == SCIPY_SOBOL_SAMPLER:
+        if not _scipy_sobol_available():
+            raise RuntimeError("scipy-sobol sampler requested but scipy is unavailable")
+        return _scipy_sobol_point(dimensions, index, seed)
+    if sampler_name == DEPENDENCY_FREE_LHC_SAMPLER:
+        raise ValueError(
+            "dependency-free-lhc sampler is not chunk-invariant for streaming ask"
+        )
     raise ValueError(f"unsupported DOE sampler {sampler_name!r}")
 
 
@@ -290,6 +338,18 @@ def _scipy_sobol_points(
         warnings.simplefilter("ignore", UserWarning)
         points = sampler.random_base2(power)
     return tuple(tuple(float(value) for value in row) for row in points[:n_samples])
+
+
+def _scipy_sobol_point(dimensions: int, index: int, seed: int) -> tuple[float, ...]:
+    from scipy.stats import qmc
+
+    sampler = qmc.Sobol(d=dimensions, scramble=True, seed=seed)
+    if index:
+        sampler.fast_forward(index)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        point = sampler.random(1)[0]
+    return tuple(float(value) for value in point)
 
 
 def _dependency_free_lhc_points(
@@ -346,9 +406,19 @@ def _validate_positive_int(name: str, value: int) -> None:
         raise ValueError(f"{name} must be a positive int")
 
 
+def _validate_non_negative_int(name: str, value: int) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"{name} must be a non-negative int")
+
+
 def _validate_seed(seed: int) -> None:
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValueError("seed must be a non-negative int")
+
+
+def _validate_sampler_name(sampler_name: str) -> None:
+    if sampler_name not in SAMPLER_NAMES:
+        raise ValueError(f"unsupported DOE sampler {sampler_name!r}")
 
 
 def _optional_float(value: Any) -> float | None:
