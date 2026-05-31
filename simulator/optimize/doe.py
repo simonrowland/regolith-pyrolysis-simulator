@@ -137,10 +137,21 @@ class FidelityCorrelationResult:
     top_k_recall: Mapping[int, float | None] = field(default_factory=dict)
     n_samples_compared: int = 0
     notes: tuple[str, ...] = ()
+    fast_screen_trustworthy: bool = False
+    n_samples_total: int = 0
+    n_samples_dropped: int = 0
+    confidence: str = "low"
+    thresholds: Mapping[str, Any] = field(default_factory=dict)
+    dropped_evaluations: tuple[Mapping[str, Any], ...] = ()
+    artifact_paths: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.n_samples_compared < 0:
             raise ValueError("n_samples_compared must be non-negative")
+        if self.n_samples_total < 0:
+            raise ValueError("n_samples_total must be non-negative")
+        if self.n_samples_dropped < 0:
+            raise ValueError("n_samples_dropped must be non-negative")
         object.__setattr__(
             self,
             "spearman_by_objective",
@@ -151,6 +162,13 @@ class FidelityCorrelationResult:
             "top_k_recall",
             MappingProxyType(dict(self.top_k_recall)),
         )
+        object.__setattr__(self, "thresholds", MappingProxyType(dict(self.thresholds)))
+        object.__setattr__(
+            self,
+            "dropped_evaluations",
+            tuple(MappingProxyType(dict(item)) for item in self.dropped_evaluations),
+        )
+        object.__setattr__(self, "artifact_paths", MappingProxyType(dict(self.artifact_paths)))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -162,6 +180,13 @@ class FidelityCorrelationResult:
             },
             "n_samples_compared": self.n_samples_compared,
             "notes": list(self.notes),
+            "fast_screen_trustworthy": self.fast_screen_trustworthy,
+            "n_samples_total": self.n_samples_total,
+            "n_samples_dropped": self.n_samples_dropped,
+            "confidence": self.confidence,
+            "thresholds": dict(self.thresholds),
+            "dropped_evaluations": [dict(item) for item in self.dropped_evaluations],
+            "artifact_paths": dict(self.artifact_paths),
         }
 
     @classmethod
@@ -185,6 +210,17 @@ class FidelityCorrelationResult:
             },
             n_samples_compared=int(payload.get("n_samples_compared", 0)),
             notes=tuple(str(note) for note in payload.get("notes", ())),
+            fast_screen_trustworthy=bool(payload.get("fast_screen_trustworthy", False)),
+            n_samples_total=int(payload.get("n_samples_total", 0)),
+            n_samples_dropped=int(payload.get("n_samples_dropped", 0)),
+            confidence=str(payload.get("confidence", "low")),
+            thresholds=dict(payload.get("thresholds", {})),
+            dropped_evaluations=tuple(
+                dict(item) for item in payload.get("dropped_evaluations", ())
+            ),
+            artifact_paths={
+                str(k): str(v) for k, v in payload.get("artifact_paths", {}).items()
+            },
         )
 
 

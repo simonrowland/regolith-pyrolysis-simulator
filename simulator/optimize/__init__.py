@@ -35,6 +35,7 @@ from simulator.optimize.doe import (
     active_sampler_name,
     sample_recipe_patches,
 )
+from simulator.optimize.fidelity import run_fidelity_correlation
 from simulator.optimize.determinism import (
     THREAD_ENV_VARS,
     assert_deterministic,
@@ -134,4 +135,5 @@ __all__ = [
     "ThresholdSpec",
     "evaluate_batch",
     "evaluate_in_process_pool",
+    "run_fidelity_correlation",
 ]
