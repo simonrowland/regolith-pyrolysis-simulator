@@ -8,6 +8,7 @@ import hashlib
 import math
 from types import MappingProxyType
 from typing import Any, Mapping
+from collections.abc import Mapping as MappingABC, Set as AbstractSet
 
 from simulator.backends import BackendUnavailableError
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
@@ -24,7 +25,12 @@ from simulator.optimize.objective import (
     compute_objectives,
     product_summary,
 )
-from simulator.optimize.physics import FeasibilityResult, GateMargin, PhysicsConstraintSet
+from simulator.optimize.physics import (
+    GATE_ORDER,
+    FeasibilityResult,
+    GateMargin,
+    PhysicsConstraintSet,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
@@ -56,6 +62,18 @@ class RunReference:
             MappingProxyType(dict(self.product_summary)),
         )
 
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                self.status,
+                self.error_message,
+                self.reason,
+                _thaw_value(self.trace),
+                _thaw_value(self.product_summary),
+            ),
+        )
+
 
 @dataclass(frozen=True)
 class ScoredResult:
@@ -76,8 +94,8 @@ class ScoredResult:
             "feasibility_margins",
             MappingProxyType(dict(self.feasibility_margins)),
         )
-        object.__setattr__(self, "failing_gates", tuple(self.failing_gates))
-        object.__setattr__(self, "notes", tuple(str(note) for note in self.notes))
+        object.__setattr__(self, "failing_gates", _ordered_failing_gates(self.failing_gates))
+        object.__setattr__(self, "notes", _ordered_notes(self.notes))
         if self.feasible:
             if self.failure_category is not None:
                 raise ValueError("feasible result cannot carry failure_category")
@@ -86,6 +104,23 @@ class ScoredResult:
         else:
             if self.objectives is not None:
                 raise ValueError("infeasible result must not carry objectives")
+
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                self.candidate_id,
+                self.eval_spec,
+                self.cache_key,
+                self.feasible,
+                self.failure_category,
+                self.objectives,
+                _thaw_value(self.feasibility_margins),
+                self.failing_gates,
+                self.run_reference,
+                self.notes,
+            ),
+        )
 
 
 class EvaluationAbort(RuntimeError):
@@ -394,6 +429,30 @@ def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReferen
         trace=getattr(run_execution, "trace", None),
         product_summary=summary,
     )
+
+
+def _ordered_failing_gates(values: Any) -> tuple[str, ...]:
+    if isinstance(values, AbstractSet):
+        raise TypeError("failing_gates must be an ordered sequence, not a set")
+    gates = tuple(str(gate) for gate in values)
+    gate_rank = {gate: index for index, gate in enumerate(GATE_ORDER)}
+    return tuple(sorted(gates, key=lambda gate: (gate_rank.get(gate, len(gate_rank)), gate)))
+
+
+def _ordered_notes(values: Any) -> tuple[str, ...]:
+    if isinstance(values, AbstractSet):
+        raise TypeError("notes must be an ordered sequence, not a set")
+    return tuple(str(note) for note in values)
+
+
+def _thaw_value(value: Any) -> Any:
+    if isinstance(value, MappingABC):
+        return {str(key): _thaw_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_thaw_value(item) for item in value)
+    if isinstance(value, list):
+        return [_thaw_value(item) for item in value]
+    return value
 
 
 def _is_backend_unavailable_message(message: str) -> bool:

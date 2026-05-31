@@ -503,6 +503,9 @@ class RecipePatch:
         }
         object.__setattr__(self, "values", MappingProxyType(normalized))
 
+    def __reduce__(self) -> tuple[Any, tuple[dict[KeyPath, Any]]]:
+        return (type(self), (dict(self.values),))
+
     @classmethod
     def from_nested(cls, nested: Mapping[str, Any]) -> "RecipePatch":
         if not isinstance(nested, Mapping):

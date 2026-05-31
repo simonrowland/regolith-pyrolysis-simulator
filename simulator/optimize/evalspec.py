@@ -83,6 +83,28 @@ class EvalSpec:
             _freeze_value(self.chemistry_kernel, "chemistry_kernel"),
         )
 
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                self.recipe_id,
+                self.feedstock_recipe_digest,
+                self.feedstock_id,
+                self.profile_id,
+                self.fidelity,
+                self.code_version,
+                _thaw_value(self.data_digests),
+                self.campaign,
+                self.hours,
+                self.mass_kg,
+                _thaw_value(self.additives_kg),
+                self.track,
+                self.backend_name,
+                _thaw_value(self.runtime_campaign_overrides),
+                _thaw_value(self.chemistry_kernel),
+            ),
+        )
+
 
 def current_code_version() -> str:
     return _VERSION_PATH.read_text(encoding="utf-8").strip()
@@ -194,4 +216,14 @@ def _freeze_value(value: Any, field_name: str) -> Any:
         return tuple(_freeze_value(item, field_name) for item in value)
     if isinstance(value, tuple):
         return tuple(_freeze_value(item, field_name) for item in value)
+    return value
+
+
+def _thaw_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _thaw_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_thaw_value(item) for item in value)
+    if isinstance(value, list):
+        return [_thaw_value(item) for item in value]
     return value

@@ -237,6 +237,9 @@ def test_notes_are_substantive_branch_reasons() -> None:
     ) != deterministic_result_view(
         _result(spec, notes=("invalid patch: electrolysis current out of range",))
     )
+    assert deterministic_result_view(_result(spec, notes=("first", "second"))) != (
+        deterministic_result_view(_result(spec, notes=("second", "first")))
+    )
 
 
 def test_probe_catches_nondeterministic_eval_with_diff() -> None:

@@ -74,6 +74,11 @@ from simulator.optimize.results_store import (
     ResultStoreSchemaError,
     ResultsStore,
 )
+from simulator.optimize.pool import (
+    PoolEvaluationRequest,
+    evaluate_batch,
+    evaluate_in_process_pool,
+)
 
 __all__ = [
     "DEPENDENCY_FREE_LHC_SAMPLER",
@@ -121,9 +126,12 @@ __all__ = [
     "feedstock_recipe_digest",
     "objective_definitions",
     "PhysicsConstraintSet",
+    "PoolEvaluationRequest",
     "pin_seeds",
     "pin_worker_env",
     "recipe_schema_version",
     "sample_recipe_patches",
     "ThresholdSpec",
+    "evaluate_batch",
+    "evaluate_in_process_pool",
 ]
