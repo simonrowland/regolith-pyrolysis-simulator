@@ -17,13 +17,31 @@ from simulator.optimize.recipe import (
     allowlist_version,
     recipe_schema_version,
 )
+from simulator.optimize.doe import (
+    DEPENDENCY_FREE_LHC_SAMPLER,
+    FIDELITY_CORRELATION_METRICS,
+    SCIPY_SOBOL_SAMPLER,
+    DoeSpec,
+    FidelityCorrelationProtocol,
+    FidelityCorrelationResult,
+    active_sampler_name,
+    sample_recipe_patches,
+)
 
 __all__ = [
+    "DEPENDENCY_FREE_LHC_SAMPLER",
+    "FIDELITY_CORRELATION_METRICS",
     "KeyPath",
     "KnobSpec",
     "RecipePatch",
     "RecipeSchema",
     "RecipeValidationError",
+    "SCIPY_SOBOL_SAMPLER",
+    "DoeSpec",
+    "FidelityCorrelationProtocol",
+    "FidelityCorrelationResult",
+    "active_sampler_name",
     "allowlist_version",
     "recipe_schema_version",
+    "sample_recipe_patches",
 ]
