@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import math
 from types import MappingProxyType
-from typing import Any, Mapping
+from collections.abc import Callable, Sequence
+from typing import Any, Mapping, TypeVar
 
 from simulator.three_product_report import classify_products
 
@@ -83,6 +84,10 @@ class ObjectiveVector:
         return MappingProxyType({value.metric: value.value for value in self.values})
 
 
+ObjectiveLike = ObjectiveVector | Mapping[str, float]
+T = TypeVar("T")
+
+
 def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
     raw_objectives = profile.get("objectives")
     if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
@@ -136,6 +141,61 @@ def normalize_objective_sense(sense: str) -> str:
     return normalized
 
 
+def objective_scores(
+    objectives: ObjectiveLike,
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[float, ...]:
+    """Render objective values as maximize-native scores in profile order."""
+
+    mapping = _objective_mapping(objectives)
+    scores: list[float] = []
+    for definition in definitions:
+        try:
+            value = mapping[definition.metric]
+        except KeyError as exc:
+            raise ObjectiveComputationError(
+                f"objective {definition.metric!r} is missing"
+            ) from exc
+        numeric = _finite_float(value, definition.metric)
+        scores.append(numeric if definition.sense == "maximize" else -numeric)
+    return tuple(scores)
+
+
+def dominates(
+    left: ObjectiveLike,
+    right: ObjectiveLike,
+    definitions: Sequence[ObjectiveDefinition],
+) -> bool:
+    """Return true when left Pareto-dominates right for the profile directions."""
+
+    left_scores = objective_scores(left, definitions)
+    right_scores = objective_scores(right, definitions)
+    return all(a >= b for a, b in zip(left_scores, right_scores)) and any(
+        a > b for a, b in zip(left_scores, right_scores)
+    )
+
+
+def pareto_front(
+    items: Sequence[T],
+    definitions: Sequence[ObjectiveDefinition],
+    *,
+    objective_getter: Callable[[T], ObjectiveLike],
+) -> tuple[T, ...]:
+    """Stable non-dominated subset using profile objective order and directions."""
+
+    front: list[T] = []
+    for index, item in enumerate(items):
+        objectives = objective_getter(item)
+        if any(
+            other_index != index
+            and dominates(objective_getter(other), objectives, definitions)
+            for other_index, other in enumerate(items)
+        ):
+            continue
+        front.append(item)
+    return tuple(front)
+
+
 def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:
     sim = getattr(run_execution, "simulator", run_execution)
     return MappingProxyType({
@@ -182,6 +242,19 @@ def _metric_value(
     raise ObjectiveComputationError(
         f"objective metric {metric!r} is not available from run outputs"
     )
+
+
+def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float]:
+    if isinstance(objectives, ObjectiveVector):
+        return objectives.as_mapping()
+    if isinstance(objectives, Mapping):
+        return objectives
+    accessor = getattr(objectives, "as_mapping", None)
+    if callable(accessor):
+        raw = accessor()
+        if isinstance(raw, Mapping):
+            return raw
+    raise ObjectiveComputationError("objective values must be a mapping")
 
 
 def _product_ledger(sim: Any) -> Mapping[str, float]:

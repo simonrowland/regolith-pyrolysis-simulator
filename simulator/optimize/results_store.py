@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import fields
 import json
+import math
 from pathlib import Path
 import sqlite3
 import threading
@@ -620,7 +621,7 @@ def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str,
         gate: {
             "gate": margin.gate,
             "feasible": margin.feasible,
-            "margin": margin.margin,
+            "margin": _json_number(margin.margin, f"{gate}.margin"),
             "threshold": {
                 "id": margin.threshold.id,
                 "value": margin.threshold.value,
@@ -629,7 +630,7 @@ def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str,
                 "source_ref": margin.threshold.source_ref,
                 "tolerance": margin.threshold.tolerance,
             },
-            "observed": margin.observed,
+            "observed": _json_number(margin.observed, f"{gate}.observed"),
             "detail": margin.detail,
         }
         for gate, margin in margins.items()
@@ -713,6 +714,16 @@ def _json_dump(value: Any) -> str:
 
 def _json_load(value: str) -> Any:
     return json.loads(value)
+
+
+def _json_number(value: float, label: str) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} is not numeric") from exc
+    if not math.isfinite(numeric):
+        raise ValueError(f"{label} is non-finite")
+    return numeric
 
 
 ResultsStore = ResultStore

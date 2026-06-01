@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import fields, replace
+import math
 import multiprocessing
 import queue
 import sqlite3
@@ -47,11 +48,17 @@ def _base_spec(**overrides: object) -> EvalSpec:
     return EvalSpec(**data)
 
 
-def _margin(gate: str = "delivered_stream_purity", feasible: bool = True) -> GateMargin:
+def _margin(
+    gate: str = "delivered_stream_purity",
+    feasible: bool = True,
+    *,
+    margin: float | None = None,
+    observed: float | None = None,
+) -> GateMargin:
     return GateMargin(
         gate=gate,
         feasible=feasible,
-        margin=0.25 if feasible else -0.25,
+        margin=margin if margin is not None else (0.25 if feasible else -0.25),
         threshold=ThresholdSpec(
             id=f"{gate}-threshold",
             value=0.95,
@@ -59,7 +66,7 @@ def _margin(gate: str = "delivered_stream_purity", feasible: bool = True) -> Gat
             source="profile",
             source_ref="test profile",
         ),
-        observed=0.98 if feasible else 0.90,
+        observed=observed if observed is not None else (0.98 if feasible else 0.90),
         detail="test margin",
     )
 
@@ -80,6 +87,7 @@ def _scored(
     oxygen: float = 10.0,
     energy: float = 2.0,
     objectives: ObjectiveVector | None = None,
+    margins: Mapping[str, GateMargin] | None = None,
     result_blob: dict[str, object] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
@@ -88,7 +96,7 @@ def _scored(
         cache_key=cache_key(spec),
         feasible=True,
         objectives=objectives or _objectives(oxygen, energy),
-        feasibility_margins={"delivered_stream_purity": _margin()},
+        feasibility_margins=margins or {"delivered_stream_purity": _margin()},
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
@@ -202,6 +210,20 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference is not None
     assert loaded.run_reference.trace == {"hours": [{"hour": 1}], "status": "ok"}
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
+
+
+def test_store_rejects_nonfinite_margin_numbers(tmp_path) -> None:
+    spec = _base_spec()
+    store = ResultStore(tmp_path / "results.sqlite")
+    scored = _scored(
+        spec,
+        margins={"delivered_stream_purity": _margin(margin=math.nan)},
+    )
+
+    with pytest.raises(ValueError, match="delivered_stream_purity.margin is non-finite"):
+        store.store(spec, scored, created_at="2026-01-01T00:00:00Z")
+
+    assert store.lookup(spec) is None
 
 
 def test_lookup_miss_returns_none(tmp_path) -> None:

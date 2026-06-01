@@ -50,7 +50,10 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
     compute_objectives,
+    dominates,
     objective_definitions,
+    objective_scores,
+    pareto_front,
 )
 from simulator.optimize.strategy import Candidate, MorrisScreenStrategy, RandomStrategy, Strategy
 
@@ -77,6 +80,13 @@ _LAZY_EXPORTS = {
     "OptunaTPEStrategy": "simulator.optimize.strategy",
     "pin_seeds": "simulator.optimize.determinism",
     "pin_worker_env": "simulator.optimize.determinism",
+    "study": "simulator.optimize.study",
+    "StudyConfig": "simulator.optimize.study",
+    "StudyError": "simulator.optimize.study",
+    "StudyNoFeasibleError": "simulator.optimize.study",
+    "StudyRecord": "simulator.optimize.study",
+    "StudyResult": "simulator.optimize.study",
+    "run": "simulator.optimize.study",
 }
 
 
@@ -89,7 +99,9 @@ def __getattr__(name: str) -> object:
     from importlib import import_module
 
     module = import_module(module_name)
-    if name == "RESULT_STORE_SCHEMA_VERSION":
+    if name == "study":
+        value = module
+    elif name == "RESULT_STORE_SCHEMA_VERSION":
         value = getattr(module, "SCHEMA_VERSION")
     else:
         value = getattr(module, name)
@@ -127,6 +139,11 @@ __all__ = [
     "ObjectiveVector",
     "OptunaNSGA2Strategy",
     "OptunaTPEStrategy",
+    "StudyConfig",
+    "StudyError",
+    "StudyNoFeasibleError",
+    "StudyRecord",
+    "StudyResult",
     "RunReference",
     "ScoredResult",
     "ResultStore",
@@ -143,9 +160,12 @@ __all__ = [
     "compute_objectives",
     "current_code_version",
     "deterministic_result_view",
+    "dominates",
     "evaluate",
     "feedstock_recipe_digest",
     "objective_definitions",
+    "objective_scores",
+    "pareto_front",
     "PhysicsConstraintSet",
     "PoolEvaluationRequest",
     "Strategy",
@@ -157,4 +177,6 @@ __all__ = [
     "evaluate_batch",
     "evaluate_in_process_pool",
     "run_fidelity_correlation",
+    "run",
+    "study",
 ]
