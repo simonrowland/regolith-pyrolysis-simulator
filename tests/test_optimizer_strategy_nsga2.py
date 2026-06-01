@@ -1,0 +1,570 @@
+from __future__ import annotations
+
+import importlib
+import re
+import subprocess
+import sys
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from simulator.optimize import (
+    Candidate,
+    GateMargin,
+    OptunaNSGA2Strategy,
+    Strategy,
+    ThresholdSpec,
+)
+from simulator.optimize.evaluate import FailureCategory, ScoredResult
+from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.strategy import bayesian
+from simulator.optimize.strategy.genetic import (
+    OPTUNA_NSGA2_REQUIRED_MESSAGE,
+    _CANDIDATE_ID_ATTR,
+    _CONSTRAINT_VALUES_ATTR,
+    _constraints_for_trial,
+    OptunaNSGA2UnavailableError,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PROFILE = {
+    "objectives": [
+        {"metric": "yield", "sense": "maximize", "units": "kg"},
+        {"metric": "energy", "sense": "minimize", "units": "kWh"},
+    ]
+}
+PATH_X = ("campaigns", "C0", "dT_dt_C_per_hr")
+PATH_Y = ("campaigns", "C0", "hold_time_hr")
+
+
+def _simple_schema() -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=PATH_X,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="test",
+            ),
+        )
+    )
+
+
+def _two_knob_schema() -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=PATH_X,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="test",
+            ),
+            KnobSpec(
+                path=PATH_Y,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="test",
+            ),
+        )
+    )
+
+
+def _value(candidate: Candidate, path: tuple[str, ...] = PATH_X) -> float:
+    return float(candidate.patch.values[path])
+
+
+def _point(candidate: Candidate) -> tuple[float, float]:
+    return (_value(candidate, PATH_X), _value(candidate, PATH_Y))
+
+
+def _canonical_candidates(candidates: list[Candidate]) -> tuple[tuple[str, str], ...]:
+    return tuple((candidate.id, candidate.patch.canonical_json()) for candidate in candidates)
+
+
+def _canonical_points(candidates: list[Candidate]) -> tuple[tuple[float, float], ...]:
+    return tuple(
+        (round(_value(candidate, PATH_X), 8), round(_value(candidate, PATH_Y), 8))
+        for candidate in candidates
+    )
+
+
+def _gate_margin(*, margin: float, tolerance: float, feasible: bool) -> GateMargin:
+    return GateMargin(
+        gate="gate",
+        feasible=feasible,
+        margin=margin,
+        threshold=ThresholdSpec(
+            id="gate",
+            value=0.0,
+            units="unit",
+            source="profile",
+            source_ref="test",
+            tolerance=tolerance,
+        ),
+        observed=0.0,
+        detail="test",
+    )
+
+
+def _trials_by_candidate(strategy: OptunaNSGA2Strategy) -> dict[str, object]:
+    return {
+        trial.user_attrs[_CANDIDATE_ID_ATTR]: trial
+        for trial in strategy.study.trials
+        if _CANDIDATE_ID_ATTR in trial.user_attrs
+    }
+
+
+def _feasible_result(candidate: Candidate, yield_value: float, energy: float) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric="yield", sense="maximize", value=yield_value),
+                ObjectiveValue(metric="energy", sense="minimize", value=energy),
+            )
+        ),
+        feasibility_margins={"gate": 0.25},
+    )
+
+
+def _point_result(candidate: Candidate) -> ScoredResult:
+    x, y = _point(candidate)
+    return _feasible_result(
+        candidate,
+        yield_value=1.0 - abs(x - 0.8) - abs(y - 0.2),
+        energy=abs(x - 0.2) + abs(y - 0.8),
+    )
+
+
+def _single_objective_result(candidate: Candidate, metric: str, value: float) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric=metric, sense="minimize", value=value),
+            )
+        ),
+        feasibility_margins={"gate": 0.25},
+    )
+
+
+def _no_objective_infeasible_result(candidate: Candidate) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+    )
+
+
+def _infeasible_result(
+    candidate: Candidate,
+    *,
+    candidate_id: str | None = None,
+    margin: float = -0.5,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id if candidate_id is None else candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"gate": margin},
+    )
+
+
+def test_nsga2_strategy_implements_protocol_and_round_trips() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=11, objective_profile=PROFILE)
+
+    assert isinstance(strategy, Strategy)
+    candidates = strategy.ask(2)
+    strategy.tell(
+        [
+            (candidates[0], _feasible_result(candidates[0], 1.0, 2.0)),
+            (candidates[1], _infeasible_result(candidates[1])),
+        ]
+    )
+
+    assert strategy.tell_count == 2
+    assert all(scored.candidate_id == candidate.id for candidate, scored in strategy.results)
+
+
+def test_nsga2_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
+    schema = RecipeSchema()
+
+    first = OptunaNSGA2Strategy(schema, seed=13, objective_profile=PROFILE).ask(8)
+    second = OptunaNSGA2Strategy(schema, seed=13, objective_profile=PROFILE).ask(8)
+    different = OptunaNSGA2Strategy(schema, seed=14, objective_profile=PROFILE).ask(8)
+
+    assert len(first) == 8
+    assert [candidate.id for candidate in first] == [
+        f"nsga2-13-{number:06d}" for number in range(8)
+    ]
+    assert len({candidate.id for candidate in first}) == 8
+    assert _canonical_candidates(first) == _canonical_candidates(second)
+    assert _canonical_candidates(first) != _canonical_candidates(different)
+    for candidate in first:
+        assert candidate.patch.validated(schema).canonical_json() == candidate.patch.canonical_json()
+        assert all(not schema.is_forbidden(path) for path in candidate.patch.values)
+        for spec in schema.allowlist:
+            value = candidate.patch.values[spec.path]
+            if spec.low is not None:
+                assert float(value) >= float(spec.low)
+            if spec.high is not None:
+                assert float(value) <= float(spec.high)
+
+
+def test_nsga2_multi_objective_directions_and_pareto_front_are_derived_from_profile() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=31, objective_profile=PROFILE)
+    candidates = strategy.ask(3)
+
+    strategy.tell(
+        [
+            (candidates[0], _feasible_result(candidates[0], 10.0, 10.0)),
+            (candidates[1], _feasible_result(candidates[1], 5.0, 5.0)),
+            (candidates[2], _feasible_result(candidates[2], 3.0, 12.0)),
+        ]
+    )
+
+    assert strategy.directions == ("maximize", "minimize")
+    assert len(strategy.study.directions) == len(PROFILE["objectives"])
+    assert {trial.user_attrs[_CANDIDATE_ID_ATTR] for trial in strategy.best_trials} == {
+        candidates[0].id,
+        candidates[1].id,
+    }
+    assert strategy.pareto_front == strategy.best_trials
+
+
+def test_nsga2_directions_change_with_objective_profile() -> None:
+    single = {"objectives": [{"metric": "energy", "sense": "minimize"}]}
+    reversed_profile = {
+        "objectives": [
+            {"metric": "energy", "sense": "minimize"},
+            {"metric": "yield", "sense": "maximize"},
+        ]
+    }
+
+    single_strategy = OptunaNSGA2Strategy(
+        _simple_schema(), seed=35, objective_profile=single
+    )
+    reversed_strategy = OptunaNSGA2Strategy(
+        _simple_schema(), seed=36, objective_profile=reversed_profile
+    )
+
+    assert single_strategy.directions == ("minimize",)
+    assert len(single_strategy.study.directions) == 1
+    assert reversed_strategy.directions == ("minimize", "maximize")
+    assert reversed_strategy.directions != ("maximize", "minimize")
+
+
+def test_nsga2_single_objective_profile_round_trips() -> None:
+    profile = {"objectives": [{"metric": "energy", "sense": "minimize"}]}
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=37, objective_profile=profile)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell([(candidate, _single_objective_result(candidate, "energy", 3.5))])
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.values == [3.5]
+    assert strategy.best_trials[0].user_attrs[_CANDIDATE_ID_ATTR] == candidate.id
+
+
+def test_nsga2_population_is_diverse_and_tell_history_changes_followup() -> None:
+    schema = _two_knob_schema()
+    strategy = OptunaNSGA2Strategy(schema, seed=26, objective_profile=PROFILE)
+    control = OptunaNSGA2Strategy(schema, seed=26, objective_profile=PROFILE)
+
+    population = strategy.ask(32)
+    xs = [_value(candidate, PATH_X) for candidate in population]
+    ys = [_value(candidate, PATH_Y) for candidate in population]
+
+    assert len(set(_canonical_points(population))) == len(population)
+    assert max(xs) - min(xs) > 0.80
+    assert max(ys) - min(ys) > 0.80
+
+    warm_candidates = strategy.ask(50)
+    control.ask(82)
+    strategy.tell([(candidate, _point_result(candidate)) for candidate in population + warm_candidates])
+
+    followup = strategy.ask(12)
+    no_tell_followup = control.ask(12)
+
+    assert _canonical_points(followup) != _canonical_points(no_tell_followup)
+
+    repeated = OptunaNSGA2Strategy(schema, seed=26, objective_profile=PROFILE)
+    repeated_population = repeated.ask(32)
+    repeated_warm = repeated.ask(50)
+    repeated.tell(
+        [(candidate, _point_result(candidate)) for candidate in repeated_population + repeated_warm]
+    )
+    assert _canonical_points(followup) == _canonical_points(repeated.ask(12))
+
+
+def test_nsga2_constraints_rank_completed_trials_but_do_not_block_asks() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=41, objective_profile=PROFILE)
+    candidates = strategy.ask(12)
+
+    assert any(_value(candidate) < 0.35 for candidate in candidates)
+    assert any(_value(candidate) > 0.65 for candidate in candidates)
+
+    strategy.tell(
+        [
+            (candidates[0], _infeasible_result(candidates[0], margin=-1.0)),
+            (candidates[1], _feasible_result(candidates[1], 0.1, 10.0)),
+        ]
+    )
+
+    trials_by_candidate = _trials_by_candidate(strategy)
+    assert trials_by_candidate[candidates[0].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (1.0,)
+    assert trials_by_candidate[candidates[1].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
+    assert strategy.ask(1)[0].patch.validated(strategy.schema)
+
+
+def test_nsga2_constraint_feasible_margin_not_violated_and_reuses_tpe_contract() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=42, objective_profile=PROFILE)
+    candidates = strategy.ask(2)
+    feasible_margin = _gate_margin(margin=-0.05, tolerance=0.1, feasible=True)
+    infeasible_margin = _gate_margin(margin=-0.05, tolerance=0.0, feasible=False)
+
+    assert _constraints_for_trial is bayesian._constraints_for_trial
+
+    strategy.tell(
+        [
+            (
+                candidates[0],
+                ScoredResult(
+                    candidate_id=candidates[0].id,
+                    eval_spec=None,
+                    cache_key=None,
+                    feasible=True,
+                    objectives=ObjectiveVector(
+                        (
+                            ObjectiveValue(metric="yield", sense="maximize", value=1.0),
+                            ObjectiveValue(metric="energy", sense="minimize", value=1.0),
+                        )
+                    ),
+                    feasibility_margins={"gate": feasible_margin},
+                ),
+            ),
+            (
+                candidates[1],
+                ScoredResult(
+                    candidate_id=candidates[1].id,
+                    eval_spec=None,
+                    cache_key=None,
+                    feasible=False,
+                    failure_category=FailureCategory.INFEASIBLE_RECIPE,
+                    feasibility_margins={"gate": infeasible_margin},
+                ),
+            ),
+        ]
+    )
+
+    trials_by_candidate = _trials_by_candidate(strategy)
+    assert trials_by_candidate[candidates[0].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
+    assert trials_by_candidate[candidates[1].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.05,)
+
+
+def test_nsga2_constraints_for_trial_rejects_malformed_or_nonfinite_attrs() -> None:
+    assert _constraints_for_trial(SimpleNamespace(user_attrs={})) == (0.0,)
+
+    bad_attrs = [
+        (),
+        "bad",
+        ("bad",),
+        ("nan",),
+        (float("nan"),),
+        (float("inf"),),
+    ]
+    for raw in bad_attrs:
+        trial = SimpleNamespace(user_attrs={_CONSTRAINT_VALUES_ATTR: raw})
+        with pytest.raises(ValueError, match="constraint values"):
+            _constraints_for_trial(trial)
+
+
+def test_nsga2_infeasible_result_uses_directional_worst_values_not_zero() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=44, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell([(candidate, _no_objective_infeasible_result(candidate))])
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.values == [bayesian._BAD_MAXIMIZE_VALUE, bayesian._BAD_MINIMIZE_VALUE]
+    assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (1.0,)
+
+
+def test_nsga2_import_boundary_is_lazy_without_optuna() -> None:
+    code = """
+import builtins
+import sys
+real_import = builtins.__import__
+def blocked_import(name, *args, **kwargs):
+    if name == "optuna" or name.startswith("optuna."):
+        raise ImportError("blocked optuna")
+    return real_import(name, *args, **kwargs)
+builtins.__import__ = blocked_import
+import simulator.optimize
+import simulator.optimize.strategy
+print("OK", "optuna" in sys.modules)
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    assert completed.stdout.strip() == "OK False"
+
+
+def test_nsga2_instantiation_fails_loud_when_optuna_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    real_import_module = importlib.import_module
+
+    def blocked_import_module(name: str, package: str | None = None) -> object:
+        if name == "optuna" or name.startswith("optuna."):
+            raise ImportError("blocked optuna")
+        return real_import_module(name, package)
+
+    monkeypatch.setattr(importlib, "import_module", blocked_import_module)
+
+    with pytest.raises(
+        OptunaNSGA2UnavailableError,
+        match=re.escape(OPTUNA_NSGA2_REQUIRED_MESSAGE),
+    ):
+        OptunaNSGA2Strategy(_simple_schema(), seed=51, objective_profile=PROFILE)
+
+
+def test_nsga2_tell_contract_is_atomic_for_mismatch_duplicate_and_unknown() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=61, objective_profile=PROFILE)
+    candidates = strategy.ask(2)
+
+    with pytest.raises(ValueError, match="candidate_id"):
+        strategy.tell(
+            [
+                (candidates[0], _feasible_result(candidates[0], 1.0, 1.0)),
+                (candidates[1], _infeasible_result(candidates[1], candidate_id="other")),
+            ]
+        )
+
+    assert strategy.tell_count == 0
+    assert strategy.results == ()
+    assert all(trial.state.name == "RUNNING" for trial in strategy.study.trials)
+
+    with pytest.raises(ValueError, match="duplicate candidate_id"):
+        strategy.tell(
+            [
+                (candidates[0], _feasible_result(candidates[0], 1.0, 1.0)),
+                (candidates[0], _feasible_result(candidates[0], 1.0, 1.0)),
+            ]
+        )
+
+    unknown = Candidate(id="unknown", patch=RecipePatch({PATH_X: 0.5}).validated(_simple_schema()))
+    with pytest.raises(ValueError, match="not planned"):
+        strategy.tell([(unknown, _feasible_result(unknown, 1.0, 1.0))])
+
+    strategy.tell([(candidates[0], _feasible_result(candidates[0], 1.0, 1.0))])
+    before = strategy.results
+    with pytest.raises(ValueError, match="already recorded"):
+        strategy.tell([(candidates[0], _feasible_result(candidates[0], 1.0, 1.0))])
+
+    assert strategy.tell_count == 1
+    assert strategy.results == before
+
+
+def test_nsga2_tell_rejects_non_scored_result_and_non_pairs() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=62, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    fake = SimpleNamespace(
+        candidate_id=candidate.id,
+        feasible=True,
+        objectives=SimpleNamespace(as_mapping=lambda: {"yield": 1.0, "energy": 1.0}),
+        feasibility_margins={"gate": 0.25},
+    )
+
+    with pytest.raises(ValueError, match="ScoredResult"):
+        strategy.tell([(candidate, fake)])  # type: ignore[list-item]
+    with pytest.raises(ValueError, match="2-tuples"):
+        strategy.tell([(candidate, fake, "extra")])  # type: ignore[list-item]
+
+    assert strategy.tell_count == 0
+    assert strategy.results == ()
+    assert all(trial.state.name == "RUNNING" for trial in strategy.study.trials)
+
+
+def test_nsga2_tell_rejects_patch_or_metadata_mismatch() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=63, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    mutated_value = 0.0 if _value(candidate) != 0.0 else 1.0
+    patch_mismatch = Candidate(
+        id=candidate.id,
+        patch=RecipePatch({PATH_X: mutated_value}).validated(_simple_schema()),
+        metadata=candidate.metadata,
+    )
+    metadata_mismatch = Candidate(
+        id=candidate.id,
+        patch=candidate.patch,
+        metadata={**dict(candidate.metadata), "extra": "value"},
+    )
+
+    with pytest.raises(ValueError, match="patch"):
+        strategy.tell([(patch_mismatch, _feasible_result(patch_mismatch, 1.0, 1.0))])
+    with pytest.raises(ValueError, match="metadata"):
+        strategy.tell(
+            [(metadata_mismatch, _feasible_result(metadata_mismatch, 1.0, 1.0))]
+        )
+
+    assert strategy.tell_count == 0
+    assert strategy.results == ()
+    assert all(trial.state.name == "RUNNING" for trial in strategy.study.trials)
+
+
+def test_nsga2_tell_empty_batch_is_documented_noop() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=64, objective_profile=PROFILE)
+    strategy.ask(1)
+    before = [
+        (trial.number, trial.state.name, dict(trial.user_attrs))
+        for trial in strategy.study.trials
+    ]
+
+    strategy.tell([])
+
+    after = [
+        (trial.number, trial.state.name, dict(trial.user_attrs))
+        for trial in strategy.study.trials
+    ]
+    assert strategy.tell_count == 0
+    assert strategy.results == ()
+    assert after == before
+
+
+def test_nsga2_ask_edge_cases() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=71, objective_profile=PROFILE)
+
+    assert strategy.ask(0) == []
+    for bad_n in (-1, True, "x"):
+        with pytest.raises(ValueError, match="non-negative int"):
+            strategy.ask(bad_n)  # type: ignore[arg-type]
+
+    candidates = strategy.ask(1) + strategy.ask(2)
+
+    assert [candidate.id for candidate in candidates] == [
+        "nsga2-71-000000",
+        "nsga2-71-000001",
+        "nsga2-71-000002",
+    ]

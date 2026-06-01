@@ -5,6 +5,7 @@ from simulator.optimize.strategy.random_strategy import RandomStrategy
 from simulator.optimize.strategy.screen import MorrisScreenStrategy
 
 _LAZY_EXPORTS = {
+    "OptunaNSGA2Strategy": "simulator.optimize.strategy.genetic",
     "OptunaTPEStrategy": "simulator.optimize.strategy.bayesian",
 }
 
@@ -26,6 +27,7 @@ def __getattr__(name: str) -> object:
 __all__ = [
     "Candidate",
     "MorrisScreenStrategy",
+    "OptunaNSGA2Strategy",
     "OptunaTPEStrategy",
     "RandomStrategy",
     "Strategy",
