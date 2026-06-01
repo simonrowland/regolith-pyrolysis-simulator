@@ -333,6 +333,31 @@ def test_nsga2_constraints_rank_completed_trials_but_do_not_block_asks() -> None
     assert strategy.ask(1)[0].patch.validated(strategy.schema)
 
 
+def test_nsga2_constraints_do_not_block_infeasible_region_after_tell() -> None:
+    # Lens B P1 (O-P4d deferred review): the rank-not-block invariant must hold AFTER tell. The test
+    # above only proves the INITIAL random population crosses both sides + a later ask is schema-valid —
+    # a strategy that learned to BLOCK the infeasible region post-tell would still pass it. Here: score
+    # x<0.35 infeasible + the rest feasible, tell, then assert the followup ask STILL proposes into the
+    # infeasible region (constraints rank completed trials; they never gate NSGA-II proposals).
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=41, objective_profile=PROFILE)
+    population = strategy.ask(32)
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                _infeasible_result(candidate, margin=-1.0)
+                if _value(candidate) < 0.35
+                else _feasible_result(candidate, 0.1, 10.0),
+            )
+            for candidate in population
+        ]
+    )
+
+    followup = strategy.ask(32)
+    assert any(_value(candidate) < 0.35 for candidate in followup)
+
+
 def test_nsga2_constraint_feasible_margin_not_violated_and_reuses_tpe_contract() -> None:
     strategy = OptunaNSGA2Strategy(_simple_schema(), seed=42, objective_profile=PROFILE)
     candidates = strategy.ask(2)
