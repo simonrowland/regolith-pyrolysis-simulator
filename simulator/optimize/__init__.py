@@ -52,7 +52,7 @@ from simulator.optimize.objective import (
     compute_objectives,
     objective_definitions,
 )
-from simulator.optimize.strategy import Candidate, RandomStrategy, Strategy
+from simulator.optimize.strategy import Candidate, MorrisScreenStrategy, RandomStrategy, Strategy
 
 _LAZY_EXPORTS = {
     "BackendUnavailableAbort": "simulator.optimize.evaluate",
@@ -117,6 +117,7 @@ __all__ = [
     "EngineBugAbort",
     "EvaluationAbort",
     "FailureCategory",
+    "MorrisScreenStrategy",
     "ObjectiveComputationError",
     "ObjectiveDefinition",
     "ObjectiveProfileError",
