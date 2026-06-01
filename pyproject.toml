@@ -28,6 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Optional extras for paths NOT required by the default operational chain.
+optimize = ["optuna==4.8.0"]
 # MAGEMin (https://github.com/ComputationalThermodynamics/MAGEMin) is a
 # compiled C/Fortran Gibbs-energy minimiser. There is NO pure-PyPI MAGEMin
 # package: the clone ships zero Python files, no setup.py, no pyproject.toml.

@@ -73,6 +73,7 @@ _LAZY_EXPORTS = {
     "THREAD_ENV_VARS": "simulator.optimize.determinism",
     "assert_deterministic": "simulator.optimize.determinism",
     "deterministic_result_view": "simulator.optimize.determinism",
+    "OptunaTPEStrategy": "simulator.optimize.strategy",
     "pin_seeds": "simulator.optimize.determinism",
     "pin_worker_env": "simulator.optimize.determinism",
 }
@@ -123,6 +124,7 @@ __all__ = [
     "ObjectiveProfileError",
     "ObjectiveValue",
     "ObjectiveVector",
+    "OptunaTPEStrategy",
     "RunReference",
     "ScoredResult",
     "ResultStore",
