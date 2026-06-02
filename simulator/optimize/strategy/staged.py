@@ -18,6 +18,7 @@ from simulator.optimize.objective import (
     ObjectiveDefinition,
     objective_definitions,
     objective_scores,
+    pareto_front,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.protocol import Candidate
@@ -46,6 +47,14 @@ class _BeamNode:
     recipe_ids: tuple[str, ...]
     parent_id: str | None
     score_key: tuple[Any, ...] = ()
+    cache_key: str | None = None
+
+
+@dataclass(frozen=True)
+class _ArchiveMember:
+    candidate: Candidate
+    scored: ScoredResult
+    node: _BeamNode
 
 
 def make_prefix_eval_spec(
@@ -130,6 +139,10 @@ class StagedStrategy:
             else options.get("children_per_parent", max(2, self.beam_width)),
             "children_per_parent",
         )
+        self.max_backward_passes = _backward_pass_limit(options)
+        self.backward_passes_completed = 0
+        self._backward_done = self.max_backward_passes <= 0
+        self._backward_reference_signature: tuple[str, ...] | None = None
         configured_allowlist = (
             stage_allowlist if stage_allowlist is not None else options.get("allowlist")
         )
@@ -151,6 +164,8 @@ class StagedStrategy:
         self._stage_results: dict[str, tuple[Candidate, ScoredResult]] = {}
         self._asked_by_id: dict[str, Candidate] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self._archive: tuple[_ArchiveMember, ...] = ()
+        self._mode = "forward"
         self._tell_count = 0
         self._build_stage_candidates()
 
@@ -205,6 +220,7 @@ class StagedStrategy:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             seen.add(candidate.id)
             light_scored = _strip_trace(scored)
+            _assert_not_parent_duplicate(candidate, light_scored)
             batch.append((candidate, light_scored))
 
         for candidate, scored in batch:
@@ -213,8 +229,31 @@ class StagedStrategy:
         self._tell_count += len(batch)
         self._advance_completed_stage()
 
-    def run_backward_pass(self) -> None:
-        raise StagedStrategyError("backward pass not implemented until O-P5b2")
+    def run_backward_pass(self) -> bool:
+        if self._backward_done:
+            return False
+        if self._pending or self._expected_stage_ids:
+            return False
+        if self._stage_index < len(self._stages):
+            return False
+        if not self._archive:
+            self._backward_done = True
+            return False
+        if self.backward_passes_completed >= self.max_backward_passes:
+            self._backward_done = True
+            return False
+
+        candidates = self._build_backward_candidates()
+        if not candidates:
+            self._backward_done = True
+            return False
+        self._backward_reference_signature = self._archive_signature()
+        self._mode = "backward"
+        self._pending = candidates
+        self._expected_stage_ids = {candidate.id for candidate in candidates}
+        self._stage_results = {}
+        self.backward_passes_completed += 1
+        return True
 
     def joint_refine(self) -> None:
         raise StagedStrategyError("joint-refine not implemented until O-P5b3")
@@ -269,6 +308,7 @@ class StagedStrategy:
                     "stage_patch_values": _metadata_patch_values(stage_patch),
                     "topology": {"id": "PATH_AB"},
                     "parent_candidate_id": parent.parent_id,
+                    "parent_cache_key": parent.cache_key,
                     "parent_rank": parent_index,
                     "child_index": child_index,
                 }
@@ -287,6 +327,9 @@ class StagedStrategy:
             return
         if set(self._stage_results) != self._expected_stage_ids:
             return
+        if self._mode == "backward":
+            self._advance_completed_backward_pass()
+            return
         ranked = _rank_stage_results(
             self._stage_results.values(),
             self._definitions,
@@ -296,19 +339,137 @@ class StagedStrategy:
             raise StagedBeamStateError("staged beam produced no ranked candidates")
         next_frontier: list[_BeamNode] = []
         for score_key, candidate, scored in ranked:
-            stage_ids = tuple(candidate.metadata["stage_ids"])
-            next_frontier.append(
-                _BeamNode(
-                    patch=candidate.patch,
-                    stage_ids=stage_ids,
-                    recipe_ids=(*tuple(candidate.metadata["prefix_recipe_ids"]), candidate.patch.recipe_id(self.schema)),
-                    parent_id=candidate.id,
-                    score_key=score_key,
-                )
-            )
+            next_frontier.append(_node_from_candidate(candidate, scored, score_key, self.schema))
         self._frontier = tuple(next_frontier)
+        if self._stage_index == len(self._stages) - 1:
+            self._archive = _pareto_archive(
+                _archive_members_from_results(
+                    self._stage_results.values(),
+                    self._definitions,
+                    self.schema,
+                ),
+                self._definitions,
+            )
+            if self._archive:
+                self._frontier = tuple(member.node for member in self._archive)
         self._stage_index += 1
         self._build_stage_candidates()
+
+    def _advance_completed_backward_pass(self) -> None:
+        ranked = _rank_stage_results(
+            self._stage_results.values(),
+            self._definitions,
+            beam_width=len(self._stage_results),
+        )
+        children = tuple(
+            _ArchiveMember(
+                candidate=candidate,
+                scored=scored,
+                node=_node_from_candidate(candidate, scored, score_key, self.schema),
+            )
+            for score_key, candidate, scored in ranked
+            if scored.feasible and scored.objectives is not None
+        )
+        self._archive = _pareto_archive((*self._archive, *children), self._definitions)
+        self._frontier = tuple(member.node for member in self._archive)
+        self._expected_stage_ids = set()
+        self._stage_results = {}
+        self._mode = "forward"
+        if (
+            self._backward_reference_signature is not None
+            and self._archive_signature() == self._backward_reference_signature
+        ):
+            self._backward_done = True
+        self._backward_reference_signature = None
+        if self.backward_passes_completed >= self.max_backward_passes:
+            self._backward_done = True
+
+    def _build_backward_candidates(self) -> list[Candidate]:
+        if not self._archive:
+            return []
+        target_index = len(self._stages) - 1 - (
+            self.backward_passes_completed % len(self._stages)
+        )
+        target_stage_id, target_specs = self._stages[target_index]
+        if not target_specs:
+            raise StagedBeamStateError(f"stage {target_stage_id!r} has no knobs")
+        stage_schema = RecipeSchema(
+            allowlist=target_specs,
+            recipe_schema_version=self.schema.recipe_schema_version,
+            allowlist_version=self.schema.allowlist_version,
+        )
+        candidates: list[Candidate] = []
+        backward_stage_id = f"backward-{target_stage_id}"
+        for parent_index, member in enumerate(self._archive):
+            parent = member.node
+            prefix_patch = _patch_for_stage_range(
+                parent.patch,
+                self._stages,
+                stop=target_index,
+            )
+            suffix_patch = _patch_for_stage_range(
+                parent.patch,
+                self._stages,
+                start=target_index + 1,
+            )
+            for child_index in range(self.children_per_parent):
+                sample_index = (
+                    10_000_000
+                    + self.backward_passes_completed * 1_000_000
+                    + target_index * 100_000
+                    + parent_index * self.children_per_parent
+                    + child_index
+                )
+                stage_patch = sample_recipe_patch_at_index(
+                    stage_schema,
+                    index=sample_index,
+                    seed=self.seed,
+                    sampler_name=self.sampler_name,
+                )
+                replay_patch = _combine_patches(stage_patch, suffix_patch)
+                patch = _combine_patches(prefix_patch, replay_patch).validated(self.schema)
+                recipe_id = patch.recipe_id(self.schema)
+                candidate_id = (
+                    f"{self.name}-{self.seed}-backward-"
+                    f"{self.backward_passes_completed:02d}-{target_stage_id}-"
+                    f"p{parent_index:03d}-c{child_index:06d}"
+                )
+                prefix_recipe_ids = parent.recipe_ids[:target_index]
+                metadata = {
+                    "strategy": self.name,
+                    "seed": self.seed,
+                    "stage_index": target_index,
+                    "stage_id": backward_stage_id,
+                    "stage_ids": (*parent.stage_ids, backward_stage_id),
+                    "recipe_ids": (*parent.recipe_ids, recipe_id),
+                    "prefix_depth": target_index,
+                    "prefix_stage_ids": tuple(
+                        stage_id for stage_id, _ in self._stages[:target_index]
+                    ),
+                    "prefix_recipe_ids": prefix_recipe_ids,
+                    "prefix_patch_values": _metadata_patch_values(prefix_patch),
+                    "stage_patch_values": _metadata_patch_values(replay_patch),
+                    "topology": {"id": "PATH_AB"},
+                    "parent_candidate_id": parent.parent_id,
+                    "parent_cache_key": parent.cache_key,
+                    "parent_rank": parent_index,
+                    "child_index": child_index,
+                    "backward_pass": self.backward_passes_completed,
+                    "backward_target_stage_id": target_stage_id,
+                }
+                candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
+                candidates.append(candidate)
+                self._asked_by_id[candidate_id] = candidate
+        return candidates
+
+    def _archive_signature(self) -> tuple[str, ...]:
+        return tuple(
+            sorted(
+                member.scored.cache_key
+                for member in self._archive
+                if isinstance(member.scored.cache_key, str)
+            )
+        )
 
 
 def _rank_stage_results(
@@ -333,6 +494,90 @@ def _rank_stage_results(
         ranked.append((score_key, candidate, scored))
     ranked.sort(key=lambda item: item[0])
     return tuple(ranked[:beam_width])
+
+
+def _archive_members_from_results(
+    results: Sequence[tuple[Candidate, ScoredResult]],
+    definitions: Sequence[ObjectiveDefinition],
+    schema: RecipeSchema,
+) -> tuple[_ArchiveMember, ...]:
+    members: list[_ArchiveMember] = []
+    for candidate, scored in results:
+        if not scored.feasible or scored.objectives is None:
+            continue
+        score_key = _score_key(candidate, scored, definitions)
+        members.append(
+            _ArchiveMember(
+                candidate=candidate,
+                scored=scored,
+                node=_node_from_candidate(candidate, scored, score_key, schema),
+            )
+        )
+    return tuple(members)
+
+
+def _pareto_archive(
+    members: Sequence[_ArchiveMember],
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[_ArchiveMember, ...]:
+    feasible = tuple(
+        member
+        for member in members
+        if member.scored.feasible and member.scored.objectives is not None
+    )
+    front = pareto_front(
+        feasible,
+        definitions,
+        objective_getter=lambda member: member.scored.objectives,
+    )
+    seen_keys: dict[str, str] = {}
+    for member in front:
+        key = member.scored.cache_key
+        if not isinstance(key, str) or not key:
+            raise StagedBeamStateError(
+                f"staged archive candidate {member.candidate.id!r} missing cache_key"
+            )
+        prior = seen_keys.get(key)
+        if prior is not None and prior != member.candidate.id:
+            raise StagedDuplicateCacheKey(
+                f"duplicate staged archive cache_key {key!r}: "
+                f"{prior!r} and {member.candidate.id!r}"
+            )
+        seen_keys[key] = member.candidate.id
+    return tuple(
+        sorted(front, key=lambda member: _score_key(member.candidate, member.scored, definitions))
+    )
+
+
+def _node_from_candidate(
+    candidate: Candidate,
+    scored: ScoredResult,
+    score_key: tuple[Any, ...],
+    schema: RecipeSchema,
+) -> _BeamNode:
+    return _BeamNode(
+        patch=candidate.patch,
+        stage_ids=_string_tuple_metadata(candidate, "stage_ids"),
+        recipe_ids=_recipe_ids_from_metadata(candidate, schema),
+        parent_id=candidate.id,
+        score_key=score_key,
+        cache_key=scored.cache_key,
+    )
+
+
+def _recipe_ids_from_metadata(candidate: Candidate, schema: RecipeSchema) -> tuple[str, ...]:
+    raw = candidate.metadata.get("recipe_ids")
+    if raw is not None:
+        if not isinstance(raw, Sequence) or isinstance(raw, str):
+            raise StagedBeamStateError("staged recipe_ids metadata must be a sequence")
+        values = tuple(raw)
+        if not all(isinstance(value, str) for value in values):
+            raise StagedBeamStateError("staged recipe_ids metadata must contain strings")
+        return values
+    return (
+        *_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+        candidate.patch.recipe_id(schema),
+    )
 
 
 def _score_key(
@@ -391,8 +636,6 @@ def _staged_options(profile: Mapping[str, Any]) -> Mapping[str, Any]:
 
 
 def _reject_out_of_scope(options: Mapping[str, Any]) -> None:
-    if options.get("backward_passes") or options.get("backward") or options.get("block_coordinate_ascent"):
-        raise StagedStrategyError("backward pass not implemented until O-P5b2")
     if options.get("joint_refine"):
         raise StagedStrategyError("joint-refine not implemented until O-P5b3")
     topology = str(options.get("topology", options.get("topology_id", "PATH_AB"))).upper()
@@ -406,6 +649,22 @@ def _positive_int(value: Any, field_name: str) -> int:
     return value
 
 
+def _non_negative_int(value: Any, field_name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"{field_name} must be a non-negative int")
+    return value
+
+
+def _backward_pass_limit(options: Mapping[str, Any]) -> int:
+    if "max_backward_passes" in options:
+        return _non_negative_int(options["max_backward_passes"], "max_backward_passes")
+    if "backward_passes" in options:
+        return _non_negative_int(options["backward_passes"], "backward_passes")
+    if options.get("backward") or options.get("block_coordinate_ascent"):
+        return 1
+    return 0
+
+
 def _merge_patches(prefix: RecipePatch, stage_patch: RecipePatch) -> RecipePatch:
     values = dict(prefix.values)
     overlap = set(values).intersection(stage_patch.values)
@@ -414,6 +673,55 @@ def _merge_patches(prefix: RecipePatch, stage_patch: RecipePatch) -> RecipePatch
         raise StagedBeamStateError(f"stage patch overlaps prefix patch: {joined}")
     values.update(stage_patch.values)
     return RecipePatch(values)
+
+
+def _combine_patches(*patches: RecipePatch) -> RecipePatch:
+    combined = RecipePatch({})
+    for patch in patches:
+        combined = _merge_patches(combined, patch)
+    return combined
+
+
+def _patch_for_stage_range(
+    patch: RecipePatch,
+    stages: Sequence[tuple[str, tuple[KnobSpec, ...]]],
+    *,
+    start: int = 0,
+    stop: int | None = None,
+) -> RecipePatch:
+    selected = {
+        spec.path
+        for _, specs in stages[start:stop]
+        for spec in specs
+    }
+    return RecipePatch(
+        {
+            path: value
+            for path, value in patch.values.items()
+            if path in selected
+        }
+    )
+
+
+def _string_tuple_metadata(candidate: Candidate, key: str) -> tuple[str, ...]:
+    raw = candidate.metadata.get(key, ())
+    if not isinstance(raw, Sequence) or isinstance(raw, str):
+        raise StagedBeamStateError(f"staged {key} metadata must be a sequence")
+    values = tuple(raw)
+    if not all(isinstance(value, str) for value in values):
+        raise StagedBeamStateError(f"staged {key} metadata must contain strings")
+    return values
+
+
+def _assert_not_parent_duplicate(candidate: Candidate, scored: ScoredResult) -> None:
+    parent_key = candidate.metadata.get("parent_cache_key")
+    if parent_key is None:
+        return
+    key = scored.cache_key
+    if isinstance(parent_key, str) and isinstance(key, str) and key == parent_key:
+        raise StagedDuplicateCacheKey(
+            f"staged child {candidate.id!r} duplicated parent cache_key {key!r}"
+        )
 
 
 def _metadata_patch_values(patch: RecipePatch) -> Mapping[str, Any]:

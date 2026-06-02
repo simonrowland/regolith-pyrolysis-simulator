@@ -248,6 +248,9 @@ def run(
         while evaluated < config.budget:
             batch_size = min(config.parallel, config.budget - evaluated)
             candidates = active_strategy.ask(batch_size)
+            if not candidates and isinstance(active_strategy, StagedStrategy):
+                if active_strategy.run_backward_pass():
+                    candidates = active_strategy.ask(batch_size)
             if not candidates:
                 break
             results = _evaluate_candidates(
