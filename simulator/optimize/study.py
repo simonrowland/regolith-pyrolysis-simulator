@@ -47,6 +47,7 @@ from simulator.optimize.strategy import (
 )
 from simulator.optimize.strategy.staged import (
     StagedBeamStateError,
+    StagedReplayViolation,
     StagedStrategy,
     TopologyChoice,
     assert_prefix_replay_equal,
@@ -111,6 +112,13 @@ class StudyAbort(StudyError):
 
 class StudyNoFeasibleError(StudyError):
     """Raised when no feasible Pareto winner exists."""
+
+
+@dataclass(frozen=True)
+class StagedReplay:
+    prefix_result: ScoredResult
+    stage_id: str | None
+    stage_patch: RecipePatch
 
 
 class StubSmokeConstraintSet:
@@ -529,23 +537,23 @@ def _evaluate_candidates(
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
     for index, candidate in enumerate(candidates):
-        prefix = _ensure_staged_prefix_replay(
-            candidate,
-            profile=profile,
-            feedstock=feedstock,
-            fidelity=fidelity,
-            out_dir=out_dir,
-            evaluator=evaluator,
-            schema=schema,
-            constraints=constraints,
-            store=store,
-            definitions=definitions,
-            prefix_replay_cache=prefix_replay_cache,
-        )
-        if prefix is not None:
-            staged_prefixes[candidate.id] = prefix
         cached = _lookup_cached(candidate, profile, feedstock, fidelity, schema, store)
         if cached is None:
+            prefix = _ensure_staged_prefix_replay(
+                candidate,
+                profile=profile,
+                feedstock=feedstock,
+                fidelity=fidelity,
+                out_dir=out_dir,
+                evaluator=evaluator,
+                schema=schema,
+                constraints=constraints,
+                store=store,
+                definitions=definitions,
+                prefix_replay_cache=prefix_replay_cache,
+            )
+            if prefix is not None:
+                staged_prefixes[candidate.id] = prefix
             misses.append((index, candidate))
         else:
             results[index] = (candidate, cached, True)
@@ -635,6 +643,10 @@ def _ensure_staged_prefix_replay(
         return cached
 
     cached = store.lookup(prefix_spec)
+    if cached is not None:
+        prefix_replay_cache[prefix_key] = cached
+        return cached
+
     fresh = _evaluate_prefix_one(
         candidate,
         prefix_patch,
@@ -650,13 +662,12 @@ def _ensure_staged_prefix_replay(
     )
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
-    if cached is None:
-        store.store(
-            prefix_spec,
-            light_fresh,
-            created_at=datetime.now(UTC).isoformat(),
-        )
-        cached = store.lookup(prefix_spec)
+    store.store(
+        prefix_spec,
+        light_fresh,
+        created_at=datetime.now(UTC).isoformat(),
+    )
+    cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
     assert_prefix_replay_equal(cached, light_fresh)
@@ -791,13 +802,27 @@ def _evaluate_one(
     staged_prefix: ScoredResult | None = None,
 ) -> ScoredResult:
     stage_patch = _stage_patch_from_metadata(candidate, schema)
-    call_patch = (
-        stage_patch
-        if staged_prefix is not None
-        and stage_patch is not None
-        and _evaluator_accepts_staged_replay(evaluator)
-        else candidate.patch
-    )
+    call_patch = candidate.patch
+    staged_replay: StagedReplay | None = None
+    if staged_prefix is not None:
+        if stage_patch is None:
+            raise StagedReplayViolation(
+                f"staged candidate {candidate.id!r} missing stage patch for replay"
+            )
+        if not _evaluator_accepts_staged_replay(evaluator):
+            raise StagedReplayViolation(
+                f"evaluator {evaluator!r} does not support explicit staged replay"
+            )
+        staged_replay = StagedReplay(
+            prefix_result=staged_prefix,
+            stage_id=(
+                candidate.metadata.get("stage_id")
+                if isinstance(candidate.metadata.get("stage_id"), str)
+                else None
+            ),
+            stage_patch=stage_patch,
+        )
+        call_patch = stage_patch
     try:
         scored = _call_evaluator(
             evaluator,
@@ -809,9 +834,7 @@ def _evaluate_one(
             schema=schema,
             constraints=constraints,
             output_dir=out_dir / "evals" / candidate.id,
-            staged_prefix_result=staged_prefix,
-            staged_stage_id=candidate.metadata.get("stage_id"),
-            staged_stage_patch=stage_patch,
+            staged_replay=staged_replay,
         )
     except EvaluationAbort:
         raise
@@ -832,12 +855,7 @@ def _evaluate_one(
 
 def _evaluator_accepts_staged_replay(evaluator: EvaluateFn) -> bool:
     signature = inspect.signature(evaluator)
-    if any(
-        parameter.kind is inspect.Parameter.VAR_KEYWORD
-        for parameter in signature.parameters.values()
-    ):
-        return True
-    return "staged_prefix_result" in signature.parameters
+    return "staged_replay" in signature.parameters
 
 
 def _call_evaluator(
@@ -852,11 +870,14 @@ def _call_evaluator(
         parameter.kind is inspect.Parameter.VAR_KEYWORD
         for parameter in signature.parameters.values()
     )
-    accepted = {
-        key: value
-        for key, value in kwargs.items()
-        if accepts_kwargs or key in signature.parameters
-    }
+    accepted = {}
+    for key, value in kwargs.items():
+        if key == "staged_replay":
+            if key in signature.parameters:
+                accepted[key] = value
+            continue
+        if accepts_kwargs or key in signature.parameters:
+            accepted[key] = value
     return evaluator(patch, feedstock, fidelity, **accepted)
 
 

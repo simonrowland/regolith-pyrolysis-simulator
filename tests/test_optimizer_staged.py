@@ -26,6 +26,7 @@ from simulator.optimize.strategy import (
     Candidate,
     StagedBeamStateError,
     StagedDuplicateCacheKey,
+    StagedReplayViolation,
     StagedStrategy,
     StagedStrategyError,
     assert_prefix_replay_equal,
@@ -78,19 +79,16 @@ class SpyEvaluator:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
-        staged_prefix_result: ScoredResult | None = None,
-        staged_stage_patch: RecipePatch | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         if candidate_id is not None and candidate_id.startswith("staged-prefix-"):
             self.prefix_calls += 1
             self.prefix_patch = patch
-            assert staged_prefix_result is None
-            assert staged_stage_patch is None
+            assert staged_replay is None
         elif "-01-" in str(candidate_id):
-            assert staged_prefix_result is not None
-            assert staged_stage_patch is not None
-            assert patch == staged_stage_patch
+            assert staged_replay is not None
+            assert patch == staged_replay.stage_patch
         return _scored(patch, feedstock, fidelity, profile, candidate_id=candidate_id)
 
 
@@ -146,6 +144,7 @@ def _scored(
     trace: Any = None,
     oxygen: float | None = None,
     energy: float = 2.0,
+    margin: GateMargin | None = None,
 ) -> ScoredResult:
     spec = eval_spec or _spec(patch, feedstock, fidelity, profile)
     key = cache_key_value or cache_key(spec)
@@ -160,7 +159,7 @@ def _scored(
         cache_key=key,
         feasible=True,
         objectives=_objectives(oxygen=oxygen_value, energy=energy),
-        feasibility_margins={"delivered_stream_purity": _margin()},
+        feasibility_margins={"delivered_stream_purity": margin or _margin()},
         run_reference=RunReference(
             status="ok",
             trace={"heavy": "trace"} if trace is None else trace,
@@ -228,6 +227,60 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     assert_prefix_replay_equal(cached, fresh)
 
 
+def test_staged_runtime_rejects_tampered_prefix_cache(tmp_path) -> None:
+    class TamperingStore(SpyStore):
+        def store(
+            self,
+            eval_spec: EvalSpec,
+            scored: ScoredResult,
+            *,
+            created_at: str,
+        ) -> None:
+            if isinstance(eval_spec, PrefixEvalSpec):
+                scored = replace(scored, notes=(*scored.notes, "tampered-prefix-cache"))
+            super().store(eval_spec, scored, created_at=created_at)
+
+    with pytest.raises(StagedReplayViolation):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=4,
+            out_dir=tmp_path,
+            seed=11,
+            evaluator=SpyEvaluator(),
+            result_store=TamperingStore(tmp_path / "cache.sqlite"),
+        )
+
+
+def test_staged_default_evaluator_fails_loud_without_replay(tmp_path) -> None:
+    def no_replay_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **_: Any,
+    ) -> ScoredResult:
+        return _scored(patch, feedstock, fidelity, profile, candidate_id=candidate_id)
+
+    with pytest.raises(StagedReplayViolation, match="explicit staged replay"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=4,
+            out_dir=tmp_path,
+            seed=12,
+            evaluator=no_replay_evaluator,
+        )
+
+
 def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None:
     base = _spec(RecipePatch({}))
     prefix = make_prefix_eval_spec(
@@ -246,8 +299,14 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
         created_at="t2",
     )
 
-    assert store.lookup(base).cache_key == cache_key(base)
-    assert store.lookup(prefix).cache_key == cache_key(prefix)
+    loaded_base = store.lookup(base)
+    loaded_prefix = store.lookup(prefix)
+    assert loaded_base.cache_key == cache_key(base)
+    assert loaded_prefix.cache_key == cache_key(prefix)
+    assert isinstance(loaded_prefix.eval_spec, PrefixEvalSpec)
+    assert loaded_prefix.eval_spec.prefix_stage_ids == ("C0",)
+    assert loaded_prefix.eval_spec.prefix_recipe_ids == (base.recipe_id,)
+    assert loaded_prefix.eval_spec.topology_id == "PATH_AB"
 
 
 def test_staged_clean_import_boundary_then_touch_loads_evaluate_only() -> None:
@@ -384,6 +443,12 @@ def test_joint_refine_improves_or_refines() -> None:
                         candidate_id=candidate.id,
                         oxygen=20.0,
                         energy=5.0,
+                        margin=replace(
+                            _margin(),
+                            gate="C2A_continuous_pressure",
+                            margin=0.01,
+                            detail="near C2A boundary",
+                        ),
                     ),
                 )
                 for candidate in candidates
@@ -391,6 +456,18 @@ def test_joint_refine_improves_or_refines() -> None:
         )
     parent_patch = strategy._archive[0].node.patch
     parent_key = strategy._archive[0].scored.cache_key
+    inactive_paths = {
+        spec.path
+        for stage_id, specs in strategy._stages
+        if stage_id == "C0"
+        for spec in specs
+    }
+    active_paths = {
+        spec.path
+        for stage_id, specs in strategy._stages
+        if stage_id in {"C0b_p_cleanup", "C2A_continuous"}
+        for spec in specs
+    }
 
     assert strategy.joint_refine() is True
     joint_candidates = strategy.ask(10)
@@ -402,6 +479,16 @@ def test_joint_refine_improves_or_refines() -> None:
     )
     assert all(candidate.metadata["prefix_depth"] > 0 for candidate in joint_candidates)
     assert any(candidate.patch.values != parent_patch.values for candidate in joint_candidates)
+    assert all(
+        candidate.patch.values.get(path) == parent_patch.values.get(path)
+        for candidate in joint_candidates
+        for path in inactive_paths
+    )
+    assert any(
+        candidate.patch.values.get(path) != parent_patch.values.get(path)
+        for candidate in joint_candidates
+        for path in active_paths
+    )
 
     strategy.tell(
         [
@@ -431,6 +518,7 @@ def test_backward_pass_reorders_pareto_with_improving_backward_candidate(tmp_pat
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         oxygen = 20.0
@@ -518,6 +606,7 @@ def test_backward_pass_does_not_evict_nondominated(tmp_path) -> None:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         oxygen = 10.0
@@ -568,6 +657,7 @@ def test_backward_pass_does_not_evict_nondominated(tmp_path) -> None:
     pre_front_keys = {scored.cache_key for _, scored in pre_front}
     frontier_keys = {node.cache_key for node in strategy._frontier}
 
+    assert strategy.backward_passes_completed == 1
     assert len(pre_front_keys) == 2
     assert pre_front_keys <= frontier_keys
     assert not any(
@@ -589,6 +679,7 @@ def test_backward_pass_is_bounded(tmp_path) -> None:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         oxygen = 25.0
@@ -714,7 +805,9 @@ def test_staged_rerun_hits_cache_without_duplicating_rows(tmp_path) -> None:
     )
     first_rows = _store_row_count(store)
     first_prefix_hits = store.prefix_hits
+    _delete_non_prefix_rows(store)
 
+    second_evaluator = SpyEvaluator()
     second = study.run(
         PROFILE,
         FEEDSTOCK,
@@ -724,12 +817,13 @@ def test_staged_rerun_hits_cache_without_duplicating_rows(tmp_path) -> None:
         budget=4,
         out_dir=tmp_path / "second",
         seed=43,
-        evaluator=SpyEvaluator(),
+        evaluator=second_evaluator,
         result_store=store,
     )
 
     assert _store_row_count(store) == first_rows
     assert store.prefix_hits > first_prefix_hits
+    assert second_evaluator.prefix_calls == 0
     assert [record.cache_key for record in second.records] == [
         record.cache_key for record in first.records
     ]
@@ -743,6 +837,7 @@ def test_all_infeasible_beam_bounded(tmp_path) -> None:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         return replace(
@@ -787,24 +882,36 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
-        child_penalty = 10.0 * str(candidate_id).count("c000001")
-        child_penalty += 20.0 * str(candidate_id).count("c000002")
+        text = str(candidate_id)
+        oxygen = 100.0
+        energy = 2.0
+        if "-00-C0-" in text:
+            oxygen = 100.0 if "c000000" in text else 90.0
+            energy = 1.0 if "c000000" in text else 2.0
+        elif "-01-C0b_p_cleanup-" in text:
+            if "-p001-" in text:
+                oxygen = 300.0
+                energy = 0.5
+            else:
+                oxygen = 110.0
+                energy = 1.5
         return _scored(
             patch,
             feedstock,
             fidelity,
             profile,
             candidate_id=candidate_id,
-            oxygen=100.0 - child_penalty,
-            energy=2.0 + child_penalty,
+            oxygen=oxygen,
+            energy=energy,
         )
 
     base_staged = {
         **PROFILE["staged"],
-        "allowlist": ("C0",),
-        "children_per_parent": 3,
+        "allowlist": ("C0", "C0b_p_cleanup"),
+        "children_per_parent": 2,
         "max_backward_passes": 0,
         "topology": {"path_ab": "A", "branch": "two", "c6": "yes"},
     }
@@ -814,24 +921,26 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
         "staged",
         "stub",
         parallel=6,
-        budget=3,
+        budget=4,
         out_dir=tmp_path / "width-one",
         seed=53,
         evaluator=scorer,
     )
     width_k = study.run(
-        {**PROFILE, "staged": {**base_staged, "beam_width": 3}},
+        {**PROFILE, "staged": {**base_staged, "beam_width": 2}},
         FEEDSTOCK,
         "staged",
         "stub",
         parallel=12,
-        budget=3,
+        budget=6,
         out_dir=tmp_path / "width-k",
         seed=53,
         evaluator=scorer,
     )
 
-    assert width_one.winner.patch.values == width_k.leaderboard[0].patch.values
+    assert width_one.winner.cache_key != width_k.winner.cache_key
+    assert "-p001-" not in width_one.winner.candidate_id
+    assert "-p001-" in width_k.winner.candidate_id
 
 
 def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
@@ -887,6 +996,17 @@ def _store_row_count(store: ResultStore) -> int:
         return int(conn.execute("SELECT COUNT(*) FROM results").fetchone()[0])
 
 
+def _delete_non_prefix_rows(store: ResultStore) -> None:
+    with sqlite3.connect(store.path) as conn:
+        rows = conn.execute("SELECT cache_key, eval_spec FROM results").fetchall()
+        full_keys = [
+            row[0]
+            for row in rows
+            if json.loads(str(row[1])).get("eval_spec_type") != "prefix"
+        ]
+        conn.executemany("DELETE FROM results WHERE cache_key = ?", [(key,) for key in full_keys])
+
+
 def _duplicate_store_cache_keys(store: ResultStore) -> list[str]:
     with sqlite3.connect(store.path) as conn:
         rows = conn.execute(
@@ -905,6 +1025,18 @@ def test_staged_out_of_scope_contracts_fail_loud() -> None:
             SCHEMA,
             seed=9,
             objective_profile={**PROFILE, "staged": {"enable_c6_topology": True}},
+        )
+    with pytest.raises(ValueError, match="enable_c6_topology is obsolete"):
+        StagedStrategy(
+            SCHEMA,
+            seed=9,
+            objective_profile={
+                **PROFILE,
+                "staged": {
+                    "enable_c6_topology": True,
+                    "topology": {"path_ab": "A", "branch": "two", "c6": "yes"},
+                },
+            },
         )
 
     strategy = StagedStrategy(
@@ -927,6 +1059,7 @@ def test_staged_result_honesty_and_light_results(tmp_path) -> None:
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
+        staged_replay: study.StagedReplay | None = None,
         **_: Any,
     ) -> ScoredResult:
         spec = _spec(patch, feedstock, fidelity, profile)

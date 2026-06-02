@@ -83,6 +83,37 @@ _PATH_AB_CHOICES = ("A", "A_staged", "B")
 _BRANCH_CHOICES = ("two", "one")
 _C6_CHOICES = (True, False)
 _DEFAULT_TOPOLOGY = TopologyChoice()
+_ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
+    {
+        "C0": ("stage0", "feed", "raw", "drying", "volatile"),
+        "C0b_p_cleanup": ("c0b", "cleanup", "perchlorate", "halide", "sulfur", "carbon"),
+        "C2A_continuous": (
+            "c2a",
+            "continuous",
+            "sio",
+            "silica",
+            "alkali",
+            "thermal",
+            "ramp",
+            "ptotal",
+        ),
+        "C2A_staged": (
+            "c2a",
+            "staged",
+            "sio",
+            "silica",
+            "alkali",
+            "thermal",
+            "ramp",
+            "ptotal",
+        ),
+        "C2B": ("c2b", "iron", "fe", "metal", "reduction"),
+        "C3": ("c3", "condenser", "fused", "baffle", "purity", "deliveredstreampurity"),
+        "C4": ("c4", "alkali", "sodium", "potassium", "na", "k"),
+        "C5": ("c5", "oxygen", "o2", "mre", "electrolysis"),
+        "C6": ("c6", "aluminum", "al", "thermite", "mg"),
+    }
+)
 
 
 def enumerate_topologies(
@@ -791,7 +822,7 @@ def _staged_options(profile: Mapping[str, Any]) -> Mapping[str, Any]:
 
 
 def _reject_out_of_scope(options: Mapping[str, Any]) -> None:
-    if options.get("enable_c6_topology") is not None and "topology" not in options:
+    if "enable_c6_topology" in options:
         raise ValueError("enable_c6_topology is obsolete; set staged.topology.c6")
 
 
@@ -978,13 +1009,38 @@ def _joint_refine_target_indices(
             if not isinstance(margin_value, int | float) or abs(float(margin_value)) > 0.05:
                 continue
             label = str(getattr(margin, "gate", name)).lower()
-            for index, stage_id in enumerate(stage_ids):
-                if stage_id.lower() in label:
-                    uncertain.update({max(0, index - 1), index})
+            for index in _active_stage_indices(label, stage_ids):
+                uncertain.update({max(0, index - 1), index})
     if uncertain:
         return tuple(sorted(uncertain))
     start = max(0, len(stages) - 2)
     return tuple(range(start, len(stages)))
+
+
+def _active_stage_indices(label: str, stage_ids: Sequence[str]) -> tuple[int, ...]:
+    compact_label = "".join(char for char in label if char.isalnum())
+    tokens = {
+        token
+        for token in "".join(char if char.isalnum() else " " for char in label).split()
+        if token
+    }
+    matches: set[int] = set()
+    for index, stage_id in enumerate(stage_ids):
+        stage_key = stage_id.lower()
+        compact_stage = "".join(char for char in stage_key if char.isalnum())
+        if stage_key in label or stage_key in tokens or compact_stage in tokens:
+            matches.add(index)
+            continue
+        if len(compact_stage) > 3 and compact_stage in compact_label:
+            matches.add(index)
+            continue
+        aliases = _ACTIVE_STAGE_ALIASES.get(stage_id, ())
+        if any(
+            alias in tokens or (len(alias) > 2 and alias in compact_label)
+            for alias in aliases
+        ):
+            matches.add(index)
+    return tuple(sorted(matches))
 
 
 def _refine_patch_near_parent(

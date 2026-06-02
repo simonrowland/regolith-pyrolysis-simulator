@@ -18,7 +18,7 @@ import time
 from typing import Any, Mapping, Sequence
 
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
-from simulator.optimize.evalspec import EvalSpec, cache_key
+from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveValue,
@@ -531,11 +531,18 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
 def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:
     return {
         field.name: _jsonable(getattr(eval_spec, field.name))
-        for field in fields(EvalSpec)
+        for field in fields(type(eval_spec))
     }
 
 
 def _deserialize_eval_spec(payload: Mapping[str, Any]) -> EvalSpec:
+    eval_spec_type = payload.get("eval_spec_type")
+    if eval_spec_type == "prefix":
+        return PrefixEvalSpec(
+            **{field.name: payload[field.name] for field in fields(PrefixEvalSpec)}
+        )
+    if eval_spec_type is not None:
+        raise ResultStoreSchemaError(f"unknown eval_spec_type {eval_spec_type!r}")
     return EvalSpec(**{field.name: payload[field.name] for field in fields(EvalSpec)})
 
 
