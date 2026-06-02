@@ -12,9 +12,10 @@ from simulator.optimize.doe import (
     DoeSpec,
     FidelityCorrelationProtocol,
     FidelityCorrelationResult,
+    sample_recipe_patch_at_index,
     sample_recipe_patches,
 )
-from simulator.optimize.recipe import KnobSpec, RecipeSchema
+from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 
 
 def _canonical_patch_set(
@@ -293,3 +294,255 @@ def test_fidelity_correlation_result_copies_input_mappings() -> None:
     assert result.to_dict() == before
     with pytest.raises(TypeError):
         result.spearman_by_objective["oxygen_recovery"] = -1.0
+
+
+# --- anchored (neighborhood) sampling -------------------------------------
+
+_TEMP = ("campaigns", "C0", "temp_range_C")
+_HOLD = ("campaigns", "C3", "endpoint", "hold_time_min")
+_MODE = ("campaigns", "C0", "mode")
+
+
+def _anchored_schema() -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=(
+            KnobSpec(path=_TEMP, kind="float", low=20, high=950),
+            KnobSpec(path=_HOLD, kind="int", low=15, high=60),
+            KnobSpec(
+                path=_MODE,
+                kind="categorical",
+                choices=("conservative", "nominal", "aggressive"),
+            ),
+        )
+    )
+
+
+def _anchor(temp: float = 500.0, hold: int = 30, mode: str = "nominal") -> RecipePatch:
+    return RecipePatch({_TEMP: temp, _HOLD: hold, _MODE: mode})
+
+
+def _assert_within_neighborhood(
+    schema: RecipeSchema, patches: tuple, anchor: RecipePatch, delta_fraction: float
+) -> None:
+    for patch in patches:
+        patch.validated(schema)
+        for spec in schema.allowlist:
+            value = patch.values[spec.path]
+            center = anchor.values[spec.path]
+            if spec.kind == "categorical":
+                assert value == center
+                continue
+            low, high = float(spec.low), float(spec.high)
+            half = delta_fraction * (high - low)
+            # within the anchor neighborhood (small tolerance for int rounding)
+            tol = 0.5 if spec.kind == "int" else 1e-9
+            assert float(center) - half - tol <= float(value) <= float(center) + half + tol
+            # and always inside the schema bounds
+            assert low <= float(value) <= high
+
+
+def test_anchored_sampling_count_matches_n_samples() -> None:
+    schema = _anchored_schema()
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=20,
+        seed=5,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=_anchor(),
+        delta_fraction=0.15,
+    )
+    assert len(patches) == 20
+
+
+def test_anchored_sampling_stays_in_neighborhood_and_bounds() -> None:
+    schema = _anchored_schema()
+    anchor = _anchor()
+    delta = 0.15
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=64,
+        seed=5,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+        delta_fraction=delta,
+    )
+    _assert_within_neighborhood(schema, patches, anchor, delta)
+    # the anchor genuinely narrows the float spread vs the full schema range
+    temps = [p.values[_TEMP] for p in patches]
+    assert max(temps) - min(temps) < (950 - 20)
+
+
+def test_anchored_sampling_clamps_when_center_near_bound() -> None:
+    schema = _anchored_schema()
+    # centers sit inside but within delta of the upper bound -> must clamp
+    anchor = _anchor(temp=940.0, hold=59)
+    delta = 0.15
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=64,
+        seed=9,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+        delta_fraction=delta,
+    )
+    _assert_within_neighborhood(schema, patches, anchor, delta)
+    assert max(p.values[_TEMP] for p in patches) <= 950.0
+    assert max(p.values[_HOLD] for p in patches) <= 60
+
+
+def test_anchored_sampling_is_deterministic_for_same_seed() -> None:
+    schema = _anchored_schema()
+    anchor = _anchor()
+    kwargs = dict(
+        n_samples=32,
+        seed=77,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+        delta_fraction=0.2,
+    )
+    first = sample_recipe_patches(schema, **kwargs)
+    second = sample_recipe_patches(schema, **kwargs)
+    assert tuple(p.canonical_json() for p in first) == tuple(
+        p.canonical_json() for p in second
+    )
+
+
+def test_anchored_sampling_differs_from_full_range() -> None:
+    schema = _anchored_schema()
+    full = sample_recipe_patches(
+        schema, n_samples=32, seed=77, sampler_name=DEPENDENCY_FREE_LHC_SAMPLER
+    )
+    anchored = sample_recipe_patches(
+        schema,
+        n_samples=32,
+        seed=77,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=_anchor(),
+        delta_fraction=0.15,
+    )
+    assert tuple(p.canonical_json() for p in full) != tuple(
+        p.canonical_json() for p in anchored
+    )
+
+
+def test_anchored_sampling_default_delta_fraction_is_used() -> None:
+    schema = _anchored_schema()
+    anchor = _anchor()
+    explicit = sample_recipe_patches(
+        schema,
+        n_samples=16,
+        seed=1,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+        delta_fraction=0.15,
+    )
+    implicit = sample_recipe_patches(
+        schema,
+        n_samples=16,
+        seed=1,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+    )
+    assert tuple(p.canonical_json() for p in explicit) == tuple(
+        p.canonical_json() for p in implicit
+    )
+
+
+def test_anchored_patch_at_index_matches_batch_row() -> None:
+    schema = _anchored_schema()
+    anchor = _anchor()
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable for streaming index sampling")
+    batch = sample_recipe_patches(
+        schema,
+        n_samples=8,
+        seed=4,
+        sampler_name=SCIPY_SOBOL_SAMPLER,
+        anchor=anchor,
+        delta_fraction=0.1,
+    )
+    at_zero = sample_recipe_patch_at_index(
+        schema,
+        index=0,
+        seed=4,
+        sampler_name=SCIPY_SOBOL_SAMPLER,
+        anchor=anchor,
+        delta_fraction=0.1,
+    )
+    assert at_zero.canonical_json() == batch[0].canonical_json()
+    _assert_within_neighborhood(schema, (at_zero,), anchor, 0.1)
+
+
+def test_anchored_sampling_rejects_nonpositive_delta_fraction() -> None:
+    schema = _anchored_schema()
+    with pytest.raises(ValueError, match="delta_fraction"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=0.0,
+        )
+
+
+def test_anchored_sampling_rejects_delta_fraction_above_one() -> None:
+    schema = _anchored_schema()
+    with pytest.raises(ValueError, match="delta_fraction"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=1.5,
+        )
+
+
+def test_anchored_sampling_rejects_anchor_missing_a_sampled_knob() -> None:
+    schema = _anchored_schema()
+    partial = RecipePatch({_TEMP: 500.0, _MODE: "nominal"})  # missing hold_time_min
+    with pytest.raises(ValueError, match="missing sampled knob"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=partial,
+        )
+
+
+def test_anchored_sampling_rejects_anchor_value_out_of_bounds() -> None:
+    schema = _anchored_schema()
+    over = _anchor(temp=2000.0)  # above the 950 upper bound
+    with pytest.raises(ValueError, match="outside bounds"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=over,
+        )
+
+
+def test_doe_spec_validates_anchor_eagerly() -> None:
+    schema = _anchored_schema()
+    # valid anchor on the DoeSpec is accepted
+    DoeSpec(
+        schema=schema,
+        n_samples=8,
+        seed=1,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=_anchor(),
+        delta_fraction=0.15,
+    )
+    # bad delta_fraction on the spec raises at construction (fail loud)
+    with pytest.raises(ValueError, match="delta_fraction"):
+        DoeSpec(
+            schema=schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=-0.1,
+        )

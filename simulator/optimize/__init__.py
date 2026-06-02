@@ -27,6 +27,7 @@ from simulator.optimize.evalspec import (
     feedstock_recipe_digest,
 )
 from simulator.optimize.doe import (
+    DEFAULT_ANCHOR_DELTA_FRACTION,
     DEPENDENCY_FREE_LHC_SAMPLER,
     FIDELITY_CORRELATION_METRICS,
     SCIPY_SOBOL_SAMPLER,
@@ -34,6 +35,7 @@ from simulator.optimize.doe import (
     FidelityCorrelationProtocol,
     FidelityCorrelationResult,
     active_sampler_name,
+    sample_recipe_patch_at_index,
     sample_recipe_patches,
 )
 from simulator.optimize.physics import (
@@ -117,6 +119,7 @@ def __getattr__(name: str) -> object:
     return value
 
 __all__ = [
+    "DEFAULT_ANCHOR_DELTA_FRACTION",
     "DEPENDENCY_FREE_LHC_SAMPLER",
     "EvalSpec",
     "FIDELITY_CORRELATION_METRICS",
@@ -188,6 +191,7 @@ __all__ = [
     "pin_seeds",
     "pin_worker_env",
     "recipe_schema_version",
+    "sample_recipe_patch_at_index",
     "sample_recipe_patches",
     "ThresholdSpec",
     "evaluate_batch",
