@@ -1,0 +1,32 @@
+profile_id: s-type-asteroid-silicate-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: s_type_asteroid_silicate
+description: Mg-rich S-type silicate; bootstrap Mg shuttle stock plus O2/glass.
+north_star_rationale: S-type material is Mg-rich, so metal recovery is weighted above glass while keeping O2 and coating gates.
+objective_emphasis: Mg/metal-forward asteroid silicate profile.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.38, rationale: Mg-dominant metal proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: glass co-product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: high liquidus penalty}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: s-type-mg-selective-seed
+    source_campaign: C4
+    rationale: Use the setpoints Mg selective pyrolysis window for Mg-rich silicate.
+    patch:
+      campaigns:
+        C4:
+          temp_range_C: [1580, 1670]
+          pO2_mbar: [0.08, 0.35]
+          pO2_mbar_default: 0.2
+          p_total_mbar_default: 0.2

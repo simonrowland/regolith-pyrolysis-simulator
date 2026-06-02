@@ -1,0 +1,31 @@
+profile_id: m-type-silicate-phase-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: m_type_silicate_phase
+description: Ultra-magnesian M-type silicate phase after metal removal.
+north_star_rationale: After magnetic metal removal, the silicate phase should behave like S-type Mg shuttle stock.
+objective_emphasis: Mg/metal proxy with O2 and glass secondary.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.40, rationale: Mg shuttle metal proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: O2 product}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: refractory/glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: high-temperature cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.08, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: m-type-silicate-mg-seed
+    source_campaign: C4
+    rationale: Use the setpoints Mg selective recipe after metallic phase removal.
+    patch:
+      campaigns:
+        C4:
+          temp_range_C: [1580, 1670]
+          pO2_mbar_default: 0.2
+          p_total_mbar_default: 0.2

@@ -1,0 +1,34 @@
+profile_id: mars-basalt-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: mars_basalt
+description: General Mars basalt; carbon/sulfate/halide cleanup then Fe/O2/alkali-compatible extraction.
+north_star_rationale: Mars basalt needs Stage-0 carbon cleanup and halide/sulfate handling before O2, metals, and glass targets.
+objective_emphasis: Mars cleanup plus balanced O2/metals/glass.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.34, rationale: stored O2 for Mars baseline}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.24, rationale: Fe/metal proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.18, rationale: glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: carbon cleanup and CO2 cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: cleanup hold penalty}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub, additives_kg: {C: 30.0}}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mars-basalt-c0-path-b-seed
+    source_campaigns: [C0, C2B]
+    rationale: Use setpoints C0 cleanup plus pO2-managed Fe extraction for Mars basalt.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50
+        C2B:
+          temp_range_C: [1320, 1480]
+          pO2_mbar_default: 1.5
+          p_total_mbar_default: 1.5

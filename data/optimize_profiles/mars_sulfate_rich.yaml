@@ -1,0 +1,30 @@
+profile_id: mars-sulfate-rich-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: mars_sulfate_rich
+description: Mars sulfate-rich soil; maximize extra O2 potential with heavy cleanup.
+north_star_rationale: Sulfate-rich Mars feed can add O2 and acid feedstock, but must protect coating and gas-stream gates during carbon cleanup.
+objective_emphasis: O2-heavy sulfate cleanup profile.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.42, rationale: extra sulfate-derived O2 potential}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.18, rationale: metal product proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: extended carbon cleanup cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: longer cleanup penalty}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub, additives_kg: {C: 45.0}}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mars-sulfate-c0-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints C0 bakeoff as the allowed carbon/sulfate cleanup seed.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

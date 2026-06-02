@@ -1,0 +1,41 @@
+profile_id: lunar-spa-kreep-influenced-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_spa_kreep_influenced
+description: Mild KREEP mafic/noritic material; prefer metal/O2 with cleanup guardrails.
+north_star_rationale: SPA KREEP has more Fe/Mg than PKT average, so keep metal weight high after P/alkali cleanup.
+objective_emphasis: Metal-forward KREEP profile.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.32, rationale: Fe/Mg metal potential}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.28, rationale: O2 product}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.18, rationale: glass product}
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.10, rationale: storage preference}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.08, rationale: cleanup energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.04, rationale: extra hold penalty}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: spa-kreep-staged-seed
+    source_campaigns: [C0b_p_cleanup, C2A_staged]
+    rationale: Use setpoints P cleanup plus staged pN2 bakeout for selective Fe/SiO/alkali routing.
+    patch:
+      campaigns:
+        C0b_p_cleanup:
+          temp_range_C: [1180, 1320]
+          pO2_mbar_default: 9.0
+          p_total_mbar_default: 9.0
+          duration_h: [0.5, 2.5]
+        C2A_staged:
+          temp_range_C: [1250, 1750]
+          default_hold_T_C: 1750
+          p_total_mbar: [5, 15]
+          p_total_mbar_default: 10.0
+          na_shuttle_stage:
+            ramp_rate_C_per_hr: 600
+            duration_h: 3

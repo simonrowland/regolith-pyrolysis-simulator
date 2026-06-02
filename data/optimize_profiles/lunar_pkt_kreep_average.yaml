@@ -1,0 +1,38 @@
+profile_id: lunar-pkt-kreep-average-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_pkt_kreep_average
+description: Average PKT KREEP; add P cleanup before balanced mare-style extraction.
+north_star_rationale: KREEP needs Stage-0 P cleanup before it behaves like clean mare basalt for O2, metals, glass, and refractory rump.
+objective_emphasis: Cleanup-biased balanced O2/metals/glass profile.
+objectives:
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.30, rationale: oxidizer after cleanup}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.24, rationale: metal ingot proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.20, rationale: silica glass product}
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.12, rationale: stored O2 preference}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.08, rationale: cleanup cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: extra hold penalty}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: pkt-kreep-p-cleanup-path-a-seed
+    source_campaigns: [C0b_p_cleanup, C2A_continuous]
+    rationale: Use setpoints P cleanup followed by Path A co-extraction.
+    patch:
+      campaigns:
+        C0b_p_cleanup:
+          temp_range_C: [1180, 1320]
+          pO2_mbar: [3.0, 15.0]
+          pO2_mbar_default: 9.0
+          p_total_mbar_default: 9.0
+          duration_h: [0.5, 2.5]
+        C2A_continuous:
+          temp_range_C: [1050, 1600]
+          p_total_mbar_default: 10.0
+          duration_h: [18, 28]

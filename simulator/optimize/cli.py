@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 from typing import Sequence
 
+from simulator.optimize.profiles import ProfileValidationError, load_profile
 from simulator.optimize.study import (
     DEFAULT_PROFILE_NAME,
     DEFAULT_PROFILES,
@@ -21,8 +22,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
     try:
+        profile = _resolve_profile_arg(args.profile, parser)
         result = run(
-            profile=args.profile,
+            profile=profile,
             feedstock=args.feedstock,
             strategy=args.strategy,
             fidelity=args.fidelity,
@@ -31,7 +33,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             out_dir=args.out,
             seed=args.seed,
         )
-    except (OSError, StudyError, TypeError, ValueError) as exc:
+    except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         parser.exit(2, f"error: {exc}\n")
     print(f"out_dir: {result.out_dir}")
     print(f"winner: {result.winner.candidate_id}")
@@ -48,8 +50,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--profile",
         default=DEFAULT_PROFILE_NAME,
-        choices=tuple(sorted(DEFAULT_PROFILES)),
-        help="objective profile name",
+        help="built-in profile name, feedstock profile id, or YAML profile path",
     )
     parser.add_argument(
         "--strategy",
@@ -68,6 +69,21 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--out", type=Path, default=None, help="artifact output directory")
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
     return parser
+
+
+def _resolve_profile_arg(profile: str, parser: argparse.ArgumentParser):
+    if profile in DEFAULT_PROFILES:
+        return profile
+    try:
+        return load_profile(profile)
+    except ProfileValidationError as exc:
+        profile_path = Path(profile)
+        if not profile_path.exists() and profile_path.suffix not in {".yaml", ".yml"}:
+            parser.exit(
+                2,
+                f"error: argument --profile: invalid choice: {profile!r}\n",
+            )
+        raise exc
 
 
 def _positive_int(value: str) -> int:

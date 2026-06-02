@@ -1,0 +1,32 @@
+profile_id: v-type-vesta-hed-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: v_type_vesta_hed
+description: Vesta HED basalt; highland-like ceramics with more Fe.
+north_star_rationale: V-type material should search between highland ceramics and mare Fe/O2 yield.
+objective_emphasis: Glass/ceramic plus Fe/O2 balance.
+objectives:
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.30, rationale: CMAS glass and ceramic precursor}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.30, rationale: higher Fe than highland}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: process energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: vesta-path-b-ceramic-seed
+    source_campaign: C2B
+    rationale: Use Path B from setpoints to preserve CMAS glass while extracting Fe.
+    patch:
+      campaigns:
+        C2B:
+          temp_range_C: [1320, 1480]
+          pO2_mbar: [0.8, 2.3]
+          pO2_mbar_default: 1.5
+          p_total_mbar_default: 1.5

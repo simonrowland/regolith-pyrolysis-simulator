@@ -1,0 +1,30 @@
+profile_id: comet-nucleus-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: comet_nucleus
+description: Jupiter-family comet nucleus; extreme volatile cleanup before silicate extraction.
+north_star_rationale: Comet profiles must heavily penalize energy/time while preserving O2 and metal/glass proxies after supervolatile cleanup.
+objective_emphasis: Extreme Stage-0 volatile cleanup profile.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.28, rationale: stored oxidizer after cleanup}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.22, rationale: CI-like metal proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: silicate glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.20, rationale: supervolatile process cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.16, rationale: long cleanup risk}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: comet-extreme-c0-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints C0 bakeoff as the allowed base for staged volatile cleanup.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

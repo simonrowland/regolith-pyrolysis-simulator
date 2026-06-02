@@ -1,0 +1,33 @@
+profile_id: lunar-highland-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_highland
+description: Al-rich anorthosite; emphasize ceramic/glass and Al-metal proxy.
+north_star_rationale: Highland feed is not Fe-rich; search should preserve glass/ceramic value and use C6 as the Al-metal proxy path.
+objective_emphasis: Glass plus metal proxy for Al-rich highland material.
+objectives:
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.32, rationale: glass/ceramic precursor proxy}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Al/metal ingot proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: anorthosite energy penalty}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: highland-al-thermite-seed
+    source_campaign: C6
+    rationale: Use the setpoints Mg thermite hold as the high-Al warm start.
+    patch:
+      campaigns:
+        C6:
+          temp_range_C: [1450, 1550]
+          default_hold_T_C: 1500
+          pO2_mbar: [0.08, 0.35]
+          pO2_mbar_default: 0.2
+          p_total_mbar_default: 0.2

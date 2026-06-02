@@ -1,0 +1,30 @@
+profile_id: ceres-regolith-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: ceres_regolith
+description: Ceres regolith; water/NH3/salts cleanup before Mg/O2 extraction.
+north_star_rationale: Ceres value starts with volatile cleanup, but the optimizer vocabulary can only steer the post-cleanup silicate extraction products.
+objective_emphasis: Cleanup-heavy volatile body profile with Mg/O2 proxy.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Mg shuttle metal proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: silicate glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: extended degassing energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.14, rationale: long staged cleanup}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: ceres-volatile-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints C0 bakeoff as the volatile-removal base recipe.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

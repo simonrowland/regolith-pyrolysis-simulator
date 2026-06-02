@@ -1,0 +1,30 @@
+profile_id: mars-perchlorate-rich-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: mars_perchlorate_rich
+description: Perchlorate-rich Mars soil; early O2 and halide cleanup.
+north_star_rationale: Perchlorate feed can produce early O2 but must keep halide cleanup from poisoning the furnace and condenser train.
+objective_emphasis: O2-heavy perchlorate cleanup profile.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.44, rationale: early perchlorate-derived O2 potential}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.18, rationale: metal product proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: cleanup energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: low-T cleanup time}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mars-perchlorate-c0-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints C0 bakeoff as the allowed perchlorate cleanup warm start.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

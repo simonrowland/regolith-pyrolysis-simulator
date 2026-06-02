@@ -1,0 +1,30 @@
+profile_id: m-type-metallic-phase-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: m_type_metallic_phase
+description: Metallic asteroid phase; direct metal tapping proxy.
+north_star_rationale: M-type metal is already ingot feed; objective is maximum metal with minimum heat/time, not O2 or glass.
+objective_emphasis: Direct metal production.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.70, rationale: direct Fe-Ni-Co metal phase}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.20, rationale: tapping energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: short melt/tap campaign}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: m-type-metal-tap-proxy-seed
+    source_campaign: C2B
+    rationale: Use the setpoints Fe pO2-managed window as the closest allowed metal-tap proxy.
+    patch:
+      campaigns:
+        C2B:
+          temp_range_C: [1320, 1480]
+          pO2_mbar: [0.8, 2.3]
+          pO2_mbar_default: 1.5
+          p_total_mbar_default: 1.5

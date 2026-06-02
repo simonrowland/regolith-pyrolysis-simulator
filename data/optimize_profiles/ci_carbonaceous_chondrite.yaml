@@ -1,0 +1,30 @@
+profile_id: ci-carbonaceous-chondrite-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: ci_carbonaceous_chondrite
+description: CI carbonaceous chondrite; volatile cleanup before metal/O2/glass search.
+north_star_rationale: CI's high water and organics make Stage-0 cleanup mandatory before the silicate extraction objective makes sense.
+objective_emphasis: Cleanup-heavy carbonaceous profile; water is outside objective vocabulary.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 after volatile cleanup}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Fe-Ni alloy proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.16, rationale: silicate glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: degassing thermal cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.12, rationale: long cleanup penalty}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: ci-carbonaceous-c0-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints vacuum bakeoff as the volatile cleanup warm start.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

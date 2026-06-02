@@ -1,0 +1,30 @@
+profile_id: cm-carbonaceous-chondrite-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: cm_carbonaceous_chondrite
+description: CM carbonaceous chondrite; moderate volatile cleanup plus metal/O2/glass.
+north_star_rationale: CM is less hydrated than CI but still needs carbonaceous cleanup before clean silicate extraction.
+objective_emphasis: Moderate cleanup-heavy carbonaceous profile.
+objectives:
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: metal alloy proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.18, rationale: glass co-product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: cleanup energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.12, rationale: cleanup duration}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: cm-carbonaceous-c0-cleanup-seed
+    source_campaign: C0
+    rationale: Use setpoints C0 bakeoff for carbonaceous volatile cleanup.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50

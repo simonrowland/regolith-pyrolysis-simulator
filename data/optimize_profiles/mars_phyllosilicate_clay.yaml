@@ -1,0 +1,35 @@
+profile_id: mars-phyllosilicate-clay-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: mars_phyllosilicate_clay
+description: Hydrated Al-rich Mars clay; water cleanup and ceramic/Al proxy.
+north_star_rationale: Clay's bound water and Al-rich melt make glass/ceramic and Al-metal proxies more important than Fe-only extraction.
+objective_emphasis: Al/glass proxy plus stored O2 after dehydroxylation.
+objectives:
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.30, rationale: ceramic/glass precursor}
+  - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.28, rationale: stored O2 product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.22, rationale: Al/metal proxy}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.12, rationale: dehydroxylation energy}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.08, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mars-clay-al-thermite-seed
+    source_campaigns: [C0, C6]
+    rationale: Use C0 dehydroxylation cleanup plus C6 Al thermite setpoints.
+    patch:
+      campaigns:
+        C0:
+          temp_range_C: [20, 950]
+          dT_dt_C_per_hr: 50
+        C6:
+          temp_range_C: [1450, 1550]
+          default_hold_T_C: 1500
+          pO2_mbar_default: 0.2
+          p_total_mbar_default: 0.2

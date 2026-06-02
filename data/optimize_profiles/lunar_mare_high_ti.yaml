@@ -1,0 +1,32 @@
+profile_id: lunar-mare-high-ti-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_mare_high_ti
+description: Ti-rich mare basalt; bias toward metal recovery while keeping O2 and glass useful.
+north_star_rationale: High-Ti mare should search toward metal-rich products without sacrificing O2 storage or glass capture.
+objective_emphasis: Metal-heavy mare profile with Ti-bearing metal proxy.
+objectives:
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.36, rationale: Fe/Ti-bearing metal proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.26, rationale: oxidizer output}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.16, rationale: glass co-product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: MRE backpressure cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.08, rationale: campaign time}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mare-high-ti-mre-seed
+    source_campaign: C5
+    rationale: Use the setpoints limited-MRE backpressure window for Ti-rich ilmenite basalt.
+    patch:
+      campaigns:
+        C5:
+          temp_range_C: [1500, 1650]
+          pO2_bar: [0.01, 0.1]
+          pO2_mbar_default: 50.0
+          p_total_mbar_default: 50.0
