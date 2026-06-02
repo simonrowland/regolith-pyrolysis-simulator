@@ -37,6 +37,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
 from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
+from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import (
@@ -76,11 +77,13 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
             {
                 "profile_id": "phase-o-default",
                 "profile_schema_version": "profile-schema-v1",
-                "objectives": (
-                    {"metric": "oxygen_kg", "sense": "maximize", "units": "kg"},
-                    {"metric": "energy_kWh", "sense": "minimize", "units": "kWh"},
-                    {"metric": "duration_h", "sense": "minimize", "units": "h"},
-                ),
+                "feedstock": "lunar_mare_low_ti",
+                "objectives": [
+                    {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.5},
+                    {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.25},
+                    {"metric": "duration_h", "sense": "minimize", "units": "h", "weight": 0.25},
+                ],
+                "constraints": {"gates": ["delivered_stream_purity"]},
                 "run": {
                     "campaign": "C0",
                     "hours": 1,
@@ -94,6 +97,17 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
                     "high": {"backend_name": "stub", "hours": 1},
                     "auto": {"backend_name": "stub", "hours": 1},
                 },
+                "seed_recipes": [
+                    {
+                        "id": "phase-o-default-c0-seed",
+                        "source_campaign": "C0",
+                        "patch": {
+                            "campaigns": {
+                                "C0": {"temp_range_C": (900, 950)},
+                            }
+                        },
+                    },
+                ],
             }
         )
     }
@@ -233,7 +247,11 @@ def run(
         out_dir=out_dir,
         seed=seed,
     )
-    resolved_profile = resolve_profile(config.profile)
+    resolved_profile = resolve_profile(
+        config.profile,
+        expected_feedstock=config.feedstock,
+        schema=active_schema,
+    )
     definitions = objective_definitions(resolved_profile)
     _validate_inputs(config, resolved_profile)
     active_constraints = (
@@ -381,15 +399,33 @@ def run(
     )
 
 
-def resolve_profile(profile: str | Mapping[str, Any]) -> Mapping[str, Any]:
+def resolve_profile(
+    profile: str | Mapping[str, Any],
+    *,
+    expected_feedstock: str | None = None,
+    schema: RecipeSchema | None = None,
+) -> Mapping[str, Any]:
     if isinstance(profile, str):
         try:
-            return MappingProxyType(dict(DEFAULT_PROFILES[profile]))
+            resolved = dict(DEFAULT_PROFILES[profile])
         except KeyError as exc:
             raise ValueError(f"unknown profile {profile!r}") from exc
+        if expected_feedstock is not None:
+            resolved["feedstock"] = expected_feedstock
+        return validate_profile(
+            resolved,
+            expected_feedstock=expected_feedstock,
+            source=f"<profile:{profile}>",
+            schema=schema,
+        )
     if not isinstance(profile, Mapping):
         raise TypeError("profile must be a profile name or mapping")
-    return MappingProxyType(dict(profile))
+    return validate_profile(
+        profile,
+        expected_feedstock=expected_feedstock,
+        source="<profile>",
+        schema=schema,
+    )
 
 
 def resolve_strategy(

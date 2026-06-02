@@ -31,6 +31,7 @@ from simulator.optimize.physics import (
     GateMargin,
     PhysicsConstraintSet,
 )
+from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
@@ -321,6 +322,12 @@ def _build_eval_inputs(
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
         raise EvaluationInputError(f"unknown feedstock_id {feedstock_id!r}")
+    profile = validate_profile(
+        profile,
+        expected_feedstock=feedstock_id,
+        source="<profile>",
+        schema=schema,
+    )
     feedstock = bundle.feedstocks[feedstock_id]
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)

@@ -24,11 +24,21 @@ from simulator.optimize.results_store import ResultStore
 PROFILE = {
     "profile_id": "study-test",
     "profile_schema_version": "profile-schema-v1",
+    "feedstock": "lunar_mare_low_ti",
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg"},
-        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh"},
+        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.6},
+        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.4},
     ],
+    "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
+    "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+    "seed_recipes": [
+        {
+            "id": "study-c0-seed",
+            "source_campaign": "C0",
+            "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+        }
+    ],
 }
 FEEDSTOCK = "lunar_mare_low_ti"
 

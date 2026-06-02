@@ -40,6 +40,10 @@ class StagedBeamStateError(StagedStrategyError):
     """Raised when staged beam state is corrupt or empty."""
 
 
+class StagedAllowlistError(StagedBeamStateError):
+    """Raised when staged allowlist names an unsupported stage."""
+
+
 @dataclass(frozen=True)
 class _BeamNode:
     patch: RecipePatch
@@ -83,6 +87,7 @@ _PATH_AB_CHOICES = ("A", "A_staged", "B")
 _BRANCH_CHOICES = ("two", "one")
 _C6_CHOICES = (True, False)
 _DEFAULT_TOPOLOGY = TopologyChoice()
+_TOPOLOGY_MAPPING_KEYS = frozenset({"id", "path", "path_ab", "branch", "c6"})
 _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "C0": ("stage0", "feed", "raw", "drying", "volatile"),
@@ -798,6 +803,17 @@ def _stage_specs(
     if stage_filter is None:
         order = [stage_id for stage_id in topology_path if stage_id in grouped]
     else:
+        unknown = sorted(set(stage_filter) - set(grouped))
+        if unknown:
+            raise StagedAllowlistError(
+                "unknown staged allowlist stage: " + ", ".join(unknown)
+            )
+        unreachable = sorted(set(stage_filter) - set(topology_path))
+        if unreachable:
+            raise StagedAllowlistError(
+                f"staged allowlist stage unreachable for topology {topology.id}: "
+                + ", ".join(unreachable)
+            )
         allowed = set(stage_filter)
         order = [
             stage_id
@@ -922,12 +938,29 @@ def _coerce_topology(value: Any) -> TopologyChoice:
             return TopologyChoice(path_ab=path_ab, branch=branch, c6=c6)
         raise ValueError(f"unknown topology {value!r}")
     if isinstance(value, Mapping):
+        unknown = sorted(set(value) - _TOPOLOGY_MAPPING_KEYS)
+        if unknown:
+            raise ValueError("unknown topology key: " + ", ".join(repr(key) for key in unknown))
         if "id" in value and len(value) == 1:
             return _coerce_topology(value["id"])
+        if "id" in value:
+            raise ValueError("topology id mapping cannot include other keys")
+        path_keys = {"path", "path_ab"} & set(value)
+        if len(path_keys) > 1:
+            raise ValueError("topology mapping must use path or path_ab, not both")
+        missing = []
+        if not path_keys:
+            missing.append("path_ab")
+        missing.extend(key for key in ("branch", "c6") if key not in value)
+        if missing:
+            raise ValueError(
+                "topology mapping missing required keys: " + ", ".join(missing)
+            )
+        path_key = "path_ab" if "path_ab" in value else "path"
         return TopologyChoice(
-            path_ab=_normalize_path_ab(value.get("path_ab", value.get("path", "A"))),
-            branch=_normalize_branch(value.get("branch", "two")),
-            c6=_normalize_c6(value.get("c6", True)),
+            path_ab=_normalize_path_ab(value[path_key]),
+            branch=_normalize_branch(value["branch"]),
+            c6=_normalize_c6(value["c6"]),
         )
     raise TypeError("topology must be a TopologyChoice, mapping, or id string")
 

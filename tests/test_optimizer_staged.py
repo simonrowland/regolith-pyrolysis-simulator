@@ -21,7 +21,11 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
-from simulator.optimize.strategy.staged import TopologyChoice, enumerate_topologies
+from simulator.optimize.strategy.staged import (
+    StagedAllowlistError,
+    TopologyChoice,
+    enumerate_topologies,
+)
 from simulator.optimize.strategy import (
     Candidate,
     StagedBeamStateError,
@@ -37,12 +41,21 @@ FEEDSTOCK = "lunar_mare_low_ti"
 PROFILE = {
     "profile_id": "staged-test",
     "profile_schema_version": "profile-schema-v1",
+    "feedstock": FEEDSTOCK,
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg"},
-        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh"},
+        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.6},
+        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.4},
     ],
+    "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
     "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+    "seed_recipes": [
+        {
+            "id": "staged-c0-seed",
+            "source_campaign": "C0",
+            "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+        }
+    ],
     "staged": {
         "beam_width": 1,
         "children_per_parent": 2,
@@ -211,7 +224,7 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
         FEEDSTOCK,
         "stub",
         profile=PROFILE,
-        candidate_id="staged-prefix-independent",
+        candidate_id=cached.candidate_id,
     )
     fresh = replace(fresh, eval_spec=prefix_spec, cache_key=cache_key(prefix_spec))
     fresh = replace(
@@ -735,6 +748,21 @@ def test_staged_single_stage_terminates_and_empty_stage_fails_loud() -> None:
 
     with pytest.raises(StagedBeamStateError):
         StagedStrategy(RecipeSchema(allowlist=()), seed=3, objective_profile=PROFILE)
+
+
+def test_staged_allowlist_unknown_stage_raises_named_error() -> None:
+    profile = {
+        **PROFILE,
+        "staged": {**PROFILE["staged"], "allowlist": ("C0", "NOPE")},
+    }
+
+    with pytest.raises(StagedAllowlistError, match="unknown staged allowlist stage: NOPE"):
+        StagedStrategy(RecipeSchema(), seed=3, objective_profile=profile)
+
+
+def test_topology_mapping_unknown_key_raises() -> None:
+    with pytest.raises(ValueError, match="unknown topology key: 'brnach'"):
+        enumerate_topologies(({"brnach": "one"},))
 
 
 def test_staged_beam_ranker_raises_on_duplicate_cache_key() -> None:

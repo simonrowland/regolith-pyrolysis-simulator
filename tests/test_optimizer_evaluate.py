@@ -15,6 +15,7 @@ from simulator.optimize.evaluate import (
     evaluate,
 )
 from simulator.optimize.objective import objective_definitions
+from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.state import CampaignPhase, HourSnapshot
 
@@ -25,18 +26,28 @@ PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
 PROFILE = {
     "profile_id": "clean-silica-test",
     "profile_schema_version": "profile-schema-v1",
+    "feedstock": "lunar_mare_low_ti",
     "objectives": [
-        {"metric": "pure_silica_glass_kg", "sense": "max", "units": "kg"},
-        {"metric": "oxygen_kg", "sense": "max", "units": "kg"},
-        {"metric": "energy_kWh", "sense": "min", "units": "kWh"},
-        {"metric": "duration_h", "sense": "min", "units": "h"},
+        {"metric": "pure_silica_glass_kg", "sense": "max", "units": "kg", "weight": 0.4},
+        {"metric": "oxygen_kg", "sense": "max", "units": "kg", "weight": 0.3},
+        {"metric": "energy_kWh", "sense": "min", "units": "kWh", "weight": 0.15},
+        {"metric": "duration_h", "sense": "min", "units": "h", "weight": 0.15},
     ],
+    "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {
         "campaign": "C0",
         "hours": 1,
         "mass_kg": 1000.0,
         "backend_name": "stub",
     },
+    "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    "seed_recipes": [
+        {
+            "id": "evaluate-c0-seed",
+            "source_campaign": "C0",
+            "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+        }
+    ],
 }
 
 
@@ -122,6 +133,22 @@ def _trace(*, mixed_stream: bool = False) -> SimpleNamespace:
         condensed_by_stage_species_delta=condensed,
         wall_deposit_by_segment_species_delta=({},),
     )
+
+
+def test_raw_profile_mapping_unknown_key_raises_before_run() -> None:
+    bad_profile = {**PROFILE, "brnach": "one"}
+    executor = FakeExecutor(execution=_execution())
+
+    with pytest.raises(ProfileValidationError, match="unknown profile key 'brnach'"):
+        evaluate(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=bad_profile,
+            executor=executor,
+        )
+
+    assert executor.calls == 0
 
 
 def _execution(

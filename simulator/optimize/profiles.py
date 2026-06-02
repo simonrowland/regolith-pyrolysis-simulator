@@ -52,6 +52,8 @@ _TOP_LEVEL_KEYS = frozenset(
         "fidelities",
         "seed_recipes",
         "early_tap_mode",
+        "staged",
+        "staged_strategy",
     }
 )
 _OBJECTIVE_KEYS = frozenset({"metric", "sense", "units", "weight", "rationale"})

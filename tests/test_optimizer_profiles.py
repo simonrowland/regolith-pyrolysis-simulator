@@ -75,6 +75,24 @@ def test_unknown_profile_key_raises_named_error() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (
+            lambda profile: profile.update({"objectivse": profile["objectives"]}),
+            "unknown profile key",
+        ),
+        (lambda profile: profile.pop("run"), "profile missing required keys: run"),
+    ],
+)
+def test_raw_mapping_profile_resolver_uses_profile_validator(mutation, message: str) -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    mutation(profile)
+
+    with pytest.raises(ProfileValidationError, match=message):
+        study.resolve_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def _profile_copy(feedstock: str) -> dict:
     path = DEFAULT_DATA_DIR / "optimize_profiles" / f"{feedstock}.yaml"
     return copy.deepcopy(yaml.safe_load(path.read_text()))
