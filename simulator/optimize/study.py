@@ -25,6 +25,7 @@ from simulator.optimize.evaluate import (
     _build_eval_inputs,
     evaluate,
 )
+from simulator.optimize.evalspec import PrefixEvalSpec, cache_key
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
@@ -43,6 +44,12 @@ from simulator.optimize.strategy import (
     MorrisScreenStrategy,
     RandomStrategy,
     Strategy,
+)
+from simulator.optimize.strategy.staged import (
+    StagedBeamStateError,
+    StagedStrategy,
+    assert_prefix_replay_equal,
+    make_prefix_eval_spec,
 )
 
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
@@ -236,6 +243,7 @@ def run(
     records: list[StudyRecord] = []
     provenance_path = out / "provenance.jsonl"
     evaluated = 0
+    prefix_replay_cache: dict[str, ScoredResult] = {}
     with provenance_path.open("w", encoding="utf-8") as provenance:
         while evaluated < config.budget:
             batch_size = min(config.parallel, config.budget - evaluated)
@@ -253,6 +261,8 @@ def run(
                 schema=active_schema,
                 constraints=active_constraints,
                 store=store,
+                definitions=definitions,
+                prefix_replay_cache=prefix_replay_cache,
             )
             tell_batch: list[tuple[Candidate, ScoredResult]] = []
             for candidate, scored, cache_hit in results:
@@ -346,7 +356,7 @@ def resolve_strategy(
     if strategy == "screen":
         return MorrisScreenStrategy(schema, seed=seed)
     if strategy == "staged":
-        raise StudyError("staged strategy is O-P5b, not implemented in O-P5a")
+        return StagedStrategy(schema, seed=seed, objective_profile=profile)
     if strategy == "bayes":
         from simulator.optimize.strategy import OptunaTPEStrategy
 
@@ -418,10 +428,28 @@ def _evaluate_candidates(
     schema: RecipeSchema,
     constraints: Any,
     store: ResultStore,
+    definitions: Sequence[ObjectiveDefinition],
+    prefix_replay_cache: dict[str, ScoredResult],
 ) -> tuple[tuple[Candidate, ScoredResult, bool], ...]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
+    staged_prefixes: dict[str, ScoredResult] = {}
     for index, candidate in enumerate(candidates):
+        prefix = _ensure_staged_prefix_replay(
+            candidate,
+            profile=profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            out_dir=out_dir,
+            evaluator=evaluator,
+            schema=schema,
+            constraints=constraints,
+            store=store,
+            definitions=definitions,
+            prefix_replay_cache=prefix_replay_cache,
+        )
+        if prefix is not None:
+            staged_prefixes[candidate.id] = prefix
         cached = _lookup_cached(candidate, profile, feedstock, fidelity, schema, store)
         if cached is None:
             misses.append((index, candidate))
@@ -429,7 +457,7 @@ def _evaluate_candidates(
             results[index] = (candidate, cached, True)
 
     if misses:
-        if parallel == 1:
+        if parallel == 1 or any(_is_staged_candidate(candidate) for _, candidate in misses):
             for index, candidate in misses:
                 scored = _evaluate_one(
                     candidate,
@@ -440,6 +468,7 @@ def _evaluate_candidates(
                     evaluator=evaluator,
                     schema=schema,
                     constraints=constraints,
+                    staged_prefix=staged_prefixes.get(candidate.id),
                 )
                 results[index] = (candidate, scored, False)
         else:
@@ -472,6 +501,170 @@ def _evaluate_candidates(
     return completed
 
 
+def _ensure_staged_prefix_replay(
+    candidate: Candidate,
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    out_dir: Path,
+    evaluator: EvaluateFn,
+    schema: RecipeSchema,
+    constraints: Any,
+    store: ResultStore,
+    definitions: Sequence[ObjectiveDefinition],
+    prefix_replay_cache: dict[str, ScoredResult],
+) -> ScoredResult | None:
+    if not _is_staged_candidate(candidate):
+        return None
+    prefix_depth = candidate.metadata.get("prefix_depth", 0)
+    if not isinstance(prefix_depth, int):
+        raise StagedBeamStateError("staged prefix_depth metadata must be an int")
+    if prefix_depth <= 0:
+        return None
+
+    prefix_patch = _prefix_patch_from_metadata(candidate, schema)
+    base_spec, _ = _build_eval_inputs(prefix_patch, feedstock, fidelity, profile, schema)
+    prefix_spec = make_prefix_eval_spec(
+        base_spec,
+        prefix_stage_ids=_string_tuple_metadata(candidate, "prefix_stage_ids"),
+        prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+        topology_id=_topology_id_metadata(candidate),
+    )
+    if not isinstance(prefix_spec, PrefixEvalSpec):
+        raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
+    prefix_key = cache_key(prefix_spec)
+    if prefix_key in prefix_replay_cache:
+        cached = store.lookup(prefix_spec)
+        if cached is None:
+            raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
+        return cached
+
+    cached = store.lookup(prefix_spec)
+    fresh = _evaluate_prefix_one(
+        candidate,
+        prefix_patch,
+        prefix_spec,
+        prefix_key,
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        out_dir=out_dir,
+        evaluator=evaluator,
+        schema=schema,
+        constraints=constraints,
+    )
+    _assert_honest_result(fresh, definitions)
+    light_fresh = _strip_heavy_result(fresh)
+    if cached is None:
+        store.store(
+            prefix_spec,
+            light_fresh,
+            created_at=datetime.now(UTC).isoformat(),
+        )
+        cached = store.lookup(prefix_spec)
+    if cached is None:
+        raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
+    assert_prefix_replay_equal(cached, light_fresh)
+    prefix_replay_cache[prefix_key] = cached
+    return cached
+
+
+def _evaluate_prefix_one(
+    candidate: Candidate,
+    prefix_patch: RecipePatch,
+    prefix_spec: PrefixEvalSpec,
+    prefix_key: str,
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    out_dir: Path,
+    evaluator: EvaluateFn,
+    schema: RecipeSchema,
+    constraints: Any,
+) -> ScoredResult:
+    prefix_id = f"staged-prefix-{prefix_key[:16]}"
+    scored = _call_evaluator(
+        evaluator,
+        prefix_patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=prefix_id,
+        schema=schema,
+        constraints=constraints,
+        output_dir=out_dir / "evals" / candidate.id / "prefix",
+    )
+    if not isinstance(scored, ScoredResult):
+        raise TypeError("evaluator must return ScoredResult")
+    scored = _with_candidate_id(scored, prefix_id)
+    return replace(scored, eval_spec=prefix_spec, cache_key=prefix_key)
+
+
+def _prefix_patch_from_metadata(candidate: Candidate, schema: RecipeSchema) -> RecipePatch:
+    raw = candidate.metadata.get("prefix_patch_values")
+    if not isinstance(raw, Mapping):
+        raise StagedBeamStateError("staged candidate missing prefix_patch_values metadata")
+    values: dict[tuple[str, ...], Any] = {}
+    for raw_path, value in raw.items():
+        if isinstance(raw_path, tuple):
+            path = raw_path
+        elif isinstance(raw_path, list):
+            path = tuple(raw_path)
+        elif isinstance(raw_path, str):
+            path = tuple(raw_path.split("."))
+        else:
+            raise StagedBeamStateError("staged prefix patch path must be tuple/list/str")
+        values[path] = value
+    return RecipePatch(values).validated(schema)
+
+
+def _stage_patch_from_metadata(candidate: Candidate, schema: RecipeSchema) -> RecipePatch | None:
+    raw = candidate.metadata.get("stage_patch_values")
+    if raw is None:
+        return None
+    if not isinstance(raw, Mapping):
+        raise StagedBeamStateError("staged candidate stage_patch_values metadata must be a mapping")
+    values: dict[tuple[str, ...], Any] = {}
+    for raw_path, value in raw.items():
+        if isinstance(raw_path, tuple):
+            path = raw_path
+        elif isinstance(raw_path, list):
+            path = tuple(raw_path)
+        elif isinstance(raw_path, str):
+            path = tuple(raw_path.split("."))
+        else:
+            raise StagedBeamStateError("staged stage patch path must be tuple/list/str")
+        values[path] = value
+    return RecipePatch(values).validated(schema)
+
+
+def _string_tuple_metadata(candidate: Candidate, key: str) -> tuple[str, ...]:
+    raw = candidate.metadata.get(key, ())
+    if not isinstance(raw, Sequence) or isinstance(raw, str):
+        raise StagedBeamStateError(f"staged {key} metadata must be a sequence")
+    values = tuple(raw)
+    if not all(isinstance(value, str) for value in values):
+        raise StagedBeamStateError(f"staged {key} metadata must contain strings")
+    return values
+
+
+def _topology_id_metadata(candidate: Candidate) -> str:
+    topology = candidate.metadata.get("topology")
+    if isinstance(topology, Mapping):
+        topology_id = topology.get("id")
+    else:
+        topology_id = topology
+    if not isinstance(topology_id, str) or not topology_id:
+        raise StagedBeamStateError("staged topology metadata must include id")
+    return topology_id
+
+
+def _is_staged_candidate(candidate: Candidate) -> bool:
+    return candidate.metadata.get("strategy") == "staged"
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -501,11 +694,20 @@ def _evaluate_one(
     evaluator: EvaluateFn,
     schema: RecipeSchema,
     constraints: Any,
+    staged_prefix: ScoredResult | None = None,
 ) -> ScoredResult:
+    stage_patch = _stage_patch_from_metadata(candidate, schema)
+    call_patch = (
+        stage_patch
+        if staged_prefix is not None
+        and stage_patch is not None
+        and _evaluator_accepts_staged_replay(evaluator)
+        else candidate.patch
+    )
     try:
         scored = _call_evaluator(
             evaluator,
-            candidate.patch,
+            call_patch,
             feedstock,
             fidelity,
             profile=profile,
@@ -513,12 +715,35 @@ def _evaluate_one(
             schema=schema,
             constraints=constraints,
             output_dir=out_dir / "evals" / candidate.id,
+            staged_prefix_result=staged_prefix,
+            staged_stage_id=candidate.metadata.get("stage_id"),
+            staged_stage_patch=stage_patch,
         )
     except EvaluationAbort:
         raise
     if not isinstance(scored, ScoredResult):
         raise TypeError("evaluator must return ScoredResult")
-    return _with_candidate_id(scored, candidate.id)
+    scored = _with_candidate_id(scored, candidate.id)
+    if staged_prefix is not None:
+        spec, _ = _build_eval_inputs(
+            candidate.patch.validated(schema),
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+        )
+        scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
+    return scored
+
+
+def _evaluator_accepts_staged_replay(evaluator: EvaluateFn) -> bool:
+    signature = inspect.signature(evaluator)
+    if any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    ):
+        return True
+    return "staged_prefix_result" in signature.parameters
 
 
 def _call_evaluator(

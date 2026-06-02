@@ -645,8 +645,8 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         capture_output=True,
         check=False,
     )
-    assert staged.returncode != 0
-    assert "staged strategy is O-P5b, not implemented in O-P5a" in staged.stderr
+    assert staged.returncode == 0, staged.stdout + staged.stderr
+    assert "strategy: staged->StagedStrategy" in staged.stdout
 
     out_dir = tmp_path / "cli-run"
     good = subprocess.run(

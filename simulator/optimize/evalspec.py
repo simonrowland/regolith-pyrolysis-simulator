@@ -106,6 +106,51 @@ class EvalSpec:
         )
 
 
+@dataclass(frozen=True)
+class PrefixEvalSpec(EvalSpec):
+    prefix_stage_ids: tuple[str, ...] = field(default_factory=tuple)
+    prefix_recipe_ids: tuple[str, ...] = field(default_factory=tuple)
+    topology_id: str = "PATH_AB"
+    eval_spec_type: str = "prefix"
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        object.__setattr__(self, "prefix_stage_ids", _freeze_string_tuple(self.prefix_stage_ids, "prefix_stage_ids"))
+        object.__setattr__(self, "prefix_recipe_ids", _freeze_string_tuple(self.prefix_recipe_ids, "prefix_recipe_ids"))
+        if len(self.prefix_recipe_ids) != len(self.prefix_stage_ids):
+            raise CanonicalizationError("prefix_recipe_ids must match prefix_stage_ids length")
+        if not isinstance(self.topology_id, str) or not self.topology_id:
+            raise CanonicalizationError("topology_id must be a non-empty string")
+        if self.eval_spec_type != "prefix":
+            raise CanonicalizationError("PrefixEvalSpec.eval_spec_type must be 'prefix'")
+
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                self.recipe_id,
+                self.feedstock_recipe_digest,
+                self.feedstock_id,
+                self.profile_id,
+                self.fidelity,
+                self.code_version,
+                _thaw_value(self.data_digests),
+                self.campaign,
+                self.hours,
+                self.mass_kg,
+                _thaw_value(self.additives_kg),
+                self.track,
+                self.backend_name,
+                _thaw_value(self.runtime_campaign_overrides),
+                _thaw_value(self.chemistry_kernel),
+                self.prefix_stage_ids,
+                self.prefix_recipe_ids,
+                self.topology_id,
+                self.eval_spec_type,
+            ),
+        )
+
+
 def current_code_version() -> str:
     return _VERSION_PATH.read_text(encoding="utf-8").strip()
 
@@ -128,6 +173,15 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "runtime_campaign_overrides": spec.runtime_campaign_overrides,
         "track": spec.track,
     }
+    if isinstance(spec, PrefixEvalSpec):
+        payload.update(
+            {
+                "eval_spec_type": spec.eval_spec_type,
+                "prefix_recipe_ids": spec.prefix_recipe_ids,
+                "prefix_stage_ids": spec.prefix_stage_ids,
+                "topology_id": spec.topology_id,
+            }
+        )
     normalized = normalize_canonical_value(payload)
     return canonical_json_dumps(normalized).encode("utf-8")
 
@@ -201,6 +255,15 @@ def _freeze_digest_map(value: Mapping[str, str]) -> Mapping[str, str]:
             raise CanonicalizationError(f"data_digests[{key!r}] must be non-empty")
         frozen[key] = digest
     return MappingProxyType(frozen)
+
+
+def _freeze_string_tuple(value: Any, field_name: str) -> tuple[str, ...]:
+    if isinstance(value, str) or not isinstance(value, (list, tuple)):
+        raise TypeError(f"{field_name} must be a sequence of strings")
+    frozen = tuple(value)
+    if not all(isinstance(item, str) for item in frozen):
+        raise CanonicalizationError(f"{field_name} must contain only strings")
+    return frozen
 
 
 def _freeze_value(value: Any, field_name: str) -> Any:
