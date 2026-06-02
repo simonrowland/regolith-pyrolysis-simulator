@@ -31,6 +31,17 @@ _DATA_DIGESTS = {
 }
 
 
+@pytest.fixture(autouse=True)
+def _restore_thread_env() -> object:
+    snapshot = {name: os.environ.get(name) for name in THREAD_ENV_VARS}
+    yield
+    for name, value in snapshot.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
+
+
 def _patch(value: int) -> RecipePatch:
     return RecipePatch.from_nested({"test": {"value": value}})
 
@@ -393,6 +404,7 @@ def test_pool_single_item_matches_serial_full_view(tmp_path: Path) -> None:
         "fast",
         candidate_id="single",
     )
+    pin_worker_env()
     serial = _fake_evaluate(
         request.patch,
         request.feedstock_id,
