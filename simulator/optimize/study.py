@@ -48,7 +48,9 @@ from simulator.optimize.strategy import (
 from simulator.optimize.strategy.staged import (
     StagedBeamStateError,
     StagedStrategy,
+    TopologyChoice,
     assert_prefix_replay_equal,
+    enumerate_topologies,
     make_prefix_eval_spec,
 )
 
@@ -208,6 +210,7 @@ def run(
     schema: RecipeSchema | None = None,
     result_store: ResultStore | None = None,
     constraints: Any = None,
+    topologies: Sequence[Any] | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
@@ -233,24 +236,53 @@ def run(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = result_store or ResultStore(out / "cache.sqlite")
-    active_strategy = resolve_strategy(
-        config.strategy,
-        profile=resolved_profile,
-        seed=config.seed,
-        schema=active_schema,
-    )
+    requested_topologies = _requested_staged_topologies(resolved_profile, topologies)
+    if requested_topologies is None:
+        active_strategy = resolve_strategy(
+            config.strategy,
+            profile=resolved_profile,
+            seed=config.seed,
+            schema=active_schema,
+        )
+        staged_strategies: tuple[StagedStrategy, ...] = ()
+    else:
+        if not (
+            config.strategy == "staged"
+            or isinstance(config.strategy, StagedStrategy)
+        ):
+            raise ValueError("topologies are only supported for staged strategy")
+        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        staged_strategies = tuple(
+            StagedStrategy(
+                active_schema,
+                seed=config.seed,
+                objective_profile=single_topology_profile,
+                topology=topology,
+            )
+            for topology in requested_topologies
+        )
+        active_strategy = staged_strategies[0]
 
     records: list[StudyRecord] = []
     provenance_path = out / "provenance.jsonl"
     evaluated = 0
+    topology_cursor = 0
     prefix_replay_cache: dict[str, ScoredResult] = {}
     with provenance_path.open("w", encoding="utf-8") as provenance:
         while evaluated < config.budget:
             batch_size = min(config.parallel, config.budget - evaluated)
-            candidates = active_strategy.ask(batch_size)
-            if not candidates and isinstance(active_strategy, StagedStrategy):
-                if active_strategy.run_backward_pass():
-                    candidates = active_strategy.ask(batch_size)
+            owners: dict[str, StagedStrategy] = {}
+            if staged_strategies:
+                candidates, topology_cursor, owners = _ask_staged_topology_candidates(
+                    staged_strategies,
+                    cursor=topology_cursor,
+                    batch_size=batch_size,
+                )
+            else:
+                candidates = active_strategy.ask(batch_size)
+                if not candidates and isinstance(active_strategy, StagedStrategy):
+                    if active_strategy.run_backward_pass() or active_strategy.joint_refine():
+                        candidates = active_strategy.ask(batch_size)
             if not candidates:
                 break
             results = _evaluate_candidates(
@@ -289,7 +321,14 @@ def run(
                     + "\n"
                 )
                 tell_batch.append((candidate, light_scored))
-            active_strategy.tell(tell_batch)
+            if staged_strategies:
+                grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
+                for candidate, scored in tell_batch:
+                    grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
+                for owner, owner_batch in grouped.items():
+                    owner.tell(owner_batch)
+            else:
+                active_strategy.tell(tell_batch)
             evaluated += len(candidates)
 
     feasible = tuple(record for record in records if record.feasible)
@@ -369,6 +408,58 @@ def resolve_strategy(
 
         return OptunaNSGA2Strategy(schema, seed=seed, objective_profile=profile)
     raise ValueError(f"unknown strategy {strategy!r}")
+
+
+def _requested_staged_topologies(
+    profile: Mapping[str, Any],
+    topologies: Sequence[Any] | None,
+) -> tuple[TopologyChoice, ...] | None:
+    if topologies is not None:
+        return enumerate_topologies(topologies)
+    for key in ("staged", "staged_strategy"):
+        options = profile.get(key)
+        if isinstance(options, Mapping) and "topologies" in options:
+            return enumerate_topologies(options["topologies"])
+    return None
+
+
+def _profile_without_staged_topologies(profile: Mapping[str, Any]) -> Mapping[str, Any]:
+    copy: dict[str, Any] = dict(profile)
+    for key in ("staged", "staged_strategy"):
+        options = profile.get(key)
+        if isinstance(options, Mapping):
+            cleaned = dict(options)
+            cleaned.pop("topologies", None)
+            copy[key] = cleaned
+    return MappingProxyType(copy)
+
+
+def _ask_staged_topology_candidates(
+    strategies: Sequence[StagedStrategy],
+    *,
+    cursor: int,
+    batch_size: int,
+) -> tuple[tuple[Candidate, ...], int, dict[str, StagedStrategy]]:
+    if not strategies:
+        return (), cursor, {}
+    candidates: list[Candidate] = []
+    owners: dict[str, StagedStrategy] = {}
+    misses = 0
+    next_cursor = cursor % len(strategies)
+    while len(candidates) < batch_size and misses < len(strategies):
+        strategy = strategies[next_cursor]
+        batch = strategy.ask(1)
+        if not batch and (strategy.run_backward_pass() or strategy.joint_refine()):
+            batch = strategy.ask(1)
+        next_cursor = (next_cursor + 1) % len(strategies)
+        if not batch:
+            misses += 1
+            continue
+        candidate = batch[0]
+        candidates.append(candidate)
+        owners[candidate.id] = strategy
+        misses = 0
+    return tuple(candidates), next_cursor, owners
 
 
 def _constraints_for_profile(profile: Mapping[str, Any]) -> Any:
@@ -684,7 +775,7 @@ def _lookup_cached(
     cached = store.lookup(spec)
     if cached is None:
         return None
-    return _with_candidate_id(cached, candidate.id)
+    return replace(cached, candidate_id=candidate.id)
 
 
 def _evaluate_one(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 import sqlite3
 import subprocess
 import sys
@@ -20,6 +21,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.strategy.staged import TopologyChoice, enumerate_topologies
 from simulator.optimize.strategy import (
     Candidate,
     StagedBeamStateError,
@@ -167,6 +169,17 @@ def _scored(
     )
 
 
+def _record_signature(record: study.StudyRecord) -> tuple[Any, ...]:
+    return (
+        record.candidate_id,
+        record.cache_key,
+        record.feasible,
+        record.status,
+        tuple(sorted(record.objectives.items())),
+        tuple(sorted((key, tuple(sorted(value.items()))) for key, value in record.feasibility_margins.items())),
+    )
+
+
 def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> None:
     store = SpyStore(tmp_path / "cache.sqlite")
     evaluator = SpyEvaluator()
@@ -188,7 +201,7 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     assert any(spec.prefix_stage_ids == ("C0",) for spec in prefix_specs)
     assert evaluator.prefix_calls == 1
     assert store.prefix_hits >= 1
-    assert any(record.candidate_id.startswith("staged-7-01-") for record in result.records)
+    assert any("-01-" in record.candidate_id for record in result.records)
 
     prefix_spec = next(spec for spec in prefix_specs if spec.prefix_stage_ids == ("C0",))
     cached = store.lookup(prefix_spec)
@@ -292,6 +305,122 @@ def test_staged_run_is_deterministic_for_same_seed_feedstock_fidelity(tmp_path) 
     assert [record.cache_key for record in first.records] == [
         record.cache_key for record in second.records
     ]
+    assert [_record_signature(record) for record in first.records] == [
+        _record_signature(record) for record in second.records
+    ]
+    assert [_record_signature(record) for record in first.pareto] == [
+        _record_signature(record) for record in second.pareto
+    ]
+    assert _record_signature(first.winner) == _record_signature(second.winner)
+
+
+def test_c6_topology_changes_stage_path() -> None:
+    profile = {**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 1}}
+    c6_no = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c6=False),
+    )
+    c6_yes = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c6=True),
+    )
+
+    assert len(enumerate_topologies()) == 12
+    assert c6_no.stage_ids != c6_yes.stage_ids
+    assert "C6" not in c6_no.stage_ids
+    assert c6_yes.stage_ids[-1] == "C6"
+
+
+def test_empty_topologies_raise(tmp_path) -> None:
+    with pytest.raises(ValueError, match="at least one topology"):
+        enumerate_topologies(())
+
+    with pytest.raises(ValueError, match="at least one topology"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=1,
+            out_dir=tmp_path,
+            seed=13,
+            evaluator=SpyEvaluator(),
+            topologies=(),
+        )
+
+
+def test_joint_refine_improves_or_refines() -> None:
+    profile = {
+        **PROFILE,
+        "staged": {
+            "beam_width": 1,
+            "children_per_parent": 2,
+            "allowlist": ("C0", "C0b_p_cleanup", "C2A_continuous"),
+            "joint_refine": True,
+            "max_backward_passes": 0,
+        },
+    }
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=23,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c6=True),
+    )
+    while True:
+        candidates = strategy.ask(20)
+        if not candidates:
+            break
+        strategy.tell(
+            [
+                (
+                    candidate,
+                    _scored(
+                        candidate.patch,
+                        candidate_id=candidate.id,
+                        oxygen=20.0,
+                        energy=5.0,
+                    ),
+                )
+                for candidate in candidates
+            ]
+        )
+    parent_patch = strategy._archive[0].node.patch
+    parent_key = strategy._archive[0].scored.cache_key
+
+    assert strategy.joint_refine() is True
+    joint_candidates = strategy.ask(10)
+    assert joint_candidates
+    assert all("-joint-" in candidate.id for candidate in joint_candidates)
+    assert all(
+        candidate.metadata["topology"]["id"] == strategy.topology.id
+        for candidate in joint_candidates
+    )
+    assert all(candidate.metadata["prefix_depth"] > 0 for candidate in joint_candidates)
+    assert any(candidate.patch.values != parent_patch.values for candidate in joint_candidates)
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                _scored(
+                    candidate.patch,
+                    candidate_id=candidate.id,
+                    oxygen=200.0 if "c000001" in candidate.id else 50.0,
+                    energy=1.0 if "c000001" in candidate.id else 4.0,
+                ),
+            )
+            for candidate in joint_candidates
+        ]
+    )
+
+    assert strategy.joint_refines_completed <= strategy.max_joint_refines
+    assert strategy._archive[0].scored.cache_key != parent_key
+    assert "joint-refine" in strategy._archive[0].candidate.metadata["stage_id"]
 
 
 def test_backward_pass_reorders_pareto_with_improving_backward_candidate(tmp_path) -> None:
@@ -606,15 +735,177 @@ def test_staged_rerun_hits_cache_without_duplicating_rows(tmp_path) -> None:
     ]
 
 
+def test_all_infeasible_beam_bounded(tmp_path) -> None:
+    def infeasible_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **_: Any,
+    ) -> ScoredResult:
+        return replace(
+            _scored(patch, feedstock, fidelity, profile, candidate_id=candidate_id),
+            feasible=False,
+            objectives=None,
+            feasibility_margins={
+                "delivered_stream_purity": replace(
+                    _margin(),
+                    feasible=False,
+                    margin=-0.1,
+                    observed=0.9,
+                    detail="finite miss",
+                )
+            },
+        )
+
+    out = tmp_path / "all-infeasible"
+    with pytest.raises(study.StudyNoFeasibleError):
+        study.run(
+            {**PROFILE, "staged": {**PROFILE["staged"], "max_backward_passes": 1}},
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=4,
+            budget=8,
+            out_dir=out,
+            seed=47,
+            evaluator=infeasible_evaluator,
+        )
+
+    assert json.loads((out / "pareto.json").read_text())["pareto"] == []
+    assert (out / "leaderboard.csv").read_text().strip() == "rank,candidate_id,cache_key,is_pareto,is_winner,oxygen_kg,energy_kWh,patch_json"
+    assert not (out / "winner.recipe.yaml").exists()
+
+
+def test_beam_width_1_vs_k(tmp_path) -> None:
+    def scorer(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **_: Any,
+    ) -> ScoredResult:
+        child_penalty = 10.0 * str(candidate_id).count("c000001")
+        child_penalty += 20.0 * str(candidate_id).count("c000002")
+        return _scored(
+            patch,
+            feedstock,
+            fidelity,
+            profile,
+            candidate_id=candidate_id,
+            oxygen=100.0 - child_penalty,
+            energy=2.0 + child_penalty,
+        )
+
+    base_staged = {
+        **PROFILE["staged"],
+        "allowlist": ("C0",),
+        "children_per_parent": 3,
+        "max_backward_passes": 0,
+        "topology": {"path_ab": "A", "branch": "two", "c6": "yes"},
+    }
+    width_one = study.run(
+        {**PROFILE, "staged": {**base_staged, "beam_width": 1}},
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=6,
+        budget=3,
+        out_dir=tmp_path / "width-one",
+        seed=53,
+        evaluator=scorer,
+    )
+    width_k = study.run(
+        {**PROFILE, "staged": {**base_staged, "beam_width": 3}},
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=12,
+        budget=3,
+        out_dir=tmp_path / "width-k",
+        seed=53,
+        evaluator=scorer,
+    )
+
+    assert width_one.winner.patch.values == width_k.leaderboard[0].patch.values
+
+
+def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
+    topologies = enumerate_topologies()
+    store = SpyStore(tmp_path / "topologies.sqlite")
+    one = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=2,
+        budget=2,
+        out_dir=tmp_path / "one",
+        seed=59,
+        evaluator=SpyEvaluator(),
+        result_store=store,
+        topologies=topologies[:1],
+    )
+    all_result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=len(topologies),
+        budget=len(topologies),
+        out_dir=tmp_path / "all",
+        seed=59,
+        evaluator=SpyEvaluator(),
+        result_store=store,
+        topologies=topologies,
+    )
+
+    assert {_topology_id_from_candidate_id(record.candidate_id) for record in one.records} == {
+        topologies[0].id
+    }
+    assert {_topology_id_from_candidate_id(record.candidate_id) for record in all_result.records} == {
+        topology.id for topology in topologies
+    }
+    assert len({record.candidate_id for record in all_result.records}) == len(all_result.records)
+    assert _duplicate_store_cache_keys(store) == []
+
+
+def test_staged_strategy_has_no_op5b3_not_implemented_raises() -> None:
+    import simulator.optimize.strategy.staged as staged_module
+
+    source = staged_module.__loader__.get_source(staged_module.__name__)
+    assert source is not None
+    assert "not implemented until O-P5b3" not in source
+
+
 def _store_row_count(store: ResultStore) -> int:
     with sqlite3.connect(store.path) as conn:
         return int(conn.execute("SELECT COUNT(*) FROM results").fetchone()[0])
 
 
+def _duplicate_store_cache_keys(store: ResultStore) -> list[str]:
+    with sqlite3.connect(store.path) as conn:
+        rows = conn.execute(
+            "SELECT cache_key FROM results GROUP BY cache_key HAVING COUNT(*) > 1"
+        ).fetchall()
+    return [str(row[0]) for row in rows]
+
+
+def _topology_id_from_candidate_id(candidate_id: str) -> str:
+    return candidate_id.split("-")[2]
+
+
 def test_staged_out_of_scope_contracts_fail_loud() -> None:
-    for options in ({"joint_refine": True}, {"topology": "C6"}):
-        with pytest.raises(StagedStrategyError):
-            StagedStrategy(SCHEMA, seed=9, objective_profile={**PROFILE, "staged": options})
+    with pytest.raises(ValueError, match="enable_c6_topology is obsolete"):
+        StagedStrategy(
+            SCHEMA,
+            seed=9,
+            objective_profile={**PROFILE, "staged": {"enable_c6_topology": True}},
+        )
 
     strategy = StagedStrategy(
         SCHEMA,
@@ -622,10 +913,10 @@ def test_staged_out_of_scope_contracts_fail_loud() -> None:
         objective_profile={**PROFILE, "staged": {"max_backward_passes": 1}},
     )
     assert strategy.run_backward_pass() is False
-    with pytest.raises(StagedStrategyError):
-        strategy.joint_refine()
-    with pytest.raises(StagedStrategyError):
-        strategy.enumerate_c6_topology()
+    assert strategy.joint_refine() is False
+    c6_no, c6_yes = strategy.enumerate_c6_topology()
+    assert c6_no.c6 is False
+    assert c6_yes.c6 is True
 
 
 def test_staged_result_honesty_and_light_results(tmp_path) -> None:
