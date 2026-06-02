@@ -31,11 +31,13 @@ import os
 import re
 import subprocess
 import tempfile
+import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import MeltBackend, EquilibriumResult
+from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -123,6 +125,8 @@ class AlphaMELTSBackend(MeltBackend):
         self._pet_payload_preloaded = False
         self._engine_version: Optional[str] = None
         self._vaporock_available = False
+        self._vaporock_helper: Optional[VapoRockBackend] = None
+        self._vaporock_unavailable_logged = False
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
@@ -204,12 +208,31 @@ class AlphaMELTSBackend(MeltBackend):
                 if require_petthermotools:
                     raise self._pet_import_error
 
-        # Try VapoRock
-        try:
-            import VapoRock  # noqa: F401
-            self._vaporock_available = True
-        except ImportError:
-            self._vaporock_available = False
+        # Vapor-side delegate: lazy-init ONE real VapoRockBackend helper
+        # (lowercase ``vaporock`` import lives inside ``VapoRockBackend``).
+        # The helper is the tested adapter — it owns oxide projection, the
+        # log10(bar)->Pa conversion, and the (g)-suffix normalisation — so
+        # alphaMELTS does NOT re-implement any of that.  is_available() is
+        # the real import gate (the old uppercase-module probe never
+        # resolved against the lowercase ``vaporock`` upstream package).  The
+        # INELIGIBLE_ACTIVE_BACKENDS guard only blocks selecting vaporock as
+        # the *active standalone* backend; an internal helper is unaffected.
+        if self._vaporock_helper is None:
+            self._vaporock_helper = VapoRockBackend()
+        with warnings.catch_warnings():
+            # The helper warns once on a missing library; that becomes the
+            # WARN below so we don't double-emit the upstream UserWarning.
+            warnings.simplefilter('ignore', UserWarning)
+            self._vaporock_helper.initialize({})
+        self._vaporock_available = self._vaporock_helper.is_available()
+        if not self._vaporock_available and not self._vaporock_unavailable_logged:
+            warnings.warn(
+                'VapoRock vapor-melt library unavailable; alphaMELTS vapor '
+                'pressures fall back to the activity x pure-component Antoine '
+                'path (vapor_pressures_source reflects the antoine fallback).',
+                stacklevel=2,
+            )
+            self._vaporock_unavailable_logged = True
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
@@ -771,9 +794,16 @@ class AlphaMELTSBackend(MeltBackend):
             )
             status = 'ok' if payload.phases_present else 'not_converged'
             if self._vaporock_available:
-                vapor_pressures = self._get_vaporock_pressures(
-                    temperature_C, comp_wt, fO2_log)
-                vapor_pressure_source = 'vaporock'
+                vapor_pressures, vapor_pressure_source = (
+                    self._vapor_pressures_via_vaporock_or_antoine(
+                        T_C=temperature_C,
+                        solved_melt_wt_pct=payload.liquid_composition_wt_pct,
+                        fallback_comp_wt=comp_wt,
+                        fO2_log=fO2_log,
+                        pressure_bar=pressure_bar,
+                        activities=payload.activity_coefficients,
+                    )
+                )
             else:
                 vapor_pressures = self._activities_times_antoine(
                     temperature_C,
@@ -842,11 +872,20 @@ class AlphaMELTSBackend(MeltBackend):
                 warnings=warnings,
             )
 
-            # Vapor pressures via VapoRock if available
+            # Vapor pressures via the real VapoRock helper if available,
+            # fed the SOLVED equilibrium liquid composition (not the
+            # pre-equilibrium input); explicit Antoine fallback otherwise.
             if self._vaporock_available:
-                eq.vapor_pressures_Pa = self._get_vaporock_pressures(
-                    temperature_C, comp_wt, fO2_log)
-                source = 'vaporock'
+                eq.vapor_pressures_Pa, source = (
+                    self._vapor_pressures_via_vaporock_or_antoine(
+                        T_C=temperature_C,
+                        solved_melt_wt_pct=eq.liquid_composition_wt_pct,
+                        fallback_comp_wt=comp_wt,
+                        fO2_log=fO2_log,
+                        pressure_bar=pressure_bar,
+                        activities=eq.activity_coefficients,
+                    )
+                )
             else:
                 # Use activity × pure-component Antoine only when the
                 # chemical-potential convention supplied real activities.
@@ -1540,34 +1579,99 @@ class AlphaMELTSBackend(MeltBackend):
     # Vapor pressure helpers
     # ------------------------------------------------------------------
 
-    def _get_vaporock_pressures(self, T_C: float, comp_wt: dict,
-                                 fO2_log: float) -> Dict[str, float]:
+    def _vapor_pressures_via_vaporock_or_antoine(
+        self,
+        *,
+        T_C: float,
+        solved_melt_wt_pct: Mapping[str, float],
+        fallback_comp_wt: Mapping[str, float],
+        fO2_log: float,
+        pressure_bar: float,
+        activities: Mapping[str, float],
+    ) -> tuple[Dict[str, float], str]:
         """
-        Get vapor pressures from VapoRock.
+        Vapor partial pressures (Pa) for the post-equilibrium melt.
 
-        VapoRock calculates equilibrium vapor speciation over
-        silicate melts using MELTS thermodynamics + JANAF tables.
-        Returns partial pressures for ~34 vapor species.
+        Delegates to the real, tested ``VapoRockBackend`` helper —
+        alphaMELTS does NOT re-implement oxide projection, the K /
+        log10(bar)->Pa conversion, or the ``(g)``-suffix normalisation.
+        The helper's ``EquilibriumResult.vapor_pressures_Pa`` is ALREADY
+        in Pa; it is returned as-is (no second bar->Pa scale, no routing
+        through any normalizer — a stray 1e5 here silently inflates the
+        Hertz-Knudsen evaporation flux).
+
+        fO2 convention: the simulator's ``fO2_log`` is absolute
+        log10(fO2/bar) (``core.py::_compute_intrinsic_melt_fO2``), and
+        VapoRock's ``System.eval_gas_abundances(T_K, logfO2)`` consumes
+        the same absolute log10(fO2/bar).  No buffer/offset conversion is
+        applied — the alphaMELTS ``fO2_buffer``/``fO2_offset`` are a
+        SEPARATE config input to the MELTS silicate solve, not this
+        absolute quantity, and are deliberately NOT forwarded here.
+
+        The melt fed to VapoRock is the composition alphaMELTS SOLVED
+        (the equilibrium liquid), not the pre-equilibrium input; the
+        pre-equilibrium ``comp_wt`` is a fallback only if the solver
+        returned no liquid composition.
+
+        Returns ``(pressures_Pa, source_label)``.  FAIL-LOUD: never
+        returns an empty dict to the caller (an empty dict zeroes
+        evaporation flux).  On any non-``ok`` VapoRock outcome it logs a
+        WARN and explicitly calls the Antoine fallback; a genuine library
+        exception is re-raised as a labelled ``RuntimeError``.
         """
-        try:
-            import VapoRock
+        # Composition alphaMELTS actually solved, projected to the
+        # VapoRock helper by the canonical oxide names it filters on.
+        # wt% are relative masses, so handing them in as composition_kg
+        # is identical to real kg (project_melt_to_oxide_wt_pct
+        # renormalises to 100%); no separate mol path is needed.
+        melt_wt = {
+            str(oxide): float(value)
+            for oxide, value in (solved_melt_wt_pct or {}).items()
+            if self._is_number(value) and float(value) > 0.0
+        }
+        if not melt_wt:
+            melt_wt = {
+                str(oxide): float(value)
+                for oxide, value in (fallback_comp_wt or {}).items()
+                if self._is_number(value) and float(value) > 0.0
+            }
 
-            # VapoRock API (simplified — actual API may differ)
-            result = VapoRock.calc_vapor(
-                composition=comp_wt,
-                temperature_C=T_C,
-                fO2_log=fO2_log,
+        helper = self._vaporock_helper
+        if helper is None or not helper.is_available():
+            return (
+                self._activities_times_antoine(T_C, dict(activities), dict(melt_wt)),
+                'antoine_fallback_from_vaporock',
             )
 
-            # Convert to Pa
-            pressures = {}
-            for species, p_bar in result.items():
-                pressures[species] = p_bar * 1e5  # bar → Pa
+        try:
+            result = helper.equilibrate(
+                temperature_C=float(T_C),
+                composition_kg=melt_wt,
+                fO2_log=float(fO2_log),
+                pressure_bar=float(pressure_bar),
+            )
+        except Exception as exc:  # noqa: BLE001 - re-raised labelled below
+            raise RuntimeError(
+                f'VapoRock vapor bridge failed: {exc}'
+            ) from exc
 
-            return pressures
+        pressures = dict(result.vapor_pressures_Pa or {})
+        if result.status != 'ok' or not pressures:
+            detail = '; '.join(result.warnings) if result.warnings else (
+                f'status={result.status}, empty vapor_pressures_Pa')
+            warnings.warn(
+                'VapoRock returned no usable vapor pressures '
+                f'({detail}); using activity x pure-component Antoine '
+                'fallback.',
+                stacklevel=2,
+            )
+            return (
+                self._activities_times_antoine(T_C, dict(activities), dict(melt_wt)),
+                'antoine_fallback_from_vaporock',
+            )
 
-        except Exception:
-            return {}
+        # ALREADY Pa — do not re-scale, do not normalize.
+        return pressures, 'vaporock'
 
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,

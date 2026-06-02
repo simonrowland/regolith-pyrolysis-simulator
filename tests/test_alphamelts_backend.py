@@ -749,3 +749,209 @@ def test_petthermotools_result_parser_marks_status_ok():
     )
 
     assert result.status == 'ok'
+
+
+# ----------------------------------------------------------------------
+# VapoRock vapor-bridge: alphaMELTS delegates to the real VapoRockBackend
+# helper for vapor pressures (no re-implemented stub). Tests below mock
+# the helper's EquilibriumResult so they do not need a live alphaMELTS or
+# the upstream library; the live numbers are validated separately in the
+# vaporock backend test + the manual physics-sanity check.
+# ----------------------------------------------------------------------
+
+
+def _vaporock_helper_returning(pressures, status='ok'):
+    """A stand-in VapoRockBackend whose equilibrate() returns a known result."""
+    class _Helper:
+        def __init__(self):
+            self.calls = []
+
+        def is_available(self):
+            return True
+
+        def equilibrate(self, *, temperature_C, composition_kg,
+                        fO2_log, pressure_bar):
+            self.calls.append({
+                'temperature_C': temperature_C,
+                'composition_kg': dict(composition_kg),
+                'fO2_log': fO2_log,
+                'pressure_bar': pressure_bar,
+            })
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status=status,
+                vapor_pressures_Pa=dict(pressures),
+            )
+    return _Helper()
+
+
+def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+    helper = _vaporock_helper_returning({'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57})
+    backend._vaporock_helper = helper
+
+    solved = {'SiO2': 45.0, 'FeO': 18.0, 'Na2O': 0.4}
+    pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct=solved,
+        fallback_comp_wt={'SiO2': 99.0},  # must NOT be used
+        fO2_log=-7.96,
+        pressure_bar=1e-6,
+        activities={'Na2O': 0.1},
+    )
+
+    # vapor_pressures_Pa is ALREADY Pa -> returned verbatim, no 1e5 rescale.
+    assert source == 'vaporock'
+    assert pressures == {'Na': 11.5, 'SiO': 0.4, 'Fe': 1.57}
+    # The SOLVED equilibrium liquid was fed to VapoRock, not the fallback.
+    assert helper.calls[0]['composition_kg'] == solved
+    # Absolute fO2_log forwarded unchanged (no buffer/offset conversion).
+    assert helper.calls[0]['fO2_log'] == pytest.approx(-7.96)
+
+
+def test_vapor_bridge_falls_back_to_pre_equilibrium_comp_when_no_solved_liquid():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+    helper = _vaporock_helper_returning({'Na': 5.0})
+    backend._vaporock_helper = helper
+
+    pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={},                 # solver returned no liquid
+        fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        activities={},
+    )
+
+    assert source == 'vaporock'
+    assert pressures == {'Na': 5.0}
+    assert helper.calls[0]['composition_kg'] == {'SiO2': 45.0, 'Na2O': 4.0}
+
+
+def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+
+    class _Down:
+        def is_available(self):
+            return False
+
+        def equilibrate(self, **_kw):  # pragma: no cover - must not be called
+            raise AssertionError('unavailable helper must not be called')
+
+    backend._vaporock_helper = _Down()
+
+    # Real activities so the Antoine fallback emits a non-empty dict.
+    pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+        T_C=1600.0,
+        solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        activities={'Na2O': 0.2, 'SiO2': 0.4},
+    )
+
+    assert source == 'antoine_fallback_from_vaporock'
+    # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
+    # would zero the evaporation flux.
+    assert pressures != {}
+    assert 'Na' in pressures and pressures['Na'] > 0.0
+
+
+def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+    # Helper available but returns out_of_domain + empty pressures.
+    backend._vaporock_helper = _vaporock_helper_returning(
+        {}, status='out_of_domain')
+
+    with pytest.warns(UserWarning):
+        pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=1600.0,
+            solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0},
+            fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0},
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+            activities={'Na2O': 0.2},
+        )
+
+    assert source == 'antoine_fallback_from_vaporock'
+    assert pressures != {}  # not a silent zero
+
+
+def test_vapor_bridge_reraises_library_exception_as_labelled_runtime_error():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+
+    class _Boom:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kw):
+            raise ValueError('upstream blew up')
+
+    backend._vaporock_helper = _Boom()
+
+    with pytest.raises(RuntimeError, match='VapoRock vapor bridge failed'):
+        backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=1600.0,
+            solved_melt_wt_pct={'SiO2': 45.0},
+            fallback_comp_wt={'SiO2': 45.0},
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+            activities={},
+        )
+
+
+def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypatch):
+    from engines.alphamelts.thermoengine import ThermoEnginePayload
+
+    solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
+
+    class FakeTransport:
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+            return ThermoEnginePayload(
+                phases_present=('liquid',),
+                phase_masses_kg={'liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(solved_liquid),
+                activity_coefficients={'Na2O': 0.1},
+                fe_redox_split={},
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+    backend._thermoengine_transport = FakeTransport()
+    backend._vaporock_available = True
+    helper = _vaporock_helper_returning({'Na': 9.9, 'SiO': 0.3})
+    backend._vaporock_helper = helper
+
+    eq = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg={'SiO2': 45.0, 'FeO': 18.0, 'MgO': 9.0,
+                        'CaO': 11.0, 'Al2O3': 12.0, 'Na2O': 4.0, 'K2O': 1.0},
+        fO2_log=-7.96,
+        pressure_bar=1e-6,
+    )
+
+    assert eq.vapor_pressures_Pa == {'Na': 9.9, 'SiO': 0.3}
+    assert set(eq.vapor_pressures_source.values()) == {'vaporock'}
+    # The post-equilibrium SOLVED liquid (not the pre-equilibrium input)
+    # is what reached the VapoRock helper.
+    assert helper.calls[0]['composition_kg'] == solved_liquid
+
+
+def test_dead_uppercase_vaporock_stub_is_gone_from_source():
+    import simulator.melt_backend.alphamelts as mod
+
+    src = Path(mod.__file__).read_text()
+    # The never-worked stub: an uppercase-module import statement and the
+    # nonexistent calc_vapor entry point + the old method name.
+    assert 'import VapoRock\n' not in src
+    assert 'VapoRock.calc_vapor' not in src
+    assert 'calc_vapor' not in src
+    assert '_get_vaporock_pressures' not in src
