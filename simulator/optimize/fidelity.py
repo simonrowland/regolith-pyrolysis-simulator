@@ -86,6 +86,8 @@ def run_fidelity_correlation(
         n_samples=n_total,
         seed=doe_spec.seed,
         sampler_name=doe_spec.sampler_name,
+        anchor=doe_spec.anchor,
+        delta_fraction=doe_spec.delta_fraction,
     )
     pairs: list[Pair] = []
     drops: list[Mapping[str, Any]] = []
@@ -130,6 +132,8 @@ def run_fidelity_correlation(
             n_samples=n_total,
             seed=doe_spec.seed,
             sampler_name=doe_spec.sampler_name,
+            anchor=doe_spec.anchor,
+            delta_fraction=doe_spec.delta_fraction,
         ),
         fast_fidelity_name=fast_fidelity_name,
         high_fidelity_name=high_fidelity_name,

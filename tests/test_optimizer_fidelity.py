@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 
@@ -486,3 +487,132 @@ def test_evaluation_abort_reason_uses_failure_category_value() -> None:
     )
 
     assert result.dropped_evaluations[0]["reason"] == "engine_bug"
+
+
+# Env var the patch-recording spy reads to find its sink file. Each
+# run_fidelity_correlation eval runs in a forked/spawned subprocess, so an
+# in-memory sink would never reach the parent; the spy appends every received
+# patch's knob values to this shared-filesystem JSONL file instead.
+_PATCH_SINK_ENV = "PYROLYSIS_TEST_PATCH_SINK"
+
+
+def _patch_recording_spy(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+) -> ScoredResult:
+    """Spy evaluator: record the sampled knob values, no real chemistry.
+
+    Module-level so it survives both fork and spawn process start. Writes the
+    received patch's numeric knob values to the sink file named by
+    ``_PATCH_SINK_ENV`` (one JSON object per eval), then returns a deterministic
+    feasible ScoredResult keyed off the candidate index.
+    """
+
+    del feedstock_id, fidelity, profile
+    sink = os.environ[_PATCH_SINK_ENV]
+    record = {".".join(path): val for path, val in patch.values.items()}
+    with open(sink, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record) + "\n")
+    value = float(_index(candidate_id) // 2)
+    return _result(candidate_id, oxygen_kg=value, energy_kwh=100.0 - value)
+
+
+def _midpoint_anchor(schema: RecipeSchema) -> RecipePatch:
+    """Build an anchor pinning every sampled numeric knob to its bounds midpoint."""
+
+    values: dict[tuple[str, ...], object] = {}
+    for spec in schema.allowlist:
+        if spec.kind == "categorical":
+            assert spec.choices
+            values[spec.path] = spec.choices[0]
+        else:
+            values[spec.path] = (float(spec.low) + float(spec.high)) / 2.0
+    return RecipePatch(values)
+
+
+def _numeric_bands(schema: RecipeSchema, df: float) -> dict[str, tuple[float, float]]:
+    """Per-knob anchored band [center - df*(hi-lo), center + df*(hi-lo)] about the midpoint."""
+
+    bands: dict[str, tuple[float, float]] = {}
+    for spec in schema.allowlist:
+        if spec.kind == "categorical":
+            continue
+        low, high = float(spec.low), float(spec.high)
+        center = (low + high) / 2.0
+        half = df * (high - low)
+        bands[".".join(spec.path)] = (center - half, center + half)
+    return bands
+
+
+def _recorded_values(sink: Path) -> list[dict[str, float]]:
+    return [json.loads(line) for line in sink.read_text().splitlines() if line.strip()]
+
+
+def test_anchor_constrains_sampled_patches_end_to_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Proves DoeSpec(anchor=...) is honored all the way through
+    # run_fidelity_correlation: every sampled numeric knob must land inside the
+    # tight anchored band, and the un-anchored full-range run must escape it.
+    # If anchor/delta_fraction are not forwarded into sample_recipe_patches the
+    # harness full-range samples and the band assertion below fails loudly.
+    schema = _schema()
+    df = 0.05
+    bands = _numeric_bands(schema, df)
+    anchor = _midpoint_anchor(schema)
+
+    anchored_sink = tmp_path / "anchored.jsonl"
+    monkeypatch.setenv(_PATCH_SINK_ENV, str(anchored_sink))
+    run_fidelity_correlation(
+        DoeSpec(
+            schema=schema,
+            n_samples=8,
+            seed=42,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=anchor,
+            delta_fraction=df,
+        ),
+        _patch_recording_spy,
+        _patch_recording_spy,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={},
+        objective_names=("oxygen_kg",),
+    )
+
+    anchored = _recorded_values(anchored_sink)
+    # fast + high fns are the same spy, so each of 8 samples is recorded twice.
+    assert len(anchored) == 16
+    for record in anchored:
+        for knob, (lo, hi) in bands.items():
+            value = float(record[knob])
+            assert lo <= value <= hi, f"{knob} value {value} escaped anchored band [{lo}, {hi}]"
+
+    # Complementary decisive check: full-range (anchor=None) must produce at
+    # least one numeric value OUTSIDE the tight anchored band, proving the band
+    # assertion above is not vacuously satisfied (e.g. by full-range sampling
+    # that happens to be ignored).
+    full_sink = tmp_path / "full.jsonl"
+    monkeypatch.setenv(_PATCH_SINK_ENV, str(full_sink))
+    run_fidelity_correlation(
+        _doe(n_samples=8),
+        _patch_recording_spy,
+        _patch_recording_spy,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={},
+        objective_names=("oxygen_kg",),
+    )
+    full = _recorded_values(full_sink)
+    escaped = any(
+        not (lo <= float(record[knob]) <= hi)
+        for record in full
+        for knob, (lo, hi) in bands.items()
+    )
+    assert escaped, "full-range sampling never escaped the anchored band; test is not decisive"
