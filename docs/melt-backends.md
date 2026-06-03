@@ -1,6 +1,6 @@
 # Melt Chemistry Backends
 
-In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools / AlphaMELTS for `SILICATE_EQUILIBRIUM`, MAGEMin for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION` — is the always-on production path; `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. The pure-Antoine × Ellingham fallback is retained as a documented diagnostic path, gated behind `chemistry_kernel.allow_fallback_vapor: true` and the upstream `vaporock` import being unavailable; without both, the kernel re-raises rather than silently downgrading. FactSAGE / ChemApp remains the only license-gated optional engine.
+In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools / AlphaMELTS for `SILICATE_EQUILIBRIUM`, MAGEMin for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION` — is the always-on production path; `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. The pure-Antoine × Ellingham fallback is retained as a documented diagnostic path, gated behind `chemistry_kernel.allow_fallback_vapor: true` and the upstream `vaporock` import being unavailable; without both, the kernel re-raises rather than silently downgrading. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
 
 ## Per-call result status
 
@@ -12,8 +12,8 @@ In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools
 (see `\goal BACKEND-DEFAULT-SWITCH`, 2026-05-14) is:
 
 1. **AlphaMELTS** is probed first. If `is_available()` (PetThermoTools or the project-local `alphamelts` binary at `engines/alphamelts/run_alphamelts.command`, or `alphamelts` on `PATH`) — selected as the active backend.
-2. **FactSAGE / ChemApp** is probed second under the strict-config gate: `FACTSAGE_CONFIG` must point at a JSON that loads, declares a ChemApp module + `.cst` datafile, and `FactSAGEBackend.initialize()` must return True. Without a strict config FactSAGE stays diagnostic-only and selection drops to the `StubBackend` fallback. The user's explicit `factsage` choice is never silently replaced with a different primary.
-3. **`StubBackend`** is the always-available fallback (built-in Ellingham/Antoine path inside `simulator/core.py`).
+2. **`StubBackend`** is the always-available fallback for `auto` when AlphaMELTS is unavailable (built-in Ellingham/Antoine path inside `simulator/core.py`).
+3. **FactSAGE / ChemApp** is not probed. The adapter was removed/archived; explicit `backend=factsage` is an unknown backend and raises instead of falling through to `auto`.
 
 **`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active `MeltBackend`.** Their honest call sites are now per-intent kernel `ChemistryProvider` registrations (VapoRock authoritative for `VAPOR_PRESSURE` under `\goal VAPOROCK-AUTHORITY-PROMOTION`; MAGEMin shadow for `SILICATE_LIQUIDUS` / `SILICATE_EQUILIBRIUM` under `\goal MAGEMIN-SHADOW-PARITY`), not the active-backend `_get_equilibrium` path. Selecting either as the active `MeltBackend` would still fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and is the canonical home for VapoRock's `VAPOR_PRESSURE` ownership; see the "VapoRock authority promotion (goal #10)" section below.
 
@@ -127,98 +127,6 @@ See `docs-private/chemistry-engine-binding-spec-2026-05-14.md` §4 for the MAGEM
 
 ## FactSAGE / ChemApp
 
-FactSAGE support lives in `simulator/melt_backend/factsage.py`. ChemApp is imported only inside backend initialization, so the repo still imports, runs, and tests without FactSAGE, ChemApp, licenses, or local thermodynamic data.
+FactSAGE / ChemApp support is archived/removed in this checkout. There is no live `simulator/melt_backend/factsage.py`, no `factsage_doctor`, and no supported `FACTSAGE_CONFIG` path.
 
-The simulator does not load bundled FactSAGE databases. A user with a licensed FactSAGE/ChemApp environment should export the needed generally distributed database selection into a ChemApp-readable `.cst` or `.dat` file and point the local config at that file. The configured export determines the backend capabilities; selecting FactSAGE in the UI does not imply whole-regolith coverage.
-
-The adapter targets the ChemApp for Python `chemapp.friendly` API:
-
-1. `ThermochemicalSystem.load(datafile_path)`
-2. `Units.set(P=bar, T=K, A=mol, E=J)`
-3. `EquilibriumCalculation.set_IA_cfs(...)`
-4. `EquilibriumCalculation.set_eq_T(...)`
-5. `EquilibriumCalculation.set_eq_P(...)`
-6. `EquilibriumCalculation.set_eq_AC_pc("GAS", "O2", 10**fO2_log)` unless `control_fO2` is explicitly disabled
-7. `EquilibriumCalculation.calculate_eq(return_result=True)`
-
-### Local Configuration
-
-Create a local JSON config outside version control, then point the web app at it:
-
-```bash
-export FACTSAGE_CONFIG=config/factsage.local.json
-```
-
-`config/factsage.local.json` should be machine-local. Do not commit ChemApp binaries, license files, generated/commercial databases, or absolute paths from a real workstation.
-
-The file may contain:
-
-```json
-{
-    "chemapp_module": "chemapp.friendly",
-    "datafile_path": "config/local-factsage-export.cst",
-    "component_map": {"SiO2": "SiO2", "FeO": "FeO", "Fe2O3": "Fe2O3"},
-    "species_map": {"Na": "Na", "K": "K", "SiO": "SiO"},
-    "phase_map": {"liquid": ["LIQUID", "SLAG"], "gas": ["GAS"]},
-    "amount_unit": "mol",
-    "capabilities": {"silicate_melt": true},
-    "timeout_s": 10
-}
-```
-
-`datafile_path` and `database_path` are aliases for the local ChemApp-readable export. No default absolute path is hard-coded. Mappings are database-specific, so docs snippets are preferred over committed example config files.
-
-Before starting the web app, a FactSAGE user can run:
-
-```bash
-python -m simulator.melt_backend.factsage_doctor --config "$FACTSAGE_CONFIG"
-```
-
-The doctor imports ChemApp, loads the configured data file, initializes the backend, and runs one smoke equilibrium. It does not install software or create generated artifacts.
-
-### Mapping and Units
-
-Simulator input composition is the cleaned silicate melt mol inventory from `AtomLedger`. Kg payloads are only external projections for reports, UI, and legacy helper calls. The FactSAGE/ChemApp adapter defaults to `amount_unit: "mol"` and sends mol amounts directly to ChemApp. If a local export is configured for `kg`, `g`, or `tonne`, the adapter can project the mol inventory into that unit at the boundary, but result parsing still requires species-resolved phase constituents before any mol-to-kg projection is accepted.
-
-Default component mappings cover:
-
-```text
-SiO2 TiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O Cr2O3 MnO P2O5 NiO CoO
-```
-
-Many FactSAGE databases use different phase or constituent names. Override `component_map`, `species_map`, and `phase_map` for the local database. A component map value of `null` disables that simulator oxide; if that oxide is present in a run, the backend raises, marks itself unavailable, and the simulator falls back to the built-in Ellingham/Antoine path for that tick.
-
-Backend capability metadata uses these names:
-
-```text
-silicate_melt gas_volatiles salt_phase sulfide_matte metal_alloy
-```
-
-FactSAGE defaults to `silicate_melt` only. Add capabilities only when the supplied `.cst`/`.dat` export actually supports them. The current `MeltBackend` call still receives cleaned melt oxides only; gas, salt, sulfide, and alloy inventories are preserved in simulator process state for future higher-level chemistry.
-
-The backend returns simulator-facing units:
-
-```text
-temperature_C: Celsius
-pressure_bar: bar
-phase_masses_kg: kg
-liquid_composition_wt_pct: wt%
-vapor_pressures_Pa: Pa
-fO2_log: log10(fO2 / 1 bar)
-```
-
-Gas phase constituent `AC` values are interpreted as fugacity in the active pressure unit and converted from bar to Pa for configured vapor species. Missing vapor species are omitted and recorded in `FactSAGEBackend.warnings`; they are not invented as zero pressures.
-
-ChemApp uses process-global state in the documented friendly API. The adapter serializes the set-conditions/set-composition/calculate/read-result transaction with a process-local lock so concurrent web simulations do not interleave equilibrium inputs.
-
-When FactSAGE/ChemApp is selected in the web UI but ChemApp or the configured data file is unavailable, the existing simulation status line reports that the built-in fallback is active. When it is active, the status line reports the configured export coverage, for example `FactSAGE/ChemApp export active: silicate melt only`.
-
-### Current Limitations
-
-- No local ChemApp/FactSAGE install or data file is included.
-- No local installer or database generator is included.
-- No FactSAGE database export is bundled; users provide local `.cst`/`.dat` files.
-- `timeout_s` is accepted and recorded, but ChemApp runs in-process, so the adapter does not forcibly kill long calculations.
-- Direct log-fO2 control is not exposed by name in the ChemApp docs. The adapter uses gas-phase O2 activity/fugacity control when available.
-- Liquid viscosity is not calculated by FactSAGE here; the default `EquilibriumResult` viscosity remains in use.
-- Phase and constituent naming are database-specific and should be configured for each local FactSAGE data file.
+`backend=factsage` is an explicit unknown backend and raises a backend-selection error. Use `alphamelts`, `stub`, or the web/API `auto` path.

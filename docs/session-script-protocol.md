@@ -33,7 +33,7 @@ quoting via `shlex`, so quoted strings may contain spaces.
 
 ```text
 start --feedstock=<id> [--campaign=<phase>] [--mass-kg=<kg>]
-      [--backend=stub|alphamelts|factsage] [--track=pyrolysis|mre_baseline]
+      [--backend=stub|alphamelts] [--track=pyrolysis|mre_baseline]
       [--additive=SPECIES=KG ...] [--c4-max-temp=<C>]
       [--setpoint=CAMPAIGN.FIELD=VALUE ...]
 advance [N]
@@ -57,6 +57,7 @@ operator knob.
 
 The default backend is `stub`. Backend resolution uses
 `BackendSelectionPolicy.RUNNER_STRICT`, matching the deterministic runner path.
+`factsage` is archived/removed and is rejected as an unknown backend.
 
 ## Frames
 

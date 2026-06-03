@@ -805,12 +805,15 @@ class AlphaMELTSBackend(MeltBackend):
                     )
                 )
             else:
-                vapor_pressures = self._activities_times_antoine(
+                vapor_pressures = self._activities_times_antoine_or_fail(
                     temperature_C,
                     payload.activity_coefficients,
                     comp_wt,
+                    context='ThermoEngine VapoRock fallback unavailable',
                 )
-                vapor_pressure_source = 'thermoengine'
+                vapor_pressure_source = (
+                    'thermoengine' if vapor_pressures else 'no_volatile_species'
+                )
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -889,9 +892,17 @@ class AlphaMELTSBackend(MeltBackend):
             else:
                 # Use activity × pure-component Antoine only when the
                 # chemical-potential convention supplied real activities.
-                eq.vapor_pressures_Pa = self._activities_times_antoine(
-                    temperature_C, eq.activity_coefficients, comp_wt)
-                source = 'alphamelts_python_api'
+                eq.vapor_pressures_Pa = self._activities_times_antoine_or_fail(
+                    temperature_C,
+                    eq.activity_coefficients,
+                    comp_wt,
+                    context='PetThermoTools VapoRock fallback unavailable',
+                )
+                source = (
+                    'alphamelts_python_api'
+                    if eq.vapor_pressures_Pa
+                    else 'no_volatile_species'
+                )
             eq.vapor_pressures_source = {
                 species: source
                 for species in eq.vapor_pressures_Pa
@@ -1614,10 +1625,10 @@ class AlphaMELTSBackend(MeltBackend):
         returned no liquid composition.
 
         Returns ``(pressures_Pa, source_label)``.  FAIL-LOUD: never
-        returns an empty dict to the caller (an empty dict zeroes
-        evaporation flux).  On any non-``ok`` VapoRock outcome it logs a
-        WARN and explicitly calls the Antoine fallback; a genuine library
-        exception is re-raised as a labelled ``RuntimeError``.
+        returns an empty dict for a volatile-bearing melt (an empty dict
+        zeroes evaporation flux).  On any non-``ok`` VapoRock outcome it
+        logs a WARN and explicitly calls the Antoine fallback; a genuine
+        library exception is re-raised as a labelled ``RuntimeError``.
         """
         # Composition alphaMELTS actually solved, projected to the
         # VapoRock helper by the canonical oxide names it filters on.
@@ -1638,9 +1649,17 @@ class AlphaMELTSBackend(MeltBackend):
 
         helper = self._vaporock_helper
         if helper is None or not helper.is_available():
+            pressures = self._activities_times_antoine_or_fail(
+                T_C,
+                dict(activities),
+                dict(melt_wt),
+                context='VapoRock helper unavailable',
+            )
             return (
-                self._activities_times_antoine(T_C, dict(activities), dict(melt_wt)),
-                'antoine_fallback_from_vaporock',
+                pressures,
+                'antoine_fallback_from_vaporock'
+                if pressures
+                else 'no_volatile_species',
             )
 
         try:
@@ -1665,13 +1684,55 @@ class AlphaMELTSBackend(MeltBackend):
                 'fallback.',
                 stacklevel=2,
             )
+            pressures = self._activities_times_antoine_or_fail(
+                T_C,
+                dict(activities),
+                dict(melt_wt),
+                context=f'VapoRock status {result.status!r}',
+            )
             return (
-                self._activities_times_antoine(T_C, dict(activities), dict(melt_wt)),
-                'antoine_fallback_from_vaporock',
+                pressures,
+                'antoine_fallback_from_vaporock'
+                if pressures
+                else 'no_volatile_species',
             )
 
         # ALREADY Pa — do not re-scale, do not normalize.
         return pressures, 'vaporock'
+
+    def _activities_times_antoine_or_fail(
+        self,
+        T_C: float,
+        activities: dict,
+        comp_wt: dict,
+        *,
+        context: str,
+    ) -> Dict[str, float]:
+        table = self._load_vapor_pressure_table()
+        if not table:
+            raise RuntimeError(
+                'AlphaMELTS vapor pressure fallback failed: vapor pressure '
+                'data table is empty; refusing empty vapor_pressures_Pa '
+                'because it would silently zero evaporation flux'
+            )
+
+        pressures = self._activities_times_antoine(T_C, activities, comp_wt)
+        if pressures:
+            return pressures
+
+        if not self._melt_has_antoine_vapor_precursor(comp_wt, table):
+            return {}
+
+        if not activities:
+            reason = 'no activity coefficients were available'
+        else:
+            reason = 'no activity coefficients matched vapor-pressure species'
+        raise RuntimeError(
+            'AlphaMELTS vapor pressure fallback failed: '
+            f'{reason} for volatile-bearing melt ({context}); refusing '
+            'empty vapor_pressures_Pa because it would silently zero '
+            'evaporation flux'
+        )
 
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,
@@ -1712,6 +1773,25 @@ class AlphaMELTSBackend(MeltBackend):
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
         return pressures
+
+    def _melt_has_antoine_vapor_precursor(
+        self,
+        comp_wt: Mapping[str, float],
+        table: Mapping[str, Mapping[str, object]],
+    ) -> bool:
+        precursor_keys = set()
+        for species in table:
+            precursor_keys.update(
+                ACTIVITY_KEYS_BY_VAPOR_SPECIES.get(str(species), (str(species),))
+            )
+        for species, wt_pct in (comp_wt or {}).items():
+            if (
+                str(species) in precursor_keys
+                and self._is_number(wt_pct)
+                and float(wt_pct) > 0.0
+            ):
+                return True
+        return False
 
     @staticmethod
     def _activity_for_vapor_species(species: str, activities: dict) -> Optional[float]:

@@ -38,7 +38,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Ellingham** — the underlying Ellingham–Richardson plot (ΔG_f° of oxides per mol O₂ vs T). In this project the word is used in two distinct senses: (1) the **oxygen-affinity ladder** read at fixed T, which tells you which metal can reduce which oxide (the operative concept for the alkali shuttle and C6 thermite); and (2) the **pressure-modified Ellingham**, which tells you how each oxide's dissociation threshold shifts under non-standard pO₂ with a species-specific slope `−1/n_M` (the operative concept for evolution at millibar / microbar / nanotorr overhead pressures). Evolution order is *not* read directly off either Ellingham sense — it is `P_eff = a_M × P_sat`, where Sense 2 sets `a_M` and the Antoine equation sets `P_sat`. See [`docs/concepts.md`](concepts.md) §"Two senses of 'Ellingham' in this project".
 
-**FactSAGE / ChemApp** — multiphase equilibrium engine (strict-config authoritative for full gas/metal/slag equilibrium). Requires a licensed local install and a user-exported `.cst`/`.dat` datafile. Stays diagnostic-only without a strict config. See [`docs/melt-backends.md`](melt-backends.md).
+**FactSAGE / ChemApp** — archived/removed multiphase-equilibrium adapter. It is not a live backend in this checkout and explicit `factsage` selection fails loud. See [`docs/melt-backends.md`](melt-backends.md).
 
 **Freeze-gate** — evaporation flux multiplier on `liquid_fraction(T)` that suppresses sub-liquidus evaporation. Default OFF (`freeze_gate.enabled: false` in `data/setpoints.yaml` §15); the default-on flip is deferred post-0.5.0 pending a blast-radius review across the recipe catalog. The plumbing (kernel intent `GATE_LIQUID_FRACTION`, MAGEMin liquid-fraction shadow, ThermoEngine activity threading) landed in 0.5.0 ready for the flip.
 
@@ -90,7 +90,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Stage purity report** — per-stage breakdown of designated vs impurity species mass on the condensation train, sourced from `simulator.condensation.stage_purity_report()` (canonical registry in `simulator/condensation_routing.py`). Verdict thresholds: `PURE` ≥95 % designated, `MIXED` 80–95 %, `CONTAMINATED` <80 %. Exposed verbatim on the runner output's top-level `stage_purity_report` field. See [`docs/runner-output-schema.md`](runner-output-schema.md).
 
-**StubBackend** — the always-available fallback melt backend using the builtin Ellingham/Antoine path; selected when neither AlphaMELTS nor FactSAGE are configured. See [`docs/melt-backends.md`](melt-backends.md).
+**StubBackend** — the always-available fallback melt backend using the builtin Ellingham/Antoine path for `auto` when AlphaMELTS is unavailable. See [`docs/melt-backends.md`](melt-backends.md).
 
 **ThermoEngine** — ENKI's Python MELTS API providing first-class melt activities via compiled Objective-C/C dylibs. Required by VapoRock. Installed by `install-engines.py` (macOS arm64 only). See [`docs/melt-backends.md`](melt-backends.md).
 

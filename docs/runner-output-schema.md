@@ -20,7 +20,7 @@ python -m simulator.runner \
     [--additive=C=30] \
     [--engines=config/engines.yaml] \
     [--engine=vapor_pressure:vaporock_v1] \
-    [--backend=stub|alphamelts|factsage] \
+    [--backend=stub|alphamelts] \
     [--track=pyrolysis|mre_baseline] \
     [--started-at-utc=ISO8601] \
     [--kernel-commit-sha=SHA]

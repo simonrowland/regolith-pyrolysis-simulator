@@ -117,10 +117,15 @@ def _resolve_web_autodetect(
             "dispatcher; select alphamelts or auto."
         )
 
+    if name not in ("", "auto", "stub", "alphamelts"):
+        raise unavailable_error_cls(
+            f"unknown backend {name!r}; select auto, stub, or alphamelts"
+        )
+
     # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
-    # only 'auto'/''/unknown fall through to the AlphaMELTS->Stub autodetect
-    # chain. (Previously 'stub' silently autodetected, so a caller asking for
-    # the deterministic stub got AlphaMELTS when it was available.)
+    # only 'auto'/'' fall through to the AlphaMELTS->Stub autodetect chain.
+    # (Previously 'stub' silently autodetected, so a caller asking for the
+    # deterministic stub got AlphaMELTS when it was available.)
     if name == "stub":
         backend = _stub_backend(stub_backend_cls)
         _log_selection(backend, log_selection, log_message)

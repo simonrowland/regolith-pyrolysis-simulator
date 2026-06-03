@@ -43,12 +43,10 @@ This guide is for contributors and coding agents that need to find the right fil
 
 - `simulator/melt_backend/base.py` defines `MeltBackend` ABC, `EquilibriumResult` DTO, and `StubBackend` fallback.
 - `simulator/melt_backend/alphamelts.py` wires PetThermoTools and subprocess paths.
-- `simulator/melt_backend/factsage.py` wraps ChemApp via lazy import; requires license and .cst.
 - `simulator/melt_backend/magemin.py` is the MAGEMin today-hook adapter (`MeltBackend` subclass), a shadow silicate solver alongside alphaMELTS.
 - `simulator/melt_backend/vaporock.py` is the VapoRock today-hook adapter for equilibrium vapor speciation over silicate melts.
 - `simulator/melt_backend/installer.py` installs engine binaries and dependencies.
-- `simulator/melt_backend/factsage_config.py` loads FactSAGE configuration.
-- `simulator/melt_backend/factsage_doctor.py` runs FactSAGE diagnostics.
+- FactSAGE/ChemApp adapter files were removed/archived; `backend=factsage` is not a supported active backend.
 
 ## Engine Source Trees
 
@@ -103,7 +101,6 @@ This guide is for contributors and coding agents that need to find the right fil
 - `tests/test_reagent_reservoirs.py` checks reagent reservoir lots and ledger contracts.
 - `tests/test_stage0_atmosphere.py` covers Stage 0 hard-vacuum and Mars-backpressure feedstocks.
 - `tests/test_feedstock_inventory.py` validates feedstock inventory loading and balance enforcement.
-- `tests/test_factsage_backend.py` exercises the FactSAGE backend with mocked ChemApp.
 - `tests/test_alphamelts_backend.py` exercises the alphaMELTS backend wiring and subprocess paths.
 - `tests/test_magemin_backend.py` defends the MAGEMin today-hook adapter (`MeltBackend`) contract.
 - `tests/test_magemin_shadow_provider.py` covers the `engines/magemin/` kernel-shadow scaffold (domain gate, parity comparator, `dispatch()` raising).
@@ -112,4 +109,4 @@ This guide is for contributors and coding agents that need to find the right fil
 - `tests/test_debug_feedstocks.py` checks debug feedstocks stay hidden by default behind the debug env flags.
 - `tests/test_public_payload_contract.py` pins the public Socket.IO payload contract.
 - `tests/test_web_events.py` covers web event handlers, launcher defaults, and simulation restarts.
-- `tests/test_artifact_guards.py` ensures local FactSAGE exports and licenses stay gitignored.
+- `tests/test_artifact_guards.py` keeps generated/local engine artifacts and licenses out of git.

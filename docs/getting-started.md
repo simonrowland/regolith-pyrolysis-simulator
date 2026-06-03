@@ -93,7 +93,7 @@ Key CLI flags:
 | `--campaign` | `C0` | Starting campaign phase |
 | `--hours` | `24` | Simulated hours to run |
 | `--mass-kg` | `1000` | Batch mass in kg |
-| `--backend` | `stub` | `stub`, `alphamelts`, or `factsage` |
+| `--backend` | `stub` | `stub` or `alphamelts`; `auto` only on web/API autodetect |
 | `--track` | `pyrolysis` | `pyrolysis` or `mre_baseline` |
 | `--additive` | none | Repeatable: `--additive=Na=12`. Post-V1c the C3 shuttle gate uses Na only; `--additive=K=…` is accepted but ignored by the gate. |
 

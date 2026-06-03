@@ -556,6 +556,65 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
     ) == {}
 
 
+def test_vaporock_empty_and_antoine_empty_fails_loud_for_volatile_melt():
+    class EmptyVapoRock:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status='not_converged',
+                vapor_pressures_Pa={},
+                warnings=['forced empty VapoRock result'],
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._vaporock_helper = EmptyVapoRock()
+
+    with pytest.warns(UserWarning, match='using activity x pure-component Antoine'):
+        with pytest.raises(
+            RuntimeError,
+            match='volatile-bearing melt.*silently zero evaporation flux',
+        ):
+            backend._vapor_pressures_via_vaporock_or_antoine(
+                T_C=1600.0,
+                solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
+                fallback_comp_wt={},
+                fO2_log=-9.0,
+                pressure_bar=1.0,
+                activities={},
+            )
+
+
+def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
+    class EmptyVapoRock:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status='not_converged',
+                vapor_pressures_Pa={},
+                warnings=['forced empty VapoRock result'],
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._vaporock_helper = EmptyVapoRock()
+
+    with pytest.warns(UserWarning, match='using activity x pure-component Antoine'):
+        pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=1600.0,
+            solved_melt_wt_pct={'P2O5': 100.0},
+            fallback_comp_wt={},
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            activities={},
+        )
+
+    assert pressures == {}
+    assert source == 'no_volatile_species'
+
+
 def test_decompression_path_calls_verified_petthermotools_api():
     backend = AlphaMELTSBackend()
     calls = []

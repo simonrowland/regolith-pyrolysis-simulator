@@ -10,7 +10,8 @@ Policy under test:
 * AlphaMELTS is probed first; selected when ``is_available()`` is True.
 * VapoRock and MAGEMin are **never** selected as the active backend; an
   explicit request for either raises ``BackendUnavailableError``.
-* StubBackend is the always-available fallback.
+* StubBackend is the always-available fallback for ``auto`` / unset.
+* Explicit unknown names fail loud.
 * The selection emits one ``engine selection: ...`` log line per call.
 """
 
@@ -241,7 +242,7 @@ def test_explicit_stub_request_pins_stub_backend(
 
     An explicit 'stub' request must NOT autodetect: even when AlphaMELTS
     is available, asking for the deterministic stub returns StubBackend.
-    Only 'auto'/'' /unknown follow the autodetect chain. (Bug D1: 'stub'
+    Only 'auto'/'' follow the autodetect chain. (Bug D1: 'stub'
     previously routed through autodetect and returned AlphaMELTS when it
     was installed, so a caller asking for a deterministic backend silently
     got AlphaMELTS.)
@@ -281,14 +282,37 @@ def test_web_autodetect_stub_bypasses_primary_probes():
     assert calls == ['stub']  # primaries never probed
 
 
-def test_unknown_backend_name_falls_through_to_autodetect(
-        monkeypatch, captured_logs):
+@pytest.mark.parametrize('name', ['something-else', 'factsage', 'FactSAGE'])
+def test_unknown_backend_name_fails_loud(monkeypatch, name):
     _install_fakes(monkeypatch,
                    alphamelts_available=False)
 
-    backend = _get_backend('something-else')
+    with pytest.raises(BackendUnavailableError,
+                       match='unknown backend'):
+        _get_backend(name)
+
+
+def test_unset_backend_still_autodetects(monkeypatch):
+    calls: list[str] = []
+
+    def make_alphamelts():
+        calls.append('alphamelts')
+        return _FakeAlphaMELTS(available=False)
+
+    def make_stub():
+        calls.append('stub')
+        return StubBackend()
+
+    backend = resolve_backend(
+        '',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=make_alphamelts,
+        stub_backend_cls=make_stub,
+        log_selection=lambda selected: None,
+    )
 
     assert isinstance(backend, StubBackend)
+    assert calls == ['alphamelts', 'stub']
 
 
 # ---------------------------------------------------------------------------
@@ -330,11 +354,8 @@ def test_explicit_alphamelts_request_is_case_insensitive_raises_when_unavailable
 )
 def test_autodetect_request_is_case_insensitive(
         monkeypatch, name, captured_logs):
-    # 'auto' is in the unknown-fall-through bucket, but the case-folding
-    # is still load-bearing: with case-folding broken AND a backend
-    # request that happens to match a literal branch by coincidence
-    # (no ineligibility check), the policy would not raise. Pin the
-    # autodetect path with the eligible backend resolved.
+    # 'auto' is accepted explicitly; case-folding is load-bearing because
+    # uppercase auto must not be treated as an unknown backend.
     _install_fakes(monkeypatch,
                    alphamelts_available=True)
 

@@ -128,12 +128,15 @@ def _get_backend(backend_name: str):
       "backend returned post-equilibrium phase material without an
       AtomLedger transition" reject).  Promotion is blocked on
       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
-    * ``'auto'`` / ``'stub'`` / unknown — autodetect chain: probe
+    * ``'stub'`` — deterministic ``StubBackend`` selection.
+    * ``'auto'`` / unset — autodetect chain: probe
       AlphaMELTS first, falling back to ``StubBackend`` as the
       always-available primary fallback.  No silent cross-backend
       fallback at runtime: if the selected primary throws inside
       ``_get_equilibrium`` after selection, ``core.py``'s fail-closed
       path handles it without re-routing here.
+    * unknown explicit names — raise ``BackendUnavailableError`` instead
+      of silently coercing to ``auto``.
     """
     return resolve_backend(
         backend_name,
