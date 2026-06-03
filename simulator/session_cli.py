@@ -289,7 +289,7 @@ def _start_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--backend",
         default="stub",
-        choices=("stub", "alphamelts", "factsage"),
+        choices=("stub", "alphamelts"),
     )
     parser.add_argument(
         "--track",

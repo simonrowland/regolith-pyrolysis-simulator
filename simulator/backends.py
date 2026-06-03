@@ -10,11 +10,6 @@ from typing import Any, Callable, Mapping, TypeVar
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.base import StubBackend
-from simulator.melt_backend.factsage import FactSAGEBackend
-from simulator.melt_backend.factsage_config import (
-    FactSAGEConfigError,
-    load_factsage_config,
-)
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
@@ -62,10 +57,7 @@ def resolve_backend(
     log_selection: Callable[[object], None] | None = None,
     log_message: Callable[[str], None] | None = None,
     alphamelts_backend_cls: type = AlphaMELTSBackend,
-    factsage_backend_cls: type = FactSAGEBackend,
     stub_backend_cls: type = StubBackend,
-    factsage_config_loader: Callable[[], Mapping[str, Any]] = load_factsage_config,
-    factsage_config_error_cls: type[Exception] = FactSAGEConfigError,
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
@@ -77,20 +69,14 @@ def resolve_backend(
             log_selection=log_selection,
             log_message=log_message,
             alphamelts_backend_cls=alphamelts_backend_cls,
-            factsage_backend_cls=factsage_backend_cls,
             stub_backend_cls=stub_backend_cls,
-            factsage_config_loader=factsage_config_loader,
-            factsage_config_error_cls=factsage_config_error_cls,
         )
     if policy is BackendSelectionPolicy.RUNNER_STRICT:
         return _resolve_runner_strict(
             backend_name,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
-            factsage_backend_cls=factsage_backend_cls,
             stub_backend_cls=stub_backend_cls,
-            factsage_config_loader=factsage_config_loader,
-            factsage_config_error_cls=factsage_config_error_cls,
         )
     raise ValueError(f"unknown backend selection policy {policy!r}")
 
@@ -121,23 +107,20 @@ def _resolve_web_autodetect(
     log_selection: Callable[[object], None] | None,
     log_message: Callable[[str], None] | None,
     alphamelts_backend_cls: type,
-    factsage_backend_cls: type,
     stub_backend_cls: type,
-    factsage_config_loader: Callable[[], Mapping[str, Any]],
-    factsage_config_error_cls: type[Exception],
 ):
     if name in INELIGIBLE_ACTIVE_BACKENDS:
         backend_label = "VapoRock" if name == "vaporock" else "MAGEMin"
         raise unavailable_error_cls(
             f"{backend_label} is not eligible as the active melt backend "
             "until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent "
-            "dispatcher; select alphamelts, factsage, or auto."
+            "dispatcher; select alphamelts or auto."
         )
 
     # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
-    # only 'auto'/''/unknown fall through to the AlphaMELTS->FactSAGE->Stub
-    # autodetect chain. (Previously 'stub' silently autodetected, so a caller
-    # asking for the deterministic stub got AlphaMELTS when it was available.)
+    # only 'auto'/''/unknown fall through to the AlphaMELTS->Stub autodetect
+    # chain. (Previously 'stub' silently autodetected, so a caller asking for
+    # the deterministic stub got AlphaMELTS when it was available.)
     if name == "stub":
         backend = _stub_backend(stub_backend_cls)
         _log_selection(backend, log_selection, log_message)
@@ -152,30 +135,7 @@ def _resolve_web_autodetect(
             "AlphaMELTS unavailable; run install-dependencies.py"
         )
 
-    if name == "factsage":
-        backend = _try_factsage(
-            factsage_backend_cls,
-            factsage_config_loader,
-            factsage_config_error_cls,
-            log_message,
-        )
-        if backend is not None:
-            _log_selection(backend, log_selection, log_message)
-            return backend
-        backend = _stub_backend(stub_backend_cls)
-        _log_selection(backend, log_selection, log_message)
-        return backend
-
     backend = _try_alphamelts(alphamelts_backend_cls)
-    if backend is not None:
-        _log_selection(backend, log_selection, log_message)
-        return backend
-    backend = _try_factsage(
-        factsage_backend_cls,
-        factsage_config_loader,
-        factsage_config_error_cls,
-        log_message,
-    )
     if backend is not None:
         _log_selection(backend, log_selection, log_message)
         return backend
@@ -189,17 +149,14 @@ def _resolve_runner_strict(
     *,
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
-    factsage_backend_cls: type,
     stub_backend_cls: type,
-    factsage_config_loader: Callable[[], Mapping[str, Any]],
-    factsage_config_error_cls: type[Exception],
 ):
     if name in ("", "stub"):
         return _stub_backend(stub_backend_cls)
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
-            "select stub, alphamelts, or factsage"
+            "select stub or alphamelts"
         )
     if name == "alphamelts":
         backend = _try_alphamelts(alphamelts_backend_cls)
@@ -209,42 +166,12 @@ def _resolve_runner_strict(
             "AlphaMELTS unavailable; rerun with --backend=stub or "
             "install via install-dependencies.py"
         )
-    if name == "factsage":
-        try:
-            config = factsage_config_loader()
-        except factsage_config_error_cls as exc:
-            raise unavailable_error_cls(
-                f"FactSAGE config error: {exc}; rerun with --backend=stub"
-            ) from exc
-        backend = factsage_backend_cls()
-        if backend.initialize(config) and backend.is_available():
-            return backend
-        raise unavailable_error_cls(
-            "FactSAGE unavailable; rerun with --backend=stub"
-        )
     raise unavailable_error_cls(f"unknown backend {name!r}")
 
 
 def _try_alphamelts(alphamelts_backend_cls: type):
     backend = alphamelts_backend_cls()
     if backend.initialize({}) and backend.is_available():
-        return backend
-    return None
-
-
-def _try_factsage(
-    factsage_backend_cls: type,
-    factsage_config_loader: Callable[[], Mapping[str, Any]],
-    factsage_config_error_cls: type[Exception],
-    log_message: Callable[[str], None] | None,
-):
-    try:
-        config = factsage_config_loader()
-    except factsage_config_error_cls as exc:
-        _log(log_message, f"FactSAGE config error: {exc}")
-        config = {}
-    backend = factsage_backend_cls()
-    if backend.initialize(config) and backend.is_available():
         return backend
     return None
 

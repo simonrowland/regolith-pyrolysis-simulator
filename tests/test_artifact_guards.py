@@ -5,28 +5,6 @@ from pathlib import Path
 from simulator.accounting import load_species_formulas
 
 
-def test_local_factsage_exports_are_gitignored():
-    repo = Path(__file__).parent.parent
-    paths = [
-        "config/local-factsage-export.cst",
-        "config/local-factsage-export.dat",
-        "config/license.lic",
-        "config/factsage-license.txt",
-    ]
-
-    result = subprocess.run(
-        ["git", "check-ignore", *paths],
-        cwd=repo,
-        check=False,
-        text=True,
-        capture_output=True,
-    )
-
-    assert result.returncode == 0
-    ignored = set(result.stdout.splitlines())
-    assert ignored == set(paths)
-
-
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
     forbidden = [

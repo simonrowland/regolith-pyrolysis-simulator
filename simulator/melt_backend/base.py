@@ -4,7 +4,7 @@ Melt Backend — Abstract Interface & Data Classes
 
 Defines the abstract MeltBackend interface and EquilibriumResult
 that all thermodynamic backends must implement:
-AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, FactSAGE, and
+AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, and
 StubBackend.
 """
 
@@ -255,7 +255,6 @@ class MeltBackend(ABC):
       or subprocess)
     - VapoRockBackend (vapor-melt equilibrium / vapor-side only)
     - MAGEMinBackend (silicate phase equilibrium, shadow second opinion)
-    - FactSAGE (multiphase equilibrium via ChemApp)
     - StubBackend (no phase equilibrium; core.py owns Antoine fallback)
     """
 

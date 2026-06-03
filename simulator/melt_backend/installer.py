@@ -22,12 +22,6 @@ from pathlib import Path
 from typing import Dict, Optional
 from urllib.request import urlretrieve
 
-from simulator.melt_backend.factsage import FactSAGEBackend
-from simulator.melt_backend.factsage_config import (
-    FactSAGEConfigError,
-    load_factsage_config,
-)
-
 
 # alphaMELTS download URLs by platform
 ALPHAMELTS_VERSION = '2.3.1'
@@ -78,9 +72,8 @@ class EngineInstaller:
         # alphaMELTS binary
         status['alphaMELTS_binary'] = self._check_binary()
 
-        # ChemApp / FactSAGE
+        # ChemApp (Python module presence only)
         status['ChemApp_module'] = self._check_chemapp()
-        status['FactSAGE'] = self._check_factsage_backend()
 
         return status
 
@@ -103,15 +96,6 @@ class EngineInstaller:
             except ImportError:
                 continue
         return False
-
-    def _check_factsage_backend(self) -> bool:
-        """Check whether the optional FactSAGE backend is usable now."""
-        try:
-            config = load_factsage_config()
-        except FactSAGEConfigError:
-            return False
-        backend = FactSAGEBackend()
-        return backend.initialize(config)
 
     def install_alphamelts(self, progress_callback=None) -> bool:
         """
@@ -242,13 +226,10 @@ class EngineInstaller:
         else:
             lines.append('  alphaMELTS binary: not found')
 
-        if status.get('FactSAGE'):
-            lines.append('  FactSAGE/ChemApp: configured and usable')
-        elif status.get('ChemApp_module'):
-            lines.append(
-                '  ChemApp module: found; FactSAGE data file not configured')
+        if status.get('ChemApp_module'):
+            lines.append('  ChemApp module: found')
         else:
-            lines.append('  FactSAGE/ChemApp: not available')
+            lines.append('  ChemApp module: not available')
 
         if not any(status.values()):
             lines.append('')

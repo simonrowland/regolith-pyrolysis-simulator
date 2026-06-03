@@ -16,11 +16,6 @@ from simulator.backends import (
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-from simulator.melt_backend.factsage import FactSAGEBackend
-from simulator.melt_backend.factsage_config import (
-    FactSAGEConfigError,
-    load_factsage_config,
-)
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -125,10 +120,6 @@ def _get_backend(backend_name: str):
 
     * ``'alphamelts'`` — strict probe; raise ``BackendUnavailableError`` if
       PetThermoTools or the alphaMELTS binary is not reachable.
-    * ``'factsage'`` — strict probe under the configured strict-config gate
-      (a real ``FACTSAGE_CONFIG`` JSON + ChemApp + ``.cst`` data file); on
-      gate failure, fall back to ``StubBackend`` so the simulator stays
-      diagnostic-without-strict-config (existing semantics).
     * ``'vaporock'`` / ``'magemin'`` — explicitly **refused**.  Both
       adapters are not wired into a multi-intent dispatcher yet; selecting
       either as the active ``MeltBackend`` would fail closed inside
@@ -138,11 +129,11 @@ def _get_backend(backend_name: str):
       AtomLedger transition" reject).  Promotion is blocked on
       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
     * ``'auto'`` / ``'stub'`` / unknown — autodetect chain: probe
-      AlphaMELTS first, then FactSAGE-with-strict-config, falling back to
-      ``StubBackend`` as the always-available primary fallback.  No silent
-      cross-backend fallback at runtime: if the selected primary throws
-      inside ``_get_equilibrium`` after selection, ``core.py``'s
-      fail-closed path handles it without re-routing here.
+      AlphaMELTS first, falling back to ``StubBackend`` as the
+      always-available primary fallback.  No silent cross-backend
+      fallback at runtime: if the selected primary throws inside
+      ``_get_equilibrium`` after selection, ``core.py``'s fail-closed
+      path handles it without re-routing here.
     """
     return resolve_backend(
         backend_name,
@@ -153,20 +144,8 @@ def _get_backend(backend_name: str):
         ),
         log_message=_safe_log,
         alphamelts_backend_cls=AlphaMELTSBackend,
-        factsage_backend_cls=FactSAGEBackend,
         stub_backend_cls=StubBackend,
-        factsage_config_loader=_factsage_config,
-        factsage_config_error_cls=FactSAGEConfigError,
     )
-
-
-def _factsage_config():
-    """Load optional FactSAGE config from FACTSAGE_CONFIG."""
-    try:
-        return load_factsage_config()
-    except FactSAGEConfigError as exc:
-        _safe_log(f'FactSAGE config error: {exc}')
-        return {}
 
 
 def _backend_name_for_session(backend) -> str:
@@ -174,8 +153,6 @@ def _backend_name_for_session(backend) -> str:
     backend_type = type(backend).__name__
     if isinstance(backend, AlphaMELTSBackend) or backend_type == 'AlphaMELTSBackend':
         return 'alphamelts'
-    if isinstance(backend, FactSAGEBackend) or backend_type == 'FactSAGEBackend':
-        return 'factsage'
     return 'stub'
 
 
@@ -594,7 +571,7 @@ def register_events(socketio):
         mass_kg = float(data.get('mass_kg', 1000))
         # Default is 'auto' (AlphaMELTS-preferred autodetect per
         # \goal BACKEND-DEFAULT-SWITCH), not 'stub'.  Explicit UI choices
-        # ('alphamelts', 'factsage', 'stub') are still honoured.
+        # ('alphamelts', 'stub') are still honoured.
         backend_name = data.get('backend', 'auto')
         track = data.get('track', 'pyrolysis')
         speed = float(data.get('speed', 1.0))
@@ -614,15 +591,7 @@ def register_events(socketio):
         backend_type = type(backend).__name__
         backend_message = ''
         if isinstance(backend, StubBackend):
-            if backend_name == 'factsage':
-                backend_message = (
-                    'FactSAGE unavailable; using built-in fallback')
-            else:
-                backend_message = 'Using built-in fallback'
-        elif backend_name == 'factsage' or backend_type == 'FactSAGEBackend':
-            backend_message = (
-                'FactSAGE/ChemApp export active: '
-                f'{backend.capability_summary()}')
+            backend_message = 'Using built-in fallback'
         else:
             backend_message = f'Using {backend_type}'
 

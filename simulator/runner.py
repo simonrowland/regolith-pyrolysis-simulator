@@ -1955,7 +1955,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mass-kg", type=float, default=1000.0,
                         help="Batch mass in kg (default: 1000)")
     parser.add_argument("--backend", default="stub",
-                        choices=("stub", "alphamelts", "factsage"),
+                        choices=("stub", "alphamelts"),
                         help="Melt backend selection (default: stub)")
     parser.add_argument("--track", default="pyrolysis",
                         choices=("pyrolysis", "mre_baseline"),

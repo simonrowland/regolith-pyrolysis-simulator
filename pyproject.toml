@@ -77,6 +77,12 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# `_attic/` holds backends removed from the live tree but preserved for
+# later re-integration (e.g. FactSAGE). Its tests are NOT collected: they
+# require the backend to be wired into the live code. `testpaths` already
+# scopes default collection to `tests/`; `norecursedirs` additionally
+# blocks `_attic` if someone runs `pytest .` or `pytest _attic` directly.
+norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
 # Parallelize across cores via pytest-xdist + bound per-test runtime via
 # pytest-timeout. Without these, the full gate took ~10 min serial and
 # routinely exceeded the 1500s sandbox tool window of in-flight codex-acp

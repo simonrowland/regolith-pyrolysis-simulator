@@ -1,0 +1,813 @@
+diff --git a/simulator/backends.py b/simulator/backends.py
+index b93460a..144aa2c 100644
+--- a/simulator/backends.py
++++ b/simulator/backends.py
+@@ -10,11 +10,6 @@ from typing import Any, Callable, Mapping, TypeVar
+ from simulator.core import PyrolysisSimulator
+ from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+ from simulator.melt_backend.base import StubBackend
+-from simulator.melt_backend.factsage import FactSAGEBackend
+-from simulator.melt_backend.factsage_config import (
+-    FactSAGEConfigError,
+-    load_factsage_config,
+-)
+ 
+ 
+ INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
+@@ -62,10 +57,7 @@ def resolve_backend(
+     log_selection: Callable[[object], None] | None = None,
+     log_message: Callable[[str], None] | None = None,
+     alphamelts_backend_cls: type = AlphaMELTSBackend,
+-    factsage_backend_cls: type = FactSAGEBackend,
+     stub_backend_cls: type = StubBackend,
+-    factsage_config_loader: Callable[[], Mapping[str, Any]] = load_factsage_config,
+-    factsage_config_error_cls: type[Exception] = FactSAGEConfigError,
+ ):
+     """Resolve and initialize the active melt backend under an explicit policy."""
+ 
+@@ -77,20 +69,14 @@ def resolve_backend(
+             log_selection=log_selection,
+             log_message=log_message,
+             alphamelts_backend_cls=alphamelts_backend_cls,
+-            factsage_backend_cls=factsage_backend_cls,
+             stub_backend_cls=stub_backend_cls,
+-            factsage_config_loader=factsage_config_loader,
+-            factsage_config_error_cls=factsage_config_error_cls,
+         )
+     if policy is BackendSelectionPolicy.RUNNER_STRICT:
+         return _resolve_runner_strict(
+             backend_name,
+             unavailable_error_cls=unavailable_error_cls,
+             alphamelts_backend_cls=alphamelts_backend_cls,
+-            factsage_backend_cls=factsage_backend_cls,
+             stub_backend_cls=stub_backend_cls,
+-            factsage_config_loader=factsage_config_loader,
+-            factsage_config_error_cls=factsage_config_error_cls,
+         )
+     raise ValueError(f"unknown backend selection policy {policy!r}")
+ 
+@@ -121,23 +107,20 @@ def _resolve_web_autodetect(
+     log_selection: Callable[[object], None] | None,
+     log_message: Callable[[str], None] | None,
+     alphamelts_backend_cls: type,
+-    factsage_backend_cls: type,
+     stub_backend_cls: type,
+-    factsage_config_loader: Callable[[], Mapping[str, Any]],
+-    factsage_config_error_cls: type[Exception],
+ ):
+     if name in INELIGIBLE_ACTIVE_BACKENDS:
+         backend_label = "VapoRock" if name == "vaporock" else "MAGEMin"
+         raise unavailable_error_cls(
+             f"{backend_label} is not eligible as the active melt backend "
+             "until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent "
+-            "dispatcher; select alphamelts, factsage, or auto."
++            "dispatcher; select alphamelts or auto."
+         )
+ 
+     # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
+-    # only 'auto'/''/unknown fall through to the AlphaMELTS->FactSAGE->Stub
+-    # autodetect chain. (Previously 'stub' silently autodetected, so a caller
+-    # asking for the deterministic stub got AlphaMELTS when it was available.)
++    # only 'auto'/''/unknown fall through to the AlphaMELTS->Stub autodetect
++    # chain. (Previously 'stub' silently autodetected, so a caller asking for
++    # the deterministic stub got AlphaMELTS when it was available.)
+     if name == "stub":
+         backend = _stub_backend(stub_backend_cls)
+         _log_selection(backend, log_selection, log_message)
+@@ -152,30 +135,7 @@ def _resolve_web_autodetect(
+             "AlphaMELTS unavailable; run install-dependencies.py"
+         )
+ 
+-    if name == "factsage":
+-        backend = _try_factsage(
+-            factsage_backend_cls,
+-            factsage_config_loader,
+-            factsage_config_error_cls,
+-            log_message,
+-        )
+-        if backend is not None:
+-            _log_selection(backend, log_selection, log_message)
+-            return backend
+-        backend = _stub_backend(stub_backend_cls)
+-        _log_selection(backend, log_selection, log_message)
+-        return backend
+-
+     backend = _try_alphamelts(alphamelts_backend_cls)
+-    if backend is not None:
+-        _log_selection(backend, log_selection, log_message)
+-        return backend
+-    backend = _try_factsage(
+-        factsage_backend_cls,
+-        factsage_config_loader,
+-        factsage_config_error_cls,
+-        log_message,
+-    )
+     if backend is not None:
+         _log_selection(backend, log_selection, log_message)
+         return backend
+@@ -189,17 +149,14 @@ def _resolve_runner_strict(
+     *,
+     unavailable_error_cls: type[_E],
+     alphamelts_backend_cls: type,
+-    factsage_backend_cls: type,
+     stub_backend_cls: type,
+-    factsage_config_loader: Callable[[], Mapping[str, Any]],
+-    factsage_config_error_cls: type[Exception],
+ ):
+     if name in ("", "stub"):
+         return _stub_backend(stub_backend_cls)
+     if name == "auto":
+         raise unavailable_error_cls(
+             "auto backend selection is unavailable under runner-strict; "
+-            "select stub, alphamelts, or factsage"
++            "select stub or alphamelts"
+         )
+     if name == "alphamelts":
+         backend = _try_alphamelts(alphamelts_backend_cls)
+@@ -209,19 +166,6 @@ def _resolve_runner_strict(
+             "AlphaMELTS unavailable; rerun with --backend=stub or "
+             "install via install-dependencies.py"
+         )
+-    if name == "factsage":
+-        try:
+-            config = factsage_config_loader()
+-        except factsage_config_error_cls as exc:
+-            raise unavailable_error_cls(
+-                f"FactSAGE config error: {exc}; rerun with --backend=stub"
+-            ) from exc
+-        backend = factsage_backend_cls()
+-        if backend.initialize(config) and backend.is_available():
+-            return backend
+-        raise unavailable_error_cls(
+-            "FactSAGE unavailable; rerun with --backend=stub"
+-        )
+     raise unavailable_error_cls(f"unknown backend {name!r}")
+ 
+ 
+@@ -232,23 +176,6 @@ def _try_alphamelts(alphamelts_backend_cls: type):
+     return None
+ 
+ 
+-def _try_factsage(
+-    factsage_backend_cls: type,
+-    factsage_config_loader: Callable[[], Mapping[str, Any]],
+-    factsage_config_error_cls: type[Exception],
+-    log_message: Callable[[str], None] | None,
+-):
+-    try:
+-        config = factsage_config_loader()
+-    except factsage_config_error_cls as exc:
+-        _log(log_message, f"FactSAGE config error: {exc}")
+-        config = {}
+-    backend = factsage_backend_cls()
+-    if backend.initialize(config) and backend.is_available():
+-        return backend
+-    return None
+-
+-
+ def _stub_backend(stub_backend_cls: type):
+     backend = stub_backend_cls()
+     backend.initialize({})
+diff --git a/simulator/chemistry/__init__.py b/simulator/chemistry/__init__.py
+index 5d1762b..04f947e 100644
+--- a/simulator/chemistry/__init__.py
++++ b/simulator/chemistry/__init__.py
+@@ -1,7 +1,7 @@
+ """Chemistry provider kernel and engine packages.
+ 
+ This package hosts the upcoming chemistry-provider kernel and its engine
+-subpackages (alphamelts, factsage, builtin, ...).  Importing this module
++subpackages (alphamelts, builtin, ...).  Importing this module
+ does NOT wire any provider into the legacy simulator code paths.  See
+ ``docs-private/chemistry-engine-refactor-plan-2026-05-10.md``.
+ """
+diff --git a/simulator/melt_backend/base.py b/simulator/melt_backend/base.py
+index 542256f..d71fa1e 100644
+--- a/simulator/melt_backend/base.py
++++ b/simulator/melt_backend/base.py
+@@ -4,7 +4,7 @@ Melt Backend — Abstract Interface & Data Classes
+ 
+ Defines the abstract MeltBackend interface and EquilibriumResult
+ that all thermodynamic backends must implement:
+-AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, FactSAGE, and
++AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, and
+ StubBackend.
+ """
+ 
+@@ -255,7 +255,6 @@ class MeltBackend(ABC):
+       or subprocess)
+     - VapoRockBackend (vapor-melt equilibrium / vapor-side only)
+     - MAGEMinBackend (silicate phase equilibrium, shadow second opinion)
+-    - FactSAGE (multiphase equilibrium via ChemApp)
+     - StubBackend (no phase equilibrium; core.py owns Antoine fallback)
+     """
+ 
+diff --git a/simulator/melt_backend/installer.py b/simulator/melt_backend/installer.py
+index 4e1c0c3..b21f174 100644
+--- a/simulator/melt_backend/installer.py
++++ b/simulator/melt_backend/installer.py
+@@ -22,12 +22,6 @@ from pathlib import Path
+ from typing import Dict, Optional
+ from urllib.request import urlretrieve
+ 
+-from simulator.melt_backend.factsage import FactSAGEBackend
+-from simulator.melt_backend.factsage_config import (
+-    FactSAGEConfigError,
+-    load_factsage_config,
+-)
+-
+ 
+ # alphaMELTS download URLs by platform
+ ALPHAMELTS_VERSION = '2.3.1'
+@@ -78,9 +72,8 @@ class EngineInstaller:
+         # alphaMELTS binary
+         status['alphaMELTS_binary'] = self._check_binary()
+ 
+-        # ChemApp / FactSAGE
++        # ChemApp (Python module presence only)
+         status['ChemApp_module'] = self._check_chemapp()
+-        status['FactSAGE'] = self._check_factsage_backend()
+ 
+         return status
+ 
+@@ -104,15 +97,6 @@ class EngineInstaller:
+                 continue
+         return False
+ 
+-    def _check_factsage_backend(self) -> bool:
+-        """Check whether the optional FactSAGE backend is usable now."""
+-        try:
+-            config = load_factsage_config()
+-        except FactSAGEConfigError:
+-            return False
+-        backend = FactSAGEBackend()
+-        return backend.initialize(config)
+-
+     def install_alphamelts(self, progress_callback=None) -> bool:
+         """
+         Download and install alphaMELTS binary.
+@@ -242,13 +226,10 @@ class EngineInstaller:
+         else:
+             lines.append('  alphaMELTS binary: not found')
+ 
+-        if status.get('FactSAGE'):
+-            lines.append('  FactSAGE/ChemApp: configured and usable')
+-        elif status.get('ChemApp_module'):
+-            lines.append(
+-                '  ChemApp module: found; FactSAGE data file not configured')
++        if status.get('ChemApp_module'):
++            lines.append('  ChemApp module: found')
+         else:
+-            lines.append('  FactSAGE/ChemApp: not available')
++            lines.append('  ChemApp module: not available')
+ 
+         if not any(status.values()):
+             lines.append('')
+diff --git a/simulator/runner.py b/simulator/runner.py
+index 618d958..a1c7aa0 100644
+--- a/simulator/runner.py
++++ b/simulator/runner.py
+@@ -1955,7 +1955,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
+     parser.add_argument("--mass-kg", type=float, default=1000.0,
+                         help="Batch mass in kg (default: 1000)")
+     parser.add_argument("--backend", default="stub",
+-                        choices=("stub", "alphamelts", "factsage"),
++                        choices=("stub", "alphamelts"),
+                         help="Melt backend selection (default: stub)")
+     parser.add_argument("--track", default="pyrolysis",
+                         choices=("pyrolysis", "mre_baseline"),
+diff --git a/simulator/session_cli.py b/simulator/session_cli.py
+index 2fb20e7..eb79f1a 100644
+--- a/simulator/session_cli.py
++++ b/simulator/session_cli.py
+@@ -289,7 +289,7 @@ def _start_parser() -> argparse.ArgumentParser:
+     parser.add_argument(
+         "--backend",
+         default="stub",
+-        choices=("stub", "alphamelts", "factsage"),
++        choices=("stub", "alphamelts"),
+     )
+     parser.add_argument(
+         "--track",
+diff --git a/tests/test_artifact_guards.py b/tests/test_artifact_guards.py
+index 883b8f6..6e61f85 100644
+--- a/tests/test_artifact_guards.py
++++ b/tests/test_artifact_guards.py
+@@ -5,28 +5,6 @@ from pathlib import Path
+ from simulator.accounting import load_species_formulas
+ 
+ 
+-def test_local_factsage_exports_are_gitignored():
+-    repo = Path(__file__).parent.parent
+-    paths = [
+-        "config/local-factsage-export.cst",
+-        "config/local-factsage-export.dat",
+-        "config/license.lic",
+-        "config/factsage-license.txt",
+-    ]
+-
+-    result = subprocess.run(
+-        ["git", "check-ignore", *paths],
+-        cwd=repo,
+-        check=False,
+-        text=True,
+-        capture_output=True,
+-    )
+-
+-    assert result.returncode == 0
+-    ignored = set(result.stdout.splitlines())
+-    assert ignored == set(paths)
+-
+-
+ def test_simulator_has_no_forbidden_internal_kg_mutations():
+     repo = Path(__file__).parent.parent
+     forbidden = [
+diff --git a/tests/test_backend_selection.py b/tests/test_backend_selection.py
+index ec3af59..ac3fd55 100644
+--- a/tests/test_backend_selection.py
++++ b/tests/test_backend_selection.py
+@@ -8,8 +8,6 @@ ChemApp, VapoRock, or MAGEMin actually installed.
+ Policy under test:
+ 
+ * AlphaMELTS is probed first; selected when ``is_available()`` is True.
+-* FactSAGE is probed second; selected only when its strict-config gate
+-  passes (i.e. ``initialize`` returns True AND ``is_available()`` is True).
+ * VapoRock and MAGEMin are **never** selected as the active backend; an
+   explicit request for either raises ``BackendUnavailableError``.
+ * StubBackend is the always-available fallback.
+@@ -66,38 +64,17 @@ class _FakeAlphaMELTS(_FakeBackend):
+     name = 'alphamelts'
+ 
+ 
+-class _FakeFactSAGE(_FakeBackend):
+-    name = 'factsage'
+-
+-
+ def _install_fakes(
+     monkeypatch,
+     *,
+     alphamelts_available: bool,
+-    factsage_available: bool,
+-    factsage_strict_config: bool = True,
+ ):
+-    """Replace the four backend classes with the test doubles.
+-
+-    ``factsage_strict_config`` controls whether the FactSAGE
+-    ``initialize()`` accepts the config; even when the binary "is
+-    available", a missing strict config means ``initialize`` returns
+-    False and the strict-config gate fails.
+-    """
+-    factsage_init = factsage_available and factsage_strict_config
++    """Replace the AlphaMELTS backend class with the test double."""
+ 
+     def make_alphamelts():
+         return _FakeAlphaMELTS(available=alphamelts_available)
+ 
+-    def make_factsage():
+-        return _FakeFactSAGE(
+-            available=factsage_available and factsage_strict_config,
+-            init_returns=factsage_init,
+-        )
+-
+     monkeypatch.setattr(events, 'AlphaMELTSBackend', make_alphamelts)
+-    monkeypatch.setattr(events, 'FactSAGEBackend', make_factsage)
+-    monkeypatch.setattr(events, '_factsage_config', lambda: {})
+ 
+ 
+ @pytest.fixture
+@@ -130,10 +107,6 @@ def test_web_autodetect_policy_preserves_probe_order():
+         calls.append('alphamelts')
+         return _FakeAlphaMELTS(available=False)
+ 
+-    def make_factsage():
+-        calls.append('factsage')
+-        return _FakeFactSAGE(available=False)
+-
+     def make_stub():
+         calls.append('stub')
+         return StubBackend()
+@@ -142,15 +115,12 @@ def test_web_autodetect_policy_preserves_probe_order():
+         'auto',
+         BackendSelectionPolicy.WEB_AUTODETECT,
+         alphamelts_backend_cls=make_alphamelts,
+-        factsage_backend_cls=make_factsage,
+         stub_backend_cls=make_stub,
+-        factsage_config_loader=lambda: {},
+-        factsage_config_error_cls=BackendUnavailableError,
+         log_selection=lambda selected: None,
+     )
+ 
+     assert isinstance(backend, StubBackend)
+-    assert calls == ['alphamelts', 'factsage', 'stub']
++    assert calls == ['alphamelts', 'stub']
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -161,8 +131,7 @@ def test_web_autodetect_policy_preserves_probe_order():
+ def test_autodetect_all_primaries_unavailable_falls_back_to_stub(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     backend = _get_backend('auto')
+ 
+@@ -174,8 +143,7 @@ def test_autodetect_all_primaries_unavailable_falls_back_to_stub(
+ def test_autodetect_alphamelts_available_picks_alphamelts(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=True)
++                   alphamelts_available=True)
+ 
+     backend = _get_backend('auto')
+ 
+@@ -196,8 +164,6 @@ def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_availa
+ 
+     monkeypatch.setattr(events, 'AlphaMELTSBackend',
+                         lambda: _FakeAlphaMELTS(available=True))
+-    monkeypatch.setattr(events, 'FactSAGEBackend',
+-                        lambda: _FakeFactSAGE(available=False))
+     # The selection logic must not probe these at all, but install them
+     # under their module-level names so the test would catch any
+     # regression that did probe them.
+@@ -211,42 +177,12 @@ def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_availa
+         lambda: _AvailableMAGEMin(available=True),
+         raising=False,
+     )
+-    monkeypatch.setattr(events, '_factsage_config', lambda: {})
+ 
+     backend = _get_backend('auto')
+ 
+     assert isinstance(backend, _FakeAlphaMELTS)
+ 
+ 
+-def test_autodetect_factsage_available_with_strict_config_picks_factsage(
+-        monkeypatch, captured_logs):
+-    _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=True,
+-                   factsage_strict_config=True)
+-
+-    backend = _get_backend('auto')
+-
+-    assert isinstance(backend, _FakeFactSAGE)
+-    assert any('engine selection: _FakeFactSAGE' in line
+-               for line in captured_logs)
+-
+-
+-def test_autodetect_factsage_available_without_strict_config_falls_to_stub(
+-        monkeypatch, captured_logs):
+-    """Strict-config gate fails -> FactSAGE is skipped, not silently used."""
+-    _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=True,
+-                   factsage_strict_config=False)
+-
+-    backend = _get_backend('auto')
+-
+-    assert isinstance(backend, StubBackend)
+-    assert any('engine selection: StubBackend' in line
+-               for line in captured_logs)
+-
+-
+ def test_autodetect_with_vaporock_or_magemin_available_still_picks_stub(
+         monkeypatch, captured_logs):
+     """VapoRock/MAGEMin is_available()=True must not influence selection."""
+@@ -258,8 +194,7 @@ def test_autodetect_with_vaporock_or_magemin_available_still_picks_stub(
+         name = 'magemin'
+ 
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+     monkeypatch.setattr(
+         'simulator.melt_backend.vaporock.VapoRockBackend',
+         lambda: _AvailableVapoRock(available=True),
+@@ -284,8 +219,7 @@ def test_autodetect_with_vaporock_or_magemin_available_still_picks_stub(
+ def test_explicit_alphamelts_request_succeeds_when_available(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=False)
++                   alphamelts_available=True)
+ 
+     backend = _get_backend('alphamelts')
+ 
+@@ -294,44 +228,13 @@ def test_explicit_alphamelts_request_succeeds_when_available(
+ 
+ def test_explicit_alphamelts_request_raises_when_unavailable(monkeypatch):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     with pytest.raises(BackendUnavailableError,
+                        match='AlphaMELTS unavailable'):
+         _get_backend('alphamelts')
+ 
+ 
+-def test_explicit_factsage_request_picks_factsage_with_strict_config(
+-        monkeypatch, captured_logs):
+-    _install_fakes(monkeypatch,
+-                   alphamelts_available=True,  # ignored by explicit factsage
+-                   factsage_available=True,
+-                   factsage_strict_config=True)
+-
+-    backend = _get_backend('factsage')
+-
+-    assert isinstance(backend, _FakeFactSAGE)
+-
+-
+-def test_explicit_factsage_request_falls_to_stub_without_strict_config(
+-        monkeypatch, captured_logs):
+-    """An explicit FactSAGE request without a strict config drops to Stub.
+-
+-    The existing diagnostic-without-strict-config posture is preserved:
+-    the user gets the built-in fallback, NOT a silent substitute primary
+-    like AlphaMELTS (which they did not ask for).
+-    """
+-    _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=True,
+-                   factsage_strict_config=False)
+-
+-    backend = _get_backend('factsage')
+-
+-    assert isinstance(backend, StubBackend)
+-
+-
+ def test_explicit_stub_request_pins_stub_backend(
+         monkeypatch, captured_logs):
+     """``backend='stub'`` deterministically pins StubBackend (D1 fix).
+@@ -344,8 +247,7 @@ def test_explicit_stub_request_pins_stub_backend(
+     got AlphaMELTS.)
+     """
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=False)
++                   alphamelts_available=True)
+ 
+     backend = _get_backend('stub')
+ 
+@@ -356,17 +258,13 @@ def test_explicit_stub_request_pins_stub_backend(
+ 
+ def test_web_autodetect_stub_bypasses_primary_probes():
+     """Under WEB_AUTODETECT, 'stub' returns StubBackend without probing
+-    AlphaMELTS or FactSAGE (D1 fix at the resolver level)."""
++    AlphaMELTS (D1 fix at the resolver level)."""
+     calls: list[str] = []
+ 
+     def make_alphamelts():
+         calls.append('alphamelts')
+         return _FakeAlphaMELTS(available=True)
+ 
+-    def make_factsage():
+-        calls.append('factsage')
+-        return _FakeFactSAGE(available=True)
+-
+     def make_stub():
+         calls.append('stub')
+         return StubBackend()
+@@ -375,10 +273,7 @@ def test_web_autodetect_stub_bypasses_primary_probes():
+         'stub',
+         BackendSelectionPolicy.WEB_AUTODETECT,
+         alphamelts_backend_cls=make_alphamelts,
+-        factsage_backend_cls=make_factsage,
+         stub_backend_cls=make_stub,
+-        factsage_config_loader=lambda: {},
+-        factsage_config_error_cls=BackendUnavailableError,
+         log_selection=lambda selected: None,
+     )
+ 
+@@ -389,8 +284,7 @@ def test_web_autodetect_stub_bypasses_primary_probes():
+ def test_unknown_backend_name_falls_through_to_autodetect(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     backend = _get_backend('something-else')
+ 
+@@ -423,35 +317,13 @@ def test_explicit_alphamelts_request_is_case_insensitive_raises_when_unavailable
+     # the uppercase variants miss the `if name == 'alphamelts':` branch
+     # and fall into autodetect, returning Stub -- this test catches that.
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     with pytest.raises(BackendUnavailableError,
+                        match='AlphaMELTS unavailable'):
+         _get_backend(name)
+ 
+ 
+-@pytest.mark.parametrize(
+-    'name',
+-    ['factsage', 'FactSAGE', 'FACTSAGE', ' factsage '],
+-)
+-def test_explicit_factsage_request_is_case_insensitive(
+-        monkeypatch, name, captured_logs):
+-    # An explicit FactSAGE request without a strict config must drop to
+-    # Stub regardless of case. If case-folding is broken the uppercase
+-    # variants miss the `if name == 'factsage':` branch and fall through
+-    # to autodetect, which would pick AlphaMELTS (available=True) -- a
+-    # silent substitution this test catches.
+-    _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=True,
+-                   factsage_strict_config=False)
+-
+-    backend = _get_backend(name)
+-
+-    assert isinstance(backend, StubBackend), backend
+-
+-
+ @pytest.mark.parametrize(
+     'name',
+     ['auto', 'Auto', 'AUTO', ' auto '],
+@@ -464,8 +336,7 @@ def test_autodetect_request_is_case_insensitive(
+     # (no ineligibility check), the policy would not raise. Pin the
+     # autodetect path with the eligible backend resolved.
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=False)
++                   alphamelts_available=True)
+ 
+     backend = _get_backend(name)
+ 
+@@ -488,8 +359,7 @@ def test_vaporock_and_magemin_refused_as_active_backend(monkeypatch, name):
+     only result (vaporock).
+     """
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=True)
++                   alphamelts_available=True)
+ 
+     with pytest.raises(BackendUnavailableError,
+                        match='not eligible as the active melt backend'):
+@@ -498,8 +368,7 @@ def test_vaporock_and_magemin_refused_as_active_backend(monkeypatch, name):
+ 
+ def test_refusal_message_names_kernel_carve_out_prerequisite(monkeypatch):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     with pytest.raises(BackendUnavailableError) as exc_info:
+         _get_backend('vaporock')
+@@ -515,8 +384,7 @@ def test_refusal_message_names_kernel_carve_out_prerequisite(monkeypatch):
+ def test_engine_selection_log_emitted_on_every_selection(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=True,
+-                   factsage_available=False)
++                   alphamelts_available=True)
+ 
+     _get_backend('auto')
+ 
+@@ -532,8 +400,7 @@ def test_engine_selection_log_emitted_on_every_selection(
+ def test_engine_selection_log_also_emitted_on_stub_fallback(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=False)
++                   alphamelts_available=False)
+ 
+     _get_backend('auto')
+ 
+@@ -542,17 +409,15 @@ def test_engine_selection_log_also_emitted_on_stub_fallback(
+     assert len(selection_lines) == 1
+ 
+ 
+-def test_engine_selection_log_records_capabilities_for_factsage(
++def test_engine_selection_log_records_capabilities_for_alphamelts(
+         monkeypatch, captured_logs):
+     _install_fakes(monkeypatch,
+-                   alphamelts_available=False,
+-                   factsage_available=True,
+-                   factsage_strict_config=True)
++                   alphamelts_available=True)
+ 
+     _get_backend('auto')
+ 
+     selection_lines = [line for line in captured_logs
+                        if line.startswith('engine selection:')]
+     assert len(selection_lines) == 1
+-    assert '_FakeFactSAGE' in selection_lines[0]
++    assert '_FakeAlphaMELTS' in selection_lines[0]
+     assert 'silicate_melt=true' in selection_lines[0]
+diff --git a/web/events.py b/web/events.py
+index 0822d35..ecbc606 100644
+--- a/web/events.py
++++ b/web/events.py
+@@ -16,11 +16,6 @@ from simulator.backends import (
+ from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+ from simulator.melt_backend.base import StubBackend
+ from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+-from simulator.melt_backend.factsage import FactSAGEBackend
+-from simulator.melt_backend.factsage_config import (
+-    FactSAGEConfigError,
+-    load_factsage_config,
+-)
+ from simulator.session import (
+     DecisionPolicy,
+     SimSession,
+@@ -125,10 +120,6 @@ def _get_backend(backend_name: str):
+ 
+     * ``'alphamelts'`` — strict probe; raise ``BackendUnavailableError`` if
+       PetThermoTools or the alphaMELTS binary is not reachable.
+-    * ``'factsage'`` — strict probe under the configured strict-config gate
+-      (a real ``FACTSAGE_CONFIG`` JSON + ChemApp + ``.cst`` data file); on
+-      gate failure, fall back to ``StubBackend`` so the simulator stays
+-      diagnostic-without-strict-config (existing semantics).
+     * ``'vaporock'`` / ``'magemin'`` — explicitly **refused**.  Both
+       adapters are not wired into a multi-intent dispatcher yet; selecting
+       either as the active ``MeltBackend`` would fail closed inside
+@@ -138,11 +129,11 @@ def _get_backend(backend_name: str):
+       AtomLedger transition" reject).  Promotion is blocked on
+       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
+     * ``'auto'`` / ``'stub'`` / unknown — autodetect chain: probe
+-      AlphaMELTS first, then FactSAGE-with-strict-config, falling back to
+-      ``StubBackend`` as the always-available primary fallback.  No silent
+-      cross-backend fallback at runtime: if the selected primary throws
+-      inside ``_get_equilibrium`` after selection, ``core.py``'s
+-      fail-closed path handles it without re-routing here.
++      AlphaMELTS first, falling back to ``StubBackend`` as the
++      always-available primary fallback.  No silent cross-backend
++      fallback at runtime: if the selected primary throws inside
++      ``_get_equilibrium`` after selection, ``core.py``'s fail-closed
++      path handles it without re-routing here.
+     """
+     return resolve_backend(
+         backend_name,
+@@ -153,29 +144,15 @@ def _get_backend(backend_name: str):
+         ),
+         log_message=_safe_log,
+         alphamelts_backend_cls=AlphaMELTSBackend,
+-        factsage_backend_cls=FactSAGEBackend,
+         stub_backend_cls=StubBackend,
+-        factsage_config_loader=_factsage_config,
+-        factsage_config_error_cls=FactSAGEConfigError,
+     )
+ 
+ 
+-def _factsage_config():
+-    """Load optional FactSAGE config from FACTSAGE_CONFIG."""
+-    try:
+-        return load_factsage_config()
+-    except FactSAGEConfigError as exc:
+-        _safe_log(f'FactSAGE config error: {exc}')
+-        return {}
+-
+-
+ def _backend_name_for_session(backend) -> str:
+     """Map the web-selected backend instance to SimSession strict name."""
+     backend_type = type(backend).__name__
+     if isinstance(backend, AlphaMELTSBackend) or backend_type == 'AlphaMELTSBackend':
+         return 'alphamelts'
+-    if isinstance(backend, FactSAGEBackend) or backend_type == 'FactSAGEBackend':
+-        return 'factsage'
+     return 'stub'
+ 
+ 
+@@ -594,7 +571,7 @@ def register_events(socketio):
+         mass_kg = float(data.get('mass_kg', 1000))
+         # Default is 'auto' (AlphaMELTS-preferred autodetect per
+         # \goal BACKEND-DEFAULT-SWITCH), not 'stub'.  Explicit UI choices
+-        # ('alphamelts', 'factsage', 'stub') are still honoured.
++        # ('alphamelts', 'stub') are still honoured.
+         backend_name = data.get('backend', 'auto')
+         track = data.get('track', 'pyrolysis')
+         speed = float(data.get('speed', 1.0))
+@@ -614,15 +591,7 @@ def register_events(socketio):
+         backend_type = type(backend).__name__
+         backend_message = ''
+         if isinstance(backend, StubBackend):
+-            if backend_name == 'factsage':
+-                backend_message = (
+-                    'FactSAGE unavailable; using built-in fallback')
+-            else:
+-                backend_message = 'Using built-in fallback'
+-        elif backend_name == 'factsage' or backend_type == 'FactSAGEBackend':
+-            backend_message = (
+-                'FactSAGE/ChemApp export active: '
+-                f'{backend.capability_summary()}')
++            backend_message = 'Using built-in fallback'
+         else:
+             backend_message = f'Using {backend_type}'
+ 
+diff --git a/web/templates/simulator.html b/web/templates/simulator.html
+index 5ed2d7d..4cb0977 100644
+--- a/web/templates/simulator.html
++++ b/web/templates/simulator.html
+@@ -27,7 +27,6 @@
+             <select id="engine-select">
+                 <option value="auto" selected>Auto (AlphaMELTS preferred)</option>
+                 <option value="alphamelts">AlphaMELTS (strict)</option>
+-                <option value="factsage">FactSAGE/ChemApp (if configured)</option>
+                 <option value="stub">Built-in fallback</option>
+             </select>
+         </fieldset>
