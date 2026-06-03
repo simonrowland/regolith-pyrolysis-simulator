@@ -226,6 +226,8 @@ class EquilibriumMixin:
             return EquilibriumResult(
                 temperature_C=self.melt.temperature_C,
                 pressure_bar=self.melt.p_total_mbar / 1000.0,
+                liquid_fraction=None,
+                phase_assemblage_available=False,
                 status='ok',
             )
 
@@ -405,6 +407,8 @@ class EquilibriumMixin:
         return EquilibriumResult(
             temperature_C=self.melt.temperature_C,
             pressure_bar=self.melt.p_total_mbar / 1000.0,
+            liquid_fraction=None,
+            phase_assemblage_available=False,
             vapor_pressures_Pa=vapor_pressures,
             vapor_pressures_source={
                 species: 'builtin_fallback'

@@ -1,3 +1,4 @@
+import ast
 import re
 import subprocess
 from pathlib import Path
@@ -51,3 +52,52 @@ def test_species_catalog_loads_case_sensitive_species_ids():
 
     assert dict(formulas["Co"].elements) == {"Co": 1.0}
     assert dict(formulas["CO"].elements) == {"C": 1.0, "O": 1.0}
+
+
+def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():
+    repo = Path(__file__).parent.parent
+    violations = []
+
+    for root in (repo / "simulator", repo / "engines"):
+        for path in root.rglob("*.py"):
+            tree = ast.parse(path.read_text())
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                func_name = (
+                    node.func.id if isinstance(node.func, ast.Name)
+                    else node.func.attr if isinstance(node.func, ast.Attribute)
+                    else None
+                )
+                if func_name != "EquilibriumResult":
+                    continue
+                keywords = {kw.arg: kw.value for kw in node.keywords if kw.arg}
+                status = keywords.get("status")
+                if (
+                    not isinstance(status, ast.Constant)
+                    or status.value != "ok"
+                ):
+                    continue
+                liquid_fraction = keywords.get("liquid_fraction")
+                phase_assemblage_available = keywords.get(
+                    "phase_assemblage_available"
+                )
+                vapor_only = (
+                    isinstance(liquid_fraction, ast.Constant)
+                    and liquid_fraction.value is None
+                    and isinstance(phase_assemblage_available, ast.Constant)
+                    and phase_assemblage_available.value is False
+                )
+                hardcoded_fraction = (
+                    liquid_fraction is None
+                    or (
+                        isinstance(liquid_fraction, ast.Constant)
+                        and liquid_fraction.value is not None
+                    )
+                )
+                if hardcoded_fraction and not vapor_only:
+                    violations.append(
+                        f"{path.relative_to(repo)}:{node.lineno}"
+                    )
+
+    assert not violations, "\n".join(violations)

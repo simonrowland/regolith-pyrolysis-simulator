@@ -640,6 +640,23 @@ def _sio_o2_train_sim():
     return sim
 
 
+def test_stub_equilibrium_ok_paths_are_vapor_only_without_liquid_fraction():
+    sim = _sio_o2_train_sim()
+
+    sim.melt.temperature_C = 25.0
+    cold = sim._stub_equilibrium()
+    assert cold.status == "ok"
+    assert cold.liquid_fraction is None
+    assert cold.phase_assemblage_available is False
+
+    sim.melt.temperature_C = 1600.0
+    hot = sim._stub_equilibrium()
+    assert hot.status == "ok"
+    assert hot.liquid_fraction is None
+    assert hot.phase_assemblage_available is False
+    assert hot.vapor_pressures_Pa
+
+
 def test_sio_suppression_uses_commanded_po2():
     """The SiO √pO₂ suppression in _stub_equilibrium references the
     commanded pO₂ from _commanded_pO2_bar. This is the *commanded*

@@ -73,6 +73,7 @@ from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     build_equilibrium_crystallization_path,
 )
+from simulator.melt_backend.base import LiquidFractionInvalidError
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
@@ -568,7 +569,16 @@ class AlphaMELTSProvider(ChemistryProvider):
             composition = dict(
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )
-            liquid_fraction = float(getattr(result, 'liquid_fraction'))
+            raw_liquid_fraction = getattr(result, 'liquid_fraction', None)
+            if not _is_finite(raw_liquid_fraction):
+                raise LiquidFractionInvalidError(
+                    f'liquid_fraction_invalid: {raw_liquid_fraction!r}'
+                )
+            liquid_fraction = float(raw_liquid_fraction)
+            if liquid_fraction < 0.0 or liquid_fraction > 1.0:
+                raise LiquidFractionInvalidError(
+                    f'liquid_fraction_invalid: {raw_liquid_fraction!r}'
+                )
             # Autoreview r7 P2 (2026-05-27): the EC path samples the
             # solidus-to-liquidus grid INCLUDING endpoints.  Post r4
             # ThermoEngine fix (the bulk_wt fabrication for subsolidus
@@ -603,6 +613,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             liquidus_T_C=path.liquidus_T_C,
             liquidus_T_K=path.liquidus_T_K,
             solidus_T_C=path.solidus_T_C,
+            liquid_fraction=path.liquid_fraction,
             status=path.status,
             warnings=(
                 *tuple(bounds.warnings),

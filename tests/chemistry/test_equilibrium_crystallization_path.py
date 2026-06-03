@@ -201,6 +201,7 @@ class _FakeECAlphaMELTSBackend:
         return LiquidusSolidusResult(
             liquidus_T_C=1300.0,
             solidus_T_C=1000.0,
+            liquid_fraction=1.0,
             status='ok',
         )
 

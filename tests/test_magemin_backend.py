@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import LiquidFractionInvalidError
 from simulator.melt_backend.magemin import MAGEMinBackend
 
 
@@ -348,6 +349,32 @@ def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     assert result.temperature_C == pytest.approx(1350.0)
     assert result.pressure_bar == pytest.approx(2000.0)
     assert result.status == "ok"
+
+
+def test_magemin_ok_result_with_nonfinite_phase_mass_raises(monkeypatch):
+    def minimize(**kwargs):
+        return {
+            "phases": {
+                "liq": {"mass_kg": float("nan")},
+                "ol": {"mass_kg": 0.2},
+            }
+        }
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    with pytest.raises(LiquidFractionInvalidError, match="phase_mass_invalid"):
+        backend.equilibrate(
+            1350.0,
+            composition_mol={"SiO2": 5.0, "MgO": 3.0, "FeO": 1.0},
+            fO2_log=-8.0,
+            pressure_bar=2000.0,
+        )
 
 
 def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):

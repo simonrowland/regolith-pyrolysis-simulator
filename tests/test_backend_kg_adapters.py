@@ -45,6 +45,7 @@ class RecordingStubBackend(StubBackend):
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
+            liquid_fraction=1.0,
             liquid_composition_wt_pct={"SiO2": 0.0, "FeO": 100.0},
         )
 

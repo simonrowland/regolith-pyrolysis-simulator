@@ -34,6 +34,7 @@ import pytest
 
 import engines.alphamelts.provider as provider_module
 from engines.alphamelts.parser import (
+    ParserError,
     diagnostics_to_equilibrium,
     project_equilibrium_to_diagnostics,
 )
@@ -42,6 +43,7 @@ from engines.alphamelts import (
     AlphaMELTSProvider,
     LiquidusDiagnostics,
 )
+from simulator.melt_backend.base import LiquidFractionInvalidError
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -207,6 +209,7 @@ class _FakeAlphaMELTSBackend:
         return self._finder_result or LiquidusSolidusResult(
             liquidus_T_C=1305.0,
             solidus_T_C=1000.0,
+            liquid_fraction=1.0,
             status='ok',
         )
 
@@ -572,6 +575,27 @@ def test_parser_falls_back_to_warning_regex_when_field_missing():
     assert diagnostics.liquidus_T_C == pytest.approx(1287.5)
 
 
+def test_parser_raises_when_liquid_fraction_missing():
+    legacy = SimpleNamespace(
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_composition_wt_pct=dict(_basalt_wt_pct()),
+        activity_coefficients={},
+        fO2_log=-9.0,
+        status='ok',
+        warnings=[],
+        vapor_pressures_Pa={},
+        ledger_transition=None,
+    )
+
+    with pytest.raises(ParserError, match='liquid_fraction_missing'):
+        project_equilibrium_to_diagnostics(
+            legacy,
+            mode='subprocess',
+            engine_version='fake-alphamelts subprocess',
+        )
+
+
 def test_alphamelts_writer_populates_structured_field_and_warning():
     """Round-trip: the AlphaMELTS subprocess writer (W6) MUST populate
     BOTH the structured ``EquilibriumResult.liquidus_T_C`` field AND
@@ -583,11 +607,14 @@ def test_alphamelts_writer_populates_structured_field_and_warning():
     from simulator.melt_backend.base import EquilibriumResult
 
     # Field default is None (no opportunistic liquidus computed).
-    eq_no_liquidus = EquilibriumResult()
+    eq_no_liquidus = EquilibriumResult(status='unavailable')
     assert eq_no_liquidus.liquidus_T_C is None
 
     # Field accepts float; the dataclass shape is unchanged otherwise.
-    eq_with_liquidus = EquilibriumResult(liquidus_T_C=1305.5)
+    eq_with_liquidus = EquilibriumResult(
+        liquid_fraction=1.0,
+        liquidus_T_C=1305.5,
+    )
     assert eq_with_liquidus.liquidus_T_C == 1305.5
 
 
@@ -874,6 +901,36 @@ def test_provider_returns_unavailable_when_backend_marked_unavailable():
     assert result.status == 'unavailable'
     assert result.transition is None
     assert (result.diagnostic or {}).get('mode') == 'unavailable'
+
+
+def test_provider_raises_on_nonfinite_ec_liquid_fraction():
+    def _bad_equilibrate(**_: object) -> SimpleNamespace:
+        return SimpleNamespace(
+            status='ok',
+            liquid_fraction=float('nan'),
+            liquid_composition_wt_pct=dict(_basalt_wt_pct()),
+            warnings=[],
+        )
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+        finder_result=LiquidusSolidusResult(
+            liquidus_T_C=1300.0,
+            solidus_T_C=1000.0,
+            liquid_fraction=1.0,
+            status='ok',
+        ),
+        equilibrate_func=_bad_equilibrate,
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        composition_mol=_basalt_species_mol(),
+    )
+
+    with pytest.raises(LiquidFractionInvalidError):
+        provider.dispatch(request)
 
 
 # ---------------------------------------------------------------------------

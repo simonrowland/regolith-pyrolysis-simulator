@@ -135,6 +135,7 @@ def _force_vaporock_available(sim: PyrolysisSimulator) -> VapoRockProvider:
                 temperature_C=1500.0,
                 pressure_bar=1e-6,
                 fO2_log=-9.0,
+                liquid_fraction=1.0,
                 status='ok',
                 # The SiO value is anchored to the SF2004 Table 9
                 # back-solve (0.0131 Pa for tholeiitic basalt at 1900 K).

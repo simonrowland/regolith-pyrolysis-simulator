@@ -6,6 +6,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Callable, Mapping, Optional, Tuple
 
+from simulator.melt_backend.base import LiquidFractionInvalidError
+
 
 @dataclass(frozen=True)
 class MeltFractionSample:
@@ -18,6 +20,7 @@ class LiquidusSolidusResult:
     liquidus_T_C: Optional[float] = None
     liquidus_T_K: Optional[float] = None
     solidus_T_C: Optional[float] = None
+    liquid_fraction: Optional[float] = None
     status: str = 'unavailable'
     warnings: Tuple[str, ...] = ()
     samples: Tuple[MeltFractionSample, ...] = ()
@@ -34,6 +37,12 @@ class LiquidusSolidusResult:
             object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
+        if self.liquid_fraction is not None:
+            object.__setattr__(
+                self,
+                'liquid_fraction',
+                float(self.liquid_fraction),
+            )
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
         object.__setattr__(self, 'samples', tuple(self.samples))
@@ -65,6 +74,7 @@ class EquilibriumCrystallizationPathResult:
     liquidus_T_C: Optional[float] = None
     liquidus_T_K: Optional[float] = None
     solidus_T_C: Optional[float] = None
+    liquid_fraction: Optional[float] = None
     status: str = 'unavailable'
     warnings: Tuple[str, ...] = ()
     liquid_fraction_path: Tuple[LiquidFractionPathPoint, ...] = ()
@@ -82,6 +92,12 @@ class EquilibriumCrystallizationPathResult:
             object.__setattr__(self, 'liquidus_T_C', self.liquidus_T_K - 273.15)
         if self.solidus_T_C is not None:
             object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
+        if self.liquid_fraction is not None:
+            object.__setattr__(
+                self,
+                'liquid_fraction',
+                float(self.liquid_fraction),
+            )
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
         object.__setattr__(
@@ -228,6 +244,7 @@ def find_liquidus_solidus_by_fraction(
     return LiquidusSolidusResult(
         liquidus_T_C=liquidus.temperature_C,
         solidus_T_C=solidus.temperature_C,
+        liquid_fraction=1.0,
         status='ok',
         warnings=tuple(smoothing_warnings),
         samples=tuple(samples),
@@ -284,6 +301,8 @@ def build_equilibrium_crystallization_path(
                     liquid_composition_wt_pct=_coerce_composition(raw_composition),
                 )
             )
+    except LiquidFractionInvalidError:
+        raise
     except Exception as exc:  # noqa: BLE001 - engine sampler boundary
         return EquilibriumCrystallizationPathResult(
             liquidus_T_C=liquidus_T_C,
@@ -300,6 +319,7 @@ def build_equilibrium_crystallization_path(
     return EquilibriumCrystallizationPathResult(
         liquidus_T_C=liquidus_T,
         solidus_T_C=solidus_T,
+        liquid_fraction=(path[-1].liquid_fraction if path else None),
         status='ok',
         warnings=tuple(smoothing_warnings),
         liquid_fraction_path=tuple(path),

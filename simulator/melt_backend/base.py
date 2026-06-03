@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+import math
 from typing import Any, Dict, List, Mapping, Optional
 
 
@@ -27,6 +28,55 @@ DEFAULT_BACKEND_CAPABILITIES = {
     key: (key == 'silicate_melt')
     for key in BACKEND_CAPABILITY_KEYS
 }
+
+
+class MeltBackendError(RuntimeError):
+    """Base class for melt backend contract violations."""
+
+
+class LiquidFractionInvalidError(MeltBackendError):
+    """Raised when an ok equilibrium result lacks a real liquid fraction."""
+
+
+class MeltCompositionError(MeltBackendError):
+    """Raised when backend phase/composition output is physically unusable."""
+
+
+_LIQUID_PHASE_NAMES = frozenset({
+    'liq', 'liquid', 'LIQUID', 'melt', 'Melt',
+})
+
+
+def liquid_fraction_from_phase_masses(
+    phase_masses_kg: Mapping[str, float],
+) -> Optional[float]:
+    """Return liquid mass / total phase mass, or None when mass is unknown."""
+    total_mass_kg = 0.0
+    liquid_mass_kg = 0.0
+    for phase, mass_kg in phase_masses_kg.items():
+        try:
+            mass = float(mass_kg)
+        except (TypeError, ValueError) as exc:
+            raise LiquidFractionInvalidError(
+                f'phase_mass_invalid: {phase}={mass_kg!r}'
+            ) from exc
+        if not math.isfinite(mass) or mass < 0.0:
+            raise LiquidFractionInvalidError(
+                f'phase_mass_invalid: {phase}={mass_kg!r}'
+            )
+        if mass == 0.0:
+            continue
+        phase_name = str(phase)
+        total_mass_kg += mass
+        if (
+            phase_name in _LIQUID_PHASE_NAMES
+            or phase_name.lower().startswith('liq')
+            or phase_name.endswith('_Liq')
+        ):
+            liquid_mass_kg += mass
+    if total_mass_kg <= 0.0:
+        return None
+    return liquid_mass_kg / total_mass_kg
 
 
 def normalize_backend_capabilities(value: Any = None) -> Dict[str, bool]:
@@ -169,7 +219,11 @@ class EquilibriumResult:
     phase_compositions: Dict[str, Dict[str, float]] = field(default_factory=dict)
 
     # Liquid state
-    liquid_fraction: float = 1.0
+    liquid_fraction: Optional[float] = None
+    # False for vapor-only backends (e.g. VapoRock) that never solve a melt
+    # phase assemblage; ``__post_init__`` then permits ``liquid_fraction=None``
+    # on ``status='ok'``.  Melt-solving backends must leave this True.
+    phase_assemblage_available: bool = True
     liquid_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
     liquid_viscosity_Pa_s: float = 5.0  # Typical basaltic melt
 
@@ -244,6 +298,29 @@ class EquilibriumResult:
     # ``ledger_transition``, ``status``, and ``sulfur_saturation``;
     # placing the new field last keeps the historic order intact.
     liquidus_T_C: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        if self.status != 'ok':
+            return
+        if self.liquid_fraction is None:
+            if not self.phase_assemblage_available:
+                return
+            raise LiquidFractionInvalidError('liquid_fraction_missing')
+        try:
+            liquid_fraction = float(self.liquid_fraction)
+        except (TypeError, ValueError) as exc:
+            raise LiquidFractionInvalidError(
+                f'liquid_fraction_invalid: {self.liquid_fraction!r}'
+            ) from exc
+        if (
+            not math.isfinite(liquid_fraction)
+            or liquid_fraction < 0.0
+            or liquid_fraction > 1.0
+        ):
+            raise LiquidFractionInvalidError(
+                f'liquid_fraction_invalid: {self.liquid_fraction!r}'
+            )
+        self.liquid_fraction = liquid_fraction
 
 
 class MeltBackend(ABC):
@@ -349,6 +426,7 @@ class StubBackend(MeltBackend):
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             status='unavailable',
+            liquid_fraction=None,
         )
 
     def get_vapor_species(self):

@@ -20,9 +20,14 @@ ledger writes never".
 from __future__ import annotations
 
 import re
+import math
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 from engines.alphamelts.result import LiquidusDiagnostics
+
+
+class ParserError(RuntimeError):
+    """Raised when adapter output cannot be projected safely."""
 
 # Liquidus marker the subprocess stdout uses; mirrors
 # ``AlphaMELTSBackend._parse_liquidus_C`` so the provider extracts the
@@ -74,6 +79,7 @@ def project_equilibrium_to_diagnostics(
         )
 
     warnings: Tuple[str, ...] = tuple(getattr(equilibrium_result, 'warnings', ()) or ())
+    backend_status = str(getattr(equilibrium_result, 'status', 'ok'))
 
     # 0.5.4 W6 (M3 historical-audit closure, 2026-05-28): prefer the
     # structured ``EquilibriumResult.liquidus_T_C`` field; fall back to
@@ -90,8 +96,8 @@ def project_equilibrium_to_diagnostics(
     phase_masses = _phase_masses_kg(equilibrium_result)
     phase_modes = _phase_modes_wt_pct(phase_masses)
     liquid_fraction = _safe_attr_float(equilibrium_result, 'liquid_fraction')
-    if liquid_fraction is None:
-        liquid_fraction = 1.0
+    if liquid_fraction is None and backend_status == 'ok':
+        raise ParserError('liquid_fraction_missing')
     fO2_log = _safe_attr_float(equilibrium_result, 'fO2_log')
     liquid_comp = {
         str(k): float(v)
@@ -128,7 +134,7 @@ def project_equilibrium_to_diagnostics(
         intrinsic_fO2_log=intrinsic_fO2_log,
         mode=mode,
         engine_version=engine_version,
-        backend_status=str(getattr(equilibrium_result, 'status', 'ok')),
+        backend_status=backend_status,
         backend_warnings=warnings,
     )
 
@@ -138,23 +144,51 @@ def diagnostics_to_equilibrium(
     request_controls: Mapping[str, Any],
 ) -> 'EquilibriumResult':
     """Rebuild legacy ``EquilibriumResult`` from a kernel diagnostic."""
-    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.melt_backend.base import (
+        EquilibriumResult,
+        LiquidFractionInvalidError,
+        liquid_fraction_from_phase_masses,
+    )
 
     controls = dict(request_controls or {})
     fO2_log = diagnostics.fO2_log
     if fO2_log is None:
         fO2_log = _control_float(controls, 'fO2_log', -9.0)
+    status = str(diagnostics.backend_status)
+    phase_masses_kg = dict(diagnostics.phase_masses_kg)
+    liquid_fraction = (
+        None if diagnostics.liquid_fraction is None
+        else float(diagnostics.liquid_fraction)
+    )
+    if status == 'ok':
+        computed = liquid_fraction_from_phase_masses(phase_masses_kg)
+        if computed is None:
+            raise LiquidFractionInvalidError('liquid_fraction_missing')
+        if liquid_fraction is not None:
+            if not math.isfinite(liquid_fraction):
+                raise LiquidFractionInvalidError(
+                    f'liquid_fraction_invalid: {liquid_fraction!r}'
+                )
+            if not math.isclose(
+                liquid_fraction, computed, rel_tol=1e-6, abs_tol=1e-6
+            ):
+                raise LiquidFractionInvalidError(
+                    'liquid_fraction_mismatch: '
+                    f'supplied={liquid_fraction!r} '
+                    f'phase_masses={computed!r}'
+                )
+        liquid_fraction = computed
     return EquilibriumResult(
         temperature_C=_control_float(controls, 'temperature_C', 0.0),
         pressure_bar=_control_float(controls, 'pressure_bar', 0.0),
         phases_present=list(diagnostics.phases_present),
-        phase_masses_kg=dict(diagnostics.phase_masses_kg),
-        liquid_fraction=float(diagnostics.liquid_fraction),
+        phase_masses_kg=phase_masses_kg,
+        liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=dict(diagnostics.liquid_composition_wt_pct),
         activity_coefficients=dict(diagnostics.activity_coefficients),
         fO2_log=float(fO2_log),
         warnings=list(diagnostics.backend_warnings),
-        status=str(diagnostics.backend_status),
+        status=status,
     )
 
 

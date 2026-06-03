@@ -104,6 +104,8 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    MeltCompositionError,
+    liquid_fraction_from_phase_masses,
     project_melt_to_oxide_wt_pct,
     split_cleaned_melt_account,
 )
@@ -355,14 +357,25 @@ class MAGEMinBackend(MeltBackend):
             for line in buffer_warnings:
                 if line not in all_warnings:
                     all_warnings.append(line)
+        (
+            phases_present,
+            phase_masses_kg,
+            phase_compositions,
+            liquid_fraction,
+            liquid_composition_wt_pct,
+        ) = self._phase_assemblage_payload(raw)
         result = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            phases_present=phases_present,
+            phase_masses_kg=phase_masses_kg,
+            phase_compositions=phase_compositions,
+            liquid_fraction=liquid_fraction,
+            liquid_composition_wt_pct=liquid_composition_wt_pct,
             status='ok',
             warnings=all_warnings,
         )
-        self._populate_result(result, raw)
         return result
 
     def find_liquidus_solidus(
@@ -422,6 +435,7 @@ class MAGEMinBackend(MeltBackend):
             liquidus_T_C=result.liquidus_T_C,
             liquidus_T_K=result.liquidus_T_K,
             solidus_T_C=result.solidus_T_C,
+            liquid_fraction=result.liquid_fraction,
             status=result.status,
             warnings=tuple(warnings_out),
             samples=result.samples,
@@ -946,38 +960,70 @@ class MAGEMinBackend(MeltBackend):
         upstream Python entry point is stable.  Today this is a
         best-effort projection.
         """
+        (
+            phases_present,
+            phase_masses_kg,
+            phase_compositions,
+            liquid_fraction,
+            liquid_composition_wt_pct,
+        ) = self._phase_assemblage_payload(raw)
+        result.phases_present.extend(phases_present)
+        result.phase_masses_kg.update(phase_masses_kg)
+        result.phase_compositions.update(phase_compositions)
+        result.liquid_fraction = liquid_fraction
+        if liquid_composition_wt_pct:
+            result.liquid_composition_wt_pct = liquid_composition_wt_pct
+
+    def _phase_assemblage_payload(
+        self,
+        raw: Any,
+    ) -> Tuple[
+        List[str],
+        Dict[str, float],
+        Dict[str, Dict[str, float]],
+        float,
+        Dict[str, float],
+    ]:
         if raw is None:
-            return
+            raise MeltCompositionError('zero_total_phase_mass')
 
         phases = self._extract_phases(raw)
-        liquid_phase_names = ('liq', 'liquid', 'LIQUID', 'melt', 'Melt')
+        liquid_fraction = liquid_fraction_from_phase_masses({
+            name: mass_kg for name, mass_kg, _ in phases
+        })
+        if liquid_fraction is None:
+            raise MeltCompositionError('zero_total_phase_mass')
 
-        total_mass_kg = 0.0
-        liquid_mass_kg = 0.0
+        liquid_phase_names = ('liq', 'liquid', 'LIQUID', 'melt', 'Melt')
+        phases_present: List[str] = []
+        phase_masses_kg: Dict[str, float] = {}
+        phase_compositions: Dict[str, Dict[str, float]] = {}
         liquid_composition: Dict[str, float] = {}
 
         for name, mass_kg, composition_wt_pct in phases:
-            if mass_kg <= 0:
+            mass = float(mass_kg)
+            if mass <= 0:
                 continue
-            result.phases_present.append(name)
-            result.phase_masses_kg[name] = mass_kg
+            phases_present.append(name)
+            phase_masses_kg[name] = mass
             if composition_wt_pct:
-                result.phase_compositions[name] = composition_wt_pct
-            total_mass_kg += mass_kg
+                phase_compositions[name] = composition_wt_pct
             if name in liquid_phase_names or name.lower().startswith('liq'):
-                liquid_mass_kg += mass_kg
                 if composition_wt_pct:
                     liquid_composition = composition_wt_pct
 
-        if total_mass_kg > 0:
-            result.liquid_fraction = liquid_mass_kg / total_mass_kg
-        if liquid_composition:
-            result.liquid_composition_wt_pct = liquid_composition
+        return (
+            phases_present,
+            phase_masses_kg,
+            phase_compositions,
+            liquid_fraction,
+            liquid_composition,
+        )
 
     @staticmethod
     def _extract_phases(
         raw: Any,
-    ) -> List[Tuple[str, float, Dict[str, float]]]:
+    ) -> List[Tuple[str, Any, Dict[str, float]]]:
         """
         Convert the upstream phase block into a list of
         ``(name, mass_kg, composition_wt_pct)`` triples.
@@ -1005,23 +1051,17 @@ class MAGEMinBackend(MeltBackend):
         return output
 
     @staticmethod
-    def _extract_mass_kg(state: Any) -> float:
+    def _extract_mass_kg(state: Any) -> Any:
         if isinstance(state, (int, float)):
-            return float(state)
+            return state
         if isinstance(state, dict):
             for key in ('mass_kg', 'mass', 'm', 'amount_kg'):
                 if key in state:
-                    try:
-                        return float(state[key])
-                    except (TypeError, ValueError):
-                        continue
+                    return state[key]
         for attr in ('mass_kg', 'mass', 'm', 'amount_kg'):
             value = getattr(state, attr, None)
             if value is not None:
-                try:
-                    return float(value)
-                except (TypeError, ValueError):
-                    continue
+                return value
         return 0.0
 
     @staticmethod

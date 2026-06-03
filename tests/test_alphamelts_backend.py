@@ -11,7 +11,10 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     activity_from_chem_potential,
 )
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    LiquidFractionInvalidError,
+)
 from engines.alphamelts.thermoengine import ThermoEngineTransport
 from engines.magemin.parity import MAGEMinParityComparator
 
@@ -93,6 +96,34 @@ def test_alphamelts_python_liquidus_finder_uses_findliq_gate():
     assert result.status == 'ok'
     assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
+
+
+@pytest.mark.parametrize(
+    ('phase_masses_kg', 'liquid_fraction', 'message'),
+    [
+        ({'liquid': math.inf, 'olivine': 1.0}, None, 'phase_mass_invalid'),
+        ({'liquid': 0.8, 'olivine': 0.2}, math.nan, 'liquid_fraction_invalid'),
+        ({}, None, 'liquid_fraction_missing'),
+        ({'liquid': 0.8, 'olivine': 0.2}, 0.1, 'liquid_fraction_mismatch'),
+    ],
+)
+def test_alphamelts_ok_result_requires_finite_phase_mass_fraction(
+    phase_masses_kg,
+    liquid_fraction,
+    message,
+):
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(LiquidFractionInvalidError, match=message):
+        backend._emit_equilibrium_result(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            phases_present=list(phase_masses_kg),
+            phase_masses_kg=phase_masses_kg,
+            liquid_fraction=liquid_fraction,
+            status='ok',
+        )
 
 
 def test_alphamelts_subprocess_liquidus_finder_is_unavailable():
@@ -354,6 +385,8 @@ def test_petthermotools_result_parser_converts_mu_to_activity():
         'Conditions': {'mass': 100.0},
         'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
         'liquid1_prop': {'mass': 80.0},
+        'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
+        'olivine1_prop': {'mass': 20.0},
         'chemical_potentials': {'Na': -900.0, 'K': -1050.0},
         'pure_chemical_potentials': {'Na': -1000.0, 'K': -1000.0},
     }, {})
@@ -631,6 +664,8 @@ def test_decompression_path_calls_verified_petthermotools_api():
                 'Conditions': {'mass': 100.0},
                 'liquid1': {'SiO2': 49.0},
                 'liquid1_prop': {'mass': 95.0},
+                'olivine1': {'SiO2': 40.0},
+                'olivine1_prop': {'mass': 5.0},
             },
         }
 
@@ -665,6 +700,27 @@ def test_decompression_path_calls_verified_petthermotools_api():
     assert calls[0]['fO2_buffer'] == 'QFM'
     assert calls[0]['fO2_offset'] == -1.5
     assert calls[0]['bulk']['FeOt_Liq'] == pytest.approx(10.0)
+
+
+def test_alphamelts_stdout_parser_solid_only_reports_zero_liquid_fraction():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable solid assemblage achieved.
+olivine: 90.3451 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
+"""
+
+    result = backend._parse_single_point_stdout(
+        output,
+        temperature_C=1100.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=1000.0,
+    )
+
+    assert result.liquid_fraction == pytest.approx(0.0)
+    assert result.phases_present == ["olivine"]
+    assert "liquid" not in result.phases_present
+    assert result.status == "ok"
 
 
 def test_alphamelts_stdout_parser_reports_liquid_fraction_without_ledger_transition():
@@ -841,6 +897,7 @@ def _vaporock_helper_returning(pressures, status='ok'):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status=status,
+                liquid_fraction=1.0 if status == 'ok' else None,
                 vapor_pressures_Pa=dict(pressures),
             )
     return _Helper()

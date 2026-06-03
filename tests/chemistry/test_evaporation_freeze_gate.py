@@ -96,7 +96,11 @@ def _set_freeze_gate(setpoints_data: dict, *, enabled: bool) -> dict:
 
 
 def _equilibrium() -> EquilibriumResult:
-    return EquilibriumResult(vapor_pressures_Pa={'Na': 1.0}, status='ok')
+    return EquilibriumResult(
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={'Na': 1.0},
+        status='ok',
+    )
 
 
 def _build_freeze_gate_sim(

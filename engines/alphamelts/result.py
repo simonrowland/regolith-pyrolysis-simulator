@@ -23,7 +23,8 @@ caller wants for trace + UI:
   to 100 across the reported phases.
 * ``phase_masses_kg``      -- legacy ``EquilibriumResult`` phase-mass
   projection, copied through for diagnostic-only reconstruction.
-* ``liquid_fraction``      -- legacy ``EquilibriumResult`` liquid fraction.
+* ``liquid_fraction``      -- legacy ``EquilibriumResult`` liquid fraction
+  (None when backend_status is not ``'ok'``).
 * ``liquid_composition_wt_pct`` -- liquid-phase oxide composition (wt%).
 * ``liquid_fraction_path`` -- EC path points over solidus -> liquidus.
 * ``activity_coefficients`` -- legacy field name for per-species
@@ -77,7 +78,7 @@ class LiquidusDiagnostics:
     phases_present: Tuple[str, ...] = ()
     phase_modes_wt_pct: Mapping[str, float] = field(default_factory=dict)
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
-    liquid_fraction: float = 1.0
+    liquid_fraction: Optional[float] = None
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     liquid_fraction_path: Tuple[Mapping[str, Any], ...] = ()
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
@@ -104,7 +105,14 @@ class LiquidusDiagnostics:
             'phase_masses_kg',
             {str(k): float(v) for k, v in dict(self.phase_masses_kg or {}).items()},
         )
-        object.__setattr__(self, 'liquid_fraction', float(self.liquid_fraction))
+        object.__setattr__(
+            self,
+            'liquid_fraction',
+            (
+                None if self.liquid_fraction is None
+                else float(self.liquid_fraction)
+            ),
+        )
         object.__setattr__(
             self,
             'liquid_composition_wt_pct',

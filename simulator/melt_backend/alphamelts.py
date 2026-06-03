@@ -36,7 +36,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.melt_backend.base import MeltBackend, EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    LiquidFractionInvalidError,
+    MeltBackend,
+    liquid_fraction_from_phase_masses,
+)
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
@@ -611,6 +616,7 @@ class AlphaMELTSBackend(MeltBackend):
             liquidus_T_C=result.liquidus_T_C,
             liquidus_T_K=result.liquidus_T_K,
             solidus_T_C=result.solidus_T_C,
+            liquid_fraction=result.liquid_fraction,
             status=result.status,
             warnings=tuple(warnings_out),
             samples=result.samples,
@@ -633,6 +639,35 @@ class AlphaMELTSBackend(MeltBackend):
         return {account: species for account, species in unsupported.items()
                 if species}
 
+    def _resolve_ok_liquid_fraction(
+        self,
+        *,
+        liquid_fraction: Optional[float],
+        phase_masses_kg: Mapping[str, float],
+    ) -> float:
+        computed = liquid_fraction_from_phase_masses(phase_masses_kg)
+        if computed is None:
+            raise LiquidFractionInvalidError('liquid_fraction_missing')
+        if liquid_fraction is not None:
+            try:
+                supplied = float(liquid_fraction)
+            except (TypeError, ValueError) as exc:
+                raise LiquidFractionInvalidError(
+                    f'liquid_fraction_invalid: {liquid_fraction!r}'
+                ) from exc
+            if not math.isfinite(supplied):
+                raise LiquidFractionInvalidError(
+                    f'liquid_fraction_invalid: {liquid_fraction!r}'
+                )
+            if not math.isclose(
+                supplied, computed, rel_tol=1e-6, abs_tol=1e-6
+            ):
+                raise LiquidFractionInvalidError(
+                    'liquid_fraction_mismatch: '
+                    f'supplied={supplied!r} phase_masses={computed!r}'
+                )
+        return computed
+
     def _emit_equilibrium_result(
         self,
         *,
@@ -641,7 +676,7 @@ class AlphaMELTSBackend(MeltBackend):
         fO2_log: float,
         phases_present: Optional[List[str]] = None,
         phase_masses_kg: Optional[Mapping[str, float]] = None,
-        liquid_fraction: float = 1.0,
+        liquid_fraction: Optional[float] = None,
         liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         activity_coefficients: Optional[Mapping[str, float]] = None,
         vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
@@ -649,13 +684,20 @@ class AlphaMELTSBackend(MeltBackend):
         warnings: Optional[List[str]] = None,
         status: str = 'ok',
     ) -> EquilibriumResult:
+        phase_masses = dict(phase_masses_kg or {})
+        resolved_liquid_fraction = liquid_fraction
+        if str(status) == 'ok':
+            resolved_liquid_fraction = self._resolve_ok_liquid_fraction(
+                liquid_fraction=resolved_liquid_fraction,
+                phase_masses_kg=phase_masses,
+            )
         return EquilibriumResult(
             temperature_C=float(temperature_C),
             pressure_bar=float(pressure_bar),
             fO2_log=float(fO2_log),
             phases_present=list(phases_present or []),
-            phase_masses_kg=dict(phase_masses_kg or {}),
-            liquid_fraction=float(liquid_fraction),
+            phase_masses_kg=phase_masses,
+            liquid_fraction=resolved_liquid_fraction,
             liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
             activity_coefficients=dict(activity_coefficients or {}),
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
@@ -1203,43 +1245,32 @@ class AlphaMELTSBackend(MeltBackend):
                 'AlphaMELTS subprocess produced no stable assemblage verdict'
             )
 
-        # The binary ran to completion with a stable assemblage - status 'ok'.
-        eq = self._emit_equilibrium_result(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-            warnings=list(warnings or []),
-            status='ok',
-        )
+        phases_present: List[str] = []
+        phase_masses_kg: Dict[str, float] = {}
+        liquid_composition_wt_pct: Dict[str, float] = {}
+        liquid_fraction: Optional[float] = None
+        result_warnings = list(warnings or [])
         liquidus_C = self._parse_liquidus_C(output)
         if liquidus_C is not None:
-            # 0.5.4 W6 (M3 historical-audit closure): write the value to
-            # the structured ``EquilibriumResult.liquidus_T_C`` field AND
-            # keep emitting the warning string for legacy log consumers.
-            # The structured field is the canonical source going forward
-            # (preferred by ``engines/alphamelts/parser.py``'s diagnostic
-            # projection); the warning preserves the audit trail for
-            # operators reading the raw warnings list.
-            eq.liquidus_T_C = float(liquidus_C)
-            eq.warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
+            result_warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
         lines = output.splitlines()
 
         for idx, line in enumerate(lines):
             stripped = line.strip()
             if stripped.startswith('liquid:'):
-                if 'liquid' not in eq.phases_present:
-                    eq.phases_present.append('liquid')
+                if 'liquid' not in phases_present:
+                    phases_present.append('liquid')
                 headers = stripped.split(':', 1)[1].split()
                 if idx + 1 < len(lines):
                     values = lines[idx + 1].split()
                     if len(values) >= 2 and values[1] == 'g':
                         try:
-                            eq.phase_masses_kg['liquid'] = float(values[0]) / 1000.0
+                            phase_masses_kg['liquid'] = float(values[0]) / 1000.0
                         except ValueError:
                             pass
                         for oxide, raw in zip(headers, values[2:]):
                             try:
-                                eq.liquid_composition_wt_pct[oxide] = float(raw)
+                                liquid_composition_wt_pct[oxide] = float(raw)
                             except ValueError:
                                 continue
 
@@ -1250,44 +1281,50 @@ class AlphaMELTSBackend(MeltBackend):
             )
             if phase_match:
                 phase = phase_match.group(1)
-                if phase != 'liquid' and phase not in eq.phases_present:
-                    eq.phases_present.append(phase)
+                if phase != 'liquid' and phase not in phases_present:
+                    phases_present.append(phase)
                 try:
                     mass_g = float(phase_match.group(2))
                 except ValueError:
                     mass_g = 0.0
                 if mass_g > 0.0:
-                    eq.phase_masses_kg[phase] = mass_g / 1000.0
+                    phase_masses_kg[phase] = mass_g / 1000.0
 
             melt_match = re.search(
                 r'Melt fraction\s*=\s*([0-9.+\-Ee]+)', stripped)
             if melt_match:
-                eq.liquid_fraction = max(
+                liquid_fraction = max(
                     0.0, min(1.0, float(melt_match.group(1))))
 
-        if not eq.phases_present:
+        if not phases_present:
             raise RuntimeError(
                 'AlphaMELTS subprocess produced no parseable phase assemblage'
             )
+        eq = self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            phases_present=phases_present,
+            phase_masses_kg=phase_masses_kg,
+            liquid_fraction=liquid_fraction,
+            liquid_composition_wt_pct=liquid_composition_wt_pct,
+            warnings=result_warnings,
+            status='ok',
+        )
+        if liquidus_C is not None:
+            eq.liquidus_T_C = float(liquidus_C)
         return eq
 
     def _parse_petthermotools_result(self, results, *, temperature_C: float,
                                      pressure_bar: float, fO2_log: float,
                                      comp_wt: dict, warnings=None
                                      ) -> EquilibriumResult:
-        # PetThermoTools returned a result object - status 'ok'.
-        eq = self._emit_equilibrium_result(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-            warnings=list(warnings or []),
-            status='ok',
-        )
         run_result = self._select_petthermotools_run(results)
         conditions = self._first_row_mapping(run_result.get('Conditions', {}))
         total_mass = self._first_number(conditions, ('mass', 'Mass'))
 
-        phase_masses: Dict[str, float] = {}
+        phases_present: List[str] = []
+        phase_masses_g: Dict[str, float] = {}
         for key, value in run_result.items():
             if not self._is_petthermotools_phase_key(key, value):
                 continue
@@ -1299,40 +1336,51 @@ class AlphaMELTSBackend(MeltBackend):
                 mass_g = self._first_number(row, ('mass', 'Mass'))
             if mass_g is not None and mass_g > 0.0:
                 phase_name = phase[:-1] if phase.endswith('_Liq') else phase
-                if phase_name not in eq.phases_present:
-                    eq.phases_present.append(phase_name)
-                phase_masses[phase_name] = mass_g
+                if phase_name not in phases_present:
+                    phases_present.append(phase_name)
+                phase_masses_g[phase_name] = mass_g
 
-        if phase_masses:
-            eq.phase_masses_kg = {
-                phase: mass_g / 1000.0
-                for phase, mass_g in phase_masses.items()
-            }
+        phase_masses_kg = {
+            phase: mass_g / 1000.0
+            for phase, mass_g in phase_masses_g.items()
+        }
+        liquid_fraction: Optional[float] = None
+        liquid_composition_wt_pct = dict(comp_wt)
         liquid_key = self._select_liquid_phase_key(run_result)
         if liquid_key is not None:
             liquid_row = self._first_row_mapping(run_result.get(liquid_key, {}))
-            eq.liquid_composition_wt_pct = (
+            liquid_composition_wt_pct = (
                 self._extract_liquid_composition(liquid_row) or dict(comp_wt)
             )
-            liquid_mass = phase_masses.get(liquid_key)
+            liquid_mass = phase_masses_g.get(liquid_key)
             if liquid_mass is None:
-                liquid_mass = phase_masses.get(
+                liquid_mass = phase_masses_g.get(
                     liquid_key[:-1] if liquid_key.endswith('_Liq') else liquid_key)
             if liquid_mass is not None and total_mass and total_mass > 0.0:
-                eq.liquid_fraction = max(0.0, min(1.0, liquid_mass / total_mass))
-        else:
-            eq.liquid_composition_wt_pct = dict(comp_wt)
+                liquid_fraction = max(0.0, min(1.0, liquid_mass / total_mass))
 
-        eq.activity_coefficients = self._extract_activities_from_chemical_potentials(
+        result_warnings = list(warnings or [])
+        activity_coefficients = self._extract_activities_from_chemical_potentials(
             run_result,
             temperature_C=temperature_C,
         )
-        if not eq.activity_coefficients:
-            eq.warnings.append(
+        if not activity_coefficients:
+            result_warnings.append(
                 'PetThermoTools chemical potentials absent; '
                 'activity-scaled Antoine fallback skipped'
             )
-        return eq
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            phases_present=phases_present,
+            phase_masses_kg=phase_masses_kg,
+            liquid_fraction=liquid_fraction,
+            liquid_composition_wt_pct=liquid_composition_wt_pct,
+            activity_coefficients=activity_coefficients,
+            warnings=result_warnings,
+            status='ok',
+        )
 
     def _select_petthermotools_run(self, results) -> dict:
         if isinstance(results, tuple) and results:

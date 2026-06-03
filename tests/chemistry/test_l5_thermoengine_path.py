@@ -54,6 +54,7 @@ class _MatchingThermoEngineBackend:
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
+            liquid_fraction=1.0,
             vapor_pressures_Pa=thermoengine_vp,
             vapor_pressures_source={
                 species: "thermoengine"
@@ -158,6 +159,7 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     result = EquilibriumResult(
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        liquid_fraction=1.0,
         vapor_pressures_Pa={"Na": bad_na},
         vapor_pressures_source={"Na": "thermoengine"},
         status="ok",

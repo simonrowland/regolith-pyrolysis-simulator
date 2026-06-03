@@ -190,6 +190,8 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
         "SiO": pytest.approx(0.1),
     }
     assert result.status == "ok"
+    assert result.liquid_fraction is None
+    assert result.phase_assemblage_available is False
 
 
 def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):

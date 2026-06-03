@@ -432,6 +432,8 @@ class VapoRockBackend(MeltBackend):
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            liquid_fraction=None,
+            phase_assemblage_available=False,
             status='ok',
             warnings=list(prior_warnings),
             vapor_pressures_Pa=dict(vaporock_full_speciation_Pa),
