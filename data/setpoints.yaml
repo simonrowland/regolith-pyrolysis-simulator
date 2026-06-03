@@ -48,6 +48,12 @@ campaigns:
     endpoint:
       type: "ir_signal_decay"
       threshold: 0.05
+    max_hold_hr: 25
+    soft_endpoint:
+      type: "temperature_min_after_min_hold"
+      min_hold_hr: 10
+      temperature_min_C: 940
+    termination_class: "C"
     duration_h: "included_in_ramp"
     notes: >
       Volatile release complete by ~700 C; alkali onset >900 C
@@ -79,6 +85,11 @@ campaigns:
     endpoint:
       type: "ir_signal_decay"
       threshold: 0.05
+    max_hold_hr: 3
+    soft_endpoint:
+      type: "temperature_min_at_cap"
+      temperature_min_C: 1200
+    termination_class: "C"
     duration_h: [0.5, 2.5]              # IR endpoint control
     notes: >
       Standardised mild oxidative P-cleanup for ALL lunar feedstocks
@@ -142,6 +153,12 @@ campaigns:
       threshold: 0.05
       species_monitored: ["Na", "K", "Fe", "SiO"]
       SiO_target: "target a(SiO2) reduction reached"
+    max_hold_hr: 30
+    soft_endpoint:
+      type: "total_evaporation_rate_below_after_min_hold"
+      min_hold_hr: 18
+      threshold_kg_hr: 0.1
+    termination_class: "C"
     duration_h: [18, 28]
     downstream_impact: >
       C3 cycles halved (0-1 K + 1 Na); C5 MRE scope reduced 20-40%;
@@ -180,6 +197,8 @@ campaigns:
         via: "start --additive=Na=<kg> or SimSessionConfig.additives_kg"
         default_kg: 12
         role: "V1c cool residual-FeO cleanup dose; thin +9.6 kJ/mol O2 margin at 1150 C"
+    max_hold_hr: 9
+    termination_class: "A"
     stages:
       - name: alkali_early_fe
         target_C: 1250
@@ -289,6 +308,13 @@ campaigns:
       type: "ir_signal_decay"
       threshold: 0.05
       species_monitored: ["Fe"]
+    max_hold_hr: 20
+    soft_endpoint:
+      type: "species_evaporation_rate_below_after_min_hold"
+      species: "Fe"
+      min_hold_hr: 8
+      threshold_kg_hr: 0.05
+    termination_class: "C"
     duration_h: null                     # IR-controlled
     notes: >
       Path B: 8-20% slower overall cycle if leaving SiO2 in the melt for
@@ -340,6 +366,16 @@ campaigns:
       type: "pO2_return_to_setpoint"
       hold_time_min: 30
       species_monitored: ["Na", "K"]
+    max_hold_hr:
+      C3_K:
+        A_staged: 3
+        A: 12
+        default: 25
+      C3_NA:
+        A_staged: 3
+        A: 18
+        default: 35
+    termination_class: "A"
     duration_after_pathA_h: [10, 18]
     duration_after_pathB_h_per_phase: [20, 35]
     notes: >
@@ -384,6 +420,13 @@ campaigns:
       type: "ir_signal_decay"
       threshold: "background"
       species_monitored: ["Mg"]
+    max_hold_hr: 20
+    soft_endpoint:
+      type: "species_evaporation_rate_below_after_min_hold"
+      species: "Mg"
+      min_hold_hr: 6
+      threshold_kg_hr: 0.02
+    termination_class: "C"
     duration_h: null                     # IR-controlled
     notes: >
       Branch Two preferred: C4 Mg pyrolysis + C6 Mg thermite. MRE <= 1.6 V,
@@ -423,6 +466,10 @@ campaigns:
       type: "current_decay"
       threshold_A: 10
       at_voltage: "target V setpoint"
+    max_hold_hr:
+      branch_two: 15
+      branch_one: 30
+    termination_class: "A"
     duration_h: null                     # voltage-hold controlled
     notes: >
       O2 backpressure provides total pyrolysis suppression during
@@ -432,6 +479,13 @@ campaigns:
   mre_baseline:
     pO2_mbar_default: 50.0
     p_total_mbar_default: 50.0
+    max_hold_hr: 120
+    soft_endpoint:
+      type: "current_decay_consecutive_hours"
+      min_voltage_V: 2.45
+      threshold_A: 10.0
+      consecutive_hours: 3
+    termination_class: "C"
 
   # --------------------------------------------------------------------------
   # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
@@ -477,6 +531,12 @@ campaigns:
     endpoint:
       type: "self_terminating"
       criterion: "liquidus exceeds 1700 C (residual SiO2+Al2O3 < 15-20%)"
+    max_hold_hr: 20
+    composition_endpoint:
+      type: "refractory_oxide_sum_below"
+      species: ["SiO2", "Al2O3"]
+      threshold_wt_pct: 17.5
+    termination_class: "A"
     duration_h: null                     # self-terminating
     notes: >
       Uses separate solar furnace. Self-terminating when residual

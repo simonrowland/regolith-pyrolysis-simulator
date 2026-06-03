@@ -90,6 +90,55 @@ class CampaignManager:
         except (TypeError, ValueError) as exc:
             raise ValueError(f'Invalid numeric campaign setpoint: {value!r}') from exc
 
+    def _required_float(self, value, label: str) -> float:
+        if value is None:
+            raise ValueError(f'Missing numeric campaign setpoint: {label}')
+        return self._float(value, 0.0)
+
+    def _configured_max_hold_hr(self,
+                                campaign: CampaignPhase,
+                                *path: str) -> float:
+        value = self._campaign_config(campaign).get('max_hold_hr')
+        label = f"{self._campaign_config_key(campaign)}.max_hold_hr"
+        for key in path:
+            label = f"{label}.{key}"
+            if not isinstance(value, Mapping) or key not in value:
+                raise ValueError(f'Missing campaign max_hold_hr setpoint: {label}')
+            value = value[key]
+        return self._required_float(value, label)
+
+    def _configured_endpoint(self,
+                             campaign: CampaignPhase,
+                             key: str) -> Mapping:
+        value = self._campaign_config(campaign).get(key, {})
+        if not isinstance(value, Mapping):
+            label = f"{self._campaign_config_key(campaign)}.{key}"
+            raise ValueError(f'Invalid campaign endpoint setpoint: {label}')
+        return value
+
+    def _endpoint_float(self,
+                        campaign: CampaignPhase,
+                        endpoint: Mapping,
+                        key: str) -> float:
+        label = f"{self._campaign_config_key(campaign)}.{key}"
+        return self._required_float(endpoint.get(key), label)
+
+    def _configured_staged_max_hold_hr(self,
+                                       campaign: CampaignPhase) -> float:
+        max_hold_hr = self._configured_max_hold_hr(campaign)
+        stages = self._campaign_config(campaign).get('stages', [])
+        total_hours = 0
+        if isinstance(stages, list):
+            for stage in stages:
+                if isinstance(stage, dict):
+                    total_hours += max(
+                        1, int(self._float(stage.get('duration_h'), 1.0)))
+        if total_hours and max_hold_hr != total_hours:
+            key = self._campaign_config_key(campaign)
+            raise ValueError(
+                f'{key}.max_hold_hr must match summed stage duration_h')
+        return max_hold_hr
+
     # ------------------------------------------------------------------
     # Campaign configuration
     # ------------------------------------------------------------------
@@ -386,59 +435,71 @@ class CampaignManager:
                 return True
 
         if campaign == CampaignPhase.C0:
-            # End when T reaches 950°C and evaporation rate is low
-            if melt.temperature_C >= 940 and melt.campaign_hour >= 10:
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            min_temperature_C = self._endpoint_float(
+                campaign, soft, 'temperature_min_C')
+            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
+            if (melt.temperature_C >= min_temperature_C
+                    and melt.campaign_hour >= min_hold_hr):
                 return True
-            # Also end if we've been running too long
-            if melt.campaign_hour >= 25:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C0B:
-            # IR-endpoint: P cleanup typically 0.5-2.5 hours
-            if melt.campaign_hour >= 3 and melt.temperature_C >= 1200:
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
+            min_temperature_C = self._endpoint_float(
+                campaign, soft, 'temperature_min_C')
+            if (melt.campaign_hour >= max_hold_hr
+                    and melt.temperature_C >= min_temperature_C):
                 return True
 
         elif campaign == CampaignPhase.C2A:
-            # Long campaign: 18-28 hours
-            # End when evaporation rate drops below threshold
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            threshold_kg_hr = self._endpoint_float(
+                campaign, soft, 'threshold_kg_hr')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
             total_rate = evap_flux.total_kg_hr
-            if melt.campaign_hour >= 18 and total_rate < 0.1:
+            if (melt.campaign_hour >= min_hold_hr
+                    and total_rate < threshold_kg_hr):
                 return True
-            if melt.campaign_hour >= 30:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C2A_STAGED:
-            cfg = self._campaign_config(campaign)
-            stages = cfg.get('stages', [])
-            total_hours = 0
-            if isinstance(stages, list):
-                for stage in stages:
-                    if isinstance(stage, dict):
-                        total_hours += max(
-                            1, int(self._float(stage.get('duration_h'), 1.0)))
-            total_hours = total_hours or 9
-            if melt.campaign_hour + 1 >= total_hours:
+            max_hold_hr = self._configured_staged_max_hold_hr(campaign)
+            if melt.campaign_hour + 1 >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C2B:
-            # Fe pyrolysis — shorter than C2A
-            fe_rate = evap_flux.species_kg_hr.get('Fe', 0.0)
-            if melt.campaign_hour >= 8 and fe_rate < 0.05:
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            threshold_kg_hr = self._endpoint_float(
+                campaign, soft, 'threshold_kg_hr')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
+            species = str(soft.get('species', ''))
+            if not species:
+                raise ValueError('C2B.soft_endpoint.species is required')
+            rate = evap_flux.species_kg_hr.get(species, 0.0)
+            if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
                 return True
-            if melt.campaign_hour >= 20:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C3_K:
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
-                    3.0,
+                    self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
                 ))
                 if melt.campaign_hour >= max(1, staged_hours):
                     return True
-            # K shuttle: 0-1 cycles after Path A, 2 after Path B
-            max_hours = 12 if record.path == 'A' else 25
-            if melt.campaign_hour >= max_hours:
+            path_key = 'A' if record.path == 'A' else 'default'
+            max_hold_hr = self._configured_max_hold_hr(
+                campaign, 'C3_K', path_key)
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C3_NA:
@@ -457,54 +518,74 @@ class CampaignManager:
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
-                    3.0,
+                    self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
                 ))
                 if melt.campaign_hour >= max(1, staged_hours):
                     return True
-            # Na shuttle: 1 cycle after Path A, 2 after Path B
-            max_hours = 18 if record.path == 'A' else 35
-            if melt.campaign_hour >= max_hours:
+            path_key = 'A' if record.path == 'A' else 'default'
+            max_hold_hr = self._configured_max_hold_hr(
+                campaign, 'C3_NA', path_key)
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C4:
-            # Mg pyrolysis — IR-controlled
-            mg_rate = evap_flux.species_kg_hr.get('Mg', 0.0)
-            if melt.campaign_hour >= 6 and mg_rate < 0.02:
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            threshold_kg_hr = self._endpoint_float(
+                campaign, soft, 'threshold_kg_hr')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
+            species = str(soft.get('species', ''))
+            if not species:
+                raise ValueError('C4.soft_endpoint.species is required')
+            rate = evap_flux.species_kg_hr.get(species, 0.0)
+            if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
                 return True
-            if melt.campaign_hour >= 20:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C5:
-            # MRE: current decay
-            # Simplified: end after estimated duration
             if record.branch == 'two':
-                if melt.campaign_hour >= 15:
-                    return True
+                max_hold_hr = self._configured_max_hold_hr(
+                    campaign, 'branch_two')
             else:
-                if melt.campaign_hour >= 30:
-                    return True
+                max_hold_hr = self._configured_max_hold_hr(
+                    campaign, 'branch_one')
+            if melt.campaign_hour >= max_hold_hr:
+                return True
 
         elif campaign == CampaignPhase.C6:
-            # Self-terminating when residual SiO₂ + Al₂O₃ < 15-20 wt%
+            composition_endpoint = self._configured_endpoint(
+                campaign, 'composition_endpoint')
+            species = composition_endpoint.get('species', [])
+            if not isinstance(species, list) or not species:
+                raise ValueError(
+                    'C6.composition_endpoint.species must be a list')
+            threshold_wt_pct = self._endpoint_float(
+                campaign, composition_endpoint, 'threshold_wt_pct')
+            max_hold_hr = self._configured_max_hold_hr(campaign)
             comp = melt.composition_wt_pct()
-            refractory_pct = comp.get('SiO2', 0.0) + comp.get('Al2O3', 0.0)
-            if refractory_pct < 17.5:
+            refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
+            if refractory_pct < threshold_wt_pct:
                 return True
-            if melt.campaign_hour >= 20:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.MRE_BASELINE:
-            # Current-decay endpoint: when effective current drops below
-            # 10 A for 3 consecutive hours at max voltage, the melt is
-            # exhausted and electrolysis should stop.
-            if melt.mre_voltage_V >= 2.45 and melt.mre_current_A < 10.0:
+            soft = self._configured_endpoint(campaign, 'soft_endpoint')
+            min_voltage_V = self._endpoint_float(
+                campaign, soft, 'min_voltage_V')
+            threshold_A = self._endpoint_float(campaign, soft, 'threshold_A')
+            consecutive_hours = int(self._endpoint_float(
+                campaign, soft, 'consecutive_hours'))
+            max_hold_hr = self._configured_max_hold_hr(campaign)
+            if (melt.mre_voltage_V >= min_voltage_V
+                    and melt.mre_current_A < threshold_A):
                 melt.mre_low_current_hours += 1
             else:
                 melt.mre_low_current_hours = 0
-            if melt.mre_low_current_hours >= 3:
+            if melt.mre_low_current_hours >= consecutive_hours:
                 return True
-            # Safety cutoff
-            if melt.campaign_hour >= 120:
+            if melt.campaign_hour >= max_hold_hr:
                 return True
 
         return False
