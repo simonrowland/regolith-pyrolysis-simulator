@@ -4,12 +4,14 @@ from copy import deepcopy
 from pathlib import Path
 
 import yaml
+import pytest
 
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+EPS = 1.0e-12
 
 
 def _load_yaml(name: str) -> dict:
@@ -42,9 +44,18 @@ def test_step_emits_extraction_completeness_side_channel() -> None:
     assert diag["campaign"] == "C2A"
     assert "SiO" in diag["completeness_by_target_species"]
     assert diag["completeness_by_target_species"]["SiO"] is not None
+    values = diag["completeness_by_target_species"]
+    aggregate = diag["aggregate_completeness_fraction"]
+    assert aggregate == pytest.approx(min(values.values()))
+    assert values[diag["aggregate_worst_target_species"]] == pytest.approx(
+        aggregate
+    )
+    assert diag["aggregate_policy"] == "min_all_targets"
+    assert diag["aggregate_status"] == "ok"
     assert diag["would_be_soft_advance_by_target_species"]["SiO"][
         "would_advance"
     ] is False
+    assert diag["would_be_soft_advance_aggregate"]["would_advance"] is False
     assert diag["would_be_hard_floor_advance"] is None
     assert diag["would_be_cap_advance"] is False
     assert "extraction_completeness" not in sim.record.snapshots[-1].__dict__
@@ -77,3 +88,41 @@ def test_completeness_diagnostic_does_not_change_campaign_advancement() -> None:
         with_diagnostic._last_extraction_completeness_diagnostic["campaign"]
         == "C2A"
     )
+
+
+def test_c2a_completion_contracts_and_aggregate_are_monotonic() -> None:
+    sim = _diagnostic_sim()
+    sim.melt.temperature_C = 1450.0
+    previous_by_target: dict[str, float] = {}
+    previous_aggregate: float | None = None
+    aggregate_values: list[float] = []
+
+    for _ in range(8):
+        sim.step()
+        diag = sim._last_extraction_completeness_diagnostic
+        targets = tuple(diag["target_species"])
+        assert targets == ("Na", "K", "Fe", "CrO2", "SiO")
+
+        values = diag["completeness_by_target_species"]
+        for target in targets:
+            fraction = values[target]
+            assert fraction is not None
+            assert (
+                diag["detail_by_target_species"][target]["contract_id"]
+            )
+            if target in previous_by_target:
+                assert fraction + EPS >= previous_by_target[target]
+            previous_by_target[target] = fraction
+
+        aggregate = diag["aggregate_completeness_fraction"]
+        assert aggregate is not None
+        aggregate_values.append(aggregate)
+        assert aggregate == pytest.approx(min(values[target] for target in targets))
+        assert values[diag["aggregate_worst_target_species"]] == pytest.approx(
+            aggregate
+        )
+        if previous_aggregate is not None:
+            assert aggregate + EPS >= previous_aggregate
+        previous_aggregate = aggregate
+
+    assert aggregate_values[-1] > aggregate_values[0]

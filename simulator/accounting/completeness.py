@@ -68,6 +68,14 @@ class TargetExtractionCompleteness:
         )
 
 
+@dataclass(frozen=True)
+class AggregateExtractionCompleteness:
+    completeness_fraction: float | None
+    worst_target_species: str | None
+    reason: str
+    aggregation: str = "min_all_targets"
+
+
 class CompletionContractBlocked(AccountingError):
     """Raised when a completion contract cannot compute clean provenance."""
 
@@ -184,6 +192,51 @@ def extraction_completeness_by_target(
     return results
 
 
+def aggregate_extraction_completeness(
+    by_target: Mapping[str, TargetExtractionCompleteness | None],
+    target_species: tuple[str, ...] | None = None,
+) -> AggregateExtractionCompleteness:
+    """Aggregate all gated targets; any n/a target makes the step n/a."""
+
+    targets = tuple(
+        str(target)
+        for target in (
+            target_species
+            if target_species is not None
+            else tuple(by_target.keys())
+        )
+    )
+    if not targets:
+        raise ValueError("target_species must be non-empty")
+
+    worst_target: str | None = None
+    worst_fraction = math.inf
+    for target in targets:
+        result = by_target.get(target)
+        if result is None:
+            return AggregateExtractionCompleteness(
+                None,
+                target,
+                f"{target}: unknown: no result",
+            )
+        fraction = result.completeness_fraction
+        if fraction is None:
+            return AggregateExtractionCompleteness(
+                None,
+                target,
+                f"{target}: {result.reason or 'unknown completeness'}",
+            )
+        if fraction < worst_fraction:
+            worst_fraction = fraction
+            worst_target = target
+
+    return AggregateExtractionCompleteness(
+        worst_fraction,
+        worst_target,
+        "min completeness across all targets",
+    )
+
+
 def extraction_completeness_pct(
     target_species: tuple[str, ...],
     residual_species_by_target: Mapping[str, tuple[str, ...]],
@@ -198,14 +251,10 @@ def extraction_completeness_pct(
         product_ledger_kg,
         terminal_rump_kg,
     )
-    if not results:
-        raise ValueError("target_species must be non-empty")
-    fractions: list[float] = []
-    for result in results.values():
-        if result.completeness_fraction is None:
-            raise ValueError(result.reason)
-        fractions.append(result.completeness_fraction)
-    return min(fractions)
+    aggregate = aggregate_extraction_completeness(results, target_species)
+    if aggregate.completeness_fraction is None:
+        raise ValueError(aggregate.reason)
+    return aggregate.completeness_fraction
 
 
 def completion_contracts_from_setpoints(

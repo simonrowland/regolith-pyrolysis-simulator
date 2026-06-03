@@ -68,6 +68,7 @@ from simulator.accounting.completeness import (
     CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
     TargetExtractionCompleteness,
+    aggregate_extraction_completeness,
     completion_contracts_for_campaign,
     extraction_completeness_by_target,
     vapor_contract_completeness,
@@ -3659,6 +3660,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for target in target_species:
                 contract = contract_by_target.get(target)
                 if contract is None:
+                    by_target[target] = TargetExtractionCompleteness(
+                        target,
+                        None,
+                        0.0,
+                        0.0,
+                        0.0,
+                        "unknown: no completion contract",
+                    )
                     continue
                 try:
                     by_target[target] = vapor_contract_completeness(
@@ -3732,6 +3741,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     "reason": "threshold set",
                 }
 
+        aggregate = aggregate_extraction_completeness(by_target, target_species)
+        aggregate_status = (
+            "n/a"
+            if aggregate.completeness_fraction is None
+            else "ok"
+        )
+        if aggregate.completeness_fraction is None:
+            aggregate_soft = {
+                "would_advance": None,
+                "reason": aggregate.reason,
+            }
+        elif threshold is None:
+            aggregate_soft = {
+                "would_advance": None,
+                "reason": threshold_status,
+            }
+        else:
+            aggregate_soft = {
+                "would_advance": aggregate.completeness_fraction >= threshold,
+                "reason": "threshold set",
+            }
+
         liquid_fraction = None
         hard_would_advance = None
         hard_reason = "freeze gate disabled"
@@ -3753,8 +3784,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_extraction_completeness_diagnostic = {
             **base,
             "completeness_by_target_species": completeness,
+            "aggregate_completeness_fraction": aggregate.completeness_fraction,
+            "aggregate_worst_target_species": aggregate.worst_target_species,
+            "aggregate_status": aggregate_status,
+            "aggregate_reason": aggregate.reason,
+            "aggregate_policy": aggregate.aggregation,
             "detail_by_target_species": detail,
             "would_be_soft_advance_by_target_species": soft,
+            "would_be_soft_advance_aggregate": aggregate_soft,
             "liquid_fraction": liquid_fraction,
             "would_be_hard_floor_advance": hard_would_advance,
             "hard_floor_status": hard_reason,

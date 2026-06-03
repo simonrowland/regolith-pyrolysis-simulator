@@ -9,6 +9,8 @@ import yaml
 
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
+    TargetExtractionCompleteness,
+    aggregate_extraction_completeness,
     completion_contracts_from_setpoints,
     validate_completion_contract_coverage,
     vapor_contract_completeness,
@@ -94,6 +96,50 @@ def test_coverage_blocks_gated_target_without_contract() -> None:
 
     with pytest.raises(ValueError, match="C4: no contract for Mg"):
         validate_completion_contract_coverage(setpoints)
+
+
+def test_aggregate_completeness_uses_worst_target_min() -> None:
+    aggregate = aggregate_extraction_completeness(
+        {
+            "Na": TargetExtractionCompleteness("Na", 0.95, 95.0, 5.0, 100.0),
+            "SiO": TargetExtractionCompleteness("SiO", 0.42, 42.0, 58.0, 100.0),
+            "Fe": TargetExtractionCompleteness("Fe", 0.8, 80.0, 20.0, 100.0),
+        },
+        ("Na", "SiO", "Fe"),
+    )
+
+    assert aggregate.completeness_fraction == pytest.approx(0.42)
+    assert aggregate.worst_target_species == "SiO"
+    assert aggregate.aggregation == "min_all_targets"
+
+
+def test_aggregate_completeness_is_na_if_any_gated_target_is_na() -> None:
+    aggregate = aggregate_extraction_completeness(
+        {
+            "Na": TargetExtractionCompleteness("Na", 0.95, 95.0, 5.0, 100.0),
+            "SiO": TargetExtractionCompleteness(
+                "SiO",
+                None,
+                0.0,
+                0.0,
+                0.0,
+                "no target-equivalent mol evidence",
+            ),
+        },
+        ("Na", "SiO"),
+    )
+
+    assert aggregate.completeness_fraction is None
+    assert aggregate.worst_target_species == "SiO"
+    assert aggregate.reason == "SiO: no target-equivalent mol evidence"
+
+    missing = aggregate_extraction_completeness(
+        {"Na": TargetExtractionCompleteness("Na", 0.95, 95.0, 5.0, 100.0)},
+        ("Na", "Fe"),
+    )
+    assert missing.completeness_fraction is None
+    assert missing.worst_target_species == "Fe"
+    assert missing.reason == "Fe: unknown: no result"
 
 
 def test_non_vapor_targets_are_deferred_not_half_implemented() -> None:
