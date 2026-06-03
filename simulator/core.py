@@ -65,8 +65,12 @@ from simulator.accounting import (
     resolve_species_formula,
 )
 from simulator.accounting.completeness import (
+    CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
+    TargetExtractionCompleteness,
+    completion_contracts_for_campaign,
     extraction_completeness_by_target,
+    vapor_contract_completeness,
 )
 from simulator.state import (
     BOLTZMANN,
@@ -3643,6 +3647,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 rump,
                 require_residual_species=True,
             )
+            campaign_key = self.campaign_mgr._campaign_config_key(
+                self.melt.campaign)
+            contract_by_target = {
+                contract.target_key: contract
+                for contract in completion_contracts_for_campaign(
+                    self.setpoints,
+                    campaign_key,
+                )
+            }
+            for target in target_species:
+                contract = contract_by_target.get(target)
+                if contract is None:
+                    continue
+                try:
+                    by_target[target] = vapor_contract_completeness(
+                        contract,
+                        queries,
+                    )
+                except CompletionContractBlocked as exc:
+                    by_target[target] = TargetExtractionCompleteness(
+                        target,
+                        None,
+                        0.0,
+                        0.0,
+                        0.0,
+                        f"blocked: {exc}",
+                        contract_id=contract.contract_id,
+                    )
         except Exception as exc:
             by_target = {
                 target: None
@@ -3661,17 +3693,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 fraction = None
                 reason = query_error or "unknown: no result"
                 product_mol = residual_mol = denom_mol = None
+                wall_mol = reagent_mol = gross_product_mol = None
+                contract_id = ""
             else:
                 fraction = result.completeness_fraction
                 reason = result.reason
                 product_mol = result.product_target_equiv_mol
                 residual_mol = result.residual_target_equiv_mol
                 denom_mol = result.denominator_target_equiv_mol
+                wall_mol = result.wall_deposit_target_equiv_mol
+                reagent_mol = result.reagent_target_equiv_mol
+                gross_product_mol = result.gross_product_target_equiv_mol
+                contract_id = result.contract_id
             completeness[target] = fraction
             detail[target] = {
                 "product_target_equiv_mol": product_mol,
                 "residual_target_equiv_mol": residual_mol,
                 "denominator_target_equiv_mol": denom_mol,
+                "wall_deposit_target_equiv_mol": wall_mol,
+                "reagent_target_equiv_mol": reagent_mol,
+                "gross_product_target_equiv_mol": gross_product_mol,
+                "contract_id": contract_id,
                 "reason": reason,
             }
             if fraction is None:

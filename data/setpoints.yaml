@@ -547,6 +547,259 @@ campaigns:
 
 
 # ============================================================================
+# 1a. COMPLETION CONTRACTS
+# ============================================================================
+completion_contracts:
+  version: "step-gating-completion-contracts-v1"
+  vapor_defaults: &vapor_completion_contract
+    mechanism: "vaporization"
+    product_accounts: &vapor_product_accounts
+      - "process.condensation_train"
+      - "process.overhead_gas"
+      - "terminal.chromium_condensed_oxide_stored"
+    residual_accounts: &vapor_residual_accounts
+      - "process.cleaned_melt"
+      - "terminal.slag"
+    wall_account: "process.wall_deposit_segment_*"
+    denominator_source: "product_plus_residual_plus_wall_deposit"
+    provenance_rule: "narrow_account_feedstock_clean"
+    mid_run_vs_terminal: "mid_run_cumulative"
+    aggregation: "min_all_targets"
+    deferred: false
+  deferred_defaults: &deferred_completion_contract
+    product_accounts: []
+    residual_accounts: []
+    residual_species: []
+    wall_account: null
+    element_map: {}
+    denominator_source: "deferred"
+    provenance_rule: "deferred"
+    mid_run_vs_terminal: "deferred"
+    aggregation: "deferred"
+    deferred: true
+
+  species_sets:
+    Na: &completion_species_Na ["Na", "Na2O"]
+    K: &completion_species_K ["K", "K2O"]
+    Fe: &completion_species_Fe ["Fe", "FeO"]
+    Si: &completion_species_Si ["SiO", "SiO2"]
+    Mg: &completion_species_Mg ["Mg", "MgO"]
+    Cr: &completion_species_Cr ["Cr", "CrO2", "Cr2O3"]
+  residual_species:
+    Na: &completion_residual_Na ["Na2O", "Na"]
+    K: &completion_residual_K ["K2O", "K"]
+    Fe: &completion_residual_Fe ["FeO", "Fe"]
+    Si: &completion_residual_Si ["SiO2", "SiO"]
+    Mg: &completion_residual_Mg ["MgO", "Mg"]
+    Cr: &completion_residual_Cr ["Cr2O3", "CrO2", "Cr"]
+
+  gated_steps:
+    C0:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C0.H2O.volatile.deferred"
+          mechanism: "volatile_removal"
+          target_species: "H2O"
+          semantic_target_kind: null
+          target_element: null
+          deferred_reason: "Stage-0 volatile inventory release fraction is out of SG-2B vapor-first scope."
+        - <<: *deferred_completion_contract
+          contract_id: "C0.CO2.volatile.deferred"
+          mechanism: "volatile_removal"
+          target_species: "CO2"
+          semantic_target_kind: null
+          target_element: null
+          deferred_reason: "Stage-0 volatile inventory release fraction is out of SG-2B vapor-first scope."
+        - <<: *deferred_completion_contract
+          contract_id: "C0.S2.volatile.deferred"
+          mechanism: "volatile_removal"
+          target_species: "S2"
+          semantic_target_kind: null
+          target_element: null
+          deferred_reason: "Stage-0 volatile inventory release fraction is out of SG-2B vapor-first scope."
+        - <<: *deferred_completion_contract
+          contract_id: "C0.CHNOPS.semantic.deferred"
+          mechanism: "volatile_removal"
+          target_species: null
+          semantic_target_kind: "CHNOPS"
+          target_element: null
+          deferred_reason: "Composite CHNOPS split needs Stage-0 inventory denominator; out of SG-2B vapor-first scope."
+    C0b_p_cleanup:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C0b.PO.semantic.deferred"
+          mechanism: "volatile_removal"
+          target_species: null
+          semantic_target_kind: "PO"
+          target_element: null
+          deferred_reason: "P-cleanup volatile denominator is Stage-0 inventory, not silicate rump; out of SG-2B vapor-first scope."
+        - <<: *deferred_completion_contract
+          contract_id: "C0b.POx.semantic.deferred"
+          mechanism: "volatile_removal"
+          target_species: null
+          semantic_target_kind: "POx"
+          target_element: null
+          deferred_reason: "P-cleanup volatile denominator is Stage-0 inventory, not silicate rump; out of SG-2B vapor-first scope."
+    C2A_continuous:
+      contracts:
+        - <<: *vapor_completion_contract
+          contract_id: "C2A_continuous.Na.vapor"
+          target_species: "Na"
+          semantic_target_kind: null
+          target_element: "Na"
+          residual_species: *completion_residual_Na
+          element_map:
+            Na: *completion_species_Na
+        - <<: *vapor_completion_contract
+          contract_id: "C2A_continuous.K.vapor"
+          target_species: "K"
+          semantic_target_kind: null
+          target_element: "K"
+          residual_species: *completion_residual_K
+          element_map:
+            K: *completion_species_K
+        - <<: *vapor_completion_contract
+          contract_id: "C2A_continuous.Fe.vapor"
+          target_species: "Fe"
+          semantic_target_kind: null
+          target_element: "Fe"
+          residual_species: *completion_residual_Fe
+          element_map:
+            Fe: *completion_species_Fe
+        - <<: *vapor_completion_contract
+          contract_id: "C2A_continuous.CrO2.vapor"
+          target_species: "CrO2"
+          semantic_target_kind: null
+          target_element: "Cr"
+          residual_species: *completion_residual_Cr
+          element_map:
+            Cr: *completion_species_Cr
+        - <<: *vapor_completion_contract
+          contract_id: "C2A_continuous.SiO.vapor"
+          target_species: "SiO"
+          semantic_target_kind: null
+          target_element: "Si"
+          residual_species: *completion_residual_Si
+          element_map:
+            Si: *completion_species_Si
+    C2A_staged:
+      stage_contracts:
+        alkali_early_fe:
+          contracts:
+            - <<: *vapor_completion_contract
+              contract_id: "C2A_staged.alkali_early_fe.Na.vapor"
+              target_species: "Na"
+              semantic_target_kind: null
+              target_element: "Na"
+              residual_species: *completion_residual_Na
+              element_map:
+                Na: *completion_species_Na
+            - <<: *vapor_completion_contract
+              contract_id: "C2A_staged.alkali_early_fe.K.vapor"
+              target_species: "K"
+              semantic_target_kind: null
+              target_element: "K"
+              residual_species: *completion_residual_K
+              element_map:
+                K: *completion_species_K
+        sio_window:
+          contracts:
+            - <<: *vapor_completion_contract
+              contract_id: "C2A_staged.sio_window.SiO.vapor"
+              target_species: "SiO"
+              semantic_target_kind: null
+              target_element: "Si"
+              residual_species: *completion_residual_Si
+              element_map:
+                Si: *completion_species_Si
+            - <<: *deferred_completion_contract
+              contract_id: "C2A_staged.sio_window.minor_Fe.semantic.deferred"
+              mechanism: "vaporization"
+              target_species: null
+              semantic_target_kind: "minor_Fe"
+              target_element: "Fe"
+              deferred_reason: "Minor Fe is a SiO-window sub-mechanism; cap-only until CAL defines the low-flux Fe pulse metric."
+        fe_hot_hold:
+          contracts:
+            - <<: *vapor_completion_contract
+              contract_id: "C2A_staged.fe_hot_hold.Fe.vapor"
+              target_species: "Fe"
+              semantic_target_kind: null
+              target_element: "Fe"
+              residual_species: *completion_residual_Fe
+              element_map:
+                Fe: *completion_species_Fe
+        cool_for_na_shuttle:
+          contracts:
+            - <<: *deferred_completion_contract
+              contract_id: "C2A_staged.cool_for_na_shuttle.residual_FeO.semantic.deferred"
+              mechanism: "metallothermic_reduction"
+              target_species: null
+              semantic_target_kind: "residual_FeO"
+              target_element: "Fe"
+              provenance_rule: "metallothermic_reduction_extent"
+              deferred_reason: "Route ii requires cumulative residual-FeO reduction plus reagent-dose exhaustion; out of SG-2B vapor-first scope."
+    C2B:
+      contracts:
+        - <<: *vapor_completion_contract
+          contract_id: "C2B.Fe.vapor"
+          target_species: "Fe"
+          semantic_target_kind: null
+          target_element: "Fe"
+          residual_species: *completion_residual_Fe
+          element_map:
+            Fe: *completion_species_Fe
+    C3:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C3.residual_FeO.semantic.deferred"
+          mechanism: "metallothermic_reduction"
+          target_species: null
+          semantic_target_kind: "residual_FeO"
+          target_element: "Fe"
+          provenance_rule: "metallothermic_reduction_extent"
+          deferred_reason: "Route ii must bind cumulative FeO-reduced counters and net reagent drawdown; out of SG-2B vapor-first scope."
+    C4:
+      contracts:
+        - <<: *vapor_completion_contract
+          contract_id: "C4.Mg.vapor"
+          target_species: "Mg"
+          semantic_target_kind: null
+          target_element: "Mg"
+          residual_species: *completion_residual_Mg
+          element_map:
+            Mg: *completion_species_Mg
+    C5:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C5.Vmax_reducible_set.mre.deferred"
+          mechanism: "mre_electrolysis"
+          target_species: null
+          semantic_target_kind: "V_max_reducible_set"
+          target_element: null
+          deferred_reason: "MRE completion derives a V_max-reducible oxide set from the Nernst ladder; out of SG-2B vapor-first scope."
+    mre_baseline:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "mre_baseline.Vmax_reducible_set.mre.deferred"
+          mechanism: "mre_electrolysis"
+          target_species: null
+          semantic_target_kind: "V_max_reducible_set"
+          target_element: null
+          deferred_reason: "MRE baseline uses current-decay over the V_max-reducible set; out of SG-2B vapor-first scope."
+    C6:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C6.Al.thermite.deferred"
+          mechanism: "thermite_reduction"
+          target_species: "Al"
+          semantic_target_kind: null
+          target_element: "Al"
+          provenance_rule: "metallothermic_reduction_extent"
+          deferred_reason: "Thermite Al needs Al/Al2O3 plus Mg transport/reagent gate; out of SG-2B vapor-first scope."
+
+
+# ============================================================================
 # 2. CONDENSATION TRAIN
 # ============================================================================
 condensation_train:

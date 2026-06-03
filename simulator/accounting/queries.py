@@ -73,6 +73,52 @@ class AccountingQueries:
         _merge_masses(products, self.sim._unspent_additive_reagents_kg())
         return products
 
+    def species_kg_by_accounts(
+        self,
+        accounts: tuple[str, ...] | list[str],
+    ) -> dict[str, float]:
+        species_kg: dict[str, float] = {}
+        for account in accounts:
+            _merge_masses(species_kg, self.ledger.kg_by_account(str(account)))
+        return {
+            species: kg
+            for species, kg in sorted(species_kg.items())
+            if kg > 0.0
+        }
+
+    def species_kg_by_account_pattern(self, account_pattern: str) -> dict[str, float]:
+        pattern = str(account_pattern)
+        if pattern.endswith("*"):
+            prefix = pattern[:-1]
+            all_accounts = self.ledger.kg_by_account()
+            species_kg: dict[str, float] = {}
+            for account, values in all_accounts.items():
+                if str(account).startswith(prefix):
+                    _merge_masses(species_kg, values)
+            return {
+                species: kg
+                for species, kg in sorted(species_kg.items())
+                if kg > 0.0
+            }
+        return self.species_kg_by_accounts((pattern,))
+
+    def unspent_additive_reagents_kg(self) -> dict[str, float]:
+        getter = getattr(self.sim, "_unspent_additive_reagents_kg", None)
+        if not callable(getter):
+            raise AccountingError(
+                "unspent additive reagent surface is unavailable"
+            )
+        values = getter()
+        if not isinstance(values, Mapping):
+            raise AccountingError(
+                "unspent additive reagent surface is not a mapping"
+            )
+        return {
+            str(species): float(kg)
+            for species, kg in values.items()
+            if float(kg) > 0.0
+        }
+
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in TERMINAL_RUMP_ACCOUNTS:
