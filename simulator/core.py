@@ -2243,6 +2243,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reached the evaporation surface without changing flux values.
             The activities dict is replaced too (the legacy stub set both
             atomically and downstream code keys off the same source).
+          - If the equilibrium result proves ``liquid_fraction == 0``,
+            no liquid surface exists.  Clear any backend vapor pressures
+            and skip the kernel dispatch so the refractory rump is a
+            physical zero, not a bulk-composition vapor source.
           - The kernel may return an empty dict legitimately (e.g. before
             the melt is seeded, or for an exotic feedstock with no known
             volatile species); leave the legacy result in that case so
@@ -2262,6 +2266,42 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         backend_sources = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
+        raw_liquid_fraction = getattr(result, 'liquid_fraction', None)
+        # H1 permits None only for vapor-only results with no phase
+        # assemblage.  That is not proof of a no-liquid rump, so the
+        # physical-zero branch is exact-zero only.
+        if raw_liquid_fraction is not None:
+            try:
+                liquid_fraction = float(raw_liquid_fraction)
+            except (TypeError, ValueError) as exc:
+                raise RuntimeError(
+                    'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
+                    f'{raw_liquid_fraction!r}'
+                ) from exc
+            if (
+                not math.isfinite(liquid_fraction)
+                or liquid_fraction < 0.0
+                or liquid_fraction > 1.0
+            ):
+                raise RuntimeError(
+                    'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
+                    f'{raw_liquid_fraction!r}'
+                )
+            if liquid_fraction == 0.0:
+                result.vapor_pressures_Pa = {}
+                result.vapor_pressures_source = {}
+                diagnostic = {
+                    'status': 'ok',
+                    'vapor_pressures_Pa': {},
+                    'vapor_pressures_source': {},
+                    'vapor_pressure_zero_reason': 'no_liquid_phase',
+                    'liquid_fraction': 0.0,
+                    'backend_vapor_pressures_source': dict(backend_sources),
+                    'backend_vapor_pressures_Pa': dict(backend_vp),
+                }
+                self._last_vapor_pressures_source = {}
+                self._last_vapor_pressure_diagnostic = diagnostic
+                return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
