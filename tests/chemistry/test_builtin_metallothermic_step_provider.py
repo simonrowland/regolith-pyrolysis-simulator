@@ -660,8 +660,9 @@ def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
     assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
 
 
+@pytest.mark.parametrize("liquid_fraction", [None, 0.25])
 def test_c6_mg_thermite_primary_matches_legacy_stoich(
-    vapor_pressure_data, feedstocks_data, setpoints_data
+    vapor_pressure_data, feedstocks_data, setpoints_data, liquid_fraction
 ):
     """Drive the provider with an Al2O3 melt + Mg reagent; assert the
     proposal matches the 3 Mg + Al2O3 -> 3 MgO + 2 Al stoichiometry
@@ -703,6 +704,7 @@ def test_c6_mg_thermite_primary_matches_legacy_stoich(
         control_inputs={
             "reaction_family": REACTION_FAMILY_C6_MG,
             "reagent_available_kg": Mg_reagent_kg,
+            "liquid_fraction": liquid_fraction,
             "dt_hr": 1.0,
         },
     )
@@ -746,6 +748,57 @@ def test_c6_mg_thermite_primary_matches_legacy_stoich(
     )
 
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+def test_c6_mg_thermite_primary_refuses_no_liquid(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    Al2O3_kg = 100.0
+    Al2O3_mol = Al2O3_kg / (MOLAR_MASS["Al2O3"] / 1000.0)
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"Al2O3": Al2O3_mol},
+            "process.metal_phase": {},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1500.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C6_MG,
+                "reagent_available_kg": 50.0,
+                "liquid_fraction": 0.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "no_liquid_phase"
+    assert result.diagnostic["reason"] == "no_liquid_phase"
+    assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C6_MG
+    assert result.diagnostic["back_reduction"] is False
+    assert result.diagnostic["liquid_fraction"] == 0.0
+    assert result.diagnostic["reagent_consumed_kg"] == 0.0
+    assert result.diagnostic["oxide_reduced_kg"] == 0.0
+    assert result.diagnostic["coproduct_kg"] == 0.0
+    assert result.diagnostic["metal_produced_kg"] == 0.0
+    assert result.diagnostic["mol_Al_produced"] == 0.0
 
 
 def test_c6_back_reduction_matches_legacy_stoich(

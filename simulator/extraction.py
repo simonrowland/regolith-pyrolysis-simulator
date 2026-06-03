@@ -1092,6 +1092,10 @@ class ExtractionMixin:
         if self.thermite_Mg_inventory_kg <= 0.01:
             return  # No Mg available
 
+        liquid_fraction = None
+        if self._freeze_gate_enabled():
+            liquid_fraction = self._freeze_gate_liquid_fraction_factor()
+
         # ------------------------------------------------------------------
         # Pass 1: primary thermite reaction (3 Mg + Al2O3 -> 3 MgO + 2 Al).
         #
@@ -1107,6 +1111,7 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'reagent_available_kg': float(
                     self.thermite_Mg_inventory_kg),
+                'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
         )

@@ -83,6 +83,9 @@ The provider:
     in the matched primary thermite call.  The back-reduction consumes
     ``BACK_REDUCTION_FRACTION = 0.30`` of this Al; passed in to keep the
     provider stateless across the two dispatches.
+  * ``liquid_fraction`` (C6 primary only) -- optional freeze-gate signal.
+    Exact ``0.0`` means no liquid phase, so thermite is refused with zero
+    yield; ``None`` means unknown and preserves legacy behavior.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 single :class:`LedgerTransitionProposal` and a ``diagnostic`` dict with
@@ -742,6 +745,30 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         control_audit,
     ) -> IntentResult:
         import math
+
+        liquid_fraction = controls.get("liquid_fraction")
+        if (
+            liquid_fraction is not None
+            and float(liquid_fraction) == 0.0
+        ):
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": "no_liquid_phase",
+                    "reason_refused": "no_liquid_phase",
+                    "reaction_family": REACTION_FAMILY_C6_MG,
+                    "back_reduction": False,
+                    "liquid_fraction": 0.0,
+                    "reagent_consumed_kg": 0.0,
+                    "oxide_reduced_kg": 0.0,
+                    "coproduct_kg": 0.0,
+                    "metal_produced_kg": 0.0,
+                    "mol_Al_produced": 0.0,
+                },
+            )
 
         Mg_available_kg = float(controls.get("reagent_available_kg") or 0.0)
         if Mg_available_kg <= 0.01:
