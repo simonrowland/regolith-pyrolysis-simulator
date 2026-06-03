@@ -291,14 +291,84 @@ def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None
     assert "denominator_target_equiv_mol=3" in margin.detail
 
 
-def test_extraction_completeness_zero_denominator_fails_closed() -> None:
-    margin = PhysicsConstraintSet().extraction_completeness(
+def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
+    """GateMargin byte-identity vs pre-refactor inline loop (7913470)."""
+
+    constraints = PhysicsConstraintSet()
+    threshold = constraints.extraction_min_fraction
+
+    zero_denom = constraints.extraction_completeness(
         _trace(condensed=({(3, "SiO"): 20.0},), products={}, rump={})
     )
+    assert zero_denom.gate == "extraction_completeness"
+    assert zero_denom.feasible is False
+    assert zero_denom.margin == -math.inf
+    assert math.isnan(zero_denom.observed)
+    assert zero_denom.threshold == threshold
+    assert zero_denom.detail == (
+        "fail-closed: SiO: no target-equivalent mol evidence"
+    )
 
-    assert not margin.feasible
-    assert margin.margin < 0.0
-    assert "fail-closed" in margin.detail
+    cr_constraints = PhysicsConstraintSet(
+        target_species=("Cr",),
+        residual_species_by_target={"Cr": ("Cr2O3", "Cr")},
+    )
+    cr_trace = _trace(
+        condensed=({(1, "Cr"): 1.0},),
+        products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
+        rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+    )
+    cr_margin = cr_constraints.extraction_completeness(cr_trace)
+    assert cr_margin.feasible is False
+    assert cr_margin.margin == pytest.approx(-0.6166666666666667)
+    assert cr_margin.observed == pytest.approx(1.0 / 3.0)
+    assert cr_margin.detail == (
+        "Cr: product_target_equiv_mol=1, residual_target_equiv_mol=2, "
+        "denominator_target_equiv_mol=3"
+    )
+
+    sio_margin = constraints.extraction_completeness(
+        _trace(condensed=({(3, "SiO"): 20.0},))
+    )
+    assert sio_margin.feasible is True
+    assert sio_margin.margin == pytest.approx(0.04233615221987319)
+    assert sio_margin.observed == pytest.approx(0.9923361522198731)
+    assert sio_margin.detail == (
+        "SiO: product_target_equiv_mol=2155.17, "
+        "residual_target_equiv_mol=16.6445, "
+        "denominator_target_equiv_mol=2171.82"
+    )
+
+    multi_constraints = PhysicsConstraintSet(
+        target_species=("Na", "K", "Fe", "SiO"),
+    )
+    multi_trace = _trace(
+        condensed=({(1, "Fe"): 5.0, (3, "SiO"): 20.0},),
+        products={"SiO": 95.0, "Fe": 10.0, "Na": 1.0, "K": 1.0},
+        rump={"SiO2": 0.1, "FeO": 0.1, "Na2O": 0.01, "K2O": 0.01},
+    )
+    multi_margin = multi_constraints.extraction_completeness(multi_trace)
+    assert multi_margin.feasible is True
+    assert multi_margin.margin == pytest.approx(0.041766921391506395)
+    assert multi_margin.observed == pytest.approx(0.9917669213915064)
+    assert multi_margin.detail == (
+        "K: product_target_equiv_mol=25.5766, residual_target_equiv_mol=0.212322, "
+        "denominator_target_equiv_mol=25.7889"
+    )
+
+    exc_constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("NotARealFormula",)},
+    )
+    exc_margin = exc_constraints.extraction_completeness(
+        _trace(condensed=({(1, "Fe"): 1.0},), products={}, rump={"NotARealFormula": 1.0})
+    )
+    assert exc_margin.feasible is False
+    assert exc_margin.margin == -math.inf
+    assert math.isnan(exc_margin.observed)
+    assert exc_margin.detail == (
+        "fail-closed: 'missing molar mass for NotARealFormula'"
+    )
 
 
 def test_physics_gates_do_not_restore_ellingham_or_mre_gate() -> None:

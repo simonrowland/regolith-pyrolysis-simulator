@@ -8,9 +8,13 @@ import math
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
 
-from simulator.accounting import AccountingError, parse_formula
+from simulator.accounting import AccountingError
+from simulator.accounting.completeness import (
+    DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
+    TargetExtractionCompleteness,
+    extraction_completeness_by_target,
+)
 from simulator.condensation_routing import accepted_species_for_stage_number
-from simulator.state import MOLAR_MASS
 
 SourceKind = Literal[
     "literature",
@@ -124,14 +128,7 @@ class PhysicsConstraintSet:
     ))
     target_species: tuple[str, ...] = ("SiO",)
     residual_species_by_target: Mapping[str, tuple[str, ...]] = field(
-        default_factory=lambda: MappingProxyType({
-            "SiO": ("SiO2", "SiO"),
-            "Fe": ("FeO", "Fe"),
-            "CrO2": ("Cr2O3", "CrO2", "Cr"),
-            "Mg": ("MgO", "Mg"),
-            "Na": ("Na2O", "Na"),
-            "K": ("K2O", "K"),
-        })
+        default_factory=lambda: DEFAULT_RESIDUAL_SPECIES_BY_TARGET
     )
     allowable_wall_deposit_kg: Mapping[tuple[str, str], ThresholdSpec] = field(
         default_factory=dict
@@ -363,35 +360,29 @@ class PhysicsConstraintSet:
         try:
             products = _required_mapping(trace, "product_ledger_kg")
             rump = _required_mapping(trace, "terminal_rump_by_species_kg")
+            by_target = extraction_completeness_by_target(
+                self.target_species,
+                self.residual_species_by_target,
+                products,
+                rump,
+            )
             worst_margin = math.inf
             worst_fraction = 1.0
             worst_detail = ""
             for target in self.target_species:
-                product_mol = _target_equivalent_mol(target, target, products.get(target, 0.0))
-                residual_mol = 0.0
-                for residual in self.residual_species_by_target.get(target, (target,)):
-                    residual_mol += _target_equivalent_mol(
-                        target,
-                        residual,
-                        rump.get(residual, 0.0),
-                    )
-                denom = product_mol + residual_mol
-                if denom <= _EPS:
+                result = by_target[str(target)]
+                if result.completeness_fraction is None:
                     return _fail_closed(
                         "extraction_completeness",
                         self.extraction_min_fraction,
-                        f"{target}: no target-equivalent mol evidence",
+                        _extraction_completeness_fail_closed_detail(result),
                     )
-                fraction = product_mol / denom
+                fraction = result.completeness_fraction
                 margin = fraction - self.extraction_min_fraction.value
                 if margin < worst_margin:
                     worst_margin = margin
                     worst_fraction = fraction
-                    worst_detail = (
-                        f"{target}: product_target_equiv_mol={product_mol:.6g}, "
-                        f"residual_target_equiv_mol={residual_mol:.6g}, "
-                        f"denominator_target_equiv_mol={denom:.6g}"
-                    )
+                    worst_detail = result.detail
             return _margin(
                 "extraction_completeness",
                 worst_margin,
@@ -483,6 +474,16 @@ class PhysicsConstraintSet:
             return _fail_closed("furnace_temperature", self.furnace_T_max_C, str(exc))
 
 
+def _extraction_completeness_fail_closed_detail(
+    result: TargetExtractionCompleteness,
+) -> str:
+    if result.reason == "no target-equivalent mol evidence":
+        return result.detail
+    if result.reason.startswith("unknown: "):
+        return result.reason.removeprefix("unknown: ")
+    return result.detail
+
+
 def _margin(
     gate: str,
     margin: float,
@@ -571,38 +572,6 @@ def _knudsen_segment_values(summary: Mapping[Any, Any]) -> list[tuple[str, float
             str(segment["regime"]).strip().lower(),
         ))
     return values
-
-
-def _target_equivalent_mol(target: str, species: str, kg: Any) -> float:
-    species_mol = _species_mol(species, kg)
-    if species_mol <= _EPS:
-        return 0.0
-    target_element = _target_element(target)
-    species_formula = parse_formula(species, species=species)
-    element_count = species_formula.elements.get(target_element, 0.0)
-    if element_count <= 0.0:
-        raise ValueError(f"{species} contains no {target_element} for target {target}")
-    return species_mol * element_count
-
-
-def _target_element(target: str) -> str:
-    formula = parse_formula(target, species=target)
-    if len(formula.elements) == 1:
-        return next(iter(formula.elements))
-    non_oxygen = [element for element in formula.elements if element != "O"]
-    if len(non_oxygen) == 1:
-        return non_oxygen[0]
-    raise ValueError(f"target {target} does not identify one target element")
-
-
-def _species_mol(species: str, kg: Any) -> float:
-    amount = _non_negative_number(kg, f"{species} kg")
-    if amount <= _EPS:
-        return 0.0
-    molar_mass = MOLAR_MASS.get(species)
-    if molar_mass is None:
-        raise KeyError(f"missing molar mass for {species}")
-    return amount * 1000.0 / float(molar_mass)
 
 
 def _non_negative_number(value: Any, name: str) -> float:

@@ -64,6 +64,10 @@ from simulator.accounting import (
     load_species_formulas,
     resolve_species_formula,
 )
+from simulator.accounting.completeness import (
+    DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
+    extraction_completeness_by_target,
+)
 from simulator.state import (
     BOLTZMANN,
     FARADAY,
@@ -379,6 +383,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
+        self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._rump_expectation_warnings: list[str] = []
         # Shuttle-physics-gate refusals: the post-V1c JANAF Ellingham +
         # S1b shuttle T-acceptance gate refuses K→FeO at any practical
@@ -3568,6 +3573,153 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def is_complete(self) -> bool:
         return self.melt.campaign == CampaignPhase.COMPLETE
 
+    @staticmethod
+    def _diagnostic_target_species(value: Any) -> tuple[str, ...]:
+        if value is None:
+            return ()
+        if isinstance(value, str):
+            return (value,)
+        if isinstance(value, (list, tuple)):
+            targets = []
+            for item in value:
+                if item is None:
+                    continue
+                target = str(item)
+                if target:
+                    targets.append(target)
+            return tuple(targets)
+        return ()
+
+    @staticmethod
+    def _diagnostic_optional_float(
+        cfg: Mapping[str, Any],
+        key: str,
+    ) -> tuple[Optional[float], str]:
+        if key not in cfg or cfg.get(key) is None:
+            return None, f"no {key} set"
+        try:
+            value = float(cfg[key])
+        except (TypeError, ValueError) as exc:
+            return None, f"invalid {key}: {exc}"
+        if not math.isfinite(value):
+            return None, f"invalid {key}: non-finite"
+        return value, "set"
+
+    def _update_extraction_completeness_diagnostic(self) -> None:
+        config_getter = getattr(self.campaign_mgr, "_campaign_config", None)
+        cfg = config_getter(self.melt.campaign) if callable(config_getter) else {}
+        if not isinstance(cfg, Mapping):
+            cfg = {}
+        target_species = self._diagnostic_target_species(
+            cfg.get("target_species"))
+        if not target_species:
+            self._last_extraction_completeness_diagnostic = {}
+            return
+
+        threshold, threshold_status = self._diagnostic_optional_float(
+            cfg, "target_yield_threshold")
+        if threshold is None and threshold_status == "no target_yield_threshold set":
+            threshold_status = "no threshold set"
+        max_hold_hr, max_hold_status = self._diagnostic_optional_float(
+            cfg, "max_hold_hr")
+        base = {
+            "campaign": self.melt.campaign.name,
+            "campaign_hour": self.melt.campaign_hour,
+            "target_species": target_species,
+            "target_yield_threshold": threshold,
+            "target_yield_threshold_status": threshold_status,
+            "max_hold_hr": max_hold_hr,
+            "max_hold_hr_status": max_hold_status,
+        }
+
+        try:
+            queries = AccountingQueries(self)
+            products = queries.product_ledger()
+            rump = queries.terminal_rump_by_species()
+            by_target = extraction_completeness_by_target(
+                target_species,
+                DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
+                products,
+                rump,
+                require_residual_species=True,
+            )
+        except Exception as exc:
+            by_target = {
+                target: None
+                for target in target_species
+            }
+            query_error = f"unknown: {exc}"
+        else:
+            query_error = ""
+
+        completeness: Dict[str, Optional[float]] = {}
+        detail: Dict[str, Dict[str, Any]] = {}
+        soft: Dict[str, Dict[str, Any]] = {}
+        for target in target_species:
+            result = by_target.get(target)
+            if result is None:
+                fraction = None
+                reason = query_error or "unknown: no result"
+                product_mol = residual_mol = denom_mol = None
+            else:
+                fraction = result.completeness_fraction
+                reason = result.reason
+                product_mol = result.product_target_equiv_mol
+                residual_mol = result.residual_target_equiv_mol
+                denom_mol = result.denominator_target_equiv_mol
+            completeness[target] = fraction
+            detail[target] = {
+                "product_target_equiv_mol": product_mol,
+                "residual_target_equiv_mol": residual_mol,
+                "denominator_target_equiv_mol": denom_mol,
+                "reason": reason,
+            }
+            if fraction is None:
+                soft[target] = {
+                    "would_advance": None,
+                    "reason": reason,
+                }
+            elif threshold is None:
+                soft[target] = {
+                    "would_advance": None,
+                    "reason": threshold_status,
+                }
+            else:
+                soft[target] = {
+                    "would_advance": fraction >= threshold,
+                    "reason": "threshold set",
+                }
+
+        liquid_fraction = None
+        hard_would_advance = None
+        hard_reason = "freeze gate disabled"
+        if self._freeze_gate_enabled():
+            try:
+                liquid_fraction = float(self._freeze_gate_liquid_fraction_factor())
+            except Exception as exc:
+                hard_reason = f"unknown: {exc}"
+            else:
+                hard_would_advance = liquid_fraction == 0.0
+                hard_reason = "freeze gate enabled"
+
+        cap_would_advance = None
+        cap_reason = max_hold_status
+        if max_hold_hr is not None:
+            cap_would_advance = self.melt.campaign_hour >= max_hold_hr
+            cap_reason = "max_hold_hr set"
+
+        self._last_extraction_completeness_diagnostic = {
+            **base,
+            "completeness_by_target_species": completeness,
+            "detail_by_target_species": detail,
+            "would_be_soft_advance_by_target_species": soft,
+            "liquid_fraction": liquid_fraction,
+            "would_be_hard_floor_advance": hard_would_advance,
+            "hard_floor_status": hard_reason,
+            "would_be_cap_advance": cap_would_advance,
+            "cap_status": cap_reason,
+        }
+
     def product_ledger(self) -> Dict[str, float]:
         """
         Return output products accumulated outside the remaining melt.
@@ -3764,6 +3916,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_condensed_by_stage_species_delta = {}
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
+        self._last_extraction_completeness_diagnostic = {}
 
         # --- 1. Decision check ---
         if self.paused_for_decision:
@@ -3896,6 +4049,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_kWh=mre_energy_kWh,  # Actual MRE energy this hour
         )
         self.energy_cumulative_kWh += energy.total_kWh
+
+        self._update_extraction_completeness_diagnostic()
 
         # --- 9. Endpoint check ---
         campaign_done = self.campaign_mgr.check_endpoint(
