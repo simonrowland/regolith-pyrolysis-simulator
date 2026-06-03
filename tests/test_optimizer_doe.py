@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 import pytest
 
@@ -321,6 +322,33 @@ def _anchor(temp: float = 500.0, hold: int = 30, mode: str = "nominal") -> Recip
     return RecipePatch({_TEMP: temp, _HOLD: hold, _MODE: mode})
 
 
+def test_doe_spec_round_trips_anchor_and_delta_fraction() -> None:
+    schema = _anchored_schema()
+    anchor = _anchor()
+    doe = DoeSpec(
+        schema=schema,
+        n_samples=8,
+        seed=22,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=anchor,
+        delta_fraction=0.2,
+    )
+
+    payload = json.loads(json.dumps(doe.to_dict(), sort_keys=True))
+    assert payload["delta_fraction"] == 0.2
+    assert payload["anchor"] == [
+        {"path": ["campaigns", "C0", "mode"], "value": "nominal"},
+        {"path": ["campaigns", "C0", "temp_range_C"], "value": 500.0},
+        {"path": ["campaigns", "C3", "endpoint", "hold_time_min"], "value": 30},
+    ]
+
+    restored = DoeSpec.from_dict(payload, schema=schema)
+    assert restored.delta_fraction == pytest.approx(0.2)
+    assert restored.anchor is not None
+    assert dict(restored.anchor.values) == dict(anchor.values)
+    assert restored.to_dict() == doe.to_dict()
+
+
 def _assert_within_neighborhood(
     schema: RecipeSchema, patches: tuple, anchor: RecipePatch, delta_fraction: float
 ) -> None:
@@ -473,6 +501,66 @@ def test_anchored_patch_at_index_matches_batch_row() -> None:
     _assert_within_neighborhood(schema, (at_zero,), anchor, 0.1)
 
 
+def test_anchored_lhc_patch_at_index_fails_with_specific_error() -> None:
+    schema = _anchored_schema()
+    with pytest.raises(
+        ValueError,
+        match="anchored sample_recipe_patch_at_index.*dependency-free-lhc.*sample_recipe_patches",
+    ):
+        sample_recipe_patch_at_index(
+            schema,
+            index=0,
+            seed=4,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=0.1,
+        )
+
+
+@pytest.mark.parametrize(
+    "delta_fraction",
+    [
+        pytest.param(math.nan, id="nan"),
+        pytest.param(math.inf, id="inf"),
+        pytest.param(0.0, id="zero"),
+        pytest.param(1.1, id="above_one"),
+        pytest.param(-0.1, id="negative"),
+        pytest.param("foo", id="string"),
+        pytest.param(None, id="none"),
+    ],
+)
+def test_delta_fraction_rejects_bad_values_without_anchor(delta_fraction: object) -> None:
+    schema = _anchored_schema()
+
+    with pytest.raises(ValueError, match="delta_fraction"):
+        DoeSpec(
+            schema=schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=None,
+            delta_fraction=delta_fraction,  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="delta_fraction"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=None,
+            delta_fraction=delta_fraction,  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="delta_fraction"):
+        sample_recipe_patch_at_index(
+            schema,
+            index=0,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=None,
+            delta_fraction=delta_fraction,  # type: ignore[arg-type]
+        )
+
+
 def test_anchored_sampling_rejects_nonpositive_delta_fraction() -> None:
     schema = _anchored_schema()
     with pytest.raises(ValueError, match="delta_fraction"):
@@ -512,6 +600,50 @@ def test_anchored_sampling_rejects_anchor_missing_a_sampled_knob() -> None:
         )
 
 
+def test_anchored_sampling_rejects_anchor_with_stray_path() -> None:
+    schema = _anchored_schema()
+    stray = RecipePatch(
+        {
+            _TEMP: 500.0,
+            _HOLD: 30,
+            _MODE: "nominal",
+            ("campaigns", "C9", "unknown"): 1.0,
+        }
+    )
+    with pytest.raises(ValueError, match="not in the sampled set"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=stray,
+        )
+
+
+def test_anchored_sampling_rejects_bad_categorical_anchor_value() -> None:
+    schema = _anchored_schema()
+    with pytest.raises(ValueError, match="not in choices"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(mode="turbo"),
+        )
+
+
+def test_anchored_sampling_rejects_float_anchor_for_int_knob() -> None:
+    schema = _anchored_schema()
+    with pytest.raises(ValueError, match="must be int"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(hold=30.0),  # type: ignore[arg-type]
+        )
+
+
 def test_anchored_sampling_rejects_anchor_value_out_of_bounds() -> None:
     schema = _anchored_schema()
     over = _anchor(temp=2000.0)  # above the 950 upper bound
@@ -522,6 +654,19 @@ def test_anchored_sampling_rejects_anchor_value_out_of_bounds() -> None:
             seed=1,
             sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
             anchor=over,
+        )
+
+
+def test_sampled_zero_range_numeric_knob_raises() -> None:
+    schema = RecipeSchema(
+        allowlist=(KnobSpec(path=_TEMP, kind="float", low=500.0, high=500.0),)
+    )
+    with pytest.raises(ValueError, match="invalid numeric bounds"):
+        sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=1,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
         )
 
 

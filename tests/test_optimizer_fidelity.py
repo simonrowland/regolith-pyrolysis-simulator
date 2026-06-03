@@ -378,6 +378,31 @@ def test_timeout_and_errors_are_dropped_excluded_and_cap_respected(
     assert payload["dropped_evaluations"][0]["reason"] in {"timeout", "error"}
 
 
+@pytest.mark.parametrize(
+    "max_samples",
+    [
+        pytest.param(True, id="bool"),
+        pytest.param(3.5, id="float"),
+        pytest.param("3", id="string"),
+        pytest.param(0, id="zero"),
+        pytest.param(-1, id="negative"),
+    ],
+)
+def test_max_samples_rejects_non_positive_or_coerced_values(max_samples: object) -> None:
+    with pytest.raises(ValueError, match="max_samples"):
+        run_fidelity_correlation(
+            _doe(n_samples=6),
+            _perfect_fast,
+            _perfect_high,
+            top_k=(2,),
+            per_eval_timeout_s=1.0,
+            feedstock_id=FEEDSTOCK_ID,
+            profile={},
+            objective_names=("oxygen_kg",),
+            max_samples=max_samples,  # type: ignore[arg-type]
+        )
+
+
 def test_all_evaluations_dropped_withholds_without_crash() -> None:
     result = run_fidelity_correlation(
         _doe(n_samples=3),
@@ -529,6 +554,8 @@ def _midpoint_anchor(schema: RecipeSchema) -> RecipePatch:
         if spec.kind == "categorical":
             assert spec.choices
             values[spec.path] = spec.choices[0]
+        elif spec.kind == "int":
+            values[spec.path] = int(round((float(spec.low) + float(spec.high)) / 2.0))
         else:
             values[spec.path] = (float(spec.low) + float(spec.high)) / 2.0
     return RecipePatch(values)
@@ -616,3 +643,52 @@ def test_anchor_constrains_sampled_patches_end_to_end(
         for knob, (lo, hi) in bands.items()
     )
     assert escaped, "full-range sampling never escaped the anchored band; test is not decisive"
+
+
+def test_anchor_with_max_samples_truncation_stays_in_band_and_records_provenance(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    schema = _schema()
+    df = 0.05
+    bands = _numeric_bands(schema, df)
+    anchor = _midpoint_anchor(schema)
+
+    sink = tmp_path / "truncated.jsonl"
+    monkeypatch.setenv(_PATCH_SINK_ENV, str(sink))
+    result = run_fidelity_correlation(
+        DoeSpec(
+            schema=schema,
+            n_samples=8,
+            seed=42,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=anchor,
+            delta_fraction=df,
+        ),
+        _patch_recording_spy,
+        _patch_recording_spy,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={},
+        objective_names=("oxygen_kg",),
+        artifact_dir=tmp_path / "artifacts",
+        max_samples=3,
+    )
+
+    recorded = _recorded_values(sink)
+    assert result.n_samples_total == 3
+    assert len(recorded) == 6
+    for record in recorded:
+        for knob, (lo, hi) in bands.items():
+            value = float(record[knob])
+            assert lo <= value <= hi, f"{knob} value {value} escaped anchored band [{lo}, {hi}]"
+
+    payload = json.loads(Path(result.artifact_paths["json"]).read_text())
+    doe_payload = payload["protocol"]["doe"]
+    assert doe_payload["delta_fraction"] == df
+    assert doe_payload["anchor"] == [
+        {"path": ["campaigns", "C0", "temp_range_C"], "value": 485.0}
+    ]
+    artifact_restored = FidelityCorrelationResult.from_dict(payload, schema=schema)
+    assert artifact_restored.protocol.doe.anchor is not None
+    assert dict(artifact_restored.protocol.doe.anchor.values) == dict(anchor.values)

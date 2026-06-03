@@ -77,7 +77,12 @@ def run_fidelity_correlation(
         raise ValueError("per_eval_timeout_s must be positive")
     top_k_values = _top_k(top_k)
     threshold_profile = _thresholds(thresholds or DEFAULT_THRESHOLD_PROFILE)
-    n_total = min(doe_spec.n_samples, int(max_samples)) if max_samples is not None else doe_spec.n_samples
+    if max_samples is None:
+        n_total = doe_spec.n_samples
+    else:
+        if isinstance(max_samples, bool) or not isinstance(max_samples, int):
+            raise ValueError("max_samples must be a positive int when provided")
+        n_total = min(doe_spec.n_samples, max_samples)
     if n_total <= 0:
         raise ValueError("max_samples must be positive when provided")
 

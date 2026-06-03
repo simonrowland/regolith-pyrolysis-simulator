@@ -43,15 +43,15 @@ class DoeSpec:
     # sampling perturbs each numeric knob within +/- ``delta_fraction`` of its
     # full schema range about the anchor center instead of sweeping the full
     # range. ``anchor`` carries no canonical-id semantics, so it is excluded
-    # from equality/repr/serialization like ``schema``.
+    # from equality/repr like ``schema``. It is still serialized for provenance.
     anchor: RecipePatch | None = field(default=None, repr=False, compare=False)
     delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION
 
     def __post_init__(self) -> None:
         _validate_positive_int("n_samples", self.n_samples)
         _validate_seed(self.seed)
+        _validate_delta_fraction(self.delta_fraction)
         if self.anchor is not None:
-            _validate_delta_fraction(self.delta_fraction)
             _validate_anchor(self.schema, self.anchor)
 
     @property
@@ -74,6 +74,8 @@ class DoeSpec:
             "recipe_schema_version": self.recipe_schema_version,
             "allowlist_version": self.allowlist_version,
             "knob_paths": [list(path) for path in self.knob_paths],
+            "anchor": _anchor_to_entries(self.anchor),
+            "delta_fraction": float(self.delta_fraction),
         }
 
     @classmethod
@@ -81,15 +83,20 @@ class DoeSpec:
         cls, payload: Mapping[str, Any], *, schema: RecipeSchema | None = None
     ) -> "DoeSpec":
         active_schema = schema or RecipeSchema()
+        active_knob_paths = tuple(spec.path for spec in active_schema.allowlist)
+        expected_paths = tuple(tuple(path) for path in payload.get("knob_paths", ()))
+        if expected_paths and expected_paths != active_knob_paths:
+            raise ValueError("DOE spec knob paths do not match the active schema")
         spec = cls(
             schema=active_schema,
             n_samples=int(payload["n_samples"]),
             seed=int(payload["seed"]),
             sampler_name=str(payload["sampler_name"]),
+            anchor=_anchor_from_entries(payload.get("anchor")),
+            delta_fraction=payload.get(
+                "delta_fraction", DEFAULT_ANCHOR_DELTA_FRACTION
+            ),
         )
-        expected_paths = tuple(tuple(path) for path in payload.get("knob_paths", ()))
-        if expected_paths and expected_paths != spec.knob_paths:
-            raise ValueError("DOE spec knob paths do not match the active schema")
         return spec
 
 
@@ -260,6 +267,7 @@ def sample_recipe_patches(
     active_schema = schema or RecipeSchema()
     _validate_positive_int("n_samples", n_samples)
     _validate_seed(seed)
+    _validate_delta_fraction(delta_fraction)
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
@@ -296,12 +304,15 @@ def sample_recipe_patch_at_index(
     """Sample one validated RecipePatch at a stable global sequence index.
 
     Honors the same ``anchor`` / ``delta_fraction`` neighborhood semantics as
-    :func:`sample_recipe_patches`; with ``anchor=None`` behaviour is unchanged.
+    :func:`sample_recipe_patches` for chunk-invariant samplers. Anchored
+    dependency-free LHC streaming is unsupported; use ``sample_recipe_patches``
+    for that sampler.
     """
 
     active_schema = schema or RecipeSchema()
     _validate_non_negative_int("index", index)
     _validate_seed(seed)
+    _validate_delta_fraction(delta_fraction)
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
@@ -310,6 +321,14 @@ def sample_recipe_patch_at_index(
     )
     if len(specs) != len(active_schema.allowlist):
         raise ValueError("RecipeSchema allowlist contains forbidden paths")
+
+    if anchor is not None and active_sampler == DEPENDENCY_FREE_LHC_SAMPLER:
+        _validate_anchor(active_schema, anchor, specs=specs)
+        raise ValueError(
+            "anchored sample_recipe_patch_at_index is unsupported for "
+            "dependency-free-lhc because the sampler is not chunk-invariant; "
+            "use sample_recipe_patches"
+        )
 
     mapper = _resolve_value_mapper(active_schema, specs, anchor, delta_fraction)
     if not specs:
@@ -431,9 +450,9 @@ def _resolve_value_mapper(
 ):
     """Return the per-knob unit->value mapper for full-range or anchored sampling."""
 
+    _validate_delta_fraction(delta_fraction)
     if anchor is None:
         return _map_unit_value
-    _validate_delta_fraction(delta_fraction)
     _validate_anchor(schema, anchor, specs=specs)
     centers = dict(anchor.values)
 
@@ -469,7 +488,7 @@ def _numeric_bounds(spec: Any) -> tuple[float, float]:
         raise ValueError(f"{'.'.join(spec.path)} numeric knob lacks bounds")
     low = float(spec.low)
     high = float(spec.high)
-    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+    if not math.isfinite(low) or not math.isfinite(high) or low >= high:
         raise ValueError(f"{'.'.join(spec.path)} has invalid numeric bounds")
     return low, high
 
@@ -547,6 +566,19 @@ def _validate_anchor(
                     f"{'.'.join(spec.path)} anchor value {center!r} not in choices"
                 )
             continue
+        if spec.kind == "int":
+            if isinstance(center, bool) or not isinstance(center, int):
+                raise ValueError(
+                    f"{'.'.join(spec.path)} anchor value {center!r} must be int"
+                )
+            low, high = _numeric_bounds(spec)
+            center_value = float(center)
+            if center_value < low or center_value > high:
+                raise ValueError(
+                    f"{'.'.join(spec.path)} anchor value {center!r} outside "
+                    f"bounds [{low!r}, {high!r}]"
+                )
+            continue
         if isinstance(center, bool) or not isinstance(center, (int, float)):
             raise ValueError(
                 f"{'.'.join(spec.path)} anchor value {center!r} must be numeric"
@@ -558,6 +590,40 @@ def _validate_anchor(
                 f"{'.'.join(spec.path)} anchor value {center!r} outside "
                 f"bounds [{low!r}, {high!r}]"
             )
+
+
+def _anchor_to_entries(anchor: RecipePatch | None) -> list[dict[str, Any]] | None:
+    if anchor is None:
+        return None
+    return [
+        {"path": list(path), "value": value}
+        for path, value in sorted(anchor.values.items())
+    ]
+
+
+def _anchor_from_entries(entries: Any) -> RecipePatch | None:
+    if entries is None:
+        return None
+    if not isinstance(entries, list):
+        raise ValueError("DOE spec anchor must be null or a list of knob-path entries")
+    values: dict[KeyPath, Any] = {}
+    for entry in entries:
+        if not isinstance(entry, Mapping):
+            raise ValueError("DOE spec anchor entries must be mappings")
+        if "path" not in entry or "value" not in entry:
+            raise ValueError("DOE spec anchor entries require path and value")
+        raw_path = entry["path"]
+        if (
+            not isinstance(raw_path, list)
+            or not raw_path
+            or any(not isinstance(part, str) for part in raw_path)
+        ):
+            raise ValueError("DOE spec anchor entry path must be a non-empty string list")
+        path = tuple(raw_path)
+        if path in values:
+            raise ValueError(f"DOE spec anchor duplicates knob path {'.'.join(path)}")
+        values[path] = entry["value"]
+    return RecipePatch(values)
 
 
 def _optional_float(value: Any) -> float | None:
