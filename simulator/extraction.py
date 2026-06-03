@@ -800,16 +800,28 @@ class ExtractionMixin:
 
         if is_injection:
             self._shuttle_phase = 'inject'
+            # liquid_fraction is consumed only by the inject dispatches below, so
+            # compute it here (NOT before the branch) — bakeout ticks must not pay
+            # the liquidus-engine cost or hit its no-source raise for a discarded value.
+            liquid_fraction = None
+            if self._freeze_gate_enabled():
+                liquid_fraction = self._freeze_gate_liquid_fraction_factor()
             if campaign == CampaignPhase.C3_K:
-                self._shuttle_inject_K()
-                self._shuttle_inject_Na(target_stage='feo_cleanup')
+                self._shuttle_inject_K(liquid_fraction=liquid_fraction)
+                self._shuttle_inject_Na(
+                    target_stage='feo_cleanup',
+                    liquid_fraction=liquid_fraction,
+                )
             elif campaign == CampaignPhase.C3_NA:
                 target_stage = (
                     'feo_cleanup'
                     if self.record.path == 'A_staged'
                     else 'cr_ti'
                 )
-                self._shuttle_inject_Na(target_stage=target_stage)
+                self._shuttle_inject_Na(
+                    target_stage=target_stage,
+                    liquid_fraction=liquid_fraction,
+                )
         else:
             self._shuttle_phase = 'bakeout'
             # Bakeout is handled by normal evaporation (K/Na have high
@@ -821,7 +833,7 @@ class ExtractionMixin:
                 elif campaign == CampaignPhase.C3_NA:
                     self.shuttle_cycle_Na += 1
 
-    def _shuttle_inject_K(self):
+    def _shuttle_inject_K(self, *, liquid_fraction=None):
         """
         K-shuttle injection: reduce FeO (primary) + condition SiO₂.
 
@@ -858,38 +870,38 @@ class ExtractionMixin:
         # F-B1: dispatch + commit through the shared helper.  The
         # kernel's commit_batch path is still the ONLY writable entry
         # into the AtomLedger for METALLOTHERMIC_STEP.
-        kernel_result = self._dispatch_and_commit(
+        kernel_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_K,
                 'reagent_available_kg': float(
                     self.shuttle_K_inventory_kg),
+                'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
-        if kernel_result.transition is None:
-            # Distinguish thermodynamic refusal from benign no-op.  The
-            # S1b shuttle T-acceptance gate (engine layer) emits
-            # ``status='refused'`` with a structured diagnostic
-            # (margin, target stage, refused targets) when the recipe
-            # operating regime is outside the species-pair crossover
-            # band; the legacy code below treated this the same as
-            # ``status='ok'`` with no transition, silently masking an
-            # invalid recipe step (autoreview r3 P2, 2026-05-27).
+        proposal = kernel_result.transition
+        if proposal is None:
             if getattr(kernel_result, 'status', '') == 'refused':
-                refusal_record = {
-                    'reaction_family': REACTION_FAMILY_C3_K,
-                    'reagent': 'K',
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
-                    'campaign': self.melt.campaign.name,
-                    'temperature_C': float(self.melt.temperature_C),
-                    'diagnostic': diagnostic,
-                }
-                self._last_shuttle_refusal_diagnostic = refusal_record
-                self._shuttle_refusal_history.append(refusal_record)
+                if diagnostic.get('reason_refused') != 'no_liquid_phase':
+                    refusal_record = {
+                        'reaction_family': REACTION_FAMILY_C3_K,
+                        'reagent': 'K',
+                        'hour': int(self.melt.hour),
+                        'campaign_hour': int(self.melt.campaign_hour),
+                        'campaign': self.melt.campaign.name,
+                        'temperature_C': float(self.melt.temperature_C),
+                        'diagnostic': diagnostic,
+                    }
+                    self._last_shuttle_refusal_diagnostic = refusal_record
+                    self._shuttle_refusal_history.append(refusal_record)
+            self._chem_no_op_dispatch_count += 1
             return
+
+        self._commit_proposal(
+            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
+        )
 
         # Fe produced goes to its canonical product destination.
         self._project_extraction_product(
@@ -909,7 +921,12 @@ class ExtractionMixin:
         self._shuttle_metal_this_hr += float(
             diagnostic.get('metal_produced_kg', 0.0))
 
-    def _shuttle_inject_Na(self, target_stage: str = 'cr_ti'):
+    def _shuttle_inject_Na(
+        self,
+        target_stage: str = 'cr_ti',
+        *,
+        liquid_fraction=None,
+    ):
         """
         Na-shuttle injection: reduce stage-selected oxides.
 
@@ -943,34 +960,40 @@ class ExtractionMixin:
             return
 
         # F-B1: dispatch + commit through the shared helper.
-        kernel_result = self._dispatch_and_commit(
+        kernel_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_NA,
                 'na_target_stage': target_stage,
                 'reagent_available_kg': float(
                     self.shuttle_Na_inventory_kg),
+                'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
-        if kernel_result.transition is None:
-            # See ``_shuttle_inject_K`` for the rationale; mirror the
-            # refusal-vs-benign-no-op split (autoreview r3 P2, 2026-05-27).
+        proposal = kernel_result.transition
+        if proposal is None:
             if getattr(kernel_result, 'status', '') == 'refused':
-                refusal_record = {
-                    'reaction_family': REACTION_FAMILY_C3_NA,
-                    'reagent': 'Na',
-                    'target_stage': target_stage,
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
-                    'campaign': self.melt.campaign.name,
-                    'temperature_C': float(self.melt.temperature_C),
-                    'diagnostic': diagnostic,
-                }
-                self._last_shuttle_refusal_diagnostic = refusal_record
-                self._shuttle_refusal_history.append(refusal_record)
+                if diagnostic.get('reason_refused') != 'no_liquid_phase':
+                    refusal_record = {
+                        'reaction_family': REACTION_FAMILY_C3_NA,
+                        'reagent': 'Na',
+                        'target_stage': target_stage,
+                        'hour': int(self.melt.hour),
+                        'campaign_hour': int(self.melt.campaign_hour),
+                        'campaign': self.melt.campaign.name,
+                        'temperature_C': float(self.melt.temperature_C),
+                        'diagnostic': diagnostic,
+                    }
+                    self._last_shuttle_refusal_diagnostic = refusal_record
+                    self._shuttle_refusal_history.append(refusal_record)
+            self._chem_no_op_dispatch_count += 1
             return
+
+        self._commit_proposal(
+            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
+        )
 
         # Reduced metals use the canonical recipe product registry.  Cr routes
         # to the dedicated Cr stage; Ti stays as a metal-phase product unless a

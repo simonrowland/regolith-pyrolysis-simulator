@@ -98,7 +98,8 @@ def test_v1c_janaf_alkali_shuttle_crossovers_are_documented():
     )
 
 
-def test_na_shuttle_reduces_feo_to_fe_atom_balanced():
+@pytest.mark.parametrize("liquid_fraction", [None, 0.25])
+def test_na_shuttle_reduces_feo_to_fe_atom_balanced(liquid_fraction):
     sim = _build_provider_sim()
     provider = BuiltinMetallothermicStepProvider()
     view = ProviderAccountView(
@@ -118,6 +119,7 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced():
             "reaction_family": REACTION_FAMILY_C3_NA,
             "na_target_stage": "feo_cleanup",
             "reagent_available_kg": 12.0,
+            "liquid_fraction": liquid_fraction,
             "dt_hr": 1.0,
         },
     )

@@ -660,6 +660,162 @@ def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
     assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
 
 
+def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
+    return IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+                },
+                "process.metal_phase": {},
+                "process.reagent_inventory": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1150.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_NA,
+            "na_target_stage": "feo_cleanup",
+            "reagent_available_kg": na_kg,
+            "liquid_fraction": liquid_fraction,
+            "dt_hr": 1.0,
+        },
+    )
+
+
+def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {
+                        "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+                    },
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_K,
+                "reagent_available_kg": 30.0,
+                "liquid_fraction": 0.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.diagnostic["reason_refused"] == "no_liquid_phase"
+    assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_K
+
+
+def test_c3_na_shuttle_primary_refuses_no_liquid(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    result = provider.dispatch(
+        _c3_na_feo_cleanup_request(sim, liquid_fraction=0.0)
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "no_liquid_phase"
+    assert result.diagnostic["reason"] == "no_liquid_phase"
+    assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_NA
+    assert result.diagnostic["liquid_fraction"] == 0.0
+    assert result.diagnostic["reagent_consumed_kg"] == 0.0
+    assert result.diagnostic["oxide_reduced_kg"] == 0.0
+    assert result.diagnostic["metal_produced_kg"] == 0.0
+    per_oxide = result.diagnostic.get("per_oxide_reduced_kg") or {}
+    assert per_oxide.get("FeO", 0.0) == 0.0
+
+
+@pytest.mark.parametrize("liquid_fraction", [None, 0.25])
+def test_c3_na_shuttle_primary_reduces_feo_with_liquid_or_unknown(
+    vapor_pressure_data, feedstocks_data, setpoints_data, liquid_fraction
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    result = provider.dispatch(
+        _c3_na_feo_cleanup_request(sim, liquid_fraction=liquid_fraction)
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["per_oxide_reduced_kg"]["FeO"] > 0.0
+
+
+def test_c3_na_shuttle_inject_no_liquid_no_reagent_leak(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    feo_mol = 10.0 / (MOLAR_MASS["FeO"] / 1000.0)
+    sim.atom_ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": feo_mol},
+        source="no-liquid shuttle leak test",
+    )
+    sim.atom_ledger.load_external(
+        "process.reagent_inventory",
+        {"Na": 12.0 / (MOLAR_MASS["Na"] / 1000.0)},
+        source="no-liquid shuttle leak test",
+    )
+    sim.shuttle_Na_inventory_kg = sim._sync_reagent_counter_from_ledger("Na")
+    na_mol_before = sim.atom_ledger.mol_by_account("process.reagent_inventory").get(
+        "Na", 0.0
+    )
+    feo_mol_before = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "FeO", 0.0
+    )
+    sim.melt.temperature_C = 1150.0
+    sim.melt.campaign = CampaignPhase.C3_NA
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    sim._shuttle_inject_Na(
+        target_stage="feo_cleanup",
+        liquid_fraction=0.0,
+    )
+
+    assert len(sim.atom_ledger.transitions) == transitions_before
+    assert sim.atom_ledger.mol_by_account("process.reagent_inventory").get(
+        "Na", 0.0
+    ) == pytest.approx(na_mol_before)
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "FeO", 0.0
+    ) == pytest.approx(feo_mol_before)
+
+
 @pytest.mark.parametrize("liquid_fraction", [None, 0.25])
 def test_c6_mg_thermite_primary_matches_legacy_stoich(
     vapor_pressure_data, feedstocks_data, setpoints_data, liquid_fraction

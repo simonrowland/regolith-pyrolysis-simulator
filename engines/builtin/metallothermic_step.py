@@ -83,9 +83,9 @@ The provider:
     in the matched primary thermite call.  The back-reduction consumes
     ``BACK_REDUCTION_FRACTION = 0.30`` of this Al; passed in to keep the
     provider stateless across the two dispatches.
-  * ``liquid_fraction`` (C6 primary only) -- optional freeze-gate signal.
-    Exact ``0.0`` means no liquid phase, so thermite is refused with zero
-    yield; ``None`` means unknown and preserves legacy behavior.
+  * ``liquid_fraction`` (C3 K/Na shuttle + C6 primary) -- optional freeze-gate
+    signal.  Exact ``0.0`` means no liquid phase, so the step is refused with
+    zero yield; ``None`` means unknown and preserves legacy behavior.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
 single :class:`LedgerTransitionProposal` and a ``diagnostic`` dict with
@@ -319,6 +319,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         resolve_species_formula,
         control_audit,
     ) -> IntentResult:
+        if self._liquid_fraction_blocks_metallothermic(controls):
+            return self._no_liquid_phase_refusal(
+                REACTION_FAMILY_C3_K,
+                control_audit=control_audit,
+            )
+
         K_available_kg = float(controls.get("reagent_available_kg") or 0.0)
         if K_available_kg <= 0.01:
             return self._empty_result(
@@ -469,6 +475,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         resolve_species_formula,
         control_audit,
     ) -> IntentResult:
+        if self._liquid_fraction_blocks_metallothermic(controls):
+            return self._no_liquid_phase_refusal(
+                REACTION_FAMILY_C3_NA,
+                control_audit=control_audit,
+            )
+
         Na_available_kg = float(controls.get("reagent_available_kg") or 0.0)
         if Na_available_kg <= 0.01:
             return self._empty_result(
@@ -958,6 +970,38 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if total_kg <= 0.0:
             return {}
         return {sp: (kg / total_kg) * 100.0 for sp, kg in composition_kg.items()}
+
+    @staticmethod
+    def _liquid_fraction_blocks_metallothermic(
+        controls: Mapping[str, Any],
+    ) -> bool:
+        liquid_fraction = controls.get("liquid_fraction")
+        return (
+            liquid_fraction is not None
+            and float(liquid_fraction) == 0.0
+        )
+
+    @staticmethod
+    def _no_liquid_phase_refusal(
+        reaction_family: str,
+        *,
+        control_audit=None,
+    ) -> IntentResult:
+        return IntentResult(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            status="refused",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reason": "no_liquid_phase",
+                "reason_refused": "no_liquid_phase",
+                "reaction_family": reaction_family,
+                "liquid_fraction": 0.0,
+                "reagent_consumed_kg": 0.0,
+                "oxide_reduced_kg": 0.0,
+                "metal_produced_kg": 0.0,
+            },
+        )
 
     @staticmethod
     def _empty_result(reason: str, *, control_audit=None) -> IntentResult:
