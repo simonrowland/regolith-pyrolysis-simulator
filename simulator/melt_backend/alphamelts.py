@@ -840,7 +840,7 @@ class AlphaMELTSBackend(MeltBackend):
                     self._vapor_pressures_via_vaporock_or_antoine(
                         T_C=temperature_C,
                         solved_melt_wt_pct=payload.liquid_composition_wt_pct,
-                        fallback_comp_wt=comp_wt,
+                        liquid_fraction=payload.liquid_fraction,
                         fO2_log=fO2_log,
                         pressure_bar=pressure_bar,
                         activities=payload.activity_coefficients,
@@ -925,7 +925,7 @@ class AlphaMELTSBackend(MeltBackend):
                     self._vapor_pressures_via_vaporock_or_antoine(
                         T_C=temperature_C,
                         solved_melt_wt_pct=eq.liquid_composition_wt_pct,
-                        fallback_comp_wt=comp_wt,
+                        liquid_fraction=eq.liquid_fraction,
                         fO2_log=fO2_log,
                         pressure_bar=pressure_bar,
                         activities=eq.activity_coefficients,
@@ -1345,13 +1345,12 @@ class AlphaMELTSBackend(MeltBackend):
             for phase, mass_g in phase_masses_g.items()
         }
         liquid_fraction: Optional[float] = None
-        liquid_composition_wt_pct = dict(comp_wt)
+        liquid_composition_wt_pct = {}
         liquid_key = self._select_liquid_phase_key(run_result)
         if liquid_key is not None:
             liquid_row = self._first_row_mapping(run_result.get(liquid_key, {}))
-            liquid_composition_wt_pct = (
-                self._extract_liquid_composition(liquid_row) or dict(comp_wt)
-            )
+            liquid_composition_wt_pct = self._extract_liquid_composition(
+                liquid_row)
             liquid_mass = phase_masses_g.get(liquid_key)
             if liquid_mass is None:
                 liquid_mass = phase_masses_g.get(
@@ -1643,7 +1642,7 @@ class AlphaMELTSBackend(MeltBackend):
         *,
         T_C: float,
         solved_melt_wt_pct: Mapping[str, float],
-        fallback_comp_wt: Mapping[str, float],
+        liquid_fraction: Optional[float],
         fO2_log: float,
         pressure_bar: float,
         activities: Mapping[str, float],
@@ -1668,9 +1667,11 @@ class AlphaMELTSBackend(MeltBackend):
         absolute quantity, and are deliberately NOT forwarded here.
 
         The melt fed to VapoRock is the composition alphaMELTS SOLVED
-        (the equilibrium liquid), not the pre-equilibrium input; the
-        pre-equilibrium ``comp_wt`` is a fallback only if the solver
-        returned no liquid composition.
+        (the equilibrium liquid), never the pre-equilibrium bulk. A zero
+        ``liquid_fraction`` is a physical no-liquid state and returns an
+        empty pressure map labelled ``no_liquid_phase``. A positive
+        ``liquid_fraction`` with an empty solved liquid composition is a
+        fail-loud solver/API contract violation.
 
         Returns ``(pressures_Pa, source_label)``.  FAIL-LOUD: never
         returns an empty dict for a volatile-bearing melt (an empty dict
@@ -1678,6 +1679,25 @@ class AlphaMELTSBackend(MeltBackend):
         logs a WARN and explicitly calls the Antoine fallback; a genuine
         library exception is re-raised as a labelled ``RuntimeError``.
         """
+        try:
+            liquid_fraction_value = float(liquid_fraction)
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError(
+                'VapoRock vapor bridge liquid_fraction_invalid: '
+                f'{liquid_fraction!r}'
+            ) from exc
+        if (
+            not math.isfinite(liquid_fraction_value)
+            or liquid_fraction_value < 0.0
+            or liquid_fraction_value > 1.0
+        ):
+            raise RuntimeError(
+                'VapoRock vapor bridge liquid_fraction_invalid: '
+                f'{liquid_fraction!r}'
+            )
+        if liquid_fraction_value == 0.0:
+            return {}, 'no_liquid_phase'
+
         # Composition alphaMELTS actually solved, projected to the
         # VapoRock helper by the canonical oxide names it filters on.
         # wt% are relative masses, so handing them in as composition_kg
@@ -1689,11 +1709,11 @@ class AlphaMELTSBackend(MeltBackend):
             if self._is_number(value) and float(value) > 0.0
         }
         if not melt_wt:
-            melt_wt = {
-                str(oxide): float(value)
-                for oxide, value in (fallback_comp_wt or {}).items()
-                if self._is_number(value) and float(value) > 0.0
-            }
+            raise RuntimeError(
+                'VapoRock vapor bridge missing_solved_liquid_composition: '
+                'liquid_fraction > 0 but solved_melt_wt_pct is empty; '
+                'refusing bulk-composition vapor fallback'
+            )
 
         helper = self._vaporock_helper
         if helper is None or not helper.is_available():

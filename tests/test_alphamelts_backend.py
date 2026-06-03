@@ -612,7 +612,7 @@ def test_vaporock_empty_and_antoine_empty_fails_loud_for_volatile_melt():
             backend._vapor_pressures_via_vaporock_or_antoine(
                 T_C=1600.0,
                 solved_melt_wt_pct={'SiO2': 95.0, 'Na2O': 5.0},
-                fallback_comp_wt={},
+                liquid_fraction=1.0,
                 fO2_log=-9.0,
                 pressure_bar=1.0,
                 activities={},
@@ -638,7 +638,7 @@ def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
         pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=1600.0,
             solved_melt_wt_pct={'P2O5': 100.0},
-            fallback_comp_wt={},
+            liquid_fraction=1.0,
             fO2_log=-9.0,
             pressure_bar=1.0,
             activities={},
@@ -864,6 +864,31 @@ def test_petthermotools_result_parser_marks_status_ok():
     )
 
     assert result.status == 'ok'
+    assert result.liquid_fraction == pytest.approx(1.0)
+    assert result.liquid_composition_wt_pct == {'SiO2': 50.0}
+
+
+def test_petthermotools_parser_preserves_empty_liquid_composition():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'not_an_oxide': 50.0},
+        'liquid1_prop': {'mass': 25.0},
+        'olivine1': {'MgO': 75.0},
+        'olivine1_prop': {'mass': 75.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Na2O': 5.0},
+    )
+
+    assert result.status == 'ok'
+    assert result.liquid_fraction == pytest.approx(0.25)
+    assert result.liquid_composition_wt_pct == {}
 
 
 # ----------------------------------------------------------------------
@@ -913,7 +938,7 @@ def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp()
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
         T_C=1600.0,
         solved_melt_wt_pct=solved,
-        fallback_comp_wt={'SiO2': 99.0},  # must NOT be used
+        liquid_fraction=1.0,
         fO2_log=-7.96,
         pressure_bar=1e-6,
         activities={'Na2O': 0.1},
@@ -928,7 +953,7 @@ def test_vapor_bridge_happy_path_labels_source_vaporock_and_passes_solved_comp()
     assert helper.calls[0]['fO2_log'] == pytest.approx(-7.96)
 
 
-def test_vapor_bridge_falls_back_to_pre_equilibrium_comp_when_no_solved_liquid():
+def test_vapor_bridge_no_liquid_phase_returns_physical_zero_without_helper():
     backend = AlphaMELTSBackend()
     backend._vaporock_available = True
     helper = _vaporock_helper_returning({'Na': 5.0})
@@ -936,16 +961,47 @@ def test_vapor_bridge_falls_back_to_pre_equilibrium_comp_when_no_solved_liquid()
 
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
         T_C=1600.0,
-        solved_melt_wt_pct={},                 # solver returned no liquid
-        fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0},
+        solved_melt_wt_pct={},
+        liquid_fraction=0.0,
         fO2_log=-8.0,
         pressure_bar=1e-6,
         activities={},
     )
 
-    assert source == 'vaporock'
-    assert pressures == {'Na': 5.0}
-    assert helper.calls[0]['composition_kg'] == {'SiO2': 45.0, 'Na2O': 4.0}
+    assert source == 'no_liquid_phase'
+    assert pressures == {}
+    assert helper.calls == []
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = types.SimpleNamespace(temperature_C=1600.0)
+    flux = sim._calculate_evaporation(EquilibriumResult(
+        status='ok',
+        liquid_fraction=0.0,
+        vapor_pressures_Pa=pressures,
+    ))
+    assert flux.species_kg_hr == {}
+
+
+def test_vapor_bridge_liquid_present_empty_solved_comp_fails_loud():
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = True
+    helper = _vaporock_helper_returning({'Na': 5.0})
+    backend._vaporock_helper = helper
+
+    with pytest.raises(
+        RuntimeError,
+        match='missing_solved_liquid_composition.*bulk-composition',
+    ):
+        backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=1600.0,
+            solved_melt_wt_pct={},
+            liquid_fraction=0.25,
+            fO2_log=-8.0,
+            pressure_bar=1e-6,
+            activities={},
+        )
+
+    assert helper.calls == []
 
 
 def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty():
@@ -965,7 +1021,7 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
         T_C=1600.0,
         solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
-        fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        liquid_fraction=1.0,
         fO2_log=-8.0,
         pressure_bar=1e-6,
         activities={'Na2O': 0.2, 'SiO2': 0.4},
@@ -989,7 +1045,7 @@ def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
         pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=1600.0,
             solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0},
-            fallback_comp_wt={'SiO2': 45.0, 'Na2O': 4.0},
+            liquid_fraction=1.0,
             fO2_log=-8.0,
             pressure_bar=1e-6,
             activities={'Na2O': 0.2},
@@ -1016,7 +1072,7 @@ def test_vapor_bridge_reraises_library_exception_as_labelled_runtime_error():
         backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=1600.0,
             solved_melt_wt_pct={'SiO2': 45.0},
-            fallback_comp_wt={'SiO2': 45.0},
+            liquid_fraction=1.0,
             fO2_log=-8.0,
             pressure_bar=1e-6,
             activities={},
