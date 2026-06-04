@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
+import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.kernel.capabilities import CapabilityProfile
+from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
+from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
@@ -15,6 +22,7 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
+    canonical_json_bytes,
     canonical_replay_key,
 )
 from simulator.state import CampaignPhase
@@ -36,7 +44,7 @@ def _pt0_setpoints() -> dict:
     return setpoints
 
 
-def _build_pt0_sim(store: PT0DeterminismStore):
+def _build_pt0_sim(store: PT0DeterminismStore | None):
     sim = _build_sim(
         "lunar_mare_low_ti",
         _load_yaml("vapor_pressures.yaml"),
@@ -46,6 +54,120 @@ def _build_pt0_sim(store: PT0DeterminismStore):
     )
     sim.configure_pt0_determinism_store(store)
     return sim
+
+
+class _CountingSilicateEquilibriumProvider(ChemistryProvider):
+    name = "alphamelts-write-through-test"
+
+    def __init__(
+        self,
+        *,
+        fail_live: bool = False,
+        provider_id: str | None = None,
+        engine_version: str = "alphamelts-authentic-test",
+    ) -> None:
+        self.calls = 0
+        self.fail_live = fail_live
+        self.provider_id = provider_id or self.name
+        self.engine_version = engine_version
+
+    def capability_profile(self) -> CapabilityProfile:
+        intents = frozenset({ChemistryIntent.SILICATE_EQUILIBRIUM})
+        return CapabilityProfile(
+            provider_id=self.provider_id,
+            intents=intents,
+            is_authoritative_for=intents,
+            declared_accounts=frozenset({"process.cleaned_melt"}),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        self.calls += 1
+        if self.fail_live:
+            raise AssertionError(
+                "PT-2 cached AlphaMELTS run attempted live dispatch"
+            )
+        return IntentResult(
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            status="ok",
+            transition=None,
+            diagnostic={
+                "phases_present": ("liquid",),
+                "phase_masses_kg": {"liquid": 1.2345},
+                "phase_modes_wt_pct": {"liquid": 100.0},
+                "liquid_fraction": 1.0,
+                "liquid_composition_wt_pct": {
+                    "SiO2": 45.0,
+                    "Al2O3": 15.0,
+                    "FeO": 10.0,
+                    "MgO": 10.0,
+                    "CaO": 10.0,
+                    "Na2O": 5.0,
+                    "K2O": 5.0,
+                },
+                "fO2_log": request.fO2_log,
+                "fe_redox_policy": request.fe_redox_policy,
+                "mode": "equilibrate",
+                "engine_version": self.engine_version,
+                "backend_status": "ok",
+            },
+        )
+
+    def _engine_version(self) -> str:
+        return self.engine_version
+
+
+def _run_authoritative_alphamelts_equilibrium(
+    store: PT0DeterminismStore | None,
+    provider: _CountingSilicateEquilibriumProvider,
+    *,
+    allow_stub_fallback: bool = True,
+):
+    sim = _build_pt0_sim(store)
+    sim.backend.is_available = lambda: True
+    if not allow_stub_fallback:
+        sim._backend_allows_stub_fallback = lambda: False
+
+    def fail_backend_equilibrate(*_args, **_kwargs):
+        raise AssertionError(
+            "authoritative SILICATE_EQUILIBRIUM used backend.equilibrate"
+        )
+
+    sim.backend.equilibrate = fail_backend_equilibrate
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    return sim._get_equilibrium()
+
+
+def test_pt2_alphamelts_diagnostic_no_store_bypasses_ledger_guard() -> None:
+    provider = _CountingSilicateEquilibriumProvider()
+
+    result = _run_authoritative_alphamelts_equilibrium(
+        None,
+        provider,
+        allow_stub_fallback=False,
+    )
+
+    assert provider.calls == 1
+    assert result.status == "ok"
+    assert result.ledger_transition is None
+    assert result.phase_masses_kg == {"liquid": 1.2345}
+    assert (
+        result.alphamelts_diagnostics["engine_version"]
+        == "alphamelts-authentic-test"
+    )
+
+
+def test_pt2_db_path_none_keeps_write_through_inert() -> None:
+    store = PT0DeterminismStore("capture", db_path=None)
+    sim = _build_pt0_sim(store)
+
+    assert store.persistent_path is None
+    assert store.persistent_store is None
+    assert store.write_through_enabled is False
+    assert store.cached_equilibrium(sim) is None
+    assert store.summary()["persistent_store"] is None
 
 
 def _run_capped_c2a(
@@ -61,6 +183,38 @@ def _run_capped_c2a(
     snapshots = []
     for _ in range(max_hours):
         snapshots.append(sim.step())
+    return _capped_trace(sim, store, snapshots)
+
+
+def _run_capped_c2a_with_equilibrium_counter(
+    store: PT0DeterminismStore,
+    *,
+    max_hours: int = 1,
+    fail_live: bool = False,
+) -> tuple[dict, int]:
+    sim = _build_pt0_sim(store)
+    sim.backend.is_available = lambda: True
+    original_equilibrate = sim.backend.equilibrate
+    calls = 0
+
+    def counted_equilibrate(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if fail_live:
+            raise AssertionError(
+                "PT-2 cached live run attempted backend.equilibrate"
+            )
+        return original_equilibrate(*args, **kwargs)
+
+    sim.backend.equilibrate = counted_equilibrate
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    snapshots = []
+    for _ in range(max_hours):
+        snapshots.append(sim.step())
+    return _capped_trace(sim, store, snapshots), calls
+
+
+def _capped_trace(sim, store: PT0DeterminismStore, snapshots: list) -> dict:
     snapshot = snapshots[-1]
     curves = [
         entry["payload"]["curve"]
@@ -90,6 +244,36 @@ def _disable_live_providers(sim) -> None:
     provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
     if provider is not None:
         provider.dispatch = disabled
+
+
+def _freeze_gate_key() -> dict:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    return canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        fe_redox_policy="intrinsic",
+    )
+
+
+def _silicate_equilibrium_key(
+    provider: _CountingSilicateEquilibriumProvider,
+) -> dict:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim.backend.is_available = lambda: True
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    return store._equilibrium_key(sim)
+
+
+def _key_hash(key: dict) -> str:
+    return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
 
 def _real_magemin_available() -> bool:
@@ -122,12 +306,95 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
     assert "sulfsat_calibration_version" in key["sulfur_side"]
     assert key["code_version"]
     assert key["engine_version"] is not None
+    assert key["source_module_digest"]["module_set"] == (
+        "equilibrium-vapor-melt-backend-v1"
+    )
+    assert key["source_module_digest"]["sha256"]
+    assert "simulator/melt_backend/base.py" in key["source_module_digest"]["paths"]
+    assert "engines/builtin/vapor_pressure.py" in key["source_module_digest"]["paths"]
     assert set(key["data_digests"]) == {
         "setpoints",
         "feedstocks",
         "vapor_pressures",
         "species_formula_registry",
     }
+
+
+def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
+    first = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-a",
+            engine_version="alpha-v1",
+        )
+    )
+    different_provider = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-b",
+            engine_version="alpha-v1",
+        )
+    )
+    different_version = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-a",
+            engine_version="alpha-v2",
+        )
+    )
+
+    assert first["intent"] == ChemistryIntent.SILICATE_EQUILIBRIUM.value
+    assert first["provider"]["resolved_provider_id"] == "alphamelts-diagnostic-a"
+    assert first["engine_version"] == "alpha-v1"
+    assert _key_hash(different_provider) != _key_hash(first)
+    assert _key_hash(different_version) != _key_hash(first)
+
+
+def test_pt2_source_module_digest_changes_with_payload_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rrd._source_module_digest.cache_clear()
+    before = _freeze_gate_key()
+    target = rrd._repo_root() / "engines/builtin/vapor_pressure.py"
+    original_read_bytes = Path.read_bytes
+
+    def changed_read_bytes(path: Path) -> bytes:
+        data = original_read_bytes(path)
+        if path.resolve() == target.resolve():
+            return data + b"\n# source-digest-test\n"
+        return data
+
+    monkeypatch.setattr(Path, "read_bytes", changed_read_bytes)
+    rrd._source_module_digest.cache_clear()
+    try:
+        after = _freeze_gate_key()
+    finally:
+        rrd._source_module_digest.cache_clear()
+
+    assert before["source_module_digest"]["sha256"] != after[
+        "source_module_digest"
+    ]["sha256"]
+    assert _key_hash(before) != _key_hash(after)
+
+
+def test_pt2_source_module_digest_cross_process_key_determinism() -> None:
+    rrd._source_module_digest.cache_clear()
+    local_hash = _key_hash(_freeze_gate_key())
+    repo_root = Path(__file__).resolve().parent.parent
+    script = """
+import hashlib
+from simulator.reduced_real_determinism import canonical_json_bytes
+from tests.test_reduced_real_pt0_determinism import _freeze_gate_key
+print(hashlib.sha256(canonical_json_bytes(_freeze_gate_key())).hexdigest())
+"""
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(repo_root)
+    remote_hash = subprocess.check_output(
+        [sys.executable, "-c", script],
+        cwd=repo_root,
+        env=env,
+        text=True,
+    ).strip()
+
+    assert remote_hash == local_hash
 
 
 def test_pt0_replay_miss_fails_loudly() -> None:
@@ -212,6 +479,128 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.summary()["hits"] == 1
     assert replay.summary()["misses"] == 0
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
+
+
+def test_pt2_live_write_through_populates_then_exact_hits(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt2-live-write-through.db"
+    live = PT0DeterminismStore("capture", db_path=db_path)
+
+    live_trace, live_calls = _run_capped_c2a_with_equilibrium_counter(live)
+
+    assert live_calls > 0
+    live_summary = live.summary()
+    assert live_summary["cache_state_counts_by_artifact"][
+        "equilibrium_post_record"
+    ]["live_fill"] >= 1
+    with sqlite3.connect(db_path) as conn:
+        populated_rows = conn.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE artifact = 'equilibrium_post_record'
+            """
+        ).fetchone()[0]
+    assert populated_rows >= 1
+
+    cached = PT0DeterminismStore("capture", db_path=db_path)
+    cached_trace, cached_calls = _run_capped_c2a_with_equilibrium_counter(
+        cached,
+        fail_live=True,
+    )
+
+    assert cached_calls == 0
+    assert deterministic_result_view(cached_trace) == deterministic_result_view(
+        live_trace
+    )
+    cached_summary = cached.summary()
+    cached_equilibrium_counts = cached_summary[
+        "cache_state_counts_by_artifact"
+    ]["equilibrium_post_record"]
+    assert cached_equilibrium_counts["cached_exact"] >= 1
+    assert cached_equilibrium_counts["live_fill"] == 0
+    assert cached_summary["hits"] >= 1
+    with sqlite3.connect(db_path) as conn:
+        rows_after_hit = conn.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE artifact = 'equilibrium_post_record'
+            """
+        ).fetchone()[0]
+    assert rows_after_hit == populated_rows
+
+
+def test_pt2_alphamelts_write_through_populates_then_exact_hits(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt2-alphamelts-write-through.db"
+    live = PT0DeterminismStore("capture", db_path=db_path)
+    live_provider = _CountingSilicateEquilibriumProvider()
+
+    live_result = _run_authoritative_alphamelts_equilibrium(
+        live,
+        live_provider,
+    )
+
+    assert live_result.status == "ok"
+    assert live_provider.calls == 1
+    assert live_result.phase_masses_kg == {"liquid": 1.2345}
+    assert (
+        live_result.alphamelts_diagnostics["engine_version"]
+        == "alphamelts-authentic-test"
+    )
+    live_counts = live.summary()["cache_state_counts_by_artifact"][
+        "equilibrium_post_record"
+    ]
+    assert live_counts["live_fill"] == 1
+    with sqlite3.connect(db_path) as conn:
+        populated_rows = conn.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE artifact = 'equilibrium_post_record'
+            """
+        ).fetchone()[0]
+        payload_bytes = conn.execute(
+            f"""
+            SELECT payload_bytes
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE artifact = 'equilibrium_post_record'
+            """
+        ).fetchone()[0]
+    assert populated_rows == 1
+    assert b"alphamelts-authentic-test" in payload_bytes
+
+    cached = PT0DeterminismStore("capture", db_path=db_path)
+    cached_provider = _CountingSilicateEquilibriumProvider(fail_live=True)
+    cached_result = _run_authoritative_alphamelts_equilibrium(
+        cached,
+        cached_provider,
+    )
+
+    assert cached_provider.calls == 0
+    assert cached_result.status == live_result.status
+    assert cached_result.phase_masses_kg == live_result.phase_masses_kg
+    assert (
+        cached_result.alphamelts_diagnostics["engine_version"]
+        == "alphamelts-authentic-test"
+    )
+    cached_counts = cached.summary()["cache_state_counts_by_artifact"][
+        "equilibrium_post_record"
+    ]
+    assert cached_counts["cached_exact"] == 1
+    assert cached_counts["live_fill"] == 0
+    with sqlite3.connect(db_path) as conn:
+        rows_after_hit = conn.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE artifact = 'equilibrium_post_record'
+            """
+        ).fetchone()[0]
+    assert rows_after_hit == populated_rows
 
 
 @pytest.mark.parametrize(

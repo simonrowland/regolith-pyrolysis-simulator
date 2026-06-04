@@ -249,6 +249,14 @@ _SULFUR_FRACTION_BY_CARRIER = {
     'S': 1.0,
 }
 
+
+def _pt0_determinism_store_for(owner: Any) -> Any | None:
+    pt0_store = getattr(owner, '_pt0_store', None)
+    if callable(pt0_store):
+        return pt0_store()
+    return getattr(owner, '_pt0_determinism_store', None)
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -1194,7 +1202,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel = self._require_chem_kernel()
         temperature_C = float(self.melt.temperature_C)
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        store = self._pt0_store()
+        store = _pt0_determinism_store_for(self)
         account_mol_overrides = None
         if store is not None and getattr(store, 'quantize_live_controls', False):
             controls = store.quantized_controls(self, fO2_log=fO2_log)
@@ -2134,12 +2142,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         surfaces existing state at the consumption point; it does not
         introduce a new control-flow branch.
         """
-        store = self._pt0_store()
+        store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
             return store.replay_equilibrium(self)
+        cache_write_through = (
+            store is not None
+            and getattr(store, 'write_through_enabled', False)
+        )
+        if cache_write_through:
+            cached_result = store.cached_equilibrium(self)
+            if cached_result is not None:
+                return cached_result
         if self.backend is None:
+            if cache_write_through:
+                raise RuntimeError(
+                    'reduced-real cache miss requires a live backend; '
+                    'no backend is configured'
+                )
             return self._record_equilibrium_status(self._stub_equilibrium())
         if self._backend_failed:
+            if cache_write_through:
+                raise RuntimeError(
+                    self._last_backend_error
+                    or 'reduced-real cache miss requires a live backend'
+                )
             if not self._backend_allows_stub_fallback():
                 raise RuntimeError(
                     self._last_backend_error
@@ -2147,6 +2173,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             return self._record_equilibrium_status(self._stub_equilibrium())
         if not self.backend.is_available():
+            if cache_write_through:
+                raise RuntimeError(
+                    self._last_backend_error
+                    or f'{type(self.backend).__name__} is unavailable'
+                )
             if not self._backend_allows_stub_fallback():
                 raise RuntimeError(
                     self._last_backend_error
@@ -2154,6 +2185,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             return self._record_equilibrium_status(self._stub_equilibrium())
 
+        diagnostic_silicate_equilibrium = False
         try:
             backend_composition_by_account = (
                 self._backend_composition_mol_by_account())
@@ -2162,7 +2194,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
             temperature_C = float(self.melt.temperature_C)
             pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-            store = self._pt0_store()
             canonicalize_pt0_inputs = store is not None and getattr(
                 store,
                 'quantize_live_controls',
@@ -2239,35 +2270,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     request_controls,
                 )
                 setattr(result, 'alphamelts_diagnostics', diagnostic)
-                return self._record_equilibrium_status(result)
-            backend_kwargs = {
-                'temperature_C': temperature_C,
-                'composition_mol': backend_composition_mol,
-                'species_formula_registry': self.species_formula_registry,
-                'fO2_log': intrinsic_fO2_log,
-                'pressure_bar': pressure_bar,
-            }
-            if self._backend_accepts_kwarg('composition_mol_by_account'):
-                backend_kwargs['composition_mol_by_account'] = (
-                    backend_composition_by_account)
-            result = self.backend.equilibrate(**backend_kwargs)
+                diagnostic_silicate_equilibrium = True
+            else:
+                backend_kwargs = {
+                    'temperature_C': temperature_C,
+                    'composition_mol': backend_composition_mol,
+                    'species_formula_registry': self.species_formula_registry,
+                    'fO2_log': intrinsic_fO2_log,
+                    'pressure_bar': pressure_bar,
+                }
+                if self._backend_accepts_kwarg('composition_mol_by_account'):
+                    backend_kwargs['composition_mol_by_account'] = (
+                        backend_composition_by_account)
+                result = self.backend.equilibrate(**backend_kwargs)
         except AccountingError:
             raise
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
+            if cache_write_through:
+                raise
             if not self._backend_allows_stub_fallback():
                 raise
             return self._record_equilibrium_status(self._stub_equilibrium())
         except ValueError as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
+            if cache_write_through:
+                raise
             if not self._backend_allows_stub_fallback():
                 raise
             return self._record_equilibrium_status(self._stub_equilibrium())
 
         transition = getattr(result, 'ledger_transition', None)
-        if transition is None and self._equilibrium_result_has_phase_species(result):
+        if (
+            transition is None
+            and not diagnostic_silicate_equilibrium
+            and self._equilibrium_result_has_phase_species(result)
+        ):
             self._last_backend_error = (
                 'backend returned post-equilibrium phase material without an '
                 'AtomLedger transition'
@@ -2311,7 +2351,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
-        store = self._pt0_store()
+        store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_equilibrium(self, result)
         return result
@@ -2399,7 +2439,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
         pO2_bar = self._commanded_pO2_bar()
-        store = self._pt0_store()
+        store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
             pO2_bar = store.quantized_pO2_bar(self)
         kernel_result = self._dispatch_only(

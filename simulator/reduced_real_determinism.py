@@ -17,6 +17,7 @@ from collections import Counter
 from collections.abc import Mapping
 from datetime import datetime
 from datetime import timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +37,23 @@ _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
 _COMPOSITION_SIG_FIGS = 5
 _TRACE_CUTOFF = 1.0e-12
+_SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v1"
+# Modules that can change the equilibrium_post_record payload: core branch
+# selection/post hooks, cache serialization, kernel dispatch contracts,
+# melt-backend adapters, AlphaMELTS diagnostics, and builtin/VapoRock vapor or
+# backend-equilibrium providers. Excludes unrelated campaign/UI code so
+# cross-commit cache reuse survives non-payload edits.
+_SOURCE_MODULE_PATTERNS = (
+    "simulator/core.py",
+    "simulator/reduced_real_determinism.py",
+    "simulator/chemistry/kernel/*.py",
+    "simulator/melt_backend/*.py",
+    "engines/alphamelts/*.py",
+    "engines/builtin/_common.py",
+    "engines/builtin/backend_equilibrium.py",
+    "engines/builtin/vapor_pressure.py",
+    "engines/vaporock/*.py",
+)
 
 
 class PT0CacheMiss(RuntimeError):
@@ -72,6 +90,7 @@ class PT0DeterminismStore:
         self.capture_sequence: list[dict[str, Any]] = []
         self.replay_sequence: list[dict[str, Any]] = []
         self.misses: list[dict[str, Any]] = []
+        self.cache_events: list[dict[str, str]] = []
         self.hits: int = 0
         self.live_fills: int = 0
         self.quantize_live_controls: bool = True
@@ -83,6 +102,10 @@ class PT0DeterminismStore:
     @property
     def replay_enabled(self) -> bool:
         return self.mode == "replay"
+
+    @property
+    def write_through_enabled(self) -> bool:
+        return self.capture_enabled and self.persistent_store is not None
 
     def clone_for_replay(self) -> "PT0DeterminismStore":
         clone = PT0DeterminismStore("replay", db_path=self.persistent_path)
@@ -146,25 +169,40 @@ class PT0DeterminismStore:
         }
 
     def capture_equilibrium(self, sim: Any, result: EquilibriumResult) -> None:
-        key = canonical_replay_key(
-            sim,
-            artifact="equilibrium_post_record",
-            intent=ChemistryIntent.BACKEND_EQUILIBRIUM,
-            fO2_log=sim._compute_intrinsic_melt_fO2(),
-            fe_redox_policy="intrinsic",
-        )
+        key = self._equilibrium_key(sim)
         payload = equilibrium_payload(sim, result)
         self._store("equilibrium_post_record", key, payload)
 
+    def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
+        if not self.write_through_enabled:
+            return None
+        payload = self._lookup_optional(
+            "equilibrium_post_record",
+            self._equilibrium_key(sim),
+        )
+        if payload is None:
+            return None
+        return self._equilibrium_from_payload(sim, payload)
+
     def replay_equilibrium(self, sim: Any) -> EquilibriumResult:
-        key = canonical_replay_key(
+        payload = self._lookup("equilibrium_post_record", self._equilibrium_key(sim))
+        return self._equilibrium_from_payload(sim, payload)
+
+    def _equilibrium_key(self, sim: Any) -> dict[str, Any]:
+        intent = _equilibrium_payload_intent(sim)
+        return canonical_replay_key(
             sim,
             artifact="equilibrium_post_record",
-            intent=ChemistryIntent.BACKEND_EQUILIBRIUM,
+            intent=intent,
             fO2_log=sim._compute_intrinsic_melt_fO2(),
             fe_redox_policy="intrinsic",
         )
-        payload = self._lookup("equilibrium_post_record", key)
+
+    def _equilibrium_from_payload(
+        self,
+        sim: Any,
+        payload: Mapping[str, Any],
+    ) -> EquilibriumResult:
         result = equilibrium_from_payload(payload)
         sim._last_backend_status = getattr(result, "status", "ok")
         sim._last_vapor_pressures_source = dict(
@@ -210,6 +248,14 @@ class PT0DeterminismStore:
         by_artifact = Counter(
             record["artifact"] for record in self.capture_sequence
         )
+        state_counts = Counter(
+            event["cache_state"] for event in self.cache_events
+        )
+        state_counts_by_artifact: dict[str, Counter[str]] = {}
+        for event in self.cache_events:
+            artifact = event["artifact"]
+            state_counts_by_artifact.setdefault(artifact, Counter())
+            state_counts_by_artifact[artifact][event["cache_state"]] += 1
         return {
             "mode": self.mode,
             "entries": len(self.entries),
@@ -219,6 +265,17 @@ class PT0DeterminismStore:
             "misses": len(self.misses),
             "live_fills": self.live_fills,
             "cache_states": CACHE_STATES,
+            "cache_state_counts": {
+                state: state_counts.get(state, 0)
+                for state in CACHE_STATES
+            },
+            "cache_state_counts_by_artifact": {
+                artifact: {
+                    state: counts.get(state, 0)
+                    for state in CACHE_STATES
+                }
+                for artifact, counts in sorted(state_counts_by_artifact.items())
+            },
             "capture_calls_by_artifact": dict(sorted(by_artifact.items())),
             "key_drift_histogram": self.key_drift_histogram(),
             "first_miss": self.misses[0] if self.misses else None,
@@ -255,7 +312,11 @@ class PT0DeterminismStore:
         key_hash = _sha256(key_bytes)
         payload_hash = _sha256(payload_bytes)
         self.capture_sequence.append(
-            {"artifact": artifact, "key": copy.deepcopy(dict(key)), "hash": key_hash}
+            {
+                "artifact": artifact,
+                "key": copy.deepcopy(dict(key)),
+                "hash": key_hash,
+            }
         )
         existing = self.entries.get(key_hash)
         if existing is not None:
@@ -296,6 +357,7 @@ class PT0DeterminismStore:
             "cache_state": "live_fill",
         }
         self.live_fills += 1
+        self._record_cache_event(artifact, "live_fill")
 
     def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
         key_bytes = canonical_json_bytes(key)
@@ -335,7 +397,56 @@ class PT0DeterminismStore:
             )
         self.hits += 1
         self.replay_sequence[-1]["cache_state"] = "cached_exact"
+        self._record_cache_event(artifact, "cached_exact")
         return copy.deepcopy(entry["payload"])
+
+    def _lookup_optional(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        key_bytes = canonical_json_bytes(key)
+        key_hash = _sha256(key_bytes)
+        entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
+        if entry is None:
+            return None
+        self.replay_sequence.append(
+            {
+                "artifact": artifact,
+                "key": copy.deepcopy(dict(key)),
+                "hash": key_hash,
+                "cache_state": "cached_exact",
+            }
+        )
+        self.hits += 1
+        self._record_cache_event(artifact, "cached_exact")
+        return copy.deepcopy(entry["payload"])
+
+    def _entry_for_key(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+    ) -> dict[str, Any] | None:
+        entry = self.entries.get(key_hash)
+        if entry is None and self.persistent_store is not None:
+            entry = self.persistent_store.get(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            if entry is not None:
+                self.entries[key_hash] = copy.deepcopy(entry)
+        if entry is not None:
+            self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+        return entry
+
+    def _record_cache_event(self, artifact: str, cache_state: str) -> None:
+        self.cache_events.append(
+            {"artifact": str(artifact), "cache_state": str(cache_state)}
+        )
 
     def _verify_entry(
         self,
@@ -697,6 +808,7 @@ def canonical_replay_key(
         },
         "data_digests": _data_digests(sim),
         "code_version": _code_version(),
+        "source_module_digest": _source_module_digest(),
         "engine_version": provider.get("engine_version"),
     }
 
@@ -909,6 +1021,19 @@ def _provider_engine_version(provider: Any) -> str | None:
     return "unavailable"
 
 
+def _equilibrium_payload_intent(sim: Any) -> ChemistryIntent:
+    registry = getattr(sim, "_chem_registry", None)
+    if (
+        registry is not None
+        and registry.authoritative_for(
+            ChemistryIntent.SILICATE_EQUILIBRIUM
+        )
+        is not None
+    ):
+        return ChemistryIntent.SILICATE_EQUILIBRIUM
+    return ChemistryIntent.BACKEND_EQUILIBRIUM
+
+
 def _sulfsat_identity(gate: Any) -> dict[str, Any]:
     return {
         "sulfsat_provider": type(gate).__name__,
@@ -963,8 +1088,45 @@ def _data_digests(sim: Any) -> dict[str, str]:
     }
 
 
+@lru_cache(maxsize=1)
+def _source_module_digest() -> dict[str, Any]:
+    root = _repo_root()
+    rel_paths = _source_module_paths(root)
+    file_digests = []
+    for rel_path in rel_paths:
+        file_digests.append(
+            {
+                "path": rel_path,
+                "sha256": _sha256((root / rel_path).read_bytes()),
+            }
+        )
+    return {
+        "module_set": _SOURCE_MODULE_SET_ID,
+        "algorithm": "sha256",
+        "paths": list(rel_paths),
+        "sha256": _sha256(canonical_json_bytes(file_digests)),
+    }
+
+
+def _source_module_paths(root: Path) -> tuple[str, ...]:
+    rel_paths: set[str] = set()
+    missing: list[str] = []
+    for pattern in _SOURCE_MODULE_PATTERNS:
+        matches = sorted(root.glob(pattern))
+        if not matches:
+            missing.append(pattern)
+            continue
+        rel_paths.update(path.relative_to(root).as_posix() for path in matches)
+    if missing:
+        raise RuntimeError(
+            "PT-0 source digest module set has missing patterns: "
+            + ", ".join(missing)
+        )
+    return tuple(sorted(rel_paths))
+
+
 def _code_version() -> str:
-    root = Path(__file__).resolve().parent.parent
+    root = _repo_root()
     path = root / "VERSION"
     if path.exists():
         return path.read_text().strip()
@@ -972,7 +1134,7 @@ def _code_version() -> str:
 
 
 def _git_dirty() -> int:
-    root = Path(__file__).resolve().parent.parent
+    root = _repo_root()
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "status", "--short"],
@@ -984,6 +1146,10 @@ def _git_dirty() -> int:
     except Exception:  # noqa: BLE001 - diagnostic metadata only
         return 1
     return 1 if result.stdout.strip() else 0
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parent.parent
 
 
 def _none_or_str(value: Any) -> str | None:
