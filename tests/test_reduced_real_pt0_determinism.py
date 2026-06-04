@@ -145,7 +145,14 @@ def _run_authoritative_alphamelts_equilibrium(
     allow_stub_fallback: bool = True,
 ):
     sim = _build_pt0_sim(store)
-    sim.backend.is_available = lambda: True
+    class AlphaMELTSBackend:
+        def is_available(self) -> bool:
+            return True
+
+        def get_engine_version(self) -> str:
+            return provider.engine_version
+
+    sim.backend = AlphaMELTSBackend()
     if not allow_stub_fallback:
         sim._backend_allows_stub_fallback = lambda: False
 
@@ -329,10 +336,15 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
     assert key["code_version"]
     assert key["engine_version"] is not None
     assert key["source_module_digest"]["module_set"] == (
-        "equilibrium-vapor-melt-backend-v1"
+        "equilibrium-vapor-melt-backend-v2"
     )
     assert key["source_module_digest"]["sha256"]
     assert "simulator/melt_backend/base.py" in key["source_module_digest"]["paths"]
+    assert "simulator/evaporation.py" in key["source_module_digest"]["paths"]
+    assert (
+        "engines/builtin/evaporation_flux.py"
+        in key["source_module_digest"]["paths"]
+    )
     assert "engines/builtin/vapor_pressure.py" in key["source_module_digest"]["paths"]
     assert set(key["data_digests"]) == {
         "setpoints",
@@ -369,12 +381,21 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
     assert _key_hash(different_version) != _key_hash(first)
 
 
+@pytest.mark.parametrize(
+    "module_path",
+    [
+        "simulator/evaporation.py",
+        "engines/builtin/evaporation_flux.py",
+        "engines/builtin/vapor_pressure.py",
+    ],
+)
 def test_pt2_source_module_digest_changes_with_payload_source(
     monkeypatch: pytest.MonkeyPatch,
+    module_path: str,
 ) -> None:
     rrd._source_module_digest.cache_clear()
     before = _freeze_gate_key()
-    target = rrd._repo_root() / "engines/builtin/vapor_pressure.py"
+    target = rrd._repo_root() / module_path
     original_read_bytes = Path.read_bytes
 
     def changed_read_bytes(path: Path) -> bytes:
@@ -503,7 +524,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
 
 
-def test_pt1_capture_equilibrium_skips_non_cacheable_status(
+def test_pt1_capture_equilibrium_rejects_stub_provider(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "pt1-equilibrium-status.db"
@@ -533,15 +554,14 @@ def test_pt1_capture_equilibrium_skips_non_cacheable_status(
     assert sim._last_reduced_real_cache_state is None
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
-    capture.capture_equilibrium(sim, ok_result)
+    with pytest.raises(RuntimeError, match="builtin-backend-equilibrium"):
+        capture.capture_equilibrium(sim, ok_result)
 
-    assert capture.summary()["entries"] == 1
-    assert capture.summary()["capture_calls_by_artifact"] == {
-        "equilibrium_post_record": 1,
-    }
-    assert capture.last_cache_state == "live_fill"
-    assert sim._last_reduced_real_cache_state == "live_fill"
-    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+    assert capture.summary()["entries"] == 0
+    assert capture.summary()["capture_calls"] == 0
+    assert capture.last_cache_state is None
+    assert sim._last_reduced_real_cache_state is None
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
 
 def test_pt1_capture_gate_curve_skips_non_cacheable_status(

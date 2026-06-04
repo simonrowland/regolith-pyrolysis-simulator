@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+import simulator.reduced_real_determinism as rrd
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -45,6 +47,69 @@ def _write_magemin_row(db_path, suffix):
         payload_bytes=payload_bytes,
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
+
+
+def _write_equilibrium_post_record_row_raw(
+    db_path,
+    *,
+    backend_name,
+    provider_id,
+):
+    key = {
+        "schema_version": rrd.SCHEMA_VERSION,
+        "code_version": "test",
+        "engine_version": "test",
+        "data_digests": {},
+        "backend": {
+            "backend_name": backend_name,
+            "backend_class": backend_name,
+            "backend_version": "test",
+        },
+        "provider": {
+            "resolved_provider_id": provider_id,
+            "authoritative_provider_id": provider_id,
+            "fallback_provider_id": None,
+        },
+    }
+    payload = {"equilibrium_result": {"status": "ok"}}
+    key_bytes = _canonical_bytes(key)
+    payload_bytes = _canonical_bytes(payload)
+    driver.PT1PersistentEquilibriumStore(db_path)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            INSERT INTO {driver.PT1_EQUILIBRIUM_TABLE} (
+                key_hash,
+                artifact,
+                store_schema_version,
+                request_schema_version,
+                key_sha256,
+                payload_sha256,
+                key_bytes,
+                payload_bytes,
+                code_version,
+                engine_version,
+                data_digests_json,
+                created_at,
+                git_dirty
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                hashlib.sha256(key_bytes).hexdigest(),
+                "equilibrium_post_record",
+                rrd.PT1_STORE_SCHEMA_VERSION,
+                key["schema_version"],
+                hashlib.sha256(key_bytes).hexdigest(),
+                hashlib.sha256(payload_bytes).hexdigest(),
+                sqlite3.Binary(key_bytes),
+                sqlite3.Binary(payload_bytes),
+                key["code_version"],
+                key["engine_version"],
+                _canonical_bytes(key["data_digests"]).decode("utf-8"),
+                "2026-06-04T00:00:00Z",
+                0,
+            ),
+        )
 
 
 def _result(*, status="complete", marker="same", row_mass=0.0, trace_mass=None, mode="capture"):
@@ -323,3 +388,31 @@ def test_merge_cache_shard_rolls_back_mid_merge_error(tmp_path):
         driver._merge_cache_shard(shard_db, target_db)
 
     assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+def test_merge_cache_shard_rejects_stub_equilibrium_post_record(tmp_path):
+    shard_db = tmp_path / "shard.db"
+    target_db = tmp_path / "target.db"
+    _write_equilibrium_post_record_row_raw(
+        shard_db,
+        backend_name="StubBackend",
+        provider_id="builtin-backend-equilibrium",
+    )
+
+    with pytest.raises(RuntimeError, match="builtin-backend-equilibrium"):
+        driver._merge_cache_shard(shard_db, target_db)
+
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+def test_full_population_command_documents_authorized_backend():
+    args = driver._parse_args([])
+    command = driver._full_population_command(
+        args,
+        REPO_ROOT / "data" / "optimize_profiles" / "lunar_mare_low_ti.yaml",
+    )
+
+    assert args.backend == "alphamelts"
+    assert "--backend alphamelts" in command
+    assert "--require-magemin" in command
+    assert "--allow-stub-equilibrium" not in command

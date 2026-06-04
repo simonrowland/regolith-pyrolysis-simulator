@@ -3,6 +3,8 @@
 
 Opt-in batch driver. It attaches ``PT0DeterminismStore(db_path=...)`` to
 normal ``PyrolysisSimulator.step()`` runs and records only compact metrics.
+Correct reduced-real population uses ``--backend alphamelts --require-magemin``;
+stub-backed equilibrium rows are rejected before persistent merge.
 """
 
 from __future__ import annotations
@@ -34,6 +36,7 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
+    validate_reduced_real_equilibrium_record_key,
 )
 from simulator.session import SimSession, SimSessionConfig
 
@@ -530,10 +533,18 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     with target_store._connect() as conn:
         target_store._initialize(conn)
         for row in rows:
+            artifact = str(row["artifact"])
             key_hash = str(row["key_hash"])
             key_bytes = bytes(row["key_bytes"])
             payload_bytes = bytes(row["payload_bytes"])
             payload_hash = str(row["payload_sha256"])
+            try:
+                key = json.loads(key_bytes.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+                raise RuntimeError(
+                    f"PT-1 cache shard row has invalid key bytes: {key_hash}"
+                ) from exc
+            validate_reduced_real_equilibrium_record_key(artifact, key)
             existing = conn.execute(
                 f"""
                 SELECT artifact, key_sha256, payload_sha256, key_bytes, payload_bytes
@@ -544,7 +555,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
             ).fetchone()
             if existing is not None:
                 if (
-                    str(existing["artifact"]) != str(row["artifact"])
+                    str(existing["artifact"]) != artifact
                     or str(existing["key_sha256"]) != str(row["key_sha256"])
                     or str(existing["payload_sha256"]) != payload_hash
                     or bytes(existing["key_bytes"]) != key_bytes
@@ -572,7 +583,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                 """,
                 (
                     key_hash,
-                    str(row["artifact"]),
+                    artifact,
                     str(row["store_schema_version"]),
                     str(row["request_schema_version"]),
                     str(row["key_sha256"]),
@@ -697,7 +708,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--profile", type=Path, default=DEFAULT_PROFILE)
     parser.add_argument("--feedstock", action="append", dest="feedstocks")
     parser.add_argument("--campaign", action="append", dest="campaigns")
-    parser.add_argument("--backend", default="stub")
+    parser.add_argument("--backend", default="alphamelts")
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--hours", type=int, default=1)
     parser.add_argument("--mass-kg", type=float, default=1000.0)
@@ -728,6 +739,11 @@ def main(argv: list[str]) -> int:
     campaigns = tuple(args.campaigns or _profile_campaigns(profile))
     cli_additives_kg = _cli_additives(args.additives)
     magemin = _magemin_status()
+    if str(args.backend).strip().lower() == "stub":
+        raise RuntimeError(
+            "stub backend cannot populate the PT-1 reduced-real cache; "
+            "use --backend alphamelts --require-magemin"
+        )
     if args.require_magemin and not magemin["available"]:
         result = {
             "status": "blocked",
@@ -997,10 +1013,11 @@ def _full_population_command(args: argparse.Namespace, profile_path: Path) -> st
         "docs-private/reviews/2026-06-04-tier-pt3/full-population.db",
         "--hours",
         "30",
+        "--backend",
+        "alphamelts",
         "--wall-cap-s",
         "43200",
         "--require-magemin",
-        "--allow-stub-equilibrium",
     ]
     for feedstock in feedstocks:
         parts.extend(["--feedstock", feedstock])

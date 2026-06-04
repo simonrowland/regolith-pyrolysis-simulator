@@ -40,20 +40,23 @@ _TRACE_CUTOFF = 1.0e-12
 _CACHEABLE_EQUILIBRIUM_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_CALIBRATION_STATUSES = frozenset({"in_range"})
-_SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v1"
+_SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v2"
 # Modules that can change the equilibrium_post_record payload: core branch
 # selection/post hooks, cache serialization, kernel dispatch contracts,
-# melt-backend adapters, AlphaMELTS diagnostics, and builtin/VapoRock vapor or
-# backend-equilibrium providers. Excludes unrelated campaign/UI code so
-# cross-commit cache reuse survives non-payload edits.
+# melt-backend adapters, evaporation curve shaping, AlphaMELTS diagnostics,
+# and builtin/VapoRock vapor, flux, or backend-equilibrium providers. Excludes
+# unrelated campaign/UI code so cross-commit cache reuse survives non-payload
+# edits.
 _SOURCE_MODULE_PATTERNS = (
     "simulator/core.py",
+    "simulator/evaporation.py",
     "simulator/reduced_real_determinism.py",
     "simulator/chemistry/kernel/*.py",
     "simulator/melt_backend/*.py",
     "engines/alphamelts/*.py",
     "engines/builtin/_common.py",
     "engines/builtin/backend_equilibrium.py",
+    "engines/builtin/evaporation_flux.py",
     "engines/builtin/vapor_pressure.py",
     "engines/vaporock/*.py",
 )
@@ -62,6 +65,8 @@ _ALPHAMELTS_BACKEND_NAME = "AlphaMELTSBackend"
 _ALPHAMELTS_BACKEND_CLASS = (
     "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
 )
+_BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
+_STUB_BACKEND_NAME = "StubBackend"
 
 
 class PT0CacheMiss(RuntimeError):
@@ -334,6 +339,7 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         payload: Mapping[str, Any],
     ) -> None:
+        validate_reduced_real_equilibrium_record_key(artifact, key)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
         key_hash = _sha256(key_bytes)
@@ -540,6 +546,7 @@ class PT1PersistentEquilibriumStore:
         payload_bytes: bytes,
         payload_hash: str,
     ) -> None:
+        validate_reduced_real_equilibrium_record_key(artifact, key)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -843,6 +850,52 @@ def canonical_replay_key(
         "source_module_digest": _source_module_digest(),
         "engine_version": provider.get("engine_version"),
     }
+
+
+def validate_reduced_real_equilibrium_record_key(
+    artifact: str,
+    key: Mapping[str, Any],
+) -> None:
+    if str(artifact) != "equilibrium_post_record":
+        return
+    provider = key.get("provider", {})
+    if not isinstance(provider, Mapping):
+        provider = {}
+    provider_ids = {
+        str(provider.get(field, "")).strip()
+        for field in (
+            "resolved_provider_id",
+            "authoritative_provider_id",
+            "fallback_provider_id",
+        )
+        if provider.get(field) is not None
+    }
+    if _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID in provider_ids:
+        backend = key.get("backend", {})
+        if not isinstance(backend, Mapping):
+            backend = {}
+        if not _is_stub_backend_key(backend):
+            return
+        raise RuntimeError(
+            "PT-1 reduced-real equilibrium_post_record rows require an "
+            "authorized real provider; got builtin-backend-equilibrium. "
+            "Populate with --backend alphamelts --require-magemin."
+        )
+    backend = key.get("backend", {})
+    if not isinstance(backend, Mapping):
+        backend = {}
+    if _is_stub_backend_key(backend):
+        raise RuntimeError(
+            "PT-1 reduced-real equilibrium_post_record rows require "
+            "an authorized real backend_name; got StubBackend."
+        )
+
+
+def _is_stub_backend_key(backend: Mapping[str, Any]) -> bool:
+    return any(
+        str(backend.get(field, "")).strip().split(".")[-1] == _STUB_BACKEND_NAME
+        for field in ("backend_name", "backend_class")
+    )
 
 
 def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
