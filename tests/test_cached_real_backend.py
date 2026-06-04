@@ -535,7 +535,7 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
     assert replay_sim._pt0_store().summary()["misses"] == 0
 
 
-def test_cached_real_reads_direct_alphamelts_populated_cache(
+def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
@@ -551,6 +551,12 @@ def test_cached_real_reads_direct_alphamelts_populated_cache(
         fO2_log=fO2_log,
         curve=curve,
     )
+    direct_summary = direct_sim._pt0_store().summary()
+
+    assert direct_result.status == "unavailable"
+    assert "equilibrium_post_record" not in direct_summary[
+        "capture_calls_by_artifact"
+    ]
 
     replay_config = _cache_config(
         db_path,
@@ -568,29 +574,25 @@ def test_cached_real_reads_direct_alphamelts_populated_cache(
         cache_config=replay_config,
     )
 
-    replay_result = replay_sim._get_equilibrium()
+    with pytest.raises(PT0CacheMiss):
+        replay_sim._get_equilibrium()
     replay_curve = replay_sim._pt0_store().replay_gate_curve(
         replay_sim,
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     )
 
-    assert replay_result.status == direct_result.status
-    assert replay_result.liquid_fraction == direct_result.liquid_fraction
     assert replay_curve == curve
     summary = replay_sim._pt0_store().summary()
-    assert (
-        summary["cache_state_counts_by_artifact"]["equilibrium_post_record"][
-            "cached_exact"
-        ]
-        == 1
-    )
+    assert "equilibrium_post_record" not in summary[
+        "cache_state_counts_by_artifact"
+    ]
     assert (
         summary["cache_state_counts_by_artifact"]["freeze_gate_curve"][
             "cached_exact"
         ]
         == 1
     )
-    assert summary["misses"] == 0
+    assert summary["misses"] == 1
 
 
 def test_cached_real_direct_alphamelts_version_mismatch_misses(

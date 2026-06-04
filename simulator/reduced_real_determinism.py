@@ -37,6 +37,9 @@ _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
 _COMPOSITION_SIG_FIGS = 5
 _TRACE_CUTOFF = 1.0e-12
+_CACHEABLE_EQUILIBRIUM_STATUSES = frozenset({"ok"})
+_CACHEABLE_GATE_STATUSES = frozenset({"ok"})
+_CACHEABLE_GATE_CALIBRATION_STATUSES = frozenset({"in_range"})
 _SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v1"
 # Modules that can change the equilibrium_post_record payload: core branch
 # selection/post hooks, cache serialization, kernel dispatch contracts,
@@ -175,6 +178,9 @@ class PT0DeterminismStore:
         }
 
     def capture_equilibrium(self, sim: Any, result: EquilibriumResult) -> None:
+        if not _is_cacheable_equilibrium_result(result):
+            self._mark_uncacheable_capture(sim)
+            return
         key = self._equilibrium_key(sim)
         payload = equilibrium_payload(sim, result)
         self._store("equilibrium_post_record", key, payload)
@@ -232,6 +238,9 @@ class PT0DeterminismStore:
         fO2_log: float,
         curve: Mapping[str, Any],
     ) -> None:
+        if not _is_cacheable_gate_curve(curve):
+            self._mark_uncacheable_capture(sim)
+            return
         provider_role = _gate_provider_role_for_capture(sim, curve)
         key = canonical_replay_key(
             sim,
@@ -243,6 +252,10 @@ class PT0DeterminismStore:
         )
         self._store("freeze_gate_curve", key, {"curve": _curve_payload(curve)})
         sim._last_reduced_real_cache_state = self.last_cache_state
+
+    def _mark_uncacheable_capture(self, sim: Any) -> None:
+        self.last_cache_state = None
+        sim._last_reduced_real_cache_state = None
 
     def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
         provider_role = _gate_provider_role_for_key(sim)
@@ -870,6 +883,30 @@ def equilibrium_from_payload(payload: Mapping[str, Any]) -> EquilibriumResult:
     if "alphamelts_diagnostics" in payload:
         setattr(result, "alphamelts_diagnostics", payload["alphamelts_diagnostics"])
     return result
+
+
+def _normalized_status(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _is_cacheable_equilibrium_result(result: EquilibriumResult) -> bool:
+    status = _normalized_status(getattr(result, "status", "ok"))
+    return status in _CACHEABLE_EQUILIBRIUM_STATUSES
+
+
+def _is_cacheable_gate_curve(curve: Mapping[str, Any]) -> bool:
+    status = _normalized_status(
+        curve.get("status") or curve.get("backend_status")
+    )
+    if status and status not in _CACHEABLE_GATE_STATUSES:
+        return False
+    calibration_status = _normalized_status(curve.get("calibration_status"))
+    if (
+        calibration_status
+        and calibration_status not in _CACHEABLE_GATE_CALIBRATION_STATUSES
+    ):
+        return False
+    return True
 
 
 def canonical_json_bytes(value: Any) -> bytes:

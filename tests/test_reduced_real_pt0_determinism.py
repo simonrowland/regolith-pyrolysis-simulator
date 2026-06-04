@@ -15,6 +15,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
@@ -54,6 +55,27 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
     )
     sim.configure_pt0_determinism_store(store)
     return sim
+
+
+def _persistent_artifact_count(db_path: Path, artifact: str) -> int:
+    if not db_path.exists():
+        return 0
+    with sqlite3.connect(db_path) as conn:
+        table_exists = conn.execute(
+            """
+            SELECT 1
+            FROM sqlite_master
+            WHERE type = 'table' AND name = ?
+            """,
+            (PT1_EQUILIBRIUM_TABLE,),
+        ).fetchone()
+        if table_exists is None:
+            return 0
+        return int(conn.execute(
+            f"SELECT COUNT(*) FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE artifact = ?",
+            (artifact,),
+        ).fetchone()[0])
 
 
 class _CountingSilicateEquilibriumProvider(ChemistryProvider):
@@ -481,55 +503,113 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
 
 
-def test_pt2_live_write_through_populates_then_exact_hits(
+def test_pt1_capture_equilibrium_skips_non_cacheable_status(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-equilibrium-status.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    failed_result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+        status="unavailable",
+    )
+    ok_result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+        status="ok",
+    )
+
+    capture.capture_equilibrium(sim, failed_result)
+
+    assert capture.summary()["entries"] == 0
+    assert capture.summary()["capture_calls"] == 0
+    assert capture.last_cache_state is None
+    assert sim._last_reduced_real_cache_state is None
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+
+    capture.capture_equilibrium(sim, ok_result)
+
+    assert capture.summary()["entries"] == 1
+    assert capture.summary()["capture_calls_by_artifact"] == {
+        "equilibrium_post_record": 1,
+    }
+    assert capture.last_cache_state == "live_fill"
+    assert sim._last_reduced_real_cache_state == "live_fill"
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 1
+
+
+def test_pt1_capture_gate_curve_skips_non_cacheable_status(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-gate-status.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    failed_curve = {
+        "source": "unit-test",
+        "status": "unavailable",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    ok_curve = {
+        "source": "unit-test",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=failed_curve)
+
+    assert capture.summary()["entries"] == 0
+    assert capture.summary()["capture_calls"] == 0
+    assert capture.last_cache_state is None
+    assert sim._last_reduced_real_cache_state is None
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
+
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=ok_curve)
+
+    assert capture.summary()["entries"] == 1
+    assert capture.summary()["capture_calls_by_artifact"] == {
+        "freeze_gate_curve": 1,
+    }
+    assert capture.last_cache_state == "live_fill"
+    assert sim._last_reduced_real_cache_state == "live_fill"
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+
+
+def test_pt2_live_write_through_skips_unavailable_equilibrium_cells(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "pt2-live-write-through.db"
     live = PT0DeterminismStore("capture", db_path=db_path)
 
-    live_trace, live_calls = _run_capped_c2a_with_equilibrium_counter(live)
+    _, live_calls = _run_capped_c2a_with_equilibrium_counter(live)
 
     assert live_calls > 0
     live_summary = live.summary()
+    assert "equilibrium_post_record" not in live_summary[
+        "cache_state_counts_by_artifact"
+    ]
     assert live_summary["cache_state_counts_by_artifact"][
-        "equilibrium_post_record"
+        "freeze_gate_curve"
     ]["live_fill"] >= 1
-    with sqlite3.connect(db_path) as conn:
-        populated_rows = conn.execute(
-            f"""
-            SELECT COUNT(*)
-            FROM {PT1_EQUILIBRIUM_TABLE}
-            WHERE artifact = 'equilibrium_post_record'
-            """
-        ).fetchone()[0]
-    assert populated_rows >= 1
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
     cached = PT0DeterminismStore("capture", db_path=db_path)
-    cached_trace, cached_calls = _run_capped_c2a_with_equilibrium_counter(
-        cached,
-        fail_live=True,
-    )
-
-    assert cached_calls == 0
-    assert deterministic_result_view(cached_trace) == deterministic_result_view(
-        live_trace
-    )
-    cached_summary = cached.summary()
-    cached_equilibrium_counts = cached_summary[
-        "cache_state_counts_by_artifact"
-    ]["equilibrium_post_record"]
-    assert cached_equilibrium_counts["cached_exact"] >= 1
-    assert cached_equilibrium_counts["live_fill"] == 0
-    assert cached_summary["hits"] >= 1
-    with sqlite3.connect(db_path) as conn:
-        rows_after_hit = conn.execute(
-            f"""
-            SELECT COUNT(*)
-            FROM {PT1_EQUILIBRIUM_TABLE}
-            WHERE artifact = 'equilibrium_post_record'
-            """
-        ).fetchone()[0]
-    assert rows_after_hit == populated_rows
+    with pytest.raises(
+        AssertionError,
+        match="PT-2 cached live run attempted backend.equilibrate",
+    ):
+        _run_capped_c2a_with_equilibrium_counter(cached, fail_live=True)
 
 
 def test_pt2_alphamelts_write_through_populates_then_exact_hits(
