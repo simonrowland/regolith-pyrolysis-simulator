@@ -73,10 +73,9 @@ The goal is to make the materials ledger visible: not only "how much oxygen," bu
 
 ## Interfaces
 
-The web app has two entry points:
+The web app's entry point:
 
 - `http://localhost:3000/` — detailed simulator with feedstock selection, additives, charts, pressure feedback, product inventory, and process decisions.
-- `http://localhost:3000/lunar-operator` — operator-style mode for multi-line refinery management.
 
 ## Quick Start
 
