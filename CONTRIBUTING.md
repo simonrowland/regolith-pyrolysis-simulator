@@ -134,6 +134,16 @@ P0/P1 findings BEFORE reporting a chunk done. Surface P2/P3 as TODO
 comments in the diff or as goal-queue follow-ups; do not commit them
 silently.
 
+**Ground-truth, not self-parity** (AGENTS.md Hard invariant 7). A new physics
+test must assert against external reality — published data, standards bodies, a
+physical definition — not against the simulator's own output. A test that only
+pins today's number to yesterday's number locks in any error already present
+(that is how the HKL flux units bug and stale atomic weights passed CI for so
+long). Put literature anchors in a sidecar separate from the runtime value
+(`data/vapor_pressures.yaml::pure_component_antoine`), and see
+`tests/test_physics_ground_truth.py` for the pattern. If a ground-truth test
+fails, investigate the physics — do not retune a coefficient to make it pass.
+
 ## Commits
 
 - **One chunk per commit.** Subject line: imperative mood, < 70 chars,
