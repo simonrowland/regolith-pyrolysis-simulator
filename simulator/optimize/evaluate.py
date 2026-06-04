@@ -30,6 +30,7 @@ from simulator.optimize.physics import (
     FeasibilityResult,
     GateMargin,
     PhysicsConstraintSet,
+    physics_constraints_digest,
 )
 from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
@@ -196,6 +197,7 @@ def evaluate(
             fidelity,
             profile,
             active_schema,
+            constraints=constraints,
         )
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
@@ -318,6 +320,8 @@ def _build_eval_inputs(
     fidelity: str,
     profile: Mapping[str, Any],
     schema: RecipeSchema,
+    *,
+    constraints: Any | None = None,
 ) -> tuple[EvalSpec, Any]:
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
@@ -349,6 +353,7 @@ def _build_eval_inputs(
             "feedstocks": bundle.digests["feedstocks"],
             "vapor_pressures": bundle.digests["vapor_pressures"],
             "profile": profile_digest,
+            "physics_constraints": physics_constraints_digest(constraints),
         },
         campaign=str(run_options["campaign"]),
         hours=int(run_options["hours"]),

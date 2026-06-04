@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+import math
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
@@ -1238,16 +1239,25 @@ def _margin_view(margin: Any) -> tuple[Any, ...]:
     return (
         margin.gate,
         bool(margin.feasible),
-        float(margin.margin),
+        _number_view(margin.margin),
         threshold.id,
         float(threshold.value),
         threshold.units,
         threshold.source,
         threshold.source_ref,
         float(threshold.tolerance),
-        float(margin.observed),
+        _number_view(margin.observed),
         margin.detail,
     )
+
+
+def _number_view(value: Any) -> Any:
+    numeric = float(value)
+    if math.isnan(numeric):
+        return "nan"
+    if math.isinf(numeric):
+        return "+inf" if numeric > 0.0 else "-inf"
+    return numeric
 
 
 def _run_reference_view(reference: RunReference | None) -> Mapping[str, Any] | None:

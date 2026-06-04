@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field
+import hashlib
 import math
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
@@ -15,12 +16,14 @@ from simulator.accounting.completeness import (
     extraction_completeness_by_target,
 )
 from simulator.condensation_routing import accepted_species_for_stage_number
+from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 
 SourceKind = Literal[
     "literature",
     "materials.yaml",
     "profile",
     "engineering_envelope",
+    "code_default",
 ]
 
 PHYSICS_GATE_VERSION = "physics-feasibility-v1"
@@ -109,22 +112,22 @@ class PhysicsConstraintSet:
         id="extraction_completeness_min",
         value=0.95,
         units="fraction",
-        source="profile",
-        source_ref="profile.feasibility.extraction_completeness.min_pct",
+        source="code_default",
+        source_ref="simulator.optimize.physics.PhysicsConstraintSet.extraction_min_fraction",
     ))
     knudsen_max: ThresholdSpec = field(default_factory=lambda: ThresholdSpec(
         id="knudsen_viscous_max",
         value=0.01,
         units="Kn",
-        source="profile",
-        source_ref="profile.feasibility.knudsen=viscous",
+        source="code_default",
+        source_ref="simulator.optimize.physics.PhysicsConstraintSet.knudsen_max",
     ))
     furnace_T_max_C: ThresholdSpec = field(default_factory=lambda: ThresholdSpec(
         id="furnace_T_max_C",
         value=1800.0,
         units="degC",
-        source="profile",
-        source_ref="profile.feasibility.furnace_T_max_C",
+        source="code_default",
+        source_ref="simulator.optimize.physics.PhysicsConstraintSet.furnace_T_max_C",
     ))
     target_species: tuple[str, ...] = ("SiO",)
     residual_species_by_target: Mapping[str, tuple[str, ...]] = field(
@@ -161,6 +164,7 @@ class PhysicsConstraintSet:
                 "materials.yaml",
                 "profile",
                 "engineering_envelope",
+                "code_default",
             }:
                 raise ValueError(f"{threshold.id} source is not declared")
 
@@ -213,6 +217,9 @@ class PhysicsConstraintSet:
                 threshold.source,
             ))
         return tuple(rows)
+
+    def digest(self) -> str:
+        return physics_constraints_digest(self)
 
     def evaluate(self, trace: Any) -> FeasibilityResult:
         margins = {
@@ -499,6 +506,48 @@ def _margin(
         observed=float(observed),
         detail=detail,
     )
+
+
+def physics_constraints_digest(constraints: Any | None = None) -> str:
+    """Stable digest for feasibility constraints used in eval cache keys."""
+
+    if constraints is None:
+        constraints = PhysicsConstraintSet()
+    payload: dict[str, Any] = {
+        "version": PHYSICS_GATE_VERSION,
+        "class": f"{type(constraints).__module__}.{type(constraints).__qualname__}",
+    }
+    if isinstance(constraints, PhysicsConstraintSet):
+        payload.update({
+            "target_species": constraints.target_species,
+            "residual_species_by_target": dict(constraints.residual_species_by_target),
+            "thresholds": tuple(
+                _threshold_payload(threshold)
+                for threshold in constraints.thresholds
+            ),
+            "allowable_wall_deposit_kg": tuple(
+                {
+                    "segment": segment,
+                    "species": species,
+                    "threshold": _threshold_payload(threshold),
+                }
+                for (segment, species), threshold
+                in sorted(constraints.allowable_wall_deposit_kg.items())
+            ),
+        })
+    canonical = canonical_json_dumps(normalize_canonical_value(payload)).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def _threshold_payload(threshold: ThresholdSpec) -> Mapping[str, Any]:
+    return {
+        "id": threshold.id,
+        "value": threshold.value,
+        "units": threshold.units,
+        "source": threshold.source,
+        "source_ref": threshold.source_ref,
+        "tolerance": threshold.tolerance,
+    }
 
 
 def _fail_closed(gate: str, threshold: ThresholdSpec, detail: str) -> GateMargin:

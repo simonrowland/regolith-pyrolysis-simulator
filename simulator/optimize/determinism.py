@@ -11,6 +11,7 @@ from __future__ import annotations
 import dataclasses
 import difflib
 import json
+import math
 import os
 import random
 from collections.abc import Callable, Mapping
@@ -162,7 +163,7 @@ def _margin_payload(margin: Any) -> dict[str, Any]:
     return {
         "gate": margin.gate,
         "feasible": margin.feasible,
-        "margin": margin.margin,
+        "margin": _number_payload(margin.margin),
         "threshold": {
             "id": threshold.id,
             "value": threshold.value,
@@ -171,9 +172,21 @@ def _margin_payload(margin: Any) -> dict[str, Any]:
             "source_ref": threshold.source_ref,
             "tolerance": threshold.tolerance,
         },
-        "observed": margin.observed,
+        "observed": _number_payload(margin.observed),
         "detail": margin.detail,
     }
+
+
+def _number_payload(value: Any) -> Any:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return value
+    if math.isnan(numeric):
+        return "nan"
+    if math.isinf(numeric):
+        return "+inf" if numeric > 0.0 else "-inf"
+    return value
 
 
 def _run_reference_payload(run_reference: RunReference | None) -> dict[str, Any] | None:

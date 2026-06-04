@@ -651,7 +651,7 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
         margins[str(gate)] = GateMargin(
             gate=str(item["gate"]),
             feasible=bool(item["feasible"]),
-            margin=float(item["margin"]),
+            margin=_decode_json_number(item["margin"], f"{gate}.margin"),
             threshold=ThresholdSpec(
                 id=str(threshold["id"]),
                 value=float(threshold["value"]),
@@ -660,7 +660,7 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
                 source_ref=str(threshold["source_ref"]),
                 tolerance=float(threshold.get("tolerance", 0.0)),
             ),
-            observed=float(item["observed"]),
+            observed=_decode_json_number(item["observed"], f"{gate}.observed"),
             detail=str(item["detail"]),
         )
     return margins
@@ -723,7 +723,23 @@ def _json_load(value: str) -> Any:
     return json.loads(value)
 
 
-def _json_number(value: float, label: str) -> float:
+def _json_number(value: float, label: str) -> float | str:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} is not numeric") from exc
+    if math.isnan(numeric):
+        raise ValueError(f"{label} is NaN")
+    if math.isinf(numeric):
+        return "+inf" if numeric > 0.0 else "-inf"
+    return numeric
+
+
+def _decode_json_number(value: Any, label: str) -> float:
+    if value == "+inf":
+        return math.inf
+    if value == "-inf":
+        return -math.inf
     try:
         numeric = float(value)
     except (TypeError, ValueError) as exc:

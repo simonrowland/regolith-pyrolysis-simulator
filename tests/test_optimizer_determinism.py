@@ -49,19 +49,25 @@ def _base_spec(**overrides: object) -> EvalSpec:
     return EvalSpec(**data)
 
 
-def _margin(feasible: bool = True) -> GateMargin:
+def _margin(
+    feasible: bool = True,
+    *,
+    gate: str = "delivered_stream_purity",
+    margin: float | None = None,
+    observed: float | None = None,
+) -> GateMargin:
     return GateMargin(
-        gate="delivered_stream_purity",
+        gate=gate,
         feasible=feasible,
-        margin=0.25 if feasible else -0.25,
+        margin=margin if margin is not None else (0.25 if feasible else -0.25),
         threshold=ThresholdSpec(
-            id="delivered_stream_purity_min",
+            id=f"{gate}_min",
             value=0.95,
             units="fraction",
             source="profile",
             source_ref="test profile",
         ),
-        observed=0.98 if feasible else 0.90,
+        observed=observed if observed is not None else (0.98 if feasible else 0.90),
         detail="test margin",
     )
 
@@ -85,6 +91,7 @@ def _result(
     candidate_id: str | None = "candidate-a",
     cache_key_value: str | None = None,
     notes: tuple[str, ...] = (),
+    margins: dict[str, GateMargin] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -93,7 +100,7 @@ def _result(
         feasible=feasible,
         failure_category=None if feasible else FailureCategory.PHYSICS_REFUSED,
         objectives=_objectives(oxygen) if feasible else None,
-        feasibility_margins={"delivered_stream_purity": _margin(feasible)},
+        feasibility_margins=margins or {"delivered_stream_purity": _margin(feasible)},
         failing_gates=() if feasible else ("delivered_stream_purity",),
         run_reference=RunReference(
             status="ok",
@@ -119,6 +126,25 @@ def test_deterministic_eval_repeats_identical_view() -> None:
 
     assert len(results) == 2
     assert deterministic_result_view(results[0]) == deterministic_result_view(results[1])
+
+
+def test_deterministic_result_view_handles_clean_infinite_margin() -> None:
+    spec = _base_spec()
+    result = _result(
+        spec,
+        margins={
+            "delivered_stream_purity": _margin(),
+            "coating": _margin(
+                gate="coating",
+                margin=float("inf"),
+                observed=float("inf"),
+            ),
+        },
+    )
+
+    view = deterministic_result_view(result)
+
+    assert '"+inf"' in view
 
 
 def test_volatile_metadata_stripped_but_substantive_fields_kept() -> None:

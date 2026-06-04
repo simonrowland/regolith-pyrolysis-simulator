@@ -16,7 +16,7 @@ from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
-from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 
@@ -79,6 +79,7 @@ def _spec(
     feedstock: str,
     fidelity: str,
     profile: Mapping[str, Any],
+    constraints: Any | None = None,
 ) -> EvalSpec:
     spec, _ = _build_eval_inputs(
         patch.validated(RecipeSchema()),
@@ -86,6 +87,7 @@ def _spec(
         fidelity,
         profile,
         RecipeSchema(),
+        constraints=constraints,
     )
     return spec
 
@@ -119,10 +121,10 @@ def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | Non
         *,
         profile: Mapping[str, Any],
         candidate_id: str | None = None,
-        **_: Any,
+        **kwargs: Any,
     ) -> ScoredResult:
         index = _sequence(candidate_id)
-        spec = _spec(patch, feedstock, fidelity, profile)
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
         if index in aborts:
             return ScoredResult(
                 candidate_id=candidate_id,
@@ -210,6 +212,120 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_path) -> None:
+    def clean_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        index = _sequence(candidate_id)
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        coating_margin = math.inf if index == 1 else 0.5
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+                )
+            ),
+            feasibility_margins={
+                "delivered_stream_purity": _margin(),
+                "coating": GateMargin(
+                    gate="coating",
+                    feasible=True,
+                    margin=coating_margin,
+                    threshold=ThresholdSpec(
+                        id="coating_min_campaigns_to_resinter",
+                        value=10.0,
+                        units="campaigns",
+                        source="code_default",
+                        source_ref="clean zero-wall-deposit test",
+                    ),
+                    observed=math.inf if index == 1 else 10.5,
+                    detail="no wall deposit" if index == 1 else "finite deposit",
+                ),
+            },
+            run_reference=RunReference(status="ok", trace={"snapshots": [index]}),
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        2,
+        tmp_path,
+        seed=7,
+        evaluator=clean_evaluator,
+    )
+
+    assert result.winner.candidate_id == "random-7-000001"
+    provenance = _read_provenance(tmp_path)
+    winner_row = next(row for row in provenance if row["candidate_id"] == result.winner.candidate_id)
+    assert winner_row["feasibility_margins"]["coating"]["margin"] == "+inf"
+    assert len(_stored_rows(tmp_path)) == 2
+
+
+def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    loose = PhysicsConstraintSet()
+    tight = PhysicsConstraintSet(
+        furnace_T_max_C=ThresholdSpec(
+            id="furnace_T_max_C",
+            value=900.0,
+            units="degC",
+            source="code_default",
+            source_ref="test tightened furnace ceiling",
+        )
+    )
+    spec_loose, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "stub",
+        PROFILE,
+        schema,
+        constraints=loose,
+    )
+    spec_tight, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "stub",
+        PROFILE,
+        schema,
+        constraints=tight,
+    )
+    store = ResultStore(tmp_path / "cache.sqlite")
+    scored = ScoredResult(
+        candidate_id="cached",
+        eval_spec=spec_loose,
+        cache_key=cache_key(spec_loose),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 1.0, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+    )
+    store.store(spec_loose, scored, created_at="t1")
+    candidate = study.Candidate(id="random-7-000000", patch=patch)
+
+    assert cache_key(spec_tight) != cache_key(spec_loose)
+    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, loose)
+    assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, tight) is None
 
 
 def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(tmp_path) -> None:
@@ -371,7 +487,7 @@ def test_feasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
             },
         )
 
-    with pytest.raises(study.StudyAbort, match="margin.*non-finite"):
+    with pytest.raises(study.StudyAbort, match="margin.*NaN"):
         study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=bad_margin)
 
     assert not (tmp_path / "pareto.json").exists()
@@ -396,12 +512,12 @@ def test_infeasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
             feasible=False,
             failure_category=FailureCategory.INFEASIBLE_RECIPE,
             feasibility_margins={
-                "delivered_stream_purity": _margin(feasible=False, observed=math.inf),
+                "delivered_stream_purity": _margin(feasible=False, observed=math.nan),
             },
             failing_gates=("delivered_stream_purity",),
         )
 
-    with pytest.raises(study.StudyAbort, match="observed.*non-finite"):
+    with pytest.raises(study.StudyAbort, match="observed.*NaN"):
         study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 1, tmp_path, evaluator=bad_margin)
 
     assert not (tmp_path / "pareto.json").exists()

@@ -9,6 +9,7 @@ from simulator.optimize.physics import (
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
+    physics_constraints_digest,
 )
 from simulator.state import CampaignPhase, HourSnapshot
 from simulator.state import MOLAR_MASS
@@ -132,6 +133,7 @@ def test_all_five_gates_are_computed_from_physics_trace() -> None:
 def test_thresholds_are_non_null_and_have_declared_provenance() -> None:
     constraints = PhysicsConstraintSet()
     allowed_sources = {
+        "code_default",
         "literature",
         "materials.yaml",
         "profile",
@@ -147,6 +149,24 @@ def test_thresholds_are_non_null_and_have_declared_provenance() -> None:
     rows = constraints.threshold_provenance_table()
     assert {row[0] for row in rows} == set(GATE_ORDER)
     assert all(row[2] in allowed_sources for row in rows)
+    hardcoded_defaults = (
+        constraints.extraction_min_fraction,
+        constraints.knudsen_max,
+        constraints.furnace_T_max_C,
+    )
+    assert {threshold.source for threshold in hardcoded_defaults} == {"code_default"}
+    assert all("profile.feasibility" not in threshold.source_ref for threshold in hardcoded_defaults)
+
+
+def test_clean_zero_wall_deposit_coating_margin_is_feasible_infinity() -> None:
+    result = PhysicsConstraintSet().evaluate(_trace(condensed=({(3, "SiO"): 20.0},)))
+
+    coating = result.margins["coating"]
+    assert result.feasible
+    assert coating.feasible
+    assert coating.detail == "no wall deposit"
+    assert coating.margin == math.inf
+    assert coating.observed == math.inf
 
 
 @pytest.mark.parametrize(
@@ -289,6 +309,21 @@ def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None
     assert not margin.feasible
     assert margin.observed == pytest.approx(1.0 / 3.0)
     assert "denominator_target_equiv_mol=3" in margin.detail
+
+
+def test_constraint_digest_changes_when_threshold_changes() -> None:
+    base = PhysicsConstraintSet()
+    tightened = PhysicsConstraintSet(
+        furnace_T_max_C=ThresholdSpec(
+            id="furnace_T_max_C",
+            value=1700.0,
+            units="degC",
+            source="code_default",
+            source_ref="test tightened furnace ceiling",
+        )
+    )
+
+    assert physics_constraints_digest(tightened) != physics_constraints_digest(base)
 
 
 def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:

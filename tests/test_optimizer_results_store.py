@@ -212,7 +212,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
-def test_store_rejects_nonfinite_margin_numbers(tmp_path) -> None:
+def test_store_rejects_nan_margin_numbers(tmp_path) -> None:
     spec = _base_spec()
     store = ResultStore(tmp_path / "results.sqlite")
     scored = _scored(
@@ -220,7 +220,7 @@ def test_store_rejects_nonfinite_margin_numbers(tmp_path) -> None:
         margins={"delivered_stream_purity": _margin(margin=math.nan)},
     )
 
-    with pytest.raises(ValueError, match="delivered_stream_purity.margin is non-finite"):
+    with pytest.raises(ValueError, match="delivered_stream_purity.margin is NaN"):
         store.store(spec, scored, created_at="2026-01-01T00:00:00Z")
 
     assert store.lookup(spec) is None
@@ -315,13 +315,25 @@ def test_best_returns_best_feasible_with_deterministic_tie_break(tmp_path) -> No
         current_data_digests=spec_a.data_digests,
     )
     store.store(spec_a, _scored(spec_a, candidate_id="a", oxygen=5.0), created_at="t1")
-    store.store(spec_b, _scored(spec_b, candidate_id="b", oxygen=7.0), created_at="t2")
+    clean_margins = {
+        "delivered_stream_purity": _margin(),
+        "coating": _margin("coating", margin=math.inf, observed=math.inf),
+    }
+    store.store(
+        spec_b,
+        _scored(spec_b, candidate_id="b", oxygen=7.0, margins=clean_margins),
+        created_at="t2",
+    )
     store.store(spec_c, _infeasible(spec_c), created_at="t3")
 
     best = store.best(spec_a.feedstock_id, objective_metric="oxygen_kg")
+    loaded_clean = store.lookup(spec_b)
 
     assert best is not None
     assert best.candidate_id == "b"
+    assert loaded_clean is not None
+    assert loaded_clean.feasibility_margins["coating"].margin == math.inf
+    assert loaded_clean.feasibility_margins["coating"].observed == math.inf
 
 
 def test_best_defaults_to_profile_primary_and_honors_direction(tmp_path) -> None:

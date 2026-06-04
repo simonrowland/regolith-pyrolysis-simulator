@@ -573,7 +573,15 @@ def _evaluate_candidates(
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
     for index, candidate in enumerate(candidates):
-        cached = _lookup_cached(candidate, profile, feedstock, fidelity, schema, store)
+        cached = _lookup_cached(
+            candidate,
+            profile,
+            feedstock,
+            fidelity,
+            schema,
+            store,
+            constraints,
+        )
         if cached is None:
             prefix = _ensure_staged_prefix_replay(
                 candidate,
@@ -662,7 +670,14 @@ def _ensure_staged_prefix_replay(
         return None
 
     prefix_patch = _prefix_patch_from_metadata(candidate, schema)
-    base_spec, _ = _build_eval_inputs(prefix_patch, feedstock, fidelity, profile, schema)
+    base_spec, _ = _build_eval_inputs(
+        prefix_patch,
+        feedstock,
+        fidelity,
+        profile,
+        schema,
+        constraints=constraints,
+    )
     prefix_spec = make_prefix_eval_spec(
         base_spec,
         prefix_stage_ids=_string_tuple_metadata(candidate, "prefix_stage_ids"),
@@ -813,10 +828,18 @@ def _lookup_cached(
     fidelity: str,
     schema: RecipeSchema,
     store: ResultStore,
+    constraints: Any,
 ) -> ScoredResult | None:
     try:
         validated = candidate.patch.validated(schema)
-        spec, _ = _build_eval_inputs(validated, feedstock, fidelity, profile, schema)
+        spec, _ = _build_eval_inputs(
+            validated,
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            constraints=constraints,
+        )
     except RecipeValidationError:
         return None
     cached = store.lookup(spec)
@@ -884,6 +907,7 @@ def _evaluate_one(
             fidelity,
             profile,
             schema,
+            constraints=constraints,
         )
         scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
     return scored
@@ -953,8 +977,8 @@ def _assert_honest_result(
 def _assert_finite_margins(scored: ScoredResult) -> None:
     for name, margin in scored.feasibility_margins.items():
         prefix = f"feasibility margin {name!r}"
-        _finite(getattr(margin, "margin", None), f"{prefix}.margin")
-        _finite(getattr(margin, "observed", None), f"{prefix}.observed")
+        _finite_or_infinite(getattr(margin, "margin", None), f"{prefix}.margin")
+        _finite_or_infinite(getattr(margin, "observed", None), f"{prefix}.observed")
 
 
 def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
@@ -1042,8 +1066,21 @@ def _finite(value: Any, label: str) -> float:
     return numeric
 
 
-def _json_number(value: Any, label: str) -> float:
-    return _finite(value, label)
+def _finite_or_infinite(value: Any, label: str) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise StudyAbort(f"{label} is not numeric") from exc
+    if math.isnan(numeric):
+        raise StudyAbort(f"{label} is NaN")
+    return numeric
+
+
+def _json_number(value: Any, label: str) -> float | str:
+    numeric = _finite_or_infinite(value, label)
+    if math.isinf(numeric):
+        return "+inf" if numeric > 0.0 else "-inf"
+    return numeric
 
 
 def _rank_key(
