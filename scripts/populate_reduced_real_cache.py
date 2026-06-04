@@ -64,6 +64,101 @@ def _resolve_profile(path: Path) -> Path:
     raise FileNotFoundError(f"profile not found: {path}")
 
 
+def _profile_run(profile: Mapping[str, Any]) -> Mapping[str, Any]:
+    run = profile.get("run") or {}
+    if not isinstance(run, Mapping):
+        raise ValueError("profile.run must be a mapping when provided")
+    return run
+
+
+def _coerce_campaigns(value: Any, *, source: str) -> tuple[str, ...]:
+    if isinstance(value, str):
+        campaigns = (value,)
+    elif isinstance(value, (list, tuple)):
+        campaigns = tuple(str(item) for item in value)
+    else:
+        raise ValueError(f"{source} must be a campaign string or list")
+    if not campaigns or any(not campaign for campaign in campaigns):
+        raise ValueError(f"{source} must contain at least one non-empty campaign")
+    return campaigns
+
+
+def _profile_campaigns(profile: Mapping[str, Any]) -> tuple[str, ...]:
+    seed_recipes = profile.get("seed_recipes") or ()
+    if seed_recipes:
+        if not isinstance(seed_recipes, list):
+            raise ValueError("profile.seed_recipes must be a list when provided")
+        first_seed = seed_recipes[0]
+        if not isinstance(first_seed, Mapping):
+            raise ValueError("profile.seed_recipes entries must be mappings")
+        if "source_campaigns" in first_seed:
+            return _coerce_campaigns(
+                first_seed["source_campaigns"],
+                source="profile.seed_recipes[0].source_campaigns",
+            )
+        if "source_campaign" in first_seed:
+            return _coerce_campaigns(
+                first_seed["source_campaign"],
+                source="profile.seed_recipes[0].source_campaign",
+            )
+
+    run = _profile_run(profile)
+    if "campaigns" in run:
+        return _coerce_campaigns(run["campaigns"], source="profile.run.campaigns")
+    if "campaign" in run:
+        return _coerce_campaigns(run["campaign"], source="profile.run.campaign")
+    return ("C2A_continuous",)
+
+
+def _coerce_additives(value: Any, *, source: str) -> dict[str, float]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{source} must be a mapping of species to kg")
+    additives: dict[str, float] = {}
+    for species, kg in value.items():
+        if not isinstance(species, str) or not species:
+            raise ValueError(f"{source} keys must be non-empty strings")
+        amount = float(kg)
+        if not math.isfinite(amount) or amount < 0.0:
+            raise ValueError(f"{source}.{species} must be a finite non-negative kg value")
+        additives[species] = amount
+    return additives
+
+
+def _parse_additive_arg(raw: str) -> tuple[str, float]:
+    if "=" not in raw:
+        raise argparse.ArgumentTypeError("--additive must use SPECIES=KG")
+    species, kg_text = raw.split("=", 1)
+    if not species:
+        raise argparse.ArgumentTypeError("--additive species must be non-empty")
+    try:
+        kg = float(kg_text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            f"--additive {raw!r} has non-numeric kg value"
+        ) from exc
+    if not math.isfinite(kg) or kg < 0.0:
+        raise argparse.ArgumentTypeError(
+            f"--additive {raw!r} must be finite and non-negative"
+        )
+    return species, kg
+
+
+def _cli_additives(entries: list[tuple[str, float]] | None) -> dict[str, float]:
+    additives: dict[str, float] = {}
+    for species, kg in entries or ():
+        additives[species] = kg
+    return additives
+
+
+def _profile_additives(profile: Mapping[str, Any]) -> dict[str, float]:
+    return _coerce_additives(
+        _profile_run(profile).get("additives_kg"),
+        source="profile.run.additives_kg",
+    )
+
+
 def _magemin_status() -> dict[str, Any]:
     backend = MAGEMinBackend()
     initialized = backend.initialize({"python_bridge": "subprocess"})
@@ -89,6 +184,7 @@ def _start_session(
     campaign: str,
     backend_name: str,
     mass_kg: float,
+    additives_kg: Mapping[str, float],
     store: PT0DeterminismStore,
     allow_stub_equilibrium: bool,
 ) -> SimSession:
@@ -103,6 +199,7 @@ def _start_session(
             backend_name=backend_name,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             mass_kg=mass_kg,
+            additives_kg=additives_kg,
         )
     )
     session.simulator.configure_pt0_determinism_store(store)
@@ -179,6 +276,7 @@ def _run_case(
     campaign: str,
     backend_name: str,
     mass_kg: float,
+    additives_kg: Mapping[str, float],
     hours: int,
     wall_cap_s: float,
     db_path: Path,
@@ -193,6 +291,7 @@ def _run_case(
         campaign=campaign,
         backend_name=backend_name,
         mass_kg=mass_kg,
+        additives_kg=additives_kg,
         store=store,
         allow_stub_equilibrium=allow_stub_equilibrium,
     )
@@ -259,6 +358,7 @@ def _run_case(
             "feedstock": feedstock,
             "campaign": campaign,
             "backend_name": backend_name,
+            "additives_kg": dict(sorted(additives_kg.items())),
             "mode": mode,
         },
         "stop_reason": stop_reason,
@@ -559,6 +659,14 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--hours", type=int, default=1)
     parser.add_argument("--mass-kg", type=float, default=1000.0)
+    parser.add_argument(
+        "--additive",
+        action="append",
+        default=[],
+        type=_parse_additive_arg,
+        dest="additives",
+        metavar="SPECIES=KG",
+    )
     parser.add_argument("--wall-cap-s", type=float, default=3600.0)
     parser.add_argument("--validate-replay", action="store_true")
     parser.add_argument("--include-kreep", action="store_true")
@@ -575,7 +683,9 @@ def main(argv: list[str]) -> int:
     feedstocks = tuple(args.feedstocks or (profile.get("feedstock"),))
     if not all(feedstocks):
         raise ValueError("feedstock required via --feedstock or profile.feedstock")
-    campaigns = tuple(args.campaigns or ("C2A_continuous",))
+    campaigns = tuple(args.campaigns or _profile_campaigns(profile))
+    additives_kg = _profile_additives(profile)
+    additives_kg.update(_cli_additives(args.additives))
     magemin = _magemin_status()
     if args.require_magemin and not magemin["available"]:
         result = {
@@ -611,6 +721,7 @@ def main(argv: list[str]) -> int:
                     campaign=campaign,
                     backend_name=args.backend,
                     mass_kg=args.mass_kg,
+                    additives_kg=additives_kg,
                     hours=args.hours,
                     wall_cap_s=args.wall_cap_s,
                     db_path=shard_db,
@@ -642,6 +753,8 @@ def main(argv: list[str]) -> int:
                         "status": "failed",
                         "failed_reason": "mass_balance_gate_failed",
                         "profile": str(profile_path.relative_to(REPO_ROOT)),
+                        "campaigns": list(campaigns),
+                        "additives_kg": dict(sorted(additives_kg.items())),
                         "db": str(args.db),
                         "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
                         "magemin": magemin,
@@ -697,6 +810,7 @@ def main(argv: list[str]) -> int:
                             campaign=campaign,
                             backend_name=args.backend,
                             mass_kg=args.mass_kg,
+                            additives_kg=additives_kg,
                             hours=args.hours,
                             wall_cap_s=args.wall_cap_s,
                             db_path=replay_db_path,
@@ -738,6 +852,8 @@ def main(argv: list[str]) -> int:
         result = {
             "status": "failed" if validation_failed else "complete",
             "profile": str(profile_path.relative_to(REPO_ROOT)),
+            "campaigns": list(campaigns),
+            "additives_kg": dict(sorted(additives_kg.items())),
             "db": str(args.db),
             "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
             "magemin": magemin,

@@ -392,6 +392,7 @@ class SimSession:
         config: SimSessionConfig,
     ) -> CampaignPhase:
         aliases = {
+            "C0b_p_cleanup": "C0B",
             "C2A_continuous": "C2A",
             "C2A_staged": "C2A_STAGED",
         }
