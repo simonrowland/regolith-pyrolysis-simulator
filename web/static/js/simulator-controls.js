@@ -77,6 +77,9 @@ document.getElementById('btn-start').addEventListener('click', () => {
         delete input.dataset.userEdited;
     });
 
+    const emptyHint = document.getElementById('empty-hint');
+    if (emptyHint) emptyHint.style.display = 'none';
+
     document.getElementById('btn-start').disabled = true;
     document.getElementById('btn-pause').disabled = false;
     document.getElementById('status-text').textContent = 'Running';

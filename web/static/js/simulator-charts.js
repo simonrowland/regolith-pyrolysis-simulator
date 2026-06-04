@@ -4,13 +4,18 @@
 
 // --- Plotly Chart Initialization ---
 
+// Theme-aware chart colours, matched to prefers-color-scheme at load.
+const chartDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const chartFontColor = chartDark ? '#e6edf3' : '#212529';
+const chartGrid = chartDark ? '#2d333b' : '#e9ecef';
+
 const chartLayout = {
     margin: { t: 30, r: 20, b: 40, l: 55 },
     paper_bgcolor: 'transparent',
     plot_bgcolor: 'transparent',
-    font: { size: 11, family: '-apple-system, sans-serif' },
-    xaxis: { title: 'Hour', gridcolor: '#e9ecef' },
-    yaxis: { gridcolor: '#e9ecef' },
+    font: { size: 11, family: '"IBM Plex Sans", -apple-system, sans-serif', color: chartFontColor },
+    xaxis: { title: 'Hour', gridcolor: chartGrid },
+    yaxis: { gridcolor: chartGrid },
 };
 const chartConfig = { responsive: true, displayModeBar: false };
 
@@ -102,16 +107,22 @@ function initO2BudgetChart() {
             x: [], y: [], mode: 'lines', name: 'O₂ Stored',
             line: { color: '#2563eb', width: 2 },
             fill: 'tozeroy', fillcolor: 'rgba(37,99,235,0.15)',
+            hovertemplate: 'O₂ Stored: %{y:.2f} kg<extra></extra>',
         },
         {
-            x: [], y: [], mode: 'lines', name: 'O₂ Vented',
+            // Line sits at stored+vented so the shaded band reads as vented;
+            // customdata carries the true vented value so hover reports vented,
+            // not the cumulative sum.
+            x: [], y: [], customdata: [], mode: 'lines', name: 'O₂ Vented',
             line: { color: '#dc2626', width: 2 },
             fill: 'tonexty', fillcolor: 'rgba(220,38,38,0.15)',
+            hovertemplate: 'O₂ Vented: %{customdata:.2f} kg<extra></extra>',
         },
         {
             x: [], y: [], mode: 'lines', name: 'Shaft Power',
             line: { color: '#f59e0b', width: 2, dash: 'dot' },
             yaxis: 'y2',
+            hovertemplate: 'Shaft: %{y:.1f} kW<extra></extra>',
         },
     ], {
         ...chartLayout,

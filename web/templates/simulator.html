@@ -24,7 +24,7 @@
         <!-- Engine selection -->
         <fieldset class="config-group">
             <legend>Thermodynamic Engine</legend>
-            <select id="engine-select">
+            <select id="engine-select" aria-label="Thermodynamic engine">
                 <option value="auto" selected>Auto (AlphaMELTS preferred)</option>
                 <option value="alphamelts">AlphaMELTS (strict)</option>
                 <option value="stub">Built-in fallback</option>
@@ -34,7 +34,7 @@
         <!-- Feedstock selection -->
         <fieldset class="config-group">
             <legend>Feedstock</legend>
-            <select id="feedstock-select">
+            <select id="feedstock-select" aria-label="Feedstock">
                 <option value="">Select feedstock...</option>
                 {% for key, fs in feedstocks.items() %}
                 <option value="{{ key }}">{{ fs.label if fs.label is defined else key }}</option>
@@ -100,14 +100,19 @@
 
         <!-- Status bar -->
         <div id="status-bar" class="status-bar">
-            <span id="status-text">Ready</span>
+            <span id="status-text" role="status" aria-live="polite">Ready</span>
             <span id="status-campaign">—</span>
             <span id="status-hour">Hour: 0</span>
             <span id="status-temp">T: — &deg;C</span>
             <span id="status-mass">Melt: — kg</span>
             <span id="status-atmosphere">Atmosphere: —</span>
-            <span id="status-ramp" class="status-indicator" style="display:none">THROTTLED</span>
-            <span id="status-vent" class="status-indicator status-danger" style="display:none">VENTING</span>
+            <span id="status-ramp" class="status-indicator" style="display:none" aria-live="polite">THROTTLED</span>
+            <span id="status-vent" class="status-indicator status-danger" style="display:none" role="alert">VENTING</span>
+        </div>
+
+        <!-- Empty-state guidance (hidden once a run starts) -->
+        <div id="empty-hint" class="empty-hint">
+            Select a feedstock and press <strong>Start</strong> to run a campaign. Charts and results populate here.
         </div>
 
         <!-- Charts grid -->

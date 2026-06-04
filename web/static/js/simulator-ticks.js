@@ -136,6 +136,10 @@ socket.on('simulation_tick', (data) => {
             [data.turbine_shaft_power_kW || 0],
         ],
     }, [0, 1, 2]);
+    // Hover for the vented band shows the true vented amount, not the stacked sum.
+    Plotly.extendTraces('chart-o2-budget', {
+        customdata: [[data.O2_vented_cumulative_kg || 0]],
+    }, [1]);
 
     // --- Melt Inventory chart ---
     if (!meltInvInitialized) initMeltInventoryChart();
