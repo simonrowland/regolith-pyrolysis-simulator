@@ -93,6 +93,64 @@ def _patch_common(monkeypatch, emitted):
     monkeypatch.setattr(driver, "_emit", lambda result, json_out: emitted.append(result))
 
 
+def test_multi_feedstock_run_resolves_additives_per_feedstock_in_replay(
+    tmp_path,
+    monkeypatch,
+):
+    emitted = []
+    calls = []
+    target_db = tmp_path / "target.db"
+
+    monkeypatch.setattr(driver, "_magemin_status", lambda: {"available": True})
+    monkeypatch.setattr(driver, "_full_population_command", lambda args, profile_path: "full")
+    monkeypatch.setattr(driver, "_emit", lambda result, json_out: emitted.append(result))
+
+    def fake_run_case(*, db_path, mode, feedstock, campaign, additives_kg, **kwargs):
+        calls.append(
+            {
+                "mode": mode,
+                "feedstock": feedstock,
+                "campaign": campaign,
+                "additives_kg": dict(additives_kg),
+            }
+        )
+        if mode == "capture":
+            _write_magemin_row(db_path, f"{feedstock}-{campaign}")
+        return _result(marker="same", mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "data/optimize_profiles/mars_basalt.yaml",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--validate-replay",
+            "--feedstock",
+            "mars_basalt",
+            "--feedstock",
+            "lunar_mare_low_ti",
+        ]
+    )
+
+    assert rc == 0
+    assert emitted[-1]["additives_kg"] == {
+        "mars_basalt": {"C": 30.0},
+        "lunar_mare_low_ti": {},
+    }
+    assert {call["mode"] for call in calls} == {"capture", "replay"}
+    for call in calls:
+        if call["feedstock"] == "mars_basalt":
+            assert call["additives_kg"] == {"C": 30.0}
+        elif call["feedstock"] == "lunar_mare_low_ti":
+            assert call["additives_kg"] == {}
+        else:
+            pytest.fail(f"unexpected feedstock: {call['feedstock']}")
+
+
 def test_validation_requires_trace_and_mass_balance_equality():
     trace_diverged = driver._validation_summary(
         [_result(marker="live", mode="capture")],

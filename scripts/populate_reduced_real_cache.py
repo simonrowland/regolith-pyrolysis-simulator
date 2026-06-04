@@ -40,6 +40,7 @@ from simulator.session import SimSession, SimSessionConfig
 
 DEFAULT_PROFILE = REPO_ROOT / "data" / "optimize_profiles" / "lunar_mare_low_ti.yaml"
 DEFAULT_DB = REPO_ROOT / "docs-private" / "reviews" / "2026-06-04-tier-pt3" / "pt3-capped.db"
+OPTIMIZE_PROFILE_DIR = REPO_ROOT / "data" / "optimize_profiles"
 MASS_BALANCE_GATE_PCT = 5e-12
 FIRST_FLIP_CAMPAIGNS = ("C2A_continuous", "C2B", "C4")
 CAL_FEEDSTOCKS = ("lunar_mare_low_ti", "mars_perchlorate_rich", "ci_carbonaceous_chondrite")
@@ -54,7 +55,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 def _resolve_profile(path: Path) -> Path:
     if path.exists():
         return path.resolve()
-    candidate = REPO_ROOT / "data" / "optimize_profiles" / path
+    candidate = OPTIMIZE_PROFILE_DIR / path
     if candidate.exists():
         return candidate.resolve()
     if candidate.suffix != ".yaml":
@@ -157,6 +158,47 @@ def _profile_additives(profile: Mapping[str, Any]) -> dict[str, float]:
         _profile_run(profile).get("additives_kg"),
         source="profile.run.additives_kg",
     )
+
+
+def _feedstock_additives(
+    feedstock: str,
+    *,
+    loaded_profile: Mapping[str, Any],
+    cli_additives: Mapping[str, float],
+) -> dict[str, float]:
+    profile_feedstock = loaded_profile.get("feedstock")
+    if profile_feedstock == feedstock:
+        additives = _profile_additives(loaded_profile)
+    else:
+        feedstock_profile_path = OPTIMIZE_PROFILE_DIR / f"{feedstock}.yaml"
+        if feedstock_profile_path.exists():
+            feedstock_profile = _load_yaml(feedstock_profile_path)
+            declared_feedstock = feedstock_profile.get("feedstock")
+            if declared_feedstock not in (None, feedstock):
+                raise ValueError(
+                    f"{feedstock_profile_path.relative_to(REPO_ROOT)} declares "
+                    f"feedstock={declared_feedstock!r}, expected {feedstock!r}"
+                )
+            additives = _profile_additives(feedstock_profile)
+        else:
+            additives = {}
+    additives.update(cli_additives)
+    return additives
+
+
+def _additives_result(
+    feedstocks: tuple[Any, ...],
+    additives_by_feedstock: Mapping[str, Mapping[str, float]],
+) -> dict[str, Any]:
+    if len(feedstocks) == 1:
+        feedstock = str(feedstocks[0])
+        return dict(sorted(additives_by_feedstock.get(feedstock, {}).items()))
+    return {
+        str(feedstock): dict(
+            sorted(additives_by_feedstock.get(str(feedstock), {}).items())
+        )
+        for feedstock in feedstocks
+    }
 
 
 def _magemin_status() -> dict[str, Any]:
@@ -684,8 +726,7 @@ def main(argv: list[str]) -> int:
     if not all(feedstocks):
         raise ValueError("feedstock required via --feedstock or profile.feedstock")
     campaigns = tuple(args.campaigns or _profile_campaigns(profile))
-    additives_kg = _profile_additives(profile)
-    additives_kg.update(_cli_additives(args.additives))
+    cli_additives_kg = _cli_additives(args.additives)
     magemin = _magemin_status()
     if args.require_magemin and not magemin["available"]:
         result = {
@@ -701,6 +742,7 @@ def main(argv: list[str]) -> int:
     cache_merges: list[dict[str, Any]] = []
     run_magemin_key_hashes: set[str] = set()
     pending_shards: list[tuple[dict[str, Any], Path]] = []
+    additives_by_feedstock: dict[str, dict[str, float]] = {}
     with tempfile.TemporaryDirectory(
         prefix="pt3-cache-work-",
         dir=args.db.parent,
@@ -713,11 +755,18 @@ def main(argv: list[str]) -> int:
 
         case_index = 0
         for feedstock in feedstocks:
+            feedstock_name = str(feedstock)
+            additives_kg = _feedstock_additives(
+                feedstock_name,
+                loaded_profile=profile,
+                cli_additives=cli_additives_kg,
+            )
+            additives_by_feedstock[feedstock_name] = additives_kg
             for campaign in campaigns:
                 case_index += 1
                 shard_db = work_path / f"cache-shard-{case_index}.db"
                 case_result = _run_case(
-                    feedstock=str(feedstock),
+                    feedstock=feedstock_name,
                     campaign=campaign,
                     backend_name=args.backend,
                     mass_kg=args.mass_kg,
@@ -754,7 +803,10 @@ def main(argv: list[str]) -> int:
                         "failed_reason": "mass_balance_gate_failed",
                         "profile": str(profile_path.relative_to(REPO_ROOT)),
                         "campaigns": list(campaigns),
-                        "additives_kg": dict(sorted(additives_kg.items())),
+                        "additives_kg": _additives_result(
+                            feedstocks,
+                            additives_by_feedstock,
+                        ),
                         "db": str(args.db),
                         "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
                         "magemin": magemin,
@@ -803,10 +855,17 @@ def main(argv: list[str]) -> int:
         replay_results = []
         if args.validate_replay:
             for feedstock in feedstocks:
+                feedstock_name = str(feedstock)
+                additives_kg = _feedstock_additives(
+                    feedstock_name,
+                    loaded_profile=profile,
+                    cli_additives=cli_additives_kg,
+                )
+                additives_by_feedstock[feedstock_name] = additives_kg
                 for campaign in campaigns:
                     replay_results.append(
                         _run_case(
-                            feedstock=str(feedstock),
+                            feedstock=feedstock_name,
                             campaign=campaign,
                             backend_name=args.backend,
                             mass_kg=args.mass_kg,
@@ -853,7 +912,7 @@ def main(argv: list[str]) -> int:
             "status": "failed" if validation_failed else "complete",
             "profile": str(profile_path.relative_to(REPO_ROOT)),
             "campaigns": list(campaigns),
-            "additives_kg": dict(sorted(additives_kg.items())),
+            "additives_kg": _additives_result(feedstocks, additives_by_feedstock),
             "db": str(args.db),
             "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
             "magemin": magemin,

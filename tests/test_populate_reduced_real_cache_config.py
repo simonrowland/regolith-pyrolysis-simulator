@@ -44,10 +44,38 @@ def test_cli_additive_overrides_profile_additive():
         ]
     )
 
-    additives = driver._profile_additives(profile)
-    additives.update(driver._cli_additives(args.additives))
+    additives = driver._feedstock_additives(
+        "mars_basalt",
+        loaded_profile=profile,
+        cli_additives=driver._cli_additives(args.additives),
+    )
 
     assert additives == {"C": 31.5, "Na": 2.0}
+
+
+def test_other_feedstock_uses_own_profile_additives_not_loaded_profile():
+    driver = _load_driver()
+    profile = driver._load_yaml(
+        REPO_ROOT / "data" / "optimize_profiles" / "mars_basalt.yaml"
+    )
+
+    assert (
+        driver._feedstock_additives(
+            "mars_basalt",
+            loaded_profile=profile,
+            cli_additives={},
+        )
+        == driver._profile_additives(profile)
+        == {"C": 30.0}
+    )
+    assert (
+        driver._feedstock_additives(
+            "lunar_mare_low_ti",
+            loaded_profile=profile,
+            cli_additives={},
+        )
+        == {}
+    )
 
 
 def test_start_session_passes_profile_additives_to_load_batch(tmp_path):
