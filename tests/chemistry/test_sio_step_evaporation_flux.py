@@ -5,7 +5,8 @@ Anchors:
 * ``data/vapor_pressures.yaml`` sets SiO Hertz-Knudsen alpha to 0.04.
 * §25-bis convergence documents VapoRock SiO pressure near 3.824e-1 Pa
   at the 1873 K SoF2018 Fig. 3 anchor. With alpha=0.04, unit area, and
-  unit stir factor, the H-K mass flux is 0.8384291054679249 kg/hr.
+  unit stir factor, the corrected H-K-L mass flux is
+  0.03695795496902614 kg/hr.
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from simulator.evaporation import _load_evaporation_alpha_by_species
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SIO_ANCHOR_PRESSURE_PA = 0.3824
-SIO_ANCHOR_FLUX_KG_HR = 0.8384291054679249
+SIO_ANCHOR_FLUX_KG_HR = 0.03695795496902614
 
 
 def _load_vapor_pressure_data() -> dict:

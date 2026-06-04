@@ -18,6 +18,8 @@ Covers:
   owns no ledger mutation (that belongs to EVAPORATION_TRANSITION, not
   yet migrated).
 * Below 400 K: provider returns empty flux dict.
+* Ground truth: pure-Si HKL mass flux matches the Safarian & Engh
+  alpha=1 branch cited in vapor_pressures.yaml, not the parity helper.
 """
 
 from __future__ import annotations
@@ -83,9 +85,11 @@ def _legacy_hertz_knudsen_flux(
         ) / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
-        denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
+        mass_flux_factor = math.sqrt(
+            M_kg_mol / (2 * math.pi * GAS_CONSTANT * T_K)
+        )
         alpha = alpha_by_species.get(species, 1.0)
-        J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) / denominator
+        J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) * mass_flux_factor
         if J_kg_s_m2 <= 0:
             continue
         rate_kg_hr = (
@@ -225,7 +229,51 @@ def test_provider_emits_no_ledger_transition():
 
 
 # ---------------------------------------------------------------------------
-# 4. Below 400 K, provider returns empty flux dict
+# 4. Physics ground-truth anchor, not parity against local code
+# ---------------------------------------------------------------------------
+
+
+def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
+    """Pure Si branch cited to Safarian & Engh 2013 must project molar HKL
+    flux to mass flux with M in the numerator."""
+
+    provider = BuiltinEvaporationFluxProvider()
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0}},
+        species_formula_registry={},
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            'vapor_pressures_Pa': {'Si': 0.27728678068938384},
+            'overhead_partials_Pa': {'Si': 0.0},
+            'molar_mass_kg_mol': {'Si': 0.02809},
+            'stoich_by_species': {
+                'Si': {
+                    'parent_oxide': 'SiO2',
+                    'oxide_per_product_kg': 2.139551442833749,
+                    'O2_per_product_kg': 1.139551442833749,
+                },
+            },
+            'available_oxide_kg': {'Si': 10.0},
+            'melt_surface_area_m2': 1.0,
+            'stir_factor': 1.0,
+            'alpha': {'Si': 1.0},
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    flux_kg_hr = result.diagnostic['evaporation_flux_kg_hr']['Si']
+    assert flux_kg_hr == pytest.approx(0.5497026611860572, rel=1e-12)
+
+
+# ---------------------------------------------------------------------------
+# 5. Below 400 K, provider returns empty flux dict
 # ---------------------------------------------------------------------------
 
 

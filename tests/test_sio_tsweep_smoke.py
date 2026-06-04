@@ -161,17 +161,13 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
     # CLI's "o2_1mbar" mode now switches the atmosphere to CONTROLLED_O2
     # so the commanded-pO2 floor at `_commanded_pO2_bar` actively
     # suppresses SiO via the 1/sqrt(pO2) Ellingham factor. The
-    # `o2_1mbar` mode's wall-deposit threshold therefore sits at a
-    # LOWER liner temperature than `no_suppress` — fewer SiO molecules
-    # in vapor means the cold-wall driving force ΔP drops below the
-    # SIO_SLOW_FOULING_WALL_DEPOSIT_KG threshold earlier in the
-    # liner-T sweep. The 1100 C value is the post-fix observed
-    # threshold; if Phase A retunes the suppression magnitude it may
-    # shift, and the assertion should be loosened to "< no_suppress
-    # threshold" rather than pinned to a specific number.
+    # P1-A HKL mass-flux fix (2026-06-04): corrected SiO flux is low enough
+    # that this coarse 1100/1500 C smoke grid hits the threshold floor in
+    # both modes. Keep the ordering non-worse; evolved-kg below still proves
+    # pO2 suppression is live.
     assert (
         thresholds["lunar_mare_low_ti:o2_1mbar"]["threshold_liner_temperature_C"]
-        < thresholds["lunar_mare_low_ti:no_suppress"]["threshold_liner_temperature_C"]
+        <= thresholds["lunar_mare_low_ti:no_suppress"]["threshold_liner_temperature_C"]
     )
     evolved_by_mode = {
         row["pO2_mode"]: float(row["sio_evolved_kg"])

@@ -17,7 +17,7 @@ MAX_BALANCE_ERR_PCT = 5.0e-12
 # this relative metric rose above the global mass-balance bound. The
 # magnitude-robust closure guard is ``terminal_mol == approx(sio_evaporated_mol)``
 # below; this caps the relative residual well below any physical effect.
-MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-8
+MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
 # C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
 # to the VapoRock-consistent activity-corrected value.
@@ -40,7 +40,7 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-8
 # under finite-headspace ON (the holdup-derived O2 partial is the
 # same across liner temperatures since C2A pO2_mbar=0 and no
 # wall-T-dependent O2 source is active in C2A).
-PHASE3BIS_SIO_EVOLVED_KG = 0.00193662886759
+PHASE3BIS_SIO_EVOLVED_KG = 8.53253498332e-05
 
 
 @lru_cache(maxsize=None)

@@ -94,7 +94,7 @@ class EvaporationMixin:
         For each volatile species, the mass flux from the melt surface is:
 
             J_i = α_i × stir_factor × A_surface × (P_sat_i - P_ambient_i)
-                  / √(2π × M_i × R × T)                            [HK-1]
+                  × √(M_i / (2π × R × T))                          [HK-1]
 
         where:
             α_i         = evaporation coefficient (~0.1-1.0 for metals)

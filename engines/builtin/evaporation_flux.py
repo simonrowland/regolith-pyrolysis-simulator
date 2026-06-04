@@ -233,7 +233,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if net_pressure_Pa <= 0:
                 continue
 
-            denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
+            mass_flux_factor = math.sqrt(
+                M_kg_mol / (2 * math.pi * GAS_CONSTANT * T_K)
+            )
             alpha_is_unmeasured = (
                 species not in alpha_by_species
                 and "*" not in alpha_by_species
@@ -244,7 +246,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
 
             baseline_rate_kg_hr = (
-                net_pressure_Pa / denominator
+                net_pressure_Pa
+                * mass_flux_factor
                 * melt_surface_area_m2
                 * stir_factor
                 * 3600.0
@@ -276,7 +279,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if uncertainty_pct is not None:
                 flux_uncertainty_pct[species] = uncertainty_pct
 
-            J_kg_s_m2 = alpha * net_pressure_Pa / denominator
+            J_kg_s_m2 = alpha * net_pressure_Pa * mass_flux_factor
 
             if J_kg_s_m2 <= 0:
                 continue
