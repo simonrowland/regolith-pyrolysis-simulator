@@ -313,6 +313,36 @@ def test_magemin_pressure_conversion_helpers_are_exact():
     assert MAGEMinBackend._GPa_to_kbar(1.5) == pytest.approx(15.0)
 
 
+def test_magemin_feot_conversion_uses_iupac_2feo_mass():
+    # Current standard atomic weights: Fe 55.845, O 15.999 g/mol.
+    feo_molar_mass = (
+        MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
+        + MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
+    )
+    fe2o3_molar_mass = (
+        2 * MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
+        + 3 * MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
+    )
+    feot_numerator = 2 * feo_molar_mass
+
+    assert feot_numerator == pytest.approx(143.688)
+    assert MAGEMinBackend._FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL == (
+        pytest.approx(feot_numerator)
+    )
+    assert MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR == pytest.approx(
+        feot_numerator / fe2o3_molar_mass
+    )
+
+
+def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
+    backend = MAGEMinBackend()
+    vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
+    feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
+
+    expected_feot = 10.0 + MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR
+    assert vector[feot_index] == pytest.approx(expected_feot)
+
+
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     # A successful call must populate phases_present, phase_masses_kg and
     # liquid_fraction from the library's phase block -- and still leave

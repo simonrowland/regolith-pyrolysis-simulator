@@ -600,6 +600,21 @@ class MAGEMinBackend(MeltBackend):
         'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O', 'TiO2',
         'O', 'Cr2O3', 'H2O',
     )
+    # Current standard atomic weights used for FeOt total-iron conversion.
+    # The shared accounting table is rounded for legacy kg<->mol tests.
+    _FE_MOLAR_MASS_G_PER_MOL = 55.845
+    _O_MOLAR_MASS_G_PER_MOL = 15.999
+    _FEO_MOLAR_MASS_G_PER_MOL = (
+        _FE_MOLAR_MASS_G_PER_MOL + _O_MOLAR_MASS_G_PER_MOL
+    )
+    _FE2O3_MOLAR_MASS_G_PER_MOL = (
+        2 * _FE_MOLAR_MASS_G_PER_MOL + 3 * _O_MOLAR_MASS_G_PER_MOL
+    )
+    _FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL = 2 * _FEO_MOLAR_MASS_G_PER_MOL
+    _FEOT_FROM_FE2O3_FACTOR = (
+        _FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL
+        / _FE2O3_MOLAR_MASS_G_PER_MOL
+    )
 
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
     # works in absolute log10(fO2); MAGEMin's single-point CLI takes a
@@ -790,9 +805,9 @@ class MAGEMinBackend(MeltBackend):
         """
         feo = float(composition_wt_pct.get('FeO', 0.0) or 0.0)
         fe2o3 = float(composition_wt_pct.get('Fe2O3', 0.0) or 0.0)
-        # Fe2O3 -> FeO-equivalent mass: each Fe2O3 (159.69 g/mol) carries
-        # 2 Fe; 2 FeO is 143.45 g/mol.  Total-iron-as-FeOt convention.
-        feot = feo + fe2o3 * (143.45 / 159.69)
+        # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
+        # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
+        feot = feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
 
         vector: List[float] = []
         for component in self._IG_BULK_ORDER:
