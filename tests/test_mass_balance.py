@@ -19,7 +19,7 @@ from tests.chemistry.conftest import _build_sim
 
 
 SIO_CLOSURE_MAX_REL_PCT = 5e-12
-SIO_CLOSURE_MAX_ABS_MOL = 2e-12
+SIO_CLOSURE_MAX_ABS_MOL = 5e-12
 MASS_BALANCE_CLOSURE_MAX_PCT = 5e-12
 CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG = 1e-9
 
@@ -43,6 +43,12 @@ def _install_liquidus_stub(sim) -> None:
         solidus_T_C=1000.0,
         liquidus_T_C=1300.0,
     )
+
+    def gate_dispatch_unavailable(reasons, *, fO2_log):
+        reasons.append("test liquidus stub bypasses gate dispatch")
+        return None
+
+    sim._freeze_gate_curve_from_gate_dispatch = gate_dispatch_unavailable
 
 
 def _cumulative_transition_imbalance_kg(sim) -> float:

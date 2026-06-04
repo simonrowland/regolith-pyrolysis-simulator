@@ -19,6 +19,7 @@ Covers:
 
 from __future__ import annotations
 
+import copy
 import math
 
 import pytest
@@ -53,6 +54,7 @@ _V1C_JANAF_ELLINGHAM = {
     "Ca": (-1285.155, -0.222295, 2, 2),
     "Al": (-1126.073, -0.218805, 4 / 3, 2 / 3),
     "Ti": (-939.632, -0.177149, 1, 1),
+    "Si": (-910.940, -0.182400, 1, 1),
     # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
     # anchored on Mn(l) above the solid→liquid transition at 1517 K
     # (Chase 1998, Mn-008 + phase transition data). See
@@ -444,6 +446,39 @@ def test_provider_short_circuits_below_400_k(vapor_pressure_data):
     result = provider.dispatch(request)
     assert result.status == "ok"
     assert (result.diagnostic or {}).get("vapor_pressures_Pa") == {}
+
+
+def test_inactive_metal_consumer_status_suppresses_builtin_fallback(
+    vapor_pressure_data,
+):
+    data = copy.deepcopy(vapor_pressure_data)
+    provider = BuiltinVaporPressureProvider(data)
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"SiO2": 10.0}},
+        species_formula_registry={},
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=view,
+        temperature_C=1700.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    inactive_result = provider.dispatch(request)
+    inactive_vp = dict(
+        (inactive_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
+    )
+    assert "SiO" in inactive_vp
+    assert "Si" not in inactive_vp
+
+    data["metals"]["Si"].pop("consumer_status", None)
+    active_result = BuiltinVaporPressureProvider(data).dispatch(request)
+    active_vp = dict(
+        (active_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
+    )
+    assert active_vp.get("Si", 0.0) > 1e-15
 
 
 # ---------------------------------------------------------------------------

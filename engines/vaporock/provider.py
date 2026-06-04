@@ -172,11 +172,9 @@ class VapoRockProvider(ChemistryProvider):
 
         pO2_bar = self._resolve_pO2_bar(request)
         composition_mol_by_account = self._composition_from_view(request)
-        # Compute total cleaned-melt kg for the fO2_log fallback in the
-        # adapter call (the adapter expects an fO2_log, not a pO2_bar).
-        # The simulator-level commanded pO2 is the canonical input;
-        # convert to log10 only when the request lacks an explicit
-        # fO2_log channel.
+        # VapoRock's vapor solver equilibrates gas species against the
+        # supplied gas fO2/log pO2.  Keep melt-liquidus redox intrinsic in
+        # the caller; VAPOR_PRESSURE uses the commanded overhead pO2.
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
@@ -257,15 +255,15 @@ class VapoRockProvider(ChemistryProvider):
 
     @staticmethod
     def _resolve_fO2_log(request: IntentRequest) -> float:
-        """Convert the request's pO2 / fO2 controls into the adapter's fO2_log."""
-        if request.fO2_log is not None:
-            return float(request.fO2_log)
+        """Convert commanded vapor pO2 into the adapter's gas fO2_log."""
         controls = request.control_inputs or {}
         pO2 = controls.get('pO2_bar') if controls else None
         if pO2 is not None:
             import math
             value = max(float(pO2), 1e-30)
             return float(math.log10(value))
+        if request.fO2_log is not None:
+            return float(request.fO2_log)
         return -9.0
 
     def _composition_from_view(self, request: IntentRequest) -> dict:
@@ -449,9 +447,7 @@ class VapoRockProvider(ChemistryProvider):
         section with the
         :data:`engines.builtin.vapor_pressure._ELLINGHAM_THERMO` table
         (the builtin only computes a vapor pressure for metals that
-        also have an Ellingham entry -- Si is the canonical example
-        of a YAML metal the builtin filters out for lack of an
-        oxide-decomposition coupling), plus the entire YAML
+        also have an Ellingham entry), plus the entire YAML
         ``oxide_vapors`` section.
 
         Goal #10 hard constraint binds this: the authority swap must

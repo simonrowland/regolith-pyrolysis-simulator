@@ -70,14 +70,6 @@ def _legacy_hertz_knudsen_flux(
     )
     metals_data = sim.vapor_pressures.get('metals', {}) or {}
     oxide_vapors_data = sim.vapor_pressures.get('oxide_vapors', {}) or {}
-    intrinsic_pO2_bar = max(
-        1.0e-30, 10.0 ** sim._compute_intrinsic_melt_fO2()
-    )
-    gas_pO2_bar = max(
-        1.0e-30,
-        sim._commanded_pO2_bar(),
-    )
-
     for species, P_sat_Pa in vapor_pressures_Pa.items():
         if P_sat_Pa <= 0:
             continue
@@ -90,17 +82,6 @@ def _legacy_hertz_knudsen_flux(
             'molar_mass_g_mol', MOLAR_MASS.get(species, 50.0)
         ) / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
-        O2_per_product_kg = max(
-            0.0, float(stoich.get('O2_per_product_kg') or 0.0)
-        )
-        if O2_per_product_kg > 0.0:
-            oxygen_mol_per_product_mol = (
-                O2_per_product_kg * M_kg_mol / (MOLAR_MASS['O2'] / 1000.0)
-            )
-            pO2_factor = (intrinsic_pO2_bar / gas_pO2_bar) ** (
-                oxygen_mol_per_product_mol
-            )
-            P_sat_Pa *= max(1.0e-12, min(1.0e12, pO2_factor))
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
         denominator = math.sqrt(2 * math.pi * M_kg_mol * GAS_CONSTANT * T_K)
         alpha = alpha_by_species.get(species, 1.0)

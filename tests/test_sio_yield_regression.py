@@ -54,9 +54,12 @@ GOLDENS = (
 # not from a real overhead inventory. Lunar
 # 0.000786620612837 → 0.00193652062882 (~+146% relative); mars
 # 0.000850874178948 → 0.00209489954469 (~+146% relative).
+# 2026-06-03 extraction pO2 de-dup: VAPOR_PRESSURE owns commanded pO2 once;
+# EVAPORATION_FLUX no longer reapplies an oxygen factor.  Vacuum-side C2A
+# SiO yield rises by +0.0056% relative, a deliberate physics consequence.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.00193652062882,
-    "mars_basalt": 0.00209489954469,
+    "lunar_mare_low_ti": 0.00193662886759,
+    "mars_basalt": 0.00209501664447,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -460,10 +463,10 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
     # pO2 = 1 mbar: the lever asserts the 1/sqrt(pO2) Ellingham suppression.
     o2_mode = _evolved_sio_kg_one_tick(pO2_mbar=1.0)
 
-    # The 1/sqrt(pO2) Ellingham factor drops SiO by sqrt(1mbar/1e-6mbar) = 1000x.
-    # Combined with the modulated equilibrium activity (∝ 1/pO2 for the
-    # SiO2 ⇌ SiO + ½ O2 reaction), the net suppression exceeds 1e-5.
-    assert o2_mode < no_suppress * 1.0e-5, (
+    # pO2 is now applied once in VAPOR_PRESSURE.  The old <1e-5 guard encoded
+    # a double application: VP suppression plus a second flux-side pO2 factor.
+    # One 1e-6 mbar -> 1 mbar SiO suppression is ~1e-3.
+    assert o2_mode < no_suppress * 1.1e-3, (
         f"o2_mode={o2_mode}, no_suppress={no_suppress}, "
         f"ratio={o2_mode / max(no_suppress, 1e-300)}"
     )

@@ -18,6 +18,9 @@ works. The provider:
   would couple intents inside a provider),
 - reads per-species overhead partials via
   ``request.control_inputs['overhead_partials_Pa']``,
+- treats the supplied vapor pressures as already-equilibrated ``P_eq``;
+  pO2 dependence belongs to the VAPOR_PRESSURE intent, not this flux
+  intent,
 - reads melt surface area, stir factor, evaporation coefficient via
   ``control_inputs['melt_surface_area_m2']``,
   ``control_inputs['stir_factor']``, ``control_inputs['alpha']``
@@ -155,14 +158,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         molar_masses_kg_mol = dict(controls.get("molar_mass_kg_mol") or {})
         stoich_by_species = dict(controls.get("stoich_by_species") or {})
         available_oxide_kg = dict(controls.get("available_oxide_kg") or {})
-        gas_pO2_bar = max(
-            1.0e-30, float(controls.get("gas_pO2_bar", 0.0) or 0.0)
-        )
-        intrinsic_pO2_bar = max(
-            1.0e-30,
-            float(controls.get("intrinsic_pO2_bar", gas_pO2_bar)
-                  or gas_pO2_bar),
-        )
 
         melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
         # 0.5.3 Phase B: stir_factor accepts either a scalar (legacy
@@ -231,19 +226,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 # there); here we skip silently since the kernel-level
                 # error surface is owned by the caller.
                 continue
-
-            O2_per_product_kg = max(
-                0.0, float(stoich.get("O2_per_product_kg") or 0.0)
-            )
-            if O2_per_product_kg > 0.0:
-                o2_molar_mass = MOLAR_MASS.get("O2", 32.0) / 1000.0
-                oxygen_mol_per_product_mol = (
-                    O2_per_product_kg * M_kg_mol / o2_molar_mass
-                )
-                pO2_factor = (intrinsic_pO2_bar / gas_pO2_bar) ** (
-                    oxygen_mol_per_product_mol
-                )
-                P_sat_Pa *= max(1.0e-12, min(1.0e12, pO2_factor))
 
             # Hertz-Knudsen mass flux (kg/s per m^2).            [HK-1]
             P_ambient_Pa = float(overhead_partials.get(species, 0.0))
@@ -317,8 +299,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "flux_uncertainty_pct": flux_uncertainty_pct,
                     "missing_alpha": missing_alpha,
                     "temperature_C": T_C,
-                    "gas_pO2_bar": gas_pO2_bar,
-                    "intrinsic_pO2_bar": intrinsic_pO2_bar,
                 },
                 warnings=(
                     "missing evaporation_alpha for sampled species: "
@@ -331,8 +311,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "alpha_used_by_species": alpha_used_by_species,
             "flux_uncertainty_pct": flux_uncertainty_pct,
             "temperature_C": T_C,
-            "gas_pO2_bar": gas_pO2_bar,
-            "intrinsic_pO2_bar": intrinsic_pO2_bar,
         }
         if unmeasured_alpha_fallback_species:
             diagnostic["unmeasured_alpha_fallback_species"] = sorted(

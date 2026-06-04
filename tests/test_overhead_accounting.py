@@ -97,6 +97,7 @@ def _cro2_train_sim():
 
 def _bypass_analytic_depletion(sim):
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    sim.campaign_mgr.check_endpoint = lambda *args, **kwargs: False
 
 
 def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
@@ -703,8 +704,8 @@ def test_sio_suppression_uses_commanded_po2():
     sim._commanded_pO2_bar = real_commanded
 
 
-def test_evaporation_flux_consults_commanded_po2_for_oxide_vapors():
-    """EVAPORATION_FLUX consumes gas pO2 for oxide-vapor suppression."""
+def test_evaporation_flux_does_not_reapply_commanded_po2():
+    """EVAPORATION_FLUX consumes P_eq; pO2 is owned by VAPOR_PRESSURE."""
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
@@ -726,7 +727,7 @@ def test_evaporation_flux_consults_commanded_po2_for_oxide_vapors():
     sim._commanded_pO2_bar = real_commanded
 
     assert flux is not None
-    assert calls, "_calculate_evaporation must feed gas pO2 to the flux provider"
+    assert not calls, "_calculate_evaporation must not reapply gas pO2"
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():

@@ -138,7 +138,7 @@ class EquilibriumMixin:
     #   n_ox = moles of oxide per mol O₂ in the decomposition reaction
 
     _ELLINGHAM_THERMO = {
-        # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti.
+        # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
         # Mn updated 0.5.2 (2026-05-27) from the 298 K basis to a proper
         # HIGH-T linear refit anchored on Mn(l) above the solid->liquid
         # transition at 1517 K (NIST-JANAF Mn-008 + phase transition
@@ -168,6 +168,7 @@ class EquilibriumMixin:
         'Ca': (-1285.155, -0.222295, 2, 2),      # Ca-027,  ΔG(1600°C) ≈ -869
         'Al': (-1126.073, -0.218805, 4/3, 2/3),  # Al-096,  ΔG(1600°C) ≈ -716
         'Ti': (-939.632, -0.177149, 1, 1),       # O-043,   ΔG(1600°C) ≈ -608
+        'Si': (-910.940, -0.182400, 1, 1),       # Si + O₂ → SiO₂; ΔG(1600°C) ≈ -569
     }
 
     def _stub_equilibrium(self):

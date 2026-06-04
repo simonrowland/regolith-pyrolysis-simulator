@@ -73,7 +73,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
-    # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti.
+    # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
     # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
     # anchored on Mn(l) above the s→l transition at 1517 K (Mn-008
     # NIST-JANAF + phase transition data); see the rationale in
@@ -87,6 +87,7 @@ _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     'Ca': (-1285.155, -0.222295, 2, 2),
     'Al': (-1126.073, -0.218805, 4/3, 2/3),
     'Ti': (-939.632, -0.177149, 1, 1),
+    'Si': (-910.940, -0.182400, 1, 1),
 }
 
 
@@ -167,6 +168,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         for species, (dH_f, dS_f, n_M, n_ox) in _ELLINGHAM_THERMO.items():
             sp_data = metals_data.get(species, {}) or {}
             if not sp_data:
+                continue
+            if str(sp_data.get('consumer_status', '')).lower() == 'inactive':
                 continue
 
             parent_oxide = sp_data.get('parent_oxide', '')
