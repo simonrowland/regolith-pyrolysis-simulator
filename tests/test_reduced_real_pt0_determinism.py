@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,8 @@ from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
     PT0CacheMiss,
     PT0DeterminismStore,
+    PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentStoreCorrupt,
     canonical_replay_key,
 )
 from simulator.state import CampaignPhase
@@ -139,6 +142,121 @@ def test_pt0_replay_miss_fails_loudly() -> None:
         )
 
 
+def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
+    db_path = tmp_path / "pt1-reduced-real.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    key = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=fO2_log,
+        fe_redox_policy="intrinsic",
+    )
+
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
+
+    with sqlite3.connect(db_path) as conn:
+        columns = {
+            row[1]
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+        row = conn.execute(
+            f"""
+            SELECT artifact, key_hash, payload_sha256
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            """
+        ).fetchone()
+    assert {
+        "key_hash",
+        "artifact",
+        "store_schema_version",
+        "request_schema_version",
+        "key_sha256",
+        "payload_sha256",
+        "key_bytes",
+        "payload_bytes",
+        "code_version",
+        "engine_version",
+        "data_digests_json",
+        "git_dirty",
+    } <= columns
+    assert row[0] == "freeze_gate_curve"
+    assert row[1]
+    assert row[2]
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replay_fO2_log = replay_sim._compute_intrinsic_melt_fO2()
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=replay_fO2_log,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert replay_key == key
+    assert replay.replay_gate_curve(replay_sim, fO2_log=replay_fO2_log) == curve
+    assert replay.summary()["hits"] == 1
+    assert replay.summary()["misses"] == 0
+    assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
+
+
+@pytest.mark.parametrize(
+    ("column", "value"),
+    (
+        ("payload_bytes", b'{"corrupt":true}'),
+        ("store_schema_version", "stale-store-schema"),
+    ),
+)
+def test_pt1_verify_on_hit_fails_loudly(
+    tmp_path: Path,
+    column: str,
+    value: bytes | str,
+) -> None:
+    db_path = tmp_path / "pt1-reduced-real.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve={
+            "source": "unit-test",
+            "solidus_T_C": 1210.0,
+            "liquidus_T_C": 1320.0,
+            "path": ((1210.0, 0.0), (1320.0, 1.0)),
+        },
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ?",
+            (value,),
+        )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    with pytest.raises(PT1PersistentStoreCorrupt):
+        replay.replay_gate_curve(
+            replay_sim,
+            fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+        )
+
+
 @pytest.mark.skipif(
     os.environ.get("REGOLITH_PT0_REAL_PROVIDER") != "1",
     reason="set REGOLITH_PT0_REAL_PROVIDER=1 to run the real MAGEMin PT-0 proof",
@@ -147,10 +265,11 @@ def test_pt0_replay_miss_fails_loudly() -> None:
     not _real_magemin_available(),
     reason="real MAGEMin subprocess backend unavailable",
 )
-def test_pt0_real_magemin_capped_replay_contract() -> None:
-    capture = PT0DeterminismStore("capture")
+def test_pt0_real_magemin_capped_replay_contract(tmp_path: Path) -> None:
+    db_path = tmp_path / "pt1-real-provider.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
     live_trace = _run_capped_c2a(capture, max_hours=1)
-    replay = capture.clone_for_replay()
+    replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_trace = _run_capped_c2a(replay, max_hours=1, disable_live=True)
 
     replay_summary = replay.summary()

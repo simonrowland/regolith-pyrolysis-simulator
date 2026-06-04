@@ -11,8 +11,12 @@ import dataclasses
 import hashlib
 import json
 import math
+import sqlite3
+import subprocess
 from collections import Counter
 from collections.abc import Mapping
+from datetime import datetime
+from datetime import timezone
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +26,9 @@ from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
+PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
+PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
+PT1_METADATA_TABLE = "reduced_real_metadata"
 CACHE_STATES = ("cached_exact", "cached_interpolated", "live_fill")
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 _T_K_QUANTUM = 0.01
@@ -39,13 +46,28 @@ class PT0CacheCollision(RuntimeError):
     """One canonical key produced different payload bytes."""
 
 
-class PT0DeterminismStore:
-    """Minimal PT-0 in-memory capture/replay store."""
+class PT1PersistentStoreCorrupt(PT0CacheCollision):
+    """Persistent PT-1 row failed verify-on-hit integrity checks."""
 
-    def __init__(self, mode: str = "capture") -> None:
+
+class PT0DeterminismStore:
+    """PT-0 capture/replay store, optionally backed by the PT-1 SQLite DB."""
+
+    def __init__(
+        self,
+        mode: str = "capture",
+        *,
+        db_path: str | Path | None = None,
+    ) -> None:
         if mode not in {"capture", "replay"}:
             raise ValueError("PT0DeterminismStore mode must be capture or replay")
         self.mode = mode
+        self.persistent_path = Path(db_path) if db_path is not None else None
+        self.persistent_store = (
+            PT1PersistentEquilibriumStore(self.persistent_path)
+            if self.persistent_path is not None
+            else None
+        )
         self.entries: dict[str, dict[str, Any]] = {}
         self.capture_sequence: list[dict[str, Any]] = []
         self.replay_sequence: list[dict[str, Any]] = []
@@ -63,7 +85,7 @@ class PT0DeterminismStore:
         return self.mode == "replay"
 
     def clone_for_replay(self) -> "PT0DeterminismStore":
-        clone = PT0DeterminismStore("replay")
+        clone = PT0DeterminismStore("replay", db_path=self.persistent_path)
         clone.entries = copy.deepcopy(self.entries)
         clone.capture_sequence = copy.deepcopy(self.capture_sequence)
         clone.quantize_live_controls = self.quantize_live_controls
@@ -200,6 +222,15 @@ class PT0DeterminismStore:
             "capture_calls_by_artifact": dict(sorted(by_artifact.items())),
             "key_drift_histogram": self.key_drift_histogram(),
             "first_miss": self.misses[0] if self.misses else None,
+            "persistent_store": (
+                None
+                if self.persistent_path is None
+                else {
+                    "path": str(self.persistent_path),
+                    "table": PT1_EQUILIBRIUM_TABLE,
+                    "schema_version": PT1_STORE_SCHEMA_VERSION,
+                }
+            ),
         }
 
     def key_drift_histogram(self) -> dict[str, int]:
@@ -233,7 +264,28 @@ class PT0DeterminismStore:
                     f"PT-0 {artifact} key collision with different payload: "
                     f"{key_hash}"
                 )
+            self._verify_entry(artifact, key, key_bytes, key_hash, existing)
+            if self.persistent_store is not None:
+                self.persistent_store.put(
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=key_bytes,
+                    key_hash=key_hash,
+                    payload=payload,
+                    payload_bytes=payload_bytes,
+                    payload_hash=payload_hash,
+                )
             return
+        if self.persistent_store is not None:
+            self.persistent_store.put(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+                payload=payload,
+                payload_bytes=payload_bytes,
+                payload_hash=payload_hash,
+            )
         self.entries[key_hash] = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -246,12 +298,22 @@ class PT0DeterminismStore:
         self.live_fills += 1
 
     def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
-        key_hash = _sha256(canonical_json_bytes(key))
+        key_bytes = canonical_json_bytes(key)
+        key_hash = _sha256(key_bytes)
         self.replay_sequence.append(
             {"artifact": artifact, "key": copy.deepcopy(dict(key)), "hash": key_hash}
         )
         entry = self.entries.get(key_hash)
-        if entry is None or entry.get("artifact") != artifact:
+        if entry is None and self.persistent_store is not None:
+            entry = self.persistent_store.get(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            if entry is not None:
+                self.entries[key_hash] = copy.deepcopy(entry)
+        if entry is None:
             miss = {
                 "artifact": artifact,
                 "key_hash": key_hash,
@@ -260,14 +322,51 @@ class PT0DeterminismStore:
             }
             self.misses.append(miss)
             raise PT0CacheMiss(f"PT-0 cached replay miss: {miss}")
-        stored_key = entry["key"]
-        if canonical_json_bytes(stored_key) != canonical_json_bytes(key):
-            raise PT0CacheCollision(
-                f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
+        self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+        sequence_index = len(self.replay_sequence) - 1
+        if len(self.capture_sequence) <= sequence_index:
+            self.capture_sequence.append(
+                {
+                    "artifact": artifact,
+                    "key": copy.deepcopy(dict(entry["key"])),
+                    "hash": key_hash,
+                    "persistent": True,
+                }
             )
         self.hits += 1
         self.replay_sequence[-1]["cache_state"] = "cached_exact"
         return copy.deepcopy(entry["payload"])
+
+    def _verify_entry(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+        entry: Mapping[str, Any],
+    ) -> None:
+        if entry.get("artifact") != artifact:
+            raise PT0CacheCollision(
+                f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
+            )
+        if entry.get("key_hash") not in {None, key_hash}:
+            raise PT0CacheCollision(
+                f"PT-0 stored key hash mismatch for {artifact}: {key_hash}"
+            )
+        stored_key_bytes = entry.get("key_bytes")
+        if isinstance(stored_key_bytes, str):
+            stored_key_bytes = stored_key_bytes.encode("utf-8")
+        if stored_key_bytes is None:
+            stored_key_bytes = canonical_json_bytes(entry["key"])
+        if stored_key_bytes != key_bytes or canonical_json_bytes(key) != key_bytes:
+            raise PT0CacheCollision(
+                f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
+            )
+        payload_bytes = canonical_json_bytes(entry["payload"])
+        if entry.get("payload_hash") != _sha256(payload_bytes):
+            raise PT0CacheCollision(
+                f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
+            )
 
     def _drift_fields_for_latest_replay(self) -> list[str]:
         index = len(self.replay_sequence) - 1
@@ -277,6 +376,259 @@ class PT0DeterminismStore:
             self.capture_sequence[index]["key"],
             self.replay_sequence[index]["key"],
         )
+
+
+class PT1PersistentEquilibriumStore:
+    """Content-addressed SQLite store for PT-0 exact reduced-real payloads."""
+
+    def __init__(self, db_path: Path) -> None:
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        with self._connect() as conn:
+            self._initialize(conn)
+
+    def put(
+        self,
+        *,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+        payload: Mapping[str, Any],
+        payload_bytes: bytes,
+        payload_hash: str,
+    ) -> None:
+        with self._connect() as conn:
+            self._initialize(conn)
+            existing = self._fetch(conn, key_hash)
+            if existing is not None:
+                entry = self._entry_from_row(
+                    existing,
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=key_bytes,
+                    key_hash=key_hash,
+                )
+                if (
+                    entry["payload_hash"] != payload_hash
+                    or canonical_json_bytes(entry["payload"]) != payload_bytes
+                ):
+                    raise PT1PersistentStoreCorrupt(
+                        f"PT-1 payload collision for {artifact}: {key_hash}"
+                    )
+                return
+            conn.execute(
+                f"""
+                INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
+                    key_hash,
+                    artifact,
+                    store_schema_version,
+                    request_schema_version,
+                    key_sha256,
+                    payload_sha256,
+                    key_bytes,
+                    payload_bytes,
+                    code_version,
+                    engine_version,
+                    data_digests_json,
+                    created_at,
+                    git_dirty
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    key_hash,
+                    artifact,
+                    PT1_STORE_SCHEMA_VERSION,
+                    str(key.get("schema_version")),
+                    key_hash,
+                    payload_hash,
+                    sqlite3.Binary(key_bytes),
+                    sqlite3.Binary(payload_bytes),
+                    str(key.get("code_version")),
+                    _none_or_str(key.get("engine_version")),
+                    canonical_json_bytes(key.get("data_digests", {})).decode("utf-8"),
+                    datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    _git_dirty(),
+                ),
+            )
+
+    def get(
+        self,
+        *,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+    ) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            self._initialize(conn)
+            row = self._fetch(conn, key_hash)
+            if row is None:
+                return None
+            return self._entry_from_row(
+                row,
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+
+    def _connect(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def _initialize(self, conn: sqlite3.Connection) -> None:
+        conn.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS {PT1_METADATA_TABLE} (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS {PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                artifact TEXT NOT NULL,
+                store_schema_version TEXT NOT NULL,
+                request_schema_version TEXT NOT NULL,
+                key_sha256 TEXT NOT NULL,
+                payload_sha256 TEXT NOT NULL,
+                key_bytes BLOB NOT NULL,
+                payload_bytes BLOB NOT NULL,
+                code_version TEXT NOT NULL,
+                engine_version TEXT,
+                data_digests_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                git_dirty INTEGER NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            f"""
+            CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_artifact
+            ON {PT1_EQUILIBRIUM_TABLE}(artifact)
+            """
+        )
+        metadata = conn.execute(
+            f"SELECT value FROM {PT1_METADATA_TABLE} WHERE key = ?",
+            ("store_schema_version",),
+        ).fetchone()
+        if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 persistent store schema version drift: "
+                f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
+            )
+        conn.execute(
+            f"""
+            INSERT OR IGNORE INTO {PT1_METADATA_TABLE} (key, value)
+            VALUES (?, ?)
+            """,
+            ("store_schema_version", PT1_STORE_SCHEMA_VERSION),
+        )
+
+    def _fetch(
+        self,
+        conn: sqlite3.Connection,
+        key_hash: str,
+    ) -> sqlite3.Row | None:
+        return conn.execute(
+            f"""
+            SELECT
+                key_hash,
+                artifact,
+                store_schema_version,
+                request_schema_version,
+                key_sha256,
+                payload_sha256,
+                key_bytes,
+                payload_bytes,
+                code_version,
+                engine_version,
+                data_digests_json
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            WHERE key_hash = ?
+            """,
+            (key_hash,),
+        ).fetchone()
+
+    def _entry_from_row(
+        self,
+        row: sqlite3.Row,
+        *,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+    ) -> dict[str, Any]:
+        row_key_bytes = _sqlite_bytes(row["key_bytes"])
+        row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
+        if row["store_schema_version"] != PT1_STORE_SCHEMA_VERSION:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row store schema version drift: "
+                f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"
+            )
+        if row["request_schema_version"] != str(key.get("schema_version")):
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row request schema version drift: "
+                f"{row['request_schema_version']} != {key.get('schema_version')}"
+            )
+        if row["artifact"] != artifact:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row artifact mismatch for {artifact}: {key_hash}"
+            )
+        if row["key_hash"] != key_hash or row["key_sha256"] != key_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key hash mismatch for {artifact}: {key_hash}"
+            )
+        if row_key_bytes != key_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row canonical request bytes mismatch: {key_hash}"
+            )
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row payload bytes mismatch: {key_hash}"
+            )
+        row_key = json.loads(row_key_bytes.decode("utf-8"))
+        row_payload = json.loads(row_payload_bytes.decode("utf-8"))
+        if canonical_json_bytes(row_key) != row_key_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical request bytes: {key_hash}"
+            )
+        if canonical_json_bytes(row_payload) != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {key_hash}"
+            )
+        if row_key != _json_ready(key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row canonical request mismatch: {key_hash}"
+            )
+        if row["code_version"] != str(key.get("code_version")):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row code VERSION drift: {key_hash}"
+            )
+        if _none_or_str(key.get("engine_version")) != row["engine_version"]:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row engine version drift: {key_hash}"
+            )
+        data_digests_json = canonical_json_bytes(
+            key.get("data_digests", {})
+        ).decode("utf-8")
+        if row["data_digests_json"] != data_digests_json:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row data digest drift: {key_hash}"
+            )
+        return {
+            "artifact": artifact,
+            "key": copy.deepcopy(dict(row_key)),
+            "key_hash": key_hash,
+            "key_bytes": row_key_bytes.decode("utf-8"),
+            "payload": copy.deepcopy(dict(row_payload)),
+            "payload_hash": row["payload_sha256"],
+            "cache_state": "live_fill",
+        }
 
 
 def canonical_replay_key(
@@ -617,6 +969,37 @@ def _code_version() -> str:
     if path.exists():
         return path.read_text().strip()
     return "unknown"
+
+
+def _git_dirty() -> int:
+    root = Path(__file__).resolve().parent.parent
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "status", "--short"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+    except Exception:  # noqa: BLE001 - diagnostic metadata only
+        return 1
+    return 1 if result.stdout.strip() else 0
+
+
+def _none_or_str(value: Any) -> str | None:
+    if value is None:
+        return None
+    return str(value)
+
+
+def _sqlite_bytes(value: Any) -> bytes:
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, memoryview):
+        return value.tobytes()
+    if isinstance(value, str):
+        return value.encode("utf-8")
+    return bytes(value)
 
 
 def _qualified_type(value: Any) -> str:
