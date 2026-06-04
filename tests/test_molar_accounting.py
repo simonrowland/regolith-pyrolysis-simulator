@@ -30,8 +30,8 @@ def _sim(feedstocks):
 @pytest.mark.parametrize(
     ("species", "kg", "expected_atom_moles"),
     [
-        ("SiO2", 60.08, {"Si": 1000.0, "O": 2000.0}),
-        ("FeO", 71.84, {"Fe": 1000.0, "O": 1000.0}),
+        ("SiO2", MOLAR_MASS["SiO2"], {"Si": 1000.0, "O": 2000.0}),
+        ("FeO", MOLAR_MASS["FeO"], {"Fe": 1000.0, "O": 1000.0}),
     ],
 )
 def test_species_formula_table_round_trips_kg_to_atoms_to_kg(
@@ -60,7 +60,9 @@ def test_atom_ledger_stores_moles_and_projects_kg():
     )
 
     assert ledger.mol_by_account("process.cleaned_melt")["FeO"] == pytest.approx(1000.0)
-    assert ledger.kg_by_account("process.cleaned_melt")["FeO"] == pytest.approx(71.84)
+    assert ledger.kg_by_account("process.cleaned_melt")["FeO"] == pytest.approx(
+        MOLAR_MASS["FeO"]
+    )
 
 
 @pytest.mark.parametrize("oxide", ["FeO", "Fe2O3"])
@@ -132,14 +134,14 @@ def test_atom_tolerance_is_tighter_than_mass_tolerance():
 
     ledger = AtomLedger()
     ledger.load_external(
-        "process.cleaned_melt", {"FeO": 71.84}, source="unit-test feed"
+        "process.cleaned_melt", {"FeO": MOLAR_MASS["FeO"]}, source="unit-test feed"
     )
     transition = LedgerTransition(
         name="bad_atom_drift_under_mass_tolerance",
         debits=(
             MaterialLot(
                 "process.cleaned_melt",
-                {"FeO": 71.84},
+                {"FeO": MOLAR_MASS["FeO"]},
                 source="unit-test reduction",
             ),
         ),

@@ -124,9 +124,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # P1-A HKL mass-flux fix (2026-06-04): EVAPORATION_FLUX now projects
     # molar HKL flux to kg with sqrt(M) in the numerator. SiO evolution and
     # downstream wall deposit scale by M_SiO=0.04408:
-    # 2.0039542334640e-05 -> 8.82916208523e-07 kg.
+    # 2.0039542334640e-05 -> 8.82956746206e-07 kg after
+    # canonical Si/O atomic weights.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        8.82916208523e-07, rel=1e-9
+        8.82956746206e-07, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

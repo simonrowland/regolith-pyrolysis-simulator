@@ -74,19 +74,19 @@ class AtomDeltaBackend(RecordingStubBackend):
             debits=(
                 self.MaterialLot(
                     "process.cleaned_melt",
-                    {"FeO": 71.84},
+                    {"FeO": MOLAR_MASS["FeO"]},
                     source="backend atom delta",
                 ),
             ),
             credits=(
                 self.MaterialLot(
                     "process.metal_phase",
-                    {"Fe": 55.84},
+                    {"Fe": MOLAR_MASS["Fe"]},
                     source="backend atom delta",
                 ),
                 self.MaterialLot(
                     "process.overhead_gas",
-                    {"O2": 16.0},
+                    {"O2": 0.5 * MOLAR_MASS["O2"]},
                     source="backend atom delta",
                 ),
             ),
@@ -111,19 +111,19 @@ class TerminalizingBackend(AtomDeltaBackend):
             debits=(
                 self.MaterialLot(
                     "process.cleaned_melt",
-                    {"FeO": 71.84},
+                    {"FeO": MOLAR_MASS["FeO"]},
                     source="backend atom delta",
                 ),
             ),
             credits=(
                 self.MaterialLot(
                     "terminal.drain_tap_material",
-                    {"Fe": 55.84},
+                    {"Fe": MOLAR_MASS["Fe"]},
                     source="backend atom delta",
                 ),
                 self.MaterialLot(
                     "terminal.oxygen_melt_offgas_stored",
-                    {"O2": 16.0},
+                    {"O2": 0.5 * MOLAR_MASS["O2"]},
                     source="backend atom delta",
                 ),
             ),
@@ -195,19 +195,23 @@ def test_backend_result_applies_as_atom_delta():
     sim.step()
 
     sim.atom_ledger.assert_balanced()
+    expected_feo_remaining_kg = 400.0 - MOLAR_MASS["FeO"]
+    expected_o2_kg = 0.5 * MOLAR_MASS["O2"]
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "FeO"
-    ] == pytest.approx(328.16)
+    ] == pytest.approx(expected_feo_remaining_kg)
     assert sim.atom_ledger.kg_by_account("process.metal_phase")[
         "Fe"
-    ] == pytest.approx(55.84)
+    ] == pytest.approx(MOLAR_MASS["Fe"])
     oxygen_partition = sim._oxygen_terminal_partition_kg()
-    assert oxygen_partition["total"] == pytest.approx(16.0)
+    assert oxygen_partition["total"] == pytest.approx(expected_o2_kg)
     assert (
         oxygen_partition["stored"] + oxygen_partition["vented"]
-    ) == pytest.approx(16.0)
+    ) == pytest.approx(expected_o2_kg)
     assert sim.melt.composition_kg["SiO2"] == pytest.approx(600.0)
-    assert sim.melt.composition_kg["FeO"] == pytest.approx(328.16)
+    assert sim.melt.composition_kg["FeO"] == pytest.approx(
+        expected_feo_remaining_kg
+    )
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 

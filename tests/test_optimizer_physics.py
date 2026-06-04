@@ -366,12 +366,12 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
         _trace(condensed=({(3, "SiO"): 20.0},))
     )
     assert sio_margin.feasible is True
-    assert sio_margin.margin == pytest.approx(0.04233615221987319)
-    assert sio_margin.observed == pytest.approx(0.9923361522198731)
+    assert sio_margin.margin == pytest.approx(0.04233584186562911)
+    assert sio_margin.observed == pytest.approx(0.9923358418656291)
     assert sio_margin.detail == (
-        "SiO: product_target_equiv_mol=2155.17, "
-        "residual_target_equiv_mol=16.6445, "
-        "denominator_target_equiv_mol=2171.82"
+        "SiO: product_target_equiv_mol=2154.98, "
+        "residual_target_equiv_mol=16.6436, "
+        "denominator_target_equiv_mol=2171.62"
     )
 
     multi_constraints = PhysicsConstraintSet(
@@ -384,10 +384,10 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
     )
     multi_margin = multi_constraints.extraction_completeness(multi_trace)
     assert multi_margin.feasible is True
-    assert multi_margin.margin == pytest.approx(0.041766921391506395)
-    assert multi_margin.observed == pytest.approx(0.9917669213915064)
+    assert multi_margin.margin == pytest.approx(0.04176683470705078)
+    assert multi_margin.observed == pytest.approx(0.9917668347070507)
     assert multi_margin.detail == (
-        "K: product_target_equiv_mol=25.5766, residual_target_equiv_mol=0.212322, "
+        "K: product_target_equiv_mol=25.5766, residual_target_equiv_mol=0.212324, "
         "denominator_target_equiv_mol=25.7889"
     )
 

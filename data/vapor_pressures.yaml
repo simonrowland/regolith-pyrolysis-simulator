@@ -28,7 +28,7 @@
 metals:
   Na:
     formula: "Na"
-    molar_mass_g_mol: 22.99
+    molar_mass_g_mol: 22.98976928
     electrons_per_atom: 1
     parent_oxide: "Na2O"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
@@ -38,6 +38,11 @@ metals:
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.121
+    pure_component_antoine:
+      source: "NIST TN 2273 normal boiling point; CRC/NIST ΔH_vap≈97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 9.407048
+      B: 5088.599272
+      C: 0
     evaporation_alpha:
       value: 1.0
       source: "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
@@ -73,7 +78,7 @@ metals:
 
   K:
     formula: "K"
-    molar_mass_g_mol: 39.10
+    molar_mass_g_mol: 39.0983
     electrons_per_atom: 1
     parent_oxide: "K2O"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
@@ -83,6 +88,11 @@ metals:
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
       target: "VapoRock K = 9.55e-02 Pa at 1773.15 K"
       residual_dex: 1.469
+    pure_component_antoine:
+      source: "NIST TN 2273 normal boiling point; CRC/NIST ΔH_vap≈79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 9.008700
+      B: 4131.679352
+      C: 0
     evaporation_alpha:
       value: 1.0
       source: "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy to Na; Sossi & Fegley 2018 liquids commonly near unity"
@@ -107,7 +117,7 @@ metals:
 
   Mg:
     formula: "Mg"
-    molar_mass_g_mol: 24.31
+    molar_mass_g_mol: 24.305
     electrons_per_atom: 2
     parent_oxide: "MgO"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
@@ -117,6 +127,11 @@ metals:
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.203
+    pure_component_antoine:
+      source: "CRC/NIST normal boiling point; CRC/NIST ΔH_vap≈128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 9.906866
+      B: 6685.903376
+      C: 0
     evaporation_alpha:
       value: 0.20
       source: "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
@@ -135,7 +150,7 @@ metals:
 
   Fe:
     formula: "Fe"
-    molar_mass_g_mol: 55.85
+    molar_mass_g_mol: 55.845
     electrons_per_atom: 2
     parent_oxide: "FeO"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
@@ -145,6 +160,11 @@ metals:
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
       target: "VapoRock partial pressure on the basalt grid"
       residual_dex: 0.023
+    pure_component_antoine:
+      source: "CRC/NIST normal boiling point; CRC/NIST ΔH_vap≈340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 10.670336
+      B: 17759.430841
+      C: 0
     evaporation_alpha:
       value: 0.02
       source: "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
@@ -172,6 +192,11 @@ metals:
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
     source: "rough legacy ΔH_vap approximation, unvalidated"
+    pure_component_antoine:
+      source: "CRC/NIST normal boiling point; legacy ΔH_vap≈182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 10.424827
+      B: 9522.188948
+      C: 0
     evaporation_alpha:
       value: 0.90
       source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
@@ -190,11 +215,16 @@ metals:
 
   Al:
     formula: "Al"
-    molar_mass_g_mol: 26.98
+    molar_mass_g_mol: 26.9815385
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
     source: "CRC/CR2 pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
+    pure_component_antoine:
+      source: "CRC/CR2 normal boiling point; legacy ΔH_vap≈332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 11.216544
+      B: 17341.561880
+      C: 0
     evaporation_alpha:
       value: 0.30
       source: "Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
@@ -213,12 +243,17 @@ metals:
 
   Si:
     formula: "Si"
-    molar_mass_g_mol: 28.09
+    molar_mass_g_mol: 28.085
     electrons_per_atom: 4
     parent_oxide: "SiO2"
     fit_target: "pure_component_psat"
     consumer_status: "inactive"
     source: "rough legacy ΔH_vap approximation, inactive and unvalidated"
+    pure_component_antoine:
+      source: "Safarian & Engh 2013 pure-Si branch plus legacy ΔH_vap≈413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 11.110207
+      B: 21598.601920
+      C: 0
     evaporation_alpha:
       value: 1.0
       source: "Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
@@ -242,6 +277,11 @@ metals:
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
     source: "CRC/CR2 pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
+    pure_component_antoine:
+      source: "CRC/CR2 normal boiling point; legacy ΔH_vap≈444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      A: 11.524374
+      B: 23207.397420
+      C: 0
     evaporation_alpha:
       value: 0.80
       source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
@@ -301,7 +341,7 @@ metals:
 oxide_vapors:
   SiO:
     formula: "SiO"
-    molar_mass_g_mol: 44.08
+    molar_mass_g_mol: 44.084
     parent_oxide: "SiO2"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
     backsolve:
@@ -310,8 +350,8 @@ oxide_vapors:
       activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.113
-    stoich_oxide_per_vapor: 1.3629764065335754  # kg SiO₂ consumed per kg SiO evaporated
-    stoich_O2_per_vapor: 0.3629764065335753    # kg O₂ freed per kg SiO evaporated
+    stoich_oxide_per_vapor: 1.362920787587333  # kg SiO₂ consumed per kg SiO evaporated
+    stoich_O2_per_vapor: 0.36292078758733326   # kg O₂ freed per kg SiO evaporated
     evaporation_alpha:
       value: 0.04
       source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
@@ -343,7 +383,7 @@ oxide_vapors:
 
   CrO2:
     formula: "CrO2"
-    molar_mass_g_mol: 83.9961
+    molar_mass_g_mol: 83.9941
     parent_oxide: "Cr2O3"
     fit_target: "standard_reaction_term"
     reaction:
@@ -351,8 +391,8 @@ oxide_vapors:
       exponent_oxide: 0.5
       exponent_pO2: 0.25
       basis: "VapoRock fallback fit to JANAF0 CrO2(g) output"
-    stoich_oxide_per_vapor: 0.9047574827878914  # kg Cr2O3 consumed per kg CrO2 evaporated
-    stoich_O2_per_vapor: -0.09524251721210866  # kg O2 consumed per kg CrO2 evaporated
+    stoich_oxide_per_vapor: 0.904761167748687  # kg Cr2O3 consumed per kg CrO2 evaporated
+    stoich_O2_per_vapor: -0.0952388322513129  # kg O2 consumed per kg CrO2 evaporated
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"

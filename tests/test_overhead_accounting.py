@@ -154,14 +154,16 @@ def test_mre_anode_o2_is_not_turbine_throughput():
 
 def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
     sim = _gas_train_sim()
-    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    fe_kg = MOLAR_MASS["Fe"]
+    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
 
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "O2"
-    ] == pytest.approx(16.0)
+    ] == pytest.approx(o2_from_fe_kg)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored").get("O2", 0.0) == pytest.approx(0.0)
     assert sim._oxygen_total_kg() == pytest.approx(0.0)
@@ -171,7 +173,11 @@ def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
 
 def test_o2_venting_moves_between_terminal_ledger_accounts():
     sim = _gas_train_sim()
-    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    fe_kg = MOLAR_MASS["Fe"]
+    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    stored_o2_kg = 10.0
+    vented_o2_kg = o2_from_fe_kg - stored_o2_kg
+    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
     turbine = types.SimpleNamespace(max_O2_flow_kg_hr=10.0)
 
     sim._route_to_condensation(flux)
@@ -189,21 +195,23 @@ def test_o2_venting_moves_between_terminal_ledger_accounts():
         o2_vented_kg=overhead.O2_vented_kg_hr,
     )
 
-    assert overhead.O2_vented_kg_hr == pytest.approx(6.0)
+    assert overhead.O2_vented_kg_hr == pytest.approx(vented_o2_kg)
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_stored")[
         "O2"
-    ] == pytest.approx(10.0)
+    ] == pytest.approx(stored_o2_kg)
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_vented_to_vacuum")[
         "O2"
-    ] == pytest.approx(6.0)
-    assert sim._oxygen_total_kg() == pytest.approx(16.0)
-    assert sim.O2_stored_cumulative_kg == pytest.approx(10.0)
-    assert sim.O2_vented_cumulative_kg == pytest.approx(6.0)
+    ] == pytest.approx(vented_o2_kg)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
+    assert sim.O2_stored_cumulative_kg == pytest.approx(stored_o2_kg)
+    assert sim.O2_vented_cumulative_kg == pytest.approx(vented_o2_kg)
 
 
 def test_step_does_not_double_credit_gas_train_ledger_o2():
     sim = _gas_train_sim()
-    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    fe_kg = MOLAR_MASS["Fe"]
+    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -212,12 +220,16 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
 
     sim.step()
 
-    assert sim._oxygen_total_kg() == pytest.approx(16.0)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
 
 
 def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
     sim = _gas_train_sim()
-    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    fe_kg = MOLAR_MASS["Fe"]
+    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    stored_o2_kg = 10.0
+    vented_o2_kg = o2_from_fe_kg - stored_o2_kg
+    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -228,13 +240,13 @@ def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
 
     sim.step()
 
-    assert sim.overhead.O2_vented_kg_hr == pytest.approx(6.0)
+    assert sim.overhead.O2_vented_kg_hr == pytest.approx(vented_o2_kg)
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(10.0)
+        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(stored_o2_kg)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
-    )["O2"] == pytest.approx(6.0)
-    assert sim._oxygen_total_kg() == pytest.approx(16.0)
+    )["O2"] == pytest.approx(vented_o2_kg)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
 
 
 def test_overhead_o2_not_double_counted_across_ticks():
@@ -246,7 +258,8 @@ def test_overhead_o2_not_double_counted_across_ticks():
     # throughput. The invariant: over tick 2, turbine throughput + vent
     # equals the ledger O2 delta into the terminal accounts.
     sim = _gas_train_sim(mass_kg=200.0)
-    flux = EvaporationFlux(species_kg_hr={"Fe": 55.84}, total_kg_hr=55.84)
+    fe_kg = MOLAR_MASS["Fe"]
+    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -274,7 +287,7 @@ def test_overhead_o2_not_double_counted_across_ticks():
 
     carried_over_kg = sim.atom_ledger.kg_by_account(
         "process.overhead_gas")["O2"]
-    assert carried_over_kg == pytest.approx(16.0)
+    assert carried_over_kg == pytest.approx(0.5 * MOLAR_MASS["O2"])
 
     # Capture the O2 quantity the turbine model is actually fed on tick 2,
     # and the ledger holdup that exists at that instant.

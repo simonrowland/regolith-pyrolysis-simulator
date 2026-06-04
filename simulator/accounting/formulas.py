@@ -14,6 +14,8 @@ from typing import Any
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 
 
+# Abridged standard atomic weights for normal terrestrial materials.
+# Source: CIAAW standard atomic weights / NIST periodic-table values.
 ATOMIC_WEIGHTS_G_PER_MOL = MappingProxyType(
     {
         "H": 1.008,
@@ -23,13 +25,13 @@ ATOMIC_WEIGHTS_G_PER_MOL = MappingProxyType(
         "B": 10.81,
         "C": 12.011,
         "N": 14.007,
-        "O": 16.0,
+        "O": 15.999,
         "F": 18.998403163,
         "Ne": 20.1797,
         "Na": 22.98976928,
         "Mg": 24.305,
         "Al": 26.9815385,
-        "Si": 28.08,
+        "Si": 28.085,
         "P": 30.973761998,
         "S": 32.06,
         "Cl": 35.45,
@@ -41,7 +43,7 @@ ATOMIC_WEIGHTS_G_PER_MOL = MappingProxyType(
         "V": 50.9415,
         "Cr": 51.9961,
         "Mn": 54.938044,
-        "Fe": 55.84,
+        "Fe": 55.845,
         "Co": 58.933194,
         "Ni": 58.6934,
         "Cu": 63.546,

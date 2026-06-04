@@ -57,19 +57,19 @@ from tests.chemistry.conftest import _build_sim
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "CrO2": 4.310047798577766e-09,
+            "CrO2": 4.310083854437474e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "CrO2": 4.310047798577766e-09,
+            "CrO2": 4.310083854437474e-09,
         },
     },
     "mars_basalt": {},
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "CrO2": 5.104145941532188e-09,
+            "CrO2": 5.104061513837736e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "CrO2": 5.104145941532188e-09,
+            "CrO2": 5.104061513837736e-09,
         },
     },
 }

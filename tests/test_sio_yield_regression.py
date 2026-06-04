@@ -58,8 +58,8 @@ GOLDENS = (
 # EVAPORATION_FLUX no longer reapplies an oxygen factor.  Vacuum-side C2A
 # SiO yield rises by +0.0056% relative, a deliberate physics consequence.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.53253498332e-05,
-    "mars_basalt": 0.000192499080826,
+    "lunar_mare_low_ti": 8.53292201106e-05,
+    "mars_basalt": 0.000192507783315,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
