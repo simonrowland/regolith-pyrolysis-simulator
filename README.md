@@ -77,6 +77,8 @@ The web app's entry point:
 
 - `http://localhost:3000/` — detailed simulator with feedstock selection, additives, charts, pressure feedback, product inventory, and process decisions.
 
+Scripting: simulations can also be run from the shell (no web server) — see [`docs/running-from-shell.md`](docs/running-from-shell.md).
+
 ## Quick Start
 
 From a source checkout, run the dependency installer:
