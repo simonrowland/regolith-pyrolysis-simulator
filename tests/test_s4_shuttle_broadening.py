@@ -183,14 +183,6 @@ def test_na_cr_stage_refuses_cr_ti_with_negative_margins():
     assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
 
 
-@pytest.mark.xfail(
-    reason=(
-        "V1c JANAF refit lowers the K/Fe crossover to ~832 C and leaves "
-        "the current C2A_staged recipe above the retuned shuttle window; "
-        "recipe retune is tracked separately in task #33."
-    ),
-    strict=True,
-)
 def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():
     k_only = _run_staged()
     broadened = _run_staged(na_dose_kg=NA_DOSE_KG)

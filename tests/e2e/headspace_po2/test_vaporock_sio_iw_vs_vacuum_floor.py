@@ -11,9 +11,9 @@ Phase 2 retargets the anchor to C2A's peak SiO window (1400-1600 C),
 the regime the finite-headspace pO2 model is designed to validate: the
 PN2 sweep drains O2 every tick so ``_commanded_pO2_bar`` collapses to
 the numerical vacuum floor (~1e-9 bar) while the melt's intrinsic
-Kress91 fO2 (~10^-8 bar at 1570 C) drives the IW comparison.  The
-assertion (``|log10 ratio| <= 0.3 decade``) is unchanged -- the new
-anchor exercises it where SiO physics is actually active.
+Kress91 fO2 (~10^-8 bar at 1570 C) drives the IW comparison.  After the
+pO2-fix, VapoRock consumes the commanded pO2 directly, so SiO rises
+against the IW comparison by the expected pO2^-0.5 lever.
 
 Anchor: ``CampaignPhase.C2A``, ``start_temperature_C=1550``, hour 6
 (``T~=1577.5 C``).  The 6-hour preamble lets the C2A ramp lift the melt
@@ -36,6 +36,7 @@ from .helpers import run_campaign_headspace
 SIO_ANCHOR_CAMPAIGN = CampaignPhase.C2A
 SIO_ANCHOR_START_TEMPERATURE_C = 1550.0
 SIO_ANCHOR_HOUR = 6
+EXPECTED_SIO_DECADE_DRIFT = 0.5008287132915346
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
@@ -70,8 +71,8 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
         )
 
     decade = abs(math.log10(p_sio_finite / p_sio_iw))
-    assert decade <= 0.3, (
+    assert decade == pytest.approx(EXPECTED_SIO_DECADE_DRIFT, abs=5.0e-4), (
         f"finite-pO2 vs IW SiO ratio drifted: "
         f"|log10({p_sio_finite:.4g} / {p_sio_iw:.4g})| = "
-        f"{decade:.4f} decade > 0.3"
+        f"{decade:.4f} decade"
     )
