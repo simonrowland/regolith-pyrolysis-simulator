@@ -263,9 +263,16 @@ class EvaporationMixin:
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
         )
+        store_getter = getattr(self, '_pt0_store', None)
+        store = store_getter() if callable(store_getter) else None
+        if store is not None and getattr(store, 'replay_enabled', False):
+            return store.replay_gate_curve(self, fO2_log=fO2_log)
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         if cache and cache.get('key') == key:
-            return dict(cache['curve'])
+            curve = dict(cache['curve'])
+            if store is not None and getattr(store, 'capture_enabled', False):
+                store.capture_gate_curve(self, fO2_log=fO2_log, curve=curve)
+            return curve
 
         reasons: list[str] = []
         curve = self._freeze_gate_curve_from_gate_dispatch(
@@ -298,6 +305,8 @@ class EvaporationMixin:
         self._freeze_gate_cache_rebuild_count = (
             int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
         )
+        if store is not None and getattr(store, 'capture_enabled', False):
+            store.capture_gate_curve(self, fO2_log=fO2_log, curve=curve)
         return curve
 
     def _freeze_gate_cache_key(

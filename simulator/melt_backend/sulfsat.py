@@ -72,6 +72,7 @@ from __future__ import annotations
 import importlib
 import warnings
 from dataclasses import dataclass, field
+from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional
 
 
@@ -115,6 +116,7 @@ _CALIBRATION_BOUNDS_WT_PCT = {
     'Na2O': (0.0, 8.0),
     'K2O': (0.0, 9.0),
 }
+SULFSAT_CALIBRATION_VERSION = 'pysulfsat-1.0.12-calibration-bounds-v1'
 
 
 @dataclass
@@ -215,6 +217,20 @@ class SulfSatGate:
     def is_available(self) -> bool:
         """``True`` when ``initialize()`` found a working PySulfSat."""
         return bool(self._available and self._module is not None)
+
+    def package_version(self) -> str:
+        module_version = getattr(self._module, '__version__', None)
+        if module_version is not None:
+            return str(module_version)
+        for distribution_name in ('PySulfSat', 'pysulfsat'):
+            try:
+                return str(importlib_metadata.version(distribution_name))
+            except importlib_metadata.PackageNotFoundError:
+                continue
+        return 'unavailable'
+
+    def calibration_version(self) -> str:
+        return SULFSAT_CALIBRATION_VERSION
 
     def compute_sulfur_saturation(
         self,

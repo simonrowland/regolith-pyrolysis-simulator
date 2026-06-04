@@ -26,6 +26,7 @@ def build_provider_account_view(
     ledger: AtomLedger,
     declared_accounts: frozenset[str],
     species_formula_registry: Mapping[str, Any],
+    account_mol_overrides: Mapping[str, Mapping[str, float]] | None = None,
 ) -> ProviderAccountView:
     """Build a provider-scoped read-only view of ``ledger``.
 
@@ -67,9 +68,23 @@ def build_provider_account_view(
             "ledger.mol_by_account() did not return a mapping; cannot filter"
         )
 
+    overrides: dict[str, dict[str, float]] = {}
+    if account_mol_overrides is not None:
+        overrides = {
+            str(account): {
+                str(species): float(value)
+                for species, value in dict(species_mol or {}).items()
+            }
+            for account, species_mol in dict(account_mol_overrides).items()
+        }
+
     filtered: dict[str, dict[str, float]] = {}
     for account in declared_accounts:
-        species_mol = snapshot.get(account, {})
+        species_mol = (
+            overrides[account]
+            if account in overrides
+            else snapshot.get(account, {})
+        )
         if species_mol:
             filtered[account] = {
                 str(species): float(value)

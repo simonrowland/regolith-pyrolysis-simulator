@@ -389,6 +389,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
+        self._pt0_determinism_store: Any | None = None
         self._rump_expectation_warnings: list[str] = []
         # Shuttle-physics-gate refusals: the post-V1c JANAF Ellingham +
         # S1b shuttle T-acceptance gate refuses K→FeO at any practical
@@ -488,6 +489,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._campaign_start_energy = 0.0
         self._campaign_start_O2 = 0.0
         self._last_campaign_summary: Optional[dict] = None
+
+    # ------------------------------------------------------------------
+    # PT-0 reduced-real determinism proof hook
+    # ------------------------------------------------------------------
+
+    def configure_pt0_determinism_store(self, store: Any | None) -> None:
+        self._pt0_determinism_store = store
+
+    def _pt0_store(self) -> Any | None:
+        return getattr(self, "_pt0_determinism_store", None)
 
     # ------------------------------------------------------------------
     # Lazy-loaded subsystem models
@@ -1181,13 +1192,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         does NOT need bookkeeping between dispatch and commit.
         """
         kernel = self._require_chem_kernel()
+        temperature_C = float(self.melt.temperature_C)
+        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        store = self._pt0_store()
+        account_mol_overrides = None
+        if store is not None and getattr(store, 'quantize_live_controls', False):
+            controls = store.quantized_controls(self, fO2_log=fO2_log)
+            temperature_C = float(controls['temperature_C'])
+            pressure_bar = float(controls['pressure_bar'])
+            fO2_log = controls['fO2_log']
+            canonicalizer = getattr(
+                store,
+                'canonical_composition_mol_by_account',
+                None,
+            )
+            if not callable(canonicalizer):
+                raise RuntimeError(
+                    'PT-0 live-control quantization requires composition '
+                    'canonicalization support'
+                )
+            account_mol_overrides = canonicalizer(self)
         return kernel.dispatch(
             intent,
-            temperature_C=float(self.melt.temperature_C),
-            pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs,
+            account_mol_overrides=account_mol_overrides,
         )
 
     def _commit_proposal(
@@ -2102,6 +2134,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         surfaces existing state at the consumption point; it does not
         introduce a new control-flow branch.
         """
+        store = self._pt0_store()
+        if store is not None and getattr(store, 'replay_enabled', False):
+            return store.replay_equilibrium(self)
         if self.backend is None:
             return self._record_equilibrium_status(self._stub_equilibrium())
         if self._backend_failed:
@@ -2125,10 +2160,55 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._validate_backend_account_scope_support(
                 backend_composition_by_account)
             intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+            temperature_C = float(self.melt.temperature_C)
+            pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+            store = self._pt0_store()
+            canonicalize_pt0_inputs = store is not None and getattr(
+                store,
+                'quantize_live_controls',
+                False,
+            )
+            if canonicalize_pt0_inputs:
+                controls = store.quantized_controls(
+                    self,
+                    fO2_log=intrinsic_fO2_log,
+                )
+                temperature_C = float(controls['temperature_C'])
+                pressure_bar = float(controls['pressure_bar'])
+                intrinsic_fO2_log = controls['fO2_log']
+                canonicalizer = getattr(
+                    store,
+                    'canonical_composition_mol_by_account',
+                    None,
+                )
+                if not callable(canonicalizer):
+                    raise RuntimeError(
+                        'PT-0 live-control quantization requires composition '
+                        'canonicalization support'
+                    )
+                backend_composition_by_account = canonicalizer(
+                    self,
+                    backend_composition_by_account,
+                )
+            if canonicalize_pt0_inputs:
+                backend_composition_mol: Dict[str, float] = {}
+                for species_mol in backend_composition_by_account.values():
+                    for species, mol in species_mol.items():
+                        backend_composition_mol[species] = (
+                            backend_composition_mol.get(species, 0.0)
+                            + float(mol)
+                        )
+                backend_composition_mol = {
+                    species: mol
+                    for species, mol in backend_composition_mol.items()
+                    if mol > 0.0
+                }
+            else:
+                backend_composition_mol = self._backend_composition_mol()
             self.melt.fO2_log = intrinsic_fO2_log
             request_controls = {
-                'temperature_C': self.melt.temperature_C,
-                'pressure_bar': self.melt.p_total_mbar / 1000.0,
+                'temperature_C': temperature_C,
+                'pressure_bar': pressure_bar,
                 'fO2_log': intrinsic_fO2_log,
                 'fe_redox_policy': 'intrinsic',
             }
@@ -2161,11 +2241,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 setattr(result, 'alphamelts_diagnostics', diagnostic)
                 return self._record_equilibrium_status(result)
             backend_kwargs = {
-                'temperature_C': self.melt.temperature_C,
-                'composition_mol': self._backend_composition_mol(),
+                'temperature_C': temperature_C,
+                'composition_mol': backend_composition_mol,
                 'species_formula_registry': self.species_formula_registry,
                 'fO2_log': intrinsic_fO2_log,
-                'pressure_bar': self.melt.p_total_mbar / 1000.0,
+                'pressure_bar': pressure_bar,
             }
             if self._backend_accepts_kwarg('composition_mol_by_account'):
                 backend_kwargs['composition_mol_by_account'] = (
@@ -2231,6 +2311,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
+        store = self._pt0_store()
+        if store is not None and getattr(store, 'capture_enabled', False):
+            store.capture_equilibrium(self, result)
         return result
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
@@ -2315,9 +2398,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
+        pO2_bar = self._commanded_pO2_bar()
+        store = self._pt0_store()
+        if store is not None and getattr(store, 'quantize_live_controls', False):
+            pO2_bar = store.quantized_pO2_bar(self)
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
-            control_inputs={'pO2_bar': self._commanded_pO2_bar()},
+            control_inputs={'pO2_bar': pO2_bar},
             fO2_log=self._compute_intrinsic_melt_fO2(),
         )
         diagnostic = dict(kernel_result.diagnostic or {})

@@ -320,6 +320,7 @@ class ChemistryKernel:
         fe_redox_policy: str = "intrinsic",
         control_inputs: Optional[Mapping[str, Any]] = None,
         declared_accounts: Optional[frozenset[str]] = None,
+        account_mol_overrides: Optional[Mapping[str, Mapping[str, float]]] = None,
     ) -> IntentResult:
         """Orchestrate one chemistry intent end-to-end.
 
@@ -369,6 +370,7 @@ class ChemistryKernel:
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
+                account_mol_overrides=account_mol_overrides,
                 role="fallback",
             )
 
@@ -382,6 +384,7 @@ class ChemistryKernel:
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
+                account_mol_overrides=account_mol_overrides,
                 role="authoritative",
             )
             if str(result.status) != "unavailable":
@@ -398,6 +401,7 @@ class ChemistryKernel:
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
+                account_mol_overrides=account_mol_overrides,
                 role="fallback",
             )
         except ProviderUnavailableError:
@@ -418,6 +422,7 @@ class ChemistryKernel:
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
+                account_mol_overrides=account_mol_overrides,
                 role="fallback",
             )
 
@@ -432,6 +437,7 @@ class ChemistryKernel:
         fe_redox_policy: str,
         control_inputs: Optional[Mapping[str, Any]],
         declared_accounts: Optional[frozenset[str]],
+        account_mol_overrides: Optional[Mapping[str, Mapping[str, float]]],
         role: str,
     ) -> IntentResult:
         """Build the IntentRequest, dispatch, and validate.
@@ -455,6 +461,7 @@ class ChemistryKernel:
             self._ledger,
             declared_accounts,
             self._species_formula_registry,
+            account_mol_overrides=account_mol_overrides,
         )
         request = IntentRequest(
             intent=intent,
