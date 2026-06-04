@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from concurrent.futures import Future
+from concurrent.futures import Future, ProcessPoolExecutor
 import json
 import os
 import pickle
@@ -40,6 +40,31 @@ def _restore_thread_env() -> object:
             os.environ.pop(name, None)
         else:
             os.environ[name] = value
+
+
+def _process_pool_probe() -> int:
+    return os.getpid()
+
+
+def _process_pool_unavailable_reason() -> str | None:
+    executor: ProcessPoolExecutor | None = None
+    try:
+        executor = ProcessPoolExecutor(max_workers=1)
+        future = executor.submit(_process_pool_probe)
+        future.result(timeout=5)
+    except Exception as exc:
+        return f"{type(exc).__name__}: {exc}"
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=False, cancel_futures=True)
+    return None
+
+
+@pytest.fixture(scope="module")
+def spawnable_process_pool() -> None:
+    reason = _process_pool_unavailable_reason()
+    if reason is not None:
+        pytest.skip(f"requires a spawnable process pool: {reason}")
 
 
 def _patch(value: int) -> RecipePatch:
@@ -425,6 +450,80 @@ def test_pool_single_item_matches_serial_full_view(tmp_path: Path) -> None:
     assert deterministic_result_view(pooled) == deterministic_result_view(serial)
 
 
+def test_pool_unavailable_constructor_falls_back_to_serial(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
+) -> None:
+    def unavailable_executor(*, max_workers: int | None, initializer: object) -> object:
+        raise PermissionError("sandbox denies process spawn")
+
+    monkeypatch.setattr(pool_module, "ProcessPoolExecutor", unavailable_executor)
+    caplog.set_level("WARNING", logger="simulator.optimize.pool")
+    for name in THREAD_ENV_VARS:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.delenv(pool_module._WORKER_OUTPUT_ENV, raising=False)
+
+    result = evaluate_batch(
+        [PoolEvaluationRequest(_patch(15), "lunar_mare_low_ti", "fast", candidate_id="a")],
+        profile=_profile(),
+        max_workers=2,
+        output_root=tmp_path / "pool",
+        evaluate_fn=_fake_evaluate,
+    )[0]
+
+    assert result.candidate_id == "a"
+    assert result.objectives is not None
+    assert result.objectives.values[0].value == 15.0
+    assert result.run_reference is not None
+    assert result.run_reference.trace["thread_env"] == {
+        name: "1" for name in THREAD_ENV_VARS
+    }
+    assert (tmp_path / "pool" / "eval-000000" / "artifact.txt").exists()
+    assert all(os.environ.get(name) is None for name in THREAD_ENV_VARS)
+    assert os.environ.get(pool_module._WORKER_OUTPUT_ENV) is None
+    assert "falling back to serial optimizer evaluation" in caplog.text
+
+
+def test_pool_unavailable_submit_falls_back_to_serial(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class SubmitDeniedExecutor:
+        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+            self.max_workers = max_workers
+            self.initializer = initializer
+            self.shutdown_calls: list[dict[str, object]] = []
+
+        def submit(self, fn: object, task: object, evaluate_fn: object) -> Future[object]:
+            raise PermissionError("sandbox denies process semlock")
+
+        def shutdown(self, *, wait: bool, cancel_futures: bool) -> None:
+            self.shutdown_calls.append({"wait": wait, "cancel_futures": cancel_futures})
+
+    executor = SubmitDeniedExecutor(max_workers=2, initializer=None)
+
+    def executor_factory(*, max_workers: int | None, initializer: object) -> SubmitDeniedExecutor:
+        assert max_workers == 2
+        return executor
+
+    monkeypatch.setattr(pool_module, "ProcessPoolExecutor", executor_factory)
+
+    results = evaluate_batch(
+        [
+            PoolEvaluationRequest(_patch(16), "lunar_mare_low_ti", "fast", candidate_id="a"),
+            PoolEvaluationRequest(_patch(17), "lunar_mare_low_ti", "fast", candidate_id="b"),
+        ],
+        profile=_profile(),
+        max_workers=2,
+        output_root=tmp_path / "pool",
+        evaluate_fn=_fake_evaluate,
+    )
+
+    assert [result.candidate_id for result in results] == ["a", "b"]
+    assert executor.shutdown_calls == [{"wait": False, "cancel_futures": True}]
+
+
 def test_pool_uses_isolated_output_dirs_without_chdir(tmp_path: Path) -> None:
     cwd = os.getcwd()
     requests = [
@@ -597,7 +696,10 @@ def test_pool_duplicate_cache_key_policy(tmp_path: Path) -> None:
     assert persisted.candidate_id == "second"
 
 
-def test_pool_mixed_feasible_infeasible_abort_no_partial_store_no_hang(tmp_path: Path) -> None:
+def test_pool_mixed_feasible_infeasible_abort_no_partial_store_no_hang(
+    spawnable_process_pool: None,
+    tmp_path: Path,
+) -> None:
     store_path = tmp_path / "results.sqlite"
     store = ResultStore(
         store_path,
@@ -628,7 +730,10 @@ def test_pool_mixed_feasible_infeasible_abort_no_partial_store_no_hang(tmp_path:
 
 
 @pytest.mark.skipif(os.name != "posix", reason="os._exit crash sentinel is POSIX-only")
-def test_pool_worker_hard_crash_reports_candidate(tmp_path: Path) -> None:
+def test_pool_worker_hard_crash_reports_candidate(
+    spawnable_process_pool: None,
+    tmp_path: Path,
+) -> None:
     with pytest.raises(RuntimeError, match="candidate_id='crashy' index=0"):
         evaluate_batch(
             [

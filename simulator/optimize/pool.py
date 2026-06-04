@@ -7,7 +7,9 @@ from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, wai
 from dataclasses import dataclass, fields, is_dataclass, replace
 from datetime import UTC, datetime
 import copy
+import errno
 import inspect
+import logging
 import os
 from pathlib import Path
 import pickle
@@ -27,6 +29,8 @@ from simulator.optimize.results_store import ResultStore
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
 _INFLIGHT_PER_WORKER = 2
+_LOGGER = logging.getLogger(__name__)
+_POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
 
 
 @dataclass(frozen=True)
@@ -50,6 +54,10 @@ class _PoolTask:
     output_dir: str
     constraints: Any = None
     schema: Any = None
+
+
+class _PoolUnavailableError(RuntimeError):
+    pass
 
 
 def evaluate_batch(
@@ -92,11 +100,46 @@ def evaluate_batch(
     if results_store is not None:
         results_store.initialize()
 
+    try:
+        completed = _evaluate_tasks_in_pool(
+            tasks,
+            evaluate_fn,
+            max_workers=max_workers,
+        )
+    except _PoolUnavailableError as exc:
+        _LOGGER.warning(
+            "process pool unavailable; falling back to serial optimizer "
+            "evaluation: %s",
+            exc.__cause__ or exc,
+        )
+        completed = _evaluate_tasks_serial(tasks, evaluate_fn)
+    if results_store is not None:
+        timestamp = created_at or datetime.now(UTC).isoformat()
+        for result in completed:
+            if result.eval_spec is not None:
+                results_store.store(result.eval_spec, result, created_at=timestamp)
+    return completed
+
+
+evaluate_in_process_pool = evaluate_batch
+
+
+def _evaluate_tasks_in_pool(
+    tasks: Sequence[_PoolTask],
+    evaluate_fn: Callable[..., ScoredResult],
+    *,
+    max_workers: int | None,
+) -> tuple[ScoredResult, ...]:
     results: list[ScoredResult | None] = [None] * len(tasks)
     worker_count = max_workers or (os.cpu_count() or 1)
     max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
     task_iter = iter(tasks)
-    executor = ProcessPoolExecutor(max_workers=max_workers, initializer=_initialize_worker)
+    try:
+        executor = ProcessPoolExecutor(max_workers=max_workers, initializer=_initialize_worker)
+    except BaseException as exc:
+        if _is_pool_unavailable(exc):
+            raise _PoolUnavailableError("could not create process pool") from exc
+        raise
     futures: dict[Future[Any], _PoolTask] = {}
     pending_abort: BaseException | None = None
     executor_closed = False
@@ -140,15 +183,33 @@ def evaluate_batch(
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(tasks):
         raise RuntimeError("process-pool evaluation ended without all results")
-    if results_store is not None:
-        timestamp = created_at or datetime.now(UTC).isoformat()
-        for result in completed:
-            if result.eval_spec is not None:
-                results_store.store(result.eval_spec, result, created_at=timestamp)
     return completed
 
 
-evaluate_in_process_pool = evaluate_batch
+def _evaluate_tasks_serial(
+    tasks: Sequence[_PoolTask],
+    evaluate_fn: Callable[..., ScoredResult],
+) -> tuple[ScoredResult, ...]:
+    env_names = _serial_fallback_env_names()
+    env_snapshot = {name: os.environ.get(name) for name in env_names}
+    try:
+        _initialize_worker()
+        results: list[ScoredResult] = []
+        for task in tasks:
+            try:
+                outcome = _evaluate_pool_task(task, evaluate_fn)
+            except BaseException as exc:
+                raise RuntimeError(
+                    f"process-pool evaluation failed for {_task_label(task)}"
+                ) from exc
+            if outcome["kind"] == "abort":
+                abort_payload = dict(outcome["abort"])
+                abort_payload.setdefault("candidate_id", task.candidate_id)
+                raise _rebuild_abort(abort_payload)
+            results.append(outcome["result"])
+        return tuple(results)
+    finally:
+        _restore_env(env_snapshot)
 
 
 def _submit_until_full(
@@ -163,7 +224,13 @@ def _submit_until_full(
             task = next(task_iter)
         except StopIteration:
             return
-        futures[executor.submit(_evaluate_pool_task, task, evaluate_fn)] = task
+        try:
+            future = executor.submit(_evaluate_pool_task, task, evaluate_fn)
+        except BaseException as exc:
+            if _is_pool_unavailable(exc):
+                raise _PoolUnavailableError("could not submit process-pool task") from exc
+            raise
+        futures[future] = task
 
 
 def _initialize_worker() -> None:
@@ -383,3 +450,23 @@ def _attach_teardown_error(abort: BaseException, teardown_error: BaseException) 
 def _task_label(task: _PoolTask) -> str:
     candidate = task.candidate_id if task.candidate_id is not None else "<none>"
     return f"candidate_id={candidate!r} index={task.index}"
+
+
+def _is_pool_unavailable(exc: BaseException) -> bool:
+    if isinstance(exc, PermissionError):
+        return True
+    return isinstance(exc, OSError) and exc.errno in _POOL_UNAVAILABLE_ERRNOS
+
+
+def _serial_fallback_env_names() -> tuple[str, ...]:
+    from simulator.optimize.determinism import THREAD_ENV_VARS
+
+    return (*THREAD_ENV_VARS, _WORKER_OUTPUT_ENV)
+
+
+def _restore_env(snapshot: Mapping[str, str | None]) -> None:
+    for name, value in snapshot.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
