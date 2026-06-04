@@ -10,10 +10,21 @@ scipy>=1.12
 # silently skipped on a fresh checkout and the default production chain fails
 # at first dispatch with ProviderUnavailableError. Keep this list in lockstep
 # with pyproject.toml [project.dependencies].
-# Autoreview r5 P1 (2026-05-27): omitting these here meant the documented
-# installer flow could not produce a working VAPOR_PRESSURE authority.
+# Autoreview r5 P1 (2026-05-27): omitting petthermotools here meant the
+# documented installer flow could not stand up the SILICATE_EQUILIBRIUM /
+# AlphaMELTS melt-equilibria path. It IS pip-installable, so it belongs here.
 petthermotools>=0.4.5,<0.5
-vaporock @ git+https://gitlab.com/ENKI-portal/vaporock.git@v0.1#subdirectory=src
+# vaporock (the VAPOR_PRESSURE authority) is deliberately NOT pinned here.
+# `import vaporock` hard-requires `thermoengine` -- a native build (a Cython
+# extension linking system GSL, Objective-C/C dylibs, and the transitive PyPI
+# dep `sulfLiq`) that pip cannot compile from a requirements line. vaporock +
+# thermoengine are provisioned by install-engines.py (sibling git clones,
+# native builds, editable installs): the same documented-build-path treatment
+# MAGEMin/alphaMELTS already get, rather than a pip pin. A git+https pin here
+# was also fragile -- it put numpy/scipy/petthermotools at the mercy of a gitlab
+# fetch in the same batch, and a stale ref (the old @v0.1 tag, which predated
+# vaporock's src/ restructure and exposed no installable project) aborted the
+# entire `pip install -r requirements.txt`. See install-engines.py + pyproject.toml.
 # Pytest plugins required by [tool.pytest.ini_options] addopts in pyproject.toml
 # (`-n auto` needs pytest-xdist; `--timeout=300` needs pytest-timeout). Without
 # these, `pytest` aborts during argument parsing before any test runs.

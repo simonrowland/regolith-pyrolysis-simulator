@@ -12,6 +12,9 @@ thermodynamic engines:
     VapoRock cannot be imported without it.
 
 Everything is idempotent: existing clones, brew formulae, and builds are reused.
+Pass --update to refresh the engine clones to the latest upstream commit
+(rebuilding the natives and reinstalling the editables) -- this is the
+cluster "engines-update" path: run it on every node the same day.
 
 Only macOS on Apple Silicon is supported. The native builds (MAGEMin, ThermoEngine)
 have platform-specific Makefile assumptions; other platforms must follow each
@@ -19,6 +22,7 @@ project's own build instructions.
 
 Usage: python3 install-engines.py
        python3 install-engines.py --skip-compiles   # clones + pip installs only
+       python3 install-engines.py --update          # pull clones to latest upstream, then rebuild
 """
 
 from __future__ import annotations
@@ -168,14 +172,26 @@ def ensure_tools(skip_compiles: bool) -> None:
 # Steps
 # --------------------------------------------------------------------------
 
-def clone_siblings() -> None:
+def clone_siblings(update: bool = False) -> None:
     _hdr("Cloning engine repositories (siblings of the repo)")
     PARENT.mkdir(parents=True, exist_ok=True)
     for name, url in SIBLING_REPOS:
         dest = PARENT / name
         if dest.exists():
-            _record(f"{name}: preexisting ({dest})")
-            continue
+            if not update:
+                _record(f"{name}: preexisting ({dest})")
+                continue
+            # --update: replace the clone with a fresh checkout of the latest
+            # upstream default-branch HEAD. This is the simplest correct "pull
+            # to latest": the in-place ThermoEngine py3.12 patch and any stale
+            # build artifacts are discarded, and the patch/build/install steps
+            # below regenerate everything against the new source. We track HEAD,
+            # not tags: VapoRock's only tag (v0.1) predates its importable src/
+            # layout and ThermoEngine's only tag (v1.0.0) is older than its
+            # validated build -- so "latest" = default-branch HEAD, which is
+            # also what fixes the stale-vaporock issue.
+            shutil.rmtree(dest)
+            _record(f"{name}: removed for --update refresh")
         _run(["git", "clone", "--depth", "1", url, str(dest)])
         _record(f"{name}: cloned")
 
@@ -362,7 +378,8 @@ def verify(python: Path) -> None:
 def main() -> int:
     args = set(sys.argv[1:])
     skip_compiles = "--skip-compiles" in args
-    unknown = args - {"--skip-compiles"}
+    update = "--update" in args
+    unknown = args - {"--skip-compiles", "--update"}
     if unknown:
         raise SystemExit(f"Unknown argument(s): {', '.join(sorted(unknown))}\n{__doc__}")
 
@@ -373,9 +390,11 @@ def main() -> int:
     print(f"Repo:   {ROOT}")
     print(f"Venv:   {VENV_DIR}")
     print(f"Clones: {PARENT}")
+    if update:
+        print("Mode:   --update (refresh engine clones to latest upstream HEAD)")
 
     # Pure-Python engines first.
-    clone_siblings()
+    clone_siblings(update=update)
     editable_installs(python)
 
     # Heavy native builds last, so a failed compile never blocks the rest.
