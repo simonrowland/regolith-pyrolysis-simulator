@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 
 import yaml
@@ -6,12 +7,21 @@ from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 
 
+C0_ENDPOINT_SETPOINTS = {
+    "max_hold_hr": 25,
+    "soft_endpoint": {
+        "min_hold_hr": 10,
+        "temperature_min_C": 940,
+    },
+}
+
+
 def _sim(feedstocks):
     backend = StubBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,
-        {"campaigns": {}},
+        {"campaigns": {"C0": deepcopy(C0_ENDPOINT_SETPOINTS)}},
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )

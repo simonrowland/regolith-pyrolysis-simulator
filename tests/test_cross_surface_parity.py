@@ -23,26 +23,28 @@ MASS_BALANCE_TOLERANCE_PCT = 5e-12
 
 # Adapted from /tmp/ae_parity_harness.py and /tmp/ae_session_recipe.txt.
 # C0/C0B force the first PATH_AB decision early; C2/C3 shortening keeps this
-# suite guard fast while still reaching O2 and metal-product ledger accounts.
+# suite guard fast while still reaching O2 and vapor-product ledger accounts.
 SETPOINT_OVERRIDES = {
-    "C0": {"max_hours": 1.0},
-    "C0B": {"max_hours": 1.0},
-    "C2A": {"max_hours": 1.0},
-    "C2B": {"max_hours": 1.0},
-    "C3_K": {"max_hours": 1.0},
-    "C3_NA": {"max_hours": 1.0},
+    "C0": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C0B": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C2A": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C2B": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C3_K": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C3_NA": {"max_hours": 1.0, "ramp_rate": 2000.0},
+    "C4": {"ramp_rate": 2000.0},
+    "C5": {"ramp_rate": 2000.0},
 }
 
 EXPECTED_CORE_ACCOUNTS = {
     "process.cleaned_melt",
-    "process.metal_phase",
-    "terminal.oxygen_mre_anode_stored",
+    "process.condensation_train",
+    "terminal.oxygen_melt_offgas_stored",
 }
 
 OPTIONAL_PRODUCT_ACCOUNTS = {
-    "process.condensation_train",
     "terminal.offgas",
-    "terminal.oxygen_melt_offgas_stored",
+    "process.metal_phase",
+    "terminal.oxygen_mre_anode_stored",
 }
 
 
@@ -78,13 +80,16 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert EXPECTED_CORE_ACCOUNTS <= set(batch.ledger)
     for account in OPTIONAL_PRODUCT_ACCOUNTS:
         assert len({account in surface.ledger for surface in surfaces}) == 1
-    assert {"Fe", "Na", "K"} <= set(batch.ledger["process.metal_phase"])
+    assert {"Fe", "Cr", "Mg", "Si"} <= set(
+        batch.ledger["process.condensation_train"]
+    )
+    assert {"Na", "K"} <= set(batch.ledger["terminal.offgas"])
     assert {"Al2O3", "CaO", "FeO", "MgO", "SiO2"} <= set(
         batch.ledger["process.cleaned_melt"]
     )
-    if "terminal.oxygen_melt_offgas_stored" in batch.ledger:
-        assert batch.ledger["terminal.oxygen_melt_offgas_stored"].keys() == {"O2"}
-    assert batch.ledger["terminal.oxygen_mre_anode_stored"].keys() == {"O2"}
+    assert batch.ledger["terminal.oxygen_melt_offgas_stored"].keys() == {"O2"}
+    if "terminal.oxygen_mre_anode_stored" in batch.ledger:
+        assert batch.ledger["terminal.oxygen_mre_anode_stored"].keys() == {"O2"}
 
     comparisons = [
         _compare_ledgers(batch, cli),

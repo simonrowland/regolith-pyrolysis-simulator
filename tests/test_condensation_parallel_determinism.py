@@ -15,6 +15,13 @@ from simulator.state import (
 
 EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.016363372841019217
 MULTI_TICK_COUNT = 4
+C0_ENDPOINT_SETPOINTS = {
+    "max_hold_hr": 25,
+    "soft_endpoint": {
+        "min_hold_hr": 10,
+        "temperature_min_C": 940,
+    },
+}
 
 
 def _silica_feedstocks() -> dict:
@@ -49,7 +56,7 @@ def _silica_vapor_pressures() -> dict:
 
 def _setpoints() -> dict:
     return {
-        "campaigns": {},
+        "campaigns": {"C0": copy.deepcopy(C0_ENDPOINT_SETPOINTS)},
         "chemistry_kernel": {"allow_unmeasured_alpha_fallback": True},
     }
 
