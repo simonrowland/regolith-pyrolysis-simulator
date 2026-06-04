@@ -367,6 +367,7 @@ def _build_eval_inputs(
         additives_kg=dict(spec.additives_kg),
         mass_kg=spec.mass_kg,
         backend_name=spec.backend_name,
+        reduced_real_cache=run_options["reduced_real_cache"],
         setpoints_patch=setpoints_patch,
         runtime_campaign_overrides=dict(spec.runtime_campaign_overrides),
         track=spec.track,
@@ -383,13 +384,25 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             selected = dict(raw_selected)
     merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     merged.update(selected)
+    backend_name = str(merged.get("backend_name", "stub"))
+    raw_cache_config = (
+        merged.get("reduced_real_cache")
+        if backend_name == "cached-real"
+        else None
+    )
+    reduced_real_cache = (
+        dict(raw_cache_config)
+        if isinstance(raw_cache_config, Mapping)
+        else None
+    )
     return MappingProxyType({
         "campaign": merged.get("campaign", "C0"),
         "hours": int(merged.get("hours", 24)),
         "mass_kg": float(merged.get("mass_kg", 1000.0)),
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
         "track": merged.get("track", "pyrolysis"),
-        "backend_name": merged.get("backend_name", "stub"),
+        "backend_name": backend_name,
+        "reduced_real_cache": reduced_real_cache,
         "runtime_campaign_overrides": dict(
             merged.get("runtime_campaign_overrides", {}) or {}
         ),

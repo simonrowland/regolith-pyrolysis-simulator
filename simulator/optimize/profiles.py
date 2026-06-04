@@ -69,10 +69,18 @@ _RUN_KEYS = frozenset(
         "additives_kg",
         "track",
         "backend_name",
+        "reduced_real_cache",
         "runtime_campaign_overrides",
         "chemistry_kernel",
     }
 )
+_REDUCED_REAL_CACHE_KEYS = frozenset({
+    "db_path",
+    "miss_policy",
+    "authorized_backend_name",
+    "authorized_backend_version",
+})
+_REDUCED_REAL_MISS_POLICIES = frozenset({"fail-loud", "live-fill"})
 
 
 class ProfileValidationError(ValueError):
@@ -165,7 +173,11 @@ def validate_profile(
     _validate_constraints(profile["constraints"], source=source)
     _validate_study_constraints(profile.get("study_constraints"), source=source)
     _validate_run(profile["run"], source=source, where="run")
-    _validate_fidelities(profile["fidelities"], source=source)
+    _validate_fidelities(
+        profile["fidelities"],
+        source=source,
+        base_run=profile["run"],
+    )
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
@@ -264,15 +276,94 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
         raise ProfileValidationError(f"{source}: {where}.hours must be positive")
     if "mass_kg" in raw and _bad_positive_number(raw["mass_kg"]):
         raise ProfileValidationError(f"{source}: {where}.mass_kg must be positive")
+    backend_name = str(raw.get("backend_name", ""))
+    cache_config = raw.get("reduced_real_cache")
+    if backend_name == "cached-real":
+        _validate_reduced_real_cache_config(
+            cache_config,
+            source=source,
+            where=f"{where}.reduced_real_cache",
+        )
+    elif cache_config is not None:
+        raise ProfileValidationError(
+            f"{source}: {where}.reduced_real_cache requires "
+            "backend_name='cached-real'"
+        )
 
 
-def _validate_fidelities(raw: Any, *, source: str | Path) -> None:
+def _validate_reduced_real_cache_config(
+    raw: Any,
+    *,
+    source: str | Path,
+    where: str,
+) -> None:
+    if not isinstance(raw, Mapping):
+        raise ProfileValidationError(f"{source}: {where} must be a mapping")
+    _reject_unknown_keys(raw, _REDUCED_REAL_CACHE_KEYS, source=source, where=where)
+    db_path = raw.get("db_path")
+    if not isinstance(db_path, str) or not db_path.strip():
+        raise ProfileValidationError(f"{source}: {where}.db_path must be a path string")
+    authorized_backend_name = raw.get("authorized_backend_name")
+    if (
+        not isinstance(authorized_backend_name, str)
+        or not authorized_backend_name.strip()
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.authorized_backend_name must be a non-empty string"
+        )
+    authorized_backend_version = raw.get("authorized_backend_version")
+    if (
+        not isinstance(authorized_backend_version, str)
+        or not authorized_backend_version.strip()
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.authorized_backend_version must be a non-empty string"
+        )
+    miss_policy = str(raw.get("miss_policy", "fail-loud")).strip().lower()
+    miss_policy = miss_policy.replace("_", "-")
+    if miss_policy not in _REDUCED_REAL_MISS_POLICIES:
+        raise ProfileValidationError(
+            f"{source}: {where}.miss_policy must be one of "
+            f"{', '.join(sorted(_REDUCED_REAL_MISS_POLICIES))}"
+        )
+
+
+def _validate_fidelities(
+    raw: Any,
+    *,
+    source: str | Path,
+    base_run: Any,
+) -> None:
     if not isinstance(raw, Mapping) or not raw:
         raise ProfileValidationError(f"{source}: fidelities must be a non-empty mapping")
     for fidelity, options in raw.items():
         if fidelity not in VALID_FIDELITIES:
             raise ProfileValidationError(f"{source}: unknown fidelity {fidelity!r}")
-        _validate_run(options, source=source, where=f"fidelities.{fidelity}")
+        if not isinstance(options, Mapping):
+            _validate_run(options, source=source, where=f"fidelities.{fidelity}")
+            continue
+        merged = _merged_run_options_for_validation(base_run, options)
+        _validate_run(
+            merged,
+            source=source,
+            where=f"fidelities.{fidelity}",
+        )
+
+
+def _merged_run_options_for_validation(
+    base_run: Any,
+    selected: Mapping[str, Any],
+) -> dict[str, Any]:
+    inherited_cache = (
+        isinstance(base_run, Mapping)
+        and "reduced_real_cache" in base_run
+        and "reduced_real_cache" not in selected
+    )
+    merged = dict(base_run if isinstance(base_run, Mapping) else {})
+    merged.update(selected)
+    if inherited_cache and str(merged.get("backend_name", "")) != "cached-real":
+        merged.pop("reduced_real_cache", None)
+    return merged
 
 
 def _validate_seed_recipes(

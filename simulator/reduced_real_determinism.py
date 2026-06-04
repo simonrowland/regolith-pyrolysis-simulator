@@ -54,6 +54,11 @@ _SOURCE_MODULE_PATTERNS = (
     "engines/builtin/vapor_pressure.py",
     "engines/vaporock/*.py",
 )
+_ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
+_ALPHAMELTS_BACKEND_NAME = "AlphaMELTSBackend"
+_ALPHAMELTS_BACKEND_CLASS = (
+    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+)
 
 
 class PT0CacheMiss(RuntimeError):
@@ -93,6 +98,7 @@ class PT0DeterminismStore:
         self.cache_events: list[dict[str, str]] = []
         self.hits: int = 0
         self.live_fills: int = 0
+        self.last_cache_state: str | None = None
         self.quantize_live_controls: bool = True
 
     @property
@@ -172,6 +178,7 @@ class PT0DeterminismStore:
         key = self._equilibrium_key(sim)
         payload = equilibrium_payload(sim, result)
         self._store("equilibrium_post_record", key, payload)
+        sim._last_reduced_real_cache_state = self.last_cache_state
 
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
         if not self.write_through_enabled:
@@ -204,6 +211,7 @@ class PT0DeterminismStore:
         payload: Mapping[str, Any],
     ) -> EquilibriumResult:
         result = equilibrium_from_payload(payload)
+        sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
         sim._last_vapor_pressures_source = dict(
             payload.get("last_vapor_pressures_source") or {}
@@ -224,24 +232,30 @@ class PT0DeterminismStore:
         fO2_log: float,
         curve: Mapping[str, Any],
     ) -> None:
+        provider_role = _gate_provider_role_for_capture(sim, curve)
         key = canonical_replay_key(
             sim,
             artifact="freeze_gate_curve",
             intent=ChemistryIntent.GATE_LIQUID_FRACTION,
             fO2_log=fO2_log,
             fe_redox_policy="intrinsic",
+            provider_role=provider_role,
         )
         self._store("freeze_gate_curve", key, {"curve": _curve_payload(curve)})
+        sim._last_reduced_real_cache_state = self.last_cache_state
 
     def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
+        provider_role = _gate_provider_role_for_key(sim)
         key = canonical_replay_key(
             sim,
             artifact="freeze_gate_curve",
             intent=ChemistryIntent.GATE_LIQUID_FRACTION,
             fO2_log=fO2_log,
             fe_redox_policy="intrinsic",
+            provider_role=provider_role,
         )
         payload = self._lookup("freeze_gate_curve", key)
+        sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
 
     def summary(self) -> dict[str, Any]:
@@ -357,6 +371,7 @@ class PT0DeterminismStore:
             "cache_state": "live_fill",
         }
         self.live_fills += 1
+        self.last_cache_state = "live_fill"
         self._record_cache_event(artifact, "live_fill")
 
     def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
@@ -383,6 +398,7 @@ class PT0DeterminismStore:
                 "drift_fields": self._drift_fields_for_latest_replay(),
             }
             self.misses.append(miss)
+            self.last_cache_state = None
             raise PT0CacheMiss(f"PT-0 cached replay miss: {miss}")
         self._verify_entry(artifact, key, key_bytes, key_hash, entry)
         sequence_index = len(self.replay_sequence) - 1
@@ -397,6 +413,7 @@ class PT0DeterminismStore:
             )
         self.hits += 1
         self.replay_sequence[-1]["cache_state"] = "cached_exact"
+        self.last_cache_state = "cached_exact"
         self._record_cache_event(artifact, "cached_exact")
         return copy.deepcopy(entry["payload"])
 
@@ -419,6 +436,7 @@ class PT0DeterminismStore:
             }
         )
         self.hits += 1
+        self.last_cache_state = "cached_exact"
         self._record_cache_event(artifact, "cached_exact")
         return copy.deepcopy(entry["payload"])
 
@@ -749,13 +767,13 @@ def canonical_replay_key(
     intent: ChemistryIntent,
     fO2_log: float | None,
     fe_redox_policy: str,
+    provider_role: str | None = None,
 ) -> dict[str, Any]:
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
-        register_gate = getattr(
-            sim, "_register_freeze_gate_liquid_fraction_providers", None
-        )
-        if callable(register_gate):
-            register_gate()
+        if provider_role is None:
+            provider_role = _gate_provider_role_for_key(sim)
+        else:
+            _register_gate_providers_for_key(sim)
     T_K = _quantize(float(sim.melt.temperature_C) + 273.15, _T_K_QUANTUM, 2)
     pressure_bar = _quantize(
         float(sim.melt.p_total_mbar) / 1000.0,
@@ -772,7 +790,11 @@ def canonical_replay_key(
             getattr(sim.inventory, "sulfide_matte_kg", {}) or {}
         ),
     }
-    provider = _provider_identity(sim, intent)
+    provider = _provider_identity(
+        sim,
+        intent,
+        provider_role=provider_role,
+    )
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
     return {
         "schema_version": SCHEMA_VERSION,
@@ -791,10 +813,7 @@ def canonical_replay_key(
             "fe_redox_policy": str(fe_redox_policy),
             "fe_split": _fe_split(sim),
         },
-        "backend": {
-            "backend_name": type(getattr(sim, "backend", None)).__name__,
-            "backend_class": _qualified_type(getattr(sim, "backend", None)),
-        },
+        "backend": _backend_identity_for_key(sim),
         "provider": provider,
         "vapor_pressure_provider": vapor_provider,
         "sulfur_side": {
@@ -889,6 +908,60 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _gate_curve_provider_role(curve: Mapping[str, Any]) -> str | None:
+    source = str(curve.get("source", ""))
+    if ":fallback:" in source:
+        return "fallback"
+    if source.startswith("gate_liquid_fraction"):
+        return "authoritative"
+    return None
+
+
+def _gate_provider_role_for_capture(
+    sim: Any,
+    curve: Mapping[str, Any],
+) -> str:
+    keyed_role = _gate_provider_role_for_key(sim)
+    curve_role = _gate_curve_provider_role(curve)
+    if curve_role is None:
+        if keyed_role == "authoritative":
+            raise PT0CacheCollision(
+                "freeze gate curve source does not identify the "
+                "authoritative provider; refusing cached-real capture"
+            )
+        return keyed_role
+    if curve_role != keyed_role:
+        raise PT0CacheCollision(
+            "freeze gate curve provider role mismatch: "
+            f"keyed role={keyed_role}, curve source role={curve_role}"
+        )
+    return keyed_role
+
+
+def _gate_provider_role_for_key(sim: Any) -> str:
+    _register_gate_providers_for_key(sim)
+    registry = getattr(sim, "_chem_registry", None)
+    if (
+        registry is not None
+        and registry.authoritative_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        is not None
+    ):
+        return "authoritative"
+    if _cached_real_authorized_backend_name(sim) == "alphamelts":
+        return "authoritative"
+    return "fallback"
+
+
+def _register_gate_providers_for_key(sim: Any) -> None:
+    register_gate = getattr(
+        sim, "_register_freeze_gate_liquid_fraction_providers", None
+    )
+    if callable(register_gate):
+        register_gate()
+
+
 def _composition_mol_fraction(sim: Any) -> list[tuple[str, float]]:
     cleaned = sim.atom_ledger.mol_by_account(_CLEANED_MELT_ACCOUNT)
     return _composition_mol_fraction_from_mol(cleaned)
@@ -952,7 +1025,12 @@ def _fe_split(sim: Any) -> dict[str, float]:
     }
 
 
-def _provider_identity(sim: Any, intent: ChemistryIntent) -> dict[str, Any]:
+def _provider_identity(
+    sim: Any,
+    intent: ChemistryIntent,
+    *,
+    provider_role: str | None = None,
+) -> dict[str, Any]:
     registry = getattr(sim, "_chem_registry", None)
     auth = registry.authoritative_for(intent) if registry is not None else None
     fallback = registry.fallback_for(intent) if registry is not None else None
@@ -962,9 +1040,24 @@ def _provider_identity(sim: Any, intent: ChemistryIntent) -> dict[str, Any]:
         fallback_allowed = intent in getattr(kernel, "allow_fallback_intents", ())
     resolved = auth
     role = "authoritative"
-    if resolved is None and fallback is not None and fallback_allowed:
+    if provider_role == "fallback" and fallback is not None:
         resolved = fallback
         role = "fallback"
+    elif provider_role == "authoritative":
+        resolved = auth
+        role = "authoritative"
+    elif resolved is None and fallback is not None and fallback_allowed:
+        resolved = fallback
+        role = "fallback"
+    if resolved is None:
+        cached_real = _cached_real_provider_identity(
+            sim,
+            intent,
+            provider_role=provider_role,
+            fallback_allowed=fallback_allowed,
+        )
+        if cached_real is not None:
+            return cached_real
     return {
         "resolved_provider_id": _provider_id(resolved),
         "resolved_role": role if resolved is not None else "none",
@@ -974,6 +1067,60 @@ def _provider_identity(sim: Any, intent: ChemistryIntent) -> dict[str, Any]:
         "model": _provider_model(resolved),
         "mode": _provider_mode(resolved),
         "engine_version": _provider_engine_version(resolved),
+    }
+
+
+def _cached_real_provider_identity(
+    sim: Any,
+    intent: ChemistryIntent,
+    *,
+    provider_role: str | None,
+    fallback_allowed: bool,
+) -> dict[str, Any] | None:
+    config = _cached_real_config(sim)
+    if config is None:
+        return None
+    authorized_name = str(
+        getattr(config, "authorized_backend_name", "")
+    ).strip().lower()
+    authorized_version = str(
+        getattr(config, "authorized_backend_version", "")
+    ).strip()
+    if authorized_name != "alphamelts":
+        return None
+    alphamelts_intents = {
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    }
+    if intent not in alphamelts_intents:
+        return None
+    if intent == ChemistryIntent.GATE_LIQUID_FRACTION and provider_role == "fallback":
+        return {
+            "resolved_provider_id": "magemin-shadow",
+            "resolved_role": "fallback",
+            "authoritative_provider_id": None,
+            "fallback_provider_id": "magemin-shadow",
+            "fallback_allowed": bool(fallback_allowed),
+            "model": "MAGEMinShadowProvider",
+            "mode": "subprocess",
+            "engine_version": "unavailable",
+        }
+    fallback_provider_id = (
+        "magemin-shadow"
+        if intent == ChemistryIntent.GATE_LIQUID_FRACTION
+        else None
+    )
+    return {
+        "resolved_provider_id": "alphamelts-diagnostic",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "alphamelts-diagnostic",
+        "fallback_provider_id": fallback_provider_id,
+        "fallback_allowed": bool(fallback_allowed),
+        "model": "alphamelts-diagnostic",
+        "mode": "AlphaMELTSProvider",
+        "engine_version": authorized_version or "unavailable",
     }
 
 
@@ -1031,6 +1178,8 @@ def _equilibrium_payload_intent(sim: Any) -> ChemistryIntent:
         is not None
     ):
         return ChemistryIntent.SILICATE_EQUILIBRIUM
+    if _cached_real_authorized_backend_name(sim) == "alphamelts":
+        return ChemistryIntent.SILICATE_EQUILIBRIUM
     return ChemistryIntent.BACKEND_EQUILIBRIUM
 
 
@@ -1075,6 +1224,21 @@ def _sulfsat_calibration_version(gate: Any) -> str:
         except Exception:  # noqa: BLE001 - diagnostic only
             return "unavailable"
     return "unavailable"
+
+
+def _cached_real_config(sim: Any) -> Any | None:
+    backend = getattr(sim, "backend", None)
+    if type(backend).__name__ != "CachedRealBackend":
+        return None
+    return getattr(backend, "config", None)
+
+
+def _cached_real_authorized_backend_name(sim: Any) -> str | None:
+    config = _cached_real_config(sim)
+    if config is None:
+        return None
+    name = str(getattr(config, "authorized_backend_name", "")).strip().lower()
+    return name or None
 
 
 def _data_digests(sim: Any) -> dict[str, str]:
@@ -1173,6 +1337,83 @@ def _qualified_type(value: Any) -> str:
         return "None"
     cls = type(value)
     return f"{cls.__module__}.{cls.__qualname__}"
+
+
+def _backend_identity_for_key(sim: Any) -> dict[str, str]:
+    backend = getattr(sim, "backend", None)
+    config = getattr(backend, "config", None)
+    if type(backend).__name__ == "CachedRealBackend" and config is not None:
+        authorized_name = str(
+            getattr(config, "authorized_backend_name", "")
+        ).strip()
+        authorized_version = str(
+            getattr(config, "authorized_backend_version", "")
+        ).strip()
+        if not authorized_name or not authorized_version:
+            raise RuntimeError(
+                "cached-real cache key requires configured authorized "
+                "backend name and version"
+            )
+        return _authorized_backend_identity_for_key(
+            authorized_name,
+            authorized_version,
+        )
+    return {
+        "backend_name": _backend_name_for_key(backend),
+        "backend_class": _backend_class_for_key(backend),
+        "backend_version": _backend_version_for_key(backend),
+    }
+
+
+def _authorized_backend_identity_for_key(
+    authorized_name: str,
+    authorized_version: str,
+) -> dict[str, str]:
+    name = str(authorized_name).strip()
+    if name.lower() == _ALPHAMELTS_AUTHORIZED_NAME:
+        return {
+            "backend_name": _ALPHAMELTS_BACKEND_NAME,
+            "backend_class": _ALPHAMELTS_BACKEND_CLASS,
+            "backend_version": str(authorized_version).strip(),
+        }
+    return {
+        "backend_name": name,
+        "backend_class": name,
+        "backend_version": str(authorized_version).strip(),
+    }
+
+
+def _backend_name_for_key(backend: Any) -> str:
+    if _is_alphamelts_backend(backend):
+        return _ALPHAMELTS_BACKEND_NAME
+    return type(backend).__name__
+
+
+def _backend_class_for_key(backend: Any) -> str:
+    if _is_alphamelts_backend(backend):
+        return _ALPHAMELTS_BACKEND_CLASS
+    return _qualified_type(backend)
+
+
+def _backend_version_for_key(backend: Any) -> str:
+    getter = getattr(backend, "get_engine_version", None)
+    if callable(getter):
+        try:
+            version = str(getter()).strip()
+        except Exception:  # noqa: BLE001 - diagnostic cache identity only
+            version = "unavailable"
+        if version:
+            return version
+    return "unavailable"
+
+
+def _is_alphamelts_backend(backend: Any) -> bool:
+    if backend is None:
+        return False
+    return any(
+        cls.__name__ == _ALPHAMELTS_BACKEND_NAME
+        for cls in type(backend).__mro__
+    )
 
 
 def _positive_float_map(value: Mapping[str, Any]) -> dict[str, float]:

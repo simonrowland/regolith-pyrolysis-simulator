@@ -398,6 +398,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._pt0_determinism_store: Any | None = None
+        self._last_reduced_real_cache_state: str | None = None
         self._rump_expectation_warnings: list[str] = []
         # Shuttle-physics-gate refusals: the post-V1c JANAF Ellingham +
         # S1b shuttle T-acceptance gate refuses K→FeO at any practical
@@ -1037,7 +1038,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ``get_engine_version``) lets the registration accept future
         AlphaMELTS subclasses without a hard isinstance gate.
         """
-        backend = self.backend
+        backend = self._provider_registration_backend(self.backend)
         if backend is None:
             return
         if not self._is_alphamelts_backend(backend):
@@ -1055,6 +1056,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     @staticmethod
+    def _provider_registration_backend(backend: Any) -> Any | None:
+        if type(backend).__name__ == 'CachedRealBackend':
+            return getattr(backend, '_live_backend', None)
+        return backend
+
+    @staticmethod
     def _is_alphamelts_backend(backend: Any) -> bool:
         """Duck-type check for the AlphaMELTSBackend class.
 
@@ -1064,6 +1071,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         same idiom used elsewhere in this module for VapoRock /
         FactSAGE backend detection.
         """
+        backend = PyrolysisSimulator._provider_registration_backend(backend)
+        if backend is None:
+            return False
         for cls in type(backend).__mro__:
             if cls.__name__ == 'AlphaMELTSBackend':
                 return True
@@ -1071,11 +1081,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _register_freeze_gate_liquid_fraction_providers(self) -> None:
         """Register providers for the freeze gate scalar intent on demand."""
-        if self._is_alphamelts_backend(self.backend):
+        backend = self._provider_registration_backend(self.backend)
+        if self._is_alphamelts_backend(backend):
             from engines.alphamelts import AlphaMELTSProvider
 
             self._chem_registry.register_idempotent(
-                AlphaMELTSProvider(backend=self.backend),
+                AlphaMELTSProvider(backend=backend),
                 [ChemistryIntent.GATE_LIQUID_FRACTION],
             )
         from engines.magemin import MAGEMinShadowProvider
@@ -2354,6 +2365,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_equilibrium(self, result)
+            self._last_reduced_real_cache_state = getattr(
+                store,
+                'last_cache_state',
+                None,
+            )
         return result
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:

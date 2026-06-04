@@ -5,14 +5,18 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Any, Callable, Mapping, TypeVar
 
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBackend
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
+CACHED_REAL_BACKEND_NAME = "cached-real"
+CACHED_REAL_MISS_POLICIES = ("fail-loud", "live-fill")
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 
 _E = TypeVar("_E", bound=Exception)
 
@@ -26,6 +30,16 @@ class BackendSelectionPolicy(Enum):
 
     WEB_AUTODETECT = "web-autodetect"
     RUNNER_STRICT = "runner-strict"
+
+
+@dataclass(frozen=True)
+class CachedRealConfig:
+    """Runtime PT-1 cache selection for the cached-real tier."""
+
+    db_path: Path
+    authorized_backend_name: str
+    authorized_backend_version: str
+    miss_policy: str = "fail-loud"
 
 
 @dataclass(frozen=True)
@@ -49,6 +63,139 @@ def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
     )
 
 
+class CachedRealBackend:
+    """MeltBackend-shaped cached-real facade.
+
+    Cache lookup is owned by ``PT0DeterminismStore`` in ``core.py``. This
+    facade gives the public resolver a distinct, non-stub backend identity and
+    delegates only explicit ``live-fill`` misses to an active-safe real backend.
+    """
+
+    name = CACHED_REAL_BACKEND_NAME
+
+    def __init__(
+        self,
+        *,
+        config: CachedRealConfig,
+        live_backend: Any | None = None,
+    ) -> None:
+        self.config = config
+        self._live_backend = live_backend
+
+    def initialize(self, _config: Mapping[str, Any] | None = None) -> bool:
+        return True
+
+    def is_available(self) -> bool:
+        if self.config.miss_policy == "fail-loud":
+            return True
+        return (
+            self._live_backend is not None
+            and bool(self._live_backend.is_available())
+        )
+
+    def capabilities(self) -> Mapping[str, bool]:
+        if self._live_backend is not None:
+            capabilities = getattr(self._live_backend, "capabilities", None)
+            if callable(capabilities):
+                return capabilities()
+        return dict(DEFAULT_BACKEND_CAPABILITIES)
+
+    def equilibrate(
+        self,
+        *args: Any,
+        composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
+        **kwargs: Any,
+    ):
+        if self._live_backend is None:
+            raise RuntimeError(
+                "cached-real out-of-coverage: no live-fill backend configured"
+            )
+        if composition_mol_by_account is not None:
+            kwargs["composition_mol_by_account"] = composition_mol_by_account
+        return self._live_backend.equilibrate(*args, **kwargs)
+
+    def find_liquidus_solidus(
+        self,
+        *args: Any,
+        composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
+        **kwargs: Any,
+    ):
+        if self._live_backend is None:
+            raise RuntimeError(
+                "cached-real out-of-coverage: no live-fill backend configured"
+            )
+        finder = getattr(self._live_backend, "find_liquidus_solidus", None)
+        if not callable(finder):
+            raise RuntimeError(
+                "cached-real live-fill backend has no liquidus/solidus solver"
+            )
+        if composition_mol_by_account is not None:
+            kwargs["composition_mol_by_account"] = composition_mol_by_account
+        return finder(*args, **kwargs)
+
+
+def normalize_cached_real_config(
+    value: CachedRealConfig | Mapping[str, Any] | None,
+    *,
+    unavailable_error_cls: type[_E] = BackendUnavailableError,
+) -> CachedRealConfig:
+    """Validate and normalize the cached-real cache config."""
+
+    if value is None:
+        raise unavailable_error_cls(
+            "cached-real requires reduced_real_cache.db_path and "
+            "reduced_real_cache.miss_policy"
+        )
+    if isinstance(value, CachedRealConfig):
+        return value
+    if not isinstance(value, Mapping):
+        raise unavailable_error_cls("cached-real cache config must be a mapping")
+    raw_db_path = value.get("db_path")
+    if raw_db_path in (None, ""):
+        raise unavailable_error_cls("cached-real requires reduced_real_cache.db_path")
+    db_path = Path(str(raw_db_path)).expanduser()
+    if not db_path.is_absolute():
+        db_path = (_REPO_ROOT / db_path).resolve()
+    authorized_backend_name = str(
+        value.get("authorized_backend_name", "")
+    ).strip()
+    if not authorized_backend_name:
+        raise unavailable_error_cls(
+            "cached-real requires reduced_real_cache.authorized_backend_name"
+        )
+    authorized_backend_version = str(
+        value.get("authorized_backend_version", "")
+    ).strip()
+    if not authorized_backend_version:
+        raise unavailable_error_cls(
+            "cached-real requires reduced_real_cache.authorized_backend_version"
+        )
+    miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
+    miss_policy = miss_policy.replace("_", "-")
+    if miss_policy not in CACHED_REAL_MISS_POLICIES:
+        raise unavailable_error_cls(
+            "cached-real reduced_real_cache.miss_policy must be one of "
+            f"{', '.join(CACHED_REAL_MISS_POLICIES)}"
+        )
+    return CachedRealConfig(
+        db_path=db_path,
+        authorized_backend_name=authorized_backend_name,
+        authorized_backend_version=authorized_backend_version,
+        miss_policy=miss_policy,
+    )
+
+
+def build_cached_real_store(config: CachedRealConfig):
+    """Build the PT-0/PT-1 runtime store for a cached-real run."""
+
+    from simulator.reduced_real_determinism import PT0DeterminismStore
+
+    mode = "replay" if config.miss_policy == "fail-loud" else "capture"
+    store = PT0DeterminismStore(mode, db_path=config.db_path)
+    store.cached_real_miss_policy = config.miss_policy
+    return store
+
+
 def resolve_backend(
     backend_name: str,
     policy: BackendSelectionPolicy,
@@ -58,6 +205,8 @@ def resolve_backend(
     log_message: Callable[[str], None] | None = None,
     alphamelts_backend_cls: type = AlphaMELTSBackend,
     stub_backend_cls: type = StubBackend,
+    cached_real_config: CachedRealConfig | Mapping[str, Any] | None = None,
+    cached_real_live_backend_cls: type | None = None,
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
@@ -70,6 +219,8 @@ def resolve_backend(
             log_message=log_message,
             alphamelts_backend_cls=alphamelts_backend_cls,
             stub_backend_cls=stub_backend_cls,
+            cached_real_config=cached_real_config,
+            cached_real_live_backend_cls=cached_real_live_backend_cls,
         )
     if policy is BackendSelectionPolicy.RUNNER_STRICT:
         return _resolve_runner_strict(
@@ -77,6 +228,8 @@ def resolve_backend(
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
             stub_backend_cls=stub_backend_cls,
+            cached_real_config=cached_real_config,
+            cached_real_live_backend_cls=cached_real_live_backend_cls,
         )
     raise ValueError(f"unknown backend selection policy {policy!r}")
 
@@ -108,6 +261,8 @@ def _resolve_web_autodetect(
     log_message: Callable[[str], None] | None,
     alphamelts_backend_cls: type,
     stub_backend_cls: type,
+    cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
+    cached_real_live_backend_cls: type | None,
 ):
     if name in INELIGIBLE_ACTIVE_BACKENDS:
         backend_label = "VapoRock" if name == "vaporock" else "MAGEMin"
@@ -117,9 +272,20 @@ def _resolve_web_autodetect(
             "dispatcher; select alphamelts or auto."
         )
 
+    if name == CACHED_REAL_BACKEND_NAME:
+        backend = _cached_real_backend(
+            cached_real_config,
+            unavailable_error_cls=unavailable_error_cls,
+            alphamelts_backend_cls=alphamelts_backend_cls,
+            cached_real_live_backend_cls=cached_real_live_backend_cls,
+        )
+        _log_selection(backend, log_selection, log_message)
+        return backend
+
     if name not in ("", "auto", "stub", "alphamelts"):
         raise unavailable_error_cls(
-            f"unknown backend {name!r}; select auto, stub, or alphamelts"
+            f"unknown backend {name!r}; select auto, stub, alphamelts, "
+            "or cached-real"
         )
 
     # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
@@ -155,13 +321,15 @@ def _resolve_runner_strict(
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
     stub_backend_cls: type,
+    cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
+    cached_real_live_backend_cls: type | None,
 ):
     if name in ("", "stub"):
         return _stub_backend(stub_backend_cls)
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
-            "select stub or alphamelts"
+            "select stub, alphamelts, or cached-real"
         )
     if name == "alphamelts":
         backend = _try_alphamelts(alphamelts_backend_cls)
@@ -170,6 +338,13 @@ def _resolve_runner_strict(
         raise unavailable_error_cls(
             "AlphaMELTS unavailable; rerun with --backend=stub or "
             "install via install-dependencies.py"
+        )
+    if name == CACHED_REAL_BACKEND_NAME:
+        return _cached_real_backend(
+            cached_real_config,
+            unavailable_error_cls=unavailable_error_cls,
+            alphamelts_backend_cls=alphamelts_backend_cls,
+            cached_real_live_backend_cls=cached_real_live_backend_cls,
         )
     raise unavailable_error_cls(f"unknown backend {name!r}")
 
@@ -185,6 +360,58 @@ def _stub_backend(stub_backend_cls: type):
     backend = stub_backend_cls()
     backend.initialize({})
     return backend
+
+
+def _cached_real_backend(
+    cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
+    *,
+    unavailable_error_cls: type[_E],
+    alphamelts_backend_cls: type,
+    cached_real_live_backend_cls: type | None,
+) -> CachedRealBackend:
+    config = normalize_cached_real_config(
+        cached_real_config,
+        unavailable_error_cls=unavailable_error_cls,
+    )
+    live_backend = None
+    if config.miss_policy == "live-fill":
+        live_backend_cls = cached_real_live_backend_cls or alphamelts_backend_cls
+        live_backend = _try_alphamelts(live_backend_cls)
+        if live_backend is None:
+            raise unavailable_error_cls(
+                "cached-real live-fill requires an available live real backend"
+            )
+        live_identity = _live_backend_identity(live_backend)
+        expected_identity = (
+            config.authorized_backend_name,
+            config.authorized_backend_version,
+        )
+        if live_identity != expected_identity:
+            raise unavailable_error_cls(
+                "cached-real live-fill backend identity mismatch: "
+                f"configured {expected_identity[0]}@{expected_identity[1]}, "
+                f"got {live_identity[0]}@{live_identity[1]}"
+            )
+    return CachedRealBackend(config=config, live_backend=live_backend)
+
+
+def _live_backend_identity(backend: Any) -> tuple[str, str]:
+    raw_name = getattr(backend, "name", None)
+    if raw_name is None and any(
+        cls.__name__ == "AlphaMELTSBackend" for cls in type(backend).__mro__
+    ):
+        raw_name = "alphamelts"
+    name = str(raw_name or type(backend).__name__).strip()
+    getter = getattr(backend, "get_engine_version", None)
+    version = ""
+    if callable(getter):
+        try:
+            version = str(getter()).strip()
+        except Exception:  # noqa: BLE001 - fail-loud config validation below
+            version = "unavailable"
+    if not version:
+        version = "unavailable"
+    return name, version
 
 
 def _log_selection(

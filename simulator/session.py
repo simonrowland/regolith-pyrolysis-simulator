@@ -8,8 +8,11 @@ from typing import Any, Callable, Iterable, Mapping
 
 from simulator.backends import (
     BackendSelectionPolicy,
+    CACHED_REAL_BACKEND_NAME,
     SimulatorBuildConfig,
     build_simulator,
+    build_cached_real_store,
+    normalize_cached_real_config,
     resolve_backend,
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
@@ -77,6 +80,7 @@ class SimSessionConfig:
     unavailable_error_cls: type[Exception] = RuntimeError
     force_builtin_vapor_pressure: Callable[[PyrolysisSimulator], None] | None = None
     result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
+    reduced_real_cache: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         overrides = _canonical_runtime_campaign_overrides(
@@ -120,10 +124,21 @@ class SimSession:
     def start(self, config: SimSessionConfig) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
+        cached_real_config = None
+        if config.backend_name == CACHED_REAL_BACKEND_NAME:
+            cached_real_config = normalize_cached_real_config(
+                config.reduced_real_cache,
+                unavailable_error_cls=config.unavailable_error_cls,
+            )
+        elif config.reduced_real_cache is not None:
+            raise config.unavailable_error_cls(
+                "reduced_real_cache is only valid with backend_name='cached-real'"
+            )
         backend = resolve_backend(
             config.backend_name,
             config.backend_policy,
             unavailable_error_cls=config.unavailable_error_cls,
+            cached_real_config=cached_real_config,
         )
         if config.feedstock_id not in config.feedstocks:
             expected = sorted(config.feedstocks)[:5]
@@ -140,6 +155,10 @@ class SimSession:
                 vapor_pressures=config.vapor_pressures,
             )
         )
+        if cached_real_config is not None:
+            sim.configure_pt0_determinism_store(
+                build_cached_real_store(cached_real_config)
+            )
 
         try:
             sim.load_batch(

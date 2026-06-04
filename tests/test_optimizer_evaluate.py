@@ -428,3 +428,102 @@ def test_evalspec_cache_key_and_scored_result_are_deterministic() -> None:
     assert first.eval_spec == second.eval_spec
     assert first.objectives == second.objectives
     assert first.feasible == second.feasible
+
+
+def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
+    tmp_path,
+) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "pt1-cache.db"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_version": "test-version",
+    }
+    profile = {
+        **PROFILE,
+        "fidelities": {
+            "high": {
+                "backend_name": "cached-real",
+                "hours": 1,
+                "reduced_real_cache": cache_config,
+            }
+        },
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.backend_name == "cached-real"
+    assert executor.config.backend_name == "cached-real"
+    assert executor.config.reduced_real_cache == cache_config
+
+
+def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "pt1-cache.db"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_version": "test-version",
+    }
+    profile = {
+        **PROFILE,
+        "run": {
+            **PROFILE["run"],
+            "backend_name": "cached-real",
+            "reduced_real_cache": cache_config,
+        },
+        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.backend_name == "stub"
+    assert executor.config.backend_name == "stub"
+    assert executor.config.reduced_real_cache is None
+
+
+def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "pt1-cache.db"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_version": "test-version",
+    }
+    profile = {
+        **PROFILE,
+        "run": {
+            **PROFILE["run"],
+            "backend_name": "cached-real",
+            "reduced_real_cache": cache_config,
+        },
+        "fidelities": {"high": {"backend_name": "cached-real", "hours": 1}},
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.backend_name == "cached-real"
+    assert executor.config.backend_name == "cached-real"
+    assert executor.config.reduced_real_cache == cache_config

@@ -337,6 +337,7 @@ class PyrolysisRun:
     # values.  Production CLI invocations leave both empty and pick up
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
+    reduced_real_cache: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         overrides = _canonical_runtime_campaign_overrides(
@@ -406,6 +407,7 @@ class PyrolysisRun:
             vapor_pressures=vapor_pressures,
             campaign=campaign_name,
             backend_name=self.backend_name,
+            reduced_real_cache=self.reduced_real_cache,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             hours=int(self.hours),
             mass_kg=self.mass_kg,
@@ -477,6 +479,10 @@ class PyrolysisRun:
             "engines_used": engines_used,
             "kernel_commit_sha": kernel_commit_sha,
         }
+        if execution.reduced_real_cache:
+            run_metadata["reduced_real_cache"] = _json_safe(
+                execution.reduced_real_cache
+            )
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.

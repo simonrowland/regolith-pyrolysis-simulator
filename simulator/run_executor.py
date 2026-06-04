@@ -34,6 +34,7 @@ class RunExecution:
     error_message: str = ""
     reason: str = ""
     refusal_diagnostic: Mapping[str, Any] = field(default_factory=dict)
+    reduced_real_cache: Mapping[str, Any] = field(default_factory=dict)
 
 
 class RunExecutor:
@@ -88,6 +89,7 @@ class RunExecutor:
         shadow_trace = _collect_shadow_trace(sim, operator_decisions)
         trace = PhysicsTrace.from_simulator(sim)
         snapshots = tuple(getattr(sim.record, "snapshots", ()))
+        reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
         return RunExecution(
             session=session,
             simulator=sim,
@@ -100,6 +102,7 @@ class RunExecutor:
             error_message=error_message,
             reason=reason,
             refusal_diagnostic=refusal_diagnostic,
+            reduced_real_cache=reduced_real_cache,
         )
 
 
@@ -138,6 +141,29 @@ def _collect_shadow_trace(
         if event_type in ("parity_warning", "parity_error"):
             events.append(_json_safe(dict(record)))
     return events
+
+
+def _collect_reduced_real_cache_diagnostic(
+    sim: PyrolysisSimulator,
+) -> dict[str, Any]:
+    store_getter = getattr(sim, "_pt0_store", None)
+    store = store_getter() if callable(store_getter) else None
+    if store is None:
+        return {}
+    summary_getter = getattr(store, "summary", None)
+    summary = summary_getter() if callable(summary_getter) else {}
+    diagnostic = dict(summary or {})
+    diagnostic["last_cache_state"] = getattr(
+        sim,
+        "_last_reduced_real_cache_state",
+        None,
+    )
+    diagnostic["miss_policy"] = getattr(
+        store,
+        "cached_real_miss_policy",
+        None,
+    )
+    return _json_safe(diagnostic)
 
 
 def _json_safe(value: Any) -> Any:
