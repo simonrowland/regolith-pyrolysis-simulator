@@ -65,6 +65,17 @@ def test_atom_ledger_stores_moles_and_projects_kg():
     )
 
 
+@pytest.mark.parametrize("element", ["O", "Si", "Fe"])
+def test_transition_atom_tolerance_is_binding_for_common_elements(element):
+    ledger_module = importlib.import_module("simulator.accounting.ledger")
+
+    assert ledger_module._atom_tolerance_for_element(
+        element,
+        ledger_module.DEFAULT_ATOM_TOLERANCE_MOL,
+        ledger_module.DEFAULT_MASS_TOLERANCE_KG,
+    ) == pytest.approx(ledger_module.DEFAULT_ATOM_TOLERANCE_MOL)
+
+
 @pytest.mark.parametrize("oxide", ["FeO", "Fe2O3"])
 def test_reducible_oxide_transitions_conserve_elements(oxide):
     AtomLedger = _required_attr("simulator.accounting", "AtomLedger")
