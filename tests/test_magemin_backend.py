@@ -11,6 +11,8 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import re
+import subprocess
 import types
 import warnings
 from pathlib import Path
@@ -663,6 +665,92 @@ def test_magemin_live_pure_endmember_references_documented_xfail(
     pytest.xfail(
         f"MAGEMin ig subprocess is not accepted for pure {name} "
         f"endmember liquidus {reference_C:g} C"
+    )
+
+
+def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:
+    """Run the live binary at one ``buffer_n`` and return GAM[O] (mu of the
+    oxygen system component, kJ).
+
+    Builds the ``ig`` bulk vector directly with a **nonzero O component** so
+    the fO2 buffer actually engages. The production adapter
+    (``_build_ig_bulk_vector``) hard-zeros ``O``, and with ``O=0`` the qfm
+    buffer is inert -- GAM[O] is identical across every ``buffer_n`` (see
+    ``docs-private/research/2026-06-05-p3f/findings.md`` Finding 2). This test
+    therefore bypasses the adapter to probe the binary's real redox response.
+
+    GAM is reported in IG component order
+    ``SiO2 Al2O3 CaO MgO FeOt K2O Na2O TiO2 O Cr2O3 H2O`` -> O is index 8.
+    """
+    # Basalt analog (matches the live-smoke test) with O set nonzero.
+    bulk = "49,14,11,9,10.899810,0.8,2.5,1.5,1.0,0.2,0"
+    completed = subprocess.run(  # noqa: S603 - args are test-built constants
+        [
+            str(binary),
+            "--Verb=2",
+            "--db=ig",
+            "--Temp=1200.0",
+            "--Pres=2.0",
+            "--sys_in=wt",
+            f"--Bulk={bulk}",
+            "--buffer=qfm",
+            f"--buffer_n={buffer_n:.6f}",
+        ],
+        cwd=str(binary.parent),
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=True,
+    )
+    match = re.search(r"GAM = \[([^\]]+)\]", completed.stdout)
+    assert match, f"no GAM vector in MAGEMin stdout:\n{completed.stdout}"
+    gam = [float(x) for x in match.group(1).split(",")]
+    # Full IG order has 11 components; the O-component mu is index 8.
+    assert len(gam) == 11, gam
+    return gam[8]
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_buffer_n_sign_and_magnitude_round_trip():
+    """P3-F: the live binary must honour ``--buffer_n`` with the correct sign
+    AND magnitude, validating ``_resolve_buffer``'s
+    ``buffer_n = fO2_log - QFM(T)`` translation against the real MAGEMin.
+
+    The single-point ``ig`` CLI prints no explicit fO2/Fe3+; redox is carried
+    by the oxygen component's chemical potential, reported as GAM[O]. We use
+    GAM[O] as the non-speculative redox proxy (recon:
+    ``docs-private/research/2026-06-05-p3f/findings.md`` Finding 1).
+
+    Two invariants, both anchored to MAGEMin's documented buffer formula
+    ``mu_offset(O2) = T_K * 0.019145 * buffer_n`` (0.019145 = R*ln10/1000):
+      - SIGN: higher buffer_n => higher (less negative) GAM[O] => more
+        oxidizing. So requesting fO2 above QFM (positive buffer_n) is more
+        oxidizing, confirming the translation sign.
+      - MAGNITUDE: d(GAM[O])/d(buffer_n) == T_K * 0.019145 / 2 (per single O;
+        the formula is per O2 = 2 O), so a delta of 4 buffer_n units shifts
+        GAM[O] by T_K * 0.019145 * 4 / 2 kJ.
+    """
+    binary = _LIVE_MAGEMIN_BINARY
+    mu_o_reduced = _run_magemin_gam_o(binary, buffer_n=-2.0)
+    mu_o_oxidized = _run_magemin_gam_o(binary, buffer_n=2.0)
+
+    # SIGN: oxidizing (higher buffer_n) gives a less-negative oxygen mu.
+    assert mu_o_oxidized > mu_o_reduced, (
+        f"buffer_n=+2 mu_O={mu_o_oxidized} must exceed "
+        f"buffer_n=-2 mu_O={mu_o_reduced} (higher buffer_n = more oxidizing)"
+    )
+
+    # MAGNITUDE: anchored to MAGEMin's own buffer formula, not a fitted
+    # constant. T = 1200 C = 1473.15 K; delta buffer_n = 4.
+    T_K = 1200.0 + 273.15
+    expected_delta = T_K * 0.019145 * 4.0 / 2.0
+    observed_delta = mu_o_oxidized - mu_o_reduced
+    assert observed_delta == pytest.approx(expected_delta, abs=0.5), (
+        f"GAM[O] shift {observed_delta:.4f} kJ over buffer_n delta=4 must "
+        f"match MAGEMin's buffer formula prediction {expected_delta:.4f} kJ"
     )
 
 
