@@ -48,7 +48,7 @@ optimize = ["optuna==4.8.0"]
 # alphaMELTS binary is documented in docs/melt-backends.md rather than pinned).
 #
 # Build path:
-#   1. Clone + build MAGEMin v1.9.3 outside synced repo storage (for example
+#   1. Clone + build MAGEMin (currently v1.9.6 on cluster) outside synced repo storage (for example
 #      ~/.local/src/MAGEMin; see its README "Manual compilation": needs MPICH,
 #      LAPACKE/Accelerate, NLopt; `make all` produces `MAGEMin`).
 #   2. Copy the executable to `engines/magemin/bin/MAGEMin`. That ignored path
