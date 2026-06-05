@@ -21,6 +21,7 @@ from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
     PT0CacheMiss,
     PT0DeterminismStore,
+    PT0InvalidControls,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
     canonical_json_bytes,
@@ -379,6 +380,34 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
     assert first["engine_version"] == "alpha-v1"
     assert _key_hash(different_provider) != _key_hash(first)
     assert _key_hash(different_version) != _key_hash(first)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        (
+            "temperature_C",
+            float("nan"),
+            "non-finite melt temperature passed to PT-0 quantization",
+        ),
+        (
+            "p_total_mbar",
+            float("inf"),
+            "non-finite melt pressure passed to PT-0 quantization",
+        ),
+    ),
+)
+def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
+    field: str,
+    value: float,
+    message: str,
+) -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    setattr(sim.melt, field, value)
+
+    with pytest.raises(PT0InvalidControls, match=message):
+        store.quantized_controls(sim, fO2_log=0.0)
 
 
 @pytest.mark.parametrize(

@@ -81,6 +81,10 @@ class PT1PersistentStoreCorrupt(PT0CacheCollision):
     """Persistent PT-1 row failed verify-on-hit integrity checks."""
 
 
+class PT0InvalidControls(RuntimeError):
+    """PT-0 control quantization received a non-finite process value."""
+
+
 class PT0DeterminismStore:
     """PT-0 capture/replay store, optionally backed by the PT-1 SQLite DB."""
 
@@ -134,16 +138,28 @@ class PT0DeterminismStore:
         *,
         fO2_log: float | None,
     ) -> dict[str, float | None]:
+        melt_temperature_C = float(sim.melt.temperature_C)
         T_K = _quantize(
-            float(sim.melt.temperature_C) + 273.15,
+            melt_temperature_C + 273.15,
             _T_K_QUANTUM,
             2,
         )
+        if T_K is None:
+            raise PT0InvalidControls(
+                "non-finite melt temperature passed to PT-0 quantization: "
+                f"{melt_temperature_C!r}"
+            )
+        melt_pressure_mbar = float(sim.melt.p_total_mbar)
         pressure_bar = _quantize(
-            float(sim.melt.p_total_mbar) / 1000.0,
+            melt_pressure_mbar / 1000.0,
             _PRESSURE_BAR_QUANTUM,
             8,
         )
+        if pressure_bar is None:
+            raise PT0InvalidControls(
+                "non-finite melt pressure passed to PT-0 quantization: "
+                f"{melt_pressure_mbar!r} mbar"
+            )
         if fO2_log is None:
             fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
         return {
