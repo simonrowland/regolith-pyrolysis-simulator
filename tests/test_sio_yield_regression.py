@@ -305,9 +305,16 @@ def test_intentional_pipe_cold_spot_flags_and_increases_wall_deposit():
     hot_route = hot.route(flux, melt)
     cold_route = cold.route(flux, melt)
 
+    # Cold spots are deliberate wall-deposit accounting signals, not refusals.
     assert not hot_route.cold_spot_warnings
     assert cold_route.cold_spot_warnings
     assert "stage_0_to_stage_1" in cold_route.cold_spot_warnings[0]
+    assert cold.last_cold_spot_diagnostic["has_cold_spot"] is True
+    # Order-independent: a future multi-species flux must not break this lock.
+    assert any(
+        f["species"] == "SiO"
+        for f in cold.last_cold_spot_diagnostic["findings"]
+    )
     assert cold_route.wall_deposit_by_species["SiO"] > (
         hot_route.wall_deposit_by_species.get("SiO", 0.0)
     )

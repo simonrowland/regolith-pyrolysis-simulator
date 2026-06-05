@@ -5,7 +5,8 @@ import pytest
 import yaml
 
 from simulator import condensation as condensation_module
-from simulator.condensation import KnudsenRegime
+from simulator.condensation import CondensationModel, KnudsenRegime
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.runner import PyrolysisRun
 
 
@@ -139,6 +140,23 @@ def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     assert any(
         segment["regime"] == KnudsenRegime.FREE_MOLECULAR.value
         for segment in diagnostic["segments"]
+    )
+
+
+def test_direct_condensation_model_without_pressure_reports_unconfigured():
+    train = CondensationTrain.create_default()
+    model = CondensationModel(train, wall_temperature_C=1800.0)
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    flux = EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0)
+
+    route = model.route(flux, melt)
+
+    # Direct callers with no pressure policy get telemetry, not a refusal.
+    assert route.knudsen_regime_diagnostic["status"] == "unconfigured"
+    assert (
+        route.knudsen_regime_diagnostic["reason"]
+        == "knudsen_policy_unconfigured"
     )
 
 
