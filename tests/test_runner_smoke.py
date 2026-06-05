@@ -132,6 +132,7 @@ def _run_scenario(scenario: dict) -> dict:
         campaign=scenario["campaign"],
         hours=scenario["hours"],
         additives_kg=dict(scenario["additives_kg"]),
+        allow_fallback_vapor=True,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "goal-18-fixture",

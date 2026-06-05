@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from simulator.chemistry.kernel import ChemistryIntent
+from simulator.chemistry.kernel import ChemistryIntent, IntentResult
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.runner import _vapor_pressure_source_report
@@ -169,3 +169,48 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
 
     assert result.vapor_pressures_Pa["Na"] == pytest.approx(kernel_vp["Na"])
     assert result.vapor_pressures_source["Na"] == "builtin_fallback"
+
+
+def test_kernel_ok_empty_vapor_pressures_zero_backend_surface(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monkeypatch,
+):
+    backend = _MatchingThermoEngineBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _setpoints_with_builtin_vapor_fallback(setpoints_data),
+        feedstocks_data,
+        vapor_pressure_data,
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.melt.temperature_C = 1700.0
+    result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={"Na": 12.0},
+        vapor_pressures_source={"Na": "thermoengine"},
+        status="ok",
+    )
+
+    def _dispatch_empty_ok(*_, **__):
+        return IntentResult(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            status="ok",
+            diagnostic={"vapor_pressures_Pa": {}},
+        )
+
+    monkeypatch.setattr(sim, "_dispatch_only", _dispatch_empty_ok)
+
+    sim._refresh_vapor_pressures_from_kernel(result)
+
+    assert result.vapor_pressures_Pa == {}
+    assert result.vapor_pressures_source == {}
+    assert sim._last_vapor_pressures_source == {}
+    assert (
+        sim._last_vapor_pressure_diagnostic["vapor_pressure_zero_reason"]
+        == "kernel_ok_empty"
+    )

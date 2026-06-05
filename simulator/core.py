@@ -2513,7 +2513,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             #
             #   - status='ok' / empty kernel_vp: legit (e.g. melt
             #     below evaporation threshold or oxide-only system);
-            #     keep backend, no escalation.
+            #     kernel-computed zero is authoritative.
             #   - status='unavailable' / 'failed' AND
             #     allow_fallback_vapor=False: raise loud so the
             #     operator sees the missing authoritative dispatch
@@ -2546,7 +2546,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # the new 'unknown' bucket for malformed status) with no
             # kernel pressures is a failure mode under
             # allow_fallback_vapor=False.
-            if kernel_status != 'ok':
+            if kernel_status == 'ok':
+                result.vapor_pressures_Pa = {}
+                result.vapor_pressures_source = {}
+                diagnostic['vapor_pressures_Pa'] = {}
+                diagnostic['vapor_pressures_source'] = {}
+                diagnostic[
+                    'vapor_pressure_zero_reason'
+                ] = 'kernel_ok_empty'
+            else:
                 if not self._allow_fallback_vapor:
                     # Codex challenge pre-0.5.1 P2 (2026-05-27): keep the
                     # exception message bounded so operator logs stay
@@ -2581,11 +2589,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f"allow_fallback_vapor=True."
                 )
                 diagnostic['kernel_vapor_pressure_warnings'] = existing_warnings
-            if backend_sources:
-                result.vapor_pressures_source = dict(backend_sources)
-            diagnostic['vapor_pressures_source'] = dict(
-                getattr(result, 'vapor_pressures_source', {}) or {}
-            )
+                if backend_sources:
+                    result.vapor_pressures_source = dict(backend_sources)
+                diagnostic['vapor_pressures_source'] = dict(
+                    getattr(result, 'vapor_pressures_source', {}) or {}
+                )
         kernel_activities = diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
