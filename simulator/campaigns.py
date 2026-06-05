@@ -284,6 +284,8 @@ class CampaignManager:
                 # explicitly named axial — whole-dataclass replace.
                 melt.stir_state = new_state
 
+        melt.validate_melt_pressures()
+
     # ------------------------------------------------------------------
     # Temperature ramp
     # ------------------------------------------------------------------

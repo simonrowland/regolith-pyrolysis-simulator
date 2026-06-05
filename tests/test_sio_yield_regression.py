@@ -424,6 +424,13 @@ def test_liner_temperature_schedule_is_recipe_controllable():
     assert model.resolve_pipe_temperature_C(melt) == pytest.approx(1600.0)
 
 
+def test_pipe_conductance_fail_closes_on_nonphysical_absolute_temperature():
+    model = OverheadGasModel()
+
+    assert model._pipe_conductance(100.0, -273.15) == 0.0
+    assert model._pipe_conductance(100.0, -274.0) == 0.0
+
+
 def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
     """The pO2 lever suppresses SiO via the 1/sqrt(pO2) Ellingham factor.
 

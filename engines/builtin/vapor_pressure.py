@@ -72,6 +72,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 #
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
+ELLINGHAM_FIT_RANGE_K = (1100.0, 1700.0)
 _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
     # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
@@ -114,6 +115,21 @@ def _require_finite_vapor_value(
             f"value={value!r}"
         )
     return checked
+
+
+def _ellingham_fit_extrapolation(
+    temperature_K: float,
+    *,
+    species: str,
+) -> dict[str, object] | None:
+    valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
+    if valid_low <= temperature_K <= valid_high:
+        return None
+    return {
+        "temperature_K": float(temperature_K),
+        "fit_range_K": (valid_low, valid_high),
+        "species": species,
+    }
 
 
 def _pow10_pressure_or_raise(
@@ -209,6 +225,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressures: dict[str, float] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
+        ellingham_extrapolations: dict[str, dict[str, object]] = {}
         warnings: list[str] = []
 
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
@@ -253,6 +270,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             if a_oxide <= 1e-10:
                 continue
+
+            ellingham_extrapolation = _ellingham_fit_extrapolation(
+                T_K,
+                species=species,
+            )
+            if ellingham_extrapolation is not None:
+                ellingham_extrapolations[species] = ellingham_extrapolation
+                valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
+                warnings.append(
+                    f"{species} Ellingham JANAF high-T fit extrapolated beyond "
+                    f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
+                    f"{T_K:.2f} K"
+                )
 
             activities[species] = a_oxide
 
@@ -357,6 +387,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "activities": activities,
                 "pO2_bar": pO2_bar,
                 "extrapolated_beyond_valid_range_K": metal_extrapolations,
+                "ellingham_extrapolated_beyond_fit_range_K": (
+                    ellingham_extrapolations
+                ),
             },
             warnings=tuple(warnings),
         )

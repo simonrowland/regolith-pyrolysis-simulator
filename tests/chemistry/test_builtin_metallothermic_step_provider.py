@@ -465,6 +465,55 @@ def test_c3_k_shuttle_refuses_1150c_feo_after_v1c_janaf_refit(
     assert result.diagnostic["margin_kJ_per_mol_O2"] < 0.0
 
 
+def test_c3_na_shuttle_flags_ellingham_pair_fit_band_extrapolation(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    FeO_kg = 10.0
+    FeO_mol = FeO_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": FeO_mol},
+            "process.metal_phase": {},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=view,
+        temperature_C=800.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_NA,
+            "na_target_stage": "feo_cleanup",
+            "reagent_available_kg": 12.0,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    flagged = result.diagnostic[
+        "ellingham_extrapolated_beyond_fit_range_K"
+    ]
+    assert flagged["Na/FeO"]["temperature_K"] == pytest.approx(1073.15)
+    assert tuple(flagged["Na/FeO"]["fit_range_K"]) == (1100.0, 1700.0)
+    assert any(
+        "Na/FeO Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
+        in warning
+        for warning in result.warnings
+    )
+
+
 @pytest.mark.parametrize("temperature_C", [1275.0, 1300.0])
 def test_c3_k_shuttle_refuses_feo_above_crossover(
     temperature_C, vapor_pressure_data, feedstocks_data, setpoints_data

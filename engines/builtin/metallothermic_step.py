@@ -125,7 +125,10 @@ from engines.builtin._common import (
     reject_wrong_intent,
     unpack_controls,
 )
-from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
+from engines.builtin.vapor_pressure import (
+    ELLINGHAM_FIT_RANGE_K,
+    _ELLINGHAM_THERMO,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -376,6 +379,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "FeO",
             temperature_C,
         )
+        fit_extrapolations = self._ellingham_pair_fit_extrapolations(
+            "K",
+            ("FeO",),
+            temperature_C,
+        )
+        fit_warnings = self._ellingham_fit_warnings(fit_extrapolations)
         if margin <= 0.0:
             return self._refused_result(
                 "thermodynamic_margin_nonpositive",
@@ -385,6 +394,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 margin_kJ_per_mol_O2=margin,
                 crossover_temperature_C=self._crossover_temperature_C("K", "Fe"),
                 control_audit=control_audit,
+                extra_diagnostic=self._ellingham_fit_diagnostic(
+                    fit_extrapolations
+                ),
+                warnings=fit_warnings,
             )
 
         # Stoichiometric integration in mol space, line-for-line with the
@@ -436,18 +449,21 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             reason="c3_k_shuttle_fe_reduction",
             atom_balance_proof=atom_proof,
         )
+        diagnostic = {
+            "reaction_family": REACTION_FAMILY_C3_K,
+            "reagent_consumed_kg": K_used_kg,
+            "oxide_reduced_kg": FeO_removed_kg,
+            "metal_produced_kg": Fe_produced_kg,
+            "metal_species": "Fe",
+        }
+        diagnostic.update(self._ellingham_fit_diagnostic(fit_extrapolations))
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
             control_audit=control_audit,
-            diagnostic={
-                "reaction_family": REACTION_FAMILY_C3_K,
-                "reagent_consumed_kg": K_used_kg,
-                "oxide_reduced_kg": FeO_removed_kg,
-                "metal_produced_kg": Fe_produced_kg,
-                "metal_species": "Fe",
-            },
+            diagnostic=diagnostic,
+            warnings=tuple(fit_warnings),
         )
 
     # ------------------------------------------------------------------
@@ -507,6 +523,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         target_stage, target_priority, thermo_audit = (
             self._resolve_na_target_priority(controls, temperature_C)
         )
+        fit_extrapolations = dict(
+            thermo_audit.get("ellingham_extrapolated_beyond_fit_range_K") or {}
+        )
+        fit_warnings = self._ellingham_fit_warnings(fit_extrapolations)
 
         FeO_available_kg = composition_kg.get("FeO", 0.0)
         TiO2_available_kg = composition_kg.get("TiO2", 0.0)
@@ -520,6 +540,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             return self._empty_result(
                 "c3_na_shuttle skipped: injection floor (<0.001 kg Na)",
                 control_audit=control_audit,
+                diagnostic=self._ellingham_fit_diagnostic(fit_extrapolations),
+                warnings=fit_warnings,
             )
 
         mol_Na = Na_inject_kg / molar_mass["Na"] * 1000.0
@@ -627,26 +649,33 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         if total_Na_used_mol <= 0.0:
             if refused_targets:
+                diagnostic = {
+                    "reason_refused": "thermodynamic_margin_nonpositive",
+                    "reaction_family": REACTION_FAMILY_C3_NA,
+                    "target_stage": target_stage,
+                    "target_priority": list(target_priority),
+                    "thermo_priority": list(thermo_audit["priority"]),
+                    "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
+                    "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
+                    "accepted_targets": accepted_targets,
+                    "refused_targets": refused_targets,
+                }
+                diagnostic.update(
+                    self._ellingham_fit_diagnostic(fit_extrapolations)
+                )
                 return IntentResult(
                     intent=ChemistryIntent.METALLOTHERMIC_STEP,
                     status="refused",
                     transition=None,
                     control_audit=control_audit,
-                    diagnostic={
-                        "reason_refused": "thermodynamic_margin_nonpositive",
-                        "reaction_family": REACTION_FAMILY_C3_NA,
-                        "target_stage": target_stage,
-                        "target_priority": list(target_priority),
-                        "thermo_priority": list(thermo_audit["priority"]),
-                        "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
-                        "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
-                        "accepted_targets": accepted_targets,
-                        "refused_targets": refused_targets,
-                    },
+                    diagnostic=diagnostic,
+                    warnings=tuple(fit_warnings),
                 )
             return self._empty_result(
                 "c3_na_shuttle skipped: no oxide accepted Na reduction",
                 control_audit=control_audit,
+                diagnostic=self._ellingham_fit_diagnostic(fit_extrapolations),
+                warnings=fit_warnings,
             )
 
         # Build mol-native proposal.  Both reactions converge on the
@@ -704,38 +733,41 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             reason="c3_na_shuttle_reduction",
             atom_balance_proof=atom_proof,
         )
+        diagnostic = {
+            "reaction_family": REACTION_FAMILY_C3_NA,
+            "target_stage": target_stage,
+            "target_priority": list(target_priority),
+            "thermo_priority": list(thermo_audit["priority"]),
+            "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
+            "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
+            "accepted_targets": accepted_targets,
+            "refused_targets": refused_targets,
+            "reagent_consumed_kg": Na_used_kg,
+            "oxide_reduced_kg": (
+                FeO_removed_kg + Cr2O3_removed_kg + TiO2_removed_kg
+            ),
+            "metal_produced_kg": (
+                Fe_produced_kg + Cr_produced_kg + Ti_produced_kg
+            ),
+            "per_oxide_reduced_kg": {
+                "FeO": FeO_removed_kg,
+                "Cr2O3": Cr2O3_removed_kg,
+                "TiO2": TiO2_removed_kg,
+            },
+            "per_metal_produced_kg": {
+                "Fe": Fe_produced_kg,
+                "Cr": Cr_produced_kg,
+                "Ti": Ti_produced_kg,
+            },
+        }
+        diagnostic.update(self._ellingham_fit_diagnostic(fit_extrapolations))
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=proposal,
             control_audit=control_audit,
-            diagnostic={
-                "reaction_family": REACTION_FAMILY_C3_NA,
-                "target_stage": target_stage,
-                "target_priority": list(target_priority),
-                "thermo_priority": list(thermo_audit["priority"]),
-                "thermo_deltaG_kJ_per_mol_O2": thermo_audit["deltaG"],
-                "na_reduction_margin_kJ_per_mol_O2": thermo_audit["margin"],
-                "accepted_targets": accepted_targets,
-                "refused_targets": refused_targets,
-                "reagent_consumed_kg": Na_used_kg,
-                "oxide_reduced_kg": (
-                    FeO_removed_kg + Cr2O3_removed_kg + TiO2_removed_kg
-                ),
-                "metal_produced_kg": (
-                    Fe_produced_kg + Cr_produced_kg + Ti_produced_kg
-                ),
-                "per_oxide_reduced_kg": {
-                    "FeO": FeO_removed_kg,
-                    "Cr2O3": Cr2O3_removed_kg,
-                    "TiO2": TiO2_removed_kg,
-                },
-                "per_metal_produced_kg": {
-                    "Fe": Fe_produced_kg,
-                    "Cr": Cr_produced_kg,
-                    "Ti": Ti_produced_kg,
-                },
-            },
+            diagnostic=diagnostic,
+            warnings=tuple(fit_warnings),
         )
 
     # ------------------------------------------------------------------
@@ -1004,13 +1036,23 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         )
 
     @staticmethod
-    def _empty_result(reason: str, *, control_audit=None) -> IntentResult:
+    def _empty_result(
+        reason: str,
+        *,
+        control_audit=None,
+        diagnostic: Mapping[str, Any] | None = None,
+        warnings: tuple[str, ...] = (),
+    ) -> IntentResult:
+        payload = {"reason_skipped": reason}
+        if diagnostic:
+            payload.update(dict(diagnostic))
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="ok",
             transition=None,
             control_audit=control_audit,
-            diagnostic={"reason_skipped": reason},
+            diagnostic=payload,
+            warnings=tuple(warnings),
         )
 
     @classmethod
@@ -1056,20 +1098,26 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         margin_kJ_per_mol_O2: float,
         crossover_temperature_C: float | None,
         control_audit=None,
+        extra_diagnostic: Mapping[str, Any] | None = None,
+        warnings: tuple[str, ...] = (),
     ) -> IntentResult:
+        diagnostic = {
+            "reason_refused": reason,
+            "reductant": reductant,
+            "target_oxide": target_oxide,
+            "temperature_C": float(temperature_C),
+            "margin_kJ_per_mol_O2": float(margin_kJ_per_mol_O2),
+            "crossover_temperature_C": crossover_temperature_C,
+        }
+        if extra_diagnostic:
+            diagnostic.update(dict(extra_diagnostic))
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
             status="refused",
             transition=None,
             control_audit=control_audit,
-            diagnostic={
-                "reason_refused": reason,
-                "reductant": reductant,
-                "target_oxide": target_oxide,
-                "temperature_C": float(temperature_C),
-                "margin_kJ_per_mol_O2": float(margin_kJ_per_mol_O2),
-                "crossover_temperature_C": crossover_temperature_C,
-            },
+            diagnostic=diagnostic,
+            warnings=tuple(warnings),
         )
 
     @staticmethod
@@ -1146,6 +1194,57 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         return targets or NA_STAGE_TARGETS[NA_TARGET_CR_TI]
 
     @staticmethod
+    def _ellingham_fit_diagnostic(
+        extrapolations: Mapping[str, Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        if not extrapolations:
+            return {}
+        return {
+            "ellingham_extrapolated_beyond_fit_range_K": {
+                str(pair): dict(data)
+                for pair, data in extrapolations.items()
+            }
+        }
+
+    @staticmethod
+    def _ellingham_fit_warnings(
+        extrapolations: Mapping[str, Mapping[str, Any]],
+    ) -> tuple[str, ...]:
+        warnings: list[str] = []
+        for pair, data in extrapolations.items():
+            valid_low, valid_high = data["fit_range_K"]
+            warnings.append(
+                f"{pair} Ellingham JANAF high-T fit extrapolated beyond "
+                f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
+                f"{float(data['temperature_K']):.2f} K"
+            )
+        return tuple(warnings)
+
+    @classmethod
+    def _ellingham_pair_fit_extrapolations(
+        cls,
+        reductant: str,
+        target_oxides: tuple[str, ...],
+        temperature_C: float,
+    ) -> dict[str, dict[str, Any]]:
+        temperature_K = float(temperature_C) + 273.15
+        valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
+        if valid_low <= temperature_K <= valid_high:
+            return {}
+        flagged: dict[str, dict[str, Any]] = {}
+        for target_oxide in target_oxides:
+            target_metal = TARGET_OXIDE_TO_METAL[target_oxide]
+            pair = f"{reductant}/{target_oxide}"
+            flagged[pair] = {
+                "temperature_K": temperature_K,
+                "fit_range_K": (valid_low, valid_high),
+                "reductant": reductant,
+                "target_oxide": target_oxide,
+                "target_metal": target_metal,
+            }
+        return flagged
+
+    @staticmethod
     def _delta_g_kj_per_mol_o2(metal: str, temperature_C: float) -> float:
         dH_f, dS_f, _n_M, _n_ox = _ELLINGHAM_THERMO[metal]
         return dH_f - (float(temperature_C) + 273.15) * dS_f
@@ -1196,4 +1295,11 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "priority": priority,
             "deltaG": delta_g,
             "margin": margin,
+            "ellingham_extrapolated_beyond_fit_range_K": (
+                cls._ellingham_pair_fit_extrapolations(
+                    "Na",
+                    targets,
+                    temperature_C,
+                )
+            ),
         }

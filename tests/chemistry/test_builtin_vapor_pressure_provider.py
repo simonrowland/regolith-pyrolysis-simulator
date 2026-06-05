@@ -26,6 +26,7 @@ import pytest
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
+    ELLINGHAM_FIT_RANGE_K,
     _ELLINGHAM_THERMO,
 )
 from simulator.equilibrium import EquilibriumMixin
@@ -157,6 +158,45 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     assert tuple(extrapolation["valid_range_K"]) == (1115.0, 1757.0)
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
+        for warning in result.warnings
+    )
+
+
+def test_ellingham_fit_band_extrapolation_is_diagnostic(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"FeO": 1.0}},
+        species_formula_registry=sim.species_formula_registry,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=view,
+        temperature_C=800.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    extrapolation = result.diagnostic[
+        "ellingham_extrapolated_beyond_fit_range_K"
+    ]["Fe"]
+    assert extrapolation["temperature_K"] == pytest.approx(1073.15)
+    assert tuple(extrapolation["fit_range_K"]) == ELLINGHAM_FIT_RANGE_K
+    assert any(
+        "Fe Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
+        in warning
         for warning in result.warnings
     )
 

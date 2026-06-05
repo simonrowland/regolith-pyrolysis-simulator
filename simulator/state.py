@@ -31,6 +31,8 @@ OXIDE_SPECIES = [
     'NiO', 'CoO',
 ]
 
+PRESSURE_PARTIAL_TOTAL_TOL_MBAR = 1e-9
+
 # --- Metal products extracted from the melt ---
 # Each metal is obtained by reducing or evaporating its parent oxide.
 METAL_SPECIES = [
@@ -543,6 +545,38 @@ class MeltState:
         + write-via-setter only.
         """
         self.stir_state.axial = float(value)
+
+    def validate_melt_pressures(self) -> None:
+        try:
+            pO2 = float(self.pO2_mbar)
+            p_total = float(self.p_total_mbar)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "melt_pressure_invalid_nonfinite: "
+                f"pO2_mbar={self.pO2_mbar!r} "
+                f"p_total_mbar={self.p_total_mbar!r}"
+            ) from exc
+        if not math.isfinite(pO2) or not math.isfinite(p_total):
+            raise ValueError(
+                "melt_pressure_invalid_nonfinite: "
+                f"pO2_mbar={self.pO2_mbar!r} "
+                f"p_total_mbar={self.p_total_mbar!r}"
+            )
+        if pO2 < 0.0 or p_total < 0.0:
+            raise ValueError(
+                "melt_pressure_invalid_negative: "
+                f"pO2_mbar={pO2:.12g} p_total_mbar={p_total:.12g}"
+            )
+        tolerance = max(
+            PRESSURE_PARTIAL_TOTAL_TOL_MBAR,
+            1e-12 * max(1.0, abs(pO2), abs(p_total)),
+        )
+        if pO2 - p_total > tolerance:
+            raise ValueError(
+                "melt_pressure_partial_exceeds_total: "
+                f"pO2_mbar={pO2:.12g} > p_total_mbar={p_total:.12g}; "
+                "oxygen partial pressure cannot exceed total pressure"
+            )
 
     def composition_wt_pct(self) -> Dict[str, float]:
         """Current composition as weight percent."""

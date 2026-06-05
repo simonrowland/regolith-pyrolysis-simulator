@@ -3709,6 +3709,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
+        self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(campaign)
         self._configure_freeze_gate(campaign)
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
@@ -4159,6 +4160,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Return current state without advancing
             return self._make_snapshot()
         self._mre_anode_O2_kg_this_hr = 0.0
+        self.melt.validate_melt_pressures()
 
         # --- 2. Temperature ramp ---
         self._update_temperature()

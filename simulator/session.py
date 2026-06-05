@@ -276,6 +276,10 @@ class SimSession:
             # the setpoint, NOT requesting controlled-O2).
             new_pO2 = float(value)
             sim.melt.pO2_mbar = new_pO2
+            sim.melt.p_total_mbar = max(
+                sim.melt.p_total_mbar,
+                sim.melt.pO2_mbar,
+            )
             if new_pO2 > 0.0:
                 # Only import locally to avoid a top-level cycle.
                 from simulator.state import Atmosphere
@@ -344,11 +348,16 @@ class SimSession:
                 # requesting controlled-O2).
                 new_pO2 = float(value)
                 sim.melt.pO2_mbar = new_pO2
+                sim.melt.p_total_mbar = max(
+                    sim.melt.p_total_mbar,
+                    sim.melt.pO2_mbar,
+                )
                 if new_pO2 > 0.0:
                     from simulator.state import Atmosphere
                     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
+        sim.melt.validate_melt_pressures()
 
     def pause(self) -> None:
         self._paused = True

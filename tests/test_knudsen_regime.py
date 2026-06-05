@@ -5,7 +5,11 @@ import pytest
 import yaml
 
 from simulator import condensation as condensation_module
-from simulator.condensation import CondensationModel, KnudsenRegime
+from simulator.condensation import (
+    CondensationModel,
+    KnudsenRegime,
+    KnudsenRegimeRefusal,
+)
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.runner import PyrolysisRun
 
@@ -49,6 +53,37 @@ def test_knudsen_number_matches_kinetic_theory_known_case():
 )
 def test_knudsen_regime_classification_boundaries(knudsen_number, expected):
     assert condensation_module.classify_knudsen_regime(knudsen_number) is expected
+
+
+def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
+    assert math.isinf(condensation_module._mean_free_path_m(0.0, 1773.15))
+    assert math.isinf(
+        condensation_module._knudsen_number(0.0, 1773.15, 0.12)
+    )
+
+    diagnostic = condensation_module.knudsen_regime_diagnostic(
+        overhead_pressure_mbar=0.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+    )
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
+    assert diagnostic["knudsen_number"] is None
+
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=0.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1500.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        model.route(flux, melt)
+    assert exc_info.value.diagnostic["status"] == "refused"
+    assert exc_info.value.diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
 
 
 def test_default_setpoint_recipes_are_viscous():

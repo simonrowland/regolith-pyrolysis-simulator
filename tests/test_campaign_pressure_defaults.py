@@ -58,6 +58,26 @@ def test_campaign_pressure_default_override_reaches_melt_state():
     assert melt.p_total_mbar == pytest.approx(1.5)
 
 
+def test_melt_pressure_validator_refuses_partial_pressure_above_total():
+    melt = MeltState()
+    melt.p_total_mbar = 1.0
+    melt.pO2_mbar = 1.0 + 5e-10
+    melt.validate_melt_pressures()
+
+    melt.pO2_mbar = 1.1
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+        melt.validate_melt_pressures()
+
+
+def test_configure_campaign_refuses_pO2_default_above_total():
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2B"]["pO2_mbar_default"] = 2.0
+    setpoints["campaigns"]["C2B"]["p_total_mbar_default"] = 1.0
+
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+        CampaignManager(setpoints).configure_campaign(MeltState(), CampaignPhase.C2B)
+
+
 def test_present_but_nonnumeric_campaign_pressure_default_raises():
     setpoints = deepcopy(_setpoints())
     setpoints["campaigns"]["C2B"]["pO2_mbar_default"] = "bad"
