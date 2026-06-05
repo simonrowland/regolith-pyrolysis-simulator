@@ -40,6 +40,26 @@ def test_sio_yield_diagnostics_require_snapshot_mass_balance_key() -> None:
         _latest_mass_balance_pct({"per_hour_summary": [{"T_C": 1400.0}]})
 
 
+def test_sio_yield_diagnostics_reject_non_numeric_mass_balance_value() -> None:
+    # runner.py:741 — a present-but-non-numeric balance must fail loud, not be
+    # coerced or silently skipped.
+    with pytest.raises(
+        EngineBugAbort, match="mass_balance_key_non_numeric_in_snapshot"
+    ):
+        _latest_mass_balance_pct({"per_hour_summary": [{"mass_balance_pct": "abc"}]})
+
+
+def test_sio_yield_diagnostics_reject_nonfinite_mass_balance_value() -> None:
+    # runner.py:747 — a present, numeric, but non-finite balance (inf/nan) is a
+    # corrupt diagnostic, not a real 0%/perfect close.
+    with pytest.raises(
+        EngineBugAbort, match="mass_balance_key_nonfinite_in_snapshot"
+    ):
+        _latest_mass_balance_pct(
+            {"per_hour_summary": [{"mass_balance_pct": math.inf}]}
+        )
+
+
 @pytest.mark.parametrize(
     "result",
     [
