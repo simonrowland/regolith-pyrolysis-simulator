@@ -88,7 +88,7 @@ def test_worker_payload_rejects_multiple_feedstocks():
         cal._worker_payload(args)
 
 
-def _summary_with_threshold() -> dict:
+def _summary_with_ok_threshold() -> dict:
     return {
         "row_count": 3,
         "case_count": 1,
@@ -114,13 +114,33 @@ def test_real_backend_blocked_when_any_worker_case_fails():
             "stop_reason": "timeout",
         },
     ]
-    summary = _summary_with_threshold()
+    summary = _summary_with_ok_threshold()
     assert cal._is_real_backend_calibration_blocked(
         cases,
         summary,
         backend="alphamelts",
         feedstocks=("lunar_mare_low_ti",),
         campaigns=("C2B", "C4"),
+    )
+
+
+def test_real_backend_blocked_when_curve_insufficient_not_ok():
+    summary = {
+        "row_count": 1,
+        "case_count": 1,
+        "analysis_by_feedstock_campaign_target": {
+            "lunar_mare_low_ti|C2B|Fe": {
+                "status": "insufficient_curve",
+                "proposed_threshold": 0.4,
+            },
+        },
+    }
+    assert cal._is_real_backend_calibration_blocked(
+        [{"rows": [{}], "stop_reason": "max_hours"}],
+        summary,
+        backend="alphamelts",
+        feedstocks=("lunar_mare_low_ti",),
+        campaigns=("C2B",),
     )
 
 
@@ -132,7 +152,7 @@ def test_real_backend_blocked_when_expected_target_missing_curve():
             "stop_reason": "max_hours",
         },
     ]
-    summary = _summary_with_threshold()
+    summary = _summary_with_ok_threshold()
     assert cal._is_real_backend_calibration_blocked(
         cases,
         summary,

@@ -463,7 +463,7 @@ def _is_real_backend_calibration_blocked(
         campaigns,
     ):
         entry = analysis.get(f"{feedstock}|{campaign}|{target}", {"status": "no_data"})
-        if entry.get("proposed_threshold") is None:
+        if entry.get("status") != "ok":
             return True
     return False
 
