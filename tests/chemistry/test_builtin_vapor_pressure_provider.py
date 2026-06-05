@@ -118,10 +118,18 @@ class _CaOnlyMelt:
         return {"CaO": 100.0}
 
 
+class _SiOnlyMelt:
+    temperature_C = 1900.0 - 273.15
+    p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"SiO2": 100.0}
+
+
 class _LegacyFallbackStub(EquilibriumMixin):
-    def __init__(self, vapor_pressure_data):
+    def __init__(self, vapor_pressure_data, melt=None):
         self.vapor_pressures = vapor_pressure_data
-        self.melt = _CaOnlyMelt()
+        self.melt = melt or _CaOnlyMelt()
 
     def _commanded_pO2_bar(self):
         return 1e-9
@@ -168,6 +176,43 @@ def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in result.warnings
     )
+
+
+def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
+    vapor_pressure_data,
+):
+    assert (
+        vapor_pressure_data["metals"]["Si"]["consumer_status"].lower()
+        == "inactive"
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_SiOnlyMelt.temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    kernel_vp = dict(
+        (provider.dispatch(request).diagnostic or {}).get("vapor_pressures_Pa")
+        or {}
+    )
+    legacy_vp = dict(
+        _LegacyFallbackStub(
+            vapor_pressure_data,
+            melt=_SiOnlyMelt(),
+        )._stub_equilibrium().vapor_pressures_Pa
+        or {}
+    )
+
+    assert "SiO" in kernel_vp
+    assert "Si" not in kernel_vp
+    assert "Si" not in legacy_vp
+    assert set(legacy_vp) == set(kernel_vp)
 
 
 # ---------------------------------------------------------------------------
@@ -281,12 +326,10 @@ def test_provider_matches_legacy_stub_for_known_lunar_composition(
             f"kernel={kernel_value:.6g} Pa (tol={tol:.3g} Pa)"
         )
 
-    # Every species the kernel emits must also appear in the legacy
-    # output — otherwise we have a one-sided divergence the loop above
-    # would miss.
-    assert set(kernel_vp) <= set(legacy_result.vapor_pressures_Pa), (
-        f"kernel emitted species the legacy stub did not: "
-        f"{set(kernel_vp) - set(legacy_result.vapor_pressures_Pa)}"
+    assert set(kernel_vp) == set(legacy_result.vapor_pressures_Pa), (
+        "legacy/kernel vapor-pressure species sets diverged: "
+        f"legacy_only={set(legacy_result.vapor_pressures_Pa) - set(kernel_vp)} "
+        f"kernel_only={set(kernel_vp) - set(legacy_result.vapor_pressures_Pa)}"
     )
 
 

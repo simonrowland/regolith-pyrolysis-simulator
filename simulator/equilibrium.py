@@ -274,6 +274,8 @@ class EquilibriumMixin:
             sp_data = metals_data.get(species, {})
             if not sp_data:
                 continue
+            if str(sp_data.get('consumer_status', '')).lower() == 'inactive':
+                continue
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
