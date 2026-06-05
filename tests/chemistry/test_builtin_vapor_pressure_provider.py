@@ -44,6 +44,7 @@ from tests.chemistry.conftest import _build_sim
 
 _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 1e-9
+_CA_RANGE_EXTRAPOLATION_T_K = 2000.0
 
 _V1C_JANAF_ELLINGHAM = {
     "Na": (-1135.130, -0.537417, 4, 2),
@@ -94,6 +95,79 @@ def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
+
+
+def _ca_range_extrapolation_request() -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"CaO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_CA_RANGE_EXTRAPOLATION_T_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+
+class _CaOnlyMelt:
+    temperature_C = _CA_RANGE_EXTRAPOLATION_T_K - 273.15
+    p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"CaO": 100.0}
+
+
+class _LegacyFallbackStub(EquilibriumMixin):
+    def __init__(self, vapor_pressure_data):
+        self.vapor_pressures = vapor_pressure_data
+        self.melt = _CaOnlyMelt()
+
+    def _commanded_pO2_bar(self):
+        return 1e-9
+
+    def _compute_intrinsic_melt_fO2(self):
+        return -9.0
+
+
+def test_metal_antoine_range_extrapolation_is_diagnostic(
+    vapor_pressure_data,
+):
+    assert vapor_pressure_data["metals"]["Ca"]["valid_range_K"] == [1115, 1757]
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    result = provider.dispatch(_ca_range_extrapolation_request())
+
+    assert result.status == "ok"
+    assert result.diagnostic["vapor_pressures_Pa"]["Ca"] > 0.0
+    extrapolation = result.diagnostic[
+        "extrapolated_beyond_valid_range_K"
+    ]["Ca"]
+    assert extrapolation["temperature_K"] == pytest.approx(
+        _CA_RANGE_EXTRAPOLATION_T_K
+    )
+    assert tuple(extrapolation["valid_range_K"]) == (1115.0, 1757.0)
+    assert any(
+        "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
+        for warning in result.warnings
+    )
+
+
+def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
+    vapor_pressure_data,
+):
+    assert vapor_pressure_data["metals"]["Ca"]["valid_range_K"] == [1115, 1757]
+    result = _LegacyFallbackStub(vapor_pressure_data)._stub_equilibrium()
+
+    assert result.vapor_pressures_Pa["Ca"] > 0.0
+    assert (
+        result.vapor_pressures_source["Ca"]
+        == "builtin_fallback:extrapolated_beyond_valid_range_K"
+    )
+    assert any(
+        "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
+        for warning in result.warnings
+    )
 
 
 # ---------------------------------------------------------------------------

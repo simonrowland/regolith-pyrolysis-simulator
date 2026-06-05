@@ -163,6 +163,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         vapor_pressures: dict[str, float] = {}
         activities: dict[str, float] = {}
+        metal_extrapolations: dict[str, dict[str, object]] = {}
+        warnings: list[str] = []
 
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
         for species, (dH_f, dS_f, n_M, n_ox) in _ELLINGHAM_THERMO.items():
@@ -182,6 +184,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             C = antoine.get('C', 0)
             if not (A > 0 and T_K > 300):
                 continue
+            valid_range = sp_data.get('valid_range_K')
+            if valid_range and len(valid_range) == 2:
+                valid_low = float(valid_range[0])
+                valid_high = float(valid_range[1])
+                if T_K < valid_low or T_K > valid_high:
+                    metal_extrapolations[species] = {
+                        "temperature_K": T_K,
+                        "valid_range_K": (valid_low, valid_high),
+                    }
+                    warnings.append(
+                        f"{species} metal Antoine fit extrapolated beyond "
+                        f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                        f"{T_K:.2f} K"
+                    )
             log_P = A - B / (T_K + C)
             P_sat_pure_Pa = 10.0 ** log_P
 
@@ -251,7 +267,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "vapor_pressures_Pa": vapor_pressures,
                 "activities": activities,
                 "pO2_bar": pO2_bar,
+                "extrapolated_beyond_valid_range_K": metal_extrapolations,
             },
+            warnings=tuple(warnings),
         )
 
     # ------------------------------------------------------------------

@@ -234,6 +234,8 @@ class EquilibriumMixin:
 
         vapor_pressures = {}
         activities = {}
+        metal_extrapolations = {}
+        warnings = []
 
         # --- Determine the oxygen partial pressure (bar) ---
         #
@@ -299,6 +301,20 @@ class EquilibriumMixin:
             C = antoine.get('C', 0)
 
             if A > 0 and T_K > 300:
+                valid_range = sp_data.get('valid_range_K')
+                if valid_range and len(valid_range) == 2:
+                    valid_low = float(valid_range[0])
+                    valid_high = float(valid_range[1])
+                    if T_K < valid_low or T_K > valid_high:
+                        metal_extrapolations[species] = {
+                            'temperature_K': T_K,
+                            'valid_range_K': (valid_low, valid_high),
+                        }
+                        warnings.append(
+                            f"{species} metal Antoine fit extrapolated beyond "
+                            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                            f"{T_K:.2f} K"
+                        )
                 # Antoine: log10(P_Pa) = A - B / (T_K + C)
                 log_P = A - B / (T_K + C)
                 P_sat_pure_Pa = 10.0 ** log_P
@@ -412,7 +428,11 @@ class EquilibriumMixin:
             phase_assemblage_available=False,
             vapor_pressures_Pa=vapor_pressures,
             vapor_pressures_source={
-                species: 'builtin_fallback'
+                species: (
+                    'builtin_fallback:extrapolated_beyond_valid_range_K'
+                    if species in metal_extrapolations
+                    else 'builtin_fallback'
+                )
                 for species in vapor_pressures
             },
             activity_coefficients=activities,
@@ -421,5 +441,6 @@ class EquilibriumMixin:
                 '_compute_intrinsic_melt_fO2',
                 lambda: math.log10(max(pO2_bar, 1e-20)),
             )(),
+            warnings=warnings,
             status='ok',
         )
