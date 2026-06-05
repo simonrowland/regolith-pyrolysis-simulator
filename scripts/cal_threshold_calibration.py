@@ -45,11 +45,23 @@ class CaseSpec:
     campaign: str
 
 
+def _capture_tail(value: Any, *, limit: int) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        text = value.decode("utf-8", errors="replace")
+    else:
+        text = str(value)
+    return text[-limit:]
+
+
 def _json_safe(value: Any) -> Any:
     if isinstance(value, dict):
         return {str(k): _json_safe(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [_json_safe(v) for v in value]
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
     if isinstance(value, float):
         if math.isfinite(value):
             return value
@@ -238,8 +250,8 @@ def _run_worker_case(
             "elapsed_s": round(time.time() - started, 3),
             "rows": [],
             "error": f"timeout after {per_case_timeout_s}s",
-            "stdout_tail": (exc.stdout or "")[-1000:],
-            "stderr_tail": (exc.stderr or "")[-1000:],
+            "stdout_tail": _capture_tail(exc.stdout, limit=1000),
+            "stderr_tail": _capture_tail(exc.stderr, limit=1000),
         }
     if completed.returncode != 0:
         return {
