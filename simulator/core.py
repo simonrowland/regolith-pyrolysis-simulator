@@ -183,6 +183,12 @@ FLOW_MASS_ACCOUNTS = (
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
 )
+FLOW_MASS_EXCLUDED_ACCOUNTS = (
+    'process.stage0_carbon_reductant',
+    'process.stage0_perchlorate_feed',
+    'process.stage0_salt_feed',
+    'process.stage0_volatile_feed',
+)
 BACKEND_REACTIVE_ACCOUNTS = (
     'process.cleaned_melt',
     'process.metal_phase',

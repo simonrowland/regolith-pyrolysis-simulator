@@ -1,10 +1,15 @@
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 import yaml
 
-from simulator.core import PyrolysisSimulator
+from simulator.core import (
+    FLOW_MASS_ACCOUNTS,
+    FLOW_MASS_EXCLUDED_ACCOUNTS,
+    PyrolysisSimulator,
+)
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import build_sio_yield_report
@@ -22,6 +27,26 @@ SIO_CLOSURE_MAX_REL_PCT = 5e-12
 SIO_CLOSURE_MAX_ABS_MOL = 5e-12
 MASS_BALANCE_CLOSURE_MAX_PCT = 5e-12
 CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG = 1e-9
+
+
+def test_flow_mass_accounts_cover_non_reservoir_ledger_accounts():
+    core_source = (
+        Path(__file__).parent.parent / "simulator" / "core.py"
+    ).read_text()
+    discovered_accounts = set(
+        re.findall(
+            r"[\"']((?:process|terminal)\.[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*)[\"']",
+            core_source,
+        )
+    )
+    covered_accounts = set(FLOW_MASS_ACCOUNTS) | set(FLOW_MASS_EXCLUDED_ACCOUNTS)
+
+    assert set(FLOW_MASS_EXCLUDED_ACCOUNTS) <= discovered_accounts
+    assert discovered_accounts <= covered_accounts, (
+        "new process/terminal ledger accounts must be added to "
+        "FLOW_MASS_ACCOUNTS or FLOW_MASS_EXCLUDED_ACCOUNTS: "
+        f"{sorted(discovered_accounts - covered_accounts)}"
+    )
 
 
 def _load_data_yaml(name):
