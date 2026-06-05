@@ -137,6 +137,23 @@ class PhysicsConstraintSet:
         default_factory=dict
     )
 
+    def __getstate__(self) -> dict[str, Any]:
+        return {
+            "stream_purity_min": self.stream_purity_min,
+            "coating_min_campaigns_to_resinter": self.coating_min_campaigns_to_resinter,
+            "extraction_min_fraction": self.extraction_min_fraction,
+            "knudsen_max": self.knudsen_max,
+            "furnace_T_max_C": self.furnace_T_max_C,
+            "target_species": self.target_species,
+            "residual_species_by_target": dict(self.residual_species_by_target),
+            "allowable_wall_deposit_kg": dict(self.allowable_wall_deposit_kg),
+        }
+
+    def __setstate__(self, state: Mapping[str, Any]) -> None:
+        for key, value in state.items():
+            object.__setattr__(self, key, value)
+        self.__post_init__()
+
     def __post_init__(self) -> None:
         object.__setattr__(
             self,

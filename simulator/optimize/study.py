@@ -37,7 +37,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
 from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
-from simulator.optimize.profiles import validate_profile
+from simulator.optimize.profiles import physics_constraints_from_profile, validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import (
@@ -423,7 +423,7 @@ def resolve_profile(
     return validate_profile(
         profile,
         expected_feedstock=expected_feedstock,
-        source="<profile>",
+        source=getattr(profile, "source", "<profile>"),
         schema=schema,
     )
 
@@ -509,7 +509,9 @@ def _ask_staged_topology_candidates(
 def _constraints_for_profile(profile: Mapping[str, Any]) -> Any:
     selector = profile.get("study_constraints")
     if selector is None:
-        return None
+        return physics_constraints_from_profile(profile)
+    if selector == "physics":
+        return physics_constraints_from_profile(profile)
     if selector == "stub_smoke":
         return StubSmokeConstraintSet()
     raise ValueError(f"unknown study_constraints {selector!r}")

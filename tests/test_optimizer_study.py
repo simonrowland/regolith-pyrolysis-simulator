@@ -17,6 +17,8 @@ from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
+from simulator.optimize.physics import physics_constraints_digest
+from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 
@@ -326,6 +328,55 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     assert cache_key(spec_tight) != cache_key(spec_loose)
     assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, loose)
     assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "stub", schema, store, tight) is None
+
+
+def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    loose_profile = dict(PROFILE)
+    loose_profile["constraints"] = {
+        **PROFILE["constraints"],
+        "furnace_T_max_C": 1800.0,
+    }
+    tight_profile = dict(PROFILE)
+    tight_profile["constraints"] = {
+        **PROFILE["constraints"],
+        "furnace_T_max_C": 1300.0,
+    }
+    loose = physics_constraints_from_profile(loose_profile)
+    tight = physics_constraints_from_profile(tight_profile)
+    spec_loose, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "stub",
+        loose_profile,
+        schema,
+        constraints=loose,
+    )
+    spec_tight, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "stub",
+        tight_profile,
+        schema,
+        constraints=tight,
+    )
+
+    assert physics_constraints_digest(loose) != physics_constraints_digest(tight)
+    assert cache_key(spec_loose) != cache_key(spec_tight)
+
+
+def test_stub_smoke_selector_ignores_profile_threshold_overrides() -> None:
+    profile = dict(PROFILE)
+    profile["study_constraints"] = "stub_smoke"
+    profile["constraints"] = {
+        **PROFILE["constraints"],
+        "furnace_T_max_C": 1300.0,
+    }
+
+    constraints = study._constraints_for_profile(profile)
+
+    assert isinstance(constraints, study.StubSmokeConstraintSet)
 
 
 def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(tmp_path) -> None:

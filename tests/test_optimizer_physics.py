@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import pickle
 from types import SimpleNamespace
 
 import pytest
@@ -11,6 +12,7 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     physics_constraints_digest,
 )
+from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.state import CampaignPhase, HourSnapshot
 from simulator.state import MOLAR_MASS
 from simulator.trace import PhysicsTrace
@@ -128,6 +130,33 @@ def test_all_five_gates_are_computed_from_physics_trace() -> None:
     assert result.feasible
     assert set(result.margins) == set(GATE_ORDER)
     assert result.margins["coating"].observed == pytest.approx(20.0)
+
+
+def test_profile_furnace_temperature_threshold_drives_gate() -> None:
+    constraints = physics_constraints_from_profile(
+        {
+            "constraints": {
+                "gates": list(GATE_ORDER),
+                "furnace_T_max_C": 1300.0,
+            }
+        },
+        source="profiles/test.yaml",
+    )
+
+    hot = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1300.1))
+    cool = constraints.evaluate(_trace(condensed=({(3, "SiO"): 20.0},), temperature_C=1299.9))
+
+    assert hot.failing_gates == ("furnace_temperature",)
+    assert cool.feasible
+    assert constraints.furnace_T_max_C.source == "profile"
+    assert constraints.furnace_T_max_C.source_ref == "profiles/test.yaml:constraints.furnace_T_max_C"
+
+
+def test_physics_constraint_set_is_picklable_for_parallel_evaluation() -> None:
+    restored = pickle.loads(pickle.dumps(PhysicsConstraintSet()))
+
+    assert isinstance(restored, PhysicsConstraintSet)
+    assert restored.furnace_T_max_C.value == pytest.approx(1800.0)
 
 
 def test_thresholds_are_non_null_and_have_declared_provenance() -> None:

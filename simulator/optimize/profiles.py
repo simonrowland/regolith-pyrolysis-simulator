@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from dataclasses import replace
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
@@ -12,14 +13,14 @@ import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.objective import ObjectiveProfileError, objective_definitions
-from simulator.optimize.physics import GATE_ORDER
+from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 
 
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
 PROFILE_DIRNAME = "optimize_profiles"
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
-KNOWN_STUDY_CONSTRAINTS = frozenset({"stub_smoke"})
+KNOWN_STUDY_CONSTRAINTS = frozenset({"physics", "stub_smoke"})
 KNOWN_OBJECTIVE_METRICS = frozenset(
     {
         "pure_silica_glass_kg",
@@ -57,7 +58,18 @@ _TOP_LEVEL_KEYS = frozenset(
     }
 )
 _OBJECTIVE_KEYS = frozenset({"metric", "sense", "units", "weight", "rationale"})
-_CONSTRAINT_KEYS = frozenset({"gates"})
+_THRESHOLD_CONSTRAINT_KEYS = MappingProxyType({
+    "stream_purity_min": "stream_purity_min",
+    "coating_min_campaigns_to_resinter": "coating_min_campaigns_to_resinter",
+    "extraction_min_fraction": "extraction_min_fraction",
+    "knudsen_max": "knudsen_max",
+    "furnace_T_max_C": "furnace_T_max_C",
+})
+_CONSTRAINT_KEYS = frozenset({
+    "gates",
+    "target_species",
+    *_THRESHOLD_CONSTRAINT_KEYS,
+})
 _SEED_KEYS = frozenset(
     {"id", "source_campaign", "source_campaigns", "rationale", "patch"}
 )
@@ -85,6 +97,21 @@ _REDUCED_REAL_MISS_POLICIES = frozenset({"fail-loud", "live-fill"})
 
 class ProfileValidationError(ValueError):
     """Raised when an optimizer profile file is malformed or unsafe."""
+
+
+class ValidatedProfile(Mapping[str, Any]):
+    def __init__(self, data: Mapping[str, Any], *, source: str | Path) -> None:
+        self._data = MappingProxyType(dict(data))
+        self.source = str(source)
+
+    def __getitem__(self, key: str) -> Any:
+        return self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
 
 
 def load_profile(
@@ -185,7 +212,38 @@ def validate_profile(
     )
     if "early_tap_mode" in profile and not isinstance(profile["early_tap_mode"], bool):
         raise ProfileValidationError(f"{source}: early_tap_mode must be boolean")
-    return MappingProxyType(profile)
+    return ValidatedProfile(profile, source=source)
+
+
+def physics_constraints_from_profile(
+    profile: Mapping[str, Any],
+    *,
+    source: str | Path | None = None,
+) -> PhysicsConstraintSet:
+    raw_constraints = profile.get("constraints", {})
+    profile_source = _profile_source(profile, source)
+    if not isinstance(raw_constraints, Mapping):
+        raise ProfileValidationError(f"{profile_source}: constraints must be a mapping")
+    _validate_constraints(raw_constraints, source=profile_source)
+    base = PhysicsConstraintSet()
+    updates: dict[str, Any] = {}
+    for key, attr in _THRESHOLD_CONSTRAINT_KEYS.items():
+        if key not in raw_constraints:
+            continue
+        threshold = getattr(base, attr)
+        updates[attr] = ThresholdSpec(
+            id=threshold.id,
+            value=float(raw_constraints[key]),
+            units=threshold.units,
+            source="profile",
+            source_ref=f"{profile_source}:constraints.{key}",
+            tolerance=threshold.tolerance,
+        )
+    if "target_species" in raw_constraints:
+        updates["target_species"] = tuple(
+            str(species) for species in raw_constraints["target_species"]
+        )
+    return replace(base, **updates)
 
 
 def _resolve_profile_path(feedstock_or_path: str | Path, *, data_dir: Path) -> Path:
@@ -259,6 +317,39 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
     for gate in gates:
         if gate not in known:
             raise ProfileValidationError(f"{source}: unknown constraint gate {gate!r}")
+    for key in _THRESHOLD_CONSTRAINT_KEYS:
+        if key not in raw:
+            continue
+        _validate_constraint_threshold(raw[key], source=source, where=f"constraints.{key}")
+    for key in ("stream_purity_min", "extraction_min_fraction"):
+        if key in raw:
+            value = float(raw[key])
+            if value < 0.0 or value > 1.0:
+                raise ProfileValidationError(
+                    f"{source}: constraints.{key} must be between 0 and 1"
+                )
+    if "target_species" in raw:
+        _validate_target_species(raw["target_species"], source=source)
+
+
+def _validate_constraint_threshold(raw: Any, *, source: str | Path, where: str) -> None:
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        raise ProfileValidationError(f"{source}: {where} must be numeric")
+    value = float(raw)
+    if not math.isfinite(value) or value <= 0.0:
+        raise ProfileValidationError(f"{source}: {where} must be positive finite")
+
+
+def _validate_target_species(raw: Any, *, source: str | Path) -> None:
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, list):
+        raise ProfileValidationError(f"{source}: constraints.target_species must be a non-empty list")
+    if not raw:
+        raise ProfileValidationError(f"{source}: constraints.target_species must be a non-empty list")
+    for index, species in enumerate(raw):
+        if not isinstance(species, str) or not species.strip():
+            raise ProfileValidationError(
+                f"{source}: constraints.target_species[{index}] must be a non-empty string"
+            )
 
 
 def _validate_study_constraints(raw: Any, *, source: str | Path) -> None:
@@ -420,6 +511,12 @@ def _reject_unknown_keys(
     for key in mapping:
         if key not in allowed:
             raise ProfileValidationError(f"{source}: unknown {where} key {key!r}")
+
+
+def _profile_source(profile: Mapping[str, Any], source: str | Path | None) -> str:
+    if source is not None:
+        return str(source)
+    return str(getattr(profile, "source", "<profile>"))
 
 
 def _require_keys(

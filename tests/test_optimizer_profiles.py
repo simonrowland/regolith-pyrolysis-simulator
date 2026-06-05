@@ -93,6 +93,30 @@ def test_raw_mapping_profile_resolver_uses_profile_validator(mutation, message: 
         study.resolve_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_constraint_threshold_overrides_validate_types() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["furnace_T_max_C"] = "1300"
+
+    with pytest.raises(ProfileValidationError, match="constraints.furnace_T_max_C must be numeric"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_constraint_target_species_must_be_non_empty_list() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["target_species"] = []
+
+    with pytest.raises(ProfileValidationError, match="constraints.target_species must be a non-empty list"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_unknown_constraint_key_raises_named_error() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["mystery_threshold"] = 1.0
+
+    with pytest.raises(ProfileValidationError, match="unknown constraints key"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def _profile_copy(feedstock: str) -> dict:
     path = DEFAULT_DATA_DIR / "optimize_profiles" / f"{feedstock}.yaml"
     return copy.deepcopy(yaml.safe_load(path.read_text()))
