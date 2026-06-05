@@ -194,18 +194,15 @@ def extraction_completeness_by_target(
 
 def aggregate_extraction_completeness(
     by_target: Mapping[str, TargetExtractionCompleteness | None],
-    target_species: tuple[str, ...] | None = None,
+    target_species: tuple[str, ...],
 ) -> AggregateExtractionCompleteness:
-    """Aggregate all gated targets; any n/a target makes the step n/a."""
+    """Aggregate explicit gated targets; any n/a target makes the step n/a."""
 
-    targets = tuple(
-        str(target)
-        for target in (
-            target_species
-            if target_species is not None
-            else tuple(by_target.keys())
+    if target_species is None:
+        raise ValueError(
+            "target_species is required; do not infer extraction targets from by_target"
         )
-    )
+    targets = tuple(str(target) for target in target_species)
     if not targets:
         raise ValueError("target_species must be non-empty")
 

@@ -113,6 +113,21 @@ def test_aggregate_completeness_uses_worst_target_min() -> None:
     assert aggregate.aggregation == "min_all_targets"
 
 
+def test_aggregate_completeness_requires_explicit_target_species() -> None:
+    by_target = {
+        "Na": TargetExtractionCompleteness("Na", 0.95, 95.0, 5.0, 100.0),
+    }
+
+    with pytest.raises(TypeError):
+        aggregate_extraction_completeness(by_target)  # type: ignore[call-arg]
+
+    with pytest.raises(ValueError, match="target_species is required"):
+        aggregate_extraction_completeness(by_target, None)  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match="target_species must be non-empty"):
+        aggregate_extraction_completeness(by_target, ())
+
+
 def test_aggregate_completeness_is_na_if_any_gated_target_is_na() -> None:
     aggregate = aggregate_extraction_completeness(
         {
