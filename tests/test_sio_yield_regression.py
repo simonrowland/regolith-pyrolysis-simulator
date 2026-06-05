@@ -205,6 +205,29 @@ def test_route_destinations_sum_to_evolved_budget():
     assert destinations == pytest.approx(1.0)
 
 
+def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
+    ca_data = condensation_module.VAPOR_PRESSURE_DATA["metals"]["Ca"]
+    assert ca_data["valid_range_K"] == [1115, 1757]
+
+    model = CondensationModel(CondensationTrain.create_default())
+    melt = MeltState()
+    melt.temperature_C = 1400.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Ca": 1.0e-6}, total_kg_hr=1.0e-6),
+        melt,
+    )
+
+    extrapolation = route.antoine_extrapolations["Ca"]
+    assert extrapolation["temperature_K"] == pytest.approx(780.0 + 273.15)
+    assert tuple(extrapolation["valid_range_K"]) == (1115.0, 1757.0)
+    assert any(
+        "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
+        for warning in route.antoine_extrapolation_warnings
+    )
+    assert route.remaining_by_species["Ca"] >= 0.0
+
+
 def test_cold_liner_routes_sio_to_wall_deposit_bucket():
     model = CondensationModel(
         CondensationTrain.create_default(),

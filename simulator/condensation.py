@@ -457,6 +457,8 @@ class CondensationRouteResult:
     wall_deposit_account_fractions_by_species: Dict[
         str, Dict[str, float]] = field(default_factory=dict)
     impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    antoine_extrapolations: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    antoine_extrapolation_warnings: tuple[str, ...] = ()
     cold_spot_warnings: tuple[str, ...] = ()
     knudsen_regime_diagnostic: Dict[str, Any] = field(default_factory=dict)
 
@@ -915,6 +917,8 @@ class CondensationModel:
         wall_deposit_account_fractions_by_species: Dict[
             str, Dict[str, float]] = {}
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
+        antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
+        antoine_extrapolation_warnings: list[str] = []
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
@@ -953,6 +957,9 @@ class CondensationModel:
                     residence_s=self.residence_time_s.get(
                         stage.stage_number, 1.0),
                     alpha_s=_stage_alpha_s(stage, species),
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings),
                 )
 
                 condensed_kg = remaining_kg * eta
@@ -976,6 +983,9 @@ class CondensationModel:
                 T_cond_C=T_cond,
                 melt_temperature_C=float(getattr(melt, 'temperature_C', T_cond)),
                 supply_by_segment_kg=segment_supply,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
             )
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
@@ -1053,6 +1063,9 @@ class CondensationModel:
             wall_deposit_account_fractions_by_species=(
                 wall_deposit_account_fractions_by_species),
             impurity_by_stage_species=impurity_by_stage_species,
+            antoine_extrapolations=dict(antoine_extrapolations),
+            antoine_extrapolation_warnings=tuple(
+                antoine_extrapolation_warnings),
             cold_spot_warnings=cold_spot_warnings,
             knudsen_regime_diagnostic=knudsen_diagnostic,
         )
@@ -1101,7 +1114,21 @@ class CondensationModel:
         rate_kg_hr: float,
         T_cond_C: float,
         melt_temperature_C: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
     ) -> float:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            _local_wall_species_pressure_pa(
+                species,
+                melt_temperature_C,
+                T_cond_C,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
         return query_wall_deposit_candidate_kg(
             self,
             species=species,
@@ -1118,7 +1145,21 @@ class CondensationModel:
         T_cond_C: float,
         melt_temperature_C: float,
         supply_by_segment_kg: Mapping[str, float],
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
     ) -> Dict[str, float]:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            _local_wall_species_pressure_pa(
+                species,
+                melt_temperature_C,
+                T_cond_C,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
         return query_wall_deposit_candidates_by_segment_kg(
             self,
             species=species,
@@ -1153,7 +1194,21 @@ class CondensationModel:
         melt_temperature_C: float,
         wall_temperature_C: float,
         surface_area_m2: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
     ) -> float:
+        if (
+            antoine_extrapolations is not None
+            or antoine_extrapolation_warnings is not None
+        ):
+            _local_wall_species_pressure_pa(
+                species,
+                melt_temperature_C,
+                T_cond_C,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
         return query_wall_deposit_candidate_for_surface_kg(
             self,
             species=species,
@@ -1202,6 +1257,8 @@ class CondensationModel:
         T_cond_C: float,
         residence_s: float,
         alpha_s: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+        antoine_extrapolation_warnings: list[str] | None = None,
     ) -> float:
         """
         Condensation efficiency for one species in one stage.
@@ -1219,7 +1276,12 @@ class CondensationModel:
         if residence_s <= 0.0 or alpha_s <= 0.0:
             return 0.0
 
-        P_local_pa = _local_species_pressure_pa(species, T_cond_C)
+        P_local_pa = _local_species_pressure_pa(
+            species,
+            T_cond_C,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        )
         if P_local_pa <= 0.0:
             return 0.0
 
@@ -1470,7 +1532,53 @@ def _default_pipe_surface_area_m2() -> float:
     return math.pi * float(pipe.diameter_m) * float(pipe.length_m)
 
 
-def _antoine_psat_pa(species: str, T_K: float) -> float | None:
+def _record_antoine_extrapolation(
+    species: str,
+    T_K: float,
+    data: Mapping[str, Any],
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+) -> None:
+    valid_range = data.get('valid_range_K')
+    if not (isinstance(valid_range, (list, tuple)) and len(valid_range) == 2):
+        return
+    try:
+        valid_low = float(valid_range[0])
+        valid_high = float(valid_range[1])
+    except (TypeError, ValueError):
+        return
+    if not (
+        math.isfinite(valid_low)
+        and math.isfinite(valid_high)
+        and valid_low <= valid_high
+    ):
+        return
+    if valid_low <= T_K <= valid_high:
+        return
+
+    if antoine_extrapolations is not None and species not in antoine_extrapolations:
+        antoine_extrapolations[species] = {
+            'temperature_K': T_K,
+            'valid_range_K': (valid_low, valid_high),
+        }
+    if antoine_extrapolation_warnings is not None:
+        warning = (
+            f"{species} metal Antoine fit extrapolated beyond "
+            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+            f"{T_K:.2f} K"
+        )
+        if warning not in antoine_extrapolation_warnings:
+            antoine_extrapolation_warnings.append(warning)
+
+
+def _antoine_psat_pa(
+    species: str,
+    T_K: float,
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> float | None:
     data = _species_vapor_data(species)
     antoine = data.get('antoine', {}) if isinstance(data, Mapping) else {}
     if not isinstance(antoine, Mapping):
@@ -1484,12 +1592,30 @@ def _antoine_psat_pa(species: str, T_K: float) -> float | None:
         return None
     if not (A > 0.0 and math.isfinite(T_K) and T_K + C > 0.0):
         return None
+    _record_antoine_extrapolation(
+        species,
+        T_K,
+        data,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
     # Same Antoine form used by equilibrium.py and builtin vapor pressure.
     return 10.0 ** (A - B / (T_K + C))
 
 
-def _local_species_pressure_pa(species: str, T_cond_C: float) -> float:
-    P_local_pa = _antoine_psat_pa(species, T_cond_C + 273.15)
+def _local_species_pressure_pa(
+    species: str,
+    T_cond_C: float,
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> float:
+    P_local_pa = _antoine_psat_pa(
+        species,
+        T_cond_C + 273.15,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
     if P_local_pa is not None and P_local_pa > 0.0:
         return P_local_pa
     # Existing condensation temperatures are documented at ~1 mbar.
@@ -1500,11 +1626,24 @@ def _local_wall_species_pressure_pa(
     species: str,
     melt_temperature_C: float,
     fallback_T_cond_C: float,
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
-    P_source_pa = _antoine_psat_pa(species, melt_temperature_C + 273.15)
+    P_source_pa = _antoine_psat_pa(
+        species,
+        melt_temperature_C + 273.15,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
     if P_source_pa is not None and P_source_pa > 0.0:
         return P_source_pa
-    return _local_species_pressure_pa(species, fallback_T_cond_C)
+    return _local_species_pressure_pa(
+        species,
+        fallback_T_cond_C,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
 
 
 def _molecular_mass_kg_per_molecule(species: str) -> float:
