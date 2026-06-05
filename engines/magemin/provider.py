@@ -61,6 +61,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 
 
@@ -417,11 +418,10 @@ class MAGEMinShadowProvider(ChemistryProvider):
     ) -> Any:
         """Call the adapter's :meth:`equilibrate`.
 
-        Returns the adapter's :class:`EquilibriumResult` (or None on
-        catastrophic failure). The adapter itself converts failure into
-        an ``EquilibriumResult`` with ``status='not_converged'``
-        rather than raising, so the broad except here is a final
-        safety net for unexpected exceptions only.
+        Returns the adapter's :class:`EquilibriumResult`. The adapter itself
+        converts failure into an ``EquilibriumResult`` with
+        ``status='not_converged'`` rather than raising, so the broad except
+        here is a final safety net for unexpected exceptions only.
         """
         species_registry = dict(
             request.account_view.species_formula_registry or {}
@@ -438,8 +438,11 @@ class MAGEMinShadowProvider(ChemistryProvider):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
-        except Exception:
-            return None
+        except Exception as exc:  # noqa: BLE001 - optional shadow boundary
+            return EquilibriumResult(
+                status='not_converged',
+                warnings=(f'MAGEMin equilibrate raised: {exc}',),
+            )
 
     def _run_liquidus_finder(
         self,

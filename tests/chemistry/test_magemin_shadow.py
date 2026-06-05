@@ -144,6 +144,18 @@ class _FakeMAGEMinBackend:
         return self._equilibrium
 
 
+class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
+    def __init__(self):
+        super().__init__(
+            equilibrium=_FakeEquilibriumResult(),
+            engine_version='fake-magemin-raising',
+        )
+
+    def equilibrate(self, **kwargs):
+        self.calls.append(kwargs)
+        raise RuntimeError('synthetic MAGEMin adapter failure')
+
+
 class _FakeEquilibriumResult:
     """Duck-typed substitute for ``simulator.melt_backend.base.EquilibriumResult``."""
 
@@ -342,6 +354,25 @@ def test_shadow_backend_initialization_pins_subprocess_bridge():
     assert fake_backend.initialize_configs == [
         {'python_bridge': 'subprocess'},
     ]
+
+
+def test_shadow_backend_exception_surfaces_warning():
+    fake_backend = _RaisingMAGEMinBackend()
+    shadow = MAGEMinShadowProvider(backend=fake_backend)
+
+    result = shadow.dispatch(
+        _make_request(ChemistryIntent.SILICATE_EQUILIBRIUM)
+    )
+
+    assert fake_backend.calls
+    assert result.status == 'not_converged'
+    assert result.diagnostic['backend_status'] == 'not_converged'
+    assert result.diagnostic['backend_warnings'] == (
+        'MAGEMin equilibrate raised: synthetic MAGEMin adapter failure',
+    )
+    assert result.warnings == (
+        'MAGEMin equilibrate raised: synthetic MAGEMin adapter failure',
+    )
 
 
 def test_kernel_dispatch_does_not_commit_shadow_transitions():
