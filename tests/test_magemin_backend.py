@@ -340,9 +340,14 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
+    oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
     expected_feot = 10.0 + MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR
     assert vector[feot_index] == pytest.approx(expected_feot)
+    assert vector[oxygen_index] == pytest.approx(
+        MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
+    )
+    assert vector[feot_index] + vector[oxygen_index] == pytest.approx(11.0)
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
@@ -673,9 +678,8 @@ def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:
     oxygen system component, kJ).
 
     Builds the ``ig`` bulk vector directly with a **nonzero O component** so
-    the fO2 buffer actually engages. The production adapter
-    (``_build_ig_bulk_vector``) hard-zeros ``O``, and with ``O=0`` the qfm
-    buffer is inert -- GAM[O] is identical across every ``buffer_n`` (see
+    the fO2 buffer actually engages. P3-F showed MAGEMin's qfm buffer is inert
+    when ``O=0`` (see
     ``docs-private/research/2026-06-05-p3f/findings.md`` Finding 2). This test
     therefore bypasses the adapter to probe the binary's real redox response.
 
@@ -708,6 +712,69 @@ def _run_magemin_gam_o(binary: Path, *, buffer_n: float) -> float:
     # Full IG order has 11 components; the O-component mu is index 8.
     assert len(gam) == 11, gam
     return gam[8]
+
+
+def _run_magemin_adapter_buffer_probe(
+    binary: Path,
+    *,
+    fO2_log: float,
+) -> tuple[float, tuple[str, ...], tuple[float, ...]]:
+    """Run the live binary through the production adapter's ig vector path."""
+    backend = MAGEMinBackend()
+    basalt_wt_pct = {
+        "SiO2": 49.0,
+        "TiO2": 1.5,
+        "Al2O3": 14.0,
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+    }
+    temperature_C = 1200.0
+    pressure_bar = 2000.0
+    pressure_kbar = backend._GPa_to_kbar(
+        backend._pressure_bar_to_GPa(pressure_bar)
+    )
+    bulk = backend._build_ig_bulk_vector(basalt_wt_pct)
+    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
+        temperature_C=temperature_C,
+        fO2_log=fO2_log,
+    )
+    completed = subprocess.run(  # noqa: S603 - args are test-built constants
+        [
+            str(binary),
+            "--Verb=2",
+            f"--db={backend._database}",
+            f"--Temp={temperature_C:.6f}",
+            f"--Pres={pressure_kbar:.6f}",
+            "--sys_in=wt",
+            "--Bulk=" + ",".join(f"{value:.6f}" for value in bulk),
+            f"--buffer={buffer_name}",
+            f"--buffer_n={buffer_n:.6f}",
+        ],
+        cwd=str(binary.parent),
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=True,
+    )
+    gam_match = re.search(r"GAM = \[([^\]]+)\]", completed.stdout)
+    assert gam_match, f"no GAM vector in MAGEMin stdout:\n{completed.stdout}"
+    gam = [float(x) for x in gam_match.group(1).split(",")]
+    assert len(gam) == 11, gam
+
+    phase_match = re.search(r"^\s*Phase\s*:\s*(.+)$", completed.stdout, re.M)
+    mode_match = re.search(r"^\s*Mode\s*:\s*(.+)$", completed.stdout, re.M)
+    assert phase_match and mode_match, (
+        f"no Phase/Mode block in MAGEMin stdout:\n{completed.stdout}"
+    )
+    phases = tuple(phase_match.group(1).split())
+    modes = tuple(float(x) for x in mode_match.group(1).split())
+    assert len(phases) == len(modes)
+    return gam[8], phases, modes
 
 
 @pytest.mark.skipif(
@@ -751,6 +818,36 @@ def test_magemin_live_buffer_n_sign_and_magnitude_round_trip():
     assert observed_delta == pytest.approx(expected_delta, abs=0.5), (
         f"GAM[O] shift {observed_delta:.4f} kJ over buffer_n delta=4 must "
         f"match MAGEMin's buffer formula prediction {expected_delta:.4f} kJ"
+    )
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_adapter_path_fO2_changes_shadow_response():
+    """Requested fO2 must move the MAGEMin shadow response.
+
+    This intentionally drives the production adapter path
+    (``_build_ig_bulk_vector`` + ``_resolve_buffer``). P3-F real-binary probes
+    showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero, so
+    Fe2O3 must provision the free O component instead of being collapsed solely
+    into FeOt.
+    """
+    binary = _LIVE_MAGEMIN_BINARY
+    reduced = _run_magemin_adapter_buffer_probe(binary, fO2_log=-12.0)
+    oxidized = _run_magemin_adapter_buffer_probe(binary, fO2_log=-4.0)
+
+    gam_o_changed = abs(oxidized[0] - reduced[0]) > 1.0e-6
+    assemblage_changed = oxidized[1] != reduced[1]
+    modes_changed = oxidized[2] != pytest.approx(reduced[2], abs=1.0e-9)
+    # Require the robust, production-parsed signals (phase assemblage / modes) to
+    # move, not GAM[O] alone: the subprocess bridge reliably exposes Phase/Mode,
+    # whereas GAM[O] is a secondary readout. GAM is kept as a sanity signal.
+    assert assemblage_changed or modes_changed, (
+        "MAGEMin adapter path must move phase assemblage or modes across widely "
+        f"separated fO2_log values; reduced={reduced} oxidized={oxidized} "
+        f"(gam_o_changed={gam_o_changed})"
     )
 
 

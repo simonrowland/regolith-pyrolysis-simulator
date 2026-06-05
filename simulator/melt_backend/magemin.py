@@ -593,9 +593,9 @@ class MAGEMinBackend(MeltBackend):
     # MAGEMin's igneous (``ig``) database ``--Bulk`` order.  See the
     # binary's ``--help``: 'ig' expects
     #   SiO2, Al2O3, CaO, MgO, FeOt, K2O, Na2O, TiO2, O, Cr2O3, H2O
-    # FeOt is *total* iron — the simulator's FeO + Fe2O3 are folded into
-    # it, and ``O`` is the free redox component (left at 0; fO2 is set by
-    # the ``--buffer`` argument instead).
+    # FeOt is *total* iron -- the simulator's FeO + Fe2O3 are folded into
+    # it. Fe2O3's oxygen in excess of 2 FeO formula masses is preserved in
+    # MAGEMin's free ``O`` component; otherwise ``--buffer`` is inert.
     _IG_BULK_ORDER: Tuple[str, ...] = (
         'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O', 'TiO2',
         'O', 'Cr2O3', 'H2O',
@@ -614,6 +614,9 @@ class MAGEMinBackend(MeltBackend):
     _FEOT_FROM_FE2O3_FACTOR = (
         _FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL
         / _FE2O3_MOLAR_MASS_G_PER_MOL
+    )
+    _EXCESS_O_FROM_FE2O3_FACTOR = (
+        _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
     )
 
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
@@ -799,8 +802,8 @@ class MAGEMinBackend(MeltBackend):
         """
         Project the simulator's 14-oxide wt% onto MAGEMin's ``ig`` bulk
         order, folding FeO + Fe2O3 into the single FeOt (total iron)
-        component and zeroing the free ``O`` redox component (fO2 is set
-        by ``--buffer``).  Oxides outside the ``ig`` system (MnO, P2O5,
+        component and preserving Fe2O3's excess oxygen as the free ``O``
+        redox component.  Oxides outside the ``ig`` system (MnO, P2O5,
         NiO, CoO) are dropped — the ``ig`` database does not model them.
         """
         feo = float(composition_wt_pct.get('FeO', 0.0) or 0.0)
@@ -808,13 +811,14 @@ class MAGEMinBackend(MeltBackend):
         # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
         # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
         feot = feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
+        excess_o = fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
 
         vector: List[float] = []
         for component in self._IG_BULK_ORDER:
             if component == 'FeOt':
                 vector.append(feot)
             elif component == 'O':
-                vector.append(0.0)
+                vector.append(excess_o)
             else:
                 vector.append(
                     float(composition_wt_pct.get(component, 0.0) or 0.0))
