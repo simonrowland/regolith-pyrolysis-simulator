@@ -91,6 +91,51 @@ _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
 }
 
 
+class VaporPressureComputationError(RuntimeError):
+    """Raised when vapor-pressure math produces a non-finite value."""
+
+
+def _require_finite_vapor_value(
+    value: float,
+    *,
+    species: str,
+    field: str,
+) -> float:
+    try:
+        checked = float(value)
+    except (TypeError, ValueError) as exc:
+        raise VaporPressureComputationError(
+            f"vapor_pressure_nonfinite: species={species} field={field} "
+            f"value={value!r}"
+        ) from exc
+    if not math.isfinite(checked):
+        raise VaporPressureComputationError(
+            f"vapor_pressure_nonfinite: species={species} field={field} "
+            f"value={value!r}"
+        )
+    return checked
+
+
+def _pow10_pressure_or_raise(
+    log_pressure: float,
+    *,
+    species: str,
+    field: str,
+) -> float:
+    try:
+        pressure = 10.0 ** float(log_pressure)
+    except OverflowError as exc:
+        raise VaporPressureComputationError(
+            f"vapor_pressure_nonfinite: species={species} field={field} "
+            f"log_pressure={log_pressure!r}"
+        ) from exc
+    return _require_finite_vapor_value(
+        pressure,
+        species=species,
+        field=field,
+    )
+
+
 class BuiltinVaporPressureProvider(ChemistryProvider):
     """Fallback ``VAPOR_PRESSURE`` provider (Antoine + Ellingham).
 
@@ -199,7 +244,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K"
                     )
             log_P = A - B / (T_K + C)
-            P_sat_pure_Pa = 10.0 ** log_P
+            P_sat_pure_Pa = _pow10_pressure_or_raise(
+                log_P,
+                species=species,
+                field="P_sat_pure_Pa",
+            )
 
             a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             if a_oxide <= 1e-10:
@@ -210,14 +259,38 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
             dG_f_kJ = dH_f - T_K * dS_f
             # K_decomp = exp(dG_f * 1000 / (R * T))
-            K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
-            numerator = K_decomp * (a_oxide ** n_ox) / pO2_bar
+            try:
+                K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
+            except OverflowError as exc:
+                raise VaporPressureComputationError(
+                    "vapor_pressure_nonfinite: "
+                    f"species={species} field=K_decomp value=overflow"
+                ) from exc
+            K_decomp = _require_finite_vapor_value(
+                K_decomp,
+                species=species,
+                field="K_decomp",
+            )
+            numerator = _require_finite_vapor_value(
+                K_decomp * (a_oxide ** n_ox) / pO2_bar,
+                species=species,
+                field="metal_activity_numerator",
+            )
             if numerator <= 0:
                 continue
 
             a_M_liquid = numerator ** (1.0 / n_M)
+            a_M_liquid = _require_finite_vapor_value(
+                a_M_liquid,
+                species=species,
+                field="metal_activity",
+            )
             a_M_liquid = min(a_M_liquid, 1.0)
-            P_effective_Pa = a_M_liquid * P_sat_pure_Pa
+            P_effective_Pa = _require_finite_vapor_value(
+                a_M_liquid * P_sat_pure_Pa,
+                species=species,
+                field="P_effective_Pa",
+            )
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
 
@@ -231,7 +304,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if not (A > 0 and valid[0] <= T_K <= valid[1]):
                 continue
             log_P = A - B / (T_K + C)
-            P_sat = 10.0 ** log_P
+            P_sat = _pow10_pressure_or_raise(
+                log_P,
+                species=name,
+                field="P_sat",
+            )
 
             parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
@@ -240,20 +317,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
-                P_sat *= max(a_ox, 0.0) ** activity_exponent
+                P_sat = _require_finite_vapor_value(
+                    P_sat * max(a_ox, 0.0) ** activity_exponent,
+                    species=name,
+                    field="P_sat_activity",
+                )
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                P_sat *= (pO2_bar / pO2_reference_bar) ** pO2_exponent
+                P_sat = _require_finite_vapor_value(
+                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    species=name,
+                    field="P_sat_pO2",
+                )
 
             # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
             # 1e-9 bar (lunar hard vacuum).
             if name == 'SiO' and not pO2_exponent and pO2_bar > 1e-9:
                 suppression = math.sqrt(1e-9 / pO2_bar)
-                P_sat *= suppression
+                P_sat = _require_finite_vapor_value(
+                    P_sat * suppression,
+                    species=name,
+                    field="P_sat_suppressed",
+                )
 
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat

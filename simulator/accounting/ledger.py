@@ -412,6 +412,7 @@ class AtomLedger:
         return self.transfer(name, debits, credits, reason=reason)
 
     def project(self, transition: LedgerTransition) -> dict[str, dict[str, float]]:
+        self._assert_balances_finite()
         balances = _copy_balances(self._balances)
         for lot in transition.debits:
             _apply_lot(
@@ -429,6 +430,7 @@ class AtomLedger:
                 tolerance_kg=self.balance_tolerance_kg,
                 registry=self.registry,
             )
+        self._assert_balances_finite(balances)
         return balances
 
     def set_account_policy(
@@ -444,6 +446,7 @@ class AtomLedger:
         return self._policies.get(name, AccountPolicy.normal(name))
 
     def kg_by_account(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
+        self._assert_balances_finite()
         if account is not None:
             return _species_mol_to_kg(
                 self._balances.get(str(account), {}),
@@ -460,6 +463,7 @@ class AtomLedger:
         }
 
     def mol_by_account(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
+        self._assert_balances_finite()
         if account is not None:
             return dict(self._balances.get(str(account), {}))
         return _copy_balances(self._balances)
@@ -473,6 +477,7 @@ class AtomLedger:
         }
 
     def total_mol_by_account(self, account: str | None = None) -> dict[str, float] | float:
+        self._assert_balances_finite()
         if account is not None:
             return sum(self._balances.get(str(account), {}).values())
         return {name: sum(species.values()) for name, species in sorted(self._balances.items())}
@@ -487,6 +492,7 @@ class AtomLedger:
         return dict(sorted((species, kg) for species, kg in totals.items() if abs(kg) > self.balance_tolerance_kg))
 
     def mol_by_species(self, account: str | None = None) -> dict[str, float]:
+        self._assert_balances_finite()
         if account is not None:
             return dict(self._balances.get(str(account), {}))
         totals: defaultdict[str, float] = defaultdict(float)
@@ -496,10 +502,12 @@ class AtomLedger:
         return dict(sorted((species, mol) for species, mol in totals.items() if mol != 0.0))
 
     def atom_moles_by_account(self, account: str) -> dict[str, float]:
+        self._assert_balances_finite()
         return _signed_atom_moles_from_species_mol(
             self._balances.get(str(account), {}), self.registry)
 
     def reservoir_balances(self) -> dict[str, dict[str, Any]]:
+        self._assert_balances_finite()
         reservoir_accounts = set(self._policies) | set(self._balances)
         report: dict[str, dict[str, Any]] = {}
         for account in sorted(name for name in reservoir_accounts if name.startswith("reservoir.")):
@@ -570,6 +578,7 @@ class AtomLedger:
         }
 
     def assert_balanced(self) -> bool:
+        self._assert_balances_finite()
         for transition in self._transitions:
             self._validate_terminal_debits(transition)
             transition.validate_conservation(
@@ -612,10 +621,31 @@ class AtomLedger:
                 raise AccountingError("account policy iterables must contain AccountPolicy objects")
             self._policies[policy.account] = policy
 
+    def _assert_balances_finite(
+        self,
+        balances: Mapping[str, Mapping[str, float]] | None = None,
+    ) -> None:
+        checked = self._balances if balances is None else balances
+        for account, species_mol in checked.items():
+            for species, mol in species_mol.items():
+                try:
+                    value = float(mol)
+                except (TypeError, ValueError) as exc:
+                    raise AccountingError(
+                        "ledger_balance_nonfinite: "
+                        f"account={account!r} species={species!r} mol={mol!r}"
+                    ) from exc
+                if not math.isfinite(value):
+                    raise AccountingError(
+                        "ledger_balance_nonfinite: "
+                        f"account={account!r} species={species!r} mol={mol!r}"
+                    )
+
     def _validate_account_policies(
         self, balances: Mapping[str, Mapping[str, float]] | None = None
     ) -> None:
         checked = balances if balances is not None else self._balances
+        self._assert_balances_finite(checked)
         for account, species_mol in checked.items():
             policy = self.account_policy(account)
             species_kg = _species_mol_to_kg(

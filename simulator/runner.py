@@ -159,6 +159,10 @@ class RunnerError(RuntimeError):
     """
 
 
+class EngineBugAbort(RunnerError):
+    """Fatal runner abort for corrupted engine snapshots."""
+
+
 # ----------------------------------------------------------------------
 # Data loading helpers
 # ----------------------------------------------------------------------
@@ -723,6 +727,52 @@ def _clean_report_float(value: float) -> float:
     return float(f"{value:.12g}")
 
 
+def _required_mass_balance_value(
+    snapshot: Mapping[str, Any],
+    key: str,
+    *,
+    source: str,
+) -> float:
+    raw = snapshot.get(key)
+    if raw is None:
+        raise EngineBugAbort(
+            f"mass_balance_key_missing_in_snapshot: source={source} key={key}"
+        )
+    try:
+        value = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise EngineBugAbort(
+            f"mass_balance_key_non_numeric_in_snapshot: source={source} key={key}"
+        ) from exc
+    if not math.isfinite(value):
+        raise EngineBugAbort(
+            f"mass_balance_key_nonfinite_in_snapshot: source={source} key={key}"
+        )
+    return value
+
+
+def _latest_mass_balance_pct(result: Mapping[str, Any]) -> float:
+    summary = result.get("per_hour_summary")
+    if not summary:
+        raise EngineBugAbort(
+            "mass_balance_snapshot_missing: source=per_hour_summary"
+        )
+    if not isinstance(summary, (list, tuple)):
+        raise EngineBugAbort(
+            "mass_balance_snapshot_malformed: source=per_hour_summary"
+        )
+    snapshot = summary[-1]
+    if not isinstance(snapshot, Mapping):
+        raise EngineBugAbort(
+            "mass_balance_snapshot_malformed: source=per_hour_summary"
+        )
+    return _required_mass_balance_value(
+        snapshot,
+        "mass_balance_pct",
+        source="per_hour_summary",
+    )
+
+
 def _format_sweep_float(value: float) -> str:
     if not math.isfinite(value):
         raise RunnerError(f"non-finite sweep value: {value!r}")
@@ -1170,11 +1220,7 @@ def build_sio_yield_report(
             "sio_wall_mol": sio_wall_mol,
             "sio_escape_mol": sio_escape_mol,
             "closure_error_pct": closure_error_pct,
-            "mass_balance_error_pct": float(
-                (result.get("per_hour_summary") or [{}])[-1].get(
-                    "mass_balance_pct", 0.0
-                )
-            ),
+            "mass_balance_error_pct": _latest_mass_balance_pct(result),
             "wall_deposit_total_kg": sum(float(v) for v in wall_deposit_kg.values()),
             "final_overhead_pressure_mbar": float(sim.overhead.pressure_mbar),
             "final_liner_temperature_C": float(sim.overhead_model.pipe_temperature_C),
@@ -1264,7 +1310,13 @@ def _sio_tsweep_row(
         ),
         "stage3_silica_kg": _clean_report_float(stage3_silica_kg),
         "mass_balance_err_pct": _clean_report_float(
-            abs(float(diagnostics.get("mass_balance_error_pct", 0.0)))
+            abs(
+                _required_mass_balance_value(
+                    diagnostics,
+                    "mass_balance_error_pct",
+                    source="diagnostics",
+                )
+            )
         ),
     }
 
@@ -1607,7 +1659,13 @@ def _sio_wall_sweep_row(
             float(report["sio_yield_pct_of_feedstock"])
         ),
         "mass_balance_err_pct": _clean_report_float(
-            abs(float(diagnostics.get("mass_balance_error_pct", 0.0)))
+            abs(
+                _required_mass_balance_value(
+                    diagnostics,
+                    "mass_balance_error_pct",
+                    source="diagnostics",
+                )
+            )
         ),
         "closure_error_pct": _clean_report_float(
             abs(float(diagnostics.get("closure_error_pct", 0.0)))
