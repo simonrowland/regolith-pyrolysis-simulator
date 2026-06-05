@@ -101,6 +101,12 @@ class _ShadowProvider(ChemistryProvider):
         )
 
 
+class _RaisingShadowProvider(_ShadowProvider):
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        self.call_count += 1
+        raise RuntimeError("shadow backend failed")
+
+
 def test_planner_routes_to_authoritative_and_returns_its_result():
     registry = ProviderRegistry()
     auth = _AuthoritativeProvider()
@@ -114,6 +120,29 @@ def test_planner_routes_to_authoritative_and_returns_its_result():
     assert auth.call_count == 1
     assert shadow.call_count == 1
     assert result.diagnostic.get("source") == "authoritative"
+
+
+def test_shadow_dispatch_error_does_not_block_authoritative_result():
+    registry = ProviderRegistry()
+    auth = _AuthoritativeProvider()
+    shadow = _RaisingShadowProvider()
+    registry.register(auth, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(shadow, [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+
+    planner = Planner(registry)
+    result = planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+
+    assert auth.call_count == 1
+    assert shadow.call_count == 1
+    assert result.diagnostic.get("source") == "authoritative"
+    assert planner.shadow_trace == (
+        {
+            "event": "shadow_error",
+            "provider_id": "shadow",
+            "intent": "vapor_pressure",
+            "error": "RuntimeError('shadow backend failed')",
+        },
+    )
 
 
 def test_planner_records_shadow_trace_separately():

@@ -141,12 +141,24 @@ class Planner:
         shadows = self._registry.shadows_for(request.intent)
         shadow_results: list[tuple[ChemistryProvider, IntentResult]] = []
         for shadow in shadows:
-            shadow_result = shadow.dispatch(request)
+            provider_id = shadow.capability_profile().provider_id
+            try:
+                shadow_result = shadow.dispatch(request)
+            except Exception as exc:  # noqa: BLE001 -- never block dispatch
+                self._append_shadow_trace(
+                    {
+                        "event": "shadow_error",
+                        "provider_id": provider_id,
+                        "intent": request.intent.value,
+                        "error": repr(exc),
+                    }
+                )
+                continue
             shadow_results.append((shadow, shadow_result))
             self._append_shadow_trace(
                 {
                     "event": "shadow_dispatch",
-                    "provider_id": shadow.capability_profile().provider_id,
+                    "provider_id": provider_id,
                     "intent": request.intent.value,
                     "result": shadow_result,
                 }
