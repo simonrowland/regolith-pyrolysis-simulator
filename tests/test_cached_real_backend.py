@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 from pathlib import Path
 from typing import Any, Mapping
 
 import pytest
 
+from scripts import populate_reduced_real_cache as populate_driver
 from simulator.backends import (
     BackendSelectionPolicy,
     BackendUnavailableError,
@@ -23,7 +25,9 @@ from simulator.reduced_real_determinism import (
     PT0CacheCollision,
     PT0CacheMiss,
     PT0DeterminismStore,
+    canonical_json_bytes,
     canonical_replay_key,
+    equilibrium_payload,
 )
 from simulator.state import CampaignPhase
 
@@ -206,6 +210,48 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
         "cached_interpolated",
         "live_fill",
     )
+
+
+def test_cached_real_replays_row_written_by_populate_driver_store(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "populate-driver.db"
+    live_backend = _FakeLiveRealBackend()
+    live_sim = _build_direct_real_sim(live_backend)
+
+    live_result = live_sim._get_equilibrium()
+    replay_config = _cache_config(db_path, "fail-loud")
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    artifact = "equilibrium_post_record"
+    key = replay_sim._pt0_store()._equilibrium_key(replay_sim)
+    payload = equilibrium_payload(live_sim, live_result)
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    populate_driver.PT1PersistentEquilibriumStore(db_path).put(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+    replay_result = replay_sim._get_equilibrium()
+
+    assert artifact == "equilibrium_post_record"
+    assert live_backend.calls == 1
+    assert replay_sim._last_reduced_real_cache_state == "cached_exact"
+    assert replay_result.status == live_result.status
+    assert replay_result.vapor_pressures_Pa == live_result.vapor_pressures_Pa
 
 
 def test_cached_real_authorized_backend_identity_partitions_cache(
