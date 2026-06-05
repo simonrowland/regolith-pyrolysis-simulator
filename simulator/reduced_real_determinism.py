@@ -310,6 +310,9 @@ class PT0DeterminismStore:
             },
             "capture_calls_by_artifact": dict(sorted(by_artifact.items())),
             "key_drift_histogram": self.key_drift_histogram(),
+            "key_drift_histogram_scope": (
+                "replay_mode_1_to_1_capture_replay_only"
+            ),
             "first_miss": self.misses[0] if self.misses else None,
             "persistent_store": (
                 None
@@ -323,6 +326,9 @@ class PT0DeterminismStore:
         }
 
     def key_drift_histogram(self) -> dict[str, int]:
+        """Replay-only drift counts for 1:1 capture/replay sequence comparisons."""
+        if not self.replay_enabled:
+            return {}
         counts: Counter[str] = Counter()
         for index, replay in enumerate(self.replay_sequence):
             if index >= len(self.capture_sequence):

@@ -692,6 +692,14 @@ def test_pt2_alphamelts_write_through_populates_then_exact_hits(
     ]
     assert cached_counts["cached_exact"] == 1
     assert cached_counts["live_fill"] == 0
+    cached_summary = cached.summary()
+    assert cached_summary["key_drift_histogram"] == {}
+    assert (
+        cached_summary["key_drift_histogram_scope"]
+        == "replay_mode_1_to_1_capture_replay_only"
+    )
+    assert cached.replay_sequence
+    assert cached.capture_sequence == []
     with sqlite3.connect(db_path) as conn:
         rows_after_hit = conn.execute(
             f"""
