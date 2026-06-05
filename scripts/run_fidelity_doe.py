@@ -1,0 +1,170 @@
+"""Pilot: fast(stub) vs high(real alphamelts) fidelity-correlation DOE, one feedstock.
+
+Hard pilot constraints (DO NOT relax without operator sign-off — each real high
+eval is ~6+ min of ThermoEngine MELTS):
+  - max_samples / N        = 4   (exactly four candidates)
+  - per_eval_timeout_s     = 900
+  - top_k                  = (2,)
+  - parallelism            : the harness loop in simulator/optimize/fidelity.py is
+    STRICTLY SEQUENTIAL (fast then high per index, each in a short-lived fork that
+    the parent join()s to completion). There is NO worker-pool knob, so the four
+    high evals SERIALIZE; the "<=4 workers" budget is moot for this code path.
+
+Run:
+  .venv/bin/python scripts/run_fidelity_doe.py
+
+Per-eval wall-clock for the REAL high arm is captured via a fork-safe timing shim
+that appends one JSONL row per evaluate() call to TIMING_LOG (the harness forks a
+child per eval, so we cannot collect timings in parent memory).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import time
+import traceback
+from pathlib import Path
+
+import yaml
+
+from simulator.optimize.doe import DoeSpec
+from simulator.optimize.evaluate import evaluate as _evaluate
+from simulator.optimize.fidelity import run_fidelity_correlation
+from simulator.optimize.recipe import RecipeSchema
+
+PROFILE = "data/optimize_profiles/lunar_mare_low_ti.yaml"
+N = 4                       # HARD: exactly four candidates
+PER_EVAL_TIMEOUT_S = 900.0  # HARD
+TOP_K = (2,)                # HARD
+# /tmp (non-Dropbox) avoids a CloudStorage sync race that can zero artifact files
+# mid-run; the constraint explicitly permits temp/ or /tmp.
+ARTIFACT_DIR = "/tmp/fidelity_pilot/out"
+TIMING_LOG = "/tmp/fidelity_pilot/eval_timings.jsonl"
+
+
+def _timed_evaluate(patch, feedstock_id, fidelity, **kwargs):
+    """Fork-safe wrapper: time evaluate(), append a JSONL timing row, re-raise on error.
+
+    Runs inside the harness child process. Records tier (==fidelity name passed by
+    the harness), wall-clock seconds, feasibility, and whether a populated objective
+    vector came back (the make-or-break signal for whether a Spearman/top-K verdict
+    is even computable on the real arm).
+    """
+    t0 = time.perf_counter()
+    err_cls = None
+    try:
+        result = _evaluate(patch, feedstock_id, fidelity, **kwargs)
+    except BaseException as exc:  # noqa: BLE001 - record then re-raise for harness taxonomy
+        err_cls = type(exc).__name__
+        result = None
+        raise
+    finally:
+        dt = time.perf_counter() - t0
+        feasible = getattr(result, "feasible", None) if result is not None else None
+        objs = getattr(result, "objectives", None) if result is not None else None
+        row = {
+            "tier": fidelity,
+            "candidate_id": kwargs.get("candidate_id"),
+            "seconds": dt,
+            "feasible": feasible,
+            "objectives_populated": objs is not None,
+            "failure_category": (
+                getattr(getattr(result, "failure_category", None), "value", None)
+                if result is not None
+                else None
+            ),
+            "error_class": err_cls,
+            "wall_clock_epoch": time.time(),
+            "pid": os.getpid(),
+        }
+        with open(TIMING_LOG, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(row) + "\n")
+    return result
+
+
+def main() -> int:
+    Path(TIMING_LOG).parent.mkdir(parents=True, exist_ok=True)
+    # Fresh timing log each run.
+    Path(TIMING_LOG).write_text("", encoding="utf-8")
+
+    profile = yaml.safe_load(Path(PROFILE).read_text())
+    feedstock = profile["feedstock"]
+
+    # Per-tier backend override: fast -> cheap deterministic stub; high -> REAL MELTS.
+    # Stock profile pins ALL tiers to "stub"; evaluate() reads
+    # profile["fidelities"][fidelity]["backend_name"] (simulator/optimize/evaluate.py
+    # _run_options). Without this override both arms would be identical stubs.
+    profile = dict(profile)
+    profile["fidelities"] = dict(profile["fidelities"])
+    profile["fidelities"]["fast"] = {"backend_name": "stub", "hours": 1}
+    profile["fidelities"]["high"] = {"backend_name": "alphamelts", "hours": 1}
+
+    schema = RecipeSchema()
+    doe = DoeSpec(schema=schema, n_samples=N, seed=0)  # sampler defaults to scipy-sobol
+
+    # Optional: forward the profile-declared study_constraints to evaluate(). The
+    # stock profile declares `study_constraints: stub_smoke`, which the study
+    # driver resolves to StubSmokeConstraintSet (a trivial always-feasible gate).
+    # Without this, evaluate() falls back to the FULL default PhysicsConstraintSet
+    # (delivered_stream_purity / extraction_completeness / knudsen_viscous / ...),
+    # under which full-range Sobol patches AND the profile's own seed recipe are
+    # all infeasible. Set FIDELITY_USE_PROFILE_CONSTRAINTS=1 to honor the profile.
+    eval_kwargs = {}
+    if os.environ.get("FIDELITY_USE_PROFILE_CONSTRAINTS") == "1":
+        from simulator.optimize.study import StubSmokeConstraintSet  # picklable, fork-safe
+
+        selector = profile.get("study_constraints")
+        if selector == "stub_smoke":
+            eval_kwargs["constraints"] = StubSmokeConstraintSet()
+            print(f"[runner] honoring profile study_constraints={selector!r} (StubSmokeConstraintSet)")
+        else:
+            print(f"[runner] WARNING: study_constraints={selector!r} not wired; using default gates")
+
+    wall0 = time.perf_counter()
+    try:
+        result = run_fidelity_correlation(
+            doe,
+            _timed_evaluate,        # SAME callable for both arms; tier string selects backend
+            _timed_evaluate,
+            per_eval_timeout_s=PER_EVAL_TIMEOUT_S,
+            feedstock_id=feedstock,
+            profile=profile,
+            fast_fidelity_name="fast",   # -> stub
+            high_fidelity_name="high",   # -> alphamelts (real)
+            top_k=TOP_K,
+            max_samples=N,
+            artifact_dir=ARTIFACT_DIR,
+            evaluator_kwargs=eval_kwargs or None,
+        )
+    except BaseException as exc:  # noqa: BLE001 - capture + STOP, no retry loop
+        total = time.perf_counter() - wall0
+        print("=== HARNESS CRASH ===")
+        print(f"error_class: {type(exc).__name__}")
+        print(f"message: {exc}")
+        print(f"total_wall_clock_s: {total:.1f}")
+        traceback.print_exc()
+        return 1
+
+    total = time.perf_counter() - wall0
+    print("=== RESULT ===")
+    print("total_wall_clock_s:", round(total, 1))
+    print("fast_screen_trustworthy:", result.fast_screen_trustworthy)
+    print("confidence:", result.confidence)
+    print("spearman_by_objective:", dict(result.spearman_by_objective))
+    print("feasible_infeasible_agreement:", result.feasible_infeasible_agreement)
+    print("top_k_recall:", dict(result.top_k_recall))
+    print(
+        "n_compared/total/dropped:",
+        result.n_samples_compared,
+        result.n_samples_total,
+        result.n_samples_dropped,
+    )
+    print("dropped_evaluations:", json.dumps([dict(d) for d in result.dropped_evaluations], indent=2))
+    print("artifact_paths:", dict(result.artifact_paths))
+    print("notes:", list(result.notes))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
