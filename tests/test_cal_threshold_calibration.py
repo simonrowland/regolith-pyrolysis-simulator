@@ -86,3 +86,67 @@ def test_worker_payload_rejects_multiple_feedstocks():
     )
     with pytest.raises(SystemExit, match="exactly one --feedstock"):
         cal._worker_payload(args)
+
+
+def _summary_with_threshold() -> dict:
+    return {
+        "row_count": 3,
+        "case_count": 1,
+        "analysis_by_feedstock_campaign_target": {
+            "lunar_mare_low_ti|C2B|Fe": {
+                "status": "ok",
+                "proposed_threshold": 0.9,
+            },
+        },
+    }
+
+
+def test_real_backend_blocked_when_any_worker_case_fails():
+    cases = [
+        {
+            "case": {"feedstock": "lunar_mare_low_ti", "campaign": "C2B"},
+            "rows": [{"feedstock": "lunar_mare_low_ti", "campaign": "C2B", "target": "Fe", "completeness": 0.5, "campaign_hour": 1, "hour_index": 0}],
+            "stop_reason": "max_hours",
+        },
+        {
+            "case": {"feedstock": "lunar_mare_low_ti", "campaign": "C4"},
+            "rows": [],
+            "stop_reason": "timeout",
+        },
+    ]
+    summary = _summary_with_threshold()
+    assert cal._is_real_backend_calibration_blocked(
+        cases,
+        summary,
+        backend="alphamelts",
+        feedstocks=("lunar_mare_low_ti",),
+        campaigns=("C2B", "C4"),
+    )
+
+
+def test_real_backend_blocked_when_expected_target_missing_curve():
+    cases = [
+        {
+            "case": {"feedstock": "lunar_mare_low_ti", "campaign": "C2B"},
+            "rows": [{"feedstock": "lunar_mare_low_ti", "campaign": "C2B", "target": "Fe", "completeness": 0.5, "campaign_hour": 1, "hour_index": 0}],
+            "stop_reason": "max_hours",
+        },
+    ]
+    summary = _summary_with_threshold()
+    assert cal._is_real_backend_calibration_blocked(
+        cases,
+        summary,
+        backend="alphamelts",
+        feedstocks=("lunar_mare_low_ti",),
+        campaigns=("C2B", "C4"),
+    )
+
+
+def test_stub_backend_never_blocked_by_partial_matrix():
+    assert not cal._is_real_backend_calibration_blocked(
+        [{"rows": [], "stop_reason": "timeout"}],
+        {"row_count": 0, "analysis_by_feedstock_campaign_target": {}},
+        backend="stub",
+        feedstocks=("lunar_mare_low_ti",),
+        campaigns=("C2B",),
+    )

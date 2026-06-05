@@ -37,6 +37,7 @@ CAMPAIGN_TARGETS = {
     "C2B": ("Fe",),
     "C4": ("Mg",),
 }
+_WORKER_FAILURE_STOP_REASONS = frozenset({"timeout", "error", "invalid_json"})
 
 
 @dataclass(frozen=True)
@@ -427,6 +428,46 @@ def _summarize(cases: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _expected_feedstock_campaign_targets(
+    feedstocks: tuple[str, ...],
+    campaigns: tuple[str, ...],
+) -> tuple[tuple[str, str, str], ...]:
+    keys: list[tuple[str, str, str]] = []
+    for feedstock in feedstocks:
+        for campaign in campaigns:
+            for target in CAMPAIGN_TARGETS.get(campaign, ()):
+                keys.append((feedstock, campaign, target))
+    return tuple(keys)
+
+
+def _is_real_backend_calibration_blocked(
+    cases: list[dict[str, Any]],
+    summary: dict[str, Any],
+    *,
+    backend: str,
+    feedstocks: tuple[str, ...],
+    campaigns: tuple[str, ...],
+) -> bool:
+    """True when a real-backend CAL run must not emit authoritative thresholds."""
+
+    if backend == "stub":
+        return False
+    if summary.get("row_count", 0) == 0:
+        return True
+    for case in cases:
+        if case.get("stop_reason") in _WORKER_FAILURE_STOP_REASONS:
+            return True
+    analysis = summary.get("analysis_by_feedstock_campaign_target", {})
+    for feedstock, campaign, target in _expected_feedstock_campaign_targets(
+        feedstocks,
+        campaigns,
+    ):
+        entry = analysis.get(f"{feedstock}|{campaign}|{target}", {"status": "no_data"})
+        if entry.get("proposed_threshold") is None:
+            return True
+    return False
+
+
 def _write_csv(rows: list[dict[str, Any]], path: Path) -> None:
     fieldnames = [
         "feedstock",
@@ -673,7 +714,13 @@ def main(argv: list[str] | None = None) -> int:
         "generated_at_unix": time.time(),
     }
     summary = _summarize(results)
-    blocked = args.backend != "stub" and summary["row_count"] == 0
+    blocked = _is_real_backend_calibration_blocked(
+        results,
+        summary,
+        backend=args.backend,
+        feedstocks=feedstocks,
+        campaigns=campaigns,
+    )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     args.review_dir.mkdir(parents=True, exist_ok=True)
