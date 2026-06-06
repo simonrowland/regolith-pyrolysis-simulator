@@ -593,9 +593,9 @@ class MAGEMinBackend(MeltBackend):
     # MAGEMin's igneous (``ig``) database ``--Bulk`` order.  See the
     # binary's ``--help``: 'ig' expects
     #   SiO2, Al2O3, CaO, MgO, FeOt, K2O, Na2O, TiO2, O, Cr2O3, H2O
-    # FeOt is *total* iron -- the simulator's FeO + Fe2O3 are folded into
-    # it. Fe2O3's oxygen in excess of 2 FeO formula masses is preserved in
-    # MAGEMin's free ``O`` component; otherwise ``--buffer`` is inert.
+    # FeOt is total iron. Explicit Fe2O3 contributes excess O; when only the
+    # spectroscopic total-iron-as-FeO convention is present, implicit redox O
+    # is provisioned so the qfm buffer can engage.
     _IG_BULK_ORDER: Tuple[str, ...] = (
         'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O', 'TiO2',
         'O', 'Cr2O3', 'H2O',
@@ -617,6 +617,15 @@ class MAGEMinBackend(MeltBackend):
     )
     _EXCESS_O_FROM_FE2O3_FACTOR = (
         _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
+    )
+    # Lunar/Apollo bulk chemistry reports total iron as ``FeO`` / ``FeO_T`` —
+    # a spectroscopy bookkeeping convention, not literal stoichiometric FeO.
+    # MAGEMin still needs a nonzero ``O`` bulk component for the qfm buffer.
+    # When no explicit ``Fe2O3`` is present, provision redox O from the total
+    # iron inventory using the same half-O-per-Fe stoichiometry as explicit
+    # Fe2O3 excess oxygen (mass-conserving with the Fe2O3 path above).
+    _EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR = (
+        _O_MOLAR_MASS_G_PER_MOL / (2.0 * _FEO_MOLAR_MASS_G_PER_MOL)
     )
 
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
@@ -802,7 +811,7 @@ class MAGEMinBackend(MeltBackend):
         """
         Project the simulator's 14-oxide wt% onto MAGEMin's ``ig`` bulk
         order, folding FeO + Fe2O3 into the single FeOt (total iron)
-        component and preserving Fe2O3's excess oxygen as the free ``O``
+        component and preserving ferric excess oxygen in the free ``O``
         redox component.  Oxides outside the ``ig`` system (MnO, P2O5,
         NiO, CoO) are dropped — the ``ig`` database does not model them.
         """
@@ -812,6 +821,9 @@ class MAGEMinBackend(MeltBackend):
         # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
         feot = feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
         excess_o = fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
+        if fe2o3 <= 0.0 and feo > 0.0:
+            # FeO key is total-iron inventory (FeO_T), not literal FeO only.
+            excess_o += feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
 
         vector: List[float] = []
         for component in self._IG_BULK_ORDER:

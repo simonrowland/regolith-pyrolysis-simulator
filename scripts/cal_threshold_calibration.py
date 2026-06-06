@@ -33,7 +33,8 @@ DEFAULT_FEEDSTOCKS = ("lunar_mare_low_ti",)
 OPTIONAL_FEEDSTOCKS = ("mars_perchlorate_rich", "ci_carbonaceous_chondrite")
 DEFAULT_CAMPAIGNS = ("C2A_continuous", "C2B", "C4")
 CAMPAIGN_TARGETS = {
-    "C2A_continuous": ("Na", "K", "Fe", "SiO", "Mg", "CrO2"),
+    # Must match setpoints.yaml campaigns.*.target_species / completion contracts.
+    "C2A_continuous": ("Na", "K", "Fe", "CrO2", "SiO"),
     "C2B": ("Fe",),
     "C4": ("Mg",),
 }
@@ -128,10 +129,9 @@ def _worker_payload(args: argparse.Namespace) -> dict[str, Any]:
         diag = getattr(sim, "_last_extraction_completeness_diagnostic", {}) or {}
         values = diag.get("completeness_by_target_species", {}) or {}
         detail = diag.get("detail_by_target_species", {}) or {}
-        target_order = tuple(diag.get("target_species", ())) or CAMPAIGN_TARGETS.get(
-            args.campaign, ()
-        )
-        target_set = tuple(dict.fromkeys((*target_order, *CAMPAIGN_TARGETS.get(args.campaign, ()))))
+        target_set = tuple(
+            diag.get("target_species", ())
+        ) or CAMPAIGN_TARGETS.get(args.campaign, ())
 
         for target in target_set:
             d = detail.get(target, {}) or {}

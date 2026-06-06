@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -160,6 +161,13 @@ def test_real_backend_blocked_when_expected_target_missing_curve():
         feedstocks=("lunar_mare_low_ti",),
         campaigns=("C2B", "C4"),
     )
+
+
+def test_c2a_campaign_targets_match_setpoints_contract():
+    setpoints = yaml.safe_load((REPO_ROOT / "data" / "setpoints.yaml").read_text())
+    expected = tuple(setpoints["campaigns"]["C2A_continuous"]["target_species"])
+    assert cal.CAMPAIGN_TARGETS["C2A_continuous"] == expected
+    assert "Mg" not in cal.CAMPAIGN_TARGETS["C2A_continuous"]
 
 
 def test_stub_backend_never_blocked_by_partial_matrix():

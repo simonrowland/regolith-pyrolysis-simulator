@@ -42,9 +42,12 @@ simulator projects only these cleaned silicate melt oxides into
 `Na2O`, `K2O`, `Cr2O3`, `MnO`, `P2O5`, `NiO`, and `CoO`.
 
 Apollo-derived lunar bulk chemistry usually reports total iron as `FeO` or
-`FeO_T`, not as a separate `FeO`/`Fe2O3` split. Keep lunar `FeO` values as
-the source-normalized total iron convention unless a source explicitly reports
-ferric iron separately.
+`FeO_T`, not as a separate `FeO`/`Fe2O3` split. That is a spectroscopy
+bookkeeping convention (total iron inventory), not a claim that the melt is
+stoichiometric FeO only — native Fe and mixed ferric/ferrous oxide chemistry
+are represented in the process model and in melt-backend redox projections.
+Keep lunar `FeO` values as the source-normalized total iron convention unless
+a source explicitly reports ferric iron separately.
 
 Other raw components are preserved in the batch inventory instead of being
 silently dropped. Examples include `H2O`, `C`, `S`, `SO3`, `Cl`, `ClO4`,

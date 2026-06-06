@@ -126,3 +126,49 @@ def test_c2a_completion_contracts_and_aggregate_are_monotonic() -> None:
         previous_aggregate = aggregate
 
     assert aggregate_values[-1] > aggregate_values[0]
+
+
+def test_c2a_overlap_diagnostic_reports_off_target_without_gating() -> None:
+    sim = _diagnostic_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.step()
+
+    completeness = sim._last_extraction_completeness_diagnostic
+    overlap = sim._last_overlap_evaporation_diagnostic
+    assert "Mg" not in completeness["completeness_by_target_species"]
+    assert completeness["target_species"] == ("Na", "K", "Fe", "CrO2", "SiO")
+    assert overlap["campaign"] == "C2A"
+    assert overlap["completion_target_species"] == completeness["target_species"]
+    assert overlap["endpoint_species_monitored"] == ("Fe", "K", "Na", "SiO")
+
+    for species, row in overlap["off_target_evaporation"].items():
+        assert species not in completeness["target_species"]
+        assert row["gates_completion"] is False
+        assert row["rate_kg_hr"] > 0.0
+
+
+def test_overlap_diagnostic_does_not_change_campaign_advancement() -> None:
+    with_overlap = _diagnostic_sim()
+    without_overlap = _diagnostic_sim()
+    without_overlap._update_overlap_evaporation_diagnostic = lambda _flux: None
+    for sim in (with_overlap, without_overlap):
+        sim.melt.campaign_hour = 30
+        sim.melt.temperature_C = 1600.0
+
+    with_overlap.step()
+    without_overlap.step()
+
+    assert (
+        with_overlap.melt.campaign,
+        with_overlap.melt.hour,
+        with_overlap.melt.campaign_hour,
+        len(with_overlap.record.snapshots),
+        with_overlap.paused_for_decision,
+    ) == (
+        without_overlap.melt.campaign,
+        without_overlap.melt.hour,
+        without_overlap.melt.campaign_hour,
+        len(without_overlap.record.snapshots),
+        without_overlap.paused_for_decision,
+    )
+    assert with_overlap._last_overlap_evaporation_diagnostic["campaign"] == "C2A"

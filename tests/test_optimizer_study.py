@@ -379,6 +379,16 @@ def test_stub_smoke_selector_ignores_profile_threshold_overrides() -> None:
     assert isinstance(constraints, study.StubSmokeConstraintSet)
 
 
+def test_fidelity_pilot_profile_resolves_stub_smoke_constraints() -> None:
+    profile_path = Path("data/optimize_profiles/lunar_mare_low_ti.yaml")
+    profile = yaml.safe_load(profile_path.read_text())
+
+    constraints = study._constraints_for_profile(profile)
+
+    assert profile["study_constraints"] == "stub_smoke"
+    assert isinstance(constraints, study.StubSmokeConstraintSet)
+
+
 def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(tmp_path) -> None:
     study.run(
         PROFILE,

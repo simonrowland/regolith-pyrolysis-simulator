@@ -64,6 +64,10 @@ from simulator.accounting import (
     load_species_formulas,
     resolve_species_formula,
 )
+from simulator.condensation_routing import (
+    designated_stage_number,
+    target_species_for_stage_number,
+)
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
@@ -403,6 +407,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
+        self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._pt0_determinism_store: Any | None = None
         self._last_reduced_real_cache_state: str | None = None
         self._rump_expectation_warnings: list[str] = []
@@ -3768,6 +3773,67 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return None, f"invalid {key}: non-finite"
         return value, "set"
 
+    _OVERLAP_EVAPORATION_RATE_EPS_KG_HR = 1e-6
+
+    @staticmethod
+    def _endpoint_species_monitored(cfg: Mapping[str, Any]) -> tuple[str, ...]:
+        for key in ("endpoint", "soft_endpoint"):
+            endpoint = cfg.get(key)
+            if not isinstance(endpoint, Mapping):
+                continue
+            monitored = PyrolysisSimulator._diagnostic_target_species(
+                endpoint.get("species_monitored"))
+            if monitored:
+                return monitored
+        return ()
+
+    def _update_overlap_evaporation_diagnostic(
+        self, evap_flux: EvaporationFlux,
+    ) -> None:
+        """Report off-target evaporation without gating campaign completion.
+
+        Campaign ``target_species`` drives completion contracts only. Species
+        assigned to later campaigns (e.g. Mg during C2A) must remain visible
+        when their vapor windows overlap the current thermal regime.
+        """
+        config_getter = getattr(self.campaign_mgr, "_campaign_config", None)
+        cfg = config_getter(self.melt.campaign) if callable(config_getter) else {}
+        if not isinstance(cfg, Mapping):
+            cfg = {}
+        target_species = self._diagnostic_target_species(cfg.get("target_species"))
+        target_set = set(target_species)
+        endpoint_watch = set(self._endpoint_species_monitored(cfg))
+        off_target: Dict[str, Dict[str, Any]] = {}
+        for species, raw_rate in sorted((evap_flux.species_kg_hr or {}).items()):
+            rate_kg_hr = float(raw_rate)
+            if rate_kg_hr <= self._OVERLAP_EVAPORATION_RATE_EPS_KG_HR:
+                continue
+            if species in target_set:
+                continue
+            stage_number = designated_stage_number(species)
+            off_target[species] = {
+                "rate_kg_hr": rate_kg_hr,
+                "designated_stage_number": stage_number,
+                "future_campaign_stage_targets": list(
+                    target_species_for_stage_number(stage_number)
+                ) if stage_number is not None else [],
+                "listed_in_endpoint_watch": (
+                    species in endpoint_watch if endpoint_watch else None
+                ),
+                "gates_completion": False,
+            }
+        self._last_overlap_evaporation_diagnostic = {
+            "campaign": self.melt.campaign.name,
+            "campaign_hour": self.melt.campaign_hour,
+            "temperature_C": self.melt.temperature_C,
+            "completion_target_species": target_species,
+            "endpoint_species_monitored": tuple(sorted(endpoint_watch)),
+            "off_target_evaporation": off_target,
+            "off_target_total_kg_hr": sum(
+                row["rate_kg_hr"] for row in off_target.values()
+            ),
+        }
+
     def _update_extraction_completeness_diagnostic(self) -> None:
         config_getter = getattr(self.campaign_mgr, "_campaign_config", None)
         cfg = config_getter(self.melt.campaign) if callable(config_getter) else {}
@@ -4154,6 +4220,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
         self._last_extraction_completeness_diagnostic = {}
+        self._last_overlap_evaporation_diagnostic = {}
 
         # --- 1. Decision check ---
         if self.paused_for_decision:
@@ -4288,6 +4355,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self.energy_cumulative_kWh += energy.total_kWh
 
+        self._update_overlap_evaporation_diagnostic(evap_flux)
         self._update_extraction_completeness_diagnostic()
 
         # --- 9. Endpoint check ---

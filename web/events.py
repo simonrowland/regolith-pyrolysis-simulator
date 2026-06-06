@@ -259,6 +259,9 @@ def _tick_payload(*, sim, snapshot, backend_message: str, backend_error: str = '
         'evap_species': {
             k: round(v, 4) for k, v in snapshot.evap_flux.species_kg_hr.items()
         },
+        'overlap_evaporation': (
+            getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
+        ),
         'pressure_mbar': round(snapshot.overhead.pressure_mbar, 3),
         'atmosphere': sim.melt.atmosphere.name,
         'p_total_mbar': round(sim.melt.p_total_mbar, 3),

@@ -350,6 +350,37 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(11.0)
 
 
+def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
+    backend = MAGEMinBackend()
+    vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
+    oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
+
+    assert vector[oxygen_index] == pytest.approx(
+        1.0 * MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
+    )
+
+
+def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
+    backend = MAGEMinBackend()
+    vector = backend._build_ig_bulk_vector(
+        {
+            "SiO2": 49.0,
+            "Al2O3": 14.0,
+            "CaO": 11.0,
+            "MgO": 8.0,
+            "FeO": 16.5,
+        }
+    )
+    feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
+    oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
+
+    assert vector[feot_index] == pytest.approx(16.5)
+    assert vector[oxygen_index] == pytest.approx(
+        16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
+    )
+    assert vector[oxygen_index] > 0.0
+
+
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     # A successful call must populate phases_present, phase_masses_kg and
     # liquid_fraction from the library's phase block -- and still leave
@@ -830,9 +861,9 @@ def test_magemin_live_adapter_path_fO2_changes_shadow_response():
 
     This intentionally drives the production adapter path
     (``_build_ig_bulk_vector`` + ``_resolve_buffer``). P3-F real-binary probes
-    showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero, so
-    Fe2O3 must provision the free O component instead of being collapsed solely
-    into FeOt.
+    showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero; the
+    adapter provisions O from explicit Fe2O3 or from the total-iron-as-FeO
+    inventory when no ferric split is reported.
     """
     binary = _LIVE_MAGEMIN_BINARY
     reduced = _run_magemin_adapter_buffer_probe(binary, fO2_log=-12.0)

@@ -103,23 +103,21 @@ def main() -> int:
     schema = RecipeSchema()
     doe = DoeSpec(schema=schema, n_samples=N, seed=0)  # sampler defaults to scipy-sobol
 
-    # Optional: forward the profile-declared study_constraints to evaluate(). The
-    # stock profile declares `study_constraints: stub_smoke`, which the study
-    # driver resolves to StubSmokeConstraintSet (a trivial always-feasible gate).
-    # Without this, evaluate() falls back to the FULL default PhysicsConstraintSet
-    # (delivered_stream_purity / extraction_completeness / knudsen_viscous / ...),
-    # under which full-range Sobol patches AND the profile's own seed recipe are
-    # all infeasible. Set FIDELITY_USE_PROFILE_CONSTRAINTS=1 to honor the profile.
-    eval_kwargs = {}
-    if os.environ.get("FIDELITY_USE_PROFILE_CONSTRAINTS") == "1":
-        from simulator.optimize.study import StubSmokeConstraintSet  # picklable, fork-safe
+    # Honor the profile's study_constraints selector (same resolver as study.py).
+    # The stock pilot profile uses stub_smoke so Sobol patches stay feasible.
+    # Set FIDELITY_SKIP_PROFILE_CONSTRAINTS=1 only to exercise full default gates.
+    eval_kwargs: dict = {}
+    if os.environ.get("FIDELITY_SKIP_PROFILE_CONSTRAINTS") != "1":
+        from simulator.optimize.study import _constraints_for_profile
 
-        selector = profile.get("study_constraints")
-        if selector == "stub_smoke":
-            eval_kwargs["constraints"] = StubSmokeConstraintSet()
-            print(f"[runner] honoring profile study_constraints={selector!r} (StubSmokeConstraintSet)")
-        else:
-            print(f"[runner] WARNING: study_constraints={selector!r} not wired; using default gates")
+        constraints = _constraints_for_profile(profile)
+        eval_kwargs["constraints"] = constraints
+        print(
+            f"[runner] study_constraints={profile.get('study_constraints')!r} "
+            f"-> {type(constraints).__name__}"
+        )
+    else:
+        print("[runner] FIDELITY_SKIP_PROFILE_CONSTRAINTS=1; using evaluate() default gates")
 
     wall0 = time.perf_counter()
     try:
