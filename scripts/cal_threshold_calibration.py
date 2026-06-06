@@ -38,7 +38,12 @@ CAMPAIGN_TARGETS = {
     "C2B": ("Fe",),
     "C4": ("Mg",),
 }
-_WORKER_FAILURE_STOP_REASONS = frozenset({"timeout", "error", "invalid_json"})
+_WORKER_FAILURE_STOP_REASONS = frozenset({
+    "timeout",
+    "error",
+    "invalid_json",
+    "max_hours",
+})
 
 
 @dataclass(frozen=True)

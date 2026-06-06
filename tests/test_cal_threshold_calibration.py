@@ -102,6 +102,33 @@ def _summary_with_ok_threshold() -> dict:
     }
 
 
+def test_real_backend_blocked_when_curve_stops_at_max_hours_with_ok_summary():
+    cases = [
+        {
+            "case": {"feedstock": "lunar_mare_low_ti", "campaign": "C2B"},
+            "rows": [
+                {
+                    "feedstock": "lunar_mare_low_ti",
+                    "campaign": "C2B",
+                    "target": "Fe",
+                    "completeness": 0.5,
+                    "campaign_hour": 1,
+                    "hour_index": 0,
+                }
+            ],
+            "stop_reason": "max_hours",
+        },
+    ]
+    summary = _summary_with_ok_threshold()
+    assert cal._is_real_backend_calibration_blocked(
+        cases,
+        summary,
+        backend="alphamelts",
+        feedstocks=("lunar_mare_low_ti",),
+        campaigns=("C2B",),
+    )
+
+
 def test_real_backend_blocked_when_any_worker_case_fails():
     cases = [
         {

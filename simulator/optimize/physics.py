@@ -130,6 +130,7 @@ class PhysicsConstraintSet:
         source_ref="simulator.optimize.physics.PhysicsConstraintSet.furnace_T_max_C",
     ))
     target_species: tuple[str, ...] = ("SiO",)
+    active_gates: tuple[str, ...] = GATE_ORDER
     residual_species_by_target: Mapping[str, tuple[str, ...]] = field(
         default_factory=lambda: DEFAULT_RESIDUAL_SPECIES_BY_TARGET
     )
@@ -145,6 +146,7 @@ class PhysicsConstraintSet:
             "knudsen_max": self.knudsen_max,
             "furnace_T_max_C": self.furnace_T_max_C,
             "target_species": self.target_species,
+            "active_gates": self.active_gates,
             "residual_species_by_target": dict(self.residual_species_by_target),
             "allowable_wall_deposit_kg": dict(self.allowable_wall_deposit_kg),
         }
@@ -170,6 +172,13 @@ class PhysicsConstraintSet:
         )
         if not self.target_species:
             raise ValueError("target_species must be non-empty")
+        active = tuple(str(gate) for gate in self.active_gates)
+        if not active:
+            raise ValueError("active_gates must be non-empty")
+        unknown = set(active) - set(GATE_ORDER)
+        if unknown:
+            raise ValueError(f"active_gates contains unknown gates: {sorted(unknown)}")
+        object.__setattr__(self, "active_gates", active)
         for threshold in self.thresholds:
             if threshold.value is None:
                 raise ValueError(f"{threshold.id} threshold must not be null")
@@ -239,12 +248,17 @@ class PhysicsConstraintSet:
         return physics_constraints_digest(self)
 
     def evaluate(self, trace: Any) -> FeasibilityResult:
+        evaluators = {
+            "delivered_stream_purity": self.delivered_stream_purity,
+            "coating": self.coating,
+            "extraction_completeness": self.extraction_completeness,
+            "knudsen_viscous": self.knudsen_viscous,
+            "furnace_temperature": self.furnace_temperature,
+        }
         margins = {
-            "delivered_stream_purity": self.delivered_stream_purity(trace),
-            "coating": self.coating(trace),
-            "extraction_completeness": self.extraction_completeness(trace),
-            "knudsen_viscous": self.knudsen_viscous(trace),
-            "furnace_temperature": self.furnace_temperature(trace),
+            gate: evaluators[gate](trace)
+            for gate in GATE_ORDER
+            if gate in self.active_gates
         }
         return FeasibilityResult(
             feasible=all(margin.feasible for margin in margins.values()),
@@ -537,6 +551,7 @@ def physics_constraints_digest(constraints: Any | None = None) -> str:
     if isinstance(constraints, PhysicsConstraintSet):
         payload.update({
             "target_species": constraints.target_species,
+            "active_gates": constraints.active_gates,
             "residual_species_by_target": dict(constraints.residual_species_by_target),
             "thresholds": tuple(
                 _threshold_payload(threshold)

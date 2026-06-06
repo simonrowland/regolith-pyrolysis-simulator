@@ -374,10 +374,10 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    assert vector[feot_index] == pytest.approx(16.5)
-    assert vector[oxygen_index] == pytest.approx(
-        16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-    )
+    feo_excess_o = 16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
+    assert vector[oxygen_index] == pytest.approx(feo_excess_o)
+    assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
+    assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
     assert vector[oxygen_index] > 0.0
 
 

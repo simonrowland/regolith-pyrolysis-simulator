@@ -823,7 +823,11 @@ class MAGEMinBackend(MeltBackend):
         excess_o = fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
         if fe2o3 <= 0.0 and feo > 0.0:
             # FeO key is total-iron inventory (FeO_T), not literal FeO only.
-            excess_o += feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
+            # Peel buffer O from the FeOt slot so FeOt + O == feo (same
+            # mass bookkeeping as the explicit Fe2O3 fold above).
+            feo_excess_o = feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
+            excess_o += feo_excess_o
+            feot -= feo_excess_o
 
         vector: List[float] = []
         for component in self._IG_BULK_ORDER:

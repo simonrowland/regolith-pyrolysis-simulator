@@ -1129,6 +1129,13 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
+            _record_wall_surface_antoine_telemetry(
+                species,
+                self.wall_temperature_C,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
         return query_wall_deposit_candidate_kg(
             self,
             species=species,
@@ -1160,6 +1167,16 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
+            for segment in self._mixed_temperature_wall_candidate_segments(
+                species,
+            ):
+                _record_wall_surface_antoine_telemetry(
+                    species,
+                    segment.wall_temperature_C,
+                    antoine_extrapolations=antoine_extrapolations,
+                    antoine_extrapolation_warnings=(
+                        antoine_extrapolation_warnings),
+                )
         return query_wall_deposit_candidates_by_segment_kg(
             self,
             species=species,
@@ -1205,6 +1222,13 @@ class CondensationModel:
                 species,
                 melt_temperature_C,
                 T_cond_C,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=(
+                    antoine_extrapolation_warnings),
+            )
+            _record_wall_surface_antoine_telemetry(
+                species,
+                wall_temperature_C,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1620,6 +1644,26 @@ def _local_species_pressure_pa(
         return P_local_pa
     # Existing condensation temperatures are documented at ~1 mbar.
     return 100.0
+
+
+def _record_wall_surface_antoine_telemetry(
+    species: str,
+    wall_temperature_C: float,
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> None:
+    if (
+        antoine_extrapolations is None
+        and antoine_extrapolation_warnings is None
+    ):
+        return
+    _antoine_psat_pa(
+        species,
+        wall_temperature_C + 273.15,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
 
 
 def _local_wall_species_pressure_pa(

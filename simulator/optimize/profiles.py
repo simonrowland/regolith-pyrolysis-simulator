@@ -243,6 +243,7 @@ def physics_constraints_from_profile(
         updates["target_species"] = tuple(
             str(species) for species in raw_constraints["target_species"]
         )
+    updates["active_gates"] = tuple(str(gate) for gate in raw_constraints["gates"])
     return replace(base, **updates)
 
 

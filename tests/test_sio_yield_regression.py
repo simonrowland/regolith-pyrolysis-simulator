@@ -228,6 +228,34 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     assert route.remaining_by_species["Ca"] >= 0.0
 
 
+def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():
+    sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
+    assert sio_data["valid_range_K"] == [1400, 2200]
+
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    assert "SiO" in route.antoine_extrapolations
+    assert tuple(route.antoine_extrapolations["SiO"]["valid_range_K"]) == (
+        1400.0,
+        2200.0,
+    )
+    assert any(
+        "SiO metal Antoine fit extrapolated beyond valid_range_K" in warning
+        and "1173.15 K" in warning
+        for warning in route.antoine_extrapolation_warnings
+    )
+
+
 def test_cold_liner_routes_sio_to_wall_deposit_bucket():
     model = CondensationModel(
         CondensationTrain.create_default(),

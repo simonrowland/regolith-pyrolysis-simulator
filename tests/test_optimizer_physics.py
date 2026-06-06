@@ -152,6 +152,28 @@ def test_profile_furnace_temperature_threshold_drives_gate() -> None:
     assert constraints.furnace_T_max_C.source_ref == "profiles/test.yaml:constraints.furnace_T_max_C"
 
 
+def test_profile_gates_limit_active_physics_evaluation() -> None:
+    constraints = physics_constraints_from_profile(
+        {
+            "constraints": {
+                "gates": ["delivered_stream_purity"],
+            }
+        },
+        source="profiles/test.yaml",
+    )
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        temperature_C=2500.0,
+        knudsen_number=10.0,
+    )
+
+    result = constraints.evaluate(trace)
+
+    assert result.feasible
+    assert tuple(result.margins) == ("delivered_stream_purity",)
+    assert constraints.active_gates == ("delivered_stream_purity",)
+
+
 def test_physics_constraint_set_is_picklable_for_parallel_evaluation() -> None:
     restored = pickle.loads(pickle.dumps(PhysicsConstraintSet()))
 
