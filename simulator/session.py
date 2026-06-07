@@ -77,6 +77,9 @@ class SimSessionConfig:
     setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
     track: str = "pyrolysis"
     c4_max_temp: float | None = None
+    c5_enabled: bool = False
+    mre_target_species: str = ""
+    mre_max_voltage_V: float = 0.0
     unavailable_error_cls: type[Exception] = RuntimeError
     force_builtin_vapor_pressure: Callable[[PyrolysisSimulator], None] | None = None
     result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
@@ -183,6 +186,10 @@ class SimSession:
         if config.c4_max_temp is not None:
             sim.c4_max_temp_C = float(config.c4_max_temp)
             sim.campaign_mgr.c4_max_temp_C = float(config.c4_max_temp)
+        sim.melt.c5_enabled = bool(config.c5_enabled)
+        sim.melt.mre_target_species = str(config.mre_target_species or "")
+        sim.melt.mre_max_voltage_V = float(config.mre_max_voltage_V or 0.0)
+        sim.campaign_mgr.c5_enabled = sim.melt.c5_enabled
 
         campaign_phase = self._campaign_phase(config.campaign, config)
         if config.track == "mre_baseline":

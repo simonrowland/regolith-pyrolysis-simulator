@@ -4549,8 +4549,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.record.branch = choice  # 'one' or 'two'
             if choice == 'two':
                 self.start_campaign(CampaignPhase.C4)
-            else:
+            elif self.melt.c5_enabled:
                 self.start_campaign(CampaignPhase.C5)
+            else:
+                self.melt.campaign = CampaignPhase.COMPLETE
 
         elif decision_type == DecisionType.TI_RETENTION:
             # Handled within C5 campaign logic

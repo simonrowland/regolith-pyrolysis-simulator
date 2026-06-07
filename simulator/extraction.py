@@ -457,6 +457,19 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import ELECTRONS_PER_OXIDE
 
+        if (
+            self.melt.campaign == CampaignPhase.C5
+            and not getattr(self.melt, 'c5_enabled', False)
+        ):
+            self._mre_metals_this_hr = {}
+            self._mre_voltage_V = 0.0
+            self._mre_current_A = 0.0
+            self._mre_effective_current_A = 0.0
+            self._mre_energy_this_hr = 0.0
+            self.melt.mre_voltage_V = 0.0
+            self.melt.mre_current_A = 0.0
+            return 0.0
+
         # --- Voltage and current selection (stepped holds) ---         [Step 9]
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence

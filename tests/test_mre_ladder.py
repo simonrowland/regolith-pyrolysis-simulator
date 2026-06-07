@@ -10,7 +10,9 @@ import yaml
 from simulator import mre_ladder
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
-from simulator.state import CampaignPhase
+from simulator.runner import PyrolysisRun
+from simulator.session import SimSession
+from simulator.state import CampaignPhase, MeltState
 
 
 def _repo_setpoints() -> dict:
@@ -31,6 +33,30 @@ def _sim(setpoints: dict) -> PyrolysisSimulator:
 
 def _species_names(sequence: list[dict]) -> list[str]:
     return [entry["species"][0] for entry in sequence]
+
+
+def test_c5_fields_default_off_and_pass_through_session_config():
+    melt = MeltState()
+
+    assert melt.c5_enabled is False
+    assert melt.mre_target_species == ""
+    assert melt.mre_max_voltage_V == pytest.approx(0.0)
+
+    config = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        c5_enabled=True,
+        mre_target_species="SiO2",
+        mre_max_voltage_V=1.7,
+    )._session_config()
+    session = SimSession().start(config)
+
+    assert config.c5_enabled is True
+    assert config.mre_target_species == "SiO2"
+    assert config.mre_max_voltage_V == pytest.approx(1.7)
+    assert session.simulator.melt.c5_enabled is True
+    assert session.simulator.melt.mre_target_species == "SiO2"
+    assert session.simulator.melt.mre_max_voltage_V == pytest.approx(1.7)
+    assert session.simulator.campaign_mgr.c5_enabled is True
 
 
 def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
@@ -136,6 +162,7 @@ def test_step_mre_dispatch_uses_yaml_cap_instead_of_literal_1_6():
     }
     sim = _sim(setpoints)
     sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
     captured: dict = {}
 
     def fake_dispatch(_intent, *, control_inputs):

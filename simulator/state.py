@@ -493,6 +493,9 @@ class MeltState:
     # ``StirState`` doc for the rationale.
 
     # --- MRE state (for endpoint detection) ---
+    c5_enabled: bool = False
+    mre_target_species: str = ""
+    mre_max_voltage_V: float = 0.0
     mre_voltage_V: float = 0.0
     mre_current_A: float = 0.0            # Effective (Faradaic) current
     mre_low_current_hours: int = 0        # Consecutive hours below threshold

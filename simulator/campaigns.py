@@ -44,6 +44,7 @@ class CampaignManager:
         # Structure: {'C2A': {'ramp_rate': 10.0, 'pO2_mbar': 1.0,
         #                     'stir_factor': 8.0, 'max_hours': 25}}
         self.overrides: Dict[str, dict] = {}
+        self.c5_enabled = False
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -596,6 +597,18 @@ class CampaignManager:
     # Campaign transitions
     # ------------------------------------------------------------------
 
+    def _get_next_after_c5(
+        self,
+        record: BatchRecord,
+    ) -> Optional[CampaignPhase]:
+        if record.branch == 'two':
+            if self._is_noninteractive_test_batch(record):
+                self._record_auto_decision(
+                    record, DecisionType.C6_PROCEED, 'yes')
+                return CampaignPhase.C6
+            return None
+        return CampaignPhase.COMPLETE
+
     def get_next_campaign(self, current: CampaignPhase,
                           record: BatchRecord) -> Optional[CampaignPhase]:
         """
@@ -678,19 +691,12 @@ class CampaignManager:
             return None  # Triggers BRANCH_ONE_TWO decision
 
         elif current == CampaignPhase.C4:
-            # After Mg pyrolysis → C5 limited MRE
-            return CampaignPhase.C5
+            if self.c5_enabled:
+                return CampaignPhase.C5
+            return self._get_next_after_c5(record)
 
         elif current == CampaignPhase.C5:
-            # After C5 → C6 decision (need Mg inventory)
-            if record.branch == 'two':
-                if self._is_noninteractive_test_batch(record):
-                    self._record_auto_decision(
-                        record, DecisionType.C6_PROCEED, 'yes')
-                    return CampaignPhase.C6
-                return None  # Triggers C6_PROCEED decision
-            else:
-                return CampaignPhase.COMPLETE
+            return self._get_next_after_c5(record)
 
         elif current == CampaignPhase.C6:
             return CampaignPhase.COMPLETE
@@ -720,19 +726,41 @@ class CampaignManager:
             )
 
         elif current == CampaignPhase.C3_NA:
+            branch_two_context = (
+                'Branch Two (preferred): C4 Mg pyrolysis + C6 Mg thermite.'
+            )
+            if self.c5_enabled:
+                branch_two_context = (
+                    'Branch Two (preferred): C4 Mg pyrolysis + C5 limited MRE '
+                    '+ C6 Mg thermite. MRE ≤1.6 V, ~1200-2000 kWh/t, '
+                    'electrode life 5-10x.'
+                )
+            branch_one_context = (
+                'Branch One (fallback): skip C4 and complete pyrolysis-only '
+                'when optional C5/MRE is disabled.'
+            )
+            if self.c5_enabled:
+                branch_one_context = (
+                    'Branch One (fallback): skip C4, full MRE to 2.5 V, '
+                    '~2650-4050 kWh/t, electrode life 2-3x.'
+                )
             return DecisionPoint(
                 decision_type=DecisionType.BRANCH_ONE_TWO,
                 options=['two', 'one'],
                 recommendation='two',
                 context=(
-                    'Branch Two (preferred): C4 Mg pyrolysis + C6 Mg thermite. '
-                    'MRE ≤1.6 V, ~1200-2000 kWh/t, electrode life 5-10×. '
-                    'Branch One (fallback): skip C4, full MRE to 2.5 V, '
-                    '~2650-4050 kWh/t, electrode life 2-3×.'
+                    f'{branch_two_context} {branch_one_context}'
                 ),
             )
 
-        elif current == CampaignPhase.C5:
+        elif (
+            current == CampaignPhase.C5
+            or (
+                current == CampaignPhase.C4
+                and not self.c5_enabled
+                and record.branch == 'two'
+            )
+        ):
             return DecisionPoint(
                 decision_type=DecisionType.C6_PROCEED,
                 options=['yes', 'no'],

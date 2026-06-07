@@ -330,6 +330,9 @@ class PyrolysisRun:
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
     setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
     track: str = "pyrolysis"
+    c5_enabled: bool = False
+    mre_target_species: str = ""
+    mre_max_voltage_V: float = 0.0
     allow_fallback_vapor: bool = False
     allow_unmeasured_alpha_fallback: bool = False
     force_builtin_vapor_pressure: bool = False
@@ -418,6 +421,9 @@ class PyrolysisRun:
             additives_kg=dict(self.additives_kg),
             runtime_campaign_overrides=dict(self.runtime_campaign_overrides),
             track=self.track,
+            c5_enabled=self.c5_enabled,
+            mre_target_species=self.mre_target_species,
+            mre_max_voltage_V=self.mre_max_voltage_V,
             unavailable_error_cls=RunnerError,
             force_builtin_vapor_pressure=(
                 _force_builtin_vapor_pressure
