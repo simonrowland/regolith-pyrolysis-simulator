@@ -35,6 +35,8 @@ class RunExecution:
     reason: str = ""
     refusal_diagnostic: Mapping[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] = field(default_factory=dict)
+    backend_status: str = "ok"
+    backend_authoritative: bool = True
 
 
 class RunExecutor:
@@ -95,6 +97,16 @@ class RunExecutor:
         trace = PhysicsTrace.from_simulator(sim)
         snapshots = tuple(getattr(sim.record, "snapshots", ()))
         reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
+        backend_status = str(
+            getattr(
+                sim,
+                "_backend_selection_status",
+                getattr(sim, "_last_backend_status", "ok"),
+            )
+        )
+        backend_authoritative = bool(
+            getattr(sim, "_backend_authoritative", True)
+        )
         return RunExecution(
             session=session,
             simulator=sim,
@@ -108,6 +120,8 @@ class RunExecutor:
             reason=reason,
             refusal_diagnostic=refusal_diagnostic,
             reduced_real_cache=reduced_real_cache,
+            backend_status=backend_status,
+            backend_authoritative=backend_authoritative,
         )
 
 

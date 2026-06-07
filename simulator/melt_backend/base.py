@@ -427,6 +427,7 @@ class StubBackend(MeltBackend):
             fO2_log=fO2_log,
             status='unavailable',
             liquid_fraction=None,
+            phase_assemblage_available=False,
         )
 
     def get_vapor_species(self):

@@ -6,7 +6,7 @@ import copy
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Mapping, TypeVar
+from typing import Any, Callable, Iterable, Mapping, TypeVar
 
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -16,6 +16,18 @@ from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBacken
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
 CACHED_REAL_BACKEND_NAME = "cached-real"
 CACHED_REAL_MISS_POLICIES = ("fail-loud", "live-fill")
+BACKEND_STATUS_OK = "ok"
+BACKEND_STATUS_UNAVAILABLE = "unavailable"
+REAL_DATA_REQUIRED_INTENTS = frozenset(
+    {
+        "silicate_equilibrium",
+        "silicate_liquidus",
+        "gate_liquid_fraction",
+        "equilibrium_crystallization",
+        "fractional_crystallization",
+        "decompression_path",
+    }
+)
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 _E = TypeVar("_E", bound=Exception)
@@ -30,6 +42,28 @@ class BackendSelectionPolicy(Enum):
 
     WEB_AUTODETECT = "web-autodetect"
     RUNNER_STRICT = "runner-strict"
+
+
+@dataclass(frozen=True)
+class BackendResolutionStatus:
+    """Machine-readable result of backend selection."""
+
+    requested_backend: str
+    active_backend: str
+    backend_status: str
+    authoritative: bool
+    selection_policy: str
+    message: str = ""
+
+    def as_payload(self) -> dict[str, Any]:
+        return {
+            "backend_requested": self.requested_backend,
+            "backend_active": self.active_backend,
+            "backend_status": self.backend_status,
+            "backend_authoritative": self.authoritative,
+            "backend_selection_policy": self.selection_policy,
+            "backend_status_message": self.message,
+        }
 
 
 @dataclass(frozen=True)
@@ -55,12 +89,17 @@ class SimulatorBuildConfig:
 def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
     """Build a simulator from pre-loaded data and an initialized backend."""
 
-    return PyrolysisSimulator(
+    sim = PyrolysisSimulator(
         config.backend,
         copy.deepcopy(config.setpoints),
         copy.deepcopy(config.feedstocks),
         copy.deepcopy(config.vapor_pressures),
     )
+    resolution = backend_resolution_status(config.backend)
+    sim._backend_resolution_status = resolution
+    sim._backend_selection_status = resolution.backend_status
+    sim._backend_authoritative = resolution.authoritative
+    return sim
 
 
 class CachedRealBackend:
@@ -207,12 +246,13 @@ def resolve_backend(
     stub_backend_cls: type = StubBackend,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None = None,
     cached_real_live_backend_cls: type | None = None,
+    required_intents: Iterable[Any] | None = None,
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
     if policy is BackendSelectionPolicy.WEB_AUTODETECT:
         name = (backend_name or "").strip().lower()
-        return _resolve_web_autodetect(
+        backend = _resolve_web_autodetect(
             name,
             unavailable_error_cls=unavailable_error_cls,
             log_selection=log_selection,
@@ -222,8 +262,8 @@ def resolve_backend(
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
         )
-    if policy is BackendSelectionPolicy.RUNNER_STRICT:
-        return _resolve_runner_strict(
+    elif policy is BackendSelectionPolicy.RUNNER_STRICT:
+        backend = _resolve_runner_strict(
             backend_name,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
@@ -231,7 +271,16 @@ def resolve_backend(
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
         )
-    raise ValueError(f"unknown backend selection policy {policy!r}")
+    else:
+        raise ValueError(f"unknown backend selection policy {policy!r}")
+
+    return _finalize_backend_resolution(
+        backend,
+        requested_backend=str(backend_name or ""),
+        policy=policy,
+        required_intents=required_intents,
+        unavailable_error_cls=unavailable_error_cls,
+    )
 
 
 def emit_web_engine_selection_log(
@@ -242,14 +291,140 @@ def emit_web_engine_selection_log(
 
     name = type(backend).__name__
     caps = backend.capabilities()
+    resolution = backend_resolution_status(backend)
     cap_str = ", ".join(
         f'{key}={"true" if caps.get(key) else "false"}'
         for key in ("silicate_melt", "gas_volatiles")
     )
     _log(
         log_message,
-        f"engine selection: {name} (capabilities: {cap_str}) -- "
+        f"engine selection: {name} "
+        f"(backend_status={resolution.backend_status}, "
+        f"authoritative={str(resolution.authoritative).lower()}, "
+        f"capabilities: {cap_str}) -- "
         "VapoRock/MAGEMin not eligible until kernel",
+    )
+
+
+def backend_resolution_status(backend: Any) -> BackendResolutionStatus:
+    """Return resolver metadata, deriving a conservative fallback if absent."""
+
+    status = getattr(backend, "backend_resolution_status", None)
+    if isinstance(status, BackendResolutionStatus):
+        return status
+
+    active_backend = type(backend).__name__
+    is_stub = isinstance(backend, StubBackend) or active_backend == "StubBackend"
+    backend_status = (
+        BACKEND_STATUS_UNAVAILABLE if is_stub else BACKEND_STATUS_OK
+    )
+    authoritative = backend_status == BACKEND_STATUS_OK and not is_stub
+    return BackendResolutionStatus(
+        requested_backend=str(getattr(backend, "name", active_backend) or active_backend),
+        active_backend=active_backend,
+        backend_status=backend_status,
+        authoritative=authoritative,
+        selection_policy="unknown",
+        message=(
+            "stub backend selected; no authoritative melt result available"
+            if is_stub
+            else "backend selected"
+        ),
+    )
+
+
+def _finalize_backend_resolution(
+    backend: Any,
+    *,
+    requested_backend: str,
+    policy: BackendSelectionPolicy,
+    required_intents: Iterable[Any] | None,
+    unavailable_error_cls: type[_E],
+):
+    resolution = _make_backend_resolution_status(
+        backend,
+        requested_backend=requested_backend,
+        policy=policy,
+    )
+    _attach_backend_resolution_status(backend, resolution)
+    _raise_if_required_intents_need_real_backend(
+        resolution,
+        required_intents,
+        unavailable_error_cls=unavailable_error_cls,
+    )
+    return backend
+
+
+def _make_backend_resolution_status(
+    backend: Any,
+    *,
+    requested_backend: str,
+    policy: BackendSelectionPolicy,
+) -> BackendResolutionStatus:
+    active_backend = type(backend).__name__
+    is_stub = isinstance(backend, StubBackend) or active_backend == "StubBackend"
+    backend_status = (
+        BACKEND_STATUS_UNAVAILABLE if is_stub else BACKEND_STATUS_OK
+    )
+    return BackendResolutionStatus(
+        requested_backend=requested_backend,
+        active_backend=active_backend,
+        backend_status=backend_status,
+        authoritative=backend_status == BACKEND_STATUS_OK and not is_stub,
+        selection_policy=policy.value,
+        message=(
+            "stub backend selected; no authoritative melt result available"
+            if is_stub
+            else "backend selected"
+        ),
+    )
+
+
+def _attach_backend_resolution_status(
+    backend: Any,
+    resolution: BackendResolutionStatus,
+) -> None:
+    try:
+        backend.backend_resolution_status = resolution
+        backend.backend_status = resolution.backend_status
+        backend.backend_authoritative = resolution.authoritative
+    except Exception:  # noqa: BLE001 - status helper still derives fallback
+        return
+
+
+def _normalize_intent_names(required_intents: Iterable[Any] | None) -> set[str]:
+    if required_intents is None:
+        return set()
+    names: set[str] = set()
+    for intent in required_intents:
+        raw = getattr(intent, "value", intent)
+        name = str(raw).strip().lower()
+        if name:
+            names.add(name)
+    return names
+
+
+def _raise_if_required_intents_need_real_backend(
+    resolution: BackendResolutionStatus,
+    required_intents: Iterable[Any] | None,
+    *,
+    unavailable_error_cls: type[_E],
+) -> None:
+    real_required = sorted(
+        _normalize_intent_names(required_intents) & REAL_DATA_REQUIRED_INTENTS
+    )
+    if not real_required:
+        return
+    if (
+        resolution.backend_status == BACKEND_STATUS_OK
+        and resolution.authoritative
+    ):
+        return
+    intents = ", ".join(real_required)
+    raise unavailable_error_cls(
+        "backend_status="
+        f"{resolution.backend_status!r} from {resolution.active_backend} "
+        f"cannot satisfy real-data intents: {intents}"
     )
 
 

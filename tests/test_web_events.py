@@ -2,6 +2,7 @@ import pytest
 
 import app as app_module
 from simulator.core import PyrolysisSimulator
+from simulator.backends import BackendSelectionPolicy
 from simulator.melt_backend.base import StubBackend
 from simulator.session import drive_auto_apply
 from web.events import (
@@ -12,6 +13,7 @@ from web.events import (
     _emit_if_current,
     _get_backend,
     _replace_simulation_state,
+    _start_payload,
     _sim_locks,
     _simulations,
 )
@@ -107,6 +109,42 @@ def test_alphamelts_backend_selection_fails_closed(monkeypatch):
     with pytest.raises(BackendUnavailableError,
                        match="AlphaMELTS unavailable"):
         _get_backend("alphamelts")
+
+
+def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
+    calls = []
+
+    def fake_resolve_backend(backend_name, policy, **kwargs):
+        calls.append((backend_name, policy, kwargs))
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    monkeypatch.setattr("web.events.resolve_backend", fake_resolve_backend)
+
+    backend = _get_backend("stub")
+
+    assert isinstance(backend, StubBackend)
+    assert len(calls) == 1
+    assert calls[0][0] == "stub"
+    assert calls[0][1] is BackendSelectionPolicy.WEB_AUTODETECT
+    assert calls[0][2]["unavailable_error_cls"] is BackendUnavailableError
+
+
+def test_web_start_payload_exposes_backend_status():
+    payload = _start_payload(
+        sim=object(),
+        feedstock_key="lunar_mare_low_ti",
+        mass_kg=1000.0,
+        backend_requested="stub",
+        backend_active="StubBackend",
+        backend_status="unavailable",
+        backend_authoritative=False,
+        backend_message="Using built-in fallback",
+    )
+
+    assert payload["backend_status"] == "unavailable"
+    assert payload["backend_authoritative"] is False
 
 
 def test_replacing_simulation_state_stops_prior_run():

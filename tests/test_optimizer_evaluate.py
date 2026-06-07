@@ -159,7 +159,12 @@ def _execution(
     snapshots: tuple[object, ...] | None = None,
     error_message: str = "",
     reason: str = "",
+    per_hour: tuple[object, ...] | None = None,
+    backend_status: str | None = None,
 ) -> SimpleNamespace:
+    per_hour_entries = per_hour
+    if per_hour_entries is None and backend_status is not None:
+        per_hour_entries = ({"backend_status": backend_status},)
     return SimpleNamespace(
         session=SimpleNamespace(),
         simulator=_Sim(),
@@ -169,6 +174,8 @@ def _execution(
             else (_snapshot(mass_balance_error_pct),)
         ),
         trace=trace or _trace(),
+        per_hour=per_hour_entries or (),
+        backend_status=backend_status,
         status=status,
         error_message=error_message,
         reason=reason,
@@ -326,7 +333,7 @@ def test_missing_objective_output_on_feasible_run_aborts_as_engine_bug() -> None
 
 
 def test_invalid_patch_rejected_before_run() -> None:
-    executor = FakeExecutor(_execution())
+    executor = FakeExecutor(_execution(backend_status="unavailable"))
     result = evaluate(
         RecipePatch({("campaigns", "C0", "label"): "bad"}),
         "lunar_mare_low_ti",
@@ -374,6 +381,46 @@ def test_genuine_missing_backend_status_aborts_as_backend_unavailable() -> None:
         )
 
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+
+
+def test_real_backend_missing_backend_status_aborts_as_backend_unavailable() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=real_profile,
+            executor=FakeExecutor(_execution()),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert "backend_status missing" in str(raised.value)
+
+
+def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=real_profile,
+            executor=FakeExecutor(_execution(backend_status="unavailable")),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert "backend_status='unavailable'" in str(raised.value)
 
 
 def test_unknown_feedstock_is_input_error_not_backend_unavailable() -> None:
@@ -449,7 +496,7 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
             }
         },
     }
-    executor = FakeExecutor(_execution())
+    executor = FakeExecutor(_execution(backend_status="ok"))
 
     result = evaluate(
         _valid_patch(),
@@ -481,7 +528,7 @@ def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> Non
         },
         "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
     }
-    executor = FakeExecutor(_execution())
+    executor = FakeExecutor(_execution(backend_status="ok"))
 
     result = evaluate(
         _valid_patch(),
@@ -513,7 +560,7 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
         },
         "fidelities": {"high": {"backend_name": "cached-real", "hours": 1}},
     }
-    executor = FakeExecutor(_execution())
+    executor = FakeExecutor(_execution(backend_status="ok"))
 
     result = evaluate(
         _valid_patch(),

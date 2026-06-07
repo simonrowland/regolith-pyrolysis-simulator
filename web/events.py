@@ -10,6 +10,7 @@ from flask import request
 from simulator.backends import (
     BackendSelectionPolicy,
     BackendUnavailableError,
+    backend_resolution_status,
     emit_web_engine_selection_log,
     resolve_backend,
 )
@@ -175,6 +176,8 @@ def _start_payload(
     mass_kg: float,
     backend_requested: str,
     backend_active: str,
+    backend_status: str,
+    backend_authoritative: bool,
     backend_message: str,
 ):
     """Build the public start status payload."""
@@ -184,11 +187,21 @@ def _start_payload(
         'mass_kg': mass_kg,
         'backend_requested': backend_requested,
         'backend_active': backend_active,
+        'backend_status': backend_status,
+        'backend_authoritative': backend_authoritative,
         'backend_message': backend_message,
     }
 
 
-def _tick_payload(*, sim, snapshot, backend_message: str, backend_error: str = ''):
+def _tick_payload(
+    *,
+    sim,
+    snapshot,
+    backend_message: str,
+    backend_status: str,
+    backend_authoritative: bool,
+    backend_error: str = '',
+):
     """Build the public per-tick payload."""
     return {
         'hour': snapshot.hour,
@@ -224,6 +237,8 @@ def _tick_payload(*, sim, snapshot, backend_message: str, backend_error: str = '
             snapshot.inventory.carbon_reductant_required_kg, 3),
         'stage0_mass_balance_delta_kg': round(
             snapshot.inventory.stage0_mass_balance_delta_kg, 3),
+        'backend_status': backend_status,
+        'backend_authoritative': backend_authoritative,
         'backend_error': backend_error,
         'backend_fallback_active': bool(backend_error),
         'backend_message': (
@@ -362,6 +377,8 @@ def _start_background_loop(
     run_id: str,
     run_lock,
     backend_message: str,
+    backend_status: str,
+    backend_authoritative: bool,
 ):
     def run_loop():
         while True:
@@ -423,6 +440,8 @@ def _start_background_loop(
                         'reason': exc.reason,
                         'message': exc.reason,
                         'knudsen_regime_diagnostic': dict(exc.diagnostic),
+                        'backend_status': backend_status,
+                        'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
                     if not _emit_if_current(
@@ -447,6 +466,8 @@ def _start_background_loop(
                     error_payload = {
                         'status': 'error',
                         'message': str(exc),
+                        'backend_status': backend_status,
+                        'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
                     if not _emit_if_current(
@@ -489,6 +510,8 @@ def _start_background_loop(
                 sim=sim,
                 snapshot=step_result.snapshot,
                 backend_message=backend_message,
+                backend_status=backend_status,
+                backend_authoritative=backend_authoritative,
                 backend_error=step_result.backend_error,
             )
             if not _emit_if_current(
@@ -591,10 +614,14 @@ def register_events(socketio):
             backend = _get_backend(backend_name)
         except BackendUnavailableError as exc:
             socketio.emit('simulation_status', {
-                'status': 'error', 'message': str(exc),
+                'status': 'error',
+                'message': str(exc),
+                'backend_status': 'unavailable',
+                'backend_authoritative': False,
             }, room=sid)
             return
         backend_type = type(backend).__name__
+        resolution_status = backend_resolution_status(backend)
         backend_message = ''
         if isinstance(backend, StubBackend):
             backend_message = 'Using built-in fallback'
@@ -628,7 +655,10 @@ def register_events(socketio):
             )
         except BackendUnavailableError as e:
             socketio.emit('simulation_status', {
-                'status': 'error', 'message': str(e),
+                'status': 'error',
+                'message': str(e),
+                'backend_status': resolution_status.backend_status,
+                'backend_authoritative': resolution_status.authoritative,
             }, room=sid)
             return
         sim = session.simulator
@@ -636,6 +666,8 @@ def register_events(socketio):
         state, run_lock = _replace_simulation_state(sid, session, speed)
         run_id = state['run_id']
         state['backend_message'] = backend_message
+        state['backend_status'] = resolution_status.backend_status
+        state['backend_authoritative'] = resolution_status.authoritative
 
         _emit_if_current(
             socketio,
@@ -648,10 +680,20 @@ def register_events(socketio):
                 mass_kg=mass_kg,
                 backend_requested=backend_name,
                 backend_active=backend_type,
+                backend_status=resolution_status.backend_status,
+                backend_authoritative=resolution_status.authoritative,
                 backend_message=backend_message,
             ),
         )
-        _start_background_loop(socketio, sid, run_id, run_lock, backend_message)
+        _start_background_loop(
+            socketio,
+            sid,
+            run_id,
+            run_lock,
+            backend_message,
+            resolution_status.backend_status,
+            resolution_status.authoritative,
+        )
 
     @socketio.on('pause_simulation')
     def handle_pause():

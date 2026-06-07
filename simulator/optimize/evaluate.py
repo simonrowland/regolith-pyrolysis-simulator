@@ -270,6 +270,14 @@ def evaluate(
             cache_key_value=key,
         )
 
+    _abort_on_non_authoritative_backend_status(
+        run_execution,
+        spec=spec,
+        patch=validated_patch,
+        candidate_id=candidate_id,
+        key=key,
+    )
+
     _abort_on_mass_balance_breach(
         run_execution,
         patch=validated_patch,
@@ -485,6 +493,50 @@ def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReferen
         trace=getattr(run_execution, "trace", None),
         product_summary=summary,
     )
+
+
+def _abort_on_non_authoritative_backend_status(
+    run_execution: Any,
+    *,
+    spec: EvalSpec,
+    patch: RecipePatch,
+    candidate_id: str | None,
+    key: str,
+) -> None:
+    if spec.backend_name == "stub":
+        return
+    backend_status = _latest_backend_status(run_execution)
+    if backend_status is None:
+        raise BackendUnavailableAbort(
+            f"backend_status missing for real backend {spec.backend_name!r}",
+            patch=patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+    if backend_status != "ok":
+        raise BackendUnavailableAbort(
+            "backend_status="
+            f"{backend_status!r} for real backend {spec.backend_name!r}",
+            patch=patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+
+
+def _latest_backend_status(run_execution: Any) -> str | None:
+    per_hour = getattr(run_execution, "per_hour", None)
+    if isinstance(per_hour, (list, tuple)) and per_hour:
+        latest = per_hour[-1]
+        if isinstance(latest, MappingABC):
+            raw = latest.get("backend_status")
+            if raw is not None:
+                return str(raw)
+    raw = getattr(run_execution, "backend_status", None)
+    if raw is not None:
+        return str(raw)
+    return None
 
 
 def _ordered_failing_gates(values: Any) -> tuple[str, ...]:
