@@ -49,6 +49,9 @@ class EvalSpec:
     additives_kg: Mapping[str, Any] = field(default_factory=dict)
     track: str = "pyrolysis"
     backend_name: str = "stub"
+    c5_enabled: bool = False
+    mre_max_voltage_V: float = 0.0
+    mre_target_species: str = ""
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
 
@@ -70,6 +73,14 @@ class EvalSpec:
             raise TypeError("hours must be an int")
         if not isinstance(self.mass_kg, (int, float, Decimal)):
             raise TypeError("mass_kg must be numeric")
+        if not isinstance(self.c5_enabled, bool):
+            raise TypeError("c5_enabled must be a bool")
+        if isinstance(self.mre_max_voltage_V, bool) or not isinstance(
+            self.mre_max_voltage_V, (int, float, Decimal)
+        ):
+            raise TypeError("mre_max_voltage_V must be numeric")
+        if not isinstance(self.mre_target_species, str):
+            raise TypeError("mre_target_species must be a string")
         object.__setattr__(self, "data_digests", _freeze_digest_map(self.data_digests))
         object.__setattr__(self, "additives_kg", _freeze_value(self.additives_kg, "additives_kg"))
         object.__setattr__(
@@ -100,6 +111,9 @@ class EvalSpec:
                 _thaw_value(self.additives_kg),
                 self.track,
                 self.backend_name,
+                self.c5_enabled,
+                self.mre_max_voltage_V,
+                self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.chemistry_kernel),
             ),
@@ -141,6 +155,9 @@ class PrefixEvalSpec(EvalSpec):
                 _thaw_value(self.additives_kg),
                 self.track,
                 self.backend_name,
+                self.c5_enabled,
+                self.mre_max_voltage_V,
+                self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.chemistry_kernel),
                 self.prefix_stage_ids,
@@ -159,6 +176,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     payload = {
         "additives_kg": spec.additives_kg,
         "backend_name": spec.backend_name,
+        "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
         "chemistry_kernel": spec.chemistry_kernel,
         "code_version": spec.code_version,
@@ -168,6 +186,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "fidelity": spec.fidelity,
         "hours": spec.hours,
         "mass_kg": spec.mass_kg,
+        "mre_max_voltage_V": spec.mre_max_voltage_V,
+        "mre_target_species": spec.mre_target_species,
         "profile_id": spec.profile_id,
         "recipe_id": spec.recipe_id,
         "runtime_campaign_overrides": spec.runtime_campaign_overrides,

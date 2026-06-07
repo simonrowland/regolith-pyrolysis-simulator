@@ -81,6 +81,9 @@ _RUN_KEYS = frozenset(
         "additives_kg",
         "track",
         "backend_name",
+        "c5_enabled",
+        "mre_max_voltage_V",
+        "mre_target_species",
         "reduced_real_cache",
         "runtime_campaign_overrides",
         "chemistry_kernel",
@@ -368,6 +371,16 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
         raise ProfileValidationError(f"{source}: {where}.hours must be positive")
     if "mass_kg" in raw and _bad_positive_number(raw["mass_kg"]):
         raise ProfileValidationError(f"{source}: {where}.mass_kg must be positive")
+    if "c5_enabled" in raw and not isinstance(raw["c5_enabled"], bool):
+        raise ProfileValidationError(f"{source}: {where}.c5_enabled must be bool")
+    if "mre_max_voltage_V" in raw and _bad_non_negative_number(raw["mre_max_voltage_V"]):
+        raise ProfileValidationError(
+            f"{source}: {where}.mre_max_voltage_V must be non-negative finite"
+        )
+    if "mre_target_species" in raw and not isinstance(raw["mre_target_species"], str):
+        raise ProfileValidationError(
+            f"{source}: {where}.mre_target_species must be a string"
+        )
     backend_name = str(raw.get("backend_name", ""))
     cache_config = raw.get("reduced_real_cache")
     if backend_name == "cached-real":
@@ -499,6 +512,15 @@ def _bad_positive_number(raw: Any) -> bool:
         or not isinstance(raw, (int, float))
         or not math.isfinite(float(raw))
         or float(raw) <= 0.0
+    )
+
+
+def _bad_non_negative_number(raw: Any) -> bool:
+    return (
+        isinstance(raw, bool)
+        or not isinstance(raw, (int, float))
+        or not math.isfinite(float(raw))
+        or float(raw) < 0.0
     )
 
 

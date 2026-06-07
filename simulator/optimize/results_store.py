@@ -8,7 +8,7 @@ O-P3 may designate one write owner or rely on this SQLite serialization.
 
 from __future__ import annotations
 
-from dataclasses import fields
+from dataclasses import MISSING, fields
 import json
 import math
 from pathlib import Path
@@ -538,12 +538,24 @@ def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:
 def _deserialize_eval_spec(payload: Mapping[str, Any]) -> EvalSpec:
     eval_spec_type = payload.get("eval_spec_type")
     if eval_spec_type == "prefix":
-        return PrefixEvalSpec(
-            **{field.name: payload[field.name] for field in fields(PrefixEvalSpec)}
-        )
+        return PrefixEvalSpec(**_eval_spec_kwargs(PrefixEvalSpec, payload))
     if eval_spec_type is not None:
         raise ResultStoreSchemaError(f"unknown eval_spec_type {eval_spec_type!r}")
-    return EvalSpec(**{field.name: payload[field.name] for field in fields(EvalSpec)})
+    return EvalSpec(**_eval_spec_kwargs(EvalSpec, payload))
+
+
+def _eval_spec_kwargs(eval_spec_cls: type[EvalSpec], payload: Mapping[str, Any]) -> dict[str, Any]:
+    values: dict[str, Any] = {}
+    for field in fields(eval_spec_cls):
+        if field.name in payload:
+            values[field.name] = payload[field.name]
+        elif field.default is not MISSING:
+            values[field.name] = field.default
+        elif field.default_factory is not MISSING:
+            values[field.name] = field.default_factory()
+        else:
+            raise KeyError(field.name)
+    return values
 
 
 def _serialize_objectives(objectives: ObjectiveVector | None) -> list[dict[str, Any]]:

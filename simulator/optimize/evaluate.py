@@ -400,6 +400,9 @@ def _build_eval_inputs(
         additives_kg=run_options["additives_kg"],
         track=str(run_options["track"]),
         backend_name=str(run_options["backend_name"]),
+        c5_enabled=bool(run_options["c5_enabled"]),
+        mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
+        mre_target_species=str(run_options["mre_target_species"]),
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         chemistry_kernel=run_options["chemistry_kernel"],
     )
@@ -415,6 +418,9 @@ def _build_eval_inputs(
         setpoints_patch=setpoints_patch,
         runtime_campaign_overrides=dict(spec.runtime_campaign_overrides),
         track=spec.track,
+        c5_enabled=spec.c5_enabled,
+        mre_target_species=spec.mre_target_species,
+        mre_max_voltage_V=spec.mre_max_voltage_V,
     )._session_config()
     return spec, run_config
 
@@ -446,6 +452,9 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
         "track": merged.get("track", "pyrolysis"),
         "backend_name": backend_name,
+        "c5_enabled": bool(merged.get("c5_enabled", False)),
+        "mre_max_voltage_V": float(merged.get("mre_max_voltage_V", 0.0) or 0.0),
+        "mre_target_species": str(merged.get("mre_target_species", "") or ""),
         "reduced_real_cache": reduced_real_cache,
         "runtime_campaign_overrides": dict(
             merged.get("runtime_campaign_overrides", {}) or {}

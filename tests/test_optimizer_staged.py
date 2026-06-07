@@ -295,7 +295,16 @@ def test_staged_default_evaluator_fails_loud_without_replay(tmp_path) -> None:
 
 
 def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None:
-    base = _spec(RecipePatch({}))
+    profile = {
+        **PROFILE,
+        "run": {
+            **PROFILE["run"],
+            "c5_enabled": True,
+            "mre_max_voltage_V": 1.4,
+            "mre_target_species": "SiO2",
+        },
+    }
+    base = _spec(RecipePatch({}), profile=profile)
     prefix = make_prefix_eval_spec(
         base,
         prefix_stage_ids=("C0",),
@@ -320,6 +329,9 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_prefix.eval_spec.prefix_stage_ids == ("C0",)
     assert loaded_prefix.eval_spec.prefix_recipe_ids == (base.recipe_id,)
     assert loaded_prefix.eval_spec.topology_id == "PATH_AB"
+    assert loaded_prefix.eval_spec.c5_enabled is True
+    assert loaded_prefix.eval_spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert loaded_prefix.eval_spec.mre_target_species == "SiO2"
 
 
 def test_staged_clean_import_boundary_then_touch_loads_evaluate_only() -> None:
@@ -386,22 +398,37 @@ def test_staged_run_is_deterministic_for_same_seed_feedstock_fidelity(tmp_path) 
     assert _record_signature(first.winner) == _record_signature(second.winner)
 
 
-def test_c6_topology_changes_stage_path() -> None:
+def test_c5_and_c6_topology_changes_stage_path() -> None:
     profile = {**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 1}}
+    c5_no = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c5=False, c6=True),
+    )
+    c5_yes = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=True),
+    )
     c6_no = StagedStrategy(
         SCHEMA,
         seed=3,
         objective_profile=profile,
-        topology=TopologyChoice(path_ab="A", branch="two", c6=False),
+        topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=False),
     )
     c6_yes = StagedStrategy(
         SCHEMA,
         seed=3,
         objective_profile=profile,
-        topology=TopologyChoice(path_ab="A", branch="two", c6=True),
+        topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=True),
     )
 
-    assert len(enumerate_topologies()) == 12
+    assert len(enumerate_topologies()) == 24
+    assert c5_no.stage_ids != c5_yes.stage_ids
+    assert "C5" not in c5_no.stage_ids
+    assert "C5" in c5_yes.stage_ids
     assert c6_no.stage_ids != c6_yes.stage_ids
     assert "C6" not in c6_no.stage_ids
     assert c6_yes.stage_ids[-1] == "C6"
@@ -941,7 +968,7 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
         "allowlist": ("C0", "C0b_p_cleanup"),
         "children_per_parent": 2,
         "max_backward_passes": 0,
-        "topology": {"path_ab": "A", "branch": "two", "c6": "yes"},
+        "topology": {"path_ab": "A", "branch": "two", "c5": "yes", "c6": "yes"},
     }
     width_one = study.run(
         {**PROFILE, "staged": {**base_staged, "beam_width": 1}},
@@ -1062,7 +1089,7 @@ def test_staged_out_of_scope_contracts_fail_loud() -> None:
                 **PROFILE,
                 "staged": {
                     "enable_c6_topology": True,
-                    "topology": {"path_ab": "A", "branch": "two", "c6": "yes"},
+                    "topology": {"path_ab": "A", "branch": "two", "c5": "yes", "c6": "yes"},
                 },
             },
         )
@@ -1075,6 +1102,8 @@ def test_staged_out_of_scope_contracts_fail_loud() -> None:
     assert strategy.run_backward_pass() is False
     assert strategy.joint_refine() is False
     c6_no, c6_yes = strategy.enumerate_c6_topology()
+    assert c6_no.c5 == strategy.topology.c5
+    assert c6_yes.c5 == strategy.topology.c5
     assert c6_no.c6 is False
     assert c6_yes.c6 is True
 

@@ -382,6 +382,20 @@ class RecipeSchema:
             ),
         ),
         _knob(
+            "campaigns.C5.branch_two.max_voltage_V",
+            low=0.0,
+            high=2.5,
+            units="V",
+            bounds_source="setpoints:campaigns.C5.branch_two.max_voltage_V",
+        ),
+        _knob(
+            "campaigns.C5.branch_one.max_voltage_V",
+            low=0.0,
+            high=2.5,
+            units="V",
+            bounds_source="setpoints:campaigns.C5.branch_one.max_voltage_V",
+        ),
+        _knob(
             "campaigns.C6.temp_range_C",
             low=1450,
             high=1550,

@@ -18,17 +18,21 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+from simulator.optimize.evaluate import _build_eval_inputs
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 
 
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"backend_name":"stub",'
-    b'"campaign":"C0","chemistry_kernel":{"allow_builtin_fallback":false,'
-    b'"engine":"builtin","pressure_Pa":"0.001000000"},'
-    b'"code_version":"0.5.4","data_digests":{"feedstocks":"feedstock-digest",'
+    b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
+    b'"allow_builtin_fallback":false,"engine":"builtin",'
+    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.4",'
+    b'"data_digests":{"feedstocks":"feedstock-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
     b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
     b'"feedstock_recipe_digest":"feedstock-recipe-digest","fidelity":"fast",'
-    b'"hours":24,"mass_kg":"1000.000000000","profile_id":"oxygen-yield-v1",'
+    b'"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000",'
+    b'"mre_target_species":"","profile_id":"oxygen-yield-v1",'
     b'"recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{'
     b'"hold_time_h":"1.000000000"}},"track":"pyrolysis"}'
 )
@@ -174,6 +178,9 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
         ("additives_kg", {"CaO": 2.5}),
         ("track", "mre_baseline"),
         ("backend_name", "magmin"),
+        ("c5_enabled", True),
+        ("mre_max_voltage_V", 1.4),
+        ("mre_target_species", "SiO2"),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
         (
             "data_digests",
@@ -196,6 +203,61 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
 )
 def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
+
+
+def test_mre_policy_fields_split_cache_keys() -> None:
+    off = _base_spec(c5_enabled=False, mre_max_voltage_V=0.0, mre_target_species="")
+    enabled = _base_spec(c5_enabled=True, mre_max_voltage_V=0.0, mre_target_species="")
+    si_target = _base_spec(
+        c5_enabled=True,
+        mre_max_voltage_V=1.4,
+        mre_target_species="SiO2",
+    )
+    ti_target = _base_spec(
+        c5_enabled=True,
+        mre_max_voltage_V=1.5,
+        mre_target_species="TiO2",
+    )
+
+    assert len({cache_key(off), cache_key(enabled), cache_key(si_target), cache_key(ti_target)}) == 4
+
+
+def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> None:
+    profile = {
+        "profile_id": "mre-policy-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 1.0}
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C5",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "c5_enabled": True,
+            "mre_max_voltage_V": 1.4,
+            "mre_target_species": "SiO2",
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert spec.c5_enabled is True
+    assert spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert spec.mre_target_species == "SiO2"
+    assert run_config.c5_enabled is True
+    assert run_config.mre_max_voltage_V == pytest.approx(1.4)
+    assert run_config.mre_target_species == "SiO2"
 
 
 @pytest.mark.parametrize("bad_value", (math.nan, math.inf, -math.inf))

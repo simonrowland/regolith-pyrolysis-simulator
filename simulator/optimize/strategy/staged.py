@@ -66,12 +66,17 @@ class _ArchiveMember:
 class TopologyChoice:
     path_ab: str = "A"
     branch: str = "two"
+    c5: bool = False
     c6: bool = True
 
     @property
     def id(self) -> str:
+        c5_value = "YES" if self.c5 else "NO"
         c6_value = "YES" if self.c6 else "NO"
-        return f"PATH_{self.path_ab.upper()}__BRANCH_{self.branch.upper()}__C6_{c6_value}"
+        return (
+            f"PATH_{self.path_ab.upper()}__BRANCH_{self.branch.upper()}"
+            f"__C5_{c5_value}__C6_{c6_value}"
+        )
 
     def metadata(self) -> Mapping[str, Any]:
         return MappingProxyType(
@@ -79,6 +84,7 @@ class TopologyChoice:
                 "id": self.id,
                 "path_ab": self.path_ab,
                 "branch": self.branch,
+                "c5": "yes" if self.c5 else "no",
                 "c6": "yes" if self.c6 else "no",
             }
         )
@@ -86,9 +92,10 @@ class TopologyChoice:
 
 _PATH_AB_CHOICES = ("A", "A_staged", "B")
 _BRANCH_CHOICES = ("two", "one")
+_C5_CHOICES = (False, True)
 _C6_CHOICES = (True, False)
 _DEFAULT_TOPOLOGY = TopologyChoice()
-_TOPOLOGY_MAPPING_KEYS = frozenset({"id", "path", "path_ab", "branch", "c6"})
+_TOPOLOGY_MAPPING_KEYS = frozenset({"id", "path", "path_ab", "branch", "c5", "c6"})
 _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "C0": ("stage0", "feed", "raw", "drying", "volatile"),
@@ -127,9 +134,10 @@ def enumerate_topologies(
 ) -> tuple[TopologyChoice, ...]:
     if topologies is None:
         return tuple(
-            TopologyChoice(path_ab=path_ab, branch=branch, c6=c6)
+            TopologyChoice(path_ab=path_ab, branch=branch, c5=c5, c6=c6)
             for path_ab in _PATH_AB_CHOICES
             for branch in _BRANCH_CHOICES
+            for c5 in _C5_CHOICES
             for c6 in _C6_CHOICES
         )
     resolved = tuple(_coerce_topology(topology) for topology in topologies)
@@ -165,6 +173,9 @@ def make_prefix_eval_spec(
         backend_name=base_spec.backend_name,
         runtime_campaign_overrides=base_spec.runtime_campaign_overrides,
         chemistry_kernel=base_spec.chemistry_kernel,
+        c5_enabled=base_spec.c5_enabled,
+        mre_max_voltage_V=base_spec.mre_max_voltage_V,
+        mre_target_species=base_spec.mre_target_species,
         prefix_stage_ids=stage_ids,
         prefix_recipe_ids=recipe_ids,
         topology_id=topology_id,
@@ -894,6 +905,7 @@ def _topology_from_options(
         for key, value in (
             ("path_ab", options.get("path_ab", options.get("path"))),
             ("branch", options.get("branch")),
+            ("c5", options.get("c5")),
             ("c6", options.get("c6")),
         )
         if value is not None
@@ -919,6 +931,7 @@ def _coerce_topology(value: Any) -> TopologyChoice:
             return TopologyChoice(path_ab="B", branch="two", c6=True)
         path_ab = None
         branch = None
+        c5 = None
         c6 = None
         for part in normalized.split("__"):
             if part in {"PATH_A", "A"}:
@@ -931,12 +944,21 @@ def _coerce_topology(value: Any) -> TopologyChoice:
                 branch = "one"
             elif part in {"BRANCH_TWO", "TWO"}:
                 branch = "two"
+            elif part in {"C5_YES"}:
+                c5 = True
+            elif part in {"C5_NO"}:
+                c5 = False
             elif part in {"C6_YES", "YES"}:
                 c6 = True
             elif part in {"C6_NO", "NO"}:
                 c6 = False
         if path_ab is not None and branch is not None and c6 is not None:
-            return TopologyChoice(path_ab=path_ab, branch=branch, c6=c6)
+            return TopologyChoice(
+                path_ab=path_ab,
+                branch=branch,
+                c5=True if c5 is None else c5,
+                c6=c6,
+            )
         raise ValueError(f"unknown topology {value!r}")
     if isinstance(value, Mapping):
         unknown = sorted(set(value) - _TOPOLOGY_MAPPING_KEYS)
@@ -961,6 +983,7 @@ def _coerce_topology(value: Any) -> TopologyChoice:
         return TopologyChoice(
             path_ab=_normalize_path_ab(value[path_key]),
             branch=_normalize_branch(value["branch"]),
+            c5=_normalize_c5(value.get("c5", False)),
             c6=_normalize_c6(value["c6"]),
         )
     raise TypeError("topology must be a TopologyChoice, mapping, or id string")
@@ -1014,6 +1037,18 @@ def _normalize_c6(value: Any) -> bool:
     raise ValueError("topology c6 must be yes/no")
 
 
+def _normalize_c5(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"yes", "y", "true", "1", "on"}:
+            return True
+        if normalized in {"no", "n", "false", "0", "off"}:
+            return False
+    raise ValueError("topology c5 must be yes/no")
+
+
 def _stage_path_for_topology(topology: TopologyChoice) -> tuple[str, ...]:
     path_stage = {
         "A": "C2A_continuous",
@@ -1023,7 +1058,8 @@ def _stage_path_for_topology(topology: TopologyChoice) -> tuple[str, ...]:
     stages = ["C0", "C0b_p_cleanup", path_stage, "C3"]
     if topology.branch == "two":
         stages.append("C4")
-    stages.append("C5")
+    if topology.c5:
+        stages.append("C5")
     if topology.c6:
         stages.append("C6")
     return tuple(stages)
