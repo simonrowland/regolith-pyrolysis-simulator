@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Dict
 
+import simulator.mre_ladder as mre_ladder
 from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import product_stage_number
 from simulator.state import (
@@ -354,38 +355,7 @@ class ExtractionMixin:
         against operator typos / partial YAML blocks; designed to
         degrade to the fallback ladder gracefully.
         """
-        block = (
-            (self.setpoints or {}).get('mre_voltage_sequence', {})
-            or {}
-        )
-        entries = block.get('sequence', []) or []
-        if not isinstance(entries, list):
-            return []
-        parsed: list = []
-        for entry in entries:
-            if not isinstance(entry, dict):
-                continue
-            species = entry.get('species')
-            if not species or not isinstance(species, str):
-                continue
-            raw_V = entry.get('decomposition_V')
-            voltage = self._coerce_mre_decomposition_voltage(raw_V)
-            if voltage is None:
-                continue
-            raw_hold = entry.get(
-                'min_hold_hours', self._MRE_DEFAULT_MIN_HOLD_HOURS
-            )
-            try:
-                min_hold = max(0, int(raw_hold))
-            except (TypeError, ValueError):
-                min_hold = self._MRE_DEFAULT_MIN_HOLD_HOURS
-            parsed.append({
-                'voltage': float(voltage),
-                'species': [str(species)],
-                'min_hold_hours': min_hold,
-            })
-        parsed.sort(key=lambda e: e['voltage'])
-        return parsed
+        return mre_ladder.parse_mre_voltage_sequence_yaml(self.setpoints)
 
     @staticmethod
     def _coerce_mre_decomposition_voltage(value) -> float | None:
@@ -393,41 +363,7 @@ class ExtractionMixin:
         per the parsing rules documented on
         ``_build_mre_voltage_sequence``. Returns None on
         unparseable / non-finite input."""
-        import math as _math
-        if value is None:
-            return None
-        if isinstance(value, bool):
-            # bool is an int subclass; explicit reject so True doesn't
-            # quietly coerce to 1.0 V.
-            return None
-        if isinstance(value, (int, float)):
-            voltage = float(value)
-            return voltage if _math.isfinite(voltage) else None
-        if isinstance(value, (list, tuple)):
-            # Range [low, high] → midpoint.
-            if len(value) != 2:
-                return None
-            try:
-                low = float(value[0])
-                high = float(value[1])
-            except (TypeError, ValueError):
-                return None
-            if not (_math.isfinite(low) and _math.isfinite(high)):
-                return None
-            return 0.5 * (low + high)
-        if isinstance(value, str):
-            stripped = value.strip()
-            # Tolerate ``<X`` / ``>X`` / ``~X`` / ``±X`` prefixes.
-            for prefix in ('<', '>', '~', '±'):
-                if stripped.startswith(prefix):
-                    stripped = stripped[len(prefix):].strip()
-                    break
-            try:
-                voltage = float(stripped)
-            except (TypeError, ValueError):
-                return None
-            return voltage if _math.isfinite(voltage) else None
-        return None
+        return mre_ladder.coerce_mre_decomposition_voltage(value)
 
     # 0.5.4.1 B5 (CW1 historical-audit closure, 2026-05-28):
     # canonical FALLBACK ladder used by ``_build_mre_voltage_sequence``
@@ -438,16 +374,7 @@ class ExtractionMixin:
     # tweaking the YAML saw zero effect. B5 wires the YAML through,
     # so this list is now the fallback / golden ground truth, NOT
     # the only source-of-truth.
-    _MRE_VOLTAGE_LADDER_FALLBACK = (
-        {'voltage': 0.6, 'species': ('FeO',), 'min_hold_hours': 3},
-        {'voltage': 0.9, 'species': ('Cr2O3',), 'min_hold_hours': 2},
-        {'voltage': 1.0, 'species': ('MnO',), 'min_hold_hours': 2},
-        {'voltage': 1.4, 'species': ('SiO2',), 'min_hold_hours': 5},
-        {'voltage': 1.5, 'species': ('TiO2',), 'min_hold_hours': 3},
-        {'voltage': 1.9, 'species': ('Al2O3',), 'min_hold_hours': 8},
-        {'voltage': 2.2, 'species': ('MgO',), 'min_hold_hours': 5},
-        {'voltage': 2.5, 'species': ('CaO',), 'min_hold_hours': 10},
-    )
+    _MRE_VOLTAGE_LADDER_FALLBACK = mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK
 
     # Default ``min_hold_hours`` per species used when YAML doesn't
     # carry an explicit value. Sourced from the same fallback ladder
@@ -455,7 +382,7 @@ class ExtractionMixin:
     # for those species). For species the YAML adds but the fallback
     # doesn't cover (e.g., Na2O / K2O in the published YAML), the
     # default below applies.
-    _MRE_DEFAULT_MIN_HOLD_HOURS = 3
+    _MRE_DEFAULT_MIN_HOLD_HOURS = mre_ladder.MRE_DEFAULT_MIN_HOLD_HOURS
 
     def _build_mre_voltage_sequence(self) -> list:
         """Build the stepped voltage hold sequence (Ellingham ladder).
@@ -490,22 +417,15 @@ class ExtractionMixin:
         reordering. Closes CW1 historical-audit item
         (``docs-private/audits/2026-05-27-p3-historical-audit.txt``).
         """
-        sequence = self._parse_mre_voltage_sequence_yaml()
-        if sequence:
-            return sequence
-        return [
-            {'voltage': entry['voltage'],
-             'species': list(entry['species']),
-             'min_hold_hours': entry['min_hold_hours']}
-            for entry in self._MRE_VOLTAGE_LADDER_FALLBACK
-        ]
+        return mre_ladder.build_mre_voltage_sequence(self.setpoints)
 
     def _step_mre(self) -> float:
         """
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
 
         Voltage strategy:
-            C5 (limited MRE):    Stepped holds at Ellingham thresholds up to 1.6 V.
+            C5 (limited MRE):    Stepped holds at Ellingham thresholds up to the
+                                 Branch Two YAML max voltage.
                                  Extracts FeO, SiO₂, TiO₂ but NOT Al₂O₃/MgO/CaO.
                                  Electrode life 5-10× longer than full MRE.
 
@@ -561,11 +481,12 @@ class ExtractionMixin:
 
             current_A = 3000.0  # Full-scale MRE: ~60 kA/m² at 0.05 m²
         else:
-            # C5 limited MRE: stepped holds up to 1.6 V
-            seq = [s for s in self._mre_voltage_sequence
-                   if s['voltage'] <= 1.6]
+            # C5 limited MRE: stepped holds up to the YAML Branch Two cap.
+            seq = mre_ladder.c5_voltage_ladder(
+                self._mre_voltage_sequence, self.setpoints
+            )
             if not seq:
-                voltage_V = 1.6
+                voltage_V = mre_ladder.branch_two_voltage_cap(self.setpoints)
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]
