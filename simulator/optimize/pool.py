@@ -8,6 +8,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from datetime import UTC, datetime
 import copy
 import errno
+from functools import partial
 import inspect
 import logging
 import os
@@ -26,6 +27,12 @@ from simulator.optimize.evaluate import (
 )
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.worker_runtime import (
+    clear_worker_runtime,
+    get_worker_runtime,
+    warm_worker_runtime,
+    warm_workers_enabled,
+)
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
 _INFLIGHT_PER_WORKER = 2
@@ -134,8 +141,10 @@ def _evaluate_tasks_in_pool(
     worker_count = max_workers or (os.cpu_count() or 1)
     max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
     task_iter = iter(tasks)
+    warm_backend_name = _warm_backend_name(tasks)
+    initializer = partial(_initialize_worker, warm_backend_name)
     try:
-        executor = ProcessPoolExecutor(max_workers=max_workers, initializer=_initialize_worker)
+        executor = ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
     except BaseException as exc:
         if _is_pool_unavailable(exc):
             raise _PoolUnavailableError("could not create process pool") from exc
@@ -192,8 +201,9 @@ def _evaluate_tasks_serial(
 ) -> tuple[ScoredResult, ...]:
     env_names = _serial_fallback_env_names()
     env_snapshot = {name: os.environ.get(name) for name in env_names}
+    warm_backend_name = _warm_backend_name(tasks)
     try:
-        _initialize_worker()
+        _initialize_worker(warm_backend_name)
         results: list[ScoredResult] = []
         for task in tasks:
             try:
@@ -209,6 +219,7 @@ def _evaluate_tasks_serial(
             results.append(outcome["result"])
         return tuple(results)
     finally:
+        clear_worker_runtime()
         _restore_env(env_snapshot)
 
 
@@ -233,9 +244,13 @@ def _submit_until_full(
         futures[future] = task
 
 
-def _initialize_worker() -> None:
+def _initialize_worker(backend_name: str | None = None) -> None:
     from simulator.optimize.determinism import pin_worker_env
     pin_worker_env()
+    if backend_name is None or not warm_workers_enabled():
+        clear_worker_runtime()
+        return
+    warm_worker_runtime(backend_name)
 
 
 def _evaluate_pool_task(
@@ -256,6 +271,7 @@ def _evaluate_pool_task(
             constraints=task.constraints,
             schema=task.schema,
             output_dir=str(output_dir),
+            worker_runtime=get_worker_runtime(),
         )
     except EvaluationAbort as exc:
         return {"kind": "abort", "index": task.index, "abort": _abort_payload(exc)}
@@ -280,6 +296,32 @@ def _call_evaluate_fn(
         if accepts_kwargs or key in signature.parameters
     }
     return evaluate_fn(patch, feedstock_id, fidelity, **accepted)
+
+
+def _warm_backend_name(tasks: Sequence[_PoolTask]) -> str | None:
+    if not warm_workers_enabled():
+        return None
+    names = {_task_backend_name(task) for task in tasks}
+    if len(names) != 1:
+        return None
+    name = next(iter(names))
+    if name in {"auto", "cached-real"}:
+        return None
+    return name
+
+
+def _task_backend_name(task: _PoolTask) -> str:
+    merged: dict[str, Any] = {}
+    profile = task.profile
+    run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
+    if isinstance(run_options, Mapping):
+        merged.update(run_options)
+    fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
+    if isinstance(fidelities, Mapping):
+        selected = fidelities.get(task.fidelity, {})
+        if isinstance(selected, Mapping):
+            merged.update(selected)
+    return str(merged.get("backend_name", "stub") or "stub")
 
 
 def _task_from_request(

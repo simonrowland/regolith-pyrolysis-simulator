@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 import hashlib
+import inspect
 import math
 from types import MappingProxyType
 from typing import Any, Mapping
@@ -34,6 +35,7 @@ from simulator.optimize.physics import (
 )
 from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
 
@@ -174,6 +176,7 @@ def evaluate(
     executor: RunExecutor | None = None,
     constraints: PhysicsConstraintSet | None = None,
     schema: RecipeSchema | None = None,
+    worker_runtime: Any | None = None,
 ) -> ScoredResult:
     """Run one recipe candidate and return its feasible-only score."""
 
@@ -207,9 +210,14 @@ def evaluate(
         ) from exc
     key = cache_key(spec)
     active_executor = executor or RunExecutor()
+    runtime = worker_runtime if worker_runtime is not None else get_worker_runtime()
 
     try:
-        run_execution = active_executor.execute(run_config)
+        run_execution = _execute_run(
+            active_executor,
+            run_config,
+            worker_runtime=runtime,
+        )
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
             str(exc),
@@ -311,6 +319,29 @@ def evaluate(
         feasibility_margins=feasibility.margins,
         failing_gates=(),
         run_reference=_run_reference(run_execution, profile),
+    )
+
+
+def _execute_run(
+    executor: Any,
+    run_config: Any,
+    *,
+    worker_runtime: Any | None,
+) -> Any:
+    execute = executor.execute
+    if worker_runtime is not None and _accepts_keyword(execute, "worker_runtime"):
+        return execute(run_config, worker_runtime=worker_runtime)
+    return execute(run_config)
+
+
+def _accepts_keyword(callable_obj: Any, keyword: str) -> bool:
+    try:
+        signature = inspect.signature(callable_obj)
+    except (TypeError, ValueError):
+        return False
+    return any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD or name == keyword
+        for name, parameter in signature.parameters.items()
     )
 
 

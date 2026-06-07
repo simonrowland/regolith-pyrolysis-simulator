@@ -40,9 +40,14 @@ class RunExecution:
 class RunExecutor:
     """Drive a configured session and return structured execution data."""
 
-    def execute(self, config: SimSessionConfig) -> RunExecution:
+    def execute(
+        self,
+        config: SimSessionConfig,
+        *,
+        worker_runtime: Any | None = None,
+    ) -> RunExecution:
         session = SimSession()
-        session.start(config)
+        session.start(config, backend=_backend_from_worker_runtime(config, worker_runtime))
         return self.execute_session(session, hours=int(config.hours))
 
     def execute_session(self, session: SimSession, *, hours: int) -> RunExecution:
@@ -104,6 +109,19 @@ class RunExecutor:
             refusal_diagnostic=refusal_diagnostic,
             reduced_real_cache=reduced_real_cache,
         )
+
+
+def _backend_from_worker_runtime(
+    config: SimSessionConfig,
+    worker_runtime: Any | None,
+) -> Any | None:
+    if worker_runtime is None:
+        return None
+    if getattr(worker_runtime, "backend_name", None) != config.backend_name:
+        return None
+    if config.reduced_real_cache is not None:
+        return None
+    return getattr(worker_runtime, "backend", None)
 
 
 def _collect_shadow_trace(

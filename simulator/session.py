@@ -121,7 +121,12 @@ class SimSession:
     def simulator(self) -> PyrolysisSimulator:
         return self._require_sim()
 
-    def start(self, config: SimSessionConfig) -> "SimSession":
+    def start(
+        self,
+        config: SimSessionConfig,
+        *,
+        backend: Any | None = None,
+    ) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
         cached_real_config = None
@@ -134,12 +139,13 @@ class SimSession:
             raise config.unavailable_error_cls(
                 "reduced_real_cache is only valid with backend_name='cached-real'"
             )
-        backend = resolve_backend(
-            config.backend_name,
-            config.backend_policy,
-            unavailable_error_cls=config.unavailable_error_cls,
-            cached_real_config=cached_real_config,
-        )
+        if backend is None:
+            backend = resolve_backend(
+                config.backend_name,
+                config.backend_policy,
+                unavailable_error_cls=config.unavailable_error_cls,
+                cached_real_config=cached_real_config,
+            )
         if config.feedstock_id not in config.feedstocks:
             expected = sorted(config.feedstocks)[:5]
             raise config.unavailable_error_cls(
