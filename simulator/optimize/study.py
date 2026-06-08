@@ -79,9 +79,27 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
                 "profile_schema_version": "profile-schema-v1",
                 "feedstock": "lunar_mare_low_ti",
                 "objectives": [
-                    {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.5},
-                    {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.25},
-                    {"metric": "duration_h", "sense": "minimize", "units": "h", "weight": 0.25},
+                    {
+                        "metric": "oxygen_kg",
+                        "sense": "maximize",
+                        "units": "kg",
+                        "weight": 0.5,
+                        "rationale": "default oxygen objective evidence",
+                    },
+                    {
+                        "metric": "energy_kWh",
+                        "sense": "minimize",
+                        "units": "kWh",
+                        "weight": 0.25,
+                        "rationale": "default energy objective evidence",
+                    },
+                    {
+                        "metric": "duration_h",
+                        "sense": "minimize",
+                        "units": "h",
+                        "weight": 0.25,
+                        "rationale": "default duration objective evidence",
+                    },
                 ],
                 "constraints": {"gates": ["delivered_stream_purity"]},
                 "run": {
@@ -964,16 +982,16 @@ def _assert_honest_result(
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
 ) -> None:
-    _assert_finite_margins(scored)
+    _assert_result_artifact_floor(scored)
     if scored.failure_category in {
         FailureCategory.ENGINE_BUG,
         FailureCategory.BACKEND_UNAVAILABLE,
     }:
         raise StudyAbort(f"aborting study on {scored.failure_category.value} result")
     if not scored.feasible:
+        if scored.failure_category is None:
+            raise StudyAbort("infeasible result missing failure_category")
         return
-    if scored.eval_spec is None or scored.cache_key is None:
-        raise StudyAbort("feasible result missing eval_spec/cache_key")
     if scored.objectives is None:
         raise StudyAbort("feasible result missing objective vector")
     try:
@@ -982,11 +1000,33 @@ def _assert_honest_result(
         raise StudyAbort(str(exc)) from exc
 
 
+def _assert_result_artifact_floor(scored: ScoredResult) -> None:
+    if scored.eval_spec is None or scored.cache_key is None:
+        raise StudyAbort("result artifact missing eval_spec/cache_key")
+    if scored.cache_key != cache_key(scored.eval_spec):
+        raise StudyAbort("result artifact cache_key does not match eval_spec")
+    if not scored.feasibility_margins:
+        raise StudyAbort("result artifact missing feasibility_margins")
+    _assert_finite_margins(scored)
+    if _result_backend_status(scored) is None:
+        raise StudyAbort("result artifact missing backend_status")
+
+
 def _assert_finite_margins(scored: ScoredResult) -> None:
     for name, margin in scored.feasibility_margins.items():
         prefix = f"feasibility margin {name!r}"
         _finite_or_infinite(getattr(margin, "margin", None), f"{prefix}.margin")
         _finite_or_infinite(getattr(margin, "observed", None), f"{prefix}.observed")
+
+
+def _result_backend_status(scored: ScoredResult) -> str | None:
+    reference = getattr(scored, "run_reference", None)
+    if reference is None:
+        return None
+    status = _backend_status_from_trace(getattr(reference, "trace", None))
+    if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
+        return "diagnostic_stub"
+    return status
 
 
 def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
@@ -997,10 +1037,44 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
         status=reference.status,
         error_message=reference.error_message,
         reason=reference.reason,
-        trace=None,
+        trace=_light_backend_status_trace(scored),
         product_summary=reference.product_summary,
     )
     return replace(scored, run_reference=light_reference)
+
+
+def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, str] | None:
+    trace = getattr(getattr(scored, "run_reference", None), "trace", None)
+    status = _backend_status_from_trace(trace)
+    if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
+        status = "diagnostic_stub"
+    return {"backend_status": status} if status is not None else None
+
+
+def _backend_status_from_trace(trace: Any) -> str | None:
+    if isinstance(trace, Mapping):
+        raw = trace.get("backend_status")
+        if raw is not None:
+            return str(raw)
+        for key in ("per_hour", "hours"):
+            status = _latest_backend_status(trace.get(key))
+            if status is not None:
+                return status
+        return None
+    raw = getattr(trace, "backend_status", None)
+    if raw is not None:
+        return str(raw)
+    for attr in ("per_hour", "hours"):
+        status = _latest_backend_status(getattr(trace, attr, None))
+        if status is not None:
+            return status
+    return None
+
+
+def _latest_backend_status(value: Any) -> str | None:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
+        return None
+    return _backend_status_from_trace(value[-1])
 
 
 def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -> StudyRecord:

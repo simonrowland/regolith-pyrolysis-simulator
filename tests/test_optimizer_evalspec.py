@@ -228,7 +228,13 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
         "profile_schema_version": "profile-schema-v1",
         "feedstock": "lunar_mare_low_ti",
         "objectives": [
-            {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 1.0}
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
         ],
         "constraints": {"gates": ["delivered_stream_purity"]},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],

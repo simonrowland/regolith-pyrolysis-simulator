@@ -57,6 +57,14 @@ def test_unknown_objective_metric_raises_named_error() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_profile_objective_importance_requires_evidence_rationale() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["objectives"][0].pop("rationale")
+
+    with pytest.raises(ProfileValidationError, match="insufficient-evidence"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def test_malformed_seed_recipe_raises_named_error() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["seed_recipes"][0]["patch"] = {

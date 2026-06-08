@@ -43,8 +43,20 @@ PROFILE = {
     "profile_schema_version": "profile-schema-v1",
     "feedstock": FEEDSTOCK,
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.6},
-        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.4},
+        {
+            "metric": "oxygen_kg",
+            "sense": "maximize",
+            "units": "kg",
+            "weight": 0.6,
+            "rationale": "test oxygen objective evidence",
+        },
+        {
+            "metric": "energy_kWh",
+            "sense": "minimize",
+            "units": "kWh",
+            "weight": 0.4,
+            "rationale": "test energy objective evidence",
+        },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
@@ -175,7 +187,9 @@ def _scored(
         feasibility_margins={"delivered_stream_purity": margin or _margin()},
         run_reference=RunReference(
             status="ok",
-            trace={"heavy": "trace"} if trace is None else trace,
+            trace={"backend_status": "diagnostic_stub", "heavy": "trace"}
+            if trace is None
+            else trace,
             product_summary={"oxygen_kg": oxygen_value},
         ),
     )
@@ -229,13 +243,13 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     fresh = replace(fresh, eval_spec=prefix_spec, cache_key=cache_key(prefix_spec))
     fresh = replace(
         fresh,
-        run_reference=RunReference(
-            status=fresh.run_reference.status,
-            error_message=fresh.run_reference.error_message,
-            reason=fresh.run_reference.reason,
-            trace=None,
-            product_summary=fresh.run_reference.product_summary,
-        ),
+            run_reference=RunReference(
+                status=fresh.run_reference.status,
+                error_message=fresh.run_reference.error_message,
+                reason=fresh.run_reference.reason,
+                trace={"backend_status": "diagnostic_stub"},
+                product_summary=fresh.run_reference.product_summary,
+            ),
     )
     assert_prefix_replay_equal(cached, fresh)
 
@@ -899,6 +913,7 @@ def test_all_infeasible_beam_bounded(tmp_path) -> None:
             _scored(patch, feedstock, fidelity, profile, candidate_id=candidate_id),
             feasible=False,
             objectives=None,
+            failure_category=FailureCategory.INFEASIBLE_RECIPE,
             feasibility_margins={
                 "delivered_stream_purity": replace(
                     _margin(),
@@ -1127,6 +1142,10 @@ def test_staged_result_honesty_and_light_results(tmp_path) -> None:
             feasible=False,
             failure_category=FailureCategory.ENGINE_BUG,
             feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="failed",
+                trace={"backend_status": "diagnostic_stub"},
+            ),
         )
 
     with pytest.raises(study.StudyAbort):
@@ -1151,4 +1170,4 @@ def test_staged_result_honesty_and_light_results(tmp_path) -> None:
     )
     candidate = strategy.ask(1)[0]
     strategy.tell([(candidate, _scored(candidate.patch, candidate_id=candidate.id, trace={"large": "trace"}))])
-    assert strategy.results[0][1].run_reference.trace is None
+    assert strategy.results[0][1].run_reference.trace == {"backend_status": "diagnostic_stub"}

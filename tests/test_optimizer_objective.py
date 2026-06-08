@@ -7,7 +7,9 @@ import pytest
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
+    ObjectiveProfileError,
     dominates,
+    objective_importance_evidence,
     pareto_front,
 )
 
@@ -52,6 +54,25 @@ def test_missing_or_nonfinite_objectives_raise() -> None:
             {"oxygen_kg": 1.0, "energy_kWh": 5.0},
             DEFINITIONS,
         )
+
+
+def test_incomplete_objective_importance_evidence_raises_insufficient_evidence() -> None:
+    profile = {
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+            }
+        ]
+    }
+
+    with pytest.raises(
+        ObjectiveProfileError,
+        match="insufficient-evidence: objectives\\[0\\] 'oxygen_kg' missing rationale",
+    ):
+        objective_importance_evidence(profile)
 
 
 def test_pareto_front_preserves_stable_non_dominated_order() -> None:

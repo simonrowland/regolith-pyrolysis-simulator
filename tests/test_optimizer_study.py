@@ -28,8 +28,20 @@ PROFILE = {
     "profile_schema_version": "profile-schema-v1",
     "feedstock": "lunar_mare_low_ti",
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "maximize", "units": "kg", "weight": 0.6},
-        {"metric": "energy_kWh", "sense": "minimize", "units": "kWh", "weight": 0.4},
+        {
+            "metric": "oxygen_kg",
+            "sense": "maximize",
+            "units": "kg",
+            "weight": 0.6,
+            "rationale": "test oxygen objective evidence",
+        },
+        {
+            "metric": "energy_kWh",
+            "sense": "minimize",
+            "units": "kWh",
+            "weight": 0.4,
+            "rationale": "test energy objective evidence",
+        },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
@@ -95,7 +107,13 @@ def _spec(
 
 
 def _scope_spec() -> EvalSpec:
-    return _spec(RecipePatch({}), FEEDSTOCK, "stub", PROFILE)
+    return _spec(
+        RecipePatch({}),
+        FEEDSTOCK,
+        "stub",
+        PROFILE,
+        physics_constraints_from_profile(PROFILE),
+    )
 
 
 def _stored_rows(out_dir: Path) -> list[ScoredResult]:
@@ -136,6 +154,10 @@ def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | Non
                 failure_category=FailureCategory.ENGINE_BUG,
                 feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
                 failing_gates=("delivered_stream_purity",),
+                run_reference=RunReference(
+                    status="failed",
+                    trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
+                ),
             )
         if index in bad:
             return ScoredResult(
@@ -146,7 +168,10 @@ def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | Non
                 failure_category=FailureCategory.INFEASIBLE_RECIPE,
                 feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
                 failing_gates=("delivered_stream_purity",),
-                run_reference=RunReference(status="ok", trace={"snapshots": ["heavy"]}),
+                run_reference=RunReference(
+                    status="ok",
+                    trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
+                ),
             )
         objectives = ObjectiveVector(
             (
@@ -161,7 +186,10 @@ def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | Non
             feasible=True,
             objectives=objectives,
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(status="ok", trace={"snapshots": ["heavy"]}),
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
+            ),
         )
 
     return evaluate_patch
@@ -257,7 +285,10 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
                     detail="no wall deposit" if index == 1 else "finite deposit",
                 ),
             },
-            run_reference=RunReference(status="ok", trace={"snapshots": [index]}),
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "diagnostic_stub", "snapshots": [index]},
+            ),
         )
 
     result = study.run(
@@ -321,6 +352,10 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={"backend_status": "diagnostic_stub"},
+        ),
     )
     store.store(spec_loose, scored, created_at="t1")
     candidate = study.Candidate(id="random-7-000000", patch=patch)
@@ -481,6 +516,10 @@ def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> No
                 )
             ),
             feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "diagnostic_stub"},
+            ),
         )
 
     first = study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path / "first", seed=7, evaluator=tied)
@@ -585,6 +624,48 @@ def test_infeasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
     assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
+def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> None:
+    produced: list[ScoredResult] = []
+
+    def unmarked_infeasible(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **_: Any,
+    ) -> ScoredResult:
+        result = ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=None,
+            cache_key=None,
+            feasible=False,
+            failure_category=None,
+            feasibility_margins={},
+            run_reference=RunReference(status="ok"),
+        )
+        produced.append(result)
+        return result
+
+    with pytest.raises(study.StudyAbort, match="eval_spec/cache_key"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "random",
+            "stub",
+            1,
+            1,
+            tmp_path,
+            evaluator=unmarked_infeasible,
+        )
+
+    assert produced and study._status(produced[0]) == "ok"
+    assert not (tmp_path / "pareto.json").exists()
+    assert not _read_provenance(tmp_path)
+    assert not _stored_rows(tmp_path)
+
+
 def test_nonfinite_objective_aborts_without_pareto(tmp_path) -> None:
     def bad_objective(
         patch: RecipePatch,
@@ -603,6 +684,10 @@ def test_nonfinite_objective_aborts_without_pareto(tmp_path) -> None:
             feasible=True,
             objectives={"oxygen_kg": math.nan, "energy_kWh": 1.0},
             feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "diagnostic_stub"},
+            ),
         )
 
     with pytest.raises(study.StudyAbort, match="oxygen_kg is non-finite"):

@@ -8,6 +8,7 @@ O-P3 may designate one write owner or rely on this SQLite serialization.
 
 from __future__ import annotations
 
+from collections.abc import Sequence as SequenceABC
 from dataclasses import MISSING, fields
 import json
 import math
@@ -127,6 +128,7 @@ class ResultStore:
             raise ValueError("scored_result.cache_key does not match eval_spec")
         if scored_result.eval_spec is not None and scored_result.eval_spec != eval_spec:
             raise ValueError("scored_result.eval_spec does not match eval_spec")
+        _validate_result_artifact(eval_spec, scored_result)
         objectives = _serialize_objectives(scored_result.objectives)
         result_blob = _result_blob(scored_result)
         with self._write_lock:
@@ -526,6 +528,58 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         ),
         notes=tuple(_json_load(row["notes"])),
     )
+
+
+def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) -> None:
+    if scored_result.cache_key is None:
+        raise ValueError("result artifact missing cache_key")
+    if scored_result.cache_key != cache_key(eval_spec):
+        raise ValueError("scored_result.cache_key does not match eval_spec")
+    if scored_result.feasible:
+        if scored_result.objectives is None:
+            raise ValueError("result artifact missing objectives")
+    elif scored_result.failure_category is None:
+        raise ValueError("result artifact missing failure_category")
+    if not scored_result.feasibility_margins:
+        raise ValueError("result artifact missing feasibility_margins")
+    if _artifact_backend_status(scored_result) is None:
+        raise ValueError("result artifact missing backend_status")
+
+
+def _artifact_backend_status(scored_result: ScoredResult) -> str | None:
+    run_reference = getattr(scored_result, "run_reference", None)
+    if run_reference is None:
+        return None
+    return _extract_backend_status(getattr(run_reference, "trace", None))
+
+
+def _extract_backend_status(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, Mapping):
+        raw = carrier.get("backend_status")
+        if raw is not None:
+            return str(raw)
+        for key in ("per_hour", "hours"):
+            nested = carrier.get(key)
+            status = _extract_latest_backend_status(nested)
+            if status is not None:
+                return status
+        return None
+    raw = getattr(carrier, "backend_status", None)
+    if raw is not None:
+        return str(raw)
+    for attr in ("per_hour", "hours"):
+        status = _extract_latest_backend_status(getattr(carrier, attr, None))
+        if status is not None:
+            return status
+    return None
+
+
+def _extract_latest_backend_status(value: Any) -> str | None:
+    if not isinstance(value, SequenceABC) or isinstance(value, (str, bytes)) or not value:
+        return None
+    return _extract_backend_status(value[-1])
 
 
 def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:

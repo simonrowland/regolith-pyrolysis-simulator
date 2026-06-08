@@ -195,6 +195,31 @@ def _authoritative_mixed_perfect_high(
     )
 
 
+def _authoritative_high_missing_energy_objective(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+) -> ScoredResult:
+    del patch, feedstock_id, fidelity, profile
+    value = float(_index(candidate_id) // 2)
+    eval_spec = _eval_spec(candidate_id, "alphamelts")
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=eval_spec,
+        cache_key=f"cache-{candidate_id}",
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", value, "kg", 0),
+            )
+        ),
+        run_reference=_run_reference("ok"),
+    )
+
+
 def _anti_high(
     patch: RecipePatch,
     feedstock_id: str,
@@ -371,6 +396,39 @@ def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
         json.loads(json.dumps(result.to_dict())), schema=_schema()
     )
     assert restored.to_dict() == result.to_dict()
+
+
+def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metric(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+
+    result = run_fidelity_correlation(
+        _doe(),
+        _perfect_fast,
+        _authoritative_high_missing_energy_objective,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={"fidelities": {"fast": {"backend_name": "stub"}, "high": {"backend_name": "alphamelts"}}},
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path,
+    )
+
+    assert result.fast_screen_trustworthy is False
+    assert result.confidence == "inconclusive"
+    assert result.spearman_by_objective["energy_kWh"] is None
+    assert any(
+        "declared objective 'energy_kWh' missing in high arm" in note
+        for note in result.notes
+    )
+
+    payload = json.loads(Path(result.artifact_paths["json"]).read_text())
+    assert payload["fast_screen_trustworthy"] is False
+    assert "energy_kWh" in payload["reason"] or any(
+        "energy_kWh" in note for note in payload["notes"]
+    )
 
 
 def test_anti_correlated_scores_fail_verdict() -> None:

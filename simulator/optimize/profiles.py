@@ -12,7 +12,11 @@ from typing import Any
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
-from simulator.optimize.objective import ObjectiveProfileError, objective_definitions
+from simulator.optimize.objective import (
+    ObjectiveProfileError,
+    objective_definitions,
+    objective_importance_evidence,
+)
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 
@@ -294,17 +298,17 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
         if not isinstance(objective, Mapping):
             raise ProfileValidationError(f"{source}: {where} must be a mapping")
         _reject_unknown_keys(objective, _OBJECTIVE_KEYS, source=source, where=where)
-        _require_keys(objective, {"metric", "sense", "units", "weight"}, source=source, where=where)
+        _require_keys(objective, {"metric", "sense", "units"}, source=source, where=where)
         metric = objective["metric"]
         if metric not in KNOWN_OBJECTIVE_METRICS:
             raise ProfileValidationError(f"{source}: unknown objective metric {metric!r}")
         if metric in seen:
             raise ProfileValidationError(f"{source}: duplicate objective metric {metric!r}")
         seen.add(metric)
-        _validate_weight(objective["weight"], source=source, where=where)
         if "rationale" in objective and not isinstance(objective["rationale"], str):
             raise ProfileValidationError(f"{source}: {where}.rationale must be a string")
     try:
+        objective_importance_evidence(profile)
         objective_definitions(profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
@@ -496,14 +500,6 @@ def _validate_seed_recipes(
             RecipePatch.from_nested(patch).validated(schema)
         except RecipeValidationError as exc:
             raise ProfileValidationError(f"{source}: malformed seed recipe: {exc}") from exc
-
-
-def _validate_weight(raw: Any, *, source: str | Path, where: str) -> None:
-    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
-        raise ProfileValidationError(f"{source}: {where}.weight must be numeric")
-    value = float(raw)
-    if not math.isfinite(value) or value <= 0.0:
-        raise ProfileValidationError(f"{source}: {where}.weight must be positive")
 
 
 def _bad_positive_number(raw: Any) -> bool:

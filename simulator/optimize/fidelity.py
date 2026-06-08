@@ -226,9 +226,14 @@ def run_fidelity_correlation(
             [high for _, _, high in pairs],
         ),
     }
+    missing_objective_notes = _missing_declared_objective_notes(pairs, objectives)
     verdict, confidence, notes = _verdict(
         spearman, agreement, recalls, len(pairs), n_total, len(drops), threshold_profile, primary
     )
+    if missing_objective_notes:
+        verdict = False
+        confidence = "inconclusive"
+        notes = (*notes, *missing_objective_notes)
     authority_reason = _high_arm_authority_reason(backend_arms)
     if verdict and authority_reason:
         verdict = False
@@ -695,6 +700,36 @@ def _primary(pairs: Sequence[Pair], names: Sequence[str]) -> str | None:
                     if value.metric in names:
                         ordinals[value.metric] = value.ordinal
     return min(ordinals.items(), key=lambda item: item[1])[0] if ordinals else None
+
+
+def _missing_declared_objective_notes(
+    pairs: Sequence[Pair],
+    names: Sequence[str],
+) -> tuple[str, ...]:
+    notes: list[str] = []
+    seen: set[tuple[str, str, str]] = set()
+    for _, fast, high in pairs:
+        for tier, result in (("fast", fast), ("high", high)):
+            if not result.feasible:
+                continue
+            present = (
+                {value.metric for value in result.objectives.values}
+                if result.objectives is not None
+                else set()
+            )
+            for name in names:
+                if name in present:
+                    continue
+                candidate = result.candidate_id or "<unknown>"
+                key = (tier, candidate, name)
+                if key in seen:
+                    continue
+                seen.add(key)
+                notes.append(
+                    f"declared objective {name!r} missing in {tier} arm "
+                    f"for candidate {candidate}"
+                )
+    return tuple(notes)
 
 
 def _verdict(

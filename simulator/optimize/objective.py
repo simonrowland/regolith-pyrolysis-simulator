@@ -51,6 +51,14 @@ class ObjectiveDefinition:
 
 
 @dataclass(frozen=True)
+class ObjectiveImportanceEvidence:
+    metric: str
+    weight: float
+    rationale: str
+    ordinal: int = 0
+
+
+@dataclass(frozen=True)
 class ObjectiveValue:
     metric: str
     sense: str
@@ -108,6 +116,49 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
             )
         )
     return tuple(definitions)
+
+
+def objective_importance_evidence(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveImportanceEvidence, ...]:
+    raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
+        raise ObjectiveProfileError("profile.objectives must be a non-empty list")
+
+    rows: list[ObjectiveImportanceEvidence] = []
+    for ordinal, raw in enumerate(raw_objectives):
+        where = f"objectives[{ordinal}]"
+        if not isinstance(raw, Mapping):
+            raise ObjectiveProfileError("each objective must be a mapping")
+        metric = str(raw.get("metric", "") or f"#{ordinal}")
+        if "weight" not in raw:
+            raise ObjectiveProfileError(
+                f"insufficient-evidence: {where} {metric!r} missing weight"
+            )
+        try:
+            weight = float(raw["weight"])
+        except (TypeError, ValueError) as exc:
+            raise ObjectiveProfileError(
+                f"insufficient-evidence: {where} {metric!r} weight is not numeric"
+            ) from exc
+        if not math.isfinite(weight) or weight <= 0.0:
+            raise ObjectiveProfileError(
+                f"insufficient-evidence: {where} {metric!r} weight must be positive finite"
+            )
+        rationale = raw.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            raise ObjectiveProfileError(
+                f"insufficient-evidence: {where} {metric!r} missing rationale"
+            )
+        rows.append(
+            ObjectiveImportanceEvidence(
+                metric=metric,
+                weight=weight,
+                rationale=rationale,
+                ordinal=ordinal,
+            )
+        )
+    return tuple(rows)
 
 
 def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> ObjectiveVector:

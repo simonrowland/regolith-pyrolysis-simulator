@@ -7,6 +7,7 @@ import multiprocessing
 import queue
 import sqlite3
 import threading
+from types import SimpleNamespace
 
 import pytest
 
@@ -100,7 +101,8 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace=result_blob or {"hours": [{"hour": 1, "oxygen_kg": oxygen}]},
+            trace=result_blob
+            or {"backend_status": "ok", "hours": [{"hour": 1, "oxygen_kg": oxygen}]},
             product_summary={"oxygen_kg": oxygen},
         ),
         notes=("stored",),
@@ -187,15 +189,35 @@ def _infeasible(spec: EvalSpec) -> ScoredResult:
         failing_gates=("delivered_stream_purity",),
         run_reference=RunReference(
             status="ok",
-            trace={"hours": [{"hour": 1, "oxygen_kg": 0.0}]},
+            trace={"backend_status": "ok", "hours": [{"hour": 1, "oxygen_kg": 0.0}]},
             product_summary={"oxygen_kg": 0.0},
         ),
     )
 
 
+def _artifact_copy(scored: ScoredResult, **overrides: object) -> object:
+    data = {
+        "candidate_id": scored.candidate_id,
+        "eval_spec": scored.eval_spec,
+        "cache_key": scored.cache_key,
+        "feasible": scored.feasible,
+        "failure_category": scored.failure_category,
+        "objectives": scored.objectives,
+        "feasibility_margins": scored.feasibility_margins,
+        "failing_gates": scored.failing_gates,
+        "run_reference": scored.run_reference,
+        "notes": scored.notes,
+    }
+    data.update(overrides)
+    return SimpleNamespace(**data)
+
+
 def test_round_trip_lossless_lookup(tmp_path) -> None:
     spec = _base_spec()
-    scored = _scored(spec, result_blob={"hours": [{"hour": 1}], "status": "ok"})
+    scored = _scored(
+        spec,
+        result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+    )
     store = ResultStore(
         tmp_path / "results.sqlite",
         current_code_version=spec.code_version,
@@ -208,8 +230,54 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded == scored
     assert loaded is not None
     assert loaded.run_reference is not None
-    assert loaded.run_reference.trace == {"hours": [{"hour": 1}], "status": "ok"}
+    assert loaded.run_reference.trace == {
+        "backend_status": "ok",
+        "hours": [{"hour": 1}],
+        "status": "ok",
+    }
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
+
+
+@pytest.mark.parametrize(
+    ("bad_result", "message"),
+    (
+        (
+            lambda spec: replace(_scored(spec), cache_key=None),
+            "result artifact missing cache_key",
+        ),
+        (
+            lambda spec: _artifact_copy(_scored(spec), objectives=None),
+            "result artifact missing objectives",
+        ),
+        (
+            lambda spec: replace(_infeasible(spec), failure_category=None),
+            "result artifact missing failure_category",
+        ),
+        (
+            lambda spec: replace(_scored(spec), feasibility_margins={}),
+            "result artifact missing feasibility_margins",
+        ),
+        (
+            lambda spec: replace(
+                _scored(spec),
+                run_reference=RunReference(status="ok", trace={"hours": [{"hour": 1}]}),
+            ),
+            "result artifact missing backend_status",
+        ),
+    ),
+)
+def test_store_result_artifact_missing_required_fields_raise_named(
+    tmp_path,
+    bad_result,
+    message: str,
+) -> None:
+    spec = _base_spec()
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ValueError, match=message):
+        store.store(spec, bad_result(spec), created_at="2026-01-01T00:00:00Z")
+
+    assert store.lookup(spec) is None
 
 
 def test_store_rejects_nan_margin_numbers(tmp_path) -> None:
@@ -229,6 +297,38 @@ def test_store_rejects_nan_margin_numbers(tmp_path) -> None:
 def test_lookup_miss_returns_none(tmp_path) -> None:
     store = ResultStore(tmp_path / "results.sqlite")
     assert store.lookup(_base_spec()) is None
+
+
+def test_result_store_mre_policy_collision_misses(tmp_path) -> None:
+    off = _base_spec(c5_enabled=False, mre_max_voltage_V=0.0, mre_target_species="")
+    enabled = _base_spec(c5_enabled=True, mre_max_voltage_V=0.0, mre_target_species="")
+    si_target = _base_spec(
+        c5_enabled=True,
+        mre_max_voltage_V=1.4,
+        mre_target_species="SiO2",
+    )
+    ti_target = _base_spec(
+        c5_enabled=True,
+        mre_max_voltage_V=1.5,
+        mre_target_species="TiO2",
+    )
+    specs = (off, enabled, si_target, ti_target)
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    assert len({cache_key(spec) for spec in specs}) == 4
+    store.store(off, _scored(off, candidate_id="off"), created_at="t0")
+
+    assert store.lookup(off) is not None
+    assert store.lookup(enabled) is None
+    assert store.lookup(si_target) is None
+    assert store.lookup(ti_target) is None
+
+    for idx, spec in enumerate(specs[1:], start=1):
+        store.store(spec, _scored(spec, candidate_id=f"mre-{idx}"), created_at=f"t{idx}")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row_count = conn.execute("SELECT count(*) FROM results").fetchone()[0]
+    assert row_count == 4
 
 
 def test_idempotent_upsert_latest_wins(tmp_path) -> None:

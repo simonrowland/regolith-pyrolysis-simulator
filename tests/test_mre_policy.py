@@ -18,8 +18,20 @@ BASE_PROFILE = {
     "profile_schema_version": "profile-schema-v1",
     "feedstock": "lunar_mare_low_ti",
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "max", "units": "kg", "weight": 0.7},
-        {"metric": "energy_kWh", "sense": "min", "units": "kWh", "weight": 0.3},
+        {
+            "metric": "oxygen_kg",
+            "sense": "max",
+            "units": "kg",
+            "weight": 0.7,
+            "rationale": "test oxygen objective evidence",
+        },
+        {
+            "metric": "energy_kWh",
+            "sense": "min",
+            "units": "kWh",
+            "weight": 0.3,
+            "rationale": "test energy objective evidence",
+        },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {

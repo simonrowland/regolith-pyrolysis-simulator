@@ -28,7 +28,13 @@ PROFILE = {
     "profile_schema_version": "profile-schema-v1",
     "feedstock": "lunar_mare_low_ti",
     "objectives": [
-        {"metric": "oxygen_kg", "sense": "max", "units": "kg", "weight": 1.0},
+        {
+            "metric": "oxygen_kg",
+            "sense": "max",
+            "units": "kg",
+            "weight": 1.0,
+            "rationale": "test oxygen objective evidence",
+        },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
     "run": {
