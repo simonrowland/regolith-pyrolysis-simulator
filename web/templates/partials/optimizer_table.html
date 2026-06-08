@@ -1,0 +1,82 @@
+<div class="section-card">
+    <h3>Feedstock/Profile Winners</h3>
+    {% if entries %}
+    <table class="composition-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Feedstock / profile</th>
+                <th>Objectives</th>
+                <th>Feasible</th>
+                <th>Study date</th>
+                <th>Fidelity</th>
+                <th>Provenance</th>
+                <th>Completeness</th>
+                <th>Coating</th>
+                <th>Products</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.rank }}</td>
+                <td>
+                    <strong>{{ entry.feedstock_id }}</strong><br>
+                    <span class="range">{{ entry.profile_id }}</span>
+                </td>
+                <td>
+                    {% for objective in entry.objective_items %}
+                    <div>
+                        {{ objective.metric }}:
+                        <strong>{{ objective.value }}</strong>
+                        {{ objective.units or "" }}
+                    </div>
+                    {% endfor %}
+                </td>
+                <td>{{ "yes" if entry.feasible else "no" }}</td>
+                <td>{{ entry.created_at }}</td>
+                <td>{{ entry.fidelity }}</td>
+                <td>
+                    Run {{ entry.run_id }}<br>
+                    Candidate {{ entry.candidate_id }}<br>
+                    <span class="range">cache {{ entry.cache_key[:12] }}</span>
+                </td>
+                <td>
+                    {% if entry.completeness.status == "available" and entry.completeness.percent is not none %}
+                    <strong>{{ entry.completeness.percent_label }}</strong><br>
+                    <span class="range">
+                        target {{ entry.completeness.target_species or "not declared" }};
+                        denominator {{ entry.completeness.denominator or "not declared" }};
+                        bin {{ entry.completeness.product_bin or "not declared" }}
+                    </span>
+                    {% else %}
+                    <strong>Completeness inconclusive</strong><br>
+                    <span class="range">{{ entry.completeness.reason or "metric missing" }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if entry.coating.status == "available" %}
+                    <strong>{{ entry.coating.total_label or "deposit inconclusive" }}</strong><br>
+                    <span class="range">
+                        campaigns to resinter:
+                        {{ entry.coating.campaigns_to_resinter if entry.coating.campaigns_to_resinter is not none else "not declared" }}
+                    </span>
+                    {% else %}
+                    <strong>Coating inconclusive</strong><br>
+                    <span class="range">{{ entry.coating.reason }}</span>
+                    {% endif %}
+                </td>
+                <td>{% include "partials/optimizer_product_strip.html" %}</td>
+                <td>
+                    <a class="btn"
+                       href="{{ url_for('web.optimizer_result_detail', run_id=entry.run_id, cache_key=entry.cache_key) }}">Open</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-hint">No stored optimizer winners match the current filters.</div>
+    {% endif %}
+</div>

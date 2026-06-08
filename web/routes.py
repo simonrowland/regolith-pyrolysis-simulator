@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
-from flask import Blueprint, current_app, render_template, jsonify, request
+from flask import Blueprint, Response, current_app, render_template, jsonify, request
 import yaml
 
 from web.feedstock_data import (
@@ -436,6 +436,604 @@ def _request_limit(default: int = 10, maximum: int = 100) -> int:
     return min(max(limit, 1), maximum)
 
 
+def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
+    profiles_dir = DATA_DIR / 'optimize_profiles'
+    profiles = []
+    feedstocks: dict[str, list[str]] = {}
+
+    if profiles_dir.is_dir():
+        for path in sorted(profiles_dir.glob('*.yaml')):
+            with path.open() as f:
+                payload = yaml.safe_load(f) or {}
+            profile_id = payload.get('profile_id') or path.stem
+            feedstock = payload.get('feedstock') or payload.get('feedstock_id')
+            objectives = payload.get('objectives') or ()
+            objective_metrics = [
+                objective.get('metric')
+                for objective in objectives
+                if isinstance(objective, dict) and objective.get('metric')
+            ]
+            row = {
+                'profile_id': profile_id,
+                'feedstock_id': feedstock,
+                'relative_path': str(path.relative_to(DATA_DIR)),
+                'objective_metrics': objective_metrics,
+            }
+            profiles.append(row)
+            if feedstock:
+                feedstocks.setdefault(feedstock, []).append(profile_id)
+
+    return {
+        'profiles': profiles,
+        'feedstocks': feedstocks,
+    }
+
+
+def _float_value(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _format_quantity(value: Any, units: str = '') -> str:
+    numeric = _float_value(value)
+    if numeric is None:
+        return 'inconclusive'
+    magnitude = abs(numeric)
+    if magnitude >= 100:
+        text = f'{numeric:,.1f}'
+    elif magnitude >= 10:
+        text = f'{numeric:,.2f}'
+    elif magnitude >= 1:
+        text = f'{numeric:,.3f}'
+    else:
+        text = f'{numeric:,.4g}'
+    return f'{text} {units}'.strip()
+
+
+def _mapping_value(value: Any) -> Mapping[str, Any]:
+    return value if isinstance(value, Mapping) else {}
+
+
+def _sum_nested_numbers(value: Any) -> float | None:
+    if isinstance(value, Mapping):
+        total = 0.0
+        found = False
+        for nested in value.values():
+            subtotal = _sum_nested_numbers(nested)
+            if subtotal is not None:
+                total += subtotal
+                found = True
+        return total if found else None
+    if isinstance(value, (list, tuple)):
+        total = 0.0
+        found = False
+        for nested in value:
+            subtotal = _sum_nested_numbers(nested)
+            if subtotal is not None:
+                total += subtotal
+                found = True
+        return total if found else None
+    return _float_value(value)
+
+
+def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
+    panel = _mapping_value(result.get('product_ledger_panel'))
+    if not panel:
+        return {
+            'status': 'inconclusive',
+            'reason': 'product_ledger_panel missing from result artifact',
+            'items': [],
+        }
+
+    outputs = panel.get('outputs')
+    if not isinstance(outputs, list):
+        return {
+            'status': 'inconclusive',
+            'reason': 'product_ledger_panel outputs missing',
+            'items': [],
+        }
+
+    order = {
+        'ingots_metals': 0,
+        'glass': 1,
+        'oxygen': 2,
+        'captured_volatiles': 3,
+        'refractory_ceramic_rump': 4,
+    }
+    items = []
+    for row in outputs:
+        if not isinstance(row, Mapping):
+            continue
+        row_id = str(row.get('id') or row.get('label') or '')
+        if not row_id:
+            continue
+        items.append({
+            'id': row_id,
+            'label': row.get('label') or row_id,
+            'kg': row.get('kg'),
+            'kg_label': _format_quantity(row.get('kg'), 'kg'),
+            'yield_label': _format_quantity(row.get('yield_pct'), '%')
+            if row.get('yield_pct') is not None
+            else 'yield inconclusive',
+            'product_bin': row.get('product_bin') or row_id,
+        })
+    items.sort(key=lambda item: (order.get(item['id'], 99), item['label']))
+
+    raw_status = panel.get('status')
+    status = str(raw_status or '').strip().lower()
+    reason = panel.get('reason')
+    if panel.get('unclassified_product_mass'):
+        status = 'inconclusive'
+        reason = 'unclassified product mass present'
+    elif status not in {'closed', 'final'}:
+        stored_status = status or 'missing'
+        status = 'inconclusive'
+        status_reason = f'product_yield_table status {stored_status}'
+        reason = (
+            f'{status_reason}: {reason}'
+            if reason
+            else status_reason
+        )
+    return {
+        'status': status,
+        'reason': reason,
+        'items': items,
+        'mass_closure': panel.get('mass_closure') or {},
+    }
+
+
+def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
+    wall = (
+        result.get('wall_deposit_kg_by_segment_species')
+        or result.get('wall_deposit_kg_by_zone_species')
+    )
+    total_kg = _sum_nested_numbers(wall)
+    campaigns = result.get('campaigns_to_resinter')
+    if total_kg is None and campaigns in (None, ''):
+        return {
+            'status': 'inconclusive',
+            'reason': 'coating artifact missing',
+        }
+    segment_count = len(wall) if isinstance(wall, Mapping) else None
+    return {
+        'status': 'available',
+        'total_kg': total_kg,
+        'total_label': _format_quantity(total_kg, 'kg'),
+        'campaigns_to_resinter': campaigns,
+        'segment_count': segment_count,
+    }
+
+
+def _first_mapping(*values: Any) -> Mapping[str, Any]:
+    for value in values:
+        if isinstance(value, Mapping):
+            return value
+    return {}
+
+
+def _completeness_readout(result: Mapping[str, Any]) -> dict[str, Any]:
+    product_summary = _mapping_value(
+        _mapping_value(result.get('run_reference')).get('product_summary')
+    )
+    panel = _mapping_value(result.get('product_ledger_panel'))
+    metric = _first_mapping(
+        result.get('extraction_completeness'),
+        product_summary.get('extraction_completeness'),
+        product_summary.get('extraction_completeness_metric'),
+        panel.get('extraction_completeness'),
+    )
+    if not metric:
+        return {
+            'status': 'inconclusive',
+            'reason': 'extraction completeness metric missing',
+        }
+
+    status = str(metric.get('status') or 'available')
+    percent = metric.get('percent')
+    if percent is None:
+        fraction = (
+            metric.get('fraction')
+            if metric.get('fraction') is not None
+            else metric.get('completeness_fraction')
+        )
+        numeric_fraction = _float_value(fraction)
+        if numeric_fraction is not None:
+            percent = numeric_fraction * 100.0
+    if percent is None:
+        extracted = _float_value(metric.get('extracted_kg'))
+        denominator = _float_value(metric.get('denominator_kg'))
+        if extracted is not None and denominator and denominator > 0.0:
+            percent = extracted / denominator * 100.0
+
+    if percent is None:
+        status = 'inconclusive'
+    return {
+        'status': status,
+        'percent': percent,
+        'percent_label': _format_quantity(percent, '%')
+        if percent is not None
+        else 'inconclusive',
+        'target_species': metric.get('target_species') or metric.get('target'),
+        'denominator': (
+            metric.get('denominator_account')
+            or metric.get('denominator')
+            or metric.get('denominator_label')
+        ),
+        'allowed_residual': metric.get('allowed_residual'),
+        'product_bin': metric.get('product_bin'),
+        'reason': metric.get('reason'),
+    }
+
+
+def _optimizer_result_view(entry: Mapping[str, Any]) -> dict[str, Any]:
+    view = dict(entry)
+    view['product_strip'] = _product_strip(view)
+    view['coating'] = _coating_readout(view)
+    view['completeness'] = _completeness_readout(view)
+    return view
+
+
+def _selector_pairs(
+    run_dirs: list[Path],
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+) -> list[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for run_dir in run_dirs:
+        try:
+            rows = _query_result_rows(
+                run_dir / OPTIMIZER_CACHE_NAME,
+                feedstock_id=feedstock_id,
+                profile_id=profile_id,
+                fidelity=fidelity,
+            )
+        except sqlite3.Error:
+            continue
+        for row in rows:
+            pairs.add((
+                str(row['feedstock_id'] or ''),
+                str(row['profile_id'] or ''),
+            ))
+    return sorted(pairs)
+
+
+def _optimizer_winner_entries(
+    run_dirs: list[Path],
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    objective_metric: str | None,
+    limit: int,
+) -> tuple[list[dict[str, Any]], str | None]:
+    entries: list[dict[str, Any]] = []
+    selected_metric = objective_metric
+    for pair_feedstock, pair_profile in _selector_pairs(
+        run_dirs,
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+    ):
+        winners, metric = _leaderboard_entries(
+            run_dirs,
+            feedstock_id=pair_feedstock,
+            profile_id=pair_profile,
+            fidelity=fidelity,
+            objective_metric=objective_metric,
+            limit=1,
+        )
+        if metric and selected_metric is None:
+            selected_metric = metric
+        entries.extend(_optimizer_result_view(entry) for entry in winners)
+        if len(entries) >= limit:
+            break
+    for rank, entry in enumerate(entries, start=1):
+        entry['rank'] = rank
+    return entries, selected_metric
+
+
+def _optimizer_table_context() -> dict[str, Any]:
+    root = _optimizer_runs_root()
+    run_dirs = _optimizer_run_dirs(root)
+    filters = {
+        'feedstock_id': _request_arg('feedstock_id') or _request_arg('feedstock'),
+        'profile_id': _request_arg('profile_id') or _request_arg('profile'),
+        'fidelity': _request_arg('fidelity'),
+        'objective_metric': (
+            _request_arg('objective_metric')
+            or _request_arg('objective')
+        ),
+        'limit': _request_limit(default=50),
+    }
+    entries, selected_metric = _optimizer_winner_entries(
+        run_dirs,
+        feedstock_id=filters['feedstock_id'],
+        profile_id=filters['profile_id'],
+        fidelity=filters['fidelity'],
+        objective_metric=filters['objective_metric'],
+        limit=filters['limit'],
+    )
+    filters['objective_metric'] = selected_metric or filters['objective_metric']
+    return {
+        'runs_dir': str(root),
+        'entries': entries,
+        'filters': filters,
+        'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
+    }
+
+
+def _optimizer_result_row(
+    run_id: str,
+    cache_key: str,
+) -> tuple[Path, Path, sqlite3.Row] | None:
+    root = _optimizer_runs_root()
+    for run_dir in _optimizer_run_dirs(root):
+        if run_dir.name != run_id:
+            continue
+        try:
+            with _connect_result_store(run_dir / OPTIMIZER_CACHE_NAME) as conn:
+                row = conn.execute(
+                    """
+                    SELECT *
+                    FROM results
+                    WHERE cache_key = ?
+                    LIMIT 1
+                    """,
+                    (cache_key,),
+                ).fetchone()
+        except sqlite3.Error:
+            return None
+        if row is None:
+            return None
+        return root, run_dir, row
+    return None
+
+
+def _display_value(value: Any) -> str:
+    if value in (None, ''):
+        return 'not declared'
+    if isinstance(value, Mapping):
+        if not value:
+            return 'none'
+        return ', '.join(
+            f'{key}: {_display_value(nested)}'
+            for key, nested in sorted(value.items(), key=lambda item: str(item[0]))
+        )
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return 'none'
+        return ', '.join(_display_value(nested) for nested in value)
+    return str(value)
+
+
+def _labelled_value(label: str, value: Any, *, basis: str = '') -> dict[str, Any]:
+    return {
+        'label': label,
+        'value': _display_value(value),
+        'basis': basis,
+    }
+
+
+def _first_present(source: Mapping[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in source and source[key] not in (None, ''):
+            return source[key]
+    return None
+
+
+def _recipe_stage_sections(eval_spec: Mapping[str, Any]) -> list[dict[str, Any]]:
+    overrides = _mapping_value(eval_spec.get('runtime_campaign_overrides'))
+    stage_ids = list(overrides.keys())
+    for stage_id in eval_spec.get('prefix_stage_ids') or ():
+        if stage_id not in stage_ids:
+            stage_ids.append(str(stage_id))
+    if not stage_ids:
+        stage_ids = [str(eval_spec.get('campaign') or 'campaign')]
+
+    sections = []
+    for stage_id in stage_ids:
+        override = _mapping_value(overrides.get(stage_id))
+        declared = {
+            'temperature': [
+                _labelled_value(
+                    'Temperature ramp rate',
+                    _first_present(
+                        override,
+                        'temperature_ramp_C_per_h',
+                        'ramp_rate_C_per_h',
+                        'ramp_C_per_h',
+                    ),
+                ),
+                _labelled_value(
+                    'Hold point',
+                    _first_present(
+                        override,
+                        'hold_temperature_C',
+                        'hold_temp_C',
+                        'temperature_C',
+                        'target_temperature_C',
+                    ),
+                ),
+                _labelled_value(
+                    'Hold duration',
+                    _first_present(override, 'hold_time_h', 'duration_h'),
+                ),
+                _labelled_value(
+                    'Wall-temp offset',
+                    _first_present(
+                        override,
+                        'wall_temp_offset_C',
+                        'wall_temperature_offset_C',
+                    ),
+                ),
+                _labelled_value(
+                    'Wall-temp zone',
+                    _first_present(override, 'wall_temp_zone', 'wall_zone'),
+                ),
+            ],
+            'atmosphere': [
+                _labelled_value(
+                    'Overhead pressure setpoint',
+                    _first_present(
+                        override,
+                        'overhead_pressure_mbar',
+                        'p_total_mbar',
+                        'pressure_mbar',
+                        'pressure_Pa',
+                        'p_total_Pa',
+                    ),
+                ),
+                _labelled_value(
+                    'pO2',
+                    _first_present(override, 'pO2_mbar', 'po2_mbar', 'pO2_Pa'),
+                ),
+                _labelled_value(
+                    'pN2 sweep',
+                    _first_present(
+                        override,
+                        'pN2_mbar',
+                        'pn2_mbar',
+                        'pN2_Pa',
+                        'knudsen_pN2_mbar',
+                    ),
+                ),
+            ],
+            'mre_policy': [
+                _labelled_value(
+                    'MRE policy',
+                    'enabled' if eval_spec.get('c5_enabled') else 'off',
+                ),
+                _labelled_value('MRE target', eval_spec.get('mre_target_species')),
+                _labelled_value(
+                    'MRE max voltage',
+                    eval_spec.get('mre_max_voltage_V'),
+                ),
+            ],
+            'dosing': [
+                _labelled_value('Global additives', eval_spec.get('additives_kg')),
+                _labelled_value(
+                    'Alkali-shuttle dosing',
+                    _first_present(override, 'alkali_dosing', 'dosing'),
+                ),
+            ],
+        }
+        derived = [
+            _labelled_value(
+                'Hours at run',
+                eval_spec.get('hours'),
+                basis='EvalSpec.hours',
+            ),
+        ]
+        stage_elapsed = _first_present(override, 'hold_time_h', 'duration_h')
+        if stage_elapsed is not None:
+            derived.append(
+                _labelled_value(
+                    'Per-stage elapsed',
+                    stage_elapsed,
+                    basis=f'{stage_id}.hold_time_h',
+                )
+            )
+        sections.append({
+            'stage_id': stage_id,
+            'declared': declared,
+            'derived': derived,
+        })
+    return sections
+
+
+def _recipe_patch(eval_spec: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            'heading': 'Identity',
+            'lines': [
+                _labelled_value('Feedstock', eval_spec.get('feedstock_id')),
+                _labelled_value('Profile', eval_spec.get('profile_id')),
+                _labelled_value('Recipe', eval_spec.get('recipe_id')),
+                _labelled_value('Campaign', eval_spec.get('campaign')),
+                _labelled_value('Track', eval_spec.get('track')),
+                _labelled_value('Fidelity', eval_spec.get('fidelity')),
+                _labelled_value('Backend', eval_spec.get('backend_name')),
+            ],
+        },
+        {
+            'heading': 'Batch',
+            'lines': [
+                _labelled_value('Mass', eval_spec.get('mass_kg')),
+                _labelled_value('Hours', eval_spec.get('hours')),
+                _labelled_value('Additives', eval_spec.get('additives_kg')),
+            ],
+        },
+        {
+            'heading': 'Provenance inputs',
+            'lines': [
+                _labelled_value('Code version', eval_spec.get('code_version')),
+                _labelled_value('Data digests', eval_spec.get('data_digests')),
+                _labelled_value(
+                    'Chemistry kernel',
+                    eval_spec.get('chemistry_kernel'),
+                ),
+            ],
+        },
+    ]
+
+
+def _result_detail_model(
+    root: Path,
+    run_dir: Path,
+    row: sqlite3.Row,
+) -> dict[str, Any]:
+    result = _optimizer_result_view(_result_metadata(row, run_id=run_dir.name))
+    eval_spec = _json_value(row['eval_spec'], {})
+    if not isinstance(eval_spec, Mapping):
+        eval_spec = {}
+    result_blob = _json_value(row['result_blob'], {})
+    if not isinstance(result_blob, Mapping):
+        result_blob = {}
+    run_reference = _json_value(row['run_reference'], {})
+    if not isinstance(run_reference, Mapping):
+        run_reference = {}
+    result['eval_spec_full'] = dict(eval_spec)
+    result['result_blob'] = dict(result_blob)
+    result['run_reference_full'] = dict(run_reference)
+    result['recipe_patch'] = _recipe_patch(eval_spec)
+    result['recipe_stages'] = _recipe_stage_sections(eval_spec)
+    result['provenance'] = {
+        'run_id': run_dir.name,
+        'run_path': _relative_to(run_dir, root),
+        'cache_path': _relative_to(run_dir / OPTIMIZER_CACHE_NAME, root),
+        'cache_key': row['cache_key'],
+        'created_at': row['created_at'],
+        'code_version': eval_spec.get('code_version'),
+        'data_digests': eval_spec.get('data_digests') or {},
+        'data_digests_label': _display_value(eval_spec.get('data_digests') or {}),
+        'artifacts': _artifact_metadata(run_dir, root),
+    }
+    return result
+
+
+def _result_yaml_payload(result: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        'result': {
+            'run_id': result.get('run_id'),
+            'cache_key': result.get('cache_key'),
+            'candidate_id': result.get('candidate_id'),
+            'created_at': result.get('created_at'),
+            'feasible': result.get('feasible'),
+            'objectives': result.get('objectives'),
+        },
+        'eval_spec': result.get('eval_spec_full') or {},
+        'recipe_patch': result.get('recipe_patch') or [],
+        'recipe_stages': result.get('recipe_stages') or [],
+        'provenance': result.get('provenance') or {},
+    }
+
+
 @bp.route('/')
 def simulator():
     """Main simulator interface."""
@@ -445,6 +1043,55 @@ def simulator():
         feedstocks=feedstocks,
         debug_feedstocks=debug_feedstocks,
         debug_mode=debug_feedstocks_enabled(),
+    )
+
+
+@bp.route('/optimizer')
+def optimizer_page():
+    """Read-only optimizer results page over stored ResultStore artifacts."""
+    return render_template('optimizer.html', **_optimizer_table_context())
+
+
+@bp.route('/partials/optimizer-table')
+def optimizer_table_partial():
+    """HTMX partial: one winner per feedstock/profile selector."""
+    return render_template(
+        'partials/optimizer_table.html',
+        **_optimizer_table_context(),
+    )
+
+
+@bp.route('/optimizer/runs/<run_id>/results/<cache_key>')
+def optimizer_result_detail(run_id: str, cache_key: str):
+    """Read-only result detail and stored recipe audit view."""
+    resolved = _optimizer_result_row(run_id, cache_key)
+    if resolved is None:
+        return render_template('optimizer_not_found.html'), 404
+    root, run_dir, row = resolved
+    return render_template(
+        'optimizer_detail.html',
+        result=_result_detail_model(root, run_dir, row),
+    )
+
+
+@bp.route('/optimizer/runs/<run_id>/results/<cache_key>/recipe.yaml')
+def optimizer_result_yaml(run_id: str, cache_key: str):
+    """Download the stored EvalSpec recipe/provenance as YAML."""
+    resolved = _optimizer_result_row(run_id, cache_key)
+    if resolved is None:
+        return jsonify({'error': 'Optimizer result not found'}), 404
+    root, run_dir, row = resolved
+    result = _result_detail_model(root, run_dir, row)
+    body = yaml.safe_dump(
+        _result_yaml_payload(result),
+        sort_keys=False,
+        allow_unicode=False,
+    )
+    filename = f'{run_id}-{result["candidate_id"]}-recipe.yaml'
+    return Response(
+        body,
+        mimetype='application/x-yaml',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
 
 
@@ -486,36 +1133,7 @@ def optimizer_runs():
 @bp.route('/api/optimizer/feedstock-profiles')
 def optimizer_feedstock_profiles():
     """Scan optimize profile YAML files into a feedstock/profile lookup."""
-    profiles_dir = DATA_DIR / 'optimize_profiles'
-    profiles = []
-    feedstocks: dict[str, list[str]] = {}
-
-    if profiles_dir.is_dir():
-        for path in sorted(profiles_dir.glob('*.yaml')):
-            with path.open() as f:
-                payload = yaml.safe_load(f) or {}
-            profile_id = payload.get('profile_id') or path.stem
-            feedstock = payload.get('feedstock') or payload.get('feedstock_id')
-            objectives = payload.get('objectives') or ()
-            objective_metrics = [
-                objective.get('metric')
-                for objective in objectives
-                if isinstance(objective, dict) and objective.get('metric')
-            ]
-            row = {
-                'profile_id': profile_id,
-                'feedstock_id': feedstock,
-                'relative_path': str(path.relative_to(DATA_DIR)),
-                'objective_metrics': objective_metrics,
-            }
-            profiles.append(row)
-            if feedstock:
-                feedstocks.setdefault(feedstock, []).append(profile_id)
-
-    return jsonify({
-        'profiles': profiles,
-        'feedstocks': feedstocks,
-    })
+    return jsonify(_optimizer_feedstock_profiles_payload())
 
 
 @bp.route('/api/optimizer/leaderboard')

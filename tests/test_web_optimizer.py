@@ -7,6 +7,7 @@ from pathlib import Path
 
 from flask import Flask
 import pytest
+import yaml
 
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import RunReference, ScoredResult
@@ -104,6 +105,65 @@ def _scored(
         ),
         notes=("stored",),
     )
+
+
+def _product_yield_table(status: str = "closed") -> dict[str, object]:
+    return {
+        "status": status,
+        "inputs": [
+            {"kind": "input", "id": "feedstock", "label": "Feedstock", "kg": 1000.0},
+            {"kind": "input", "id": "additive:CaO", "label": "CaO", "kg": 1.5},
+        ],
+        "outputs": [
+            {
+                "kind": "output",
+                "id": "ingots_metals",
+                "label": "Ingots/metals",
+                "kg": 50.0,
+                "yield_pct": 4.992511,
+            },
+            {
+                "kind": "output",
+                "id": "glass",
+                "label": "Glass",
+                "kg": 40.0,
+                "yield_pct": 3.994009,
+            },
+            {
+                "kind": "output",
+                "id": "oxygen",
+                "label": "O2",
+                "kg": 20.0,
+                "yield_pct": 1.997004,
+            },
+            {
+                "kind": "output",
+                "id": "captured_volatiles",
+                "label": "Captured volatiles",
+                "kg": 5.0,
+                "yield_pct": 0.499251,
+            },
+            {
+                "kind": "output",
+                "id": "refractory_ceramic_rump",
+                "label": "Refractory ceramic/rump",
+                "kg": 80.0,
+                "yield_pct": 7.988018,
+            },
+        ],
+        "mass_closure": {
+            "kind": "mass_closure",
+            "label": "Mass closure",
+            "mass_in_kg": 1001.5,
+            "accountable_mass_out_kg": 1001.5,
+            "products_out_kg": 195.0,
+            "balance_error_pct": 0.0,
+            "tolerance_pct": 5e-12,
+            "status": "closed",
+        },
+        "total_input_kg": 1001.5,
+        "products_out_kg": 195.0,
+    }
 
 
 @pytest.fixture
@@ -223,6 +283,235 @@ def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> N
             "objective_metrics": ["oxygen_kg"],
         }
     ]
+
+
+def test_optimizer_page_and_table_render_feedstock_profile_winners(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-page"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(recipe_id="recipe-page")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-page",
+            oxygen=14.0,
+            product_summary={
+                "product_yield_table": _product_yield_table(),
+                "wall_deposit_kg_by_segment_species": {
+                    "C4-cold-wall": {"SiO2": 0.25, "Al2O3": 0.05},
+                },
+                "campaigns_to_resinter": 3,
+                "extraction_completeness": {
+                    "status": "available",
+                    "target_species": "Fe",
+                    "denominator_account": "cleaned_silicate_feed",
+                    "allowed_residual": "0.1 kg",
+                    "product_bin": "ingots_metals",
+                    "fraction": 0.95,
+                },
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/optimizer")
+    partial = client.get("/partials/optimizer-table")
+
+    assert response.status_code == 200
+    assert partial.status_code == 200
+    html = response.get_data(as_text=True)
+    table = partial.get_data(as_text=True)
+    assert 'hx-get="/partials/optimizer-table"' in html
+    assert "candidate-page" in table
+    assert "lunar_mare_low_ti" in table
+    assert "oxygen-yield-v1" in table
+    assert "oxygen_kg" in table
+    assert "14.0" in table
+    assert "95.00 %" in table
+    assert "campaigns to resinter" in table
+    assert "Ingots/metals" in table
+    assert "Glass" in table
+    assert "O2" in table
+    assert "Captured volatiles" in table
+    assert "Refractory ceramic/rump" in table
+
+
+def test_optimizer_page_marks_missing_readouts_inconclusive(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-inconclusive-page"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    product_yield_table = {
+        "status": "closed",
+        "inputs": [
+            {"kind": "input", "id": "feedstock", "label": "Feedstock", "kg": 1000.0},
+        ],
+        "outputs": [
+            {"kind": "output", "id": "oxygen", "label": "O2", "kg": 20.0},
+        ],
+        "mass_closure": {
+            "kind": "mass_closure",
+            "label": "Mass closure",
+            "mass_in_kg": 1000.0,
+            "accountable_mass_out_kg": 1000.0,
+            "products_out_kg": 20.0,
+            "balance_error_pct": 0.0,
+            "tolerance_pct": 5e-12,
+            "status": "closed",
+        },
+    }
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-inconclusive",
+            product_summary={
+                "product_yield_table": product_yield_table,
+                "product_classes": {
+                    "unclassified": {
+                        "kg_by_species": {"MysteryOxide": 7.0},
+                        "total_kg": 7.0,
+                    },
+                },
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/optimizer")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-inconclusive" in html
+    assert "Product inconclusive" in html
+    assert "Completeness inconclusive" in html
+    assert "Coating inconclusive" in html
+    assert "extraction completeness metric missing" in html
+    assert "coating artifact missing" in html
+
+
+def test_optimizer_page_marks_unclassified_product_status_inconclusive(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unclassified-status-page"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    product_yield_table = _product_yield_table(status="unclassified")
+    product_yield_table["reason"] = "stored product classes unresolved"
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-unclassified-status",
+            product_summary={
+                "product_yield_table": product_yield_table,
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/optimizer")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-unclassified-status" in html
+    assert "Product inconclusive" in html
+    assert "product_yield_table status unclassified" in html
+    assert "stored product classes unresolved" in html
+
+
+def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-detail"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(
+        recipe_id="recipe-detail",
+        hours=36,
+        additives_kg={"Na": 2.0},
+        c5_enabled=True,
+        mre_max_voltage_V=1.35,
+        mre_target_species="FeO",
+        runtime_campaign_overrides={
+            "C4": {
+                "temperature_ramp_C_per_h": 25,
+                "hold_temperature_C": 1300,
+                "hold_time_h": 3,
+                "p_total_mbar": 0.01,
+                "pO2_mbar": 0.001,
+                "pN2_mbar": 0.009,
+                "wall_temp_offset_C": -40,
+                "wall_temp_zone": "cold-wall",
+                "alkali_dosing": {"Na_kg": 2.0},
+            },
+        },
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-detail",
+            product_summary={
+                "product_yield_table": _product_yield_table(),
+                "extraction_completeness": {
+                    "status": "available",
+                    "target_species": "Fe",
+                    "denominator_account": "cleaned_silicate_feed",
+                    "product_bin": "ingots_metals",
+                    "fraction": 0.9,
+                },
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    detail = client.get(f"/optimizer/runs/run-detail/results/{key}")
+    download = client.get(f"/optimizer/runs/run-detail/results/{key}/recipe.yaml")
+
+    assert detail.status_code == 200
+    html = detail.get_data(as_text=True)
+    assert "candidate-detail" in html
+    assert "Recipe Patch" in html
+    assert "Run Recipe" in html
+    assert "Stage C4" in html
+    assert "Temperature ramp rate" in html
+    assert "Hold point" in html
+    assert "Overhead pressure setpoint" in html
+    assert "pO2" in html
+    assert "pN2 sweep" in html
+    assert "MRE policy" in html
+    assert "Wall-temp offset" in html
+    assert "Alkali-shuttle dosing" in html
+    assert "Declared" in html
+    assert "Derived" in html
+    assert "Hours at run" in html
+    assert "computed from EvalSpec.hours" in html
+
+    assert download.status_code == 200
+    assert download.mimetype == "application/x-yaml"
+    payload = yaml.safe_load(download.get_data(as_text=True))
+    assert payload["result"]["candidate_id"] == "candidate-detail"
+    assert payload["eval_spec"]["runtime_campaign_overrides"]["C4"][
+        "hold_temperature_C"
+    ] == 1300
+    assert payload["eval_spec"]["mre_target_species"] == "FeO"
+    assert payload["provenance"]["cache_key"] == key
 
 
 def test_product_ledger_panel_has_ingots_glass_o2_volatiles_ceramic_and_mass_closure(

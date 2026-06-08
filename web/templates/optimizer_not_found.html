@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Optimizer Result Not Found - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Optimizer Result Not Found</h2>
+        <p>The requested stored optimizer result was not found in the configured runs directory.</p>
+        <div class="control-buttons">
+            <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

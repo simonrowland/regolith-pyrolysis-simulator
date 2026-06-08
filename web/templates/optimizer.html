@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Optimizer Results - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Optimizer Results</h2>
+        <form id="optimizer-filters"
+              class="campaign-controls"
+              hx-get="{{ url_for('web.optimizer_table_partial') }}"
+              hx-target="#optimizer-table">
+            <div class="ctrl-row">
+                <label for="optimizer-feedstock">Feedstock</label>
+                <select id="optimizer-feedstock" name="feedstock_id">
+                    <option value="">All feedstocks</option>
+                    {% for feedstock_id in feedstock_profiles.feedstocks.keys()|sort %}
+                    <option value="{{ feedstock_id }}" {% if filters.feedstock_id == feedstock_id %}selected{% endif %}>{{ feedstock_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="optimizer-profile">Profile</label>
+                <select id="optimizer-profile" name="profile_id">
+                    <option value="">All profiles</option>
+                    {% for profile in feedstock_profiles.profiles %}
+                    <option value="{{ profile.profile_id }}" {% if filters.profile_id == profile.profile_id %}selected{% endif %}>{{ profile.profile_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="optimizer-fidelity">Fidelity</label>
+                <input id="optimizer-fidelity" name="fidelity" value="{{ filters.fidelity or '' }}" placeholder="fast, high, stub">
+            </div>
+            <div class="ctrl-row">
+                <label for="optimizer-objective">Objective</label>
+                <input id="optimizer-objective" name="objective_metric" value="{{ filters.objective_metric or '' }}" placeholder="oxygen_kg">
+            </div>
+            <div class="control-buttons">
+                <button class="btn btn-primary" type="submit">Apply</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="optimizer-table"
+         hx-get="{{ url_for('web.optimizer_table_partial') }}"
+         hx-include="#optimizer-filters"
+         hx-trigger="optimizer-refresh from:body">
+        {% include "partials/optimizer_table.html" %}
+    </div>
+</section>
+{% endblock %}

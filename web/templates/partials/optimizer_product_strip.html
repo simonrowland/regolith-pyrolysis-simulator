@@ -1,0 +1,12 @@
+{% set product = entry.product_strip if entry is defined else result.product_strip %}
+{% if product.status in ["inconclusive", "unclassified"] %}
+<strong>Product inconclusive</strong><br>
+<span class="range">{{ product.reason }}</span>
+{% endif %}
+{% if product["items"] %}
+<div>
+    {% for item in product["items"] %}
+    <span>{{ item.label }} {{ item.kg_label }}{% if item.yield_label != "yield inconclusive" %} ({{ item.yield_label }}){% endif %}</span>{% if not loop.last %}<br>{% endif %}
+    {% endfor %}
+</div>
+{% endif %}

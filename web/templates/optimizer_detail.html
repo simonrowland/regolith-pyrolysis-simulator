@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Optimizer Result {{ result.candidate_id }} - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Optimizer Result Detail</h2>
+        <table class="param-table">
+            <tr><td>Candidate</td><td>{{ result.candidate_id }}</td></tr>
+            <tr><td>Run</td><td>{{ result.run_id }}</td></tr>
+            <tr><td>Cache key</td><td>{{ result.cache_key }}</td></tr>
+            <tr><td>Created</td><td>{{ result.created_at }}</td></tr>
+            <tr><td>Feasible</td><td>{{ "yes" if result.feasible else "no" }}</td></tr>
+        </table>
+        <div class="control-buttons">
+            <a class="btn btn-primary"
+               href="{{ url_for('web.optimizer_result_yaml', run_id=result.run_id, cache_key=result.cache_key) }}">Download YAML</a>
+            <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3>Recipe Patch</h3>
+        {% for group in result.recipe_patch %}
+        <h4 class="ctrl-heading">{{ group.heading }}</h4>
+        <table class="param-table">
+            {% for line in group.lines %}
+            <tr><td>{{ line.label }}</td><td>{{ line.value }}</td></tr>
+            {% endfor %}
+        </table>
+        {% endfor %}
+    </div>
+
+    <div class="section-card">
+        <h3>Run Recipe</h3>
+        {% for stage in result.recipe_stages %}
+        <details open>
+            <summary>Stage {{ stage.stage_id }}</summary>
+            <div class="disclosure-content">
+                {% for group, lines in stage.declared.items() %}
+                <h4 class="ctrl-heading">{{ group|replace("_", " ")|title }}</h4>
+                <table class="param-table">
+                    {% for line in lines %}
+                    <tr>
+                        <td>{{ line.label }}</td>
+                        <td><span class="status-indicator">Declared</span> {{ line.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endfor %}
+                <h4 class="ctrl-heading">Derived Fields</h4>
+                <table class="param-table">
+                    {% for line in stage.derived %}
+                    <tr>
+                        <td>{{ line.label }}</td>
+                        <td>
+                            <span class="status-indicator">Derived</span>
+                            {{ line.value }}
+                            <span class="range">computed from {{ line.basis }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+
+    <div class="section-card">
+        <h3>Product Ledger</h3>
+        {% include "partials/optimizer_product_strip.html" %}
+        {% if result.product_ledger_panel.outputs %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>Line item</th>
+                    <th>Input mass</th>
+                    <th>Output mass</th>
+                    <th>Yield</th>
+                    <th>Product bin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in result.product_ledger_panel.inputs or [] %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.kg }} kg</td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ row.id }}</td>
+                </tr>
+                {% endfor %}
+                {% for row in result.product_ledger_panel.outputs %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td></td>
+                    <td>{{ row.kg if row.kg is defined else "inconclusive" }} kg</td>
+                    <td>{{ row.yield_pct if row.yield_pct is defined else "inconclusive" }}</td>
+                    <td>{{ row.product_bin if row.product_bin is defined else row.id }}</td>
+                </tr>
+                {% endfor %}
+                {% if result.product_ledger_panel.mass_closure %}
+                <tr>
+                    <td>Mass closure</td>
+                    <td>{{ result.product_ledger_panel.mass_closure.mass_in_kg }} kg</td>
+                    <td>{{ result.product_ledger_panel.mass_closure.accountable_mass_out_kg }} kg</td>
+                    <td>{{ result.product_ledger_panel.mass_closure.balance_error_pct }} % error</td>
+                    <td>{{ result.product_ledger_panel.mass_closure.status }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <div class="section-card">
+        <h3>Readouts</h3>
+        <table class="param-table">
+            <tr>
+                <td>Extraction completeness</td>
+                <td>
+                    {% if result.completeness.status == "available" and result.completeness.percent is not none %}
+                    {{ result.completeness.percent_label }};
+                    target {{ result.completeness.target_species or "not declared" }};
+                    denominator {{ result.completeness.denominator or "not declared" }};
+                    product bin {{ result.completeness.product_bin or "not declared" }}
+                    {% else %}
+                    Completeness inconclusive: {{ result.completeness.reason or "metric missing" }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Coating</td>
+                <td>
+                    {% if result.coating.status == "available" %}
+                    {{ result.coating.total_label or "deposit inconclusive" }};
+                    campaigns to resinter {{ result.coating.campaigns_to_resinter if result.coating.campaigns_to_resinter is not none else "not declared" }}
+                    {% else %}
+                    Coating inconclusive: {{ result.coating.reason }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section-card">
+        <h3>Provenance</h3>
+        <table class="param-table">
+            <tr><td>Run path</td><td>{{ result.provenance.run_path }}</td></tr>
+            <tr><td>Cache path</td><td>{{ result.provenance.cache_path }}</td></tr>
+            <tr><td>Code version</td><td>{{ result.provenance.code_version }}</td></tr>
+            <tr><td>Data digests</td><td>{{ result.provenance.data_digests_label }}</td></tr>
+        </table>
+    </div>
+</section>
+{% endblock %}
