@@ -17,6 +17,7 @@ from simulator.accounting.completeness import (
 )
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
 SourceKind = Literal[
     "literature",
@@ -351,22 +352,58 @@ class PhysicsConstraintSet:
                     segment, species = _segment_species_key(key)
                     amount = _non_negative_number(kg, "wall deposit kg")
                     by_campaign[(campaign, segment, species)] += amount
+            has_wall_deposit = any(kg > _EPS for kg in by_campaign.values())
+            zone_by_segment: Mapping[Any, Any] | None = None
+            if has_wall_deposit:
+                zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
+                if zone_by_segment is None:
+                    return _fail_closed(
+                        "coating",
+                        self.coating_min_campaigns_to_resinter,
+                        "wall_zone_by_segment trace is missing for wall deposit",
+                    )
+                if not isinstance(zone_by_segment, Mapping):
+                    return _fail_closed(
+                        "coating",
+                        self.coating_min_campaigns_to_resinter,
+                        "wall_zone_by_segment trace is not a mapping",
+                    )
             worst_margin = math.inf
             worst_observed = math.inf
             worst_detail = "no wall deposit"
             for (campaign, segment, species), kg in sorted(by_campaign.items()):
                 if kg <= _EPS:
                     continue
-                limit = self.allowable_wall_deposit_kg.get((segment, species))
-                if limit is None:
+                if zone_by_segment is None:
                     return _fail_closed(
                         "coating",
                         self.coating_min_campaigns_to_resinter,
-                        (
-                            "missing allowable_wall_deposit_kg for "
-                            f"{segment}/{species}"
-                        ),
+                        "wall_zone_by_segment trace is missing for wall deposit",
                     )
+                if segment not in zone_by_segment:
+                    return _fail_closed(
+                        "coating",
+                        self.coating_min_campaigns_to_resinter,
+                        f"missing wall zone for segment {segment}",
+                    )
+                zone = str(zone_by_segment[segment])
+                if zone not in WALL_DEPOSIT_ZONE_NAMES:
+                    return _fail_closed(
+                        "coating",
+                        self.coating_min_campaigns_to_resinter,
+                        f"unknown wall zone {zone!r} for segment {segment}",
+                    )
+                limit = self.allowable_wall_deposit_kg.get((segment, species))
+                if limit is None:
+                    if math.isinf(worst_margin):
+                        worst_margin = 0.0
+                        worst_observed = math.inf
+                        worst_detail = (
+                            f"{campaign}/{zone}/{segment}/{species}: "
+                            f"deposit={kg:.6g} kg, allowable=unconfigured; "
+                            "campaigns_to_resinter=unreported"
+                        )
+                    continue
                 campaigns_to_resinter = limit.value / kg
                 campaign_margin = (
                     campaigns_to_resinter
@@ -378,18 +415,24 @@ class PhysicsConstraintSet:
                     worst_margin = margin
                     worst_observed = campaigns_to_resinter
                     worst_detail = (
-                        f"{campaign}/{segment}/{species}: deposit={kg:.6g} kg, "
+                        f"{campaign}/{zone}/{segment}/{species}: "
+                        f"deposit={kg:.6g} kg, "
                         f"allowable={limit.value:.6g} kg, "
                         f"campaigns_to_resinter={campaigns_to_resinter:.6g}"
                     )
             if math.isinf(worst_margin):
                 worst_margin = math.inf
-            return _margin(
-                "coating",
-                worst_margin,
-                self.coating_min_campaigns_to_resinter,
-                worst_observed,
-                worst_detail,
+            return GateMargin(
+                gate="coating",
+                feasible=True,
+                margin=float(worst_margin),
+                threshold=self.coating_min_campaigns_to_resinter,
+                observed=float(worst_observed),
+                detail=(
+                    worst_detail
+                    if worst_detail == "no wall deposit"
+                    else f"reported-only: {worst_detail}"
+                ),
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))

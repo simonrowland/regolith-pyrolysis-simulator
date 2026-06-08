@@ -50,6 +50,7 @@ def _trace(
     products: dict[str, float] | None = None,
     rump: dict[str, float] | None = None,
     wall: tuple[dict[tuple[str, str], float], ...] | None = None,
+    wall_zone_by_segment: dict[str, str] | None = None,
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
     ) -> PhysicsTrace:
@@ -57,12 +58,20 @@ def _trace(
         _kn_snapshot(temperature_C=temperature_C, knudsen_number=knudsen_number)
         for _ in condensed
     )
+    wall_delta = wall or tuple({} for _ in condensed)
+    inferred_zones = {
+        str(segment): "Hottest"
+        for tick in wall_delta
+        for segment, _species in tick
+    }
+    inferred_zones.update(wall_zone_by_segment or {})
     return PhysicsTrace(
         snapshots=snapshots,
         product_ledger_kg={"SiO": 95.0} if products is None else products,
         terminal_rump_by_species_kg={"SiO2": 1.0} if rump is None else rump,
         condensed_by_stage_species_delta=condensed,
-        wall_deposit_by_segment_species_delta=wall or tuple({} for _ in condensed),
+        wall_deposit_by_segment_species_delta=wall_delta,
+        wall_zone_by_segment=inferred_zones,
     )
 
 
@@ -218,6 +227,103 @@ def test_clean_zero_wall_deposit_coating_margin_is_feasible_infinity() -> None:
     assert coating.detail == "no wall deposit"
     assert coating.margin == math.inf
     assert coating.observed == math.inf
+
+
+def test_coating_readout_reports_wall_deposit_margin_without_hard_gate() -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "SiO"): ThresholdSpec(
+            id="allowable_wall_deposit_kg.hot_wall.SiO",
+            value=0.01,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "SiO"): 0.05},),
+    )
+
+    result = constraints.evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
+    assert coating.margin < 0.0
+    assert coating.observed == pytest.approx(0.2)
+    assert "reported-only" in coating.detail
+    assert "Hottest/hot_wall/SiO" in coating.detail
+
+
+@pytest.mark.parametrize(
+    ("trace", "expected_detail"),
+    (
+        (
+            _valid_trace_object(
+                wall_deposit_by_segment_species_delta=(
+                    {("hot_wall", "SiO"): 0.05},
+                ),
+            ),
+            "wall_zone_by_segment trace is missing for wall deposit",
+        ),
+        (
+            _valid_trace_object(
+                wall_deposit_by_segment_species_delta=(
+                    {("hot_wall", "SiO"): 0.05},
+                ),
+                wall_zone_by_segment={},
+            ),
+            "missing wall zone for segment hot_wall",
+        ),
+    ),
+)
+def test_coating_positive_wall_deposit_requires_real_zone_trace(
+    trace: object,
+    expected_detail: str,
+) -> None:
+    coating = PhysicsConstraintSet().coating(trace)
+
+    assert not coating.feasible
+    assert "fail-closed" in coating.detail
+    assert expected_detail in coating.detail
+    assert "unbucketed" not in coating.detail
+
+
+@pytest.mark.parametrize(
+    ("segment", "zone"),
+    (
+        ("hot_wall", "Hottest"),
+        ("mid_wall", "Hot"),
+        ("cool_wall", "Rest"),
+    ),
+)
+def test_coating_readout_uses_declared_wall_zone_buckets(
+    segment: str,
+    zone: str,
+) -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        (segment, "SiO"): ThresholdSpec(
+            id=f"allowable_wall_deposit_kg.{segment}.SiO",
+            value=0.01,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({(segment, "SiO"): 0.05},),
+        wall_zone_by_segment={segment: zone},
+    )
+
+    coating = constraints.coating(trace)
+
+    assert coating.feasible
+    assert coating.margin < 0.0
+    assert "reported-only" in coating.detail
+    assert f"{zone}/{segment}/SiO" in coating.detail
+    assert "unbucketed" not in coating.detail
 
 
 @pytest.mark.parametrize(

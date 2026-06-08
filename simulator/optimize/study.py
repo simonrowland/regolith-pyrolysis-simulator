@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 import csv
 import inspect
@@ -186,6 +186,7 @@ class StudyRecord:
     failing_gates: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
     cache_hit: bool = False
+    product_summary: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "objectives", MappingProxyType(dict(self.objectives)))
@@ -201,6 +202,11 @@ class StudyRecord:
         )
         object.__setattr__(self, "failing_gates", tuple(self.failing_gates))
         object.__setattr__(self, "notes", tuple(self.notes))
+        object.__setattr__(
+            self,
+            "product_summary",
+            MappingProxyType(dict(self.product_summary)),
+        )
 
 
 @dataclass(frozen=True)
@@ -1012,6 +1018,7 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
         failing_gates=scored.failing_gates,
         notes=scored.notes,
         cache_hit=cache_hit,
+        product_summary=_product_summary_mapping(scored.run_reference),
     )
 
 
@@ -1050,6 +1057,48 @@ def _margin_payload(margin: Any) -> Mapping[str, Any]:
     return MappingProxyType(payload)
 
 
+def _product_summary_mapping(reference: RunReference | None) -> Mapping[str, Any]:
+    if reference is None:
+        return MappingProxyType({})
+    return MappingProxyType(dict(reference.product_summary))
+
+
+def _coating_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
+    fields: list[str] = []
+    if any("campaigns_to_resinter" in record.product_summary for record in records):
+        fields.append("campaigns_to_resinter")
+    if any(
+        "wall_deposit_kg_by_segment_species" in record.product_summary
+        for record in records
+    ):
+        fields.append("wall_deposit_kg_by_segment_species_json")
+    if any(
+        "wall_deposit_kg_by_zone_species" in record.product_summary
+        for record in records
+    ):
+        fields.append("wall_deposit_kg_by_zone_species_json")
+    return tuple(fields)
+
+
+def _coating_leaderboard_row(
+    record: StudyRecord,
+    fields: Sequence[str],
+) -> dict[str, Any]:
+    summary = record.product_summary
+    row: dict[str, Any] = {}
+    if "campaigns_to_resinter" in fields:
+        row["campaigns_to_resinter"] = summary.get("campaigns_to_resinter", "")
+    if "wall_deposit_kg_by_segment_species_json" in fields:
+        row["wall_deposit_kg_by_segment_species_json"] = _json_dump_value(
+            summary.get("wall_deposit_kg_by_segment_species", {})
+        )
+    if "wall_deposit_kg_by_zone_species_json" in fields:
+        row["wall_deposit_kg_by_zone_species_json"] = _json_dump_value(
+            summary.get("wall_deposit_kg_by_zone_species", {})
+        )
+    return row
+
+
 def _status(scored: ScoredResult) -> str:
     if scored.failure_category is not None:
         return scored.failure_category.value
@@ -1083,6 +1132,28 @@ def _json_number(value: Any, label: str) -> float | str:
     if math.isinf(numeric):
         return "+inf" if numeric > 0.0 else "-inf"
     return numeric
+
+
+def _jsonable_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _jsonable_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_jsonable_value(item) for item in value]
+    if isinstance(value, list):
+        return [_jsonable_value(item) for item in value]
+    if isinstance(value, float):
+        return _json_number(value, "json value")
+    json.dumps(value)
+    return value
+
+
+def _json_dump_value(value: Any) -> str:
+    return json.dumps(
+        _jsonable_value(value),
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
 
 
 def _rank_key(
@@ -1197,6 +1268,7 @@ def _write_leaderboard(
 ) -> None:
     pareto_ids = {record.candidate_id for record in pareto}
     margin_names = sorted({name for record in leaderboard for name in record.feasibility_margins})
+    coating_fields = _coating_leaderboard_fields(leaderboard)
     fieldnames = [
         "rank",
         "candidate_id",
@@ -1205,6 +1277,7 @@ def _write_leaderboard(
         "is_winner",
         *(definition.metric for definition in definitions),
         *(f"margin_{name}" for name in margin_names),
+        *coating_fields,
         "patch_json",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
@@ -1232,6 +1305,7 @@ def _write_leaderboard(
                     if name in record.feasibility_margins
                 }
             )
+            row.update(_coating_leaderboard_row(record, coating_fields))
             writer.writerow(row)
 
 
@@ -1249,6 +1323,7 @@ def _record_payload(record: StudyRecord, schema: RecipeSchema) -> Mapping[str, A
         "notes": list(record.notes),
         "objectives": dict(record.objectives),
         "patch": schema.to_setpoints_patch(record.patch),
+        "product_summary": _jsonable_value(record.product_summary),
         "status": record.status,
     }
 

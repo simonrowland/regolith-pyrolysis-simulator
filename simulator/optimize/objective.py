@@ -8,7 +8,9 @@ from types import MappingProxyType
 from collections.abc import Callable, Sequence
 from typing import Any, Mapping, TypeVar
 
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.three_product_report import classify_products
+from simulator.trace import wall_deposit_kg_by_zone_species
 
 
 _MISSING = object()
@@ -198,10 +200,110 @@ def pareto_front(
 
 def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:
     sim = getattr(run_execution, "simulator", run_execution)
-    return MappingProxyType({
+    summary: dict[str, Any] = {
         "product_ledger_kg": MappingProxyType(dict(_product_ledger(sim))),
         "product_classes": product_classes_summary(sim, profile),
+    }
+    summary.update(_coating_product_summary(run_execution))
+    return MappingProxyType(summary)
+
+
+def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
+    trace = getattr(run_execution, "trace", None)
+    if trace is None:
+        return MappingProxyType({})
+    raw_by_segment = getattr(trace, "wall_deposit_by_segment_species_kg", None)
+    if raw_by_segment is None:
+        raise ObjectiveComputationError(
+            "wall_deposit_by_segment_species_kg trace is missing"
+        )
+    if not isinstance(raw_by_segment, Mapping):
+        raise ObjectiveComputationError(
+            "wall_deposit_by_segment_species_kg trace is not a mapping"
+        )
+    by_segment = _wall_deposit_by_segment_species_summary(raw_by_segment)
+    zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
+    if zone_by_segment is None:
+        raise ObjectiveComputationError("wall_zone_by_segment trace is missing")
+    if not isinstance(zone_by_segment, Mapping):
+        raise ObjectiveComputationError("wall_zone_by_segment trace is not a mapping")
+    try:
+        by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
+    except (TypeError, ValueError) as exc:
+        raise ObjectiveComputationError(str(exc)) from exc
+    return MappingProxyType({
+        "wall_deposit_kg_by_segment_species": by_segment,
+        "wall_deposit_kg_by_zone_species": MappingProxyType({
+            zone: MappingProxyType(dict(species_kg))
+            for zone, species_kg in by_zone.items()
+        }),
+        "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
     })
+
+
+def _wall_deposit_by_segment_species_summary(
+    raw: Mapping[Any, Any],
+) -> Mapping[str, Mapping[str, float]]:
+    by_segment: dict[str, dict[str, float]] = {}
+    for key, kg in raw.items():
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise ObjectiveComputationError(
+                "wall deposit key must be (segment, species)"
+            )
+        segment, species = str(key[0]), str(key[1])
+        amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
+        if amount <= 1e-12:
+            continue
+        species_kg = by_segment.setdefault(segment, {})
+        species_kg[species] = species_kg.get(species, 0.0) + amount
+    return MappingProxyType({
+        segment: MappingProxyType(dict(sorted(species_kg.items())))
+        for segment, species_kg in sorted(by_segment.items())
+    })
+
+
+def _campaigns_to_resinter(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+) -> float | str:
+    by_species: dict[str, float] = {}
+    for key, kg in wall_deposit_by_segment_species.items():
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise ObjectiveComputationError(
+                "wall deposit key must be (segment, species)"
+            )
+        species = str(key[1])
+        amount = _finite_float(kg, f"wall_deposit[{key!r}]")
+        if amount > 1e-12:
+            by_species[species] = by_species.get(species, 0.0) + amount
+    if not by_species:
+        return "infinite"
+    dominant_species = max(by_species, key=by_species.get)
+    dominant_kg = by_species[dominant_species]
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is None:
+        return f"resinter_threshold_kg / {dominant_kg:.12g}"
+    return threshold / dominant_kg
+
+
+def _wall_resinter_threshold_kg() -> float | None:
+    materials = load_config_bundle(DEFAULT_DATA_DIR).materials
+    surfaces = materials.get("wall_surfaces", {}) or {}
+    surface = (
+        surfaces.get("interstage_duct", {}) or {}
+        if isinstance(surfaces, Mapping)
+        else {}
+    )
+    liner_material = str(surface.get("liner_material") or "")
+    liners = materials.get("liner_materials", {}) or {}
+    liner = (
+        liners.get(liner_material, {}) or {}
+        if isinstance(liners, Mapping)
+        else {}
+    )
+    threshold = liner.get("resinter_threshold_kg")
+    if threshold is None:
+        return None
+    return _finite_float(threshold, "resinter_threshold_kg")
 
 
 def product_classes_summary(sim: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:

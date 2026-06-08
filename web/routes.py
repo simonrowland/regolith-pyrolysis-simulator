@@ -172,8 +172,11 @@ def _result_metadata(
     run_reference = _json_value(row['run_reference'], {})
     if not isinstance(run_reference, dict):
         run_reference = {}
+    product_summary = run_reference.get('product_summary', {})
+    if not isinstance(product_summary, dict):
+        product_summary = {}
 
-    return {
+    metadata = {
         'run_id': run_id,
         'cache_key': row['cache_key'],
         'candidate_id': row['candidate_id'],
@@ -190,11 +193,19 @@ def _result_metadata(
             'status': run_reference.get('status', ''),
             'reason': run_reference.get('reason', ''),
             'error_message': run_reference.get('error_message', ''),
-            'product_summary': run_reference.get('product_summary', {}),
+            'product_summary': product_summary,
         },
         'eval_spec': _eval_spec_summary(_json_value(row['eval_spec'], {})),
         'notes': _json_value(row['notes'], []),
     }
+    for key in (
+        'wall_deposit_kg_by_segment_species',
+        'wall_deposit_kg_by_zone_species',
+        'campaigns_to_resinter',
+    ):
+        if key in product_summary:
+            metadata[key] = product_summary[key]
+    return metadata
 
 
 def _read_cache_summary(cache_path: Path, run_id: str) -> dict[str, Any]:
