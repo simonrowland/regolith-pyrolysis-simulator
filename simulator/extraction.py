@@ -425,8 +425,8 @@ class ExtractionMixin:
 
         Voltage strategy:
             C5 (limited MRE):    Stepped holds at Ellingham thresholds up to the
-                                 Branch Two YAML max voltage.
-                                 Extracts FeO, SiO₂, TiO₂ but NOT Al₂O₃/MgO/CaO.
+                                 selected EvalSpec target/max voltage.
+                                 Extracts only the selected C5 ladder prefix.
                                  Electrode life 5-10× longer than full MRE.
 
             MRE_BASELINE:        Stepped holds at each Ellingham threshold (0.6→2.5 V).
@@ -494,12 +494,37 @@ class ExtractionMixin:
 
             current_A = 3000.0  # Full-scale MRE: ~60 kA/m² at 0.05 m²
         else:
-            # C5 limited MRE: stepped holds up to the YAML Branch Two cap.
-            seq = mre_ladder.c5_voltage_ladder(
-                self._mre_voltage_sequence, self.setpoints
+            # C5 limited MRE: EvalSpec/session fields are behavior determinants.
+            target = str(getattr(self.melt, 'mre_target_species', '') or '')
+            configured_max = (
+                mre_ladder.coerce_mre_decomposition_voltage(
+                    getattr(self.melt, 'mre_max_voltage_V', 0.0)
+                )
+                or 0.0
+            )
+            if target:
+                target_max = mre_ladder.max_voltage_for_target(
+                    target, self._mre_voltage_sequence
+                )
+                if target_max > 0.0 and configured_max > 0.0:
+                    selected_max = min(target_max, configured_max)
+                else:
+                    selected_max = target_max
+            else:
+                selected_max = configured_max
+            seq = mre_ladder.filter_steps_up_to_max_v(
+                self._mre_voltage_sequence, selected_max
             )
             if not seq:
-                voltage_V = mre_ladder.branch_two_voltage_cap(self.setpoints)
+                self._mre_metals_this_hr = {}
+                self._mre_voltage_V = 0.0
+                self._mre_current_A = 0.0
+                self._mre_effective_current_A = 0.0
+                self._mre_energy_this_hr = 0.0
+                self.melt.mre_voltage_V = 0.0
+                self.melt.mre_current_A = 0.0
+                return 0.0
+
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]

@@ -19,6 +19,10 @@ MRE_VOLTAGE_LADDER_FALLBACK = (
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
 C5_BRANCH_TWO_MAX_V_FALLBACK = 1.6
+DISABLED_PRESET_TARGETS = {
+    'Na2O': 'pre-depleted by C3; not a selectable C5 target',
+    'K2O': 'pre-depleted by C3; not a selectable C5 target',
+}
 
 
 def coerce_mre_decomposition_voltage(value: Any) -> float | None:
@@ -104,8 +108,76 @@ def build_mre_voltage_sequence(setpoints: dict[str, Any] | None) -> list[dict[st
     ]
 
 
-def branch_two_voltage_cap(setpoints: dict[str, Any] | None) -> float:
-    """Return the C5 Branch Two maximum voltage from YAML strategy config."""
+def parse_ladder_from_setpoints(setpoints: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Canonical dispatch helper: return the usable MRE ladder for setpoints."""
+    return build_mre_voltage_sequence(setpoints)
+
+
+def _coerce_ladder_step(entry: dict[str, Any]) -> dict[str, Any] | None:
+    voltage = coerce_mre_decomposition_voltage(entry.get('voltage'))
+    if voltage is None:
+        return None
+    species = entry.get('species') or []
+    if isinstance(species, str):
+        species_list = [species]
+    else:
+        try:
+            species_list = [str(item) for item in species if item]
+        except TypeError:
+            return None
+    if not species_list:
+        return None
+    raw_hold = entry.get('min_hold_hours', MRE_DEFAULT_MIN_HOLD_HOURS)
+    try:
+        min_hold = max(0, int(raw_hold))
+    except (TypeError, ValueError):
+        min_hold = MRE_DEFAULT_MIN_HOLD_HOURS
+    return {
+        'voltage': float(voltage),
+        'species': species_list,
+        'min_hold_hours': min_hold,
+    }
+
+
+def max_voltage_for_target(
+    target_oxide: str,
+    ladder: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+) -> float:
+    """Return the ladder voltage that first reaches ``target_oxide``."""
+    target = str(target_oxide or '').strip()
+    if not target:
+        return 0.0
+    for entry in ladder or []:
+        if not isinstance(entry, dict):
+            continue
+        step = _coerce_ladder_step(entry)
+        if step is None:
+            continue
+        if target in step['species']:
+            return float(step['voltage'])
+    return 0.0
+
+
+def filter_steps_up_to_max_v(
+    ladder: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+    max_voltage_V: Any,
+) -> list[dict[str, Any]]:
+    """Return normalized ladder steps whose threshold is at or below max V."""
+    cap = coerce_mre_decomposition_voltage(max_voltage_V)
+    if cap is None or cap <= 0.0:
+        return []
+    selected: list[dict[str, Any]] = []
+    for entry in ladder or []:
+        if not isinstance(entry, dict):
+            continue
+        step = _coerce_ladder_step(entry)
+        if step is not None and step['voltage'] <= cap:
+            selected.append(step)
+    selected.sort(key=lambda entry: entry['voltage'])
+    return selected
+
+
+def _branch_two_strategy_cap(setpoints: dict[str, Any] | None) -> float:
     block = ((setpoints or {}).get('mre_voltage_sequence', {}) or {})
     strategy = block.get('voltage_strategy', {}) or {}
     if not isinstance(strategy, dict):
@@ -119,32 +191,58 @@ def branch_two_voltage_cap(setpoints: dict[str, Any] | None) -> float:
     return float(voltage)
 
 
+def branch_two_legacy_preset(setpoints: dict[str, Any] | None) -> dict[str, Any]:
+    """Legacy C5 Branch-Two preset retained for old callers."""
+    return {
+        'id': 'legacy_branch_two',
+        'label': 'Legacy Branch Two cap',
+        'c5_enabled': True,
+        'mre_target_species': '',
+        'mre_max_voltage_V': _branch_two_strategy_cap(setpoints),
+        'enabled': True,
+        'legacy': True,
+    }
+
+
+def branch_two_voltage_cap(setpoints: dict[str, Any] | None) -> float:
+    """Legacy wrapper returning the C5 Branch-Two preset max voltage."""
+    return float(branch_two_legacy_preset(setpoints)['mre_max_voltage_V'])
+
+
+def preset_catalog(setpoints: dict[str, Any] | None) -> tuple[dict[str, Any], ...]:
+    """Return UI-ready C5/MRE target presets from the canonical ladder."""
+    presets: list[dict[str, Any]] = [{
+        'id': 'off',
+        'label': 'MRE off',
+        'c5_enabled': False,
+        'mre_target_species': '',
+        'mre_max_voltage_V': 0.0,
+        'enabled': True,
+        'legacy': False,
+    }]
+    for entry in parse_ladder_from_setpoints(setpoints):
+        step = _coerce_ladder_step(entry)
+        if step is None:
+            continue
+        target = step['species'][0]
+        disabled_reason = DISABLED_PRESET_TARGETS.get(target, '')
+        presets.append({
+            'id': f'target:{target}',
+            'label': target,
+            'target_oxide': target,
+            'c5_enabled': True,
+            'mre_target_species': target,
+            'mre_max_voltage_V': step['voltage'],
+            'enabled': not disabled_reason,
+            'disabled_reason': disabled_reason,
+            'legacy': False,
+        })
+    return tuple(presets)
+
+
 def c5_voltage_ladder(
     sequence: list[dict[str, Any]],
     setpoints: dict[str, Any] | None,
 ) -> list[dict[str, Any]]:
-    """Return the C5 Branch Two prefix selected by the YAML max voltage."""
-    cap = branch_two_voltage_cap(setpoints)
-    selected: list[dict[str, Any]] = []
-    for entry in sequence or []:
-        if not isinstance(entry, dict):
-            continue
-        voltage = coerce_mre_decomposition_voltage(entry.get('voltage'))
-        if voltage is None or voltage > cap:
-            continue
-        species = entry.get('species') or []
-        if isinstance(species, str):
-            species_list = [species]
-        else:
-            species_list = list(species)
-        raw_hold = entry.get('min_hold_hours', MRE_DEFAULT_MIN_HOLD_HOURS)
-        try:
-            min_hold = max(0, int(raw_hold))
-        except (TypeError, ValueError):
-            min_hold = MRE_DEFAULT_MIN_HOLD_HOURS
-        selected.append({
-            'voltage': float(voltage),
-            'species': species_list,
-            'min_hold_hours': min_hold,
-        })
-    return selected
+    """Legacy Branch-Two helper. New C5 code uses runtime EvalSpec fields."""
+    return filter_steps_up_to_max_v(sequence, branch_two_voltage_cap(setpoints))

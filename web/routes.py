@@ -154,6 +154,9 @@ def _eval_spec_summary(payload: Any) -> dict[str, Any]:
         'fidelity',
         'code_version',
         'data_digests',
+        'c5_enabled',
+        'mre_max_voltage_V',
+        'mre_target_species',
     )
     return {key: payload[key] for key in keys if key in payload}
 

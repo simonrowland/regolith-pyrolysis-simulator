@@ -193,15 +193,10 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps = _run_c2a_staged_to_completion(sim)
 
-    # Autoreview r6 P2 fix (2026-05-27): C2A_STAGED → C3_NA transition
-    # stores ``staged_duration_h`` from ``na_shuttle_stage`` (default 3h
-    # per setpoints.yaml §C2A_STAGED.na_shuttle_stage.duration_h) onto
-    # the C3_NA override; the C3_NA termination check now honors that
-    # override for ``record.path == 'A_staged'`` instead of running the
-    # default 35h. C2A_staged total step count therefore drops from 87
-    # (pre-r6: 35h C3_NA) to 55 (post-r6: 3h C3_NA) -- the 32-step
-    # delta matches the C3_NA duration reduction exactly.
-    assert steps == 55
+    # C5 is default-off: the staged path now stops after the branch
+    # decision instead of appending a default C5 cleanup segment. The
+    # conservation assertions below remain the invariant being guarded.
+    assert steps == 40
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions

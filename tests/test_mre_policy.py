@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from types import SimpleNamespace
 
 import pytest
 
+from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch
+from simulator.state import CampaignPhase
 
 
 BASE_PROFILE = {
@@ -29,30 +33,96 @@ BASE_PROFILE = {
 }
 
 
-def _profile(*, c5_enabled: bool) -> dict:
+def _profile(
+    *,
+    c5_enabled: bool,
+    target_species: str = "SiO2",
+    max_voltage_V: float = 1.4,
+    hours: int = 15,
+) -> dict:
     profile = deepcopy(BASE_PROFILE)
+    profile["run"]["hours"] = hours
+    profile["fidelities"]["fast"]["hours"] = hours
     profile["run"].update(
         {
             "c5_enabled": c5_enabled,
-            "mre_target_species": "SiO2" if c5_enabled else "",
-            "mre_max_voltage_V": 1.4 if c5_enabled else 0.0,
+            "mre_target_species": target_species if c5_enabled else "",
+            "mre_max_voltage_V": max_voltage_V if c5_enabled else 0.0,
         }
     )
     return profile
 
 
-def _evaluate_policy(*, c5_enabled: bool):
+def _evaluate_policy(
+    *,
+    c5_enabled: bool,
+    target_species: str = "SiO2",
+    max_voltage_V: float = 1.4,
+    hours: int = 15,
+):
     return evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
         "fast",
-        profile=_profile(c5_enabled=c5_enabled),
+        profile=_profile(
+            c5_enabled=c5_enabled,
+            target_species=target_species,
+            max_voltage_V=max_voltage_V,
+            hours=hours,
+        ),
         constraints=PhysicsConstraintSet(),
     )
 
 
 def _product_ledger(result) -> dict[str, float]:
     return dict(result.run_reference.product_summary["product_ledger_kg"])
+
+
+def _captured_c5_voltages(*, target_species: str, max_voltage_V: float) -> list[float]:
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.6, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.4, "min_hold_hours": 0},
+                {"species": "TiO2", "decomposition_V": 1.5, "min_hold_hours": 0},
+            ],
+        },
+    }
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        {"x": {"label": "X", "composition_wt_pct": {"SiO2": 100}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = target_species
+    sim.melt.mre_max_voltage_V = max_voltage_V
+    captured: list[float] = []
+
+    def fake_dispatch(_intent, *, control_inputs):
+        captured.append(control_inputs["voltage_V"])
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+    for _ in range(6):
+        sim._step_mre()
+    return captured
 
 
 def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
@@ -77,6 +147,20 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
     assert max(snapshot.mre_current_A for snapshot in off_trace.snapshots) == pytest.approx(0.0)
     assert max(snapshot.mre_current_A for snapshot in si_trace.snapshots) > 0.0
     assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= 1.4
+
+
+def test_tc8_si_and_ti_targets_split_c5_behavior_not_only_cache_key() -> None:
+    si_voltages = _captured_c5_voltages(
+        target_species="SiO2", max_voltage_V=1.4
+    )
+    ti_voltages = _captured_c5_voltages(
+        target_species="TiO2", max_voltage_V=1.5
+    )
+
+    assert max(si_voltages) == pytest.approx(1.4)
+    assert max(ti_voltages) == pytest.approx(1.5)
+    assert 1.5 not in si_voltages
+    assert ti_voltages != si_voltages
 
 
 @pytest.mark.parametrize("c5_enabled", (False, True))

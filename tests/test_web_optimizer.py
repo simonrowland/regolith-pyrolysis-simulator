@@ -124,7 +124,13 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     )
 
     spec_a = _base_spec(recipe_id="recipe-a")
-    spec_b = replace(spec_a, recipe_id="recipe-b")
+    spec_b = replace(
+        spec_a,
+        recipe_id="recipe-b",
+        c5_enabled=True,
+        mre_max_voltage_V=1.4,
+        mre_target_species="SiO2",
+    )
     store = ResultStore(run_dir / "cache.sqlite")
     store.store(
         spec_a,
@@ -162,6 +168,9 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         run["latest_result"]["run_reference"]["product_summary"]["oxygen_kg"]
         == 12.0
     )
+    assert run["latest_result"]["eval_spec"]["c5_enabled"] is True
+    assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.4
+    assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
 
     leaderboard = client.get(
         "/api/optimizer/leaderboard"
@@ -174,6 +183,11 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         "candidate-b"
     ]
     assert board_payload["entries"][0]["objective_value"] == 12.0
+    assert board_payload["entries"][0]["eval_spec"]["c5_enabled"] is True
+    assert (
+        board_payload["entries"][0]["eval_spec"]["mre_target_species"]
+        == "SiO2"
+    )
 
 
 def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> None:
