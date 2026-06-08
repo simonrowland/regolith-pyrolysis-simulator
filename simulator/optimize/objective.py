@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import replace
 import math
 from types import MappingProxyType
 from collections.abc import Callable, Sequence
 from typing import Any, Mapping, TypeVar
 
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.optimize.physics import (
+    PhysicsConstraintSet,
+    ThresholdSpec,
+    extraction_completeness_report,
+)
 from simulator.three_product_report import classify_products
 from simulator.trace import wall_deposit_kg_by_zone_species
 
@@ -254,9 +260,45 @@ def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[s
     summary: dict[str, Any] = {
         "product_ledger_kg": MappingProxyType(dict(_product_ledger(sim))),
         "product_classes": product_classes_summary(sim, profile),
+        "extraction_completeness": extraction_completeness_report(
+            getattr(run_execution, "trace", None),
+            _extraction_constraints_from_profile(profile),
+        ),
     }
     summary.update(_coating_product_summary(run_execution))
     return MappingProxyType(summary)
+
+
+def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsConstraintSet:
+    raw_constraints = profile.get("constraints", {})
+    if raw_constraints is None:
+        raw_constraints = {}
+    if not isinstance(raw_constraints, Mapping):
+        raise ObjectiveComputationError("profile.constraints must be a mapping")
+
+    base = PhysicsConstraintSet()
+    updates: dict[str, Any] = {}
+    if "target_species" in raw_constraints:
+        raw_targets = raw_constraints["target_species"]
+        if not isinstance(raw_targets, (list, tuple)) or not raw_targets:
+            raise ObjectiveComputationError(
+                "profile.constraints.target_species must be a non-empty sequence"
+            )
+        updates["target_species"] = tuple(str(target) for target in raw_targets)
+    if "extraction_min_fraction" in raw_constraints:
+        threshold = base.extraction_min_fraction
+        updates["extraction_min_fraction"] = ThresholdSpec(
+            id=threshold.id,
+            value=_finite_float(
+                raw_constraints["extraction_min_fraction"],
+                "profile.constraints.extraction_min_fraction",
+            ),
+            units=threshold.units,
+            source="profile",
+            source_ref="profile.constraints.extraction_min_fraction",
+            tolerance=threshold.tolerance,
+        )
+    return replace(base, **updates) if updates else base
 
 
 def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:

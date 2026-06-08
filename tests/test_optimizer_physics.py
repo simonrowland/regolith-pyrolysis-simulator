@@ -10,8 +10,10 @@ from simulator.optimize.physics import (
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
+    extraction_completeness_report,
     physics_constraints_digest,
 )
+from simulator.optimize.objective import product_summary
 from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.state import CampaignPhase, HourSnapshot
 from simulator.state import MOLAR_MASS
@@ -85,6 +87,21 @@ def _valid_trace_object(**overrides: object) -> SimpleNamespace:
     }
     fields.update(overrides)
     return SimpleNamespace(**fields)
+
+
+def _assert_insufficient_target_evidence_is_unknown(
+    target: dict[str, object],
+) -> None:
+    assert target["status"] == "insufficient-evidence"
+    assert target["completeness_fraction"] is None
+    assert target["allowed_residual"]["target_equiv_mol"] is None
+    for key in (
+        "product_target_equiv_mol",
+        "residual_target_equiv_mol",
+        "denominator_target_equiv_mol",
+    ):
+        assert key in target
+        assert target[key] is None
 
 
 def test_rev5_same_stage_mixed_stream_recipe_is_infeasible_by_purity_only() -> None:
@@ -466,6 +483,118 @@ def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None
     assert not margin.feasible
     assert margin.observed == pytest.approx(1.0 / 3.0)
     assert "denominator_target_equiv_mol=3" in margin.detail
+
+
+def test_extraction_completeness_reports_target_denominator_residual_and_product_bin() -> None:
+    constraints = PhysicsConstraintSet(
+        target_species=("Cr",),
+        residual_species_by_target={"Cr": ("Cr2O3", "Cr")},
+    )
+    trace = _trace(
+        condensed=({(1, "Cr"): 1.0},),
+        products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
+        rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+    )
+
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Cr"]
+
+    assert report["status"] == "reported"
+    assert report["conclusion"] == "reported"
+    assert report["worst_target_species"] == "Cr"
+    assert report["completeness_fraction"] == pytest.approx(1.0 / 3.0)
+    assert target["target_species"] == "Cr"
+    assert target["status"] == "reported"
+    assert target["denominator_account"] == {
+        "product": "product_ledger_kg",
+        "residual": "terminal_rump_by_species_kg",
+    }
+    assert target["denominator_basis"] == "target_equivalent_mol"
+    assert target["allowed_residual"]["account"] == "terminal_rump_by_species_kg"
+    assert target["allowed_residual"]["species"] == ("Cr2O3", "Cr")
+    assert target["allowed_residual"]["fraction"] == pytest.approx(0.05)
+    assert target["allowed_residual"]["target_equiv_mol"] == pytest.approx(0.15)
+    assert target["product_bin"] == "Cr"
+    assert target["product_account"] == "product_ledger_kg"
+    assert target["product_target_equiv_mol"] == pytest.approx(1.0)
+    assert target["residual_target_equiv_mol"] == pytest.approx(2.0)
+    assert target["denominator_target_equiv_mol"] == pytest.approx(3.0)
+
+    missing = extraction_completeness_report(
+        _trace(condensed=({(1, "Cr"): 1.0},), products={}, rump={}),
+        constraints,
+    )
+    missing_target = missing["targets"]["Cr"]
+    assert missing["status"] == "insufficient-evidence"
+    assert missing["conclusion"] == "inconclusive"
+    assert missing["completeness_fraction"] is None
+    _assert_insufficient_target_evidence_is_unknown(missing_target)
+    assert "no target-equivalent mol evidence" in missing_target["reason"]
+
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=()),
+        product_ledger=lambda: {"Cr": MOLAR_MASS["Cr"] / 1000.0},
+        _terminal_rump_by_species=lambda: {
+            "Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0,
+        },
+    )
+    summary = product_summary(
+        SimpleNamespace(simulator=sim, trace=trace),
+        {"constraints": {"target_species": ["Cr"]}},
+    )
+
+    assert summary["extraction_completeness"]["targets"]["Cr"]["product_bin"] == "Cr"
+
+
+@pytest.mark.parametrize(
+    ("trace", "reason_fragment"),
+    (
+        (None, "trace missing product_ledger_kg"),
+        (
+            SimpleNamespace(product_ledger_kg={"Cr": MOLAR_MASS["Cr"] / 1000.0}),
+            "trace missing terminal_rump_by_species_kg",
+        ),
+    ),
+)
+def test_extraction_completeness_report_missing_evidence_never_zero_fills(
+    trace: object,
+    reason_fragment: str,
+) -> None:
+    constraints = PhysicsConstraintSet(
+        target_species=("Cr",),
+        residual_species_by_target={"Cr": ("Cr2O3", "Cr")},
+    )
+
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Cr"]
+
+    assert report["status"] == "insufficient-evidence"
+    assert report["conclusion"] == "inconclusive"
+    assert report["completeness_fraction"] is None
+    assert reason_fragment in report["reason"]
+    assert reason_fragment in target["reason"]
+    _assert_insufficient_target_evidence_is_unknown(target)
+
+
+def test_extraction_completeness_report_unknown_residual_map_never_zero_fills() -> None:
+    constraints = PhysicsConstraintSet(
+        target_species=("Cr",),
+        residual_species_by_target={},
+    )
+    trace = _trace(
+        condensed=({(1, "Cr"): 1.0},),
+        products={"Cr": MOLAR_MASS["Cr"] / 1000.0},
+        rump={"Cr2O3": MOLAR_MASS["Cr2O3"] / 1000.0},
+    )
+
+    report = extraction_completeness_report(trace, constraints)
+    target = report["targets"]["Cr"]
+
+    assert report["status"] == "insufficient-evidence"
+    assert report["conclusion"] == "inconclusive"
+    assert "no residual species map for target" in report["reason"]
+    assert "no residual species map for target" in target["reason"]
+    _assert_insufficient_target_evidence_is_unknown(target)
 
 
 def test_constraint_digest_changes_when_threshold_changes() -> None:

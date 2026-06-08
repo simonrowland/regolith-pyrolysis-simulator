@@ -565,6 +565,196 @@ def _extraction_completeness_fail_closed_detail(
     return result.detail
 
 
+def extraction_completeness_report(
+    trace: Any,
+    constraints: PhysicsConstraintSet | None = None,
+) -> Mapping[str, Any]:
+    active_constraints = constraints or PhysicsConstraintSet()
+    targets = tuple(str(target) for target in active_constraints.target_species)
+    try:
+        products = _required_mapping(trace, "product_ledger_kg")
+        rump = _required_mapping(trace, "terminal_rump_by_species_kg")
+        by_target = extraction_completeness_by_target(
+            targets,
+            active_constraints.residual_species_by_target,
+            products,
+            rump,
+            require_residual_species=True,
+        )
+    except (AccountingError, KeyError, TypeError, ValueError) as exc:
+        target_payloads = {
+            target: _extraction_completeness_insufficient_report(
+                target,
+                active_constraints,
+                str(exc),
+            )
+            for target in targets
+        }
+        return _extraction_completeness_report_payload(
+            "insufficient-evidence",
+            "inconclusive",
+            target_payloads,
+            str(exc),
+        )
+
+    target_payloads = {
+        target: _extraction_completeness_target_report(
+            by_target[target],
+            active_constraints,
+        )
+        for target in targets
+    }
+    insufficient = tuple(
+        payload
+        for payload in target_payloads.values()
+        if payload["status"] != "reported"
+    )
+    if insufficient:
+        return _extraction_completeness_report_payload(
+            "insufficient-evidence",
+            "inconclusive",
+            target_payloads,
+            str(insufficient[0]["reason"]),
+        )
+    worst_target = min(
+        targets,
+        key=lambda target: target_payloads[target]["completeness_fraction"],
+    )
+    return _extraction_completeness_report_payload(
+        "reported",
+        "reported",
+        target_payloads,
+        "",
+        worst_target=worst_target,
+        completeness_fraction=target_payloads[worst_target]["completeness_fraction"],
+    )
+
+
+def _extraction_completeness_target_report(
+    result: TargetExtractionCompleteness,
+    constraints: PhysicsConstraintSet,
+) -> Mapping[str, Any]:
+    target = str(result.target_species)
+    residual_species = _residual_species_for_target(target, constraints)
+    has_denominator = result.completeness_fraction is not None
+    payload: dict[str, Any] = {
+        "status": "reported",
+        "conclusion": "reported",
+        "target_species": target,
+        "denominator_account": _extraction_denominator_account(),
+        "denominator_basis": "target_equivalent_mol",
+        "allowed_residual": _allowed_residual_payload(
+            residual_species,
+            constraints,
+            result.denominator_target_equiv_mol if has_denominator else None,
+            has_denominator,
+        ),
+        "product_bin": target,
+        "product_account": "product_ledger_kg",
+        "product_target_equiv_mol": (
+            result.product_target_equiv_mol if has_denominator else None
+        ),
+        "residual_target_equiv_mol": (
+            result.residual_target_equiv_mol if has_denominator else None
+        ),
+        "denominator_target_equiv_mol": (
+            result.denominator_target_equiv_mol if has_denominator else None
+        ),
+        "completeness_fraction": result.completeness_fraction,
+        "reason": "",
+        "detail": result.detail,
+    }
+    if result.completeness_fraction is None:
+        payload.update({
+            "status": "insufficient-evidence",
+            "conclusion": "inconclusive",
+            "reason": _extraction_completeness_fail_closed_detail(result),
+        })
+    return MappingProxyType(payload)
+
+
+def _extraction_completeness_insufficient_report(
+    target: str,
+    constraints: PhysicsConstraintSet,
+    reason: str,
+) -> Mapping[str, Any]:
+    residual_species = _residual_species_for_target(target, constraints)
+    return MappingProxyType({
+        "status": "insufficient-evidence",
+        "conclusion": "inconclusive",
+        "target_species": target,
+        "denominator_account": _extraction_denominator_account(),
+        "denominator_basis": "target_equivalent_mol",
+        "allowed_residual": _allowed_residual_payload(
+            residual_species,
+            constraints,
+            None,
+            False,
+        ),
+        "product_bin": target,
+        "product_account": "product_ledger_kg",
+        "product_target_equiv_mol": None,
+        "residual_target_equiv_mol": None,
+        "denominator_target_equiv_mol": None,
+        "completeness_fraction": None,
+        "reason": reason,
+        "detail": f"{target}: {reason}",
+    })
+
+
+def _extraction_completeness_report_payload(
+    status: str,
+    conclusion: str,
+    target_payloads: Mapping[str, Mapping[str, Any]],
+    reason: str,
+    *,
+    worst_target: str | None = None,
+    completeness_fraction: float | None = None,
+) -> Mapping[str, Any]:
+    return MappingProxyType({
+        "status": status,
+        "conclusion": conclusion,
+        "aggregation": "min_all_targets",
+        "worst_target_species": worst_target,
+        "completeness_fraction": completeness_fraction,
+        "reason": reason,
+        "targets": MappingProxyType(dict(target_payloads)),
+    })
+
+
+def _extraction_denominator_account() -> Mapping[str, str]:
+    return MappingProxyType({
+        "product": "product_ledger_kg",
+        "residual": "terminal_rump_by_species_kg",
+    })
+
+
+def _allowed_residual_payload(
+    residual_species: tuple[str, ...],
+    constraints: PhysicsConstraintSet,
+    denominator_target_equiv_mol: float | None,
+    has_denominator: bool,
+) -> Mapping[str, Any]:
+    allowed_fraction = max(0.0, 1.0 - constraints.extraction_min_fraction.value)
+    return MappingProxyType({
+        "account": "terminal_rump_by_species_kg",
+        "species": residual_species,
+        "fraction": allowed_fraction,
+        "target_equiv_mol": (
+            denominator_target_equiv_mol * allowed_fraction
+            if has_denominator
+            else None
+        ),
+    })
+
+
+def _residual_species_for_target(
+    target: str,
+    constraints: PhysicsConstraintSet,
+) -> tuple[str, ...]:
+    return tuple(constraints.residual_species_by_target.get(target, ()))
+
+
 def _margin(
     gate: str,
     margin: float,
