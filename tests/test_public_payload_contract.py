@@ -51,12 +51,24 @@ def test_socket_start_payload_keeps_existing_kg_shape():
         mass_kg=1000.0,
         backend_requested="stub",
         backend_active="StubBackend",
+        backend_status="stub",
+        backend_authoritative=False,
         backend_message="Using StubBackend",
+        c5_enabled=True,
+        mre_target_species="SiO2",
+        mre_max_voltage_V=1.4,
     )
 
     assert payload["status"] == "started"
     assert payload["mass_kg"] == pytest.approx(1000.0)
     assert isinstance(payload["mass_kg"], numbers.Real)
+    assert payload["backend_requested"] == "stub"
+    assert payload["backend_active"] == "StubBackend"
+    assert payload["backend_status"] == "stub"
+    assert payload["backend_authoritative"] is False
+    assert payload["c5_enabled"] is True
+    assert payload["mre_target_species"] == "SiO2"
+    assert payload["mre_max_voltage_V"] == pytest.approx(1.4)
 
 
 def test_tick_payload_keeps_existing_kg_keys():
@@ -68,6 +80,8 @@ def test_tick_payload_keeps_existing_kg_keys():
         sim=sim,
         snapshot=snapshot,
         backend_message="Using StubBackend",
+        backend_status="stub",
+        backend_authoritative=False,
     )
 
     expected_keys = {
@@ -97,6 +111,8 @@ def test_tick_payload_keeps_existing_kg_keys():
     assert expected_keys <= payload.keys()
     for key in expected_keys:
         _assert_numeric_leaf_values(payload[key], key)
+    assert payload["backend_status"] == "stub"
+    assert payload["backend_authoritative"] is False
 
 
 def test_completion_payload_keeps_existing_mass_keys():

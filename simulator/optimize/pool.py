@@ -122,9 +122,17 @@ def evaluate_batch(
         completed = _evaluate_tasks_serial(tasks, evaluate_fn)
     if results_store is not None:
         timestamp = created_at or datetime.now(UTC).isoformat()
-        for result in completed:
+        stored_results: list[ScoredResult] = []
+        for task, result in zip(tasks, completed):
+            stored_result = _ensure_pool_backend_provenance(result, task)
             if result.eval_spec is not None:
-                results_store.store(result.eval_spec, result, created_at=timestamp)
+                results_store.store(
+                    result.eval_spec,
+                    stored_result,
+                    created_at=timestamp,
+                )
+            stored_results.append(stored_result)
+        completed = tuple(stored_results)
     return completed
 
 
@@ -296,6 +304,65 @@ def _call_evaluate_fn(
         if accepts_kwargs or key in signature.parameters
     }
     return evaluate_fn(patch, feedstock_id, fidelity, **accepted)
+
+
+def _ensure_pool_backend_provenance(
+    result: ScoredResult,
+    task: _PoolTask,
+) -> ScoredResult:
+    ref = getattr(result, "run_reference", None)
+    if ref is None or _result_backend_status(result) is not None:
+        return result
+    if _task_backend_name(task) != "stub":
+        return result
+
+    return replace(
+        result,
+        run_reference=replace(
+            ref,
+            backend_status="diagnostic_stub",
+            backend_authoritative=False,
+        ),
+    )
+
+
+def _result_backend_status(result: ScoredResult) -> str | None:
+    ref = getattr(result, "run_reference", None)
+    if ref is None:
+        return None
+    for carrier in (ref, getattr(ref, "trace", None)):
+        status = _extract_backend_status(carrier)
+        if status is not None:
+            return status
+    return None
+
+
+def _extract_backend_status(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, Mapping):
+        raw = carrier.get("backend_status")
+        if raw is not None:
+            return str(raw)
+        for key in ("per_hour", "hours"):
+            status = _latest_backend_status(carrier.get(key))
+            if status is not None:
+                return status
+        return None
+    raw = getattr(carrier, "backend_status", None)
+    if raw is not None:
+        return str(raw)
+    for attr in ("per_hour", "hours"):
+        status = _latest_backend_status(getattr(carrier, attr, None))
+        if status is not None:
+            return status
+    return None
+
+
+def _latest_backend_status(value: Any) -> str | None:
+    if not isinstance(value, (list, tuple)) or not value:
+        return None
+    return _extract_backend_status(value[-1])
 
 
 def _warm_backend_name(tasks: Sequence[_PoolTask]) -> str | None:

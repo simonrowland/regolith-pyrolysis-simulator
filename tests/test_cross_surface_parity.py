@@ -70,26 +70,29 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
 
     assert {surface.final_hour for surface in surfaces} == {HOURS}
     assert batch.decisions == cli.decisions == web.decisions
-    assert batch.decisions == [("PATH_AB", "A"), ("BRANCH_ONE_TWO", "two")]
+    assert batch.decisions == [
+        ("PATH_AB", "A"),
+        ("BRANCH_ONE_TWO", "two"),
+        ("C6_PROCEED", "yes"),
+    ]
 
     campaigns = _campaigns(batch.summaries)
-    assert campaigns == ["C0", "C0B", "C2A", "C3_K", "C3_NA", "C4", "C5"]
+    assert campaigns == ["C0", "C0B", "C2A", "C3_K", "C3_NA", "C4", "C6"]
     assert _campaign_transition_exercised(batch.summaries)
     assert web.campaign_event_count >= 1
 
     assert EXPECTED_CORE_ACCOUNTS <= set(batch.ledger)
     for account in OPTIONAL_PRODUCT_ACCOUNTS:
         assert len({account in surface.ledger for surface in surfaces}) == 1
-    assert {"Fe", "Cr", "Mg", "Si"} <= set(
+    assert {"Fe", "Cr", "Si"} <= set(
         batch.ledger["process.condensation_train"]
     )
-    assert {"Na", "K"} <= set(batch.ledger["terminal.offgas"])
+    assert {"Na", "K", "Mg"} <= set(batch.ledger["terminal.offgas"])
     assert {"Al2O3", "CaO", "FeO", "MgO", "SiO2"} <= set(
         batch.ledger["process.cleaned_melt"]
     )
     assert batch.ledger["terminal.oxygen_melt_offgas_stored"].keys() == {"O2"}
-    if "terminal.oxygen_mre_anode_stored" in batch.ledger:
-        assert batch.ledger["terminal.oxygen_mre_anode_stored"].keys() == {"O2"}
+    assert batch.ledger.get("terminal.oxygen_mre_anode_stored", {}) == {}
 
     comparisons = [
         _compare_ledgers(batch, cli),

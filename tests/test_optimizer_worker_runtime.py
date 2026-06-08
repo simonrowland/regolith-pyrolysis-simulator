@@ -95,7 +95,7 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
         raise AssertionError("cold backend resolve should not run")
 
     monkeypatch.setattr(session_module, "resolve_backend", fail_cold_resolve)
-    seen: list[tuple[int, int, object]] = []
+    seen: list[tuple[object, object, object]] = []
 
     def record_session(
         self: RunExecutor,
@@ -104,7 +104,8 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
         hours: int,
     ) -> SimpleNamespace:
         sim = session.simulator
-        seen.append((id(sim), id(sim.atom_ledger), sim.backend))
+        # Keep strong refs; CPython may recycle id() after the first session is freed.
+        seen.append((sim, sim.atom_ledger, sim.backend))
         return SimpleNamespace(session=session, simulator=sim)
 
     monkeypatch.setattr(RunExecutor, "execute_session", record_session)
@@ -116,8 +117,8 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
     assert resolve_calls == ["stub"]
     assert seen[0][2] is context.backend
     assert seen[1][2] is context.backend
-    assert seen[0][0] != seen[1][0]
-    assert seen[0][1] != seen[1][1]
+    assert seen[0][0] is not seen[1][0]
+    assert seen[0][1] is not seen[1][1]
 
 
 def test_cold_env_forces_fresh_backend_resolve(

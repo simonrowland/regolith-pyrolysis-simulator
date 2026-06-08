@@ -58,6 +58,8 @@ class RunReference:
     reason: str = ""
     trace: Any = field(default=None, compare=False, repr=False)
     product_summary: Mapping[str, Any] = field(default_factory=dict)
+    backend_status: str | None = None
+    backend_authoritative: bool | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -65,6 +67,18 @@ class RunReference:
             "product_summary",
             MappingProxyType(dict(self.product_summary)),
         )
+        if self.backend_status is None:
+            backend_status = _backend_status_from_carrier(self.trace)
+            if backend_status is not None:
+                object.__setattr__(self, "backend_status", backend_status)
+        if self.backend_authoritative is None:
+            backend_authoritative = _backend_authoritative_from_carrier(self.trace)
+            if backend_authoritative is not None:
+                object.__setattr__(
+                    self,
+                    "backend_authoritative",
+                    backend_authoritative,
+                )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
@@ -75,6 +89,8 @@ class RunReference:
                 self.reason,
                 _thaw_value(self.trace),
                 _thaw_value(self.product_summary),
+                self.backend_status,
+                self.backend_authoritative,
             ),
         )
 
@@ -501,6 +517,8 @@ def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReferen
         reason=str(getattr(run_execution, "reason", "")),
         trace=getattr(run_execution, "trace", None),
         product_summary=summary,
+        backend_status=_latest_backend_status(run_execution),
+        backend_authoritative=_backend_authoritative(run_execution),
     )
 
 
@@ -546,6 +564,49 @@ def _latest_backend_status(run_execution: Any) -> str | None:
     if raw is not None:
         return str(raw)
     return None
+
+
+def _backend_authoritative(run_execution: Any) -> bool | None:
+    raw = getattr(run_execution, "backend_authoritative", None)
+    return bool(raw) if raw is not None else None
+
+
+def _backend_status_from_carrier(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, MappingABC):
+        raw = carrier.get("backend_status")
+        if raw is not None:
+            return str(raw)
+        for key in ("per_hour", "hours"):
+            status = _latest_backend_status_from_sequence(carrier.get(key))
+            if status is not None:
+                return status
+        return None
+    raw = getattr(carrier, "backend_status", None)
+    if raw is not None:
+        return str(raw)
+    for attr in ("per_hour", "hours"):
+        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
+        if status is not None:
+            return status
+    return None
+
+
+def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, MappingABC):
+        raw = carrier.get("backend_authoritative")
+        return bool(raw) if raw is not None else None
+    raw = getattr(carrier, "backend_authoritative", None)
+    return bool(raw) if raw is not None else None
+
+
+def _latest_backend_status_from_sequence(value: Any) -> str | None:
+    if not isinstance(value, (list, tuple)) or not value:
+        return None
+    return _backend_status_from_carrier(value[-1])
 
 
 def _ordered_failing_gates(values: Any) -> tuple[str, ...]:

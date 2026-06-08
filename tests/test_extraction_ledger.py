@@ -165,6 +165,13 @@ def _install_fixed_mre_provider(sim, **kwargs) -> None:
     )
 
 
+def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = target_species
+    sim.melt.mre_max_voltage_V = max_voltage_V
+    sim.campaign_mgr.c5_enabled = True
+
+
 def _assert_product_matches_account(sim, account, species):
     account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
     assert account_kg > 0.0
@@ -225,6 +232,7 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
     )
     sim.setpoints["campaigns"]["C5"] = {"c5_targets": ["Ca"]}
     sim.load_batch("oxide", mass_kg=10.0)
+    _enable_c5_mre(sim, target_species="CaO", max_voltage_V=2.5)
     sim.record.branch = "one"
     sim.start_campaign(CampaignPhase.C5)
 
@@ -246,7 +254,11 @@ def test_c5_branch_one_rump_expectation_honors_c5_targets():
         O2_kg=o2_kg,
         energy_kWh=1.25,
     )
-    sim._mre_voltage_sequence = [{"voltage": 2.5, "min_hold_hours": 1}]
+    sim._mre_voltage_sequence = [{
+        "voltage": 2.5,
+        "species": ["CaO"],
+        "min_hold_hours": 1,
+    }]
     sim._mre_voltage_step_idx = 0
     sim._mre_hold_hours = 0
     sim._mre_effective_current_A = 3000.0
@@ -278,6 +290,7 @@ def test_mre_reduction_records_atom_ledger_transition():
         }
     )
     sim.load_batch("feo", mass_kg=1000.0)
+    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.6)
 
     feo_removed_kg = 1.0
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
@@ -299,7 +312,11 @@ def test_mre_reduction_records_atom_ledger_transition():
     )
 
     sim.melt.campaign = CampaignPhase.C5
-    sim._mre_voltage_sequence = [{"voltage": 0.6, "min_hold_hours": 1}]
+    sim._mre_voltage_sequence = [{
+        "voltage": 0.6,
+        "species": ["FeO"],
+        "min_hold_hours": 1,
+    }]
     sim._mre_voltage_step_idx = 0
     sim._mre_hold_hours = 0
     sim._mre_effective_current_A = 100.0
@@ -343,6 +360,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
         }
     )
     sim.load_batch("feo", mass_kg=1000.0)
+    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.6)
 
     feo_removed_kg = 1.0
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
@@ -370,7 +388,11 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     )
 
     sim.melt.campaign = CampaignPhase.C5
-    sim._mre_voltage_sequence = [{"voltage": 0.6, "min_hold_hours": 1}]
+    sim._mre_voltage_sequence = [{
+        "voltage": 0.6,
+        "species": ["FeO"],
+        "min_hold_hours": 1,
+    }]
     sim._mre_voltage_step_idx = 0
     sim._mre_hold_hours = 0
     sim._mre_effective_current_A = 100.0

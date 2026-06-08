@@ -1,8 +1,9 @@
 """Tests for E6a north-star product-class classifier.
 
 Pins:
-1. The 5-bucket output shape (metals+O2 / silica / mixed glass /
-   rump / unclassified) on a fresh sim.
+1. The expanded output shape preserves the original 5 canonical
+   buckets (metals+O2 / silica / mixed glass / rump / unclassified)
+   and adds product-specific convenience views.
 2. Metal/O2 sums match the canonical METAL_PRODUCT_SPECIES list.
 3. Stage 3 capture reads SiO + SiO2 collected_kg.
 4. Defensive: missing methods / empty product_ledger don't raise.
@@ -55,24 +56,32 @@ def _config(**overrides) -> SimSessionConfig:
 # ---------------------------------------------------------------------------
 
 def test_classifier_returns_documented_5_bucket_shape():
-    """The classifier MUST return the documented 5-bucket dict so
-    downstream consumers (E6b runner CLI, web UI, log scrapers)
-    can rely on the schema."""
+    """The classifier MUST return the documented expanded dict while
+    preserving the original 5 canonical buckets for downstream
+    consumers (E6b runner CLI, web UI, log scrapers)."""
     session = SimSession().start(_config(campaign="C2A"))
     result = classify_products(session.simulator)
-    expected_buckets = {
+    canonical_buckets = {
         'metals_plus_O2',
         'pure_silica_glass',
         'industrial_mixed_glass',
         'refractory_ceramic_rump',
         'unclassified',
     }
-    assert set(result.keys()) == expected_buckets
+    additive_buckets = {
+        'ingots_metals',
+        'oxygen',
+        'glass',
+        'captured_volatiles',
+    }
+    assert canonical_buckets <= result.keys()
+    assert set(result.keys()) == canonical_buckets | additive_buckets
     # Each bucket carries a ``class_total_kg`` (or for unclassified,
     # ``total_kg``) so the operator can sum across classes.
     for bucket in (
         'metals_plus_O2', 'pure_silica_glass',
         'industrial_mixed_glass', 'refractory_ceramic_rump',
+        'ingots_metals', 'oxygen', 'glass', 'captured_volatiles',
     ):
         assert 'class_total_kg' in result[bucket]
         assert isinstance(result[bucket]['class_total_kg'], float)

@@ -1,8 +1,8 @@
 """E6c: tests for the three-product runner CLI.
 
 Pins:
-1. ``run()`` programmatic entry point returns the 5-bucket
-   classification dict.
+1. ``run()`` programmatic entry point returns the expanded
+   classification dict while preserving the 5 canonical buckets.
 2. ``main()`` CLI entry produces markdown OR json output to file
    per ``--format`` arg.
 3. ``--hours 0`` produces a well-formed report on a never-stepped
@@ -28,25 +28,33 @@ from simulator.three_product_runner import (
 
 def test_run_returns_classification_dict():
     """The programmatic ``run()`` entry point returns the same
-    5-bucket dict shape that ``classify_products`` produces."""
+    expanded dict shape that ``classify_products`` produces."""
     result = run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
         hours=2,
     )
-    assert set(result.keys()) == {
+    canonical_buckets = {
         'metals_plus_O2',
         'pure_silica_glass',
         'industrial_mixed_glass',
         'refractory_ceramic_rump',
         'unclassified',
     }
+    additive_buckets = {
+        'ingots_metals',
+        'oxygen',
+        'glass',
+        'captured_volatiles',
+    }
+    assert canonical_buckets <= result.keys()
+    assert set(result.keys()) == canonical_buckets | additive_buckets
 
 
 def test_run_with_zero_hours_returns_well_formed_baseline():
     """``--hours 0`` builds the sim but doesn't step it. The
-    classifier still returns a valid 5-bucket dict (likely with
-    empty metals_plus_O2 + zero stage_3 capture)."""
+    classifier still returns a valid canonical dict (likely with empty
+    metals_plus_O2 + zero stage_3 capture)."""
     result = run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",

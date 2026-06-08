@@ -879,6 +879,8 @@ def register_events(socketio):
                     state['run_id'],
                     lock,
                     state.get('backend_message', ''),
+                    state.get('backend_status', 'unavailable'),
+                    bool(state.get('backend_authoritative', False)),
                 )
 
     @socketio.on('adjust_parameter')

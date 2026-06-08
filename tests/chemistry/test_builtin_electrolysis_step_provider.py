@@ -62,6 +62,13 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
+def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = target_species
+    sim.melt.mre_max_voltage_V = max_voltage_V
+    sim.campaign_mgr.c5_enabled = True
+
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------
@@ -636,6 +643,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
         setpoints_data,
         additives_kg=additives_kg,
     )
+    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.5)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -747,6 +755,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
         setpoints_data,
         additives_kg=additives_kg,
     )
+    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.5)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",

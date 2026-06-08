@@ -550,7 +550,8 @@ def _artifact_backend_status(scored_result: ScoredResult) -> str | None:
     run_reference = getattr(scored_result, "run_reference", None)
     if run_reference is None:
         return None
-    return _extract_backend_status(getattr(run_reference, "trace", None))
+    raw = getattr(run_reference, "backend_status", None)
+    return str(raw) if raw is not None else None
 
 
 def _extract_backend_status(carrier: Any) -> str | None:
@@ -740,6 +741,8 @@ def _serialize_run_reference(run_reference: RunReference | None) -> dict[str, An
         "error_message": run_reference.error_message,
         "reason": run_reference.reason,
         "product_summary": _jsonable(run_reference.product_summary),
+        "backend_status": run_reference.backend_status,
+        "backend_authoritative": run_reference.backend_authoritative,
     }
 
 
@@ -755,6 +758,12 @@ def _deserialize_run_reference(
         reason=str(payload.get("reason", "")),
         trace=result_blob,
         product_summary=payload.get("product_summary", {}),
+        backend_status=(
+            str(payload["backend_status"])
+            if payload.get("backend_status") is not None
+            else None
+        ),
+        backend_authoritative=payload.get("backend_authoritative"),
     )
 
 
@@ -763,7 +772,19 @@ def _result_blob(scored_result: ScoredResult) -> Any:
         return _jsonable(getattr(scored_result, "result_blob"))
     if scored_result.run_reference is None:
         return None
-    return _jsonable(scored_result.run_reference.trace)
+    try:
+        return _jsonable(scored_result.run_reference.trace)
+    except (TypeError, ValueError):
+        return _storage_run_reference_trace(scored_result.run_reference)
+
+
+def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
+    trace: dict[str, Any] = {}
+    if run_reference.backend_status is not None:
+        trace["backend_status"] = run_reference.backend_status
+    if run_reference.backend_authoritative is not None:
+        trace["backend_authoritative"] = run_reference.backend_authoritative
+    return trace
 
 
 def _jsonable(value: Any) -> Any:

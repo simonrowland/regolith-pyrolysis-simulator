@@ -20,6 +20,14 @@ canonical surfaces (``product_ledger`` + ``train.stages`` +
 ``_terminal_rump_by_species``) and projects onto a single dict; it
 does NOT mutate any account.
 
+Public contract: the original five canonical buckets
+(``metals_plus_O2``, ``pure_silica_glass``,
+``industrial_mixed_glass``, ``refractory_ceramic_rump``,
+``unclassified``) remain stable. PROD-1 added additive convenience
+views (``ingots_metals``, ``oxygen``, ``glass``,
+``captured_volatiles``) for product-specific UI/report slices without
+removing or reshaping the canonical buckets.
+
 E6a scope: the classifier function. E6b (deferred) is the runner CLI
 + markdown report wrapping E6a.
 """
@@ -105,6 +113,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'metals_kg': {species: kg, ...},
                 'metals_total_kg': float,
                 'O2_kg': float,
+                'O2_partition_kg': {bin: kg, ...},
+                'class_total_kg': float,
+            },
+            'ingots_metals': {
+                'species_kg': {species: kg, ...},
+                'class_total_kg': float,
+            },
+            'oxygen': {
+                'O2_kg': float,
+                'partition_kg': {bin: kg, ...},
                 'class_total_kg': float,
             },
             'pure_silica_glass': {
@@ -112,13 +130,26 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'stage_3_kg_by_species': {species: kg, ...},
                 'class_total_kg': float,
             },
+            'glass': {
+                'species_kg': {species: kg, ...},
+                'class_total_kg': float,
+                'pure_silica_glass_kg': float,
+                'industrial_mixed_glass_kg': float,
+            },
             'industrial_mixed_glass': {
                 'mixed_melt_residual_kg': float,
+                'early_tap_mode': bool,
                 'note': 'present only if recipe tapped early',
+                'class_total_kg': float,
+            },
+            'captured_volatiles': {
+                'kg_by_species': {species: kg, ...},
+                'class_total_kg': float,
             },
             'refractory_ceramic_rump': {
                 'rump_kg_by_species': {species: kg, ...},
                 'rump_total_kg': float,
+                'class_total_kg': float,
             },
             'unclassified': {
                 'kg_by_species': {species: kg, ...},
