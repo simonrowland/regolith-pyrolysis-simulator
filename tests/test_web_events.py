@@ -1,10 +1,13 @@
+from types import SimpleNamespace
+
 import pytest
 
 import app as app_module
-from simulator.core import PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy
+from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.session import drive_auto_apply
+from simulator.state import EvaporationFlux
 from web.events import (
     BackendUnavailableError,
     _clear_simulation_state,
@@ -16,6 +19,7 @@ from web.events import (
     _start_payload,
     _sim_locks,
     _simulations,
+    _tick_payload,
 )
 
 
@@ -228,6 +232,132 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert payload["mass_balance_error_pct"] == pytest.approx(0.0)
     assert payload["stage0_mass_balance_delta_kg"] == pytest.approx(0.0)
     assert "residual_inventory_kg" in payload
+
+
+def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
+    captured_tasks = []
+    drive_calls = {"count": 0}
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def run_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        target()
+        return {"captured_task": len(captured_tasks)}
+
+    def one_tick_drive(session, *args, **kwargs):
+        drive_calls["count"] += 1
+        if drive_calls["count"] > 1:
+            return iter(())
+        snapshot = session.simulator._make_snapshot()
+        snapshot.hour = 1
+        snapshot.evap_flux = EvaporationFlux(
+            species_kg_hr={"Na": 1.25, "SiO": 0.5},
+        )
+        snapshot.evap_flux.update_totals()
+        snapshot.melt_offgas_O2_mol_hr = 2.0
+        return iter([
+            SimpleNamespace(
+                snapshot=snapshot,
+                backend_error="",
+                per_hour_summary={"hour": 1},
+                campaign_summary=None,
+                decision_event=None,
+            )
+        ])
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events.drive_session", one_tick_drive)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        received = client.get_received()
+        ticks = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_tick"
+        ]
+
+        assert len(ticks) == 1
+        tick = ticks[0]
+        assert tick["pot_composition"]["SiO2"] > 0
+        assert tick["pot_composition_units"] == "kg"
+        assert tick["pot_composition_wt_pct"]["SiO2"] > 0
+        assert tick["flue_composition"]["Na"] == pytest.approx(1.25)
+        assert tick["flue_composition"]["SiO"] == pytest.approx(0.5)
+        assert tick["flue_composition"]["O2"] == pytest.approx(
+            2.0 * 31.998 / 1000.0
+        )
+        assert tick["flue_composition_units"] == "kg/hr"
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+class RaisingCleanedMeltLedger:
+    def kg_by_account(self, account):
+        assert account == "process.cleaned_melt"
+        raise RuntimeError("cleaned melt unavailable")
+
+
+@pytest.mark.parametrize("ledger", [None, RaisingCleanedMeltLedger()])
+def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
+    ledger,
+):
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 34.0,
+                },
+            },
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    snapshot = sim._make_snapshot()
+    assert snapshot.inventory.melt_oxide_kg["SiO2"] > 0
+    sim.atom_ledger = ledger
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="stub",
+        backend_authoritative=False,
+    )
+
+    assert payload["pot_composition"] == {}
+    assert payload["pot_composition_wt_pct"] == {}
 
 
 def test_web_pause_resume_is_result_neutral(monkeypatch):

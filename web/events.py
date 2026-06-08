@@ -23,6 +23,7 @@ from simulator.session import (
     SimSessionConfig,
     drive_session,
 )
+from simulator.state import MOLAR_MASS
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
 # runner share ONE per-hour summary builder.  ``SimSession.advance()``
 # owns that runner-format summary and returns it in ``StepResult``; this
@@ -45,6 +46,7 @@ def _load_yaml(filename):
 _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
+_O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 
 
 def _safe_log(message: str) -> None:
@@ -169,6 +171,50 @@ def _decision_payload(decision):
     }
 
 
+def _rounded_positive_species(values, digits: int) -> dict[str, float]:
+    species = {}
+    for key, value in dict(values or {}).items():
+        amount = float(value or 0.0)
+        if amount > 1e-12:
+            species[str(key)] = round(amount, digits)
+    return dict(sorted(species.items()))
+
+
+def _wt_pct_from_kg(species_kg: dict[str, float]) -> dict[str, float]:
+    total_kg = sum(float(value or 0.0) for value in species_kg.values())
+    if total_kg <= 0.0:
+        return {}
+    return {
+        species: round(float(kg) / total_kg * 100.0, 2)
+        for species, kg in sorted(species_kg.items())
+        if float(kg or 0.0) > 1e-12
+    }
+
+
+def _pot_composition_kg(sim, snapshot) -> dict[str, float]:
+    ledger = getattr(sim, 'atom_ledger', None)
+    if ledger is None:
+        return {}
+    try:
+        return _rounded_positive_species(
+            ledger.kg_by_account('process.cleaned_melt'), 4)
+    except Exception as exc:
+        _safe_log(f'Unable to read cleaned-melt ledger for web tick: {exc}')
+        return {}
+
+
+def _flue_composition_kg_hr(snapshot) -> dict[str, float]:
+    flue = dict(getattr(snapshot.evap_flux, 'species_kg_hr', {}) or {})
+    o2_kg_hr = max(
+        0.0,
+        float(getattr(snapshot, 'melt_offgas_O2_mol_hr', 0.0) or 0.0)
+        * _O2_KG_PER_MOL,
+    )
+    if o2_kg_hr > 1e-12:
+        flue['O2'] = flue.get('O2', 0.0) + o2_kg_hr
+    return _rounded_positive_species(flue, 6)
+
+
 def _start_payload(
     *,
     sim,
@@ -203,11 +249,16 @@ def _tick_payload(
     backend_error: str = '',
 ):
     """Build the public per-tick payload."""
+    pot_composition = _pot_composition_kg(sim, snapshot)
+    flue_composition = _flue_composition_kg_hr(snapshot)
     return {
         'hour': snapshot.hour,
         'campaign': snapshot.campaign.name,
         'temperature_C': round(snapshot.temperature_C, 1),
         'melt_mass_kg': round(snapshot.melt_mass_kg, 1),
+        'pot_composition': pot_composition,
+        'pot_composition_units': 'kg',
+        'pot_composition_wt_pct': _wt_pct_from_kg(pot_composition),
         'composition_wt_pct': {
             k: round(v, 2) for k, v in snapshot.composition_wt_pct.items()
         },
@@ -274,6 +325,15 @@ def _tick_payload(
         'evap_species': {
             k: round(v, 4) for k, v in snapshot.evap_flux.species_kg_hr.items()
         },
+        'flue_composition': flue_composition,
+        'flue_composition_units': 'kg/hr',
+        'flue_partial_pressure_mbar': _rounded_positive_species(
+            getattr(snapshot.overhead, 'composition', {}) or {}, 6),
+        'flue_composition_note': (
+            '' if flue_composition else
+            'No gas-offtake species flow reported for this tick; '
+            'partial pressures are surfaced separately when available.'
+        ),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),

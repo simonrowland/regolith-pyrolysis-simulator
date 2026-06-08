@@ -4,6 +4,19 @@
 
 // --- Real-time update handler ---
 
+const liveGraphColors = [
+    '#6366f1', '#dc2626', '#22c55e', '#eab308', '#06b6d4',
+    '#f97316', '#ec4899', '#14b8a6', '#8b5cf6', '#64748b',
+];
+let potCompositionInitialized = false;
+let potCompositionTraces = {};
+let potCompositionHours = [];
+let potCompositionLastHour = null;
+let flueCompositionInitialized = false;
+let flueCompositionTraces = {};
+let flueCompositionHours = [];
+let flueCompositionLastHour = null;
+
 socket.on('simulation_tick', (data) => {
     // Status bar
     const setEl = (id, text) => { const e = document.getElementById(id); if (e) e.textContent = text; };
@@ -55,6 +68,14 @@ socket.on('simulation_tick', (data) => {
     if (compIndices.length > 0) {
         Plotly.extendTraces('chart-composition', compUpdate, compIndices);
     }
+    updateLiveCompositionChart(
+        'chart-pot-composition',
+        data.pot_composition || {},
+        data.hour,
+        'Pot / Melt Composition',
+        data.pot_composition_units || 'kg',
+        'pot',
+    );
 
     // Absolute composition chart (oxides above, metals below x-axis)
     if (!absInitialized) initAbsoluteChart();
@@ -108,6 +129,14 @@ socket.on('simulation_tick', (data) => {
             Plotly.extendTraces('chart-massflow', flowUpdate, flowIndices);
         }
     }
+    updateLiveCompositionChart(
+        'chart-flue-composition',
+        data.flue_composition || {},
+        data.hour,
+        'Gas Offtake / Flue Composition',
+        data.flue_composition_units || 'kg/hr',
+        'flue',
+    );
 
     // Condensation train DOM update (cond already declared above)
     for (const [species, kg] of Object.entries(cond)) {
@@ -251,6 +280,88 @@ socket.on('simulation_tick', (data) => {
     }
 });
 
+function updateLiveCompositionChart(chartId, speciesMap, hour, title, units, mode) {
+    const chart = document.getElementById(chartId);
+    if (!chart) return;
+
+    const state = mode === 'pot'
+        ? {
+            initialized: potCompositionInitialized,
+            traces: potCompositionTraces,
+            hours: potCompositionHours,
+            lastHour: potCompositionLastHour,
+            setInitialized: (value) => { potCompositionInitialized = value; },
+            setTraces: (value) => { potCompositionTraces = value; },
+            setHours: (value) => { potCompositionHours = value; },
+            setLastHour: (value) => { potCompositionLastHour = value; },
+        }
+        : {
+            initialized: flueCompositionInitialized,
+            traces: flueCompositionTraces,
+            hours: flueCompositionHours,
+            lastHour: flueCompositionLastHour,
+            setInitialized: (value) => { flueCompositionInitialized = value; },
+            setTraces: (value) => { flueCompositionTraces = value; },
+            setHours: (value) => { flueCompositionHours = value; },
+            setLastHour: (value) => { flueCompositionLastHour = value; },
+        };
+
+    const reset = !state.initialized || (
+        state.lastHour !== null && Number(hour) <= Number(state.lastHour)
+    );
+    if (reset) {
+        Plotly.newPlot(chartId, [], liveCompositionLayout(title, units), chartConfig);
+        state.setInitialized(true);
+        state.setTraces({});
+        state.setHours([]);
+    }
+
+    const traces = mode === 'pot' ? potCompositionTraces : flueCompositionTraces;
+    const hours = mode === 'pot' ? potCompositionHours : flueCompositionHours;
+    const reportedSpecies = speciesMap || {};
+    const keys = Object.keys(reportedSpecies).sort();
+    for (const species of keys) {
+        if (traces[species] !== undefined) continue;
+        const idx = Object.keys(traces).length;
+        Plotly.addTraces(chartId, {
+            x: hours.slice(),
+            y: hours.map(() => null),
+            mode: 'lines',
+            name: species,
+            line: { color: liveGraphColors[idx % liveGraphColors.length], width: 2 },
+            hovertemplate: species + ': %{y:.4g} ' + units + '<extra></extra>',
+        });
+        traces[species] = idx;
+    }
+
+    hours.push(hour);
+    const update = { x: [], y: [] };
+    const indices = [];
+    for (const [species, idx] of Object.entries(traces)) {
+        update.x.push([hour]);
+        update.y.push([
+            Object.hasOwn(reportedSpecies, species)
+                ? reportedSpecies[species]
+                : null,
+        ]);
+        indices.push(idx);
+    }
+    if (indices.length > 0) {
+        Plotly.extendTraces(chartId, update, indices);
+    }
+    state.setLastHour(hour);
+}
+
+function liveCompositionLayout(title, units) {
+    return {
+        ...chartLayout,
+        title: { text: title, font: { size: 13 } },
+        yaxis: { ...chartLayout.yaxis, title: units },
+        hovermode: 'x unified',
+        legend: { x: 1.02, y: 1, font: { size: 9 } },
+    };
+}
+
 // --- Gas train bar helper ---
 function updateBar(barId, pct) {
     const bar = document.getElementById(barId);
@@ -286,6 +397,9 @@ function updateDebugInventoryComment(data) {
             drain_tap: data.drain_tap_kg || {},
             buckets: data.process_buckets_kg || {},
             condensation: data.condensation || {},
+            pot_composition: data.pot_composition || {},
+            flue_composition: data.flue_composition || {},
+            flue_partial_pressure_mbar: data.flue_partial_pressure_mbar || {},
         },
         oxygen_accounts_kg: {
             total: data.oxygen_kg || 0,
