@@ -25,6 +25,18 @@ function setConnectionReady(ready) {
 
 setConnectionReady(false);
 
+function updateBackendBadge(data) {
+    const badge = document.getElementById('status-backend');
+    if (!badge || !data) return;
+    const active = data.backend_active || 'unknown';
+    const status = data.backend_status || 'unknown';
+    const authoritative = data.backend_authoritative === true;
+    badge.textContent = `Backend: ${active} / ${status}`;
+    badge.className = 'backend-badge '
+        + (authoritative ? 'backend-badge-ok' : 'backend-badge-stub');
+    badge.title = data.backend_status_message || data.backend_message || '';
+}
+
 socket.on('connect', () => {
     console.log('Connected to simulator server');
     const el = document.getElementById('status-text');
@@ -59,6 +71,7 @@ socket.on('simulation_status', (data) => {
     const detail = data.message || data.backend_message || '';
     const suffix = detail ? ` — ${detail}` : '';
     if (el) el.textContent = `${data.status}${suffix}`;
+    updateBackendBadge(data);
     if (data.message) console.log(data.message);
     if (data.backend_message) console.log(data.backend_message);
     if (data.status === 'error') {

@@ -12,6 +12,18 @@ from urllib.parse import quote
 from flask import Blueprint, Response, current_app, render_template, jsonify, request
 import yaml
 
+from simulator.backends import BackendResolutionStatus, backend_resolution_status
+from simulator.condensation import (
+    BOLTZMANN_CONSTANT_J_K,
+    CONTINUUM_BUFFER_KN,
+    DEFAULT_PIPE_DIAMETER_M,
+    N2_COLLISION_DIAMETER_M,
+)
+from simulator.mre_ladder import (
+    filter_steps_up_to_max_v,
+    parse_ladder_from_setpoints,
+    preset_catalog as build_mre_preset_catalog,
+)
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -31,6 +43,11 @@ OPTIMIZER_ARTIFACT_NAMES = (
     'pareto.json',
     'provenance.jsonl',
 )
+
+
+class _StoredBackendResolutionCarrier:
+    def __init__(self, resolution: BackendResolutionStatus) -> None:
+        self.backend_resolution_status = resolution
 
 
 def _load_yaml(filename):
@@ -162,6 +179,50 @@ def _eval_spec_summary(payload: Any) -> dict[str, Any]:
     return {key: payload[key] for key in keys if key in payload}
 
 
+def _latest_backend_status(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, Mapping):
+        raw = carrier.get('backend_status')
+        if raw is not None:
+            return str(raw)
+        for key in ('per_hour', 'hours', 'trace', 'result_blob'):
+            status = _latest_backend_status(carrier.get(key))
+            if status is not None:
+                return status
+        return None
+    if isinstance(carrier, (list, tuple)):
+        for item in reversed(carrier):
+            status = _latest_backend_status(item)
+            if status is not None:
+                return status
+        return None
+    raw = getattr(carrier, 'backend_status', None)
+    return str(raw) if raw is not None else None
+
+
+def _optimizer_backend_payload(
+    eval_spec: Mapping[str, Any],
+    result_blob: Mapping[str, Any],
+    run_reference: Mapping[str, Any],
+) -> dict[str, Any]:
+    requested = str(eval_spec.get('backend_name') or 'not declared')
+    stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
+    if stored_status is None:
+        stored_status = 'unavailable'
+    stubish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
+    backend_status = 'unavailable' if stubish else stored_status
+    resolution = BackendResolutionStatus(
+        requested_backend=requested,
+        active_backend='StubBackend' if stubish else requested,
+        backend_status=backend_status,
+        authoritative=backend_status == 'ok' and not stubish,
+        selection_policy='stored-result',
+        message='stored optimizer backend status',
+    )
+    return backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
+
+
 def _result_metadata(
     row: sqlite3.Row,
     *,
@@ -170,9 +231,15 @@ def _result_metadata(
 ) -> dict[str, Any]:
     objectives = _objective_items(row)
     selected = _objective_for(objectives, objective_metric)
+    result_blob = _json_value(row['result_blob'], {})
+    if not isinstance(result_blob, dict):
+        result_blob = {}
     run_reference = _json_value(row['run_reference'], {})
     if not isinstance(run_reference, dict):
         run_reference = {}
+    eval_spec = _json_value(row['eval_spec'], {})
+    if not isinstance(eval_spec, dict):
+        eval_spec = {}
     product_summary = run_reference.get('product_summary', {})
     if not isinstance(product_summary, dict):
         product_summary = {}
@@ -196,7 +263,8 @@ def _result_metadata(
             'error_message': run_reference.get('error_message', ''),
             'product_summary': product_summary,
         },
-        'eval_spec': _eval_spec_summary(_json_value(row['eval_spec'], {})),
+        'eval_spec': _eval_spec_summary(eval_spec),
+        'backend': _optimizer_backend_payload(eval_spec, result_blob, run_reference),
         'notes': _json_value(row['notes'], []),
     }
     for key in (
@@ -467,6 +535,62 @@ def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
         'profiles': profiles,
         'feedstocks': feedstocks,
     }
+
+
+def _mre_preset_catalog_payload() -> list[dict[str, Any]]:
+    setpoints = _load_yaml('setpoints.yaml')
+    ladder = parse_ladder_from_setpoints(setpoints)
+    raw_presets = [dict(preset) for preset in build_mre_preset_catalog(setpoints)]
+    disabled_targets = {
+        str(preset.get('mre_target_species') or '')
+        for preset in raw_presets
+        if preset.get('c5_enabled') and not preset.get('enabled')
+    }
+    presets = []
+    for row in raw_presets:
+        included_species: list[str] = []
+        if row.get('c5_enabled'):
+            for step in filter_steps_up_to_max_v(
+                ladder,
+                row.get('mre_max_voltage_V'),
+            ):
+                for species in step.get('species', ()):
+                    species_name = str(species)
+                    if species_name in disabled_targets:
+                        continue
+                    included = _oxide_target_label(species_name)
+                    if included not in included_species:
+                        included_species.append(included)
+        row['included_species'] = included_species
+        row['included_species_label'] = (
+            ', '.join(included_species)
+            if included_species
+            else 'none'
+        )
+        row.setdefault('disabled_reason', '')
+        presets.append(row)
+    return presets
+
+
+def _knudsen_config_payload() -> dict[str, float]:
+    return {
+        'boltzmann_constant_j_k': BOLTZMANN_CONSTANT_J_K,
+        'characteristic_length_m': DEFAULT_PIPE_DIAMETER_M,
+        'n2_collision_diameter_m': N2_COLLISION_DIAMETER_M,
+        'continuum_buffer_kn': CONTINUUM_BUFFER_KN,
+    }
+
+
+def _oxide_target_label(target_oxide: str) -> str:
+    token = ''
+    for char in target_oxide:
+        if not token and char.isalpha():
+            token = char
+        elif token and char.islower():
+            token += char
+        elif token:
+            break
+    return token or target_oxide
 
 
 def _float_value(value: Any) -> float | None:
@@ -1041,6 +1165,8 @@ def simulator():
     return render_template(
         'simulator.html',
         feedstocks=feedstocks,
+        mre_presets=_mre_preset_catalog_payload(),
+        knudsen_config=_knudsen_config_payload(),
         debug_feedstocks=debug_feedstocks,
         debug_mode=debug_feedstocks_enabled(),
     )
@@ -1134,6 +1260,27 @@ def optimizer_runs():
 def optimizer_feedstock_profiles():
     """Scan optimize profile YAML files into a feedstock/profile lookup."""
     return jsonify(_optimizer_feedstock_profiles_payload())
+
+
+@bp.route('/api/mre-preset-catalog')
+def mre_preset_catalog():
+    """Return the shared MRE target preset catalog for web forms."""
+    return jsonify({'presets': _mre_preset_catalog_payload()})
+
+
+@bp.route('/api/knudsen-config')
+def knudsen_config():
+    """Return read-only Knudsen display constants from the condensation model."""
+    return jsonify(_knudsen_config_payload())
+
+
+@bp.route('/partials/mre-preset-catalog')
+def mre_preset_catalog_partial():
+    """HTMX fragment for the shared MRE target preset catalog."""
+    return render_template(
+        'partials/mre_preset_catalog.html',
+        presets=_mre_preset_catalog_payload(),
+    )
 
 
 @bp.route('/api/optimizer/leaderboard')

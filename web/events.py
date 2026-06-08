@@ -1,5 +1,6 @@
 """SocketIO event handlers for the simulator interface."""
 
+from collections.abc import Mapping
 import threading
 import uuid
 from pathlib import Path
@@ -162,6 +163,34 @@ def _backend_name_for_session(backend) -> str:
     return 'stub'
 
 
+def _coerce_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+    return bool(value)
+
+
+def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
+    if not isinstance(value, Mapping):
+        return {}
+    overrides: dict[str, dict[str, float]] = {}
+    for campaign, fields in value.items():
+        if not campaign or not isinstance(fields, Mapping):
+            continue
+        clean_fields: dict[str, float] = {}
+        for field_name, field_value in fields.items():
+            if not field_name:
+                continue
+            try:
+                clean_fields[str(field_name)] = float(field_value)
+            except (TypeError, ValueError):
+                continue
+        if clean_fields:
+            overrides[str(campaign)] = clean_fields
+    return overrides
+
+
 def _decision_payload(decision):
     return {
         'type': decision.decision_type.name,
@@ -225,18 +254,30 @@ def _start_payload(
     backend_status: str,
     backend_authoritative: bool,
     backend_message: str,
+    backend_payload: Mapping[str, object] | None = None,
+    c5_enabled: bool = False,
+    mre_target_species: str = '',
+    mre_max_voltage_V: float = 0.0,
 ):
     """Build the public start status payload."""
-    return {
+    payload = {
         'status': 'started',
         'feedstock': feedstock_key,
         'mass_kg': mass_kg,
-        'backend_requested': backend_requested,
-        'backend_active': backend_active,
-        'backend_status': backend_status,
-        'backend_authoritative': backend_authoritative,
         'backend_message': backend_message,
+        'c5_enabled': bool(c5_enabled),
+        'mre_target_species': str(mre_target_species or ''),
+        'mre_max_voltage_V': float(mre_max_voltage_V or 0.0),
     }
+    if backend_payload is None:
+        backend_payload = {
+            'backend_requested': backend_requested,
+            'backend_active': backend_active,
+            'backend_status': backend_status,
+            'backend_authoritative': backend_authoritative,
+        }
+    payload.update(dict(backend_payload))
+    return payload
 
 
 def _tick_payload(
@@ -690,6 +731,15 @@ def register_events(socketio):
 
         # User-configurable parameters
         c4_max_temp = float(data.get('c4_max_temp_C', 1670))
+        c5_enabled = _coerce_bool(data.get('c5_enabled', False))
+        mre_target_species = str(data.get('mre_target_species') or '').strip()
+        mre_max_voltage_V = float(data.get('mre_max_voltage_V') or 0.0)
+        if not c5_enabled:
+            mre_target_species = ''
+            mre_max_voltage_V = 0.0
+        runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
+            data.get('runtime_campaign_overrides')
+        )
 
         # Additives from inventory (Na, K, Mg, Ca, C)
         raw_additives = data.get('additives', {})
@@ -708,8 +758,12 @@ def register_events(socketio):
                     backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
                     mass_kg=mass_kg,
                     additives_kg=additives_kg,
+                    runtime_campaign_overrides=runtime_campaign_overrides,
                     track=track,
                     c4_max_temp=c4_max_temp,
+                    c5_enabled=c5_enabled,
+                    mre_target_species=mre_target_species,
+                    mre_max_voltage_V=mre_max_voltage_V,
                     unavailable_error_cls=BackendUnavailableError,
                 )
             )
@@ -743,6 +797,10 @@ def register_events(socketio):
                 backend_status=resolution_status.backend_status,
                 backend_authoritative=resolution_status.authoritative,
                 backend_message=backend_message,
+                backend_payload=resolution_status.as_payload(),
+                c5_enabled=c5_enabled,
+                mre_target_species=mre_target_species,
+                mre_max_voltage_V=mre_max_voltage_V,
             ),
         )
         _start_background_loop(

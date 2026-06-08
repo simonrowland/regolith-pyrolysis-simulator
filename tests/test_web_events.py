@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 import app as app_module
-from simulator.backends import BackendSelectionPolicy
+from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.session import drive_auto_apply
@@ -136,6 +136,7 @@ def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
 
 
 def test_web_start_payload_exposes_backend_status():
+    expected_backend = backend_resolution_status(StubBackend()).as_payload()
     payload = _start_payload(
         sim=object(),
         feedstock_key="lunar_mare_low_ti",
@@ -145,10 +146,93 @@ def test_web_start_payload_exposes_backend_status():
         backend_status="unavailable",
         backend_authoritative=False,
         backend_message="Using built-in fallback",
+        backend_payload=expected_backend,
+        c5_enabled=True,
+        mre_target_species="SiO2",
+        mre_max_voltage_V=1.4,
     )
 
+    for key, value in expected_backend.items():
+        assert payload[key] == value
     assert payload["backend_status"] == "unavailable"
     assert payload["backend_authoritative"] is False
+    assert payload["c5_enabled"] is True
+    assert payload["mre_target_species"] == "SiO2"
+    assert payload["mre_max_voltage_V"] == pytest.approx(1.4)
+
+
+def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "c5_enabled": True,
+                "mre_target_species": "SiO2",
+                "mre_max_voltage_V": 1.4,
+                "runtime_campaign_overrides": {
+                    "C4": {
+                        "pO2_mbar": 0.2,
+                        "hold_temp_C": 1600,
+                        "max_hours": 24,
+                        "ramp_rate": 10,
+                    }
+                },
+            },
+        )
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses
+        started = statuses[-1]
+        assert started["c5_enabled"] is True
+        assert started["mre_target_species"] == "SiO2"
+        assert started["mre_max_voltage_V"] == pytest.approx(1.4)
+        assert started["backend_status"] == "unavailable"
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        sim = state["session"].simulator
+        assert sim.melt.c5_enabled is True
+        assert sim.melt.mre_target_species == "SiO2"
+        assert sim.melt.mre_max_voltage_V == pytest.approx(1.4)
+        assert sim.campaign_mgr.overrides["C4"]["pO2_mbar"] == pytest.approx(0.2)
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
 
 
 def test_replacing_simulation_state_stops_prior_run():

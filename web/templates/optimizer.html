@@ -5,6 +5,10 @@
 <section class="main-area">
     <div class="section-card">
         <h2>Optimizer Results</h2>
+        <p class="config-hint">
+            Mode C is read-only browse over stored ResultStore artifacts; launching
+            a new study from an EvalSpec form is deferred to C+ / W-B.
+        </p>
         <form id="optimizer-filters"
               class="campaign-controls"
               hx-get="{{ url_for('web.optimizer_table_partial') }}"

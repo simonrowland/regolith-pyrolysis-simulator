@@ -62,6 +62,89 @@
             </label>
         </fieldset>
 
+        <fieldset class="config-group" id="mre-config">
+            <legend>MRE Policy</legend>
+            <label class="toggle-row">
+                <input type="checkbox" id="mre-enabled">
+                Enable C5 limited MRE
+            </label>
+            <div class="mre-config-body" id="mre-fields" hidden>
+                <label>
+                    Target species:
+                    <select id="mre-preset"
+                            aria-label="MRE target species"
+                            data-catalog-url="{{ url_for('web.mre_preset_catalog') }}">
+                        {% with presets=mre_presets %}
+                        {% include "partials/mre_preset_catalog.html" %}
+                        {% endwith %}
+                    </select>
+                </label>
+                <label>
+                    Derived max voltage (V):
+                    <input type="number" id="mre-max-voltage" value="0" readonly>
+                </label>
+                <div class="config-hint" id="mre-included-species">Included species: none</div>
+            </div>
+        </fieldset>
+
+        <fieldset class="config-group" id="recipe-levers">
+            <legend>Recipe Levers</legend>
+            <label>
+                Stage:
+                <select id="lever-campaign" aria-label="Recipe lever campaign">
+                    <option value="C2A">C2A continuous</option>
+                    <option value="C2A_staged">C2A staged</option>
+                    <option value="C2B">C2B</option>
+                    <option value="C3_K">C3 K phase</option>
+                    <option value="C3_NA">C3 Na phase</option>
+                    <option value="C4" selected>C4 Mg pyrolysis</option>
+                    <option value="C5">C5 MRE</option>
+                </select>
+            </label>
+            <label>
+                pO2 (mbar):
+                <input type="number" id="lever-po2-mbar" class="recipe-lever"
+                       data-param="pO2_mbar" data-field="pO2_mbar" min="0" step="0.001" value="0.2">
+            </label>
+            <label>
+                Total overhead / pN2 sweep (mbar):
+                <input type="number" id="lever-pn2-mbar" min="0" step="0.1" value="10">
+            </label>
+            <div id="knudsen-indicator"
+                 class="config-hint"
+                 data-boltzmann-constant-j-k="{{ knudsen_config.boltzmann_constant_j_k }}"
+                 data-characteristic-length-m="{{ knudsen_config.characteristic_length_m }}"
+                 data-n2-collision-diameter-m="{{ knudsen_config.n2_collision_diameter_m }}"
+                 data-continuum-buffer-kn="{{ knudsen_config.continuum_buffer_kn }}">Kn: —</div>
+            <label>
+                Stage target T (&deg;C):
+                <input type="number" id="lever-stage-temp" class="recipe-lever"
+                       data-field="hold_temp_C" min="20" step="10" value="1600">
+            </label>
+            <label>
+                Stage duration (h):
+                <input type="number" id="lever-stage-duration" class="recipe-lever"
+                       data-field="max_hours" min="0" step="0.5" value="24">
+            </label>
+            <label>
+                Ramp (&deg;C/h):
+                <input type="number" id="lever-stage-ramp" class="recipe-lever"
+                       data-field="ramp_rate" min="0" step="1" value="10">
+            </label>
+            <label>
+                C4 furnace cap (&deg;C):
+                <input type="number" id="c4-max-temp" min="1000" step="10" value="1670">
+            </label>
+            <div class="chip-row" aria-label="Wall temperature offset display">
+                <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">-50</button>
+                <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">nominal</button>
+                <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">+50</button>
+                <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">+100</button>
+            </div>
+            <div id="lever-warning" class="config-warning" hidden></div>
+            <div class="config-hint">pN2 and wall-temperature controls are display-only until runtime support lands.</div>
+        </fieldset>
+
         <!-- Additives -->
         <fieldset class="config-group">
             <legend>Additives from Inventory (kg)</legend>
@@ -106,6 +189,7 @@
             <span id="status-temp">T: — &deg;C</span>
             <span id="status-mass">Melt: — kg</span>
             <span id="status-atmosphere">Atmosphere: —</span>
+            <span id="status-backend" class="backend-badge backend-badge-unknown" title="Backend status not selected">Backend: —</span>
             <span id="status-ramp" class="status-indicator" style="display:none" aria-live="polite">THROTTLED</span>
             <span id="status-vent" class="status-indicator status-danger" style="display:none" role="alert">VENTING</span>
         </div>

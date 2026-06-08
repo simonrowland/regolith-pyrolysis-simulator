@@ -10,6 +10,7 @@
                 <th>Feasible</th>
                 <th>Study date</th>
                 <th>Fidelity</th>
+                <th>Backend</th>
                 <th>Provenance</th>
                 <th>Completeness</th>
                 <th>Coating</th>
@@ -37,6 +38,12 @@
                 <td>{{ "yes" if entry.feasible else "no" }}</td>
                 <td>{{ entry.created_at }}</td>
                 <td>{{ entry.fidelity }}</td>
+                <td>
+                    <span class="backend-badge {{ 'backend-badge-ok' if entry.backend.backend_authoritative else 'backend-badge-stub' }}"
+                          title="{{ entry.backend.backend_status_message }}">
+                        {{ entry.backend.backend_active }} / {{ entry.backend.backend_status }}
+                    </span>
+                </td>
                 <td>
                     Run {{ entry.run_id }}<br>
                     Candidate {{ entry.candidate_id }}<br>

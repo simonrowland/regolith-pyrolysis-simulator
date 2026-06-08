@@ -4,6 +4,177 @@
 
 // --- Control buttons ---
 
+function selectedMreOption() {
+    const select = document.getElementById('mre-preset');
+    return select ? select.options[select.selectedIndex] : null;
+}
+
+function updateMreFields() {
+    const enabled = document.getElementById('mre-enabled')?.checked === true;
+    const fields = document.getElementById('mre-fields');
+    const select = document.getElementById('mre-preset');
+    if (fields) fields.hidden = !enabled;
+    if (select && !enabled) select.value = 'off';
+
+    const option = selectedMreOption();
+    const voltage = enabled && option ? parseFloat(option.dataset.maxVoltage || '0') : 0;
+    const target = enabled && option ? option.dataset.targetSpecies || '' : '';
+    const included = enabled && option ? option.dataset.includedSpecies || 'none' : 'none';
+    const voltageEl = document.getElementById('mre-max-voltage');
+    const speciesEl = document.getElementById('mre-included-species');
+    if (voltageEl) voltageEl.value = Number.isFinite(voltage) ? voltage.toFixed(3) : '0.000';
+    if (speciesEl) {
+        speciesEl.textContent = target
+            ? `Included species: ${included}`
+            : 'Included species: none';
+    }
+}
+
+function optionForMrePreset(preset) {
+    const option = document.createElement('option');
+    option.value = preset.id;
+    option.textContent = preset.label + (preset.enabled === false ? ' (disabled)' : '');
+    option.dataset.c5Enabled = preset.c5_enabled ? 'true' : 'false';
+    option.dataset.targetSpecies = preset.mre_target_species || '';
+    option.dataset.maxVoltage = String(preset.mre_max_voltage_V || 0);
+    option.dataset.includedSpecies = preset.included_species_label || 'none';
+    option.disabled = preset.enabled === false;
+    if (preset.disabled_reason) option.title = preset.disabled_reason;
+    if (preset.id === 'off') option.selected = true;
+    return option;
+}
+
+function hydrateMrePresetCatalog() {
+    const select = document.getElementById('mre-preset');
+    if (!select || !select.dataset.catalogUrl) {
+        updateMreFields();
+        return;
+    }
+    fetch(select.dataset.catalogUrl)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
+        .then(data => {
+            if (!Array.isArray(data.presets)) return;
+            select.replaceChildren(...data.presets.map(optionForMrePreset));
+            select.value = 'off';
+            updateMreFields();
+        })
+        .catch(() => updateMreFields());
+}
+
+function selectedMrePayload() {
+    const enabled = document.getElementById('mre-enabled')?.checked === true;
+    const option = selectedMreOption();
+    if (!enabled || !option || option.value === 'off') {
+        return {
+            c5_enabled: false,
+            mre_target_species: '',
+            mre_max_voltage_V: 0,
+        };
+    }
+    return {
+        c5_enabled: option.dataset.c5Enabled === 'true',
+        mre_target_species: option.dataset.targetSpecies || '',
+        mre_max_voltage_V: parseFloat(option.dataset.maxVoltage || '0') || 0,
+    };
+}
+
+function selectedLeverCampaign() {
+    return document.getElementById('lever-campaign')?.value || 'C4';
+}
+
+function buildRuntimeCampaignOverrides() {
+    const campaign = selectedLeverCampaign();
+    const fields = {};
+    document.querySelectorAll('.recipe-lever[data-field]').forEach(input => {
+        const value = parseFloat(input.value);
+        if (input.dataset.field && Number.isFinite(value)) {
+            fields[input.dataset.field] = value;
+        }
+    });
+    return Object.keys(fields).length ? {[campaign]: fields} : {};
+}
+
+function numericDataAttribute(element, name) {
+    const value = parseFloat(element.getAttribute(`data-${name}`) || '');
+    return Number.isFinite(value) ? value : null;
+}
+
+function knudsenDisplayConfig(indicator) {
+    const config = {
+        boltzmannConstantJK: numericDataAttribute(indicator, 'boltzmann-constant-j-k'),
+        characteristicLengthM: numericDataAttribute(indicator, 'characteristic-length-m'),
+        n2CollisionDiameterM: numericDataAttribute(indicator, 'n2-collision-diameter-m'),
+        continuumBufferKn: numericDataAttribute(indicator, 'continuum-buffer-kn'),
+    };
+    if (
+        config.boltzmannConstantJK === null
+        || config.characteristicLengthM === null
+        || config.characteristicLengthM <= 0
+        || config.n2CollisionDiameterM === null
+        || config.n2CollisionDiameterM <= 0
+        || config.continuumBufferKn === null
+        || config.continuumBufferKn <= 0
+    ) {
+        return null;
+    }
+    return config;
+}
+
+function updateKnudsenIndicator() {
+    const pressureMbar = parseFloat(document.getElementById('lever-pn2-mbar')?.value || '0');
+    const tempC = parseFloat(document.getElementById('lever-stage-temp')?.value || '1600');
+    const indicator = document.getElementById('knudsen-indicator');
+    if (!indicator || !Number.isFinite(pressureMbar) || pressureMbar <= 0) {
+        if (indicator) indicator.textContent = 'Kn: unavailable';
+        return;
+    }
+    const config = knudsenDisplayConfig(indicator);
+    if (!config) {
+        indicator.textContent = 'Kn: unavailable';
+        indicator.classList.remove('config-warning');
+        return;
+    }
+    const pressurePa = pressureMbar * 100;
+    const meanFreePathM = config.boltzmannConstantJK * (tempC + 273.15)
+        / (Math.SQRT2 * Math.PI * config.n2CollisionDiameterM ** 2 * pressurePa);
+    const kn = meanFreePathM / config.characteristicLengthM;
+    indicator.textContent = `Kn: ${kn.toExponential(2)}`
+        + (kn >= config.continuumBufferKn
+            ? ' - molecular flow / coating risk'
+            : ' - viscous transport');
+    indicator.classList.toggle('config-warning', kn >= config.continuumBufferKn);
+}
+
+function updateLeverWarning() {
+    const warning = document.getElementById('lever-warning');
+    if (!warning) return;
+    const messages = [];
+    const pressureMbar = parseFloat(document.getElementById('lever-pn2-mbar')?.value || '0');
+    const tempC = parseFloat(document.getElementById('lever-stage-temp')?.value || '0');
+    if (Number.isFinite(pressureMbar) && (pressureMbar < 5 || pressureMbar > 15)) {
+        messages.push('pN2 sweep outside 5-15 mbar viscous-flow band');
+    }
+    if (Number.isFinite(tempC) && (tempC < 20 || tempC > 1900)) {
+        messages.push('stage temperature outside characterized operator band');
+    }
+    warning.hidden = messages.length === 0;
+    warning.textContent = messages.join('; ');
+}
+
+hydrateMrePresetCatalog();
+document.getElementById('mre-enabled')?.addEventListener('change', updateMreFields);
+document.getElementById('mre-preset')?.addEventListener('change', updateMreFields);
+document.getElementById('lever-pn2-mbar')?.addEventListener('input', () => {
+    updateKnudsenIndicator();
+    updateLeverWarning();
+});
+document.getElementById('lever-stage-temp')?.addEventListener('input', () => {
+    updateKnudsenIndicator();
+    updateLeverWarning();
+});
+updateKnudsenIndicator();
+updateLeverWarning();
+
 document.getElementById('btn-start').addEventListener('click', () => {
     if (!socket.connected) {
         document.getElementById('status-text').textContent = 'Connection not ready';
@@ -19,6 +190,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
     const track = document.querySelector('input[name="track"]:checked').value;
     const speedMs = parseInt(document.querySelector('input[name="speed"]:checked').value);
     const mass_kg = parseFloat(document.getElementById('batch-mass').value);
+    const mrePayload = selectedMrePayload();
 
     socket.emit('start_simulation', {
         feedstock: feedstock,
@@ -27,6 +199,10 @@ document.getElementById('btn-start').addEventListener('click', () => {
         track: track,
         speed: speedMs / 1000.0,  // Convert ms to seconds for backend
         c4_max_temp_C: parseFloat(document.getElementById('c4-max-temp')?.value) || 1670,
+        c5_enabled: mrePayload.c5_enabled,
+        mre_target_species: mrePayload.mre_target_species,
+        mre_max_voltage_V: mrePayload.mre_max_voltage_V,
+        runtime_campaign_overrides: buildRuntimeCampaignOverrides(),
         additives: {
             Na: parseFloat(document.getElementById('add-na').value) || 0,
             K: parseFloat(document.getElementById('add-k').value) || 0,
@@ -102,6 +278,23 @@ document.getElementById('btn-resume').addEventListener('click', () => {
 // --- Event delegation for dynamically loaded controls ---
 // Handles .ctrl-param elements loaded via HTMX disclosure triangles
 document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('recipe-lever')) {
+        const rawValue = e.target.value;
+        const value = parseFloat(rawValue);
+        if (!Number.isFinite(value)) return;
+        if (e.target.dataset.param) {
+            socket.emit('adjust_parameter', {param: e.target.dataset.param, value: value});
+        }
+        if (e.target.dataset.field) {
+            socket.emit('adjust_parameter', {
+                param: 'campaign_override',
+                campaign: selectedLeverCampaign(),
+                field: e.target.dataset.field,
+                value: value,
+            });
+        }
+        updateLeverWarning();
+    }
     if (e.target.classList.contains('ctrl-param')) {
         const param = e.target.dataset.param;
         const value = parseFloat(e.target.value);

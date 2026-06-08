@@ -1,0 +1,11 @@
+{% for preset in presets %}
+<option value="{{ preset.id }}"
+        data-c5-enabled="{{ 'true' if preset.c5_enabled else 'false' }}"
+        data-target-species="{{ preset.mre_target_species }}"
+        data-max-voltage="{{ preset.mre_max_voltage_V }}"
+        data-included-species="{{ preset.included_species_label }}"
+        {% if not preset.enabled %}disabled title="{{ preset.disabled_reason }}"{% endif %}
+        {% if preset.id == 'off' %}selected{% endif %}>
+    {{ preset.label }}{% if not preset.enabled %} (disabled){% endif %}
+</option>
+{% endfor %}

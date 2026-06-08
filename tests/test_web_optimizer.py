@@ -9,10 +9,20 @@ from flask import Flask
 import pytest
 import yaml
 
+from simulator import mre_ladder
+from simulator.backends import backend_resolution_status
+from simulator.condensation import (
+    BOLTZMANN_CONSTANT_J_K,
+    CONTINUUM_BUFFER_KN,
+    DEFAULT_PIPE_DIAMETER_M,
+    N2_COLLISION_DIAMETER_M,
+)
+from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
-from simulator.optimize.evaluate import RunReference, ScoredResult
+from simulator.optimize.evaluate import RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 from web import routes as web_routes
 
@@ -89,6 +99,7 @@ def _scored(
     objectives: ObjectiveVector | None = None,
     margins: Mapping[str, GateMargin] | None = None,
     product_summary: Mapping[str, object] | None = None,
+    trace: Mapping[str, object] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -100,7 +111,8 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace={"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]},
+            trace=trace
+            or {"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]},
             product_summary=product_summary or {"oxygen_kg": oxygen},
         ),
         notes=("stored",),
@@ -175,6 +187,185 @@ def client(tmp_path):
     return app.test_client()
 
 
+def test_mre_preset_catalog_route_returns_shared_ladder(client) -> None:
+    response = client.get("/api/mre-preset-catalog")
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    presets = payload["presets"]
+    source = mre_ladder.preset_catalog(web_routes._load_yaml("setpoints.yaml"))
+    canonical_fields = {
+        "id",
+        "label",
+        "target_oxide",
+        "c5_enabled",
+        "mre_target_species",
+        "mre_max_voltage_V",
+        "enabled",
+        "disabled_reason",
+        "legacy",
+    }
+    ui_derived_fields = {"included_species", "included_species_label"}
+
+    def canonical(preset: Mapping[str, object]) -> dict[str, object | None]:
+        return {
+            field: preset.get(field, "") if field == "disabled_reason"
+            else preset.get(field)
+            for field in sorted(canonical_fields)
+        }
+
+    assert [canonical(preset) for preset in presets] == [
+        canonical(preset)
+        for preset in source
+    ]
+    for preset in presets:
+        assert set(preset) <= canonical_fields | ui_derived_fields
+
+    by_target = {preset.get("mre_target_species"): preset for preset in presets}
+    assert by_target[""]["c5_enabled"] is False
+    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.4)
+    assert by_target["SiO2"]["included_species"] == ["Fe", "Cr", "Mn", "Si"]
+    assert by_target["Na2O"]["enabled"] is False
+    assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
+    assert by_target["K2O"]["enabled"] is False
+
+
+def test_mre_preset_catalog_fragment_is_golden(client) -> None:
+    response = client.get("/partials/mre-preset-catalog")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'value="off"' in html
+    assert 'data-c5-enabled="false"' in html
+    assert 'value="target:SiO2"' in html
+    assert 'data-max-voltage="1.4"' in html
+    assert 'data-included-species="Fe, Cr, Mn, Si"' in html
+    assert "Na2O" in html
+    assert "disabled" in html
+    assert "pre-depleted by C3" in html
+
+
+def test_simulator_config_renders_mre_default_off_backend_badge_and_levers(
+    client,
+) -> None:
+    response = client.get("/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'id="mre-enabled"' in html
+    assert 'id="mre-enabled" checked' not in html
+    assert 'id="mre-fields" hidden' in html
+    assert 'data-catalog-url="/api/mre-preset-catalog"' in html
+    assert 'id="mre-max-voltage" value="0" readonly' in html
+    assert 'id="status-backend"' in html
+    assert 'id="lever-po2-mbar"' in html
+    assert 'id="lever-pn2-mbar"' in html
+    assert 'id="knudsen-indicator"' in html
+    assert "No live wall-temperature offset path exists yet" in html
+    assert "pN2 and wall-temperature controls are display-only" in html
+
+
+def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
+    response = client.get("/api/knudsen-config")
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["boltzmann_constant_j_k"] == BOLTZMANN_CONSTANT_J_K
+    assert payload["characteristic_length_m"] == DEFAULT_PIPE_DIAMETER_M
+    assert payload["n2_collision_diameter_m"] == N2_COLLISION_DIAMETER_M
+    assert payload["continuum_buffer_kn"] == CONTINUUM_BUFFER_KN
+
+    html = client.get("/").get_data(as_text=True)
+    assert (
+        f'data-characteristic-length-m="{DEFAULT_PIPE_DIAMETER_M}"'
+        in html
+    )
+    assert f'data-continuum-buffer-kn="{CONTINUUM_BUFFER_KN}"' in html
+
+
+def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
+    catalog = client.get("/api/mre-preset-catalog").get_json()["presets"]
+    si_preset = next(
+        preset for preset in catalog
+        if preset["mre_target_species"] == "SiO2"
+    )
+    profile = {
+        "profile_id": "web-parity-mre-policy",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "web parity test objective",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C5",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "c5_enabled": si_preset["c5_enabled"],
+            "mre_max_voltage_V": si_preset["mre_max_voltage_V"],
+            "mre_target_species": si_preset["mre_target_species"],
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    assert run_config.c5_enabled is True
+    assert run_config.mre_target_species == "SiO2"
+
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-web-parity"
+    run_dir.mkdir(parents=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-web-parity",
+            trace={"backend_status": "ok", "hours": [{"hour": 1}]},
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=web-parity-mre-policy"
+    )
+    detail = client.get(f"/optimizer/runs/run-web-parity/results/{key}")
+    download = client.get(f"/optimizer/runs/run-web-parity/results/{key}/recipe.yaml")
+
+    assert leaderboard.status_code == 200
+    entry = leaderboard.get_json()["entries"][0]
+    assert entry["eval_spec"]["c5_enabled"] is True
+    assert entry["eval_spec"]["mre_target_species"] == spec.mre_target_species
+    assert entry["eval_spec"]["mre_max_voltage_V"] == pytest.approx(
+        spec.mre_max_voltage_V
+    )
+    assert entry["backend"]["backend_status"] == "unavailable"
+    assert detail.status_code == 200
+    assert "candidate-web-parity" in detail.get_data(as_text=True)
+    assert download.status_code == 200
+    payload = yaml.safe_load(download.get_data(as_text=True))
+    assert payload["eval_spec"]["c5_enabled"] is True
+    assert payload["eval_spec"]["mre_target_species"] == spec.mre_target_species
+    assert payload["eval_spec"]["mre_max_voltage_V"] == pytest.approx(
+        spec.mre_max_voltage_V
+    )
+
+
 def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-a"
@@ -232,6 +423,10 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert run["latest_result"]["eval_spec"]["c5_enabled"] is True
     assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.4
     assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
+    assert run["latest_result"]["backend"]["backend_requested"] == "stub"
+    assert run["latest_result"]["backend"]["backend_active"] == "StubBackend"
+    assert run["latest_result"]["backend"]["backend_status"] == "unavailable"
+    assert run["latest_result"]["backend"]["backend_authoritative"] is False
 
     leaderboard = client.get(
         "/api/optimizer/leaderboard"
@@ -249,6 +444,7 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         board_payload["entries"][0]["eval_spec"]["mre_target_species"]
         == "SiO2"
     )
+    assert board_payload["entries"][0]["backend"] == run["latest_result"]["backend"]
 
 
 def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> None:
@@ -327,6 +523,8 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     html = response.get_data(as_text=True)
     table = partial.get_data(as_text=True)
     assert 'hx-get="/partials/optimizer-table"' in html
+    assert "Mode C is read-only browse" in html
+    assert "EvalSpec form is deferred to C+ / W-B" in html
     assert "candidate-page" in table
     assert "lunar_mare_low_ti" in table
     assert "oxygen-yield-v1" in table
@@ -339,6 +537,8 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "O2" in table
     assert "Captured volatiles" in table
     assert "Refractory ceramic/rump" in table
+    assert "backend-badge" in table
+    assert "StubBackend / unavailable" in table
 
 
 def test_optimizer_page_marks_missing_readouts_inconclusive(
@@ -502,6 +702,9 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "Derived" in html
     assert "Hours at run" in html
     assert "computed from EvalSpec.hours" in html
+    assert "Backend" in html
+    assert "backend-badge" in html
+    assert "StubBackend / unavailable" in html
 
     assert download.status_code == 200
     assert download.mimetype == "application/x-yaml"
