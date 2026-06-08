@@ -12,6 +12,18 @@
             <tr><td>Created</td><td>{{ result.created_at }}</td></tr>
             <tr><td>Feasible</td><td>{{ "yes" if result.feasible else "no" }}</td></tr>
             <tr>
+                <td>Version</td>
+                <td>
+                    <span class="version-badge version-badge-{{ result.version_badge.status }}">
+                        {{ result.version_badge.label }}
+                    </span>
+                    <span class="range">
+                        stored {{ result.version_badge.stored_version or "unknown" }};
+                        current {{ result.version_badge.current_version }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
                 <td>Backend</td>
                 <td>
                     <span class="backend-badge {{ 'backend-badge-ok' if result.backend.backend_authoritative else 'backend-badge-stub' }}"

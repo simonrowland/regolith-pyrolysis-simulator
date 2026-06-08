@@ -26,6 +26,8 @@ from simulator.mre_ladder import (
     parse_ladder_from_setpoints,
     preset_catalog as build_mre_preset_catalog,
 )
+from simulator.optimize import job_runner as optimizer_job_runner
+from simulator.optimize.evalspec import current_code_version
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -45,6 +47,9 @@ OPTIMIZER_ARTIFACT_NAMES = (
     'pareto.json',
     'provenance.jsonl',
 )
+OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
+OPTIMIZER_JOB_FIDELITIES = ('stub', 'fast', 'high', 'auto')
+DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 
@@ -70,6 +75,48 @@ def _optimizer_runs_root() -> Path:
     if configured:
         return Path(configured).expanduser()
     return Path.cwd() / 'runs'
+
+
+def _optimizer_job_parallel_cap() -> int:
+    configured = current_app.config.get('OPTIMIZER_JOB_PARALLEL_CAP')
+    try:
+        cap = int(configured)
+    except (TypeError, ValueError):
+        cap = DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
+    return max(1, cap)
+
+
+def _optimizer_job_runner() -> optimizer_job_runner.OptimizerJobRunner:
+    popen_factory = current_app.config.get('OPTIMIZER_JOB_POPEN_FACTORY')
+    kwargs: dict[str, Any] = {}
+    if popen_factory is not None:
+        kwargs['popen_factory'] = popen_factory
+    return optimizer_job_runner.get_runner(_optimizer_runs_root(), **kwargs)
+
+
+def _version_badge(stored_version: Any) -> dict[str, Any]:
+    current = current_code_version()
+    if not stored_version:
+        return {
+            'status': 'unknown',
+            'label': 'version unknown',
+            'stored_version': None,
+            'current_version': current,
+        }
+    stored = str(stored_version)
+    if stored == current:
+        return {
+            'status': 'current',
+            'label': 'current',
+            'stored_version': stored,
+            'current_version': current,
+        }
+    return {
+        'status': 'stale',
+        'label': 'stale version',
+        'stored_version': stored,
+        'current_version': current,
+    }
 
 
 def _optimizer_run_dirs(root: Path) -> list[Path]:
@@ -554,11 +601,18 @@ def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
                 for objective in objectives
                 if isinstance(objective, dict) and objective.get('metric')
             ]
+            constraints = payload.get('constraints') or {}
+            gates = constraints.get('gates') if isinstance(constraints, dict) else ()
+            constraints_gates = [
+                str(gate) for gate in gates
+                if isinstance(gate, str) and gate
+            ]
             row = {
                 'profile_id': profile_id,
                 'feedstock_id': feedstock,
                 'relative_path': str(path.relative_to(DATA_DIR)),
                 'objective_metrics': objective_metrics,
+                'constraints_gates': constraints_gates,
             }
             profiles.append(row)
             if feedstock:
@@ -568,6 +622,145 @@ def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
         'profiles': profiles,
         'feedstocks': feedstocks,
     }
+
+
+def _optimizer_profile_by_id(
+    feedstock_profiles: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    profiles = feedstock_profiles.get('profiles')
+    if not isinstance(profiles, list):
+        return {}
+    return {
+        str(profile.get('profile_id')): profile
+        for profile in profiles
+        if isinstance(profile, dict) and profile.get('profile_id')
+    }
+
+
+def _payload_value(payload: Mapping[str, Any], name: str, default: Any = None) -> Any:
+    value = payload.get(name, default)
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
+def _positive_int_payload(
+    payload: Mapping[str, Any],
+    name: str,
+    *,
+    default: int | None = None,
+    maximum: int | None = None,
+) -> tuple[int | None, str | None]:
+    raw = _payload_value(payload, name, default)
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return None, f'{name} must be a positive integer'
+    if value <= 0:
+        return None, f'{name} must be a positive integer'
+    if maximum is not None and value > maximum:
+        return None, f'{name} must be <= {maximum}'
+    return value, None
+
+
+def _non_negative_int_payload(
+    payload: Mapping[str, Any],
+    name: str,
+    *,
+    default: int,
+) -> tuple[int | None, str | None]:
+    raw = _payload_value(payload, name, default)
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return None, f'{name} must be a non-negative integer'
+    if value < 0:
+        return None, f'{name} must be a non-negative integer'
+    return value, None
+
+
+def _optimizer_job_payload() -> Mapping[str, Any]:
+    if request.is_json:
+        parsed = request.get_json(silent=True)
+        if isinstance(parsed, Mapping):
+            return parsed
+    return request.form
+
+
+def _parse_optimizer_job_request(
+    payload: Mapping[str, Any],
+) -> tuple[optimizer_job_runner.OptimizerJobRequest | None, str | None]:
+    feedstock_id = str(_payload_value(payload, 'feedstock_id', '') or '')
+    profile_id = str(_payload_value(payload, 'profile_id', '') or '')
+    strategy = str(_payload_value(payload, 'strategy', '') or '')
+    fidelity = str(_payload_value(payload, 'fidelity', '') or '')
+    feedstock_profiles = _optimizer_feedstock_profiles_payload()
+    profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
+    feedstocks = feedstock_profiles.get('feedstocks')
+    if not isinstance(feedstocks, Mapping):
+        feedstocks = {}
+
+    if feedstock_id not in feedstocks:
+        return None, f'unknown feedstock_id: {feedstock_id}'
+    if profile_id not in profile_by_id:
+        return None, f'unknown profile_id: {profile_id}'
+    allowed_profiles = feedstocks.get(feedstock_id)
+    if isinstance(allowed_profiles, list) and profile_id not in allowed_profiles:
+        return None, f'profile_id {profile_id} is not valid for {feedstock_id}'
+    if strategy not in OPTIMIZER_JOB_STRATEGIES:
+        return None, f'unknown strategy: {strategy}'
+    if fidelity not in OPTIMIZER_JOB_FIDELITIES:
+        return None, f'unknown fidelity: {fidelity}'
+
+    budget, error = _positive_int_payload(payload, 'budget')
+    if error:
+        return None, error
+    parallel, error = _positive_int_payload(
+        payload,
+        'parallel',
+        default=1,
+        maximum=_optimizer_job_parallel_cap(),
+    )
+    if error:
+        return None, error
+    seed, error = _non_negative_int_payload(payload, 'seed', default=0)
+    if error:
+        return None, error
+
+    profile = profile_by_id[profile_id]
+    profile_arg = str(DATA_DIR / str(profile['relative_path']))
+    return optimizer_job_runner.OptimizerJobRequest(
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        strategy=strategy,
+        fidelity=fidelity,
+        budget=budget or 1,
+        parallel=parallel or 1,
+        seed=seed or 0,
+        profile_arg=profile_arg,
+    ), None
+
+
+def _optimizer_jobs_context() -> dict[str, Any]:
+    jobs = _optimizer_job_runner().list_jobs()
+    return {
+        'jobs': jobs,
+        'jobs_dir': str(_optimizer_runs_root() / 'jobs'),
+    }
+
+
+def _optimizer_launch_context() -> dict[str, Any]:
+    return {
+        'job_strategy_choices': OPTIMIZER_JOB_STRATEGIES,
+        'job_fidelity_choices': OPTIMIZER_JOB_FIDELITIES,
+        'job_parallel_cap': _optimizer_job_parallel_cap(),
+        'mre_presets': _mre_preset_catalog_payload(),
+        **_optimizer_jobs_context(),
+    }
+
+
+def _wants_json_response() -> bool:
+    return request.path.startswith('/api/') or request.is_json
 
 
 def _mre_preset_catalog_payload() -> list[dict[str, Any]]:
@@ -831,6 +1024,9 @@ def _optimizer_result_view(entry: Mapping[str, Any]) -> dict[str, Any]:
     view['product_strip'] = _product_strip(view)
     view['coating'] = _coating_readout(view)
     view['completeness'] = _completeness_readout(view)
+    view['version_badge'] = _version_badge(
+        _mapping_value(view.get('eval_spec')).get('code_version')
+    )
     return view
 
 
@@ -1207,8 +1403,12 @@ def simulator():
 
 @bp.route('/optimizer')
 def optimizer_page():
-    """Read-only optimizer results page over stored ResultStore artifacts."""
-    return render_template('optimizer.html', **_optimizer_table_context())
+    """Optimizer results page plus async CLI launch form."""
+    return render_template(
+        'optimizer.html',
+        **_optimizer_table_context(),
+        **_optimizer_launch_context(),
+    )
 
 
 @bp.route('/partials/optimizer-table')
@@ -1218,6 +1418,71 @@ def optimizer_table_partial():
         'partials/optimizer_table.html',
         **_optimizer_table_context(),
     )
+
+
+@bp.route('/partials/optimizer-jobs')
+def optimizer_jobs_partial():
+    """HTMX partial: current optimizer CLI job queue."""
+    return render_template(
+        'partials/optimizer_jobs.html',
+        **_optimizer_jobs_context(),
+    )
+
+
+@bp.route('/partials/optimizer-jobs/<job_id>')
+def optimizer_job_detail_partial(job_id: str):
+    """HTMX partial: one optimizer CLI job detail panel."""
+    job = _optimizer_job_runner().get_job(job_id)
+    if job is None:
+        return render_template('optimizer_not_found.html'), 404
+    return render_template('partials/optimizer_job_detail_panel.html', job=job)
+
+
+@bp.route('/api/optimizer/jobs')
+def optimizer_jobs_api():
+    """Return submitted optimizer CLI jobs from the disk-backed register."""
+    return jsonify({
+        'jobs_dir': str(_optimizer_runs_root() / 'jobs'),
+        'jobs': _optimizer_job_runner().list_jobs(),
+    })
+
+
+@bp.route('/api/optimizer/jobs', methods=['POST'])
+@bp.route('/optimizer/jobs', methods=['POST'])
+def optimizer_job_submit():
+    """Validate and enqueue an optimizer CLI job without importing eval code."""
+    job_request, error = _parse_optimizer_job_request(_optimizer_job_payload())
+    if error is not None or job_request is None:
+        if _wants_json_response():
+            return jsonify({'error': error}), 400
+        context = _optimizer_launch_context()
+        context['job_error'] = error
+        return render_template('partials/optimizer_jobs.html', **context), 400
+
+    job = _optimizer_job_runner().submit(job_request)
+    if _wants_json_response():
+        return jsonify({'job': job}), 202
+    context = _optimizer_jobs_context()
+    context['submitted_job'] = job
+    return render_template('partials/optimizer_jobs.html', **context), 202
+
+
+@bp.route('/api/optimizer/jobs/<job_id>')
+def optimizer_job_detail_api(job_id: str):
+    """Return one optimizer CLI job from the disk-backed register."""
+    job = _optimizer_job_runner().get_job(job_id)
+    if job is None:
+        return jsonify({'error': 'Optimizer job not found'}), 404
+    return jsonify({'job': job})
+
+
+@bp.route('/optimizer/jobs/<job_id>')
+def optimizer_job_detail(job_id: str):
+    """Pollable optimizer CLI job detail page."""
+    job = _optimizer_job_runner().get_job(job_id)
+    if job is None:
+        return render_template('optimizer_not_found.html'), 404
+    return render_template('optimizer_job.html', job=job)
 
 
 @bp.route('/optimizer/runs/<run_id>/results/<cache_key>')

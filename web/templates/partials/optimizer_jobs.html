@@ -1,0 +1,78 @@
+<div id="optimizer-jobs" class="section-card">
+    <h3>Optimizer Jobs</h3>
+    {% if job_error %}
+    <div class="empty-hint optimizer-job-error">{{ job_error }}</div>
+    {% endif %}
+    {% if submitted_job %}
+    <div class="empty-hint">Booked {{ submitted_job.job_id }}.</div>
+    {% endif %}
+    {% if jobs %}
+    <table class="composition-table optimizer-jobs-table">
+        <thead>
+            <tr>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Feedstock / profile</th>
+                <th>Strategy</th>
+                <th>Fidelity</th>
+                <th>Budget</th>
+                <th>Queue</th>
+                <th>ETA</th>
+                <th>Version</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>
+                    <strong>{{ job.job_id }}</strong><br>
+                    <span class="range">{{ job.created_at }}</span>
+                </td>
+                <td>
+                    <span class="backend-badge optimizer-status-{{ job.status|lower }}">
+                        {{ job.status }}
+                    </span>
+                </td>
+                <td>
+                    <strong>{{ job.feedstock_id }}</strong><br>
+                    <span class="range">{{ job.profile_id }}</span>
+                </td>
+                <td>{{ job.strategy }}</td>
+                <td>{{ job.fidelity }}</td>
+                <td>{{ job.budget }} evals / {{ job.parallel }} parallel</td>
+                <td>
+                    {% if job.status == "QUEUED" %}
+                    {{ job.queue_depth }} jobs ahead
+                    {% elif job.status == "RUNNING" %}
+                    running
+                    {% else %}
+                    complete
+                    {% endif %}
+                </td>
+                <td>
+                    {% if job.eta %}
+                    {{ "%.0f"|format(job.eta.seconds) }} s
+                    <span class="range">{{ job.eta.basis }}</span>
+                    {% else %}
+                    estimating...
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="version-badge version-badge-{{ job.version_badge.status }}"
+                          title="stored {{ job.version_badge.stored_version or 'unknown' }}; current {{ job.version_badge.current_version }}">
+                        {{ job.version_badge.label }}
+                    </span>
+                </td>
+                <td>
+                    <a class="btn"
+                       href="{{ url_for('web.optimizer_job_detail', job_id=job.job_id) }}">Open</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-hint">No optimizer jobs booked.</div>
+    {% endif %}
+</div>

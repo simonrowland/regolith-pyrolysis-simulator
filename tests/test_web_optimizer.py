@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import ast
+import json
 import math
+import sqlite3
 from collections.abc import Mapping
 from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask
@@ -21,6 +24,7 @@ from simulator.condensation import (
 from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
@@ -181,11 +185,73 @@ def _product_yield_table(status: str = "closed") -> dict[str, object]:
 
 @pytest.fixture
 def client(tmp_path):
+    optimizer_job_runner.reset_runner_cache()
     app = Flask(__name__)
     app.config["TESTING"] = True
     app.config["OPTIMIZER_RUNS_DIR"] = str(tmp_path / "runs")
     app.register_blueprint(web_routes.bp)
-    return app.test_client()
+    yield app.test_client()
+    optimizer_job_runner.reset_runner_cache()
+
+
+class _FakeProcess:
+    def __init__(self, pid: int, returncode: int | None = None) -> None:
+        self.pid = pid
+        self.returncode = returncode
+
+    def poll(self) -> int | None:
+        return self.returncode
+
+
+class _FakePopenFactory:
+    def __init__(self, *, output: bytes = b"") -> None:
+        self.output = output
+        self.calls: list[dict[str, object]] = []
+        self.processes: list[_FakeProcess] = []
+
+    def __call__(self, cmd, *, cwd=None, stdout=None, stderr=None, env=None):
+        process = _FakeProcess(pid=5000 + len(self.processes))
+        self.processes.append(process)
+        self.calls.append(
+            {
+                "cmd": list(cmd),
+                "cwd": cwd,
+                "stderr": stderr,
+                "env": dict(env or {}),
+            }
+        )
+        if stdout is not None and self.output:
+            stdout.write(self.output)
+            stdout.flush()
+        return process
+
+
+def _write_minimal_result_table(job_dir: Path) -> None:
+    with sqlite3.connect(job_dir / "cache.sqlite") as conn:
+        conn.execute("CREATE TABLE results (id INTEGER)")
+        conn.execute("INSERT INTO results VALUES (1)")
+
+
+def _job_request(
+    *,
+    feedstock_id: str = "lunar_mare_low_ti",
+    profile_id: str = "lunar-mare-low-ti-objectives-v1",
+    strategy: str = "random",
+    fidelity: str = "stub",
+    budget: int = 2,
+    parallel: int = 1,
+    seed: int = 0,
+) -> optimizer_job_runner.OptimizerJobRequest:
+    return optimizer_job_runner.OptimizerJobRequest(
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        strategy=strategy,
+        fidelity=fidelity,
+        budget=budget,
+        parallel=parallel,
+        seed=seed,
+        profile_arg=str(Path("data/optimize_profiles/lunar_mare_low_ti.yaml")),
+    )
 
 
 def test_mre_preset_catalog_route_returns_shared_ladder(client) -> None:
@@ -459,6 +525,8 @@ def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> N
                 "feedstock: lunar_mare_low_ti",
                 "objectives:",
                 "  - {metric: oxygen_kg, sense: maximize, units: kg}",
+                "constraints:",
+                "  gates: [mass_balance]",
             )
         ),
         encoding="utf-8",
@@ -478,8 +546,292 @@ def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> N
             "feedstock_id": "lunar_mare_low_ti",
             "relative_path": "optimize_profiles/oxygen.yaml",
             "objective_metrics": ["oxygen_kg"],
+            "constraints_gates": ["mass_balance"],
         }
     ]
+
+
+def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+
+    response = client.post(
+        "/api/optimizer/jobs",
+        json={
+            "feedstock_id": "lunar_mare_low_ti",
+            "profile_id": "lunar-mare-low-ti-objectives-v1",
+            "strategy": "random",
+            "fidelity": "stub",
+            "budget": 3,
+            "parallel": 1,
+            "seed": 11,
+        },
+    )
+
+    assert response.status_code == 202
+    job = response.get_json()["job"]
+    assert job["status"] == "RUNNING"
+    assert job["feedstock_id"] == "lunar_mare_low_ti"
+    assert job["profile_id"] == "lunar-mare-low-ti-objectives-v1"
+    assert job["eta"] is None
+    assert job["version_badge"]["status"] == "current"
+
+    assert len(popen.calls) == 1
+    cmd = popen.calls[0]["cmd"]
+    assert cmd[1:3] == ["-m", "simulator.optimize"]
+    assert cmd[cmd.index("--feedstock") + 1] == "lunar_mare_low_ti"
+    assert cmd[cmd.index("--strategy") + 1] == "random"
+    assert cmd[cmd.index("--fidelity") + 1] == "stub"
+    assert cmd[cmd.index("--budget") + 1] == "3"
+    assert cmd[cmd.index("--parallel") + 1] == "1"
+    assert cmd[cmd.index("--seed") + 1] == "11"
+    assert cmd[cmd.index("--profile") + 1].endswith(
+        "data/optimize_profiles/lunar_mare_low_ti.yaml"
+    )
+    out_dir = Path(cmd[cmd.index("--out") + 1])
+    assert out_dir.parent == Path(client.application.config["OPTIMIZER_RUNS_DIR"]) / "jobs"
+    assert Path(job["log_path"]).name == "job.log"
+    meta = yaml.safe_load((out_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "RUNNING"
+    assert meta["pid"] == popen.processes[0].pid
+
+
+def test_optimizer_job_submit_rejects_unknown_profile_before_spawn(client) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+
+    response = client.post(
+        "/api/optimizer/jobs",
+        json={
+            "feedstock_id": "lunar_mare_low_ti",
+            "profile_id": "unknown-profile",
+            "strategy": "random",
+            "fidelity": "stub",
+            "budget": 1,
+            "parallel": 1,
+            "seed": 0,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "unknown profile_id: unknown-profile"
+    assert popen.calls == []
+
+
+@pytest.mark.parametrize(
+    ("override", "expected_error"),
+    [
+        ({"budget": "many"}, "budget must be a positive integer"),
+        ({"budget": 0}, "budget must be a positive integer"),
+        ({"parallel": "wide"}, "parallel must be a positive integer"),
+        ({"parallel": 0}, "parallel must be a positive integer"),
+        ({"parallel": 3}, "parallel must be <= 2"),
+        ({"seed": "late"}, "seed must be a non-negative integer"),
+        ({"seed": -1}, "seed must be a non-negative integer"),
+        ({"strategy": "magic"}, "unknown strategy: magic"),
+        ({"fidelity": "oracle"}, "unknown fidelity: oracle"),
+    ],
+)
+def test_optimizer_job_submit_rejects_bad_launch_values_before_spawn(
+    client,
+    override,
+    expected_error,
+) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    client.application.config["OPTIMIZER_JOB_PARALLEL_CAP"] = 2
+    payload = {
+        "feedstock_id": "lunar_mare_low_ti",
+        "profile_id": "lunar-mare-low-ti-objectives-v1",
+        "strategy": "random",
+        "fidelity": "stub",
+        "budget": 1,
+        "parallel": 1,
+        "seed": 0,
+    }
+    payload.update(override)
+
+    response = client.post("/api/optimizer/jobs", json=payload)
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == expected_error
+    assert popen.calls == []
+    jobs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"]) / "jobs"
+    assert not jobs_dir.exists() or list(jobs_dir.iterdir()) == []
+
+
+def test_optimizer_job_exit_zero_without_results_fails_loud(client) -> None:
+    popen = _FakePopenFactory(output=b"finished without persisting rows\n")
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    created = client.post(
+        "/api/optimizer/jobs",
+        json={
+            "feedstock_id": "lunar_mare_low_ti",
+            "profile_id": "lunar-mare-low-ti-objectives-v1",
+            "strategy": "random",
+            "fidelity": "stub",
+            "budget": 1,
+            "parallel": 1,
+            "seed": 0,
+        },
+    ).get_json()["job"]
+    popen.processes[0].returncode = 0
+
+    detail = client.get(f"/api/optimizer/jobs/{created['job_id']}")
+
+    assert detail.status_code == 200
+    job = detail.get_json()["job"]
+    assert job["status"] == "FAILED"
+    assert "finished without persisting rows" in job["stderr_tail"]
+    assert "optimizer exited 0 without stored results" in job["stderr_tail"]
+    assert not (Path(created["out_dir"]) / "cache.sqlite").exists()
+
+
+def test_optimizer_job_nonzero_exit_fails_loud_and_surfaces_stderr(client) -> None:
+    popen = _FakePopenFactory(output=b"backend license missing\n")
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    created = client.post(
+        "/api/optimizer/jobs",
+        json={
+            "feedstock_id": "lunar_mare_low_ti",
+            "profile_id": "lunar-mare-low-ti-objectives-v1",
+            "strategy": "random",
+            "fidelity": "high",
+            "budget": 1,
+            "parallel": 1,
+            "seed": 0,
+        },
+    ).get_json()["job"]
+    popen.processes[0].returncode = 2
+
+    detail = client.get(f"/api/optimizer/jobs/{created['job_id']}")
+    html = client.get(f"/optimizer/jobs/{created['job_id']}").get_data(as_text=True)
+
+    assert detail.status_code == 200
+    job = detail.get_json()["job"]
+    assert job["status"] == "FAILED"
+    assert "backend license missing" in job["stderr_tail"]
+    assert "FAILED" in html
+    assert "backend license missing" in html
+
+
+def test_optimizer_job_runner_fifo_queue_and_single_running(tmp_path) -> None:
+    popen = _FakePopenFactory()
+    moments = [
+        datetime(2026, 6, 8, tzinfo=UTC) + timedelta(seconds=offset)
+        for offset in range(20)
+    ]
+    runner = optimizer_job_runner.OptimizerJobRunner(
+        tmp_path / "runs",
+        popen_factory=popen,
+        now_factory=lambda: moments.pop(0),
+    )
+
+    first = runner.submit(_job_request(seed=1))
+    second = runner.submit(_job_request(seed=2))
+    third = runner.submit(_job_request(seed=3))
+
+    assert len(popen.calls) == 1
+    jobs = {job["job_id"]: job for job in runner.list_jobs()}
+    assert jobs[first["job_id"]]["status"] == "RUNNING"
+    assert jobs[second["job_id"]]["status"] == "QUEUED"
+    assert jobs[second["job_id"]]["queue_depth"] == 1
+    assert jobs[third["job_id"]]["status"] == "QUEUED"
+    assert jobs[third["job_id"]]["queue_depth"] == 2
+
+    _write_minimal_result_table(Path(first["out_dir"]))
+    popen.processes[0].returncode = 0
+    jobs = {job["job_id"]: job for job in runner.list_jobs()}
+
+    assert len(popen.calls) == 2
+    assert jobs[first["job_id"]]["status"] == "SUCCEEDED"
+    assert jobs[second["job_id"]]["status"] == "RUNNING"
+    assert jobs[third["job_id"]]["status"] == "QUEUED"
+    assert jobs[third["job_id"]]["queue_depth"] == 1
+
+
+def test_optimizer_job_register_rebuilds_from_disk_on_fresh_app(tmp_path) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "job-from-disk"
+    job_dir.mkdir(parents=True)
+    (job_dir / ".job_meta.json").write_text(
+        json.dumps(
+            {
+                "job_id": "job-from-disk",
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "lunar-mare-low-ti-objectives-v1",
+                "feedstock_id": "lunar_mare_low_ti",
+                "profile_id": "lunar-mare-low-ti-objectives-v1",
+                "strategy": "random",
+                "fidelity": "stub",
+                "budget": 1,
+                "parallel": 1,
+                "seed": 0,
+                "pid": None,
+                "status": "SUCCEEDED",
+                "created_at": "2026-06-08T00:00:00+00:00",
+                "completed_at": "2026-06-08T00:01:00+00:00",
+                "eta": None,
+                "stderr_tail": "",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    optimizer_job_runner.reset_runner_cache()
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+    app.config["OPTIMIZER_RUNS_DIR"] = str(runs_dir)
+    app.register_blueprint(web_routes.bp)
+
+    response = app.test_client().get("/api/optimizer/jobs")
+
+    assert response.status_code == 200
+    job = response.get_json()["jobs"][0]
+    assert job["job_id"] == "job-from-disk"
+    assert job["status"] == "SUCCEEDED"
+    assert job["version_badge"]["status"] == "unknown"
+
+
+def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_path) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "dead-running-job"
+    job_dir.mkdir(parents=True)
+    (job_dir / ".job_meta.json").write_text(
+        json.dumps(
+            {
+                "job_id": "dead-running-job",
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "lunar-mare-low-ti-objectives-v1",
+                "feedstock_id": "lunar_mare_low_ti",
+                "profile_id": "lunar-mare-low-ti-objectives-v1",
+                "strategy": "random",
+                "fidelity": "stub",
+                "budget": 1,
+                "parallel": 1,
+                "seed": 0,
+                "status": "RUNNING",
+                "created_at": "2026-06-08T00:00:00+00:00",
+                "started_at": "2026-06-08T00:00:01+00:00",
+                "eta": None,
+                "stderr_tail": "",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+    jobs = runner.list_jobs()
+
+    assert jobs[0]["job_id"] == "dead-running-job"
+    assert jobs[0]["status"] == "FAILED"
+    assert (
+        "optimizer process exited before the web process recorded an exit code"
+        in jobs[0]["stderr_tail"]
+    )
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "FAILED"
 
 
 def test_optimizer_page_and_table_render_feedstock_profile_winners(
@@ -524,8 +876,10 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     html = response.get_data(as_text=True)
     table = partial.get_data(as_text=True)
     assert 'hx-get="/partials/optimizer-table"' in html
-    assert "Mode C is read-only browse" in html
-    assert "EvalSpec form is deferred to C+ / W-B" in html
+    assert "Launch Optimizer Job" in html
+    assert "minutes to hours" in html
+    assert 'hx-post="/optimizer/jobs"' in html
+    assert 'hx-get="/partials/optimizer-jobs"' in html
     assert "candidate-page" in table
     assert "lunar_mare_low_ti" in table
     assert "oxygen-yield-v1" in table
@@ -540,6 +894,7 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "Refractory ceramic/rump" in table
     assert "backend-badge" in table
     assert "StubBackend / unavailable" in table
+    assert "current" in table
 
 
 def test_optimizer_page_marks_missing_readouts_inconclusive(
@@ -898,28 +1253,39 @@ def test_product_ledger_panel_surfaces_unclassified_mass_as_inconclusive(
 
 
 def test_web_routes_do_not_import_evaluate_or_worker_runtime() -> None:
-    source = Path(web_routes.__file__).read_text(encoding="utf-8")
-    tree = ast.parse(source)
     forbidden: list[str] = []
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            forbidden.extend(
-                alias.name
-                for alias in node.names
-                if alias.name == "simulator.optimize.evaluate"
-            )
-        if isinstance(node, ast.ImportFrom):
-            if node.module == "simulator.optimize.evaluate":
-                forbidden.append(node.module)
-            if node.module and node.module.endswith("worker_runtime"):
-                forbidden.append(node.module)
-        if isinstance(node, ast.Call):
-            func = node.func
-            if isinstance(func, ast.Name) and func.id == "evaluate":
-                forbidden.append("evaluate()")
-            if isinstance(func, ast.Attribute) and func.attr == "evaluate":
-                forbidden.append("*.evaluate()")
+    for path in (
+        Path(web_routes.__file__),
+        Path(optimizer_job_runner.__file__),
+    ):
+        source = path.read_text(encoding="utf-8")
+        tree = ast.parse(source)
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                forbidden.extend(
+                    alias.name
+                    for alias in node.names
+                    if alias.name == "simulator.optimize.evaluate"
+                )
+            if isinstance(node, ast.ImportFrom):
+                if node.module == "simulator.optimize.evaluate":
+                    forbidden.append(f"{path.name}:{node.module}")
+                if node.module and node.module.endswith("worker_runtime"):
+                    forbidden.append(f"{path.name}:{node.module}")
+            if isinstance(node, ast.Call):
+                func = node.func
+                if isinstance(func, ast.Name) and func.id in {
+                    "evaluate",
+                    "evaluate_batch",
+                }:
+                    forbidden.append(f"{path.name}:{func.id}()")
+                if isinstance(func, ast.Attribute) and func.attr in {
+                    "evaluate",
+                    "evaluate_batch",
+                }:
+                    forbidden.append(f"{path.name}:*.{func.attr}()")
+        assert "worker_runtime" not in source
 
     assert forbidden == []
-    assert "worker_runtime" not in source

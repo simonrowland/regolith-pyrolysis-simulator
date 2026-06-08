@@ -6,8 +6,8 @@
     <div class="section-card">
         <h2>Optimizer Results</h2>
         <p class="config-hint">
-            Mode C is read-only browse over stored ResultStore artifacts; launching
-            a new study from an EvalSpec form is deferred to C+ / W-B.
+            Stored ResultStore artifacts and CLI-spawned optimizer jobs share
+            {{ runs_dir }}.
         </p>
         <form id="optimizer-filters"
               class="campaign-controls"
@@ -43,6 +43,88 @@
                 <button class="btn btn-primary" type="submit">Apply</button>
             </div>
         </form>
+    </div>
+
+    <div class="section-card">
+        <h3>Launch Optimizer Job</h3>
+        <p class="config-hint">
+            High-fidelity real-backend jobs are expected to take minutes to hours;
+            queued/running status means the browser is waiting on the CLI job, not hung.
+        </p>
+        <form id="optimizer-launch-form"
+              class="campaign-controls"
+              hx-post="{{ url_for('web.optimizer_job_submit') }}"
+              hx-target="#optimizer-jobs"
+              hx-swap="outerHTML">
+            <div class="ctrl-row">
+                <label for="job-feedstock">Feedstock</label>
+                <select id="job-feedstock" name="feedstock_id" required>
+                    <option value="">Select feedstock</option>
+                    {% for feedstock_id in feedstock_profiles.feedstocks.keys()|sort %}
+                    <option value="{{ feedstock_id }}">{{ feedstock_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-profile">Profile</label>
+                <select id="job-profile" name="profile_id" required>
+                    <option value="">Select profile</option>
+                    {% for profile in feedstock_profiles.profiles %}
+                    <option value="{{ profile.profile_id }}"
+                            data-feedstock="{{ profile.feedstock_id }}"
+                            title="objectives: {{ profile.objective_metrics|join(', ') or 'not declared' }}; gates: {{ profile.constraints_gates|join(', ') or 'not declared' }}">
+                        {{ profile.profile_id }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-strategy">Strategy</label>
+                <select id="job-strategy" name="strategy" required>
+                    {% for strategy in job_strategy_choices %}
+                    <option value="{{ strategy }}" {% if strategy == "staged" %}selected{% endif %}>{{ strategy }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-fidelity">Fidelity</label>
+                <select id="job-fidelity" name="fidelity" required>
+                    {% for fidelity in job_fidelity_choices %}
+                    <option value="{{ fidelity }}" {% if fidelity == "high" %}selected{% endif %}>{{ fidelity }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-budget">Budget</label>
+                <input id="job-budget" name="budget" type="number" min="1" step="1" value="24" required>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-parallel">Parallel</label>
+                <input id="job-parallel" name="parallel" type="number" min="1" max="{{ job_parallel_cap }}" step="1" value="1" required>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-seed">Seed</label>
+                <input id="job-seed" name="seed" type="number" min="0" step="1" value="0" required>
+            </div>
+            <div class="ctrl-row">
+                <label for="job-mre-preset">MRE catalog</label>
+                <select id="job-mre-preset" name="mre_preset_id">
+                    {% for preset in mre_presets %}
+                    <option value="{{ preset.id }}">{{ preset.label }} · {{ preset.included_species_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="control-buttons">
+                <button class="btn btn-primary" type="submit">Book Job</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="optimizer-jobs"
+         hx-get="{{ url_for('web.optimizer_jobs_partial') }}"
+         hx-trigger="load, every 5s"
+         hx-swap="outerHTML">
+        {% include "partials/optimizer_jobs.html" %}
     </div>
 
     <div id="optimizer-table"

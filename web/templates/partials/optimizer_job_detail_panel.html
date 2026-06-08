@@ -1,0 +1,62 @@
+<div id="optimizer-job-detail" class="section-card"
+     hx-get="{{ url_for('web.optimizer_job_detail_partial', job_id=job.job_id) }}"
+     hx-trigger="every 5s"
+     hx-swap="outerHTML">
+    <h2>Optimizer Job {{ job.job_id }}</h2>
+    <table class="param-table">
+        <tr><td>Status</td><td>{{ job.status }}</td></tr>
+        <tr><td>Feedstock</td><td>{{ job.feedstock_id }}</td></tr>
+        <tr><td>Profile</td><td>{{ job.profile_id }}</td></tr>
+        <tr><td>Strategy</td><td>{{ job.strategy }}</td></tr>
+        <tr><td>Fidelity</td><td>{{ job.fidelity }}</td></tr>
+        <tr><td>Budget</td><td>{{ job.budget }}</td></tr>
+        <tr><td>Parallel</td><td>{{ job.parallel }}</td></tr>
+        <tr><td>Seed</td><td>{{ job.seed }}</td></tr>
+        <tr><td>PID</td><td>{{ job.pid or "not running" }}</td></tr>
+        <tr><td>Created</td><td>{{ job.created_at }}</td></tr>
+        <tr><td>Completed</td><td>{{ job.completed_at or "not complete" }}</td></tr>
+        <tr>
+            <td>Queue</td>
+            <td>
+                {% if job.status == "QUEUED" %}
+                {{ job.queue_depth }} jobs ahead
+                {% elif job.status == "RUNNING" %}
+                running
+                {% else %}
+                complete
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>ETA</td>
+            <td>
+                {% if job.eta %}
+                {{ "%.0f"|format(job.eta.seconds) }} s from {{ job.eta.basis }}
+                {% else %}
+                estimating...
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>Version</td>
+            <td>
+                <span class="version-badge version-badge-{{ job.version_badge.status }}">
+                    {{ job.version_badge.label }}
+                </span>
+                <span class="range">
+                    stored {{ job.version_badge.stored_version or "unknown" }};
+                    current {{ job.version_badge.current_version }}
+                </span>
+            </td>
+        </tr>
+        <tr><td>Output directory</td><td>{{ job.out_dir }}</td></tr>
+        <tr><td>Log</td><td>{{ job.log_path }}</td></tr>
+    </table>
+    {% if job.status == "FAILED" %}
+    <h3>Failure Tail</h3>
+    <pre class="debug-json-comment">{{ job.stderr_tail or "optimizer failed without stderr" }}</pre>
+    {% endif %}
+    <div class="control-buttons">
+        <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
+    </div>
+</div>

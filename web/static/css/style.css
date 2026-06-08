@@ -745,6 +745,47 @@ details details {
     white-space: pre;
 }
 
+.version-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.version-badge-current {
+    background: #dcfce7;
+    color: #064e3b;
+}
+
+.version-badge-stale,
+.optimizer-status-failed,
+.optimizer-job-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.version-badge-unknown,
+.optimizer-status-queued {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.optimizer-status-running {
+    background: #dbeafe;
+    color: #1e3a8a;
+}
+
+.optimizer-status-succeeded {
+    background: #dcfce7;
+    color: #064e3b;
+}
+
+.optimizer-jobs-table .range {
+    display: block;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
     .simulator-layout {
