@@ -5,6 +5,10 @@ from __future__ import annotations
 import json
 import math
 import multiprocessing as mp
+import os
+import time
+from dataclasses import dataclass, replace
+import inspect
 from pathlib import Path
 from queue import Empty
 from typing import Any, Callable, Mapping, Sequence
@@ -24,6 +28,20 @@ from simulator.optimize.objective import ObjectiveValue
 EvaluateFn = Callable[..., ScoredResult]
 EvalOutcome = tuple[ScoredResult | None, Mapping[str, Any] | None]
 Pair = tuple[int, ScoredResult, ScoredResult]
+STUB_DIAGNOSTIC_REASON = "stub-vs-stub diagnostic, not authoritative"
+
+
+@dataclass(frozen=True)
+class _FidelityTask:
+    index: int
+    tier: str
+    fn: EvaluateFn
+    patch: Any
+    feedstock_id: str
+    fidelity: str
+    profile: Mapping[str, Any]
+    candidate_id: str
+    kwargs: Mapping[str, Any]
 
 DEFAULT_THRESHOLD_PROFILE: Mapping[str, Mapping[str, Any]] = {
     "spearman_min": {
@@ -99,32 +117,76 @@ def run_fidelity_correlation(
     kwargs = dict(evaluator_kwargs or {})
     prof = dict(profile or {})
 
+    fast_tasks: list[_FidelityTask] = []
+    high_tasks: list[_FidelityTask] = []
     for index, patch in enumerate(patches):
         fast_id = f"fidelity-doe-{index:06d}-fast"
         high_id = f"fidelity-doe-{index:06d}-high"
-        fast, fast_drop = _run_eval(
-            evaluate_fn_fast,
-            patch,
-            feedstock_id,
-            fast_fidelity_name,
-            prof,
-            fast_id,
-            per_eval_timeout_s,
-            kwargs,
-            index,
-            "fast",
+        fast_tasks.append(
+            _FidelityTask(
+                index=index,
+                tier="fast",
+                fn=evaluate_fn_fast,
+                patch=patch,
+                feedstock_id=feedstock_id,
+                fidelity=fast_fidelity_name,
+                profile=prof,
+                candidate_id=fast_id,
+                kwargs=kwargs,
+            )
         )
-        high, high_drop = _run_eval(
-            evaluate_fn_high,
-            patch,
-            feedstock_id,
-            high_fidelity_name,
-            prof,
-            high_id,
+        high_tasks.append(
+            _FidelityTask(
+                index=index,
+                tier="high",
+                fn=evaluate_fn_high,
+                patch=patch,
+                feedstock_id=feedstock_id,
+                fidelity=high_fidelity_name,
+                profile=prof,
+                candidate_id=high_id,
+                kwargs=kwargs,
+            )
+        )
+
+    outcomes = {
+        **_run_eval_batch(
+            fast_tasks,
             per_eval_timeout_s,
-            kwargs,
-            index,
-            "high",
+            max_workers=_fidelity_worker_count(fast_tasks, n_total),
+        ),
+        **_run_eval_batch(
+            high_tasks,
+            per_eval_timeout_s,
+            max_workers=_fidelity_worker_count(high_tasks, n_total),
+        ),
+    }
+    for index in range(n_total):
+        fast, fast_drop = outcomes.get(
+            ("fast", index),
+            (
+                None,
+                _drop(
+                    index,
+                    "fast",
+                    f"fidelity-doe-{index:06d}-fast",
+                    "engine_bug",
+                    "fidelity pool ended without result",
+                ),
+            ),
+        )
+        high, high_drop = outcomes.get(
+            ("high", index),
+            (
+                None,
+                _drop(
+                    index,
+                    "high",
+                    f"fidelity-doe-{index:06d}-high",
+                    "engine_bug",
+                    "fidelity pool ended without result",
+                ),
+            ),
         )
         drops.extend(drop for drop in (fast_drop, high_drop) if drop is not None)
         if fast is not None and high is not None:
@@ -150,9 +212,29 @@ def run_fidelity_correlation(
     agreement = _agreement(pairs)
     primary = _primary(pairs, objectives)
     recalls = {k: _recall(pairs, primary, k) for k in top_k_values}
+    backend_arms = {
+        "fast": _arm_backend_authority(
+            "fast",
+            fast_fidelity_name,
+            fast_tasks,
+            [fast for _, fast, _ in pairs],
+        ),
+        "high": _arm_backend_authority(
+            "high",
+            high_fidelity_name,
+            high_tasks,
+            [high for _, _, high in pairs],
+        ),
+    }
     verdict, confidence, notes = _verdict(
         spearman, agreement, recalls, len(pairs), n_total, len(drops), threshold_profile, primary
     )
+    authority_reason = _high_arm_authority_reason(backend_arms)
+    if verdict and authority_reason:
+        verdict = False
+        confidence = "inconclusive"
+        notes = (*notes, authority_reason)
+    reason = _payload_reason(verdict, notes, authority_reason)
     artifacts = _artifacts(
         artifact_dir,
         protocol,
@@ -168,6 +250,8 @@ def run_fidelity_correlation(
         confidence,
         notes,
         primary,
+        backend_arms,
+        reason,
     )
     return FidelityCorrelationResult(
         protocol=protocol,
@@ -186,81 +270,347 @@ def run_fidelity_correlation(
     )
 
 
-def _run_eval(
-    fn: EvaluateFn,
-    patch: Any,
-    feedstock_id: str,
-    fidelity: str,
-    profile: Mapping[str, Any],
-    candidate_id: str,
+def _run_eval_batch(
+    tasks: Sequence[_FidelityTask],
     timeout_s: float,
-    kwargs: Mapping[str, Any],
-    index: int,
-    tier: str,
-) -> EvalOutcome:
-    ctx = mp.get_context("fork" if "fork" in mp.get_all_start_methods() else "spawn")
-    queue: mp.Queue[Any] = ctx.Queue(maxsize=1)
-    process = ctx.Process(
-        target=_worker,
-        args=(queue, fn, patch, feedstock_id, fidelity, dict(profile), candidate_id, dict(kwargs)),
-    )
-    process.start()
-    process.join(timeout_s)
-    if process.is_alive():
-        process.terminate()
-        process.join(1.0)
-        if process.is_alive() and hasattr(process, "kill"):
-            process.kill()
-            process.join(1.0)
-        return None, _drop(index, tier, candidate_id, "timeout", "per-eval timeout")
+    *,
+    max_workers: int,
+) -> Mapping[tuple[str, int], EvalOutcome]:
+    worker_count = min(max_workers, len(tasks), os.cpu_count() or 1)
+    warm_backend_name = _warm_backend_name(tasks)
+    ctx = mp.get_context(_start_method())
+    task_queue: mp.Queue[Any] = ctx.Queue()
+    result_queue: mp.Queue[Any] = ctx.Queue()
+    workers = [
+        ctx.Process(target=_fidelity_worker_loop, args=(task_queue, result_queue, warm_backend_name))
+        for _ in range(worker_count)
+    ]
+    outcomes: dict[tuple[str, int], EvalOutcome] = {}
+    pending = {(task.tier, task.index): task for task in tasks}
+    started: dict[tuple[str, int], float] = {}
     try:
-        status, payload = queue.get_nowait()
-    except Empty:
-        return None, _drop(
-            index,
-            tier,
-            candidate_id,
-            "engine_bug",
-            f"worker exited without result; exitcode={process.exitcode}",
-        )
-    if status == "ok":
-        return payload, None
-    return None, _drop(index, tier, candidate_id, payload["category"], payload["message"])
+        for worker in workers:
+            worker.start()
+        for task in tasks:
+            task_queue.put(task)
+        for _ in workers:
+            task_queue.put(None)
+        while pending:
+            try:
+                message = result_queue.get(timeout=0.05)
+            except Empty:
+                message = None
+            if message is not None:
+                key = (message["tier"], int(message["index"]))
+                if key in pending:
+                    if message["kind"] == "started":
+                        started[key] = time.monotonic()
+                    elif message["kind"] == "done":
+                        outcomes[key] = _payload_outcome(message["payload"])
+                        pending.pop(key, None)
+                        started.pop(key, None)
+            now = time.monotonic()
+            expired = [
+                key for key, start in started.items() if key in pending and now - start >= timeout_s
+            ]
+            if expired:
+                for key in expired:
+                    task = pending.pop(key)
+                    started.pop(key, None)
+                    outcomes[key] = (
+                        None,
+                        _drop(task.index, task.tier, task.candidate_id, "timeout", "per-eval timeout"),
+                    )
+                _terminate_workers(workers)
+                for key, task in list(pending.items()):
+                    outcomes[key] = (
+                        None,
+                        _drop(
+                            task.index,
+                            task.tier,
+                            task.candidate_id,
+                            "timeout",
+                            "fidelity pool aborted after per-eval timeout",
+                        ),
+                    )
+                pending.clear()
+            elif not any(worker.is_alive() for worker in workers):
+                while True:
+                    try:
+                        message = result_queue.get_nowait()
+                    except Empty:
+                        break
+                    key = (message["tier"], int(message["index"]))
+                    if key in pending and message["kind"] == "done":
+                        outcomes[key] = _payload_outcome(message["payload"])
+                        pending.pop(key, None)
+                        started.pop(key, None)
+                for key, task in list(pending.items()):
+                    outcomes[key] = (
+                        None,
+                        _drop(
+                            task.index,
+                            task.tier,
+                            task.candidate_id,
+                            "engine_bug",
+                            "fidelity worker pool exited without result",
+                        ),
+                    )
+                pending.clear()
+    finally:
+        _join_or_stop_workers(workers)
+        task_queue.close()
+        result_queue.close()
+    return outcomes
 
 
-def _worker(
-    queue: Any,
-    fn: EvaluateFn,
-    patch: Any,
-    feedstock_id: str,
-    fidelity: str,
-    profile: Mapping[str, Any],
-    candidate_id: str,
-    kwargs: Mapping[str, Any],
+def _fidelity_worker_loop(
+    task_queue: Any,
+    result_queue: Any,
+    warm_backend_name: str | None,
 ) -> None:
+    _initialize_fidelity_worker(warm_backend_name)
+    while True:
+        task = task_queue.get()
+        if task is None:
+            return
+        result_queue.put({"kind": "started", "tier": task.tier, "index": task.index})
+        result_queue.put(
+            {
+                "kind": "done",
+                "tier": task.tier,
+                "index": task.index,
+                "payload": _evaluate_fidelity_task(task),
+            }
+        )
+
+
+def _evaluate_fidelity_task(task: _FidelityTask) -> Mapping[str, Any]:
     try:
-        result = fn(
-            patch,
-            feedstock_id,
-            fidelity,
-            profile=profile,
-            candidate_id=candidate_id,
-            **dict(kwargs),
-        )
+        result = _call_evaluate_fn(task)
     except EvaluationAbort as exc:
-        queue.put(
-            (
-                "error",
-                {
-                    "category": getattr(exc.category, "value", str(exc.category)),
-                    "message": str(exc),
-                },
-            )
-        )
+        return {
+            "kind": "drop",
+            "drop": _drop(
+                task.index,
+                task.tier,
+                task.candidate_id,
+                getattr(exc.category, "value", str(exc.category)),
+                str(exc),
+            ),
+        }
     except BaseException as exc:
-        queue.put(("error", {"category": "error", "message": f"{type(exc).__name__}: {exc}"}))
+        return {
+            "kind": "drop",
+            "drop": _drop(
+                task.index,
+                task.tier,
+                task.candidate_id,
+                "error",
+                f"{type(exc).__name__}: {exc}",
+            ),
+        }
+    return {"kind": "result", "result": _queue_safe_result(result)}
+
+
+def _queue_safe_result(result: ScoredResult) -> ScoredResult:
+    if isinstance(result, ScoredResult):
+        return replace(result, run_reference=_queue_safe_run_reference(result))
+    return result
+
+
+def _queue_safe_run_reference(result: ScoredResult) -> Any | None:
+    ref = result.run_reference
+    if ref is None:
+        return None
+    backend_status = _result_backend_status(result)
+    safe_trace = {"backend_status": backend_status} if backend_status is not None else None
+    try:
+        return replace(ref, trace=safe_trace, product_summary={})
+    except TypeError:
+        return None
+
+
+def _call_evaluate_fn(task: _FidelityTask) -> ScoredResult:
+    from simulator.optimize.worker_runtime import get_worker_runtime
+
+    call_kwargs: dict[str, Any] = {
+        "profile": dict(task.profile),
+        "candidate_id": task.candidate_id,
+        "worker_runtime": get_worker_runtime(),
+    }
+    call_kwargs.update(dict(task.kwargs))
+    signature = inspect.signature(task.fn)
+    accepts_kwargs = any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    )
+    if not accepts_kwargs:
+        call_kwargs = {
+            key: value for key, value in call_kwargs.items() if key in signature.parameters
+        }
+    return task.fn(
+        task.patch,
+        task.feedstock_id,
+        task.fidelity,
+        **call_kwargs,
+    )
+
+
+def _payload_outcome(payload: Mapping[str, Any]) -> EvalOutcome:
+    if payload.get("kind") == "result":
+        return payload["result"], None
+    return None, payload["drop"]
+
+
+def _initialize_fidelity_worker(backend_name: str | None) -> None:
+    from simulator.optimize.determinism import pin_worker_env
+    from simulator.optimize.worker_runtime import clear_worker_runtime, warm_worker_runtime
+
+    pin_worker_env()
+    if backend_name is None:
+        clear_worker_runtime()
+        return
+    warm_worker_runtime(backend_name)
+
+
+def _warm_backend_name(tasks: Sequence[_FidelityTask]) -> str | None:
+    from simulator.optimize.worker_runtime import warm_workers_enabled
+
+    if not warm_workers_enabled():
+        return None
+    names = {_task_backend_name(task) for task in tasks}
+    if len(names) != 1:
+        return None
+    name = next(iter(names))
+    if name in {"auto", "cached-real"}:
+        return None
+    return name
+
+
+def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
+    if not tasks:
+        return 1
+    backend_name = _task_backend_name(tasks[0])
+    if backend_name not in {"stub", "auto", "cached-real"}:
+        return 1
+    return max(1, min(n_total, 2))
+
+
+def _task_backend_name(task: _FidelityTask) -> str:
+    merged: dict[str, Any] = {}
+    profile = task.profile
+    run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
+    if isinstance(run_options, Mapping):
+        merged.update(run_options)
+    fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
+    if isinstance(fidelities, Mapping):
+        selected = fidelities.get(task.fidelity, {})
+        if isinstance(selected, Mapping):
+            merged.update(selected)
+    return str(merged.get("backend_name", "stub") or "stub")
+
+
+def _arm_backend_authority(
+    tier: str,
+    fidelity_name: str,
+    tasks: Sequence[_FidelityTask],
+    results: Sequence[ScoredResult],
+) -> Mapping[str, Any]:
+    backend_names = {name for name in (_task_backend_name(task) for task in tasks) if name}
+    for result in results:
+        spec = getattr(result, "eval_spec", None)
+        raw_name = getattr(spec, "backend_name", None)
+        if raw_name:
+            backend_names.add(str(raw_name))
+    if not backend_names:
+        backend_names.add("stub")
+    ordered_names = tuple(sorted(backend_names))
+    backend_name = ordered_names[0] if len(ordered_names) == 1 else "mixed:" + ",".join(ordered_names)
+
+    statuses = [_result_backend_status(result) for result in results]
+    missing_statuses = sum(1 for status in statuses if status is None)
+    present_statuses = [status for status in statuses if status is not None]
+    if len(ordered_names) != 1:
+        backend_status = "mixed_backend"
+        authoritative = False
+    elif backend_name == "stub":
+        backend_status = "diagnostic_stub"
+        authoritative = False
+    elif not results:
+        backend_status = "no_compared_results"
+        authoritative = False
+    elif missing_statuses:
+        backend_status = "missing"
+        authoritative = False
+    elif all(status == "ok" for status in present_statuses):
+        backend_status = "ok"
+        authoritative = True
     else:
-        queue.put(("ok", result))
+        backend_status = "mixed:" + ",".join(sorted(set(present_statuses)))
+        authoritative = False
+    return {
+        "tier": tier,
+        "fidelity_name": fidelity_name,
+        "backend_name": backend_name,
+        "backend_status": backend_status,
+        "authoritative": authoritative,
+    }
+
+
+def _result_backend_status(result: ScoredResult) -> str | None:
+    ref = getattr(result, "run_reference", None)
+    if ref is None:
+        return None
+    for carrier in (getattr(ref, "trace", None), ref):
+        status = _extract_backend_status(carrier)
+        if status is not None:
+            return status
+    return None
+
+
+def _extract_backend_status(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    if isinstance(carrier, Mapping):
+        per_hour = carrier.get("per_hour")
+        raw = carrier.get("backend_status")
+    else:
+        per_hour = getattr(carrier, "per_hour", None)
+        raw = getattr(carrier, "backend_status", None)
+    if isinstance(per_hour, (list, tuple)) and per_hour:
+        status = _extract_backend_status(per_hour[-1])
+        if status is not None:
+            return status
+    if raw is not None:
+        return str(raw)
+    return None
+
+
+def _start_method() -> str:
+    methods = mp.get_all_start_methods()
+    if "PYTEST_CURRENT_TEST" in os.environ and "fork" in methods:
+        return "fork"
+    if "spawn" in methods:
+        return "spawn"
+    return methods[0]
+
+
+def _terminate_workers(workers: Sequence[Any]) -> None:
+    for worker in workers:
+        if worker.is_alive():
+            worker.terminate()
+
+
+def _join_or_stop_workers(workers: Sequence[Any]) -> None:
+    for worker in workers:
+        worker.join(1.0)
+        if worker.is_alive():
+            worker.terminate()
+            worker.join(1.0)
+        if worker.is_alive() and hasattr(worker, "kill"):
+            worker.kill()
+            worker.join(1.0)
 
 
 def _spearman(pairs: Sequence[Pair], objective: str) -> float | None:
@@ -388,6 +738,33 @@ def _verdict(
     return verdict, "high" if verdict else "low", tuple(notes)
 
 
+def _high_arm_authority_reason(backend_arms: Mapping[str, Mapping[str, Any]]) -> str:
+    high = backend_arms.get("high", {})
+    fast = backend_arms.get("fast", {})
+    high_backend = str(high.get("backend_name", "stub") or "stub")
+    fast_backend = str(fast.get("backend_name", "stub") or "stub")
+    if high_backend == "stub":
+        if fast_backend == "stub":
+            return STUB_DIAGNOSTIC_REASON
+        return "high arm stub diagnostic, not authoritative"
+    if not bool(high.get("authoritative", False)):
+        status = str(high.get("backend_status", "missing") or "missing")
+        return f"high arm backend_status={status!r}, not authoritative"
+    return ""
+
+
+def _payload_reason(
+    verdict: bool,
+    notes: Sequence[str],
+    authority_reason: str,
+) -> str:
+    if verdict:
+        return ""
+    if authority_reason:
+        return authority_reason
+    return str(notes[0]) if notes else ""
+
+
 def _artifacts(
     artifact_dir: str | Path | None,
     protocol: FidelityCorrelationProtocol,
@@ -403,6 +780,8 @@ def _artifacts(
     confidence: str,
     notes: Sequence[str],
     primary: str | None,
+    backend_arms: Mapping[str, Mapping[str, Any]],
+    reason: str,
 ) -> Mapping[str, str]:
     if artifact_dir is None:
         return {}
@@ -424,6 +803,8 @@ def _artifacts(
         "thresholds": dict(thresholds),
         "fast_screen_trustworthy": verdict,
         "confidence": confidence,
+        "reason": reason,
+        "backend_arms": {arm: dict(metadata) for arm, metadata in backend_arms.items()},
         "notes": list(notes),
         "artifact_paths": {"json": str(json_path), "markdown": str(md_path)},
     }
@@ -438,6 +819,7 @@ def _markdown(payload: Mapping[str, Any]) -> str:
         "",
         f"- Verdict: {payload['fast_screen_trustworthy']}",
         f"- Confidence: {payload['confidence']}",
+        f"- Reason: {payload['reason']}",
         f"- Compared: {payload['n_samples_compared']} / {payload['n_samples_total']}",
         f"- Dropped: {payload['n_samples_dropped']}",
         "",
@@ -452,6 +834,14 @@ def _markdown(payload: Mapping[str, Any]) -> str:
         f"- {name}: {item['value']} ({item['source_type']}; {item['source']})"
         for name, item in payload["thresholds"].items()
     ]
+    lines += ["", "## Backend Arms"]
+    for arm, metadata in payload["backend_arms"].items():
+        lines.append(
+            "- "
+            f"{arm}: backend_name={metadata['backend_name']}; "
+            f"backend_status={metadata['backend_status']}; "
+            f"authoritative={metadata['authoritative']}"
+        )
     if payload["notes"]:
         lines += ["", "## Notes", *(f"- {note}" for note in payload["notes"])]
     return "\n".join(lines) + "\n"

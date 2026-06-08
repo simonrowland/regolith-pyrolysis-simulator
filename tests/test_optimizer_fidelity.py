@@ -12,10 +12,12 @@ from simulator.optimize.doe import (
     DoeSpec,
     FidelityCorrelationResult,
 )
-from simulator.optimize.evaluate import EvaluationAbort, FailureCategory, ScoredResult
+from simulator.optimize.evaluate import EvaluationAbort, FailureCategory, RunReference, ScoredResult
+from simulator.optimize.evalspec import EvalSpec
 from simulator.optimize.fidelity import DEFAULT_THRESHOLD_PROFILE, run_fidelity_correlation
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.worker_runtime import WARM_WORKERS_ENV
 
 FEEDSTOCK_ID = "lunar_mare_low_ti"
 
@@ -47,25 +49,59 @@ def _index(candidate_id: str | None) -> int:
     return int(candidate_id.split("-")[-2])
 
 
+def _candidate_fidelity(candidate_id: str | None) -> str:
+    return str(candidate_id).rsplit("-", 1)[-1] if candidate_id else "test"
+
+
+def _eval_spec(candidate_id: str | None, backend_name: str) -> EvalSpec:
+    return EvalSpec(
+        recipe_id=f"recipe-{candidate_id or 'test'}",
+        feedstock_recipe_digest="feedstock-digest",
+        feedstock_id=FEEDSTOCK_ID,
+        profile_id="test-profile",
+        fidelity=_candidate_fidelity(candidate_id),
+        code_version="test",
+        data_digests={
+            "feedstocks": "feedstocks-digest",
+            "profile": "profile-digest",
+            "setpoints": "setpoints-digest",
+            "vapor_pressures": "vapor-pressures-digest",
+        },
+        backend_name=backend_name,
+    )
+
+
+def _run_reference(backend_status: str | None) -> RunReference | None:
+    if backend_status is None:
+        return None
+    return RunReference(status="ok", trace={"backend_status": backend_status})
+
+
 def _result(
     candidate_id: str | None,
     *,
     oxygen_kg: float,
     energy_kwh: float,
     feasible: bool = True,
+    backend_name: str | None = None,
+    backend_status: str | None = None,
 ) -> ScoredResult:
+    eval_spec = _eval_spec(candidate_id, backend_name) if backend_name is not None else None
+    cache_key = f"cache-{candidate_id}" if eval_spec is not None else None
+    run_reference = _run_reference(backend_status)
     if not feasible:
         return ScoredResult(
             candidate_id=candidate_id,
-            eval_spec=None,
-            cache_key=None,
+            eval_spec=eval_spec,
+            cache_key=cache_key,
             feasible=False,
             failure_category=FailureCategory.INFEASIBLE_RECIPE,
+            run_reference=run_reference,
         )
     return ScoredResult(
         candidate_id=candidate_id,
-        eval_spec=None,
-        cache_key=None,
+        eval_spec=eval_spec,
+        cache_key=cache_key,
         feasible=True,
         objectives=ObjectiveVector(
             (
@@ -73,6 +109,7 @@ def _result(
                 ObjectiveValue("energy_kWh", "minimize", energy_kwh, "kWh", 1),
             )
         ),
+        run_reference=run_reference,
     )
 
 
@@ -134,6 +171,27 @@ def _mixed_perfect_high(
         fidelity,
         profile=profile,
         candidate_id=candidate_id,
+    )
+
+
+def _authoritative_mixed_perfect_high(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+) -> ScoredResult:
+    del patch, feedstock_id, fidelity, profile
+    index = _index(candidate_id)
+    value = float(index // 2)
+    return _result(
+        candidate_id,
+        oxygen_kg=value,
+        energy_kwh=100.0 - value,
+        feasible=index < 6,
+        backend_name="alphamelts",
+        backend_status="ok",
     )
 
 
@@ -230,7 +288,7 @@ def _flaky_high(
     )
 
 
-def test_perfect_correlation_is_trustworthy_and_writes_artifacts(tmp_path: Path) -> None:
+def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     result = run_fidelity_correlation(
         _doe(),
         _mixed_perfect_fast,
@@ -239,6 +297,51 @@ def test_perfect_correlation_is_trustworthy_and_writes_artifacts(tmp_path: Path)
         per_eval_timeout_s=2.0,
         feedstock_id=FEEDSTOCK_ID,
         profile={},
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path,
+    )
+
+    assert result.feasible_infeasible_agreement == 1.0
+    assert result.top_k_recall[3] == 1.0
+    assert result.spearman_by_objective["oxygen_kg"] == pytest.approx(1.0)
+    assert result.spearman_by_objective["energy_kWh"] == pytest.approx(1.0)
+    assert result.fast_screen_trustworthy is False
+    assert result.confidence == "inconclusive"
+    assert result.notes == ("stub-vs-stub diagnostic, not authoritative",)
+
+    payload = json.loads(Path(result.artifact_paths["json"]).read_text())
+    assert payload["fast_screen_trustworthy"] is False
+    assert payload["reason"] == "stub-vs-stub diagnostic, not authoritative"
+    assert payload["backend_arms"]["fast"] == {
+        "tier": "fast",
+        "fidelity_name": "fast",
+        "backend_name": "stub",
+        "backend_status": "diagnostic_stub",
+        "authoritative": False,
+    }
+    assert payload["backend_arms"]["high"] == {
+        "tier": "high",
+        "fidelity_name": "high",
+        "backend_name": "stub",
+        "backend_status": "diagnostic_stub",
+        "authoritative": False,
+    }
+
+
+def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+
+    result = run_fidelity_correlation(
+        _doe(),
+        _mixed_perfect_fast,
+        _authoritative_mixed_perfect_high,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={"fidelities": {"fast": {"backend_name": "stub"}, "high": {"backend_name": "alphamelts"}}},
         objective_names=("oxygen_kg", "energy_kWh"),
         artifact_dir=tmp_path,
     )
@@ -254,6 +357,10 @@ def test_perfect_correlation_is_trustworthy_and_writes_artifacts(tmp_path: Path)
 
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is True
+    assert payload["reason"] == ""
+    assert payload["backend_arms"]["high"]["backend_name"] == "alphamelts"
+    assert payload["backend_arms"]["high"]["backend_status"] == "ok"
+    assert payload["backend_arms"]["high"]["authoritative"] is True
     assert payload["top_k_recall"]["3"] == 1.0
     assert Path(result.artifact_paths["markdown"]).read_text().startswith(
         "# Fidelity Correlation Report"
@@ -519,6 +626,7 @@ def test_evaluation_abort_reason_uses_failure_category_value() -> None:
 # in-memory sink would never reach the parent; the spy appends every received
 # patch's knob values to this shared-filesystem JSONL file instead.
 _PATCH_SINK_ENV = "PYROLYSIS_TEST_PATCH_SINK"
+_RUNTIME_SINK_ENV = "PYROLYSIS_TEST_RUNTIME_SINK"
 
 
 def _patch_recording_spy(
@@ -544,6 +652,77 @@ def _patch_recording_spy(
         handle.write(json.dumps(record) + "\n")
     value = float(_index(candidate_id) // 2)
     return _result(candidate_id, oxygen_kg=value, energy_kwh=100.0 - value)
+
+
+def _runtime_recording_spy(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    worker_runtime: object | None = None,
+) -> ScoredResult:
+    del patch, feedstock_id, fidelity, profile
+    sink = os.environ[_RUNTIME_SINK_ENV]
+    record = {
+        "candidate_id": candidate_id,
+        "pid": os.getpid(),
+        "has_runtime": worker_runtime is not None,
+    }
+    with open(sink, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record) + "\n")
+    value = float(_index(candidate_id) // 2)
+    return _result(candidate_id, oxygen_kg=value, energy_kwh=100.0 - value)
+
+
+def test_fidelity_pool_reuses_warm_workers_and_cold_env_preserves_zero_drop_parity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    warm_sink = tmp_path / "warm-runtime.jsonl"
+    monkeypatch.setenv(_RUNTIME_SINK_ENV, str(warm_sink))
+    monkeypatch.delenv(WARM_WORKERS_ENV, raising=False)
+
+    warm_result = run_fidelity_correlation(
+        _doe(n_samples=4),
+        _runtime_recording_spy,
+        _runtime_recording_spy,
+        top_k=(2,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={"run": {"backend_name": "stub"}},
+        objective_names=("oxygen_kg",),
+    )
+
+    warm_records = _recorded_values(warm_sink)
+    assert warm_result.n_samples_total == 4
+    assert warm_result.n_samples_compared == 4
+    assert warm_result.n_samples_dropped == 0
+    assert len(warm_records) == 8
+    assert all(record["has_runtime"] for record in warm_records)
+    assert len({record["pid"] for record in warm_records}) <= 4
+
+    cold_sink = tmp_path / "cold-runtime.jsonl"
+    monkeypatch.setenv(_RUNTIME_SINK_ENV, str(cold_sink))
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    cold_result = run_fidelity_correlation(
+        _doe(n_samples=4),
+        _runtime_recording_spy,
+        _runtime_recording_spy,
+        top_k=(2,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={"run": {"backend_name": "stub"}},
+        objective_names=("oxygen_kg",),
+    )
+
+    cold_records = _recorded_values(cold_sink)
+    assert cold_result.to_dict() | {"artifact_paths": {}} == warm_result.to_dict() | {
+        "artifact_paths": {}
+    }
+    assert len(cold_records) == 8
+    assert not any(record["has_runtime"] for record in cold_records)
 
 
 def _midpoint_anchor(schema: RecipeSchema) -> RecipePatch:
