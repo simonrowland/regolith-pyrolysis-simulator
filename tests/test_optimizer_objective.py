@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,6 +12,7 @@ from simulator.optimize.objective import (
     dominates,
     objective_importance_evidence,
     pareto_front,
+    product_summary,
 )
 
 
@@ -90,3 +92,103 @@ def test_pareto_front_preserves_stable_non_dominated_order() -> None:
     )
 
     assert [item["id"] for item in front] == ["d", "c"]
+
+
+class _FakeLedger:
+    def kg_by_account(self, account: str) -> dict[str, float]:
+        if account == "terminal.offgas":
+            return {"H2O": 5.0}
+        return {}
+
+
+class _FakeProductSim:
+    atom_ledger = _FakeLedger()
+
+    def __init__(self) -> None:
+        self.train = SimpleNamespace(
+            stages=(
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={"SiO": 40.0}),
+            )
+        )
+        self.record = SimpleNamespace(
+            feedstock_key="lunar_mare_low_ti",
+            batch_mass_kg=1000.0,
+            additives_kg={"CaO": 1.5},
+            snapshots=(
+                SimpleNamespace(
+                    mass_in_kg=1001.5,
+                    mass_out_kg=1001.5,
+                    mass_balance_error_pct=0.0,
+                ),
+            ),
+        )
+
+    def product_ledger(self) -> dict[str, float]:
+        return {"Fe": 50.0, "SiO": 40.0, "H2O": 5.0}
+
+    def _terminal_rump_by_species(self) -> dict[str, float]:
+        return {"Al2O3": 80.0}
+
+    def _oxygen_terminal_partition_kg(self) -> dict[str, float]:
+        return {
+            "stored": 20.0,
+            "vented": 0.0,
+            "total": 20.0,
+            "mre_anode_stored": 20.0,
+        }
+
+
+class _FakeUnclassifiedProductSim(_FakeProductSim):
+    def product_ledger(self) -> dict[str, float]:
+        ledger = dict(super().product_ledger())
+        ledger["MysteryOxide"] = 7.0
+        return ledger
+
+
+def test_product_summary_includes_input_output_yield_table_and_mass_closure() -> None:
+    summary = product_summary(
+        SimpleNamespace(simulator=_FakeProductSim(), trace=None),
+        {"feedstock": "lunar_mare_low_ti"},
+    )
+
+    table = summary["product_yield_table"]
+    outputs = {row["id"]: row for row in table["outputs"]}
+
+    assert [row["id"] for row in table["inputs"]] == ["feedstock", "additive:CaO"]
+    assert set(outputs) == {
+        "ingots_metals",
+        "glass",
+        "oxygen",
+        "captured_volatiles",
+        "refractory_ceramic_rump",
+    }
+    assert outputs["ingots_metals"]["kg"] == pytest.approx(50.0)
+    assert outputs["glass"]["yield_pct"] == pytest.approx(40.0 / 1001.5 * 100.0)
+    assert outputs["oxygen"]["partition_kg"]["mre_anode_stored"] == pytest.approx(20.0)
+    assert outputs["captured_volatiles"]["kg_by_species"] == {"H2O": 5.0}
+    assert table["mass_closure"]["status"] == "closed"
+    assert table["mass_closure"]["tolerance_pct"] == pytest.approx(5e-12)
+
+
+def test_unclassified_product_mass_makes_yield_table_inconclusive() -> None:
+    summary = product_summary(
+        SimpleNamespace(simulator=_FakeUnclassifiedProductSim(), trace=None),
+        {"feedstock": "lunar_mare_low_ti"},
+    )
+
+    table = summary["product_yield_table"]
+
+    assert table["mass_closure"]["status"] == "closed"
+    assert table["status"] == "inconclusive"
+    assert table["unclassified_product_mass"]["total_kg"] == pytest.approx(7.0)
+    assert table["unclassified_product_mass"]["kg_by_species"]["MysteryOxide"] == (
+        pytest.approx(7.0)
+    )
+    diagnostics = {row["id"]: row for row in table["diagnostics"]}
+    assert diagnostics["unclassified_product_mass"]["kind"] == "diagnostic"
+    assert "unclassified_product_mass" not in {
+        row["id"] for row in table["outputs"]
+    }

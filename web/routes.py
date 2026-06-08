@@ -3,6 +3,7 @@
 import json
 import os
 import sqlite3
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -199,13 +200,83 @@ def _result_metadata(
         'notes': _json_value(row['notes'], []),
     }
     for key in (
+        'product_ledger_kg',
+        'product_bins',
+        'product_yield_table',
         'wall_deposit_kg_by_segment_species',
         'wall_deposit_kg_by_zone_species',
         'campaigns_to_resinter',
     ):
         if key in product_summary:
             metadata[key] = product_summary[key]
+    product_ledger_panel = _product_ledger_panel(product_summary)
+    if product_ledger_panel is not None:
+        metadata['product_ledger_panel'] = product_ledger_panel
     return metadata
+
+
+def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any] | None:
+    product_yield_table = product_summary.get('product_yield_table')
+    if isinstance(product_yield_table, Mapping):
+        panel = dict(product_yield_table)
+        unclassified = _unclassified_product_mass(product_summary)
+        if unclassified is not None:
+            panel['status'] = 'inconclusive'
+            panel['unclassified_product_mass'] = unclassified
+            diagnostics = list(panel.get('diagnostics') or [])
+            if not any(
+                isinstance(row, Mapping)
+                and row.get('id') == 'unclassified_product_mass'
+                for row in diagnostics
+            ):
+                diagnostics.append({
+                    'kind': 'diagnostic',
+                    'id': 'unclassified_product_mass',
+                    'label': 'Unclassified product mass',
+                    'kg': unclassified['total_kg'],
+                    'kg_by_species': unclassified['kg_by_species'],
+                    'status': 'inconclusive',
+                    'reason': 'product ledger species are outside named product bins',
+                })
+            panel['diagnostics'] = diagnostics
+        return panel
+    if product_summary:
+        return {
+            'status': 'inconclusive',
+            'reason': 'product_yield_table missing',
+        }
+    return None
+
+
+def _unclassified_product_mass(
+    product_summary: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    product_classes = product_summary.get('product_classes')
+    if not isinstance(product_classes, Mapping):
+        return None
+    raw = product_classes.get('unclassified')
+    if not isinstance(raw, Mapping):
+        return None
+    kg_by_species: dict[str, float] = {}
+    raw_species = raw.get('kg_by_species')
+    if isinstance(raw_species, Mapping):
+        for species, kg in raw_species.items():
+            try:
+                value = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if value > 0.0:
+                kg_by_species[str(species)] = value
+    try:
+        total_kg = float(raw.get('total_kg', sum(kg_by_species.values())))
+    except (TypeError, ValueError):
+        total_kg = sum(kg_by_species.values())
+    if total_kg <= 0.0:
+        return None
+    return {
+        'kg_by_species': kg_by_species,
+        'total_kg': total_kg,
+    }
 
 
 def _read_cache_summary(cache_path: Path, run_id: str) -> dict[str, Any]:

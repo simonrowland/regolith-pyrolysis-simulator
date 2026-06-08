@@ -257,9 +257,18 @@ def pareto_front(
 
 def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:
     sim = getattr(run_execution, "simulator", run_execution)
+    product_classes = product_classes_summary(sim, profile)
+    product_bins = _product_bins(product_classes)
     summary: dict[str, Any] = {
         "product_ledger_kg": MappingProxyType(dict(_product_ledger(sim))),
-        "product_classes": product_classes_summary(sim, profile),
+        "product_classes": product_classes,
+        "product_bins": product_bins,
+        "product_yield_table": _product_yield_table(
+            sim,
+            profile,
+            product_bins,
+            product_classes,
+        ),
         "extraction_completeness": extraction_completeness_report(
             getattr(run_execution, "trace", None),
             _extraction_constraints_from_profile(profile),
@@ -332,6 +341,221 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         }),
         "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
     })
+
+
+def _product_bins(product_classes: Mapping[str, Any]) -> Mapping[str, Any]:
+    bins: dict[str, Mapping[str, Any]] = {}
+    for key, label in (
+        ("ingots_metals", "Ingots/metals"),
+        ("glass", "Glass"),
+        ("oxygen", "O2"),
+        ("captured_volatiles", "Captured volatiles"),
+        ("refractory_ceramic_rump", "Refractory ceramic/rump"),
+    ):
+        value = product_classes.get(key)
+        if not isinstance(value, Mapping):
+            continue
+        total = _optional_finite_float(value.get("class_total_kg"), key)
+        if total is None or total <= 0.0:
+            continue
+        payload = dict(value)
+        payload["id"] = key
+        payload["label"] = label
+        payload["kg"] = total
+        bins[key] = MappingProxyType(payload)
+    return MappingProxyType(bins)
+
+
+def _product_yield_table(
+    sim: Any,
+    profile: Mapping[str, Any],
+    product_bins: Mapping[str, Any],
+    product_classes: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    inputs = _input_line_items(sim, profile)
+    total_input_kg = sum(row["kg"] for row in inputs)
+    outputs = [
+        _output_line_item(key, value, total_input_kg)
+        for key, value in product_bins.items()
+    ]
+    products_out_kg = sum(row["kg"] for row in outputs)
+    closure = _mass_closure_row(sim, total_input_kg, products_out_kg)
+    status = closure["status"]
+    unclassified = _unclassified_product_mass(product_classes)
+    diagnostics: list[Mapping[str, Any]] = []
+    if unclassified["total_kg"] > 0.0:
+        diagnostics.append(_unclassified_product_mass_row(unclassified))
+        status = "inconclusive"
+    if not inputs:
+        status = "inconclusive"
+    table: dict[str, Any] = {
+        "status": status,
+        "inputs": tuple(inputs),
+        "outputs": tuple(outputs),
+        "mass_closure": MappingProxyType(closure),
+        "total_input_kg": total_input_kg,
+        "products_out_kg": products_out_kg,
+    }
+    if diagnostics:
+        table["diagnostics"] = tuple(diagnostics)
+        table["unclassified_product_mass"] = unclassified
+    return MappingProxyType(table)
+
+
+def _unclassified_product_mass(product_classes: Mapping[str, Any]) -> Mapping[str, Any]:
+    raw = product_classes.get("unclassified")
+    if not isinstance(raw, Mapping):
+        return MappingProxyType({
+            "kg_by_species": MappingProxyType({}),
+            "total_kg": 0.0,
+        })
+    kg_by_species: dict[str, float] = {}
+    raw_species = raw.get("kg_by_species")
+    if isinstance(raw_species, Mapping):
+        for species, kg in raw_species.items():
+            value = _optional_finite_float(kg, f"unclassified.{species}")
+            if value is not None and value > 0.0:
+                kg_by_species[str(species)] = value
+    total = _optional_finite_float(raw.get("total_kg"), "unclassified.total_kg")
+    if total is None:
+        total = sum(kg_by_species.values())
+    return MappingProxyType({
+        "kg_by_species": MappingProxyType(kg_by_species),
+        "total_kg": total,
+    })
+
+
+def _unclassified_product_mass_row(
+    unclassified: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    return MappingProxyType({
+        "kind": "diagnostic",
+        "id": "unclassified_product_mass",
+        "label": "Unclassified product mass",
+        "kg": unclassified["total_kg"],
+        "kg_by_species": unclassified["kg_by_species"],
+        "status": "inconclusive",
+        "reason": "product ledger species are outside named product bins",
+    })
+
+
+def _input_line_items(sim: Any, profile: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    record = getattr(sim, "record", None)
+    profile_run = profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
+    feedstock_id = (
+        str(getattr(record, "feedstock_key", "") or "")
+        or str(profile.get("feedstock") or profile.get("feedstock_id") or "")
+    )
+    batch_mass = _optional_finite_float(
+        getattr(record, "batch_mass_kg", None),
+        "record.batch_mass_kg",
+    )
+    if batch_mass is None:
+        batch_mass = _optional_finite_float(profile_run.get("mass_kg"), "profile.run.mass_kg")
+
+    rows: list[Mapping[str, Any]] = []
+    if batch_mass is not None and batch_mass > 0.0:
+        rows.append(MappingProxyType({
+            "kind": "input",
+            "id": "feedstock",
+            "label": "Feedstock" if not feedstock_id else f"Feedstock: {feedstock_id}",
+            "kg": batch_mass,
+            "source": "feedstock",
+        }))
+
+    additives = getattr(record, "additives_kg", None)
+    if not isinstance(additives, Mapping):
+        additives = profile_run.get("additives_kg", {})
+    if isinstance(additives, Mapping):
+        for species, kg in sorted(additives.items()):
+            amount = _optional_finite_float(kg, f"additives_kg[{species!r}]")
+            if amount is None or amount <= 0.0:
+                continue
+            name = str(species)
+            rows.append(MappingProxyType({
+                "kind": "input",
+                "id": f"additive:{name}",
+                "label": name,
+                "kg": amount,
+                "source": "additive",
+            }))
+    return rows
+
+
+def _output_line_item(
+    key: str,
+    value: Mapping[str, Any],
+    total_input_kg: float,
+) -> Mapping[str, Any]:
+    kg = _finite_float(value["kg"], f"product_bins[{key!r}].kg")
+    row: dict[str, Any] = {
+        "kind": "output",
+        "id": key,
+        "label": str(value.get("label") or key),
+        "kg": kg,
+    }
+    if total_input_kg > 0.0:
+        row["yield_pct"] = kg / total_input_kg * 100.0
+    for detail_key in (
+        "species_kg",
+        "kg_by_species",
+        "partition_kg",
+        "rump_kg_by_species",
+    ):
+        if detail_key in value:
+            row[detail_key] = value[detail_key]
+    return MappingProxyType(row)
+
+
+def _mass_closure_row(
+    sim: Any,
+    total_input_kg: float,
+    products_out_kg: float,
+) -> dict[str, Any]:
+    row: dict[str, Any] = {
+        "kind": "mass_closure",
+        "label": "Mass closure",
+        "tolerance_pct": 5e-12,
+        "products_out_kg": products_out_kg,
+    }
+    if total_input_kg > 0.0:
+        row["mass_in_kg"] = total_input_kg
+        row["product_yield_pct"] = products_out_kg / total_input_kg * 100.0
+    latest = _latest_snapshot(sim)
+    if latest is None:
+        row["status"] = "inconclusive"
+        row["reason"] = "mass_balance_error_pct missing"
+        return row
+    balance = _optional_finite_float(
+        getattr(latest, "mass_balance_error_pct", None),
+        "mass_balance_error_pct",
+    )
+    if balance is None:
+        row["status"] = "inconclusive"
+        row["reason"] = "mass_balance_error_pct missing"
+        return row
+    mass_out = _optional_finite_float(getattr(latest, "mass_out_kg", None), "mass_out_kg")
+    if mass_out is not None:
+        row["accountable_mass_out_kg"] = mass_out
+    row["balance_error_pct"] = balance
+    row["status"] = "closed" if abs(balance) <= row["tolerance_pct"] else "open"
+    return row
+
+
+def _latest_snapshot(sim: Any) -> Any | None:
+    snapshots = getattr(getattr(sim, "record", None), "snapshots", None)
+    if snapshots:
+        return snapshots[-1]
+    direct = getattr(sim, "_make_snapshot", None)
+    if callable(direct):
+        return direct()
+    return None
+
+
+def _optional_finite_float(value: Any, label: str) -> float | None:
+    if value is None:
+        return None
+    return _finite_float(value, label)
 
 
 def _wall_deposit_by_segment_species_summary(

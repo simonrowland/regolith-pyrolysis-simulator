@@ -87,6 +87,7 @@ def _scored(
     energy: float = 2.0,
     objectives: ObjectiveVector | None = None,
     margins: Mapping[str, GateMargin] | None = None,
+    product_summary: Mapping[str, object] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -98,8 +99,8 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace={"hours": [{"hour": 1, "oxygen_kg": oxygen}]},
-            product_summary={"oxygen_kg": oxygen},
+            trace={"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]},
+            product_summary=product_summary or {"oxygen_kg": oxygen},
         ),
         notes=("stored",),
     )
@@ -222,6 +223,136 @@ def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> N
             "objective_metrics": ["oxygen_kg"],
         }
     ]
+
+
+def test_product_ledger_panel_has_ingots_glass_o2_volatiles_ceramic_and_mass_closure(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-products"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    product_yield_table = {
+        "status": "closed",
+        "inputs": [
+            {"kind": "input", "id": "feedstock", "label": "Feedstock", "kg": 1000.0},
+            {"kind": "input", "id": "additive:CaO", "label": "CaO", "kg": 1.5},
+        ],
+        "outputs": [
+            {"kind": "output", "id": "ingots_metals", "label": "Ingots/metals", "kg": 50.0, "yield_pct": 4.992511},
+            {"kind": "output", "id": "glass", "label": "Glass", "kg": 40.0, "yield_pct": 3.994009},
+            {"kind": "output", "id": "oxygen", "label": "O2", "kg": 20.0, "yield_pct": 1.997004},
+            {"kind": "output", "id": "captured_volatiles", "label": "Captured volatiles", "kg": 5.0, "yield_pct": 0.499251},
+            {"kind": "output", "id": "refractory_ceramic_rump", "label": "Refractory ceramic/rump", "kg": 80.0, "yield_pct": 7.988018},
+        ],
+        "mass_closure": {
+            "kind": "mass_closure",
+            "label": "Mass closure",
+            "mass_in_kg": 1001.5,
+            "accountable_mass_out_kg": 1001.5,
+            "products_out_kg": 195.0,
+            "balance_error_pct": 0.0,
+            "tolerance_pct": 5e-12,
+            "status": "closed",
+        },
+        "total_input_kg": 1001.5,
+        "products_out_kg": 195.0,
+    }
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            product_summary={
+                "product_bins": {
+                    row["id"]: {"label": row["label"], "kg": row["kg"]}
+                    for row in product_yield_table["outputs"]
+                },
+                "product_yield_table": product_yield_table,
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200
+    result = response.get_json()["runs"][0]["latest_result"]
+    panel = result["product_ledger_panel"]
+    outputs = {row["id"]: row for row in panel["outputs"]}
+    assert set(outputs) == {
+        "ingots_metals",
+        "glass",
+        "oxygen",
+        "captured_volatiles",
+        "refractory_ceramic_rump",
+    }
+    assert result["product_bins"]["oxygen"]["kg"] == 20.0
+    assert panel["inputs"][1]["id"] == "additive:CaO"
+    assert panel["mass_closure"]["status"] == "closed"
+    assert panel["mass_closure"]["tolerance_pct"] == 5e-12
+
+
+def test_product_ledger_panel_surfaces_unclassified_mass_as_inconclusive(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unclassified"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    product_yield_table = {
+        "status": "closed",
+        "inputs": [
+            {"kind": "input", "id": "feedstock", "label": "Feedstock", "kg": 1000.0},
+        ],
+        "outputs": [
+            {"kind": "output", "id": "oxygen", "label": "O2", "kg": 20.0},
+        ],
+        "mass_closure": {
+            "kind": "mass_closure",
+            "label": "Mass closure",
+            "mass_in_kg": 1000.0,
+            "accountable_mass_out_kg": 1000.0,
+            "products_out_kg": 20.0,
+            "balance_error_pct": 0.0,
+            "tolerance_pct": 5e-12,
+            "status": "closed",
+        },
+        "total_input_kg": 1000.0,
+        "products_out_kg": 20.0,
+    }
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            product_summary={
+                "product_classes": {
+                    "unclassified": {
+                        "kg_by_species": {"MysteryOxide": 7.0},
+                        "total_kg": 7.0,
+                    },
+                },
+                "product_yield_table": product_yield_table,
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200
+    panel = response.get_json()["runs"][0]["latest_result"]["product_ledger_panel"]
+    assert panel["mass_closure"]["status"] == "closed"
+    assert panel["status"] == "inconclusive"
+    assert panel["unclassified_product_mass"]["total_kg"] == 7.0
+    assert panel["unclassified_product_mass"]["kg_by_species"] == {
+        "MysteryOxide": 7.0,
+    }
+    diagnostics = {row["id"]: row for row in panel["diagnostics"]}
+    assert diagnostics["unclassified_product_mass"]["kind"] == "diagnostic"
 
 
 def test_web_routes_do_not_import_evaluate_or_worker_runtime() -> None:

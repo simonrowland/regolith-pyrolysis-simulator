@@ -48,6 +48,9 @@ O2_PRODUCT_SPECIES: tuple[str, ...] = ('O2',)
 """Terminal O₂ accumulator — part of product class 1 (the
 disproportionation by-product that motivates the whole refinery)."""
 
+CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = ('terminal.offgas',)
+"""Terminal volatile trap accounts that should surface as product output."""
+
 PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')
 """Product class 2: SiO landed on Stage 3 fused-silica baffles is
 the canonical pure-silica output. SiO2 surfaces here when a
@@ -141,7 +144,8 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         if kg > 0.0:
             metals_kg[species] = kg
     metals_total_kg = float(sum(metals_kg.values()))
-    o2_kg = float(products.get('O2', 0.0))
+    oxygen_partition = _oxygen_partition_kg(sim)
+    o2_kg = float(oxygen_partition.get('total', products.get('O2', 0.0)))
     metals_plus_o2_total = float(metals_total_kg + o2_kg)
 
     # ----- Class 2: pure silica glass (Stage 3 capture) -----
@@ -154,6 +158,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             if kg > 0.0:
                 stage_3_kg_by_species[species] = kg
     stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
+
+    # ----- Captured volatiles -----
+    captured_volatiles_kg_by_species = _ledger_species_kg(
+        sim,
+        CAPTURED_VOLATILE_ACCOUNTS,
+        exclude_species=set(O2_PRODUCT_SPECIES),
+    )
+    captured_volatiles_total_kg = float(
+        sum(captured_volatiles_kg_by_species.values())
+    )
 
     # ----- Class 4: refractory ceramic rump -----
     rump_kg_by_species: dict[str, float] = {}
@@ -194,6 +208,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         set(metals_kg.keys())
         | {'O2'}
         | set(stage_3_kg_by_species.keys())
+        | set(captured_volatiles_kg_by_species.keys())
         | set(rump_kg_by_species.keys())
     )
     unclassified: dict[str, float] = {}
@@ -213,12 +228,28 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'metals_kg': metals_kg,
             'metals_total_kg': metals_total_kg,
             'O2_kg': o2_kg,
+            'O2_partition_kg': oxygen_partition,
             'class_total_kg': metals_plus_o2_total,
+        },
+        'ingots_metals': {
+            'species_kg': metals_kg,
+            'class_total_kg': metals_total_kg,
+        },
+        'oxygen': {
+            'O2_kg': o2_kg,
+            'partition_kg': oxygen_partition,
+            'class_total_kg': o2_kg,
         },
         'pure_silica_glass': {
             'stage_3_capture_kg': stage_3_capture_kg,
             'stage_3_kg_by_species': stage_3_kg_by_species,
             'class_total_kg': stage_3_capture_kg,
+        },
+        'glass': {
+            'species_kg': stage_3_kg_by_species,
+            'class_total_kg': stage_3_capture_kg + mixed_melt_residual_kg,
+            'pure_silica_glass_kg': stage_3_capture_kg,
+            'industrial_mixed_glass_kg': mixed_melt_residual_kg,
         },
         'industrial_mixed_glass': {
             'mixed_melt_residual_kg': mixed_melt_residual_kg,
@@ -230,6 +261,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             ),
             'class_total_kg': mixed_melt_residual_kg,
         },
+        'captured_volatiles': {
+            'kg_by_species': captured_volatiles_kg_by_species,
+            'class_total_kg': captured_volatiles_total_kg,
+        },
         'refractory_ceramic_rump': {
             'rump_kg_by_species': rump_kg_by_species,
             'rump_total_kg': rump_total_kg,
@@ -240,3 +275,61 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
+
+
+def _ledger_species_kg(
+    sim: Any,
+    accounts: tuple[str, ...],
+    *,
+    exclude_species: set[str] | None = None,
+) -> dict[str, float]:
+    ledger = getattr(sim, 'atom_ledger', None)
+    kg_by_account = getattr(ledger, 'kg_by_account', None)
+    if not callable(kg_by_account):
+        return {}
+    excluded = exclude_species or set()
+    values: dict[str, float] = {}
+    for account in accounts:
+        raw = kg_by_account(account)
+        if not isinstance(raw, Mapping):
+            continue
+        for species, kg in raw.items():
+            name = str(species)
+            if name in excluded:
+                continue
+            try:
+                amount = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if amount > 0.0:
+                values[name] = values.get(name, 0.0) + amount
+    return dict(sorted(values.items()))
+
+
+def _oxygen_partition_kg(sim: Any) -> dict[str, float]:
+    partition_method = getattr(sim, '_oxygen_terminal_partition_kg', None)
+    if callable(partition_method):
+        try:
+            partition = partition_method() or {}
+        except (TypeError, ValueError):
+            partition = {}
+        if isinstance(partition, Mapping):
+            values = {}
+            for key, value in partition.items():
+                amount = float(value)
+                if amount > 0.0:
+                    values[str(key)] = amount
+            if 'total' in values:
+                return values
+    record = getattr(sim, 'record', None)
+    if record is None:
+        return {}
+    stored = float(getattr(record, 'oxygen_stored_kg', 0.0) or 0.0)
+    vented = float(getattr(record, 'oxygen_vented_kg', 0.0) or 0.0)
+    total = float(getattr(record, 'oxygen_total_kg', stored + vented) or 0.0)
+    values = {
+        'stored': stored,
+        'vented': vented,
+        'total': total,
+    }
+    return {key: value for key, value in values.items() if value > 0.0}
