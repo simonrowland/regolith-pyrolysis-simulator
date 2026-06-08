@@ -185,6 +185,7 @@ def _execution(
     reason: str = "",
     per_hour: tuple[object, ...] | None = None,
     backend_status: str | None = None,
+    backend_authoritative: bool | None = None,
 ) -> SimpleNamespace:
     per_hour_entries = per_hour
     if per_hour_entries is None and backend_status is not None:
@@ -200,6 +201,7 @@ def _execution(
         trace=trace or _trace(),
         per_hour=per_hour_entries or (),
         backend_status=backend_status,
+        backend_authoritative=backend_authoritative,
         status=status,
         error_message=error_message,
         reason=reason,
@@ -447,6 +449,31 @@ def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable()
     assert "backend_status='unavailable'" in str(raised.value)
 
 
+def test_real_backend_ok_but_non_authoritative_aborts_as_backend_unavailable() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=real_profile,
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="ok",
+                    backend_authoritative=False,
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert "backend_authoritative is not True" in str(raised.value)
+
+
 def test_unknown_feedstock_is_input_error_not_backend_unavailable() -> None:
     with pytest.raises(EvaluationInputError, match="unknown feedstock_id"):
         evaluate(
@@ -520,7 +547,7 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
             }
         },
     }
-    executor = FakeExecutor(_execution(backend_status="ok"))
+    executor = FakeExecutor(_execution(backend_status="ok", backend_authoritative=True))
 
     result = evaluate(
         _valid_patch(),
@@ -584,7 +611,7 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
         },
         "fidelities": {"high": {"backend_name": "cached-real", "hours": 1}},
     }
-    executor = FakeExecutor(_execution(backend_status="ok"))
+    executor = FakeExecutor(_execution(backend_status="ok", backend_authoritative=True))
 
     result = evaluate(
         _valid_patch(),

@@ -1171,3 +1171,69 @@ def test_staged_result_honesty_and_light_results(tmp_path) -> None:
     candidate = strategy.ask(1)[0]
     strategy.tell([(candidate, _scored(candidate.patch, candidate_id=candidate.id, trace={"large": "trace"}))])
     assert strategy.results[0][1].run_reference.trace == {"backend_status": "diagnostic_stub"}
+
+
+def test_staged_strip_trace_preserves_real_backend_provenance(tmp_path) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "pt1-cache.db"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_version": "test-version",
+    }
+    real_profile = {
+        **PROFILE,
+        "fidelities": {
+            "high": {
+                "backend_name": "cached-real",
+                "hours": 1,
+                "reduced_real_cache": cache_config,
+            }
+        },
+    }
+    strategy = StagedStrategy(
+        RecipeSchema(
+            allowlist=tuple(spec for spec in RecipeSchema.ALLOWLIST if spec.path[:2] == ("campaigns", "C0"))
+        ),
+        seed=23,
+        objective_profile={**real_profile, "staged": {"beam_width": 1, "children_per_parent": 1}},
+    )
+    candidate = strategy.ask(1)[0]
+    scored = _scored(
+        candidate.patch,
+        "lunar_mare_low_ti",
+        "high",
+        real_profile,
+        candidate_id=candidate.id,
+        trace={},
+    )
+    assert scored.run_reference.trace == {}
+    scored = replace(
+        scored,
+        run_reference=RunReference(
+            status="ok",
+            trace={},
+            product_summary=scored.run_reference.product_summary,
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+    pre_fix_stripped = replace(
+        scored,
+        run_reference=RunReference(
+            status=scored.run_reference.status,
+            error_message=scored.run_reference.error_message,
+            reason=scored.run_reference.reason,
+            trace=None,
+            product_summary=scored.run_reference.product_summary,
+        ),
+    )
+    with pytest.raises(study.StudyAbort, match="missing backend_status"):
+        study._assert_result_artifact_floor(pre_fix_stripped)
+
+    strategy.tell([(candidate, scored)])
+
+    stored = strategy.results[0][1]
+    assert stored.run_reference.trace == {"backend_status": "ok"}
+    assert stored.run_reference.backend_status == "ok"
+    assert stored.run_reference.backend_authoritative is True
+    study._assert_result_artifact_floor(stored)

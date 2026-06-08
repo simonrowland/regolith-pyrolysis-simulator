@@ -153,46 +153,6 @@ def test_preset_catalog_includes_disabled_alkali_targets():
     assert "pre-depleted" in by_target["K2O"]["disabled_reason"]
 
 
-def test_c5_voltage_ladder_uses_yaml_branch_two_max_v():
-    setpoints = _repo_setpoints()
-    sequence = mre_ladder.build_mre_voltage_sequence(setpoints)
-
-    c5_sequence = mre_ladder.c5_voltage_ladder(sequence, setpoints)
-
-    assert mre_ladder.branch_two_voltage_cap(setpoints) == 1.6
-    assert _species_names(c5_sequence) == [
-        "Na2O",
-        "K2O",
-        "FeO",
-        "Cr2O3",
-        "MnO",
-        "SiO2",
-        "TiO2",
-    ]
-    assert all(entry["voltage"] <= 1.6 for entry in c5_sequence)
-
-
-def test_c5_voltage_ladder_tracks_yaml_cap_changes():
-    setpoints = _repo_setpoints()
-    setpoints = deepcopy(setpoints)
-    setpoints["mre_voltage_sequence"]["voltage_strategy"]["branch_two"][
-        "max_V"
-    ] = 1.4
-
-    sequence = mre_ladder.build_mre_voltage_sequence(setpoints)
-    c5_sequence = mre_ladder.c5_voltage_ladder(sequence, setpoints)
-
-    assert mre_ladder.branch_two_voltage_cap(setpoints) == 1.4
-    assert _species_names(c5_sequence) == [
-        "Na2O",
-        "K2O",
-        "FeO",
-        "Cr2O3",
-        "MnO",
-        "SiO2",
-    ]
-
-
 def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     setpoints = {
         "campaigns": {},

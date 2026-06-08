@@ -1235,16 +1235,27 @@ def _strip_trace(scored: ScoredResult) -> ScoredResult:
             reason=reference.reason,
             trace=_light_backend_status_trace(scored),
             product_summary=reference.product_summary,
+            backend_status=_result_backend_status(scored),
+            backend_authoritative=reference.backend_authoritative,
         ),
     )
 
 
 def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, str] | None:
-    trace = getattr(getattr(scored, "run_reference", None), "trace", None)
-    status = _backend_status_from_trace(trace)
+    status = _result_backend_status(scored)
     if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
         status = "diagnostic_stub"
     return {"backend_status": status} if status is not None else None
+
+
+def _result_backend_status(scored: ScoredResult) -> str | None:
+    reference = getattr(scored, "run_reference", None)
+    if reference is None:
+        return None
+    status = getattr(reference, "backend_status", None)
+    if status is None:
+        status = _backend_status_from_trace(getattr(reference, "trace", None))
+    return str(status) if status is not None else None
 
 
 def _backend_status_from_trace(trace: Any) -> str | None:

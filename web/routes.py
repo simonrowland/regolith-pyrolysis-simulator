@@ -1,7 +1,9 @@
 """Flask routes for the simulator interface."""
 
 import json
+import math
 import os
+import re
 import sqlite3
 from collections.abc import Mapping
 from datetime import datetime, timezone
@@ -43,6 +45,8 @@ OPTIMIZER_ARTIFACT_NAMES = (
     'pareto.json',
     'provenance.jsonl',
 )
+MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
+_SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 
 
 class _StoredBackendResolutionCarrier:
@@ -502,6 +506,35 @@ def _request_limit(default: int = 10, maximum: int = 100) -> int:
     except (TypeError, ValueError):
         limit = default
     return min(max(limit, 1), maximum)
+
+
+def _safe_filename_part(value: Any, fallback: str = 'result') -> str:
+    clean = _SAFE_FILENAME_RE.sub('-', str(value or '')).strip('._-')
+    return clean[:80] or fallback
+
+
+def _positive_finite_arg(
+    name: str,
+    *,
+    default: float,
+    maximum: float,
+) -> tuple[float | None, tuple[object, int] | None]:
+    raw = request.args.get(name, default)
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None, (
+            jsonify({'error': f'{name} must be a finite number > 0'}),
+            400,
+        )
+    if not math.isfinite(value) or value <= 0.0 or value > maximum:
+        return None, (
+            jsonify({
+                'error': f'{name} must be finite, > 0, and <= {maximum:g}',
+            }),
+            400,
+        )
+    return value, None
 
 
 def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
@@ -1213,12 +1246,17 @@ def optimizer_result_yaml(run_id: str, cache_key: str):
         sort_keys=False,
         allow_unicode=False,
     )
-    filename = f'{run_id}-{result["candidate_id"]}-recipe.yaml'
-    return Response(
+    filename = (
+        f'{_safe_filename_part(run_id, "run")}-'
+        f'{_safe_filename_part(result["candidate_id"], "candidate")}-'
+        'recipe.yaml'
+    )
+    response = Response(
         body,
         mimetype='application/x-yaml',
-        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
+    response.headers.set('Content-Disposition', 'attachment', filename=filename)
+    return response
 
 
 @bp.route('/api/feedstocks')
@@ -1342,7 +1380,13 @@ def additive_calc(key):
     if fs is None:
         return jsonify({'error': 'Feedstock not found'}), 404
 
-    mass_kg = float(request.args.get('mass_kg', 1000))
+    mass_kg, error_response = _positive_finite_arg(
+        'mass_kg',
+        default=1000.0,
+        maximum=MAX_ADDITIVE_CALC_MASS_KG,
+    )
+    if error_response is not None:
+        return error_response
     comp = fs.get('composition_wt_pct', {})
 
     # Absolute kg of each oxide in the batch

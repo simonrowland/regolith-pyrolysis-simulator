@@ -36,6 +36,7 @@ from simulator.optimize.physics import (
 from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.worker_runtime import get_worker_runtime
+from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
 
@@ -391,6 +392,7 @@ def _build_eval_inputs(
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
     run_options = _run_options(profile, fidelity)
+    _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
     for digest_key in ("setpoints", "feedstocks", "vapor_pressures"):
         if digest_key not in bundle.digests:
@@ -479,6 +481,25 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     })
 
 
+def _validate_c5_eval_options(
+    run_options: Mapping[str, Any],
+    setpoints: Mapping[str, Any],
+) -> None:
+    if not bool(run_options.get("c5_enabled", False)):
+        return
+    max_voltage = float(run_options.get("mre_max_voltage_V", 0.0) or 0.0)
+    if max_voltage > 0.0:
+        return
+    target = str(run_options.get("mre_target_species", "") or "").strip()
+    sequence = parse_ladder_from_setpoints(dict(setpoints))
+    if target and max_voltage_for_target(target, sequence) > 0.0:
+        return
+    raise EvaluationInputError(
+        "c5_enabled requires positive mre_max_voltage_V or canonical "
+        f"mre_target_species; invalid mre_target_species {target!r}"
+    )
+
+
 def _profile_digest(profile: Mapping[str, Any]) -> str:
     normalized = normalize_canonical_value(profile)
     return hashlib.sha256(canonical_json_dumps(normalized).encode("utf-8")).hexdigest()
@@ -545,6 +566,15 @@ def _abort_on_non_authoritative_backend_status(
         raise BackendUnavailableAbort(
             "backend_status="
             f"{backend_status!r} for real backend {spec.backend_name!r}",
+            patch=patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        )
+    if _backend_authoritative(run_execution) is not True:
+        raise BackendUnavailableAbort(
+            "backend_authoritative is not True for real backend "
+            f"{spec.backend_name!r}",
             patch=patch,
             candidate_id=candidate_id,
             eval_spec=spec,

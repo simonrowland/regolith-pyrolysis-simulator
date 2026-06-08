@@ -1,4 +1,4 @@
-"""MRE voltage ladder parsing and branch cap helpers."""
+"""MRE voltage ladder parsing and C5 preset helpers."""
 
 from __future__ import annotations
 
@@ -18,7 +18,6 @@ MRE_VOLTAGE_LADDER_FALLBACK = (
 )
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
-C5_BRANCH_TWO_MAX_V_FALLBACK = 1.6
 DISABLED_PRESET_TARGETS = {
     'Na2O': 'pre-depleted by C3; not a selectable C5 target',
     'K2O': 'pre-depleted by C3; not a selectable C5 target',
@@ -177,38 +176,6 @@ def filter_steps_up_to_max_v(
     return selected
 
 
-def _branch_two_strategy_cap(setpoints: dict[str, Any] | None) -> float:
-    block = ((setpoints or {}).get('mre_voltage_sequence', {}) or {})
-    strategy = block.get('voltage_strategy', {}) or {}
-    if not isinstance(strategy, dict):
-        return C5_BRANCH_TWO_MAX_V_FALLBACK
-    branch_two = strategy.get('branch_two', {}) or {}
-    if not isinstance(branch_two, dict):
-        return C5_BRANCH_TWO_MAX_V_FALLBACK
-    voltage = coerce_mre_decomposition_voltage(branch_two.get('max_V'))
-    if voltage is None or voltage <= 0.0:
-        return C5_BRANCH_TWO_MAX_V_FALLBACK
-    return float(voltage)
-
-
-def branch_two_legacy_preset(setpoints: dict[str, Any] | None) -> dict[str, Any]:
-    """Legacy C5 Branch-Two preset retained for old callers."""
-    return {
-        'id': 'legacy_branch_two',
-        'label': 'Legacy Branch Two cap',
-        'c5_enabled': True,
-        'mre_target_species': '',
-        'mre_max_voltage_V': _branch_two_strategy_cap(setpoints),
-        'enabled': True,
-        'legacy': True,
-    }
-
-
-def branch_two_voltage_cap(setpoints: dict[str, Any] | None) -> float:
-    """Legacy wrapper returning the C5 Branch-Two preset max voltage."""
-    return float(branch_two_legacy_preset(setpoints)['mre_max_voltage_V'])
-
-
 def preset_catalog(setpoints: dict[str, Any] | None) -> tuple[dict[str, Any], ...]:
     """Return UI-ready C5/MRE target presets from the canonical ladder."""
     presets: list[dict[str, Any]] = [{
@@ -238,11 +205,3 @@ def preset_catalog(setpoints: dict[str, Any] | None) -> tuple[dict[str, Any], ..
             'legacy': False,
         })
     return tuple(presets)
-
-
-def c5_voltage_ladder(
-    sequence: list[dict[str, Any]],
-    setpoints: dict[str, Any] | None,
-) -> list[dict[str, Any]]:
-    """Legacy Branch-Two helper. New C5 code uses runtime EvalSpec fields."""
-    return filter_steps_up_to_max_v(sequence, branch_two_voltage_cap(setpoints))

@@ -125,6 +125,20 @@ def test_unknown_constraint_key_raises_named_error() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_c5_enabled_unknown_target_without_voltage_raises_named_error() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update(
+        {
+            "c5_enabled": True,
+            "mre_target_species": "Bogus",
+            "mre_max_voltage_V": 0.0,
+        }
+    )
+
+    with pytest.raises(ProfileValidationError, match="Bogus"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def _profile_copy(feedstock: str) -> dict:
     path = DEFAULT_DATA_DIR / "optimize_profiles" / f"{feedstock}.yaml"
     return copy.deepcopy(yaml.safe_load(path.read_text()))

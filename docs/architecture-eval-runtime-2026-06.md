@@ -80,14 +80,11 @@ Canonical `EvalSpec` v1.1 is defined by `simulator/optimize/evalspec.py::EvalSpe
 ## New module: `simulator/optimize/worker_runtime.py`
 
 ```python
-@dataclass
+@dataclass(frozen=True)
 class WorkerEvalContext:
     backend_name: str
     backend: Any          # MeltBackend instance; warmed once
-    init_wall_s: float
-    worker_pid: int
-    engine_version: str
-    transport_mode: str   # "thermoengine" | "subprocess" | "petthermo" | ...
+    transport: Any | None = None
 
 def get_worker_runtime() -> WorkerEvalContext | None: ...
 def warm_worker_runtime(backend_name: str) -> WorkerEvalContext: ...
@@ -193,6 +190,8 @@ Read-heavy `cached-real` evals remain safe; write contention is the risk during 
 | `scripts/profile_eval_hotpath.py` | 2nd eval in worker: init time ≈ 0 |
 | `run_fidelity_doe.py` N=4 | Wall ↓ vs pre-G9.7c baseline; 0 drops |
 | `REGOLITH_OPTIMIZER_WARM_WORKERS=0` | Bit-identical or within float tolerance vs warm |
+
+G9.7 runtime telemetry is emitted by `scripts/profile_eval_hotpath.py`; `WorkerEvalContext` itself is intentionally limited to backend/transport state.
 
 ---
 

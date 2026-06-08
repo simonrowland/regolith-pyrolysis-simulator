@@ -235,6 +235,69 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
             _clear_simulation_state(sid)
 
 
+@pytest.mark.parametrize(
+    ("override", "message_field"),
+    [
+        ({"mass_kg": "abc"}, "mass_kg"),
+        ({"mass_kg": -1}, "mass_kg"),
+        ({"mass_kg": "nan"}, "mass_kg"),
+        ({"mass_kg": "inf"}, "mass_kg"),
+        ({"speed": "abc"}, "speed"),
+        ({"speed": "inf"}, "speed"),
+        ({"c4_max_temp_C": "nan"}, "c4_max_temp_C"),
+        ({"c5_enabled": True, "mre_max_voltage_V": "abc"}, "mre_max_voltage_V"),
+        ({"additives": {"Na": "abc"}}, "additives.Na"),
+        ({"additives": {"Na": -1}}, "additives.Na"),
+        ({"additives": []}, "additives"),
+    ],
+)
+def test_web_start_event_rejects_invalid_numeric_payload_before_session(
+    monkeypatch,
+    override,
+    message_field,
+):
+    backend_called = False
+
+    def fail_if_backend_resolves(_backend_name):
+        nonlocal backend_called
+        backend_called = True
+        raise AssertionError("backend resolution should not run")
+
+    monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "stub",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+    payload.update(override)
+
+    try:
+        client.emit("start_simulation", payload)
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert message_field in statuses[-1]["message"]
+        assert set(_simulations) == before
+        assert backend_called is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 def test_replacing_simulation_state_stops_prior_run():
     sid = "test-replace"
     try:

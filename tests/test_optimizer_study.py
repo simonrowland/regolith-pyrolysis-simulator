@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import csv
-from dataclasses import is_dataclass, fields
+from dataclasses import is_dataclass, fields, replace
 import json
 import math
 from pathlib import Path
@@ -242,6 +242,37 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path) -> None:
+    spec = replace(_scope_spec(), backend_name="alphamelts")
+    scored = ScoredResult(
+        candidate_id="real-backend-field",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 1.0, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={},
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+    study._assert_result_artifact_floor(scored)
+    light = study._strip_heavy_result(scored)
+
+    assert light.run_reference is not None
+    assert light.run_reference.backend_status == "ok"
+    assert light.run_reference.backend_authoritative is True
+    ResultStore(tmp_path / "cache.sqlite").store(spec, light, created_at="t1")
 
 
 def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_path) -> None:

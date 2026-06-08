@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import math
 from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
@@ -715,6 +716,55 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     ] == 1300
     assert payload["eval_spec"]["mre_target_species"] == "FeO"
     assert payload["provenance"]["cache_key"] == key
+
+
+def test_optimizer_result_yaml_download_sanitizes_stored_candidate_id(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-unsafe-name"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(recipe_id="recipe-unsafe-name")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(spec, candidate_id='candidate"\r\nbad/name'),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    response = client.get(
+        f"/optimizer/runs/run-unsafe-name/results/{key}/recipe.yaml"
+    )
+
+    assert response.status_code == 200
+    disposition = response.headers["Content-Disposition"]
+    assert "\r" not in disposition
+    assert "\n" not in disposition
+    assert '"' not in disposition
+    assert "/" not in disposition
+    assert "candidate-bad-name-recipe.yaml" in disposition
+    payload = yaml.safe_load(response.get_data(as_text=True))
+    assert payload["result"]["candidate_id"] == 'candidate"\r\nbad/name'
+
+
+@pytest.mark.parametrize("mass_kg", ["abc", "-1", "0", "nan", "inf", "1e309"])
+def test_additive_calc_rejects_invalid_mass_kg(client, mass_kg: str) -> None:
+    response = client.get(f"/api/additive-calc/lunar_mare_low_ti?mass_kg={mass_kg}")
+
+    assert response.status_code == 400
+    assert "mass_kg" in response.get_json()["error"]
+
+
+def test_additive_calc_returns_finite_non_negative_masses(client) -> None:
+    response = client.get("/api/additive-calc/lunar_mare_low_ti?mass_kg=1000")
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert set(payload) == {"Na", "K", "Mg", "Ca", "C"}
+    assert all(isinstance(value, (int, float)) for value in payload.values())
+    assert all(math.isfinite(value) and value >= 0.0 for value in payload.values())
 
 
 def test_product_ledger_panel_has_ingots_glass_o2_volatiles_ceramic_and_mass_closure(

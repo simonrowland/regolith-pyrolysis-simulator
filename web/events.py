@@ -1,6 +1,7 @@
 """SocketIO event handlers for the simulator interface."""
 
 from collections.abc import Mapping
+import math
 import threading
 import uuid
 from pathlib import Path
@@ -48,6 +49,15 @@ _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
+_MAX_WEB_MASS_KG = 1_000_000_000.0
+_MAX_SIM_SPEED_SECONDS = 3600.0
+_MAX_C4_TEMP_C = 5000.0
+_MAX_MRE_VOLTAGE_V = 100.0
+_MAX_ADDITIVE_KG = 1_000_000_000.0
+
+
+class InputValidationError(ValueError):
+    pass
 
 
 def _safe_log(message: str) -> None:
@@ -169,6 +179,55 @@ def _coerce_bool(value) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {'1', 'true', 'yes', 'on'}
     return bool(value)
+
+
+def _coerce_bounded_float(
+    value,
+    *,
+    field: str,
+    default: float | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    exclusive_minimum: bool = False,
+) -> float:
+    if value is None or value == '':
+        if default is None:
+            raise InputValidationError(f'{field} is required')
+        value = default
+    if isinstance(value, bool):
+        raise InputValidationError(f'{field} must be numeric')
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        raise InputValidationError(f'{field} must be numeric') from None
+    if not math.isfinite(numeric):
+        raise InputValidationError(f'{field} must be finite')
+    if minimum is not None:
+        below = numeric <= minimum if exclusive_minimum else numeric < minimum
+        if below:
+            operator = '>' if exclusive_minimum else '>='
+            raise InputValidationError(f'{field} must be {operator} {minimum:g}')
+    if maximum is not None and numeric > maximum:
+        raise InputValidationError(f'{field} must be <= {maximum:g}')
+    return numeric
+
+
+def _coerce_additives_kg(value) -> dict[str, float]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise InputValidationError('additives must be an object')
+    additives_kg: dict[str, float] = {}
+    for key, raw_amount in value.items():
+        amount = _coerce_bounded_float(
+            raw_amount,
+            field=f'additives.{key}',
+            minimum=0.0,
+            maximum=_MAX_ADDITIVE_KG,
+        )
+        if amount > 0.0:
+            additives_kg[str(key)] = amount
+    return additives_kg
 
 
 def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
@@ -696,15 +755,61 @@ def register_events(socketio):
         }
         """
         sid = request.sid
+        if data is None:
+            data = {}
+        elif not isinstance(data, Mapping):
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': 'start_simulation payload must be an object',
+            }, room=sid)
+            return
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
-        mass_kg = float(data.get('mass_kg', 1000))
+        try:
+            mass_kg = _coerce_bounded_float(
+                data.get('mass_kg'),
+                field='mass_kg',
+                default=1000.0,
+                minimum=0.0,
+                maximum=_MAX_WEB_MASS_KG,
+                exclusive_minimum=True,
+            )
+            speed = _coerce_bounded_float(
+                data.get('speed'),
+                field='speed',
+                default=1.0,
+                minimum=0.0,
+                maximum=_MAX_SIM_SPEED_SECONDS,
+            )
+            c4_max_temp = _coerce_bounded_float(
+                data.get('c4_max_temp_C'),
+                field='c4_max_temp_C',
+                default=1670.0,
+                minimum=0.0,
+                maximum=_MAX_C4_TEMP_C,
+                exclusive_minimum=True,
+            )
+            c5_enabled = _coerce_bool(data.get('c5_enabled', False))
+            mre_target_species = str(data.get('mre_target_species') or '').strip()
+            mre_max_voltage_V = _coerce_bounded_float(
+                data.get('mre_max_voltage_V'),
+                field='mre_max_voltage_V',
+                default=0.0,
+                minimum=0.0,
+                maximum=_MAX_MRE_VOLTAGE_V,
+            )
+            additives_kg = _coerce_additives_kg(data.get('additives', {}))
+        except InputValidationError as exc:
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': str(exc),
+            }, room=sid)
+            return
         # Default is 'auto' (AlphaMELTS-preferred autodetect per
         # \goal BACKEND-DEFAULT-SWITCH), not 'stub'.  Explicit UI choices
         # ('alphamelts', 'stub') are still honoured.
         backend_name = data.get('backend', 'auto')
         track = data.get('track', 'pyrolysis')
-        speed = float(data.get('speed', 1.0))
 
         # Load data files
         feedstocks = load_visible_feedstocks()
@@ -730,21 +835,12 @@ def register_events(socketio):
             backend_message = f'Using {backend_type}'
 
         # User-configurable parameters
-        c4_max_temp = float(data.get('c4_max_temp_C', 1670))
-        c5_enabled = _coerce_bool(data.get('c5_enabled', False))
-        mre_target_species = str(data.get('mre_target_species') or '').strip()
-        mre_max_voltage_V = float(data.get('mre_max_voltage_V') or 0.0)
         if not c5_enabled:
             mre_target_species = ''
             mre_max_voltage_V = 0.0
         runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
             data.get('runtime_campaign_overrides')
         )
-
-        # Additives from inventory (Na, K, Mg, Ca, C)
-        raw_additives = data.get('additives', {})
-        additives_kg = {k: float(v) for k, v in raw_additives.items()
-                        if float(v) > 0}
 
         session = SimSession()
         try:

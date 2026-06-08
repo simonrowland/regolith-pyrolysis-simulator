@@ -1023,10 +1023,12 @@ def _result_backend_status(scored: ScoredResult) -> str | None:
     reference = getattr(scored, "run_reference", None)
     if reference is None:
         return None
-    status = _backend_status_from_trace(getattr(reference, "trace", None))
+    status = getattr(reference, "backend_status", None)
+    if status is None:
+        status = _backend_status_from_trace(getattr(reference, "trace", None))
     if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
         return "diagnostic_stub"
-    return status
+    return str(status) if status is not None else None
 
 
 def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
@@ -1039,15 +1041,14 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
         reason=reference.reason,
         trace=_light_backend_status_trace(scored),
         product_summary=reference.product_summary,
+        backend_status=_result_backend_status(scored),
+        backend_authoritative=reference.backend_authoritative,
     )
     return replace(scored, run_reference=light_reference)
 
 
 def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, str] | None:
-    trace = getattr(getattr(scored, "run_reference", None), "trace", None)
-    status = _backend_status_from_trace(trace)
-    if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
-        status = "diagnostic_stub"
+    status = _result_backend_status(scored)
     return {"backend_status": status} if status is not None else None
 
 

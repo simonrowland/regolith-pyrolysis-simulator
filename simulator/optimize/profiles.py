@@ -19,6 +19,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 
 
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
@@ -385,6 +386,7 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
         raise ProfileValidationError(
             f"{source}: {where}.mre_target_species must be a string"
         )
+    _validate_c5_request(raw, source=source, where=where)
     backend_name = str(raw.get("backend_name", ""))
     cache_config = raw.get("reduced_real_cache")
     if backend_name == "cached-real":
@@ -398,6 +400,46 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
             f"{source}: {where}.reduced_real_cache requires "
             "backend_name='cached-real'"
         )
+
+
+def _validate_c5_request(raw: Mapping[str, Any], *, source: str | Path, where: str) -> None:
+    if not bool(raw.get("c5_enabled", False)):
+        return
+    max_voltage = float(raw.get("mre_max_voltage_V", 0.0) or 0.0)
+    if max_voltage > 0.0:
+        return
+    target = str(raw.get("mre_target_species", "") or "").strip()
+    sequence = _canonical_mre_ladder_for_profile(source)
+    if target and max_voltage_for_target(target, sequence) > 0.0:
+        return
+    raise ProfileValidationError(
+        f"{source}: {where}.c5_enabled requires positive mre_max_voltage_V "
+        "or canonical mre_target_species; invalid "
+        f"{where}.mre_target_species {target!r}"
+    )
+
+
+def _canonical_mre_ladder_for_profile(source: str | Path) -> list[dict[str, Any]]:
+    source_path = Path(source)
+    data_dir = DEFAULT_DATA_DIR
+    if source_path.parent.name == PROFILE_DIRNAME:
+        data_dir = source_path.parent.parent
+    setpoints_path = data_dir / "setpoints.yaml"
+    try:
+        loaded = yaml.safe_load(setpoints_path.read_text())
+    except OSError as exc:
+        raise ProfileValidationError(
+            f"{source}: cannot read {setpoints_path} for C5 MRE target validation"
+        ) from exc
+    except yaml.YAMLError as exc:
+        raise ProfileValidationError(
+            f"{source}: invalid {setpoints_path} for C5 MRE target validation"
+        ) from exc
+    if not isinstance(loaded, Mapping):
+        raise ProfileValidationError(
+            f"{source}: {setpoints_path} must be a mapping for C5 MRE target validation"
+        )
+    return parse_ladder_from_setpoints(dict(loaded))
 
 
 def _validate_reduced_real_cache_config(
