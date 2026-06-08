@@ -14,7 +14,7 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v1"
+allowlist_version = "allowlist-v2"
 
 
 class RecipeValidationError(ValueError):
@@ -386,14 +386,20 @@ class RecipeSchema:
             low=0.0,
             high=2.5,
             units="V",
-            bounds_source="setpoints:campaigns.C5.branch_two.max_voltage_V",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml scalar "
+                "campaigns.C5.branch_two.max_voltage_V=1.6"
+            ),
         ),
         _knob(
             "campaigns.C5.branch_one.max_voltage_V",
             low=0.0,
             high=2.5,
             units="V",
-            bounds_source="setpoints:campaigns.C5.branch_one.max_voltage_V",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml scalar "
+                "campaigns.C5.branch_one.max_voltage_V=2.5"
+            ),
         ),
         _knob(
             "campaigns.C6.temp_range_C",
@@ -429,6 +435,113 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
+        ),
+        _knob(
+            "overhead_headspace.temperature_offset_K",
+            low=-500,
+            high=500,
+            units="K",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.temperature_offset_K"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.liner_temperature_C.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.liner_temperature_C.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_0_to_stage_1.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_1_to_stage_2.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_1_to_stage_2.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_2_to_stage_3.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_2_to_stage_3.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_3_to_stage_4.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_3_to_stage_4.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_4_to_stage_5.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_5_to_stage_6.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_5_to_stage_6.default_C"
+            ),
+        ),
+        _knob(
+            "overhead_headspace.pipe_segment_temperatures_C.segments.stage_6_to_stage_7.default_C",
+            low=20,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml "
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                "stage_6_to_stage_7.default_C"
+            ),
         ),
     )
 
@@ -504,6 +617,70 @@ class RecipeSchema:
     def to_setpoints_patch(self, patch: "RecipePatch") -> dict[str, Any]:
         """Validate then render the optimizer-facing setpoints patch."""
         return patch.validated(self).to_nested()
+
+
+MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
+    tuple(path.split("."))
+    for path in (
+        "campaigns.C0.temp_range_C",
+        "campaigns.C0.dT_dt_C_per_hr",
+        "campaigns.C0b_p_cleanup.temp_range_C",
+        "campaigns.C0b_p_cleanup.pO2_mbar",
+        "campaigns.C0b_p_cleanup.pO2_mbar_default",
+        "campaigns.C0b_p_cleanup.p_total_mbar_default",
+        "campaigns.C0b_p_cleanup.duration_h",
+        "campaigns.C2A_continuous.temp_range_C",
+        "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
+        "campaigns.C2A_continuous.p_total_mbar",
+        "campaigns.C2A_continuous.p_total_mbar_default",
+        "campaigns.C2A_continuous.duration_h",
+        "campaigns.C2A_staged.temp_range_C",
+        "campaigns.C2A_staged.default_hold_T_C",
+        "campaigns.C2A_staged.p_total_mbar",
+        "campaigns.C2A_staged.p_total_mbar_default",
+        "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.na_shuttle_stage.duration_h",
+        "campaigns.C2B.temp_range_C",
+        "campaigns.C2B.pO2_mbar",
+        "campaigns.C2B.pO2_mbar_default",
+        "campaigns.C2B.p_total_mbar_default",
+        "campaigns.C3.pO2_mbar_default",
+        "campaigns.C3.p_total_mbar_default",
+        "campaigns.C3.K_phase.pO2_bakeout_mbar",
+        "campaigns.C3.Na_phase.pO2_bakeout_mbar",
+        "campaigns.C3.endpoint.hold_time_min",
+        "campaigns.C3.duration_after_pathA_h",
+        "campaigns.C3.duration_after_pathB_h_per_phase",
+        "campaigns.C4.temp_range_C",
+        "campaigns.C4.pO2_mbar",
+        "campaigns.C4.pO2_mbar_default",
+        "campaigns.C4.p_total_mbar_default",
+        "campaigns.C4.optional_Ca_harvest.pO2_mbar",
+        "campaigns.C5.temp_range_C",
+        "campaigns.C5.pO2_bar",
+        "campaigns.C5.pO2_mbar_default",
+        "campaigns.C5.p_total_mbar_default",
+        "campaigns.C6.temp_range_C",
+        "campaigns.C6.default_hold_T_C",
+        "campaigns.C6.pO2_mbar",
+        "campaigns.C6.pO2_mbar_default",
+        "campaigns.C6.p_total_mbar_default",
+        "overhead_headspace.temperature_offset_K",
+        "overhead_headspace.liner_temperature_C.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_1_to_stage_2.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_2_to_stage_3.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_3_to_stage_4.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_5_to_stage_6.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_6_to_stage_7.default_C",
+    )
+)
+
+MANDATE_LEVER_ALLOWLIST: tuple[KnobSpec, ...] = tuple(
+    spec for spec in RecipeSchema.ALLOWLIST if spec.path in MANDATE_LEVER_PATHS
+)
 
 
 @dataclass(frozen=True)
