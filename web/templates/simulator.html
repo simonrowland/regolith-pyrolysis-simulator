@@ -460,6 +460,23 @@
             </div>
         </div>
 
+        <div id="wall-risk-panel" class="section-card advisory-card" data-wall-risk-panel>
+            <div class="advisory-panel-header">
+                <h3>Wall Risk</h3>
+                <span id="wall-risk-state" class="advisory-state advisory-state-n/a">n/a</span>
+            </div>
+            <div id="wall-risk-meta" class="advisory-meta">Active vapors: n/a</div>
+            <div id="wall-risk-content" class="advisory-empty">n/a</div>
+        </div>
+
+        <div id="ceramic-rump-panel" class="section-card advisory-card" data-ceramic-rump-panel>
+            <div class="advisory-panel-header">
+                <h3>Ceramic Rump</h3>
+                <span id="ceramic-rump-state" class="advisory-state advisory-state-n/a">n/a</span>
+            </div>
+            <div id="ceramic-rump-content" class="advisory-empty">n/a</div>
+        </div>
+
         {% if debug_mode %}
         <div id="debug-inventory-panel" class="section-card debug-panel">
             <h3>Debug Inventory JSON</h3>
@@ -537,6 +554,7 @@ Start a simulation to populate process inventory JSON.
 <script src="{{ url_for('web.static', filename='js/simulator-socket.js') }}"></script>
 <script src="{{ url_for('web.static', filename='js/simulator-charts.js') }}"></script>
 <script src="{{ url_for('web.static', filename='js/simulator-ticks.js') }}"></script>
+<script src="{{ url_for('web.static', filename='js/simulator-advisory.js') }}"></script>
 <script src="{{ url_for('web.static', filename='js/simulator-decisions.js') }}"></script>
 <script src="{{ url_for('web.static', filename='js/simulator-controls.js') }}"></script>
 {% endblock %}

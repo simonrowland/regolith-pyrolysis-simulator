@@ -1,0 +1,72 @@
+<div class="advisory-panel" data-wall-risk-panel>
+    <div class="advisory-panel-header">
+        <h3>Wall Risk</h3>
+        <span class="advisory-state advisory-state-{{ wall_risk.status }}">{{ wall_risk.status }}</span>
+    </div>
+    <div class="advisory-meta">
+        Active vapors:
+        {% if wall_risk.active_species %}
+        {{ wall_risk.active_species | join(', ') }}
+        {% else %}
+        n/a
+        {% endif %}
+    </div>
+    {% if wall_risk.status == 'n/a' %}
+    <div class="advisory-empty">n/a</div>
+    {% else %}
+    {% for zone in wall_risk.zones %}
+    <details class="advisory-zone" {% if loop.first %}open{% endif %}>
+        <summary>{{ zone.label }} wall zone - {{ '%.0f'|format(zone.temperature_C) }} C</summary>
+        <div class="advisory-table-wrap">
+            <table class="advisory-table">
+                <thead>
+                    <tr>
+                        <th>Material</th>
+                        <th>Temp</th>
+                        <th>Rollup</th>
+                        <th>Active species</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in zone.materials %}
+                    <tr class="{% if not material.temp_ok %}advisory-muted{% endif %}">
+                        <td>{{ material.label }}</td>
+                        <td>
+                            <span class="advisory-badge advisory-temp-{{ material.temp_verdict }}">
+                                {{ material.temp_verdict }}
+                            </span>
+                            {% if material.limiting_temperature_C is not none %}
+                            <span class="advisory-note">limit {{ '%.0f'|format(material.limiting_temperature_C) }} C</span>
+                            {% else %}
+                            <span class="advisory-note">limit n/a</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="advisory-badge advisory-rollup-{{ material.rollup }}">
+                                {{ material.rollup }}
+                            </span>
+                        </td>
+                        <td>
+                            {% for species in material.species %}
+                            <div class="advisory-species-row">
+                                <strong>{{ species.species }}</strong>
+                                <span class="advisory-badge {% if species.chemical_attack.uncharacterized %}advisory-uncharacterized{% endif %}">
+                                    attack {{ species.chemical_attack.display }}
+                                </span>
+                                <span class="advisory-evidence">{{ species.chemical_attack.evidence }}</span>
+                                <span class="advisory-badge {% if species.stickiness.uncharacterized %}advisory-uncharacterized{% endif %}">
+                                    stick {{ species.stickiness.display }}
+                                </span>
+                                <span class="advisory-evidence">{{ species.stickiness.evidence }}</span>
+                            </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+    {% endfor %}
+    {% endif %}
+</div>

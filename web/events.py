@@ -31,6 +31,12 @@ from simulator.state import MOLAR_MASS
 # owns that runner-format summary and returns it in ``StepResult``; this
 # adapter only emits it alongside the legacy ``simulation_tick`` payload.
 from web.feedstock_data import load_visible_feedstocks
+from web.advisory import (
+    active_wall_species_from_flue,
+    ceramic_rump_payload,
+    oxide_wt_pct_from_kg,
+    wall_advisory_payload,
+)
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -351,6 +357,7 @@ def _tick_payload(
     """Build the public per-tick payload."""
     pot_composition = _pot_composition_kg(sim, snapshot)
     flue_composition = _flue_composition_kg_hr(snapshot)
+    active_wall_species = active_wall_species_from_flue(flue_composition)
     return {
         'hour': snapshot.hour,
         'campaign': snapshot.campaign.name,
@@ -434,6 +441,7 @@ def _tick_payload(
             'No gas-offtake species flow reported for this tick; '
             'partial pressures are surfaced separately when available.'
         ),
+        'wall_risk_panel': wall_advisory_payload(active_wall_species),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),
@@ -494,6 +502,10 @@ def _tick_payload(
 
 def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
+    terminal_rump_by_species = sim._terminal_rump_by_species()
+    terminal_rump_composition_wt_pct = oxide_wt_pct_from_kg(
+        terminal_rump_by_species
+    )
     return {
         'total_hours': sim.melt.hour,
         'energy_kWh': sim.energy_cumulative_kWh,
@@ -515,8 +527,12 @@ def _completion_payload(sim):
                      for k, v in sim.product_ledger().items()},
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
         'terminal_rump_kg': sim._terminal_slag_kg(),
-        'terminal_rump_by_species': sim._terminal_rump_by_species(),
+        'terminal_rump_by_species': terminal_rump_by_species,
+        'terminal_rump_composition_wt_pct': terminal_rump_composition_wt_pct,
         'terminal_rump_by_class': sim._terminal_rump_by_class(),
+        'ceramic_rump_panel': ceramic_rump_payload(
+            terminal_rump_composition_wt_pct
+        ),
         'stage_purity_report': stage_purity_report(sim.train),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }

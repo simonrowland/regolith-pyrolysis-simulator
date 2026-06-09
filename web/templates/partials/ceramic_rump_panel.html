@@ -1,0 +1,21 @@
+<div class="advisory-panel" data-ceramic-rump-panel>
+    <div class="advisory-panel-header">
+        <h3>Ceramic Rump</h3>
+        <span class="advisory-state advisory-state-{{ ceramic_rump.status }}">{{ ceramic_rump.status }}</span>
+    </div>
+    {% if ceramic_rump.status == 'n/a' %}
+    <div class="advisory-empty">n/a</div>
+    {% elif ceramic_rump.status in ['no-match', 'ambiguous'] %}
+    <div class="advisory-empty">{{ ceramic_rump.status }} - {{ ceramic_rump.reason }}</div>
+    {% elif ceramic_rump.match %}
+    <div class="advisory-result">
+        <div class="advisory-result-title">{{ ceramic_rump.match.label }}</div>
+        <div>Composition: {{ ceramic_rump.match.composition_kind }}</div>
+        <div>{{ ceramic_rump.match.service_temp.display }}</div>
+        <div>Service kind: {{ ceramic_rump.match.service_temp.kind }}</div>
+        <div>Liner verdict: {{ ceramic_rump.match.liner_suitability.verdict }}</div>
+    </div>
+    {% else %}
+    <div class="advisory-empty">{{ ceramic_rump.status }} - {{ ceramic_rump.reason }}</div>
+    {% endif %}
+</div>

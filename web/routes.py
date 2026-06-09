@@ -34,6 +34,7 @@ from web.feedstock_data import (
     load_feedstock_groups,
     load_visible_feedstocks,
 )
+from web.advisory import ceramic_rump_payload, wall_advisory_payload
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
@@ -1401,6 +1402,45 @@ def simulator():
     )
 
 
+@bp.route('/api/wall-risk')
+def wall_risk_api():
+    payload = wall_advisory_payload(
+        _query_species(),
+        wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
+    )
+    return jsonify(payload)
+
+
+@bp.route('/partials/wall-risk-panel')
+def wall_risk_panel_partial():
+    payload = wall_advisory_payload(
+        _query_species(),
+        wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
+    )
+    return render_template('partials/wall_risk_panel.html', wall_risk=payload)
+
+
+@bp.route('/api/ceramic-rump')
+def ceramic_rump_api():
+    payload = ceramic_rump_payload(
+        _query_composition_wt_pct(),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct'),
+    )
+    return jsonify(payload)
+
+
+@bp.route('/partials/ceramic-rump-panel')
+def ceramic_rump_panel_partial():
+    payload = ceramic_rump_payload(
+        _query_composition_wt_pct(),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct'),
+    )
+    return render_template(
+        'partials/ceramic_rump_panel.html',
+        ceramic_rump=payload,
+    )
+
+
 @bp.route('/optimizer')
 def optimizer_page():
     """Optimizer results page plus async CLI launch form."""
@@ -1409,6 +1449,42 @@ def optimizer_page():
         **_optimizer_table_context(),
         **_optimizer_launch_context(),
     )
+
+
+def _query_species() -> list[str]:
+    values = request.args.getlist('species')
+    if len(values) == 1 and ',' in values[0]:
+        values = values[0].split(',')
+    return [value.strip() for value in values if value.strip()]
+
+
+def _query_composition_wt_pct() -> dict[str, float]:
+    composition: dict[str, float] = {}
+    for key, value in request.args.items():
+        if key == 'tolerance_wt_pct':
+            continue
+        amount = _optional_query_float(value)
+        if amount is not None:
+            composition[key] = amount
+    return composition
+
+
+def _query_float(name: str, *, default: float) -> float:
+    value = _query_optional_float(name)
+    return default if value is None else value
+
+
+def _query_optional_float(name: str) -> float | None:
+    return _optional_query_float(request.args.get(name))
+
+
+def _optional_query_float(value: object) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 @bp.route('/partials/optimizer-table')

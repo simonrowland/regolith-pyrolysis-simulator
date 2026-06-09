@@ -830,6 +830,143 @@ input, select, button, textarea { font-family: inherit; }
     font-size: var(--fs-sm);
 }
 
+.advisory-card {
+    overflow: hidden;
+}
+
+.advisory-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.advisory-panel-header h3 {
+    margin: 0;
+}
+
+.advisory-state,
+.advisory-badge,
+.advisory-evidence {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.advisory-state,
+.advisory-badge {
+    background: #eef2ff;
+    color: #312e81;
+}
+
+.advisory-state-n\/a,
+.advisory-uncharacterized,
+.advisory-rollup-uncharacterized {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.advisory-temp-temperature-limited,
+.advisory-rollup-temperature-limited,
+.advisory-state-no-match,
+.advisory-state-ambiguous {
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+.advisory-temp-ok,
+.advisory-rollup-usable,
+.advisory-state-ok,
+.advisory-state-match {
+    background: #dcfce7;
+    color: #064e3b;
+}
+
+.advisory-rollup-risky {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.advisory-rollup-caution {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.advisory-evidence {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.advisory-meta,
+.advisory-note,
+.advisory-empty,
+.advisory-result {
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+}
+
+.advisory-empty,
+.advisory-result {
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+
+.advisory-result-title {
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.advisory-zone {
+    margin-top: var(--space-3);
+}
+
+.advisory-zone summary {
+    cursor: pointer;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.advisory-table-wrap {
+    overflow-x: auto;
+    margin-top: var(--space-3);
+}
+
+.advisory-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+}
+
+.advisory-table th,
+.advisory-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.advisory-muted {
+    opacity: 0.62;
+}
+
+.advisory-species-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
 /* Dark theme — follows OS preference; matches the lunar (moon) brand. */
 @media (prefers-color-scheme: dark) {
     :root {
@@ -854,5 +991,14 @@ input, select, button, textarea { font-family: inherit; }
         background: #3a2e0a;
         border-color: #6b5413;
         color: #f0c674;
+    }
+    .advisory-state,
+    .advisory-badge {
+        background: #1f2937;
+        color: #d1d5db;
+    }
+    .advisory-empty,
+    .advisory-result {
+        background: #0e1116;
     }
 }
