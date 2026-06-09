@@ -223,7 +223,46 @@ def test_alphamelts_initialize_requires_petthermotools_payload(monkeypatch):
         backend.initialize({'mode': 'python_api'})
 
 
-def test_alphamelts_initialize_prefers_thermoengine_when_available(monkeypatch):
+def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+
+    def fake_import(name):
+        if name in {'petthermotools', 'PetThermoTools'}:
+            return types.SimpleNamespace(__version__='0.test')
+        if name == 'meltsdynamic':
+            raise ImportError('no meltsdynamic')
+        raise AssertionError(name)
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.importlib.import_module',
+        fake_import,
+    )
+
+    with pytest.raises(ImportError, match='PetThermoTools Python path unavailable'):
+        backend.initialize({'require_petthermotools': True})
+    assert backend._mode is None
+
+
+def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+
+    assert backend.initialize({}) is True
+    assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch):
     class FakeThermoEngineTransport:
         engine_version = 'thermoengine fake'
 
@@ -240,7 +279,7 @@ def test_alphamelts_initialize_prefers_thermoengine_when_available(monkeypatch):
         FakeThermoEngineTransport,
     )
 
-    assert backend.initialize({}) is True
+    assert backend.initialize({'mode': 'thermoengine'}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
 

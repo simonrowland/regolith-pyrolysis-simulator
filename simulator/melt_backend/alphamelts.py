@@ -4,9 +4,9 @@ AlphaMELTS Backend
 
 Wraps alphaMELTS for thermodynamic equilibrium calculations via:
 
-1. ThermoEngine transport (preferred): ENKI MELTS API, including μ output
+1. Subprocess transport (default): write .melts files, run binary, parse stdout/tables
 2. Python API fallback: petthermotools -> alphaMELTS for Python
-3. Subprocess fallback: write .melts files, run binary, parse stdout/tables
+3. ThermoEngine transport (explicit mode): ENKI MELTS API, including μ output
 
 PetThermoTools 0.4.5 schema verified from installed source:
 
@@ -113,8 +113,9 @@ class AlphaMELTSBackend(MeltBackend):
     """
     AlphaMELTS thermodynamic backend.
 
-    Tries ThermoEngine first, then PetThermoTools Python API, then
-    subprocess mode if the binary is available.
+    Defaults to the real alphaMELTS subprocess binary.  ThermoEngine stays
+    explicit because its rubicon-objc bridge can spin indefinitely inside
+    the native execute() call on this macOS/arm64 environment.
     """
 
     def __init__(self):
@@ -145,10 +146,10 @@ class AlphaMELTSBackend(MeltBackend):
         Detect available alphaMELTS interfaces.
 
         Checks in order unless ``mode`` pins a transport:
-        1. ThermoEngine Python package
-        2. PetThermoTools Python package
-        3. alphaMELTS binary in engines/alphamelts/
-        4. alphaMELTS on system PATH
+        1. alphaMELTS binary in engines/alphamelts/
+        2. alphaMELTS on system PATH
+        3. PetThermoTools Python package
+        4. ThermoEngine Python package (explicit ``mode='thermoengine'``)
         """
         config = self._alphamelts_config(config)
         requested_mode = self._normalize_mode(config.get('mode'))
@@ -175,13 +176,26 @@ class AlphaMELTSBackend(MeltBackend):
         )
         require_subprocess = requested_mode == 'subprocess'
 
-        if requested_mode in (None, 'thermoengine'):
+        if requested_mode == 'thermoengine':
             try:
                 self._thermoengine_transport = ThermoEngineTransport(
                     model_name=self._model,
                     activity_converter=activity_from_chem_potential,
                 )
                 self._thermoengine_transport.initialize()
+                health_check = getattr(
+                    self._thermoengine_transport,
+                    'health_check',
+                    None,
+                )
+                if callable(health_check):
+                    ok, reason = health_check(
+                        timeout_s=float(
+                            config.get('thermoengine_health_timeout_s', 8.0)
+                        )
+                    )
+                    if not ok:
+                        raise ImportError(reason)
                 self._thermoengine_import_error = None
                 self._engine_version = self._thermoengine_transport.engine_version
                 self._mode = 'thermoengine'
@@ -194,24 +208,13 @@ class AlphaMELTSBackend(MeltBackend):
                         f'{exc}'
                     ) from exc
 
-        if self._mode is None and requested_mode in (None, 'python_api'):
-            try:
-                self._pet_module = self._import_petthermotools()
-                self._engine_version = None
-                self._preload_petthermotools_payload(self._pet_module)
-                self._pet_available = True
-                self._mode = 'python_api'
-            except ImportError:
-                self._pet_available = False
-                self._pet_module = None
-                self._pet_melts = None
-                self._pet_payload_preloaded = False
-                self._pet_import_error = ImportError(
-                    'PetThermoTools Python path unavailable: '
-                    'petthermotools and meltsdynamic must both import'
-                )
-                if require_petthermotools:
-                    raise self._pet_import_error
+        if (
+            self._mode is None
+            and (requested_mode == 'python_api' or require_petthermotools)
+        ):
+            self._initialize_petthermotools(
+                require_petthermotools=require_petthermotools
+            )
 
         # Vapor-side delegate: lazy-init ONE real VapoRockBackend helper
         # (lowercase ``vaporock`` import lives inside ``VapoRockBackend``).
@@ -265,7 +268,35 @@ class AlphaMELTSBackend(MeltBackend):
             if self._mode is None and require_subprocess:
                 raise ImportError('AlphaMELTS subprocess transport unavailable')
 
+        if self._mode is None and requested_mode in (None, 'python_api'):
+            self._initialize_petthermotools(
+                require_petthermotools=require_petthermotools
+            )
+
         return self._mode is not None
+
+    def _initialize_petthermotools(
+        self,
+        *,
+        require_petthermotools: bool,
+    ) -> None:
+        try:
+            self._pet_module = self._import_petthermotools()
+            self._engine_version = None
+            self._preload_petthermotools_payload(self._pet_module)
+            self._pet_available = True
+            self._mode = 'python_api'
+        except ImportError:
+            self._pet_available = False
+            self._pet_module = None
+            self._pet_melts = None
+            self._pet_payload_preloaded = False
+            self._pet_import_error = ImportError(
+                'PetThermoTools Python path unavailable: '
+                'petthermotools and meltsdynamic must both import'
+            )
+            if require_petthermotools:
+                raise self._pet_import_error
 
     def _alphamelts_config(self, config: dict) -> dict:
         if not isinstance(config, Mapping):
@@ -379,6 +410,11 @@ class AlphaMELTSBackend(MeltBackend):
         if self._thermoengine_transport is not None:
             self._engine_version = self._thermoengine_transport.engine_version
             return self._engine_version
+        if self._mode == 'subprocess':
+            binary_version = self._subprocess_engine_version()
+            if binary_version:
+                self._engine_version = binary_version
+                return self._engine_version
         if self._pet_module is not None:
             version = getattr(self._pet_module, '__version__', None)
             if version:
@@ -391,22 +427,29 @@ class AlphaMELTSBackend(MeltBackend):
                 return self._engine_version
             except importlib.metadata.PackageNotFoundError:
                 continue
-        if self._binary_path is not None or self._engine_path is not None:
-            binary = self._binary_path or self._engine_path
-            try:
-                result = subprocess.run(
-                    [str(binary), '--version'],
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                )
-                text = (result.stdout or result.stderr).strip().splitlines()
-                if result.returncode == 0 and text:
-                    self._engine_version = text[0]
-                    return self._engine_version
-            except (OSError, subprocess.TimeoutExpired):
-                pass
+        binary_version = self._subprocess_engine_version()
+        if binary_version:
+            self._engine_version = binary_version
+            return self._engine_version
         return 'unavailable'
+
+    def _subprocess_engine_version(self) -> Optional[str]:
+        if self._binary_path is None and self._engine_path is None:
+            return None
+        binary = self._binary_path or self._engine_path
+        try:
+            result = subprocess.run(
+                [str(binary), '--version'],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            text = (result.stdout or result.stderr).strip().splitlines()
+            if result.returncode == 0 and text:
+                return text[0]
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        return f'alphaMELTS subprocess ({binary})'
 
     def capabilities(self) -> Dict[str, object]:
         caps = super().capabilities()

@@ -8,6 +8,8 @@ emits a ledger transition.
 from __future__ import annotations
 
 import math
+import subprocess
+import sys
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional
 
@@ -23,6 +25,7 @@ _MODEL_TO_THERMOENGINE = {
     'MELTSv1.2.0': ('1.2.0', 'v1.2'),
     'pMELTS': ('5.6.1', 'pMELTS'),
 }
+_THERMOENGINE_HEALTH_CACHE: dict[str, tuple[bool, str]] = {}
 
 
 @dataclass(frozen=True)
@@ -89,6 +92,76 @@ class ThermoEngineTransport:
             f'(liq_mod {liq_model}; {module_path})'
         )
         return True
+
+    def health_check(self, *, timeout_s: float = 8.0) -> tuple[bool, str]:
+        timeout = max(1.0, float(timeout_s))
+        cache_key = f'{self._model_name}:{timeout:.3f}'
+        cached = _THERMOENGINE_HEALTH_CACHE.get(cache_key)
+        if cached is not None:
+            return cached
+
+        code = f"""
+from engines.alphamelts.thermoengine import ThermoEngineTransport
+
+def activity_from_mu(_mu, _mu0, _temperature_K):
+    return 1.0
+
+transport = ThermoEngineTransport(
+    model_name={self._model_name!r},
+    activity_converter=activity_from_mu,
+)
+transport.initialize()
+payload = transport.equilibrate(
+    temperature_C=1200.0,
+    pressure_bar=1.0,
+    comp_wt={{
+        'SiO2': 49.0,
+        'TiO2': 1.5,
+        'Al2O3': 14.0,
+        'FeO': 10.0,
+        'Fe2O3': 1.0,
+        'MgO': 9.0,
+        'CaO': 11.0,
+        'Na2O': 2.5,
+        'K2O': 0.8,
+        'Cr2O3': 0.2,
+        'MnO': 0.2,
+        'P2O5': 0.3,
+    }},
+)
+if not payload.phases_present:
+    raise RuntimeError('ThermoEngine smoke equilibrium returned no phases')
+print('ok')
+"""
+        try:
+            result = subprocess.run(
+                [sys.executable, '-c', code],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            health = (
+                False,
+                f'ThermoEngine smoke equilibrium timed out after '
+                f'{timeout:.1f}s',
+            )
+        except OSError as exc:
+            health = (False, f'ThermoEngine smoke equilibrium failed: {exc}')
+        else:
+            if result.returncode == 0:
+                health = (True, 'ThermoEngine smoke equilibrium completed')
+            else:
+                detail = (result.stderr or result.stdout or '').strip()
+                if detail:
+                    detail = detail.splitlines()[-1]
+                health = (
+                    False,
+                    'ThermoEngine smoke equilibrium failed'
+                    + (f': {detail}' if detail else ''),
+                )
+        _THERMOENGINE_HEALTH_CACHE[cache_key] = health
+        return health
 
     def equilibrate(
         self,
