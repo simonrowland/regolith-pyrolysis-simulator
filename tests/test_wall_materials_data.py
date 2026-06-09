@@ -40,6 +40,33 @@ SURFACE_EVIDENCE_TIERS = {
     "uncharacterized",
 }
 SURFACE_REGIMES = {"air", "low-pO2", "vacuum", "thin-film"}
+REACTIVE_EXCHANGE_SPECIES = {"SiO", "alkali_NaK", "Fe_FeO"}
+REACTIVE_REGIMES = {"oxidizing", "reducing_vacuum", "buffered"}
+REACTIVE_SIGNS = {
+    "consolidating",
+    "neutral",
+    "expansive_spalling",
+    "volatile_or_revolatilizing",
+    "uncharacterized",
+}
+REACTIVE_FAVORABILITY = {
+    "direct_observation",
+    "phase_diagram_supported",
+    "source_supported",
+    "uncharacterized",
+}
+REACTIVE_EVIDENCE_TIERS = {
+    "direct_observation",
+    "phase_diagram",
+    "uncharacterized",
+}
+NET_LINER_DELTAS = {"thickening", "thinning", "spall", "uncharacterized"}
+REACTION_SITES = {"surface", "grain_boundary", "bulk", "unknown"}
+PHASE_WINDOW_EVIDENCE_TIERS = {
+    "phase_diagram_source",
+    "close_analog",
+    "calphad_bibliographic",
+}
 
 CERAMIC_ANCHORS = {
     "anorthite",
@@ -143,6 +170,141 @@ def test_wall_materials_schema_is_fail_closed():
                 assert provenance["needs_experiment"]
 
         assert entry["service_life"]["evidence"] in EVIDENCE_TAGS
+
+
+def test_wall_reactive_exchange_schema_is_regime_gated_and_sourced():
+    data = _load_yaml("wall_materials.yaml")
+    exchange = data["reactive_exchange"]
+    assert set(exchange) == WALL_MATERIALS
+
+    for material_cells in exchange.values():
+        assert set(material_cells) == REACTIVE_EXCHANGE_SPECIES
+        for cells in material_cells.values():
+            assert isinstance(cells, list)
+            assert cells
+            for cell in cells:
+                assert {
+                    "regime",
+                    "product_phase",
+                    "favorability",
+                    "sign",
+                    "redox_path",
+                    "oxygen_activity_window",
+                    "total_pressure_window",
+                    "net_liner_delta",
+                    "reaction_site",
+                    "wall_property_effect",
+                    "evidence_tier",
+                    "source_ids",
+                    "needs_experiment",
+                    "needs_calphad",
+                } <= set(cell)
+                assert cell["regime"] in REACTIVE_REGIMES
+                assert cell["sign"] in REACTIVE_SIGNS
+                assert cell["favorability"] in REACTIVE_FAVORABILITY
+                assert cell["evidence_tier"] in REACTIVE_EVIDENCE_TIERS
+                assert cell["net_liner_delta"] in NET_LINER_DELTAS
+                assert cell["reaction_site"] in REACTION_SITES
+                assert isinstance(cell["source_ids"], list)
+                assert all(isinstance(source_id, str) and source_id for source_id in cell["source_ids"])
+                assert isinstance(cell["needs_experiment"], bool)
+                assert isinstance(cell["needs_calphad"], bool)
+
+                effect = cell["wall_property_effect"]
+                assert {"structural", "service_temp_shift", "magnitude", "basis"} <= set(effect)
+                assert effect["magnitude"] == "qualitative"
+                assert effect["basis"]
+
+                if cell["favorability"] != "uncharacterized":
+                    assert cell["product_phase"] != "uncharacterized"
+                    assert cell["redox_path"] != "uncharacterized"
+                    assert cell["source_ids"]
+                if cell["regime"] == "oxidizing" or cell["favorability"] == "direct_observation":
+                    assert cell["source_ids"]
+                if cell["evidence_tier"] == "uncharacterized":
+                    assert cell["sign"] == "uncharacterized"
+                    assert cell["needs_experiment"]
+
+
+def test_wall_reactive_exchange_known_incorporations_are_regime_gated():
+    exchange = _load_yaml("wall_materials.yaml")["reactive_exchange"]
+
+    dense_alumina_sio = exchange["dense_alumina"]["SiO"]
+    assert any(
+        cell["regime"] == "oxidizing"
+        and cell["product_phase"].startswith("mullite")
+        and cell["sign"] == "consolidating"
+        for cell in dense_alumina_sio
+    )
+    assert any(
+        cell["regime"] == "reducing_vacuum"
+        and cell["sign"] == "volatile_or_revolatilizing"
+        for cell in dense_alumina_sio
+    )
+
+    for material in ("dense_alumina", "plasma_sprayed_alumina", "plasma_sprayed_mullite"):
+        alkali_cell = exchange[material]["alkali_NaK"][0]
+        assert "beta-alumina" in alkali_cell["product_phase"]
+        assert alkali_cell["sign"] == "expansive_spalling"
+        assert alkali_cell["net_liner_delta"] == "spall"
+
+    for material in ("dense_alumina", "plasma_sprayed_alumina"):
+        fe_cell = exchange[material]["Fe_FeO"][0]
+        assert "hercynite" in fe_cell["product_phase"]
+        assert fe_cell["source_ids"]
+
+    magnesia_sio = exchange["magnesia"]["SiO"]
+    assert any(
+        cell["regime"] == "buffered" and "forsterite" in cell["product_phase"]
+        for cell in magnesia_sio
+    )
+
+    mullite_sio = exchange["plasma_sprayed_mullite"]["SiO"]
+    assert any(
+        cell["regime"] == "reducing_vacuum"
+        and cell["product_phase"] == "Al2O3 + SiO(g)"
+        and cell["sign"] == "volatile_or_revolatilizing"
+        for cell in mullite_sio
+    )
+
+
+def test_wall_equilibrium_phase_windows_are_provenanced():
+    windows = _load_yaml("wall_materials.yaml")["equilibrium_phase_window"]
+    assert set(windows) == {
+        "Na2O-SiO2",
+        "K2O-SiO2",
+        "FeO-SiO2_fayalite",
+        "Na2O-FeO-SiO2",
+    }
+
+    for window in windows.values():
+        assert {
+            "diagram_ref",
+            "temperature_C",
+            "phase_field",
+            "tolerance",
+            "composition_bounds",
+            "oxygen_activity_window",
+            "total_pressure_window",
+            "evidence_tier",
+            "source_ids",
+            "needs_experiment",
+            "needs_calphad",
+        } <= set(window)
+        assert window["diagram_ref"]
+        assert window["phase_field"]
+        assert window["tolerance"]
+        assert window["evidence_tier"] in PHASE_WINDOW_EVIDENCE_TIERS
+        assert isinstance(window["source_ids"], list)
+        assert window["source_ids"]
+        assert window["temperature_C"] is None or isinstance(window["temperature_C"], (int, float))
+        assert isinstance(window["needs_experiment"], bool)
+        assert isinstance(window["needs_calphad"], bool)
+
+    thresholds = windows["Na2O-FeO-SiO2"]["engine_redox_thresholds"]
+    assert thresholds["Na_FeO_crossover_C"] == 1173.4
+    assert thresholds["K_FeO_crossover_C"] == 832.0
+    assert thresholds["basis"]
 
 
 def test_ceramic_types_schema_is_fail_closed():

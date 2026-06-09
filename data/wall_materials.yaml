@@ -4,6 +4,7 @@ source_documents:
   audit: "docs-private/research/2026-06-08-wall-chemistry/wall-AUDIT.md"
   references: "docs-private/references/wall-materials-references.md"
   surface_interaction_sources: "docs-private/research/2026-06-09-wall-ceramic-deep-research/references-to-trawl.md"
+  reactive_exchange_sources: "docs-private/research/2026-06-09-wall-ceramic-deep-research/references-to-trawl.md"
 evidence_tags:
   - direct
   - analogous-only
@@ -17,6 +18,331 @@ species_keys:
     - SiO
     - alkali
     - Fe
+
+reactive_exchange_templates:
+  uncharacterized_reducing_vacuum: &rx_uncharacterized_reducing_vacuum
+    regime: reducing_vacuum
+    product_phase: uncharacterized
+    favorability: uncharacterized
+    sign: uncharacterized
+    redox_path: uncharacterized
+    oxygen_activity_window: null
+    total_pressure_window: null
+    net_liner_delta: uncharacterized
+    reaction_site: unknown
+    wall_property_effect:
+      structural: uncharacterized
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'No source-backed reactive-exchange product or regime window for this material/species cell in hot low-pO2, low-total-pressure service.'
+    evidence_tier: uncharacterized
+    source_ids: []
+    needs_experiment: true
+    needs_calphad: true
+  sio_reducing_vacuum_volatile: &rx_sio_reducing_vacuum_volatile
+    regime: reducing_vacuum
+    product_phase: 'SiO(g) / SiOx disproportionation products, not stable mullite'
+    favorability: source_supported
+    sign: volatile_or_revolatilizing
+    redox_path: 'Hot low-pO2/low-total-pressure branch keeps SiO volatile or drives SiOx disproportionation; stable SiO2-to-mullite incorporation is not the default.'
+    oxygen_activity_window: 'low-pO2 reducing vacuum; numeric pO2 window unfilled'
+    total_pressure_window: '<=1e-2 Pa counterexample at 1673 K for mullite decomposition'
+    net_liner_delta: uncharacterized
+    reaction_site: surface
+    wall_property_effect:
+      structural: uncharacterized
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'Schick gates silica vaporization by oxygen potential; Kitaoka gives the vacuum counterexample for mullite decomposition to Al2O3 + SiO(g).'
+    evidence_tier: direct_observation
+    source_ids: ['R4-RX-Schick-1960', 'R4-RX-Kitaoka-2019']
+    needs_experiment: true
+    needs_calphad: false
+  alumina_sio_oxidizing_mullite: &rx_alumina_sio_oxidizing_mullite
+    regime: oxidizing
+    product_phase: 'mullite (3Al2O3.2SiO2)'
+    favorability: phase_diagram_supported
+    sign: consolidating
+    redox_path: 'SiO/SiOx must first oxidize to SiO2; SiO2 then reacts with Al2O3 into the mullite field.'
+    oxygen_activity_window: 'oxidizing or locally O-buffered wall; numeric pO2 window unfilled'
+    total_pressure_window: null
+    net_liner_delta: thickening
+    reaction_site: surface
+    wall_property_effect:
+      structural: consolidating_if_adherent
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'Only the oxidized silica branch is source-backed for mullite formation; adhesion and reaction-layer continuity still require testing.'
+    evidence_tier: phase_diagram
+    source_ids: ['R4-RX-Schick-1960', 'R4-RX-Kitaoka-2019', 'ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: false
+  alumina_alkali_beta_spall: &rx_alumina_alkali_beta_spall
+    regime: reducing_vacuum
+    product_phase: 'beta-alumina / alkali aluminate'
+    favorability: direct_observation
+    sign: expansive_spalling
+    redox_path: 'Na/Na2O ingress into alumina or aluminosilicate refractory; K analogue remains less characterized.'
+    oxygen_activity_window: null
+    total_pressure_window: null
+    net_liner_delta: spall
+    reaction_site: grain_boundary
+    wall_property_effect:
+      structural: spall
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'Kennedy and Lee report alkali-aluminate/beta-alumina products, rapid alkali diffusion, volume expansion, poor thermal-shock resistance, and refractory failure; owner prompt carries the 20-25 pct expansion hazard.'
+    evidence_tier: direct_observation
+    source_ids: ['R4-RX-Kennedy-1981', 'R4-RX-Lee-1988']
+    needs_experiment: true
+    needs_calphad: true
+  alumina_feo_hercynite: &rx_alumina_feo_hercynite
+    regime: reducing_vacuum
+    product_phase: 'hercynite (FeAl2O4)'
+    favorability: direct_observation
+    sign: neutral
+    redox_path: 'FeO-bearing slag reacts with Al2O3 to grow a FeAl2O4 reaction layer; activity/window and rate remain FeO-activity dependent.'
+    oxygen_activity_window: 'FeO-bearing low-oxygen slag branch; numeric pO2 window unfilled'
+    total_pressure_window: null
+    net_liner_delta: thinning
+    reaction_site: surface
+    wall_property_effect:
+      structural: reaction_layer
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'Sarkar/Sohn show diffusion-controlled hercynite reaction-layer growth through FeAl2O4 in FeO-bearing slags.'
+    evidence_tier: direct_observation
+    source_ids: ['R4-RX-Sarkar-Sohn-2019']
+    needs_experiment: true
+    needs_calphad: true
+  mullite_sio_oxidizing: &rx_mullite_sio_oxidizing
+    regime: oxidizing
+    product_phase: mullite
+    favorability: source_supported
+    sign: neutral
+    redox_path: 'Oxidizing or O-buffered surface keeps silica activity compatible with mullite rather than SiO volatilization.'
+    oxygen_activity_window: 'oxidizing or locally O-buffered wall; numeric pO2 window unfilled'
+    total_pressure_window: null
+    net_liner_delta: thickening
+    reaction_site: surface
+    wall_property_effect:
+      structural: consolidating_if_adherent
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'Kitaoka treats mullite stability under oxygen-potential gradients; no hot regolith condensate adhesion constant is filled.'
+    evidence_tier: direct_observation
+    source_ids: ['R4-RX-Kitaoka-2019']
+    needs_experiment: true
+    needs_calphad: false
+  mullite_sio_reducing_decomposition: &rx_mullite_sio_reducing_decomposition
+    regime: reducing_vacuum
+    product_phase: 'Al2O3 + SiO(g)'
+    favorability: direct_observation
+    sign: volatile_or_revolatilizing
+    redox_path: 'Mullite decomposition is thermodynamically favored at <=1e-2 Pa total pressure and 1673 K; do not treat SiO-to-mullite as the default branch.'
+    oxygen_activity_window: 'reducing vacuum / oxygen-potential gradient'
+    total_pressure_window: '<=1e-2 Pa at 1673 K'
+    net_liner_delta: thinning
+    reaction_site: surface
+    wall_property_effect:
+      structural: surface_recession
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'Kitaoka supplies the low-pressure mullite decomposition counterexample; Schick supplies the silica-to-SiO(g) vaporization gate.'
+    evidence_tier: direct_observation
+    source_ids: ['R4-RX-Kitaoka-2019', 'R4-RX-Schick-1960']
+    needs_experiment: true
+    needs_calphad: false
+  magnesia_sio_forsterite_buffered: &rx_magnesia_sio_forsterite_buffered
+    regime: buffered
+    product_phase: 'forsterite (Mg2SiO4) / Mg-silicate reaction layer'
+    favorability: phase_diagram_supported
+    sign: consolidating
+    redox_path: 'SiO must enter an oxidized SiO2/silica-activity branch before MgO + SiO2 can form forsterite.'
+    oxygen_activity_window: 'glazed or deposit-buffered silica activity; numeric pO2 window unfilled'
+    total_pressure_window: null
+    net_liner_delta: thickening
+    reaction_site: surface
+    wall_property_effect:
+      structural: reaction_layer
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'MgO-SiO2/MAS phase-diagram provenance supports product identity only; transport, adherence, and reaction depth remain unfilled.'
+    evidence_tier: phase_diagram
+    source_ids: ['ACerS-NIST-SRD31', 'R4-RX-Smart-Glasser-1981']
+    needs_experiment: true
+    needs_calphad: false
+  silica_alkali_silicate: &rx_silica_alkali_silicate
+    regime: buffered
+    product_phase: 'Na/K silicate glass or liquid'
+    favorability: phase_diagram_supported
+    sign: neutral
+    redox_path: 'Alkali oxide plus SiO2 enters binary alkali-silicate phase fields; exact Na/K volatility and film composition are unfilled.'
+    oxygen_activity_window: 'oxide/glazed branch; metallic Na/K first-arrival remains uncharacterized'
+    total_pressure_window: null
+    net_liner_delta: thinning
+    reaction_site: surface
+    wall_property_effect:
+      structural: fluxing
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'ACerS/NIST phase-equilibria source supports alkali-silicate product classes; exact binary windows need diagram extraction.'
+    evidence_tier: phase_diagram
+    source_ids: ['ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: true
+  silica_feo_fayalite: &rx_silica_feo_fayalite
+    regime: reducing_vacuum
+    product_phase: 'fayalite-type FeO-SiO2 liquid/slag'
+    favorability: phase_diagram_supported
+    sign: neutral
+    redox_path: 'FeO plus SiO2 enters fayalite/FeO-SiO2 slag fields when an FeO-bearing oxide film exists; metallic Fe first-arrival remains uncharacterized.'
+    oxygen_activity_window: 'low-pO2 FeO-bearing slag branch'
+    total_pressure_window: null
+    net_liner_delta: thinning
+    reaction_site: surface
+    wall_property_effect:
+      structural: fluxing
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'Fayalite-type FeO-SiO2 slag wetting is source-backed at low pO2; exact fused-silica liner corrosion rate is not filled.'
+    evidence_tier: phase_diagram
+    source_ids: ['R1-SI3', 'R4-CD7', 'ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: true
+
+reactive_exchange:
+  fused_silica:
+    SiO:
+      - regime: reducing_vacuum
+        product_phase: 'SiO(g) from SiO2 self-volatilization'
+        favorability: source_supported
+        sign: volatile_or_revolatilizing
+        redox_path: 'Hot low-pO2/vacuum conditions favor silica vaporization to SiO(g); incoming SiO does not create a stable retained liner product by default.'
+        oxygen_activity_window: 'low-pO2 reducing vacuum; numeric pO2 window unfilled'
+        total_pressure_window: null
+        net_liner_delta: thinning
+        reaction_site: surface
+        wall_property_effect:
+          structural: surface_recession
+          service_temp_shift: lower
+          magnitude: qualitative
+          basis: 'Schick supports SiO2-to-SiO(g) wall self-volatilization under hot low-pO2/vacuum conditions.'
+        evidence_tier: direct_observation
+        source_ids: ['R4-RX-Schick-1960']
+        needs_experiment: true
+        needs_calphad: false
+    alkali_NaK:
+      - *rx_silica_alkali_silicate
+    Fe_FeO:
+      - *rx_silica_feo_fayalite
+  dense_alumina:
+    SiO:
+      - *rx_alumina_sio_oxidizing_mullite
+      - *rx_sio_reducing_vacuum_volatile
+    alkali_NaK:
+      - *rx_alumina_alkali_beta_spall
+    Fe_FeO:
+      - *rx_alumina_feo_hercynite
+  doloma:
+    SiO:
+      - *rx_uncharacterized_reducing_vacuum
+    alkali_NaK:
+      - *rx_uncharacterized_reducing_vacuum
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
+  magnesia:
+    SiO:
+      - *rx_magnesia_sio_forsterite_buffered
+      - *rx_sio_reducing_vacuum_volatile
+    alkali_NaK:
+      - *rx_uncharacterized_reducing_vacuum
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
+  bulk_zirconia_ysz:
+    SiO:
+      - *rx_uncharacterized_reducing_vacuum
+    alkali_NaK:
+      - *rx_uncharacterized_reducing_vacuum
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
+  plasma_sprayed_alumina:
+    SiO:
+      - *rx_alumina_sio_oxidizing_mullite
+      - *rx_sio_reducing_vacuum_volatile
+    alkali_NaK:
+      - *rx_alumina_alkali_beta_spall
+    Fe_FeO:
+      - *rx_alumina_feo_hercynite
+  plasma_sprayed_ysz:
+    SiO:
+      - *rx_uncharacterized_reducing_vacuum
+    alkali_NaK:
+      - *rx_uncharacterized_reducing_vacuum
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
+  plasma_sprayed_mullite:
+    SiO:
+      - *rx_mullite_sio_oxidizing
+      - *rx_mullite_sio_reducing_decomposition
+    alkali_NaK:
+      - *rx_alumina_alkali_beta_spall
+    Fe_FeO:
+      - *rx_uncharacterized_reducing_vacuum
+
+equilibrium_phase_window:
+  Na2O-SiO2:
+    diagram_ref: 'ACerS-NIST Phase Equilibria Diagrams Database, Version 6.0 (2025), binary Na2O-SiO2 diagrams; diagram ID not extracted in this repository.'
+    temperature_C: null
+    phase_field: 'Na-silicate glass/liquid and crystalline sodium-silicate fields; exact composition and liquidus windows are not digitized.'
+    tolerance: 'unfilled; requires ACerS/NIST diagram extraction before numeric bounds'
+    composition_bounds: 'Na2O-SiO2 binary only; excludes Na volatility and mixed Na-K-Fe-Ca-Al-Mg-O films.'
+    oxygen_activity_window: 'oxide/glazed branch only'
+    total_pressure_window: null
+    evidence_tier: phase_diagram_source
+    source_ids: ['ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: true
+  K2O-SiO2:
+    diagram_ref: 'ACerS-NIST Phase Equilibria Diagrams Database, Version 6.0 (2025), binary K2O-SiO2 diagrams; diagram ID not extracted in this repository.'
+    temperature_C: null
+    phase_field: 'K-silicate glass/liquid and crystalline potassium-silicate fields; exact composition and liquidus windows are not digitized.'
+    tolerance: 'unfilled; requires ACerS/NIST diagram extraction before numeric bounds'
+    composition_bounds: 'K2O-SiO2 binary only; excludes K volatility and mixed Na-K-Fe-Ca-Al-Mg-O films.'
+    oxygen_activity_window: 'oxide/glazed branch only'
+    total_pressure_window: null
+    evidence_tier: phase_diagram_source
+    source_ids: ['ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: true
+  FeO-SiO2_fayalite:
+    diagram_ref: 'Fukuyama, Donald, and Toguri 1996 fayalite-type slag on MgO; ACerS/NIST FeO-SiO2 phase-equilibria diagrams not digitized in this repository.'
+    temperature_C: 1200
+    phase_field: 'fayalite-type FeO-SiO2 slag/liquid branch at Fe/SiO2 mass ratio 1.4-2.0 and pO2 1e-6 to 1e-4 Pa in the web abstract.'
+    tolerance: 'web-abstract bounds only; full diagram/PDF extraction required for numeric composition tolerance'
+    composition_bounds: 'Fe/SiO2 mass ratio 1.4-2.0 for wetting abstract; not a general FeO-SiO2 phase polygon.'
+    oxygen_activity_window: 'pO2 1e-6 to 1e-4 Pa from R1-SI3 web abstract'
+    total_pressure_window: null
+    evidence_tier: close_analog
+    source_ids: ['R1-SI3', 'ACerS-NIST-SRD31']
+    needs_experiment: true
+    needs_calphad: true
+  Na2O-FeO-SiO2:
+    diagram_ref: 'Moosavi-Khoonsari and Jung 2016 Na2O-FeO-Fe2O3-SiO2 CALPHAD; Garter and Ibrahim 1952 Na2O-FeO-SiO2 ternary, full extraction still needed.'
+    temperature_C: null
+    phase_field: 'Na-Fe-silicate joint chemistry including reported Na2O.FeO.SiO2 compound; pO2, Na volatility, and Fe valence remain gated.'
+    tolerance: 'unfilled; bibliographic/abstract confirmation only until CALPHAD or diagram extraction'
+    composition_bounds: 'Na2O-FeO-SiO2 ternary slice only; full Na-K-Fe-Ca-Al-Mg-O mix remains needs_experiment.'
+    oxygen_activity_window: 'Fe valence and pO2 dependent; not numerically filled'
+    total_pressure_window: null
+    engine_redox_thresholds:
+      Na_FeO_crossover_C: 1173.4
+      K_FeO_crossover_C: 832.0
+      basis: 'tests/test_physics_ground_truth.py NIST-JANAF high-T oxide refit; above each crossover the corresponding alkali-to-FeO reduction is thermodynamically refused.'
+    evidence_tier: calphad_bibliographic
+    source_ids: ['R4-CD5', 'R4-CD6', 'JANAF-NaK-FeO-crossovers']
+    needs_experiment: true
+    needs_calphad: true
 
 materials:
   fused_silica:
