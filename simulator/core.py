@@ -312,10 +312,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         self.backend = melt_backend
         self._last_backend_error = ''
-        # Per-call outcome of the most recent EquilibriumResult
+        # Per-call outcome of EquilibriumResult evaluations
         # ('ok' / 'not_converged' / 'out_of_domain' / 'unavailable').
-        # Descriptive only - no control-flow branch reads this.
+        # The latest value is a UI diagnostic; the history lets batch
+        # evaluation classify a candidate that hit a real backend domain edge.
         self._last_backend_status = 'ok'
+        self._backend_status_history: list[str] = []
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -620,6 +622,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # is rebuilt per batch.
         self._last_backend_error = ''
         self._last_backend_status = 'ok'
+        self._backend_status_history = []
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -2351,6 +2354,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Record the per-call backend outcome and run the post-equilibrium
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
         self._last_backend_status = getattr(result, 'status', 'ok')
+        self._backend_status_history.append(str(self._last_backend_status))
         # VAPOR_PRESSURE intent — kernel-authoritative.
         #
         # \goal BUILTIN-ENGINE-EXTRACTION (#7), first flip landed. The

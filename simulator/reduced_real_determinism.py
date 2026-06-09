@@ -244,6 +244,9 @@ class PT0DeterminismStore:
         result = equilibrium_from_payload(payload)
         sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
+        history = getattr(sim, "_backend_status_history", None)
+        if isinstance(history, list):
+            history.append(str(sim._last_backend_status))
         sim._last_vapor_pressures_source = dict(
             payload.get("last_vapor_pressures_source") or {}
         )

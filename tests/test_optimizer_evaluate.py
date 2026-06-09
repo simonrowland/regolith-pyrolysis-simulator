@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.backends import BackendUnavailableError
+from simulator.chemistry.kernel import ProposalRejected
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
     EngineBugAbort,
@@ -18,6 +19,7 @@ from simulator.optimize.objective import objective_definitions
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.reduced_real_determinism import PT0NonFinitePayload
+from simulator.runner import RunnerError
 from simulator.state import CampaignPhase, HourSnapshot
 
 
@@ -258,6 +260,63 @@ def test_pt0_nonfinite_failed_run_is_candidate_failure() -> None:
     assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
     assert result.run_reference is not None
     assert result.run_reference.error_message.startswith("PT0NonFinitePayload")
+
+
+def test_proposal_rejected_direct_exception_is_invalid_recipe() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            exc=ProposalRejected(
+                "insufficient available 'FeO' in normal account "
+                "'process.cleaned_melt': balance would be -7.87e-05 kg"
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.failing_gates == ("inventory_overdraw",)
+    assert result.feasibility_margins["inventory_overdraw"].observed == pytest.approx(
+        7.87e-05
+    )
+    assert any("overdraw_kg=7.87e-05" in note for note in result.notes)
+
+
+def test_proposal_rejected_runner_paths_are_invalid_recipe() -> None:
+    for executor in (
+        FakeExecutor(
+            exc=RunnerError(
+                "ProposalRejected: insufficient available 'Cr2O3' in normal "
+                "account 'process.cleaned_melt': balance would be -0.125 kg"
+            )
+        ),
+        FakeExecutor(
+            _execution(
+                status="failed",
+                error_message=(
+                    "ProposalRejected: insufficient available 'Al2O3' in normal "
+                    "account 'process.cleaned_melt': balance would be -2.5 kg"
+                ),
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    ):
+        result = evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=executor,
+        )
+
+        assert result.feasible is False
+        assert result.failure_category is FailureCategory.INVALID_RECIPE
+        assert result.run_reference is not None
+        assert result.run_reference.backend_status == "ok"
 
 
 def test_mass_balance_breach_aborts_as_engine_bug_with_repro_patch() -> None:

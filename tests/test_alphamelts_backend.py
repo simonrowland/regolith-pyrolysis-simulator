@@ -289,7 +289,7 @@ def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
         ),
     )
 
-    with pytest.raises(RuntimeError, match='no stable assemblage verdict'):
+    with pytest.raises(RuntimeError, match='no parseable phase assemblage'):
         backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
@@ -954,10 +954,65 @@ olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
     assert result.status == 'ok'
 
 
+def test_alphamelts_stdout_parser_accepts_parseable_rows_without_stable_banner():
+    backend = AlphaMELTSBackend()
+    output = """
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid:    SiO2 TiO2 Al2O3 Fe2O3 Cr2O3   FeO  MnO  MgO  NiO  CoO   CaO Na2O  K2O P2O5  H2O
+90.3451 g 46.49 2.21 16.60  0.00  0.00 11.71 0.00 7.54 0.00 0.00 11.02 3.32 1.11 0.00 0.00
+Activity of H2O = 0  Melt fraction = 0.921889
+olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
+"""
+
+    result = backend._parse_single_point_stdout(
+        output,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=1000.0,
+    )
+
+    assert result.status == "ok"
+    assert result.phases_present == ["liquid", "olivine"]
+    assert result.liquid_fraction == pytest.approx(0.921889)
+    assert result.warnings == [
+        "AlphaMELTS stable assemblage banner absent; accepted parseable phase rows"
+    ]
+
+
+def test_alphamelts_stdout_parser_classifies_no_phase_convergence_failure():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Found the liquidus at T = 1249.41 (C).
+...Checking saturation state of potential solids.
+...Adding the solid phase olivine to the assemblage.
+...Projecting equality constraints.
+...Minimizing the thermodynamic potential.
+...Quadratic convergence failure. Aborting.
+Initial calculation failed (1.000000 bars, 1249.414062 C)!
+"""
+
+    result = backend._parse_single_point_stdout(
+        output,
+        temperature_C=1250.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=1000.0,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.phases_present == []
+    assert result.warnings == [
+        "AlphaMELTS liquidus_C=1249.410",
+        "AlphaMELTS subprocess failed before phase rows: "
+        "Quadratic convergence failure. Aborting.",
+    ]
+
+
 def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
     backend = AlphaMELTSBackend()
 
-    with pytest.raises(RuntimeError, match="stable assemblage"):
+    with pytest.raises(RuntimeError, match="parseable phase assemblage"):
         backend._parse_single_point_stdout(
             "Error in SILMIN file input procedure.",
             temperature_C=1200.0,

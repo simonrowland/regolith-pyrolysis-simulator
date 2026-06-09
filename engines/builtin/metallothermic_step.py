@@ -115,6 +115,7 @@ account; the declared set is the first-line gate.
 from __future__ import annotations
 
 from collections.abc import Mapping
+import math
 from typing import Any
 
 from engines.builtin._common import (
@@ -258,12 +259,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "process.cleaned_melt",
         )
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
+        true_available_mol = self._true_available_mol_by_species(controls)
 
         if reaction_family == REACTION_FAMILY_C3_K:
             return self._dispatch_c3_k(
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
+                true_available_mol,
                 request.temperature_C,
                 controls,
                 MOLAR_MASS,
@@ -276,6 +279,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
+                true_available_mol,
                 request.temperature_C,
                 controls,
                 MOLAR_MASS,
@@ -288,6 +292,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if back_reduction:
             return self._dispatch_c6_back_reduction(
                 composition_kg,
+                true_available_mol,
                 metal_mol,
                 controls,
                 MOLAR_MASS,
@@ -298,6 +303,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         return self._dispatch_c6_mg_primary(
             composition_kg,
             composition_wt_pct,
+            true_available_mol,
             controls,
             MOLAR_MASS,
             registry,
@@ -315,6 +321,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_kg: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
         total_kg: float,
+        true_available_mol: Mapping[str, float],
         temperature_C: float,
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
@@ -353,7 +360,13 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             K2O_max_kg * (2 * molar_mass["K"] / molar_mass["K2O"])
         )
 
-        FeO_available_kg = composition_kg.get("FeO", 0.0)
+        mol_FeO_available = self._available_mol(
+            "FeO",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        FeO_available_kg = mol_FeO_available * molar_mass["FeO"] / 1000.0
         # 1 kg K reduces (M_FeO / (2 * M_K)) kg FeO -- inverse of the
         # 2K + FeO -> K2O + Fe stoichiometry.  Same expression as legacy.
         K_for_FeO_kg = (
@@ -408,11 +421,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # IEEE-754 round-off on the same operand sequence the legacy
         # already pinned in the smoke run.
         mol_K = K_inject_kg / molar_mass["K"] * 1000.0
-        mol_FeO_available = (
-            FeO_available_kg / molar_mass["FeO"] * 1000.0
-            if molar_mass["FeO"] > 0.0
-            else 0.0
-        )
         mol_FeO_reduced = min(mol_K / 2.0, mol_FeO_available)
         mol_K_used = mol_FeO_reduced * 2.0
         if mol_FeO_reduced <= 0.0:
@@ -484,6 +492,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         composition_kg: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
         total_kg: float,
+        true_available_mol: Mapping[str, float],
         temperature_C: float,
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
@@ -528,9 +537,27 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         )
         fit_warnings = self._ellingham_fit_warnings(fit_extrapolations)
 
-        FeO_available_kg = composition_kg.get("FeO", 0.0)
-        TiO2_available_kg = composition_kg.get("TiO2", 0.0)
-        Cr2O3_available_kg = composition_kg.get("Cr2O3", 0.0)
+        mol_FeO_available = self._available_mol(
+            "FeO",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        mol_TiO2_available = self._available_mol(
+            "TiO2",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        mol_Cr2O3_available = self._available_mol(
+            "Cr2O3",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        FeO_available_kg = mol_FeO_available * molar_mass["FeO"] / 1000.0
+        TiO2_available_kg = mol_TiO2_available * molar_mass["TiO2"] / 1000.0
+        Cr2O3_available_kg = mol_Cr2O3_available * molar_mass["Cr2O3"] / 1000.0
 
         Na_available_this_hr = Na_available_kg / 3.0
         Na_inject_kg = max(
@@ -575,8 +602,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
-                mol_FeO = FeO_available_kg / molar_mass["FeO"] * 1000.0
-                mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO)
+                mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO_available)
                 mol_Na_for_Fe = mol_FeO_reduced * 2.0
                 mol_Na2O_from_Fe = mol_FeO_reduced
                 mol_Fe_produced = mol_FeO_reduced
@@ -603,8 +629,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
-                mol_Cr2O3 = Cr2O3_available_kg / molar_mass["Cr2O3"] * 1000.0
-                mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3)
+                mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3_available)
                 mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
                 mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
                 mol_Cr_produced = mol_Cr2O3_reduced * 2.0
@@ -631,8 +656,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
-                mol_TiO2 = TiO2_available_kg / molar_mass["TiO2"] * 1000.0
-                mol_TiO2_accessible = mol_TiO2 * self.TI_ACCESSIBILITY
+                mol_TiO2_accessible = mol_TiO2_available * self.TI_ACCESSIBILITY
                 mol_TiO2_reduced = min(
                     mol_Na / 4.0, mol_TiO2_accessible
                 )
@@ -782,6 +806,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         self,
         composition_kg: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
+        true_available_mol: Mapping[str, float],
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
@@ -821,7 +846,13 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 control_audit=control_audit,
             )
 
-        Al2O3_available_kg = composition_kg.get("Al2O3", 0.0)
+        mol_Al2O3_available = self._available_mol(
+            "Al2O3",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        Al2O3_available_kg = mol_Al2O3_available * molar_mass["Al2O3"] / 1000.0
         if Al2O3_available_kg < 0.01:
             return self._empty_result(
                 "c6_mg_thermite skipped: Al2O3 below 0.01 kg threshold",
@@ -837,9 +868,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         # 3 Mg + Al2O3 -> 3 MgO + 2 Al.  Mg is the limiting reagent.
         mol_Mg = Mg_available_this_hr / molar_mass["Mg"] * 1000.0
-        mol_Al2O3_available = (
-            Al2O3_available_kg / molar_mass["Al2O3"] * 1000.0
-        )
         mol_Al2O3_reduced = min(mol_Mg / 3.0, mol_Al2O3_available)
         if mol_Al2O3_reduced < 0.001:
             return self._empty_result(
@@ -900,6 +928,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     def _dispatch_c6_back_reduction(
         self,
         composition_kg: Mapping[str, float],
+        true_available_mol: Mapping[str, float],
         metal_mol: Mapping[str, float],
         controls: Mapping[str, Any],
         molar_mass: Mapping[str, float],
@@ -908,7 +937,13 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         control_audit,
     ) -> IntentResult:
         mol_Al_produced = float(controls.get("mol_Al_produced") or 0.0)
-        SiO2_available_kg = composition_kg.get("SiO2", 0.0)
+        mol_SiO2_available = self._available_mol(
+            "SiO2",
+            composition_kg,
+            true_available_mol,
+            molar_mass,
+        )
+        SiO2_available_kg = mol_SiO2_available * molar_mass["SiO2"] / 1000.0
 
         # kg view of the freshly produced Al for the legacy gate
         # (Al_produced_kg > 0.01).
@@ -928,9 +963,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             * self.BACK_REDUCTION_FRACTION
             / molar_mass["Al"]
             * 1000.0
-        )
-        mol_SiO2_available = (
-            SiO2_available_kg / molar_mass["SiO2"] * 1000.0
         )
         mol_SiO2_consumed = min(
             mol_Al_for_back * 3.0 / 4.0, mol_SiO2_available
@@ -1002,6 +1034,43 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if total_kg <= 0.0:
             return {}
         return {sp: (kg / total_kg) * 100.0 for sp, kg in composition_kg.items()}
+
+    def _true_available_mol_by_species(
+        self,
+        controls: Mapping[str, Any],
+    ) -> Mapping[str, float]:
+        raw = controls.get("true_available_mol_by_species")
+        if raw is None:
+            return {}
+        if not isinstance(raw, Mapping):
+            raise TypeError("true_available_mol_by_species must be a mapping")
+        available: dict[str, float] = {}
+        for species, value in raw.items():
+            mol = float(value)
+            if not math.isfinite(mol):
+                raise ValueError(
+                    f"true_available_mol_by_species[{species!r}] is non-finite"
+                )
+            available[str(species)] = max(0.0, mol)
+        return available
+
+    def _available_mol(
+        self,
+        species: str,
+        composition_kg: Mapping[str, float],
+        true_available_mol: Mapping[str, float],
+        molar_mass: Mapping[str, float],
+    ) -> float:
+        if species in true_available_mol:
+            return float(true_available_mol[species])
+        mass_g_per_mol = float(molar_mass[species])
+        if mass_g_per_mol <= 0.0:
+            return 0.0
+        return (
+            max(0.0, float(composition_kg.get(species, 0.0)))
+            / mass_g_per_mol
+            * 1000.0
+        )
 
     @staticmethod
     def _liquid_fraction_blocks_metallothermic(

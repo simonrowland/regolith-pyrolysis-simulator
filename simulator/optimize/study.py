@@ -413,7 +413,10 @@ def run(
             definitions=definitions,
             failure_counts=failure_counts,
         )
-        raise StudyNoFeasibleError("no feasible candidates; winner.recipe.yaml not written")
+        raise StudyNoFeasibleError(
+            "no feasible candidates; winner.recipe.yaml not written; "
+            f"failure_counts={dict(failure_counts)}"
+        )
     winner = pareto_ranked[0]
     artifacts = _write_artifacts(
         out,

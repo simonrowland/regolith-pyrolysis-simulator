@@ -97,12 +97,16 @@ class RunExecutor:
         trace = PhysicsTrace.from_simulator(sim)
         snapshots = tuple(getattr(sim.record, "snapshots", ()))
         reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
-        backend_status = str(
+        latest_backend_status = str(
             getattr(
                 sim,
                 "_backend_selection_status",
                 getattr(sim, "_last_backend_status", "ok"),
             )
+        )
+        backend_status = _aggregate_backend_status(
+            getattr(sim, "_backend_status_history", ()),
+            latest_backend_status,
         )
         backend_authoritative = bool(
             getattr(sim, "_backend_authoritative", True)
@@ -136,6 +140,18 @@ def _backend_from_worker_runtime(
     if config.reduced_real_cache is not None:
         return None
     return getattr(worker_runtime, "backend", None)
+
+
+def _aggregate_backend_status(history: Any, latest: str) -> str:
+    try:
+        statuses = [str(status) for status in history]
+    except TypeError:
+        statuses = []
+    statuses.append(str(latest))
+    for status in ("unavailable", "out_of_domain", "not_converged"):
+        if status in statuses:
+            return status
+    return str(latest)
 
 
 def _collect_shadow_trace(

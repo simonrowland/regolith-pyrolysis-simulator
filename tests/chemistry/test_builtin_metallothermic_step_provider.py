@@ -734,6 +734,57 @@ def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
     )
 
 
+def test_c3_na_draw_uses_true_ledger_availability_not_quantized_view(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    true_feo_kg = 10.0
+    quantized_feo_kg = true_feo_kg * 1.000053
+    true_feo_mol = true_feo_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    quantized_feo_mol = quantized_feo_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    na_kg_for_full_true_draw = (
+        true_feo_mol * 2.0 * MOLAR_MASS["Na"] / 1000.0 * 3.1
+    )
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {
+                        "SiO2": 1000.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+                        "FeO": quantized_feo_mol,
+                    },
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_NA,
+                "na_target_stage": "feo_cleanup",
+                "reagent_available_kg": na_kg_for_full_true_draw,
+                "true_available_mol_by_species": {"FeO": true_feo_mol},
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    debited = result.transition.debits["process.cleaned_melt"]["FeO"]
+    assert debited == pytest.approx(true_feo_mol)
+    assert debited < quantized_feo_mol
+
+
 def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

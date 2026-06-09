@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from simulator.run_executor import RunExecution, RunExecutor
+from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
 from simulator.runner import PyrolysisRun
 from simulator.trace import PhysicsTrace
 
@@ -57,3 +57,13 @@ def test_run_executor_partial_path_sets_status_and_decisions():
     assert execution.error_message == ""
     assert execution.operator_decisions
     assert execution.shadow_trace == execution.operator_decisions
+
+
+def test_backend_status_aggregation_preserves_recovered_domain_edges():
+    assert _aggregate_backend_status(("ok", "out_of_domain", "ok"), "ok") == (
+        "out_of_domain"
+    )
+    assert _aggregate_backend_status(("ok", "not_converged"), "ok") == (
+        "not_converged"
+    )
+    assert _aggregate_backend_status(("ok",), "ok") == "ok"

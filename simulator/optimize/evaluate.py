@@ -7,11 +7,14 @@ from enum import Enum
 import hashlib
 import inspect
 import math
+import re
 from types import MappingProxyType
 from typing import Any, Mapping
 from collections.abc import Mapping as MappingABC, Set as AbstractSet
 
+from simulator.accounting import OverdraftError
 from simulator.backends import BackendUnavailableError
+from simulator.chemistry.kernel import ProposalRejected
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
@@ -52,6 +55,7 @@ class FailureCategory(str, Enum):
     OUT_OF_DOMAIN = "out_of_domain"
     PHYSICS_REFUSED = "physics_refused"
     NON_FINITE_PAYLOAD = "non_finite_payload"
+    INVALID_RECIPE = "invalid_recipe"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
 
@@ -270,6 +274,13 @@ def evaluate(
                 key,
                 str(exc),
             )
+        if _is_inventory_overdraw_message(str(exc)):
+            return _invalid_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                str(exc),
+            )
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
@@ -277,6 +288,13 @@ def evaluate(
             eval_spec=spec,
             cache_key_value=key,
         ) from exc
+    except (ProposalRejected, OverdraftError) as exc:
+        return _invalid_recipe_result(
+            candidate_id,
+            spec,
+            key,
+            f"{type(exc).__name__}: {exc}",
+        )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
@@ -299,6 +317,15 @@ def evaluate(
             )
         if _is_non_finite_payload_message(error_message):
             return _non_finite_payload_result(
+                candidate_id,
+                spec,
+                key,
+                error_message,
+                run_execution=run_execution,
+                profile=profile,
+            )
+        if _is_inventory_overdraw_message(error_message):
+            return _invalid_recipe_result(
                 candidate_id,
                 spec,
                 key,
@@ -655,6 +682,68 @@ def _non_finite_payload_margin() -> GateMargin:
     )
 
 
+def _invalid_recipe_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    error_message: str,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    overdraw_kg = _extract_overdraw_kg(error_message)
+    run_reference = (
+        _run_reference(run_execution, profile or {})
+        if run_execution is not None
+        else RunReference(
+            status="failed",
+            error_message=error_message,
+            reason="invalid_recipe",
+            trace={"backend_status": "ok"},
+            backend_status="ok",
+            backend_authoritative=True,
+        )
+    )
+    notes = [
+        "ProposalRejected: recipe attempted to draw more inventory than available",
+        error_message,
+    ]
+    if overdraw_kg is not None:
+        notes.append(f"overdraw_kg={overdraw_kg:.12g}")
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_RECIPE,
+        feasibility_margins={
+            "inventory_overdraw": _invalid_recipe_margin(overdraw_kg)
+        },
+        failing_gates=("inventory_overdraw",),
+        run_reference=run_reference,
+        notes=tuple(notes),
+    )
+
+
+def _invalid_recipe_margin(overdraw_kg: float | None) -> GateMargin:
+    observed = overdraw_kg if overdraw_kg is not None else 1.0
+    threshold = ThresholdSpec(
+        id="inventory_overdraw_kg",
+        value=0.0,
+        units="kg",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: ProposalRejected inventory overdraw",
+    )
+    return GateMargin(
+        gate="inventory_overdraw",
+        feasible=False,
+        margin=-float(observed),
+        threshold=threshold,
+        observed=float(observed),
+        detail="ledger proposal would overdraw an inventory account",
+    )
+
+
 def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReference:
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
@@ -818,6 +907,31 @@ def _is_non_finite_payload_message(message: str) -> bool:
         "pt0nonfinitepayload" in lowered
         or "non-finite value in pt-0 payload" in lowered
     )
+
+
+def _is_inventory_overdraw_message(message: str) -> bool:
+    lowered = message.lower()
+    return (
+        "proposalrejected" in lowered
+        or "overdrafterror" in lowered
+        or (
+            "insufficient available" in lowered
+            and "balance would be" in lowered
+        )
+    )
+
+
+def _extract_overdraw_kg(message: str) -> float | None:
+    match = re.search(r"balance would be\s+([-+0-9.eE]+)\s+kg", message)
+    if match is None:
+        return None
+    try:
+        value = float(match.group(1))
+    except ValueError:
+        return None
+    if not math.isfinite(value):
+        return None
+    return abs(value)
 
 
 def _abort_on_mass_balance_breach(

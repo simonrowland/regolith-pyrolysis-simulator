@@ -1311,10 +1311,7 @@ class AlphaMELTSBackend(MeltBackend):
                                    pressure_bar: float, fO2_log: float,
                                    total_input_kg: float,
                                    warnings=None) -> EquilibriumResult:
-        if not re.search(r'<> Stable .+ assemblage achieved\.', output):
-            raise RuntimeError(
-                'AlphaMELTS subprocess produced no stable assemblage verdict'
-            )
+        stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
 
         phases_present: List[str] = []
         phase_masses_kg: Dict[str, float] = {}
@@ -1368,8 +1365,22 @@ class AlphaMELTSBackend(MeltBackend):
                     0.0, min(1.0, float(melt_match.group(1))))
 
         if not phases_present:
+            no_phase_reason = self._no_phase_subprocess_failure_reason(output)
+            if no_phase_reason is not None:
+                result_warnings.append(no_phase_reason)
+                return self._emit_equilibrium_result(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    warnings=result_warnings,
+                    status='out_of_domain',
+                )
             raise RuntimeError(
                 'AlphaMELTS subprocess produced no parseable phase assemblage'
+            )
+        if stable_verdict is None:
+            result_warnings.append(
+                'AlphaMELTS stable assemblage banner absent; accepted parseable phase rows'
             )
         eq = self._emit_equilibrium_result(
             temperature_C=temperature_C,
@@ -1385,6 +1396,19 @@ class AlphaMELTSBackend(MeltBackend):
         if liquidus_C is not None:
             eq.liquidus_T_C = float(liquidus_C)
         return eq
+
+    def _no_phase_subprocess_failure_reason(self, output: str) -> Optional[str]:
+        if re.search(r'Quadratic convergence failure\. Aborting\.', output):
+            return (
+                'AlphaMELTS subprocess failed before phase rows: '
+                'Quadratic convergence failure. Aborting.'
+            )
+        if re.search(r'Initial calculation failed', output):
+            return (
+                'AlphaMELTS subprocess failed before phase rows: '
+                'Initial calculation failed.'
+            )
+        return None
 
     def _parse_petthermotools_result(self, results, *, temperature_C: float,
                                      pressure_bar: float, fO2_log: float,

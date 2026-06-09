@@ -38,6 +38,16 @@ class ExtractionMixin:
             float(self.atom_ledger.kg_by_account(account).get(species, 0.0)),
         )
 
+    def _cleaned_melt_available_mol_by_species(
+        self,
+        species_names,
+    ) -> dict[str, float]:
+        cleaned_melt = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        return {
+            str(species): max(0.0, float(cleaned_melt.get(species, 0.0)))
+            for species in species_names
+        }
+
     def _process_reagent_inventory_kg(self, species: str) -> float:
         return self._ledger_account_species_kg(
             'process.reagent_inventory', species)
@@ -863,6 +873,8 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C3_K,
                 'reagent_available_kg': float(
                     self.shuttle_K_inventory_kg),
+                'true_available_mol_by_species':
+                    self._cleaned_melt_available_mol_by_species(('FeO',)),
                 'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
@@ -954,6 +966,10 @@ class ExtractionMixin:
                 'na_target_stage': target_stage,
                 'reagent_available_kg': float(
                     self.shuttle_Na_inventory_kg),
+                'true_available_mol_by_species':
+                    self._cleaned_melt_available_mol_by_species(
+                        ('FeO', 'Cr2O3', 'TiO2'),
+                    ),
                 'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
@@ -1121,6 +1137,8 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'reagent_available_kg': float(
                     self.thermite_Mg_inventory_kg),
+                'true_available_mol_by_species':
+                    self._cleaned_melt_available_mol_by_species(('Al2O3',)),
                 'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
@@ -1157,6 +1175,8 @@ class ExtractionMixin:
                 'back_reduction': True,
                 'mol_Al_produced': mol_Al_produced,
                 'reagent_available_kg': 0.0,
+                'true_available_mol_by_species':
+                    self._cleaned_melt_available_mol_by_species(('SiO2',)),
                 'dt_hr': 1.0,
             },
         )

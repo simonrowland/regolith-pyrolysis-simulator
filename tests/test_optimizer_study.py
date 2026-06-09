@@ -137,11 +137,13 @@ def _evaluator(
     engine_bug: set[int] | None = None,
     out_of_domain: set[int] | None = None,
     non_finite_payload: set[int] | None = None,
+    invalid_recipe: set[int] | None = None,
 ):
     bad = infeasible or set()
     aborts = engine_bug or set()
     domain_rejects = out_of_domain or set()
     non_finite = non_finite_payload or set()
+    invalid = invalid_recipe or set()
 
     def evaluate_patch(
         patch: RecipePatch,
@@ -215,6 +217,32 @@ def _evaluator(
                     backend_status="ok",
                 ),
                 notes=("CALC_BUG: PT-0 payload contained a non-finite derived value",),
+            )
+        if index in invalid:
+            return ScoredResult(
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=False,
+                failure_category=FailureCategory.INVALID_RECIPE,
+                feasibility_margins={
+                    "inventory_overdraw": GateMargin(
+                        gate="inventory_overdraw",
+                        feasible=False,
+                        margin=-0.125,
+                        threshold=_threshold(),
+                        observed=0.125,
+                        detail="test inventory overdraw",
+                    )
+                },
+                failing_gates=("inventory_overdraw",),
+                run_reference=RunReference(
+                    status="failed",
+                    error_message="ProposalRejected: balance would be -0.125 kg",
+                    trace={"backend_status": "ok", "snapshots": ["heavy"]},
+                    backend_status="ok",
+                ),
+                notes=("overdraw_kg=0.125",),
             )
         if index in bad:
             return ScoredResult(
@@ -724,6 +752,54 @@ def test_nonfinite_payload_result_continues_and_counts_failure(tmp_path) -> None
         row.failure_category is FailureCategory.NON_FINITE_PAYLOAD
         for row in stored
     )
+
+
+def test_invalid_recipe_result_continues_and_counts_failure(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(invalid_recipe={0}),
+    )
+
+    assert result.winner is not None
+    records = _read_provenance(tmp_path)
+    assert len(records) == 3
+    assert records[0]["failure_category"] == "invalid_recipe"
+    summary = json.loads((tmp_path / "pareto.json").read_text())
+    assert summary["failure_counts"] == {"invalid_recipe": 1}
+    stored = _stored_rows(tmp_path)
+    assert any(
+        row.failure_category is FailureCategory.INVALID_RECIPE
+        for row in stored
+    )
+
+
+def test_all_invalid_recipe_results_fail_loud_with_counts(tmp_path) -> None:
+    with pytest.raises(
+        study.StudyNoFeasibleError,
+        match=r"failure_counts=.*invalid_recipe",
+    ):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "random",
+            "stub",
+            1,
+            2,
+            tmp_path,
+            seed=7,
+            evaluator=_evaluator(invalid_recipe={0, 1}),
+        )
+
+    summary = json.loads((tmp_path / "pareto.json").read_text())
+    assert summary["failure_counts"] == {"invalid_recipe": 2}
+    assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
 def test_all_nonfinite_payload_results_fail_loud_with_counts(tmp_path) -> None:
