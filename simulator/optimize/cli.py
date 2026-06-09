@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
+import json
 from pathlib import Path
 import sys
 from typing import Sequence
@@ -16,6 +18,9 @@ from simulator.optimize.study import (
     StudyError,
     run,
 )
+
+
+JOB_STATUS_NAME = "job_status.json"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -34,10 +39,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             seed=args.seed,
         )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
+        _write_job_status(
+            args.out,
+            status="FAILED",
+            reason=type(exc).__name__,
+            message=str(exc),
+        )
         parser.exit(2, f"error: {exc}\n")
     print(f"out_dir: {result.out_dir}")
     print(f"winner: {result.winner.candidate_id}")
     print(f"strategy: {args.strategy}->{STRATEGY_CLASS_NAMES[args.strategy]}")
+    _write_job_status(
+        result.out_dir,
+        status="SUCCEEDED",
+        reason="completed",
+        winner_candidate_id=result.winner.candidate_id,
+    )
     return 0
 
 
@@ -84,6 +101,37 @@ def _resolve_profile_arg(profile: str, parser: argparse.ArgumentParser):
                 f"error: argument --profile: invalid choice: {profile!r}\n",
             )
         raise exc
+
+
+def _write_job_status(
+    out_dir: Path | None,
+    *,
+    status: str,
+    reason: str,
+    message: str = "",
+    winner_candidate_id: str | None = None,
+) -> None:
+    if out_dir is None:
+        return
+    payload = {
+        "completed_at": datetime.now(UTC).isoformat(),
+        "message": message,
+        "reason": reason,
+        "status": status,
+        "success": status == "SUCCEEDED",
+    }
+    if winner_candidate_id is not None:
+        payload["winner_candidate_id"] = winner_candidate_id
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        tmp = out_dir / f"{JOB_STATUS_NAME}.tmp"
+        tmp.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        tmp.replace(out_dir / JOB_STATUS_NAME)
+    except OSError:
+        return
 
 
 def _positive_int(value: str) -> int:

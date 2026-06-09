@@ -232,6 +232,52 @@ def _write_minimal_result_table(job_dir: Path) -> None:
         conn.execute("INSERT INTO results VALUES (1)")
 
 
+def _write_job_status_marker(
+    job_dir: Path,
+    *,
+    status: str,
+    reason: str = "completed",
+    message: str = "",
+) -> None:
+    payload = {
+        "status": status,
+        "success": status == "SUCCEEDED",
+        "reason": reason,
+        "message": message,
+    }
+    (job_dir / "job_status.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_running_job_meta(job_dir: Path, job_id: str) -> None:
+    (job_dir / ".job_meta.json").write_text(
+        json.dumps(
+            {
+                "job_id": job_id,
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "lunar-mare-low-ti-objectives-v1",
+                "feedstock_id": "lunar_mare_low_ti",
+                "profile_id": "lunar-mare-low-ti-objectives-v1",
+                "strategy": "random",
+                "fidelity": "stub",
+                "budget": 1,
+                "parallel": 1,
+                "seed": 0,
+                "pid": 999999999,
+                "status": "RUNNING",
+                "created_at": "2026-06-08T00:00:00+00:00",
+                "started_at": "2026-06-08T00:00:01+00:00",
+                "eta": None,
+                "stderr_tail": "",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def _job_request(
     *,
     feedstock_id: str = "lunar_mare_low_ti",
@@ -847,86 +893,82 @@ def test_optimizer_job_register_rebuilds_from_disk_on_fresh_app(tmp_path) -> Non
     assert job["version_badge"]["status"] == "unknown"
 
 
-def test_optimizer_job_register_marks_orphan_with_results_succeeded_on_rebuild(
+def test_optimizer_job_register_marks_orphan_with_success_marker_succeeded_on_rebuild(
     tmp_path,
 ) -> None:
     runs_dir = tmp_path / "runs"
-    job_dir = runs_dir / "jobs" / "orphan-with-results"
+    job_dir = runs_dir / "jobs" / "orphan-with-success-marker"
     job_dir.mkdir(parents=True)
-    (job_dir / ".job_meta.json").write_text(
-        json.dumps(
-            {
-                "job_id": "orphan-with-results",
-                "feedstock": "lunar_mare_low_ti",
-                "profile": "lunar-mare-low-ti-objectives-v1",
-                "feedstock_id": "lunar_mare_low_ti",
-                "profile_id": "lunar-mare-low-ti-objectives-v1",
-                "strategy": "random",
-                "fidelity": "stub",
-                "budget": 1,
-                "parallel": 1,
-                "seed": 0,
-                "pid": 999999999,
-                "status": "RUNNING",
-                "created_at": "2026-06-08T00:00:00+00:00",
-                "started_at": "2026-06-08T00:00:01+00:00",
-                "eta": None,
-                "stderr_tail": "",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
+    _write_running_job_meta(job_dir, "orphan-with-success-marker")
     _write_minimal_result_table(job_dir)
+    _write_job_status_marker(job_dir, status="SUCCEEDED")
 
     runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
     jobs = runner.list_jobs()
 
-    assert jobs[0]["job_id"] == "orphan-with-results"
+    assert jobs[0]["job_id"] == "orphan-with-success-marker"
     assert jobs[0]["status"] == "SUCCEEDED"
     meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
     assert meta["status"] == "SUCCEEDED"
     assert meta["completed_at"] is not None
 
 
+def test_optimizer_job_register_marks_orphan_with_failure_marker_failed_despite_results(
+    tmp_path,
+) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "orphan-failed-with-results"
+    job_dir.mkdir(parents=True)
+    _write_running_job_meta(job_dir, "orphan-failed-with-results")
+    _write_minimal_result_table(job_dir)
+    _write_job_status_marker(
+        job_dir,
+        status="FAILED",
+        reason="StudyNoFeasibleError",
+        message="no feasible candidates; winner.recipe.yaml not written",
+    )
+
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+    jobs = runner.list_jobs()
+
+    assert jobs[0]["job_id"] == "orphan-failed-with-results"
+    assert jobs[0]["status"] == "FAILED"
+    assert "StudyNoFeasibleError" in jobs[0]["stderr_tail"]
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "FAILED"
+
+
+def test_optimizer_job_register_marks_orphan_without_terminal_marker_failed_even_with_results(
+    tmp_path,
+) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "orphan-no-marker-with-results"
+    job_dir.mkdir(parents=True)
+    _write_running_job_meta(job_dir, "orphan-no-marker-with-results")
+    _write_minimal_result_table(job_dir)
+
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+    jobs = runner.list_jobs()
+
+    assert jobs[0]["job_id"] == "orphan-no-marker-with-results"
+    assert jobs[0]["status"] == "FAILED"
+    assert "terminal status marker" in jobs[0]["stderr_tail"]
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "FAILED"
+
+
 def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_path) -> None:
     runs_dir = tmp_path / "runs"
     job_dir = runs_dir / "jobs" / "dead-running-job"
     job_dir.mkdir(parents=True)
-    (job_dir / ".job_meta.json").write_text(
-        json.dumps(
-            {
-                "job_id": "dead-running-job",
-                "feedstock": "lunar_mare_low_ti",
-                "profile": "lunar-mare-low-ti-objectives-v1",
-                "feedstock_id": "lunar_mare_low_ti",
-                "profile_id": "lunar-mare-low-ti-objectives-v1",
-                "strategy": "random",
-                "fidelity": "stub",
-                "budget": 1,
-                "parallel": 1,
-                "seed": 0,
-                "pid": 999999999,
-                "status": "RUNNING",
-                "created_at": "2026-06-08T00:00:00+00:00",
-                "started_at": "2026-06-08T00:00:01+00:00",
-                "eta": None,
-                "stderr_tail": "",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
+    _write_running_job_meta(job_dir, "dead-running-job")
 
     runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
     jobs = runner.list_jobs()
 
     assert jobs[0]["job_id"] == "dead-running-job"
     assert jobs[0]["status"] == "FAILED"
-    assert (
-        "optimizer process exited before the web process recorded an exit code"
-        in jobs[0]["stderr_tail"]
-    )
+    assert "terminal status marker" in jobs[0]["stderr_tail"]
     meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
     assert meta["status"] == "FAILED"
 

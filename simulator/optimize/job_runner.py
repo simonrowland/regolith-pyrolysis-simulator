@@ -25,6 +25,7 @@ TERMINAL_STATUSES = {STATUS_SUCCEEDED, STATUS_FAILED}
 META_NAME = ".job_meta.json"
 LOG_NAME = "job.log"
 CACHE_NAME = "cache.sqlite"
+STATUS_MARKER_NAME = "job_status.json"
 
 
 PopenFactory = Callable[..., subprocess.Popen]
@@ -153,14 +154,22 @@ class OptimizerJobRunner:
             meta["completed_at"] = meta.get("completed_at") or self._now()
             tail = self._log_tail(job_id)
             meta["stderr_tail"] = tail
-            if self._has_stored_results(job_id):
-                meta["status"] = STATUS_SUCCEEDED
-            else:
+            terminal_status = self._terminal_status_from_marker(job_id)
+            if terminal_status is None:
                 meta["status"] = STATUS_FAILED
                 meta["stderr_tail"] = (
                     tail
-                    or "optimizer process exited before the web process recorded an exit code"
+                    or "optimizer process exited without a terminal status marker"
                 )
+            else:
+                status, marker_detail = terminal_status
+                meta["status"] = status
+                if status == STATUS_FAILED:
+                    meta["stderr_tail"] = (
+                        tail
+                        or marker_detail
+                        or "optimizer terminal status marker recorded failure"
+                    )
             self._write_meta(meta)
             changed = True
         if changed:
@@ -231,9 +240,19 @@ class OptimizerJobRunner:
 
     def _complete_job_locked(self, meta: dict[str, Any], return_code: int) -> None:
         meta["completed_at"] = self._now()
-        tail = self._log_tail(str(meta["job_id"]))
+        job_id = str(meta["job_id"])
+        tail = self._log_tail(job_id)
         meta["stderr_tail"] = tail
-        if return_code == 0 and self._has_stored_results(str(meta["job_id"])):
+        terminal_status = self._terminal_status_from_marker(job_id)
+        if terminal_status and terminal_status[0] == STATUS_FAILED:
+            _, marker_detail = terminal_status
+            meta["status"] = STATUS_FAILED
+            meta["stderr_tail"] = (
+                tail
+                or marker_detail
+                or "optimizer terminal status marker recorded failure"
+            )
+        elif return_code == 0 and self._has_stored_results(job_id):
             meta["status"] = STATUS_SUCCEEDED
         elif return_code == 0:
             meta["status"] = STATUS_FAILED
@@ -370,6 +389,41 @@ class OptimizerJobRunner:
         except sqlite3.Error:
             return False
         return bool(row and row[0] > 0)
+
+    def _terminal_status_from_marker(self, job_id: str) -> tuple[str, str] | None:
+        marker_path = self.jobs_root / job_id / STATUS_MARKER_NAME
+        if not marker_path.is_file():
+            return None
+        try:
+            payload = json.loads(marker_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            return (
+                STATUS_FAILED,
+                f"optimizer terminal status marker unreadable: {exc}",
+            )
+        if not isinstance(payload, dict):
+            return (
+                STATUS_FAILED,
+                "optimizer terminal status marker is not a JSON object",
+            )
+        marker_status = str(payload.get("status") or "").upper()
+        success = payload.get("success")
+        detail = self._terminal_marker_detail(payload)
+        if marker_status in {STATUS_SUCCEEDED, "SUCCESS"} or success is True:
+            return STATUS_SUCCEEDED, detail
+        if marker_status in {STATUS_FAILED, "FAILURE", "ERROR"} or success is False:
+            return STATUS_FAILED, detail
+        return (
+            STATUS_FAILED,
+            f"optimizer terminal status marker has invalid status: {marker_status or '<missing>'}",
+        )
+
+    def _terminal_marker_detail(self, payload: dict[str, Any]) -> str:
+        reason = str(payload.get("reason") or "").strip()
+        message = str(payload.get("message") or "").strip()
+        if reason and message:
+            return f"{reason}: {message}"
+        return reason or message
 
     def _log_tail(self, job_id: str, limit: int = 4096) -> str:
         log_path = self.jobs_root / job_id / LOG_NAME

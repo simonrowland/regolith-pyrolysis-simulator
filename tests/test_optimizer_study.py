@@ -12,6 +12,7 @@ from typing import Any, Mapping
 import pytest
 import yaml
 
+from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
@@ -980,6 +981,51 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
     assert (out_dir / "winner.recipe.yaml").exists()
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    assert status["status"] == "SUCCEEDED"
+    assert status["success"] is True
+    assert status["winner_candidate_id"]
+
+
+def test_cli_writes_failure_job_status_marker_for_no_feasible(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    out_dir = tmp_path / "cli-failed"
+
+    def fail_after_partial_artifacts(**kwargs):
+        Path(kwargs["out_dir"]).mkdir(parents=True, exist_ok=True)
+        (Path(kwargs["out_dir"]) / "cache.sqlite").write_text("partial", encoding="utf-8")
+        raise study.StudyNoFeasibleError(
+            "no feasible candidates; winner.recipe.yaml not written"
+        )
+
+    monkeypatch.setattr(optimizer_cli, "run", fail_after_partial_artifacts)
+
+    with pytest.raises(SystemExit) as exc_info:
+        optimizer_cli.main(
+            [
+                "--feedstock",
+                FEEDSTOCK,
+                "--profile",
+                "default",
+                "--strategy",
+                "random",
+                "--fidelity",
+                "stub",
+                "--budget",
+                "1",
+                "--out",
+                str(out_dir),
+            ]
+        )
+
+    assert exc_info.value.code == 2
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    assert status["status"] == "FAILED"
+    assert status["success"] is False
+    assert status["reason"] == "StudyNoFeasibleError"
+    assert "no feasible candidates" in status["message"]
 
 
 def test_determinism_same_seed_same_pareto_and_winner(tmp_path) -> None:
