@@ -29,7 +29,7 @@ from pathlib import Path
 import pytest
 
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
-from simulator.runner import PyrolysisRun, RUNNER_SCHEMA_VERSION
+from simulator.runner import PyrolysisRun, RUNNER_SCHEMA_VERSION, RunnerError
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "runner"
@@ -173,6 +173,71 @@ def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
         hours=1,
     ).run()
     assert undosed["run_metadata"]["additives_kg"] == {}
+
+
+def test_c3_alkali_dosing_conflict_fail_loud():
+    """CONFLICT: explicit additives_kg and C3 alkali_dosing must not disagree."""
+    schema = RecipeSchema()
+    na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")
+    k_dose = ("campaigns", "C3", "alkali_dosing", "K_kg")
+    patch = RecipePatch({na_dose: 12.0, k_dose: 4.0}).validated(schema)
+    setpoints_patch = schema.to_setpoints_patch(patch)
+
+    conflict = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+        additives_kg={"Na": 5.0},
+        setpoints_patch=setpoints_patch,
+        allow_fallback_vapor=True,
+    )
+    with pytest.raises(
+        RunnerError,
+        match=(
+            r"campaigns\.C3\.alkali_dosing\.Na_kg conflicts with "
+            r"additives_kg\['Na'\]"
+        ),
+    ):
+        conflict._session_config()
+
+    k_conflict = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+        additives_kg={"K": 1.0},
+        setpoints_patch=setpoints_patch,
+        allow_fallback_vapor=True,
+    )
+    with pytest.raises(
+        RunnerError,
+        match=(
+            r"campaigns\.C3\.alkali_dosing\.K_kg conflicts with "
+            r"additives_kg\['K'\]"
+        ),
+    ):
+        k_conflict._session_config()
+
+    dosing_only = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+        setpoints_patch=setpoints_patch,
+        allow_fallback_vapor=True,
+    )
+    dosing_config = dosing_only._session_config()
+    assert dosing_config.additives_kg["Na"] == pytest.approx(12.0)
+    assert dosing_config.additives_kg["K"] == pytest.approx(4.0)
+
+    additive_only = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+        additives_kg={"Na": 5.0, "K": 2.0},
+        allow_fallback_vapor=True,
+    )
+    additive_config = additive_only._session_config()
+    assert additive_config.additives_kg["Na"] == pytest.approx(5.0)
+    assert additive_config.additives_kg["K"] == pytest.approx(2.0)
 
 
 def _assert_schema_shape(payload: dict) -> None:
