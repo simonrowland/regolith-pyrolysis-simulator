@@ -1,0 +1,350 @@
+schema_version: 1
+source_documents:
+  deepened_table: "docs-private/research/2026-06-08-wall-chemistry/ceramic-types-deepened.md"
+  audit: "docs-private/research/2026-06-08-wall-chemistry/ceramic-AUDIT.md"
+  references: "docs-private/references/ceramic-types-references.md"
+composition_kinds:
+  - point-anchor
+  - window
+service_temp_kinds:
+  - service
+  - melting-only
+  - uncharacterized
+
+ceramics:
+  anorthite:
+    label: "Anorthite / Ca-rich plagioclase ceramic, CaAl2Si2O8"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "Al2O3", "SiO2"]
+      wt_pct: {CaO: 20.0, Al2O3: 37.0, SiO2: 43.0}
+      citations: ["C:S8", "C:S13"]
+      note: >
+        Narrow phase anchor only. SOFC/CMAS seal sources treat anorthite as a
+        crystallized seal/glass-ceramic phase, not a hot-face liner rating.
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: "Standalone anorthite refractory service is uncharacterized."
+    liner_suitability:
+      verdict: not-recommended
+      citations: ["C:S8", "C:S13"]
+      note: >
+        Use as a CAS/LTCC/CMAS glass-ceramic phase marker only; blank to
+        no-match outside sourced anorthite or CMAS windows.
+
+  mullite:
+    label: "Mullite, aluminosilicate solid solution"
+    composition:
+      kind: window
+      defining_oxides: ["Al2O3", "SiO2"]
+      wt_pct_window:
+        Al2O3: [71.8, 74.3]
+        SiO2: [25.7, 28.2]
+      citations: ["C:S2"]
+      note: >
+        Source-supported mullite solid solution is 60-63 mol% Al2O3 below
+        1600 degC. Broader alumina-rich points remain out of classifier scope
+        without another source.
+    service_temp:
+      value_C: 1600
+      kind: service
+      citations: ["C:S2"]
+      qualified_values_C:
+        vacuum_limit: 1600
+        typical_air_max: 1725
+        air_limit: 1800
+      note: >
+        Use 1600 degC as conservative default where atmosphere/load is unknown.
+        Air-service product rows can be higher.
+    liner_suitability:
+      verdict: strong-candidate
+      citations: ["C:S2"]
+      note: >
+        Strong liner/kiln-furniture candidate with cited hot-blast, reheat,
+        steel-ladle, glass, and kiln-furniture uses.
+
+  doloma:
+    label: "Doloma / dolomite basic refractory, CaO.MgO family"
+    composition:
+      kind: window
+      defining_oxides: ["CaO", "MgO"]
+      wt_pct_window:
+        CaO: [40.0, 45.0]
+        MgO: [30.0, 35.0]
+      point_anchor_wt_pct: {CaO: 58.2, MgO: 41.8}
+      citations: ["C:S6"]
+      note: >
+        Product/service dolomite-brick window is kept separate from pure
+        CaO.MgO stoichiometry.
+    service_temp:
+      value_C: 1650
+      kind: service
+      citations: ["C:S6"]
+      qualified_values_C:
+        basic_refractory_guide_max: 1800
+      note: >
+        Product table gives 1650 degC max temperature; broader basic-refractory
+        guidance reaches 1800 degC.
+    liner_suitability:
+      verdict: candidate
+      citations: ["C:S6"]
+      note: >
+        Genuine basic refractory candidate for steelmaking, cement, and
+        non-ferrous service. Hydration sensitivity remains a gate.
+
+  monocalcium_aluminate_CA:
+    label: "Monocalcium aluminate, CA, CaO.Al2O3"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "Al2O3"]
+      wt_pct: {CaO: 35.0, Al2O3: 65.0}
+      citations: ["C:S3", "C:S8"]
+      note: "Narrow phase anchor."
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: ["C:S3", "C:S8"]
+      scoped_values_C:
+        CAC_castable_systems: [700, 1900]
+      note: >
+        Standalone CA terminal-ceramic service is uncharacterized. CAC-bonded
+        castable limits are formulation ratings, not pure CA service.
+    liner_suitability:
+      verdict: limited-scope
+      citations: ["C:S3", "C:S8"]
+      note: >
+        Binder/castable-system phase only. Do not classify as a standalone
+        terminal liner ceramic.
+
+  calcium_dialuminate_CA2:
+    label: "Calcium dialuminate, CA2, CaO.2Al2O3"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "Al2O3"]
+      wt_pct: {CaO: 22.0, Al2O3: 78.0}
+      citations: ["C:S3", "C:S8"]
+      note: "Narrow phase anchor."
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: ["C:S3", "C:S8"]
+      scoped_values_C:
+        CAC_castable_systems: [700, 1900]
+      note: >
+        Standalone CA2 terminal-ceramic service is uncharacterized. CAC/castable
+        values are product-system evidence only.
+    liner_suitability:
+      verdict: limited-scope
+      citations: ["C:S3", "C:S8"]
+      note: >
+        Binder/high-alumina CAC phase. Do not classify a rump as furnace-liner
+        CA2 unless a CA2 body/product window is added.
+
+  calcium_hexaluminate_CA6:
+    label: "Calcium hexaluminate / hibonite, CA6, CaO.6Al2O3"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "Al2O3"]
+      wt_pct: {CaO: 8.0, Al2O3: 92.0}
+      citations: ["C:S4", "C:S5", "C:S8"]
+      note: >
+        Narrow phase anchor; in-situ CA6 production is described from Al2O3
+        and CaO sources in 6:1 molar ratio.
+    service_temp:
+      value_C: 1500
+      kind: service
+      citations: ["C:S4", "C:S5"]
+      melting_note_C: 1830
+      note: >
+        Porous CA6 is described as long-term stable up to 1500 degC for
+        thermal-insulating/refractory applications.
+    liner_suitability:
+      verdict: strong-candidate
+      citations: ["C:S4", "C:S5"]
+      note: >
+        Strong terminal refractory/insulating-liner candidate with sourced
+        alkaline resistance, reducing-atmosphere stability, and low wettability
+        by molten metals/slags.
+
+  dicalcium_silicate_C2S:
+    label: "Dicalcium silicate / belite, C2S, 2CaO.SiO2"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "SiO2"]
+      wt_pct: {CaO: 65.0, SiO2: 35.0}
+      citations: ["C:S8", "C:S9"]
+      note: "Narrow cement-clinker phase anchor."
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: "Standalone refractory service is uncharacterized."
+    liner_suitability:
+      verdict: not-recommended
+      citations: ["C:S8", "C:S9"]
+      note: >
+        Cement-clinker/hydraulic phase, not a terminal refractory-liner class
+        by itself.
+
+  tricalcium_silicate_C3S:
+    label: "Tricalcium silicate / alite, C3S, 3CaO.SiO2"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "SiO2"]
+      wt_pct: {CaO: 74.0, SiO2: 26.0}
+      citations: ["C:S8", "C:S10"]
+      note: "Narrow cement-clinker phase anchor."
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: "Standalone refractory service is uncharacterized."
+    liner_suitability:
+      verdict: not-recommended
+      citations: ["C:S8", "C:S10"]
+      note: >
+        High-Ca clinker phase is inappropriate as a hot-face ceramic
+        classification without a source-backed refractory product.
+
+  wollastonite:
+    label: "Wollastonite / calcium metasilicate, CS, CaO.SiO2"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "SiO2"]
+      wt_pct: {CaO: 48.0, SiO2: 52.0}
+      citations: ["C:S8", "C:S11", "C:S12"]
+      note: >
+        Substitutions can occur, but no sourced admissible oxide window was
+        found for a pure wollastonite refractory-liner classifier.
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: ["C:S11"]
+      melting_note_C: 1540
+      note: >
+        Pure wollastonite standalone furnace-liner service is uncharacterized.
+        Do not substitute calcium-silicate insulation-board ratings.
+    liner_suitability:
+      verdict: limited-scope
+      citations: ["C:S11", "C:S12"]
+      note: >
+        Useful ceramic/glaze/frit ingredient and thermal-shock modifier, not a
+        proven terminal hot-face liner anchor.
+
+  magnesium_aluminate_spinel:
+    label: "Magnesium aluminate spinel, MgAl2O4"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["MgO", "Al2O3"]
+      wt_pct: {MgO: 28.3, Al2O3: 71.7}
+      citations: ["C:S1", "C:S14"]
+      note: >
+        Stoichiometric point. Alumina-rich or magnesia-rich spinel stays out of
+        scope until a source gives windows.
+    service_temp:
+      value_C: 1700
+      kind: service
+      citations: ["C:S1"]
+      melting_note_C: 2135
+      note: >
+        Morgan lists magnesium aluminate typical maximum use temperature of
+        1700 degC in inert atmosphere; this is not a universal load-bearing
+        liner rating.
+    liner_suitability:
+      verdict: candidate
+      citations: ["C:S1", "C:S14"]
+      note: >
+        Genuine refractory/technical-ceramic candidate for high-temperature
+        components and magnesia-spinel refractory systems.
+
+  forsterite:
+    label: "Forsterite, Mg2SiO4"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["MgO", "SiO2"]
+      wt_pct: {MgO: 57.3, SiO2: 42.7}
+      product_brick_window:
+        MgO_min: 60.0
+        SiO2_min: 20.0
+      citations: ["C:S15", "C:S16", "C:S17"]
+      note: >
+        Product-grade magnesia-forsterite brick formulation is not the pure
+        forsterite classifier window.
+    service_temp:
+      value_C: 1890
+      kind: melting-only
+      citations: ["C:S15", "C:S16", "C:S17"]
+      product_RUL_C:
+        RSMF_60A: 1650
+        RSMF_60B: 1600
+      note: >
+        Audit correction: S15 supports product refractoriness-under-load and
+        applications, not a genuine max-service rating for pure forsterite.
+    liner_suitability:
+      verdict: candidate
+      citations: ["C:S15", "C:S16", "C:S17"]
+      note: >
+        Product-grade magnesia-forsterite brick is a refractory candidate, but
+        pure-phase service temperature must remain non-service until a direct
+        service source is added.
+
+  cordierite_mullite:
+    label: "Cordierite / cordierite-mullite kiln furniture"
+    composition:
+      kind: window
+      defining_oxides: ["MgO", "Al2O3", "SiO2"]
+      wt_pct_window:
+        MgO: [4.0, 7.0]
+        Al2O3: [35.0, 48.0]
+        SiO2: [45.0, 58.0]
+      pure_cordierite_wt_pct: {MgO: 13.8, Al2O3: 34.9, SiO2: 51.4}
+      citations: ["C:S18", "C:S19"]
+      note: >
+        Practical window is a cordierite-mullite kiln-furniture body, not pure
+        cordierite.
+    service_temp:
+      value_C: 1300
+      kind: service
+      citations: ["C:S18", "C:S19"]
+      qualified_values_C:
+        product_grade_range: [1150, 1350]
+        high_temperature_grade: 1350
+      note: >
+        ABREF lists max service temperature 1300 degC; IPS product grades span
+        1150-1350 degC.
+    liner_suitability:
+      verdict: candidate
+      citations: ["C:S18", "C:S19"]
+      note: >
+        Good kiln furniture, burner, and hot support candidate below service
+        ceiling; not for terminal hot-face liner service above 1350 degC.
+
+  cmas_glass_ceramic:
+    label: "CMAS glass-ceramic, melilite/anorthite SOFC-seal family"
+    composition:
+      kind: point-anchor
+      defining_oxides: ["CaO", "MgO", "Al2O3", "SiO2"]
+      wt_pct: {CaO: 35.0, MgO: 6.3, Al2O3: 21.2, SiO2: 37.5}
+      mol_pct: {CaO: 38.7, MgO: 9.7, Al2O3: 12.9, SiO2: 38.7}
+      citations: ["C:S13", "C:S20"]
+      note: >
+        Single characterized SOFC-seal composition, not a universal CMAS
+        window.
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: ["C:S13", "C:S20"]
+      scoped_values_C:
+        SOFC_seal_operation: [750, 950]
+        seal_stability: 850
+      note: >
+        Audit scope guard: SOFC seal/glass-ceramic use is sourced, but this is
+        not a refractory-liner or hot-duct service rating.
+    liner_suitability:
+      verdict: limited-scope
+      citations: ["C:S13", "C:S20"]
+      note: >
+        Sealing glass-ceramic candidate only. Not a terminal furnace liner or
+        hot-duct ceramic anchor.

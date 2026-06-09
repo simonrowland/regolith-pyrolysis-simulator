@@ -1,0 +1,555 @@
+schema_version: 1
+source_documents:
+  deepened_table: "docs-private/research/2026-06-08-wall-chemistry/wall-materials-deepened.md"
+  audit: "docs-private/research/2026-06-08-wall-chemistry/wall-AUDIT.md"
+  references: "docs-private/references/wall-materials-references.md"
+evidence_tags:
+  - direct
+  - analogous-only
+  - uncharacterized
+species_keys:
+  chemical_attack:
+    - SiO
+    - alkali_NaK
+    - Fe_FeO
+  stickiness:
+    - SiO
+    - alkali
+    - Fe
+
+materials:
+  fused_silica:
+    label: "Fused silica / fused quartz (SiO2)"
+    role: "Glaze or capture surface; low-expansion hot-face insert; not primary structure above its continuous range."
+    service_temp:
+      continuous_C: 1050
+      max_operating_C: 1200
+      peak_C: 1250
+      degradation_onset_C: 1000
+      evidence: direct
+      citations: ["W:S1"]
+      note: >
+        Normal continuous use is about 1050 degC, recommended max operating
+        temperature is 1200 degC, and non-continuous use is about 1250 degC.
+        Devitrification begins near 1000 degC and is accelerated by alkali
+        contamination.
+    chemical_attack:
+      SiO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S24", "W:S25", "W:S26"]
+        note: >
+          SiO condensate and ferrosilicon fouling are sourced, but fused-silica
+          wall compatibility or beneficial glaze behavior is not direct
+          material data. Sustained low-pO2 SiO exposure remains
+          uncharacterized.
+      alkali_NaK:
+        severity: high
+        evidence: direct
+        citations: ["W:S1", "W:S36"]
+        note: >
+          Silica-rich refractories failed in high-temperature or boiling sodium,
+          and alkali contamination accelerates quartz/fused-silica
+          devitrification and alkali-silicate fluxing.
+      Fe_FeO:
+        severity: high
+        evidence: direct
+        citations: ["W:S12"]
+        note: >
+          FeO-SiO2 compositions can form low-melting fayalitic phases. Metallic
+          Fe vapor or FeO vapor adherence to fused silica remains
+          uncharacterized.
+    stickiness:
+      SiO:
+        class: uncharacterized
+        evidence: analogous-only
+        citations: ["W:S24", "W:S25", "W:S26"]
+        note: >
+          Industrial SiO deposits foul equipment, but adhesion to fused silica
+          is not directly characterized and nanofab SiO film adhesion evidence
+          is mixed.
+      alkali:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S1", "W:S27", "W:S36"]
+        note: >
+          Alkali-silicate glass/liquid formation is the sticky analog. No
+          direct Na/K vapor deposit adhesion class was found.
+      Fe:
+        class: uncharacterized
+        evidence: analogous-only
+        citations: ["W:S12"]
+        note: >
+          Strong adherence is limited to the fayalitic-liquid analog. Metallic
+          Fe vapor deposit adhesion is uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: []
+      note: >
+        No regolith SiO/Na/K/FeO campaign lifetime was found. Wear gates are
+        devitrification, alkali-silicate fluxing, and fayalite formation.
+
+  dense_alumina:
+    label: "Dense high-purity alumina (Al2O3)"
+    role: "Structural hot face, crucible, and tube material."
+    service_temp:
+      continuous_C: 1700
+      max_operating_C: 1843
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S3", "W:S5"]
+      note: >
+        99.8 percent dense alumina is listed to 1700 degC with no load.
+        High-alumina furnace-lining limits near 1843 degC are formulation
+        dependent.
+    chemical_attack:
+      SiO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S10", "W:S34"]
+        note: >
+          Alumina-silica and FeOx-silicate slag behavior provide the analog.
+          Direct SiO vapor compatibility remains uncharacterized.
+      alkali_NaK:
+        severity: high
+        evidence: direct
+        citations: ["W:S3", "W:S4", "W:S36", "W:S37"]
+        note: >
+          Na vapor/gaseous alkali can form sodium aluminate and beta-alumina.
+          K salt reactions are sourced, while K metal vapor remains
+          uncharacterized.
+      Fe_FeO:
+        severity: high
+        evidence: direct
+        citations: ["W:S34", "W:S35"]
+        note: >
+          FeOx-silicate slag strongly wets/reacts with alumina and FeO-Al2O3
+          can form hercynite. Fe/FeO vapor behavior remains uncharacterized.
+    stickiness:
+      SiO:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S34"]
+        note: >
+          Strong adherence is inferred only for molten silicate or
+          FeOx-silicate deposits. Direct SiO-on-alumina furnace data was not
+          found.
+      alkali:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S3", "W:S4", "W:S37"]
+        note: >
+          Reaction-layer chemistry is sourced, but pure vapor deposit adhesion
+          is not. Keep the vapor adhesion mechanism fail-closed.
+      Fe:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S34", "W:S35"]
+        note: >
+          FeOx-silicate slag adherence is sourced; liquid metallic Fe is
+          generally non-wetting and Fe vapor deposits are uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: []
+      note: >
+        No regolith campaign lifetime was found. Alkali reaction kinetics and
+        FeOx-slag wetting are lab proxies only.
+
+  doloma:
+    label: "Doloma / dolomitic refractory (CaO.MgO, magnesia-doloma)"
+    role: "Basic structural refractory for clean-steel, cement-kiln, or basic-slag style liner service."
+    service_temp:
+      continuous_C: 1700
+      max_operating_C: 1700
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S7", "W:S8"]
+      note: >
+        Magnesia-dolomite brick refractoriness under load is reported at
+        1700 degC. MgO-CaO brick use is product and hydration-state dependent.
+    chemical_attack:
+      SiO:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S7", "W:S33"]
+        note: >
+          Silica-rich acidic deposits can react with basic CaO/MgO refractories
+          through Ca/Mg silicate formation. Direct SiO vapor attack data was
+          not found.
+      alkali_NaK:
+        severity: null
+        evidence: uncharacterized
+        citations: ["W:S27", "W:S32"]
+        note: >
+          Kiln-clinker alkali resistance and coating/ring analogs exist, but
+          Na/K metal vapor and pure alkali condensate behavior on CaO.MgO are
+          uncharacterized.
+      Fe_FeO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S15", "W:S33", "W:S34"]
+        note: >
+          Basic refractories are used in iron/steel/basic-slag environments,
+          and MgO can form magnesiowustite under FeO-rich exposure. Direct
+          Fe/FeO vapor data remains uncharacterized.
+    stickiness:
+      SiO:
+        class: uncharacterized
+        evidence: analogous-only
+        citations: ["W:S33"]
+        note: >
+          Slag spread and penetration are sourced for dolomitic refractory, but
+          exact SiO condensate adhesion is not direct.
+      alkali:
+        class: moderate
+        evidence: analogous-only
+        citations: ["W:S27", "W:S32"]
+        note: >
+          Cement-kiln coating and boiler sticky-layer behavior are analogs
+          only; pure Na/K vapor adhesion is uncharacterized.
+      Fe:
+        class: moderate
+        evidence: analogous-only
+        citations: ["W:S15", "W:S33", "W:S34"]
+        note: >
+          FeO-bearing basic slag is the analog. Metallic Fe vapor adhesion is
+          uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: ["W:S7"]
+      note: >
+        No quantitative regolith service span was found. Magnesia-doloma review
+        notes limited pilot/full-scale wear-rate data; free CaO hydration is a
+        storage and service risk.
+
+  magnesia:
+    label: "Magnesia (MgO, magnesite refractory)"
+    role: "Basic structural refractory and slag-resistant liner."
+    service_temp:
+      continuous_C: 1600
+      max_operating_C: 1800
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S6"]
+      note: >
+        Vendor magnesite-brick service-temperature range is 1600-1800 degC.
+        Actual limit depends on brick, load, atmosphere, and formulation.
+    chemical_attack:
+      SiO:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S7", "W:S25", "W:S34"]
+        note: >
+          Acidic SiO2-bearing slag attacks magnesia and CMAS-type slags wet
+          MgO. Direct SiO vapor data remains uncharacterized.
+      alkali_NaK:
+        severity: low
+        evidence: direct
+        citations: ["W:S36", "W:S37"]
+        note: >
+          High-magnesia, low-silica refractories were compatible with
+          high-temperature sodium, and KCl + MgO tests found no new product at
+          600-1200 degC. K-metal vapor remains uncharacterized.
+      Fe_FeO:
+        severity: high
+        evidence: direct
+        citations: ["W:S7", "W:S34", "W:S36"]
+        note: >
+          Iron-rich slag can form magnesiowustite and infiltrate MgO; FeOx-
+          silicate slag reacts strongly with MgO. Fe/FeO vapor behavior remains
+          uncharacterized.
+    stickiness:
+      SiO:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S25", "W:S34"]
+        note: >
+          Molten silicate/CMAS wetting and penetration are the analog. Direct
+          SiO condensate adhesion was not found.
+      alkali:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["W:S36", "W:S37"]
+        note: >
+          Chemical compatibility/resistance is sourced, but absence of reaction
+          product is not an adhesion or shedding measurement.
+      Fe:
+        class: strongly-adhering
+        evidence: direct
+        citations: ["W:S7", "W:S34"]
+        note: >
+          Direct only for FeO-bearing liquid slag attack/adherence. Metallic
+          Fe vapor remains analogous-only or uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: ["W:S7"]
+      note: >
+        No regolith campaign span was found. A 4 h iron-rich slag infiltration
+        experiment is a lab proxy only.
+
+  bulk_zirconia_ysz:
+    label: "Zirconia / YSZ (bulk refractory zirconia, stabilized zirconia)"
+    role: "Ultra-high-temperature insert, crucible, refractory board/fiber, or coating substrate."
+    service_temp:
+      continuous_C: 2200
+      max_operating_C: 2200
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S15", "W:S16", "W:S17", "W:S18"]
+      note: >
+        Stabilized zirconia/YSZ is the relevant high-temperature candidate.
+        Unstabilized ZrO2 phase-change behavior remains a design caveat.
+    chemical_attack:
+      SiO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S16", "W:S29", "W:S30"]
+        note: >
+          Low zirconia solubility and glass-furnace/AZS behavior do not prove
+          SiO vapor compatibility. CMAS attack of porous YSZ prevents a shed
+          verdict.
+      alkali_NaK:
+        severity: moderate
+        evidence: direct
+        citations: ["W:S3", "W:S36"]
+        note: >
+          Alkali kinetics and sodium compatibility split by zirconia form are
+          sourced. Product/lifetime behavior remains uncharacterized.
+      Fe_FeO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S16", "W:S35"]
+        note: >
+          Liquid Fe non-wetting and low molten-metal solubility are sourced,
+          but FeO vapor or FeO-silicate liquid behavior is not direct.
+    stickiness:
+      SiO:
+        class: moderate
+        evidence: analogous-only
+        citations: ["W:S29", "W:S30"]
+        note: >
+          Dense bulk zirconia may shed nonmolten silicate better than porous
+          coatings, but the sourced sticky story is CMAS attack of YSZ coatings.
+      alkali:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["W:S3", "W:S36"]
+        note: >
+          Corrosion kinetics and sodium survival do not classify deposit
+          adhesion or shedding.
+      Fe:
+        class: moderate
+        evidence: direct
+        citations: ["W:S35"]
+        note: >
+          Liquid Fe wettability on zirconia is sourced. FeO/Fe-vapor condensate
+          adhesion remains uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: []
+      note: >
+        No regolith service span was found. Alkali and FeO vapor cells are too
+        sparse for campaign lifetime.
+
+  plasma_sprayed_alumina:
+    label: "Plasma-sprayed alumina (Al2O3)"
+    role: "Ceramic coating, plasma/electrical/erosion barrier, or hot-face coating over structure."
+    service_temp:
+      continuous_C: 1650
+      max_operating_C: 1650
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S19"]
+      note: >
+        Oerlikon Metco 6103 high-purity alumina powder is specified for
+        plasma-sprayed coatings with service temperature less than or equal to
+        1650 degC.
+    chemical_attack:
+      SiO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S10", "W:S31", "W:S34"]
+        note: >
+          Dense-alumina chemistry and CMAS-NaCl wetting are analogs only;
+          coating porosity/metastable phases make bulk extrapolation unsafe.
+      alkali_NaK:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S3", "W:S4", "W:S37"]
+        note: >
+          Dense alumina alkali products are sourced, but direct
+          plasma-sprayed alumina Na/K vapor lifetime is uncharacterized.
+      Fe_FeO:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S34", "W:S35"]
+        note: >
+          FeOx-silicate slag strongly wets/reacts with dense alumina; coating
+          porosity may worsen infiltration, but direct coating vapor data was
+          not found.
+    stickiness:
+      SiO:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S31", "W:S34"]
+        note: >
+          Strong adherence applies only if condensate is molten silicate/CMAS.
+          Direct SiO film-on-coating data is absent.
+      alkali:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S3", "W:S4", "W:S27", "W:S37"]
+        note: >
+          Dense-alumina alkali products and sticky aerosol layers are analogs;
+          direct plasma-spray adhesion data was not found.
+      Fe:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S34", "W:S35"]
+        note: >
+          FeOx-silicate slag is the analog. Fe metal vapor is
+          uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: ["W:S19"]
+      note: >
+        Product sheet gives temperature capability, not regolith corrosion
+        life. Treat 1650 degC as temperature capability only.
+
+  plasma_sprayed_ysz:
+    label: "Plasma-sprayed YSZ"
+    role: "Thermal barrier coating; not a structural wall by itself."
+    service_temp:
+      continuous_C: 1200
+      max_operating_C: 1200
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["W:S20", "W:S21"]
+      note: >
+        NASA TBC sources keep YSZ-style ceramic-oxide coating surfaces near or
+        below 1200 degC in turbine service.
+    chemical_attack:
+      SiO:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S21", "W:S29", "W:S30"]
+        note: >
+          CMAS/siliceous deposits infiltrate porous YSZ coatings, but CMAS is a
+          silicate/oxide analog rather than pure SiO vapor or pure SiO2
+          condensate.
+      alkali_NaK:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S3", "W:S31"]
+        note: >
+          Bulk zirconia alkali kinetics and CMAS-NaCl wetting are analogs.
+          Direct Na/K vapor data for plasma-sprayed YSZ remains
+          uncharacterized.
+      Fe_FeO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S31", "W:S35"]
+        note: >
+          Liquid Fe non-wetting is not the relevant FeOx-silicate or CMAS-type
+          liquid case. Direct FeO/iron vapor data for plasma-sprayed YSZ was
+          not found.
+    stickiness:
+      SiO:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S21", "W:S29", "W:S30"]
+        note: >
+          Strongly adhering/infiltrating behavior is sourced for molten CMAS on
+          porous YSZ coatings; this is an analog for the SiO column.
+      alkali:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S31"]
+        note: >
+          Supported only for alkali-bearing CMAS/NaCl melt. Pure Na/K metal
+          vapor remains uncharacterized.
+      Fe:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["W:S31", "W:S35"]
+        note: >
+          Fe vapor adhesion is uncharacterized. Fe in silicate slag is only an
+          analog.
+    service_life:
+      evidence: uncharacterized
+      citations: ["W:S20", "W:S21"]
+      note: >
+        No regolith lifespan was found. TBC erosion, delamination, and
+        spallation require condition-based replacement, not universal hours.
+
+  plasma_sprayed_mullite:
+    label: "Plasma-sprayed mullite (3Al2O3.2SiO2)"
+    role: "Environmental/thermal barrier coating or sacrificial aluminosilicate top layer."
+    service_temp:
+      continuous_C: 1300
+      max_operating_C: 1300
+      peak_C: null
+      degradation_onset_C: 1300
+      evidence: direct
+      citations: ["W:S22", "W:S23"]
+      note: >
+        NASA EBC work found rapid sintering evidence as low as 1300 degC, and
+        plasma-sprayed mullite/YSZ EBCs were cycled at 1300 degC under rich
+        water vapor.
+    chemical_attack:
+      SiO:
+        severity: moderate
+        evidence: analogous-only
+        citations: ["W:S22", "W:S23", "W:S25"]
+        note: >
+          Mullite is chemically close to silica-rich deposits, but direct SiO
+          vapor data remains uncharacterized.
+      alkali_NaK:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S3", "W:S4"]
+        note: >
+          Gaseous alkali and K corrosion products are sourced for
+          mullite/aluminosilicates, not plasma-sprayed coating lifecycle.
+      Fe_FeO:
+        severity: high
+        evidence: analogous-only
+        citations: ["W:S12", "W:S34"]
+        note: >
+          FeO-Al2O3-SiO2 systems can form fayalitic eutectics and
+          hercynite/fayalite assemblages; direct coating FeO-vapor data was not
+          found.
+    stickiness:
+      SiO:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S22", "W:S23", "W:S25"]
+        note: >
+          Siliceous condensate sintering into an aluminosilicate surface is an
+          analog. Direct SiO condensate adhesion is absent.
+      alkali:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S3", "W:S4"]
+        note: >
+          Bulk/mullite chemistry supports reaction products but not
+          plasma-sprayed coating adhesion or stickiness.
+      Fe:
+        class: strongly-adhering
+        evidence: analogous-only
+        citations: ["W:S12", "W:S34"]
+        note: >
+          Strong adherence is inferred only if FeO joins silica/alumina to form
+          low-melting fayalitic liquid. Fe vapor remains uncharacterized.
+    service_life:
+      evidence: uncharacterized
+      citations: ["W:S22", "W:S23"]
+      note: >
+        Water-vapor cycling and rapid-sintering evidence do not characterize
+        regolith SiO/Na/K/FeO deposit life.
