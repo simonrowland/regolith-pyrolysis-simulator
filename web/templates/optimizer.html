@@ -120,12 +120,7 @@
         </form>
     </div>
 
-    <div id="optimizer-jobs"
-         hx-get="{{ url_for('web.optimizer_jobs_partial') }}"
-         hx-trigger="load, every 5s"
-         hx-swap="outerHTML">
-        {% include "partials/optimizer_jobs.html" %}
-    </div>
+    {% include "partials/optimizer_jobs.html" %}
 
     <div id="optimizer-table"
          hx-get="{{ url_for('web.optimizer_table_partial') }}"

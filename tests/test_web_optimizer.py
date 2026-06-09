@@ -514,6 +514,46 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert board_payload["entries"][0]["backend"] == run["latest_result"]["backend"]
 
 
+def test_optimizer_reader_discovers_completed_job_result_dirs(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    job_id = "job-complete-001"
+    run_id = f"jobs/{job_id}"
+    job_dir = runs_dir / "jobs" / job_id
+    job_dir.mkdir(parents=True)
+
+    spec = _base_spec(
+        recipe_id="job-recipe",
+        profile_id="job-profile",
+        fidelity="high",
+    )
+    store = ResultStore(job_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(spec, candidate_id="candidate-job", oxygen=14.0, energy=3.0),
+        created_at="2026-06-09T00:00:00Z",
+    )
+    key = cache_key(spec)
+
+    runs = client.get("/api/optimizer/runs")
+    assert runs.status_code == 200
+    run = runs.get_json()["runs"][0]
+    assert run["id"] == run_id
+    assert run["latest_result"]["run_id"] == run_id
+
+    table = client.get(
+        "/partials/optimizer-table"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=job-profile&objective=oxygen_kg"
+    )
+    assert table.status_code == 200
+    table_html = table.get_data(as_text=True)
+    assert "job-profile" in table_html
+    assert f'href="/optimizer/runs/{run_id}/results/{key}"' in table_html
+
+    detail = client.get(f"/optimizer/runs/{run_id}/results/{key}")
+    assert detail.status_code == 200
+    assert "candidate-job" in detail.get_data(as_text=True)
+
+
 def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> None:
     data_dir = tmp_path / "data"
     profiles_dir = data_dir / "optimize_profiles"
@@ -594,6 +634,17 @@ def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
     meta = yaml.safe_load((out_dir / ".job_meta.json").read_text(encoding="utf-8"))
     assert meta["status"] == "RUNNING"
     assert meta["pid"] == popen.processes[0].pid
+
+
+def test_optimizer_jobs_partial_keeps_polling_attrs_after_outer_swap(client) -> None:
+    response = client.get("/partials/optimizer-jobs")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'id="optimizer-jobs"' in html
+    assert 'hx-get="/partials/optimizer-jobs"' in html
+    assert 'hx-trigger="load, every 5s"' in html
+    assert 'hx-swap="outerHTML"' in html
 
 
 def test_optimizer_job_submit_rejects_unknown_profile_before_spawn(client) -> None:

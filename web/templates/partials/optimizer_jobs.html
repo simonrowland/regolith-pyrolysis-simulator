@@ -1,4 +1,8 @@
-<div id="optimizer-jobs" class="section-card">
+<div id="optimizer-jobs"
+     class="section-card"
+     hx-get="{{ url_for('web.optimizer_jobs_partial') }}"
+     hx-trigger="load, every 5s"
+     hx-swap="outerHTML">
     <h3>Optimizer Jobs</h3>
     {% if job_error %}
     <div class="empty-hint optimizer-job-error">{{ job_error }}</div>

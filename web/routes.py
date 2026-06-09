@@ -48,6 +48,7 @@ OPTIMIZER_ARTIFACT_NAMES = (
     'pareto.json',
     'provenance.jsonl',
 )
+OPTIMIZER_JOBS_DIR_NAME = 'jobs'
 OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
 OPTIMIZER_JOB_FIDELITIES = ('stub', 'fast', 'high', 'auto')
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
@@ -132,6 +133,12 @@ def _optimizer_run_dirs(root: Path) -> list[Path]:
         if child.is_dir() and (child / OPTIMIZER_CACHE_NAME).is_file():
             run_dirs.append(child)
 
+    jobs_root = root / OPTIMIZER_JOBS_DIR_NAME
+    if jobs_root.is_dir():
+        for child in sorted(jobs_root.iterdir()):
+            if child.is_dir() and (child / OPTIMIZER_CACHE_NAME).is_file():
+                run_dirs.append(child)
+
     unique = {path.resolve(): path for path in run_dirs}
     return sorted(
         unique.values(),
@@ -170,6 +177,10 @@ def _relative_to(path: Path, root: Path) -> str:
         return str(path.relative_to(root))
     except ValueError:
         return path.name
+
+
+def _optimizer_run_id(run_dir: Path, root: Path) -> str:
+    return _relative_to(run_dir, root).replace(os.sep, '/')
 
 
 def _artifact_metadata(run_dir: Path, root: Path) -> list[dict[str, Any]]:
@@ -436,7 +447,7 @@ def _read_cache_summary(cache_path: Path, run_id: str) -> dict[str, Any]:
 
 def _optimizer_run_metadata(run_dir: Path, root: Path) -> dict[str, Any]:
     cache_path = run_dir / OPTIMIZER_CACHE_NAME
-    run_id = run_dir.name
+    run_id = _optimizer_run_id(run_dir, root)
     metadata = {
         'id': run_id,
         'relative_path': _relative_to(run_dir, root),
@@ -499,9 +510,10 @@ def _leaderboard_entries(
     rows: list[tuple[dict[str, Any], float, str]] = []
     selected_metric = objective_metric
     selected_sense = 'maximize'
+    root = _optimizer_runs_root()
 
     for run_dir in run_dirs:
-        run_id = run_dir.name
+        run_id = _optimizer_run_id(run_dir, root)
         try:
             result_rows = _query_result_rows(
                 run_dir / OPTIMIZER_CACHE_NAME,
@@ -746,7 +758,7 @@ def _optimizer_jobs_context() -> dict[str, Any]:
     jobs = _optimizer_job_runner().list_jobs()
     return {
         'jobs': jobs,
-        'jobs_dir': str(_optimizer_runs_root() / 'jobs'),
+        'jobs_dir': str(_optimizer_runs_root() / OPTIMIZER_JOBS_DIR_NAME),
     }
 
 
@@ -1128,7 +1140,7 @@ def _optimizer_result_row(
 ) -> tuple[Path, Path, sqlite3.Row] | None:
     root = _optimizer_runs_root()
     for run_dir in _optimizer_run_dirs(root):
-        if run_dir.name != run_id:
+        if _optimizer_run_id(run_dir, root) != run_id:
             continue
         try:
             with _connect_result_store(run_dir / OPTIMIZER_CACHE_NAME) as conn:
@@ -1342,7 +1354,8 @@ def _result_detail_model(
     run_dir: Path,
     row: sqlite3.Row,
 ) -> dict[str, Any]:
-    result = _optimizer_result_view(_result_metadata(row, run_id=run_dir.name))
+    run_id = _optimizer_run_id(run_dir, root)
+    result = _optimizer_result_view(_result_metadata(row, run_id=run_id))
     eval_spec = _json_value(row['eval_spec'], {})
     if not isinstance(eval_spec, Mapping):
         eval_spec = {}
@@ -1358,7 +1371,7 @@ def _result_detail_model(
     result['recipe_patch'] = _recipe_patch(eval_spec)
     result['recipe_stages'] = _recipe_stage_sections(eval_spec)
     result['provenance'] = {
-        'run_id': run_dir.name,
+        'run_id': run_id,
         'run_path': _relative_to(run_dir, root),
         'cache_path': _relative_to(run_dir / OPTIMIZER_CACHE_NAME, root),
         'cache_key': row['cache_key'],
@@ -1561,7 +1574,7 @@ def optimizer_job_detail(job_id: str):
     return render_template('optimizer_job.html', job=job)
 
 
-@bp.route('/optimizer/runs/<run_id>/results/<cache_key>')
+@bp.route('/optimizer/runs/<path:run_id>/results/<cache_key>')
 def optimizer_result_detail(run_id: str, cache_key: str):
     """Read-only result detail and stored recipe audit view."""
     resolved = _optimizer_result_row(run_id, cache_key)
@@ -1574,7 +1587,7 @@ def optimizer_result_detail(run_id: str, cache_key: str):
     )
 
 
-@bp.route('/optimizer/runs/<run_id>/results/<cache_key>/recipe.yaml')
+@bp.route('/optimizer/runs/<path:run_id>/results/<cache_key>/recipe.yaml')
 def optimizer_result_yaml(run_id: str, cache_key: str):
     """Download the stored EvalSpec recipe/provenance as YAML."""
     resolved = _optimizer_result_row(run_id, cache_key)
@@ -1669,7 +1682,11 @@ def optimizer_leaderboard():
     run_dirs = _optimizer_run_dirs(root)
     run_id = _request_arg('run_id')
     if run_id:
-        run_dirs = [run_dir for run_dir in run_dirs if run_dir.name == run_id]
+        run_dirs = [
+            run_dir
+            for run_dir in run_dirs
+            if _optimizer_run_id(run_dir, root) == run_id
+        ]
         if not run_dirs:
             return jsonify({'error': 'Optimizer run not found'}), 404
 
