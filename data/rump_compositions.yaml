@@ -1,0 +1,316 @@
+schema_version: 1
+source: sim-derived
+basis: oxide_wt_pct_normalized_volatiles_free
+recipe_id: default_targeted_extraction_astaged_v1
+extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+c5_enabled: false
+generated_by:
+  method: PyrolysisRun C0 session with PATH_AB=A_staged; terminal rump from sim._terminal_rump_by_species; oxide normalization from web.advisory.oxide_wt_pct_from_kg; classification from classify_ceramic_rump.
+  code_version: "0.5.4"
+  git_head: d999e8ad6d95
+  backend_name: stub
+  requested_hours: 500
+normalization_exclusions:
+  - residual volatiles
+  - Fe metal
+  - sulfides
+  - salts
+target_species_ladder:
+  stage_1:
+    - Fe
+  stage_2:
+    - Cr
+    - CrO2
+  stage_3:
+    - SiO
+  stage_4:
+    - Na
+    - K
+    - Mg
+entries:
+  - feedstock_id: lunar_mare_low_ti
+    feedstock_label: Lunar Mare Basalt (Low-Ti)
+    recipe_id: default_targeted_extraction_astaged_v1
+    extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+    c5_enabled: false
+    basis: oxide_wt_pct_normalized_volatiles_free
+    source: sim-derived
+    source_run_id: sim-rump-c85f99671304790d
+    run:
+      complete: true
+      hours_completed: 68
+      additives_kg: {}
+      campaign_path:
+        - C0
+        - C0B
+        - C2A_STAGED
+        - C3_NA
+        - C4
+        - C6
+        - COMPLETE
+      operator_choices:
+        PATH_AB: A_staged
+        BRANCH_ONE_TWO: two
+        C6_PROCEED: "yes"
+    oxide_wt_pct:
+      Al2O3: 14.214
+      CaO: 11.637
+      Cr2O3: 0.013
+      FeO: 16.353
+      MgO: 9.463
+      MnO: 0.212
+      Na2O: 0.182
+      P2O5: 0.106
+      SiO2: 46.234
+      TiO2: 1.587
+    classification:
+      status: no-match
+      matched_ceramic: null
+      reason: composition outside source-supported ceramic windows
+      service_temp:
+        kind: null
+        value_C: null
+        usable_service_C: null
+      tolerance_wt_pct: 0.5
+    literature_cross_check:
+      evidence_tier: close_analog
+      note: Source feedstock is a regolith analog composition; comparison only checked oxide-family plausibility after matching the volatiles-free basis.
+  - feedstock_id: lunar_highland
+    feedstock_label: Lunar Highland Anorthosite
+    recipe_id: default_targeted_extraction_astaged_v1
+    extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+    c5_enabled: false
+    basis: oxide_wt_pct_normalized_volatiles_free
+    source: sim-derived
+    source_run_id: sim-rump-69b57a0109d51210
+    run:
+      complete: true
+      hours_completed: 68
+      additives_kg: {}
+      campaign_path:
+        - C0
+        - C0B
+        - C2A_STAGED
+        - C3_NA
+        - C4
+        - C6
+        - COMPLETE
+      operator_choices:
+        PATH_AB: A_staged
+        BRANCH_ONE_TWO: two
+        C6_PROCEED: "yes"
+    oxide_wt_pct:
+      Al2O3: 27.181
+      CaO: 15.935
+      FeO: 4.363
+      MgO: 6.119
+      MnO: 0.072
+      Na2O: 0.221
+      P2O5: 0.051
+      SiO2: 45.594
+      TiO2: 0.463
+    classification:
+      status: no-match
+      matched_ceramic: null
+      reason: composition outside source-supported ceramic windows
+      service_temp:
+        kind: null
+        value_C: null
+        usable_service_C: null
+      tolerance_wt_pct: 0.5
+    literature_cross_check:
+      evidence_tier: close_analog
+      note: Source feedstock is a regolith analog composition; comparison only checked oxide-family plausibility after matching the volatiles-free basis.
+  - feedstock_id: lunar_pkt_kreep_average
+    feedstock_label: Procellarum KREEP Terrane (PKT) Average
+    recipe_id: default_targeted_extraction_astaged_v1
+    extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+    c5_enabled: false
+    basis: oxide_wt_pct_normalized_volatiles_free
+    source: sim-derived
+    source_run_id: sim-rump-49ad3a56873cf506
+    run:
+      complete: true
+      hours_completed: 68
+      additives_kg: {}
+      campaign_path:
+        - C0
+        - C0B
+        - C2A_STAGED
+        - C3_NA
+        - C4
+        - C6
+        - COMPLETE
+      operator_choices:
+        PATH_AB: A_staged
+        BRANCH_ONE_TWO: two
+        C6_PROCEED: "yes"
+    oxide_wt_pct:
+      Al2O3: 16.488
+      CaO: 10.345
+      Cr2O3: 0.005
+      FeO: 9.309
+      MgO: 8.74
+      MnO: 0.207
+      Na2O: 0.312
+      P2O5: 1.035
+      SiO2: 51.231
+      TiO2: 2.328
+    classification:
+      status: no-match
+      matched_ceramic: null
+      reason: composition outside source-supported ceramic windows
+      service_temp:
+        kind: null
+        value_C: null
+        usable_service_C: null
+      tolerance_wt_pct: 0.5
+    literature_cross_check:
+      evidence_tier: close_analog
+      note: Source feedstock is a regolith analog composition; comparison only checked oxide-family plausibility after matching the volatiles-free basis.
+  - feedstock_id: ci_carbonaceous_chondrite
+    feedstock_label: CI Carbonaceous Chondrite
+    recipe_id: default_targeted_extraction_astaged_v1
+    extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+    c5_enabled: false
+    basis: oxide_wt_pct_normalized_volatiles_free
+    source: sim-derived
+    source_run_id: sim-rump-ea1f12d1b194fbdb
+    run:
+      complete: true
+      hours_completed: 68
+      additives_kg: {}
+      campaign_path:
+        - C0
+        - C0B
+        - C2A_STAGED
+        - C3_NA
+        - C4
+        - C6
+        - COMPLETE
+      operator_choices:
+        PATH_AB: A_staged
+        BRANCH_ONE_TWO: two
+        C6_PROCEED: "yes"
+    oxide_wt_pct:
+      Al2O3: 2.455
+      CaO: 2.397
+      FeO: 29.94
+      MgO: 25.211
+      NiO: 2.131
+      SiO2: 37.866
+    classification:
+      status: no-match
+      matched_ceramic: null
+      reason: composition outside source-supported ceramic windows
+      service_temp:
+        kind: null
+        value_C: null
+        usable_service_C: null
+      tolerance_wt_pct: 0.5
+    literature_cross_check:
+      evidence_tier: close_analog
+      note: Source feedstock is a meteorite analog composition; comparison only checked oxide-family plausibility after matching the volatiles-free basis.
+  - feedstock_id: mars_basalt
+    feedstock_label: Mars Basalt (General)
+    recipe_id: default_targeted_extraction_astaged_v1
+    extraction_sequence_version: sim_target_ladder_c0_c0b_c2a_staged_c3na_c4_c6_v1
+    c5_enabled: false
+    basis: oxide_wt_pct_normalized_volatiles_free
+    source: sim-derived
+    source_run_id: sim-rump-c15803943c700785
+    run:
+      complete: true
+      hours_completed: 68
+      additives_kg:
+        C: 30.0
+      campaign_path:
+        - C0
+        - C0B
+        - C2A_STAGED
+        - C3_NA
+        - C4
+        - C6
+        - COMPLETE
+      operator_choices:
+        PATH_AB: A_staged
+        BRANCH_ONE_TWO: two
+        C6_PROCEED: "yes"
+    oxide_wt_pct:
+      Al2O3: 11.72
+      CaO: 7.859
+      FeO: 17.494
+      MgO: 9.484
+      Na2O: 1.454
+      P2O5: 0.954
+      SiO2: 49.911
+      TiO2: 1.123
+    classification:
+      status: no-match
+      matched_ceramic: null
+      reason: composition outside source-supported ceramic windows
+      service_temp:
+        kind: null
+        value_C: null
+        usable_service_C: null
+      tolerance_wt_pct: 0.5
+    literature_cross_check:
+      evidence_tier: close_analog
+      note: Source feedstock is a Mars basalt analog composition; comparison only checked oxide-family plausibility after matching the volatiles-free basis.
+todo_feedstocks:
+  - feedstock_id: lunar_mare_high_ti
+    feedstock_label: Lunar Mare Basalt (High-Ti)
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: lunar_spa_kreep_influenced
+    feedstock_label: South Pole-Aitken KREEP-Influenced
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: targeted_super_kreep_ore
+    feedstock_label: Targeted Super-KREEP Ore
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: s_type_asteroid_silicate
+    feedstock_label: S-Type Asteroid Silicate Fraction
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: m_type_metallic_phase
+    feedstock_label: M-Type Asteroid -- Metallic Phase
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: m_type_silicate_phase
+    feedstock_label: M-Type Asteroid -- Silicate Phase
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: v_type_vesta_hed
+    feedstock_label: V-Type Asteroid (Vesta HED Meteorites)
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: e_type_enstatite_aubrite
+    feedstock_label: E-Type Asteroid (Enstatite Aubrite)
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: cm_carbonaceous_chondrite
+    feedstock_label: CM Carbonaceous Chondrite
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: ceres_regolith
+    feedstock_label: Ceres Regolith
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: comet_nucleus
+    feedstock_label: Comet Nucleus (Jupiter-Family)
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: mars_sulfate_rich
+    feedstock_label: Mars Sulfate-Rich Soil
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: mars_phyllosilicate_clay
+    feedstock_label: Mars Phyllosilicate Clay
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
+  - feedstock_id: mars_perchlorate_rich
+    feedstock_label: Mars Perchlorate-Rich Soil
+    status: TODO
+    reason: Not in representative R3 BOOT-1 batch; derive later with the same simulator path.
