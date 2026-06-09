@@ -145,21 +145,34 @@ def _run_scenario(scenario: dict) -> dict:
 def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
     schema = RecipeSchema()
     na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")
-    patch = RecipePatch({na_dose: 12.0}).validated(schema)
+    k_dose = ("campaigns", "C3", "alkali_dosing", "K_kg")
+    patch = RecipePatch({na_dose: 12.0, k_dose: 4.0}).validated(schema)
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C3_NA",
-        hours=0,
+        hours=1,
         setpoints_patch=schema.to_setpoints_patch(patch),
     )
 
     config = run._session_config()
     session = run._start_session()
     sim = session.simulator
+    payload = run.run()
 
     assert config.additives_kg["Na"] == pytest.approx(12.0)
+    assert config.additives_kg["K"] == pytest.approx(4.0)
     assert sim.record.additives_kg["Na"] == pytest.approx(12.0)
+    assert sim.record.additives_kg["K"] == pytest.approx(4.0)
     assert sim.shuttle_Na_inventory_kg == pytest.approx(12.0)
+    assert payload["run_metadata"]["additives_kg"] == {"K": 4.0, "Na": 12.0}
+    _assert_mass_balance_bound(payload)
+
+    undosed = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_NA",
+        hours=1,
+    ).run()
+    assert undosed["run_metadata"]["additives_kg"] == {}
 
 
 def _assert_schema_shape(payload: dict) -> None:

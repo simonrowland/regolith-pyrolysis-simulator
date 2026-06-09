@@ -522,6 +522,10 @@ class PyrolysisRun:
         )
 
         engines_used = self._engines_used(sim)
+        session_config = getattr(execution.session, "_config", None)
+        if session_config is None:
+            raise RuntimeError("run execution session missing config")
+        applied_additives_kg = dict(session_config.additives_kg)
 
         run_metadata = {
             "schema_version": RUNNER_SCHEMA_VERSION,
@@ -530,7 +534,9 @@ class PyrolysisRun:
             "hours_requested": int(self.hours),
             "hours_completed": int(sim.melt.hour),
             "mass_kg": float(self.mass_kg),
-            "additives_kg": {k: float(v) for k, v in sorted(self.additives_kg.items())},
+            "additives_kg": {
+                k: float(v) for k, v in sorted(applied_additives_kg.items())
+            },
             "track": self.track,
             "backend": self.backend_name,
             "started_at_utc": started_at_utc,

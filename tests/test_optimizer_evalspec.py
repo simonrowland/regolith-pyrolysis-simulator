@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 import json
 import math
 from pathlib import Path
@@ -264,6 +265,57 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     assert run_config.c5_enabled is True
     assert run_config.mre_max_voltage_V == pytest.approx(1.4)
     assert run_config.mre_target_species == "SiO2"
+
+
+def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> None:
+    profile = {
+        "profile_id": "c3-dose-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C3_NA", "patch": {}}],
+        "run": {
+            "campaign": "C3_NA",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+    schema = RecipeSchema()
+    na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")
+    k_dose = ("campaigns", "C3", "alkali_dosing", "K_kg")
+
+    undosed_spec, undosed_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    dosed_spec, dosed_config = _build_eval_inputs(
+        RecipePatch({na_dose: 12.0, k_dose: 4.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert dict(undosed_spec.additives_kg) == {}
+    assert dict(undosed_config.additives_kg) == {}
+    assert cache_key(undosed_spec) == cache_key(replace(undosed_spec, additives_kg={}))
+    assert dict(dosed_spec.additives_kg) == {"K": 4.0, "Na": 12.0}
+    assert dict(dosed_config.additives_kg) == {"K": 4.0, "Na": 12.0}
+    assert cache_key(dosed_spec) != cache_key(replace(dosed_spec, additives_kg={}))
 
 
 @pytest.mark.parametrize("bad_value", (math.nan, math.inf, -math.inf))

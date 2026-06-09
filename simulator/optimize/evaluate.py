@@ -398,6 +398,22 @@ def _build_eval_inputs(
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
 
+    run_config = PyrolysisRun(
+        feedstock_id=feedstock_id,
+        campaign=str(run_options["campaign"]),
+        hours=int(run_options["hours"]),
+        additives_kg=dict(run_options["additives_kg"]),
+        mass_kg=float(run_options["mass_kg"]),
+        backend_name=str(run_options["backend_name"]),
+        reduced_real_cache=run_options["reduced_real_cache"],
+        setpoints_patch=setpoints_patch,
+        runtime_campaign_overrides=dict(run_options["runtime_campaign_overrides"]),
+        track=str(run_options["track"]),
+        c5_enabled=bool(run_options["c5_enabled"]),
+        mre_target_species=str(run_options["mre_target_species"]),
+        mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
+    )._session_config()
+
     spec = EvalSpec(
         recipe_id=patch.recipe_id(),
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
@@ -415,7 +431,7 @@ def _build_eval_inputs(
         campaign=str(run_options["campaign"]),
         hours=int(run_options["hours"]),
         mass_kg=float(run_options["mass_kg"]),
-        additives_kg=run_options["additives_kg"],
+        additives_kg=run_config.additives_kg,
         track=str(run_options["track"]),
         backend_name=str(run_options["backend_name"]),
         c5_enabled=bool(run_options["c5_enabled"]),
@@ -424,22 +440,6 @@ def _build_eval_inputs(
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         chemistry_kernel=run_options["chemistry_kernel"],
     )
-
-    run_config = PyrolysisRun(
-        feedstock_id=feedstock_id,
-        campaign=spec.campaign,
-        hours=spec.hours,
-        additives_kg=dict(spec.additives_kg),
-        mass_kg=spec.mass_kg,
-        backend_name=spec.backend_name,
-        reduced_real_cache=run_options["reduced_real_cache"],
-        setpoints_patch=setpoints_patch,
-        runtime_campaign_overrides=dict(spec.runtime_campaign_overrides),
-        track=spec.track,
-        c5_enabled=spec.c5_enabled,
-        mre_target_species=spec.mre_target_species,
-        mre_max_voltage_V=spec.mre_max_voltage_V,
-    )._session_config()
     return spec, run_config
 
 
