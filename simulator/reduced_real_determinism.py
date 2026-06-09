@@ -1626,20 +1626,26 @@ def _positive_float_map(value: Mapping[str, Any]) -> dict[str, float]:
     }
 
 
-def _json_ready(value: Any) -> Any:
+def _json_ready(value: Any, path: str = "$") -> Any:
     if dataclasses.is_dataclass(value) and not isinstance(value, type):
         return {
-            field.name: _json_ready(getattr(value, field.name))
+            field.name: _json_ready(
+                getattr(value, field.name),
+                f"{path}.{field.name}",
+            )
             for field in dataclasses.fields(value)
         }
     if isinstance(value, Mapping):
-        return {str(key): _json_ready(item) for key, item in value.items()}
+        return {
+            str(key): _json_ready(item, f"{path}.{str(key)}")
+            for key, item in value.items()
+        }
     if isinstance(value, (list, tuple)):
-        return [_json_ready(item) for item in value]
+        return [_json_ready(item, f"{path}[{index}]") for index, item in enumerate(value)]
     if isinstance(value, float):
         if not math.isfinite(value):
             raise PT0NonFinitePayload(
-                f"non-finite value in PT-0 payload: {value!r}"
+                f"non-finite value in PT-0 payload at {path}: {value!r}"
             )
         return value
     if value is None or isinstance(value, (str, int, bool)):

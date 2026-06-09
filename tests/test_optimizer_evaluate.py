@@ -17,6 +17,7 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.objective import objective_definitions
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
+from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.state import CampaignPhase, HourSnapshot
 
 
@@ -211,6 +212,52 @@ def _execution(
 
 def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
+
+
+def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            exc=PT0NonFinitePayload(
+                "non-finite value in PT-0 payload at $.SCSS_ppm: inf"
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
+    assert result.failing_gates == ("non_finite_payload",)
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+    assert any("CALC_BUG" in note for note in result.notes)
+
+
+def test_pt0_nonfinite_failed_run_is_candidate_failure() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            _execution(
+                status="failed",
+                error_message=(
+                    "PT0NonFinitePayload: non-finite value in PT-0 payload "
+                    "at $.SCSS_ppm: inf"
+                ),
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
+    assert result.run_reference is not None
+    assert result.run_reference.error_message.startswith("PT0NonFinitePayload")
 
 
 def test_mass_balance_breach_aborts_as_engine_bug_with_repro_patch() -> None:

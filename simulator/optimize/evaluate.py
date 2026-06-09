@@ -37,6 +37,7 @@ from simulator.optimize.physics import (
 from simulator.optimize.profiles import validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.worker_runtime import get_worker_runtime
+from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
@@ -50,6 +51,7 @@ class FailureCategory(str, Enum):
     INFEASIBLE_RECIPE = "infeasible_recipe"
     OUT_OF_DOMAIN = "out_of_domain"
     PHYSICS_REFUSED = "physics_refused"
+    NON_FINITE_PAYLOAD = "non_finite_payload"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
 
@@ -237,6 +239,13 @@ def evaluate(
             run_config,
             worker_runtime=runtime,
         )
+    except PT0NonFinitePayload as exc:
+        return _non_finite_payload_result(
+            candidate_id,
+            spec,
+            key,
+            str(exc),
+        )
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
             str(exc),
@@ -254,6 +263,13 @@ def evaluate(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
+        if _is_non_finite_payload_message(str(exc)):
+            return _non_finite_payload_result(
+                candidate_id,
+                spec,
+                key,
+                str(exc),
+            )
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
@@ -280,6 +296,15 @@ def evaluate(
                 candidate_id=candidate_id,
                 eval_spec=spec,
                 cache_key_value=key,
+            )
+        if _is_non_finite_payload_message(error_message):
+            return _non_finite_payload_result(
+                candidate_id,
+                spec,
+                key,
+                error_message,
+                run_execution=run_execution,
+                profile=profile,
             )
         raise EngineBugAbort(
             error_message or "run executor failed",
@@ -575,6 +600,61 @@ def _out_of_domain_margin() -> GateMargin:
     )
 
 
+def _non_finite_payload_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    error_message: str,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    run_reference = (
+        _run_reference(run_execution, profile or {})
+        if run_execution is not None
+        else RunReference(
+            status="failed",
+            error_message=error_message,
+            reason="non_finite_payload",
+            trace={"backend_status": "ok"},
+            backend_status="ok",
+            backend_authoritative=True,
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.NON_FINITE_PAYLOAD,
+        feasibility_margins={"non_finite_payload": _non_finite_payload_margin()},
+        failing_gates=("non_finite_payload",),
+        run_reference=run_reference,
+        notes=(
+            "CALC_BUG: PT-0 payload contained a non-finite derived value",
+            error_message,
+        ),
+    )
+
+
+def _non_finite_payload_margin() -> GateMargin:
+    threshold = ThresholdSpec(
+        id="pt0_payload_finite",
+        value=0.0,
+        units="nonfinite_count",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: PT0NonFinitePayload",
+    )
+    return GateMargin(
+        gate="non_finite_payload",
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=1.0,
+        detail="PT-0 payload contains a non-finite derived calc value",
+    )
+
+
 def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReference:
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
@@ -730,6 +810,14 @@ def _is_backend_unavailable_message(message: str) -> bool:
     )
     import_failure = lowered.startswith("importerror") or " importerror" in lowered
     return explicit_unavailable or import_failure
+
+
+def _is_non_finite_payload_message(message: str) -> bool:
+    lowered = message.lower()
+    return (
+        "pt0nonfinitepayload" in lowered
+        or "non-finite value in pt-0 payload" in lowered
+    )
 
 
 def _abort_on_mass_balance_breach(

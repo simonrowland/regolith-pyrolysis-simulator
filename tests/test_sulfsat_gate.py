@@ -35,6 +35,7 @@ still execute.
 from __future__ import annotations
 
 import importlib
+import math
 import sys
 import types
 from types import SimpleNamespace
@@ -226,6 +227,29 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
     assert result.S_in_sulfide_ppm == pytest.approx(expected_sulfide)
     # MORB comp is inside the calibration window: no warnings expected.
     assert result.warnings == []
+
+
+def test_gate_guards_nonfinite_scss_as_no_modeled_sulfide_saturation(monkeypatch):
+    fake = _make_fake_pysulfsat(scss_ppm=float("inf"))
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0,
+        P_bar=1.0,
+        fO2_log=-9.0,
+        S_input_ppm=10.0,
+    )
+
+    assert result.calibration_status == 'out_of_range'
+    assert math.isfinite(result.SCSS_ppm)
+    assert result.SCSS_ppm == 0.0
+    assert result.S_in_sulfide_ppm == 0.0
+    assert result.S_in_sulfate_ppm == pytest.approx(4.0)
+    assert any('non-finite SCSS_ppm' in warning for warning in result.warnings)
 
 
 # ---------------------------------------------------------------------------

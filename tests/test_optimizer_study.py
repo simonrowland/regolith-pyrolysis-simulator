@@ -136,10 +136,12 @@ def _evaluator(
     infeasible: set[int] | None = None,
     engine_bug: set[int] | None = None,
     out_of_domain: set[int] | None = None,
+    non_finite_payload: set[int] | None = None,
 ):
     bad = infeasible or set()
     aborts = engine_bug or set()
     domain_rejects = out_of_domain or set()
+    non_finite = non_finite_payload or set()
 
     def evaluate_patch(
         patch: RecipePatch,
@@ -187,6 +189,32 @@ def _evaluator(
                     trace={"backend_status": "out_of_domain", "snapshots": ["heavy"]},
                     backend_status="out_of_domain",
                 ),
+            )
+        if index in non_finite:
+            return ScoredResult(
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=False,
+                failure_category=FailureCategory.NON_FINITE_PAYLOAD,
+                feasibility_margins={
+                    "non_finite_payload": GateMargin(
+                        gate="non_finite_payload",
+                        feasible=False,
+                        margin=-1.0,
+                        threshold=_threshold(),
+                        observed=1.0,
+                        detail="test PT-0 non-finite payload",
+                    )
+                },
+                failing_gates=("non_finite_payload",),
+                run_reference=RunReference(
+                    status="failed",
+                    error_message="PT0NonFinitePayload: $.SCSS_ppm inf",
+                    trace={"backend_status": "ok", "snapshots": ["heavy"]},
+                    backend_status="ok",
+                ),
+                notes=("CALC_BUG: PT-0 payload contained a non-finite derived value",),
             )
         if index in bad:
             return ScoredResult(
@@ -670,6 +698,54 @@ def test_engine_bug_result_aborts_without_pareto(tmp_path) -> None:
         )
 
     assert not (tmp_path / "pareto.json").exists()
+
+
+def test_nonfinite_payload_result_continues_and_counts_failure(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(non_finite_payload={0}),
+    )
+
+    assert result.winner is not None
+    records = _read_provenance(tmp_path)
+    assert len(records) == 3
+    assert records[0]["failure_category"] == "non_finite_payload"
+    summary = json.loads((tmp_path / "pareto.json").read_text())
+    assert summary["failure_counts"] == {"non_finite_payload": 1}
+    stored = _stored_rows(tmp_path)
+    assert any(
+        row.failure_category is FailureCategory.NON_FINITE_PAYLOAD
+        for row in stored
+    )
+
+
+def test_all_nonfinite_payload_results_fail_loud_with_counts(tmp_path) -> None:
+    with pytest.raises(
+        study.StudyNoFeasibleError,
+        match=r"all candidates failed with non_finite_payload.*failure_counts",
+    ):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "random",
+            "stub",
+            1,
+            2,
+            tmp_path,
+            seed=7,
+            evaluator=_evaluator(non_finite_payload={0, 1}),
+        )
+
+    summary = json.loads((tmp_path / "pareto.json").read_text())
+    assert summary["failure_counts"] == {"non_finite_payload": 2}
+    assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
 def test_feasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:

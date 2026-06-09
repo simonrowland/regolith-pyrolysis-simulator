@@ -70,6 +70,7 @@ the builtin Stage 0 path stays authoritative for everything else.
 from __future__ import annotations
 
 import importlib
+import math
 import warnings
 from dataclasses import dataclass, field
 from importlib import metadata as importlib_metadata
@@ -485,14 +486,31 @@ class SulfSatGate:
                 ss.calculate_S6St_Jugo2010_eq10(deltaQFM=delta_qfm)
             )
 
-        # Defensive clamps. PySulfSat's models can produce small
-        # negative values near machine epsilon on degenerate compositions;
-        # the simulator's downstream Stage 0 path assumes non-negative
-        # capacities and fractions, so pin them at zero / one before
-        # returning.
-        scss_ppm = max(0.0, scss_ppm)
-        scas_ppm = max(0.0, scas_ppm)
-        s6_fraction = min(1.0, max(0.0, s6_fraction))
+        numerical_warnings: List[str] = []
+        scss_ppm, note = self._finite_capacity_ppm(
+            scss_ppm,
+            field='SCSS_ppm',
+            model='Smythe 2017 SCSS',
+        )
+        if note is not None:
+            numerical_warnings.append(note)
+        scas_ppm, note = self._finite_capacity_ppm(
+            scas_ppm,
+            field='SCAS_ppm',
+            model='Chowdhury-Dasgupta 2019 SCAS',
+        )
+        if note is not None:
+            numerical_warnings.append(note)
+        s6_fraction, note = self._finite_fraction(
+            s6_fraction,
+            field='S6_fraction',
+            model='Jugo 2010 S6+/S_total',
+        )
+        if note is not None:
+            numerical_warnings.append(note)
+        if numerical_warnings:
+            redox_warnings = list(redox_warnings) + numerical_warnings
+            redox_in_range = False
 
         return scss_ppm, scas_ppm, s6_fraction, redox_warnings, redox_in_range
 
@@ -617,6 +635,53 @@ class SulfSatGate:
         return pd.DataFrame([row])
 
     @staticmethod
+    def _finite_capacity_ppm(
+        value: float,
+        *,
+        field: str,
+        model: str,
+    ) -> tuple[float, str | None]:
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            return (
+                0.0,
+                f'{model} returned invalid {field}={value!r}; '
+                f'treating capacity as 0.0 ppm ({exc!r})',
+            )
+        if not math.isfinite(number):
+            return (
+                0.0,
+                f'{model} returned non-finite {field}={number!r}; '
+                'treating capacity as 0.0 ppm for degenerate no modeled '
+                'sulfide/sulfate saturation',
+            )
+        return max(0.0, number), None
+
+    @staticmethod
+    def _finite_fraction(
+        value: float,
+        *,
+        field: str,
+        model: str,
+    ) -> tuple[float, str | None]:
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            return (
+                0.0,
+                f'{model} returned invalid {field}={value!r}; '
+                f'treating fraction as 0.0 ({exc!r})',
+            )
+        if not math.isfinite(number):
+            return (
+                0.0,
+                f'{model} returned non-finite {field}={number!r}; '
+                'treating fraction as 0.0 for degenerate sulfur speciation',
+            )
+        return min(1.0, max(0.0, number)), None
+
+    @staticmethod
     def _partition_input_S(
         *,
         S_input_ppm: float,
@@ -642,6 +707,12 @@ class SulfSatGate:
         s_sulfate_ppm = S_input_ppm * S6_fraction
         s_sulfide_ppm = S_input_ppm - s_sulfate_ppm
 
-        s_sulfate_ppm = min(s_sulfate_ppm, max(0.0, float(SCAS_ppm)))
-        s_sulfide_ppm = min(s_sulfide_ppm, max(0.0, float(SCSS_ppm)))
+        scas_cap = float(SCAS_ppm)
+        if not math.isfinite(scas_cap):
+            scas_cap = 0.0
+        scss_cap = float(SCSS_ppm)
+        if not math.isfinite(scss_cap):
+            scss_cap = 0.0
+        s_sulfate_ppm = min(s_sulfate_ppm, max(0.0, scas_cap))
+        s_sulfide_ppm = min(s_sulfide_ppm, max(0.0, scss_cap))
         return s_sulfide_ppm, s_sulfate_ppm

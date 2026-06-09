@@ -22,6 +22,7 @@ from simulator.reduced_real_determinism import (
     PT0CacheMiss,
     PT0DeterminismStore,
     PT0InvalidControls,
+    PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
     canonical_json_bytes,
@@ -77,6 +78,11 @@ def _persistent_artifact_count(db_path: Path, artifact: str) -> int:
             "WHERE artifact = ?",
             (artifact,),
         ).fetchone()[0])
+
+
+def test_json_ready_nonfinite_error_names_payload_path() -> None:
+    with pytest.raises(PT0NonFinitePayload, match=r"\$\.outer\.inner\[0\]"):
+        canonical_json_bytes({"outer": {"inner": [float("inf")]}})
 
 
 class _CountingSilicateEquilibriumProvider(ChemistryProvider):

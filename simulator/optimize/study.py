@@ -390,6 +390,20 @@ def run(
         objective_getter=lambda row: row.objectives,
     )
     pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
+    non_finite_count = failure_counts.get(FailureCategory.NON_FINITE_PAYLOAD.value, 0)
+    if records and non_finite_count == len(records):
+        _write_empty_artifacts(
+            out,
+            profile=resolved_profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            definitions=definitions,
+            failure_counts=failure_counts,
+        )
+        raise StudyNoFeasibleError(
+            "all candidates failed with non_finite_payload; "
+            f"failure_counts={dict(failure_counts)}"
+        )
     if not pareto_ranked:
         _write_empty_artifacts(
             out,
