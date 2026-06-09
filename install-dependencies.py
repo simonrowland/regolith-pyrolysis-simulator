@@ -200,6 +200,18 @@ def _install_alphamelts() -> None:
     print(f"alphaMELTS installed: {engine_dir / 'run_alphamelts.command'}")
 
 
+def _install_recipe_db_starter(python: Path) -> None:
+    """Unpack the shipped starter recipe DB into the optimizer runs root.
+
+    Idempotent + non-destructive (skips if the user already has runs). Gives a
+    fresh install a browsable recipe database out of the box.
+    """
+    script = ROOT / "scripts" / "install_recipe_db_starter.py"
+    if not script.exists():
+        return
+    subprocess.run([str(python), str(script)], check=False)
+
+
 def main() -> int:
     if len(sys.argv) != 1:
         raise SystemExit("Usage: python3 install-dependencies.py")
@@ -211,6 +223,7 @@ def main() -> int:
     if not _install_with_uv(python):
         _install_with_pip(python)
     _install_alphamelts()
+    _install_recipe_db_starter(python)
 
     print("\nInstall complete.")
     print(f"Run: {python} regolith-pyrolysis-run.py")
