@@ -3,6 +3,7 @@ source_documents:
   deepened_table: "docs-private/research/2026-06-08-wall-chemistry/wall-materials-deepened.md"
   audit: "docs-private/research/2026-06-08-wall-chemistry/wall-AUDIT.md"
   references: "docs-private/references/wall-materials-references.md"
+  surface_interaction_sources: "docs-private/research/2026-06-09-wall-ceramic-deep-research/references-to-trawl.md"
 evidence_tags:
   - direct
   - analogous-only
@@ -68,6 +69,31 @@ materials:
           Industrial SiO deposits foul equipment, but adhesion to fused silica
           is not directly characterized and nanofab SiO film adhesion evidence
           is mixed.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'SiO first-arrival treated as molecular/SiOx film; melt-wetting analog not applied without oxidized or mixed-oxide branch evidence. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: thin-film
+          source_ids: ['W:S24', 'W:S25', 'W:S26']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: strongly-adhering
         evidence: analogous-only
@@ -75,6 +101,33 @@ materials:
         note: >
           Alkali-silicate glass/liquid formation is the sticky analog. No
           direct Na/K vapor deposit adhesion class was found.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: 'soda-lime-silica glass on alumina-silica refractory; close analog for secondary alkali/silicate oxide-melt branch, not first-arrival Na/K metal or SiO film.'
+            temperature_C: 1200
+            atmosphere: 'air / solid-glass-air sessile-drop interface'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Contact-angle source applies to secondary soda-lime-silica oxide melt on alumina-silica refractory, not primary Na/K metallic condensate; PDF extraction needed for numeric angle table.'
+          regime: air
+          source_ids: ['R1-SI1', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: 'R1-SI1'
       Fe:
         class: uncharacterized
         evidence: analogous-only
@@ -82,6 +135,31 @@ materials:
         note: >
           Strong adherence is limited to the fayalitic-liquid analog. Metallic
           Fe vapor deposit adhesion is uncharacterized.
+        surface_interaction:
+          arrival_mode: solid_aerosol
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Fe first-arrival on this representative wall is treated as metal nuclei/aerosol unless an FeO-silicate liquid branch is sourced. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S12']
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: []
@@ -135,6 +213,31 @@ materials:
           Strong adherence is inferred only for molten silicate or
           FeOx-silicate deposits. Direct SiO-on-alumina furnace data was not
           found.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: 'soda-lime-silica glass on alumina-silica refractory; close analog for secondary alkali/silicate oxide-melt branch, not first-arrival Na/K metal or SiO film.'
+            temperature_C: 1200
+            atmosphere: 'air / solid-glass-air sessile-drop interface'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'SiO arrival is molecular/SiOx film; source is only a secondary soda-lime-silica oxide-melt wetting analog on alumina-silica refractory.'
+          regime: air
+          source_ids: ['R1-SI1', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: 'R1-SI1'
       alkali:
         class: strongly-adhering
         evidence: analogous-only
@@ -142,6 +245,33 @@ materials:
         note: >
           Reaction-layer chemistry is sourced, but pure vapor deposit adhesion
           is not. Keep the vapor adhesion mechanism fail-closed.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: 'soda-lime-silica glass on alumina-silica refractory; close analog for secondary alkali/silicate oxide-melt branch, not first-arrival Na/K metal or SiO film.'
+            temperature_C: 1200
+            atmosphere: 'air / solid-glass-air sessile-drop interface'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Contact-angle source applies to secondary soda-lime-silica oxide melt on alumina-silica refractory, not primary Na/K metallic condensate; PDF extraction needed for numeric angle table.'
+          regime: air
+          source_ids: ['R1-SI1', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: 'R1-SI1'
       Fe:
         class: strongly-adhering
         evidence: analogous-only
@@ -149,6 +279,31 @@ materials:
         note: >
           FeOx-silicate slag adherence is sourced; liquid metallic Fe is
           generally non-wetting and Fe vapor deposits are uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Representative hot-face service can exceed Fe melting, so first-arrival is classified metallic_liquid; wetting/retention data remains absent.'
+          regime: vacuum
+          source_ids: []
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: []
@@ -202,6 +357,31 @@ materials:
         note: >
           Slag spread and penetration are sourced for dolomitic refractory, but
           exact SiO condensate adhesion is not direct.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'SiO first-arrival treated as molecular/SiOx film; melt-wetting analog not applied without oxidized or mixed-oxide branch evidence. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: thin-film
+          source_ids: ['W:S33']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: moderate
         evidence: analogous-only
@@ -209,6 +389,33 @@ materials:
         note: >
           Cement-kiln coating and boiler sticky-layer behavior are analogs
           only; pure Na/K vapor adhesion is uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Na/K first-arrival treated as metallic condensate; reacted alkali-silicate wetting is unmeasured for this liner. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S27', 'W:S32']
+          needs_experiment: true
+          needs_pdf_extraction: null
       Fe:
         class: moderate
         evidence: analogous-only
@@ -216,6 +423,31 @@ materials:
         note: >
           FeO-bearing basic slag is the analog. Metallic Fe vapor adhesion is
           uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Representative hot-face service can exceed Fe melting, so first-arrival is classified metallic_liquid; wetting/retention data remains absent. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S15', 'W:S33', 'W:S34']
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: ["W:S7"]
@@ -269,6 +501,33 @@ materials:
         note: >
           Molten silicate/CMAS wetting and penetration are the analog. Direct
           SiO condensate adhesion was not found.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg:
+              min: 10
+              max: 30
+            surface_energy_J_m2: 0.4
+            liquid_composition: 'fayalite-type FeO-SiO2 slag melt, Fe/SiO2 mass ratio 1.4-2.0; surface tension value reported for Fe/SiO2 = 2.0.'
+            temperature_C: 1200
+            atmosphere: 'low pO2, 1e-6 to 1e-4 Pa'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Fayalite-on-MgO wetting applies only to a mixed FeO-SiO2 oxide-melt branch after SiO/FeO co-deposition; pure SiO film retention remains uncharacterized.'
+          regime: low-pO2
+          source_ids: ['R1-SI3', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: uncharacterized
         evidence: uncharacterized
@@ -276,6 +535,33 @@ materials:
         note: >
           Chemical compatibility/resistance is sourced, but absence of reaction
           product is not an adhesion or shedding measurement.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Na/K first-arrival treated as metallic condensate; reacted alkali-silicate wetting is unmeasured for this liner. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S36', 'W:S37']
+          needs_experiment: true
+          needs_pdf_extraction: null
       Fe:
         class: strongly-adhering
         evidence: direct
@@ -283,6 +569,33 @@ materials:
         note: >
           Direct only for FeO-bearing liquid slag attack/adherence. Metallic
           Fe vapor remains analogous-only or uncharacterized.
+        surface_interaction:
+          arrival_mode: oxide_melt
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg:
+              min: 10
+              max: 30
+            surface_energy_J_m2: 0.4
+            liquid_composition: 'fayalite-type FeO-SiO2 slag melt, Fe/SiO2 mass ratio 1.4-2.0; surface tension value reported for Fe/SiO2 = 2.0.'
+            temperature_C: 1200
+            atmosphere: 'low pO2, 1e-6 to 1e-4 Pa'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Fayalite-type FeO-SiO2 slag on MgO is close to the FeO-silicate liquid branch already cited for this cell; metallic Fe vapor retention remains uncharacterized.'
+          regime: low-pO2
+          source_ids: ['R1-SI3', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: ["W:S7"]
@@ -334,6 +647,31 @@ materials:
         note: >
           Dense bulk zirconia may shed nonmolten silicate better than porous
           coatings, but the sourced sticky story is CMAS attack of YSZ coatings.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Existing sources cover CMAS/alkali attack or chemistry, not deposit wetting, removal, or retained fraction for this arrival mode.'
+          regime: thin-film
+          source_ids: ['W:S29', 'W:S30']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: uncharacterized
         evidence: uncharacterized
@@ -341,6 +679,33 @@ materials:
         note: >
           Corrosion kinetics and sodium survival do not classify deposit
           adhesion or shedding.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Existing sources cover CMAS/alkali attack or chemistry, not deposit wetting, removal, or retained fraction for this arrival mode.'
+          regime: vacuum
+          source_ids: ['W:S3', 'W:S36']
+          needs_experiment: true
+          needs_pdf_extraction: null
       Fe:
         class: moderate
         evidence: direct
@@ -348,6 +713,31 @@ materials:
         note: >
           Liquid Fe wettability on zirconia is sourced. FeO/Fe-vapor condensate
           adhesion remains uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: weak_proxy
+          applicability: 'Existing data note says liquid Fe wettability on zirconia is sourced, but the numeric angle was not available in R1; extract before using.'
+          regime: vacuum
+          source_ids: ['W:S35']
+          needs_experiment: true
+          needs_pdf_extraction: 'W:S35'
     service_life:
       evidence: uncharacterized
       citations: []
@@ -400,6 +790,31 @@ materials:
         note: >
           Strong adherence applies only if condensate is molten silicate/CMAS.
           Direct SiO film-on-coating data is absent.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: 'soda-lime-silica glass on alumina-silica refractory; close analog for secondary alkali/silicate oxide-melt branch, not first-arrival Na/K metal or SiO film.'
+            temperature_C: 1200
+            atmosphere: 'air / solid-glass-air sessile-drop interface'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'SiO arrival is molecular/SiOx film; source is only a secondary soda-lime-silica oxide-melt wetting analog on alumina-silica refractory.'
+          regime: air
+          source_ids: ['R1-SI1', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: 'R1-SI1'
       alkali:
         class: strongly-adhering
         evidence: analogous-only
@@ -407,6 +822,33 @@ materials:
         note: >
           Dense-alumina alkali products and sticky aerosol layers are analogs;
           direct plasma-spray adhesion data was not found.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: 'soda-lime-silica glass on alumina-silica refractory; close analog for secondary alkali/silicate oxide-melt branch, not first-arrival Na/K metal or SiO film.'
+            temperature_C: 1200
+            atmosphere: 'air / solid-glass-air sessile-drop interface'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Contact-angle source applies to secondary soda-lime-silica oxide melt on alumina-silica refractory, not primary Na/K metallic condensate; PDF extraction needed for numeric angle table.'
+          regime: air
+          source_ids: ['R1-SI1', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: 'R1-SI1'
       Fe:
         class: strongly-adhering
         evidence: analogous-only
@@ -414,6 +856,31 @@ materials:
         note: >
           FeOx-silicate slag is the analog. Fe metal vapor is
           uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Upper coating service can exceed Fe melting, so first-arrival is classified metallic_liquid; plasma-spray Fe retention data remains absent.'
+          regime: vacuum
+          source_ids: []
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: ["W:S19"]
@@ -467,6 +934,31 @@ materials:
         note: >
           Strongly adhering/infiltrating behavior is sourced for molten CMAS on
           porous YSZ coatings; this is an analog for the SiO column.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'SiO first-arrival treated as molecular/SiOx film; melt-wetting analog not applied without oxidized or mixed-oxide branch evidence. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: thin-film
+          source_ids: ['W:S21', 'W:S29', 'W:S30']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: strongly-adhering
         evidence: analogous-only
@@ -474,6 +966,33 @@ materials:
         note: >
           Supported only for alkali-bearing CMAS/NaCl melt. Pure Na/K metal
           vapor remains uncharacterized.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Na/K first-arrival treated as metallic condensate; reacted alkali-silicate wetting is unmeasured for this liner. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S31']
+          needs_experiment: true
+          needs_pdf_extraction: null
       Fe:
         class: uncharacterized
         evidence: uncharacterized
@@ -481,6 +1000,31 @@ materials:
         note: >
           Fe vapor adhesion is uncharacterized. Fe in silicate slag is only an
           analog.
+        surface_interaction:
+          arrival_mode: solid_aerosol
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Fe first-arrival on this representative wall is treated as metal nuclei/aerosol unless an FeO-silicate liquid branch is sourced. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S31', 'W:S35']
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: ["W:S20", "W:S21"]
@@ -533,6 +1077,34 @@ materials:
         note: >
           Siliceous condensate sintering into an aluminosilicate surface is an
           analog. Direct SiO condensate adhesion is absent.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg:
+              YAS_1600_C: '10-15'
+              borosilicate_1600_C: 45
+            surface_energy_J_m2: null
+            liquid_composition: 'Y2O3-Al2O3-SiO2 and B2O3-SiO2 glasses on mullite; close analog for reacted alkali/silicate or SiOx-derived glassy deposit.'
+            temperature_C:
+              range_C: [1300, 1600]
+            atmosphere: 'air'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Mullite sessile-drop values are glass-on-mullite in air; applicable only after a glassy oxide-melt branch forms, not as direct vapor/metal arrival retention.'
+          regime: air
+          source_ids: ['R1-SI2', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: null
       alkali:
         class: strongly-adhering
         evidence: analogous-only
@@ -540,6 +1112,36 @@ materials:
         note: >
           Bulk/mullite chemistry supports reaction products but not
           plasma-sprayed coating adhesion or stickiness.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg:
+              YAS_1600_C: '10-15'
+              borosilicate_1600_C: 45
+            surface_energy_J_m2: null
+            liquid_composition: 'Y2O3-Al2O3-SiO2 and B2O3-SiO2 glasses on mullite; close analog for reacted alkali/silicate or SiOx-derived glassy deposit.'
+            temperature_C:
+              range_C: [1300, 1600]
+            atmosphere: 'air'
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: close_analog
+          applicability: 'Mullite sessile-drop values are glass-on-mullite in air; applicable only after a glassy oxide-melt branch forms, not as direct vapor/metal arrival retention.'
+          regime: air
+          source_ids: ['R1-SI2', 'R1-SI5']
+          needs_experiment: true
+          needs_pdf_extraction: null
       Fe:
         class: strongly-adhering
         evidence: analogous-only
@@ -547,6 +1149,31 @@ materials:
         note: >
           Strong adherence is inferred only if FeO joins silica/alumina to form
           low-melting fayalitic liquid. Fe vapor remains uncharacterized.
+        surface_interaction:
+          arrival_mode: solid_aerosol
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No regolith-condensate bonding onset value. R1-SI5/Fuel-2017 cold-compression-strength testing is methodology only; do not use ash onset values as simulator constants.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires deposit-on-liner thermal-cycle test before deriving retained fraction.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Fe first-arrival on this representative wall is treated as metal nuclei/aerosol unless an FeO-silicate liquid branch is sourced. Existing source IDs are chemistry or attack proxies only; no R1 retention primitive is filled.'
+          regime: vacuum
+          source_ids: ['W:S12', 'W:S34']
+          needs_experiment: true
+          needs_pdf_extraction: null
     service_life:
       evidence: uncharacterized
       citations: ["W:S22", "W:S23"]

@@ -26,6 +26,20 @@ STICKINESS_CLASSES = {
     "strongly-adhering",
     "uncharacterized",
 }
+SURFACE_ARRIVAL_MODES = {
+    "metallic_liquid",
+    "oxide_melt",
+    "molecular_film",
+    "solid_aerosol",
+    "uncharacterized",
+}
+SURFACE_EVIDENCE_TIERS = {
+    "direct",
+    "close_analog",
+    "weak_proxy",
+    "uncharacterized",
+}
+SURFACE_REGIMES = {"air", "low-pO2", "vacuum", "thin-film"}
 
 CERAMIC_ANCHORS = {
     "anorthite",
@@ -93,6 +107,41 @@ def test_wall_materials_schema_is_fail_closed():
             if cell["evidence"] == "uncharacterized":
                 assert cell["class"] == "uncharacterized"
 
+            assert {"surface_interaction", "provenance"} <= set(cell)
+            surface = cell["surface_interaction"]
+            assert {
+                "arrival_mode",
+                "sticking",
+                "wetting",
+                "bonding_or_sintering",
+                "removal",
+                "derived_retention_fraction",
+            } <= set(surface)
+            assert surface["arrival_mode"] in SURFACE_ARRIVAL_MODES
+            alpha_ref = surface["sticking"]["alpha_s_ref"]
+            if isinstance(alpha_ref, dict):
+                assert set(alpha_ref) == {"Na", "K"}
+                assert all(str(value).startswith("data/materials.yaml::default_alpha_s_by_species.") for value in alpha_ref.values())
+            else:
+                assert str(alpha_ref).startswith("data/materials.yaml::default_alpha_s_by_species.")
+            assert {"contact_angle_deg", "surface_energy_J_m2", "liquid_composition", "temperature_C", "atmosphere"} <= set(surface["wetting"])
+            assert {"onset_C", "basis"} <= set(surface["bonding_or_sintering"])
+            assert {"reentrainment", "thermal_cycle_spallation_risk"} <= set(surface["removal"])
+            assert surface["derived_retention_fraction"]["value"] is None
+
+            provenance = cell["provenance"]
+            assert {"evidence_tier", "applicability", "regime", "source_ids", "needs_experiment", "needs_pdf_extraction"} <= set(provenance)
+            assert provenance["evidence_tier"] in SURFACE_EVIDENCE_TIERS
+            assert provenance["regime"] in SURFACE_REGIMES
+            assert isinstance(provenance["source_ids"], list)
+            assert all(isinstance(source_id, str) and source_id for source_id in provenance["source_ids"])
+            assert isinstance(provenance["needs_experiment"], bool)
+            assert provenance["needs_pdf_extraction"] is None or isinstance(provenance["needs_pdf_extraction"], str)
+            if provenance["evidence_tier"] == "direct":
+                assert provenance["source_ids"]
+            if provenance["evidence_tier"] == "uncharacterized":
+                assert provenance["needs_experiment"]
+
         assert entry["service_life"]["evidence"] in EVIDENCE_TAGS
 
 
@@ -112,6 +161,24 @@ def test_ceramic_types_schema_is_fail_closed():
             assert "wt_pct" in composition
         else:
             assert "wt_pct_window" in composition
+        if "window" in composition:
+            window = composition["window"]
+            assert {
+                "diagram_ref",
+                "temperature_C",
+                "phase_field",
+                "digitized_by",
+                "tolerance_wt_pct",
+            } <= set(window)
+            assert isinstance(window["diagram_ref"], str)
+            assert window["diagram_ref"]
+            assert window["temperature_C"] is not None
+            assert isinstance(window["phase_field"], str)
+            assert window["phase_field"]
+            assert isinstance(window["digitized_by"], str)
+            assert window["digitized_by"]
+            assert isinstance(window["tolerance_wt_pct"], (int, float))
+            assert window["tolerance_wt_pct"] >= 0
 
         service_temp = entry["service_temp"]
         assert {"value_C", "kind", "citations", "note"} <= set(service_temp)
@@ -122,6 +189,24 @@ def test_ceramic_types_schema_is_fail_closed():
         suitability = entry["liner_suitability"]
         assert {"verdict", "citations", "note"} <= set(suitability)
         assert isinstance(suitability["citations"], list)
+
+
+def test_ceramic_phase_diagram_windows_are_provenanced():
+    ceramics = _load_yaml("ceramic_types.yaml")["ceramics"]
+    phase_diagram_windows = {
+        ceramic_id: entry["composition"]["window"]
+        for ceramic_id, entry in ceramics.items()
+        if "window" in entry["composition"]
+    }
+
+    assert set(phase_diagram_windows) == {"mullite", "cordierite_mullite"}
+    for window in phase_diagram_windows.values():
+        assert window["diagram_ref"]
+        assert window["temperature_C"] is not None
+        assert window["phase_field"]
+        assert window["digitized_by"]
+        assert isinstance(window["tolerance_wt_pct"], (int, float))
+        assert window["tolerance_wt_pct"] >= 0
 
 
 def test_direct_and_service_cells_have_citations():

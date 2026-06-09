@@ -42,6 +42,12 @@ ceramics:
       wt_pct_window:
         Al2O3: [71.8, 74.3]
         SiO2: [25.7, 28.2]
+      window:
+        diagram_ref: "Mao et al. 2006, J. Am. Ceram. Soc. 89(1):298-308, Fig. 1, DOI:10.1111/j.1551-2916.2005.00698.x; CAS Mul liquidus field"
+        temperature_C: 1600
+        phase_field: "mullite solid-solution classifier window inside the CaO-Al2O3-SiO2 Mul field"
+        digitized_by: "codex-R2-2026-06-09; text-bounded window, no polygon expansion"
+        tolerance_wt_pct: 0.5
       citations: ["C:S2"]
       note: >
         Source-supported mullite solid solution is 60-63 mol% Al2O3 below
@@ -299,6 +305,12 @@ ceramics:
         MgO: [4.0, 7.0]
         Al2O3: [35.0, 48.0]
         SiO2: [45.0, 58.0]
+      window:
+        diagram_ref: "Smart and Glasser 1981, Ceram. Int. 7(3):90-97, DOI:10.1016/0272-8842(81)90003-1; MgO-Al2O3-SiO2 1350 C isothermal section"
+        temperature_C: 1350
+        phase_field: "cordierite-mullite kiln-furniture body; cordierite/mullite MAS assemblage"
+        digitized_by: "codex-R2-2026-06-09; product window retained, no ternary-polygon expansion"
+        tolerance_wt_pct: 0.5
       pure_cordierite_wt_pct: {MgO: 13.8, Al2O3: 34.9, SiO2: 51.4}
       citations: ["C:S18", "C:S19"]
       note: >
