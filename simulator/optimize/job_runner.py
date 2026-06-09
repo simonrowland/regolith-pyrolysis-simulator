@@ -161,6 +161,17 @@ class OptimizerJobRunner:
                     tail
                     or "optimizer process exited without a terminal status marker"
                 )
+            elif terminal_status[0] == STATUS_SUCCEEDED and not (
+                self._has_stored_results(job_id)
+            ):
+                # Symmetric with the live-completion path: a success marker is
+                # necessary but not sufficient — refuse to advertise SUCCEEDED
+                # when the persisted result store is missing/unreadable.
+                meta["status"] = STATUS_FAILED
+                meta["stderr_tail"] = (
+                    tail
+                    or "optimizer success marker present but no stored results"
+                )
             else:
                 status, marker_detail = terminal_status
                 meta["status"] = status

@@ -913,6 +913,29 @@ def test_optimizer_job_register_marks_orphan_with_success_marker_succeeded_on_re
     assert meta["completed_at"] is not None
 
 
+def test_optimizer_job_register_marks_orphan_success_marker_without_results_failed(
+    tmp_path,
+) -> None:
+    # A success marker is necessary but not sufficient: if the persisted result
+    # store is missing/unreadable, the orphaned-reload path must NOT advertise
+    # SUCCEEDED (symmetric with the live-completion stored-results gate).
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "orphan-success-marker-no-results"
+    job_dir.mkdir(parents=True)
+    _write_running_job_meta(job_dir, "orphan-success-marker-no-results")
+    # Deliberately NO _write_minimal_result_table: marker says success, store absent.
+    _write_job_status_marker(job_dir, status="SUCCEEDED")
+
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+    jobs = runner.list_jobs()
+
+    assert jobs[0]["job_id"] == "orphan-success-marker-no-results"
+    assert jobs[0]["status"] == "FAILED"
+    assert "no stored results" in jobs[0]["stderr_tail"]
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "FAILED"
+
+
 def test_optimizer_job_register_marks_orphan_with_failure_marker_failed_despite_results(
     tmp_path,
 ) -> None:
