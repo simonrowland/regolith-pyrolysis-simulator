@@ -594,6 +594,7 @@ def test_optimizer_feedstock_profile_scanner(client, tmp_path, monkeypatch) -> N
 def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
     popen = _FakePopenFactory()
     client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    client.application.config["OPTIMIZER_JOB_BUDGET_CAP"] = 3
 
     response = client.post(
         "/api/optimizer/jobs",
@@ -674,6 +675,7 @@ def test_optimizer_job_submit_rejects_unknown_profile_before_spawn(client) -> No
     [
         ({"budget": "many"}, "budget must be a positive integer"),
         ({"budget": 0}, "budget must be a positive integer"),
+        ({"budget": 6}, "budget must be <= 5"),
         ({"parallel": "wide"}, "parallel must be a positive integer"),
         ({"parallel": 0}, "parallel must be a positive integer"),
         ({"parallel": 3}, "parallel must be <= 2"),
@@ -690,6 +692,7 @@ def test_optimizer_job_submit_rejects_bad_launch_values_before_spawn(
 ) -> None:
     popen = _FakePopenFactory()
     client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    client.application.config["OPTIMIZER_JOB_BUDGET_CAP"] = 5
     client.application.config["OPTIMIZER_JOB_PARALLEL_CAP"] = 2
     payload = {
         "feedstock_id": "lunar_mare_low_ti",
@@ -844,6 +847,48 @@ def test_optimizer_job_register_rebuilds_from_disk_on_fresh_app(tmp_path) -> Non
     assert job["version_badge"]["status"] == "unknown"
 
 
+def test_optimizer_job_register_marks_orphan_with_results_succeeded_on_rebuild(
+    tmp_path,
+) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "orphan-with-results"
+    job_dir.mkdir(parents=True)
+    (job_dir / ".job_meta.json").write_text(
+        json.dumps(
+            {
+                "job_id": "orphan-with-results",
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "lunar-mare-low-ti-objectives-v1",
+                "feedstock_id": "lunar_mare_low_ti",
+                "profile_id": "lunar-mare-low-ti-objectives-v1",
+                "strategy": "random",
+                "fidelity": "stub",
+                "budget": 1,
+                "parallel": 1,
+                "seed": 0,
+                "pid": 999999999,
+                "status": "RUNNING",
+                "created_at": "2026-06-08T00:00:00+00:00",
+                "started_at": "2026-06-08T00:00:01+00:00",
+                "eta": None,
+                "stderr_tail": "",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    _write_minimal_result_table(job_dir)
+
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+    jobs = runner.list_jobs()
+
+    assert jobs[0]["job_id"] == "orphan-with-results"
+    assert jobs[0]["status"] == "SUCCEEDED"
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "SUCCEEDED"
+    assert meta["completed_at"] is not None
+
+
 def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_path) -> None:
     runs_dir = tmp_path / "runs"
     job_dir = runs_dir / "jobs" / "dead-running-job"
@@ -861,6 +906,7 @@ def test_optimizer_job_register_marks_dead_running_job_failed_on_rebuild(tmp_pat
                 "budget": 1,
                 "parallel": 1,
                 "seed": 0,
+                "pid": 999999999,
                 "status": "RUNNING",
                 "created_at": "2026-06-08T00:00:00+00:00",
                 "started_at": "2026-06-08T00:00:01+00:00",

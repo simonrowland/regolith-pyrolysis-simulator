@@ -52,6 +52,7 @@ OPTIMIZER_JOBS_DIR_NAME = 'jobs'
 OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
 OPTIMIZER_JOB_FIDELITIES = ('stub', 'fast', 'high', 'auto')
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
+DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 
@@ -85,6 +86,15 @@ def _optimizer_job_parallel_cap() -> int:
         cap = int(configured)
     except (TypeError, ValueError):
         cap = DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
+    return max(1, cap)
+
+
+def _optimizer_job_budget_cap() -> int:
+    configured = current_app.config.get('OPTIMIZER_JOB_BUDGET_CAP')
+    try:
+        cap = int(configured)
+    except (TypeError, ValueError):
+        cap = DEFAULT_OPTIMIZER_JOB_BUDGET_CAP
     return max(1, cap)
 
 
@@ -725,7 +735,11 @@ def _parse_optimizer_job_request(
     if fidelity not in OPTIMIZER_JOB_FIDELITIES:
         return None, f'unknown fidelity: {fidelity}'
 
-    budget, error = _positive_int_payload(payload, 'budget')
+    budget, error = _positive_int_payload(
+        payload,
+        'budget',
+        maximum=_optimizer_job_budget_cap(),
+    )
     if error:
         return None, error
     parallel, error = _positive_int_payload(
@@ -767,6 +781,7 @@ def _optimizer_launch_context() -> dict[str, Any]:
         'job_strategy_choices': OPTIMIZER_JOB_STRATEGIES,
         'job_fidelity_choices': OPTIMIZER_JOB_FIDELITIES,
         'job_parallel_cap': _optimizer_job_parallel_cap(),
+        'job_budget_cap': _optimizer_job_budget_cap(),
         'mre_presets': _mre_preset_catalog_payload(),
         **_optimizer_jobs_context(),
     }

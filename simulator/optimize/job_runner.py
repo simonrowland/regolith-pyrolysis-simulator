@@ -150,12 +150,17 @@ class OptimizerJobRunner:
                 continue
             if self._pid_is_alive(meta.get("pid")):
                 continue
-            meta["status"] = STATUS_FAILED
             meta["completed_at"] = meta.get("completed_at") or self._now()
-            meta["stderr_tail"] = (
-                self._log_tail(job_id)
-                or "optimizer process exited before the web process recorded an exit code"
-            )
+            tail = self._log_tail(job_id)
+            meta["stderr_tail"] = tail
+            if self._has_stored_results(job_id):
+                meta["status"] = STATUS_SUCCEEDED
+            else:
+                meta["status"] = STATUS_FAILED
+                meta["stderr_tail"] = (
+                    tail
+                    or "optimizer process exited before the web process recorded an exit code"
+                )
             self._write_meta(meta)
             changed = True
         if changed:
