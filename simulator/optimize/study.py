@@ -381,6 +381,7 @@ def run(
                 active_strategy.tell(tell_batch)
             evaluated += len(candidates)
 
+    failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
     leaderboard = tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
     pareto = pareto_front(
@@ -396,6 +397,7 @@ def run(
             feedstock=feedstock,
             fidelity=fidelity,
             definitions=definitions,
+            failure_counts=failure_counts,
         )
         raise StudyNoFeasibleError("no feasible candidates; winner.recipe.yaml not written")
     winner = pareto_ranked[0]
@@ -409,6 +411,7 @@ def run(
         leaderboard=leaderboard,
         winner=winner,
         schema=active_schema,
+        failure_counts=failure_counts,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1138,6 +1141,15 @@ def _product_summary_mapping(reference: RunReference | None) -> Mapping[str, Any
     return MappingProxyType(dict(reference.product_summary))
 
 
+def _failure_counts(records: Sequence[StudyRecord]) -> Mapping[str, int]:
+    counts: dict[str, int] = {}
+    for record in records:
+        if record.failure_category is None:
+            continue
+        counts[record.failure_category] = counts.get(record.failure_category, 0) + 1
+    return MappingProxyType(dict(sorted(counts.items())))
+
+
 def _coating_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
     fields: list[str] = []
     if any("campaigns_to_resinter" in record.product_summary for record in records):
@@ -1250,13 +1262,18 @@ def _write_artifacts(
     leaderboard: Sequence[StudyRecord],
     winner: StudyRecord,
     schema: RecipeSchema,
+    failure_counts: Mapping[str, int],
 ) -> dict[str, Path]:
     pareto_path = out / "pareto.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
+    pareto_payload = dict(
+        _pareto_payload(profile, feedstock, fidelity, definitions, pareto, winner, schema)
+    )
+    pareto_payload["failure_counts"] = dict(failure_counts)
     pareto_path.write_text(
         json.dumps(
-            _pareto_payload(profile, feedstock, fidelity, definitions, pareto, winner, schema),
+            pareto_payload,
             indent=2,
             sort_keys=True,
             allow_nan=False,
@@ -1283,12 +1300,14 @@ def _write_empty_artifacts(
     feedstock: str,
     fidelity: str,
     definitions: Sequence[ObjectiveDefinition],
+    failure_counts: Mapping[str, int],
 ) -> None:
     (out / "pareto.json").write_text(
         json.dumps(
             {
                 "feedstock": feedstock,
                 "fidelity": fidelity,
+                "failure_counts": dict(failure_counts),
                 "objectives": [_definition_payload(definition) for definition in definitions],
                 "pareto": [],
                 "profile": profile_id(profile),

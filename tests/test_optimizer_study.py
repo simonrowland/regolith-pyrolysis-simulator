@@ -131,9 +131,15 @@ def _read_provenance(out_dir: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in (out_dir / "provenance.jsonl").read_text().splitlines()]
 
 
-def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | None = None):
+def _evaluator(
+    *,
+    infeasible: set[int] | None = None,
+    engine_bug: set[int] | None = None,
+    out_of_domain: set[int] | None = None,
+):
     bad = infeasible or set()
     aborts = engine_bug or set()
+    domain_rejects = out_of_domain or set()
 
     def evaluate_patch(
         patch: RecipePatch,
@@ -158,6 +164,28 @@ def _evaluator(*, infeasible: set[int] | None = None, engine_bug: set[int] | Non
                 run_reference=RunReference(
                     status="failed",
                     trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
+                ),
+            )
+        if index in domain_rejects:
+            return ScoredResult(
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=False,
+                failure_category=FailureCategory.OUT_OF_DOMAIN,
+                feasibility_margins={"backend_domain": GateMargin(
+                    gate="backend_domain",
+                    feasible=False,
+                    margin=-1.0,
+                    threshold=_threshold(),
+                    observed=0.0,
+                    detail="test alphamelts domain rejection",
+                )},
+                failing_gates=("backend_domain",),
+                run_reference=RunReference(
+                    status="ok",
+                    trace={"backend_status": "out_of_domain", "snapshots": ["heavy"]},
+                    backend_status="out_of_domain",
                 ),
             )
         if index in bad:
@@ -481,6 +509,33 @@ def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(
     assert logged["random-7-000001"]["feasibility_margins"]["delivered_stream_purity"]["margin"] < 0
 
 
+def test_out_of_domain_candidate_is_stored_and_study_continues(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(out_of_domain={1}),
+    )
+
+    assert result.winner.candidate_id == "random-7-000002"
+    pareto = json.loads((tmp_path / "pareto.json").read_text())
+    provenance = _read_provenance(tmp_path)
+    logged = {row["candidate_id"]: row for row in provenance}
+    stored = {row.candidate_id: row for row in _stored_rows(tmp_path)}
+
+    assert pareto["failure_counts"] == {"out_of_domain": 1}
+    assert logged["random-7-000001"]["status"] == "out_of_domain"
+    assert logged["random-7-000001"]["failure_category"] == "out_of_domain"
+    assert logged["random-7-000001"]["objectives"] == {}
+    assert logged["random-7-000001"]["feasibility_margins"]["backend_domain"]["observed"] == 0.0
+    assert stored["random-7-000001"].failure_category is FailureCategory.OUT_OF_DOMAIN
+
+
 def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:
     with pytest.raises(study.StudyNoFeasibleError):
         study.run(
@@ -503,6 +558,31 @@ def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:
     ]
     assert len(_read_provenance(tmp_path)) == 3
     assert len(_stored_rows(tmp_path)) == 3
+    assert not (tmp_path / "winner.recipe.yaml").exists()
+
+
+def test_all_out_of_domain_raises_no_feasible_and_logs_count(tmp_path) -> None:
+    with pytest.raises(study.StudyNoFeasibleError):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "random",
+            "stub",
+            1,
+            3,
+            tmp_path,
+            seed=7,
+            evaluator=_evaluator(out_of_domain={0, 1, 2}),
+        )
+
+    pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
+    assert pareto_payload["pareto"] == []
+    assert pareto_payload["winner_candidate_id"] is None
+    assert pareto_payload["failure_counts"] == {"out_of_domain": 3}
+    assert len(_read_provenance(tmp_path)) == 3
+    stored = _stored_rows(tmp_path)
+    assert len(stored) == 3
+    assert {row.failure_category for row in stored} == {FailureCategory.OUT_OF_DOMAIN}
     assert not (tmp_path / "winner.recipe.yaml").exists()
 
 

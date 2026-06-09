@@ -29,6 +29,7 @@ import importlib.metadata
 import math
 import os
 import re
+import signal
 import subprocess
 import tempfile
 import warnings
@@ -69,6 +70,13 @@ MELTS_OXIDE_ALIASES.update({
 FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}
 FE3_TO_FEOT_FACTOR = 0.8998
+
+
+def _signal_name(returncode: int) -> str:
+    try:
+        return signal.Signals(-int(returncode)).name
+    except ValueError:
+        return f'signal {-int(returncode)}'
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -1233,16 +1241,36 @@ class AlphaMELTSBackend(MeltBackend):
                     timeout=20,
                     env=env,
                 )
-            except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
+            except subprocess.TimeoutExpired as exc:
+                raise RuntimeError(
+                    'AlphaMELTS subprocess equilibrium timed out: '
+                    f'{exc}'
+                ) from exc
+            except FileNotFoundError as exc:
                 self._mode = None
                 raise RuntimeError(
-                    f'AlphaMELTS subprocess equilibrium failed: {exc}'
+                    'AlphaMELTS subprocess equilibrium binary not found: '
+                    f'{exc}'
                 ) from exc
 
-            if result.returncode != 0:
-                self._mode = None
+            if result.returncode < 0:
+                signal_name = _signal_name(result.returncode)
+                return self._emit_equilibrium_result(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    warnings=[
+                        *(warnings or []),
+                        'AlphaMELTS subprocess exited via '
+                        f'{signal_name} (returncode {result.returncode}); '
+                        'composition outside Rhyolite-MELTS calibration domain',
+                    ],
+                    status='out_of_domain',
+                )
+            if result.returncode > 0:
                 raise RuntimeError(
                     'AlphaMELTS subprocess equilibrium failed: '
+                    f'returncode {result.returncode}: '
                     f'{result.stderr or result.stdout}'
                 )
 

@@ -449,6 +449,32 @@ def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable()
     assert "backend_status='unavailable'" in str(raised.value)
 
 
+def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(_execution(backend_status="out_of_domain")),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.objectives is None
+    assert result.failing_gates == ("backend_domain",)
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    margin = result.feasibility_margins["backend_domain"]
+    assert margin.observed == pytest.approx(0.0)
+    assert math.isfinite(margin.margin)
+
+
 def test_real_backend_ok_but_non_authoritative_aborts_as_backend_unavailable() -> None:
     real_profile = {
         **PROFILE,

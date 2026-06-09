@@ -1,4 +1,5 @@
 import math
+import subprocess
 import time
 import types
 from pathlib import Path
@@ -138,6 +139,165 @@ def test_alphamelts_subprocess_liquidus_finder_is_unavailable():
 
     assert result.status == 'unavailable'
     assert any('python_api mode' in warning for warning in result.warnings)
+
+
+def _melts_domain_composition() -> dict[str, float]:
+    return {
+        'SiO2': 50.0,
+        'Al2O3': 15.0,
+        'FeO': 10.0,
+        'MgO': 10.0,
+        'CaO': 10.0,
+        'Na2O': 5.0,
+    }
+
+
+def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    calls = []
+
+    def fake_run(*args, **kwargs):
+        calls.append((args, kwargs))
+        if len(calls) == 1:
+            return types.SimpleNamespace(
+                returncode=-6,
+                stdout='... liquidus search stopped mid-stream',
+                stderr='',
+            )
+        return types.SimpleNamespace(returncode=0, stdout='stable', stderr='')
+
+    def fake_parse(*args, **kwargs):
+        return EquilibriumResult(
+            temperature_C=kwargs['temperature_C'],
+            pressure_bar=kwargs['pressure_bar'],
+            fO2_log=kwargs['fO2_log'],
+            phases_present=['liquid'],
+            phase_masses_kg={'liquid': 1.0},
+            liquid_fraction=1.0,
+            status='ok',
+        )
+
+    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+    monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
+
+    first = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    second = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert first.status == 'out_of_domain'
+    assert any('SIGABRT' in warning for warning in first.warnings)
+    assert backend._mode == 'subprocess'
+    assert second.status == 'ok'
+    assert len(calls) == 2
+
+
+def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+
+    def fake_run(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=20)
+
+    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+
+    with pytest.raises(RuntimeError, match='timed out'):
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+    assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypatch):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+
+    def fake_run(*args, **kwargs):
+        raise FileNotFoundError('missing binary')
+
+    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+
+    with pytest.raises(RuntimeError, match='binary not found'):
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+    assert backend._mode is None
+
+
+def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        lambda *args, **kwargs: types.SimpleNamespace(
+            returncode=2,
+            stdout='',
+            stderr='wrapper error',
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match='returncode 2'):
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+    assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        lambda *args, **kwargs: types.SimpleNamespace(
+            returncode=0,
+            stdout='successful run but changed format',
+            stderr='',
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match='no stable assemblage verdict'):
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+    assert backend._mode == 'subprocess'
 
 
 def test_configured_unavailable_alphamelts_backend_fail_closes():

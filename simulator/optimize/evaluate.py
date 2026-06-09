@@ -31,6 +31,7 @@ from simulator.optimize.physics import (
     FeasibilityResult,
     GateMargin,
     PhysicsConstraintSet,
+    ThresholdSpec,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import validate_profile
@@ -47,6 +48,7 @@ MASS_BALANCE_ABORT_PCT = 5e-12
 class FailureCategory(str, Enum):
     INVALID_PATCH = "invalid_patch"
     INFEASIBLE_RECIPE = "infeasible_recipe"
+    OUT_OF_DOMAIN = "out_of_domain"
     PHYSICS_REFUSED = "physics_refused"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
@@ -287,6 +289,16 @@ def evaluate(
             cache_key_value=key,
         )
 
+    backend_status = _latest_backend_status(run_execution)
+    if backend_status == "out_of_domain":
+        return _out_of_domain_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+        )
+
     _abort_on_non_authoritative_backend_status(
         run_execution,
         spec=spec,
@@ -522,6 +534,44 @@ def _infeasible_result(
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
         run_reference=_run_reference(run_execution, profile),
+    )
+
+
+def _out_of_domain_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.OUT_OF_DOMAIN,
+        feasibility_margins={"backend_domain": _out_of_domain_margin()},
+        failing_gates=("backend_domain",),
+        run_reference=_run_reference(run_execution, profile),
+        notes=("backend_status=out_of_domain",),
+    )
+
+
+def _out_of_domain_margin() -> GateMargin:
+    threshold = ThresholdSpec(
+        id="alphamelts_domain",
+        value=1.0,
+        units="boolean",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: backend_status out_of_domain",
+    )
+    return GateMargin(
+        gate="backend_domain",
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=0.0,
+        detail="authoritative backend rejected composition as out of domain",
     )
 
 

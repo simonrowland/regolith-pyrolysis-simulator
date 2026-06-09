@@ -314,10 +314,12 @@ class PhysicsConstraintSet:
                         f"contaminants={contaminants}"
                     )
             if math.isinf(worst_margin):
-                return _fail_closed(
+                return _margin(
                     "delivered_stream_purity",
+                    -self.stream_purity_min.value,
                     self.stream_purity_min,
-                    "no nonzero delivered stream evidence",
+                    0.0,
+                    "zero delivered stream",
                 )
             return _margin(
                 "delivered_stream_purity",

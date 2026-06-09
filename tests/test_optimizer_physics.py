@@ -122,6 +122,20 @@ def test_rev5_same_stage_mixed_stream_recipe_is_infeasible_by_purity_only() -> N
         assert result.margins[gate].margin >= 0.0
 
 
+def test_delivered_stream_purity_zero_delivery_is_infeasible_not_nan() -> None:
+    trace = _trace(condensed=({(3, "SiO"): 0.0},))
+
+    result = PhysicsConstraintSet().evaluate(trace)
+
+    assert not result.feasible
+    margin = result.margins["delivered_stream_purity"]
+    assert not margin.feasible
+    assert margin.observed == pytest.approx(0.0)
+    assert margin.margin == pytest.approx(-margin.threshold.value)
+    assert math.isfinite(margin.observed)
+    assert math.isfinite(margin.margin)
+
+
 def test_clean_selective_recipe_trace_is_feasible_with_signed_margins() -> None:
     trace = _trace(condensed=({(1, "Fe"): 5.0, (3, "SiO"): 20.0},))
 
@@ -401,14 +415,17 @@ def test_missing_required_trace_data_fails_closed_for_all_gates(
         ({(3, "SiO"): 0.0},),
     ),
 )
-def test_delivered_stream_purity_empty_or_zero_stream_fails_closed(
+def test_delivered_stream_purity_empty_or_zero_stream_is_finite_infeasible(
     condensed: tuple[dict[tuple[int, str], float], ...],
 ) -> None:
     margin = PhysicsConstraintSet().delivered_stream_purity(_trace(condensed=condensed))
 
     assert not margin.feasible
     assert margin.margin < 0.0
-    assert "fail-closed" in margin.detail
+    assert margin.observed == pytest.approx(0.0)
+    assert math.isfinite(margin.margin)
+    assert math.isfinite(margin.observed)
+    assert "zero delivered stream" in margin.detail
 
 
 def test_delivered_stream_purity_delta_count_mismatch_fails_closed() -> None:
