@@ -226,6 +226,21 @@ def test_wall_reactive_exchange_schema_is_regime_gated_and_sourced():
                     assert cell["needs_experiment"]
 
 
+def test_fused_silica_alkali_reducing_vacuum_is_fail_closed():
+    cells = _load_yaml("wall_materials.yaml")["reactive_exchange"]["fused_silica"]["alkali_NaK"]
+    reducing_vacuum = [cell for cell in cells if cell["regime"] == "reducing_vacuum"]
+    assert len(reducing_vacuum) == 1
+
+    cell = reducing_vacuum[0]
+    assert cell["product_phase"] == "uncharacterized"
+    assert cell["favorability"] == "uncharacterized"
+    assert cell["sign"] == "uncharacterized"
+    assert cell["redox_path"] == "uncharacterized"
+    assert cell["source_ids"] == []
+    assert cell["needs_experiment"] is True
+    assert cell["needs_calphad"] is True
+
+
 def test_wall_reactive_exchange_known_incorporations_are_regime_gated():
     exchange = _load_yaml("wall_materials.yaml")["reactive_exchange"]
 

@@ -130,7 +130,7 @@ reactive_exchange_templates:
       service_temp_shift: uncharacterized
       magnitude: qualitative
       basis: 'Kitaoka treats mullite stability under oxygen-potential gradients; no hot regolith condensate adhesion constant is filled.'
-    evidence_tier: direct_observation
+    evidence_tier: phase_diagram
     source_ids: ['R4-RX-Kitaoka-2019']
     needs_experiment: true
     needs_calphad: false
@@ -157,7 +157,7 @@ reactive_exchange_templates:
     regime: buffered
     product_phase: 'forsterite (Mg2SiO4) / Mg-silicate reaction layer'
     favorability: phase_diagram_supported
-    sign: consolidating
+    sign: neutral
     redox_path: 'SiO must enter an oxidized SiO2/silica-activity branch before MgO + SiO2 can form forsterite.'
     oxygen_activity_window: 'glazed or deposit-buffered silica activity; numeric pO2 window unfilled'
     total_pressure_window: null
@@ -234,6 +234,7 @@ reactive_exchange:
         needs_calphad: false
     alkali_NaK:
       - *rx_silica_alkali_silicate
+      - *rx_uncharacterized_reducing_vacuum
     Fe_FeO:
       - *rx_silica_feo_fayalite
   dense_alumina:
