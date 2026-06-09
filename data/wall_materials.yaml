@@ -19,6 +19,20 @@ species_keys:
     - alkali
     - Fe
 
+wall_surface_state:
+  enum:
+    - unglazed
+    - glazed
+    - coated
+  coated:
+    material_refs:
+      - silicon_carbide_coating
+      - mzo_coating
+    substrate: glassy_regolith_bulk
+    note: >-
+      Engineered coating state is material-specific and regime-gated. It does
+      not imply inertness unless the coating/species/regime cell is sourced.
+
 reactive_exchange_templates:
   uncharacterized_reducing_vacuum: &rx_uncharacterized_reducing_vacuum
     regime: reducing_vacuum
@@ -210,6 +224,82 @@ reactive_exchange_templates:
     source_ids: ['R1-SI3', 'R4-CD7', 'ACerS-NIST-SRD31']
     needs_experiment: true
     needs_calphad: true
+  sic_oxidizing_passive_silica: &rx_sic_oxidizing_passive_silica
+    regime: oxidizing
+    product_phase: 'SiO2(s) passive scale'
+    favorability: source_supported
+    sign: consolidating
+    redox_path: 'Oxidizing SiC forms SiO2 + CO; the silica scale can limit further oxidation only in the passive branch.'
+    oxygen_activity_window: 'oxidizing/passive SiC branch; not the project low-pO2 vacuum default'
+    total_pressure_window: null
+    net_liner_delta: thickening
+    reaction_site: surface
+    wall_property_effect:
+      structural: passivating_if_adherent
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'NASA and review sources distinguish passive SiO2-scale formation from active SiO(g) loss; coating adhesion and regolith-deposit survival remain untested.'
+    evidence_tier: direct_observation
+    source_ids: ['R6-SiC-active-oxidation-NASA-2011', 'R6-SiC-dry-hydrothermal-review-2021']
+    needs_experiment: true
+    needs_calphad: false
+  sic_reducing_vacuum_active_oxidation: &rx_sic_reducing_vacuum_active_oxidation
+    regime: reducing_vacuum
+    product_phase: 'SiO(g) + CO(g)'
+    favorability: source_supported
+    sign: volatile_or_revolatilizing
+    redox_path: 'Low oxygen potential shifts SiC oxidation toward volatile SiO(g) rather than a protective SiO2 scale.'
+    oxygen_activity_window: 'low-pO2 / reduced oxygen-potential branch; numeric project pO2 threshold unfilled'
+    total_pressure_window: 'low-pressure and low-pO2 analogs only; project total-pressure window untested'
+    net_liner_delta: thinning
+    reaction_site: surface
+    wall_property_effect:
+      structural: surface_recession
+      service_temp_shift: lower
+      magnitude: qualitative
+      basis: 'Active oxidation produces volatile SiO and extensive SiC attack; this is a hazard branch, not protection.'
+    evidence_tier: direct_observation
+    source_ids: ['R6-SiC-active-oxidation-NASA-2011', 'R6-SiC-active-passive-transition-NASA-1990', 'R6-SiC-hydrogen-low-pressure-NASA-1989', 'R6-SiC-low-pressure-oxygen-ORNL']
+    needs_experiment: true
+    needs_calphad: true
+  sic_other_species_uncharacterized: &rx_sic_other_species_uncharacterized
+    regime: reducing_vacuum
+    product_phase: uncharacterized
+    favorability: uncharacterized
+    sign: uncharacterized
+    redox_path: 'No source-backed Na/K or Fe/FeO reactive-exchange product was found for plasma-sprayed SiC in hot low-pO2, low-total-pressure service.'
+    oxygen_activity_window: 'project default low-pO2 branch'
+    total_pressure_window: 'project low-total-pressure branch; untested'
+    net_liner_delta: uncharacterized
+    reaction_site: unknown
+    wall_property_effect:
+      structural: uncharacterized
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'Bulk SiC temperature data and APS decomposition data do not characterize Na/K or Fe deposit chemistry.'
+    evidence_tier: uncharacterized
+    source_ids: ['R6-SiC-SaintGobain-Hexoloy-SE', 'R6-SiC-APS-2020']
+    needs_experiment: true
+    needs_calphad: true
+  mzo_reducing_vacuum_uncharacterized: &rx_mzo_reducing_vacuum_uncharacterized
+    regime: reducing_vacuum
+    product_phase: uncharacterized
+    favorability: uncharacterized
+    sign: uncharacterized
+    redox_path: 'MZO/zirconia-family sources support thermal-spray use and glass-refractory corrosion context, not direct SiO/Na/K/Fe exchange under low-pO2 vacuum.'
+    oxygen_activity_window: 'project default low-pO2 branch'
+    total_pressure_window: 'project low-total-pressure branch; untested'
+    net_liner_delta: uncharacterized
+    reaction_site: unknown
+    wall_property_effect:
+      structural: uncharacterized
+      service_temp_shift: uncharacterized
+      magnitude: qualitative
+      basis: 'ZrO2/glass corrosion data show alkali-bearing glasses can still increase ZrO2 corrosion; do not assume inertness for MZO deposits.'
+    evidence_tier: uncharacterized
+    source_ids: ['R6-MZO-SaintGobain-TDS', 'R6-MZO-NASA-RB211-1985', 'R6-zirconia-glass-corrosion-1986']
+    needs_experiment: true
+    needs_calphad: true
 
 reactive_exchange:
   fused_silica:
@@ -290,6 +380,21 @@ reactive_exchange:
       - *rx_alumina_alkali_beta_spall
     Fe_FeO:
       - *rx_uncharacterized_reducing_vacuum
+  silicon_carbide_coating:
+    SiO:
+      - *rx_sic_oxidizing_passive_silica
+      - *rx_sic_reducing_vacuum_active_oxidation
+    alkali_NaK:
+      - *rx_sic_other_species_uncharacterized
+    Fe_FeO:
+      - *rx_sic_other_species_uncharacterized
+  mzo_coating:
+    SiO:
+      - *rx_mzo_reducing_vacuum_uncharacterized
+    alkali_NaK:
+      - *rx_mzo_reducing_vacuum_uncharacterized
+    Fe_FeO:
+      - *rx_mzo_reducing_vacuum_uncharacterized
 
 equilibrium_phase_window:
   Na2O-SiO2:
@@ -1507,3 +1612,315 @@ materials:
       note: >
         Water-vapor cycling and rapid-sintering evidence do not characterize
         regolith SiO/Na/K/FeO deposit life.
+
+  silicon_carbide_coating:
+    label: "Plasma-sprayed silicon carbide coating"
+    role: "plasma-sprayed coating"
+    wall_surface_state: coated
+    application:
+      method: plasma_spray
+      feedstock: bar_stock
+      substrate: glassy_regolith_bulk
+      self_bootstrap_source:
+        silicon: refinery_silicon_product
+        carbon: stage0_carbon
+        status: needs_experiment
+      note: >
+        Owner-proposed bar-stock applicator is not validated by the indexed
+        thermal-spray sources; SiC APS literature uses modified powders and
+        still reports decomposition/porosity risks.
+    service_temp:
+      continuous_C: null
+      max_operating_C: null
+      peak_C: null
+      degradation_onset_C: null
+      evidence: uncharacterized
+      citations: ["R6-SiC-SaintGobain-Hexoloy-SE", "R6-SiC-APS-2020"]
+      note: >
+        Bulk sintered SiC has very high listed use temperature, but
+        atmospheric-plasma-sprayed SiC can decompose and form porous weak
+        coatings. Do not carry the bulk limit into a coating service limit.
+    chemical_attack:
+      SiO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-SiC-active-oxidation-NASA-2011", "R6-SiC-low-pressure-oxygen-ORNL"]
+        note: >
+          Low-pO2 SiC behavior is a hazard branch: active oxidation can form
+          volatile SiO(g). Direct incoming-SiO compatibility for a sprayed SiC
+          coating was not found.
+      alkali_NaK:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-SiC-SaintGobain-Hexoloy-SE"]
+        note: >
+          No source was found for Na/K metal or alkali-vapor attack on
+          plasma-sprayed SiC in hot low-pO2, low-total-pressure service.
+      Fe_FeO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-SiC-APS-2020"]
+        note: >
+          No source was found for Fe, FeO, or mixed Fe-silicate deposit
+          compatibility on plasma-sprayed SiC in the project regime.
+    stickiness:
+      SiO:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-SiC-active-oxidation-NASA-2011", "R6-SiC-APS-2020"]
+        note: >
+          SiO/SiOx arrival on SiC is entangled with active/passive oxidation;
+          no retained-film or wetting coefficient is filled.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'Active/passive SiC oxidation sources do not characterize SiO-condensate bonding or film survival on sprayed SiC.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; APS SiC porosity/decomposition and CTE mismatch require coating-on-glassy-regolith thermal-cycle testing.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Regime-gated SiC oxidation hazard only; no direct SiO retention data for a sprayed SiC coating.'
+          regime: low-pO2
+          source_ids: ['R6-SiC-active-oxidation-NASA-2011', 'R6-SiC-APS-2020']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      alkali:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-SiC-SaintGobain-Hexoloy-SE"]
+        note: >
+          Bulk chemical-resistance data does not cover hot Na/K deposits or
+          alkali vapor in the low-pO2 furnace regime.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No Na/K-on-sprayed-SiC deposit bonding source in the project regime.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires alkali deposit-on-sprayed-SiC thermal-cycle test.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Na/K first-arrival treated as metallic condensate; no source-backed retention primitive on sprayed SiC.'
+          regime: vacuum
+          source_ids: ['R6-SiC-SaintGobain-Hexoloy-SE']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      Fe:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-SiC-APS-2020"]
+        note: >
+          Fe vapor/liquid or FeO-silicate retention on sprayed SiC was not
+          found.
+        surface_interaction:
+          arrival_mode: solid_aerosol
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No Fe/FeO-on-sprayed-SiC deposit bonding source in the project regime.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires Fe/FeO deposit-on-sprayed-SiC thermal-cycle test.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Fe first-arrival on this coating is uncharacterized; APS SiC process sources do not characterize Fe retention.'
+          regime: vacuum
+          source_ids: ['R6-SiC-APS-2020']
+          needs_experiment: true
+          needs_pdf_extraction: null
+    service_life:
+      evidence: uncharacterized
+      citations: ["R6-SiC-active-oxidation-NASA-2011", "R6-SiC-APS-2020"]
+      note: >
+        Low-pO2 active oxidation and APS decomposition risks prevent any
+        sourced campaign-life claim.
+
+  mzo_coating:
+    label: "Plasma-sprayed MZO / magnesium-zirconate coating"
+    role: "plasma-sprayed coating"
+    wall_surface_state: coated
+    application:
+      method: plasma_spray
+      feedstock: bar_stock
+      substrate: glassy_regolith_bulk
+      self_bootstrap_source:
+        magnesium: extraction_product_mg
+        zirconia: refractory_rump_zro2
+        status: needs_experiment
+      note: >
+        Thermal-spray product data is powder-based. Refinery-made bar stock
+        would need conversion to controlled spray feedstock before this
+        application path is characterized.
+    service_temp:
+      continuous_C: 1500
+      max_operating_C: 1500
+      peak_C: null
+      degradation_onset_C: null
+      evidence: direct
+      citations: ["R6-MZO-SaintGobain-TDS"]
+      note: >
+        Product-sheet evidence supports magnesium-zirconate thermal-spray
+        powder for thermal-barrier/thermal-shock use and particle erosion up
+        to 1500 degC. It does not characterize regolith low-pO2 chemistry.
+    chemical_attack:
+      SiO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-MZO-SaintGobain-TDS", "R6-zirconia-glass-corrosion-1986"]
+        note: >
+          Zirconia-family glass-refractory data does not establish SiO vapor
+          compatibility for MZO in hot low-pO2 vacuum.
+      alkali_NaK:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-zirconia-glass-corrosion-1986", "R6-andalusite-sodium-vapour-2011"]
+        note: >
+          Alumina sodium-vapor attack is source-backed, and zirconia/AZS are
+          glass-furnace corrosion candidates, but alkali components still
+          increase ZrO2 corrosion rate in molten glasses. No direct MZO Na/K
+          vapor protection in the project regime was found.
+      Fe_FeO:
+        severity: null
+        evidence: uncharacterized
+        citations: ["R6-MZO-SaintGobain-TDS"]
+        note: >
+          MZO thermal-barrier product data does not characterize Fe, FeO, or
+          mixed Fe-silicate deposit chemistry in low-pO2 vacuum.
+    stickiness:
+      SiO:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-MZO-SaintGobain-TDS", "R6-zirconia-glass-corrosion-1986"]
+        note: >
+          No SiO/SiOx condensate adhesion data on MZO was found; zirconia glass
+          corrosion is a chemistry analog only.
+        surface_interaction:
+          arrival_mode: molecular_film
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.SiO
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No SiO/SiOx-on-MZO deposit bonding source in the project regime.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; MZO/glassy-regolith CTE and porosity spallation need coating-coupon tests.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Thermal-spray and zirconia/glass corrosion sources do not characterize SiO retention on MZO.'
+          regime: low-pO2
+          source_ids: ['R6-MZO-SaintGobain-TDS', 'R6-zirconia-glass-corrosion-1986']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      alkali:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-zirconia-glass-corrosion-1986", "R6-andalusite-sodium-vapour-2011"]
+        note: >
+          Alkali resistance cannot be assumed: zirconia glass-corrosion data
+          shows alkali components can accelerate ZrO2 refractory corrosion.
+        surface_interaction:
+          arrival_mode: metallic_liquid
+          sticking:
+            alpha_s_ref:
+              Na: data/materials.yaml::default_alpha_s_by_species.Na
+              K: data/materials.yaml::default_alpha_s_by_species.K
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No Na/K-on-MZO deposit bonding source in the project low-pO2 vacuum regime.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires alkali deposit-on-MZO thermal-cycle test.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'Alumina sodium-vapor attack and zirconia/glass corrosion are analogs; direct MZO Na/K retention data absent.'
+          regime: vacuum
+          source_ids: ['R6-zirconia-glass-corrosion-1986', 'R6-andalusite-sodium-vapour-2011']
+          needs_experiment: true
+          needs_pdf_extraction: null
+      Fe:
+        class: uncharacterized
+        evidence: uncharacterized
+        citations: ["R6-MZO-SaintGobain-TDS"]
+        note: >
+          Fe vapor/liquid and FeO-silicate retention on MZO were not found.
+        surface_interaction:
+          arrival_mode: solid_aerosol
+          sticking:
+            alpha_s_ref: data/materials.yaml::default_alpha_s_by_species.Fe
+          wetting:
+            contact_angle_deg: null
+            surface_energy_J_m2: null
+            liquid_composition: null
+            temperature_C: null
+            atmosphere: null
+          bonding_or_sintering:
+            onset_C: null
+            basis: 'No Fe/FeO-on-MZO deposit bonding source in the project regime.'
+          removal:
+            reentrainment: null
+            thermal_cycle_spallation_risk: 'uncharacterized; requires Fe/FeO deposit-on-MZO thermal-cycle test.'
+          derived_retention_fraction:
+            value: null
+        provenance:
+          evidence_tier: uncharacterized
+          applicability: 'MZO thermal-barrier sources do not characterize Fe retention.'
+          regime: vacuum
+          source_ids: ['R6-MZO-SaintGobain-TDS']
+          needs_experiment: true
+          needs_pdf_extraction: null
+    service_life:
+      evidence: uncharacterized
+      citations: ["R6-MZO-SaintGobain-TDS", "R6-MZO-NASA-RB211-1985"]
+      note: >
+        Turbine service and product-sheet evidence do not establish campaign
+        life against SiO/Na/K/Fe deposits on a glassy regolith substrate.

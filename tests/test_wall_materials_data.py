@@ -16,6 +16,8 @@ WALL_MATERIALS = {
     "plasma_sprayed_alumina",
     "plasma_sprayed_ysz",
     "plasma_sprayed_mullite",
+    "silicon_carbide_coating",
+    "mzo_coating",
 }
 WALL_ATTACK_SPECIES = {"SiO", "alkali_NaK", "Fe_FeO"}
 WALL_STICKINESS_SPECIES = {"SiO", "alkali", "Fe"}
@@ -85,6 +87,7 @@ CERAMIC_ANCHORS = {
 }
 COMPOSITION_KINDS = {"point-anchor", "window"}
 SERVICE_TEMP_KINDS = {"service", "melting-only", "uncharacterized"}
+WALL_SURFACE_STATES = {"unglazed", "glazed", "coated"}
 
 
 def _load_yaml(name: str) -> dict:
@@ -170,6 +173,61 @@ def test_wall_materials_schema_is_fail_closed():
                 assert provenance["needs_experiment"]
 
         assert entry["service_life"]["evidence"] in EVIDENCE_TAGS
+
+
+def test_wall_surface_state_schema_declares_engineered_coatings():
+    state = _load_yaml("wall_materials.yaml")["wall_surface_state"]
+
+    assert set(state["enum"]) == WALL_SURFACE_STATES
+    assert state["coated"]["substrate"] == "glassy_regolith_bulk"
+    assert set(state["coated"]["material_refs"]) == {
+        "silicon_carbide_coating",
+        "mzo_coating",
+    }
+    assert "does not imply inertness" in state["coated"]["note"]
+
+
+def test_engineered_coatings_are_application_gated_and_fail_closed():
+    data = _load_yaml("wall_materials.yaml")
+    materials = data["materials"]
+    exchange = data["reactive_exchange"]
+
+    for material_id in ("silicon_carbide_coating", "mzo_coating"):
+        entry = materials[material_id]
+        assert entry["role"] == "plasma-sprayed coating"
+        assert entry["wall_surface_state"] == "coated"
+
+        application = entry["application"]
+        assert application["method"] == "plasma_spray"
+        assert application["feedstock"] == "bar_stock"
+        assert application["substrate"] == "glassy_regolith_bulk"
+        assert application["self_bootstrap_source"]
+
+        for species in WALL_ATTACK_SPECIES:
+            attack = entry["chemical_attack"][species]
+            if attack["evidence"] == "uncharacterized":
+                assert attack["severity"] is None
+                _assert_citations(attack["citations"])
+
+        assert set(exchange[material_id]) == REACTIVE_EXCHANGE_SPECIES
+        for cells in exchange[material_id].values():
+            assert cells
+            for cell in cells:
+                assert cell["regime"] in REACTIVE_REGIMES
+                assert cell["needs_experiment"]
+
+    sic_reducing = [
+        cell
+        for cell in exchange["silicon_carbide_coating"]["SiO"]
+        if cell["regime"] == "reducing_vacuum"
+    ]
+    assert len(sic_reducing) == 1
+    assert sic_reducing[0]["sign"] == "volatile_or_revolatilizing"
+    assert sic_reducing[0]["net_liner_delta"] == "thinning"
+
+    for cells in exchange["mzo_coating"].values():
+        assert cells[0]["evidence_tier"] == "uncharacterized"
+        assert cells[0]["sign"] == "uncharacterized"
 
 
 def test_wall_reactive_exchange_schema_is_regime_gated_and_sourced():
