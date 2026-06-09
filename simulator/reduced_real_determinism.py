@@ -279,16 +279,18 @@ class PT0DeterminismStore:
         sim._last_reduced_real_cache_state = None
 
     def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
-        provider_role = _gate_provider_role_for_key(sim)
-        key = canonical_replay_key(
-            sim,
-            artifact="freeze_gate_curve",
-            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
-            fO2_log=fO2_log,
-            fe_redox_policy="intrinsic",
-            provider_role=provider_role,
+        keys = tuple(
+            canonical_replay_key(
+                sim,
+                artifact="freeze_gate_curve",
+                intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+                fO2_log=fO2_log,
+                fe_redox_policy="intrinsic",
+                provider_role=provider_role,
+            )
+            for provider_role in _gate_provider_roles_for_replay(sim)
         )
-        payload = self._lookup("freeze_gate_curve", key)
+        payload = self._lookup_first_available("freeze_gate_curve", keys)
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
 
@@ -457,6 +459,63 @@ class PT0DeterminismStore:
         self.last_cache_state = "cached_exact"
         self._record_cache_event(artifact, "cached_exact")
         return copy.deepcopy(entry["payload"])
+
+    def _lookup_first_available(
+        self,
+        artifact: str,
+        keys: tuple[Mapping[str, Any], ...],
+    ) -> dict[str, Any]:
+        if not keys:
+            raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
+
+        checked: list[tuple[Mapping[str, Any], bytes, str]] = []
+        for key in keys:
+            key_bytes = canonical_json_bytes(key)
+            key_hash = _sha256(key_bytes)
+            checked.append((key, key_bytes, key_hash))
+            entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
+            if entry is None:
+                continue
+            self.replay_sequence.append(
+                {
+                    "artifact": artifact,
+                    "key": copy.deepcopy(dict(key)),
+                    "hash": key_hash,
+                    "cache_state": "cached_exact",
+                }
+            )
+            sequence_index = len(self.replay_sequence) - 1
+            if len(self.capture_sequence) <= sequence_index:
+                self.capture_sequence.append(
+                    {
+                        "artifact": artifact,
+                        "key": copy.deepcopy(dict(entry["key"])),
+                        "hash": key_hash,
+                        "persistent": True,
+                    }
+                )
+            self.hits += 1
+            self.last_cache_state = "cached_exact"
+            self._record_cache_event(artifact, "cached_exact")
+            return copy.deepcopy(entry["payload"])
+
+        key, _key_bytes, key_hash = checked[0]
+        self.replay_sequence.append(
+            {"artifact": artifact, "key": copy.deepcopy(dict(key)), "hash": key_hash}
+        )
+        miss = {
+            "artifact": artifact,
+            "key_hash": key_hash,
+            "sequence_index": len(self.replay_sequence) - 1,
+            "drift_fields": self._drift_fields_for_latest_replay(),
+        }
+        if len(checked) > 1:
+            miss["alternate_key_hashes"] = [
+                alternate_hash for _, _, alternate_hash in checked[1:]
+            ]
+        self.misses.append(miss)
+        self.last_cache_state = None
+        raise PT0CacheMiss(f"PT-0 cached replay miss: {miss}")
 
     def _lookup_optional(
         self,
@@ -1043,11 +1102,38 @@ def _gate_provider_role_for_capture(
             )
         return keyed_role
     if curve_role != keyed_role:
+        if curve_role == "fallback" and _cached_real_config(sim) is None:
+            return curve_role
         raise PT0CacheCollision(
             "freeze gate curve provider role mismatch: "
             f"keyed role={keyed_role}, curve source role={curve_role}"
         )
     return keyed_role
+
+
+def _gate_provider_roles_for_replay(sim: Any) -> tuple[str, ...]:
+    primary = _gate_provider_role_for_key(sim)
+    roles = [primary]
+    if primary == "authoritative" and _gate_fallback_provider_available_for_key(sim):
+        roles.append("fallback")
+    return tuple(dict.fromkeys(roles))
+
+
+def _gate_fallback_provider_available_for_key(sim: Any) -> bool:
+    _register_gate_providers_for_key(sim)
+    registry = getattr(sim, "_chem_registry", None)
+    if (
+        registry is not None
+        and registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION) is not None
+    ):
+        return True
+    cached_real = _cached_real_provider_identity(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        provider_role="fallback",
+        fallback_allowed=False,
+    )
+    return cached_real is not None
 
 
 def _gate_provider_role_for_key(sim: Any) -> str:

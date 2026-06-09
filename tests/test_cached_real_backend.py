@@ -641,6 +641,46 @@ def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
     assert summary["misses"] == 1
 
 
+def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "direct-alphamelts-fallback-gate.db"
+    direct_sim = _build_direct_real_sim(
+        AlphaMELTSBackend(),
+        db_path=db_path,
+    )
+    fallback_curve = {
+        **_authoritative_gate_curve(),
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+    }
+
+    direct_sim._pt0_store().capture_gate_curve(
+        direct_sim,
+        fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
+        curve=fallback_curve,
+    )
+    live_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
+
+    replay_sim = _build_direct_real_sim(AlphaMELTSBackend())
+    replay_store = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim.configure_pt0_determinism_store(replay_store)
+    replay_curve = replay_store.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    )
+    replay_key = replay_store.replay_sequence[-1]["key"]
+    replay_summary = replay_store.summary()
+
+    assert replay_curve == fallback_curve
+    assert live_key["provider"]["resolved_role"] == "fallback"
+    assert live_key["provider"]["resolved_provider_id"] == "magemin-shadow"
+    assert replay_key == live_key
+    assert replay_summary["misses"] == 0
+    assert replay_summary["cache_state_counts_by_artifact"]["freeze_gate_curve"][
+        "cached_exact"
+    ] == 1
+
+
 def test_cached_real_direct_alphamelts_version_mismatch_misses(
     tmp_path: Path,
 ) -> None:
