@@ -309,6 +309,107 @@ def test_passing_run_merges_shard_but_estimate_excludes_old_rows(tmp_path, monke
     assert emitted[-1]["estimate"]["key_rate_basis"] == "run_local_temporary_capture_shards"
 
 
+def test_known_chemistry_edges_are_isolated_per_case(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    target_db = tmp_path / "target.db"
+
+    def fake_load_yaml(path):
+        path = Path(path)
+        if path.name == "dummy-profile.yaml":
+            return {"feedstock": "fake_feedstock"}
+        return {"feedstock": path.stem}
+
+    monkeypatch.setattr(driver, "_load_yaml", fake_load_yaml)
+
+    def fake_run_case(*, db_path, feedstock, campaign, mode, **kwargs):
+        assert mode == "capture"
+        if feedstock == "m_type_metallic_phase":
+            raise RuntimeError(
+                "Authoritative VAPOR_PRESSURE dispatch returned "
+                "status='out_of_domain' with no pressures and "
+                "allow_fallback_vapor=False; refusing to silently continue "
+                "on backend vapor pressures. Diagnostic keys: "
+                "['provider_id', 'status']"
+            )
+        if feedstock == "mars_phyllosilicate_clay" and campaign == "C4":
+            raise driver.PT0NonFinitePayload(
+                "non-finite value in PT-0 payload: inf"
+            )
+        _write_magemin_row(db_path, f"{feedstock}-{campaign}")
+        return _result(marker=f"{feedstock}-{campaign}", mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "unused",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--feedstock",
+            "m_type_metallic_phase",
+            "--feedstock",
+            "mars_phyllosilicate_clay",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C2A_continuous",
+            "--campaign",
+            "C4",
+        ]
+    )
+
+    assert rc == 0
+    assert emitted[-1]["status"] == "complete"
+    assert driver._cache_row_summary(target_db)["rows"] == 3
+    assert emitted[-1]["domain_gaps"] == emitted[-1]["case_gaps"]
+    assert emitted[-1]["domain_gap_count"] == 3
+    assert {
+        (gap["feedstock"], gap["campaign"], gap["reason"])
+        for gap in emitted[-1]["domain_gaps"]
+    } == {
+        (
+            "m_type_metallic_phase",
+            "C2A_continuous",
+            "vapor_pressure_out_of_domain",
+        ),
+        ("m_type_metallic_phase", "C4", "vapor_pressure_out_of_domain"),
+        ("mars_phyllosilicate_clay", "C4", "non_finite_payload"),
+    }
+    assert "CASE-GAP: m_type_metallic_phase/C2A_continuous" in capsys.readouterr().out
+
+
+def test_unrelated_runtime_error_still_propagates(tmp_path, monkeypatch):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+
+    def fake_run_case(**kwargs):
+        raise RuntimeError("unexpected mass-balance breach")
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    with pytest.raises(RuntimeError, match="unexpected mass-balance breach"):
+        driver.main(
+            [
+                "--profile",
+                "unused",
+                "--db",
+                str(tmp_path / "target.db"),
+                "--hours",
+                "1",
+            ]
+        )
+
+    assert emitted == []
+
+
 def test_validate_replay_publishes_only_after_success(tmp_path, monkeypatch):
     emitted = []
     _patch_common(monkeypatch, emitted)

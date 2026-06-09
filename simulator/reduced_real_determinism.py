@@ -85,6 +85,10 @@ class PT0InvalidControls(RuntimeError):
     """PT-0 control quantization received a non-finite process value."""
 
 
+class PT0NonFinitePayload(ValueError):
+    """PT-0 payload canonicalization received a non-finite value."""
+
+
 class PT0DeterminismStore:
     """PT-0 capture/replay store, optionally backed by the PT-1 SQLite DB."""
 
@@ -1634,7 +1638,9 @@ def _json_ready(value: Any) -> Any:
         return [_json_ready(item) for item in value]
     if isinstance(value, float):
         if not math.isfinite(value):
-            raise ValueError(f"non-finite value in PT-0 payload: {value!r}")
+            raise PT0NonFinitePayload(
+                f"non-finite value in PT-0 payload: {value!r}"
+            )
         return value
     if value is None or isinstance(value, (str, int, bool)):
         return value

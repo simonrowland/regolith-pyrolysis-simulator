@@ -10,6 +10,7 @@ stub-backed equilibrium rows are rejected before persistent merge.
 from __future__ import annotations
 
 import argparse
+import ast
 import copy
 import json
 import math
@@ -34,6 +35,7 @@ from simulator.config import load_config_bundle
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
+    PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
     validate_reduced_real_equilibrium_record_key,
@@ -302,6 +304,48 @@ def _timed_magemin_dispatch(events: list[dict[str, Any]]) -> Iterator[None]:
         yield
     finally:
         MAGEMinShadowProvider.dispatch = original
+
+
+def _diagnostic_keys_from_vapor_pressure_refusal(
+    detail: str,
+) -> tuple[str, ...] | None:
+    marker = "Diagnostic keys: "
+    if marker not in detail:
+        return None
+    raw_keys = detail.rsplit(marker, 1)[1].strip()
+    try:
+        keys = ast.literal_eval(raw_keys)
+    except (SyntaxError, ValueError):
+        return None
+    if not isinstance(keys, list) or not all(isinstance(key, str) for key in keys):
+        return None
+    return tuple(keys)
+
+
+def _known_chemistry_case_gap(exc: RuntimeError | ValueError) -> dict[str, Any] | None:
+    detail = str(exc)
+    if isinstance(exc, RuntimeError):
+        diagnostic_keys = _diagnostic_keys_from_vapor_pressure_refusal(detail)
+        if (
+            "Authoritative VAPOR_PRESSURE dispatch returned" in detail
+            and "status='out_of_domain'" in detail
+            and "allow_fallback_vapor=False" in detail
+            and diagnostic_keys is not None
+        ):
+            return {
+                "reason": "vapor_pressure_out_of_domain",
+                "detail": detail,
+                "diagnostic_keys": list(diagnostic_keys),
+            }
+        return None
+    if isinstance(exc, PT0NonFinitePayload) or detail.startswith(
+        "non-finite value in PT-0 payload: "
+    ):
+        return {
+            "reason": "non_finite_payload",
+            "detail": detail,
+        }
+    return None
 
 
 def _apply_pending_decision(session: SimSession) -> bool:
@@ -758,6 +802,8 @@ def main(argv: list[str]) -> int:
     cache_merges: list[dict[str, Any]] = []
     run_magemin_key_hashes: set[str] = set()
     pending_shards: list[tuple[dict[str, Any], Path]] = []
+    captured_cases: list[tuple[str, str]] = []
+    case_gaps: list[dict[str, Any]] = []
     additives_by_feedstock: dict[str, dict[str, float]] = {}
     with tempfile.TemporaryDirectory(
         prefix="pt3-cache-work-",
@@ -781,19 +827,44 @@ def main(argv: list[str]) -> int:
             for campaign in campaigns:
                 case_index += 1
                 shard_db = work_path / f"cache-shard-{case_index}.db"
-                case_result = _run_case(
-                    feedstock=feedstock_name,
-                    campaign=campaign,
-                    backend_name=args.backend,
-                    mass_kg=args.mass_kg,
-                    additives_kg=additives_kg,
-                    hours=args.hours,
-                    wall_cap_s=args.wall_cap_s,
-                    db_path=shard_db,
-                    mode="capture",
-                    disable_live=False,
-                    allow_stub_equilibrium=args.allow_stub_equilibrium,
-                )
+                try:
+                    case_result = _run_case(
+                        feedstock=feedstock_name,
+                        campaign=campaign,
+                        backend_name=args.backend,
+                        mass_kg=args.mass_kg,
+                        additives_kg=additives_kg,
+                        hours=args.hours,
+                        wall_cap_s=args.wall_cap_s,
+                        db_path=shard_db,
+                        mode="capture",
+                        disable_live=False,
+                        allow_stub_equilibrium=args.allow_stub_equilibrium,
+                    )
+                except RuntimeError as exc:
+                    gap = _known_chemistry_case_gap(exc)
+                    if gap is None:
+                        raise
+                    gap = {
+                        "feedstock": feedstock_name,
+                        "campaign": campaign,
+                        **gap,
+                    }
+                    case_gaps.append(gap)
+                    print(f"CASE-GAP: {feedstock_name}/{campaign} {gap['reason']}")
+                    continue
+                except ValueError as exc:
+                    gap = _known_chemistry_case_gap(exc)
+                    if gap is None:
+                        raise
+                    gap = {
+                        "feedstock": feedstock_name,
+                        "campaign": campaign,
+                        **gap,
+                    }
+                    case_gaps.append(gap)
+                    print(f"CASE-GAP: {feedstock_name}/{campaign} {gap['reason']}")
+                    continue
                 case_result["cache_shard"] = {
                     "temporary": True,
                     "path": str(shard_db),
@@ -828,6 +899,9 @@ def main(argv: list[str]) -> int:
                         "magemin": magemin,
                         "live": live_results,
                         "replay": [],
+                        "case_gaps": list(case_gaps),
+                        "domain_gaps": list(case_gaps),
+                        "domain_gap_count": len(case_gaps),
                         "cache": _cache_row_summary(args.db),
                         "cache_merges": cache_merges,
                         "magemin_timing": timing_summary,
@@ -867,33 +941,32 @@ def main(argv: list[str]) -> int:
                     case_result["cache_merge"] = merge_summary
                     cache_merges.append(merge_summary)
                 live_results.append(case_result)
+                captured_cases.append((feedstock_name, campaign))
 
         replay_results = []
         if args.validate_replay:
-            for feedstock in feedstocks:
-                feedstock_name = str(feedstock)
+            for feedstock_name, campaign in captured_cases:
                 additives_kg = _feedstock_additives(
                     feedstock_name,
                     loaded_profile=profile,
                     cli_additives=cli_additives_kg,
                 )
                 additives_by_feedstock[feedstock_name] = additives_kg
-                for campaign in campaigns:
-                    replay_results.append(
-                        _run_case(
-                            feedstock=feedstock_name,
-                            campaign=campaign,
-                            backend_name=args.backend,
-                            mass_kg=args.mass_kg,
-                            additives_kg=additives_kg,
-                            hours=args.hours,
-                            wall_cap_s=args.wall_cap_s,
-                            db_path=replay_db_path,
-                            mode="replay",
-                            disable_live=True,
-                            allow_stub_equilibrium=args.allow_stub_equilibrium,
-                        )
+                replay_results.append(
+                    _run_case(
+                        feedstock=feedstock_name,
+                        campaign=campaign,
+                        backend_name=args.backend,
+                        mass_kg=args.mass_kg,
+                        additives_kg=additives_kg,
+                        hours=args.hours,
+                        wall_cap_s=args.wall_cap_s,
+                        db_path=replay_db_path,
+                        mode="replay",
+                        disable_live=True,
+                        allow_stub_equilibrium=args.allow_stub_equilibrium,
                     )
+                )
 
         all_live_timings = [
             item
@@ -934,6 +1007,9 @@ def main(argv: list[str]) -> int:
             "magemin": magemin,
             "live": live_results,
             "replay": replay_results,
+            "case_gaps": list(case_gaps),
+            "domain_gaps": list(case_gaps),
+            "domain_gap_count": len(case_gaps),
             "cache": cache_summary,
             "cache_merges": cache_merges,
             "magemin_timing": timing_summary,
