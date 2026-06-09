@@ -277,6 +277,50 @@ def _deep_merge_setpoints(
     return merged
 
 
+def _additives_with_c3_alkali_dosing(
+    additives_kg: Mapping[str, float],
+    setpoints: Mapping[str, Any],
+) -> dict[str, float]:
+    additives = {str(k): float(v) for k, v in dict(additives_kg).items()}
+    campaigns = setpoints.get("campaigns", {})
+    if not isinstance(campaigns, Mapping):
+        return additives
+    c3 = campaigns.get("C3", {})
+    if not isinstance(c3, Mapping):
+        return additives
+    dosing = c3.get("alkali_dosing", {})
+    if dosing in (None, {}):
+        return additives
+    if not isinstance(dosing, Mapping):
+        raise RunnerError("campaigns.C3.alkali_dosing must be a mapping")
+
+    for key, species in (("Na_kg", "Na"), ("K_kg", "K")):
+        if key not in dosing or dosing[key] is None:
+            continue
+        try:
+            dose_kg = float(dosing[key])
+        except (TypeError, ValueError) as exc:
+            raise RunnerError(
+                f"campaigns.C3.alkali_dosing.{key} must be numeric"
+            ) from exc
+        if not math.isfinite(dose_kg) or dose_kg < 0.0:
+            raise RunnerError(
+                f"campaigns.C3.alkali_dosing.{key} must be finite and non-negative"
+            )
+        if dose_kg <= 0.0:
+            continue
+        raw_additive_kg = additives.get(species, 0.0)
+        if raw_additive_kg > 0.0 and not math.isclose(
+            raw_additive_kg, dose_kg, rel_tol=0.0, abs_tol=1.0e-12
+        ):
+            raise RunnerError(
+                f"campaigns.C3.alkali_dosing.{key} conflicts with "
+                f"additives_kg[{species!r}]"
+            )
+        additives[species] = dose_kg
+    return additives
+
+
 def _canonical_runtime_campaign_overrides(
     *,
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None,
@@ -407,6 +451,10 @@ class PyrolysisRun:
         vapor_pressures = bundle.vapor_pressures
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
             self.campaign, self.campaign)
+        additives_kg = _additives_with_c3_alkali_dosing(
+            self.additives_kg,
+            setpoints,
+        )
         return SimSessionConfig(
             feedstock_id=self.feedstock_id,
             feedstocks=feedstocks,
@@ -418,7 +466,7 @@ class PyrolysisRun:
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             hours=int(self.hours),
             mass_kg=self.mass_kg,
-            additives_kg=dict(self.additives_kg),
+            additives_kg=additives_kg,
             runtime_campaign_overrides=dict(self.runtime_campaign_overrides),
             track=self.track,
             c5_enabled=self.c5_enabled,

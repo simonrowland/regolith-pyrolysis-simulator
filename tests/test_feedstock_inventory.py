@@ -1029,6 +1029,94 @@ def test_recovered_reagent_transfer_debits_condenser_product():
     assert sim.product_ledger()["unspent_K_reagent"] == pytest.approx(2.0)
 
 
+def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "FeO": 50.0,
+                },
+            }
+        }
+    )
+
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 12.0})
+    reservoir_before = sim.atom_ledger.kg_by_account("reservoir.reagent.Na")["Na"]
+
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    process_before = sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory"
+    )["Na"]
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 1150.0
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    process_after = sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory"
+    ).get("Na", 0.0)
+    snapshot = sim._make_snapshot()
+    registry = sim.atom_ledger.registry
+    transition_imbalance_kg = sum(
+        abs(t.debit_mass_kg(registry) - t.credit_mass_kg(registry))
+        for t in sim.atom_ledger.transitions
+    )
+
+    assert reservoir_before == pytest.approx(12.0)
+    assert process_before == pytest.approx(12.0)
+    assert process_after < process_before
+    assert sim.shuttle_Na_inventory_kg == pytest.approx(process_after)
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")["Fe"] > 0.0
+    assert abs(snapshot.mass_balance_error_pct) < 5e-12
+    assert transition_imbalance_kg < 1e-6
+
+
+def test_c3_alkali_dose_overdraw_fails_loud():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "FeO": 50.0,
+                },
+            }
+        }
+    )
+
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 1.0})
+    sim.record.additives_kg["Na"] = 2.0
+
+    with pytest.raises(ValueError, match="exceeds available inventory"):
+        sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+
+def test_c3_na_dose_activation_is_idempotent_across_k_then_na_phases():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "FeO": 50.0,
+                },
+            }
+        }
+    )
+
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 12.0})
+
+    sim._init_shuttle_inventory(CampaignPhase.C3_K)
+    after_k_phase = sim.shuttle_Na_inventory_kg
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+    assert after_k_phase == pytest.approx(12.0)
+    assert sim.shuttle_Na_inventory_kg == pytest.approx(12.0)
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get(
+        "Na", 0.0
+    ) == pytest.approx(0.0)
+
+
 def test_oxygen_is_not_duplicated_in_product_ledger():
     sim = _sim(
         {

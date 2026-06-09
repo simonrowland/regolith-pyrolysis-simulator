@@ -51,7 +51,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v2" == schema.allowlist_version
+    assert "allowlist-v3" == schema.allowlist_version
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
@@ -64,6 +64,8 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
         _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
         _path("campaigns.C3.endpoint.hold_time_min"),
+        _path("campaigns.C3.alkali_dosing.Na_kg"),
+        _path("campaigns.C3.alkali_dosing.K_kg"),
         _path("overhead_headspace.temperature_offset_K"),
         _path(
             "overhead_headspace.pipe_segment_temperatures_C.segments."
@@ -97,6 +99,19 @@ def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:
         ]["default_C"]
         == 425.0
     )
+    assert patch.validated(schema).recipe_id() != RecipePatch({}).recipe_id(schema)
+
+
+def test_c3_alkali_dosing_knobs_render_to_setpoints_patch() -> None:
+    schema = RecipeSchema()
+    na_dose = _path("campaigns.C3.alkali_dosing.Na_kg")
+    k_dose = _path("campaigns.C3.alkali_dosing.K_kg")
+    patch = RecipePatch({na_dose: 12.0, k_dose: 4.0})
+
+    nested = schema.to_setpoints_patch(patch)
+
+    assert nested["campaigns"]["C3"]["alkali_dosing"]["Na_kg"] == pytest.approx(12.0)
+    assert nested["campaigns"]["C3"]["alkali_dosing"]["K_kg"] == pytest.approx(4.0)
     assert patch.validated(schema).recipe_id() != RecipePatch({}).recipe_id(schema)
 
 

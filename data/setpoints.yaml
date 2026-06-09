@@ -194,7 +194,7 @@ campaigns:
         bounds_C: [1650, 1800]
         role: "cycle-time lever; not a thermal-yield ceiling breaker"
       Na_additive_kg:
-        via: "start --additive=Na=<kg> or SimSessionConfig.additives_kg"
+        via: "recipe knob campaigns.C3.alkali_dosing.Na_kg projected to additives_kg"
         default_kg: 12
         role: "V1c cool residual-FeO cleanup dose; thin +9.6 kJ/mol O2 margin at 1150 C"
     max_hold_hr: 9
@@ -334,6 +334,9 @@ campaigns:
     pO2_mbar_default: 1.0
     p_total_mbar_default: 1.0
     sequencing: "legacy K-first then Na; physics gate may refuse all targets"
+    alkali_dosing:
+      Na_kg: 0.0
+      K_kg: 0.0
     K_phase:
       name: "Deprecated K FeO reduction diagnostic"
       T_inject_C: [760, 820]

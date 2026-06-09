@@ -184,13 +184,27 @@ class ExtractionMixin:
         )
         return kg
 
-    def _draw_reagent_to_process(self, species: str, requested_kg: float) -> float:
+    def _draw_reagent_to_process(
+        self,
+        species: str,
+        requested_kg: float,
+        *,
+        fail_if_insufficient: bool = False,
+        ) -> float:
         requested_kg = max(0.0, float(requested_kg))
         if requested_kg <= self._LEDGER_KG_TOL:
             return 0.0
 
         reservoir = f'reservoir.reagent.{species}'
         available_kg = self._ledger_account_species_kg(reservoir, species)
+        if (
+            fail_if_insufficient
+            and requested_kg > available_kg + self._LEDGER_KG_TOL
+        ):
+            raise ValueError(
+                f"requested {requested_kg:.12g} kg {species} reagent exceeds "
+                f"available inventory {available_kg:.12g} kg"
+            )
         draw_kg = min(requested_kg, available_kg)
         if draw_kg <= self._LEDGER_KG_TOL:
             return 0.0
@@ -205,6 +219,16 @@ class ExtractionMixin:
 
     def _sync_reagent_counter_from_ledger(self, species: str) -> float:
         return self._process_reagent_inventory_kg(species)
+
+    def _activate_additive_reagent(self, species: str, requested_kg: float) -> None:
+        if species in self._activated_additive_reagents:
+            return
+        self._activated_additive_reagents.add(species)
+        self._draw_reagent_to_process(
+            species,
+            requested_kg,
+            fail_if_insufficient=True,
+        )
 
     def _set_melt_species_projection(self, species: str, kg: float) -> None:
         self.melt.composition_kg.update({species: max(0.0, float(kg))})
@@ -657,23 +681,27 @@ class ExtractionMixin:
         Called once at the start of C3_K and C3_NA phases.
         """
         if campaign == CampaignPhase.C3_K:
-            self._activated_additive_reagents.add('K')
-            self._draw_reagent_to_process(
-                'K', self.record.additives_kg.get('K', 0.0))
+            self._activate_additive_reagent(
+                'K',
+                self.record.additives_kg.get('K', 0.0),
+            )
             self._transfer_condensed_species('K')
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             na_additive_kg = self.record.additives_kg.get('Na', 0.0)
             if na_additive_kg > self._LEDGER_KG_TOL:
-                self._activated_additive_reagents.add('Na')
-                self._draw_reagent_to_process('Na', na_additive_kg)
+                self._activate_additive_reagent(
+                    'Na',
+                    na_additive_kg,
+                )
                 self._transfer_condensed_species('Na')
                 self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_K = 0
 
         elif campaign == CampaignPhase.C3_NA:
-            self._activated_additive_reagents.add('Na')
-            self._draw_reagent_to_process(
-                'Na', self.record.additives_kg.get('Na', 0.0))
+            self._activate_additive_reagent(
+                'Na',
+                self.record.additives_kg.get('Na', 0.0),
+            )
             self._transfer_condensed_species('Na')
             self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_Na = 0

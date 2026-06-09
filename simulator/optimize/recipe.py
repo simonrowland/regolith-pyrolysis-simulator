@@ -14,7 +14,7 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v2"
+allowlist_version = "allowlist-v3"
 
 
 class RecipeValidationError(ValueError):
@@ -58,8 +58,8 @@ class RecipeSchema:
 
     # These whole-value list paths replace YAML ranges such as
     # ``temp_range_C: [lo, hi]``. V1 still forbids list-item paths; future C5
-    # endpoint-hours/current and alkali-dose knobs should be added here only
-    # after R1/R2 parameterize them as explicit setpoint inputs.
+    # endpoint-hours/current knobs should be added here only after R1/R2
+    # parameterize them as explicit setpoint inputs.
     NUMERIC_PAIR_VALUE_PATHS: frozenset[KeyPath] = frozenset(
         tuple(path.split("."))
         for path in (
@@ -294,6 +294,26 @@ class RecipeSchema:
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C3.endpoint.hold_time_min=30"
+            ),
+        ),
+        _knob(
+            "campaigns.C3.alkali_dosing.Na_kg",
+            low=0.0,
+            high=140.0,
+            units="kg",
+            bounds_source=(
+                "engineering_envelope from disabled=0 plus "
+                "setpoints:campaigns.C3.Na_phase.Na_total_kg high bound"
+            ),
+        ),
+        _knob(
+            "campaigns.C3.alkali_dosing.K_kg",
+            low=0.0,
+            high=56.0,
+            units="kg",
+            bounds_source=(
+                "engineering_envelope from setpoints:campaigns.C3."
+                "K_phase.K_per_cycle_kg high bound over two cycles"
             ),
         ),
         _knob(
@@ -649,6 +669,8 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C3.K_phase.pO2_bakeout_mbar",
         "campaigns.C3.Na_phase.pO2_bakeout_mbar",
         "campaigns.C3.endpoint.hold_time_min",
+        "campaigns.C3.alkali_dosing.Na_kg",
+        "campaigns.C3.alkali_dosing.K_kg",
         "campaigns.C3.duration_after_pathA_h",
         "campaigns.C3.duration_after_pathB_h_per_phase",
         "campaigns.C4.temp_range_C",
