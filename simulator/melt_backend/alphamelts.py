@@ -609,12 +609,12 @@ class AlphaMELTSBackend(MeltBackend):
                               tolerance_C: float = 2.0,
                               ) -> LiquidusSolidusResult:
         """Find solidus/liquidus when a liquid-fraction transport is live."""
-        if self._mode not in {'python_api', 'thermoengine'}:
+        if self._mode not in {'python_api', 'thermoengine', 'subprocess'}:
             return LiquidusSolidusResult(
                 status='unavailable',
                 warnings=(
-                    'AlphaMELTS liquidus finder requires ThermoEngine or '
-                    'PetThermoTools python_api mode',
+                    'AlphaMELTS liquidus finder requires ThermoEngine, '
+                    'PetThermoTools python_api, or subprocess mode',
                 ),
             )
 

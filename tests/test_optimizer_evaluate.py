@@ -6,8 +6,17 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.alphamelts import AlphaMELTSProvider
+from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendUnavailableError
-from simulator.chemistry.kernel import ProposalRejected
+from simulator.chemistry.kernel import (
+    ChemistryIntent,
+    ChemistryKernel,
+    ProposalRejected,
+    ProviderRegistry,
+)
+from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
     EngineBugAbort,
@@ -714,6 +723,52 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     assert "composition_digest" in trace["rump_terminal"]["proof_inputs"]
     assert trace["out_of_domain_crash_point"]["temperature_C"] == pytest.approx(1100.0)
     assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+
+
+def test_kernel_liquidus_account_overrides_reach_alphamelts_provider() -> None:
+    class RecordingAlphaMELTSBackend(AlphaMELTSBackend):
+        def __init__(self) -> None:
+            super().__init__()
+            self._mode = "subprocess"
+            self.finder_calls: list[dict[str, object]] = []
+
+        def get_engine_version(self) -> str:
+            return "fake-alphamelts subprocess"
+
+        def find_liquidus_solidus(self, **kwargs: object) -> LiquidusSolidusResult:
+            self.finder_calls.append(dict(kwargs))
+            return LiquidusSolidusResult(
+                liquidus_T_C=1400.0,
+                solidus_T_C=1200.0,
+                liquid_fraction=1.0,
+                status="ok",
+            )
+
+    backend = RecordingAlphaMELTSBackend()
+    provider = AlphaMELTSProvider(backend=backend)
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.SILICATE_LIQUIDUS])
+    kernel = ChemistryKernel(
+        ledger=AtomLedger(
+            initial_balances={"process.cleaned_melt": {"SiO2": 99.0}}
+        ),
+        registry=registry,
+        species_formula_registry={},
+    )
+
+    overrides = {"process.cleaned_melt": {"SiO2": 1.0, "CaO": 2.0}}
+    result = kernel.dispatch(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        temperature_C=1100.0,
+        pressure_bar=1.0e-6,
+        fO2_log=-9.0,
+        account_mol_overrides=overrides,
+    )
+
+    assert result.status == "ok"
+    assert backend.finder_calls
+    provider_request = backend.finder_calls[-1]["composition_mol_by_account"]
+    assert provider_request == overrides
 
 
 @pytest.mark.parametrize(

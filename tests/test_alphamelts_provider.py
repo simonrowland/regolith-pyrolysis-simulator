@@ -7,9 +7,9 @@ Covers goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` checklist:
 2. DomainGate rejects metal-only / gas-only / halide-only compositions
    (checklist item 2 / 4 / acceptance gate "DomainGate rejects
    metal/gas/halide compositions in tests").
-3. Provider returns :class:`LiquidusDiagnostics` from ThermoEngine or
-   PetThermoTools for the liquidus finder and keeps subprocess liquidus
-   unavailable rather than fabricating a number.
+3. Provider returns :class:`LiquidusDiagnostics` from ThermoEngine,
+   PetThermoTools, or subprocess-backed liquid-fraction sampling for the
+   liquidus finder.
 4. :attr:`IntentResult.transition` is ALWAYS ``None`` (checklist 5,
    acceptance gate "No LedgerTransition emitted").
 5. The provider module does NOT import ``LedgerTransition`` /
@@ -198,12 +198,12 @@ class _FakeAlphaMELTSBackend:
 
     def find_liquidus_solidus(self, **kwargs):
         self.finder_calls.append(kwargs)
-        if self._mode not in {'thermoengine', 'python_api'}:
+        if self._mode not in {'thermoengine', 'python_api', 'subprocess'}:
             return LiquidusSolidusResult(
                 status='unavailable',
                 warnings=(
-                    'fake AlphaMELTS finder requires thermoengine or '
-                    'python_api mode',
+                    'fake AlphaMELTS finder requires thermoengine, '
+                    'python_api, or subprocess mode',
                 ),
             )
         return self._finder_result or LiquidusSolidusResult(
@@ -429,7 +429,7 @@ def test_provider_returns_liquidus_diagnostics_for_thermoengine_path():
     assert backend.finder_calls
 
 
-def test_provider_reports_liquidus_unavailable_for_subprocess_path():
+def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     backend = _FakeAlphaMELTSBackend(
         mode='subprocess',
         equilibrium=_build_equilibrium_for_basalt(liquidus_C=1280.0),
@@ -440,13 +440,17 @@ def test_provider_reports_liquidus_unavailable_for_subprocess_path():
         composition_mol=_basalt_species_mol(),
     )
     result = provider.dispatch(request)
-    assert result.status == 'unavailable'
+    assert result.status == 'ok'
     assert result.transition is None
     diagnostic = dict(result.diagnostic or {})
     assert diagnostic['mode'] == 'subprocess'
-    assert diagnostic['liquidus_T_C'] is None
-    assert diagnostic['solidus_T_C'] is None
-    assert any('requires' in warning for warning in result.warnings)
+    assert diagnostic['liquidus_T_C'] == pytest.approx(1305.0)
+    assert diagnostic['solidus_T_C'] == pytest.approx(1000.0)
+    assert backend.finder_calls
+    call_kwargs = backend.finder_calls[0]
+    assert (
+        'process.cleaned_melt' in call_kwargs['composition_mol_by_account']
+    )
 
 
 def test_provider_handles_silicate_equilibrium_intent():

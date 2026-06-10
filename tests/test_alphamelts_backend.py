@@ -127,18 +127,38 @@ def test_alphamelts_ok_result_requires_finite_phase_mass_fraction(
         )
 
 
-def test_alphamelts_subprocess_liquidus_finder_is_unavailable():
-    backend = AlphaMELTSBackend()
-    backend._mode = 'subprocess'
+def test_alphamelts_subprocess_liquidus_finder_uses_fraction_samples():
+    class FakeFinderBackend(AlphaMELTSBackend):
+        def __init__(self):
+            super().__init__()
+            self._mode = 'subprocess'
+
+        def equilibrate(self, temperature_C, **kwargs):
+            frac = max(0.0, min(1.0, (float(temperature_C) - 1000.0) / 300.0))
+            return EquilibriumResult(
+                temperature_C=float(temperature_C),
+                pressure_bar=float(kwargs.get('pressure_bar', 1e-6)),
+                liquid_fraction=frac,
+                phases_present=['liq'] if frac > 0.0 else ['ol'],
+                phase_masses_kg={'liq': frac, 'ol': 1.0 - frac},
+                status='ok',
+            )
+
+    backend = FakeFinderBackend()
 
     result = backend.find_liquidus_solidus(
         composition_kg={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 15.0, 'CaO': 20.0},
         fO2_log=-9.0,
         pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
     )
 
-    assert result.status == 'unavailable'
-    assert any('python_api mode' in warning for warning in result.warnings)
+    assert result.status == 'ok'
+    assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
 def _melts_domain_composition() -> dict[str, float]:
