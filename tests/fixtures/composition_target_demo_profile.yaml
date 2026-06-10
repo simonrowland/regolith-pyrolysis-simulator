@@ -1,0 +1,55 @@
+profile_id: composition-target-demo-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_mare_low_ti
+description: Demo composition-target objective for stub optimizer smoke runs.
+north_star_rationale: Exercise the v1 composition-target objective without adding a shipped feedstock profile.
+objective_emphasis:
+  primary: composition-target demo score
+objectives:
+  - type: composition_target
+    id: pc-demo-residual-rump
+    metric: composition_target:pc-demo-residual-rump
+    sense: maximize
+    units: score_0_1
+    weight: 1.0
+    rationale: Demo PC-style target over residual rump composition.
+    target:
+      pool: residual_rump_at_stop
+      species_vector:
+        Si: retain
+      composition_window:
+        pool: residual_rump_at_stop
+        basis: oxide_wt_pct
+        mode: hard_window
+        oxides:
+          SiO2:
+            min: 0.0
+            max: 100.0
+            weight: 1.0
+            needs_experiment: true
+      maturity:
+        mode: campaign_hours
+        campaign: C2B
+        hours: 24
+      constraints:
+        coating_min_campaigns_to_resinter: profile_default
+        furnace_T_max_C: profile_or_study_constraint
+      score_weights:
+        extraction: 0.0
+        composition: 1.0
+constraints:
+  gates: [coating]
+run:
+  campaign: C0
+  hours: 1
+  mass_kg: 1000.0
+  backend_name: stub
+fidelities:
+  stub:
+    backend_name: stub
+    hours: 1
+seed_recipes:
+  - id: composition-target-demo-seed
+    source_campaign: C0
+    rationale: Minimal no-op seed for stub smoke.
+    patch: {}

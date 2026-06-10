@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 import hashlib
 import inspect
@@ -26,6 +26,10 @@ from simulator.optimize.evalspec import (
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveVector,
+    composition_target_eval_metadata,
+    composition_target_infeasible_reason,
+    composition_targets_require_coating,
+    composition_targets_require_terminal_rump,
     compute_objectives,
     product_summary,
 )
@@ -37,7 +41,7 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     physics_constraints_digest,
 )
-from simulator.optimize.profiles import validate_profile
+from simulator.optimize.profiles import physics_constraints_from_profile, validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.reduced_real_determinism import PT0NonFinitePayload
@@ -231,6 +235,7 @@ def evaluate(
             notes=(str(exc),),
         )
 
+    active_constraints = _composition_target_constraints(profile, constraints)
     try:
         spec, run_config = _build_eval_inputs(
             validated_patch,
@@ -238,7 +243,7 @@ def evaluate(
             fidelity,
             profile,
             active_schema,
-            constraints=constraints,
+            constraints=active_constraints,
         )
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
@@ -363,7 +368,7 @@ def evaluate(
             run_execution,
             profile,
             patch=validated_patch,
-            constraints=constraints,
+            constraints=active_constraints,
         )
 
     _abort_on_non_authoritative_backend_status(
@@ -399,9 +404,32 @@ def evaluate(
             ),
         )
 
-    feasibility = (constraints or PhysicsConstraintSet()).evaluate(run_execution.trace)
+    feasibility = (active_constraints or PhysicsConstraintSet()).evaluate(run_execution.trace)
     if not feasibility.feasible:
         return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
+    target_reason = composition_target_infeasible_reason(profile)
+    if target_reason:
+        return _target_infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            gate="composition_target_order",
+            detail=target_reason,
+            notes=(target_reason,),
+        )
+    if composition_targets_require_terminal_rump(profile) and not _trace_has_earned_rump_terminal(run_execution):
+        return _target_infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            gate="rump_terminal",
+            detail="rump_terminal_unproven",
+            notes=("rump_terminal_unproven",),
+        )
 
     try:
         objectives = compute_objectives(profile, run_execution)
@@ -470,6 +498,7 @@ def _build_eval_inputs(
     feedstock = bundle.feedstocks[feedstock_id]
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
+    target_metadata = composition_target_eval_metadata(profile)
     run_options = _run_options(profile, fidelity)
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
@@ -518,6 +547,10 @@ def _build_eval_inputs(
         mre_target_species=str(run_options["mre_target_species"]),
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         chemistry_kernel=run_options["chemistry_kernel"],
+        target_spec_id=str(target_metadata["target_spec_id"]),
+        target_spec_digest=str(target_metadata["target_spec_digest"]),
+        target_maturity=target_metadata["target_maturity"],
+        target_provenance=target_metadata["target_provenance"],
     )
     return spec, run_config
 
@@ -584,6 +617,22 @@ def _profile_digest(profile: Mapping[str, Any]) -> str:
     return hashlib.sha256(canonical_json_dumps(normalized).encode("utf-8")).hexdigest()
 
 
+def _composition_target_constraints(
+    profile: Mapping[str, Any],
+    constraints: PhysicsConstraintSet | None,
+) -> PhysicsConstraintSet | None:
+    active = constraints or physics_constraints_from_profile(profile)
+    try:
+        requires_coating = composition_targets_require_coating(profile)
+    except ValueError:
+        return active
+    if not requires_coating:
+        return active
+    if "coating" in active.active_gates:
+        return active
+    return replace(active, active_gates=(*active.active_gates, "coating"))
+
+
 def _infeasible_result(
     candidate_id: str | None,
     spec: EvalSpec,
@@ -606,6 +655,62 @@ def _infeasible_result(
         run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
         notes=notes,
     )
+
+
+def _target_infeasible_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    gate: str,
+    detail: str,
+    notes: tuple[str, ...],
+    trace_payload: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    margin = _target_infeasible_margin(gate, detail)
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={gate: margin},
+        failing_gates=(gate,),
+        run_reference=_run_reference(
+            run_execution,
+            profile,
+            trace_payload=trace_payload,
+        ),
+        notes=notes,
+    )
+
+
+def _target_infeasible_margin(gate: str, detail: str) -> GateMargin:
+    threshold = ThresholdSpec(
+        id=f"{gate}_required",
+        value=1.0,
+        units="boolean",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: composition target hard gate",
+    )
+    return GateMargin(
+        gate=gate,
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=0.0,
+        detail=detail,
+    )
+
+
+def _trace_has_earned_rump_terminal(run_execution: Any) -> bool:
+    trace = getattr(run_execution, "trace", None)
+    payload = _carrier_value(trace, "rump_terminal")
+    if not isinstance(payload, MappingABC):
+        return False
+    return str(payload.get("status", "")) == "earned"
 
 
 def _out_of_domain_result(
@@ -665,6 +770,19 @@ def _out_of_domain_result(
                 trace_payload=assessment.trace_payload,
             ),
             notes=assessment.notes,
+        )
+
+    if composition_targets_require_terminal_rump(profile):
+        return _target_infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            gate="rump_terminal",
+            detail="rump_terminal_unproven",
+            notes=(*assessment.notes, "rump_terminal_unproven"),
+            trace_payload=assessment.trace_payload,
         )
 
     return ScoredResult(

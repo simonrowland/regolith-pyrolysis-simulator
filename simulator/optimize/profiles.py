@@ -13,9 +13,13 @@ import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.objective import (
+    COMPOSITION_TARGET_METRIC_PREFIX,
+    COMPOSITION_TARGET_TYPE,
     ObjectiveProfileError,
+    normalize_composition_target_objective,
     objective_definitions,
     objective_importance_evidence,
+    objective_type,
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
@@ -63,6 +67,7 @@ _TOP_LEVEL_KEYS = frozenset(
     }
 )
 _OBJECTIVE_KEYS = frozenset({"metric", "sense", "units", "weight", "rationale"})
+_LEGACY_OBJECTIVE_KEYS = _OBJECTIVE_KEYS | frozenset({"type"})
 _THRESHOLD_CONSTRAINT_KEYS = MappingProxyType({
     "stream_purity_min": "stream_purity_min",
     "coating_min_campaigns_to_resinter": "coating_min_campaigns_to_resinter",
@@ -294,20 +299,45 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
     if not isinstance(raw_objectives, list) or not raw_objectives:
         raise ProfileValidationError(f"{source}: objectives must be a non-empty list")
     seen: set[str] = set()
+    normalized_objectives: list[Mapping[str, Any]] = []
     for index, objective in enumerate(raw_objectives):
         where = f"objectives[{index}]"
         if not isinstance(objective, Mapping):
             raise ProfileValidationError(f"{source}: {where} must be a mapping")
-        _reject_unknown_keys(objective, _OBJECTIVE_KEYS, source=source, where=where)
+        kind = objective_type(objective)
+        if kind == COMPOSITION_TARGET_TYPE:
+            try:
+                normalized = normalize_composition_target_objective(
+                    objective,
+                    where=where,
+                )
+            except ObjectiveProfileError as exc:
+                raise ProfileValidationError(f"{source}: {exc}") from exc
+            metric = normalized["metric"]
+            if not str(metric).startswith(COMPOSITION_TARGET_METRIC_PREFIX):
+                raise ProfileValidationError(
+                    f"{source}: {where}.metric must be a composition_target key"
+                )
+            normalized_objectives.append(normalized)
+        elif kind == "legacy_metric":
+            _reject_unknown_keys(objective, _LEGACY_OBJECTIVE_KEYS, source=source, where=where)
+            if "type" in objective and objective["type"] != "legacy_metric":
+                raise ProfileValidationError(f"{source}: unknown objective type {kind!r}")
+            _require_keys(objective, {"metric", "sense", "units"}, source=source, where=where)
+            metric = objective["metric"]
+            if metric not in KNOWN_OBJECTIVE_METRICS:
+                raise ProfileValidationError(f"{source}: unknown objective metric {metric!r}")
+            normalized_objectives.append(dict(objective))
+        else:
+            raise ProfileValidationError(f"{source}: unknown objective type {kind!r}")
         _require_keys(objective, {"metric", "sense", "units"}, source=source, where=where)
-        metric = objective["metric"]
-        if metric not in KNOWN_OBJECTIVE_METRICS:
-            raise ProfileValidationError(f"{source}: unknown objective metric {metric!r}")
         if metric in seen:
             raise ProfileValidationError(f"{source}: duplicate objective metric {metric!r}")
         seen.add(metric)
         if "rationale" in objective and not isinstance(objective["rationale"], str):
             raise ProfileValidationError(f"{source}: {where}.rationale must be a string")
+    if isinstance(profile, dict):
+        profile["objectives"] = normalized_objectives
     try:
         objective_importance_evidence(profile)
         objective_definitions(profile)

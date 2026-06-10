@@ -238,6 +238,60 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_composition_target_metric_and_evalspec_metadata_round_trip(tmp_path) -> None:
+    spec = _base_spec(
+        target_spec_id="pc-glass-clear",
+        target_spec_digest="target-digest",
+        target_maturity={"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+        target_provenance={
+            "composition_window": {
+                "oxides": {
+                    "Fe2O3": {
+                        "tier": "clear_container",
+                        "needs_experiment": True,
+                        "min": 0.0,
+                        "max": 1.0,
+                    }
+                }
+            }
+        },
+    )
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue(
+                "composition_target:pc-glass-clear",
+                "maximize",
+                1.0,
+                "score_0_1",
+                ordinal=0,
+            ),
+        )
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(
+        spec,
+        _scored(spec, objectives=objectives),
+        created_at="2026-06-10T00:00:00Z",
+    )
+
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.eval_spec is not None
+    assert loaded.eval_spec.target_spec_id == "pc-glass-clear"
+    assert loaded.eval_spec.target_spec_digest == "target-digest"
+    assert loaded.eval_spec.target_maturity["campaign"] == "C2B"
+    row = loaded.eval_spec.target_provenance["composition_window"]["oxides"]["Fe2O3"]
+    assert row["tier"] == "clear_container"
+    assert row["needs_experiment"] is True
+    assert loaded.objectives is not None
+    assert loaded.objectives.as_mapping()["composition_target:pc-glass-clear"] == pytest.approx(1.0)
+
+
 @pytest.mark.parametrize(
     ("bad_result", "message"),
     (

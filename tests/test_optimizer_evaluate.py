@@ -108,6 +108,14 @@ class _Stage:
         self.collected_kg = collected_kg or {}
 
 
+class _EvalLedger:
+    def mol_by_account(self, account: str | None = None):
+        balances = {"process.cleaned_melt": {"CaO": 1.0}}
+        if account is None:
+            return {key: dict(value) for key, value in balances.items()}
+        return dict(balances.get(account, {}))
+
+
 class _Sim:
     def __init__(
         self,
@@ -115,6 +123,7 @@ class _Sim:
         backend_diagnostics: dict[str, object] | None = None,
         freeze_curve: dict[str, object] | None = None,
     ) -> None:
+        self.atom_ledger = _EvalLedger()
         self.train = SimpleNamespace(
             stages=(
                 _Stage(),
@@ -303,6 +312,47 @@ def _kernel_curve(
         "liquidus_T_C": 1400.0,
         "path": ((1200.0, 0.0), (1400.0, 1.0)),
     }
+
+
+def _composition_eval_profile(
+    pool: str,
+    *,
+    target_id: str = "composition-eval-test",
+    oxides: dict[str, dict[str, float]] | None = None,
+) -> dict:
+    profile = {
+        **PROFILE,
+        "profile_id": f"{target_id}-profile",
+        "objectives": [
+            {
+                "type": "composition_target",
+                "id": target_id,
+                "metric": f"composition_target:{target_id}",
+                "sense": "maximize",
+                "units": "score_0_1",
+                "weight": 1.0,
+                "rationale": "test composition target objective",
+                "target": {
+                    "pool": pool,
+                    "species_vector": {"Ca": "retain"},
+                    "composition_window": {
+                        "pool": pool,
+                        "basis": "oxide_wt_pct",
+                        "mode": "hard_window",
+                        "oxides": oxides
+                        or {"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+                    },
+                    "maturity": {"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+                    "constraints": {
+                        "coating_min_campaigns_to_resinter": "profile_default",
+                        "furnace_T_max_C": "profile_or_study_constraint",
+                    },
+                    "score_weights": {"extraction": 0.0, "composition": 1.0},
+                },
+            }
+        ],
+    }
+    return profile
 
 
 def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
@@ -551,6 +601,105 @@ def test_missing_objective_output_on_feasible_run_aborts_as_engine_bug() -> None
         )
 
     assert raised.value.category is FailureCategory.ENGINE_BUG
+
+
+def test_composition_target_missing_pool_aborts_as_engine_bug() -> None:
+    execution = _execution()
+    execution.simulator.train.stages[3].collected_kg = {}
+    execution.trace.condensed_by_stage_species_delta = ({},)
+    profile = _composition_eval_profile(
+        "captured_stage_3_silica",
+        target_id="pc-missing-pool",
+    )
+    profile["constraints"] = {"gates": ["coating"]}
+
+    with pytest.raises(EngineBugAbort, match="captured_stage_3_silica") as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=profile,
+            executor=FakeExecutor(execution),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+
+
+def test_composition_target_terminal_rump_unearned_is_infeasible() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "terminal_rump_earned",
+            target_id="pc-ceramic-test",
+            oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        ),
+        executor=FakeExecutor(_execution()),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.objectives is None
+    assert result.failing_gates == ("rump_terminal",)
+    assert "rump_terminal_unproven" in result.notes
+
+
+def test_composition_target_forces_coating_gate_for_arbitrary_target_id() -> None:
+    trace = _trace()
+    delattr(trace, "wall_deposit_by_segment_species_delta")
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "residual_rump_at_stop",
+            target_id="glass-clear-post-fe-v1",
+        ),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.objectives is None
+    assert result.failing_gates == ("coating",)
+
+
+def test_composition_target_require_coating_gate_false_skips_coating_gate() -> None:
+    trace = _trace()
+    delattr(trace, "wall_deposit_by_segment_species_delta")
+    profile = _composition_eval_profile(
+        "residual_rump_at_stop",
+        target_id="glass-clear-post-fe-v1",
+    )
+    profile["objectives"][0]["target"]["require_coating_gate"] = False
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert result.feasible
+    assert result.failing_gates == ()
+
+
+def test_legacy_metric_profile_does_not_force_coating_gate() -> None:
+    trace = _trace()
+    delattr(trace, "wall_deposit_by_segment_species_delta")
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert result.feasible
+    assert result.failing_gates == ()
 
 
 def test_invalid_patch_rejected_before_run() -> None:
@@ -1016,6 +1165,60 @@ def test_evalspec_cache_key_and_scored_result_are_deterministic() -> None:
     assert first.eval_spec == second.eval_spec
     assert first.objectives == second.objectives
     assert first.feasible == second.feasible
+
+
+def test_composition_target_evalspec_carries_target_digest() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "residual_rump_at_stop",
+            target_id="pc-glass-test",
+            oxides={"Fe2O3": {"tier": "clear_container"}},
+        ),
+        executor=FakeExecutor(_execution()),
+    )
+
+    assert result.eval_spec is not None
+    assert result.eval_spec.target_spec_id == "pc-glass-test"
+    assert result.eval_spec.target_spec_digest
+    assert result.eval_spec.target_maturity["campaign"] == "C2B"
+    row = result.eval_spec.target_provenance["composition_window"]["oxides"]["Fe2O3"]
+    assert row["tier"] == "clear_container"
+    assert row["needs_experiment"] is True
+
+
+def test_require_coating_gate_toggle_changes_target_digest_and_cache_key() -> None:
+    default_profile = _composition_eval_profile(
+        "residual_rump_at_stop",
+        target_id="glass-clear-post-fe-v1",
+    )
+    opt_out_profile = _composition_eval_profile(
+        "residual_rump_at_stop",
+        target_id="glass-clear-post-fe-v1",
+    )
+    opt_out_profile["objectives"][0]["target"]["require_coating_gate"] = False
+
+    default_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=default_profile,
+        executor=FakeExecutor(_execution()),
+    )
+    opt_out_result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=opt_out_profile,
+        executor=FakeExecutor(_execution()),
+    )
+
+    assert default_result.eval_spec is not None
+    assert opt_out_result.eval_spec is not None
+    assert default_result.eval_spec.target_spec_digest != opt_out_result.eval_spec.target_spec_digest
+    assert default_result.cache_key != opt_out_result.cache_key
 
 
 def test_cached_real_profile_builds_honest_evalspec_and_cache_config(

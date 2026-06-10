@@ -54,6 +54,10 @@ class EvalSpec:
     mre_target_species: str = ""
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
+    target_spec_id: str = ""
+    target_spec_digest: str = ""
+    target_maturity: Mapping[str, Any] = field(default_factory=dict)
+    target_provenance: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -81,6 +85,10 @@ class EvalSpec:
             raise TypeError("mre_max_voltage_V must be numeric")
         if not isinstance(self.mre_target_species, str):
             raise TypeError("mre_target_species must be a string")
+        if not isinstance(self.target_spec_id, str):
+            raise TypeError("target_spec_id must be a string")
+        if not isinstance(self.target_spec_digest, str):
+            raise TypeError("target_spec_digest must be a string")
         object.__setattr__(self, "data_digests", _freeze_digest_map(self.data_digests))
         object.__setattr__(self, "additives_kg", _freeze_value(self.additives_kg, "additives_kg"))
         object.__setattr__(
@@ -92,6 +100,16 @@ class EvalSpec:
             self,
             "chemistry_kernel",
             _freeze_value(self.chemistry_kernel, "chemistry_kernel"),
+        )
+        object.__setattr__(
+            self,
+            "target_maturity",
+            _freeze_value(self.target_maturity, "target_maturity"),
+        )
+        object.__setattr__(
+            self,
+            "target_provenance",
+            _freeze_value(self.target_provenance, "target_provenance"),
         )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
@@ -116,6 +134,10 @@ class EvalSpec:
                 self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.chemistry_kernel),
+                self.target_spec_id,
+                self.target_spec_digest,
+                _thaw_value(self.target_maturity),
+                _thaw_value(self.target_provenance),
             ),
         )
 
@@ -160,6 +182,10 @@ class PrefixEvalSpec(EvalSpec):
                 self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.chemistry_kernel),
+                self.target_spec_id,
+                self.target_spec_digest,
+                _thaw_value(self.target_maturity),
+                _thaw_value(self.target_provenance),
                 self.prefix_stage_ids,
                 self.prefix_recipe_ids,
                 self.topology_id,
@@ -193,6 +219,14 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "runtime_campaign_overrides": spec.runtime_campaign_overrides,
         "track": spec.track,
     }
+    if spec.target_spec_digest:
+        payload.update(
+            {
+                "target_maturity": spec.target_maturity,
+                "target_spec_digest": spec.target_spec_digest,
+                "target_spec_id": spec.target_spec_id,
+            }
+        )
     if isinstance(spec, PrefixEvalSpec):
         payload.update(
             {

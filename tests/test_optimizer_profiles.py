@@ -7,6 +7,7 @@ import pytest
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER
 from simulator.optimize.profiles import (
@@ -26,7 +27,8 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     for feedstock, profile in profiles.items():
         assert profile["feedstock"] == feedstock
         for objective in profile["objectives"]:
-            assert objective["metric"] in KNOWN_OBJECTIVE_METRICS
+            if objective.get("type", "legacy_metric") == "legacy_metric":
+                assert objective["metric"] in KNOWN_OBJECTIVE_METRICS
         assert set(profile["constraints"]["gates"]).issubset(set(GATE_ORDER))
         for seed in profile["seed_recipes"]:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
@@ -139,6 +141,185 @@ def test_c5_enabled_unknown_target_without_voltage_raises_named_error() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_composition_target_validates_and_resolves_fe_tier() -> None:
+    profile = _composition_profile()
+
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+    objective = validated["objectives"][0]
+    fe_row = objective["target"]["composition_window"]["oxides"][
+        "Fe_total_as_Fe2O3_wt_pct"
+    ]
+    assert objective["type"] == "composition_target"
+    assert objective["metric"] == "composition_target:pc-glass-clear-test"
+    assert fe_row["tier"] == "clear_container"
+    assert fe_row["min"] == pytest.approx(0.0)
+    assert fe_row["max"] == pytest.approx(1.0)
+    assert fe_row["weight"] == pytest.approx(1.0)
+    assert fe_row["needs_experiment"] is True
+    assert "provenance" in fe_row
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (lambda p: p["objectives"][0].update({"type": "mystery"}), "unknown objective type"),
+        (
+            lambda p: p["objectives"][0]["target"]["species_vector"].update(
+                {"Fe": "free", "Si": "free", "Al": "free", "Ca": "free"}
+            ),
+            "all-free",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"]["composition_window"].update({"oxides": {}}),
+            "non-empty mapping",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"]["composition_window"]["oxides"]["SiO2"].update(
+                {"weight": 0.0}
+            ),
+            "weight must be positive",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"].update({"pool": "unknown_pool"}),
+            "unknown pool id",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"]["composition_window"]["oxides"][
+                "Fe_total_as_Fe2O3_wt_pct"
+            ].update({"tier": "unknown_tier"}),
+            "unknown tier",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"].update(
+                {"score_weights": {"extraction": 0.0, "composition": 0.0}}
+            ),
+            "at least one positive branch",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"].update({"surprise": True}),
+            "unknown objectives\\[0\\].target key",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"].update({"require_coating_gate": "false"}),
+            "require_coating_gate must be bool",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"]["composition_window"].update(
+                {"mode": "soft_distance", "exploratory": True}
+            ),
+            "soft_distance requires exploratory non-menu target",
+        ),
+    ],
+)
+def test_composition_target_degenerate_profiles_fail_loud(mutation, message: str) -> None:
+    profile = _composition_profile()
+    mutation(profile)
+
+    with pytest.raises(ProfileValidationError, match=message):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda p: p["objectives"][0]["target"]["extraction"].update(
+            {"captured_pool": "captured_stage_3_silica"}
+        ),
+        lambda p: p["objectives"][0]["target"]["extraction"]["completeness_min"].update(
+            {"Fe": 0.9}
+        ),
+        lambda p: p["objectives"][0]["target"]["composition_window"]["oxides"]["SiO2"].update(
+            {"max": 70.0}
+        ),
+        lambda p: p["objectives"][0]["target"]["maturity"].update({"hours": 48}),
+        lambda p: p["objectives"][0]["target"].update(
+            {"score_weights": {"extraction": 0.25, "composition": 0.75}}
+        ),
+        lambda p: p["objectives"][0]["target"].update({"require_coating_gate": False}),
+    ],
+)
+def test_composition_target_digest_covers_full_target_spec(mutation) -> None:
+    base = validate_profile(_composition_profile(), expected_feedstock="lunar_mare_low_ti")
+    edited_raw = _composition_profile()
+    mutation(edited_raw)
+    edited = validate_profile(edited_raw, expected_feedstock="lunar_mare_low_ti")
+
+    assert composition_target_eval_metadata(base)["target_spec_digest"] != (
+        composition_target_eval_metadata(edited)["target_spec_digest"]
+    )
+
+
 def _profile_copy(feedstock: str) -> dict:
     path = DEFAULT_DATA_DIR / "optimize_profiles" / f"{feedstock}.yaml"
     return copy.deepcopy(yaml.safe_load(path.read_text()))
+
+
+def _composition_profile() -> dict:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["profile_id"] = "composition-target-profile-test"
+    profile["objectives"] = [
+        {
+            "type": "composition_target",
+            "id": "pc-glass-clear-test",
+            "metric": "composition_target:pc-glass-clear-test",
+            "sense": "maximize",
+            "units": "score_0_1",
+            "weight": 1.0,
+            "rationale": "test composition target evidence",
+            "target": {
+                "pool": "residual_rump_at_stop",
+                "species_vector": {
+                    "Fe": "extract",
+                    "Si": "retain",
+                    "Al": "retain",
+                    "Ca": "retain",
+                },
+                "extraction": {
+                    "basis": "input_element_mol",
+                    "captured_pool": "captured_products",
+                    "credit_policy": {
+                        "additives": "no_product_credit",
+                        "vented": "no_product_credit",
+                    },
+                    "completeness_min": {"Fe": 0.5},
+                },
+                "composition_window": {
+                    "pool": "residual_rump_at_stop",
+                    "basis": "oxide_wt_pct",
+                    "mode": "hard_window",
+                    "oxides": {
+                        "SiO2": {
+                            "min": 45.0,
+                            "max": 75.0,
+                            "weight": 2.0,
+                            "needs_experiment": True,
+                        },
+                        "Al2O3": {
+                            "min": 5.0,
+                            "max": 25.0,
+                            "weight": 1.0,
+                            "needs_experiment": True,
+                        },
+                        "CaO": {
+                            "min": 5.0,
+                            "max": 25.0,
+                            "weight": 1.0,
+                            "needs_experiment": True,
+                        },
+                        "Fe_total_as_Fe2O3_wt_pct": {
+                            "tier": "clear_container",
+                            "needs_experiment": True,
+                        },
+                    },
+                },
+                "maturity": {"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+                "constraints": {
+                    "coating_min_campaigns_to_resinter": "profile_default",
+                    "furnace_T_max_C": "profile_or_study_constraint",
+                },
+                "score_weights": {"extraction": 0.5, "composition": 0.5},
+            },
+        }
+    ]
+    return profile

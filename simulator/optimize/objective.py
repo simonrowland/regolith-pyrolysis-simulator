@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import replace
+import hashlib
 import math
 from types import MappingProxyType
 from collections.abc import Callable, Sequence
 from typing import Any, Mapping, TypeVar
 
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -21,6 +24,90 @@ from simulator.trace import wall_deposit_kg_by_zone_species
 
 _MISSING = object()
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
+COMPOSITION_TARGET_TYPE = "composition_target"
+COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
+SUPPORTED_COMPOSITION_POOLS = frozenset(
+    {
+        "captured_stage_3_silica",
+        "captured_products",
+        "residual_rump_at_stop",
+        "terminal_rump_earned",
+    }
+)
+COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
+COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free"})
+COMPOSITION_WINDOW_MODES = frozenset({"hard_window", "soft_distance"})
+_COMPOSITION_OBJECTIVE_KEYS = frozenset(
+    {"type", "id", "metric", "sense", "units", "weight", "rationale", "target"}
+)
+_COMPOSITION_TARGET_KEYS = frozenset(
+    {
+        "pool",
+        "require_coating_gate",
+        "species_vector",
+        "extraction",
+        "composition_window",
+        "maturity",
+        "constraints",
+        "score_weights",
+    }
+)
+_EXTRACTION_KEYS = frozenset(
+    {"basis", "captured_pool", "credit_policy", "completeness_min"}
+)
+_CREDIT_POLICY_KEYS = frozenset({"additives", "vented"})
+_COMPOSITION_WINDOW_KEYS = frozenset(
+    {"pool", "basis", "mode", "oxides", "exploratory"}
+)
+_OXIDE_ROW_KEYS = frozenset(
+    {"min", "max", "weight", "needs_experiment", "tier", "provenance"}
+)
+_MATURITY_KEYS = frozenset({"mode", "campaign", "hours"})
+_TARGET_CONSTRAINT_KEYS = frozenset(
+    {"coating_min_campaigns_to_resinter", "furnace_T_max_C"}
+)
+_SCORE_WEIGHT_KEYS = frozenset({"extraction", "composition"})
+_FE_TIER_BOUNDS = MappingProxyType(
+    {
+        "clear_container": MappingProxyType(
+            {
+                "min": 0.0,
+                "max": 1.0,
+                "weight": 1.0,
+                "needs_experiment": True,
+                "provenance": "design-composition-target-objective-2026-06-10 seed",
+            }
+        ),
+        "green_amber_container": MappingProxyType(
+            {
+                "min": 1.0,
+                "max": 10.0,
+                "weight": 1.0,
+                "needs_experiment": True,
+                "provenance": "design-composition-target-objective-2026-06-10 seed",
+            }
+        ),
+        "workable_glass": MappingProxyType(
+            {
+                "min": 0.0,
+                "max": 10.0,
+                "weight": 1.0,
+                "needs_experiment": True,
+                "provenance": "design-composition-target-objective-2026-06-10 seed",
+            }
+        ),
+    }
+)
+_POOL_LEDGER_ACCOUNTS = MappingProxyType(
+    {
+        "residual_rump_at_stop": ("process.cleaned_melt",),
+        "terminal_rump_earned": ("terminal.slag",),
+    }
+)
+_VENTED_PRODUCT_ACCOUNTS = frozenset(
+    {"terminal.oxygen_melt_offgas_vented_to_vacuum", "vent"}
+)
+_EPS = 1.0e-12
 _OBJECTIVE_SENSE_ALIASES = {
     "min": "minimize",
     "minimum": "minimize",
@@ -104,6 +191,525 @@ ObjectiveLike = ObjectiveVector | Mapping[str, float]
 T = TypeVar("T")
 
 
+def objective_type(raw: Mapping[str, Any]) -> str:
+    value = str(raw.get("type", "legacy_metric") or "legacy_metric")
+    return "legacy_metric" if value == "legacy_metric" else value
+
+
+def normalize_composition_target_objective(
+    raw: Mapping[str, Any],
+    *,
+    where: str = "objective",
+) -> dict[str, Any]:
+    _reject_unknown_objective_keys(raw, _COMPOSITION_OBJECTIVE_KEYS, where)
+    _require_objective_keys(raw, {"id", "metric", "sense", "units", "weight", "target"}, where)
+    target_id = _required_text(raw.get("id"), f"{where}.id")
+    metric = _required_text(raw.get("metric"), f"{where}.metric")
+    if metric != f"{COMPOSITION_TARGET_METRIC_PREFIX}{target_id}":
+        raise ObjectiveProfileError(
+            f"{where}.metric must be {COMPOSITION_TARGET_METRIC_PREFIX}{target_id}"
+        )
+    if str(raw.get("units")) != "score_0_1":
+        raise ObjectiveProfileError(f"{where}.units must be 'score_0_1'")
+    if normalize_objective_sense(str(raw.get("sense", ""))) != "maximize":
+        raise ObjectiveProfileError(f"{where}.sense must be maximize")
+    target = _normalize_target_spec(
+        raw.get("target"),
+        target_id=target_id,
+        where=f"{where}.target",
+    )
+    normalized = dict(raw)
+    normalized["type"] = COMPOSITION_TARGET_TYPE
+    normalized["id"] = target_id
+    normalized["metric"] = metric
+    normalized["sense"] = "maximize"
+    normalized["target"] = target
+    return normalized
+
+
+def composition_target_specs(profile: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    specs: list[Mapping[str, Any]] = []
+    raw_objectives = profile.get("objectives", ())
+    if not isinstance(raw_objectives, (list, tuple)):
+        return ()
+    for ordinal, raw in enumerate(raw_objectives):
+        if not isinstance(raw, Mapping):
+            continue
+        if objective_type(raw) == COMPOSITION_TARGET_TYPE:
+            specs.append(
+                normalize_composition_target_objective(
+                    raw,
+                    where=f"objectives[{ordinal}]",
+                )
+            )
+    return tuple(specs)
+
+
+def composition_target_eval_metadata(profile: Mapping[str, Any]) -> Mapping[str, Any]:
+    specs = composition_target_specs(profile)
+    if not specs:
+        return MappingProxyType(
+            {
+                "target_spec_id": "",
+                "target_spec_digest": "",
+                "target_maturity": MappingProxyType({}),
+                "target_provenance": MappingProxyType({}),
+            }
+        )
+    if len(specs) == 1:
+        objective = specs[0]
+        target = objective["target"]
+        return MappingProxyType(
+            {
+                "target_spec_id": str(objective["id"]),
+                "target_spec_digest": target_spec_digest(target),
+                "target_maturity": MappingProxyType(dict(target.get("maturity", {}))),
+                "target_provenance": MappingProxyType(_target_provenance(target)),
+            }
+        )
+    payload = tuple(
+        {
+            "id": str(objective["id"]),
+            "target": objective["target"],
+        }
+        for objective in specs
+    )
+    digest = target_spec_digest({"targets": payload})
+    return MappingProxyType(
+        {
+            "target_spec_id": f"multi:{digest[:16]}",
+            "target_spec_digest": digest,
+            "target_maturity": MappingProxyType(
+                {
+                    "targets": tuple(
+                        {
+                            "id": str(objective["id"]),
+                            "maturity": MappingProxyType(
+                                dict(objective["target"].get("maturity", {}))
+                            ),
+                        }
+                        for objective in specs
+                    )
+                }
+            ),
+            "target_provenance": MappingProxyType(
+                {
+                    "targets": tuple(
+                        {
+                            "id": str(objective["id"]),
+                            "provenance": MappingProxyType(
+                                _target_provenance(objective["target"])
+                            ),
+                        }
+                        for objective in specs
+                    )
+                }
+            ),
+        }
+    )
+
+
+def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
+    window = target.get("composition_window", {})
+    if not isinstance(window, Mapping):
+        return {}
+    oxides = window.get("oxides", {})
+    if not isinstance(oxides, Mapping):
+        return {}
+    resolved_oxides: dict[str, Mapping[str, Any]] = {}
+    for oxide, raw in oxides.items():
+        if not isinstance(raw, Mapping):
+            continue
+        row: dict[str, Any] = {
+            "min": raw.get("min"),
+            "max": raw.get("max"),
+            "weight": raw.get("weight"),
+        }
+        for key in ("tier", "needs_experiment", "provenance"):
+            if key in raw:
+                row[key] = raw[key]
+        if any(key in row for key in ("tier", "needs_experiment", "provenance")):
+            resolved_oxides[str(oxide)] = MappingProxyType(row)
+    if not resolved_oxides:
+        return {}
+    return {
+        "composition_window": MappingProxyType(
+            {
+                "pool": str(window.get("pool", "")),
+                "mode": str(window.get("mode", "")),
+                "oxides": MappingProxyType(resolved_oxides),
+            }
+        )
+    }
+
+
+def target_spec_digest(target: Mapping[str, Any]) -> str:
+    normalized = normalize_canonical_value(target)
+    return hashlib.sha256(canonical_json_dumps(normalized).encode("utf-8")).hexdigest()
+
+
+def composition_targets_require_coating(profile: Mapping[str, Any]) -> bool:
+    return any(
+        bool(objective["target"].get("require_coating_gate", True))
+        for objective in composition_target_specs(profile)
+    )
+
+
+def composition_targets_require_terminal_rump(profile: Mapping[str, Any]) -> bool:
+    for objective in composition_target_specs(profile):
+        target = objective["target"]
+        window = target.get("composition_window", {})
+        pools = {
+            str(target.get("pool", "")),
+            str(window.get("pool", "")) if isinstance(window, Mapping) else "",
+        }
+        if "terminal_rump_earned" in pools:
+            return True
+    return False
+
+
+def composition_target_infeasible_reason(profile: Mapping[str, Any]) -> str:
+    for objective in composition_target_specs(profile):
+        target = objective["target"]
+        vector = target["species_vector"]
+        if vector.get("Mg") != "extract":
+            continue
+        if not any(vector.get(species) == "retain" for species in ("Na", "K")):
+            continue
+        campaign = str(target.get("maturity", {}).get("campaign", ""))
+        objective_id = str(objective.get("id", ""))
+        if "C3" in campaign or "c3" in objective_id.lower():
+            continue
+        return "order: Mg extract with Na/K retain requires explicit C3 re-dose route"
+    return ""
+
+
+def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str, Any]:
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _COMPOSITION_TARGET_KEYS, where)
+    _require_objective_keys(
+        raw,
+        {"pool", "species_vector", "composition_window", "score_weights"},
+        where,
+    )
+    pool = _validate_pool(raw.get("pool"), f"{where}.pool")
+    vector = _normalize_species_vector(raw.get("species_vector"), where=f"{where}.species_vector")
+    extraction = _normalize_extraction(
+        raw.get("extraction", {}),
+        vector=vector,
+        where=f"{where}.extraction",
+    )
+    window = _normalize_composition_window(
+        raw.get("composition_window"),
+        target_id=target_id,
+        where=f"{where}.composition_window",
+    )
+    score_weights = _normalize_score_weights(
+        raw.get("score_weights"),
+        vector=vector,
+        window=window,
+        where=f"{where}.score_weights",
+    )
+    maturity = _normalize_maturity(raw.get("maturity", {}), where=f"{where}.maturity")
+    constraints = _normalize_target_constraints(
+        raw.get("constraints", {}),
+        where=f"{where}.constraints",
+    )
+    require_coating_gate = True
+    if "require_coating_gate" in raw:
+        require_coating_gate = raw["require_coating_gate"]
+        if not isinstance(require_coating_gate, bool):
+            raise ObjectiveProfileError(f"{where}.require_coating_gate must be bool")
+    return {
+        "pool": pool,
+        "require_coating_gate": require_coating_gate,
+        "species_vector": MappingProxyType(vector),
+        "extraction": MappingProxyType(extraction),
+        "composition_window": MappingProxyType(window),
+        "maturity": MappingProxyType(maturity),
+        "constraints": MappingProxyType(constraints),
+        "score_weights": MappingProxyType(score_weights),
+    }
+
+
+def _normalize_species_vector(raw: Any, *, where: str) -> dict[str, str]:
+    if not isinstance(raw, Mapping) or not raw:
+        raise ObjectiveProfileError(f"{where} must be a non-empty mapping")
+    vector: dict[str, str] = {}
+    for species, role in raw.items():
+        key = str(species)
+        if key not in COMPOSITION_VECTOR_SPECIES:
+            raise ObjectiveProfileError(f"{where} unknown species {key!r}")
+        role_name = str(role)
+        if role_name not in COMPOSITION_VECTOR_ROLES:
+            raise ObjectiveProfileError(f"{where}.{key} has invalid role {role_name!r}")
+        vector[key] = role_name
+    if all(role == "free" for role in vector.values()):
+        raise ObjectiveProfileError(f"{where} must not be all-free")
+    return vector
+
+
+def _normalize_extraction(
+    raw: Any,
+    *,
+    vector: Mapping[str, str],
+    where: str,
+) -> dict[str, Any]:
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _EXTRACTION_KEYS, where)
+    basis = str(raw.get("basis", "input_element_mol"))
+    if basis != "input_element_mol":
+        raise ObjectiveProfileError(f"{where}.basis must be 'input_element_mol'")
+    captured_pool = _validate_pool(raw.get("captured_pool", "captured_products"), f"{where}.captured_pool")
+    if captured_pool not in {"captured_products", "captured_stage_3_silica"}:
+        raise ObjectiveProfileError(f"{where}.captured_pool cannot be {captured_pool!r}")
+    credit_policy = raw.get("credit_policy", {})
+    if credit_policy is None:
+        credit_policy = {}
+    if not isinstance(credit_policy, Mapping):
+        raise ObjectiveProfileError(f"{where}.credit_policy must be a mapping")
+    _reject_unknown_objective_keys(
+        credit_policy,
+        _CREDIT_POLICY_KEYS,
+        f"{where}.credit_policy",
+    )
+    for key, expected in (
+        ("additives", "no_product_credit"),
+        ("vented", "no_product_credit"),
+    ):
+        value = str(credit_policy.get(key, expected))
+        if value != expected:
+            raise ObjectiveProfileError(
+                f"{where}.credit_policy.{key} must be {expected!r}"
+            )
+    completeness_min = raw.get("completeness_min", {})
+    if completeness_min is None:
+        completeness_min = {}
+    if not isinstance(completeness_min, Mapping):
+        raise ObjectiveProfileError(f"{where}.completeness_min must be a mapping")
+    normalized_min: dict[str, float] = {}
+    extract_species = [species for species, role in vector.items() if role == "extract"]
+    for species in extract_species:
+        if species not in completeness_min:
+            raise ObjectiveProfileError(
+                f"{where}.completeness_min missing extract species {species!r}"
+            )
+    for species, value in completeness_min.items():
+        key = str(species)
+        if key not in vector:
+            raise ObjectiveProfileError(f"{where}.completeness_min unknown species {key!r}")
+        numeric = _positive_profile_float(value, f"{where}.completeness_min.{key}")
+        normalized_min[key] = numeric
+    return {
+        "basis": basis,
+        "captured_pool": captured_pool,
+        "credit_policy": MappingProxyType(
+            {
+                "additives": "no_product_credit",
+                "vented": "no_product_credit",
+            }
+        ),
+        "completeness_min": MappingProxyType(normalized_min),
+    }
+
+
+def _normalize_composition_window(
+    raw: Any,
+    *,
+    target_id: str,
+    where: str,
+) -> dict[str, Any]:
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _COMPOSITION_WINDOW_KEYS, where)
+    _require_objective_keys(raw, {"pool", "basis", "mode", "oxides"}, where)
+    pool = _validate_pool(raw.get("pool"), f"{where}.pool")
+    if str(raw.get("basis")) != "oxide_wt_pct":
+        raise ObjectiveProfileError(f"{where}.basis must be 'oxide_wt_pct'")
+    mode = str(raw.get("mode"))
+    if mode not in COMPOSITION_WINDOW_MODES:
+        raise ObjectiveProfileError(f"{where}.mode must be hard_window or soft_distance")
+    exploratory = bool(raw.get("exploratory", False))
+    if mode == "soft_distance" and (
+        not exploratory or str(target_id).startswith("pc-")
+    ):
+        raise ObjectiveProfileError(
+            f"{where}.mode soft_distance requires exploratory non-menu target"
+        )
+    oxides = raw.get("oxides")
+    if not isinstance(oxides, Mapping) or not oxides:
+        raise ObjectiveProfileError(f"{where}.oxides must be a non-empty mapping")
+    normalized_oxides: dict[str, Mapping[str, Any]] = {}
+    for oxide, row in oxides.items():
+        oxide_name = str(oxide)
+        normalized_oxides[oxide_name] = MappingProxyType(
+            _normalize_oxide_row(row, where=f"{where}.oxides.{oxide_name}")
+        )
+    return {
+        "pool": pool,
+        "basis": "oxide_wt_pct",
+        "mode": mode,
+        "oxides": MappingProxyType(normalized_oxides),
+        **({"exploratory": True} if exploratory else {}),
+    }
+
+
+def _normalize_oxide_row(raw: Any, *, where: str) -> dict[str, Any]:
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _OXIDE_ROW_KEYS, where)
+    row = dict(raw)
+    if "tier" in row:
+        tier = str(row["tier"])
+        try:
+            bounds = dict(_FE_TIER_BOUNDS[tier])
+        except KeyError as exc:
+            raise ObjectiveProfileError(f"{where}.tier unknown tier {tier!r}") from exc
+        row = {**bounds, **row}
+        row["tier"] = tier
+        row["needs_experiment"] = True
+        row.setdefault("provenance", bounds["provenance"])
+    _require_objective_keys(row, {"min", "max", "weight"}, where)
+    lower = _finite_profile_float(row["min"], f"{where}.min")
+    upper = _finite_profile_float(row["max"], f"{where}.max")
+    if upper < lower:
+        raise ObjectiveProfileError(f"{where} has empty window")
+    weight = _positive_profile_float(row["weight"], f"{where}.weight")
+    normalized = {
+        "min": lower,
+        "max": upper,
+        "weight": weight,
+    }
+    if "needs_experiment" in row:
+        normalized["needs_experiment"] = bool(row["needs_experiment"])
+    if "tier" in row:
+        normalized["tier"] = str(row["tier"])
+    if "provenance" in row:
+        normalized["provenance"] = str(row["provenance"])
+    return normalized
+
+
+def _normalize_score_weights(
+    raw: Any,
+    *,
+    vector: Mapping[str, str],
+    window: Mapping[str, Any],
+    where: str,
+) -> dict[str, float]:
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _SCORE_WEIGHT_KEYS, where)
+    weights = {
+        "extraction": _non_negative_profile_float(raw.get("extraction", 0.0), f"{where}.extraction"),
+        "composition": _non_negative_profile_float(raw.get("composition", 0.0), f"{where}.composition"),
+    }
+    if weights["extraction"] <= 0.0 and weights["composition"] <= 0.0:
+        raise ObjectiveProfileError(f"{where} must contain at least one positive branch")
+    if weights["extraction"] > 0.0 and not any(role == "extract" for role in vector.values()):
+        raise ObjectiveProfileError(f"{where}.extraction positive but vector has no extract species")
+    oxides = window.get("oxides", {})
+    if weights["composition"] > 0.0 and not any(
+        float(row.get("weight", 0.0)) > 0.0
+        for row in oxides.values()
+        if isinstance(row, Mapping)
+    ):
+        raise ObjectiveProfileError(f"{where}.composition positive but window is empty")
+    return weights
+
+
+def _normalize_maturity(raw: Any, *, where: str) -> dict[str, Any]:
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _MATURITY_KEYS, where)
+    if not raw:
+        return {}
+    mode = str(raw.get("mode", "campaign_hours"))
+    if mode != "campaign_hours":
+        raise ObjectiveProfileError(f"{where}.mode must be 'campaign_hours'")
+    result: dict[str, Any] = {"mode": mode}
+    if "campaign" in raw:
+        result["campaign"] = _required_text(raw["campaign"], f"{where}.campaign")
+    if "hours" in raw:
+        result["hours"] = _positive_profile_float(raw["hours"], f"{where}.hours")
+    return result
+
+
+def _normalize_target_constraints(raw: Any, *, where: str) -> dict[str, Any]:
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _TARGET_CONSTRAINT_KEYS, where)
+    return {str(key): value for key, value in raw.items()}
+
+
+def _validate_pool(raw: Any, where: str) -> str:
+    pool = _required_text(raw, where)
+    if pool not in SUPPORTED_COMPOSITION_POOLS:
+        raise ObjectiveProfileError(f"{where} unknown pool id {pool!r}")
+    return pool
+
+
+def _required_text(value: Any, where: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ObjectiveProfileError(f"{where} must be a non-empty string")
+    return value.strip()
+
+
+def _finite_profile_float(value: Any, where: str) -> float:
+    if isinstance(value, bool):
+        raise ObjectiveProfileError(f"{where} must be numeric")
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ObjectiveProfileError(f"{where} must be numeric") from exc
+    if not math.isfinite(numeric):
+        raise ObjectiveProfileError(f"{where} must be finite")
+    return numeric
+
+
+def _positive_profile_float(value: Any, where: str) -> float:
+    numeric = _finite_profile_float(value, where)
+    if numeric <= 0.0:
+        raise ObjectiveProfileError(f"{where} must be positive")
+    return numeric
+
+
+def _non_negative_profile_float(value: Any, where: str) -> float:
+    numeric = _finite_profile_float(value, where)
+    if numeric < 0.0:
+        raise ObjectiveProfileError(f"{where} must be non-negative")
+    return numeric
+
+
+def _reject_unknown_objective_keys(
+    mapping: Mapping[str, Any],
+    allowed: frozenset[str],
+    where: str,
+) -> None:
+    for key in mapping:
+        if key not in allowed:
+            raise ObjectiveProfileError(f"unknown {where} key {key!r}")
+
+
+def _require_objective_keys(
+    mapping: Mapping[str, Any],
+    required: set[str],
+    where: str,
+) -> None:
+    missing = sorted(required - set(mapping))
+    if missing:
+        raise ObjectiveProfileError(
+            f"{where} missing required keys: {', '.join(missing)}"
+        )
+
+
 def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefinition, ...]:
     raw_objectives = profile.get("objectives")
     if not isinstance(raw_objectives, (list, tuple)) or not raw_objectives:
@@ -171,6 +777,9 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
     """Compute the declared objective vector from real simulator outputs."""
 
     definitions = objective_definitions(profile)
+    raw_objectives = profile.get("objectives")
+    if not isinstance(raw_objectives, (list, tuple)):
+        raise ObjectiveProfileError("profile.objectives must be a non-empty list")
     sim = getattr(run_execution, "simulator", run_execution)
     product_classes = classify_products(
         sim,
@@ -178,17 +787,478 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
     )
     product_ledger = _product_ledger(sim)
 
-    values = tuple(
-        ObjectiveValue(
-            metric=definition.metric,
-            sense=definition.sense,
-            value=_metric_value(definition.metric, sim, product_ledger, product_classes),
-            units=definition.units,
-            ordinal=definition.ordinal,
+    values: list[ObjectiveValue] = []
+    for definition, raw in zip(definitions, raw_objectives, strict=True):
+        if not isinstance(raw, Mapping):
+            raise ObjectiveProfileError("each objective must be a mapping")
+        if objective_type(raw) == COMPOSITION_TARGET_TYPE:
+            normalized = normalize_composition_target_objective(
+                raw,
+                where=f"objectives[{definition.ordinal}]",
+            )
+            value = _composition_target_score(normalized, run_execution, profile)
+        else:
+            value = _metric_value(
+                definition.metric,
+                sim,
+                product_ledger,
+                product_classes,
+            )
+        values.append(
+            ObjectiveValue(
+                metric=definition.metric,
+                sense=definition.sense,
+                value=value,
+                units=definition.units,
+                ordinal=definition.ordinal,
+            )
         )
-        for definition in definitions
+    return ObjectiveVector(tuple(values))
+
+
+def _composition_target_score(
+    objective: Mapping[str, Any],
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> float:
+    target = objective["target"]
+    vector = target["species_vector"]
+    extraction = target["extraction"]
+    window = target["composition_window"]
+    weights = target["score_weights"]
+    extraction_weight = float(weights["extraction"])
+    composition_weight = float(weights["composition"])
+
+    extraction_score = 0.0
+    if extraction_weight > 0.0:
+        extraction_score = _extraction_score(
+            vector,
+            extraction,
+            run_execution,
+            profile,
+        )
+
+    composition_score = 0.0
+    if composition_weight > 0.0:
+        composition_score = _composition_window_score(
+            window,
+            run_execution,
+        )
+        if str(window["mode"]) == "hard_window" and composition_score <= 0.0:
+            return 0.0
+
+    return extraction_weight * extraction_score + composition_weight * composition_score
+
+
+def _extraction_score(
+    vector: Mapping[str, str],
+    extraction: Mapping[str, Any],
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> float:
+    scores: list[float] = []
+    completeness_min = extraction["completeness_min"]
+    captured_pool = str(extraction["captured_pool"])
+    for species, role in vector.items():
+        if role != "extract":
+            continue
+        input_mol = _feedstock_input_target_mol(species, run_execution, profile)
+        if input_mol <= _EPS:
+            raise ObjectiveComputationError(
+                f"composition target extract species {species!r} has no input mol"
+            )
+        captured_mol = _captured_target_mol(species, captured_pool, run_execution)
+        additive_mol = _additive_target_mol(species, run_execution, profile)
+        captured_mol = max(0.0, captured_mol - additive_mol)
+        completeness = captured_mol / input_mol
+        threshold = _finite_float(
+            completeness_min[species],
+            f"composition_target.completeness_min[{species!r}]",
+        )
+        if threshold <= 0.0:
+            raise ObjectiveComputationError(
+                f"composition_target.completeness_min[{species!r}] must be positive"
+            )
+        scores.append(_clamp(completeness / threshold, 0.0, 1.0))
+    if not scores:
+        raise ObjectiveComputationError("composition target extraction branch has no species")
+    return sum(scores) / len(scores)
+
+
+def _composition_window_score(
+    window: Mapping[str, Any],
+    run_execution: Any,
+) -> float:
+    pool = str(window["pool"])
+    species_mol = _pool_species_mol(pool, run_execution)
+    if not species_mol:
+        raise ObjectiveComputationError(f"composition target pool {pool!r} is missing or empty")
+    mode = str(window["mode"])
+    oxides = window["oxides"]
+    if mode == "hard_window":
+        for oxide, row in oxides.items():
+            observed = _oxide_wt_pct(str(oxide), species_mol, run_execution)
+            lower = _finite_float(row["min"], f"{oxide}.min")
+            upper = _finite_float(row["max"], f"{oxide}.max")
+            if observed < lower or observed > upper:
+                return 0.0
+        return 1.0
+    if mode == "soft_distance":
+        weighted = 0.0
+        total_weight = 0.0
+        for oxide, row in oxides.items():
+            observed = _oxide_wt_pct(str(oxide), species_mol, run_execution)
+            lower = _finite_float(row["min"], f"{oxide}.min")
+            upper = _finite_float(row["max"], f"{oxide}.max")
+            weight = _finite_float(row["weight"], f"{oxide}.weight")
+            total_weight += weight
+            if lower <= observed <= upper:
+                weighted += weight
+            elif observed < lower and lower > 0.0:
+                weighted += weight * _clamp(observed / lower, 0.0, 1.0)
+            elif observed > upper and observed > 0.0:
+                weighted += weight * _clamp(upper / observed, 0.0, 1.0)
+        if total_weight <= 0.0:
+            raise ObjectiveComputationError("composition target window has zero total weight")
+        return weighted / total_weight
+    raise ObjectiveComputationError(f"unsupported composition window mode {mode!r}")
+
+
+def _pool_species_mol(pool: str, run_execution: Any) -> Mapping[str, float]:
+    sim = getattr(run_execution, "simulator", run_execution)
+    if pool == "captured_stage_3_silica":
+        return MappingProxyType(_captured_stage_3_silica_mol(run_execution))
+    if pool == "captured_products":
+        return MappingProxyType(_captured_products_mol(run_execution))
+    if pool == "residual_rump_at_stop":
+        ledger_values = _ledger_mol_by_accounts(
+            sim,
+            _POOL_LEDGER_ACCOUNTS[pool],
+        )
+        if ledger_values:
+            return MappingProxyType(ledger_values)
+        raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
+    if pool == "terminal_rump_earned":
+        _require_earned_terminal_rump(run_execution)
+        ledger_values = _ledger_mol_by_accounts(
+            sim,
+            _POOL_LEDGER_ACCOUNTS[pool],
+        )
+        if ledger_values:
+            return MappingProxyType(ledger_values)
+        fallback = _terminal_rump_trace_mol(run_execution)
+        if fallback:
+            return MappingProxyType(fallback)
+    raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
+
+
+def _captured_target_mol(
+    target_species: str,
+    pool: str,
+    run_execution: Any,
+) -> float:
+    species_mol = _pool_species_mol(pool, run_execution)
+    return sum(
+        _target_equivalent_mol(target_species, species, mol, run_execution)
+        for species, mol in species_mol.items()
     )
-    return ObjectiveVector(values)
+
+
+def _feedstock_input_target_mol(
+    target_species: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> float:
+    sim = getattr(run_execution, "simulator", run_execution)
+    record = getattr(sim, "record", None)
+    feedstock_id = str(
+        profile.get("feedstock")
+        or getattr(record, "feedstock_key", "")
+        or getattr(record, "feedstock_id", "")
+    )
+    if not feedstock_id:
+        raise ObjectiveComputationError("composition target feedstock id unavailable")
+    bundle = load_config_bundle(DEFAULT_DATA_DIR)
+    try:
+        feedstock = bundle.feedstocks[feedstock_id]
+    except KeyError as exc:
+        raise ObjectiveComputationError(
+            f"composition target unknown feedstock {feedstock_id!r}"
+        ) from exc
+    composition = feedstock.get("composition_wt_pct", feedstock)
+    if not isinstance(composition, Mapping):
+        raise ObjectiveComputationError("composition target feedstock composition unavailable")
+    mass_kg = _run_mass_kg(run_execution, profile)
+    total = 0.0
+    for species, wt_pct in composition.items():
+        kg = mass_kg * _finite_float(wt_pct, f"feedstock[{species!r}]") / 100.0
+        mol = _kg_to_mol(str(species), kg, run_execution)
+        total += _target_equivalent_mol(target_species, str(species), mol, run_execution)
+    return total
+
+
+def _additive_target_mol(
+    target_species: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> float:
+    sim = getattr(run_execution, "simulator", run_execution)
+    record = getattr(sim, "record", None)
+    raw = getattr(record, "additives_kg", None)
+    if raw is None:
+        raw = profile.get("run", {}).get("additives_kg", {}) if isinstance(profile.get("run"), Mapping) else {}
+    if not isinstance(raw, Mapping):
+        return 0.0
+    total = 0.0
+    for species, kg in raw.items():
+        mol = _kg_to_mol(str(species), _finite_float(kg, f"additive[{species!r}]"), run_execution)
+        total += _target_equivalent_mol(target_species, str(species), mol, run_execution)
+    return total
+
+
+def _run_mass_kg(run_execution: Any, profile: Mapping[str, Any]) -> float:
+    sim = getattr(run_execution, "simulator", run_execution)
+    record = getattr(sim, "record", None)
+    raw = getattr(record, "batch_mass_kg", None)
+    if raw is None and isinstance(profile.get("run"), Mapping):
+        raw = profile["run"].get("mass_kg", 1000.0)
+    return _finite_float(raw, "composition target run mass_kg")
+
+
+def _captured_stage_3_silica_mol(run_execution: Any) -> dict[str, float]:
+    sim = getattr(run_execution, "simulator", run_execution)
+    result: dict[str, float] = {}
+    stages = tuple(getattr(getattr(sim, "train", None), "stages", ()) or ())
+    if len(stages) > 3:
+        collected = getattr(stages[3], "collected_kg", {})
+        if isinstance(collected, Mapping):
+            for species in ("SiO", "SiO2"):
+                kg = collected.get(species, 0.0)
+                mol = _kg_to_mol(species, _finite_float(kg, f"stage3[{species}]"), run_execution)
+                if mol > _EPS:
+                    result[species] = result.get(species, 0.0) + mol
+    if result:
+        return result
+    trace = getattr(run_execution, "trace", None)
+    deltas = getattr(trace, "condensed_by_stage_species_delta", ())
+    for tick in (deltas if isinstance(deltas, (list, tuple)) else ()):
+        if not isinstance(tick, Mapping):
+            continue
+        for key, kg in tick.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            stage, species = key
+            species_name = str(species)
+            if int(stage) != 3 or species_name not in {"SiO", "SiO2"}:
+                continue
+            mol = _kg_to_mol(species_name, _finite_float(kg, f"stage3[{species_name}]"), run_execution)
+            if mol > _EPS:
+                result[species_name] = result.get(species_name, 0.0) + mol
+    return result
+
+
+def _captured_products_mol(run_execution: Any) -> dict[str, float]:
+    sim = getattr(run_execution, "simulator", run_execution)
+    result: dict[str, float] = {}
+    ledger = getattr(sim, "atom_ledger", None)
+    mol_by_account = getattr(ledger, "mol_by_account", None)
+    if callable(mol_by_account):
+        raw = mol_by_account()
+        if isinstance(raw, Mapping):
+            for account, species_mol in raw.items():
+                account_name = str(account)
+                if account_name in _VENTED_PRODUCT_ACCOUNTS:
+                    continue
+                if not (
+                    account_name.startswith("terminal.")
+                    or account_name in {"process.metal_phase", "process.condensation_train"}
+                ):
+                    continue
+                if not isinstance(species_mol, Mapping):
+                    continue
+                for species, mol in species_mol.items():
+                    amount = _finite_float(mol, f"{account_name}[{species!r}]")
+                    if amount > _EPS:
+                        result[str(species)] = result.get(str(species), 0.0) + amount
+    if result:
+        return result
+    for species, kg in _product_ledger(sim).items():
+        mol = _kg_to_mol(species, kg, run_execution)
+        if mol > _EPS:
+            result[species] = result.get(species, 0.0) + mol
+    return result
+
+
+def _terminal_rump_trace_mol(run_execution: Any) -> dict[str, float]:
+    _require_earned_terminal_rump(run_execution)
+    trace = getattr(run_execution, "trace", None)
+    raw = getattr(trace, "terminal_rump_by_species_kg", None)
+    if not isinstance(raw, Mapping):
+        return {}
+    result: dict[str, float] = {}
+    for species, kg in raw.items():
+        mol = _kg_to_mol(str(species), _finite_float(kg, f"terminal_rump[{species!r}]"), run_execution)
+        if mol > _EPS:
+            result[str(species)] = result.get(str(species), 0.0) + mol
+    return result
+
+
+def _require_earned_terminal_rump(run_execution: Any) -> None:
+    trace = getattr(run_execution, "trace", None)
+    payload = _carrier_value(trace, "rump_terminal")
+    if not isinstance(payload, Mapping) or str(payload.get("status", "")) != "earned":
+        raise ObjectiveComputationError("composition target terminal rump is not earned")
+
+
+def _carrier_value(carrier: Any, name: str) -> Any:
+    if isinstance(carrier, Mapping):
+        return carrier.get(name)
+    return getattr(carrier, name, None)
+
+
+def _ledger_mol_by_accounts(sim: Any, accounts: Sequence[str]) -> dict[str, float]:
+    ledger = getattr(sim, "atom_ledger", None)
+    mol_by_account = getattr(ledger, "mol_by_account", None)
+    if not callable(mol_by_account):
+        return {}
+    result: dict[str, float] = {}
+    for account in accounts:
+        raw = mol_by_account(account)
+        if not isinstance(raw, Mapping):
+            continue
+        for species, mol in raw.items():
+            amount = _finite_float(mol, f"{account}[{species!r}]")
+            if amount > _EPS:
+                result[str(species)] = result.get(str(species), 0.0) + amount
+    return result
+
+
+def _oxide_wt_pct(
+    oxide_name: str,
+    species_mol: Mapping[str, float],
+    run_execution: Any,
+) -> float:
+    total_kg = sum(
+        _mol_to_kg(species, mol, run_execution)
+        for species, mol in species_mol.items()
+    )
+    if total_kg <= _EPS:
+        raise ObjectiveComputationError("composition target pool has zero mass")
+    oxide_kg = _oxide_equivalent_kg(oxide_name, species_mol, run_execution)
+    return oxide_kg / total_kg * 100.0
+
+
+def _oxide_equivalent_kg(
+    oxide_name: str,
+    species_mol: Mapping[str, float],
+    run_execution: Any,
+) -> float:
+    if oxide_name == "Fe_total_as_Fe2O3_wt_pct":
+        return _single_oxide_equivalent_kg("Fe2O3", species_mol, run_execution)
+    if oxide_name == "Al2O3_CaO_MgO_balance":
+        return sum(
+            _single_oxide_equivalent_kg(oxide, species_mol, run_execution)
+            for oxide in ("Al2O3", "CaO", "MgO")
+        )
+    if oxide_name == "TiO2_plus_Cr2O3_plus_REO":
+        total = sum(
+            _single_oxide_equivalent_kg(oxide, species_mol, run_execution)
+            for oxide in ("TiO2", "Cr2O3")
+        )
+        total += sum(
+            _mol_to_kg(species, mol, run_execution)
+            for species, mol in species_mol.items()
+            if "REO" in species or "REE" in species
+        )
+        return total
+    if "_plus_" in oxide_name:
+        return sum(
+            _single_oxide_equivalent_kg(part, species_mol, run_execution)
+            for part in oxide_name.split("_plus_")
+        )
+    return _single_oxide_equivalent_kg(oxide_name, species_mol, run_execution)
+
+
+def _single_oxide_equivalent_kg(
+    oxide_name: str,
+    species_mol: Mapping[str, float],
+    run_execution: Any,
+) -> float:
+    oxide_formula = _species_formula(oxide_name, run_execution)
+    non_oxygen = [element for element in oxide_formula.elements if element != "O"]
+    if len(non_oxygen) != 1:
+        raise ObjectiveComputationError(
+            f"oxide row {oxide_name!r} does not identify one cation"
+        )
+    element = non_oxygen[0]
+    oxide_element_count = oxide_formula.elements[element]
+    oxide_mol = 0.0
+    for species, mol in species_mol.items():
+        formula = _species_formula(species, run_execution)
+        element_count = formula.elements.get(element, 0.0)
+        if element_count <= 0.0:
+            continue
+        oxide_mol += _finite_float(mol, f"{species} mol") * element_count / oxide_element_count
+    return oxide_mol * oxide_formula.molar_mass_kg_per_mol()
+
+
+def _target_equivalent_mol(
+    target_species: str,
+    species: str,
+    species_mol: float,
+    run_execution: Any,
+) -> float:
+    amount = _finite_float(species_mol, f"{species} mol")
+    if amount <= _EPS:
+        return 0.0
+    target_formula = _species_formula(target_species, run_execution)
+    target_elements = list(target_formula.elements)
+    if len(target_elements) != 1:
+        non_oxygen = [element for element in target_elements if element != "O"]
+        if len(non_oxygen) != 1:
+            raise ObjectiveComputationError(
+                f"target species {target_species!r} does not identify one target element"
+            )
+        element = non_oxygen[0]
+    else:
+        element = target_elements[0]
+    species_formula = _species_formula(species, run_execution)
+    count = species_formula.elements.get(element, 0.0)
+    if count <= 0.0:
+        return 0.0
+    return amount * count / target_formula.elements[element]
+
+
+def _kg_to_mol(species: str, kg: float, run_execution: Any) -> float:
+    amount = _finite_float(kg, f"{species} kg")
+    if amount < -_EPS:
+        raise ObjectiveComputationError(f"{species} kg must be non-negative")
+    if amount <= _EPS:
+        return 0.0
+    return amount / _species_formula(species, run_execution).molar_mass_kg_per_mol()
+
+
+def _mol_to_kg(species: str, mol: float, run_execution: Any) -> float:
+    amount = _finite_float(mol, f"{species} mol")
+    if amount < -_EPS:
+        raise ObjectiveComputationError(f"{species} mol must be non-negative")
+    if amount <= _EPS:
+        return 0.0
+    return amount * _species_formula(species, run_execution).molar_mass_kg_per_mol()
+
+
+def _species_formula(species: str, run_execution: Any):
+    sim = getattr(run_execution, "simulator", run_execution)
+    registry = getattr(getattr(sim, "atom_ledger", None), "registry", None)
+    try:
+        return resolve_species_formula(str(species), registry)
+    except Exception as exc:  # noqa: BLE001 - surface as objective failure
+        raise ObjectiveComputationError(f"unknown composition species {species!r}") from exc
+
+
+def _clamp(value: float, lower: float, upper: float) -> float:
+    numeric = _finite_float(value, "composition target score")
+    return max(lower, min(upper, numeric))
 
 
 def normalize_objective_sense(sense: str) -> str:

@@ -206,6 +206,44 @@ def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
 
 
+def test_target_spec_fields_split_cache_key_only_when_digest_present() -> None:
+    legacy = _base_spec()
+    explicit_empty = _base_spec(
+        target_spec_id="",
+        target_spec_digest="",
+        target_maturity={},
+    )
+    targeted = _base_spec(
+        target_spec_id="pc-glass-clear",
+        target_spec_digest="target-digest",
+        target_maturity={"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+    )
+    targeted_with_provenance = _base_spec(
+        target_spec_id="pc-glass-clear",
+        target_spec_digest="target-digest",
+        target_maturity={"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+        target_provenance={
+            "composition_window": {
+                "oxides": {
+                    "Fe2O3": {
+                        "tier": "clear_container",
+                        "needs_experiment": True,
+                        "min": 0.0,
+                        "max": 1.0,
+                    }
+                }
+            }
+        },
+    )
+
+    assert canonical_evalspec_json(legacy) == canonical_evalspec_json(explicit_empty)
+    assert b"target_spec_digest" not in canonical_evalspec_json(legacy)
+    assert b"target_spec_digest" in canonical_evalspec_json(targeted)
+    assert cache_key(targeted) != cache_key(legacy)
+    assert canonical_evalspec_json(targeted_with_provenance) == canonical_evalspec_json(targeted)
+    assert cache_key(targeted_with_provenance) == cache_key(targeted)
+
+
 def test_mre_policy_fields_split_cache_keys() -> None:
     off = _base_spec(c5_enabled=False, mre_max_voltage_V=0.0, mre_target_species="")
     enabled = _base_spec(c5_enabled=True, mre_max_voltage_V=0.0, mre_target_species="")
