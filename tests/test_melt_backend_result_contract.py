@@ -8,6 +8,7 @@ from simulator.melt_backend.base import (
     MeltCompositionError,
     StubBackend,
 )
+from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.magemin import MAGEMinBackend
 
 
@@ -35,6 +36,27 @@ def test_vapor_only_ok_permits_missing_liquid_fraction():
 
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
+
+
+def test_alphamelts_out_of_domain_result_carries_crash_point_inputs():
+    backend = AlphaMELTSBackend()
+
+    result = backend.equilibrate(
+        temperature_C=1325.0,
+        fO2_log=-8.5,
+        pressure_bar=1.0e-6,
+        composition_mol_by_account={
+            'process.cleaned_melt': {'SiO2': 1.0},
+        },
+    )
+
+    assert result.status == 'out_of_domain'
+    crash_point = result.diagnostics['out_of_domain_crash_point']
+    assert crash_point['temperature_C'] == pytest.approx(1325.0)
+    assert crash_point['pressure_bar'] == pytest.approx(1.0e-6)
+    assert crash_point['fO2_log'] == pytest.approx(-8.5)
+    assert crash_point['composition_mol']['SiO2'] == pytest.approx(1.0)
+    assert crash_point['composition_wt_pct']['SiO2'] == pytest.approx(100.0)
 
 
 def test_melt_solving_ok_raises_without_liquid_fraction():

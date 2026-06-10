@@ -205,6 +205,7 @@ class StudyRecord:
     notes: tuple[str, ...] = ()
     cache_hit: bool = False
     product_summary: Mapping[str, Any] = field(default_factory=dict)
+    trace_summary: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "objectives", MappingProxyType(dict(self.objectives)))
@@ -224,6 +225,11 @@ class StudyRecord:
             self,
             "product_summary",
             MappingProxyType(dict(self.product_summary)),
+        )
+        object.__setattr__(
+            self,
+            "trace_summary",
+            MappingProxyType(dict(self.trace_summary)),
         )
 
 
@@ -1067,9 +1073,25 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
     return replace(scored, run_reference=light_reference)
 
 
-def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, str] | None:
+def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | None:
+    reference = scored.run_reference
     status = _result_backend_status(scored)
-    return {"backend_status": status} if status is not None else None
+    trace = getattr(reference, "trace", None) if reference is not None else None
+    payload: dict[str, Any] = {}
+    if status is not None:
+        payload["backend_status"] = status
+    if reference is not None and reference.backend_authoritative is not None:
+        payload["backend_authoritative"] = reference.backend_authoritative
+    if isinstance(trace, Mapping):
+        for key in (
+            "backend_diagnostics",
+            "out_of_domain_crash_point",
+            "rump_terminal",
+            "terminal_rump_by_species_kg",
+        ):
+            if key in trace:
+                payload[key] = _jsonable_value(trace[key])
+    return MappingProxyType(payload) if payload else None
 
 
 def _backend_status_from_trace(trace: Any) -> str | None:
@@ -1114,6 +1136,7 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
         notes=scored.notes,
         cache_hit=cache_hit,
         product_summary=_product_summary_mapping(scored.run_reference),
+        trace_summary=_trace_summary_mapping(scored.run_reference),
     )
 
 
@@ -1156,6 +1179,35 @@ def _product_summary_mapping(reference: RunReference | None) -> Mapping[str, Any
     if reference is None:
         return MappingProxyType({})
     return MappingProxyType(dict(reference.product_summary))
+
+
+def _trace_summary_mapping(reference: RunReference | None) -> Mapping[str, Any]:
+    if reference is None or not isinstance(reference.trace, Mapping):
+        return MappingProxyType({})
+    return _light_backend_status_trace_for_reference(reference)
+
+
+def _light_backend_status_trace_for_reference(
+    reference: RunReference,
+) -> Mapping[str, Any]:
+    payload: dict[str, Any] = {}
+    status = getattr(reference, "backend_status", None)
+    if status is None:
+        status = _backend_status_from_trace(reference.trace)
+    if status is not None:
+        payload["backend_status"] = str(status)
+    if reference.backend_authoritative is not None:
+        payload["backend_authoritative"] = reference.backend_authoritative
+    if isinstance(reference.trace, Mapping):
+        for key in (
+            "backend_diagnostics",
+            "out_of_domain_crash_point",
+            "rump_terminal",
+            "terminal_rump_by_species_kg",
+        ):
+            if key in reference.trace:
+                payload[key] = _jsonable_value(reference.trace[key])
+    return MappingProxyType(payload)
 
 
 def _failure_counts(records: Sequence[StudyRecord]) -> Mapping[str, int]:
@@ -1435,6 +1487,7 @@ def _record_payload(record: StudyRecord, schema: RecipeSchema) -> Mapping[str, A
         "objectives": dict(record.objectives),
         "patch": schema.to_setpoints_patch(record.patch),
         "product_summary": _jsonable_value(record.product_summary),
+        "trace_summary": _jsonable_value(record.trace_summary),
         "status": record.status,
     }
 

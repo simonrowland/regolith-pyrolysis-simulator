@@ -18,6 +18,7 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.objective import objective_definitions
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.results_store import ResultStore
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.runner import RunnerError
 from simulator.state import CampaignPhase, HourSnapshot
@@ -99,7 +100,12 @@ class _Stage:
 
 
 class _Sim:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        backend_diagnostics: dict[str, object] | None = None,
+        freeze_curve: dict[str, object] | None = None,
+    ) -> None:
         self.train = SimpleNamespace(
             stages=(
                 _Stage(),
@@ -117,6 +123,9 @@ class _Sim:
         )
         self.energy_cumulative_kWh = 44.0
         self.melt = SimpleNamespace(hour=1)
+        self._last_backend_diagnostics = backend_diagnostics or {}
+        self._freeze_curve = freeze_curve
+        self.kernel_curve_requests: list[dict[str, object]] = []
 
     def product_ledger(self) -> dict[str, float]:
         return dict(self.record.products_kg)
@@ -126,6 +135,43 @@ class _Sim:
 
     def _oxygen_terminal_partition_kg(self) -> dict[str, float]:
         return {"stored": 2.5, "vented": 0.5, "total": 3.0}
+
+    def _freeze_gate_curve_from_kernel_liquidus(
+        self,
+        reasons: list[str],
+        *,
+        fO2_log: float,
+        temperature_C: float | None = None,
+        pressure_bar: float | None = None,
+        composition_mol_by_account: dict[str, dict[str, float]] | None = None,
+        allow_parametric: bool = False,
+    ) -> dict[str, object] | None:
+        self.kernel_curve_requests.append(
+            {
+                "fO2_log": fO2_log,
+                "temperature_C": temperature_C,
+                "pressure_bar": pressure_bar,
+                "composition_mol_by_account": composition_mol_by_account,
+                "allow_parametric": allow_parametric,
+            }
+        )
+        if self._freeze_curve is None:
+            reasons.append("test kernel liquidus unavailable")
+            return None
+        return dict(self._freeze_curve)
+
+    @staticmethod
+    def _interpolate_freeze_gate_curve(
+        curve: dict[str, object],
+        temperature_C: float,
+    ) -> float:
+        solidus_T_C = float(curve["solidus_T_C"])
+        liquidus_T_C = float(curve["liquidus_T_C"])
+        if temperature_C <= solidus_T_C:
+            return 0.0
+        if temperature_C >= liquidus_T_C:
+            return 1.0
+        return (temperature_C - solidus_T_C) / (liquidus_T_C - solidus_T_C)
 
 
 def _snapshot(mass_balance_error_pct: float = 0.0) -> HourSnapshot:
@@ -156,8 +202,10 @@ def _trace(*, mixed_stream: bool = False) -> SimpleNamespace:
     return SimpleNamespace(
         snapshots=(_snapshot(),),
         product_ledger_kg={"SiO": 95.0},
-        terminal_rump_by_species_kg={"SiO2": 1.0},
+        terminal_rump_by_species_kg={"CaO": 2.0},
         condensed_by_stage_species_delta=condensed,
+        wall_deposit_by_segment_species_kg={},
+        wall_zone_by_segment={},
         wall_deposit_by_segment_species_delta=({},),
     )
 
@@ -189,13 +237,18 @@ def _execution(
     per_hour: tuple[object, ...] | None = None,
     backend_status: str | None = None,
     backend_authoritative: bool | None = None,
+    backend_diagnostics: dict[str, object] | None = None,
+    freeze_curve: dict[str, object] | None = None,
 ) -> SimpleNamespace:
     per_hour_entries = per_hour
     if per_hour_entries is None and backend_status is not None:
         per_hour_entries = ({"backend_status": backend_status},)
     return SimpleNamespace(
         session=SimpleNamespace(),
-        simulator=_Sim(),
+        simulator=_Sim(
+            backend_diagnostics=backend_diagnostics,
+            freeze_curve=freeze_curve,
+        ),
         snapshots=(
             snapshots
             if snapshots is not None
@@ -214,6 +267,33 @@ def _execution(
 
 def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
+
+
+def _crash_diagnostics(temperature_C: float = 1100.0) -> dict[str, object]:
+    return {
+        "backend_status": "out_of_domain",
+        "out_of_domain_crash_point": {
+            "temperature_C": temperature_C,
+            "pressure_bar": 1.0e-6,
+            "fO2_log": -9.0,
+            "composition_wt_pct": {"SiO2": 55.0, "CaO": 45.0},
+            "composition_mol": {"SiO2": 1.0, "CaO": 1.0},
+        },
+    }
+
+
+def _kernel_curve(
+    *,
+    source: str = "liquidus_solidus:kernel:composition_derived",
+    composition_derived: bool = True,
+) -> dict[str, object]:
+    return {
+        "source": source,
+        "composition_derived": composition_derived,
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1400.0,
+        "path": ((1200.0, 0.0), (1400.0, 1.0)),
+    }
 
 
 def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
@@ -579,6 +659,229 @@ def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
     margin = result.feasibility_margins["backend_domain"]
     assert margin.observed == pytest.approx(0.0)
     assert math.isfinite(margin.margin)
+    assert "rump_terminal: not_earned reason=missing_crash_point" in result.notes
+
+
+def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    execution = _execution(
+        backend_status="out_of_domain",
+        backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+        freeze_curve=_kernel_curve(),
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(execution),
+    )
+
+    requests = execution.simulator.kernel_curve_requests
+    assert requests, "rump earning must request a kernel curve"
+    earned_request = requests[-1]
+    assert earned_request["allow_parametric"] is False
+    assert earned_request["temperature_C"] == pytest.approx(1100.0)
+    assert earned_request["pressure_bar"] == pytest.approx(1.0e-6)
+    assert earned_request["fO2_log"] == pytest.approx(-9.0)
+    overrides = earned_request["composition_mol_by_account"]
+    assert overrides, "crash composition must be passed as account overrides"
+    assert any("SiO2" in mols for mols in overrides.values())
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert "rump_terminal" in result.feasibility_margins
+    assert any("earned_by=kernel_liquidus" in note for note in result.notes)
+    assert result.run_reference is not None
+    assert result.run_reference.product_summary["product_bins"][
+        "refractory_ceramic_rump"
+    ]["kg"] == pytest.approx(2.0)
+    trace = result.run_reference.trace
+    assert trace["rump_terminal"]["status"] == "earned"
+    assert trace["rump_terminal"]["curve_source"] == (
+        "liquidus_solidus:kernel:composition_derived"
+    )
+    assert trace["rump_terminal"]["composition_derived"] is True
+    assert trace["rump_terminal"]["proof_inputs"]["T_crash_C"] == pytest.approx(
+        1100.0
+    )
+    assert "composition_digest" in trace["rump_terminal"]["proof_inputs"]
+    assert trace["out_of_domain_crash_point"]["temperature_C"] == pytest.approx(1100.0)
+    assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+
+
+@pytest.mark.parametrize(
+    "curve_source",
+    (
+        "liquidus_solidus:kernel",
+        "liquidus_solidus:kernel:parametric_dry_silicate_lower_bound",
+    ),
+)
+def test_real_backend_out_of_domain_default_or_parametric_curve_cannot_earn(
+    curve_source: str,
+) -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+                freeze_curve=_kernel_curve(
+                    source=curve_source,
+                    composition_derived=False,
+                ),
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.objectives is None
+    assert any(
+        "rump_terminal_unproven: kernel curve not composition-derived" in note
+        for note in result.notes
+    )
+    assert result.run_reference is not None
+    trace = result.run_reference.trace
+    assert trace["rump_terminal"]["status"] == "not_earned"
+    assert trace["rump_terminal"]["reason"] == "rump_terminal_unproven"
+    assert trace["rump_terminal"]["curve_source"] == curve_source
+    assert trace["rump_terminal"]["composition_derived"] is False
+    assert trace["rump_terminal"]["proof_inputs"]["T_crash_C"] == pytest.approx(
+        1100.0
+    )
+
+
+def test_real_backend_out_of_domain_same_temperature_keys_on_curve_provenance() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    parametric = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+                freeze_curve=_kernel_curve(
+                    source=(
+                        "liquidus_solidus:kernel:"
+                        "parametric_dry_silicate_lower_bound"
+                    ),
+                    composition_derived=False,
+                ),
+            )
+        ),
+    )
+    derived = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+                freeze_curve=_kernel_curve(),
+            )
+        ),
+    )
+
+    assert not parametric.feasible
+    assert parametric.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert derived.feasible
+    assert derived.failure_category is None
+
+
+def test_real_backend_out_of_domain_above_solidus_disagrees_and_skips() -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics=_crash_diagnostics(temperature_C=1300.0),
+                freeze_curve=_kernel_curve(),
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.objectives is None
+    assert any("kernel_liquidus_disagree" in note for note in result.notes)
+    assert result.run_reference is not None
+    assert result.run_reference.trace["rump_terminal"]["status"] == "not_earned"
+    assert result.run_reference.trace["rump_terminal"]["liquid_fraction"] == pytest.approx(
+        0.5
+    )
+
+
+def test_out_of_domain_crash_provenance_round_trips_results_store(tmp_path) -> None:
+    real_profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=real_profile,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+                freeze_curve=_kernel_curve(),
+            )
+        ),
+    )
+    assert result.eval_spec is not None
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=result.eval_spec.code_version,
+        current_data_digests=result.eval_spec.data_digests,
+    )
+
+    store.store(result.eval_spec, result, created_at="2026-06-09T00:00:00Z")
+    loaded = store.lookup(result.eval_spec)
+
+    assert loaded is not None
+    assert loaded.feasible
+    assert loaded.run_reference is not None
+    trace = loaded.run_reference.trace
+    assert trace["rump_terminal"]["status"] == "earned"
+    assert trace["out_of_domain_crash_point"]["composition_mol"]["CaO"] == pytest.approx(
+        1.0
+    )
 
 
 def test_real_backend_ok_but_non_authoritative_aborts_as_backend_unavailable() -> None:

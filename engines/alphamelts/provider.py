@@ -200,6 +200,11 @@ class AlphaMELTSProvider(ChemistryProvider):
                     engine_version=self._engine_version(),
                     backend_status='out_of_domain',
                     backend_warnings=tuple(gate_warnings),
+                    backend_diagnostics=_out_of_domain_diagnostics(
+                        request,
+                        composition_wt_pct=composition_wt_pct,
+                        composition_mol_by_account=composition_mol_by_account,
+                    ),
                     **redox_diagnostic,
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),
@@ -647,6 +652,52 @@ def _is_finite(value: Any) -> bool:
     if numeric in (float('inf'), float('-inf')):
         return False
     return True
+
+
+def _out_of_domain_diagnostics(
+    request: IntentRequest,
+    *,
+    composition_wt_pct: Mapping[str, float],
+    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+) -> dict[str, Any]:
+    crash_point: dict[str, Any] = {
+        'temperature_C': float(request.temperature_C),
+        'pressure_bar': float(request.pressure_bar),
+        'composition_wt_pct': _finite_positive_mapping(composition_wt_pct),
+    }
+    if request.fO2_log is not None:
+        crash_point['fO2_log'] = float(request.fO2_log)
+    cleaned_melt = dict(
+        composition_mol_by_account.get(AlphaMELTSProvider.DECLARED_ACCOUNT, {})
+        or {}
+    )
+    crash_point['composition_mol'] = _finite_positive_mapping(cleaned_melt)
+    by_account = _finite_positive_nested_mapping(composition_mol_by_account)
+    if by_account:
+        crash_point['composition_mol_by_account'] = by_account
+    return {
+        'backend_status': 'out_of_domain',
+        'out_of_domain_crash_point': crash_point,
+    }
+
+
+def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for key, value in dict(values or {}).items():
+        if _is_finite(value) and float(value) > 0.0:
+            result[str(key)] = float(value)
+    return result
+
+
+def _finite_positive_nested_mapping(
+    values: Mapping[str, Mapping[str, float]],
+) -> dict[str, dict[str, float]]:
+    result: dict[str, dict[str, float]] = {}
+    for account, species_mol in dict(values or {}).items():
+        compact = _finite_positive_mapping(species_mol)
+        if compact:
+            result[str(account)] = compact
+    return result
 
 
 __all__ = ('AlphaMELTSProvider',)

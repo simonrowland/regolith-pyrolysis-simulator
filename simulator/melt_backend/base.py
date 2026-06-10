@@ -299,6 +299,10 @@ class EquilibriumResult:
     # placing the new field last keeps the historic order intact.
     liquidus_T_C: Optional[float] = None
 
+    # Optional per-call structured backend diagnostics. Kept at the ABI-safe
+    # tail for the same positional-constructor reason as ``liquidus_T_C``.
+    diagnostics: Dict[str, Any] = field(default_factory=dict)
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return

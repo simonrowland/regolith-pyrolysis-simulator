@@ -505,6 +505,13 @@ class AlphaMELTSBackend(MeltBackend):
                             for account, species in sorted(unsupported.items())
                         )
                     ],
+                    diagnostics=self._out_of_domain_diagnostics(
+                        temperature_C=temperature_C,
+                        pressure_bar=pressure_bar,
+                        fO2_log=fO2_log,
+                        composition_mol=composition_mol,
+                        composition_mol_by_account=composition_mol_by_account,
+                    ),
                 )
             composition_mol = {}
             for species, mol in composition_mol_by_account.get(
@@ -526,6 +533,14 @@ class AlphaMELTSBackend(MeltBackend):
             composition_kg = dict(composition_kg or {})
 
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
+        crash_diagnostics = self._out_of_domain_diagnostics(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            composition_wt_pct=raw_comp_wt,
+            composition_mol=composition_mol,
+            composition_mol_by_account=composition_mol_by_account,
+        )
         if not raw_comp_wt:
             # No melt oxides supplied - the engine has nothing valid to act on.
             return self._emit_equilibrium_result(
@@ -533,16 +548,27 @@ class AlphaMELTSBackend(MeltBackend):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='out_of_domain',
+                diagnostics=crash_diagnostics,
             )
         domain_rejection = self._domain_gate(
             raw_comp_wt,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            diagnostics=crash_diagnostics,
         )
         if domain_rejection is not None:
             return domain_rejection
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
+        crash_diagnostics = self._out_of_domain_diagnostics(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            composition_wt_pct=raw_comp_wt,
+            composition_melts_wt_pct=comp_wt,
+            composition_mol=composition_mol,
+            composition_mol_by_account=composition_mol_by_account,
+        )
         warnings = list(self._last_normalization_warnings)
 
         if self._mode == 'thermoengine':
@@ -553,7 +579,8 @@ class AlphaMELTSBackend(MeltBackend):
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
         elif self._mode == 'subprocess':
             return self._equilibrate_subprocess(
-                temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
+                temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
+                diagnostics=crash_diagnostics)
         else:
             # No PetThermoTools, no binary -- the engine is not present.
             return self._emit_equilibrium_result(
@@ -623,8 +650,10 @@ class AlphaMELTSBackend(MeltBackend):
                 )
 
         sample_warnings: list[str] = []
+        last_out_of_domain_diagnostics: dict[str, Any] = {}
 
         def sample_fraction(temperature_C: float) -> float:
+            nonlocal last_out_of_domain_diagnostics
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
@@ -635,6 +664,8 @@ class AlphaMELTSBackend(MeltBackend):
                 species_formula_registry=species_formula_registry,
             )
             if result.status != 'ok':
+                if result.status == 'out_of_domain' and result.diagnostics:
+                    last_out_of_domain_diagnostics = dict(result.diagnostics)
                 warning = '; '.join(result.warnings) or result.status
                 raise RuntimeError(warning)
             for warning in result.warnings:
@@ -672,6 +703,9 @@ class AlphaMELTSBackend(MeltBackend):
             warnings=tuple(warnings_out),
             samples=result.samples,
             iterations=result.iterations,
+            diagnostics=last_out_of_domain_diagnostics
+            if result.status == 'out_of_domain'
+            else {},
         )
 
     def _unsupported_accounts(
@@ -734,6 +768,7 @@ class AlphaMELTSBackend(MeltBackend):
         vapor_pressures_source: Optional[Mapping[str, str]] = None,
         warnings: Optional[List[str]] = None,
         status: str = 'ok',
+        diagnostics: Optional[Mapping[str, object]] = None,
     ) -> EquilibriumResult:
         phase_masses = dict(phase_masses_kg or {})
         resolved_liquid_fraction = liquid_fraction
@@ -755,7 +790,69 @@ class AlphaMELTSBackend(MeltBackend):
             vapor_pressures_source=dict(vapor_pressures_source or {}),
             warnings=list(warnings or []),
             status=str(status),
+            diagnostics=dict(diagnostics or {}),
         )
+
+    def _out_of_domain_diagnostics(
+        self,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: float,
+        composition_wt_pct: Optional[Mapping[str, float]] = None,
+        composition_melts_wt_pct: Optional[Mapping[str, float]] = None,
+        composition_mol: Optional[Mapping[str, float]] = None,
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ] = None,
+    ) -> dict[str, object]:
+        crash_point: dict[str, object] = {
+            'temperature_C': float(temperature_C),
+            'pressure_bar': float(pressure_bar),
+            'fO2_log': float(fO2_log),
+            'composition_wt_pct': self._finite_positive_mapping(
+                composition_wt_pct or {}
+            ),
+            'composition_mol': self._finite_positive_mapping(
+                composition_mol or {}
+            ),
+        }
+        melts_wt = self._finite_positive_mapping(composition_melts_wt_pct or {})
+        if melts_wt:
+            crash_point['composition_melts_wt_pct'] = melts_wt
+        by_account = self._finite_positive_nested_mapping(
+            composition_mol_by_account or {}
+        )
+        if by_account:
+            crash_point['composition_mol_by_account'] = by_account
+        return {
+            'backend_status': 'out_of_domain',
+            'out_of_domain_crash_point': crash_point,
+        }
+
+    @staticmethod
+    def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:
+        result: dict[str, float] = {}
+        for species, raw in values.items():
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                result[str(species)] = value
+        return result
+
+    @classmethod
+    def _finite_positive_nested_mapping(
+        cls,
+        values: Mapping[str, Mapping[str, float]],
+    ) -> dict[str, dict[str, float]]:
+        result: dict[str, dict[str, float]] = {}
+        for account, species_mol in values.items():
+            cleaned = cls._finite_positive_mapping(species_mol or {})
+            if cleaned:
+                result[str(account)] = cleaned
+        return result
 
     def _composition_kg_to_wt_pct(self, composition_kg: Mapping[str, float]) -> dict:
         total = sum(float(value) for value in composition_kg.values()
@@ -771,7 +868,9 @@ class AlphaMELTSBackend(MeltBackend):
     def _domain_gate(self, comp_wt: Mapping[str, float], *,
                      temperature_C: float,
                      pressure_bar: float,
-                     fO2_log: float) -> Optional[EquilibriumResult]:
+                     fO2_log: float,
+                     diagnostics: Optional[Mapping[str, object]] = None,
+                     ) -> Optional[EquilibriumResult]:
         canonical_wt: Dict[str, float] = {}
         non_oxides: List[str] = []
         for raw_name, raw_wt in comp_wt.items():
@@ -798,17 +897,25 @@ class AlphaMELTSBackend(MeltBackend):
         if not reasons:
             return None
         return self._domain_gate_result(
-            temperature_C, pressure_bar, fO2_log, reasons)
+            temperature_C,
+            pressure_bar,
+            fO2_log,
+            reasons,
+            diagnostics=diagnostics,
+        )
 
     def _domain_gate_result(self, temperature_C: float, pressure_bar: float,
                             fO2_log: float,
-                            reasons: List[str]) -> EquilibriumResult:
+                            reasons: List[str],
+                            diagnostics: Optional[Mapping[str, object]] = None,
+                            ) -> EquilibriumResult:
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             warnings=['DomainGate rejected: ' + '; '.join(reasons)],
             status='out_of_domain',
+            diagnostics=diagnostics,
         )
 
     def _is_non_oxide_species_name(self, name: str) -> bool:
@@ -1061,6 +1168,14 @@ class AlphaMELTSBackend(MeltBackend):
         if composition_mol_by_account is not None:
             unsupported = self._unsupported_accounts(composition_mol_by_account)
             if unsupported:
+                diagnostics = self._out_of_domain_diagnostics(
+                    temperature_C=min_T_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    composition_wt_pct=None,
+                    composition_mol=composition_mol,
+                    composition_mol_by_account=composition_mol_by_account,
+                )
                 return LiquidusSolidusResult(
                     status='out_of_domain',
                     warnings=(
@@ -1070,6 +1185,7 @@ class AlphaMELTSBackend(MeltBackend):
                             for account, species in sorted(unsupported.items())
                         ),
                     ),
+                    diagnostics=diagnostics,
                 )
             composition_mol = {}
             for species, mol in composition_mol_by_account.get(
@@ -1091,21 +1207,32 @@ class AlphaMELTSBackend(MeltBackend):
             composition_kg = dict(composition_kg or {})
 
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
+        diagnostics = self._out_of_domain_diagnostics(
+            temperature_C=min_T_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            composition_wt_pct=raw_comp_wt,
+            composition_mol=composition_mol,
+            composition_mol_by_account=composition_mol_by_account,
+        )
         if not raw_comp_wt:
             return LiquidusSolidusResult(
                 status='out_of_domain',
                 warnings=('AlphaMELTS liquidus finder received no melt oxides',),
+                diagnostics=diagnostics,
             )
         domain_rejection = self._domain_gate(
             raw_comp_wt,
             temperature_C=min_T_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            diagnostics=diagnostics,
         )
         if domain_rejection is not None:
             return LiquidusSolidusResult(
                 status='out_of_domain',
                 warnings=tuple(domain_rejection.warnings),
+                diagnostics=dict(domain_rejection.diagnostics),
             )
         try:
             return self._normalize_composition_to_melts_basis(raw_comp_wt)
@@ -1113,6 +1240,7 @@ class AlphaMELTSBackend(MeltBackend):
             return LiquidusSolidusResult(
                 status='out_of_domain',
                 warnings=(f'AlphaMELTS composition rejected: {exc}',),
+                diagnostics=diagnostics,
             )
 
     def _find_petthermotools_liquidus_C(
@@ -1204,8 +1332,16 @@ class AlphaMELTSBackend(MeltBackend):
     # Subprocess mode
     # ------------------------------------------------------------------
 
-    def _equilibrate_subprocess(self, temperature_C, comp_wt,
-                                 fO2_log, pressure_bar, warnings=None):
+    def _equilibrate_subprocess(
+        self,
+        temperature_C,
+        comp_wt,
+        fO2_log,
+        pressure_bar,
+        warnings=None,
+        *,
+        diagnostics: Optional[Mapping[str, object]] = None,
+    ):
         """
         Run alphaMELTS binary via subprocess.
 
@@ -1266,6 +1402,7 @@ class AlphaMELTSBackend(MeltBackend):
                         'composition outside Rhyolite-MELTS calibration domain',
                     ],
                     status='out_of_domain',
+                    diagnostics=diagnostics,
                 )
             if result.returncode > 0:
                 raise RuntimeError(
@@ -1281,6 +1418,7 @@ class AlphaMELTSBackend(MeltBackend):
                 fO2_log=fO2_log,
                 total_input_kg=100.0,
                 warnings=warnings,
+                diagnostics=diagnostics,
             )
 
     def _write_melts_file(self, path: Path, comp_wt: dict,
@@ -1310,7 +1448,11 @@ class AlphaMELTSBackend(MeltBackend):
     def _parse_single_point_stdout(self, output: str, *, temperature_C: float,
                                    pressure_bar: float, fO2_log: float,
                                    total_input_kg: float,
-                                   warnings=None) -> EquilibriumResult:
+                                   warnings=None,
+                                   diagnostics: Optional[
+                                       Mapping[str, object]
+                                   ] = None,
+                                   ) -> EquilibriumResult:
         stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
 
         phases_present: List[str] = []
@@ -1374,6 +1516,7 @@ class AlphaMELTSBackend(MeltBackend):
                     fO2_log=fO2_log,
                     warnings=result_warnings,
                     status='out_of_domain',
+                    diagnostics=diagnostics,
                 )
             raise RuntimeError(
                 'AlphaMELTS subprocess produced no parseable phase assemblage'

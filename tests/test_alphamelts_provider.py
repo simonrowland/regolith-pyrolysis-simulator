@@ -474,6 +474,13 @@ def test_provider_handles_silicate_equilibrium_intent():
 
 def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     legacy = _build_equilibrium_for_basalt(liquidus_C=1290.0)
+    legacy.diagnostics = {
+        'backend_status': 'out_of_domain',
+        'out_of_domain_crash_point': {
+            'temperature_C': 865.0,
+            'composition_wt_pct': {'SiO2': 45.0},
+        },
+    }
     diagnostics = project_equilibrium_to_diagnostics(
         legacy,
         mode='subprocess',
@@ -497,6 +504,7 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     assert result.liquid_composition_wt_pct == pytest.approx(_basalt_wt_pct())
     assert result.activity_coefficients == pytest.approx({'SiO2': 0.95, 'FeO': 1.1})
     assert result.fO2_log == pytest.approx(-8.25)
+    assert result.diagnostics == legacy.diagnostics
     assert result.ledger_transition is None
 
 

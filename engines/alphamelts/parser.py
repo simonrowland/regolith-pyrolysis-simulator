@@ -136,6 +136,9 @@ def project_equilibrium_to_diagnostics(
         engine_version=engine_version,
         backend_status=backend_status,
         backend_warnings=warnings,
+        backend_diagnostics=dict(
+            getattr(equilibrium_result, 'diagnostics', {}) or {}
+        ),
     )
 
 
@@ -189,6 +192,7 @@ def diagnostics_to_equilibrium(
         fO2_log=float(fO2_log),
         warnings=list(diagnostics.backend_warnings),
         status=status,
+        diagnostics=dict(diagnostics.backend_diagnostics),
     )
 
 

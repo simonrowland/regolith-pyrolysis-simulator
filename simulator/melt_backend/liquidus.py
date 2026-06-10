@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Callable, Mapping, Optional, Tuple
+from typing import Any, Callable, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import LiquidFractionInvalidError
 
@@ -25,6 +25,7 @@ class LiquidusSolidusResult:
     warnings: Tuple[str, ...] = ()
     samples: Tuple[MeltFractionSample, ...] = ()
     iterations: int = 0
+    diagnostics: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.liquidus_T_C is not None:
@@ -47,6 +48,7 @@ class LiquidusSolidusResult:
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
         object.__setattr__(self, 'samples', tuple(self.samples))
         object.__setattr__(self, 'iterations', int(self.iterations))
+        object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
 
 
 @dataclass(frozen=True)

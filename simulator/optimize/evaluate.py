@@ -12,7 +12,7 @@ from types import MappingProxyType
 from typing import Any, Mapping
 from collections.abc import Mapping as MappingABC, Set as AbstractSet
 
-from simulator.accounting import OverdraftError
+from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backends import BackendUnavailableError
 from simulator.chemistry.kernel import ProposalRejected
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
@@ -47,6 +47,7 @@ from simulator.runner import PyrolysisRun, RunnerError
 
 
 MASS_BALANCE_ABORT_PCT = 5e-12
+RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 
 
 class FailureCategory(str, Enum):
@@ -58,6 +59,18 @@ class FailureCategory(str, Enum):
     INVALID_RECIPE = "invalid_recipe"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
+
+
+@dataclass(frozen=True)
+class RumpTerminalAssessment:
+    earned: bool
+    reason: str
+    notes: tuple[str, ...]
+    trace_payload: Mapping[str, Any]
+    liquid_fraction: float | None = None
+    solidus_T_C: float | None = None
+    liquidus_T_C: float | None = None
+    T_crash_C: float | None = None
 
 
 @dataclass(frozen=True)
@@ -349,6 +362,8 @@ def evaluate(
             key,
             run_execution,
             profile,
+            patch=validated_patch,
+            constraints=constraints,
         )
 
     _abort_on_non_authoritative_backend_status(
@@ -576,6 +591,9 @@ def _infeasible_result(
     feasibility: FeasibilityResult,
     run_execution: Any,
     profile: Mapping[str, Any],
+    *,
+    notes: tuple[str, ...] = (),
+    trace_payload: Mapping[str, Any] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -585,7 +603,8 @@ def _infeasible_result(
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
-        run_reference=_run_reference(run_execution, profile),
+        run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
+        notes=notes,
     )
 
 
@@ -595,7 +614,59 @@ def _out_of_domain_result(
     key: str,
     run_execution: Any,
     profile: Mapping[str, Any],
+    *,
+    patch: RecipePatch,
+    constraints: PhysicsConstraintSet | None,
 ) -> ScoredResult:
+    assessment = _assess_rump_terminal(run_execution)
+    if assessment.earned:
+        _abort_on_mass_balance_breach(
+            run_execution,
+            patch=patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            key=key,
+        )
+        feasibility = (constraints or PhysicsConstraintSet()).evaluate(run_execution.trace)
+        if not feasibility.feasible:
+            return _infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                feasibility,
+                run_execution,
+                profile,
+                notes=assessment.notes,
+                trace_payload=assessment.trace_payload,
+            )
+        try:
+            objectives = compute_objectives(profile, run_execution)
+        except ObjectiveComputationError as exc:
+            raise EngineBugAbort(
+                str(exc),
+                patch=patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        margins = dict(feasibility.margins)
+        margins["rump_terminal"] = _rump_terminal_margin(assessment)
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=key,
+            feasible=True,
+            objectives=objectives,
+            feasibility_margins=margins,
+            failing_gates=(),
+            run_reference=_run_reference(
+                run_execution,
+                profile,
+                trace_payload=assessment.trace_payload,
+            ),
+            notes=assessment.notes,
+        )
+
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -604,8 +675,12 @@ def _out_of_domain_result(
         failure_category=FailureCategory.OUT_OF_DOMAIN,
         feasibility_margins={"backend_domain": _out_of_domain_margin()},
         failing_gates=("backend_domain",),
-        run_reference=_run_reference(run_execution, profile),
-        notes=("backend_status=out_of_domain",),
+        run_reference=_run_reference(
+            run_execution,
+            profile,
+            trace_payload=assessment.trace_payload,
+        ),
+        notes=assessment.notes,
     )
 
 
@@ -625,6 +700,513 @@ def _out_of_domain_margin() -> GateMargin:
         observed=0.0,
         detail="authoritative backend rejected composition as out of domain",
     )
+
+
+def _assess_rump_terminal(run_execution: Any) -> RumpTerminalAssessment:
+    diagnostics = _out_of_domain_diagnostics(run_execution)
+    crash_point = _crash_point_from_diagnostics(diagnostics)
+    if crash_point is None:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="missing_crash_point",
+        )
+
+    T_crash_C = _finite_optional_float(crash_point.get("temperature_C"))
+    pressure_bar = _finite_optional_float(crash_point.get("pressure_bar"))
+    fO2_log = _finite_optional_float(crash_point.get("fO2_log"))
+    if T_crash_C is None or pressure_bar is None or fO2_log is None:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="incomplete_crash_point_controls",
+            crash_point=crash_point,
+        )
+    composition_mol_by_account = _crash_point_composition_mol_by_account(
+        crash_point,
+        run_execution,
+    )
+    if composition_mol_by_account is None:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="missing_crash_point_composition",
+            crash_point=crash_point,
+        )
+    proof_inputs = _rump_terminal_proof_inputs(
+        composition_mol_by_account,
+        T_crash_C=T_crash_C,
+        pressure_bar=pressure_bar,
+        fO2_log=fO2_log,
+    )
+    unproven_curve_proof = _rump_terminal_curve_proof(
+        curve_source="liquidus_solidus:kernel",
+        composition_derived=False,
+        proof_inputs=proof_inputs,
+    )
+
+    sim = getattr(run_execution, "simulator", None)
+    curve_from_kernel = getattr(sim, "_freeze_gate_curve_from_kernel_liquidus", None)
+    interpolate = getattr(sim, "_interpolate_freeze_gate_curve", None)
+    if not callable(curve_from_kernel) or not callable(interpolate):
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="kernel_liquidus_unavailable",
+            crash_point=crash_point,
+            curve_proof=unproven_curve_proof,
+        )
+
+    reasons: list[str] = []
+    try:
+        curve = curve_from_kernel(
+            reasons,
+            fO2_log=fO2_log,
+            temperature_C=T_crash_C,
+            pressure_bar=pressure_bar,
+            composition_mol_by_account=composition_mol_by_account,
+            allow_parametric=False,
+        )
+    except Exception as exc:  # noqa: BLE001 - proof source unavailable, not earned
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="rump_terminal_unproven",
+            detail=(
+                "rump_terminal_unproven: kernel curve not composition-derived; "
+                f"{type(exc).__name__}: {exc}"
+            ),
+            crash_point=crash_point,
+            curve_proof=unproven_curve_proof,
+        )
+    if curve is None:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="rump_terminal_unproven",
+            detail=_rump_terminal_unproven_detail(reasons),
+            crash_point=crash_point,
+            curve_proof=unproven_curve_proof,
+        )
+
+    curve_source = str(curve.get("source") or "")
+    composition_derived = bool(curve.get("composition_derived"))
+    curve_proof = _rump_terminal_curve_proof(
+        curve_source=curve_source,
+        composition_derived=composition_derived,
+        proof_inputs=proof_inputs,
+    )
+    if not composition_derived:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="rump_terminal_unproven",
+            detail="rump_terminal_unproven: kernel curve not composition-derived",
+            crash_point=crash_point,
+            curve_proof=curve_proof,
+        )
+
+    try:
+        liquid_fraction = float(interpolate(curve, T_crash_C))
+        solidus_T_C = float(curve["solidus_T_C"])
+        liquidus_T_C = float(curve["liquidus_T_C"])
+    except (TypeError, ValueError, KeyError) as exc:
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="kernel_liquidus_invalid",
+            detail=f"{type(exc).__name__}: {exc}",
+            crash_point=crash_point,
+            curve_proof=curve_proof,
+        )
+    if not all(
+        math.isfinite(value)
+        for value in (liquid_fraction, solidus_T_C, liquidus_T_C)
+    ):
+        return _rump_terminal_not_earned(
+            run_execution,
+            diagnostics,
+            reason="kernel_liquidus_invalid",
+            crash_point=crash_point,
+            curve_proof=curve_proof,
+        )
+
+    if liquid_fraction <= RUMP_TERMINAL_LIQUID_FRACTION_MAX:
+        note = _rump_terminal_note(
+            "earned_by=kernel_liquidus",
+            liquid_fraction=liquid_fraction,
+            solidus_T_C=solidus_T_C,
+            T_crash_C=T_crash_C,
+        )
+        trace = _out_of_domain_trace_payload(
+            run_execution,
+            diagnostics,
+            crash_point=crash_point,
+            rump_terminal={
+                "status": "earned",
+                "earned_by": "kernel_liquidus",
+                "liquid_fraction": liquid_fraction,
+                "liquid_fraction_threshold": RUMP_TERMINAL_LIQUID_FRACTION_MAX,
+                "solidus_T_C": solidus_T_C,
+                "liquidus_T_C": liquidus_T_C,
+                "T_crash_C": T_crash_C,
+                **curve_proof,
+            },
+        )
+        return RumpTerminalAssessment(
+            earned=True,
+            reason="earned_by_kernel_liquidus",
+            notes=("backend_status=out_of_domain", note),
+            trace_payload=trace,
+            liquid_fraction=liquid_fraction,
+            solidus_T_C=solidus_T_C,
+            liquidus_T_C=liquidus_T_C,
+            T_crash_C=T_crash_C,
+        )
+
+    note = _rump_terminal_note(
+        "not_earned reason=kernel_liquidus_disagree",
+        liquid_fraction=liquid_fraction,
+        solidus_T_C=solidus_T_C,
+        T_crash_C=T_crash_C,
+    )
+    trace = _out_of_domain_trace_payload(
+        run_execution,
+        diagnostics,
+        crash_point=crash_point,
+        rump_terminal={
+            "status": "not_earned",
+            "reason": "kernel_liquidus_disagree",
+            "liquid_fraction": liquid_fraction,
+            "liquid_fraction_threshold": RUMP_TERMINAL_LIQUID_FRACTION_MAX,
+            "solidus_T_C": solidus_T_C,
+            "liquidus_T_C": liquidus_T_C,
+            "T_crash_C": T_crash_C,
+            **curve_proof,
+        },
+    )
+    return RumpTerminalAssessment(
+        earned=False,
+        reason="kernel_liquidus_disagree",
+        notes=("backend_status=out_of_domain", note),
+        trace_payload=trace,
+        liquid_fraction=liquid_fraction,
+        solidus_T_C=solidus_T_C,
+        liquidus_T_C=liquidus_T_C,
+        T_crash_C=T_crash_C,
+    )
+
+
+def _rump_terminal_not_earned(
+    run_execution: Any,
+    diagnostics: Mapping[str, Any],
+    *,
+    reason: str,
+    detail: str = "",
+    crash_point: Mapping[str, Any] | None = None,
+    proof_inputs: Mapping[str, Any] | None = None,
+    curve_proof: Mapping[str, Any] | None = None,
+) -> RumpTerminalAssessment:
+    note = f"rump_terminal: not_earned reason={reason}"
+    if detail:
+        note = f"{note} detail={detail}"
+    proof_payload: dict[str, Any] = {}
+    if proof_inputs is not None:
+        proof_payload["proof_inputs"] = _compact_jsonable(proof_inputs)
+    if curve_proof is not None:
+        proof_payload.update(_compact_jsonable(curve_proof))
+    trace = _out_of_domain_trace_payload(
+        run_execution,
+        diagnostics,
+        crash_point=crash_point,
+        rump_terminal={
+            "status": "not_earned",
+            "reason": reason,
+            **({"detail": detail} if detail else {}),
+            **proof_payload,
+        },
+    )
+    return RumpTerminalAssessment(
+        earned=False,
+        reason=reason,
+        notes=("backend_status=out_of_domain", note),
+        trace_payload=trace,
+    )
+
+
+def _rump_terminal_margin(assessment: RumpTerminalAssessment) -> GateMargin:
+    observed = float(assessment.liquid_fraction or 0.0)
+    threshold = ThresholdSpec(
+        id="rump_terminal_liquid_fraction_max",
+        value=RUMP_TERMINAL_LIQUID_FRACTION_MAX,
+        units="fraction",
+        source="code_default",
+        source_ref=(
+            "simulator.optimize.evaluate:"
+            "RUMP_TERMINAL_LIQUID_FRACTION_MAX"
+        ),
+    )
+    return GateMargin(
+        gate="rump_terminal",
+        feasible=True,
+        margin=RUMP_TERMINAL_LIQUID_FRACTION_MAX - observed,
+        threshold=threshold,
+        observed=observed,
+        detail="kernel liquidus voted the out_of_domain crash point sub-solidus",
+    )
+
+
+def _rump_terminal_note(
+    prefix: str,
+    *,
+    liquid_fraction: float,
+    solidus_T_C: float,
+    T_crash_C: float,
+) -> str:
+    return (
+        f"rump_terminal: {prefix}, "
+        f"liquid_fraction={liquid_fraction:.12g}, "
+        f"solidus_T_C={solidus_T_C:.12g}, "
+        f"T_crash_C={T_crash_C:.12g}"
+    )
+
+
+def _out_of_domain_diagnostics(run_execution: Any) -> Mapping[str, Any]:
+    sim = getattr(run_execution, "simulator", None)
+    candidates = (
+        getattr(sim, "_last_out_of_domain_diagnostics", None),
+        getattr(sim, "_last_backend_diagnostics", None),
+        _carrier_value(getattr(run_execution, "trace", None), "backend_diagnostics"),
+        _carrier_value(getattr(run_execution, "trace", None), "out_of_domain_crash_point"),
+    )
+    for candidate in candidates:
+        if isinstance(candidate, MappingABC):
+            if "out_of_domain_crash_point" in candidate:
+                return _compact_jsonable(candidate)
+            if candidate is candidates[-1]:
+                return {"out_of_domain_crash_point": _compact_jsonable(candidate)}
+    return {}
+
+
+def _crash_point_from_diagnostics(
+    diagnostics: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    raw = diagnostics.get("out_of_domain_crash_point")
+    if raw is None:
+        raw = diagnostics.get("crash_point")
+    if not isinstance(raw, MappingABC):
+        return None
+    return _compact_jsonable(raw)
+
+
+def _crash_point_has_composition(crash_point: Mapping[str, Any]) -> bool:
+    for key in (
+        "composition_mol",
+        "composition_wt_pct",
+        "composition_melts_wt_pct",
+    ):
+        raw = crash_point.get(key)
+        if isinstance(raw, MappingABC) and any(
+            _finite_optional_float(value) is not None
+            for value in raw.values()
+        ):
+            return True
+    raw_by_account = crash_point.get("composition_mol_by_account")
+    if isinstance(raw_by_account, MappingABC):
+        for species_mol in raw_by_account.values():
+            if isinstance(species_mol, MappingABC) and any(
+                _finite_optional_float(value) is not None
+                for value in species_mol.values()
+            ):
+                return True
+    return False
+
+
+def _crash_point_composition_mol_by_account(
+    crash_point: Mapping[str, Any],
+    run_execution: Any,
+) -> dict[str, dict[str, float]] | None:
+    raw_by_account = crash_point.get("composition_mol_by_account")
+    if isinstance(raw_by_account, MappingABC):
+        by_account = _finite_nested_float_mapping(raw_by_account)
+        if by_account:
+            return by_account
+
+    raw_mol = crash_point.get("composition_mol")
+    if isinstance(raw_mol, MappingABC):
+        mol = _finite_float_mapping(raw_mol)
+        if mol:
+            return {"process.cleaned_melt": mol}
+
+    for key in ("composition_melts_wt_pct", "composition_wt_pct"):
+        raw_wt_pct = crash_point.get(key)
+        if isinstance(raw_wt_pct, MappingABC):
+            mol = _composition_wt_pct_to_mol(raw_wt_pct, run_execution)
+            if mol:
+                return {"process.cleaned_melt": mol}
+    return None
+
+
+def _finite_nested_float_mapping(
+    values: Mapping[Any, Any],
+) -> dict[str, dict[str, float]]:
+    result: dict[str, dict[str, float]] = {}
+    for account, species_mol in values.items():
+        if not isinstance(species_mol, MappingABC):
+            continue
+        cleaned = _finite_float_mapping(species_mol)
+        if cleaned:
+            result[str(account)] = cleaned
+    return result
+
+
+def _composition_wt_pct_to_mol(
+    values: Mapping[Any, Any],
+    run_execution: Any,
+) -> dict[str, float]:
+    sim = getattr(run_execution, "simulator", None)
+    registry = dict(getattr(sim, "species_formula_registry", {}) or {})
+    result: dict[str, float] = {}
+    for species, raw_mass in values.items():
+        mass_basis = _finite_optional_float(raw_mass)
+        if mass_basis is None or mass_basis <= 0.0:
+            continue
+        try:
+            formula = resolve_species_formula(str(species), registry)
+        except Exception:  # noqa: BLE001 - unregistered species cannot prove
+            continue
+        mol = mass_basis / formula.molar_mass_kg_per_mol()
+        if math.isfinite(mol) and mol > 0.0:
+            result[str(species)] = mol
+    return result
+
+
+def _rump_terminal_proof_inputs(
+    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+    *,
+    T_crash_C: float,
+    pressure_bar: float,
+    fO2_log: float,
+) -> dict[str, Any]:
+    normalized = normalize_canonical_value(composition_mol_by_account)
+    digest = hashlib.sha256(
+        canonical_json_dumps(normalized).encode("utf-8"),
+    ).hexdigest()
+    return {
+        "composition_digest": digest,
+        "T_crash_C": T_crash_C,
+        "pressure_bar": pressure_bar,
+        "fO2_log": fO2_log,
+    }
+
+
+def _rump_terminal_curve_proof(
+    *,
+    curve_source: str,
+    composition_derived: bool,
+    proof_inputs: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "curve_source": curve_source,
+        "composition_derived": composition_derived,
+        "proof_inputs": dict(proof_inputs),
+    }
+
+
+def _rump_terminal_unproven_detail(reasons: list[str]) -> str:
+    detail = "rump_terminal_unproven: kernel curve not composition-derived"
+    if reasons:
+        return f"{detail}; {'; '.join(reasons[-4:])}"
+    return detail
+
+
+def _out_of_domain_trace_payload(
+    run_execution: Any,
+    diagnostics: Mapping[str, Any],
+    *,
+    crash_point: Mapping[str, Any] | None,
+    rump_terminal: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    payload: dict[str, Any] = {
+        "backend_status": "out_of_domain",
+        "rump_terminal": _compact_jsonable(rump_terminal),
+    }
+    backend_authoritative = _backend_authoritative(run_execution)
+    if backend_authoritative is not None:
+        payload["backend_authoritative"] = backend_authoritative
+    if diagnostics:
+        payload["backend_diagnostics"] = _compact_jsonable(diagnostics)
+    if crash_point is not None:
+        payload["out_of_domain_crash_point"] = _compact_jsonable(crash_point)
+    rump_kg = _terminal_rump_by_species_kg(run_execution)
+    if rump_kg:
+        payload["terminal_rump_by_species_kg"] = rump_kg
+    return payload
+
+
+def _terminal_rump_by_species_kg(run_execution: Any) -> dict[str, float]:
+    trace = getattr(run_execution, "trace", None)
+    raw = _carrier_value(trace, "terminal_rump_by_species_kg")
+    if isinstance(raw, MappingABC):
+        return _finite_float_mapping(raw)
+    sim = getattr(run_execution, "simulator", None)
+    getter = getattr(sim, "_terminal_rump_by_species", None)
+    if callable(getter):
+        try:
+            return _finite_float_mapping(getter() or {})
+        except (TypeError, ValueError):
+            return {}
+    return {}
+
+
+def _carrier_value(carrier: Any, key: str) -> Any:
+    if carrier is None:
+        return None
+    if isinstance(carrier, MappingABC):
+        return carrier.get(key)
+    return getattr(carrier, key, None)
+
+
+def _finite_float_mapping(values: Mapping[Any, Any]) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for key, raw in values.items():
+        value = _finite_optional_float(raw)
+        if value is not None and value > 0.0:
+            result[str(key)] = value
+    return result
+
+
+def _finite_optional_float(value: Any) -> float | None:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(numeric):
+        return None
+    return numeric
+
+
+def _compact_jsonable(value: Any) -> Any:
+    if isinstance(value, MappingABC):
+        return {
+            str(key): _compact_jsonable(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return [_compact_jsonable(item) for item in value]
+    if isinstance(value, list):
+        return [_compact_jsonable(item) for item in value]
+    if isinstance(value, bool) or value is None or isinstance(value, str):
+        return value
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return value if math.isfinite(value) else str(value)
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    return numeric if math.isfinite(numeric) else str(value)
 
 
 def _non_finite_payload_result(
@@ -744,7 +1326,12 @@ def _invalid_recipe_margin(overdraw_kg: float | None) -> GateMargin:
     )
 
 
-def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReference:
+def _run_reference(
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    trace_payload: Mapping[str, Any] | None = None,
+) -> RunReference:
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
         try:
@@ -755,7 +1342,7 @@ def _run_reference(run_execution: Any, profile: Mapping[str, Any]) -> RunReferen
         status=str(getattr(run_execution, "status", "ok")),
         error_message=str(getattr(run_execution, "error_message", "")),
         reason=str(getattr(run_execution, "reason", "")),
-        trace=getattr(run_execution, "trace", None),
+        trace=trace_payload if trace_payload is not None else getattr(run_execution, "trace", None),
         product_summary=summary,
         backend_status=_latest_backend_status(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),

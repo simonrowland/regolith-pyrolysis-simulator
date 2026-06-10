@@ -171,6 +171,13 @@ def _evaluator(
                 ),
             )
         if index in domain_rejects:
+            crash_point = {
+                "temperature_C": 865.0,
+                "pressure_bar": 1.0e-6,
+                "fO2_log": -9.0,
+                "composition_wt_pct": {"SiO2": 55.0, "CaO": 45.0},
+                "composition_mol": {"SiO2": 1.0, "CaO": 1.0},
+            }
             return ScoredResult(
                 candidate_id=candidate_id,
                 eval_spec=spec,
@@ -188,7 +195,23 @@ def _evaluator(
                 failing_gates=("backend_domain",),
                 run_reference=RunReference(
                     status="ok",
-                    trace={"backend_status": "out_of_domain", "snapshots": ["heavy"]},
+                    trace={
+                        "backend_status": "out_of_domain",
+                        "backend_diagnostics": {
+                            "backend_status": "out_of_domain",
+                            "out_of_domain_crash_point": crash_point,
+                        },
+                        "out_of_domain_crash_point": crash_point,
+                        "rump_terminal": {
+                            "status": "not_earned",
+                            "reason": "kernel_liquidus_disagree",
+                            "liquid_fraction": 0.5,
+                            "solidus_T_C": 900.0,
+                            "T_crash_C": 865.0,
+                        },
+                        "terminal_rump_by_species_kg": {"CaO": 2.0},
+                        "snapshots": ["heavy"],
+                    },
                     backend_status="out_of_domain",
                 ),
             )
@@ -589,7 +612,17 @@ def test_out_of_domain_candidate_is_stored_and_study_continues(tmp_path) -> None
     assert logged["random-7-000001"]["failure_category"] == "out_of_domain"
     assert logged["random-7-000001"]["objectives"] == {}
     assert logged["random-7-000001"]["feasibility_margins"]["backend_domain"]["observed"] == 0.0
+    trace_summary = logged["random-7-000001"]["trace_summary"]
+    assert trace_summary["out_of_domain_crash_point"]["temperature_C"] == pytest.approx(865.0)
+    assert trace_summary["out_of_domain_crash_point"]["composition_mol"]["CaO"] == pytest.approx(1.0)
+    assert trace_summary["rump_terminal"]["liquid_fraction"] == pytest.approx(0.5)
+    assert trace_summary["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+    assert "snapshots" not in trace_summary
     assert stored["random-7-000001"].failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert stored["random-7-000001"].run_reference is not None
+    stored_trace = stored["random-7-000001"].run_reference.trace
+    assert stored_trace["out_of_domain_crash_point"]["fO2_log"] == pytest.approx(-9.0)
+    assert "snapshots" not in stored_trace
 
 
 def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:

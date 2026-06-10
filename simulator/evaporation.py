@@ -455,16 +455,44 @@ class EvaporationMixin:
         reasons: list[str],
         *,
         fO2_log: float,
+        temperature_C: float | None = None,
+        pressure_bar: float | None = None,
+        composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
+        allow_parametric: bool = False,
     ) -> dict[str, Any] | None:
+        composition_derived = bool(composition_mol_by_account)
         try:
-            result = self._dispatch_only(
-                ChemistryIntent.SILICATE_LIQUIDUS,
-                control_inputs={},
-                fO2_log=fO2_log,
-                fe_redox_policy='intrinsic',
-            )
+            if composition_derived:
+                result = self._require_chem_kernel().dispatch(
+                    ChemistryIntent.SILICATE_LIQUIDUS,
+                    temperature_C=(
+                        float(self.melt.temperature_C)
+                        if temperature_C is None
+                        else float(temperature_C)
+                    ),
+                    pressure_bar=(
+                        float(self.melt.p_total_mbar) / 1000.0
+                        if pressure_bar is None
+                        else float(pressure_bar)
+                    ),
+                    fO2_log=fO2_log,
+                    fe_redox_policy='intrinsic',
+                    control_inputs={
+                        'composition_source': 'out_of_domain_crash_point',
+                    },
+                    account_mol_overrides=composition_mol_by_account,
+                )
+            else:
+                result = self._dispatch_only(
+                    ChemistryIntent.SILICATE_LIQUIDUS,
+                    control_inputs={},
+                    fO2_log=fO2_log,
+                    fe_redox_policy='intrinsic',
+                )
         except ProviderUnavailableError as exc:
             reasons.append(f'kernel liquidus unavailable: {exc}')
+            if allow_parametric:
+                return self._freeze_gate_curve_from_parametric_liquidus(reasons)
             return None
 
         diagnostic = dict(getattr(result, 'diagnostic', None) or {})
@@ -475,11 +503,39 @@ class EvaporationMixin:
         )
         if status != 'ok':
             reasons.append(f'kernel liquidus unavailable: status={status}')
+            if allow_parametric:
+                return self._freeze_gate_curve_from_parametric_liquidus(reasons)
             return None
-        return self._freeze_gate_curve_from_bounds(
+        curve = self._freeze_gate_curve_from_bounds(
             solidus_T_C=self._optional_float(diagnostic.get('solidus_T_C')),
             liquidus_T_C=self._optional_float(diagnostic.get('liquidus_T_C')),
-            source='liquidus_solidus:kernel',
+            source=(
+                'liquidus_solidus:kernel:composition_derived'
+                if composition_derived
+                else 'liquidus_solidus:kernel'
+            ),
+            reasons=reasons,
+        )
+        if curve is not None and composition_derived:
+            curve = dict(curve)
+            curve['composition_derived'] = True
+        return curve
+
+    def _freeze_gate_curve_from_parametric_liquidus(
+        self,
+        reasons: list[str],
+    ) -> dict[str, Any] | None:
+        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        if not any(
+            species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
+            for species, mol in cleaned_mol.items()
+        ):
+            reasons.append('parametric liquidus unavailable: no cleaned melt')
+            return None
+        return self._freeze_gate_curve_from_bounds(
+            solidus_T_C=900.0,
+            liquidus_T_C=1200.0,
+            source='liquidus_solidus:kernel:parametric_dry_silicate_lower_bound',
             reasons=reasons,
         )
 
@@ -492,6 +548,11 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         status = str(getattr(result, 'status', 'unavailable'))
         if status != 'ok':
+            diagnostics = getattr(result, 'diagnostics', None)
+            if isinstance(diagnostics, Mapping) and diagnostics:
+                self._last_backend_diagnostics = dict(diagnostics)
+                if status == 'out_of_domain':
+                    self._last_out_of_domain_diagnostics = dict(diagnostics)
             warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
             reasons.append(
                 f'{source} unavailable: status={status}'

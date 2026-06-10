@@ -90,6 +90,7 @@ class LiquidusDiagnostics:
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
     backend_warnings: Tuple[str, ...] = ()
+    backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -136,6 +137,7 @@ class LiquidusDiagnostics:
         )
         object.__setattr__(self, 'phases_present', tuple(str(p) for p in self.phases_present))
         object.__setattr__(self, 'backend_warnings', tuple(str(w) for w in self.backend_warnings))
+        object.__setattr__(self, 'backend_diagnostics', dict(self.backend_diagnostics or {}))
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'fe_redox_policy', str(self.fe_redox_policy))
         object.__setattr__(self, 'engine_version', str(self.engine_version))

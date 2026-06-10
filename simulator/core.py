@@ -318,6 +318,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # evaluation classify a candidate that hit a real backend domain edge.
         self._last_backend_status = 'ok'
         self._backend_status_history: list[str] = []
+        self._last_backend_diagnostics: Dict[str, Any] = {}
+        self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
@@ -623,6 +625,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_error = ''
         self._last_backend_status = 'ok'
         self._backend_status_history = []
+        self._last_backend_diagnostics = {}
+        self._last_out_of_domain_diagnostics = {}
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -2355,6 +2359,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
         self._last_backend_status = getattr(result, 'status', 'ok')
         self._backend_status_history.append(str(self._last_backend_status))
+        self._last_backend_diagnostics = dict(
+            getattr(result, 'diagnostics', {}) or {}
+        )
+        if (
+            str(self._last_backend_status) == 'out_of_domain'
+            and self._last_backend_diagnostics
+        ):
+            self._last_out_of_domain_diagnostics = dict(
+                self._last_backend_diagnostics
+            )
         # VAPOR_PRESSURE intent — kernel-authoritative.
         #
         # \goal BUILTIN-ENGINE-EXTRACTION (#7), first flip landed. The
