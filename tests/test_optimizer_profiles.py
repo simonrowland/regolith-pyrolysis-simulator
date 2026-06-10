@@ -197,6 +197,18 @@ def test_composition_target_validates_and_resolves_fe_tier() -> None:
             "at least one positive branch",
         ),
         (
+            lambda p: p["objectives"][0]["target"].update(
+                {"score_weights": {"extraction": 1.0, "composition": 1.0}}
+            ),
+            "score_weight_sum_not_one",
+        ),
+        (
+            lambda p: p["objectives"][0]["target"].update(
+                {"score_weights": {"extraction": 0.25, "composition": 0.25}}
+            ),
+            "score_weight_sum_not_one",
+        ),
+        (
             lambda p: p["objectives"][0]["target"].update({"surprise": True}),
             "unknown objectives\\[0\\].target key",
         ),

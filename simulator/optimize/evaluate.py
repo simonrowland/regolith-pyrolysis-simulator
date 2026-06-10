@@ -122,6 +122,37 @@ class RunReference:
 
 
 @dataclass(frozen=True)
+class _TraceOverlay:
+    original_trace: Any
+    overrides: Mapping[str, Any]
+
+    def __getattr__(self, name: str) -> Any:
+        if name in self.overrides:
+            return self.overrides[name]
+        return getattr(self.original_trace, name)
+
+
+@dataclass(frozen=True)
+class _TraceOverrideRunExecution:
+    run_execution: Any
+    trace_payload: Mapping[str, Any]
+    trace: Any = field(init=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "trace",
+            _TraceOverlay(
+                getattr(self.run_execution, "trace", None),
+                self.trace_payload,
+            ),
+        )
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.run_execution, name)
+
+
+@dataclass(frozen=True)
 class ScoredResult:
     candidate_id: str | None
     eval_spec: EvalSpec | None
@@ -746,8 +777,12 @@ def _out_of_domain_result(
                 notes=assessment.notes,
                 trace_payload=assessment.trace_payload,
             )
+        scoring_execution = _TraceOverrideRunExecution(
+            run_execution,
+            assessment.trace_payload,
+        )
         try:
-            objectives = compute_objectives(profile, run_execution)
+            objectives = compute_objectives(profile, scoring_execution)
         except ObjectiveComputationError as exc:
             raise EngineBugAbort(
                 str(exc),
@@ -767,7 +802,7 @@ def _out_of_domain_result(
             feasibility_margins=margins,
             failing_gates=(),
             run_reference=_run_reference(
-                run_execution,
+                scoring_execution,
                 profile,
                 trace_payload=assessment.trace_payload,
             ),

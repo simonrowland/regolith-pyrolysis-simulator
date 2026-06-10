@@ -323,6 +323,59 @@ def test_composition_target_hard_window_miss_zeroes_extraction_branch() -> None:
     assert compute_objectives(profile, run).as_mapping()["composition_target:pool-test"] == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize(
+    ("product_kg", "oxides"),
+    [
+        (
+            {"SiO2": 1000.0},
+            {
+                "SiO2": {"min": 40.0, "max": 60.0, "weight": 1.0},
+                "CaO": {"min": 40.0, "max": 60.0, "weight": 1.0},
+            },
+        ),
+        (
+            {},
+            {
+                "SiO2": {"min": 40.0, "max": 60.0, "weight": 1.0},
+                "CaO": {"min": 40.0, "max": 60.0, "weight": 1.0},
+            },
+        ),
+        (
+            {"SiO2": 1000.0},
+            {"SiO2": {"min": 90.0, "max": 100.0, "weight": 1.0}},
+        ),
+    ],
+)
+def test_composition_target_valid_unit_weights_keep_score_0_1(
+    product_kg: dict[str, float],
+    oxides: dict[str, dict[str, float]],
+) -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"SiO2": 10.0, "CaO": 10.0},
+            stage3_kg={},
+            product_kg=product_kg,
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        species_vector={"Si": "extract", "Ca": "retain"},
+        extraction={
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Si": 0.01},
+        },
+        oxides=oxides,
+        score_weights={"extraction": 0.5, "composition": 0.5},
+    )
+
+    score = compute_objectives(profile, run).as_mapping()["composition_target:pool-test"]
+
+    assert math.isfinite(score)
+    assert 0.0 <= score <= 1.0
+
+
 def test_composition_target_extraction_skips_unknown_product_bookkeeping_species() -> None:
     run = SimpleNamespace(
         simulator=_CompositionSim(

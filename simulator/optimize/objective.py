@@ -616,6 +616,12 @@ def _normalize_score_weights(
     }
     if weights["extraction"] <= 0.0 and weights["composition"] <= 0.0:
         raise ObjectiveProfileError(f"{where} must contain at least one positive branch")
+    weight_sum = weights["extraction"] + weights["composition"]
+    if not math.isclose(weight_sum, 1.0, rel_tol=0.0, abs_tol=1e-9):
+        raise ObjectiveProfileError(
+            f"{where} score_weight_sum_not_one: extraction + composition must equal "
+            f"1.0 for score_0_1 objective (got {weight_sum:.17g})"
+        )
     if weights["extraction"] > 0.0 and not any(role == "extract" for role in vector.values()):
         raise ObjectiveProfileError(f"{where}.extraction positive but vector has no extract species")
     oxides = window.get("oxides", {})

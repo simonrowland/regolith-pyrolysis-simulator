@@ -111,7 +111,10 @@ class _Stage:
 
 class _EvalLedger:
     def mol_by_account(self, account: str | None = None):
-        balances = {"process.cleaned_melt": {"CaO": 1.0}}
+        balances = {
+            "process.cleaned_melt": {"CaO": 1.0},
+            "terminal.slag": {"CaO": 1.0},
+        }
         if account is None:
             return {key: dict(value) for key, value in balances.items()}
         return dict(balances.get(account, {}))
@@ -883,6 +886,69 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     assert "composition_digest" in trace["rump_terminal"]["proof_inputs"]
     assert trace["out_of_domain_crash_point"]["temperature_C"] == pytest.approx(1100.0)
     assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+
+
+def test_out_of_domain_earned_rump_terminal_composition_target_scores_success() -> None:
+    class NoTerminalSlagLedger:
+        def mol_by_account(self, account: str | None = None):
+            balances = {"process.cleaned_melt": {"CaO": 1.0}}
+            if account is None:
+                return {key: dict(value) for key, value in balances.items()}
+            return dict(balances.get(account, {}))
+
+    trace = _trace()
+    delattr(trace, "terminal_rump_by_species_kg")
+    trace.condensed_by_stage_species_delta = ({(3, "SiO"): 20.0},)
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO2"): 0.25}
+    trace.wall_zone_by_segment = {"hot_wall": "Hot"}
+    profile = _composition_eval_profile(
+        "terminal_rump_earned",
+        target_id="pc-terminal-rump-earned",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+    target = profile["objectives"][0]["target"]
+    target["species_vector"] = {"Ca": "retain", "Si": "extract"}
+    target["extraction"] = {
+        "basis": "input_element_mol",
+        "captured_pool": "captured_stage_3_silica",
+        "completeness_min": {"Si": 1.0e-12},
+    }
+    target["score_weights"] = {"extraction": 0.5, "composition": 0.5}
+    profile["run"] = {**PROFILE["run"], "backend_name": "alphamelts"}
+    profile["fidelities"] = {"high": {"backend_name": "alphamelts", "hours": 1}}
+    execution = _execution(
+        trace=trace,
+        backend_status="out_of_domain",
+        backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+        freeze_curve=_kernel_curve(),
+    )
+    execution.simulator.atom_ledger = NoTerminalSlagLedger()
+    execution.simulator.train.stages = (_Stage(), _Stage(), _Stage(), _Stage())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=profile,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()["composition_target:pc-terminal-rump-earned"] == (
+        pytest.approx(1.0)
+    )
+    assert "rump_terminal" in result.feasibility_margins
+    assert result.run_reference is not None
+    assert result.run_reference.trace["rump_terminal"]["status"] == "earned"
+    assert result.run_reference.trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+    assert result.run_reference.product_summary[
+        "wall_deposit_kg_by_segment_species"
+    ]["hot_wall"]["SiO2"] == pytest.approx(0.25)
+    assert result.run_reference.product_summary[
+        "wall_deposit_kg_by_zone_species"
+    ]["Hot"]["SiO2"] == pytest.approx(0.25)
 
 
 def test_kernel_liquidus_account_overrides_reach_alphamelts_provider() -> None:
