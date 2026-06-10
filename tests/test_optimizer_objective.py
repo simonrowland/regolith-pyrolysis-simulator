@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.optimize.objective import (
+    CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ObjectiveComputationError,
     ObjectiveDefinition,
     ObjectiveProfileError,
@@ -320,6 +321,68 @@ def test_composition_target_hard_window_miss_zeroes_extraction_branch() -> None:
     )
 
     assert compute_objectives(profile, run).as_mapping()["composition_target:pool-test"] == pytest.approx(0.0)
+
+
+def test_composition_target_extraction_skips_unknown_product_bookkeeping_species() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"SiO2": 10.0},
+            stage3_kg={},
+            product_kg={"SiO2": 1000.0, "unspent_K_reagent": 1.0},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        species_vector={"Si": "extract"},
+        extraction={
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Si": 0.01},
+        },
+        oxides={"SiO2": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        score_weights={"extraction": 1.0, "composition": 0.0},
+    )
+
+    objectives = compute_objectives(profile, run)
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
+    assert objectives.evidence["composition_target:pool-test"][
+        "captured_product_bookkeeping_exclusions"
+    ] == ("unspent_K_reagent",)
+    assert objectives.evidence["composition_target:pool-test"]["notes"] == (
+        "excluded captured-products bookkeeping species from extraction credit: "
+        "unspent_K_reagent",
+    )
+
+
+def test_composition_target_unknown_non_bookkeeping_product_species_raises() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"SiO2": 10.0},
+            stage3_kg={},
+            product_kg={"SiO2": 1000.0, "MysteryProduct": 1.0},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        species_vector={"Si": "extract"},
+        extraction={
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Si": 0.01},
+        },
+        oxides={"SiO2": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        score_weights={"extraction": 1.0, "composition": 0.0},
+    )
+
+    with pytest.raises(ObjectiveComputationError, match="MysteryProduct"):
+        compute_objectives(profile, run)
+
+
+def test_captured_product_bookkeeping_pattern_constant_pinned() -> None:
+    assert CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS == ("unspent_*_reagent",)
 
 
 def test_residual_rump_pool_missing_data_does_not_alias_terminal_trace() -> None:

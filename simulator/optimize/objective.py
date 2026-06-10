@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 from dataclasses import replace
+import fnmatch
 import hashlib
 import math
 from types import MappingProxyType
@@ -107,6 +109,9 @@ _POOL_LEDGER_ACCOUNTS = MappingProxyType(
 _VENTED_PRODUCT_ACCOUNTS = frozenset(
     {"terminal.oxygen_melt_offgas_vented_to_vacuum", "vent"}
 )
+# Source: AccountingQueries.product_ledger merges sim._unspent_additive_reagents_kg(),
+# which emits unspent_<element>_reagent entries for additive bookkeeping.
+CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS = ("unspent_*_reagent",)
 _EPS = 1.0e-12
 _OBJECTIVE_SENSE_ALIASES = {
     "min": "minimize",
@@ -177,11 +182,13 @@ class ObjectiveValue:
 @dataclass(frozen=True)
 class ObjectiveVector:
     values: tuple[ObjectiveValue, ...]
+    evidence: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         metrics = tuple(value.metric for value in self.values)
         if len(set(metrics)) != len(metrics):
             raise ObjectiveProfileError("objective metrics must be unique")
+        object.__setattr__(self, "evidence", dict(self.evidence))
 
     def as_mapping(self) -> Mapping[str, float]:
         return MappingProxyType({value.metric: value.value for value in self.values})
@@ -788,6 +795,7 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
     product_ledger = _product_ledger(sim)
 
     values: list[ObjectiveValue] = []
+    evidence: dict[str, Mapping[str, Any]] = {}
     for definition, raw in zip(definitions, raw_objectives, strict=True):
         if not isinstance(raw, Mapping):
             raise ObjectiveProfileError("each objective must be a mapping")
@@ -796,7 +804,15 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
                 raw,
                 where=f"objectives[{definition.ordinal}]",
             )
-            value = _composition_target_score(normalized, run_execution, profile)
+            objective_evidence: dict[str, Any] = {}
+            value = _composition_target_score(
+                normalized,
+                run_execution,
+                profile,
+                evidence=objective_evidence,
+            )
+            if objective_evidence:
+                evidence[definition.metric] = dict(objective_evidence)
         else:
             value = _metric_value(
                 definition.metric,
@@ -813,13 +829,15 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
                 ordinal=definition.ordinal,
             )
         )
-    return ObjectiveVector(tuple(values))
+    return ObjectiveVector(tuple(values), evidence=evidence)
 
 
 def _composition_target_score(
     objective: Mapping[str, Any],
     run_execution: Any,
     profile: Mapping[str, Any],
+    *,
+    evidence: dict[str, Any] | None = None,
 ) -> float:
     target = objective["target"]
     vector = target["species_vector"]
@@ -831,12 +849,21 @@ def _composition_target_score(
 
     extraction_score = 0.0
     if extraction_weight > 0.0:
+        bookkeeping_exclusions: set[str] = set()
         extraction_score = _extraction_score(
             vector,
             extraction,
             run_execution,
             profile,
+            bookkeeping_exclusions=bookkeeping_exclusions,
         )
+        if bookkeeping_exclusions and evidence is not None:
+            excluded = tuple(sorted(bookkeeping_exclusions))
+            evidence["captured_product_bookkeeping_exclusions"] = excluded
+            evidence["notes"] = (
+                "excluded captured-products bookkeeping species from extraction credit: "
+                + ", ".join(excluded),
+            )
 
     composition_score = 0.0
     if composition_weight > 0.0:
@@ -855,6 +882,8 @@ def _extraction_score(
     extraction: Mapping[str, Any],
     run_execution: Any,
     profile: Mapping[str, Any],
+    *,
+    bookkeeping_exclusions: set[str] | None = None,
 ) -> float:
     scores: list[float] = []
     completeness_min = extraction["completeness_min"]
@@ -867,7 +896,12 @@ def _extraction_score(
             raise ObjectiveComputationError(
                 f"composition target extract species {species!r} has no input mol"
             )
-        captured_mol = _captured_target_mol(species, captured_pool, run_execution)
+        captured_mol = _captured_target_mol(
+            species,
+            captured_pool,
+            run_execution,
+            bookkeeping_exclusions=bookkeeping_exclusions,
+        )
         additive_mol = _additive_target_mol(species, run_execution, profile)
         captured_mol = max(0.0, captured_mol - additive_mol)
         completeness = captured_mol / input_mol
@@ -924,12 +958,22 @@ def _composition_window_score(
     raise ObjectiveComputationError(f"unsupported composition window mode {mode!r}")
 
 
-def _pool_species_mol(pool: str, run_execution: Any) -> Mapping[str, float]:
+def _pool_species_mol(
+    pool: str,
+    run_execution: Any,
+    *,
+    bookkeeping_exclusions: set[str] | None = None,
+) -> Mapping[str, float]:
     sim = getattr(run_execution, "simulator", run_execution)
     if pool == "captured_stage_3_silica":
         return MappingProxyType(_captured_stage_3_silica_mol(run_execution))
     if pool == "captured_products":
-        return MappingProxyType(_captured_products_mol(run_execution))
+        return MappingProxyType(
+            _captured_products_mol(
+                run_execution,
+                bookkeeping_exclusions=bookkeeping_exclusions,
+            )
+        )
     if pool == "residual_rump_at_stop":
         ledger_values = _ledger_mol_by_accounts(
             sim,
@@ -956,10 +1000,23 @@ def _captured_target_mol(
     target_species: str,
     pool: str,
     run_execution: Any,
+    *,
+    bookkeeping_exclusions: set[str] | None = None,
 ) -> float:
-    species_mol = _pool_species_mol(pool, run_execution)
+    species_mol = _pool_species_mol(
+        pool,
+        run_execution,
+        bookkeeping_exclusions=bookkeeping_exclusions,
+    )
     return sum(
-        _target_equivalent_mol(target_species, species, mol, run_execution)
+        _target_equivalent_mol(
+            target_species,
+            species,
+            mol,
+            run_execution,
+            allow_bookkeeping_skip=(pool == "captured_products"),
+            bookkeeping_exclusions=bookkeeping_exclusions,
+        )
         for species, mol in species_mol.items()
     )
 
@@ -1057,7 +1114,11 @@ def _captured_stage_3_silica_mol(run_execution: Any) -> dict[str, float]:
     return result
 
 
-def _captured_products_mol(run_execution: Any) -> dict[str, float]:
+def _captured_products_mol(
+    run_execution: Any,
+    *,
+    bookkeeping_exclusions: set[str] | None = None,
+) -> dict[str, float]:
     sim = getattr(run_execution, "simulator", run_execution)
     result: dict[str, float] = {}
     ledger = getattr(sim, "atom_ledger", None)
@@ -1083,9 +1144,17 @@ def _captured_products_mol(run_execution: Any) -> dict[str, float]:
     if result:
         return result
     for species, kg in _product_ledger(sim).items():
-        mol = _kg_to_mol(species, kg, run_execution)
+        species_name = str(species)
+        try:
+            mol = _kg_to_mol(species_name, kg, run_execution)
+        except ObjectiveComputationError:
+            if _is_captured_product_bookkeeping_species(species_name):
+                if bookkeeping_exclusions is not None:
+                    bookkeeping_exclusions.add(species_name)
+                continue
+            raise
         if mol > _EPS:
-            result[species] = result.get(species, 0.0) + mol
+            result[species_name] = result.get(species_name, 0.0) + mol
     return result
 
 
@@ -1207,6 +1276,9 @@ def _target_equivalent_mol(
     species: str,
     species_mol: float,
     run_execution: Any,
+    *,
+    allow_bookkeeping_skip: bool = False,
+    bookkeeping_exclusions: set[str] | None = None,
 ) -> float:
     amount = _finite_float(species_mol, f"{species} mol")
     if amount <= _EPS:
@@ -1222,11 +1294,25 @@ def _target_equivalent_mol(
         element = non_oxygen[0]
     else:
         element = target_elements[0]
-    species_formula = _species_formula(species, run_execution)
+    try:
+        species_formula = _species_formula(species, run_execution)
+    except ObjectiveComputationError:
+        if allow_bookkeeping_skip and _is_captured_product_bookkeeping_species(species):
+            if bookkeeping_exclusions is not None:
+                bookkeeping_exclusions.add(str(species))
+            return 0.0
+        raise
     count = species_formula.elements.get(element, 0.0)
     if count <= 0.0:
         return 0.0
     return amount * count / target_formula.elements[element]
+
+
+def _is_captured_product_bookkeeping_species(species: str) -> bool:
+    return any(
+        fnmatch.fnmatchcase(str(species), pattern)
+        for pattern in CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS
+    )
 
 
 def _kg_to_mol(species: str, kg: float, run_execution: Any) -> float:

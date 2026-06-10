@@ -22,6 +22,7 @@ from simulator.optimize.evaluate import (
     EngineBugAbort,
     EvaluationInputError,
     FailureCategory,
+    _composition_target_constraints,
     evaluate,
 )
 from simulator.optimize.objective import objective_definitions
@@ -663,6 +664,16 @@ def test_composition_target_forces_coating_gate_for_arbitrary_target_id() -> Non
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
     assert result.objectives is None
     assert result.failing_gates == ("coating",)
+
+
+def test_composition_target_constraint_augmentation_skips_stub_smoke_constraints() -> None:
+    profile = _composition_eval_profile("residual_rump_at_stop")
+    stub_smoke_constraints = object()
+
+    assert (
+        _composition_target_constraints(profile, stub_smoke_constraints)
+        is stub_smoke_constraints
+    )
 
 
 def test_composition_target_require_coating_gate_false_skips_coating_gate() -> None:

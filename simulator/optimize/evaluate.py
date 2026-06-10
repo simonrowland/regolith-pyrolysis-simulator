@@ -628,6 +628,8 @@ def _composition_target_constraints(
         return active
     if not requires_coating:
         return active
+    if not hasattr(active, "active_gates"):
+        return active
     if "coating" in active.active_gates:
         return active
     return replace(active, active_gates=(*active.active_gates, "coating"))
