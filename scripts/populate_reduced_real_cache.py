@@ -51,6 +51,13 @@ FIRST_FLIP_CAMPAIGNS = ("C2A_continuous", "C2B", "C4")
 CAL_FEEDSTOCKS = ("lunar_mare_low_ti", "mars_perchlorate_rich", "ci_carbonaceous_chondrite")
 KREEP_FEEDSTOCK = "lunar_pkt_kreep_average"
 MAGEMIN_PROVIDER_ID = "magemin-shadow"
+# TODO: replace message-prefix match with a typed exception once the in-flight
+# evaporation.py work lands. Pinned by
+# tests/test_populate_reduced_real_cache_driver.py against the upstream literal
+# in simulator/evaporation.py.
+GATE_LIQUIDUS_UNAVAILABLE_PREFIX = (
+    "freeze_gate.enabled requires a liquid_fraction(T) source"
+)
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -325,6 +332,11 @@ def _diagnostic_keys_from_vapor_pressure_refusal(
 def _known_chemistry_case_gap(exc: RuntimeError | ValueError) -> dict[str, Any] | None:
     detail = str(exc)
     if isinstance(exc, RuntimeError):
+        if detail.startswith(GATE_LIQUIDUS_UNAVAILABLE_PREFIX):
+            return {
+                "reason": "gate_liquidus_unavailable",
+                "detail": detail,
+            }
         diagnostic_keys = _diagnostic_keys_from_vapor_pressure_refusal(detail)
         if (
             "Authoritative VAPOR_PRESSURE dispatch returned" in detail
@@ -827,6 +839,10 @@ def main(argv: list[str]) -> int:
             for campaign in campaigns:
                 case_index += 1
                 shard_db = work_path / f"cache-shard-{case_index}.db"
+                print(
+                    f"[case] feedstock={feedstock_name} campaign={campaign} start",
+                    flush=True,
+                )
                 try:
                     case_result = _run_case(
                         feedstock=feedstock_name,
@@ -841,7 +857,7 @@ def main(argv: list[str]) -> int:
                         disable_live=False,
                         allow_stub_equilibrium=args.allow_stub_equilibrium,
                     )
-                except RuntimeError as exc:
+                except (RuntimeError, ValueError) as exc:
                     gap = _known_chemistry_case_gap(exc)
                     if gap is None:
                         raise
@@ -851,20 +867,26 @@ def main(argv: list[str]) -> int:
                         **gap,
                     }
                     case_gaps.append(gap)
-                    print(f"CASE-GAP: {feedstock_name}/{campaign} {gap['reason']}")
+                    print(
+                        f"CASE-GAP: {feedstock_name}/{campaign} {gap['reason']}",
+                        flush=True,
+                    )
+                    print(
+                        f"[case] feedstock={feedstock_name} campaign={campaign} "
+                        f"status={gap['reason']} hours=0",
+                        flush=True,
+                    )
                     continue
-                except ValueError as exc:
-                    gap = _known_chemistry_case_gap(exc)
-                    if gap is None:
-                        raise
-                    gap = {
-                        "feedstock": feedstock_name,
-                        "campaign": campaign,
-                        **gap,
-                    }
-                    case_gaps.append(gap)
-                    print(f"CASE-GAP: {feedstock_name}/{campaign} {gap['reason']}")
-                    continue
+                case_status = (
+                    "ok"
+                    if case_result.get("status") == "complete"
+                    else str(case_result.get("stop_reason") or "failed")
+                )
+                print(
+                    f"[case] feedstock={feedstock_name} campaign={campaign} "
+                    f"status={case_status} hours={case_result['hours_completed']}",
+                    flush=True,
+                )
                 case_result["cache_shard"] = {
                     "temporary": True,
                     "path": str(shard_db),

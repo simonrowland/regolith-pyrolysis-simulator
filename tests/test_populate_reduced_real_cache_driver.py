@@ -386,6 +386,117 @@ def test_known_chemistry_edges_are_isolated_per_case(
     assert "CASE-GAP: m_type_metallic_phase/C2A_continuous" in capsys.readouterr().out
 
 
+def test_gate_liquidus_unavailable_is_isolated_per_case(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    target_db = tmp_path / "target.db"
+
+    def fake_load_yaml(path):
+        path = Path(path)
+        if path.name == "dummy-profile.yaml":
+            return {"feedstock": "fake_feedstock"}
+        return {"feedstock": path.stem}
+
+    monkeypatch.setattr(driver, "_load_yaml", fake_load_yaml)
+
+    gate_message = (
+        "freeze_gate.enabled requires a liquid_fraction(T) source; "
+        "no liquidus engine produced usable solidus/liquidus bounds. "
+        "gate liquid fraction unavailable: status=not_converged"
+    )
+
+    def fake_run_case(*, db_path, feedstock, campaign, mode, **kwargs):
+        assert mode == "capture"
+        if feedstock == "mars_sulfate_rich":
+            raise RuntimeError(gate_message)
+        _write_magemin_row(db_path, f"{feedstock}-{campaign}")
+        return _result(marker=f"{feedstock}-{campaign}", mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "unused",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--feedstock",
+            "mars_sulfate_rich",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C2A_staged",
+        ]
+    )
+
+    assert rc == 0
+    assert emitted[-1]["status"] == "complete"
+    assert driver._cache_row_summary(target_db)["rows"] == 1
+    assert emitted[-1]["domain_gaps"] == emitted[-1]["case_gaps"]
+    assert emitted[-1]["domain_gap_count"] == 1
+    assert emitted[-1]["domain_gaps"][0] == {
+        "feedstock": "mars_sulfate_rich",
+        "campaign": "C2A_staged",
+        "reason": "gate_liquidus_unavailable",
+        "detail": gate_message,
+    }
+    out = capsys.readouterr().out
+    assert "[case] feedstock=mars_sulfate_rich campaign=C2A_staged start" in out
+    assert (
+        "[case] feedstock=mars_sulfate_rich campaign=C2A_staged "
+        "status=gate_liquidus_unavailable hours=0"
+    ) in out
+    assert "[case] feedstock=lunar_mare_low_ti campaign=C2A_staged start" in out
+    assert (
+        "[case] feedstock=lunar_mare_low_ti campaign=C2A_staged "
+        "status=ok hours=1"
+    ) in out
+    assert "CASE-GAP: mars_sulfate_rich/C2A_staged gate_liquidus_unavailable" in out
+
+
+def test_non_prefix_gate_liquidus_runtime_error_still_aborts(tmp_path, monkeypatch):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+
+    def fake_run_case(**kwargs):
+        raise RuntimeError(
+            "gate liquid fraction unavailable: freeze_gate.enabled requires "
+            "a liquid_fraction(T) source"
+        )
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    with pytest.raises(RuntimeError, match="gate liquid fraction unavailable"):
+        driver.main(
+            [
+                "--profile",
+                "unused",
+                "--db",
+                str(tmp_path / "target.db"),
+                "--hours",
+                "1",
+            ]
+        )
+
+    assert emitted == []
+
+
+def test_gate_liquidus_message_prefix_pinned_to_upstream_source():
+    assert driver.GATE_LIQUIDUS_UNAVAILABLE_PREFIX == (
+        "freeze_gate.enabled requires a liquid_fraction(T) source"
+    )
+    evaporation_source = (
+        REPO_ROOT / "simulator" / "evaporation.py"
+    ).read_text(encoding="utf-8")
+    assert driver.GATE_LIQUIDUS_UNAVAILABLE_PREFIX in evaporation_source
+
+
 def test_unrelated_runtime_error_still_propagates(tmp_path, monkeypatch):
     emitted = []
     _patch_common(monkeypatch, emitted)
