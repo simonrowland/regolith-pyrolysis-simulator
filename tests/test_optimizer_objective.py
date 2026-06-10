@@ -323,6 +323,179 @@ def test_composition_target_hard_window_miss_zeroes_extraction_branch() -> None:
     assert compute_objectives(profile, run).as_mapping()["composition_target:pool-test"] == pytest.approx(0.0)
 
 
+def test_composition_target_soft_rows_rank_only_after_strict_pass() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"SiO2": 1.0, "Al2O3": 1.0},
+            stage3_kg={},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0},
+            "Al2O3": {"min": 15.0, "max": 20.0, "strict": False, "weight": 2.0},
+        },
+    )
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+    soft_row = next(row for row in evidence["rows"] if row["id"] == "Al2O3")
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(
+        soft_row["score"]
+    )
+    assert evidence["certified_envelope"][0]["id"] == "SiO2"
+    assert evidence["preference_score"] == pytest.approx(soft_row["score"])
+
+
+def test_composition_target_hard_miss_skips_soft_rows() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"SiO2": 1.0, "Al2O3": 1.0},
+            stage3_kg={},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 99.0, "max": 100.0, "strict": True, "weight": 1.0},
+            "Al2O3": {"min": 15.0, "max": 20.0, "strict": False, "weight": 2.0},
+        },
+    )
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+    soft_row = next(row for row in evidence["rows"] if row["id"] == "Al2O3")
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(0.0)
+    assert soft_row["score"] is None
+    assert soft_row["reason"] == "hard_gate_failed_soft_not_computed"
+
+
+def test_composition_target_ratio_row_scores_after_pool_projection() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0, "Al2O3": 1.0},
+            stage3_kg={},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+        ratios=[
+            {
+                "ratio": {
+                    "numerator": "CaO",
+                    "denominator": "Al2O3",
+                    "min": 0.45,
+                    "max": 0.75,
+                    "strict": True,
+                    "weight": 1.0,
+                }
+            }
+        ],
+    )
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
+    assert evidence["resolved_composition"]["ratios"]["CaO/Al2O3"] == pytest.approx(
+        0.54999,
+        rel=1e-5,
+    )
+
+
+def test_composition_target_ratio_zero_denominator_fails_loud() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+        ratios=[
+            {
+                "ratio": {
+                    "numerator": "CaO",
+                    "denominator": "Al2O3",
+                    "min": 0.45,
+                    "max": 0.75,
+                    "strict": True,
+                    "weight": 1.0,
+                }
+            }
+        ],
+    )
+
+    with pytest.raises(ObjectiveComputationError, match="denominator.*missing"):
+        compute_objectives(profile, run)
+
+
+def test_terminal_rump_pool_scores_completed_run_residue_with_provenance() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+        ),
+        trace=None,
+        backend_status="ok",
+    )
+    profile = _composition_score_profile(
+        "terminal_rump_earned",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+    )
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
+    assert evidence["terminal_rump_source"] == "completed_run"
+
+
+def test_terminal_rump_pool_rejects_trace_only_out_of_domain_as_completed_run() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+            extra_accounts={"terminal.slag": {"CaO": 10.0}},
+        ),
+        trace=SimpleNamespace(backend_status="out_of_domain"),
+    )
+    profile = _composition_score_profile(
+        "terminal_rump_earned",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+    )
+
+    with pytest.raises(ObjectiveComputationError, match="cannot use completed_run"):
+        compute_objectives(profile, run)
+
+
+def test_terminal_rump_pool_unknown_completion_status_fails_closed() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+            extra_accounts={"terminal.slag": {"CaO": 10.0}},
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "terminal_rump_earned",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "strict": True, "weight": 1.0}},
+    )
+
+    with pytest.raises(ObjectiveComputationError, match="positive completion evidence"):
+        compute_objectives(profile, run)
+
+
 @pytest.mark.parametrize(
     ("product_kg", "oxides"),
     [
@@ -518,20 +691,24 @@ def _composition_score_profile(
     *,
     target_id: str = "pool-test",
     oxides: dict[str, dict[str, float]] | None = None,
+    ratios: list[dict] | None = None,
     species_vector: dict[str, str] | None = None,
     extraction: dict[str, object] | None = None,
     score_weights: dict[str, float] | None = None,
 ) -> dict:
+    window = {
+        "pool": pool,
+        "basis": "oxide_wt_pct",
+        "mode": "hard_window",
+        "oxides": oxides
+        or {"SiO2": {"min": 99.0, "max": 100.0, "weight": 1.0}},
+    }
+    if ratios is not None:
+        window["ratios"] = ratios
     target = {
         "pool": pool,
         "species_vector": species_vector or {"Si": "retain"},
-        "composition_window": {
-            "pool": pool,
-            "basis": "oxide_wt_pct",
-            "mode": "hard_window",
-            "oxides": oxides
-            or {"SiO2": {"min": 99.0, "max": 100.0, "weight": 1.0}},
-        },
+        "composition_window": window,
         "score_weights": score_weights or {"extraction": 0.0, "composition": 1.0},
     }
     if extraction is not None:

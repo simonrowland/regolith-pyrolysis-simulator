@@ -155,6 +155,7 @@ def test_composition_target_validates_and_resolves_fe_tier() -> None:
     assert fe_row["tier"] == "clear_container"
     assert fe_row["min"] == pytest.approx(0.0)
     assert fe_row["max"] == pytest.approx(1.0)
+    assert fe_row["strict"] is True
     assert fe_row["weight"] == pytest.approx(1.0)
     assert fe_row["needs_experiment"] is True
     assert "provenance" in fe_row
@@ -172,7 +173,7 @@ def test_composition_target_validates_and_resolves_fe_tier() -> None:
         ),
         (
             lambda p: p["objectives"][0]["target"]["composition_window"].update({"oxides": {}}),
-            "non-empty mapping",
+            "at least one oxide or ratio row",
         ),
         (
             lambda p: p["objectives"][0]["target"]["composition_window"]["oxides"]["SiO2"].update(
@@ -232,6 +233,99 @@ def test_composition_target_degenerate_profiles_fail_loud(mutation, message: str
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_composition_target_windowless_extraction_only_validates() -> None:
+    profile = _composition_profile()
+    target = profile["objectives"][0]["target"]
+    target["species_vector"] = {"Fe": "extract", "Si": "free"}
+    target["extraction"]["completeness_min"] = {"Fe": 0.5}
+    target.pop("composition_window")
+    target["score_weights"] = {"extraction": 1.0}
+
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+    target = validated["objectives"][0]["target"]
+
+    assert "composition_window" not in target
+    assert target["score_weights"]["extraction"] == pytest.approx(1.0)
+    assert target["score_weights"]["composition"] == pytest.approx(0.0)
+
+
+def test_composition_target_windowless_requires_extraction_only_split() -> None:
+    profile = _composition_profile()
+    target = profile["objectives"][0]["target"]
+    target["species_vector"] = {"Fe": "extract", "Si": "free"}
+    target["extraction"]["completeness_min"] = {"Fe": 0.5}
+    target.pop("composition_window")
+    target["score_weights"] = {"extraction": 0.5, "composition": 0.5}
+
+    with pytest.raises(ProfileValidationError, match="window is empty"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_composition_target_to_window_requires_corresponding_row() -> None:
+    valid = _composition_profile()
+    target = valid["objectives"][0]["target"]
+    target["species_vector"] = {"Fe": "to_window", "Si": "retain"}
+    target["extraction"]["completeness_min"] = {}
+    target["score_weights"] = {"extraction": 0.0, "composition": 1.0}
+    target["composition_window"]["oxides"] = {
+        "FeO_total": {"min": 0.0, "max": 0.5, "weight": 1.0}
+    }
+
+    validate_profile(valid, expected_feedstock="lunar_mare_low_ti")
+
+    invalid = _composition_profile()
+    target = invalid["objectives"][0]["target"]
+    target["species_vector"] = {"Fe": "to_window", "Si": "retain"}
+    target["extraction"]["completeness_min"] = {}
+    target["score_weights"] = {"extraction": 0.0, "composition": 1.0}
+    target["composition_window"]["oxides"] = {
+        "SiO2": {"min": 45.0, "max": 75.0, "weight": 1.0}
+    }
+
+    with pytest.raises(ProfileValidationError, match="to_window requires"):
+        validate_profile(invalid, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_composition_target_all_soft_requires_exploratory_field() -> None:
+    profile = _composition_profile()
+    for row in profile["objectives"][0]["target"]["composition_window"]["oxides"].values():
+        row["strict"] = False
+
+    with pytest.raises(ProfileValidationError, match="needs at least one strict row"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+    exploratory = _composition_profile()
+    exploratory["objectives"][0]["id"] = "glass-clear-explore"
+    exploratory["objectives"][0]["metric"] = "composition_target:glass-clear-explore"
+    window = exploratory["objectives"][0]["target"]["composition_window"]
+    window["exploratory"] = True
+    for row in window["oxides"].values():
+        row["strict"] = False
+
+    validated = validate_profile(exploratory, expected_feedstock="lunar_mare_low_ti")
+    assert validated["objectives"][0]["target"]["composition_window"]["exploratory"] is True
+
+
+def test_composition_target_ratio_rows_require_strict_species_companion() -> None:
+    profile = _composition_profile()
+    window = profile["objectives"][0]["target"]["composition_window"]
+    window["oxides"] = {}
+    window["ratios"] = [
+        {
+            "ratio": {
+                "numerator": "CaO",
+                "denominator": "Al2O3",
+                "min": 0.45,
+                "max": 0.75,
+                "weight": 1.0,
+            }
+        }
+    ]
+
+    with pytest.raises(ProfileValidationError, match="strict per-species oxide band"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 @pytest.mark.parametrize(
     "mutation",
     [
@@ -249,6 +343,27 @@ def test_composition_target_degenerate_profiles_fail_loud(mutation, message: str
             {"score_weights": {"extraction": 0.25, "composition": 0.75}}
         ),
         lambda p: p["objectives"][0]["target"].update({"require_coating_gate": False}),
+        lambda p: p["objectives"][0]["target"]["composition_window"]["oxides"]["SiO2"].update(
+            {"strict": False}
+        ),
+        lambda p: p["objectives"][0]["target"]["composition_window"].update(
+            {
+                "ratios": [
+                    {
+                        "ratio": {
+                            "numerator": "CaO",
+                            "denominator": "Al2O3",
+                            "min": 0.45,
+                            "max": 0.75,
+                            "weight": 1.0,
+                        }
+                    }
+                ]
+            }
+        ),
+        lambda p: p["objectives"][0]["target"]["composition_window"].update(
+            {"exploratory": True}
+        ),
     ],
 )
 def test_composition_target_digest_covers_full_target_spec(mutation) -> None:

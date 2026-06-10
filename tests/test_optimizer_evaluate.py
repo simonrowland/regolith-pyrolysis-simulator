@@ -630,6 +630,8 @@ def test_composition_target_missing_pool_aborts_as_engine_bug() -> None:
 
 
 def test_composition_target_terminal_rump_unearned_is_infeasible() -> None:
+    trace = _trace()
+    trace.rump_terminal = {"status": "not_earned", "reason": "kernel_liquidus_disagree"}
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -639,7 +641,7 @@ def test_composition_target_terminal_rump_unearned_is_infeasible() -> None:
             target_id="pc-ceramic-test",
             oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
         ),
-        executor=FakeExecutor(_execution()),
+        executor=FakeExecutor(_execution(trace=trace)),
     )
 
     assert not result.feasible
@@ -647,6 +649,85 @@ def test_composition_target_terminal_rump_unearned_is_infeasible() -> None:
     assert result.objectives is None
     assert result.failing_gates == ("rump_terminal",)
     assert "rump_terminal_unproven" in result.notes
+
+
+def test_composition_target_terminal_rump_completed_run_scores_with_trace() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "terminal_rump_earned",
+            target_id="pc-ceramic-test",
+            oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        ),
+        executor=FakeExecutor(_execution(backend_status="ok")),
+    )
+
+    assert result.feasible
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()["composition_target:pc-ceramic-test"] == (
+        pytest.approx(1.0)
+    )
+    assert result.run_reference is not None
+    payload = result.run_reference.trace["composition_target"]
+    assert payload["terminal_rump_source"] == "completed_run"
+    assert payload["certification_tier"] == "certified"
+    assert payload["certified_envelope"]
+
+
+def test_trace_only_out_of_domain_terminal_rump_cannot_score_completed_run() -> None:
+    trace = _trace()
+    trace.backend_status = "out_of_domain"
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "terminal_rump_earned",
+            target_id="pc-ceramic-test",
+            oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        ),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.objectives is None
+    assert result.failing_gates == ("rump_terminal",)
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.trace["rump_terminal"]["status"] == "not_earned"
+    assert "rump_terminal_unproven" in result.notes
+    assert "completed_run" not in result.notes
+
+
+def test_trace_only_out_of_domain_earned_rump_terminal_scores_earned_crash() -> None:
+    trace = _trace()
+    trace.backend_status = "out_of_domain"
+    trace.backend_diagnostics = _crash_diagnostics(temperature_C=1100.0)
+    execution = _execution(trace=trace, freeze_curve=_kernel_curve())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "terminal_rump_earned",
+            target_id="pc-ceramic-test",
+            oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        ),
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.trace["rump_terminal"]["status"] == "earned"
+    assert result.run_reference.trace["composition_target"]["terminal_rump_source"] == "earned_crash"
 
 
 def test_composition_target_forces_coating_gate_for_arbitrary_target_id() -> None:
@@ -943,6 +1024,7 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success() 
     assert result.run_reference is not None
     assert result.run_reference.trace["rump_terminal"]["status"] == "earned"
     assert result.run_reference.trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+    assert result.run_reference.trace["composition_target"]["terminal_rump_source"] == "earned_crash"
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_segment_species"
     ]["hot_wall"]["SiO2"] == pytest.approx(0.25)

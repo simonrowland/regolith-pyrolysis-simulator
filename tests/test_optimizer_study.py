@@ -352,6 +352,42 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
 
 
+def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
+    record = study.StudyRecord(
+        candidate_id="targeted",
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={"composition_target:pc-glass-clear": 0.75},
+        feasibility_margins={},
+        cache_key="cache",
+        trace_summary={
+            "composition_target": {
+                "certification_tier": "certified",
+                "certified_envelope": [{"id": "FeO_total", "strict": True, "pass": True}],
+                "preference_score": 0.75,
+                "target_spec_digest": "digest",
+            }
+        },
+    )
+
+    study._write_leaderboard(
+        tmp_path / "leaderboard.csv",
+        [record],
+        [record],
+        record,
+        [study.ObjectiveDefinition("composition_target:pc-glass-clear", "maximize", "score_0_1")],
+        RecipeSchema(),
+    )
+
+    row = next(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+    assert row["certification_tier"] == "certified"
+    assert json.loads(row["certified_envelope_json"]) == [
+        {"id": "FeO_total", "pass": True, "strict": True}
+    ]
+    assert float(row["preference_score"]) == pytest.approx(0.75)
+
+
 def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path) -> None:
     spec = replace(_scope_spec(), backend_name="alphamelts")
     scored = ScoredResult(

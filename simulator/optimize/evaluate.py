@@ -9,7 +9,7 @@ import inspect
 import math
 import re
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 from collections.abc import Mapping as MappingABC, Set as AbstractSet
 
 from simulator.accounting import OverdraftError, resolve_species_formula
@@ -391,7 +391,10 @@ def evaluate(
         )
 
     backend_status = _latest_backend_status(run_execution)
-    if backend_status == "out_of_domain":
+    if _has_out_of_domain_backend_signal(
+        run_execution,
+        backend_status=backend_status,
+    ):
         return _out_of_domain_result(
             candidate_id,
             spec,
@@ -450,17 +453,30 @@ def evaluate(
             detail=target_reason,
             notes=(target_reason,),
         )
-    if composition_targets_require_terminal_rump(profile) and not _trace_has_earned_rump_terminal(run_execution):
-        return _target_infeasible_result(
-            candidate_id,
-            spec,
-            key,
-            run_execution,
-            profile,
-            gate="rump_terminal",
-            detail="rump_terminal_unproven",
-            notes=("rump_terminal_unproven",),
-        )
+    if composition_targets_require_terminal_rump(profile):
+        if _trace_has_unearned_rump_terminal(run_execution):
+            return _target_infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                profile,
+                gate="rump_terminal",
+                detail="rump_terminal_unproven",
+                notes=("rump_terminal_unproven",),
+            )
+        completion_problem = _terminal_rump_completed_run_problem(run_execution)
+        if completion_problem is not None:
+            return _target_infeasible_result(
+                candidate_id,
+                spec,
+                key,
+                run_execution,
+                profile,
+                gate="rump_terminal",
+                detail=completion_problem,
+                notes=(completion_problem,),
+            )
 
     try:
         objectives = compute_objectives(profile, run_execution)
@@ -473,6 +489,7 @@ def evaluate(
             cache_key_value=key,
         ) from exc
 
+    trace_payload = _composition_target_trace_payload(profile, objectives, run_execution)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -481,7 +498,7 @@ def evaluate(
         objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=(),
-        run_reference=_run_reference(run_execution, profile),
+        run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
     )
 
 
@@ -738,12 +755,70 @@ def _target_infeasible_margin(gate: str, detail: str) -> GateMargin:
     )
 
 
+def _composition_target_trace_payload(
+    profile: Mapping[str, Any],
+    objectives: ObjectiveVector,
+    run_execution: Any,
+    *,
+    base_trace: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any] | None:
+    entries = []
+    for metric, raw in objectives.evidence.items():
+        if not isinstance(raw, MappingABC):
+            continue
+        payload = raw.get("composition_target")
+        if isinstance(payload, MappingABC):
+            entries.append({"metric": str(metric), **dict(payload)})
+    if not entries:
+        return base_trace
+
+    trace = base_trace if base_trace is not None else getattr(run_execution, "trace", None)
+    merged: dict[str, Any] = {}
+    if isinstance(trace, MappingABC):
+        merged.update(_compact_jsonable(trace))
+    else:
+        backend_status = _latest_backend_status(run_execution)
+        if backend_status is not None:
+            merged["backend_status"] = backend_status
+        backend_authoritative = _backend_authoritative(run_execution)
+        if backend_authoritative is not None:
+            merged["backend_authoritative"] = backend_authoritative
+
+    metadata = dict(composition_target_eval_metadata(profile))
+    target_payload: Mapping[str, Any]
+    if len(entries) == 1:
+        target_payload = {**metadata, **entries[0]}
+    else:
+        target_payload = {**metadata, "targets": entries}
+    merged["composition_target"] = _compact_jsonable(target_payload)
+    return MappingProxyType(merged)
+
+
 def _trace_has_earned_rump_terminal(run_execution: Any) -> bool:
     trace = getattr(run_execution, "trace", None)
     payload = _carrier_value(trace, "rump_terminal")
     if not isinstance(payload, MappingABC):
         return False
     return str(payload.get("status", "")) == "earned"
+
+
+def _trace_has_unearned_rump_terminal(run_execution: Any) -> bool:
+    trace = getattr(run_execution, "trace", None)
+    payload = _carrier_value(trace, "rump_terminal")
+    if not isinstance(payload, MappingABC):
+        return False
+    return str(payload.get("status", "")) != "earned"
+
+
+def _terminal_rump_completed_run_problem(run_execution: Any) -> str | None:
+    if _trace_has_earned_rump_terminal(run_execution):
+        return None
+    backend_status = _latest_backend_status(run_execution)
+    if backend_status == "ok":
+        return None
+    if backend_status is None:
+        return "rump_terminal_completion_unknown"
+    return f"rump_terminal_completion_not_completed: backend_status={backend_status}"
 
 
 def _out_of_domain_result(
@@ -791,6 +866,12 @@ def _out_of_domain_result(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
+        trace_payload = _composition_target_trace_payload(
+            profile,
+            objectives,
+            scoring_execution,
+            base_trace=assessment.trace_payload,
+        )
         margins = dict(feasibility.margins)
         margins["rump_terminal"] = _rump_terminal_margin(assessment)
         return ScoredResult(
@@ -804,7 +885,7 @@ def _out_of_domain_result(
             run_reference=_run_reference(
                 scoring_execution,
                 profile,
-                trace_payload=assessment.trace_payload,
+                trace_payload=trace_payload,
             ),
             notes=assessment.notes,
         )
@@ -1544,17 +1625,7 @@ def _abort_on_non_authoritative_backend_status(
 
 
 def _latest_backend_status(run_execution: Any) -> str | None:
-    per_hour = getattr(run_execution, "per_hour", None)
-    if isinstance(per_hour, (list, tuple)) and per_hour:
-        latest = per_hour[-1]
-        if isinstance(latest, MappingABC):
-            raw = latest.get("backend_status")
-            if raw is not None:
-                return str(raw)
-    raw = getattr(run_execution, "backend_status", None)
-    if raw is not None:
-        return str(raw)
-    return None
+    return _select_backend_status(_backend_statuses_from_run_execution(run_execution))
 
 
 def _backend_authoritative(run_execution: Any) -> bool | None:
@@ -1563,25 +1634,18 @@ def _backend_authoritative(run_execution: Any) -> bool | None:
 
 
 def _backend_status_from_carrier(carrier: Any) -> str | None:
-    if carrier is None:
-        return None
-    if isinstance(carrier, MappingABC):
-        raw = carrier.get("backend_status")
-        if raw is not None:
-            return str(raw)
-        for key in ("per_hour", "hours"):
-            status = _latest_backend_status_from_sequence(carrier.get(key))
-            if status is not None:
-                return status
-        return None
-    raw = getattr(carrier, "backend_status", None)
-    if raw is not None:
-        return str(raw)
-    for attr in ("per_hour", "hours"):
-        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
-        if status is not None:
-            return status
-    return None
+    return _select_backend_status(_backend_statuses_from_carrier(carrier))
+
+
+def _has_out_of_domain_backend_signal(
+    run_execution: Any,
+    *,
+    backend_status: str | None = None,
+) -> bool:
+    if backend_status == "out_of_domain":
+        return True
+    diagnostics = _out_of_domain_diagnostics(run_execution)
+    return _crash_point_from_diagnostics(diagnostics) is not None
 
 
 def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
@@ -1597,7 +1661,72 @@ def _backend_authoritative_from_carrier(carrier: Any) -> bool | None:
 def _latest_backend_status_from_sequence(value: Any) -> str | None:
     if not isinstance(value, (list, tuple)) or not value:
         return None
-    return _backend_status_from_carrier(value[-1])
+    return _select_backend_status(
+        status
+        for item in value
+        for status in _backend_statuses_from_carrier(item)
+    )
+
+
+def _backend_statuses_from_run_execution(run_execution: Any) -> tuple[str, ...]:
+    sim = getattr(run_execution, "simulator", None)
+    carriers = (
+        run_execution,
+        getattr(run_execution, "trace", None),
+        getattr(sim, "_last_backend_diagnostics", None),
+        getattr(sim, "_last_out_of_domain_diagnostics", None),
+    )
+    return tuple(
+        status
+        for carrier in carriers
+        for status in _backend_statuses_from_carrier(carrier)
+    )
+
+
+def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
+    if carrier is None:
+        return ()
+    statuses: list[str] = []
+    if isinstance(carrier, MappingABC):
+        raw = carrier.get("backend_status")
+        if raw is not None:
+            statuses.append(str(raw))
+        if _carrier_has_crash_point(carrier):
+            statuses.append("out_of_domain")
+        for key in ("per_hour", "hours"):
+            status = _latest_backend_status_from_sequence(carrier.get(key))
+            if status is not None:
+                statuses.append(status)
+        for key in ("trace", "backend_diagnostics", "diagnostics"):
+            statuses.extend(_backend_statuses_from_carrier(carrier.get(key)))
+        return tuple(statuses)
+    raw = getattr(carrier, "backend_status", None)
+    if raw is not None:
+        statuses.append(str(raw))
+    for attr in ("per_hour", "hours"):
+        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
+        if status is not None:
+            statuses.append(status)
+    for attr in ("trace", "backend_diagnostics", "diagnostics"):
+        statuses.extend(_backend_statuses_from_carrier(getattr(carrier, attr, None)))
+    return tuple(statuses)
+
+
+def _carrier_has_crash_point(carrier: Mapping[Any, Any]) -> bool:
+    return any(
+        isinstance(carrier.get(key), MappingABC)
+        for key in ("out_of_domain_crash_point", "crash_point")
+    )
+
+
+def _select_backend_status(statuses: Iterable[str]) -> str | None:
+    values = tuple(str(status) for status in statuses if status is not None)
+    for status in ("out_of_domain", "unavailable", "not_converged"):
+        if status in values:
+            return status
+    if values:
+        return values[-1]
+    return None
 
 
 def _ordered_failing_gates(values: Any) -> tuple[str, ...]:

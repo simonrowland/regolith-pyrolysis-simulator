@@ -9,8 +9,8 @@ import fnmatch
 import hashlib
 import math
 from types import MappingProxyType
-from collections.abc import Callable, Sequence
-from typing import Any, Mapping, TypeVar
+from collections.abc import Callable, Mapping as MappingABC, Sequence
+from typing import Any, Iterable, Mapping, TypeVar
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
@@ -37,7 +37,7 @@ SUPPORTED_COMPOSITION_POOLS = frozenset(
     }
 )
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
-COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free"})
+COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
 COMPOSITION_WINDOW_MODES = frozenset({"hard_window", "soft_distance"})
 _COMPOSITION_OBJECTIVE_KEYS = frozenset(
     {"type", "id", "metric", "sense", "units", "weight", "rationale", "target"}
@@ -59,10 +59,22 @@ _EXTRACTION_KEYS = frozenset(
 )
 _CREDIT_POLICY_KEYS = frozenset({"additives", "vented"})
 _COMPOSITION_WINDOW_KEYS = frozenset(
-    {"pool", "basis", "mode", "oxides", "exploratory"}
+    {"pool", "basis", "mode", "oxides", "ratios", "exploratory"}
 )
 _OXIDE_ROW_KEYS = frozenset(
-    {"min", "max", "weight", "needs_experiment", "tier", "provenance"}
+    {"oxide", "min", "max", "strict", "weight", "needs_experiment", "tier", "provenance"}
+)
+_RATIO_ROW_KEYS = frozenset(
+    {
+        "numerator",
+        "denominator",
+        "min",
+        "max",
+        "strict",
+        "weight",
+        "needs_experiment",
+        "provenance",
+    }
 )
 _MATURITY_KEYS = frozenset({"mode", "campaign", "hours"})
 _TARGET_CONSTRAINT_KEYS = frozenset(
@@ -104,6 +116,15 @@ _POOL_LEDGER_ACCOUNTS = MappingProxyType(
     {
         "residual_rump_at_stop": ("process.cleaned_melt",),
         "terminal_rump_earned": ("terminal.slag",),
+    }
+)
+_OXIDE_KEY_ALIASES = MappingProxyType(
+    {
+        "FeO_total": ("FeO",),
+        "Fe_total_as_Fe2O3_wt_pct": ("Fe2O3",),
+        "Na2O_plus_K2O": ("K2O", "Na2O"),
+        "Al2O3_CaO_MgO_balance": ("Al2O3", "CaO", "MgO"),
+        "TiO2_plus_Cr2O3_plus_REO": ("Cr2O3", "TiO2", "REO"),
     }
 )
 _VENTED_PRODUCT_ACCOUNTS = frozenset(
@@ -322,7 +343,7 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
         return {}
     oxides = window.get("oxides", {})
     if not isinstance(oxides, Mapping):
-        return {}
+        oxides = {}
     resolved_oxides: dict[str, Mapping[str, Any]] = {}
     for oxide, raw in oxides.items():
         if not isinstance(raw, Mapping):
@@ -330,6 +351,7 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
         row: dict[str, Any] = {
             "min": raw.get("min"),
             "max": raw.get("max"),
+            "strict": raw.get("strict", True),
             "weight": raw.get("weight"),
         }
         for key in ("tier", "needs_experiment", "provenance"):
@@ -337,17 +359,35 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
                 row[key] = raw[key]
         if any(key in row for key in ("tier", "needs_experiment", "provenance")):
             resolved_oxides[str(oxide)] = MappingProxyType(row)
-    if not resolved_oxides:
-        return {}
-    return {
-        "composition_window": MappingProxyType(
-            {
-                "pool": str(window.get("pool", "")),
-                "mode": str(window.get("mode", "")),
-                "oxides": MappingProxyType(resolved_oxides),
+    resolved_ratios: list[Mapping[str, Any]] = []
+    ratios = window.get("ratios", ())
+    if isinstance(ratios, (list, tuple)):
+        for raw in ratios:
+            if not isinstance(raw, Mapping):
+                continue
+            row: dict[str, Any] = {
+                "numerator": tuple(raw.get("numerator", ())),
+                "denominator": tuple(raw.get("denominator", ())),
+                "min": raw.get("min"),
+                "max": raw.get("max"),
+                "strict": raw.get("strict", True),
+                "weight": raw.get("weight"),
             }
-        )
+            for key in ("needs_experiment", "provenance"):
+                if key in raw:
+                    row[key] = raw[key]
+            resolved_ratios.append(MappingProxyType(row))
+    if not resolved_oxides and not resolved_ratios:
+        return {}
+    payload: dict[str, Any] = {
+        "pool": str(window.get("pool", "")),
+        "mode": str(window.get("mode", "")),
+        "exploratory": bool(window.get("exploratory", False)),
+        "oxides": MappingProxyType(resolved_oxides),
     }
+    if resolved_ratios:
+        payload["ratios"] = tuple(resolved_ratios)
+    return {"composition_window": MappingProxyType(payload)}
 
 
 def target_spec_digest(target: Mapping[str, Any]) -> str:
@@ -397,7 +437,7 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
     _reject_unknown_objective_keys(raw, _COMPOSITION_TARGET_KEYS, where)
     _require_objective_keys(
         raw,
-        {"pool", "species_vector", "composition_window", "score_weights"},
+        {"pool", "species_vector", "score_weights"},
         where,
     )
     pool = _validate_pool(raw.get("pool"), f"{where}.pool")
@@ -407,11 +447,14 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         vector=vector,
         where=f"{where}.extraction",
     )
-    window = _normalize_composition_window(
-        raw.get("composition_window"),
-        target_id=target_id,
-        where=f"{where}.composition_window",
-    )
+    raw_window = raw.get("composition_window", _MISSING)
+    window: Mapping[str, Any] | None = None
+    if raw_window is not _MISSING and raw_window is not None:
+        window = _normalize_composition_window(
+            raw_window,
+            target_id=target_id,
+            where=f"{where}.composition_window",
+        )
     score_weights = _normalize_score_weights(
         raw.get("score_weights"),
         vector=vector,
@@ -428,16 +471,25 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         require_coating_gate = raw["require_coating_gate"]
         if not isinstance(require_coating_gate, bool):
             raise ObjectiveProfileError(f"{where}.require_coating_gate must be bool")
-    return {
+    _validate_target_shape(
+        vector=vector,
+        extraction=extraction,
+        window=window,
+        score_weights=score_weights,
+        where=where,
+    )
+    normalized = {
         "pool": pool,
         "require_coating_gate": require_coating_gate,
         "species_vector": MappingProxyType(vector),
         "extraction": MappingProxyType(extraction),
-        "composition_window": MappingProxyType(window),
         "maturity": MappingProxyType(maturity),
         "constraints": MappingProxyType(constraints),
         "score_weights": MappingProxyType(score_weights),
     }
+    if window is not None:
+        normalized["composition_window"] = MappingProxyType(window)
+    return normalized
 
 
 def _normalize_species_vector(raw: Any, *, where: str) -> dict[str, str]:
@@ -533,36 +585,94 @@ def _normalize_composition_window(
     if not isinstance(raw, Mapping):
         raise ObjectiveProfileError(f"{where} must be a mapping")
     _reject_unknown_objective_keys(raw, _COMPOSITION_WINDOW_KEYS, where)
-    _require_objective_keys(raw, {"pool", "basis", "mode", "oxides"}, where)
+    _require_objective_keys(raw, {"pool", "basis", "mode"}, where)
     pool = _validate_pool(raw.get("pool"), f"{where}.pool")
     if str(raw.get("basis")) != "oxide_wt_pct":
         raise ObjectiveProfileError(f"{where}.basis must be 'oxide_wt_pct'")
     mode = str(raw.get("mode"))
     if mode not in COMPOSITION_WINDOW_MODES:
         raise ObjectiveProfileError(f"{where}.mode must be hard_window or soft_distance")
-    exploratory = bool(raw.get("exploratory", False))
+    exploratory_raw = raw.get("exploratory", False)
+    if not isinstance(exploratory_raw, bool):
+        raise ObjectiveProfileError(f"{where}.exploratory must be bool")
+    exploratory = exploratory_raw
     if mode == "soft_distance" and (
         not exploratory or str(target_id).startswith("pc-")
     ):
         raise ObjectiveProfileError(
             f"{where}.mode soft_distance requires exploratory non-menu target"
         )
-    oxides = raw.get("oxides")
-    if not isinstance(oxides, Mapping) or not oxides:
-        raise ObjectiveProfileError(f"{where}.oxides must be a non-empty mapping")
-    normalized_oxides: dict[str, Mapping[str, Any]] = {}
-    for oxide, row in oxides.items():
-        oxide_name = str(oxide)
-        normalized_oxides[oxide_name] = MappingProxyType(
-            _normalize_oxide_row(row, where=f"{where}.oxides.{oxide_name}")
+    normalized_oxides = _normalize_oxide_rows(raw.get("oxides", ()), where=f"{where}.oxides")
+    normalized_ratios = _normalize_ratio_rows(raw.get("ratios", ()), where=f"{where}.ratios")
+    if not normalized_oxides and not normalized_ratios:
+        raise ObjectiveProfileError(f"{where} must contain at least one oxide or ratio row")
+    if normalized_ratios:
+        if not any(
+            bool(row.get("strict", True)) and len(_oxide_key_elements(str(oxide))) == 1
+            for oxide, row in normalized_oxides.items()
+        ):
+            raise ObjectiveProfileError(
+                f"{where}.ratios require at least one strict per-species oxide band"
+            )
+        if any(not bool(row.get("strict", True)) for row in normalized_oxides.values()):
+            raise ObjectiveProfileError(
+                f"{where}.ratios companion oxide bands must be strict"
+            )
+    strict_rows = [
+        row
+        for row in (*normalized_oxides.values(), *normalized_ratios)
+        if bool(row.get("strict", True))
+    ]
+    soft_rows = [
+        row
+        for row in (*normalized_oxides.values(), *normalized_ratios)
+        if not bool(row.get("strict", True))
+    ]
+    if soft_rows and mode == "hard_window":
+        for row in soft_rows:
+            lower = float(row["min"])
+            upper = float(row["max"])
+            if upper <= lower:
+                raise ObjectiveProfileError(f"{where} soft row has zero-width band")
+    if not strict_rows and not exploratory:
+        raise ObjectiveProfileError(
+            f"{where} certifiable non-exploratory target needs at least one strict row"
         )
     return {
         "pool": pool,
         "basis": "oxide_wt_pct",
         "mode": mode,
         "oxides": MappingProxyType(normalized_oxides),
-        **({"exploratory": True} if exploratory else {}),
+        "ratios": tuple(MappingProxyType(row) for row in normalized_ratios),
+        "exploratory": exploratory,
     }
+
+
+def _normalize_oxide_rows(raw: Any, *, where: str) -> dict[str, Mapping[str, Any]]:
+    if raw in (None, _MISSING):
+        return {}
+    items: list[tuple[str, Any]] = []
+    if isinstance(raw, Mapping):
+        items = [(str(oxide), row) for oxide, row in raw.items()]
+    elif isinstance(raw, (list, tuple)):
+        for ordinal, item in enumerate(raw):
+            if not isinstance(item, Mapping):
+                raise ObjectiveProfileError(f"{where}[{ordinal}] must be a mapping")
+            if "oxide" not in item:
+                raise ObjectiveProfileError(f"{where}[{ordinal}].oxide is required")
+            oxide_name = str(item["oxide"])
+            row = dict(item)
+            row.pop("oxide", None)
+            items.append((oxide_name, row))
+    else:
+        raise ObjectiveProfileError(f"{where} must be a mapping or list")
+    normalized: dict[str, Mapping[str, Any]] = {}
+    for oxide_name, row in items:
+        _validate_oxide_key(oxide_name, f"{where}.{oxide_name}")
+        normalized[oxide_name] = MappingProxyType(
+            _normalize_oxide_row(row, where=f"{where}.{oxide_name}")
+        )
+    return normalized
 
 
 def _normalize_oxide_row(raw: Any, *, where: str) -> dict[str, Any]:
@@ -586,9 +696,13 @@ def _normalize_oxide_row(raw: Any, *, where: str) -> dict[str, Any]:
     if upper < lower:
         raise ObjectiveProfileError(f"{where} has empty window")
     weight = _positive_profile_float(row["weight"], f"{where}.weight")
+    strict = row.get("strict", True)
+    if not isinstance(strict, bool):
+        raise ObjectiveProfileError(f"{where}.strict must be bool")
     normalized = {
         "min": lower,
         "max": upper,
+        "strict": strict,
         "weight": weight,
     }
     if "needs_experiment" in row:
@@ -600,11 +714,60 @@ def _normalize_oxide_row(raw: Any, *, where: str) -> dict[str, Any]:
     return normalized
 
 
+def _normalize_ratio_rows(raw: Any, *, where: str) -> tuple[dict[str, Any], ...]:
+    if raw in (None, _MISSING):
+        return ()
+    if not isinstance(raw, (list, tuple)):
+        raise ObjectiveProfileError(f"{where} must be a list")
+    normalized: list[dict[str, Any]] = []
+    for ordinal, item in enumerate(raw):
+        row_where = f"{where}[{ordinal}]"
+        if not isinstance(item, Mapping):
+            raise ObjectiveProfileError(f"{row_where} must be a mapping")
+        payload = item.get("ratio", item)
+        if not isinstance(payload, Mapping):
+            raise ObjectiveProfileError(f"{row_where}.ratio must be a mapping")
+        _reject_unknown_objective_keys(payload, _RATIO_ROW_KEYS, f"{row_where}.ratio")
+        _require_objective_keys(
+            payload,
+            {"numerator", "denominator", "min", "max", "weight"},
+            f"{row_where}.ratio",
+        )
+        lower = _finite_profile_float(payload["min"], f"{row_where}.ratio.min")
+        upper = _finite_profile_float(payload["max"], f"{row_where}.ratio.max")
+        if upper < lower:
+            raise ObjectiveProfileError(f"{row_where}.ratio has empty window")
+        weight = _positive_profile_float(payload["weight"], f"{row_where}.ratio.weight")
+        strict = payload.get("strict", True)
+        if not isinstance(strict, bool):
+            raise ObjectiveProfileError(f"{row_where}.ratio.strict must be bool")
+        normalized_row: dict[str, Any] = {
+            "numerator": _normalize_ratio_operand(
+                payload["numerator"],
+                where=f"{row_where}.ratio.numerator",
+            ),
+            "denominator": _normalize_ratio_operand(
+                payload["denominator"],
+                where=f"{row_where}.ratio.denominator",
+            ),
+            "min": lower,
+            "max": upper,
+            "strict": strict,
+            "weight": weight,
+        }
+        if "needs_experiment" in payload:
+            normalized_row["needs_experiment"] = bool(payload["needs_experiment"])
+        if "provenance" in payload:
+            normalized_row["provenance"] = str(payload["provenance"])
+        normalized.append(normalized_row)
+    return tuple(normalized)
+
+
 def _normalize_score_weights(
     raw: Any,
     *,
     vector: Mapping[str, str],
-    window: Mapping[str, Any],
+    window: Mapping[str, Any] | None,
     where: str,
 ) -> dict[str, float]:
     if not isinstance(raw, Mapping):
@@ -624,14 +787,131 @@ def _normalize_score_weights(
         )
     if weights["extraction"] > 0.0 and not any(role == "extract" for role in vector.values()):
         raise ObjectiveProfileError(f"{where}.extraction positive but vector has no extract species")
-    oxides = window.get("oxides", {})
-    if weights["composition"] > 0.0 and not any(
-        float(row.get("weight", 0.0)) > 0.0
-        for row in oxides.values()
-        if isinstance(row, Mapping)
-    ):
+    row_count = 0
+    if window is not None:
+        row_count += len(window.get("oxides", {}))
+        row_count += len(window.get("ratios", ()))
+    if weights["composition"] > 0.0 and row_count <= 0:
         raise ObjectiveProfileError(f"{where}.composition positive but window is empty")
     return weights
+
+
+def _validate_target_shape(
+    *,
+    vector: Mapping[str, str],
+    extraction: Mapping[str, Any],
+    window: Mapping[str, Any] | None,
+    score_weights: Mapping[str, float],
+    where: str,
+) -> None:
+    has_extract = any(role == "extract" for role in vector.values())
+    has_retain = any(role == "retain" for role in vector.values())
+    has_to_window = any(role == "to_window" for role in vector.values())
+    if window is None:
+        if has_retain:
+            raise ObjectiveProfileError(f"{where}.composition_window required for retain role")
+        if has_to_window:
+            raise ObjectiveProfileError(f"{where}.composition_window required for to_window role")
+        if not has_extract:
+            raise ObjectiveProfileError(f"{where}.species_vector has no target role")
+        if any(role != "extract" and role != "free" for role in vector.values()):
+            raise ObjectiveProfileError(f"{where}.species_vector invalid windowless target shape")
+        if tuple(score_weights.items()) != (
+            ("extraction", 1.0),
+            ("composition", 0.0),
+        ):
+            raise ObjectiveProfileError(
+                f"{where}.score_weights windowless extraction-only requires extraction 1.0"
+            )
+        if set(extraction.get("completeness_min", {})) != {
+            species for species, role in vector.items() if role == "extract"
+        }:
+            raise ObjectiveProfileError(
+                f"{where}.extraction.completeness_min must match extract species"
+            )
+        return
+
+    if has_to_window:
+        _validate_to_window_correspondence(vector, window, f"{where}.species_vector")
+
+
+def _validate_to_window_correspondence(
+    vector: Mapping[str, str],
+    window: Mapping[str, Any],
+    where: str,
+) -> None:
+    oxides = window.get("oxides", {})
+    ratios = window.get("ratios", ())
+    for species, role in vector.items():
+        if role != "to_window":
+            continue
+        if any(species in _oxide_key_elements(str(oxide)) for oxide in oxides):
+            continue
+        found_ratio = False
+        for ratio in ratios:
+            numerator = ratio.get("numerator", ())
+            if any(species in _oxide_key_elements(str(oxide)) for oxide in numerator):
+                found_ratio = True
+                break
+        if found_ratio:
+            continue
+        raise ObjectiveProfileError(
+            f"{where}.{species} to_window requires same-pool oxide row or ratio numerator"
+        )
+
+
+def _normalize_ratio_operand(raw: Any, *, where: str) -> tuple[str, ...]:
+    if isinstance(raw, str):
+        operands = (raw,)
+    elif isinstance(raw, (list, tuple)):
+        if not raw:
+            raise ObjectiveProfileError(f"{where} must not be empty")
+        operands = tuple(str(item) for item in raw)
+    else:
+        raise ObjectiveProfileError(f"{where} must be an oxide key or explicit list")
+    normalized: set[str] = set()
+    for oxide in operands:
+        _validate_oxide_key(oxide, where)
+        normalized.update(_canonical_oxide_operand_parts(oxide))
+    return tuple(sorted(normalized))
+
+
+def _canonical_oxide_operand_parts(oxide_name: str) -> tuple[str, ...]:
+    if oxide_name in _OXIDE_KEY_ALIASES:
+        return tuple(_OXIDE_KEY_ALIASES[oxide_name])
+    if "_plus_" in oxide_name:
+        return tuple(sorted(str(part) for part in oxide_name.split("_plus_")))
+    return (oxide_name,)
+
+
+def _validate_oxide_key(oxide_name: str, where: str) -> None:
+    if not oxide_name:
+        raise ObjectiveProfileError(f"{where} oxide key is required")
+    if oxide_name in _OXIDE_KEY_ALIASES:
+        return
+    if "_plus_" in oxide_name:
+        for part in oxide_name.split("_plus_"):
+            _validate_oxide_key(part, where)
+        return
+    try:
+        formula = resolve_species_formula(oxide_name)
+    except Exception as exc:  # noqa: BLE001 - profile validation reports the key.
+        raise ObjectiveProfileError(f"{where} unknown oxide key {oxide_name!r}") from exc
+    if "O" not in formula.elements:
+        raise ObjectiveProfileError(f"{where} oxide key {oxide_name!r} must contain oxygen")
+
+
+def _oxide_key_elements(oxide_name: str) -> frozenset[str]:
+    if oxide_name == "TiO2_plus_Cr2O3_plus_REO":
+        return frozenset({"Ti", "Cr", "REE"})
+    elements: set[str] = set()
+    for part in _canonical_oxide_operand_parts(oxide_name):
+        if part == "REO":
+            elements.add("REE")
+            continue
+        formula = resolve_species_formula(part)
+        elements.update(element for element in formula.elements if element != "O")
+    return frozenset(elements)
 
 
 def _normalize_maturity(raw: Any, *, where: str) -> dict[str, Any]:
@@ -848,21 +1128,36 @@ def _composition_target_score(
     target = objective["target"]
     vector = target["species_vector"]
     extraction = target["extraction"]
-    window = target["composition_window"]
+    window = target.get("composition_window")
     weights = target["score_weights"]
     extraction_weight = float(weights["extraction"])
     composition_weight = float(weights["composition"])
+    target_trace: dict[str, Any] = {
+        "target_spec_id": str(objective["id"]),
+        "target_spec_digest": target_spec_digest(target),
+        "target_maturity": dict(target.get("maturity", {})),
+        "target_provenance": _target_provenance(target),
+        "rows": [],
+        "resolved_composition": {"oxide_wt_pct": {}, "ratios": {}},
+        "certified_envelope": [],
+        "preference_score": None,
+        "extraction_completeness": {},
+        "certification_tier": "certified",
+    }
 
     extraction_score = 0.0
     if extraction_weight > 0.0:
         bookkeeping_exclusions: set[str] = set()
+        extraction_evidence: dict[str, Any] = {}
         extraction_score = _extraction_score(
             vector,
             extraction,
             run_execution,
             profile,
             bookkeeping_exclusions=bookkeeping_exclusions,
+            completeness_evidence=extraction_evidence,
         )
+        target_trace["extraction_completeness"] = extraction_evidence
         if bookkeeping_exclusions and evidence is not None:
             excluded = tuple(sorted(bookkeeping_exclusions))
             evidence["captured_product_bookkeeping_exclusions"] = excluded
@@ -873,14 +1168,28 @@ def _composition_target_score(
 
     composition_score = 0.0
     if composition_weight > 0.0:
+        if not isinstance(window, Mapping):
+            raise ObjectiveComputationError("composition target has no composition window")
+        window_evidence: dict[str, Any] = {}
         composition_score = _composition_window_score(
             window,
             run_execution,
+            evidence=window_evidence,
         )
-        if str(window["mode"]) == "hard_window" and composition_score <= 0.0:
+        target_trace.update(window_evidence)
+        if str(window["mode"]) == "soft_distance":
+            target_trace["certification_tier"] = "exploratory"
+        if str(window["mode"]) == "hard_window" and not bool(
+            window_evidence.get("reached_window", composition_score > 0.0)
+        ):
+            if evidence is not None:
+                evidence["composition_target"] = target_trace
             return 0.0
 
-    return extraction_weight * extraction_score + composition_weight * composition_score
+    score = extraction_weight * extraction_score + composition_weight * composition_score
+    if evidence is not None:
+        evidence["composition_target"] = target_trace
+    return score
 
 
 def _extraction_score(
@@ -890,10 +1199,15 @@ def _extraction_score(
     profile: Mapping[str, Any],
     *,
     bookkeeping_exclusions: set[str] | None = None,
+    completeness_evidence: dict[str, Any] | None = None,
 ) -> float:
     scores: list[float] = []
     completeness_min = extraction["completeness_min"]
     captured_pool = str(extraction["captured_pool"])
+    if completeness_evidence is not None:
+        completeness_evidence["captured_pool"] = captured_pool
+        completeness_evidence["basis"] = str(extraction["basis"])
+        completeness_evidence["species"] = {}
     for species, role in vector.items():
         if role != "extract":
             continue
@@ -919,7 +1233,17 @@ def _extraction_score(
             raise ObjectiveComputationError(
                 f"composition_target.completeness_min[{species!r}] must be positive"
             )
-        scores.append(_clamp(completeness / threshold, 0.0, 1.0))
+        species_score = _clamp(completeness / threshold, 0.0, 1.0)
+        if completeness_evidence is not None:
+            completeness_evidence["species"][species] = {
+                "input_mol": input_mol,
+                "captured_mol": captured_mol,
+                "completeness": completeness,
+                "threshold": threshold,
+                "pass": completeness >= threshold,
+                "score": species_score,
+            }
+        scores.append(species_score)
     if not scores:
         raise ObjectiveComputationError("composition target extraction branch has no species")
     return sum(scores) / len(scores)
@@ -928,40 +1252,312 @@ def _extraction_score(
 def _composition_window_score(
     window: Mapping[str, Any],
     run_execution: Any,
+    *,
+    evidence: dict[str, Any] | None = None,
 ) -> float:
     pool = str(window["pool"])
-    species_mol = _pool_species_mol(pool, run_execution)
+    pool_provenance: dict[str, Any] = {}
+    species_mol = _pool_species_mol(pool, run_execution, pool_provenance=pool_provenance)
     if not species_mol:
         raise ObjectiveComputationError(f"composition target pool {pool!r} is missing or empty")
     mode = str(window["mode"])
     oxides = window["oxides"]
+    ratios = window.get("ratios", ())
+    row_verdicts: list[dict[str, Any]] = []
+    resolved_oxides: dict[str, float] = {}
+    resolved_ratios: dict[str, float] = {}
+    certified_envelope: list[dict[str, Any]] = []
+
+    def oxide_verdict(oxide: str, row: Mapping[str, Any]) -> dict[str, Any]:
+        observed = _oxide_wt_pct(oxide, species_mol, run_execution)
+        resolved_oxides[oxide] = observed
+        return _window_row_verdict(
+            row_type="oxide",
+            row_id=oxide,
+            pool=pool,
+            basis="oxide_wt_pct",
+            operand=oxide,
+            row=row,
+            value=observed,
+        )
+
+    def ratio_verdict(index: int, row: Mapping[str, Any]) -> dict[str, Any]:
+        numerator = tuple(str(item) for item in row["numerator"])
+        denominator = tuple(str(item) for item in row["denominator"])
+        numerator_wt = _oxide_operand_wt_pct(
+            numerator,
+            species_mol,
+            run_execution,
+            where=f"ratio[{index}].numerator",
+        )
+        denominator_wt = _oxide_operand_wt_pct(
+            denominator,
+            species_mol,
+            run_execution,
+            where=f"ratio[{index}].denominator",
+        )
+        if denominator_wt <= _EPS:
+            raise ObjectiveComputationError(
+                f"composition target ratio[{index}] denominator is zero or missing"
+            )
+        if numerator_wt <= _EPS:
+            raise ObjectiveComputationError(
+                f"composition target ratio[{index}] numerator is zero or missing"
+            )
+        value = numerator_wt / denominator_wt
+        if not math.isfinite(value):
+            raise ObjectiveComputationError(f"composition target ratio[{index}] is non-finite")
+        ratio_id = f"{'+'.join(numerator)}/{'+'.join(denominator)}"
+        resolved_ratios[ratio_id] = value
+        verdict = _window_row_verdict(
+            row_type="ratio",
+            row_id=ratio_id,
+            pool=pool,
+            basis="oxide_wt_pct_ratio",
+            operand={
+                "numerator": numerator,
+                "denominator": denominator,
+                "numerator_wt_pct": numerator_wt,
+                "denominator_wt_pct": denominator_wt,
+            },
+            row=row,
+            value=value,
+        )
+        return verdict
+
+    strict_rows: list[dict[str, Any]] = []
+    soft_sources: list[tuple[str, str | int, Mapping[str, Any]]] = []
+    for oxide, row in oxides.items():
+        if bool(row.get("strict", True)):
+            strict_rows.append(oxide_verdict(str(oxide), row))
+        else:
+            soft_sources.append(("oxide", str(oxide), row))
+    for index, row in enumerate(ratios):
+        if bool(row.get("strict", True)):
+            strict_rows.append(ratio_verdict(index, row))
+        else:
+            soft_sources.append(("ratio", index, row))
+
     if mode == "hard_window":
-        for oxide, row in oxides.items():
-            observed = _oxide_wt_pct(str(oxide), species_mol, run_execution)
-            lower = _finite_float(row["min"], f"{oxide}.min")
-            upper = _finite_float(row["max"], f"{oxide}.max")
-            if observed < lower or observed > upper:
-                return 0.0
-        return 1.0
+        row_verdicts.extend(strict_rows)
+        certified_envelope.extend(strict_rows)
+        if any(not bool(row["pass"]) for row in strict_rows):
+            for row_type, row_id, row in soft_sources:
+                skipped = _skipped_soft_row_verdict(row_type, row_id, pool, row)
+                row_verdicts.append(skipped)
+            if evidence is not None:
+                evidence.update(
+                    _composition_window_evidence(
+                        row_verdicts=row_verdicts,
+                        resolved_oxides=resolved_oxides,
+                        resolved_ratios=resolved_ratios,
+                        certified_envelope=certified_envelope,
+                        preference_score=None,
+                        reached_window=False,
+                        window_mode=mode,
+                        pool_source=pool_provenance.get(pool, ""),
+                    )
+                )
+            return 0.0
+        if not soft_sources:
+            preference_score = None
+            score = 1.0
+        else:
+            weighted = 0.0
+            total_weight = 0.0
+            for row_type, row_id, row in soft_sources:
+                verdict = (
+                    oxide_verdict(str(row_id), row)
+                    if row_type == "oxide"
+                    else ratio_verdict(int(row_id), row)
+                )
+                row_verdicts.append(verdict)
+                weight = _finite_float(row["weight"], f"{row_id}.weight")
+                total_weight += weight
+                weighted += weight * _finite_float(verdict["score"], f"{row_id}.score")
+            if total_weight <= 0.0:
+                raise ObjectiveComputationError("composition target window has zero soft weight")
+            preference_score = weighted / total_weight
+            score = preference_score
+        if evidence is not None:
+            evidence.update(
+                _composition_window_evidence(
+                    row_verdicts=row_verdicts,
+                    resolved_oxides=resolved_oxides,
+                    resolved_ratios=resolved_ratios,
+                    certified_envelope=certified_envelope,
+                    preference_score=preference_score,
+                    reached_window=True,
+                    window_mode=mode,
+                    pool_source=pool_provenance.get(pool, ""),
+                )
+            )
+        return score
     if mode == "soft_distance":
         weighted = 0.0
         total_weight = 0.0
+        soft_rows: list[dict[str, Any]] = []
         for oxide, row in oxides.items():
-            observed = _oxide_wt_pct(str(oxide), species_mol, run_execution)
-            lower = _finite_float(row["min"], f"{oxide}.min")
-            upper = _finite_float(row["max"], f"{oxide}.max")
-            weight = _finite_float(row["weight"], f"{oxide}.weight")
+            soft_rows.append(oxide_verdict(str(oxide), row))
+        for index, row in enumerate(ratios):
+            soft_rows.append(ratio_verdict(index, row))
+        for verdict in soft_rows:
+            weight = _finite_float(verdict["weight"], f"{verdict['id']}.weight")
             total_weight += weight
-            if lower <= observed <= upper:
-                weighted += weight
-            elif observed < lower and lower > 0.0:
-                weighted += weight * _clamp(observed / lower, 0.0, 1.0)
-            elif observed > upper and observed > 0.0:
-                weighted += weight * _clamp(upper / observed, 0.0, 1.0)
+            weighted += weight * _finite_float(verdict["score"], f"{verdict['id']}.score")
         if total_weight <= 0.0:
             raise ObjectiveComputationError("composition target window has zero total weight")
-        return weighted / total_weight
+        preference_score = weighted / total_weight
+        if evidence is not None:
+            evidence.update(
+                _composition_window_evidence(
+                    row_verdicts=soft_rows,
+                    resolved_oxides=resolved_oxides,
+                    resolved_ratios=resolved_ratios,
+                    certified_envelope=[],
+                    preference_score=preference_score,
+                    reached_window=False,
+                    window_mode=mode,
+                    pool_source=pool_provenance.get(pool, ""),
+                )
+            )
+        return preference_score
     raise ObjectiveComputationError(f"unsupported composition window mode {mode!r}")
+
+
+def _window_row_verdict(
+    *,
+    row_type: str,
+    row_id: str,
+    pool: str,
+    basis: str,
+    operand: Any,
+    row: Mapping[str, Any],
+    value: float,
+) -> dict[str, Any]:
+    lower = _finite_float(row["min"], f"{row_id}.min")
+    upper = _finite_float(row["max"], f"{row_id}.max")
+    if upper < lower:
+        raise ObjectiveComputationError(f"composition target row {row_id!r} has empty window")
+    strict = bool(row.get("strict", True))
+    in_band = lower <= value <= upper
+    score = 1.0 if in_band else 0.0
+    reason = "in_band" if in_band else "outside_band"
+    if not strict:
+        if upper <= lower:
+            raise ObjectiveComputationError(
+                f"composition target soft row {row_id!r} has zero-width band"
+            )
+        score = _soft_band_score(value, lower, upper)
+        reason = "soft_distance_inverse_linear_to_band"
+    payload: dict[str, Any] = {
+        "id": row_id,
+        "type": row_type,
+        "pool": pool,
+        "basis": basis,
+        "operand": operand,
+        "min": lower,
+        "max": upper,
+        "value": value,
+        "strict": strict,
+        "pass": in_band,
+        "score": score,
+        "reason": reason,
+        "weight": _finite_float(row["weight"], f"{row_id}.weight"),
+    }
+    for key in ("needs_experiment", "provenance", "tier"):
+        if key in row:
+            payload[key] = row[key]
+    return payload
+
+
+def _skipped_soft_row_verdict(
+    row_type: str,
+    row_id: str | int,
+    pool: str,
+    row: Mapping[str, Any],
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "id": str(row_id),
+        "type": row_type,
+        "pool": pool,
+        "strict": False,
+        "pass": None,
+        "score": None,
+        "reason": "hard_gate_failed_soft_not_computed",
+        "weight": _finite_float(row["weight"], f"{row_id}.weight"),
+        "min": _finite_float(row["min"], f"{row_id}.min"),
+        "max": _finite_float(row["max"], f"{row_id}.max"),
+    }
+    for key in ("needs_experiment", "provenance", "tier"):
+        if key in row:
+            payload[key] = row[key]
+    return payload
+
+
+def _composition_window_evidence(
+    *,
+    row_verdicts: Sequence[Mapping[str, Any]],
+    resolved_oxides: Mapping[str, float],
+    resolved_ratios: Mapping[str, float],
+    certified_envelope: Sequence[Mapping[str, Any]],
+    preference_score: float | None,
+    reached_window: bool,
+    window_mode: str,
+    pool_source: str,
+) -> dict[str, Any]:
+    return {
+        "rows": [dict(row) for row in row_verdicts],
+        "resolved_composition": {
+            "oxide_wt_pct": dict(sorted(resolved_oxides.items())),
+            "ratios": dict(sorted(resolved_ratios.items())),
+        },
+        "certified_envelope": [dict(row) for row in certified_envelope],
+        "preference_score": preference_score,
+        "reached_window": reached_window,
+        "window_mode": window_mode,
+        **({"terminal_rump_source": pool_source} if pool_source else {}),
+    }
+
+
+def _soft_band_score(value: float, lower: float, upper: float) -> float:
+    band_width = upper - lower
+    if band_width <= 0.0:
+        raise ObjectiveComputationError("composition target soft row has zero-width band")
+    if not all(math.isfinite(raw) for raw in (value, lower, upper, band_width)):
+        raise ObjectiveComputationError("composition target soft row has non-finite value")
+    if lower <= value <= upper:
+        normalized_distance = 0.0
+    elif value < lower:
+        normalized_distance = (lower - value) / band_width
+    else:
+        normalized_distance = (value - upper) / band_width
+    return 1.0 / (1.0 + normalized_distance)
+
+
+def _oxide_operand_wt_pct(
+    operand: Sequence[str],
+    species_mol: Mapping[str, float],
+    run_execution: Any,
+    *,
+    where: str,
+) -> float:
+    total_kg = sum(
+        _mol_to_kg(species, mol, run_execution)
+        for species, mol in species_mol.items()
+    )
+    if total_kg <= _EPS:
+        raise ObjectiveComputationError("composition target pool has zero mass")
+    operand_kg = 0.0
+    for oxide in operand:
+        oxide_kg = _oxide_equivalent_kg(str(oxide), species_mol, run_execution)
+        if oxide_kg <= _EPS:
+            raise ObjectiveComputationError(f"composition target {where} missing {oxide!r}")
+        operand_kg += oxide_kg
+    value = operand_kg / total_kg * 100.0
+    if not math.isfinite(value):
+        raise ObjectiveComputationError(f"composition target {where} is non-finite")
+    return value
 
 
 def _pool_species_mol(
@@ -969,6 +1565,7 @@ def _pool_species_mol(
     run_execution: Any,
     *,
     bookkeeping_exclusions: set[str] | None = None,
+    pool_provenance: dict[str, Any] | None = None,
 ) -> Mapping[str, float]:
     sim = getattr(run_execution, "simulator", run_execution)
     if pool == "captured_stage_3_silica":
@@ -989,16 +1586,34 @@ def _pool_species_mol(
             return MappingProxyType(ledger_values)
         raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
     if pool == "terminal_rump_earned":
-        _require_earned_terminal_rump(run_execution)
-        ledger_values = _ledger_mol_by_accounts(
-            sim,
-            _POOL_LEDGER_ACCOUNTS[pool],
-        )
-        if ledger_values:
-            return MappingProxyType(ledger_values)
-        fallback = _terminal_rump_trace_mol(run_execution)
-        if fallback:
-            return MappingProxyType(fallback)
+        trace = getattr(run_execution, "trace", None)
+        payload = _carrier_value(trace, "rump_terminal")
+        if isinstance(payload, Mapping):
+            if str(payload.get("status", "")) != "earned":
+                raise ObjectiveComputationError("composition target terminal rump is not earned")
+            if pool_provenance is not None:
+                pool_provenance[pool] = "earned_crash"
+            ledger_values = _ledger_mol_by_accounts(
+                sim,
+                _POOL_LEDGER_ACCOUNTS[pool],
+            )
+            if ledger_values:
+                return MappingProxyType(ledger_values)
+            fallback = _terminal_rump_trace_mol(run_execution)
+            if fallback:
+                return MappingProxyType(fallback)
+        else:
+            completion_problem = _terminal_rump_completed_run_problem(run_execution)
+            if completion_problem is not None:
+                raise ObjectiveComputationError(completion_problem)
+            ledger_values = _ledger_mol_by_accounts(
+                sim,
+                _POOL_LEDGER_ACCOUNTS["residual_rump_at_stop"],
+            )
+            if ledger_values:
+                if pool_provenance is not None:
+                    pool_provenance[pool] = "completed_run"
+                return MappingProxyType(ledger_values)
     raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
 
 
@@ -1185,6 +1800,92 @@ def _require_earned_terminal_rump(run_execution: Any) -> None:
         raise ObjectiveComputationError("composition target terminal rump is not earned")
 
 
+def _terminal_rump_completed_run_problem(run_execution: Any) -> str | None:
+    backend_status = _latest_backend_status(run_execution)
+    if backend_status == "ok":
+        return None
+    if backend_status is None:
+        return (
+            "composition target terminal rump completed_run lacks positive "
+            "completion evidence"
+        )
+    return (
+        "composition target terminal rump cannot use completed_run because "
+        f"backend_status={backend_status!r}"
+    )
+
+
+def _latest_backend_status(run_execution: Any) -> str | None:
+    sim = getattr(run_execution, "simulator", None)
+    carriers = (
+        run_execution,
+        getattr(run_execution, "trace", None),
+        getattr(sim, "_last_backend_diagnostics", None),
+        getattr(sim, "_last_out_of_domain_diagnostics", None),
+    )
+    return _select_backend_status(
+        status
+        for carrier in carriers
+        for status in _backend_statuses_from_carrier(carrier)
+    )
+
+
+def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
+    if carrier is None:
+        return ()
+    statuses: list[str] = []
+    if isinstance(carrier, MappingABC):
+        raw = carrier.get("backend_status")
+        if raw is not None:
+            statuses.append(str(raw))
+        if _carrier_has_crash_point(carrier):
+            statuses.append("out_of_domain")
+        for key in ("per_hour", "hours"):
+            status = _latest_backend_status_from_sequence(carrier.get(key))
+            if status is not None:
+                statuses.append(status)
+        for key in ("trace", "backend_diagnostics", "diagnostics"):
+            statuses.extend(_backend_statuses_from_carrier(carrier.get(key)))
+        return tuple(statuses)
+    raw = getattr(carrier, "backend_status", None)
+    if raw is not None:
+        statuses.append(str(raw))
+    for attr in ("per_hour", "hours"):
+        status = _latest_backend_status_from_sequence(getattr(carrier, attr, None))
+        if status is not None:
+            statuses.append(status)
+    for attr in ("trace", "backend_diagnostics", "diagnostics"):
+        statuses.extend(_backend_statuses_from_carrier(getattr(carrier, attr, None)))
+    return tuple(statuses)
+
+
+def _latest_backend_status_from_sequence(value: Any) -> str | None:
+    if not isinstance(value, (list, tuple)) or not value:
+        return None
+    return _select_backend_status(
+        status
+        for item in value
+        for status in _backend_statuses_from_carrier(item)
+    )
+
+
+def _carrier_has_crash_point(carrier: MappingABC[Any, Any]) -> bool:
+    return any(
+        isinstance(carrier.get(key), MappingABC)
+        for key in ("out_of_domain_crash_point", "crash_point")
+    )
+
+
+def _select_backend_status(statuses: Iterable[str]) -> str | None:
+    values = tuple(str(status) for status in statuses if status is not None)
+    for status in ("out_of_domain", "unavailable", "not_converged"):
+        if status in values:
+            return status
+    if values:
+        return values[-1]
+    return None
+
+
 def _carrier_value(carrier: Any, name: str) -> Any:
     if isinstance(carrier, Mapping):
         return carrier.get(name)
@@ -1228,6 +1929,8 @@ def _oxide_equivalent_kg(
     species_mol: Mapping[str, float],
     run_execution: Any,
 ) -> float:
+    if oxide_name == "FeO_total":
+        return _single_oxide_equivalent_kg("FeO", species_mol, run_execution)
     if oxide_name == "Fe_total_as_Fe2O3_wt_pct":
         return _single_oxide_equivalent_kg("Fe2O3", species_mol, run_execution)
     if oxide_name == "Al2O3_CaO_MgO_balance":

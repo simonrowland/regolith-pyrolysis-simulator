@@ -1088,6 +1088,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "out_of_domain_crash_point",
             "rump_terminal",
             "terminal_rump_by_species_kg",
+            "composition_target",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -1253,6 +1254,38 @@ def _coating_leaderboard_row(
             summary.get("wall_deposit_kg_by_zone_species", {})
         )
     return row
+
+
+def _composition_target_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
+    if not any(isinstance(record.trace_summary.get("composition_target"), Mapping) for record in records):
+        return ()
+    return (
+        "certification_tier",
+        "certified_envelope_json",
+        "preference_score",
+        "target_spec_digest",
+    )
+
+
+def _composition_target_leaderboard_row(
+    record: StudyRecord,
+    fields: Sequence[str],
+) -> dict[str, Any]:
+    if not fields:
+        return {}
+    payload = record.trace_summary.get("composition_target")
+    if not isinstance(payload, Mapping):
+        return {field: "" for field in fields}
+    return {
+        "certification_tier": str(payload.get("certification_tier", "")),
+        "certified_envelope_json": _json_dump_value(payload.get("certified_envelope", [])),
+        "preference_score": (
+            ""
+            if payload.get("preference_score") is None
+            else payload["preference_score"]
+        ),
+        "target_spec_digest": str(payload.get("target_spec_digest", "")),
+    }
 
 
 def _status(scored: ScoredResult) -> str:
@@ -1432,6 +1465,7 @@ def _write_leaderboard(
     pareto_ids = {record.candidate_id for record in pareto}
     margin_names = sorted({name for record in leaderboard for name in record.feasibility_margins})
     coating_fields = _coating_leaderboard_fields(leaderboard)
+    composition_target_fields = _composition_target_leaderboard_fields(leaderboard)
     fieldnames = [
         "rank",
         "candidate_id",
@@ -1441,6 +1475,7 @@ def _write_leaderboard(
         *(definition.metric for definition in definitions),
         *(f"margin_{name}" for name in margin_names),
         *coating_fields,
+        *composition_target_fields,
         "patch_json",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
@@ -1469,6 +1504,7 @@ def _write_leaderboard(
                 }
             )
             row.update(_coating_leaderboard_row(record, coating_fields))
+            row.update(_composition_target_leaderboard_row(record, composition_target_fields))
             writer.writerow(row)
 
 

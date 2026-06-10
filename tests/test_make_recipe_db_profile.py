@@ -63,7 +63,7 @@ def test_target_menu_known_unseeded_id_refuses_to_invent_bounds(
             [
                 "lunar_mare_low_ti",
                 "--target",
-                "pc-extract-na",
+                "pc-glass-green",
                 "--out",
                 str(tmp_path / "profile.yaml"),
             ]
@@ -73,7 +73,6 @@ def test_target_menu_known_unseeded_id_refuses_to_invent_bounds(
 @pytest.mark.parametrize(
     ("target_id", "expected_tier"),
     [
-        ("pc-glass-clear", "clear_container"),
         ("pc-glass-retain-na-k-c3", "workable_glass"),
     ],
 )
@@ -101,6 +100,94 @@ def test_target_menu_tier_rows_resolve_with_provenance(
     assert fe_row["min"] >= 0.0
     assert fe_row["max"] > fe_row["min"]
     assert "provenance" in fe_row
+
+
+@pytest.mark.parametrize(
+    ("target_id", "species", "completeness_min"),
+    [
+        ("pc-extract-na", "Na", 0.95),
+        ("pc-extract-k", "K", 0.90),
+        ("pc-extract-fe", "Fe", 0.85),
+    ],
+)
+def test_target_menu_extract_rows_are_windowless(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+    species: str,
+    completeness_min: float,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = yaml.safe_load(out.read_text())
+    objective = validate_profile(
+        profile,
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )["objectives"][0]
+    target = objective["target"]
+    assert target["species_vector"][species] == "extract"
+    assert "composition_window" not in target
+    assert target["extraction"]["completeness_min"][species] == pytest.approx(
+        completeness_min
+    )
+    assert target["score_weights"]["extraction"] == pytest.approx(1.0)
+    assert target["score_weights"]["composition"] == pytest.approx(0.0)
+
+
+def test_target_menu_glass_clear_uses_rev32_strict_soft_rows(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-glass-clear.yaml"
+
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", "pc-glass-clear", out)
+
+    profile = yaml.safe_load(out.read_text())
+    objective = validate_profile(
+        profile,
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )["objectives"][0]
+    oxides = objective["target"]["composition_window"]["oxides"]
+    assert oxides["FeO_total"]["min"] == pytest.approx(0.0)
+    assert oxides["FeO_total"]["max"] == pytest.approx(0.5)
+    assert oxides["FeO_total"]["strict"] is True
+    assert oxides["Al2O3"]["min"] == pytest.approx(15.0)
+    assert oxides["Al2O3"]["max"] == pytest.approx(20.0)
+    assert oxides["Al2O3"]["strict"] is False
+    assert oxides["Al2O3"]["weight"] == pytest.approx(2.0)
+
+
+def test_target_menu_ratio_seed_has_strict_companions(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-ceramic-ca-al-ratio-seed.yaml"
+
+    _run_generator(
+        monkeypatch,
+        tmp_path,
+        "lunar_mare_low_ti",
+        "pc-ceramic-ca-al-ratio-seed",
+        out,
+    )
+
+    profile = yaml.safe_load(out.read_text())
+    objective = validate_profile(
+        profile,
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )["objectives"][0]
+    window = objective["target"]["composition_window"]
+    assert all(row["strict"] is True for row in window["oxides"].values())
+    ratio = window["ratios"][0]
+    assert ratio["numerator"] == ("CaO",)
+    assert ratio["denominator"] == ("Al2O3",)
+    assert ratio["min"] == pytest.approx(0.45)
+    assert ratio["max"] == pytest.approx(0.75)
 
 
 def test_target_menu_all_emits_materialized_seed_rows(

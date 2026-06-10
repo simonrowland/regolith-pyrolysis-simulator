@@ -27,7 +27,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 DESIGN_TARGET_PROVENANCE = (
-    "design-composition-target-objective-2026-06-10 rev 2.1 PC target menu seed"
+    "design-composition-target-objective-2026-06-10 rev 3.2 PC target menu seed"
 )
 STANDARD_COST_METRICS = ("energy_kWh", "duration_h")
 MENU_TARGET_IDS = (
@@ -42,6 +42,7 @@ MENU_TARGET_IDS = (
     "pc-glass-green",
     "pc-glass-retain-na-k-c3",
     "pc-ceramic-ca-al-ree",
+    "pc-ceramic-ca-al-ratio-seed",
     "pc-ceramic-ca-ree-after-al",
 )
 
@@ -54,11 +55,78 @@ class TargetMenuRow:
     oxides: Mapping[str, Mapping[str, Any]]
     maturity_campaign: str
     maturity_hours: int
+    ratios: tuple[Mapping[str, Any], ...] = ()
     extraction_min: Mapping[str, float] | None = None
     score_weights: Mapping[str, float] | None = None
 
 
+def _extract_row(
+    target_id: str,
+    species: str,
+    *,
+    campaign: str,
+    hours: int,
+    completeness_min: float,
+) -> TargetMenuRow:
+    species_ids = ("Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2")
+    return TargetMenuRow(
+        target_id=target_id,
+        pool="captured_products",
+        species_vector={
+            key: "extract" if key == species else "free"
+            for key in species_ids
+        },
+        oxides={},
+        maturity_campaign=campaign,
+        maturity_hours=hours,
+        extraction_min={species: completeness_min},
+        score_weights={"extraction": 1.0},
+    )
+
+
 TARGET_MENU: Mapping[str, TargetMenuRow] = {
+    "pc-extract-na": _extract_row(
+        "pc-extract-na",
+        "Na",
+        campaign="C2A_continuous",
+        hours=24,
+        completeness_min=0.95,
+    ),
+    "pc-extract-k": _extract_row(
+        "pc-extract-k",
+        "K",
+        campaign="C2A_continuous",
+        hours=24,
+        completeness_min=0.90,
+    ),
+    "pc-extract-fe": _extract_row(
+        "pc-extract-fe",
+        "Fe",
+        campaign="C2B",
+        hours=24,
+        completeness_min=0.85,
+    ),
+    "pc-extract-mg": _extract_row(
+        "pc-extract-mg",
+        "Mg",
+        campaign="C4",
+        hours=24,
+        completeness_min=1.0,
+    ),
+    "pc-extract-al": _extract_row(
+        "pc-extract-al",
+        "Al",
+        campaign="C6",
+        hours=24,
+        completeness_min=1.0,
+    ),
+    "pc-extract-o2": _extract_row(
+        "pc-extract-o2",
+        "O2",
+        campaign="C2A_continuous",
+        hours=24,
+        completeness_min=1.0,
+    ),
     "pc-glass-clear": TargetMenuRow(
         target_id="pc-glass-clear",
         pool="residual_rump_at_stop",
@@ -74,14 +142,22 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
         },
         extraction_min={"Na": 0.95, "K": 0.90, "Fe": 0.85},
         oxides={
-            "Fe_total_as_Fe2O3_wt_pct": {
-                "tier": "clear_container",
+            "FeO_total": {
+                "min": 0.0,
+                "max": 0.5,
+                "strict": True,
+                "weight": 1.0,
                 "needs_experiment": True,
+                "provenance": "owner_seed_clear_fe_style",
             },
-            "SiO2": {"min": 45, "max": 75, "weight": 2.0, "needs_experiment": True},
-            "Al2O3": {"min": 5, "max": 25, "weight": 1.0, "needs_experiment": True},
-            "CaO": {"min": 5, "max": 25, "weight": 1.0, "needs_experiment": True},
-            "MgO": {"min": 0, "max": 20, "weight": 1.0, "needs_experiment": True},
+            "Al2O3": {
+                "min": 15.0,
+                "max": 20.0,
+                "strict": False,
+                "weight": 2.0,
+                "needs_experiment": True,
+                "provenance": "owner_seed_loose_stabilizer_style",
+            },
         },
         maturity_campaign="C2B",
         maturity_hours=24,
@@ -159,6 +235,61 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
                 "needs_experiment": True,
             },
         },
+        maturity_campaign="C4",
+        maturity_hours=24,
+        score_weights={"extraction": 0.50, "composition": 0.50},
+    ),
+    "pc-ceramic-ca-al-ratio-seed": TargetMenuRow(
+        target_id="pc-ceramic-ca-al-ratio-seed",
+        pool="terminal_rump_earned",
+        species_vector={
+            "Na": "extract",
+            "K": "extract",
+            "Fe": "extract",
+            "Mg": "extract",
+            "Si": "extract",
+            "Ca": "retain",
+            "Al": "retain",
+            "O2": "free",
+        },
+        extraction_min={"Na": 0.95, "K": 0.90, "Fe": 0.85, "Mg": 0.85, "Si": 0.85},
+        oxides={
+            "CaO": {"min": 20, "max": 60, "strict": True, "weight": 1.0, "needs_experiment": True},
+            "Al2O3": {"min": 10, "max": 45, "strict": True, "weight": 1.0, "needs_experiment": True},
+            "TiO2_plus_Cr2O3_plus_REO": {
+                "min": 1,
+                "max": 25,
+                "strict": True,
+                "weight": 1.0,
+                "needs_experiment": True,
+            },
+            "Na2O_plus_K2O": {
+                "min": 0,
+                "max": 2,
+                "strict": True,
+                "weight": 1.0,
+                "needs_experiment": True,
+            },
+            "Fe_total_as_Fe2O3_wt_pct": {
+                "min": 0,
+                "max": 5,
+                "strict": True,
+                "weight": 1.0,
+                "needs_experiment": True,
+            },
+        },
+        ratios=(
+            {
+                "numerator": "CaO",
+                "denominator": "Al2O3",
+                "min": 0.45,
+                "max": 0.75,
+                "strict": True,
+                "weight": 1.0,
+                "needs_experiment": True,
+                "provenance": "owner_seed_calcium_aluminate_composition",
+            },
+        ),
         maturity_campaign="C4",
         maturity_hours=24,
         score_weights={"extraction": 0.50, "composition": 0.50},
@@ -247,6 +378,33 @@ def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[
         },
         "completeness_min": extraction_min,
     }
+    target = {
+        "pool": row.pool,
+        "require_coating_gate": True,
+        "species_vector": dict(row.species_vector),
+        "extraction": extraction,
+        "maturity": {
+            "mode": "campaign_hours",
+            "campaign": campaign,
+            "hours": hours,
+        },
+        "constraints": {
+            "coating_min_campaigns_to_resinter": "profile_default",
+            "furnace_T_max_C": "profile_or_study_constraint",
+        },
+        "score_weights": dict(row.score_weights or {"extraction": 0.5, "composition": 0.5}),
+    }
+    if row.oxides or row.ratios:
+        window: dict[str, Any] = {
+            "pool": row.pool,
+            "basis": "oxide_wt_pct",
+            "mode": "hard_window",
+            "exploratory": False,
+            "oxides": _with_row_provenance(row.oxides),
+        }
+        if row.ratios:
+            window["ratios"] = [dict(ratio) for ratio in row.ratios]
+        target["composition_window"] = window
     return {
         "type": "composition_target",
         "id": row.target_id,
@@ -255,28 +413,7 @@ def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[
         "units": "score_0_1",
         "weight": 1.0,
         "rationale": "PC target matrix seed; bounds are provisional.",
-        "target": {
-            "pool": row.pool,
-            "require_coating_gate": True,
-            "species_vector": dict(row.species_vector),
-            "extraction": extraction,
-            "composition_window": {
-                "pool": row.pool,
-                "basis": "oxide_wt_pct",
-                "mode": "hard_window",
-                "oxides": _with_row_provenance(row.oxides),
-            },
-            "maturity": {
-                "mode": "campaign_hours",
-                "campaign": campaign,
-                "hours": hours,
-            },
-            "constraints": {
-                "coating_min_campaigns_to_resinter": "profile_default",
-                "furnace_T_max_C": "profile_or_study_constraint",
-            },
-            "score_weights": dict(row.score_weights or {"extraction": 0.5, "composition": 0.5}),
-        },
+        "target": target,
     }
 
 
@@ -366,7 +503,7 @@ def _resolve_target_rows(raw_targets: list[str] | None) -> list[TargetMenuRow]:
             rows.append(TARGET_MENU[target_id])
         except KeyError as exc:
             raise SystemExit(
-                f"PC target {target_id!r} has no rev 2.1 seed window; refusing to invent bounds"
+                f"PC target {target_id!r} has no rev 3.2 seed window; refusing to invent bounds"
             ) from exc
     return rows
 
