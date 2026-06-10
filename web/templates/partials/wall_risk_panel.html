@@ -11,6 +11,15 @@
         n/a
         {% endif %}
     </div>
+    {% if wall_risk.operating_point %}
+    <div class="advisory-meta" data-wall-operating-point>
+        Operating point:
+        pO2 {{ wall_risk.operating_point.pO2_mbar if wall_risk.operating_point.pO2_mbar is not none else 'n/a' }} mbar
+        ({{ wall_risk.operating_point.po2_regime }}),
+        buffer {{ wall_risk.operating_point.p_buffer_mbar if wall_risk.operating_point.p_buffer_mbar is not none else 'n/a' }} mbar
+        ({{ wall_risk.operating_point.pressure_regime }})
+    </div>
+    {% endif %}
     {% if wall_risk.status == 'n/a' %}
     <div class="advisory-empty">n/a</div>
     {% else %}
@@ -58,7 +67,22 @@
                                     stick {{ species.stickiness.display }}
                                 </span>
                                 <span class="advisory-evidence">{{ species.stickiness.evidence }}</span>
+                                {% if not species.stickiness.verdict_eligible %}
+                                <span class="advisory-note">provenance-only ({{ species.stickiness.regime }} analog); does not drive verdict</span>
+                                {% endif %}
+                                <span class="advisory-badge advisory-reactive-{{ species.reactive.verdict }} {% if species.reactive.verdict == 'uncharacterized' %}advisory-uncharacterized{% endif %}">
+                                    reactive {{ species.reactive.verdict }}{% if species.reactive.matched %} ({{ species.reactive.regime }}){% endif %}
+                                </span>
+                                {% if species.reactive.matched and species.reactive.product_phase %}
+                                <span class="advisory-note">product: {{ species.reactive.product_phase }}</span>
+                                {% endif %}
+                                {% if species.reactive.verdict == 'uncharacterized' %}
+                                <span class="advisory-note">needs experiment</span>
+                                {% endif %}
                             </div>
+                            {% if species.chemical_attack.note %}
+                            <div class="advisory-note advisory-attack-note">{{ species.chemical_attack.note }}</div>
+                            {% endif %}
                             {% endfor %}
                         </td>
                     </tr>

@@ -888,14 +888,27 @@ input, select, button, textarea { font-family: inherit; }
     color: #064e3b;
 }
 
-.advisory-rollup-risky {
+.advisory-rollup-risky,
+.advisory-reactive-hazardous {
     background: #fee2e2;
     color: #991b1b;
 }
 
-.advisory-rollup-caution {
+.advisory-rollup-caution,
+.advisory-reactive-tolerable {
     background: #fef3c7;
     color: #92400e;
+}
+
+.advisory-reactive-protective {
+    background: #dcfce7;
+    color: #064e3b;
+}
+
+.advisory-attack-note {
+    margin: 0 0 6px 12px;
+    max-width: 48em;
+    white-space: normal;
 }
 
 .advisory-evidence {

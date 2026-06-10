@@ -34,14 +34,19 @@ function renderWallRiskPanel(payload) {
     if (!content) return;
     const status = payload && payload.status ? payload.status : 'n/a';
     updateAdvisoryState('wall-risk-state', status);
-    advisorySetText(
-        'wall-risk-meta',
-        'Active vapors: ' + (
-            payload && payload.active_species && payload.active_species.length
-                ? payload.active_species.join(', ')
-                : 'n/a'
-        )
+    let metaText = 'Active vapors: ' + (
+        payload && payload.active_species && payload.active_species.length
+            ? payload.active_species.join(', ')
+            : 'n/a'
     );
+    const op = payload && payload.operating_point;
+    if (op) {
+        const po2 = op.pO2_mbar === null || op.pO2_mbar === undefined ? 'n/a' : op.pO2_mbar;
+        const buffer = op.p_buffer_mbar === null || op.p_buffer_mbar === undefined ? 'n/a' : op.p_buffer_mbar;
+        metaText += ' | Operating point: pO2 ' + po2 + ' mbar (' + (op.po2_regime || 'n/a') + '), '
+            + 'buffer ' + buffer + ' mbar (' + (op.pressure_regime || 'n/a') + ')';
+    }
+    advisorySetText('wall-risk-meta', metaText);
     advisoryClear(content);
     if (!payload || status === 'n/a' || !payload.zones || !payload.zones.length) {
         content.className = 'advisory-empty';
@@ -106,7 +111,22 @@ function renderWallRiskPanel(payload) {
                 row.appendChild(label);
                 appendWallCell(row, 'attack', species.chemical_attack);
                 appendWallCell(row, 'stick', species.stickiness);
+                if (species.stickiness && species.stickiness.verdict_eligible === false) {
+                    const provenance = document.createElement('span');
+                    provenance.className = 'advisory-note';
+                    provenance.textContent = 'provenance-only ('
+                        + (species.stickiness.regime || 'n/a')
+                        + ' analog); does not drive verdict';
+                    row.appendChild(provenance);
+                }
+                appendReactiveCell(row, species.reactive);
                 speciesCell.appendChild(row);
+                if (species.chemical_attack && species.chemical_attack.note) {
+                    const attackNote = document.createElement('div');
+                    attackNote.className = 'advisory-note advisory-attack-note';
+                    attackNote.textContent = species.chemical_attack.note;
+                    speciesCell.appendChild(attackNote);
+                }
             }
             tr.appendChild(speciesCell);
             tbody.appendChild(tr);
@@ -126,6 +146,29 @@ function appendWallCell(parent, label, cell) {
     evidence.className = 'advisory-evidence';
     evidence.textContent = cell && cell.evidence ? cell.evidence : 'uncharacterized';
     parent.appendChild(evidence);
+}
+
+function appendReactiveCell(parent, reactive) {
+    const verdict = reactive && reactive.verdict ? reactive.verdict : 'uncharacterized';
+    let text = 'reactive ' + verdict;
+    if (reactive && reactive.matched && reactive.regime) {
+        text += ' (' + reactive.regime + ')';
+    }
+    const classes = ['advisory-reactive-' + verdict];
+    if (verdict === 'uncharacterized') classes.push('advisory-uncharacterized');
+    parent.appendChild(advisoryBadge(text, classes.join(' ')));
+    if (reactive && reactive.matched && reactive.product_phase) {
+        const product = document.createElement('span');
+        product.className = 'advisory-note';
+        product.textContent = 'product: ' + reactive.product_phase;
+        parent.appendChild(product);
+    }
+    if (verdict === 'uncharacterized') {
+        const needs = document.createElement('span');
+        needs.className = 'advisory-note';
+        needs.textContent = 'needs experiment';
+        parent.appendChild(needs);
+    }
 }
 
 function renderCeramicRumpPanel(payload) {

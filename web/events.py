@@ -441,7 +441,13 @@ def _tick_payload(
             'No gas-offtake species flow reported for this tick; '
             'partial pressures are surfaced separately when available.'
         ),
-        'wall_risk_panel': wall_advisory_payload(active_wall_species),
+        'wall_risk_panel': wall_advisory_payload(
+            active_wall_species,
+            pO2_mbar=max(sim.melt.pO2_mbar, 0.0),
+            # CO2/N2/Ar are all generic buffer gas; the non-O2 overhead
+            # pressure is what sets the transport (Knudsen) regime.
+            p_buffer_mbar=max(sim.melt.p_total_mbar - sim.melt.pO2_mbar, 0.0),
+        ),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),

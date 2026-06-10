@@ -13,6 +13,7 @@ from urllib.parse import quote
 
 from flask import Blueprint, Response, current_app, render_template, jsonify, request
 import yaml
+from werkzeug.exceptions import BadRequest
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
 from simulator.condensation import (
@@ -1435,6 +1436,8 @@ def wall_risk_api():
     payload = wall_advisory_payload(
         _query_species(),
         wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
+        pO2_mbar=_query_optional_float('pO2_mbar'),
+        p_buffer_mbar=_query_optional_float('p_buffer_mbar'),
     )
     return jsonify(payload)
 
@@ -1444,6 +1447,8 @@ def wall_risk_panel_partial():
     payload = wall_advisory_payload(
         _query_species(),
         wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
+        pO2_mbar=_query_optional_float('pO2_mbar'),
+        p_buffer_mbar=_query_optional_float('p_buffer_mbar'),
     )
     return render_template('partials/wall_risk_panel.html', wall_risk=payload)
 
@@ -1491,7 +1496,7 @@ def _query_composition_wt_pct() -> dict[str, float]:
     for key, value in request.args.items():
         if key == 'tolerance_wt_pct':
             continue
-        amount = _optional_query_float(value)
+        amount = _optional_query_float(value, name=key)
         if amount is not None:
             composition[key] = amount
     return composition
@@ -1503,16 +1508,19 @@ def _query_float(name: str, *, default: float) -> float:
 
 
 def _query_optional_float(name: str) -> float | None:
-    return _optional_query_float(request.args.get(name))
+    return _optional_query_float(request.args.get(name), name=name)
 
 
-def _optional_query_float(value: object) -> float | None:
+def _optional_query_float(value: object, *, name: str) -> float | None:
     if value is None:
         return None
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
-        return None
+        raise BadRequest(f"{name} must be a finite number") from None
+    if not math.isfinite(number):
+        raise BadRequest(f"{name} must be a finite number")
+    return number
 
 
 @bp.route('/partials/optimizer-table')

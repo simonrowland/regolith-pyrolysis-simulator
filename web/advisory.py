@@ -16,8 +16,11 @@ from simulator.wall_advisor import (
     WALL_ZONE_TEMPERATURES_C,
     WallCompatibilityCell,
     WallMaterialAssessment,
+    WallOperatingPoint,
+    WallReactiveVerdict,
     WallServiceTemperature,
     advise_wall_materials,
+    resolve_wall_operating_point,
 )
 
 WALL_ZONE_ORDER = ("hottest", "hot", "rest")
@@ -50,13 +53,20 @@ def wall_advisory_payload(
     active_species: Iterable[str] | None,
     *,
     wall_temp_offset_C: float = 0.0,
+    pO2_mbar: float | None = None,
+    p_buffer_mbar: float | None = None,
 ) -> dict[str, Any]:
     species = _normalize_species(active_species)
+    operating_point = resolve_wall_operating_point(
+        pO2_mbar=pO2_mbar,
+        p_buffer_mbar=p_buffer_mbar,
+    )
     if not species:
         return {
             "status": "n/a",
             "message": "n/a",
             "active_species": [],
+            "operating_point": _operating_point_payload(operating_point),
             "zones": [],
         }
 
@@ -66,6 +76,8 @@ def wall_advisory_payload(
             species,
             zone=zone,
             wall_temp_offset_C=wall_temp_offset_C,
+            pO2_mbar=pO2_mbar,
+            p_buffer_mbar=p_buffer_mbar,
         )
         zone_temperature_C = (
             assessments[0].zone_temperature_C
@@ -87,7 +99,19 @@ def wall_advisory_payload(
         "status": "ok",
         "message": "",
         "active_species": species,
+        "operating_point": _operating_point_payload(operating_point),
         "zones": zones,
+    }
+
+
+def _operating_point_payload(
+    operating_point: WallOperatingPoint,
+) -> dict[str, Any]:
+    return {
+        "pO2_mbar": _round_or_none(operating_point.pO2_mbar),
+        "p_buffer_mbar": _round_or_none(operating_point.p_buffer_mbar),
+        "po2_regime": operating_point.po2_regime,
+        "pressure_regime": operating_point.pressure_regime,
     }
 
 
@@ -154,10 +178,26 @@ def _wall_material_payload(
                 "stickiness": _wall_cell_payload(
                     species_assessment.stickiness
                 ),
+                "reactive": _wall_reactive_payload(
+                    species_assessment.reactive
+                ),
             }
             for species_name, species_assessment
             in sorted(assessment.species.items())
         ],
+    }
+
+
+def _wall_reactive_payload(verdict: WallReactiveVerdict) -> dict[str, Any]:
+    return {
+        "verdict": verdict.verdict,
+        "sign": verdict.sign,
+        "product_phase": verdict.product_phase,
+        "net_liner_delta": verdict.net_liner_delta,
+        "regime": verdict.regime_raw,
+        "basis": verdict.basis,
+        "needs_experiment": verdict.needs_experiment,
+        "matched": verdict.matched,
     }
 
 
@@ -184,6 +224,8 @@ def _wall_cell_payload(cell: WallCompatibilityCell) -> dict[str, Any]:
         "evidence": cell.evidence,
         "note": cell.note,
         "uncharacterized": cell.uncharacterized,
+        "regime": cell.regime_raw,
+        "verdict_eligible": cell.verdict_eligible,
     }
 
 
