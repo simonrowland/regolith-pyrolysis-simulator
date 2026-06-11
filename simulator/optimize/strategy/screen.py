@@ -24,7 +24,7 @@ import random
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
-from simulator.optimize.doe import _map_unit_value
+from simulator.optimize.doe import _map_unit_row, _map_unit_value
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.protocol import Candidate
 
@@ -322,10 +322,8 @@ class MorrisScreenStrategy:
         moved_group: str | None,
         group_delta: float,
     ) -> Candidate:
-        values = {
-            spec.path: _map_unit_value(spec, group_units[_group_for_path(spec.path)])
-            for spec in self._specs
-        }
+        row = tuple(group_units[_group_for_path(spec.path)] for spec in self._specs)
+        values = _map_unit_row(self.schema, self._specs, row, _map_unit_value)
         patch = RecipePatch(values).validated(self.schema)
         return Candidate(
             id=f"{self.name}-{self.seed}-t{trajectory:04d}-s{step:03d}",

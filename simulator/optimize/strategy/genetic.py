@@ -16,6 +16,7 @@ from simulator.optimize.strategy.bayesian import (
     _bad_objective_value,
     _constraint_values,
     _constraints_for_trial,
+    _couple_suggested_pressure_defaults,
     _objective_mapping,
     _suggest_value,
 )
@@ -139,6 +140,7 @@ class OptunaNSGA2Strategy:
                 for spec in self._specs
                 if not self.schema.is_forbidden(spec.path)
             }
+            _couple_suggested_pressure_defaults(self.schema, values)
             patch = RecipePatch(values).validated(self.schema)
             candidate = Candidate(
                 id=f"nsga2-{self.seed}-{trial.number:06d}",

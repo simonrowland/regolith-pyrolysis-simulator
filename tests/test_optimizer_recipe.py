@@ -16,6 +16,9 @@ from simulator.runner import PyrolysisRun
 
 FEEDSTOCK = "lunar_mare_low_ti"
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
+PTOTAL_DEFAULT = ("campaigns", "C0b_p_cleanup", "p_total_mbar_default")
+C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
+C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
 PRODUCT_TARGET = ("campaigns", "C0b_p_cleanup", "products", "oxygen_kg")
 SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
 
@@ -88,6 +91,7 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     patch = RecipePatch(
         {
             PO2_DEFAULT: 10.0,
+            PTOTAL_DEFAULT: 10.0,
             ("campaigns", "C2A_continuous", "duration_h"): [20, 24],
         }
     )
@@ -95,11 +99,17 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     schema = RecipeSchema()
     nested = schema.to_setpoints_patch(patch)
     loaded = yaml.safe_load(yaml.safe_dump(nested, sort_keys=True))
-    assert RecipePatch.from_nested(loaded).values == patch.validated(schema).values
+    loaded_patch = RecipePatch.from_nested(loaded)
+    assert loaded_patch.values[PO2_DEFAULT] == pytest.approx(10.0)
+    assert loaded_patch.values[PTOTAL_DEFAULT] == pytest.approx(10.0)
+    assert loaded_patch.values[
+        ("campaigns", "C2A_continuous", "duration_h")
+    ] == [20, 24]
 
     run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
     config = run._session_config()
     assert config.setpoints["campaigns"]["C0b_p_cleanup"]["pO2_mbar_default"] == 10.0
+    assert config.setpoints["campaigns"]["C0b_p_cleanup"]["p_total_mbar_default"] == 10.0
     assert config.setpoints["campaigns"]["C2A_continuous"]["duration_h"] == [
         20,
         24,
@@ -118,7 +128,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
         == "2b42cde96b21ca9c9cb810d42da04359ffc7d8ca9983f2c32016b79d7bef78b9"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
-    assert RecipePatch({PO2_DEFAULT: 10.0}).validated().recipe_id() != first.recipe_id()
+    assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
 
 
 def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
@@ -165,11 +175,81 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
     assert engineering_envelopes > 0
 
 
+def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:
+    schema = RecipeSchema()
+    allowlisted = {spec.path for spec in schema.allowlist}
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    expected_pairs = {}
+
+    for path in allowlisted:
+        if len(path) != 3:
+            continue
+        if path[0] != "campaigns" or path[2] != "pO2_mbar_default":
+            continue
+        total_path = (path[0], path[1], "p_total_mbar_default")
+        if total_path not in allowlisted:
+            continue
+        _lookup_setpoint(setpoints, ".".join(path))
+        _lookup_setpoint(setpoints, ".".join(total_path))
+        expected_pairs[path] = total_path
+
+    assert dict(schema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT) == expected_pairs
+
+
 def test_to_setpoints_patch_validates_before_rendering_forbidden_paths() -> None:
     patch = RecipePatch({("campaigns", "C2A", "products", "x"): 1.0})
 
     with pytest.raises(RecipeValidationError, match="forbidden recipe path"):
         RecipeSchema().to_setpoints_patch(patch)
+
+
+def test_recipe_patch_refuses_explicit_partial_pressure_above_total() -> None:
+    patch = RecipePatch({C3_PO2_DEFAULT: 1.2, C3_PTOTAL_DEFAULT: 0.8})
+
+    with pytest.raises(RecipeValidationError, match="recipe_pressure_partial_exceeds_total"):
+        patch.validated()
+
+
+def test_to_setpoints_patch_keeps_po2_only_default_total_untouched() -> None:
+    nested = RecipeSchema().to_setpoints_patch(RecipePatch({C3_PO2_DEFAULT: 0.8}))
+
+    assert nested["campaigns"]["C3"]["pO2_mbar_default"] == pytest.approx(0.8)
+    assert "p_total_mbar_default" not in nested["campaigns"]["C3"]
+    config = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)._session_config()
+    assert config.setpoints["campaigns"]["C3"]["p_total_mbar_default"] == pytest.approx(
+        1.0
+    )
+
+
+def test_to_setpoints_patch_rejects_po2_only_above_default_total() -> None:
+    with pytest.raises(RecipeValidationError, match="recipe_pressure_partial_exceeds_total"):
+        RecipeSchema().to_setpoints_patch(RecipePatch({C3_PO2_DEFAULT: 1.2}))
+
+
+def test_po2_only_patch_recipe_id_differs_from_old_derived_total_effect() -> None:
+    schema = RecipeSchema()
+    po2_only = RecipePatch({C3_PO2_DEFAULT: 0.8}).validated(schema)
+    explicit_old_derivation = RecipePatch(
+        {C3_PO2_DEFAULT: 0.8, C3_PTOTAL_DEFAULT: 0.8}
+    ).validated(schema)
+
+    assert po2_only.recipe_id(schema) != explicit_old_derivation.recipe_id(schema)
+    assert "p_total_mbar_default" not in po2_only.canonical_json()
+
+    po2_only_config = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        setpoints_patch=schema.to_setpoints_patch(po2_only),
+    )._session_config()
+    explicit_config = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        setpoints_patch=schema.to_setpoints_patch(explicit_old_derivation),
+    )._session_config()
+    assert po2_only_config.setpoints["campaigns"]["C3"][
+        "p_total_mbar_default"
+    ] == pytest.approx(1.0)
+    assert explicit_config.setpoints["campaigns"]["C3"][
+        "p_total_mbar_default"
+    ] == pytest.approx(0.8)
 
 
 def test_dotted_path_segment_is_rejected() -> None:

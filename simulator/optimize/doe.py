@@ -284,10 +284,7 @@ def sample_recipe_patches(
     points = _unit_hypercube_points(len(specs), n_samples, seed, active_sampler)
     patches: list[RecipePatch] = []
     for row in points:
-        values = {
-            spec.path: mapper(spec, unit_value)
-            for spec, unit_value in zip(specs, row, strict=True)
-        }
+        values = _map_unit_row(active_schema, specs, row, mapper)
         patches.append(RecipePatch(values).validated(active_schema))
     return tuple(patches)
 
@@ -335,10 +332,7 @@ def sample_recipe_patch_at_index(
         return RecipePatch({}).validated(active_schema)
 
     point = _unit_hypercube_point(len(specs), index, seed, active_sampler)
-    values = {
-        spec.path: mapper(spec, unit_value)
-        for spec, unit_value in zip(specs, point, strict=True)
-    }
+    values = _map_unit_row(active_schema, specs, point, mapper)
     return RecipePatch(values).validated(active_schema)
 
 
@@ -440,6 +434,47 @@ def _map_unit_value(spec: Any, unit_value: float) -> Any:
     if spec.kind == "float":
         return float(value)
     raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
+
+
+def _map_unit_row(
+    schema: RecipeSchema,
+    specs: tuple[Any, ...],
+    row: tuple[float, ...],
+    mapper,
+) -> dict[KeyPath, Any]:
+    values: dict[KeyPath, Any] = {}
+    unit_by_path: dict[KeyPath, float] = {}
+    for spec, unit_value in zip(specs, row, strict=True):
+        unit_by_path[spec.path] = float(unit_value)
+        values[spec.path] = mapper(spec, unit_value)
+    _couple_pressure_default_pairs(schema, specs, values, unit_by_path)
+    return values
+
+
+def _couple_pressure_default_pairs(
+    schema: RecipeSchema,
+    specs: tuple[Any, ...],
+    values: dict[KeyPath, Any],
+    unit_by_path: Mapping[KeyPath, float],
+) -> None:
+    spec_by_path = {spec.path: spec for spec in specs}
+    for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
+        if po2_path not in values or total_path not in values:
+            continue
+        po2_spec = spec_by_path[po2_path]
+        po2_low, po2_high = _numeric_bounds(po2_spec)
+        total = float(values[total_path])
+        feasible_high = min(po2_high, total)
+        tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
+        if feasible_high + tolerance < po2_low:
+            raise ValueError(
+                "pressure_default_pair_infeasible_bounds: "
+                f"{'.'.join(po2_path)} low {po2_low:.12g} exceeds "
+                f"{'.'.join(total_path)} {total:.12g}"
+            )
+        values[po2_path] = float(
+            po2_low + unit_by_path[po2_path] * (feasible_high - po2_low)
+        )
 
 
 def _resolve_value_mapper(

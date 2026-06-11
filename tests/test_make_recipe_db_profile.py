@@ -88,6 +88,7 @@ def test_target_menu_rows_emit_validating_profiles(
 
     profile = yaml.safe_load(out.read_text())
     validated = validate_profile(profile, expected_feedstock=feedstock, source=out)
+    _assert_pressure_default_boxes_are_jointly_feasible(validated)
     objective = validated["objectives"][0]
     assert objective["type"] == "composition_target"
     assert objective["id"] == target_id
@@ -304,6 +305,14 @@ def test_target_menu_all_emits_materialized_seed_rows(
         for target_id in sorted(generator.TARGET_MENU)
     ]
 
+    for path in out_dir.glob("*.yaml"):
+        profile = validate_profile(
+            yaml.safe_load(path.read_text()),
+            expected_feedstock="lunar_mare_low_ti",
+            source=path,
+        )
+        _assert_pressure_default_boxes_are_jointly_feasible(profile)
+
 
 def _run_generator(
     monkeypatch: pytest.MonkeyPatch,
@@ -324,3 +333,32 @@ def _run_generator(
             str(out),
         ]
     ) == 0
+
+
+def _assert_pressure_default_boxes_are_jointly_feasible(profile) -> None:
+    for seed in profile["seed_recipes"]:
+        campaigns = (seed.get("patch") or {}).get("campaigns") or {}
+        for campaign, config in campaigns.items():
+            if not isinstance(config, dict):
+                continue
+            if (
+                "pO2_mbar_default" not in config
+                or "p_total_mbar_default" not in config
+            ):
+                continue
+            _, po2_high = _numeric_interval(config["pO2_mbar_default"])
+            total_low, _ = _numeric_interval(config["p_total_mbar_default"])
+            assert po2_high <= total_low, (
+                campaign,
+                "pO2_mbar_default",
+                config["pO2_mbar_default"],
+                "p_total_mbar_default",
+                config["p_total_mbar_default"],
+            )
+
+
+def _numeric_interval(value) -> tuple[float, float]:
+    if isinstance(value, list):
+        assert len(value) == 2
+        return float(value[0]), float(value[1])
+    return float(value), float(value)

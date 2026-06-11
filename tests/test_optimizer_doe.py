@@ -75,6 +75,22 @@ def _assert_patch_values_match_specs(schema: RecipeSchema, patches: tuple) -> No
                 raise AssertionError(f"unsupported knob kind {spec.kind!r}")
 
 
+def _assert_pressure_defaults_are_jointly_feasible(
+    schema: RecipeSchema,
+    patches: tuple[RecipePatch, ...],
+) -> None:
+    for patch in patches:
+        for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
+            if po2_path not in patch.values or total_path not in patch.values:
+                continue
+            assert patch.values[po2_path] <= patch.values[total_path], (
+                ".".join(po2_path),
+                patch.values[po2_path],
+                ".".join(total_path),
+                patch.values[total_path],
+            )
+
+
 def test_sobol_sampler_is_deterministic_for_schema_n_and_seed() -> None:
     first = _canonical_patch_set(n_samples=16, seed=123)
     second = _canonical_patch_set(n_samples=16, seed=123)
@@ -185,6 +201,34 @@ def test_sampler_outputs_all_allowlist_paths_in_bounds_and_no_forbidden_paths() 
 
         assert len(patches) == 8
         _assert_patch_values_match_specs(schema, patches)
+
+
+def test_sampler_couples_pressure_defaults_to_physical_partial_pressure_limit() -> None:
+    schema = RecipeSchema()
+    samplers = [DEPENDENCY_FREE_LHC_SAMPLER]
+    if doe_module._scipy_sobol_available():
+        samplers.append(SCIPY_SOBOL_SAMPLER)
+
+    for sampler_name in samplers:
+        patches = sample_recipe_patches(
+            schema,
+            n_samples=32,
+            seed=20260610,
+            sampler_name=sampler_name,
+        )
+        _assert_pressure_defaults_are_jointly_feasible(schema, patches)
+
+    if doe_module._scipy_sobol_available():
+        streaming = tuple(
+            sample_recipe_patch_at_index(
+                schema,
+                index=sequence,
+                seed=20260610,
+                sampler_name=SCIPY_SOBOL_SAMPLER,
+            )
+            for sequence in range(16)
+        )
+        _assert_pressure_defaults_are_jointly_feasible(schema, streaming)
 
 
 def test_sampler_varies_every_allowlisted_knob_across_samples() -> None:

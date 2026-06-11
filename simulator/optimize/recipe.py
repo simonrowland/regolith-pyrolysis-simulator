@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 import hashlib
 import math
 from fnmatch import fnmatchcase
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
 
+import yaml
+
+from simulator.config import DEFAULT_DATA_DIR
 from simulator.optimize.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
@@ -87,6 +91,23 @@ class RecipeSchema:
             "campaigns.C6.temp_range_C",
             "campaigns.C6.pO2_mbar",
         )
+    )
+    PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT: Mapping[KeyPath, KeyPath] = MappingProxyType({
+        tuple("campaigns.C0b_p_cleanup.pO2_mbar_default".split(".")):
+            tuple("campaigns.C0b_p_cleanup.p_total_mbar_default".split(".")),
+        tuple("campaigns.C2B.pO2_mbar_default".split(".")):
+            tuple("campaigns.C2B.p_total_mbar_default".split(".")),
+        tuple("campaigns.C3.pO2_mbar_default".split(".")):
+            tuple("campaigns.C3.p_total_mbar_default".split(".")),
+        tuple("campaigns.C4.pO2_mbar_default".split(".")):
+            tuple("campaigns.C4.p_total_mbar_default".split(".")),
+        tuple("campaigns.C5.pO2_mbar_default".split(".")):
+            tuple("campaigns.C5.p_total_mbar_default".split(".")),
+        tuple("campaigns.C6.pO2_mbar_default".split(".")):
+            tuple("campaigns.C6.p_total_mbar_default".split(".")),
+    })
+    PRESSURE_COUPLED_DEFAULT_PAIRS: tuple[tuple[KeyPath, KeyPath], ...] = tuple(
+        PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT.items()
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
@@ -773,6 +794,7 @@ class RecipePatch:
         for path, value in self.values.items():
             spec = active_schema.spec_for(path)
             _validate_value(spec, value, active_schema)
+        _validate_pressure_default_pairs(active_schema, self.values)
         return RecipePatch(dict(self.values))
 
     def recipe_id(
@@ -823,6 +845,55 @@ def _normalize_value(value: Any) -> Any:
     if isinstance(value, Mapping):
         raise RecipeValidationError("recipe values must be scalars or lists")
     return value
+
+
+def _validate_pressure_default_pairs(
+    schema: RecipeSchema,
+    values: Mapping[KeyPath, Any],
+) -> None:
+    for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
+        if po2_path not in values or total_path not in schema._spec_by_path:
+            continue
+        po2 = float(values[po2_path])
+        if total_path in values:
+            total = float(values[total_path])
+            total_source = "patched"
+        else:
+            total = float(_default_setpoint_value(total_path))
+            total_source = "YAML default"
+        tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2), abs(total)))
+        if po2 - total > tolerance:
+            raise RecipeValidationError(
+                "recipe_pressure_partial_exceeds_total: "
+                f"{_format_path(po2_path)}={po2:.12g} > "
+                f"{_format_path(total_path)}={total:.12g} ({total_source}); "
+                "oxygen partial pressure cannot exceed total pressure; "
+                "set both pO2 and p_total knobs for this campaign"
+            )
+
+
+@lru_cache(maxsize=1)
+def _default_setpoints() -> Mapping[str, Any]:
+    path = DEFAULT_DATA_DIR / "setpoints.yaml"
+    with path.open("r", encoding="utf-8") as handle:
+        loaded = yaml.safe_load(handle) or {}
+    if not isinstance(loaded, Mapping):
+        raise RecipeValidationError(
+            f"recipe default setpoints must be a mapping: {path}"
+        )
+    return loaded
+
+
+def _default_setpoint_value(path: KeyPath) -> Any:
+    node: Any = _default_setpoints()
+    for segment in path:
+        if not isinstance(node, Mapping) or segment not in node:
+            raise RecipeValidationError(
+                "recipe_pressure_total_default_missing: "
+                f"missing YAML default for {_format_path(path)}"
+            )
+        node = node[segment]
+    return node
 
 
 def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:

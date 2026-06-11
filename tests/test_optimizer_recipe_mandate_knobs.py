@@ -75,9 +75,21 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     mandate_paths = {spec.path for spec in MANDATE_LEVER_ALLOWLIST}
     assert required_examples <= mandate_paths
 
+    # pO2 defaults are jointly constrained with their campaign's total-pressure
+    # default (partial <= total, validate-don't-derive): tuning one above the
+    # YAML default total requires patching the pair, so sample the pair here.
+    pair_map = dict(RecipeSchema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
+    spec_by_path = {spec.path: spec for spec in schema.allowlist}
     for spec in MANDATE_LEVER_ALLOWLIST:
         _lookup(setpoints, spec.path)
-        patch = RecipePatch({spec.path: _sample_value(spec)})
+        values = {spec.path: _sample_value(spec)}
+        total_path = pair_map.get(spec.path)
+        if total_path is not None:
+            total_spec = spec_by_path[total_path]
+            values[total_path] = max(
+                float(values[spec.path]), float(_sample_value(total_spec))
+            )
+        patch = RecipePatch(values)
         assert patch.validated(schema).values[spec.path] == _sample_value(spec)
 
 
