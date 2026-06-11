@@ -57,11 +57,22 @@ from simulator.reduced_real_determinism import PT1PersistentEquilibriumStore
 DEFAULT_TIME_BOX_SECONDS = 2 * 60 * 60
 DEFAULT_DUP_THRESHOLD = 0.02
 DEFAULT_LOW_DUP_EPOCHS = 2
-JOURNAL_SCHEMA_VERSION = 1
+JOURNAL_SCHEMA_VERSION = 2
+LEGACY_JOURNAL_SCHEMA_VERSION = 1
 DECISION_CONTINUE = "continue"
 DECISION_FINAL_LONG = "final_long"
 DECISION_BATCH_COMPLETE = "batch_complete"
 DECISION_FAILED = "failed"
+JOB_IDENTITY_FIELDS = (
+    "feedstock",
+    "profile",
+    "budget",
+    "strategy",
+    "seed",
+    "out",
+    "fidelity",
+    "parallel",
+)
 
 
 @dataclass(frozen=True)
@@ -94,6 +105,12 @@ class DriverConfig:
     low_dup_epochs: int
     duplication_expected: bool
     nice: int
+
+
+@dataclass(frozen=True)
+class ChildOutcome:
+    kind: str
+    returncode: int | None = None
 
 
 def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path | None = None) -> Manifest:
@@ -155,7 +172,16 @@ def duplication_rate_from_merge(summary: Mapping[str, Any]) -> float:
     source_rows = 0
     for source in summary.get("sources", []):
         if isinstance(source, Mapping) and source.get("skipped") != "target":
-            source_rows += int(source.get("source_rows", 0))
+            recorded_source_rows = int(source.get("source_rows", 0))
+            seed_rows = int(source.get("seed_rows", 0))
+            produced_rows = recorded_source_rows - seed_rows
+            if produced_rows < 0:
+                shard = source.get("source", "<unknown>")
+                raise ValueError(
+                    f"{shard}: source_rows={recorded_source_rows} is less than "
+                    f"seed_rows={seed_rows}; merge accounting is corrupt"
+                )
+            source_rows += produced_rows
     return duplication_rate(source_rows, int(summary.get("inserted_rows", 0)))
 
 
@@ -195,14 +221,7 @@ def initialize_journal(manifest: Manifest) -> dict[str, Any]:
             {
                 "id": job.id,
                 "status": "pending",
-                "feedstock": job.feedstock,
-                "profile": job.profile,
-                "budget": job.budget,
-                "strategy": job.strategy,
-                "seed": job.seed,
-                "out": str(job.out),
-                "fidelity": job.fidelity,
-                "parallel": job.parallel,
+                **_job_identity(job, manifest.path.parent),
             }
             for job in manifest.jobs
         ],
@@ -210,7 +229,20 @@ def initialize_journal(manifest: Manifest) -> dict[str, Any]:
     }
 
 
-def _journal_identity_mismatches(journal: Mapping[str, Any], manifest: Manifest) -> list[str]:
+def _job_identity(job: JobSpec, manifest_dir: Path) -> dict[str, object]:
+    return {
+        "feedstock": job.feedstock,
+        "profile": str(_resolve_path(job.profile, manifest_dir)),
+        "budget": job.budget,
+        "strategy": job.strategy,
+        "seed": job.seed,
+        "out": str(job.out),
+        "fidelity": job.fidelity,
+        "parallel": job.parallel,
+    }
+
+
+def _journal_top_identity_mismatches(journal: Mapping[str, Any], manifest: Manifest) -> list[str]:
     mismatches: list[str] = []
     expected = {
         "manifest": str(manifest.path),
@@ -236,12 +268,113 @@ def _journal_identity_mismatches(journal: Mapping[str, Any], manifest: Manifest)
     return mismatches
 
 
+def _journal_job_identity_mismatches(
+    journal: Mapping[str, Any],
+    manifest: Manifest,
+    *,
+    ignore_missing: bool = False,
+) -> list[str]:
+    mismatches: list[str] = []
+    journal_jobs = {
+        str(item.get("id")): item
+        for item in journal.get("jobs", [])
+        if isinstance(item, Mapping)
+    }
+    for job in manifest.jobs:
+        recorded = journal_jobs.get(job.id)
+        if not isinstance(recorded, Mapping):
+            continue
+        expected = _job_identity(job, manifest.path.parent)
+        fields = [
+            field
+            for field in JOB_IDENTITY_FIELDS
+            if (not ignore_missing or field in recorded)
+            and not _job_identity_field_matches(
+                field,
+                recorded.get(field),
+                expected[field],
+                manifest.path.parent,
+            )
+        ]
+        if fields:
+            mismatches.append(
+                f"job {job.id!r} parameters: "
+                + ", ".join(
+                    f"{field} journal={recorded.get(field)!r} manifest={expected[field]!r}"
+                    for field in fields
+                )
+            )
+    return mismatches
+
+
+def _journal_identity_mismatches(
+    journal: Mapping[str, Any],
+    manifest: Manifest,
+    *,
+    ignore_missing_job_fields: bool = False,
+) -> list[str]:
+    return [
+        *_journal_top_identity_mismatches(journal, manifest),
+        *_journal_job_identity_mismatches(
+            journal,
+            manifest,
+            ignore_missing=ignore_missing_job_fields,
+        ),
+    ]
+
+
+def _job_identity_field_matches(
+    field: str,
+    recorded: Any,
+    expected: object,
+    manifest_dir: Path,
+) -> bool:
+    if field == "profile" and recorded is not None:
+        return str(_resolve_path(recorded, manifest_dir)) == expected
+    return recorded == expected
+
+
+def _migrate_legacy_journal(journal: dict[str, Any], manifest: Manifest) -> None:
+    journal_jobs = {
+        str(item.get("id")): item
+        for item in journal.get("jobs", [])
+        if isinstance(item, dict)
+    }
+    for job in manifest.jobs:
+        recorded = journal_jobs.get(job.id)
+        if isinstance(recorded, dict):
+            recorded.update(_job_identity(job, manifest.path.parent))
+    journal["schema_version"] = JOURNAL_SCHEMA_VERSION
+    notes = journal.get("journal_notes")
+    if not isinstance(notes, list):
+        notes = []
+        journal["journal_notes"] = notes
+    notes.append(
+        {
+            "type": "schema_migration",
+            "from_schema": LEGACY_JOURNAL_SCHEMA_VERSION,
+            "to_schema": JOURNAL_SCHEMA_VERSION,
+            "message": "backfilled per-job identity fields from manifest",
+        }
+    )
+
+
 def load_or_initialize_journal(path: Path, manifest: Manifest) -> dict[str, Any]:
     if path.exists():
         journal = json.loads(path.read_text(encoding="utf-8"))
-        if journal.get("schema_version") != JOURNAL_SCHEMA_VERSION:
-            raise ValueError(f"{path}: unsupported journal schema {journal.get('schema_version')!r}")
-        mismatches = _journal_identity_mismatches(journal, manifest)
+        schema_version = journal.get("schema_version")
+        if schema_version == JOURNAL_SCHEMA_VERSION:
+            mismatches = _journal_identity_mismatches(journal, manifest)
+        elif schema_version == LEGACY_JOURNAL_SCHEMA_VERSION:
+            mismatches = _journal_identity_mismatches(
+                journal,
+                manifest,
+                ignore_missing_job_fields=True,
+            )
+            if not mismatches:
+                _migrate_legacy_journal(journal, manifest)
+        else:
+            raise ValueError(f"{path}: unsupported journal schema {schema_version!r}")
         if mismatches:
             raise ValueError(
                 f"{path}: journal identity does not match the loaded manifest; "
@@ -334,21 +467,26 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
     for job in pending_jobs(manifest, journal):
         shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
         out_dir = job.out / f"epoch-{next_epoch:04d}"
-        profile = _planned_profile_arg(job, manifest.path.parent, shard_db)
-        jobs.append(
-            {
-                "id": job.id,
-                "shard_db": str(shard_db),
-                "out": str(out_dir),
-                "command": build_optimizer_command(
-                    job,
-                    profile=profile,
-                    out_dir=out_dir,
-                    python=config.python,
-                    nice=config.nice,
-                ),
+        profile, profile_overlay = plan_epoch_profile(job, manifest.path.parent, shard_db, epoch_dir)
+        job_plan = {
+            "id": job.id,
+            "shard_db": str(shard_db),
+            "out": str(out_dir),
+            "profile": profile,
+            "command": build_optimizer_command(
+                job,
+                profile=profile,
+                out_dir=out_dir,
+                python=config.python,
+                nice=config.nice,
+            ),
+        }
+        if profile_overlay is not None:
+            job_plan["would_write_profile"] = {
+                "path": profile,
+                "content": profile_overlay,
             }
-        )
+        jobs.append(job_plan)
     return {
         "manifest": str(manifest.path),
         "base_cache": str(manifest.base_cache),
@@ -367,6 +505,7 @@ def merge_epoch_shards(
     shard_paths: Iterable[Path],
     *,
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
+    seed_rows_by_source: Mapping[str, int] | None = None,
 ) -> dict[str, Any]:
     sources = [path for path in shard_paths if path.exists()]
     if not sources:
@@ -377,7 +516,14 @@ def merge_epoch_shards(
             "inserted_rows": 0,
             "sources": [],
         }
-    return dict(seed_fn(base_cache, sources))
+    summary = dict(seed_fn(base_cache, sources))
+    if seed_rows_by_source:
+        for source in summary.get("sources", []):
+            if not isinstance(source, dict) or source.get("skipped") == "target":
+                continue
+            seed_rows = seed_rows_by_source.get(str(source.get("source")), 0)
+            source["seed_rows"] = int(seed_rows)
+    return summary
 
 
 def seed_job_cache(
@@ -425,7 +571,14 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         )
         _apply_epoch_result(journal, epoch_result)
 
-        merge_summary = merge_epoch_shards(manifest.base_cache, [Path(p) for p in epoch_result["shard_dbs"]])
+        merge_summary = merge_epoch_shards(
+            manifest.base_cache,
+            [Path(p) for p in epoch_result["shard_dbs"]],
+            seed_rows_by_source={
+                str(path): int(rows)
+                for path, rows in epoch_result.get("seed_rows_by_shard", {}).items()
+            },
+        )
         rate = duplication_rate_from_merge(merge_summary)
         epoch_result["merge"] = merge_summary
         epoch_result["dup_rate"] = rate
@@ -476,6 +629,7 @@ def run_epoch(
     epoch_index: int,
     final_long: bool = False,
 ) -> dict[str, Any]:
+    """Run one epoch; wrapper timeouts keep partial rows mergeable and pending."""
     epoch_dir = manifest.work_dir / f"epoch-{epoch_index:04d}"
     log_dir = epoch_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -489,13 +643,15 @@ def run_epoch(
         "timed_out_jobs": [],
         "attempted_jobs": [],
         "shard_dbs": [],
+        "seed_rows_by_shard": {},
     }
 
     for job in jobs:
         if deadline is not None and time.monotonic() >= deadline:
             break
         shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
-        seed_job_cache(shard_db, manifest.base_cache)
+        seed_summary = seed_job_cache(shard_db, manifest.base_cache)
+        seed_rows = int(seed_summary.get("rows_after", 0))
         profile_arg = write_epoch_profile(job, manifest.path.parent, shard_db, epoch_dir)
         out_dir = job.out / f"epoch-{epoch_index:04d}"
         command = build_optimizer_command(
@@ -516,36 +672,51 @@ def run_epoch(
             "stderr": str(stderr_path),
         }
         result["attempted_jobs"].append(job_record)
-        result["shard_dbs"].append(str(shard_db))
         timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
-        code = _run_child(command, stdout_path=stdout_path, stderr_path=stderr_path, timeout=timeout)
-        if code == 0:
+        outcome = _run_child(command, stdout_path=stdout_path, stderr_path=stderr_path, timeout=timeout)
+        if outcome.kind == "completed":
+            result["shard_dbs"].append(str(shard_db))
+            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
             result["completed_jobs"].append(job.id)
-        elif code == 124:
+        elif outcome.kind == "timed_out":
+            result["shard_dbs"].append(str(shard_db))
+            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
             result["timed_out_jobs"].append(job.id)
             break
         else:
-            job_record["returncode"] = code
+            job_record["returncode"] = outcome.returncode
             result["failed_jobs"].append(job_record)
             break
     return result
 
 
 def write_epoch_profile(job: JobSpec, manifest_dir: Path, shard_db: Path, epoch_dir: Path) -> str:
+    profile_arg, profile = plan_epoch_profile(job, manifest_dir, shard_db, epoch_dir)
+    if profile is None:
+        return profile_arg
+    out = Path(profile_arg)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(profile, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return str(out)
+
+
+def plan_epoch_profile(
+    job: JobSpec,
+    manifest_dir: Path,
+    shard_db: Path,
+    epoch_dir: Path,
+) -> tuple[str, dict[str, Any] | None]:
     profile_path = _resolve_path(job.profile, manifest_dir)
     if not profile_path.exists():
-        return job.profile
+        return job.profile, None
 
     profile = _load_mapping(profile_path)
     changed = _apply_cache_db(profile, shard_db, job.reduced_real_cache)
     if not changed:
-        return str(profile_path)
+        return str(profile_path), None
 
-    profile_dir = epoch_dir / "profiles"
-    profile_dir.mkdir(parents=True, exist_ok=True)
-    out = profile_dir / f"{job.id}.profile.json"
-    out.write_text(json.dumps(profile, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return str(out)
+    out = epoch_dir / "profiles" / f"{job.id}.profile.json"
+    return str(out), profile
 
 
 def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]) -> None:
@@ -561,7 +732,13 @@ def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]
     journal["epoch"] = int(epoch_result.get("epoch", journal.get("epoch", 0)))
 
 
-def _run_child(command: Sequence[str], *, stdout_path: Path, stderr_path: Path, timeout: float | None) -> int:
+def _run_child(
+    command: Sequence[str],
+    *,
+    stdout_path: Path,
+    stderr_path: Path,
+    timeout: float | None,
+) -> ChildOutcome:
     stdout_path.parent.mkdir(parents=True, exist_ok=True)
     with stdout_path.open("wb") as stdout, stderr_path.open("wb") as stderr:
         process = subprocess.Popen(
@@ -571,10 +748,13 @@ def _run_child(command: Sequence[str], *, stdout_path: Path, stderr_path: Path, 
             start_new_session=True,
         )
         try:
-            return int(process.wait(timeout=timeout))
+            returncode = int(process.wait(timeout=timeout))
+            if returncode == 0:
+                return ChildOutcome(kind="completed", returncode=returncode)
+            return ChildOutcome(kind="failed", returncode=returncode)
         except subprocess.TimeoutExpired:
             _terminate_process_group(process)
-            return 124
+            return ChildOutcome(kind="timed_out", returncode=None)
 
 
 def _terminate_process_group(process: subprocess.Popen[Any]) -> None:
@@ -625,13 +805,6 @@ def _apply_cache_to_run(
     updated["db_path"] = str(shard_db)
     run_options["reduced_real_cache"] = updated
     return True
-
-
-def _planned_profile_arg(job: JobSpec, manifest_dir: Path, shard_db: Path) -> str:
-    profile_path = _resolve_path(job.profile, manifest_dir)
-    if profile_path.exists():
-        return str(profile_path)
-    return job.profile
 
 
 def _load_mapping(path: Path) -> dict[str, Any]:

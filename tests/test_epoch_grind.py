@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -66,8 +67,37 @@ def test_duplication_rate_math() -> None:
     }
 
     assert epoch_grind.duplication_rate_from_merge(summary) == pytest.approx(0.2)
+    assert epoch_grind.duplication_rate_from_merge(
+        {
+            "inserted_rows": 20,
+            "sources": [{"source_rows": 1020, "seed_rows": 1000, "inserted_rows": 20}],
+        }
+    ) == pytest.approx(0.0)
+    assert epoch_grind.duplication_rate_from_merge(
+        {
+            "inserted_rows": 0,
+            "sources": [{"source_rows": 1020, "seed_rows": 1000, "inserted_rows": 0}],
+        }
+    ) == pytest.approx(1.0)
     assert epoch_grind.duplication_rate(0, 0) == 0.0
     assert epoch_grind.duplication_rate(10, 15) == 0.0
+
+
+def test_duplication_rate_rejects_source_rows_below_seed_rows() -> None:
+    with pytest.raises(ValueError, match=r"shard-a.sqlite: source_rows=999 .* seed_rows=1000"):
+        epoch_grind.duplication_rate_from_merge(
+            {
+                "inserted_rows": 0,
+                "sources": [
+                    {
+                        "source": "shard-a.sqlite",
+                        "source_rows": 999,
+                        "seed_rows": 1000,
+                        "inserted_rows": 0,
+                    }
+                ],
+            }
+        )
 
 
 def test_adaptive_termination_state_machine() -> None:
@@ -203,7 +233,87 @@ def test_resume_rejects_journal_with_mismatched_job_ids(tmp_path: Path) -> None:
         epoch_grind.load_or_initialize_journal(journal_path, renamed)
 
 
-def test_dry_run_plan_prints_optimizer_commands(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_resume_rejects_journal_with_mismatched_job_parameters(tmp_path: Path) -> None:
+    job = {
+        "id": "job-a",
+        "feedstock": "lunar_mare_low_ti",
+        "profile": "profile.json",
+        "budget": 1,
+        "strategy": "random",
+        "seed": 1,
+        "out": "runs/job-a",
+    }
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=[dict(job)]))
+    journal_path = tmp_path / "journal.json"
+    epoch_grind.save_journal(journal_path, epoch_grind.initialize_journal(manifest))
+
+    changed = epoch_grind.load_manifest(
+        _manifest_file(tmp_path, jobs=[{**job, "budget": 2}])
+    )
+
+    with pytest.raises(ValueError, match=r"job 'job-a' parameters: .*budget"):
+        epoch_grind.load_or_initialize_journal(journal_path, changed)
+
+
+def test_old_schema_journal_without_job_identity_is_grandfathered(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal = epoch_grind.initialize_journal(manifest)
+    journal["schema_version"] = epoch_grind.LEGACY_JOURNAL_SCHEMA_VERSION
+    for job in journal["jobs"]:
+        for field in epoch_grind.JOB_IDENTITY_FIELDS:
+            job.pop(field, None)
+    journal_path = tmp_path / "journal.json"
+    journal_path.write_text(json.dumps(journal), encoding="utf-8")
+
+    loaded = epoch_grind.load_or_initialize_journal(journal_path, manifest)
+
+    assert loaded["schema_version"] == epoch_grind.JOURNAL_SCHEMA_VERSION
+    assert loaded["jobs"][0]["profile"] == str(tmp_path / "profile.json")
+    assert loaded["jobs"][0]["out"] == str(tmp_path / "runs/job-a")
+    assert loaded["journal_notes"][-1]["type"] == "schema_migration"
+
+
+def test_old_schema_journal_with_drifted_job_ids_is_refused(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal = epoch_grind.initialize_journal(manifest)
+    journal["schema_version"] = epoch_grind.LEGACY_JOURNAL_SCHEMA_VERSION
+    journal["jobs"][0]["id"] = "other-job"
+    for field in epoch_grind.JOB_IDENTITY_FIELDS:
+        journal["jobs"][0].pop(field, None)
+    journal_path = tmp_path / "journal.json"
+    journal_path.write_text(json.dumps(journal), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="job ids"):
+        epoch_grind.load_or_initialize_journal(journal_path, manifest)
+
+
+def test_profile_identity_normalizes_manifest_relative_paths(tmp_path: Path) -> None:
+    job = {
+        "id": "job-a",
+        "feedstock": "lunar_mare_low_ti",
+        "profile": "./profile.json",
+        "budget": 1,
+        "strategy": "random",
+        "seed": 1,
+        "out": "runs/job-a",
+    }
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=[dict(job)]))
+    journal_path = tmp_path / "journal.json"
+    epoch_grind.save_journal(journal_path, epoch_grind.initialize_journal(manifest))
+
+    equivalent = epoch_grind.load_manifest(
+        _manifest_file(tmp_path, jobs=[{**job, "profile": "profile.json"}])
+    )
+    loaded = epoch_grind.load_or_initialize_journal(journal_path, equivalent)
+
+    assert loaded["jobs"][0]["profile"] == str(tmp_path / "profile.json")
+
+
+def test_dry_run_plan_prints_optimizer_commands(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
     journal = epoch_grind.initialize_journal(manifest)
     config = epoch_grind.DriverConfig(
@@ -225,9 +335,40 @@ def test_dry_run_plan_prints_optimizer_commands(tmp_path: Path, capsys: pytest.C
     assert code == 0
     payload = json.loads(capsys.readouterr().out)
     command = payload["jobs"][0]["command"]
+    profile_arg = command[command.index("--profile") + 1]
+    assert profile_arg.endswith("epoch-0001/profiles/job-a.profile.json")
+    assert not Path(profile_arg).exists()
+    assert payload["jobs"][0]["would_write_profile"]["path"] == profile_arg
+    assert payload["jobs"][0]["would_write_profile"]["content"]["run"][
+        "reduced_real_cache"
+    ]["db_path"].endswith("epoch-0001/shards/job-a.sqlite")
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+            lambda *args, **kwargs: {"rows_after": 1000},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
+    )
+    real_epoch = epoch_grind.run_epoch(
+        manifest,
+        manifest.jobs,
+        config,
+        epoch_index=1,
+    )
+    real_command = real_epoch["attempted_jobs"][0]["command"]
+
+    assert command == real_command
     assert command[:5] == ["nice", "-n", "15", "/venv/bin/python", "-m"]
     assert "simulator.optimize" in command
     assert payload["jobs"][0]["shard_db"].endswith("epoch-0001/shards/job-a.sqlite")
+    profile = json.loads(Path(profile_arg).read_text(encoding="utf-8"))
+    assert profile["run"]["reduced_real_cache"]["db_path"].endswith(
+        "epoch-0001/shards/job-a.sqlite"
+    )
 
 
 def test_schema_gate_passthrough_from_merge(tmp_path: Path) -> None:
@@ -256,6 +397,95 @@ def test_write_epoch_profile_overlays_cache_db(tmp_path: Path) -> None:
     assert profile["run"]["reduced_real_cache"]["db_path"] == str(shard)
 
 
+def test_timeboxed_child_stays_pending_and_mergeable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"rows_after": 1000},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="timed_out"),
+    )
+
+    result = epoch_grind.run_epoch(manifest, manifest.jobs, config, epoch_index=1)
+    journal = epoch_grind.initialize_journal(manifest)
+    epoch_grind._apply_epoch_result(journal, result)
+
+    assert result["timed_out_jobs"] == ["job-a"]
+    assert result["completed_jobs"] == []
+    assert result["failed_jobs"] == []
+    assert result["shard_dbs"] == [
+        str(manifest.work_dir / "epoch-0001" / "shards" / "job-a.sqlite")
+    ]
+    assert result["seed_rows_by_shard"][result["shard_dbs"][0]] == 1000
+    assert [job.id for job in epoch_grind.pending_jobs(manifest, journal)] == ["job-a"]
+
+
+def test_run_child_classifies_child_owned_rc_124_as_failure(tmp_path: Path) -> None:
+    outcome = epoch_grind._run_child(
+        [sys.executable, "-c", "raise SystemExit(124)"],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(kind="failed", returncode=124)
+
+
+def test_child_owned_rc_124_is_failed_and_excluded_from_merge(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"rows_after": 1000},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="failed", returncode=124),
+    )
+
+    result = epoch_grind.run_epoch(manifest, manifest.jobs, config, epoch_index=1)
+    journal = epoch_grind.initialize_journal(manifest)
+    epoch_grind._apply_epoch_result(journal, result)
+
+    assert result["timed_out_jobs"] == []
+    assert result["completed_jobs"] == []
+    assert result["shard_dbs"] == []
+    assert result["seed_rows_by_shard"] == {}
+    assert result["failed_jobs"][0]["id"] == "job-a"
+    assert result["failed_jobs"][0]["returncode"] == 124
+    with pytest.raises(RuntimeError, match="journal has failed jobs: job-a"):
+        epoch_grind.pending_jobs(manifest, journal)
+
+
 def test_failed_epoch_is_journaled_before_return(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -271,25 +501,27 @@ def test_failed_epoch_is_journaled_before_return(
         nice=15,
     )
 
+    merged_shards: list[Path] = []
+
     monkeypatch.setattr(
         epoch_grind,
-        "run_epoch",
-        lambda *args, **kwargs: {
-            "epoch": 1,
-            "completed_jobs": [],
-            "failed_jobs": [{"id": "job-a"}],
-            "timed_out_jobs": [],
-            "attempted_jobs": [],
-            "shard_dbs": [],
-        },
+        "seed_job_cache",
+        lambda *args, **kwargs: {"rows_after": 1000},
     )
     monkeypatch.setattr(
         epoch_grind,
-        "merge_epoch_shards",
-        lambda *args, **kwargs: {"inserted_rows": 0, "sources": []},
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="failed", returncode=2),
     )
+
+    def merge_recorder(base: Path, shard_paths: list[Path], **kwargs: object) -> dict[str, object]:
+        merged_shards.extend(shard_paths)
+        return {"inserted_rows": 0, "sources": []}
+
+    monkeypatch.setattr(epoch_grind, "merge_epoch_shards", merge_recorder)
 
     assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == 2
     journal = json.loads(journal_path.read_text(encoding="utf-8"))
     assert journal["decision"] == epoch_grind.DECISION_FAILED
     assert journal["jobs"][0]["status"] == "failed"
+    assert merged_shards == []
