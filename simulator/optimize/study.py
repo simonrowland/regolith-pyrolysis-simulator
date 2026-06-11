@@ -70,6 +70,22 @@ WINNER_SELECTION_RULE = (
     "objectives in order using their declared directions, then cache_key, "
     "then candidate_id"
 )
+_TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
+    {
+        "campaigns_to_resinter",
+        "wall_deposit_kg_by_segment_species",
+        "wall_deposit_kg_by_zone_species",
+        "wall_deposit_kg",
+        "fouling_rate",
+    }
+)
+_COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
+    {
+        "campaigns_to_resinter": "campaigns_to_resinter",
+        "wall_deposit_kg_by_segment_species": "wall_deposit_kg_by_segment_species_json",
+        "wall_deposit_kg_by_zone_species": "wall_deposit_kg_by_zone_species_json",
+    }
+)
 DEFAULT_PROFILE_NAME = "default"
 DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
     {
@@ -369,7 +385,7 @@ def run(
                 records.append(record)
                 provenance.write(
                     json.dumps(
-                        _record_payload(record, active_schema),
+                        _record_payload(record, active_schema, resolved_profile),
                         sort_keys=True,
                         separators=(",", ":"),
                         allow_nan=False,
@@ -1179,7 +1195,49 @@ def _margin_payload(margin: Any) -> Mapping[str, Any]:
 def _product_summary_mapping(reference: RunReference | None) -> Mapping[str, Any]:
     if reference is None:
         return MappingProxyType({})
-    return MappingProxyType(dict(reference.product_summary))
+    summary = dict(reference.product_summary)
+    if _tap_truncated_composition_payload(reference):
+        _apply_tap_coating_product_summary(
+            summary,
+            _tap_truncated_product_summary(reference),
+        )
+    return MappingProxyType(summary)
+
+
+def _tap_truncated_product_summary(reference: RunReference) -> Mapping[str, Any]:
+    payload = _tap_truncated_composition_payload(reference)
+    if not payload:
+        return MappingProxyType({})
+    summary = payload.get("tap_coating_product_summary")
+    return summary if isinstance(summary, Mapping) else MappingProxyType({})
+
+
+def _tap_truncated_composition_payload(reference: RunReference) -> Mapping[str, Any]:
+    trace = reference.trace
+    if not isinstance(trace, Mapping):
+        return MappingProxyType({})
+    payload = trace.get("composition_target")
+    if not isinstance(payload, Mapping) or not _is_tap_truncated(payload):
+        return MappingProxyType({})
+    return payload
+
+
+def _apply_tap_coating_product_summary(
+    summary: dict[str, Any],
+    tap_summary: Mapping[str, Any],
+) -> None:
+    terminal_fields = sorted(
+        key for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS if key in summary
+    )
+    missing = [key for key in terminal_fields if key not in tap_summary]
+    if missing:
+        raise StudyAbort(
+            "tap-truncated coating projection missing hour-basis field(s): "
+            + ", ".join(missing)
+        )
+    for key in _TAP_COATING_PRODUCT_SUMMARY_FIELDS:
+        if key in tap_summary:
+            summary[key] = tap_summary[key]
 
 
 def _trace_summary_mapping(reference: RunReference | None) -> Mapping[str, Any]:
@@ -1205,6 +1263,7 @@ def _light_backend_status_trace_for_reference(
             "out_of_domain_crash_point",
             "rump_terminal",
             "terminal_rump_by_species_kg",
+            "composition_target",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
@@ -1222,18 +1281,9 @@ def _failure_counts(records: Sequence[StudyRecord]) -> Mapping[str, int]:
 
 def _coating_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
     fields: list[str] = []
-    if any("campaigns_to_resinter" in record.product_summary for record in records):
-        fields.append("campaigns_to_resinter")
-    if any(
-        "wall_deposit_kg_by_segment_species" in record.product_summary
-        for record in records
-    ):
-        fields.append("wall_deposit_kg_by_segment_species_json")
-    if any(
-        "wall_deposit_kg_by_zone_species" in record.product_summary
-        for record in records
-    ):
-        fields.append("wall_deposit_kg_by_zone_species_json")
+    for summary_key, csv_key in _COATING_LEADERBOARD_FIELDS.items():
+        if any(summary_key in record.product_summary for record in records):
+            fields.append(csv_key)
     return tuple(fields)
 
 
@@ -1264,6 +1314,11 @@ def _composition_target_leaderboard_fields(records: Sequence[StudyRecord]) -> tu
         "certified_envelope_json",
         "preference_score",
         "target_spec_digest",
+        "best_tap_enabled",
+        "tap_hour",
+        "tap_provenance",
+        "tap_certified",
+        "tap_knife_edge",
     )
 
 
@@ -1285,6 +1340,15 @@ def _composition_target_leaderboard_row(
             else payload["preference_score"]
         ),
         "target_spec_digest": str(payload.get("target_spec_digest", "")),
+        "best_tap_enabled": bool(payload.get("best_tap_enabled", False)),
+        "tap_hour": payload.get("tap_hour", ""),
+        "tap_provenance": str(payload.get("tap_provenance", "")),
+        "tap_certified": (
+            "" if "certified" not in payload else bool(payload.get("certified"))
+        ),
+        "tap_knife_edge": (
+            "" if "knife_edge" not in payload else bool(payload.get("knife_edge"))
+        ),
     }
 
 
@@ -1369,6 +1433,7 @@ def _write_artifacts(
     pareto_path = out / "pareto.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
+    tap_sidecar_path = out / "winner.tap-truncated.json"
     pareto_payload = dict(
         _pareto_payload(profile, feedstock, fidelity, definitions, pareto, winner, schema)
     )
@@ -1383,16 +1448,170 @@ def _write_artifacts(
         + "\n",
         encoding="utf-8",
     )
-    _write_leaderboard(leaderboard_path, leaderboard, pareto, winner, definitions, schema)
+    _write_leaderboard(
+        leaderboard_path,
+        leaderboard,
+        pareto,
+        winner,
+        definitions,
+        schema,
+        profile=profile,
+    )
+    winner_patch = _materialized_winner_patch(winner, schema, profile)
     winner_path.write_text(
-        yaml.safe_dump(schema.to_setpoints_patch(winner.patch), sort_keys=True),
+        yaml.safe_dump(winner_patch, sort_keys=True),
         encoding="utf-8",
     )
-    return {
+    artifacts = {
         "pareto": pareto_path,
         "leaderboard": leaderboard_path,
         "winner": winner_path,
     }
+    tap_sidecar = _tap_truncated_sidecar(
+        winner,
+        winner_patch,
+        schema.to_setpoints_patch(winner.patch),
+    )
+    if tap_sidecar is not None:
+        tap_sidecar_path.write_text(
+            json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+        artifacts["winner_tap_truncated"] = tap_sidecar_path
+    return artifacts
+
+
+_TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(
+    {
+        "C0B": ("campaigns", "C0b_p_cleanup", "duration_h"),
+        "C0b_p_cleanup": ("campaigns", "C0b_p_cleanup", "duration_h"),
+        "C2A": ("campaigns", "C2A_continuous", "duration_h"),
+        "C2A_continuous": ("campaigns", "C2A_continuous", "duration_h"),
+    }
+)
+_UNSUPPORTED_TAP_TRUNCATION_CAMPAIGNS = frozenset(
+    {
+        "C2A_STAGED",
+        "C2A_staged",
+        "C3",
+        "C3_K",
+        "C3_NA",
+        "C5",
+    }
+)
+
+
+def _materialized_winner_patch(
+    winner: StudyRecord,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    return _materialized_record_patch(winner, schema, profile)
+
+
+def _materialized_record_patch(
+    record: StudyRecord,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    parent_patch = schema.to_setpoints_patch(record.patch)
+    payload = _composition_target_payload(record)
+    if not _is_tap_truncated(payload):
+        return parent_patch
+    if profile is None:
+        raise StudyAbort(
+            "tap-truncated row cannot be serialized without profile context"
+        )
+    return _tap_truncated_materialized_patch(record, schema, profile, payload)
+
+
+def _tap_truncated_materialized_patch(
+    record: StudyRecord,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+    payload: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    tap_hour = _positive_int(payload.get("tap_hour"), "tap_hour")
+    path = _tap_duration_path(payload, profile)
+    values = dict(record.patch.values)
+    values[path] = float(tap_hour)
+    return schema.to_setpoints_patch(RecipePatch(values))
+
+
+def _tap_truncated_sidecar(
+    winner: StudyRecord,
+    recipe_patch: Mapping[str, Any],
+    parent_patch: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    payload = _composition_target_payload(winner)
+    if not _is_tap_truncated(payload):
+        return None
+    return {
+        "candidate_id": winner.candidate_id,
+        "provenance": "tap_truncated",
+        "recipe": _jsonable_value(recipe_patch),
+        "materialized_patch": _jsonable_value(recipe_patch),
+        "parent_trajectory_patch": _jsonable_value(parent_patch),
+        "operator_instruction": _jsonable_value(payload.get("operator_instruction", {})),
+        "tap_grade_report": _jsonable_value(payload.get("tap_grade_report", {})),
+        "tap_coating_product_summary": _jsonable_value(
+            payload.get("tap_coating_product_summary", {})
+        ),
+        "tap_hour": payload.get("tap_hour"),
+        "configured_hours": payload.get("configured_hours"),
+        "tap_score_curve": _jsonable_value(payload.get("tap_score_curve", [])),
+    }
+
+
+def _composition_target_payload(record: StudyRecord) -> Mapping[str, Any]:
+    payload = record.trace_summary.get("composition_target")
+    return payload if isinstance(payload, Mapping) else MappingProxyType({})
+
+
+def _is_tap_truncated(payload: Mapping[str, Any]) -> bool:
+    return bool(payload) and str(payload.get("tap_provenance", "")) == "tap_truncated"
+
+
+def _tap_duration_path(
+    payload: Mapping[str, Any],
+    profile: Mapping[str, Any],
+) -> tuple[str, ...]:
+    instruction = payload.get("operator_instruction", {})
+    candidates: list[str] = []
+    if isinstance(instruction, Mapping):
+        candidates.extend(
+            str(instruction.get(key, ""))
+            for key in ("configured_campaign", "phase_at_tap")
+            if instruction.get(key)
+        )
+    run = profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
+    if run.get("campaign"):
+        candidates.append(str(run["campaign"]))
+    for candidate in candidates:
+        path = _TAP_TRUNCATION_DURATION_PATHS.get(candidate)
+        if path is not None:
+            return path
+    unsupported = [candidate for candidate in candidates if candidate in _UNSUPPORTED_TAP_TRUNCATION_CAMPAIGNS]
+    if unsupported:
+        raise StudyAbort(
+            "tap-truncated winner cannot be faithfully materialized via the "
+            f"recipe schema for staged/dosed campaign {unsupported[0]!r}; "
+            "refusing to emit a non-reproducing recipe"
+        )
+    raise StudyAbort(
+        "tap-truncated winner cannot be materialized as a schema-valid recipe "
+        f"for campaign candidates {candidates!r}"
+    )
+
+
+def _positive_int(value: Any, label: str) -> int:
+    try:
+        numeric = int(value)
+    except (TypeError, ValueError) as exc:
+        raise StudyAbort(f"{label} must be an integer") from exc
+    if numeric <= 0:
+        raise StudyAbort(f"{label} must be positive")
+    return numeric
 
 
 def _write_empty_artifacts(
@@ -1438,7 +1657,7 @@ def _pareto_payload(
         "feedstock": feedstock,
         "fidelity": fidelity,
         "objectives": [_definition_payload(definition) for definition in definitions],
-        "pareto": [_record_payload(record, schema) for record in pareto],
+        "pareto": [_record_payload(record, schema, profile) for record in pareto],
         "profile": profile_id(profile),
         "selection_rule": WINNER_SELECTION_RULE,
         "winner_candidate_id": winner.candidate_id,
@@ -1454,6 +1673,34 @@ def _definition_payload(definition: ObjectiveDefinition) -> Mapping[str, Any]:
     }
 
 
+def _materialized_patch_leaderboard_fields(
+    records: Sequence[StudyRecord],
+) -> tuple[str, ...]:
+    if not any(_is_tap_truncated(_composition_target_payload(record)) for record in records):
+        return ()
+    return ("materialized_patch_json", "parent_trajectory_patch_json")
+
+
+def _materialized_patch_leaderboard_row(
+    record: StudyRecord,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any] | None,
+    fields: Sequence[str],
+) -> dict[str, Any]:
+    if not fields:
+        return {}
+    if not _is_tap_truncated(_composition_target_payload(record)):
+        return {field: "" for field in fields}
+    materialized = _materialized_record_patch(record, schema, profile)
+    # Tap rows make the tap-hour patch primary; parent_trajectory_patch_json keeps the full-run metadata.
+    return {
+        "materialized_patch_json": _json_dump_value(materialized),
+        "parent_trajectory_patch_json": _json_dump_value(
+            schema.to_setpoints_patch(record.patch)
+        ),
+    }
+
+
 def _write_leaderboard(
     path: Path,
     leaderboard: Sequence[StudyRecord],
@@ -1461,11 +1708,14 @@ def _write_leaderboard(
     winner: StudyRecord | None,
     definitions: Sequence[ObjectiveDefinition],
     schema: RecipeSchema,
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> None:
     pareto_ids = {record.candidate_id for record in pareto}
     margin_names = sorted({name for record in leaderboard for name in record.feasibility_margins})
     coating_fields = _coating_leaderboard_fields(leaderboard)
     composition_target_fields = _composition_target_leaderboard_fields(leaderboard)
+    materialized_patch_fields = _materialized_patch_leaderboard_fields(leaderboard)
     fieldnames = [
         "rank",
         "candidate_id",
@@ -1476,6 +1726,7 @@ def _write_leaderboard(
         *(f"margin_{name}" for name in margin_names),
         *coating_fields,
         *composition_target_fields,
+        *materialized_patch_fields,
         "patch_json",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
@@ -1488,11 +1739,9 @@ def _write_leaderboard(
                 "cache_key": record.cache_key or "",
                 "is_pareto": record.candidate_id in pareto_ids,
                 "is_winner": bool(winner and record.candidate_id == winner.candidate_id),
-                "patch_json": json.dumps(
-                    schema.to_setpoints_patch(record.patch),
-                    sort_keys=True,
-                    separators=(",", ":"),
-                    allow_nan=False,
+                # For tap rows, patch_json is the materialized tap-hour patch, not the parent trajectory.
+                "patch_json": _json_dump_value(
+                    _materialized_record_patch(record, schema, profile)
                 ),
             }
             row.update({definition.metric: record.objectives[definition.metric] for definition in definitions})
@@ -1505,11 +1754,24 @@ def _write_leaderboard(
             )
             row.update(_coating_leaderboard_row(record, coating_fields))
             row.update(_composition_target_leaderboard_row(record, composition_target_fields))
+            row.update(
+                _materialized_patch_leaderboard_row(
+                    record,
+                    schema,
+                    profile,
+                    materialized_patch_fields,
+                )
+            )
             writer.writerow(row)
 
 
-def _record_payload(record: StudyRecord, schema: RecipeSchema) -> Mapping[str, Any]:
-    return {
+def _record_payload(
+    record: StudyRecord,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    patch = _materialized_record_patch(record, schema, profile)
+    payload = {
         "cache_hit": record.cache_hit,
         "cache_key": record.cache_key,
         "candidate_id": record.candidate_id,
@@ -1521,11 +1783,16 @@ def _record_payload(record: StudyRecord, schema: RecipeSchema) -> Mapping[str, A
         "feasible": record.feasible,
         "notes": list(record.notes),
         "objectives": dict(record.objectives),
-        "patch": schema.to_setpoints_patch(record.patch),
+        "patch": patch,
         "product_summary": _jsonable_value(record.product_summary),
         "trace_summary": _jsonable_value(record.trace_summary),
         "status": record.status,
     }
+    if _is_tap_truncated(_composition_target_payload(record)):
+        # Tap rows serialize materialized patch as primary; parent_trajectory_patch preserves metadata.
+        payload["materialized_patch"] = patch
+        payload["parent_trajectory_patch"] = schema.to_setpoints_patch(record.patch)
+    return payload
 
 
 def profile_id(profile: Mapping[str, Any]) -> str:

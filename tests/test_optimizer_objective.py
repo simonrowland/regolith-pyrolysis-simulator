@@ -686,6 +686,387 @@ def test_composition_targets_require_coating_honors_explicit_opt_out() -> None:
     assert composition_targets_require_coating(profile) is False
 
 
+def test_best_tap_digest_changes_when_enabled() -> None:
+    base = _composition_score_profile("residual_rump_at_stop")
+    enabled = _composition_score_profile(
+        "residual_rump_at_stop",
+        maturity={"best_tap": {"enabled": True}},
+    )
+
+    assert composition_target_eval_metadata(base)["target_spec_digest"] != (
+        composition_target_eval_metadata(enabled)["target_spec_digest"]
+    )
+
+
+def test_best_tap_selects_single_intermediate_hour_with_grade_report() -> None:
+    snapshots = (
+        _tap_snapshot(1, {"SiO2": 80.0, "CaO": 20.0}, stage_delta={(1, "Fe"): 1.0}),
+        _tap_snapshot(
+            2,
+            {"SiO2": 50.0, "CaO": 50.0},
+            stage_delta={(3, "SiO2"): 3.0, (4, "Na"): 1.0, (4, "Mg"): 1.0},
+        ),
+        _tap_snapshot(3, {"SiO2": 20.0, "CaO": 80.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 3)
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+    grade = evidence["tap_grade_report"]
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
+    assert evidence["tap_hour"] == 2
+    assert evidence["configured_hours"] == 3
+    assert evidence["tap_provenance"] == "tap_truncated"
+    assert evidence["pool_snapshot_hour"] == 2
+    assert evidence["operator_instruction"]["phase_at_tap"] == "C2A"
+    assert evidence["operator_instruction"]["pN2_mbar"] == pytest.approx(10.0)
+    assert evidence["operator_instruction"]["sweep_setting"] == "millibar_sweep"
+    assert evidence["knife_edge"] is True
+    assert evidence["certified"] is False
+    assert [entry["hour"] for entry in evidence["tap_score_curve"]] == [1, 2, 3]
+    assert sum(grade["melt_tap"]["oxide_wt_pct"].values()) == pytest.approx(100.0)
+    assert "2" not in grade["distillation_train_taps"]
+    stage3 = grade["distillation_train_taps"]["3"]
+    assert stage3["dominant_species"] == "SiO2"
+    assert stage3["dominant_species_purity_pct"] == pytest.approx(100.0)
+    stage4 = grade["distillation_train_taps"]["4"]
+    assert sum(stage4["species_wt_pct"].values()) == pytest.approx(100.0)
+
+    truncated_profile = {
+        **profile,
+        "run": {**profile["run"], "hours": 2},
+        "fidelities": {"stub": {**profile["fidelities"]["stub"], "hours": 2}},
+    }
+    truncated_run = _tap_run(snapshots[:2], configured_hours=2)
+    reproduced = compute_objectives(truncated_profile, truncated_run)
+    reproduced_evidence = reproduced.evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    assert reproduced.as_mapping()["composition_target:pool-test"] == pytest.approx(
+        objectives.as_mapping()["composition_target:pool-test"]
+    )
+    assert reproduced_evidence["resolved_composition"] == evidence["resolved_composition"]
+    assert [row["pass"] for row in reproduced_evidence["rows"]] == [
+        row["pass"] for row in evidence["rows"]
+    ]
+
+
+def test_best_tap_dwell_can_prefer_later_certified_tie() -> None:
+    snapshots = (
+        _tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(2, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(3, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(4, {"SiO2": 80.0, "CaO": 20.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=4)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 4)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+
+    assert evidence["tap_hour"] == 3
+    assert evidence["certified"] is True
+    assert evidence["knife_edge"] is False
+
+
+def test_best_tap_nonterminal_captured_pool_fails_loud_without_note() -> None:
+    snapshots = (
+        _tap_snapshot(1, {}, melt_mass_kg=0.0, stage_delta={(3, "SiO2"): 10.0}),
+        _tap_snapshot(2, {}, melt_mass_kg=0.0),
+        _tap_snapshot(3, {}, melt_mass_kg=0.0),
+    )
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _captured_extraction_profile(
+        {"best_tap": {"enabled": True, "tap_stability_hours": 2}},
+    )
+    _set_profile_hours(profile, 3)
+
+    with pytest.raises(ObjectiveComputationError, match="non-terminal captured-pool"):
+        compute_objectives(profile, run)
+
+
+def test_best_tap_nonterminal_captured_pool_can_emit_explicit_note() -> None:
+    snapshots = (
+        _tap_snapshot(1, {}, melt_mass_kg=0.0, stage_delta={(3, "SiO2"): 10.0}),
+        _tap_snapshot(2, {}, melt_mass_kg=0.0),
+        _tap_snapshot(3, {}, melt_mass_kg=0.0),
+    )
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _captured_extraction_profile(
+        {
+            "best_tap": {
+                "enabled": True,
+                "tap_stability_hours": 2,
+                "captured_pool_nonterminal_policy": "allow_with_note",
+            }
+        },
+    )
+    _set_profile_hours(profile, 3)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+
+    assert evidence["tap_hour"] == 2
+    assert evidence["tap_provenance"] == "tap_truncated"
+    assert evidence["nonterminal_captured_pool_note"] == (
+        "target pool-test selected captured-pool tap for pool captured_products "
+        "at hour 2 of configured 3"
+    )
+
+
+def test_best_tap_coating_summary_uses_tap_hour_not_terminal_deposit() -> None:
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 80.0, "CaO": 20.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 0.001},
+        ),
+        _tap_snapshot(2, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(
+            3,
+            {"SiO2": 20.0, "CaO": 80.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 100.0},
+        ),
+    )
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 3)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    coating = evidence["tap_coating_product_summary"]
+
+    assert evidence["tap_hour"] == 2
+    assert coating["wall_deposit_kg_by_segment_species"]["stage_1_to_stage_2"]["SiO"] == pytest.approx(0.001)
+    assert coating["wall_deposit_kg_by_zone_species"]["Hot"]["SiO"] == pytest.approx(0.001)
+    assert "0.001" in coating["campaigns_to_resinter"]
+    assert "100" not in coating["campaigns_to_resinter"]
+
+
+def test_best_tap_clean_coating_summary_emits_complete_empty_fields() -> None:
+    snapshots = (
+        _tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(
+            2,
+            {"SiO2": 20.0, "CaO": 80.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 100.0},
+        ),
+    )
+    run = _tap_run(snapshots, configured_hours=2)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 2)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    coating = evidence["tap_coating_product_summary"]
+
+    assert evidence["tap_hour"] == 1
+    assert coating["campaigns_to_resinter"] == "infinite"
+    assert coating["wall_deposit_kg_by_segment_species"] == {}
+    assert coating["wall_deposit_kg_by_zone_species"] == {}
+
+
+def test_best_tap_coating_summary_carries_violation_present_at_tap_hour() -> None:
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 80.0, "CaO": 20.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 100.0},
+        ),
+        _tap_snapshot(2, {"SiO2": 50.0, "CaO": 50.0}),
+        _tap_snapshot(3, {"SiO2": 20.0, "CaO": 80.0}),
+    )
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 3)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    coating = evidence["tap_coating_product_summary"]
+
+    assert evidence["tap_hour"] == 2
+    assert coating["wall_deposit_kg_by_segment_species"]["stage_1_to_stage_2"]["SiO"] == pytest.approx(100.0)
+    assert "100" in coating["campaigns_to_resinter"]
+
+
+def test_best_tap_missing_requested_grid_hour_fails_loud() -> None:
+    snapshots = (_tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),)
+    run = _tap_run(snapshots, configured_hours=3)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True, "tap_grid": [1, 2]}},
+    )
+    _set_profile_hours(profile, 3)
+
+    with pytest.raises(ObjectiveComputationError, match=r"missing hours: \[2\]"):
+        compute_objectives(profile, run)
+
+
+def test_best_tap_grade_basis_divergence_fails_loud() -> None:
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 50.0, "CaO": 50.0},
+            inventory_melt_oxide_kg={"SiO2": 90.0, "CaO": 10.0},
+        ),
+    )
+    run = _tap_run(snapshots, configured_hours=1)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 1)
+
+    with pytest.raises(ObjectiveComputationError, match="grade basis diverges"):
+        compute_objectives(profile, run)
+
+
+def test_best_tap_grade_basis_tolerates_float_noise_edge() -> None:
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 50.0, "CaO": 50.0},
+            inventory_melt_oxide_kg={"SiO2": 50.000002, "CaO": 49.999998},
+        ),
+    )
+    run = _tap_run(snapshots, configured_hours=1)
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True}},
+    )
+    _set_profile_hours(profile, 1)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+
+    assert evidence["tap_hour"] == 1
+
+
+def _tap_snapshot(
+    hour: int,
+    composition_wt_pct: dict[str, float],
+    *,
+    melt_mass_kg: float = 100.0,
+    stage_delta: dict[tuple[int, str], float] | None = None,
+    wall_delta: dict[tuple[str, str], float] | None = None,
+    inventory_melt_oxide_kg: dict[str, float] | None = None,
+):
+    return SimpleNamespace(
+        hour=hour,
+        campaign=SimpleNamespace(name="C2A"),
+        temperature_C=1200.0 + hour,
+        melt_mass_kg=melt_mass_kg,
+        composition_wt_pct=composition_wt_pct,
+        inventory=SimpleNamespace(melt_oxide_kg=dict(inventory_melt_oxide_kg or {})),
+        overhead=SimpleNamespace(composition={"O2": 0.25, "N2": 10.0}),
+        condensed_by_stage_species_delta=dict(stage_delta or {}),
+        wall_deposit_by_segment_species_delta=dict(wall_delta or {}),
+        sweep_setting="millibar_sweep",
+    )
+
+
+def _tap_run(snapshots, *, configured_hours: int):
+    sim = _CompositionSim(cleaned_melt={"SiO2": 1.0}, stage3_kg={})
+    sim.record.total_hours = configured_hours
+    return SimpleNamespace(
+        simulator=sim,
+        snapshots=tuple(snapshots),
+        trace=SimpleNamespace(
+            snapshots=tuple(snapshots),
+            wall_zone_by_segment={"stage_1_to_stage_2": "Hot"},
+        ),
+        per_hour=tuple(
+            {
+                "hour": snapshot.hour,
+                "campaign": snapshot.campaign.name,
+                "T_C": snapshot.temperature_C,
+                "reduced_real_cache_state": "cached_exact",
+            }
+            for snapshot in snapshots
+        ),
+        backend_status="ok",
+    )
+
+
+def _captured_extraction_profile(maturity: dict[str, object]) -> dict:
+    profile = _composition_score_profile(
+        "captured_products",
+        species_vector={"Si": "extract"},
+        extraction={
+            "basis": "input_element_mol",
+            "captured_pool": "captured_products",
+            "completeness_min": {"Si": 0.0001},
+        },
+        oxides=None,
+        score_weights={"extraction": 1.0, "composition": 0.0},
+        maturity=maturity,
+    )
+    del profile["objectives"][0]["target"]["composition_window"]
+    return profile
+
+
+def _set_profile_hours(profile: dict, hours: int) -> None:
+    profile["run"]["hours"] = hours
+    profile["fidelities"]["stub"]["hours"] = hours
+
+
 def _composition_score_profile(
     pool: str,
     *,
@@ -695,6 +1076,7 @@ def _composition_score_profile(
     species_vector: dict[str, str] | None = None,
     extraction: dict[str, object] | None = None,
     score_weights: dict[str, float] | None = None,
+    maturity: dict[str, object] | None = None,
 ) -> dict:
     window = {
         "pool": pool,
@@ -713,6 +1095,8 @@ def _composition_score_profile(
     }
     if extraction is not None:
         target["extraction"] = extraction
+    if maturity is not None:
+        target["maturity"] = maturity
     return {
         "profile_id": "composition-target-score-test",
         "profile_schema_version": "profile-schema-v1",

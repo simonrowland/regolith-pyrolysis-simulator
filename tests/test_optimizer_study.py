@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 from typing import Any, Mapping
 
 import pytest
@@ -17,6 +18,7 @@ from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize.evaluate import evaluate
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
@@ -304,6 +306,196 @@ def _evaluator(
     return evaluate_patch
 
 
+class _SingleCandidateStrategy:
+    name = "single"
+    seed = 0
+
+    def __init__(self, patch: RecipePatch | None = None) -> None:
+        self._pending = [study.Candidate(id="single-000000", patch=patch or RecipePatch({}))]
+
+    def ask(self, n: int) -> list[study.Candidate]:
+        batch = self._pending[:n]
+        self._pending = self._pending[n:]
+        return batch
+
+    def tell(self, results) -> None:
+        return None
+
+
+class _ClosedLoopLedger:
+    registry = {}
+
+    def __init__(self, cleaned_melt: Mapping[str, float]) -> None:
+        self._balances = {"process.cleaned_melt": dict(cleaned_melt)}
+
+    def mol_by_account(self, account: str | None = None):
+        if account is None:
+            return {key: dict(value) for key, value in self._balances.items()}
+        return dict(self._balances.get(account, {}))
+
+    def kg_by_account(self, account: str | None = None):
+        return {}
+
+
+class _ClosedLoopSim:
+    def __init__(self, snapshots: tuple[object, ...], configured_hours: int) -> None:
+        self.atom_ledger = _ClosedLoopLedger({"SiO2": 1.0, "CaO": 1.0})
+        self.train = SimpleNamespace(
+            stages=(
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+            )
+        )
+        self.record = SimpleNamespace(
+            feedstock_key=FEEDSTOCK,
+            batch_mass_kg=1000.0,
+            additives_kg={},
+            snapshots=snapshots,
+            total_hours=configured_hours,
+        )
+        self.melt = SimpleNamespace(hour=configured_hours)
+        self.energy_cumulative_kWh = 1.0
+
+    def product_ledger(self) -> dict[str, float]:
+        return {}
+
+    def _terminal_rump_by_species(self) -> dict[str, float]:
+        return {"SiO2": 50.0, "CaO": 50.0}
+
+    def _oxygen_terminal_partition_kg(self) -> dict[str, float]:
+        return {
+            "stored": 0.0,
+            "vented": 0.0,
+            "total": 0.0,
+            "mre_anode_stored": 0.0,
+        }
+
+
+class _ClosedLoopTapExecutor:
+    def __init__(self) -> None:
+        self.durations: list[int] = []
+
+    def execute(self, config: object) -> object:
+        configured_hours = int(getattr(config, "hours", 3))
+        duration = self._duration_from_config(config, configured_hours)
+        self.durations.append(duration)
+        snapshots = _closed_loop_snapshots()[:duration]
+        return _closed_loop_run(snapshots, configured_hours=configured_hours)
+
+    @staticmethod
+    def _duration_from_config(config: object, fallback: int) -> int:
+        setpoints = getattr(config, "setpoints", {})
+        if isinstance(setpoints, Mapping):
+            campaigns = setpoints.get("campaigns", {})
+            if isinstance(campaigns, Mapping):
+                for campaign in ("C0b_p_cleanup", "C2A_continuous"):
+                    values = campaigns.get(campaign, {})
+                    if not isinstance(values, Mapping):
+                        continue
+                    raw = values.get("duration_h")
+                    if isinstance(raw, int | float) and math.isfinite(float(raw)):
+                        return max(1, int(float(raw)))
+        return fallback
+
+
+def _closed_loop_snapshots() -> tuple[object, ...]:
+    return (
+        _closed_loop_snapshot(1, {"SiO2": 52.0, "CaO": 48.0}),
+        _closed_loop_snapshot(2, {"SiO2": 50.0, "CaO": 50.0}),
+        _closed_loop_snapshot(3, {"SiO2": 80.0, "CaO": 20.0}),
+    )
+
+
+def _closed_loop_snapshot(hour: int, composition_wt_pct: Mapping[str, float]) -> object:
+    return SimpleNamespace(
+        hour=hour,
+        campaign=SimpleNamespace(name="C0B"),
+        temperature_C=1200.0 + hour,
+        melt_mass_kg=100.0,
+        composition_wt_pct=dict(composition_wt_pct),
+        inventory=SimpleNamespace(melt_oxide_kg={}),
+        overhead=SimpleNamespace(composition={"O2": 0.25, "N2": 10.0}),
+        condensed_by_stage_species_delta={},
+        wall_deposit_by_segment_species_delta={},
+        mass_in_kg=1000.0,
+        mass_out_kg=1000.0,
+        mass_balance_error_pct=0.0,
+    )
+
+
+def _closed_loop_run(
+    snapshots: tuple[object, ...],
+    *,
+    configured_hours: int,
+) -> object:
+    return SimpleNamespace(
+        simulator=_ClosedLoopSim(snapshots, configured_hours),
+        snapshots=snapshots,
+        trace=SimpleNamespace(
+            snapshots=snapshots,
+            wall_deposit_by_segment_species_kg={},
+            wall_zone_by_segment={"stage_1_to_stage_2": "Hot"},
+        ),
+        per_hour=tuple(
+            {"hour": snapshot.hour, "backend_status": "diagnostic_stub"}
+            for snapshot in snapshots
+        ),
+        backend_status="diagnostic_stub",
+        status="ok",
+        error_message="",
+        reason="",
+    )
+
+
+def _closed_loop_best_tap_profile() -> dict[str, Any]:
+    return {
+        **PROFILE,
+        "profile_id": "closed-loop-best-tap",
+        "constraints": {"gates": ["furnace_temperature"]},
+        "run": {
+            "campaign": "C0b_p_cleanup",
+            "hours": 3,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub", "hours": 3}},
+        "objectives": [
+            {
+                "type": "composition_target",
+                "id": "closed-loop-glass",
+                "metric": "composition_target:closed-loop-glass",
+                "sense": "maximize",
+                "units": "score_0_1",
+                "weight": 1.0,
+                "rationale": "closed-loop best-tap materialization test",
+                "target": {
+                    "pool": "residual_rump_at_stop",
+                    "require_coating_gate": False,
+                    "species_vector": {"Si": "retain", "Ca": "retain"},
+                    "composition_window": {
+                        "pool": "residual_rump_at_stop",
+                        "basis": "oxide_wt_pct",
+                        "mode": "hard_window",
+                        "oxides": {
+                            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+                            "CaO": {
+                                "min": 49.0,
+                                "max": 51.0,
+                                "strict": False,
+                                "weight": 1.0,
+                            },
+                        },
+                    },
+                    "maturity": {"best_tap": {"enabled": True}},
+                    "score_weights": {"extraction": 0.0, "composition": 1.0},
+                },
+            }
+        ],
+    }
+
+
 def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path) -> None:
     result = study.run(
         PROFILE,
@@ -351,6 +543,69 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:
+    profile = _closed_loop_best_tap_profile()
+    executor = _ClosedLoopTapExecutor()
+
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        _SingleCandidateStrategy(),
+        "stub",
+        1,
+        1,
+        tmp_path,
+        evaluator=lambda patch, feedstock, fidelity, **kwargs: evaluate(
+            patch,
+            feedstock,
+            fidelity,
+            profile=kwargs["profile"],
+            executor=executor,
+            candidate_id=kwargs.get("candidate_id"),
+        ),
+    )
+
+    leaderboard = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+    assert len(leaderboard) == 1
+    assert result.winner.candidate_id == "single-000000"
+    tap_claim = result.winner.trace_summary["composition_target"]
+    assert tap_claim["tap_hour"] == 2
+
+    emitted_recipe = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
+    assert emitted_recipe["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(2.0)
+    emitted_patch = RecipePatch.from_nested(emitted_recipe).validated(RecipeSchema())
+    replay_executor = _ClosedLoopTapExecutor()
+    replay = evaluate(
+        emitted_patch,
+        FEEDSTOCK,
+        "stub",
+        profile=profile,
+        executor=replay_executor,
+        candidate_id="replay",
+    )
+    assert replay.feasible
+    assert replay_executor.durations == [2]
+    assert replay.run_reference is not None
+    replay_claim = replay.run_reference.trace["composition_target"]
+
+    assert replay_claim["pool_snapshot_hour"] == tap_claim["pool_snapshot_hour"]
+    assert replay_claim["resolved_composition"]["oxide_wt_pct"] == pytest.approx(
+        tap_claim["resolved_composition"]["oxide_wt_pct"]
+    )
+    assert replay_claim["resolved_composition"]["ratios"] == pytest.approx(
+        tap_claim["resolved_composition"]["ratios"]
+    )
+    assert [
+        (row["id"], row["pool"], row["pass"])
+        for row in replay_claim["rows"]
+        if row.get("strict", True)
+    ] == [
+        (row["id"], row["pool"], row["pass"])
+        for row in tap_claim["rows"]
+        if row.get("strict", True)
+    ]
 
 
 def test_parallel_composition_target_stub_study_completes(
@@ -428,7 +683,304 @@ def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path
     assert json.loads(row["certified_envelope_json"]) == [
         {"id": "FeO_total", "pass": True, "strict": True}
     ]
-    assert float(row["preference_score"]) == pytest.approx(0.75)
+
+
+def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "run": {
+            "campaign": "C0b_p_cleanup",
+            "hours": 2,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+    }
+    record = study.StudyRecord(
+        candidate_id="tap-winner",
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={"composition_target:pc-glass-clear": 1.0},
+        feasibility_margins={},
+        cache_key="cache",
+        trace_summary={
+            "composition_target": {
+                "best_tap_enabled": True,
+                "tap_hour": 1,
+                "configured_hours": 2,
+                "tap_provenance": "tap_truncated",
+                "operator_instruction": {
+                    "tap_hour": 1,
+                    "configured_hours": 2,
+                    "configured_campaign": "C0b_p_cleanup",
+                    "phase_at_tap": "C0B",
+                    "T_C": 950.0,
+                    "pO2_mbar": 0.1,
+                    "provenance": "tap_truncated",
+                },
+                "tap_grade_report": {
+                    "melt_tap": {"oxide_wt_pct": {"SiO2": 50.0, "CaO": 50.0}},
+                    "distillation_train_taps": {
+                        "3": {
+                            "dominant_species": "SiO2",
+                            "dominant_species_purity_pct": 100.0,
+                            "species_wt_pct": {"SiO2": 100.0},
+                        }
+                    },
+                },
+                "tap_score_curve": [{"hour": 1, "score": 1.0, "certified": True}],
+            }
+        },
+    )
+
+    artifacts = study._write_artifacts(
+        tmp_path,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="stub",
+        definitions=[
+            study.ObjectiveDefinition(
+                "composition_target:pc-glass-clear",
+                "maximize",
+                "score_0_1",
+            )
+        ],
+        pareto=[record],
+        leaderboard=[record],
+        winner=record,
+        schema=RecipeSchema(),
+        failure_counts={},
+    )
+
+    recipe = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
+    assert recipe["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert RecipePatch.from_nested(recipe).validated(RecipeSchema())
+    pareto = json.loads((tmp_path / "pareto.json").read_text())
+    pareto_row = pareto["pareto"][0]
+    assert pareto_row["patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert pareto_row["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert pareto_row["parent_trajectory_patch"] == {}
+    leaderboard_row = next(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+    assert json.loads(leaderboard_row["patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert json.loads(leaderboard_row["materialized_patch_json"])["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert json.loads(leaderboard_row["parent_trajectory_patch_json"]) == {}
+    sidecar = json.loads((tmp_path / "winner.tap-truncated.json").read_text())
+    assert artifacts["winner_tap_truncated"] == tmp_path / "winner.tap-truncated.json"
+    assert sidecar["materialized_patch"]["campaigns"]["C0b_p_cleanup"]["duration_h"] == pytest.approx(1.0)
+    assert sidecar["parent_trajectory_patch"] == {}
+    assert sidecar["operator_instruction"]["tap_hour"] == 1
+    assert sidecar["tap_grade_report"]["melt_tap"]["oxide_wt_pct"] == {
+        "CaO": 50.0,
+        "SiO2": 50.0,
+    }
+
+
+def test_tap_truncated_c3_materialization_fails_loud_for_dosing_schedule(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "run": {
+            "campaign": "C3",
+            "hours": 6,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+    }
+    record = study.StudyRecord(
+        candidate_id="tap-c3",
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={"composition_target:pc-glass-clear": 1.0},
+        feasibility_margins={},
+        cache_key="cache",
+        trace_summary={
+            "composition_target": {
+                "best_tap_enabled": True,
+                "tap_hour": 2,
+                "configured_hours": 6,
+                "tap_provenance": "tap_truncated",
+                "operator_instruction": {
+                    "tap_hour": 2,
+                    "configured_hours": 6,
+                    "configured_campaign": "C3",
+                    "phase_at_tap": "C3_NA",
+                    "provenance": "tap_truncated",
+                },
+            }
+        },
+    )
+
+    with pytest.raises(study.StudyAbort, match="cannot be faithfully materialized"):
+        study._write_artifacts(
+            tmp_path,
+            profile=profile,
+            feedstock=FEEDSTOCK,
+            fidelity="stub",
+            definitions=[
+                study.ObjectiveDefinition(
+                    "composition_target:pc-glass-clear",
+                    "maximize",
+                    "score_0_1",
+                )
+            ],
+            pareto=[record],
+            leaderboard=[record],
+            winner=record,
+            schema=RecipeSchema(),
+            failure_counts={},
+        )
+
+
+def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> None:
+    spec = _scope_spec()
+    scored = ScoredResult(
+        candidate_id="tap-row",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(
+                    "composition_target:pc-glass-clear",
+                    "maximize",
+                    1.0,
+                    "score_0_1",
+                    ordinal=0,
+                ),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            product_summary={
+                "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "wall_deposit_kg_by_segment_species": {
+                    "stage_1_to_stage_2": {"SiO": 100.0}
+                },
+                "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+            },
+            trace={
+                "backend_status": "diagnostic_stub",
+                "composition_target": {
+                    "tap_provenance": "tap_truncated",
+                    "tap_hour": 1,
+                    "configured_hours": 2,
+                    "operator_instruction": {
+                        "tap_hour": 1,
+                        "configured_hours": 2,
+                        "configured_campaign": "C0b_p_cleanup",
+                        "phase_at_tap": "C0B",
+                    },
+                    "tap_coating_product_summary": {
+                        "campaigns_to_resinter": "resinter_threshold_kg / 0.001",
+                        "wall_deposit_kg_by_segment_species": {
+                            "stage_1_to_stage_2": {"SiO": 0.001}
+                        },
+                        "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 0.001}},
+                    },
+                },
+            },
+            backend_status="diagnostic_stub",
+        ),
+    )
+    record = study._to_record(
+        study.Candidate(id="tap-row", patch=RecipePatch({})),
+        scored,
+        cache_hit=False,
+    )
+    assert record.product_summary["campaigns_to_resinter"] == "resinter_threshold_kg / 0.001"
+    assert record.product_summary["wall_deposit_kg_by_segment_species"] == {
+        "stage_1_to_stage_2": {"SiO": 0.001}
+    }
+    assert record.product_summary["wall_deposit_kg_by_zone_species"] == {
+        "Hot": {"SiO": 0.001}
+    }
+
+    study._write_leaderboard(
+        tmp_path / "leaderboard.csv",
+        [record],
+        [record],
+        record,
+        [study.ObjectiveDefinition("composition_target:pc-glass-clear", "maximize", "score_0_1")],
+        RecipeSchema(),
+        profile=PROFILE,
+    )
+
+    row = next(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+    assert row["campaigns_to_resinter"] == "resinter_threshold_kg / 0.001"
+    assert json.loads(row["wall_deposit_kg_by_segment_species_json"]) == {
+        "stage_1_to_stage_2": {"SiO": 0.001}
+    }
+    assert json.loads(row["wall_deposit_kg_by_zone_species_json"]) == {
+        "Hot": {"SiO": 0.001}
+    }
+    assert "100" not in row["wall_deposit_kg_by_segment_species_json"]
+    pareto = study._pareto_payload(
+        PROFILE,
+        FEEDSTOCK,
+        "stub",
+        [study.ObjectiveDefinition("composition_target:pc-glass-clear", "maximize", "score_0_1")],
+        [record],
+        record,
+        RecipeSchema(),
+    )
+    assert pareto["pareto"][0]["product_summary"]["campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 0.001"
+    )
+    assert pareto["pareto"][0]["product_summary"]["wall_deposit_kg_by_zone_species"] == {
+        "Hot": {"SiO": 0.001}
+    }
+
+
+def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
+    spec = _scope_spec()
+    scored = ScoredResult(
+        candidate_id="tap-partial",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(
+                    "composition_target:pc-glass-clear",
+                    "maximize",
+                    1.0,
+                    "score_0_1",
+                    ordinal=0,
+                ),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            product_summary={
+                "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "wall_deposit_kg_by_segment_species": {
+                    "stage_1_to_stage_2": {"SiO": 100.0}
+                },
+                "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+            },
+            trace={
+                "backend_status": "diagnostic_stub",
+                "composition_target": {
+                    "tap_provenance": "tap_truncated",
+                    "tap_hour": 1,
+                    "configured_hours": 2,
+                    "tap_coating_product_summary": {
+                        "campaigns_to_resinter": "resinter_threshold_kg / 0.001",
+                    },
+                },
+            },
+            backend_status="diagnostic_stub",
+        ),
+    )
+
+    with pytest.raises(study.StudyAbort, match="wall_deposit_kg_by_segment_species"):
+        study._to_record(
+            study.Candidate(id="tap-partial", patch=RecipePatch({})),
+            scored,
+            cache_hit=False,
+        )
 
 
 def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path) -> None:

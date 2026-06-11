@@ -76,7 +76,17 @@ _RATIO_ROW_KEYS = frozenset(
         "provenance",
     }
 )
-_MATURITY_KEYS = frozenset({"mode", "campaign", "hours"})
+_MATURITY_KEYS = frozenset({"mode", "campaign", "hours", "best_tap"})
+_BEST_TAP_KEYS = frozenset(
+    {
+        "enabled",
+        "tap_grid",
+        "tap_stability_hours",
+        "dwell_policy",
+        "captured_pool_nonterminal_policy",
+        "nonterminal_captured_pool_note",
+    }
+)
 _TARGET_CONSTRAINT_KEYS = frozenset(
     {"coating_min_campaigns_to_resinter", "furnace_T_max_C"}
 )
@@ -134,6 +144,8 @@ _VENTED_PRODUCT_ACCOUNTS = frozenset(
 # which emits unspent_<element>_reagent entries for additive bookkeeping.
 CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS = ("unspent_*_reagent",)
 _EPS = 1.0e-12
+_SNAPSHOT_GRADE_WT_ABS_TOL = 1.0e-6
+_SNAPSHOT_GRADE_WT_REL_TOL = 1.0e-7
 _OBJECTIVE_SENSE_ALIASES = {
     "min": "minimize",
     "minimum": "minimize",
@@ -474,7 +486,12 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         window=window,
         where=f"{where}.score_weights",
     )
-    maturity = _normalize_maturity(raw.get("maturity", {}), where=f"{where}.maturity")
+    maturity = _normalize_maturity(
+        raw.get("maturity", {}),
+        target_id=target_id,
+        window=window,
+        where=f"{where}.maturity",
+    )
     constraints = _normalize_target_constraints(
         raw.get("constraints", {}),
         where=f"{where}.constraints",
@@ -927,7 +944,13 @@ def _oxide_key_elements(oxide_name: str) -> frozenset[str]:
     return frozenset(elements)
 
 
-def _normalize_maturity(raw: Any, *, where: str) -> dict[str, Any]:
+def _normalize_maturity(
+    raw: Any,
+    *,
+    target_id: str,
+    window: Mapping[str, Any] | None,
+    where: str,
+) -> dict[str, Any]:
     if raw is None:
         raw = {}
     if not isinstance(raw, Mapping):
@@ -943,7 +966,98 @@ def _normalize_maturity(raw: Any, *, where: str) -> dict[str, Any]:
         result["campaign"] = _required_text(raw["campaign"], f"{where}.campaign")
     if "hours" in raw:
         result["hours"] = _positive_profile_float(raw["hours"], f"{where}.hours")
+    if "best_tap" in raw:
+        result["best_tap"] = MappingProxyType(
+            _normalize_best_tap(
+                raw["best_tap"],
+                target_id=target_id,
+                window=window,
+                where=f"{where}.best_tap",
+            )
+        )
     return result
+
+
+def _normalize_best_tap(
+    raw: Any,
+    *,
+    target_id: str,
+    window: Mapping[str, Any] | None,
+    where: str,
+) -> dict[str, Any]:
+    if not isinstance(raw, Mapping):
+        raise ObjectiveProfileError(f"{where} must be a mapping")
+    _reject_unknown_objective_keys(raw, _BEST_TAP_KEYS, where)
+    enabled = bool(raw.get("enabled", False))
+    if not isinstance(raw.get("enabled", False), bool):
+        raise ObjectiveProfileError(f"{where}.enabled must be bool")
+    if not enabled:
+        return {"enabled": False}
+
+    exploratory = bool(window.get("exploratory", False)) if isinstance(window, Mapping) else False
+    default_stability = 1 if exploratory else 3
+    stability = _positive_profile_int(
+        raw.get("tap_stability_hours", default_stability),
+        f"{where}.tap_stability_hours",
+    )
+    if not exploratory and stability < 2:
+        raise ObjectiveProfileError(
+            f"{where}.tap_stability_hours must be >= 2 for certifying targets"
+        )
+
+    tap_grid = _normalize_tap_grid(raw.get("tap_grid", "recorded_hours"), f"{where}.tap_grid")
+    dwell_policy = str(raw.get("dwell_policy", "trailing_recorded_hours"))
+    if dwell_policy != "trailing_recorded_hours":
+        raise ObjectiveProfileError(
+            f"{where}.dwell_policy must be 'trailing_recorded_hours'"
+        )
+    captured_policy = str(raw.get("captured_pool_nonterminal_policy", "fail_loud"))
+    if captured_policy not in {"fail_loud", "allow_with_note"}:
+        raise ObjectiveProfileError(
+            f"{where}.captured_pool_nonterminal_policy must be fail_loud or allow_with_note"
+        )
+    normalized: dict[str, Any] = {
+        "enabled": True,
+        "tap_grid": tap_grid,
+        "tap_stability_hours": stability,
+        "dwell_policy": dwell_policy,
+        "captured_pool_nonterminal_policy": captured_policy,
+    }
+    if "nonterminal_captured_pool_note" in raw:
+        normalized["nonterminal_captured_pool_note"] = _required_text(
+            raw["nonterminal_captured_pool_note"],
+            f"{where}.nonterminal_captured_pool_note",
+        )
+    return normalized
+
+
+def _normalize_tap_grid(raw: Any, where: str) -> str | tuple[int, ...]:
+    if raw is None:
+        return "recorded_hours"
+    if isinstance(raw, str):
+        if raw != "recorded_hours":
+            raise ObjectiveProfileError(f"{where} must be 'recorded_hours' or a list of hours")
+        return raw
+    if not isinstance(raw, (list, tuple)):
+        raise ObjectiveProfileError(f"{where} must be 'recorded_hours' or a list of hours")
+    hours = tuple(sorted({_positive_profile_int(item, f"{where}[]") for item in raw}))
+    if not hours:
+        raise ObjectiveProfileError(f"{where} must not be empty")
+    return hours
+
+
+def _positive_profile_int(value: Any, where: str) -> int:
+    if isinstance(value, bool):
+        raise ObjectiveProfileError(f"{where} must be an integer")
+    try:
+        numeric = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ObjectiveProfileError(f"{where} must be an integer") from exc
+    if float(numeric) != float(value):
+        raise ObjectiveProfileError(f"{where} must be an integer")
+    if numeric <= 0:
+        raise ObjectiveProfileError(f"{where} must be positive")
+    return numeric
 
 
 def _normalize_target_constraints(raw: Any, *, where: str) -> dict[str, Any]:
@@ -1138,6 +1252,33 @@ def _composition_target_score(
     *,
     evidence: dict[str, Any] | None = None,
 ) -> float:
+    best_tap = _best_tap_config(objective["target"])
+    if best_tap is not None:
+        return _best_tap_score(
+            objective,
+            run_execution,
+            profile,
+            best_tap=best_tap,
+            evidence=evidence,
+        )
+    return _composition_target_score_at(
+        objective,
+        run_execution,
+        profile,
+        evidence=evidence,
+    )
+
+
+def _composition_target_score_at(
+    objective: Mapping[str, Any],
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    evidence: dict[str, Any] | None = None,
+    pool_projection: Mapping[str, Mapping[str, float]] | None = None,
+    pool_snapshot_hour: int | None = None,
+    tap_provenance: str | None = None,
+) -> float:
     target = objective["target"]
     vector = target["species_vector"]
     extraction = target["extraction"]
@@ -1157,6 +1298,10 @@ def _composition_target_score(
         "extraction_completeness": {},
         "certification_tier": "certified",
     }
+    if pool_snapshot_hour is not None:
+        target_trace["pool_snapshot_hour"] = int(pool_snapshot_hour)
+    if tap_provenance is not None:
+        target_trace["tap_provenance"] = str(tap_provenance)
 
     extraction_score = 0.0
     if extraction_weight > 0.0:
@@ -1169,6 +1314,7 @@ def _composition_target_score(
             profile,
             bookkeeping_exclusions=bookkeeping_exclusions,
             completeness_evidence=extraction_evidence,
+            pool_projection=pool_projection,
         )
         target_trace["extraction_completeness"] = extraction_evidence
         if bookkeeping_exclusions and evidence is not None:
@@ -1188,6 +1334,8 @@ def _composition_target_score(
             window,
             run_execution,
             evidence=window_evidence,
+            pool_projection=pool_projection,
+            pool_snapshot_hour=pool_snapshot_hour,
         )
         target_trace.update(window_evidence)
         if str(window["mode"]) == "soft_distance":
@@ -1205,6 +1353,644 @@ def _composition_target_score(
     return score
 
 
+def _best_tap_config(target: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    maturity = target.get("maturity", {})
+    if not isinstance(maturity, Mapping):
+        return None
+    best_tap = maturity.get("best_tap")
+    if not isinstance(best_tap, Mapping) or not bool(best_tap.get("enabled", False)):
+        return None
+    return best_tap
+
+
+def _best_tap_score(
+    objective: Mapping[str, Any],
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    best_tap: Mapping[str, Any],
+    evidence: dict[str, Any] | None = None,
+) -> float:
+    snapshots = _tap_snapshots(run_execution, best_tap)
+    configured_hours = _configured_run_hours(run_execution, profile)
+    per_hour_summary = _per_hour_summary_by_hour(run_execution)
+    curve: list[dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
+    traces_by_hour: dict[int, dict[str, Any]] = {}
+
+    for snapshot in snapshots:
+        hour = _snapshot_hour(snapshot)
+        grade_report = _tap_grade_report(run_execution, snapshot, snapshots)
+        try:
+            projection = _tap_pool_projection(run_execution, snapshot, snapshots)
+            hour_evidence: dict[str, Any] = {}
+            score = _composition_target_score_at(
+                objective,
+                run_execution,
+                profile,
+                evidence=hour_evidence,
+                pool_projection=projection,
+                pool_snapshot_hour=hour,
+                tap_provenance=(
+                    "completed_run" if hour >= configured_hours else "tap_truncated"
+                ),
+            )
+        except ObjectiveComputationError as exc:
+            curve.append(
+                {
+                    "hour": hour,
+                    "excluded": True,
+                    "reason": str(exc),
+                    "grade_report": grade_report,
+                }
+            )
+            continue
+        target_trace = dict(hour_evidence.get("composition_target", {}))
+        target_trace["tap_grade_report"] = grade_report
+        if hour in per_hour_summary:
+            cache_state = per_hour_summary[hour].get("reduced_real_cache_state")
+            if cache_state is not None:
+                target_trace["reduced_real_cache_state"] = str(cache_state)
+        traces_by_hour[hour] = target_trace
+        candidates.append(
+            {
+                "hour": hour,
+                "score": score,
+                "trace": target_trace,
+                "grade_report": grade_report,
+            }
+        )
+
+    if not candidates:
+        raise ObjectiveComputationError("best_tap found no eligible tap candidates")
+
+    for candidate in candidates:
+        certified, knife_edge, dwell_hours = _tap_certification(
+            candidate["hour"],
+            traces_by_hour,
+            best_tap=best_tap,
+        )
+        candidate["certified"] = certified
+        candidate["knife_edge"] = knife_edge
+        candidate["dwell_hours"] = dwell_hours
+        curve.append(
+            {
+                "hour": candidate["hour"],
+                "score": candidate["score"],
+                "certified": certified,
+                "knife_edge": knife_edge,
+                "grade_report": candidate["grade_report"],
+            }
+        )
+
+    winner = max(
+        candidates,
+        key=lambda item: (
+            _finite_float(item["score"], "best_tap score"),
+            bool(item["certified"]),
+            -int(item["hour"]),
+        ),
+    )
+    tap_hour = int(winner["hour"])
+    nonterminal = tap_hour < configured_hours
+    target = objective["target"]
+    if nonterminal and _target_uses_captured_pool(target):
+        policy = str(best_tap["captured_pool_nonterminal_policy"])
+        if policy != "allow_with_note":
+            raise ObjectiveComputationError(
+                "best_tap selected non-terminal captured-pool candidate without "
+                "captured_pool_nonterminal_policy=allow_with_note"
+            )
+
+    snapshot = _snapshot_by_hour(snapshots, tap_hour)
+    operator_instruction = _operator_instruction(
+        snapshot,
+        tap_hour=tap_hour,
+        configured_hours=configured_hours,
+        profile=profile,
+    )
+    tap_coating_summary = (
+        _tap_coating_product_summary(run_execution, snapshots, tap_hour)
+        if nonterminal
+        else MappingProxyType({})
+    )
+    winning_trace = dict(winner["trace"])
+    winning_trace.update(
+        {
+            "best_tap_enabled": True,
+            "tap_grid": _jsonable_tap_grid(best_tap["tap_grid"]),
+            "tap_hour": tap_hour,
+            "configured_hours": configured_hours,
+            "tap_stability_hours": int(best_tap["tap_stability_hours"]),
+            "operator_instruction": operator_instruction,
+            "pool_snapshot_hour": tap_hour,
+            "tap_provenance": "tap_truncated" if nonterminal else "completed_run",
+            "knife_edge": bool(winner["knife_edge"]),
+            "certified": bool(winner["certified"]),
+            "tap_score_curve": sorted(curve, key=lambda item: int(item["hour"])),
+            "tap_grade_report": winner["grade_report"],
+            "truncated_recipe": {
+                "provenance": "tap_truncated" if nonterminal else "completed_run",
+                "tap_hour": tap_hour,
+                "configured_hours": configured_hours,
+                "operator_instruction": operator_instruction,
+                "tap_grade_report": winner["grade_report"],
+            },
+        }
+    )
+    if tap_coating_summary:
+        winning_trace["tap_coating_product_summary"] = tap_coating_summary
+        winning_trace["truncated_recipe"]["tap_coating_product_summary"] = tap_coating_summary
+    if nonterminal and _target_uses_captured_pool(target):
+        note_pool = _target_captured_pool_note_id(target)
+        winning_trace["nonterminal_captured_pool_note"] = str(
+            best_tap.get("nonterminal_captured_pool_note")
+            or (
+                f"target {objective['id']} selected captured-pool tap for pool "
+                f"{note_pool} at hour {tap_hour} of configured {configured_hours}"
+            )
+        )
+    if evidence is not None:
+        evidence["composition_target"] = winning_trace
+    return _finite_float(winner["score"], "best_tap score")
+
+
+def _tap_snapshots(
+    run_execution: Any,
+    best_tap: Mapping[str, Any],
+) -> tuple[Any, ...]:
+    snapshots = tuple(getattr(run_execution, "snapshots", ()) or ())
+    if not snapshots:
+        trace = getattr(run_execution, "trace", None)
+        snapshots = tuple(getattr(trace, "snapshots", ()) or ())
+    if not snapshots:
+        raise ObjectiveComputationError("best_tap requires recorded hour snapshots")
+    grid = best_tap["tap_grid"]
+    if grid == "recorded_hours":
+        return snapshots
+    requested = {int(hour) for hour in grid}
+    by_hour = {_snapshot_hour(snapshot): snapshot for snapshot in snapshots}
+    missing = sorted(requested - set(by_hour))
+    if missing:
+        raise ObjectiveComputationError(
+            f"best_tap tap_grid requested missing hours: {missing}"
+        )
+    return tuple(by_hour[hour] for hour in sorted(requested))
+
+
+def _tap_pool_projection(
+    run_execution: Any,
+    snapshot: Any,
+    snapshots: Sequence[Any],
+) -> Mapping[str, Mapping[str, float]]:
+    residual = _snapshot_melt_mol(snapshot, run_execution)
+    captured_products = _cumulative_stage_species_mol(run_execution, snapshots, _snapshot_hour(snapshot))
+    stage3 = {
+        species: mol
+        for (stage, species), mol in captured_products.items()
+        if int(stage) == 3 and species in {"SiO", "SiO2"}
+    }
+    captured_flat: dict[str, float] = {}
+    for (_stage, species), mol in captured_products.items():
+        captured_flat[species] = captured_flat.get(species, 0.0) + mol
+    projection: dict[str, Mapping[str, float]] = {}
+    if residual:
+        projection["residual_rump_at_stop"] = MappingProxyType(residual)
+        projection["terminal_rump_earned"] = MappingProxyType(residual)
+    if captured_flat:
+        projection["captured_products"] = MappingProxyType(captured_flat)
+    if stage3:
+        projection["captured_stage_3_silica"] = MappingProxyType(stage3)
+    return MappingProxyType(projection)
+
+
+def _tap_coating_product_summary(
+    run_execution: Any,
+    snapshots: Sequence[Any],
+    hour: int,
+) -> Mapping[str, Any]:
+    raw_by_segment = _cumulative_wall_deposit_by_segment_species_kg(snapshots, hour)
+    if not raw_by_segment:
+        return MappingProxyType(
+            {
+                "wall_deposit_kg_by_segment_species": MappingProxyType({}),
+                "wall_deposit_kg_by_zone_species": MappingProxyType({}),
+                "campaigns_to_resinter": "infinite",
+            }
+        )
+    zone_by_segment = _coating_zone_by_segment(run_execution)
+    if zone_by_segment is None:
+        raise ObjectiveComputationError(
+            "best_tap coating projection requires wall_zone_by_segment trace"
+        )
+    by_segment = _wall_deposit_by_segment_species_summary(raw_by_segment)
+    try:
+        by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
+    except (TypeError, ValueError) as exc:
+        raise ObjectiveComputationError(str(exc)) from exc
+    return MappingProxyType(
+        {
+            "wall_deposit_kg_by_segment_species": by_segment,
+            "wall_deposit_kg_by_zone_species": MappingProxyType(
+                {
+                    zone: MappingProxyType(dict(species_kg))
+                    for zone, species_kg in by_zone.items()
+                }
+            ),
+            "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+        }
+    )
+
+
+def _cumulative_wall_deposit_by_segment_species_kg(
+    snapshots: Sequence[Any],
+    hour: int,
+) -> dict[tuple[str, str], float]:
+    result: dict[tuple[str, str], float] = {}
+    for snapshot in snapshots:
+        if _snapshot_hour(snapshot) > hour:
+            continue
+        raw = getattr(snapshot, "wall_deposit_by_segment_species_delta", None)
+        if not isinstance(raw, Mapping):
+            continue
+        for key, kg in raw.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                raise ObjectiveComputationError(
+                    "wall deposit key must be (segment, species)"
+                )
+            segment, species = str(key[0]), str(key[1])
+            amount = _finite_float(kg, f"wall_deposit[{segment!r}][{species!r}]")
+            if amount > _EPS:
+                result[(segment, species)] = result.get((segment, species), 0.0) + amount
+    return result
+
+
+def _coating_zone_by_segment(run_execution: Any) -> Mapping[str, str] | None:
+    trace = getattr(run_execution, "trace", None)
+    raw = _carrier_value(trace, "wall_zone_by_segment")
+    if raw is None:
+        return None
+    if not isinstance(raw, Mapping):
+        raise ObjectiveComputationError("wall_zone_by_segment trace is not a mapping")
+    return MappingProxyType({str(segment): str(zone) for segment, zone in raw.items()})
+
+
+def _snapshot_melt_mol(snapshot: Any, run_execution: Any) -> dict[str, float]:
+    source = _snapshot_melt_oxide_kg(snapshot, run_execution)
+    result: dict[str, float] = {}
+    for species, kg in source.items():
+        mol = _kg_to_mol(str(species), _finite_float(kg, f"snapshot[{species!r}]"), run_execution)
+        if mol > _EPS:
+            result[str(species)] = result.get(str(species), 0.0) + mol
+    return result
+
+
+def _snapshot_melt_oxide_kg(snapshot: Any, run_execution: Any) -> dict[str, float]:
+    inventory = getattr(snapshot, "inventory", None)
+    melt_oxide_kg = getattr(inventory, "melt_oxide_kg", None)
+    composition_source = _snapshot_composition_oxide_kg(snapshot)
+    if isinstance(melt_oxide_kg, Mapping) and melt_oxide_kg:
+        inventory_source = {
+            str(species): _finite_float(kg, f"snapshot.inventory.melt_oxide_kg[{species!r}]")
+            for species, kg in melt_oxide_kg.items()
+            if abs(_finite_float(kg, f"snapshot.inventory.melt_oxide_kg[{species!r}]")) > _EPS
+        }
+        if composition_source:
+            _assert_snapshot_grade_basis_equivalent(
+                inventory_source,
+                composition_source,
+                run_execution,
+            )
+        return inventory_source
+    return composition_source
+
+
+def _snapshot_composition_oxide_kg(snapshot: Any) -> dict[str, float]:
+    composition = getattr(snapshot, "composition_wt_pct", None)
+    mass_kg = _finite_float(getattr(snapshot, "melt_mass_kg", 0.0), "snapshot.melt_mass_kg")
+    if not isinstance(composition, Mapping) or mass_kg <= _EPS:
+        return {}
+    return {
+        str(species): mass_kg * _finite_float(wt_pct, f"snapshot.composition_wt_pct[{species!r}]") / 100.0
+        for species, wt_pct in composition.items()
+        if abs(_finite_float(wt_pct, f"snapshot.composition_wt_pct[{species!r}]")) > _EPS
+    }
+
+
+def _assert_snapshot_grade_basis_equivalent(
+    primary_kg: Mapping[str, float],
+    composition_kg: Mapping[str, float],
+    run_execution: Any,
+) -> None:
+    primary_wt = _oxide_wt_pct_from_kg(primary_kg, run_execution)
+    composition_wt = _oxide_wt_pct_from_kg(composition_kg, run_execution)
+    for species in sorted(set(primary_wt) | set(composition_wt)):
+        primary = primary_wt.get(species, 0.0)
+        composition = composition_wt.get(species, 0.0)
+        # Normalized wt% bases can differ by FP normalization noise; 1e-7 relative stays <=1e-5 wt% for real components.
+        if not math.isclose(
+            primary,
+            composition,
+            rel_tol=_SNAPSHOT_GRADE_WT_REL_TOL,
+            abs_tol=_SNAPSHOT_GRADE_WT_ABS_TOL,
+        ):
+            raise ObjectiveComputationError(
+                "best_tap melt grade basis diverges from projected pool "
+                f"for {species}: inventory={primary:.12g} "
+                f"wt_pct composition={composition:.12g} wt_pct"
+            )
+
+
+def _oxide_wt_pct_from_kg(
+    oxide_kg: Mapping[str, float],
+    run_execution: Any,
+) -> dict[str, float]:
+    kg_by_species = {
+        str(species): _finite_float(kg, f"snapshot oxide kg[{species!r}]")
+        for species, kg in oxide_kg.items()
+        if abs(_finite_float(kg, f"snapshot oxide kg[{species!r}]")) > _EPS
+    }
+    total_kg = sum(kg_by_species.values())
+    if total_kg <= _EPS:
+        return {}
+    return {
+        species: kg / total_kg * 100.0
+        for species, kg in sorted(kg_by_species.items())
+        if _kg_to_mol(species, kg, run_execution) > _EPS
+    }
+
+
+def _cumulative_stage_species_mol(
+    run_execution: Any,
+    snapshots: Sequence[Any],
+    hour: int,
+) -> dict[tuple[int, str], float]:
+    kg_by_stage_species = _cumulative_stage_species_kg(snapshots, hour)
+    result: dict[tuple[int, str], float] = {}
+    for (stage, species), kg in kg_by_stage_species.items():
+        mol = _kg_to_mol(species, kg, run_execution)
+        if mol > _EPS:
+            result[(stage, species)] = mol
+    return result
+
+
+def _cumulative_stage_species_kg(
+    snapshots: Sequence[Any],
+    hour: int,
+) -> dict[tuple[int, str], float]:
+    result: dict[tuple[int, str], float] = {}
+    for snapshot in snapshots:
+        if _snapshot_hour(snapshot) > hour:
+            continue
+        raw = getattr(snapshot, "condensed_by_stage_species_delta", None)
+        if not isinstance(raw, Mapping):
+            continue
+        for key, kg in raw.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            stage, species = int(key[0]), str(key[1])
+            amount = _finite_float(kg, f"stage[{stage}][{species!r}]")
+            if amount > _EPS:
+                result[(stage, species)] = result.get((stage, species), 0.0) + amount
+    return result
+
+
+def _tap_certification(
+    hour: int,
+    traces_by_hour: Mapping[int, Mapping[str, Any]],
+    *,
+    best_tap: Mapping[str, Any],
+) -> tuple[bool, bool, tuple[int, ...]]:
+    stability = int(best_tap["tap_stability_hours"])
+    dwell_hours = tuple(range(hour - stability + 1, hour + 1))
+    instant_pass = _tap_trace_certifies(traces_by_hour.get(hour, {}))
+    if not instant_pass:
+        return False, False, dwell_hours
+    if stability <= 1:
+        return True, False, dwell_hours
+    dwell_pass = all(
+        _tap_trace_certifies(traces_by_hour.get(dwell_hour, {}))
+        for dwell_hour in dwell_hours
+    )
+    return dwell_pass, not dwell_pass, dwell_hours
+
+
+def _tap_trace_certifies(trace: Mapping[str, Any]) -> bool:
+    if not trace or str(trace.get("certification_tier", "certified")) == "exploratory":
+        return False
+    rows = trace.get("rows", ())
+    if isinstance(rows, Sequence) and not isinstance(rows, (str, bytes)):
+        for row in rows:
+            if isinstance(row, Mapping) and bool(row.get("strict", True)) and row.get("pass") is not True:
+                return False
+    if trace.get("window_mode") == "hard_window" and trace.get("reached_window") is not True:
+        return False
+    extraction = trace.get("extraction_completeness", {})
+    if isinstance(extraction, Mapping):
+        species = extraction.get("species", {})
+        if isinstance(species, Mapping):
+            for payload in species.values():
+                if isinstance(payload, Mapping) and payload.get("pass") is not True:
+                    return False
+    return True
+
+
+def _tap_grade_report(
+    run_execution: Any,
+    snapshot: Any,
+    snapshots: Sequence[Any],
+) -> Mapping[str, Any]:
+    hour = _snapshot_hour(snapshot)
+    report: dict[str, Any] = {"pool_snapshot_hour": hour}
+    melt_grade = _melt_tap_grade(snapshot, run_execution)
+    if melt_grade:
+        report["melt_tap"] = melt_grade
+    train_grade = _distillation_train_grade(run_execution, snapshots, hour)
+    if train_grade:
+        report["distillation_train_taps"] = train_grade
+    return MappingProxyType(report)
+
+
+def _melt_tap_grade(snapshot: Any, run_execution: Any) -> Mapping[str, Any]:
+    oxide_wt_pct = _oxide_wt_pct_from_kg(
+        _snapshot_melt_oxide_kg(snapshot, run_execution),
+        run_execution,
+    )
+    if not oxide_wt_pct:
+        return MappingProxyType({})
+    return MappingProxyType({"oxide_wt_pct": dict(sorted(oxide_wt_pct.items()))})
+
+
+def _distillation_train_grade(
+    run_execution: Any,
+    snapshots: Sequence[Any],
+    hour: int,
+) -> Mapping[str, Any]:
+    stage_species_kg = _cumulative_stage_species_kg(snapshots, hour)
+    by_stage: dict[int, dict[str, float]] = {}
+    for (stage, species), kg in stage_species_kg.items():
+        by_stage.setdefault(stage, {})[species] = by_stage.setdefault(stage, {}).get(species, 0.0) + kg
+    report: dict[str, Any] = {}
+    for stage, species_kg in sorted(by_stage.items()):
+        total_kg = sum(species_kg.values())
+        if total_kg <= _EPS:
+            continue
+        breakdown = {
+            species: kg / total_kg * 100.0
+            for species, kg in sorted(species_kg.items())
+            if kg > _EPS
+        }
+        if not breakdown:
+            continue
+        dominant_species, purity = max(breakdown.items(), key=lambda item: item[1])
+        species_mol = {
+            species: _kg_to_mol(species, kg, run_execution)
+            for species, kg in sorted(species_kg.items())
+            if kg > _EPS
+        }
+        report[str(stage)] = {
+            "dominant_species": dominant_species,
+            "dominant_species_purity_pct": purity,
+            "species_wt_pct": breakdown,
+            "species_mol": species_mol,
+            "total_kg": total_kg,
+        }
+    return MappingProxyType(report)
+
+
+def _target_uses_captured_pool(target: Mapping[str, Any]) -> bool:
+    extraction = target.get("extraction", {})
+    weights = target.get("score_weights", {})
+    extraction_weight = (
+        float(weights.get("extraction", 0.0))
+        if isinstance(weights, Mapping)
+        else 0.0
+    )
+    if (
+        extraction_weight > 0.0
+        and isinstance(extraction, Mapping)
+        and str(extraction.get("captured_pool", "")) in {
+            "captured_products",
+            "captured_stage_3_silica",
+        }
+    ):
+        return True
+    window = target.get("composition_window", {})
+    pools = {str(target.get("pool", ""))}
+    if isinstance(window, Mapping):
+        pools.add(str(window.get("pool", "")))
+    return bool(pools & {"captured_products", "captured_stage_3_silica"})
+
+
+def _target_captured_pool_note_id(target: Mapping[str, Any]) -> str:
+    extraction = target.get("extraction", {})
+    if isinstance(extraction, Mapping) and extraction.get("captured_pool"):
+        return str(extraction["captured_pool"])
+    window = target.get("composition_window", {})
+    if isinstance(window, Mapping) and window.get("pool"):
+        return str(window["pool"])
+    return str(target.get("pool", ""))
+
+
+def _operator_instruction(
+    snapshot: Any,
+    *,
+    tap_hour: int,
+    configured_hours: int,
+    profile: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    campaign = getattr(snapshot, "campaign", "")
+    phase_at_tap = getattr(campaign, "name", str(campaign))
+    overhead = getattr(snapshot, "overhead", None)
+    composition = getattr(overhead, "composition", {}) if overhead is not None else {}
+    pO2_mbar = 0.0
+    if isinstance(composition, Mapping):
+        pO2_mbar = _finite_float(composition.get("O2", 0.0), "snapshot.pO2_mbar")
+    run = profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
+    payload: dict[str, Any] = {
+        "tap_hour": tap_hour,
+        "configured_hours": configured_hours,
+        "phase_at_tap": phase_at_tap,
+        "configured_campaign": str(run.get("campaign", "")),
+        "T_C": _finite_float(getattr(snapshot, "temperature_C", 0.0), "snapshot.T_C"),
+        "pO2_mbar": pO2_mbar,
+        "provenance": "tap_truncated" if tap_hour < configured_hours else "completed_run",
+    }
+    if isinstance(composition, Mapping) and composition.get("N2") is not None:
+        payload["pN2_mbar"] = _finite_float(composition.get("N2", 0.0), "snapshot.pN2_mbar")
+    for attr, key in (
+        ("pN2_mbar", "pN2_mbar"),
+        ("pn2_mbar", "pN2_mbar"),
+        ("sweep_setting", "sweep_setting"),
+        ("sweep_mode", "sweep_mode"),
+        ("carrier_gas", "carrier_gas"),
+        ("recirculating_inert_sweep", "recirculating_inert_sweep"),
+    ):
+        if hasattr(snapshot, attr):
+            payload[key] = getattr(snapshot, attr)
+    if overhead is not None:
+        for attr, key in (
+            ("carrier_gas", "carrier_gas"),
+            ("sweep_setting", "sweep_setting"),
+            ("sweep_mode", "sweep_mode"),
+            ("recirculating_inert_sweep", "recirculating_inert_sweep"),
+        ):
+            if hasattr(overhead, attr):
+                payload[key] = getattr(overhead, attr)
+    return MappingProxyType(payload)
+
+
+def _configured_run_hours(run_execution: Any, profile: Mapping[str, Any]) -> int:
+    run = profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
+    raw = run.get("hours")
+    if raw is None:
+        sim = getattr(run_execution, "simulator", None)
+        raw = getattr(getattr(sim, "record", None), "total_hours", None)
+    if raw is None:
+        snapshots = tuple(getattr(run_execution, "snapshots", ()) or ())
+        raw = _snapshot_hour(snapshots[-1]) if snapshots else 0
+    return _positive_runtime_int(raw, "configured run hours")
+
+
+def _positive_runtime_int(value: Any, where: str) -> int:
+    try:
+        numeric = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ObjectiveComputationError(f"{where} must be an integer") from exc
+    if numeric <= 0:
+        raise ObjectiveComputationError(f"{where} must be positive")
+    return numeric
+
+
+def _snapshot_hour(snapshot: Any) -> int:
+    return _positive_runtime_int(getattr(snapshot, "hour", None), "snapshot.hour")
+
+
+def _snapshot_by_hour(snapshots: Sequence[Any], hour: int) -> Any:
+    for snapshot in snapshots:
+        if _snapshot_hour(snapshot) == hour:
+            return snapshot
+    raise ObjectiveComputationError(f"best_tap missing selected hour {hour}")
+
+
+def _per_hour_summary_by_hour(run_execution: Any) -> dict[int, Mapping[str, Any]]:
+    result: dict[int, Mapping[str, Any]] = {}
+    for entry in getattr(run_execution, "per_hour", ()) or ():
+        if not isinstance(entry, Mapping):
+            continue
+        raw_hour = entry.get("hour")
+        if raw_hour is None:
+            continue
+        result[_positive_runtime_int(raw_hour, "per_hour.hour")] = entry
+    return result
+
+
+def _jsonable_tap_grid(value: Any) -> Any:
+    if isinstance(value, tuple):
+        return list(value)
+    return value
+
+
 def _extraction_score(
     vector: Mapping[str, str],
     extraction: Mapping[str, Any],
@@ -1213,6 +1999,7 @@ def _extraction_score(
     *,
     bookkeeping_exclusions: set[str] | None = None,
     completeness_evidence: dict[str, Any] | None = None,
+    pool_projection: Mapping[str, Mapping[str, float]] | None = None,
 ) -> float:
     scores: list[float] = []
     completeness_min = extraction["completeness_min"]
@@ -1234,6 +2021,7 @@ def _extraction_score(
             captured_pool,
             run_execution,
             bookkeeping_exclusions=bookkeeping_exclusions,
+            pool_projection=pool_projection,
         )
         additive_mol = _additive_target_mol(species, run_execution, profile)
         captured_mol = max(0.0, captured_mol - additive_mol)
@@ -1267,10 +2055,17 @@ def _composition_window_score(
     run_execution: Any,
     *,
     evidence: dict[str, Any] | None = None,
+    pool_projection: Mapping[str, Mapping[str, float]] | None = None,
+    pool_snapshot_hour: int | None = None,
 ) -> float:
     pool = str(window["pool"])
     pool_provenance: dict[str, Any] = {}
-    species_mol = _pool_species_mol(pool, run_execution, pool_provenance=pool_provenance)
+    species_mol = _pool_species_mol(
+        pool,
+        run_execution,
+        pool_provenance=pool_provenance,
+        pool_projection=pool_projection,
+    )
     if not species_mol:
         raise ObjectiveComputationError(f"composition target pool {pool!r} is missing or empty")
     mode = str(window["mode"])
@@ -1369,6 +2164,7 @@ def _composition_window_score(
                         reached_window=False,
                         window_mode=mode,
                         pool_source=pool_provenance.get(pool, ""),
+                        pool_snapshot_hour=pool_snapshot_hour,
                     )
                 )
             return 0.0
@@ -1400,11 +2196,12 @@ def _composition_window_score(
                     resolved_ratios=resolved_ratios,
                     certified_envelope=certified_envelope,
                     preference_score=preference_score,
-                    reached_window=True,
-                    window_mode=mode,
-                    pool_source=pool_provenance.get(pool, ""),
+                        reached_window=True,
+                        window_mode=mode,
+                        pool_source=pool_provenance.get(pool, ""),
+                        pool_snapshot_hour=pool_snapshot_hour,
+                    )
                 )
-            )
         return score
     if mode == "soft_distance":
         weighted = 0.0
@@ -1429,11 +2226,12 @@ def _composition_window_score(
                     resolved_ratios=resolved_ratios,
                     certified_envelope=[],
                     preference_score=preference_score,
-                    reached_window=False,
-                    window_mode=mode,
-                    pool_source=pool_provenance.get(pool, ""),
+                        reached_window=False,
+                        window_mode=mode,
+                        pool_source=pool_provenance.get(pool, ""),
+                        pool_snapshot_hour=pool_snapshot_hour,
+                    )
                 )
-            )
         return preference_score
     raise ObjectiveComputationError(f"unsupported composition window mode {mode!r}")
 
@@ -1518,6 +2316,7 @@ def _composition_window_evidence(
     reached_window: bool,
     window_mode: str,
     pool_source: str,
+    pool_snapshot_hour: int | None = None,
 ) -> dict[str, Any]:
     return {
         "rows": [dict(row) for row in row_verdicts],
@@ -1530,6 +2329,11 @@ def _composition_window_evidence(
         "reached_window": reached_window,
         "window_mode": window_mode,
         **({"terminal_rump_source": pool_source} if pool_source else {}),
+        **(
+            {"pool_snapshot_hour": int(pool_snapshot_hour)}
+            if pool_snapshot_hour is not None
+            else {}
+        ),
     }
 
 
@@ -1579,7 +2383,19 @@ def _pool_species_mol(
     *,
     bookkeeping_exclusions: set[str] | None = None,
     pool_provenance: dict[str, Any] | None = None,
+    pool_projection: Mapping[str, Mapping[str, float]] | None = None,
 ) -> Mapping[str, float]:
+    if pool_projection is not None:
+        projected = pool_projection.get(pool)
+        if projected is None:
+            raise ObjectiveComputationError(
+                f"composition target projected pool {pool!r} is missing"
+            )
+        if not projected:
+            raise ObjectiveComputationError(
+                f"composition target projected pool {pool!r} is empty"
+            )
+        return MappingProxyType(dict(projected))
     sim = getattr(run_execution, "simulator", run_execution)
     if pool == "captured_stage_3_silica":
         return MappingProxyType(_captured_stage_3_silica_mol(run_execution))
@@ -1636,11 +2452,13 @@ def _captured_target_mol(
     run_execution: Any,
     *,
     bookkeeping_exclusions: set[str] | None = None,
+    pool_projection: Mapping[str, Mapping[str, float]] | None = None,
 ) -> float:
     species_mol = _pool_species_mol(
         pool,
         run_execution,
         bookkeeping_exclusions=bookkeeping_exclusions,
+        pool_projection=pool_projection,
     )
     return sum(
         _target_equivalent_mol(
