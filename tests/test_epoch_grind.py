@@ -9,6 +9,17 @@ import pytest
 from scripts import epoch_grind
 
 
+NO_FEASIBLE_MESSAGE = (
+    "no feasible candidates; winner.recipe.yaml not written; "
+    "failure_counts={'infeasible_recipe': 3}"
+)
+NO_FEASIBLE_NON_FINITE_MESSAGE = (
+    "all candidates failed with non_finite_payload; "
+    "failure_counts={'non_finite_payload': 3}"
+)
+NO_FEASIBLE_STDERR_LINE = f"error: {NO_FEASIBLE_MESSAGE}"
+
+
 def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) -> Path:
     profile = tmp_path / "profile.json"
     profile.write_text(
@@ -54,6 +65,42 @@ def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) 
     manifest = tmp_path / "jobs.json"
     manifest.write_text(json.dumps(payload), encoding="utf-8")
     return manifest
+
+
+def _write_no_feasible_artifacts(
+    out_dir: Path,
+    *,
+    budget: int,
+    provenance_rows: int | None = None,
+    write_status: bool = True,
+    message: str = NO_FEASIBLE_MESSAGE,
+    failure_counts: dict[str, int] | None = None,
+) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    counts = failure_counts or {"infeasible_recipe": budget}
+    row_count = budget if provenance_rows is None else provenance_rows
+    (out_dir / "provenance.jsonl").write_text(
+        "".join(json.dumps({"candidate_id": f"candidate-{index}"}) + "\n" for index in range(row_count)),
+        encoding="utf-8",
+    )
+    (out_dir / "pareto.json").write_text(
+        json.dumps({"failure_counts": counts, "pareto": [], "winner_candidate_id": None}) + "\n",
+        encoding="utf-8",
+    )
+    (out_dir / "leaderboard.csv").write_text("candidate_id,feasible\n", encoding="utf-8")
+    if write_status:
+        (out_dir / "job_status.json").write_text(
+            json.dumps(
+                {
+                    "message": message,
+                    "reason": "StudyNoFeasibleError",
+                    "status": "FAILED",
+                    "success": False,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
 
 def test_duplication_rate_math() -> None:
@@ -447,6 +494,124 @@ def test_run_child_classifies_child_owned_rc_124_as_failure(tmp_path: Path) -> N
     assert outcome == epoch_grind.ChildOutcome(kind="failed", returncode=124)
 
 
+def test_run_child_classifies_structured_no_feasible_as_terminal(tmp_path: Path) -> None:
+    out_dir = tmp_path / "run"
+    _write_no_feasible_artifacts(out_dir, budget=3)
+
+    outcome = epoch_grind._run_child(
+        [sys.executable, "-c", "raise SystemExit(2)"],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+        out_dir=out_dir,
+        budget=3,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(
+        kind=epoch_grind.NO_FEASIBLE_STATUS,
+        returncode=2,
+        failure_counts={"infeasible_recipe": 3},
+    )
+
+
+def test_run_child_classifies_structured_non_finite_no_feasible_as_terminal(tmp_path: Path) -> None:
+    out_dir = tmp_path / "run"
+    _write_no_feasible_artifacts(
+        out_dir,
+        budget=3,
+        message=NO_FEASIBLE_NON_FINITE_MESSAGE,
+        failure_counts={"non_finite_payload": 3},
+    )
+
+    outcome = epoch_grind._run_child(
+        [sys.executable, "-c", "raise SystemExit(2)"],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+        out_dir=out_dir,
+        budget=3,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(
+        kind=epoch_grind.NO_FEASIBLE_STATUS,
+        returncode=2,
+        failure_counts={"non_finite_payload": 3},
+    )
+
+
+def test_run_child_classifies_stderr_no_feasible_when_status_missing(tmp_path: Path) -> None:
+    out_dir = tmp_path / "run"
+    _write_no_feasible_artifacts(out_dir, budget=3, write_status=False)
+
+    outcome = epoch_grind._run_child(
+        [
+            sys.executable,
+            "-c",
+            f"import sys; print({NO_FEASIBLE_STDERR_LINE!r}, file=sys.stderr); raise SystemExit(2)",
+        ],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+        out_dir=out_dir,
+        budget=3,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(
+        kind=epoch_grind.NO_FEASIBLE_STATUS,
+        returncode=2,
+        failure_counts={"infeasible_recipe": 3},
+    )
+
+
+@pytest.mark.parametrize("status_payload", ["{not-json", "{}"])
+def test_run_child_falls_back_to_stderr_when_status_unparseable_or_empty(
+    tmp_path: Path,
+    status_payload: str,
+) -> None:
+    out_dir = tmp_path / "run"
+    _write_no_feasible_artifacts(out_dir, budget=3)
+    (out_dir / "job_status.json").write_text(status_payload, encoding="utf-8")
+
+    outcome = epoch_grind._run_child(
+        [
+            sys.executable,
+            "-c",
+            f"import sys; print({NO_FEASIBLE_STDERR_LINE!r}, file=sys.stderr); raise SystemExit(2)",
+        ],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+        out_dir=out_dir,
+        budget=3,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(
+        kind=epoch_grind.NO_FEASIBLE_STATUS,
+        returncode=2,
+        failure_counts={"infeasible_recipe": 3},
+    )
+
+
+def test_run_child_keeps_partial_no_feasible_artifacts_failed(tmp_path: Path) -> None:
+    out_dir = tmp_path / "run"
+    _write_no_feasible_artifacts(out_dir, budget=3, provenance_rows=2, write_status=False)
+
+    outcome = epoch_grind._run_child(
+        [
+            sys.executable,
+            "-c",
+            f"import sys; print({NO_FEASIBLE_STDERR_LINE!r}, file=sys.stderr); raise SystemExit(2)",
+        ],
+        stdout_path=tmp_path / "child.stdout.log",
+        stderr_path=tmp_path / "child.stderr.log",
+        timeout=5.0,
+        out_dir=out_dir,
+        budget=3,
+    )
+
+    assert outcome == epoch_grind.ChildOutcome(kind="failed", returncode=2)
+
+
 def test_child_owned_rc_124_is_failed_and_excluded_from_merge(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -484,6 +649,75 @@ def test_child_owned_rc_124_is_failed_and_excluded_from_merge(
     assert result["failed_jobs"][0]["returncode"] == 124
     with pytest.raises(RuntimeError, match="journal has failed jobs: job-a"):
         epoch_grind.pending_jobs(manifest, journal)
+
+
+def test_no_feasible_job_is_terminal_mergeable_and_counted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal_path = tmp_path / "journal.json"
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    merged_shards: list[Path] = []
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"rows_after": 1000},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(
+            kind=epoch_grind.NO_FEASIBLE_STATUS,
+            returncode=2,
+            failure_counts={"infeasible_recipe": 8},
+        ),
+    )
+
+    def merge_recorder(base: Path, shard_paths: list[Path], **kwargs: object) -> dict[str, object]:
+        merged_shards.extend(shard_paths)
+        seed_rows_by_source = kwargs.get("seed_rows_by_source", {})
+        return {
+            "inserted_rows": len(shard_paths),
+            "sources": [
+                {
+                    "inserted_rows": 1,
+                    "seed_rows": int(seed_rows_by_source[str(path)]),
+                    "source": str(path),
+                    "source_rows": int(seed_rows_by_source[str(path)]) + 1,
+                }
+                for path in shard_paths
+            ],
+        }
+
+    monkeypatch.setattr(epoch_grind, "merge_epoch_shards", merge_recorder)
+
+    assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == 0
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+
+    assert journal["decision"] == epoch_grind.DECISION_BATCH_COMPLETE
+    assert journal["jobs"][0]["status"] == epoch_grind.NO_FEASIBLE_STATUS
+    assert journal["jobs_no_feasible"] == ["job-a"]
+    assert journal["job_status_counts"] == {epoch_grind.NO_FEASIBLE_STATUS: 1}
+    assert journal["jobs"][0]["failure_counts"] == {"infeasible_recipe": 8}
+    assert journal["epochs"][0]["no_feasible_jobs"][0]["id"] == "job-a"
+    assert journal["epochs"][0]["no_feasible_jobs"][0]["returncode"] == 2
+    assert journal["epochs"][0]["no_feasible_jobs"][0]["failure_counts"] == {"infeasible_recipe": 8}
+    assert merged_shards == [manifest.work_dir / "epoch-0001" / "shards" / "job-a.sqlite"]
+    assert epoch_grind.pending_jobs(manifest, journal) == []
+    out = capsys.readouterr().out
+    assert "no_feasible=1" in out
+    assert 'status_counts={"no_feasible":1}' in out
+    assert 'no_feasible_failure_counts=job-a:{"infeasible_recipe":8}' in out
 
 
 def test_failed_epoch_is_journaled_before_return(

@@ -31,8 +31,10 @@ Minimal JSON manifest:
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable as RuntimeIterable
 import json
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -63,6 +65,15 @@ DECISION_CONTINUE = "continue"
 DECISION_FINAL_LONG = "final_long"
 DECISION_BATCH_COMPLETE = "batch_complete"
 DECISION_FAILED = "failed"
+NO_FEASIBLE_STATUS = "no_feasible"
+NO_FEASIBLE_MESSAGE_BODY_RE = re.compile(
+    r"^(?:no feasible candidates; winner\.recipe\.yaml not written|"
+    r"all candidates failed with non_finite_payload); failure_counts=\{.*\}$"
+)
+NO_FEASIBLE_STDERR_RE = re.compile(
+    r"^error: (?:no feasible candidates; winner\.recipe\.yaml not written|"
+    r"all candidates failed with non_finite_payload); failure_counts=\{.*\}$"
+)
 JOB_IDENTITY_FIELDS = (
     "feedstock",
     "profile",
@@ -111,6 +122,7 @@ class DriverConfig:
 class ChildOutcome:
     kind: str
     returncode: int | None = None
+    failure_counts: Mapping[str, int] | None = None
 
 
 def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path | None = None) -> Manifest:
@@ -394,10 +406,10 @@ def save_journal(path: Path, journal: Mapping[str, Any]) -> None:
 
 
 def pending_jobs(manifest: Manifest, journal: Mapping[str, Any]) -> list[JobSpec]:
-    done = {
+    terminal = {
         str(item.get("id"))
         for item in journal.get("jobs", [])
-        if isinstance(item, Mapping) and item.get("status") == "done"
+        if isinstance(item, Mapping) and item.get("status") in {"done", NO_FEASIBLE_STATUS}
     }
     failed = {
         str(item.get("id"))
@@ -406,12 +418,13 @@ def pending_jobs(manifest: Manifest, journal: Mapping[str, Any]) -> list[JobSpec
     }
     if failed:
         raise RuntimeError(f"journal has failed jobs: {', '.join(sorted(failed))}")
-    return [job for job in manifest.jobs if job.id not in done]
+    return [job for job in manifest.jobs if job.id not in terminal]
 
 
 def _journal_with_job_summary(journal: Mapping[str, Any]) -> dict[str, Any]:
     payload = dict(journal)
     done: list[str] = []
+    no_feasible: list[str] = []
     remaining: list[str] = []
     for item in payload.get("jobs", []):
         if not isinstance(item, Mapping):
@@ -419,11 +432,43 @@ def _journal_with_job_summary(journal: Mapping[str, Any]) -> dict[str, Any]:
         job_id = str(item.get("id"))
         if item.get("status") == "done":
             done.append(job_id)
+        elif item.get("status") == NO_FEASIBLE_STATUS:
+            no_feasible.append(job_id)
         elif item.get("status") != "failed":
             remaining.append(job_id)
     payload["jobs_done"] = done
+    payload["jobs_no_feasible"] = no_feasible
     payload["jobs_remaining"] = remaining
+    payload["job_status_counts"] = _job_status_counts(payload)
     return payload
+
+
+def _job_status_counts(journal: Mapping[str, Any]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for item in journal.get("jobs", []):
+        if not isinstance(item, Mapping):
+            continue
+        status = str(item.get("status", "unknown"))
+        counts[status] = counts.get(status, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def _format_status_counts(journal: Mapping[str, Any]) -> str:
+    return json.dumps(_job_status_counts(journal), sort_keys=True, separators=(",", ":"))
+
+
+def _format_no_feasible_failure_counts(journal: Mapping[str, Any]) -> str:
+    items: list[str] = []
+    for item in journal.get("jobs", []):
+        if not isinstance(item, Mapping) or item.get("status") != NO_FEASIBLE_STATUS:
+            continue
+        counts = item.get("failure_counts")
+        if isinstance(counts, Mapping):
+            encoded = json.dumps(dict(sorted(counts.items())), sort_keys=True, separators=(",", ":"))
+        else:
+            encoded = "{}"
+        items.append(f"{item.get('id')}:{encoded}")
+    return ",".join(items)
 
 
 def build_optimizer_command(
@@ -558,7 +603,13 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         if not remaining:
             journal["decision"] = DECISION_BATCH_COMPLETE
             save_journal(journal_path, journal)
-            print("decision=batch_complete")
+            print(
+                "decision=batch_complete status_counts={status_counts} "
+                "no_feasible_failure_counts={failure_counts}".format(
+                    status_counts=_format_status_counts(journal),
+                    failure_counts=_format_no_feasible_failure_counts(journal),
+                )
+            )
             return 0
 
         final_long = journal.get("decision") == DECISION_FINAL_LONG
@@ -588,10 +639,15 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
             journal["decision"] = DECISION_FAILED
             save_journal(journal_path, journal)
             print(
-                "epoch={epoch} failed_jobs={failed} dup_rate={dup_rate:.6f} decision=failed".format(
+                "epoch={epoch} failed_jobs={failed} no_feasible={no_feasible} "
+                "dup_rate={dup_rate:.6f} decision=failed status_counts={status_counts} "
+                "no_feasible_failure_counts={failure_counts}".format(
                     epoch=epoch_result["epoch"],
                     failed=len(epoch_result["failed_jobs"]),
+                    no_feasible=len(epoch_result.get("no_feasible_jobs", [])),
                     dup_rate=rate,
+                    status_counts=_format_status_counts(journal),
+                    failure_counts=_format_no_feasible_failure_counts(journal),
                 )
             )
             return 2
@@ -606,12 +662,17 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         save_journal(journal_path, journal)
         print(
             "epoch={epoch} completed={completed} remaining={remaining} "
-            "dup_rate={dup_rate:.6f} decision={decision}".format(
+            "no_feasible={no_feasible} dup_rate={dup_rate:.6f} "
+            "decision={decision} status_counts={status_counts} "
+            "no_feasible_failure_counts={failure_counts}".format(
                 epoch=epoch_result["epoch"],
                 completed=len(epoch_result["completed_jobs"]),
                 remaining=remaining_count,
+                no_feasible=len(epoch_result.get("no_feasible_jobs", [])),
                 dup_rate=rate,
                 decision=journal["decision"],
+                status_counts=_format_status_counts(journal),
+                failure_counts=_format_no_feasible_failure_counts(journal),
             )
         )
 
@@ -640,6 +701,7 @@ def run_epoch(
         "time_box_seconds": None if final_long else config.time_box_seconds,
         "completed_jobs": [],
         "failed_jobs": [],
+        "no_feasible_jobs": [],
         "timed_out_jobs": [],
         "attempted_jobs": [],
         "shard_dbs": [],
@@ -673,11 +735,25 @@ def run_epoch(
         }
         result["attempted_jobs"].append(job_record)
         timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
-        outcome = _run_child(command, stdout_path=stdout_path, stderr_path=stderr_path, timeout=timeout)
+        outcome = _run_child(
+            command,
+            stdout_path=stdout_path,
+            stderr_path=stderr_path,
+            timeout=timeout,
+            out_dir=out_dir,
+            budget=job.budget,
+        )
         if outcome.kind == "completed":
             result["shard_dbs"].append(str(shard_db))
             result["seed_rows_by_shard"][str(shard_db)] = seed_rows
             result["completed_jobs"].append(job.id)
+        elif outcome.kind == NO_FEASIBLE_STATUS:
+            result["shard_dbs"].append(str(shard_db))
+            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
+            job_record["returncode"] = outcome.returncode
+            if outcome.failure_counts is not None:
+                job_record["failure_counts"] = dict(sorted(outcome.failure_counts.items()))
+            result["no_feasible_jobs"].append(job_record)
         elif outcome.kind == "timed_out":
             result["shard_dbs"].append(str(shard_db))
             result["seed_rows_by_shard"][str(shard_db)] = seed_rows
@@ -722,14 +798,37 @@ def plan_epoch_profile(
 def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]) -> None:
     completed = {str(job_id) for job_id in epoch_result.get("completed_jobs", [])}
     failed = {str(job.get("id")) for job in epoch_result.get("failed_jobs", []) if isinstance(job, Mapping)}
+    no_feasible = _job_ids(epoch_result.get("no_feasible_jobs", []))
+    no_feasible_records = {
+        str(job.get("id")): job
+        for job in epoch_result.get("no_feasible_jobs", [])
+        if isinstance(job, Mapping)
+    }
     for job in journal.get("jobs", []):
         if not isinstance(job, dict):
             continue
         if job.get("id") in completed:
             job["status"] = "done"
+        elif job.get("id") in no_feasible:
+            job["status"] = NO_FEASIBLE_STATUS
+            record = no_feasible_records.get(str(job.get("id")))
+            if record is not None and isinstance(record.get("failure_counts"), Mapping):
+                job["failure_counts"] = dict(sorted(record["failure_counts"].items()))
         elif job.get("id") in failed:
             job["status"] = "failed"
     journal["epoch"] = int(epoch_result.get("epoch", journal.get("epoch", 0)))
+
+
+def _job_ids(items: object) -> set[str]:
+    if not isinstance(items, RuntimeIterable) or isinstance(items, (str, bytes)):
+        return set()
+    ids: set[str] = set()
+    for item in items:
+        if isinstance(item, Mapping):
+            ids.add(str(item.get("id")))
+        else:
+            ids.add(str(item))
+    return ids
 
 
 def _run_child(
@@ -738,6 +837,8 @@ def _run_child(
     stdout_path: Path,
     stderr_path: Path,
     timeout: float | None,
+    out_dir: Path | None = None,
+    budget: int | None = None,
 ) -> ChildOutcome:
     stdout_path.parent.mkdir(parents=True, exist_ok=True)
     with stdout_path.open("wb") as stdout, stderr_path.open("wb") as stderr:
@@ -751,10 +852,107 @@ def _run_child(
             returncode = int(process.wait(timeout=timeout))
             if returncode == 0:
                 return ChildOutcome(kind="completed", returncode=returncode)
+            if out_dir is not None and budget is not None:
+                failure_counts = _no_feasible_failure_counts(out_dir, stderr_path, budget)
+                if failure_counts is not None:
+                    return ChildOutcome(
+                        kind=NO_FEASIBLE_STATUS,
+                        returncode=returncode,
+                        failure_counts=failure_counts,
+                    )
             return ChildOutcome(kind="failed", returncode=returncode)
         except subprocess.TimeoutExpired:
             _terminate_process_group(process)
             return ChildOutcome(kind="timed_out", returncode=None)
+
+
+def _no_feasible_failure_counts(out_dir: Path, stderr_path: Path, budget: int) -> dict[str, int] | None:
+    if not _has_complete_no_feasible_artifacts(out_dir, budget):
+        return None
+    job_status = _load_job_status(out_dir / "job_status.json")
+    if job_status is not None:
+        if job_status.get("reason") == "StudyNoFeasibleError" or _message_reports_no_feasible(
+            str(job_status.get("message", ""))
+        ):
+            return _load_no_feasible_artifact_failure_counts(out_dir)
+        return None
+    if _stderr_reports_no_feasible(stderr_path):
+        return _load_no_feasible_artifact_failure_counts(out_dir)
+    return None
+
+
+def _load_job_status(path: Path) -> Mapping[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, Mapping) or not payload:
+        return None
+    return payload
+
+
+def _message_reports_no_feasible(message: str) -> bool:
+    return bool(NO_FEASIBLE_MESSAGE_BODY_RE.fullmatch(message.strip()))
+
+
+def _stderr_reports_no_feasible(stderr_path: Path) -> bool:
+    try:
+        lines = stderr_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    return any(NO_FEASIBLE_STDERR_RE.fullmatch(line.strip()) for line in lines)
+
+
+def _load_no_feasible_artifact_failure_counts(out_dir: Path) -> dict[str, int]:
+    try:
+        payload = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if not isinstance(payload, Mapping) or not isinstance(payload.get("failure_counts"), Mapping):
+        return {}
+    counts: dict[str, int] = {}
+    for key, value in payload["failure_counts"].items():
+        try:
+            counts[str(key)] = int(value)
+        except (TypeError, ValueError):
+            continue
+    return dict(sorted(counts.items()))
+
+
+def _has_complete_no_feasible_artifacts(out_dir: Path, budget: int) -> bool:
+    if not _provenance_rows_match_budget(out_dir / "provenance.jsonl", budget):
+        return False
+    if not (out_dir / "leaderboard.csv").exists():
+        return False
+    if (out_dir / "winner.recipe.yaml").exists():
+        return False
+    pareto_path = out_dir / "pareto.json"
+    try:
+        pareto_payload = json.loads(pareto_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if not isinstance(pareto_payload, Mapping):
+        return False
+    return pareto_payload.get("winner_candidate_id") is None and pareto_payload.get("pareto") == []
+
+
+def _provenance_rows_match_budget(path: Path, budget: int) -> bool:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    rows = 0
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            json.loads(line)
+        except json.JSONDecodeError:
+            return False
+        rows += 1
+    return rows == budget
 
 
 def _terminate_process_group(process: subprocess.Popen[Any]) -> None:
