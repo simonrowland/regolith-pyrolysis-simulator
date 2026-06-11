@@ -284,7 +284,14 @@ def sample_recipe_patches(
     points = _unit_hypercube_points(len(specs), n_samples, seed, active_sampler)
     patches: list[RecipePatch] = []
     for row in points:
-        values = _map_unit_row(active_schema, specs, row, mapper)
+        values = _map_unit_row(
+            active_schema,
+            specs,
+            row,
+            mapper,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+        )
         patches.append(RecipePatch(values).validated(active_schema))
     return tuple(patches)
 
@@ -332,7 +339,14 @@ def sample_recipe_patch_at_index(
         return RecipePatch({}).validated(active_schema)
 
     point = _unit_hypercube_point(len(specs), index, seed, active_sampler)
-    values = _map_unit_row(active_schema, specs, point, mapper)
+    values = _map_unit_row(
+        active_schema,
+        specs,
+        point,
+        mapper,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+    )
     return RecipePatch(values).validated(active_schema)
 
 
@@ -441,13 +455,23 @@ def _map_unit_row(
     specs: tuple[Any, ...],
     row: tuple[float, ...],
     mapper,
+    *,
+    anchor: RecipePatch | None = None,
+    delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
 ) -> dict[KeyPath, Any]:
     values: dict[KeyPath, Any] = {}
     unit_by_path: dict[KeyPath, float] = {}
     for spec, unit_value in zip(specs, row, strict=True):
         unit_by_path[spec.path] = float(unit_value)
         values[spec.path] = mapper(spec, unit_value)
-    _couple_pressure_default_pairs(schema, specs, values, unit_by_path)
+    _couple_pressure_default_pairs(
+        schema,
+        specs,
+        values,
+        unit_by_path,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+    )
     return values
 
 
@@ -456,6 +480,9 @@ def _couple_pressure_default_pairs(
     specs: tuple[Any, ...],
     values: dict[KeyPath, Any],
     unit_by_path: Mapping[KeyPath, float],
+    *,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
 ) -> None:
     spec_by_path = {spec.path: spec for spec in specs}
     for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
@@ -464,6 +491,22 @@ def _couple_pressure_default_pairs(
         po2_spec = spec_by_path[po2_path]
         po2_low, po2_high = _numeric_bounds(po2_spec)
         total = float(values[total_path])
+        if anchor is not None:
+            po2_low, po2_high = _anchored_numeric_interval(
+                po2_spec, anchor.values[po2_path], delta_fraction
+            )
+            feasible_high = min(po2_high, total)
+            tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
+            if feasible_high + tolerance < po2_low:
+                raise ValueError(
+                    "pressure_default_pair_infeasible_bounds: "
+                    f"{'.'.join(po2_path)} anchored low {po2_low:.12g} exceeds "
+                    f"{'.'.join(total_path)} {total:.12g}"
+                )
+            values[po2_path] = float(
+                min(max(float(values[po2_path]), po2_low), feasible_high)
+            )
+            continue
         feasible_high = min(po2_high, total)
         tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
         if feasible_high + tolerance < po2_low:
@@ -507,15 +550,27 @@ def _map_unit_value_anchored(
         return center
 
     low, high = _numeric_bounds(spec)
+    anchored_low, anchored_high = _anchored_numeric_interval(
+        spec, center, delta_fraction
+    )
     # value = clamp(c + (2u-1) * delta_fraction * (hi-lo), lo, hi)
     half_width = delta_fraction * (high - low)
     value = float(center) + (2.0 * unit_value - 1.0) * half_width
-    value = min(max(value, low), high)
+    value = min(max(value, anchored_low), anchored_high)
     if spec.kind == "int":
         return int(round(value))
     if spec.kind == "float":
         return float(value)
     raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
+
+
+def _anchored_numeric_interval(
+    spec: Any, center: Any, delta_fraction: float
+) -> tuple[float, float]:
+    low, high = _numeric_bounds(spec)
+    half_width = delta_fraction * (high - low)
+    center_value = float(center)
+    return max(center_value - half_width, low), min(center_value + half_width, high)
 
 
 def _numeric_bounds(spec: Any) -> tuple[float, float]:

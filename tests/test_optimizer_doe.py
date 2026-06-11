@@ -346,6 +346,8 @@ def test_fidelity_correlation_result_copies_input_mappings() -> None:
 _TEMP = ("campaigns", "C0", "temp_range_C")
 _HOLD = ("campaigns", "C3", "endpoint", "hold_time_min")
 _MODE = ("campaigns", "C0", "mode")
+_C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
+_C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
 
 
 def _anchored_schema() -> RecipeSchema:
@@ -364,6 +366,31 @@ def _anchored_schema() -> RecipeSchema:
 
 def _anchor(temp: float = 500.0, hold: int = 30, mode: str = "nominal") -> RecipePatch:
     return RecipePatch({_TEMP: temp, _HOLD: hold, _MODE: mode})
+
+
+def _anchored_pressure_schema() -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=(
+            KnobSpec(path=_C3_PO2_DEFAULT, kind="float", low=0.5, high=1.5),
+            KnobSpec(path=_C3_PTOTAL_DEFAULT, kind="float", low=0.5, high=1.5),
+        )
+    )
+
+
+def _pressure_anchor(po2: float = 1.0, total: float = 1.0) -> RecipePatch:
+    return RecipePatch({_C3_PO2_DEFAULT: po2, _C3_PTOTAL_DEFAULT: total})
+
+
+def _assert_anchored_c3_pressure_is_coupled(
+    patches: tuple[RecipePatch, ...], delta_fraction: float
+) -> None:
+    low = 1.0 - delta_fraction
+    high = 1.0 + delta_fraction
+    for patch in patches:
+        po2 = patch.values[_C3_PO2_DEFAULT]
+        total = patch.values[_C3_PTOTAL_DEFAULT]
+        assert low <= po2 <= high
+        assert po2 <= total
 
 
 def test_doe_spec_round_trips_anchor_and_delta_fraction() -> None:
@@ -460,6 +487,41 @@ def test_anchored_sampling_clamps_when_center_near_bound() -> None:
     _assert_within_neighborhood(schema, patches, anchor, delta)
     assert max(p.values[_TEMP] for p in patches) <= 950.0
     assert max(p.values[_HOLD] for p in patches) <= 60
+
+
+def test_anchored_pressure_coupling_stays_in_neighborhood_and_under_total() -> None:
+    schema = _anchored_pressure_schema()
+    delta = 0.05
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=64,
+        seed=20260611,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=_pressure_anchor(),
+        delta_fraction=delta,
+    )
+
+    _assert_anchored_c3_pressure_is_coupled(patches, delta)
+
+
+def test_streaming_anchored_pressure_coupling_stays_in_neighborhood_and_under_total() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy Sobol sampler unavailable")
+    schema = _anchored_pressure_schema()
+    delta = 0.05
+    patches = tuple(
+        sample_recipe_patch_at_index(
+            schema,
+            index=sequence,
+            seed=20260611,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+            anchor=_pressure_anchor(),
+            delta_fraction=delta,
+        )
+        for sequence in range(32)
+    )
+
+    _assert_anchored_c3_pressure_is_coupled(patches, delta)
 
 
 def test_anchored_sampling_is_deterministic_for_same_seed() -> None:

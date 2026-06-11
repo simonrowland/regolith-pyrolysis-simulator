@@ -852,9 +852,18 @@ def _validate_pressure_default_pairs(
     values: Mapping[KeyPath, Any],
 ) -> None:
     for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
-        if po2_path not in values or total_path not in schema._spec_by_path:
+        if (
+            po2_path not in schema._spec_by_path
+            or total_path not in schema._spec_by_path
+            or (po2_path not in values and total_path not in values)
+        ):
             continue
-        po2 = float(values[po2_path])
+        if po2_path in values:
+            po2 = float(values[po2_path])
+            po2_source = "patched"
+        else:
+            po2 = float(_default_setpoint_value(po2_path))
+            po2_source = "YAML default"
         if total_path in values:
             total = float(values[total_path])
             total_source = "patched"
@@ -865,7 +874,7 @@ def _validate_pressure_default_pairs(
         if po2 - total > tolerance:
             raise RecipeValidationError(
                 "recipe_pressure_partial_exceeds_total: "
-                f"{_format_path(po2_path)}={po2:.12g} > "
+                f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) > "
                 f"{_format_path(total_path)}={total:.12g} ({total_source}); "
                 "oxygen partial pressure cannot exceed total pressure; "
                 "set both pO2 and p_total knobs for this campaign"

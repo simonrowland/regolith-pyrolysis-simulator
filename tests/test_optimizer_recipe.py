@@ -226,6 +226,28 @@ def test_to_setpoints_patch_rejects_po2_only_above_default_total() -> None:
         RecipeSchema().to_setpoints_patch(RecipePatch({C3_PO2_DEFAULT: 1.2}))
 
 
+def test_to_setpoints_patch_keeps_total_only_above_default_po2_untouched() -> None:
+    nested = RecipeSchema().to_setpoints_patch(RecipePatch({C3_PTOTAL_DEFAULT: 1.2}))
+
+    assert nested["campaigns"]["C3"]["p_total_mbar_default"] == pytest.approx(1.2)
+    assert "pO2_mbar_default" not in nested["campaigns"]["C3"]
+    config = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)._session_config()
+    assert config.setpoints["campaigns"]["C3"]["pO2_mbar_default"] == pytest.approx(
+        1.0
+    )
+
+
+def test_to_setpoints_patch_rejects_total_only_below_default_po2() -> None:
+    with pytest.raises(RecipeValidationError) as exc_info:
+        RecipeSchema().to_setpoints_patch(RecipePatch({C3_PTOTAL_DEFAULT: 0.6}))
+
+    message = str(exc_info.value)
+    assert "recipe_pressure_partial_exceeds_total" in message
+    assert "campaigns.C3.pO2_mbar_default=1 (YAML default)" in message
+    assert "campaigns.C3.p_total_mbar_default=0.6 (patched)" in message
+    assert "set both pO2 and p_total knobs" in message
+
+
 def test_po2_only_patch_recipe_id_differs_from_old_derived_total_effect() -> None:
     schema = RecipeSchema()
     po2_only = RecipePatch({C3_PO2_DEFAULT: 0.8}).validated(schema)
