@@ -32,6 +32,8 @@ SESSION_CAMPAIGN_ALIASES = {
     "C2A_continuous": "C2A",
     "C2A_staged": "C2A_STAGED",
 }
+STREAM_PRODUCT_POOLS = frozenset({"captured_products", "captured_stage_3_silica"})
+MELT_PRODUCT_POOLS = frozenset({"residual_rump_at_stop", "terminal_rump_earned"})
 
 
 def test_pinned_session_campaign_vocabulary() -> None:
@@ -98,6 +100,62 @@ def test_target_menu_rows_emit_validating_profiles(
         "energy_kWh",
         "duration_h",
     }
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_extraction_gate_is_scoped_to_extracted_species(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    constraints = profile["constraints"]
+    target = profile["objectives"][0]["target"]
+    gates = tuple(constraints["gates"])
+    completeness_min = dict(target["extraction"]["completeness_min"])
+    target_species = tuple(constraints.get("target_species", ()))
+
+    if completeness_min:
+        assert "extraction_completeness" in gates
+        assert target_species == tuple(completeness_min)
+    else:
+        assert "extraction_completeness" not in gates
+        assert target_species == ()
+
+    for species in target_species:
+        assert target["species_vector"][species] == "extract"
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_stream_purity_gate_matches_product_pool(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    gates = tuple(profile["constraints"]["gates"])
+
+    if target["pool"] in STREAM_PRODUCT_POOLS:
+        assert "delivered_stream_purity" in gates
+    elif target["pool"] in MELT_PRODUCT_POOLS:
+        assert "delivered_stream_purity" not in gates
+    else:
+        pytest.fail(f"unclassified target product pool: {target['pool']}")
 
 
 @pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
@@ -225,6 +283,37 @@ def test_target_menu_extract_rows_are_windowless(
     )
     assert target["score_weights"]["extraction"] == pytest.approx(1.0)
     assert target["score_weights"]["composition"] == pytest.approx(0.0)
+
+
+def test_target_menu_retain_alkali_c3_uses_fe_extraction_and_soft_alkali_window(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-glass-retain-na-k-c3.yaml"
+
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", "pc-glass-retain-na-k-c3", out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    constraints = profile["constraints"]
+    target = profile["objectives"][0]["target"]
+    oxides = target["composition_window"]["oxides"]
+
+    assert "delivered_stream_purity" not in constraints["gates"]
+    assert "extraction_completeness" in constraints["gates"]
+    assert constraints["target_species"] == ["Fe"]
+    assert target["species_vector"]["Fe"] == "extract"
+    assert target["species_vector"]["Na"] == "retain"
+    assert target["species_vector"]["K"] == "retain"
+    assert target["species_vector"]["Si"] == "retain"
+    assert target["extraction"]["completeness_min"]["Fe"] == pytest.approx(0.95)
+    assert oxides["Na2O_plus_K2O"]["min"] == pytest.approx(5.0)
+    assert oxides["Na2O_plus_K2O"]["max"] == pytest.approx(18.0)
+    assert oxides["Na2O_plus_K2O"]["strict"] is False
+    assert "retained_alkali_ceiling_soft_rank" in oxides["Na2O_plus_K2O"]["provenance"]
 
 
 def test_target_menu_glass_clear_uses_rev32_strict_soft_rows(

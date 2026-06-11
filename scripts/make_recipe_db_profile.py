@@ -169,19 +169,24 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
         species_vector={
             "Na": "retain",
             "K": "retain",
-            "Fe": "free",
+            "Fe": "extract",
             "Mg": "retain",
             "Ca": "retain",
             "Al": "retain",
             "Si": "retain",
             "O2": "free",
         },
+        extraction_min={"Fe": 0.95},
         oxides={
             "Na2O_plus_K2O": {
                 "min": 5,
                 "max": 18,
+                "strict": False,
                 "weight": 1.0,
                 "needs_experiment": True,
+                "provenance": (
+                    "owner_adjudication_c3_na_retained_alkali_ceiling_soft_rank"
+                ),
             },
             "Fe_total_as_Fe2O3_wt_pct": {
                 "tier": "workable_glass",
@@ -195,7 +200,8 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
                 "needs_experiment": True,
             },
         },
-        # Session accepts a single shuttle phase; K-leaning recipes vary the dose knob.
+        # C3_NA retained-alkali ceiling is about 3.3 wt% for lunar mare; rank
+        # closeness softly until best-tap C0b -> C2B -> partial C3_NA sequencing lands.
         maturity_campaign="C3_NA",
         maturity_hours=24,
         score_weights={"extraction": 0.0, "composition": 1.0},
@@ -443,6 +449,29 @@ def _remove_constraint_gate(profile: dict[str, Any], gate: str) -> None:
     constraints["gates"] = [item for item in gates if item != gate]
 
 
+def _row_delivers_condenser_stream(row: TargetMenuRow) -> bool:
+    return row.pool in {"captured_products", "captured_stage_3_silica"}
+
+
+def _scope_target_profile_constraints(profile: dict[str, Any], row: TargetMenuRow) -> None:
+    constraints = profile.get("constraints")
+    if not isinstance(constraints, dict):
+        return
+    gates = constraints.get("gates")
+    if not isinstance(gates, list):
+        return
+
+    if not _row_delivers_condenser_stream(row):
+        _remove_constraint_gate(profile, "delivered_stream_purity")
+
+    extraction_targets = tuple((row.extraction_min or {}).keys())
+    if extraction_targets:
+        constraints["target_species"] = list(extraction_targets)
+    else:
+        _remove_constraint_gate(profile, "extraction_completeness")
+        constraints.pop("target_species", None)
+
+
 def _target_profile(
     base_profile: Mapping[str, Any],
     row: TargetMenuRow,
@@ -451,6 +480,7 @@ def _target_profile(
     hours: int,
 ) -> dict[str, Any]:
     profile = copy.deepcopy(dict(base_profile))
+    _scope_target_profile_constraints(profile, row)
     if row.target_id == "pc-glass-retain-na-k-c3":
         # C3 retain-alkali profiles do not produce a SiO viscous-flow observable.
         _remove_constraint_gate(profile, "knudsen_viscous")
