@@ -27,7 +27,7 @@ PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
-    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.4",'
+    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.5",'
     b'"data_digests":{"feedstocks":"feedstock-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
     b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
@@ -88,7 +88,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.4",
+    code_version="0.5.5",
     data_digests={
         "setpoints": "setpoints-digest",
         "feedstocks": "feedstock-digest",
@@ -172,7 +172,7 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
         ("feedstock_id", "lunar_highlands"),
         ("profile_id", "other-profile"),
         ("fidelity", "accurate"),
-        ("code_version", "0.5.5"),
+        ("code_version", "0.0.0-determinant-mutant"),
         ("campaign", "C2A"),
         ("hours", 48),
         ("mass_kg", 500.0),

@@ -8,13 +8,17 @@ import hashlib
 import inspect
 import math
 import re
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 from typing import Any, Iterable, Mapping
 from collections.abc import Mapping as MappingABC, Set as AbstractSet
 
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backends import BackendUnavailableError
 from simulator.chemistry.kernel import ProposalRejected
+from simulator.condensation import (
+    DEFAULT_PIPE_DIAMETER_M,
+    knudsen_regime_diagnostic,
+)
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
@@ -52,6 +56,8 @@ from simulator.runner import PyrolysisRun, RunnerError
 
 MASS_BALANCE_ABORT_PCT = 5e-12
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
+KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
+KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
 
 
 class FailureCategory(str, Enum):
@@ -438,7 +444,13 @@ def evaluate(
             ),
         )
 
-    feasibility = (active_constraints or PhysicsConstraintSet()).evaluate(run_execution.trace)
+    feasibility = _evaluate_physics_constraints(
+        active_constraints,
+        run_execution.trace,
+        spec=spec,
+        profile=profile,
+        run_config=run_config,
+    )
     if not feasibility.feasible:
         return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
     target_reason = composition_target_infeasible_reason(profile)
@@ -512,6 +524,511 @@ def _execute_run(
     if worker_runtime is not None and _accepts_keyword(execute, "worker_runtime"):
         return execute(run_config, worker_runtime=worker_runtime)
     return execute(run_config)
+
+
+def _evaluate_physics_constraints(
+    constraints: PhysicsConstraintSet | None,
+    trace: Any,
+    *,
+    spec: EvalSpec | None = None,
+    profile: Mapping[str, Any] | None = None,
+    run_config: Any | None = None,
+) -> FeasibilityResult:
+    active_constraints = constraints or PhysicsConstraintSet()
+    prepared_trace, missing_knudsen_state = _trace_with_knudsen_observables(trace)
+    feasibility = active_constraints.evaluate(prepared_trace)
+    if (
+        missing_knudsen_state is not None
+        and "knudsen_viscous" in feasibility.margins
+    ):
+        fallback_summary = _knudsen_summary_from_eval_inputs(
+            spec=spec,
+            profile=profile,
+            run_config=run_config,
+        )
+        if fallback_summary is not None:
+            prepared_trace, missing_knudsen_state = _trace_with_knudsen_observables(
+                _trace_with_fallback_knudsen_summary(trace, fallback_summary)
+            )
+            feasibility = active_constraints.evaluate(prepared_trace)
+    if (
+        missing_knudsen_state is not None
+        and "knudsen_viscous" in feasibility.margins
+    ):
+        margins = dict(feasibility.margins)
+        margins["knudsen_viscous"] = _knudsen_not_applicable_margin(
+            active_constraints,
+            missing_knudsen_state,
+        )
+        return FeasibilityResult(
+            feasible=False,
+            margins={
+                gate: margins[gate]
+                for gate in GATE_ORDER
+                if gate in margins
+            },
+        )
+    return _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
+
+
+def _knudsen_summary_from_eval_inputs(
+    *,
+    spec: EvalSpec | None,
+    profile: Mapping[str, Any] | None,
+    run_config: Any | None,
+) -> Mapping[str, Any] | None:
+    if spec is None:
+        return None
+    campaign = str(getattr(spec, "campaign", "") or "")
+    pressure_mbar = _knudsen_campaign_pressure_mbar(
+        campaign=campaign,
+        spec=spec,
+        profile=profile,
+        run_config=run_config,
+    )
+    if pressure_mbar is None or pressure_mbar <= 0.0:
+        return None
+    gas_temperature_C = _knudsen_campaign_temperature_C(
+        campaign=campaign,
+        spec=spec,
+        profile=profile,
+        run_config=run_config,
+    )
+    if gas_temperature_C is None:
+        gas_temperature_C = 1500.0
+    pipe_diameter_m = _knudsen_pipe_diameter_m()
+    summary = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=pressure_mbar,
+        gas_temperature_C=gas_temperature_C,
+        pipe_diameter_m=pipe_diameter_m,
+    )
+    return _knudsen_summary_with_fallback_provenance(
+        summary,
+        KNUDSEN_FALLBACK_EVAL_INPUTS,
+    )
+
+
+def _knudsen_campaign_pressure_mbar(
+    *,
+    campaign: str,
+    spec: EvalSpec,
+    profile: Mapping[str, Any] | None,
+    run_config: Any | None,
+) -> float | None:
+    candidates = (
+        _campaign_setting(
+            getattr(run_config, "setpoints_patch", None),
+            campaign,
+            "p_total_mbar_default",
+        ),
+        _campaign_setting(
+            getattr(run_config, "setpoints_patch", None),
+            campaign,
+            "p_total_mbar",
+        ),
+        _campaign_setting(
+            getattr(spec, "runtime_campaign_overrides", None),
+            campaign,
+            "p_total_mbar_default",
+        ),
+        _campaign_setting(
+            getattr(spec, "runtime_campaign_overrides", None),
+            campaign,
+            "p_total_mbar",
+        ),
+        _profile_campaign_setting(profile, campaign, "p_total_mbar_default"),
+        _profile_campaign_setting(profile, campaign, "p_total_mbar"),
+        _default_campaign_setting(campaign, "p_total_mbar_default"),
+        _default_campaign_setting(campaign, "p_total_mbar"),
+    )
+    for value in candidates:
+        # Kn grows with mean free path, so fallback envelopes use lowest pressure and highest gas temperature.
+        numeric = _numeric_setting(value, sequence_policy="min")
+        if numeric is not None:
+            return numeric
+    return None
+
+
+def _knudsen_campaign_temperature_C(
+    *,
+    campaign: str,
+    spec: EvalSpec,
+    profile: Mapping[str, Any] | None,
+    run_config: Any | None,
+) -> float | None:
+    candidates = (
+        _campaign_setting(
+            getattr(run_config, "setpoints_patch", None),
+            campaign,
+            "gas_temperature_C",
+        ),
+        _campaign_setting(
+            getattr(spec, "runtime_campaign_overrides", None),
+            campaign,
+            "gas_temperature_C",
+        ),
+        _profile_campaign_setting(profile, campaign, "gas_temperature_C"),
+        _default_campaign_setting(campaign, "gas_temperature_C"),
+        _campaign_setting(
+            getattr(run_config, "setpoints_patch", None),
+            campaign,
+            "temp_range_C",
+        ),
+        _campaign_setting(
+            getattr(spec, "runtime_campaign_overrides", None),
+            campaign,
+            "temp_range_C",
+        ),
+        _profile_campaign_setting(profile, campaign, "temp_range_C"),
+        _default_campaign_setting(campaign, "temp_range_C"),
+    )
+    for value in candidates:
+        numeric = _numeric_setting(value, sequence_policy="max")
+        if numeric is not None:
+            return numeric
+    return None
+
+
+def _campaign_setting(source: Any, campaign: str, key: str) -> Any:
+    if not isinstance(source, MappingABC):
+        return None
+    campaigns = source.get("campaigns")
+    if isinstance(campaigns, MappingABC):
+        selected = campaigns.get(campaign)
+        if isinstance(selected, MappingABC) and key in selected:
+            return selected[key]
+    selected = source.get(campaign)
+    if isinstance(selected, MappingABC) and key in selected:
+        return selected[key]
+    return source.get(key)
+
+
+def _profile_campaign_setting(
+    profile: Mapping[str, Any] | None,
+    campaign: str,
+    key: str,
+) -> Any:
+    if not isinstance(profile, MappingABC):
+        return None
+    run_value = _campaign_setting(profile.get("run"), campaign, key)
+    if run_value is not None:
+        return run_value
+    for seed in profile.get("seed_recipes", ()) or ():
+        if not isinstance(seed, MappingABC):
+            continue
+        if str(seed.get("source_campaign", "") or campaign) != campaign:
+            continue
+        value = _campaign_setting(seed.get("patch"), campaign, key)
+        if value is not None:
+            return value
+    return None
+
+
+def _default_campaign_setting(campaign: str, key: str) -> Any:
+    try:
+        setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
+    except Exception:  # noqa: BLE001 -- missing defaults preserve fail-loud margin
+        return None
+    campaign_config = (setpoints.get("campaigns", {}) or {}).get(campaign)
+    if not isinstance(campaign_config, MappingABC):
+        return None
+    if campaign_config.get("flow_regime") != "viscous":
+        return None
+    return campaign_config.get(key)
+
+
+def _numeric_setting(value: Any, *, sequence_policy: str) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (tuple, list)):
+        values = [
+            numeric for item in value
+            if (numeric := _finite_float_or_none(item)) is not None
+        ]
+        if not values:
+            return None
+        if sequence_policy == "min":
+            return min(values)
+        if sequence_policy == "max":
+            return max(values)
+        return sum(values) / len(values)
+    return _finite_float_or_none(value)
+
+
+def _knudsen_pipe_diameter_m() -> float:
+    try:
+        setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
+        pipe_config = ((setpoints.get("furnace", {}) or {}).get(
+            "hot_wall_pipe",
+            {},
+        ) or {})
+        typical_cm = _finite_float_or_none(pipe_config.get("typical_cm"))
+        if typical_cm is not None and typical_cm > 0.0:
+            return typical_cm / 100.0
+    except Exception:  # noqa: BLE001 -- use transport module default below
+        pass
+    return DEFAULT_PIPE_DIAMETER_M
+
+
+def _trace_with_fallback_knudsen_summary(
+    trace: Any,
+    summary: Mapping[str, Any],
+) -> Any:
+    snapshots = getattr(trace, "snapshots", None)
+    if not isinstance(snapshots, (tuple, list)):
+        return trace
+    fallback_snapshots = []
+    for index, snapshot in enumerate(snapshots):
+        existing_summary = getattr(snapshot, "knudsen_regime_summary", None)
+        prepared_summary, missing_reason = _knudsen_summary_with_segment(
+            existing_summary,
+            index,
+        )
+        if missing_reason is not None:
+            fallback_snapshots.append(
+                _replace_snapshot_knudsen_summary(snapshot, summary)
+            )
+        elif prepared_summary is not existing_summary:
+            fallback_snapshots.append(
+                _replace_snapshot_knudsen_summary(snapshot, prepared_summary)
+            )
+        else:
+            fallback_snapshots.append(snapshot)
+    return _replace_trace_snapshots(trace, tuple(fallback_snapshots))
+
+
+def _trace_with_knudsen_observables(trace: Any) -> tuple[Any, str | None]:
+    snapshots = getattr(trace, "snapshots", None)
+    if not isinstance(snapshots, (tuple, list)):
+        return trace, "trace missing snapshots for overhead flow state"
+    if not snapshots:
+        return trace, "trace has no snapshots for overhead flow state"
+
+    updated_snapshots = []
+    changed = False
+    for index, snapshot in enumerate(snapshots):
+        summary = getattr(snapshot, "knudsen_regime_summary", None)
+        prepared_summary, missing_reason = _knudsen_summary_with_segment(
+            summary,
+            index,
+        )
+        if missing_reason is not None:
+            return trace, missing_reason
+        if prepared_summary is not summary:
+            changed = True
+            updated_snapshots.append(
+                _replace_snapshot_knudsen_summary(snapshot, prepared_summary)
+            )
+        else:
+            updated_snapshots.append(snapshot)
+
+    if not changed:
+        return trace, None
+    return _replace_trace_snapshots(trace, tuple(updated_snapshots)), None
+
+
+def _knudsen_summary_with_segment(
+    summary: Any,
+    index: int,
+) -> tuple[Mapping[str, Any] | None, str | None]:
+    if not isinstance(summary, MappingABC) or not summary:
+        return (
+            None,
+            f"snapshot {index} missing overhead flow state: "
+            "knudsen_regime_summary absent",
+        )
+    if summary.get("segments"):
+        return summary, None
+
+    knudsen_number = _finite_float_or_none(summary.get("knudsen_number"))
+    if knudsen_number is None:
+        return (
+            None,
+            f"snapshot {index} missing overhead flow state: "
+            "knudsen_number unavailable"
+            f"{_knudsen_summary_status_detail(summary)}",
+        )
+    regime = _knudsen_summary_regime(summary, knudsen_number)
+    if not regime:
+        return (
+            None,
+            f"snapshot {index} missing overhead flow state: "
+            "knudsen regime unavailable"
+            f"{_knudsen_summary_status_detail(summary)}",
+        )
+
+    prepared = dict(summary)
+    prepared.setdefault("regime", regime)
+    prepared["provenance"] = KNUDSEN_FALLBACK_GLOBAL_SUMMARY
+    prepared["segments"] = (
+        {
+            "name": "global_pipe",
+            "regime": regime,
+            "knudsen_number": knudsen_number,
+            "provenance": KNUDSEN_FALLBACK_GLOBAL_SUMMARY,
+        },
+    )
+    return prepared, None
+
+
+def _knudsen_summary_with_fallback_provenance(
+    summary: Mapping[str, Any],
+    provenance: str,
+) -> Mapping[str, Any]:
+    prepared = dict(summary)
+    prepared["provenance"] = provenance
+    segments = []
+    for segment in prepared.get("segments", ()) or ():
+        if isinstance(segment, MappingABC):
+            segment = {**segment, "provenance": provenance}
+        segments.append(segment)
+    prepared["segments"] = tuple(segments)
+    return prepared
+
+
+def _with_knudsen_fallback_margin_detail(
+    feasibility: FeasibilityResult,
+    trace: Any,
+) -> FeasibilityResult:
+    margin = feasibility.margins.get("knudsen_viscous")
+    if margin is None:
+        return feasibility
+    provenance = _knudsen_margin_fallback_provenance(margin, trace)
+    if provenance is None or margin.detail.startswith(provenance):
+        return feasibility
+    margins = dict(feasibility.margins)
+    detail = f"{provenance}: {margin.detail}" if margin.detail else provenance
+    margins["knudsen_viscous"] = replace(margin, detail=detail)
+    return FeasibilityResult(
+        feasible=feasibility.feasible,
+        margins={
+            gate: margins[gate]
+            for gate in GATE_ORDER
+            if gate in margins
+        },
+        version=feasibility.version,
+    )
+
+
+def _knudsen_margin_fallback_provenance(
+    margin: GateMargin,
+    trace: Any,
+) -> str | None:
+    snapshots = getattr(trace, "snapshots", None)
+    if not isinstance(snapshots, (tuple, list)):
+        return None
+    match = re.search(r"snapshot\s+(\d+)\s+(.+?)\s+Kn=", margin.detail)
+    if match is not None:
+        index = int(match.group(1))
+        label = match.group(2)
+        if 0 <= index < len(snapshots):
+            provenance = _knudsen_snapshot_segment_provenance(
+                snapshots[index],
+                label,
+            )
+            if provenance is not None:
+                return provenance
+    return None
+
+
+def _knudsen_snapshot_segment_provenance(
+    snapshot: Any,
+    label: str,
+) -> str | None:
+    summary = getattr(snapshot, "knudsen_regime_summary", None)
+    if not isinstance(summary, MappingABC):
+        return None
+    summary_provenance = _fallback_provenance(summary.get("provenance"))
+    for segment in summary.get("segments", ()) or ():
+        if not isinstance(segment, MappingABC):
+            continue
+        name = str(segment.get("name", "segment"))
+        if name != label:
+            continue
+        return _fallback_provenance(segment.get("provenance")) or summary_provenance
+    return None
+
+
+def _fallback_provenance(value: Any) -> str | None:
+    provenance = str(value or "").strip()
+    if provenance.startswith("fallback:"):
+        return provenance
+    return None
+
+
+def _knudsen_summary_regime(
+    summary: Mapping[str, Any],
+    knudsen_number: float,
+) -> str:
+    raw_regime = summary.get("regime", summary.get("knudsen_regime", ""))
+    regime = str(raw_regime).strip().lower()
+    if regime:
+        return regime
+    if knudsen_number < 0.01:
+        return "viscous"
+    if knudsen_number < 10.0:
+        return "transitional"
+    return "free_molecular"
+
+
+def _knudsen_summary_status_detail(summary: Mapping[str, Any]) -> str:
+    status = str(summary.get("status", "") or "").strip()
+    reason = str(summary.get("reason", "") or "").strip()
+    details = []
+    if status:
+        details.append(f"status={status}")
+    if reason:
+        details.append(f"reason={reason}")
+    return "" if not details else f" ({', '.join(details)})"
+
+
+def _finite_float_or_none(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return numeric if math.isfinite(numeric) else None
+
+
+def _replace_trace_snapshots(trace: Any, snapshots: tuple[Any, ...]) -> Any:
+    try:
+        return replace(trace, snapshots=snapshots)
+    except TypeError:
+        if hasattr(trace, "__dict__"):
+            values = dict(vars(trace))
+            values["snapshots"] = snapshots
+            return SimpleNamespace(**values)
+        return trace
+
+
+def _replace_snapshot_knudsen_summary(
+    snapshot: Any,
+    summary: Mapping[str, Any],
+) -> Any:
+    try:
+        return replace(snapshot, knudsen_regime_summary=dict(summary))
+    except TypeError:
+        if hasattr(snapshot, "__dict__"):
+            values = dict(vars(snapshot))
+            values["knudsen_regime_summary"] = dict(summary)
+            return SimpleNamespace(**values)
+        return snapshot
+
+
+def _knudsen_not_applicable_margin(
+    constraints: PhysicsConstraintSet,
+    reason: str,
+) -> GateMargin:
+    return GateMargin(
+        gate="knudsen_viscous",
+        feasible=False,
+        margin=-math.inf,
+        threshold=constraints.knudsen_max,
+        observed=math.inf,
+        detail=f"not-applicable: {reason}",
+    )
 
 
 def _accepts_keyword(callable_obj: Any, keyword: str) -> bool:
@@ -840,7 +1357,12 @@ def _out_of_domain_result(
             eval_spec=spec,
             key=key,
         )
-        feasibility = (constraints or PhysicsConstraintSet()).evaluate(run_execution.trace)
+        feasibility = _evaluate_physics_constraints(
+            constraints,
+            run_execution.trace,
+            spec=spec,
+            profile=profile,
+        )
         if not feasibility.feasible:
             return _infeasible_result(
                 candidate_id,

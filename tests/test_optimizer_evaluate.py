@@ -29,6 +29,7 @@ from simulator.optimize.objective import objective_definitions
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.runner import RunnerError
 from simulator.state import CampaignPhase, HourSnapshot
@@ -196,13 +197,13 @@ class _Sim:
         return (temperature_C - solidus_T_C) / (liquidus_T_C - solidus_T_C)
 
 
-def _snapshot(mass_balance_error_pct: float = 0.0) -> HourSnapshot:
-    return HourSnapshot(
-        hour=1,
-        campaign=CampaignPhase.C2A,
-        temperature_C=1600.0,
-        mass_balance_error_pct=mass_balance_error_pct,
-        knudsen_regime_summary={
+def _snapshot(
+    mass_balance_error_pct: float = 0.0,
+    *,
+    knudsen_regime_summary: dict[str, object] | None = None,
+) -> HourSnapshot:
+    if knudsen_regime_summary is None:
+        knudsen_regime_summary = {
             "status": "ok",
             "regime": "viscous",
             "knudsen_number": 0.001,
@@ -213,16 +214,26 @@ def _snapshot(mass_balance_error_pct: float = 0.0) -> HourSnapshot:
                     "knudsen_number": 0.001,
                 }
             ],
-        },
+        }
+    return HourSnapshot(
+        hour=1,
+        campaign=CampaignPhase.C2A,
+        temperature_C=1600.0,
+        mass_balance_error_pct=mass_balance_error_pct,
+        knudsen_regime_summary=knudsen_regime_summary,
     )
 
 
-def _trace(*, mixed_stream: bool = False) -> SimpleNamespace:
+def _trace(
+    *,
+    mixed_stream: bool = False,
+    snapshots: tuple[HourSnapshot, ...] | None = None,
+) -> SimpleNamespace:
     condensed = ({(3, "SiO"): 20.0},)
     if mixed_stream:
         condensed = ({(3, "SiO"): 19.0, (3, "Fe"): 2.0},)
     return SimpleNamespace(
-        snapshots=(_snapshot(),),
+        snapshots=snapshots or (_snapshot(),),
         product_ledger_kg={"SiO": 95.0},
         terminal_rump_by_species_kg={"CaO": 2.0},
         condensed_by_stage_species_delta=condensed,
@@ -289,6 +300,219 @@ def _execution(
 
 def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
+
+
+def _knudsen_gate_profile() -> dict:
+    return {
+        **PROFILE,
+        "constraints": {"gates": ["knudsen_viscous"]},
+        "run": {
+            **PROFILE["run"],
+            "campaign": "C2A_continuous",
+            "hours": 24,
+        },
+        "fidelities": {
+            "fast": {
+                "backend_name": "stub",
+                "hours": 24,
+            }
+        },
+        "seed_recipes": [
+            {
+                "id": "pc-extract-na-shape",
+                "source_campaign": "C2A_continuous",
+                "patch": {
+                    "campaigns": {
+                        "C2A_continuous": {
+                            "p_total_mbar": [5, 15],
+                            "p_total_mbar_default": 10,
+                            "temp_range_C": [1050, 1600],
+                        }
+                    }
+                },
+            }
+        ],
+    }
+
+
+def _knudsen_no_flow_profile() -> dict:
+    return {
+        **PROFILE,
+        "constraints": {"gates": ["knudsen_viscous"]},
+    }
+
+
+def _hand_knudsen_number(
+    pressure_mbar: float,
+    gas_temperature_C: float,
+) -> float:
+    boltzmann_j_k = 1.380649e-23
+    n2_collision_diameter_m = 3.7e-10
+    gas_temperature_k = gas_temperature_C + 273.15
+    pressure_pa = pressure_mbar * 100.0
+    pipe_diameter_m = 0.12
+    mean_free_path_m = (
+        boltzmann_j_k
+        * gas_temperature_k
+        / (
+            math.sqrt(2.0)
+            * math.pi
+            * n2_collision_diameter_m**2
+            * pressure_pa
+        )
+    )
+    return mean_free_path_m / pipe_diameter_m
+
+
+def _hand_knudsen_number_10_mbar_1600c() -> float:
+    return _hand_knudsen_number(10.0, 1600.0)
+
+
+def _hand_knudsen_number_5_mbar_1600c() -> float:
+    return _hand_knudsen_number(5.0, 1600.0)
+
+
+def test_batch_global_knudsen_summary_feeds_finite_physics_gate() -> None:
+    expected_kn = _hand_knudsen_number_10_mbar_1600c()
+    assert expected_kn == pytest.approx(3.5432865412006963e-4)
+    trace = _trace(
+        snapshots=(
+            _snapshot(
+                knudsen_regime_summary={
+                    "status": "ok",
+                    "knudsen_regime": "viscous",
+                    "knudsen_number": expected_kn,
+                    "regime_factor": expected_kn / (expected_kn + 0.01),
+                    "warnings": (),
+                }
+            ),
+        )
+    )
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_gate_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert margin.feasible
+    assert margin.observed == pytest.approx(expected_kn)
+    assert 2.0e-4 < margin.observed < 8.0e-4
+    assert margin.detail.startswith("fallback:global-summary")
+    assert "global_pipe" in margin.detail
+
+
+def test_measured_segment_knudsen_margin_keeps_measured_detail() -> None:
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_gate_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=_trace(),
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert margin.feasible
+    assert margin.observed == pytest.approx(0.001)
+    assert not margin.detail.startswith("fallback:")
+    assert "hot_wall" in margin.detail
+
+
+def test_repro_profile_missing_trace_knudsen_uses_pressure_band() -> None:
+    expected_kn = _hand_knudsen_number_5_mbar_1600c()
+    assert expected_kn == pytest.approx(7.086573082401393e-4)
+    profile = _knudsen_gate_profile()
+    del profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ]
+    trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert margin.feasible
+    assert margin.observed == pytest.approx(expected_kn)
+    assert 6.0e-4 < margin.observed < 8.0e-4
+    assert margin.detail.startswith("fallback:eval-inputs")
+    assert "default_pipe" in margin.detail
+
+
+def test_missing_knudsen_flow_state_is_named_and_serializable(tmp_path) -> None:
+    trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_no_flow_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert not margin.feasible
+    assert not math.isnan(margin.observed)
+    assert margin.detail.startswith("not-applicable:")
+    assert "missing overhead flow state" in margin.detail
+
+    assert result.eval_spec is not None
+    store = ResultStore(
+        tmp_path / "knudsen-results.sqlite",
+        current_code_version=result.eval_spec.code_version,
+        current_data_digests=result.eval_spec.data_digests,
+    )
+    store.store(result.eval_spec, result, created_at="2026-06-11T00:00:00Z")
+
+
+def test_stub_smoke_constraint_set_skips_missing_knudsen_gate_boundary() -> None:
+    trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        constraints=StubSmokeConstraintSet(),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert tuple(result.feasibility_margins) == ("stub_smoke",)
 
 
 def _crash_diagnostics(temperature_C: float = 1100.0) -> dict[str, object]:

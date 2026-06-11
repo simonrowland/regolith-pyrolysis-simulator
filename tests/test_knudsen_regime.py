@@ -40,6 +40,40 @@ def test_knudsen_number_matches_kinetic_theory_known_case():
     ) == pytest.approx(expected_knudsen)
 
 
+def test_pc_extract_na_profile_knudsen_order_matches_hand_literal():
+    pressure_pa = 1000.0
+    temperature_K = 1873.15
+    pipe_diameter_m = 0.12
+
+    expected_mean_free_path_m = 4.2519438494408356e-5
+    expected_knudsen = 3.5432865412006963e-4
+
+    assert condensation_module._mean_free_path_m(
+        pressure_pa, temperature_K
+    ) == pytest.approx(expected_mean_free_path_m)
+    assert condensation_module._knudsen_number(
+        pressure_pa, temperature_K, pipe_diameter_m
+    ) == pytest.approx(expected_knudsen)
+    assert 2.0e-4 < expected_knudsen < 8.0e-4
+
+
+def test_pressure_band_min_knudsen_order_matches_hand_literal():
+    pressure_pa = 500.0
+    temperature_K = 1873.15
+    pipe_diameter_m = 0.12
+
+    expected_mean_free_path_m = 8.503887698881671e-5
+    expected_knudsen = 7.086573082401393e-4
+
+    assert condensation_module._mean_free_path_m(
+        pressure_pa, temperature_K
+    ) == pytest.approx(expected_mean_free_path_m)
+    assert condensation_module._knudsen_number(
+        pressure_pa, temperature_K, pipe_diameter_m
+    ) == pytest.approx(expected_knudsen)
+    assert 6.0e-4 < expected_knudsen < 8.0e-4
+
+
 @pytest.mark.parametrize(
     ("knudsen_number", "expected"),
     [
