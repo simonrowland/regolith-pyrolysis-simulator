@@ -97,6 +97,7 @@ import os
 import shutil
 import subprocess
 import warnings
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
@@ -116,17 +117,13 @@ from simulator.melt_backend.liquidus import (
 from simulator.state import OXIDE_SPECIES
 
 
-# MAGEMin operates on the same 14-oxide MELTS basis as alphaMELTS, so
-# the simulator's ``OXIDE_SPECIES`` list is the canonical projection
-# target.  Upstream MAGEMin spells the oxides in standard chemistry
-# notation; the simulator already uses the same spellings so this is a
-# 1:1 rename; pass ``OXIDE_SPECIES`` directly to the projection helper
-# rather than rebinding a private alias that hides the identity.
-#
-# TODO(magemin): once an actual MAGEMin install is available, verify the
-# exact oxide-name spellings the upstream library expects (the C-level
-# ``MAGEMin_init_db`` documents an oxide list; the Python wrappers may
-# remap).  Today this adapter assumes 1:1 with ``OXIDE_SPECIES``.
+@dataclass(frozen=True)
+class _MAGEMinBulkProjection:
+    database: str
+    order: Tuple[str, ...]
+    vector: Tuple[float, ...]
+    composition_wt_pct: Dict[str, float]
+    warnings: Tuple[str, ...]
 
 
 class MAGEMinBackend(MeltBackend):
@@ -308,7 +305,7 @@ class MAGEMinBackend(MeltBackend):
         comp_wt = project_melt_to_oxide_wt_pct(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
-            oxide_basis=tuple(OXIDE_SPECIES),
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
             species_formula_registry=species_formula_registry,
         )
         if not comp_wt:
@@ -326,8 +323,21 @@ class MAGEMinBackend(MeltBackend):
             )
 
         try:
+            bulk_projection = self._build_db_bulk_projection(comp_wt)
+        except MeltCompositionError as exc:
+            message = f'MAGEMin bulk projection failed: {exc}'
+            self._last_error = message
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[*prior_warnings, message],
+            )
+
+        try:
             raw = self._call_magemin(
-                composition_wt_pct=comp_wt,
+                bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
@@ -342,7 +352,7 @@ class MAGEMinBackend(MeltBackend):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 status='not_converged',
-                warnings=[*prior_warnings, message],
+                warnings=[*prior_warnings, *bulk_projection.warnings, message],
             )
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
@@ -351,7 +361,7 @@ class MAGEMinBackend(MeltBackend):
         # core.py::_get_equilibrium as the active backend (see the module
         # "Authority posture" note) — it is only valid for a shadow
         # comparator.
-        all_warnings = list(prior_warnings)
+        all_warnings = [*prior_warnings, *bulk_projection.warnings]
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
@@ -590,16 +600,41 @@ class MAGEMinBackend(MeltBackend):
     # Library call
     # ------------------------------------------------------------------
 
-    # MAGEMin's igneous (``ig``) database ``--Bulk`` order.  See the
-    # binary's ``--help``: 'ig' expects
-    #   SiO2, Al2O3, CaO, MgO, FeOt, K2O, Na2O, TiO2, O, Cr2O3, H2O
-    # FeOt is total iron. Explicit Fe2O3 contributes excess O; when only the
-    # spectroscopic total-iron-as-FeO convention is present, implicit redox O
-    # is provisioned so the qfm buffer can engage.
-    _IG_BULK_ORDER: Tuple[str, ...] = (
-        'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O', 'TiO2',
-        'O', 'Cr2O3', 'H2O',
-    )
+    # Local MAGEMin 1.9.6 ``--help`` declares a DB-specific ``--Bulk`` order.
+    # Keep this table exact: the CLI is positional and silently accepts
+    # wrongly shaped vectors.
+    _DB_BULK_ORDERS: Dict[str, Tuple[str, ...]] = {
+        'ig': (
+            'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O',
+            'TiO2', 'O', 'Cr2O3', 'H2O',
+        ),
+        'igad': (
+            'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O',
+            'TiO2', 'O', 'Cr2O3',
+        ),
+        'mp': (
+            'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O',
+            'TiO2', 'O', 'MnO', 'H2O',
+        ),
+        'mb': (
+            'SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'K2O', 'Na2O',
+            'TiO2', 'O', 'H2O',
+        ),
+        'um': ('SiO2', 'Al2O3', 'MgO', 'FeOt', 'O', 'H2O', 'S'),
+        'ume': (
+            'SiO2', 'Al2O3', 'MgO', 'FeOt', 'O', 'H2O', 'S', 'CaO',
+            'Na2O',
+        ),
+        'mtl': ('SiO2', 'Al2O3', 'CaO', 'MgO', 'FeOt', 'Na2O'),
+    }
+    _IG_BULK_ORDER: Tuple[str, ...] = _DB_BULK_ORDERS['ig']
+    _MAGEMIN_INPUT_BASIS: Tuple[str, ...] = tuple(dict.fromkeys((
+        *OXIDE_SPECIES,
+        'FeOt',
+        'O',
+        'H2O',
+        'S',
+    )))
     # Current standard atomic weights used for FeOt total-iron conversion.
     # The shared accounting table is rounded for legacy kg<->mol tests.
     _FE_MOLAR_MASS_G_PER_MOL = 55.845
@@ -649,7 +684,7 @@ class MAGEMinBackend(MeltBackend):
 
     def _call_magemin(
         self,
-        composition_wt_pct: Dict[str, float],
+        bulk_projection: _MAGEMinBulkProjection,
         temperature_C: float,
         pressure_bar: float,
         fO2_log: float,
@@ -679,7 +714,7 @@ class MAGEMinBackend(MeltBackend):
                 if fn is None:
                     continue
                 return fn(
-                    composition=composition_wt_pct,
+                    composition=bulk_projection.composition_wt_pct,
                     T_C=temperature_C,
                     T_K=temperature_K,
                     P_GPa=pressure_GPa,
@@ -694,7 +729,7 @@ class MAGEMinBackend(MeltBackend):
             # a struct.  This is a thin wrapper — full marshaling is
             # the responsibility of MAGEMin_C.jl.
             return JuliaMain.MAGEMin.single_point_minimization(
-                composition_wt_pct,
+                bulk_projection.composition_wt_pct,
                 temperature_K,
                 pressure_kbar,
                 self._database,
@@ -714,7 +749,7 @@ class MAGEMinBackend(MeltBackend):
 
         if self._bridge == 'subprocess':
             return self._call_magemin_subprocess(
-                composition_wt_pct=composition_wt_pct,
+                bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
@@ -726,7 +761,7 @@ class MAGEMinBackend(MeltBackend):
     def _call_magemin_subprocess(
         self,
         *,
-        composition_wt_pct: Dict[str, float],
+        bulk_projection: _MAGEMinBulkProjection,
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
@@ -755,7 +790,7 @@ class MAGEMinBackend(MeltBackend):
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
 
-        bulk = self._build_ig_bulk_vector(composition_wt_pct)
+        bulk = bulk_projection.vector
         buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
             temperature_C=temperature_C, fO2_log=fO2_log,
         )
@@ -808,19 +843,66 @@ class MAGEMinBackend(MeltBackend):
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]
     ) -> List[float]:
+        return list(
+            self._build_db_bulk_projection(
+                composition_wt_pct, database='ig',
+            ).vector
+        )
+
+    def _build_db_bulk_projection(
+        self,
+        composition_wt_pct: Mapping[str, float],
+        *,
+        database: Optional[str] = None,
+    ) -> _MAGEMinBulkProjection:
         """
-        Project the simulator's 14-oxide wt% onto MAGEMin's ``ig`` bulk
-        order, folding FeO + Fe2O3 into the single FeOt (total iron)
-        component and preserving ferric excess oxygen in the free ``O``
-        redox component.  Oxides outside the ``ig`` system (MnO, P2O5,
-        NiO, CoO) are dropped — the ``ig`` database does not model them.
+        Project simulator oxide wt% into the installed MAGEMin DB bulk order.
+
+        FeO/Fe2O3 are MAGEMin's documented total-iron convention:
+        ``FeOt`` plus free ``O`` where the DB exposes an O component. Other
+        positive components absent from the selected DB order are not hidden:
+        they are listed in warnings as documented drops. Unknown component
+        names fail before the binary sees a positional vector.
         """
-        feo = float(composition_wt_pct.get('FeO', 0.0) or 0.0)
-        fe2o3 = float(composition_wt_pct.get('Fe2O3', 0.0) or 0.0)
+        db = str(database or self._database).lower().strip()
+        if db not in self._DB_BULK_ORDERS:
+            raise MeltCompositionError(
+                f'unknown MAGEMin database {database or self._database!r}; '
+                f'known databases: {", ".join(sorted(self._DB_BULK_ORDERS))}'
+            )
+        order = self._DB_BULK_ORDERS[db]
+        allowed = set(self._MAGEMIN_INPUT_BASIS)
+        source: Dict[str, float] = {}
+        unknown: List[str] = []
+        for component, raw_value in composition_wt_pct.items():
+            value = float(raw_value or 0.0)
+            if value <= 0.0:
+                continue
+            name = str(component)
+            if name not in allowed:
+                unknown.append(name)
+                continue
+            source[name] = source.get(name, 0.0) + value
+        if unknown:
+            raise MeltCompositionError(
+                'unprojectable MAGEMin bulk component(s): '
+                + ', '.join(sorted(unknown))
+            )
+
+        feo = source.pop('FeO', 0.0)
+        fe2o3 = source.pop('Fe2O3', 0.0)
+        feot = source.pop('FeOt', 0.0)
+        excess_o = source.pop('O', 0.0)
+        merged: List[str] = []
+        if feo > 0.0:
+            merged.append('FeO->FeOt+O')
+        if fe2o3 > 0.0:
+            merged.append('Fe2O3->FeOt+O')
+
         # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
         # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
-        feot = feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
-        excess_o = fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
+        feot += feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
+        excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
         if fe2o3 <= 0.0 and feo > 0.0:
             # FeO key is total-iron inventory (FeO_T), not literal FeO only.
             # Peel buffer O from the FeOt slot so FeOt + O == feo (same
@@ -829,16 +911,51 @@ class MAGEMinBackend(MeltBackend):
             excess_o += feo_excess_o
             feot -= feo_excess_o
 
-        vector: List[float] = []
-        for component in self._IG_BULK_ORDER:
-            if component == 'FeOt':
-                vector.append(feot)
-            elif component == 'O':
-                vector.append(excess_o)
-            else:
-                vector.append(
-                    float(composition_wt_pct.get(component, 0.0) or 0.0))
-        return vector
+        if feot > 0.0:
+            source['FeOt'] = source.get('FeOt', 0.0) + feot
+        if excess_o > 0.0:
+            source['O'] = source.get('O', 0.0) + excess_o
+
+        order_set = set(order)
+        projected = {
+            component: value
+            for component, value in source.items()
+            if component in order_set and value > 0.0
+        }
+        dropped = sorted(
+            component for component, value in source.items()
+            if component not in order_set and value > 0.0
+        )
+        if not projected:
+            detail = f'; dropped: {", ".join(dropped)}' if dropped else ''
+            raise MeltCompositionError(
+                f'no positive components remain in MAGEMin {db!r} bulk order'
+                + detail
+            )
+
+        diagnostics: List[str] = []
+        if merged:
+            diagnostics.append(
+                f'MAGEMin: database {db!r} merged '
+                + ', '.join(merged)
+            )
+        if dropped:
+            diagnostics.append(
+                f'MAGEMin: database {db!r} dropped components outside '
+                f'documented bulk order: {", ".join(dropped)}'
+            )
+
+        return _MAGEMinBulkProjection(
+            database=db,
+            order=order,
+            vector=tuple(float(projected.get(component, 0.0)) for component in order),
+            composition_wt_pct={
+                component: float(projected[component])
+                for component in order
+                if component in projected
+            },
+            warnings=tuple(diagnostics),
+        )
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:

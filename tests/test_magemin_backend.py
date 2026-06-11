@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import LiquidFractionInvalidError
+from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.melt_backend.magemin import MAGEMinBackend
 
 
@@ -334,6 +334,94 @@ def test_magemin_feot_conversion_uses_iupac_2feo_mass():
     assert MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR == pytest.approx(
         feot_numerator / fe2o3_molar_mass
     )
+
+
+def test_magemin_db_bulk_orders_match_installed_binary_help():
+    assert MAGEMinBackend._DB_BULK_ORDERS == {
+        "ig": (
+            "SiO2", "Al2O3", "CaO", "MgO", "FeOt", "K2O", "Na2O",
+            "TiO2", "O", "Cr2O3", "H2O",
+        ),
+        "igad": (
+            "SiO2", "Al2O3", "CaO", "MgO", "FeOt", "K2O", "Na2O",
+            "TiO2", "O", "Cr2O3",
+        ),
+        "mp": (
+            "SiO2", "Al2O3", "CaO", "MgO", "FeOt", "K2O", "Na2O",
+            "TiO2", "O", "MnO", "H2O",
+        ),
+        "mb": (
+            "SiO2", "Al2O3", "CaO", "MgO", "FeOt", "K2O", "Na2O",
+            "TiO2", "O", "H2O",
+        ),
+        "um": ("SiO2", "Al2O3", "MgO", "FeOt", "O", "H2O", "S"),
+        "ume": (
+            "SiO2", "Al2O3", "MgO", "FeOt", "O", "H2O", "S", "CaO",
+            "Na2O",
+        ),
+        "mtl": ("SiO2", "Al2O3", "CaO", "MgO", "FeOt", "Na2O"),
+    }
+
+
+def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
+    backend = MAGEMinBackend()
+    composition = {
+        "SiO2": 45.0,
+        "Al2O3": 10.0,
+        "FeO": 12.0,
+        "MnO": 0.4,
+        "Cr2O3": 0.3,
+        "H2O": 2.0,
+    }
+
+    mp = backend._build_db_bulk_projection(composition, database="mp")
+    assert mp.order == MAGEMinBackend._DB_BULK_ORDERS["mp"]
+    assert mp.vector[mp.order.index("MnO")] == pytest.approx(0.4)
+    assert "Cr2O3" not in mp.composition_wt_pct
+    assert any("Cr2O3" in warning for warning in mp.warnings)
+    assert any("FeO->FeOt+O" in warning for warning in mp.warnings)
+
+    igad = backend._build_db_bulk_projection(composition, database="igad")
+    assert "H2O" not in igad.order
+    assert "H2O" not in igad.composition_wt_pct
+    assert "MnO" not in igad.composition_wt_pct
+    assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
+
+
+def test_magemin_db_projection_ume_and_mtl_orders_are_not_ig_shaped():
+    backend = MAGEMinBackend()
+    composition = {
+        "SiO2": 40.0,
+        "Al2O3": 5.0,
+        "MgO": 30.0,
+        "FeO": 10.0,
+        "K2O": 4.0,
+        "Na2O": 3.0,
+        "CaO": 2.0,
+        "H2O": 1.0,
+        "S": 0.5,
+    }
+
+    ume = backend._build_db_bulk_projection(composition, database="ume")
+    assert ume.order == MAGEMinBackend._DB_BULK_ORDERS["ume"]
+    assert "CaO" in ume.composition_wt_pct
+    assert "Na2O" in ume.composition_wt_pct
+    assert "S" in ume.composition_wt_pct
+    assert "K2O" not in ume.composition_wt_pct
+
+    mtl = backend._build_db_bulk_projection(composition, database="mtl")
+    assert mtl.order == MAGEMinBackend._DB_BULK_ORDERS["mtl"]
+    assert len(mtl.vector) == 6
+    assert "H2O" not in mtl.composition_wt_pct
+    assert "S" not in mtl.composition_wt_pct
+    assert any("H2O" in warning and "S" in warning for warning in mtl.warnings)
+
+
+def test_magemin_db_projection_rejects_unknown_bulk_component():
+    backend = MAGEMinBackend()
+
+    with pytest.raises(MeltCompositionError, match="unprojectable.*CO2"):
+        backend._build_db_bulk_projection({"SiO2": 50.0, "CO2": 1.0})
 
 
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
