@@ -26,6 +26,7 @@ from simulator.optimize.evaluate import (
     evaluate,
 )
 from simulator.optimize.objective import objective_definitions
+from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
@@ -200,6 +201,7 @@ class _Sim:
 def _snapshot(
     mass_balance_error_pct: float = 0.0,
     *,
+    hour: int = 1,
     knudsen_regime_summary: dict[str, object] | None = None,
 ) -> HourSnapshot:
     if knudsen_regime_summary is None:
@@ -216,7 +218,7 @@ def _snapshot(
             ],
         }
     return HourSnapshot(
-        hour=1,
+        hour=hour,
         campaign=CampaignPhase.C2A,
         temperature_C=1600.0,
         mass_balance_error_pct=mass_balance_error_pct,
@@ -498,6 +500,70 @@ def test_missing_knudsen_flow_state_is_named_and_serializable(tmp_path) -> None:
     store.store(result.eval_spec, result, created_at="2026-06-11T00:00:00Z")
 
 
+def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) -> None:
+    constraints = PhysicsConstraintSet(
+        active_gates=("extraction_completeness",),
+        target_species=("Cr",),
+        residual_species_by_target={"Cr": ("Cr2O3", "Cr")},
+    )
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        constraints=constraints,
+        executor=FakeExecutor(
+            _execution(
+                trace=_trace(),
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    margin = result.feasibility_margins["extraction_completeness"]
+    assert not margin.feasible
+    assert margin.margin == -math.inf
+    assert margin.observed == math.inf
+    assert margin.detail == "not-applicable: zero input basis for Cr"
+    assert result.failing_gates == ("extraction_completeness",)
+
+    assert result.eval_spec is not None
+    store = ResultStore(
+        tmp_path / "extraction-results.sqlite",
+        current_code_version=result.eval_spec.code_version,
+        current_data_digests=result.eval_spec.data_digests,
+    )
+    store.store(result.eval_spec, result, created_at="2026-06-11T00:00:00Z")
+
+
+def test_nonzero_extraction_completeness_margin_is_hand_pinned() -> None:
+    constraints = PhysicsConstraintSet(active_gates=("extraction_completeness",))
+    trace = _trace()
+    trace.terminal_rump_by_species_kg = {"SiO2": 1.0}
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        constraints=constraints,
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert result.feasible
+    margin = result.feasibility_margins["extraction_completeness"]
+    assert margin.feasible
+    assert margin.observed == pytest.approx(0.9923358418656291)
+    assert margin.margin == pytest.approx(0.04233584186562911)
+    assert margin.detail == (
+        "SiO: product_target_equiv_mol=2154.98, "
+        "residual_target_equiv_mol=16.6436, "
+        "denominator_target_equiv_mol=2171.62"
+    )
+
+
 def test_stub_smoke_constraint_set_skips_missing_knudsen_gate_boundary() -> None:
     trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
 
@@ -581,6 +647,75 @@ def _composition_eval_profile(
         ],
     }
     return profile
+
+
+def _best_tap_composition_profile(
+    *,
+    tap_hour: int,
+    warm_start: bool,
+    target_id: str = "pc-warmstart-tap-test",
+) -> dict:
+    profile = _composition_eval_profile(
+        "terminal_rump_earned",
+        target_id=target_id,
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+    profile["run"] = {
+        "campaign": "C2A_continuous",
+        "hours": 24,
+        "mass_kg": 1000.0,
+        "backend_name": "stub",
+    }
+    profile["fidelities"] = {"fast": {"backend_name": "stub"}}
+    target = profile["objectives"][0]["target"]
+    target["maturity"] = {
+        "mode": "campaign_hours",
+        "campaign": "C2A_continuous",
+        "hours": 24,
+        "best_tap": {
+            "enabled": True,
+            "tap_grid": [tap_hour],
+            "tap_stability_hours": 2,
+        },
+    }
+    if warm_start:
+        profile["seed_recipes"] = [
+            {
+                "id": "thermal-window-seed",
+                "source_campaign": "C2A_continuous",
+                "patch": {
+                    "campaigns": {
+                        "C2A_continuous": {
+                            "p_total_mbar_default": 10.0,
+                            "temp_range_C": [1050.0, 1600.0],
+                            "duration_h": 24,
+                        }
+                    }
+                },
+            }
+        ]
+    return profile
+
+
+def _best_tap_execution(*hours: int) -> SimpleNamespace:
+    snapshots = tuple(_best_tap_snapshot(hour) for hour in hours)
+    return _execution(
+        backend_status="ok",
+        snapshots=snapshots,
+        trace=_trace(snapshots=snapshots),
+    )
+
+
+def _best_tap_snapshot(hour: int) -> SimpleNamespace:
+    snapshot = _snapshot(hour=hour)
+    return SimpleNamespace(
+        hour=snapshot.hour,
+        campaign=snapshot.campaign,
+        temperature_C=snapshot.temperature_C,
+        mass_balance_error_pct=snapshot.mass_balance_error_pct,
+        knudsen_regime_summary=snapshot.knudsen_regime_summary,
+        inventory=SimpleNamespace(melt_oxide_kg={"CaO": 1.0}),
+    )
 
 
 def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
@@ -898,6 +1033,104 @@ def test_composition_target_terminal_rump_completed_run_scores_with_trace() -> N
     assert payload["terminal_rump_source"] == "completed_run"
     assert payload["certification_tier"] == "certified"
     assert payload["certified_envelope"]
+
+
+def test_warm_start_terminal_best_tap_uses_extended_configured_hours() -> None:
+    target_id = "pc-warm-terminal"
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_best_tap_composition_profile(
+            tap_hour=26,
+            warm_start=True,
+            target_id=target_id,
+        ),
+        executor=FakeExecutor(_best_tap_execution(26)),
+    )
+
+    assert result.feasible
+    assert result.eval_spec is not None
+    assert result.eval_spec.hours == 26
+    assert result.objectives is not None
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    instruction = payload["operator_instruction"]
+    assert payload["tap_hour"] == 26
+    assert payload["configured_hours"] == 26
+    assert payload["tap_provenance"] == "completed_run"
+    assert payload["truncated_recipe"]["provenance"] == "completed_run"
+    assert instruction["tap_hour"] == 26
+    assert instruction["configured_hours"] == 26
+    assert instruction["provenance"] == "completed_run"
+
+
+def test_warm_start_mid_window_best_tap_is_absolute_truncated_with_preheat() -> None:
+    target_id = "pc-warm-mid-window"
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_best_tap_composition_profile(
+            tap_hour=24,
+            warm_start=True,
+            target_id=target_id,
+        ),
+        executor=FakeExecutor(_best_tap_execution(24)),
+    )
+
+    assert result.feasible
+    assert result.eval_spec is not None
+    assert result.eval_spec.hours == 26
+    assert result.objectives is not None
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    instruction = payload["operator_instruction"]
+    truncated = payload["truncated_recipe"]
+    assert payload["tap_hour"] == 24
+    assert payload["configured_hours"] == 26
+    assert payload["tap_provenance"] == "tap_truncated"
+    assert payload["thermal_window_preheat_hours"] == pytest.approx(2.0)
+    assert instruction["tap_hour"] == 24
+    assert instruction["configured_hours"] == 26
+    assert instruction["provenance"] == "tap_truncated"
+    assert instruction["thermal_window_preheat_hours"] == pytest.approx(2.0)
+    assert truncated["provenance"] == "tap_truncated"
+    assert truncated["operator_instruction"]["thermal_window_preheat_hours"] == (
+        pytest.approx(2.0)
+    )
+
+
+def test_cold_best_tap_keeps_completed_run_without_preheat_metadata() -> None:
+    target_id = "pc-cold-terminal"
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_best_tap_composition_profile(
+            tap_hour=24,
+            warm_start=False,
+            target_id=target_id,
+        ),
+        executor=FakeExecutor(_best_tap_execution(24)),
+    )
+
+    assert result.feasible
+    assert result.eval_spec is not None
+    assert result.eval_spec.hours == 24
+    assert result.objectives is not None
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    instruction = payload["operator_instruction"]
+    assert payload["tap_hour"] == 24
+    assert payload["configured_hours"] == 24
+    assert payload["tap_provenance"] == "completed_run"
+    assert instruction["provenance"] == "completed_run"
+    assert "thermal_window_preheat_hours" not in payload
+    assert "thermal_window_preheat_hours" not in instruction
 
 
 def test_trace_only_out_of_domain_terminal_rump_cannot_score_completed_run() -> None:

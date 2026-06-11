@@ -159,6 +159,28 @@ def test_silica_glass_zero_when_stage_3_missing():
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
+def test_captured_volatiles_include_condensation_train_account():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=SimpleNamespace(
+            kg_by_account=lambda acct: {
+                'terminal.offgas': {'H2O': 1.0, 'O2': 2.0},
+                'process.condensation_train': {'Na': 3.0, 'K': 4.0},
+            }.get(acct, {})
+        ),
+    )
+
+    result = classify_products(sim)
+
+    assert result['captured_volatiles']['kg_by_species'] == {
+        'H2O': 1.0,
+        'K': 4.0,
+        'Na': 3.0,
+    }
+    assert result['captured_volatiles']['class_total_kg'] == pytest.approx(8.0)
+
+
 # ---------------------------------------------------------------------------
 # 4. Refractory ceramic rump
 # ---------------------------------------------------------------------------

@@ -56,7 +56,10 @@ O2_PRODUCT_SPECIES: tuple[str, ...] = ('O2',)
 """Terminal O₂ accumulator — part of product class 1 (the
 disproportionation by-product that motivates the whole refinery)."""
 
-CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = ('terminal.offgas',)
+CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
+    'terminal.offgas',
+    'process.condensation_train',
+)
 """Terminal volatile trap accounts that should surface as product output."""
 
 PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')

@@ -9,8 +9,8 @@ import inspect
 import math
 import re
 from types import MappingProxyType, SimpleNamespace
-from typing import Any, Iterable, Mapping
-from collections.abc import Mapping as MappingABC, Set as AbstractSet
+from typing import Any, Mapping
+from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backends import BackendUnavailableError
@@ -58,6 +58,8 @@ MASS_BALANCE_ABORT_PCT = 5e-12
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
+DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
+DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 
 
 class FailureCategory(str, Enum):
@@ -289,6 +291,7 @@ def evaluate(
             candidate_id=candidate_id,
         ) from exc
     key = cache_key(spec)
+    objective_profile = _objective_profile_for_spec(profile, spec)
     active_executor = executor or RunExecutor()
     runtime = worker_runtime if worker_runtime is not None else get_worker_runtime()
 
@@ -406,7 +409,7 @@ def evaluate(
             spec,
             key,
             run_execution,
-            profile,
+            objective_profile,
             patch=validated_patch,
             constraints=active_constraints,
         )
@@ -491,7 +494,7 @@ def evaluate(
             )
 
     try:
-        objectives = compute_objectives(profile, run_execution)
+        objectives = compute_objectives(objective_profile, run_execution)
     except ObjectiveComputationError as exc:
         raise EngineBugAbort(
             str(exc),
@@ -501,7 +504,12 @@ def evaluate(
             cache_key_value=key,
         ) from exc
 
-    trace_payload = _composition_target_trace_payload(profile, objectives, run_execution)
+    objectives = _objectives_with_thermal_window_metadata(objectives, spec)
+    trace_payload = _composition_target_trace_payload(
+        objective_profile,
+        objectives,
+        run_execution,
+    )
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -510,7 +518,11 @@ def evaluate(
         objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=(),
-        run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
+        run_reference=_run_reference(
+            run_execution,
+            objective_profile,
+            trace_payload=trace_payload,
+        ),
     )
 
 
@@ -1064,7 +1076,11 @@ def _build_eval_inputs(
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
     target_metadata = composition_target_eval_metadata(profile)
-    run_options = _run_options(profile, fidelity)
+    run_options = _thermal_scheduled_run_options(
+        _run_options(profile, fidelity),
+        profile=profile,
+        constraints=constraints,
+    )
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
     for digest_key in ("setpoints", "feedstocks", "vapor_pressures"):
@@ -1085,6 +1101,8 @@ def _build_eval_inputs(
         c5_enabled=bool(run_options["c5_enabled"]),
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
+        allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
+        force_builtin_vapor_pressure=bool(run_options["force_builtin_vapor_pressure"]),
     )._session_config()
 
     spec = EvalSpec(
@@ -1155,7 +1173,163 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             merged.get("runtime_campaign_overrides", {}) or {}
         ),
         "chemistry_kernel": dict(merged.get("chemistry_kernel", {}) or {}),
+        "allow_fallback_vapor": bool(merged.get("allow_fallback_vapor", False)),
+        "force_builtin_vapor_pressure": bool(
+            merged.get("force_builtin_vapor_pressure", False)
+        ),
     })
+
+
+def _thermal_scheduled_run_options(
+    run_options: Mapping[str, Any],
+    *,
+    profile: Mapping[str, Any],
+    constraints: PhysicsConstraintSet | None,
+) -> Mapping[str, Any]:
+    schedule = _profile_thermal_window_schedule(
+        run_options,
+        profile=profile,
+        constraints=constraints,
+    )
+    if schedule is None:
+        return run_options
+    merged = dict(run_options)
+    runtime_overrides = {
+        str(campaign): dict(fields)
+        for campaign, fields in dict(
+            run_options.get("runtime_campaign_overrides", {}) or {}
+        ).items()
+    }
+    campaign = str(schedule["campaign"])
+    campaign_overrides = runtime_overrides.setdefault(campaign, {})
+    for key, value in schedule["overrides"].items():
+        existing = campaign_overrides.get(key)
+        if existing is not None and float(existing) != float(value):
+            raise EvaluationInputError(
+                f"runtime_campaign_overrides[{campaign!r}].{key} conflicts "
+                "with profile-declared thermal window"
+            )
+        campaign_overrides[key] = float(value)
+    merged["runtime_campaign_overrides"] = runtime_overrides
+    merged["hours"] = int(schedule["total_hours"])
+    chemistry_kernel = dict(merged.get("chemistry_kernel", {}) or {})
+    chemistry_kernel.setdefault("allow_fallback_vapor", True)
+    merged["chemistry_kernel"] = chemistry_kernel
+    merged["allow_fallback_vapor"] = True
+    merged["force_builtin_vapor_pressure"] = True
+    return MappingProxyType(merged)
+
+
+def _profile_thermal_window_schedule(
+    run_options: Mapping[str, Any],
+    *,
+    profile: Mapping[str, Any],
+    constraints: PhysicsConstraintSet | None,
+) -> Mapping[str, Any] | None:
+    campaign = str(run_options.get("campaign", "") or "")
+    if campaign not in {"C2A", "C2A_continuous"}:
+        return None
+    temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
+    bounds = _numeric_interval(temp_range)
+    if bounds is None:
+        return None
+    low_C, high_C = bounds
+    if high_C < low_C:
+        raise EvaluationInputError(
+            f"{campaign}.temp_range_C must be ascending; got {temp_range!r}"
+        )
+    ceiling_C = _furnace_ceiling_C(constraints)
+    if high_C > ceiling_C:
+        raise EvaluationInputError(
+            f"{campaign}.temp_range_C high {high_C:g} C exceeds "
+            f"furnace_T_max_C {ceiling_C:g} C"
+        )
+    duration_h = _thermal_window_duration_h(
+        _profile_campaign_setting(profile, campaign, "duration_h"),
+        run_hours=int(run_options.get("hours", 24)),
+    )
+    if duration_h <= 0.0:
+        raise EvaluationInputError(
+            f"{campaign}.duration_h must be positive for thermal window scheduling"
+        )
+    preheat_ramp = _thermal_preheat_ramp_C_per_hr(profile, campaign)
+    preheat_hours = int(math.ceil(
+        max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / preheat_ramp
+    ))
+    total_hours = int(math.ceil(preheat_hours + duration_h))
+    window_ramp = (high_C - low_C) / duration_h if duration_h > 0.0 else 0.0
+    return MappingProxyType({
+        "campaign": campaign,
+        "total_hours": total_hours,
+        "overrides": {
+            "thermal_window_low_C": low_C,
+            "thermal_window_high_C": high_C,
+            "thermal_window_duration_h": duration_h,
+            "thermal_window_preheat_ramp_C_per_hr": preheat_ramp,
+            "thermal_window_preheat_hours": float(preheat_hours),
+            "thermal_window_ramp_C_per_hr": window_ramp,
+            "min_hold_hr": float(total_hours),
+            "max_hours": float(total_hours),
+        },
+    })
+
+
+def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
+    interval = _numeric_interval(value)
+    if interval is None:
+        return float(run_hours)
+    low, high = interval
+    if high < low:
+        raise EvaluationInputError(f"duration_h must be ascending; got {value!r}")
+    if low <= float(run_hours) <= high:
+        return float(run_hours)
+    if low == high:
+        return low
+    return (low + high) / 2.0
+
+
+def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) -> float:
+    value = _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr")
+    if value is None:
+        value = _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr")
+    if value is None:
+        return DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
+    numeric = _numeric_setting(value, sequence_policy="max")
+    if numeric is None or numeric <= 0.0:
+        raise EvaluationInputError(
+            f"{campaign}.preheat_ramp_C_per_hr must be positive"
+        )
+    return numeric
+
+
+def _furnace_ceiling_C(constraints: PhysicsConstraintSet | None) -> float:
+    if constraints is None:
+        return 1800.0
+    threshold = getattr(constraints, "furnace_T_max_C", None)
+    value = getattr(threshold, "value", None)
+    if value is None:
+        return 1800.0
+    return float(value)
+
+
+def _numeric_interval(value: Any) -> tuple[float, float] | None:
+    if value is None:
+        return None
+    if isinstance(value, (str, bytes)) or not isinstance(value, Iterable):
+        numeric = _numeric_setting(value, sequence_policy="max")
+        if numeric is None:
+            return None
+        return (numeric, numeric)
+    values = [
+        _numeric_setting(item, sequence_policy="max")
+        for item in value
+    ]
+    numbers = [float(item) for item in values if item is not None]
+    if not numbers:
+        return None
+    if len(numbers) == 1:
+        return (numbers[0], numbers[0])
+    return (numbers[0], numbers[1])
 
 
 def _validate_c5_eval_options(
@@ -1180,6 +1354,97 @@ def _validate_c5_eval_options(
 def _profile_digest(profile: Mapping[str, Any]) -> str:
     normalized = normalize_canonical_value(profile)
     return hashlib.sha256(canonical_json_dumps(normalized).encode("utf-8")).hexdigest()
+
+
+def _objective_profile_for_spec(
+    profile: Mapping[str, Any],
+    spec: EvalSpec,
+) -> Mapping[str, Any]:
+    run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
+    changed = False
+    try:
+        configured_hours = int(run.get("hours"))
+    except (TypeError, ValueError):
+        configured_hours = None
+    if configured_hours != int(spec.hours):
+        run["hours"] = int(spec.hours)
+        changed = True
+
+    preheat_hours = _thermal_window_preheat_hours(spec)
+    if preheat_hours is not None:
+        run["thermal_window_preheat_hours"] = preheat_hours
+        changed = True
+
+    if not changed:
+        return profile
+    merged = dict(profile)
+    merged["run"] = run
+    return MappingProxyType(merged)
+
+
+def _thermal_window_preheat_hours(spec: EvalSpec) -> float | None:
+    overrides = spec.runtime_campaign_overrides.get(spec.campaign, {})
+    if not isinstance(overrides, Mapping):
+        return None
+    value = overrides.get("thermal_window_preheat_hours")
+    if value is None:
+        return None
+    return float(value)
+
+
+def _objectives_with_thermal_window_metadata(
+    objectives: ObjectiveVector,
+    spec: EvalSpec,
+) -> ObjectiveVector:
+    preheat_hours = _thermal_window_preheat_hours(spec)
+    if preheat_hours is None:
+        return objectives
+    evidence: dict[str, Any] = {}
+    changed = False
+    for metric, raw in objectives.evidence.items():
+        patched = _evidence_with_thermal_window_preheat(raw, preheat_hours)
+        evidence[str(metric)] = patched
+        changed = changed or patched is not raw
+    if not changed:
+        return objectives
+    return ObjectiveVector(objectives.values, evidence=evidence)
+
+
+def _evidence_with_thermal_window_preheat(
+    raw: Any,
+    preheat_hours: float,
+) -> Any:
+    if not isinstance(raw, MappingABC):
+        return raw
+    target = raw.get("composition_target")
+    if not isinstance(target, MappingABC):
+        return raw
+
+    patched_target = dict(target)
+    patched_target["thermal_window_preheat_hours"] = preheat_hours
+    _add_preheat_to_operator_instruction(patched_target, preheat_hours)
+
+    truncated = patched_target.get("truncated_recipe")
+    if isinstance(truncated, MappingABC):
+        patched_truncated = dict(truncated)
+        patched_truncated["thermal_window_preheat_hours"] = preheat_hours
+        _add_preheat_to_operator_instruction(patched_truncated, preheat_hours)
+        patched_target["truncated_recipe"] = patched_truncated
+
+    patched = dict(raw)
+    patched["composition_target"] = patched_target
+    return patched
+
+
+def _add_preheat_to_operator_instruction(
+    payload: dict[str, Any],
+    preheat_hours: float,
+) -> None:
+    instruction = payload.get("operator_instruction")
+    if isinstance(instruction, MappingABC):
+        patched_instruction = dict(instruction)
+        patched_instruction["thermal_window_preheat_hours"] = preheat_hours
+        payload["operator_instruction"] = patched_instruction
 
 
 def _composition_target_constraints(
@@ -1388,6 +1653,7 @@ def _out_of_domain_result(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
+        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
         trace_payload = _composition_target_trace_payload(
             profile,
             objectives,

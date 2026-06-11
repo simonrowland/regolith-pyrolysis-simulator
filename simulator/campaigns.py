@@ -317,6 +317,34 @@ class CampaignManager:
             return (1250.0, 30.0)
 
         elif campaign == CampaignPhase.C2A:
+            ovr = self._campaign_overrides(campaign)
+            if {
+                'thermal_window_low_C',
+                'thermal_window_high_C',
+                'thermal_window_duration_h',
+            } <= set(ovr):
+                low_C = self._float(ovr.get('thermal_window_low_C'), 1050.0)
+                high_C = self._float(ovr.get('thermal_window_high_C'), 1600.0)
+                duration_h = self._float(ovr.get('thermal_window_duration_h'), 24.0)
+                if duration_h <= 0.0:
+                    raise ValueError('thermal_window_duration_h must be positive')
+                if high_C < low_C:
+                    raise ValueError('thermal_window_high_C must be >= thermal_window_low_C')
+                if melt.temperature_C < low_C - 1e-9:
+                    return (
+                        low_C,
+                        self._float(
+                            ovr.get('thermal_window_preheat_ramp_C_per_hr'),
+                            600.0,
+                        ),
+                    )
+                return (
+                    high_C,
+                    self._float(
+                        ovr.get('thermal_window_ramp_C_per_hr'),
+                        (high_C - low_C) / duration_h,
+                    ),
+                )
             # Continuous ramp 1050 → 1600°C
             # Ramp rate varies: 15°C/hr early, 7.5°C/hr at peak SiO window
             if melt.temperature_C < 1320:
@@ -460,9 +488,14 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C2A:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
-            threshold_kg_hr = self._endpoint_float(
-                campaign, soft, 'threshold_kg_hr')
+            min_hold_hr = self._float(
+                ovr.get('min_hold_hr'),
+                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            )
+            threshold_kg_hr = self._float(
+                ovr.get('threshold_kg_hr'),
+                self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
+            )
             max_hold_hr = self._configured_max_hold_hr(campaign)
             total_rate = evap_flux.total_kg_hr
             if (melt.campaign_hour >= min_hold_hr

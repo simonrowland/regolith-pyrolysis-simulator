@@ -19,8 +19,10 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
-from simulator.optimize.evaluate import _build_eval_inputs
+from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
+from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.runner import PyrolysisRun
 
 
 PINNED_EVALSPEC_JSON = (
@@ -356,12 +358,163 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
     assert cache_key(dosed_spec) != cache_key(replace(dosed_spec, additives_kg={}))
 
 
+def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _c2a_window_profile(1050.0, 1600.0, 24),
+        RecipeSchema(),
+    )
+
+    overrides = run_config.runtime_campaign_overrides["C2A_continuous"]
+    assert run_config.hours == 26
+    assert spec.hours == 26
+    assert overrides["thermal_window_preheat_hours"] == pytest.approx(2.0)
+    assert overrides["thermal_window_ramp_C_per_hr"] == pytest.approx(
+        (1600.0 - 1050.0) / 24.0
+    )
+
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    temperatures = [
+        session.advance().snapshot.temperature_C
+        for _ in range(run_config.hours)
+    ]
+
+    assert temperatures[0] == pytest.approx(625.0)
+    assert temperatures[1] == pytest.approx(1050.0)
+    assert temperatures[-1] == pytest.approx(1600.0)
+
+
+def test_c2a_profile_window_splits_cache_key_from_cold_start() -> None:
+    cold_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _c2a_window_profile(None, None, 24),
+        RecipeSchema(),
+    )
+    warm_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _c2a_window_profile(1050.0, 1600.0, 24),
+        RecipeSchema(),
+    )
+
+    assert cold_spec.runtime_campaign_overrides == {}
+    assert warm_spec.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_low_C"
+    ] == pytest.approx(1050.0)
+    assert cache_key(cold_spec) != cache_key(warm_spec)
+
+
+def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
+    constraints = PhysicsConstraintSet(
+        furnace_T_max_C=ThresholdSpec(
+            id="furnace_T_max_C",
+            value=1300.0,
+            units="degC",
+            source="test",
+            source_ref="tests/test_optimizer_evalspec.py",
+        )
+    )
+
+    with pytest.raises(EvaluationInputError, match="exceeds furnace_T_max_C"):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            _c2a_window_profile(1400.0, 1450.0, 18),
+            RecipeSchema(),
+            constraints=constraints,
+        )
+
+
+def test_in_window_c2a_run_captures_na_product() -> None:
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _c2a_window_profile(1400.0, 1450.0, 18),
+        RecipeSchema(),
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign=run_config.campaign,
+        hours=run_config.hours,
+        mass_kg=run_config.mass_kg,
+        backend_name=run_config.backend_name,
+        runtime_campaign_overrides=run_config.runtime_campaign_overrides,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    session = run._start_session()
+    result = run._run_session(session)
+
+    assert result["status"] == "ok"
+    assert session.simulator.product_ledger()["Na"] > 0.0
+
+
 @pytest.mark.parametrize("bad_value", (math.nan, math.inf, -math.inf))
 def test_cache_key_rejects_nan_and_infinity(bad_value: float) -> None:
     spec = _base_spec(chemistry_kernel={"allow_builtin_fallback": False, "x": bad_value})
 
     with pytest.raises(ValueError, match="NaN and infinity"):
         cache_key(spec)
+
+
+def _c2a_window_profile(
+    low_C: float | None,
+    high_C: float | None,
+    duration_h: int,
+) -> dict[str, object]:
+    campaign_patch: dict[str, object] = {"p_total_mbar_default": 10.0}
+    if low_C is not None and high_C is not None:
+        campaign_patch["temp_range_C"] = [low_C, high_C]
+        campaign_patch["duration_h"] = duration_h
+    return {
+        "profile_id": "c2a-thermal-window-test",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [
+            {
+                "id": "seed",
+                "source_campaign": "C2A_continuous",
+                "patch": {"campaigns": {"C2A_continuous": campaign_patch}},
+            }
+        ],
+        "run": {
+            "campaign": "C2A_continuous",
+            "hours": duration_h,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+
+def _force_builtin_run_from_config(run_config) -> PyrolysisRun:
+    return PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign=run_config.campaign,
+        hours=run_config.hours,
+        mass_kg=run_config.mass_kg,
+        backend_name=run_config.backend_name,
+        runtime_campaign_overrides=run_config.runtime_campaign_overrides,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
 
 
 def test_non_string_mapping_keys_raise() -> None:
