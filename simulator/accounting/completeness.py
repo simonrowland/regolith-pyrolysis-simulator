@@ -170,7 +170,7 @@ def extraction_completeness_by_target(
                     product_mol,
                     residual_mol,
                     denom,
-                    "no target-equivalent mol evidence",
+                    f"not-applicable: zero input basis for {target}",
                 )
                 continue
             results[target] = TargetExtractionCompleteness(

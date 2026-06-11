@@ -455,10 +455,17 @@ class PhysicsConstraintSet:
             for target in self.target_species:
                 result = by_target[str(target)]
                 if result.completeness_fraction is None:
+                    detail = _extraction_completeness_fail_closed_detail(result)
+                    if detail.startswith("not-applicable:"):
+                        return _not_applicable(
+                            "extraction_completeness",
+                            self.extraction_min_fraction,
+                            detail,
+                        )
                     return _fail_closed(
                         "extraction_completeness",
                         self.extraction_min_fraction,
-                        _extraction_completeness_fail_closed_detail(result),
+                        detail,
                     )
                 fraction = result.completeness_fraction
                 margin = fraction - self.extraction_min_fraction.value
@@ -560,6 +567,8 @@ class PhysicsConstraintSet:
 def _extraction_completeness_fail_closed_detail(
     result: TargetExtractionCompleteness,
 ) -> str:
+    if result.reason.startswith("not-applicable:"):
+        return result.reason
     if result.reason == "no target-equivalent mol evidence":
         return result.detail
     if result.reason.startswith("unknown: "):
@@ -825,6 +834,17 @@ def _fail_closed(gate: str, threshold: ThresholdSpec, detail: str) -> GateMargin
         threshold=threshold,
         observed=math.nan,
         detail=f"fail-closed: {detail}",
+    )
+
+
+def _not_applicable(gate: str, threshold: ThresholdSpec, detail: str) -> GateMargin:
+    return GateMargin(
+        gate=gate,
+        feasible=False,
+        margin=-math.inf,
+        threshold=threshold,
+        observed=math.inf,
+        detail=detail,
     )
 
 

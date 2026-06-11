@@ -405,7 +405,10 @@ def test_missing_required_trace_data_fails_closed_for_all_gates(
     assert not result.feasible
     assert not result.margins[gate].feasible
     assert result.margins[gate].margin < 0.0
-    assert "fail-closed" in result.margins[gate].detail
+    if gate == "extraction_completeness":
+        assert result.margins[gate].detail.startswith("not-applicable:")
+    else:
+        assert "fail-closed" in result.margins[gate].detail
 
 
 @pytest.mark.parametrize(
@@ -546,7 +549,7 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     assert missing["conclusion"] == "inconclusive"
     assert missing["completeness_fraction"] is None
     _assert_insufficient_target_evidence_is_unknown(missing_target)
-    assert "no target-equivalent mol evidence" in missing_target["reason"]
+    assert missing_target["reason"] == "not-applicable: zero input basis for Cr"
 
     sim = SimpleNamespace(
         train=SimpleNamespace(stages=()),
@@ -641,11 +644,9 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
     assert zero_denom.gate == "extraction_completeness"
     assert zero_denom.feasible is False
     assert zero_denom.margin == -math.inf
-    assert math.isnan(zero_denom.observed)
+    assert zero_denom.observed == math.inf
     assert zero_denom.threshold == threshold
-    assert zero_denom.detail == (
-        "fail-closed: SiO: no target-equivalent mol evidence"
-    )
+    assert zero_denom.detail == "not-applicable: zero input basis for SiO"
 
     cr_constraints = PhysicsConstraintSet(
         target_species=("Cr",),
