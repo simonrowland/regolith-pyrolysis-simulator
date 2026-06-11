@@ -195,7 +195,8 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
                 "needs_experiment": True,
             },
         },
-        maturity_campaign="C3",
+        # Session accepts a single shuttle phase; K-leaning recipes vary the dose knob.
+        maturity_campaign="C3_NA",
         maturity_hours=24,
         score_weights={"extraction": 0.0, "composition": 1.0},
     ),
@@ -432,6 +433,16 @@ def _standard_cost_objectives(profile: Mapping[str, Any]) -> list[dict[str, Any]
     return [by_metric[metric] for metric in STANDARD_COST_METRICS]
 
 
+def _remove_constraint_gate(profile: dict[str, Any], gate: str) -> None:
+    constraints = profile.get("constraints")
+    if not isinstance(constraints, dict):
+        return
+    gates = constraints.get("gates")
+    if not isinstance(gates, list):
+        return
+    constraints["gates"] = [item for item in gates if item != gate]
+
+
 def _target_profile(
     base_profile: Mapping[str, Any],
     row: TargetMenuRow,
@@ -440,6 +451,9 @@ def _target_profile(
     hours: int,
 ) -> dict[str, Any]:
     profile = copy.deepcopy(dict(base_profile))
+    if row.target_id == "pc-glass-retain-na-k-c3":
+        # C3 retain-alkali profiles do not produce a SiO viscous-flow observable.
+        _remove_constraint_gate(profile, "knudsen_viscous")
     feedstock = str(profile["feedstock"])
     profile["profile_id"] = f"{feedstock}-{row.target_id}-recipe-db-profile-v1"
     profile["description"] = f"{feedstock} PC target matrix profile for {row.target_id}."
@@ -453,6 +467,20 @@ def _target_profile(
         *_standard_cost_objectives(profile),
     ]
     return profile
+
+
+def _target_campaign(campaign: str | None, row: TargetMenuRow) -> str:
+    if campaign is None:
+        return row.maturity_campaign
+    if campaign == "C3" and row.maturity_campaign in {"C3_K", "C3_NA"}:
+        return row.maturity_campaign
+    return _normalize_campaign(campaign)
+
+
+def _normalize_campaign(campaign: str) -> str:
+    if campaign == "C3":
+        return "C3_NA"
+    return campaign
 
 
 def _plain_data(value: Any) -> Any:
@@ -558,7 +586,7 @@ def main(argv: list[str]) -> int:
     target_rows = _resolve_target_rows(args.target)
 
     if not target_rows:
-        campaign = args.campaign or "C2A_continuous"
+        campaign = _normalize_campaign(args.campaign or "C2A_continuous")
         hours = args.hours if args.hours is not None else 30
         _apply_cached_real(
             profile,
@@ -576,7 +604,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     for row in target_rows:
-        campaign = args.campaign or row.maturity_campaign
+        campaign = _target_campaign(args.campaign, row)
         hours = args.hours if args.hours is not None else row.maturity_hours
         target_profile = _target_profile(profile, row, campaign=campaign, hours=hours)
         _apply_cached_real(

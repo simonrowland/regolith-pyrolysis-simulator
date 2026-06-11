@@ -6,7 +6,72 @@ import pytest
 import yaml
 
 import scripts.make_recipe_db_profile as generator
+from simulator.optimize.evaluate import EngineBugAbort, evaluate
 from simulator.optimize.profiles import validate_profile
+from simulator.optimize.recipe import RecipePatch
+from simulator.state import CampaignPhase
+
+
+SESSION_VALID_CAMPAIGNS = (
+    "IDLE",
+    "C0",
+    "C0B",
+    "C2A",
+    "C2A_STAGED",
+    "C2B",
+    "C3_K",
+    "C3_NA",
+    "C4",
+    "C5",
+    "C6",
+    "MRE_BASELINE",
+    "COMPLETE",
+)
+SESSION_CAMPAIGN_ALIASES = {
+    "C0b_p_cleanup": "C0B",
+    "C2A_continuous": "C2A",
+    "C2A_staged": "C2A_STAGED",
+}
+
+
+def test_pinned_session_campaign_vocabulary() -> None:
+    assert tuple(member.name for member in CampaignPhase) == SESSION_VALID_CAMPAIGNS
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_campaigns_are_session_valid(target_id: str) -> None:
+    campaign = generator.TARGET_MENU[target_id].maturity_campaign
+    canonical = SESSION_CAMPAIGN_ALIASES.get(campaign, campaign)
+    assert canonical in SESSION_VALID_CAMPAIGNS
+
+
+def test_retain_alkali_legacy_c3_override_emits_session_phase(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-glass-retain-na-k-c3.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-glass-retain-na-k-c3",
+                "--campaign",
+                "C3",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+
+    profile = yaml.safe_load(out.read_text())
+    assert profile["run"]["campaign"] == "C3_NA"
+    assert "knudsen_viscous" not in profile["constraints"]["gates"]
 
 
 @pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
@@ -32,6 +97,30 @@ def test_target_menu_rows_emit_validating_profiles(
         "energy_kWh",
         "duration_h",
     }
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_generated_profiles_stub_eval_no_campaign_vocabulary_abort(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = yaml.safe_load(out.read_text())
+    try:
+        evaluate(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile=profile,
+            candidate_id=f"smoke-{target_id}",
+        )
+    except EngineBugAbort as exc:
+        message = str(exc)
+        assert "unknown campaign" not in message
+        assert "valid options:" not in message
 
 
 def test_target_menu_unknown_id_fails_loud(
