@@ -1578,11 +1578,46 @@ def _run_reference(
         status=str(getattr(run_execution, "status", "ok")),
         error_message=str(getattr(run_execution, "error_message", "")),
         reason=str(getattr(run_execution, "reason", "")),
-        trace=trace_payload if trace_payload is not None else getattr(run_execution, "trace", None),
+        trace=_cache_trace_payload(run_execution, trace_payload),
         product_summary=summary,
         backend_status=_latest_backend_status(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
+
+
+def _cache_trace_payload(
+    run_execution: Any,
+    trace_payload: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | Any:
+    payload: dict[str, Any] = {}
+    if isinstance(trace_payload, Mapping):
+        payload.update(dict(trace_payload))
+
+    reduced_real_cache = getattr(run_execution, "reduced_real_cache", None)
+    if isinstance(reduced_real_cache, Mapping) and reduced_real_cache:
+        payload["reduced_real_cache"] = _compact_jsonable(reduced_real_cache)
+
+    per_hour_cache: list[dict[str, Any]] = []
+    for index, entry in enumerate(getattr(run_execution, "per_hour", ()) or (), start=1):
+        if not isinstance(entry, Mapping):
+            continue
+        cache_state = entry.get("reduced_real_cache_state")
+        if cache_state is None:
+            continue
+        per_hour_cache.append(
+            {
+                "hour": entry.get("hour", index),
+                "campaign": entry.get("campaign"),
+                "T_C": entry.get("T_C"),
+                "reduced_real_cache_state": str(cache_state),
+            }
+        )
+    if per_hour_cache:
+        payload["per_hour"] = per_hour_cache
+
+    if payload:
+        return MappingProxyType(payload)
+    return getattr(run_execution, "trace", None)
 
 
 def _abort_on_non_authoritative_backend_status(

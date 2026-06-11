@@ -69,7 +69,11 @@ class RunExecutor:
                 DecisionPolicy.AUTO_APPLY,
                 operator_decisions=operator_decisions,
             ):
-                per_hour.append(result.per_hour_summary)
+                per_hour_summary = dict(result.per_hour_summary)
+                cache_state = getattr(sim, "_last_reduced_real_cache_state", None)
+                if cache_state is not None:
+                    per_hour_summary["reduced_real_cache_state"] = str(cache_state)
+                per_hour.append(per_hour_summary)
             # Status semantics:
             #   * "ok"      -- the run consumed its full hour budget and
             #                  the simulator is either mid-batch or
