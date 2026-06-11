@@ -24,6 +24,16 @@ def _freeze_nested_mapping(
     })
 
 
+def _thaw_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _thaw_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_thaw_value(item) for item in value)
+    if isinstance(value, list):
+        return [_thaw_value(item) for item in value]
+    return value
+
+
 @dataclass(frozen=True)
 class PhysicsTrace:
     """Read-only scoring surface.
@@ -81,6 +91,25 @@ class PhysicsTrace:
             impurity_delta=tuple(
                 _freeze_mapping(snapshot.impurity_delta)
                 for snapshot in snapshots
+            ),
+        )
+
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                self.snapshots,
+                _thaw_value(self.product_ledger_kg),
+                _thaw_value(self.terminal_rump_by_species_kg),
+                _thaw_value(self.terminal_rump_by_class_kg),
+                _thaw_value(self.oxygen_terminal_partition_kg),
+                _thaw_value(self.condensation_totals_kg),
+                _thaw_value(self.wall_deposit_by_segment_species_kg),
+                _thaw_value(self.wall_zone_by_segment),
+                _thaw_value(self.stage_purity_pct),
+                _thaw_value(self.condensed_by_stage_species_delta),
+                _thaw_value(self.wall_deposit_by_segment_species_delta),
+                _thaw_value(self.impurity_delta),
             ),
         )
 

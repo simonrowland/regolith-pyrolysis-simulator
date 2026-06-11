@@ -412,7 +412,7 @@ def _task_from_request(
         patch=_normalize_patch(normalized.patch),
         feedstock_id=normalized.feedstock_id,
         fidelity=normalized.fidelity,
-        profile=copy.deepcopy(dict(active_profile)),
+        profile=_plain_value_for_process_pool(active_profile),
         candidate_id=normalized.candidate_id,
         output_dir=str(output_dir),
     )
@@ -434,6 +434,23 @@ def _normalize_patch(patch: RecipePatch | Mapping[str, Any]) -> RecipePatch:
     if isinstance(patch, RecipePatch):
         return RecipePatch(dict(patch.values))
     return RecipePatch.from_nested(copy.deepcopy(dict(patch)))
+
+
+def _plain_value_for_process_pool(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            copy.deepcopy(key): _plain_value_for_process_pool(child)
+            for key, child in value.items()
+        }
+    if isinstance(value, list):
+        return [_plain_value_for_process_pool(child) for child in value]
+    if isinstance(value, tuple):
+        return tuple(_plain_value_for_process_pool(child) for child in value)
+    if isinstance(value, set):
+        return {_plain_value_for_process_pool(child) for child in value}
+    if isinstance(value, frozenset):
+        return frozenset(_plain_value_for_process_pool(child) for child in value)
+    return copy.deepcopy(value)
 
 
 def _abort_payload(exc: EvaluationAbort) -> dict[str, Any]:

@@ -9,6 +9,7 @@ import sqlite3
 import subprocess
 import sys
 import time
+from types import MappingProxyType
 
 import pytest
 
@@ -252,6 +253,28 @@ def _float_reduction_evaluate(
     )
 
 
+def _mappingproxy_profile_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    assert not _contains_mappingproxy(profile)
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
+
 def _spec(
     patch: RecipePatch,
     feedstock_id: str,
@@ -275,6 +298,19 @@ def _spec(
         runtime_campaign_overrides={},
         chemistry_kernel={},
     )
+
+
+def _contains_mappingproxy(value: object) -> bool:
+    if isinstance(value, MappingProxyType):
+        return True
+    if isinstance(value, dict):
+        return any(
+            _contains_mappingproxy(key) or _contains_mappingproxy(child)
+            for key, child in value.items()
+        )
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return any(_contains_mappingproxy(child) for child in value)
+    return False
 
 
 def _margin(value: int) -> GateMargin:
@@ -405,6 +441,86 @@ def test_evalspec_pickle_roundtrips_nested_runtime_overrides_and_chemistry_kerne
     restored = pickle.loads(pickle.dumps(spec))
 
     assert canonical_evalspec_json(restored) == canonical_evalspec_json(spec)
+
+
+def test_pool_task_thaws_nested_mappingproxy_profile_for_pickle_boundary(
+    tmp_path: Path,
+) -> None:
+    profile = MappingProxyType(
+        {
+            **_profile(),
+            "objectives": (
+                MappingProxyType(
+                    {
+                        "type": "composition_target",
+                        "target": MappingProxyType(
+                            {
+                                "species_vector": MappingProxyType(
+                                    {"Na": "retain", "K": "retain"}
+                                )
+                            }
+                        ),
+                    }
+                ),
+            ),
+        }
+    )
+
+    task = pool_module._task_from_request(
+        0,
+        PoolEvaluationRequest(
+            _patch(12),
+            "lunar_mare_low_ti",
+            "fast",
+            candidate_id="proxy-profile",
+        ),
+        profile=profile,
+        output_root=tmp_path,
+    )
+
+    assert not _contains_mappingproxy(task.profile)
+    pickle.dumps(task)
+
+
+def test_process_pool_thaws_nested_mappingproxy_profile(
+    tmp_path: Path,
+) -> None:
+    profile = MappingProxyType(
+        {
+            **_profile(),
+            "objectives": (
+                MappingProxyType(
+                    {
+                        "type": "composition_target",
+                        "target": MappingProxyType(
+                            {
+                                "species_vector": MappingProxyType(
+                                    {"Na": "retain", "K": "retain"}
+                                )
+                            }
+                        ),
+                    }
+                ),
+            ),
+        }
+    )
+
+    results = evaluate_batch(
+        [
+            PoolEvaluationRequest(
+                _patch(13),
+                "lunar_mare_low_ti",
+                "fast",
+                candidate_id="proxy-profile",
+            )
+        ],
+        profile=profile,
+        max_workers=2,
+        output_root=tmp_path / "pool",
+        evaluate_fn=_mappingproxy_profile_evaluate,
+    )
+
+    assert [result.candidate_id for result in results] == ["proxy-profile"]
 
 
 def test_pool_empty_batch_policy(tmp_path: Path) -> None:

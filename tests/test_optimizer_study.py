@@ -12,6 +12,7 @@ from typing import Any, Mapping
 import pytest
 import yaml
 
+import scripts.make_recipe_db_profile as generator
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
@@ -350,6 +351,48 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_parallel_composition_target_stub_study_completes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    profile_path = tmp_path / "lunar_mare_low_ti__pc-glass-retain-na-k-c3.real.yaml"
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-glass-retain-na-k-c3",
+                "--campaign",
+                "C3",
+                "--hours",
+                "24",
+                "--gate",
+                "stub_smoke",
+                "--db",
+                str(tmp_path / "profile.db"),
+                "--out",
+                str(profile_path),
+            ]
+        )
+        == 0
+    )
+
+    result = study.run(
+        yaml.safe_load(profile_path.read_text()),
+        "lunar_mare_low_ti",
+        "screen",
+        "stub",
+        2,
+        4,
+        tmp_path / "study",
+        seed=0,
+    )
+
+    assert result.winner is not None
+    assert (tmp_path / "study" / "pareto.json").exists()
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:

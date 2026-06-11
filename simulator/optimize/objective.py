@@ -214,9 +214,22 @@ class ObjectiveVector:
     def as_mapping(self) -> Mapping[str, float]:
         return MappingProxyType({value.metric: value.value for value in self.values})
 
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (type(self), (self.values, _thaw_value(self.evidence)))
+
 
 ObjectiveLike = ObjectiveVector | Mapping[str, float]
 T = TypeVar("T")
+
+
+def _thaw_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _thaw_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_thaw_value(item) for item in value)
+    if isinstance(value, list):
+        return [_thaw_value(item) for item in value]
+    return value
 
 
 def objective_type(raw: Mapping[str, Any]) -> str:
