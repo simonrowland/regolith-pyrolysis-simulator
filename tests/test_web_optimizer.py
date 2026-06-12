@@ -124,6 +124,71 @@ def _scored(
     )
 
 
+def _leaderboard_objectives_payload(
+    oxygen: float,
+    *,
+    energy: float = 2.0,
+) -> str:
+    return json.dumps(
+        [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "value": oxygen,
+                "units": "kg",
+                "ordinal": 0,
+            },
+            {
+                "metric": "energy_kWh",
+                "sense": "minimize",
+                "value": energy,
+                "units": "kWh",
+                "ordinal": 1,
+            },
+        ]
+    )
+
+
+def _seed_leaderboard_fixture(
+    run_dir: Path,
+    rows: list[Mapping[str, object]],
+) -> None:
+    run_dir.mkdir(parents=True, exist_ok=True)
+    store = ResultStore(run_dir / "cache.sqlite")
+    for index, row in enumerate(rows):
+        candidate_id = str(row["candidate_id"])
+        oxygen = float(row.get("oxygen", 10.0))
+        stored_oxygen = oxygen if math.isfinite(oxygen) else 10.0
+        spec = _base_spec(recipe_id=f"recipe-{candidate_id}")
+        store.store(
+            spec,
+            _scored(
+                spec,
+                candidate_id=candidate_id,
+                oxygen=stored_oxygen,
+                energy=float(row.get("energy", 2.0)),
+            ),
+            created_at=f"2026-06-03T00:00:{index:02d}Z",
+        )
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        for row in rows:
+            conn.execute(
+                """
+                UPDATE results
+                SET feasible = ?, objectives = ?
+                WHERE candidate_id = ?
+                """,
+                (
+                    1 if row.get("feasible", True) else 0,
+                    _leaderboard_objectives_payload(
+                        float(row.get("oxygen", 10.0)),
+                        energy=float(row.get("energy", 2.0)),
+                    ),
+                    str(row["candidate_id"]),
+                ),
+            )
+
+
 def _product_yield_table(status: str = "closed") -> dict[str, object]:
     return {
         "status": status,
@@ -560,6 +625,132 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert board_payload["entries"][0]["backend"] == run["latest_result"]["backend"]
 
 
+def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-leaderboard-green"
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {"candidate_id": "candidate-low", "oxygen": 6.0},
+            {"candidate_id": "candidate-high", "oxygen": 12.0},
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-high",
+        "candidate-low",
+    ]
+    assert [entry["objective_value"] for entry in payload["entries"]] == [
+        12.0,
+        6.0,
+    ]
+    assert [entry["rank"] for entry in payload["entries"]] == [1, 2]
+    assert payload["excluded_infeasible"] == 0
+    assert payload["excluded_nonfinite"] == 0
+
+
+def test_optimizer_leaderboard_excludes_infeasible_rows_with_objectives(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-leaderboard-infeasible-poison"
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {"candidate_id": "candidate-low", "oxygen": 6.0},
+            {"candidate_id": "candidate-high", "oxygen": 12.0},
+            {
+                "candidate_id": "candidate-infeasible-poison",
+                "oxygen": 99.0,
+                "feasible": False,
+            },
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-high",
+        "candidate-low",
+    ]
+    assert payload["excluded_infeasible"] == 1
+    assert payload["excluded_nonfinite"] == 0
+
+
+def test_optimizer_leaderboard_all_infeasible_returns_empty_with_counts(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-leaderboard-all-infeasible"
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {
+                "candidate_id": "candidate-infeasible-only",
+                "oxygen": 99.0,
+                "feasible": False,
+            },
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["entries"] == []
+    assert payload["excluded_infeasible"] == 1
+    assert payload["excluded_nonfinite"] == 0
+
+
+@pytest.mark.parametrize("poison_value", [math.nan, math.inf, -math.inf])
+def test_optimizer_leaderboard_excludes_nonfinite_objective_rows(
+    client,
+    poison_value: float,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-leaderboard-nonfinite-poison"
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {"candidate_id": "candidate-low", "oxygen": 6.0},
+            {"candidate_id": "candidate-high", "oxygen": 12.0},
+            {
+                "candidate_id": "candidate-nonfinite-poison",
+                "oxygen": poison_value,
+            },
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-high",
+        "candidate-low",
+    ]
+    assert payload["excluded_infeasible"] == 0
+    assert payload["excluded_nonfinite"] == 1
+
+
 def test_optimizer_leaderboard_excludes_stale_version_and_digest_rows(client) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-stale-scope"
@@ -676,6 +867,80 @@ def test_optimizer_leaderboard_exposes_multiple_current_digest_scopes(client) ->
         "profile-a-digest",
         "profile-b-digest",
     }
+
+
+def test_optimizer_leaderboard_excludes_infeasible_rows_on_multi_digest_path(
+    client,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-multi-digest-infeasible-poison"
+    run_dir.mkdir(parents=True)
+
+    spec_a = _base_spec(
+        recipe_id="recipe-current-a",
+        profile_id="oxygen-yield-v1",
+        data_digests={
+            "setpoints": "setpoints-digest",
+            "feedstocks": "feedstock-digest",
+            "vapor_pressures": "vapor-digest",
+            "profile": "profile-a-digest",
+        },
+    )
+    spec_b = replace(
+        spec_a,
+        recipe_id="recipe-current-b",
+        profile_id="glass-yield-v1",
+        data_digests={**spec_a.data_digests, "profile": "profile-b-digest"},
+    )
+    poison_spec = replace(
+        spec_a,
+        recipe_id="recipe-current-poison",
+        profile_id="metals-yield-v1",
+        data_digests={**spec_a.data_digests, "profile": "profile-poison-digest"},
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec_a,
+        _scored(spec_a, candidate_id="candidate-a", oxygen=10.0, energy=2.0),
+        created_at="2026-06-03T00:00:00Z",
+    )
+    store.store(
+        spec_b,
+        _scored(spec_b, candidate_id="candidate-b", oxygen=12.0, energy=2.0),
+        created_at="2026-06-04T00:00:00Z",
+    )
+    store.store(
+        poison_spec,
+        _scored(poison_spec, candidate_id="candidate-infeasible-poison", oxygen=99.0),
+        created_at="2026-06-05T00:00:00Z",
+    )
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = 0, objectives = ?
+            WHERE candidate_id = ?
+            """,
+            (
+                _leaderboard_objectives_payload(99.0),
+                "candidate-infeasible-poison",
+            ),
+        )
+
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&objective=oxygen_kg&limit=5"
+    )
+
+    assert leaderboard.status_code == 200
+    payload = leaderboard.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-b",
+        "candidate-a",
+    ]
+    assert payload["data_digest_scope"]["mode"] == "multiple_current_data_digests"
+    assert payload["excluded_infeasible"] == 1
+    assert payload["excluded_nonfinite"] == 0
 
 
 def test_optimizer_reader_discovers_completed_job_result_dirs(client) -> None:

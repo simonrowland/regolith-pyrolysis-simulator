@@ -622,8 +622,17 @@ def _current_selector_data_digest_scopes(
 def _numeric_objective_value(objective: dict[str, Any]) -> float | None:
     value = objective.get('value')
     if isinstance(value, (int, float)):
-        return float(value)
+        numeric = float(value)
+        if math.isfinite(numeric):
+            return numeric
     return None
+
+
+def _result_row_feasible(row: sqlite3.Row) -> bool:
+    try:
+        return int(row['feasible']) == 1
+    except (IndexError, KeyError, TypeError, ValueError):
+        return False
 
 
 def _leaderboard_entries(
@@ -634,9 +643,13 @@ def _leaderboard_entries(
     fidelity: str | None,
     objective_metric: str | None,
     limit: int,
-) -> tuple[list[dict[str, Any]], str | None, dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], str | None, dict[str, Any], dict[str, int]]:
     rows: list[tuple[dict[str, Any], float, str]] = []
     digest_scopes: list[dict[str, Any]] = []
+    excluded_counts = {
+        'excluded_infeasible': 0,
+        'excluded_nonfinite': 0,
+    }
     selected_metric = objective_metric
     selected_sense = 'maximize'
     root = _optimizer_runs_root()
@@ -655,6 +668,9 @@ def _leaderboard_entries(
         digest_scope = {**digest_scope, 'run_id': run_id}
         digest_scopes.append(digest_scope)
         for row in result_rows:
+            if not _result_row_feasible(row):
+                excluded_counts['excluded_infeasible'] += 1
+                continue
             objectives = _objective_items(row)
             if selected_metric is None:
                 primary = _objective_for(objectives)
@@ -665,6 +681,7 @@ def _leaderboard_entries(
                 continue
             value = _numeric_objective_value(objective)
             if value is None:
+                excluded_counts['excluded_nonfinite'] += 1
                 continue
             selected_sense = str(objective.get('sense') or selected_sense)
             entry = _result_metadata(
@@ -687,7 +704,12 @@ def _leaderboard_entries(
     for rank, (entry, _value, _sense) in enumerate(rows[:limit], start=1):
         entry['rank'] = rank
         entries.append(entry)
-    return entries, selected_metric, _leaderboard_data_digest_scope(digest_scopes)
+    return (
+        entries,
+        selected_metric,
+        _leaderboard_data_digest_scope(digest_scopes),
+        excluded_counts,
+    )
 
 
 def _leaderboard_data_digest_scope(scopes: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1238,7 +1260,7 @@ def _optimizer_winner_entries(
         profile_id=profile_id,
         fidelity=fidelity,
     ):
-        winners, metric, _digest_scope = _leaderboard_entries(
+        winners, metric, _digest_scope, _excluded_counts = _leaderboard_entries(
             run_dirs,
             feedstock_id=pair_feedstock,
             profile_id=pair_profile,
@@ -1856,7 +1878,7 @@ def optimizer_leaderboard():
         _request_arg('objective_metric')
         or _request_arg('objective')
     )
-    entries, selected_metric, data_digest_scope = _leaderboard_entries(
+    entries, selected_metric, data_digest_scope, excluded_counts = _leaderboard_entries(
         run_dirs,
         feedstock_id=_request_arg('feedstock_id') or _request_arg('feedstock'),
         profile_id=_request_arg('profile_id') or _request_arg('profile'),
@@ -1868,6 +1890,7 @@ def optimizer_leaderboard():
         'objective_metric': selected_metric,
         'limit': _request_limit(),
         'data_digest_scope': data_digest_scope,
+        **excluded_counts,
         'entries': entries,
     })
 
