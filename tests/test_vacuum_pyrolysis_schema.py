@@ -6,9 +6,14 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.lab_geometry import parse_lab_geometry
+from simulator.lab_schedule import normalize_lab_schedule
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-PRESET_PATH = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
+PRESET_DIR = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis"
+PRESET_PATH = PRESET_DIR / "robinot_2026.yaml"
+SESKO_PRESET_PATH = PRESET_DIR / "sesko_2024.yaml"
 MEASUREMENTS_PATH = REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml"
 FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
 
@@ -60,6 +65,19 @@ ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
     "Ti": 2.0,
     "Fe": 3.0,
 }
+SESKO_PRESSURE_RUNTIME_FLOOR_MBAR = pytest.approx(1.0e-3)
+SESKO_PRESSURE_REPORTED_MIN_MBAR = pytest.approx(1.0e-7)
+SESKO_PRESSURE_REPORTED_MAX_MBAR = pytest.approx(1.0e-2)
+SESKO_TEMP_MIN_C = pytest.approx(1476.85)
+SESKO_TEMP_MAX_C = pytest.approx(1626.85)
+SESKO_SAMPLE_MASS_G = pytest.approx(10.0)
+SESKO_WINDOW_APERTURE_MM = pytest.approx(98.6)
+SESKO_WINDOW_AREA_M2 = pytest.approx(0.00763561)
+SESKO_DEPOSIT_THICKNESS_UM = pytest.approx(31.3)
+SESKO_TEMP_EMISSIVITY = pytest.approx(0.98)
+SESKO_TRACKING_INTERVAL_MIN = pytest.approx(5)
+SESKO_FIXED_MIRROR_ANGLE_DEG = pytest.approx(45)
+SESKO_PRESSURE_RUNTIME_DELTA_ID = "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
 
 
 class SchemaValidationError(AssertionError):
@@ -501,8 +519,140 @@ def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -
     }
 
 
+def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
+    preset = load_yaml(SESKO_PRESET_PATH)
+    measurements = load_yaml(MEASUREMENTS_PATH)
+    measurement = measurements["measurements"]["sesko_2024_vapor_phase_pyrolysis_measurements"]
+
+    feedstock_ids = {
+        preset["pair"]["faithful"]["feedstock_id"],
+        preset["pair"]["remediation"]["feedstock_id"],
+    }
+    assert feedstock_ids == {"lunar_eac_1a"}
+    assert measurement["material_context"]["feedstock_id"] == "lunar_eac_1a"
+    assert measurement["conditions_reported"]["feedstock"]["species"] == "EAC-1A"
+
+    schedule = preset["lab_schedule"]
+    assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
+    assert schedule["melt_temperature_C"][-1]["value"] == SESKO_TEMP_MAX_C
+    assert schedule["melt_temperature_C"][0]["unit"] == "C"
+    assert schedule["chamber_pressure_mbar"][0]["value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+    assert schedule["chamber_pressure_mbar"][0]["runtime_delta_annotation_id"] == SESKO_PRESSURE_RUNTIME_DELTA_ID
+    assert schedule["chamber_pressure_mbar"][-1]["value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
+    reported_profile = schedule["reported_exposure_profile"]["pressure_mbar"]
+    assert reported_profile["reported_min_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
+    assert reported_profile["reported_max_value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
+    assert reported_profile["qualifier"] == "oscillating_range"
+    runtime_delta = {
+        row["id"]: row for row in schedule["runtime_schedule_annotations"]
+    }[SESKO_PRESSURE_RUNTIME_DELTA_ID]
+    assert runtime_delta["reported_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
+    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+    assert runtime_delta["reason"] == "normalize_lab_schedule_floor"
+    assert schedule["gas_boundary"]["background_gas"]["reported_status"] == NOT_REPORTED
+    assert schedule["gas_boundary"]["imposed_flow"]["reported_status"] == NOT_REPORTED
+    assert schedule["gas_boundary"]["pressure_control"]["mode"] == "pumped_dynamic_uhv_exposure"
+    assert (
+        schedule["temperature_measurement_basis"]["surface_temperature_reference"]["instrument"]
+        == "Optris PI 1M infrared camera"
+    )
+    assert (
+        schedule["temperature_measurement_basis"]["surface_temperature_reference"]["emissivity"]
+        == SESKO_TEMP_EMISSIVITY
+    )
+    assert (
+        schedule["experiment_windows"]["solar_exposure"]["manual_tracking_adjustment_interval_min"]["value"]
+        == SESKO_TRACKING_INTERVAL_MIN
+    )
+    assert schedule["optical_train"]["fixed_mirror_angle_deg"]["value"] == SESKO_FIXED_MIRROR_ANGLE_DEG
+    assert preset["pair"]["faithful"]["transport_model"] == "molecular_transitional_regime_p0b_blocked"
+
+    geometry = preset["lab_geometry"]
+    assert geometry["sample"]["mass_g"] == SESKO_SAMPLE_MASS_G
+    surfaces = {row["id"]: row for row in geometry["surfaces"]}
+    assert surfaces["quartz_window"]["source_class"] == "literature_sidecar"
+    assert surfaces["quartz_window"]["equivalent_diameter_m"] == pytest.approx(
+        SESKO_WINDOW_APERTURE_MM.expected / 1000.0
+    )
+    assert surfaces["quartz_window"]["area_m2"] == SESKO_WINDOW_AREA_M2
+    assert (
+        sum(row["source_class"] == "literature_sidecar" for row in geometry["surfaces"])
+        == 1
+    )
+    assert (
+        sum(
+            row["source_class"] == "assumption_with_sensitivity_marker"
+            for row in geometry["surfaces"]
+        )
+        == 2
+    )
+
+    conditions = measurement["conditions_reported"]
+    assert conditions["exposure_pressure_mbar"]["reported_min_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
+    assert conditions["exposure_pressure_mbar"]["reported_max_value"] == SESKO_PRESSURE_REPORTED_MAX_MBAR
+    assert conditions["exposure_surface_temperature_K"]["reported_min_value"] == 1750
+    assert conditions["exposure_surface_temperature_K"]["reported_max_value"] == 1900
+    assert (
+        conditions["surface_temperature_reference_camera"]["reported_value"]
+        == "Optris PI 1M infrared camera"
+    )
+    assert (
+        conditions["surface_temperature_reference_emissivity"]["reported_value"]
+        == SESKO_TEMP_EMISSIVITY
+    )
+    assert (
+        conditions["manual_solar_tracking_adjustment_interval_min"]["reported_value"]
+        == SESKO_TRACKING_INTERVAL_MIN
+    )
+    assert conditions["fixed_mirror_angle_deg"]["reported_value"] == SESKO_FIXED_MIRROR_ANGLE_DEG
+    assert conditions["window_aperture_diameter_mm"]["reported_value"] == SESKO_WINDOW_APERTURE_MM
+
+    products = {row["observable"]: row for row in measurement["quantitative_measurements"]}
+    assert products["crucible_wall_deposit_thickness_um"]["reported_value"] == SESKO_DEPOSIT_THICKNESS_UM
+    assert products["modeled_eac1a_o2_plus_o_yield_at_1e-5_mbar_T_vapor"][
+        "reported_value"
+    ] == pytest.approx(0.30)
+    assert products["modeled_eac1a_o2_plus_o_yield_at_1e-5_mbar_T_O2_max"][
+        "reported_value"
+    ] == pytest.approx(0.11)
+
+    locations = {row["id"]: row for row in measurement["observed_locations"]}
+    assert "crucible_wall" in locations
+    assert locations["crucible_wall"]["reported_species_or_composition"]["Na"][
+        "qualifier"
+    ] == "high_in_needle_like_crystals"
+    assert locations["crucible_wall"]["reported_species_or_composition"]["Fe"][
+        "qualifier"
+    ] == "brown_lower_layer_present"
+
+
 def test_valid_vpr_skeleton_passes_test_local_schema_validator() -> None:
     validate_vpr_schema(load_yaml(PRESET_PATH), load_yaml(MEASUREMENTS_PATH))
+
+
+def test_all_vpr_presets_validate_and_round_trip_runtime_parsers() -> None:
+    measurements = load_yaml(MEASUREMENTS_PATH)
+    for preset_path in sorted(PRESET_DIR.glob("*.yaml")):
+        preset = load_yaml(preset_path)
+        validate_vpr_schema(preset, measurements)
+        measurement_id = preset["measurement_id"]
+        assert measurement_id in measurements["measurements"]
+
+        geometry = parse_lab_geometry(
+            preset["lab_geometry"],
+            allow_temperature_profiles=True,
+        )
+        normalized_schedule = normalize_lab_schedule(
+            preset["lab_schedule"],
+            required_surface_profiles=[
+                surface.surface_id
+                for surface in geometry.surfaces
+                if surface.temperature_profile
+            ],
+        )
+
+        assert normalized_schedule["id"] == preset["lab_schedule"]["id"]
+        assert geometry.geometry_id == preset["lab_geometry"]["id"]
 
 
 def test_sparse_paper_gas_boundary_accepts_explicit_not_reported_disposition() -> None:

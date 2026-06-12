@@ -1,0 +1,309 @@
+schema_version: vacuum_pyrolysis_preset.v1
+paper_id: sesko_2024_vapor_phase_pyrolysis
+paper_citation_id: sesko_2024
+measurement_id: sesko_2024_vapor_phase_pyrolysis_measurements
+preset_kind: faithful_with_remediation_twin
+extraction_status: condition_capture_p0b_transport_blocked
+
+source_notes:
+  - citation_id: sesko_2024
+    digest: "Sesko et al. 2024 reports EAC-1A simulant, UHV bakeout, and solar exposure in a purpose-built high-vacuum solar furnace."
+  - citation_id: sesko_2024
+    digest: "Feedstock mapped to registered lunar_eac_1a alias; paper text uses EAC-1A while the composition table header abbreviates EAC-1."
+  - citation_id: sesko_2024
+    digest: "Reported exposure pressure spans 1e-7..1e-2 mbar; reported_exposure_profile records that source range first-class, while chamber_pressure_mbar carries the runtime floor with a named delta annotation."
+
+lab_schedule:
+  id: sesko_2024_schedule_solar_exposure
+  duration_h: 1.0
+  duration_qualifier: assumption_for_parser
+  duration_source_class: assumption_with_sensitivity_marker
+  duration_source_ref: sesko_2024_experimental_procedure
+  duration_citation_id: sesko_2024
+  duration_extraction_note: "Solar exposure duration is not stated; one-hour parser skeleton preserves reported T/p ranges without claiming run duration."
+  interpolation: piecewise_linear
+  interpolation_source_class: assumption_with_sensitivity_marker
+  interpolation_citation_id: sesko_2024
+  interpolation_extraction_note: "Paper reports exposure ranges, not a time-resolved T(t)/p(t) trace; piecewise-linear endpoints are a parser skeleton."
+  furnace_ceiling_C: 1626.85
+  furnace_ceiling_qualifier: converted_from_reported_1900_K_surface_temperature
+  furnace_ceiling_source_class: literature_sidecar
+  furnace_ceiling_source_ref: sesko_2024_experimental_procedure
+  furnace_ceiling_citation_id: sesko_2024
+  experiment_windows:
+    heating: {start_h: 0.0, end_h: 1.0}
+    measured: {start_h: 0.0, end_h: 1.0}
+    cooldown: {reported: true, deposit_sampling: post_run_cooldown}
+    uhv_bakeout:
+      start_h: -5.0
+      end_h: 0.0
+      duration_h: 5.0
+      pressure_mbar:
+        value: 1.0e-5
+        unit: mbar
+        qualifier: approximate
+        source_class: literature_sidecar
+        citation_id: sesko_2024
+      chamber_external_heater_C:
+        value: 180
+        unit: C
+        qualifier: approximate
+        source_class: literature_sidecar
+        citation_id: sesko_2024
+      crucible_internal_heater_C:
+        value: 400
+        unit: C
+        qualifier: lower_bound
+        source_class: literature_sidecar
+        citation_id: sesko_2024
+    solar_exposure:
+      start_h: 0.0
+      end_h: 1.0
+      duration_h: 1.0
+      duration_source_class: assumption_with_sensitivity_marker
+      citation_id: sesko_2024
+      extraction_note: "Exposure duration is not reported; the paper reports pressure and surface-temperature ranges during exposure."
+      manual_tracking_adjustment_interval_min:
+        value: 5
+        unit: min
+        source_class: literature_sidecar
+        source_ref: sesko_2024_experimental_procedure
+        citation_id: sesko_2024
+        extraction_note: "Solar tracking was performed manually and adjusted every 5 min during exposure."
+  reported_exposure_profile:
+    pressure_mbar:
+      reported_min_value: 1.0e-7
+      reported_max_value: 1.0e-2
+      reported_unit: mbar
+      qualifier: oscillating_range
+      source_class: literature_sidecar
+      source_ref: sesko_2024_experimental_procedure
+      citation_id: sesko_2024
+      extraction_note: "Paper states exposure pressure measurements oscillated from 1e-7 mbar to 1e-2 mbar."
+    surface_temperature_K:
+      reported_min_value: 1750
+      reported_max_value: 1900
+      reported_unit: K
+      source_class: literature_sidecar
+      source_ref: sesko_2024_experimental_procedure
+      citation_id: sesko_2024
+      extraction_note: "Paper states regolith sample surface temperature reached 1750 K to 1900 K during exposure."
+  window_semantics:
+    measured_window_start_h: 0.0
+    measured_window_end_h: 1.0
+    cooldown_h: 0.0
+    deposit_sample_basis: after_cooldown
+    basis_source_class: literature_sidecar
+    citation_id: sesko_2024
+    extraction_note: "Deposits were inspected after the run by SEM/EDX and polished cross-section microscopy."
+  melt_temperature_C:
+    - {t_h: 0.0, value: 1476.85, unit: C, qualifier: converted_from_reported_1750_K_lower_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
+    - {t_h: 1.0, value: 1626.85, unit: C, qualifier: converted_from_reported_1900_K_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
+  chamber_pressure_mbar:
+    - {t_h: 0.0, value: 0.001, unit: mbar, qualifier: parser_floor_for_reported_1e-7_mbar, runtime_delta_annotation_id: pressure_floor_delta_reported_uhv_min_to_runtime_floor, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Current normalize_lab_schedule floor is 1e-3 mbar; reported_exposure_profile.pressure_mbar preserves the stated 1e-7 mbar lower bound."}
+    - {t_h: 1.0, value: 0.01, unit: mbar, qualifier: reported_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
+  runtime_schedule_annotations:
+    - id: pressure_floor_delta_reported_uhv_min_to_runtime_floor
+      field: chamber_pressure_mbar[0].value
+      runtime_value: 1.0e-3
+      runtime_unit: mbar
+      reported_profile_field: reported_exposure_profile.pressure_mbar.reported_min_value
+      reported_value: 1.0e-7
+      reported_unit: mbar
+      delta_factor: 10000
+      reason: normalize_lab_schedule_floor
+      source_class: assumption_with_sensitivity_marker
+      citation_id: sesko_2024
+      extraction_note: "Runtime parser rejects chamber pressure below 1e-3 mbar; source-faithful reported profile remains 1e-7..1e-2 mbar."
+  gas_boundary:
+    background_gas:
+      reported_status: not_reported
+      source_class: not_reported
+      citation_id: sesko_2024
+      extraction_note: "Paper describes high-vacuum operation, not a carrier gas species."
+      digest: "Sesko gas boundary: no imposed carrier gas reported."
+    imposed_flow:
+      reported_status: not_reported
+      source_class: not_reported
+      citation_id: sesko_2024
+      extraction_note: "No imposed flow rate is reported; pumps were operating during solar exposure."
+      digest: "Sesko gas boundary: no imposed flow reported."
+    pressure_control:
+      mode: pumped_dynamic_uhv_exposure
+      source_class: literature_sidecar
+      source_ref: sesko_2024_experimental_procedure
+      citation_id: sesko_2024
+      digest: "Vacuum pumps were operating during exposure; measured pressure oscillated from 1e-7 to 1e-2 mbar."
+  temperature_measurement_basis:
+    surface_temperature_reference:
+      instrument: Optris PI 1M infrared camera
+      software: Optris PIX Connect
+      emissivity: 0.98
+      reference_temperature: maximum_temperature
+      source_class: literature_sidecar
+      source_ref: sesko_2024_experimental_setup
+      citation_id: sesko_2024
+      extraction_note: "IR image of the crucible was analyzed in Optris PIX Connect; maximum temperature with emissivity 0.98 was used as process reference temperature."
+  optical_train:
+    fixed_mirror_angle_deg:
+      value: 45
+      unit: deg
+      source_class: literature_sidecar
+      source_ref: sesko_2024_experimental_setup
+      citation_id: sesko_2024
+      extraction_note: "Optical system included a fixed mirror at 45 deg redirecting horizontal rays into the Fresnel lens."
+  surface_temperature_C:
+    crucible_wall:
+      - {t_h: 0.0, value: 180, unit: C, source_class: literature_sidecar, citation_id: sesko_2024, extraction_note: "Bakeout channels/chamber heated externally to around 180 C before exposure."}
+      - {t_h: 1.0, value: 250, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Crucible wall temperature during exposure not reported; sensitivity marker in geometry."}
+    quartz_window:
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Quartz window temperature not reported."}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Quartz window temperature not reported."}
+    chamber_wall:
+      - {t_h: 0.0, value: 180, unit: C, source_class: literature_sidecar, citation_id: sesko_2024, extraction_note: "Bakeout channels/chamber heated externally to around 180 C before exposure."}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Chamber wall temperature during exposure not reported."}
+
+lab_geometry:
+  id: sesko_2024_geometry_skeleton
+  scale: gram_lab
+  equipment_sizing: lab_fixed_geometry
+  geometry_status: populated_with_stated_window_and_assumption_geometry
+  sample:
+    mass_g: 10.0
+    mass_source_class: literature_sidecar
+    mass_source_ref: sesko_2024_experimental_procedure
+    mass_citation_id: sesko_2024
+    mass_digest: "10 g EAC-1A simulant sample placed in an alumina ceramic crucible."
+    named_missing_fields:
+      - particle_size_distribution
+      - packed_bed_depth_m
+  chamber:
+    volume_m3: null
+    wall_area_m2: null
+    wall_temperature_profile: chamber_wall
+    named_missing_fields:
+      - chamber_volume_m3
+      - chamber_wall_area_m2
+      - pump_throughput
+  surfaces:
+    - id: quartz_window
+      role: transparent_wall
+      area_m2: 0.00763561
+      equivalent_diameter_m: 0.0986
+      view_factor_from_melt: 0.15
+      view_factor_source_class: assumption_with_sensitivity_marker
+      line_of_sight_to_melt: true
+      temperature_profile: quartz_window
+      source_class: literature_sidecar
+      source_ref: sesko_2024_apparatus
+      citation_id: sesko_2024
+      extraction_note: "CF DN 100 quartz glass window aperture diameter reported as 98.6 mm; area derived from aperture diameter. View factor is assumed."
+    - id: crucible_wall
+      role: sample_holder
+      area_m2: 0.0025
+      equivalent_diameter_m: 0.04
+      view_factor_from_melt: 0.45
+      line_of_sight_to_melt: true
+      temperature_profile: crucible_wall
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: sesko_crucible_wall_area_view_factor_sweep
+      source_ref: sesko_2024_apparatus
+      citation_id: sesko_2024
+      extraction_note: "Alumina ceramic crucible and wall deposit are reported, but crucible dimensions and view factor are not."
+    - id: chamber_wall
+      role: chamber_wall
+      area_m2: 0.04
+      equivalent_diameter_m: 0.1
+      view_factor_from_melt: 0.05
+      line_of_sight_to_melt: false
+      temperature_profile: chamber_wall
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: sesko_chamber_wall_area_temperature_sweep
+      source_ref: sesko_2024_apparatus
+      citation_id: sesko_2024
+      extraction_note: "Vacuum chamber is reported, but chamber dimensions and deposition-relevant area are not."
+  pump:
+    pressure_sensor_location: chamber_exit
+    pump_state_during_exposure: operating
+    pump_throughput_source: not_reported
+    conductance_path:
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: sesko_pump_conductance_path_sweep
+      named_missing_fields:
+        - pump_speed
+        - line_diameter_m
+        - line_length_m
+
+pair:
+  faithful:
+    feedstock_id: lunar_eac_1a
+    schedule_id: sesko_2024_schedule_solar_exposure
+    geometry_id: sesko_2024_geometry_skeleton
+    duration_h: 1.0
+    transport_model: molecular_transitional_regime_p0b_blocked
+    mitigation: none
+    kinetics_caveat: blocked_missing_gram_scale_kinetics_model
+    status: p0b_transport_not_claim_grade
+  remediation:
+    feedstock_id: lunar_eac_1a
+    schedule_id: sesko_2024_schedule_solar_exposure
+    geometry_id: sesko_2024_geometry_skeleton
+    duration_h: 1.0
+    transport_model: molecular_transitional_regime_p0b_blocked
+    mitigation:
+      pO2_cover:
+        enabled: true
+        setpoint_mbar: 0.21
+        p_total_mbar: 0.001
+        effective_pO2_achieved_mbar: 0.001
+        limited_by_total_pressure: true
+        status: clipped_to_total_pressure
+    kinetics_caveat: blocked_missing_gram_scale_kinetics_model
+    status: p0b_transport_not_claim_grade
+
+sticking_provenance:
+  status: assumption_with_sensitivity_marker
+  digest: "No Sesko-specific sticking coefficients extracted; deposit observations are qualitative wall/crucible observations."
+  species_surface_pairs:
+    - species: Na
+      surface_id: crucible_wall
+      sticking_coefficient: 1.0
+      source_class: assumption_with_sensitivity_marker
+      citation_id: sesko_2024
+      extraction_note: no_sesko_specific_sticking_coefficient_extracted
+      digest: sesko_2024_na_crucible_wall_sticking_assumption_v1
+    - species: K
+      surface_id: crucible_wall
+      sticking_coefficient: 1.0
+      source_class: assumption_with_sensitivity_marker
+      citation_id: sesko_2024
+      extraction_note: no_sesko_specific_sticking_coefficient_extracted
+      digest: sesko_2024_k_crucible_wall_sticking_assumption_v1
+    - species: Fe
+      surface_id: crucible_wall
+      sticking_coefficient: 1.0
+      source_class: assumption_with_sensitivity_marker
+      citation_id: sesko_2024
+      extraction_note: no_sesko_specific_sticking_coefficient_extracted
+      digest: sesko_2024_fe_crucible_wall_sticking_assumption_v1
+
+comparison_contract:
+  model_evidence_class: builtin_process_model
+  fidelity_tier_allowed:
+    - cached-real
+  internal_analytical_used: false
+  blocked_claims:
+    - molecular_flow_transport_reproduction
+    - transitional_flow_transport_reproduction
+    - deposit_mass_closure
+  notes:
+    - "Preset captures reported Sesko conditions and observations; transport wiring remains P0b+ scope."
+
+digests:
+  feedstock_digest: lunar_eac_1a_engelschion2020_xrf_sha256_1b7cce46216cb29f_sesko_alias
+  schedule_digest: sesko_2024_schedule_solar_exposure_v1
+  gas_boundary_digest: sesko_2024_dynamic_uhv_1e-7_to_1e-2mbar_v1
+  geometry_digest: sesko_2024_geometry_window_stated_assumptions_v1
+  transport_formula_digest: p0b_molecular_transitional_not_implemented
+  sticking_provenance_digest: sesko_2024_sticking_skeleton_v1
+  measurement_sidecar_digest: sesko_2024_measurements_v1

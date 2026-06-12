@@ -443,3 +443,352 @@ measurements:
       - view_factor_from_melt
       - full_feedstock_composition
     measured_time_series: []
+
+  sesko_2024_vapor_phase_pyrolysis_measurements:
+    evidence_class: experiment-grade
+    paper_citation:
+      citation_id: sesko_2024
+      label: "Sesko et al. 2024 solar vapor-phase pyrolysis of EAC-1A"
+      bibliography_status: full_text_extracted
+    doi: 10.1016/j.actaastro.2024.08.009
+    extraction:
+      source_location: mineru_markdown_methods_results_conclusion
+      digitized: false
+      extractor: Sesko-preset-authoring
+      extraction_date: 2026-06-12
+      extraction_status: full_text_numeric_pass_no_figure_digitization
+      source_paths:
+        - docs-private/research/2026-06-12-vpr-sources/sesko_2024_vapor_phase_pyrolysis.md
+    figure_extraction: {}
+    conditions_reported:
+      feedstock:
+        species: EAC-1A
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup_and_procedure
+          digest: "Vacuum pyrolysis experiments used EAC-1A regolith simulant."
+      sample_mass_g:
+        reported_value: 10.0
+        reported_unit: g
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "A 10 g EAC-1A sample was placed in an alumina ceramic crucible."
+      uhv_bake_pressure_mbar:
+        reported_value: 1.0e-5
+        reported_unit: mbar
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Pumps decreased pressure to approximately 1e-5 mbar before bakeout."
+      uhv_bake_duration_h:
+        reported_value: 5.0
+        reported_unit: h
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Bakeout under these conditions lasted 5 h."
+      chamber_bake_temperature_C:
+        reported_value: 180
+        reported_unit: C
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Vacuum channels and chamber were externally heated to around 180 C."
+      crucible_bake_temperature_C:
+        reported_value: 400
+        reported_unit: C
+        qualifier: lower_bound
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Internal heater allowed the regolith simulant to reach temperatures above 400 C."
+      solar_irradiance_local_W_m2:
+        reported_min_value: 860
+        reported_max_value: 960
+        reported_unit: W_m2
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Local sensor measured total solar irradiance from 860 to 960 W m-2 during exposure."
+      solar_irradiance_dwd_W_m2:
+        reported_min_value: 825
+        reported_max_value: 903
+        reported_unit: W_m2
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "DWD data gave 825 to 903 W m-2 during exposure."
+      exposure_pressure_mbar:
+        reported_min_value: 1.0e-7
+        reported_max_value: 1.0e-2
+        reported_unit: mbar
+        qualifier: oscillating_range
+        transport_regime_note: molecular_to_transitional_regime_p0b_blocked
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "During exposure pressure measurements oscillated from 1e-7 mbar to 1e-2 mbar."
+      exposure_surface_temperature_K:
+        reported_min_value: 1750
+        reported_max_value: 1900
+        reported_unit: K
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "During exposure regolith surface temperature reached 1750 K to 1900 K."
+      surface_temperature_reference_camera:
+        reported_value: Optris PI 1M infrared camera
+        reported_unit: instrument_model
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup
+          digest: "Temperature measurements used an Optris PI 1M infrared camera looking through the solar window."
+      surface_temperature_reference_software:
+        reported_value: Optris PIX Connect
+        reported_unit: software
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup
+          digest: "The infrared image of the crucible was analyzed through Optris PIX Connect software."
+      surface_temperature_reference_emissivity:
+        reported_value: 0.98
+        reported_unit: dimensionless
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup
+          digest: "The maximum temperature with emissivity 0.98 was extracted as reference temperature."
+      manual_solar_tracking_adjustment_interval_min:
+        reported_value: 5
+        reported_unit: min
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_procedure
+          digest: "Solar tracking was performed manually and adjusted every 5 min."
+      fixed_mirror_angle_deg:
+        reported_value: 45
+        reported_unit: deg
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup
+          digest: "The optical train used a fixed mirror at 45 deg to redirect horizontal rays along the vertical axis."
+      window_aperture_diameter_mm:
+        reported_value: 98.6
+        reported_unit: mm
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_setup
+          digest: "Quartz glass CF DN 100 window aperture diameter reported as 98.6 mm."
+    material_context:
+      feedstock_id: lunar_eac_1a
+      feedstock_label_reported: EAC-1A
+      feedstock_alias_note: "Existing feedstock registry maps EAC-1A/EAC-1 to lunar_eac_1a."
+    quantitative_measurements:
+      - observable: modeled_T_vapor_at_1e-5_mbar
+        reported_value: 1600
+        reported_unit: K
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: fig5_text_image_table
+          digest: "Table extracted from Fig. 5 reports T_vapor about 1600 K at 1e-5 mbar."
+      - observable: modeled_T_O2_max_at_1e-5_mbar
+        reported_value: 1400
+        reported_unit: K
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: fig5_text_image_table
+          digest: "Table extracted from Fig. 5 reports T_O2,max about 1400 K at 1e-5 mbar."
+      - observable: modeled_o2_yield_at_1e-5_mbar_T_O2_max
+        reported_value: 0.13
+        reported_unit: mass_fraction
+        source:
+          citation_id: sesko_2024
+          source_location: fig6_text_image_table
+          digest: "Fig. 6 table reports O2 yield 0.13 at T_O2,max and 1e-5 mbar."
+      - observable: modeled_o2_plus_o_yield_at_1e-5_mbar_T_O2_max
+        reported_value: 0.14
+        reported_unit: mass_fraction
+        source:
+          citation_id: sesko_2024
+          source_location: fig6_text_image_table
+          digest: "Fig. 6 table reports O2+O yield 0.14 at T_O2,max and 1e-5 mbar."
+      - observable: modeled_o2_yield_at_1e-5_mbar_T_vapor
+        reported_value: 0.01
+        reported_unit: mass_fraction
+        source:
+          citation_id: sesko_2024
+          source_location: fig6_text_image_table
+          digest: "Fig. 6 table reports O2 yield 0.01 at T_vapor and 1e-5 mbar."
+      - observable: modeled_o2_plus_o_yield_at_1e-5_mbar_T_vapor
+        reported_value: 0.29
+        reported_unit: mass_fraction
+        source:
+          citation_id: sesko_2024
+          source_location: fig6_text_image_table
+          digest: "Fig. 6 table reports O2+O yield 0.29 at T_vapor and 1e-5 mbar."
+      - observable: modeled_eac1a_o2_plus_o_yield_at_1e-5_mbar_T_vapor
+        reported_value: 0.30
+        reported_unit: mass_fraction
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: fig7_text_image_table
+          digest: "Fig. 7 table reports EAC-1A O2+O yield about 0.30 at T_vapor and 1e-5 mbar."
+      - observable: modeled_eac1a_o2_plus_o_yield_at_1e-5_mbar_T_O2_max
+        reported_value: 0.11
+        reported_unit: mass_fraction
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: fig7_text_image_table
+          digest: "Fig. 7 table reports EAC-1A O2+O yield about 0.11 at T_O2,max and 1e-5 mbar."
+      - observable: peak_sublimation_regime_o2_yield_below_1e-6_mbar
+        reported_value: 0.14
+        reported_unit: mass_fraction
+        qualifier: highest_peak_below_1e-6_mbar
+        source:
+          citation_id: sesko_2024
+          source_location: oxygen_production_comparison
+          digest: "Text reports highest peak yields of 14% below 1e-6 mbar in the sublimation regime."
+      - observable: peak_melting_regime_o2_yield_at_1e-5_mbar
+        reported_min_value: 0.12
+        reported_max_value: 0.13
+        reported_unit: mass_fraction
+        qualifier: on_order_of
+        source:
+          citation_id: sesko_2024
+          source_location: oxygen_production_comparison
+          digest: "Text reports melting-regime peak yields on the order of 12% to 13% at 1e-5 mbar."
+      - observable: crucible_wall_deposit_thickness_um
+        reported_value: 31.3
+        reported_unit: um
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_results_deposit_cross_section
+          digest: "Optical cross-section measured a 31.3 um thick white and cloudy deposit on the crucible surface."
+      - observable: typical_crucible_deposit_thickness_um
+        reported_value: 30
+        reported_unit: um
+        qualifier: usual_around
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_results_deposit_texture
+          digest: "Text reports usually around 30 um thick white or brown crystal deposits."
+      - observable: deposit_K_wt_pct
+        reported_min_value: 5
+        reported_max_value: 8
+        reported_unit: wt_percent
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_results_deposit_edx
+          digest: "EDX on crucible deposits showed K concentrations ranging from 5 to 8 wt%."
+      - observable: needle_crystal_Na_wt_pct
+        reported_value: 30
+        reported_unit: wt_percent
+        qualifier: approximate
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_results_deposit_edx
+          digest: "Needle-like crystals had very high Na concentration around 30 wt%."
+      - observable: deposit_Si_wt_pct
+        reported_min_value: 7
+        reported_max_value: 20
+        reported_unit: wt_percent
+        source:
+          citation_id: sesko_2024
+          source_location: experimental_results_deposit_edx
+          digest: "EDX observed Si ranging from 7 to 20 wt% in deposits."
+    observed_locations:
+      - id: crucible_wall
+        role: sample_holder
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          Na:
+            measurement_type: qualitative
+            qualifier: high_in_needle_like_crystals
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_deposit_edx
+              digest: "Needle-like crystals in the crucible deposit were Na-rich."
+          K:
+            measurement_type: qualitative
+            qualifier: high_5_to_8_wt_percent
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_deposit_edx
+              digest: "Both deposit regions showed K concentrations ranging from 5 to 8 wt%."
+          Si:
+            measurement_type: qualitative
+            qualifier: present_7_to_20_wt_percent
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_deposit_edx
+              digest: "Si was observed ranging from 7 to 20 wt% in the deposit."
+          Fe:
+            measurement_type: qualitative
+            qualifier: brown_lower_layer_present
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_deposit_texture
+              digest: "Brown lower layer was interpreted as higher in iron than the rest of the deposit."
+        morphology_notes:
+          value: "White or brown inhomogeneous evaporate deposit, about 30 um typical thickness, with Na/K-rich crystals and a lower Fe-rich brown layer."
+          source:
+            citation_id: sesko_2024
+            source_location: experimental_results_deposit_texture
+            digest: "Crucible wall deposit morphology and composition described from SEM, EDX, and optical microscopy."
+        quantitative_measurements:
+          - observable: crucible_wall_deposit_thickness_um
+            reported_value: 31.3
+            reported_unit: um
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_deposit_cross_section
+              digest: "Cross-section reports 31.3 um deposit thickness."
+      - id: melt_region
+        role: sample
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          glass:
+            measurement_type: qualitative
+            qualifier: homogeneous_glassy_surface
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_melt_surface
+              digest: "SEM imagery showed a relatively homogeneous and glassy melt surface."
+          Mg:
+            measurement_type: qualitative
+            qualifier: mg_rich_dendrites
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_melt_cross_section
+              digest: "Dendrites were attributed to Mg-rich phase separation."
+          Al:
+            measurement_type: qualitative
+            qualifier: al_rich_dendrites
+            source:
+              citation_id: sesko_2024
+              source_location: experimental_results_melt_cross_section
+              digest: "Dendrites were attributed to Al-rich phase separation."
+        morphology_notes:
+          value: "Melt had homogeneous glassy upper surface, gas bubbles from the lower melt interface, and Mg/Al-rich dendrites near side and bottom interface areas."
+          source:
+            citation_id: sesko_2024
+            source_location: experimental_results_melt_cross_section
+            digest: "Melt region observations described gas bubbles, glassy phase, and Mg/Al-rich dendrites."
+        quantitative_measurements: []
+    conflicting_reported_values: []
+    named_missing_fields:
+      - exposure_duration_h
+      - deposit_mass_g
+      - per_location_deposit_mass_g
+      - crucible_dimensions
+      - chamber_volume_m3
+      - pump_throughput
+      - time_resolved_pressure_trace
+      - time_resolved_temperature_trace
+    measured_time_series: []
