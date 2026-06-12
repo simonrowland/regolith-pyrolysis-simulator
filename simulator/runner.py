@@ -776,7 +776,7 @@ def _wall_deposit_cumulative_kg_at_snapshot(
     snapshot: HourSnapshot,
 ) -> dict[str, dict[str, float]]:
     cumulative: dict[tuple[str, str], float] = {}
-    snapshots = tuple(getattr(sim.record, "snapshots", ()) or ())
+    snapshots = tuple(getattr(getattr(sim, "record", None), "snapshots", ()) or ())
     found_snapshot = False
     for item in snapshots:
         if int(getattr(item, "hour", -1)) > int(snapshot.hour):
