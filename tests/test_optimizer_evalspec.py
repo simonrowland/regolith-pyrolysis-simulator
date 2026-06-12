@@ -21,6 +21,7 @@ from simulator.optimize.evalspec import (
 )
 from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
+from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.runner import PyrolysisRun
 
@@ -391,17 +392,18 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
         RecipePatch({}),
         "lunar_mare_low_ti",
         "stub",
-        _campaign_window_profile("C2B", 1320.0, 1480.0, 24),
+        _campaign_window_profile("C2B", 1320.0, 1480.0, 17),
         RecipeSchema(),
     )
 
     overrides = run_config.runtime_campaign_overrides["C2B"]
-    assert run_config.hours == 27
-    assert spec.hours == 27
+    assert run_config.hours == 20
+    assert spec.hours == 20
     assert overrides["thermal_window_preheat_hours"] == pytest.approx(3.0)
     assert overrides["thermal_window_ramp_C_per_hr"] == pytest.approx(
-        (1480.0 - 1320.0) / 24.0
+        (1480.0 - 1320.0) / 17.0
     )
+    assert overrides["max_hours"] == pytest.approx(20.0)
 
     session = _force_builtin_run_from_config(run_config)._start_session()
     temperatures = [
@@ -414,6 +416,17 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[2] == pytest.approx(1320.0)
     assert temperatures[-1] == pytest.approx(1480.0)
     assert max(temperatures) >= 1320.0
+
+
+def test_c2b_profile_window_over_campaign_cap_fails_loud() -> None:
+    with pytest.raises(ProfileValidationError, match=r"max_hold_hr.*FORCE_PROFILES=1"):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            _campaign_window_profile("C2B", 1320.0, 1480.0, 24),
+            RecipeSchema(),
+        )
 
 
 def test_c2a_profile_window_splits_cache_key_from_cold_start() -> None:

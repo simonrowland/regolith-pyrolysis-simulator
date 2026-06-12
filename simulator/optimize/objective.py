@@ -33,6 +33,9 @@ SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
 COMPOSITION_WINDOW_MODES = frozenset({"hard_window", "soft_distance"})
+COMPOSITION_EXTRACTION_MECHANISMS = frozenset(
+    {"thermal_volatilization", "c3_metallothermic_shuttle", "c6_mg_thermite"}
+)
 _COMPOSITION_OBJECTIVE_KEYS = frozenset(
     {"type", "id", "metric", "sense", "units", "weight", "rationale", "target"}
 )
@@ -51,7 +54,7 @@ _COMPOSITION_TARGET_KEYS = frozenset(
 )
 _TARGET_SPEC_DIGEST_DISPLAY_KEYS = frozenset({"thermal_window"})
 _EXTRACTION_KEYS = frozenset(
-    {"basis", "captured_pool", "credit_policy", "completeness_min"}
+    {"basis", "captured_pool", "credit_policy", "completeness_min", "mechanisms"}
 )
 _CREDIT_POLICY_KEYS = frozenset({"additives", "vented"})
 _COMPOSITION_WINDOW_KEYS = frozenset(
@@ -359,9 +362,13 @@ def composition_target_eval_metadata(profile: Mapping[str, Any]) -> Mapping[str,
 
 
 def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    thermal_window = target.get("thermal_window")
+    if isinstance(thermal_window, str) and thermal_window:
+        result["thermal_window"] = thermal_window
     window = target.get("composition_window", {})
     if not isinstance(window, Mapping):
-        return {}
+        return result
     oxides = window.get("oxides", {})
     if not isinstance(oxides, Mapping):
         oxides = {}
@@ -399,7 +406,7 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
                     row[key] = raw[key]
             resolved_ratios.append(MappingProxyType(row))
     if not resolved_oxides and not resolved_ratios:
-        return {}
+        return result
     payload: dict[str, Any] = {
         "pool": str(window.get("pool", "")),
         "mode": str(window.get("mode", "")),
@@ -408,7 +415,8 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
     }
     if resolved_ratios:
         payload["ratios"] = tuple(resolved_ratios)
-    return {"composition_window": MappingProxyType(payload)}
+    result["composition_window"] = MappingProxyType(payload)
+    return result
 
 
 def target_spec_digest(target: Mapping[str, Any]) -> str:
@@ -611,6 +619,24 @@ def _normalize_extraction(
             raise ObjectiveProfileError(f"{where}.completeness_min unknown species {key!r}")
         numeric = _positive_profile_float(value, f"{where}.completeness_min.{key}")
         normalized_min[key] = numeric
+    raw_mechanisms = raw.get("mechanisms", {})
+    if raw_mechanisms is None:
+        raw_mechanisms = {}
+    if not isinstance(raw_mechanisms, Mapping):
+        raise ObjectiveProfileError(f"{where}.mechanisms must be a mapping")
+    mechanisms: dict[str, str] = {}
+    for species, mechanism in raw_mechanisms.items():
+        key = str(species)
+        if key not in normalized_min:
+            raise ObjectiveProfileError(
+                f"{where}.mechanisms.{key} must match an extracted species"
+            )
+        mechanism_name = str(mechanism)
+        if mechanism_name not in COMPOSITION_EXTRACTION_MECHANISMS:
+            raise ObjectiveProfileError(
+                f"{where}.mechanisms.{key} has invalid mechanism {mechanism_name!r}"
+            )
+        mechanisms[key] = mechanism_name
     return {
         "basis": basis,
         "captured_pool": captured_pool,
@@ -621,6 +647,7 @@ def _normalize_extraction(
             }
         ),
         "completeness_min": MappingProxyType(normalized_min),
+        "mechanisms": MappingProxyType(mechanisms),
     }
 
 
@@ -2022,6 +2049,9 @@ def _extraction_score(
     if completeness_evidence is not None:
         completeness_evidence["captured_pool"] = captured_pool
         completeness_evidence["basis"] = str(extraction["basis"])
+        completeness_evidence["mechanisms"] = MappingProxyType(
+            dict(extraction.get("mechanisms", {}))
+        )
         completeness_evidence["species"] = {}
     for species, role in vector.items():
         if role != "extract":

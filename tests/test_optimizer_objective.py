@@ -680,10 +680,12 @@ def test_composition_target_eval_metadata_carries_tier_resolution_provenance() -
         species_vector={"Fe": "retain"},
         oxides={"Fe2O3": {"tier": "clear_container"}},
     )
+    profile["objectives"][0]["target"]["thermal_window"] = "C2B window 1260-1480 C"
 
     metadata = composition_target_eval_metadata(profile)
     row = metadata["target_provenance"]["composition_window"]["oxides"]["Fe2O3"]
 
+    assert metadata["target_provenance"]["thermal_window"] == "C2B window 1260-1480 C"
     assert row["tier"] == "clear_container"
     assert row["needs_experiment"] is True
     assert row["min"] == pytest.approx(0.0)

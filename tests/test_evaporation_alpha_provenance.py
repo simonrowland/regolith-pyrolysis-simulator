@@ -45,8 +45,9 @@ EXPECTED_ALPHA = {
         "value": 1.0,
         "envelope": (0.9, 1.0),
         "source": (
-            "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy "
-            "to Na; Sossi & Fegley 2018 liquids commonly near unity"
+            "ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy "
+            "to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; "
+            "Sossi & Fegley 2018 liquids commonly near unity"
         ),
         "tier": 2,
     },

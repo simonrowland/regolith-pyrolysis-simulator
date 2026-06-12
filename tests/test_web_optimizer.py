@@ -620,6 +620,62 @@ def test_optimizer_leaderboard_excludes_stale_version_and_digest_rows(client) ->
         "candidate-current"
     ]
     assert payload["entries"][0]["eval_spec"]["data_digests"] == current_spec.data_digests
+    assert payload["entries"][0]["data_digest_scope"]["data_digests"] == current_spec.data_digests
+    assert payload["data_digest_scope"]["mode"] == "exact_data_digests"
+    assert payload["data_digest_scope"]["data_digests"] == current_spec.data_digests
+    assert payload["data_digest_scope"]["narrowed_to_latest"] is True
+
+
+def test_optimizer_leaderboard_exposes_multiple_current_digest_scopes(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-multi-digest-scope"
+    run_dir.mkdir(parents=True)
+
+    spec_a = _base_spec(
+        recipe_id="recipe-current-a",
+        profile_id="oxygen-yield-v1",
+        data_digests={
+            "setpoints": "setpoints-digest",
+            "feedstocks": "feedstock-digest",
+            "vapor_pressures": "vapor-digest",
+            "profile": "profile-a-digest",
+        },
+    )
+    spec_b = replace(
+        spec_a,
+        recipe_id="recipe-current-b",
+        profile_id="glass-yield-v1",
+        data_digests={**spec_a.data_digests, "profile": "profile-b-digest"},
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec_a,
+        _scored(spec_a, candidate_id="candidate-a", oxygen=10.0, energy=2.0),
+        created_at="2026-06-03T00:00:00Z",
+    )
+    store.store(
+        spec_b,
+        _scored(spec_b, candidate_id="candidate-b", oxygen=12.0, energy=2.0),
+        created_at="2026-06-04T00:00:00Z",
+    )
+
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&objective=oxygen_kg&limit=5"
+    )
+
+    assert leaderboard.status_code == 200
+    payload = leaderboard.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-b",
+        "candidate-a",
+    ]
+    assert payload["data_digest_scope"]["mode"] == "multiple_current_data_digests"
+    assert payload["data_digest_scope"]["available_current_data_digest_count"] == 2
+    assert {entry["data_digest_scope"]["data_digests"]["profile"] for entry in payload["entries"]} == {
+        "profile-a-digest",
+        "profile-b-digest",
+    }
 
 
 def test_optimizer_reader_discovers_completed_job_result_dirs(client) -> None:
@@ -1226,6 +1282,18 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
         c5_enabled=True,
         mre_max_voltage_V=1.35,
         mre_target_species="FeO",
+        target_spec_id="pc-glass-clear",
+        target_spec_digest="target-digest",
+        target_provenance={
+            "targets": [
+                {
+                    "id": "pc-glass-clear",
+                    "provenance": {
+                        "thermal_window": "C2B window 1260-1480 C",
+                    },
+                }
+            ]
+        },
         runtime_campaign_overrides={
             "C4": {
                 "temperature_ramp_C_per_h": 25,
@@ -1285,6 +1353,8 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "Backend" in html
     assert "backend-badge" in html
     assert "StubBackend / unavailable" in html
+    assert "Target thermal window" in html
+    assert "pc-glass-clear: C2B window 1260-1480 C" in html
 
     assert download.status_code == 200
     assert download.mimetype == "application/x-yaml"
@@ -1294,6 +1364,12 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
         "hold_temperature_C"
     ] == 1300
     assert payload["eval_spec"]["mre_target_species"] == "FeO"
+    assert (
+        payload["eval_spec"]["target_provenance"]["targets"][0]["provenance"][
+            "thermal_window"
+        ]
+        == "C2B window 1260-1480 C"
+    )
     assert payload["provenance"]["cache_key"] == key
 
 

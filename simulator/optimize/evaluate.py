@@ -1090,6 +1090,7 @@ def _build_eval_inputs(
         _run_options(profile, fidelity),
         profile=profile,
         constraints=constraints,
+        setpoints=bundle.setpoints,
     )
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
@@ -1195,11 +1196,13 @@ def _thermal_scheduled_run_options(
     *,
     profile: Mapping[str, Any],
     constraints: PhysicsConstraintSet | None,
+    setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any]:
     schedule = _profile_thermal_window_schedule(
         run_options,
         profile=profile,
         constraints=constraints,
+        setpoints=setpoints,
     )
     if schedule is None:
         return run_options
@@ -1235,6 +1238,7 @@ def _profile_thermal_window_schedule(
     *,
     profile: Mapping[str, Any],
     constraints: PhysicsConstraintSet | None,
+    setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
     campaign = str(run_options.get("campaign", "") or "")
     temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
@@ -1266,6 +1270,14 @@ def _profile_thermal_window_schedule(
     ))
     total_hours = int(math.ceil(preheat_hours + duration_h))
     window_ramp = (high_C - low_C) / duration_h if duration_h > 0.0 else 0.0
+    max_hold_hr = _campaign_max_hold_hr(setpoints, campaign)
+    if max_hold_hr is not None and float(total_hours) > max_hold_hr:
+        raise EvaluationInputError(
+            f"{campaign} thermal window requires {total_hours:g} h "
+            f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) but "
+            f"campaign max_hold_hr is {max_hold_hr:g}; regenerate with "
+            "FORCE_PROFILES=1"
+        )
     return MappingProxyType({
         "campaign": campaign,
         "total_hours": total_hours,
@@ -1280,6 +1292,28 @@ def _profile_thermal_window_schedule(
             "max_hours": float(total_hours),
         },
     })
+
+
+def _campaign_max_hold_hr(
+    setpoints: Mapping[str, Any],
+    campaign: str,
+) -> float | None:
+    campaigns = setpoints.get("campaigns")
+    if not isinstance(campaigns, MappingABC):
+        return None
+    cfg = campaigns.get(campaign)
+    if not isinstance(cfg, MappingABC):
+        return None
+    value = cfg.get("max_hold_hr")
+    if value is None or isinstance(value, bool) or isinstance(value, MappingABC):
+        return None
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(amount) or amount <= 0.0:
+        return None
+    return amount
 
 
 def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:

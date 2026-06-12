@@ -174,9 +174,9 @@ def test_constraint_target_species_must_be_non_empty_list() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-@pytest.mark.parametrize("gate", ("delivered_stream_purity", "knudsen_viscous"))
-def test_runtime_loader_refuses_stale_melt_pool_gates(gate: str) -> None:
+def test_runtime_loader_refuses_stale_melt_pool_stream_purity_gate() -> None:
     profile = _composition_profile()
+    gate = "delivered_stream_purity"
     profile["constraints"]["gates"].append(gate)
 
     with pytest.raises(ProfileValidationError) as excinfo:
@@ -186,6 +186,34 @@ def test_runtime_loader_refuses_stale_melt_pool_gates(gate: str) -> None:
     assert gate in message
     assert "residual_rump_at_stop" in message
     assert "FORCE_PROFILES=1" in message
+
+
+def test_runtime_loader_allows_knudsen_gate_on_melt_pool_targets() -> None:
+    profile = _composition_profile()
+    profile["constraints"]["gates"].append("knudsen_viscous")
+
+    constraints = physics_constraints_from_profile(profile, source="flow-profile.yaml")
+
+    assert "knudsen_viscous" in constraints.active_gates
+
+
+def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C4", "hours": 18})
+    profile["fidelities"] = {"stub": {"backend_name": "stub"}}
+    profile["seed_recipes"] = [
+        {
+            "id": "stale-c4-window",
+            "source_campaign": "C4",
+            "patch": {"campaigns": {"C4": {"temp_range_C": [1580.0, 1670.0]}}},
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold refusal.*FORCE_PROFILES=1",
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
 def test_unknown_constraint_key_raises_named_error() -> None:

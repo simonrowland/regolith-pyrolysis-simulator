@@ -1,6 +1,8 @@
 # Analog source: data/optimize_profiles/lunar_highland.yaml.
 # Simulant-specific adjustment: LHS-1 uses the same highlands objective mix;
 # only ids/text/feedstock are changed until an optimizer calibration exists.
+# H1 scope note: stub/fast/high/auto share the existing stub_smoke fidelity posture;
+# the H1/G3 backend-honesty gate is deferred and not closed by this profile.
 profile_id: lunar-highlands-lhs1-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_highlands_lhs1

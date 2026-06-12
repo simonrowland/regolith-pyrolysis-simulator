@@ -13,7 +13,7 @@ from simulator.optimize.evaluate import (
     evaluate,
 )
 from simulator.optimize.product_pools import MELT_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
-from simulator.optimize.profiles import validate_profile
+from simulator.optimize.profiles import ProfileValidationError, validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 
@@ -38,6 +38,31 @@ SESSION_CAMPAIGN_ALIASES = {
     "C2A_continuous": "C2A",
     "C2A_staged": "C2A_STAGED",
 }
+
+
+def _is_runnable_target(row: generator.TargetMenuRow) -> bool:
+    return (
+        generator._target_blocked_reason(
+            row,
+            campaign=row.maturity_campaign,
+        )
+        is None
+    )
+
+
+RUNNABLE_TARGET_IDS = tuple(
+    sorted(
+        target_id
+        for target_id, row in generator.TARGET_MENU.items()
+        if _is_runnable_target(row)
+    )
+)
+
+
+def _setpoint_campaign_config(campaign: str) -> dict[str, object]:
+    path = Path("data/setpoints.yaml")
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return data["campaigns"][generator._setpoint_campaign_key(campaign)]
 
 def test_pinned_session_campaign_vocabulary() -> None:
     assert tuple(member.name for member in CampaignPhase) == SESSION_VALID_CAMPAIGNS
@@ -77,9 +102,108 @@ def test_retain_alkali_legacy_c3_override_emits_session_phase(
     profile = yaml.safe_load(out.read_text())
     assert profile["run"]["campaign"] == "C3_NA"
     assert "knudsen_viscous" not in profile["constraints"]["gates"]
+    assert "extraction_completeness" not in profile["constraints"]["gates"]
+    assert "target_species" not in profile["constraints"]
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_pc_extract_al_generates_thermite_profile_when_c6_present(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-extract-al.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-extract-al",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    assert target["extraction"]["completeness_min"]["Al"] == pytest.approx(1.0)
+    assert target["extraction"]["mechanisms"]["Al"] == "c6_mg_thermite"
+
+
+def test_pc_extract_al_blocks_when_campaign_set_lacks_c6(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-extract-al-c2b.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-extract-al",
+                "--campaign",
+                "C2B",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+
+    profile = yaml.safe_load(out.read_text())
+    assert profile["status"] == "BLOCKED"
+    assert profile["target_id"] == "pc-extract-al"
+    assert profile["blocked_reason"] == "Al reachable via C6 thermite - row lacks C6"
+    assert profile["disposition"]["kind"] == "missing_extraction_mechanism"
+
+
+def test_pc_extract_fe_is_askable_via_c3_shuttle(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-extract-fe-c3.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-extract-fe",
+                "--campaign",
+                "C3",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    assert target["maturity"]["campaign"] == "C3_NA"
+    assert target["extraction"]["mechanisms"]["Fe"] == "c3_metallothermic_shuttle"
+
+
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 @pytest.mark.parametrize("feedstock", ["lunar_mare_low_ti", "ci_carbonaceous_chondrite"])
 def test_target_menu_rows_emit_validating_profiles(
     monkeypatch: pytest.MonkeyPatch,
@@ -105,7 +229,7 @@ def test_target_menu_rows_emit_validating_profiles(
     }
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 def test_target_menu_extraction_gate_is_scoped_to_extracted_species(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -114,8 +238,9 @@ def test_target_menu_extraction_gate_is_scoped_to_extracted_species(
     out = tmp_path / f"{target_id}.yaml"
     _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
 
-    profile = validate_profile(
-        yaml.safe_load(out.read_text()),
+    profile = yaml.safe_load(out.read_text())
+    validate_profile(
+        profile,
         expected_feedstock="lunar_mare_low_ti",
         source=out,
     )
@@ -136,7 +261,7 @@ def test_target_menu_extraction_gate_is_scoped_to_extracted_species(
         assert target["species_vector"][species] == "extract"
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 def test_target_menu_stream_purity_gate_matches_product_pool(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -145,8 +270,9 @@ def test_target_menu_stream_purity_gate_matches_product_pool(
     out = tmp_path / f"{target_id}.yaml"
     _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
 
-    profile = validate_profile(
-        yaml.safe_load(out.read_text()),
+    profile = yaml.safe_load(out.read_text())
+    validate_profile(
+        profile,
         expected_feedstock="lunar_mare_low_ti",
         source=out,
     )
@@ -161,8 +287,8 @@ def test_target_menu_stream_purity_gate_matches_product_pool(
         pytest.fail(f"unclassified target product pool: {target['pool']}")
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
-def test_target_menu_knudsen_gate_matches_product_pool(
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
+def test_target_menu_knudsen_gate_tracks_vapor_removal_physics(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
     target_id: str,
@@ -178,15 +304,14 @@ def test_target_menu_knudsen_gate_matches_product_pool(
     target = profile["objectives"][0]["target"]
     gates = tuple(profile["constraints"]["gates"])
 
-    if target["pool"] in STREAM_PRODUCT_POOLS:
+    requires_vapor_removal = bool(target["extraction"]["completeness_min"])
+    if requires_vapor_removal:
         assert "knudsen_viscous" in gates
-    elif target["pool"] in MELT_PRODUCT_POOLS:
-        assert "knudsen_viscous" not in gates
     else:
-        pytest.fail(f"unclassified target product pool: {target['pool']}")
+        assert "knudsen_viscous" not in gates
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 def test_target_menu_extraction_minima_reach_physics_constraints(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -217,7 +342,7 @@ def test_target_menu_extraction_minima_reach_physics_constraints(
         assert constraints.extraction_min_fraction_by_species == {}
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 def test_target_menu_windowed_campaigns_emit_runtime_schedule(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -240,25 +365,75 @@ def test_target_menu_windowed_campaigns_emit_runtime_schedule(
         constraints=_composition_target_constraints(profile, None),
     )
     campaign = profile["run"]["campaign"]
-    expected_patch = generator._campaign_window_patch(
-        campaign,
-        hours=int(profile["run"]["hours"]),
-    )
+    cfg = _setpoint_campaign_config(campaign)
+    expected_temp_range = cfg.get("temp_range_C")
 
-    if expected_patch is None:
+    if expected_temp_range is None:
         assert campaign not in spec.runtime_campaign_overrides
         return
 
     overrides = spec.runtime_campaign_overrides[campaign]
     assert run_config.runtime_campaign_overrides[campaign] == overrides
     assert overrides["thermal_window_low_C"] == pytest.approx(
-        expected_patch["temp_range_C"][0]
+        expected_temp_range[0]
     )
     assert overrides["thermal_window_high_C"] == pytest.approx(
-        expected_patch["temp_range_C"][1]
+        expected_temp_range[1]
     )
     assert overrides["thermal_window_preheat_hours"] >= 0.0
-    assert run_config.hours >= int(profile["run"]["hours"])
+    max_hold_hr = cfg.get("max_hold_hr")
+    if isinstance(max_hold_hr, (int, float)):
+        assert overrides["max_hours"] <= float(max_hold_hr)
+    else:
+        assert run_config.hours >= int(profile["run"]["hours"])
+
+
+def test_target_menu_generation_refuses_window_duration_over_campaign_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-extract-mg.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+
+    with pytest.raises(SystemExit, match=r"pc-extract-mg C4\.duration_h exceeds campaign max_hold_hr"):
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-extract-mg",
+                "--hours",
+                "24",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+
+
+def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-extract-mg.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", "pc-extract-mg", out)
+    profile = yaml.safe_load(out.read_text())
+    validate_profile(
+        profile,
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    profile["run"]["hours"] = 18
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold refusal.*FORCE_PROFILES=1",
+    ):
+        validate_profile(
+            profile,
+            expected_feedstock="lunar_mare_low_ti",
+            source=out,
+        )
 
 
 def test_plural_only_seed_does_not_receive_unrelated_thermal_window(
@@ -280,9 +455,7 @@ def test_plural_only_seed_does_not_receive_unrelated_thermal_window(
         seed for seed in profile["seed_recipes"] if seed["id"] == "pc-extract-mg-C4-thermal-window"
     )
     assert window_seed["source_campaign"] == "C4"
-    assert window_seed["patch"]["campaigns"]["C4"]["temp_range_C"] == (
-        generator._campaign_window_patch("C4", hours=24)["temp_range_C"]
-    )
+    assert window_seed["patch"]["campaigns"]["C4"]["temp_range_C"] == [1580.0, 1670.0]
 
 
 def test_no_declared_campaign_window_is_target_visible(
@@ -302,7 +475,7 @@ def test_no_declared_campaign_window_is_target_visible(
     assert target["thermal_window"] == "not-declared-for-campaign:C3"
 
 
-@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+@pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
 def test_target_menu_generated_profiles_stub_eval_no_campaign_vocabulary_abort(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -400,6 +573,7 @@ def test_target_menu_tier_rows_resolve_with_provenance(
         ("pc-extract-na", "Na", 0.95),
         ("pc-extract-k", "K", 0.90),
         ("pc-extract-fe", "Fe", 0.85),
+        ("pc-extract-al", "Al", 1.0),
     ],
 )
 def test_target_menu_extract_rows_are_windowless(
@@ -429,7 +603,7 @@ def test_target_menu_extract_rows_are_windowless(
     assert target["score_weights"]["composition"] == pytest.approx(0.0)
 
 
-def test_target_menu_retain_alkali_c3_uses_fe_extraction_and_soft_alkali_window(
+def test_target_menu_retain_alkali_c3_uses_soft_alkali_window_without_fe_hard_gate(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -447,13 +621,13 @@ def test_target_menu_retain_alkali_c3_uses_fe_extraction_and_soft_alkali_window(
     oxides = target["composition_window"]["oxides"]
 
     assert "delivered_stream_purity" not in constraints["gates"]
-    assert "extraction_completeness" in constraints["gates"]
-    assert constraints["target_species"] == ["Fe"]
-    assert target["species_vector"]["Fe"] == "extract"
+    assert "extraction_completeness" not in constraints["gates"]
+    assert "target_species" not in constraints
+    assert target["species_vector"]["Fe"] == "retain"
     assert target["species_vector"]["Na"] == "retain"
     assert target["species_vector"]["K"] == "retain"
     assert target["species_vector"]["Si"] == "retain"
-    assert target["extraction"]["completeness_min"]["Fe"] == pytest.approx(0.95)
+    assert target["extraction"]["completeness_min"] == {}
     assert oxides["Na2O_plus_K2O"]["min"] == pytest.approx(5.0)
     assert oxides["Na2O_plus_K2O"]["max"] == pytest.approx(18.0)
     assert oxides["Na2O_plus_K2O"]["strict"] is False

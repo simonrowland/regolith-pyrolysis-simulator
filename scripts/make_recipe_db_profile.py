@@ -14,6 +14,7 @@ Writes the real-fidelity profile to --out (default docs-private/recipe-db/profil
 """
 import argparse
 import copy
+import math
 import sys
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -53,6 +54,12 @@ MENU_TARGET_IDS = (
     "pc-ceramic-ca-al-ratio-seed",
     "pc-ceramic-ca-ree-after-al",
 )
+FURNACE_SURVIVABLE_T_MAX_C = 1800.0
+DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
+DEFAULT_COLD_START_TEMPERATURE_C = 25.0
+THERMAL_VOLATILIZATION = "thermal_volatilization"
+C3_METALLOTHERMIC_SHUTTLE = "c3_metallothermic_shuttle"
+C6_MG_THERMITE = "c6_mg_thermite"
 
 
 @dataclass(frozen=True)
@@ -111,21 +118,21 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
         "pc-extract-fe",
         "Fe",
         campaign="C2B",
-        hours=24,
+        hours=17,
         completeness_min=0.85,
     ),
     "pc-extract-mg": _extract_row(
         "pc-extract-mg",
         "Mg",
         campaign="C4",
-        hours=24,
+        hours=17,
         completeness_min=1.0,
     ),
     "pc-extract-al": _extract_row(
         "pc-extract-al",
         "Al",
         campaign="C6",
-        hours=24,
+        hours=17,
         completeness_min=1.0,
     ),
     "pc-extract-o2": _extract_row(
@@ -168,7 +175,7 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
             },
         },
         maturity_campaign="C2B",
-        maturity_hours=24,
+        maturity_hours=17,
         score_weights={"extraction": 0.50, "composition": 0.50},
     ),
     "pc-glass-retain-na-k-c3": TargetMenuRow(
@@ -251,7 +258,7 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
             },
         },
         maturity_campaign="C4",
-        maturity_hours=24,
+        maturity_hours=17,
         score_weights={"extraction": 0.50, "composition": 0.50},
     ),
     "pc-ceramic-ca-al-ratio-seed": TargetMenuRow(
@@ -306,7 +313,7 @@ TARGET_MENU: Mapping[str, TargetMenuRow] = {
             },
         ),
         maturity_campaign="C4",
-        maturity_hours=24,
+        maturity_hours=17,
         score_weights={"extraction": 0.50, "composition": 0.50},
     ),
 }
@@ -378,26 +385,63 @@ def _with_row_provenance(
     return copied
 
 
+def _row_scores_extraction(row: TargetMenuRow) -> bool:
+    weights = row.score_weights or {}
+    try:
+        return float(weights.get("extraction", 0.0)) > 0.0
+    except (TypeError, ValueError):
+        return False
+
+
+def _scored_extraction_min(row: TargetMenuRow) -> dict[str, float]:
+    if not _row_scores_extraction(row):
+        return {}
+    return dict(row.extraction_min or {})
+
+
+def _extraction_mechanisms(row: TargetMenuRow, *, campaign: str) -> dict[str, str]:
+    campaigns = _row_campaign_set(campaign)
+    mechanisms: dict[str, str] = {}
+    for species in _scored_extraction_min(row):
+        mechanism = _extraction_mechanism_for_species(str(species), campaigns)
+        if mechanism is not None:
+            mechanisms[str(species)] = mechanism
+    return mechanisms
+
+
+def _row_campaign_set(campaign: str) -> frozenset[str]:
+    selected = str(campaign)
+    campaigns = {selected, _setpoint_campaign_key(selected)}
+    if selected in {"C3", "C3_K", "C3_NA"}:
+        campaigns.add("C3")
+    return frozenset(campaigns)
+
+
+def _extraction_mechanism_for_species(
+    species: str,
+    campaigns: frozenset[str],
+) -> str | None:
+    if species in {"Fe", "Cr"} and "C3" in campaigns:
+        return C3_METALLOTHERMIC_SHUTTLE
+    if species == "Al" and "C6" in campaigns:
+        return C6_MG_THERMITE
+    if _species_reachable_by_thermal_volatilization(species):
+        return THERMAL_VOLATILIZATION
+    return None
+
+
 def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[str, Any]:
-    extraction_min = dict(row.extraction_min or {})
-    extraction = {
-        "basis": "input_element_mol",
-        "captured_pool": (
-            "captured_stage_3_silica"
-            if row.pool == "captured_stage_3_silica"
-            else "captured_products"
-        ),
-        "credit_policy": {
-            "additives": "no_product_credit",
-            "vented": "no_product_credit",
-        },
-        "completeness_min": extraction_min,
-    }
+    extraction_min = _scored_extraction_min(row)
+    species_vector = dict(row.species_vector)
+    if not extraction_min:
+        species_vector = {
+            species: ("retain" if action == "extract" else action)
+            for species, action in species_vector.items()
+        }
     target = {
         "pool": row.pool,
         "require_coating_gate": True,
-        "species_vector": dict(row.species_vector),
-        "extraction": extraction,
+        "species_vector": species_vector,
         "maturity": {
             "mode": "campaign_hours",
             "campaign": campaign,
@@ -409,6 +453,21 @@ def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[
         },
         "score_weights": dict(row.score_weights or {"extraction": 0.5, "composition": 0.5}),
     }
+    if extraction_min:
+        target["extraction"] = {
+            "basis": "input_element_mol",
+            "captured_pool": (
+                "captured_stage_3_silica"
+                if row.pool == "captured_stage_3_silica"
+                else "captured_products"
+            ),
+            "credit_policy": {
+                "additives": "no_product_credit",
+                "vented": "no_product_credit",
+            },
+            "completeness_min": extraction_min,
+            "mechanisms": _extraction_mechanisms(row, campaign=campaign),
+        }
     thermal_window = _campaign_window_disposition(campaign)
     if thermal_window is not None:
         target["thermal_window"] = thermal_window
@@ -484,11 +543,12 @@ def _scope_target_profile_constraints(profile: dict[str, Any], row: TargetMenuRo
     for gate in forbidden_gates_for_pool(row.pool):
         _remove_constraint_gate(profile, gate)
 
-    extraction_targets = tuple((row.extraction_min or {}).keys())
+    extraction_targets = tuple(_scored_extraction_min(row))
     if extraction_targets:
         constraints["target_species"] = list(extraction_targets)
     else:
         _remove_constraint_gate(profile, "extraction_completeness")
+        _remove_constraint_gate(profile, "knudsen_viscous")
         constraints.pop("target_species", None)
 
 
@@ -510,6 +570,68 @@ def _setpoint_campaign_config(campaign: str) -> Mapping[str, Any]:
     if not isinstance(selected, Mapping):
         raise SystemExit(f"setpoints campaign {campaign!r} must be a mapping")
     return selected
+
+
+def _setpoint_campaign_max_hold_hr(campaign: str) -> float | None:
+    value = _setpoint_campaign_config(campaign).get("max_hold_hr")
+    if isinstance(value, Mapping):
+        return None
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(
+            f"{campaign}.max_hold_hr must be numeric when declaring a thermal window"
+        ) from exc
+
+
+def _validate_campaign_window_within_caps(
+    row: TargetMenuRow,
+    *,
+    campaign: str,
+    hours: int,
+) -> None:
+    cfg = _setpoint_campaign_config(campaign)
+    temp_range = cfg.get("temp_range_C")
+    if temp_range is None:
+        return
+    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
+    if high_C < low_C:
+        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+    if high_C > FURNACE_SURVIVABLE_T_MAX_C:
+        raise SystemExit(
+            f"{row.target_id} {campaign}.temp_range_C exceeds furnace-survivable "
+            f"window: {high_C:g} C > {FURNACE_SURVIVABLE_T_MAX_C:g} C"
+        )
+    max_hold_hr = _setpoint_campaign_max_hold_hr(campaign)
+    preheat_hours = _thermal_window_preheat_hours(campaign, low_C)
+    total_hours = preheat_hours + float(hours)
+    if max_hold_hr is not None and total_hours > max_hold_hr:
+        raise SystemExit(
+            f"{row.target_id} {campaign}.duration_h exceeds campaign max_hold_hr: "
+            f"{total_hours:g} h including {preheat_hours:g} h preheat > "
+            f"{max_hold_hr:g} h"
+        )
+
+
+def _thermal_window_preheat_hours(campaign: str, low_C: float) -> int:
+    cfg = _setpoint_campaign_config(campaign)
+    value = cfg.get("preheat_ramp_C_per_hr") or cfg.get("ramp_rate_C_per_hr")
+    if value is None:
+        ramp_C_per_hr = DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
+    else:
+        try:
+            ramp_C_per_hr = float(value)
+        except (TypeError, ValueError) as exc:
+            raise SystemExit(f"{campaign}.preheat_ramp_C_per_hr must be numeric") from exc
+    if ramp_C_per_hr <= 0.0:
+        raise SystemExit(f"{campaign}.preheat_ramp_C_per_hr must be positive")
+    return int(
+        math.ceil(
+            max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / ramp_C_per_hr
+        )
+    )
 
 
 def _campaign_window_patch(campaign: str, *, hours: int) -> dict[str, Any] | None:
@@ -545,6 +667,88 @@ def _campaign_window_disposition(campaign: str) -> str | None:
     if cfg.get("temp_range_C") is None:
         return f"not-declared-for-campaign:{_setpoint_campaign_key(campaign)}"
     return None
+
+
+def _vapor_pressure_entry(species: str) -> Mapping[str, Any] | None:
+    src = REPO_ROOT / "data" / "vapor_pressures.yaml"
+    loaded = yaml.safe_load(src.read_text())
+    if not isinstance(loaded, Mapping):
+        raise SystemExit(f"invalid vapor-pressure sidecar: {src}")
+    for section in ("species", "metals", "oxide_vapors"):
+        species_data = loaded.get(section)
+        if not isinstance(species_data, Mapping):
+            continue
+        entry = species_data.get(species)
+        if isinstance(entry, Mapping):
+            return entry
+    return None
+
+
+def _species_reachable_by_thermal_volatilization(species: str) -> bool:
+    if species == "O2":
+        return True
+    entry = _vapor_pressure_entry(species)
+    if entry is None:
+        return True
+    notes = str(entry.get("notes", "")).lower()
+    boiling_point = entry.get("boiling_point_C")
+    try:
+        boiling_point_C = float(boiling_point)
+    except (TypeError, ValueError):
+        boiling_point_C = None
+    if "not pyrolysable" in notes and (
+        boiling_point_C is None or boiling_point_C > FURNACE_SURVIVABLE_T_MAX_C
+    ):
+        return False
+    return True
+
+
+def _target_blocked_reason(row: TargetMenuRow, *, campaign: str) -> str | None:
+    if not _row_scores_extraction(row):
+        return None
+    campaigns = _row_campaign_set(campaign)
+    for species in _scored_extraction_min(row):
+        species_name = str(species)
+        if _extraction_mechanism_for_species(species_name, campaigns) is None:
+            return _missing_extraction_mechanism_reason(species_name, campaigns)
+    return None
+
+
+def _missing_extraction_mechanism_reason(
+    species: str,
+    campaigns: frozenset[str],
+) -> str:
+    if species == "Al" and "C6" not in campaigns:
+        return "Al reachable via C6 thermite - row lacks C6"
+    if species in {"Fe", "Cr"} and "C3" not in campaigns:
+        return f"{species} reachable via C3 metallothermic shuttle - row lacks C3"
+    return f"{species} lacks thermal volatilization or configured extraction mechanism"
+
+
+def _blocked_target_profile(
+    base_profile: Mapping[str, Any],
+    row: TargetMenuRow,
+    *,
+    campaign: str,
+    hours: int,
+    reason: str,
+) -> dict[str, Any]:
+    feedstock = str(base_profile["feedstock"])
+    return {
+        "profile_id": f"{feedstock}-{row.target_id}-blocked-v1",
+        "profile_schema_version": "blocked-target-v1",
+        "feedstock": feedstock,
+        "target_id": row.target_id,
+        "status": "BLOCKED",
+        "blocked_reason": reason,
+        "campaign": campaign,
+        "hours": hours,
+        "disposition": {
+            "kind": "missing_extraction_mechanism",
+            "reason": reason,
+            "vapor_pressure_sidecar": "data/vapor_pressures.yaml",
+        },
+    }
 
 
 def _recipe_campaign_key_allowed(campaign: str, key: str) -> bool:
@@ -633,6 +837,7 @@ def _target_profile(
     campaign: str,
     hours: int,
 ) -> dict[str, Any]:
+    _validate_campaign_window_within_caps(row, campaign=campaign, hours=hours)
     profile = copy.deepcopy(dict(base_profile))
     _scope_target_profile_constraints(profile, row)
     feedstock = str(profile["feedstock"])
@@ -793,6 +998,23 @@ def main(argv: list[str]) -> int:
     for row in target_rows:
         campaign = _target_campaign(args.campaign, row)
         hours = args.hours if args.hours is not None else row.maturity_hours
+        blocked_reason = _target_blocked_reason(row, campaign=campaign)
+        out = _output_path(args.feedstock, row.target_id, args.out, len(target_rows))
+        if blocked_reason is not None:
+            _write_profile(
+                _blocked_target_profile(
+                    profile,
+                    row,
+                    campaign=campaign,
+                    hours=hours,
+                    reason=blocked_reason,
+                ),
+                out,
+            )
+            print(f"blocked {out}")
+            print(f"  target={row.target_id}")
+            print(f"  reason={blocked_reason}")
+            continue
         target_profile = _target_profile(profile, row, campaign=campaign, hours=hours)
         _apply_cached_real(
             target_profile,
@@ -805,7 +1027,6 @@ def main(argv: list[str]) -> int:
             target_profile,
             source=f"<generated:{args.feedstock}:{row.target_id}>",
         )
-        out = _output_path(args.feedstock, row.target_id, args.out, len(target_rows))
         _write_profile(validated, out)
         print(f"wrote {out}")
         print(f"  target={row.target_id}")

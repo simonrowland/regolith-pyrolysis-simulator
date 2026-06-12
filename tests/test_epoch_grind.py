@@ -246,6 +246,14 @@ def test_resume_from_journal_keeps_done_jobs_done(tmp_path: Path) -> None:
     pending = epoch_grind.pending_jobs(manifest, loaded)
 
     assert loaded["epoch"] == 3
+    assert loaded["code_version"] == epoch_grind.current_code_version()
+    assert set(loaded["data_digests"]) >= {
+        "feedstocks",
+        "setpoints",
+        "vapor_pressures",
+        "profiles",
+    }
+    assert set(loaded["data_digests"]["profiles"]) == {"done", "pending"}
     assert loaded["jobs_done"] == ["done"]
     assert loaded["jobs_remaining"] == ["pending"]
     assert [job.id for job in pending] == ["pending"]
@@ -273,8 +281,30 @@ def test_resume_rejects_journal_from_different_manifest(tmp_path: Path) -> None:
     journal_path = tmp_path / "journal.json"
     epoch_grind.save_journal(journal_path, journal)
 
-    with pytest.raises(ValueError, match="journal identity does not match"):
+    with pytest.raises(ValueError, match="stale_journal_identity"):
         epoch_grind.load_or_initialize_journal(journal_path, second)
+
+
+def test_resume_rejects_journal_with_mismatched_code_version(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal = epoch_grind.initialize_journal(manifest)
+    journal["code_version"] = "0.5.5"
+    journal_path = tmp_path / "journal.json"
+    epoch_grind.save_journal(journal_path, journal)
+
+    with pytest.raises(ValueError, match="stale_journal_identity:.*code_version"):
+        epoch_grind.load_or_initialize_journal(journal_path, manifest)
+
+
+def test_resume_rejects_journal_with_mismatched_data_digest(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal = epoch_grind.initialize_journal(manifest)
+    journal["data_digests"]["profiles"]["job-a"] = "sha256:stale"
+    journal_path = tmp_path / "journal.json"
+    epoch_grind.save_journal(journal_path, journal)
+
+    with pytest.raises(ValueError, match="stale_journal_identity:.*data_digests"):
+        epoch_grind.load_or_initialize_journal(journal_path, manifest)
 
 
 def test_resume_rejects_journal_with_mismatched_job_ids(tmp_path: Path) -> None:
@@ -323,22 +353,20 @@ def test_resume_rejects_journal_with_mismatched_job_parameters(tmp_path: Path) -
         epoch_grind.load_or_initialize_journal(journal_path, changed)
 
 
-def test_old_schema_journal_without_job_identity_is_grandfathered(tmp_path: Path) -> None:
+def test_pre_056_schema_journal_without_identity_is_refused(tmp_path: Path) -> None:
     manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
     journal = epoch_grind.initialize_journal(manifest)
     journal["schema_version"] = epoch_grind.LEGACY_JOURNAL_SCHEMA_VERSION
+    journal.pop("code_version", None)
+    journal.pop("data_digests", None)
     for job in journal["jobs"]:
         for field in epoch_grind.JOB_IDENTITY_FIELDS:
             job.pop(field, None)
     journal_path = tmp_path / "journal.json"
     journal_path.write_text(json.dumps(journal), encoding="utf-8")
 
-    loaded = epoch_grind.load_or_initialize_journal(journal_path, manifest)
-
-    assert loaded["schema_version"] == epoch_grind.JOURNAL_SCHEMA_VERSION
-    assert loaded["jobs"][0]["profile"] == str(tmp_path / "profile.json")
-    assert loaded["jobs"][0]["out"] == str(tmp_path / "runs/job-a")
-    assert loaded["journal_notes"][-1]["type"] == "schema_migration"
+    with pytest.raises(ValueError, match="stale_journal_identity"):
+        epoch_grind.load_or_initialize_journal(journal_path, manifest)
 
 
 def test_old_schema_journal_with_drifted_job_ids_is_refused(tmp_path: Path) -> None:

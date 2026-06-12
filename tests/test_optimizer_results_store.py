@@ -244,6 +244,7 @@ def test_composition_target_metric_and_evalspec_metadata_round_trip(tmp_path) ->
         target_spec_digest="target-digest",
         target_maturity={"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
         target_provenance={
+            "thermal_window": "C2B window 1260-1480 C",
             "composition_window": {
                 "oxides": {
                     "Fe2O3": {
@@ -288,6 +289,7 @@ def test_composition_target_metric_and_evalspec_metadata_round_trip(tmp_path) ->
     row = loaded.eval_spec.target_provenance["composition_window"]["oxides"]["Fe2O3"]
     assert row["tier"] == "clear_container"
     assert row["needs_experiment"] is True
+    assert loaded.eval_spec.target_provenance["thermal_window"] == "C2B window 1260-1480 C"
     assert loaded.objectives is not None
     assert loaded.objectives.as_mapping()["composition_target:pc-glass-clear"] == pytest.approx(1.0)
 

@@ -32,6 +32,14 @@ PROFILE_SCHEMA_VERSION = "profile-schema-v1"
 PROFILE_DIRNAME = "optimize_profiles"
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
 KNOWN_STUDY_CONSTRAINTS = frozenset({"physics", "stub_smoke"})
+DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
+DEFAULT_COLD_START_TEMPERATURE_C = 25.0
+_SETPOINT_CAMPAIGN_ALIASES = {
+    "C2A": "C2A_continuous",
+    "C2A_staged": "C2A_staged",
+    "C3_K": "C3",
+    "C3_NA": "C3",
+}
 KNOWN_OBJECTIVE_METRICS = frozenset(
     {
         "pure_silica_glass_kg",
@@ -221,6 +229,7 @@ def validate_profile(
         source=source,
         base_run=profile["run"],
     )
+    _validate_thermal_window_caps(profile, source=source)
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
@@ -586,6 +595,240 @@ def _merged_run_options_for_validation(
     if inherited_cache and str(merged.get("backend_name", "")) != "cached-real":
         merged.pop("reduced_real_cache", None)
     return merged
+
+
+def _validate_thermal_window_caps(profile: Mapping[str, Any], *, source: str | Path) -> None:
+    run_options = profile.get("run")
+    if isinstance(run_options, Mapping):
+        _validate_run_thermal_window_caps(
+            profile,
+            run_options,
+            source=source,
+            where="run",
+        )
+    fidelities = profile.get("fidelities")
+    if not isinstance(fidelities, Mapping):
+        return
+    for fidelity, options in fidelities.items():
+        if not isinstance(options, Mapping):
+            continue
+        merged = _merged_run_options_for_validation(run_options, options)
+        _validate_run_thermal_window_caps(
+            profile,
+            merged,
+            source=source,
+            where=f"fidelities.{fidelity}",
+        )
+
+
+def _validate_run_thermal_window_caps(
+    profile: Mapping[str, Any],
+    run_options: Mapping[str, Any],
+    *,
+    source: str | Path,
+    where: str,
+) -> None:
+    campaign = str(run_options.get("campaign", "") or "")
+    if not campaign:
+        return
+    temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
+    bounds = _numeric_interval_optional(temp_range)
+    if bounds is None:
+        return
+    low_C, high_C = bounds
+    if high_C < low_C:
+        raise ProfileValidationError(
+            f"{source}: {campaign}.temp_range_C must be ascending"
+        )
+    run_hours = int(float(run_options.get("hours", 24)))
+    duration_h = _thermal_window_duration_h(
+        _profile_campaign_setting(profile, campaign, "duration_h"),
+        run_hours=run_hours,
+    )
+    preheat_ramp = _thermal_preheat_ramp_C_per_hr(profile, campaign)
+    preheat_hours = int(
+        math.ceil(
+            max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / preheat_ramp
+        )
+    )
+    total_hours = int(math.ceil(preheat_hours + duration_h))
+    max_hold_hr = _campaign_max_hold_hr_for_profile(source, campaign)
+    if max_hold_hr is None or float(total_hours) <= max_hold_hr:
+        return
+    raise ProfileValidationError(
+        f"{source}: thermal_window_campaign_max_hold refusal for {where} "
+        f"{campaign}: requested {total_hours:g} h "
+        f"(preheat {preheat_hours:g} h + hold {duration_h:g} h) exceeds "
+        f"{_setpoint_campaign_key(campaign)}.max_hold_hr {max_hold_hr:g}; "
+        "regenerate with FORCE_PROFILES=1"
+    )
+
+
+def _profile_campaign_setting(
+    profile: Mapping[str, Any],
+    campaign: str,
+    key: str,
+) -> Any:
+    run_value = _campaign_setting(profile.get("run"), campaign, key)
+    if run_value is not None:
+        return run_value
+    for seed in profile.get("seed_recipes", ()) or ():
+        if not isinstance(seed, Mapping):
+            continue
+        if campaign not in _seed_source_campaigns(seed):
+            continue
+        value = _campaign_setting(seed.get("patch"), campaign, key)
+        if value is not None:
+            return value
+    return None
+
+
+def _campaign_setting(source: Any, campaign: str, key: str) -> Any:
+    if not isinstance(source, Mapping):
+        return None
+    campaigns = source.get("campaigns")
+    if isinstance(campaigns, Mapping):
+        selected = campaigns.get(campaign)
+        if isinstance(selected, Mapping) and key in selected:
+            return selected[key]
+    selected = source.get(campaign)
+    if isinstance(selected, Mapping) and key in selected:
+        return selected[key]
+    return source.get(key)
+
+
+def _seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
+    campaigns: set[str] = set()
+    source_campaign = seed.get("source_campaign")
+    if source_campaign is not None:
+        campaigns.add(str(source_campaign))
+    source_campaigns = seed.get("source_campaigns")
+    if isinstance(source_campaigns, list):
+        campaigns.update(str(campaign) for campaign in source_campaigns)
+    return frozenset(campaigns)
+
+
+def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
+    interval = _numeric_interval_optional(value)
+    if interval is None:
+        return float(run_hours)
+    low, high = interval
+    if high < low:
+        raise ProfileValidationError(f"duration_h must be ascending; got {value!r}")
+    if low <= float(run_hours) <= high:
+        return float(run_hours)
+    if low == high:
+        return low
+    return (low + high) / 2.0
+
+
+def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) -> float:
+    value = _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr")
+    if value is None:
+        value = _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr")
+    numeric = _numeric_setting(value, sequence_policy="max")
+    if numeric is None:
+        return DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
+    if numeric <= 0.0:
+        raise ProfileValidationError(
+            f"{campaign}.preheat_ramp_C_per_hr must be positive"
+        )
+    return numeric
+
+
+def _campaign_max_hold_hr_for_profile(source: str | Path, campaign: str) -> float | None:
+    data_dir = _data_dir_for_profile_source(source)
+    setpoints_path = data_dir / "setpoints.yaml"
+    try:
+        loaded = yaml.safe_load(setpoints_path.read_text())
+    except OSError as exc:
+        raise ProfileValidationError(
+            f"{source}: cannot read {setpoints_path} for thermal window validation"
+        ) from exc
+    except yaml.YAMLError as exc:
+        raise ProfileValidationError(
+            f"{source}: invalid {setpoints_path} for thermal window validation"
+        ) from exc
+    if not isinstance(loaded, Mapping):
+        raise ProfileValidationError(
+            f"{source}: {setpoints_path} must be a mapping for thermal window validation"
+        )
+    campaigns = loaded.get("campaigns")
+    if not isinstance(campaigns, Mapping):
+        return None
+    cfg = campaigns.get(_setpoint_campaign_key(campaign))
+    if not isinstance(cfg, Mapping):
+        return None
+    value = cfg.get("max_hold_hr")
+    if value is None or isinstance(value, bool) or isinstance(value, Mapping):
+        return None
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(amount) or amount <= 0.0:
+        return None
+    return amount
+
+
+def _data_dir_for_profile_source(source: str | Path) -> Path:
+    source_path = Path(source)
+    if source_path.parent.name == PROFILE_DIRNAME:
+        return source_path.parent.parent
+    return DEFAULT_DATA_DIR
+
+
+def _setpoint_campaign_key(campaign: str) -> str:
+    return _SETPOINT_CAMPAIGN_ALIASES.get(campaign, campaign)
+
+
+def _numeric_interval_optional(value: Any) -> tuple[float, float] | None:
+    if value is None:
+        return None
+    if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
+        numeric = _numeric_setting(value, sequence_policy="max")
+        if numeric is None:
+            return None
+        return numeric, numeric
+    values = [
+        numeric
+        for item in value
+        if (numeric := _finite_float_or_none(item)) is not None
+    ]
+    if not values:
+        return None
+    return min(values), max(values)
+
+
+def _numeric_setting(value: Any, *, sequence_policy: str) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (tuple, list)):
+        values = [
+            numeric
+            for item in value
+            if (numeric := _finite_float_or_none(item)) is not None
+        ]
+        if not values:
+            return None
+        if sequence_policy == "max":
+            return max(values)
+        if sequence_policy == "min":
+            return min(values)
+        return sum(values) / len(values)
+    return _finite_float_or_none(value)
+
+
+def _finite_float_or_none(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(numeric):
+        return None
+    return numeric
 
 
 def _validate_seed_recipes(

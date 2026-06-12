@@ -254,6 +254,31 @@ def _eval_spec_summary(payload: Any) -> dict[str, Any]:
     return {key: payload[key] for key in keys if key in payload}
 
 
+def _target_thermal_windows(eval_spec: Mapping[str, Any]) -> list[dict[str, str]]:
+    provenance = eval_spec.get('target_provenance')
+    if not isinstance(provenance, Mapping):
+        return []
+    rows: list[dict[str, str]] = []
+    targets = provenance.get('targets')
+    if isinstance(targets, (list, tuple)):
+        for target in targets:
+            if not isinstance(target, Mapping):
+                continue
+            payload = target.get('provenance')
+            if not isinstance(payload, Mapping):
+                continue
+            disposition = payload.get('thermal_window')
+            if isinstance(disposition, str) and disposition:
+                rows.append({
+                    'id': str(target.get('id') or ''),
+                    'thermal_window': disposition,
+                })
+    disposition = provenance.get('thermal_window')
+    if isinstance(disposition, str) and disposition:
+        rows.append({'id': '', 'thermal_window': disposition})
+    return rows
+
+
 def _latest_backend_status(carrier: Any) -> str | None:
     if carrier is None:
         return None
@@ -480,26 +505,52 @@ def _query_result_rows(
     feedstock_id: str | None,
     profile_id: str | None,
     fidelity: str | None,
-) -> list[sqlite3.Row]:
+) -> tuple[list[sqlite3.Row], dict[str, Any]]:
     active_code_version = current_code_version()
     with _connect_result_store(cache_path) as conn:
-        data_digests = _current_selector_data_digests(
+        digest_scopes = _current_selector_data_digest_scopes(
             conn,
             feedstock_id=feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
             code_version=active_code_version,
         )
-        if data_digests is None:
-            return []
-        where, params = selector_where(
+        if not digest_scopes:
+            return [], {
+                'mode': 'no_current_data_digests',
+                'code_version': active_code_version,
+            }
+        if len(digest_scopes) == 1 or profile_id:
+            selected = digest_scopes[0]
+            where, params = selector_where(
+                feedstock_id,
+                profile_id=profile_id,
+                fidelity=fidelity,
+                code_version=active_code_version,
+                data_digests=selected,
+            )
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM results
+                WHERE {where}
+                """,
+                params,
+            ).fetchall()
+            return rows, {
+                'mode': 'exact_data_digests',
+                'code_version': active_code_version,
+                'data_digests': selected,
+                'available_current_data_digest_count': len(digest_scopes),
+                'narrowed_to_latest': len(digest_scopes) > 1,
+            }
+        where, params = _selector_where_without_data_digests(
             feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
             code_version=active_code_version,
-            data_digests=data_digests,
         )
-        return conn.execute(
+        rows = conn.execute(
             f"""
             SELECT *
             FROM results
@@ -507,20 +558,23 @@ def _query_result_rows(
             """,
             params,
         ).fetchall()
+        return rows, {
+            'mode': 'multiple_current_data_digests',
+            'code_version': active_code_version,
+            'available_current_data_digest_count': len(digest_scopes),
+            'data_digests': digest_scopes,
+        }
 
 
-def _current_selector_data_digests(
-    conn: sqlite3.Connection,
-    *,
+def _selector_where_without_data_digests(
     feedstock_id: str | None,
+    *,
     profile_id: str | None,
     fidelity: str | None,
     code_version: str,
-) -> Mapping[str, str] | None:
-    clauses = []
-    params: list[str] = []
-    clauses.append('code_version = ?')
-    params.append(code_version)
+) -> tuple[str, tuple[Any, ...]]:
+    clauses = ['code_version = ?']
+    params: list[Any] = [code_version]
     for column, value in (
         ('feedstock_id', feedstock_id),
         ('profile_id', profile_id),
@@ -529,23 +583,40 @@ def _current_selector_data_digests(
         if value:
             clauses.append(f'{column} = ?')
             params.append(value)
-    where = ' AND '.join(clauses) if clauses else '1 = 1'
-    row = conn.execute(
+    return ' AND '.join(clauses), tuple(params)
+
+
+def _current_selector_data_digest_scopes(
+    conn: sqlite3.Connection,
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    code_version: str,
+) -> list[Mapping[str, str]]:
+    where, params = _selector_where_without_data_digests(
+        feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+        code_version=code_version,
+    )
+    rows = conn.execute(
         f"""
-        SELECT data_digests
+        SELECT data_digests, MAX(created_at) AS latest_created_at
         FROM results
         WHERE {where}
-        ORDER BY created_at DESC, cache_key ASC
-        LIMIT 1
+        GROUP BY data_digests
+        ORDER BY latest_created_at DESC, data_digests ASC
         """,
         params,
-    ).fetchone()
-    if row is None:
-        return None
-    data_digests = _json_value(row['data_digests'], {})
-    if not isinstance(data_digests, Mapping):
-        return None
-    return {str(key): str(value) for key, value in data_digests.items()}
+    ).fetchall()
+    scopes: list[Mapping[str, str]] = []
+    for row in rows:
+        data_digests = _json_value(row['data_digests'], {})
+        if not isinstance(data_digests, Mapping):
+            continue
+        scopes.append({str(key): str(value) for key, value in data_digests.items()})
+    return scopes
 
 
 def _numeric_objective_value(objective: dict[str, Any]) -> float | None:
@@ -563,8 +634,9 @@ def _leaderboard_entries(
     fidelity: str | None,
     objective_metric: str | None,
     limit: int,
-) -> tuple[list[dict[str, Any]], str | None]:
+) -> tuple[list[dict[str, Any]], str | None, dict[str, Any]]:
     rows: list[tuple[dict[str, Any], float, str]] = []
+    digest_scopes: list[dict[str, Any]] = []
     selected_metric = objective_metric
     selected_sense = 'maximize'
     root = _optimizer_runs_root()
@@ -572,7 +644,7 @@ def _leaderboard_entries(
     for run_dir in run_dirs:
         run_id = _optimizer_run_id(run_dir, root)
         try:
-            result_rows = _query_result_rows(
+            result_rows, digest_scope = _query_result_rows(
                 run_dir / OPTIMIZER_CACHE_NAME,
                 feedstock_id=feedstock_id,
                 profile_id=profile_id,
@@ -580,6 +652,8 @@ def _leaderboard_entries(
             )
         except sqlite3.Error:
             continue
+        digest_scope = {**digest_scope, 'run_id': run_id}
+        digest_scopes.append(digest_scope)
         for row in result_rows:
             objectives = _objective_items(row)
             if selected_metric is None:
@@ -601,6 +675,10 @@ def _leaderboard_entries(
             entry['objective_metric'] = selected_metric
             entry['objective_value'] = value
             entry['objective_sense'] = selected_sense
+            entry['data_digest_scope'] = {
+                'mode': 'entry_data_digests',
+                'data_digests': entry.get('eval_spec', {}).get('data_digests') or {},
+            }
             rows.append((entry, value, selected_sense))
 
     reverse = selected_sense != 'minimize'
@@ -609,7 +687,19 @@ def _leaderboard_entries(
     for rank, (entry, _value, _sense) in enumerate(rows[:limit], start=1):
         entry['rank'] = rank
         entries.append(entry)
-    return entries, selected_metric
+    return entries, selected_metric, _leaderboard_data_digest_scope(digest_scopes)
+
+
+def _leaderboard_data_digest_scope(scopes: list[dict[str, Any]]) -> dict[str, Any]:
+    if not scopes:
+        return {'mode': 'no_runs_checked'}
+    normalized = [
+        {key: value for key, value in scope.items() if key != 'run_id'}
+        for scope in scopes
+    ]
+    if all(scope == normalized[0] for scope in normalized):
+        return scopes[0]
+    return {'mode': 'per_run', 'scopes': scopes}
 
 
 def _request_arg(name: str) -> str | None:
@@ -1115,7 +1205,7 @@ def _selector_pairs(
     pairs: set[tuple[str, str]] = set()
     for run_dir in run_dirs:
         try:
-            rows = _query_result_rows(
+            rows, _digest_scope = _query_result_rows(
                 run_dir / OPTIMIZER_CACHE_NAME,
                 feedstock_id=feedstock_id,
                 profile_id=profile_id,
@@ -1139,7 +1229,7 @@ def _optimizer_winner_entries(
     fidelity: str | None,
     objective_metric: str | None,
     limit: int,
-) -> tuple[list[dict[str, Any]], str | None]:
+    ) -> tuple[list[dict[str, Any]], str | None]:
     entries: list[dict[str, Any]] = []
     selected_metric = objective_metric
     for pair_feedstock, pair_profile in _selector_pairs(
@@ -1148,7 +1238,7 @@ def _optimizer_winner_entries(
         profile_id=profile_id,
         fidelity=fidelity,
     ):
-        winners, metric = _leaderboard_entries(
+        winners, metric, _digest_scope = _leaderboard_entries(
             run_dirs,
             feedstock_id=pair_feedstock,
             profile_id=pair_profile,
@@ -1432,6 +1522,8 @@ def _result_detail_model(
     result['run_reference_full'] = dict(run_reference)
     result['recipe_patch'] = _recipe_patch(eval_spec)
     result['recipe_stages'] = _recipe_stage_sections(eval_spec)
+    target_thermal_windows = _target_thermal_windows(eval_spec)
+    result['target_thermal_windows'] = target_thermal_windows
     result['provenance'] = {
         'run_id': run_id,
         'run_path': _relative_to(run_dir, root),
@@ -1441,6 +1533,7 @@ def _result_detail_model(
         'code_version': eval_spec.get('code_version'),
         'data_digests': eval_spec.get('data_digests') or {},
         'data_digests_label': _display_value(eval_spec.get('data_digests') or {}),
+        'target_thermal_windows': target_thermal_windows,
         'artifacts': _artifact_metadata(run_dir, root),
     }
     return result
@@ -1763,7 +1856,7 @@ def optimizer_leaderboard():
         _request_arg('objective_metric')
         or _request_arg('objective')
     )
-    entries, selected_metric = _leaderboard_entries(
+    entries, selected_metric, data_digest_scope = _leaderboard_entries(
         run_dirs,
         feedstock_id=_request_arg('feedstock_id') or _request_arg('feedstock'),
         profile_id=_request_arg('profile_id') or _request_arg('profile'),
@@ -1774,6 +1867,7 @@ def optimizer_leaderboard():
     return jsonify({
         'objective_metric': selected_metric,
         'limit': _request_limit(),
+        'data_digest_scope': data_digest_scope,
         'entries': entries,
     })
 

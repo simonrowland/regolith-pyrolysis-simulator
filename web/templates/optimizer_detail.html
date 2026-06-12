@@ -171,6 +171,16 @@
             <tr><td>Cache path</td><td>{{ result.provenance.cache_path }}</td></tr>
             <tr><td>Code version</td><td>{{ result.provenance.code_version }}</td></tr>
             <tr><td>Data digests</td><td>{{ result.provenance.data_digests_label }}</td></tr>
+            {% if result.target_thermal_windows %}
+            <tr>
+                <td>Target thermal window</td>
+                <td>
+                    {% for row in result.target_thermal_windows %}
+                    {{ row.id or "target" }}: {{ row.thermal_window }}{% if not loop.last %}; {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
         </table>
     </div>
 </section>

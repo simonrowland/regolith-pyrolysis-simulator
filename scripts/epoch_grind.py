@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Iterable as RuntimeIterable
+import hashlib
 import json
 import os
 import re
@@ -53,6 +54,8 @@ except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
     yaml = None  # type: ignore[assignment]
 
 from scripts.seed_reduced_real_cache import seed_cache
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.optimize.evalspec import current_code_version
 from simulator.reduced_real_determinism import PT1PersistentEquilibriumStore
 
 
@@ -228,6 +231,8 @@ def initialize_journal(manifest: Manifest) -> dict[str, Any]:
         "manifest": str(manifest.path),
         "base_cache": str(manifest.base_cache),
         "work_dir": str(manifest.work_dir),
+        "code_version": current_code_version(),
+        "data_digests": _journal_data_digests(manifest),
         "epoch": 0,
         "decision": DECISION_CONTINUE,
         "dup_rates": [],
@@ -258,12 +263,36 @@ def _job_identity(job: JobSpec, manifest_dir: Path) -> dict[str, object]:
     }
 
 
+def _journal_data_digests(manifest: Manifest) -> dict[str, object]:
+    bundle = load_config_bundle(DEFAULT_DATA_DIR)
+    shared = {
+        key: str(bundle.digests[key])
+        for key in ("feedstocks", "setpoints", "vapor_pressures")
+        if key in bundle.digests
+    }
+    profile_digests = {
+        job.id: _file_sha256(_resolve_path(job.profile, manifest.path.parent))
+        for job in manifest.jobs
+    }
+    return {**shared, "profiles": profile_digests}
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return f"sha256:{digest.hexdigest()}"
+
+
 def _journal_top_identity_mismatches(journal: Mapping[str, Any], manifest: Manifest) -> list[str]:
     mismatches: list[str] = []
     expected = {
         "manifest": str(manifest.path),
         "base_cache": str(manifest.base_cache),
         "work_dir": str(manifest.work_dir),
+        "code_version": current_code_version(),
+        "data_digests": _journal_data_digests(manifest),
     }
     for field, expected_value in expected.items():
         recorded = journal.get(field)
@@ -393,8 +422,8 @@ def load_or_initialize_journal(path: Path, manifest: Manifest) -> dict[str, Any]
             raise ValueError(f"{path}: unsupported journal schema {schema_version!r}")
         if mismatches:
             raise ValueError(
-                f"{path}: journal identity does not match the loaded manifest; "
-                f"refusing to resume (a stale journal would silently skip jobs): "
+                f"{path}: stale_journal_identity: refusing to resume; "
+                "remedy=new work dir (explicit --accept-stale-journal is not supported): "
                 + "; ".join(mismatches)
             )
         return journal
