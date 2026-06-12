@@ -999,9 +999,6 @@ class EvaporationMixin:
         the caller to drive ``_project_condensed_stage_collection``.
         """
 
-        if condensed_kg <= 1e-12:
-            return 0.0
-
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
             control_inputs={

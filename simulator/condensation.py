@@ -971,6 +971,7 @@ class CondensationModel:
             self.pipe_segments,
             evap_flux.species_kg_hr,
             margin_C=self.cold_spot_margin_C,
+            temps=self.condensation_temperatures_C,
         )
         self.last_cold_spot_diagnostic = diagnostic
         self.cold_spot_history.append(diagnostic)
@@ -1041,6 +1042,7 @@ class CondensationModel:
                 rate_kg_hr,
                 self.train.stages,
                 self.residence_time_s,
+                temps=self.condensation_temperatures_C,
             )
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
@@ -2215,11 +2217,13 @@ def _pressure_isolated_capture_budget_kg(
     rate_kg_hr: float,
     stages: list[CondensationStage],
     residence_time_s: Mapping[int, float],
+    *,
+    temps: Mapping[str, float] | None = None,
 ) -> float:
     """Hold total vapor removal fixed until Chunk C pressure coupling lands."""
 
     remaining_kg = max(0.0, rate_kg_hr)
-    T_cond_C = _species_condensation_temperature_C(species)
+    T_cond_C = _species_condensation_temperature_C(species, temps=temps)
     alpha_s = STICKING_COEFF.get(species, 0.8)
     for stage in stages:
         if remaining_kg <= 1e-15:
@@ -2319,6 +2323,7 @@ def cold_spot_diagnostic(
     vapor_species_kg_hr: Mapping[str, float],
     *,
     margin_C: float = COLD_SPOT_MARGIN_C,
+    temps: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     """Flag pipe segments colder than a flowing species' landing threshold."""
 
@@ -2330,7 +2335,10 @@ def cold_spot_diagnostic(
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             continue
-        condensation_T_C = _species_condensation_temperature_C(species)
+        condensation_T_C = _species_condensation_temperature_C(
+            species,
+            temps=temps,
+        )
         threshold_C = condensation_T_C - float(margin_C)
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)

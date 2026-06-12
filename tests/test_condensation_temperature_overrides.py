@@ -33,9 +33,11 @@ import yaml
 from simulator import condensation as condensation_module
 from simulator.condensation import (
     CONDENSATION_TEMPS_C,
+    CondensationModel,
     apply_setpoints_condensation_temperature_overrides,
     restore_condensation_temperature_overrides,
 )
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
 @pytest.fixture(autouse=True)
@@ -335,3 +337,38 @@ def test_simulator_construction_applies_setpoints_overrides():
         sim.condensation_model.condensation_temperatures_C['SiO']
         == 980.0
     )
+
+
+@pytest.mark.parametrize(
+    "subpath",
+    ["cold_spot_diagnostic", "pressure_isolated_capture_budget"],
+)
+def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
+    CONDENSATION_TEMPS_C['SiO'] = 1300.0
+
+    default_model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=1000.0,
+    )
+    default_result = default_model.route(
+        EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    overridden_model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=1000.0,
+    )
+    overridden_model.condensation_temperatures_C['SiO'] = 900.0
+    overridden_result = overridden_model.route(
+        EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+
+    if subpath == "cold_spot_diagnostic":
+        assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
+        assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
+    else:
+        assert overridden_result.remaining_by_species["SiO"] > (
+            default_result.remaining_by_species["SiO"] + 0.05
+        )

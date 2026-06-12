@@ -46,9 +46,11 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.condensation import CondensationRouteResult
 from simulator.state import (
     CampaignPhase,
     DecisionType,
+    EvaporationFlux,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
 )
 from tests.chemistry.conftest import _build_sim
@@ -298,6 +300,73 @@ def test_kernel_commit_accepts_balanced_proposal(
     sim._chem_kernel.commit_batch(
         ChemistryIntent.CONDENSATION_ROUTE, balanced_proposal
     )
+
+
+@pytest.mark.parametrize(
+    ("condensed_kg", "expect_noop"),
+    [
+        (5e-13, True),
+        (5e-9, False),
+    ],
+)
+def test_evaporation_caller_dispatches_condensation_floor_to_provider(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    condensed_kg,
+    expect_noop,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1e-6
+    route_result = CondensationRouteResult(
+        remaining_by_species={"Na": rate_kg_hr - condensed_kg},
+    )
+    sim.condensation_model.route = lambda evap_flux, melt: route_result
+    original_dispatch_and_commit = sim._dispatch_and_commit
+    seen = []
+
+    def _spying_dispatch_and_commit(intent, *, control_inputs):
+        result = original_dispatch_and_commit(
+            intent,
+            control_inputs=control_inputs,
+        )
+        if intent is ChemistryIntent.CONDENSATION_ROUTE:
+            seen.append((dict(control_inputs), result))
+        return result
+
+    sim._dispatch_and_commit = _spying_dispatch_and_commit
+    no_op_count_before = sim._chem_no_op_dispatch_count
+
+    sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"Na": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+        )
+    )
+
+    assert seen, "CONDENSATION_ROUTE was not dispatched"
+    controls, result = seen[-1]
+    assert controls["condensed_kg"] == pytest.approx(condensed_kg)
+    assert result.status == "ok"
+    if expect_noop:
+        assert result.transition is None
+        assert result.diagnostic["reason_skipped"] == "below numerical floor"
+        assert result.diagnostic["credited_condensed_kg"] == pytest.approx(0.0)
+        assert sim._chem_no_op_dispatch_count == no_op_count_before + 1
+    else:
+        assert result.transition is not None
+        assert result.diagnostic["credited_condensed_kg"] == pytest.approx(
+            condensed_kg
+        )
+        assert sim._chem_no_op_dispatch_count == no_op_count_before
+        assert sim.atom_ledger.kg_by_account("process.condensation_train")[
+            "Na"
+        ] == pytest.approx(condensed_kg)
 
 
 # ---------------------------------------------------------------------------
