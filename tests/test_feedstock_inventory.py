@@ -228,6 +228,23 @@ def test_oxide_only_melt_behavior_is_unchanged():
         44.5 / 97.15 * 100.0)
 
 
+def test_lunar_eac1a_unreported_loi_residual_routes_to_terminal_slag_without_renormalizing_oxides():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim(feedstocks)
+
+    sim.load_batch("lunar_eac_1a", mass_kg=1000.0)
+    snapshot = sim._make_snapshot()
+
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(437.0)
+    assert sim.melt.composition_kg["P2O5"] == pytest.approx(6.0)
+    assert sim.inventory.terminal_slag_components_kg[
+        "unreported_loi_residual"
+    ] == pytest.approx(16.0)
+    assert "unreported_loi_residual" not in sim.inventory.residual_components_kg
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
+
+
 def test_carbonaceous_stage0_uses_anhydrous_silicate_handoff():
     sim = _sim(
         {

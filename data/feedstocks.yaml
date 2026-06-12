@@ -526,21 +526,62 @@ lunar_mare_jsc_1a_legacy:
   process_notes: "Blocked for quantitative runs in this data file."
 
 # buy: not_available (legacy_or_paper_stock)
-# source: Robinot et al. 2026 and Sesko et al. 2024 reproduction anchors cite EAC-1/EAC-1A use; citable composition not captured in this chunk.
+# source: Engelschiøn et al. 2020 Scientific Reports XRF table for EAC-1A; Robinot et al. 2026 Fig. 5 elementals retained as extraction-suspect cross-check.
 lunar_eac_1a:
-  name: "EAC-1A lunar simulant"
-  label: "EAC-1A Lunar Simulant (reproduction-required, blocked)"
+  name: "EAC-1/EAC-1A lunar simulant"
+  label: "EAC-1A Lunar Simulant (Engelschiøn XRF)"
   class: lunar_simulant
-  status: blocked_missing_citable_composition
-  blocked_reason: "Reproduction research identifies EAC-1/EAC-1A as Robinot/Sesko feedstock, but captured inputs do not include a citable oxide table."
-  source: "Robinot et al. 2026 and Sesko et al. 2024 vacuum-pyrolysis reproduction anchors"
-  confidence: "Blocked"
-  note: "Required for faithful reproduction presets once source composition is captured."
-  composition_wt_pct: {}
-  sum_check: null
+  source: "Engelschiøn et al. 2020, Scientific Reports, EAC-1A XRF major-oxide table"
+  confidence: "High for primary EAC-1A oxide composition; Robinot Fig. 5 elemental extraction is suspect"
+  note: >
+    Use the Engelschiøn et al. 2020 primary XRF table for loadable oxide
+    composition. The later Robinot Fig. 5 elemental row is retained below only
+    as an extraction-suspect cross-check; do not derive oxides from it.
+  paper_aliases:
+    - EAC-1
+  composition_wt_pct:
+    SiO2:  43.7
+    TiO2:   2.4
+    Al2O3: 12.6
+    FeO:   12.0
+    MnO:    0.2
+    MgO:   11.9
+    CaO:   10.8
+    Na2O:   2.9
+    K2O:    1.3
+    P2O5:   0.6
+  sum_check: 98.4
+  composition_status: "primary_xrf_loadable"
+  composition_basis:
+    source: "Engelschiøn et al. 2020 XRF major oxides, wt% on post-LOI/ignited basis"
+    method: "XRF after drying, LOI at 1050 C, and Li2B4O7 fusion glass bead preparation"
+    fe_reporting_convention: "Total Fe reported as FeO in the primary XRF major-oxide table."
+    secondary_batch_xrf_spread: "Zemeny et al. 2024/Luna Analog Facility stock XRF gives SiO2 42.1-42.3, TiO2 2.1, MgO 13.1-13.8, Na2O 2.8-2.9, Al2O3 11.2, CaO 10.4; use primary Engelschiøn values where batches differ."
+    findings_ref: "docs-private/research/2026-06-12-vpr-sources/eac1a-composition-findings.md"
+  non_oxide_components:
+    unreported_loi_residual_wt_pct: 1.6
+  formula_inventory:
+    unreported_loi_residual:
+      formula: O
+      estimated: true
+      source: "ACCOUNTING SURROGATE only: explicit 1.6 wt% unreported/LOI residual needed to close the Engelschiøn EAC-1A 98.4 wt% oxide table without renormalizing stated oxides; routed to inert terminal slag and not used as chemistry evidence."
+  elemental_composition_wt_pct:
+    O: 44.0
+    Na: 2.0
+    Mg: 6.0
+    Al: 1.0
+    P: 0.0
+    Si: 25.0
+    K: 3.0
+    Ca: 10.0
+    Ti: 2.0
+    Fe: 3.0
+  elemental_sum_check: 96.0
+  elemental_composition_status: "extraction_suspect_cross_check_only"
+  elemental_cross_check_note: "Primary-oxide-implied elementals differ from Robinot Fig. 5 extraction: Al 6.7 vs 1 wt%, Si 20.4 vs 25 wt%, Fe 9.3 vs 3 wt%, K 1.1 vs 3 wt%; see measurements sidecar and findings_ref."
   glass_fraction:
     value: "not_reported"
-    note: "not_reported in captured reproduction research; faithful comparison blocks if required."
+    note: "not_reported in primary XRF table; secondary facility-stock mineralogy reports volcanic glass near 6.3 wt% but this loadable oxide entry does not infer a separable glass inventory."
   stage0_buckets:
     h2o_wt_pct: "not_reported"
     organics_wt_pct: "not_reported"
@@ -553,16 +594,16 @@ lunar_eac_1a:
     sulfides_wt_pct: "not_reported"
     refractory_trace_wt_pct: "not_reported"
   provenance:
-    composition_citation: "Robinot et al. 2026 / Sesko et al. 2024 feedstock identity captured; EAC-1A oxide composition TODO."
-    composition_digest: "sha256:618d59e216de0849"
-    lot_or_batch: "blocked: paper/source composition required"
+    composition_citation: "Engelschiøn V.S. et al. 2020, EAC-1A: A novel large-volume lunar regolith simulant, Scientific Reports, primary XRF major-oxide table; later Zemeny et al. 2024 batch XRF used only as spread note."
+    composition_digest: "sha256:1b7cce46216cb29f"
+    lot_or_batch: "EAC-1A primary characterization stock; later EAC facility stocks vary slightly"
     buy_url: "not_available"
     buy_url_reason: "paper_stock_or_not_commercially_captured"
     buy_url_checked: "2026-06-11"
   simulant_vs_real_caveat:
     report_placement: "measurement_sidecar"
-    text: "EAC-1A is a paper simulant feedstock, not real regolith; comparison sidecars must keep that caveat explicit."
-  process_notes: "Blocked for quantitative runs until citable composition is captured."
+    text: "EAC-1/EAC-1A is a paper simulant feedstock, not real regolith; comparison sidecars must keep that caveat explicit."
+  process_notes: "Loadable major-oxide table populated from primary XRF; explicit 1.6 wt% unreported/LOI residual closes the 98.4 wt% oxide table without renormalizing stated oxides."
 
 # buy: not_available (legacy_or_paper_stock)
 # source: Matchett/Cardiff 2006-2007 reproduction anchors identify MLS-1A; citable composition not captured in this chunk.

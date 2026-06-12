@@ -8,6 +8,8 @@ extraction_status: skeleton_not_full_paper_data
 source_notes:
   - citation_id: robinot_2026
     digest: "Worked example skeleton only; full bibliographic extraction and per-dimension apparatus values remain pending lit sweep."
+  - citation_id: robinot_2026
+    digest: "Feedstock linked to registered loadable lunar_eac_1a alias: Engelschiøn et al. 2020 supplies primary EAC-1A XRF oxides; Robinot Fig. 5 elementals remain extraction-suspect cross-check data."
   - citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
     digest: "Rev 2 requires Robinot Ar carrier gas near 13 mbar and 0.3 NL/min, explicit gas boundary digest, pO2 achieved-vs-setpoint fields, and C3 trust tags."
 
@@ -166,7 +168,7 @@ lab_geometry:
 
 pair:
   faithful:
-    feedstock_id: robinot_2026_feedstock_pending_lit_sweep
+    feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule_skeleton
     geometry_id: robinot_2026_geometry_skeleton
     duration_h: 1.0
@@ -175,7 +177,7 @@ pair:
     kinetics_caveat: none
     status: skeleton_not_claim_grade
   remediation:
-    feedstock_id: robinot_2026_feedstock_pending_lit_sweep
+    feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule_skeleton
     geometry_id: robinot_2026_geometry_skeleton
     duration_h: 1.0
@@ -237,7 +239,7 @@ comparison_contract:
     reason: skeleton_missing_geometry_and_full_measurement_extraction
 
 digests:
-  feedstock_digest: pending_lit_sweep
+  feedstock_digest: lunar_eac_1a_engelschion2020_xrf_sha256_1b7cce46216cb29f_robinot_elementals_suspect
   schedule_digest: robinot_2026_schedule_skeleton_v1
   gas_boundary_digest: robinot_2026_argon_13mbar_0p3NLmin_v1
   geometry_digest: robinot_2026_geometry_skeleton_v1

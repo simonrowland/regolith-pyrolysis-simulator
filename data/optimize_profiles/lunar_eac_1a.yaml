@@ -1,0 +1,39 @@
+# Analog source: data/optimize_profiles/lunar_mare_lms1.yaml.
+# Simulant-specific adjustment: EAC-1A keeps the mare basalt balance, with
+# text/id/feedstock changed for the Engelschion 2020 Eifel basanite simulant.
+# H1 scope note: stub/fast/high/auto share the existing stub_smoke fidelity posture;
+# the H1/G3 backend-honesty gate is deferred and not closed by this profile.
+profile_id: lunar-eac-1a-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_eac_1a
+description: EAC-1A mare-like basaltic simulant; balance O2, Fe/Mg metal, silica glass, and short runs.
+north_star_rationale: EAC-1A is an Eifel basanite lunar simulant with mare-like Fe/Mg/Ca-rich oxides, so reuse the mare simulant objective shape while preserving its source-captured composition caveat.
+objective_emphasis: Balanced O2/metals/glass profile for source-captured EAC-1A.
+objectives:
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.22, rationale: Stage 3 glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: eac1a-mare-path-a-seed
+    source_campaign: C2A_continuous
+    rationale: Use the low-Ti mare Path A co-extraction recipe unchanged for EAC-1A.
+    patch:
+      campaigns:
+        C2A_continuous:
+          temp_range_C: [1050, 1600]
+          dT_dt_C_per_hr:
+            early_ramp_1050_1320C: [10, 20]
+          p_total_mbar: [5, 15]
+          p_total_mbar_default: 10.0
+          duration_h: [18, 28]

@@ -128,9 +128,35 @@ measurements:
           digest: "Robinot anchor reports a 3.38 g EAC-1 pellet."
     material_context:
       feedstock_kind: simulant
-      feedstock_id: robinot_2026_feedstock_pending_lit_sweep
-      simulant_vs_real_caveat: "Skeleton preserves the paper as simulant context; full composition extraction pending."
+      feedstock_id: lunar_eac_1a
+      simulant_vs_real_caveat: "Skeleton preserves the paper as simulant context; Robinot names EAC-1, carried as the registered lunar_eac_1a alias."
       glass_fraction_status: blocked_missing_glass_fraction
+      feedstock_elemental_wt_pct:
+        extraction_status: extraction_suspect
+        source:
+          citation_id: robinot_2026
+          source_location: fig5_bar_stacked_feedstock_composition
+          digest: "Robinot Fig. 5 EAC-1 elemental wt% extraction retained as suspect, not deleted."
+        values:
+          O: 44.0
+          Na: 2.0
+          Mg: 6.0
+          Al: 1.0
+          P: 0.0
+          Si: 25.0
+          K: 3.0
+          Ca: 10.0
+          Ti: 2.0
+          Fe: 3.0
+        sum_check: 96.0
+        cross_check:
+          against: "Engelschiøn et al. 2020 EAC-1A primary XRF oxide table"
+          findings_ref: "docs-private/research/2026-06-12-vpr-sources/eac1a-composition-findings.md"
+          evidence:
+            - "Al: oxide-implied 6.7 wt% vs extracted 1.0 wt%"
+            - "Si: oxide-implied 20.4 wt% vs extracted 25.0 wt%"
+            - "Fe: oxide-implied 9.3 wt% vs extracted 3.0 wt%"
+            - "K: oxide-implied 1.1 wt% vs extracted 3.0 wt%"
     quantitative_measurements:
       - observable: oxygen_released
         reported_value: 35

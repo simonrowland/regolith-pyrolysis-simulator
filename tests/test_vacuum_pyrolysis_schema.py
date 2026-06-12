@@ -10,6 +10,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PRESET_PATH = REPO_ROOT / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
 MEASUREMENTS_PATH = REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml"
+FEEDSTOCKS_PATH = REPO_ROOT / "data" / "feedstocks.yaml"
 
 ROBINOT_CARRIER_GAS = "Ar"
 ROBINOT_PRESSURE_MBAR = pytest.approx(13.0)
@@ -30,6 +31,18 @@ KINETICS_CAVEATS = {
     "none",
     "furnace_scale_bulk_mixing_assumption",
     "blocked_missing_gram_scale_kinetics_model",
+}
+ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
+    "O": 44.0,
+    "Na": 2.0,
+    "Mg": 6.0,
+    "Al": 1.0,
+    "P": 0.0,
+    "Si": 25.0,
+    "K": 3.0,
+    "Ca": 10.0,
+    "Ti": 2.0,
+    "Fe": 3.0,
 }
 
 
@@ -144,6 +157,30 @@ def validate_vpr_schema(preset: dict, measurements: dict) -> None:
             )
 
     for measurement_id, measurement in measurements.get("measurements", {}).items():
+        material_context = measurement.get("material_context", {})
+        suspect_elementals = material_context.get("feedstock_elemental_wt_pct")
+        if isinstance(suspect_elementals, dict):
+            require(
+                suspect_elementals.get("extraction_status") == "extraction_suspect",
+                "feedstock_elementals_must_be_marked_extraction_suspect",
+                measurement_id,
+            )
+            require_source_citation(
+                suspect_elementals.get("source") or {},
+                "feedstock_elementals_missing_source",
+                measurement_id,
+            )
+            require(
+                bool(suspect_elementals.get("values")),
+                "feedstock_elementals_missing_values",
+                measurement_id,
+            )
+            cross_check = suspect_elementals.get("cross_check") or {}
+            require(
+                bool(cross_check.get("findings_ref") and cross_check.get("evidence")),
+                "feedstock_elementals_missing_cross_check",
+                measurement_id,
+            )
         for condition_name, condition in measurement.get("conditions_reported", {}).items():
             if isinstance(condition, dict) and "reported_value" in condition:
                 require_source_citation(
@@ -298,6 +335,29 @@ def test_robinot_preset_skeleton_carries_required_external_anchors() -> None:
     assert preset["comparison_contract"]["internal_analytical_used"] is False
 
 
+def test_robinot_preset_references_registered_loadable_eac1_feedstock() -> None:
+    preset = load_yaml(PRESET_PATH)
+    feedstocks = load_yaml(FEEDSTOCKS_PATH)
+
+    feedstock_ids = {
+        preset["pair"]["faithful"]["feedstock_id"],
+        preset["pair"]["remediation"]["feedstock_id"],
+    }
+    assert feedstock_ids == {"lunar_eac_1a"}
+    assert feedstock_ids <= set(feedstocks)
+
+    entry = feedstocks["lunar_eac_1a"]
+    assert "status" not in entry
+    assert entry["composition_status"] == "primary_xrf_loadable"
+    assert entry["sum_check"] == pytest.approx(98.4)
+    assert entry["paper_aliases"] == ["EAC-1"]
+    assert "primary EAC-1A XRF oxides" in preset["source_notes"][1]["digest"]
+    assert (
+        preset["digests"]["feedstock_digest"]
+        == "lunar_eac_1a_engelschion2020_xrf_sha256_1b7cce46216cb29f_robinot_elementals_suspect"
+    )
+
+
 def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -> None:
     measurements = load_yaml(MEASUREMENTS_PATH)
     measurement = measurements["measurements"]["robinot_2026_deposit_measurements"]
@@ -309,6 +369,13 @@ def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -
     assert measurement["conditions_reported"]["temperature_C"]["reported_value"] == ROBINOT_PEAK_TEMPERATURE_C
     assert measurement["conditions_reported"]["duration_h"]["reported_value"] == ROBINOT_DURATION_H
     assert measurement["conditions_reported"]["sample_mass_g"]["reported_value"] == ROBINOT_SAMPLE_MASS_G
+    assert measurement["material_context"]["feedstock_id"] == "lunar_eac_1a"
+    elementals = measurement["material_context"]["feedstock_elemental_wt_pct"]
+    assert elementals["extraction_status"] == "extraction_suspect"
+    assert elementals["values"] == ROBINOT_EAC1_ELEMENTAL_WT_PCT
+    assert elementals["sum_check"] == pytest.approx(96.0)
+    assert elementals["cross_check"]["findings_ref"].endswith("eac1a-composition-findings.md")
+    assert "Al: oxide-implied 6.7 wt% vs extracted 1.0 wt%" in elementals["cross_check"]["evidence"]
 
     products = {row["observable"]: row for row in measurement["quantitative_measurements"]}
     assert products["oxygen_released"]["reported_value"] == ROBINOT_O2_RELEASED_MG
