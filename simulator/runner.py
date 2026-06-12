@@ -67,7 +67,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.1.0"
+RUNNER_SCHEMA_VERSION = "1.2.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -92,6 +92,7 @@ SIO_YIELD_STAGE_KEYS: dict[int, str] = {
     5: "stage_5_dust_filter_carryover",
 }
 SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
+NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
 SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
 SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
@@ -380,6 +381,11 @@ class PyrolysisRun:
     allow_fallback_vapor: bool = False
     allow_unmeasured_alpha_fallback: bool = False
     force_builtin_vapor_pressure: bool = False
+    sio_start_temperature_c: float | None = None
+    sio_hold_temperature_c: float | None = None
+    sio_ramp_c_per_hr: float | None = None
+    sio_liner_temperature_c: float | None = None
+    sio_pO2_mbar: float | None = None
     feedstocks_path: Optional[Path] = None
     setpoints_path: Optional[Path] = None
     vapor_pressures_path: Optional[Path] = None
@@ -410,8 +416,16 @@ class PyrolysisRun:
         diff failure reasons without parsing stderr.
         """
 
-        config = self._session_config()
-        execution = RunExecutor().execute(config)
+        if self._has_sio_pre_run_controls():
+            session = self._start_session()
+            self._apply_sio_pre_run_controls(session.simulator)
+            execution = RunExecutor().execute_session(
+                session,
+                hours=int(self.hours),
+            )
+        else:
+            config = self._session_config()
+            execution = RunExecutor().execute(config)
         document = self._build_output(execution)
         execution.session._set_result_document(document)
         return document
@@ -422,10 +436,38 @@ class PyrolysisRun:
         return session
 
     def _run_session(self, session: SimSession) -> dict:
+        self._apply_sio_pre_run_controls(session.simulator)
         execution = RunExecutor().execute_session(session, hours=int(self.hours))
         document = self._build_output(execution)
         execution.session._set_result_document(document)
         return document
+
+    def _has_sio_pre_run_controls(self) -> bool:
+        return any(
+            value is not None
+            for value in (
+                self.sio_start_temperature_c,
+                self.sio_hold_temperature_c,
+                self.sio_ramp_c_per_hr,
+                self.sio_liner_temperature_c,
+                self.sio_pO2_mbar,
+            )
+        )
+
+    def _apply_sio_pre_run_controls(self, sim: PyrolysisSimulator) -> None:
+        if not self._has_sio_pre_run_controls():
+            return
+        _prepare_sio_campaign_start(
+            sim,
+            t_low_c=self.sio_start_temperature_c,
+            t_hold_c=self.sio_hold_temperature_c,
+            ramp_c_per_hr=self.sio_ramp_c_per_hr,
+        )
+        _apply_sio_wall_sweep_controls(
+            sim,
+            liner_temperature_c=self.sio_liner_temperature_c,
+            pO2_mbar=self.sio_pO2_mbar,
+        )
 
     # ------------------------------------------------------------------
     # Session construction
@@ -577,6 +619,7 @@ class PyrolysisRun:
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
+            "final": _final_summary_report(final_state, execution),
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
@@ -660,6 +703,77 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
     }
 
 
+def _finite_export_float(value: Any, *, field: str) -> float:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError) as exc:
+        raise RunnerError(f"non-numeric {field}: {value!r}") from exc
+    if not math.isfinite(amount):
+        raise RunnerError(f"non-finite {field}: {value!r}")
+    return amount
+
+
+def _nested_species_kg_from_segment_species(
+    values: Mapping[tuple[str, str], float],
+) -> dict[str, dict[str, float]]:
+    nested: dict[str, dict[str, float]] = {}
+    for key, raw_kg in sorted(values.items()):
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise RunnerError(f"wall deposit key must be (segment, species): {key!r}")
+        segment, species = key
+        kg = _finite_export_float(raw_kg, field="wall deposit kg")
+        if abs(kg) <= 1.0e-12:
+            continue
+        nested.setdefault(str(segment), {})[str(species)] = kg
+    return {
+        segment: dict(sorted(species_kg.items()))
+        for segment, species_kg in sorted(nested.items())
+    }
+
+
+def _wall_deposit_cumulative_kg_at_snapshot(
+    sim: PyrolysisSimulator,
+    snapshot: HourSnapshot,
+) -> dict[str, dict[str, float]]:
+    cumulative: dict[tuple[str, str], float] = {}
+    snapshots = tuple(getattr(sim.record, "snapshots", ()) or ())
+    found_snapshot = False
+    for item in snapshots:
+        if int(getattr(item, "hour", -1)) > int(snapshot.hour):
+            break
+        for key, kg in item.wall_deposit_by_segment_species_delta.items():
+            cumulative[key] = cumulative.get(key, 0.0) + float(kg)
+        if item is snapshot:
+            found_snapshot = True
+            break
+    if not found_snapshot and snapshot not in snapshots:
+        for key, kg in snapshot.wall_deposit_by_segment_species_delta.items():
+            cumulative[key] = cumulative.get(key, 0.0) + float(kg)
+    return _nested_species_kg_from_segment_species(cumulative)
+
+
+def _vapor_species_kg_hr(snapshot: HourSnapshot) -> dict[str, float]:
+    return {
+        str(species): _finite_export_float(kg_hr, field="vapor species kg/hr")
+        for species, kg_hr in sorted(snapshot.evap_flux.species_kg_hr.items())
+        if abs(float(kg_hr)) > 1.0e-12
+    }
+
+
+def _knudsen_regime_observables(snapshot: HourSnapshot) -> dict[str, Any]:
+    summary = dict(snapshot.knudsen_regime_summary or {})
+    kn = summary.get("knudsen_number")
+    return {
+        "Kn": (
+            _finite_export_float(kn, field="Kn")
+            if kn is not None
+            else None
+        ),
+        "regime": str(summary.get("knudsen_regime") or ""),
+        "transport_formula_id": NOT_APPLICABLE_UNTIL_P0,
+    }
+
+
 def build_per_hour_summary(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
@@ -676,9 +790,14 @@ def build_per_hour_summary(
     * ``pO2_bar``: pO2 partial pressure in bar
     * ``mass_balance_pct``: ledger-based mass balance error, percent
     * ``O2_yield_kg_cumulative``: cumulative O2 from all bins (kg)
-    * ``metal_yields_kg``: dict of metal product yields (kg) at this
+        * ``metal_yields_kg``: dict of metal product yields (kg) at this
       hour, sourced from the simulator's product_ledger projection
-    * ``condensation_train_kg``: dict of cumulative condensation totals
+        * ``condensation_train_kg``: dict of cumulative condensation totals
+        * ``vapor_species_kg_hr``: per-species vapor flux from the snapshot
+        * ``wall_deposit_delta_kg``: per-hour wall deposit by segment/species
+        * ``wall_deposit_cumulative_kg``: running wall deposit by segment/species
+        * ``Kn`` / ``regime``: Knudsen-regime observables from the snapshot
+        * ``transport_formula_id``: P0-gated sentinel until molecular transport lands
     """
 
     # 0.5.3 Phase C milestone review P1 (codex 2026-05-28): the per-hour
@@ -731,6 +850,14 @@ def build_per_hour_summary(
             for species, kg in sorted(snapshot.condensation_totals.items())
             if abs(kg) > 1e-12
         },
+        "vapor_species_kg_hr": _vapor_species_kg_hr(snapshot),
+        "wall_deposit_delta_kg": _nested_species_kg_from_segment_species(
+            snapshot.wall_deposit_by_segment_species_delta,
+        ),
+        "wall_deposit_cumulative_kg": _wall_deposit_cumulative_kg_at_snapshot(
+            sim, snapshot,
+        ),
+        **_knudsen_regime_observables(snapshot),
     }
 
 
@@ -938,6 +1065,19 @@ def _wall_deposit_mol_by_species(
                 wall_deposit_mol.get(species, 0.0) + float(mol)
             )
     return wall_deposit_mol
+
+
+def _final_summary_report(
+    final_state: Mapping[str, Mapping[str, float]],
+    execution: RunExecution,
+) -> dict[str, Any]:
+    return {
+        "wall_deposit_by_species_kg": _wall_deposit_report_kg(final_state),
+        "deposit_by_surface_species_kg": _nested_species_kg_from_segment_species(
+            execution.trace.wall_deposit_by_segment_species_kg,
+        ),
+        "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
+    }
 
 
 def _wall_liner_resinter_config() -> dict[str, Any]:
@@ -2101,6 +2241,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--setpoints-overrides", default=None,
                         help="Deprecated alias for "
                              "--runtime-campaign-overrides")
+    parser.add_argument("--allow-fallback-vapor", action="store_true",
+                        help="Permit builtin vapor-pressure fallback")
+    parser.add_argument("--allow-unmeasured-alpha-fallback",
+                        action="store_true",
+                        help="Permit configured fallback evaporation alpha")
+    parser.add_argument("--force-builtin-vapor-pressure",
+                        action="store_true",
+                        help="Force builtin vapor-pressure provider")
+    parser.add_argument("--sio-start-temperature-c", type=float, default=None,
+                        help="Set initial melt temperature before SiO run")
+    parser.add_argument("--sio-hold-temperature-c", type=float, default=None,
+                        help="Override SiO campaign hold temperature")
+    parser.add_argument("--sio-ramp-c-per-hr", type=float, default=None,
+                        help="Override SiO campaign ramp rate")
+    parser.add_argument("--sio-liner-temperature-c", type=float, default=None,
+                        help="Override SiO overhead liner temperature")
+    parser.add_argument("--sio-po2-mbar", type=float, default=None,
+                        help="Override SiO controlled pO2 in mbar")
     parser.add_argument("--output", required=True,
                         help="Path to write the JSON result document")
     parser.add_argument("--started-at-utc", default=None,
@@ -2152,6 +2310,16 @@ def main(argv: Optional[list[str]] = None) -> int:
         backend_name=args.backend,
         runtime_campaign_overrides=runtime_campaign_overrides,
         track=args.track,
+        allow_fallback_vapor=bool(args.allow_fallback_vapor),
+        allow_unmeasured_alpha_fallback=bool(
+            args.allow_unmeasured_alpha_fallback
+        ),
+        force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
+        sio_start_temperature_c=args.sio_start_temperature_c,
+        sio_hold_temperature_c=args.sio_hold_temperature_c,
+        sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
+        sio_liner_temperature_c=args.sio_liner_temperature_c,
+        sio_pO2_mbar=args.sio_po2_mbar,
         run_metadata_overrides=metadata_overrides,
     )
 
@@ -2186,6 +2354,11 @@ def main(argv: Optional[list[str]] = None) -> int:
                     "kernel_commit_sha", _resolve_kernel_commit_sha()),
             },
             "final_state": {},
+            "final": {
+                "wall_deposit_by_species_kg": {},
+                "deposit_by_surface_species_kg": {},
+                "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
+            },
             "stage_purity_report": {},
             "vapor_pressure_source_report": {
                 "species": {},

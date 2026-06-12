@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parent.parent
+_MPLCONFIG_TMP = tempfile.TemporaryDirectory(prefix="regolith-session-cli-mpl-")
+_MPLCONFIG_READY = False
 PER_HOUR_KEYS = {
     "hour",
     "campaign",
@@ -19,10 +23,17 @@ PER_HOUR_KEYS = {
     "O2_yield_kg_cumulative",
     "metal_yields_kg",
     "condensation_train_kg",
+    "vapor_species_kg_hr",
+    "wall_deposit_delta_kg",
+    "wall_deposit_cumulative_kg",
+    "Kn",
+    "regime",
+    "transport_formula_id",
 }
 
 
 def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedProcess:
+    global _MPLCONFIG_READY
     cmd = [
         sys.executable,
         "-m",
@@ -32,12 +43,25 @@ def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedPr
     ]
     if strict:
         cmd.append("--strict")
+    env = os.environ.copy()
+    env["MPLCONFIGDIR"] = _MPLCONFIG_TMP.name
+    if not _MPLCONFIG_READY:
+        subprocess.run(
+            [sys.executable, "-c", "import matplotlib.font_manager"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            cwd=ROOT,
+            env=env,
+            check=False,
+        )
+        _MPLCONFIG_READY = True
     return subprocess.run(
         cmd,
         input=script,
         text=True,
         capture_output=True,
         cwd=ROOT,
+        env=env,
         check=False,
     )
 
@@ -234,4 +258,3 @@ def test_run_subcommand_matches_runner_byte_for_byte(tmp_path: Path):
     assert simulator_result.returncode == 0, simulator_result.stderr
     assert runner_result.returncode == 0, runner_result.stderr
     assert simulator_output.read_bytes() == runner_output.read_bytes()
-
