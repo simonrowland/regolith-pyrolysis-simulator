@@ -9,21 +9,21 @@ slot marker, so provenance survives refinement.**
 
 ## Abstract
 
-<!-- SLOT:abstract source=design-robinot-reconciliation (rev 3, converged) status=draft -->
+<!-- SLOT:abstract source=design-robinot-reconciliation rev 4 status=refined -->
 
-*Placeholder structure:* A first-principles analytical model of solar-thermal
-vacuum pyrolysis of regolith — developed as the process kernel of a
-multi-product regolith refinery simulator — is compared without parameter
-fitting against the published gram-scale solar-furnace experiments of
-Robinot et al. (2026), with secondary anchors from Šeško et al. (2024) and
-Sauerborn (2005). We report the model–experiment daylight per observable
-(oxygen yield, per-surface deposition, time-resolved evolution), decompose
-the discrepancy into a quantified error budget (model parameters,
-experimental uncertainty, structural model gaps), and state the resulting
-accuracy envelope as the headline validation result. The experimental
-run-to-run reproducibility of the anchor dataset (≈11 % on oxygen yield)
-sets the floor below which no model comparison is meaningful. [Final
-headline numbers TBD from converged synthesis.]
+A first-principles analytical model of solar-thermal vacuum pyrolysis of
+regolith is compared without parameter fitting against the gram-scale
+solar-furnace experiments of Robinot et al. (2026), with secondary anchors
+from Šeško et al. (2024) and Sauerborn (2005). The converged result is a
+split accuracy envelope, not a tuned match: one literature-alpha/top-area
+Robinot variant is order-unity on total non-O2 vapor/capture (`1.1-2.0x`
+after oxidation-state and mass-account bands), while analyzer-visible free
+O2 is still `18.75x` high before any downstream sink is credited. The O2
+miss is therefore treated as a four-channel sink-allocation problem
+(plume oxidation, deposit gettering, melt-redox retention, and post-run air
+oxidation), not as a scalar alpha or area correction. The exp. 1 / exp. 2
+O2 reproducibility floor is about `11%`; daylight below that is not a
+meaningful validation target for the present corpus.
 
 ## 1. Introduction
 
@@ -129,12 +129,13 @@ Shallow-pot verdict: shallow pots are a credible throughput lever, but "maximize
 
 ### 4.1 Oxygen yield
 
-<!-- SLOT:o2-comparison source=o2-probes-findings.md + attack-alpha-findings.md status=pending-wave -->
+<!-- SLOT:o2-comparison source=o2-probes-findings.md + attack-alpha-findings.md + design-robinot-reconciliation rev 4 status=refined -->
 
 | Quantity | Experiment (exp. 1 / exp. 2) | Model (faithful) | Model (literature-α forward prediction, band) | Daylight |
 |---|---|---|---|---|
-| O₂ yield (mg) | 35 / 39.2 | [880 — pre-α] | [TBD ± band] | [TBD] |
-| O₂ yield (% of sample) | 1.05 / 1.17 | [TBD] | [TBD] | [TBD] |
+| O2 yield (mg) | `35` / `39.229` | about `882` (`25.20x` exp. 1) | `656.204` central (`18.25x-19.04x` area band; `18.75x` central) | Faithful raw is `25.20x` high; literature-alpha/top-area is still `18.75x` high. Missing free-O2 equivalent: `0.621204 g`. |
+| O2 yield (% of `3.38 g` sample) | `1.05%` / `1.16%` | about `26.1%` | about `19.4%` central | Above the `~11%` exp. 1 / exp. 2 reproducibility floor by order-of-magnitude; not a run-to-run scatter issue. |
+| Free-O2 / captured-vapor ratio | `0.035 g / 1.26 g = 0.028` | high, not sink-corrected | model source chemistry implies a reduced-source floor `>=0.2` before downstream sinks | The measured ratio is below the stoichiometric floor, so free O2 must be consumed or retained after source emission. |
 
 *Experimental reproducibility floor: |1.17 − 1.05| / 1.11 ≈ 11 % — the
 benchmark against which model daylight is judged.*
@@ -153,16 +154,33 @@ benchmark against which model daylight is judged.*
 Conductance-routed source variant: `filter_reachable_paper_share_area` has Wall total g `0.000785623`, Filter g `0.000321760`, Filter share `40.96%`, Filter species `K, Mg, Na, SiO`.
 
 ### 4.3 Time-resolved evolution
-<!-- SLOT:timeseries-comparison source=supplement-exp2 CSVs + staged-T rerun artifacts status=pending -->
-<!-- Figure slot: model vs exp. 2 cumulative O₂(t) at 1 s resolution. -->
+<!-- SLOT:timeseries-comparison source=supplement-exp2 CSVs + staged-T rerun artifacts status=refined -->
+Exp. 2 has a 1-second O2 record available; the staged-temperature model comparison is still pending, so no model-vs-experiment time-series plot is claimed here.
 
 ### 4.4 Hypothesis disposition
 
-<!-- SLOT:hypothesis-disposition source=hypothesis-registry.md + all attack-wave deposits status=pending-synthesis -->
+<!-- SLOT:hypothesis-disposition source=hypothesis-registry.md + all attack-wave deposits + design-robinot-reconciliation rev 4 status=final -->
 
-| # | Hypothesis (class) | Attack wave | Disposition (killed / weakened / survives) | Evidence |
+Final count: `2` killed, `4` weakened, `10` survive.
+
+| # | Hypothesis | Disposition | Evidence | What it now means |
 |---|---|---|---|---|
-| *16 rows: 7 model / 5 experiment / 4 comparison* | | | | |
+| M1 | Source-side alpha-area kinetics | killed | Literature alpha plus honest top area predicts O2 `18.75x` and vapor `1.365x`; O2-matching post-hoc area gives vapor `0.093x`. | Alpha remains parameter debt, but alpha-area as the main O2 closure mechanism is killed. |
+| M2 | Pellet/effective area basis | weakened | Honest top-area variants still leave O2 `18.25x-19.04x` high. | Area is a diagnostic and cache seam, not a behavior fix by itself. |
+| M3 | Oxygen sink decomposition | survives | Stoichiometric O2 deficit; SiO is the mature oxygen-bearing source vapor; deposit mass/chemistry, upstream filter, and residual melt redox remain open. | Split into plume oxidation, deposit gettering, melt-redox retention, and post-run air oxidation. Post-run air oxidation can explain oxidized recovered deposits only, not low in-run analyzer O2. |
+| M4 | Activity / vapor-pressure chain | weakened | SiO Antoine terms, activity proxy, and pO2 floor remain high-sensitivity, while total vapor is already order-unity. | Standing uncertainty band; do not retune coefficients to hide the oxygen-sink gap. |
+| M5 | Open-system transport survival | weakened | Outlet-only survival did not close O2; instrument recommendations keep QMS/pO2 open. | Transport matters only when tied to an atom-conserved sink channel. |
+| M6 | Surface routing / sticking / filter | weakened | Direct named wall deposits are `0.000368x` paper total; reachable-filter variant fixes routing but not absolute mass. | Survives for per-surface split and gettering, not as standalone mass/O2 closure. |
+| M7 | Thermal-field model | survives | Surface `1850-2400+ deg C` and bulk/effective `1400-1750 deg C` remain plausible. | The `1800 deg C` reading is not a reliable bulk setpoint. |
+| E1 | Pyrometer/emissivity T error | survives | Emissivity/front-face bias and partial-melt gradients can be hundreds of K. | True temperature must be measured; sign alone does not close O2. |
+| E2 | Wall/condenser actual T | survives | Glass walls `100-400+ deg C`; condenser faces `50-200+ deg C`; opacification can warm surfaces. | Needed for per-surface deposition, gettering, re-evaporation, and air/post-run separation. |
+| E3 | O2 ppm x flow integration | killed | Independent rough reconstruction plus image digitization land on the `35 mg` anchor. | The paper O2 integral stands; cross-sensitivity remains a method caveat. |
+| E4 | Mass-accounting soft spots | survives | A `0.265 g` discrepancy could raise apparatus deposits from `1.260 g` to `1.525 g` (`+21.0%`). | Use mass bands and oxidation-state caveats; do not force one exact ledger. |
+| E5 | Deposit chemistry/location writeup | survives | EDS/XRD/Raman characterize products, but oxygen fraction and post-vent reoxidation are unresolved. | Air-isolated oxidation-state data is mandatory. |
+| C1 | Thermal-history equivalence false | survives | Staged history reduces O2 but still leaves `19.52x` high. | Flat one-hour hold is invalid; T(t) is secondary unless coupled to area and sink channels. |
+| C2 | Analyzer species specificity | survives | Total vapor and analyzer-visible O2 diverge. | Compare analyzer output only to free O2/O reaching the analyzer, not total O atoms in SiO, deposits, melt, or post-run oxides. |
+| C3 | Sample emplacement differences | survives | Robinot used a `13 mm x 10 mm`, `3.38 g` pellet on a cooled holder, partially molten. | Geometry, active fraction, and heat penetration must be explicit. |
+| C4 | Cross-paper discriminator scope | survives | Sauerborn and Šeško do not yet carry matching O2/deposit sidecars. | Cross-papers can falsify mechanisms qualitatively; they cannot certify quantitative Robinot closure. |
 
 ## 5. Error Budget and Accuracy Envelope
 
@@ -176,28 +194,33 @@ named term. Terms are ordered model-parameter → model-structural →
 experiment-side, so the reader can see at a glance how much of the daylight
 is ours, how much is the bench's, and how much is honestly unattributed.
 
-<!-- SLOT:error-budget source=design-robinot-reconciliation rev 3 status=pending-synthesis -->
+<!-- SLOT:error-budget source=design-robinot-reconciliation rev 4 status=refined -->
 
-*Cascade per observable (O₂ yield; total vaporised mass; per-surface
-deposition). Placeholder term order pending synthesis values:*
+PVsyst-style cascade, kept per observable. Each cascade ends with an explicit
+unexplained-residual row; no residual is absorbed into a named term.
 
-| # | Cascade term | Class | Factor (log₁₀) | % of gap explained | Basis |
-|---|---|---|---|---|---|
-| 0 | Raw faithful-model prediction | — | — | — | faithful-run artifact |
-| 1 | Evaporation coefficients (α), literature band | model parameter | [TBD] | [TBD] | alpha-principles |
-| 2 | Evaporation area basis (pellet vs pool) | model parameter | [TBD] | [TBD] | area-geometry |
-| 3 | Vapor-phase speciation (oxygen bound in oxide/suboxide transport) | model structure | [TBD — dominant term per attack A] | [TBD] | synthesis rev 3 |
-| 4 | Melt temperature (ε = 1 single-band pyrometry) | experiment | [TBD] | [TBD] | attack-pyrometry |
-| 5 | Mass accounting (0.265 g discrepancy; text–figure tensions) | experiment | [bounded] | [TBD] | attack-experiment |
-| 6 | Run-to-run reproducibility | experiment | ≈11 % | — (floor) | exp. 1 vs exp. 2 |
-| 7 | **Unexplained residual** | — | [TBD — explicit, never absorbed] | [TBD] | synthesis rev 3 |
-| = | Measured value | — | — | — | Robinot 2026 |
+| Observable | Cascade row | Class | Current value / factor | Budget meaning |
+|---|---|---|---|---|
+| Analyzer-visible O2 | Raw faithful model | baseline | about `25.20x` Robinot exp. 1 (`~882 mg` vs `35 mg`) | Faithful raw value before literature-alpha/top-area attack. |
+| Analyzer-visible O2 | Literature-alpha/top-area forward prediction | model parameter / geometry | `0.656204 g`, `18.75x` central; `18.25x-19.04x` area band; P4 pressure-floor variant `18.59x` | Alpha and exposed area shrink the miss but do not close it. |
+| Analyzer-visible O2 | Experiment reproducibility and integral | experiment | exp. 1 `35 mg`; exp. 2 `39.229 mg`; about `11%` reproducibility floor | The O2 integral stands; cross-sensitivity is a caveat, not a falsifier. |
+| Analyzer-visible O2 | Stoichiometric sink requirement | structural | free-O2/vapor `0.028` measured vs `>=0.2` congruent reduced-source floor; missing free-O2 equivalent `0.621204 g` | Requires downstream consumption or retention after source emission. |
+| Analyzer-visible O2 | Four-channel allocation | structural | plume oxidation / deposit gettering / melt-redox retention / post-run air oxidation | Channel split is not yet measured; post-run air oxidation cannot reduce in-run analyzer O2. |
+| Analyzer-visible O2 | **Unexplained residual** | residual | allocation of the missing `0.621204 g` among the four channels | Remains open until position-resolved gas sampling and air-isolated oxidation-state data exist. |
+| Total non-O2 vapor/capture | Literature-alpha/top-area forward prediction | model parameter / geometry | `1.72035 g` vs `1.26 g`, or `1.365x` | Order-unity total vapor with honest area and alpha. |
+| Total non-O2 vapor/capture | Mass-account upper band | experiment | `1.525 g` target if the `0.265 g` discrepancy is unrecovered deposit; model ratio about `1.13x` | Target identity can move the comparison by `+21.0%`. |
+| Total non-O2 vapor/capture | Reduced-vs-oxidized transported mass | experiment / structural | reduced transported mass could be `0.84-0.97 g`; honest vapor band about `1.1-2.0x` | Oxidation state and account identity dominate the remaining target band. |
+| Total non-O2 vapor/capture | Sauerborn active-mass miss | structural | `3.76x-4.78x` overprediction unless active melt fraction / heat penetration is modeled; MS5 active fraction improves to `1.87x` only if `43 wt%` is used as an input | Sauerborn remains a separate active-fraction problem, not a Robinot O2 closure. |
+| Total non-O2 vapor/capture | **Unexplained residual** | residual | active melt fraction, heat penetration, and oxidation-state target identity | Must be pre-registered before claiming better than the `1.1-2.0x` band. |
+| Per-surface deposition / oxidation state | Direct named wall deposits | baseline | `0.000368x` paper total; holder `0.0000599x`, window `0.000846x`, condenser `0.000779x`, filter `0` | The current named wall accounts do not reproduce paper-scale surface deposits. |
+| Per-surface deposition / oxidation state | Unmapped material accounts | structural | `process.condensation_train` `1.842495 g`; `terminal.offgas` `0.283171 g` | Paper-scale material exists, but not in Robinot holder/window/condenser/filter semantics. |
+| Per-surface deposition / oxidation state | Surface and sticking bands | model / experiment | Fe on cold Cu/SS near `1`; Na `0.5-1.0`; SiO/Mg broad `0.04-1.0`; wall `100-400+ deg C`, condenser `50-200+ deg C` | Surface temperature, view factors, sticking, and re-evaporation remain unresolved. |
+| Per-surface deposition / oxidation state | Four-channel allocation | structural | deposit gettering vs post-run air oxidation must be separated with in-vac witnesses | Recovered EDS/XRD oxygen cannot be treated as in-run analyzer closure. |
+| Per-surface deposition / oxidation state | **Unexplained residual** | residual | surface routing plus sink-channel attribution | Open until holder/window/condenser/filter mapping and in-vac oxidation states are measured. |
 
 **Headline accuracy statement** *(the product of this work)*:
-<!-- SLOT:headline source=rev 3 synthesis status=pending-synthesis -->
-> The model reproduces [observable] within [X] under [conditions], limited
-> by [dominant budget term]; experimental reproducibility bounds achievable
-> validation at ≈11 %.
+<!-- SLOT:headline source=design-robinot-reconciliation rev 4 status=final -->
+> Current Robinot-class accuracy: one literature-alpha/top-area Robinot variant is order-unity on total non-O2 vapor/capture (`1.1-2.0x` oxidation-state band), but analyzer-visible O2 is overpredicted by `18.75x`; closure now requires a four-channel oxygen-sink ledger, position-resolved gas sampling, and air-isolated deposit oxidation-state data.
 
 ## 6. Discussion
 
@@ -228,19 +251,16 @@ Standing list of the data, systematic lab results, and work items that would
 shrink specific budget terms. Terse by design; one row each; pointers into
 the analysis corpus. Rows retire when a budget term's band tightens.
 
-<!-- SLOT:accuracy-backlog source=synthesis rev 3 + ongoing status=draft -->
+<!-- SLOT:accuracy-backlog source=design-robinot-reconciliation rev 4 status=refined -->
 
-| Improvement | Shrinks budget term | Pointer |
+| Improvement | Channel / budget term | Acceptance condition |
 |---|---|---|
-| Deposit oxidation-state measurement (XPS / wet chemistry) on recovered surfaces | speciation (dominant structural term) | instrument recommendations; surviving-hypothesis kill condition |
-| Ratio / emissivity-corrected pyrometry on future benches | melt-temperature band | §6.2; pyrometry attack bands |
-| Calibrated QMS outlet speciation | speciation + O₂ quantification cross-check | §6.2 top pick |
-| α measurements for Na, K, Fe on basaltic melts | α bands (4 banded, 3+ assumption-only species) | α-principles gaps table |
-| Elimination of the 8 fitted parameters from the derivation chain | parameter-provenance debt | derivation audit (68-row table, Appendix B) |
-| Sauerborn reproduction presets (3 selected experiments) | cross-validation breadth | Sauerborn anchor table |
-| Šeško molecular-regime run (pending transport wiring) | regime discrimination among structural candidates | §6.3 |
-| Time-resolved per-surface deposition (QCM / witness hybrid) | per-surface daylight attribution | §6.2 |
-| EAC-1A volatile/LOI characterization (1.6 wt% residual bucket) | feedstock composition term | feedstock provenance notes |
+| Position-resolved gas sampling with calibrated QMS near melt, pre-filter, and outlet; OES/UV-Vis as timing support | Plume oxidation; analyzer-visible O2 unexplained residual | Shows whether O2/O is consumed between melt and analyzer and whether plume/silica products grow with the missing O2. |
+| Air-isolated deposit oxidation-state falsifier on holder/window/condenser/filter witnesses, paired with air-exposed controls | Deposit gettering; post-run air oxidation; per-surface oxidation-state residual | Separates in-vac bound oxygen from post-run reoxidation; post-vent EDS alone is not closure. |
+| Pre-registered oxide-vapor ceilings for Na/K/Fe/Mg and related source species | Source-species ceiling; prevents plume oxidation from becoming a tuning knob | Any explanation requiring source oxide vapors above the ceiling is killed rather than tuned. |
+| Active-melt-fraction thermal model for Sauerborn MS5 and Robinot-style pellets | Total vapor/capture band; active-mass / heat-penetration residual | Predicts active mass fraction before comparison; the reported Sauerborn `43 wt%` melted fraction is validation data, not an input knob. |
+| O-atom ledger split across analyzer free O2/O, SiO/plume products, deposits, and residual melt | Four-channel oxygen-sink ledger; O2 residual | Reports atom-conserved diagnostics for plume oxidation, deposit gettering, melt-redox retention, and post-run air oxidation separately. |
+| Holder/window/condenser/filter account mapping | Deposit gettering; per-surface split residual | Maps paper surfaces to wall-deposit segments, condensation train, filter semantics, and offgas before claiming per-surface agreement. |
 
 ## 7. Conclusions
 <!-- Prose: restate the envelope, the no-fitting posture, and the standing invitation to falsify. -->
