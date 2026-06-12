@@ -1655,7 +1655,10 @@ freeze_gate:
 chemistry_kernel:
   # V1e-impl TIER-3 fail-loud (engine policy: refuse if a species without
   # measured evaporation_alpha is sampled). Cr, CrO2, and Mn currently lack
-  # measured α in the literature (per V1e-audit) and are routinely sampled in
+  # measured α in the literature (audit artifacts:
+  # docs-private/goal-V1e-audit-alpha-coverage-2026-05-26.md and
+  # docs-private/research/2026-05-29-e2b-alpha-anchors/findings.md — both
+  # verified present 2026-06-12) and are routinely sampled in
   # default lunar/Mars extraction recipes (Cr2O3 trace ~0.3-0.5 wt%; CrO2(g)
   # is a real VapoRock species). Setting this true makes production use α=1.0
   # as the HK upper-bound placeholder for those species, with the fallback

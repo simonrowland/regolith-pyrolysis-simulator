@@ -13,7 +13,7 @@
 
 lunar_mare_low_ti:
   label: "Lunar Mare Basalt (Low-Ti)"
-  source: "Apollo 12/15 low-Ti basaltic soils"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
   note: >
     Low-Ti mare basalt variant (TiO2 ~1.5 wt%). Source data gives single
@@ -54,7 +54,7 @@ lunar_mare_low_ti:
 
 lunar_mare_high_ti:
   label: "Lunar Mare Basalt (High-Ti)"
-  source: "Apollo 11/17 high-Ti basaltic soils"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 11/17 high-Ti basaltic soils"
   confidence: "High"
   note: >
     High-Ti mare basalt variant (TiO2 ~8 wt%). Using upper TiO2 range
@@ -94,7 +94,7 @@ lunar_mare_high_ti:
 
 lunar_highland:
   label: "Lunar Highland Anorthosite"
-  source: "Apollo 16 anorthositic soils"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 16 anorthositic soils"
   confidence: "High"
   note: >
     Source data omits Cr2O3, MnO, P2O5; typical highland values added
@@ -130,7 +130,7 @@ lunar_highland:
 
 lunar_pkt_kreep_average:
   label: "Procellarum KREEP Terrane (PKT) Average"
-  source: "Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
   confidence: "High"
   note: >
     Source data omits Cr2O3, MnO; typical KREEP basalt values added.
@@ -171,7 +171,7 @@ lunar_pkt_kreep_average:
 
 lunar_spa_kreep_influenced:
   label: "South Pole-Aitken KREEP-Influenced"
-  source: "CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
   confidence: "Medium"
   note: >
     Very wide oxide ranges reflect heterogeneous SPA floor lithology.
@@ -211,15 +211,16 @@ lunar_spa_kreep_influenced:
   process_notes: "Intermediate KREEP enrichment; K2O 2-8x mare"
 
 targeted_super_kreep_ore:
-  label: "Targeted Super-KREEP Ore"
-  source: "Apollo 15386-type KREEP basalt + VHK clasts + urKREEP immiscible fractions"
+  label: "Targeted Super-KREEP Ore (Modeled Enriched Blend)"
+  source: "MODELED ENRICHED BLEND (synthetic targeted-ore scenario; not a measured table); component basis: major oxides from Apollo 15386-type KREEP basalt analog, K/P/REE/Zr enrichment from VHK clasts + urKREEP immiscible fractions, Cr/Mn trace estimates"
   confidence: "Medium-High"
   note: >
-    Extreme KREEP-enriched material from Copernicus rays, Aristarchus,
-    Lalande ejecta, Imbrium enriched strata. Includes REE and ZrO2 as
-    oxide components. Midpoint sum ~105.8 wt% because REE/ZrO2 are
-    additive to the major-oxide budget in extreme enrichments.
-    Normalise for simulation; or treat REE+ZrO2 as trace substitutions.
+    Synthetic enriched-blend scenario for Copernicus rays, Aristarchus,
+    Lalande ejecta, and Imbrium enriched strata. Includes REE and ZrO2
+    as oxide components. The 105.88 wt% sum is a deliberate enrichment
+    construction, not measured-table closure: REE/ZrO2 are additive to
+    the major-oxide budget in extreme enrichments. Normalise for
+    simulation; or treat REE+ZrO2 as trace substitutions.
   composition_wt_pct:
     SiO2:  50.5
     TiO2:   2.50
@@ -647,7 +648,7 @@ lunar_highlands_nu_lht_2m:
 
 s_type_asteroid_silicate:
   label: "S-Type Asteroid Silicate Fraction"
-  source: "H/L/LL ordinary chondrite meteorites; Hayabusa Itokawa sample return"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: H/L/LL ordinary chondrite meteorites; Hayabusa Itokawa sample return"
   confidence: "High"
   note: >
     Silicate fraction AFTER magnetic separation of Fe-Ni metal phase.
@@ -692,13 +693,14 @@ s_type_asteroid_silicate:
 
 m_type_metallic_phase:
   label: "M-Type Asteroid — Metallic Phase"
-  source: "Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
+  source: "PROCESS ASSUMPTION (50/50 bulk phase split chosen for modeling); context-not-source: Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
   confidence: "Low"
   note: >
-    No sample return; Psyche mission arrives Aug 2029. Metallic phase
-    is ~500 kg per tonne of bulk material. This entry is phase-normalized:
-    a 1000 kg simulation means 1000 kg of separated metal phase, not one
-    tonne of unsorted bulk M-type regolith. Elemental composition (not oxides).
+    No sample return; Psyche mission arrives Aug 2029. The 0.50
+    mass_fraction_of_bulk is a process split assumption, not a sourced
+    asteroid bulk fraction. This entry is phase-normalized: a 1000 kg
+    simulation means 1000 kg of separated metal phase, not one tonne of
+    unsorted bulk M-type regolith. Elemental composition (not oxides).
   composition_wt_pct:
     Fe:  90.0
     Ni:   7.5
@@ -711,7 +713,7 @@ m_type_metallic_phase:
     Co: [0.3, 0.5]
     S:  [0.5, 2]
     P:  [0.1, 0.3]
-  mass_fraction_of_bulk: 0.50   # metadata only; entry is phase-normalized
+  mass_fraction_of_bulk: 0.50   # process assumption; entry is phase-normalized
   sum_check: 99.35
   key_feature: "Natural Invar/Kovar analog; melting + tapping only"
   preferred_for: "Direct metal production; no reduction needed"
@@ -719,13 +721,14 @@ m_type_metallic_phase:
 
 m_type_silicate_phase:
   label: "M-Type Asteroid — Silicate Phase"
-  source: "Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
+  source: "PROCESS ASSUMPTION (50/50 bulk phase split chosen for modeling); context-not-source: Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
   confidence: "Low"
   note: >
-    Silicate phase is ~500 kg per tonne of bulk material. This entry is
-    phase-normalized: a 1000 kg simulation means 1000 kg of separated silicate
-    phase, not one tonne of unsorted bulk M-type regolith. Very high
-    uncertainty (+-30-50%) on Na2O. Sum ~99.8 wt%.
+    The 0.50 mass_fraction_of_bulk is a process split assumption, not a
+    sourced asteroid bulk fraction. This entry is phase-normalized: a
+    1000 kg simulation means 1000 kg of separated silicate phase, not one
+    tonne of unsorted bulk M-type regolith. Very high uncertainty
+    (+-30-50%) on Na2O. Sum ~99.8 wt%.
   composition_wt_pct:
     SiO2:  57.5
     MgO:   35.0
@@ -740,7 +743,7 @@ m_type_silicate_phase:
     Al2O3: [1, 3]
     CaO:   [1, 2]
     Na2O:  [0.1, 0.5]
-  mass_fraction_of_bulk: 0.50   # metadata only; entry is phase-normalized
+  mass_fraction_of_bulk: 0.50   # process assumption; entry is phase-normalized
   sum_check: 99.80
   key_feature: "Ultra-magnesian forsterite/enstatite silicate; very low FeO"
   preferred_for: "Mg shuttle stock after metallic phase removed; S-type flowchart"
@@ -751,7 +754,7 @@ m_type_silicate_phase:
 
 v_type_vesta_hed:
   label: "V-Type Asteroid (Vesta HED Meteorites)"
-  source: "HED meteorites (howardite regolith analogs) + Dawn/Vesta surface"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: HED meteorites (howardite regolith analogs) + Dawn/Vesta surface"
   confidence: "Very High"
   note: >
     Source data omits Cr2O3, MnO, P2O5; not added (insufficient constraint).
@@ -784,7 +787,7 @@ v_type_vesta_hed:
 
 e_type_enstatite_aubrite:
   label: "E-Type Asteroid (Enstatite Aubrite)"
-  source: "Aubrite meteorites (enstatite achondrites) + inner-belt E-type asteroids"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Aubrite meteorites (enstatite achondrites) + inner-belt E-type asteroids"
   confidence: "High"
   note: >
     Extremely reduced, nearly pure enstatite pyroxenite. Sulfur present
@@ -824,7 +827,7 @@ e_type_enstatite_aubrite:
 
 ci_carbonaceous_chondrite:
   label: "CI Carbonaceous Chondrite"
-  source: "CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
   confidence: "High"
   note: >
     Bulk composition includes ~20-35% volatile mass (H2O, C, S) lost during
@@ -864,7 +867,7 @@ ci_carbonaceous_chondrite:
       cap_kg_per_tonne: [20, 50]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "CI carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "MODELED BUCKET (not a cited table); CI carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
     hydrocarbons:
       template_formula: generic_carbonaceous_hydrocarbon
       decomposition_temp_range_C: [200, 500]
@@ -872,7 +875,7 @@ ci_carbonaceous_chondrite:
       cap_kg_per_tonne: [15, 30]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "Generic carbonaceous hydrocarbon cleanup bucket; C/H mass fractions approximate sourcebook-style volatile tables when exact organics speciation is unavailable."
+      source: "MODELED BUCKET (not a cited table); generic carbonaceous hydrocarbon cleanup bucket; C/H mass fractions approximate sourcebook-style volatile tables when exact organics speciation is unavailable."
   anhydrous_silicate_after_degassing:
     note: "650-800 kg per tonne survives C0; this is the C1-C6 input"
     mass_per_tonne_kg: [650, 800]
@@ -912,7 +915,7 @@ ci_carbonaceous_chondrite:
 
 cm_carbonaceous_chondrite:
   label: "CM Carbonaceous Chondrite"
-  source: "CM meteorites (Murchison, etc.); similar to CI but less hydrated"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CM meteorites (Murchison, etc.); similar to CI but less hydrated"
   confidence: "High"
   note: >
     Similar to CI but less hydrated and less carbon-rich. Post-degassing
@@ -945,7 +948,7 @@ cm_carbonaceous_chondrite:
       cap_kg_per_tonne: [15, 30]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "CM carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "MODELED BUCKET (not a cited table); CM carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Similar to CI but slightly higher SiO2, lower FeO"
     composition_wt_pct:
@@ -969,7 +972,7 @@ cm_carbonaceous_chondrite:
 
 ceres_regolith:
   label: "Ceres Regolith"
-  source: "Dawn VIR/GRaND global mapping + 2025 brine/habitability reanalyses"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Dawn VIR/GRaND global mapping + 2025 brine/habitability reanalyses"
   confidence: "Very High"
   note: >
     Evolved icy carbonaceous dwarf-planet regolith (NH4-clays + brine salts).
@@ -1002,7 +1005,7 @@ ceres_regolith:
       cap_kg_per_tonne: [150, 200]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "Ceres carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "MODELED BUCKET (not a cited table); Ceres carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26) but slightly Mg-richer"
     composition_wt_pct:
@@ -1036,7 +1039,7 @@ ceres_regolith:
 
 comet_nucleus:
   label: "Comet Nucleus (Jupiter-Family)"
-  source: "Rosetta/67P + other Jupiter-family comets; primitive outer-solar-system analogs"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Rosetta/67P + other Jupiter-family comets; primitive outer-solar-system analogs"
   confidence: "High"
   note: >
     Volatile-extreme CI with massive supervolatiles. Dust-to-ice ratio
@@ -1073,7 +1076,7 @@ comet_nucleus:
       final_temp_C: 1050
       cap_kg_per_tonne: [50, 150]
       offgas_mode: native_mixture
-      source: "Equal-molar CO/CO2 volatile bucket from comet nucleus source range."
+      source: "MODELED BUCKET (not a cited table); equal-molar CO/CO2 volatile bucket from comet nucleus source range."
     organics:
       template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 500]
@@ -1081,7 +1084,7 @@ comet_nucleus:
       cap_kg_per_tonne: [50, 100]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "Generic carbonaceous organic cleanup bucket; C/H/O/N mass fractions approximate sourcebook-style volatile tables when exact tar-forming organics speciation is unavailable."
+      source: "MODELED BUCKET (not a cited table); generic carbonaceous organic cleanup bucket; C/H/O/N mass fractions approximate sourcebook-style volatile tables when exact tar-forming organics speciation is unavailable."
     CH4_NH3_HCN:
       atoms:
         C: 2
@@ -1091,7 +1094,7 @@ comet_nucleus:
       final_temp_C: 1050
       cap_kg_per_tonne: [10, 40]
       offgas_mode: native_mixture
-      source: "Equal-molar CH4/NH3/HCN supervolatile bucket from comet nucleus source range."
+      source: "MODELED BUCKET (not a cited table); equal-molar CH4/NH3/HCN supervolatile bucket from comet nucleus source range."
     CO_CH4_propellant:
       atoms:
         C: 2
@@ -1101,7 +1104,7 @@ comet_nucleus:
       final_temp_C: 1050
       cap_kg_per_tonne: [60, 180]
       offgas_mode: native_mixture
-      source: "Equal-molar CO/CH4 propellant bucket from comet nucleus product range."
+      source: "MODELED BUCKET (not a cited table); equal-molar CO/CH4 propellant bucket from comet nucleus product range."
     NH3_HCN:
       atoms:
         C: 1
@@ -1111,7 +1114,7 @@ comet_nucleus:
       final_temp_C: 1050
       cap_kg_per_tonne: [10, 30]
       offgas_mode: native_mixture
-      source: "Equal-molar NH3/HCN scrubber bucket from comet nucleus product range."
+      source: "MODELED BUCKET (not a cited table); equal-molar NH3/HCN scrubber bucket from comet nucleus product range."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26)"
     composition_wt_pct:
@@ -1227,7 +1230,7 @@ mars_basalt:
   stage0_perchlorate_cleanup:
     reactions:
       - perchlorate_to_chloride_o2
-  source: "Curiosity/Spirit/Opportunity APXS; Phoenix lander"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Curiosity/Spirit/Opportunity APXS; Phoenix lander"
   confidence: "High"
   note: >
     Thousands of APXS analyses across 4 sites; +-1-2 wt% major oxides.
@@ -1286,7 +1289,7 @@ mars_sulfate_rich:
     reactions:
       - sulfate_so3_to_so2_co
       - co2_boudouard_to_co
-  source: "Meridiani Planum soils, Vera Rubin Ridge margins, polar/sedimentary deposits"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Meridiani Planum soils, Vera Rubin Ridge margins, polar/sedimentary deposits"
   confidence: "High"
   note: >
     Elevated Ca/Mg/Fe sulfates (SO3 8-15 wt% vs 5-7% baseline).
@@ -1336,7 +1339,7 @@ mars_phyllosilicate_clay:
   stage0_carbon_cleanup:
     carbon_reductant_kg_per_tonne: 0
     reactions: []
-  source: "Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs"
   confidence: "High"
   note: >
     Smectite-rich deposits. Higher Al2O3 (12-18%) and bound water than
@@ -1385,7 +1388,7 @@ mars_perchlorate_rich:
   stage0_perchlorate_cleanup:
     reactions:
       - perchlorate_to_chloride_o2
-  source: "Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
+  source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
   confidence: "Medium-High"
   note: >
     Source data omits TiO2; estimated from mars_basalt range. Elevated

@@ -95,7 +95,7 @@ metals:
       C: 0
     evaporation_alpha:
       value: 1.0
-      source: "Sossi et al. 2019 GCA 260:204 alkali near-ideal by analogy to Na; Sossi & Fegley 2018 liquids commonly near unity"
+      source: "ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi & Fegley 2018 liquids commonly near unity"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
       tier: 2
@@ -191,9 +191,9 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
-    source: "rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ca vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
     pure_component_antoine:
-      source: "CRC/NIST normal boiling point; legacy ΔH_vap≈182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy ΔH_vap≈182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.424827
       B: 9522.188948
       C: 0
@@ -219,9 +219,9 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
-    source: "CRC/CR2 pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Al vapor-pressure table/regression): legacy CRC-style pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
     pure_component_antoine:
-      source: "CRC/CR2 normal boiling point; legacy ΔH_vap≈332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy ΔH_vap≈332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.216544
       B: 17341.561880
       C: 0
@@ -248,9 +248,9 @@ metals:
     parent_oxide: "SiO2"
     fit_target: "pure_component_psat"
     consumer_status: "inactive"
-    source: "rough legacy ΔH_vap approximation, inactive and unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named pure-Si vapor-pressure fit): rough legacy ΔH_vap approximation, inactive and unvalidated"
     pure_component_antoine:
-      source: "Safarian & Engh 2013 pure-Si branch plus legacy ΔH_vap≈413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy ΔH_vap≈413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.110207
       B: 21598.601920
       C: 0
@@ -276,9 +276,9 @@ metals:
     electrons_per_atom: 4
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
-    source: "CRC/CR2 pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ti vapor-pressure table/regression): legacy CRC-style pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
     pure_component_antoine:
-      source: "CRC/CR2 normal boiling point; legacy ΔH_vap≈444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy ΔH_vap≈444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.524374
       B: 23207.397420
       C: 0
@@ -304,7 +304,7 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Cr2O3"
     fit_target: "pure_component_psat"
-    source: "rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Cr vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
@@ -324,7 +324,7 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
-    source: "rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Mn vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
