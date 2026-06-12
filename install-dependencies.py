@@ -212,6 +212,30 @@ def _install_recipe_db_starter(python: Path) -> None:
     subprocess.run([str(python), str(script)], check=False)
 
 
+def _ensure_local_runs_dir() -> None:
+    """Create the gitignored local-runs/ root for grind/optimizer run data.
+
+    Idempotent. On macOS, marks it Dropbox-ignored: this repo may live inside
+    a synced folder, and live sqlite run caches must not churn the sync. The
+    xattr cannot ride along in git (the directory is untracked), so a fresh
+    checkout needs it re-applied here.
+    """
+    local_runs = ROOT / "local-runs"
+    local_runs.mkdir(exist_ok=True)
+    if sys.platform == "darwin":
+        result = subprocess.run(
+            ["xattr", "-w", "com.dropbox.ignored", "1", str(local_runs)],
+            check=False,
+            capture_output=True,
+        )
+        if result.returncode != 0:
+            print(
+                "warning: could not set com.dropbox.ignored on local-runs/ — "
+                "if this repo lives in Dropbox, set it manually: "
+                f"xattr -w com.dropbox.ignored 1 {local_runs}"
+            )
+
+
 def main() -> int:
     if len(sys.argv) != 1:
         raise SystemExit("Usage: python3 install-dependencies.py")
@@ -224,6 +248,7 @@ def main() -> int:
         _install_with_pip(python)
     _install_alphamelts()
     _install_recipe_db_starter(python)
+    _ensure_local_runs_dir()
 
     print("\nInstall complete.")
     print(f"Run: {python} regolith-pyrolysis-run.py")
