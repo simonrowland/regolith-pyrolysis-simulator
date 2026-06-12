@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import math
 from pathlib import Path
 
 import pytest
@@ -388,27 +390,41 @@ def test_target_menu_windowed_campaigns_emit_runtime_schedule(
         assert run_config.hours >= int(profile["run"]["hours"])
 
 
-def test_target_menu_generation_refuses_window_duration_over_campaign_cap(
+def test_target_menu_generation_constructs_hold_under_campaign_cap(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    out = tmp_path / "pc-extract-mg.yaml"
-    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    out = tmp_path / "pc-extract-fe.yaml"
+    _run_generator(
+        monkeypatch,
+        tmp_path,
+        "lunar_mare_low_ti",
+        "pc-extract-fe",
+        out,
+        extra_args=["--hours", "24"],
+    )
 
-    with pytest.raises(SystemExit, match=r"pc-extract-mg C4\.duration_h exceeds campaign max_hold_hr"):
-        generator.main(
-            [
-                "lunar_mare_low_ti",
-                "--target",
-                "pc-extract-mg",
-                "--hours",
-                "24",
-                "--db",
-                str(tmp_path / "cache.db"),
-                "--out",
-                str(out),
-            ]
-        )
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    campaign = "C2B"
+    cfg = _setpoint_campaign_config(campaign)
+    max_hold_hr = float(cfg["max_hold_hr"])
+    preheat_hours = _expected_preheat_hours(cfg)
+    expected_hold_hours = max_hold_hr - preheat_hours
+    expected_provenance = (
+        f"requested 24 h -> {_format_hours(expected_hold_hours)} h under "
+        f"{campaign} max_hold {_format_hours(max_hold_hr)} h - "
+        f"{_format_hours(preheat_hours)} h preheat"
+    )
+    target = profile["objectives"][0]["target"]
+
+    assert profile["run"]["hours"] == pytest.approx(expected_hold_hours)
+    assert profile["fidelities"]["high"]["hours"] == pytest.approx(expected_hold_hours)
+    assert target["maturity"]["hours"] == pytest.approx(expected_hold_hours)
+    assert target["hold_construction"] == expected_provenance
 
 
 def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
@@ -433,6 +449,91 @@ def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
             profile,
             expected_feedstock="lunar_mare_low_ti",
             source=out,
+        )
+
+
+def test_target_menu_generation_refuses_impossible_constructed_window(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    real_config = generator._setpoint_campaign_config
+
+    def config_with_no_usable_hold(campaign: str):
+        cfg = dict(real_config(campaign))
+        if generator._setpoint_campaign_key(campaign) == "C2B":
+            cfg["max_hold_hr"] = 1
+        return cfg
+
+    out = tmp_path / "pc-extract-fe.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    monkeypatch.setattr(generator, "_setpoint_campaign_config", config_with_no_usable_hold)
+
+    with pytest.raises(
+        SystemExit,
+        match=r"pc-extract-fe C2B\.duration_h has no usable thermal-window hold",
+    ):
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-extract-fe",
+                "--hours",
+                "24",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
+        )
+
+
+def test_target_menu_generation_refuses_explicit_declared_window_over_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    real_load = generator._load_base_profile
+
+    def load_with_explicit_over_cap_window(feedstock: str) -> dict:
+        profile = copy.deepcopy(real_load(feedstock))
+        profile["seed_recipes"].append(
+            {
+                "id": "explicit-c0b-over-cap-window",
+                "source_campaign": "C0b_p_cleanup",
+                "rationale": "test explicit operator window remains fail-loud",
+                "patch": {
+                    "campaigns": {
+                        "C0b_p_cleanup": {
+                            "temp_range_C": [1180, 1320],
+                            "pO2_mbar": [3.0, 15.0],
+                            "pO2_mbar_default": 9.0,
+                            "p_total_mbar_default": 9.0,
+                            "duration_h": [4.0, 5.0],
+                        }
+                    }
+                },
+            }
+        )
+        return profile
+
+    out = tmp_path / "pc-glass-clear-c0b.yaml"
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    monkeypatch.setattr(generator, "_load_base_profile", load_with_explicit_over_cap_window)
+
+    with pytest.raises(SystemExit, match=r"thermal_window_campaign_max_hold refusal"):
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-glass-clear",
+                "--campaign",
+                "C0b_p_cleanup",
+                "--hours",
+                "24",
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--out",
+                str(out),
+            ]
         )
 
 
@@ -727,18 +828,27 @@ def _run_generator(
     feedstock: str,
     target_id: str,
     out: Path,
+    *,
+    extra_args: list[str] | None = None,
 ) -> None:
     monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
-    assert generator.main(
+    args = [
+        feedstock,
+        "--target",
+        target_id,
+    ]
+    if extra_args is not None:
+        args.extend(extra_args)
+    args.extend(
         [
-            feedstock,
-            "--target",
-            target_id,
             "--db",
             str(tmp_path / "cache.db"),
             "--out",
             str(out),
         ]
+    )
+    assert generator.main(
+        args
     ) == 0
 
 
@@ -769,3 +879,22 @@ def _numeric_interval(value) -> tuple[float, float]:
         assert len(value) == 2
         return float(value[0]), float(value[1])
     return float(value), float(value)
+
+
+def _expected_preheat_hours(campaign_cfg: dict[str, object]) -> int:
+    low_C, _ = _numeric_interval(campaign_cfg["temp_range_C"])
+    ramp = (
+        campaign_cfg.get("preheat_ramp_C_per_hr")
+        or campaign_cfg.get("ramp_rate_C_per_hr")
+        or generator.DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
+    )
+    return int(
+        math.ceil(
+            max(0.0, low_C - generator.DEFAULT_COLD_START_TEMPERATURE_C)
+            / float(ramp)
+        )
+    )
+
+
+def _format_hours(value: int | float) -> str:
+    return f"{float(value):g}"

@@ -48,11 +48,12 @@ _COMPOSITION_TARGET_KEYS = frozenset(
         "composition_window",
         "maturity",
         "thermal_window",
+        "hold_construction",
         "constraints",
         "score_weights",
     }
 )
-_TARGET_SPEC_DIGEST_DISPLAY_KEYS = frozenset({"thermal_window"})
+_TARGET_SPEC_DIGEST_DISPLAY_KEYS = frozenset({"thermal_window", "hold_construction"})
 _EXTRACTION_KEYS = frozenset(
     {"basis", "captured_pool", "credit_policy", "completeness_min", "mechanisms"}
 )
@@ -366,6 +367,9 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
     thermal_window = target.get("thermal_window")
     if isinstance(thermal_window, str) and thermal_window:
         result["thermal_window"] = thermal_window
+    hold_construction = target.get("hold_construction")
+    if isinstance(hold_construction, str) and hold_construction:
+        result["hold_construction"] = hold_construction
     window = target.get("composition_window", {})
     if not isinstance(window, Mapping):
         return result
@@ -525,6 +529,11 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         if not isinstance(thermal_window, str) or not thermal_window.strip():
             raise ObjectiveProfileError(f"{where}.thermal_window must be a non-empty string")
         thermal_window = thermal_window.strip()
+    hold_construction = raw.get("hold_construction")
+    if "hold_construction" in raw:
+        if not isinstance(hold_construction, str) or not hold_construction.strip():
+            raise ObjectiveProfileError(f"{where}.hold_construction must be a non-empty string")
+        hold_construction = hold_construction.strip()
     _validate_target_shape(
         vector=vector,
         extraction=extraction,
@@ -545,6 +554,8 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         normalized["composition_window"] = MappingProxyType(window)
     if thermal_window is not None:
         normalized["thermal_window"] = thermal_window
+    if hold_construction is not None:
+        normalized["hold_construction"] = hold_construction
     return normalized
 
 

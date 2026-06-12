@@ -57,6 +57,7 @@ MENU_TARGET_IDS = (
 FURNACE_SURVIVABLE_T_MAX_C = 1800.0
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
+MIN_THERMAL_WINDOW_HOLD_HR = 1.0
 THERMAL_VOLATILIZATION = "thermal_volatilization"
 C3_METALLOTHERMIC_SHUTTLE = "c3_metallothermic_shuttle"
 C6_MG_THERMITE = "c6_mg_thermite"
@@ -430,7 +431,13 @@ def _extraction_mechanism_for_species(
     return None
 
 
-def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[str, Any]:
+def _target_objective(
+    row: TargetMenuRow,
+    *,
+    campaign: str,
+    hours: int | float,
+    hold_construction: str | None = None,
+) -> dict[str, Any]:
     extraction_min = _scored_extraction_min(row)
     species_vector = dict(row.species_vector)
     if not extraction_min:
@@ -471,6 +478,8 @@ def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[
     thermal_window = _campaign_window_disposition(campaign)
     if thermal_window is not None:
         target["thermal_window"] = thermal_window
+    if hold_construction is not None:
+        target["hold_construction"] = hold_construction
     if row.oxides or row.ratios:
         window: dict[str, Any] = {
             "pool": row.pool,
@@ -590,7 +599,7 @@ def _validate_campaign_window_within_caps(
     row: TargetMenuRow,
     *,
     campaign: str,
-    hours: int,
+    hours: int | float,
 ) -> None:
     cfg = _setpoint_campaign_config(campaign)
     temp_range = cfg.get("temp_range_C")
@@ -615,6 +624,69 @@ def _validate_campaign_window_within_caps(
         )
 
 
+def _construct_campaign_hold_hours(
+    row: TargetMenuRow,
+    *,
+    campaign: str,
+    requested_hours: int | float,
+) -> tuple[int | float, str | None]:
+    cfg = _setpoint_campaign_config(campaign)
+    temp_range = cfg.get("temp_range_C")
+    if temp_range is None:
+        return requested_hours, None
+
+    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
+    if high_C < low_C:
+        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+
+    max_hold_hr = _setpoint_campaign_max_hold_hr(campaign)
+    if max_hold_hr is None:
+        return requested_hours, None
+
+    try:
+        requested = float(requested_hours)
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(f"{row.target_id} {campaign}.duration_h must be numeric") from exc
+    if not math.isfinite(requested) or requested <= 0.0:
+        raise SystemExit(f"{row.target_id} {campaign}.duration_h must be positive")
+
+    preheat_hours = _thermal_window_preheat_hours(campaign, low_C)
+    usable_hold_hr = max_hold_hr - float(preheat_hours)
+    if usable_hold_hr < MIN_THERMAL_WINDOW_HOLD_HR:
+        raise SystemExit(
+            f"{row.target_id} {campaign}.duration_h has no usable thermal-window hold: "
+            f"{_format_hours(max_hold_hr)} h max_hold_hr - "
+            f"{_format_hours(preheat_hours)} h preheat leaves "
+            f"{_format_hours(usable_hold_hr)} h"
+        )
+
+    constructed = min(requested, usable_hold_hr)
+    if constructed < MIN_THERMAL_WINDOW_HOLD_HR:
+        raise SystemExit(
+            f"{row.target_id} {campaign}.duration_h must be at least "
+            f"{_format_hours(MIN_THERMAL_WINDOW_HOLD_HR)} h"
+        )
+    constructed_value = _plain_hour_value(constructed)
+    if constructed >= requested:
+        return constructed_value, None
+
+    return constructed_value, (
+        f"requested {_format_hours(requested)} h -> "
+        f"{_format_hours(constructed)} h under {campaign} max_hold "
+        f"{_format_hours(max_hold_hr)} h - {_format_hours(preheat_hours)} h preheat"
+    )
+
+
+def _plain_hour_value(value: float) -> int | float:
+    if float(value).is_integer():
+        return int(value)
+    return value
+
+
+def _format_hours(value: int | float) -> str:
+    return f"{float(value):g}"
+
+
 def _thermal_window_preheat_hours(campaign: str, low_C: float) -> int:
     cfg = _setpoint_campaign_config(campaign)
     value = cfg.get("preheat_ramp_C_per_hr") or cfg.get("ramp_rate_C_per_hr")
@@ -634,7 +706,7 @@ def _thermal_window_preheat_hours(campaign: str, low_C: float) -> int:
     )
 
 
-def _campaign_window_patch(campaign: str, *, hours: int) -> dict[str, Any] | None:
+def _campaign_window_patch(campaign: str, *, hours: int | float) -> dict[str, Any] | None:
     cfg = _setpoint_campaign_config(campaign)
     temp_range = cfg.get("temp_range_C")
     if temp_range is None:
@@ -782,7 +854,7 @@ def _ensure_target_campaign_window(
     row: TargetMenuRow,
     *,
     campaign: str,
-    hours: int,
+    hours: int | float,
 ) -> None:
     patch = _campaign_window_patch(campaign, hours=hours)
     if patch is None:
@@ -835,7 +907,8 @@ def _target_profile(
     row: TargetMenuRow,
     *,
     campaign: str,
-    hours: int,
+    hours: int | float,
+    hold_construction: str | None = None,
 ) -> dict[str, Any]:
     _validate_campaign_window_within_caps(row, campaign=campaign, hours=hours)
     profile = copy.deepcopy(dict(base_profile))
@@ -849,7 +922,12 @@ def _target_profile(
     )
     profile["objective_emphasis"] = f"PC target matrix: {row.target_id}."
     profile["objectives"] = [
-        _target_objective(row, campaign=campaign, hours=hours),
+        _target_objective(
+            row,
+            campaign=campaign,
+            hours=hours,
+            hold_construction=hold_construction,
+        ),
         *_standard_cost_objectives(profile),
     ]
     _ensure_target_campaign_window(
@@ -997,7 +1075,7 @@ def main(argv: list[str]) -> int:
 
     for row in target_rows:
         campaign = _target_campaign(args.campaign, row)
-        hours = args.hours if args.hours is not None else row.maturity_hours
+        requested_hours = args.hours if args.hours is not None else row.maturity_hours
         blocked_reason = _target_blocked_reason(row, campaign=campaign)
         out = _output_path(args.feedstock, row.target_id, args.out, len(target_rows))
         if blocked_reason is not None:
@@ -1006,7 +1084,7 @@ def main(argv: list[str]) -> int:
                     profile,
                     row,
                     campaign=campaign,
-                    hours=hours,
+                    hours=requested_hours,
                     reason=blocked_reason,
                 ),
                 out,
@@ -1015,7 +1093,18 @@ def main(argv: list[str]) -> int:
             print(f"  target={row.target_id}")
             print(f"  reason={blocked_reason}")
             continue
-        target_profile = _target_profile(profile, row, campaign=campaign, hours=hours)
+        hours, hold_construction = _construct_campaign_hold_hours(
+            row,
+            campaign=campaign,
+            requested_hours=requested_hours,
+        )
+        target_profile = _target_profile(
+            profile,
+            row,
+            campaign=campaign,
+            hours=hours,
+            hold_construction=hold_construction,
+        )
         _apply_cached_real(
             target_profile,
             campaign=campaign,
@@ -1032,6 +1121,8 @@ def main(argv: list[str]) -> int:
         print(f"  target={row.target_id}")
         print(f"  engine: {name}@{version}")
         print(f"  campaign={campaign} hours={hours} gate={args.gate} db={args.db}")
+        if hold_construction is not None:
+            print(f"  hold_construction={hold_construction}")
     return 0
 
 
