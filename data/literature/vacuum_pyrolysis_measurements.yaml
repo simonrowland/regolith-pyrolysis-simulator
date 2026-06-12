@@ -7,13 +7,79 @@ measurements:
       citation_id: robinot_2026
       label: "Robinot et al. 2026 vacuum pyrolysis experiment"
       bibliography_status: pending_full_lit_sweep
-    doi: pending_full_lit_sweep
+    doi: 10.1016/j.asr.2026.02.003
     extraction:
-      source_location: methods_results_and_conclusion
+      source_location: mineru_markdown_methods_results_conclusion_and_fig4_caption
       digitized: false
       extractor: VPR-P5-schema
-      extraction_date: 2026-06-11
-      extraction_status: skeleton_not_full_paper_data
+      extraction_date: 2026-06-12
+      extraction_status: full_text_numeric_pass_no_fig4c_table
+    figure_extraction:
+      fig4c_per_location_mass_table:
+        extraction_status: not_extractable_from_markdown
+        checked_sources:
+          - docs-private/research/2026-06-12-vpr-sources/robinot_2026_solar_pyrolysis.md
+          - docs-private/research/2026-06-12-vpr-sources/acquisition-manifest.json
+        source:
+          citation_id: robinot_2026
+          source_location: fig4_caption_and_results_section
+          digest: "Fig. 4c is present only as a figure image/caption in the MinerU markdown; no tabulated per-location mass rows are extracted."
+      numerically_extractable_from_markdown:
+        - observable: sample_mass
+          reported_value: 3.38
+          reported_unit: g
+          source_location: results_section
+        - observable: chamber_pressure
+          reported_value: 13.0
+          reported_unit: mbar
+          qualifier: approximate
+          source_location: results_section
+        - observable: argon_flow
+          reported_value: 0.3
+          reported_unit: NL_min
+          source_location: results_section
+        - observable: duration
+          reported_value: 1.0
+          reported_unit: h
+          qualifier: approximate
+          source_location: results_section
+        - observable: peak_temperature
+          reported_value: 1800
+          reported_unit: degC
+          qualifier: approximate_peak
+          source_location: results_section
+        - observable: oxygen_released
+          reported_value: 35
+          reported_unit: mg
+          source_location: results_section
+        - observable: oxygen_yield_by_mass
+          reported_value: 1.05
+          reported_unit: percent
+          source_location: results_section
+        - observable: comparable_run_yield
+          reported_value: 1.17
+          reported_unit: percent
+          source_location: results_section
+        - observable: specific_energy_yield
+          reported_value: 31
+          reported_unit: mg_O2_per_kWh
+          source_location: results_section
+        - observable: glassy_lump_mass
+          reported_value: 1.82
+          reported_unit: g
+          source_location: results_section
+        - observable: total_vaporized_or_captured_mass
+          reported_value: 1.1
+          reported_unit: g
+          source_location: results_section
+        - observable: unaccounted_mass
+          reported_value: 0.27
+          reported_unit: g
+          source_location: results_section
+        - observable: final_mass_recovery
+          reported_value: 92
+          reported_unit: percent
+          source_location: results_section
     conditions_reported:
       pressure_mbar:
         reported_value: 13.0
@@ -82,6 +148,29 @@ measurements:
           citation_id: robinot_2026
           source_location: results_section
           digest: "Robinot anchor reports a 1.82 g glassy lump."
+      - observable: total_vaporized_or_captured_mass
+        reported_value: 1.1
+        reported_unit: g
+        normalized_value_kg: 0.0011
+        source:
+          citation_id: robinot_2026
+          source_location: results_section
+          digest: "Robinot Sec. 4.1 reports 1.1 g material vaporized and captured on holder, window, condenser, and filter; Fig. 4c per-location mass split is not tabulated in markdown."
+      - observable: unaccounted_mass
+        reported_value: 0.27
+        reported_unit: g
+        normalized_value_kg: 0.00027
+        source:
+          citation_id: robinot_2026
+          source_location: results_section
+          digest: "Robinot Sec. 4.1 reports 0.27 g unaccounted for after component cleaning."
+      - observable: final_mass_recovery
+        reported_value: 92
+        reported_unit: percent
+        source:
+          citation_id: robinot_2026
+          source_location: results_section
+          digest: "Robinot Sec. 4.1 reports final mass recovery reached 92%."
     observed_locations:
       - id: holder
         surface_role: sample_holder
@@ -137,7 +226,7 @@ measurements:
         quantitative_measurements: []
       - id: condenser
         surface_role: collector
-        extraction_status: measured
+        extraction_status: qualitative_only
         measured_hot_vs_cooldown: post_run_cooldown
         reported_species_or_composition:
           Si:
@@ -162,22 +251,12 @@ measurements:
               source_location: results_section
               digest: "Robinot per-location sweep anchor reports Mg in condenser deposit."
         morphology_notes:
-          value: "Condenser/cold-trap location holds the skeleton recovered-mass row."
+          value: "Condenser/cold-trap location is named qualitatively; Fig. 4c mass split is figure-only in the markdown."
           source:
             citation_id: robinot_2026
             source_location: results
-            digest: "Condenser row is the quantitative deposit anchor for this skeleton."
-        quantitative_measurements:
-          - observable: recovered_mass
-            reported_value: 1.1
-            reported_unit: g
-            normalized_value_kg: 0.0011
-            uncertainty_kg: null
-            measured_hot_vs_cooldown: post_run_cooldown
-            source:
-              citation_id: robinot_2026
-              source_location: results_section
-              digest: "One Robinot passage reports 1.1 g total vaporized or captured mass."
+            digest: "Robinot reports condenser composition, but the 1.1 g captured mass is total across holder/window/condenser/filter."
+        quantitative_measurements: []
       - id: filter
         surface_role: downstream_filter
         extraction_status: missing_mass

@@ -84,7 +84,7 @@ lab_geometry:
   id: robinot_2026_geometry_skeleton
   scale: gram_lab
   equipment_sizing: lab_fixed_geometry
-  geometry_status: skeleton_missing_dimensions
+  geometry_status: populated_with_assumption_geometry
   sample:
     mass_g: 3.38
     mass_qualifier: reported
@@ -109,36 +109,52 @@ lab_geometry:
   surfaces:
     - id: holder
       role: sample_holder
+      area_m2: 0.000314
+      equivalent_diameter_m: 0.02
+      view_factor_from_melt: 0.35
+      line_of_sight_to_melt: true
       temperature_profile: holder
-      source_class: literature_sidecar
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: robinot_holder_area_view_factor_sweep
       source_ref: robinot_2026_apparatus
       citation_id: robinot_2026
-      extraction_note: "Role known from Robinot apparatus description; dimensions pending."
-      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+      extraction_note: "Robinot Sec. 2.2 states the sample was on a water-cooled steel holder and reports a roughly 2 cm focal spot; holder capture area/view factor are not stated, so the active holder area is assumed from that spot and must remain in sensitivity sweeps."
     - id: window
       role: transparent_wall
+      area_m2: 0.01
+      equivalent_diameter_m: 0.113
+      view_factor_from_melt: 0.25
+      line_of_sight_to_melt: true
       temperature_profile: window
-      source_class: literature_sidecar
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: robinot_window_area_view_factor_sweep
       source_ref: robinot_2026_apparatus
       citation_id: robinot_2026
-      extraction_note: "Window fouling is tracked as its own qualitative deposit surface."
-      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+      extraction_note: "Robinot Sec. 4.1 reports visible opacification of the reactor glass and Fig. 4c includes recovered material locations; transparent wall area/view factor are not stated, so a 0.01 m2 exposed glass surface is an assumption with sensitivity coverage."
     - id: condenser
       role: collector
+      area_m2: 0.005
+      equivalent_diameter_m: 0.08
+      view_factor_from_melt: 0.30
+      line_of_sight_to_melt: true
       temperature_profile: condenser
-      source_class: literature_sidecar
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: robinot_condenser_area_view_factor_sweep
       source_ref: robinot_2026_apparatus
       citation_id: robinot_2026
-      extraction_note: "Condenser/cold trap is the skeleton quantitative deposit collector."
-      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+      extraction_note: "Robinot Sec. 2.2 states a refrigerated copper condenser was positioned above the reactor; collector area/view factor are not stated, so an 80 mm equivalent collector is an assumption with sensitivity coverage."
     - id: filter
       role: downstream_filter
+      area_m2: 0.002
+      equivalent_diameter_m: 0.05
+      view_factor_from_melt: 0.05
+      line_of_sight_to_melt: false
       temperature_profile: filter
-      source_class: literature_sidecar
+      source_class: assumption_with_sensitivity_marker
+      sensitivity_marker: robinot_filter_area_view_factor_sweep
       source_ref: robinot_2026_apparatus
       citation_id: robinot_2026
-      extraction_note: "Downstream filter is kept separate from condenser and window deposits."
-      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+      extraction_note: "Robinot Sec. 2.2 states a PORAL grade 03 316L porous filter sat between reactor and pump; filter area/view factor are not stated, so a 50 mm equivalent downstream filter is an assumption with sensitivity coverage."
   pump:
     pumping_speed_m3_s: null
     port_area_m2: null

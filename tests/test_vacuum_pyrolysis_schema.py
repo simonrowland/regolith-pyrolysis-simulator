@@ -19,6 +19,9 @@ ROBINOT_DURATION_H = pytest.approx(1.0)
 ROBINOT_PEAK_TEMPERATURE_C = pytest.approx(1800.0)
 ROBINOT_O2_RELEASED_MG = pytest.approx(35.0)
 ROBINOT_GLASSY_LUMP_G = pytest.approx(1.82)
+ROBINOT_TOTAL_CAPTURED_G = pytest.approx(1.1)
+ROBINOT_UNACCOUNTED_G = pytest.approx(0.27)
+ROBINOT_MASS_RECOVERY_PERCENT = pytest.approx(92.0)
 ROBINOT_CONFLICT_KG = {0.0011, 0.0013}
 NOT_REPORTED = "not_reported"
 ROBINOT_INTERPOLATION = "piecewise_linear"
@@ -312,6 +315,15 @@ def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -
     assert products["oxygen_released"]["reported_unit"] == "mg"
     assert products["glassy_lump_mass"]["reported_value"] == ROBINOT_GLASSY_LUMP_G
     assert products["glassy_lump_mass"]["reported_unit"] == "g"
+    assert products["total_vaporized_or_captured_mass"]["reported_value"] == ROBINOT_TOTAL_CAPTURED_G
+    assert products["total_vaporized_or_captured_mass"]["reported_unit"] == "g"
+    assert products["unaccounted_mass"]["reported_value"] == ROBINOT_UNACCOUNTED_G
+    assert products["unaccounted_mass"]["reported_unit"] == "g"
+    assert products["final_mass_recovery"]["reported_value"] == ROBINOT_MASS_RECOVERY_PERCENT
+    assert products["final_mass_recovery"]["reported_unit"] == "percent"
+
+    figure = measurement["figure_extraction"]["fig4c_per_location_mass_table"]
+    assert figure["extraction_status"] == "not_extractable_from_markdown"
 
     locations = {row["id"]: row for row in measurement["observed_locations"]}
     assert set(locations) == {"holder", "window", "condenser", "filter"}
@@ -338,11 +350,8 @@ def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -
         assert {row["measurement_type"] for row in composition.values()} == {"qualitative"}
         assert all(row["source"]["citation_id"] == "robinot_2026" for row in composition.values())
 
-    condenser_values = locations["condenser"]["quantitative_measurements"]
-    assert condenser_values[0]["reported_value"] == pytest.approx(1.1)
-    assert condenser_values[0]["reported_unit"] == "g"
-    assert condenser_values[0]["normalized_value_kg"] == pytest.approx(0.0011)
-    assert condenser_values[0]["source"]["digest"]
+    for location_id in locations:
+        assert locations[location_id]["quantitative_measurements"] == []
 
     conflict = measurement["conflicting_reported_values"][0]
     assert conflict["resolution"] == "unresolved_report_both"
