@@ -733,8 +733,18 @@ def _serialize_run_reference(run_reference: RunReference | None) -> dict[str, An
         "error_message": run_reference.error_message,
         "reason": run_reference.reason,
         "product_summary": _jsonable(run_reference.product_summary),
+        "backend_name": run_reference.backend_name,
         "backend_status": run_reference.backend_status,
         "backend_authoritative": run_reference.backend_authoritative,
+        "evidence_class": run_reference.evidence_class,
+        "cache_state": run_reference.cache_state,
+        "runtime_status": run_reference.runtime_status,
+        "label_source": run_reference.label_source,
+        "degradation_reason": run_reference.degradation_reason,
+        "degraded_from": list(run_reference.degraded_from),
+        "backend_real_active": run_reference.backend_real_active,
+        "certification_allowed": run_reference.certification_allowed,
+        "contributors": _jsonable(run_reference.contributors),
     }
 
 
@@ -750,12 +760,48 @@ def _deserialize_run_reference(
         reason=str(payload.get("reason", "")),
         trace=result_blob,
         product_summary=payload.get("product_summary", {}),
+        backend_name=(
+            str(payload["backend_name"])
+            if payload.get("backend_name") is not None
+            else None
+        ),
         backend_status=(
             str(payload["backend_status"])
             if payload.get("backend_status") is not None
             else None
         ),
         backend_authoritative=payload.get("backend_authoritative"),
+        evidence_class=(
+            str(payload["evidence_class"])
+            if payload.get("evidence_class") is not None
+            else None
+        ),
+        cache_state=(
+            str(payload["cache_state"])
+            if payload.get("cache_state") is not None
+            else None
+        ),
+        runtime_status=(
+            str(payload["runtime_status"])
+            if payload.get("runtime_status") is not None
+            else None
+        ),
+        label_source=(
+            str(payload["label_source"])
+            if payload.get("label_source") is not None
+            else None
+        ),
+        degradation_reason=(
+            str(payload["degradation_reason"])
+            if payload.get("degradation_reason") is not None
+            else None
+        ),
+        degraded_from=tuple(str(item) for item in payload.get("degraded_from", ())),
+        backend_real_active=payload.get("backend_real_active"),
+        certification_allowed=payload.get("certification_allowed"),
+        contributors=tuple(
+            dict(item) for item in payload.get("contributors", ())
+        ),
     )
 
 
@@ -776,6 +822,23 @@ def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
         trace["backend_status"] = run_reference.backend_status
     if run_reference.backend_authoritative is not None:
         trace["backend_authoritative"] = run_reference.backend_authoritative
+    for key in (
+        "backend_name",
+        "evidence_class",
+        "cache_state",
+        "runtime_status",
+        "label_source",
+        "degradation_reason",
+        "backend_real_active",
+        "certification_allowed",
+    ):
+        value = getattr(run_reference, key)
+        if value is not None:
+            trace[key] = value
+    if run_reference.degraded_from:
+        trace["degraded_from"] = list(run_reference.degraded_from)
+    if run_reference.contributors:
+        trace["contributors"] = _jsonable(run_reference.contributors)
     return trace
 
 

@@ -580,7 +580,15 @@
   "run_metadata": {
     "additives_kg": {},
     "backend": "stub",
+    "backend_authoritative": false,
+    "backend_real_active": false,
+    "backend_status": "unavailable",
     "campaign": "C0",
+    "certification_allowed": false,
+    "degradation_reason": "unavailable",
+    "degraded_from": [
+      "unavailable"
+    ],
     "engines_used": {
       "active": {
         "condensation_route": "builtin-condensation-route",
@@ -642,6 +650,7 @@
       },
       "requested": {}
     },
+    "evidence_class": "internal-analytical",
     "feedstock_id": "lunar_mare_low_ti",
     "hours_completed": 24,
     "hours_requested": 24,
@@ -703,7 +712,13 @@
       "viscous_flow_required": false,
       "warnings": []
     },
+    "label_source": "legacy_backend_alias:stub",
+    "label_sources": [
+      "legacy_backend_alias:stub",
+      "legacy_backend_authoritative"
+    ],
     "mass_kg": 1000.0,
+    "runtime_status": "unavailable",
     "schema_version": "1.3.0",
     "started_at_utc": "2026-05-15T00:00:00Z",
     "track": "pyrolysis"

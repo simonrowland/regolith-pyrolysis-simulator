@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import fields, replace
+import json
 import math
 import multiprocessing
 import queue
@@ -11,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
@@ -266,6 +268,39 @@ def test_not_run_backend_labels_round_trip(tmp_path) -> None:
         "backend_authoritative": False,
         "execution_status": "not_run",
     }
+
+
+def test_lookup_rejects_poisoned_run_reference_canonical_fields(tmp_path) -> None:
+    spec = _base_spec()
+    db_path = tmp_path / "results.sqlite"
+    store = ResultStore(
+        db_path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    store.store(spec, _scored(spec), created_at="2026-05-31T00:00:00Z")
+
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT run_reference FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
+        payload = json.loads(row[0])
+        payload.update(
+            {
+                "backend_name": "stub",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "certification_allowed": True,
+            }
+        )
+        conn.execute(
+            "UPDATE results SET run_reference = ? WHERE cache_key = ?",
+            (json.dumps(payload), cache_key(spec)),
+        )
+
+    with pytest.raises(FidelityVocabularyTranslationError, match="certification_allowed"):
+        store.lookup(spec)
 
 
 def test_composition_target_metric_and_evalspec_metadata_round_trip(tmp_path) -> None:

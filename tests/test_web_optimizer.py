@@ -21,6 +21,7 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import RunReference, ScoredResult, _build_eval_inputs
@@ -605,6 +606,12 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert run["latest_result"]["backend"]["backend_active"] == "StubBackend"
     assert run["latest_result"]["backend"]["backend_status"] == "unavailable"
     assert run["latest_result"]["backend"]["backend_authoritative"] is False
+    assert (
+        run["latest_result"]["backend"]["evidence_class"]
+        == "internal-analytical"
+    )
+    assert run["latest_result"]["backend"]["runtime_status"] == "unavailable"
+    assert run["latest_result"]["backend"]["certification_allowed"] is False
 
     leaderboard = client.get(
         "/api/optimizer/leaderboard"
@@ -655,6 +662,64 @@ def test_optimizer_reader_renders_not_run_backend_labels(client, tmp_path) -> No
     assert run["latest_result"]["backend"]["backend_active"] == "alphamelts"
     assert run["latest_result"]["backend"]["backend_status"] == "not_run"
     assert run["latest_result"]["backend"]["backend_authoritative"] is False
+    assert run["latest_result"]["backend"]["evidence_class"] == "melts"
+    assert run["latest_result"]["backend"]["runtime_status"] == "not_run"
+    assert run["latest_result"]["backend"]["backend_real_active"] is False
+    assert run["latest_result"]["backend"]["certification_allowed"] is True
+
+
+def test_optimizer_reader_replays_legacy_no_compared_results_status(client, tmp_path) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-legacy-no-compared"
+    run_dir.mkdir(parents=True)
+
+    spec = _base_spec(recipe_id="recipe-legacy-no-compared", backend_name="alphamelts")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-legacy-no-compared",
+            trace={
+                "backend_status": "no_compared_results",
+                "backend_authoritative": False,
+                "execution_status": "no_compared_results",
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200
+    run = response.get_json()["runs"][0]
+    assert run["latest_result"]["candidate_id"] == "candidate-legacy-no-compared"
+    assert run["latest_result"]["backend"]["backend_status"] == "no_compared_results"
+    assert run["latest_result"]["backend"]["runtime_status"] == "not_run"
+    assert run["latest_result"]["backend"]["degradation_reason"] == "not_run"
+    assert run["latest_result"]["backend"]["backend_authoritative"] is False
+
+
+def test_optimizer_backend_payload_unknown_status_fails_closed() -> None:
+    with pytest.raises(UnknownFidelityVocabularyTokenError):
+        web_routes._optimizer_backend_payload(
+            {"backend_name": "alphamelts"},
+            {"backend_status": "opaque-status"},
+            {},
+        )
+
+
+def test_optimizer_backend_payload_diagnostic_stub_does_not_masquerade_as_real() -> None:
+    payload = web_routes._optimizer_backend_payload(
+        {"backend_name": "alphamelts"},
+        {"backend_status": "diagnostic_stub"},
+        {},
+    )
+
+    assert payload["backend_requested"] == "alphamelts"
+    assert payload["backend_active"] == "StubBackend"
+    assert payload["evidence_class"] == "internal-analytical"
+    assert payload["certification_allowed"] is False
 
 
 def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:

@@ -83,6 +83,13 @@ RUN_METADATA_KEYS = frozenset({
     "additives_kg",
     "track",
     "backend",
+    "backend_status",
+    "backend_authoritative",
+    "backend_real_active",
+    "evidence_class",
+    "runtime_status",
+    "label_source",
+    "certification_allowed",
     "started_at_utc",
     "engines_used",
     "kernel_commit_sha",
@@ -319,6 +326,11 @@ def _assert_schema_shape(payload: dict) -> None:
         f"run_metadata missing keys: "
         f"{RUN_METADATA_KEYS - set(payload['run_metadata'])}"
     )
+    metadata = payload["run_metadata"]
+    assert metadata["evidence_class"] == "internal-analytical"
+    assert metadata["runtime_status"] in {"ok", "unavailable", "out_of_domain"}
+    assert metadata["backend_real_active"] is metadata["backend_authoritative"]
+    assert metadata["certification_allowed"] is False
     engines_used = payload["run_metadata"]["engines_used"]
     assert isinstance(engines_used, dict)
     assert "active" in engines_used

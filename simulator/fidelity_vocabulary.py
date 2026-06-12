@@ -43,6 +43,7 @@ class RuntimeStatus(str, Enum):
     OK = "ok"
     UNAVAILABLE = "unavailable"
     OUT_OF_DOMAIN = "out_of_domain"
+    NOT_RUN = "not_run"
 
 
 class LabelSource(str, Enum):
@@ -72,6 +73,7 @@ class DegradationReason(str, Enum):
     MISSING = "missing"
     UNAVAILABLE = "unavailable"
     OUT_OF_DOMAIN = "out_of_domain"
+    NOT_RUN = "not_run"
 
 
 CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
@@ -111,6 +113,8 @@ LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
                 "ok",
                 "unavailable",
                 "out_of_domain",
+                "not_run",
+                "no_compared_results",
             }
         ),
         "legacy runtime field": frozenset({"backend_authoritative"}),
@@ -262,6 +266,14 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
             runtime_status=RuntimeStatus.OUT_OF_DOMAIN.value,
             degradation_reason=DegradationReason.OUT_OF_DOMAIN.value,
         ),
+        ("backend/status alias", "not_run"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.NOT_RUN.value,
+            degradation_reason=DegradationReason.NOT_RUN.value,
+        ),
+        ("backend/status alias", "no_compared_results"): CanonicalFidelityMapping(
+            runtime_status=RuntimeStatus.NOT_RUN.value,
+            degradation_reason=DegradationReason.NOT_RUN.value,
+        ),
     }
 )
 
@@ -328,12 +340,139 @@ def may_certify(
     return _evidence_class_value(evidence_class) not in CERTIFICATION_DENYLIST
 
 
+def canonicalize_fidelity_emission(
+    *,
+    backend_name: object | None = None,
+    backend_status: object | None = None,
+    backend_authoritative: object | None = None,
+    reduced_real_cache_state: object | None = None,
+    evidence_class: object | None = None,
+    inherited_evidence_class: str | EvidenceClass | None = None,
+    contributors: Sequence[str] | None = None,
+    artifact_digest: str | None = None,
+    migration_chunk: str = "chunk-1b",
+    certification_shape: bool = False,
+) -> dict[str, Any]:
+    """Return additive canonical trust fields for an emitted payload."""
+
+    data: dict[str, Any] = {}
+    label_sources: list[str] = []
+    degraded_from: list[str] = []
+    contributor_payloads: list[dict[str, Any]] = []
+
+    def merge(mapping: CanonicalFidelityMapping) -> None:
+        _merge_scalar(data, CanonicalDimension.EVIDENCE_CLASS.value, mapping.evidence_class)
+        _merge_scalar(data, CanonicalDimension.CACHE_STATE.value, mapping.cache_state)
+        _merge_scalar(data, CanonicalDimension.RUNTIME_STATUS.value, mapping.runtime_status)
+        if mapping.label_source is not None:
+            label_sources.append(mapping.label_source)
+        if mapping.degradation_reason is not None:
+            degraded_from.append(mapping.degradation_reason)
+            data.setdefault(
+                CanonicalDimension.DEGRADATION_REASON.value,
+                mapping.degradation_reason,
+            )
+        if mapping.backend_real_active is not None:
+            _merge_scalar(data, "backend_real_active", mapping.backend_real_active)
+        if mapping.requires_inherited_evidence_class:
+            data["requires_inherited_evidence_class"] = True
+        if mapping.contributors:
+            contributor_payloads.extend(
+                contributor.as_dict() for contributor in mapping.contributors
+            )
+
+    if backend_name is not None:
+        merge(
+            translate_legacy_token(
+                "backend/status alias",
+                backend_name,
+                artifact_digest=artifact_digest,
+                migration_chunk=migration_chunk,
+                inherited_evidence_class=inherited_evidence_class,
+                contributors=contributors,
+            )
+        )
+    if backend_status is not None:
+        merge(
+            translate_legacy_token(
+                "backend/status alias",
+                backend_status,
+                artifact_digest=artifact_digest,
+                migration_chunk=migration_chunk,
+                inherited_evidence_class=inherited_evidence_class,
+                contributors=contributors,
+            )
+        )
+    if backend_authoritative is not None:
+        merge(
+            translate_legacy_token(
+                "legacy runtime field",
+                "backend_authoritative",
+                artifact_digest=artifact_digest,
+                migration_chunk=migration_chunk,
+                value=backend_authoritative,
+            )
+        )
+    if reduced_real_cache_state is not None:
+        merge(
+            translate_legacy_token(
+                "reduced_real_cache_state",
+                reduced_real_cache_state,
+                artifact_digest=artifact_digest,
+                migration_chunk=migration_chunk,
+            )
+        )
+    if evidence_class is not None:
+        _merge_scalar(
+            data,
+            CanonicalDimension.EVIDENCE_CLASS.value,
+            _evidence_class_value(evidence_class),
+        )
+
+    if label_sources:
+        data[CanonicalDimension.LABEL_SOURCE.value] = label_sources[0]
+        if len(label_sources) > 1:
+            data["label_sources"] = list(label_sources)
+    if degraded_from:
+        data["degraded_from"] = list(dict.fromkeys(degraded_from))
+    if contributor_payloads:
+        data["contributors"] = list(contributor_payloads)
+
+    emitted_evidence_class = data.get(CanonicalDimension.EVIDENCE_CLASS.value)
+    if emitted_evidence_class is not None:
+        allowed = may_certify(str(emitted_evidence_class))
+        data["certification_allowed"] = allowed
+        if certification_shape and not allowed:
+            raise FidelityVocabularyTranslationError(
+                "certification emission refused for denylisted evidence_class="
+                f"{emitted_evidence_class!r}"
+            )
+    elif certification_shape:
+        raise FidelityVocabularyTranslationError(
+            "certification emission requires canonical evidence_class"
+        )
+    return data
+
+
 def legacy_backend_alias_for_evidence_class(
     evidence_class: str | EvidenceClass,
 ) -> str | None:
     return LEGACY_EVIDENCE_CLASS_SERIALIZATION_ALIASES.get(
         _evidence_class_value(evidence_class)
     )
+
+
+def _merge_scalar(data: dict[str, Any], key: str, value: Any) -> None:
+    if value is None:
+        return
+    existing = data.get(key)
+    if existing is None:
+        data[key] = value
+        return
+    if existing != value:
+        raise FidelityVocabularyTranslationError(
+            f"conflicting canonical fidelity field {key}: {existing!r} vs {value!r}"
+        )
 
 
 def _normalize_family(

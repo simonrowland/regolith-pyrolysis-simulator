@@ -24,6 +24,12 @@ from simulator.optimize.doe import (
 )
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import ObjectiveValue
+from simulator.fidelity_vocabulary import (
+    CANONICAL_EVIDENCE_CLASSES,
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+    translate_legacy_token,
+)
 
 EvaluateFn = Callable[..., ScoredResult]
 EvalOutcome = tuple[ScoredResult | None, Mapping[str, Any] | None]
@@ -503,6 +509,10 @@ def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
 
 
 def _task_backend_name(task: _FidelityTask) -> str:
+    return str(_task_run_options(task).get("backend_name", "stub") or "stub")
+
+
+def _task_run_options(task: _FidelityTask) -> dict[str, Any]:
     merged: dict[str, Any] = {}
     profile = task.profile
     run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
@@ -513,7 +523,7 @@ def _task_backend_name(task: _FidelityTask) -> str:
         selected = fidelities.get(task.fidelity, {})
         if isinstance(selected, Mapping):
             merged.update(selected)
-    return str(merged.get("backend_name", "stub") or "stub")
+    return merged
 
 
 def _arm_backend_authority(
@@ -543,7 +553,7 @@ def _arm_backend_authority(
         backend_status = "diagnostic_stub"
         authoritative = False
     elif not results:
-        backend_status = "no_compared_results"
+        backend_status = "not_run"
         authoritative = False
     elif missing_statuses:
         backend_status = "missing"
@@ -554,13 +564,86 @@ def _arm_backend_authority(
     else:
         backend_status = "mixed:" + ",".join(sorted(set(present_statuses)))
         authoritative = False
+    inherited_evidence_class = (
+        _arm_inherited_evidence_class(tasks, results)
+        if backend_name == "cached-real"
+        else None
+    )
+    if backend_name == "cached-real" and authoritative and inherited_evidence_class is None:
+        authoritative = False
+    canonical = canonicalize_fidelity_emission(
+        backend_name=backend_name,
+        backend_status=backend_status,
+        backend_authoritative=authoritative,
+        contributors=ordered_names,
+        inherited_evidence_class=inherited_evidence_class,
+        certification_shape=authoritative and not (
+            backend_name == "cached-real" and inherited_evidence_class is None
+        ),
+    )
     return {
         "tier": tier,
         "fidelity_name": fidelity_name,
         "backend_name": backend_name,
         "backend_status": backend_status,
         "authoritative": authoritative,
+        **canonical,
     }
+
+
+def _arm_inherited_evidence_class(
+    tasks: Sequence[_FidelityTask],
+    results: Sequence[ScoredResult],
+) -> str | None:
+    for result in results:
+        token = _result_inherited_evidence_token(result)
+        if token is not None:
+            return _inherited_evidence_class_from_token(token)
+    for task in tasks:
+        cache_config = _task_run_options(task).get("reduced_real_cache")
+        if isinstance(cache_config, Mapping):
+            token = cache_config.get("authorized_backend_name")
+            if token is not None:
+                return _inherited_evidence_class_from_token(token)
+    return None
+
+
+def _result_inherited_evidence_token(result: ScoredResult) -> object | None:
+    ref = getattr(result, "run_reference", None)
+    carriers = (
+        ref,
+        getattr(ref, "trace", None),
+        getattr(result, "eval_spec", None),
+    )
+    for carrier in carriers:
+        token = _carrier_value(carrier, "evidence_class")
+        if token is not None:
+            return token
+        cache_config = _carrier_value(carrier, "reduced_real_cache")
+        if isinstance(cache_config, Mapping):
+            token = cache_config.get("authorized_backend_name")
+            if token is not None:
+                return token
+    return None
+
+
+def _carrier_value(carrier: Any, key: str) -> Any:
+    if carrier is None:
+        return None
+    if isinstance(carrier, Mapping):
+        return carrier.get(key)
+    return getattr(carrier, key, None)
+
+
+def _inherited_evidence_class_from_token(token: object) -> str:
+    value = str(token).strip()
+    if value in CANONICAL_EVIDENCE_CLASSES:
+        return value
+    try:
+        mapped = translate_legacy_token("backend/status alias", value)
+    except FidelityVocabularyTranslationError:
+        return value
+    return mapped.evidence_class or value
 
 
 def _result_backend_status(result: ScoredResult) -> str | None:
@@ -782,6 +865,13 @@ def _high_arm_authority_reason(backend_arms: Mapping[str, Mapping[str, Any]]) ->
         if fast_backend == "stub":
             return STUB_DIAGNOSTIC_REASON
         return "high arm stub diagnostic, not authoritative"
+    if high.get("evidence_class") is not None and not high.get(
+        "certification_allowed", False
+    ):
+        return (
+            "high arm evidence_class="
+            f"{high.get('evidence_class')!r}, not certifiable"
+        )
     if not bool(high.get("authoritative", False)):
         status = str(high.get("backend_status", "missing") or "missing")
         return f"high arm backend_status={status!r}, not authoritative"

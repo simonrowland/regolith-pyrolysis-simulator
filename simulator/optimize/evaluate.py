@@ -34,6 +34,10 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+)
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveVector,
@@ -74,6 +78,15 @@ KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 SYNTHETIC_BACKEND_NOT_RUN = "not_run"
+_RUN_REFERENCE_CANONICAL_FIELDS = (
+    "evidence_class",
+    "cache_state",
+    "runtime_status",
+    "label_source",
+    "degradation_reason",
+    "backend_real_active",
+    "certification_allowed",
+)
 
 
 class FailureCategory(str, Enum):
@@ -108,8 +121,18 @@ class RunReference:
     reason: str = ""
     trace: Any = field(default=None, compare=False, repr=False)
     product_summary: Mapping[str, Any] = field(default_factory=dict)
+    backend_name: str | None = None
     backend_status: str | None = None
     backend_authoritative: bool | None = None
+    evidence_class: str | None = None
+    cache_state: str | None = None
+    runtime_status: str | None = None
+    label_source: str | None = None
+    degradation_reason: str | None = None
+    degraded_from: tuple[str, ...] = ()
+    backend_real_active: bool | None = None
+    certification_allowed: bool | None = None
+    contributors: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -129,6 +152,13 @@ class RunReference:
                     "backend_authoritative",
                     backend_authoritative,
                 )
+        canonical = canonicalize_fidelity_emission(
+            backend_name=self.backend_name or _carrier_value(self.trace, "backend_name"),
+            backend_status=self.backend_status,
+            backend_authoritative=self.backend_authoritative,
+            evidence_class=self.evidence_class or _carrier_value(self.trace, "evidence_class"),
+        )
+        _apply_run_reference_canonical_fields(self, canonical)
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
@@ -139,10 +169,83 @@ class RunReference:
                 self.reason,
                 _thaw_value(self.trace),
                 _thaw_value(self.product_summary),
+                self.backend_name,
                 self.backend_status,
                 self.backend_authoritative,
+                self.evidence_class,
+                self.cache_state,
+                self.runtime_status,
+                self.label_source,
+                self.degradation_reason,
+                self.degraded_from,
+                self.backend_real_active,
+                self.certification_allowed,
+                self.contributors,
             ),
         )
+
+
+def _apply_run_reference_canonical_fields(
+    reference: RunReference,
+    canonical: Mapping[str, Any],
+) -> None:
+    for key in _RUN_REFERENCE_CANONICAL_FIELDS:
+        current = getattr(reference, key)
+        if key in canonical:
+            value = canonical[key]
+            if current is None:
+                object.__setattr__(reference, key, value)
+            elif current != value:
+                _raise_run_reference_canonical_conflict(key, current, value)
+        elif current is not None:
+            _raise_run_reference_canonical_conflict(key, current, None)
+
+    expected_degraded_from = tuple(
+        str(item) for item in canonical.get("degraded_from", ())
+    )
+    if reference.degraded_from:
+        current_degraded_from = tuple(str(item) for item in reference.degraded_from)
+        if current_degraded_from != expected_degraded_from:
+            _raise_run_reference_canonical_conflict(
+                "degraded_from",
+                current_degraded_from,
+                expected_degraded_from,
+            )
+        object.__setattr__(reference, "degraded_from", current_degraded_from)
+    elif expected_degraded_from:
+        object.__setattr__(reference, "degraded_from", expected_degraded_from)
+
+    expected_contributors = tuple(
+        MappingProxyType(dict(item)) for item in canonical.get("contributors", ())
+    )
+    if reference.contributors:
+        current_contributors = tuple(dict(item) for item in reference.contributors)
+        expected_plain = tuple(dict(item) for item in expected_contributors)
+        if current_contributors != expected_plain:
+            _raise_run_reference_canonical_conflict(
+                "contributors",
+                current_contributors,
+                expected_plain,
+            )
+        object.__setattr__(
+            reference,
+            "contributors",
+            tuple(MappingProxyType(dict(item)) for item in reference.contributors),
+        )
+    elif expected_contributors:
+        object.__setattr__(reference, "contributors", expected_contributors)
+
+
+def _raise_run_reference_canonical_conflict(
+    key: str,
+    current: object,
+    expected: object,
+) -> None:
+    raise FidelityVocabularyTranslationError(
+        "stored run_reference canonical trust field "
+        f"{key!r} conflicts with vocabulary-derived value: "
+        f"{current!r} vs {expected!r}"
+    )
 
 
 @dataclass(frozen=True)
@@ -2579,6 +2682,7 @@ def _non_finite_payload_result(
             error_message=error_message,
             reason="non_finite_payload",
             trace=_synthetic_not_run_trace(),
+            backend_name=None,
             backend_status=SYNTHETIC_BACKEND_NOT_RUN,
             backend_authoritative=False,
         )
@@ -2654,6 +2758,7 @@ def _invalid_recipe_result(
             error_message=error_message,
             reason="invalid_recipe",
             trace=_synthetic_not_run_trace(),
+            backend_name=None,
             backend_status=SYNTHETIC_BACKEND_NOT_RUN,
             backend_authoritative=False,
         )
@@ -2717,6 +2822,7 @@ def _zero_input_basis_result(
             error_message=error_message,
             reason=ZERO_INPUT_BASIS_BREACH,
             trace=_synthetic_not_run_trace(),
+            backend_name=None,
             backend_status=SYNTHETIC_BACKEND_NOT_RUN,
             backend_authoritative=False,
         ),
@@ -2725,11 +2831,18 @@ def _zero_input_basis_result(
 
 
 def _synthetic_not_run_trace() -> dict[str, Any]:
-    return {
+    payload = {
         "backend_status": SYNTHETIC_BACKEND_NOT_RUN,
         "backend_authoritative": False,
         "execution_status": SYNTHETIC_BACKEND_NOT_RUN,
     }
+    payload.update(
+        canonicalize_fidelity_emission(
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
+        )
+    )
+    return payload
 
 
 def _zero_input_basis_margin(observed_kg: float | None) -> GateMargin:
@@ -2773,6 +2886,7 @@ def _run_reference(
         reason=str(getattr(run_execution, "reason", "")),
         trace=_cache_trace_payload(run_execution, trace_payload),
         product_summary=summary,
+        backend_name=_run_reference_backend_name(run_execution),
         backend_status=_latest_backend_status(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
@@ -2785,6 +2899,13 @@ def _cache_trace_payload(
     payload: dict[str, Any] = {}
     if isinstance(trace_payload, Mapping):
         payload.update(dict(trace_payload))
+
+    payload.update(
+        _canonical_backend_trace_fields(
+            run_execution,
+            backend_name=_run_reference_backend_name(run_execution),
+        )
+    )
 
     reduced_real_cache = getattr(run_execution, "reduced_real_cache", None)
     if isinstance(reduced_real_cache, Mapping) and reduced_real_cache:
@@ -2809,6 +2930,9 @@ def _cache_trace_payload(
                 "campaign": entry.get("campaign"),
                 "T_C": entry.get("T_C"),
                 "reduced_real_cache_state": str(cache_state),
+                **canonicalize_fidelity_emission(
+                    reduced_real_cache_state=cache_state,
+                ),
             }
         )
     if per_hour_cache:
@@ -2819,6 +2943,30 @@ def _cache_trace_payload(
     if payload:
         return MappingProxyType(payload)
     return getattr(run_execution, "trace", None)
+
+
+def _run_reference_backend_name(run_execution: Any) -> str | None:
+    session = getattr(run_execution, "session", None)
+    config = getattr(session, "_config", None)
+    raw = getattr(config, "backend_name", None)
+    return str(raw) if raw else None
+
+
+def _canonical_backend_trace_fields(
+    run_execution: Any,
+    *,
+    backend_name: str | None,
+) -> dict[str, Any]:
+    backend_status = _latest_backend_status(run_execution)
+    backend_authoritative = _backend_authoritative(run_execution)
+    payload = canonicalize_fidelity_emission(
+        backend_name=backend_name,
+        backend_status=backend_status,
+        backend_authoritative=backend_authoritative,
+    )
+    if backend_name is not None:
+        payload["backend_name"] = backend_name
+    return payload
 
 
 def _abort_on_non_authoritative_backend_status(

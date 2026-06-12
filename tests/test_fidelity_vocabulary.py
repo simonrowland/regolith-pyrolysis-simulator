@@ -10,6 +10,7 @@ from simulator.fidelity_vocabulary import (
     EvidenceClass,
     FidelityVocabularyTranslationError,
     UnknownFidelityVocabularyTokenError,
+    canonicalize_fidelity_emission,
     legacy_backend_alias_for_evidence_class,
     may_certify,
     translate_legacy_token,
@@ -41,6 +42,8 @@ EXPECTED_LEGACY_TOKENS = {
         "ok",
         "unavailable",
         "out_of_domain",
+        "not_run",
+        "no_compared_results",
     },
     "legacy runtime field": {"backend_authoritative"},
 }
@@ -159,6 +162,22 @@ EXPECTED_LEGACY_TOKENS = {
                 "degradation_reason": "out_of_domain",
             },
         ),
+        (
+            "backend/status alias",
+            "not_run",
+            {
+                "runtime_status": "not_run",
+                "degradation_reason": "not_run",
+            },
+        ),
+        (
+            "backend/status alias",
+            "no_compared_results",
+            {
+                "runtime_status": "not_run",
+                "degradation_reason": "not_run",
+            },
+        ),
     ],
 )
 def test_design_table_simple_rows_translate(family: str, token: str, expected: dict[str, str]) -> None:
@@ -179,7 +198,7 @@ def test_design_token_inventory_is_pinned_to_spec_table() -> None:
     assert {
         family: set(tokens) for family, tokens in LEGACY_VOCABULARY_TOKENS.items()
     } == EXPECTED_LEGACY_TOKENS
-    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 22
+    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 24
 
 
 def test_auto_requires_and_decomposes_selected_backend() -> None:
@@ -372,3 +391,39 @@ def test_stub_alias_round_trips_to_internal_analytical() -> None:
         legacy_backend_alias_for_evidence_class(result.evidence_class)
         == "stub"
     )
+
+
+def test_canonical_emission_combines_backend_status_and_runtime_flag() -> None:
+    payload = canonicalize_fidelity_emission(
+        backend_name="alphamelts",
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+
+    assert payload["evidence_class"] == "melts"
+    assert payload["runtime_status"] == "ok"
+    assert payload["backend_real_active"] is True
+    assert payload["certification_allowed"] is True
+    assert payload["label_source"] == "backend_alias:alphamelts"
+
+
+def test_canonical_emission_preserves_not_run_honesty() -> None:
+    payload = canonicalize_fidelity_emission(
+        backend_status="not_run",
+        backend_authoritative=False,
+    )
+
+    assert payload["runtime_status"] == "not_run"
+    assert payload["backend_real_active"] is False
+    assert payload["degradation_reason"] == "not_run"
+    assert payload["degraded_from"] == ["not_run"]
+
+
+def test_canonical_emission_refuses_denylisted_certification_shape() -> None:
+    with pytest.raises(FidelityVocabularyTranslationError):
+        canonicalize_fidelity_emission(
+            backend_name="stub",
+            backend_status="ok",
+            backend_authoritative=True,
+            certification_shape=True,
+        )

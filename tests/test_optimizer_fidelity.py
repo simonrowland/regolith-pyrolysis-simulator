@@ -195,6 +195,27 @@ def _authoritative_mixed_perfect_high(
     )
 
 
+def _authoritative_cached_real_fast(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+) -> ScoredResult:
+    del patch, feedstock_id, fidelity, profile
+    index = _index(candidate_id)
+    value = float(index // 2)
+    return _result(
+        candidate_id,
+        oxygen_kg=value,
+        energy_kwh=100.0 - value,
+        feasible=index < 6,
+        backend_name="cached-real",
+        backend_status="ok",
+    )
+
+
 def _authoritative_high_missing_energy_objective(
     patch: RecipePatch,
     feedstock_id: str,
@@ -337,20 +358,44 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is False
     assert payload["reason"] == "stub-vs-stub diagnostic, not authoritative"
-    assert payload["backend_arms"]["fast"] == {
+    assert {
+        key: payload["backend_arms"]["fast"][key]
+        for key in (
+            "tier",
+            "fidelity_name",
+            "backend_name",
+            "backend_status",
+            "authoritative",
+        )
+    } == {
         "tier": "fast",
         "fidelity_name": "fast",
         "backend_name": "stub",
         "backend_status": "diagnostic_stub",
         "authoritative": False,
     }
-    assert payload["backend_arms"]["high"] == {
+    assert payload["backend_arms"]["fast"]["evidence_class"] == "internal-analytical"
+    assert payload["backend_arms"]["fast"]["degradation_reason"] == "diagnostic_only"
+    assert payload["backend_arms"]["fast"]["certification_allowed"] is False
+    assert {
+        key: payload["backend_arms"]["high"][key]
+        for key in (
+            "tier",
+            "fidelity_name",
+            "backend_name",
+            "backend_status",
+            "authoritative",
+        )
+    } == {
         "tier": "high",
         "fidelity_name": "high",
         "backend_name": "stub",
         "backend_status": "diagnostic_stub",
         "authoritative": False,
     }
+    assert payload["backend_arms"]["high"]["evidence_class"] == "internal-analytical"
+    assert payload["backend_arms"]["high"]["degradation_reason"] == "diagnostic_only"
+    assert payload["backend_arms"]["high"]["certification_allowed"] is False
 
 
 def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
@@ -386,6 +431,9 @@ def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
     assert payload["backend_arms"]["high"]["backend_name"] == "alphamelts"
     assert payload["backend_arms"]["high"]["backend_status"] == "ok"
     assert payload["backend_arms"]["high"]["authoritative"] is True
+    assert payload["backend_arms"]["high"]["evidence_class"] == "melts"
+    assert payload["backend_arms"]["high"]["runtime_status"] == "ok"
+    assert payload["backend_arms"]["high"]["certification_allowed"] is True
     assert payload["top_k_recall"]["3"] == 1.0
     assert Path(result.artifact_paths["markdown"]).read_text().startswith(
         "# Fidelity Correlation Report"
@@ -396,6 +444,88 @@ def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
         json.loads(json.dumps(result.to_dict())), schema=_schema()
     )
     assert restored.to_dict() == result.to_dict()
+
+
+def test_cached_real_all_ok_arm_inherits_cache_authority_and_writes_artifacts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    cache_config = {
+        "db_path": str(tmp_path / "pt1-cache.db"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_version": "test-version",
+    }
+
+    result = run_fidelity_correlation(
+        _doe(),
+        _authoritative_cached_real_fast,
+        _authoritative_mixed_perfect_high,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={
+            "fidelities": {
+                "fast": {
+                    "backend_name": "cached-real",
+                    "hours": 1,
+                    "reduced_real_cache": cache_config,
+                },
+                "high": {"backend_name": "alphamelts", "hours": 1},
+            }
+        },
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path,
+    )
+
+    assert result.fast_screen_trustworthy is True
+    payload = json.loads(Path(result.artifact_paths["json"]).read_text())
+    fast = payload["backend_arms"]["fast"]
+    assert fast["backend_name"] == "cached-real"
+    assert fast["backend_status"] == "ok"
+    assert fast["authoritative"] is True
+    assert fast["cache_state"] == "cached_real"
+    assert fast["evidence_class"] == "melts"
+    assert fast["runtime_status"] == "ok"
+    assert fast["label_source"] == "cached-real"
+    assert fast["certification_allowed"] is True
+    assert "requires_inherited_evidence_class" not in fast
+
+
+def test_cached_real_all_ok_arm_without_inherited_evidence_degrades_without_crash(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+
+    result = run_fidelity_correlation(
+        _doe(),
+        _authoritative_cached_real_fast,
+        _authoritative_mixed_perfect_high,
+        top_k=(3,),
+        per_eval_timeout_s=2.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={
+            "fidelities": {
+                "fast": {"backend_name": "cached-real", "hours": 1},
+                "high": {"backend_name": "alphamelts", "hours": 1},
+            }
+        },
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path,
+    )
+
+    payload = json.loads(Path(result.artifact_paths["json"]).read_text())
+    fast = payload["backend_arms"]["fast"]
+    assert fast["backend_name"] == "cached-real"
+    assert fast["backend_status"] == "ok"
+    assert fast["authoritative"] is False
+    assert fast["cache_state"] == "cached_real"
+    assert fast["runtime_status"] == "ok"
+    assert fast["requires_inherited_evidence_class"] is True
+    assert "evidence_class" not in fast
+    assert "certification_allowed" not in fast
 
 
 def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metric(

@@ -16,6 +16,10 @@ from simulator.chemistry.kernel import (
     ProposalRejected,
     ProviderRegistry,
 )
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    UnknownFidelityVocabularyTokenError,
+)
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.optimize.evaluate import (
@@ -384,6 +388,9 @@ def _assert_synthetic_not_run_reference(run_reference: object | None) -> None:
     assert trace["backend_status"] == "not_run"
     assert trace["backend_authoritative"] is False
     assert trace["execution_status"] == "not_run"
+    assert trace["runtime_status"] == "not_run"
+    assert trace["backend_real_active"] is False
+    assert trace["degradation_reason"] == "not_run"
 
 
 def _inventory_overdraw_fixture(*, overdraw_kg: float | None):
@@ -2499,3 +2506,58 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
     assert result.eval_spec.backend_name == "cached-real"
     assert executor.config.backend_name == "cached-real"
     assert executor.config.reduced_real_cache == cache_config
+
+
+def test_run_reference_derives_real_engine_canonical_class() -> None:
+    reference = evaluate_module.RunReference(
+        status="ok",
+        trace={"backend_status": "ok", "backend_authoritative": True},
+        backend_name="alphamelts",
+    )
+
+    assert reference.backend_status == "ok"
+    assert reference.evidence_class == "melts"
+    assert reference.runtime_status == "ok"
+    assert reference.backend_real_active is True
+    assert reference.certification_allowed is True
+
+
+def test_run_reference_migrates_legacy_no_compared_results_status() -> None:
+    reference = evaluate_module.RunReference(
+        status="ok",
+        trace={"backend_status": "no_compared_results"},
+    )
+
+    assert reference.backend_status == "no_compared_results"
+    assert reference.runtime_status == "not_run"
+    assert reference.degradation_reason == "not_run"
+    assert reference.degraded_from == ("not_run",)
+
+
+def test_run_reference_refuses_spoofed_stub_certification() -> None:
+    with pytest.raises(FidelityVocabularyTranslationError):
+        evaluate_module.RunReference(
+            status="ok",
+            backend_name="stub",
+            backend_status="ok",
+            backend_authoritative=True,
+            certification_allowed=True,
+        )
+
+
+def test_run_reference_refuses_conflicting_runtime_status() -> None:
+    with pytest.raises(FidelityVocabularyTranslationError):
+        evaluate_module.RunReference(
+            status="ok",
+            backend_name="alphamelts",
+            backend_status="ok",
+            runtime_status="not_run",
+        )
+
+
+def test_run_reference_unknown_backend_status_fails_closed() -> None:
+    with pytest.raises(UnknownFidelityVocabularyTokenError):
+        evaluate_module.RunReference(
+            status="failed",
+            trace={"backend_status": "opaque-status"},
+        )

@@ -47,6 +47,7 @@ from simulator.backends import (
     BackendSelectionPolicy,
 )
 from simulator.config import ConfigBundle, load_config_bundle
+from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager
 from simulator.core import (
     CampaignPhase,
@@ -615,6 +616,19 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        run_metadata.update(
+            {
+                "backend_status": str(execution.backend_status),
+                "backend_authoritative": bool(execution.backend_authoritative),
+            }
+        )
+        run_metadata.update(
+            canonicalize_fidelity_emission(
+                backend_name=self.backend_name,
+                backend_status=execution.backend_status,
+                backend_authoritative=execution.backend_authoritative,
+            )
+        )
 
         final_state = _final_state_from_ledger(sim)
         knudsen_diagnostic = dict(

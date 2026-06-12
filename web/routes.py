@@ -22,6 +22,7 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.mre_ladder import (
     filter_steps_up_to_max_v,
     parse_ladder_from_setpoints,
@@ -301,26 +302,61 @@ def _latest_backend_status(carrier: Any) -> str | None:
     return str(raw) if raw is not None else None
 
 
+def _optional_bool(value: Any) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    return bool(value)
+
+
 def _optimizer_backend_payload(
     eval_spec: Mapping[str, Any],
     result_blob: Mapping[str, Any],
     run_reference: Mapping[str, Any],
 ) -> dict[str, Any]:
-    requested = str(eval_spec.get('backend_name') or 'not declared')
+    raw_requested = eval_spec.get('backend_name') or run_reference.get('backend_name')
+    requested = str(raw_requested) if raw_requested else 'not declared'
     stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
     if stored_status is None:
         stored_status = 'unavailable'
     stubish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
     backend_status = 'unavailable' if stubish else stored_status
+    canonical_backend_name = (
+        'diagnostic_stub'
+        if stored_status == 'diagnostic_stub'
+        else str(raw_requested) if raw_requested else None
+    )
+    backend_authoritative = _optional_bool(
+        run_reference.get('backend_real_active')
+        if run_reference.get('backend_real_active') is not None
+        else run_reference.get('backend_authoritative')
+    )
+    if backend_authoritative is None:
+        backend_authoritative = backend_status == 'ok' and not stubish
+    canonical = canonicalize_fidelity_emission(
+        backend_name=canonical_backend_name,
+        backend_status=backend_status,
+        backend_authoritative=backend_authoritative,
+        evidence_class=(
+            run_reference.get('evidence_class')
+            or result_blob.get('evidence_class')
+        ),
+    )
+    authoritative = bool(canonical.get('backend_real_active')) and bool(
+        canonical.get('certification_allowed', False)
+    )
     resolution = BackendResolutionStatus(
         requested_backend=requested,
         active_backend='StubBackend' if stubish else requested,
         backend_status=backend_status,
-        authoritative=backend_status == 'ok' and not stubish,
+        authoritative=authoritative,
         selection_policy='stored-result',
         message='stored optimizer backend status',
     )
-    return backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
+    payload = backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
+    payload.update(canonical)
+    return payload
 
 
 def _result_metadata(
