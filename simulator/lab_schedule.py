@@ -22,6 +22,7 @@ LAB_SCHEDULE_PO2_SETPOINT_KEY = "lab_schedule_pO2_setpoint_mbar"
 LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
 ASSUMED_WITH_SENSITIVITY = "assumption_with_sensitivity_marker"
 SUPPORTED_INTERPOLATION = "piecewise_linear"
+DEFAULT_LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = "not_reported"
 LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
     {
         "hot",
@@ -138,7 +139,14 @@ def interpolate_schedule_points(
         raise LabScheduleValidationError("lab_schedule_points_empty")
     t = float(t_h)
     first = points[0]
-    if t <= float(first["t_h"]):
+    first_t = float(first["t_h"])
+    if not math.isfinite(t):
+        raise LabScheduleValidationError("lab_schedule_sample_time_not_finite")
+    if t < first_t - 1.0e-12:
+        raise LabScheduleValidationError(
+            "lab_schedule_sample_time_outside_declared_window"
+        )
+    if t <= first_t:
         return float(first["value"])
     for left, right in zip(points, points[1:]):
         left_t = float(left["t_h"])
@@ -151,7 +159,9 @@ def interpolate_schedule_points(
             return float(left["value"]) + frac * (
                 float(right["value"]) - float(left["value"])
             )
-    return float(points[-1]["value"])
+    raise LabScheduleValidationError(
+        "lab_schedule_sample_time_outside_declared_window"
+    )
 
 
 def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: int) -> float:
@@ -408,7 +418,7 @@ def _experiment_cooldown_h(
 
 
 def _experiment_deposit_sample_basis(raw: Any) -> str:
-    value = str(raw or "not_reported").strip()
+    value = str(raw or DEFAULT_LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS).strip()
     aliases = {
         "hot": "hot",
         "in_situ_hot": "hot",
@@ -481,7 +491,11 @@ def _normalize_window_semantics(
         )
 
     deposit_sample_basis = str(
-        raw.get("deposit_sample_basis", "hot") or ""
+        raw.get(
+            "deposit_sample_basis",
+            DEFAULT_LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS,
+        )
+        or ""
     ).strip()
     if deposit_sample_basis not in LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS:
         allowed = ", ".join(sorted(LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS))

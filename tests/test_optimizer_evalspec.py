@@ -11,7 +11,13 @@ import sys
 import pytest
 
 from simulator.config import load_config_bundle
-from simulator.lab_schedule import lab_schedule_digests, normalize_lab_schedule
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
+    LabScheduleValidationError,
+    interpolate_schedule_points,
+    lab_schedule_digests,
+    normalize_lab_schedule,
+)
 from simulator.optimize.evalspec import (
     EvalSpec,
     cache_key,
@@ -658,6 +664,59 @@ def test_lab_schedule_digest_uses_canonical_physics_not_legacy_or_provenance() -
     )
 
 
+def test_lab_schedule_deposit_sample_basis_default_is_branch_invariant() -> None:
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (2.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (2.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+
+    explicit_window = copy.deepcopy(schedule)
+    explicit_window["window_semantics"] = {
+        "preheat_h": 0.0,
+        "measured_window_start_h": 0.0,
+        "measured_window_end_h": 2.0,
+        "cooldown_h": 0.0,
+        "deposit_sample_basis": "hot",
+    }
+    explicit_experiment = copy.deepcopy(schedule)
+    explicit_experiment["experiment_windows"] = {
+        "measured": {"start_h": 0.0, "end_h": 2.0},
+        "cooldown": {"duration_h": 0.0, "deposit_sampling": "hot"},
+    }
+
+    normalized_window = normalize_lab_schedule(explicit_window)
+    normalized_experiment = normalize_lab_schedule(explicit_experiment)
+    assert normalized_window["window_semantics"]["deposit_sample_basis"] == "hot"
+    assert normalized_experiment["window_semantics"]["deposit_sample_basis"] == "hot"
+    assert (
+        lab_schedule_digests(normalized_window)["schedule_digest"]
+        == lab_schedule_digests(normalized_experiment)["schedule_digest"]
+    )
+
+    missing_window = normalize_lab_schedule(copy.deepcopy(schedule))
+    missing_experiment_input = copy.deepcopy(schedule)
+    missing_experiment_input["experiment_windows"] = {
+        "measured": {"start_h": 0.0, "end_h": 2.0},
+    }
+    missing_experiment = normalize_lab_schedule(missing_experiment_input)
+    assert missing_window["window_semantics"]["deposit_sample_basis"] == "not_reported"
+    assert (
+        missing_experiment["window_semantics"]["deposit_sample_basis"]
+        == "not_reported"
+    )
+    assert missing_window["window_semantics"] == missing_experiment["window_semantics"]
+    assert (
+        lab_schedule_digests(missing_window)["schedule_digest"]
+        == lab_schedule_digests(missing_experiment)["schedule_digest"]
+    )
+    assert (
+        lab_schedule_digests(missing_window)["schedule_digest"]
+        != lab_schedule_digests(normalized_window)["schedule_digest"]
+    )
+
+
 def test_lab_schedule_profile_reports_window_semantics_to_runtime_overrides() -> None:
     schedule = _lab_schedule(
         duration_h=3.0,
@@ -810,6 +869,33 @@ def test_lab_schedule_profile_fail_loud_rules_are_named(
             RecipeSchema(),
             constraints=constraints,
         )
+
+
+def test_lab_schedule_pressure_floor_endpoint_is_explicit() -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=(
+            (0.0, LAB_SCHEDULE_PRESSURE_FLOOR_MBAR),
+            (1.0, LAB_SCHEDULE_PRESSURE_FLOOR_MBAR),
+        ),
+        furnace_ceiling_C=1300.0,
+    )
+
+    normalized = normalize_lab_schedule(schedule)
+    assert normalized["chamber_pressure_mbar"][0]["value"] == pytest.approx(
+        LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
+    )
+
+    below_floor = copy.deepcopy(schedule)
+    below_floor["chamber_pressure_mbar"][0]["value"] = (
+        LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
+    )
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_pressure_below_implemented_floor",
+    ):
+        normalize_lab_schedule(below_floor)
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:
@@ -1004,6 +1090,27 @@ def _declared_piecewise_value(
             frac = (t_h - left["t_h"]) / span
             return left["value"] + frac * (right["value"] - left["value"])
     return points[-1]["value"]
+
+
+def test_interpolate_schedule_points_refuses_extrapolation() -> None:
+    schedule = normalize_lab_schedule(
+        _lab_schedule(
+            duration_h=1.0,
+            temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+            pressure_points=((0.0, 13.0), (1.0, 13.0)),
+            furnace_ceiling_C=1300.0,
+        )
+    )
+    points = schedule["melt_temperature_C"]
+
+    assert interpolate_schedule_points(points, 0.0) == pytest.approx(25.0)
+    assert interpolate_schedule_points(points, 1.0) == pytest.approx(1200.0)
+    for sample_time_h in (-0.1, 1.1):
+        with pytest.raises(
+            LabScheduleValidationError,
+            match="lab_schedule_sample_time_outside_declared_window",
+        ):
+            interpolate_schedule_points(points, sample_time_h)
 
 
 def test_non_string_mapping_keys_raise() -> None:
