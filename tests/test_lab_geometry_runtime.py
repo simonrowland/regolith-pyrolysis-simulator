@@ -10,14 +10,14 @@ from simulator.accounting import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import CondensationModel, knudsen_regime_diagnostic
+from simulator.core import PyrolysisSimulator
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.melt_backend.base import StubBackend
 from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
 from simulator.state import (
     CondensationTrain,
     PipeSegment,
-    register_wall_deposit_accounts,
-    unregister_wall_deposit_accounts,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
 
@@ -265,56 +265,163 @@ def test_lab_surface_provenance_poison_pairs_are_named_refusals(
     assert excinfo.value.code == refusal_code
 
 
-def test_provider_routes_registered_lab_surface_accounts() -> None:
+def test_provider_routes_configured_lab_surface_accounts() -> None:
     geometry = parse_lab_geometry(robinot_geometry_fixture())
     accounts = geometry.wall_deposit_accounts
-    register_wall_deposit_accounts(accounts)
-    try:
-        provider = BuiltinCondensationRouteProvider()
-        holder_account = geometry.surfaces[0].wall_deposit_account
-        condenser_account = geometry.surfaces[2].wall_deposit_account
-        request = IntentRequest(
-            intent=ChemistryIntent.CONDENSATION_ROUTE,
-            account_view=ProviderAccountView(
-                accounts={
-                    "process.overhead_gas": {"Na": 1.0},
-                    "process.condensation_train": {},
-                    "process.wall_deposit": {},
-                    holder_account: {},
-                    condenser_account: {},
-                },
-                species_formula_registry={},
-            ),
-            temperature_C=1100.0,
-            pressure_bar=1e-6,
-            control_inputs={
-                "species": "Na",
-                "condensed_kg": 0.01,
-                "sp_data": {},
-                "wall_deposit_fraction": 1.0,
-                "wall_deposit_account_fractions": {
-                    holder_account: 0.25,
-                    condenser_account: 0.75,
-                },
-                "dt_hr": 1.0,
+    provider = BuiltinCondensationRouteProvider(wall_deposit_accounts=accounts)
+    holder_account = geometry.surfaces[0].wall_deposit_account
+    condenser_account = geometry.surfaces[2].wall_deposit_account
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Na": 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+                holder_account: {},
+                condenser_account: {},
             },
-        )
+            species_formula_registry={},
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "condensed_kg": 0.01,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {
+                holder_account: 0.25,
+                condenser_account: 0.75,
+            },
+            "dt_hr": 1.0,
+        },
+    )
 
-        result = provider.dispatch(request)
+    result = provider.dispatch(request)
 
-        assert result.status == "ok"
-        assert result.transition is not None
-        assert "process.wall_deposit" not in result.transition.credits
-        assert result.transition.credits[holder_account]["Na"] > 0.0
-        assert result.transition.credits[condenser_account]["Na"] > 0.0
-        assert result.diagnostic["credited_wall_deposit_accounts_kg"][
-            holder_account
-        ] == pytest.approx(0.0025)
-        assert result.diagnostic["credited_wall_deposit_accounts_kg"][
-            condenser_account
-        ] == pytest.approx(0.0075)
-    finally:
-        unregister_wall_deposit_accounts(accounts)
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert "process.wall_deposit" not in result.transition.credits
+    assert result.transition.credits[holder_account]["Na"] > 0.0
+    assert result.transition.credits[condenser_account]["Na"] > 0.0
+    assert result.diagnostic["credited_wall_deposit_accounts_kg"][
+        holder_account
+    ] == pytest.approx(0.0025)
+    assert result.diagnostic["credited_wall_deposit_accounts_kg"][
+        condenser_account
+    ] == pytest.approx(0.0075)
+
+
+def test_provider_wall_deposit_authority_is_instance_scoped_poison_pair() -> None:
+    geometry = parse_lab_geometry(robinot_geometry_fixture())
+    lab_model = CondensationModel(CondensationTrain.create_default())
+    lab_model.configure_lab_geometry(geometry)
+    holder_account = geometry.surfaces[0].wall_deposit_account
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Na": 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+                holder_account: {},
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "condensed_kg": 0.01,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {holder_account: 1.0},
+            "dt_hr": 1.0,
+        },
+    )
+
+    lab_provider = BuiltinCondensationRouteProvider(
+        wall_deposit_accounts=lab_model.wall_deposit_accounts
+    )
+    lab_result = lab_provider.dispatch(request)
+
+    assert lab_result.status == "ok"
+    assert lab_result.transition is not None
+    assert holder_account in lab_result.transition.credits
+
+    industrial_model = CondensationModel(CondensationTrain.create_default())
+    industrial_provider = BuiltinCondensationRouteProvider(
+        wall_deposit_accounts=industrial_model.wall_deposit_accounts
+    )
+    poison_result = industrial_provider.dispatch(request)
+
+    assert poison_result.status == "refused"
+    assert poison_result.transition is None
+    assert poison_result.diagnostic["reason_refused"] == (
+        "undeclared_wall_deposit_account"
+    )
+    assert poison_result.diagnostic["account"] == holder_account
+
+
+def test_simulator_wall_deposit_authority_does_not_cross_instances() -> None:
+    holder_account = "process.wall_deposit_segment_holder"
+
+    lab_backend = StubBackend()
+    lab_backend.initialize({})
+    lab_sim = PyrolysisSimulator(
+        lab_backend, {"lab_geometry": robinot_geometry_fixture()}, {}, {}
+    )
+    lab_sim._build_chemistry_kernel()
+    lab_provider = lab_sim._chem_registry.authoritative_for(
+        ChemistryIntent.CONDENSATION_ROUTE
+    )
+    assert lab_provider is not None
+
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Na": 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+                holder_account: {},
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "condensed_kg": 0.01,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {holder_account: 1.0},
+            "dt_hr": 1.0,
+        },
+    )
+
+    lab_result = lab_provider.dispatch(request)
+    assert lab_result.status == "ok"
+    assert lab_result.transition is not None
+    assert holder_account in lab_result.transition.credits
+
+    industrial_backend = StubBackend()
+    industrial_backend.initialize({})
+    industrial_sim = PyrolysisSimulator(industrial_backend, {}, {}, {})
+    industrial_sim._build_chemistry_kernel()
+    industrial_provider = industrial_sim._chem_registry.authoritative_for(
+        ChemistryIntent.CONDENSATION_ROUTE
+    )
+    assert industrial_provider is not None
+
+    poison_result = industrial_provider.dispatch(request)
+    assert poison_result.status == "refused"
+    assert poison_result.transition is None
+    assert poison_result.diagnostic["reason_refused"] == (
+        "undeclared_wall_deposit_account"
+    )
+    assert poison_result.diagnostic["account"] == holder_account
 
 
 def test_provider_refuses_unregistered_lab_surface_account() -> None:
@@ -418,43 +525,40 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
         ],
     }
     model = CondensationModel(CondensationTrain.create_default())
-    geometry = model.configure_lab_geometry(parse_lab_geometry(raw))
-    try:
-        supply = {segment.name: 0.01 for segment in model.pipe_segments}
+    model.configure_lab_geometry(parse_lab_geometry(raw))
+    supply = {segment.name: 0.01 for segment in model.pipe_segments}
 
-        base = model._wall_deposit_candidates_by_segment_kg(
-            species="SiO",
-            rate_kg_hr=0.01,
-            T_cond_C=900.0,
-            melt_temperature_C=1700.0,
-            supply_by_segment_kg=supply,
-        )
-        raw["surfaces"][0]["view_factor_from_melt"] = 0.1
-        raw["surfaces"][1]["view_factor_from_melt"] = 0.9
-        model.configure_lab_geometry(parse_lab_geometry(raw))
-        flipped = model._wall_deposit_candidates_by_segment_kg(
-            species="SiO",
-            rate_kg_hr=0.01,
-            T_cond_C=900.0,
-            melt_temperature_C=1700.0,
-            supply_by_segment_kg=supply,
-        )
+    base = model._wall_deposit_candidates_by_segment_kg(
+        species="SiO",
+        rate_kg_hr=0.01,
+        T_cond_C=900.0,
+        melt_temperature_C=1700.0,
+        supply_by_segment_kg=supply,
+    )
+    raw["surfaces"][0]["view_factor_from_melt"] = 0.1
+    raw["surfaces"][1]["view_factor_from_melt"] = 0.9
+    model.configure_lab_geometry(parse_lab_geometry(raw))
+    flipped = model._wall_deposit_candidates_by_segment_kg(
+        species="SiO",
+        rate_kg_hr=0.01,
+        T_cond_C=900.0,
+        melt_temperature_C=1700.0,
+        supply_by_segment_kg=supply,
+    )
 
-        assert base["holder"] > base["condenser"]
-        assert flipped["condenser"] > flipped["holder"]
+    assert base["holder"] > base["condenser"]
+    assert flipped["condenser"] > flipped["holder"]
 
-        raw["surfaces"][1]["line_of_sight_to_melt"] = False
-        model.configure_lab_geometry(parse_lab_geometry(raw))
-        blocked = model._wall_deposit_candidates_by_segment_kg(
-            species="SiO",
-            rate_kg_hr=0.01,
-            T_cond_C=900.0,
-            melt_temperature_C=1700.0,
-            supply_by_segment_kg=supply,
-        )
-        assert blocked.get("condenser", 0.0) == pytest.approx(0.0)
-    finally:
-        unregister_wall_deposit_accounts(geometry.wall_deposit_accounts)
+    raw["surfaces"][1]["line_of_sight_to_melt"] = False
+    model.configure_lab_geometry(parse_lab_geometry(raw))
+    blocked = model._wall_deposit_candidates_by_segment_kg(
+        species="SiO",
+        rate_kg_hr=0.01,
+        T_cond_C=900.0,
+        melt_temperature_C=1700.0,
+        supply_by_segment_kg=supply,
+    )
+    assert blocked.get("condenser", 0.0) == pytest.approx(0.0)
 
 
 def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:

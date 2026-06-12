@@ -92,7 +92,6 @@ from simulator.state import (
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     PipeSegment,
     clamp_stir_factor,
-    register_wall_deposit_accounts,
 )
 
 
@@ -594,6 +593,10 @@ class CondensationModel:
             7: 0.0,    # Accumulator — no condensation
         }
 
+    @property
+    def wall_deposit_accounts(self) -> tuple[str, ...]:
+        return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
+
     def configure_operating_conditions(
         self,
         *,
@@ -924,7 +927,6 @@ class CondensationModel:
         )
         if geometry is None:
             raise ValueError("lab_geometry is required")
-        register_wall_deposit_accounts(geometry.wall_deposit_accounts)
         self.pipe_segments = geometry.to_pipe_segments(
             default_diameter_m=require_lab_pipe_diameter(
                 self.pipe_diameter_m, 'pipe_diameter_m'),

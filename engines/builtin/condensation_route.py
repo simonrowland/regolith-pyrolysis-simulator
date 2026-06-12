@@ -68,7 +68,7 @@ provider must declare every account the proposal touches
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from engines.builtin._common import (
@@ -91,16 +91,16 @@ from simulator.condensation import (
     WALL_DEPOSIT_ACCOUNT,
 )
 from simulator.state import (
-    registered_wall_deposit_accounts,
+    declared_wall_deposit_accounts,
 )
 
 
 class BuiltinCondensationRouteProvider(ChemistryProvider):
     """Authoritative ``CONDENSATION_ROUTE`` provider.
 
-    See module docstring. Stateless -- per-call inputs arrive through
-    :class:`IntentRequest.control_inputs`; the same instance serves
-    every species in every tick without holding simulator references.
+    See module docstring. Per-call inputs arrive through
+    :class:`IntentRequest.control_inputs`; account authority is scoped to
+    the configured wall-deposit accounts passed to this provider instance.
     """
 
     name = "builtin-condensation-route"
@@ -112,6 +112,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
     })
+
+    def __init__(self, wall_deposit_accounts: Iterable[str] = ()):
+        self._declared_wall_deposit_accounts = frozenset(
+            declared_wall_deposit_accounts(wall_deposit_accounts)
+        )
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -351,14 +356,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
         return credits
 
-    @classmethod
-    def _declared_accounts(cls) -> frozenset[str]:
-        return cls.BASE_DECLARED_ACCOUNTS | frozenset(
-            registered_wall_deposit_accounts())
+    def _declared_accounts(self) -> frozenset[str]:
+        return self.BASE_DECLARED_ACCOUNTS | self._declared_wall_deposit_accounts
 
-    @classmethod
+    @staticmethod
     def _undeclared_wall_deposit_account(
-        cls,
         controls: Mapping[str, Any],
         declared_accounts: frozenset[str],
     ) -> str | None:

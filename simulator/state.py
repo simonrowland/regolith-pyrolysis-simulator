@@ -629,32 +629,31 @@ PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
     for name in PIPE_SEGMENT_NAMES
 )
-_REGISTERED_WALL_DEPOSIT_ACCOUNTS: set[str] = set()
 
 
-def register_wall_deposit_accounts(accounts: Iterable[str]) -> None:
-    for account in accounts:
-        account_name = str(account)
-        if not account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
-            raise ValueError(
-                f"wall deposit account {account_name!r} must start with "
-                f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX!r}"
-            )
-        suffix = account_name.removeprefix(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
-        if not suffix:
-            raise ValueError("wall deposit account suffix is required")
-        _REGISTERED_WALL_DEPOSIT_ACCOUNTS.add(account_name)
+def _validated_wall_deposit_account(account: str) -> str:
+    account_name = str(account)
+    if not account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
+        raise ValueError(
+            f"wall deposit account {account_name!r} must start with "
+            f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX!r}"
+        )
+    suffix = account_name.removeprefix(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
+    if not suffix:
+        raise ValueError("wall deposit account suffix is required")
+    return account_name
 
 
-def unregister_wall_deposit_accounts(accounts: Iterable[str]) -> None:
-    for account in accounts:
-        _REGISTERED_WALL_DEPOSIT_ACCOUNTS.discard(str(account))
-
-
-def registered_wall_deposit_accounts() -> tuple[str, ...]:
+def declared_wall_deposit_accounts(
+    extra_accounts: Iterable[str] = (),
+) -> tuple[str, ...]:
+    extras = sorted({
+        _validated_wall_deposit_account(str(account))
+        for account in extra_accounts
+    })
     return tuple(dict.fromkeys((
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
-        *sorted(_REGISTERED_WALL_DEPOSIT_ACCOUNTS),
+        *extras,
     )))
 
 

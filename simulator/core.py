@@ -942,11 +942,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ) in self._BUILTIN_PROVIDER_REGISTRATIONS:
             provider_cls = getattr(
                 importlib.import_module(module_path), class_name)
-            provider = (
-                provider_cls(self.vapor_pressures)
-                if needs_vapor_pressures
-                else provider_cls()
-            )
+            if class_name == 'BuiltinCondensationRouteProvider':
+                provider = provider_cls(
+                    wall_deposit_accounts=(
+                        self._condensation_route_wall_deposit_accounts()
+                    )
+                )
+            else:
+                provider = (
+                    provider_cls(self.vapor_pressures)
+                    if needs_vapor_pressures
+                    else provider_cls()
+                )
             self._chem_registry.register_idempotent(provider, list(intents))
 
         # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock takes the
@@ -995,6 +1002,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species_formula_registry=self.species_formula_registry,
             allow_fallback_intents=allow_fallback_intents,
         )
+
+    def _condensation_route_wall_deposit_accounts(self) -> tuple[str, ...]:
+        if self.lab_geometry is None:
+            return ()
+        return self.lab_geometry.wall_deposit_accounts
 
     def _register_vapor_pressure_pair(self) -> None:
         """Wire the authoritative + fallback VAPOR_PRESSURE pair.
