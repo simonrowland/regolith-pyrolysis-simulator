@@ -249,9 +249,31 @@ def _raise_run_reference_canonical_conflict(
 
 
 @dataclass(frozen=True)
-class _TraceOverlay:
+class _TraceOverlay(MappingABC):
     original_trace: Any
     overrides: Mapping[str, Any]
+
+    def __getitem__(self, key: str) -> Any:
+        if key in self.overrides:
+            return self.overrides[key]
+        if isinstance(self.original_trace, MappingABC):
+            return self.original_trace[key]
+        try:
+            return getattr(self.original_trace, key)
+        except AttributeError as exc:
+            raise KeyError(key) from exc
+
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def __iter__(self) -> Iterable[str]:
+        return iter(self.overrides)
+
+    def __len__(self) -> int:
+        return len(self.overrides)
 
     def __getattr__(self, name: str) -> Any:
         if name in self.overrides:
@@ -2884,12 +2906,23 @@ def _run_reference(
         status=str(getattr(run_execution, "status", "ok")),
         error_message=str(getattr(run_execution, "error_message", "")),
         reason=str(getattr(run_execution, "reason", "")),
-        trace=_cache_trace_payload(run_execution, trace_payload),
+        trace=_live_run_reference_trace(run_execution, trace_payload),
         product_summary=summary,
         backend_name=_run_reference_backend_name(run_execution),
         backend_status=_latest_backend_status(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
+
+
+def _live_run_reference_trace(
+    run_execution: Any,
+    trace_payload: Mapping[str, Any] | None,
+) -> Any:
+    trace = getattr(run_execution, "trace", None)
+    payload = _cache_trace_payload(run_execution, trace_payload)
+    if not isinstance(payload, MappingABC) or payload is trace:
+        return trace
+    return _TraceOverlay(trace, MappingProxyType(dict(payload)))
 
 
 def _cache_trace_payload(
@@ -2930,9 +2963,6 @@ def _cache_trace_payload(
                 "campaign": entry.get("campaign"),
                 "T_C": entry.get("T_C"),
                 "reduced_real_cache_state": str(cache_state),
-                **canonicalize_fidelity_emission(
-                    reduced_real_cache_state=cache_state,
-                ),
             }
         )
     if per_hour_cache:
@@ -2941,7 +2971,7 @@ def _cache_trace_payload(
         payload["pO2_enforcement_by_hour"] = pO2_enforcement_by_hour
 
     if payload:
-        return MappingProxyType(payload)
+        return payload
     return getattr(run_execution, "trace", None)
 
 
