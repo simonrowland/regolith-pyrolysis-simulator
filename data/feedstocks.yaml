@@ -1,5 +1,5 @@
 # =============================================================================
-# Regolith Pyrolysis Simulator — Feedstock Compositions
+# Regolith Pyrolysis Simulator  --  Feedstock Compositions
 # =============================================================================
 # Source: Oxygen Shuttle context v2 (context-feedstocks.yaml)
 # All compositions in wt% oxide on anhydrous basis unless noted.
@@ -18,7 +18,7 @@ lunar_mare_low_ti:
   note: >
     Low-Ti mare basalt variant (TiO2 ~1.5 wt%). Source data gives single
     ranges for all oxides with TiO2 1.5-8.0; this entry uses the low end
-    for TiO2. Sum of midpoints is ~97.2 wt% — the deficit reflects that
+    for TiO2. Sum of midpoints is ~97.2 wt%  --  the deficit reflects that
     real low-Ti samples have slightly higher SiO2/FeO/CaO than the
     overall range midpoints. Retained as-is for traceability.
     Lunar sample chemistry reports total iron as FeO by convention unless
@@ -175,7 +175,7 @@ lunar_spa_kreep_influenced:
   confidence: "Medium"
   note: >
     Very wide oxide ranges reflect heterogeneous SPA floor lithology.
-    Midpoint sum ~102.6 wt% — the broad ranges cause overshoot.
+    Midpoint sum ~102.6 wt%  --  the broad ranges cause overshoot.
     Source data omits Cr2O3, MnO. Normalise for simulation.
   composition_wt_pct:
     SiO2:  48.5
@@ -692,7 +692,7 @@ s_type_asteroid_silicate:
     10-20 wt% free Fe-Ni metal recoverable magnetically before pyrolysis.
 
 m_type_metallic_phase:
-  label: "M-Type Asteroid — Metallic Phase"
+  label: "M-Type Asteroid  --  Metallic Phase"
   source: "PROCESS ASSUMPTION (50/50 bulk phase split chosen for modeling); context-not-source: Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
   confidence: "Low"
   note: >
@@ -720,7 +720,7 @@ m_type_metallic_phase:
   process_notes: "Melt at 1550-1600C; immiscible separation (7.9 vs 2.8 g/cm3); tap Fe-Ni-Co-P metal; process silicate separately"
 
 m_type_silicate_phase:
-  label: "M-Type Asteroid — Silicate Phase"
+  label: "M-Type Asteroid  --  Silicate Phase"
   source: "PROCESS ASSUMPTION (50/50 bulk phase split chosen for modeling); context-not-source: Iron meteorite analogy; Psyche radar/density; pallasitic inclusions"
   confidence: "Low"
   note: >
@@ -791,7 +791,7 @@ e_type_enstatite_aubrite:
   confidence: "High"
   note: >
     Extremely reduced, nearly pure enstatite pyroxenite. Sulfur present
-    as oldhamite/troilite (1-3 wt% S elemental, not an oxide) — listed
+    as oldhamite/troilite (1-3 wt% S elemental, not an oxide)  --  listed
     separately. Sum of oxide components ~99.85 wt%.
   composition_wt_pct:
     SiO2:  57.5
@@ -814,7 +814,7 @@ e_type_enstatite_aubrite:
   preferred_for: "Mg shuttle bootstrap + sulfur chemicals; refractory enstatite ceramics"
   process_notes: >
     Extreme S-type analog. C0: major sulfur recovery. C2 Fe negligible.
-    C4 dominant (120-220 kg Mg/t possible — immediate surplus). Very low
+    C4 dominant (120-220 kg Mg/t possible  --  immediate surplus). Very low
     liquidus energy. Strong pO2 self-buffering. Perfect for Mg bootstrapping
     and high-temperature refractories.
 
@@ -1235,7 +1235,7 @@ mars_basalt:
   note: >
     Thousands of APXS analyses across 4 sites; +-1-2 wt% major oxides.
     Includes SO3 and Cl as components (sulfate-bearing soil). FeO_total
-    includes both FeO and Fe2O3. Sum ~102.1 wt% — slight overshoot from
+    includes both FeO and Fe2O3. Sum ~102.1 wt%  --  slight overshoot from
     independent range midpoints; within analytical uncertainty.
   composition_wt_pct:
     SiO2:  45.5
@@ -1293,7 +1293,7 @@ mars_sulfate_rich:
   confidence: "High"
   note: >
     Elevated Ca/Mg/Fe sulfates (SO3 8-15 wt% vs 5-7% baseline).
-    Midpoint sum ~105.5 wt% — wide SO3 range causes overshoot.
+    Midpoint sum ~105.5 wt%  --  wide SO3 range causes overshoot.
     Normalise for simulation.
   composition_wt_pct:
     SiO2:  45.0
@@ -1343,7 +1343,7 @@ mars_phyllosilicate_clay:
   confidence: "High"
   note: >
     Smectite-rich deposits. Higher Al2O3 (12-18%) and bound water than
-    baseline Mars basalt. Sum ~103.8 wt% — broad range midpoints overshoot.
+    baseline Mars basalt. Sum ~103.8 wt%  --  broad range midpoints overshoot.
     Structural water (20-100 kg/t) released during C0.
   composition_wt_pct:
     SiO2:  46.0
@@ -1379,7 +1379,7 @@ mars_phyllosilicate_clay:
   preferred_for: "Al production, mullite/anorthite ceramics, water yield"
   process_notes: >
     Extra dehydroxylation H2O release in C0. More aluminous melt (higher
-    viscosity — induction stirring essential). Easier Al retention in C5/C6;
+    viscosity  --  induction stirring essential). Easier Al retention in C5/C6;
     terminal slag ideal for high-Al ceramics. 10-15% energy savings vs
     baseline due to lower SiO2 activity.
 

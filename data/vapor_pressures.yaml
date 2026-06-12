@@ -39,7 +39,7 @@ metals:
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.121
     pure_component_antoine:
-      source: "NIST TN 2273 normal boiling point; CRC/NIST ΔH_vap≈97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.407048
       B: 5088.599272
       C: 0
@@ -89,7 +89,7 @@ metals:
       target: "VapoRock K = 9.55e-02 Pa at 1773.15 K"
       residual_dex: 1.469
     pure_component_antoine:
-      source: "NIST TN 2273 normal boiling point; CRC/NIST ΔH_vap≈79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.008700
       B: 4131.679352
       C: 0
@@ -128,7 +128,7 @@ metals:
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.203
     pure_component_antoine:
-      source: "CRC/NIST normal boiling point; CRC/NIST ΔH_vap≈128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.906866
       B: 6685.903376
       C: 0
@@ -161,7 +161,7 @@ metals:
       target: "VapoRock partial pressure on the basalt grid"
       residual_dex: 0.023
     pure_component_antoine:
-      source: "CRC/NIST normal boiling point; CRC/NIST ΔH_vap≈340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.670336
       B: 17759.430841
       C: 0
@@ -191,9 +191,9 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ca vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ca vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy ΔH_vap≈182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy dH_vap~182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.424827
       B: 9522.188948
       C: 0
@@ -211,7 +211,7 @@ metals:
     valid_range_K: [1115, 1757]
     boiling_point_C: 1484
     condensation_T_C_at_1mbar: 780
-    notes: "ΔH_vap ≈ 182.3 kJ/mol. Significant above ~1500°C."
+    notes: "dH_vap ~ 182.3 kJ/mol. Significant above ~1500°C."
 
   Al:
     formula: "Al"
@@ -219,9 +219,9 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Al vapor-pressure table/regression): legacy CRC-style pure Al vapor-pressure table regression; legacy ΔH_vap ≈ 332.0 kJ/mol"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Al vapor-pressure table/regression): legacy CRC-style pure Al vapor-pressure table regression; legacy dH_vap ~ 332.0 kJ/mol"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy ΔH_vap≈332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.216544
       B: 17341.561880
       C: 0
@@ -239,7 +239,7 @@ metals:
     valid_range_K: [933, 2792]
     boiling_point_C: 2519
     condensation_T_C_at_1mbar: 1180
-    notes: "ΔH_vap ≈ 332.0 kJ/mol. Negligible below 2500°C — not pyrolysable."
+    notes: "dH_vap ~ 332.0 kJ/mol. Negligible below 2500°C  --  not pyrolysable."
 
   Si:
     formula: "Si"
@@ -248,9 +248,9 @@ metals:
     parent_oxide: "SiO2"
     fit_target: "pure_component_psat"
     consumer_status: "inactive"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named pure-Si vapor-pressure fit): rough legacy ΔH_vap approximation, inactive and unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named pure-Si vapor-pressure fit): rough legacy dH_vap approximation, inactive and unvalidated"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy ΔH_vap≈413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy dH_vap~413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.110207
       B: 21598.601920
       C: 0
@@ -268,7 +268,7 @@ metals:
     valid_range_K: [1687, 3538]
     boiling_point_C: 3265
     condensation_T_C_at_1mbar: 1400
-    notes: "ΔH_vap ≈ 413.5 kJ/mol. Negligible at process T. Extracted by MRE only."
+    notes: "dH_vap ~ 413.5 kJ/mol. Negligible at process T. Extracted by MRE only."
 
   Ti:
     formula: "Ti"
@@ -276,9 +276,9 @@ metals:
     electrons_per_atom: 4
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ti vapor-pressure table/regression): legacy CRC-style pure Ti liquid equation/table; legacy ΔH_vap ≈ 444.3 kJ/mol"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ti vapor-pressure table/regression): legacy CRC-style pure Ti liquid equation/table; legacy dH_vap ~ 444.3 kJ/mol"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace ΔH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy ΔH_vap≈444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.524374
       B: 23207.397420
       C: 0
@@ -296,7 +296,7 @@ metals:
     valid_range_K: [1941, 3560]
     boiling_point_C: 3287
     condensation_T_C_at_1mbar: 1500
-    notes: "ΔH_vap ≈ 444.3 kJ/mol. Not pyrolysable — extracted by Na shuttle or MRE."
+    notes: "dH_vap ~ 444.3 kJ/mol. Not pyrolysable  --  extracted by Na shuttle or MRE."
 
   Cr:
     formula: "Cr"
@@ -304,7 +304,7 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Cr2O3"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Cr vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Cr vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
@@ -316,7 +316,7 @@ metals:
     valid_range_K: [2180, 2944]
     boiling_point_C: 2671
     condensation_T_C_at_1mbar: 1280
-    notes: "ΔH_vap ≈ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle."
+    notes: "dH_vap ~ 396.9 kJ/mol. Trace amounts, extracted by Na shuttle."
 
   Mn:
     formula: "Mn"
@@ -324,7 +324,7 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Mn vapor-pressure table or refit): rough legacy ΔH_vap approximation, unvalidated"
+    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Mn vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
@@ -336,7 +336,7 @@ metals:
     valid_range_K: [1519, 2334]
     boiling_point_C: 2061
     condensation_T_C_at_1mbar: 1000
-    notes: "ΔH_vap ≈ 282.3 kJ/mol. Moderate volatility, trace amounts."
+    notes: "dH_vap ~ 282.3 kJ/mol. Moderate volatility, trace amounts."
 
 oxide_vapors:
   SiO:
@@ -350,8 +350,8 @@ oxide_vapors:
       activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.113
-    stoich_oxide_per_vapor: 1.362920787587333  # kg SiO₂ consumed per kg SiO evaporated
-    stoich_O2_per_vapor: 0.36292078758733326   # kg O₂ freed per kg SiO evaporated
+    stoich_oxide_per_vapor: 1.362920787587333  # kg SiO2 consumed per kg SiO evaporated
+    stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
     evaporation_alpha:
       value: 0.04
       source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
@@ -359,23 +359,23 @@ oxide_vapors:
       envelope: [0.003, 0.048]
       tier: 2
     antoine:
-      # SiO vapor from SiO₂ decomposition: SiO₂(melt) → SiO(g) + ½O₂(g)
-      # Effective vapor pressure depends on a(SiO₂) and pO₂
+      # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2O2(g)
+      # Effective vapor pressure depends on a(SiO2) and pO2
       # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
       A: 22.117682
       B: 40638.351545
       C: 0
     valid_range_K: [1400, 2200]
     condensation_T_C: [900, 1200]
-    condensation_product: "amorphous SiO₂ (disproportionation: 2SiO → Si + SiO₂)"
+    condensation_product: "amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)"
     condensation_products_mol_per_mol_vapor:
       Si: 0.5
       SiO2: 0.5
-    suppression_equation: "p(SiO) = K(T) × a(SiO₂) / √pO₂"
-    suppression_factor_at_1mbar_O2: ">300×"
+    suppression_equation: "p(SiO) = K(T) * a(SiO2) / sqrt pO2"
+    suppression_factor_at_1mbar_O2: ">300*"
     notes: |
-      THE problem species. At hard vacuum (pO₂ ~1e-9 bar), SiO dominates
-      offgas above ~1400°C. At pO₂ = 1 mbar, suppressed >300×.
+      THE problem species. At hard vacuum (pO2 ~1e-9 bar), SiO dominates
+      offgas above ~1400°C. At pO2 = 1 mbar, suppressed >300*.
       Condenses as adhesive, corrosive amorphous silica below ~1200°C.
       See [THERMO-1] in context-thermo.md.
       Builtin fallback max residual 0.113 dex vs VapoRock on the Kress91 IW
@@ -440,7 +440,7 @@ oxide_vapors:
 # Used by condensation train model for species routing
 condensation_reference_at_1mbar:
   Fe: 1250    # Stage 1
-  SiO: 1050   # Stage 2 (as amorphous SiO₂)
+  SiO: 1050   # Stage 2 (as amorphous SiO2)
   Mg: 580     # Stage 3
   Na: 480     # Stage 3
   K: 420      # Stage 3

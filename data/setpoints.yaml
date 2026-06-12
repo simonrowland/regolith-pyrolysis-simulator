@@ -814,7 +814,7 @@ condensation_train:
   # via
   # ``apply_setpoints_condensation_temperature_overrides`` (called
   # once at sim load time). All values below match the in-source
-  # defaults — no behavior shift from a fresh checkout. Operators
+  # defaults  --  no behavior shift from a fresh checkout. Operators
   # who want to retune (e.g., move SiO from the recipe midpoint to
   # the cold-baffle anchor) edit here; YAML is canonical for the
   # operator surface.
@@ -1199,7 +1199,7 @@ mre_voltage_sequence:
   # carries the canonical hold-hours; the Python fallback ladder
   # (simulator/extraction.py::_MRE_VOLTAGE_LADDER_FALLBACK)
   # remains in lockstep for the missing-YAML path. Na2O / K2O are
-  # present in the YAML but ABSENT from the Python fallback —
+  # present in the YAML but ABSENT from the Python fallback  -- 
   # operators running with the YAML get the 10-species ladder;
   # tests built on the fallback see the 8-species subset.
   # V2O5 was an early member of the YAML but was REMOVED in the
@@ -1236,7 +1236,7 @@ mre_voltage_sequence:
     # 2026-05-28): V is not in simulator/state.py OXIDE_SPECIES /
     # OXIDE_TO_METAL / MOLAR_MASS / electrolysis.py decomposition
     # voltage tables. Including V2O5 in the YAML ladder caused
-    # _step_mre to silently no-op for the species — operator-visible
+    # _step_mre to silently no-op for the species  --  operator-visible
     # "running" lie with zero cleanup output. Add V2O5 here once
     # full V vector landing support lands (vapor-pressure data +
     # MOLAR_MASS + OXIDE_TO_METAL + ELECTRONS_PER_OXIDE etc.).
@@ -1447,7 +1447,7 @@ mre_stepped_voltage_holds:
 # ============================================================================
 overhead_headspace:
   # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Per docs-private/
-  # goal-finite-headspace-2026-05-21.md Q1 pinned decision — finite headspace
+  # goal-finite-headspace-2026-05-21.md Q1 pinned decision  --  finite headspace
   # is DEFAULT-ON GLOBALLY; every campaign gets the backpressure-floor
   # physics. Goldens regenerated to reflect the new default.
   enabled: true
@@ -1657,7 +1657,7 @@ chemistry_kernel:
   # measured evaporation_alpha is sampled). Cr, CrO2, and Mn currently lack
   # measured α in the literature (audit artifacts:
   # docs-private/goal-V1e-audit-alpha-coverage-2026-05-26.md and
-  # docs-private/research/2026-05-29-e2b-alpha-anchors/findings.md — both
+  # docs-private/research/2026-05-29-e2b-alpha-anchors/findings.md  --  both
   # verified present 2026-06-12) and are routinely sampled in
   # default lunar/Mars extraction recipes (Cr2O3 trace ~0.3-0.5 wt%; CrO2(g)
   # is a real VapoRock species). Setting this true makes production use α=1.0

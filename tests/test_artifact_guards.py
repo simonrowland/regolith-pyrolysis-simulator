@@ -101,3 +101,27 @@ def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():
                     )
 
     assert not violations, "\n".join(violations)
+
+
+def test_data_yaml_survives_latin1_misdecode():
+    """data/*.yaml must contain no UTF-8 bytes in the C1 range (0x80-0x9F).
+
+    docs-private/grind/prepare-profiles.sh runs the profile generator under
+    LC_ALL=en_US.ISO8859-1 + PYTHONUTF8=0 (alphamelts subprocess workaround);
+    characters like em-dash decode to C1 control chars there and YAML
+    check_printable rejects the whole file (2026-06-12: 252/252 cells
+    excluded). ASCII-or-Latin-1-printable punctuation only in data yamls.
+    """
+    repo = Path(__file__).parent.parent
+    offenders = []
+    for path in sorted((repo / "data").glob("*.yaml")):
+        raw = path.read_bytes()
+        for i, byte in enumerate(raw):
+            if 0x80 <= byte <= 0x9F:
+                line = raw[:i].count(b"\n") + 1
+                offenders.append(f"{path.name}:{line} byte=0x{byte:02X}")
+                break
+    assert not offenders, (
+        "C1-range UTF-8 bytes in data yamls (break ISO8859-1 profile "
+        f"generation): {offenders}"
+    )
