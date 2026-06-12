@@ -4666,10 +4666,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.inventory.stage0_external_inputs_kg.values())
         mass_out = self._flow_mass_out_kg()
         error_pct = 0.0
+        error_category = ''
         if mass_in > 0:
             error_pct = abs(mass_in - mass_out) / mass_in * 100.0
+        elif mass_out > 0:
+            error_pct = None
+            error_category = 'zero_input_basis_breach'
 
-        return HourSnapshot(
+        snapshot = HourSnapshot(
             hour=self.melt.hour,
             campaign=self.melt.campaign,
             temperature_C=self.melt.temperature_C,
@@ -4729,3 +4733,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # didn't trigger a condensation route.
             knudsen_regime_summary=self._latest_knudsen_summary(),
         )
+        if error_category:
+            setattr(snapshot, 'mass_balance_error_category', error_category)
+        return snapshot

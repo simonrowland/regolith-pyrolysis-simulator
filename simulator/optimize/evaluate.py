@@ -67,6 +67,7 @@ from simulator.runner import PyrolysisRun, RunnerError
 
 
 MASS_BALANCE_ABORT_PCT = 5e-12
+ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
@@ -84,6 +85,7 @@ class FailureCategory(str, Enum):
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
     STALE_PROFILE = "stale_profile"
+    ZERO_INPUT_BASIS_BREACH = ZERO_INPUT_BASIS_BREACH
 
 
 @dataclass(frozen=True)
@@ -300,6 +302,10 @@ def evaluate(
     except ProfileValidationError as exc:
         if _is_stale_profile_refusal(exc):
             return _stale_profile_result(candidate_id, str(exc))
+        raise
+    except EvaluationInputError as exc:
+        if _is_zero_input_basis_breach_message(str(exc)):
+            return _zero_input_basis_result(candidate_id, str(exc))
         raise
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
@@ -1083,6 +1089,7 @@ def _build_eval_inputs(
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
         raise EvaluationInputError(f"unknown feedstock_id {feedstock_id!r}")
+    _validate_eval_mass_basis(profile, fidelity)
     profile = validate_profile(
         profile,
         expected_feedstock=feedstock_id,
@@ -1182,10 +1189,11 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         if isinstance(raw_cache_config, Mapping)
         else None
     )
+    mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
         "campaign": merged.get("campaign", "C0"),
         "hours": int(merged.get("hours", 24)),
-        "mass_kg": float(merged.get("mass_kg", 1000.0)),
+        "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
         "track": merged.get("track", "pyrolysis"),
         "backend_name": backend_name,
@@ -1203,6 +1211,41 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             merged.get("force_builtin_vapor_pressure", False)
         ),
     })
+
+
+def _positive_eval_mass_kg(raw: Any) -> float:
+    try:
+        mass_kg = float(raw)
+    except (TypeError, ValueError) as exc:
+        raise EvaluationInputError(
+            f"{ZERO_INPUT_BASIS_BREACH}: mass_kg must be numeric; got {raw!r}"
+        ) from exc
+    if not math.isfinite(mass_kg):
+        raise EvaluationInputError(
+            f"{ZERO_INPUT_BASIS_BREACH}: mass_kg must be finite; got {raw!r}"
+        )
+    if mass_kg <= 0.0:
+        raise EvaluationInputError(
+            f"{ZERO_INPUT_BASIS_BREACH}: mass_kg must be > 0 kg; got {mass_kg:.12g}"
+        )
+    return mass_kg
+
+
+def _validate_eval_mass_basis(profile: Mapping[str, Any], fidelity: str) -> None:
+    raw_mass: Any = None
+    found = False
+    run_options = profile.get("run")
+    if isinstance(run_options, MappingABC) and "mass_kg" in run_options:
+        raw_mass = run_options["mass_kg"]
+        found = True
+    fidelity_options = profile.get("fidelities")
+    if isinstance(fidelity_options, MappingABC):
+        selected = fidelity_options.get(fidelity)
+        if isinstance(selected, MappingABC) and "mass_kg" in selected:
+            raw_mass = selected["mass_kg"]
+            found = True
+    if found:
+        _positive_eval_mass_kg(raw_mass)
 
 
 def _thermal_scheduled_run_options(
@@ -2654,6 +2697,55 @@ def _invalid_recipe_margin(overdraw_kg: float | None) -> GateMargin:
     )
 
 
+def _zero_input_basis_result(
+    candidate_id: str | None,
+    error_message: str,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.ZERO_INPUT_BASIS_BREACH,
+        feasibility_margins={
+            ZERO_INPUT_BASIS_BREACH: _zero_input_basis_margin(0.0),
+        },
+        failing_gates=(ZERO_INPUT_BASIS_BREACH,),
+        run_reference=RunReference(
+            status="failed",
+            error_message=error_message,
+            reason=ZERO_INPUT_BASIS_BREACH,
+            trace={"backend_status": "ok"},
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+        notes=(error_message,),
+    )
+
+
+def _zero_input_basis_margin(observed_kg: float | None) -> GateMargin:
+    observed = 0.0 if observed_kg is None else float(observed_kg)
+    threshold = ThresholdSpec(
+        id="positive_mass_kg",
+        value=0.0,
+        units="kg",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: zero_input_basis_breach",
+    )
+    return GateMargin(
+        gate=ZERO_INPUT_BASIS_BREACH,
+        feasible=False,
+        margin=-1.0 if observed <= 0.0 else observed,
+        threshold=threshold,
+        observed=observed,
+        detail="mass basis must be positive before material can be produced",
+    )
+
+
+def _is_zero_input_basis_breach_message(message: str) -> bool:
+    return message.startswith(f"{ZERO_INPUT_BASIS_BREACH}:")
+
+
 def _run_reference(
     run_execution: Any,
     profile: Mapping[str, Any],
@@ -2967,6 +3059,32 @@ def _abort_on_mass_balance_breach(
             cache_key_value=key,
         )
     for index, snapshot in enumerate(snapshots):
+        category = str(
+            getattr(snapshot, "mass_balance_error_category", "") or ""
+        )
+        if category == ZERO_INPUT_BASIS_BREACH:
+            mass_in = getattr(snapshot, "mass_in_kg", None)
+            mass_out = getattr(snapshot, "mass_out_kg", None)
+            raise EvaluationAbort(
+                (
+                    f"mass balance breach at snapshot {index}: "
+                    f"{ZERO_INPUT_BASIS_BREACH} "
+                    f"mass_in_kg={mass_in!r} mass_out_kg={mass_out!r}"
+                ),
+                category=FailureCategory.ZERO_INPUT_BASIS_BREACH,
+                patch=patch,
+                candidate_id=candidate_id,
+                eval_spec=eval_spec,
+                cache_key_value=key,
+            )
+        if category:
+            raise EngineBugAbort(
+                f"mass balance breach at snapshot {index}: {category}",
+                patch=patch,
+                candidate_id=candidate_id,
+                eval_spec=eval_spec,
+                cache_key_value=key,
+            )
         raw = getattr(snapshot, "mass_balance_error_pct", None)
         if raw is None:
             raise EngineBugAbort(

@@ -20,6 +20,8 @@ from simulator.core import (
     ProcessInventory,
 )
 
+ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
+
 
 class MassBalance:
     """
@@ -41,7 +43,7 @@ class MassBalance:
               oxygen_kg: float,
               volatiles_kg: float = 0.0,
               inventory: ProcessInventory = None,
-              additive_inventory_kg: Dict[str, float] = None) -> Dict[str, float]:
+              additive_inventory_kg: Dict[str, float] = None) -> Dict[str, object]:
         """
         Check mass conservation.
 
@@ -52,7 +54,10 @@ class MassBalance:
             condensed:    Total in condensation train (kg)
             oxygen:       O₂ produced (kg)
             volatiles:    Volatiles collected (kg)
-            error_pct:    Discrepancy as % of input
+            error_pct:    Discrepancy as % of input; ``None`` when output
+                          exists on a zero input basis
+            error_category: Named category for non-percentable breaches.
+                            Empty zero-in/zero-out systems stay closed at 0.0.
         """
         mass_in = self.input_mass_kg + self.additive_mass_kg
         melt_remaining = melt.total_mass_kg
@@ -79,8 +84,12 @@ class MassBalance:
         )
 
         error_pct = 0.0
+        error_category = ""
         if mass_in > 0:
             error_pct = abs(mass_in - mass_out) / mass_in * 100.0
+        elif mass_out > 0:
+            error_pct = None
+            error_category = ZERO_INPUT_BASIS_BREACH
 
         return {
             'mass_in': mass_in,
@@ -96,6 +105,7 @@ class MassBalance:
             'stage0_mass_balance_delta': 0.0,
             'additive_inventory': additive_inventory,
             'error_pct': error_pct,
+            'error_category': error_category,
         }
 
     def product_summary(self, train: CondensationTrain,

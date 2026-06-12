@@ -381,6 +381,45 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert "residual_inventory_kg" in payload
 
 
+def test_completion_payload_exposes_mass_balance_category_when_pct_none(
+    monkeypatch,
+):
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 34.0,
+                },
+                "bulk_additions": {
+                    "metallic_FeNi_wt_pct": 15.0,
+                },
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    snapshot = sim._make_snapshot()
+    snapshot.mass_balance_error_pct = None
+    setattr(
+        snapshot,
+        "mass_balance_error_category",
+        "zero_input_basis_breach",
+    )
+    monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
+
+    payload = _completion_payload(sim)
+
+    assert payload["mass_balance_error_pct"] is None
+    assert payload["mass_balance_error_category"] == "zero_input_basis_breach"
+
+
 def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
     captured_tasks = []
     drive_calls = {"count": 0}
@@ -448,6 +487,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
 
         assert len(ticks) == 1
         tick = ticks[0]
+        assert tick["mass_balance_error_pct"] == pytest.approx(0.0)
         assert tick["pot_composition"]["SiO2"] > 0
         assert tick["pot_composition_units"] == "kg"
         assert tick["pot_composition_wt_pct"]["SiO2"] > 0
@@ -457,6 +497,84 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
             2.0 * 31.998 / 1000.0
         )
         assert tick["flue_composition_units"] == "kg/hr"
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
+    monkeypatch,
+):
+    captured_tasks = []
+    drive_calls = {"count": 0}
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def run_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        target()
+        return {"captured_task": len(captured_tasks)}
+
+    def one_tick_drive(session, *args, **kwargs):
+        drive_calls["count"] += 1
+        if drive_calls["count"] > 1:
+            return iter(())
+        snapshot = session.simulator._make_snapshot()
+        snapshot.hour = 1
+        snapshot.mass_balance_error_pct = None
+        setattr(
+            snapshot,
+            "mass_balance_error_category",
+            "zero_input_basis_breach",
+        )
+        return iter([
+            SimpleNamespace(
+                snapshot=snapshot,
+                backend_error="",
+                per_hour_summary={"hour": 1},
+                campaign_summary=None,
+                decision_event=None,
+            )
+        ])
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events.drive_session", one_tick_drive)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        received = client.get_received()
+        ticks = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_tick"
+        ]
+
+        assert len(ticks) == 1
+        tick = ticks[0]
+        assert tick["mass_balance_error_pct"] is None
+        assert tick["mass_balance_error_category"] == "zero_input_basis_breach"
     finally:
         client.disconnect()
         for sid in list(_simulations):

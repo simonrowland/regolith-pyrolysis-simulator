@@ -152,7 +152,12 @@ socket.on('simulation_tick', (data) => {
     setEl('oxygen-total', data.oxygen_kg.toFixed(2) + ' kg');
 
     // Mass balance
-    setEl('mass-error', data.mass_balance_error_pct.toFixed(3) + '%');
+    const massBalancePct = data.mass_balance_error_pct;
+    const massBalanceCategory = data.mass_balance_error_category || 'undefined';
+    const massBalanceText = Number.isFinite(massBalancePct)
+        ? massBalancePct.toFixed(3) + '%'
+        : massBalanceCategory;
+    setEl('mass-error', massBalanceText);
     updateDebugInventoryComment(data);
 
     // --- O₂ Budget chart ---
@@ -388,6 +393,7 @@ function updateDebugInventoryComment(data) {
             temperature_C: data.temperature_C,
             melt_mass_kg: data.melt_mass_kg,
             mass_balance_error_pct: data.mass_balance_error_pct,
+            mass_balance_error_category: data.mass_balance_error_category || null,
         },
         process_inventory_kg: {
             cleaned_melt_oxide_projection: data.composition_wt_pct || {},

@@ -309,6 +309,20 @@ def _flue_composition_kg_hr(snapshot) -> dict[str, float]:
     return _rounded_positive_species(flue, 6)
 
 
+def _mass_balance_error_fields(snapshot, digits: int) -> dict[str, object]:
+    error_pct = getattr(snapshot, 'mass_balance_error_pct', None)
+    category = getattr(snapshot, 'mass_balance_error_category', None)
+    if error_pct is None:
+        return {
+            'mass_balance_error_pct': None,
+            'mass_balance_error_category': category or 'undefined',
+        }
+    return {
+        'mass_balance_error_pct': round(error_pct, digits),
+        'mass_balance_error_category': category,
+    }
+
+
 def _start_payload(
     *,
     sim,
@@ -465,7 +479,7 @@ def _tick_payload(
         'energy_kWh': round(snapshot.energy.total_kWh, 4),
         'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
         'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
-        'mass_balance_error_pct': round(snapshot.mass_balance_error_pct, 3),
+        **_mass_balance_error_fields(snapshot, 3),
         'ramp_throttled': snapshot.ramp_throttled,
         'nominal_ramp_rate': round(snapshot.nominal_ramp_rate_C_hr, 2),
         'actual_ramp_rate': round(snapshot.actual_ramp_rate_C_hr, 2),
@@ -520,8 +534,7 @@ def _completion_payload(sim):
         'oxygen_vented_kg': sim._oxygen_vented_kg(),
         'mass_in_kg': round(final_snapshot.mass_in_kg, 3),
         'mass_out_kg': round(final_snapshot.mass_out_kg, 3),
-        'mass_balance_error_pct': round(
-            final_snapshot.mass_balance_error_pct, 6),
+        **_mass_balance_error_fields(final_snapshot, 6),
         'residual_inventory_kg': {
             k: round(v, 3)
             for k, v in (

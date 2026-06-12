@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from engines.alphamelts import AlphaMELTSProvider
+import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendUnavailableError
 from simulator.chemistry.kernel import (
@@ -20,6 +21,7 @@ from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
     EngineBugAbort,
+    EvaluationAbort,
     EvaluationInputError,
     FailureCategory,
     _composition_target_constraints,
@@ -35,6 +37,7 @@ from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError
+from simulator.session import SimSession
 from simulator.state import CampaignPhase, HourSnapshot
 
 
@@ -201,10 +204,13 @@ class _Sim:
 
 
 def _snapshot(
-    mass_balance_error_pct: float = 0.0,
+    mass_balance_error_pct: float | None = 0.0,
     *,
     hour: int = 1,
     knudsen_regime_summary: dict[str, object] | None = None,
+    mass_in_kg: float = 1000.0,
+    mass_out_kg: float = 1000.0,
+    mass_balance_error_category: str = "",
 ) -> HourSnapshot:
     if knudsen_regime_summary is None:
         knudsen_regime_summary = {
@@ -219,13 +225,18 @@ def _snapshot(
                 }
             ],
         }
-    return HourSnapshot(
+    snapshot = HourSnapshot(
         hour=hour,
         campaign=CampaignPhase.C2A,
         temperature_C=1600.0,
+        mass_in_kg=mass_in_kg,
+        mass_out_kg=mass_out_kg,
         mass_balance_error_pct=mass_balance_error_pct,
         knudsen_regime_summary=knudsen_regime_summary,
     )
+    if mass_balance_error_category:
+        setattr(snapshot, "mass_balance_error_category", mass_balance_error_category)
+    return snapshot
 
 
 def _trace(
@@ -408,7 +419,10 @@ def _mass_balance_gate_profile() -> dict:
 
 @dataclass
 class ProductionMassBalanceReplayExecutor:
-    mass_balance_error_pct: float
+    mass_balance_error_pct: float | None = 0.0
+    mass_in_kg: float | None = None
+    mass_out_kg: float | None = None
+    mass_balance_error_category: str = ""
     calls: int = 0
     execution: object | None = None
 
@@ -417,14 +431,61 @@ class ProductionMassBalanceReplayExecutor:
         execution = RunExecutor().execute(config)
         snapshots = tuple(getattr(execution, "snapshots", ()))
         assert snapshots
-        patched_snapshots = (
-            replace(
-                snapshots[0],
-                mass_balance_error_pct=self.mass_balance_error_pct,
-            ),
-            *snapshots[1:],
-        )
+        overrides = {"mass_balance_error_pct": self.mass_balance_error_pct}
+        if self.mass_in_kg is not None:
+            overrides["mass_in_kg"] = self.mass_in_kg
+        if self.mass_out_kg is not None:
+            overrides["mass_out_kg"] = self.mass_out_kg
+        first = replace(snapshots[0], **overrides)
+        if self.mass_balance_error_category:
+            setattr(
+                first,
+                "mass_balance_error_category",
+                self.mass_balance_error_category,
+            )
+        patched_snapshots = (first, *snapshots[1:])
         self.execution = replace(execution, snapshots=patched_snapshots)
+        return self.execution
+
+
+@dataclass
+class ProductionMassBalanceRealPathExecutor:
+    mass_balance_error_pct: float | None = None
+    mass_in_kg: float = 0.0
+    mass_out_kg: float = 1.0
+    mass_balance_error_category: str = "zero_input_basis_breach"
+    calls: int = 0
+    execution: object | None = None
+
+    def execute(self, config: object) -> object:
+        self.calls += 1
+        session = SimSession()
+        session.start(config)
+        sim = session.simulator
+        original_step = sim.step
+
+        def marked_step() -> HourSnapshot:
+            snapshot = original_step()
+            marked = replace(
+                snapshot,
+                mass_balance_error_pct=self.mass_balance_error_pct,
+                mass_in_kg=self.mass_in_kg,
+                mass_out_kg=self.mass_out_kg,
+            )
+            if self.mass_balance_error_category:
+                setattr(
+                    marked,
+                    "mass_balance_error_category",
+                    self.mass_balance_error_category,
+                )
+            sim.record.snapshots[-1] = marked
+            return marked
+
+        sim.step = marked_step
+        self.execution = RunExecutor().execute_session(
+            session,
+            hours=int(getattr(config, "hours")),
+        )
         return self.execution
 
 
@@ -1055,8 +1116,18 @@ def test_inventory_overdraw_poison_pair_fires_named_gate() -> None:
     )
 
 
-def test_mass_balance_green_path_scores_with_gate_engaged_at_abort_boundary() -> None:
+def test_mass_balance_green_path_scores_with_gate_engaged_at_abort_boundary(
+    monkeypatch,
+) -> None:
     executor = ProductionMassBalanceReplayExecutor(mass_balance_error_pct=5.0e-12)
+    gate_calls: list[bool] = []
+    original_gate = evaluate_module._abort_on_mass_balance_breach
+
+    def spy_gate(*args, **kwargs):
+        gate_calls.append(True)
+        return original_gate(*args, **kwargs)
+
+    monkeypatch.setattr(evaluate_module, "_abort_on_mass_balance_breach", spy_gate)
 
     result = evaluate(
         _valid_patch(),
@@ -1075,6 +1146,7 @@ def test_mass_balance_green_path_scores_with_gate_engaged_at_abort_boundary() ->
         5.0e-12
     )
     assert result.run_reference is not None
+    assert gate_calls == [True]
 
 
 def test_mass_balance_poison_pair_fires_named_gate() -> None:
@@ -1091,6 +1163,76 @@ def test_mass_balance_poison_pair_fires_named_gate() -> None:
 
     assert raised.value.category is FailureCategory.ENGINE_BUG
     assert "mass balance breach" in str(raised.value)
+
+
+def test_mass_balance_zero_input_nonzero_output_fires_named_gate() -> None:
+    executor = ProductionMassBalanceRealPathExecutor()
+
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=_mass_balance_gate_profile(),
+            executor=executor,
+        )
+
+    assert raised.value.category is FailureCategory.ZERO_INPUT_BASIS_BREACH
+    assert "zero_input_basis_breach" in str(raised.value)
+    assert "mass_in_kg=0.0" in str(raised.value)
+    assert "mass_out_kg=1.0" in str(raised.value)
+    assert executor.calls == 1
+    assert executor.execution is not None
+    assert getattr(executor.execution, "status") == "ok"
+    per_hour = getattr(executor.execution, "per_hour")[0]
+    assert per_hour["mass_balance_pct"] is None
+    assert per_hour["mass_balance_error_category"] == "zero_input_basis_breach"
+
+
+def test_mass_balance_zero_input_zero_output_is_vacuously_closed_for_gate() -> None:
+    executor = ProductionMassBalanceReplayExecutor(
+        mass_balance_error_pct=0.0,
+        mass_in_kg=0.0,
+        mass_out_kg=0.0,
+    )
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_mass_balance_gate_profile(),
+        executor=executor,
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert executor.execution is not None
+    assert executor.execution.snapshots[0].mass_balance_error_pct == pytest.approx(0.0)
+    assert not hasattr(executor.execution.snapshots[0], "mass_balance_error_category")
+
+
+def test_zero_mass_eval_input_returns_named_ingress_refusal() -> None:
+    profile = {
+        **_mass_balance_gate_profile(),
+        "run": {**PROFILE["run"], "mass_kg": 0.0},
+    }
+    executor = FakeExecutor(_execution())
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.ZERO_INPUT_BASIS_BREACH
+    assert result.failing_gates == ("zero_input_basis_breach",)
+    assert result.eval_spec is None
+    assert result.cache_key is None
+    assert "zero_input_basis_breach" in result.notes[0]
+    assert executor.calls == 0
 
 
 def test_mass_balance_breach_aborts_as_engine_bug_with_repro_patch() -> None:

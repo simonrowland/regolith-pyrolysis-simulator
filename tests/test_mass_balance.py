@@ -10,7 +10,7 @@ from simulator.core import (
     FLOW_MASS_EXCLUDED_ACCOUNTS,
     PyrolysisSimulator,
 )
-from simulator.mass_balance import MassBalance
+from simulator.mass_balance import MassBalance, ZERO_INPUT_BASIS_BREACH
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import build_sio_yield_report
 from simulator.state import (
@@ -140,6 +140,56 @@ def test_mass_balance_counts_process_inventory_without_o2_double_count():
     assert result["condensed"] == pytest.approx(0.0)
     assert result["oxygen"] == pytest.approx(7.0)
     assert result["error_pct"] == pytest.approx(0.0)
+    assert result["error_category"] == ""
+
+
+def test_zero_input_nonzero_output_mass_balance_is_named_undefined():
+    melt = MeltState()
+    train = CondensationTrain.create_default()
+    balance = MassBalance()
+    balance.set_inputs(0.0, {})
+
+    result = balance.check(melt, train, oxygen_kg=1.0)
+
+    assert result["mass_in"] == pytest.approx(0.0)
+    assert result["mass_out"] == pytest.approx(1.0)
+    assert result["error_pct"] is None
+    assert result["error_category"] == ZERO_INPUT_BASIS_BREACH
+
+
+def test_zero_input_zero_output_mass_balance_is_vacuously_closed():
+    melt = MeltState()
+    train = CondensationTrain.create_default()
+    balance = MassBalance()
+    balance.set_inputs(0.0, {})
+
+    result = balance.check(melt, train, oxygen_kg=0.0)
+
+    assert result["mass_in"] == pytest.approx(0.0)
+    assert result["mass_out"] == pytest.approx(0.0)
+    assert result["error_pct"] == pytest.approx(0.0)
+    assert result["error_category"] == ""
+
+
+def test_snapshot_zero_input_nonzero_output_marks_named_breach():
+    feedstocks = _load_data_yaml("feedstocks.yaml")
+    setpoints = _load_data_yaml("setpoints.yaml")
+    vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressures,
+        feedstocks,
+        setpoints,
+    )
+    sim.record.batch_mass_kg = 0.0
+    sim.record.additives_kg = {}
+
+    snapshot = sim._make_snapshot()
+
+    assert snapshot.mass_in_kg == pytest.approx(0.0)
+    assert snapshot.mass_out_kg > 0.0
+    assert snapshot.mass_balance_error_pct is None
+    assert getattr(snapshot, "mass_balance_error_category") == ZERO_INPUT_BASIS_BREACH
 
 
 def test_product_summary_sums_duplicate_volatile_species():

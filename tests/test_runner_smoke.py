@@ -666,6 +666,36 @@ def test_runner_cli_entry_point_writes_output_file(tmp_path):
     assert payload["run_metadata"]["hours_completed"] == 2
 
 
+def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):
+    output = tmp_path / "zero-mass.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=2",
+            "--mass-kg=0",
+            f"--output={output}",
+            "--started-at-utc=2026-05-15T00:00:00Z",
+            "--kernel-commit-sha=cli-zero-mass",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert output.exists(), f"CLI did not write {output}"
+    payload = json.loads(output.read_text())
+    assert payload["status"] == "failed"
+    assert payload["run_metadata"]["mass_kg"] == pytest.approx(0.0)
+    assert "zero_input_basis_breach" in payload["error_message"]
+
+
 def test_runner_records_operator_decision_in_shadow_trace():
     """When the simulator pauses for a decision mid-run, the runner
     auto-applies the recommendation and records an ``operator_decision``

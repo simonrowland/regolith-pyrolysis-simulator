@@ -309,6 +309,41 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     assert run_config.mre_target_species == "SiO2"
 
 
+def test_build_eval_inputs_rejects_zero_mass_with_named_category() -> None:
+    profile = {
+        "profile_id": "zero-mass-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 0.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    with pytest.raises(EvaluationInputError, match="zero_input_basis_breach"):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile,
+            RecipeSchema(),
+        )
+
+
 def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> None:
     profile = {
         "profile_id": "c3-dose-profile",

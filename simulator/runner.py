@@ -69,6 +69,7 @@ from simulator.state import (
 
 # Public schema version pinned by docs/runner-output-schema.md.
 RUNNER_SCHEMA_VERSION = "1.3.0"
+ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -499,6 +500,7 @@ class PyrolysisRun:
             self.additives_kg,
             setpoints,
         )
+        mass_kg = _positive_mass_kg(self.mass_kg)
         runtime_overrides = {
             str(campaign): dict(fields)
             for campaign, fields in dict(self.runtime_campaign_overrides).items()
@@ -521,7 +523,7 @@ class PyrolysisRun:
             reduced_real_cache=self.reduced_real_cache,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             hours=int(self.hours),
-            mass_kg=self.mass_kg,
+            mass_kg=mass_kg,
             additives_kg=additives_kg,
             runtime_campaign_overrides=runtime_overrides,
             track=self.track,
@@ -733,6 +735,24 @@ def _finite_export_float(value: Any, *, field: str) -> float:
     return amount
 
 
+def _positive_mass_kg(value: Any, *, field: str = "mass_kg") -> float:
+    try:
+        mass_kg = float(value)
+    except (TypeError, ValueError) as exc:
+        raise RunnerError(
+            f"{ZERO_INPUT_BASIS_BREACH}: {field} must be numeric; got {value!r}"
+        ) from exc
+    if not math.isfinite(mass_kg):
+        raise RunnerError(
+            f"{ZERO_INPUT_BASIS_BREACH}: {field} must be finite; got {value!r}"
+        )
+    if mass_kg <= 0.0:
+        raise RunnerError(
+            f"{ZERO_INPUT_BASIS_BREACH}: {field} must be > 0 kg; got {mass_kg:.12g}"
+        )
+    return mass_kg
+
+
 def _nested_species_kg_from_segment_species(
     values: Mapping[tuple[str, str], float],
 ) -> dict[str, dict[str, float]]:
@@ -856,13 +876,21 @@ def build_per_hour_summary(
     # snapshot-level surface is already accessible to in-process
     # consumers and the web UI; this just defers the JSON-output
     # propagation.
+    mass_balance_category = str(
+        getattr(snapshot, "mass_balance_error_category", "") or ""
+    )
+    raw_mass_balance_pct = getattr(snapshot, "mass_balance_error_pct", None)
+    mass_balance_pct = (
+        None if raw_mass_balance_pct is None else float(raw_mass_balance_pct)
+    )
+
     summary = {
         "hour": int(snapshot.hour),
         "campaign": snapshot.campaign.name,
         "T_C": float(snapshot.temperature_C),
         "P_total_bar": p_total_bar,
         "pO2_bar": pO2_bar,
-        "mass_balance_pct": float(snapshot.mass_balance_error_pct),
+        "mass_balance_pct": mass_balance_pct,
         "O2_yield_kg_cumulative": float(snapshot.oxygen_produced_kg),
         "metal_yields_kg": metal_yields,
         "condensation_train_kg": {
@@ -879,6 +907,8 @@ def build_per_hour_summary(
         ),
         **_knudsen_regime_observables(snapshot),
     }
+    if mass_balance_category:
+        summary["mass_balance_error_category"] = mass_balance_category
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
@@ -1304,6 +1334,7 @@ def build_sio_yield_report(
             f"SiO yield report supports campaign {SIO_YIELD_CAMPAIGN!r}; "
             f"got {campaign!r}"
         )
+    mass_kg = _positive_mass_kg(mass_kg)
 
     from simulator.evaporation import _load_evaporation_alpha_by_species
 
@@ -1325,7 +1356,7 @@ def build_sio_yield_report(
         raise RunnerError(
             "SiO evaporation alpha missing from data/vapor_pressures.yaml"
         ) from exc
-    stage0_carbon_kg = _required_stage0_carbon_kg(feedstock, float(mass_kg))
+    stage0_carbon_kg = _required_stage0_carbon_kg(feedstock, mass_kg)
     additives_kg = {}
     if stage0_carbon_kg > 1.0e-12:
         additives_kg["C"] = stage0_carbon_kg
@@ -1340,7 +1371,7 @@ def build_sio_yield_report(
         feedstock_id=feedstock_id,
         campaign=campaign,
         hours=int(hours),
-        mass_kg=float(mass_kg),
+        mass_kg=mass_kg,
         backend_name="stub",
         track="pyrolysis",
         additives_kg=additives_kg,
@@ -1404,7 +1435,7 @@ def build_sio_yield_report(
 
     sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
-    sio_yield_pct = sio_evolved_kg / float(mass_kg) * 100.0
+    sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
     sio_to_silica_fume_kg = _stage_silica_fume_kg(sim)
     reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
