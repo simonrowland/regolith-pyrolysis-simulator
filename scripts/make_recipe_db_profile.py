@@ -26,10 +26,18 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
+
 DESIGN_TARGET_PROVENANCE = (
     "design-composition-target-objective-2026-06-10 rev 3.2 PC target menu seed"
 )
 STANDARD_COST_METRICS = ("energy_kWh", "duration_h")
+_SETPOINT_CAMPAIGN_ALIASES = {
+    "C2A": "C2A_continuous",
+    "C2A_staged": "C2A_staged",
+    "C3_K": "C3",
+    "C3_NA": "C3",
+}
 MENU_TARGET_IDS = (
     "pc-extract-na",
     "pc-extract-k",
@@ -401,6 +409,9 @@ def _target_objective(row: TargetMenuRow, *, campaign: str, hours: int) -> dict[
         },
         "score_weights": dict(row.score_weights or {"extraction": 0.5, "composition": 0.5}),
     }
+    thermal_window = _campaign_window_disposition(campaign)
+    if thermal_window is not None:
+        target["thermal_window"] = thermal_window
     if row.oxides or row.ratios:
         window: dict[str, Any] = {
             "pool": row.pool,
@@ -450,7 +461,16 @@ def _remove_constraint_gate(profile: dict[str, Any], gate: str) -> None:
 
 
 def _row_delivers_condenser_stream(row: TargetMenuRow) -> bool:
-    return row.pool in {"captured_products", "captured_stage_3_silica"}
+    return _row_product_pool_class(row) == "stream"
+
+
+def _row_product_pool_class(row: TargetMenuRow) -> str:
+    try:
+        return product_pool_class(row.pool)
+    except ValueError as exc:
+        raise SystemExit(
+            f"PC target {row.target_id!r} has unclassified product pool {row.pool!r}"
+        ) from exc
 
 
 def _scope_target_profile_constraints(profile: dict[str, Any], row: TargetMenuRow) -> None:
@@ -461,8 +481,8 @@ def _scope_target_profile_constraints(profile: dict[str, Any], row: TargetMenuRo
     if not isinstance(gates, list):
         return
 
-    if not _row_delivers_condenser_stream(row):
-        _remove_constraint_gate(profile, "delivered_stream_purity")
+    for gate in forbidden_gates_for_pool(row.pool):
+        _remove_constraint_gate(profile, gate)
 
     extraction_targets = tuple((row.extraction_min or {}).keys())
     if extraction_targets:
@@ -470,6 +490,140 @@ def _scope_target_profile_constraints(profile: dict[str, Any], row: TargetMenuRo
     else:
         _remove_constraint_gate(profile, "extraction_completeness")
         constraints.pop("target_species", None)
+
+
+def _setpoint_campaign_key(campaign: str) -> str:
+    return _SETPOINT_CAMPAIGN_ALIASES.get(campaign, campaign)
+
+
+def _setpoint_campaign_config(campaign: str) -> Mapping[str, Any]:
+    src = REPO_ROOT / "data" / "setpoints.yaml"
+    loaded = yaml.safe_load(src.read_text())
+    if not isinstance(loaded, Mapping):
+        raise SystemExit(f"invalid setpoints file: {src}")
+    campaigns = loaded.get("campaigns")
+    if not isinstance(campaigns, Mapping):
+        raise SystemExit(f"setpoints missing campaigns mapping: {src}")
+    selected = campaigns.get(_setpoint_campaign_key(campaign))
+    if selected is None:
+        raise SystemExit(f"setpoints missing campaign {campaign!r}")
+    if not isinstance(selected, Mapping):
+        raise SystemExit(f"setpoints campaign {campaign!r} must be a mapping")
+    return selected
+
+
+def _campaign_window_patch(campaign: str, *, hours: int) -> dict[str, Any] | None:
+    cfg = _setpoint_campaign_config(campaign)
+    temp_range = cfg.get("temp_range_C")
+    if temp_range is None:
+        return None
+    low_C, high_C = _numeric_interval(temp_range, label=f"{campaign}.temp_range_C")
+    if high_C < low_C:
+        raise SystemExit(f"{campaign}.temp_range_C must be ascending")
+    patch: dict[str, Any] = {
+        "temp_range_C": [low_C, high_C],
+    }
+    duration = cfg.get("duration_h")
+    if duration is not None and _recipe_campaign_key_allowed(campaign, "duration_h"):
+        patch["duration_h"] = duration
+    for key in (
+        "p_total_mbar",
+        "p_total_mbar_default",
+        "pO2_mbar",
+        "pO2_mbar_default",
+        "gas_temperature_C",
+        "flow_regime",
+    ):
+        value = cfg.get(key)
+        if value is not None and _recipe_campaign_key_allowed(campaign, key):
+            patch[key] = copy.deepcopy(value)
+    return patch
+
+
+def _campaign_window_disposition(campaign: str) -> str | None:
+    cfg = _setpoint_campaign_config(campaign)
+    if cfg.get("temp_range_C") is None:
+        return f"not-declared-for-campaign:{_setpoint_campaign_key(campaign)}"
+    return None
+
+
+def _recipe_campaign_key_allowed(campaign: str, key: str) -> bool:
+    from simulator.optimize.recipe import RecipeSchema, RecipeValidationError
+
+    try:
+        RecipeSchema().spec_for(("campaigns", campaign, key))
+    except RecipeValidationError:
+        return False
+    return True
+
+
+def _seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
+    campaigns: set[str] = set()
+    source_campaign = seed.get("source_campaign")
+    if source_campaign is not None:
+        campaigns.add(str(source_campaign))
+    source_campaigns = seed.get("source_campaigns")
+    if source_campaigns is None:
+        return frozenset(campaigns)
+    if isinstance(source_campaigns, (str, bytes)) or not isinstance(source_campaigns, list):
+        raise SystemExit(
+            f"seed {seed.get('id', '<unnamed>')} source_campaigns must be a list"
+        )
+    campaigns.update(str(campaign) for campaign in source_campaigns)
+    return frozenset(campaigns)
+
+
+def _ensure_target_campaign_window(
+    profile: dict[str, Any],
+    row: TargetMenuRow,
+    *,
+    campaign: str,
+    hours: int,
+) -> None:
+    patch = _campaign_window_patch(campaign, hours=hours)
+    if patch is None:
+        return
+    seeds = list(profile.get("seed_recipes") or [])
+    for seed in seeds:
+        if not isinstance(seed, dict):
+            continue
+        if campaign not in _seed_source_campaigns(seed):
+            continue
+        seed_patch = seed.setdefault("patch", {})
+        if not isinstance(seed_patch, dict):
+            raise SystemExit(f"seed {seed.get('id', '<unnamed>')} patch must be a mapping")
+        campaigns = seed_patch.setdefault("campaigns", {})
+        if not isinstance(campaigns, dict):
+            raise SystemExit(f"seed {seed.get('id', '<unnamed>')} campaigns must be a mapping")
+        existing = campaigns.setdefault(campaign, {})
+        if not isinstance(existing, dict):
+            raise SystemExit(f"seed {seed.get('id', '<unnamed>')} {campaign} patch must be a mapping")
+        for key, value in patch.items():
+            if key in existing and existing[key] != value:
+                if key == "duration_h":
+                    continue
+                raise SystemExit(
+                    f"{row.target_id} {campaign}.{key} conflicts with setpoint window"
+                )
+            existing.setdefault(key, value)
+        profile["seed_recipes"] = seeds
+        return
+    seeds.append({
+        "id": f"{row.target_id}-{campaign}-thermal-window",
+        "source_campaign": campaign,
+        "rationale": "materialize target campaign thermal window for runtime scheduling",
+        "patch": {"campaigns": {campaign: patch}},
+    })
+    profile["seed_recipes"] = seeds
+
+
+def _numeric_interval(value: Any, *, label: str) -> tuple[float, float]:
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise SystemExit(f"{label} must be a two-value interval")
+    try:
+        return float(value[0]), float(value[1])
+    except (TypeError, ValueError) as exc:
+        raise SystemExit(f"{label} must be numeric") from exc
 
 
 def _target_profile(
@@ -481,9 +635,6 @@ def _target_profile(
 ) -> dict[str, Any]:
     profile = copy.deepcopy(dict(base_profile))
     _scope_target_profile_constraints(profile, row)
-    if row.target_id == "pc-glass-retain-na-k-c3":
-        # C3 retain-alkali profiles do not produce a SiO viscous-flow observable.
-        _remove_constraint_gate(profile, "knudsen_viscous")
     feedstock = str(profile["feedstock"])
     profile["profile_id"] = f"{feedstock}-{row.target_id}-recipe-db-profile-v1"
     profile["description"] = f"{feedstock} PC target matrix profile for {row.target_id}."
@@ -496,6 +647,12 @@ def _target_profile(
         _target_objective(row, campaign=campaign, hours=hours),
         *_standard_cost_objectives(profile),
     ]
+    _ensure_target_campaign_window(
+        profile,
+        row,
+        campaign=campaign,
+        hours=hours,
+    )
     return profile
 
 

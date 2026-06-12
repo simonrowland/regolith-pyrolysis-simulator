@@ -505,6 +505,61 @@ def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None
     assert "denominator_target_equiv_mol=3" in margin.detail
 
 
+def test_extraction_completeness_uses_per_species_minimum() -> None:
+    def fe_threshold(value: float) -> ThresholdSpec:
+        return ThresholdSpec(
+            id="extraction_completeness_min[Fe]",
+            value=value,
+            units="fraction",
+            source="profile",
+            source_ref="test target.extraction.completeness_min.Fe",
+        )
+
+    products = {"Fe": 0.86 * MOLAR_MASS["Fe"] / 1000.0}
+    rump = {"FeO": 0.14 * MOLAR_MASS["FeO"] / 1000.0}
+    trace = _trace(
+        condensed=({(1, "Fe"): 1.0},),
+        products=products,
+        rump=rump,
+    )
+    loose = PhysicsConstraintSet(
+        target_species=("Fe",),
+        extraction_min_fraction_by_species={"Fe": fe_threshold(0.85)},
+    )
+    tight = PhysicsConstraintSet(
+        target_species=("Fe",),
+        extraction_min_fraction_by_species={"Fe": fe_threshold(0.95)},
+    )
+
+    loose_margin = loose.extraction_completeness(trace)
+    tight_margin = tight.extraction_completeness(trace)
+
+    assert loose_margin.feasible
+    assert loose_margin.observed == pytest.approx(0.86)
+    assert loose_margin.margin == pytest.approx(0.01)
+    assert loose_margin.threshold.value == pytest.approx(0.85)
+    assert not tight_margin.feasible
+    assert tight_margin.observed == pytest.approx(0.86)
+    assert tight_margin.margin == pytest.approx(-0.09)
+    assert tight_margin.threshold.value == pytest.approx(0.95)
+
+
+def test_per_species_extraction_thresholds_must_cover_targets() -> None:
+    threshold = ThresholdSpec(
+        id="extraction_completeness_min[Fe]",
+        value=0.85,
+        units="fraction",
+        source="profile",
+        source_ref="test target.extraction.completeness_min.Fe",
+    )
+
+    with pytest.raises(ValueError, match="missing thresholds"):
+        PhysicsConstraintSet(
+            target_species=("Fe", "K"),
+            extraction_min_fraction_by_species={"Fe": threshold},
+        )
+
+
 def test_extraction_completeness_reports_target_denominator_residual_and_product_bin() -> None:
     constraints = PhysicsConstraintSet(
         target_species=("Cr",),

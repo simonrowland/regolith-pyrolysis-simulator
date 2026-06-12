@@ -29,7 +29,7 @@ PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
-    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.5",'
+    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
     b'"data_digests":{"feedstocks":"feedstock-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
     b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
@@ -90,7 +90,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.5",
+    code_version="0.5.6",
     data_digests={
         "setpoints": "setpoints-digest",
         "feedstocks": "feedstock-digest",
@@ -386,6 +386,36 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[-1] == pytest.approx(1600.0)
 
 
+def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _campaign_window_profile("C2B", 1320.0, 1480.0, 24),
+        RecipeSchema(),
+    )
+
+    overrides = run_config.runtime_campaign_overrides["C2B"]
+    assert run_config.hours == 27
+    assert spec.hours == 27
+    assert overrides["thermal_window_preheat_hours"] == pytest.approx(3.0)
+    assert overrides["thermal_window_ramp_C_per_hr"] == pytest.approx(
+        (1480.0 - 1320.0) / 24.0
+    )
+
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    temperatures = [
+        session.advance().snapshot.temperature_C
+        for _ in range(run_config.hours)
+    ]
+
+    assert temperatures[0] == pytest.approx(625.0)
+    assert temperatures[1] == pytest.approx(1225.0)
+    assert temperatures[2] == pytest.approx(1320.0)
+    assert temperatures[-1] == pytest.approx(1480.0)
+    assert max(temperatures) >= 1320.0
+
+
 def test_c2a_profile_window_splits_cache_key_from_cold_start() -> None:
     cold_spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -469,12 +499,34 @@ def _c2a_window_profile(
     high_C: float | None,
     duration_h: int,
 ) -> dict[str, object]:
-    campaign_patch: dict[str, object] = {"p_total_mbar_default": 10.0}
+    return _campaign_window_profile(
+        "C2A_continuous",
+        low_C,
+        high_C,
+        duration_h,
+        profile_id="c2a-thermal-window-test",
+    )
+
+
+def _campaign_window_profile(
+    campaign: str,
+    low_C: float | None,
+    high_C: float | None,
+    duration_h: int,
+    *,
+    profile_id: str | None = None,
+) -> dict[str, object]:
+    campaign_patch: dict[str, object] = (
+        {"p_total_mbar_default": 10.0}
+        if campaign == "C2A_continuous"
+        else {}
+    )
     if low_C is not None and high_C is not None:
         campaign_patch["temp_range_C"] = [low_C, high_C]
-        campaign_patch["duration_h"] = duration_h
+        if campaign == "C2A_continuous":
+            campaign_patch["duration_h"] = duration_h
     return {
-        "profile_id": "c2a-thermal-window-test",
+        "profile_id": profile_id or f"{campaign.lower()}-thermal-window-test",
         "profile_schema_version": "profile-schema-v1",
         "feedstock": "lunar_mare_low_ti",
         "objectives": [
@@ -490,12 +542,12 @@ def _c2a_window_profile(
         "seed_recipes": [
             {
                 "id": "seed",
-                "source_campaign": "C2A_continuous",
-                "patch": {"campaigns": {"C2A_continuous": campaign_patch}},
+                "source_campaign": campaign,
+                "patch": {"campaigns": {campaign: campaign_patch}},
             }
         ],
         "run": {
-            "campaign": "C2A_continuous",
+            "campaign": campaign,
             "hours": duration_h,
             "mass_kg": 1000.0,
             "backend_name": "stub",

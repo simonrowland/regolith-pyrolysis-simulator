@@ -13,6 +13,7 @@ from simulator.optimize.physics import GATE_ORDER
 from simulator.optimize.profiles import (
     KNOWN_OBJECTIVE_METRICS,
     ProfileValidationError,
+    physics_constraints_from_profile,
     validate_profile,
     validate_profile_catalog,
 )
@@ -117,6 +118,20 @@ def test_constraint_target_species_must_be_non_empty_list() -> None:
 
     with pytest.raises(ProfileValidationError, match="constraints.target_species must be a non-empty list"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+@pytest.mark.parametrize("gate", ("delivered_stream_purity", "knudsen_viscous"))
+def test_runtime_loader_refuses_stale_melt_pool_gates(gate: str) -> None:
+    profile = _composition_profile()
+    profile["constraints"]["gates"].append(gate)
+
+    with pytest.raises(ProfileValidationError) as excinfo:
+        physics_constraints_from_profile(profile, source="stale-profile.yaml")
+
+    message = str(excinfo.value)
+    assert gate in message
+    assert "residual_rump_at_stop" in message
+    assert "FORCE_PROFILES=1" in message
 
 
 def test_unknown_constraint_key_raises_named_error() -> None:
@@ -384,6 +399,11 @@ def _profile_copy(feedstock: str) -> dict:
 
 def _composition_profile() -> dict:
     profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["gates"] = [
+        gate
+        for gate in profile["constraints"]["gates"]
+        if gate not in {"delivered_stream_purity", "knudsen_viscous"}
+    ]
     profile["profile_id"] = "composition-target-profile-test"
     profile["objectives"] = [
         {

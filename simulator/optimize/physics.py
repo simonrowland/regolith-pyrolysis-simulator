@@ -116,6 +116,9 @@ class PhysicsConstraintSet:
         source="code_default",
         source_ref="simulator.optimize.physics.PhysicsConstraintSet.extraction_min_fraction",
     ))
+    extraction_min_fraction_by_species: Mapping[str, ThresholdSpec] = field(
+        default_factory=dict
+    )
     knudsen_max: ThresholdSpec = field(default_factory=lambda: ThresholdSpec(
         id="knudsen_viscous_max",
         value=0.01,
@@ -144,6 +147,9 @@ class PhysicsConstraintSet:
             "stream_purity_min": self.stream_purity_min,
             "coating_min_campaigns_to_resinter": self.coating_min_campaigns_to_resinter,
             "extraction_min_fraction": self.extraction_min_fraction,
+            "extraction_min_fraction_by_species": dict(
+                self.extraction_min_fraction_by_species
+            ),
             "knudsen_max": self.knudsen_max,
             "furnace_T_max_C": self.furnace_T_max_C,
             "target_species": self.target_species,
@@ -166,6 +172,25 @@ class PhysicsConstraintSet:
                 for target, species in self.residual_species_by_target.items()
             }),
         )
+        object.__setattr__(
+            self,
+            "extraction_min_fraction_by_species",
+            MappingProxyType({
+                str(species): threshold
+                for species, threshold in self.extraction_min_fraction_by_species.items()
+            }),
+        )
+        if self.extraction_min_fraction_by_species:
+            missing = sorted(
+                str(species)
+                for species in self.target_species
+                if str(species) not in self.extraction_min_fraction_by_species
+            )
+            if missing:
+                raise ValueError(
+                    "extraction_min_fraction_by_species missing thresholds for "
+                    f"target_species: {missing}"
+                )
         object.__setattr__(
             self,
             "allowable_wall_deposit_kg",
@@ -201,6 +226,7 @@ class PhysicsConstraintSet:
             self.stream_purity_min,
             self.coating_min_campaigns_to_resinter,
             self.extraction_min_fraction,
+            *tuple(self.extraction_min_fraction_by_species.values()),
             self.knudsen_max,
             self.furnace_T_max_C,
             *tuple(self.allowable_wall_deposit_kg.values()),
@@ -237,6 +263,12 @@ class PhysicsConstraintSet:
                 self.furnace_T_max_C.source,
             ),
         ]
+        for species, threshold in sorted(self.extraction_min_fraction_by_species.items()):
+            rows.append((
+                "extraction_completeness",
+                f"extraction_min_fraction_by_species[{species}]={threshold.value:g}",
+                threshold.source,
+            ))
         for (segment, species), threshold in sorted(self.allowable_wall_deposit_kg.items()):
             rows.append((
                 "coating",
@@ -452,31 +484,34 @@ class PhysicsConstraintSet:
             worst_margin = math.inf
             worst_fraction = 1.0
             worst_detail = ""
+            worst_threshold = self.extraction_min_fraction
             for target in self.target_species:
+                threshold = self._extraction_threshold_for_target(str(target))
                 result = by_target[str(target)]
                 if result.completeness_fraction is None:
                     detail = _extraction_completeness_fail_closed_detail(result)
                     if detail.startswith("not-applicable:"):
                         return _not_applicable(
                             "extraction_completeness",
-                            self.extraction_min_fraction,
+                            threshold,
                             detail,
                         )
                     return _fail_closed(
                         "extraction_completeness",
-                        self.extraction_min_fraction,
+                        threshold,
                         detail,
                     )
                 fraction = result.completeness_fraction
-                margin = fraction - self.extraction_min_fraction.value
+                margin = fraction - threshold.value
                 if margin < worst_margin:
                     worst_margin = margin
                     worst_fraction = fraction
                     worst_detail = result.detail
+                    worst_threshold = threshold
             return _margin(
                 "extraction_completeness",
                 worst_margin,
-                self.extraction_min_fraction,
+                worst_threshold,
                 worst_fraction,
                 worst_detail,
             )
@@ -486,6 +521,12 @@ class PhysicsConstraintSet:
                 self.extraction_min_fraction,
                 str(exc),
             )
+
+    def _extraction_threshold_for_target(self, target: str) -> ThresholdSpec:
+        return self.extraction_min_fraction_by_species.get(
+            str(target),
+            self.extraction_min_fraction,
+        )
 
     def knudsen_viscous(self, trace: Any) -> GateMargin:
         try:
@@ -646,6 +687,7 @@ def _extraction_completeness_target_report(
     constraints: PhysicsConstraintSet,
 ) -> Mapping[str, Any]:
     target = str(result.target_species)
+    threshold = constraints._extraction_threshold_for_target(target)
     residual_species = _residual_species_for_target(target, constraints)
     has_denominator = result.completeness_fraction is not None
     payload: dict[str, Any] = {
@@ -656,7 +698,7 @@ def _extraction_completeness_target_report(
         "denominator_basis": "target_equivalent_mol",
         "allowed_residual": _allowed_residual_payload(
             residual_species,
-            constraints,
+            threshold,
             result.denominator_target_equiv_mol if has_denominator else None,
             has_denominator,
         ),
@@ -689,6 +731,7 @@ def _extraction_completeness_insufficient_report(
     constraints: PhysicsConstraintSet,
     reason: str,
 ) -> Mapping[str, Any]:
+    threshold = constraints._extraction_threshold_for_target(target)
     residual_species = _residual_species_for_target(target, constraints)
     return MappingProxyType({
         "status": "insufficient-evidence",
@@ -698,7 +741,7 @@ def _extraction_completeness_insufficient_report(
         "denominator_basis": "target_equivalent_mol",
         "allowed_residual": _allowed_residual_payload(
             residual_species,
-            constraints,
+            threshold,
             None,
             False,
         ),
@@ -742,11 +785,11 @@ def _extraction_denominator_account() -> Mapping[str, str]:
 
 def _allowed_residual_payload(
     residual_species: tuple[str, ...],
-    constraints: PhysicsConstraintSet,
+    threshold: ThresholdSpec,
     denominator_target_equiv_mol: float | None,
     has_denominator: bool,
 ) -> Mapping[str, Any]:
-    allowed_fraction = max(0.0, 1.0 - constraints.extraction_min_fraction.value)
+    allowed_fraction = max(0.0, 1.0 - threshold.value)
     return MappingProxyType({
         "account": "terminal_rump_by_species_kg",
         "species": residual_species,

@@ -560,6 +560,68 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert board_payload["entries"][0]["backend"] == run["latest_result"]["backend"]
 
 
+def test_optimizer_leaderboard_excludes_stale_version_and_digest_rows(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-stale-scope"
+    run_dir.mkdir(parents=True)
+
+    current_spec = _base_spec(recipe_id="recipe-current")
+    stale_version_spec = replace(
+        current_spec,
+        recipe_id="recipe-old-version",
+        code_version="0.5.5",
+    )
+    stale_digest_spec = replace(
+        current_spec,
+        recipe_id="recipe-old-digest",
+        data_digests={**current_spec.data_digests, "profile": "old-profile-digest"},
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        stale_version_spec,
+        _scored(
+            stale_version_spec,
+            candidate_id="candidate-old-version",
+            oxygen=99.0,
+            energy=1.0,
+        ),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    store.store(
+        stale_digest_spec,
+        _scored(
+            stale_digest_spec,
+            candidate_id="candidate-old-digest",
+            oxygen=98.0,
+            energy=1.0,
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    store.store(
+        current_spec,
+        _scored(
+            current_spec,
+            candidate_id="candidate-current",
+            oxygen=10.0,
+            energy=2.0,
+        ),
+        created_at="2026-06-03T00:00:00Z",
+    )
+
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert leaderboard.status_code == 200
+    payload = leaderboard.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-current"
+    ]
+    assert payload["entries"][0]["eval_spec"]["data_digests"] == current_spec.data_digests
+
+
 def test_optimizer_reader_discovers_completed_job_result_dirs(client) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     job_id = "job-complete-001"

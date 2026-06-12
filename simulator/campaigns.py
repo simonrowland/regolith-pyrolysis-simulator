@@ -108,6 +108,13 @@ class CampaignManager:
             value = value[key]
         return self._required_float(value, label)
 
+    def _max_hold_hr(self, campaign: CampaignPhase, *path: str) -> float:
+        if not path:
+            ovr = self._campaign_overrides(campaign)
+            if 'max_hours' in ovr:
+                return self._float(ovr.get('max_hours'), 0.0)
+        return self._configured_max_hold_hr(campaign, *path)
+
     def _configured_endpoint(self,
                              campaign: CampaignPhase,
                              key: str) -> Mapping:
@@ -308,6 +315,10 @@ class CampaignManager:
                                campaign_hour: int,
                                melt: MeltState) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
+        thermal_window = self._thermal_window_temp_target(campaign, melt)
+        if thermal_window is not None:
+            return thermal_window
+
         if campaign == CampaignPhase.C0:
             # Ramp from current T to 950°C at 50°C/hr
             return (950.0, 50.0)
@@ -317,34 +328,6 @@ class CampaignManager:
             return (1250.0, 30.0)
 
         elif campaign == CampaignPhase.C2A:
-            ovr = self._campaign_overrides(campaign)
-            if {
-                'thermal_window_low_C',
-                'thermal_window_high_C',
-                'thermal_window_duration_h',
-            } <= set(ovr):
-                low_C = self._float(ovr.get('thermal_window_low_C'), 1050.0)
-                high_C = self._float(ovr.get('thermal_window_high_C'), 1600.0)
-                duration_h = self._float(ovr.get('thermal_window_duration_h'), 24.0)
-                if duration_h <= 0.0:
-                    raise ValueError('thermal_window_duration_h must be positive')
-                if high_C < low_C:
-                    raise ValueError('thermal_window_high_C must be >= thermal_window_low_C')
-                if melt.temperature_C < low_C - 1e-9:
-                    return (
-                        low_C,
-                        self._float(
-                            ovr.get('thermal_window_preheat_ramp_C_per_hr'),
-                            600.0,
-                        ),
-                    )
-                return (
-                    high_C,
-                    self._float(
-                        ovr.get('thermal_window_ramp_C_per_hr'),
-                        (high_C - low_C) / duration_h,
-                    ),
-                )
             # Continuous ramp 1050 → 1600°C
             # Ramp rate varies: 15°C/hr early, 7.5°C/hr at peak SiO window
             if melt.temperature_C < 1320:
@@ -421,9 +404,48 @@ class CampaignManager:
 
         return (None, 0.0)
 
+    def _thermal_window_temp_target(
+            self,
+            campaign: CampaignPhase,
+            melt: MeltState) -> Optional[Tuple[Optional[float], float]]:
+        ovr = self._campaign_overrides(campaign)
+        keys = {
+            'thermal_window_low_C',
+            'thermal_window_high_C',
+            'thermal_window_duration_h',
+        }
+        present = keys & set(ovr)
+        if not present:
+            return None
+        if present != keys:
+            missing = ', '.join(sorted(keys - present))
+            raise ValueError(f'thermal window override missing: {missing}')
+        low_C = self._float(ovr.get('thermal_window_low_C'), 0.0)
+        high_C = self._float(ovr.get('thermal_window_high_C'), 0.0)
+        duration_h = self._float(ovr.get('thermal_window_duration_h'), 0.0)
+        if duration_h <= 0.0:
+            raise ValueError('thermal_window_duration_h must be positive')
+        if high_C < low_C:
+            raise ValueError('thermal_window_high_C must be >= thermal_window_low_C')
+        if melt.temperature_C < low_C - 1e-9:
+            return (
+                low_C,
+                self._float(
+                    ovr.get('thermal_window_preheat_ramp_C_per_hr'),
+                    600.0,
+                ),
+            )
+        return (
+            high_C,
+            self._float(
+                ovr.get('thermal_window_ramp_C_per_hr'),
+                (high_C - low_C) / duration_h,
+            ),
+        )
+
     def _apply_ramp_override(self, campaign: CampaignPhase,
-                              target_T: Optional[float],
-                              ramp_rate: float) -> Tuple[Optional[float], float]:
+                             target_T: Optional[float],
+                             ramp_rate: float) -> Tuple[Optional[float], float]:
         """Apply runtime ramp rate override if set."""
         ovr = self._campaign_overrides(campaign)
         if 'ramp_rate' in ovr:
@@ -470,7 +492,7 @@ class CampaignManager:
             min_temperature_C = self._endpoint_float(
                 campaign, soft, 'temperature_min_C')
             min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            max_hold_hr = self._max_hold_hr(campaign)
             if (melt.temperature_C >= min_temperature_C
                     and melt.campaign_hour >= min_hold_hr):
                 return True
@@ -479,7 +501,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C0B:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            max_hold_hr = self._max_hold_hr(campaign)
             min_temperature_C = self._endpoint_float(
                 campaign, soft, 'temperature_min_C')
             if (melt.campaign_hour >= max_hold_hr
@@ -496,7 +518,7 @@ class CampaignManager:
                 ovr.get('threshold_kg_hr'),
                 self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
             )
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            max_hold_hr = self._max_hold_hr(campaign)
             total_rate = evap_flux.total_kg_hr
             if (melt.campaign_hour >= min_hold_hr
                     and total_rate < threshold_kg_hr):
@@ -511,10 +533,15 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C2B:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
-            threshold_kg_hr = self._endpoint_float(
-                campaign, soft, 'threshold_kg_hr')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            min_hold_hr = self._float(
+                ovr.get('min_hold_hr'),
+                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            )
+            threshold_kg_hr = self._float(
+                ovr.get('threshold_kg_hr'),
+                self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
+            )
+            max_hold_hr = self._max_hold_hr(campaign)
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C2B.soft_endpoint.species is required')
@@ -569,7 +596,7 @@ class CampaignManager:
             min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
             threshold_kg_hr = self._endpoint_float(
                 campaign, soft, 'threshold_kg_hr')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            max_hold_hr = self._max_hold_hr(campaign)
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
@@ -598,7 +625,7 @@ class CampaignManager:
                     'C6.composition_endpoint.species must be a list')
             threshold_wt_pct = self._endpoint_float(
                 campaign, composition_endpoint, 'threshold_wt_pct')
-            max_hold_hr = self._configured_max_hold_hr(campaign)
+            max_hold_hr = self._max_hold_hr(campaign)
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
             if refractory_pct < threshold_wt_pct:

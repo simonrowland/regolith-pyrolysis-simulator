@@ -32,6 +32,7 @@ from simulator.optimize.objective import (
     ObjectiveVector,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
+    composition_target_specs,
     composition_targets_require_coating,
     composition_targets_require_terminal_rump,
     compute_objectives,
@@ -45,7 +46,11 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     physics_constraints_digest,
 )
-from simulator.optimize.profiles import physics_constraints_from_profile, validate_profile
+from simulator.optimize.profiles import (
+    ProfileValidationError,
+    physics_constraints_from_profile,
+    validate_profile,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.reduced_real_determinism import PT0NonFinitePayload
@@ -71,6 +76,7 @@ class FailureCategory(str, Enum):
     INVALID_RECIPE = "invalid_recipe"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
+    STALE_PROFILE = "stale_profile"
 
 
 @dataclass(frozen=True)
@@ -274,8 +280,8 @@ def evaluate(
             notes=(str(exc),),
         )
 
-    active_constraints = _composition_target_constraints(profile, constraints)
     try:
+        active_constraints = _composition_target_constraints(profile, constraints)
         spec, run_config = _build_eval_inputs(
             validated_patch,
             feedstock_id,
@@ -284,6 +290,10 @@ def evaluate(
             active_schema,
             constraints=active_constraints,
         )
+    except ProfileValidationError as exc:
+        if _is_stale_profile_refusal(exc):
+            return _stale_profile_result(candidate_id, str(exc))
+        raise
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
             str(exc),
@@ -1227,8 +1237,6 @@ def _profile_thermal_window_schedule(
     constraints: PhysicsConstraintSet | None,
 ) -> Mapping[str, Any] | None:
     campaign = str(run_options.get("campaign", "") or "")
-    if campaign not in {"C2A", "C2A_continuous"}:
-        return None
     temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
     bounds = _numeric_interval(temp_range)
     if bounds is None:
@@ -1452,6 +1460,7 @@ def _composition_target_constraints(
     constraints: PhysicsConstraintSet | None,
 ) -> PhysicsConstraintSet | None:
     active = constraints or physics_constraints_from_profile(profile)
+    active = _with_composition_target_extraction_thresholds(profile, active)
     try:
         requires_coating = composition_targets_require_coating(profile)
     except ValueError:
@@ -1463,6 +1472,78 @@ def _composition_target_constraints(
     if "coating" in active.active_gates:
         return active
     return replace(active, active_gates=(*active.active_gates, "coating"))
+
+
+def _with_composition_target_extraction_thresholds(
+    profile: Mapping[str, Any],
+    constraints: PhysicsConstraintSet | None,
+) -> PhysicsConstraintSet | None:
+    if constraints is None or not isinstance(constraints, PhysicsConstraintSet):
+        return constraints
+    specs = composition_target_specs(profile)
+    if not specs:
+        return constraints
+
+    profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
+    species_thresholds: dict[str, ThresholdSpec] = {}
+    for spec in specs:
+        objective_id = str(spec.get("id") or spec.get("metric") or "composition_target")
+        target = spec.get("target")
+        if not isinstance(target, MappingABC):
+            continue
+        extraction = target.get("extraction")
+        if not isinstance(extraction, MappingABC):
+            continue
+        completeness_min = extraction.get("completeness_min")
+        if not isinstance(completeness_min, MappingABC):
+            continue
+        for species in tuple(str(item) for item in target.get("species_vector", ())):
+            if str(target["species_vector"][species]) != "extract":
+                continue
+            if species not in completeness_min:
+                raise EvaluationInputError(
+                    f"{objective_id} extraction species {species!r} lacks "
+                    "target.extraction.completeness_min threshold"
+                )
+        for species, value in completeness_min.items():
+            key = str(species)
+            threshold = ThresholdSpec(
+                id=f"extraction_completeness_min[{key}]",
+                value=float(value),
+                units=constraints.extraction_min_fraction.units,
+                source="profile",
+                source_ref=(
+                    f"{profile_id}:{objective_id}."
+                    f"target.extraction.completeness_min.{key}"
+                ),
+                tolerance=constraints.extraction_min_fraction.tolerance,
+            )
+            existing = species_thresholds.get(key)
+            if existing is not None and existing.value != threshold.value:
+                raise EvaluationInputError(
+                    f"conflicting extraction completeness thresholds for {key!r}: "
+                    f"{existing.value:g} vs {threshold.value:g}"
+                )
+            species_thresholds[key] = threshold
+
+    if not species_thresholds:
+        return constraints
+    if "extraction_completeness" not in constraints.active_gates:
+        return constraints
+    missing = sorted(
+        species
+        for species in constraints.target_species
+        if str(species) not in species_thresholds
+    )
+    if missing:
+        raise EvaluationInputError(
+            "profile extraction constraints missing per-species thresholds for "
+            f"target_species: {missing}"
+        )
+    return replace(
+        constraints,
+        extraction_min_fraction_by_species=MappingProxyType(species_thresholds),
+    )
 
 
 def _infeasible_result(
@@ -2268,6 +2349,25 @@ def _non_finite_payload_result(
             error_message,
         ),
     )
+
+
+def _stale_profile_result(
+    candidate_id: str | None,
+    error_message: str,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.STALE_PROFILE,
+        notes=(error_message,),
+    )
+
+
+def _is_stale_profile_refusal(exc: ProfileValidationError) -> bool:
+    message = str(exc)
+    return "out-of-policy gate" in message and "FORCE_PROFILES=1" in message
 
 
 def _non_finite_payload_margin() -> GateMargin:

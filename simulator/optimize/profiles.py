@@ -22,6 +22,7 @@ from simulator.optimize.objective import (
     objective_type,
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
+from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 
@@ -211,6 +212,7 @@ def validate_profile(
 
     _validate_objectives(profile, source=source)
     _validate_constraints(profile["constraints"], source=source)
+    _validate_pool_scoped_constraints(profile, source=source)
     _validate_study_constraints(profile.get("study_constraints"), source=source)
     _validate_run(profile["run"], source=source, where="run")
     _validate_fidelities(
@@ -238,6 +240,7 @@ def physics_constraints_from_profile(
     if not isinstance(raw_constraints, Mapping):
         raise ProfileValidationError(f"{profile_source}: constraints must be a mapping")
     _validate_constraints(raw_constraints, source=profile_source)
+    _validate_pool_scoped_constraints(profile, source=profile_source)
     base = PhysicsConstraintSet()
     updates: dict[str, Any] = {}
     for key, attr in _THRESHOLD_CONSTRAINT_KEYS.items():
@@ -369,6 +372,39 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
                 )
     if "target_species" in raw:
         _validate_target_species(raw["target_species"], source=source)
+
+
+def _validate_pool_scoped_constraints(profile: Mapping[str, Any], *, source: str | Path) -> None:
+    raw_constraints = profile.get("constraints", {})
+    if not isinstance(raw_constraints, Mapping):
+        return
+    gates = raw_constraints.get("gates")
+    if not isinstance(gates, list):
+        return
+    active_gates = {str(gate) for gate in gates}
+    objectives = profile.get("objectives", ())
+    if not isinstance(objectives, list):
+        return
+    for index, objective in enumerate(objectives):
+        if not isinstance(objective, Mapping):
+            continue
+        if objective_type(objective) != COMPOSITION_TARGET_TYPE:
+            continue
+        target = objective.get("target")
+        if not isinstance(target, Mapping):
+            continue
+        pool = str(target.get("pool", ""))
+        try:
+            pool_class = product_pool_class(pool)
+        except ValueError:
+            continue
+        for gate in forbidden_gates_for_pool(pool):
+            if gate in active_gates:
+                raise ProfileValidationError(
+                    f"{source}: constraints.gates contains out-of-policy gate {gate!r} "
+                    f"for {pool_class} target pool {pool!r}; regenerate with "
+                    "FORCE_PROFILES=1"
+                )
 
 
 def _validate_constraint_threshold(raw: Any, *, source: str | Path, where: str) -> None:

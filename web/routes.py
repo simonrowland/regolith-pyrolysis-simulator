@@ -29,6 +29,7 @@ from simulator.mre_ladder import (
 )
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.result_scope import selector_where
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -480,8 +481,46 @@ def _query_result_rows(
     profile_id: str | None,
     fidelity: str | None,
 ) -> list[sqlite3.Row]:
+    active_code_version = current_code_version()
+    with _connect_result_store(cache_path) as conn:
+        data_digests = _current_selector_data_digests(
+            conn,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            code_version=active_code_version,
+        )
+        if data_digests is None:
+            return []
+        where, params = selector_where(
+            feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            code_version=active_code_version,
+            data_digests=data_digests,
+        )
+        return conn.execute(
+            f"""
+            SELECT *
+            FROM results
+            WHERE {where}
+            """,
+            params,
+        ).fetchall()
+
+
+def _current_selector_data_digests(
+    conn: sqlite3.Connection,
+    *,
+    feedstock_id: str | None,
+    profile_id: str | None,
+    fidelity: str | None,
+    code_version: str,
+) -> Mapping[str, str] | None:
     clauses = []
     params: list[str] = []
+    clauses.append('code_version = ?')
+    params.append(code_version)
     for column, value in (
         ('feedstock_id', feedstock_id),
         ('profile_id', profile_id),
@@ -491,15 +530,22 @@ def _query_result_rows(
             clauses.append(f'{column} = ?')
             params.append(value)
     where = ' AND '.join(clauses) if clauses else '1 = 1'
-    with _connect_result_store(cache_path) as conn:
-        return conn.execute(
-            f"""
-            SELECT *
-            FROM results
-            WHERE {where}
-            """,
-            params,
-        ).fetchall()
+    row = conn.execute(
+        f"""
+        SELECT data_digests
+        FROM results
+        WHERE {where}
+        ORDER BY created_at DESC, cache_key ASC
+        LIMIT 1
+        """,
+        params,
+    ).fetchone()
+    if row is None:
+        return None
+    data_digests = _json_value(row['data_digests'], {})
+    if not isinstance(data_digests, Mapping):
+        return None
+    return {str(key): str(value) for key, value in data_digests.items()}
 
 
 def _numeric_objective_value(objective: dict[str, Any]) -> float | None:

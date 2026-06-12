@@ -23,6 +23,8 @@ from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
     _build_eval_inputs,
+    _is_stale_profile_refusal,
+    _stale_profile_result,
     evaluate,
 )
 from simulator.optimize.evalspec import PrefixEvalSpec, cache_key
@@ -37,7 +39,11 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
 from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
-from simulator.optimize.profiles import physics_constraints_from_profile, validate_profile
+from simulator.optimize.profiles import (
+    ProfileValidationError,
+    physics_constraints_from_profile,
+    validate_profile,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import (
@@ -293,18 +299,28 @@ def run(
         out_dir=out_dir,
         seed=seed,
     )
-    resolved_profile = resolve_profile(
-        config.profile,
-        expected_feedstock=config.feedstock,
-        schema=active_schema,
-    )
+    try:
+        resolved_profile = resolve_profile(
+            config.profile,
+            expected_feedstock=config.feedstock,
+            schema=active_schema,
+        )
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
+            raise
+        resolved_profile = dict(config.profile)
     definitions = objective_definitions(resolved_profile)
     _validate_inputs(config, resolved_profile)
-    active_constraints = (
-        _constraints_for_profile(resolved_profile)
-        if constraints is None
-        else constraints
-    )
+    try:
+        active_constraints = (
+            _constraints_for_profile(resolved_profile)
+            if constraints is None
+            else constraints
+        )
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        active_constraints = None
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = result_store or ResultStore(out / "cache.sqlite")
@@ -910,6 +926,10 @@ def _lookup_cached(
         )
     except RecipeValidationError:
         return None
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        return None
     cached = store.lookup(spec)
     if cached is None:
         return None
@@ -963,20 +983,29 @@ def _evaluate_one(
             output_dir=out_dir / "evals" / candidate.id,
             staged_replay=staged_replay,
         )
+    except ProfileValidationError as exc:
+        if _is_stale_profile_refusal(exc):
+            return _stale_profile_result(candidate.id, str(exc))
+        raise
     except EvaluationAbort:
         raise
     if not isinstance(scored, ScoredResult):
         raise TypeError("evaluator must return ScoredResult")
     scored = _with_candidate_id(scored, candidate.id)
     if staged_prefix is not None:
-        spec, _ = _build_eval_inputs(
-            candidate.patch.validated(schema),
-            feedstock,
-            fidelity,
-            profile,
-            schema,
-            constraints=constraints,
-        )
+        try:
+            spec, _ = _build_eval_inputs(
+                candidate.patch.validated(schema),
+                feedstock,
+                fidelity,
+                profile,
+                schema,
+                constraints=constraints,
+            )
+        except ProfileValidationError as exc:
+            if _is_stale_profile_refusal(exc):
+                return _stale_profile_result(candidate.id, str(exc))
+            raise
         scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
     return scored
 
@@ -1024,6 +1053,12 @@ def _assert_honest_result(
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
 ) -> None:
+    if scored.failure_category is FailureCategory.STALE_PROFILE:
+        if scored.feasible:
+            raise StudyAbort("stale_profile result cannot be feasible")
+        if not scored.notes:
+            raise StudyAbort("stale_profile result missing refusal message")
+        return
     _assert_result_artifact_floor(scored)
     if scored.failure_category in {
         FailureCategory.ENGINE_BUG,

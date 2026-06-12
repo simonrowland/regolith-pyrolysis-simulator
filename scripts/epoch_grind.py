@@ -66,6 +66,8 @@ DECISION_FINAL_LONG = "final_long"
 DECISION_BATCH_COMPLETE = "batch_complete"
 DECISION_FAILED = "failed"
 NO_FEASIBLE_STATUS = "no_feasible"
+STALE_PROFILE_STATUS = "stale_profile"
+TERMINAL_JOB_STATUSES = frozenset({NO_FEASIBLE_STATUS, STALE_PROFILE_STATUS})
 NO_FEASIBLE_MESSAGE_BODY_RE = re.compile(
     r"^(?:no feasible candidates; winner\.recipe\.yaml not written|"
     r"all candidates failed with non_finite_payload); failure_counts=\{.*\}$"
@@ -123,6 +125,8 @@ class ChildOutcome:
     kind: str
     returncode: int | None = None
     failure_counts: Mapping[str, int] | None = None
+    reason: str | None = None
+    message: str | None = None
 
 
 def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path | None = None) -> Manifest:
@@ -409,7 +413,8 @@ def pending_jobs(manifest: Manifest, journal: Mapping[str, Any]) -> list[JobSpec
     terminal = {
         str(item.get("id"))
         for item in journal.get("jobs", [])
-        if isinstance(item, Mapping) and item.get("status") in {"done", NO_FEASIBLE_STATUS}
+        if isinstance(item, Mapping)
+        and item.get("status") in {"done", *TERMINAL_JOB_STATUSES}
     }
     failed = {
         str(item.get("id"))
@@ -425,6 +430,7 @@ def _journal_with_job_summary(journal: Mapping[str, Any]) -> dict[str, Any]:
     payload = dict(journal)
     done: list[str] = []
     no_feasible: list[str] = []
+    stale_profile: list[str] = []
     remaining: list[str] = []
     for item in payload.get("jobs", []):
         if not isinstance(item, Mapping):
@@ -434,10 +440,13 @@ def _journal_with_job_summary(journal: Mapping[str, Any]) -> dict[str, Any]:
             done.append(job_id)
         elif item.get("status") == NO_FEASIBLE_STATUS:
             no_feasible.append(job_id)
+        elif item.get("status") == STALE_PROFILE_STATUS:
+            stale_profile.append(job_id)
         elif item.get("status") != "failed":
             remaining.append(job_id)
     payload["jobs_done"] = done
     payload["jobs_no_feasible"] = no_feasible
+    payload["jobs_stale_profile"] = stale_profile
     payload["jobs_remaining"] = remaining
     payload["job_status_counts"] = _job_status_counts(payload)
     return payload
@@ -461,6 +470,20 @@ def _format_no_feasible_failure_counts(journal: Mapping[str, Any]) -> str:
     items: list[str] = []
     for item in journal.get("jobs", []):
         if not isinstance(item, Mapping) or item.get("status") != NO_FEASIBLE_STATUS:
+            continue
+        counts = item.get("failure_counts")
+        if isinstance(counts, Mapping):
+            encoded = json.dumps(dict(sorted(counts.items())), sort_keys=True, separators=(",", ":"))
+        else:
+            encoded = "{}"
+        items.append(f"{item.get('id')}:{encoded}")
+    return ",".join(items)
+
+
+def _format_terminal_failure_counts(journal: Mapping[str, Any]) -> str:
+    items: list[str] = []
+    for item in journal.get("jobs", []):
+        if not isinstance(item, Mapping) or item.get("status") not in TERMINAL_JOB_STATUSES:
             continue
         counts = item.get("failure_counts")
         if isinstance(counts, Mapping):
@@ -605,9 +628,11 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
             save_journal(journal_path, journal)
             print(
                 "decision=batch_complete status_counts={status_counts} "
-                "no_feasible_failure_counts={failure_counts}".format(
+                "no_feasible_failure_counts={failure_counts} "
+                "terminal_failure_counts={terminal_counts}".format(
                     status_counts=_format_status_counts(journal),
                     failure_counts=_format_no_feasible_failure_counts(journal),
+                    terminal_counts=_format_terminal_failure_counts(journal),
                 )
             )
             return 0
@@ -640,14 +665,18 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
             save_journal(journal_path, journal)
             print(
                 "epoch={epoch} failed_jobs={failed} no_feasible={no_feasible} "
+                "stale_profile={stale_profile} "
                 "dup_rate={dup_rate:.6f} decision=failed status_counts={status_counts} "
-                "no_feasible_failure_counts={failure_counts}".format(
+                "no_feasible_failure_counts={failure_counts} "
+                "terminal_failure_counts={terminal_counts}".format(
                     epoch=epoch_result["epoch"],
                     failed=len(epoch_result["failed_jobs"]),
                     no_feasible=len(epoch_result.get("no_feasible_jobs", [])),
+                    stale_profile=len(epoch_result.get("stale_profile_jobs", [])),
                     dup_rate=rate,
                     status_counts=_format_status_counts(journal),
                     failure_counts=_format_no_feasible_failure_counts(journal),
+                    terminal_counts=_format_terminal_failure_counts(journal),
                 )
             )
             return 2
@@ -662,17 +691,20 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         save_journal(journal_path, journal)
         print(
             "epoch={epoch} completed={completed} remaining={remaining} "
-            "no_feasible={no_feasible} dup_rate={dup_rate:.6f} "
+            "no_feasible={no_feasible} stale_profile={stale_profile} dup_rate={dup_rate:.6f} "
             "decision={decision} status_counts={status_counts} "
-            "no_feasible_failure_counts={failure_counts}".format(
+            "no_feasible_failure_counts={failure_counts} "
+            "terminal_failure_counts={terminal_counts}".format(
                 epoch=epoch_result["epoch"],
                 completed=len(epoch_result["completed_jobs"]),
                 remaining=remaining_count,
                 no_feasible=len(epoch_result.get("no_feasible_jobs", [])),
+                stale_profile=len(epoch_result.get("stale_profile_jobs", [])),
                 dup_rate=rate,
                 decision=journal["decision"],
                 status_counts=_format_status_counts(journal),
                 failure_counts=_format_no_feasible_failure_counts(journal),
+                terminal_counts=_format_terminal_failure_counts(journal),
             )
         )
 
@@ -702,6 +734,7 @@ def run_epoch(
         "completed_jobs": [],
         "failed_jobs": [],
         "no_feasible_jobs": [],
+        "stale_profile_jobs": [],
         "timed_out_jobs": [],
         "attempted_jobs": [],
         "shard_dbs": [],
@@ -754,6 +787,18 @@ def run_epoch(
             if outcome.failure_counts is not None:
                 job_record["failure_counts"] = dict(sorted(outcome.failure_counts.items()))
             result["no_feasible_jobs"].append(job_record)
+        elif outcome.kind == STALE_PROFILE_STATUS:
+            result["shard_dbs"].append(str(shard_db))
+            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
+            job_record["returncode"] = outcome.returncode
+            job_record["failure_counts"] = dict(
+                sorted((outcome.failure_counts or {STALE_PROFILE_STATUS: 1}).items())
+            )
+            if outcome.reason:
+                job_record["reason"] = outcome.reason
+            if outcome.message:
+                job_record["message"] = outcome.message
+            result["stale_profile_jobs"].append(job_record)
         elif outcome.kind == "timed_out":
             result["shard_dbs"].append(str(shard_db))
             result["seed_rows_by_shard"][str(shard_db)] = seed_rows
@@ -799,9 +844,15 @@ def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]
     completed = {str(job_id) for job_id in epoch_result.get("completed_jobs", [])}
     failed = {str(job.get("id")) for job in epoch_result.get("failed_jobs", []) if isinstance(job, Mapping)}
     no_feasible = _job_ids(epoch_result.get("no_feasible_jobs", []))
+    stale_profile = _job_ids(epoch_result.get("stale_profile_jobs", []))
     no_feasible_records = {
         str(job.get("id")): job
         for job in epoch_result.get("no_feasible_jobs", [])
+        if isinstance(job, Mapping)
+    }
+    stale_profile_records = {
+        str(job.get("id")): job
+        for job in epoch_result.get("stale_profile_jobs", [])
         if isinstance(job, Mapping)
     }
     for job in journal.get("jobs", []):
@@ -814,6 +865,15 @@ def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]
             record = no_feasible_records.get(str(job.get("id")))
             if record is not None and isinstance(record.get("failure_counts"), Mapping):
                 job["failure_counts"] = dict(sorted(record["failure_counts"].items()))
+        elif job.get("id") in stale_profile:
+            job["status"] = STALE_PROFILE_STATUS
+            record = stale_profile_records.get(str(job.get("id")))
+            if record is not None and isinstance(record.get("failure_counts"), Mapping):
+                job["failure_counts"] = dict(sorted(record["failure_counts"].items()))
+            if record is not None and record.get("reason"):
+                job["reason"] = record["reason"]
+            if record is not None and record.get("message"):
+                job["message"] = record["message"]
         elif job.get("id") in failed:
             job["status"] = "failed"
     journal["epoch"] = int(epoch_result.get("epoch", journal.get("epoch", 0)))
@@ -860,6 +920,16 @@ def _run_child(
                         returncode=returncode,
                         failure_counts=failure_counts,
                     )
+            if out_dir is not None:
+                stale_profile = _stale_profile_status(out_dir)
+                if stale_profile is not None:
+                    return ChildOutcome(
+                        kind=STALE_PROFILE_STATUS,
+                        returncode=returncode,
+                        failure_counts={STALE_PROFILE_STATUS: 1},
+                        reason=stale_profile.get("reason"),
+                        message=stale_profile.get("message"),
+                    )
             return ChildOutcome(kind="failed", returncode=returncode)
         except subprocess.TimeoutExpired:
             _terminate_process_group(process)
@@ -891,6 +961,21 @@ def _load_job_status(path: Path) -> Mapping[str, Any] | None:
     if not isinstance(payload, Mapping) or not payload:
         return None
     return payload
+
+
+def _stale_profile_status(out_dir: Path) -> Mapping[str, str] | None:
+    job_status = _load_job_status(out_dir / "job_status.json")
+    if job_status is None:
+        return None
+    reason = str(job_status.get("reason", ""))
+    message = str(job_status.get("message", ""))
+    if reason != "ProfileValidationError" or not _message_reports_stale_profile(message):
+        return None
+    return {"reason": reason, "message": message}
+
+
+def _message_reports_stale_profile(message: str) -> bool:
+    return "out-of-policy gate" in message and "FORCE_PROFILES=1" in message
 
 
 def _message_reports_no_feasible(message: str) -> bool:

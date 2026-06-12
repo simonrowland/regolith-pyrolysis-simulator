@@ -6,9 +6,15 @@ import pytest
 import yaml
 
 import scripts.make_recipe_db_profile as generator
-from simulator.optimize.evaluate import EngineBugAbort, evaluate
+from simulator.optimize.evaluate import (
+    EngineBugAbort,
+    _build_eval_inputs,
+    _composition_target_constraints,
+    evaluate,
+)
+from simulator.optimize.product_pools import MELT_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.optimize.profiles import validate_profile
-from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.state import CampaignPhase
 
 
@@ -32,9 +38,6 @@ SESSION_CAMPAIGN_ALIASES = {
     "C2A_continuous": "C2A",
     "C2A_staged": "C2A_STAGED",
 }
-STREAM_PRODUCT_POOLS = frozenset({"captured_products", "captured_stage_3_silica"})
-MELT_PRODUCT_POOLS = frozenset({"residual_rump_at_stop", "terminal_rump_earned"})
-
 
 def test_pinned_session_campaign_vocabulary() -> None:
     assert tuple(member.name for member in CampaignPhase) == SESSION_VALID_CAMPAIGNS
@@ -156,6 +159,147 @@ def test_target_menu_stream_purity_gate_matches_product_pool(
         assert "delivered_stream_purity" not in gates
     else:
         pytest.fail(f"unclassified target product pool: {target['pool']}")
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_knudsen_gate_matches_product_pool(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    gates = tuple(profile["constraints"]["gates"])
+
+    if target["pool"] in STREAM_PRODUCT_POOLS:
+        assert "knudsen_viscous" in gates
+    elif target["pool"] in MELT_PRODUCT_POOLS:
+        assert "knudsen_viscous" not in gates
+    else:
+        pytest.fail(f"unclassified target product pool: {target['pool']}")
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_extraction_minima_reach_physics_constraints(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    completeness_min = dict(target["extraction"]["completeness_min"])
+    constraints = _composition_target_constraints(profile, None)
+
+    if completeness_min:
+        assert constraints is not None
+        assert set(constraints.extraction_min_fraction_by_species) == set(completeness_min)
+        for species, value in completeness_min.items():
+            threshold = constraints.extraction_min_fraction_by_species[species]
+            assert threshold.value == pytest.approx(value)
+            assert threshold.source == "profile"
+            assert f"completeness_min.{species}" in threshold.source_ref
+    else:
+        assert constraints is not None
+        assert constraints.extraction_min_fraction_by_species == {}
+
+
+@pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))
+def test_target_menu_windowed_campaigns_emit_runtime_schedule(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    target_id: str,
+) -> None:
+    out = tmp_path / f"{target_id}.yaml"
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "high",
+        profile,
+        RecipeSchema(),
+        constraints=_composition_target_constraints(profile, None),
+    )
+    campaign = profile["run"]["campaign"]
+    expected_patch = generator._campaign_window_patch(
+        campaign,
+        hours=int(profile["run"]["hours"]),
+    )
+
+    if expected_patch is None:
+        assert campaign not in spec.runtime_campaign_overrides
+        return
+
+    overrides = spec.runtime_campaign_overrides[campaign]
+    assert run_config.runtime_campaign_overrides[campaign] == overrides
+    assert overrides["thermal_window_low_C"] == pytest.approx(
+        expected_patch["temp_range_C"][0]
+    )
+    assert overrides["thermal_window_high_C"] == pytest.approx(
+        expected_patch["temp_range_C"][1]
+    )
+    assert overrides["thermal_window_preheat_hours"] >= 0.0
+    assert run_config.hours >= int(profile["run"]["hours"])
+
+
+def test_plural_only_seed_does_not_receive_unrelated_thermal_window(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "mars-phyllosilicate-mg.yaml"
+
+    _run_generator(monkeypatch, tmp_path, "mars_phyllosilicate_clay", "pc-extract-mg", out)
+
+    profile = yaml.safe_load(out.read_text())
+    plural_seed = next(
+        seed for seed in profile["seed_recipes"] if seed["id"] == "mars-clay-al-thermite-seed"
+    )
+    plural_campaigns = plural_seed.get("patch", {}).get("campaigns", {})
+    assert "C4" not in plural_campaigns
+
+    window_seed = next(
+        seed for seed in profile["seed_recipes"] if seed["id"] == "pc-extract-mg-C4-thermal-window"
+    )
+    assert window_seed["source_campaign"] == "C4"
+    assert window_seed["patch"]["campaigns"]["C4"]["temp_range_C"] == (
+        generator._campaign_window_patch("C4", hours=24)["temp_range_C"]
+    )
+
+
+def test_no_declared_campaign_window_is_target_visible(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "pc-glass-retain-na-k-c3.yaml"
+
+    _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", "pc-glass-retain-na-k-c3", out)
+
+    profile = validate_profile(
+        yaml.safe_load(out.read_text()),
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
+    target = profile["objectives"][0]["target"]
+    assert target["thermal_window"] == "not-declared-for-campaign:C3"
 
 
 @pytest.mark.parametrize("target_id", sorted(generator.TARGET_MENU))

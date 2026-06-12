@@ -17,6 +17,7 @@ from simulator.optimize.objective import (
     objective_importance_evidence,
     pareto_front,
     product_summary,
+    target_spec_digest,
 )
 
 
@@ -48,6 +49,29 @@ def test_dominates_honors_mixed_minimize_maximize_directions() -> None:
 
     assert dominates(lower_energy, higher_energy, DEFINITIONS)
     assert not dominates(higher_energy, lower_energy, DEFINITIONS)
+
+
+def test_target_spec_digest_excludes_derived_thermal_window_disposition() -> None:
+    target = {
+        "pool": "residual_rump_at_stop",
+        "species_vector": {"Ca": "retain"},
+        "composition_window": {
+            "pool": "residual_rump_at_stop",
+            "basis": "oxide_wt_pct",
+            "mode": "hard_window",
+            "oxides": {"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+        },
+        "maturity": {"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+    }
+    with_display_disposition = {
+        **target,
+        "thermal_window": "campaign-without-explicit-temperature-window",
+    }
+
+    assert target_spec_digest(with_display_disposition) == target_spec_digest(target)
+    assert target_spec_digest(
+        {"targets": ({"id": "a", "target": with_display_disposition},)}
+    ) == target_spec_digest({"targets": ({"id": "a", "target": target},)})
 
 
 def test_missing_or_nonfinite_objectives_raise() -> None:

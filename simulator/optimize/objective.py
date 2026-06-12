@@ -20,6 +20,7 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     extraction_completeness_report,
 )
+from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.three_product_report import classify_products
 from simulator.trace import wall_deposit_kg_by_zone_species
 
@@ -28,14 +29,7 @@ _MISSING = object()
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
-SUPPORTED_COMPOSITION_POOLS = frozenset(
-    {
-        "captured_stage_3_silica",
-        "captured_products",
-        "residual_rump_at_stop",
-        "terminal_rump_earned",
-    }
-)
+SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
 COMPOSITION_WINDOW_MODES = frozenset({"hard_window", "soft_distance"})
@@ -50,10 +44,12 @@ _COMPOSITION_TARGET_KEYS = frozenset(
         "extraction",
         "composition_window",
         "maturity",
+        "thermal_window",
         "constraints",
         "score_weights",
     }
 )
+_TARGET_SPEC_DIGEST_DISPLAY_KEYS = frozenset({"thermal_window"})
 _EXTRACTION_KEYS = frozenset(
     {"basis", "captured_pool", "credit_policy", "completeness_min"}
 )
@@ -416,8 +412,23 @@ def _target_provenance(target: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def target_spec_digest(target: Mapping[str, Any]) -> str:
-    normalized = normalize_canonical_value(target)
+    # Exclude `thermal_window`: derived display text; seed/patch windows carry runtime meaning.
+    normalized = normalize_canonical_value(_target_spec_digest_payload(target))
     return hashlib.sha256(canonical_json_dumps(normalized).encode("utf-8")).hexdigest()
+
+
+def _target_spec_digest_payload(value: Any) -> Any:
+    if isinstance(value, MappingABC):
+        return {
+            str(key): _target_spec_digest_payload(item)
+            for key, item in value.items()
+            if str(key) not in _TARGET_SPEC_DIGEST_DISPLAY_KEYS
+        }
+    if isinstance(value, tuple):
+        return tuple(_target_spec_digest_payload(item) for item in value)
+    if isinstance(value, list):
+        return [_target_spec_digest_payload(item) for item in value]
+    return value
 
 
 def composition_targets_require_coating(profile: Mapping[str, Any]) -> bool:
@@ -501,6 +512,11 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
         require_coating_gate = raw["require_coating_gate"]
         if not isinstance(require_coating_gate, bool):
             raise ObjectiveProfileError(f"{where}.require_coating_gate must be bool")
+    thermal_window = raw.get("thermal_window")
+    if "thermal_window" in raw:
+        if not isinstance(thermal_window, str) or not thermal_window.strip():
+            raise ObjectiveProfileError(f"{where}.thermal_window must be a non-empty string")
+        thermal_window = thermal_window.strip()
     _validate_target_shape(
         vector=vector,
         extraction=extraction,
@@ -519,6 +535,8 @@ def _normalize_target_spec(raw: Any, *, target_id: str, where: str) -> dict[str,
     }
     if window is not None:
         normalized["composition_window"] = MappingProxyType(window)
+    if thermal_window is not None:
+        normalized["thermal_window"] = thermal_window
     return normalized
 
 
@@ -554,7 +572,7 @@ def _normalize_extraction(
     if basis != "input_element_mol":
         raise ObjectiveProfileError(f"{where}.basis must be 'input_element_mol'")
     captured_pool = _validate_pool(raw.get("captured_pool", "captured_products"), f"{where}.captured_pool")
-    if captured_pool not in {"captured_products", "captured_stage_3_silica"}:
+    if captured_pool not in STREAM_PRODUCT_POOLS:
         raise ObjectiveProfileError(f"{where}.captured_pool cannot be {captured_pool!r}")
     credit_policy = raw.get("credit_policy", {})
     if credit_policy is None:
@@ -1869,17 +1887,14 @@ def _target_uses_captured_pool(target: Mapping[str, Any]) -> bool:
     if (
         extraction_weight > 0.0
         and isinstance(extraction, Mapping)
-        and str(extraction.get("captured_pool", "")) in {
-            "captured_products",
-            "captured_stage_3_silica",
-        }
+        and str(extraction.get("captured_pool", "")) in STREAM_PRODUCT_POOLS
     ):
         return True
     window = target.get("composition_window", {})
     pools = {str(target.get("pool", ""))}
     if isinstance(window, Mapping):
         pools.add(str(window.get("pool", "")))
-    return bool(pools & {"captured_products", "captured_stage_3_silica"})
+    return bool(pools & STREAM_PRODUCT_POOLS)
 
 
 def _target_captured_pool_note_id(target: Mapping[str, Any]) -> str:

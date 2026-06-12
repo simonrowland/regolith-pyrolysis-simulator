@@ -27,6 +27,7 @@ from simulator.optimize.evaluate import (
 )
 from simulator.optimize.objective import objective_definitions
 from simulator.optimize.physics import PhysicsConstraintSet
+from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
@@ -259,6 +260,30 @@ def test_raw_profile_mapping_unknown_key_raises_before_run() -> None:
         )
 
     assert executor.calls == 0
+
+
+def test_stale_melt_profile_refusal_returns_named_verdict() -> None:
+    profile = _composition_eval_profile("residual_rump_at_stop")
+    profile["constraints"]["gates"] = [
+        *profile["constraints"]["gates"],
+        "delivered_stream_purity",
+    ]
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(execution=_execution()),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.STALE_PROFILE
+    assert result.eval_spec is None
+    assert result.cache_key is None
+    assert "delivered_stream_purity" in result.notes[0]
+    assert "residual_rump_at_stop" in result.notes[0]
+    assert "FORCE_PROFILES=1" in result.notes[0]
 
 
 def _execution(
@@ -614,9 +639,17 @@ def _composition_eval_profile(
     target_id: str = "composition-eval-test",
     oxides: dict[str, dict[str, float]] | None = None,
 ) -> dict:
+    gates = [
+        gate
+        for gate in PROFILE["constraints"]["gates"]
+        if gate not in forbidden_gates_for_pool(pool)
+    ]
+    if not gates:
+        gates = ["furnace_temperature"]
     profile = {
         **PROFILE,
         "profile_id": f"{target_id}-profile",
+        "constraints": {"gates": gates},
         "objectives": [
             {
                 "type": "composition_target",

@@ -27,6 +27,7 @@ from simulator.optimize.objective import (
     normalize_objective_sense,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.result_scope import selector_where
 
 SCHEMA_VERSION = 2
 DEFAULT_BUSY_TIMEOUT_MS = 30000
@@ -39,6 +40,7 @@ __all__ = [
     "ResultStore",
     "ResultStoreSchemaError",
     "ResultsStore",
+    "selector_where",
 ]
 
 
@@ -352,23 +354,13 @@ class ResultStore:
             if data_digests is not None
             else self._scope_data_digests_json
         )
-        if active_code_version is None or active_data_digests is None:
-            raise ValueError(
-                "query/best require current code_version and data_digests scope"
-            )
-        clauses = [
-            "feedstock_id = ?",
-            "code_version = ?",
-            "data_digests = ?",
-        ]
-        params: list[Any] = [feedstock_id, active_code_version, active_data_digests]
-        if profile_id is not None:
-            clauses.append("profile_id = ?")
-            params.append(profile_id)
-        if fidelity is not None:
-            clauses.append("fidelity = ?")
-            params.append(fidelity)
-        return " AND ".join(clauses), tuple(params)
+        return selector_where(
+            feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+            code_version=active_code_version,
+            data_digests_json=active_data_digests,
+        )
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(

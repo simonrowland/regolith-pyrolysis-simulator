@@ -120,6 +120,38 @@ def _scope_spec() -> EvalSpec:
     )
 
 
+def _stale_melt_target_profile() -> dict[str, Any]:
+    return {
+        **PROFILE,
+        "profile_id": "stale-melt-target-profile",
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "objectives": [
+            {
+                "type": "composition_target",
+                "id": "stale-profile-target",
+                "metric": "composition_target:stale-profile-target",
+                "sense": "maximize",
+                "units": "score_0_1",
+                "weight": 1.0,
+                "rationale": "test stale-profile refusal",
+                "target": {
+                    "pool": "residual_rump_at_stop",
+                    "species_vector": {"Ca": "retain"},
+                    "composition_window": {
+                        "pool": "residual_rump_at_stop",
+                        "basis": "oxide_wt_pct",
+                        "mode": "hard_window",
+                        "oxides": {"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+                    },
+                    "maturity": {"mode": "campaign_hours", "campaign": "C2B", "hours": 24},
+                    "constraints": {"furnace_T_max_C": "profile_or_study_constraint"},
+                    "score_weights": {"extraction": 0.0, "composition": 1.0},
+                },
+            }
+        ],
+    }
+
+
 def _stored_rows(out_dir: Path) -> list[ScoredResult]:
     spec = _scope_spec()
     store = ResultStore(
@@ -1087,7 +1119,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     tight = PhysicsConstraintSet(
         furnace_T_max_C=ThresholdSpec(
             id="furnace_T_max_C",
-            value=900.0,
+            value=1300.0,
             units="degC",
             source="code_default",
             source_ref="test tightened furnace ceiling",
@@ -1278,6 +1310,31 @@ def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:
     ]
     assert len(_read_provenance(tmp_path)) == 3
     assert len(_stored_rows(tmp_path)) == 3
+    assert not (tmp_path / "winner.recipe.yaml").exists()
+
+
+def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) -> None:
+    with pytest.raises(study.StudyNoFeasibleError, match="stale_profile"):
+        study.run(
+            _stale_melt_target_profile(),
+            FEEDSTOCK,
+            "random",
+            "stub",
+            1,
+            1,
+            tmp_path,
+            seed=7,
+        )
+
+    pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
+    provenance = _read_provenance(tmp_path)
+
+    assert pareto_payload["failure_counts"] == {"stale_profile": 1}
+    assert provenance[0]["status"] == "stale_profile"
+    assert provenance[0]["failure_category"] == "stale_profile"
+    assert "delivered_stream_purity" in provenance[0]["notes"][0]
+    assert "residual_rump_at_stop" in provenance[0]["notes"][0]
+    assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
     assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
