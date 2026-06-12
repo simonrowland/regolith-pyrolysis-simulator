@@ -11,6 +11,7 @@ import sys
 import pytest
 
 from simulator.config import load_config_bundle
+from simulator.lab_schedule import lab_schedule_digests, normalize_lab_schedule
 from simulator.optimize.evalspec import (
     EvalSpec,
     cache_key,
@@ -499,6 +500,314 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     assert session.simulator.product_ledger()["Na"] > 0.0
 
 
+def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure() -> None:
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (1.0, 625.0), (2.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (1.0, 14.0), (2.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _lab_schedule_profile(schedule),
+        RecipeSchema(),
+    )
+
+    assert spec.hours == 2
+    assert run_config.hours == 2
+    assert spec.lab_schedule["id"] == "test_lab_schedule"
+    assert "schedule_digest" in spec.data_digests
+    assert "gas_boundary_digest" in spec.data_digests
+
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    rows = [session.advance().per_hour_summary for _ in range(run_config.hours)]
+
+    expected_temperatures = [
+        _declared_piecewise_value(schedule["melt_temperature_C"], hour)
+        for hour in (1.0, 2.0)
+    ]
+    expected_pressures = [
+        _declared_piecewise_value(schedule["chamber_pressure_mbar"], hour)
+        for hour in (1.0, 2.0)
+    ]
+    assert [row["T_C"] for row in rows] == pytest.approx(expected_temperatures)
+    assert [
+        row["pO2_enforcement"]["p_total_mbar"]
+        for row in rows
+    ] == pytest.approx(expected_pressures)
+    assert spec.lab_schedule["window_semantics"]["preheat_h"] == pytest.approx(0.0)
+    assert spec.lab_schedule["window_semantics"]["measured_window_end_h"] == (
+        pytest.approx(2.0)
+    )
+
+
+def test_lab_schedule_digests_keep_gas_boundary_separate() -> None:
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (2.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (2.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    gas_mutation = copy.deepcopy(schedule)
+    gas_mutation["gas_boundary"]["background_gas"]["species"] = "He"
+    schedule_mutation = copy.deepcopy(schedule)
+    schedule_mutation["melt_temperature_C"][-1]["value"] = 1200.0
+
+    base = lab_schedule_digests(normalize_lab_schedule(schedule))
+    gas_changed = lab_schedule_digests(normalize_lab_schedule(gas_mutation))
+    schedule_changed = lab_schedule_digests(normalize_lab_schedule(schedule_mutation))
+
+    assert gas_changed["schedule_digest"] == base["schedule_digest"]
+    assert gas_changed["gas_boundary_digest"] != base["gas_boundary_digest"]
+    assert schedule_changed["schedule_digest"] != base["schedule_digest"]
+    assert schedule_changed["gas_boundary_digest"] == base["gas_boundary_digest"]
+
+
+def test_lab_schedule_digest_uses_canonical_physics_not_legacy_or_provenance() -> None:
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (2.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (2.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    schedule["experiment_windows"] = {
+        "heating": {"start_h": 0.0, "end_h": 2.0},
+        "measured": {"start_h": 0.5, "end_h": 1.5},
+        "cooldown": {"duration_h": 0.5, "deposit_sampling": "cooldown_or_post_run"},
+    }
+    schedule["window_semantics"] = {
+        "preheat_h": 0.5,
+        "measured_window_start_h": 0.5,
+        "measured_window_end_h": 1.5,
+        "cooldown_h": 0.5,
+        "deposit_sample_basis": "after_cooldown",
+    }
+    base = lab_schedule_digests(normalize_lab_schedule(schedule))
+
+    legacy_wording = copy.deepcopy(schedule)
+    legacy_wording["experiment_windows"]["cooldown"][
+        "deposit_sampling"
+    ] = "post_run_cooldown"
+    point_provenance = copy.deepcopy(schedule)
+    point_provenance["melt_temperature_C"][0]["citation_id"] = "other_citation"
+    cooldown = copy.deepcopy(schedule)
+    cooldown["experiment_windows"]["cooldown"]["duration_h"] = 0.25
+    cooldown["window_semantics"]["cooldown_h"] = 0.25
+    deposit_basis = copy.deepcopy(schedule)
+    deposit_basis["experiment_windows"]["cooldown"]["deposit_sampling"] = "hot"
+    deposit_basis["window_semantics"]["deposit_sample_basis"] = "hot"
+
+    assert (
+        lab_schedule_digests(normalize_lab_schedule(legacy_wording))[
+            "schedule_digest"
+        ]
+        == base["schedule_digest"]
+    )
+    assert (
+        lab_schedule_digests(normalize_lab_schedule(point_provenance))[
+            "schedule_digest"
+        ]
+        == base["schedule_digest"]
+    )
+    assert (
+        lab_schedule_digests(normalize_lab_schedule(cooldown))["schedule_digest"]
+        != base["schedule_digest"]
+    )
+    assert (
+        lab_schedule_digests(normalize_lab_schedule(deposit_basis))[
+            "schedule_digest"
+        ]
+        != base["schedule_digest"]
+    )
+
+
+def test_lab_schedule_profile_reports_window_semantics_to_runtime_overrides() -> None:
+    schedule = _lab_schedule(
+        duration_h=3.0,
+        temperature_points=((0.0, 25.0), (1.0, 625.0), (3.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (3.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    schedule["window_semantics"] = {
+        "preheat_h": 0.5,
+        "measured_window_start_h": 0.5,
+        "measured_window_end_h": 2.5,
+        "cooldown_h": 0.5,
+        "deposit_sample_basis": "after_cooldown",
+    }
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _lab_schedule_profile(schedule),
+        RecipeSchema(),
+    )
+
+    overrides = run_config.runtime_campaign_overrides["C2A_continuous"]
+    window = spec.lab_schedule["window_semantics"]
+    assert overrides["thermal_window_preheat_hours"] == pytest.approx(0.5)
+    assert window["measured_window_start_h"] == pytest.approx(0.5)
+    assert window["measured_window_end_h"] == pytest.approx(2.5)
+    assert window["cooldown_h"] == pytest.approx(0.5)
+    assert window["deposit_sample_basis"] == "after_cooldown"
+
+
+def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -> None:
+    schedule = _lab_schedule(
+        duration_h=3.0,
+        temperature_points=((0.0, 25.0), (1.0, 625.0), (3.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (3.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    schedule["experiment_windows"] = {
+        "heating": {"start_h": 0.0, "end_h": 3.0},
+        "measured": {"start_h": 0.5, "end_h": 2.5},
+        "cooldown": {
+            "duration_h": 0.5,
+            "deposit_sampling": "cooldown_or_post_run",
+        },
+    }
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _lab_schedule_profile(schedule),
+        RecipeSchema(),
+    )
+
+    overrides = run_config.runtime_campaign_overrides["C2A_continuous"]
+    window = spec.lab_schedule["window_semantics"]
+    assert overrides["thermal_window_preheat_hours"] == pytest.approx(0.5)
+    assert window["measured_window_start_h"] == pytest.approx(0.5)
+    assert window["measured_window_end_h"] == pytest.approx(2.5)
+    assert window["cooldown_h"] == pytest.approx(0.5)
+    assert window["deposit_sample_basis"] == "after_cooldown"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        ("above_declared_ceiling", "lab_schedule_temperature_exceeds_furnace_ceiling"),
+        ("above_constraint_ceiling", "lab_schedule_temperature_exceeds_furnace_T_max_C"),
+        (
+            "nonmonotonic_pressure",
+            "lab_schedule_chamber_pressure_mbar_time_arrays_must_be_monotonic",
+        ),
+        ("missing_gas_boundary", "lab_schedule_missing_gas_boundary"),
+        ("missing_point_unit", "lab_schedule_melt_temperature_C_unit_missing"),
+        ("pressure_unit_pa", "lab_schedule_chamber_pressure_mbar_unit_mismatch"),
+        ("temperature_unit_k", "lab_schedule_melt_temperature_C_unit_mismatch"),
+        (
+            "windows_consistency",
+            "lab_schedule_experiment_windows_conflict_with_window_semantics",
+        ),
+        ("time_h_alias", "lab_schedule_melt_temperature_C_time_h_alias_unsupported"),
+    ],
+)
+def test_lab_schedule_profile_fail_loud_rules_are_named(
+    mutation: str,
+    expected: str,
+) -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, 13.0), (1.0, 13.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    constraints = None
+    if mutation == "above_declared_ceiling":
+        schedule["melt_temperature_C"][-1]["value"] = 1500.0
+    elif mutation == "above_constraint_ceiling":
+        schedule["melt_temperature_C"][-1]["value"] = 1200.0
+        constraints = PhysicsConstraintSet(
+            furnace_T_max_C=ThresholdSpec(
+                id="furnace_T_max_C",
+                value=1000.0,
+                units="degC",
+                source="test",
+                source_ref="tests/test_optimizer_evalspec.py",
+            )
+        )
+    elif mutation == "nonmonotonic_pressure":
+        schedule["chamber_pressure_mbar"] = [
+            {"t_h": 0.0, "value": 13.0, "unit": "mbar"},
+            {"t_h": 0.5, "value": 13.0, "unit": "mbar"},
+            {"t_h": 0.4, "value": 13.0, "unit": "mbar"},
+        ]
+    elif mutation == "missing_gas_boundary":
+        schedule.pop("gas_boundary")
+    elif mutation == "missing_point_unit":
+        schedule["melt_temperature_C"][0].pop("unit")
+    elif mutation == "pressure_unit_pa":
+        schedule["chamber_pressure_mbar"][0]["unit"] = "Pa"
+    elif mutation == "temperature_unit_k":
+        schedule["melt_temperature_C"][0]["unit"] = "K"
+    elif mutation == "windows_consistency":
+        schedule["experiment_windows"] = {
+            "heating": {"start_h": 0.0, "end_h": 1.0},
+            "measured": {"start_h": 0.0, "end_h": 1.0},
+            "cooldown": {
+                "duration_h": 0.0,
+                "deposit_sampling": "cooldown_or_post_run",
+            },
+        }
+        schedule["window_semantics"] = {
+            "preheat_h": 0.0,
+            "measured_window_start_h": 0.0,
+            "measured_window_end_h": 1.0,
+            "cooldown_h": 0.0,
+            "deposit_sample_basis": "hot",
+        }
+    elif mutation == "time_h_alias":
+        first = schedule["melt_temperature_C"][0]
+        first["time_h"] = first.pop("t_h")
+
+    with pytest.raises(EvaluationInputError, match=expected):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            _lab_schedule_profile(schedule),
+            RecipeSchema(),
+            constraints=constraints,
+        )
+
+
+def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 625.0)),
+        pressure_points=((0.0, 1.0), (1.0, 1.0)),
+        furnace_ceiling_C=700.0,
+    )
+    profile = _lab_schedule_profile(
+        schedule,
+        runtime_campaign_overrides={
+            "C2A_continuous": {"pO2_mbar": 3.0},
+        },
+    )
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    row = session.advance().per_hour_summary["pO2_enforcement"]
+
+    assert row["hour"] == 1
+    assert row["setpoint_mbar"] == pytest.approx(3.0)
+    assert row["achieved_mbar"] == pytest.approx(1.0)
+    assert row["limited_by_total_pressure"] is True
+    assert row["status"] == "clipped_to_total_pressure"
+
+
 @pytest.mark.parametrize("bad_value", (math.nan, math.inf, -math.inf))
 def test_cache_key_rejects_nan_and_infinity(bad_value: float) -> None:
     spec = _base_spec(chemistry_kernel={"allow_builtin_fallback": False, "x": bad_value})
@@ -580,6 +889,86 @@ def _force_builtin_run_from_config(run_config) -> PyrolysisRun:
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,
     )
+
+
+def _lab_schedule(
+    *,
+    duration_h: float,
+    temperature_points: tuple[tuple[float, float], ...],
+    pressure_points: tuple[tuple[float, float], ...],
+    furnace_ceiling_C: float,
+) -> dict[str, object]:
+    return {
+        "id": "test_lab_schedule",
+        "duration_h": duration_h,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "assumption_with_sensitivity_marker",
+        "interpolation_citation_id": "test",
+        "interpolation_extraction_note": "test-declared piecewise schedule",
+        "furnace_ceiling_C": furnace_ceiling_C,
+        "melt_temperature_C": [
+            {"t_h": t_h, "value": value, "unit": "C"}
+            for t_h, value in temperature_points
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": t_h, "value": value, "unit": "mbar"}
+            for t_h, value in pressure_points
+        ],
+        "gas_boundary": {
+            "background_gas": {
+                "species": "Ar",
+                "mole_fraction": 1.0,
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "imposed_flow": {
+                "value": 0.3,
+                "unit": "NL_min",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "pressure_control": {
+                "mode": "flow_through_with_pump",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+        },
+    }
+
+
+def _lab_schedule_profile(
+    schedule: dict[str, object],
+    *,
+    runtime_campaign_overrides: dict[str, dict[str, float]] | None = None,
+) -> dict[str, object]:
+    profile = _campaign_window_profile(
+        "C2A_continuous",
+        None,
+        None,
+        int(math.ceil(float(schedule["duration_h"]))),
+        profile_id="lab-schedule-test",
+    )
+    profile["run"] = {
+        **profile["run"],
+        "lab_schedule": schedule,
+    }
+    if runtime_campaign_overrides:
+        profile["run"]["runtime_campaign_overrides"] = runtime_campaign_overrides
+    return profile
+
+
+def _declared_piecewise_value(
+    points: list[dict[str, float]],
+    t_h: float,
+) -> float:
+    for left, right in zip(points, points[1:]):
+        if t_h <= right["t_h"]:
+            span = right["t_h"] - left["t_h"]
+            if span <= 0.0:
+                return right["value"]
+            frac = (t_h - left["t_h"]) / span
+            return left["value"] + frac * (right["value"] - left["value"])
+    return points[-1]["value"]
 
 
 def test_non_string_mapping_keys_raise() -> None:

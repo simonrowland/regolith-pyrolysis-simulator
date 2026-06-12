@@ -31,12 +31,18 @@ lab_schedule:
     heating: {start_h: 0.0, end_h: 1.0}
     measured: {start_h: 0.0, end_h: 1.0}
     cooldown: {reported: true, deposit_sampling: cooldown_or_post_run}
+  window_semantics:
+    preheat_h: 0.0
+    measured_window_start_h: 0.0
+    measured_window_end_h: 1.0
+    cooldown_h: 0.0
+    deposit_sample_basis: after_cooldown
   melt_temperature_C:
-    - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: TODO_initial_temperature_not_named_in_anchor}
-    - {t_h: 1.0, value: 1800, qualifier: approximate_peak, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+    - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: TODO_initial_temperature_not_named_in_anchor}
+    - {t_h: 1.0, value: 1800, unit: C, qualifier: approximate_peak, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
   chamber_pressure_mbar:
-    - {t_h: 0.0, value: 13.0, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
-    - {t_h: 1.0, value: 13.0, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+    - {t_h: 0.0, value: 13.0, unit: mbar, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+    - {t_h: 1.0, value: 13.0, unit: mbar, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
   gas_boundary:
     background_gas:
       species: Ar
@@ -62,17 +68,17 @@ lab_schedule:
       digest: "Pressure-control mode is inferred from the reported 13 mbar chamber pressure and 0.3 NL/min Ar flow; full paper extraction must confirm pump/control details."
   surface_temperature_C:
     holder:
-      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 1500, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 1500, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
     window:
-      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 80, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
     condenser:
-      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
     filter:
-      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
-      - {t_h: 1.0, value: 80, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 80, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
 
 lab_geometry:
   id: robinot_2026_geometry_skeleton

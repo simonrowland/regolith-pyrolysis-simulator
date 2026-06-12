@@ -6,7 +6,7 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.2.0`
+**Schema version:** `1.3.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Run the CLI as:
@@ -48,13 +48,14 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
+  "pO2_enforcement_by_hour": [...], // see "pO2 enforcement"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed" | "refused",
@@ -71,7 +72,7 @@ schema-shape assertion.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -164,7 +165,7 @@ schema-shape assertion.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.
-* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.2.0`
+* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.0`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
 
@@ -297,6 +298,11 @@ schema-shape assertion.
   filtered to a curated list of metal species (see
   `simulator/runner.py::_METAL_PRODUCT_SPECIES`).  Non-metal products
   appear in `final_state` and `condensation_train_kg`.
+* Lab-schedule runs may include `pO2_enforcement` on each affected
+  per-hour row: `{hour, schedule_id, schedule_time_h, setpoint_mbar,
+  achieved_mbar, p_total_mbar, limited_by_total_pressure, status}`.
+  The top-level `pO2_enforcement_by_hour` list repeats those rows for
+  artifact consumers that do not scan every hour.
 * P6a wall-deposit fields are direct projections of
   `HourSnapshot.wall_deposit_by_segment_species_delta` and the running
   sum of those deltas. The report layer does not recompute deposits.

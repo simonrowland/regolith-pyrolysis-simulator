@@ -829,6 +829,61 @@ def _best_tap_composition_profile(
     return profile
 
 
+def _lab_schedule_best_tap_window() -> dict:
+    return {
+        "id": "composition_target_lab_schedule",
+        "duration_h": 26.0,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "assumption_with_sensitivity_marker",
+        "interpolation_citation_id": "test",
+        "interpolation_extraction_note": "test-declared piecewise schedule",
+        "furnace_ceiling_C": 1700.0,
+        "experiment_windows": {
+            "heating": {"start_h": 0.0, "end_h": 26.0},
+            "measured": {"start_h": 2.0, "end_h": 24.0},
+            "cooldown": {
+                "duration_h": 2.0,
+                "deposit_sampling": "cooldown_or_post_run",
+            },
+        },
+        "melt_temperature_C": [
+            {"t_h": 0.0, "value": 25.0, "unit": "C"},
+            {"t_h": 2.0, "value": 1050.0, "unit": "C"},
+            {"t_h": 26.0, "value": 1600.0, "unit": "C"},
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": 0.0, "value": 10.0, "unit": "mbar"},
+            {"t_h": 26.0, "value": 10.0, "unit": "mbar"},
+        ],
+        "window_semantics": {
+            "preheat_h": 2.0,
+            "measured_window_start_h": 2.0,
+            "measured_window_end_h": 24.0,
+            "cooldown_h": 2.0,
+            "deposit_sample_basis": "after_cooldown",
+        },
+        "gas_boundary": {
+            "background_gas": {
+                "species": "Ar",
+                "mole_fraction": 1.0,
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "imposed_flow": {
+                "value": 0.3,
+                "unit": "NL_min",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "pressure_control": {
+                "mode": "flow_through_with_pump",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+        },
+    }
+
+
 def _best_tap_execution(*hours: int) -> SimpleNamespace:
     snapshots = tuple(_best_tap_snapshot(hour) for hour in hours)
     return _execution(
@@ -1357,6 +1412,49 @@ def test_warm_start_mid_window_best_tap_is_absolute_truncated_with_preheat() -> 
     assert truncated["provenance"] == "tap_truncated"
     assert truncated["operator_instruction"]["thermal_window_preheat_hours"] == (
         pytest.approx(2.0)
+    )
+
+
+def test_lab_schedule_best_tap_reports_window_semantics_and_sample_basis() -> None:
+    target_id = "pc-lab-schedule-window"
+    profile = _best_tap_composition_profile(
+        tap_hour=24,
+        warm_start=False,
+        target_id=target_id,
+    )
+    profile["run"] = {
+        **profile["run"],
+        "lab_schedule": _lab_schedule_best_tap_window(),
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_best_tap_execution(24)),
+    )
+
+    assert result.feasible
+    assert result.eval_spec is not None
+    assert result.eval_spec.hours == 26
+    assert result.objectives is not None
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    instruction = payload["operator_instruction"]
+    truncated = payload["truncated_recipe"]
+    window = payload["lab_schedule_window_semantics"]
+    assert payload["thermal_window_preheat_hours"] == pytest.approx(2.0)
+    assert window["measured_window_start_h"] == pytest.approx(2.0)
+    assert window["measured_window_end_h"] == pytest.approx(24.0)
+    assert window["cooldown_h"] == pytest.approx(2.0)
+    assert payload["deposit_sample_basis"] == "after_cooldown"
+    assert instruction["lab_schedule_window_semantics"] == window
+    assert instruction["deposit_sample_basis"] == "after_cooldown"
+    assert truncated["lab_schedule_window_semantics"] == window
+    assert truncated["operator_instruction"]["deposit_sample_basis"] == (
+        "after_cooldown"
     )
 
 

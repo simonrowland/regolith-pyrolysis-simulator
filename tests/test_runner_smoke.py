@@ -55,19 +55,6 @@ VPR_P6A_TRACE_CONTROLS = {
     "sio_liner_temperature_c": 1100.0,
 }
 
-GOLDEN_FIXTURE_TOP_LEVEL_EXCLUSIONS_TODO_VPR_P6A = frozenset({
-    "final",
-})
-GOLDEN_FIXTURE_PER_HOUR_EXCLUSIONS_TODO_VPR_P6A = frozenset({
-    "vapor_species_kg_hr",
-    "wall_deposit_delta_kg",
-    "wall_deposit_cumulative_kg",
-    "Kn",
-    "regime",
-    "transport_formula_id",
-})
-
-
 # Schema-shape: the top-level keys every runner output must expose.
 TOP_LEVEL_KEYS = frozenset({
     "schema_version",
@@ -77,6 +64,7 @@ TOP_LEVEL_KEYS = frozenset({
     "stage_purity_report",
     "vapor_pressure_source_report",
     "shuttle_refusal_history",
+    "pO2_enforcement_by_hour",
     "per_hour_summary",
     "shadow_trace",
     "status",
@@ -117,6 +105,9 @@ PER_HOUR_KEYS = frozenset({
     "Kn",
     "regime",
     "transport_formula_id",
+})
+PER_HOUR_OPTIONAL_KEYS = frozenset({
+    "pO2_enforcement",
 })
 
 
@@ -362,12 +353,22 @@ def _assert_schema_shape(payload: dict) -> None:
         assert isinstance(item["percentage"], (int, float))
 
     assert isinstance(payload["per_hour_summary"], list)
+    assert isinstance(payload["pO2_enforcement_by_hour"], list)
+    for row in payload["pO2_enforcement_by_hour"]:
+        assert set(row).issuperset({
+            "hour",
+            "setpoint_mbar",
+            "achieved_mbar",
+            "limited_by_total_pressure",
+            "status",
+        })
     for entry in payload["per_hour_summary"]:
-        assert set(entry) == PER_HOUR_KEYS, (
+        assert PER_HOUR_KEYS.issubset(entry), (
             f"per_hour_summary key drift: extras "
             f"{set(entry) - PER_HOUR_KEYS}, missing "
             f"{PER_HOUR_KEYS - set(entry)}"
         )
+        assert set(entry).issubset(PER_HOUR_KEYS | PER_HOUR_OPTIONAL_KEYS)
         assert isinstance(entry["metal_yields_kg"], dict)
         assert isinstance(entry["condensation_train_kg"], dict)
         assert isinstance(entry["vapor_species_kg_hr"], dict)
@@ -590,21 +591,6 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
     assert "pump_outlet_by_species_kg" in payload["final"]
 
 
-def _without_golden_fixture_todo_exclusions(payload: dict) -> dict:
-    cleaned = dict(payload)
-    for key in GOLDEN_FIXTURE_TOP_LEVEL_EXCLUSIONS_TODO_VPR_P6A:
-        cleaned.pop(key, None)
-    cleaned["per_hour_summary"] = [
-        {
-            key: value
-            for key, value in entry.items()
-            if key not in GOLDEN_FIXTURE_PER_HOUR_EXCLUSIONS_TODO_VPR_P6A
-        }
-        for entry in cleaned["per_hour_summary"]
-    ]
-    return cleaned
-
-
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
 def test_runner_golden_fixture_matches(scenario):
     """A live run must reproduce the committed golden fixture exactly."""
@@ -615,34 +601,7 @@ def test_runner_golden_fixture_matches(scenario):
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
-    # F1 adds stage-purity diagnostics, E3 adds vapor-pressure source provenance,
-    # F3 adds Knudsen regime diagnostic. None of these regenerate legacy goldens;
-    # we patch them in from the live actual on every assertion.
-    expected = dict(expected)
-    expected["schema_version"] = actual["schema_version"]
-    expected["run_metadata"] = dict(expected["run_metadata"])
-    expected["run_metadata"]["schema_version"] = actual["run_metadata"][
-        "schema_version"
-    ]
-    if "knudsen_regime_diagnostic" in actual["run_metadata"]:
-        expected["run_metadata"]["knudsen_regime_diagnostic"] = (
-            actual["run_metadata"]["knudsen_regime_diagnostic"]
-        )
-    expected["stage_purity_report"] = actual["stage_purity_report"]
-    expected["vapor_pressure_source_report"] = actual[
-        "vapor_pressure_source_report"
-    ]
-    # Autoreview r3 P2 (2026-05-27): shuttle_refusal_history is always
-    # emitted (empty list when no refusals); patch from live actual so
-    # legacy goldens that pre-date the field don't need regeneration.
-    expected["shuttle_refusal_history"] = actual["shuttle_refusal_history"]
-    if "reason" in actual:
-        expected["reason"] = actual["reason"]
-    # TODO(vpr-p6a-golden-refresh): regenerate the runner fixture JSON files
-    # and remove these exclusions once this dispatch may edit tests/fixtures.
-    assert _without_golden_fixture_todo_exclusions(
-        actual
-    ) == _without_golden_fixture_todo_exclusions(expected), (
+    assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate via `python -m simulator.runner --output=tests/fixtures/"
         f"runner/{scenario['fixture']}` if the change is intentional."
@@ -792,6 +751,7 @@ def test_runner_failure_envelope_for_unknown_feedstock(tmp_path):
         f"missing={TOP_LEVEL_KEYS - set(payload)}"
     )
     assert payload["shuttle_refusal_history"] == []
+    assert payload["pO2_enforcement_by_hour"] == []
     assert payload["per_hour_summary"] == []
     assert payload["shadow_trace"] == []
 

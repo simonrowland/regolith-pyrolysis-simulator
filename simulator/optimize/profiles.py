@@ -106,6 +106,7 @@ _RUN_KEYS = frozenset(
         "mre_target_species",
         "reduced_real_cache",
         "runtime_campaign_overrides",
+        "lab_schedule",
         "chemistry_kernel",
     }
 )

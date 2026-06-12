@@ -4249,6 +4249,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_anode_O2_kg_this_hr = 0.0
         self.melt.validate_melt_pressures()
 
+        self.campaign_mgr.apply_lab_schedule_controls(
+            self.melt,
+            self.melt.campaign,
+            sample_time_h=float(self.melt.campaign_hour) + 1.0,
+        )
+
         # --- 2. Temperature ramp ---
         self._update_temperature()
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()

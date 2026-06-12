@@ -63,6 +63,7 @@ def validate_vpr_schema(preset: dict, measurements: dict) -> None:
             "schedule_interpolation_missing_assumption_note",
             "assumed interpolation requires citation and extraction note",
         )
+    require_schedule_point_units(schedule)
 
     gas_boundary = schedule.get("gas_boundary", {})
     gas = gas_boundary.get("background_gas")
@@ -194,6 +195,33 @@ def require_not_reported_gas_boundary(row: dict, detail: str) -> None:
     require(bool(row.get("digest")), "gas_boundary_not_reported_missing_digest", detail)
 
 
+def require_schedule_point_units(schedule: dict) -> None:
+    require_points_have_unit(schedule.get("melt_temperature_C"), "C", "melt_temperature_C")
+    require_points_have_unit(
+        schedule.get("chamber_pressure_mbar"),
+        "mbar",
+        "chamber_pressure_mbar",
+    )
+    for surface_id, points in (schedule.get("surface_temperature_C") or {}).items():
+        require_points_have_unit(points, "C", f"surface_temperature_C.{surface_id}")
+
+
+def require_points_have_unit(points: object, expected: str, detail: str) -> None:
+    require(isinstance(points, list), "schedule_points_missing", detail)
+    for index, point in enumerate(points):
+        require(isinstance(point, dict), "schedule_point_not_mapping", f"{detail}[{index}]")
+        if "unit" not in point:
+            raise SchemaValidationError(
+                "schedule_point_missing_unit",
+                f"{detail}[{index}].unit required",
+            )
+        require(
+            point.get("unit") == expected,
+            "schedule_point_unit_mismatch",
+            f"{detail}[{index}] expected {expected}",
+        )
+
+
 def require_gas_boundary_source(row: dict, detail: str) -> None:
     if is_not_reported(row):
         require_not_reported_gas_boundary(row, detail)
@@ -235,9 +263,12 @@ def test_robinot_preset_skeleton_carries_required_external_anchors() -> None:
     assert gas_boundary["imposed_flow"]["value"] == ROBINOT_FLOW_NL_MIN
     assert gas_boundary["imposed_flow"]["unit"] == "NL_min"
     assert preset["lab_schedule"]["chamber_pressure_mbar"][0]["value"] == ROBINOT_PRESSURE_MBAR
+    assert preset["lab_schedule"]["chamber_pressure_mbar"][0]["unit"] == "mbar"
     assert preset["lab_schedule"]["duration_h"] == ROBINOT_DURATION_H
     assert preset["lab_schedule"]["furnace_ceiling_C"] == ROBINOT_PEAK_TEMPERATURE_C
     assert preset["lab_schedule"]["melt_temperature_C"][-1]["value"] == ROBINOT_PEAK_TEMPERATURE_C
+    assert preset["lab_schedule"]["melt_temperature_C"][-1]["unit"] == "C"
+    assert preset["lab_schedule"]["window_semantics"]["deposit_sample_basis"] == "after_cooldown"
     assert preset["digests"]["gas_boundary_digest"]
 
     roles = {row["id"]: row["role"] for row in preset["lab_geometry"]["surfaces"]}
@@ -359,6 +390,7 @@ def test_sparse_paper_gas_boundary_accepts_explicit_not_reported_disposition() -
             "drop_schedule_interpolation_note",
             "schedule_interpolation_missing_assumption_note",
         ),
+        ("drop_schedule_point_unit", "schedule_point_missing_unit"),
         ("drop_carrier_gas", "missing_carrier_gas"),
         ("drop_imposed_flow", "missing_gas_boundary_imposed_flow"),
         ("drop_pressure_control", "missing_gas_boundary_pressure_control"),
@@ -408,6 +440,8 @@ def test_vpr_schema_fail_loud_rules_are_named(
         del preset["lab_schedule"]["interpolation_source_class"]
     elif mutation == "drop_schedule_interpolation_note":
         del preset["lab_schedule"]["interpolation_extraction_note"]
+    elif mutation == "drop_schedule_point_unit":
+        del preset["lab_schedule"]["melt_temperature_C"][0]["unit"]
     elif mutation == "drop_carrier_gas":
         del preset["lab_schedule"]["gas_boundary"]["background_gas"]["species"]
     elif mutation == "drop_imposed_flow":

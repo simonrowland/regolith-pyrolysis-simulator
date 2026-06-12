@@ -179,6 +179,7 @@ def make_prefix_eval_spec(
         prefix_stage_ids=stage_ids,
         prefix_recipe_ids=recipe_ids,
         topology_id=topology_id,
+        lab_schedule=base_spec.lab_schedule,
     )
 
 

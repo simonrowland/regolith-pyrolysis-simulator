@@ -55,6 +55,7 @@ from simulator.condensation import (
     stage_purity_report,
 )
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
+from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY
 from simulator.session import (
     SimSession,
     SimSessionConfig,
@@ -67,7 +68,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.2.0"
+RUNNER_SCHEMA_VERSION = "1.3.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -374,6 +375,7 @@ class PyrolysisRun:
     setpoints_patch: Mapping[str, Any] = field(default_factory=dict)
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
     setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
+    lab_schedule: Mapping[str, Any] | None = None
     track: str = "pyrolysis"
     c5_enabled: bool = False
     mre_target_species: str = ""
@@ -497,6 +499,18 @@ class PyrolysisRun:
             self.additives_kg,
             setpoints,
         )
+        runtime_overrides = {
+            str(campaign): dict(fields)
+            for campaign, fields in dict(self.runtime_campaign_overrides).items()
+        }
+        if self.lab_schedule is not None:
+            campaign_overrides = runtime_overrides.setdefault(campaign_name, {})
+            if LAB_SCHEDULE_OVERRIDE_KEY in campaign_overrides:
+                raise RunnerError(
+                    "lab_schedule conflicts with runtime_campaign_overrides "
+                    f"{campaign_name}.{LAB_SCHEDULE_OVERRIDE_KEY}"
+                )
+            campaign_overrides[LAB_SCHEDULE_OVERRIDE_KEY] = dict(self.lab_schedule)
         return SimSessionConfig(
             feedstock_id=self.feedstock_id,
             feedstocks=feedstocks,
@@ -509,7 +523,7 @@ class PyrolysisRun:
             hours=int(self.hours),
             mass_kg=self.mass_kg,
             additives_kg=additives_kg,
-            runtime_campaign_overrides=dict(self.runtime_campaign_overrides),
+            runtime_campaign_overrides=runtime_overrides,
             track=self.track,
             c5_enabled=self.c5_enabled,
             mre_target_species=self.mre_target_species,
@@ -614,6 +628,11 @@ class PyrolysisRun:
         # cleanup quietly missing.  Empty list when no refusals.
         shuttle_refusal_history = list(
             getattr(sim, "_shuttle_refusal_history", []) or [])
+        pO2_enforcement_by_hour = [
+            dict(row["pO2_enforcement"])
+            for row in execution.per_hour
+            if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
+        ]
 
         return {
             "schema_version": RUNNER_SCHEMA_VERSION,
@@ -623,6 +642,7 @@ class PyrolysisRun:
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
+            "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
             "per_hour_summary": list(execution.per_hour),
             "shadow_trace": list(execution.shadow_trace),
             "status": execution.status,
@@ -836,7 +856,7 @@ def build_per_hour_summary(
     # snapshot-level surface is already accessible to in-process
     # consumers and the web UI; this just defers the JSON-output
     # propagation.
-    return {
+    summary = {
         "hour": int(snapshot.hour),
         "campaign": snapshot.campaign.name,
         "T_C": float(snapshot.temperature_C),
@@ -859,6 +879,10 @@ def build_per_hour_summary(
         ),
         **_knudsen_regime_observables(snapshot),
     }
+    enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
+    if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
+        summary["pO2_enforcement"] = _json_safe(dict(enforcement))
+    return summary
 
 
 # ----------------------------------------------------------------------
@@ -2366,6 +2390,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 "total_species": 0,
             },
             "shuttle_refusal_history": [],
+            "pO2_enforcement_by_hour": [],
             "per_hour_summary": [],
             "shadow_trace": [],
             "status": "failed",

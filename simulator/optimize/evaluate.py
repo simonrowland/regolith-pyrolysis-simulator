@@ -20,6 +20,13 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_OVERRIDE_KEY,
+    LAB_SCHEDULE_PO2_SETPOINT_KEY,
+    LabScheduleValidationError,
+    lab_schedule_digests,
+    normalize_lab_schedule,
+)
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -1116,6 +1123,17 @@ def _build_eval_inputs(
         force_builtin_vapor_pressure=bool(run_options["force_builtin_vapor_pressure"]),
     )._session_config()
 
+    data_digests = {
+        "setpoints": bundle.digests["setpoints"],
+        "feedstocks": bundle.digests["feedstocks"],
+        "vapor_pressures": bundle.digests["vapor_pressures"],
+        "profile": profile_digest,
+        "physics_constraints": physics_constraints_digest(constraints),
+    }
+    lab_schedule = run_options.get("lab_schedule")
+    if isinstance(lab_schedule, MappingABC) and lab_schedule:
+        data_digests.update(lab_schedule_digests(lab_schedule))
+
     spec = EvalSpec(
         recipe_id=patch.recipe_id(),
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
@@ -1123,13 +1141,7 @@ def _build_eval_inputs(
         profile_id=profile_id,
         fidelity=fidelity,
         code_version=current_code_version(),
-        data_digests={
-            "setpoints": bundle.digests["setpoints"],
-            "feedstocks": bundle.digests["feedstocks"],
-            "vapor_pressures": bundle.digests["vapor_pressures"],
-            "profile": profile_digest,
-            "physics_constraints": physics_constraints_digest(constraints),
-        },
+        data_digests=data_digests,
         campaign=str(run_options["campaign"]),
         hours=int(run_options["hours"]),
         mass_kg=float(run_options["mass_kg"]),
@@ -1140,6 +1152,7 @@ def _build_eval_inputs(
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
         mre_target_species=str(run_options["mre_target_species"]),
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
+        lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
         chemistry_kernel=run_options["chemistry_kernel"],
         target_spec_id=str(target_metadata["target_spec_id"]),
         target_spec_digest=str(target_metadata["target_spec_digest"]),
@@ -1183,6 +1196,7 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         "runtime_campaign_overrides": dict(
             merged.get("runtime_campaign_overrides", {}) or {}
         ),
+        "lab_schedule": merged.get("lab_schedule"),
         "chemistry_kernel": dict(merged.get("chemistry_kernel", {}) or {}),
         "allow_fallback_vapor": bool(merged.get("allow_fallback_vapor", False)),
         "force_builtin_vapor_pressure": bool(
@@ -1198,6 +1212,20 @@ def _thermal_scheduled_run_options(
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any]:
+    lab_schedule = _profile_lab_schedule(run_options, constraints=constraints)
+    if lab_schedule is not None:
+        if _profile_thermal_window_schedule(
+            run_options,
+            profile=profile,
+            constraints=constraints,
+            setpoints=setpoints,
+        ) is not None:
+            raise EvaluationInputError(
+                "lab_schedule_conflicts_with_thermal_window: remove "
+                "temp_range_C/duration thermal-window inputs"
+            )
+        return _lab_scheduled_run_options(run_options, lab_schedule)
+
     schedule = _profile_thermal_window_schedule(
         run_options,
         profile=profile,
@@ -1225,6 +1253,94 @@ def _thermal_scheduled_run_options(
         campaign_overrides[key] = float(value)
     merged["runtime_campaign_overrides"] = runtime_overrides
     merged["hours"] = int(schedule["total_hours"])
+    chemistry_kernel = dict(merged.get("chemistry_kernel", {}) or {})
+    chemistry_kernel.setdefault("allow_fallback_vapor", True)
+    merged["chemistry_kernel"] = chemistry_kernel
+    merged["allow_fallback_vapor"] = True
+    merged["force_builtin_vapor_pressure"] = True
+    return MappingProxyType(merged)
+
+
+def _profile_lab_schedule(
+    run_options: Mapping[str, Any],
+    *,
+    constraints: PhysicsConstraintSet | None,
+) -> Mapping[str, Any] | None:
+    raw = run_options.get("lab_schedule")
+    if raw is None:
+        return None
+    try:
+        schedule = normalize_lab_schedule(raw)
+    except LabScheduleValidationError as exc:
+        raise EvaluationInputError(str(exc)) from exc
+    ceiling_C = _furnace_ceiling_C(constraints)
+    scheduled_peak = max(
+        float(point["value"])
+        for point in schedule["melt_temperature_C"]
+    )
+    if scheduled_peak > ceiling_C:
+        raise EvaluationInputError(
+            "lab_schedule_temperature_exceeds_furnace_T_max_C: "
+            f"{scheduled_peak:g} C > {ceiling_C:g} C"
+        )
+    return schedule
+
+
+def _lab_scheduled_run_options(
+    run_options: Mapping[str, Any],
+    lab_schedule: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    merged = dict(run_options)
+    runtime_overrides = {
+        str(campaign): dict(fields)
+        for campaign, fields in dict(
+            run_options.get("runtime_campaign_overrides", {}) or {}
+        ).items()
+    }
+    campaign = str(run_options.get("campaign", "") or "")
+    campaign_overrides = runtime_overrides.setdefault(campaign, {})
+    existing = campaign_overrides.get(LAB_SCHEDULE_OVERRIDE_KEY)
+    if existing is not None and normalize_lab_schedule(existing) != lab_schedule:
+        raise EvaluationInputError(
+            f"runtime_campaign_overrides[{campaign!r}].lab_schedule conflicts "
+            "with profile-declared lab_schedule"
+        )
+    for pressure_key in ("p_total_mbar", "p_total_mbar_default"):
+        if pressure_key in campaign_overrides:
+            raise EvaluationInputError(
+                f"runtime_campaign_overrides[{campaign!r}].{pressure_key} "
+                "conflicts with lab_schedule.chamber_pressure_mbar"
+            )
+    campaign_overrides[LAB_SCHEDULE_OVERRIDE_KEY] = lab_schedule
+
+    cover = lab_schedule.get("pO2_cover")
+    if (
+        isinstance(cover, MappingABC)
+        and bool(cover.get("enabled", False))
+        and LAB_SCHEDULE_PO2_SETPOINT_KEY not in campaign_overrides
+        and "pO2_mbar" not in campaign_overrides
+    ):
+        campaign_overrides[LAB_SCHEDULE_PO2_SETPOINT_KEY] = float(
+            cover["setpoint_mbar"]
+        )
+
+    window_semantics = lab_schedule.get("window_semantics")
+    if isinstance(window_semantics, MappingABC):
+        preheat_h = float(window_semantics["preheat_h"])
+        existing_preheat = campaign_overrides.get("thermal_window_preheat_hours")
+        if existing_preheat is not None and float(existing_preheat) != preheat_h:
+            raise EvaluationInputError(
+                f"runtime_campaign_overrides[{campaign!r}].thermal_window_preheat_hours "
+                "conflicts with lab_schedule.window_semantics.preheat_h"
+            )
+        campaign_overrides["thermal_window_preheat_hours"] = preheat_h
+
+    # TODO(VPR-P2-lab-geometry-interface): surface_temperature_C is normalized
+    # but remains unbound until pipe-segment geometry owns surface IDs.
+    duration_h = float(lab_schedule["duration_h"])
+    merged["runtime_campaign_overrides"] = runtime_overrides
+    merged["lab_schedule"] = lab_schedule
+    merged["hours"] = int(math.ceil(duration_h))
     chemistry_kernel = dict(merged.get("chemistry_kernel", {}) or {})
     chemistry_kernel.setdefault("allow_fallback_vapor", True)
     merged["chemistry_kernel"] = chemistry_kernel
@@ -1417,6 +1533,12 @@ def _objective_profile_for_spec(
         run["thermal_window_preheat_hours"] = preheat_hours
         changed = True
 
+    lab_schedule_window = _lab_schedule_window_semantics(spec)
+    if lab_schedule_window is not None:
+        run["lab_schedule_window_semantics"] = lab_schedule_window
+        run["deposit_sample_basis"] = lab_schedule_window["deposit_sample_basis"]
+        changed = True
+
     if not changed:
         return profile
     merged = dict(profile)
@@ -1434,17 +1556,40 @@ def _thermal_window_preheat_hours(spec: EvalSpec) -> float | None:
     return float(value)
 
 
+def _lab_schedule_window_semantics(spec: EvalSpec) -> Mapping[str, Any] | None:
+    schedule = spec.lab_schedule
+    if not isinstance(schedule, MappingABC) or not schedule:
+        return None
+    window = schedule.get("window_semantics")
+    if not isinstance(window, MappingABC):
+        return None
+    return MappingProxyType(
+        {
+            "preheat_h": float(window["preheat_h"]),
+            "measured_window_start_h": float(window["measured_window_start_h"]),
+            "measured_window_end_h": float(window["measured_window_end_h"]),
+            "cooldown_h": float(window["cooldown_h"]),
+            "deposit_sample_basis": str(window["deposit_sample_basis"]),
+        }
+    )
+
+
 def _objectives_with_thermal_window_metadata(
     objectives: ObjectiveVector,
     spec: EvalSpec,
 ) -> ObjectiveVector:
     preheat_hours = _thermal_window_preheat_hours(spec)
-    if preheat_hours is None:
+    lab_schedule_window = _lab_schedule_window_semantics(spec)
+    if preheat_hours is None and lab_schedule_window is None:
         return objectives
     evidence: dict[str, Any] = {}
     changed = False
     for metric, raw in objectives.evidence.items():
-        patched = _evidence_with_thermal_window_preheat(raw, preheat_hours)
+        patched = _evidence_with_thermal_window_preheat(
+            raw,
+            preheat_hours,
+            lab_schedule_window=lab_schedule_window,
+        )
         evidence[str(metric)] = patched
         changed = changed or patched is not raw
     if not changed:
@@ -1454,7 +1599,9 @@ def _objectives_with_thermal_window_metadata(
 
 def _evidence_with_thermal_window_preheat(
     raw: Any,
-    preheat_hours: float,
+    preheat_hours: float | None,
+    *,
+    lab_schedule_window: Mapping[str, Any] | None = None,
 ) -> Any:
     if not isinstance(raw, MappingABC):
         return raw
@@ -1463,14 +1610,20 @@ def _evidence_with_thermal_window_preheat(
         return raw
 
     patched_target = dict(target)
-    patched_target["thermal_window_preheat_hours"] = preheat_hours
-    _add_preheat_to_operator_instruction(patched_target, preheat_hours)
+    if preheat_hours is not None:
+        patched_target["thermal_window_preheat_hours"] = preheat_hours
+        _add_preheat_to_operator_instruction(patched_target, preheat_hours)
+    if lab_schedule_window is not None:
+        _add_lab_schedule_window_metadata(patched_target, lab_schedule_window)
 
     truncated = patched_target.get("truncated_recipe")
     if isinstance(truncated, MappingABC):
         patched_truncated = dict(truncated)
-        patched_truncated["thermal_window_preheat_hours"] = preheat_hours
-        _add_preheat_to_operator_instruction(patched_truncated, preheat_hours)
+        if preheat_hours is not None:
+            patched_truncated["thermal_window_preheat_hours"] = preheat_hours
+            _add_preheat_to_operator_instruction(patched_truncated, preheat_hours)
+        if lab_schedule_window is not None:
+            _add_lab_schedule_window_metadata(patched_truncated, lab_schedule_window)
         patched_target["truncated_recipe"] = patched_truncated
 
     patched = dict(raw)
@@ -1486,6 +1639,23 @@ def _add_preheat_to_operator_instruction(
     if isinstance(instruction, MappingABC):
         patched_instruction = dict(instruction)
         patched_instruction["thermal_window_preheat_hours"] = preheat_hours
+        payload["operator_instruction"] = patched_instruction
+
+
+def _add_lab_schedule_window_metadata(
+    payload: dict[str, Any],
+    lab_schedule_window: Mapping[str, Any],
+) -> None:
+    window_payload = dict(lab_schedule_window)
+    payload["lab_schedule_window_semantics"] = window_payload
+    payload["deposit_sample_basis"] = str(lab_schedule_window["deposit_sample_basis"])
+    instruction = payload.get("operator_instruction")
+    if isinstance(instruction, MappingABC):
+        patched_instruction = dict(instruction)
+        patched_instruction["lab_schedule_window_semantics"] = dict(window_payload)
+        patched_instruction["deposit_sample_basis"] = str(
+            lab_schedule_window["deposit_sample_basis"]
+        )
         payload["operator_instruction"] = patched_instruction
 
 
@@ -2520,9 +2690,15 @@ def _cache_trace_payload(
         payload["reduced_real_cache"] = _compact_jsonable(reduced_real_cache)
 
     per_hour_cache: list[dict[str, Any]] = []
+    pO2_enforcement_by_hour: list[dict[str, Any]] = []
     for index, entry in enumerate(getattr(run_execution, "per_hour", ()) or (), start=1):
         if not isinstance(entry, Mapping):
             continue
+        enforcement = entry.get("pO2_enforcement")
+        if isinstance(enforcement, Mapping):
+            pO2_enforcement_by_hour.append(
+                _compact_jsonable(dict(enforcement))
+            )
         cache_state = entry.get("reduced_real_cache_state")
         if cache_state is None:
             continue
@@ -2536,6 +2712,8 @@ def _cache_trace_payload(
         )
     if per_hour_cache:
         payload["per_hour"] = per_hour_cache
+    if pO2_enforcement_by_hour:
+        payload["pO2_enforcement_by_hour"] = pO2_enforcement_by_hour
 
     if payload:
         return MappingProxyType(payload)

@@ -53,6 +53,7 @@ class EvalSpec:
     mre_max_voltage_V: float = 0.0
     mre_target_species: str = ""
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    lab_schedule: Mapping[str, Any] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
     target_spec_id: str = ""
     target_spec_digest: str = ""
@@ -98,6 +99,11 @@ class EvalSpec:
         )
         object.__setattr__(
             self,
+            "lab_schedule",
+            _freeze_value(self.lab_schedule, "lab_schedule"),
+        )
+        object.__setattr__(
+            self,
             "chemistry_kernel",
             _freeze_value(self.chemistry_kernel, "chemistry_kernel"),
         )
@@ -133,6 +139,7 @@ class EvalSpec:
                 self.mre_max_voltage_V,
                 self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
+                _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
                 self.target_spec_id,
                 self.target_spec_digest,
@@ -181,6 +188,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.mre_max_voltage_V,
                 self.mre_target_species,
                 _thaw_value(self.runtime_campaign_overrides),
+                _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
                 self.target_spec_id,
                 self.target_spec_digest,
@@ -219,6 +227,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "runtime_campaign_overrides": spec.runtime_campaign_overrides,
         "track": spec.track,
     }
+    if spec.lab_schedule:
+        payload["lab_schedule"] = spec.lab_schedule
     if spec.target_spec_digest:
         payload.update(
             {

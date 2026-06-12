@@ -17,6 +17,7 @@ from simulator.backends import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
+from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.state import (
     DecisionPoint,
     HourSnapshot,
@@ -213,7 +214,10 @@ class SimSession:
                 )
             target = sim.campaign_mgr.overrides.setdefault(str(campaign), {})
             for field_name, value in overrides.items():
-                target[str(field_name)] = float(value)
+                if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
+                    target[str(field_name)] = normalize_lab_schedule(value)
+                else:
+                    target[str(field_name)] = float(value)
 
         self._sim = sim
         self._config = config

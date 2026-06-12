@@ -18,6 +18,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Dict, List, Optional, Tuple
 
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_OVERRIDE_KEY,
+    interpolate_schedule_points,
+    normalize_lab_schedule,
+    pO2_enforcement_row,
+    pO2_setpoint_mbar_from_schedule,
+    schedule_sample_time_h,
+)
 from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
@@ -44,6 +52,7 @@ class CampaignManager:
         # Structure: {'C2A': {'ramp_rate': 10.0, 'pO2_mbar': 1.0,
         #                     'stir_factor': 8.0, 'max_hours': 25}}
         self.overrides: Dict[str, dict] = {}
+        self.last_pO2_enforcement: dict[str, object] | None = None
         self.c5_enabled = False
 
     _CONFIG_KEY_BY_PHASE = {
@@ -245,6 +254,7 @@ class CampaignManager:
             melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
             if override_pO2 > 0.0:
                 melt.atmosphere = Atmosphere.CONTROLLED_O2
+        self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)
         # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis
         # merge precedence. Before this fix, when an operator passed
         # BOTH ``{stir_factor: 6, stir_state: {radial: 8}}``, the whole-
@@ -315,6 +325,15 @@ class CampaignManager:
                                campaign_hour: int,
                                melt: MeltState) -> Tuple[Optional[float], float]:
         """Base temperature targets before runtime overrides."""
+        lab_schedule = self._lab_schedule(campaign)
+        if lab_schedule is not None:
+            sample_time_h = schedule_sample_time_h(lab_schedule, campaign_hour)
+            target = interpolate_schedule_points(
+                lab_schedule['melt_temperature_C'],
+                sample_time_h,
+            )
+            return (target, abs(float(target) - float(melt.temperature_C)))
+
         thermal_window = self._thermal_window_temp_target(campaign, melt)
         if thermal_window is not None:
             return thermal_window
@@ -442,6 +461,52 @@ class CampaignManager:
                 (high_C - low_C) / duration_h,
             ),
         )
+
+    def _lab_schedule(self, campaign: CampaignPhase) -> Optional[Mapping]:
+        raw = self._campaign_overrides(campaign).get(LAB_SCHEDULE_OVERRIDE_KEY)
+        if raw is None:
+            return None
+        if isinstance(raw, Mapping):
+            return normalize_lab_schedule(raw)
+        raise ValueError('lab_schedule_must_be_mapping')
+
+    def apply_lab_schedule_controls(
+            self,
+            melt: MeltState,
+            campaign: CampaignPhase,
+            *,
+            sample_time_h: float) -> None:
+        lab_schedule = self._lab_schedule(campaign)
+        if lab_schedule is None:
+            self.last_pO2_enforcement = None
+            return
+        ovr = self._campaign_overrides(campaign)
+        total_pressure = interpolate_schedule_points(
+            lab_schedule['chamber_pressure_mbar'],
+            sample_time_h,
+        )
+        pO2_setpoint = pO2_setpoint_mbar_from_schedule(
+            lab_schedule,
+            ovr,
+            total_pressure,
+        )
+        row = pO2_enforcement_row(
+            hour=int(melt.hour) + (0 if sample_time_h <= 0.0 else 1),
+            schedule=lab_schedule,
+            schedule_time_h=float(sample_time_h),
+            setpoint_mbar=pO2_setpoint,
+            total_pressure_mbar=total_pressure,
+        )
+        melt.p_total_mbar = float(total_pressure)
+        melt.pO2_mbar = float(row['achieved_mbar'])
+        if melt.pO2_mbar > 0.0:
+            melt.atmosphere = Atmosphere.CONTROLLED_O2
+        elif melt.p_total_mbar > 0.0:
+            melt.atmosphere = Atmosphere.PN2_SWEEP
+        else:
+            melt.atmosphere = Atmosphere.HARD_VACUUM
+        self.last_pO2_enforcement = dict(row)
+        melt.validate_melt_pressures()
 
     def _apply_ramp_override(self, campaign: CampaignPhase,
                              target_T: Optional[float],
