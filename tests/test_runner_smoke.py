@@ -264,6 +264,41 @@ def test_c3_alkali_dosing_conflict_fail_loud():
     assert additive_config.additives_kg["K"] == pytest.approx(2.0)
 
 
+def test_runtime_campaign_overrides_refuse_unknown_field_names() -> None:
+    valid = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        runtime_campaign_overrides={
+            "C2A": {
+                "pO2_mbar": 1.0,
+                "p_total_mbar": 9.0,
+                "ramp_rate": 12.0,
+            }
+        },
+        allow_fallback_vapor=True,
+    )
+    assert valid._session_config().runtime_campaign_overrides["C2A"] == {
+        "pO2_mbar": 1.0,
+        "p_total_mbar": 9.0,
+        "ramp_rate": 12.0,
+    }
+
+    poisoned = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        runtime_campaign_overrides={"C2A": {"unused_limit": 1.0}},
+        allow_fallback_vapor=True,
+    )
+    with pytest.raises(
+        RunnerError,
+        match=(
+            r"runtime_campaign_overrides\['C2A'\]\.unused_limit.*"
+            r"known overridable fields.*pO2_mbar"
+        ),
+    ):
+        poisoned._session_config()
+
+
 def _assert_schema_shape(payload: dict) -> None:
     """Assert the runner-output schema contract.
 

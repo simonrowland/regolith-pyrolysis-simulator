@@ -15,11 +15,15 @@ Each campaign has:
 
 from __future__ import annotations
 
+import ast
 from collections.abc import Mapping
+from functools import lru_cache
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
+    LAB_SCHEDULE_PO2_SETPOINT_KEY,
     interpolate_schedule_points,
     normalize_lab_schedule,
     pO2_enforcement_row,
@@ -31,6 +35,77 @@ from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
     DecisionPoint, DecisionType, EvaporationFlux, MeltState,
 )
+
+
+class _CampaignOverrideFields(dict):
+    def __init__(self,
+                 campaign_name: str,
+                 validator,
+                 values: Mapping[str, object] | None = None):
+        self._campaign_name = str(campaign_name)
+        self._validator = validator
+        super().__init__()
+        if values:
+            self.update(values)
+
+    def _validate(self, fields: Mapping[str, object]) -> None:
+        if fields:
+            self._validator(self._campaign_name, fields)
+
+    def __setitem__(self, key: str, value: object) -> None:
+        field = str(key)
+        self._validate({field: value})
+        super().__setitem__(field, value)
+
+    def setdefault(self, key: str, default: object = None):
+        field = str(key)
+        if field not in self:
+            self._validate({field: default})
+        return super().setdefault(field, default)
+
+    def update(self, *args, **kwargs) -> None:
+        fields = {
+            str(key): value
+            for key, value in dict(*args, **kwargs).items()
+        }
+        self._validate(fields)
+        for key, value in fields.items():
+            super().__setitem__(key, value)
+
+
+class _CampaignOverrideStore(dict):
+    def __init__(self, validator):
+        self._validator = validator
+        super().__init__()
+
+    def _coerce_fields(self, campaign_name: str, value: object):
+        if isinstance(value, _CampaignOverrideFields):
+            return value
+        if not isinstance(value, Mapping):
+            raise ValueError(
+                f'runtime_campaign_overrides[{campaign_name!r}] must be a mapping')
+        return _CampaignOverrideFields(
+            campaign_name,
+            self._validator,
+            value,
+        )
+
+    def __setitem__(self, key: str, value: object) -> None:
+        campaign_name = str(key)
+        super().__setitem__(
+            campaign_name,
+            self._coerce_fields(campaign_name, value),
+        )
+
+    def setdefault(self, key: str, default: object = None):
+        campaign_name = str(key)
+        if campaign_name not in self:
+            self[campaign_name] = {} if default is None else default
+        return super().__getitem__(campaign_name)
+
+    def update(self, *args, **kwargs) -> None:
+        for key, value in dict(*args, **kwargs).items():
+            self[str(key)] = value
 
 
 class CampaignManager:
@@ -51,7 +126,8 @@ class CampaignManager:
         # Runtime overrides from UI (keyed by campaign name)
         # Structure: {'C2A': {'ramp_rate': 10.0, 'pO2_mbar': 1.0,
         #                     'stir_factor': 8.0, 'max_hours': 25}}
-        self.overrides: Dict[str, dict] = {}
+        self.overrides: Dict[str, dict] = _CampaignOverrideStore(
+            type(self)._refuse_unknown_override_fields)
         self.last_pO2_enforcement: dict[str, object] | None = None
         self.c5_enabled = False
 
@@ -63,6 +139,17 @@ class CampaignManager:
         CampaignPhase.C3_NA: 'C3',
         CampaignPhase.MRE_BASELINE: 'mre_baseline',
     }
+
+    _EXTRA_OVERRIDE_KEY_PHASES = {
+        'C0b': (CampaignPhase.C0B,),
+    }
+    _OVERRIDE_CONSUMER_NAMES = frozenset({
+        'campaign_overrides',
+        'override',
+        'overrides',
+        'ovr',
+        'runtime_override',
+    })
 
     @staticmethod
     def _is_noninteractive_test_batch(record: BatchRecord) -> bool:
@@ -83,11 +170,168 @@ class CampaignManager:
         cfg = self.campaigns.get(self._campaign_config_key(campaign), {})
         return cfg if isinstance(cfg, dict) else {}
 
+    @classmethod
+    def _campaign_phases_for_override_key(
+            cls, campaign_name: str) -> Tuple[CampaignPhase, ...]:
+        phases: list[CampaignPhase] = []
+        try:
+            phases.append(CampaignPhase[str(campaign_name)])
+        except KeyError:
+            pass
+        phases.extend(
+            phase
+            for phase, key in cls._CONFIG_KEY_BY_PHASE.items()
+            if key == str(campaign_name)
+        )
+        phases.extend(cls._EXTRA_OVERRIDE_KEY_PHASES.get(str(campaign_name), ()))
+        unique: list[CampaignPhase] = []
+        for phase in phases:
+            if phase not in unique:
+                unique.append(phase)
+        return tuple(unique)
+
+    @classmethod
+    def known_override_fields(cls, campaign_name: str) -> Tuple[str, ...]:
+        phases = cls._campaign_phases_for_override_key(str(campaign_name))
+        if not phases:
+            return ()
+        return tuple(sorted(cls._derived_override_field_names()))
+
+    @classmethod
+    @lru_cache(maxsize=1)
+    def _derived_override_field_names(cls) -> frozenset[str]:
+        root = Path(__file__).resolve().parents[1]
+        source_paths = (
+            Path(__file__).resolve(),
+            Path(__file__).with_name('lab_schedule.py').resolve(),
+            root / 'simulator' / 'runner.py',
+            root / 'web' / 'routes.py',
+        )
+        constants = {
+            name: value
+            for name, value in globals().items()
+            if isinstance(value, str)
+        }
+        fields: set[str] = set()
+        for source_path in source_paths:
+            try:
+                tree = ast.parse(source_path.read_text(encoding='utf-8'))
+            except OSError:
+                continue
+            fields.update(cls._override_fields_from_ast(tree, constants))
+        return frozenset(fields)
+
+    @classmethod
+    def _override_fields_from_ast(
+            cls,
+            tree: ast.AST,
+            constants: Mapping[str, str]) -> set[str]:
+        fields: set[str] = set()
+
+        def literal_key(node: ast.AST) -> str | None:
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                return node.value
+            if isinstance(node, ast.Name):
+                value = constants.get(node.id)
+                return value if isinstance(value, str) else None
+            return None
+
+        def is_consumer_name(node: ast.AST) -> bool:
+            return isinstance(node, ast.Name) and node.id in cls._OVERRIDE_CONSUMER_NAMES
+
+        def is_campaign_override_call(node: ast.AST) -> bool:
+            return (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == '_campaign_overrides'
+            )
+
+        def is_consumer_node(node: ast.AST) -> bool:
+            return is_consumer_name(node) or is_campaign_override_call(node)
+
+        def collect_key(node: ast.AST) -> None:
+            key = literal_key(node)
+            if key:
+                fields.add(key)
+
+        class Visitor(ast.NodeVisitor):
+            def visit_Call(self, node: ast.Call) -> None:
+                func = node.func
+                if (isinstance(func, ast.Attribute)
+                        and func.attr in {'get', 'setdefault'}
+                        and is_consumer_node(func.value)
+                        and node.args):
+                    collect_key(node.args[0])
+                if (isinstance(func, ast.Name)
+                        and func.id == '_first_present'
+                        and node.args
+                        and is_consumer_node(node.args[0])):
+                    for arg in node.args[1:]:
+                        collect_key(arg)
+                self.generic_visit(node)
+
+            def visit_Subscript(self, node: ast.Subscript) -> None:
+                if is_consumer_node(node.value):
+                    collect_key(node.slice)
+                self.generic_visit(node)
+
+            def visit_Compare(self, node: ast.Compare) -> None:
+                for op, comparator in zip(node.ops, node.comparators):
+                    if isinstance(op, ast.In):
+                        if is_consumer_node(comparator):
+                            collect_key(node.left)
+                        elif is_consumer_node(node.left):
+                            collect_key(comparator)
+                self.generic_visit(node)
+
+        Visitor().visit(tree)
+        return fields
+
+    @classmethod
+    def validate_runtime_campaign_overrides(
+            cls,
+            overrides: Mapping[str, Mapping[str, object]]) -> None:
+        if not isinstance(overrides, Mapping):
+            raise ValueError('runtime_campaign_overrides must be a mapping')
+        for campaign_name, fields in overrides.items():
+            if not isinstance(fields, Mapping):
+                raise ValueError(
+                    f'runtime_campaign_overrides[{campaign_name!r}] '
+                    'must be a mapping')
+            cls._refuse_unknown_override_fields(str(campaign_name), fields)
+
+    @classmethod
+    def _refuse_unknown_override_fields(
+            cls,
+            campaign_name: str,
+            fields: Mapping[str, object]) -> None:
+        known_fields = cls.known_override_fields(campaign_name)
+        if not known_fields:
+            known_campaigns = sorted({
+                phase.name for phase in CampaignPhase
+                if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
+            } | set(cls._CONFIG_KEY_BY_PHASE.values())
+              | set(cls._EXTRA_OVERRIDE_KEY_PHASES))
+            raise ValueError(
+                f'unknown runtime_campaign_overrides campaign '
+                f'{campaign_name!r}; known campaigns: '
+                f'{", ".join(known_campaigns)}')
+        known = set(known_fields)
+        unknown = sorted(str(field) for field in fields if str(field) not in known)
+        if unknown:
+            raise ValueError(
+                f'unknown runtime_campaign_overrides[{campaign_name!r}].'
+                f'{unknown[0]}; known overridable fields for '
+                f'{campaign_name}: {", ".join(known_fields)}')
+
     def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
         merged: dict = {}
         for key in (self._campaign_config_key(campaign), campaign.name):
             ovr = self.overrides.get(key, {})
             if isinstance(ovr, dict):
+                self._refuse_unknown_override_fields(key, ovr)
+                if 'setpoints' in ovr:
+                    merged.setdefault('setpoints', ovr['setpoints'])
                 merged.update(ovr)
         return merged
 
@@ -122,6 +366,10 @@ class CampaignManager:
             ovr = self._campaign_overrides(campaign)
             if 'max_hours' in ovr:
                 return self._float(ovr.get('max_hours'), 0.0)
+            if 'hold_time_h' in ovr:
+                return self._float(ovr.get('hold_time_h'), 0.0)
+            if 'duration_h' in ovr:
+                return self._float(ovr.get('duration_h'), 0.0)
         return self._configured_max_hold_hr(campaign, *path)
 
     def _configured_endpoint(self,
@@ -406,7 +654,12 @@ class CampaignManager:
             # Higher T → more Mg extraction but risk of freezing
             # refractory-enriched melt (liquidus rises as composition
             # becomes more aluminous/calcic after Fe/Ti/SiO₂ removal)
-            target = min(self.c4_max_temp_C, 1900.0)  # safety cap
+            ovr = self._campaign_overrides(campaign)
+            target = self._float(
+                ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
+                self.c4_max_temp_C,
+            )
+            target = min(target, 1900.0)  # safety cap
             return (target, 10.0)
 
         elif campaign == CampaignPhase.C5:
@@ -446,6 +699,9 @@ class CampaignManager:
             raise ValueError('thermal_window_duration_h must be positive')
         if high_C < low_C:
             raise ValueError('thermal_window_high_C must be >= thermal_window_low_C')
+        preheat_hours = self._float(ovr.get('thermal_window_preheat_hours'), 0.0)
+        if preheat_hours < 0.0:
+            raise ValueError('thermal_window_preheat_hours must be non-negative')
         if melt.temperature_C < low_C - 1e-9:
             return (
                 low_C,
@@ -515,6 +771,10 @@ class CampaignManager:
         ovr = self._campaign_overrides(campaign)
         if 'ramp_rate' in ovr:
             ramp_rate = float(ovr['ramp_rate'])
+        elif 'temperature_ramp_C_per_h' in ovr:
+            ramp_rate = float(ovr['temperature_ramp_C_per_h'])
+        elif 'ramp_rate_C_per_h' in ovr:
+            ramp_rate = float(ovr['ramp_rate_C_per_h'])
         return (target_T, ramp_rate)
 
     # ------------------------------------------------------------------
@@ -556,7 +816,10 @@ class CampaignManager:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
             min_temperature_C = self._endpoint_float(
                 campaign, soft, 'temperature_min_C')
-            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            min_hold_hr = self._float(
+                ovr.get('min_hold_hr'),
+                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            )
             max_hold_hr = self._max_hold_hr(campaign)
             if (melt.temperature_C >= min_temperature_C
                     and melt.campaign_hour >= min_hold_hr):
@@ -658,7 +921,10 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C4:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_hold_hr = self._endpoint_float(campaign, soft, 'min_hold_hr')
+            min_hold_hr = self._float(
+                ovr.get('min_hold_hr'),
+                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            )
             threshold_kg_hr = self._endpoint_float(
                 campaign, soft, 'threshold_kg_hr')
             max_hold_hr = self._max_hold_hr(campaign)
@@ -684,6 +950,7 @@ class CampaignManager:
         elif campaign == CampaignPhase.C6:
             composition_endpoint = self._configured_endpoint(
                 campaign, 'composition_endpoint')
+            min_hold_hr = self._float(ovr.get('min_hold_hr'), 0.0)
             species = composition_endpoint.get('species', [])
             if not isinstance(species, list) or not species:
                 raise ValueError(
@@ -693,7 +960,7 @@ class CampaignManager:
             max_hold_hr = self._max_hold_hr(campaign)
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
-            if refractory_pct < threshold_wt_pct:
+            if melt.campaign_hour >= min_hold_hr and refractory_pct < threshold_wt_pct:
                 return True
             if melt.campaign_hour >= max_hold_hr:
                 return True

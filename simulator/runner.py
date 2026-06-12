@@ -47,6 +47,7 @@ from simulator.backends import (
     BackendSelectionPolicy,
 )
 from simulator.config import ConfigBundle, load_config_bundle
+from simulator.campaigns import CampaignManager
 from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
@@ -513,6 +514,10 @@ class PyrolysisRun:
                     f"{campaign_name}.{LAB_SCHEDULE_OVERRIDE_KEY}"
                 )
             campaign_overrides[LAB_SCHEDULE_OVERRIDE_KEY] = dict(self.lab_schedule)
+        try:
+            CampaignManager.validate_runtime_campaign_overrides(runtime_overrides)
+        except ValueError as exc:
+            raise RunnerError(str(exc)) from exc
         return SimSessionConfig(
             feedstock_id=self.feedstock_id,
             feedstocks=feedstocks,

@@ -30,7 +30,7 @@ from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
-from simulator.runner import PyrolysisRun
+from simulator.runner import PyrolysisRun, RunnerError
 
 
 PINNED_EVALSPEC_JSON = (
@@ -492,6 +492,123 @@ def test_c2a_profile_window_splits_cache_key_from_cold_start() -> None:
         "thermal_window_low_C"
     ] == pytest.approx(1050.0)
     assert cache_key(cold_spec) != cache_key(warm_spec)
+
+
+def test_build_eval_inputs_refuses_unknown_runtime_campaign_override_fields() -> None:
+    profile = _c2a_window_profile(None, None, 24)
+    profile["run"]["runtime_campaign_overrides"] = {
+        "C2A_continuous": {"unused_limit": 1.0}
+    }
+
+    with pytest.raises(
+        RunnerError,
+        match=(
+            r"runtime_campaign_overrides\['C2A_continuous'\]\.unused_limit.*"
+            r"known overridable fields.*pO2_mbar"
+        ),
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile,
+            RecipeSchema(),
+        )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "low_C", "high_C", "duration_h"),
+    (
+        ("C2A_continuous", 1050.0, 1600.0, 24),
+        ("C2B", 1320.0, 1480.0, 17),
+        ("C4", 1580.0, 1670.0, 10),
+        ("C6", 1450.0, 1550.0, 10),
+    ),
+)
+def test_build_eval_inputs_accepts_profile_window_override_shapes(
+    campaign: str,
+    low_C: float,
+    high_C: float,
+    duration_h: int,
+) -> None:
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        _campaign_window_profile(campaign, low_C, high_C, duration_h),
+        RecipeSchema(),
+    )
+
+    overrides = run_config.runtime_campaign_overrides[campaign]
+    assert spec.runtime_campaign_overrides[campaign] == overrides
+    assert {
+        "thermal_window_low_C",
+        "thermal_window_high_C",
+        "thermal_window_duration_h",
+        "thermal_window_preheat_ramp_C_per_hr",
+        "thermal_window_preheat_hours",
+        "thermal_window_ramp_C_per_hr",
+        "min_hold_hr",
+        "max_hours",
+    } <= set(overrides)
+    assert overrides["min_hold_hr"] == pytest.approx(run_config.hours)
+    _force_builtin_run_from_config(run_config)._start_session()
+
+
+def test_web_default_c4_override_shape_is_allowed_and_controls_target() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        runtime_campaign_overrides={
+            "C4": {
+                "pO2_mbar": 0.2,
+                "hold_temp_C": 1600.0,
+                "max_hours": 1.0,
+                "ramp_rate": 10.0,
+            }
+        },
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+
+    config = run._session_config()
+    session = run._start_session()
+    target, ramp_rate = session.simulator.campaign_mgr.get_temp_target(
+        session.simulator.melt.campaign,
+        0,
+        session.simulator.melt,
+    )
+
+    assert config.runtime_campaign_overrides["C4"]["hold_temp_C"] == pytest.approx(1600.0)
+    assert target == pytest.approx(1600.0)
+    assert ramp_rate == pytest.approx(10.0)
+
+
+def test_session_campaign_override_rejects_unknown_fields_at_adjust_time() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    session = run._start_session()
+
+    with pytest.raises(
+        ValueError,
+        match=r"runtime_campaign_overrides\['C4'\]\.unused_limit",
+    ):
+        session.adjust(
+            "campaign_override",
+            1.0,
+            campaign="C4",
+            field="unused_limit",
+        )
 
 
 def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
