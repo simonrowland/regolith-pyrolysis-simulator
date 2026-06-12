@@ -5,6 +5,7 @@ import yaml
 
 from simulator.core import PyrolysisSimulator
 from simulator.accounting import AccountingError, resolve_species_formula
+from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
 from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase
 
@@ -25,6 +26,8 @@ def test_builtin_feedstocks_initially_conserve_batch_mass():
     feedstocks = yaml.safe_load(data_path.read_text())
 
     for key in feedstocks:
+        if str(feedstocks[key].get("status", "")).startswith("blocked_"):
+            continue
         sim = _sim(feedstocks)
         required_c = 0.0
         if PyrolysisSimulator._uses_mars_carbon_cleanup(feedstocks[key]):
@@ -35,6 +38,25 @@ def test_builtin_feedstocks_initially_conserve_batch_mass():
         snapshot = sim._make_snapshot()
 
         assert snapshot.mass_balance_error_pct == pytest.approx(0.0), key
+
+
+def test_load_batch_refuses_status_blocked_feedstocks():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    blocked_key, blocked_entry = next(
+        (key, entry)
+        for key, entry in feedstocks.items()
+        if is_blocked_feedstock(entry)
+    )
+    sim = _sim(feedstocks)
+
+    with pytest.raises(BlockedFeedstockError) as excinfo:
+        sim.load_batch(blocked_key, mass_kg=1000.0)
+
+    message = str(excinfo.value)
+    assert blocked_key in message
+    assert blocked_entry["status"] in message
+    assert blocked_entry["blocked_reason"] in message
 
 
 def test_load_batch_preserves_non_melt_feedstock_inventory():

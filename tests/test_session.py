@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -112,6 +113,24 @@ def test_start_queries_and_result_document_factory():
     assert not session.is_complete()
     assert session.snapshot().campaign == CampaignPhase.C0
     assert session.result_document() == {"hour": 0, "campaign": "C0"}
+
+
+def test_start_refuses_status_blocked_feedstock_selection():
+    feedstocks = _load_yaml("feedstocks.yaml")
+    blocked_key, blocked_entry = next(
+        (key, entry)
+        for key, entry in feedstocks.items()
+        if is_blocked_feedstock(entry)
+    )
+
+    with pytest.raises(RuntimeError) as excinfo:
+        SimSession().start(_config(feedstock_id=blocked_key))
+
+    message = str(excinfo.value)
+    assert "BlockedFeedstockError" in message
+    assert blocked_key in message
+    assert blocked_entry["status"] in message
+    assert blocked_entry["blocked_reason"] in message
 
 
 def test_adjust_handles_only_session_parameters_with_live_override_effects():

@@ -68,6 +68,7 @@ from simulator.condensation_routing import (
     designated_stage_number,
     target_species_for_stage_number,
 )
+from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
@@ -593,6 +594,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fs = self.feedstocks.get(feedstock_key)
         if fs is None:
             raise ValueError(f"Unknown feedstock: {feedstock_key}")
+        assert_feedstock_loadable(feedstock_key, fs)
 
         additives = dict(additives_kg or {})
         ledger_additives = dict(additives)

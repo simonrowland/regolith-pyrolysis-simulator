@@ -1,11 +1,18 @@
 import pytest
+import yaml
 
 import app as app_module
 from simulator.campaigns import CampaignManager
 from simulator.core import PyrolysisSimulator
+from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.melt_backend.base import StubBackend
 from simulator.state import BatchRecord, CampaignPhase, DecisionType
-from web.feedstock_data import load_visible_feedstocks
+from web.feedstock_data import (
+    DATA_DIR,
+    get_visible_feedstock,
+    load_feedstock_groups,
+    load_visible_feedstocks,
+)
 
 
 def test_debug_feedstocks_are_hidden_by_default(monkeypatch):
@@ -21,6 +28,30 @@ def test_debug_feedstocks_are_hidden_by_default(monkeypatch):
     assert b"debug-inventory-json" not in page.data
     assert "debug_pure_feo" not in feedstocks
     assert client.get("/api/feedstock/debug_pure_feo").status_code == 404
+
+
+def test_blocked_feedstocks_are_hidden_from_selection_and_api(monkeypatch):
+    monkeypatch.delenv("REGOLITH_DEBUG_FEEDSTOCKS", raising=False)
+    data_path = DATA_DIR / "feedstocks.yaml"
+    all_feedstocks = yaml.safe_load(data_path.read_text())
+    blocked_keys = {
+        key for key, entry in all_feedstocks.items()
+        if is_blocked_feedstock(entry)
+    }
+    assert blocked_keys
+
+    base, debug = load_feedstock_groups()
+    visible = load_visible_feedstocks(include_custom=True)
+    client = app_module.create_app().test_client()
+    api_feedstocks = client.get("/api/feedstocks").get_json()
+
+    assert not blocked_keys & set(base)
+    assert not blocked_keys & set(debug)
+    assert not blocked_keys & set(visible)
+    assert not blocked_keys & set(api_feedstocks)
+    for key in blocked_keys:
+        assert get_visible_feedstock(key, include_custom=True) is None
+        assert client.get(f"/api/feedstock/{key}").status_code == 404
 
 
 def test_debug_feedstocks_and_inventory_panel_are_visible_when_enabled(

@@ -261,6 +261,387 @@ targeted_super_kreep_ore:
     in C1; slag mass/grade dramatically higher. K2O 8-50x mare baseline.
 
 # ---------------------------------------------------------------------------
+# LUNAR SIMULANT FEEDSTOCKS
+# ---------------------------------------------------------------------------
+
+# buy: https://spaceresourcetech.com/collections/regolith-simulants
+# source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 fused-bead XRF; SRT/Exolith LHS-1.
+lunar_highlands_lhs1:
+  name: "LHS-1 lunar highlands simulant"
+  label: "LHS-1 Lunar Highlands Simulant (SRT/Exolith)"
+  class: lunar_simulant
+  source: "Space Resource Technologies (Exolith Lab spin-off) LHS-1; targets average lunar highlands regolith"
+  confidence: "High"
+  note: >
+    Source-captured SRT/Exolith LHS-1 simulant composition. FeO is total
+    iron as FeO, following lunar reporting convention. The listed oxide
+    subtotal excludes unquoted minor/other components; source XRF total is
+    retained separately. Simulant, not real regolith: no agglutinates or
+    nanophase Fe0; batch-specific XRF should be requested for experiment
+    reproduction.
+  composition_wt_pct:
+    SiO2:  49.12
+    TiO2:   0.63
+    Al2O3: 26.29
+    FeO:    3.20
+    MgO:    2.86
+    CaO:   13.52
+    Na2O:   2.55
+    K2O:    0.34
+    MnO:    0.06
+    P2O5:   0.17
+  sum_check: 98.74
+  source_total_wt_pct: 99.15
+  glass_fraction:
+    value: "not_reported"
+    note: "Catalog reports basalt/glass-rich mineral feedstock but no glass fraction; do not infer."
+  stage0_buckets:
+    h2o_wt_pct: 0.0
+    organics_wt_pct: 0.0
+    carbon_wt_pct: 0.0
+    sulfur_wt_pct: 0.0
+    halides_wt_pct: 0.0
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: 0.0
+    native_metals_wt_pct: 0.0
+    sulfides_wt_pct: 0.0
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Long-Fox J.M. et al. 2023, Characterization of planetary regolith simulants, Frontiers in Space Technologies, Table 2 XRF."
+    composition_digest: "sha256:d3118cd978db7e60"
+    lot_or_batch: "not_reported; request current-lot XRF from SRT"
+    buy_url: "https://spaceresourcetech.com/collections/regolith-simulants"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "LHS-1 is a mineral simulant, not real highlands regolith; agglutinates and nanophase Fe0 are absent."
+  key_feature: "High-Al anorthositic simulant; Al2O3 ~26 wt%; low Fe/Mg highlands analog"
+  preferred_for: "Highland ISRU trials; Al/Ca extraction; low-Fe melt behavior; ceramic feedstock tests"
+  process_notes: "Standard C0-C6 flowsheet applicable; lower Fe yield than mare material."
+
+# buy: https://spaceresourcetech.com/products/lms-1-lunar-mare-simulant
+# source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF; SRT/Exolith LMS-1, with vendor factsheet minors captured in catalog.
+lunar_mare_lms1:
+  name: "LMS-1 lunar mare simulant"
+  label: "LMS-1 Lunar Mare Simulant (SRT/Exolith)"
+  class: lunar_simulant
+  source: "Space Resource Technologies (Exolith Lab spin-off) LMS-1; targets low-Ti lunar mare basaltic regolith"
+  confidence: "High"
+  note: >
+    Source-captured LMS-1 simulant composition. Major oxides use Long-Fox
+    et al. 2023 values; TiO2/K2O/P2O5 include catalog-captured vendor
+    factsheet cross-values where the research note flagged minor-source
+    differences. FeO is total iron as FeO. Simulant, not real mare soil:
+    agglutinates and nanophase Fe0 are absent.
+  composition_wt_pct:
+    SiO2:  48.22
+    TiO2:   3.62
+    Al2O3: 12.40
+    FeO:    8.79
+    MgO:   15.97
+    CaO:    7.65
+    Na2O:   1.73
+    K2O:    0.70
+    MnO:    0.20
+    P2O5:   0.50
+  sum_check: 99.78
+  source_total_wt_pct: 98.87
+  glass_fraction:
+    value: "not_reported"
+    note: "Catalog reports glass-rich basalt feedstock but no separable glass fraction; do not infer."
+  stage0_buckets:
+    h2o_wt_pct: 0.0
+    organics_wt_pct: 0.0
+    carbon_wt_pct: 0.0
+    sulfur_wt_pct: 0.0
+    halides_wt_pct: 0.0
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: 0.0
+    native_metals_wt_pct: 0.0
+    sulfides_wt_pct: 0.0
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF; SRT factsheet minors as captured in 2026-06-11 catalog."
+    composition_digest: "sha256:0141281040a51723"
+    lot_or_batch: "not_reported; request current-lot XRF from SRT"
+    buy_url: "https://spaceresourcetech.com/products/lms-1-lunar-mare-simulant"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "LMS-1 is a mineral simulant, not real mare regolith; agglutinates and nanophase Fe0 are absent."
+  key_feature: "Mare basalt simulant with ilmenite; TiO2 ~3.6 wt%; higher Fe/Mg than highlands"
+  preferred_for: "Mare ISRU; ilmenite reduction pathways; Fe/Mg extraction benchmarking"
+  process_notes: "Standard C0-C6 flowsheet; ilmenite changes C2 Fe/Ti behavior."
+
+# buy: https://www.offplanetresearch.com/ (contact for quote; simulants-feedstocks-and-additives)
+# source: Off Planet Research OPR General Lunar Regolith Simulants Data Sheet references; 2022 LSIC Lunar Simulant Assessment; 2025 LPSC feedstock tables. Full current-lot XRF not public in captured research.
+lunar_mare_oprl2n:
+  name: "OPRL2N lunar mare simulant"
+  label: "OPRL2N Lunar Mare Simulant (Off Planet Research)"
+  class: lunar_simulant
+  status: blocked_missing_current_lot_xrf
+  blocked_reason: "Captured research has partial public OPRL2N/OPRL2NT oxide values only; full current-lot XRF/datasheet required before loadable simulation."
+  source: "Off Planet Research OPRL2N; binary basaltic cinder plus Shawmere anorthosite mare simulant"
+  confidence: "Medium-High for availability; blocked for composition completeness"
+  note: >
+    Commercial quote-based OPR lunar simulant line. Partial public chemistry
+    is retained for traceability, but this entry is not loadable until a full
+    current-lot oxide table is captured. Simulant, not real regolith; custom
+    agglutinates or ilmenite may be added by OPR and must be represented by
+    lot-specific metadata.
+  composition_wt_pct:
+    SiO2:  46.2
+    TiO2:   5.5
+    Al2O3: 12.9
+    FeO:   12.9
+    MgO:    2.7
+    CaO:    3.2
+    Na2O:   3.0
+  sum_check: 86.4
+  composition_status: "partial_public_quote_not_loadable"
+  glass_fraction:
+    value: "not_reported"
+    note: "OPR public/captured sources do not report glass fraction for OPRL2N."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: "not_reported"
+    carbon_wt_pct: "not_reported"
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: "not_reported"
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "OPR General Lunar Regolith Simulants Data Sheet references in 2022 LSIC and 2025 LPSC feedstock tables; partial values captured in 2026-06-11 catalog."
+    composition_digest: "sha256:8299b3a7938ab85f"
+    lot_or_batch: "blocked: current-lot OPR datasheet/XRF required"
+    buy_url: "https://www.offplanetresearch.com/"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "OPRL2N is a binary-feedstock simulant, not real mare soil; agglutinate/nanophase-Fe content depends on ordered additives."
+  key_feature: "Quote-based OPR mare simulant; partial public chemistry only"
+  preferred_for: "Hardware/geotech tests after lot-specific oxide capture"
+  process_notes: "Do not use for quantitative simulation until full XRF and additive state are captured."
+
+# buy: https://www.washingtonmills.com/products/duraluna
+# source: Rickman et al. 2024 NASA NTRS 20240007991; LPSC 2022 1146; NASA/USGS NU-LHT lineage. Exact oxide table not extracted in captured research.
+lunar_highlands_nuw_lht_5m:
+  name: "NUW-LHT-5M / DURALUNA lunar highlands simulant"
+  label: "NUW-LHT-5M / DURALUNA Lunar Highlands Simulant (Washington Mills)"
+  class: lunar_simulant
+  status: blocked_pending_rickman_2024_oxide_extraction
+  blocked_reason: "Captured research confirms citation, availability, mineral design, and 40 wt% synthetic glass, but exact Rickman 2024 oxide table was not extracted."
+  source: "Washington Mills DURALUNA NUW-LHT-5M; NASA/USGS highlands simulant lineage"
+  confidence: "High for lineage; blocked for exact composition capture"
+  note: >
+    Active commercial successor in the NU-LHT family. Research capture names
+    the Rickman et al. 2024 NTRS characterization as the composition authority
+    but does not include the exact major-oxide table. The partial design-anchor
+    values below are not sufficient for loadable simulation. Simulant, not real
+    Apollo highlands soil.
+  composition_wt_pct:
+    TiO2:   0.45
+    Al2O3: 26.5
+    FeO:    5.0
+    MgO:    6.0
+    CaO:   15.5
+    Na2O:   0.50
+    K2O:    0.10
+  sum_check: 54.05
+  composition_status: "partial_design_anchor_not_loadable"
+  glass_fraction:
+    value: 40.0
+    unit: wt_pct
+    note: "Catalog capture: NUW-LHT-5M design is 60:40 crystalline:synthetic high-Ca glass."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: 0.0
+    carbon_wt_pct: 0.0
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: 0.0
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Rickman et al. 2024, Characterization of NUW-LHT-5M, NASA NTRS 20240007991; exact oxide table pending extraction."
+    composition_digest: "sha256:b9cc6c2f03a50511"
+    lot_or_batch: "blocked: Rickman 2024 table/current Washington Mills lot required"
+    buy_url: "https://www.washingtonmills.com/products/duraluna"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "NUW-LHT-5M is a Stillwater/synthetic-glass simulant, not real Apollo 16 regolith; agglutinate and nanophase-Fe inventories are not natural-soil inventories."
+  key_feature: "NU-LHT lineage highlands simulant with 40 wt% synthetic glass"
+  preferred_for: "High-fidelity highlands engineering after exact oxide table capture"
+  process_notes: "Blocked for quantitative runs until Rickman 2024/current-lot oxides are entered."
+
+# buy: not_available (legacy_discontinued)
+# source: McKay et al. 1993/1994 JSC characterization and ORBITEC production notes cited in catalog; no citable composition table captured in this chunk.
+lunar_mare_jsc_1a_legacy:
+  name: "JSC-1A legacy lunar mare simulant"
+  label: "JSC-1A Legacy Lunar Mare Simulant (NASA/ORBITEC, discontinued)"
+  class: lunar_simulant
+  status: blocked_legacy_composition_not_captured
+  blocked_reason: "Catalog captured legacy/discontinued status only; no source-cited oxide table captured for this chunk."
+  source: "NASA/ORBITEC JSC-1A legacy simulant; Merriam Crater basalt ash"
+  confidence: "Legacy status high; composition blocked"
+  note: >
+    JSC-1A is retained as a legacy-status feedstock note because it appears in
+    older literature and is no longer generally purchasable. Do not substitute
+    LMS-1E or another successor without an explicit recipe/paper decision.
+  composition_wt_pct: {}
+  sum_check: null
+  glass_fraction:
+    value: "not_reported"
+    note: "Research capture says glass-rich low-Ti mare analog but did not capture a glass fraction."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: "not_reported"
+    carbon_wt_pct: "not_reported"
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: 0.0
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: "not_reported"
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "McKay et al. 1993/1994 JSC documents and ORBITEC production notes cited by 2026-06-11 catalog; oxide table not captured."
+    composition_digest: "sha256:3683dd3dfdb6b88b"
+    lot_or_batch: "not_available: legacy/discontinued"
+    buy_url: "not_available"
+    buy_url_reason: "legacy_discontinued"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "JSC-1A is a legacy basalt-ash simulant, not real mare regolith; agglutinate/nanophase-Fe differences must be named in comparisons."
+  key_feature: "Legacy literature simulant, discontinued"
+  preferred_for: "Historical paper traceability only until source composition is captured"
+  process_notes: "Blocked for quantitative runs in this data file."
+
+# buy: not_available (legacy_or_paper_stock)
+# source: Robinot et al. 2026 and Sesko et al. 2024 reproduction anchors cite EAC-1/EAC-1A use; citable composition not captured in this chunk.
+lunar_eac_1a:
+  name: "EAC-1A lunar simulant"
+  label: "EAC-1A Lunar Simulant (reproduction-required, blocked)"
+  class: lunar_simulant
+  status: blocked_missing_citable_composition
+  blocked_reason: "Reproduction research identifies EAC-1/EAC-1A as Robinot/Sesko feedstock, but captured inputs do not include a citable oxide table."
+  source: "Robinot et al. 2026 and Sesko et al. 2024 vacuum-pyrolysis reproduction anchors"
+  confidence: "Blocked"
+  note: "Required for faithful reproduction presets once source composition is captured."
+  composition_wt_pct: {}
+  sum_check: null
+  glass_fraction:
+    value: "not_reported"
+    note: "not_reported in captured reproduction research; faithful comparison blocks if required."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: "not_reported"
+    carbon_wt_pct: "not_reported"
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: "not_reported"
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: "not_reported"
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Robinot et al. 2026 / Sesko et al. 2024 feedstock identity captured; EAC-1A oxide composition TODO."
+    composition_digest: "sha256:618d59e216de0849"
+    lot_or_batch: "blocked: paper/source composition required"
+    buy_url: "not_available"
+    buy_url_reason: "paper_stock_or_not_commercially_captured"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "EAC-1A is a paper simulant feedstock, not real regolith; comparison sidecars must keep that caveat explicit."
+  process_notes: "Blocked for quantitative runs until citable composition is captured."
+
+# buy: not_available (legacy_or_paper_stock)
+# source: Matchett/Cardiff 2006-2007 reproduction anchors identify MLS-1A; citable composition not captured in this chunk.
+lunar_mls_1a:
+  name: "MLS-1A lunar simulant"
+  label: "MLS-1A Lunar Simulant (reproduction-required, blocked)"
+  class: lunar_simulant
+  status: blocked_missing_citable_composition
+  blocked_reason: "Reproduction research identifies MLS-1A for Matchett/Cardiff anchors, but captured inputs do not include a citable oxide table."
+  source: "Matchett/Cardiff 2006-2007 vacuum-pyrolysis reproduction anchors"
+  confidence: "Blocked"
+  note: "Required for faithful reproduction presets once source composition is captured."
+  composition_wt_pct: {}
+  sum_check: null
+  glass_fraction:
+    value: "not_reported"
+    note: "not_reported in captured reproduction research; faithful comparison blocks if required."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: "not_reported"
+    carbon_wt_pct: "not_reported"
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: "not_reported"
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: "not_reported"
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Matchett/Cardiff 2006-2007 feedstock identity captured; MLS-1A oxide composition TODO."
+    composition_digest: "sha256:2a48ad48e744954d"
+    lot_or_batch: "blocked: paper/source composition required"
+    buy_url: "not_available"
+    buy_url_reason: "legacy_or_paper_stock"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "MLS-1A is a paper simulant feedstock, not real regolith; comparison sidecars must keep that caveat explicit."
+  process_notes: "Blocked for quantitative runs until citable composition is captured."
+
+# buy: not_available (legacy_not_currently_stocked)
+# source: USGS/NASA NU-LHT lineage noted in 2022 LSIC assessment and captured catalog; NU-LHT-2M exact composition not captured in this chunk.
+lunar_highlands_nu_lht_2m:
+  name: "NU-LHT-2M lunar highlands simulant"
+  label: "NU-LHT-2M Lunar Highlands Simulant (legacy, blocked)"
+  class: lunar_simulant
+  status: blocked_missing_citable_composition
+  blocked_reason: "Design requires NU-LHT-2M, but captured research only names lineage/status; exact NU-LHT-2M oxide table is TODO."
+  source: "USGS/NASA NU-LHT lineage; Constellation-era highlands simulant"
+  confidence: "Blocked"
+  note: "Legacy NU-LHT-2M entry retained for reproduction routing; active commercial successor is NUW-LHT-5M/DURALUNA."
+  composition_wt_pct: {}
+  sum_check: null
+  glass_fraction:
+    value: "not_reported"
+    note: "not_reported for NU-LHT-2M in captured catalog; do not substitute NUW-LHT-5M glass fraction."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: "not_reported"
+    carbon_wt_pct: "not_reported"
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: "not_reported"
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: "not_reported"
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "2026-06-11 catalog notes USGS/NASA NU-LHT-2M/4M lineage and 2022 LSIC status; exact NU-LHT-2M composition TODO."
+    composition_digest: "sha256:18151af9c3b75716"
+    lot_or_batch: "blocked: legacy stock/source composition required"
+    buy_url: "not_available"
+    buy_url_reason: "legacy_not_currently_stocked"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "NU-LHT-2M is a legacy highlands simulant, not real Apollo 16 regolith; no substitution with NUW-LHT-5M without explicit paper/recipe decision."
+  process_notes: "Blocked for quantitative runs until citable composition is captured."
+
+# ---------------------------------------------------------------------------
 # ASTEROID FEEDSTOCKS
 # ---------------------------------------------------------------------------
 
@@ -768,6 +1149,72 @@ comet_nucleus:
 # Mars feedstocks include SO3, Cl, ClO4 as additional components (sulfates,
 # halides, perchlorates) not present in lunar/asteroid compositions.
 # All Mars feedstocks operate under ~6 mbar CO2 atmosphere (no deep vacuum).
+
+# buy: https://spaceresourcetech.com/collections/regolith-simulants
+# source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF for MGS-1 base; Costa et al. 2024 TiO2 cross-check.
+mars_global_mgs1:
+  name: "MGS-1 Mars global simulant"
+  label: "MGS-1 Mars Global Simulant (SRT/Exolith)"
+  class: mars_simulant
+  stage0_profile: "bulk_preservation"
+  source: "Space Resource Technologies (Exolith Lab spin-off) MGS-1; targets average Mars global surface regolith"
+  confidence: "High for captured major oxides; Mars volatile salts must be lot/variant-specific"
+  note: >
+    Source-captured MGS-1 base simulant composition. Mars sulfate, chloride,
+    and perchlorate inventories are variant/lot-specific and explicitly
+    not_reported here rather than inferred. Use MGS-1S/MGS-1C/JEZ-1 variants
+    only after their full source tables are captured. Simulant, not real Mars
+    soil: nanophase iron oxides, perchlorates, and hydrated phases are not
+    automatically represented by this base XRF subset.
+  # Long-Fox et al. 2023 Table 2 MGS-1 oxide subset sums to 89.59 wt%.
+  # Composition below is declared on a 100 wt% anhydrous/volatile-free basis;
+  # sulfur, halides, perchlorates, salts, and sulfides remain not_reported per lot.
+  # TODO(vpr-p4): capture lot-variant volatile sidecar before enabling Mars volatile chemistry.
+  composition_wt_pct:
+    SiO2:  49.00
+    TiO2:   0.51
+    Al2O3: 11.63
+    FeO:   11.83
+    MgO:   16.53
+    CaO:    8.83
+    Na2O:   1.67
+  sum_check: 100.00
+  composition_basis:
+    mode: "declared_anhydrous_volatile_free_normalized"
+    source_oxide_subset_wt_pct: 89.59
+    normalized_sum_check_wt_pct: 100.0
+    excluded_classes: [sulfur, halides, perchlorates, salts, sulfides]
+    citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF for MGS-1."
+  glass_fraction:
+    value: "not_reported"
+    note: "MGS-1 captured sources do not report glass fraction."
+  stage0_buckets:
+    h2o_wt_pct: "not_reported"
+    organics_wt_pct: 0.0
+    carbon_wt_pct: 0.0
+    sulfur_wt_pct: "not_reported"
+    halides_wt_pct: "not_reported"
+    perchlorates_wt_pct: "not_reported"
+    salts_wt_pct: "not_reported"
+    native_metals_wt_pct: 0.0
+    sulfides_wt_pct: "not_reported"
+    refractory_trace_wt_pct: "not_reported"
+  provenance:
+    composition_citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF for MGS-1; Costa et al. 2024 analytical cross-check for TiO2 0.46."
+    composition_digest: "sha256:d58159a7b69bcc9c"
+    lot_or_batch: "not_reported; request current-lot XRF from SRT"
+    buy_url: "https://spaceresourcetech.com/collections/regolith-simulants"
+    buy_url_checked: "2026-06-11"
+  simulant_vs_real_caveat:
+    report_placement: "measurement_sidecar"
+    text: "MGS-1 is a Mars simulant, not real Mars regolith; nanophase Fe oxides, hydrated phases, perchlorates, and sulfate/halide salts require explicit sidecar data."
+  environment:
+    surface_pressure_mbar: 6
+    atmosphere: "96% CO2"
+    constraint: "Mars material is not processed as hard-vacuum regolith"
+  key_feature: "Mars global average simulant with elevated Mg and explicit missing volatile-salt metadata"
+  preferred_for: "Mars ISRU baseline after variant/lot volatile salts are supplied"
+  process_notes: "Loadable for oxide-only comparisons; not experiment-grade for Mars volatile chemistry without sidecar salts/perchlorates."
 
 mars_basalt:
   label: "Mars Basalt (General)"

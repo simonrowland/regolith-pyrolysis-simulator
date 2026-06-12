@@ -1,0 +1,38 @@
+# Analog source: data/optimize_profiles/lunar_mare_lms1.yaml.
+# Simulant-specific adjustment: MGS-1 is kept as a dry oxide base-simulant
+# profile, using the closest source-captured no-cleanup basaltic simulant shape.
+# TODO(vpr-p4): capture lot-variant volatile sidecar before any Mars salt/perchlorate profile.
+profile_id: mars-global-mgs1-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: mars_global_mgs1
+description: MGS-1 Mars global base simulant; oxide-only Fe/O2/glass search from the LMS-1 basaltic simulant analog.
+north_star_rationale: MGS-1 is a source-captured dry oxide Mars base simulant, so reuse the no-cleanup basaltic simulant objective shape while keeping lot-variant volatile chemistry out of this profile.
+objective_emphasis: Balanced O2/metals/glass profile for source-captured MGS-1 base simulant.
+objectives:
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main oxidizer product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.22, rationale: Stage 3 glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: mgs1-base-simulant-path-a-seed
+    source_campaign: C2A_continuous
+    rationale: Use the LMS-1 low-Ti mare Path A co-extraction recipe for dry oxide MGS-1.
+    patch:
+      campaigns:
+        C2A_continuous:
+          temp_range_C: [1050, 1600]
+          dT_dt_C_per_hr:
+            early_ramp_1050_1320C: [10, 20]
+          p_total_mbar: [5, 15]
+          p_total_mbar_default: 10.0
+          duration_h: [18, 28]

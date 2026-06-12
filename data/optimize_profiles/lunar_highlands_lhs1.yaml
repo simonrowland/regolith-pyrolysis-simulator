@@ -1,0 +1,36 @@
+# Analog source: data/optimize_profiles/lunar_highland.yaml.
+# Simulant-specific adjustment: LHS-1 uses the same highlands objective mix;
+# only ids/text/feedstock are changed until an optimizer calibration exists.
+profile_id: lunar-highlands-lhs1-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_highlands_lhs1
+description: LHS-1 highlands simulant; Al-rich anorthositic feed with glass/ceramic and Al-metal proxy emphasis.
+north_star_rationale: LHS-1 is a source-captured highlands simulant, so reuse the highland search shape while preserving the simulant caveat.
+objective_emphasis: Glass plus metal proxy for source-captured LHS-1 highlands material.
+objectives:
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.32, rationale: glass/ceramic precursor proxy}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Al/metal ingot proxy}
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: anorthosite energy penalty}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: throughput}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: lhs1-highland-al-thermite-seed
+    source_campaign: C6
+    rationale: Use the highland Mg thermite seed unchanged for the Al-rich LHS-1 analog.
+    patch:
+      campaigns:
+        C6:
+          temp_range_C: [1450, 1550]
+          default_hold_T_C: 1500
+          pO2_mbar: [0.08, 0.35]
+          pO2_mbar_default: 0.2
+          p_total_mbar_default: 0.2

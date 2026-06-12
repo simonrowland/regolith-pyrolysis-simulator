@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+from simulator.feedstock_guard import loadable_feedstocks
+
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
 
@@ -46,10 +48,15 @@ def load_feedstock_groups(
         custom = load_yaml('custom_compositions.yaml')
         if custom:
             base.update(custom)
+    base = loadable_feedstocks(base)
 
     if include_debug is None:
         include_debug = debug_feedstocks_enabled()
-    debug = load_yaml('debug_feedstocks.yaml') if include_debug else {}
+    debug = (
+        loadable_feedstocks(load_yaml('debug_feedstocks.yaml'))
+        if include_debug
+        else {}
+    )
     return base, debug
 
 

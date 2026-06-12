@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import copy
+import re
 from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER
@@ -22,9 +24,16 @@ from simulator.optimize.recipe import RecipePatch, RecipeSchema
 
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     feedstocks = yaml.safe_load((DEFAULT_DATA_DIR / "feedstocks.yaml").read_text())
+    blocked_feedstocks = {
+        key for key, entry in feedstocks.items()
+        if is_blocked_feedstock(entry)
+    }
+    loadable_feedstocks = set(feedstocks) - blocked_feedstocks
     profiles = validate_profile_catalog()
 
-    assert set(profiles) == set(feedstocks)
+    assert blocked_feedstocks
+    assert set(profiles) == loadable_feedstocks
+    assert blocked_feedstocks.isdisjoint(profiles)
     for feedstock, profile in profiles.items():
         assert profile["feedstock"] == feedstock
         for objective in profile["objectives"]:
@@ -33,6 +42,51 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
         assert set(profile["constraints"]["gates"]).issubset(set(GATE_ORDER))
         for seed in profile["seed_recipes"]:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
+
+
+def test_mgs1_profile_is_base_simulant_without_carbon_cleanup_seed() -> None:
+    profile = _profile_copy("mars_global_mgs1")
+
+    assert profile["feedstock"] == "mars_global_mgs1"
+    assert "additives_kg" not in profile["run"]
+    assert "cleanup" not in profile["objective_emphasis"].lower()
+    for objective in profile["objectives"]:
+        assert "cleanup" not in objective["rationale"].lower()
+
+    for seed in profile["seed_recipes"]:
+        source_campaigns = seed.get("source_campaigns")
+        if source_campaigns is None:
+            source_campaigns = [seed.get("source_campaign")]
+        assert all(not str(campaign).startswith("C0") for campaign in source_campaigns)
+        assert all(
+            not str(campaign).startswith("C0")
+            for campaign in seed["patch"]["campaigns"]
+        )
+
+
+def test_profile_catalog_blocked_exemption_is_status_marker_driven(tmp_path: Path) -> None:
+    profile_dir = tmp_path / "optimize_profiles"
+    profile_dir.mkdir()
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["profile_id"] = "loadable-profile-test"
+    profile["feedstock"] = "loadable_feedstock"
+    (profile_dir / "loadable_feedstock.yaml").write_text(yaml.safe_dump(profile))
+    feedstocks = {
+        "loadable_feedstock": {"composition_wt_pct": {"SiO2": 100.0}},
+        "missing_profile_but_blocked": {
+            "status": "blocked_missing_test_composition",
+            "blocked_reason": "test marker exemption",
+        },
+    }
+    feedstock_path = tmp_path / "feedstocks.yaml"
+    feedstock_path.write_text(yaml.safe_dump(feedstocks))
+
+    assert set(validate_profile_catalog(data_dir=tmp_path)) == {"loadable_feedstock"}
+
+    feedstocks["missing_profile_but_blocked"]["status"] = "missing_test_composition"
+    feedstock_path.write_text(yaml.safe_dump(feedstocks))
+    with pytest.raises(ProfileValidationError, match=re.escape("missing_profile_but_blocked")):
+        validate_profile_catalog(data_dir=tmp_path)
 
 
 def test_each_profile_drives_stub_study(tmp_path: Path) -> None:

@@ -12,6 +12,7 @@ from typing import Any
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
     COMPOSITION_TARGET_TYPE,
@@ -163,7 +164,7 @@ def validate_profile_catalog(
     schema: RecipeSchema | None = None,
 ) -> Mapping[str, Mapping[str, Any]]:
     data_root = Path(data_dir)
-    expected = set(_feedstock_ids(data_root))
+    expected = set(_feedstock_ids(data_root, include_blocked=False))
     found = {path.stem for path in _profile_paths(data_root)}
     missing = sorted(expected - found)
     extras = sorted(found - expected)
@@ -282,12 +283,16 @@ def _load_yaml_mapping(path: Path) -> Mapping[str, Any]:
     return loaded
 
 
-def _feedstock_ids(data_dir: Path) -> tuple[str, ...]:
+def _feedstock_ids(data_dir: Path, *, include_blocked: bool = True) -> tuple[str, ...]:
     path = data_dir / "feedstocks.yaml"
     loaded = yaml.safe_load(path.read_text())
     if not isinstance(loaded, Mapping):
         raise ProfileValidationError(f"{path}: feedstocks.yaml must be a mapping")
-    return tuple(str(key) for key in loaded)
+    return tuple(
+        str(key)
+        for key, feedstock in loaded.items()
+        if include_blocked or not is_blocked_feedstock(feedstock)
+    )
 
 
 def _profile_paths(data_dir: Path) -> tuple[Path, ...]:

@@ -1,0 +1,37 @@
+# Analog source: data/optimize_profiles/lunar_mare_low_ti.yaml.
+# Simulant-specific adjustment: LMS-1 keeps the low-Ti mare balance, with
+# text/id/feedstock changed for the source-captured simulant composition.
+profile_id: lunar-mare-lms1-objectives-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_mare_lms1
+description: LMS-1 mare simulant; balance O2, Fe/Mg metal, silica glass, and short runs.
+north_star_rationale: LMS-1 is a source-captured low-Ti mare simulant, so reuse the mare-low-Ti objective shape while keeping simulant provenance separate from real regolith.
+objective_emphasis: Balanced O2/metals/glass profile for source-captured LMS-1.
+objectives:
+  - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
+  - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
+  - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.22, rationale: Stage 3 glass product}
+  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
+  - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
+constraints:
+  gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
+study_constraints: stub_smoke
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+fidelities:
+  stub: {backend_name: stub, hours: 1}
+  fast: {backend_name: stub, hours: 1}
+  high: {backend_name: stub, hours: 1}
+  auto: {backend_name: stub, hours: 1}
+seed_recipes:
+  - id: lms1-mare-path-a-seed
+    source_campaign: C2A_continuous
+    rationale: Use the low-Ti mare Path A co-extraction recipe unchanged for LMS-1.
+    patch:
+      campaigns:
+        C2A_continuous:
+          temp_range_C: [1050, 1600]
+          dT_dt_C_per_hr:
+            early_ramp_1050_1320C: [10, 20]
+          p_total_mbar: [5, 15]
+          p_total_mbar_default: 10.0
+          duration_h: [18, 28]

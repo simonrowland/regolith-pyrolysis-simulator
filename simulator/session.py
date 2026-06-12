@@ -16,6 +16,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
+from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.state import (
     DecisionPoint,
     HourSnapshot,
@@ -155,6 +156,15 @@ class SimSession:
                 f"unknown feedstock {config.feedstock_id!r}; expected one of "
                 f"{expected}..."
             )
+        try:
+            assert_feedstock_loadable(
+                config.feedstock_id,
+                config.feedstocks[config.feedstock_id],
+            )
+        except BlockedFeedstockError as exc:
+            raise config.unavailable_error_cls(
+                f"BlockedFeedstockError: {exc}"
+            ) from exc
 
         sim = build_simulator(
             SimulatorBuildConfig(

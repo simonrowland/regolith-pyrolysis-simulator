@@ -12,6 +12,13 @@ Important questions:
 - When does pO2-managed pyrolysis preserve useful glass rather than boiling off SiO?
 - How much Mg or Al-bearing residue remains for later stages?
 
+Lunar simulant entries use the same inventory path as real-regolith feedstocks,
+but they are not experiment-grade measurements by themselves. Each simulant must
+carry machine-readable `provenance`, `glass_fraction`, `stage0_buckets`, and
+`simulant_vs_real_caveat` fields. If a source-cited composition is not captured,
+the entry stays in `status: blocked_*` until the oxide table and lot metadata are
+added.
+
 ## Asteroid Feedstocks
 
 Asteroid material broadens the materials ledger.
@@ -70,6 +77,13 @@ Mars feedstocks with CO2 atmosphere, sulfate, chloride, perchlorate, or carbon
 pre-reduction notes use the Mars carbon-cleanup Stage 0 profile. That profile
 runs to 1050 C, records carbon reagent demand from `kg C/t` process notes, and
 routes sulfate/halide/perchlorate products outside `MeltState`.
+
+Simulant entries must also declare explicit Stage 0 buckets for water, organics,
+carbon, sulfur, halides, perchlorates, salts, native metals, sulfides, and
+refractory traces. Use `not_reported` when the source does not report a bucket;
+do not silently treat unknown non-oxide inventory as zero. `buy_url` belongs in
+the YAML `provenance` mapping, with `buy_url_reason` when it is
+`not_available`; comments are retained only for human audit.
 
 ## Adding Feedstocks
 
