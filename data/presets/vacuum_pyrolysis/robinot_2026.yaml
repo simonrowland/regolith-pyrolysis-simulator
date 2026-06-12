@@ -1,0 +1,224 @@
+schema_version: vacuum_pyrolysis_preset.v1
+paper_id: robinot_2026_vacuum_pyrolysis
+paper_citation_id: robinot_2026
+measurement_id: robinot_2026_deposit_measurements
+preset_kind: faithful_with_remediation_twin
+extraction_status: skeleton_not_full_paper_data
+
+source_notes:
+  - citation_id: robinot_2026
+    digest: "Worked example skeleton only; full bibliographic extraction and per-dimension apparatus values remain pending lit sweep."
+  - citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
+    digest: "Rev 2 requires Robinot Ar carrier gas near 13 mbar and 0.3 NL/min, explicit gas boundary digest, pO2 achieved-vs-setpoint fields, and C3 trust tags."
+
+lab_schedule:
+  id: robinot_2026_schedule_skeleton
+  duration_h: 1.0
+  duration_qualifier: approximate
+  duration_source_class: literature_sidecar
+  duration_source_ref: robinot_2026_methods
+  duration_citation_id: robinot_2026
+  interpolation: piecewise_linear
+  interpolation_source_class: assumption_with_sensitivity_marker
+  interpolation_citation_id: robinot_2026
+  interpolation_extraction_note: "Findings anchor reports about 1 h heating and a peak near 1800 C, not a paper-reported T(t) profile; piecewise-linear interpolation is a sensitivity-marked schedule-shape assumption."
+  furnace_ceiling_C: 1800
+  furnace_ceiling_qualifier: approximate_peak
+  furnace_ceiling_source_class: literature_sidecar
+  furnace_ceiling_source_ref: robinot_2026_methods
+  furnace_ceiling_citation_id: robinot_2026
+  experiment_windows:
+    heating: {start_h: 0.0, end_h: 1.0}
+    measured: {start_h: 0.0, end_h: 1.0}
+    cooldown: {reported: true, deposit_sampling: cooldown_or_post_run}
+  melt_temperature_C:
+    - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: TODO_initial_temperature_not_named_in_anchor}
+    - {t_h: 1.0, value: 1800, qualifier: approximate_peak, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+  chamber_pressure_mbar:
+    - {t_h: 0.0, value: 13.0, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+    - {t_h: 1.0, value: 13.0, qualifier: approximate, source_class: literature_sidecar, source_ref: robinot_2026_methods, citation_id: robinot_2026}
+  gas_boundary:
+    background_gas:
+      species: Ar
+      mole_fraction: 1.0
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      digest: "Robinot carrier-gas anchor: argon sweep at about 13 mbar."
+    imposed_flow:
+      value: 0.3
+      unit: NL_min
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      digest: "Robinot imposed-flow anchor: 0.3 NL/min Ar."
+    pressure_control:
+      mode: flow_through_with_pump
+      source_class: assumption_with_sensitivity_marker
+      pump_throughput_source: assumption_with_sensitivity_marker
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      extraction_note: TODO_confirm_pressure_control_mode_from_paper_methods
+      digest: "Pressure-control mode is inferred from the reported 13 mbar chamber pressure and 0.3 NL/min Ar flow; full paper extraction must confirm pump/control details."
+  surface_temperature_C:
+    holder:
+      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 1500, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+    window:
+      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 80, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+    condenser:
+      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+    filter:
+      - {t_h: 0.0, value: 25, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+      - {t_h: 1.0, value: 80, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: skeleton_pending_surface_temperature_extraction}
+
+lab_geometry:
+  id: robinot_2026_geometry_skeleton
+  scale: gram_lab
+  equipment_sizing: lab_fixed_geometry
+  geometry_status: skeleton_missing_dimensions
+  sample:
+    mass_g: 3.38
+    mass_qualifier: reported
+    mass_source_class: literature_sidecar
+    mass_source_ref: robinot_2026_methods
+    mass_citation_id: robinot_2026
+    mass_digest: "Robinot anchor reports an EAC-1 pellet mass of 3.38 g."
+    crucible_material: null
+    exposed_melt_area_m2: null
+    crucible_opening_area_m2: null
+    named_missing_fields:
+      - crucible_material
+      - exposed_melt_area_m2
+      - crucible_opening_area_m2
+  chamber:
+    volume_m3: null
+    wall_area_m2: null
+    wall_temperature_profile: window
+    named_missing_fields:
+      - chamber_volume_m3
+      - chamber_wall_area_m2
+  surfaces:
+    - id: holder
+      role: sample_holder
+      temperature_profile: holder
+      source_class: literature_sidecar
+      source_ref: robinot_2026_apparatus
+      citation_id: robinot_2026
+      extraction_note: "Role known from Robinot apparatus description; dimensions pending."
+      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+    - id: window
+      role: transparent_wall
+      temperature_profile: window
+      source_class: literature_sidecar
+      source_ref: robinot_2026_apparatus
+      citation_id: robinot_2026
+      extraction_note: "Window fouling is tracked as its own qualitative deposit surface."
+      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+    - id: condenser
+      role: collector
+      temperature_profile: condenser
+      source_class: literature_sidecar
+      source_ref: robinot_2026_apparatus
+      citation_id: robinot_2026
+      extraction_note: "Condenser/cold trap is the skeleton quantitative deposit collector."
+      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+    - id: filter
+      role: downstream_filter
+      temperature_profile: filter
+      source_class: literature_sidecar
+      source_ref: robinot_2026_apparatus
+      citation_id: robinot_2026
+      extraction_note: "Downstream filter is kept separate from condenser and window deposits."
+      named_missing_fields: [area_m2, distance_from_melt_m, view_factor_from_melt]
+  pump:
+    pumping_speed_m3_s: null
+    port_area_m2: null
+    conductance_path: null
+    named_missing_fields:
+      - pumping_speed_m3_s
+      - port_area_m2
+      - conductance_path
+
+pair:
+  faithful:
+    feedstock_id: robinot_2026_feedstock_pending_lit_sweep
+    schedule_id: robinot_2026_schedule_skeleton
+    geometry_id: robinot_2026_geometry_skeleton
+    duration_h: 1.0
+    transport_model: auto_named_regime
+    mitigation: none
+    kinetics_caveat: none
+    status: skeleton_not_claim_grade
+  remediation:
+    feedstock_id: robinot_2026_feedstock_pending_lit_sweep
+    schedule_id: robinot_2026_schedule_skeleton
+    geometry_id: robinot_2026_geometry_skeleton
+    duration_h: 1.0
+    transport_model: auto_named_regime
+    mitigation:
+      pO2_cover:
+        enabled: true
+        setpoint_mbar: 1.0e-4
+        p_total_mbar: 13.0
+        effective_pO2_achieved_mbar: 1.0e-4
+        limited_by_total_pressure: false
+        status: achieved_as_setpoint
+        source: model_design
+        source_class: assumption_with_sensitivity_marker
+        citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
+        digest: "Schema skeleton records achieved pO2 separately so low-pressure twins can fail loud on clipping."
+      alkali_shuttle_deconfliction:
+        enabled: false
+        source_class: assumption_with_sensitivity_marker
+    kinetics_caveat: furnace_scale_bulk_mixing_assumption
+    status: blocked_missing_gram_scale_kinetics_model
+
+sticking_provenance:
+  status: assumption_with_sensitivity_marker
+  digest: robinot_2026_sticking_skeleton_v1
+  species_surface_pairs:
+    - species: SiO
+      surface_id: condenser
+      sticking_coefficient: 1.0
+      source_class: assumption_with_sensitivity_marker
+      source_ref: design_vacuum_pyrolysis_reproduction_2026_06_11:R1.10
+      citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
+      extraction_note: no_robinot_specific_sticking_coefficient_extracted
+      digest: "No Robinot-specific SiO condenser sticking coefficient extracted yet; sensitivity marker required before claim-grade comparison."
+    - species: SiO
+      surface_id: window
+      sticking_coefficient: 1.0
+      source_class: assumption_with_sensitivity_marker
+      source_ref: design_vacuum_pyrolysis_reproduction_2026_06_11:R1.10
+      citation_id: design_vacuum_pyrolysis_reproduction_2026_06_11
+      extraction_note: no_robinot_specific_sticking_coefficient_extracted
+      digest: "Window-fouling sticking remains sensitivity-bearing until literature sidecar value exists."
+
+comparison_contract:
+  model_evidence_class: builtin_process_model
+  fidelity_tier_allowed:
+    - real
+    - cached-real
+  provider_id: builtin
+  cache_state_allowed:
+    - fresh
+    - cached-real
+    - not_cached
+  internal_analytical_used: false
+  internal_analytical_blocker: internal_analytical_cannot_certify_experiment_grade
+  fast_tier_policy: cached_real_only_no_internal_analytical
+  degraded_fallback_state:
+    status: blocked_for_claim_grade
+    reason: skeleton_missing_geometry_and_full_measurement_extraction
+
+digests:
+  feedstock_digest: pending_lit_sweep
+  schedule_digest: robinot_2026_schedule_skeleton_v1
+  gas_boundary_digest: robinot_2026_argon_13mbar_0p3NLmin_v1
+  geometry_digest: robinot_2026_geometry_skeleton_v1
+  transport_formula_digest: not_applicable_until_p0
+  sticking_provenance_digest: robinot_2026_sticking_skeleton_v1
+  measurement_sidecar_digest: robinot_2026_measurements_skeleton_v1

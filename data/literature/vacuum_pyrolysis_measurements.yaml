@@ -1,0 +1,259 @@
+schema_version: vacuum_pyrolysis_measurements.v1
+
+measurements:
+  robinot_2026_deposit_measurements:
+    evidence_class: experiment-grade
+    paper_citation:
+      citation_id: robinot_2026
+      label: "Robinot et al. 2026 vacuum pyrolysis experiment"
+      bibliography_status: pending_full_lit_sweep
+    doi: pending_full_lit_sweep
+    extraction:
+      source_location: methods_results_and_conclusion
+      digitized: false
+      extractor: VPR-P5-schema
+      extraction_date: 2026-06-11
+      extraction_status: skeleton_not_full_paper_data
+    conditions_reported:
+      pressure_mbar:
+        reported_value: 13.0
+        reported_unit: mbar
+        qualifier: approximate
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Argon carrier-gas sweep pressure is about 13 mbar."
+      carrier_gas:
+        species: Ar
+        mole_fraction: 1.0
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Carrier gas reported as argon."
+      flow_boundary:
+        reported_value: 0.3
+        reported_unit: NL_min
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Imposed argon flow reported as 0.3 NL/min."
+      temperature_C:
+        reported_value: 1800
+        reported_unit: degC
+        qualifier: approximate_peak
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Robinot anchor reports a peak temperature near 1800 C."
+      duration_h:
+        reported_value: 1.0
+        reported_unit: h
+        qualifier: approximate
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Robinot anchor reports about one hour of heating."
+      sample_mass_g:
+        reported_value: 3.38
+        reported_unit: g
+        source:
+          citation_id: robinot_2026
+          source_location: methods
+          digest: "Robinot anchor reports a 3.38 g EAC-1 pellet."
+    material_context:
+      feedstock_kind: simulant
+      feedstock_id: robinot_2026_feedstock_pending_lit_sweep
+      simulant_vs_real_caveat: "Skeleton preserves the paper as simulant context; full composition extraction pending."
+      glass_fraction_status: blocked_missing_glass_fraction
+    quantitative_measurements:
+      - observable: oxygen_released
+        reported_value: 35
+        reported_unit: mg
+        normalized_value_kg: 0.000035
+        source:
+          citation_id: robinot_2026
+          source_location: results_section
+          digest: "Robinot anchor reports 35 mg O2."
+      - observable: glassy_lump_mass
+        reported_value: 1.82
+        reported_unit: g
+        normalized_value_kg: 0.00182
+        source:
+          citation_id: robinot_2026
+          source_location: results_section
+          digest: "Robinot anchor reports a 1.82 g glassy lump."
+    observed_locations:
+      - id: holder
+        surface_role: sample_holder
+        extraction_status: qualitative_only
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          Na:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Na on the holder."
+          Fe:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Fe on the holder."
+        morphology_notes:
+          value: "Holder deposit/fouling tracked as a named location; full paper extraction pending."
+          source:
+            citation_id: robinot_2026
+            source_location: apparatus_and_results
+            digest: "Holder is retained as a separate surface role for per-location comparison."
+        quantitative_measurements: []
+      - id: window
+        surface_role: transparent_wall
+        extraction_status: qualitative_only
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          Si:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Si on the window."
+          Fe:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Fe on the window."
+        morphology_notes:
+          value: "Window fouling tracked qualitatively; no recovered mass entered in skeleton."
+          source:
+            citation_id: robinot_2026
+            source_location: apparatus_and_results
+            digest: "Window is retained as a separate surface role for qualitative residuals."
+        quantitative_measurements: []
+      - id: condenser
+        surface_role: collector
+        extraction_status: measured
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          Si:
+            measurement_type: qualitative
+            qualifier: about_one_third
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports the condenser deposit is about one-third Si."
+          Fe:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Fe in condenser deposit."
+          Mg:
+            measurement_type: qualitative
+            qualifier: present
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports Mg in condenser deposit."
+        morphology_notes:
+          value: "Condenser/cold-trap location holds the skeleton recovered-mass row."
+          source:
+            citation_id: robinot_2026
+            source_location: results
+            digest: "Condenser row is the quantitative deposit anchor for this skeleton."
+        quantitative_measurements:
+          - observable: recovered_mass
+            reported_value: 1.1
+            reported_unit: g
+            normalized_value_kg: 0.0011
+            uncertainty_kg: null
+            measured_hot_vs_cooldown: post_run_cooldown
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "One Robinot passage reports 1.1 g total vaporized or captured mass."
+      - id: filter
+        surface_role: downstream_filter
+        extraction_status: missing_mass
+        measured_hot_vs_cooldown: post_run_cooldown
+        reported_species_or_composition:
+          Si:
+            measurement_type: qualitative
+            qualifier: mostly
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports the filter deposit is mostly Si."
+          Na:
+            measurement_type: qualitative
+            qualifier: moderate
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports moderate Na on the filter."
+          Fe:
+            measurement_type: qualitative
+            qualifier: moderate
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports moderate Fe on the filter."
+          Mg:
+            measurement_type: qualitative
+            qualifier: trace
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports trace Mg on the filter."
+          P:
+            measurement_type: qualitative
+            qualifier: trace
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports trace P on the filter."
+          K:
+            measurement_type: qualitative
+            qualifier: trace
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot per-location sweep anchor reports trace K on the filter."
+        morphology_notes:
+          value: "Filter retained as downstream surface; mass split pending."
+          source:
+            citation_id: robinot_2026
+            source_location: apparatus_and_results
+            digest: "Filter location is named so missing mass does not collapse to zero."
+        quantitative_measurements: []
+    conflicting_reported_values:
+      - observable: total_vaporized_or_captured_mass
+        resolution: unresolved_report_both
+        values:
+          - reported_value: 1.1
+            reported_unit: g
+            normalized_value_kg: 0.0011
+            source:
+              citation_id: robinot_2026
+              source_location: results_section
+              digest: "Robinot result passage reports 1.1 g."
+          - reported_value: 1.3
+            reported_unit: g
+            normalized_value_kg: 0.0013
+            source:
+              citation_id: robinot_2026
+              source_location: conclusion
+              digest: "Robinot conclusion passage reports 1.3 g."
+    named_missing_fields:
+      - condenser_temperature_C
+      - per_location_surface_temperature_C
+      - view_factor_from_melt
+      - full_feedstock_composition
+      - per_location_mass_split
+    measured_time_series: []
