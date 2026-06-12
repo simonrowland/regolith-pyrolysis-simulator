@@ -69,7 +69,8 @@ from simulator.condensation_routing import (
     target_species_for_stage_number,
 )
 from simulator.feedstock_guard import assert_feedstock_loadable
-from simulator.lab_geometry import parse_lab_geometry
+from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
@@ -294,8 +295,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sim.apply_decision(decision.decision_type, chosen_option)
     """
 
-    def __init__(self, melt_backend, setpoints: dict, feedstocks: dict,
-                 vapor_pressures: dict):
+    def __init__(
+        self,
+        melt_backend,
+        setpoints: dict,
+        feedstocks: dict,
+        vapor_pressures: dict,
+        *,
+        allow_lab_geometry_temperature_profiles: bool = False,
+    ):
         """
         Args:
             melt_backend: A MeltBackend instance (AlphaMELTS, stub, etc.)
@@ -344,7 +352,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.feedstocks = copy.deepcopy(feedstocks)
         self.vapor_pressures = copy.deepcopy(vapor_pressures)
         self.lab_geometry = parse_lab_geometry(
-            self.setpoints.get("lab_geometry")
+            self.setpoints.get("lab_geometry"),
+            allow_temperature_profiles=allow_lab_geometry_temperature_profiles,
         )
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
@@ -1463,6 +1472,98 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )
+
+    def _active_lab_schedule(self) -> Mapping[str, Any] | None:
+        getter = getattr(self.campaign_mgr, "_lab_schedule", None)
+        if not callable(getter):
+            return None
+        return getter(self.melt.campaign)
+
+    def _active_surface_temperature_schedule(
+        self,
+    ) -> Mapping[str, Any]:
+        schedule = self._active_lab_schedule()
+        if schedule is None:
+            return {}
+        raw = schedule.get("surface_temperature_C", {})
+        return raw if isinstance(raw, Mapping) else {}
+
+    def validate_lab_surface_temperature_resolver(self) -> None:
+        surface_schedule = self._active_surface_temperature_schedule()
+        if self.lab_geometry is None:
+            if surface_schedule:
+                raise LabGeometryError(
+                    "lab_surface_temperature_schedule_without_geometry",
+                    "lab_schedule.surface_temperature_C requires lab_geometry",
+                )
+            return
+        self._resolve_lab_surface_temperatures(
+            surface_schedule,
+            sample_time_h=0.0,
+        )
+
+    def _resolve_lab_surface_temperatures(
+        self,
+        surface_schedule: Mapping[str, Any],
+        *,
+        sample_time_h: float,
+    ) -> dict[str, float]:
+        if self.lab_geometry is None:
+            if surface_schedule:
+                raise LabGeometryError(
+                    "lab_surface_temperature_schedule_without_geometry",
+                    "lab_schedule.surface_temperature_C requires lab_geometry",
+                )
+            return {}
+        temperatures_C: dict[str, float] = {}
+        for surface in self.lab_geometry.surfaces:
+            profile_key = str(getattr(surface, "temperature_profile", "") or "")
+            if profile_key:
+                if profile_key not in surface_schedule:
+                    raise LabScheduleValidationError(
+                        "lab_schedule_missing_surface_temperature: "
+                        f"{profile_key}"
+                    )
+                points = surface_schedule[profile_key]
+                temperatures_C[surface.surface_id] = interpolate_schedule_points(
+                    points,
+                    sample_time_h,
+                )
+                continue
+            if surface.surface_id in surface_schedule:
+                temperatures_C[surface.surface_id] = interpolate_schedule_points(
+                    surface_schedule[surface.surface_id],
+                    sample_time_h,
+                )
+                continue
+            if surface.temperature_C is None:
+                raise LabGeometryError(
+                    "missing_lab_surface_temperature_schedule",
+                    (
+                        f"{surface.surface_id}: temperature_C/wall_temperature_C "
+                        "or lab_schedule.surface_temperature_C profile is required"
+                    ),
+                )
+            temperatures_C[surface.surface_id] = float(surface.temperature_C)
+        return temperatures_C
+
+    def _apply_lab_surface_temperatures(self, *, sample_time_h: float) -> None:
+        surface_schedule = self._active_surface_temperature_schedule()
+        if self.lab_geometry is None:
+            if surface_schedule:
+                raise LabGeometryError(
+                    "lab_surface_temperature_schedule_without_geometry",
+                    "lab_schedule.surface_temperature_C requires lab_geometry",
+                )
+            return
+        temperatures_C = self._resolve_lab_surface_temperatures(
+            surface_schedule,
+            sample_time_h=sample_time_h,
+        )
+        if temperatures_C:
+            self.condensation_model.update_pipe_segment_temperatures(
+                temperatures_C
+            )
 
     def _headspace_downstream_pressure_bar(self) -> float:
         configured = self._overhead_headspace_config.get(
@@ -4269,11 +4370,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_anode_O2_kg_this_hr = 0.0
         self.melt.validate_melt_pressures()
 
+        sample_time_h = float(self.melt.campaign_hour) + 1.0
         self.campaign_mgr.apply_lab_schedule_controls(
             self.melt,
             self.melt.campaign,
-            sample_time_h=float(self.melt.campaign_hour) + 1.0,
+            sample_time_h=sample_time_h,
         )
+        self.validate_lab_surface_temperature_resolver()
 
         # --- 2. Temperature ramp ---
         self._update_temperature()
@@ -4316,6 +4419,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Each stage collects species based on its temperature.
         if evap_flux.total_kg_hr > 0:
             self._configure_condensation_operating_conditions(evap_flux)
+            self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
             self._route_to_condensation(evap_flux)
 
         # --- 6. Update melt composition ---

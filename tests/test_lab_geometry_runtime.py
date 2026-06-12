@@ -11,12 +11,16 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import CondensationModel, knudsen_regime_diagnostic
 from simulator.core import PyrolysisSimulator
+from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.melt_backend.base import StubBackend
+from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
+from simulator.runner import PyrolysisRun
 from simulator.state import (
     CondensationTrain,
+    EvaporationFlux,
     PipeSegment,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
@@ -104,6 +108,226 @@ def robinot_geometry_fixture() -> dict:
             },
         ],
     }
+
+
+def dynamic_surface_geometry_fixture() -> dict:
+    return {
+        "id": "dynamic_surface_temperature_geometry",
+        "scale": "gram_lab",
+        "equipment_sizing": "lab_fixed_geometry",
+        "surfaces": [
+            {
+                "id": "holder",
+                "role": "holder",
+                "area_m2": 0.002,
+                "temperature_profile": "holder_profile",
+                "view_factor_from_melt": 0.5,
+                "line_of_sight_to_melt": True,
+                "source_class": "assumption_with_sensitivity_marker",
+                "sensitivity_marker": "holder_surface_temperature_sweep",
+                "extraction_note": "Synthetic holder for surface T(t) resolver",
+                "equivalent_diameter_m": 0.02,
+            },
+            {
+                "id": "condenser",
+                "role": "condenser",
+                "area_m2": 0.002,
+                "temperature_profile": "condenser_profile",
+                "view_factor_from_melt": 0.5,
+                "line_of_sight_to_melt": True,
+                "source_class": "assumption_with_sensitivity_marker",
+                "sensitivity_marker": "condenser_surface_temperature_sweep",
+                "extraction_note": "Synthetic condenser for surface T(t) resolver",
+                "equivalent_diameter_m": 0.02,
+            },
+        ],
+    }
+
+
+def dynamic_lab_schedule(*, holder_then_condenser: bool = True) -> dict:
+    holder_profile = ((0.0, 25.0), (1.0, 25.0), (2.0, 1500.0))
+    condenser_profile = ((0.0, 1500.0), (1.0, 1500.0), (2.0, 25.0))
+    if not holder_then_condenser:
+        holder_profile, condenser_profile = condenser_profile, holder_profile
+    return {
+        "id": "dynamic_surface_temperature_schedule",
+        "duration_h": 2.0,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "assumption_with_sensitivity_marker",
+        "interpolation_citation_id": "test",
+        "interpolation_extraction_note": "Synthetic declared surface temperatures",
+        "furnace_ceiling_C": 1800.0,
+        "melt_temperature_C": [
+            {"t_h": 0.0, "value": 1700.0, "unit": "C"},
+            {"t_h": 2.0, "value": 1700.0, "unit": "C"},
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": 0.0, "value": 13.0, "unit": "mbar"},
+            {"t_h": 2.0, "value": 13.0, "unit": "mbar"},
+        ],
+        "gas_boundary": {
+            "background_gas": {
+                "species": "Ar",
+                "mole_fraction": 1.0,
+                "source_class": "literature_sidecar",
+                "source_ref": "test",
+            },
+            "imposed_flow": {
+                "value": 0.3,
+                "unit": "NL_min",
+                "source_class": "literature_sidecar",
+                "source_ref": "test",
+            },
+            "pressure_control": {
+                "mode": "flow_through_with_pump",
+                "source_class": "literature_sidecar",
+                "source_ref": "test",
+            },
+        },
+        "surface_temperature_C": {
+            "holder_profile": [
+                {"t_h": t_h, "value": value, "unit": "C"}
+                for t_h, value in holder_profile
+            ],
+            "condenser_profile": [
+                {"t_h": t_h, "value": value, "unit": "C"}
+                for t_h, value in condenser_profile
+            ],
+        },
+    }
+
+
+def _surface_temperature_evalspec(schedule: dict) -> EvalSpec:
+    return EvalSpec(
+        recipe_id="surface-temperature-test",
+        feedstock_recipe_digest="feedstock-recipe-digest",
+        feedstock_id="lunar_mare_low_ti",
+        profile_id="surface-temperature-profile",
+        fidelity="fast",
+        code_version=current_code_version(),
+        data_digests={
+            "feedstocks": "feedstock-digest",
+            "profile": "profile-digest",
+            "setpoints": "setpoints-digest",
+            "vapor_pressures": "vapor-digest",
+        },
+        campaign="C2A",
+        hours=2,
+        mass_kg=1000.0,
+        backend_name="stub",
+        lab_schedule=normalize_lab_schedule(schedule),
+    )
+
+
+def _surface_temperature_rows(schedule: dict) -> list[dict]:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=2,
+        mass_kg=1000.0,
+        backend_name="stub",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=schedule,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim._calculate_evaporation = lambda _equilibrium: EvaporationFlux(
+        species_kg_hr={"SiO": 0.02},
+        total_kg_hr=0.02,
+    )
+    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    return [
+        session.advance().per_hour_summary
+        for _ in range(2)
+    ]
+
+
+def _surface_sio_delta(row: dict, surface_id: str) -> float:
+    return float(
+        row.get("wall_deposit_delta_kg", {})
+        .get(surface_id, {})
+        .get("SiO", 0.0)
+    )
+
+
+def test_profile_only_geometry_stays_refused_without_surface_schedule() -> None:
+    with pytest.raises(LabGeometryError) as excinfo:
+        parse_lab_geometry(dynamic_surface_geometry_fixture())
+
+    assert excinfo.value.code == "missing_lab_surface_temperature"
+
+
+def test_surface_temperature_schedule_requires_lab_geometry() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        lab_schedule=dynamic_lab_schedule(),
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        run._start_session()
+
+    assert excinfo.value.code == "lab_surface_temperature_schedule_without_geometry"
+
+
+def test_surface_temperature_profile_key_is_required() -> None:
+    schedule = dynamic_lab_schedule()
+    schedule["surface_temperature_C"]["holder"] = schedule[
+        "surface_temperature_C"
+    ].pop("holder_profile")
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=schedule,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+
+    with pytest.raises(
+        LabScheduleValidationError,
+        match="lab_schedule_missing_surface_temperature: holder_profile",
+    ):
+        run._start_session()
+
+
+def test_declared_surface_temperature_schedule_moves_runtime_deposits() -> None:
+    rows = _surface_temperature_rows(dynamic_lab_schedule())
+
+    assert _surface_sio_delta(rows[0], "holder") > (
+        _surface_sio_delta(rows[0], "condenser")
+    )
+    assert _surface_sio_delta(rows[1], "condenser") > (
+        _surface_sio_delta(rows[1], "holder")
+    )
+
+
+def test_surface_temperature_schedule_is_behavioral_cache_determinant() -> None:
+    base_schedule = dynamic_lab_schedule(holder_then_condenser=True)
+    mutant_schedule = dynamic_lab_schedule(holder_then_condenser=False)
+
+    assert cache_key(_surface_temperature_evalspec(base_schedule)) != cache_key(
+        _surface_temperature_evalspec(mutant_schedule)
+    )
+
+    base_rows = _surface_temperature_rows(base_schedule)
+    mutant_rows = _surface_temperature_rows(mutant_schedule)
+    assert _surface_sio_delta(base_rows[0], "holder") > (
+        _surface_sio_delta(base_rows[0], "condenser")
+    )
+    assert _surface_sio_delta(mutant_rows[0], "condenser") > (
+        _surface_sio_delta(mutant_rows[0], "holder")
+    )
 
 
 def test_gram_lab_equipment_bypass_uses_declared_lab_surface_area() -> None:

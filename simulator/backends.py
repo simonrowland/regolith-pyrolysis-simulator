@@ -84,6 +84,7 @@ class SimulatorBuildConfig:
     setpoints: Mapping[str, Any]
     feedstocks: Mapping[str, Any]
     vapor_pressures: Mapping[str, Any]
+    allow_lab_geometry_temperature_profiles: bool = False
 
 
 def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
@@ -94,6 +95,9 @@ def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
         copy.deepcopy(config.setpoints),
         copy.deepcopy(config.feedstocks),
         copy.deepcopy(config.vapor_pressures),
+        allow_lab_geometry_temperature_profiles=(
+            config.allow_lab_geometry_temperature_profiles
+        ),
     )
     resolution = backend_resolution_status(config.backend)
     sim._backend_resolution_status = resolution

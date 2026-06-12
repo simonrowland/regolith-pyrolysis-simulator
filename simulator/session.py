@@ -50,6 +50,21 @@ def _canonical_runtime_campaign_overrides(
     return {str(campaign): dict(fields) for campaign, fields in source.items()}
 
 
+def _has_runtime_surface_temperature_schedule(
+    runtime_campaign_overrides: Mapping[str, Mapping[str, Any]],
+) -> bool:
+    for fields in runtime_campaign_overrides.values():
+        if not isinstance(fields, Mapping):
+            continue
+        raw_schedule = fields.get(LAB_SCHEDULE_OVERRIDE_KEY)
+        if not isinstance(raw_schedule, Mapping):
+            continue
+        surface_temperatures = raw_schedule.get("surface_temperature_C")
+        if isinstance(surface_temperatures, Mapping) and bool(surface_temperatures):
+            return True
+    return False
+
+
 class DecisionPolicy(Enum):
     """Driver-loop decision routing mode.
 
@@ -173,6 +188,11 @@ class SimSession:
                 setpoints=config.setpoints,
                 feedstocks=config.feedstocks,
                 vapor_pressures=config.vapor_pressures,
+                allow_lab_geometry_temperature_profiles=(
+                    _has_runtime_surface_temperature_schedule(
+                        config.runtime_campaign_overrides
+                    )
+                ),
             )
         )
         if cached_real_config is not None:
@@ -219,6 +239,7 @@ class SimSession:
                 else:
                     target[str(field_name)] = float(value)
 
+        sim.validate_lab_surface_temperature_resolver()
         self._sim = sim
         self._config = config
         self._paused = False

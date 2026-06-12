@@ -48,7 +48,7 @@ class LabSurface:
     surface_id: str
     role: str
     area_m2: float
-    temperature_C: float
+    temperature_C: float | None
     view_factor_from_melt: float
     line_of_sight_to_melt: bool
     source_class: str
@@ -84,7 +84,9 @@ class LabSurface:
             name=self.surface_id,
             upstream_stage=upstream_stage,
             downstream_stage=downstream_stage,
-            wall_temperature_C=self.temperature_C,
+            wall_temperature_C=(
+                0.0 if self.temperature_C is None else self.temperature_C
+            ),
             length_m=length_m,
             inner_diameter_m=diameter_m,
             role=self.role,
@@ -132,7 +134,11 @@ class LabGeometry:
         return segments
 
 
-def parse_lab_geometry(raw: Mapping[str, Any] | None) -> LabGeometry | None:
+def parse_lab_geometry(
+    raw: Mapping[str, Any] | None,
+    *,
+    allow_temperature_profiles: bool = False,
+) -> LabGeometry | None:
     """Validate and normalize a runtime lab_geometry mapping."""
 
     if raw is None:
@@ -158,7 +164,11 @@ def parse_lab_geometry(raw: Mapping[str, Any] | None) -> LabGeometry | None:
             "missing_lab_surfaces", "lab_geometry.surfaces must be non-empty"
         )
     surfaces = tuple(
-        _parse_lab_surface(index, surface)
+        _parse_lab_surface(
+            index,
+            surface,
+            allow_temperature_profiles=allow_temperature_profiles,
+        )
         for index, surface in enumerate(surfaces_raw)
     )
     return LabGeometry(
@@ -175,7 +185,12 @@ def parse_lab_geometry(raw: Mapping[str, Any] | None) -> LabGeometry | None:
     )
 
 
-def _parse_lab_surface(index: int, raw: Any) -> LabSurface:
+def _parse_lab_surface(
+    index: int,
+    raw: Any,
+    *,
+    allow_temperature_profiles: bool,
+) -> LabSurface:
     if not isinstance(raw, Mapping):
         raise LabGeometryError(
             "invalid_lab_surface", f"surface[{index}] must be a mapping"
@@ -187,7 +202,13 @@ def _parse_lab_surface(index: int, raw: Any) -> LabSurface:
         )
     role = _canonical_role(raw.get("role"), surface_id=surface_id)
     area_m2 = _required_finite_positive(raw.get("area_m2"), f"{surface_id}.area_m2")
-    temperature_C = _surface_temperature_C(raw, surface_id)
+    temperature_profile = str(raw.get("temperature_profile") or "").strip()
+    temperature_C = _surface_temperature_C(
+        raw,
+        surface_id,
+        temperature_profile=temperature_profile,
+        allow_temperature_profiles=allow_temperature_profiles,
+    )
     view_factor = _required_unit_interval(
         raw.get("view_factor_from_melt"),
         f"{surface_id}.view_factor_from_melt",
@@ -208,7 +229,7 @@ def _parse_lab_surface(index: int, raw: Any) -> LabSurface:
         line_of_sight_to_melt=_line_of_sight(raw, surface_id),
         source_class=source_class,
         sensitivity_marker=sensitivity_marker,
-        temperature_profile=str(raw.get("temperature_profile") or ""),
+        temperature_profile=temperature_profile,
         distance_from_melt_m=_optional_finite_positive(
             raw.get("distance_from_melt_m"),
             field=f"{surface_id}.distance_from_melt_m",
@@ -235,15 +256,21 @@ def _canonical_role(value: Any, *, surface_id: str) -> str:
     return role
 
 
-def _surface_temperature_C(raw: Mapping[str, Any], surface_id: str) -> float:
+def _surface_temperature_C(
+    raw: Mapping[str, Any],
+    surface_id: str,
+    *,
+    temperature_profile: str,
+    allow_temperature_profiles: bool,
+) -> float | None:
     for key in ("temperature_C", "wall_temperature_C"):
         if key in raw:
             return _required_finite(raw[key], f"{surface_id}.{key}")
-    # TODO(VPR-P1-lab-schedules): accept temperature_profile only after the
-    # schedule-owned runtime resolver can provide a concrete surface T(t).
+    if allow_temperature_profiles and temperature_profile:
+        return None
     raise LabGeometryError(
         "missing_lab_surface_temperature",
-        f"{surface_id}: temperature_C is required until lab schedules provide it",
+        f"{surface_id}: temperature_C or resolvable temperature_profile is required",
     )
 
 

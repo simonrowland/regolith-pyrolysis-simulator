@@ -916,6 +916,25 @@ class CondensationModel:
             ))
         self.pipe_segments = updated
 
+    def update_pipe_segment_temperatures(
+        self,
+        temperatures_C: Mapping[str, float],
+    ) -> None:
+        self._apply_pipe_segment_temperatures(temperatures_C)
+        if not self.pipe_segments:
+            return
+        self.wall_temperature_C = min(
+            segment.wall_temperature_C for segment in self.pipe_segments
+        )
+        if self.operating_history:
+            self.operating_history[-1]["wall_temperature_C"] = float(
+                self.wall_temperature_C
+            )
+            self.operating_history[-1]["pipe_segment_temperatures_C"] = {
+                segment.name: float(segment.wall_temperature_C)
+                for segment in self.pipe_segments
+            }
+
     def configure_lab_geometry(
         self,
         lab_geometry: LabGeometry | Mapping[str, Any],
