@@ -74,7 +74,12 @@ from simulator.config import load_config_bundle
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
-from simulator.lab_geometry import LabGeometry, parse_lab_geometry
+from simulator.lab_geometry import (
+    LabGeometry,
+    LabGeometryError,
+    parse_lab_geometry,
+    require_lab_pipe_diameter,
+)
 from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
@@ -105,6 +110,7 @@ VISCOUS_KNUDSEN_MAX = CONTINUUM_BUFFER_KN
 FREE_MOLECULAR_KNUDSEN_MIN = 10.0
 KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
+INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
 
 # Viscous-regime mass-transfer model (post-F3 follow-on, 2026-05-27).
@@ -625,7 +631,8 @@ class CondensationModel:
         if wall_temperature_C is not None:
             self.wall_temperature_C = float(wall_temperature_C)
         if pipe_diameter_m is not None:
-            self.pipe_diameter_m = max(1.0e-9, float(pipe_diameter_m))
+            self.pipe_diameter_m = require_lab_pipe_diameter(
+                pipe_diameter_m, 'pipe_diameter_m')
         if gas_temperature_C is not None:
             self.gas_temperature_C = float(gas_temperature_C)
         elif wall_temperature_C is not None:
@@ -856,7 +863,8 @@ class CondensationModel:
         stages = sorted(self.train.stages, key=lambda stage: stage.stage_number)
         if len(stages) < 2:
             return []
-        diameter_m = max(1.0e-9, float(self.pipe_diameter_m))
+        diameter_m = require_lab_pipe_diameter(
+            self.pipe_diameter_m, 'pipe_diameter_m')
         total_length_m = (
             max(0.0, float(self.wall_surface_area_m2))
             / (math.pi * diameter_m)
@@ -918,7 +926,8 @@ class CondensationModel:
             raise ValueError("lab_geometry is required")
         register_wall_deposit_accounts(geometry.wall_deposit_accounts)
         self.pipe_segments = geometry.to_pipe_segments(
-            default_diameter_m=max(1.0e-9, float(self.pipe_diameter_m)),
+            default_diameter_m=require_lab_pipe_diameter(
+                self.pipe_diameter_m, 'pipe_diameter_m'),
         )
         self.wall_surface_area_m2 = geometry.total_surface_area_m2
         if self.pipe_segments:
@@ -2018,6 +2027,53 @@ def classify_knudsen_regime(knudsen_number: float) -> KnudsenRegime:
     return KnudsenRegime.FREE_MOLECULAR
 
 
+def _invalid_pipe_diameter_diagnostic(
+    exc: LabGeometryError,
+    *,
+    field: str,
+    raw_value: Any,
+    overhead_pressure_mbar: float,
+    gas_temperature_C: float,
+    regime_factor: float | None,
+    segment_name: str | None = None,
+) -> dict[str, Any]:
+    try:
+        pipe_diameter_m = _finite_or_none(float(raw_value))
+    except (TypeError, ValueError):
+        pipe_diameter_m = None
+    try:
+        diagnostic_regime_factor = (
+            None if regime_factor is None else float(regime_factor)
+        )
+    except (TypeError, ValueError):
+        diagnostic_regime_factor = None
+    segment: dict[str, Any] | None = None
+    if segment_name is not None:
+        segment = {
+            'name': segment_name,
+            'reason_refused': INVALID_PIPE_DIAMETER_REASON,
+            'characteristic_length_m': pipe_diameter_m,
+        }
+    return {
+        'status': 'refused',
+        'reason': INVALID_PIPE_DIAMETER_REASON,
+        'reason_refused': INVALID_PIPE_DIAMETER_REASON,
+        'detail': str(exc),
+        'field': field,
+        'regime': 'invalid',
+        'knudsen_number': None,
+        'mean_free_path_m': None,
+        'overhead_pressure_mbar': max(0.0, float(overhead_pressure_mbar)),
+        'gas_temperature_C': float(gas_temperature_C),
+        'pipe_diameter_m': pipe_diameter_m,
+        'regime_factor': diagnostic_regime_factor,
+        'segments': [] if segment is None else [segment],
+        'warnings': [
+            'Pipe diameter is invalid; condensation routing refused.'
+        ],
+    }
+
+
 def knudsen_regime_diagnostic(
     *,
     overhead_pressure_mbar: float,
@@ -2028,7 +2084,18 @@ def knudsen_regime_diagnostic(
 ) -> dict[str, Any]:
     pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
     gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
-    fallback_diameter_m = max(1.0e-9, float(pipe_diameter_m))
+    try:
+        fallback_diameter_m = require_lab_pipe_diameter(
+            pipe_diameter_m, 'pipe_diameter_m')
+    except LabGeometryError as exc:
+        return _invalid_pipe_diameter_diagnostic(
+            exc,
+            field='pipe_diameter_m',
+            raw_value=pipe_diameter_m,
+            overhead_pressure_mbar=overhead_pressure_mbar,
+            gas_temperature_C=gas_temperature_C,
+            regime_factor=regime_factor,
+        )
     mean_free_path_m = _mean_free_path_m(pressure_pa, gas_temperature_K)
 
     segments: list[dict[str, Any]] = []
@@ -2052,17 +2119,29 @@ def knudsen_regime_diagnostic(
         KnudsenRegime.FREE_MOLECULAR: 2,
     }
     for segment in source_segments:
-        diameter_m = max(
-            1.0e-9,
-            float(getattr(segment, 'inner_diameter_m', fallback_diameter_m)),
-        )
+        raw_diameter_m = getattr(
+            segment, 'inner_diameter_m', fallback_diameter_m)
+        segment_name = str(getattr(segment, 'name', 'default_pipe'))
+        try:
+            diameter_m = require_lab_pipe_diameter(
+                raw_diameter_m, f'{segment_name}.inner_diameter_m')
+        except LabGeometryError as exc:
+            return _invalid_pipe_diameter_diagnostic(
+                exc,
+                field=f'{segment_name}.inner_diameter_m',
+                raw_value=raw_diameter_m,
+                overhead_pressure_mbar=overhead_pressure_mbar,
+                gas_temperature_C=gas_temperature_C,
+                regime_factor=regime_factor,
+                segment_name=segment_name,
+            )
         knudsen_number = _knudsen_number(
             pressure_pa, gas_temperature_K, diameter_m)
         regime = classify_knudsen_regime(knudsen_number)
         if severity[regime] > severity[worst_regime]:
             worst_regime = regime
         segments.append({
-            'name': str(getattr(segment, 'name', 'default_pipe')),
+            'name': segment_name,
             'knudsen_number': _finite_or_none(knudsen_number),
             'regime': regime.value,
             'characteristic_length_m': diameter_m,

@@ -214,7 +214,10 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 status="ok",
                 transition=None,
                 control_audit=control_audit,
-                diagnostic={"credited_condensed_kg": 0.0},
+                diagnostic={
+                    "credited_condensed_kg": 0.0,
+                    "reason_skipped": "empty condensation product credits",
+                },
             )
 
         # ------------------------------------------------------------------

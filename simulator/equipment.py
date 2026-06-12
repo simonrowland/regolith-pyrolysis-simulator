@@ -42,6 +42,8 @@ from simulator.lab_geometry import (
     LAB_GEOMETRY_SCALE,
     LabGeometry,
     parse_lab_geometry,
+    require_lab_pipe_diameter,
+    require_lab_pipe_length,
 )
 
 
@@ -241,8 +243,13 @@ class EquipmentDesigner:
             (segment.inner_diameter_m for segment in segments),
             default=0.02,
         )
+        diameter_m = require_lab_pipe_diameter(
+            diameter_m, "lab_geometry.pipe.diameter_m")
         length_m = (
-            total_area_m2 / (math.pi * max(diameter_m, 1.0e-9))
+            require_lab_pipe_length(
+                total_area_m2 / (math.pi * diameter_m),
+                "lab_geometry.pipe.length_m",
+            )
             if total_area_m2 > 0.0 else 0.0
         )
         design.pipe = PipeSpec(

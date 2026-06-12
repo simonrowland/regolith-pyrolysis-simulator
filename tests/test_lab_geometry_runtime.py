@@ -9,12 +9,13 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from simulator.accounting import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import CondensationModel
+from simulator.condensation import CondensationModel, knudsen_regime_diagnostic
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
 from simulator.state import (
     CondensationTrain,
+    PipeSegment,
     register_wall_deposit_accounts,
     unregister_wall_deposit_accounts,
 )
@@ -124,6 +125,94 @@ def test_gram_lab_equipment_bypass_uses_declared_lab_surface_area() -> None:
     assert design.pipe.length_m == pytest.approx(
         declared_area / (math.pi * design.pipe.diameter_m)
     )
+
+
+def test_declared_lab_pipe_diameter_maps_to_pipe_segment() -> None:
+    raw = robinot_geometry_fixture()
+    raw["surfaces"] = [raw["surfaces"][0]]
+    raw["surfaces"][0]["equivalent_diameter_m"] = 0.012
+
+    geometry = parse_lab_geometry(raw)
+    segment = geometry.to_pipe_segments()[0]
+
+    assert segment.inner_diameter_m == pytest.approx(0.012)
+    assert segment.length_m == pytest.approx(
+        raw["surfaces"][0]["area_m2"] / (math.pi * 0.012)
+    )
+
+
+@pytest.mark.parametrize("diameter_m", [0.0, -0.01, 1.0e-12])
+def test_lab_surface_equivalent_diameter_poison_pairs_are_named_refusals(
+    diameter_m: float,
+) -> None:
+    raw = copy.deepcopy(robinot_geometry_fixture())
+    raw["surfaces"][0]["equivalent_diameter_m"] = diameter_m
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        parse_lab_geometry(raw)
+
+    assert excinfo.value.code == "invalid_lab_geometry_pipe_diameter"
+
+
+def test_zero_lab_surface_area_is_named_refusal() -> None:
+    raw = copy.deepcopy(robinot_geometry_fixture())
+    raw["surfaces"][0]["area_m2"] = 0.0
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        parse_lab_geometry(raw)
+
+    assert excinfo.value.code == "invalid_lab_geometry_positive_value"
+    assert "area_m2" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("diameter_m", [0.0, -0.01, 1.0e-12])
+def test_knudsen_diagnostic_refuses_invalid_pipe_diameters(
+    diameter_m: float,
+) -> None:
+    diagnostic = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=diameter_m,
+    )
+
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["reason_refused"] == "invalid_pipe_diameter"
+    assert diagnostic["field"] == "pipe_diameter_m"
+
+
+@pytest.mark.parametrize("diameter_m", [0.0, -0.01, 1.0e-12])
+def test_condensation_operating_pipe_diameter_poison_pairs_are_named_refusals(
+    diameter_m: float,
+) -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+
+    with pytest.raises(LabGeometryError) as excinfo:
+        model.configure_operating_conditions(pipe_diameter_m=diameter_m)
+
+    assert excinfo.value.code == "invalid_lab_geometry_pipe_diameter"
+
+
+def test_knudsen_diagnostic_refuses_invalid_segment_diameter() -> None:
+    diagnostic = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+        pipe_segments=[
+            PipeSegment(
+                name="poison_segment",
+                upstream_stage="stage_0",
+                downstream_stage="stage_1",
+                wall_temperature_C=1500.0,
+                length_m=1.0,
+                inner_diameter_m=1.0e-12,
+            )
+        ],
+    )
+
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["reason_refused"] == "invalid_pipe_diameter"
+    assert diagnostic["field"] == "poison_segment.inner_diameter_m"
+    assert diagnostic["segments"][0]["name"] == "poison_segment"
 
 
 def test_unknown_lab_surface_role_is_named_refusal() -> None:
@@ -260,6 +349,42 @@ def test_provider_refuses_unregistered_lab_surface_account() -> None:
     assert result.transition is None
     assert result.diagnostic["reason_refused"] == "undeclared_wall_deposit_account"
     assert result.diagnostic["account"] == bad_account
+
+
+def test_provider_empty_credit_path_is_named_noop() -> None:
+    provider = BuiltinCondensationRouteProvider()
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Na": 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "condensed_kg": 0.01,
+            "sp_data": {
+                "condensation_products_mol_per_mol_vapor": {"Na": 0.0},
+            },
+            "wall_deposit_fraction": 0.0,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is None
+    assert (
+        result.diagnostic["reason_skipped"]
+        == "empty condensation product credits"
+    )
+    assert result.diagnostic["credited_condensed_kg"] == pytest.approx(0.0)
 
 
 def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:

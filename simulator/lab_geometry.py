@@ -30,6 +30,7 @@ LAB_GEOMETRY_SOURCE_CLASSES = frozenset({
     "measured",
     "assumption_with_sensitivity_marker",
 })
+LAB_MIN_PIPE_DIAMETER_M = 1.0e-9
 
 
 class LabGeometryError(ValueError):
@@ -70,9 +71,15 @@ class LabSurface:
     ) -> PipeSegment:
         diameter_m = self.equivalent_diameter_m
         if diameter_m is None:
-            diameter_m = math.sqrt(max(self.area_m2, 0.0) / math.pi)
-        diameter_m = max(1.0e-9, float(diameter_m or default_diameter_m))
-        length_m = max(0.0, self.area_m2) / (math.pi * diameter_m)
+            diameter_m = math.sqrt(self.area_m2 / math.pi)
+            diameter_field = f"{self.surface_id}.derived_equivalent_diameter_m"
+        else:
+            diameter_field = f"{self.surface_id}.equivalent_diameter_m"
+        diameter_m = require_lab_pipe_diameter(diameter_m, diameter_field)
+        length_m = require_lab_pipe_length(
+            self.area_m2 / (math.pi * diameter_m),
+            f"{self.surface_id}.pipe_length_m",
+        )
         return PipeSegment(
             name=self.surface_id,
             upstream_stage=upstream_stage,
@@ -206,7 +213,7 @@ def _parse_lab_surface(index: int, raw: Any) -> LabSurface:
             raw.get("distance_from_melt_m"),
             field=f"{surface_id}.distance_from_melt_m",
         ),
-        equivalent_diameter_m=_optional_finite_positive(
+        equivalent_diameter_m=_optional_lab_pipe_diameter(
             raw.get("equivalent_diameter_m"),
             field=f"{surface_id}.equivalent_diameter_m",
         ),
@@ -309,6 +316,38 @@ def _optional_finite_positive(value: Any, *, field: str) -> float | None:
     if value is None:
         return None
     return _required_finite_positive(value, field)
+
+
+def _optional_lab_pipe_diameter(value: Any, *, field: str) -> float | None:
+    if value is None:
+        return None
+    return require_lab_pipe_diameter(value, field)
+
+
+def require_lab_pipe_diameter(value: Any, field: str) -> float:
+    result = _required_finite(value, field)
+    if result < LAB_MIN_PIPE_DIAMETER_M:
+        raise LabGeometryError(
+            "invalid_lab_geometry_pipe_diameter",
+            (
+                f"{field} must be >= {LAB_MIN_PIPE_DIAMETER_M:g} m; "
+                f"got {result:g} m"
+            ),
+        )
+    return result
+
+
+def require_lab_pipe_length(value: Any, field: str) -> float:
+    result = _required_finite(value, field)
+    if result < LAB_MIN_PIPE_DIAMETER_M:
+        raise LabGeometryError(
+            "invalid_lab_geometry_pipe_length",
+            (
+                f"{field} must be >= {LAB_MIN_PIPE_DIAMETER_M:g} m; "
+                f"got {result:g} m"
+            ),
+        )
+    return result
 
 
 def _required_unit_interval(value: Any, field: str) -> float:
