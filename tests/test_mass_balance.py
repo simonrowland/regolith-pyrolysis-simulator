@@ -49,6 +49,27 @@ def test_flow_mass_accounts_cover_non_reservoir_ledger_accounts():
     )
 
 
+def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"sample": {"composition_wt_pct": {"SiO2": 100.0}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sample", mass_kg=1.0)
+    before = sim._flow_mass_out_kg()
+
+    sim.atom_ledger.load_external(
+        "process.wall_deposit_segment_condenser",
+        {"SiO": 1.0e-6},
+        source="test dynamic lab surface deposit",
+    )
+
+    assert sim._flow_mass_out_kg() - before == pytest.approx(1.0e-6)
+
+
 def _load_data_yaml(name):
     return yaml.safe_load(
         (Path(__file__).parent.parent / "data" / name).read_text())

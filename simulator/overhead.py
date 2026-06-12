@@ -477,7 +477,7 @@ class OverheadGasModel:
                                         * vapor_pressure_mbar)
 
         # Controlled/background atmosphere partial pressures.
-        if melt.pO2_mbar > 0.001:
+        if melt.pO2_mbar > 0.0:
             gas.composition['O2'] = max(
                 gas.composition.get('O2', 0.0), melt.pO2_mbar)
 
@@ -489,6 +489,23 @@ class OverheadGasModel:
             gas.composition['N2'] = max(
                 gas.composition.get('N2', 0.0),
                 max(0.0, melt.p_total_mbar - melt.pO2_mbar))
+        elif atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        } and melt.p_total_mbar > 0:
+            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)
+            background_species = str(
+                getattr(melt, 'background_gas_species', '') or '').strip()
+            if background_species and background_species.upper() != 'O2':
+                background_fraction = float(
+                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
+                background_fraction = min(1.0, max(0.0, background_fraction))
+                gas.composition[background_species] = max(
+                    gas.composition.get(background_species, 0.0),
+                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+                    * background_fraction,
+                )
 
         # ── Turbine flow + capacity enforcement ─────────── [LOOP-2]
         O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)
@@ -588,10 +605,23 @@ class OverheadGasModel:
             'CONTROLLED_O2',
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
-        } and melt.pO2_mbar > 0.001:
-            gas.composition['O2'] = max(
-                gas.composition.get('O2', 0.0), melt.pO2_mbar)
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.pO2_mbar)
+        }:
+            if melt.pO2_mbar > 0.0:
+                gas.composition['O2'] = max(
+                    gas.composition.get('O2', 0.0), melt.pO2_mbar)
+            gas.pressure_mbar = max(
+                gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)
+            background_species = str(
+                getattr(melt, 'background_gas_species', '') or '').strip()
+            if background_species and background_species.upper() != 'O2':
+                background_fraction = float(
+                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
+                background_fraction = min(1.0, max(0.0, background_fraction))
+                gas.composition[background_species] = max(
+                    gas.composition.get(background_species, 0.0),
+                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+                    * background_fraction,
+                )
 
         self._update_turbine_fields(
             gas,

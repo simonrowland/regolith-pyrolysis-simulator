@@ -103,6 +103,7 @@ from simulator.state import (
     OXIDE_SPECIES,
     OXIDE_TO_METAL,
     OverheadGas,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     ProcessInventory,
     STOICH_RATIOS,
@@ -167,6 +168,7 @@ STAGE0_METAL_ALLOY_COMPONENTS = {
 STAGE0_TERMINAL_SLAG_COMPONENTS = {
     'zro2', 'ree', 'ree_oxide', 'ree_oxides', 'rare_earths',
     'rare_earth_oxide', 'rare_earth_oxides', 'th', 'tho2', 'u', 'uo2',
+    'unreported_loi_residual', 'unreported_residual', 'loi_residual',
 }
 FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
@@ -4194,6 +4196,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         accounts.update(
             account for account in totals
             if account.startswith('reservoir.')
+            or account.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
         )
         return sum(float(totals.get(account, 0.0)) for account in accounts)
 

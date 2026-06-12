@@ -753,8 +753,28 @@ class CampaignManager:
             setpoint_mbar=pO2_setpoint,
             total_pressure_mbar=total_pressure,
         )
+        background_gas = lab_schedule.get('gas_boundary', {}).get(
+            'background_gas', {})
+        background_species = ''
+        background_fraction = 0.0
+        if (
+            isinstance(background_gas, Mapping)
+            and str(background_gas.get('reported_status', '') or '') != 'not_reported'
+        ):
+            background_species = str(background_gas.get('species') or '').strip()
+            try:
+                background_fraction = float(
+                    background_gas.get('mole_fraction', 1.0))
+            except (TypeError, ValueError):
+                background_fraction = 0.0
+            if background_fraction < 0.0:
+                background_fraction = 0.0
+            elif background_fraction > 1.0:
+                background_fraction = 1.0
         melt.p_total_mbar = float(total_pressure)
         melt.pO2_mbar = float(row['achieved_mbar'])
+        melt.background_gas_species = background_species
+        melt.background_gas_mole_fraction = background_fraction
         if melt.pO2_mbar > 0.0:
             melt.atmosphere = Atmosphere.CONTROLLED_O2
         elif melt.p_total_mbar > 0.0:

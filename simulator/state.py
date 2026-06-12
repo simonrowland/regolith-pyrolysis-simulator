@@ -454,6 +454,9 @@ class MeltState:
     ambient_pressure_mbar: float = 0.0
     # Site pressure floor for bodies without hard vacuum, e.g. Mars ~6 mbar.
     ambient_atmosphere: str = ''
+    background_gas_species: str = ''
+    # Lab/preset carrier gas species used to populate overhead gas state.
+    background_gas_mole_fraction: float = 0.0
 
     # --- Process state ---
     campaign: CampaignPhase = CampaignPhase.IDLE

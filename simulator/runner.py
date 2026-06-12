@@ -26,6 +26,7 @@ schema-shape assertion in ``tests/test_runner_smoke.py``.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import copy
 import csv
 import importlib.abc
@@ -57,7 +58,12 @@ from simulator.condensation import (
     stage_purity_report,
 )
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
-from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY
+from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_OVERRIDE_KEY,
+    LabScheduleValidationError,
+    normalize_lab_schedule,
+)
 from simulator.session import (
     SimSession,
     SimSessionConfig,
@@ -97,6 +103,7 @@ SIO_YIELD_STAGE_KEYS: dict[int, str] = {
 }
 SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
+PRESET_PROVENANCE_METADATA_KEY = "preset"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
 SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
 SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
@@ -168,6 +175,19 @@ class EngineBugAbort(RunnerError):
     """Fatal runner abort for corrupted engine snapshots."""
 
 
+class PresetRunnerError(RunnerError):
+    """Runner error carrying whatever preset provenance is already known."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        provenance: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.provenance = dict(provenance or {})
+
+
 # ----------------------------------------------------------------------
 # Data loading helpers
 # ----------------------------------------------------------------------
@@ -178,6 +198,289 @@ def _load_yaml(path: Path) -> dict:
         raise RunnerError(f"required data file missing: {path}")
     with path.open() as f:
         return yaml.safe_load(f) or {}
+
+
+@dataclass(frozen=True)
+class PresetRunSpec:
+    feedstock_id: str
+    hours: int
+    mass_kg: float
+    lab_schedule: Mapping[str, Any]
+    lab_geometry: Mapping[str, Any]
+    provenance: dict[str, Any]
+
+
+def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
+    requested_leg = str(leg or "faithful").strip()
+    base_provenance = {
+        "path": str(path),
+        "leg": requested_leg,
+    }
+    if not requested_leg:
+        raise PresetRunnerError(
+            "malformed_preset: --leg must be non-empty",
+            provenance=base_provenance,
+        )
+    try:
+        raw_bytes = path.read_bytes()
+    except FileNotFoundError as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: preset file missing: {path}",
+            provenance=base_provenance,
+        ) from exc
+    except OSError as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: could not read preset file {path}: {exc}",
+            provenance=base_provenance,
+        ) from exc
+
+    digest = hashlib.sha256(raw_bytes).hexdigest()
+    provenance = {
+        **base_provenance,
+        "digest": f"sha256:{digest}",
+    }
+    try:
+        preset = yaml.safe_load(raw_bytes.decode("utf-8")) or {}
+    except (UnicodeDecodeError, yaml.YAMLError) as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {path}: {exc}",
+            provenance=provenance,
+        ) from exc
+    if not isinstance(preset, Mapping):
+        raise PresetRunnerError(
+            "malformed_preset: preset root must be a mapping",
+            provenance=provenance,
+        )
+
+    pair = _preset_mapping(preset.get("pair"), "pair", provenance)
+    if requested_leg not in pair:
+        expected = ", ".join(sorted(str(name) for name in pair))
+        raise PresetRunnerError(
+            f"unknown_preset_leg: {requested_leg!r}; expected one of {expected}",
+            provenance=provenance,
+        )
+    leg_block = _preset_mapping(
+        pair.get(requested_leg),
+        f"pair.{requested_leg}",
+        provenance,
+    )
+    schedule = copy.deepcopy(
+        _preset_mapping(preset.get("lab_schedule"), "lab_schedule", provenance)
+    )
+    geometry = copy.deepcopy(
+        _preset_mapping(preset.get("lab_geometry"), "lab_geometry", provenance)
+    )
+
+    feedstock_id = _preset_text(
+        leg_block.get("feedstock_id"),
+        f"pair.{requested_leg}.feedstock_id",
+        provenance,
+    )
+    schedule_id = _preset_text(
+        leg_block.get("schedule_id"),
+        f"pair.{requested_leg}.schedule_id",
+        provenance,
+    )
+    geometry_id = _preset_text(
+        leg_block.get("geometry_id"),
+        f"pair.{requested_leg}.geometry_id",
+        provenance,
+    )
+    if str(schedule.get("id") or "") != schedule_id:
+        raise PresetRunnerError(
+            "malformed_preset: "
+            f"pair.{requested_leg}.schedule_id={schedule_id!r} "
+            f"does not match lab_schedule.id={schedule.get('id')!r}",
+            provenance=provenance,
+        )
+    if str(geometry.get("id") or "") != geometry_id:
+        raise PresetRunnerError(
+            "malformed_preset: "
+            f"pair.{requested_leg}.geometry_id={geometry_id!r} "
+            f"does not match lab_geometry.id={geometry.get('id')!r}",
+            provenance=provenance,
+        )
+
+    _apply_leg_mitigation_to_schedule(
+        schedule,
+        leg_block.get("mitigation"),
+        leg=requested_leg,
+        provenance=provenance,
+    )
+    try:
+        lab_geometry = parse_lab_geometry(
+            geometry,
+            allow_temperature_profiles=True,
+        )
+        if lab_geometry is None:
+            raise LabGeometryError(
+                "missing_lab_geometry",
+                "preset lab_geometry is required",
+            )
+        required_profiles = tuple(
+            surface.temperature_profile
+            for surface in lab_geometry.surfaces
+            if surface.temperature_profile
+        )
+        normalize_lab_schedule(
+            schedule,
+            required_surface_profiles=required_profiles,
+        )
+    except (LabGeometryError, LabScheduleValidationError, TypeError, ValueError) as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {exc}",
+            provenance=provenance,
+        ) from exc
+
+    mass_g = lab_geometry.sample_mass_g
+    if mass_g is None:
+        raise PresetRunnerError(
+            "malformed_preset: lab_geometry.sample.mass_g is required "
+            "unless the runner grows an explicit preset mass contract",
+            provenance=provenance,
+        )
+    duration_h = _preset_duration_h(
+        leg_block.get("duration_h", schedule.get("duration_h")),
+        f"pair.{requested_leg}.duration_h",
+        provenance,
+    )
+    hours = int(duration_h)
+    if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
+        raise PresetRunnerError(
+            "malformed_preset: "
+            f"pair.{requested_leg}.duration_h={duration_h!r} cannot map "
+            "losslessly to runner integer --hours",
+            provenance=provenance,
+        )
+
+    digests = preset.get("digests")
+    if isinstance(digests, Mapping):
+        for key, value in digests.items():
+            if str(key).endswith("_digest"):
+                provenance[str(key)] = str(value)
+    for key in (
+        "schema_version",
+        "paper_id",
+        "paper_citation_id",
+        "measurement_id",
+        "preset_kind",
+        "extraction_status",
+        "source_notes",
+        "sticking_provenance",
+        "comparison_contract",
+    ):
+        if key in preset:
+            provenance[key] = copy.deepcopy(preset[key])
+    mass_kg = float(mass_g) / 1000.0
+    provenance.update(
+        {
+            "feedstock_id": feedstock_id,
+            "duration_h": duration_h,
+            "sample_mass_g": float(mass_g),
+            "mass_kg": mass_kg,
+            "schedule_id": schedule_id,
+            "geometry_id": geometry_id,
+        }
+    )
+    return PresetRunSpec(
+        feedstock_id=feedstock_id,
+        hours=hours,
+        mass_kg=mass_kg,
+        lab_schedule=schedule,
+        lab_geometry=geometry,
+        provenance=provenance,
+    )
+
+
+def _preset_mapping(
+    value: Any,
+    field: str,
+    provenance: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise PresetRunnerError(
+            f"malformed_preset: {field} must be a mapping",
+            provenance=provenance,
+        )
+    return value
+
+
+def _preset_text(
+    value: Any,
+    field: str,
+    provenance: Mapping[str, Any],
+) -> str:
+    text = str(value or "").strip()
+    if not text:
+        raise PresetRunnerError(
+            f"malformed_preset: {field} is required",
+            provenance=provenance,
+        )
+    return text
+
+
+def _preset_duration_h(
+    value: Any,
+    field: str,
+    provenance: Mapping[str, Any],
+) -> float:
+    try:
+        duration_h = float(value)
+    except (TypeError, ValueError) as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {field} must be a finite positive number",
+            provenance=provenance,
+        ) from exc
+    if not math.isfinite(duration_h) or duration_h <= 0.0:
+        raise PresetRunnerError(
+            f"malformed_preset: {field} must be a finite positive number",
+            provenance=provenance,
+        )
+    return duration_h
+
+
+def _apply_leg_mitigation_to_schedule(
+    schedule: dict[str, Any],
+    mitigation: Any,
+    *,
+    leg: str,
+    provenance: Mapping[str, Any],
+) -> None:
+    if mitigation in (None, "", "none"):
+        return
+    if not isinstance(mitigation, Mapping):
+        raise PresetRunnerError(
+            f"malformed_preset: pair.{leg}.mitigation must be 'none' or a mapping",
+            provenance=provenance,
+        )
+    pO2_cover = mitigation.get("pO2_cover")
+    if isinstance(pO2_cover, Mapping) and bool(pO2_cover.get("enabled", False)):
+        schedule["pO2_cover"] = copy.deepcopy(dict(pO2_cover))
+    elif pO2_cover not in (None, False):
+        raise PresetRunnerError(
+            f"malformed_preset: pair.{leg}.mitigation.pO2_cover must be a mapping",
+            provenance=provenance,
+        )
+
+    shuttle = mitigation.get("alkali_shuttle_deconfliction")
+    if isinstance(shuttle, Mapping) and bool(shuttle.get("enabled", False)):
+        raise PresetRunnerError(
+            "unsupported_preset_mitigation: "
+            f"pair.{leg}.mitigation.alkali_shuttle_deconfliction",
+            provenance=provenance,
+        )
+    known = {"pO2_cover", "alkali_shuttle_deconfliction"}
+    unknown_enabled = [
+        str(key)
+        for key, value in mitigation.items()
+        if key not in known and value not in (None, False, "", "none")
+    ]
+    if unknown_enabled:
+        raise PresetRunnerError(
+            "unsupported_preset_mitigation: "
+            + ", ".join(sorted(unknown_enabled)),
+            provenance=provenance,
+        )
 
 
 def _resolve_kernel_commit_sha() -> str:
@@ -902,6 +1205,12 @@ def build_per_hour_summary(
     mass_balance_pct = (
         None if raw_mass_balance_pct is None else float(raw_mass_balance_pct)
     )
+    if (
+        mass_balance_pct is not None
+        and abs(mass_balance_pct) <= 5e-12
+        and getattr(sim.campaign_mgr, "last_pO2_enforcement", None) is not None
+    ):
+        mass_balance_pct = 0.0
 
     summary = {
         "hour": int(snapshot.hour),
@@ -2285,6 +2594,103 @@ def _parse_runtime_campaign_overrides_json(
     return parsed
 
 
+def _runner_failure_result(
+    *,
+    error: RunnerError,
+    feedstock_id: str,
+    campaign: str,
+    hours: int,
+    mass_kg: float,
+    additives_kg: Mapping[str, float],
+    track: str,
+    backend_name: str,
+    engines: Mapping[str, str],
+    metadata_overrides: Mapping[str, Any],
+) -> dict[str, Any]:
+    overrides = dict(metadata_overrides)
+    started_at_utc = overrides.pop(
+        "started_at_utc",
+        datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    )
+    kernel_commit_sha = overrides.pop(
+        "kernel_commit_sha",
+        _resolve_kernel_commit_sha(),
+    )
+    run_metadata = {
+        "schema_version": RUNNER_SCHEMA_VERSION,
+        "feedstock_id": feedstock_id,
+        "campaign": campaign,
+        "hours_requested": int(hours),
+        "hours_completed": 0,
+        "mass_kg": float(mass_kg),
+        "additives_kg": dict(additives_kg),
+        "track": track,
+        "backend": backend_name,
+        "started_at_utc": started_at_utc,
+        "engines_used": {"requested": dict(engines), "registry": {}},
+        "kernel_commit_sha": kernel_commit_sha,
+    }
+    for key, value in overrides.items():
+        run_metadata[str(key)] = value
+    return {
+        "schema_version": RUNNER_SCHEMA_VERSION,
+        "run_metadata": run_metadata,
+        "final_state": {},
+        "final": {
+            "wall_deposit_by_species_kg": {},
+            "deposit_by_surface_species_kg": {},
+            "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
+        },
+        "stage_purity_report": {},
+        "vapor_pressure_source_report": {
+            "species": {},
+            "summary": {},
+            "total_species": 0,
+        },
+        "shuttle_refusal_history": [],
+        "pO2_enforcement_by_hour": [],
+        "per_hour_summary": [],
+        "shadow_trace": [],
+        "status": "failed",
+        "reason": "",
+        "error_message": f"RunnerError: {error}",
+    }
+
+
+def _assert_cli_matches_preset(
+    *,
+    flag_name: str,
+    cli_value: Any,
+    preset_value: Any,
+    preset: PresetRunSpec,
+) -> None:
+    if cli_value is None:
+        return
+    if isinstance(preset_value, float):
+        try:
+            cli_float = float(cli_value)
+        except (TypeError, ValueError) as exc:
+            raise PresetRunnerError(
+                f"preset_cli_conflict: {flag_name}={cli_value!r} "
+                f"does not match preset value {preset_value!r}",
+                provenance=preset.provenance,
+            ) from exc
+        matches = math.isclose(
+            cli_float,
+            float(preset_value),
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+    else:
+        matches = str(cli_value) == str(preset_value)
+    if not matches:
+        raise PresetRunnerError(
+            f"preset_cli_conflict: {flag_name}={cli_value!r} "
+            f"does not match preset value {preset_value!r}",
+            provenance=preset.provenance,
+        )
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m simulator.runner",
@@ -2294,13 +2700,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "docs/runner-output-schema.md for the schema contract."
         ),
     )
-    parser.add_argument("--feedstock", required=True,
+    parser.add_argument("--feedstock",
                         help="Feedstock ID from data/feedstocks.yaml")
+    parser.add_argument("--preset",
+                        help="Path to a vacuum-pyrolysis preset YAML")
+    parser.add_argument("--leg", default="faithful",
+                        help="Preset leg to run when --preset is supplied "
+                             "(default: faithful)")
     parser.add_argument("--campaign", default="C0",
                         help="Starting campaign phase (default: C0)")
-    parser.add_argument("--hours", type=int, default=24,
+    parser.add_argument("--hours", type=int, default=None,
                         help="Hours of simulated wallclock to advance")
-    parser.add_argument("--mass-kg", type=float, default=1000.0,
+    parser.add_argument("--mass-kg", type=float, default=None,
                         help="Batch mass in kg (default: 1000)")
     parser.add_argument("--backend", default="stub",
                         choices=("stub", "alphamelts"),
@@ -2358,105 +2769,119 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
 
-    additives = _parse_kv_pairs(args.additive)
-    engine_overrides = _parse_engine_pairs(args.engine)
-    if args.engines:
-        file_engines = _load_engines_config(Path(args.engines))
-        # CLI --engine flags win over file entries; the CLI surface is
-        # the operator's last word.
-        merged = {**file_engines, **engine_overrides}
-    else:
-        merged = engine_overrides
-    runtime_campaign_overrides = _canonical_runtime_campaign_overrides(
-        runtime_campaign_overrides=_parse_runtime_campaign_overrides_json(
-            args.runtime_campaign_overrides,
-            flag_name="--runtime-campaign-overrides",
-        ),
-        setpoints_overrides=_parse_runtime_campaign_overrides_json(
-            args.setpoints_overrides,
-            flag_name="--setpoints-overrides",
-        ),
-    )
-
     metadata_overrides: dict[str, Any] = {}
     if args.started_at_utc:
         metadata_overrides["started_at_utc"] = args.started_at_utc
     if args.kernel_commit_sha:
         metadata_overrides["kernel_commit_sha"] = args.kernel_commit_sha
 
-    run = PyrolysisRun(
-        feedstock_id=args.feedstock,
-        campaign=args.campaign,
-        hours=int(args.hours),
-        engines=merged,
-        additives_kg=additives,
-        mass_kg=float(args.mass_kg),
-        backend_name=args.backend,
-        runtime_campaign_overrides=runtime_campaign_overrides,
-        track=args.track,
-        allow_fallback_vapor=bool(args.allow_fallback_vapor),
-        allow_unmeasured_alpha_fallback=bool(
-            args.allow_unmeasured_alpha_fallback
-        ),
-        force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
-        sio_start_temperature_c=args.sio_start_temperature_c,
-        sio_hold_temperature_c=args.sio_hold_temperature_c,
-        sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
-        sio_liner_temperature_c=args.sio_liner_temperature_c,
-        sio_pO2_mbar=args.sio_po2_mbar,
-        run_metadata_overrides=metadata_overrides,
-    )
+    additives: dict[str, float] = {}
+    merged: dict[str, str] = {}
+    runtime_campaign_overrides: dict[str, dict[str, Any]] = {}
+    feedstock_id = str(args.feedstock or "")
+    campaign = str(args.campaign)
+    hours = int(args.hours) if args.hours is not None else 24
+    mass_kg = float(args.mass_kg) if args.mass_kg is not None else 1000.0
 
     try:
+        additives = _parse_kv_pairs(args.additive)
+        engine_overrides = _parse_engine_pairs(args.engine)
+        if args.engines:
+            file_engines = _load_engines_config(Path(args.engines))
+            # CLI --engine flags win over file entries; the CLI surface is
+            # the operator's last word.
+            merged = {**file_engines, **engine_overrides}
+        else:
+            merged = engine_overrides
+        runtime_campaign_overrides = _canonical_runtime_campaign_overrides(
+            runtime_campaign_overrides=_parse_runtime_campaign_overrides_json(
+                args.runtime_campaign_overrides,
+                flag_name="--runtime-campaign-overrides",
+            ),
+            setpoints_overrides=_parse_runtime_campaign_overrides_json(
+                args.setpoints_overrides,
+                flag_name="--setpoints-overrides",
+            ),
+        )
+
+        setpoints_patch: Mapping[str, Any] = {}
+        lab_schedule: Mapping[str, Any] | None = None
+        if args.preset:
+            preset = _load_preset_run_spec(Path(args.preset), str(args.leg))
+            _assert_cli_matches_preset(
+                flag_name="--feedstock",
+                cli_value=args.feedstock,
+                preset_value=preset.feedstock_id,
+                preset=preset,
+            )
+            _assert_cli_matches_preset(
+                flag_name="--hours",
+                cli_value=args.hours,
+                preset_value=preset.hours,
+                preset=preset,
+            )
+            _assert_cli_matches_preset(
+                flag_name="--mass-kg",
+                cli_value=args.mass_kg,
+                preset_value=preset.mass_kg,
+                preset=preset,
+            )
+            feedstock_id = preset.feedstock_id
+            hours = preset.hours
+            mass_kg = preset.mass_kg
+            setpoints_patch = {
+                "lab_geometry": copy.deepcopy(preset.lab_geometry),
+            }
+            lab_schedule = copy.deepcopy(preset.lab_schedule)
+            metadata_overrides[PRESET_PROVENANCE_METADATA_KEY] = dict(
+                preset.provenance
+            )
+        elif not feedstock_id:
+            raise RunnerError("--feedstock is required unless --preset is supplied")
+
+        run = PyrolysisRun(
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+            hours=hours,
+            engines=merged,
+            additives_kg=additives,
+            mass_kg=mass_kg,
+            backend_name=args.backend,
+            setpoints_patch=setpoints_patch,
+            runtime_campaign_overrides=runtime_campaign_overrides,
+            lab_schedule=lab_schedule,
+            track=args.track,
+            allow_fallback_vapor=bool(args.allow_fallback_vapor),
+            allow_unmeasured_alpha_fallback=bool(
+                args.allow_unmeasured_alpha_fallback
+            ),
+            force_builtin_vapor_pressure=bool(args.force_builtin_vapor_pressure),
+            sio_start_temperature_c=args.sio_start_temperature_c,
+            sio_hold_temperature_c=args.sio_hold_temperature_c,
+            sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
+            sio_liner_temperature_c=args.sio_liner_temperature_c,
+            sio_pO2_mbar=args.sio_po2_mbar,
+            run_metadata_overrides=metadata_overrides,
+        )
         result = run.run()
     except RunnerError as exc:
-        # Autoreview r5 P2 (2026-05-27): the failure envelope MUST
-        # match the schema version it advertises. Any top-level key
-        # the happy-path output emits has to be present here too
-        # (with an empty/zero default) so downstream consumers don't
-        # have to special-case failed runs. Keep this dict in lockstep
-        # with `RunnerOrchestrator._build_output` keys + the
-        # ``TOP_LEVEL_KEYS`` set in tests/test_runner_smoke.py.
-        result = {
-            "schema_version": RUNNER_SCHEMA_VERSION,
-            "run_metadata": {
-                "schema_version": RUNNER_SCHEMA_VERSION,
-                "feedstock_id": args.feedstock,
-                "campaign": args.campaign,
-                "hours_requested": int(args.hours),
-                "hours_completed": 0,
-                "mass_kg": float(args.mass_kg),
-                "additives_kg": additives,
-                "track": args.track,
-                "backend": args.backend,
-                "started_at_utc": metadata_overrides.get(
-                    "started_at_utc",
-                    datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                ),
-                "engines_used": {"requested": merged, "registry": {}},
-                "kernel_commit_sha": metadata_overrides.get(
-                    "kernel_commit_sha", _resolve_kernel_commit_sha()),
-            },
-            "final_state": {},
-            "final": {
-                "wall_deposit_by_species_kg": {},
-                "deposit_by_surface_species_kg": {},
-                "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
-            },
-            "stage_purity_report": {},
-            "vapor_pressure_source_report": {
-                "species": {},
-                "summary": {},
-                "total_species": 0,
-            },
-            "shuttle_refusal_history": [],
-            "pO2_enforcement_by_hour": [],
-            "per_hour_summary": [],
-            "shadow_trace": [],
-            "status": "failed",
-            "reason": "",
-            "error_message": f"RunnerError: {exc}",
-        }
+        if isinstance(exc, PresetRunnerError) and exc.provenance:
+            metadata_overrides.setdefault(
+                PRESET_PROVENANCE_METADATA_KEY,
+                dict(exc.provenance),
+            )
+        result = _runner_failure_result(
+            error=exc,
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+            hours=hours,
+            mass_kg=mass_kg,
+            additives_kg=additives,
+            track=args.track,
+            backend_name=args.backend,
+            engines=merged,
+            metadata_overrides=metadata_overrides,
+        )
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
