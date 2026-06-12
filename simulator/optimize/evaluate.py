@@ -73,6 +73,7 @@ KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
+SYNTHETIC_BACKEND_NOT_RUN = "not_run"
 
 
 class FailureCategory(str, Enum):
@@ -2577,9 +2578,9 @@ def _non_finite_payload_result(
             status="failed",
             error_message=error_message,
             reason="non_finite_payload",
-            trace={"backend_status": "ok"},
-            backend_status="ok",
-            backend_authoritative=True,
+            trace=_synthetic_not_run_trace(),
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
         )
     )
     return ScoredResult(
@@ -2652,9 +2653,9 @@ def _invalid_recipe_result(
             status="failed",
             error_message=error_message,
             reason="invalid_recipe",
-            trace={"backend_status": "ok"},
-            backend_status="ok",
-            backend_authoritative=True,
+            trace=_synthetic_not_run_trace(),
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
         )
     )
     notes = [
@@ -2715,12 +2716,20 @@ def _zero_input_basis_result(
             status="failed",
             error_message=error_message,
             reason=ZERO_INPUT_BASIS_BREACH,
-            trace={"backend_status": "ok"},
-            backend_status="ok",
-            backend_authoritative=True,
+            trace=_synthetic_not_run_trace(),
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
         ),
         notes=(error_message,),
     )
+
+
+def _synthetic_not_run_trace() -> dict[str, Any]:
+    return {
+        "backend_status": SYNTHETIC_BACKEND_NOT_RUN,
+        "backend_authoritative": False,
+        "execution_status": SYNTHETIC_BACKEND_NOT_RUN,
+    }
 
 
 def _zero_input_basis_margin(observed_kg: float | None) -> GateMargin:

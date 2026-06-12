@@ -375,6 +375,17 @@ def _non_finite_payload_fixture(*, non_finite: bool):
     )
 
 
+def _assert_synthetic_not_run_reference(run_reference: object | None) -> None:
+    assert run_reference is not None
+    assert getattr(run_reference, "backend_status") == "not_run"
+    assert getattr(run_reference, "backend_authoritative") is False
+    trace = getattr(run_reference, "trace")
+    assert isinstance(trace, dict)
+    assert trace["backend_status"] == "not_run"
+    assert trace["backend_authoritative"] is False
+    assert trace["execution_status"] == "not_run"
+
+
 def _inventory_overdraw_fixture(*, overdraw_kg: float | None):
     exc = None
     if overdraw_kg is not None:
@@ -985,6 +996,7 @@ def test_non_finite_payload_poison_pair_fires_named_gate() -> None:
     assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
     assert result.failing_gates == ("non_finite_payload",)
     assert result.feasibility_margins["non_finite_payload"].feasible is False
+    _assert_synthetic_not_run_reference(result.run_reference)
 
 
 def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
@@ -1004,7 +1016,7 @@ def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
     assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
     assert result.failing_gates == ("non_finite_payload",)
     assert result.run_reference is not None
-    assert result.run_reference.backend_status == "ok"
+    _assert_synthetic_not_run_reference(result.run_reference)
     assert any("CALC_BUG" in note for note in result.notes)
 
 
@@ -1031,6 +1043,8 @@ def test_pt0_nonfinite_failed_run_is_candidate_failure() -> None:
     assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
     assert result.run_reference is not None
     assert result.run_reference.error_message.startswith("PT0NonFinitePayload")
+    assert result.run_reference.backend_status == "ok"
+    assert result.run_reference.backend_authoritative is True
 
 
 def test_proposal_rejected_direct_exception_is_invalid_recipe() -> None:
@@ -1053,29 +1067,39 @@ def test_proposal_rejected_direct_exception_is_invalid_recipe() -> None:
     assert result.feasibility_margins["inventory_overdraw"].observed == pytest.approx(
         7.87e-05
     )
+    _assert_synthetic_not_run_reference(result.run_reference)
     assert any("overdraw_kg=7.87e-05" in note for note in result.notes)
 
 
 def test_proposal_rejected_runner_paths_are_invalid_recipe() -> None:
-    for executor in (
-        FakeExecutor(
-            exc=RunnerError(
-                "ProposalRejected: insufficient available 'Cr2O3' in normal "
-                "account 'process.cleaned_melt': balance would be -0.125 kg"
-            )
+    cases = (
+        (
+            FakeExecutor(
+                exc=RunnerError(
+                    "ProposalRejected: insufficient available 'Cr2O3' in normal "
+                    "account 'process.cleaned_melt': balance would be -0.125 kg"
+                )
+            ),
+            "not_run",
+            False,
         ),
-        FakeExecutor(
-            _execution(
-                status="failed",
-                error_message=(
-                    "ProposalRejected: insufficient available 'Al2O3' in normal "
-                    "account 'process.cleaned_melt': balance would be -2.5 kg"
+        (
+            FakeExecutor(
+                _execution(
+                    status="failed",
+                    error_message=(
+                        "ProposalRejected: insufficient available 'Al2O3' in normal "
+                        "account 'process.cleaned_melt': balance would be -2.5 kg"
+                    ),
+                    backend_status="ok",
+                    backend_authoritative=True,
                 ),
-                backend_status="ok",
-                backend_authoritative=True,
-            )
+            ),
+            "ok",
+            True,
         ),
-    ):
+    )
+    for executor, expected_status, expected_authoritative in cases:
         result = evaluate(
             _valid_patch(),
             "lunar_mare_low_ti",
@@ -1087,7 +1111,10 @@ def test_proposal_rejected_runner_paths_are_invalid_recipe() -> None:
         assert result.feasible is False
         assert result.failure_category is FailureCategory.INVALID_RECIPE
         assert result.run_reference is not None
-        assert result.run_reference.backend_status == "ok"
+        assert result.run_reference.backend_status == expected_status
+        assert result.run_reference.backend_authoritative is expected_authoritative
+        if expected_status == "not_run":
+            _assert_synthetic_not_run_reference(result.run_reference)
 
 
 def test_inventory_overdraw_green_path_accepts_clean_ledger_execution() -> None:
@@ -1233,6 +1260,7 @@ def test_zero_mass_eval_input_returns_named_ingress_refusal() -> None:
     assert result.cache_key is None
     assert "zero_input_basis_breach" in result.notes[0]
     assert executor.calls == 0
+    _assert_synthetic_not_run_reference(result.run_reference)
 
 
 def test_mass_balance_breach_aborts_as_engine_bug_with_repro_patch() -> None:

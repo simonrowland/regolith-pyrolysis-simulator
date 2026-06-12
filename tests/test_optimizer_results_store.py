@@ -238,6 +238,36 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_not_run_backend_labels_round_trip(tmp_path) -> None:
+    spec = _base_spec()
+    scored = _scored(
+        spec,
+        result_blob={
+            "backend_status": "not_run",
+            "backend_authoritative": False,
+            "execution_status": "not_run",
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
+
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.backend_status == "not_run"
+    assert loaded.run_reference.backend_authoritative is False
+    assert loaded.run_reference.trace == {
+        "backend_status": "not_run",
+        "backend_authoritative": False,
+        "execution_status": "not_run",
+    }
+
+
 def test_composition_target_metric_and_evalspec_metadata_round_trip(tmp_path) -> None:
     spec = _base_spec(
         target_spec_id="pc-glass-clear",

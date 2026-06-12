@@ -625,6 +625,38 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert board_payload["entries"][0]["backend"] == run["latest_result"]["backend"]
 
 
+def test_optimizer_reader_renders_not_run_backend_labels(client, tmp_path) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-not-run"
+    run_dir.mkdir(parents=True)
+
+    spec = _base_spec(recipe_id="recipe-not-run", backend_name="alphamelts")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-not-run",
+            trace={
+                "backend_status": "not_run",
+                "backend_authoritative": False,
+                "execution_status": "not_run",
+            },
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    response = client.get("/api/optimizer/runs")
+
+    assert response.status_code == 200
+    run = response.get_json()["runs"][0]
+    assert run["latest_result"]["candidate_id"] == "candidate-not-run"
+    assert run["latest_result"]["backend"]["backend_requested"] == "alphamelts"
+    assert run["latest_result"]["backend"]["backend_active"] == "alphamelts"
+    assert run["latest_result"]["backend"]["backend_status"] == "not_run"
+    assert run["latest_result"]["backend"]["backend_authoritative"] is False
+
+
 def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-leaderboard-green"
