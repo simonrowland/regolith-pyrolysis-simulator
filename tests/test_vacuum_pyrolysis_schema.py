@@ -24,6 +24,22 @@ ROBINOT_TOTAL_CAPTURED_G = pytest.approx(1.1)
 ROBINOT_UNACCOUNTED_G = pytest.approx(0.27)
 ROBINOT_MASS_RECOVERY_PERCENT = pytest.approx(92.0)
 ROBINOT_CONFLICT_KG = {0.0011, 0.0013}
+ROBINOT_FIG4C_IMAGE_PATH = (
+    "docs-private/research/2026-06-12-vpr-sources/figures/fig4-composite.jpg"
+)
+ROBINOT_FIG4C_LOCATION_MASSES_G = {
+    "glass_lump_on_holder": 1.82,
+    "holder": 0.2,
+    "window": 0.35,
+    "condenser": 0.2,
+    "filter": 0.51,
+    "O2": 0.035,
+    "discrepancy": 0.265,
+}
+ROBINOT_FIG4C_CAPTURED_LOCATION_IDS = {"holder", "window", "condenser", "filter"}
+ROBINOT_FIG4C_CAPTURED_G = pytest.approx(1.26)
+ROBINOT_FIG4C_SOURCE_CLASS = "digitized_from_figure"
+FIGURE_MASS_SOURCE_CLASSES = {ROBINOT_FIG4C_SOURCE_CLASS}
 NOT_REPORTED = "not_reported"
 ROBINOT_INTERPOLATION = "piecewise_linear"
 ROBINOT_INTERPOLATION_SOURCE_CLASS = "assumption_with_sensitivity_marker"
@@ -190,6 +206,31 @@ def validate_vpr_schema(preset: dict, measurements: dict) -> None:
                 )
         for value in measurement.get("quantitative_measurements", []):
             require_value_citation(value, measurement_id)
+        fig4c_table = (measurement.get("figure_extraction") or {}).get(
+            "fig4c_per_location_mass_table"
+        ) or {}
+        for row in fig4c_table.get("rows", []):
+            detail = f"{measurement_id}:fig4c:{row.get('location_id')}"
+            require(
+                row.get("source_class") in FIGURE_MASS_SOURCE_CLASSES,
+                "figure_mass_invalid_source_class",
+                detail,
+            )
+            require(
+                bool(row.get("extraction_note")),
+                "figure_mass_missing_extraction_note",
+                detail,
+            )
+            require(
+                row.get("reported_value") is not None and row.get("reported_unit") == "g",
+                "figure_mass_missing_reported_value",
+                detail,
+            )
+            require_source_citation(
+                row.get("source") or {},
+                "figure_mass_missing_citation",
+                detail,
+            )
         for location in measurement.get("observed_locations", []):
             composition = location.get("reported_species_or_composition") or {}
             require(
@@ -390,7 +431,37 @@ def test_measurements_sidecar_preserves_per_location_conflicts_and_citations() -
     assert products["final_mass_recovery"]["reported_unit"] == "percent"
 
     figure = measurement["figure_extraction"]["fig4c_per_location_mass_table"]
-    assert figure["extraction_status"] == "not_extractable_from_markdown"
+    assert figure["extraction_status"] == ROBINOT_FIG4C_SOURCE_CLASS
+    assert ROBINOT_FIG4C_IMAGE_PATH in figure["checked_sources"]
+    assert figure["sample_mass_sum_check_g"] == ROBINOT_SAMPLE_MASS_G
+    assert figure["captured_on_apparatus_sum_g"] == ROBINOT_FIG4C_CAPTURED_G
+    assert "Body text reports 1.1 g" in figure["text_vs_figure_note"]
+    assert "figure rows close exactly" in figure["text_vs_figure_note"]
+
+    fig4c_rows = {row["location_id"]: row for row in figure["rows"]}
+    assert set(fig4c_rows) == set(ROBINOT_FIG4C_LOCATION_MASSES_G)
+    assert sum(row["reported_value"] for row in fig4c_rows.values()) == ROBINOT_SAMPLE_MASS_G
+    assert (
+        sum(
+            fig4c_rows[location_id]["reported_value"]
+            for location_id in ROBINOT_FIG4C_CAPTURED_LOCATION_IDS
+        )
+        == ROBINOT_FIG4C_CAPTURED_G
+    )
+    for location_id, expected_mass_g in ROBINOT_FIG4C_LOCATION_MASSES_G.items():
+        row = fig4c_rows[location_id]
+        assert row["reported_value"] == pytest.approx(expected_mass_g)
+        assert row["reported_unit"] == "g"
+        assert row["normalized_value_kg"] == pytest.approx(expected_mass_g / 1000.0)
+        assert row["source_class"] == ROBINOT_FIG4C_SOURCE_CLASS
+        assert ROBINOT_FIG4C_IMAGE_PATH in row["extraction_note"]
+        assert "1.1 g vaporized and captured" in row["extraction_note"]
+        assert "1.26 g captured" in row["extraction_note"]
+        assert "0.265 g discrepancy" in row["extraction_note"]
+        assert row["source"]["citation_id"] == "robinot_2026"
+        assert row["source"]["source_location"] == "fig4c_bar_labels"
+
+    assert "per_location_mass_split" not in measurement["named_missing_fields"]
 
     locations = {row["id"]: row for row in measurement["observed_locations"]}
     assert set(locations) == {"holder", "window", "condenser", "filter"}
