@@ -74,6 +74,7 @@ from simulator.config import load_config_bundle
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
+from simulator.lab_geometry import LabGeometry, parse_lab_geometry
 from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
@@ -86,6 +87,7 @@ from simulator.state import (
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     PipeSegment,
     clamp_stir_factor,
+    register_wall_deposit_accounts,
 )
 
 
@@ -893,8 +895,42 @@ class CondensationModel:
                 wall_temperature_C=max(0.0, float(raw_temperature)),
                 length_m=segment.length_m,
                 inner_diameter_m=segment.inner_diameter_m,
+                role=segment.role,
+                declared_area_m2=segment.declared_area_m2,
+                view_factor_from_melt=segment.view_factor_from_melt,
+                line_of_sight_to_melt=segment.line_of_sight_to_melt,
+                source_class=segment.source_class,
+                sensitivity_marker=segment.sensitivity_marker,
+                extraction_note=segment.extraction_note,
             ))
         self.pipe_segments = updated
+
+    def configure_lab_geometry(
+        self,
+        lab_geometry: LabGeometry | Mapping[str, Any],
+    ) -> LabGeometry:
+        geometry = (
+            lab_geometry
+            if isinstance(lab_geometry, LabGeometry)
+            else parse_lab_geometry(lab_geometry)
+        )
+        if geometry is None:
+            raise ValueError("lab_geometry is required")
+        register_wall_deposit_accounts(geometry.wall_deposit_accounts)
+        self.pipe_segments = geometry.to_pipe_segments(
+            default_diameter_m=max(1.0e-9, float(self.pipe_diameter_m)),
+        )
+        self.wall_surface_area_m2 = geometry.total_surface_area_m2
+        if self.pipe_segments:
+            self.pipe_diameter_m = min(
+                segment.inner_diameter_m for segment in self.pipe_segments
+            )
+            self.wall_temperature_C = min(
+                segment.wall_temperature_C for segment in self.pipe_segments
+            )
+            self.gas_temperature_C = self.wall_temperature_C
+        self.lab_geometry = geometry
+        return geometry
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """

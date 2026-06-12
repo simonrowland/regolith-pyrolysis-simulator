@@ -288,10 +288,13 @@ def wall_deposit_candidates_by_segment_kg(
     }
     if len(temperatures) == 1:
         wall_temperature_C = next(iter(temperatures))
-        reachable_surface_m2 = sum(
-            max(0.0, float(segment.surface_area_m2))
+        conductance_weights = {
+            segment.name: _wall_geometry_conductance_weight(segment)
             for segment in reachable_segments
-        )
+        }
+        reachable_surface_m2 = sum(conductance_weights.values())
+        if reachable_surface_m2 <= 0.0:
+            return {}
         total_candidate = wall_deposit_candidate_for_surface_kg(
             model,
             species=species,
@@ -305,10 +308,7 @@ def wall_deposit_candidates_by_segment_kg(
 
         candidates = _allocate_total_by_weights(
             total_candidate,
-            {
-                segment.name: segment.surface_area_m2
-                for segment in reachable_segments
-            },
+            conductance_weights,
         )
         for segment in reachable_segments:
             supply_kg = min(
@@ -335,7 +335,7 @@ def wall_deposit_candidates_by_segment_kg(
             T_cond_C=T_cond_C,
             melt_temperature_C=melt_temperature_C,
             wall_temperature_C=segment.wall_temperature_C,
-            surface_area_m2=segment.surface_area_m2,
+            surface_area_m2=_wall_geometry_conductance_weight(segment),
         )
         if candidate > 0.0:
             candidates[segment.name] = min(candidate, supply_kg)
@@ -407,3 +407,29 @@ def wall_deposit_candidate_for_surface_kg(
     ) * max(0.0, float(surface_area_m2))
     eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
     return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
+
+
+def _wall_geometry_conductance_weight(segment: Any) -> float:
+    """Named assumption: free-molecular view-factor/LOS area proxy.
+
+    TODO(P0a): replace this proxy with the pinned aperture/tube conductance
+    ladder once carrier/regime plumbing is available for lab surfaces.
+    """
+
+    area_m2 = max(0.0, float(getattr(segment, "surface_area_m2", 0.0)))
+    view_factor = getattr(segment, "view_factor_from_melt", None)
+    line_of_sight = getattr(segment, "line_of_sight_to_melt", None)
+    if view_factor is None and line_of_sight is None:
+        return area_m2
+    if line_of_sight is False:
+        return 0.0
+    if view_factor is None:
+        view_factor_value = 1.0
+    else:
+        try:
+            view_factor_value = float(view_factor)
+        except (TypeError, ValueError):
+            return 0.0
+        if not math.isfinite(view_factor_value):
+            return 0.0
+    return area_m2 * max(0.0, min(1.0, view_factor_value))

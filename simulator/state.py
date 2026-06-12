@@ -13,7 +13,7 @@ import math
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
@@ -629,6 +629,33 @@ PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
     for name in PIPE_SEGMENT_NAMES
 )
+_REGISTERED_WALL_DEPOSIT_ACCOUNTS: set[str] = set()
+
+
+def register_wall_deposit_accounts(accounts: Iterable[str]) -> None:
+    for account in accounts:
+        account_name = str(account)
+        if not account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
+            raise ValueError(
+                f"wall deposit account {account_name!r} must start with "
+                f"{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX!r}"
+            )
+        suffix = account_name.removeprefix(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
+        if not suffix:
+            raise ValueError("wall deposit account suffix is required")
+        _REGISTERED_WALL_DEPOSIT_ACCOUNTS.add(account_name)
+
+
+def unregister_wall_deposit_accounts(accounts: Iterable[str]) -> None:
+    for account in accounts:
+        _REGISTERED_WALL_DEPOSIT_ACCOUNTS.discard(str(account))
+
+
+def registered_wall_deposit_accounts() -> tuple[str, ...]:
+    return tuple(dict.fromkeys((
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+        *sorted(_REGISTERED_WALL_DEPOSIT_ACCOUNTS),
+    )))
 
 
 @dataclass(frozen=True)
@@ -641,11 +668,20 @@ class PipeSegment:
     wall_temperature_C: float
     length_m: float
     inner_diameter_m: float
+    role: str = ''
+    declared_area_m2: float | None = None
+    view_factor_from_melt: float | None = None
+    line_of_sight_to_melt: bool | None = None
+    source_class: str = ''
+    sensitivity_marker: str = ''
+    extraction_note: str = ''
 
     @property
     def surface_area_m2(self) -> float:
         """Cylindrical wall area for the segment."""
 
+        if self.declared_area_m2 is not None:
+            return max(0.0, float(self.declared_area_m2))
         return (
             math.pi
             * max(0.0, float(self.inner_diameter_m))

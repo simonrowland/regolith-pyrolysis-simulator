@@ -69,6 +69,7 @@ from simulator.condensation_routing import (
     target_species_for_stage_number,
 )
 from simulator.feedstock_guard import assert_feedstock_loadable
+from simulator.lab_geometry import parse_lab_geometry
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
@@ -342,6 +343,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.setpoints = copy.deepcopy(setpoints)
         self.feedstocks = copy.deepcopy(feedstocks)
         self.vapor_pressures = copy.deepcopy(vapor_pressures)
+        self.lab_geometry = parse_lab_geometry(
+            self.setpoints.get("lab_geometry")
+        )
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()
@@ -550,6 +554,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._condensation_model.apply_setpoints_overrides(
                 self.setpoints
             )
+            if self.lab_geometry is not None:
+                self._condensation_model.configure_lab_geometry(
+                    self.lab_geometry
+                )
         return self._condensation_model
 
     @property
@@ -4533,7 +4541,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             designer = EquipmentDesigner()
             feedstock = self.feedstocks.get(self.record.feedstock_key, {})
             self._equipment = designer.design_for_batch(
-                self.record.batch_mass_kg, feedstock)
+                self.record.batch_mass_kg,
+                feedstock,
+                lab_geometry=self.lab_geometry,
+            )
             # Also store volatiles train spec for Loop 4 throttle
             self._volatiles_train_spec = self._equipment.volatiles_train
             self.overhead_model.pipe_diameter_m = self._equipment.pipe.diameter_m

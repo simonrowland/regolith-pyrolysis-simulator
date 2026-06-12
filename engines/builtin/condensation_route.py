@@ -89,7 +89,9 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.condensation import (
     WALL_DEPOSIT_ACCOUNT,
-    WALL_DEPOSIT_SEGMENT_ACCOUNTS,
+)
+from simulator.state import (
+    registered_wall_deposit_accounts,
 )
 
 
@@ -104,12 +106,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     name = "builtin-condensation-route"
     CHROMIUM_CONDENSED_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 
-    DECLARED_ACCOUNTS = frozenset({
+    BASE_DECLARED_ACCOUNTS = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
         WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
-        *WALL_DEPOSIT_SEGMENT_ACCOUNTS,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -119,7 +120,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             is_authoritative_for=frozenset(
                 {ChemistryIntent.CONDENSATION_ROUTE}
             ),
-            declared_accounts=self.DECLARED_ACCOUNTS,
+            declared_accounts=self._declared_accounts(),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -172,6 +173,23 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
 
         registry = request.account_view.species_formula_registry
+        declared_accounts = self._declared_accounts()
+        refused_account = self._undeclared_wall_deposit_account(
+            controls, declared_accounts)
+        if refused_account is not None:
+            return IntentResult(
+                intent=ChemistryIntent.CONDENSATION_ROUTE,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": "undeclared_wall_deposit_account",
+                    "reason_refused": "undeclared_wall_deposit_account",
+                    "account": refused_account,
+                },
+            )
+        wall_account_fractions = self._wall_deposit_account_fractions(
+            controls, declared_accounts)
 
         # Build the per-product mol map. Disproportionation branch
         # (SiO -> Si + SiO2) is the canonical case; non-disproportionation
@@ -213,7 +231,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
         if wall_deposit_mol > 0.0:
             for account, account_mol in self._wall_deposit_mol_by_account(
-                wall_deposit_mol, controls,
+                wall_deposit_mol, wall_account_fractions,
             ).items():
                 species_mol = credits.setdefault(account, {})
                 species_mol[species] = (
@@ -248,7 +266,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "credited_wall_deposit_accounts_kg": {
                     account: float(wall_deposit_kg) * float(fraction)
                     for account, fraction in (
-                        self._wall_deposit_account_fractions(controls).items()
+                        wall_account_fractions.items()
                     )
                 },
             },
@@ -324,11 +342,32 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             account = str(
                 product_accounts.get(product) or "process.condensation_train"
             )
-            if account not in self.DECLARED_ACCOUNTS:
+            if account not in self._declared_accounts():
                 account = "process.condensation_train"
             species_mol = credits.setdefault(account, {})
             species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
         return credits
+
+    @classmethod
+    def _declared_accounts(cls) -> frozenset[str]:
+        return cls.BASE_DECLARED_ACCOUNTS | frozenset(
+            registered_wall_deposit_accounts())
+
+    @classmethod
+    def _undeclared_wall_deposit_account(
+        cls,
+        controls: Mapping[str, Any],
+        declared_accounts: frozenset[str],
+    ) -> str | None:
+        raw_segment_fractions = controls.get(
+            "wall_deposit_account_fractions", {})
+        if not isinstance(raw_segment_fractions, Mapping):
+            return None
+        for account in raw_segment_fractions:
+            account_name = str(account)
+            if account_name not in declared_accounts:
+                return account_name
+        return None
 
     @staticmethod
     def _wall_deposit_fraction(controls: Mapping[str, Any]) -> float:
@@ -345,6 +384,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     def _wall_deposit_account_fractions(
         cls,
         controls: Mapping[str, Any],
+        declared_accounts: frozenset[str],
     ) -> dict[str, float]:
         raw_segment_fractions = controls.get(
             "wall_deposit_account_fractions", {})
@@ -352,7 +392,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             fractions: dict[str, float] = {}
             for account, raw_fraction in raw_segment_fractions.items():
                 account_name = str(account)
-                if account_name not in cls.DECLARED_ACCOUNTS:
+                if account_name not in declared_accounts:
                     continue
                 try:
                     fraction = float(raw_fraction)
@@ -373,9 +413,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     def _wall_deposit_mol_by_account(
         cls,
         wall_deposit_mol: float,
-        controls: Mapping[str, Any],
+        fractions: Mapping[str, float],
     ) -> dict[str, float]:
-        fractions = cls._wall_deposit_account_fractions(controls)
         if wall_deposit_mol <= 0.0 or not fractions:
             return {}
         credited: dict[str, float] = {}

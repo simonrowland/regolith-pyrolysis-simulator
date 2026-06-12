@@ -64,7 +64,7 @@ from simulator.state import (
     Atmosphere,
     HourSnapshot,
     MOLAR_MASS,
-    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
@@ -1066,7 +1066,12 @@ def _wall_deposit_report_kg(
     wall_deposit_kg = _kg_by_species_from_mol_state(
         state, WALL_DEPOSIT_ACCOUNT,
     )
-    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+    segment_accounts = sorted(
+        account
+        for account in state
+        if str(account).startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
+    )
+    for account in segment_accounts:
         for species, kg in _kg_by_species_from_mol_state(
             state, account,
         ).items():
@@ -1083,7 +1088,12 @@ def _wall_deposit_mol_by_species(
     state: Mapping[str, Mapping[str, float]],
 ) -> dict[str, float]:
     wall_deposit_mol = dict(state.get(WALL_DEPOSIT_ACCOUNT, {}) or {})
-    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+    segment_accounts = sorted(
+        account
+        for account in state
+        if str(account).startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
+    )
+    for account in segment_accounts:
         for species, mol in (state.get(account, {}) or {}).items():
             wall_deposit_mol[species] = (
                 wall_deposit_mol.get(species, 0.0) + float(mol)

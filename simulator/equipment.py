@@ -36,7 +36,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
+
+from simulator.lab_geometry import (
+    LAB_GEOMETRY_SCALE,
+    LabGeometry,
+    parse_lab_geometry,
+)
 
 
 @dataclass
@@ -134,6 +140,7 @@ class PlantDesign:
     volatiles_train: VolatilesTrainSpec = field(default_factory=VolatilesTrainSpec)
     buffer_tank: BufferTankSpec = field(default_factory=BufferTankSpec)
     headspace_volume_m3: float = 0.0
+    lab_geometry_id: str = ""
 
 
 class EquipmentDesigner:
@@ -151,7 +158,10 @@ class EquipmentDesigner:
 
     def design_for_batch(self, mass_kg: float,
                           feedstock: dict,
-                          peak_T_C: float = 1700.0) -> PlantDesign:
+                          peak_T_C: float = 1700.0,
+                          lab_geometry: (
+                              Mapping[str, Any] | LabGeometry | None
+                          ) = None) -> PlantDesign:
         """
         Generate a complete plant design for the given batch parameters.
 
@@ -163,6 +173,19 @@ class EquipmentDesigner:
         Returns:
             PlantDesign with all equipment specs
         """
+        geometry = (
+            lab_geometry
+            if isinstance(lab_geometry, LabGeometry)
+            else parse_lab_geometry(lab_geometry)
+        )
+        if geometry is not None and geometry.scale == LAB_GEOMETRY_SCALE:
+            return self.design_for_lab_geometry(
+                geometry,
+                mass_kg=mass_kg,
+                feedstock=feedstock,
+                peak_T_C=peak_T_C,
+            )
+
         design = PlantDesign(batch_mass_kg=mass_kg)
 
         design.crucible = self.size_crucible(mass_kg)
@@ -187,6 +210,54 @@ class EquipmentDesigner:
         design.volatiles_train = self.size_volatiles_train(mass_kg, feedstock)
         design.buffer_tank = self.size_buffer_tanks(mass_kg)
 
+        return design
+
+    def design_for_lab_geometry(
+        self,
+        geometry: LabGeometry,
+        *,
+        mass_kg: float,
+        feedstock: dict,
+        peak_T_C: float = 1700.0,
+    ) -> PlantDesign:
+        """Build a PlantDesign from declared gram-lab geometry."""
+
+        batch_mass_kg = (
+            float(geometry.sample_mass_g) / 1000.0
+            if geometry.sample_mass_g is not None
+            else float(mass_kg)
+        )
+        design = PlantDesign(
+            batch_mass_kg=batch_mass_kg,
+            lab_geometry_id=geometry.geometry_id,
+        )
+        design.crucible = self.size_crucible(batch_mass_kg)
+        design.concentrator = self.size_solar_concentrator(
+            batch_mass_kg, peak_T_C)
+
+        segments = geometry.to_pipe_segments()
+        total_area_m2 = geometry.total_surface_area_m2
+        diameter_m = min(
+            (segment.inner_diameter_m for segment in segments),
+            default=0.02,
+        )
+        length_m = (
+            total_area_m2 / (math.pi * max(diameter_m, 1.0e-9))
+            if total_area_m2 > 0.0 else 0.0
+        )
+        design.pipe = PipeSpec(
+            diameter_m=diameter_m,
+            length_m=length_m,
+            surface_area_m2=total_area_m2,
+            conductance_kg_s=0.0,
+            max_transport_g_s=0.0,
+        )
+        design.headspace_volume_m3 = (
+            design.crucible.volume_m3 * design.crucible.freeboard_pct / 100.0
+        )
+        design.turbine = self.size_turbine(batch_mass_kg)
+        design.volatiles_train = self.size_volatiles_train(batch_mass_kg, feedstock)
+        design.buffer_tank = self.size_buffer_tanks(batch_mass_kg)
         return design
 
     def size_crucible(self, mass_kg: float) -> CrucibleSpec:
