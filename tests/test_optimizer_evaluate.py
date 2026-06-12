@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import math
 from types import SimpleNamespace
 
@@ -33,6 +33,7 @@ from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
+from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError
 from simulator.state import CampaignPhase, HourSnapshot
 
@@ -327,6 +328,104 @@ def _execution(
 
 def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
+
+
+def _real_backend_profile() -> dict:
+    return {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+
+def _available_real_backend_execution(**kwargs: object) -> SimpleNamespace:
+    return _execution(
+        backend_status="ok",
+        backend_authoritative=True,
+        **kwargs,
+    )
+
+
+def _non_finite_payload_fixture(*, non_finite: bool):
+    executor = FakeExecutor(
+        exc=PT0NonFinitePayload(
+            "non-finite value in PT-0 payload at $.SCSS_ppm: inf"
+        )
+        if non_finite
+        else None,
+        execution=None if non_finite else _available_real_backend_execution(),
+    )
+    return evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=executor,
+    )
+
+
+def _inventory_overdraw_fixture(*, overdraw_kg: float | None):
+    exc = None
+    if overdraw_kg is not None:
+        exc = ProposalRejected(
+            "insufficient available 'FeO' in normal account "
+            "'process.cleaned_melt': balance would be "
+            f"-{overdraw_kg:.12g} kg"
+        )
+    executor = FakeExecutor(
+        exc=exc,
+        execution=None if exc is not None else _available_real_backend_execution(),
+    )
+    return evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=executor,
+    )
+
+
+def _backend_availability_fixture(*, available: bool):
+    executor = FakeExecutor(
+        execution=_available_real_backend_execution() if available else None,
+        exc=None if available else BackendUnavailableError("missing binary"),
+    )
+    return evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=executor,
+    )
+
+
+def _mass_balance_gate_profile() -> dict:
+    return {
+        **PROFILE,
+        "constraints": {"gates": ["furnace_temperature"]},
+    }
+
+
+@dataclass
+class ProductionMassBalanceReplayExecutor:
+    mass_balance_error_pct: float
+    calls: int = 0
+    execution: object | None = None
+
+    def execute(self, config: object) -> object:
+        self.calls += 1
+        execution = RunExecutor().execute(config)
+        snapshots = tuple(getattr(execution, "snapshots", ()))
+        assert snapshots
+        patched_snapshots = (
+            replace(
+                snapshots[0],
+                mass_balance_error_pct=self.mass_balance_error_pct,
+            ),
+            *snapshots[1:],
+        )
+        self.execution = replace(execution, snapshots=patched_snapshots)
+        return self.execution
 
 
 def _knudsen_gate_profile() -> dict:
@@ -751,6 +850,27 @@ def _best_tap_snapshot(hour: int) -> SimpleNamespace:
     )
 
 
+def test_non_finite_payload_green_path_accepts_finite_authoritative_run() -> None:
+    result = _non_finite_payload_fixture(non_finite=False)
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.failing_gates == ()
+    assert result.objectives is not None
+    assert all(math.isfinite(value) for value in result.objectives.as_mapping().values())
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+
+
+def test_non_finite_payload_poison_pair_fires_named_gate() -> None:
+    result = _non_finite_payload_fixture(non_finite=True)
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.NON_FINITE_PAYLOAD
+    assert result.failing_gates == ("non_finite_payload",)
+    assert result.feasibility_margins["non_finite_payload"].feasible is False
+
+
 def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
     result = evaluate(
         _valid_patch(),
@@ -852,6 +972,70 @@ def test_proposal_rejected_runner_paths_are_invalid_recipe() -> None:
         assert result.failure_category is FailureCategory.INVALID_RECIPE
         assert result.run_reference is not None
         assert result.run_reference.backend_status == "ok"
+
+
+def test_inventory_overdraw_green_path_accepts_clean_ledger_execution() -> None:
+    result = _inventory_overdraw_fixture(overdraw_kg=None)
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.failing_gates == ()
+    assert result.objectives is not None
+    assert result.run_reference is not None
+    assert result.run_reference.product_summary["product_bins"]["ingots_metals"][
+        "species_kg"
+    ]["Fe"] == (
+        pytest.approx(1.0)
+    )
+
+
+def test_inventory_overdraw_poison_pair_fires_named_gate() -> None:
+    result = _inventory_overdraw_fixture(overdraw_kg=7.87e-05)
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.failing_gates == ("inventory_overdraw",)
+    assert result.feasibility_margins["inventory_overdraw"].observed == pytest.approx(
+        7.87e-05
+    )
+
+
+def test_mass_balance_green_path_scores_with_gate_engaged_at_abort_boundary() -> None:
+    executor = ProductionMassBalanceReplayExecutor(mass_balance_error_pct=5.0e-12)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_mass_balance_gate_profile(),
+        executor=executor,
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.failing_gates == ()
+    assert executor.calls == 1
+    assert type(executor.execution).__name__ == "RunExecution"
+    assert executor.execution.snapshots[0].mass_balance_error_pct == pytest.approx(
+        5.0e-12
+    )
+    assert result.run_reference is not None
+
+
+def test_mass_balance_poison_pair_fires_named_gate() -> None:
+    executor = ProductionMassBalanceReplayExecutor(mass_balance_error_pct=5.1e-12)
+
+    with pytest.raises(EngineBugAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=_mass_balance_gate_profile(),
+            executor=executor,
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert "mass balance breach" in str(raised.value)
 
 
 def test_mass_balance_breach_aborts_as_engine_bug_with_repro_patch() -> None:
@@ -969,6 +1153,46 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert infeasible.objectives is None
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+
+
+def test_pO2_enforcement_rows_surface_in_optimizer_result_artifact() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            _execution(
+                backend_status="ok",
+                per_hour=(
+                    {
+                        "hour": 1,
+                        "campaign": "C2A",
+                        "T_C": 625.0,
+                        "pO2_enforcement": {
+                            "hour": 1,
+                            "setpoint_mbar": 3.0,
+                            "achieved_mbar": 1.0,
+                            "limited_by_total_pressure": True,
+                            "status": "clipped_to_total_pressure",
+                        },
+                    },
+                ),
+            )
+        ),
+    )
+
+    assert result.run_reference is not None
+    trace = result.run_reference.trace
+    assert trace["pO2_enforcement_by_hour"] == [
+        {
+            "hour": 1,
+            "setpoint_mbar": 3.0,
+            "achieved_mbar": 1.0,
+            "limited_by_total_pressure": True,
+            "status": "clipped_to_total_pressure",
+        }
+    ]
 
 
 def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
@@ -1317,6 +1541,25 @@ def test_backend_unavailable_aborts_distinct_from_engine_bug() -> None:
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
 
 
+def test_backend_unavailable_green_path_accepts_available_real_backend() -> None:
+    result = _backend_availability_fixture(available=True)
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.eval_spec is not None
+    assert result.eval_spec.backend_name == "alphamelts"
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+
+
+def test_backend_unavailable_poison_pair_fires_named_gate() -> None:
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        _backend_availability_fixture(available=False)
+
+    assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+    assert "missing binary" in str(raised.value)
+
+
 def test_genuine_missing_backend_status_aborts_as_backend_unavailable() -> None:
     with pytest.raises(BackendUnavailableAbort) as raised:
         evaluate(
@@ -1376,6 +1619,23 @@ def test_real_backend_unavailable_backend_status_aborts_as_backend_unavailable()
 
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
     assert "backend_status='unavailable'" in str(raised.value)
+
+
+def test_non_authoritative_backend_status_green_path_requires_authoritative_ok() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(_available_real_backend_execution()),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.eval_spec is not None
+    assert result.eval_spec.backend_name == "alphamelts"
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
 
 
 def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
@@ -1511,6 +1771,10 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success() 
         pytest.approx(1.0)
     )
     assert "rump_terminal" in result.feasibility_margins
+    rump_margin = result.feasibility_margins["rump_terminal"]
+    assert rump_margin.feasible
+    assert rump_margin.observed == pytest.approx(0.0)
+    assert rump_margin.margin >= 0.0
     assert result.run_reference is not None
     assert result.run_reference.trace["rump_terminal"]["status"] == "earned"
     assert result.run_reference.trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}

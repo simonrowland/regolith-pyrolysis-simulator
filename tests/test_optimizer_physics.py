@@ -287,6 +287,50 @@ def test_coating_readout_reports_wall_deposit_margin_without_hard_gate() -> None
     assert "Hottest/hot_wall/SiO" in coating.detail
 
 
+def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "SiO"): ThresholdSpec(
+            id="allowable_wall_deposit_kg.hot_wall.SiO",
+            value=1.0,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "SiO"): 0.05},),
+        wall_zone_by_segment={"hot_wall": "Hottest"},
+    )
+
+    result = constraints.evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
+    assert coating.observed == pytest.approx(20.0)
+    assert coating.margin > 0.0
+    assert "Hottest/hot_wall/SiO" in coating.detail
+
+
+@pytest.mark.skip(
+    reason="needs-interface: coating is reported-only; input data cannot make it fail"
+)
+def test_coating_blocking_green_path_needs_interface_poison_pair() -> None:
+    pass
+
+
+@pytest.mark.skip(
+    reason=(
+        "needs-interface: allowable_wall_deposit_kg feeds reported-only coating; "
+        "input data cannot make it fail"
+    )
+)
+def test_allowable_wall_deposit_blocking_green_path_needs_interface_poison_pair() -> None:
+    pass
+
+
 @pytest.mark.parametrize(
     ("trace", "expected_detail"),
     (
