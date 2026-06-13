@@ -263,6 +263,56 @@ def test_prune_merged_shards_after_integrity_check(tmp_path: Path) -> None:
     assert row is not None and row[0] == "ok"
 
 
+def test_prune_merged_shards_unlinks_wal_sidecars(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    _put_cache_row(shard, tag="with-sidecars")
+
+    merge_summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard],
+        seed_rows_by_source={str(shard): 0},
+    )
+    for suffix in ("-wal", "-shm"):
+        shard.with_name(shard.name + suffix).touch()
+
+    pruned = epoch_grind.prune_merged_shards(
+        [shard],
+        base,
+        merge_summary=merge_summary,
+    )
+
+    assert pruned == [str(shard)]
+    assert not shard.exists()
+    assert not shard.with_name(shard.name + "-wal").exists()
+    assert not shard.with_name(shard.name + "-shm").exists()
+
+
+def test_prune_merged_shards_succeeds_without_sidecars(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    _put_cache_row(shard, tag="no-sidecars")
+
+    merge_summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard],
+        seed_rows_by_source={str(shard): 0},
+    )
+    assert not shard.with_name(shard.name + "-wal").exists()
+    assert not shard.with_name(shard.name + "-shm").exists()
+
+    pruned = epoch_grind.prune_merged_shards(
+        [shard],
+        base,
+        merge_summary=merge_summary,
+    )
+
+    assert pruned == [str(shard)]
+    assert not shard.exists()
+
+
 def test_prune_skips_shard_on_partial_merge(tmp_path: Path) -> None:
     base = tmp_path / "base.sqlite"
     shard = tmp_path / "shard.sqlite"

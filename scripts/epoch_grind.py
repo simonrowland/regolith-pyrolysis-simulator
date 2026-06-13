@@ -723,6 +723,10 @@ def prune_merged_shards(
                 _LOGGER.warning("prune_merged_shards skipped shard: %s", reason)
                 continue
         shard.unlink()
+        for suffix in ("-wal", "-shm"):
+            sidecar = shard.with_name(shard.name + suffix)
+            if sidecar.exists():
+                sidecar.unlink()
         pruned.append(str(shard))
     return pruned
 
