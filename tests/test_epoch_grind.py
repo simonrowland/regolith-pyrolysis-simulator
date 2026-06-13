@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from scripts import epoch_grind
+from simulator.reduced_real_determinism import PT1PersistentEquilibriumStore
 
 
 NO_FEASIBLE_MESSAGE = (
@@ -69,6 +70,7 @@ def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) 
     }
     manifest = tmp_path / "jobs.json"
     manifest.write_text(json.dumps(payload), encoding="utf-8")
+    PT1PersistentEquilibriumStore(tmp_path / "base.sqlite")
     return manifest
 
 
@@ -442,7 +444,7 @@ def test_dry_run_plan_prints_optimizer_commands(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-            lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,
@@ -487,10 +489,19 @@ def test_write_epoch_profile_overlays_cache_db(tmp_path: Path) -> None:
     job = manifest.jobs[0]
     shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
 
-    profile_arg = epoch_grind.write_epoch_profile(job, tmp_path, shard, tmp_path / "epoch")
+    profile_arg = epoch_grind.write_epoch_profile(
+        job,
+        tmp_path,
+        shard,
+        tmp_path / "epoch",
+        base_cache=manifest.base_cache,
+    )
     profile = json.loads(Path(profile_arg).read_text(encoding="utf-8"))
 
     assert profile["run"]["reduced_real_cache"]["db_path"] == str(shard)
+    assert profile["run"]["reduced_real_cache"]["read_only_base_db_path"] == str(
+        manifest.base_cache
+    )
 
 
 def test_timeboxed_child_stays_pending_and_mergeable(
@@ -510,7 +521,7 @@ def test_timeboxed_child_stays_pending_and_mergeable(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-        lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,
@@ -528,7 +539,7 @@ def test_timeboxed_child_stays_pending_and_mergeable(
     assert result["shard_dbs"] == [
         str(manifest.work_dir / "epoch-0001" / "shards" / "job-a.sqlite")
     ]
-    assert result["seed_rows_by_shard"][result["shard_dbs"][0]] == 1000
+    assert result["seed_rows_by_shard"][result["shard_dbs"][0]] == 0
     assert [job.id for job in epoch_grind.pending_jobs(manifest, journal)] == ["job-a"]
 
 
@@ -700,7 +711,7 @@ def test_child_owned_rc_124_is_failed_and_excluded_from_merge(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-        lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,
@@ -742,7 +753,7 @@ def test_no_feasible_job_is_terminal_mergeable_and_counted(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-        lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,
@@ -811,7 +822,7 @@ def test_stale_profile_job_is_terminal_mergeable_and_counted(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-        lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,
@@ -886,7 +897,7 @@ def test_failed_epoch_is_journaled_before_return(
     monkeypatch.setattr(
         epoch_grind,
         "seed_job_cache",
-        lambda *args, **kwargs: {"rows_after": 1000},
+        lambda *args, **kwargs: {"seed_rows": 0},
     )
     monkeypatch.setattr(
         epoch_grind,

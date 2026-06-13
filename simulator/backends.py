@@ -81,6 +81,7 @@ class CachedRealConfig:
     authorized_backend_version: str
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
+    read_only_base_db_path: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -235,12 +236,19 @@ def normalize_cached_real_config(
             "cached-real reduced_real_cache.cache_tier_ceiling must be one of "
             f"{', '.join(CACHE_TIER_CEILINGS)}"
         )
+    read_only_base_db_path = None
+    raw_read_only_base = value.get("read_only_base_db_path")
+    if raw_read_only_base not in (None, ""):
+        read_only_base_db_path = Path(str(raw_read_only_base)).expanduser()
+        if not read_only_base_db_path.is_absolute():
+            read_only_base_db_path = (_REPO_ROOT / read_only_base_db_path).resolve()
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
         authorized_backend_version=authorized_backend_version,
         miss_policy=miss_policy,
         cache_tier_ceiling=cache_tier_ceiling,
+        read_only_base_db_path=read_only_base_db_path,
     )
 
 
@@ -250,7 +258,11 @@ def build_cached_real_store(config: CachedRealConfig):
     from simulator.reduced_real_determinism import PT0DeterminismStore
 
     mode = "replay" if config.miss_policy == "fail-loud" else "capture"
-    store = PT0DeterminismStore(mode, db_path=config.db_path)
+    store = PT0DeterminismStore(
+        mode,
+        db_path=config.db_path,
+        read_only_base_db_path=config.read_only_base_db_path,
+    )
     store.cached_real_miss_policy = config.miss_policy
     store.cache_tier_ceiling = config.cache_tier_ceiling
     return store

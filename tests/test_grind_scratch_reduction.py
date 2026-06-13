@@ -1,0 +1,272 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import sqlite3
+from pathlib import Path
+
+import pytest
+
+from scripts import epoch_grind
+from scripts.seed_reduced_real_cache import payload_count, seed_cache
+from simulator.backends import build_cached_real_store, normalize_cached_real_config
+from simulator.reduced_real_determinism import (
+    PT0DeterminismStore,
+    PT1PersistentEquilibriumStore,
+    canonical_json_bytes,
+    canonical_physics_bucket_key_from_replay_key,
+)
+
+
+def _put_cache_row(
+    db_path: Path,
+    *,
+    tag: str,
+    artifact: str = "freeze_gate_curve",
+) -> dict:
+    key = {
+        "artifact": artifact,
+        "code_version": "test",
+        "data_digests": {"fixture": "v1"},
+        "schema_version": "test",
+        "tag": tag,
+    }
+    payload = {"curve": {"status": "in_range", "tag": tag}}
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+    return key
+
+
+def _db_bytes(path: Path) -> int:
+    return path.stat().st_size if path.exists() else 0
+
+
+def test_read_only_base_attach_exact_hit(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    key = _put_cache_row(base, tag="from-base")
+    PT1PersistentEquilibriumStore(shard)
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=shard,
+        read_only_base_db_path=base,
+    )
+    store.cache_tier_ceiling = "cached_exact"
+    payload = store._lookup_optional(
+        str(key["artifact"]),
+        key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
+    )
+
+    assert payload is not None
+    assert payload["curve"]["tag"] == "from-base"
+    assert store.last_cache_state == "cached_exact"
+    assert payload_count(shard) == 0
+
+
+def test_shard_holds_only_new_rows_after_write(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    for index in range(5):
+        _put_cache_row(base, tag=f"base-{index}")
+    base_rows = payload_count(base)
+    base_bytes = _db_bytes(base)
+
+    shard_store = PT1PersistentEquilibriumStore(shard, read_only_base_db_path=base)
+    new_key = _put_cache_row(shard, tag="new-only")
+
+    assert payload_count(shard) == 1
+    assert payload_count(base) == base_rows
+    assert _db_bytes(base) == base_bytes
+    assert _db_bytes(shard) < base_bytes
+
+    hit = shard_store.get(
+        artifact=str(new_key["artifact"]),
+        key=new_key,
+        key_bytes=canonical_json_bytes(new_key),
+        key_hash=hashlib.sha256(canonical_json_bytes(new_key)).hexdigest(),
+    )
+    assert hit is not None
+    assert hit["payload"]["curve"]["tag"] == "new-only"
+
+
+def test_base_not_written_by_job_store(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    _put_cache_row(base, tag="seed")
+    base_mtime = os.path.getmtime(base)
+    base_rows = payload_count(base)
+
+    PT1PersistentEquilibriumStore(shard)
+    build_cached_real_store(
+        normalize_cached_real_config(
+            {
+                "db_path": str(shard),
+                "read_only_base_db_path": str(base),
+                "authorized_backend_name": "magemin",
+                "authorized_backend_version": "test",
+                "miss_policy": "live-fill",
+                "cache_tier_ceiling": "cached_exact",
+            }
+        )
+    )
+    _put_cache_row(shard, tag="job-write")
+
+    assert payload_count(base) == base_rows
+    assert os.path.getmtime(base) == pytest.approx(base_mtime, abs=1.0)
+    assert payload_count(shard) == 1
+
+
+def test_seed_job_cache_creates_empty_shard_without_base_copy(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    for index in range(3):
+        _put_cache_row(base, tag=f"base-{index}")
+
+    summary = epoch_grind.seed_job_cache(shard, base)
+
+    assert summary["seed_rows"] == 0
+    assert summary["rows_after"] == 0
+    assert payload_count(shard) == 0
+    assert payload_count(base) == 3
+
+
+def test_duplication_rate_with_zero_seed_rows() -> None:
+    summary = {
+        "inserted_rows": 2,
+        "sources": [
+            {"source_rows": 5, "seed_rows": 0, "inserted_rows": 2},
+            {"source_rows": 3, "seed_rows": 0, "inserted_rows": 0},
+        ],
+    }
+    assert epoch_grind.duplication_rate_from_merge(summary) == pytest.approx(0.75)
+
+
+def test_prune_merged_shards_after_integrity_check(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard_a = tmp_path / "shard-a.sqlite"
+    shard_b = tmp_path / "shard-b.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    _put_cache_row(shard_a, tag="a")
+    _put_cache_row(shard_b, tag="b")
+
+    pruned = epoch_grind.prune_merged_shards([shard_a, shard_b], base)
+
+    assert pruned == [str(shard_a), str(shard_b)]
+    assert not shard_a.exists()
+    assert not shard_b.exists()
+    row = sqlite3.connect(base).execute("PRAGMA integrity_check").fetchone()
+    assert row is not None and row[0] == "ok"
+
+
+def test_merge_epoch_shards_and_prune_integration(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    _put_cache_row(shard, tag="merge-me")
+
+    summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard],
+        seed_rows_by_source={str(shard): 0},
+    )
+    pruned = epoch_grind.prune_merged_shards([shard], base)
+
+    assert summary["inserted_rows"] == 1
+    assert payload_count(base) == 1
+    assert pruned == [str(shard)]
+    assert epoch_grind.duplication_rate_from_merge(summary) == pytest.approx(0.0)
+
+
+def test_multi_job_shard_scratch_bounded_not_n_times_base(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    for index in range(10):
+        _put_cache_row(base, tag=f"base-{index}")
+    base_bytes = _db_bytes(base)
+
+    shard_paths: list[Path] = []
+    for job_id in ("job-a", "job-b", "job-c"):
+        shard = tmp_path / "epoch-0001" / "shards" / f"{job_id}.sqlite"
+        epoch_grind.seed_job_cache(shard, base)
+        _put_cache_row(shard, tag=f"new-{job_id}")
+        shard_paths.append(shard)
+
+    total_shard_bytes = sum(_db_bytes(path) for path in shard_paths)
+    assert total_shard_bytes < 3 * base_bytes
+    assert all(payload_count(path) == 1 for path in shard_paths)
+    assert payload_count(base) == 10
+
+
+def test_epoch_profile_wires_read_only_base_path(tmp_path: Path) -> None:
+    profile = tmp_path / "profile.json"
+    profile.write_text(
+        json.dumps(
+            {
+                "profile_id": "test",
+                "profile_schema_version": "optimizer-profile-v1",
+                "feedstock": "lunar_mare_low_ti",
+                "objectives": {},
+                "constraints": {},
+                "run": {
+                    "backend_name": "cached-real",
+                    "reduced_real_cache": {
+                        "db_path": "old.sqlite",
+                        "authorized_backend_name": "magemin",
+                        "authorized_backend_version": "test",
+                    },
+                },
+                "fidelities": {"fast": {}},
+                "seed_recipes": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    manifest = tmp_path / "jobs.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "base_cache": "base.sqlite",
+                "work_dir": "epochs",
+                "fidelity": "fast",
+                "parallel": 1,
+                "jobs": [
+                    {
+                        "id": "job-a",
+                        "feedstock": "lunar_mare_low_ti",
+                        "profile": str(profile),
+                        "budget": 4,
+                        "strategy": "random",
+                        "seed": 1,
+                        "out": "runs/job-a",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    loaded = epoch_grind.load_manifest(manifest)
+    PT1PersistentEquilibriumStore(loaded.base_cache)
+    shard = tmp_path / "epoch-0001" / "shards" / "job-a.sqlite"
+    _, overlay = epoch_grind.plan_epoch_profile(
+        loaded.jobs[0],
+        tmp_path,
+        shard,
+        tmp_path / "epoch-0001",
+        base_cache=loaded.base_cache,
+    )
+
+    assert overlay is not None
+    cache = overlay["run"]["reduced_real_cache"]
+    assert cache["db_path"] == str(shard)
+    assert cache["read_only_base_db_path"] == str(loaded.base_cache)

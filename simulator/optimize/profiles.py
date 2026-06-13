@@ -139,6 +139,7 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "authorized_backend_name",
     "authorized_backend_version",
     "cache_tier_ceiling",
+    "read_only_base_db_path",
 })
 _TWO_PHASE_CERTIFY_KEYS = frozenset({
     "enabled",

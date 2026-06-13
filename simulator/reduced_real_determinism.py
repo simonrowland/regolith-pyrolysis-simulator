@@ -32,6 +32,7 @@ PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
 PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
+PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
 PHYSICS_BUCKET_LADDER_RUNGS = (
     ("h40", 4.0),
     ("h30", 3.0),
@@ -120,13 +121,22 @@ class PT0DeterminismStore:
         mode: str = "capture",
         *,
         db_path: str | Path | None = None,
+        read_only_base_db_path: str | Path | None = None,
     ) -> None:
         if mode not in {"capture", "replay"}:
             raise ValueError("PT0DeterminismStore mode must be capture or replay")
         self.mode = mode
         self.persistent_path = Path(db_path) if db_path is not None else None
+        self.read_only_base_db_path = (
+            Path(read_only_base_db_path)
+            if read_only_base_db_path is not None
+            else None
+        )
         self.persistent_store = (
-            PT1PersistentEquilibriumStore(self.persistent_path)
+            PT1PersistentEquilibriumStore(
+                self.persistent_path,
+                read_only_base_db_path=self.read_only_base_db_path,
+            )
             if self.persistent_path is not None
             else None
         )
@@ -156,7 +166,11 @@ class PT0DeterminismStore:
         return self.capture_enabled and self.persistent_store is not None
 
     def clone_for_replay(self) -> "PT0DeterminismStore":
-        clone = PT0DeterminismStore("replay", db_path=self.persistent_path)
+        clone = PT0DeterminismStore(
+            "replay",
+            db_path=self.persistent_path,
+            read_only_base_db_path=self.read_only_base_db_path,
+        )
         clone.entries = copy.deepcopy(self.entries)
         clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
         clone.capture_sequence = copy.deepcopy(self.capture_sequence)
@@ -817,8 +831,18 @@ class PT0DeterminismStore:
 class PT1PersistentEquilibriumStore:
     """Content-addressed SQLite store for PT-0 exact reduced-real payloads."""
 
-    def __init__(self, db_path: Path) -> None:
+    def __init__(
+        self,
+        db_path: Path,
+        *,
+        read_only_base_db_path: Path | None = None,
+    ) -> None:
         self.db_path = Path(db_path)
+        self.read_only_base_db_path = (
+            Path(read_only_base_db_path)
+            if read_only_base_db_path is not None
+            else None
+        )
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             self._initialize(conn)
@@ -960,26 +984,35 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_bytes: bytes,
         physics_bucket_hash: str,
     ) -> dict[str, Any] | None:
+        query = f"""
+            SELECT *
+            FROM {{table}}
+            WHERE artifact = ?
+              AND physics_bucket_schema_version = ?
+              AND physics_bucket_sha256 = ?
+              AND replay_scope_sha256 = ?
+            ORDER BY key_hash
+            LIMIT 1
+            """
+        params = (
+            artifact,
+            str(physics_bucket_key.get("schema_version")),
+            physics_bucket_hash,
+            _replay_scope_hash(physics_bucket_key),
+        )
         with self._connect() as conn:
             self._initialize(conn)
             row = conn.execute(
-                f"""
-                SELECT *
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                WHERE artifact = ?
-                  AND physics_bucket_schema_version = ?
-                  AND physics_bucket_sha256 = ?
-                  AND replay_scope_sha256 = ?
-                ORDER BY key_hash
-                LIMIT 1
-                """,
-                (
-                    artifact,
-                    str(physics_bucket_key.get("schema_version")),
-                    physics_bucket_hash,
-                    _replay_scope_hash(physics_bucket_key),
-                ),
+                query.format(table=PT1_EQUILIBRIUM_TABLE),
+                params,
             ).fetchone()
+            if row is None:
+                read_only_table = self._read_only_equilibrium_table(conn)
+                if read_only_table is not None:
+                    row = conn.execute(
+                        query.format(table=read_only_table),
+                        params,
+                    ).fetchone()
             if row is None:
                 return None
             return self._entry_from_physics_bucket_row(
@@ -997,35 +1030,43 @@ class PT1PersistentEquilibriumStore:
         replay_scope_sha256: str,
         exclude_key_hash: str | None = None,
     ) -> list[dict[str, Any]]:
+        query = f"""
+            SELECT key_hash, key_bytes, payload_bytes
+            FROM {{table}}
+            WHERE artifact = ?
+              AND replay_scope_sha256 = ?
+            ORDER BY key_hash
+            """
+        params = (artifact, replay_scope_sha256)
         with self._connect() as conn:
             self._initialize(conn)
-            rows = conn.execute(
-                f"""
-                SELECT key_hash, key_bytes, payload_bytes
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                WHERE artifact = ?
-                  AND replay_scope_sha256 = ?
-                ORDER BY key_hash
-                """,
-                (artifact, replay_scope_sha256),
-            )
             candidates: list[dict[str, Any]] = []
-            for row in rows:
-                row_hash = str(row["key_hash"])
-                if exclude_key_hash is not None and row_hash == exclude_key_hash:
-                    continue
-                row_key_bytes = _sqlite_bytes(row["key_bytes"])
-                row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
-                row_key = json.loads(row_key_bytes.decode("utf-8"))
-                row_payload = json.loads(row_payload_bytes.decode("utf-8"))
-                candidates.append(
-                    {
-                        "artifact": artifact,
-                        "key": copy.deepcopy(dict(row_key)),
-                        "key_hash": row_hash,
-                        "payload": copy.deepcopy(dict(row_payload)),
-                    }
-                )
+            seen_hashes: set[str] = set()
+            tables = [PT1_EQUILIBRIUM_TABLE]
+            read_only_table = self._read_only_equilibrium_table(conn)
+            if read_only_table is not None:
+                tables.append(read_only_table)
+            for table in tables:
+                rows = conn.execute(query.format(table=table), params)
+                for row in rows:
+                    row_hash = str(row["key_hash"])
+                    if exclude_key_hash is not None and row_hash == exclude_key_hash:
+                        continue
+                    if row_hash in seen_hashes:
+                        continue
+                    seen_hashes.add(row_hash)
+                    row_key_bytes = _sqlite_bytes(row["key_bytes"])
+                    row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
+                    row_key = json.loads(row_key_bytes.decode("utf-8"))
+                    row_payload = json.loads(row_payload_bytes.decode("utf-8"))
+                    candidates.append(
+                        {
+                            "artifact": artifact,
+                            "key": copy.deepcopy(dict(row_key)),
+                            "key_hash": row_hash,
+                            "payload": copy.deepcopy(dict(row_payload)),
+                        }
+                    )
             return candidates
 
     def get_by_physics_ladder_bucket(
@@ -1039,49 +1080,85 @@ class PT1PersistentEquilibriumStore:
     ) -> dict[str, Any] | None:
         hash_column = _physics_ladder_hash_column(rung_tag)
         distance_column = _physics_ladder_distance_column(rung_tag)
+        query = f"""
+            SELECT *
+            FROM {{table}}
+            WHERE artifact = ?
+              AND replay_scope_sha256 = ?
+              AND {hash_column} = ?
+            ORDER BY {distance_column} ASC, key_hash ASC
+            """
+        params = (
+            artifact,
+            _replay_scope_hash(rung_key),
+            rung_hash,
+        )
         with self._connect() as conn:
             self._initialize(conn)
-            rows = conn.execute(
-                f"""
-                SELECT *
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                WHERE artifact = ?
-                  AND replay_scope_sha256 = ?
-                  AND {hash_column} = ?
-                ORDER BY {distance_column} ASC, key_hash ASC
-                """,
-                (
-                    artifact,
-                    _replay_scope_hash(rung_key),
-                    rung_hash,
-                ),
-            )
-            for row in rows:
-                entry = self._entry_from_physics_ladder_bucket_row(
-                    row,
-                    artifact=artifact,
-                    rung_tag=rung_tag,
-                    rung_key=rung_key,
-                    rung_hash=rung_hash,
-                )
-                if query_key is not None and _physics_ladder_coarsens_controls(
-                    rung_tag
-                ):
-                    budget = physics_control_rung_error_budget(
-                        query_key,
-                        entry["key"],
-                        rung_tag,
-                        source_payload=entry.get("payload"),
+            tables = [PT1_EQUILIBRIUM_TABLE]
+            read_only_table = self._read_only_equilibrium_table(conn)
+            if read_only_table is not None:
+                tables.append(read_only_table)
+            best_entry: dict[str, Any] | None = None
+            best_sort: tuple[float, str] | None = None
+            for table in tables:
+                rows = conn.execute(query.format(table=table), params)
+                for row in rows:
+                    entry = self._entry_from_physics_ladder_bucket_row(
+                        row,
+                        artifact=artifact,
+                        rung_tag=rung_tag,
+                        rung_key=rung_key,
+                        rung_hash=rung_hash,
                     )
-                    if not bool(budget["accepted"]):
-                        continue
-                return entry
-            return None
+                    if query_key is not None and _physics_ladder_coarsens_controls(
+                        rung_tag
+                    ):
+                        budget = physics_control_rung_error_budget(
+                            query_key,
+                            entry["key"],
+                            rung_tag,
+                            source_payload=entry.get("payload"),
+                        )
+                        if not bool(budget["accepted"]):
+                            continue
+                    row_distance = float(
+                        row[_physics_ladder_distance_column(rung_tag)]
+                    )
+                    sort_key = (row_distance, str(entry["key_hash"]))
+                    if best_sort is None or sort_key < best_sort:
+                        best_sort = sort_key
+                        best_entry = entry
+            return best_entry
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
+        self._attach_read_only_base(conn)
         return conn
+
+    def _attach_read_only_base(self, conn: sqlite3.Connection) -> None:
+        if self.read_only_base_db_path is None or not self.read_only_base_db_path.exists():
+            return
+        uri = self._sqlite_readonly_uri(self.read_only_base_db_path)
+        conn.execute(
+            f"ATTACH DATABASE ? AS {PT1_READ_ONLY_BASE_ALIAS}",
+            (uri,),
+        )
+
+    @staticmethod
+    def _sqlite_readonly_uri(path: Path) -> str:
+        return f"{path.resolve().as_uri()}?mode=ro"
+
+    def _read_only_equilibrium_table(self, conn: sqlite3.Connection) -> str | None:
+        alias = PT1_READ_ONLY_BASE_ALIAS
+        row = conn.execute(
+            "SELECT 1 FROM pragma_database_list WHERE name = ?",
+            (alias,),
+        ).fetchone()
+        if row is None:
+            return None
+        return f"{alias}.{PT1_EQUILIBRIUM_TABLE}"
 
     def _initialize(self, conn: sqlite3.Connection) -> None:
         conn.execute(
@@ -1255,8 +1332,7 @@ class PT1PersistentEquilibriumStore:
         conn: sqlite3.Connection,
         key_hash: str,
     ) -> sqlite3.Row | None:
-        return conn.execute(
-            f"""
+        query = f"""
             SELECT
                 key_hash,
                 artifact,
@@ -1269,9 +1345,20 @@ class PT1PersistentEquilibriumStore:
                 code_version,
                 engine_version,
                 data_digests_json
-            FROM {PT1_EQUILIBRIUM_TABLE}
+            FROM {{table}}
             WHERE key_hash = ?
-            """,
+            """
+        row = conn.execute(
+            query.format(table=PT1_EQUILIBRIUM_TABLE),
+            (key_hash,),
+        ).fetchone()
+        if row is not None:
+            return row
+        read_only_table = self._read_only_equilibrium_table(conn)
+        if read_only_table is None:
+            return None
+        return conn.execute(
+            query.format(table=read_only_table),
             (key_hash,),
         ).fetchone()
 

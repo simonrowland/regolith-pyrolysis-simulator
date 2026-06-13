@@ -1,9 +1,10 @@
 """Epoch-merge-redispatch driver for reduced-real cache grinding.
 
 This is a local orchestrator. It launches one `python -m simulator.optimize`
-study per manifest job, using a fresh per-epoch cache shard seeded from the
-shared base cache. After each time-boxed epoch it merges shard DBs back into the
-base through `scripts.seed_reduced_real_cache.seed_cache`, records the
+study per manifest job, using a fresh per-epoch cache shard that accumulates
+only newly-ground rows while reading the shared base cache read-only for hits.
+After each time-boxed epoch it merges shard DBs back into the base through
+`scripts.seed_reduced_real_cache.seed_cache`, prunes merged shards, records the
 duplication rate, then either redispatches another epoch or switches to one
 final unboxed run when duplication has stayed low.
 
@@ -38,6 +39,7 @@ import os
 import re
 import shutil
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
@@ -564,7 +566,13 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
     for job in pending_jobs(manifest, journal):
         shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
         out_dir = job.out / f"epoch-{next_epoch:04d}"
-        profile, profile_overlay = plan_epoch_profile(job, manifest.path.parent, shard_db, epoch_dir)
+        profile, profile_overlay = plan_epoch_profile(
+            job,
+            manifest.path.parent,
+            shard_db,
+            epoch_dir,
+            base_cache=manifest.base_cache,
+        )
         job_plan = {
             "id": job.id,
             "shard_db": str(shard_db),
@@ -595,6 +603,30 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
         "duplication_expected": config.duplication_expected,
         "jobs": jobs,
     }
+
+
+def verify_base_cache_integrity(base_cache: Path) -> None:
+    con = sqlite3.connect(base_cache)
+    try:
+        row = con.execute("PRAGMA integrity_check").fetchone()
+        if row is None or str(row[0]) != "ok":
+            detail = row[0] if row is not None else "<no result>"
+            raise RuntimeError(
+                f"base cache integrity check failed for {base_cache}: {detail}"
+            )
+    finally:
+        con.close()
+
+
+def prune_merged_shards(shard_paths: Iterable[Path], base_cache: Path) -> list[str]:
+    verify_base_cache_integrity(base_cache)
+    pruned: list[str] = []
+    for path in shard_paths:
+        shard = Path(path)
+        if shard.exists():
+            shard.unlink()
+            pruned.append(str(shard))
+    return pruned
 
 
 def merge_epoch_shards(
@@ -629,17 +661,18 @@ def seed_job_cache(
     *,
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
 ) -> Mapping[str, Any]:
+    del seed_fn
     if shard_db.exists():
         shard_db.unlink()
     shard_db.parent.mkdir(parents=True, exist_ok=True)
-    if base_cache.exists():
-        return seed_fn(shard_db, [base_cache])
     PT1PersistentEquilibriumStore(shard_db)
     return {
         "target": str(shard_db),
         "rows_before": 0,
         "rows_after": 0,
         "inserted_rows": 0,
+        "seed_rows": 0,
+        "read_only_base": str(base_cache) if base_cache.exists() else None,
         "sources": [],
     }
 
@@ -687,6 +720,11 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
         rate = duplication_rate_from_merge(merge_summary)
         epoch_result["merge"] = merge_summary
         epoch_result["dup_rate"] = rate
+        if epoch_result.get("shard_dbs"):
+            epoch_result["pruned_shards"] = prune_merged_shards(
+                [Path(path) for path in epoch_result["shard_dbs"]],
+                manifest.base_cache,
+            )
         journal["dup_rates"] = [*journal.get("dup_rates", []), rate]
         journal.setdefault("epochs", []).append(epoch_result)
         if epoch_result.get("failed_jobs"):
@@ -775,8 +813,14 @@ def run_epoch(
             break
         shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
         seed_summary = seed_job_cache(shard_db, manifest.base_cache)
-        seed_rows = int(seed_summary.get("rows_after", 0))
-        profile_arg = write_epoch_profile(job, manifest.path.parent, shard_db, epoch_dir)
+        seed_rows = int(seed_summary.get("seed_rows", 0))
+        profile_arg = write_epoch_profile(
+            job,
+            manifest.path.parent,
+            shard_db,
+            epoch_dir,
+            base_cache=manifest.base_cache,
+        )
         out_dir = job.out / f"epoch-{epoch_index:04d}"
         command = build_optimizer_command(
             job,
@@ -840,8 +884,21 @@ def run_epoch(
     return result
 
 
-def write_epoch_profile(job: JobSpec, manifest_dir: Path, shard_db: Path, epoch_dir: Path) -> str:
-    profile_arg, profile = plan_epoch_profile(job, manifest_dir, shard_db, epoch_dir)
+def write_epoch_profile(
+    job: JobSpec,
+    manifest_dir: Path,
+    shard_db: Path,
+    epoch_dir: Path,
+    *,
+    base_cache: Path | None = None,
+) -> str:
+    profile_arg, profile = plan_epoch_profile(
+        job,
+        manifest_dir,
+        shard_db,
+        epoch_dir,
+        base_cache=base_cache,
+    )
     if profile is None:
         return profile_arg
     out = Path(profile_arg)
@@ -855,13 +912,20 @@ def plan_epoch_profile(
     manifest_dir: Path,
     shard_db: Path,
     epoch_dir: Path,
+    *,
+    base_cache: Path | None = None,
 ) -> tuple[str, dict[str, Any] | None]:
     profile_path = _resolve_path(job.profile, manifest_dir)
     if not profile_path.exists():
         return job.profile, None
 
     profile = _load_mapping(profile_path)
-    changed = _apply_cache_db(profile, shard_db, job.reduced_real_cache)
+    changed = _apply_cache_db(
+        profile,
+        shard_db,
+        job.reduced_real_cache,
+        base_cache=base_cache,
+    )
     if not changed:
         return str(profile_path), None
 
@@ -1088,18 +1152,36 @@ def _apply_cache_db(
     profile: dict[str, Any],
     shard_db: Path,
     job_cache_config: Mapping[str, Any] | None,
+    *,
+    base_cache: Path | None = None,
 ) -> bool:
     changed = False
     run = profile.get("run")
     if isinstance(run, dict):
-        changed = _apply_cache_to_run(run, shard_db, job_cache_config) or changed
+        changed = (
+            _apply_cache_to_run(
+                run,
+                shard_db,
+                job_cache_config,
+                base_cache=base_cache,
+            )
+            or changed
+        )
     fidelities = profile.get("fidelities")
     if isinstance(fidelities, Mapping):
         for options in fidelities.values():
             if isinstance(options, dict) and (
                 options.get("backend_name") == "cached-real" or "reduced_real_cache" in options
             ):
-                changed = _apply_cache_to_run(options, shard_db, job_cache_config) or changed
+                changed = (
+                    _apply_cache_to_run(
+                        options,
+                        shard_db,
+                        job_cache_config,
+                        base_cache=base_cache,
+                    )
+                    or changed
+                )
     return changed
 
 
@@ -1107,6 +1189,8 @@ def _apply_cache_to_run(
     run_options: dict[str, Any],
     shard_db: Path,
     job_cache_config: Mapping[str, Any] | None,
+    *,
+    base_cache: Path | None = None,
 ) -> bool:
     cache_config = run_options.get("reduced_real_cache")
     if not isinstance(cache_config, Mapping):
@@ -1115,6 +1199,8 @@ def _apply_cache_to_run(
         return False
     updated = dict(cache_config)
     updated["db_path"] = str(shard_db)
+    if base_cache is not None and base_cache.exists():
+        updated["read_only_base_db_path"] = str(base_cache)
     run_options["reduced_real_cache"] = updated
     return True
 
