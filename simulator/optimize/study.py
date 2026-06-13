@@ -551,6 +551,114 @@ def run(
     )
 
 
+def run_certify(
+    profile: str | Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    source_store: str | Path,
+    certify_cache_key: str,
+    out_dir: str | Path | None = None,
+    *,
+    evaluator: EvaluateFn = evaluate,
+    schema: RecipeSchema | None = None,
+) -> StudyResult:
+    """Re-evaluate one stored optimizer result with exact live-fill certification."""
+
+    active_schema = schema or RecipeSchema()
+    config = StudyConfig(
+        profile=profile,
+        feedstock=feedstock,
+        strategy="random",
+        fidelity=fidelity,
+        parallel=1,
+        budget=1,
+        out_dir=out_dir,
+        seed=0,
+    )
+    try:
+        resolved_profile = resolve_profile(
+            config.profile,
+            expected_feedstock=config.feedstock,
+            schema=active_schema,
+        )
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
+            raise
+        resolved_profile = dict(config.profile)
+    definitions = objective_definitions(resolved_profile)
+    _validate_inputs(config, resolved_profile)
+    try:
+        active_constraints = _constraints_for_profile(resolved_profile)
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        active_constraints = None
+    out = _resolve_out_dir(config.out_dir)
+    _prepare_out_dir(out)
+    store = ResultStore(out / "cache.sqlite")
+    source = ResultStore(Path(source_store))
+    stored = source.fetch(certify_cache_key)
+    if stored is None:
+        raise StudyError(f"certify cache_key not found: {certify_cache_key!r}")
+    if stored.eval_spec is None:
+        raise StudyError(f"stored result {certify_cache_key!r} missing eval_spec")
+    if stored.eval_spec.feedstock_id != config.feedstock:
+        raise StudyError(
+            "certify feedstock mismatch: "
+            f"requested {config.feedstock!r}, stored {stored.eval_spec.feedstock_id!r}"
+        )
+    certify_profile = _profile_for_cache_phase(
+        resolved_profile,
+        config.fidelity,
+        cache_tier_ceiling=CERTIFY_CACHE_TIER_CEILING,
+        miss_policy="live-fill",
+    )
+    patch = RecipePatch.from_nested(dict(stored.eval_spec.runtime_campaign_overrides))
+    candidate = Candidate(id=stored.candidate_id, patch=patch)
+    scored = _evaluate_one(
+        candidate,
+        profile=certify_profile,
+        feedstock=config.feedstock,
+        fidelity=config.fidelity,
+        out_dir=out,
+        evaluator=evaluator,
+        schema=active_schema,
+        constraints=active_constraints,
+    )
+    _assert_honest_result(scored, definitions)
+    record = _to_record(candidate, scored, cache_hit=False)
+    store.store(
+        scored.eval_spec,
+        _strip_heavy_result(scored),
+        created_at=datetime.now(UTC).isoformat(),
+    )
+    artifacts = _write_artifacts(
+        out,
+        profile=resolved_profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        definitions=definitions,
+        pareto=(record,),
+        leaderboard=(record,),
+        winner=record,
+        schema=active_schema,
+        failure_counts=MappingProxyType({}),
+    )
+    artifacts["provenance"] = out / "provenance.jsonl"
+    artifacts["store"] = store.path
+    artifacts["certify_source_store"] = str(Path(source_store))
+    artifacts["certify_cache_key"] = certify_cache_key
+    return StudyResult(
+        out_dir=out,
+        store_path=store.path,
+        artifacts=artifacts,
+        records=(record,),
+        leaderboard=(record,),
+        pareto=(record,),
+        winner=record,
+    )
+
+
 @dataclass(frozen=True)
 class _CertificationPassResult:
     leaderboard: tuple[StudyRecord, ...]

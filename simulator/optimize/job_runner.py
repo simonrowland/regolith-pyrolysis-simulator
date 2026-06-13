@@ -42,6 +42,9 @@ class OptimizerJobRequest:
     parallel: int
     seed: int
     profile_arg: str | None = None
+    certify: bool = False
+    source_store_path: str | None = None
+    certify_cache_key: str | None = None
 
 
 class OptimizerJobRunner:
@@ -99,6 +102,9 @@ class OptimizerJobRunner:
                 "parallel": request.parallel,
                 "seed": request.seed,
                 "profile_arg": request.profile_arg or request.profile_id,
+                "certify": bool(request.certify),
+                "source_store_path": request.source_store_path,
+                "certify_cache_key": request.certify_cache_key,
                 "pid": None,
                 "status": STATUS_QUEUED,
                 "created_at": now,
@@ -211,8 +217,6 @@ class OptimizerJobRunner:
             str(meta["feedstock_id"]),
             "--profile",
             str(meta.get("profile_arg") or meta["profile_id"]),
-            "--strategy",
-            str(meta["strategy"]),
             "--fidelity",
             str(meta["fidelity"]),
             "--parallel",
@@ -224,6 +228,18 @@ class OptimizerJobRunner:
             "--seed",
             str(meta["seed"]),
         ]
+        if meta.get("certify"):
+            cmd.extend(
+                [
+                    "--certify",
+                    "--source-store",
+                    str(meta["source_store_path"]),
+                    "--cache-key",
+                    str(meta["certify_cache_key"]),
+                ]
+            )
+        else:
+            cmd.extend(["--strategy", str(meta["strategy"])])
         env = os.environ.copy()
         env["OPTIMIZER_RUNS_DIR"] = str(self.runs_root)
         repo_root = Path(__file__).resolve().parents[2]
@@ -291,6 +307,9 @@ class OptimizerJobRunner:
         normalized.setdefault("profile", normalized.get("profile_id"))
         normalized.setdefault("fidelity", "")
         normalized.setdefault("profile_arg", normalized.get("profile_id"))
+        normalized.setdefault("certify", False)
+        normalized.setdefault("source_store_path", None)
+        normalized.setdefault("certify_cache_key", None)
         normalized.setdefault("pid", None)
         normalized.setdefault("started_at", None)
         normalized.setdefault("completed_at", None)

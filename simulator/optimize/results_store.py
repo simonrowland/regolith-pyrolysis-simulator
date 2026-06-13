@@ -234,10 +234,13 @@ class ResultStore:
 
     def lookup(self, eval_spec: EvalSpec) -> ScoredResult | None:
         key = cache_key(eval_spec)
+        return self.fetch(key)
+
+    def fetch(self, cache_key_value: str) -> ScoredResult | None:
         with self._connect() as conn:
             row = conn.execute(
                 "SELECT * FROM results WHERE cache_key = ?",
-                (key,),
+                (cache_key_value,),
             ).fetchone()
         if row is None:
             return None

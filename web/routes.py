@@ -310,6 +310,154 @@ def _optional_bool(value: Any) -> bool | None:
     return bool(value)
 
 
+_CERTIFIED_CACHE_TIERS = frozenset({'cached_exact', 'live_fill'})
+_ESTIMATED_CACHE_TIERS = frozenset({'cached_physics_bucket', 'cached_interpolated'})
+_LEGACY_EVIDENCE_BACKEND_ALIASES = frozenset({'stub', 'diagnostic_stub'})
+
+
+def _stored_reduced_real_cache_state(
+    run_reference: Mapping[str, Any],
+    result_blob: Mapping[str, Any],
+) -> str | None:
+    for carrier in (run_reference, result_blob):
+        if not isinstance(carrier, Mapping):
+            continue
+        for key in ('cache_state', 'reduced_real_cache_state'):
+            raw = carrier.get(key)
+            if raw is not None and str(raw).strip():
+                return str(raw)
+        per_hour = carrier.get('per_hour_summary')
+        if isinstance(per_hour, list) and per_hour:
+            last = per_hour[-1]
+            if isinstance(last, Mapping):
+                for key in ('reduced_real_cache_state', 'cache_state'):
+                    raw = last.get(key)
+                    if raw is not None and str(raw).strip():
+                        return str(raw)
+    return None
+
+
+def _stored_evidence_class(
+    run_reference: Mapping[str, Any],
+    result_blob: Mapping[str, Any],
+) -> str | None:
+    for carrier in (run_reference, result_blob):
+        if not isinstance(carrier, Mapping):
+            continue
+        raw = carrier.get('evidence_class')
+        if raw is not None and str(raw).strip():
+            return str(raw)
+    return None
+
+
+def _tier_label_title(
+    run_reference: Mapping[str, Any],
+    result_blob: Mapping[str, Any],
+    *,
+    tier: str | None,
+) -> str:
+    parts: list[str] = []
+    if tier:
+        parts.append(f'tier={tier}')
+    for carrier in (run_reference, result_blob):
+        if not isinstance(carrier, Mapping):
+            continue
+        for key in ('cache_rung', 'physics_rung', 'sig_fig_rung', 'rung'):
+            raw = carrier.get(key)
+            if raw is not None:
+                parts.append(f'rung={raw}')
+                break
+        disagreement = carrier.get('neighbor_disagreement')
+        if isinstance(disagreement, Mapping):
+            if disagreement.get('max') is not None:
+                parts.append(f'neighbor_disagreement_max={disagreement["max"]}')
+            elif disagreement.get('p95') is not None:
+                parts.append(f'neighbor_disagreement_p95={disagreement["p95"]}')
+        reduced_real = carrier.get('reduced_real_cache')
+        if isinstance(reduced_real, Mapping):
+            err = reduced_real.get('interpolation_error_estimate')
+            if isinstance(err, Mapping) and err.get('max') is not None:
+                parts.append(f'interpolation_error_max={err["max"]}')
+    return '; '.join(parts) if parts else 'cache tier from stored artifact'
+
+
+def _optimizer_tier_label(
+    run_reference: Mapping[str, Any],
+    result_blob: Mapping[str, Any],
+    *,
+    backend_payload: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    stored_state = _stored_reduced_real_cache_state(run_reference, result_blob)
+    evidence_class = _stored_evidence_class(run_reference, result_blob)
+    backend_name = _mapping_value(run_reference).get('backend_name')
+    if backend_name is None:
+        backend_name = _mapping_value(result_blob).get('backend_name')
+    backend_status = _mapping_value(run_reference).get('backend_status')
+    if backend_status is None:
+        backend_status = _mapping_value(result_blob).get('backend_status')
+    backend_authoritative = _optional_bool(
+        _mapping_value(run_reference).get('backend_authoritative')
+    )
+    if backend_authoritative is None:
+        backend_authoritative = _optional_bool(
+            _mapping_value(result_blob).get('backend_authoritative')
+        )
+    if isinstance(backend_payload, Mapping):
+        backend_status = backend_payload.get('backend_status') or backend_status
+        backend_authoritative = _optional_bool(
+            backend_payload.get('backend_authoritative')
+        )
+        if backend_authoritative is None:
+            backend_authoritative = _optional_bool(
+                backend_payload.get('backend_real_active')
+            )
+        if evidence_class is None:
+            evidence_class = backend_payload.get('evidence_class')
+        if backend_name is None:
+            backend_name = backend_payload.get('backend_name')
+
+    canonical_evidence_class = evidence_class
+    canonical_backend_name = backend_name
+    if (
+        isinstance(canonical_evidence_class, str)
+        and canonical_evidence_class in _LEGACY_EVIDENCE_BACKEND_ALIASES
+    ):
+        canonical_backend_name = canonical_backend_name or canonical_evidence_class
+        canonical_evidence_class = None
+
+    if stored_state is not None:
+        canonical = canonicalize_fidelity_emission(
+            reduced_real_cache_state=stored_state,
+            evidence_class=canonical_evidence_class,
+            backend_name=canonical_backend_name if canonical_evidence_class is None else None,
+            backend_status=backend_status if canonical_evidence_class is None else None,
+        )
+    else:
+        canonical = canonicalize_fidelity_emission(
+            evidence_class=canonical_evidence_class,
+            backend_name=canonical_backend_name,
+            backend_status=backend_status,
+            backend_authoritative=backend_authoritative,
+        )
+    certification_allowed = bool(canonical.get('certification_allowed', False))
+    tier = stored_state or 'unknown'
+    if tier in _CERTIFIED_CACHE_TIERS and certification_allowed:
+        ux_label = 'CERTIFIED'
+    elif tier in _ESTIMATED_CACHE_TIERS:
+        ux_label = 'ESTIMATED'
+    else:
+        ux_label = 'UNVERIFIED'
+
+    return {
+        'tier': tier,
+        'evidence_class': canonical.get('evidence_class') or evidence_class,
+        'ux_label': ux_label,
+        'certification_allowed': certification_allowed,
+        'title': _tier_label_title(run_reference, result_blob, tier=tier),
+        'canonical': canonical,
+    }
+
+
 def _optimizer_backend_payload(
     eval_spec: Mapping[str, Any],
     result_blob: Mapping[str, Any],
@@ -356,6 +504,11 @@ def _optimizer_backend_payload(
     )
     payload = backend_resolution_status(_StoredBackendResolutionCarrier(resolution)).as_payload()
     payload.update(canonical)
+    payload['tier_label'] = _optimizer_tier_label(
+        run_reference,
+        result_blob,
+        backend_payload=payload,
+    )
     return payload
 
 
@@ -401,8 +554,10 @@ def _result_metadata(
         },
         'eval_spec': _eval_spec_summary(eval_spec),
         'backend': _optimizer_backend_payload(eval_spec, result_blob, run_reference),
+        'tier_label': None,
         'notes': _json_value(row['notes'], []),
     }
+    metadata['tier_label'] = metadata['backend'].get('tier_label')
     for key in (
         'product_ledger_kg',
         'product_bins',
@@ -963,6 +1118,72 @@ def _parse_optimizer_job_request(
     ), None
 
 
+def _parse_optimizer_certify_request(
+    payload: Mapping[str, Any],
+) -> tuple[optimizer_job_runner.OptimizerJobRequest | None, str | None]:
+    run_id = str(_payload_value(payload, 'run_id', '') or '')
+    cache_key = str(_payload_value(payload, 'cache_key', '') or '')
+    feedstock_id = str(_payload_value(payload, 'feedstock_id', '') or '')
+    profile_id = str(_payload_value(payload, 'profile_id', '') or '')
+    fidelity = str(_payload_value(payload, 'fidelity', '') or 'fast')
+
+    if not run_id:
+        return None, 'run_id is required'
+    if not cache_key:
+        return None, 'cache_key is required'
+
+    resolved = _optimizer_result_row(run_id, cache_key)
+    if resolved is None:
+        return None, f'optimizer result not found: {run_id}/{cache_key}'
+    _root, run_dir, row = resolved
+
+    stored_feedstock = str(row['feedstock_id'] or '')
+    stored_profile = str(row['profile_id'] or '')
+    stored_fidelity = str(row['fidelity'] or '')
+    if feedstock_id and feedstock_id != stored_feedstock:
+        return None, (
+            f'feedstock_id mismatch: requested {feedstock_id}, stored {stored_feedstock}'
+        )
+    if profile_id and profile_id != stored_profile:
+        return None, (
+            f'profile_id mismatch: requested {profile_id}, stored {stored_profile}'
+        )
+    feedstock_id = feedstock_id or stored_feedstock
+    profile_id = profile_id or stored_profile
+    if fidelity not in OPTIMIZER_JOB_FIDELITIES:
+        fidelity = stored_fidelity if stored_fidelity in OPTIMIZER_JOB_FIDELITIES else 'fast'
+
+    feedstock_profiles = _optimizer_feedstock_profiles_payload()
+    profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
+    feedstocks = feedstock_profiles.get('feedstocks')
+    if not isinstance(feedstocks, Mapping):
+        feedstocks = {}
+    if feedstock_id not in feedstocks:
+        return None, f'unknown feedstock_id: {feedstock_id}'
+    if profile_id not in profile_by_id:
+        return None, f'unknown profile_id: {profile_id}'
+    allowed_profiles = feedstocks.get(feedstock_id)
+    if isinstance(allowed_profiles, list) and profile_id not in allowed_profiles:
+        return None, f'profile_id {profile_id} is not valid for {feedstock_id}'
+
+    profile = profile_by_id[profile_id]
+    profile_arg = str(DATA_DIR / str(profile['relative_path']))
+    source_store_path = str(run_dir / OPTIMIZER_CACHE_NAME)
+    return optimizer_job_runner.OptimizerJobRequest(
+        feedstock_id=feedstock_id,
+        profile_id=profile_id,
+        strategy='random',
+        fidelity=fidelity,
+        budget=1,
+        parallel=1,
+        seed=0,
+        profile_arg=profile_arg,
+        certify=True,
+        source_store_path=source_store_path,
+        certify_cache_key=cache_key,
+    ), None
+
+
 def _optimizer_jobs_context() -> dict[str, Any]:
     jobs = _optimizer_job_runner().list_jobs()
     return {
@@ -1250,6 +1471,8 @@ def _optimizer_result_view(entry: Mapping[str, Any]) -> dict[str, Any]:
     view['version_badge'] = _version_badge(
         _mapping_value(view.get('eval_spec')).get('code_version')
     )
+    backend = _mapping_value(view.get('backend'))
+    view['tier_label'] = view.get('tier_label') or backend.get('tier_label')
     return view
 
 
@@ -1754,6 +1977,27 @@ def optimizer_jobs_api():
         'jobs_dir': str(_optimizer_runs_root() / 'jobs'),
         'jobs': _optimizer_job_runner().list_jobs(),
     })
+
+
+@bp.route('/api/optimizer/certify', methods=['POST'])
+@bp.route('/optimizer/certify', methods=['POST'])
+def optimizer_certify_submit():
+    """Enqueue an exact live-fill certify job for one stored optimizer result."""
+    job_request, error = _parse_optimizer_certify_request(_optimizer_job_payload())
+    if error is not None or job_request is None:
+        if _wants_json_response():
+            return jsonify({'error': error}), 400
+        context = _optimizer_launch_context()
+        context['job_error'] = error
+        return render_template('partials/optimizer_jobs.html', **context), 400
+
+    job = _optimizer_job_runner().submit(job_request)
+    if _wants_json_response():
+        return jsonify({'job': job}), 202
+    return render_template(
+        'partials/optimizer_job_detail_panel.html',
+        job=job,
+    ), 202
 
 
 @bp.route('/api/optimizer/jobs', methods=['POST'])

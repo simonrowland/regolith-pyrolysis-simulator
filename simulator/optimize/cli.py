@@ -17,6 +17,7 @@ from simulator.optimize.study import (
     VALID_FIDELITIES,
     StudyError,
     run,
+    run_certify,
 )
 
 
@@ -28,22 +29,36 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         profile = _resolve_profile_arg(args.profile, parser)
-        two_phase_certify = None
-        if args.two_phase_certify:
-            two_phase_certify = {"enabled": True}
-            if args.certify_top_k is not None:
-                two_phase_certify["top_k"] = args.certify_top_k
-        result = run(
-            profile=profile,
-            feedstock=args.feedstock,
-            strategy=args.strategy,
-            fidelity=args.fidelity,
-            parallel=args.parallel,
-            budget=args.budget,
-            out_dir=args.out,
-            seed=args.seed,
-            two_phase_certify=two_phase_certify,
-        )
+        if not args.certify and args.strategy is None:
+            parser.error("--strategy is required unless --certify is set")
+        if args.certify:
+            if args.source_store is None or args.cache_key is None:
+                parser.error("--certify requires --source-store and --cache-key")
+            result = run_certify(
+                profile=profile,
+                feedstock=args.feedstock,
+                fidelity=args.fidelity,
+                source_store=args.source_store,
+                certify_cache_key=args.cache_key,
+                out_dir=args.out,
+            )
+        else:
+            two_phase_certify = None
+            if args.two_phase_certify:
+                two_phase_certify = {"enabled": True}
+                if args.certify_top_k is not None:
+                    two_phase_certify["top_k"] = args.certify_top_k
+            result = run(
+                profile=profile,
+                feedstock=args.feedstock,
+                strategy=args.strategy,
+                fidelity=args.fidelity,
+                parallel=args.parallel,
+                budget=args.budget,
+                out_dir=args.out,
+                seed=args.seed,
+                two_phase_certify=two_phase_certify,
+            )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         _write_job_status(
             args.out,
@@ -77,9 +92,8 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--strategy",
-        required=True,
         choices=tuple(sorted(STRATEGY_CLASS_NAMES)),
-        help="optimizer strategy",
+        help="optimizer strategy (not used with --certify)",
     )
     parser.add_argument(
         "--fidelity",
@@ -101,6 +115,22 @@ def _parser() -> argparse.ArgumentParser:
         type=_positive_int,
         default=None,
         help="top-K candidates to re-certify when --two-phase-certify is set",
+    )
+    parser.add_argument(
+        "--certify",
+        action="store_true",
+        help="force exact live-fill certification of one stored result",
+    )
+    parser.add_argument(
+        "--source-store",
+        type=Path,
+        default=None,
+        help="source results cache.sqlite for --certify",
+    )
+    parser.add_argument(
+        "--cache-key",
+        default=None,
+        help="stored result cache_key to certify with --certify",
     )
     return parser
 

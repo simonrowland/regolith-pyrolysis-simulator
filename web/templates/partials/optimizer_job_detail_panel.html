@@ -7,7 +7,13 @@
         <tr><td>Status</td><td>{{ job.status }}</td></tr>
         <tr><td>Feedstock</td><td>{{ job.feedstock_id }}</td></tr>
         <tr><td>Profile</td><td>{{ job.profile_id }}</td></tr>
+        <tr><td>Mode</td><td>{{ "certify (live-fill)" if job.certify else job.strategy }}</td></tr>
+        {% if job.certify %}
+        <tr><td>Source store</td><td>{{ job.source_store_path }}</td></tr>
+        <tr><td>Cache key</td><td>{{ job.certify_cache_key }}</td></tr>
+        {% else %}
         <tr><td>Strategy</td><td>{{ job.strategy }}</td></tr>
+        {% endif %}
         <tr><td>Fidelity</td><td>{{ job.fidelity }}</td></tr>
         <tr><td>Budget</td><td>{{ job.budget }}</td></tr>
         <tr><td>Parallel</td><td>{{ job.parallel }}</td></tr>

@@ -32,12 +32,35 @@
                     </span>
                 </td>
             </tr>
+            <tr>
+                <td>Cache tier</td>
+                <td>
+                    {% set tier = result.tier_label or {} %}
+                    <span class="backend-badge {{ 'backend-badge-ok' if tier.ux_label == 'CERTIFIED' else ('backend-badge-stub' if tier.ux_label == 'ESTIMATED' else 'backend-badge-unknown') }}"
+                          title="{{ tier.title or 'cache tier from stored artifact' }}">
+                        {{ tier.ux_label or 'UNVERIFIED' }} / {{ tier.tier or 'unknown' }}
+                    </span>
+                </td>
+            </tr>
         </table>
         <div class="control-buttons">
             <a class="btn btn-primary"
                href="{{ url_for('web.optimizer_result_yaml', run_id=result.run_id, cache_key=result.cache_key) }}">Download YAML</a>
+            <form method="post"
+                  action="{{ url_for('web.optimizer_certify_submit') }}"
+                  hx-post="{{ url_for('web.optimizer_certify_submit') }}"
+                  hx-target="#optimizer-certify-job"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="run_id" value="{{ result.run_id }}">
+                <input type="hidden" name="cache_key" value="{{ result.cache_key }}">
+                <input type="hidden" name="feedstock_id" value="{{ result.feedstock_id }}">
+                <input type="hidden" name="profile_id" value="{{ result.profile_id }}">
+                <input type="hidden" name="fidelity" value="{{ result.fidelity }}">
+                <button class="btn" type="submit">COMPUTE (exact certify)</button>
+            </form>
             <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
         </div>
+        <div id="optimizer-certify-job"></div>
     </div>
 
     <div class="section-card">
