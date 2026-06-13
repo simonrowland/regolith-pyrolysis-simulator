@@ -153,6 +153,86 @@ def test_duplication_rate_with_zero_seed_rows() -> None:
     assert epoch_grind.duplication_rate_from_merge(summary) == pytest.approx(0.75)
 
 
+def test_seed_rows_zero_merge_summary_accounting() -> None:
+    assert epoch_grind.duplication_rate_from_merge(
+        {
+            "inserted_rows": 2,
+            "sources": [
+                {
+                    "source": "shard-a.sqlite",
+                    "source_rows": 5,
+                    "seed_rows": 0,
+                    "inserted_rows": 2,
+                }
+            ],
+        }
+    ) == pytest.approx(0.6)
+    assert epoch_grind.duplication_rate_from_merge(
+        {
+            "inserted_rows": 0,
+            "sources": [{"source_rows": 0, "seed_rows": 0, "inserted_rows": 0}],
+        }
+    ) == pytest.approx(0.0)
+    with pytest.raises(ValueError, match=r"merge accounting is corrupt"):
+        epoch_grind.duplication_rate_from_merge(
+            {
+                "inserted_rows": 0,
+                "sources": [
+                    {
+                        "source": "shard-a.sqlite",
+                        "source_rows": -1,
+                        "seed_rows": 0,
+                        "inserted_rows": 0,
+                    }
+                ],
+            }
+        )
+
+
+def _filesystem_is_case_insensitive() -> bool:
+    probe = Path(os.environ.get("TMPDIR", "/tmp")) / "case_probe_guard"
+    try:
+        probe.write_text("x", encoding="utf-8")
+        alt = probe.parent / probe.name.swapcase()
+        if not alt.exists():
+            return False
+        return os.stat(probe).st_ino == os.stat(alt).st_ino
+    finally:
+        probe.unlink(missing_ok=True)
+
+
+def test_same_path_base_attach_raises(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite"
+    with pytest.raises(ValueError, match=r"must not equal db_path"):
+        PT1PersistentEquilibriumStore(db_path, read_only_base_db_path=db_path)
+
+
+@pytest.mark.skipif(
+    not _filesystem_is_case_insensitive(),
+    reason="case-sensitive filesystem",
+)
+def test_case_variant_same_path_base_attach_raises(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite"
+    alt_base = tmp_path / "Cache.sqlite"
+    db_path.touch()
+    with pytest.raises(ValueError, match=r"must not equal db_path"):
+        PT1PersistentEquilibriumStore(db_path, read_only_base_db_path=alt_base)
+
+
+def test_missing_base_path_logs_warning(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    shard = tmp_path / "shard.sqlite"
+    missing_base = tmp_path / "missing-base.sqlite"
+
+    with caplog.at_level("WARNING"):
+        PT1PersistentEquilibriumStore(shard, read_only_base_db_path=missing_base)
+
+    assert any(
+        "read_only_base_db_path does not exist" in record.message
+        and str(missing_base) in record.message
+        for record in caplog.records
+    )
+
+
 def test_prune_merged_shards_after_integrity_check(tmp_path: Path) -> None:
     base = tmp_path / "base.sqlite"
     shard_a = tmp_path / "shard-a.sqlite"
@@ -161,13 +241,50 @@ def test_prune_merged_shards_after_integrity_check(tmp_path: Path) -> None:
     _put_cache_row(shard_a, tag="a")
     _put_cache_row(shard_b, tag="b")
 
-    pruned = epoch_grind.prune_merged_shards([shard_a, shard_b], base)
+    merge_summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard_a, shard_b],
+        seed_rows_by_source={str(shard_a): 0, str(shard_b): 0},
+    )
+    pruned = epoch_grind.prune_merged_shards(
+        [shard_a, shard_b],
+        base,
+        merge_summary=merge_summary,
+    )
 
     assert pruned == [str(shard_a), str(shard_b)]
     assert not shard_a.exists()
     assert not shard_b.exists()
     row = sqlite3.connect(base).execute("PRAGMA integrity_check").fetchone()
     assert row is not None and row[0] == "ok"
+
+
+def test_prune_skips_shard_on_partial_merge(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    _put_cache_row(shard, tag="unmerged")
+
+    partial_summary = {
+        "inserted_rows": 0,
+        "sources": [
+            {
+                "source": str(shard),
+                "source_rows": 1,
+                "seed_rows": 0,
+                "inserted_rows": 0,
+            }
+        ],
+    }
+    pruned = epoch_grind.prune_merged_shards(
+        [shard],
+        base,
+        merge_summary=partial_summary,
+    )
+
+    assert pruned == []
+    assert shard.exists()
+    assert payload_count(base) == 0
 
 
 def test_merge_epoch_shards_and_prune_integration(tmp_path: Path) -> None:
@@ -181,7 +298,11 @@ def test_merge_epoch_shards_and_prune_integration(tmp_path: Path) -> None:
         [shard],
         seed_rows_by_source={str(shard): 0},
     )
-    pruned = epoch_grind.prune_merged_shards([shard], base)
+    pruned = epoch_grind.prune_merged_shards(
+        [shard],
+        base,
+        merge_summary=summary,
+    )
 
     assert summary["inserted_rows"] == 1
     assert payload_count(base) == 1

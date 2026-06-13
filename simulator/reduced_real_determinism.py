@@ -10,7 +10,9 @@ import copy
 import dataclasses
 import hashlib
 import json
+import logging
 import math
+import os
 import sqlite3
 import subprocess
 from collections import Counter
@@ -25,6 +27,8 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
+
+_LOGGER = logging.getLogger(__name__)
 
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
@@ -828,6 +832,21 @@ class PT0DeterminismStore:
         )
 
 
+def _paths_refer_to_same_file(left: Path, right: Path) -> bool:
+    left_resolved = left.resolve()
+    right_resolved = right.resolve()
+    if left_resolved.exists() and right_resolved.exists():
+        left_stat = os.stat(left_resolved)
+        right_stat = os.stat(right_resolved)
+        return (left_stat.st_dev, left_stat.st_ino) == (
+            right_stat.st_dev,
+            right_stat.st_ino,
+        )
+    return os.path.normcase(str(left_resolved)) == os.path.normcase(
+        str(right_resolved)
+    )
+
+
 class PT1PersistentEquilibriumStore:
     """Content-addressed SQLite store for PT-0 exact reduced-real payloads."""
 
@@ -1138,7 +1157,22 @@ class PT1PersistentEquilibriumStore:
         return conn
 
     def _attach_read_only_base(self, conn: sqlite3.Connection) -> None:
-        if self.read_only_base_db_path is None or not self.read_only_base_db_path.exists():
+        if self.read_only_base_db_path is None:
+            return
+        if _paths_refer_to_same_file(
+            self.read_only_base_db_path,
+            self.db_path,
+        ):
+            raise ValueError(
+                "read_only_base_db_path must not equal db_path; attaching base-as-itself "
+                "would route unqualified INSERTs into the read-only base"
+            )
+        if not self.read_only_base_db_path.exists():
+            _LOGGER.warning(
+                "read_only_base_db_path does not exist: %s; "
+                "epoch will miss base-cache hits",
+                self.read_only_base_db_path,
+            )
             return
         uri = self._sqlite_readonly_uri(self.read_only_base_db_path)
         conn.execute(

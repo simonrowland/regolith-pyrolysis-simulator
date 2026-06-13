@@ -35,6 +35,7 @@ import argparse
 from collections.abc import Iterable as RuntimeIterable
 import hashlib
 import json
+import logging
 import os
 import re
 import shutil
@@ -58,8 +59,13 @@ except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
 from scripts.seed_reduced_real_cache import seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
-from simulator.reduced_real_determinism import PT1PersistentEquilibriumStore
+from simulator.reduced_real_determinism import (
+    PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentEquilibriumStore,
+)
 
+
+_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_TIME_BOX_SECONDS = 2 * 60 * 60
 DEFAULT_DUP_THRESHOLD = 0.02
@@ -618,14 +624,106 @@ def verify_base_cache_integrity(base_cache: Path) -> None:
         con.close()
 
 
-def prune_merged_shards(shard_paths: Iterable[Path], base_cache: Path) -> list[str]:
+def _merge_source_for_shard(
+    shard: Path,
+    merge_summary: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    shard_resolved = shard.resolve()
+    for source in merge_summary.get("sources", []):
+        if not isinstance(source, Mapping) or source.get("skipped") == "target":
+            continue
+        source_path = Path(str(source.get("source", "")))
+        if source_path.resolve() == shard_resolved:
+            return source
+    return None
+
+
+def _shard_keys_missing_from_base(shard: Path, base_cache: Path) -> int:
+    if not shard.exists() or not base_cache.exists():
+        return 0
+    shard_conn = sqlite3.connect(shard)
+    base_conn = sqlite3.connect(base_cache)
+    try:
+        shard_hashes = [
+            str(row[0])
+            for row in shard_conn.execute(
+                f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+            ).fetchall()
+        ]
+        if not shard_hashes:
+            return 0
+        placeholders = ",".join("?" * len(shard_hashes))
+        found = int(
+            base_conn.execute(
+                f"""
+                SELECT count(*)
+                FROM {PT1_EQUILIBRIUM_TABLE}
+                WHERE key_hash IN ({placeholders})
+                """,
+                tuple(shard_hashes),
+            ).fetchone()[0]
+        )
+        return len(shard_hashes) - found
+    finally:
+        shard_conn.close()
+        base_conn.close()
+
+
+def _shard_merge_row_complete(
+    shard: Path,
+    base_cache: Path,
+    source_entry: Mapping[str, Any],
+) -> tuple[bool, str]:
+    source_rows = int(source_entry.get("source_rows", 0))
+    seed_rows = int(source_entry.get("seed_rows", 0))
+    inserted_rows = int(source_entry.get("inserted_rows", 0))
+    produced_rows = source_rows - seed_rows
+    if produced_rows < 0:
+        return False, (
+            f"corrupt merge accounting for {shard}: source_rows={source_rows} "
+            f"< seed_rows={seed_rows}"
+        )
+    if inserted_rows > produced_rows:
+        return False, (
+            f"merge over-count for {shard}: inserted_rows={inserted_rows} "
+            f"> produced_rows={produced_rows}"
+        )
+    missing_keys = _shard_keys_missing_from_base(shard, base_cache)
+    if missing_keys > 0:
+        return False, (
+            f"{missing_keys} row(s) from {shard} missing in {base_cache} after merge "
+            f"(inserted_rows={inserted_rows}, produced_rows={produced_rows})"
+        )
+    return True, ""
+
+
+def prune_merged_shards(
+    shard_paths: Iterable[Path],
+    base_cache: Path,
+    *,
+    merge_summary: Mapping[str, Any] | None = None,
+) -> list[str]:
     verify_base_cache_integrity(base_cache)
     pruned: list[str] = []
     for path in shard_paths:
         shard = Path(path)
-        if shard.exists():
-            shard.unlink()
-            pruned.append(str(shard))
+        if not shard.exists():
+            continue
+        if merge_summary is not None:
+            source_entry = _merge_source_for_shard(shard, merge_summary)
+            if source_entry is None:
+                _LOGGER.warning(
+                    "prune_merged_shards skipped shard: %s: no merge source entry; "
+                    "keeping shard for re-merge",
+                    shard,
+                )
+                continue
+            complete, reason = _shard_merge_row_complete(shard, base_cache, source_entry)
+            if not complete:
+                _LOGGER.warning("prune_merged_shards skipped shard: %s", reason)
+                continue
+        shard.unlink()
+        pruned.append(str(shard))
     return pruned
 
 
@@ -724,6 +822,7 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
             epoch_result["pruned_shards"] = prune_merged_shards(
                 [Path(path) for path in epoch_result["shard_dbs"]],
                 manifest.base_cache,
+                merge_summary=merge_summary,
             )
         journal["dup_rates"] = [*journal.get("dup_rates", []), rate]
         journal.setdefault("epochs", []).append(epoch_result)
