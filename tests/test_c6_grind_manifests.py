@@ -16,6 +16,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 GRIND_DIR = REPO_ROOT / "docs-private" / "grind"
 MOON_MANIFEST = GRIND_DIR / "manifest-c6-moon-studio1.json"
 MARS_MANIFEST = GRIND_DIR / "manifest-c6-mars-stype-studio2.json"
+STYPE_MANIFEST = GRIND_DIR / "manifest-c6-stype-studio2.json"
+LAUNCH_SCRIPT = GRIND_DIR / "launch-c6-studio.sh"
 BUILD_SCRIPT = REPO_ROOT / "scripts" / "build_c6_manifests.py"
 EPOCH_GRIND = REPO_ROOT / "scripts" / "epoch_grind.py"
 PROFILE_DIR = GRIND_DIR / "profiles"
@@ -63,6 +65,12 @@ def moon_manifest() -> dict:
 def mars_manifest() -> dict:
     assert MARS_MANIFEST.is_file(), f"missing {MARS_MANIFEST}"
     return _load_manifest(MARS_MANIFEST)
+
+
+@pytest.fixture(scope="module")
+def stype_manifest() -> dict:
+    assert STYPE_MANIFEST.is_file(), f"missing {STYPE_MANIFEST}"
+    return _load_manifest(STYPE_MANIFEST)
 
 
 def test_manifest_schema_and_profiles(moon_manifest: dict, mars_manifest: dict) -> None:
@@ -114,6 +122,46 @@ def test_multiple_seeds_per_cell(moon_manifest: dict, mars_manifest: dict) -> No
         assert len(seeds) == len(sample_jobs)
         assert len(outs) == len(sample_jobs)
         assert len(ids) == len(sample_jobs)
+
+
+def test_stype_manifest_s_type_only_filter(
+    mars_manifest: dict,
+    stype_manifest: dict,
+) -> None:
+    source_stype_jobs = [
+        job for job in mars_manifest["jobs"] if job["feedstock"] == "s_type_asteroid_silicate"
+    ]
+    assert source_stype_jobs, "superset manifest has no s_type_asteroid_silicate jobs"
+
+    stype_jobs = stype_manifest["jobs"]
+    assert stype_jobs, "stype manifest has no jobs"
+    assert len(stype_jobs) == len(source_stype_jobs)
+
+    feedstocks = {job["feedstock"] for job in stype_jobs}
+    assert feedstocks == {"s_type_asteroid_silicate"}
+
+    source_ids = {job["id"] for job in source_stype_jobs}
+    assert {job["id"] for job in stype_jobs} == source_ids
+
+    for key in ("description", "base_cache", "work_dir", "fidelity", "parallel"):
+        assert key in stype_manifest
+        assert stype_manifest[key] == mars_manifest[key]
+
+
+def test_stype_manifest_schema_and_profiles(stype_manifest: dict) -> None:
+    jobs = stype_manifest["jobs"]
+    assert jobs
+    for job in jobs:
+        missing = REQUIRED_JOB_FIELDS - set(job.keys())
+        assert not missing, f"stype job {job.get('id')} missing fields: {sorted(missing)}"
+        profile_path = GRIND_DIR / job["profile"]
+        assert profile_path.is_file(), f"missing profile for {job['id']}: {profile_path}"
+
+
+def test_launch_studio2_defaults_to_stype_manifest() -> None:
+    text = LAUNCH_SCRIPT.read_text(encoding="utf-8")
+    assert "manifest-c6-stype-studio2.json" in text
+    assert 'MANIFEST_DEFAULT="$REPO/docs-private/grind/manifest-c6-moon-studio1.json"' in text
 
 
 def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> None:
