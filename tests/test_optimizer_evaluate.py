@@ -9,13 +9,14 @@ import pytest
 from engines.alphamelts import AlphaMELTSProvider
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
-from simulator.backends import BackendUnavailableError
+from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
     ProposalRejected,
     ProviderRegistry,
 )
+from simulator.config import load_config_bundle
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
     UnknownFidelityVocabularyTokenError,
@@ -40,8 +41,8 @@ from simulator.optimize.results_store import ResultStore
 from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
-from simulator.runner import RunnerError
-from simulator.session import SimSession
+from simulator.runner import RunnerError, _force_builtin_vapor_pressure
+from simulator.session import SimSession, SimSessionConfig
 from simulator.state import CampaignPhase, HourSnapshot
 
 
@@ -704,24 +705,39 @@ def test_missing_knudsen_flow_state_is_named_and_serializable(tmp_path) -> None:
 
 
 def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) -> None:
-    constraints = PhysicsConstraintSet(
-        active_gates=("extraction_completeness",),
-        target_species=("Cr",),
-        residual_species_by_target={"Cr": ("Cr2O3", "Cr")},
-    )
-    result = evaluate(
+    green_profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": ["extraction_completeness"],
+            "target_species": ["CrO2"],
+        },
+    }
+    green = evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
         "fast",
-        profile=PROFILE,
-        constraints=constraints,
-        executor=FakeExecutor(
-            _execution(
-                trace=_trace(),
-                backend_status="ok",
-                backend_authoritative=True,
-            )
-        ),
+        profile=green_profile,
+        executor=RunExecutor(),
+    )
+    green_margin = green.feasibility_margins["extraction_completeness"]
+    green_target = green.run_reference.product_summary["extraction_completeness"][
+        "targets"
+    ]["CrO2"]
+    assert green.run_reference.trace is not None
+    assert green_target["status"] == "reported"
+    assert "denominator_target_equiv_mol=" in green_margin.detail
+    assert "not-applicable" not in green_margin.detail
+
+    poison_profile = {
+        **green_profile,
+        "feedstock": "lunar_highlands_lhs1",
+    }
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_highlands_lhs1",
+        "fast",
+        profile=poison_profile,
+        executor=RunExecutor(),
     )
 
     assert not result.feasible
@@ -730,8 +746,13 @@ def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) 
     assert not margin.feasible
     assert margin.margin == -math.inf
     assert margin.observed == math.inf
-    assert margin.detail == "not-applicable: zero input basis for Cr"
+    assert margin.detail == "not-applicable: zero input basis for CrO2"
     assert result.failing_gates == ("extraction_completeness",)
+    target = result.run_reference.product_summary["extraction_completeness"][
+        "targets"
+    ]["CrO2"]
+    assert target["status"] == "insufficient-evidence"
+    assert target["reason"] == "not-applicable: zero input basis for CrO2"
 
     assert result.eval_spec is not None
     store = ResultStore(
@@ -1221,6 +1242,33 @@ def test_mass_balance_zero_input_nonzero_output_fires_named_gate() -> None:
     per_hour = getattr(executor.execution, "per_hour")[0]
     assert per_hour["mass_balance_pct"] is None
     assert per_hour["mass_balance_error_category"] == "zero_input_basis_breach"
+
+
+def test_zero_mass_direct_run_executor_has_no_nonzero_output_input_seam() -> None:
+    bundle = load_config_bundle()
+    execution = RunExecutor().execute(
+        SimSessionConfig(
+            feedstock_id="lunar_mare_low_ti",
+            feedstocks=bundle.feedstocks,
+            setpoints=bundle.setpoints,
+            vapor_pressures=bundle.vapor_pressures,
+            campaign="C0",
+            backend_name="stub",
+            backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+            hours=1,
+            mass_kg=0.0,
+            force_builtin_vapor_pressure=_force_builtin_vapor_pressure,
+        )
+    )
+
+    assert execution.status == "ok"
+    assert execution.snapshots
+    snapshot = execution.snapshots[0]
+    assert snapshot.mass_in_kg == pytest.approx(0.0)
+    assert snapshot.mass_out_kg == pytest.approx(0.0)
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
+    assert not hasattr(snapshot, "mass_balance_error_category")
+    assert execution.per_hour[0]["mass_balance_pct"] == pytest.approx(0.0)
 
 
 def test_mass_balance_zero_input_zero_output_is_vacuously_closed_for_gate() -> None:

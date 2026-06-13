@@ -21,6 +21,7 @@ from simulator.runner import PyrolysisRun
 from simulator.state import (
     CondensationTrain,
     EvaporationFlux,
+    MeltState,
     PipeSegment,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
@@ -719,70 +720,45 @@ def test_provider_empty_credit_path_is_named_noop() -> None:
 
 
 def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
-    raw = {
-        "id": "geometry_sensitivity",
-        "scale": "gram_lab",
-        "equipment_sizing": "lab_fixed_geometry",
-        "surfaces": [
-            {
-                "id": "holder",
-                "role": "holder",
-                "area_m2": 0.001,
-                "temperature_C": 25.0,
-                "view_factor_from_melt": 0.9,
-                "line_of_sight_to_melt": True,
-                "source_class": "assumption_with_sensitivity_marker",
-                "sensitivity_marker": "holder_view_factor_sweep",
-                "extraction_note": "Synthetic sensitivity fixture for R5.6 allocation",
-            },
-            {
-                "id": "condenser",
-                "role": "condenser",
-                "area_m2": 0.001,
-                "temperature_C": 25.0,
-                "view_factor_from_melt": 0.1,
-                "line_of_sight_to_melt": True,
-                "source_class": "assumption_with_sensitivity_marker",
-                "sensitivity_marker": "condenser_view_factor_sweep",
-                "extraction_note": "Synthetic sensitivity fixture for R5.6 allocation",
-            },
-        ],
-    }
+    raw = robinot_geometry_fixture()
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_lab_geometry(parse_lab_geometry(raw))
-    supply = {segment.name: 0.01 for segment in model.pipe_segments}
 
-    base = model._wall_deposit_candidates_by_segment_kg(
-        species="SiO",
-        rate_kg_hr=0.01,
-        T_cond_C=900.0,
-        melt_temperature_C=1700.0,
-        supply_by_segment_kg=supply,
-    )
-    raw["surfaces"][0]["view_factor_from_melt"] = 0.1
-    raw["surfaces"][1]["view_factor_from_melt"] = 0.9
-    model.configure_lab_geometry(parse_lab_geometry(raw))
-    flipped = model._wall_deposit_candidates_by_segment_kg(
-        species="SiO",
-        rate_kg_hr=0.01,
-        T_cond_C=900.0,
-        melt_temperature_C=1700.0,
-        supply_by_segment_kg=supply,
-    )
+    base = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    ).wall_deposit_by_segment_species
+    assert base["condenser"]["SiO"] > base["holder"]["SiO"]
 
-    assert base["holder"] > base["condenser"]
-    assert flipped["condenser"] > flipped["holder"]
+    low_view_factor = copy.deepcopy(raw)
+    for surface in low_view_factor["surfaces"]:
+        if surface["id"] == "condenser":
+            surface["view_factor_from_melt"] = 0.01
+    model.configure_lab_geometry(parse_lab_geometry(low_view_factor))
+    weakened = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    ).wall_deposit_by_segment_species
+    assert weakened["condenser"]["SiO"] < weakened["holder"]["SiO"]
 
-    raw["surfaces"][1]["line_of_sight_to_melt"] = False
-    model.configure_lab_geometry(parse_lab_geometry(raw))
-    blocked = model._wall_deposit_candidates_by_segment_kg(
-        species="SiO",
-        rate_kg_hr=0.01,
-        T_cond_C=900.0,
-        melt_temperature_C=1700.0,
-        supply_by_segment_kg=supply,
-    )
-    assert blocked.get("condenser", 0.0) == pytest.approx(0.0)
+    blocked_los = copy.deepcopy(raw)
+    for surface in blocked_los["surfaces"]:
+        if surface["id"] == "condenser":
+            surface["line_of_sight_to_melt"] = False
+    model.configure_lab_geometry(parse_lab_geometry(blocked_los))
+    blocked = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    ).wall_deposit_by_segment_species
+    assert "condenser" not in blocked
+
+    invalid_view_factor = copy.deepcopy(raw)
+    invalid_view_factor["surfaces"][2]["view_factor_from_melt"] = 1.1
+    with pytest.raises(
+        LabGeometryError,
+        match="invalid_lab_geometry_view_factor",
+    ):
+        parse_lab_geometry(invalid_view_factor)
 
 
 def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:

@@ -913,6 +913,22 @@ def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -
         ("pressure_unit_pa", "lab_schedule_chamber_pressure_mbar_unit_mismatch"),
         ("temperature_unit_k", "lab_schedule_melt_temperature_C_unit_mismatch"),
         (
+            "temperature_requires_two_points",
+            "lab_schedule_melt_temperature_C_requires_two_points",
+        ),
+        (
+            "pressure_endpoint_mismatch",
+            "lab_schedule_chamber_pressure_mbar_time_arrays_must_start_at_0_end_at_duration",
+        ),
+        (
+            "measured_window_negative",
+            "lab_schedule_window_semantics_measured_window_negative",
+        ),
+        (
+            "cooldown_overflow",
+            "lab_schedule_window_semantics_cooldown_exceeds_duration",
+        ),
+        (
             "windows_consistency",
             "lab_schedule_experiment_windows_conflict_with_window_semantics",
         ),
@@ -957,6 +973,26 @@ def test_lab_schedule_profile_fail_loud_rules_are_named(
         schedule["chamber_pressure_mbar"][0]["unit"] = "Pa"
     elif mutation == "temperature_unit_k":
         schedule["melt_temperature_C"][0]["unit"] = "K"
+    elif mutation == "temperature_requires_two_points":
+        schedule["melt_temperature_C"] = schedule["melt_temperature_C"][:1]
+    elif mutation == "pressure_endpoint_mismatch":
+        schedule["chamber_pressure_mbar"][-1]["t_h"] = 0.9
+    elif mutation == "measured_window_negative":
+        schedule["window_semantics"] = {
+            "preheat_h": 0.0,
+            "measured_window_start_h": 0.8,
+            "measured_window_end_h": 0.7,
+            "cooldown_h": 0.0,
+            "deposit_sample_basis": "hot",
+        }
+    elif mutation == "cooldown_overflow":
+        schedule["window_semantics"] = {
+            "preheat_h": 0.0,
+            "measured_window_start_h": 0.0,
+            "measured_window_end_h": 0.9,
+            "cooldown_h": 0.2,
+            "deposit_sample_basis": "after_cooldown",
+        }
     elif mutation == "windows_consistency":
         schedule["experiment_windows"] = {
             "heating": {"start_h": 0.0, "end_h": 1.0},
