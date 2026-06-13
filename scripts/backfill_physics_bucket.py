@@ -22,9 +22,12 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
+    PHYSICS_BUCKET_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
+    physics_ladder_bucket_distance_from_replay_key,
 )
 
 
@@ -34,6 +37,10 @@ PHYSICS_COLUMNS = {
     "physics_bucket_sha256": "TEXT",
     "replay_scope_sha256": "TEXT",
     "physics_key_bytes": "BLOB",
+    "physics_bucket_h40_sha256": "TEXT",
+    "physics_bucket_h40_distance": "REAL",
+    "physics_bucket_h30_sha256": "TEXT",
+    "physics_bucket_h30_distance": "REAL",
 }
 
 
@@ -43,6 +50,10 @@ class PhysicsBucketValues:
     physics_bucket_sha256: str
     replay_scope_sha256: str
     physics_key_bytes: bytes
+    physics_bucket_h40_sha256: str
+    physics_bucket_h40_distance: float
+    physics_bucket_h30_sha256: str
+    physics_bucket_h30_distance: float
 
 
 @dataclass
@@ -51,6 +62,8 @@ class BackfillStats:
     dry_run: bool
     total_rows: int = 0
     distinct_physics_bucket_sha256: int = 0
+    distinct_physics_bucket_h40_sha256: int = 0
+    distinct_physics_bucket_h30_sha256: int = 0
     rows_already_backfilled: int = 0
     rows_needing_backfill: int = 0
     rows_updated: int = 0
@@ -99,6 +112,10 @@ def run_backfill(
             columns = _table_columns(conn)
 
         distinct_physics_hashes: set[str] = set()
+        distinct_ladder_hashes: dict[str, set[str]] = {
+            rung_tag: set()
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS
+        }
         cursor = conn.execute(_select_rows_sql(columns))
         while True:
             rows = cursor.fetchmany(batch_size)
@@ -115,6 +132,8 @@ def run_backfill(
                         f"invalid replay key bytes for row {row['key_hash']}"
                     ) from None
                 distinct_physics_hashes.add(values.physics_bucket_sha256)
+                distinct_ladder_hashes["h40"].add(values.physics_bucket_h40_sha256)
+                distinct_ladder_hashes["h30"].add(values.physics_bucket_h30_sha256)
                 state = _backfill_state(row, values)
                 if state == "conflict":
                     stats.conflicts += 1
@@ -133,6 +152,10 @@ def run_backfill(
                             values.physics_bucket_sha256,
                             values.replay_scope_sha256,
                             sqlite3.Binary(values.physics_key_bytes),
+                            values.physics_bucket_h40_sha256,
+                            values.physics_bucket_h40_distance,
+                            values.physics_bucket_h30_sha256,
+                            values.physics_bucket_h30_distance,
                             row["key_hash"],
                         )
                     )
@@ -143,19 +166,33 @@ def run_backfill(
                     SET physics_bucket_schema_version = ?,
                         physics_bucket_sha256 = ?,
                         replay_scope_sha256 = ?,
-                        physics_key_bytes = ?
+                        physics_key_bytes = ?,
+                        physics_bucket_h40_sha256 = ?,
+                        physics_bucket_h40_distance = ?,
+                        physics_bucket_h30_sha256 = ?,
+                        physics_bucket_h30_distance = ?
                     WHERE key_hash = ?
                       AND (
                           physics_bucket_schema_version IS NULL
                           OR physics_bucket_sha256 IS NULL
                           OR replay_scope_sha256 IS NULL
                           OR physics_key_bytes IS NULL
+                          OR physics_bucket_h40_sha256 IS NULL
+                          OR physics_bucket_h40_distance IS NULL
+                          OR physics_bucket_h30_sha256 IS NULL
+                          OR physics_bucket_h30_distance IS NULL
                       )
                     """,
                     updates,
                 )
                 stats.rows_updated += int(update_cursor.rowcount)
         stats.distinct_physics_bucket_sha256 = len(distinct_physics_hashes)
+        stats.distinct_physics_bucket_h40_sha256 = len(
+            distinct_ladder_hashes["h40"]
+        )
+        stats.distinct_physics_bucket_h30_sha256 = len(
+            distinct_ladder_hashes["h30"]
+        )
     return stats
 
 
@@ -199,6 +236,19 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
         )
         """
     )
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+        conn.execute(
+            f"""
+            CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_{rung_tag}
+            ON {PT1_EQUILIBRIUM_TABLE}(
+                artifact,
+                replay_scope_sha256,
+                physics_bucket_{rung_tag}_sha256,
+                physics_bucket_{rung_tag}_distance,
+                key_hash
+            )
+            """
+        )
 
 
 def _select_rows_sql(columns: set[str]) -> str:
@@ -223,6 +273,19 @@ def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
     physics_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_key_bytes = canonical_json_bytes(physics_key)
     replay_scope = physics_key.get("replay_scope", {})
+    ladder_values = {}
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            key,
+            rung_tag,
+        )
+        ladder_values[rung_tag] = {
+            "sha256": _sha256(canonical_json_bytes(rung_key)),
+            "distance": physics_ladder_bucket_distance_from_replay_key(
+                key,
+                rung_tag,
+            ),
+        }
     return PhysicsBucketValues(
         schema_version=str(
             physics_key.get("schema_version", PHYSICS_BUCKET_SCHEMA_VERSION)
@@ -230,6 +293,10 @@ def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
         physics_bucket_sha256=_sha256(physics_key_bytes),
         replay_scope_sha256=_sha256(canonical_json_bytes(replay_scope)),
         physics_key_bytes=physics_key_bytes,
+        physics_bucket_h40_sha256=str(ladder_values["h40"]["sha256"]),
+        physics_bucket_h40_distance=float(ladder_values["h40"]["distance"]),
+        physics_bucket_h30_sha256=str(ladder_values["h30"]["sha256"]),
+        physics_bucket_h30_distance=float(ladder_values["h30"]["distance"]),
     )
 
 
@@ -239,12 +306,20 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
         "physics_bucket_sha256": row["physics_bucket_sha256"],
         "replay_scope_sha256": row["replay_scope_sha256"],
         "physics_key_bytes": row["physics_key_bytes"],
+        "physics_bucket_h40_sha256": row["physics_bucket_h40_sha256"],
+        "physics_bucket_h40_distance": row["physics_bucket_h40_distance"],
+        "physics_bucket_h30_sha256": row["physics_bucket_h30_sha256"],
+        "physics_bucket_h30_distance": row["physics_bucket_h30_distance"],
     }
     expected = {
         "physics_bucket_schema_version": values.schema_version,
         "physics_bucket_sha256": values.physics_bucket_sha256,
         "replay_scope_sha256": values.replay_scope_sha256,
         "physics_key_bytes": values.physics_key_bytes,
+        "physics_bucket_h40_sha256": values.physics_bucket_h40_sha256,
+        "physics_bucket_h40_distance": values.physics_bucket_h40_distance,
+        "physics_bucket_h30_sha256": values.physics_bucket_h30_sha256,
+        "physics_bucket_h30_distance": values.physics_bucket_h30_distance,
     }
     complete = True
     for name, expected_value in expected.items():
@@ -254,6 +329,8 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
             continue
         if name == "physics_key_bytes":
             actual_value = _blob_bytes(actual_value)
+        if name.endswith("_distance"):
+            actual_value = float(actual_value)
         if actual_value != expected_value:
             return "conflict"
     return "complete" if complete else "missing"
@@ -291,6 +368,14 @@ def _print_stats(stats: BackfillStats, *, json_output: bool) -> None:
     print(f"mode={'dry-run' if data['dry_run'] else 'backfill'}")
     print(f"rows_total={data['total_rows']}")
     print(f"distinct_physics_bucket_sha256={data['distinct_physics_bucket_sha256']}")
+    print(
+        "distinct_physics_bucket_h40_sha256="
+        f"{data['distinct_physics_bucket_h40_sha256']}"
+    )
+    print(
+        "distinct_physics_bucket_h30_sha256="
+        f"{data['distinct_physics_bucket_h30_sha256']}"
+    )
     print(f"collapse={data['collapse']}")
     print(f"reuse_fraction={data['reuse_fraction']:.6f}")
     print(f"rows_already_backfilled={data['rows_already_backfilled']}")

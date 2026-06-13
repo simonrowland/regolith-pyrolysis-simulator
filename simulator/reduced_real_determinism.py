@@ -31,6 +31,10 @@ PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
 PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
+PHYSICS_BUCKET_LADDER_RUNGS = (
+    ("h40", 4.0),
+    ("h30", 3.0),
+)
 CACHE_STATES = (
     "cached_exact",
     "cached_physics_bucket",
@@ -559,9 +563,28 @@ class PT0DeterminismStore:
         key_hash = _sha256(key_bytes)
         entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
         cache_state = "cached_exact"
+        physics_bucket_hash: str | None = None
+        physics_bucket_rung: str | None = None
         if entry is None and physics_bucket_key is not None:
             entry = self._entry_for_physics_bucket(artifact, physics_bucket_key)
             cache_state = "cached_physics_bucket"
+            physics_bucket_hash = _sha256(canonical_json_bytes(physics_bucket_key))
+        if entry is None:
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+                rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                    key,
+                    rung_tag,
+                )
+                entry = self._entry_for_physics_ladder_bucket(
+                    artifact,
+                    rung_tag,
+                    rung_key,
+                )
+                if entry is not None:
+                    cache_state = "cached_physics_bucket"
+                    physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
+                    physics_bucket_rung = rung_tag
+                    break
         if entry is None:
             return None
         replay_event = {
@@ -571,9 +594,9 @@ class PT0DeterminismStore:
             "cache_state": cache_state,
         }
         if cache_state == "cached_physics_bucket" and physics_bucket_key is not None:
-            replay_event["physics_bucket_hash"] = _sha256(
-                canonical_json_bytes(physics_bucket_key)
-            )
+            replay_event["physics_bucket_hash"] = physics_bucket_hash
+            if physics_bucket_rung is not None:
+                replay_event["physics_bucket_rung"] = physics_bucket_rung
             replay_event["source_key_hash"] = str(entry["key_hash"])
         self.replay_sequence.append(replay_event)
         self.hits += 1
@@ -631,6 +654,26 @@ class PT0DeterminismStore:
         self.cache_events.append(
             {"artifact": str(artifact), "cache_state": str(cache_state)}
         )
+
+    def _entry_for_physics_ladder_bucket(
+        self,
+        artifact: str,
+        rung_tag: str,
+        rung_key: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        rung_bytes = canonical_json_bytes(rung_key)
+        rung_hash = _sha256(rung_bytes)
+        if self.persistent_store is None:
+            return None
+        entry = self.persistent_store.get_by_physics_ladder_bucket(
+            artifact=artifact,
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+        )
+        if entry is not None:
+            self.entries[str(entry["key_hash"])] = copy.deepcopy(entry)
+        return entry
 
     def _verify_entry(
         self,
@@ -703,6 +746,7 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
+        ladder_values = _physics_ladder_values_from_replay_key(key)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -727,6 +771,7 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_key=physics_bucket_key,
                     physics_bucket_bytes=physics_bucket_bytes,
                     physics_bucket_hash=physics_bucket_hash,
+                    ladder_values=ladder_values,
                 )
                 return
             conn.execute(
@@ -747,9 +792,13 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_sha256,
                     replay_scope_sha256,
                     physics_key_bytes,
+                    physics_bucket_h40_sha256,
+                    physics_bucket_h40_distance,
+                    physics_bucket_h30_sha256,
+                    physics_bucket_h30_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -767,6 +816,10 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
                     sqlite3.Binary(physics_bucket_bytes),
+                    ladder_values["h40"]["sha256"],
+                    ladder_values["h40"]["distance"],
+                    ladder_values["h30"]["sha256"],
+                    ladder_values["h30"]["distance"],
                     datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     _git_dirty(),
                 ),
@@ -831,6 +884,44 @@ class PT1PersistentEquilibriumStore:
                 physics_bucket_hash=physics_bucket_hash,
             )
 
+    def get_by_physics_ladder_bucket(
+        self,
+        *,
+        artifact: str,
+        rung_tag: str,
+        rung_key: Mapping[str, Any],
+        rung_hash: str,
+    ) -> dict[str, Any] | None:
+        hash_column = _physics_ladder_hash_column(rung_tag)
+        distance_column = _physics_ladder_distance_column(rung_tag)
+        with self._connect() as conn:
+            self._initialize(conn)
+            row = conn.execute(
+                f"""
+                SELECT *
+                FROM {PT1_EQUILIBRIUM_TABLE}
+                WHERE artifact = ?
+                  AND replay_scope_sha256 = ?
+                  AND {hash_column} = ?
+                ORDER BY {distance_column} ASC, key_hash ASC
+                LIMIT 1
+                """,
+                (
+                    artifact,
+                    _replay_scope_hash(rung_key),
+                    rung_hash,
+                ),
+            ).fetchone()
+            if row is None:
+                return None
+            return self._entry_from_physics_ladder_bucket_row(
+                row,
+                artifact=artifact,
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+            )
+
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
@@ -863,6 +954,10 @@ class PT1PersistentEquilibriumStore:
                 physics_bucket_sha256 TEXT,
                 replay_scope_sha256 TEXT,
                 physics_key_bytes BLOB,
+                physics_bucket_h40_sha256 TEXT,
+                physics_bucket_h40_distance REAL,
+                physics_bucket_h30_sha256 TEXT,
+                physics_bucket_h30_distance REAL,
                 created_at TEXT NOT NULL,
                 git_dirty INTEGER NOT NULL
             )
@@ -886,6 +981,21 @@ class PT1PersistentEquilibriumStore:
             )
             """
         )
+        for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+            hash_column = _physics_ladder_hash_column(rung_tag)
+            distance_column = _physics_ladder_distance_column(rung_tag)
+            conn.execute(
+                f"""
+                CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_{rung_tag}
+                ON {PT1_EQUILIBRIUM_TABLE}(
+                    artifact,
+                    replay_scope_sha256,
+                    {hash_column},
+                    {distance_column},
+                    key_hash
+                )
+                """
+            )
         metadata = conn.execute(
             f"SELECT value FROM {PT1_METADATA_TABLE} WHERE key = ?",
             ("store_schema_version",),
@@ -913,6 +1023,10 @@ class PT1PersistentEquilibriumStore:
             "physics_bucket_sha256": "TEXT",
             "replay_scope_sha256": "TEXT",
             "physics_key_bytes": "BLOB",
+            "physics_bucket_h40_sha256": "TEXT",
+            "physics_bucket_h40_distance": "REAL",
+            "physics_bucket_h30_sha256": "TEXT",
+            "physics_bucket_h30_distance": "REAL",
         }
         for name, column_type in columns.items():
             if name not in existing:
@@ -929,6 +1043,7 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_key: Mapping[str, Any],
         physics_bucket_bytes: bytes,
         physics_bucket_hash: str,
+        ladder_values: Mapping[str, Mapping[str, Any]],
     ) -> None:
         conn.execute(
             f"""
@@ -936,15 +1051,27 @@ class PT1PersistentEquilibriumStore:
             SET physics_bucket_schema_version = ?,
                 physics_bucket_sha256 = ?,
                 replay_scope_sha256 = ?,
-                physics_key_bytes = ?
+                physics_key_bytes = ?,
+                physics_bucket_h40_sha256 = ?,
+                physics_bucket_h40_distance = ?,
+                physics_bucket_h30_sha256 = ?,
+                physics_bucket_h30_distance = ?
             WHERE key_hash = ?
-              AND physics_bucket_sha256 IS NULL
+              AND (
+                  physics_bucket_sha256 IS NULL
+                  OR physics_bucket_h40_sha256 IS NULL
+                  OR physics_bucket_h30_sha256 IS NULL
+              )
             """,
             (
                 str(physics_bucket_key.get("schema_version")),
                 physics_bucket_hash,
                 _replay_scope_hash(physics_bucket_key),
                 sqlite3.Binary(physics_bucket_bytes),
+                ladder_values["h40"]["sha256"],
+                ladder_values["h40"]["distance"],
+                ladder_values["h30"]["sha256"],
+                ladder_values["h30"]["distance"],
                 key_hash,
             ),
         )
@@ -1090,6 +1217,54 @@ class PT1PersistentEquilibriumStore:
             key_hash=str(row["key_hash"]),
         )
 
+    def _entry_from_physics_ladder_bucket_row(
+        self,
+        row: sqlite3.Row,
+        *,
+        artifact: str,
+        rung_tag: str,
+        rung_key: Mapping[str, Any],
+        rung_hash: str,
+    ) -> dict[str, Any]:
+        if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
+            )
+        if row["replay_scope_sha256"] != _replay_scope_hash(rung_key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
+            )
+        row_distance = row[_physics_ladder_distance_column(rung_tag)]
+        if row_distance is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            )
+        row_key_bytes = _sqlite_bytes(row["key_bytes"])
+        row_key = json.loads(row_key_bytes.decode("utf-8"))
+        row_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            row_key,
+            rung_tag,
+        )
+        if _sha256(canonical_json_bytes(row_rung_key)) != rung_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce {rung_tag} hash: {rung_hash}"
+            )
+        expected_distance = physics_ladder_bucket_distance_from_replay_key(
+            row_key,
+            rung_tag,
+        )
+        if float(row_distance) != expected_distance:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
+            )
+        return self._entry_from_row(
+            row,
+            artifact=artifact,
+            key=row_key,
+            key_bytes=row_key_bytes,
+            key_hash=str(row["key_hash"]),
+        )
+
 
 def canonical_replay_key(
     sim: Any,
@@ -1226,6 +1401,75 @@ def canonical_physics_bucket_key_from_replay_key(
         },
         "replay_scope": replay_scope,
     }
+
+
+def canonical_physics_ladder_bucket_key_from_replay_key(
+    key: Mapping[str, Any],
+    rung_tag: str,
+) -> dict[str, Any]:
+    sig_figs = _physics_ladder_sig_figs(rung_tag)
+    bucket = canonical_physics_bucket_key_from_replay_key(key)
+    physics_bucket = copy.deepcopy(dict(bucket["physics_bucket"]))
+    controls = dict(physics_bucket.get("controls", {}) or {})
+    controls["T_K"] = _sigfig_snap(controls.get("T_K"), sig_figs)
+    physics_bucket["controls"] = controls
+    physics_bucket["composition_mol_fraction"] = [
+        [str(species), _sigfig_snap(float(fraction), sig_figs)]
+        for species, fraction in _composition_items(
+            physics_bucket.get("composition_mol_fraction", [])
+        )
+    ]
+    physics_bucket["precision_rung"] = {
+        "tag": rung_tag,
+        "composition_mol_fraction_sig_figs": sig_figs,
+        "T_K_sig_figs": sig_figs,
+        "controls": "c1-exact-pressure-redox-sulfur-namespace",
+    }
+    return {
+        "schema_version": bucket["schema_version"],
+        "physics_bucket": physics_bucket,
+        "replay_scope": copy.deepcopy(dict(bucket["replay_scope"])),
+    }
+
+
+def physics_ladder_bucket_distance_from_replay_key(
+    key: Mapping[str, Any],
+    rung_tag: str,
+) -> float:
+    sig_figs = _physics_ladder_sig_figs(rung_tag)
+    exact_composition = {
+        species: float(fraction)
+        for species, fraction in _composition_items(
+            key.get("composition_mol_fraction", [])
+        )
+    }
+    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(key, rung_tag)
+    rung_bucket = rung_key.get("physics_bucket", {})
+    if not isinstance(rung_bucket, Mapping):
+        rung_bucket = {}
+    snapped_composition = _composition_items(
+        rung_bucket.get("composition_mol_fraction", [])
+    )
+    distance = 0.0
+    for species, snapped_fraction in snapped_composition:
+        exact_fraction = exact_composition.get(species, 0.0)
+        distance += _normalized_sigfig_distance(
+            exact_fraction,
+            float(snapped_fraction),
+            sig_figs,
+        )
+    controls = key.get("controls", {})
+    if not isinstance(controls, Mapping):
+        controls = {}
+    rung_controls = rung_bucket.get("controls", {})
+    if not isinstance(rung_controls, Mapping):
+        rung_controls = {}
+    distance += _normalized_sigfig_distance(
+        float(controls.get("T_K", 0.0) or 0.0),
+        float(rung_controls.get("T_K", 0.0) or 0.0),
+        sig_figs,
+    )
+    return float(round(distance, 15))
 
 
 def validate_reduced_real_equilibrium_record_key(
@@ -1802,6 +2046,54 @@ def _replay_scope_hash(physics_bucket_key: Mapping[str, Any]) -> str:
     return _digest(physics_bucket_key.get("replay_scope", {}))
 
 
+def _physics_ladder_values_from_replay_key(
+    key: Mapping[str, Any],
+) -> dict[str, dict[str, float | str]]:
+    values: dict[str, dict[str, float | str]] = {}
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            key,
+            rung_tag,
+        )
+        values[rung_tag] = {
+            "sha256": _sha256(canonical_json_bytes(rung_key)),
+            "distance": physics_ladder_bucket_distance_from_replay_key(
+                key,
+                rung_tag,
+            ),
+        }
+    return values
+
+
+def _physics_ladder_sig_figs(rung_tag: str) -> float:
+    for candidate_tag, sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+        if rung_tag == candidate_tag:
+            return float(sig_figs)
+    raise ValueError(f"unknown physics bucket precision rung: {rung_tag!r}")
+
+
+def _physics_ladder_hash_column(rung_tag: str) -> str:
+    _physics_ladder_sig_figs(rung_tag)
+    return f"physics_bucket_{rung_tag}_sha256"
+
+
+def _physics_ladder_distance_column(rung_tag: str) -> str:
+    _physics_ladder_sig_figs(rung_tag)
+    return f"physics_bucket_{rung_tag}_distance"
+
+
+def _composition_items(value: Any) -> list[tuple[str, float]]:
+    items: list[tuple[str, float]] = []
+    for item in value or []:
+        if isinstance(item, Mapping):
+            species = item.get("species")
+            fraction = item.get("mol_fraction")
+        else:
+            species, fraction = item
+        items.append((str(species), float(fraction)))
+    return sorted(items)
+
+
 @lru_cache(maxsize=1)
 def _source_module_digest() -> dict[str, Any]:
     root = _repo_root()
@@ -2029,6 +2321,44 @@ def _sigfig(value: float | None, sig_figs: int) -> float | None:
         return 0.0
     digits = sig_figs - int(math.floor(math.log10(abs(number)))) - 1
     return round(number, digits)
+
+
+def _sigfig_quantum(value: float, sig_figs: float) -> float:
+    number = abs(float(value))
+    if number == 0.0:
+        return 10.0 ** (1.0 - float(sig_figs))
+    return 10.0 ** (math.floor(math.log10(number)) + 1.0 - float(sig_figs))
+
+
+def _sigfig_snap(value: Any, sig_figs: float) -> float | None:
+    if value is None:
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    if number == 0.0:
+        return 0.0
+    quantum = _sigfig_quantum(number, sig_figs)
+    snapped = round(number / quantum) * quantum
+    if snapped == 0.0:
+        return 0.0
+    digits = max(
+        0,
+        int(math.ceil(float(sig_figs) - math.floor(math.log10(abs(snapped))) - 1)),
+    )
+    return round(snapped, digits)
+
+
+def _normalized_sigfig_distance(
+    exact_value: float,
+    snapped_center: float,
+    sig_figs: float,
+) -> float:
+    quantum = _sigfig_quantum(exact_value if exact_value != 0.0 else snapped_center, sig_figs)
+    if quantum == 0.0:
+        return 0.0
+    delta = (float(exact_value) - float(snapped_center)) / quantum
+    return delta * delta
 
 
 def _diff_top_fields(left: Mapping[str, Any], right: Mapping[str, Any]) -> list[str]:

@@ -37,6 +37,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
 
     assert dry.total_rows == 3
     assert dry.distinct_physics_bucket_sha256 == 2
+    assert dry.distinct_physics_bucket_h40_sha256 == 2
+    assert dry.distinct_physics_bucket_h30_sha256 == 2
     assert dry.rows_needing_backfill == 3
     assert dry.rows_updated == 0
     assert _physics_columns(db_path) == set()
@@ -45,6 +47,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
 
     assert real.total_rows == 3
     assert real.distinct_physics_bucket_sha256 == 2
+    assert real.distinct_physics_bucket_h40_sha256 == 2
+    assert real.distinct_physics_bucket_h30_sha256 == 2
     assert real.rows_updated == 3
     assert real.rows_already_backfilled == 0
     assert _exact_columns(db_path) == exact_before
@@ -55,6 +59,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
 
     assert second.total_rows == 3
     assert second.distinct_physics_bucket_sha256 == 2
+    assert second.distinct_physics_bucket_h40_sha256 == 2
+    assert second.distinct_physics_bucket_h30_sha256 == 2
     assert second.rows_updated == 0
     assert second.rows_already_backfilled == 3
     assert _exact_columns(db_path) == exact_before
@@ -192,15 +198,16 @@ def _exact_columns(db_path: Path) -> list[tuple]:
 
 
 def _null_physics_column_count(db_path: Path) -> int:
+    null_predicate = " OR ".join(
+        f"{column} IS NULL"
+        for column in backfill.PHYSICS_COLUMNS
+    )
     with sqlite3.connect(db_path) as conn:
         (count,) = conn.execute(
             f"""
             SELECT COUNT(*)
             FROM {rrd.PT1_EQUILIBRIUM_TABLE}
-            WHERE physics_bucket_schema_version IS NULL
-               OR physics_bucket_sha256 IS NULL
-               OR replay_scope_sha256 IS NULL
-               OR physics_key_bytes IS NULL
+            WHERE {null_predicate}
             """
         ).fetchone()
         return int(count)

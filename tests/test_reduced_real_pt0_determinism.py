@@ -318,6 +318,62 @@ def _physics_bucket_hash(key: dict) -> str:
     return _key_hash(canonical_physics_bucket_key_from_replay_key(key))
 
 
+def _physics_ladder_hash(key: dict, rung_tag: str) -> str:
+    return _key_hash(rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, rung_tag))
+
+
+def _c3a_ladder_key(
+    label: str,
+    *,
+    feo_fraction: float,
+    temperature_K: float,
+) -> dict:
+    key = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-cache-c3a",
+            engine_version="alpha-v1",
+        )
+    )
+    key["code_version"] = f"test-{label}"
+    key["backend"] = {
+        "backend_name": "AlphaMELTSBackend",
+        "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
+        "backend_version": "alpha-v1",
+    }
+    key["composition_mol_fraction"] = [
+        ["FeO", feo_fraction],
+        ["SiO2", 1.0 - feo_fraction],
+    ]
+    key["controls"]["T_K"] = temperature_K
+    return key
+
+
+def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
+    payload = {"equilibrium_result": {"status": "ok"}, "label": label}
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    rrd.PT1PersistentEquilibriumStore(db_path).put(
+        artifact=str(key["artifact"]),
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
+def _lookup_c3a_payload(db_path: Path, key: dict) -> tuple[dict, PT0DeterminismStore]:
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    payload = store._lookup_optional(
+        str(key["artifact"]),
+        key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
+    )
+    assert payload is not None
+    return payload, store
+
+
 def _real_magemin_available() -> bool:
     backend = MAGEMinBackend()
     backend.initialize({"python_bridge": "subprocess"})
@@ -482,6 +538,142 @@ def test_pt2_physics_bucket_keeps_sulfur_input_without_stage0_digest() -> None:
     history_changed = copy.deepcopy(sulfur_key)
     history_changed["sulfur_side"]["stage0_inventory_digest"] = "history-b"
     assert _physics_bucket_hash(history_changed) == _physics_bucket_hash(sulfur_key)
+
+
+def test_pt2_physics_ladder_snaps_composition_and_temperature_only() -> None:
+    key = _c3a_ladder_key(
+        "snap",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    c1 = canonical_physics_bucket_key_from_replay_key(key)
+    h40 = rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, "h40")
+    h30 = rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, "h30")
+
+    assert h40["physics_bucket"]["composition_mol_fraction"] == [
+        ["FeO", 0.1235],
+        ["SiO2", 0.8765],
+    ]
+    assert h40["physics_bucket"]["controls"]["T_K"] == 1235.0
+    assert h30["physics_bucket"]["composition_mol_fraction"] == [
+        ["FeO", 0.123],
+        ["SiO2", 0.877],
+    ]
+    assert h30["physics_bucket"]["controls"]["T_K"] == 1230.0
+    for rung in (h40, h30):
+        assert rung["replay_scope"] == c1["replay_scope"]
+        assert rung["physics_bucket"]["controls"]["pressure_bar"] == c1[
+            "physics_bucket"
+        ]["controls"]["pressure_bar"]
+        assert rung["physics_bucket"]["controls"]["log_fO2"] == c1[
+            "physics_bucket"
+        ]["controls"]["log_fO2"]
+        assert rung["physics_bucket"]["controls"]["pO2_bar"] == c1[
+            "physics_bucket"
+        ]["controls"]["pO2_bar"]
+        assert rung["physics_bucket"]["precision_rung"]["tag"] in {"h40", "h30"}
+
+
+def test_pt2_ladder_walk_forward_uses_finest_matching_rung(
+    tmp_path: Path,
+) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.123446,
+        temperature_K=1234.46,
+    )
+    h40_key = _c3a_ladder_key(
+        "h40-row",
+        feo_fraction=0.123444,
+        temperature_K=1234.44,
+    )
+    h30_key = _c3a_ladder_key(
+        "h30-row",
+        feo_fraction=0.1231,
+        temperature_K=1231.0,
+    )
+
+    assert _physics_bucket_hash(query_key) != _physics_bucket_hash(h40_key)
+    assert _physics_ladder_hash(query_key, "h40") == _physics_ladder_hash(
+        h40_key,
+        "h40",
+    )
+    assert _physics_ladder_hash(query_key, "h40") != _physics_ladder_hash(
+        h30_key,
+        "h40",
+    )
+    assert _physics_ladder_hash(query_key, "h30") == _physics_ladder_hash(
+        h30_key,
+        "h30",
+    )
+
+    db_path = tmp_path / "ladder-finest.sqlite"
+    _put_c3a_payload(db_path, h30_key, "h30")
+    _put_c3a_payload(db_path, h40_key, "h40")
+
+    payload, store = _lookup_c3a_payload(db_path, query_key)
+
+    assert payload["label"] == "h40"
+    assert store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
+    assert store.replay_sequence[-1]["physics_bucket_rung"] == "h40"
+
+    db_path = tmp_path / "ladder-coarse.sqlite"
+    _put_c3a_payload(db_path, h30_key, "h30")
+
+    payload, store = _lookup_c3a_payload(db_path, query_key)
+
+    assert payload["label"] == "h30"
+    assert store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
+    assert store.replay_sequence[-1]["physics_bucket_rung"] == "h30"
+
+
+def test_pt2_ladder_tiebreak_is_insertion_independent(tmp_path: Path) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.12342,
+        temperature_K=1234.2,
+    )
+    near_center = _c3a_ladder_key(
+        "near-center",
+        feo_fraction=0.123401,
+        temperature_K=1234.01,
+    )
+    far_center = _c3a_ladder_key(
+        "far-center",
+        feo_fraction=0.123449,
+        temperature_K=1234.49,
+    )
+    labels = []
+    for index, rows in enumerate(
+        ((near_center, far_center), (far_center, near_center))
+    ):
+        db_path = tmp_path / f"ladder-tiebreak-{index}.sqlite"
+        for row in rows:
+            _put_c3a_payload(db_path, row, str(row["code_version"]))
+        payload, store = _lookup_c3a_payload(db_path, query_key)
+        labels.append(payload["label"])
+        assert store.replay_sequence[-1]["physics_bucket_rung"] == "h40"
+
+    assert labels == ["test-near-center", "test-near-center"]
+
+
+def test_pt2_ladder_columns_are_nullable_additive(tmp_path: Path) -> None:
+    db_path = tmp_path / "pt1-schema.sqlite"
+    rrd.PT1PersistentEquilibriumStore(db_path)
+    with sqlite3.connect(db_path) as conn:
+        column_flags = {
+            row[1]: row[3]
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+
+    for column in (
+        "physics_bucket_h40_sha256",
+        "physics_bucket_h40_distance",
+        "physics_bucket_h30_sha256",
+        "physics_bucket_h30_distance",
+    ):
+        assert column in column_flags
+        assert column_flags[column] == 0
 
 
 def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -> None:
