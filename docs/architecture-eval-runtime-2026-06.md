@@ -181,6 +181,27 @@ Read-heavy `cached-real` evals remain safe; write contention is the risk during 
 
 ---
 
+## Lab Geometry Scope (REC-W0-05)
+
+W0-04 added the gram-lab exposed-melt-area path: when
+`lab_geometry.scale == gram_lab`, the lab geometry sample's
+`exposed_melt_area_m2` can flow to the run's effective
+`melt_surface_area_m2` for Robinot-style lab diagnostics and result-scope
+metadata. Runs without that gram-lab gate keep the industrial/default
+`melt_surface_area_m2` of `0.2 m2`; REC-W0-05 does not change that default.
+
+Gram-lab exposed melt area and industrial pot geometry are separate concepts.
+The gram-lab value is a lab diagnostic for a small exposed sample surface.
+Industrial pot geometry is the production area model for full-scale pot or
+vessel behavior; it is not inferred from the gram-lab sample field.
+
+Any future industrial-area runtime behavior is a separate owner-gated chunk. It
+is not part of the Robinot remediation, is not authorized by REC-W0-04 or
+REC-W0-05, and must not be wired into runtime behavior or hidden behind this
+spec.
+
+---
+
 ## Verification gates (G9.7 acceptance)
 
 | Test | Gate |
