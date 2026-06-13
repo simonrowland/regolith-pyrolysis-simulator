@@ -26,6 +26,7 @@ from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
 
+
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
 PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
 PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
@@ -615,7 +616,10 @@ class PT0DeterminismStore:
                     physics_bucket_rung = rung_tag
                     break
         if entry is None:
-            return None
+            interpolated = self._lookup_interpolated(artifact, key)
+            if interpolated is None:
+                return None
+            return interpolated
         replay_event = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -692,6 +696,49 @@ class PT0DeterminismStore:
         self.cache_events.append(
             {"artifact": str(artifact), "cache_state": str(cache_state)}
         )
+
+    def _lookup_interpolated(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        from simulator.reduced_real_cache_interpolation import (
+            attempt_cached_interpolation,
+            replay_scope_for_interpolation,
+        )
+
+        if self.persistent_store is None:
+            return None
+        key_bytes = canonical_json_bytes(key)
+        key_hash = _sha256(key_bytes)
+        candidates = self.persistent_store.list_interpolation_candidates(
+            artifact=artifact,
+            replay_scope_sha256=replay_scope_for_interpolation(key),
+            exclude_key_hash=key_hash,
+        )
+        for candidate in candidates:
+            self.entries[str(candidate["key_hash"])] = copy.deepcopy(candidate)
+        attempt = attempt_cached_interpolation(key, candidates)
+        if attempt is None:
+            return None
+        replay_event = {
+            "artifact": artifact,
+            "key": copy.deepcopy(dict(key)),
+            "hash": key_hash,
+            "cache_state": "cached_interpolated",
+            "interpolation_neighbor_key_hashes": [
+                str(neighbor.get("key_hash", ""))
+                for neighbor in attempt["neighbors"]
+            ],
+            "interpolation_mode": attempt["weight_info"]["mode"],
+            "interpolation_error_estimate": attempt["error_estimate"],
+            "interpolation_gate": attempt["gate"],
+        }
+        self.replay_sequence.append(replay_event)
+        self.hits += 1
+        self.last_cache_state = "cached_interpolated"
+        self._record_cache_event(artifact, "cached_interpolated")
+        return copy.deepcopy(attempt["payload"])
 
     def _entry_for_physics_ladder_bucket(
         self,
@@ -932,6 +979,44 @@ class PT1PersistentEquilibriumStore:
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
             )
+
+    def list_interpolation_candidates(
+        self,
+        *,
+        artifact: str,
+        replay_scope_sha256: str,
+        exclude_key_hash: str | None = None,
+    ) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            self._initialize(conn)
+            rows = conn.execute(
+                f"""
+                SELECT key_hash, key_bytes, payload_bytes
+                FROM {PT1_EQUILIBRIUM_TABLE}
+                WHERE artifact = ?
+                  AND replay_scope_sha256 = ?
+                ORDER BY key_hash
+                """,
+                (artifact, replay_scope_sha256),
+            )
+            candidates: list[dict[str, Any]] = []
+            for row in rows:
+                row_hash = str(row["key_hash"])
+                if exclude_key_hash is not None and row_hash == exclude_key_hash:
+                    continue
+                row_key_bytes = _sqlite_bytes(row["key_bytes"])
+                row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
+                row_key = json.loads(row_key_bytes.decode("utf-8"))
+                row_payload = json.loads(row_payload_bytes.decode("utf-8"))
+                candidates.append(
+                    {
+                        "artifact": artifact,
+                        "key": copy.deepcopy(dict(row_key)),
+                        "key_hash": row_hash,
+                        "payload": copy.deepcopy(dict(row_payload)),
+                    }
+                )
+            return candidates
 
     def get_by_physics_ladder_bucket(
         self,
