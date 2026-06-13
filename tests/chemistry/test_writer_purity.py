@@ -62,6 +62,7 @@ _ATOM_LEDGER_WRITER_METHODS = (
 _SEED_LOAD_EXTERNAL_CONTEXTS = (
     ("simulator/core.py", "_load_ledger_account"),
     ("simulator/core.py", "_record_stage0_carbon_cleanup_transitions"),
+    ("simulator/core.py", "_record_stage0_carbonate_decomposition_transitions"),
     ("simulator/core.py", "_record_stage0_oxidation_transitions"),
     ("simulator/core.py", "_record_stage0_perchlorate_cleanup_transitions"),
     ("simulator/core.py", "_seed_atom_ledger"),

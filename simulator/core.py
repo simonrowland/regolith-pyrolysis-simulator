@@ -157,8 +157,29 @@ STRICT_STAGE0_FORMULA_COMPONENTS = {
 STAGE0_SALT_COMPONENTS = {
     'cl', 'f', 'clo4', 'so3', 'nacl', 'kcl', 'salt', 'salts',
     'perchlorate', 'perchlorates', 'sulfate', 'sulfates', 'halide',
-    'halides', 'carbonate', 'carbonates',
+    'halides',
 }
+STAGE0_CARBONATE_COMPONENTS = frozenset({
+    'carbonate', 'carbonates', 'carbonate_salts',
+})
+STAGE0_CATION_SULFATE_COMPONENTS = frozenset({
+    'caso4', 'mgso4',
+})
+STAGE0_CATION_SULFATE_OXIDE_PRODUCTS = {
+    'CaSO4': 'CaO',
+    'MgSO4': 'MgO',
+}
+STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS = {
+    'CaSO4': 'CaS',
+    'MgSO4': 'MgS',
+}
+STAGE0_CARBONATE_METAL_OXIDE_STOICH = (
+    ('Mg', 'MgO', 1.0),
+    ('Ca', 'CaO', 1.0),
+    ('Fe', 'FeO', 1.0),
+    ('Na', 'Na2O', 2.0),
+    ('K', 'K2O', 2.0),
+)
 STAGE0_SULFIDE_COMPONENTS = {
     's', 'fes', 'fes_troilite', 'troilite', 'oldhamite', 'sulfide',
     'sulfides',
@@ -197,6 +218,7 @@ FLOW_MASS_ACCOUNTS = (
 )
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_carbon_reductant',
+    'process.stage0_carbonate_feed',
     'process.stage0_perchlorate_feed',
     'process.stage0_salt_feed',
     'process.stage0_volatile_feed',
@@ -338,6 +360,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
+        self._stage0_carbonate_decomposition_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
         # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
         # the optional [sulfur] extra is absent, the gate stays
@@ -629,6 +652,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.atom_ledger = self._new_atom_ledger()
         self.inventory = self._build_process_inventory(fs, mass_kg)
         self._stage0_carbon_cleanup_specs = []
+        self._stage0_carbonate_decomposition_specs = []
         self._stage0_perchlorate_cleanup_specs = []
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
@@ -1712,15 +1736,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         oxidation_specs, oxidized_offgas_kg = (
             self._stage0_oxidation_transition_specs(feedstock))
         carbon_specs = list(self._stage0_carbon_cleanup_specs)
+        carbonate_specs = list(self._stage0_carbonate_decomposition_specs)
         carbon_offgas_kg: Dict[str, float] = {}
         for spec in carbon_specs:
             self._merge_masses(carbon_offgas_kg, spec['products_kg'])
+        carbonate_offgas_kg: Dict[str, float] = {}
+        carbonate_oxide_kg: Dict[str, float] = {}
+        for spec in carbonate_specs:
+            self._merge_masses(
+                carbonate_offgas_kg, spec.get('offgas_products_kg') or {})
+            self._merge_masses(
+                carbonate_oxide_kg, spec.get('oxide_products_kg') or {})
+        cation_sulfate_oxide_kg: Dict[str, float] = {}
+        cation_sulfate_sulfide_kg: Dict[str, float] = {}
+        for spec in carbon_specs:
+            self._merge_masses(
+                cation_sulfate_oxide_kg, spec.get('oxide_products_kg') or {})
+            self._merge_masses(
+                cation_sulfate_sulfide_kg, spec.get('sulfide_products_kg') or {})
         perchlorate_specs = list(self._stage0_perchlorate_cleanup_specs)
         perchlorate_salt_kg: Dict[str, float] = {}
         for spec in perchlorate_specs:
             self._merge_masses(perchlorate_salt_kg, spec['salt_products_kg'])
         generated_offgas_kg = dict(oxidized_offgas_kg)
         self._merge_masses(generated_offgas_kg, carbon_offgas_kg)
+        self._merge_masses(generated_offgas_kg, carbonate_offgas_kg)
         terminal_offgas_external = self._subtract_species_kg(
             self.inventory.gas_volatiles_kg,
             generated_offgas_kg,
@@ -1731,10 +1771,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             perchlorate_salt_kg,
             context=f'{label} Stage 0 salt products',
         )
+        kernel_credited_melt_kg = dict(carbonate_oxide_kg)
+        self._merge_masses(kernel_credited_melt_kg, cation_sulfate_oxide_kg)
+        terminal_melt_external = self._subtract_species_kg(
+            self.inventory.melt_oxide_kg,
+            kernel_credited_melt_kg,
+            context=f'{label} Stage 0 melt oxide products',
+        )
+        terminal_sulfide_external = self._subtract_species_kg(
+            self.inventory.sulfide_matte_kg,
+            cation_sulfate_sulfide_kg,
+            context=f'{label} Stage 0 sulfide matte products',
+        )
 
         self._load_ledger_account(
             'process.cleaned_melt',
-            self.inventory.melt_oxide_kg,
+            terminal_melt_external,
             source=f'{label} cleaned melt',
         )
         self._load_ledger_account(
@@ -1754,7 +1806,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._load_ledger_account(
             'terminal.stage0_sulfide_matte',
-            self.inventory.sulfide_matte_kg,
+            terminal_sulfide_external,
             source=f'{label} Stage 0 sulfide matte',
         )
         self._load_ledger_account(
@@ -1777,6 +1829,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         self._record_stage0_oxidation_transitions(label, oxidation_specs)
+        self._record_stage0_carbonate_decomposition_transitions(
+            label, carbonate_specs)
         self._record_stage0_carbon_cleanup_transitions(label, carbon_specs)
         self._record_stage0_perchlorate_cleanup_transitions(
             label, perchlorate_specs)
@@ -1938,6 +1992,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 },
             )
 
+    def _record_stage0_carbonate_decomposition_transitions(
+        self,
+        label: str,
+        specs: list[dict],
+    ) -> None:
+        """Kernel-route Stage 0 carbonate thermal-decomposition transitions."""
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+        )
+
+        feed_account = 'process.stage0_carbonate_feed'
+        for spec in specs:
+            species = str(spec['species'])
+            feed_kg = float(spec['feed_kg'])
+            oxide_products_kg = dict(spec.get('oxide_products_kg') or {})
+            offgas_products_kg = dict(spec.get('offgas_products_kg') or {})
+            if feed_kg <= 1e-12:
+                continue
+            self.atom_ledger.load_external(
+                feed_account,
+                {species: feed_kg},
+                source=f'{label} Stage 0 {species} carbonate feed',
+            )
+            self._dispatch_and_commit(
+                ChemistryIntent.STAGE0_PRETREATMENT,
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                    'species': species,
+                    'feed_kg': feed_kg,
+                    'oxide_products_kg': oxide_products_kg,
+                    'offgas_products_kg': offgas_products_kg,
+                },
+            )
+
     def _record_stage0_carbon_cleanup_transitions(
         self,
         label: str,
@@ -1965,6 +2053,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         from engines.builtin.stage0_pretreatment import (
             REACTION_FAMILY_BOUDOUARD,
+            REACTION_FAMILY_CATION_SULFATE_CARBON,
             REACTION_FAMILY_SULFATE_CARBON,
         )
 
@@ -1975,6 +2064,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # ``_stage0_carbon_cleanup_reaction_ids`` validates exactly.
         SPEC_FAMILY = {
             'stage0_sulfate_carbon_cleanup': REACTION_FAMILY_SULFATE_CARBON,
+            'stage0_cation_sulfate_carbon_cleanup': (
+                REACTION_FAMILY_CATION_SULFATE_CARBON
+            ),
             'stage0_boudouard_carbon_cleanup': REACTION_FAMILY_BOUDOUARD,
         }
 
@@ -2000,14 +2092,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not debits_payload:
                 continue
 
-            # F-B1: dispatch + commit through the shared helper.
+            control_inputs = {
+                'reaction_family': family,
+                'debits': tuple(debits_payload),
+                'products_kg': dict(spec.get('products_kg') or {}),
+            }
+            if family == REACTION_FAMILY_CATION_SULFATE_CARBON:
+                control_inputs['oxide_products_kg'] = dict(
+                    spec.get('oxide_products_kg') or {})
+                control_inputs['sulfide_products_kg'] = dict(
+                    spec.get('sulfide_products_kg') or {})
             self._dispatch_and_commit(
                 ChemistryIntent.STAGE0_PRETREATMENT,
-                control_inputs={
-                    'reaction_family': family,
-                    'debits': tuple(debits_payload),
-                    'products_kg': dict(spec.get('products_kg') or {}),
-                },
+                control_inputs=control_inputs,
             )
 
     def _record_stage0_perchlorate_cleanup_transitions(
@@ -2840,11 +2937,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'C', self.species_formula_registry).molar_mass_kg_per_mol()
 
         specs: list[dict] = []
+        cation_sulfate_ran = False
         for reaction_id in reaction_ids:
             if reaction_id == 'sulfate_so3_to_so2_co':
                 carbon_mol_remaining = self._apply_stage0_sulfate_carbon_reaction(
                     carbon_mol_remaining, specs)
             elif reaction_id == 'co2_boudouard_to_co':
+                if not cation_sulfate_ran:
+                    carbon_mol_remaining = (
+                        self._apply_stage0_cation_sulfate_carbon_reactions(
+                            feedstock, carbon_mol_remaining, specs))
+                    cation_sulfate_ran = True
                 if not self._has_stage0_co2_source(feedstock):
                     raise AccountingError(
                         'co2_boudouard_to_co requires a declared CO2 atmosphere '
@@ -2856,6 +2959,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise AccountingError(
                     f'unsupported Stage 0 carbon cleanup reaction {reaction_id!r}'
                 )
+        if not cation_sulfate_ran:
+            carbon_mol_remaining = (
+                self._apply_stage0_cation_sulfate_carbon_reactions(
+                    feedstock, carbon_mol_remaining, specs)
+            )
 
         carbon_kg_remaining = carbon_mol_remaining * resolve_species_formula(
             'C', self.species_formula_registry).molar_mass_kg_per_mol()
@@ -2954,6 +3062,102 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'products_kg': products_kg,
         })
         return carbon_mol_remaining - extent_mol
+
+    def _apply_stage0_cation_sulfate_carbon_reactions(
+        self,
+        feedstock: Mapping[str, Any],
+        carbon_mol_remaining: float,
+        specs: list[dict],
+    ) -> float:
+        if carbon_mol_remaining <= 1e-12:
+            return 0.0
+        cleanup = feedstock.get('stage0_carbon_cleanup') or {}
+        if not isinstance(cleanup, Mapping):
+            return carbon_mol_remaining
+        product_mode = str(
+            cleanup.get('cation_sulfate_product', 'oxide')
+        ).lower()
+        to_sulfide = product_mode == 'sulfide'
+        cation_feed = dict(self.inventory.cation_sulfate_feed_kg)
+        if not cation_feed:
+            return carbon_mol_remaining
+
+        molar = {
+            species: resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            for species in ('C', 'SO2', 'CO', 'CaO', 'MgO', 'CaS', 'MgS')
+        }
+        for species, feed_kg in list(cation_feed.items()):
+            if feed_kg <= 1e-12:
+                continue
+            feed_formula = resolve_species_formula(
+                species, self.species_formula_registry)
+            feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+            if feed_mol <= 1e-12:
+                continue
+            if to_sulfide:
+                c_per_mol = 4.0
+                sulfide_species = STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS.get(
+                    species)
+                if sulfide_species is None:
+                    raise AccountingError(
+                        f'unsupported cation-sulfate sulfide product for '
+                        f'{species!r}'
+                    )
+                extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
+                if extent_mol <= 1e-12:
+                    continue
+                c_consumed_kg = extent_mol * c_per_mol * molar['C']
+                products_kg = {'CO': 4.0 * extent_mol * molar['CO']}
+                sulfide_products_kg = {
+                    sulfide_species: extent_mol * molar[sulfide_species],
+                }
+                oxide_products_kg: Dict[str, float] = {}
+            else:
+                c_per_mol = 1.0
+                oxide_species = STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.get(
+                    species)
+                if oxide_species is None:
+                    raise AccountingError(
+                        f'unsupported cation-sulfate oxide product for '
+                        f'{species!r}'
+                    )
+                extent_mol = min(carbon_mol_remaining, feed_mol)
+                if extent_mol <= 1e-12:
+                    continue
+                c_consumed_kg = extent_mol * molar['C']
+                products_kg = {
+                    'SO2': extent_mol * molar['SO2'],
+                    'CO': extent_mol * molar['CO'],
+                }
+                oxide_products_kg = {
+                    oxide_species: extent_mol * molar[oxide_species],
+                }
+                sulfide_products_kg = {}
+
+            consumed_kg = extent_mol * feed_formula.molar_mass_kg_per_mol()
+            self._decrease_inventory_species(
+                self.inventory.cation_sulfate_feed_kg, species, consumed_kg)
+            self._merge_masses(self.inventory.gas_volatiles_kg, products_kg)
+            self._merge_masses(self.inventory.stage0_products_kg, products_kg)
+            self._merge_masses(
+                self.inventory.melt_oxide_kg, oxide_products_kg)
+            self._merge_masses(
+                self.inventory.sulfide_matte_kg, sulfide_products_kg)
+            specs.append({
+                'name': 'stage0_cation_sulfate_carbon_cleanup',
+                'debits': (
+                    ('process.stage0_salt_feed', {species: consumed_kg}),
+                    ('process.stage0_carbon_reductant', {
+                        'C': c_consumed_kg}),
+                ),
+                'products_kg': products_kg,
+                'oxide_products_kg': oxide_products_kg,
+                'sulfide_products_kg': sulfide_products_kg,
+            })
+            carbon_mol_remaining -= extent_mol * c_per_mol
+        return carbon_mol_remaining
 
     def _apply_stage0_boudouard_reaction(
         self, carbon_mol_remaining: float, specs: list[dict]
@@ -3141,6 +3345,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._validate_required_feedstock_formulas(feedstock, formula_species)
         stage0_external_inputs = self._apply_stage0_offgas_chemistry(
             feedstock, buckets)
+        carbonate_specs: list[dict] = []
+        self._decompose_stage0_carbonates(
+            feedstock, buckets, melt, carbonate_specs)
+        self._stage0_carbonate_decomposition_specs = carbonate_specs
 
         residual = self._residual_components_after_stage0(
             raw, processed_components)
@@ -3166,6 +3374,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             stage0_products_kg=stage0_products,
             gas_volatiles_kg=buckets['gas_volatiles'],
             salt_phase_kg=buckets['salt_phase'],
+            cation_sulfate_feed_kg=buckets['cation_sulfate_feed'],
             sulfide_matte_kg=buckets['sulfide_matte'],
             metal_alloy_kg=buckets['metal_alloy'],
             terminal_slag_components_kg=buckets['terminal_slag'],
@@ -3378,6 +3587,91 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         oxidant_kg = oxidant_o2_mol * resolve_species_formula(
             'O2', self.species_formula_registry).molar_mass_kg_per_mol()
         return products_kg, oxidant_kg
+
+    def _decompose_stage0_carbonates(
+        self,
+        feedstock: Mapping[str, Any],
+        buckets: Dict[str, Dict[str, float]],
+        melt: Dict[str, float],
+        specs: list[dict],
+    ) -> None:
+        carbonate_bucket = buckets.get('carbonate_feed') or {}
+        for species, feed_kg in list(carbonate_bucket.items()):
+            if feed_kg <= 1e-12:
+                continue
+            oxide_products_kg, offgas_products_kg = (
+                self._carbonate_decomposition_products(species, feed_kg))
+            self._merge_masses(melt, oxide_products_kg)
+            self._merge_masses(
+                buckets.setdefault('gas_volatiles', {}), offgas_products_kg)
+            carbonate_bucket.pop(species, None)
+            specs.append({
+                'species': species,
+                'feed_kg': feed_kg,
+                'oxide_products_kg': oxide_products_kg,
+                'offgas_products_kg': offgas_products_kg,
+            })
+
+    def _carbonate_decomposition_products(
+        self, species: str, feed_kg: float
+    ) -> Tuple[Dict[str, float], Dict[str, float]]:
+        if species == 'carbonate_salts':
+            return self._decompose_carbonate_salts_group(feed_kg)
+        return self._decompose_single_carbonate_species(species, feed_kg)
+
+    def _decompose_carbonate_salts_group(
+        self, feed_kg: float
+    ) -> Tuple[Dict[str, float], Dict[str, float]]:
+        component_specs = (
+            ('MgCO3', 1.0),
+            ('CaCO3', 1.0),
+            ('Na2CO3', 1.0),
+        )
+        component_molar = [
+            (
+                comp_id,
+                moles,
+                resolve_species_formula(
+                    comp_id, self.species_formula_registry
+                ).molar_mass_kg_per_mol(),
+            )
+            for comp_id, moles in component_specs
+        ]
+        total_group_mass = sum(
+            moles * molar_mass for _, moles, molar_mass in component_molar)
+        oxide_products: Dict[str, float] = {}
+        co2_total = 0.0
+        for comp_id, moles, molar_mass in component_molar:
+            comp_kg = feed_kg * (moles * molar_mass / total_group_mass)
+            oxide_kg, co2_kg = self._decompose_single_carbonate_species(
+                comp_id, comp_kg)
+            self._merge_masses(oxide_products, oxide_kg)
+            co2_total += co2_kg
+        return oxide_products, {'CO2': co2_total}
+
+    def _decompose_single_carbonate_species(
+        self, species: str, feed_kg: float
+    ) -> Tuple[Dict[str, float], float]:
+        formula = resolve_species_formula(
+            species, self.species_formula_registry)
+        species_mol = feed_kg / formula.molar_mass_kg_per_mol()
+        atom_mol = formula.atom_moles(species_mol)
+        carbon_mol = atom_mol.get('C', 0.0)
+        co2_kg = carbon_mol * resolve_species_formula(
+            'CO2', self.species_formula_registry).molar_mass_kg_per_mol()
+        oxide_kg: Dict[str, float] = {}
+        for metal, oxide, atoms_per_oxide in STAGE0_CARBONATE_METAL_OXIDE_STOICH:
+            metal_mol = atom_mol.get(metal, 0.0)
+            if metal_mol <= 1e-12:
+                continue
+            oxide_mol = metal_mol / atoms_per_oxide
+            oxide_kg[oxide] = (
+                oxide_mol
+                * resolve_species_formula(
+                    oxide, self.species_formula_registry
+                ).molar_mass_kg_per_mol()
+            )
+        return oxide_kg, co2_kg
 
     @classmethod
     def _melt_from_composition(
@@ -3680,6 +3974,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return {
             'gas_volatiles': {},
             'salt_phase': {},
+            'carbonate_feed': {},
+            'cation_sulfate_feed': {},
             'sulfide_matte': {},
             'metal_alloy': {},
             'terminal_slag': {},
@@ -3770,18 +4066,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _classify_stage0_components(
         cls, components: Mapping[str, float]
     ) -> Dict[str, Dict[str, float]]:
-        buckets = {
-            'gas_volatiles': {},
-            'salt_phase': {},
-            'sulfide_matte': {},
-            'metal_alloy': {},
-            'terminal_slag': {},
-        }
+        buckets = cls._empty_stage0_buckets()
         for component, kg in components.items():
             bucket_name = cls._stage0_bucket_for_name(component)
             if bucket_name is not None:
                 buckets[bucket_name][component] = kg
         return buckets
+
+    @classmethod
+    def _is_stage0_carbonate_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        if key in STAGE0_CARBONATE_COMPONENTS:
+            return True
+        return key.startswith('carbonate_salt')
+
+    @classmethod
+    def _is_stage0_cation_sulfate_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        if key in STAGE0_CATION_SULFATE_COMPONENTS:
+            return True
+        return str(component).strip() in STAGE0_CATION_SULFATE_OXIDE_PRODUCTS
 
     @classmethod
     def _stage0_bucket_for_name(cls, component: str) -> Optional[str]:
@@ -3790,10 +4094,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 'gas_volatiles'
         if key.startswith(('co_', 'ch4_', 'nh3_', 'hydrocarbon')):
             return 'gas_volatiles'
+        if cls._is_stage0_carbonate_component(component):
+            return 'carbonate_feed'
+        if cls._is_stage0_cation_sulfate_component(component):
+            return 'cation_sulfate_feed'
         if key in STAGE0_SALT_COMPONENTS:
             return 'salt_phase'
-        if key.startswith(('nacl', 'kcl', 'carbonate_salt',
-                           'sulfuric_acid')):
+        if key.startswith(('nacl', 'kcl', 'sulfuric_acid')):
             return 'salt_phase'
         if key in STAGE0_SULFIDE_COMPONENTS:
             return 'sulfide_matte'

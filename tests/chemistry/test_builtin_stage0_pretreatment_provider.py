@@ -78,19 +78,12 @@ def test_provider_declares_only_stage0_pretreatment_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_exactly_nine_stage0_accounts():
-    """Provider declares exactly the nine accounts touched by every
-    legacy ``_record_stage0_*_transitions`` call.  Pinning the set
-    stops a future refactor from silently widening the surface (e.g.
-    crediting cleaned_melt, process.metal_phase, an MRE anode O2 bin,
-    or any other terminal store outside Stage 0's scope).
-
-    Account-scope sanity: the Stage 0 provider must NOT touch any
-    downstream account (cleaned_melt is the melt that the equilibrium
-    backend / MRE / shuttle / thermite read; process.metal_phase is
-    the metallothermic intent's domain).  The hardened kernel
-    account-filter gate rejects any proposal naming an undeclared
-    account.
+def test_provider_declares_exactly_twelve_stage0_accounts():
+    """Provider declares exactly the twelve accounts touched by every
+    legacy ``_record_stage0_*_transitions`` call including carbonate
+    decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
+    CaS -> sulfide matte).  Pinning the set stops a future refactor
+    from silently widening the surface beyond Stage 0's scope.
     """
 
     provider = BuiltinStage0PretreatmentProvider()
@@ -98,16 +91,18 @@ def test_provider_declares_exactly_nine_stage0_accounts():
     assert profile.declared_accounts == frozenset({
         "process.stage0_volatile_feed",
         "process.stage0_salt_feed",
+        "process.stage0_carbonate_feed",
         "process.stage0_carbon_reductant",
         "process.stage0_perchlorate_feed",
+        "process.cleaned_melt",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
         "terminal.offgas",
         "terminal.stage0_salt_phase",
+        "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
     })
-    # Sanity: Stage 0 must not touch downstream accounts.
-    assert "process.cleaned_melt" not in profile.declared_accounts
+    # Sanity: Stage 0 must not touch downstream metallothermic accounts.
     assert "process.metal_phase" not in profile.declared_accounts
     assert "process.reagent_inventory" not in profile.declared_accounts
     assert "process.overhead_gas" not in profile.declared_accounts
@@ -199,14 +194,12 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY
-    the nine declared Stage 0 accounts. The kernel account filter is
-    the enforcer (binding spec §7); a ``process.cleaned_melt`` seed
-    must NOT cross the boundary into this provider's view.
+    the twelve declared Stage 0 accounts. The kernel account filter is
+    the enforcer (binding spec §7); downstream accounts like
+    ``process.metal_phase`` must NOT cross the boundary into this
+    provider's view.
     """
 
-    # Mars feedstock loads with sulfate + perchlorate Stage 0
-    # transitions; the cleaned_melt account is heavily populated and
-    # the metal_phase account is empty (no metallothermic yet).
     sim = _build_sim(
         "mars_basalt",
         vapor_pressure_data,
@@ -214,8 +207,6 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         setpoints_data,
         additives_kg={"C": 50.0},
     )
-    # cleaned_melt is populated after Stage 0 -- this is the leak we
-    # want to ensure does NOT show up in the provider's view.
     cleaned_kg = sum(
         sim.atom_ledger.kg_by_account("process.cleaned_melt").values())
     assert cleaned_kg > 0.0
@@ -230,14 +221,13 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         profile.declared_accounts,
         sim.species_formula_registry,
     )
-    # The provider's view must contain ONLY the declared accounts.
     accounts = set(view.accounts.keys())
     expected = set(profile.declared_accounts)
     assert accounts.issubset(expected), (
         f"kernel filter leaked an undeclared account into the provider: "
         f"{accounts - expected}"
     )
-    assert "process.cleaned_melt" not in accounts
+    assert "process.cleaned_melt" in expected
     assert "process.metal_phase" not in accounts
     assert "process.reagent_inventory" not in accounts
     assert "terminal.oxygen_mre_anode_stored" not in accounts

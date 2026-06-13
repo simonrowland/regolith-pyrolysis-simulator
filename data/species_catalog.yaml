@@ -102,6 +102,30 @@ species:
     category: oxide_equivalent
     estimated: false
     source: Stoichiometric SO3 equivalent used for sulfate-style feedstock accounting.
+  - id: CaSO4
+    formula: CaSO4
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Stoichiometric calcium sulfate formula for cation-bearing sulfate Stage 0 routing.
+  - id: MgSO4
+    formula: MgSO4
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Stoichiometric magnesium sulfate formula for cation-bearing sulfate Stage 0 routing.
+  - id: CaS
+    formula: CaS
+    basis: mineral_formula
+    category: sulfide
+    estimated: false
+    source: Calcium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
+  - id: MgS
+    formula: MgS
+    basis: mineral_formula
+    category: sulfide
+    estimated: false
+    source: Magnesium sulfide product for low-pO2 cation-sulfate carbothermal reduction branch.
   - id: ClO4
     formula: ClO4
     basis: perchlorate_anion_equivalent

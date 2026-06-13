@@ -166,11 +166,15 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 #   - perchlorate: maps to feedstock 'perchlorate_to_chloride_o2'.
 REACTION_FAMILY_COMPLETE_OXIDATION = "complete_oxidation"
 REACTION_FAMILY_SULFATE_CARBON = "sulfate_carbon"
+REACTION_FAMILY_CATION_SULFATE_CARBON = "cation_sulfate_carbon"
+REACTION_FAMILY_CARBONATE_DECOMPOSITION = "carbonate_decomposition"
 REACTION_FAMILY_BOUDOUARD = "boudouard"
 REACTION_FAMILY_PERCHLORATE = "perchlorate"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_COMPLETE_OXIDATION,
     REACTION_FAMILY_SULFATE_CARBON,
+    REACTION_FAMILY_CATION_SULFATE_CARBON,
+    REACTION_FAMILY_CARBONATE_DECOMPOSITION,
     REACTION_FAMILY_BOUDOUARD,
     REACTION_FAMILY_PERCHLORATE,
 })
@@ -217,12 +221,15 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     DECLARED_ACCOUNTS = frozenset({
         "process.stage0_volatile_feed",
         "process.stage0_salt_feed",
+        "process.stage0_carbonate_feed",
         "process.stage0_carbon_reductant",
         "process.stage0_perchlorate_feed",
+        "process.cleaned_melt",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
         "terminal.offgas",
         "terminal.stage0_salt_phase",
+        "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
     })
 
@@ -273,6 +280,14 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             )
         if reaction_family == REACTION_FAMILY_SULFATE_CARBON:
             return self._dispatch_sulfate_carbon(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_CATION_SULFATE_CARBON:
+            return self._dispatch_cation_sulfate_carbon(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_CARBONATE_DECOMPOSITION:
+            return self._dispatch_carbonate_decomposition(
                 controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
@@ -427,6 +442,158 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             reason="stage0_sulfate_carbon_cleanup",
         )
 
+    def _dispatch_cation_sulfate_carbon(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        debits_payload = controls.get("debits") or ()
+        products_kg = dict(controls.get("products_kg") or {})
+        oxide_products_kg = dict(controls.get("oxide_products_kg") or {})
+        sulfide_products_kg = dict(controls.get("sulfide_products_kg") or {})
+
+        if not debits_payload or not products_kg:
+            return self._out_of_domain(
+                "cation_sulfate_carbon has no spec (empty debits or products)",
+                control_audit=control_audit,
+            )
+        if not oxide_products_kg and not sulfide_products_kg:
+            return self._out_of_domain(
+                "cation_sulfate_carbon requires oxide or sulfide products",
+                control_audit=control_audit,
+            )
+
+        debits_mol, debits_kg = self._kg_payload_to_mol_accounts(
+            debits_payload, registry, resolve_species_formula,
+        )
+        if not debits_mol:
+            return self._empty_result(
+                "cation_sulfate_carbon skipped: all debits zero after threshold",
+                control_audit=control_audit,
+            )
+
+        credits_mol: dict[str, dict[str, float]] = {}
+        offgas_mol = self._kg_dict_to_mol(products_kg, registry, resolve_species_formula)
+        if offgas_mol:
+            credits_mol["terminal.offgas"] = offgas_mol
+
+        melt_mol = self._kg_dict_to_mol(
+            oxide_products_kg, registry, resolve_species_formula,
+        )
+        if melt_mol:
+            credits_mol["process.cleaned_melt"] = melt_mol
+
+        sulfide_mol = self._kg_dict_to_mol(
+            sulfide_products_kg, registry, resolve_species_formula,
+        )
+        if sulfide_mol:
+            credits_mol["terminal.stage0_sulfide_matte"] = sulfide_mol
+
+        if not credits_mol:
+            return self._empty_result(
+                "cation_sulfate_carbon skipped: no positive products",
+                control_audit=control_audit,
+            )
+
+        atom_proof = build_atom_balance_proof(
+            debits_mol, credits_mol, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits_mol,
+            credits=credits_mol,
+            reason="stage0_cation_sulfate_carbon_cleanup",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_CATION_SULFATE_CARBON,
+                "debits_kg": debits_kg,
+                "products_kg": dict(products_kg),
+                "oxide_products_kg": dict(oxide_products_kg),
+                "sulfide_products_kg": dict(sulfide_products_kg),
+            },
+        )
+
+    def _dispatch_carbonate_decomposition(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        species = str(controls.get("species") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        oxide_products_kg = dict(controls.get("oxide_products_kg") or {})
+        offgas_products_kg = dict(controls.get("offgas_products_kg") or {})
+
+        if not species or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "carbonate_decomposition requires species and positive feed_kg",
+                control_audit=control_audit,
+            )
+        if not oxide_products_kg and not offgas_products_kg:
+            return self._out_of_domain(
+                "carbonate_decomposition requires oxide and/or offgas products",
+                control_audit=control_audit,
+            )
+
+        feed_formula = resolve_species_formula(species, registry)
+        mol_feed = feed_kg / feed_formula.molar_mass_kg_per_mol()
+        if mol_feed <= 0.0:
+            return self._out_of_domain(
+                f"carbonate_decomposition feed_kg {feed_kg!r} non-positive",
+                control_audit=control_audit,
+            )
+
+        debits = {
+            "process.stage0_carbonate_feed": {species: mol_feed},
+        }
+        credits: dict[str, dict[str, float]] = {}
+        offgas_mol = self._kg_dict_to_mol(
+            offgas_products_kg, registry, resolve_species_formula,
+        )
+        if offgas_mol:
+            credits["terminal.offgas"] = offgas_mol
+        melt_mol = self._kg_dict_to_mol(
+            oxide_products_kg, registry, resolve_species_formula,
+        )
+        if melt_mol:
+            credits["process.cleaned_melt"] = melt_mol
+        if not credits:
+            return self._empty_result(
+                "carbonate_decomposition skipped: no positive products",
+                control_audit=control_audit,
+            )
+
+        atom_proof = build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason=f"stage0_carbonate_decomposition_{species}",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                "species": species,
+                "feed_kg": feed_kg,
+                "oxide_products_kg": dict(oxide_products_kg),
+                "offgas_products_kg": dict(offgas_products_kg),
+            },
+        )
+
     # ------------------------------------------------------------------
     # boudouard: C + CO2 -> 2 CO  (carbon-CO2 cleanup).  Mirrors the
     # legacy spec built by _apply_stage0_boudouard_reaction.
@@ -447,6 +614,50 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             family=REACTION_FAMILY_BOUDOUARD,
             reason="stage0_boudouard_carbon_cleanup",
         )
+
+    @staticmethod
+    def _kg_dict_to_mol(
+        products_kg: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+    ) -> dict[str, float]:
+        mol_by_species: dict[str, float] = {}
+        for species, kg in products_kg.items():
+            kg_val = float(kg)
+            if kg_val <= 1e-12:
+                continue
+            formula = resolve_species_formula(str(species), registry)
+            mol_by_species[str(species)] = (
+                kg_val / formula.molar_mass_kg_per_mol()
+            )
+        return mol_by_species
+
+    @staticmethod
+    def _kg_payload_to_mol_accounts(
+        debits_payload,
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+    ) -> tuple[dict[str, dict[str, float]], dict[str, dict[str, float]]]:
+        debits_mol: dict[str, dict[str, float]] = {}
+        debits_kg: dict[str, dict[str, float]] = {}
+        for entry in debits_payload:
+            account, species_kg = entry
+            account = str(account)
+            mol_for_account: dict[str, float] = {}
+            kg_for_account: dict[str, float] = {}
+            for species, kg in dict(species_kg or {}).items():
+                kg_val = float(kg)
+                if kg_val <= 1e-12:
+                    continue
+                formula = resolve_species_formula(str(species), registry)
+                mol_for_account[str(species)] = (
+                    kg_val / formula.molar_mass_kg_per_mol()
+                )
+                kg_for_account[str(species)] = kg_val
+            if mol_for_account:
+                debits_mol[account] = mol_for_account
+                debits_kg[account] = kg_for_account
+        return debits_mol, debits_kg
 
     def _dispatch_offgas_reaction(
         self,
