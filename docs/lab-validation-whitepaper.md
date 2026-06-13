@@ -5,6 +5,17 @@
 and carry placeholder column structures; replace the table body, never the
 slot marker, so provenance survives refinement.**
 
+> **Data provenance.** Every data table in this document was compiled against
+> regolith-pyrolysis-simulator **v0.5.6**, git commit
+> **`f3f2c6a`** (`f3f2c6ae98c9febe81d6fc5b9d0718202c6f3b9c`),
+> commit date **2026-06-12**, compiled **2026-06-12 (UTC)**. All numeric
+> values, parameter-provenance classes, and `file:line` source references
+> reflect that committed repository state; the working tree was clean for
+> `data/`, `simulator/`, and `engines/` at compile time. This stamp pins the
+> commit the table *values* were drawn from — a later stamp-only edit does not
+> change it. When a table is refined against a newer build, bump this stamp and
+> record the per-row code version in Appendix C.
+
 ---
 
 ## Abstract
