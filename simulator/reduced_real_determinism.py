@@ -37,6 +37,7 @@ PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
+DEFAULT_SHARD_BUSY_TIMEOUT_MS = 60_000.0
 PHYSICS_BUCKET_LADDER_RUNGS = (
     ("h40", 4.0),
     ("h30", 3.0),
@@ -855,6 +856,7 @@ class PT1PersistentEquilibriumStore:
         db_path: Path,
         *,
         read_only_base_db_path: Path | None = None,
+        shard_busy_timeout_ms: float = DEFAULT_SHARD_BUSY_TIMEOUT_MS,
     ) -> None:
         self.db_path = Path(db_path)
         self.read_only_base_db_path = (
@@ -862,6 +864,7 @@ class PT1PersistentEquilibriumStore:
             if read_only_base_db_path is not None
             else None
         )
+        self._shard_busy_timeout_ms = float(shard_busy_timeout_ms)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             self._initialize(conn)
@@ -1151,8 +1154,12 @@ class PT1PersistentEquilibriumStore:
             return best_entry
 
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
+        timeout_sec = self._shard_busy_timeout_ms / 1000.0
+        conn = sqlite3.connect(self.db_path, timeout=timeout_sec)
         conn.row_factory = sqlite3.Row
+        conn.execute(f"PRAGMA busy_timeout={int(self._shard_busy_timeout_ms)}")
+        if self.read_only_base_db_path is not None:
+            conn.execute("PRAGMA main.journal_mode=WAL")
         self._attach_read_only_base(conn)
         return conn
 

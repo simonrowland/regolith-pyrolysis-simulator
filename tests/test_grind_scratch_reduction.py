@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import multiprocessing
 import os
+import queue
 import sqlite3
 from pathlib import Path
 
@@ -12,8 +14,10 @@ from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.backends import build_cached_real_store, normalize_cached_real_config
 from simulator.reduced_real_determinism import (
+    DEFAULT_SHARD_BUSY_TIMEOUT_MS,
     PT0DeterminismStore,
     PT1PersistentEquilibriumStore,
+    PT1_READ_ONLY_BASE_ALIAS,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
 )
@@ -391,3 +395,172 @@ def test_epoch_profile_wires_read_only_base_path(tmp_path: Path) -> None:
     cache = overlay["run"]["reduced_real_cache"]
     assert cache["db_path"] == str(shard)
     assert cache["read_only_base_db_path"] == str(loaded.base_cache)
+
+
+def _process_shard_put_worker(
+    shard_path: str,
+    base_path: str,
+    worker_idx: int,
+    count: int,
+    start: multiprocessing.synchronize.Event,
+    errors: multiprocessing.queues.Queue,
+    *,
+    shard_busy_timeout_ms: float,
+) -> None:
+    try:
+        store = PT1PersistentEquilibriumStore(
+            Path(shard_path),
+            read_only_base_db_path=Path(base_path),
+            shard_busy_timeout_ms=shard_busy_timeout_ms,
+        )
+        start.wait(30)
+        for index in range(count):
+            tag = f"w{worker_idx}-{index}"
+            key = {
+                "artifact": "freeze_gate_curve",
+                "code_version": "test",
+                "data_digests": {"fixture": "v1"},
+                "schema_version": "test",
+                "tag": tag,
+            }
+            payload = {"curve": {"status": "in_range", "tag": tag}}
+            key_bytes = canonical_json_bytes(key)
+            payload_bytes = canonical_json_bytes(payload)
+            store.put(
+                artifact="freeze_gate_curve",
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=hashlib.sha256(key_bytes).hexdigest(),
+                payload=payload,
+                payload_bytes=payload_bytes,
+                payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            )
+    except BaseException as exc:  # pragma: no cover - asserted in parent process
+        errors.put(repr(exc))
+
+
+def _collect_process_errors(
+    processes: list[multiprocessing.Process],
+    errors: multiprocessing.queues.Queue,
+) -> list[str]:
+    failures: list[str] = []
+    for process in processes:
+        process.join(timeout=120)
+        if process.exitcode != 0:
+            failures.append(f"{process.name} exit={process.exitcode}")
+    while True:
+        try:
+            failures.append(errors.get_nowait())
+        except queue.Empty:
+            break
+    return failures
+
+
+def test_shard_connect_sets_busy_timeout_and_wal_on_main_only(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    _put_cache_row(base, tag="seed")
+    base_bytes = _db_bytes(base)
+
+    store = PT1PersistentEquilibriumStore(shard, read_only_base_db_path=base)
+    with store._connect() as conn:
+        busy_timeout = int(conn.execute("PRAGMA busy_timeout").fetchone()[0])
+        main_journal = str(conn.execute("PRAGMA main.journal_mode").fetchone()[0])
+        base_journal = str(
+            conn.execute(
+                f"PRAGMA {PT1_READ_ONLY_BASE_ALIAS}.journal_mode"
+            ).fetchone()[0]
+        )
+
+    assert busy_timeout == int(DEFAULT_SHARD_BUSY_TIMEOUT_MS)
+    assert main_journal.lower() == "wal"
+    assert base_journal.lower() != "wal"
+
+    _put_cache_row(shard, tag="shard-only")
+    assert payload_count(base) == 1
+    assert _db_bytes(base) == base_bytes
+
+
+def test_concurrent_process_shard_puts_without_database_locked(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    for index in range(5):
+        _put_cache_row(base, tag=f"base-{index}")
+    base_rows = payload_count(base)
+    base_bytes = _db_bytes(base)
+
+    epoch_grind.seed_job_cache(shard, base)
+
+    worker_count = 8
+    puts_per_worker = 20
+    ctx = multiprocessing.get_context("spawn")
+    start = ctx.Event()
+    errors = ctx.Queue()
+    processes = [
+        ctx.Process(
+            target=_process_shard_put_worker,
+            args=(
+                str(shard),
+                str(base),
+                worker_idx,
+                puts_per_worker,
+                start,
+                errors,
+            ),
+            kwargs={"shard_busy_timeout_ms": DEFAULT_SHARD_BUSY_TIMEOUT_MS},
+            name=f"shard-put-{worker_idx}",
+        )
+        for worker_idx in range(worker_count)
+    ]
+
+    for process in processes:
+        process.start()
+    start.set()
+    failures = _collect_process_errors(processes, errors)
+
+    lock_failures = [item for item in failures if "database is locked" in item.lower()]
+    assert lock_failures == [], failures
+    assert failures == []
+    assert payload_count(shard) == worker_count * puts_per_worker
+    assert payload_count(base) == base_rows
+    assert _db_bytes(base) == base_bytes
+
+
+def test_concurrent_shard_puts_fail_without_busy_timeout_pragma(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "shard.sqlite"
+    _put_cache_row(base, tag="seed")
+    epoch_grind.seed_job_cache(shard, base)
+
+    worker_count = 8
+    puts_per_worker = 80
+    ctx = multiprocessing.get_context("spawn")
+    start = ctx.Event()
+    errors = ctx.Queue()
+    processes = [
+        ctx.Process(
+            target=_process_shard_put_worker,
+            args=(
+                str(shard),
+                str(base),
+                worker_idx,
+                puts_per_worker,
+                start,
+                errors,
+            ),
+            kwargs={"shard_busy_timeout_ms": 0.0},
+            name=f"shard-put-zero-timeout-{worker_idx}",
+        )
+        for worker_idx in range(worker_count)
+    ]
+
+    for process in processes:
+        process.start()
+    start.set()
+    failures = _collect_process_errors(processes, errors)
+
+    lock_failures = [item for item in failures if "database is locked" in item.lower()]
+    assert lock_failures, (
+        "expected database is locked under busy_timeout=0 concurrent shard writes; "
+        f"got failures={failures!r}"
+    )
