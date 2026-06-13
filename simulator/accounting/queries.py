@@ -84,6 +84,9 @@ class AccountingQueries:
                 },
             )
         _merge_masses(products, self.sim._unspent_additive_reagents_kg())
+        consumed_getter = getattr(self.sim, "_consumed_additive_reagents_kg", None)
+        if callable(consumed_getter):
+            _merge_masses(products, consumed_getter())
         return products
 
     def species_kg_by_accounts(

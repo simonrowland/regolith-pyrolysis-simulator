@@ -720,6 +720,10 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     assert inv.carbon_reductant_required_kg == pytest.approx(45.0)
     assert sim.atom_ledger.kg_by_account(
         "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory").get("C", 0.0) == pytest.approx(0.0)
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
+    assert "unspent_C_reagent" not in sim.product_ledger()
     terminal_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
     assert terminal_offgas.get("C", 0.0) == pytest.approx(0.0)
     molar = {
@@ -740,7 +744,6 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     )
     assert inv.stage0_external_inputs_kg["CO2"] == pytest.approx(
         boudouard_extent_mol * molar["CO2"])
-    assert "unspent_C_reagent" not in sim.product_ledger()
     assert sim.melt.ambient_pressure_mbar == pytest.approx(6.0)
     assert sim.melt.ambient_atmosphere == "96% CO2"
     assert "SO3" not in sim.melt.composition_kg
@@ -752,6 +755,128 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     assert "SO3" not in inv.residual_components_kg
     assert "Cl" not in inv.residual_components_kg
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
+
+
+def test_carbon_reagent_credited_to_reservoir_on_load():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Mars sulfate-rich",
+                "stage0_profile": "mars_carbon_cleanup",
+                "environment": {
+                    "surface_pressure_mbar": 6,
+                    "atmosphere": "96% CO2",
+                },
+                "composition_wt_pct": {
+                    "SiO2": 45.0,
+                    "FeO": 17.5,
+                    "SO3": 11.5,
+                },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": [
+                        "sulfate_so3_to_so2_co",
+                        "co2_boudouard_to_co",
+                    ],
+                },
+            }
+        }
+    )
+    sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 45.0})
+    assert sim.record.additives_kg.get("C", 0.0) == pytest.approx(45.0)
+
+
+def test_stage0_carbon_cleanup_debits_process_reagent_inventory():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Mars sulfate-rich",
+                "stage0_profile": "mars_carbon_cleanup",
+                "environment": {
+                    "surface_pressure_mbar": 6,
+                    "atmosphere": "96% CO2",
+                },
+                "composition_wt_pct": {
+                    "SiO2": 45.0,
+                    "FeO": 17.5,
+                    "SO3": 11.5,
+                },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": [
+                        "sulfate_so3_to_so2_co",
+                        "co2_boudouard_to_co",
+                    ],
+                },
+            }
+        }
+    )
+    sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 45.0})
+    assert sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory").get("C", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account(
+        "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0)
+    assert "process.stage0_carbon_reductant" not in sim.atom_ledger.kg_by_account()
+
+
+def test_consumed_c_reagent_in_product_ledger():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Mars sulfate-rich",
+                "stage0_profile": "mars_carbon_cleanup",
+                "environment": {
+                    "surface_pressure_mbar": 6,
+                    "atmosphere": "96% CO2",
+                },
+                "composition_wt_pct": {
+                    "SiO2": 45.0,
+                    "FeO": 17.5,
+                    "SO3": 11.5,
+                },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": [
+                        "sulfate_so3_to_so2_co",
+                        "co2_boudouard_to_co",
+                    ],
+                },
+            }
+        }
+    )
+    sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 45.0})
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
+    assert "unspent_C_reagent" not in sim.product_ledger()
+
+
+def test_surplus_c_reports_unspent():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Mars sulfate-rich",
+                "stage0_profile": "mars_carbon_cleanup",
+                "environment": {
+                    "surface_pressure_mbar": 6,
+                    "atmosphere": "96% CO2",
+                },
+                "composition_wt_pct": {
+                    "SiO2": 45.0,
+                    "FeO": 17.5,
+                    "SO3": 11.5,
+                },
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": [30, 60],
+                    "reactions": [
+                        "sulfate_so3_to_so2_co",
+                        "co2_boudouard_to_co",
+                    ],
+                },
+            }
+        }
+    )
+    sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 50.0})
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
+    assert sim.product_ledger()["unspent_C_reagent"] == pytest.approx(5.0)
 
 
 def test_mars_carbon_cleanup_requires_carbon_additive():

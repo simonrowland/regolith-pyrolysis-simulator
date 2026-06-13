@@ -35,11 +35,11 @@ covers several reaction families.  The provider receives a
   ``_apply_stage0_sulfate_carbon_reaction`` builds the spec with
   ``products_kg = {'SO2': extent*M_SO2, 'CO': extent*M_CO}`` and
   ``debits = (('process.stage0_salt_feed', {'SO3': so3_consumed_kg}),
-              ('process.stage0_carbon_reductant', {'C': c_consumed_kg}))``).
+              ('process.reagent_inventory', {'C': c_consumed_kg}))``).
 * ``'boudouard'`` -- ``C + CO2 -> 2 CO`` (Boudouard back-reduction; the
   legacy ``_apply_stage0_boudouard_reaction`` builds the spec with
   ``products_kg = {'CO': 2*extent*M_CO}`` and
-  ``debits = (('process.stage0_carbon_reductant', {'C': c_consumed_kg}),
+  ``debits = (('process.reagent_inventory', {'C': c_consumed_kg}),
               ('reservoir.stage0_process_gas', {'CO2': co2_input_kg}))``).
 * ``'perchlorate'`` -- ``ClO4 -> Cl + 2 O2`` (Mars perchlorate thermal
   decomposition; the legacy
@@ -109,8 +109,8 @@ write):
   in :meth:`_record_stage0_oxidation_transitions`.
 * ``process.stage0_salt_feed`` -- debit; loaded from
   ``inventory.salt_phase_kg['SO3']`` slice before dispatch.
-* ``process.stage0_carbon_reductant`` -- debit; loaded from the
-  additive C inventory before dispatch.
+* ``process.reagent_inventory`` -- debit; C reductant drawn from
+  ``reservoir.reagent.C`` before dispatch.
 * ``process.stage0_perchlorate_feed`` -- debit; loaded from
   ``inventory.salt_phase_kg['ClO4']`` slice before dispatch.
 * ``reservoir.stage0_oxidant`` -- debit; loaded with the computed O2
@@ -208,7 +208,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # transition the provider needs to author):
     #   process.stage0_volatile_feed  (carbonaceous organics feed)
     #   process.stage0_salt_feed       (sulfate-bearing salt feed)
-    #   process.stage0_carbon_reductant (C reductant additive)
+    #   process.reagent_inventory (C reductant from reservoir.reagent.C)
     #   process.stage0_perchlorate_feed (perchlorate-bearing salt feed)
     # Reservoir feed buckets (debited; same load_external seeding):
     #   reservoir.stage0_oxidant       (controlled O2 oxidant)
@@ -222,7 +222,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "process.stage0_volatile_feed",
         "process.stage0_salt_feed",
         "process.stage0_carbonate_feed",
-        "process.stage0_carbon_reductant",
+        "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
         "process.cleaned_melt",
         "reservoir.stage0_oxidant",
@@ -506,6 +506,9 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             reason="stage0_cation_sulfate_carbon_cleanup",
             atom_balance_proof=atom_proof,
         )
+        reagent_consumed_kg = float(
+            (debits_kg.get("process.reagent_inventory") or {}).get("C", 0.0)
+        )
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
@@ -517,6 +520,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "products_kg": dict(products_kg),
                 "oxide_products_kg": dict(oxide_products_kg),
                 "sulfide_products_kg": dict(sulfide_products_kg),
+                "reagent_consumed_kg": reagent_consumed_kg,
             },
         )
 
@@ -747,6 +751,9 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             reason=reason,
             atom_balance_proof=atom_proof,
         )
+        reagent_consumed_kg = float(
+            (debits_kg.get("process.reagent_inventory") or {}).get("C", 0.0)
+        )
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
@@ -756,6 +763,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "reaction_family": family,
                 "debits_kg": debits_kg,
                 "products_kg": dict(products_kg),
+                "reagent_consumed_kg": reagent_consumed_kg,
             },
         )
 

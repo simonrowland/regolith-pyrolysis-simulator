@@ -92,7 +92,7 @@ def test_provider_declares_exactly_twelve_stage0_accounts():
         "process.stage0_volatile_feed",
         "process.stage0_salt_feed",
         "process.stage0_carbonate_feed",
-        "process.stage0_carbon_reductant",
+        "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
         "process.cleaned_melt",
         "reservoir.stage0_oxidant",
@@ -104,7 +104,7 @@ def test_provider_declares_exactly_twelve_stage0_accounts():
     })
     # Sanity: Stage 0 must not touch downstream metallothermic accounts.
     assert "process.metal_phase" not in profile.declared_accounts
-    assert "process.reagent_inventory" not in profile.declared_accounts
+    assert "process.stage0_carbon_reductant" not in profile.declared_accounts
     assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
     assert "terminal.oxygen_mre_anode_stored" not in profile.declared_accounts
@@ -228,8 +228,8 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         f"{accounts - expected}"
     )
     assert "process.cleaned_melt" in expected
+    assert "process.reagent_inventory" in expected
     assert "process.metal_phase" not in accounts
-    assert "process.reagent_inventory" not in accounts
     assert "terminal.oxygen_mre_anode_stored" not in accounts
 
 
@@ -296,7 +296,7 @@ def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
     bad_proposal = LedgerTransitionProposal(
         debits={
             "process.stage0_salt_feed": {"SO3": 2.0},
-            "process.stage0_carbon_reductant": {"C": 1.0},
+            "process.reagent_inventory": {"C": 1.0},
         },
         credits={
             # 1 SO2 instead of 2 -> S short by 1, O short by 2.
@@ -536,7 +536,7 @@ def test_sulfate_carbon_matches_legacy_stoich(
     view = ProviderAccountView(
         accounts={
             "process.stage0_salt_feed": {},
-            "process.stage0_carbon_reductant": {},
+            "process.reagent_inventory": {},
         },
         species_formula_registry=sim.species_formula_registry,
     )
@@ -568,7 +568,7 @@ def test_sulfate_carbon_matches_legacy_stoich(
             "reaction_family": REACTION_FAMILY_SULFATE_CARBON,
             "debits": (
                 ("process.stage0_salt_feed", {"SO3": so3_consumed_kg}),
-                ("process.stage0_carbon_reductant", {"C": c_consumed_kg}),
+                ("process.reagent_inventory", {"C": c_consumed_kg}),
             ),
             "products_kg": products_kg,
         },
@@ -583,6 +583,10 @@ def test_sulfate_carbon_matches_legacy_stoich(
     # Expected: SO2 = extent_mol = 2.0; CO = extent_mol = 2.0.
     assert abs(so2_mol - extent_mol) < 1e-12
     assert abs(co_mol - extent_mol) < 1e-12
+    assert result.diagnostic["reagent_consumed_kg"] == pytest.approx(
+        c_consumed_kg)
+    assert proposal.debits["process.reagent_inventory"]["C"] == pytest.approx(
+        c_consumed_kg / M_C)
 
 
 def test_boudouard_matches_legacy_stoich(
@@ -604,7 +608,7 @@ def test_boudouard_matches_legacy_stoich(
     provider = BuiltinStage0PretreatmentProvider()
     view = ProviderAccountView(
         accounts={
-            "process.stage0_carbon_reductant": {},
+            "process.reagent_inventory": {},
             "reservoir.stage0_process_gas": {},
         },
         species_formula_registry=sim.species_formula_registry,
@@ -631,7 +635,7 @@ def test_boudouard_matches_legacy_stoich(
         control_inputs={
             "reaction_family": REACTION_FAMILY_BOUDOUARD,
             "debits": (
-                ("process.stage0_carbon_reductant", {"C": c_consumed_kg}),
+                ("process.reagent_inventory", {"C": c_consumed_kg}),
                 ("reservoir.stage0_process_gas", {"CO2": co2_input_kg}),
             ),
             "products_kg": products_kg,
@@ -645,6 +649,10 @@ def test_boudouard_matches_legacy_stoich(
     co_mol = proposal.credits["terminal.offgas"]["CO"]
     # Expected: CO = 2 * extent_mol = 6.0.
     assert abs(co_mol - 2.0 * extent_mol) < 1e-12
+    assert result.diagnostic["reagent_consumed_kg"] == pytest.approx(
+        c_consumed_kg)
+    assert proposal.debits["process.reagent_inventory"]["C"] == pytest.approx(
+        extent_mol)
 
 
 def test_complete_oxidation_matches_legacy_stoich(

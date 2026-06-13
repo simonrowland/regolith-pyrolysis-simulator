@@ -240,6 +240,16 @@ class ExtractionMixin:
             fail_if_insufficient=True,
         )
 
+    def _activate_stage0_carbon_reagent(self, required_kg: float) -> None:
+        if 'C' in self._activated_additive_reagents:
+            return
+        self._activated_additive_reagents.add('C')
+        self._draw_reagent_to_process(
+            'C',
+            required_kg,
+            fail_if_insufficient=True,
+        )
+
     def _set_melt_species_projection(self, species: str, kg: float) -> None:
         self.melt.composition_kg.update({species: max(0.0, float(kg))})
 

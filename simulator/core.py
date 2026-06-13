@@ -217,7 +217,6 @@ FLOW_MASS_ACCOUNTS = (
     OXYGEN_MRE_ANODE_ACCOUNT,
 )
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
-    'process.stage0_carbon_reductant',
     'process.stage0_carbonate_feed',
     'process.stage0_perchlorate_feed',
     'process.stage0_salt_feed',
@@ -648,6 +647,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         additives = dict(additives_kg or {})
         ledger_additives = dict(additives)
+        self._activated_additive_reagents = set()
         self.species_formula_registry = self._registry_for_feedstock(fs)
         self.atom_ledger = self._new_atom_ledger()
         self.inventory = self._build_process_inventory(fs, mass_kg)
@@ -737,7 +737,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.shuttle_cycle_K = 0
         # Reset thermite state
         self.thermite_Mg_inventory_kg = 0.0
-        self._activated_additive_reagents = set()
         self.shuttle_cycle_Na = 0
         self._shuttle_injected_this_hr = 0.0
         self._shuttle_reduced_this_hr = 0.0
@@ -838,10 +837,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return ()
         return tuple(provider())
 
+    def _reagent_account_policies(self) -> tuple[AccountPolicy, ...]:
+        return (
+            AccountPolicy.reservoir(
+                'reservoir.reagent.C',
+                credit_limit_kg_by_species={'C': 1e15},
+            ),
+        )
+
     def _new_atom_ledger(self) -> AtomLedger:
         return AtomLedger(
             registry=self.species_formula_registry,
-            account_policies=self._backend_account_policies(),
+            account_policies=(
+                self._backend_account_policies()
+                + self._reagent_account_policies()
+            ),
         )
 
     # ------------------------------------------------------------------
@@ -2045,17 +2055,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         the legacy ``self.atom_ledger.record`` direct mutation is gone.
 
         The ``load_external`` calls are kept here for legacy seeding
-        semantics (process.stage0_salt_feed,
-        process.stage0_carbon_reductant, reservoir.stage0_process_gas)
+        semantics (process.stage0_salt_feed, reservoir.stage0_process_gas)
         -- bringing source mass IN from the feedstock inventory is
         distinct from the chemistry-transition payload the kernel
-        commits.
+        commits.  C reductant is drawn from ``reservoir.reagent.C`` into
+        ``process.reagent_inventory`` before the transition loop (not
+        per-transition ``load_external``).
         """
         from engines.builtin.stage0_pretreatment import (
             REACTION_FAMILY_BOUDOUARD,
             REACTION_FAMILY_CATION_SULFATE_CARBON,
             REACTION_FAMILY_SULFATE_CARBON,
         )
+
+        required_c_kg = float(self.inventory.carbon_reductant_required_kg)
+        if specs and required_c_kg > 1e-12:
+            self._activate_stage0_carbon_reagent(required_c_kg)
 
         # Map legacy spec names to provider reaction-family
         # discriminators.  The provider rejects anything outside
@@ -2077,18 +2092,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise AccountingError(
                     f'unsupported Stage 0 carbon cleanup spec {name!r}'
                 )
-            # Seed source accounts (legacy load_external semantics).
             debits_payload: list[tuple[str, dict[str, float]]] = []
             for account, species_kg in spec['debits']:
                 payload = self._ledger_species_kg(species_kg)
                 if not payload:
                     continue
+                account_name = str(account)
+                if account_name == 'process.reagent_inventory':
+                    debits_payload.append((account_name, dict(payload)))
+                    continue
                 self.atom_ledger.load_external(
-                    account,
+                    account_name,
                     payload,
                     source=f"{label} {name} feed",
                 )
-                debits_payload.append((str(account), dict(payload)))
+                debits_payload.append((account_name, dict(payload)))
             if not debits_payload:
                 continue
 
@@ -2973,9 +2991,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'{carbon_kg_remaining:.6g} kg remains'
             )
 
-        additives_kg['C'] = max(0.0, available_kg - required_kg)
-        if additives_kg['C'] <= 1e-12:
-            additives_kg.pop('C', None)
         self._stage0_carbon_cleanup_specs = specs
 
     @staticmethod
@@ -3057,7 +3072,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'name': 'stage0_sulfate_carbon_cleanup',
             'debits': (
                 ('process.stage0_salt_feed', {'SO3': so3_consumed_kg}),
-                ('process.stage0_carbon_reductant', {'C': c_consumed_kg}),
+                ('process.reagent_inventory', {'C': c_consumed_kg}),
             ),
             'products_kg': products_kg,
         })
@@ -3149,7 +3164,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'name': 'stage0_cation_sulfate_carbon_cleanup',
                 'debits': (
                     ('process.stage0_salt_feed', {species: consumed_kg}),
-                    ('process.stage0_carbon_reductant', {
+                    ('process.reagent_inventory', {
                         'C': c_consumed_kg}),
                 ),
                 'products_kg': products_kg,
@@ -3182,7 +3197,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         specs.append({
             'name': 'stage0_boudouard_carbon_cleanup',
             'debits': (
-                ('process.stage0_carbon_reductant', {'C': c_consumed_kg}),
+                ('process.reagent_inventory', {'C': c_consumed_kg}),
                 ('reservoir.stage0_process_gas', {'CO2': co2_input_kg}),
             ),
             'products_kg': products_kg,
@@ -4617,6 +4632,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg > 1e-9:
                 unspent[f'unspent_{reagent}_reagent'] = kg
         return unspent
+
+    def _consumed_additive_reagents_kg(self) -> Dict[str, float]:
+        consumed: Dict[str, float] = {}
+        if 'C' in self._activated_additive_reagents:
+            required_kg = float(self.inventory.carbon_reductant_required_kg)
+            if required_kg > 1e-9:
+                consumed['consumed_C_reagent'] = required_kg
+        return consumed
 
     def _capture_campaign_summary(self, campaign_name: str) -> dict:
         """Capture a summary of what happened during the just-completed campaign."""
