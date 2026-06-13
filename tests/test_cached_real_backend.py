@@ -207,6 +207,7 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
     assert summary["misses"] == 0
     assert summary["cache_states"] == (
         "cached_exact",
+        "cached_physics_bucket",
         "cached_interpolated",
         "live_fill",
     )

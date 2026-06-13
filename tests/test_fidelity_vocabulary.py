@@ -28,6 +28,7 @@ EXPECTED_LEGACY_TOKENS = {
     "reduced_real_cache_state": {
         "live_fill",
         "cached_exact",
+        "cached_physics_bucket",
         "cached_interpolated",
     },
     "backend/status alias": {
@@ -198,7 +199,7 @@ def test_design_token_inventory_is_pinned_to_spec_table() -> None:
     assert {
         family: set(tokens) for family, tokens in LEGACY_VOCABULARY_TOKENS.items()
     } == EXPECTED_LEGACY_TOKENS
-    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 24
+    assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 25
 
 
 def test_auto_requires_and_decomposes_selected_backend() -> None:

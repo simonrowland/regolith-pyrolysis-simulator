@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import os
 import sqlite3
@@ -25,6 +26,7 @@ from simulator.reduced_real_determinism import (
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
+    canonical_physics_bucket_key_from_replay_key,
     canonical_json_bytes,
     canonical_replay_key,
 )
@@ -312,6 +314,10 @@ def _key_hash(key: dict) -> str:
     return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
 
+def _physics_bucket_hash(key: dict) -> str:
+    return _key_hash(canonical_physics_bucket_key_from_replay_key(key))
+
+
 def _real_magemin_available() -> bool:
     backend = MAGEMinBackend()
     backend.initialize({"python_bridge": "subprocess"})
@@ -386,6 +392,148 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
     assert first["engine_version"] == "alpha-v1"
     assert _key_hash(different_provider) != _key_hash(first)
     assert _key_hash(different_version) != _key_hash(first)
+
+
+def test_pt2_physics_bucket_ignores_recipe_setpoints_islands() -> None:
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic-cache-c1",
+        engine_version="alpha-v1",
+    )
+    store = PT0DeterminismStore("capture")
+    first = _build_pt0_sim(store)
+    first.backend.is_available = lambda: True
+    first._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    second = _build_pt0_sim(store)
+    second.backend.is_available = lambda: True
+    second._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    second.setpoints["optimizer_candidate_patch"] = {
+        "mre_target_species": ["FeO"],
+        "temperature_C": 1275.0,
+    }
+
+    first_key = store._equilibrium_key(first)
+    second_key = store._equilibrium_key(second)
+
+    assert _key_hash(first_key) != _key_hash(second_key)
+    assert first_key["data_digests"]["setpoints"] != second_key["data_digests"]["setpoints"]
+    assert _physics_bucket_hash(first_key) == _physics_bucket_hash(second_key)
+
+
+def test_pt2_physics_bucket_partitions_real_determinants() -> None:
+    key = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-cache-c1",
+            engine_version="alpha-v1",
+        )
+    )
+    baseline = _physics_bucket_hash(key)
+
+    composition_changed = copy.deepcopy(key)
+    composition_changed["composition_mol_fraction"] = list(
+        composition_changed["composition_mol_fraction"]
+    )
+    composition_changed["composition_mol_fraction"].append(("Fe2O3", 1.0e-5))
+
+    temperature_changed = copy.deepcopy(key)
+    temperature_changed["controls"]["T_K"] += 0.01
+
+    pressure_changed = copy.deepcopy(key)
+    pressure_changed["controls"]["pressure_bar"] += 0.00001
+
+    redox_changed = copy.deepcopy(key)
+    redox_changed["controls"]["log_fO2"] -= 0.001
+
+    po2_changed = copy.deepcopy(key)
+    po2_changed["controls"]["pO2_bar"] *= 10.0
+
+    solver_version_changed = copy.deepcopy(key)
+    solver_version_changed["provider"]["engine_version"] = "alpha-v2"
+    solver_version_changed["engine_version"] = "alpha-v2"
+
+    assert _physics_bucket_hash(composition_changed) != baseline
+    assert _physics_bucket_hash(temperature_changed) != baseline
+    assert _physics_bucket_hash(pressure_changed) != baseline
+    assert _physics_bucket_hash(redox_changed) != baseline
+    assert _physics_bucket_hash(po2_changed) != baseline
+    assert _physics_bucket_hash(solver_version_changed) != baseline
+
+
+def test_pt2_physics_bucket_keeps_sulfur_input_without_stage0_digest() -> None:
+    key = _silicate_equilibrium_key(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic-cache-c1",
+            engine_version="alpha-v1",
+        )
+    )
+    sulfur_key = copy.deepcopy(key)
+    sulfur_key["sulfur_side"]["S_input_ppm"] = 1000.0
+    sulfur_key["sulfur_side"]["stage0_inventory_digest"] = "history-a"
+    bucket = canonical_physics_bucket_key_from_replay_key(sulfur_key)
+
+    assert bucket["physics_bucket"]["sulfur"]["S_input_ppm"] == 1000.0
+    assert "stage0_inventory_digest" not in canonical_json_bytes(bucket).decode("utf-8")
+
+    history_changed = copy.deepcopy(sulfur_key)
+    history_changed["sulfur_side"]["stage0_inventory_digest"] = "history-b"
+    assert _physics_bucket_hash(history_changed) == _physics_bucket_hash(sulfur_key)
+
+
+def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -> None:
+    class NonStubBackend:
+        def get_engine_version(self) -> str:
+            return "non-stub-test"
+
+    db_path = tmp_path / "pt1.sqlite"
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic-cache-c1",
+        engine_version="alpha-v1",
+    )
+    capture_store = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture_store)
+    capture_sim.backend = NonStubBackend()
+    capture_sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    capture_store.capture_equilibrium(
+        capture_sim,
+        EquilibriumResult(
+            temperature_C=float(capture_sim.melt.temperature_C),
+            pressure_bar=float(capture_sim.melt.p_total_mbar) / 1000.0,
+            phases_present=["liquid"],
+            phase_masses_kg={"liquid": 1.0},
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={"SiO2": 45.0, "FeO": 10.0},
+            vapor_pressures_Pa={"SiO": 1.0},
+            vapor_pressures_source={"SiO": "test"},
+            fO2_log=capture_sim._compute_intrinsic_melt_fO2(),
+        ),
+    )
+
+    replay_store = PT0DeterminismStore("capture", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay_store)
+    replay_sim.backend = NonStubBackend()
+    replay_sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    replay_sim.setpoints["optimizer_candidate_patch"] = {"temperature_C": 1275.0}
+
+    payload = replay_store.cached_equilibrium(replay_sim)
+
+    assert payload is not None
+    assert replay_sim._last_reduced_real_cache_state == "cached_physics_bucket"
+    counts = replay_store.summary()["cache_state_counts_by_artifact"][
+        "equilibrium_post_record"
+    ]
+    assert counts["cached_physics_bucket"] == 1
+    assert counts["cached_exact"] == 0
 
 
 @pytest.mark.parametrize(

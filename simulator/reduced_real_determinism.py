@@ -27,10 +27,16 @@ from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
+PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
 PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
-CACHE_STATES = ("cached_exact", "cached_interpolated", "live_fill")
+CACHE_STATES = (
+    "cached_exact",
+    "cached_physics_bucket",
+    "cached_interpolated",
+    "live_fill",
+)
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -108,6 +114,7 @@ class PT0DeterminismStore:
             else None
         )
         self.entries: dict[str, dict[str, Any]] = {}
+        self.physics_bucket_entries: dict[str, str] = {}
         self.capture_sequence: list[dict[str, Any]] = []
         self.replay_sequence: list[dict[str, Any]] = []
         self.misses: list[dict[str, Any]] = []
@@ -132,6 +139,7 @@ class PT0DeterminismStore:
     def clone_for_replay(self) -> "PT0DeterminismStore":
         clone = PT0DeterminismStore("replay", db_path=self.persistent_path)
         clone.entries = copy.deepcopy(self.entries)
+        clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
         clone.capture_sequence = copy.deepcopy(self.capture_sequence)
         clone.quantize_live_controls = self.quantize_live_controls
         return clone
@@ -214,9 +222,11 @@ class PT0DeterminismStore:
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
         if not self.write_through_enabled:
             return None
+        key = self._equilibrium_key(sim)
         payload = self._lookup_optional(
             "equilibrium_post_record",
-            self._equilibrium_key(sim),
+            key,
+            physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
         )
         if payload is None:
             return None
@@ -375,11 +385,15 @@ class PT0DeterminismStore:
         payload_bytes = canonical_json_bytes(payload)
         key_hash = _sha256(key_bytes)
         payload_hash = _sha256(payload_bytes)
+        physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+        physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
+        physics_bucket_hash = _sha256(physics_bucket_bytes)
         self.capture_sequence.append(
             {
                 "artifact": artifact,
                 "key": copy.deepcopy(dict(key)),
                 "hash": key_hash,
+                "physics_bucket_hash": physics_bucket_hash,
             }
         )
         existing = self.entries.get(key_hash)
@@ -399,7 +413,11 @@ class PT0DeterminismStore:
                     payload=payload,
                     payload_bytes=payload_bytes,
                     payload_hash=payload_hash,
+                    physics_bucket_key=physics_bucket_key,
+                    physics_bucket_bytes=physics_bucket_bytes,
+                    physics_bucket_hash=physics_bucket_hash,
                 )
+            self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
             return
         if self.persistent_store is not None:
             self.persistent_store.put(
@@ -410,6 +428,9 @@ class PT0DeterminismStore:
                 payload=payload,
                 payload_bytes=payload_bytes,
                 payload_hash=payload_hash,
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
             )
         self.entries[key_hash] = {
             "artifact": artifact,
@@ -418,8 +439,11 @@ class PT0DeterminismStore:
             "key_bytes": key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
+            "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
+            "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
         }
+        self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
         self.live_fills += 1
         self.last_cache_state = "live_fill"
         self._record_cache_event(artifact, "live_fill")
@@ -528,23 +552,33 @@ class PT0DeterminismStore:
         self,
         artifact: str,
         key: Mapping[str, Any],
+        *,
+        physics_bucket_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         key_bytes = canonical_json_bytes(key)
         key_hash = _sha256(key_bytes)
         entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
+        cache_state = "cached_exact"
+        if entry is None and physics_bucket_key is not None:
+            entry = self._entry_for_physics_bucket(artifact, physics_bucket_key)
+            cache_state = "cached_physics_bucket"
         if entry is None:
             return None
-        self.replay_sequence.append(
-            {
-                "artifact": artifact,
-                "key": copy.deepcopy(dict(key)),
-                "hash": key_hash,
-                "cache_state": "cached_exact",
-            }
-        )
+        replay_event = {
+            "artifact": artifact,
+            "key": copy.deepcopy(dict(key)),
+            "hash": key_hash,
+            "cache_state": cache_state,
+        }
+        if cache_state == "cached_physics_bucket" and physics_bucket_key is not None:
+            replay_event["physics_bucket_hash"] = _sha256(
+                canonical_json_bytes(physics_bucket_key)
+            )
+            replay_event["source_key_hash"] = str(entry["key_hash"])
+        self.replay_sequence.append(replay_event)
         self.hits += 1
-        self.last_cache_state = "cached_exact"
-        self._record_cache_event(artifact, "cached_exact")
+        self.last_cache_state = cache_state
+        self._record_cache_event(artifact, cache_state)
         return copy.deepcopy(entry["payload"])
 
     def _entry_for_key(
@@ -566,6 +600,31 @@ class PT0DeterminismStore:
                 self.entries[key_hash] = copy.deepcopy(entry)
         if entry is not None:
             self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+        return entry
+
+    def _entry_for_physics_bucket(
+        self,
+        artifact: str,
+        physics_bucket_key: Mapping[str, Any],
+    ) -> dict[str, Any] | None:
+        physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
+        physics_bucket_hash = _sha256(physics_bucket_bytes)
+        key_hash = self.physics_bucket_entries.get(physics_bucket_hash)
+        entry = self.entries.get(key_hash) if key_hash is not None else None
+        if entry is None and self.persistent_store is not None:
+            entry = self.persistent_store.get_by_physics_bucket(
+                artifact=artifact,
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
+            )
+            if entry is not None:
+                row_hash = str(entry["key_hash"])
+                self.entries[row_hash] = copy.deepcopy(entry)
+                self.physics_bucket_entries.setdefault(
+                    physics_bucket_hash,
+                    row_hash,
+                )
         return entry
 
     def _record_cache_event(self, artifact: str, cache_state: str) -> None:
@@ -633,8 +692,17 @@ class PT1PersistentEquilibriumStore:
         payload: Mapping[str, Any],
         payload_bytes: bytes,
         payload_hash: str,
+        physics_bucket_key: Mapping[str, Any] | None = None,
+        physics_bucket_bytes: bytes | None = None,
+        physics_bucket_hash: str | None = None,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key)
+        if physics_bucket_key is None:
+            physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+        if physics_bucket_bytes is None:
+            physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
+        if physics_bucket_hash is None:
+            physics_bucket_hash = _sha256(physics_bucket_bytes)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -653,6 +721,13 @@ class PT1PersistentEquilibriumStore:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 payload collision for {artifact}: {key_hash}"
                     )
+                self._update_physics_bucket_columns(
+                    conn,
+                    key_hash=key_hash,
+                    physics_bucket_key=physics_bucket_key,
+                    physics_bucket_bytes=physics_bucket_bytes,
+                    physics_bucket_hash=physics_bucket_hash,
+                )
                 return
             conn.execute(
                 f"""
@@ -668,9 +743,13 @@ class PT1PersistentEquilibriumStore:
                     code_version,
                     engine_version,
                     data_digests_json,
+                    physics_bucket_schema_version,
+                    physics_bucket_sha256,
+                    replay_scope_sha256,
+                    physics_key_bytes,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -684,6 +763,10 @@ class PT1PersistentEquilibriumStore:
                     str(key.get("code_version")),
                     _none_or_str(key.get("engine_version")),
                     canonical_json_bytes(key.get("data_digests", {})).decode("utf-8"),
+                    str(physics_bucket_key.get("schema_version")),
+                    physics_bucket_hash,
+                    _replay_scope_hash(physics_bucket_key),
+                    sqlite3.Binary(physics_bucket_bytes),
                     datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     _git_dirty(),
                 ),
@@ -708,6 +791,44 @@ class PT1PersistentEquilibriumStore:
                 key=key,
                 key_bytes=key_bytes,
                 key_hash=key_hash,
+            )
+
+    def get_by_physics_bucket(
+        self,
+        *,
+        artifact: str,
+        physics_bucket_key: Mapping[str, Any],
+        physics_bucket_bytes: bytes,
+        physics_bucket_hash: str,
+    ) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            self._initialize(conn)
+            row = conn.execute(
+                f"""
+                SELECT *
+                FROM {PT1_EQUILIBRIUM_TABLE}
+                WHERE artifact = ?
+                  AND physics_bucket_schema_version = ?
+                  AND physics_bucket_sha256 = ?
+                  AND replay_scope_sha256 = ?
+                ORDER BY key_hash
+                LIMIT 1
+                """,
+                (
+                    artifact,
+                    str(physics_bucket_key.get("schema_version")),
+                    physics_bucket_hash,
+                    _replay_scope_hash(physics_bucket_key),
+                ),
+            ).fetchone()
+            if row is None:
+                return None
+            return self._entry_from_physics_bucket_row(
+                row,
+                artifact=artifact,
+                physics_bucket_key=physics_bucket_key,
+                physics_bucket_bytes=physics_bucket_bytes,
+                physics_bucket_hash=physics_bucket_hash,
             )
 
     def _connect(self) -> sqlite3.Connection:
@@ -738,15 +859,31 @@ class PT1PersistentEquilibriumStore:
                 code_version TEXT NOT NULL,
                 engine_version TEXT,
                 data_digests_json TEXT NOT NULL,
+                physics_bucket_schema_version TEXT,
+                physics_bucket_sha256 TEXT,
+                replay_scope_sha256 TEXT,
+                physics_key_bytes BLOB,
                 created_at TEXT NOT NULL,
                 git_dirty INTEGER NOT NULL
             )
             """
         )
+        self._ensure_physics_bucket_columns(conn)
         conn.execute(
             f"""
             CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_artifact
             ON {PT1_EQUILIBRIUM_TABLE}(artifact)
+            """
+        )
+        conn.execute(
+            f"""
+            CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_physics
+            ON {PT1_EQUILIBRIUM_TABLE}(
+                artifact,
+                physics_bucket_schema_version,
+                physics_bucket_sha256,
+                replay_scope_sha256
+            )
             """
         )
         metadata = conn.execute(
@@ -764,6 +901,52 @@ class PT1PersistentEquilibriumStore:
             VALUES (?, ?)
             """,
             ("store_schema_version", PT1_STORE_SCHEMA_VERSION),
+        )
+
+    def _ensure_physics_bucket_columns(self, conn: sqlite3.Connection) -> None:
+        existing = {
+            str(row["name"])
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+        columns = {
+            "physics_bucket_schema_version": "TEXT",
+            "physics_bucket_sha256": "TEXT",
+            "replay_scope_sha256": "TEXT",
+            "physics_key_bytes": "BLOB",
+        }
+        for name, column_type in columns.items():
+            if name not in existing:
+                conn.execute(
+                    f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+                    f"ADD COLUMN {name} {column_type}"
+                )
+
+    def _update_physics_bucket_columns(
+        self,
+        conn: sqlite3.Connection,
+        *,
+        key_hash: str,
+        physics_bucket_key: Mapping[str, Any],
+        physics_bucket_bytes: bytes,
+        physics_bucket_hash: str,
+    ) -> None:
+        conn.execute(
+            f"""
+            UPDATE {PT1_EQUILIBRIUM_TABLE}
+            SET physics_bucket_schema_version = ?,
+                physics_bucket_sha256 = ?,
+                replay_scope_sha256 = ?,
+                physics_key_bytes = ?
+            WHERE key_hash = ?
+              AND physics_bucket_sha256 IS NULL
+            """,
+            (
+                str(physics_bucket_key.get("schema_version")),
+                physics_bucket_hash,
+                _replay_scope_hash(physics_bucket_key),
+                sqlite3.Binary(physics_bucket_bytes),
+                key_hash,
+            ),
         )
 
     def _fetch(
@@ -867,6 +1050,46 @@ class PT1PersistentEquilibriumStore:
             "cache_state": "live_fill",
         }
 
+    def _entry_from_physics_bucket_row(
+        self,
+        row: sqlite3.Row,
+        *,
+        artifact: str,
+        physics_bucket_key: Mapping[str, Any],
+        physics_bucket_bytes: bytes,
+        physics_bucket_hash: str,
+    ) -> dict[str, Any]:
+        row_physics_bytes = _sqlite_bytes(row["physics_key_bytes"])
+        if row["physics_bucket_schema_version"] != str(
+            physics_bucket_key.get("schema_version")
+        ):
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row physics bucket schema drift: "
+                f"{row['physics_bucket_schema_version']} != "
+                f"{physics_bucket_key.get('schema_version')}"
+            )
+        if row["physics_bucket_sha256"] != physics_bucket_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row physics bucket hash mismatch: {physics_bucket_hash}"
+            )
+        if row["replay_scope_sha256"] != _replay_scope_hash(physics_bucket_key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row replay scope hash mismatch: {physics_bucket_hash}"
+            )
+        if row_physics_bytes != physics_bucket_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
+            )
+        row_key_bytes = _sqlite_bytes(row["key_bytes"])
+        row_key = json.loads(row_key_bytes.decode("utf-8"))
+        return self._entry_from_row(
+            row,
+            artifact=artifact,
+            key=row_key,
+            key_bytes=row_key_bytes,
+            key_hash=str(row["key_hash"]),
+        )
+
 
 def canonical_replay_key(
     sim: Any,
@@ -937,6 +1160,71 @@ def canonical_replay_key(
         "code_version": _code_version(),
         "source_module_digest": _source_module_digest(),
         "engine_version": provider.get("engine_version"),
+    }
+
+
+def canonical_physics_bucket_key(
+    sim: Any,
+    *,
+    artifact: str,
+    intent: ChemistryIntent,
+    fO2_log: float | None,
+    fe_redox_policy: str,
+    provider_role: str | None = None,
+) -> dict[str, Any]:
+    return canonical_physics_bucket_key_from_replay_key(
+        canonical_replay_key(
+            sim,
+            artifact=artifact,
+            intent=intent,
+            fO2_log=fO2_log,
+            fe_redox_policy=fe_redox_policy,
+            provider_role=provider_role,
+        )
+    )
+
+
+def canonical_physics_bucket_key_from_replay_key(
+    key: Mapping[str, Any],
+) -> dict[str, Any]:
+    controls = key.get("controls", {})
+    if not isinstance(controls, Mapping):
+        controls = {}
+    bucket_controls: dict[str, Any] = {
+        "T_K": controls.get("T_K"),
+        "pressure_bar": controls.get("pressure_bar"),
+    }
+    if _physics_bucket_consumes_log_fO2(key):
+        bucket_controls["log_fO2"] = controls.get("log_fO2")
+    if _physics_bucket_consumes_pO2_bar(key):
+        bucket_controls["pO2_bar"] = controls.get("pO2_bar")
+
+    sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
+    replay_scope: dict[str, Any] = {
+        "exact_replay_schema_version": key.get("schema_version"),
+        "backend": _json_ready(key.get("backend", {})),
+        "provider": _json_ready(key.get("provider", {})),
+        "vapor_pressure_provider": _json_ready(
+            key.get("vapor_pressure_provider", {})
+        ),
+        "engine_version": key.get("engine_version"),
+        "data_digests": _solver_data_digests_from_key(key),
+    }
+    if sulfur_input_ppm and sulfur_input_ppm > 0.0:
+        replay_scope["sulfsat"] = _sulfsat_scope_from_key(key)
+
+    return {
+        "schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
+        "physics_bucket": {
+            "artifact": str(key.get("artifact")),
+            "intent": str(key.get("intent")),
+            "composition_mol_fraction": _json_ready(
+                key.get("composition_mol_fraction", [])
+            ),
+            "controls": bucket_controls,
+            "sulfur": {"S_input_ppm": sulfur_input_ppm},
+        },
+        "replay_scope": replay_scope,
     }
 
 
@@ -1455,6 +1743,63 @@ def _data_digests(sim: Any) -> dict[str, str]:
             getattr(sim, "species_formula_registry", {})
         ),
     }
+
+
+def _solver_data_digests_from_key(key: Mapping[str, Any]) -> dict[str, Any]:
+    data_digests = key.get("data_digests", {})
+    if not isinstance(data_digests, Mapping):
+        data_digests = {}
+    return {
+        name: data_digests.get(name)
+        for name in ("species_formula_registry", "vapor_pressures")
+        if data_digests.get(name) is not None
+    }
+
+
+def _sulfur_input_ppm_from_replay_key(key: Mapping[str, Any]) -> float:
+    sulfur_side = key.get("sulfur_side", {})
+    if not isinstance(sulfur_side, Mapping):
+        sulfur_side = {}
+    try:
+        value = float(sulfur_side.get("S_input_ppm", 0.0) or 0.0)
+    except (TypeError, ValueError):
+        value = 0.0
+    return float(_sigfig(value, 6) or 0.0)
+
+
+def _sulfsat_scope_from_key(key: Mapping[str, Any]) -> dict[str, Any]:
+    sulfur_side = key.get("sulfur_side", {})
+    if not isinstance(sulfur_side, Mapping):
+        sulfur_side = {}
+    return {
+        name: sulfur_side.get(name)
+        for name in (
+            "sulfsat_provider",
+            "sulfsat_available",
+            "sulfsat_package_version",
+            "sulfsat_calibration_version",
+        )
+        if sulfur_side.get(name) is not None
+    }
+
+
+def _physics_bucket_consumes_log_fO2(key: Mapping[str, Any]) -> bool:
+    return str(key.get("intent")) in {
+        ChemistryIntent.SILICATE_EQUILIBRIUM.value,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION.value,
+        ChemistryIntent.GATE_LIQUID_FRACTION.value,
+        ChemistryIntent.BACKEND_EQUILIBRIUM.value,
+    }
+
+
+def _physics_bucket_consumes_pO2_bar(key: Mapping[str, Any]) -> bool:
+    return str(key.get("artifact")) == "equilibrium_post_record" and bool(
+        key.get("vapor_pressure_provider")
+    )
+
+
+def _replay_scope_hash(physics_bucket_key: Mapping[str, Any]) -> str:
+    return _digest(physics_bucket_key.get("replay_scope", {}))
 
 
 @lru_cache(maxsize=1)

@@ -34,6 +34,7 @@ CANONICAL_EVIDENCE_CLASSES: frozenset[str] = frozenset(
 class CacheState(str, Enum):
     LIVE_FILL = "live_fill"
     CACHED_EXACT = "cached_exact"
+    CACHED_PHYSICS_BUCKET = "cached_physics_bucket"
     SERVED_NEIGHBOR = "served_neighbor"
     CACHED_REAL = "cached_real"
 
@@ -98,7 +99,12 @@ LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
             {"earned_crash", "completed_run", "tap_truncated"}
         ),
         "reduced_real_cache_state": frozenset(
-            {"live_fill", "cached_exact", "cached_interpolated"}
+            {
+                "live_fill",
+                "cached_exact",
+                "cached_physics_bucket",
+                "cached_interpolated",
+            }
         ),
         "backend/status alias": frozenset(
             {
@@ -233,6 +239,12 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
         ),
         ("reduced_real_cache_state", "cached_exact"): CanonicalFidelityMapping(
             cache_state=CacheState.CACHED_EXACT.value
+        ),
+        (
+            "reduced_real_cache_state",
+            "cached_physics_bucket",
+        ): CanonicalFidelityMapping(
+            cache_state=CacheState.CACHED_PHYSICS_BUCKET.value
         ),
         ("reduced_real_cache_state", "cached_interpolated"): CanonicalFidelityMapping(
             cache_state=CacheState.SERVED_NEIGHBOR.value,
