@@ -16,6 +16,12 @@ from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBacken
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
 CACHED_REAL_BACKEND_NAME = "cached-real"
 CACHED_REAL_MISS_POLICIES = ("fail-loud", "live-fill")
+CACHE_TIER_CEILINGS = (
+    "cached_interpolated",
+    "cached_physics_bucket",
+    "cached_exact",
+)
+DEFAULT_CACHE_TIER_CEILING = "cached_interpolated"
 BACKEND_STATUS_OK = "ok"
 BACKEND_STATUS_UNAVAILABLE = "unavailable"
 REAL_DATA_REQUIRED_INTENTS = frozenset(
@@ -74,6 +80,7 @@ class CachedRealConfig:
     authorized_backend_name: str
     authorized_backend_version: str
     miss_policy: str = "fail-loud"
+    cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
 
 
 @dataclass(frozen=True)
@@ -220,11 +227,20 @@ def normalize_cached_real_config(
             "cached-real reduced_real_cache.miss_policy must be one of "
             f"{', '.join(CACHED_REAL_MISS_POLICIES)}"
         )
+    cache_tier_ceiling = str(
+        value.get("cache_tier_ceiling", DEFAULT_CACHE_TIER_CEILING)
+    ).strip()
+    if cache_tier_ceiling not in CACHE_TIER_CEILINGS:
+        raise unavailable_error_cls(
+            "cached-real reduced_real_cache.cache_tier_ceiling must be one of "
+            f"{', '.join(CACHE_TIER_CEILINGS)}"
+        )
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
         authorized_backend_version=authorized_backend_version,
         miss_policy=miss_policy,
+        cache_tier_ceiling=cache_tier_ceiling,
     )
 
 
@@ -236,6 +252,7 @@ def build_cached_real_store(config: CachedRealConfig):
     mode = "replay" if config.miss_policy == "fail-loud" else "capture"
     store = PT0DeterminismStore(mode, db_path=config.db_path)
     store.cached_real_miss_policy = config.miss_policy
+    store.cache_tier_ceiling = config.cache_tier_ceiling
     return store
 
 

@@ -11,6 +11,7 @@ from typing import Any
 
 import yaml
 
+from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import (
@@ -75,6 +76,7 @@ _TOP_LEVEL_KEYS = frozenset(
         "early_tap_mode",
         "staged",
         "staged_strategy",
+        "two_phase_certify",
     }
 )
 _OBJECTIVE_KEYS = frozenset({"metric", "sense", "units", "weight", "rationale"})
@@ -117,6 +119,8 @@ _RUN_KEYS = frozenset(
         "area_basis",
         "oxide_vapor_ceiling_digest",
         "sink_channel_evidence_digests",
+        "cache_tier_ceiling",
+        "miss_policy",
     }
 )
 _LAB_OVERLAY_SCOPE_KEYS = frozenset(
@@ -134,6 +138,12 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "miss_policy",
     "authorized_backend_name",
     "authorized_backend_version",
+    "cache_tier_ceiling",
+})
+_TWO_PHASE_CERTIFY_KEYS = frozenset({
+    "enabled",
+    "top_k",
+    "disagreement_threshold",
 })
 _REDUCED_REAL_MISS_POLICIES = frozenset({"fail-loud", "live-fill"})
 
@@ -250,6 +260,7 @@ def validate_profile(
         base_run=profile["run"],
     )
     _validate_thermal_window_caps(profile, source=source)
+    _validate_two_phase_certify(profile.get("two_phase_certify"), source=source)
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
@@ -495,6 +506,13 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
             ) from exc
     _validate_lab_overlay_scope(raw, source=source, where=where)
     _validate_c5_request(raw, source=source, where=where)
+    if "cache_tier_ceiling" in raw:
+        cache_tier_ceiling = str(raw["cache_tier_ceiling"]).strip()
+        if cache_tier_ceiling not in CACHE_TIER_CEILINGS:
+            raise ProfileValidationError(
+                f"{source}: {where}.cache_tier_ceiling must be one of "
+                f"{', '.join(CACHE_TIER_CEILINGS)}"
+            )
     backend_name = str(raw.get("backend_name", ""))
     cache_config = raw.get("reduced_real_cache")
     if backend_name == "cached-real":
@@ -628,6 +646,48 @@ def _validate_reduced_real_cache_config(
             f"{source}: {where}.miss_policy must be one of "
             f"{', '.join(sorted(_REDUCED_REAL_MISS_POLICIES))}"
         )
+    cache_tier_ceiling = str(
+        raw.get("cache_tier_ceiling", DEFAULT_CACHE_TIER_CEILING)
+    ).strip()
+    if cache_tier_ceiling not in CACHE_TIER_CEILINGS:
+        raise ProfileValidationError(
+            f"{source}: {where}.cache_tier_ceiling must be one of "
+            f"{', '.join(CACHE_TIER_CEILINGS)}"
+        )
+
+
+def _validate_two_phase_certify(
+    raw: Any,
+    *,
+    source: str | Path,
+) -> None:
+    if raw is None:
+        return
+    if not isinstance(raw, Mapping):
+        raise ProfileValidationError(f"{source}: two_phase_certify must be a mapping")
+    _reject_unknown_keys(
+        raw,
+        _TWO_PHASE_CERTIFY_KEYS,
+        source=source,
+        where="two_phase_certify",
+    )
+    if "top_k" in raw:
+        top_k = raw["top_k"]
+        if not isinstance(top_k, int) or isinstance(top_k, bool) or top_k <= 0:
+            raise ProfileValidationError(
+                f"{source}: two_phase_certify.top_k must be a positive integer"
+            )
+    if "disagreement_threshold" in raw:
+        threshold = raw["disagreement_threshold"]
+        if not isinstance(threshold, (int, float)) or isinstance(threshold, bool):
+            raise ProfileValidationError(
+                f"{source}: two_phase_certify.disagreement_threshold must be a number"
+            )
+        if not math.isfinite(float(threshold)) or float(threshold) < 0.0:
+            raise ProfileValidationError(
+                f"{source}: two_phase_certify.disagreement_threshold must be finite "
+                "and non-negative"
+            )
 
 
 def _validate_fidelities(

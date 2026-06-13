@@ -28,6 +28,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         profile = _resolve_profile_arg(args.profile, parser)
+        two_phase_certify = None
+        if args.two_phase_certify:
+            two_phase_certify = {"enabled": True}
+            if args.certify_top_k is not None:
+                two_phase_certify["top_k"] = args.certify_top_k
         result = run(
             profile=profile,
             feedstock=args.feedstock,
@@ -37,6 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             budget=args.budget,
             out_dir=args.out,
             seed=args.seed,
+            two_phase_certify=two_phase_certify,
         )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         _write_job_status(
@@ -85,6 +91,17 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--budget", type=_positive_int, required=True, help="evaluation budget")
     parser.add_argument("--out", type=Path, default=None, help="artifact output directory")
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
+    parser.add_argument(
+        "--two-phase-certify",
+        action="store_true",
+        help="run coarse explore then exact-certify top-K (opt-in)",
+    )
+    parser.add_argument(
+        "--certify-top-k",
+        type=_positive_int,
+        default=None,
+        help="top-K candidates to re-certify when --two-phase-certify is set",
+    )
     return parser
 
 

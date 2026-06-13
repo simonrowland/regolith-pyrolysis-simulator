@@ -140,6 +140,8 @@ class PT0DeterminismStore:
         self.live_fills: int = 0
         self.last_cache_state: str | None = None
         self.quantize_live_controls: bool = True
+        self.cache_tier_ceiling: str = "cached_interpolated"
+        self.cached_real_miss_policy: str | None = None
 
     @property
     def capture_enabled(self) -> bool:
@@ -159,6 +161,8 @@ class PT0DeterminismStore:
         clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
         clone.capture_sequence = copy.deepcopy(self.capture_sequence)
         clone.quantize_live_controls = self.quantize_live_controls
+        clone.cache_tier_ceiling = self.cache_tier_ceiling
+        clone.cached_real_miss_policy = self.cached_real_miss_policy
         return clone
 
     def quantized_controls(
@@ -574,52 +578,58 @@ class PT0DeterminismStore:
     ) -> dict[str, Any] | None:
         key_bytes = canonical_json_bytes(key)
         key_hash = _sha256(key_bytes)
+        tier_ceiling = str(
+            getattr(self, "cache_tier_ceiling", "cached_interpolated")
+        )
         entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
         cache_state = "cached_exact"
         physics_bucket_hash: str | None = None
         physics_bucket_rung: str | None = None
-        if entry is None and physics_bucket_key is not None:
-            entry = self._entry_for_physics_bucket(artifact, physics_bucket_key)
-            cache_state = "cached_physics_bucket"
-            physics_bucket_hash = _sha256(canonical_json_bytes(physics_bucket_key))
+        if entry is None and tier_ceiling != "cached_exact":
+            if physics_bucket_key is not None:
+                entry = self._entry_for_physics_bucket(artifact, physics_bucket_key)
+                cache_state = "cached_physics_bucket"
+                physics_bucket_hash = _sha256(canonical_json_bytes(physics_bucket_key))
+            if entry is None:
+                for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+                    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        key,
+                        rung_tag,
+                    )
+                    entry = self._entry_for_physics_ladder_bucket(
+                        artifact,
+                        rung_tag,
+                        rung_key,
+                    )
+                    if entry is not None:
+                        cache_state = "cached_physics_bucket"
+                        physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
+                        physics_bucket_rung = rung_tag
+                        break
+            if entry is None:
+                for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
+                    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        key,
+                        rung_tag,
+                    )
+                    entry = self._entry_for_physics_ladder_bucket(
+                        artifact,
+                        rung_tag,
+                        rung_key,
+                        query_key=key,
+                    )
+                    if entry is not None:
+                        cache_state = "cached_physics_bucket"
+                        physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
+                        physics_bucket_rung = rung_tag
+                        break
         if entry is None:
-            for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
-                rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                    key,
-                    rung_tag,
-                )
-                entry = self._entry_for_physics_ladder_bucket(
-                    artifact,
-                    rung_tag,
-                    rung_key,
-                )
-                if entry is not None:
-                    cache_state = "cached_physics_bucket"
-                    physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
-                    physics_bucket_rung = rung_tag
-                    break
-        if entry is None:
-            for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
-                rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                    key,
-                    rung_tag,
-                )
-                entry = self._entry_for_physics_ladder_bucket(
-                    artifact,
-                    rung_tag,
-                    rung_key,
-                    query_key=key,
-                )
-                if entry is not None:
-                    cache_state = "cached_physics_bucket"
-                    physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
-                    physics_bucket_rung = rung_tag
-                    break
-        if entry is None:
-            interpolated = self._lookup_interpolated(artifact, key)
-            if interpolated is None:
-                return None
-            return interpolated
+            if tier_ceiling == "cached_interpolated":
+                interpolated = self._lookup_interpolated(artifact, key)
+                if interpolated is None:
+                    return None
+                return interpolated
+            return None
         replay_event = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),

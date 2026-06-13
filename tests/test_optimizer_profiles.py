@@ -12,6 +12,7 @@ from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER
+from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
     KNOWN_OBJECTIVE_METRICS,
     ProfileValidationError,
@@ -20,6 +21,52 @@ from simulator.optimize.profiles import (
     validate_profile_catalog,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
+
+
+def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"]["backend_name"] = "cached-real"
+    profile["run"]["reduced_real_cache"] = {
+        "db_path": "data/reduced-real.db",
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "AlphaMELTSBackend",
+        "authorized_backend_version": "alpha-v1",
+        "cache_tier_ceiling": "cached_exact",
+    }
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+    assert (
+        validated["run"]["reduced_real_cache"]["cache_tier_ceiling"]
+        == "cached_exact"
+    )
+
+
+def test_reduced_real_cache_rejects_unknown_cache_tier_ceiling() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"]["backend_name"] = "cached-real"
+    profile["run"]["reduced_real_cache"] = {
+        "db_path": "data/reduced-real.db",
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "AlphaMELTSBackend",
+        "authorized_backend_version": "alpha-v1",
+        "cache_tier_ceiling": "cached_approximate",
+    }
+    with pytest.raises(ProfileValidationError, match="cache_tier_ceiling"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+    assert "cached_approximate" not in CACHE_TIER_CEILINGS
+
+
+def test_two_phase_certify_profile_block_validates() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["two_phase_certify"] = {"enabled": True, "top_k": 5}
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+    assert validated["two_phase_certify"]["top_k"] == 5
+
+
+def test_two_phase_certify_rejects_invalid_top_k() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["two_phase_certify"] = {"enabled": True, "top_k": 0}
+    with pytest.raises(ProfileValidationError, match="top_k"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:

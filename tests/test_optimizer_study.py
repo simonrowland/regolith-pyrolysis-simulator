@@ -1981,6 +1981,144 @@ def test_cli_writes_failure_job_status_marker_for_no_feasible(
     assert "no feasible candidates" in status["message"]
 
 
+def _two_phase_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    index = _sequence(candidate_id)
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    fid_opts = profile.get("fidelities", {}).get(fidelity, {})
+    tier_ceiling = fid_opts.get("cache_tier_ceiling", "cached_interpolated")
+    if tier_ceiling == "cached_interpolated":
+        oxygen = 100.0 + index
+        cache_state = "cached_interpolated"
+    else:
+        oxygen = 10.0 + index
+        cache_state = "cached_exact"
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+            ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "diagnostic_stub",
+                "per_hour_summary": [{"reduced_real_cache_state": cache_state}],
+                "snapshots": ["heavy"],
+            },
+        ),
+    )
+
+
+def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -> None:
+    out = tmp_path / "two-phase"
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    explore_states = {
+        record.trace_summary.get("reduced_real_cache_state")
+        for record in result.records
+        if record.feasible
+    }
+    assert "cached_interpolated" in explore_states
+
+    certification_path = out / "two_phase_certification.json"
+    assert certification_path.exists()
+    certification = json.loads(certification_path.read_text())
+    assert certification["candidates"]
+    assert "aggregate_disagreement" in certification
+    assert certification["aggregate_disagreement"]["max"] > 0.0
+    assert "replay_metadata" in certification
+    metadata = certification["replay_metadata"]
+    for key in (
+        "seed",
+        "strategy",
+        "parallel",
+        "sampler",
+        "objective_names",
+        "code_version",
+        "data_digests",
+    ):
+        assert key in metadata
+    assert metadata["seed"] == 7
+    assert metadata["parallel"] == 1
+
+    winner_index = int(result.winner.candidate_id.rsplit("-", 1)[1])
+    assert result.winner.objectives["oxygen_kg"] == pytest.approx(10.0 + winner_index)
+    explore_by_id = {record.candidate_id: record for record in result.records}
+    explore_winner = explore_by_id[result.winner.candidate_id]
+    assert explore_winner.objectives["oxygen_kg"] == pytest.approx(100.0 + winner_index)
+    assert (
+        certification["aggregate_disagreement"]["max"]
+        == pytest.approx(abs(explore_winner.objectives["oxygen_kg"] - result.winner.objectives["oxygen_kg"]))
+    )
+
+
+def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:
+    single = tmp_path / "single"
+    disabled = tmp_path / "disabled"
+    kwargs = dict(
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="stub",
+        parallel=1,
+        budget=3,
+        seed=7,
+        evaluator=_evaluator(),
+    )
+    study.run(**kwargs, out_dir=single)
+    study.run(**kwargs, out_dir=disabled, two_phase_certify={"enabled": False})
+
+    assert (single / "pareto.json").read_text() == (disabled / "pareto.json").read_text()
+    assert (single / "winner.recipe.yaml").read_text() == (
+        disabled / "winner.recipe.yaml"
+    ).read_text()
+    assert not (disabled / "two_phase_certification.json").exists()
+
+
+def test_two_phase_certification_records_parallel_for_adaptive_strategy(tmp_path) -> None:
+    out = tmp_path / "adaptive-two-phase"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "bayes",
+        "stub",
+        2,
+        4,
+        out,
+        seed=3,
+        evaluator=_two_phase_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 2},
+    )
+    certification = json.loads((out / "two_phase_certification.json").read_text())
+    assert certification["replay_metadata"]["parallel"] == 2
+
+
 def test_determinism_same_seed_same_pareto_and_winner(tmp_path) -> None:
     first = tmp_path / "first"
     second = tmp_path / "second"

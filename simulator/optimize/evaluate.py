@@ -1327,6 +1327,13 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         if isinstance(raw_cache_config, Mapping)
         else None
     )
+    tier_ceiling = merged.get("cache_tier_ceiling")
+    if tier_ceiling is not None:
+        cache_overlay = dict(reduced_real_cache or {})
+        cache_overlay["cache_tier_ceiling"] = str(tier_ceiling)
+        if merged.get("miss_policy") is not None:
+            cache_overlay["miss_policy"] = str(merged["miss_policy"])
+        reduced_real_cache = cache_overlay
     lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({

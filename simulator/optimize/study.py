@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
+import copy
 import csv
 import inspect
 import json
@@ -16,7 +17,9 @@ from typing import Any
 
 import yaml
 
+from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.optimize.doe import active_sampler_name
 from simulator.optimize.evaluate import (
     EvaluationAbort,
     FailureCategory,
@@ -76,6 +79,11 @@ WINNER_SELECTION_RULE = (
     "objectives in order using their declared directions, then cache_key, "
     "then candidate_id"
 )
+CERTIFIED_CACHE_STATES = frozenset({"cached_exact", "live_fill"})
+EXPLORE_CACHE_TIER_CEILING = "cached_interpolated"
+CERTIFY_CACHE_TIER_CEILING = "cached_exact"
+DEFAULT_TWO_PHASE_TOP_K = 10
+_TWO_PHASE_CERTIFICATION_NAME = "two_phase_certification.json"
 _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
     {
         "campaigns_to_resinter",
@@ -256,6 +264,13 @@ class StudyRecord:
 
 
 @dataclass(frozen=True)
+class TwoPhaseConfig:
+    enabled: bool = False
+    top_k: int = DEFAULT_TWO_PHASE_TOP_K
+    disagreement_threshold: float | None = None
+
+
+@dataclass(frozen=True)
 class StudyResult:
     out_dir: Path
     store_path: Path
@@ -285,6 +300,7 @@ def run(
     result_store: ResultStore | None = None,
     constraints: Any = None,
     topologies: Sequence[Any] | None = None,
+    two_phase_certify: bool | Mapping[str, Any] | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
@@ -310,6 +326,7 @@ def run(
             raise
         resolved_profile = dict(config.profile)
     definitions = objective_definitions(resolved_profile)
+    two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
         active_constraints = (
@@ -356,6 +373,15 @@ def run(
     evaluated = 0
     topology_cursor = 0
     prefix_replay_cache: dict[str, ScoredResult] = {}
+    loop_profile = (
+        _profile_for_cache_phase(
+            resolved_profile,
+            config.fidelity,
+            cache_tier_ceiling=EXPLORE_CACHE_TIER_CEILING,
+        )
+        if two_phase.enabled
+        else resolved_profile
+    )
     with provenance_path.open("w", encoding="utf-8") as provenance:
         while evaluated < config.budget:
             batch_size = min(config.parallel, config.budget - evaluated)
@@ -375,7 +401,7 @@ def run(
                 break
             results = _evaluate_candidates(
                 candidates,
-                profile=resolved_profile,
+                profile=loop_profile,
                 feedstock=config.feedstock,
                 fidelity=config.fidelity,
                 parallel=config.parallel,
@@ -421,13 +447,15 @@ def run(
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
-    leaderboard = tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
-    pareto = pareto_front(
+    explore_leaderboard = tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
+    explore_pareto = pareto_front(
         feasible,
         definitions,
         objective_getter=lambda row: row.objectives,
     )
-    pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
+    explore_pareto_ranked = tuple(
+        sorted(explore_pareto, key=lambda row: _rank_key(row, definitions))
+    )
     non_finite_count = failure_counts.get(FailureCategory.NON_FINITE_PAYLOAD.value, 0)
     if records and non_finite_count == len(records):
         _write_empty_artifacts(
@@ -442,7 +470,7 @@ def run(
             "all candidates failed with non_finite_payload; "
             f"failure_counts={dict(failure_counts)}"
         )
-    if not pareto_ranked:
+    if not explore_pareto_ranked:
         _write_empty_artifacts(
             out,
             profile=resolved_profile,
@@ -455,7 +483,41 @@ def run(
             "no feasible candidates; winner.recipe.yaml not written; "
             f"failure_counts={dict(failure_counts)}"
         )
-    winner = pareto_ranked[0]
+
+    certification_artifact: dict[str, Any] | None = None
+    if two_phase.enabled:
+        certify_profile = _profile_for_cache_phase(
+            resolved_profile,
+            config.fidelity,
+            cache_tier_ceiling=CERTIFY_CACHE_TIER_CEILING,
+            miss_policy="live-fill",
+        )
+        certification = _run_exact_certification(
+            explore_leaderboard[: two_phase.top_k],
+            records=records,
+            profile=certify_profile,
+            feedstock=config.feedstock,
+            fidelity=config.fidelity,
+            parallel=config.parallel,
+            out_dir=out,
+            evaluator=evaluator,
+            schema=active_schema,
+            constraints=active_constraints,
+            store=store,
+            definitions=definitions,
+            config=config,
+            active_strategy=active_strategy,
+            staged_strategies=staged_strategies,
+        )
+        leaderboard = certification.leaderboard
+        pareto_ranked = certification.pareto
+        winner = certification.winner
+        certification_artifact = certification.artifact
+    else:
+        leaderboard = explore_leaderboard
+        pareto_ranked = explore_pareto_ranked
+        winner = pareto_ranked[0]
+
     artifacts = _write_artifacts(
         out,
         profile=resolved_profile,
@@ -470,6 +532,14 @@ def run(
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
+    if certification_artifact is not None:
+        certification_path = out / _TWO_PHASE_CERTIFICATION_NAME
+        certification_path.write_text(
+            json.dumps(certification_artifact, indent=2, sort_keys=True, allow_nan=False)
+            + "\n",
+            encoding="utf-8",
+        )
+        artifacts["two_phase_certification"] = certification_path
     return StudyResult(
         out_dir=out,
         store_path=store.path,
@@ -478,6 +548,258 @@ def run(
         leaderboard=leaderboard,
         pareto=pareto_ranked,
         winner=winner,
+    )
+
+
+@dataclass(frozen=True)
+class _CertificationPassResult:
+    leaderboard: tuple[StudyRecord, ...]
+    pareto: tuple[StudyRecord, ...]
+    winner: StudyRecord
+    artifact: dict[str, Any]
+
+
+def _resolve_two_phase_config(
+    profile: Mapping[str, Any],
+    override: bool | Mapping[str, Any] | None,
+) -> TwoPhaseConfig:
+    if override is not None:
+        if isinstance(override, bool):
+            return TwoPhaseConfig(enabled=override)
+        if isinstance(override, Mapping):
+            return TwoPhaseConfig(
+                enabled=bool(override.get("enabled", True)),
+                top_k=int(override.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
+                disagreement_threshold=(
+                    float(override["disagreement_threshold"])
+                    if override.get("disagreement_threshold") is not None
+                    else None
+                ),
+            )
+        raise TypeError("two_phase_certify must be a bool or mapping")
+    block = profile.get("two_phase_certify")
+    if block is None:
+        return TwoPhaseConfig(enabled=False)
+    if not isinstance(block, Mapping):
+        raise StudyError("two_phase_certify must be a mapping when present in profile")
+    return TwoPhaseConfig(
+        enabled=bool(block.get("enabled", False)),
+        top_k=int(block.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
+        disagreement_threshold=(
+            float(block["disagreement_threshold"])
+            if block.get("disagreement_threshold") is not None
+            else None
+        ),
+    )
+
+
+def _profile_for_cache_phase(
+    profile: Mapping[str, Any],
+    fidelity: str,
+    *,
+    cache_tier_ceiling: str,
+    miss_policy: str | None = None,
+) -> dict[str, Any]:
+    if cache_tier_ceiling not in CACHE_TIER_CEILINGS:
+        raise StudyError(
+            f"unsupported cache_tier_ceiling {cache_tier_ceiling!r}; "
+            f"expected one of {', '.join(CACHE_TIER_CEILINGS)}"
+        )
+    result = copy.deepcopy(dict(profile))
+    fidelities = dict(result.get("fidelities", {}) or {})
+    fid_opts = dict(fidelities.get(fidelity, {}) or {})
+    run = dict(result.get("run", {}) or {})
+    backend_name = str(fid_opts.get("backend_name", run.get("backend_name", "stub")))
+    fid_opts["cache_tier_ceiling"] = cache_tier_ceiling
+    if miss_policy is not None:
+        fid_opts["miss_policy"] = miss_policy
+    if backend_name == "cached-real":
+        cache = dict(fid_opts.get("reduced_real_cache") or run.get("reduced_real_cache") or {})
+        cache["cache_tier_ceiling"] = cache_tier_ceiling
+        if miss_policy is not None:
+            cache["miss_policy"] = miss_policy
+        fid_opts["reduced_real_cache"] = cache
+        if str(run.get("backend_name", "")) == "cached-real":
+            run["reduced_real_cache"] = cache
+    fidelities[fidelity] = fid_opts
+    result["fidelities"] = fidelities
+    result["run"] = run
+    return result
+
+
+def _resolved_strategy_sampler(strategy: Strategy | str) -> str:
+    if isinstance(strategy, str):
+        return active_sampler_name()
+    sampler_name = getattr(strategy, "sampler_name", None)
+    return str(sampler_name) if sampler_name is not None else active_sampler_name()
+
+
+def _strategy_label(strategy: Strategy | str) -> str:
+    if isinstance(strategy, str):
+        return STRATEGY_CLASS_NAMES.get(strategy, strategy)
+    return type(strategy).__name__
+
+
+def _primary_objective_metric(definitions: Sequence[ObjectiveDefinition]) -> str:
+    if not definitions:
+        raise StudyError("objective definitions required for certification")
+    return definitions[0].metric
+
+
+def _objective_value(record: StudyRecord, metric: str) -> float:
+    if metric not in record.objectives:
+        raise StudyError(f"record {record.candidate_id!r} missing objective {metric!r}")
+    return float(record.objectives[metric])
+
+
+def _cache_state_from_record(record: StudyRecord) -> str | None:
+    trace = record.trace_summary
+    if isinstance(trace, Mapping):
+        state = trace.get("reduced_real_cache_state")
+        if state is not None:
+            return str(state)
+    return None
+
+
+def _cache_state_from_scored(scored: ScoredResult) -> str | None:
+    reference = scored.run_reference
+    if reference is not None and reference.cache_state is not None:
+        return str(reference.cache_state)
+    trace = reference.trace if reference is not None else None
+    if isinstance(trace, Mapping):
+        per_hour = trace.get("per_hour_summary")
+        if isinstance(per_hour, Sequence) and per_hour:
+            last = per_hour[-1]
+            if isinstance(last, Mapping):
+                state = last.get("reduced_real_cache_state")
+                if state is not None:
+                    return str(state)
+    return None
+
+
+def _is_certified_cache_state(cache_state: str | None) -> bool:
+    return cache_state in CERTIFIED_CACHE_STATES
+
+
+def _disagreement_aggregate(values: Sequence[float]) -> dict[str, float]:
+    if not values:
+        return {"max": 0.0, "p95": 0.0}
+    ordered = sorted(float(value) for value in values)
+    index = max(0, min(len(ordered) - 1, math.ceil(0.95 * len(ordered)) - 1))
+    return {"max": ordered[-1], "p95": ordered[index]}
+
+
+def _run_exact_certification(
+    top_k_records: Sequence[StudyRecord],
+    *,
+    records: list[StudyRecord],
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    parallel: int,
+    out_dir: Path,
+    evaluator: EvaluateFn,
+    schema: RecipeSchema,
+    constraints: Any,
+    store: ResultStore,
+    definitions: Sequence[ObjectiveDefinition],
+    config: "StudyConfig",
+    active_strategy: Strategy,
+    staged_strategies: tuple[StagedStrategy, ...],
+) -> _CertificationPassResult:
+    if not top_k_records:
+        raise StudyNoFeasibleError("two-phase certification received no explore candidates")
+    primary_metric = _primary_objective_metric(definitions)
+    explore_by_id = {record.candidate_id: record for record in records}
+    certification_rows: list[dict[str, Any]] = []
+    certified_records: list[StudyRecord] = []
+    replay_code_version: str | None = None
+    replay_data_digests: Mapping[str, str] | None = None
+
+    for explore_record in top_k_records:
+        candidate = Candidate(id=explore_record.candidate_id, patch=explore_record.patch)
+        results = _evaluate_candidates(
+            [candidate],
+            profile=profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            parallel=parallel,
+            out_dir=out_dir,
+            evaluator=evaluator,
+            schema=schema,
+            constraints=constraints,
+            store=store,
+            definitions=definitions,
+            prefix_replay_cache={},
+            skip_store_lookup=True,
+        )
+        _, scored, _ = results[0]
+        _assert_honest_result(scored, definitions)
+        certified = _to_record(candidate, scored, cache_hit=False)
+        certified_records.append(certified)
+        cache_state = _cache_state_from_scored(scored)
+        explore_objective = _objective_value(explore_record, primary_metric)
+        certified_objective = _objective_value(certified, primary_metric)
+        disagreement = abs(explore_objective - certified_objective)
+        certification_rows.append(
+            {
+                "candidate_id": explore_record.candidate_id,
+                "explore_objective": explore_objective,
+                "certified_objective": certified_objective,
+                "disagreement": disagreement,
+                "explore_cache_state": _cache_state_from_record(explore_record),
+                "certified_cache_state": cache_state,
+            }
+        )
+        if scored.eval_spec is not None:
+            replay_code_version = scored.eval_spec.code_version
+            replay_data_digests = scored.eval_spec.data_digests
+            store.store(
+                scored.eval_spec,
+                _strip_heavy_result(scored),
+                created_at=datetime.now(UTC).isoformat(),
+            )
+
+    certified_feasible = tuple(record for record in certified_records if record.feasible)
+    if not certified_feasible:
+        raise StudyNoFeasibleError(
+            "two-phase certification produced no feasible certified candidates"
+        )
+    leaderboard = tuple(sorted(certified_feasible, key=lambda row: _rank_key(row, definitions)))
+    pareto = pareto_front(
+        certified_feasible,
+        definitions,
+        objective_getter=lambda row: row.objectives,
+    )
+    pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
+    winner = pareto_ranked[0]
+    disagreements = [float(row["disagreement"]) for row in certification_rows]
+    strategy_name = (
+        config.strategy
+        if isinstance(config.strategy, str)
+        else type(active_strategy).__name__
+    )
+    artifact = {
+        "candidates": certification_rows,
+        "aggregate_disagreement": _disagreement_aggregate(disagreements),
+        "replay_metadata": {
+            "seed": config.seed,
+            "strategy": _strategy_label(config.strategy),
+            "strategy_name": strategy_name,
+            "parallel": config.parallel,
+            "sampler": _resolved_strategy_sampler(config.strategy),
+            "objective_names": [definition.metric for definition in definitions],
+            "code_version": replay_code_version,
+            "data_digests": dict(replay_data_digests or {}),
+        },
+        "top_k": len(top_k_records),
+        "disagreement_threshold": None,
+    }
+    return _CertificationPassResult(
+        leaderboard=leaderboard,
+        pareto=pareto_ranked,
+        winner=winner,
+        artifact=artifact,
     )
 
 
@@ -652,20 +974,23 @@ def _evaluate_candidates(
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
     prefix_replay_cache: dict[str, ScoredResult],
+    skip_store_lookup: bool = False,
 ) -> tuple[tuple[Candidate, ScoredResult, bool], ...]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
     for index, candidate in enumerate(candidates):
-        cached = _lookup_cached(
-            candidate,
-            profile,
-            feedstock,
-            fidelity,
-            schema,
-            store,
-            constraints,
-        )
+        cached = None
+        if not skip_store_lookup:
+            cached = _lookup_cached(
+                candidate,
+                profile,
+                feedstock,
+                fidelity,
+                schema,
+                store,
+                constraints,
+            )
         if cached is None:
             prefix = _ensure_staged_prefix_replay(
                 candidate,
@@ -913,6 +1238,8 @@ def _lookup_cached(
     schema: RecipeSchema,
     store: ResultStore,
     constraints: Any,
+    *,
+    require_certified_cache_state: bool = False,
 ) -> ScoredResult | None:
     try:
         validated = candidate.patch.validated(schema)
@@ -932,6 +1259,10 @@ def _lookup_cached(
         return None
     cached = store.lookup(spec)
     if cached is None:
+        return None
+    if require_certified_cache_state and not _is_certified_cache_state(
+        _cache_state_from_scored(cached)
+    ):
         return None
     return replace(cached, candidate_id=candidate.id)
 
@@ -1292,6 +1623,14 @@ def _light_backend_status_trace_for_reference(
         payload["backend_status"] = str(status)
     if reference.backend_authoritative is not None:
         payload["backend_authoritative"] = reference.backend_authoritative
+    if reference.cache_state is not None:
+        payload["reduced_real_cache_state"] = str(reference.cache_state)
+    elif isinstance(reference.trace, Mapping):
+        per_hour = reference.trace.get("per_hour_summary")
+        if isinstance(per_hour, Sequence) and per_hour:
+            last = per_hour[-1]
+            if isinstance(last, Mapping) and last.get("reduced_real_cache_state") is not None:
+                payload["reduced_real_cache_state"] = str(last["reduced_real_cache_state"])
     if isinstance(reference.trace, Mapping):
         for key in (
             "backend_diagnostics",

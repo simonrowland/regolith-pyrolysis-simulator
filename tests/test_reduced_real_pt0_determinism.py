@@ -1297,3 +1297,77 @@ def test_pt0_real_magemin_capped_replay_contract(tmp_path: Path) -> None:
     assert capture.summary()["capture_calls_by_artifact"][
         "equilibrium_post_record"
     ] >= 1
+
+
+def test_tier_ceiling_cached_exact_refuses_physics_bucket_hit(tmp_path: Path) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.123446,
+        temperature_K=1234.46,
+    )
+    h40_key = _c3a_ladder_key(
+        "h40-row",
+        feo_fraction=0.123444,
+        temperature_K=1234.44,
+    )
+    db_path = tmp_path / "tier-exact.sqlite"
+    _put_c3a_payload(db_path, h40_key, "h40")
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    store.cache_tier_ceiling = "cached_exact"
+    payload = store._lookup_optional(
+        str(query_key["artifact"]),
+        query_key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query_key),
+    )
+
+    assert payload is None
+    assert store.replay_sequence == []
+
+
+def test_tier_ceiling_cached_physics_bucket_refuses_interpolation(
+    tmp_path: Path,
+) -> None:
+    from tests.test_reduced_real_cache_interpolation import (
+        _interpolation_key,
+        _put_interpolation_row,
+    )
+
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    db_path = tmp_path / "tier-bucket.sqlite"
+    _put_interpolation_row(db_path, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(db_path, high, liquid_fraction=0.71, sio_pa=7.05)
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    store.cache_tier_ceiling = "cached_physics_bucket"
+    payload = store._lookup_optional(
+        str(query["artifact"]),
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+
+    assert payload is None
+    assert store.replay_sequence == []
+
+
+def test_tier_ceiling_default_preserves_pre_c5_lookup_behavior(tmp_path: Path) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.123446,
+        temperature_K=1234.46,
+    )
+    h40_key = _c3a_ladder_key(
+        "h40-row",
+        feo_fraction=0.123444,
+        temperature_K=1234.44,
+    )
+    db_path = tmp_path / "tier-default.sqlite"
+    _put_c3a_payload(db_path, h40_key, "h40")
+
+    payload, store = _lookup_c3a_payload(db_path, query_key)
+
+    assert payload["label"] == "h40"
+    assert store.cache_tier_ceiling == "cached_interpolated"
+    assert store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
