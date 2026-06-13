@@ -21,6 +21,51 @@ This project is a comparative process simulator. It is not a validated engineeri
 - **The evaporation-α surface has tiered coverage.** Tier 1 species (Na, K, Fe, Mg, SiO) carry measured α with citation. Tier 2 species (Ca, Ti) use a Zhang 2014 CaTiO₃ proxy; Al uses a broad conflicting-proxy envelope. Tier 3 species (Cr, Mn, CrO₂) intentionally have no numeric α — the engine returns `missing_alpha` and fails loud rather than silently assuming α = 1. Prototype runs can opt into a fallback with `setpoints.chemistry_kernel.allow_unmeasured_alpha_fallback: true`; outputs then record `unmeasured_alpha_fallback_species`. See [`docs/output-interpretation.md`](output-interpretation.md).
 - Feedstock values include literature-derived ranges and estimates.
 
+## Stage-0 bakeout: unlimited-reductant assumption and non-rock clearance
+
+Stage 0 is meant to strip non-rock species (volatiles, salts, sulfides, native metals, refractory trace) from the feedstock before the cleaned silicate oxide composition reaches `MeltState` and downstream melt backends. The operator-facing simplification is that unlimited C, CO, and O₂ reductant/oxidant are available during bakeout. **As coded, that assumption does not drive thermodynamic clearance for most species.** The audit in [`docs-private/research/2026-06-13-stage0-unblocked-audit/stage0-bakeout-chemistry.md`](../docs-private/research/2026-06-13-stage0-unblocked-audit/stage0-bakeout-chemistry.md) (per-species table + file:line anchors) is the source for the verdicts below.
+
+### Mechanism
+
+Stage-0 clearance is primarily **name-routing** (clean-by-fiat), not reductant-driven thermodynamics. Raw feedstock components are matched by normalized name strings against constant sets in `simulator/core.py` and dropped whole into terminal buckets (`terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.stage0_sulfide_matte`, `terminal.drain_tap_material`, `terminal.slag`) with no reaction and no reagent debit. `MeltState` receives only the 14 `OXIDE_SPECIES` oxides — a structural filter, not a chemistry outcome.
+
+Reagent-consuming stoichiometry exists in **four gated reaction families only** (kernel `STAGE0_PRETREATMENT` intent):
+
+1. **complete_oxidation** — organics/tar: C/H/O/N atoms → CO₂, H₂O, N₂; O₂ drawn from `reservoir.stage0_oxidant` when O-deficient. Raises on any atom outside CHON.
+2. **sulfate_carbon** — `SO3 + C → SO2 + CO` (requires SO₃ already in the salt bucket and an explicit per-feedstock carbon recipe).
+3. **boudouard** — `C + CO2 → 2 CO` (requires a declared CO₂ atmosphere/source).
+4. **perchlorate** — `ClO4 → Cl + 2 O2`; O₂ banked, Cl credited to the salt-phase residue.
+
+Every other non-rock species is removed by string-matching into a bucket. The unlimited C/CO/O₂ assumption is therefore an assertion in the routing tables, not a consequence of modeled bakeout thermodynamics against stubborn species.
+
+### Defensible as coded
+
+These paths match what a carbothermal/oxidative bake at furnace-survivable Stage-0 temperatures (ramps capped ~950–1050 °C) would reasonably deliver:
+
+- **Organics / hydrocarbons / C / CH₄ / NH₃ / HCN** — `complete_oxidation` with unlimited O₂; atom-gated to CHON (raises on organo-metallic or organo-S/Cl content rather than silently mis-clearing).
+- **H₂O and other volatiles** — routed to `terminal.offgas`; dehydration and vapor release are trivially correct.
+- **Sulfate as SO₃ surrogate + carbon recipe** — `SO3 + C → SO2 + CO` is real carbothermal sulfate reduction (~600–1050 °C) when the feedstock declares bulk SO₃ and the sulfate carbon reaction.
+- **Perchlorate decomposition** — thermal `ClO4 → O₂ + chloride` is real and easy (~300–500 °C); O₂ is banked. (The chloride product is separated to a salt bucket, not gasified — see resistant list.)
+- **Native Fe, Ni, Co, FeNi alloy** — physically separate from the oxide melt; name-routed to `terminal.drain_tap_material`. NiO/CoO oxides still enter the melt separately.
+- **P₂O₅ in the melt (intended exception)** — `P2O5 ∈ OXIDE_SPECIES` and is not in any Stage-0 removal set; phosphate stays in the cleaned silicate composition for igneous analytic ingestion. Igneous-correct.
+
+### Resistant or mis-routed species
+
+The model asserts clearance that a real carbothermal/oxidative bake at furnace-survivable temperature will **not** deliver, or routes products to the wrong ledger destination. Ranked by whether the error corrupts the melt composition handed to MELTS/MAGEMin:
+
+**P1 — corrupts melt cation inventory**
+
+- **Carbonates** (`carbonate`, `carbonates`, `carbonate_salts` surrogate) — routed whole to `terminal.stage0_salt_phase` by name. Real bake: `MCO₃ → MO + CO₂↑`; CO₂ should offgas but the **Ca/Mg/Na oxide should remain in the melt** (rump-forming cations). The model deletes the entire carbonate mass to a salt bucket, under-feeding the melt with alkaline-earth and alkali oxides. Affects carbonaceous (CI/CM/Ceres/comet) and Mars-carbonate feedstocks.
+- **Alkaline-earth sulfates (CaSO₄/MgSO₄) not pre-cracked to SO₃** — only the `SO3` surrogate is carbothermally reduced; a literal `CaSO4`/`MgSO4` name falls through generic `sulfate` → salt phase, removing the Ca/Mg cation with the sulfur. Real carbothermal reduction leaves **CaS** (→ sulfide matte) or **CaO** (→ melt), not a clean offgas. Mars feedstocks declare bulk SO₃ and dodge this, but the surrogate masks the cation-routing error.
+
+**P2 — clearance overstated or unmodeled**
+
+- **Fluorides (CaF₂)** — matched by bare name `f` and routed to salt phase as "cleared." CaF₂ is refractory (b.p. ~2530 °C); C/CO/O₂ at furnace-survivable T will not gasify it. It belongs in the refractory rump or melt, not a removed salt phase.
+- **Chlorides (Cl, NaCl, KCl, halide)** — separated to a salt bucket, not gasified. NaCl (b.p. ~1465 °C) and KCl (~1420 °C) **volatilize under mbar vacuum** at Stage-0 temperatures and **re-condense on cold walls** — the same wall-fouling failure mode tracked elsewhere in the simulator. Perchlorate decomposition is real, but the chloride product lands in the salt residue; calling this "cleared" overstates gasification.
+- **Nitrates** — zero coverage: no name match, no constant, no reaction, no catalog entry. A declared nitrate would land in `residual_components_kg` (carried, never cleared) or raise. Real decomposition (`MNO₃ → MO + NOₓ↑`) is easy chemistry at 400–900 °C but unmodeled. Low impact for typical regolith feedstocks, but an honest coverage hole.
+
+For file:line anchors and the full per-species verdict table, see the audit linked above.
+
 ## Good Uses
 
 - Compare feedstock classes.
