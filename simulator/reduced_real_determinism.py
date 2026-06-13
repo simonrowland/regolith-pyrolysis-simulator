@@ -35,6 +35,18 @@ PHYSICS_BUCKET_LADDER_RUNGS = (
     ("h40", 4.0),
     ("h30", 3.0),
 )
+PHYSICS_BUCKET_CONTROL_LADDER_RUNGS = (
+    ("h40c", 4.0),
+    ("h30c", 3.0),
+)
+PHYSICS_BUCKET_ALL_LADDER_RUNGS = (
+    PHYSICS_BUCKET_LADDER_RUNGS + PHYSICS_BUCKET_CONTROL_LADDER_RUNGS
+)
+CONTROL_RUNG_SIO_ERROR_BUDGET_TERM = (
+    "po2_control_coarsening_sio_vapor_relative_error"
+)
+CONTROL_RUNG_SIO_RELATIVE_ERROR_BUDGET = 1.0e-3
+CONTROL_RUNG_SIO_PO2_KNEE_BAR = 1.0e-9
 CACHE_STATES = (
     "cached_exact",
     "cached_physics_bucket",
@@ -586,6 +598,23 @@ class PT0DeterminismStore:
                     physics_bucket_rung = rung_tag
                     break
         if entry is None:
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
+                rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                    key,
+                    rung_tag,
+                )
+                entry = self._entry_for_physics_ladder_bucket(
+                    artifact,
+                    rung_tag,
+                    rung_key,
+                    query_key=key,
+                )
+                if entry is not None:
+                    cache_state = "cached_physics_bucket"
+                    physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
+                    physics_bucket_rung = rung_tag
+                    break
+        if entry is None:
             return None
         replay_event = {
             "artifact": artifact,
@@ -597,6 +626,15 @@ class PT0DeterminismStore:
             replay_event["physics_bucket_hash"] = physics_bucket_hash
             if physics_bucket_rung is not None:
                 replay_event["physics_bucket_rung"] = physics_bucket_rung
+                if _physics_ladder_coarsens_controls(physics_bucket_rung):
+                    replay_event["physics_bucket_error_budget"] = (
+                        physics_control_rung_error_budget(
+                            key,
+                            entry["key"],
+                            physics_bucket_rung,
+                            source_payload=entry.get("payload"),
+                        )
+                    )
             replay_event["source_key_hash"] = str(entry["key_hash"])
         self.replay_sequence.append(replay_event)
         self.hits += 1
@@ -660,6 +698,8 @@ class PT0DeterminismStore:
         artifact: str,
         rung_tag: str,
         rung_key: Mapping[str, Any],
+        *,
+        query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         rung_bytes = canonical_json_bytes(rung_key)
         rung_hash = _sha256(rung_bytes)
@@ -670,6 +710,7 @@ class PT0DeterminismStore:
             rung_tag=rung_tag,
             rung_key=rung_key,
             rung_hash=rung_hash,
+            query_key=query_key,
         )
         if entry is not None:
             self.entries[str(entry["key_hash"])] = copy.deepcopy(entry)
@@ -796,9 +837,13 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_h40_distance,
                     physics_bucket_h30_sha256,
                     physics_bucket_h30_distance,
+                    physics_bucket_h40c_sha256,
+                    physics_bucket_h40c_distance,
+                    physics_bucket_h30c_sha256,
+                    physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -820,6 +865,10 @@ class PT1PersistentEquilibriumStore:
                     ladder_values["h40"]["distance"],
                     ladder_values["h30"]["sha256"],
                     ladder_values["h30"]["distance"],
+                    ladder_values["h40c"]["sha256"],
+                    ladder_values["h40c"]["distance"],
+                    ladder_values["h30c"]["sha256"],
+                    ladder_values["h30c"]["distance"],
                     datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                     _git_dirty(),
                 ),
@@ -891,12 +940,13 @@ class PT1PersistentEquilibriumStore:
         rung_tag: str,
         rung_key: Mapping[str, Any],
         rung_hash: str,
+        query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         hash_column = _physics_ladder_hash_column(rung_tag)
         distance_column = _physics_ladder_distance_column(rung_tag)
         with self._connect() as conn:
             self._initialize(conn)
-            row = conn.execute(
+            rows = conn.execute(
                 f"""
                 SELECT *
                 FROM {PT1_EQUILIBRIUM_TABLE}
@@ -904,23 +954,34 @@ class PT1PersistentEquilibriumStore:
                   AND replay_scope_sha256 = ?
                   AND {hash_column} = ?
                 ORDER BY {distance_column} ASC, key_hash ASC
-                LIMIT 1
                 """,
                 (
                     artifact,
                     _replay_scope_hash(rung_key),
                     rung_hash,
                 ),
-            ).fetchone()
-            if row is None:
-                return None
-            return self._entry_from_physics_ladder_bucket_row(
-                row,
-                artifact=artifact,
-                rung_tag=rung_tag,
-                rung_key=rung_key,
-                rung_hash=rung_hash,
             )
+            for row in rows:
+                entry = self._entry_from_physics_ladder_bucket_row(
+                    row,
+                    artifact=artifact,
+                    rung_tag=rung_tag,
+                    rung_key=rung_key,
+                    rung_hash=rung_hash,
+                )
+                if query_key is not None and _physics_ladder_coarsens_controls(
+                    rung_tag
+                ):
+                    budget = physics_control_rung_error_budget(
+                        query_key,
+                        entry["key"],
+                        rung_tag,
+                        source_payload=entry.get("payload"),
+                    )
+                    if not bool(budget["accepted"]):
+                        continue
+                return entry
+            return None
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -958,6 +1019,10 @@ class PT1PersistentEquilibriumStore:
                 physics_bucket_h40_distance REAL,
                 physics_bucket_h30_sha256 TEXT,
                 physics_bucket_h30_distance REAL,
+                physics_bucket_h40c_sha256 TEXT,
+                physics_bucket_h40c_distance REAL,
+                physics_bucket_h30c_sha256 TEXT,
+                physics_bucket_h30c_distance REAL,
                 created_at TEXT NOT NULL,
                 git_dirty INTEGER NOT NULL
             )
@@ -981,7 +1046,7 @@ class PT1PersistentEquilibriumStore:
             )
             """
         )
-        for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+        for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
             hash_column = _physics_ladder_hash_column(rung_tag)
             distance_column = _physics_ladder_distance_column(rung_tag)
             conn.execute(
@@ -1027,6 +1092,10 @@ class PT1PersistentEquilibriumStore:
             "physics_bucket_h40_distance": "REAL",
             "physics_bucket_h30_sha256": "TEXT",
             "physics_bucket_h30_distance": "REAL",
+            "physics_bucket_h40c_sha256": "TEXT",
+            "physics_bucket_h40c_distance": "REAL",
+            "physics_bucket_h30c_sha256": "TEXT",
+            "physics_bucket_h30c_distance": "REAL",
         }
         for name, column_type in columns.items():
             if name not in existing:
@@ -1055,12 +1124,18 @@ class PT1PersistentEquilibriumStore:
                 physics_bucket_h40_sha256 = ?,
                 physics_bucket_h40_distance = ?,
                 physics_bucket_h30_sha256 = ?,
-                physics_bucket_h30_distance = ?
+                physics_bucket_h30_distance = ?,
+                physics_bucket_h40c_sha256 = ?,
+                physics_bucket_h40c_distance = ?,
+                physics_bucket_h30c_sha256 = ?,
+                physics_bucket_h30c_distance = ?
             WHERE key_hash = ?
               AND (
                   physics_bucket_sha256 IS NULL
                   OR physics_bucket_h40_sha256 IS NULL
                   OR physics_bucket_h30_sha256 IS NULL
+                  OR physics_bucket_h40c_sha256 IS NULL
+                  OR physics_bucket_h30c_sha256 IS NULL
               )
             """,
             (
@@ -1072,6 +1147,10 @@ class PT1PersistentEquilibriumStore:
                 ladder_values["h40"]["distance"],
                 ladder_values["h30"]["sha256"],
                 ladder_values["h30"]["distance"],
+                ladder_values["h40c"]["sha256"],
+                ladder_values["h40c"]["distance"],
+                ladder_values["h30c"]["sha256"],
+                ladder_values["h30c"]["distance"],
                 key_hash,
             ),
         )
@@ -1412,6 +1491,14 @@ def canonical_physics_ladder_bucket_key_from_replay_key(
     physics_bucket = copy.deepcopy(dict(bucket["physics_bucket"]))
     controls = dict(physics_bucket.get("controls", {}) or {})
     controls["T_K"] = _sigfig_snap(controls.get("T_K"), sig_figs)
+    if _physics_ladder_coarsens_controls(rung_tag):
+        if "pressure_bar" in controls:
+            controls["pressure_bar"] = _sigfig_snap(
+                controls.get("pressure_bar"),
+                sig_figs,
+            )
+        if "pO2_bar" in controls:
+            controls["pO2_bar"] = _sigfig_snap(controls.get("pO2_bar"), sig_figs)
     physics_bucket["controls"] = controls
     physics_bucket["composition_mol_fraction"] = [
         [str(species), _sigfig_snap(float(fraction), sig_figs)]
@@ -1423,7 +1510,11 @@ def canonical_physics_ladder_bucket_key_from_replay_key(
         "tag": rung_tag,
         "composition_mol_fraction_sig_figs": sig_figs,
         "T_K_sig_figs": sig_figs,
-        "controls": "c1-exact-pressure-redox-sulfur-namespace",
+        "controls": (
+            "pressure-pO2-sigfig-log_fO2-exact"
+            if _physics_ladder_coarsens_controls(rung_tag)
+            else "c1-exact-pressure-redox-sulfur-namespace"
+        ),
     }
     return {
         "schema_version": bucket["schema_version"],
@@ -1469,7 +1560,79 @@ def physics_ladder_bucket_distance_from_replay_key(
         float(rung_controls.get("T_K", 0.0) or 0.0),
         sig_figs,
     )
+    if _physics_ladder_coarsens_controls(rung_tag):
+        for control_name in ("pressure_bar", "pO2_bar"):
+            if control_name not in controls or control_name not in rung_controls:
+                continue
+            exact_value = controls.get(control_name)
+            snapped_value = rung_controls.get(control_name)
+            if exact_value is None or snapped_value is None:
+                continue
+            distance += _normalized_sigfig_distance(
+                float(exact_value),
+                float(snapped_value),
+                sig_figs,
+            )
     return float(round(distance, 15))
+
+
+def physics_control_rung_error_budget(
+    query_key: Mapping[str, Any],
+    source_key: Mapping[str, Any],
+    rung_tag: str,
+    *,
+    source_payload: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    _physics_ladder_sig_figs(rung_tag)
+    result: dict[str, Any] = {
+        "term": CONTROL_RUNG_SIO_ERROR_BUDGET_TERM,
+        "rung": rung_tag,
+        "budget_relative_error": CONTROL_RUNG_SIO_RELATIVE_ERROR_BUDGET,
+        "accepted": True,
+        "refusal_reason": None,
+    }
+    if not _physics_ladder_coarsens_controls(rung_tag):
+        result["relative_error"] = 0.0
+        return result
+    if not (
+        _physics_bucket_consumes_pO2_bar(query_key)
+        or _physics_bucket_consumes_pO2_bar(source_key)
+    ):
+        result["relative_error"] = 0.0
+        return result
+
+    query_pO2 = _control_float(query_key, "pO2_bar")
+    source_pO2 = _control_float(source_key, "pO2_bar")
+    result["query_pO2_bar"] = query_pO2
+    result["source_pO2_bar"] = source_pO2
+    if query_pO2 is None or source_pO2 is None or query_pO2 <= 0.0 or source_pO2 <= 0.0:
+        result["accepted"] = False
+        result["refusal_reason"] = "pO2_missing_or_nonpositive"
+        result["relative_error"] = math.inf
+        return result
+    if _crosses_sio_po2_knee(query_pO2, source_pO2):
+        result["accepted"] = False
+        result["refusal_reason"] = "pO2_knee_crossing"
+        result["relative_error"] = math.inf
+        return result
+    if _po2_bucket_spans_sio_knee(query_pO2, _physics_ladder_sig_figs(rung_tag)):
+        result["accepted"] = False
+        result["refusal_reason"] = "pO2_knee_bucket"
+        result["relative_error"] = math.inf
+        return result
+
+    relative_error = abs(math.sqrt(query_pO2 / source_pO2) - 1.0)
+    source_sio = _payload_sio_pressure(source_payload)
+    if source_sio is not None:
+        exact_estimate = source_sio * math.sqrt(source_pO2 / query_pO2)
+        result["source_SiO_vapor_pressure_Pa"] = source_sio
+        result["estimated_exact_SiO_vapor_pressure_Pa"] = exact_estimate
+        result["absolute_error_Pa"] = abs(source_sio - exact_estimate)
+    result["relative_error"] = float(relative_error)
+    if relative_error > CONTROL_RUNG_SIO_RELATIVE_ERROR_BUDGET:
+        result["accepted"] = False
+        result["refusal_reason"] = "pO2_error_budget_exceeded"
+    return result
 
 
 def validate_reduced_real_equilibrium_record_key(
@@ -2042,6 +2205,59 @@ def _physics_bucket_consumes_pO2_bar(key: Mapping[str, Any]) -> bool:
     )
 
 
+def _control_float(key: Mapping[str, Any], control_name: str) -> float | None:
+    controls = key.get("controls", {})
+    if not isinstance(controls, Mapping):
+        return None
+    value = controls.get(control_name)
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _crosses_sio_po2_knee(left: float, right: float) -> bool:
+    low = min(float(left), float(right))
+    high = max(float(left), float(right))
+    return low < CONTROL_RUNG_SIO_PO2_KNEE_BAR < high
+
+
+def _po2_bucket_spans_sio_knee(pO2_bar: float, sig_figs: float) -> bool:
+    center = _sigfig_snap(pO2_bar, sig_figs)
+    if center is None:
+        return True
+    quantum = _sigfig_quantum(float(pO2_bar), sig_figs)
+    low = float(center) - 0.5 * quantum
+    high = float(center) + 0.5 * quantum
+    return low < CONTROL_RUNG_SIO_PO2_KNEE_BAR < high
+
+
+def _payload_sio_pressure(payload: Mapping[str, Any] | None) -> float | None:
+    if not isinstance(payload, Mapping):
+        return None
+    result = payload.get("equilibrium_result", {})
+    if not isinstance(result, Mapping):
+        return None
+    vapor_pressures = result.get("vapor_pressures_Pa", {})
+    if not isinstance(vapor_pressures, Mapping):
+        return None
+    value = vapor_pressures.get("SiO")
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number) or number < 0.0:
+        return None
+    return number
+
+
 def _replay_scope_hash(physics_bucket_key: Mapping[str, Any]) -> str:
     return _digest(physics_bucket_key.get("replay_scope", {}))
 
@@ -2050,7 +2266,7 @@ def _physics_ladder_values_from_replay_key(
     key: Mapping[str, Any],
 ) -> dict[str, dict[str, float | str]]:
     values: dict[str, dict[str, float | str]] = {}
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
             key,
             rung_tag,
@@ -2066,10 +2282,17 @@ def _physics_ladder_values_from_replay_key(
 
 
 def _physics_ladder_sig_figs(rung_tag: str) -> float:
-    for candidate_tag, sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+    for candidate_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         if rung_tag == candidate_tag:
             return float(sig_figs)
     raise ValueError(f"unknown physics bucket precision rung: {rung_tag!r}")
+
+
+def _physics_ladder_coarsens_controls(rung_tag: str) -> bool:
+    return any(
+        rung_tag == candidate_tag
+        for candidate_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS
+    )
 
 
 def _physics_ladder_hash_column(rung_tag: str) -> str:

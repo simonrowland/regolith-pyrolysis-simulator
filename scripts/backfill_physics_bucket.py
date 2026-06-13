@@ -22,7 +22,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
-    PHYSICS_BUCKET_LADDER_RUNGS,
+    PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
     canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
@@ -41,6 +41,10 @@ PHYSICS_COLUMNS = {
     "physics_bucket_h40_distance": "REAL",
     "physics_bucket_h30_sha256": "TEXT",
     "physics_bucket_h30_distance": "REAL",
+    "physics_bucket_h40c_sha256": "TEXT",
+    "physics_bucket_h40c_distance": "REAL",
+    "physics_bucket_h30c_sha256": "TEXT",
+    "physics_bucket_h30c_distance": "REAL",
 }
 
 
@@ -54,6 +58,10 @@ class PhysicsBucketValues:
     physics_bucket_h40_distance: float
     physics_bucket_h30_sha256: str
     physics_bucket_h30_distance: float
+    physics_bucket_h40c_sha256: str
+    physics_bucket_h40c_distance: float
+    physics_bucket_h30c_sha256: str
+    physics_bucket_h30c_distance: float
 
 
 @dataclass
@@ -64,6 +72,8 @@ class BackfillStats:
     distinct_physics_bucket_sha256: int = 0
     distinct_physics_bucket_h40_sha256: int = 0
     distinct_physics_bucket_h30_sha256: int = 0
+    distinct_physics_bucket_h40c_sha256: int = 0
+    distinct_physics_bucket_h30c_sha256: int = 0
     rows_already_backfilled: int = 0
     rows_needing_backfill: int = 0
     rows_updated: int = 0
@@ -114,7 +124,7 @@ def run_backfill(
         distinct_physics_hashes: set[str] = set()
         distinct_ladder_hashes: dict[str, set[str]] = {
             rung_tag: set()
-            for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS
+            for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
         }
         cursor = conn.execute(_select_rows_sql(columns))
         while True:
@@ -134,6 +144,8 @@ def run_backfill(
                 distinct_physics_hashes.add(values.physics_bucket_sha256)
                 distinct_ladder_hashes["h40"].add(values.physics_bucket_h40_sha256)
                 distinct_ladder_hashes["h30"].add(values.physics_bucket_h30_sha256)
+                distinct_ladder_hashes["h40c"].add(values.physics_bucket_h40c_sha256)
+                distinct_ladder_hashes["h30c"].add(values.physics_bucket_h30c_sha256)
                 state = _backfill_state(row, values)
                 if state == "conflict":
                     stats.conflicts += 1
@@ -156,6 +168,10 @@ def run_backfill(
                             values.physics_bucket_h40_distance,
                             values.physics_bucket_h30_sha256,
                             values.physics_bucket_h30_distance,
+                            values.physics_bucket_h40c_sha256,
+                            values.physics_bucket_h40c_distance,
+                            values.physics_bucket_h30c_sha256,
+                            values.physics_bucket_h30c_distance,
                             row["key_hash"],
                         )
                     )
@@ -170,7 +186,11 @@ def run_backfill(
                         physics_bucket_h40_sha256 = ?,
                         physics_bucket_h40_distance = ?,
                         physics_bucket_h30_sha256 = ?,
-                        physics_bucket_h30_distance = ?
+                        physics_bucket_h30_distance = ?,
+                        physics_bucket_h40c_sha256 = ?,
+                        physics_bucket_h40c_distance = ?,
+                        physics_bucket_h30c_sha256 = ?,
+                        physics_bucket_h30c_distance = ?
                     WHERE key_hash = ?
                       AND (
                           physics_bucket_schema_version IS NULL
@@ -181,6 +201,10 @@ def run_backfill(
                           OR physics_bucket_h40_distance IS NULL
                           OR physics_bucket_h30_sha256 IS NULL
                           OR physics_bucket_h30_distance IS NULL
+                          OR physics_bucket_h40c_sha256 IS NULL
+                          OR physics_bucket_h40c_distance IS NULL
+                          OR physics_bucket_h30c_sha256 IS NULL
+                          OR physics_bucket_h30c_distance IS NULL
                       )
                     """,
                     updates,
@@ -192,6 +216,12 @@ def run_backfill(
         )
         stats.distinct_physics_bucket_h30_sha256 = len(
             distinct_ladder_hashes["h30"]
+        )
+        stats.distinct_physics_bucket_h40c_sha256 = len(
+            distinct_ladder_hashes["h40c"]
+        )
+        stats.distinct_physics_bucket_h30c_sha256 = len(
+            distinct_ladder_hashes["h30c"]
         )
     return stats
 
@@ -236,7 +266,7 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
         )
         """
     )
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         conn.execute(
             f"""
             CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_{rung_tag}
@@ -274,7 +304,7 @@ def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
     physics_key_bytes = canonical_json_bytes(physics_key)
     replay_scope = physics_key.get("replay_scope", {})
     ladder_values = {}
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
         rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
             key,
             rung_tag,
@@ -297,6 +327,10 @@ def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
         physics_bucket_h40_distance=float(ladder_values["h40"]["distance"]),
         physics_bucket_h30_sha256=str(ladder_values["h30"]["sha256"]),
         physics_bucket_h30_distance=float(ladder_values["h30"]["distance"]),
+        physics_bucket_h40c_sha256=str(ladder_values["h40c"]["sha256"]),
+        physics_bucket_h40c_distance=float(ladder_values["h40c"]["distance"]),
+        physics_bucket_h30c_sha256=str(ladder_values["h30c"]["sha256"]),
+        physics_bucket_h30c_distance=float(ladder_values["h30c"]["distance"]),
     )
 
 
@@ -310,6 +344,10 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
         "physics_bucket_h40_distance": row["physics_bucket_h40_distance"],
         "physics_bucket_h30_sha256": row["physics_bucket_h30_sha256"],
         "physics_bucket_h30_distance": row["physics_bucket_h30_distance"],
+        "physics_bucket_h40c_sha256": row["physics_bucket_h40c_sha256"],
+        "physics_bucket_h40c_distance": row["physics_bucket_h40c_distance"],
+        "physics_bucket_h30c_sha256": row["physics_bucket_h30c_sha256"],
+        "physics_bucket_h30c_distance": row["physics_bucket_h30c_distance"],
     }
     expected = {
         "physics_bucket_schema_version": values.schema_version,
@@ -320,6 +358,10 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
         "physics_bucket_h40_distance": values.physics_bucket_h40_distance,
         "physics_bucket_h30_sha256": values.physics_bucket_h30_sha256,
         "physics_bucket_h30_distance": values.physics_bucket_h30_distance,
+        "physics_bucket_h40c_sha256": values.physics_bucket_h40c_sha256,
+        "physics_bucket_h40c_distance": values.physics_bucket_h40c_distance,
+        "physics_bucket_h30c_sha256": values.physics_bucket_h30c_sha256,
+        "physics_bucket_h30c_distance": values.physics_bucket_h30c_distance,
     }
     complete = True
     for name, expected_value in expected.items():
@@ -375,6 +417,14 @@ def _print_stats(stats: BackfillStats, *, json_output: bool) -> None:
     print(
         "distinct_physics_bucket_h30_sha256="
         f"{data['distinct_physics_bucket_h30_sha256']}"
+    )
+    print(
+        "distinct_physics_bucket_h40c_sha256="
+        f"{data['distinct_physics_bucket_h40c_sha256']}"
+    )
+    print(
+        "distinct_physics_bucket_h30c_sha256="
+        f"{data['distinct_physics_bucket_h30c_sha256']}"
     )
     print(f"collapse={data['collapse']}")
     print(f"reuse_fraction={data['reuse_fraction']:.6f}")

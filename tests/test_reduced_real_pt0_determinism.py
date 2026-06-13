@@ -574,6 +574,64 @@ def test_pt2_physics_ladder_snaps_composition_and_temperature_only() -> None:
         assert rung["physics_bucket"]["precision_rung"]["tag"] in {"h40", "h30"}
 
 
+def test_pt2_control_ladder_snaps_pressure_and_pO2_additively() -> None:
+    key = _c3a_ladder_key(
+        "control-snap",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    key["controls"]["pressure_bar"] = 0.00123456
+    key["controls"]["pO2_bar"] = 1.23456e-6
+    c1 = canonical_physics_bucket_key_from_replay_key(key)
+    h40 = rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, "h40")
+    h40c = rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, "h40c")
+    h30c = rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, "h30c")
+
+    assert h40["physics_bucket"]["controls"]["pressure_bar"] == c1[
+        "physics_bucket"
+    ]["controls"]["pressure_bar"]
+    assert h40["physics_bucket"]["controls"]["pO2_bar"] == c1["physics_bucket"][
+        "controls"
+    ]["pO2_bar"]
+    assert h40c["physics_bucket"]["controls"]["pressure_bar"] == 0.001235
+    assert h40c["physics_bucket"]["controls"]["pO2_bar"] == 1.235e-6
+    assert h30c["physics_bucket"]["controls"]["pressure_bar"] == 0.00123
+    assert h30c["physics_bucket"]["controls"]["pO2_bar"] == 1.23e-6
+    assert h40c["physics_bucket"]["controls"]["log_fO2"] == c1["physics_bucket"][
+        "controls"
+    ]["log_fO2"]
+    assert h40c["physics_bucket"]["precision_rung"]["controls"] == (
+        "pressure-pO2-sigfig-log_fO2-exact"
+    )
+
+
+def test_pt2_control_ladder_error_budget_computes_named_sio_term() -> None:
+    source_key = _c3a_ladder_key(
+        "source",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    query_key = copy.deepcopy(source_key)
+    source_key["controls"]["pO2_bar"] = 1.23454e-6
+    query_key["controls"]["pO2_bar"] = 1.23456e-6
+
+    budget = rrd.physics_control_rung_error_budget(
+        query_key,
+        source_key,
+        "h40c",
+        source_payload={
+            "equilibrium_result": {
+                "vapor_pressures_Pa": {"SiO": 12.0},
+            },
+        },
+    )
+
+    assert budget["term"] == rrd.CONTROL_RUNG_SIO_ERROR_BUDGET_TERM
+    assert budget["accepted"] is True
+    assert budget["relative_error"] <= rrd.CONTROL_RUNG_SIO_RELATIVE_ERROR_BUDGET
+    assert budget["absolute_error_Pa"] > 0.0
+
+
 def test_pt2_ladder_walk_forward_uses_finest_matching_rung(
     tmp_path: Path,
 ) -> None:
@@ -627,6 +685,78 @@ def test_pt2_ladder_walk_forward_uses_finest_matching_rung(
     assert store.replay_sequence[-1]["physics_bucket_rung"] == "h30"
 
 
+def test_pt2_control_ladder_hit_records_error_budget(tmp_path: Path) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    source_key = copy.deepcopy(query_key)
+    query_key["controls"]["pressure_bar"] = 0.00123456
+    source_key["controls"]["pressure_bar"] = 0.00123454
+    query_key["controls"]["pO2_bar"] = 1.23456e-6
+    source_key["controls"]["pO2_bar"] = 1.23454e-6
+    query_key["code_version"] = "test-query-control"
+    source_key["code_version"] = "test-source-control"
+
+    assert _physics_bucket_hash(query_key) != _physics_bucket_hash(source_key)
+    assert _physics_ladder_hash(query_key, "h40") != _physics_ladder_hash(
+        source_key,
+        "h40",
+    )
+    assert _physics_ladder_hash(query_key, "h40c") == _physics_ladder_hash(
+        source_key,
+        "h40c",
+    )
+
+    db_path = tmp_path / "control-rung.sqlite"
+    _put_c3a_payload(db_path, source_key, "control-source")
+    payload, store = _lookup_c3a_payload(db_path, query_key)
+
+    assert payload["label"] == "control-source"
+    event = store.replay_sequence[-1]
+    assert event["cache_state"] == "cached_physics_bucket"
+    assert event["physics_bucket_rung"] == "h40c"
+    assert event["physics_bucket_error_budget"]["accepted"] is True
+    assert event["physics_bucket_error_budget"]["term"] == (
+        rrd.CONTROL_RUNG_SIO_ERROR_BUDGET_TERM
+    )
+
+
+def test_pt2_control_ladder_refuses_po2_knee_crossing(tmp_path: Path) -> None:
+    query_key = _c3a_ladder_key(
+        "query-knee",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    source_key = copy.deepcopy(query_key)
+    query_key["controls"]["pO2_bar"] = 1.0001e-9
+    source_key["controls"]["pO2_bar"] = 9.999e-10
+    query_key["code_version"] = "test-query-knee"
+    source_key["code_version"] = "test-source-knee"
+
+    budget = rrd.physics_control_rung_error_budget(query_key, source_key, "h30c")
+    assert budget["accepted"] is False
+    assert budget["refusal_reason"] == "pO2_knee_crossing"
+    assert _physics_ladder_hash(query_key, "h30c") == _physics_ladder_hash(
+        source_key,
+        "h30c",
+    )
+
+    db_path = tmp_path / "control-rung-knee.sqlite"
+    _put_c3a_payload(db_path, source_key, "knee-source")
+    store = PT0DeterminismStore("capture", db_path=db_path)
+
+    payload = store._lookup_optional(
+        str(query_key["artifact"]),
+        query_key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query_key),
+    )
+
+    assert payload is None
+    assert store.replay_sequence == []
+
+
 def test_pt2_ladder_tiebreak_is_insertion_independent(tmp_path: Path) -> None:
     query_key = _c3a_ladder_key(
         "query",
@@ -671,6 +801,10 @@ def test_pt2_ladder_columns_are_nullable_additive(tmp_path: Path) -> None:
         "physics_bucket_h40_distance",
         "physics_bucket_h30_sha256",
         "physics_bucket_h30_distance",
+        "physics_bucket_h40c_sha256",
+        "physics_bucket_h40c_distance",
+        "physics_bucket_h30c_sha256",
+        "physics_bucket_h30c_distance",
     ):
         assert column in column_flags
         assert column_flags[column] == 0

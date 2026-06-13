@@ -39,6 +39,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     assert dry.distinct_physics_bucket_sha256 == 2
     assert dry.distinct_physics_bucket_h40_sha256 == 2
     assert dry.distinct_physics_bucket_h30_sha256 == 2
+    assert dry.distinct_physics_bucket_h40c_sha256 == 2
+    assert dry.distinct_physics_bucket_h30c_sha256 == 2
     assert dry.rows_needing_backfill == 3
     assert dry.rows_updated == 0
     assert _physics_columns(db_path) == set()
@@ -49,6 +51,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     assert real.distinct_physics_bucket_sha256 == 2
     assert real.distinct_physics_bucket_h40_sha256 == 2
     assert real.distinct_physics_bucket_h30_sha256 == 2
+    assert real.distinct_physics_bucket_h40c_sha256 == 2
+    assert real.distinct_physics_bucket_h30c_sha256 == 2
     assert real.rows_updated == 3
     assert real.rows_already_backfilled == 0
     assert _exact_columns(db_path) == exact_before
@@ -61,6 +65,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     assert second.distinct_physics_bucket_sha256 == 2
     assert second.distinct_physics_bucket_h40_sha256 == 2
     assert second.distinct_physics_bucket_h30_sha256 == 2
+    assert second.distinct_physics_bucket_h40c_sha256 == 2
+    assert second.distinct_physics_bucket_h30c_sha256 == 2
     assert second.rows_updated == 0
     assert second.rows_already_backfilled == 3
     assert _exact_columns(db_path) == exact_before
