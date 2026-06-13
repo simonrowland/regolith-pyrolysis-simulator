@@ -43,7 +43,9 @@ import signal
 import sqlite3
 import subprocess
 import sys
+import threading
 import time
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
@@ -129,6 +131,7 @@ class DriverConfig:
     low_dup_epochs: int
     duplication_expected: bool
     nice: int
+    job_concurrency: int = 1
 
 
 @dataclass(frozen=True)
@@ -884,6 +887,128 @@ def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, 
             return 0 if remaining_count == 0 else 2
 
 
+@dataclass(frozen=True)
+class _PreparedJobRun:
+    job: JobSpec
+    shard_db: Path
+    seed_rows: int
+    out_dir: Path
+    command: list[str]
+    stdout_path: Path
+    stderr_path: Path
+    job_record: dict[str, Any]
+
+
+def _prepare_job_run(
+    job: JobSpec,
+    manifest: Manifest,
+    config: DriverConfig,
+    *,
+    epoch_dir: Path,
+    epoch_index: int,
+    log_dir: Path,
+) -> _PreparedJobRun:
+    shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
+    seed_summary = seed_job_cache(shard_db, manifest.base_cache)
+    seed_rows = int(seed_summary.get("seed_rows", 0))
+    profile_arg = write_epoch_profile(
+        job,
+        manifest.path.parent,
+        shard_db,
+        epoch_dir,
+        base_cache=manifest.base_cache,
+    )
+    out_dir = job.out / f"epoch-{epoch_index:04d}"
+    command = build_optimizer_command(
+        job,
+        profile=profile_arg,
+        out_dir=out_dir,
+        python=config.python,
+        nice=config.nice,
+    )
+    stdout_path = log_dir / f"{job.id}.stdout.log"
+    stderr_path = log_dir / f"{job.id}.stderr.log"
+    job_record = {
+        "id": job.id,
+        "command": command,
+        "shard_db": str(shard_db),
+        "out": str(out_dir),
+        "stdout": str(stdout_path),
+        "stderr": str(stderr_path),
+    }
+    return _PreparedJobRun(
+        job=job,
+        shard_db=shard_db,
+        seed_rows=seed_rows,
+        out_dir=out_dir,
+        command=command,
+        stdout_path=stdout_path,
+        stderr_path=stderr_path,
+        job_record=job_record,
+    )
+
+
+def _run_prepared_job(
+    prepared: _PreparedJobRun,
+    *,
+    deadline: float | None,
+) -> tuple[_PreparedJobRun, ChildOutcome]:
+    timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
+    outcome = _run_child(
+        prepared.command,
+        stdout_path=prepared.stdout_path,
+        stderr_path=prepared.stderr_path,
+        timeout=timeout,
+        out_dir=prepared.out_dir,
+        budget=prepared.job.budget,
+    )
+    return prepared, outcome
+
+
+def _record_job_outcome(
+    result: dict[str, Any],
+    prepared: _PreparedJobRun,
+    outcome: ChildOutcome,
+) -> bool:
+    """Apply one job outcome to epoch result. Return True when scheduling must stop."""
+    job_record = prepared.job_record
+    shard_key = str(prepared.shard_db)
+    if outcome.kind == "completed":
+        result["shard_dbs"].append(shard_key)
+        result["seed_rows_by_shard"][shard_key] = prepared.seed_rows
+        result["completed_jobs"].append(prepared.job.id)
+        return False
+    if outcome.kind == NO_FEASIBLE_STATUS:
+        result["shard_dbs"].append(shard_key)
+        result["seed_rows_by_shard"][shard_key] = prepared.seed_rows
+        job_record["returncode"] = outcome.returncode
+        if outcome.failure_counts is not None:
+            job_record["failure_counts"] = dict(sorted(outcome.failure_counts.items()))
+        result["no_feasible_jobs"].append(job_record)
+        return False
+    if outcome.kind == STALE_PROFILE_STATUS:
+        result["shard_dbs"].append(shard_key)
+        result["seed_rows_by_shard"][shard_key] = prepared.seed_rows
+        job_record["returncode"] = outcome.returncode
+        job_record["failure_counts"] = dict(
+            sorted((outcome.failure_counts or {STALE_PROFILE_STATUS: 1}).items())
+        )
+        if outcome.reason:
+            job_record["reason"] = outcome.reason
+        if outcome.message:
+            job_record["message"] = outcome.message
+        result["stale_profile_jobs"].append(job_record)
+        return False
+    if outcome.kind == "timed_out":
+        result["shard_dbs"].append(shard_key)
+        result["seed_rows_by_shard"][shard_key] = prepared.seed_rows
+        result["timed_out_jobs"].append(prepared.job.id)
+        return True
+    job_record["returncode"] = outcome.returncode
+    result["failed_jobs"].append(job_record)
+    return True
+
+
 def run_epoch(
     manifest: Manifest,
     jobs: Sequence[JobSpec],
@@ -901,6 +1026,7 @@ def run_epoch(
         "epoch": epoch_index,
         "mode": "final_long" if final_long else "time_boxed",
         "time_box_seconds": None if final_long else config.time_box_seconds,
+        "job_concurrency": config.job_concurrency,
         "completed_jobs": [],
         "failed_jobs": [],
         "no_feasible_jobs": [],
@@ -910,80 +1036,117 @@ def run_epoch(
         "shard_dbs": [],
         "seed_rows_by_shard": {},
     }
+    if not jobs:
+        return result
 
+    job_concurrency = max(1, int(config.job_concurrency))
+    if job_concurrency == 1:
+        return _run_epoch_serial(
+            manifest,
+            jobs,
+            config,
+            epoch_dir=epoch_dir,
+            log_dir=log_dir,
+            epoch_index=epoch_index,
+            deadline=deadline,
+            result=result,
+        )
+    return _run_epoch_concurrent(
+        manifest,
+        jobs,
+        config,
+        epoch_dir=epoch_dir,
+        log_dir=log_dir,
+        epoch_index=epoch_index,
+        deadline=deadline,
+        result=result,
+        job_concurrency=job_concurrency,
+    )
+
+
+def _run_epoch_serial(
+    manifest: Manifest,
+    jobs: Sequence[JobSpec],
+    config: DriverConfig,
+    *,
+    epoch_dir: Path,
+    log_dir: Path,
+    epoch_index: int,
+    deadline: float | None,
+    result: dict[str, Any],
+) -> dict[str, Any]:
     for job in jobs:
         if deadline is not None and time.monotonic() >= deadline:
             break
-        shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
-        seed_summary = seed_job_cache(shard_db, manifest.base_cache)
-        seed_rows = int(seed_summary.get("seed_rows", 0))
-        profile_arg = write_epoch_profile(
+        prepared = _prepare_job_run(
             job,
-            manifest.path.parent,
-            shard_db,
-            epoch_dir,
-            base_cache=manifest.base_cache,
+            manifest,
+            config,
+            epoch_dir=epoch_dir,
+            epoch_index=epoch_index,
+            log_dir=log_dir,
         )
-        out_dir = job.out / f"epoch-{epoch_index:04d}"
-        command = build_optimizer_command(
-            job,
-            profile=profile_arg,
-            out_dir=out_dir,
-            python=config.python,
-            nice=config.nice,
-        )
-        stdout_path = log_dir / f"{job.id}.stdout.log"
-        stderr_path = log_dir / f"{job.id}.stderr.log"
-        job_record = {
-            "id": job.id,
-            "command": command,
-            "shard_db": str(shard_db),
-            "out": str(out_dir),
-            "stdout": str(stdout_path),
-            "stderr": str(stderr_path),
-        }
-        result["attempted_jobs"].append(job_record)
-        timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
-        outcome = _run_child(
-            command,
-            stdout_path=stdout_path,
-            stderr_path=stderr_path,
-            timeout=timeout,
-            out_dir=out_dir,
-            budget=job.budget,
-        )
-        if outcome.kind == "completed":
-            result["shard_dbs"].append(str(shard_db))
-            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
-            result["completed_jobs"].append(job.id)
-        elif outcome.kind == NO_FEASIBLE_STATUS:
-            result["shard_dbs"].append(str(shard_db))
-            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
-            job_record["returncode"] = outcome.returncode
-            if outcome.failure_counts is not None:
-                job_record["failure_counts"] = dict(sorted(outcome.failure_counts.items()))
-            result["no_feasible_jobs"].append(job_record)
-        elif outcome.kind == STALE_PROFILE_STATUS:
-            result["shard_dbs"].append(str(shard_db))
-            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
-            job_record["returncode"] = outcome.returncode
-            job_record["failure_counts"] = dict(
-                sorted((outcome.failure_counts or {STALE_PROFILE_STATUS: 1}).items())
+        result["attempted_jobs"].append(prepared.job_record)
+        _, outcome = _run_prepared_job(prepared, deadline=deadline)
+        if _record_job_outcome(result, prepared, outcome):
+            break
+    return result
+
+
+def _run_epoch_concurrent(
+    manifest: Manifest,
+    jobs: Sequence[JobSpec],
+    config: DriverConfig,
+    *,
+    epoch_dir: Path,
+    log_dir: Path,
+    epoch_index: int,
+    deadline: float | None,
+    result: dict[str, Any],
+    job_concurrency: int,
+) -> dict[str, Any]:
+    pending = list(jobs)
+    stop_launching = threading.Event()
+    results_lock = threading.Lock()
+    active: dict[Future[tuple[_PreparedJobRun, ChildOutcome]], _PreparedJobRun] = {}
+
+    def _time_box_exhausted() -> bool:
+        return deadline is not None and time.monotonic() >= deadline
+
+    def _submit_jobs(executor: ThreadPoolExecutor) -> None:
+        while not stop_launching.is_set() and pending:
+            if _time_box_exhausted():
+                stop_launching.set()
+                break
+            if len(active) >= job_concurrency:
+                break
+            job = pending.pop(0)
+            prepared = _prepare_job_run(
+                job,
+                manifest,
+                config,
+                epoch_dir=epoch_dir,
+                epoch_index=epoch_index,
+                log_dir=log_dir,
             )
-            if outcome.reason:
-                job_record["reason"] = outcome.reason
-            if outcome.message:
-                job_record["message"] = outcome.message
-            result["stale_profile_jobs"].append(job_record)
-        elif outcome.kind == "timed_out":
-            result["shard_dbs"].append(str(shard_db))
-            result["seed_rows_by_shard"][str(shard_db)] = seed_rows
-            result["timed_out_jobs"].append(job.id)
-            break
-        else:
-            job_record["returncode"] = outcome.returncode
-            result["failed_jobs"].append(job_record)
-            break
+            with results_lock:
+                result["attempted_jobs"].append(prepared.job_record)
+            future = executor.submit(_run_prepared_job, prepared, deadline=deadline)
+            active[future] = prepared
+
+    with ThreadPoolExecutor(max_workers=job_concurrency) as executor:
+        _submit_jobs(executor)
+        while active:
+            done_future = next(as_completed(active))
+            prepared = active.pop(done_future)
+            _, outcome = done_future.result()
+            stop_after = False
+            with results_lock:
+                stop_after = _record_job_outcome(result, prepared, outcome)
+            if stop_after:
+                stop_launching.set()
+            if not stop_launching.is_set():
+                _submit_jobs(executor)
     return result
 
 
@@ -1379,6 +1542,12 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="disable adaptive final-long switch based on low duplication rates",
     )
+    parser.add_argument(
+        "--job-concurrency",
+        type=int,
+        default=1,
+        help="max concurrent optimize jobs per epoch (default 1 = serial)",
+    )
     return parser
 
 
@@ -1394,6 +1563,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             low_dup_epochs=args.low_dup_epochs,
             duplication_expected=not args.no_duplication_expected,
             nice=args.nice,
+            job_concurrency=_positive_int(args.job_concurrency, "job-concurrency"),
         )
         if not shutil.which("nice"):
             raise RuntimeError("nice command not found")

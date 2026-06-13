@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import sqlite3
 import sys
+import threading
+import time
 from pathlib import Path
 
 import pytest
 
 from scripts import epoch_grind
-from simulator.reduced_real_determinism import PT1PersistentEquilibriumStore
+from scripts.seed_reduced_real_cache import payload_count
+from simulator.reduced_real_determinism import (
+    PT1PersistentEquilibriumStore,
+    canonical_json_bytes,
+)
 
 
 NO_FEASIBLE_MESSAGE = (
@@ -875,6 +883,312 @@ def test_stale_profile_job_is_terminal_mergeable_and_counted(
     assert "stale_profile=1" in out
     assert 'status_counts={"stale_profile":1}' in out
     assert 'terminal_failure_counts=job-a:{"stale_profile":1}' in out
+
+
+def _put_shard_row(shard_db: Path, *, tag: str, base_db: Path | None = None) -> None:
+    key = {
+        "artifact": "freeze_gate_curve",
+        "code_version": "test",
+        "data_digests": {"fixture": "v1"},
+        "schema_version": "test",
+        "tag": tag,
+    }
+    payload = {"curve": {"status": "in_range", "tag": tag}}
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(
+        shard_db,
+        read_only_base_db_path=base_db,
+    ).put(
+        artifact="freeze_gate_curve",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
+def test_concurrent_jobs_complete_with_isolated_shards(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = tmp_path / "profile.json"
+    profile.write_text(
+        json.dumps(
+            {
+                "profile_id": "test",
+                "profile_schema_version": "optimizer-profile-v1",
+                "feedstock": "lunar_mare_low_ti",
+                "objectives": {},
+                "constraints": {},
+                "run": {
+                    "backend_name": "cached-real",
+                    "reduced_real_cache": {
+                        "db_path": "old.sqlite",
+                        "authorized_backend_name": "magemin",
+                        "authorized_backend_version": "test",
+                    },
+                },
+                "fidelities": {"fast": {}},
+                "seed_recipes": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    job_ids = ["job-a", "job-b", "job-c"]
+    jobs = [
+        {
+            "id": job_id,
+            "feedstock": "lunar_mare_low_ti",
+            "profile": str(profile),
+            "budget": 4,
+            "strategy": "random",
+            "seed": index,
+            "out": f"runs/{job_id}",
+        }
+        for index, job_id in enumerate(job_ids, start=1)
+    ]
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=jobs))
+    journal_path = tmp_path / "journal.json"
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+        job_concurrency=3,
+    )
+
+    overlap_lock = threading.Lock()
+    in_flight = 0
+    max_in_flight = 0
+    lock_errors: list[str] = []
+    rows_per_job = 8
+
+    def fake_run_child(
+        command: list[str],
+        *,
+        stdout_path: Path,
+        stderr_path: Path,
+        timeout: float | None,
+        out_dir: Path | None = None,
+        budget: int | None = None,
+    ) -> epoch_grind.ChildOutcome:
+        del stdout_path, stderr_path, timeout, out_dir, budget
+        nonlocal in_flight, max_in_flight
+        profile_path = Path(command[command.index("--profile") + 1])
+        profile_payload = json.loads(profile_path.read_text(encoding="utf-8"))
+        cache = profile_payload["run"]["reduced_real_cache"]
+        shard_db = Path(cache["db_path"])
+        base_db = Path(cache["read_only_base_db_path"])
+        with overlap_lock:
+            in_flight += 1
+            max_in_flight = max(max_in_flight, in_flight)
+        try:
+            for row_index in range(rows_per_job):
+                try:
+                    _put_shard_row(
+                        shard_db,
+                        tag=f"{shard_db.stem}-{row_index}",
+                        base_db=base_db,
+                    )
+                except sqlite3.OperationalError as exc:
+                    if "database is locked" in str(exc).lower():
+                        lock_errors.append(str(exc))
+                    raise
+            time.sleep(0.02)
+        finally:
+            with overlap_lock:
+                in_flight -= 1
+        return epoch_grind.ChildOutcome(kind="completed", returncode=0)
+
+    monkeypatch.setattr(epoch_grind, "_run_child", fake_run_child)
+
+    assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == 0
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+
+    assert lock_errors == []
+    assert max_in_flight >= 2
+    assert journal["decision"] == epoch_grind.DECISION_BATCH_COMPLETE
+    assert set(journal["jobs_done"]) == set(job_ids)
+    assert journal["job_status_counts"] == {"done": len(job_ids)}
+    epoch = journal["epochs"][0]
+    assert epoch["job_concurrency"] == 3
+    assert set(epoch["completed_jobs"]) == set(job_ids)
+    assert len(epoch["shard_dbs"]) == len(job_ids)
+    assert int(epoch["merge"]["inserted_rows"]) == len(job_ids) * rows_per_job
+    assert payload_count(manifest.base_cache) == len(job_ids) * rows_per_job
+
+
+@pytest.mark.parametrize("terminal_kind", ["failed", "timed_out"])
+def test_concurrent_jobs_failure_drains_in_flight_siblings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    terminal_kind: str,
+) -> None:
+    profile = tmp_path / "profile.json"
+    profile.write_text(
+        json.dumps(
+            {
+                "profile_id": "test",
+                "profile_schema_version": "optimizer-profile-v1",
+                "feedstock": "lunar_mare_low_ti",
+                "objectives": {},
+                "constraints": {},
+                "run": {
+                    "backend_name": "cached-real",
+                    "reduced_real_cache": {
+                        "db_path": "old.sqlite",
+                        "authorized_backend_name": "magemin",
+                        "authorized_backend_version": "test",
+                    },
+                },
+                "fidelities": {"fast": {}},
+                "seed_recipes": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    job_ids = ["job-a", "job-b", "job-c"]
+    failing_job = "job-b"
+    jobs = [
+        {
+            "id": job_id,
+            "feedstock": "lunar_mare_low_ti",
+            "profile": str(profile),
+            "budget": 4,
+            "strategy": "random",
+            "seed": index,
+            "out": f"runs/{job_id}",
+        }
+        for index, job_id in enumerate(job_ids, start=1)
+    ]
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=jobs))
+    journal_path = tmp_path / "journal.json"
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+        job_concurrency=3,
+    )
+
+    overlap_lock = threading.Lock()
+    in_flight = 0
+    max_in_flight = 0
+    lock_errors: list[str] = []
+    rows_per_job = 8
+    failing_job_calls = 0
+
+    def fake_run_child(
+        command: list[str],
+        *,
+        stdout_path: Path,
+        stderr_path: Path,
+        timeout: float | None,
+        out_dir: Path | None = None,
+        budget: int | None = None,
+    ) -> epoch_grind.ChildOutcome:
+        del stdout_path, stderr_path, timeout, out_dir, budget
+        nonlocal in_flight, max_in_flight, failing_job_calls
+        profile_path = Path(command[command.index("--profile") + 1])
+        profile_payload = json.loads(profile_path.read_text(encoding="utf-8"))
+        cache = profile_payload["run"]["reduced_real_cache"]
+        shard_db = Path(cache["db_path"])
+        base_db = Path(cache["read_only_base_db_path"])
+        job_id = shard_db.stem
+        with overlap_lock:
+            in_flight += 1
+            max_in_flight = max(max_in_flight, in_flight)
+        try:
+            if job_id == failing_job:
+                failing_job_calls += 1
+                time.sleep(0.05)
+                if terminal_kind == "failed":
+                    return epoch_grind.ChildOutcome(kind="failed", returncode=2)
+                if failing_job_calls == 1:
+                    for row_index in range(2):
+                        try:
+                            _put_shard_row(
+                                shard_db,
+                                tag=f"{shard_db.stem}-partial-{row_index}",
+                                base_db=base_db,
+                            )
+                        except sqlite3.OperationalError as exc:
+                            if "database is locked" in str(exc).lower():
+                                lock_errors.append(str(exc))
+                            raise
+                    return epoch_grind.ChildOutcome(kind="timed_out")
+                for row_index in range(rows_per_job):
+                    try:
+                        _put_shard_row(
+                            shard_db,
+                            tag=f"{shard_db.stem}-{row_index}",
+                            base_db=base_db,
+                        )
+                    except sqlite3.OperationalError as exc:
+                        if "database is locked" in str(exc).lower():
+                            lock_errors.append(str(exc))
+                        raise
+                return epoch_grind.ChildOutcome(kind="completed", returncode=0)
+
+            time.sleep(0.15)
+            for row_index in range(rows_per_job):
+                try:
+                    _put_shard_row(
+                        shard_db,
+                        tag=f"{shard_db.stem}-{row_index}",
+                        base_db=base_db,
+                    )
+                except sqlite3.OperationalError as exc:
+                    if "database is locked" in str(exc).lower():
+                        lock_errors.append(str(exc))
+                    raise
+        finally:
+            with overlap_lock:
+                in_flight -= 1
+        return epoch_grind.ChildOutcome(kind="completed", returncode=0)
+
+    monkeypatch.setattr(epoch_grind, "_run_child", fake_run_child)
+
+    expected_exit = 2 if terminal_kind == "failed" else 0
+    assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == expected_exit
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+
+    assert lock_errors == []
+    assert max_in_flight >= 2
+    epoch1 = journal["epochs"][0]
+    assert epoch1["job_concurrency"] == 3
+    sibling_ids = {"job-a", "job-c"}
+    assert set(epoch1["completed_jobs"]) == sibling_ids
+    assert set(journal["jobs_done"]) == (sibling_ids if terminal_kind == "failed" else set(job_ids))
+
+    if terminal_kind == "failed":
+        assert journal["decision"] == epoch_grind.DECISION_FAILED
+        assert epoch1["timed_out_jobs"] == []
+        assert len(epoch1["failed_jobs"]) == 1
+        assert epoch1["failed_jobs"][0]["id"] == failing_job
+        assert epoch1["failed_jobs"][0]["returncode"] == 2
+        failed_status = next(
+            job["status"] for job in journal["jobs"] if job["id"] == failing_job
+        )
+        assert failed_status == "failed"
+        assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job
+        assert payload_count(manifest.base_cache) == len(sibling_ids) * rows_per_job
+    else:
+        assert epoch1["timed_out_jobs"] == [failing_job]
+        assert epoch1["failed_jobs"] == []
+        timed_out_status = next(
+            job["status"] for job in journal["jobs"] if job["id"] == failing_job
+        )
+        assert timed_out_status == "done"
+        assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job + 2
+        assert payload_count(manifest.base_cache) == len(sibling_ids) * rows_per_job + rows_per_job + 2
 
 
 def test_failed_epoch_is_journaled_before_return(
