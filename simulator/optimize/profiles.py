@@ -25,6 +25,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 
 
@@ -467,6 +468,13 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
         raise ProfileValidationError(
             f"{source}: {where}.mre_target_species must be a string"
         )
+    if "chemistry_kernel" in raw:
+        try:
+            normalize_chemistry_kernel_config(raw["chemistry_kernel"])
+        except (TypeError, ValueError) as exc:
+            raise ProfileValidationError(
+                f"{source}: {where}.chemistry_kernel.{exc}"
+            ) from exc
     _validate_c5_request(raw, source=source, where=where)
     backend_name = str(raw.get("backend_name", ""))
     cache_config = raw.get("reduced_real_cache")

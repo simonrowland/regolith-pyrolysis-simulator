@@ -13,12 +13,16 @@ from typing import Any, Literal, Mapping
 import yaml
 
 from simulator.config import DEFAULT_DATA_DIR
+from simulator.chemistry.kernel.config import (
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
+    OXYGEN_SINK_CHANNEL_MODE_VALUES,
+)
 from simulator.optimize.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v3"
+allowlist_version = "allowlist-v4"
 
 
 class RecipeValidationError(ValueError):
@@ -478,6 +482,16 @@ class RecipeSchema:
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
         ),
         _knob(
+            f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}",
+            "categorical",
+            choices=OXYGEN_SINK_CHANNEL_MODE_VALUES,
+            units="diagnostic",
+            bounds_source=(
+                "engineering_envelope diagnostic Robinot oxygen-sink "
+                "channel annotation; no behavior authority"
+            ),
+        ),
+        _knob(
             "overhead_headspace.temperature_offset_K",
             low=-500,
             high=500,
@@ -600,6 +614,9 @@ class RecipeSchema:
         "*.safety",
         "*.safety_ceilings",
     )
+    FORBIDDEN_EXACT_PATH_EXCEPTIONS: frozenset[KeyPath] = frozenset(
+        {("chemistry_kernel", OXYGEN_SINK_CHANNEL_MODE_KEY)}
+    )
 
     recipe_schema_version = recipe_schema_version
     allowlist_version = allowlist_version
@@ -648,6 +665,8 @@ class RecipeSchema:
             ) from exc
 
     def is_forbidden(self, path: KeyPath) -> bool:
+        if path in self.FORBIDDEN_EXACT_PATH_EXCEPTIONS:
+            return False
         dotted_prefixes = _dotted_prefixes(path)
         return any(
             fnmatchcase(prefix, pattern)

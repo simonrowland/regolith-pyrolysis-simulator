@@ -29,6 +29,11 @@ from typing import Any, Optional
 from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel.account_filters import build_provider_account_view
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.config import (
+    DEFAULT_OXYGEN_SINK_CHANNEL_MODE,
+    OxygenSinkChannelMode,
+    normalize_oxygen_sink_channel_mode,
+)
 from simulator.chemistry.kernel.dto import (
     IntentRequest,
     IntentResult,
@@ -282,6 +287,9 @@ class ChemistryKernel:
         species_formula_registry: Mapping[str, Any],
         *,
         allow_fallback_intents: Optional[frozenset[ChemistryIntent]] = None,
+        oxygen_sink_channel_mode: OxygenSinkChannelMode | str = (
+            DEFAULT_OXYGEN_SINK_CHANNEL_MODE
+        ),
     ) -> None:
         self._ledger = ledger
         self._registry = registry
@@ -297,6 +305,9 @@ class ChemistryKernel:
         # ``allow_fallback_vapor``).
         self._allow_fallback_intents: frozenset[ChemistryIntent] = frozenset(
             allow_fallback_intents or ()
+        )
+        self._oxygen_sink_channel_mode = normalize_oxygen_sink_channel_mode(
+            oxygen_sink_channel_mode
         )
 
     @property
@@ -316,6 +327,10 @@ class ChemistryKernel:
         """Intents the kernel may retry against the registered fallback."""
 
         return self._allow_fallback_intents
+
+    @property
+    def oxygen_sink_channel_mode(self) -> OxygenSinkChannelMode:
+        return self._oxygen_sink_channel_mode
 
     def clear_shadow_trace(self) -> None:
         """Pass-through to :meth:`Planner.clear_shadow_trace`."""

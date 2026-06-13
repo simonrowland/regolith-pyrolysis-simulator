@@ -14,7 +14,7 @@ from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backends import BackendUnavailableError
-from simulator.chemistry.kernel import ProposalRejected
+from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     knudsen_regime_diagnostic,
@@ -1252,6 +1252,9 @@ def _build_eval_inputs(
         c5_enabled=bool(run_options["c5_enabled"]),
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
+        chemistry_kernel=_diagnostic_chemistry_kernel_run_config(
+            run_options["chemistry_kernel"]
+        ),
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=bool(run_options["force_builtin_vapor_pressure"]),
     )._session_config()
@@ -1337,6 +1340,18 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             merged.get("force_builtin_vapor_pressure", False)
         ),
     })
+
+
+def _diagnostic_chemistry_kernel_run_config(
+    chemistry_kernel: Mapping[str, Any],
+) -> dict[str, Any]:
+    if not isinstance(chemistry_kernel, MappingABC):
+        return {}
+    if OXYGEN_SINK_CHANNEL_MODE_KEY not in chemistry_kernel:
+        return {}
+    return {
+        OXYGEN_SINK_CHANNEL_MODE_KEY: chemistry_kernel[OXYGEN_SINK_CHANNEL_MODE_KEY]
+    }
 
 
 def _positive_eval_mass_kg(raw: Any) -> float:

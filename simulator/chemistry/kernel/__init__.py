@@ -11,6 +11,14 @@ from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
 )
+from simulator.chemistry.kernel.config import (
+    DEFAULT_OXYGEN_SINK_CHANNEL_MODE,
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
+    OXYGEN_SINK_CHANNEL_MODE_VALUES,
+    OxygenSinkChannelMode,
+    normalize_chemistry_kernel_config,
+    normalize_oxygen_sink_channel_mode,
+)
 from simulator.chemistry.kernel.dto import (
     ControlAudit,
     IntentRequest,
@@ -47,6 +55,12 @@ __all__ = (
     # Capabilities + provider contract
     "ChemistryIntent",
     "CapabilityProfile",
+    "OxygenSinkChannelMode",
+    "DEFAULT_OXYGEN_SINK_CHANNEL_MODE",
+    "OXYGEN_SINK_CHANNEL_MODE_KEY",
+    "OXYGEN_SINK_CHANNEL_MODE_VALUES",
+    "normalize_chemistry_kernel_config",
+    "normalize_oxygen_sink_channel_mode",
     "ChemistryProvider",
     # Kernel runtime
     "ChemistryKernel",

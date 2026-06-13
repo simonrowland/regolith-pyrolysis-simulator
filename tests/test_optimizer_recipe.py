@@ -1,17 +1,24 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import yaml
 import pytest
 
+from simulator.chemistry.kernel import (
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
+    OXYGEN_SINK_CHANNEL_MODE_VALUES,
+)
 from simulator.optimize.recipe import (
     KnobSpec,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
 )
+from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
 from simulator.runner import PyrolysisRun
+from simulator.session import SimSession
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
@@ -20,7 +27,14 @@ PTOTAL_DEFAULT = ("campaigns", "C0b_p_cleanup", "p_total_mbar_default")
 C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
 C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
 PRODUCT_TARGET = ("campaigns", "C0b_p_cleanup", "products", "oxygen_kg")
+OXYGEN_SINK_CHANNEL_MODE = ("chemistry_kernel", OXYGEN_SINK_CHANNEL_MODE_KEY)
 SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
+DATA_DIGESTS = {
+    "feedstocks": "feedstocks-digest",
+    "profile": "profile-digest",
+    "setpoints": "setpoints-digest",
+    "vapor_pressures": "vapor-pressures-digest",
+}
 
 
 def _lookup_setpoint(root: dict, dotted_path: str):
@@ -114,6 +128,72 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
         20,
         24,
     ]
+
+
+@pytest.mark.parametrize("mode", OXYGEN_SINK_CHANNEL_MODE_VALUES)
+def test_oxygen_sink_channel_mode_round_trips_as_diagnostic_only(mode: str) -> None:
+    patch = RecipePatch({OXYGEN_SINK_CHANNEL_MODE: mode})
+
+    schema = RecipeSchema()
+    nested = schema.to_setpoints_patch(patch)
+    loaded = yaml.safe_load(yaml.safe_dump(nested, sort_keys=True))
+    loaded_patch = RecipePatch.from_nested(loaded)
+    assert loaded_patch.values[OXYGEN_SINK_CHANNEL_MODE] == mode
+
+    run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
+    config = run._session_config()
+    assert config.setpoints["chemistry_kernel"][OXYGEN_SINK_CHANNEL_MODE_KEY] == mode
+
+    session = SimSession().start(config)
+    assert session.simulator.oxygen_sink_channel_mode.value == mode
+    assert session.simulator._chem_kernel is not None
+    assert session.simulator._chem_kernel.oxygen_sink_channel_mode.value == mode
+
+
+def test_oxygen_sink_channel_mode_default_is_absent_from_setpoints_patch() -> None:
+    config = PyrolysisRun(feedstock_id=FEEDSTOCK)._session_config()
+    assert OXYGEN_SINK_CHANNEL_MODE_KEY not in config.setpoints.get(
+        "chemistry_kernel", {}
+    )
+
+    session = SimSession().start(config)
+    assert (
+        session.simulator.oxygen_sink_channel_mode.value
+        == "legacy_source_equilibrium"
+    )
+
+
+def test_oxygen_sink_channel_mode_rejects_unknown_value() -> None:
+    with pytest.raises(RecipeValidationError, match="not in choices"):
+        RecipePatch({OXYGEN_SINK_CHANNEL_MODE: "condensation_only_sink"}).validated()
+
+
+def test_oxygen_sink_channel_mode_evalspec_round_trip_and_validation() -> None:
+    mode = "deposit_gettering_diagnostic"
+    spec = EvalSpec(
+        recipe_id="recipe-id",
+        feedstock_recipe_digest="feedstock-recipe-digest",
+        feedstock_id=FEEDSTOCK,
+        profile_id="profile-id",
+        fidelity="fast",
+        code_version="test-code-version",
+        data_digests=DATA_DIGESTS,
+        chemistry_kernel={OXYGEN_SINK_CHANNEL_MODE_KEY: mode},
+    )
+    payload = json.loads(canonical_evalspec_json(spec).decode("utf-8"))
+
+    assert payload["chemistry_kernel"][OXYGEN_SINK_CHANNEL_MODE_KEY] == mode
+    with pytest.raises(ValueError, match=OXYGEN_SINK_CHANNEL_MODE_KEY):
+        EvalSpec(
+            recipe_id="recipe-id",
+            feedstock_recipe_digest="feedstock-recipe-digest",
+            feedstock_id=FEEDSTOCK,
+            profile_id="profile-id",
+            fidelity="fast",
+            code_version="test-code-version",
+            data_digests=DATA_DIGESTS,
+            chemistry_kernel={OXYGEN_SINK_CHANNEL_MODE_KEY: "behavior_mode"},
+        )
 
 
 def test_recipe_id_is_stable_and_schema_versioned() -> None:

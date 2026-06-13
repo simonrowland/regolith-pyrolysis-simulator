@@ -25,6 +25,7 @@ from simulator.optimize.canonical import (
     canonical_json_dumps,
     normalize_canonical_value,
 )
+from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
@@ -105,7 +106,10 @@ class EvalSpec:
         object.__setattr__(
             self,
             "chemistry_kernel",
-            _freeze_value(self.chemistry_kernel, "chemistry_kernel"),
+            _freeze_value(
+                normalize_chemistry_kernel_config(self.chemistry_kernel),
+                "chemistry_kernel",
+            ),
         )
         object.__setattr__(
             self,

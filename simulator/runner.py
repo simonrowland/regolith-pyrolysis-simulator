@@ -51,6 +51,10 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager
 from simulator.accounting import AccountingQueries
+from simulator.chemistry.kernel import (
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
+    normalize_chemistry_kernel_config,
+)
 from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
@@ -128,6 +132,7 @@ SIO_WALL_SWEEP_DEFAULT_PO2_MODES: tuple[str, ...] = (
     "no_suppress",
     "o2_1mbar",
 )
+_SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS = frozenset({OXYGEN_SINK_CHANNEL_MODE_KEY})
 SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
     "no_suppress": {
         "label": "C2A no-suppress SiO extraction",
@@ -570,10 +575,23 @@ def _deep_merge_setpoints(
     # top-level key that stringifies to "chemistry_kernel" cannot slip past
     # this guard and overwrite kernel config.
     if _top_level and any(str(key) == "chemistry_kernel" for key in patch):
-        raise RunnerError(
-            "setpoints_patch may not contain top-level 'chemistry_kernel'; "
-            "use fallback flags instead"
+        raw_kernel_patch = patch.get("chemistry_kernel")
+        if not isinstance(raw_kernel_patch, Mapping):
+            raise RunnerError("setpoints_patch.chemistry_kernel must be a mapping")
+        extra_keys = (
+            set(map(str, raw_kernel_patch))
+            - _SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS
         )
+        if extra_keys:
+            raise RunnerError(
+                "setpoints_patch may only contain diagnostic "
+                f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}; "
+                "use fallback flags instead"
+            )
+        try:
+            normalize_chemistry_kernel_config(raw_kernel_patch)
+        except (TypeError, ValueError) as exc:
+            raise RunnerError(str(exc)) from exc
     merged = dict(base)
     for key, value in patch.items():
         current = merged.get(key)
@@ -689,6 +707,7 @@ class PyrolysisRun:
     mre_max_voltage_V: float = 0.0
     allow_fallback_vapor: bool = False
     allow_unmeasured_alpha_fallback: bool = False
+    chemistry_kernel: Mapping[str, Any] | None = None
     force_builtin_vapor_pressure: bool = False
     sio_start_temperature_c: float | None = None
     sio_hold_temperature_c: float | None = None
@@ -787,6 +806,26 @@ class PyrolysisRun:
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
         setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        if self.chemistry_kernel:
+            try:
+                diagnostic_kernel_config = normalize_chemistry_kernel_config(
+                    self.chemistry_kernel
+                )
+            except (TypeError, ValueError) as exc:
+                raise RunnerError(str(exc)) from exc
+            extra_keys = (
+                set(diagnostic_kernel_config)
+                - _SETPOINTS_PATCH_CHEMISTRY_KERNEL_KEYS
+            )
+            if extra_keys:
+                raise RunnerError(
+                    "PyrolysisRun.chemistry_kernel only accepts diagnostic "
+                    f"{OXYGEN_SINK_CHANNEL_MODE_KEY}"
+                )
+            setpoints = _deep_merge_setpoints(
+                setpoints,
+                {"chemistry_kernel": diagnostic_kernel_config},
+            )
         if (
             self.allow_fallback_vapor
             or self.force_builtin_vapor_pressure

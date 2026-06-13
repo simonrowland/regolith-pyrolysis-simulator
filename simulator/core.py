@@ -121,7 +121,10 @@ from simulator.chemistry.kernel import (
     ChemistryKernel,
     IntentResult,
     LedgerTransitionProposal,
+    OXYGEN_SINK_CHANNEL_MODE_KEY,
     ProviderRegistry,
+    normalize_chemistry_kernel_config,
+    normalize_oxygen_sink_channel_mode,
 )
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
@@ -382,7 +385,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # ``setpoints['chemistry_kernel']['allow_fallback_vapor'] =
         # True`` -- the default is loud
         # :class:`ProviderUnavailableError` if VapoRock is missing.
-        kernel_config = setpoints.get('chemistry_kernel', {}) or {}
+        kernel_config = normalize_chemistry_kernel_config(
+            setpoints.get('chemistry_kernel', {}) or {}
+        )
+        self.oxygen_sink_channel_mode = normalize_oxygen_sink_channel_mode(
+            kernel_config.get(OXYGEN_SINK_CHANNEL_MODE_KEY)
+        )
         # Codex challenge pre-0.5.1 P2 (2026-05-27): a plain ``bool(...)``
         # coerces the strings ``"false"``, ``"no"``, ``"0"`` to True
         # (any non-empty string is truthy in Python). Setpoints come
@@ -1012,6 +1020,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             registry=self._chem_registry,
             species_formula_registry=self.species_formula_registry,
             allow_fallback_intents=allow_fallback_intents,
+            oxygen_sink_channel_mode=self.oxygen_sink_channel_mode,
         )
 
     def _condensation_route_wall_deposit_accounts(self) -> tuple[str, ...]:
