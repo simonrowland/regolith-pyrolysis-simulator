@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import types
 import warnings
 from pathlib import Path
@@ -992,6 +993,91 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
 
     assert result.status == "out_of_domain"
     assert any("empty melt composition" in w for w in result.warnings)
+
+
+def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
+    """MAGEMin appends _pseudosection_output.txt to its CWD; isolate per call."""
+    captured: dict = {}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ""
+        stdout = "Phase : liq\nMode  : 1.000\n"
+
+    def fake_subprocess_run(args, **kwargs):
+        captured["args"] = list(args)
+        captured["cwd"] = kwargs.get("cwd")
+        return FakeCompleted()
+
+    fake_binary = tmp_path / "MAGEMin"
+    fake_binary.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: fake_binary),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(
+        magemin_module.subprocess, "run", fake_subprocess_run
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({}) is True
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_mol={"SiO2": 5.0, "MgO": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert result.status == "ok"
+    assert "cwd" in captured, "subprocess.run was not invoked"
+    cwd = Path(captured["cwd"])
+    assert cwd != fake_binary.parent.resolve()
+    # Per-call TemporaryDirectory; path is under the system temp root.
+    assert str(cwd).startswith(tempfile.gettempdir())
+    assert cwd.name.startswith("tmp")
+    binary_arg = Path(captured["args"][0])
+    assert binary_arg.is_absolute()
+    assert binary_arg == fake_binary.resolve()
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree():
+    """Equilibrium calls must not grow _pseudosection_output.txt in-tree."""
+    binary = _LIVE_MAGEMIN_BINARY.resolve()
+    dump_path = binary.parent / "_pseudosection_output.txt"
+    size_before = dump_path.stat().st_size if dump_path.exists() else 0
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({"binary_path": str(binary)})
+    if not available:
+        pytest.skip("MAGEMin binary present but backend failed to initialize")
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_kg={"SiO2": 49.0, "MgO": 9.0, "Al2O3": 14.0, "CaO": 11.0},
+        fO2_log=-8.0,
+        pressure_bar=2000.0,
+    )
+    assert result.status == "ok", result.warnings
+
+    size_after = dump_path.stat().st_size if dump_path.exists() else 0
+    assert size_after == size_before
 
 
 def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):

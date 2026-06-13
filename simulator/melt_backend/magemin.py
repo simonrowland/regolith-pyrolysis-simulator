@@ -96,6 +96,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import tempfile
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -514,13 +515,16 @@ class MAGEMinBackend(MeltBackend):
 
         if self._binary_path is None:
             return 'unavailable'
+        binary_path = self._binary_path.resolve()
         try:
-            result = subprocess.run(
-                [str(self._binary_path), '--version', '--db', self._database],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                result = subprocess.run(
+                    [str(binary_path), '--version', '--db', self._database],
+                    cwd=tmpdir,
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
             lines = (result.stdout or result.stderr).strip().splitlines()
             if result.returncode == 0 and lines:
                 legacy = lines[0].strip()
@@ -833,13 +837,15 @@ class MAGEMinBackend(MeltBackend):
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
 
+        binary_path = self._binary_path.resolve()
+
         bulk = bulk_projection.vector
         buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
             temperature_C=temperature_C, fO2_log=fO2_log,
         )
 
         args = [
-            str(self._binary_path),
+            str(binary_path),
             '--Verb=0',
             f'--db={self._database}',
             f'--Temp={temperature_C:.6f}',
@@ -852,14 +858,15 @@ class MAGEMinBackend(MeltBackend):
 
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
-            completed = subprocess.run(  # noqa: S603 - args are adapter-built
-                args,
-                cwd=str(self._binary_path.parent),
-                capture_output=True,
-                text=True,
-                timeout=timeout_s,
-                check=False,
-            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                completed = subprocess.run(  # noqa: S603 - adapter-built
+                    args,
+                    cwd=tmpdir,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout_s,
+                    check=False,
+                )
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError(
                 f'MAGEMin binary timed out after {timeout_s:g}s'
