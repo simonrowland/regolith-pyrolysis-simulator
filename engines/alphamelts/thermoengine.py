@@ -14,6 +14,11 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.engine_local_config import (
+    cache_version_for,
+    setup_thermoengine_dylib_path,
+    warn_legacy_once,
+)
 
 
 ActivityConverter = Callable[[float, float, float], float]
@@ -62,6 +67,7 @@ class ThermoEngineTransport:
         self.engine_version = 'thermoengine unavailable'
 
     def initialize(self) -> bool:
+        setup_thermoengine_dylib_path()
         import thermoengine
         from thermoengine import chem, equilibrate, model
 
@@ -86,11 +92,20 @@ class ThermoEngineTransport:
         self._liq_phase = liq_phase
         self._melts_version = melts_version
         self._liq_model = liq_model
-        module_path = getattr(thermoengine, '__file__', 'unknown')
-        self.engine_version = (
-            f'thermoengine MELTS {melts_version} '
-            f'(liq_mod {liq_model}; {module_path})'
-        )
+        config_version = cache_version_for('thermoengine')
+        if config_version is not None:
+            self.engine_version = config_version
+        else:
+            module_path = getattr(thermoengine, '__file__', 'unknown')
+            self.engine_version = (
+                f'thermoengine MELTS {melts_version} '
+                f'(liq_mod {liq_model}; {module_path})'
+            )
+            warn_legacy_once(
+                'thermoengine',
+                'engines.local.toml absent; using legacy ThermoEngine '
+                'path-based identity for cache comparison',
+            )
         return True
 
     def health_check(self, *, timeout_s: float = 8.0) -> tuple[bool, str]:

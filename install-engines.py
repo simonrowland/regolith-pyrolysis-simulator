@@ -27,12 +27,25 @@ Usage: python3 install-engines.py
 
 from __future__ import annotations
 
+import importlib.metadata
 import os
 import platform
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+from simulator.engine_local_config import (
+    EngineIdentity,
+    EngineLocalConfig,
+    EnginePaths,
+    THERMOENGINE_DYLIBS,
+    find_alphamelts_binary,
+    git_rev,
+    sha256_combined,
+    sha256_file,
+    write_config,
+)
 
 
 # --------------------------------------------------------------------------
@@ -91,9 +104,6 @@ BUILD_ENV = {
     "CPATH": f"{BREW_PREFIX}/include",
     "LIBRARY_PATH": f"{BREW_PREFIX}/lib",
 }
-
-THERMOENGINE_DYLIBS = ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib")
-
 
 # --------------------------------------------------------------------------
 # Output helpers
@@ -341,6 +351,137 @@ def check_alphamelts() -> None:
         )
 
 
+def _binary_version_line(binary: Path, *, db: str | None = None) -> str:
+    command = [str(binary), "--version"]
+    if db:
+        command.extend(["--db", db])
+    try:
+        proc = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        lines = (proc.stdout or proc.stderr).strip().splitlines()
+        if proc.returncode == 0 and lines:
+            return lines[0].strip()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    return f"{binary.name} ({binary})"
+
+
+def _package_version(*distribution_names: str) -> str:
+    for name in distribution_names:
+        try:
+            return str(importlib.metadata.version(name))
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    return "unknown"
+
+
+def _thermoengine_version_string() -> str:
+    try:
+        import thermoengine
+        from thermoengine import model
+
+        database = model.Database(database="Berman", liq_mod="v1.0", calib=True)
+        melts_version = "1.0.2"
+        liq_model = "v1.0"
+        _ = database.get_phase("Liq")
+        _ = melts_version, liq_model, thermoengine
+        return f"thermoengine MELTS {melts_version} (liq_mod {liq_model})"
+    except Exception:
+        return "thermoengine MELTS 1.0.2 (liq_mod v1.0)"
+
+
+def _thermoengine_digest(dylib_dir: Path, clone_root: Path) -> str:
+    parts: list[bytes] = []
+    for name in THERMOENGINE_DYLIBS:
+        path = dylib_dir / name
+        if path.is_file():
+            parts.append(path.read_bytes())
+    parts.append(git_rev(clone_root).encode("utf-8"))
+    return sha256_combined(*parts)
+
+
+def write_local_config(python: Path) -> None:
+    _hdr("Writing engines/engines.local.toml")
+
+    dylib_dir = HOME_LIB if HOME_LIB.is_dir() else None
+    alphamelts_binary = find_alphamelts_binary(ENGINES_DIR / "alphamelts")
+    if alphamelts_binary is None:
+        on_path = shutil.which("alphamelts")
+        if on_path:
+            alphamelts_binary = Path(on_path)
+
+    magemin_binary = PARENT / "MAGEMin" / "MAGEMin"
+    if not magemin_binary.exists():
+        magemin_binary = ENGINES_DIR / "magemin" / "MAGEMin"
+    if not magemin_binary.exists():
+        magemin_binary = None
+
+    paths = EnginePaths(
+        thermoengine_dylib_dir=dylib_dir,
+        alphamelts_binary_path=alphamelts_binary,
+        magemin_binary_path=magemin_binary if magemin_binary and magemin_binary.exists() else None,
+    )
+
+    identities: dict[str, EngineIdentity] = {}
+
+    if alphamelts_binary is not None and alphamelts_binary.is_file():
+        identities["alphamelts"] = EngineIdentity(
+            name="alphamelts",
+            version=_binary_version_line(alphamelts_binary),
+            digest=sha256_file(alphamelts_binary),
+        )
+    else:
+        _record("engines.local.toml: alphaMELTS binary missing; identity skipped")
+
+    if magemin_binary is not None and magemin_binary.is_file():
+        identities["magemin"] = EngineIdentity(
+            name="magemin",
+            version=_binary_version_line(magemin_binary, db="ig"),
+            digest=sha256_file(magemin_binary),
+            extra={"db": "ig"},
+        )
+    else:
+        _record("engines.local.toml: MAGEMin binary missing; identity skipped")
+
+    if dylib_dir is not None:
+        thermo_clone = PARENT / "ThermoEngine"
+        identities["thermoengine"] = EngineIdentity(
+            name="thermoengine",
+            version=_thermoengine_version_string(),
+            digest=_thermoengine_digest(dylib_dir, thermo_clone),
+        )
+    else:
+        _record("engines.local.toml: ThermoEngine dylib_dir missing; identity skipped")
+
+    vaporock_clone = PARENT / "VapoRock"
+    if vaporock_clone.is_dir():
+        identities["vaporock"] = EngineIdentity(
+            name="vaporock",
+            version=_package_version("vaporock"),
+            digest=f"sha256:{git_rev(vaporock_clone)}",
+        )
+
+    pysulfsat_clone = PARENT / "PySulfSat"
+    if pysulfsat_clone.is_dir():
+        identities["pysulfsat"] = EngineIdentity(
+            name="pysulfsat",
+            version=_package_version("PySulfSat", "pysulfsat"),
+            digest=f"sha256:{git_rev(pysulfsat_clone)}",
+        )
+
+    if not identities:
+        _record("engines.local.toml: no engine identities resolved; not written")
+        return
+
+    config = EngineLocalConfig(paths=paths, identities=identities)
+    written = write_config(config)
+    _record(f"engines.local.toml: written ({written})")
+
+
 def verify(python: Path) -> None:
     _hdr("Verifying engine availability")
     checks = [
@@ -408,6 +549,7 @@ def main() -> int:
 
     check_alphamelts()
     verify(python)
+    write_local_config(python)
 
     _hdr("Summary")
     for line in _REPORT:

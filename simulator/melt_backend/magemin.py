@@ -184,7 +184,15 @@ class MAGEMinBackend(MeltBackend):
 
         self._database = str(self._config.get('database') or 'ig')
 
-        binary_path = self._locate_binary(self._config.get('binary_path'))
+        explicit_path = self._config.get('binary_path')
+        if explicit_path:
+            binary_path = self._locate_binary(explicit_path)
+        else:
+            from simulator.engine_local_config import configured_magemin_binary_path
+
+            binary_path = configured_magemin_binary_path()
+            if binary_path is None:
+                binary_path = self._locate_binary(None)
         if binary_path is None:
             self._warn(
                 'MAGEMin binary not found in engines/magemin or PATH; '
@@ -468,6 +476,9 @@ class MAGEMinBackend(MeltBackend):
                (the documented build location, see ``pyproject.toml``
                ``[magemin]``)
             4. ``MAGEMin`` on the system PATH
+
+        ``initialize()`` probes ``engines.local.toml`` before this helper when
+        no explicit ``binary_path`` is supplied.
         """
         if explicit:
             path = Path(str(explicit)).expanduser()
@@ -479,7 +490,6 @@ class MAGEMinBackend(MeltBackend):
         candidates = [
             project_root / 'engines' / 'magemin' / 'MAGEMin',
             project_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
-            # Sibling clone built in place — see pyproject.toml [magemin].
             project_root.parent / 'MAGEMin' / 'MAGEMin',
         ]
         for candidate in candidates:
@@ -491,6 +501,39 @@ class MAGEMinBackend(MeltBackend):
             return Path(which)
 
         return None
+
+    def get_engine_version(self) -> str:
+        from simulator.engine_local_config import (
+            cache_version_for,
+            warn_legacy_once,
+        )
+
+        config_version = cache_version_for('magemin')
+        if config_version is not None:
+            return config_version
+
+        if self._binary_path is None:
+            return 'unavailable'
+        try:
+            result = subprocess.run(
+                [str(self._binary_path), '--version', '--db', self._database],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            lines = (result.stdout or result.stderr).strip().splitlines()
+            if result.returncode == 0 and lines:
+                legacy = lines[0].strip()
+            else:
+                legacy = f'MAGEMin subprocess ({self._binary_path})'
+        except (OSError, subprocess.TimeoutExpired):
+            legacy = f'MAGEMin subprocess ({self._binary_path})'
+        warn_legacy_once(
+            'magemin',
+            'engines.local.toml absent; using legacy MAGEMin '
+            'path-based identity for cache comparison',
+        )
+        return legacy
 
     def _import_magemin_bridge(
         self, *, requested: Optional[Any]

@@ -252,11 +252,14 @@ class AlphaMELTSBackend(MeltBackend):
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
-            # Check project engines/ directory
+            from simulator.engine_local_config import find_alphamelts_binary
+
             project_root = Path(__file__).parent.parent.parent
             engine_root = project_root / 'engines' / 'alphamelts'
             engine_path = engine_root / 'run_alphamelts.command'
-            binary_path = self._find_project_binary(engine_root)
+            binary_path = find_alphamelts_binary(engine_root)
+            if binary_path is None:
+                binary_path = self._find_project_binary(engine_root)
             if engine_path.exists() or binary_path is not None:
                 self._engine_path = engine_path if engine_path.exists() else binary_path
                 self._binary_path = binary_path
@@ -442,6 +445,15 @@ class AlphaMELTSBackend(MeltBackend):
         return 'unavailable'
 
     def _subprocess_engine_version(self) -> Optional[str]:
+        from simulator.engine_local_config import (
+            cache_version_for,
+            warn_legacy_once,
+        )
+
+        config_version = cache_version_for('alphamelts')
+        if config_version is not None:
+            return config_version
+
         if self._binary_path is None and self._engine_path is None:
             return None
         binary = self._binary_path or self._engine_path
@@ -454,10 +466,17 @@ class AlphaMELTSBackend(MeltBackend):
             )
             text = (result.stdout or result.stderr).strip().splitlines()
             if result.returncode == 0 and text:
-                return text[0]
+                legacy = text[0]
+            else:
+                legacy = f'alphaMELTS subprocess ({binary})'
         except (OSError, subprocess.TimeoutExpired):
-            pass
-        return f'alphaMELTS subprocess ({binary})'
+            legacy = f'alphaMELTS subprocess ({binary})'
+        warn_legacy_once(
+            'alphamelts',
+            'engines.local.toml absent; using legacy alphaMELTS '
+            'path-based identity for cache comparison',
+        )
+        return legacy
 
     def capabilities(self) -> Dict[str, object]:
         caps = super().capabilities()
