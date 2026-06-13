@@ -50,6 +50,7 @@ from simulator.backends import (
 from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager
+from simulator.accounting import AccountingQueries
 from simulator.core import (
     CampaignPhase,
     PyrolysisSimulator,
@@ -1643,15 +1644,20 @@ def build_sio_yield_report(
     hours: int = 24,
     mass_kg: float = 1000.0,
     include_diagnostics: bool = False,
+    include_lab_oxygen_diagnostics: bool = False,
     t_low_c: float | None = None,
     t_hold_c: float | None = None,
     ramp_c_per_hr: float | None = None,
     liner_temperature_c: float | None = None,
     pO2_mbar: float | None = None,
     allow_unmeasured_alpha_fallback: bool = False,
-) -> dict[str, Any] | tuple[dict[str, Any], dict[str, float]]:
+) -> dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]:
     """Run the C2A SiO yield slice and return the golden-file report."""
 
+    if include_lab_oxygen_diagnostics and not include_diagnostics:
+        raise RunnerError(
+            "lab oxygen diagnostics require include_diagnostics=True"
+        )
     if feedstock_id not in SIO_YIELD_FEEDSTOCKS:
         raise RunnerError(
             "SiO yield report supports feedstocks "
@@ -1853,6 +1859,10 @@ def build_sio_yield_report(
         if vaporock_full_speciation:
             diagnostics["vaporock_full_speciation_Pa"] = (
                 vaporock_full_speciation
+            )
+        if include_lab_oxygen_diagnostics:
+            diagnostics["lab_oxygen_atom_partition"] = (
+                AccountingQueries(sim).lab_oxygen_atom_partition()
             )
         return report, diagnostics
     return report
@@ -2926,6 +2936,10 @@ def build_sio_yield_arg_parser() -> argparse.ArgumentParser:
         required=True,
         help="Path to write the SiO yield report JSON",
     )
+    parser.add_argument(
+        "--lab-oxygen-diagnostics-output",
+        help="Optional JSON sidecar path for lab oxygen-atom diagnostics",
+    )
     return parser
 
 
@@ -2934,14 +2948,32 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        report = build_sio_yield_report(
+        result = build_sio_yield_report(
             feedstock_id=args.feedstock,
             campaign=args.campaign,
             hours=int(args.hours),
             mass_kg=float(args.mass_kg),
+            include_diagnostics=bool(args.lab_oxygen_diagnostics_output),
+            include_lab_oxygen_diagnostics=bool(
+                args.lab_oxygen_diagnostics_output
+            ),
         )
     except RunnerError as exc:
         parser.error(str(exc))
+    if args.lab_oxygen_diagnostics_output:
+        report, diagnostics = result
+        diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
+        diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+        with diagnostics_path.open("w") as f:
+            json.dump(
+                diagnostics["lab_oxygen_atom_partition"],
+                f,
+                indent=2,
+                sort_keys=False,
+            )
+            f.write("\n")
+    else:
+        report = result
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)

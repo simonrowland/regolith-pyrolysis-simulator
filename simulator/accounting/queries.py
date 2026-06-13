@@ -17,8 +17,21 @@ from simulator.account_ids import (
     OXYGEN_VENTED_ACCOUNTS,
 )
 from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.formulas import resolve_species_formula
 
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
+FREE_ANALYZER_OXYGEN_SPECIES = frozenset({OXYGEN_SPECIES, "O"})
+OVERHEAD_VAPOR_ACCOUNTS = (
+    "process.overhead_gas",
+    "terminal.offgas",
+)
+CONDENSATION_TRAIN_ACCOUNT = "process.condensation_train"
+WALL_DEPOSIT_SEGMENT_ACCOUNT_PREFIX = "process.wall_deposit_segment_"
+FREE_ANALYZER_OXYGEN_ACCOUNTS = (
+    *OVERHEAD_VAPOR_ACCOUNTS,
+    *OXYGEN_STORED_ACCOUNTS,
+    *OXYGEN_VENTED_ACCOUNTS,
+)
 TERMINAL_RUMP_ACCOUNTS = (
     "process.cleaned_melt",
     "terminal.slag",
@@ -204,6 +217,155 @@ class AccountingQueries:
             totals.pop(OXYGEN_SPECIES, None)
         return totals
 
+    def lab_oxygen_atom_partition(self) -> dict[str, Any]:
+        balances = self.ledger.mol_by_account()
+        registry = self.ledger.registry
+        total_oxygen_atom_mol = _oxygen_atom_mol_for_balances(
+            balances,
+            registry,
+        )
+        free_species_mol: dict[str, float] = {}
+        free_species_oxygen_atom_mol: dict[str, float] = {}
+        overhead_bound_species_oxygen_atom_mol: dict[str, float] = {}
+        condensation_species_oxygen_atom_mol: dict[str, float] = {}
+        wall_by_surface: dict[str, dict[str, Any]] = {}
+
+        for account, species_mol in sorted(balances.items()):
+            account_name = str(account)
+            species_oxygen = _oxygen_atom_mol_by_species(
+                species_mol,
+                registry,
+            )
+            if not species_oxygen:
+                continue
+
+            if account_name.startswith(WALL_DEPOSIT_SEGMENT_ACCOUNT_PREFIX):
+                surface = account_name.removeprefix(
+                    WALL_DEPOSIT_SEGMENT_ACCOUNT_PREFIX
+                )
+                wall_by_surface[surface] = {
+                    "account": account_name,
+                    "oxygen_atom_mol": sum(species_oxygen.values()),
+                    "species_oxygen_atom_mol": dict(sorted(
+                        species_oxygen.items()
+                    )),
+                }
+                continue
+
+            if account_name == CONDENSATION_TRAIN_ACCOUNT:
+                _merge_masses(
+                    condensation_species_oxygen_atom_mol,
+                    species_oxygen,
+                )
+                continue
+
+            if account_name in OVERHEAD_VAPOR_ACCOUNTS:
+                for species, oxygen_atom_mol in species_oxygen.items():
+                    if species in FREE_ANALYZER_OXYGEN_SPECIES:
+                        free_species_oxygen_atom_mol[species] = (
+                            free_species_oxygen_atom_mol.get(species, 0.0)
+                            + oxygen_atom_mol
+                        )
+                        free_species_mol[species] = (
+                            free_species_mol.get(species, 0.0)
+                            + float(species_mol.get(species, 0.0))
+                        )
+                    else:
+                        overhead_bound_species_oxygen_atom_mol[species] = (
+                            overhead_bound_species_oxygen_atom_mol.get(
+                                species, 0.0
+                            )
+                            + oxygen_atom_mol
+                        )
+                continue
+
+            if account_name in FREE_ANALYZER_OXYGEN_ACCOUNTS:
+                for species, oxygen_atom_mol in species_oxygen.items():
+                    if species not in FREE_ANALYZER_OXYGEN_SPECIES:
+                        continue
+                    free_species_oxygen_atom_mol[species] = (
+                        free_species_oxygen_atom_mol.get(species, 0.0)
+                        + oxygen_atom_mol
+                    )
+                    free_species_mol[species] = (
+                        free_species_mol.get(species, 0.0)
+                        + float(species_mol.get(species, 0.0))
+                    )
+
+        free_oxygen_atom_mol = sum(free_species_oxygen_atom_mol.values())
+        overhead_bound_oxygen_atom_mol = sum(
+            overhead_bound_species_oxygen_atom_mol.values()
+        )
+        condensation_oxygen_atom_mol = sum(
+            condensation_species_oxygen_atom_mol.values()
+        )
+        wall_segment_oxygen_atom_mol = sum(
+            surface["oxygen_atom_mol"]
+            for surface in wall_by_surface.values()
+        )
+        allocated_oxygen_atom_mol = (
+            free_oxygen_atom_mol
+            + overhead_bound_oxygen_atom_mol
+            + condensation_oxygen_atom_mol
+            + wall_segment_oxygen_atom_mol
+        )
+        residual_unallocated_oxygen_atom_mol = (
+            total_oxygen_atom_mol - allocated_oxygen_atom_mol
+        )
+        reported_total_oxygen_atom_mol = (
+            allocated_oxygen_atom_mol
+            + residual_unallocated_oxygen_atom_mol
+        )
+        if total_oxygen_atom_mol > 0.0:
+            closure_error_pct = (
+                abs(total_oxygen_atom_mol - reported_total_oxygen_atom_mol)
+                / total_oxygen_atom_mol
+                * 100.0
+            )
+        else:
+            closure_error_pct = 0.0
+
+        return {
+            "total_oxygen_atom_mol": total_oxygen_atom_mol,
+            "free_analyzer_visible": {
+                "oxygen_atom_mol": free_oxygen_atom_mol,
+                "species_mol": dict(sorted(
+                    (species, amount)
+                    for species, amount in free_species_mol.items()
+                    if amount > 0.0
+                )),
+                "species_oxygen_atom_mol": dict(sorted(
+                    free_species_oxygen_atom_mol.items()
+                )),
+            },
+            "overhead_vapor_bound": {
+                "oxygen_atom_mol": overhead_bound_oxygen_atom_mol,
+                "species_oxygen_atom_mol": dict(sorted(
+                    overhead_bound_species_oxygen_atom_mol.items()
+                )),
+            },
+            "condensation_train": {
+                "oxygen_atom_mol": condensation_oxygen_atom_mol,
+                "species_oxygen_atom_mol": dict(sorted(
+                    condensation_species_oxygen_atom_mol.items()
+                )),
+            },
+            "wall_deposit_segment_by_surface": {
+                "total_oxygen_atom_mol": wall_segment_oxygen_atom_mol,
+                "surfaces": dict(sorted(wall_by_surface.items())),
+            },
+            "residual_unallocated_oxygen_atom_mol": (
+                residual_unallocated_oxygen_atom_mol
+            ),
+            "closure": {
+                "allocated_oxygen_atom_mol": allocated_oxygen_atom_mol,
+                "reported_total_oxygen_atom_mol": (
+                    reported_total_oxygen_atom_mol
+                ),
+                "error_pct": closure_error_pct,
+            },
+        }
+
     def rump_element_kg(self, element: str) -> float:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
@@ -227,6 +389,34 @@ class AccountingQueries:
 def _ledger_o2_kg(ledger: Any, account: str) -> float:
     species_kg = ledger.kg_by_account(account)
     return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+
+
+def _oxygen_atom_mol_for_balances(
+    balances: Mapping[str, Mapping[str, float]],
+    registry: Mapping[str, Any],
+) -> float:
+    return sum(
+        sum(_oxygen_atom_mol_by_species(species_mol, registry).values())
+        for species_mol in balances.values()
+    )
+
+
+def _oxygen_atom_mol_by_species(
+    species_mol: Mapping[str, float],
+    registry: Mapping[str, Any],
+) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for species, mol in species_mol.items():
+        formula = resolve_species_formula(str(species), registry)
+        oxygen_atoms = float(formula.atoms.get("O", 0.0))
+        if oxygen_atoms <= 0.0:
+            continue
+        oxygen_atom_mol = float(mol) * oxygen_atoms
+        if oxygen_atom_mol > 0.0:
+            result[str(species)] = (
+                result.get(str(species), 0.0) + oxygen_atom_mol
+            )
+    return dict(sorted(result.items()))
 
 
 def stage_purity(train: Any) -> dict[int, dict[str, float]]:
