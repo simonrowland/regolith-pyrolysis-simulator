@@ -9,12 +9,25 @@ from pathlib import Path
 
 import pytest
 
+from simulator.runner import PyrolysisRun
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def _write_bridge_preset(tmp_path: Path, *, feedstock_id: str) -> Path:
+def _write_bridge_preset(
+    tmp_path: Path,
+    *,
+    feedstock_id: str,
+    scale: str = "gram_lab",
+    exposed_melt_area_m2: float | None = None,
+) -> Path:
     preset_path = tmp_path / "bridge_preset.yaml"
+    exposed_area_line = (
+        ""
+        if exposed_melt_area_m2 is None
+        else f"\n                exposed_melt_area_m2: {exposed_melt_area_m2}"
+    )
     preset_path.write_text(
         textwrap.dedent(
             f"""
@@ -58,10 +71,10 @@ def _write_bridge_preset(tmp_path: Path, *, feedstock_id: str) -> Path:
                   - {{t_h: 1.0, value: 300.0, unit: C}}
             lab_geometry:
               id: bridge_geometry
-              scale: gram_lab
+              scale: {scale}
               equipment_sizing: lab_fixed_geometry
               sample:
-                mass_g: 2.0
+                mass_g: 2.0{exposed_area_line}
               surfaces:
                 - id: witness
                   role: condenser
@@ -105,6 +118,31 @@ def _write_bridge_preset(tmp_path: Path, *, feedstock_id: str) -> Path:
     return preset_path
 
 
+def _runtime_geometry(*, scale: str, exposed_melt_area_m2: float) -> dict:
+    return {
+        "id": "runtime_area_geometry",
+        "scale": scale,
+        "equipment_sizing": "lab_fixed_geometry",
+        "sample": {
+            "mass_g": 2.0,
+            "exposed_melt_area_m2": exposed_melt_area_m2,
+        },
+        "surfaces": [
+            {
+                "id": "witness",
+                "role": "condenser",
+                "area_m2": 0.001,
+                "temperature_C": 25.0,
+                "view_factor_from_melt": 0.25,
+                "line_of_sight_to_melt": False,
+                "source_class": "assumption_with_sensitivity_marker",
+                "sensitivity_marker": "runtime_area_surface_sweep",
+                "extraction_note": "synthetic surface for runtime area tests",
+            }
+        ],
+    }
+
+
 def _run_preset_cli(tmp_path: Path, preset_path: Path, *extra_args: str) -> tuple[int, dict]:
     output_path = tmp_path / "runner-output.json"
     cmd = [
@@ -133,6 +171,54 @@ def _run_preset_cli(tmp_path: Path, preset_path: Path, *extra_args: str) -> tupl
     )
     assert output_path.exists(), completed.stderr
     return completed.returncode, json.loads(output_path.read_text())
+
+
+def test_gram_lab_exposed_area_sets_runtime_melt_area() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=0,
+        mass_kg=0.002,
+        setpoints_patch={
+            "lab_geometry": _runtime_geometry(
+                scale="gram_lab",
+                exposed_melt_area_m2=0.000123,
+            ),
+        },
+    )
+    session = run._start_session()
+
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(0.2)
+    bridge = run._lab_area_bridge()
+    run._apply_lab_area_bridge(session.simulator, bridge)
+
+    assert bridge == {
+        "effective_exposed_area_m2": 0.000123,
+        "area_basis": "gram_lab_exposed_melt",
+    }
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(0.000123)
+
+
+def test_non_gram_lab_exposed_area_leaves_runtime_melt_area_default() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=0,
+        mass_kg=0.002,
+        setpoints_patch={
+            "lab_geometry": _runtime_geometry(
+                scale="industrial_pot",
+                exposed_melt_area_m2=0.000123,
+            ),
+        },
+    )
+    session = run._start_session()
+
+    bridge = run._lab_area_bridge()
+    run._apply_lab_area_bridge(session.simulator, bridge)
+
+    assert bridge == {}
+    assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(0.2)
 
 
 def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
@@ -183,6 +269,25 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
     assert row["P_total_bar"] == pytest.approx(13.0e-3)
     assert row["pO2_bar"] == pytest.approx(
         enforcement[0]["achieved_mbar"] * 1.0e-3)
+
+
+def test_preset_bridge_records_exposed_area_result_scope(tmp_path: Path):
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+        exposed_melt_area_m2=0.000123,
+    )
+
+    returncode, payload = _run_preset_cli(tmp_path, preset_path)
+
+    assert returncode == 0, payload
+    metadata = payload["run_metadata"]
+    assert metadata["effective_exposed_area_m2"] == pytest.approx(0.000123)
+    assert metadata["area_basis"] == "gram_lab_exposed_melt"
+    preset = metadata["preset"]
+    assert preset["geometry_digest"] == "bridge_geometry_digest"
+    assert preset["effective_exposed_area_m2"] == pytest.approx(0.000123)
+    assert preset["area_basis"] == "gram_lab_exposed_melt"
 
 
 def test_preset_bridge_missing_feedstock_uses_existing_named_refusal(tmp_path: Path):

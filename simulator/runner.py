@@ -60,6 +60,7 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.condensation import (
+    gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
@@ -388,6 +389,7 @@ def _load_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             "geometry_id": geometry_id,
         }
     )
+    provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
     return PresetRunSpec(
         feedstock_id=feedstock_id,
         hours=hours,
@@ -744,8 +746,10 @@ class PyrolysisRun:
         diff failure reasons without parsing stderr.
         """
 
-        if self._has_sio_pre_run_controls():
+        lab_area_bridge = self._lab_area_bridge()
+        if self._has_sio_pre_run_controls() or lab_area_bridge:
             session = self._start_session()
+            self._apply_lab_area_bridge(session.simulator, lab_area_bridge)
             self._apply_sio_pre_run_controls(session.simulator)
             execution = RunExecutor().execute_session(
                 session,
@@ -764,11 +768,34 @@ class PyrolysisRun:
         return session
 
     def _run_session(self, session: SimSession) -> dict:
+        self._apply_lab_area_bridge(session.simulator, self._lab_area_bridge())
         self._apply_sio_pre_run_controls(session.simulator)
         execution = RunExecutor().execute_session(session, hours=int(self.hours))
         document = self._build_output(execution)
         execution.session._set_result_document(document)
         return document
+
+    def _lab_area_bridge(self) -> dict[str, Any]:
+        lab_geometry = (
+            self.setpoints_patch.get("lab_geometry")
+            if isinstance(self.setpoints_patch, Mapping)
+            else None
+        )
+        try:
+            return gram_lab_exposed_melt_area_bridge(lab_geometry)
+        except LabGeometryError as exc:
+            raise RunnerError(str(exc)) from exc
+
+    @staticmethod
+    def _apply_lab_area_bridge(
+        sim: PyrolysisSimulator,
+        bridge: Mapping[str, Any],
+    ) -> None:
+        if not bridge:
+            return
+        sim.melt.melt_surface_area_m2 = float(
+            bridge["effective_exposed_area_m2"]
+        )
 
     def _has_sio_pre_run_controls(self) -> bool:
         return any(
@@ -954,6 +981,9 @@ class PyrolysisRun:
             run_metadata["reduced_real_cache"] = _json_safe(
                 execution.reduced_real_cache
             )
+        lab_area_bridge = self._lab_area_bridge()
+        if lab_area_bridge:
+            run_metadata.update(_json_safe(lab_area_bridge))
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.

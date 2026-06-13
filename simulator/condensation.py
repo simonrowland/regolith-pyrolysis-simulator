@@ -111,6 +111,7 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
+LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
 # Viscous-regime mass-transfer model (post-F3 follow-on, 2026-05-27).
 # F3 added regime_factor = Kn/(Kn + 0.01) to the band-integrated HKL
@@ -297,6 +298,42 @@ def _stirring_enhanced_sherwood(
     # to Sh = sherwood_laminar, not Sh = 0.
     sh_input = max(1.0, operator_value)
     return float(sherwood_laminar) * math.sqrt(sh_input)
+
+
+def gram_lab_exposed_melt_area_bridge(
+    lab_geometry: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    if not isinstance(lab_geometry, Mapping):
+        return {}
+    if str(lab_geometry.get('scale') or '').strip() != 'gram_lab':
+        return {}
+    sample = lab_geometry.get('sample')
+    if not isinstance(sample, Mapping):
+        return {}
+    raw_area = sample.get('exposed_melt_area_m2')
+    if raw_area in (None, ''):
+        return {}
+    if isinstance(raw_area, bool):
+        raise LabGeometryError(
+            'invalid_lab_geometry_positive_value',
+            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
+        )
+    try:
+        area = float(raw_area)
+    except (TypeError, ValueError) as exc:
+        raise LabGeometryError(
+            'invalid_lab_geometry_positive_value',
+            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
+        ) from exc
+    if not math.isfinite(area) or area <= 0.0:
+        raise LabGeometryError(
+            'invalid_lab_geometry_positive_value',
+            'lab_geometry.sample.exposed_melt_area_m2 must be finite positive',
+        )
+    return {
+        'effective_exposed_area_m2': area,
+        'area_basis': LAB_EXPOSED_MELT_AREA_BASIS,
+    }
 
 
 def _neufeld_collision_integral_omega_d(T_star: float) -> float:

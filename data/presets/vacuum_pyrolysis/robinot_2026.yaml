@@ -95,11 +95,12 @@ lab_geometry:
     mass_citation_id: robinot_2026
     mass_digest: "Robinot anchor reports an EAC-1 pellet mass of 3.38 g."
     crucible_material: null
-    exposed_melt_area_m2: null
+    exposed_melt_area_m2: 0.000314
+    exposed_melt_area_basis: "diagnostic 20 mm holder/opening top area; not fit to Robinot O2"
+    exposed_melt_area_digest: "REC-W0-04 uses pi*(0.01 m)^2 as a gram-lab exposed-area bridge. The value is not chosen to close the Robinot O2 gap."
     crucible_opening_area_m2: null
     named_missing_fields:
       - crucible_material
-      - exposed_melt_area_m2
       - crucible_opening_area_m2
   chamber:
     volume_m3: null
