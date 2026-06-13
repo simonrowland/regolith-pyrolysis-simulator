@@ -206,6 +206,27 @@ def test_validity_gate_refuses_solver_status_mismatch() -> None:
     assert gate["refusal_reason"] == "solver_status_mismatch"
 
 
+def test_validity_gate_refuses_held_out_disagreement() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    neighbors = [
+        _candidate(
+            _interpolation_key("low", feo_fraction=0.20, temperature_K=1400.0),
+            _interpolation_payload(liquid_fraction=0.5, sio_pa=1.0),
+        ),
+        _candidate(
+            _interpolation_key("high", feo_fraction=0.20, temperature_K=1600.0),
+            _interpolation_payload(liquid_fraction=0.5, sio_pa=100.0),
+        ),
+    ]
+    gate = rci.interpolation_validity_gate(query, neighbors)
+    assert gate["accepted"] is False
+    assert gate["refusal_reason"] == "held_out_disagreement_exceeded"
+    assert (
+        gate["neighbor_disagreement"]["relative_error_max"]
+        > rci.INTERPOLATION_HELD_OUT_DISAGREEMENT_THRESHOLD
+    )
+
+
 def test_validity_gate_refuses_po2_knee_region() -> None:
     query = _interpolation_key(
         "query",
