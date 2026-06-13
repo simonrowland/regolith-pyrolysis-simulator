@@ -15,6 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from decimal import Decimal
 import hashlib
+import math
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
@@ -56,6 +57,12 @@ class EvalSpec:
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     lab_schedule: Mapping[str, Any] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
+    lab_alpha_digest: str = ""
+    geometry_digest: str = ""
+    effective_exposed_area_m2: float | None = None
+    area_basis: str = ""
+    oxide_vapor_ceiling_digest: str = ""
+    sink_channel_evidence_digests: Mapping[str, str] = field(default_factory=dict)
     target_spec_id: str = ""
     target_spec_digest: str = ""
     target_maturity: Mapping[str, Any] = field(default_factory=dict)
@@ -72,6 +79,10 @@ class EvalSpec:
             "campaign",
             "track",
             "backend_name",
+            "lab_alpha_digest",
+            "geometry_digest",
+            "area_basis",
+            "oxide_vapor_ceiling_digest",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -91,6 +102,14 @@ class EvalSpec:
             raise TypeError("target_spec_id must be a string")
         if not isinstance(self.target_spec_digest, str):
             raise TypeError("target_spec_digest must be a string")
+        if self.effective_exposed_area_m2 is not None:
+            if isinstance(self.effective_exposed_area_m2, bool) or not isinstance(
+                self.effective_exposed_area_m2,
+                (int, float, Decimal),
+            ):
+                raise TypeError("effective_exposed_area_m2 must be numeric or None")
+            if not math.isfinite(float(self.effective_exposed_area_m2)):
+                raise CanonicalizationError("effective_exposed_area_m2 must be finite")
         object.__setattr__(self, "data_digests", _freeze_digest_map(self.data_digests))
         object.__setattr__(self, "additives_kg", _freeze_value(self.additives_kg, "additives_kg"))
         object.__setattr__(
@@ -109,6 +128,14 @@ class EvalSpec:
             _freeze_value(
                 normalize_chemistry_kernel_config(self.chemistry_kernel),
                 "chemistry_kernel",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "sink_channel_evidence_digests",
+            _freeze_optional_digest_map(
+                self.sink_channel_evidence_digests,
+                "sink_channel_evidence_digests",
             ),
         )
         object.__setattr__(
@@ -145,6 +172,12 @@ class EvalSpec:
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
+                self.lab_alpha_digest,
+                self.geometry_digest,
+                self.effective_exposed_area_m2,
+                self.area_basis,
+                self.oxide_vapor_ceiling_digest,
+                _thaw_value(self.sink_channel_evidence_digests),
                 self.target_spec_id,
                 self.target_spec_digest,
                 _thaw_value(self.target_maturity),
@@ -194,6 +227,12 @@ class PrefixEvalSpec(EvalSpec):
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
+                self.lab_alpha_digest,
+                self.geometry_digest,
+                self.effective_exposed_area_m2,
+                self.area_basis,
+                self.oxide_vapor_ceiling_digest,
+                _thaw_value(self.sink_channel_evidence_digests),
                 self.target_spec_id,
                 self.target_spec_digest,
                 _thaw_value(self.target_maturity),
@@ -233,6 +272,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     }
     if spec.lab_schedule:
         payload["lab_schedule"] = spec.lab_schedule
+    payload.update(lab_overlay_scope_payload(spec))
     if spec.target_spec_digest:
         payload.update(
             {
@@ -256,6 +296,23 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
 
 def cache_key(spec: EvalSpec) -> str:
     return hashlib.sha256(canonical_evalspec_json(spec)).hexdigest()
+
+
+def lab_overlay_scope_payload(spec: EvalSpec) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    if spec.lab_alpha_digest:
+        payload["lab_alpha_digest"] = spec.lab_alpha_digest
+    if spec.geometry_digest:
+        payload["geometry_digest"] = spec.geometry_digest
+    if spec.effective_exposed_area_m2 is not None:
+        payload["effective_exposed_area_m2"] = spec.effective_exposed_area_m2
+    if spec.area_basis:
+        payload["area_basis"] = spec.area_basis
+    if spec.oxide_vapor_ceiling_digest:
+        payload["oxide_vapor_ceiling_digest"] = spec.oxide_vapor_ceiling_digest
+    if spec.sink_channel_evidence_digests:
+        payload["sink_channel_evidence_digests"] = spec.sink_channel_evidence_digests
+    return payload
 
 
 def feedstock_recipe_digest(composition: Mapping[str, Any]) -> str:
@@ -321,6 +378,23 @@ def _freeze_digest_map(value: Mapping[str, str]) -> Mapping[str, str]:
             raise TypeError("data_digests values must be strings")
         if not digest:
             raise CanonicalizationError(f"data_digests[{key!r}] must be non-empty")
+        frozen[key] = digest
+    return MappingProxyType(frozen)
+
+
+def _freeze_optional_digest_map(value: Mapping[str, str], field_name: str) -> Mapping[str, str]:
+    if not isinstance(value, Mapping):
+        raise TypeError(f"{field_name} must be a mapping")
+    frozen: dict[str, str] = {}
+    keys = list(value)
+    if not all(isinstance(key, str) for key in keys):
+        raise CanonicalizationError(f"{field_name} keys must be strings")
+    for key in sorted(keys):
+        digest = value[key]
+        if not isinstance(digest, str):
+            raise TypeError(f"{field_name} values must be strings")
+        if not digest:
+            raise CanonicalizationError(f"{field_name}[{key!r}] must be non-empty")
         frozen[key] = digest
     return MappingProxyType(frozen)
 

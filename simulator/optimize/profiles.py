@@ -109,6 +109,24 @@ _RUN_KEYS = frozenset(
         "runtime_campaign_overrides",
         "lab_schedule",
         "chemistry_kernel",
+        "lab_overlay_scope",
+        "lab_overlay",
+        "lab_alpha_digest",
+        "geometry_digest",
+        "effective_exposed_area_m2",
+        "area_basis",
+        "oxide_vapor_ceiling_digest",
+        "sink_channel_evidence_digests",
+    }
+)
+_LAB_OVERLAY_SCOPE_KEYS = frozenset(
+    {
+        "lab_alpha_digest",
+        "geometry_digest",
+        "effective_exposed_area_m2",
+        "area_basis",
+        "oxide_vapor_ceiling_digest",
+        "sink_channel_evidence_digests",
     }
 )
 _REDUCED_REAL_CACHE_KEYS = frozenset({
@@ -475,6 +493,7 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
             raise ProfileValidationError(
                 f"{source}: {where}.chemistry_kernel.{exc}"
             ) from exc
+    _validate_lab_overlay_scope(raw, source=source, where=where)
     _validate_c5_request(raw, source=source, where=where)
     backend_name = str(raw.get("backend_name", ""))
     cache_config = raw.get("reduced_real_cache")
@@ -489,6 +508,49 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
             f"{source}: {where}.reduced_real_cache requires "
             "backend_name='cached-real'"
         )
+
+
+def _validate_lab_overlay_scope(raw: Mapping[str, Any], *, source: str | Path, where: str) -> None:
+    for scope_key in ("lab_overlay_scope", "lab_overlay"):
+        scope = raw.get(scope_key)
+        if scope is None:
+            continue
+        if not isinstance(scope, Mapping):
+            raise ProfileValidationError(f"{source}: {where}.{scope_key} must be a mapping")
+        _reject_unknown_keys(
+            scope,
+            _LAB_OVERLAY_SCOPE_KEYS,
+            source=source,
+            where=f"{where}.{scope_key}",
+        )
+        _validate_lab_overlay_scope(scope, source=source, where=f"{where}.{scope_key}")
+    for field in (
+        "lab_alpha_digest",
+        "geometry_digest",
+        "area_basis",
+        "oxide_vapor_ceiling_digest",
+    ):
+        if field in raw and raw[field] is not None and not isinstance(raw[field], str):
+            raise ProfileValidationError(f"{source}: {where}.{field} must be a string")
+    if (
+        "effective_exposed_area_m2" in raw
+        and raw["effective_exposed_area_m2"] is not None
+        and _bad_positive_number(raw["effective_exposed_area_m2"])
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.effective_exposed_area_m2 must be positive finite"
+        )
+    digests = raw.get("sink_channel_evidence_digests")
+    if digests is not None:
+        if not isinstance(digests, Mapping):
+            raise ProfileValidationError(
+                f"{source}: {where}.sink_channel_evidence_digests must be a mapping"
+            )
+        for key, value in digests.items():
+            if not isinstance(key, str) or not isinstance(value, str) or not value:
+                raise ProfileValidationError(
+                    f"{source}: {where}.sink_channel_evidence_digests must map strings to non-empty strings"
+                )
 
 
 def _validate_c5_request(raw: Mapping[str, Any], *, source: str | Path, where: str) -> None:

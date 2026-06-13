@@ -85,9 +85,19 @@ def _base_spec(**overrides: object) -> EvalSpec:
 
 def test_canonical_evalspec_json_and_cache_key_are_byte_stable_cross_run() -> None:
     spec = _base_spec()
+    explicit_empty = _base_spec(
+        lab_alpha_digest="",
+        geometry_digest="",
+        effective_exposed_area_m2=None,
+        area_basis="",
+        oxide_vapor_ceiling_digest="",
+        sink_channel_evidence_digests={},
+    )
 
     assert canonical_evalspec_json(spec) == PINNED_EVALSPEC_JSON
+    assert canonical_evalspec_json(explicit_empty) == PINNED_EVALSPEC_JSON
     assert cache_key(spec) == cache_key(_base_spec())
+    assert cache_key(explicit_empty) == cache_key(spec)
 
     code = """
 import json
@@ -193,6 +203,18 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
         ("mre_max_voltage_V", 1.4),
         ("mre_target_species", "SiO2"),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
+        ("lab_alpha_digest", "robinot-lab-alpha-v1"),
+        ("geometry_digest", "robinot-geometry-v1"),
+        ("effective_exposed_area_m2", 0.000314),
+        ("area_basis", "gram_lab_exposed_melt"),
+        ("oxide_vapor_ceiling_digest", "oxide-vapor-ceiling-v1"),
+        (
+            "sink_channel_evidence_digests",
+            {
+                "plume_oxidation_diagnostic": "plume-evidence-v1",
+                "deposit_gettering_diagnostic": "deposit-evidence-v1",
+            },
+        ),
         (
             "data_digests",
             {
@@ -214,6 +236,46 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
 )
 def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
+
+
+def test_lab_overlay_scope_serializes_deterministically_and_only_when_non_empty() -> None:
+    first = _base_spec(
+        lab_alpha_digest="robinot-alpha-v1",
+        geometry_digest="robinot-geometry-v1",
+        effective_exposed_area_m2=0.000314,
+        area_basis="gram_lab_exposed_melt",
+        oxide_vapor_ceiling_digest="oxide-ceiling-v1",
+        sink_channel_evidence_digests={
+            "plume_oxidation_diagnostic": "plume-evidence-v1",
+            "deposit_gettering_diagnostic": "deposit-evidence-v1",
+        },
+    )
+    second = _base_spec(
+        lab_alpha_digest="robinot-alpha-v1",
+        geometry_digest="robinot-geometry-v1",
+        effective_exposed_area_m2=0.000314,
+        area_basis="gram_lab_exposed_melt",
+        oxide_vapor_ceiling_digest="oxide-ceiling-v1",
+        sink_channel_evidence_digests={
+            "deposit_gettering_diagnostic": "deposit-evidence-v1",
+            "plume_oxidation_diagnostic": "plume-evidence-v1",
+        },
+    )
+
+    payload = json.loads(canonical_evalspec_json(first).decode("utf-8"))
+
+    assert payload["lab_alpha_digest"] == "robinot-alpha-v1"
+    assert payload["geometry_digest"] == "robinot-geometry-v1"
+    assert payload["effective_exposed_area_m2"] == "0.000314000"
+    assert payload["area_basis"] == "gram_lab_exposed_melt"
+    assert payload["oxide_vapor_ceiling_digest"] == "oxide-ceiling-v1"
+    assert payload["sink_channel_evidence_digests"] == {
+        "deposit_gettering_diagnostic": "deposit-evidence-v1",
+        "plume_oxidation_diagnostic": "plume-evidence-v1",
+    }
+    assert canonical_evalspec_json(first) == canonical_evalspec_json(second)
+    assert cache_key(first) == cache_key(second)
+    assert cache_key(first) != cache_key(_base_spec())
 
 
 def test_target_spec_fields_split_cache_key_only_when_digest_present() -> None:
@@ -313,6 +375,62 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     assert run_config.c5_enabled is True
     assert run_config.mre_max_voltage_V == pytest.approx(1.4)
     assert run_config.mre_target_species == "SiO2"
+
+
+def test_build_eval_inputs_records_lab_overlay_scope_without_runtime_behavior() -> None:
+    profile = {
+        "profile_id": "lab-overlay-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "lab_overlay_scope": {
+                "lab_alpha_digest": "robinot-alpha-v1",
+                "geometry_digest": "robinot-geometry-v1",
+                "effective_exposed_area_m2": 0.000314,
+                "area_basis": "gram_lab_exposed_melt",
+                "oxide_vapor_ceiling_digest": "oxide-ceiling-v1",
+                "sink_channel_evidence_digests": {
+                    "plume_oxidation_diagnostic": "plume-evidence-v1"
+                },
+            },
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    payload = json.loads(canonical_evalspec_json(spec).decode("utf-8"))
+
+    assert spec.lab_alpha_digest == "robinot-alpha-v1"
+    assert spec.geometry_digest == "robinot-geometry-v1"
+    assert spec.effective_exposed_area_m2 == pytest.approx(0.000314)
+    assert spec.area_basis == "gram_lab_exposed_melt"
+    assert spec.oxide_vapor_ceiling_digest == "oxide-ceiling-v1"
+    assert spec.sink_channel_evidence_digests["plume_oxidation_diagnostic"] == (
+        "plume-evidence-v1"
+    )
+    assert payload["effective_exposed_area_m2"] == "0.000314000"
+    assert not hasattr(run_config, "lab_overlay_scope")
 
 
 def test_build_eval_inputs_rejects_zero_mass_with_named_category() -> None:

@@ -27,9 +27,9 @@ from simulator.optimize.objective import (
     normalize_objective_sense,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.optimize.result_scope import selector_where
+from simulator.optimize.result_scope import result_scope_json, selector_where
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
@@ -61,8 +61,10 @@ class ResultStore:
         *,
         current_code_version: str | None = None,
         current_data_digests: Mapping[str, str] | None = None,
+        current_result_scope: Mapping[str, Any] | None = None,
         code_version: str | None = None,
         data_digests: Mapping[str, str] | None = None,
+        result_scope: Mapping[str, Any] | None = None,
         busy_timeout_ms: int = DEFAULT_BUSY_TIMEOUT_MS,
     ) -> None:
         if code_version is not None:
@@ -77,6 +79,13 @@ class ResultStore:
             ):
                 raise ValueError("current_data_digests conflicts with data_digests")
             current_data_digests = data_digests
+        if result_scope is not None:
+            if (
+                current_result_scope is not None
+                and _canonical_json(current_result_scope) != _canonical_json(result_scope)
+            ):
+                raise ValueError("current_result_scope conflicts with result_scope")
+            current_result_scope = result_scope
         self.path = Path(path)
         self.busy_timeout_ms = int(busy_timeout_ms)
         self._write_lock = threading.Lock()
@@ -86,6 +95,7 @@ class ResultStore:
             if current_data_digests is not None
             else None
         )
+        self._scope_result_scope_json = _canonical_json(current_result_scope or {})
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.initialize()
 
@@ -106,17 +116,24 @@ class ResultStore:
         *,
         code_version: str,
         data_digests: Mapping[str, str],
+        result_scope: Mapping[str, Any] | None = None,
     ) -> None:
         self._scope_code_version = code_version
         self._scope_data_digests_json = _canonical_json(data_digests)
+        self._scope_result_scope_json = _canonical_json(result_scope or {})
 
     def set_current_version(
         self,
         *,
         code_version: str,
         data_digests: Mapping[str, str],
+        result_scope: Mapping[str, Any] | None = None,
     ) -> None:
-        self.set_current_scope(code_version=code_version, data_digests=data_digests)
+        self.set_current_scope(
+            code_version=code_version,
+            data_digests=data_digests,
+            result_scope=result_scope,
+        )
 
     def store(
         self,
@@ -139,11 +156,11 @@ class ResultStore:
                     """
                     INSERT INTO results (
                         cache_key, feedstock_id, recipe_id, profile_id, fidelity,
-                        code_version, data_digests, feasible, failure_category,
+                        code_version, data_digests, result_scope, feasible, failure_category,
                         objectives, feasibility_margins, failing_gates, candidate_id,
                         result_blob, run_reference, eval_spec, notes, created_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(cache_key) DO UPDATE SET
                         feedstock_id = excluded.feedstock_id,
                         recipe_id = excluded.recipe_id,
@@ -151,6 +168,7 @@ class ResultStore:
                         fidelity = excluded.fidelity,
                         code_version = excluded.code_version,
                         data_digests = excluded.data_digests,
+                        result_scope = excluded.result_scope,
                         feasible = excluded.feasible,
                         failure_category = excluded.failure_category,
                         objectives = excluded.objectives,
@@ -171,6 +189,7 @@ class ResultStore:
                         eval_spec.fidelity,
                         eval_spec.code_version,
                         _canonical_json(eval_spec.data_digests),
+                        result_scope_json(eval_spec),
                         int(scored_result.feasible),
                         (
                             scored_result.failure_category.value
@@ -232,6 +251,7 @@ class ResultStore:
         fidelity: str | None = None,
         code_version: str | None = None,
         data_digests: Mapping[str, str] | None = None,
+        result_scope: Mapping[str, Any] | None = None,
     ) -> list[ScoredResult]:
         where, params = self._selector_where(
             feedstock_id,
@@ -239,6 +259,7 @@ class ResultStore:
             fidelity=fidelity,
             code_version=code_version,
             data_digests=data_digests,
+            result_scope=result_scope,
         )
         with self._connect() as conn:
             rows = conn.execute(
@@ -260,6 +281,7 @@ class ResultStore:
         fidelity: str | None = None,
         code_version: str | None = None,
         data_digests: Mapping[str, str] | None = None,
+        result_scope: Mapping[str, Any] | None = None,
     ) -> ScoredResult | None:
         metric = objective_metric or self._default_objective_metric(
             feedstock_id,
@@ -267,6 +289,7 @@ class ResultStore:
             fidelity=fidelity,
             code_version=code_version,
             data_digests=data_digests,
+            result_scope=result_scope,
         )
         if metric is None:
             return None
@@ -276,6 +299,7 @@ class ResultStore:
             fidelity=fidelity,
             code_version=code_version,
             data_digests=data_digests,
+            result_scope=result_scope,
         )
         with self._connect() as conn:
             objective = conn.execute(
@@ -317,6 +341,7 @@ class ResultStore:
         fidelity: str | None,
         code_version: str | None,
         data_digests: Mapping[str, str] | None,
+        result_scope: Mapping[str, Any] | None,
     ) -> str | None:
         where, params = self._selector_where(
             feedstock_id,
@@ -324,6 +349,7 @@ class ResultStore:
             fidelity=fidelity,
             code_version=code_version,
             data_digests=data_digests,
+            result_scope=result_scope,
         )
         with self._connect() as conn:
             row = conn.execute(
@@ -347,6 +373,7 @@ class ResultStore:
         fidelity: str | None,
         code_version: str | None,
         data_digests: Mapping[str, str] | None,
+        result_scope: Mapping[str, Any] | None,
     ) -> tuple[str, tuple[Any, ...]]:
         active_code_version = code_version or self._scope_code_version
         active_data_digests = (
@@ -354,12 +381,18 @@ class ResultStore:
             if data_digests is not None
             else self._scope_data_digests_json
         )
+        active_result_scope = (
+            _canonical_json(result_scope)
+            if result_scope is not None
+            else self._scope_result_scope_json
+        )
         return selector_where(
             feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
             code_version=active_code_version,
             data_digests_json=active_data_digests,
+            result_scope_json=active_result_scope,
         )
 
     def _connect(self) -> sqlite3.Connection:
@@ -403,6 +436,7 @@ class ResultStore:
                 fidelity TEXT NOT NULL,
                 code_version TEXT NOT NULL,
                 data_digests TEXT NOT NULL,
+                result_scope TEXT NOT NULL DEFAULT '{}',
                 feasible INTEGER NOT NULL CHECK (feasible IN (0, 1)),
                 failure_category TEXT,
                 objectives TEXT NOT NULL,
@@ -432,10 +466,6 @@ class ResultStore:
             """
             CREATE INDEX IF NOT EXISTS idx_results_selector
                 ON results(feedstock_id, recipe_id, fidelity)
-            """,
-            """
-            CREATE INDEX IF NOT EXISTS idx_results_current_selector
-                ON results(feedstock_id, profile_id, fidelity, code_version, data_digests)
             """,
             """
             CREATE INDEX IF NOT EXISTS idx_objective_values_metric
@@ -471,8 +501,32 @@ class ResultStore:
                 (str(SCHEMA_VERSION),),
             )
             version = 2
+        if version < 3:
+            if not _column_exists(conn, "results", "result_scope"):
+                conn.execute(
+                    "ALTER TABLE results ADD COLUMN result_scope TEXT NOT NULL DEFAULT '{}'"
+                )
+            conn.execute(
+                """
+                INSERT INTO store_meta(key, value)
+                VALUES ('schema_version', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (str(SCHEMA_VERSION),),
+            )
+            version = 3
         if version != SCHEMA_VERSION:
             raise ResultStoreSchemaError(f"unsupported result store schema {version}")
+        self._refresh_current_selector_index(conn)
+
+    def _refresh_current_selector_index(self, conn: sqlite3.Connection) -> None:
+        conn.execute("DROP INDEX IF EXISTS idx_results_current_selector")
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_results_current_selector
+                ON results(feedstock_id, profile_id, fidelity, code_version, data_digests, result_scope)
+            """
+        )
 
     def _execute_write(self, operation: Any) -> Any:
         last_error: sqlite3.OperationalError | None = None

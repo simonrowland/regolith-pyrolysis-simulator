@@ -17,6 +17,7 @@ from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_versio
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import ResultStore, SCHEMA_VERSION
 
 
@@ -452,6 +453,131 @@ def test_result_store_mre_policy_collision_misses(tmp_path) -> None:
     assert row_count == 4
 
 
+def test_lab_overlay_result_scope_selector_isolates_non_empty_scopes(tmp_path) -> None:
+    industrial = _base_spec(recipe_id="industrial")
+    lab = replace(
+        industrial,
+        recipe_id="lab-robinot",
+        lab_alpha_digest="robinot-alpha-v1",
+        geometry_digest="robinot-geometry-v1",
+        effective_exposed_area_m2=0.000314,
+        area_basis="gram_lab_exposed_melt",
+        oxide_vapor_ceiling_digest="oxide-ceiling-v1",
+        sink_channel_evidence_digests={
+            "deposit_gettering_diagnostic": "deposit-evidence-v1",
+            "plume_oxidation_diagnostic": "plume-evidence-v1",
+        },
+    )
+    sink_mode = replace(
+        industrial,
+        recipe_id="lab-sink-mode",
+        chemistry_kernel={
+            **industrial.chemistry_kernel,
+            "oxygen_sink_channel_mode": "deposit_gettering_diagnostic",
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=industrial.code_version,
+        current_data_digests=industrial.data_digests,
+    )
+
+    store.store(industrial, _scored(industrial, candidate_id="industrial"), created_at="t0")
+    store.store(lab, _scored(lab, candidate_id="lab"), created_at="t1")
+    store.store(sink_mode, _scored(sink_mode, candidate_id="sink-mode"), created_at="t2")
+
+    assert store.lookup(lab) is not None
+    assert store.lookup(sink_mode) is not None
+    assert [row.candidate_id for row in store.query(industrial.feedstock_id)] == [
+        "sink-mode",
+        "lab",
+        "industrial"
+    ]
+    assert [
+        row.candidate_id
+        for row in store.query(lab.feedstock_id, result_scope=result_scope_payload(lab))
+    ] == ["lab"]
+    assert [
+        row.candidate_id
+        for row in store.query(
+            sink_mode.feedstock_id,
+            result_scope=result_scope_payload(sink_mode),
+        )
+    ] == ["sink-mode"]
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        scopes = {
+            row[0]: json.loads(row[1])
+            for row in conn.execute(
+                "SELECT candidate_id, result_scope FROM results ORDER BY candidate_id"
+            )
+        }
+    assert scopes["industrial"] == {}
+    assert scopes["lab"]["effective_exposed_area_m2"] == "0.000314000"
+    assert scopes["lab"]["sink_channel_evidence_digests"] == {
+        "deposit_gettering_diagnostic": "deposit-evidence-v1",
+        "plume_oxidation_diagnostic": "plume-evidence-v1",
+    }
+    assert scopes["sink-mode"] == {
+        "oxygen_sink_channel_mode": "deposit_gettering_diagnostic"
+    }
+
+
+def test_empty_result_scope_selector_matches_base_selector_byte_for_byte() -> None:
+    expected_where = (
+        "feedstock_id = ? AND code_version = ? AND data_digests = ? "
+        "AND profile_id = ? AND fidelity = ?"
+    )
+    expected_params = (
+        "lunar_mare_low_ti",
+        "code-version",
+        "data-digests-json",
+        "oxygen-yield-v1",
+        "fast",
+    )
+    base_kwargs = {
+        "profile_id": "oxygen-yield-v1",
+        "fidelity": "fast",
+        "code_version": "code-version",
+        "data_digests_json": "data-digests-json",
+    }
+
+    assert selector_where("lunar_mare_low_ti", **base_kwargs) == (
+        expected_where,
+        expected_params,
+    )
+    assert selector_where("lunar_mare_low_ti", result_scope={}, **base_kwargs) == (
+        expected_where,
+        expected_params,
+    )
+    assert selector_where(
+        "lunar_mare_low_ti",
+        result_scope_json="{}",
+        **base_kwargs,
+    ) == (
+        expected_where,
+        expected_params,
+    )
+
+    scoped_where, scoped_params = selector_where(
+        "lunar_mare_low_ti",
+        result_scope={"lab_alpha_digest": "robinot-alpha-v1"},
+        **base_kwargs,
+    )
+    assert scoped_where == (
+        "feedstock_id = ? AND code_version = ? AND data_digests = ? "
+        "AND result_scope = ? AND profile_id = ? AND fidelity = ?"
+    )
+    assert scoped_params == (
+        "lunar_mare_low_ti",
+        "code-version",
+        "data-digests-json",
+        '{"lab_alpha_digest":"robinot-alpha-v1"}',
+        "oxygen-yield-v1",
+        "fast",
+    )
+
+
 def test_idempotent_upsert_latest_wins(tmp_path) -> None:
     spec = _base_spec()
     store = ResultStore(tmp_path / "results.sqlite")
@@ -751,3 +877,69 @@ def test_schema_version_stamped_and_migration_smoke(tmp_path) -> None:
 
     migrated = ResultStore(path)
     assert migrated.schema_version == SCHEMA_VERSION
+
+
+def test_v2_store_migrates_result_scope_column_before_selector_index(tmp_path) -> None:
+    path = tmp_path / "old-v2.sqlite"
+    with sqlite3.connect(path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE store_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+            INSERT INTO store_meta(key, value) VALUES ('schema_version', '2');
+            CREATE TABLE results (
+                cache_key TEXT PRIMARY KEY,
+                feedstock_id TEXT NOT NULL,
+                recipe_id TEXT NOT NULL,
+                profile_id TEXT NOT NULL,
+                fidelity TEXT NOT NULL,
+                code_version TEXT NOT NULL,
+                data_digests TEXT NOT NULL,
+                feasible INTEGER NOT NULL CHECK (feasible IN (0, 1)),
+                failure_category TEXT,
+                objectives TEXT NOT NULL,
+                feasibility_margins TEXT NOT NULL,
+                failing_gates TEXT NOT NULL,
+                candidate_id TEXT,
+                result_blob TEXT NOT NULL,
+                run_reference TEXT NOT NULL,
+                eval_spec TEXT NOT NULL,
+                notes TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE objective_values (
+                cache_key TEXT NOT NULL,
+                metric TEXT NOT NULL,
+                sense TEXT NOT NULL CHECK (sense IN ('minimize', 'maximize')),
+                value REAL NOT NULL,
+                units TEXT NOT NULL,
+                ordinal INTEGER NOT NULL,
+                PRIMARY KEY (cache_key, metric),
+                FOREIGN KEY (cache_key) REFERENCES results(cache_key)
+                    ON DELETE CASCADE
+            );
+            CREATE INDEX idx_results_current_selector
+                ON results(feedstock_id, profile_id, fidelity, code_version, data_digests);
+            """
+        )
+
+    migrated = ResultStore(path)
+
+    assert migrated.schema_version == SCHEMA_VERSION
+    with sqlite3.connect(path) as conn:
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(results)")}
+        index_columns = [
+            row[2]
+            for row in conn.execute("PRAGMA index_info(idx_results_current_selector)")
+        ]
+    assert "result_scope" in columns
+    assert index_columns == [
+        "feedstock_id",
+        "profile_id",
+        "fidelity",
+        "code_version",
+        "data_digests",
+        "result_scope",
+    ]

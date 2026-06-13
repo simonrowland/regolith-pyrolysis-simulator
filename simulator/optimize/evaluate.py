@@ -78,6 +78,14 @@ KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 SYNTHETIC_BACKEND_NOT_RUN = "not_run"
+LAB_OVERLAY_SCOPE_FIELDS = (
+    "lab_alpha_digest",
+    "geometry_digest",
+    "effective_exposed_area_m2",
+    "area_basis",
+    "oxide_vapor_ceiling_digest",
+    "sink_channel_evidence_digests",
+)
 _RUN_REFERENCE_CANONICAL_FIELDS = (
     "evidence_class",
     "cache_state",
@@ -1290,6 +1298,7 @@ def _build_eval_inputs(
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
         chemistry_kernel=run_options["chemistry_kernel"],
+        **run_options["lab_overlay_scope"],
         target_spec_id=str(target_metadata["target_spec_id"]),
         target_spec_digest=str(target_metadata["target_spec_digest"]),
         target_maturity=target_metadata["target_maturity"],
@@ -1318,6 +1327,7 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         if isinstance(raw_cache_config, Mapping)
         else None
     )
+    lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
         "campaign": merged.get("campaign", "C0"),
@@ -1335,11 +1345,28 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         ),
         "lab_schedule": merged.get("lab_schedule"),
         "chemistry_kernel": dict(merged.get("chemistry_kernel", {}) or {}),
+        "lab_overlay_scope": lab_overlay_scope,
         "allow_fallback_vapor": bool(merged.get("allow_fallback_vapor", False)),
         "force_builtin_vapor_pressure": bool(
             merged.get("force_builtin_vapor_pressure", False)
         ),
     })
+
+
+def _lab_overlay_scope_options(merged: Mapping[str, Any]) -> dict[str, Any]:
+    scope: dict[str, Any] = {}
+    for source_key in ("lab_overlay_scope", "lab_overlay"):
+        raw = merged.get(source_key)
+        if isinstance(raw, MappingABC):
+            scope.update(raw)
+    for field_name in LAB_OVERLAY_SCOPE_FIELDS:
+        if field_name in merged:
+            scope[field_name] = merged[field_name]
+    return {
+        field_name: scope[field_name]
+        for field_name in LAB_OVERLAY_SCOPE_FIELDS
+        if field_name in scope
+    }
 
 
 def _diagnostic_chemistry_kernel_run_config(
