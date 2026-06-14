@@ -13,6 +13,7 @@ from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
     FOULANT_GROUPS,
     Stage0HarnessError,
+    _capture_cleaned_melt_kg,
     default_max_stage0_hours,
     run_stage0_harness,
     run_stage0_harness_from_config,
@@ -148,9 +149,51 @@ def test_mars_sulfate_diagnostic_splits_land_in_timeline():
 def test_cleaned_melt_matches_ledger_projection():
     session = SimSession().start(_session_config("lunar_mare_low_ti"))
     result = run_stage0_harness(session)
-    sim = session.simulator
-    sim._project_cleaned_melt_from_atom_ledger()
-    ledger = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    ledger = session.simulator.atom_ledger.kg_by_account("process.cleaned_melt")
 
     for species, kg in result.cleaned_melt_kg.items():
         assert ledger[species] == pytest.approx(kg, rel=0.0, abs=1e-12)
+
+
+def test_capture_cleaned_melt_does_not_mutate_melt_state():
+    session = SimSession().start(_session_config("lunar_mare_low_ti"))
+    session.advance()
+    sim = session.simulator
+    prior_comp = dict(sim.melt.composition_kg)
+    prior_oxide = dict(sim.inventory.melt_oxide_kg)
+    prior_total = sim.melt.total_mass_kg
+
+    _capture_cleaned_melt_kg(sim)
+
+    assert sim.melt.composition_kg == prior_comp
+    assert sim.inventory.melt_oxide_kg == prior_oxide
+    assert sim.melt.total_mass_kg == prior_total
+
+
+def test_disposition_timeline_assigns_by_campaign_phase():
+    result = run_stage0_harness_from_config(
+        _session_config("ci_carbonaceous_chondrite"),
+    )
+
+    hours_with_diag = [
+        entry.hour
+        for entry in result.disposition_timeline
+        if any(events for events in entry.by_group.values())
+    ]
+    assert len(hours_with_diag) >= 2
+    assert len(set(hours_with_diag)) >= 2
+
+
+def test_harness_shadow_parity_with_full_run_truncated():
+    config = _session_config("lunar_mare_low_ti")
+    harness_result = run_stage0_harness_from_config(config)
+
+    session = SimSession().start(config)
+    for _ in range(harness_result.total_hours):
+        session.advance()
+
+    sim = session.simulator
+    assert sim.melt.hour == harness_result.total_hours
+    assert _capture_cleaned_melt_kg(sim) == harness_result.cleaned_melt_kg
+    assert sim.melt.campaign.name == "C0B"
+    assert harness_result.stop_reason == "c0b_path_ab_pause"

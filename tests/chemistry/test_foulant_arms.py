@@ -247,6 +247,33 @@ def test_refractory_fluoride_inert_to_rump(
     assert result.diagnostic["escaped_frac"] == 0.0
 
 
+def _load_batch_sim(
+    feedstock_key: str,
+    *,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    diagnostics_enabled: bool = True,
+) -> PyrolysisSimulator:
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints_data,
+        feedstocks_data,
+        vapor_pressure_data,
+    )
+    sim._foulant_diagnostics_enabled = diagnostics_enabled
+    additives = None
+    if feedstock_key == "mars_sulfate_rich":
+        fs = feedstocks_data[feedstock_key]
+        additives = {
+            "C": PyrolysisSimulator._carbon_reductant_required_kg(fs, 1000.0),
+        }
+    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives)
+    return sim
+
+
 @pytest.mark.parametrize(
     "feedstock_key",
     ["lunar_mare_low_ti", "mars_sulfate_rich", "ci_carbonaceous_chondrite"],
@@ -257,24 +284,97 @@ def test_foulant_diagnostics_golden_neutral_mass_balance(
     feedstocks_data,
     setpoints_data,
 ):
-    backend = StubBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(
-        backend,
-        setpoints_data,
-        feedstocks_data,
-        vapor_pressure_data,
+    sim = _load_batch_sim(
+        feedstock_key,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
     )
-    additives = None
-    if feedstock_key == "mars_sulfate_rich":
-        fs = feedstocks_data[feedstock_key]
-        additives = {
-            "C": PyrolysisSimulator._carbon_reductant_required_kg(fs, 1000.0),
-        }
-    sim.load_batch(feedstock_key, mass_kg=1000.0, additives_kg=additives)
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
     assert isinstance(sim._stage0_foulant_diagnostics, list)
+
+
+@pytest.mark.parametrize(
+    "feedstock_key,expected_families",
+    [
+        (
+            "ci_carbonaceous_chondrite",
+            {
+                REACTION_FAMILY_PARTITION_CARBON,
+                REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                REACTION_FAMILY_SILICATE_DISPLACEMENT,
+            },
+        ),
+        (
+            "cm_carbonaceous_chondrite",
+            {
+                REACTION_FAMILY_PARTITION_CARBON,
+                REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                REACTION_FAMILY_SILICATE_DISPLACEMENT,
+            },
+        ),
+        (
+            "ceres_regolith",
+            {
+                REACTION_FAMILY_PARTITION_CARBON,
+                REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                REACTION_FAMILY_SILICATE_DISPLACEMENT,
+            },
+        ),
+        (
+            "mars_sulfate_rich",
+            {
+                REACTION_FAMILY_SULFATE_DECOMP,
+                REACTION_FAMILY_VOLATILIZATION,
+            },
+        ),
+    ],
+)
+def test_messy_feedstocks_emit_nonzero_runtime_diagnostics(
+    feedstock_key,
+    expected_families,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _load_batch_sim(
+        feedstock_key,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+    families = {row["reaction_family"] for row in sim._stage0_foulant_diagnostics}
+    assert families == expected_families
+    assert len(sim._stage0_foulant_diagnostics) > 0
+
+
+@pytest.mark.parametrize(
+    "feedstock_key",
+    ["lunar_mare_low_ti", "mars_sulfate_rich", "ci_carbonaceous_chondrite"],
+)
+def test_foulant_diagnostics_byte_identical_golden_neutral(
+    feedstock_key,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim_on = _load_batch_sim(
+        feedstock_key,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+        diagnostics_enabled=True,
+    )
+    sim_off = _load_batch_sim(
+        feedstock_key,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+        diagnostics_enabled=False,
+    )
+    assert sim_on.atom_ledger.mol_by_account() == sim_off.atom_ledger.mol_by_account()
+    assert sim_on.inventory.melt_oxide_kg == sim_off.inventory.melt_oxide_kg
 
 
 def test_mars_sulfate_emits_sulfate_decomp_diagnostic(

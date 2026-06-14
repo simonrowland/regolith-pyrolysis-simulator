@@ -309,7 +309,6 @@ def _stage0_exit_reason(sim: PyrolysisSimulator) -> str | None:
 
 
 def _capture_cleaned_melt_kg(sim: PyrolysisSimulator) -> dict[str, float]:
-    sim._project_cleaned_melt_from_atom_ledger()
     ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     return {
         species: float(kg)
@@ -318,21 +317,62 @@ def _capture_cleaned_melt_kg(sim: PyrolysisSimulator) -> dict[str, float]:
     }
 
 
+def _diagnostic_stage0_phase(diagnostic: Mapping[str, Any]) -> str | None:
+    explicit = diagnostic.get("stage0_phase")
+    if isinstance(explicit, str) and explicit:
+        return explicit
+    phase_id = diagnostic.get("phase")
+    if phase_id is not None:
+        return (
+            "phase_1_oxidizing"
+            if int(phase_id) == 1
+            else "phase_2_vacuum"
+        )
+    family = str(diagnostic.get("reaction_family", ""))
+    if family == REACTION_FAMILY_PARTITION_CARBON:
+        return "phase_1_oxidizing"
+    if family == REACTION_FAMILY_SILICATE_DISPLACEMENT:
+        return "phase_2_vacuum"
+    if family == REACTION_FAMILY_CARBONATE_DECOMPOSITION:
+        return "phase_1_oxidizing"
+    return None
+
+
+def _pending_diagnostic_events_by_phase(
+    diagnostics: list[Mapping[str, Any]],
+    registry: FoulantRegistry,
+) -> dict[str, list[dict[str, Any]]]:
+    pending = {
+        "phase_1_oxidizing": [],
+        "phase_2_vacuum": [],
+        "unphased": [],
+    }
+    for diagnostic in diagnostics:
+        target_phase = _diagnostic_stage0_phase(diagnostic)
+        for event in _diagnostic_events(diagnostic, registry):
+            phase = event.get("phase") or target_phase
+            if phase in pending:
+                pending[phase].append(event)
+            else:
+                pending["unphased"].append(event)
+    return pending
+
+
 def _timeline_entry_from_step(
     *,
     hour: int,
     sim: PyrolysisSimulator,
     step: StepResult,
     registry: FoulantRegistry,
-    projected_by_group: dict[str, list[dict[str, Any]]] | None,
+    step_diagnostic_events: list[dict[str, Any]] | None,
 ) -> HourlyDispositionEntry:
     campaign = sim.melt.campaign
     stage0_phase = STAGE0_PHASE_BY_CAMPAIGN.get(campaign)
     by_group = _empty_by_group()
 
-    if projected_by_group is not None:
-        for group, events in projected_by_group.items():
-            by_group[group].extend(events)
+    if step_diagnostic_events:
+        for event in step_diagnostic_events:
+            by_group[event["group"]].append(event)
 
     evap = getattr(step.snapshot, "evap_flux", None)
     species_kg_hr = getattr(evap, "species_kg_hr", {}) or {}
@@ -375,10 +415,16 @@ def run_stage0_harness(
     if foulant_registry is None:
         foulant_registry = load_foulant_registry(_DEFAULT_FOULANT_THERMO)
 
-    projected_by_group = _group_diagnostic_events(
+    pending_by_phase = _pending_diagnostic_events_by_phase(
         list(getattr(sim, "_stage0_foulant_diagnostics", []) or []),
         foulant_registry,
     )
+    assigned_phase = {
+        "phase_1_oxidizing": False,
+        "phase_2_vacuum": False,
+        "unphased": False,
+    }
+    diagnostic_cursor = len(getattr(sim, "_stage0_foulant_diagnostics", []) or [])
     timeline: list[HourlyDispositionEntry] = []
     hours_run = 0
     stop_reason = ""
@@ -393,16 +439,37 @@ def run_stage0_harness(
 
         step = session.advance()
         hours_run += 1
+
+        diagnostics = list(getattr(sim, "_stage0_foulant_diagnostics", []) or [])
+        if len(diagnostics) > diagnostic_cursor:
+            fresh_pending = _pending_diagnostic_events_by_phase(
+                diagnostics[diagnostic_cursor:],
+                foulant_registry,
+            )
+            for phase_key, events in fresh_pending.items():
+                pending_by_phase[phase_key].extend(events)
+            diagnostic_cursor = len(diagnostics)
+
+        campaign_phase = STAGE0_PHASE_BY_CAMPAIGN.get(sim.melt.campaign)
+        step_events: list[dict[str, Any]] = []
+        if campaign_phase and not assigned_phase[campaign_phase]:
+            step_events.extend(pending_by_phase[campaign_phase])
+            pending_by_phase[campaign_phase] = []
+            assigned_phase[campaign_phase] = True
+        if not assigned_phase["unphased"] and pending_by_phase["unphased"]:
+            step_events.extend(pending_by_phase["unphased"])
+            pending_by_phase["unphased"] = []
+            assigned_phase["unphased"] = True
+
         timeline.append(
             _timeline_entry_from_step(
                 hour=int(sim.melt.hour),
                 sim=sim,
                 step=step,
                 registry=foulant_registry,
-                projected_by_group=projected_by_group if hours_run == 1 else None,
+                step_diagnostic_events=step_events or None,
             )
         )
-        projected_by_group = None
 
         stop_reason = _stage0_exit_reason(sim) or ""
         if stop_reason:

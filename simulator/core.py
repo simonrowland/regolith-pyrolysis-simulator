@@ -180,15 +180,17 @@ STAGE0_CARBONATE_COMPONENTS = frozenset({
     'carbonate', 'carbonates', 'carbonate_salts',
 })
 STAGE0_CATION_SULFATE_COMPONENTS = frozenset({
-    'caso4', 'mgso4',
+    'caso4', 'mgso4', 'feso4',
 })
 STAGE0_CATION_SULFATE_OXIDE_PRODUCTS = {
     'CaSO4': 'CaO',
     'MgSO4': 'MgO',
+    'FeSO4': 'Fe2O3',
 }
 STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS = {
     'CaSO4': 'CaS',
     'MgSO4': 'MgS',
+    'FeSO4': 'FeS',
 }
 STAGE0_CARBONATE_METAL_OXIDE_STOICH = (
     ('Mg', 'MgO', 1.0),
@@ -384,6 +386,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stage0_carbonate_decomposition_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
         self._stage0_foulant_diagnostics: list[dict] = []
+        self._foulant_diagnostics_enabled: bool = True
         # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
         # the optional [sulfur] extra is absent, the gate stays
         # un-initialised and ``is_available()`` returns False, which
@@ -3398,6 +3401,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         formula_species.update(self._bucket_species(buckets))
         formula_species.update(self._bucket_species(declared_stage0_buckets))
         self._validate_required_feedstock_formulas(feedstock, formula_species)
+        foulant_carrier_snapshot = self._snapshot_stage0_foulant_carriers(
+            buckets)
         stage0_external_inputs = self._apply_stage0_offgas_chemistry(
             feedstock, buckets)
         carbonate_specs: list[dict] = []
@@ -3423,7 +3428,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         stage0_products = self._stage0_products_from_buckets(buckets)
         self._emit_stage0_foulant_diagnostics(
             feedstock,
-            buckets,
+            foulant_carrier_snapshot,
             melt,
             feedstock_key=feedstock_key,
         )
@@ -4252,9 +4257,84 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             },
         )
 
+    @staticmethod
+    def _snapshot_stage0_foulant_carriers(
+        buckets: Mapping[str, Mapping[str, float]],
+    ) -> dict[str, dict[str, float]]:
+        return {
+            bucket: dict(species)
+            for bucket, species in buckets.items()
+            if species
+        }
+
+    def _expand_carbonate_salts_foulant_feed(
+        self, component: str, feed_kg: float,
+    ) -> list[tuple[str, float]]:
+        key = self._normalized_component_key(component)
+        if key != "carbonate_salts":
+            return [(component, feed_kg)]
+        component_specs = (
+            ("MgCO3", 1.0),
+            ("CaCO3", 1.0),
+            ("Na2CO3", 1.0),
+        )
+        component_molar = [
+            (
+                comp_id,
+                moles,
+                resolve_species_formula(
+                    comp_id, self.species_formula_registry,
+                ).molar_mass_kg_per_mol(),
+            )
+            for comp_id, moles in component_specs
+        ]
+        total_group_mass = sum(
+            moles * molar_mass for _, moles, molar_mass in component_molar)
+        expanded: list[tuple[str, float]] = []
+        for comp_id, moles, molar_mass in component_molar:
+            comp_kg = feed_kg * (moles * molar_mass / total_group_mass)
+            if comp_kg > 1e-12:
+                expanded.append((comp_id, comp_kg))
+        return expanded
+
+    @classmethod
+    def _expand_chloride_foulant_feed(
+        cls,
+        component: str,
+        feed_kg: float,
+        feedstock: Mapping[str, Any],
+    ) -> list[tuple[str, float]]:
+        key = cls._normalized_component_key(component)
+        if key in {"nacl", "kcl"}:
+            return [(component, feed_kg)]
+        if key not in {"cl", "halide", "halides", "nacl_kcl_salts"}:
+            return [(component, feed_kg)]
+        comp = feedstock.get("composition_wt_pct") or {}
+        na = float(comp.get("Na2O", 0.0) or 0.0)
+        k = float(comp.get("K2O", 0.0) or 0.0)
+        if na + k < 1e-12:
+            na_frac, k_frac = 0.5, 0.5
+        else:
+            total = na + k
+            na_frac = na / total
+            k_frac = k / total
+        expanded: list[tuple[str, float]] = []
+        if feed_kg * na_frac > 1e-12:
+            expanded.append(("NaCl", feed_kg * na_frac))
+        if feed_kg * k_frac > 1e-12:
+            expanded.append(("KCl", feed_kg * k_frac))
+        return expanded or [(component, feed_kg)]
+
     def _resolve_foulant_carrier_key(self, component: str) -> str | None:
         registry = self._load_foulant_registry_cached()
         key = self._normalized_component_key(component)
+        if key in {"carbonate_salts", "carbonates"}:
+            return None
+        if key == "carbonate":
+            return registry.alias_to_carrier.get(
+                "carbonate",
+                registry.alias_to_carrier.get("caco3"),
+            )
         return registry.alias_to_carrier.get(
             component,
             registry.alias_to_carrier.get(key),
@@ -4288,7 +4368,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _emit_stage0_foulant_diagnostics(
         self,
         feedstock: Mapping[str, Any],
-        buckets: Mapping[str, Mapping[str, float]],
+        carrier_snapshot: Mapping[str, Mapping[str, float]],
         melt: Mapping[str, float],
         *,
         feedstock_key: str | None,
@@ -4303,6 +4383,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         self._stage0_foulant_diagnostics = []
+        if not self._foulant_diagnostics_enabled:
+            return
+
         foulant_registry = self._load_foulant_registry_cached()
         thermo_path = str(self._foulant_thermo_path())
         phase_specs = self._foulant_volatilization_phase_specs()
@@ -4312,23 +4395,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
 
         for component, feed_kg in (
-            buckets.get("chloride_salt_phase") or {}
+            carrier_snapshot.get("chloride_salt_phase") or {}
         ).items():
-            carrier_key = self._resolve_foulant_carrier_key(component)
-            if carrier_key is None:
-                continue
-            entry = foulant_registry.carriers.get(carrier_key)
-            if entry is None or entry.reaction_family != "volatilization":
-                continue
-            diag = self._dispatch_stage0_foulant_diagnostic({
-                **common,
-                "reaction_family": REACTION_FAMILY_VOLATILIZATION,
-                "carrier": entry.carrier_key,
-                "feed_kg": feed_kg,
-                "phase_specs": phase_specs,
-            })
-            if diag is not None:
-                self._stage0_foulant_diagnostics.append(diag)
+            for carrier_name, split_kg in self._expand_chloride_foulant_feed(
+                component, feed_kg, feedstock,
+            ):
+                carrier_key = self._resolve_foulant_carrier_key(carrier_name)
+                if carrier_key is None:
+                    continue
+                entry = foulant_registry.carriers.get(carrier_key)
+                if entry is None or entry.reaction_family != "volatilization":
+                    continue
+                diag = self._dispatch_stage0_foulant_diagnostic({
+                    **common,
+                    "reaction_family": REACTION_FAMILY_VOLATILIZATION,
+                    "carrier": entry.carrier_key,
+                    "feed_kg": split_kg,
+                    "source_component": component,
+                    "phase_specs": phase_specs,
+                })
+                if diag is not None:
+                    self._stage0_foulant_diagnostics.append(diag)
 
         salt_phase_sulfate_proxy = {
             "so3": "CaSO4",
@@ -4337,12 +4424,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         sulfate_sources: list[tuple[str, float, str]] = []
         for component, feed_kg in (
-            buckets.get("cation_sulfate_feed") or {}
+            carrier_snapshot.get("cation_sulfate_feed") or {}
         ).items():
             carrier_key = self._resolve_foulant_carrier_key(component)
             if carrier_key is not None:
                 sulfate_sources.append((component, feed_kg, carrier_key))
-        for component, feed_kg in (buckets.get("salt_phase") or {}).items():
+        for component, feed_kg in (carrier_snapshot.get("salt_phase") or {}).items():
             key = self._normalized_component_key(component)
             proxy = salt_phase_sulfate_proxy.get(key)
             if proxy is not None:
@@ -4363,41 +4450,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 })
                 if diag is not None:
                     diag["phase"] = phase["phase"]
+                    diag["stage0_phase"] = (
+                        "phase_1_oxidizing"
+                        if int(phase["phase"]) == 1
+                        else "phase_2_vacuum"
+                    )
                     self._stage0_foulant_diagnostics.append(diag)
 
-        for component, feed_kg in (buckets.get("carbonate_feed") or {}).items():
+        for component, feed_kg in (carrier_snapshot.get("carbonate_feed") or {}).items():
             if feed_kg <= 1e-12:
                 continue
-            carrier_key = self._resolve_foulant_carrier_key(component)
-            if carrier_key is None:
-                continue
-            entry = foulant_registry.carriers.get(carrier_key)
-            if entry is None:
-                continue
-            if entry.reaction_family == "silicate_displacement":
-                diag = self._dispatch_stage0_foulant_diagnostic({
-                    **common,
-                    "reaction_family": REACTION_FAMILY_SILICATE_DISPLACEMENT,
-                    "carrier": entry.carrier_key,
-                    "feed_kg": feed_kg,
-                    "T_C": STAGE0_FOULANT_PHASE2_TEMP_C,
-                    "melt_sio2_kg": float(melt.get("SiO2", 0.0)),
-                })
-            elif entry.reaction_family == "carbonate_decomposition":
-                diag = self._dispatch_stage0_foulant_diagnostic({
-                    **common,
-                    "reaction_family": REACTION_FAMILY_CARBONATE_DECOMPOSITION,
-                    "diagnostic_only": True,
-                    "species": entry.carrier_key,
-                    "feed_kg": feed_kg,
-                    "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
-                })
-            else:
-                continue
-            if diag is not None:
-                self._stage0_foulant_diagnostics.append(diag)
+            for carrier_name, split_kg in self._expand_carbonate_salts_foulant_feed(
+                component, feed_kg,
+            ):
+                carrier_key = self._resolve_foulant_carrier_key(carrier_name)
+                if carrier_key is None:
+                    carrier_key = carrier_name
+                entry = foulant_registry.carriers.get(carrier_key)
+                if entry is None:
+                    continue
+                if entry.reaction_family == "silicate_displacement":
+                    diag = self._dispatch_stage0_foulant_diagnostic({
+                        **common,
+                        "reaction_family": REACTION_FAMILY_SILICATE_DISPLACEMENT,
+                        "carrier": entry.carrier_key,
+                        "feed_kg": split_kg,
+                        "source_component": component,
+                        "T_C": STAGE0_FOULANT_PHASE2_TEMP_C,
+                        "melt_sio2_kg": float(melt.get("SiO2", 0.0)),
+                    })
+                    if diag is not None:
+                        diag["stage0_phase"] = "phase_2_vacuum"
+                        self._stage0_foulant_diagnostics.append(diag)
+                elif entry.reaction_family == "carbonate_decomposition":
+                    diag = self._dispatch_stage0_foulant_diagnostic({
+                        **common,
+                        "reaction_family": REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                        "diagnostic_only": True,
+                        "species": entry.carrier_key,
+                        "feed_kg": split_kg,
+                        "source_component": component,
+                        "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
+                    })
+                    if diag is not None:
+                        diag["stage0_phase"] = "phase_1_oxidizing"
+                        self._stage0_foulant_diagnostics.append(diag)
 
-        for component, feed_kg in (buckets.get("terminal_slag") or {}).items():
+        for component, feed_kg in (carrier_snapshot.get("terminal_slag") or {}).items():
             if not self._is_stage0_refractory_fluoride_component(component):
                 continue
             carrier_key = self._resolve_foulant_carrier_key(component) or component
@@ -4417,7 +4516,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 .get("phase_partitions", {})
                 .get(feedstock_key)
             )
-        for component, feed_kg in (buckets.get("gas_volatiles") or {}).items():
+        for component, feed_kg in (carrier_snapshot.get("gas_volatiles") or {}).items():
             key = self._normalized_component_key(component)
             if key not in {
                 "c",
@@ -4438,6 +4537,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "phase_specs": phase_specs,
             })
             if diag is not None:
+                diag["stage0_phase"] = "phase_1_oxidizing"
                 self._stage0_foulant_diagnostics.append(diag)
 
     @classmethod

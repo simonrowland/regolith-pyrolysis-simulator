@@ -96,7 +96,7 @@ foulant_dG:
 NaCl:
   carrier:
     species: NaCl
-    aliases: [nacl, halide, nacl_kcl_salts]
+    aliases: [nacl, halide, halides, nacl_kcl_salts]
     molar_mass_g_mol: 58.44
   group: other_mineral_contaminant
   reaction_family: volatilization
@@ -221,7 +221,7 @@ FeSO4:
 CaCO3:
   carrier:
     species: CaCO3
-    aliases: [caco3, carbonate]
+    aliases: [caco3, carbonate, carbonates]
     molar_mass_g_mol: 100.09
   group: other_mineral_contaminant
   reaction_family: carbonate_decomposition
@@ -274,7 +274,7 @@ Na2CO3:
     requires_reagent: null
   fate:
     on_decompose_offgas: {account: terminal.offgas, species: [CO2]}
-    on_decompose_melt: {account: process.cleaned_melt, species: [Na2O]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [Na2SiO3]}
   warning_flags:
     confidence: well_grounded
     regime_caveat: "thermal-alone ΔG=0 ~2100 K (~1826 °C); clears in-melt via SiO2 contact (Kim et al. 2004)"
