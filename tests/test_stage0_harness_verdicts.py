@@ -508,22 +508,46 @@ def test_verdict_b_reads_backend_status_no_new_equilibrium():
         T_in_C=1400.0,
     )
     assert verdicts["verdict_b"]["backend_status"] == "out_of_domain"
+    assert verdicts["verdict_b"]["hard_gate_failed"] is True
     assert verdicts["verdict_b"]["contaminant_present_never_crash"] is True
 
 
-def test_verdict_b_hard_gate_on_stripped_out_of_domain_not_contaminant():
+def test_verdict_b_does_not_hard_fail_stripping_induced_low_oxide_sum():
+    cleaned = {
+        **_basalt_oxide_kg(100.0),
+        "NaCl": 450.0,
+        "C": 450.0,
+    }
+    stripped = strip_non_oxide_residuals(cleaned)
+    assert stripped.stripped_mass_kg > 0.0
+    assert sum(stripped.oxide_wt_pct.values()) < 95.0
+
+    verdict = evaluate_verdict_b(cleaned, "ok", "alphamelts")
+    assert verdict.layer_a_state == "stripped_then_in_domain"
+    assert verdict.offending_species == ("C", "NaCl")
+    assert verdict.stripped_domain_valid is True
+    assert verdict.hard_gate_failed is False
+    assert verdict.backend_status == "ok"
+    assert sum(verdict.stripped_oxide_wt_pct.values()) < 95.0
+    assert verdict.stripped_mass_provenance
+    assert sum(p.kg for p in verdict.stripped_mass_provenance) == pytest.approx(900.0)
+
+
+@pytest.mark.parametrize(
+    "backend_status",
+    ("unavailable", "out_of_domain", "not_converged"),
+)
+def test_verdict_b_hard_gate_comes_from_backend_status(backend_status):
     cleaned = {
         **_basalt_oxide_kg(999.0),
         "NaCl": 1.0,
     }
-    stripped = strip_non_oxide_residuals(cleaned)
-    assert stripped.stripped_mass_kg > 0.0
-    verdict = evaluate_verdict_b(cleaned, "out_of_domain", "alphamelts")
-    assert verdict.layer_a_state == "stripped_then_in_domain"
-    assert verdict.offending_species == ("NaCl",)
+    verdict = evaluate_verdict_b(cleaned, backend_status, "alphamelts")
+    assert verdict.layer_a_state == "out_of_domain"
+    assert verdict.offending_species == tuple(sorted(verdict.stripped_oxide_wt_pct))
     assert verdict.stripped_domain_valid is True
-    assert verdict.hard_gate_failed is False
-    assert verdict.backend_status == "out_of_domain"
+    assert verdict.hard_gate_failed is True
+    assert verdict.backend_status == backend_status
 
 
 def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate():
@@ -531,11 +555,12 @@ def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate():
         "SiO2": 100.0,
         "FeO": 900.0,
     }
-    verdict = evaluate_verdict_b(cleaned, "ok", "alphamelts")
+    verdict = evaluate_verdict_b(cleaned, "out_of_domain", "alphamelts")
     assert verdict.layer_a_state == "out_of_domain"
     assert verdict.offending_species
     assert verdict.stripped_domain_valid is False
     assert verdict.hard_gate_failed is True
+    assert verdict.stripped_oxide_wt_pct == {"SiO2": 10.0, "FeO": 90.0}
     assert verdict.domain_warnings
 
 

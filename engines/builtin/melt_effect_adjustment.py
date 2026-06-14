@@ -63,6 +63,9 @@ EFFECT_TABLE_VERSION = "2026-06-14-refine2-newcompute-v3"
 PHASE_PRESENCE_FLOOR_FRACTION = 0.001
 MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES = ("CoO", "MnO", "NiO", "P2O5")
 _MAGEMIN_BULK_SUM_DATABASES = frozenset({"ig", "igad"})
+_VERDICT_B_HARD_FAIL_BACKEND_STATUSES = frozenset(
+    {"unavailable", "out_of_domain", "not_converged"}
+)
 
 # Per-contaminant effect rows sourced from CONTAMINANT-WARNING-DOC + evidence-E5.
 # Intervals are literature-imported, NOT simulator-measured.
@@ -322,6 +325,30 @@ def strip_non_oxide_residuals(
         provenance=tuple(provenance),
         stripped_mass_kg=stripped_mass,
     )
+
+
+def _oxide_ratios_for_domain_check(
+    oxide_wt_pct: Mapping[str, float],
+) -> dict[str, float]:
+    """Return a 100 wt% oxide-ratio copy for domain checks only."""
+    oxide_total = 0.0
+    parsed: dict[str, float] = {}
+    for species, raw_wt in oxide_wt_pct.items():
+        try:
+            wt = float(raw_wt)
+        except (TypeError, ValueError):
+            return dict(oxide_wt_pct)
+        if wt != wt or wt in (float("inf"), float("-inf")):
+            return dict(oxide_wt_pct)
+        parsed[str(species)] = wt
+        if wt > 0.0:
+            oxide_total += wt
+    if oxide_total <= 0.0:
+        return dict(oxide_wt_pct)
+    return {
+        species: (wt / oxide_total * 100.0) if wt > 0.0 else wt
+        for species, wt in parsed.items()
+    }
 
 
 def residual_wt_pct_by_species(
@@ -1094,10 +1121,15 @@ def evaluate_verdict_b(
     """Hard gate on stripped silicate OOD only; contaminant-present never crashes."""
     stripped = strip_non_oxide_residuals(cleaned_melt_kg)
     gate = _domain_gate_for_engine(engine)
-    stripped_valid, domain_warnings = gate.validate(stripped.oxide_wt_pct)
+    # Domain validity is a silicate oxide-ratio question. This normalization is
+    # only for the gate input; the returned stripped wt% and provenance keep the
+    # honest post-strip sub-100 mass record.
+    domain_oxide_wt_pct = _oxide_ratios_for_domain_check(stripped.oxide_wt_pct)
+    stripped_valid, domain_warnings = gate.validate(domain_oxide_wt_pct)
 
-    hard_gate_failed = not stripped_valid
-    if not stripped_valid:
+    status = str(backend_status)
+    hard_gate_failed = status in _VERDICT_B_HARD_FAIL_BACKEND_STATUSES
+    if hard_gate_failed or not stripped_valid:
         layer_a_state = "out_of_domain"
         offending_species = tuple(sorted(stripped.oxide_wt_pct))
     elif stripped.stripped_mass_kg > 0.0:
@@ -1106,9 +1138,6 @@ def evaluate_verdict_b(
     else:
         layer_a_state = "in_domain"
         offending_species = ()
-    status = str(backend_status)
-    if status in {"unavailable", "out_of_domain", "not_converged"} and stripped_valid:
-        pass
 
     return VerdictBResult(
         backend_status=status,
