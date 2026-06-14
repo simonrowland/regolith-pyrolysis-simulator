@@ -22,6 +22,7 @@ from simulator.optimize.physics import (
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.three_product_report import classify_products
+from simulator.diagnostics import wall_deposit_remobilization_by_segment_species
 from simulator.trace import wall_deposit_kg_by_zone_species
 
 
@@ -1631,6 +1632,7 @@ def _tap_coating_product_summary(
             {
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
+                "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
             }
         )
@@ -1644,6 +1646,13 @@ def _tap_coating_product_summary(
         by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
+    sim = getattr(run_execution, "simulator", run_execution)
+    remobilization = wall_deposit_remobilization_by_segment_species(
+        sim,
+        snapshots=snapshots,
+        cumulative_deposits_kg=raw_by_segment,
+        through_hour=hour,
+    )
     return MappingProxyType(
         {
             "wall_deposit_kg_by_segment_species": by_segment,
@@ -1653,6 +1662,13 @@ def _tap_coating_product_summary(
                     for zone, species_kg in by_zone.items()
                 }
             ),
+            "wall_deposit_remobilization_by_segment_species": MappingProxyType({
+                segment: MappingProxyType({
+                    species: MappingProxyType(dict(fields))
+                    for species, fields in species_map.items()
+                })
+                for segment, species_map in remobilization.items()
+            }),
             "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
         }
     )
@@ -3085,11 +3101,23 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         by_zone = wall_deposit_kg_by_zone_species(raw_by_segment, zone_by_segment)
     except (TypeError, ValueError) as exc:
         raise ObjectiveComputationError(str(exc)) from exc
+    sim = getattr(run_execution, "simulator", run_execution)
+    remobilization = wall_deposit_remobilization_by_segment_species(
+        sim,
+        cumulative_deposits_kg=raw_by_segment,
+    )
     return MappingProxyType({
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
             zone: MappingProxyType(dict(species_kg))
             for zone, species_kg in by_zone.items()
+        }),
+        "wall_deposit_remobilization_by_segment_species": MappingProxyType({
+            segment: MappingProxyType({
+                species: MappingProxyType(dict(fields))
+                for species, fields in species_map.items()
+            })
+            for segment, species_map in remobilization.items()
         }),
         "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
     })
