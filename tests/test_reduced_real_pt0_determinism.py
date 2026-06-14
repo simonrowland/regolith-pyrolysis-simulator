@@ -415,6 +415,10 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
         in key["source_module_digest"]["paths"]
     )
     assert "engines/builtin/vapor_pressure.py" in key["source_module_digest"]["paths"]
+    assert (
+        "engines/builtin/stage0_pretreatment.py"
+        in key["source_module_digest"]["paths"]
+    )
     assert set(key["data_digests"]) == {
         "setpoints",
         "feedstocks",
@@ -896,6 +900,7 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
         "simulator/evaporation.py",
         "engines/builtin/evaporation_flux.py",
         "engines/builtin/vapor_pressure.py",
+        "engines/builtin/stage0_pretreatment.py",
     ],
 )
 def test_pt2_source_module_digest_changes_with_payload_source(

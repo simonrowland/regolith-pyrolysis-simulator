@@ -87,6 +87,7 @@ _SOURCE_MODULE_PATTERNS = (
     "engines/builtin/backend_equilibrium.py",
     "engines/builtin/evaporation_flux.py",
     "engines/builtin/vapor_pressure.py",
+    "engines/builtin/stage0_pretreatment.py",
     "engines/vaporock/*.py",
 )
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
