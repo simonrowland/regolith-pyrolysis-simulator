@@ -19,16 +19,41 @@ from simulator.state import OXIDE_SPECIES
 
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
 
-# Ratified property-impact thresholds (CONTAMINANT-WARNING-DOC §★, PROPOSED).
-LIQUIDUS_WARNING_FRAC_OF_T = 0.02
-LIQUIDUS_NOTICE_FRAC_OF_T = 0.005
-PHASE_WARNING_ABS_FRAC = 0.02
-PHASE_NOTICE_ABS_FRAC = 0.005
-# Redox Δlog₁₀ fO₂ equivalents — PROPOSED, sweep-grounded (S-E5-4).
-REDOX_WARNING_DELTA_LOG = 0.20
-REDOX_NOTICE_DELTA_LOG = 0.05
 
-EFFECT_TABLE_VERSION = "2026-06-14-proposed-e5"
+@dataclass(frozen=True)
+class PropertyThreshold:
+    metric: str
+    warning: float
+    notice: float
+    absolute_warning_floor: float | None = None
+    absolute_notice_floor: float | None = None
+    basis: str = "absolute"
+
+
+PROPERTY_THRESHOLD_TABLE: dict[str, PropertyThreshold] = {
+    "liquidus": PropertyThreshold(
+        metric="delta_T_frac_of_T_in_C",
+        warning=2.0,
+        notice=0.5,
+        absolute_warning_floor=25.0,
+        absolute_notice_floor=7.0,
+        basis="celsius_relative_percent_with_floor",
+    ),
+    "redox": PropertyThreshold(
+        metric="delta_log10_fO2",
+        warning=1.0,
+        notice=0.3,
+        basis="absolute_log10_fO2",
+    ),
+    "phase": PropertyThreshold(
+        metric="delta_absolute_fraction",
+        warning=0.02,
+        notice=0.005,
+        basis="absolute_mass_fraction",
+    ),
+}
+
+EFFECT_TABLE_VERSION = "2026-06-14-refine1-thresholds-v2"
 
 # Per-contaminant effect rows sourced from CONTAMINANT-WARNING-DOC + evidence-E5.
 # Intervals are literature-imported, NOT simulator-measured.
@@ -142,9 +167,11 @@ class PropertyPerturbation:
     perturbation_after: float | None
     metric: str
     grounded: bool
+    correctable: bool
     raw_value: float | None = None
     adjusted_value: float | None = None
     interval: tuple[float, float] | None = None
+    metric_basis: float | None = None
 
 
 @dataclass(frozen=True)
@@ -157,10 +184,12 @@ class PropertyFlag:
     perturbation_after: float | None
     metric: str
     grounded: bool
+    correctable: bool
     residual_wt_pct: float
     hour: int
     active: bool = True
     cleared: bool = False
+    clear_hour: int | None = None
     noise_floor_status: str = "proposed"
 
 
@@ -188,6 +217,8 @@ class VerdictAResult:
 @dataclass(frozen=True)
 class VerdictBResult:
     backend_status: str
+    layer_a_state: str
+    offending_species: tuple[str, ...]
     stripped_domain_valid: bool
     hard_gate_failed: bool
     stripped_oxide_wt_pct: dict[str, float]
@@ -313,6 +344,10 @@ def _liquidus_perturbation_pct(delta_T_C: float, T_in_C: float) -> float:
     return abs(delta_T_C) / T_in_C * 100.0
 
 
+def _interval_half_width(low: float, high: float) -> float:
+    return abs(float(high) - float(low)) / 2.0
+
+
 def _compute_property_perturbation(
     *,
     property_name: str,
@@ -342,8 +377,10 @@ def _compute_property_perturbation(
             perturbation_after=after,
             metric="delta_T_frac_of_T_in_C",
             grounded=grounded,
+            correctable=grounded,
             raw_value=delta_T,
             adjusted_value=0.0,
+            metric_basis=float(T_in_C),
         )
 
     if mode == "delta_T_interval_per_wt_pct":
@@ -358,7 +395,7 @@ def _compute_property_perturbation(
             _liquidus_perturbation_pct(delta_high, T_in_C)
             - _liquidus_perturbation_pct(delta_low, T_in_C)
         )
-        after = width
+        after = width / 2.0
         return PropertyPerturbation(
             property=property_name,
             contaminant=species,
@@ -369,15 +406,17 @@ def _compute_property_perturbation(
             perturbation_after=after,
             metric="delta_T_frac_of_T_in_C",
             grounded=False,
+            correctable=False,
             raw_value=None,
             adjusted_value=None,
             interval=(delta_low, delta_high),
+            metric_basis=float(T_in_C),
         )
 
     if mode == "delta_fraction_interval_per_wt_pct":
         low_f, high_f = prop_cfg["interval_per_wt_pct"]
         before = max(abs(float(low_f) * wt_pct), abs(float(high_f) * wt_pct))
-        after = abs(float(high_f) - float(low_f)) * wt_pct
+        after = _interval_half_width(float(low_f) * wt_pct, float(high_f) * wt_pct)
         return PropertyPerturbation(
             property=property_name,
             contaminant=species,
@@ -388,13 +427,14 @@ def _compute_property_perturbation(
             perturbation_after=after,
             metric="delta_absolute_fraction",
             grounded=False,
+            correctable=False,
             interval=(float(low_f) * wt_pct, float(high_f) * wt_pct),
         )
 
     if mode == "delta_log10_fO2_interval_per_wt_pct":
         low_l, high_l = prop_cfg["interval_per_wt_pct"]
         before = max(abs(float(low_l) * wt_pct), abs(float(high_l) * wt_pct))
-        after = abs(float(high_l) - float(low_l)) * wt_pct
+        after = _interval_half_width(float(low_l) * wt_pct, float(high_l) * wt_pct)
         return PropertyPerturbation(
             property=property_name,
             contaminant=species,
@@ -405,6 +445,7 @@ def _compute_property_perturbation(
             perturbation_after=after,
             metric="delta_log10_fO2",
             grounded=False,
+            correctable=False,
             interval=(float(low_l) * wt_pct, float(high_l) * wt_pct),
         )
 
@@ -425,6 +466,7 @@ def _unmodeled_residual_perturbation(
         perturbation_after=None,
         metric="noise_floor_ungrounded",
         grounded=False,
+        correctable=False,
     )
 
 
@@ -520,7 +562,7 @@ def melt_effect_adjustment(
             if not pert.grounded:
                 warnings.append(
                     f"noise_floor_ungrounded: {species} {prop_name} effect "
-                    f"interval width drives flag (row={row_key})"
+                    f"interval half-width drives flag (row={row_key})"
                 )
 
     adjusted_liquidus = None
@@ -547,32 +589,78 @@ def melt_effect_adjustment(
     )
 
 
-def _property_thresholds(property_name: str, metric: str) -> tuple[float, float]:
-    if property_name == "liquidus" or metric == "delta_T_frac_of_T_in_C":
-        return LIQUIDUS_WARNING_FRAC_OF_T * 100.0, LIQUIDUS_NOTICE_FRAC_OF_T * 100.0
-    if property_name == "redox" or metric == "delta_log10_fO2":
-        return REDOX_WARNING_DELTA_LOG, REDOX_NOTICE_DELTA_LOG
-    if property_name == "phase" or metric == "delta_absolute_fraction":
-        return PHASE_WARNING_ABS_FRAC, PHASE_NOTICE_ABS_FRAC
-    return 2.0, 0.5
+def _property_thresholds(property_name: str, metric: str) -> PropertyThreshold:
+    for name, threshold in PROPERTY_THRESHOLD_TABLE.items():
+        if property_name == name or metric == threshold.metric:
+            return threshold
+    return PropertyThreshold(metric=metric, warning=2.0, notice=0.5)
+
+
+def _liquidus_absolute_before_after(
+    pert: PropertyPerturbation,
+) -> tuple[float | None, float | None]:
+    if pert.raw_value is not None:
+        return abs(float(pert.raw_value)), abs(float(pert.adjusted_value or 0.0))
+    if pert.interval is not None:
+        low, high = pert.interval
+        return max(abs(float(low)), abs(float(high))), _interval_half_width(low, high)
+    return None, None
+
+
+def _meets_threshold(
+    pert: PropertyPerturbation,
+    threshold: PropertyThreshold,
+    level: str,
+    *,
+    after_only: bool,
+) -> bool:
+    limit = threshold.warning if level == "warning" else threshold.notice
+    values: list[float] = []
+    if not after_only and pert.perturbation_before is not None:
+        values.append(float(pert.perturbation_before))
+    if pert.perturbation_after is not None:
+        values.append(float(pert.perturbation_after))
+
+    if threshold.absolute_warning_floor is None or pert.property != "liquidus":
+        return any(value >= limit for value in values)
+
+    basis = float(pert.metric_basis or 0.0)
+    floor = (
+        threshold.absolute_warning_floor
+        if level == "warning"
+        else threshold.absolute_notice_floor
+    )
+    if floor is None:
+        return any(value >= limit for value in values)
+
+    absolute_limit = max((basis * limit / 100.0) if basis > 0.0 else 0.0, floor)
+    before_abs, after_abs = _liquidus_absolute_before_after(pert)
+    absolute_values: list[float] = []
+    if not after_only and before_abs is not None:
+        absolute_values.append(before_abs)
+    if after_abs is not None:
+        absolute_values.append(after_abs)
+    if absolute_values:
+        return any(value >= absolute_limit for value in absolute_values)
+    return any(value >= limit for value in values)
 
 
 def _classify_flag(pert: PropertyPerturbation) -> str | None:
-    warn_thr, notice_thr = _property_thresholds(pert.property, pert.metric)
     if pert.metric == "noise_floor_ungrounded":
-        if pert.residual_wt_pct >= warn_thr:
-            return "WARNING"
-        if pert.residual_wt_pct >= notice_thr:
-            return "NOTICE"
-        return None
+        return "WARNING"
     if pert.perturbation_before is None or pert.perturbation_after is None:
         return None
-    severity = max(pert.perturbation_before, pert.perturbation_after)
-    if severity >= warn_thr:
+    thresholds = _property_thresholds(pert.property, pert.metric)
+    if _meets_threshold(pert, thresholds, "warning", after_only=False):
         return "WARNING"
-    if pert.perturbation_after >= notice_thr:
+    if _meets_threshold(
+        pert,
+        thresholds,
+        "notice",
+        after_only=pert.correctable,
+    ):
         return "NOTICE"
-    return None
+    return "INFO"
 
 
 def evaluate_verdict_a(
@@ -603,6 +691,7 @@ def evaluate_verdict_a(
                 perturbation_after=pert.perturbation_after,
                 metric=pert.metric,
                 grounded=pert.grounded,
+                correctable=pert.correctable,
                 residual_wt_pct=pert.residual_wt_pct,
                 hour=hour,
                 noise_floor_status=noise_status,
@@ -654,6 +743,30 @@ def _estimate_hourly_residuals(
     return hourly
 
 
+def _flag_timeline_key(flag: PropertyFlag) -> tuple[str, str, str]:
+    return (flag.contaminant, flag.property, flag.effect_row)
+
+
+def _timeline_flag_record(
+    flag: PropertyFlag,
+    *,
+    cleared: bool,
+    clear_hour: int | None,
+) -> dict[str, Any]:
+    return {
+        "property": flag.property,
+        "level": flag.level,
+        "contaminant": flag.contaminant,
+        "effect_row": flag.effect_row,
+        "grounded": flag.grounded,
+        "correctable": flag.correctable,
+        "metric": flag.metric,
+        "active": not cleared,
+        "cleared": cleared,
+        "clear_hour": clear_hour,
+    }
+
+
 def evaluate_verdict_a_timeline(
     final_residual_wt_pct: Mapping[str, float],
     melts_result: Mapping[str, Any] | None,
@@ -667,6 +780,8 @@ def evaluate_verdict_a_timeline(
     hourly = _estimate_hourly_residuals(final_residual_wt_pct, timeline)
     all_flags: list[PropertyFlag] = []
     step_resolved: list[dict[str, Any]] = []
+    previous_active: dict[tuple[str, str, str], PropertyFlag] = {}
+    clear_hour_by_key: dict[tuple[str, str, str], int] = {}
 
     for hour, residual_at_hour in hourly:
         adjustment = melt_effect_adjustment(
@@ -681,27 +796,33 @@ def evaluate_verdict_a_timeline(
             confounding_threshold_pct=confounding_threshold_pct,
             residual_wt_pct=residual_at_hour,
         )
-        active = [f for f in flags if f.level]
-        cleared = all(
-            float(residual_at_hour.get(s, 0.0)) < confounding_threshold_pct
-            for s in final_residual_wt_pct
-        )
+        active_by_key = {_flag_timeline_key(f): f for f in flags if f.level}
+        flag_records = [
+            _timeline_flag_record(
+                flag,
+                cleared=False,
+                clear_hour=clear_hour_by_key.get(key),
+            )
+            for key, flag in active_by_key.items()
+        ]
+        for key, old_flag in previous_active.items():
+            if key in active_by_key or key in clear_hour_by_key:
+                continue
+            clear_hour_by_key[key] = hour
+            flag_records.append(
+                _timeline_flag_record(
+                    old_flag,
+                    cleared=True,
+                    clear_hour=hour,
+                )
+            )
         step_resolved.append({
             "hour": hour,
             "residual_wt_pct": dict(residual_at_hour),
-            "flags": [
-                {
-                    "property": f.property,
-                    "level": f.level,
-                    "contaminant": f.contaminant,
-                    "cleared": cleared
-                    or float(residual_at_hour.get(f.contaminant, 0.0))
-                    < confounding_threshold_pct,
-                }
-                for f in active
-            ],
+            "flags": flag_records,
         })
         all_flags.extend(flags)
+        previous_active = active_by_key
 
     return VerdictAResult(
         flags=tuple(all_flags),
@@ -728,12 +849,23 @@ def evaluate_verdict_b(
     stripped_valid, domain_warnings = gate.validate(stripped.oxide_wt_pct)
 
     hard_gate_failed = not stripped_valid
+    if not stripped_valid:
+        layer_a_state = "out_of_domain"
+        offending_species = tuple(sorted(stripped.oxide_wt_pct))
+    elif stripped.stripped_mass_kg > 0.0:
+        layer_a_state = "stripped_then_in_domain"
+        offending_species = tuple(sorted(stripped.stripped_kg))
+    else:
+        layer_a_state = "in_domain"
+        offending_species = ()
     status = str(backend_status)
     if status in {"unavailable", "out_of_domain", "not_converged"} and stripped_valid:
         pass
 
     return VerdictBResult(
         backend_status=status,
+        layer_a_state=layer_a_state,
+        offending_species=offending_species,
         stripped_domain_valid=stripped_valid,
         hard_gate_failed=hard_gate_failed,
         stripped_oxide_wt_pct=dict(stripped.oxide_wt_pct),
@@ -816,8 +948,12 @@ def build_harness_verdicts(
                     "perturbation_after": f.perturbation_after,
                     "metric": f.metric,
                     "grounded": f.grounded,
+                    "correctable": f.correctable,
                     "residual_wt_pct": f.residual_wt_pct,
                     "hour": f.hour,
+                    "active": f.active,
+                    "cleared": f.cleared,
+                    "clear_hour": f.clear_hour,
                     "noise_floor_status": f.noise_floor_status,
                 }
                 for f in verdict_a.flags
@@ -826,6 +962,8 @@ def build_harness_verdicts(
         },
         "verdict_b": {
             "backend_status": verdict_b.backend_status,
+            "layer_a_state": verdict_b.layer_a_state,
+            "offending_species": list(verdict_b.offending_species),
             "stripped_domain_valid": verdict_b.stripped_domain_valid,
             "hard_gate_failed": verdict_b.hard_gate_failed,
             "stripped_oxide_wt_pct": verdict_b.stripped_oxide_wt_pct,
@@ -878,9 +1016,11 @@ def build_harness_verdicts(
                     "perturbation_after": p.perturbation_after,
                     "metric": p.metric,
                     "grounded": p.grounded,
+                    "correctable": p.correctable,
                     "raw_value": p.raw_value,
                     f"adjusted_{p.property}": p.adjusted_value,
                     "interval": p.interval,
+                    "metric_basis": p.metric_basis,
                 }
                 for p in adjustment.perturbations
             ],

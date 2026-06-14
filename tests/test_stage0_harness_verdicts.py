@@ -9,6 +9,9 @@ import pytest
 
 from engines.builtin.melt_effect_adjustment import (
     CertifiedPointRefusedError,
+    EFFECT_TABLE_VERSION,
+    PROPERTY_THRESHOLD_TABLE,
+    PropertyPerturbation,
     aggregate_backend_status,
     build_harness_verdicts,
     evaluate_verdict_a,
@@ -63,10 +66,64 @@ def test_liquidus_warning_at_two_percent_of_T():
     assert liquidus_flags
     assert liquidus_flags[0].level == "WARNING"
     assert liquidus_flags[0].perturbation_before >= 2.0
+    assert liquidus_flags[0].grounded is True
+    assert liquidus_flags[0].correctable is True
 
 
-def test_notice_when_after_in_band_not_warning():
-    residual = {"C": 0.2}
+def test_three_rung_grounded_correctable_matrix():
+    info = PropertyPerturbation(
+        property="phase",
+        contaminant="synthetic",
+        effect_row="synthetic_grounded_info",
+        source="test",
+        residual_wt_pct=1.0,
+        perturbation_before=0.001,
+        perturbation_after=0.0,
+        metric="delta_absolute_fraction",
+        grounded=True,
+        correctable=True,
+        raw_value=0.001,
+        adjusted_value=0.0,
+    )
+    notice = PropertyPerturbation(
+        property="phase",
+        contaminant="synthetic",
+        effect_row="synthetic_grounded_notice",
+        source="test",
+        residual_wt_pct=1.0,
+        perturbation_before=0.004,
+        perturbation_after=0.006,
+        metric="delta_absolute_fraction",
+        grounded=True,
+        correctable=True,
+        raw_value=0.004,
+        adjusted_value=0.006,
+    )
+    warning = PropertyPerturbation(
+        property="phase",
+        contaminant="synthetic",
+        effect_row="synthetic_grounded_warning",
+        source="test",
+        residual_wt_pct=1.0,
+        perturbation_before=0.03,
+        perturbation_after=0.0,
+        metric="delta_absolute_fraction",
+        grounded=True,
+        correctable=True,
+        raw_value=0.03,
+        adjusted_value=0.0,
+    )
+
+    flags = evaluate_verdict_a((info, notice, warning), hour=1)
+    by_row = {f.effect_row: f for f in flags}
+    assert by_row["synthetic_grounded_info"].level == "INFO"
+    assert by_row["synthetic_grounded_notice"].level == "NOTICE"
+    assert by_row["synthetic_grounded_warning"].level == "WARNING"
+    assert all(f.grounded is True and f.correctable is True for f in flags)
+
+
+def test_redox_metric_is_log10_not_percent_and_interval_upper_edge_drives_rung():
+    residual = {"C": 1.0}
     adj = melt_effect_adjustment(
         residual,
         {"liquidus_T_C": 1400.0},
@@ -76,12 +133,25 @@ def test_notice_when_after_in_band_not_warning():
     flags = evaluate_verdict_a(adj.perturbations, hour=1)
     redox_flags = [f for f in flags if f.property == "redox"]
     assert redox_flags
+    pert = adj.perturbations[0]
+    assert pert.metric == "delta_log10_fO2"
+    assert "%" not in pert.metric
+    assert pert.interval == pytest.approx((0.10, 0.50))
+    assert pert.perturbation_after == pytest.approx(0.20)
     assert redox_flags[0].level == "NOTICE"
-    assert redox_flags[0].perturbation_after >= 0.05
-    assert max(
-        redox_flags[0].perturbation_before,
-        redox_flags[0].perturbation_after,
-    ) < 0.20
+    assert redox_flags[0].grounded is False
+    assert redox_flags[0].correctable is False
+
+    warning_adj = melt_effect_adjustment(
+        {"C": 2.0},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    warning_flags = evaluate_verdict_a(warning_adj.perturbations, hour=1)
+    warning_redox = [f for f in warning_flags if f.property == "redox"]
+    assert warning_redox[0].level == "WARNING"
+    assert warning_adj.perturbations[0].interval == pytest.approx((0.20, 1.00))
 
 
 def test_ungrounded_large_interval_escalates_to_warning_via_max_before_after():
@@ -101,17 +171,42 @@ def test_ungrounded_large_interval_escalates_to_warning_via_max_before_after():
     assert pert.raw_value is None
     assert pert.adjusted_value is None
     assert pert.interval == pytest.approx((-100.0, -25.0))
+    assert pert.perturbation_after == pytest.approx(((100.0 - 25.0) / 2.0) / 1400.0 * 100.0)
     assert not pert.grounded
+    assert pert.correctable is False
     flags = evaluate_verdict_a(adj.perturbations, hour=1)
     liquidus_flags = [f for f in flags if f.property == "liquidus"]
     assert liquidus_flags
     assert not liquidus_flags[0].grounded
     assert liquidus_flags[0].noise_floor_status == "noise_floor_ungrounded"
     assert liquidus_flags[0].level == "WARNING"
+    assert liquidus_flags[0].correctable is False
     assert max(
         liquidus_flags[0].perturbation_before,
         liquidus_flags[0].perturbation_after,
     ) >= 2.0
+
+
+def test_liquidus_uses_max_relative_and_absolute_floor():
+    assert PROPERTY_THRESHOLD_TABLE["liquidus"].absolute_warning_floor == pytest.approx(25.0)
+    below_floor = melt_effect_adjustment(
+        {"NaCl": 0.24},
+        {"liquidus_T_C": 1000.0},
+        "alphamelts",
+        T_in_C=1000.0,
+    )
+    below_flags = evaluate_verdict_a(below_floor.perturbations, hour=1)
+    assert below_flags[0].perturbation_before > 2.0
+    assert below_flags[0].level == "INFO"
+
+    at_floor = melt_effect_adjustment(
+        {"NaCl": 0.25},
+        {"liquidus_T_C": 1000.0},
+        "alphamelts",
+        T_in_C=1000.0,
+    )
+    at_floor_flags = evaluate_verdict_a(at_floor.perturbations, hour=1)
+    assert at_floor_flags[0].level == "WARNING"
 
 
 def test_unpinned_residual_reaches_verdict_a_noise_floor_flag_without_magnitude():
@@ -143,12 +238,13 @@ def test_unpinned_residual_reaches_verdict_a_noise_floor_flag_without_magnitude(
     assert flag.noise_floor_status == "noise_floor_ungrounded"
     assert flag.level == "WARNING"
     assert flag.grounded is False
+    assert flag.correctable is False
     assert flag.residual_wt_pct == pytest.approx(5.0)
     assert flag.perturbation_before is None
     assert flag.perturbation_after is None
 
 
-def test_residual_bakes_out_clears_flag_step_resolved():
+def test_residual_bakes_out_clears_flag_step_resolved_per_property():
     timeline = (
         _FakeTimelineEntry(
             hour=1,
@@ -185,6 +281,42 @@ def test_residual_bakes_out_clears_flag_step_resolved():
     assert not hour3_flags or all(f.get("cleared") for f in hour3_flags)
 
 
+def test_per_property_clear_records_clear_step_while_other_property_active():
+    timeline = (
+        _FakeTimelineEntry(hour=1, by_group={"other_mineral_contaminant": []}),
+        _FakeTimelineEntry(
+            hour=2,
+            by_group={
+                "other_mineral_contaminant": [
+                    {
+                        "carrier": "NaCl",
+                        "disposition": "escaped",
+                        "source": "diagnostic",
+                    }
+                ]
+            },
+        ),
+        _FakeTimelineEntry(hour=3, by_group={"other_mineral_contaminant": []}),
+    )
+    verdict = evaluate_verdict_a_timeline(
+        {"NaCl": 0.3, "C": 2.0},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+        timeline=timeline,
+    )
+    hour2 = [s for s in verdict.step_resolved if s["hour"] == 2][0]
+    liquidus_clear = [
+        f for f in hour2["flags"] if f["property"] == "liquidus" and f["cleared"]
+    ]
+    redox_active = [
+        f for f in hour2["flags"] if f["property"] == "redox" and f["active"]
+    ]
+    assert liquidus_clear
+    assert liquidus_clear[0]["clear_hour"] == 2
+    assert redox_active
+
+
 def test_raw_and_adjusted_are_separate_with_provenance():
     residual = {"NaCl": 0.3}
     adj = melt_effect_adjustment(
@@ -196,10 +328,12 @@ def test_raw_and_adjusted_are_separate_with_provenance():
     assert adj.raw_liquidus_C == pytest.approx(1400.0)
     assert adj.adjusted_liquidus_C == pytest.approx(1370.0)
     assert adj.adjusted_liquidus_C != adj.raw_liquidus_C
+    assert adj.effect_table_version == EFFECT_TABLE_VERSION
     assert adj.adjusted_liquidus_provenance
     pert = adj.perturbations[0]
     assert pert.raw_value is not None
     assert pert.adjusted_value == pytest.approx(0.0)
+    assert pert.correctable is True
 
 
 def test_certified_point_on_ungrounded_effect_fails_loud():
@@ -257,6 +391,8 @@ def test_verdict_b_hard_gate_on_stripped_out_of_domain_not_contaminant():
     stripped = strip_non_oxide_residuals(cleaned)
     assert stripped.stripped_mass_kg > 0.0
     verdict = evaluate_verdict_b(cleaned, "out_of_domain", "alphamelts")
+    assert verdict.layer_a_state == "stripped_then_in_domain"
+    assert verdict.offending_species == ("NaCl",)
     assert verdict.stripped_domain_valid is True
     assert verdict.hard_gate_failed is False
     assert verdict.backend_status == "out_of_domain"
@@ -268,6 +404,8 @@ def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate():
         "FeO": 900.0,
     }
     verdict = evaluate_verdict_b(cleaned, "ok", "alphamelts")
+    assert verdict.layer_a_state == "out_of_domain"
+    assert verdict.offending_species
     assert verdict.stripped_domain_valid is False
     assert verdict.hard_gate_failed is True
     assert verdict.domain_warnings

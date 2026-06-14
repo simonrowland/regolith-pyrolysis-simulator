@@ -5,8 +5,9 @@ the structural C0B→C2A handoff without entering the extraction tail. Captures
 the cleaned-melt projection and a per-hour foulant-disposition timeline grouped
 by ``{trapped_gasses, refractory_carbon, other_mineral_contaminant}``.
 
-Verdict (a) property-impact WARN flags and verdict (b) stripped-silicate domain
-gate are computed at the C0B→C2A cut — see :attr:`Stage0HarnessResult.verdicts`.
+Verdict (a) property-impact flags include per-property clear-step records, and
+verdict (b) stripped-silicate domain gate is computed at the C0B→C2A cut — see
+:attr:`Stage0HarnessResult.verdicts`.
 """
 
 from __future__ import annotations
