@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting import AccountingQueries, AtomLedger
+from simulator.accounting.queries import FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL
 from simulator.runner import RunnerError, build_sio_yield_report
 
 
@@ -149,3 +150,175 @@ def test_sio_yield_report_lab_oxygen_sidecar_is_explicit_opt_in():
     partition = diagnostics["lab_oxygen_atom_partition"]
     assert partition["closure"]["error_pct"] <= OXYGEN_CLOSURE_MAX_PCT
     assert "residual_unallocated_oxygen_atom_mol" in partition
+    plume = diagnostics["lab_plume_product_partition"]
+    assert plume["schema"] == "rec_w1_02_qms_oes_position_resolved.v1"
+    assert "discriminant" in plume
+
+
+def _plume_diagnostic_sim(
+    *,
+    overhead: dict[str, float] | None = None,
+    terminal_offgas: dict[str, float] | None = None,
+    condensation: dict[str, float] | None = None,
+):
+    ledger = AtomLedger()
+    if overhead:
+        ledger.load_external_mol(
+            "process.overhead_gas",
+            overhead,
+            source="test plume overhead",
+        )
+    if terminal_offgas:
+        ledger.load_external_mol(
+            "terminal.offgas",
+            terminal_offgas,
+            source="test plume terminal escape",
+        )
+    if condensation:
+        ledger.load_external_mol(
+            "process.condensation_train",
+            condensation,
+            source="test plume condensation",
+        )
+    return SimpleNamespace(atom_ledger=ledger)
+
+
+def test_lab_plume_product_partition_stoichiometry_discriminant():
+    near_melt_o2 = 1.0
+    plume_extent = 0.02
+    predicted_outlet_o2 = near_melt_o2 - 0.5 * plume_extent
+    partition = AccountingQueries(
+        _plume_diagnostic_sim(
+            overhead={"O2": near_melt_o2, "SiO": plume_extent},
+            condensation={
+                "O2": predicted_outlet_o2,
+                "SiO2": plume_extent,
+            },
+        )
+    ).lab_plume_product_partition()
+
+    assert partition["near_melt"]["sio"]["species_mol"] == pytest.approx(
+        plume_extent
+    )
+    assert partition["near_melt"]["free_analyzer_oxygen"]["species_mol"] == {
+        "O2": pytest.approx(near_melt_o2),
+    }
+    assert partition["outlet"]["plume_product_proxy"]["species_mol"] == (
+        pytest.approx(plume_extent)
+    )
+    assert partition["outlet"]["plume_product_proxy"]["species"] == "SiO2"
+    assert partition["outlet"]["plume_product_proxy"]["provenance"] == (
+        "condensation_train_route_product_proxy"
+    )
+    assert partition["outlet"]["sio"]["species_mol"] == pytest.approx(0.0)
+    assert partition["discriminant"]["plume_extent_mol"] == pytest.approx(
+        plume_extent
+    )
+    assert partition["discriminant"]["predicted_outlet_o2_mol"] == (
+        pytest.approx(predicted_outlet_o2)
+    )
+    assert partition["discriminant"]["observed_outlet_o2_mol"] == (
+        pytest.approx(predicted_outlet_o2)
+    )
+    assert (
+        partition["discriminant"]["predicted_minus_observed_outlet_o2_mol"]
+        == pytest.approx(0.0)
+    )
+    assert partition["near_melt"]["sio"]["oxygen_atom_mol"] == pytest.approx(
+        plume_extent
+    )
+    assert partition["outlet"]["plume_product_proxy"]["oxygen_atom_mol"] == (
+        pytest.approx(2.0 * plume_extent)
+    )
+    assert partition["near_melt"]["account"] == "process.overhead_gas"
+
+
+def test_lab_plume_product_partition_ceiling_breach_at_frozen_extent():
+    at_ceiling = FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL
+    below = AccountingQueries(
+        _plume_diagnostic_sim(overhead={"SiO": at_ceiling})
+    ).lab_plume_product_partition()
+    above = AccountingQueries(
+        _plume_diagnostic_sim(overhead={"SiO": at_ceiling + 1e-12})
+    ).lab_plume_product_partition()
+
+    assert below["ceiling_breach"]["breached"] is False
+    assert below["ceiling_breach"]["offending_species"] == []
+    assert above["ceiling_breach"]["breached"] is True
+    assert above["ceiling_breach"]["offending_species"] == ["SiO"]
+
+
+def test_lab_plume_product_partition_denied_major_oxide_nonzero_is_breach():
+    partition = AccountingQueries(
+        _plume_diagnostic_sim(overhead={"FeO": 1e-9})
+    ).lab_plume_product_partition()
+
+    assert partition["ceiling_breach"]["breached"] is True
+    assert partition["ceiling_breach"]["offending_species"] == ["FeO"]
+
+
+def test_lab_plume_product_partition_empty_accounts_are_honest_zeros():
+    partition = AccountingQueries(
+        _plume_diagnostic_sim()
+    ).lab_plume_product_partition()
+
+    assert partition["near_melt"]["free_analyzer_oxygen"]["species_mol"] == {}
+    assert partition["near_melt"]["free_analyzer_oxygen"][
+        "oxygen_atom_mol"
+    ] == pytest.approx(0.0)
+    assert partition["near_melt"]["sio"]["species_mol"] == pytest.approx(0.0)
+    assert partition["outlet"]["plume_product_proxy"]["species_mol"] == (
+        pytest.approx(0.0)
+    )
+    assert partition["terminal_escape"]["free_analyzer_oxygen"][
+        "species_mol"
+    ] == {}
+    assert partition["discriminant"]["plume_extent_mol"] == pytest.approx(0.0)
+    assert partition["discriminant"]["predicted_outlet_o2_mol"] == (
+        pytest.approx(0.0)
+    )
+    assert partition["ceiling_breach"]["breached"] is False
+
+
+def test_lab_plume_product_partition_terminal_offgas_lands_in_terminal_escape():
+    partition = AccountingQueries(
+        _plume_diagnostic_sim(
+            overhead={"O2": 1.0, "SiO": 0.01},
+            terminal_offgas={"O2": 0.5, "SiO": 0.2},
+            condensation={"SiO2": 0.01},
+        )
+    ).lab_plume_product_partition()
+
+    assert partition["near_melt"]["account"] == "process.overhead_gas"
+    assert partition["near_melt"]["free_analyzer_oxygen"]["species_mol"] == {
+        "O2": pytest.approx(1.0),
+    }
+    assert partition["near_melt"]["sio"]["species_mol"] == pytest.approx(0.01)
+    assert partition["terminal_escape"]["account"] == "terminal.offgas"
+    assert partition["terminal_escape"]["free_analyzer_oxygen"][
+        "species_mol"
+    ] == {"O2": pytest.approx(0.5)}
+    assert partition["terminal_escape"]["sio"]["species_mol"] == (
+        pytest.approx(0.2)
+    )
+    assert partition["discriminant"]["near_melt_o2_mol"] == pytest.approx(1.0)
+
+
+def test_lab_plume_product_partition_outlet_only_sio2_trips_ceiling_breach():
+    at_ceiling = FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL
+    below = AccountingQueries(
+        _plume_diagnostic_sim(condensation={"SiO2": at_ceiling})
+    ).lab_plume_product_partition()
+    above = AccountingQueries(
+        _plume_diagnostic_sim(
+            condensation={"SiO2": at_ceiling + 1e-12}
+        )
+    ).lab_plume_product_partition()
+
+    assert below["ceiling_breach"]["sio_source_proxy_mol"] == pytest.approx(
+        at_ceiling
+    )
+    assert below["ceiling_breach"]["breached"] is False
+    assert below["ceiling_breach"]["offending_species"] == []
+    assert above["ceiling_breach"]["breached"] is True
+    assert above["ceiling_breach"]["offending_species"] == ["SiO"]

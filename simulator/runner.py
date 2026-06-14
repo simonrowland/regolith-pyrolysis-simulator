@@ -1930,8 +1930,12 @@ def build_sio_yield_report(
                 vaporock_full_speciation
             )
         if include_lab_oxygen_diagnostics:
+            queries = AccountingQueries(sim)
             diagnostics["lab_oxygen_atom_partition"] = (
-                AccountingQueries(sim).lab_oxygen_atom_partition()
+                queries.lab_oxygen_atom_partition()
+            )
+            diagnostics["lab_plume_product_partition"] = (
+                queries.lab_plume_product_partition()
             )
         return report, diagnostics
     return report
@@ -3034,8 +3038,14 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
         diagnostics_path = Path(args.lab_oxygen_diagnostics_output)
         diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
         with diagnostics_path.open("w") as f:
+            cli_diagnostics = dict(
+                diagnostics["lab_oxygen_atom_partition"]
+            )
+            cli_diagnostics["lab_plume_product_partition"] = diagnostics[
+                "lab_plume_product_partition"
+            ]
             json.dump(
-                diagnostics["lab_oxygen_atom_partition"],
+                cli_diagnostics,
                 f,
                 indent=2,
                 sort_keys=False,

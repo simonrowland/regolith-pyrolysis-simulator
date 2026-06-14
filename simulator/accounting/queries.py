@@ -25,6 +25,8 @@ OVERHEAD_VAPOR_ACCOUNTS = (
     "process.overhead_gas",
     "terminal.offgas",
 )
+NEAR_MELT_SOURCE_ACCOUNT = "process.overhead_gas"
+TERMINAL_ESCAPE_ACCOUNT = "terminal.offgas"
 CONDENSATION_TRAIN_ACCOUNT = "process.condensation_train"
 WALL_DEPOSIT_SEGMENT_ACCOUNT_PREFIX = "process.wall_deposit_segment_"
 FREE_ANALYZER_OXYGEN_ACCOUNTS = (
@@ -32,6 +34,20 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
     *OXYGEN_STORED_ACCOUNTS,
     *OXYGEN_VENTED_ACCOUNTS,
 )
+PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
+PLUME_SOURCE_SIO_SPECIES = "SiO"
+FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL = 0.013617600827
+MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL = {
+    PLUME_SOURCE_SIO_SPECIES: FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
+    "Na2O": 0.0,
+    "K2O": 0.0,
+    "FeO": 0.0,
+    "MgO": 0.0,
+    "CaO": 0.0,
+    "Al2O3": 0.0,
+    "TiO2": 0.0,
+    "CrO2": 0.0,
+}
 TERMINAL_RUMP_ACCOUNTS = (
     "process.cleaned_melt",
     "terminal.slag",
@@ -370,6 +386,113 @@ class AccountingQueries:
             },
         }
 
+    def lab_plume_product_partition(self) -> dict[str, Any]:
+        """Position-resolved plume-product diagnostic for Channel A falsification.
+
+        Near-melt reads ``process.overhead_gas`` only (pre-condensation source
+        proxy). ``terminal.offgas`` is downstream escape (``terminal_escape``),
+        not near-melt. Outlet ``plume_product_proxy`` is condensation-train
+        SiO2 — a route-product proxy, not direct O2-consuming ledger proof.
+        """
+        balances = self.ledger.mol_by_account()
+        registry = self.ledger.registry
+
+        near_melt_species_mol = dict(
+            balances.get(NEAR_MELT_SOURCE_ACCOUNT, {}) or {}
+        )
+        terminal_escape_species_mol = dict(
+            balances.get(TERMINAL_ESCAPE_ACCOUNT, {}) or {}
+        )
+        outlet_species_mol = dict(
+            balances.get(CONDENSATION_TRAIN_ACCOUNT, {}) or {}
+        )
+
+        near_melt = _plume_position_reading(
+            near_melt_species_mol,
+            registry,
+        )
+        terminal_escape = _plume_position_reading(
+            terminal_escape_species_mol,
+            registry,
+        )
+        outlet = _plume_position_reading(
+            outlet_species_mol,
+            registry,
+        )
+
+        plume_extent_mol = float(
+            outlet["plume_product_proxy"]["species_mol"]
+        )
+        near_melt_sio_mol = float(
+            near_melt["sio"]["species_mol"]
+        )
+        sio_source_proxy_mol = near_melt_sio_mol + plume_extent_mol
+        near_melt_o2_mol = float(
+            near_melt["free_analyzer_oxygen"]["species_mol"].get(
+                OXYGEN_SPECIES, 0.0
+            )
+        )
+        predicted_outlet_o2_mol = (
+            near_melt_o2_mol - 0.5 * plume_extent_mol
+        )
+        observed_outlet_o2_mol = float(
+            outlet["free_analyzer_oxygen"]["species_mol"].get(
+                OXYGEN_SPECIES, 0.0
+            )
+        )
+
+        ceiling_offenders: list[str] = []
+        for species, ceiling_mol in sorted(
+            MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL.items()
+        ):
+            if species == PLUME_SOURCE_SIO_SPECIES:
+                source_mol = sio_source_proxy_mol
+            else:
+                source_mol = float(
+                    near_melt_species_mol.get(species, 0.0) or 0.0
+                )
+            if source_mol > ceiling_mol + 1e-15:
+                ceiling_offenders.append(species)
+
+        return {
+            "schema": "rec_w1_02_qms_oes_position_resolved.v1",
+            "near_melt": {
+                "account": NEAR_MELT_SOURCE_ACCOUNT,
+                **near_melt,
+            },
+            "terminal_escape": {
+                "account": TERMINAL_ESCAPE_ACCOUNT,
+                **terminal_escape,
+            },
+            "outlet": {
+                "account": CONDENSATION_TRAIN_ACCOUNT,
+                **outlet,
+            },
+            "discriminant": {
+                "stoichiometry": (
+                    "SiO + 0.5 O2 -> SiO2(plume_product_proxy)"
+                ),
+                "plume_extent_mol": plume_extent_mol,
+                "near_melt_o2_mol": near_melt_o2_mol,
+                "predicted_outlet_o2_mol": predicted_outlet_o2_mol,
+                "observed_outlet_o2_mol": observed_outlet_o2_mol,
+                "predicted_minus_observed_outlet_o2_mol": (
+                    predicted_outlet_o2_mol - observed_outlet_o2_mol
+                ),
+            },
+            "ceiling_breach": {
+                "breached": bool(ceiling_offenders),
+                "offending_species": ceiling_offenders,
+                "sio_source_proxy_mol": sio_source_proxy_mol,
+                "frozen_sio_ceiling_mol": (
+                    FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL
+                ),
+                "major_metal_oxide_ceilings_mol": dict(
+                    MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL
+                ),
+            },
+        }
+
     def rump_element_kg(self, element: str) -> float:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
@@ -403,6 +526,67 @@ def _oxygen_atom_mol_for_balances(
         sum(_oxygen_atom_mol_by_species(species_mol, registry).values())
         for species_mol in balances.values()
     )
+
+
+def _merge_species_mol_from_accounts(
+    balances: Mapping[str, Mapping[str, float]],
+    accounts: tuple[str, ...] | list[str],
+) -> dict[str, float]:
+    merged: dict[str, float] = {}
+    for account in accounts:
+        for species, mol in (balances.get(str(account), {}) or {}).items():
+            amount = float(mol)
+            if amount:
+                merged[str(species)] = merged.get(str(species), 0.0) + amount
+    return dict(sorted(merged.items()))
+
+
+def _plume_position_reading(
+    species_mol: Mapping[str, float],
+    registry: Mapping[str, Any],
+) -> dict[str, Any]:
+    free_species_mol: dict[str, float] = {}
+    for species, mol in species_mol.items():
+        if species not in FREE_ANALYZER_OXYGEN_SPECIES:
+            continue
+        amount = float(mol)
+        if amount > 0.0:
+            free_species_mol[str(species)] = amount
+
+    sio_mol = float(species_mol.get(PLUME_SOURCE_SIO_SPECIES, 0.0) or 0.0)
+    plume_sio2_mol = float(
+        species_mol.get(PLUME_PRODUCT_SIO2_SPECIES, 0.0) or 0.0
+    )
+    oxygen_by_species = _oxygen_atom_mol_by_species(species_mol, registry)
+
+    free_oxygen_atom_mol = sum(
+        oxygen_by_species.get(species, 0.0)
+        for species in FREE_ANALYZER_OXYGEN_SPECIES
+        if species in species_mol
+    )
+    sio_oxygen_atom_mol = oxygen_by_species.get(PLUME_SOURCE_SIO_SPECIES, 0.0)
+    plume_sio2_oxygen_atom_mol = oxygen_by_species.get(
+        PLUME_PRODUCT_SIO2_SPECIES, 0.0
+    )
+
+    return {
+        "free_analyzer_oxygen": {
+            "species_mol": dict(sorted(free_species_mol.items())),
+            "oxygen_atom_mol": free_oxygen_atom_mol,
+        },
+        "sio": {
+            "species_mol": sio_mol,
+            "oxygen_atom_mol": sio_oxygen_atom_mol,
+        },
+        "plume_product_proxy": {
+            "species": PLUME_PRODUCT_SIO2_SPECIES,
+            "provenance": (
+                "condensation_train_route_product_proxy"
+            ),
+            "species_mol": plume_sio2_mol,
+            "oxygen_atom_mol": plume_sio2_oxygen_atom_mol,
+        },
+    }
 
 
 def _oxygen_atom_mol_by_species(
