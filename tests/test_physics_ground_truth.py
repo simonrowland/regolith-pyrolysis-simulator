@@ -36,6 +36,29 @@ def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
     )
 
 
+def _antoine_pa(entry: dict, temperature_K: float) -> float:
+    coeff = entry["antoine"]
+    return 10.0 ** (
+        float(coeff["A"])
+        - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
+    )
+
+
+def _chi_escape_equilibrium(p_sat_pa: float, p_total_pa: float) -> float:
+    return p_sat_pa / (p_sat_pa + p_total_pa)
+
+
+def _require_certified_pure_component_antoine(entry: dict, temperature_K: float) -> float:
+    if entry.get("interval_required"):
+        raise ValueError(
+            f"certified-point request refused for interval-only row "
+            f"(confidence={entry.get('confidence')!r})"
+        )
+    if "pure_component_antoine" not in entry:
+        raise KeyError("pure_component_antoine")
+    return _pure_component_antoine_pa(entry, temperature_K)
+
+
 @pytest.mark.parametrize(
     ("species", "temperature_K", "rel_tol"),
     [
@@ -180,10 +203,104 @@ def test_janaf_alkali_fe_reduction_margin_changes_sign_at_crossover() -> None:
     ) < 0.0
 
 
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "rel_tol"),
+    [
+        ("NaCl", 1738.15, 0.02),  # CRC/NIST: NaCl normal boiling point 1465 C.
+        ("KCl", 1693.15, 0.02),  # CRC/NIST: KCl normal boiling point 1420 C.
+    ],
+)
+def test_foulant_vapor_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
+    species: str,
+    temperature_K: float,
+    rel_tol: float,
+) -> None:
+    data = _vapor_pressure_data()["foulant_vapor"][species]
+
+    assert data["pure_component_antoine"]["source"]
+    assert "parent_oxide" not in data
+    assert data.get("carrier_is_own_vapor") is True
+    assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
+        PA_PER_ATM,
+        rel=rel_tol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_pa", "rel_tol"),
+    [
+        # NIST Chemistry WebBook SRD 69, Stull 1947 NaCl row at 1200 K.
+        ("NaCl", 1200.0, 366.8, 0.01),
+        # NIST Chemistry WebBook SRD 69, Stull 1947 KCl row at 1200 K (ground-truth coeffs).
+        ("KCl", 1200.0, 747.85, 0.01),
+    ],
+)
+def test_foulant_vapor_pure_component_antoine_matches_published_vapor_pressure_points(
+    species: str,
+    temperature_K: float,
+    expected_pa: float,
+    rel_tol: float,
+) -> None:
+    data = _vapor_pressure_data()["foulant_vapor"][species]
+
+    assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
+        expected_pa,
+        rel=rel_tol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_C", "p_total_pa", "expected_chi", "abs_tol"),
+    [
+        ("NaCl", 1200.0, 20_000.0, 0.354, 0.01),
+        ("KCl", 1200.0, 20_000.0, 0.459, 0.01),
+        ("NaCl", 1200.0, 100.0, 0.99, 0.01),
+        ("KCl", 1200.0, 100.0, 0.99, 0.01),
+    ],
+)
+def test_foulant_vapor_chi_escape_matches_equilibrium_partition(
+    species: str,
+    temperature_C: float,
+    p_total_pa: float,
+    expected_chi: float,
+    abs_tol: float,
+) -> None:
+    data = _vapor_pressure_data()["foulant_vapor"][species]
+    temperature_K = temperature_C + 273.15
+    p_sat = _pure_component_antoine_pa(data, temperature_K)
+    chi = _chi_escape_equilibrium(p_sat, p_total_pa)
+    assert chi == pytest.approx(expected_chi, abs=abs_tol)
+
+
+def test_naf_foulant_vapor_certified_point_request_fails_loud() -> None:
+    data = _vapor_pressure_data()["foulant_vapor"]["NaF"]
+
+    assert data.get("confidence") == "partly_grounded"
+    assert data.get("interval_required") is True
+    assert data.get("certified_point") is None
+    assert "pure_component_antoine" not in data
+    with pytest.raises(ValueError, match="certified-point request refused"):
+        _require_certified_pure_component_antoine(data, 1977.15)
+
+
+def test_caf2_mgf2_absent_from_foulant_vapor() -> None:
+    foulant_vapor = _vapor_pressure_data()["foulant_vapor"]
+    assert "CaF2" not in foulant_vapor
+    assert "MgF2" not in foulant_vapor
+
+
 def test_antoine_values_are_finite_positive_ground_truth_numbers() -> None:
     # Guard against future parity-only rewrites that silently insert NaN/inf or
     # backsolved zero-pressure placeholders in the pure-component table.
     for species, entry in _vapor_pressure_data()["metals"].items():
+        if "pure_component_antoine" not in entry:
+            continue
+        temperature_K = float(entry["boiling_point_C"]) + 273.15
+        pressure_pa = _pure_component_antoine_pa(entry, temperature_K)
+        assert math.isfinite(pressure_pa)
+        assert pressure_pa > 0.0
+
+    for species, entry in _vapor_pressure_data()["foulant_vapor"].items():
         if "pure_component_antoine" not in entry:
             continue
         temperature_K = float(entry["boiling_point_C"]) + 273.15

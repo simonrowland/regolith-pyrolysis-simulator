@@ -436,6 +436,79 @@ oxide_vapors:
       fixture records CrO2(g) as significant above 1500 K; VapoRock JANAF0
       supplies CrO2(g) thermochemistry over 1100-6000 K.
 
+foulant_vapor:
+  NaCl:
+    formula: "NaCl"
+    molar_mass_g_mol: 58.44
+    fit_target: pure_component_psat
+    carrier_is_own_vapor: true
+    pure_component_antoine:
+      source: "NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C"
+      A: 10.07184
+      B: 8388.497
+      C: -82.638
+    antoine:
+      A: 10.07184
+      B: 8388.497
+      C: -82.638
+    valid_range_K: [1138, 1738]
+    boiling_point_C: 1465
+    condensation_T_C_at_1mbar: 900
+    evaporation_alpha:
+      value: 1.0
+      source: "Salt analogy — Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
+      tier: 2
+    notes: "Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g)."
+
+  KCl:
+    formula: "KCl"
+    molar_mass_g_mol: 74.55
+    fit_target: pure_component_psat
+    carrier_is_own_vapor: true
+    pure_component_antoine:
+      source: "NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
+      A: 10.185900
+      B: 8774.500
+      C: 0
+    antoine:
+      source: "NIST Stull 1947 mid-range faithful runtime row; bp overshoots — tests use pure_component_antoine"
+      A: 9.78236
+      B: 7440.691
+      C: -122.709
+    valid_range_K: [1094, 1680]
+    boiling_point_C: 1420
+    condensation_T_C_at_1mbar: 880
+    evaporation_alpha:
+      value: 1.0
+      source: "Salt analogy — Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
+      tier: 2
+    notes: "Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T."
+
+  NaF:
+    formula: "NaF"
+    molar_mass_g_mol: 41.98817
+    fit_target: pure_component_psat
+    carrier_is_own_vapor: true
+    confidence: partly_grounded
+    interval_required: true
+    certified_point: null
+    antoine:
+      source: "UNGROUNDED CC interval — NIST WebBook fetch failed 2026-06-14; CRC bp 1704 C; ΔH_vap ~175 kJ/mol alkali-halide analogy pending JANAF/NIST; interval only, NOT certified"
+      A: 9.626700
+      B: 9137.400
+      C: 0
+    valid_range_K: [1200, 2000]
+    boiling_point_C: 1704
+    condensation_T_C_at_1mbar: 1050
+    evaporation_alpha:
+      value: 1.0
+      source: "UNGROUNDED tier-2 salt analogy; no regolith-NaF HK measurement"
+      tier: 2
+    notes: |
+      Interval-only Antoine row. NIST SRD 69 Antoine unavailable (fetch failed).
+      Do NOT certify against P_sat(T_bp)=101325 Pa until a named literature row lands.
+      CaF2/MgF2 deliberately absent — refractory rump (b129999).
+
 # Condensation temperature reference (at ~1 mbar partial pressure)
 # Used by condensation train model for species routing
 condensation_reference_at_1mbar:
@@ -448,3 +521,5 @@ condensation_reference_at_1mbar:
   Mn: 1000    # between Stage 1 and 2
   Cr: 1280    # Stage 1 (co-deposits with Fe)
   CrO2: 1250  # Dedicated Cr oxide stage; condenses as Cr2O3 + O2
+  NaCl: 900   # Stage-0 foulant volatilization
+  KCl: 880    # Stage-0 foulant volatilization (more volatile than NaCl)

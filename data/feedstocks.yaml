@@ -884,7 +884,8 @@ ci_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.50
     H2O:   15.0    # structural, in phyllosilicates
-    carbonaceous_organic: 3.5  # generic organics + carbonates bucket
+    carbonaceous_organic: 0.75  # organics remainder after carbonate carrier split (was 3.5 lump)
+    carbonate_salts: 2.75  # carrier key alias carbonate; Mg/Ca/Fe vein carbonate; not_speciated mass
     S:      4.0    # predominantly sulfides
   composition_ranges:
     SiO2:  [22, 28]
@@ -895,9 +896,20 @@ ci_carbonaceous_chondrite:
     Na2O:  [0.5, 1.0]
     NiO:   [1.2, 1.8]
     H2O:   [10, 20]
-    carbonaceous_organic: [2, 5]
+    carbonaceous_organic: [0, 3]
+    carbonate_salts: [2, 5]
     S:     [2, 6]
   sum_check: 97.25  # bulk; remainder is minor/trace phases
+  stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [2.0, 5.0]
+      sources:
+        - "Tomeoka & Buseck 1988"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -972,13 +984,25 @@ cm_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.5
     H2O:    9.0     # structural, in phyllosilicates
-    carbonaceous_organic: 2.25  # generic organics + carbonates bucket
+    carbonaceous_organic: 0.25  # organics remainder after carbonate carrier split (was 2.25 lump)
+    carbonate_salts: 2.0  # carrier key alias carbonate; vein carbonate; interval_required
     S:      3.0     # predominantly sulfides
   composition_ranges:
     H2O:   [6, 12]
-    carbonaceous_organic: [1.5, 3]
+    carbonaceous_organic: [0, 2]
+    carbonate_salts: [2, 4]
     S:     [2, 4]
   sum_check: 91.0   # approximate; source data incomplete for CM oxides
+  stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [2.0, 4.0]
+      sources:
+        - "Tomeoka & Buseck 1988"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -1030,12 +1054,51 @@ ceres_regolith:
     Na2O:   0.75
     NiO:    1.5
     H2O:   20.0    # ice + structural; poles/bright spots much higher
-    carbonaceous_organic: 17.5  # ultra-carbonaceous organics bucket
+    carbonaceous_organic: 13.1  # organics + unallocated brine_salts mass (brine split deferred; see stage0_carrier_keys)
+    carbonate_salts: 2.75  # carrier key alias carbonate; Mg/Ca/Na carbonate; not_speciated mass
+    NH3:    1.65    # ammoniated phyllosilicate degas; nh4_clay carrier alias
     S:      3.5
   composition_ranges:
     H2O_ice_structural_kg_per_tonne: [120, 280]
-    carbonaceous_organic_wt_pct: [15, 20]
+    carbonaceous_organic_wt_pct: [11, 19]
+    carbonate_salts: [1.5, 4.0]
+    NH3: [0.8, 2.5]
   sum_check: 115.25  # bulk with massive C and H2O; volatile-dominated
+  stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      not_speciated: true
+      carbonate_c_share: interval
+      level_range_wt_pct: [1.5, 4.0]
+      sources:
+        - "De Sanctis 2015/2016"
+        - "Dawn VIR 3.95 um"
+    nh4_clay:
+      composition_key: NH3
+      reaction_family: complete_oxidation
+      stage0_components_set: STAGE0_GAS_COMPONENTS
+      partly_grounded: true
+      level_range_wt_pct: [0.8, 2.5]
+      sources:
+        - "De Sanctis 2015"
+        - "Ammannito 2016"
+        - "Dawn VIR 3.1 um"
+    brine_salts:
+      composition_keys: [NaCl, MgSO4]
+      reaction_family: volatilization
+      stage0_components_set: STAGE0_CHLORIDE_SALT_COMPONENTS
+      partly_grounded: true
+      not_speciated: true
+      interval_required: true
+      allocated_wt_pct: 0.0
+      level_range_wt_pct: [0.5, 2.0]
+      note: >
+        Carrier key for OD-6 binding; mass remains in carbonaceous_organic until
+        brine NaCl/MgSO4 composition split is grounded (core Stage-0 routing gap).
+      sources:
+        - "Neveu & Desch 2015"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -1263,6 +1326,20 @@ mars_global_mgs1:
 mars_basalt:
   label: "Mars Basalt (General)"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carrier_keys:
+    sulfate_decomp:
+      composition_key: SO3
+      reaction_family: sulfate_decomp
+      onset_C: 1200
+      mixed_cation_onset: true
+      regime_caveat: >
+        Models mixed Mars sulfate via bulk SO3 with CaSO4-like ~1200 C onset;
+        real Meridiani Fe-sulfate is jarosite KFe3(SO4)2(OH)6 (carries structural
+        OH + K) — H2O/K2O release not modeled; FeSO4 early-clear physics deferred.
+      sources:
+        - "Squyres 2004"
+        - "Yen 2005"
+        - "Kanari 2018"
   stage0_carbon_cleanup:
     carbon_reductant_kg_per_tonne: [20, 40]
     reactions:
@@ -1325,6 +1402,20 @@ mars_basalt:
 mars_sulfate_rich:
   label: "Mars Sulfate-Rich Soil"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carrier_keys:
+    sulfate_decomp:
+      composition_key: SO3
+      reaction_family: sulfate_decomp
+      onset_C: 1200
+      mixed_cation_onset: true
+      regime_caveat: >
+        Models mixed Mars sulfate via bulk SO3 with CaSO4-like ~1200 C onset;
+        real Meridiani Fe-sulfate is jarosite KFe3(SO4)2(OH)6 (carries structural
+        OH + K) — H2O/K2O release not modeled; FeSO4 early-clear physics deferred.
+      sources:
+        - "Squyres 2004"
+        - "Yen 2005"
+        - "Kanari 2018"
   stage0_carbon_cleanup:
     carbon_reductant_kg_per_tonne: [30, 60]
     reactions:
