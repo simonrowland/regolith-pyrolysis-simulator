@@ -27,7 +27,7 @@ Stage 0 is meant to strip non-rock species (volatiles, salts, sulfides, native m
 
 ### Mechanism
 
-Stage-0 clearance is primarily **name-routing** (clean-by-fiat), not reductant-driven thermodynamics. Raw feedstock components are matched by normalized name strings against constant sets in `simulator/core.py` and dropped whole into terminal buckets (`terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.stage0_sulfide_matte`, `terminal.drain_tap_material`, `terminal.slag`) with no reaction and no reagent debit. `MeltState` receives only the 14 `OXIDE_SPECIES` oxides — a structural filter, not a chemistry outcome.
+Stage-0 clearance is primarily **name-routing** (clean-by-fiat), not reductant-driven thermodynamics. Raw feedstock components are matched by normalized name strings against constant sets in `simulator/core.py` and dropped whole into terminal buckets (`terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.stage0_chloride_salt_phase`, `terminal.stage0_sulfide_matte`, `terminal.drain_tap_material`, `terminal.slag`) with no reaction and no reagent debit. `MeltState` receives only the 14 `OXIDE_SPECIES` oxides — a structural filter, not a chemistry outcome.
 
 Reagent-consuming stoichiometry exists in **four gated reaction families only** (kernel `STAGE0_PRETREATMENT` intent):
 
@@ -60,8 +60,8 @@ The model asserts clearance that a real carbothermal/oxidative bake at furnace-s
 
 **P2 — clearance overstated or unmodeled**
 
-- **Fluorides (CaF₂)** — matched by bare name `f` and routed to salt phase as "cleared." CaF₂ is refractory (b.p. ~2530 °C); C/CO/O₂ at furnace-survivable T will not gasify it. It belongs in the refractory rump or melt, not a removed salt phase.
-- **Chlorides (Cl, NaCl, KCl, halide)** — separated to a salt bucket, not gasified. NaCl (b.p. ~1465 °C) and KCl (~1420 °C) **volatilize under mbar vacuum** at Stage-0 temperatures and **re-condense on cold walls** — the same wall-fouling failure mode tracked elsewhere in the simulator. Perchlorate decomposition is real, but the chloride product lands in the salt residue; calling this "cleared" overstates gasification.
+- **Fluorides (CaF₂)** — explicit keys (`CaF2`, `NaF`, `fluorite`, `fluoride`) only; bare `f` is rejected. Refractory CaF₂/MgF₂ route to `terminal.slag` (rump), not a removed salt phase. HF-route defluorination (SiO₂ + steam) is out-of-scope.
+- **Chlorides (Cl, NaCl, KCl, halide)** — routed to `terminal.stage0_chloride_salt_phase` as **separated chloride salt at re-condensation/fouling risk**, not gasified clearance. NaCl (b.p. ~1465 °C) and KCl (~1420 °C) **volatilize under mbar vacuum** at Stage-0 temperatures and **re-condense on cold walls**. Perchlorate decomposition is real; the chloride product lands in the same fouling-risk bucket.
 - **Nitrates** — zero coverage: no name match, no constant, no reaction, no catalog entry. A declared nitrate would land in `residual_components_kg` (carried, never cleared) or raise. Real decomposition (`MNO₃ → MO + NOₓ↑`) is easy chemistry at 400–900 °C but unmodeled. Low impact for typical regolith feedstocks, but an honest coverage hole.
 
 For file:line anchors and the full per-species verdict table, see the audit linked above.

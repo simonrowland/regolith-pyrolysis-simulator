@@ -78,7 +78,7 @@ The provider:
     legacy ``spec['debits']`` tuple of
     ``(account, {species: kg})`` entries.  Used verbatim.
   * ``salt_products_kg`` (perchlorate only) -- credit to
-    ``terminal.stage0_salt_phase``.
+    ``terminal.stage0_chloride_salt_phase``.
   * ``oxygen_products_kg`` (perchlorate only) -- credit to
     ``terminal.oxygen_stage0_stored``.
 
@@ -119,8 +119,8 @@ write):
   CO2 atmospheric source kg before dispatch.
 * ``terminal.offgas`` -- credit; carbonaceous CO2/H2O/N2 + sulfate
   SO2/CO + Boudouard CO go here.
-* ``terminal.stage0_salt_phase`` -- credit; perchlorate Cl- product
-  lands here.
+* ``terminal.stage0_chloride_salt_phase`` -- credit; perchlorate Cl-
+  product lands here (separated chloride salt at fouling risk).
 * ``terminal.oxygen_stage0_stored`` -- credit; perchlorate O2 product
   AND the carbonaceous-degas O2 coproduct (when feed is oxygen-rich)
   land here.
@@ -216,7 +216,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # Terminal sinks (credited; canonical commit path supports terminal
     # credits per AtomLedger._validate_terminal_debits):
     #   terminal.offgas                (CO2/H2O/N2/SO2/CO offgas)
-    #   terminal.stage0_salt_phase     (perchlorate Cl- product)
+    #   terminal.stage0_chloride_salt_phase (perchlorate Cl- product;
+    #       separated chloride salt at re-condensation/fouling risk)
     #   terminal.oxygen_stage0_stored  (perchlorate + carbonaceous O2)
     DECLARED_ACCOUNTS = frozenset({
         "process.stage0_volatile_feed",
@@ -229,6 +230,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "reservoir.stage0_process_gas",
         "terminal.offgas",
         "terminal.stage0_salt_phase",
+        "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
     })
@@ -771,7 +773,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # perchlorate: ClO4 -> Cl + 2 O2.  Mirrors the legacy spec built by
     # _apply_stage0_perchlorate_reactions: debit
     # process.stage0_perchlorate_feed (ClO4) + credit
-    # terminal.stage0_salt_phase (Cl) + credit
+    # terminal.stage0_chloride_salt_phase (Cl) + credit
     # terminal.oxygen_stage0_stored (O2).
     # ------------------------------------------------------------------
 
@@ -833,7 +835,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             formula = resolve_species_formula(str(species), registry)
             salt_mol[str(species)] = kg_val / formula.molar_mass_kg_per_mol()
         if salt_mol:
-            credits_mol["terminal.stage0_salt_phase"] = salt_mol
+            credits_mol["terminal.stage0_chloride_salt_phase"] = salt_mol
 
         oxygen_mol: dict[str, float] = {}
         for species, kg in oxygen_products_kg.items():

@@ -389,6 +389,7 @@ class ProcessInventory:
     stage0_products_kg: Dict[str, float] = field(default_factory=dict)
     gas_volatiles_kg: Dict[str, float] = field(default_factory=dict)
     salt_phase_kg: Dict[str, float] = field(default_factory=dict)
+    chloride_salt_phase_kg: Dict[str, float] = field(default_factory=dict)
     cation_sulfate_feed_kg: Dict[str, float] = field(default_factory=dict)
     sulfide_matte_kg: Dict[str, float] = field(default_factory=dict)
     metal_alloy_kg: Dict[str, float] = field(default_factory=dict)
@@ -409,6 +410,7 @@ class ProcessInventory:
             stage0_products_kg=dict(self.stage0_products_kg),
             gas_volatiles_kg=dict(self.gas_volatiles_kg),
             salt_phase_kg=dict(self.salt_phase_kg),
+            chloride_salt_phase_kg=dict(self.chloride_salt_phase_kg),
             cation_sulfate_feed_kg=dict(self.cation_sulfate_feed_kg),
             sulfide_matte_kg=dict(self.sulfide_matte_kg),
             metal_alloy_kg=dict(self.metal_alloy_kg),

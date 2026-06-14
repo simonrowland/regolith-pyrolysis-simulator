@@ -155,10 +155,26 @@ STRICT_STAGE0_FORMULA_COMPONENTS = {
     'carbonaceous_organic',
 }
 STAGE0_SALT_COMPONENTS = {
-    'cl', 'f', 'clo4', 'so3', 'nacl', 'kcl', 'salt', 'salts',
-    'perchlorate', 'perchlorates', 'sulfate', 'sulfates', 'halide',
-    'halides',
+    'clo4', 'so3', 'salt', 'salts',
+    'perchlorate', 'perchlorates', 'sulfate', 'sulfates',
 }
+STAGE0_CHLORIDE_SALT_COMPONENTS = {
+    'cl', 'nacl', 'kcl', 'halide', 'halides', 'nacl_kcl_salts',
+}
+# CaF2/MgF2 survive furnace T; HF-route defluorination (SiO2 + steam) is out-of-scope.
+STAGE0_REFRACTORY_FLUORIDE_COMPONENTS = {
+    'caf2', 'mgf2', 'fluorite',
+}
+STAGE0_VOLATILE_FLUORIDE_COMPONENTS = {
+    'naf', 'fluoride', 'fluorides',
+}
+STAGE0_UNMODELED_NITRATE_MARKERS = frozenset({
+    'nitrate', 'nitrates', 'no3',
+})
+STAGE0_CHLORIDE_SALT_ACCOUNT = 'terminal.stage0_chloride_salt_phase'
+STAGE0_CHLORIDE_SALT_DISPOSITION = (
+    'separated_chloride_salt_fouling_risk'
+)
 STAGE0_CARBONATE_COMPONENTS = frozenset({
     'carbonate', 'carbonates', 'carbonate_salts',
 })
@@ -207,6 +223,7 @@ FLOW_MASS_ACCOUNTS = (
     'process.reagent_inventory',
     'terminal.offgas',
     'terminal.stage0_salt_phase',
+    STAGE0_CHLORIDE_SALT_ACCOUNT,
     'terminal.stage0_sulfide_matte',
     'terminal.drain_tap_material',
     'terminal.slag',
@@ -1776,10 +1793,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             generated_offgas_kg,
             context=f'{label} Stage 0 oxidation products',
         )
-        terminal_salt_external = self._subtract_species_kg(
-            self.inventory.salt_phase_kg,
+        terminal_salt_external = dict(self.inventory.salt_phase_kg)
+        terminal_chloride_external = self._subtract_species_kg(
+            self.inventory.chloride_salt_phase_kg,
             perchlorate_salt_kg,
-            context=f'{label} Stage 0 salt products',
+            context=f'{label} Stage 0 chloride salt products',
         )
         kernel_credited_melt_kg = dict(carbonate_oxide_kg)
         self._merge_masses(kernel_credited_melt_kg, cation_sulfate_oxide_kg)
@@ -1813,6 +1831,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'terminal.stage0_salt_phase',
             terminal_salt_external,
             source=f'{label} Stage 0 salt phase',
+        )
+        self._load_ledger_account(
+            STAGE0_CHLORIDE_SALT_ACCOUNT,
+            terminal_chloride_external,
+            source=(
+                f'{label} Stage 0 separated chloride salt '
+                '(re-condensation/fouling risk)'
+            ),
         )
         self._load_ledger_account(
             'terminal.stage0_sulfide_matte',
@@ -2137,7 +2163,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         spec is dispatched as ``perchlorate`` family (ClO4 -> Cl +
         2 O2) -- the provider emits a :class:`LedgerTransitionProposal`
         debiting ``process.stage0_perchlorate_feed`` (ClO4) and
-        crediting ``terminal.stage0_salt_phase`` (Cl) + ``terminal.
+        crediting ``terminal.stage0_chloride_salt_phase`` (Cl) + ``terminal.
         oxygen_stage0_stored`` (O2).
         :meth:`ChemistryKernel.commit_batch` is the sole writable path
         into the ledger for this intent after the flip; the legacy
@@ -3247,7 +3273,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.inventory.salt_phase_kg, 'ClO4', clo4_kg)
         self._decrease_inventory_species(
             self.inventory.stage0_products_kg, 'ClO4', clo4_kg)
-        self._merge_masses(self.inventory.salt_phase_kg, salt_products_kg)
+        self._merge_masses(
+            self.inventory.chloride_salt_phase_kg, salt_products_kg)
         self._merge_masses(self.inventory.stage0_products_kg, salt_products_kg)
         specs = [{
             'name': 'stage0_perchlorate_cleanup',
@@ -3290,6 +3317,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             feedstock.get('structural_water', {}) or {}, mass_kg)
         self._merge_masses(raw, structural)
         self._normalize_component_masses(raw, mass_kg)
+        self._validate_stage0_unmodeled_nitrate_components(raw)
         unbacked_declared_kg = self._unbacked_declared_stage0_products_kg(
             declared_stage0_buckets, raw)
         if unbacked_declared_kg > 1e-9:
@@ -3389,6 +3417,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             stage0_products_kg=stage0_products,
             gas_volatiles_kg=buckets['gas_volatiles'],
             salt_phase_kg=buckets['salt_phase'],
+            chloride_salt_phase_kg=buckets['chloride_salt_phase'],
             cation_sulfate_feed_kg=buckets['cation_sulfate_feed'],
             sulfide_matte_kg=buckets['sulfide_matte'],
             metal_alloy_kg=buckets['metal_alloy'],
@@ -3989,6 +4018,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return {
             'gas_volatiles': {},
             'salt_phase': {},
+            'chloride_salt_phase': {},
             'carbonate_feed': {},
             'cation_sulfate_feed': {},
             'sulfide_matte': {},
@@ -4028,7 +4058,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buckets: Mapping[str, Mapping[str, float]]
     ) -> Dict[str, float]:
         products: Dict[str, float] = {}
-        for bucket_name in ('gas_volatiles', 'salt_phase', 'sulfide_matte'):
+        for bucket_name in (
+            'gas_volatiles', 'salt_phase', 'chloride_salt_phase', 'sulfide_matte',
+        ):
             bucket = buckets.get(bucket_name, {})
             for component, kg in bucket.items():
                 products[component] = products.get(component, 0.0) + kg
@@ -4103,6 +4135,54 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return str(component).strip() in STAGE0_CATION_SULFATE_OXIDE_PRODUCTS
 
     @classmethod
+    def _is_stage0_nitrate_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        if key in STAGE0_UNMODELED_NITRATE_MARKERS:
+            return True
+        if 'nitrate' in key:
+            return True
+        if key.endswith('no3') or key.endswith('_no3'):
+            return True
+        return False
+
+    @classmethod
+    def _validate_stage0_unmodeled_nitrate_components(
+        cls, raw: Mapping[str, float]
+    ) -> None:
+        for component, kg in raw.items():
+            if kg <= 0.0:
+                continue
+            if cls._is_stage0_nitrate_component(component):
+                raise ValueError(
+                    f'Stage 0 does not model nitrate component {component!r}; '
+                    'nitrates are unmodeled — use an oxide surrogate or '
+                    'remove the nitrate key'
+                )
+            key = cls._normalized_component_key(component)
+            if key == 'f':
+                raise ValueError(
+                    "Stage 0 fluoride routing requires an explicit key "
+                    "(CaF2, NaF, fluorite, fluoride); bare 'f' is not accepted"
+                )
+
+    @classmethod
+    def _is_stage0_refractory_fluoride_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        return key in STAGE0_REFRACTORY_FLUORIDE_COMPONENTS
+
+    @classmethod
+    def _is_stage0_volatile_fluoride_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        return key in STAGE0_VOLATILE_FLUORIDE_COMPONENTS
+
+    @classmethod
+    def _is_stage0_chloride_salt_component(cls, component: str) -> bool:
+        key = cls._normalized_component_key(component)
+        if key in STAGE0_CHLORIDE_SALT_COMPONENTS:
+            return True
+        return key.startswith(('nacl', 'kcl'))
+
+    @classmethod
     def _stage0_bucket_for_name(cls, component: str) -> Optional[str]:
         key = cls._normalized_component_key(component)
         if key in STAGE0_GAS_COMPONENTS or key.startswith('h2o'):
@@ -4113,9 +4193,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 'carbonate_feed'
         if cls._is_stage0_cation_sulfate_component(component):
             return 'cation_sulfate_feed'
+        if cls._is_stage0_refractory_fluoride_component(component):
+            return 'terminal_slag'
+        if cls._is_stage0_volatile_fluoride_component(component):
+            return 'chloride_salt_phase'
+        if cls._is_stage0_chloride_salt_component(component):
+            return 'chloride_salt_phase'
         if key in STAGE0_SALT_COMPONENTS:
             return 'salt_phase'
-        if key.startswith(('nacl', 'kcl', 'sulfuric_acid')):
+        if key.startswith('sulfuric_acid'):
             return 'salt_phase'
         if key in STAGE0_SULFIDE_COMPONENTS:
             return 'sulfide_matte'

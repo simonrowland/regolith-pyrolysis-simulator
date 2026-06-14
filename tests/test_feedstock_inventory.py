@@ -127,8 +127,8 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert "REE_oxides" not in inv.stage0_products_kg
     assert inv.gas_volatiles_kg["C"] == pytest.approx(21.100917)
     assert inv.salt_phase_kg["SO3"] == pytest.approx(36.697248)
-    assert inv.salt_phase_kg["Cl"] == pytest.approx(9.174312)
     assert inv.salt_phase_kg["ClO4"] == pytest.approx(4.587156)
+    assert inv.chloride_salt_phase_kg["Cl"] == pytest.approx(9.174312)
     assert inv.sulfide_matte_kg["S"] == pytest.approx(45.871560)
     assert inv.sulfide_matte_kg["FeS_troilite"] == pytest.approx(50.458716)
     assert inv.metal_alloy_kg["Fe"] == pytest.approx(55.045872)
@@ -749,7 +749,7 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     assert "SO3" not in sim.melt.composition_kg
     assert "Cl" not in sim.melt.composition_kg
     assert inv.salt_phase_kg.get("SO3", 0.0) == pytest.approx(0.0)
-    assert inv.salt_phase_kg["Cl"] == pytest.approx(8.060692)
+    assert inv.chloride_salt_phase_kg["Cl"] == pytest.approx(8.060692)
     assert "sulfuric_acid_feedstock" not in inv.salt_phase_kg
     assert "O2_extra" not in inv.gas_volatiles_kg
     assert "SO3" not in inv.residual_components_kg
@@ -992,7 +992,7 @@ def test_perchlorate_cleanup_routes_o2_to_oxygen_ledger():
     extent_mol = clo4_kg / molar["ClO4"]
 
     assert sim.inventory.salt_phase_kg.get("ClO4", 0.0) == pytest.approx(0.0)
-    assert sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")[
+    assert sim.atom_ledger.kg_by_account("terminal.stage0_chloride_salt_phase")[
         "Cl"
     ] == pytest.approx(extent_mol * molar["Cl"])
     stage0_o2_kg = 2.0 * extent_mol * molar["O2"]

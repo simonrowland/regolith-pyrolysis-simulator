@@ -427,6 +427,13 @@ def _tick_payload(
                 k: round(v, 3)
                 for k, v in snapshot.inventory.salt_phase_kg.items()
             },
+            'chloride_salt_phase': {
+                'disposition': 'separated_chloride_salt_fouling_risk',
+                'components_kg': {
+                    k: round(v, 3)
+                    for k, v in snapshot.inventory.chloride_salt_phase_kg.items()
+                },
+            },
             'sulfide_matte': {
                 k: round(v, 3)
                 for k, v in snapshot.inventory.sulfide_matte_kg.items()

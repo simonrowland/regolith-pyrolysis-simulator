@@ -99,6 +99,7 @@ def test_provider_declares_exactly_twelve_stage0_accounts():
         "reservoir.stage0_process_gas",
         "terminal.offgas",
         "terminal.stage0_salt_phase",
+        "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
     })
@@ -263,7 +264,7 @@ def test_kernel_commit_rejects_atom_unbalanced_perchlorate_proposal(
             "process.stage0_perchlorate_feed": {"ClO4": 1.0},
         },
         credits={
-            "terminal.stage0_salt_phase": {"Cl": 1.0},
+            "terminal.stage0_chloride_salt_phase": {"Cl": 1.0},
             "terminal.oxygen_stage0_stored": {"O2": 1.0},  # should be 2.0
         },
         reason="malformed_perchlorate_proposal_for_test",
@@ -342,7 +343,7 @@ def test_kernel_commit_accepts_balanced_perchlorate_proposal(
             "process.stage0_perchlorate_feed": {"ClO4": 0.001},
         },
         credits={
-            "terminal.stage0_salt_phase": {"Cl": 0.001},
+            "terminal.stage0_chloride_salt_phase": {"Cl": 0.001},
             "terminal.oxygen_stage0_stored": {"O2": 0.002},
         },
         reason="balanced_perchlorate_proposal_for_test",
@@ -506,7 +507,7 @@ def test_perchlorate_matches_legacy_stoich(
     # Atom balance closes independently.
     _atom_check(proposal, sim.species_formula_registry, tol=1e-9)
     # Cl mol matches extent_mol exactly within IEEE round-off.
-    cl_mol = proposal.credits["terminal.stage0_salt_phase"]["Cl"]
+    cl_mol = proposal.credits["terminal.stage0_chloride_salt_phase"]["Cl"]
     assert abs(cl_mol - extent_mol) < 1e-12
     o2_mol = proposal.credits["terminal.oxygen_stage0_stored"]["O2"]
     assert abs(o2_mol - 2.0 * extent_mol) < 1e-12
@@ -803,7 +804,7 @@ def test_full_batch_stage0_kernel_credits_mars_perchlorate_to_declared_accounts(
 ):
     """Mars basalt loads with perchlorate Stage 0 cleanup.  After the
     flip the perchlorate product (Cl) lands in
-    ``terminal.stage0_salt_phase`` and O2 lands in
+    ``terminal.stage0_chloride_salt_phase`` and O2 lands in
     ``terminal.oxygen_stage0_stored`` -- both inside the provider's
     declared accounts.  The kernel account-filter gate would have
     raised at commit time if a future refactor leaked the credit
@@ -817,11 +818,12 @@ def test_full_batch_stage0_kernel_credits_mars_perchlorate_to_declared_accounts(
         setpoints_data,
         additives_kg={"C": 50.0},
     )
-    salt = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
+    chloride_salt = sim.atom_ledger.kg_by_account(
+        "terminal.stage0_chloride_salt_phase")
     o2_stage0 = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_stage0_stored")
     # Perchlorate produces Cl and O2; sulfate-carbon doesn't.
-    assert salt.get("Cl", 0.0) > 0.0
+    assert chloride_salt.get("Cl", 0.0) > 0.0
     assert o2_stage0.get("O2", 0.0) > 0.0
 
 

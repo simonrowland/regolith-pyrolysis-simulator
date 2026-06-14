@@ -68,6 +68,7 @@ class AccountingQueries:
         for account in (
             "terminal.offgas",
             "terminal.stage0_salt_phase",
+            "terminal.stage0_chloride_salt_phase",
             "terminal.stage0_sulfide_matte",
             "terminal.drain_tap_material",
             CHROMIUM_CONDENSED_OXIDE_ACCOUNT,

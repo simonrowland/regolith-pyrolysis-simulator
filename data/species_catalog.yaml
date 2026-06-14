@@ -340,6 +340,26 @@ species:
     category: salt
     estimated: false
     source: Stoichiometric salt formula from species id.
+  - id: CaF2
+    formula: CaF2
+    basis: mineral_formula
+    category: refractory_salt
+    estimated: false
+    aliases:
+      - fluorite
+    source: Calcium fluoride (fluorite); refractory at furnace-survivable T (b.p. ~2530 C).
+  - id: NaF
+    formula: NaF
+    basis: molecular_formula
+    category: salt
+    estimated: false
+    source: Sodium fluoride; volatile under mbar vacuum at Stage-0 T (b.p. ~1695 C).
+  - id: MgF2
+    formula: MgF2
+    basis: mineral_formula
+    category: refractory_salt
+    estimated: false
+    source: Magnesium fluoride; refractory at furnace-survivable T (b.p. ~2260 C).
   - id: sulfuric_acid_feedstock
     formula: H2SO4
     basis: molecular_formula
