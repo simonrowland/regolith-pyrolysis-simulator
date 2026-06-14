@@ -92,8 +92,12 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
         (CampaignPhase.C4, 6, 25.0, _flux(Mg=0.019), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C4, 20, 25.0, _flux(Mg=9.0), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C5, 14, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C5, 15, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C5, 30, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C5, 15, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, False),
+        (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 1, False),
+        (CampaignPhase.C5, 10, 25.0, _flux(), BatchRecord(branch="two"), None, 1.6, 4.0, 3, True),
+        (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C5, 799, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, False),
+        (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
         (
             CampaignPhase.C6,
             0,
@@ -170,8 +174,8 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
     }
     assert campaigns["C4"]["max_hold_hr"] == 20
     assert campaigns["C5"]["max_hold_hr"] == {
-        "branch_two": 15,
-        "branch_one": 30,
+        "branch_two": 800,
+        "branch_one": 800,
     }
     assert campaigns["mre_baseline"]["max_hold_hr"] == 120
     assert campaigns["C6"]["max_hold_hr"] == 20

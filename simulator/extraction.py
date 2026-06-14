@@ -470,7 +470,10 @@ class ExtractionMixin:
         Voltage strategy:
             C5 (limited MRE):    Stepped holds at Ellingham thresholds up to the
                                  selected EvalSpec target/max voltage.
-                                 Extracts only the selected C5 ladder prefix.
+                                 ``allowed_oxides`` is an operator stage-targeting
+                                 prefix filter (ladder steps through the EvalSpec
+                                 target); Nernst + the voltage cap already govern
+                                 which species are physically reducible.
                                  Electrode life 5-10× longer than full MRE.
 
             MRE_BASELINE:        Stepped holds at each Ellingham threshold (0.6→2.5 V).
@@ -537,6 +540,7 @@ class ExtractionMixin:
                         self._mre_hold_hours = 0
 
             current_A = 3000.0  # Full-scale MRE: ~60 kA/m² at 0.05 m²
+            c5_allowed_oxides = None
         else:
             # C5 limited MRE: EvalSpec/session fields are behavior determinants.
             target = str(getattr(self.melt, 'mre_target_species', '') or '')
@@ -546,18 +550,18 @@ class ExtractionMixin:
                 )
                 or 0.0
             )
-            if target:
-                target_max = mre_ladder.max_voltage_for_target(
+            ladder_cap_V = configured_max
+            if ladder_cap_V <= 0.0 and target:
+                ladder_cap_V = mre_ladder.max_voltage_for_target(
                     target, self._mre_voltage_sequence
                 )
-                if target_max > 0.0 and configured_max > 0.0:
-                    selected_max = min(target_max, configured_max)
-                else:
-                    selected_max = target_max
-            else:
-                selected_max = configured_max
+            allowed_oxides = mre_ladder.allowed_oxides_for_target(
+                target,
+                self._mre_voltage_sequence,
+                ladder_cap_V,
+            )
             seq = mre_ladder.filter_steps_up_to_max_v(
-                self._mre_voltage_sequence, selected_max
+                self._mre_voltage_sequence, ladder_cap_V
             )
             if not seq:
                 self._mre_metals_this_hr = {}
@@ -577,13 +581,18 @@ class ExtractionMixin:
                 self._mre_hold_hours += 1
                 if (self._mre_hold_hours >= step_info.get('min_hold_hours', 3)
                         and idx < len(seq) - 1):
+                    c5_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
                     target_current_low = (
-                        self._mre_effective_current_A < 100.0 * 0.05)
+                        self._mre_effective_current_A < c5_current_A * 0.05)
                     if target_current_low:
                         self._mre_voltage_step_idx += 1
                         self._mre_hold_hours = 0
 
-            current_A = 100.0
+            current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
+            # Operator stage-targeting prefix; not a second Nernst gate.
+            c5_allowed_oxides = (
+                sorted(allowed_oxides) if allowed_oxides is not None else None
+            )
 
         # F-B1: dispatch + commit split via the _dispatch_only /
         # _commit_proposal helper pair so the per-account balance
@@ -593,13 +602,16 @@ class ExtractionMixin:
         # off the per-tick increment in process.metal_phase, not the
         # legacy result dict).  commit_batch is still the ONLY writable
         # path into the AtomLedger for ELECTROLYSIS_STEP.
+        electrolysis_controls = {
+            'voltage_V': float(voltage_V),
+            'current_A': float(current_A),
+            'dt_hr': 1.0,
+        }
+        if c5_allowed_oxides is not None:
+            electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
-            control_inputs={
-                'voltage_V': float(voltage_V),
-                'current_A': float(current_A),
-                'dt_hr': 1.0,
-            },
+            control_inputs=electrolysis_controls,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         result = diagnostic  # legacy variable name -- same shape as step_hour's dict.
@@ -706,6 +718,7 @@ class ExtractionMixin:
                 self.record.additives_kg.get('K', 0.0),
             )
             self._transfer_condensed_species('K')
+            self._transfer_condensed_species('Na')
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             na_additive_kg = self.record.additives_kg.get('Na', 0.0)
             if na_additive_kg > self._LEDGER_KG_TOL:
@@ -713,7 +726,8 @@ class ExtractionMixin:
                     'Na',
                     na_additive_kg,
                 )
-                self._transfer_condensed_species('Na')
+                self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
+            else:
                 self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_K = 0
 
@@ -723,7 +737,9 @@ class ExtractionMixin:
                 self.record.additives_kg.get('Na', 0.0),
             )
             self._transfer_condensed_species('Na')
+            self._transfer_condensed_species('K')
             self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
+            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             self.shuttle_cycle_Na = 0
 
     def _step_shuttle(self):

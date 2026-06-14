@@ -21,6 +21,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from simulator import mre_ladder
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -958,12 +959,47 @@ class CampaignManager:
                 return True
 
         elif campaign == CampaignPhase.C5:
+            endpoint = self._configured_endpoint(campaign, 'endpoint')
             if record.branch == 'two':
+                branch_cfg = self._campaign_config(campaign).get('branch_two', {})
+                default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 1.6)
                 max_hold_hr = self._configured_max_hold_hr(
                     campaign, 'branch_two')
             else:
+                branch_cfg = self._campaign_config(campaign).get('branch_one', {})
+                default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 2.5)
                 max_hold_hr = self._configured_max_hold_hr(
                     campaign, 'branch_one')
+            configured_cap_V = (
+                mre_ladder.coerce_mre_decomposition_voltage(
+                    getattr(melt, 'mre_max_voltage_V', 0.0)
+                )
+                or 0.0
+            )
+            voltage_cap_V = (
+                configured_cap_V if configured_cap_V > 0.0 else default_cap_V
+            )
+            at_cap_margin_V = self._float(
+                endpoint.get('at_voltage_margin_V'),
+                mre_ladder.C5_DEPLETION_AT_CAP_MARGIN_V,
+            )
+            threshold_A = self._float(
+                endpoint.get('threshold_A'),
+                mre_ladder.C5_DEPLETION_LOW_CURRENT_A,
+            )
+            consecutive_hours = int(
+                self._float(
+                    endpoint.get('consecutive_hours'),
+                    mre_ladder.C5_DEPLETION_CONSECUTIVE_HOURS,
+                )
+            )
+            at_cap = melt.mre_voltage_V >= (voltage_cap_V - at_cap_margin_V)
+            if at_cap and melt.mre_current_A < threshold_A:
+                melt.mre_low_current_hours += 1
+            else:
+                melt.mre_low_current_hours = 0
+            if melt.mre_low_current_hours >= consecutive_hours:
+                return True
             if melt.campaign_hour >= max_hold_hr:
                 return True
 

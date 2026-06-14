@@ -199,10 +199,11 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     sim._step_mre()
 
     assert captured["voltage_V"] == pytest.approx(1.7)
-    assert captured["current_A"] == pytest.approx(100.0)
+    assert captured["current_A"] == pytest.approx(mre_ladder.C5_LIMITED_MRE_CURRENT_A)
+    assert captured["allowed_oxides"] == ["SiO2"]
 
 
-def test_step_mre_never_exceeds_selected_target_max_voltage():
+def test_step_mre_restricts_reducible_oxides_to_target_prefix():
     setpoints = {
         "campaigns": {},
         "mre_voltage_sequence": {
@@ -219,11 +220,11 @@ def test_step_mre_never_exceeds_selected_target_max_voltage():
     sim.melt.campaign = CampaignPhase.C5
     sim.melt.c5_enabled = True
     sim.melt.mre_target_species = "SiO2"
-    sim.melt.mre_max_voltage_V = 2.5
-    captured_voltages: list[float] = []
+    sim.melt.mre_max_voltage_V = 1.4
+    captured: list[dict] = []
 
     def fake_dispatch(_intent, *, control_inputs):
-        captured_voltages.append(control_inputs["voltage_V"])
+        captured.append(dict(control_inputs))
         return SimpleNamespace(
             diagnostic={
                 "energy_kWh": 0.0,
@@ -239,10 +240,8 @@ def test_step_mre_never_exceeds_selected_target_max_voltage():
     sim._project_extraction_melt = lambda: None
     sim._sync_oxygen_kg_counters = lambda: None
 
-    for _ in range(8):
-        sim._step_mre()
+    sim._step_mre()
 
-    assert captured_voltages
-    assert max(captured_voltages) == pytest.approx(1.4)
-    assert 1.5 not in captured_voltages
-    assert 2.5 not in captured_voltages
+    assert captured
+    assert captured[0]["allowed_oxides"] == ["FeO", "SiO2"]
+    assert captured[0]["voltage_V"] == pytest.approx(0.6)

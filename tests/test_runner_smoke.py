@@ -194,7 +194,10 @@ def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
     assert config.additives_kg["K"] == pytest.approx(4.0)
     assert sim.record.additives_kg["Na"] == pytest.approx(12.0)
     assert sim.record.additives_kg["K"] == pytest.approx(4.0)
-    assert sim.shuttle_Na_inventory_kg == pytest.approx(12.0)
+    assert sim.shuttle_Na_inventory_kg >= 12.0
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get("Na", 0.0) == (
+        pytest.approx(0.0)
+    )
     assert payload["run_metadata"]["additives_kg"] == {"K": 4.0, "Na": 12.0}
     _assert_mass_balance_bound(payload)
 

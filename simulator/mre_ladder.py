@@ -18,6 +18,11 @@ MRE_VOLTAGE_LADDER_FALLBACK = (
 )
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
+C5_LIMITED_MRE_CURRENT_A = 1000.0
+C5_DEPLETION_AT_CAP_MARGIN_V = 0.05
+C5_DEPLETION_LOW_CURRENT_A = 5.0
+C5_DEPLETION_CONSECUTIVE_HOURS = 3
+C5_DEPLETION_SAFETY_MAX_HOLD_HR = 800.0
 DISABLED_PRESET_TARGETS = {
     'Na2O': 'pre-depleted by C3; not a selectable C5 target',
     'K2O': 'pre-depleted by C3; not a selectable C5 target',
@@ -155,6 +160,28 @@ def max_voltage_for_target(
         if target in step['species']:
             return float(step['voltage'])
     return 0.0
+
+
+def allowed_oxides_for_target(
+    target_oxide: str,
+    ladder: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+    max_voltage_V: Any,
+) -> frozenset[str] | None:
+    """Return the operator stage-targeting oxide prefix through ``target_oxide``.
+
+    This is an EvalSpec/recipe selectivity filter (which ladder steps the
+    operator asked to run), not a Nernst-derived voltage gate — physical
+    reducibility is already enforced by the decomposition-voltage cap.
+    """
+    target = str(target_oxide or '').strip()
+    if not target:
+        return None
+    allowed: set[str] = set()
+    for step in filter_steps_up_to_max_v(ladder, max_voltage_V):
+        allowed.update(step['species'])
+        if target in step['species']:
+            break
+    return frozenset(allowed) if allowed else frozenset()
 
 
 def filter_steps_up_to_max_v(

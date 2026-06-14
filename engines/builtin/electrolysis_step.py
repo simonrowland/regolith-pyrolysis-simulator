@@ -208,11 +208,18 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
+        allowed_oxides_raw = controls.get("allowed_oxides")
+        allowed_oxides: set[str] | None = None
+        if allowed_oxides_raw:
+            allowed_oxides = {str(item) for item in allowed_oxides_raw if item}
+
         # Find all reducible species at this voltage. Mirrors
         # ElectrolysisModel.step_hour line-for-line: same E0 table,
         # same Nernst formula, same 1e-6 kg gate, same activity proxy.
         reducible: list[tuple[str, float, float, float]] = []
         for oxide in DECOMP_VOLTAGES:
+            if allowed_oxides is not None and oxide not in allowed_oxides:
+                continue
             if oxide not in composition_kg:
                 continue
             if composition_kg.get(oxide, 0.0) < 1e-6:

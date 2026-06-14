@@ -466,12 +466,14 @@ campaigns:
       life_extension_branch_two: "5-10x"
       life_extension_branch_one: "2-3x"
     endpoint:
-      type: "current_decay"
-      threshold_A: 10
+      type: "current_decay_consecutive_hours"
+      at_voltage_margin_V: 0.05
+      threshold_A: 5.0
+      consecutive_hours: 3
       at_voltage: "target V setpoint"
     max_hold_hr:
-      branch_two: 15
-      branch_one: 30
+      branch_two: 800
+      branch_one: 800
     termination_class: "A"
     duration_h: null                     # voltage-hold controlled
     notes: >
