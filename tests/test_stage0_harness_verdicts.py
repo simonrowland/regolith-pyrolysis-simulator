@@ -92,6 +92,16 @@ def test_ungrounded_large_interval_escalates_to_warning_via_max_before_after():
         "alphamelts",
         T_in_C=1400.0,
     )
+    assert adj.raw_liquidus_C == pytest.approx(1400.0)
+    assert adj.adjusted_liquidus_C == pytest.approx(1400.0)
+    assert adj.adjusted_liquidus_interval_C == pytest.approx((1300.0, 1375.0))
+    assert adj.adjusted_liquidus_provenance == ()
+    assert adj.adjusted_liquidus_interval_provenance
+    pert = adj.perturbations[0]
+    assert pert.raw_value is None
+    assert pert.adjusted_value is None
+    assert pert.interval == pytest.approx((-100.0, -25.0))
+    assert not pert.grounded
     flags = evaluate_verdict_a(adj.perturbations, hour=1)
     liquidus_flags = [f for f in flags if f.property == "liquidus"]
     assert liquidus_flags
@@ -102,6 +112,40 @@ def test_ungrounded_large_interval_escalates_to_warning_via_max_before_after():
         liquidus_flags[0].perturbation_before,
         liquidus_flags[0].perturbation_after,
     ) >= 2.0
+
+
+def test_unpinned_residual_reaches_verdict_a_noise_floor_flag_without_magnitude():
+    residual = {"Br": 5.0}
+    adj = melt_effect_adjustment(
+        residual,
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert any("no effect row for residual Br" in w for w in adj.warnings)
+    assert len(adj.perturbations) == 1
+    pert = adj.perturbations[0]
+    assert pert.property == "noise_floor"
+    assert pert.metric == "noise_floor_ungrounded"
+    assert pert.contaminant == "Br"
+    assert pert.residual_wt_pct == pytest.approx(5.0)
+    assert pert.raw_value is None
+    assert pert.adjusted_value is None
+    assert pert.perturbation_before is None
+    assert pert.perturbation_after is None
+
+    flags = evaluate_verdict_a(adj.perturbations, hour=1)
+    assert flags
+    flag = flags[0]
+    assert flag.contaminant == "Br"
+    assert flag.property == "noise_floor"
+    assert flag.metric == "noise_floor_ungrounded"
+    assert flag.noise_floor_status == "noise_floor_ungrounded"
+    assert flag.level == "WARNING"
+    assert flag.grounded is False
+    assert flag.residual_wt_pct == pytest.approx(5.0)
+    assert flag.perturbation_before is None
+    assert flag.perturbation_after is None
 
 
 def test_residual_bakes_out_clears_flag_step_resolved():

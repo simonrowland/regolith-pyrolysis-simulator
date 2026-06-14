@@ -138,8 +138,8 @@ class PropertyPerturbation:
     effect_row: str
     source: str
     residual_wt_pct: float
-    perturbation_before: float
-    perturbation_after: float
+    perturbation_before: float | None
+    perturbation_after: float | None
     metric: str
     grounded: bool
     raw_value: float | None = None
@@ -153,10 +153,11 @@ class PropertyFlag:
     level: str
     contaminant: str
     effect_row: str
-    perturbation_before: float
-    perturbation_after: float
+    perturbation_before: float | None
+    perturbation_after: float | None
     metric: str
     grounded: bool
+    residual_wt_pct: float
     hour: int
     active: bool = True
     cleared: bool = False
@@ -171,7 +172,9 @@ class MeltEffectAdjustmentResult:
     perturbations: tuple[PropertyPerturbation, ...]
     raw_liquidus_C: float | None
     adjusted_liquidus_C: float | None
+    adjusted_liquidus_interval_C: tuple[float, float] | None = None
     adjusted_liquidus_provenance: tuple[dict[str, Any], ...] = ()
+    adjusted_liquidus_interval_provenance: tuple[dict[str, Any], ...] = ()
     warnings: tuple[str, ...] = ()
 
 
@@ -356,7 +359,6 @@ def _compute_property_perturbation(
             - _liquidus_perturbation_pct(delta_low, T_in_C)
         )
         after = width
-        midpoint = (delta_low + delta_high) / 2.0
         return PropertyPerturbation(
             property=property_name,
             contaminant=species,
@@ -367,7 +369,7 @@ def _compute_property_perturbation(
             perturbation_after=after,
             metric="delta_T_frac_of_T_in_C",
             grounded=False,
-            raw_value=midpoint,
+            raw_value=None,
             adjusted_value=None,
             interval=(delta_low, delta_high),
         )
@@ -409,6 +411,23 @@ def _compute_property_perturbation(
     raise ValueError(f"unsupported effect mode {mode!r} for {property_name}")
 
 
+def _unmodeled_residual_perturbation(
+    species: str,
+    wt_pct: float,
+) -> PropertyPerturbation:
+    return PropertyPerturbation(
+        property="noise_floor",
+        contaminant=species,
+        effect_row="unmodeled_residual",
+        source="no matched contaminant effect row",
+        residual_wt_pct=float(wt_pct),
+        perturbation_before=None,
+        perturbation_after=None,
+        metric="noise_floor_ungrounded",
+        grounded=False,
+    )
+
+
 def request_certified_point(
     row_key: str,
     property_name: str,
@@ -442,6 +461,9 @@ def melt_effect_adjustment(
     perturbations: list[PropertyPerturbation] = []
     liquidus_delta = 0.0
     liquidus_prov: list[dict[str, Any]] = []
+    liquidus_interval_low = 0.0
+    liquidus_interval_high = 0.0
+    liquidus_interval_prov: list[dict[str, Any]] = []
     warnings: list[str] = []
 
     raw_liquidus = None
@@ -455,6 +477,9 @@ def melt_effect_adjustment(
             continue
         matched = _match_effect_row(species)
         if matched is None:
+            perturbations.append(
+                _unmodeled_residual_perturbation(species, float(wt_pct))
+            )
             warnings.append(
                 f"noise_floor_ungrounded: no effect row for residual {species} "
                 f"at {wt_pct:.4g} wt%"
@@ -472,7 +497,7 @@ def melt_effect_adjustment(
                 T_in_C=T_in_C,
             )
             perturbations.append(pert)
-            if prop_name == "liquidus" and pert.raw_value is not None:
+            if prop_name == "liquidus" and pert.grounded and pert.raw_value is not None:
                 liquidus_delta += float(pert.raw_value)
                 liquidus_prov.append({
                     "contaminant": species,
@@ -480,6 +505,17 @@ def melt_effect_adjustment(
                     "source": pert.source,
                     "delta_T_C": pert.raw_value,
                     "grounded": pert.grounded,
+                })
+            if prop_name == "liquidus" and not pert.grounded and pert.interval is not None:
+                delta_low, delta_high = pert.interval
+                liquidus_interval_low += float(delta_low)
+                liquidus_interval_high += float(delta_high)
+                liquidus_interval_prov.append({
+                    "contaminant": species,
+                    "effect_row": row_key,
+                    "source": pert.source,
+                    "interval_delta_T_C": pert.interval,
+                    "grounded": False,
                 })
             if not pert.grounded:
                 warnings.append(
@@ -490,6 +526,12 @@ def melt_effect_adjustment(
     adjusted_liquidus = None
     if raw_liquidus is not None:
         adjusted_liquidus = raw_liquidus + liquidus_delta
+    adjusted_liquidus_interval = None
+    if raw_liquidus is not None and liquidus_interval_prov:
+        adjusted_liquidus_interval = (
+            raw_liquidus + liquidus_interval_low,
+            raw_liquidus + liquidus_interval_high,
+        )
 
     return MeltEffectAdjustmentResult(
         effect_table_version=EFFECT_TABLE_VERSION,
@@ -498,7 +540,9 @@ def melt_effect_adjustment(
         perturbations=tuple(perturbations),
         raw_liquidus_C=raw_liquidus,
         adjusted_liquidus_C=adjusted_liquidus,
+        adjusted_liquidus_interval_C=adjusted_liquidus_interval,
         adjusted_liquidus_provenance=tuple(liquidus_prov),
+        adjusted_liquidus_interval_provenance=tuple(liquidus_interval_prov),
         warnings=tuple(warnings),
     )
 
@@ -515,6 +559,14 @@ def _property_thresholds(property_name: str, metric: str) -> tuple[float, float]
 
 def _classify_flag(pert: PropertyPerturbation) -> str | None:
     warn_thr, notice_thr = _property_thresholds(pert.property, pert.metric)
+    if pert.metric == "noise_floor_ungrounded":
+        if pert.residual_wt_pct >= warn_thr:
+            return "WARNING"
+        if pert.residual_wt_pct >= notice_thr:
+            return "NOTICE"
+        return None
+    if pert.perturbation_before is None or pert.perturbation_after is None:
+        return None
     severity = max(pert.perturbation_before, pert.perturbation_after)
     if severity >= warn_thr:
         return "WARNING"
@@ -551,6 +603,7 @@ def evaluate_verdict_a(
                 perturbation_after=pert.perturbation_after,
                 metric=pert.metric,
                 grounded=pert.grounded,
+                residual_wt_pct=pert.residual_wt_pct,
                 hour=hour,
                 noise_floor_status=noise_status,
             )
@@ -763,6 +816,7 @@ def build_harness_verdicts(
                     "perturbation_after": f.perturbation_after,
                     "metric": f.metric,
                     "grounded": f.grounded,
+                    "residual_wt_pct": f.residual_wt_pct,
                     "hour": f.hour,
                     "noise_floor_status": f.noise_floor_status,
                 }
@@ -806,8 +860,12 @@ def build_harness_verdicts(
             "effect_table_version": adjustment.effect_table_version,
             "raw_liquidus_C": adjustment.raw_liquidus_C,
             "adjusted_liquidus_C": adjustment.adjusted_liquidus_C,
+            "adjusted_liquidus_interval_C": adjustment.adjusted_liquidus_interval_C,
             "adjusted_liquidus_provenance": list(
                 adjustment.adjusted_liquidus_provenance
+            ),
+            "adjusted_liquidus_interval_provenance": list(
+                adjustment.adjusted_liquidus_interval_provenance
             ),
             "perturbations": [
                 {
