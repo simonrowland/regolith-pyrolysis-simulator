@@ -428,11 +428,8 @@ def _tick_payload(
                 for k, v in snapshot.inventory.salt_phase_kg.items()
             },
             'chloride_salt_phase': {
-                'disposition': 'separated_chloride_salt_fouling_risk',
-                'components_kg': {
-                    k: round(v, 3)
-                    for k, v in snapshot.inventory.chloride_salt_phase_kg.items()
-                },
+                k: round(v, 3)
+                for k, v in snapshot.inventory.chloride_salt_phase_kg.items()
             },
             'sulfide_matte': {
                 k: round(v, 3)
@@ -447,6 +444,11 @@ def _tick_payload(
                 for k, v in (
                     snapshot.inventory
                     .terminal_slag_components_kg.items())
+            },
+        },
+        'process_bucket_metadata': {
+            'chloride_salt_phase': {
+                'disposition': 'separated_chloride_salt_fouling_risk',
             },
         },
         'evap_total_kg_hr': round(snapshot.evap_flux.total_kg_hr, 4),

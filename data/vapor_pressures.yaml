@@ -456,7 +456,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 900
     evaporation_alpha:
       value: 1.0
-      source: "Salt analogy — Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
+      source: "Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g)."
 
@@ -471,7 +471,7 @@ foulant_vapor:
       B: 8774.500
       C: 0
     antoine:
-      source: "NIST Stull 1947 mid-range faithful runtime row; bp overshoots — tests use pure_component_antoine"
+      source: "NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine"
       A: 9.78236
       B: 7440.691
       C: -122.709
@@ -480,7 +480,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 880
     evaporation_alpha:
       value: 1.0
-      source: "Salt analogy — Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
+      source: "Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T."
 
@@ -493,7 +493,7 @@ foulant_vapor:
     interval_required: true
     certified_point: null
     antoine:
-      source: "UNGROUNDED CC interval — NIST WebBook fetch failed 2026-06-14; CRC bp 1704 C; ΔH_vap ~175 kJ/mol alkali-halide analogy pending JANAF/NIST; interval only, NOT certified"
+      source: "UNGROUNDED CC interval - NIST WebBook fetch failed 2026-06-14; CRC bp 1704 C; DeltaH_vap ~175 kJ/mol alkali-halide analogy pending JANAF/NIST; interval only, NOT certified"
       A: 9.626700
       B: 9137.400
       C: 0
@@ -507,7 +507,7 @@ foulant_vapor:
     notes: |
       Interval-only Antoine row. NIST SRD 69 Antoine unavailable (fetch failed).
       Do NOT certify against P_sat(T_bp)=101325 Pa until a named literature row lands.
-      CaF2/MgF2 deliberately absent — refractory rump (b129999).
+      CaF2/MgF2 deliberately absent - refractory rump (b129999).
 
 # Condensation temperature reference (at ~1 mbar partial pressure)
 # Used by condensation train model for species routing

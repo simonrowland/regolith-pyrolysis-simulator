@@ -1,12 +1,12 @@
 # Stage-0 foulant disposition registry (chunk A0).
-# CACHE-INERT until G2 digest wiring — not in REQUIRED_DATA_DIGEST_KEYS.
+# CACHE-INERT until G2 digest wiring - not in REQUIRED_DATA_DIGEST_KEYS.
 # Constants: evidence-E1 (C0-corrected), foulant-disposition-spec, CONTAMINANT-WARNING-DOC.
-# †ΔG rows: NIST WebBook tier-2 bounds (ΔH°f − TΔS°, no Cp); sulfide rows anchor kinetic onset (E2).
+# Dagger/DeltaG rows: NIST WebBook tier-2 bounds (DeltaH0f - TDeltaS0, no Cp); sulfide rows anchor kinetic onset (E2).
 
 foulant_dG:
   CaSO4_thermal_decomp:
     reaction: "CaSO4 -> CaO + SO2 + 1/2 O2"
-    source: "NIST WebBook †; E1 §1.1 (½O₂ path); C0-corrected"
+    source: "NIST WebBook dagger; E1 sec 1.1 (1/2O2 path); C0-corrected"
     points:
       - {T_K: 1373.15, dG_kJ_per_mol: 80.0}
       - {T_K: 1573.15, dG_kJ_per_mol: 57.0}
@@ -15,7 +15,7 @@ foulant_dG:
 
   MgSO4_thermal_decomp:
     reaction: "MgSO4 -> MgO + SO3"
-    source: "NIST WebBook † SO₃ path; E1 §1.4 C0-6"
+    source: "NIST WebBook dagger SO3 path; E1 sec 1.4 C0-6"
     points:
       - {T_K: 1273.15, dG_kJ_per_mol: 24.0}
       - {T_K: 1453.15, dG_kJ_per_mol: 0.0}
@@ -23,7 +23,7 @@ foulant_dG:
 
   FeSO4_thermal_decomp:
     reaction: "2 FeSO4 -> Fe2O3 + 2 SO2 + O2"
-    source: "NIST WebBook †; E1 §1.5; Kanari 2018"
+    source: "NIST WebBook dagger; E1 sec 1.5; Kanari 2018"
     points:
       - {T_K: 873.15, dG_kJ_per_mol: 30.0}
       - {T_K: 973.15, dG_kJ_per_mol: 0.0}
@@ -31,7 +31,7 @@ foulant_dG:
 
   CaCO3_calcination:
     reaction: "CaCO3 -> CaO + CO2"
-    source: "NIST WebBook †; E1 §2.1"
+    source: "NIST WebBook dagger; E1 sec 2.1"
     points:
       - {T_K: 873.15, dG_kJ_per_mol: 20.0}
       - {T_K: 1173.15, dG_kJ_per_mol: -8.0}
@@ -39,7 +39,7 @@ foulant_dG:
 
   MgCO3_calcination:
     reaction: "MgCO3 -> MgO + CO2"
-    source: "NIST WebBook †; E1 §2.2"
+    source: "NIST WebBook dagger; E1 sec 2.2"
     points:
       - {T_K: 673.15, dG_kJ_per_mol: 10.0}
       - {T_K: 773.15, dG_kJ_per_mol: -35.0}
@@ -47,7 +47,7 @@ foulant_dG:
 
   Na2CO3_silicate_displacement:
     reaction: "Na2CO3 + SiO2 -> Na2SiO3 + CO2"
-    source: "NIST WebBook †; E1 §2.3 C0-corrected (−84 @900 °C)"
+    source: "NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 @900 degC)"
     points:
       - {T_K: 1073.15, dG_kJ_per_mol: 20.0}
       - {T_K: 1173.15, dG_kJ_per_mol: -84.0}
@@ -71,7 +71,7 @@ foulant_dG:
 
   FeS_roasting:
     reaction: "FeS + 3/4 O2 -> FeO + SO2"
-    source: "E2 §2.1 JANAF-class; kinetic-onset tier-2 bracket (ΔG° ≪ 0 @1200–1400 K)"
+    source: "E2 sec 2.1 JANAF-class; kinetic-onset tier-2 bracket (DeltaG0 << 0 @1200-1400 K)"
     points:
       - {T_K: 673.15, dG_kJ_per_mol: 25.0}
       - {T_K: 873.15, dG_kJ_per_mol: 0.0}
@@ -159,7 +159,7 @@ CaSO4:
   reaction_family: sulfate_decomp
   thermo:
     dG_row: foulant_dG.CaSO4_thermal_decomp
-    source: "NIST WebBook †; E1 §1.1–1.3 C0-corrected"
+    source: "NIST WebBook dagger; E1 sec 1.1-1.3 C0-corrected"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: suppresses
@@ -182,7 +182,7 @@ MgSO4:
   reaction_family: sulfate_decomp
   thermo:
     dG_row: foulant_dG.MgSO4_thermal_decomp
-    source: "NIST WebBook † SO₃ path; E1 §1.4"
+    source: "NIST WebBook dagger SO3 path; E1 sec 1.4"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: suppresses
@@ -205,7 +205,7 @@ FeSO4:
   reaction_family: sulfate_decomp
   thermo:
     dG_row: foulant_dG.FeSO4_thermal_decomp
-    source: "NIST WebBook †; E1 §1.5; Kanari 2018"
+    source: "NIST WebBook dagger; E1 sec 1.5; Kanari 2018"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: none
@@ -215,7 +215,7 @@ FeSO4:
     on_decompose_melt: {account: process.cleaned_melt, species: [Fe2O3]}
   warning_flags:
     confidence: well_grounded
-    regime_caveat: "models anhydrous FeSO4; real Meridiani Fe-sulfate is jarosite KFe3(SO4)2(OH)6 — H2O/K2O release unmodeled (C0-10)"
+    regime_caveat: "models anhydrous FeSO4; real Meridiani Fe-sulfate is jarosite KFe3(SO4)2(OH)6 - H2O/K2O release unmodeled (C0-10)"
     behavior_change_gate: instrument_first
 
 CaCO3:
@@ -227,7 +227,7 @@ CaCO3:
   reaction_family: carbonate_decomposition
   thermo:
     dG_row: foulant_dG.CaCO3_calcination
-    source: "NIST WebBook †; E1 §2.1"
+    source: "NIST WebBook dagger; E1 sec 2.1"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: none
@@ -247,7 +247,7 @@ MgCO3:
   reaction_family: carbonate_decomposition
   thermo:
     dG_row: foulant_dG.MgCO3_calcination
-    source: "NIST WebBook †; E1 §2.2"
+    source: "NIST WebBook dagger; E1 sec 2.2"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: none
@@ -267,7 +267,7 @@ Na2CO3:
   reaction_family: silicate_displacement
   thermo:
     dG_row: foulant_dG.Na2CO3_silicate_displacement
-    source: "NIST WebBook †; E1 §2.3 C0-corrected (−84 kJ/mol @900 °C)"
+    source: "NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)"
   gating:
     chi_model: dG_sigmoid
     o2_dependence: none
@@ -277,7 +277,7 @@ Na2CO3:
     on_decompose_melt: {account: process.cleaned_melt, species: [Na2SiO3]}
   warning_flags:
     confidence: well_grounded
-    regime_caveat: "thermal-alone ΔG=0 ~2100 K (~1826 °C); clears in-melt via SiO2 contact (Kim et al. 2004)"
+    regime_caveat: "thermal-alone DeltaG=0 ~2100 K (~1826 degC); clears in-melt via SiO2 contact (Kim et al. 2004)"
 
 Mg_ClO4_2:
   carrier:

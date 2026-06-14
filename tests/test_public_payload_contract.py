@@ -111,6 +111,15 @@ def test_tick_payload_keeps_existing_kg_keys():
     assert expected_keys <= payload.keys()
     for key in expected_keys:
         _assert_numeric_leaf_values(payload[key], key)
+    chloride_bucket = payload["process_buckets_kg"]["chloride_salt_phase"]
+    assert chloride_bucket == {
+        k: pytest.approx(round(v, 3))
+        for k, v in snapshot.inventory.chloride_salt_phase_kg.items()
+    }
+    assert (
+        payload["process_bucket_metadata"]["chloride_salt_phase"]["disposition"]
+        == "separated_chloride_salt_fouling_risk"
+    )
     assert payload["backend_status"] == "stub"
     assert payload["backend_authoritative"] is False
 

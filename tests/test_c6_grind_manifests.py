@@ -161,7 +161,7 @@ def test_stype_manifest_schema_and_profiles(stype_manifest: dict) -> None:
 def test_launch_studio2_defaults_to_stype_manifest() -> None:
     text = LAUNCH_SCRIPT.read_text(encoding="utf-8")
     assert "manifest-c6-stype-studio2.json" in text
-    assert 'MANIFEST_DEFAULT="$REPO/docs-private/grind/manifest-c6-moon-studio1.json"' in text
+    assert 'MANIFEST_DEFAULT="$REPO/docs-private/grind/manifest-c6-stype-studio2.json"' in text
 
 
 def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> None:
