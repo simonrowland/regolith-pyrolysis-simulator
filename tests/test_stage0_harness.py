@@ -74,7 +74,8 @@ def test_real_feedstock_stops_at_c0b_path_ab_pause():
     assert session.simulator.melt.campaign == CampaignPhase.C0B
     assert session.simulator.paused_for_decision is True
     assert result.cleaned_melt_kg
-    assert result.verdicts is None
+    assert result.verdicts is not None
+    assert result.verdicts["verdict_a"]["warn_only"] is True
 
 
 def test_debug_feedstock_stops_on_campaign_leave():

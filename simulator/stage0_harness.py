@@ -5,8 +5,8 @@ the structural C0B→C2A handoff without entering the extraction tail. Captures
 the cleaned-melt projection and a per-hour foulant-disposition timeline grouped
 by ``{trapped_gasses, refractory_carbon, other_mineral_contaminant}``.
 
-Verdict computation (noise floor + MELTS domain) is intentionally deferred to
-H2/H3 — see :attr:`Stage0HarnessResult.verdicts`.
+Verdict (a) property-impact WARN flags and verdict (b) stripped-silicate domain
+gate are computed at the C0B→C2A cut — see :attr:`Stage0HarnessResult.verdicts`.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from typing import Any, Mapping
 import yaml
 
 from engines.builtin.foulant_disposition import FoulantRegistry, load_foulant_registry
+from engines.builtin.melt_effect_adjustment import build_harness_verdicts
 from engines.builtin.stage0_pretreatment import (
     REACTION_FAMILY_CARBONATE_DECOMPOSITION,
     REACTION_FAMILY_INERT_TO_RUMP,
@@ -82,7 +83,7 @@ class Stage0HarnessResult:
     total_hours: int
     cleaned_melt_kg: dict[str, float]
     disposition_timeline: list[HourlyDispositionEntry] = field(default_factory=list)
-    verdicts: None = None
+    verdicts: dict[str, Any] | None = None
 
 
 def default_max_stage0_hours(setpoints: Mapping[str, Any]) -> float:
@@ -476,13 +477,23 @@ def run_stage0_harness(
             break
 
     cleaned_melt_kg = _capture_cleaned_melt_kg(sim)
+    config = session._config
+    engine = str(getattr(config, "backend_name", "stub") if config else "stub")
+    T_in_C = float(sim.melt.temperature_C)
+    verdicts = build_harness_verdicts(
+        cleaned_melt_kg=cleaned_melt_kg,
+        sim=sim,
+        engine=engine,
+        timeline=tuple(timeline),
+        T_in_C=T_in_C,
+    )
     return Stage0HarnessResult(
         early_melt_reached=True,
         stop_reason=stop_reason,
         total_hours=hours_run,
         cleaned_melt_kg=cleaned_melt_kg,
         disposition_timeline=timeline,
-        verdicts=None,
+        verdicts=verdicts,
     )
 
 
