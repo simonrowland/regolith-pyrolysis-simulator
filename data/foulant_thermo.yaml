@@ -1,0 +1,385 @@
+# Stage-0 foulant disposition registry (chunk A0).
+# CACHE-INERT until G2 digest wiring — not in REQUIRED_DATA_DIGEST_KEYS.
+# Constants: evidence-E1 (C0-corrected), foulant-disposition-spec, CONTAMINANT-WARNING-DOC.
+# †ΔG rows: NIST WebBook tier-2 bounds (ΔH°f − TΔS°, no Cp); sulfide rows anchor kinetic onset (E2).
+
+foulant_dG:
+  CaSO4_thermal_decomp:
+    reaction: "CaSO4 -> CaO + SO2 + 1/2 O2"
+    source: "NIST WebBook †; E1 §1.1 (½O₂ path); C0-corrected"
+    points:
+      - {T_K: 1373.15, dG_kJ_per_mol: 80.0}
+      - {T_K: 1573.15, dG_kJ_per_mol: 57.0}
+      - {T_K: 1673.15, dG_kJ_per_mol: 28.0}
+      - {T_K: 1773.15, dG_kJ_per_mol: 0.0}
+
+  MgSO4_thermal_decomp:
+    reaction: "MgSO4 -> MgO + SO3"
+    source: "NIST WebBook † SO₃ path; E1 §1.4 C0-6"
+    points:
+      - {T_K: 1273.15, dG_kJ_per_mol: 24.0}
+      - {T_K: 1453.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 1573.15, dG_kJ_per_mol: -64.0}
+
+  FeSO4_thermal_decomp:
+    reaction: "2 FeSO4 -> Fe2O3 + 2 SO2 + O2"
+    source: "NIST WebBook †; E1 §1.5; Kanari 2018"
+    points:
+      - {T_K: 873.15, dG_kJ_per_mol: 30.0}
+      - {T_K: 973.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 1173.15, dG_kJ_per_mol: -20.0}
+
+  CaCO3_calcination:
+    reaction: "CaCO3 -> CaO + CO2"
+    source: "NIST WebBook †; E1 §2.1"
+    points:
+      - {T_K: 873.15, dG_kJ_per_mol: 20.0}
+      - {T_K: 1173.15, dG_kJ_per_mol: -8.0}
+      - {T_K: 1273.15, dG_kJ_per_mol: -35.0}
+
+  MgCO3_calcination:
+    reaction: "MgCO3 -> MgO + CO2"
+    source: "NIST WebBook †; E1 §2.2"
+    points:
+      - {T_K: 673.15, dG_kJ_per_mol: 10.0}
+      - {T_K: 773.15, dG_kJ_per_mol: -35.0}
+      - {T_K: 1173.15, dG_kJ_per_mol: -105.0}
+
+  Na2CO3_silicate_displacement:
+    reaction: "Na2CO3 + SiO2 -> Na2SiO3 + CO2"
+    source: "NIST WebBook †; E1 §2.3 C0-corrected (−84 @900 °C)"
+    points:
+      - {T_K: 1073.15, dG_kJ_per_mol: 20.0}
+      - {T_K: 1173.15, dG_kJ_per_mol: -84.0}
+      - {T_K: 1273.15, dG_kJ_per_mol: -120.0}
+
+  Mg_ClO4_2_decomp:
+    reaction: "Mg(ClO4)2 -> MgCl2 + 4 O2"
+    source: "Sutter 2014 NTRS 20140006489; E1 §3.1 C0-2 balanced"
+    points:
+      - {T_K: 673.15, dG_kJ_per_mol: 15.0}
+      - {T_K: 729.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 799.15, dG_kJ_per_mol: -45.0}
+
+  Ca_ClO4_2_decomp:
+    reaction: "Ca(ClO4)2 -> CaCl2 + 4 O2"
+    source: "Bruck 2014 LPSC 2057; E1 §3.2 C0-2 balanced"
+    points:
+      - {T_K: 623.15, dG_kJ_per_mol: 20.0}
+      - {T_K: 673.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 773.15, dG_kJ_per_mol: -35.0}
+
+  FeS_roasting:
+    reaction: "FeS + 3/4 O2 -> FeO + SO2"
+    source: "E2 §2.1 JANAF-class; kinetic-onset tier-2 bracket (ΔG° ≪ 0 @1200–1400 K)"
+    points:
+      - {T_K: 673.15, dG_kJ_per_mol: 25.0}
+      - {T_K: 873.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 1273.15, dG_kJ_per_mol: -120.0}
+
+  CaS_roasting:
+    reaction: "CaS + 2 O2 -> CaO + SO2"
+    source: "E2 §2.1; kinetic-onset tier-2 bracket"
+    points:
+      - {T_K: 723.15, dG_kJ_per_mol: 20.0}
+      - {T_K: 923.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 1273.15, dG_kJ_per_mol: -100.0}
+
+  NiS_roasting:
+    reaction: "NiS + O2 -> NiO + SO2"
+    source: "E2 §2.1; kinetic-onset tier-2 bracket"
+    points:
+      - {T_K: 673.15, dG_kJ_per_mol: 22.0}
+      - {T_K: 873.15, dG_kJ_per_mol: 0.0}
+      - {T_K: 1273.15, dG_kJ_per_mol: -110.0}
+
+NaCl:
+  carrier:
+    species: NaCl
+    aliases: [nacl, halide, nacl_kcl_salts]
+    molar_mass_g_mol: 58.44
+  group: other_mineral_contaminant
+  reaction_family: volatilization
+  thermo:
+    antoine_row: foulant_vapor.NaCl
+    source: "NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md"
+  gating:
+    chi_model: vapor_psat_vs_overhead
+  fate:
+    on_escape: {account: evaporation, residual_target: NaCl}
+    on_retain: {account: terminal.stage0_chloride_salt_phase}
+  warning_flags:
+    confidence: partly_grounded
+    kinetic_access_flag: hk_alpha_tier2_salt_analogy
+
+KCl:
+  carrier:
+    species: KCl
+    aliases: [kcl]
+    molar_mass_g_mol: 74.55
+  group: other_mineral_contaminant
+  reaction_family: volatilization
+  thermo:
+    antoine_row: foulant_vapor.KCl
+    source: "NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md"
+  gating:
+    chi_model: vapor_psat_vs_overhead
+  fate:
+    on_escape: {account: evaporation, residual_target: KCl}
+    on_retain: {account: terminal.stage0_chloride_salt_phase}
+  warning_flags:
+    confidence: partly_grounded
+    kinetic_access_flag: hk_alpha_tier2_salt_analogy
+
+NaF:
+  carrier:
+    species: NaF
+    aliases: [naf, fluoride]
+    molar_mass_g_mol: 41.98817
+  group: other_mineral_contaminant
+  reaction_family: volatilization
+  thermo:
+    antoine_row: foulant_vapor.NaF
+    source: "CRC bp 1704 C; vapor_pressures.yaml interval-only row"
+  gating:
+    chi_model: vapor_psat_vs_overhead
+  fate:
+    on_escape: {account: evaporation, residual_target: NaF}
+    on_retain: {account: terminal.stage0_chloride_salt_phase}
+  warning_flags:
+    confidence: partly_grounded
+    interval_required: true
+
+CaSO4:
+  carrier:
+    species: CaSO4
+    aliases: [caso4, caso4_nh2o]
+    molar_mass_g_mol: 136.14
+  group: other_mineral_contaminant
+  reaction_family: sulfate_decomp
+  thermo:
+    dG_row: foulant_dG.CaSO4_thermal_decomp
+    source: "NIST WebBook †; E1 §1.1–1.3 C0-corrected"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: suppresses
+    o2_reference_bar: 0.2
+    requires_reagent: null
+    carbothermic_onset_C: 1000
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [SO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [CaO]}
+  warning_flags:
+    confidence: well_grounded
+    behavior_change_gate: instrument_first
+
+MgSO4:
+  carrier:
+    species: MgSO4
+    aliases: [mgso4]
+    molar_mass_g_mol: 120.37
+  group: other_mineral_contaminant
+  reaction_family: sulfate_decomp
+  thermo:
+    dG_row: foulant_dG.MgSO4_thermal_decomp
+    source: "NIST WebBook † SO₃ path; E1 §1.4"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: suppresses
+    o2_reference_bar: 0.2
+    requires_reagent: null
+    carbothermic_onset_C: 900
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [SO3, SO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [MgO]}
+  warning_flags:
+    confidence: well_grounded
+    behavior_change_gate: instrument_first
+
+FeSO4:
+  carrier:
+    species: FeSO4
+    aliases: [feso4]
+    molar_mass_g_mol: 151.91
+  group: other_mineral_contaminant
+  reaction_family: sulfate_decomp
+  thermo:
+    dG_row: foulant_dG.FeSO4_thermal_decomp
+    source: "NIST WebBook †; E1 §1.5; Kanari 2018"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [SO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [Fe2O3]}
+  warning_flags:
+    confidence: well_grounded
+    regime_caveat: "models anhydrous FeSO4; real Meridiani Fe-sulfate is jarosite KFe3(SO4)2(OH)6 — H2O/K2O release unmodeled (C0-10)"
+    behavior_change_gate: instrument_first
+
+CaCO3:
+  carrier:
+    species: CaCO3
+    aliases: [caco3, carbonate]
+    molar_mass_g_mol: 100.09
+  group: other_mineral_contaminant
+  reaction_family: carbonate_decomposition
+  thermo:
+    dG_row: foulant_dG.CaCO3_calcination
+    source: "NIST WebBook †; E1 §2.1"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [CO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [CaO]}
+  warning_flags:
+    confidence: well_grounded
+
+MgCO3:
+  carrier:
+    species: MgCO3
+    aliases: [mgco3]
+    molar_mass_g_mol: 84.31
+  group: other_mineral_contaminant
+  reaction_family: carbonate_decomposition
+  thermo:
+    dG_row: foulant_dG.MgCO3_calcination
+    source: "NIST WebBook †; E1 §2.2"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [CO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [MgO]}
+  warning_flags:
+    confidence: well_grounded
+
+Na2CO3:
+  carrier:
+    species: Na2CO3
+    aliases: [na2co3]
+    molar_mass_g_mol: 105.99
+  group: other_mineral_contaminant
+  reaction_family: silicate_displacement
+  thermo:
+    dG_row: foulant_dG.Na2CO3_silicate_displacement
+    source: "NIST WebBook †; E1 §2.3 C0-corrected (−84 kJ/mol @900 °C)"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.offgas, species: [CO2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [Na2O]}
+  warning_flags:
+    confidence: well_grounded
+    regime_caveat: "thermal-alone ΔG=0 ~2100 K (~1826 °C); clears in-melt via SiO2 contact (Kim et al. 2004)"
+
+Mg_ClO4_2:
+  carrier:
+    species: Mg(ClO4)2
+    aliases: [mg_clo4_2, clo4, perchlorate]
+    molar_mass_g_mol: 223.21
+  group: trapped_gasses
+  reaction_family: perchlorate
+  thermo:
+    dG_row: foulant_dG.Mg_ClO4_2_decomp
+    source: "Sutter 2014; E1 §3.1 C0-2 balanced MgCl2+4O2"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.oxygen_stage0_stored, species: [O2]}
+    on_decompose_chloride: {account: terminal.stage0_chloride_salt_phase, species: [MgCl2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [MgO]}
+  warning_flags:
+    confidence: well_grounded
+
+Ca_ClO4_2:
+  carrier:
+    species: Ca(ClO4)2
+    aliases: [ca_clo4_2]
+    molar_mass_g_mol: 238.98
+  group: trapped_gasses
+  reaction_family: perchlorate
+  thermo:
+    dG_row: foulant_dG.Ca_ClO4_2_decomp
+    source: "Bruck 2014 LPSC 2057; E1 §3.2 C0-2 balanced CaCl2+4O2"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.oxygen_stage0_stored, species: [O2]}
+    on_decompose_chloride: {account: terminal.stage0_chloride_salt_phase, species: [CaCl2]}
+    on_decompose_melt: {account: process.cleaned_melt, species: [CaO]}
+  warning_flags:
+    confidence: well_grounded
+
+FeS:
+  carrier:
+    species: FeS
+    aliases: [fes, troilite, sulfide]
+    molar_mass_g_mol: 87.91
+  group: other_mineral_contaminant
+  reaction_family: sulfide_roasting
+  thermo:
+    dG_row: foulant_dG.FeS_roasting
+    source: "E2 §2.1; foulant-disposition-spec roasting row"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: requires
+    o2_reference_bar: 0.2
+    requires_reagent: null
+  fate:
+    on_roast_offgas: {account: terminal.offgas, species: [SO2]}
+    on_roast_melt: {account: process.cleaned_melt, species: [FeO]}
+  warning_flags:
+    confidence: well_grounded
+
+CaS:
+  carrier:
+    species: CaS
+    aliases: [cas, oldhamite]
+    molar_mass_g_mol: 72.14
+  group: other_mineral_contaminant
+  reaction_family: sulfide_roasting
+  thermo:
+    dG_row: foulant_dG.CaS_roasting
+    source: "E2 §2.1; oldhamite disposition"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: requires
+    o2_reference_bar: 0.2
+    requires_reagent: null
+  fate:
+    on_roast_offgas: {account: terminal.offgas, species: [SO2]}
+    on_roast_melt: {account: process.cleaned_melt, species: [CaO]}
+  warning_flags:
+    confidence: partly_grounded
+
+NiS:
+  carrier:
+    species: NiS
+    aliases: [nis]
+    molar_mass_g_mol: 90.76
+  group: other_mineral_contaminant
+  reaction_family: sulfide_roasting
+  thermo:
+    dG_row: foulant_dG.NiS_roasting
+    source: "E2 §2.1; native Ni oxidation path"
+  gating:
+    chi_model: dG_sigmoid
+    o2_dependence: requires
+    o2_reference_bar: 0.2
+    requires_reagent: null
+  fate:
+    on_roast_offgas: {account: terminal.offgas, species: [SO2]}
+    on_roast_melt: {account: process.cleaned_melt, species: [NiO]}
+  warning_flags:
+    confidence: partly_grounded

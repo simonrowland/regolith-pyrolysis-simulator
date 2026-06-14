@@ -1,0 +1,110 @@
+# Stage-0 carbon phase partition authority (chunk A1).
+# CACHE-INERT until G2 digest wiring — not in REQUIRED_DATA_DIGEST_KEYS.
+# Anchors: carbon-partition-design.md (Sephton 2004 Murchison hydropyrolysis).
+
+phase_partitions:
+  ci_carbonaceous_chondrite:
+    carrier: carbonaceous_organic
+    feedstock_key: ci_carbonaceous_chondrite
+    carbon_basis: generic_carbonaceous_organic_template_C_mass_fraction
+    template_C_mass_fraction: 0.74
+    f_refractory_organic_C:
+      floor: 0.39
+      iom_anchor: 0.56
+      certified_point: null
+      source: sephton_2004_murchison_hydropyrolysis
+      regime_caveat: H2_pyrolysis_to_520C_not_O2_bake_to_1050C
+    f_carbonate_C:
+      value: null
+      status: not_speciated
+    f_process_reductant_C:
+      value: 0.0
+    confidence: partly_grounded
+
+  cm_carbonaceous_chondrite:
+    carrier: carbonaceous_organic
+    feedstock_key: cm_carbonaceous_chondrite
+    carbon_basis: generic_carbonaceous_organic_template_C_mass_fraction
+    template_C_mass_fraction: 0.74
+    f_refractory_organic_C:
+      floor: 0.39
+      iom_anchor: 0.56
+      certified_point: null
+      source: sephton_2004_murchison_hydropyrolysis
+      regime_caveat: H2_pyrolysis_to_520C_not_O2_bake_to_1050C
+    f_carbonate_C:
+      value: null
+      status: not_speciated
+    f_process_reductant_C:
+      value: 0.0
+    confidence: partly_grounded
+
+  ceres_regolith:
+    carrier: carbonaceous_organic
+    feedstock_key: ceres_regolith
+    carbon_basis: generic_carbonaceous_organic_template_C_mass_fraction
+    template_C_mass_fraction: 0.74
+    f_refractory_organic_C:
+      floor: 0.39
+      iom_anchor: 0.56
+      certified_point: null
+      source: sephton_2004_murchison_hydropyrolysis
+      regime_caveat: weak_Ceres_analog_carbonate_prose_only
+    f_carbonate_C:
+      value: null
+      status: not_speciated
+    f_process_reductant_C:
+      value: 0.0
+    confidence: partly_grounded
+
+  comet_nucleus:
+    carrier: organics
+    feedstock_key: comet_nucleus
+    carbon_basis: generic_carbonaceous_organic_template_C_mass_fraction
+    template_C_mass_fraction: 0.74
+    f_refractory_organic_C:
+      floor: null
+      iom_anchor: null
+      interval: [0.0, 1.0]
+      status: not_speciated
+      source: ungrounded_comet_organic_fraction
+      regime_caveat: no_comet_dust_IOM_source_in_repo
+    f_carbonate_C:
+      value: null
+      status: not_speciated
+    f_process_reductant_C:
+      value: 0.0
+    confidence: ungroundable
+
+burnout_kinetics:
+  labile_chon_unlimited_o2:
+    law: complete_when_o2_sufficient
+    chi_default: 1.0
+    source: sephton_2004_stepped_combustion_temperature_classes
+
+  refractory_accessible_char_tga:
+    law: apparent_solid_state
+    model: avrami_erofeev_n_1p5
+    Ea_kJ_per_mol_range: [59.6, 110.66]
+    temperature_validity_C: [400, 700]
+    atmosphere: air
+    source: guo_2018_rsc_advances_low_rank_char
+    use: scenario_only_not_default_certification
+
+  graphite_process_reductant_ere:
+    law: langmuir_extended_resistance_equation
+    Ea_ads_cal_per_mol_range: [4500, 7500]
+    Ea_des_cal_per_mol_range: [35000, 45000]
+    davis_hottel:
+      Ea_ads_cal_per_mol: 11400
+      k_ads0_g_per_cm2_s: 5.65
+      Ea_des_cal_per_mol: 28800
+      k_des0_g_per_cm2_s: 298
+    source: doe_osti_5279262
+    use: process_added_graphitic_C_or_scenario_only
+
+uncertainty_policies:
+  refractory_process_extent:
+    certified_range: [0.0, 1.0]
+    reason: missing_O2_bake_data_for_regolith_matrix_pO2_surface_area_dwell
+    queued_measurement: O2_bake_TGA_or_fixed_bed_test_at_1050C_with_pO2_profile
