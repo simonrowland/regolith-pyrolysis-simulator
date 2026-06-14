@@ -78,12 +78,13 @@ def test_provider_declares_only_stage0_pretreatment_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_exactly_twelve_stage0_accounts():
-    """Provider declares exactly the twelve accounts touched by every
+def test_provider_declares_exactly_fifteen_stage0_accounts():
+    """Provider declares exactly the fifteen accounts touched by every
     legacy ``_record_stage0_*_transitions`` call including carbonate
     decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
-    CaS -> sulfide matte).  Pinning the set stops a future refactor
-    from silently widening the surface beyond Stage 0's scope.
+    CaS -> sulfide matte), plus foulant residual-C diagnostic accounts.
+    Pinning the set stops a future refactor from silently widening the
+    surface beyond Stage 0's scope.
     """
 
     provider = BuiltinStage0PretreatmentProvider()
@@ -102,6 +103,8 @@ def test_provider_declares_exactly_twelve_stage0_accounts():
         "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
+        "terminal.stage0_residual_refractory_carbon",
+        "terminal.stage0_residual_carbonate_carbon",
     })
     # Sanity: Stage 0 must not touch downstream metallothermic accounts.
     assert "process.metal_phase" not in profile.declared_accounts

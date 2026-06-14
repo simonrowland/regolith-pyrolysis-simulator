@@ -119,6 +119,7 @@ from simulator.melt_backend.sulfsat import (
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
+    IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -284,6 +285,10 @@ DEFAULT_FREEZE_GATE_CONFIG = {
 BACKEND_FALLBACK_EXCEPTIONS = (RuntimeError, ImportError)
 STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
 STAGE0_CARBON_CLEANUP_TEMP_RANGE_C = (20.0, 1050.0)
+STAGE0_FOULANT_PHASE1_TEMP_C = 1050.0
+STAGE0_FOULANT_PHASE1_OVERHEAD_BAR = 0.2
+STAGE0_FOULANT_PHASE2_TEMP_C = 1350.0
+STAGE0_FOULANT_PHASE2_OVERHEAD_BAR = 0.001
 DEFAULT_CARBONACEOUS_MELT_KG_PER_TONNE = 725.0
 
 # Atomic mass of sulfur (g/mol) used by the SulfSat gate when projecting
@@ -378,6 +383,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stage0_carbon_cleanup_specs: list[dict] = []
         self._stage0_carbonate_decomposition_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
+        self._stage0_foulant_diagnostics: list[dict] = []
         # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
         # the optional [sulfur] extra is absent, the gate stays
         # un-initialised and ``is_available()`` returns False, which
@@ -667,7 +673,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._activated_additive_reagents = set()
         self.species_formula_registry = self._registry_for_feedstock(fs)
         self.atom_ledger = self._new_atom_ledger()
-        self.inventory = self._build_process_inventory(fs, mass_kg)
+        self.inventory = self._build_process_inventory(
+            fs, mass_kg, feedstock_key=feedstock_key,
+        )
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
         self._stage0_perchlorate_cleanup_specs = []
@@ -3301,7 +3309,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             values.pop(species, None)
 
     def _build_process_inventory(
-        self, feedstock: Mapping[str, Any], mass_kg: float
+        self,
+        feedstock: Mapping[str, Any],
+        mass_kg: float,
+        *,
+        feedstock_key: str | None = None,
     ) -> ProcessInventory:
         """Build raw, Stage 0, and cleaned melt inventories for a batch."""
         comp = feedstock.get('composition_wt_pct', {}) or {}
@@ -3409,6 +3421,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         stage0_products = self._stage0_products_from_buckets(buckets)
+        self._emit_stage0_foulant_diagnostics(
+            feedstock,
+            buckets,
+            melt,
+            feedstock_key=feedstock_key,
+        )
 
         return ProcessInventory(
             raw_components_kg=raw,
@@ -4181,6 +4199,246 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if key in STAGE0_CHLORIDE_SALT_COMPONENTS:
             return True
         return key.startswith(('nacl', 'kcl'))
+
+    @staticmethod
+    def _foulant_thermo_path() -> "Path":
+        from pathlib import Path
+
+        return Path(__file__).resolve().parents[1] / "data" / "foulant_thermo.yaml"
+
+    @staticmethod
+    def _carbon_partition_path() -> "Path":
+        from pathlib import Path
+
+        return (
+            Path(__file__).resolve().parents[1]
+            / "data"
+            / "stage0_carbon_partition.yaml"
+        )
+
+    def _load_foulant_registry_cached(self):
+        from engines.builtin.foulant_disposition import load_foulant_registry
+
+        cached = getattr(self, "_cached_foulant_registry", None)
+        if cached is None:
+            cached = load_foulant_registry(self._foulant_thermo_path())
+            self._cached_foulant_registry = cached
+        return cached
+
+    def _load_carbon_partition_config(self) -> dict:
+        import yaml
+
+        cached = getattr(self, "_cached_carbon_partition_config", None)
+        if cached is None:
+            with self._carbon_partition_path().open(encoding="utf-8") as handle:
+                cached = yaml.safe_load(handle) or {}
+            self._cached_carbon_partition_config = cached
+        return cached
+
+    @staticmethod
+    def _foulant_volatilization_phase_specs() -> tuple[dict, ...]:
+        return (
+            {
+                "phase": 1,
+                "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
+                "p_overhead_bar": STAGE0_FOULANT_PHASE1_OVERHEAD_BAR,
+                "pO2_bar": STAGE0_FOULANT_PHASE1_OVERHEAD_BAR,
+            },
+            {
+                "phase": 2,
+                "T_C": STAGE0_FOULANT_PHASE2_TEMP_C,
+                "p_overhead_bar": STAGE0_FOULANT_PHASE2_OVERHEAD_BAR,
+                "pO2_bar": STAGE0_FOULANT_PHASE2_OVERHEAD_BAR,
+            },
+        )
+
+    def _resolve_foulant_carrier_key(self, component: str) -> str | None:
+        registry = self._load_foulant_registry_cached()
+        key = self._normalized_component_key(component)
+        return registry.alias_to_carrier.get(
+            component,
+            registry.alias_to_carrier.get(key),
+        )
+
+    def _dispatch_stage0_foulant_diagnostic(
+        self, control_inputs: Mapping[str, Any]
+    ) -> dict | None:
+        from engines.builtin.stage0_pretreatment import (
+            BuiltinStage0PretreatmentProvider,
+        )
+        from simulator.chemistry.kernel.dto import ProviderAccountView
+
+        provider = BuiltinStage0PretreatmentProvider()
+        view = ProviderAccountView(
+            accounts={},
+            species_formula_registry=self.species_formula_registry,
+        )
+        request = IntentRequest(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            account_view=view,
+            temperature_C=STAGE0_FOULANT_PHASE1_TEMP_C,
+            pressure_bar=STAGE0_FOULANT_PHASE1_OVERHEAD_BAR,
+            control_inputs=dict(control_inputs),
+        )
+        result = provider.dispatch(request)
+        if result.status != "ok" or not result.diagnostic:
+            return None
+        return dict(result.diagnostic)
+
+    def _emit_stage0_foulant_diagnostics(
+        self,
+        feedstock: Mapping[str, Any],
+        buckets: Mapping[str, Mapping[str, float]],
+        melt: Mapping[str, float],
+        *,
+        feedstock_key: str | None,
+    ) -> None:
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+            REACTION_FAMILY_INERT_TO_RUMP,
+            REACTION_FAMILY_PARTITION_CARBON,
+            REACTION_FAMILY_SILICATE_DISPLACEMENT,
+            REACTION_FAMILY_SULFATE_DECOMP,
+            REACTION_FAMILY_VOLATILIZATION,
+        )
+
+        self._stage0_foulant_diagnostics = []
+        foulant_registry = self._load_foulant_registry_cached()
+        thermo_path = str(self._foulant_thermo_path())
+        phase_specs = self._foulant_volatilization_phase_specs()
+        common = {
+            "foulant_registry": foulant_registry,
+            "foulant_thermo_path": thermo_path,
+        }
+
+        for component, feed_kg in (
+            buckets.get("chloride_salt_phase") or {}
+        ).items():
+            carrier_key = self._resolve_foulant_carrier_key(component)
+            if carrier_key is None:
+                continue
+            entry = foulant_registry.carriers.get(carrier_key)
+            if entry is None or entry.reaction_family != "volatilization":
+                continue
+            diag = self._dispatch_stage0_foulant_diagnostic({
+                **common,
+                "reaction_family": REACTION_FAMILY_VOLATILIZATION,
+                "carrier": entry.carrier_key,
+                "feed_kg": feed_kg,
+                "phase_specs": phase_specs,
+            })
+            if diag is not None:
+                self._stage0_foulant_diagnostics.append(diag)
+
+        salt_phase_sulfate_proxy = {
+            "so3": "CaSO4",
+            "sulfate": "CaSO4",
+            "sulfates": "CaSO4",
+        }
+        sulfate_sources: list[tuple[str, float, str]] = []
+        for component, feed_kg in (
+            buckets.get("cation_sulfate_feed") or {}
+        ).items():
+            carrier_key = self._resolve_foulant_carrier_key(component)
+            if carrier_key is not None:
+                sulfate_sources.append((component, feed_kg, carrier_key))
+        for component, feed_kg in (buckets.get("salt_phase") or {}).items():
+            key = self._normalized_component_key(component)
+            proxy = salt_phase_sulfate_proxy.get(key)
+            if proxy is not None:
+                sulfate_sources.append((component, feed_kg, proxy))
+        for component, feed_kg, carrier_key in sulfate_sources:
+            entry = foulant_registry.carriers.get(carrier_key)
+            if entry is None or entry.reaction_family != "sulfate_decomp":
+                continue
+            for phase in phase_specs:
+                diag = self._dispatch_stage0_foulant_diagnostic({
+                    **common,
+                    "reaction_family": REACTION_FAMILY_SULFATE_DECOMP,
+                    "carrier": entry.carrier_key,
+                    "feed_kg": feed_kg,
+                    "source_component": component,
+                    "T_C": phase["T_C"],
+                    "pO2_bar": phase["pO2_bar"],
+                })
+                if diag is not None:
+                    diag["phase"] = phase["phase"]
+                    self._stage0_foulant_diagnostics.append(diag)
+
+        for component, feed_kg in (buckets.get("carbonate_feed") or {}).items():
+            if feed_kg <= 1e-12:
+                continue
+            carrier_key = self._resolve_foulant_carrier_key(component)
+            if carrier_key is None:
+                continue
+            entry = foulant_registry.carriers.get(carrier_key)
+            if entry is None:
+                continue
+            if entry.reaction_family == "silicate_displacement":
+                diag = self._dispatch_stage0_foulant_diagnostic({
+                    **common,
+                    "reaction_family": REACTION_FAMILY_SILICATE_DISPLACEMENT,
+                    "carrier": entry.carrier_key,
+                    "feed_kg": feed_kg,
+                    "T_C": STAGE0_FOULANT_PHASE2_TEMP_C,
+                    "melt_sio2_kg": float(melt.get("SiO2", 0.0)),
+                })
+            elif entry.reaction_family == "carbonate_decomposition":
+                diag = self._dispatch_stage0_foulant_diagnostic({
+                    **common,
+                    "reaction_family": REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                    "diagnostic_only": True,
+                    "species": entry.carrier_key,
+                    "feed_kg": feed_kg,
+                    "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
+                })
+            else:
+                continue
+            if diag is not None:
+                self._stage0_foulant_diagnostics.append(diag)
+
+        for component, feed_kg in (buckets.get("terminal_slag") or {}).items():
+            if not self._is_stage0_refractory_fluoride_component(component):
+                continue
+            carrier_key = self._resolve_foulant_carrier_key(component) or component
+            diag = self._dispatch_stage0_foulant_diagnostic({
+                **common,
+                "reaction_family": REACTION_FAMILY_INERT_TO_RUMP,
+                "carrier": carrier_key,
+                "feed_kg": feed_kg,
+            })
+            if diag is not None:
+                self._stage0_foulant_diagnostics.append(diag)
+
+        carbon_row = None
+        if feedstock_key:
+            carbon_row = (
+                self._load_carbon_partition_config()
+                .get("phase_partitions", {})
+                .get(feedstock_key)
+            )
+        for component, feed_kg in (buckets.get("gas_volatiles") or {}).items():
+            key = self._normalized_component_key(component)
+            if key not in {
+                "c",
+                "carbon_content",
+                "carbonaceous_organic",
+                "organics",
+                "hydrocarbons",
+            }:
+                continue
+            if carbon_row is None:
+                continue
+            diag = self._dispatch_stage0_foulant_diagnostic({
+                **common,
+                "reaction_family": REACTION_FAMILY_PARTITION_CARBON,
+                "carrier": component,
+                "feed_kg": feed_kg,
+                "carbon_partition_row": carbon_row,
+                "phase_specs": phase_specs,
+            })
+            if diag is not None:
+                self._stage0_foulant_diagnostics.append(diag)
 
     @classmethod
     def _stage0_bucket_for_name(cls, component: str) -> Optional[str]:

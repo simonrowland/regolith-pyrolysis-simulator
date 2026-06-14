@@ -170,6 +170,11 @@ REACTION_FAMILY_CATION_SULFATE_CARBON = "cation_sulfate_carbon"
 REACTION_FAMILY_CARBONATE_DECOMPOSITION = "carbonate_decomposition"
 REACTION_FAMILY_BOUDOUARD = "boudouard"
 REACTION_FAMILY_PERCHLORATE = "perchlorate"
+REACTION_FAMILY_VOLATILIZATION = "volatilization"
+REACTION_FAMILY_SULFATE_DECOMP = "sulfate_decomp"
+REACTION_FAMILY_SILICATE_DISPLACEMENT = "silicate_displacement"
+REACTION_FAMILY_PARTITION_CARBON = "partition_carbon"
+REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_COMPLETE_OXIDATION,
     REACTION_FAMILY_SULFATE_CARBON,
@@ -177,6 +182,11 @@ VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_CARBONATE_DECOMPOSITION,
     REACTION_FAMILY_BOUDOUARD,
     REACTION_FAMILY_PERCHLORATE,
+    REACTION_FAMILY_VOLATILIZATION,
+    REACTION_FAMILY_SULFATE_DECOMP,
+    REACTION_FAMILY_SILICATE_DISPLACEMENT,
+    REACTION_FAMILY_PARTITION_CARBON,
+    REACTION_FAMILY_INERT_TO_RUMP,
 })
 
 OXYGEN_SPECIES = "O2"
@@ -233,6 +243,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "terminal.stage0_chloride_salt_phase",
         "terminal.stage0_sulfide_matte",
         "terminal.oxygen_stage0_stored",
+        "terminal.stage0_residual_refractory_carbon",
+        "terminal.stage0_residual_carbonate_carbon",
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -289,8 +301,32 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 controls, registry, resolve_species_formula, control_audit,
             )
         if reaction_family == REACTION_FAMILY_CARBONATE_DECOMPOSITION:
+            if controls.get("diagnostic_only"):
+                return self._dispatch_carbonate_decomposition_diagnostic(
+                    controls, registry, resolve_species_formula, control_audit,
+                )
             return self._dispatch_carbonate_decomposition(
                 controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_VOLATILIZATION:
+            return self._dispatch_volatilization_diagnostic(
+                controls, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_SULFATE_DECOMP:
+            return self._dispatch_sulfate_decomp_diagnostic(
+                controls, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_SILICATE_DISPLACEMENT:
+            return self._dispatch_silicate_displacement_diagnostic(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_PARTITION_CARBON:
+            return self._dispatch_partition_carbon_diagnostic(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_INERT_TO_RUMP:
+            return self._dispatch_inert_to_rump_diagnostic(
+                controls, control_audit,
             )
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
             return self._dispatch_boudouard(
@@ -874,6 +910,417 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "debits_kg": debits_kg,
                 "salt_products_kg": dict(salt_products_kg),
                 "oxygen_products_kg": dict(oxygen_products_kg),
+            },
+        )
+
+    # ------------------------------------------------------------------
+    # Foulant disposition arms (DIAGNOSTIC-first — transition=None).
+    # ------------------------------------------------------------------
+
+    def _dispatch_volatilization_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        control_audit,
+    ) -> IntentResult:
+        from engines.builtin.foulant_disposition import (
+            FoulantRegistry,
+            chi_escape_salt,
+            load_foulant_registry,
+        )
+
+        carrier = str(controls.get("carrier") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        phase_specs = list(controls.get("phase_specs") or ())
+        registry_payload = controls.get("foulant_registry")
+        if not carrier or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "volatilization requires carrier and positive feed_kg",
+                control_audit=control_audit,
+            )
+        if not phase_specs:
+            return self._out_of_domain(
+                "volatilization requires phase_specs",
+                control_audit=control_audit,
+            )
+
+        if isinstance(registry_payload, FoulantRegistry):
+            registry = registry_payload
+        else:
+            path = controls.get("foulant_thermo_path")
+            if path is None:
+                return self._out_of_domain(
+                    "volatilization requires foulant_registry or foulant_thermo_path",
+                    control_audit=control_audit,
+                )
+            registry = load_foulant_registry(path)
+
+        entry = registry.carriers.get(
+            registry.alias_to_carrier.get(carrier, carrier)
+        )
+        interval_required = bool(
+            entry and entry.warning_flags.get("interval_required")
+        )
+
+        phase_splits: list[dict[str, Any]] = []
+        retained_after_phases = 1.0
+        for phase_row in phase_specs:
+            t_c = float(phase_row["T_C"])
+            p_bar = float(phase_row["p_overhead_bar"])
+            phase_id = phase_row.get("phase", len(phase_splits) + 1)
+            if interval_required:
+                split = self._chi_escape_interval(carrier, t_c, p_bar)
+                escaped = split["escaped_frac"]
+                confidence = split["confidence"]
+            else:
+                result = chi_escape_salt(carrier, t_c, p_bar, registry)
+                escaped = result.escaped_frac
+                confidence = "partly_grounded"
+            retained = 1.0 - escaped
+            retained_after_phases *= retained
+            phase_splits.append({
+                "phase": phase_id,
+                "T_C": t_c,
+                "p_overhead_bar": p_bar,
+                "escaped_frac": escaped,
+                "retained_frac": retained,
+                "confidence": confidence,
+            })
+
+        cumulative_escaped = 1.0 - retained_after_phases
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_VOLATILIZATION,
+                "carrier": carrier,
+                "feed_kg": feed_kg,
+                "phase_splits": phase_splits,
+                "cumulative_escaped_frac": cumulative_escaped,
+                "cumulative_retained_frac": retained_after_phases,
+                "wall_deposit_frac": cumulative_escaped,
+                "interval_required": interval_required,
+                "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    @staticmethod
+    def _chi_escape_interval(
+        carrier: str,
+        t_c: float,
+        p_overhead_bar: float,
+    ) -> dict[str, Any]:
+        """Interval-only vapor escape using the non-certified Antoine row."""
+        from pathlib import Path
+
+        import yaml
+
+        from engines.builtin.foulant_disposition import PA_PER_BAR
+
+        repo_root = Path(__file__).resolve().parents[2]
+        vapor_path = repo_root / "data" / "vapor_pressures.yaml"
+        with vapor_path.open(encoding="utf-8") as handle:
+            payload = yaml.safe_load(handle) or {}
+        entry = (payload.get("foulant_vapor") or {}).get(carrier)
+        if entry is None:
+            raise KeyError(f"foulant_vapor row missing for carrier {carrier!r}")
+        if not entry.get("interval_required"):
+            raise ValueError(
+                f"interval escape path refused for certified row {carrier!r}"
+            )
+        coeff = entry.get("antoine")
+        if not coeff:
+            raise KeyError(f"antoine row missing for interval carrier {carrier!r}")
+        temperature_k = float(t_c) + 273.15
+        log_p = float(coeff["A"]) - float(coeff["B"]) / (
+            temperature_k + float(coeff.get("C", 0.0))
+        )
+        p_sat_pa = 10.0**log_p
+        p_total_pa = float(p_overhead_bar) * PA_PER_BAR
+        denom = p_sat_pa + p_total_pa
+        escaped = p_sat_pa / denom if denom > 0.0 else 0.0
+        escaped = min(max(escaped, 0.0), 1.0)
+        return {
+            "escaped_frac": escaped,
+            "retained_frac": 1.0 - escaped,
+            "confidence": str(entry.get("confidence", "partly_grounded")),
+        }
+
+    def _dispatch_sulfate_decomp_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        control_audit,
+    ) -> IntentResult:
+        from engines.builtin.foulant_disposition import (
+            FoulantRegistry,
+            chi_decomp,
+            load_foulant_registry,
+        )
+
+        carrier = str(controls.get("carrier") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        t_c = float(controls.get("T_C") or 0.0)
+        p_o2_bar = float(controls.get("pO2_bar") or 0.0)
+        registry_payload = controls.get("foulant_registry")
+        if not carrier or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "sulfate_decomp requires carrier and positive feed_kg",
+                control_audit=control_audit,
+            )
+        if isinstance(registry_payload, FoulantRegistry):
+            registry = registry_payload
+        else:
+            path = controls.get("foulant_thermo_path")
+            if path is None:
+                return self._out_of_domain(
+                    "sulfate_decomp requires foulant_registry or foulant_thermo_path",
+                    control_audit=control_audit,
+                )
+            registry = load_foulant_registry(path)
+
+        extent = chi_decomp(carrier, t_c, p_o2_bar, 0.0, registry)
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_SULFATE_DECOMP,
+                "carrier": carrier,
+                "feed_kg": feed_kg,
+                "T_C": t_c,
+                "pO2_bar": p_o2_bar,
+                "extent": extent.extent,
+                "fiat_extent": 1.0,
+                "onset_K": extent.onset_K,
+                "path": extent.path,
+                "confidence": extent.confidence,
+                "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    def _dispatch_silicate_displacement_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        from engines.builtin.foulant_disposition import (
+            FoulantRegistry,
+            chi_decomp,
+            load_foulant_registry,
+        )
+
+        carrier = str(controls.get("carrier") or "Na2CO3")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        t_c = float(controls.get("T_C") or 0.0)
+        melt_sio2_kg = float(controls.get("melt_sio2_kg") or 0.0)
+        registry_payload = controls.get("foulant_registry")
+        if feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "silicate_displacement requires positive feed_kg",
+                control_audit=control_audit,
+            )
+        if isinstance(registry_payload, FoulantRegistry):
+            foulant_registry = registry_payload
+        else:
+            path = controls.get("foulant_thermo_path")
+            if path is None:
+                return self._out_of_domain(
+                    "silicate_displacement requires foulant_registry",
+                    control_audit=control_audit,
+                )
+            foulant_registry = load_foulant_registry(path)
+
+        thermal_extent = chi_decomp(carrier, t_c, 0.0, 0.0, foulant_registry)
+        feed_formula = resolve_species_formula(carrier, registry)
+        feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+        sio2_formula = resolve_species_formula("SiO2", registry)
+        sio2_mol_available = melt_sio2_kg / sio2_formula.molar_mass_kg_per_mol()
+        sio2_gate = min(1.0, sio2_mol_available / feed_mol) if feed_mol > 0.0 else 0.0
+        extent = thermal_extent.extent * sio2_gate
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_SILICATE_DISPLACEMENT,
+                "carrier": carrier,
+                "feed_kg": feed_kg,
+                "T_C": t_c,
+                "extent": extent,
+                "thermal_extent": thermal_extent.extent,
+                "melt_sio2_gate": sio2_gate,
+                "melt_sio2_kg": melt_sio2_kg,
+                "product_melt_species": "Na2SiO3",
+                "offgas_species": "CO2",
+                "fiat_extent": 1.0,
+                "confidence": thermal_extent.confidence,
+                "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    def _dispatch_carbonate_decomposition_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        from engines.builtin.foulant_disposition import (
+            FoulantRegistry,
+            chi_decomp,
+            load_foulant_registry,
+        )
+
+        species = str(controls.get("species") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        t_c = float(controls.get("T_C") or 0.0)
+        registry_payload = controls.get("foulant_registry")
+        if not species or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "carbonate_decomposition diagnostic requires species and feed_kg",
+                control_audit=control_audit,
+            )
+        if isinstance(registry_payload, FoulantRegistry):
+            foulant_registry = registry_payload
+        else:
+            path = controls.get("foulant_thermo_path")
+            if path is None:
+                return self._out_of_domain(
+                    "carbonate_decomposition diagnostic requires foulant_registry",
+                    control_audit=control_audit,
+                )
+            foulant_registry = load_foulant_registry(path)
+
+        extent = chi_decomp(species, t_c, 0.0, 0.0, foulant_registry)
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                "species": species,
+                "feed_kg": feed_kg,
+                "T_C": t_c,
+                "extent": extent.extent,
+                "fiat_extent": 1.0,
+                "onset_K": extent.onset_K,
+                "confidence": extent.confidence,
+                "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    def _dispatch_partition_carbon_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        from engines.builtin.foulant_disposition import (
+            NOT_SPECIFIED,
+            chi_refractory,
+            partition_carbon,
+        )
+
+        carrier = str(controls.get("carrier") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        source_row = dict(controls.get("carbon_partition_row") or {})
+        phase_specs = list(controls.get("phase_specs") or ())
+        if not carrier or feed_kg <= 1e-12 or not source_row:
+            return self._out_of_domain(
+                "partition_carbon requires carrier, feed_kg, carbon_partition_row",
+                control_audit=control_audit,
+            )
+
+        feed_formula = resolve_species_formula(carrier, registry)
+        species_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+        declared_c_mol = feed_formula.atom_moles(species_mol).get("C", 0.0)
+        if declared_c_mol <= 0.0:
+            return self._out_of_domain(
+                f"partition_carbon carrier {carrier!r} has no declared C",
+                control_audit=control_audit,
+            )
+
+        split = partition_carbon(carrier, declared_c_mol, source_row)
+        refractory_interval = chi_refractory(
+            [(float(row.get("T_C", 0.0)), 1.0) for row in phase_specs],
+            float(phase_specs[0].get("pO2_bar", 0.2)) if phase_specs else 0.2,
+            None,
+        )
+        labile_extent = 1.0 if phase_specs else 0.0
+        refractory_mol = split.refractory_mol
+        labile_mol = split.labile_mol
+        if refractory_mol != NOT_SPECIFIED and isinstance(refractory_mol, float):
+            refractory_burned = refractory_mol * (
+                1.0 - refractory_interval.high
+            )
+            refractory_residual = refractory_mol - refractory_burned
+        else:
+            refractory_burned = NOT_SPECIFIED
+            refractory_residual = NOT_SPECIFIED
+
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_PARTITION_CARBON,
+                "carrier": carrier,
+                "feed_kg": feed_kg,
+                "declared_c_mol": declared_c_mol,
+                "labile_mol": labile_mol,
+                "refractory_mol": refractory_mol,
+                "carbonate_mol": split.carbonate_mol,
+                "process_reductant_mol": split.process_reductant_mol,
+                "not_speciated": list(split.not_speciated),
+                "labile_extent": labile_extent,
+                "refractory_interval": {
+                    "low": refractory_interval.low,
+                    "high": refractory_interval.high,
+                    "reason": refractory_interval.reason,
+                },
+                "refractory_residual_mol": refractory_residual,
+                "residual_account": "terminal.stage0_residual_refractory_carbon",
+                "carbonate_residual_account": (
+                    "terminal.stage0_residual_carbonate_carbon"
+                ),
+                "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    def _dispatch_inert_to_rump_diagnostic(
+        self,
+        controls: Mapping[str, Any],
+        control_audit,
+    ) -> IntentResult:
+        carrier = str(controls.get("carrier") or "")
+        feed_kg = float(controls.get("feed_kg") or 0.0)
+        if not carrier or feed_kg <= 1e-12:
+            return self._out_of_domain(
+                "inert_to_rump requires carrier and positive feed_kg",
+                control_audit=control_audit,
+            )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_INERT_TO_RUMP,
+                "carrier": carrier,
+                "feed_kg": feed_kg,
+                "escaped_frac": 0.0,
+                "retained_frac": 1.0,
+                "rump_frac": 1.0,
+                "fate": "terminal_slag",
+                "behavior_change_gate": "instrument_first",
             },
         )
 
