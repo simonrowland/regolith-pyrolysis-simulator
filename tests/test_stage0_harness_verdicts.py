@@ -363,6 +363,134 @@ def test_p2o5_not_stripped():
     assert stripped.stripped_mass_kg == pytest.approx(0.0)
 
 
+def test_p2o5_apatite_phase_topology_warning_grounded_with_floor():
+    adj = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {
+            "liquidus_T_C": 1400.0,
+            "phase_modes_wt_pct": {"liquid": 99.8, "apatite": 0.2},
+        },
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    phase_perts = [
+        p for p in adj.perturbations if p.metric == "phase_topology_presence"
+    ]
+    assert phase_perts
+    phase = phase_perts[0]
+    assert phase.property == "phase"
+    assert phase.grounded is True
+    assert phase.raw_value == pytest.approx(0.002)
+    assert phase.metadata["phase"] == "apatite"
+    assert phase.metadata["phase_presence_floor_wt_pct"] == pytest.approx(0.1)
+
+    flags = evaluate_verdict_a(adj.perturbations, hour=1)
+    phase_flags = [f for f in flags if f.metric == "phase_topology_presence"]
+    assert phase_flags
+    assert phase_flags[0].level == "WARNING"
+    assert phase_flags[0].grounded is True
+
+    subfloor = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {
+            "liquidus_T_C": 1400.0,
+            "phase_modes_wt_pct": {"liquid": 99.95, "apatite": 0.05},
+        },
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert not [
+        p for p in subfloor.perturbations if p.metric == "phase_topology_presence"
+    ]
+
+
+def test_stripped_s_phase_event_stays_ungrounded_interval_warning():
+    adj = melt_effect_adjustment(
+        {"S": 0.2},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    phase_perts = [p for p in adj.perturbations if p.property == "phase"]
+    assert phase_perts
+    pert = phase_perts[0]
+    assert pert.metric == "delta_absolute_fraction"
+    assert pert.interval == pytest.approx((0.01, 0.04))
+    assert pert.perturbation_before == pytest.approx(0.04)
+    assert pert.perturbation_after == pytest.approx(0.015)
+    assert pert.grounded is False
+    assert pert.correctable is False
+
+    flags = evaluate_verdict_a(adj.perturbations, hour=1)
+    phase_flags = [f for f in flags if f.property == "phase"]
+    assert phase_flags[0].level == "WARNING"
+    assert phase_flags[0].grounded is False
+    assert phase_flags[0].noise_floor_status == "noise_floor_ungrounded"
+
+
+def test_magemin_ig_bulk_sum_closure_warning_grounded_and_engine_gated():
+    composition_wt_pct = {
+        "SiO2": 40.0,
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "MgO": 10.0,
+        "CaO": 10.0,
+        "Na2O": 4.0,
+        "K2O": 4.0,
+        "MnO": 1.1,
+        "P2O5": 0.85,
+        "NiO": 0.08,
+        "CoO": 0.02,
+    }
+    magemin = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {"liquidus_T_C": 1400.0, "magemin_database": "ig"},
+        "magemin",
+        T_in_C=1400.0,
+        cleaned_oxide_wt_pct=composition_wt_pct,
+    )
+    bulk_perts = [
+        p for p in magemin.perturbations if p.property == "bulk_sum_closure"
+    ]
+    assert bulk_perts
+    bulk = bulk_perts[0]
+    assert bulk.metric == "dropped_component_mass_fraction"
+    assert bulk.raw_value == pytest.approx(0.0205)
+    assert bulk.grounded is True
+    assert bulk.correctable is False
+    assert bulk.metadata["dropped_oxides_wt_pct"] == {
+        "CoO": 0.02,
+        "MnO": 1.1,
+        "NiO": 0.08,
+        "P2O5": 0.85,
+    }
+
+    flags = evaluate_verdict_a(magemin.perturbations, hour=1)
+    bulk_flags = [f for f in flags if f.property == "bulk_sum_closure"]
+    assert bulk_flags
+    assert bulk_flags[0].level == "WARNING"
+    assert bulk_flags[0].grounded is True
+
+    alphamelts = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+        cleaned_oxide_wt_pct=composition_wt_pct,
+    )
+    assert not [
+        p for p in alphamelts.perturbations if p.property == "bulk_sum_closure"
+    ]
+
+
+def test_refine2_effect_version_and_threshold_rows_are_cache_inert_data():
+    assert "refine2" in EFFECT_TABLE_VERSION
+    assert PROPERTY_THRESHOLD_TABLE["phase"].basis == (
+        "topological_or_absolute_mass_fraction"
+    )
+    assert PROPERTY_THRESHOLD_TABLE["bulk_sum_closure"].warning == pytest.approx(0.02)
+
+
 def test_verdict_b_reads_backend_status_no_new_equilibrium():
     sim = SimpleNamespace(
         _backend_status_history=["ok", "out_of_domain"],

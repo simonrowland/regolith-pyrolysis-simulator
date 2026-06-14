@@ -46,14 +46,23 @@ PROPERTY_THRESHOLD_TABLE: dict[str, PropertyThreshold] = {
         basis="absolute_log10_fO2",
     ),
     "phase": PropertyThreshold(
-        metric="delta_absolute_fraction",
+        metric="phase_topology_or_delta_absolute_fraction",
+        warning=0.02,
+        notice=0.005,
+        basis="topological_or_absolute_mass_fraction",
+    ),
+    "bulk_sum_closure": PropertyThreshold(
+        metric="dropped_component_mass_fraction",
         warning=0.02,
         notice=0.005,
         basis="absolute_mass_fraction",
     ),
 }
 
-EFFECT_TABLE_VERSION = "2026-06-14-refine1-thresholds-v2"
+EFFECT_TABLE_VERSION = "2026-06-14-refine2-newcompute-v3"
+PHASE_PRESENCE_FLOOR_FRACTION = 0.001
+MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES = ("CoO", "MnO", "NiO", "P2O5")
+_MAGEMIN_BULK_SUM_DATABASES = frozenset({"ig", "igad"})
 
 # Per-contaminant effect rows sourced from CONTAMINANT-WARNING-DOC + evidence-E5.
 # Intervals are literature-imported, NOT simulator-measured.
@@ -123,6 +132,18 @@ EFFECT_ROWS: dict[str, dict[str, Any]] = {
         "species_aliases": ("P2O5",),
         "stripped": False,
         "properties": {
+            "phase": {
+                "mode": "phase_topology_presence",
+                "phase_aliases": (
+                    "apatite",
+                    "fluorapatite",
+                    "chlorapatite",
+                    "hydroxyapatite",
+                ),
+                "modeled_engines": ("alphamelts",),
+                "grounded": True,
+                "source": "Watson 1979; AlphaMELTS phase assemblage read",
+            },
             "liquidus": {
                 "mode": "delta_T_interval_per_wt_pct",
                 "interval_C_per_wt_pct": (-15.0, -5.0),
@@ -172,6 +193,7 @@ class PropertyPerturbation:
     adjusted_value: float | None = None
     interval: tuple[float, float] | None = None
     metric_basis: float | None = None
+    metadata: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -191,6 +213,7 @@ class PropertyFlag:
     cleared: bool = False
     clear_hour: int | None = None
     noise_floor_status: str = "proposed"
+    metadata: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -348,6 +371,193 @@ def _interval_half_width(low: float, high: float) -> float:
     return abs(float(high) - float(low)) / 2.0
 
 
+def _lookup_result_value(result: Mapping[str, Any] | Any | None, key: str) -> Any:
+    if result is None:
+        return None
+    if isinstance(result, Mapping):
+        if key in result:
+            return result[key]
+        for nested_key in ("diagnostic", "backend_diagnostics"):
+            nested = result.get(nested_key)
+            if isinstance(nested, Mapping) and key in nested:
+                return nested[key]
+    return getattr(result, key, None)
+
+
+def _finite_float(value: Any) -> float | None:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if numeric != numeric or numeric in (float("inf"), float("-inf")):
+        return None
+    return numeric
+
+
+def _phase_modes_as_fractions(
+    melts_result: Mapping[str, Any] | Any | None,
+) -> dict[str, float]:
+    modes = _lookup_result_value(melts_result, "phase_modes_wt_pct")
+    if modes is None:
+        modes = _lookup_result_value(melts_result, "phase_modes_pct")
+    if isinstance(modes, Mapping) and modes:
+        out: dict[str, float] = {}
+        for name, value in modes.items():
+            numeric = _finite_float(value)
+            if numeric is not None and numeric > 0.0:
+                out[str(name)] = numeric / 100.0
+        return out
+
+    masses = _lookup_result_value(melts_result, "phase_masses_kg")
+    if isinstance(masses, Mapping) and masses:
+        positive: dict[str, float] = {}
+        for name, value in masses.items():
+            numeric = _finite_float(value)
+            if numeric is not None and numeric > 0.0:
+                positive[str(name)] = numeric
+        total = sum(positive.values())
+        if total > 0.0:
+            return {name: mass / total for name, mass in positive.items()}
+    return {}
+
+
+def _normal_phase_name(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(name).lower())
+
+
+def _phase_alias_match(name: str, aliases: tuple[str, ...]) -> bool:
+    normalized = _normal_phase_name(name)
+    return any(_normal_phase_name(alias) in normalized for alias in aliases)
+
+
+def _engine_matches_any(engine: str, names: tuple[str, ...]) -> bool:
+    engine_key = str(engine).lower()
+    return any(name.lower() in engine_key for name in names)
+
+
+def _phase_topology_perturbation(
+    *,
+    species: str,
+    wt_pct: float,
+    prop_cfg: Mapping[str, Any],
+    row_key: str,
+    contaminant_group: str,
+    melts_result: Mapping[str, Any] | Any | None,
+    engine: str,
+) -> PropertyPerturbation | None:
+    modeled_engines = tuple(str(e) for e in prop_cfg.get("modeled_engines", ()))
+    if modeled_engines and not _engine_matches_any(engine, modeled_engines):
+        return None
+
+    aliases = tuple(str(a) for a in prop_cfg.get("phase_aliases", ()))
+    phase_modes = _phase_modes_as_fractions(melts_result)
+    matches = {
+        phase: fraction
+        for phase, fraction in phase_modes.items()
+        if _phase_alias_match(phase, aliases)
+    }
+    if not matches:
+        return None
+
+    phase, fraction = max(matches.items(), key=lambda item: item[1])
+    if fraction < PHASE_PRESENCE_FLOOR_FRACTION:
+        return None
+
+    return PropertyPerturbation(
+        property="phase",
+        contaminant=species,
+        effect_row=row_key,
+        source=str(prop_cfg.get("source", "")),
+        residual_wt_pct=float(wt_pct),
+        perturbation_before=float(fraction),
+        perturbation_after=0.0,
+        metric="phase_topology_presence",
+        grounded=bool(prop_cfg.get("grounded", False)),
+        correctable=True,
+        raw_value=float(fraction),
+        adjusted_value=0.0,
+        metric_basis=PHASE_PRESENCE_FLOOR_FRACTION,
+        metadata={
+            "contaminant_group": contaminant_group,
+            "phase": phase,
+            "phase_fraction": float(fraction),
+            "phase_wt_pct": float(fraction) * 100.0,
+            "phase_presence_floor_wt_pct": PHASE_PRESENCE_FLOOR_FRACTION * 100.0,
+        },
+    )
+
+
+def _magemin_database_from_engine_or_result(
+    engine: str,
+    melts_result: Mapping[str, Any] | Any | None,
+) -> str | None:
+    for key in ("magemin_database", "database", "db"):
+        value = _lookup_result_value(melts_result, key)
+        if value is not None:
+            return str(value).lower().strip()
+
+    engine_key = str(engine).lower().replace("-", "_")
+    for database in ("igad", "ig", "mp", "mb", "um", "ume", "mtl"):
+        if engine_key == database or engine_key.endswith(f"_{database}"):
+            return database
+    if "magemin" in engine_key:
+        return "ig"
+    return None
+
+
+def _magemin_ig_igad_bulk_sum_applies(
+    engine: str,
+    melts_result: Mapping[str, Any] | Any | None,
+) -> bool:
+    engine_key = str(engine).lower()
+    if "magemin" not in engine_key and engine_key not in _MAGEMIN_BULK_SUM_DATABASES:
+        return False
+    database = _magemin_database_from_engine_or_result(engine, melts_result)
+    return database in _MAGEMIN_BULK_SUM_DATABASES
+
+
+def _bulk_sum_closure_perturbation(
+    *,
+    cleaned_oxide_wt_pct: Mapping[str, float] | None,
+    engine: str,
+    melts_result: Mapping[str, Any] | Any | None,
+) -> PropertyPerturbation | None:
+    if not _magemin_ig_igad_bulk_sum_applies(engine, melts_result):
+        return None
+    if not cleaned_oxide_wt_pct:
+        return None
+
+    dropped: dict[str, float] = {}
+    for oxide in MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES:
+        value = _finite_float(cleaned_oxide_wt_pct.get(oxide))
+        if value is not None and value > 0.0:
+            dropped[oxide] = value
+    dropped_wt_pct = sum(dropped.values())
+    if dropped_wt_pct <= 1e-12:
+        return None
+
+    dropped_fraction = dropped_wt_pct / 100.0
+    return PropertyPerturbation(
+        property="bulk_sum_closure",
+        contaminant="MAGEMin ig/igad dropped oxides",
+        effect_row="magemin_ig_igad_bulk_sum_closure",
+        source="simulator/melt_backend/magemin.py::_DB_BULK_ORDERS",
+        residual_wt_pct=float(dropped_wt_pct),
+        perturbation_before=float(dropped_fraction),
+        perturbation_after=0.0,
+        metric="dropped_component_mass_fraction",
+        grounded=True,
+        correctable=False,
+        raw_value=float(dropped_fraction),
+        adjusted_value=0.0,
+        metadata={
+            "dropped_oxides_wt_pct": dict(sorted(dropped.items())),
+            "dropped_wt_pct": float(dropped_wt_pct),
+            "database": _magemin_database_from_engine_or_result(engine, melts_result),
+        },
+    )
+
+
 def _compute_property_perturbation(
     *,
     property_name: str,
@@ -357,10 +567,23 @@ def _compute_property_perturbation(
     row_key: str,
     contaminant_group: str,
     T_in_C: float,
-) -> PropertyPerturbation:
+    melts_result: Mapping[str, Any] | Any | None,
+    engine: str,
+) -> PropertyPerturbation | None:
     mode = str(prop_cfg.get("mode", ""))
     grounded = bool(prop_cfg.get("grounded", False))
     source = str(prop_cfg.get("source", ""))
+
+    if mode == "phase_topology_presence":
+        return _phase_topology_perturbation(
+            species=species,
+            wt_pct=wt_pct,
+            prop_cfg=prop_cfg,
+            row_key=row_key,
+            contaminant_group=contaminant_group,
+            melts_result=melts_result,
+            engine=engine,
+        )
 
     if mode == "delta_T_per_wt_pct":
         coeff = float(prop_cfg["coefficient_C_per_wt_pct"])
@@ -498,6 +721,7 @@ def melt_effect_adjustment(
     engine: str,
     *,
     T_in_C: float,
+    cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
 ) -> MeltEffectAdjustmentResult:
     """Per-residual analytical correction with separate raw vs adjusted fields."""
     perturbations: list[PropertyPerturbation] = []
@@ -510,9 +734,21 @@ def melt_effect_adjustment(
 
     raw_liquidus = None
     if melts_result is not None:
-        raw_liquidus = melts_result.get("liquidus_T_C")
+        raw_liquidus = _lookup_result_value(melts_result, "liquidus_T_C")
         if raw_liquidus is not None:
             raw_liquidus = float(raw_liquidus)
+
+    bulk_sum = _bulk_sum_closure_perturbation(
+        cleaned_oxide_wt_pct=(
+            cleaned_oxide_wt_pct
+            if cleaned_oxide_wt_pct is not None
+            else residual_by_species_wt_pct
+        ),
+        engine=engine,
+        melts_result=melts_result,
+    )
+    if bulk_sum is not None:
+        perturbations.append(bulk_sum)
 
     for species, wt_pct in sorted(residual_by_species_wt_pct.items()):
         if wt_pct <= 1e-12:
@@ -537,7 +773,11 @@ def melt_effect_adjustment(
                 row_key=row_key,
                 contaminant_group=str(row.get("contaminant_group", "")),
                 T_in_C=T_in_C,
+                melts_result=melts_result,
+                engine=engine,
             )
+            if pert is None:
+                continue
             perturbations.append(pert)
             if prop_name == "liquidus" and pert.grounded and pert.raw_value is not None:
                 liquidus_delta += float(pert.raw_value)
@@ -648,6 +888,10 @@ def _meets_threshold(
 def _classify_flag(pert: PropertyPerturbation) -> str | None:
     if pert.metric == "noise_floor_ungrounded":
         return "WARNING"
+    if pert.metric == "phase_topology_presence":
+        if (pert.perturbation_before or 0.0) >= PHASE_PRESENCE_FLOOR_FRACTION:
+            return "WARNING"
+        return None
     if pert.perturbation_before is None or pert.perturbation_after is None:
         return None
     thresholds = _property_thresholds(pert.property, pert.metric)
@@ -673,7 +917,7 @@ def evaluate_verdict_a(
     """WARN-only property-impact flags for one timeline step."""
     flags: list[PropertyFlag] = []
     for pert in perturbations:
-        if residual_wt_pct is not None:
+        if residual_wt_pct is not None and pert.property != "bulk_sum_closure":
             wt = float(residual_wt_pct.get(pert.contaminant, 0.0))
             if wt < confounding_threshold_pct:
                 continue
@@ -695,6 +939,7 @@ def evaluate_verdict_a(
                 residual_wt_pct=pert.residual_wt_pct,
                 hour=hour,
                 noise_floor_status=noise_status,
+                metadata=dict(pert.metadata),
             )
         )
     return tuple(flags)
@@ -764,6 +1009,7 @@ def _timeline_flag_record(
         "active": not cleared,
         "cleared": cleared,
         "clear_hour": clear_hour,
+        "metadata": dict(flag.metadata),
     }
 
 
@@ -775,6 +1021,7 @@ def evaluate_verdict_a_timeline(
     T_in_C: float,
     timeline: tuple[Any, ...],
     confounding_threshold_pct: float = 0.01,
+    cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
 ) -> VerdictAResult:
     """Step-resolved WARN-only flags; clears when bakeoff drops residual."""
     hourly = _estimate_hourly_residuals(final_residual_wt_pct, timeline)
@@ -789,6 +1036,7 @@ def evaluate_verdict_a_timeline(
             melts_result,
             engine,
             T_in_C=T_in_C,
+            cleaned_oxide_wt_pct=cleaned_oxide_wt_pct,
         )
         flags = evaluate_verdict_a(
             adjustment.perturbations,
@@ -902,17 +1150,29 @@ def build_harness_verdicts(
 
     melts_result: dict[str, Any] = {}
     raw_liq = getattr(sim, "_last_liquidus_T_C", None)
+    diag = getattr(sim, "_last_backend_diagnostics", {}) or {}
     if raw_liq is None:
-        diag = getattr(sim, "_last_backend_diagnostics", {}) or {}
         raw_liq = diag.get("liquidus_T_C") or diag.get("liquidus_C")
     if raw_liq is not None:
         melts_result["liquidus_T_C"] = float(raw_liq)
+    for key in (
+        "phase_modes_wt_pct",
+        "phase_modes_pct",
+        "phase_masses_kg",
+        "phases_present",
+        "magemin_database",
+        "database",
+        "db",
+    ):
+        if key in diag:
+            melts_result[key] = diag[key]
 
     adjustment = melt_effect_adjustment(
         residual_wt,
         melts_result or None,
         engine,
         T_in_C=T_in_C,
+        cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
     )
     verdict_a = evaluate_verdict_a_timeline(
         residual_wt,
@@ -920,6 +1180,7 @@ def build_harness_verdicts(
         engine,
         T_in_C=T_in_C,
         timeline=timeline,
+        cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
     )
 
     latest_status = str(
@@ -955,6 +1216,7 @@ def build_harness_verdicts(
                     "cleared": f.cleared,
                     "clear_hour": f.clear_hour,
                     "noise_floor_status": f.noise_floor_status,
+                    "metadata": dict(f.metadata),
                 }
                 for f in verdict_a.flags
             ],
@@ -1021,6 +1283,7 @@ def build_harness_verdicts(
                     f"adjusted_{p.property}": p.adjusted_value,
                     "interval": p.interval,
                     "metric_basis": p.metric_basis,
+                    "metadata": dict(p.metadata),
                 }
                 for p in adjustment.perturbations
             ],
