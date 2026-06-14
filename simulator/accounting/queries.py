@@ -63,6 +63,11 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})
 TERMINAL_RUMP_CLASS_TOLERANCE_PCT = 5e-12
+STAGE0_MELT_REDOX_ACCOUNT = "process.cleaned_melt"
+STAGE0_O2_SOURCE_ACCOUNT_PREFIXES = (
+    "process.stage0_",
+    "reservoir.stage0_",
+)
 
 
 def _merge_masses(target: dict[str, float], values: Mapping[str, float]) -> None:
@@ -209,18 +214,69 @@ class AccountingQueries:
         }
         stored_kg = sum(stored_by_source.values())
         vented_kg = sum(vented_by_source.values())
+        stage0_o2_vented = vented_by_source.get(
+            OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0)
+        stage0_o2_recovered = stored_by_source.get(OXYGEN_STAGE0_ACCOUNT, 0.0)
+        stage0_o2_bound = self._stage0_o2_bound_into_melt_redox_kg(
+            stage0_o2_vented,
+            stage0_o2_recovered,
+        )
         return {
             "stored": stored_kg,
             "vented": vented_kg,
             "total": stored_kg + vented_kg,
-            "stage0_stored": stored_by_source.get(OXYGEN_STAGE0_ACCOUNT, 0.0),
+            "stage0_stored": stage0_o2_recovered,
             "melt_offgas_stored": stored_by_source.get(
                 OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
             "mre_anode_stored": stored_by_source.get(
                 OXYGEN_MRE_ANODE_ACCOUNT, 0.0),
             "melt_offgas_vented": vented_by_source.get(
                 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0),
+            "stage0_o2_vented_with_offgas": stage0_o2_vented,
+            "stage0_o2_recovered_stored": stage0_o2_recovered,
+            "stage0_o2_bound_into_melt_redox": stage0_o2_bound,
         }
+
+    def _stage0_o2_bound_into_melt_redox_kg(
+        self,
+        stage0_o2_vented_kg: float,
+        stage0_o2_recovered_kg: float,
+    ) -> float:
+        redox_o2_kg = 0.0
+        terminal_o2_accounts = frozenset(
+            (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_VENTED_ACCOUNTS)
+        )
+        for transition in getattr(self.ledger, "transitions", ()):
+            if not str(getattr(transition, "name", "")).startswith("stage0_"):
+                continue
+            credits = tuple(getattr(transition, "credits", ()))
+            if not any(
+                getattr(lot, "account", "") == STAGE0_MELT_REDOX_ACCOUNT
+                for lot in credits
+            ):
+                continue
+            for lot in getattr(transition, "debits", ()):
+                account = str(getattr(lot, "account", ""))
+                if account in terminal_o2_accounts:
+                    continue
+                if not account.startswith(STAGE0_O2_SOURCE_ACCOUNT_PREFIXES):
+                    continue
+                species_kg = getattr(lot, "species_kg", {})
+                redox_o2_kg += float(species_kg.get(OXYGEN_SPECIES, 0.0))
+
+        consumed_kg = (
+            float(stage0_o2_vented_kg)
+            + float(stage0_o2_recovered_kg)
+            + redox_o2_kg
+        )
+        bound_kg = (
+            consumed_kg
+            - float(stage0_o2_vented_kg)
+            - float(stage0_o2_recovered_kg)
+        )
+        if bound_kg <= OXYGEN_ACCOUNTING_TOLERANCE_KG:
+            return 0.0
+        return bound_kg
 
     def condensation_totals_with_terminal_oxygen(self) -> dict[str, float]:
         totals = {
