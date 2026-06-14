@@ -68,6 +68,26 @@ STAGE0_O2_SOURCE_ACCOUNT_PREFIXES = (
     "process.stage0_",
     "reservoir.stage0_",
 )
+STAGE0_FOULANT_GROUPS = (
+    "trapped_gasses",
+    "refractory_carbon",
+    "other_mineral_contaminant",
+)
+STAGE0_FOULANT_PARTITION_FIELDS = (
+    "escaped_kg",
+    "retained_kg",
+    "wall_deposit_kg",
+    "rump_kg",
+    "burned_kg",
+)
+STAGE0_FOULANT_CLOSURE_TOLERANCE_KG = 1e-9
+STAGE0_FOULANT_CLOSURE_REL_TOL = 1e-9
+REACTION_FAMILY_PARTITION_CARBON = "partition_carbon"
+REACTION_FAMILY_VOLATILIZATION = "volatilization"
+REACTION_FAMILY_SULFATE_DECOMP = "sulfate_decomp"
+REACTION_FAMILY_SILICATE_DISPLACEMENT = "silicate_displacement"
+REACTION_FAMILY_CARBONATE_DECOMPOSITION = "carbonate_decomposition"
+REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
 
 
 def _merge_masses(target: dict[str, float], values: Mapping[str, float]) -> None:
@@ -202,6 +222,76 @@ class AccountingQueries:
                 f"({error_pct:.15g} pct)"
             )
         return by_class
+
+    def stage0_foulant_partition_by_group(self) -> dict[str, dict[str, Any]]:
+        """Read-only Stage-0 foulant fate rollup by reporting group."""
+        groups = _empty_stage0_foulant_partition_groups()
+        registry = _stage0_foulant_registry(self.sim)
+        diagnostics = _coalesced_stage0_foulant_diagnostics(
+            getattr(self.sim, "_stage0_foulant_diagnostics", ()) or ()
+        )
+
+        for diagnostic in diagnostics:
+            if not isinstance(diagnostic, Mapping):
+                continue
+            for row in _stage0_foulant_partition_rows(diagnostic, registry):
+                _add_stage0_foulant_partition_row(groups, row)
+
+        return _finalize_stage0_foulant_partition_groups(groups)
+
+    def stage0_foulant_hourly_by_group(
+        self,
+        snapshot: Any,
+    ) -> dict[str, dict[str, Any]]:
+        """Read one snapshot's reset-per-hour foulant deltas by group."""
+        groups = _empty_stage0_foulant_hourly_groups()
+        registry = _stage0_foulant_registry(self.sim)
+
+        by_group = getattr(snapshot, "by_group", None)
+        if isinstance(by_group, Mapping):
+            for group, events in by_group.items():
+                if group not in STAGE0_FOULANT_GROUPS:
+                    continue
+                for event in events or ():
+                    if isinstance(event, Mapping):
+                        _add_stage0_foulant_hourly_event(
+                            groups,
+                            str(group),
+                            event,
+                        )
+            return _finalize_stage0_foulant_hourly_groups(groups)
+
+        evap = getattr(snapshot, "evap_flux", None)
+        species_kg_hr = getattr(evap, "species_kg_hr", {}) or {}
+        if isinstance(species_kg_hr, Mapping):
+            for species, kg in species_kg_hr.items():
+                amount = _stage0_positive_float(kg)
+                if amount <= 0.0:
+                    continue
+                group = _stage0_group_for_carrier(
+                    str(species),
+                    "",
+                    registry,
+                )
+                groups[group]["escaped_kg"] += amount
+
+        wall_delta = getattr(
+            snapshot,
+            "wall_deposit_by_segment_species_delta",
+            {},
+        ) or {}
+        if isinstance(wall_delta, Mapping):
+            for key, kg in wall_delta.items():
+                if not isinstance(key, tuple) or len(key) != 2:
+                    continue
+                amount = _stage0_positive_float(kg)
+                if amount <= 0.0:
+                    continue
+                species = str(key[1])
+                group = _stage0_group_for_carrier(species, "", registry)
+                groups[group]["wall_deposit_kg"] += amount
+
+        return _finalize_stage0_foulant_hourly_groups(groups)
 
     def oxygen_terminal_partition_kg(self) -> dict[str, float]:
         stored_by_source = {
@@ -572,6 +662,473 @@ class AccountingQueries:
 def _ledger_o2_kg(ledger: Any, account: str) -> float:
     species_kg = ledger.kg_by_account(account)
     return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+
+
+def _empty_stage0_foulant_partition_groups() -> dict[str, dict[str, Any]]:
+    return {
+        group: {
+            "escaped_kg": 0.0,
+            "retained_kg": 0.0,
+            "wall_deposit_kg": 0.0,
+            "rump_kg": 0.0,
+            "burned_kg": 0.0,
+            "_source_kg": 0.0,
+            "_reaction_family_totals_kg": {},
+            "_residual_intervals": [],
+        }
+        for group in STAGE0_FOULANT_GROUPS
+    }
+
+
+def _empty_stage0_foulant_hourly_groups() -> dict[str, dict[str, Any]]:
+    return {
+        group: {
+            "escaped_kg": 0.0,
+            "retained_kg": 0.0,
+            "wall_deposit_kg": 0.0,
+            "rump_kg": 0.0,
+            "burned_kg": 0.0,
+            "_residual_intervals": [],
+        }
+        for group in STAGE0_FOULANT_GROUPS
+    }
+
+
+def _stage0_foulant_registry(sim: Any) -> Any | None:
+    getter = getattr(sim, "_load_foulant_registry_cached", None)
+    if not callable(getter):
+        return None
+    try:
+        return getter()
+    except Exception:
+        return None
+
+
+def _stage0_positive_float(value: Any) -> float:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(amount) or amount <= 0.0:
+        return 0.0
+    return amount
+
+
+def _stage0_optional_float(value: Any) -> float | None:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(amount):
+        return None
+    return amount
+
+
+def _stage0_fraction(value: Any) -> float:
+    amount = _stage0_optional_float(value)
+    if amount is None:
+        return 0.0
+    return amount
+
+
+def _stage0_group_for_carrier(
+    carrier: str,
+    reaction_family: str,
+    registry: Any | None,
+) -> str:
+    if registry is not None:
+        alias_to_carrier = getattr(registry, "alias_to_carrier", {}) or {}
+        carriers = getattr(registry, "carriers", {}) or {}
+        key = alias_to_carrier.get(carrier) or alias_to_carrier.get(
+            carrier.lower()
+        )
+        entry = carriers.get(key) if key is not None else None
+        group = getattr(entry, "group", None)
+        if group in STAGE0_FOULANT_GROUPS:
+            return str(group)
+    if reaction_family == REACTION_FAMILY_PARTITION_CARBON:
+        return "refractory_carbon"
+    return "other_mineral_contaminant"
+
+
+def _coalesced_stage0_foulant_diagnostics(
+    diagnostics: Any,
+) -> list[Mapping[str, Any]]:
+    coalesced: list[Mapping[str, Any]] = []
+    sulfate: dict[tuple[str, float], dict[str, Any]] = {}
+    for diagnostic in diagnostics:
+        if not isinstance(diagnostic, Mapping):
+            continue
+        family = str(diagnostic.get("reaction_family", ""))
+        if family != REACTION_FAMILY_SULFATE_DECOMP:
+            coalesced.append(diagnostic)
+            continue
+        carrier = str(diagnostic.get("carrier") or diagnostic.get("species") or "")
+        feed_kg = _stage0_positive_float(diagnostic.get("feed_kg"))
+        key = (carrier, feed_kg)
+        row = sulfate.setdefault(
+            key,
+            {
+                **dict(diagnostic),
+                "_retained_fraction_product": 1.0,
+                "_phase_rows": [],
+            },
+        )
+        extent = _stage0_fraction(diagnostic.get("extent"))
+        row["_retained_fraction_product"] *= 1.0 - extent
+        row["_phase_rows"].append(dict(diagnostic))
+    for row in sulfate.values():
+        retained = float(row.pop("_retained_fraction_product"))
+        row["extent"] = 1.0 - retained
+        row["phase_rows"] = tuple(row.pop("_phase_rows"))
+        coalesced.append(row)
+    return coalesced
+
+
+def _stage0_foulant_partition_rows(
+    diagnostic: Mapping[str, Any],
+    registry: Any | None,
+) -> list[dict[str, Any]]:
+    family = str(diagnostic.get("reaction_family", ""))
+    carrier = str(
+        diagnostic.get("carrier")
+        or diagnostic.get("species")
+        or diagnostic.get("source_component")
+        or ""
+    )
+    if family == REACTION_FAMILY_PARTITION_CARBON:
+        return _stage0_partition_carbon_rows(diagnostic)
+
+    feed_kg = _stage0_positive_float(diagnostic.get("feed_kg"))
+    if feed_kg <= 0.0:
+        return []
+    group = _stage0_group_for_carrier(carrier, family, registry)
+
+    if family == REACTION_FAMILY_VOLATILIZATION:
+        escaped = feed_kg * _stage0_fraction(
+            diagnostic.get("cumulative_escaped_frac")
+        )
+        retained = feed_kg * _stage0_fraction(
+            diagnostic.get("cumulative_retained_frac")
+        )
+        wall = feed_kg * _stage0_fraction(diagnostic.get("wall_deposit_frac"))
+        if wall > escaped and math.isclose(
+            wall,
+            escaped,
+            rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+            abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+        ):
+            wall = escaped
+        escaped_nonwall = escaped - wall
+        return [_stage0_partition_row(
+            group,
+            family,
+            feed_kg,
+            escaped_kg=escaped_nonwall,
+            retained_kg=retained,
+            wall_deposit_kg=wall,
+        )]
+
+    if family in {
+        REACTION_FAMILY_SULFATE_DECOMP,
+        REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+    }:
+        extent = _stage0_fraction(diagnostic.get("extent"))
+        return [_stage0_partition_row(
+            group,
+            family,
+            feed_kg,
+            escaped_kg=feed_kg * extent,
+            retained_kg=feed_kg * (1.0 - extent),
+        )]
+
+    if family == REACTION_FAMILY_SILICATE_DISPLACEMENT:
+        extent = _stage0_fraction(diagnostic.get("extent"))
+        return [_stage0_partition_row(
+            group,
+            family,
+            feed_kg,
+            retained_kg=feed_kg * (1.0 - extent),
+            rump_kg=feed_kg * extent,
+        )]
+
+    if family == REACTION_FAMILY_INERT_TO_RUMP:
+        rump_frac = _stage0_fraction(diagnostic.get("rump_frac", 1.0))
+        return [_stage0_partition_row(
+            group,
+            family,
+            feed_kg,
+            retained_kg=feed_kg * (1.0 - rump_frac),
+            rump_kg=feed_kg * rump_frac,
+        )]
+
+    return [_stage0_partition_row(group, family, feed_kg, retained_kg=feed_kg)]
+
+
+def _stage0_partition_carbon_rows(
+    diagnostic: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    feed_kg = _stage0_positive_float(diagnostic.get("feed_kg"))
+    declared_c_mol = _stage0_positive_float(diagnostic.get("declared_c_mol"))
+    if feed_kg <= 0.0 or declared_c_mol <= 0.0:
+        return []
+
+    rows: list[dict[str, Any]] = []
+    assigned_kg = 0.0
+
+    labile_kg = _stage0_carbon_split_kg(
+        diagnostic.get("labile_mol"),
+        declared_c_mol,
+        feed_kg,
+    )
+    if labile_kg > 0.0:
+        labile_extent = _stage0_fraction(diagnostic.get("labile_extent"))
+        assigned_kg += labile_kg
+        rows.append(_stage0_partition_row(
+            "trapped_gasses",
+            REACTION_FAMILY_PARTITION_CARBON,
+            labile_kg,
+            retained_kg=labile_kg * (1.0 - labile_extent),
+            burned_kg=labile_kg * labile_extent,
+        ))
+
+    refractory_kg = _stage0_carbon_split_kg(
+        diagnostic.get("refractory_mol"),
+        declared_c_mol,
+        feed_kg,
+    )
+    if refractory_kg > 0.0:
+        assigned_kg += refractory_kg
+        interval = dict(diagnostic.get("refractory_interval") or {})
+        low = _stage0_fraction(interval.get("low"))
+        high = _stage0_fraction(interval.get("high", 1.0))
+        retained_kg = refractory_kg * high
+        burned_kg = refractory_kg - retained_kg
+        rows.append(_stage0_partition_row(
+            "refractory_carbon",
+            REACTION_FAMILY_PARTITION_CARBON,
+            refractory_kg,
+            retained_kg=retained_kg,
+            burned_kg=burned_kg,
+            residual_interval={
+                "low_kg": refractory_kg * low,
+                "high_kg": refractory_kg * high,
+                "reason": interval.get("reason"),
+            },
+        ))
+
+    carbonate_kg = _stage0_carbon_split_kg(
+        diagnostic.get("carbonate_mol"),
+        declared_c_mol,
+        feed_kg,
+    )
+    if carbonate_kg > 0.0:
+        assigned_kg += carbonate_kg
+        rows.append(_stage0_partition_row(
+            "other_mineral_contaminant",
+            REACTION_FAMILY_PARTITION_CARBON,
+            carbonate_kg,
+            rump_kg=carbonate_kg,
+        ))
+
+    unassigned_kg = feed_kg - assigned_kg
+    if unassigned_kg > STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+        rows.append(_stage0_partition_row(
+            "other_mineral_contaminant",
+            REACTION_FAMILY_PARTITION_CARBON,
+            unassigned_kg,
+            retained_kg=unassigned_kg,
+            residual_interval={
+                "low_kg": 0.0,
+                "high_kg": unassigned_kg,
+                "reason": "carbon_partition_not_speciated",
+            },
+        ))
+    return rows
+
+
+def _stage0_carbon_split_kg(
+    split_mol: Any,
+    declared_c_mol: float,
+    feed_kg: float,
+) -> float:
+    amount = _stage0_optional_float(split_mol)
+    if amount is None or amount <= 0.0:
+        return 0.0
+    return feed_kg * amount / declared_c_mol
+
+
+def _stage0_partition_row(
+    group: str,
+    reaction_family: str,
+    source_kg: float,
+    *,
+    escaped_kg: float = 0.0,
+    retained_kg: float = 0.0,
+    wall_deposit_kg: float = 0.0,
+    rump_kg: float = 0.0,
+    burned_kg: float = 0.0,
+    residual_interval: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    values = {
+        "source_kg": float(source_kg),
+        "escaped_kg": float(escaped_kg),
+        "retained_kg": float(retained_kg),
+        "wall_deposit_kg": float(wall_deposit_kg),
+        "rump_kg": float(rump_kg),
+        "burned_kg": float(burned_kg),
+    }
+    for field, value in values.items():
+        if value < -STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+            raise AccountingError(
+                f"Stage-0 foulant {field} is negative for group {group!r}: "
+                f"{value:.15g} kg"
+            )
+        if value < 0.0:
+            values[field] = 0.0
+    return {
+        "group": group,
+        "reaction_family": str(reaction_family),
+        "source_kg": values["source_kg"],
+        "escaped_kg": values["escaped_kg"],
+        "retained_kg": values["retained_kg"],
+        "wall_deposit_kg": values["wall_deposit_kg"],
+        "rump_kg": values["rump_kg"],
+        "burned_kg": values["burned_kg"],
+        "residual_interval": (
+            dict(residual_interval) if residual_interval is not None else None
+        ),
+    }
+
+
+def _add_stage0_foulant_partition_row(
+    groups: dict[str, dict[str, Any]],
+    row: Mapping[str, Any],
+) -> None:
+    group = str(row.get("group", ""))
+    if group not in groups:
+        raise AccountingError(f"unknown Stage-0 foulant group {group!r}")
+    payload = groups[group]
+    source_kg = float(row.get("source_kg", 0.0) or 0.0)
+    payload["_source_kg"] += source_kg
+    family = str(row.get("reaction_family", ""))
+    family_totals = payload["_reaction_family_totals_kg"]
+    family_totals[family] = family_totals.get(family, 0.0) + source_kg
+    for field in STAGE0_FOULANT_PARTITION_FIELDS:
+        payload[field] += float(row.get(field, 0.0) or 0.0)
+    interval = row.get("residual_interval")
+    if isinstance(interval, Mapping):
+        payload["_residual_intervals"].append(dict(interval))
+
+
+def _finalize_stage0_foulant_partition_groups(
+    groups: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
+    for group, payload in groups.items():
+        source_kg = float(payload["_source_kg"])
+        allocated_kg = sum(float(payload[field]) for field in STAGE0_FOULANT_PARTITION_FIELDS)
+        error_kg = allocated_kg - source_kg
+        if not math.isclose(
+            allocated_kg,
+            source_kg,
+            rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+            abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+        ):
+            raise AccountingError(
+                f"Stage-0 foulant group {group!r} mass does not close: "
+                f"{allocated_kg:.15g} kg allocated vs "
+                f"{source_kg:.15g} kg debited"
+            )
+        error_pct = (
+            abs(error_kg) / source_kg * 100.0 if source_kg > 0.0 else 0.0
+        )
+        result[group] = {
+            "escaped_kg": float(payload["escaped_kg"]),
+            "retained_kg": float(payload["retained_kg"]),
+            "wall_deposit_kg": float(payload["wall_deposit_kg"]),
+            "rump_kg": float(payload["rump_kg"]),
+            "burned_kg": float(payload["burned_kg"]),
+            "residual_interval": _combine_stage0_residual_intervals(
+                payload["_residual_intervals"]
+            ),
+            "reaction_family_totals_kg": dict(sorted(
+                payload["_reaction_family_totals_kg"].items()
+            )),
+            "closure": {
+                "source_debited_kg": source_kg,
+                "allocated_kg": allocated_kg,
+                "error_kg": error_kg,
+                "error_pct": error_pct,
+            },
+        }
+    return result
+
+
+def _add_stage0_foulant_hourly_event(
+    groups: dict[str, dict[str, Any]],
+    group: str,
+    event: Mapping[str, Any],
+) -> None:
+    payload = groups[group]
+    for field in STAGE0_FOULANT_PARTITION_FIELDS:
+        amount = _stage0_positive_float(event.get(field))
+        if amount > 0.0:
+            payload[field] += amount
+    disposition = str(event.get("disposition", ""))
+    amount_kg = _stage0_positive_float(event.get("amount_kg"))
+    decomposed_kg = _stage0_positive_float(event.get("decomposed_kg"))
+    evolved_kg = _stage0_positive_float(event.get("evolved_kg_hr"))
+    if disposition in {"escaped", "evolved"} and amount_kg > 0.0:
+        payload["escaped_kg"] += amount_kg
+    elif disposition == "rump" and amount_kg > 0.0:
+        payload["rump_kg"] += amount_kg
+    elif disposition in {"residual", "carbonate_residual"} and amount_kg > 0.0:
+        payload["retained_kg"] += amount_kg
+    if decomposed_kg > 0.0:
+        payload["escaped_kg"] += decomposed_kg
+    if evolved_kg > 0.0:
+        payload["escaped_kg"] += evolved_kg
+    interval = event.get("residual_interval")
+    if isinstance(interval, Mapping):
+        payload["_residual_intervals"].append(dict(interval))
+
+
+def _finalize_stage0_foulant_hourly_groups(
+    groups: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    return {
+        group: {
+            "escaped_kg": float(payload["escaped_kg"]),
+            "retained_kg": float(payload["retained_kg"]),
+            "wall_deposit_kg": float(payload["wall_deposit_kg"]),
+            "rump_kg": float(payload["rump_kg"]),
+            "burned_kg": float(payload["burned_kg"]),
+            "residual_interval": _combine_stage0_residual_intervals(
+                payload["_residual_intervals"]
+            ),
+        }
+        for group, payload in groups.items()
+    }
+
+
+def _combine_stage0_residual_intervals(
+    intervals: list[Mapping[str, Any]],
+) -> dict[str, Any] | None:
+    if not intervals:
+        return None
+    low = sum(float(item.get("low_kg", 0.0) or 0.0) for item in intervals)
+    high = sum(float(item.get("high_kg", 0.0) or 0.0) for item in intervals)
+    reasons = sorted({
+        str(item.get("reason"))
+        for item in intervals
+        if item.get("reason") is not None
+    })
+    return {
+        "low_kg": low,
+        "high_kg": high,
+        "reasons": reasons,
+    }
 
 
 def _oxygen_atom_mol_for_balances(
