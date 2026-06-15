@@ -28,37 +28,37 @@ FEEDSTOCKS_PATH = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
 # Pre-F1 composition totals (re-partition invariant: same sum_check / oxide total).
 PRE_SPLIT = {
     "ceres_regolith": {
-        "carbonaceous_organic": 17.5,
-        "sum_check": 115.25,
+        "carbonaceous_organic": 5.2,
+        "sum_check": 102.95,
     },
     "ci_carbonaceous_chondrite": {
-        "carbonaceous_organic": 3.5,
-        "sum_check": 97.25,
+        "carbonaceous_organic": 6.5,
+        "sum_check": 100.25,
     },
     "cm_carbonaceous_chondrite": {
-        "carbonaceous_organic": 2.25,
-        "sum_check": 91.0,
+        "carbonaceous_organic": 3.2,
+        "sum_check": 91.95,
     },
     "mars_basalt": {
         "SO3": 6.0,
-        "sum_check": 102.05,
+        "sum_check": 105.05,
     },
     "mars_sulfate_rich": {
         "SO3": 11.5,
-        "sum_check": 105.45,
+        "sum_check": 107.45,
     },
 }
 
 LITERATURE_RANGES = {
     "ceres_regolith": {
-        "carbonate_salts": (1.5, 4.0),
-        "NH3": (0.8, 2.5),
+        "carbonate_salts": (2.0, 4.5),
+        "NH3": (0.8, 2.0),
     },
     "ci_carbonaceous_chondrite": {
-        "carbonate_salts": (2.0, 5.0),
+        "carbonate_salts": (1.5, 4.0),
     },
     "cm_carbonaceous_chondrite": {
-        "carbonate_salts": (2.0, 4.0),
+        "carbonate_salts": (0.8, 2.5),
     },
 }
 
@@ -254,7 +254,7 @@ def test_f1_carrier_levels_within_literature_ranges(feedstocks):
 
     brine = feedstocks["ceres_regolith"]["stage0_carrier_keys"]["brine_salts"]
     assert brine["interval_required"] is True
-    assert brine["allocated_wt_pct"] == 0.0
+    assert brine["allocated_wt_pct"] == pytest.approx(1.0)
     lo, hi = brine["level_range_wt_pct"]
     assert lo < hi
 

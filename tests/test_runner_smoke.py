@@ -567,6 +567,7 @@ def _run_c2a_trace_export():
         hours=24,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,
+        force_builtin_vapor_pressure=True,
         **VPR_P6A_TRACE_CONTROLS,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
@@ -596,6 +597,7 @@ def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
             "--hours=24",
             "--allow-fallback-vapor",
             "--allow-unmeasured-alpha-fallback",
+            "--force-builtin-vapor-pressure",
             f"--sio-start-temperature-c={VPR_P6A_TRACE_CONTROLS['sio_start_temperature_c']}",
             f"--sio-hold-temperature-c={VPR_P6A_TRACE_CONTROLS['sio_hold_temperature_c']}",
             f"--sio-ramp-c-per-hr={VPR_P6A_TRACE_CONTROLS['sio_ramp_c_per_hr']}",

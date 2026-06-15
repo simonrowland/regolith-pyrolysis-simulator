@@ -884,8 +884,8 @@ ci_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.50
     H2O:   15.0    # structural, in phyllosilicates
-    carbonaceous_organic: 0.75  # organics remainder after carbonate carrier split (was 3.5 lump)
-    carbonate_salts: 2.75  # carrier key alias carbonate; Mg/Ca/Fe vein carbonate; not_speciated mass
+    carbonaceous_organic: 4.0  # IOM/organic matter; literature-converged correction, not carbonate remainder
+    carbonate_salts: 2.5  # Ivuna/Orgueil-class carbonate mineral mass; not_speciated Mg/Ca/Fe carbonate
     S:      4.0    # predominantly sulfides
   composition_ranges:
     SiO2:  [22, 28]
@@ -896,10 +896,22 @@ ci_carbonaceous_chondrite:
     Na2O:  [0.5, 1.0]
     NiO:   [1.2, 1.8]
     H2O:   [10, 20]
-    carbonaceous_organic: [0, 3]
-    carbonate_salts: [2, 5]
+    carbonaceous_organic: [3.0, 5.5]
+    carbonate_salts: [1.5, 4.0]
     S:     [2, 6]
-  sum_check: 97.25  # bulk; remainder is minor/trace phases
+  sum_check: 100.25  # bulk; corrected carbon carriers consume prior minor/trace remainder
+  carbon_speciation_provenance:
+    carbonaceous_organic:
+      value_wt_pct: 4.0
+      interval_wt_pct: [3.0, 5.5]
+      source: "Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&PS 41:1899-1918; Alexander C.M.O'D. et al. 2007, GCA 71:4380-4403."
+      basis: "CI bulk carbon is IOM/organic-dominated; Ivuna organic C is about 90% of total C."
+    carbonate_salts:
+      value_wt_pct: 2.5
+      interval_wt_pct: [1.5, 4.0]
+      source: "Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&PS 39:3-16; Endress M. & Bischoff A. 1996, GCA 60:3035-3045."
+      basis: "Ivuna residual carbonate C implies about 2.6-2.8 wt% carbonate mineral; Ryugu-rich aliquots remain a separate lithology branch."
+    implied_bulk_c_wt_pct: [2.9, 4.0]
   stage0_carrier_keys:
     carbonate:
       composition_key: carbonate_salts
@@ -907,9 +919,11 @@ ci_carbonaceous_chondrite:
       stage0_components_set: STAGE0_CARBONATE_COMPONENTS
       interval_required: true
       not_speciated: true
-      level_range_wt_pct: [2.0, 5.0]
+      level_range_wt_pct: [1.5, 4.0]
       sources:
-        - "Tomeoka & Buseck 1988"
+        - "Yokoyama et al. 2023"
+        - "Bland et al. 2004"
+        - "Endress & Bischoff 1996"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -917,10 +931,10 @@ ci_carbonaceous_chondrite:
       template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
-      cap_kg_per_tonne: [20, 50]
+      cap_kg_per_tonne: [30, 55]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "MODELED BUCKET (not a cited table); CI carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
     hydrocarbons:
       template_formula: generic_carbonaceous_hydrocarbon
       decomposition_temp_range_C: [200, 500]
@@ -984,15 +998,27 @@ cm_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.5
     H2O:    9.0     # structural, in phyllosilicates
-    carbonaceous_organic: 0.25  # organics remainder after carbonate carrier split (was 2.25 lump)
-    carbonate_salts: 2.0  # carrier key alias carbonate; vein carbonate; interval_required
+    carbonaceous_organic: 2.0  # IOM/organic matter; literature-converged correction
+    carbonate_salts: 1.2  # Murchison-like carbonate mineral mass; carbonate-rich lithologies are not default CM
     S:      3.0     # predominantly sulfides
   composition_ranges:
     H2O:   [6, 12]
-    carbonaceous_organic: [0, 2]
-    carbonate_salts: [2, 4]
+    carbonaceous_organic: [1.5, 3.5]
+    carbonate_salts: [0.8, 2.5]
     S:     [2, 4]
-  sum_check: 91.0   # approximate; source data incomplete for CM oxides
+  sum_check: 91.95  # approximate; source data incomplete for CM oxides
+  carbon_speciation_provenance:
+    carbonaceous_organic:
+      value_wt_pct: 2.0
+      interval_wt_pct: [1.5, 3.5]
+      source: "Pearson V.K. et al. 2006, M&PS 41:1899-1918; Smith J.W. & Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O'D. et al. 2007, GCA 71:4380-4403."
+      basis: "CM bulk carbon is organic-dominated; Murchison bulk C is 2.25 +/- 0.09 wt%."
+    carbonate_salts:
+      value_wt_pct: 1.2
+      interval_wt_pct: [0.8, 2.5]
+      source: "Bland P.A. et al. 2004, M&PS 39:3-16; Pearson V.K. et al. 2006, M&PS 41:1899-1918; Zolensky M.E. et al. 2002, M&PS 37:737-761."
+      basis: "Murchison modal calcite is about 1.1 wt%; carbonate-rich Tagish-like lithologies are excluded from default CM."
+    implied_bulk_c_wt_pct: [1.5, 2.5]
   stage0_carrier_keys:
     carbonate:
       composition_key: carbonate_salts
@@ -1000,9 +1026,10 @@ cm_carbonaceous_chondrite:
       stage0_components_set: STAGE0_CARBONATE_COMPONENTS
       interval_required: true
       not_speciated: true
-      level_range_wt_pct: [2.0, 4.0]
+      level_range_wt_pct: [0.8, 2.5]
       sources:
-        - "Tomeoka & Buseck 1988"
+        - "Bland et al. 2004"
+        - "Pearson et al. 2006"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -1013,7 +1040,7 @@ cm_carbonaceous_chondrite:
       cap_kg_per_tonne: [15, 30]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "MODELED BUCKET (not a cited table); CM carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "Pearson et al. 2006 + Smith & Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
   anhydrous_silicate_after_degassing:
     note: "Similar to CI but slightly higher SiO2, lower FeO"
     composition_wt_pct:
@@ -1054,16 +1081,44 @@ ceres_regolith:
     Na2O:   0.75
     NiO:    1.5
     H2O:   20.0    # ice + structural; poles/bright spots much higher
-    carbonaceous_organic: 13.1  # organics + unallocated brine_salts mass (brine split deferred; see stage0_carrier_keys)
-    carbonate_salts: 2.75  # carrier key alias carbonate; Mg/Ca/Na carbonate; not_speciated mass
-    NH3:    1.65    # ammoniated phyllosilicate degas; nh4_clay carrier alias
+    carbonaceous_organic: 1.0  # true organics only; Ernutet enrichments are not global average
+    carbonate_salts: 3.0  # Mg/Ca carbonate mineral mass; local Na-carbonate faculae are separate
+    NH3:    1.2     # ammoniated phyllosilicate degas proxy; mineral phase mass declared below
     S:      3.5
   composition_ranges:
     H2O_ice_structural_kg_per_tonne: [120, 280]
-    carbonaceous_organic_wt_pct: [11, 19]
-    carbonate_salts: [1.5, 4.0]
-    NH3: [0.8, 2.5]
-  sum_check: 115.25  # bulk with massive C and H2O; volatile-dominated
+    carbonaceous_organic_wt_pct: [0.5, 1.5]
+    carbonate_salts: [2.0, 4.5]
+    NH3: [0.8, 2.0]
+    brine_salts_wt_pct: [0.5, 2.0]
+    nh4_phyllosilicate_wt_pct: [5, 12]
+  sum_check: 102.95  # corrected organic/carbonate/NH3 raw keys; NH4 phase + brine are declaration-only carriers pending exact formulas
+  carbon_speciation_provenance:
+    carbonaceous_organic:
+      value_wt_pct: 1.0
+      interval_wt_pct: [0.5, 1.5]
+      source: "De Sanctis M.C. et al. 2017, Science 355:719-722, DOI 10.1126/science.aaj2305."
+      basis: "Global organics are <=1 wt%; Ernutet 4-9 wt% organics are localized and not a global reservoir."
+    carbonate_salts:
+      value_wt_pct: 3.0
+      interval_wt_pct: [2.0, 4.5]
+      source: "De Sanctis M.C. et al. 2018, M&PS 53:1844-1858, DOI 10.1111/maps.13104; McSween H.Y. et al. 2018, M&PS 53:1793-1804, DOI 10.1111/maps.12947."
+      basis: "Dawn spectral fits center about 2-3.6 wt% dolomite with advanced alteration supporting the upper half of 2-5 wt%."
+    NH3:
+      value_wt_pct: 1.2
+      interval_wt_pct: [0.8, 2.0]
+      source: "De Sanctis M.C. et al. 2015, Nature 526:108, DOI 10.1038/nature16172; Ammannito E. et al. 2016, Science 353:aaf4279, DOI 10.1126/science.aaf4279."
+      basis: "NH3 key is a degas proxy, not full NH4-phyllosilicate mineral mass."
+    brine_salts:
+      allocated_wt_pct: 1.0
+      interval_wt_pct: [0.5, 2.0]
+      source: "Castillo-Rogez J.C. et al. 2020, Astrobiology 20:269; De Sanctis M.C. et al. 2018, M&PS 53:1844-1858."
+      basis: "Weakly grounded Ceres brine/hydrated salts; kept declaration-only until NaCl/MgSO4/Na-carbonate split is exact."
+    nh4_phyllosilicate:
+      phase_wt_pct: 8.0
+      interval_wt_pct: [5, 12]
+      source: "De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&PS 53:1844-1858."
+      basis: "N-bearing ammoniated phyllosilicate phase, explicitly not a carbon carrier."
   stage0_carrier_keys:
     carbonate:
       composition_key: carbonate_salts
@@ -1071,20 +1126,34 @@ ceres_regolith:
       stage0_components_set: STAGE0_CARBONATE_COMPONENTS
       not_speciated: true
       carbonate_c_share: interval
-      level_range_wt_pct: [1.5, 4.0]
+      level_range_wt_pct: [2.0, 4.5]
       sources:
-        - "De Sanctis 2015/2016"
-        - "Dawn VIR 3.95 um"
+        - "De Sanctis et al. 2018"
+        - "McSween et al. 2018"
     nh4_clay:
       composition_key: NH3
       reaction_family: complete_oxidation
       stage0_components_set: STAGE0_GAS_COMPONENTS
       partly_grounded: true
-      level_range_wt_pct: [0.8, 2.5]
+      level_range_wt_pct: [0.8, 2.0]
       sources:
-        - "De Sanctis 2015"
-        - "Ammannito 2016"
-        - "Dawn VIR 3.1 um"
+        - "De Sanctis et al. 2015"
+        - "Ammannito et al. 2016"
+    nh4_phyllosilicate:
+      composition_key: NH3
+      reaction_family: declaration_only
+      stage0_components_set: STAGE0_GAS_COMPONENTS
+      partly_grounded: true
+      allocated_wt_pct: 8.0
+      level_range_wt_pct: [5.0, 12.0]
+      note: >
+        Full NH4-phyllosilicate mineral mass is tracked as a declared carrier;
+        the raw composition key remains NH3 degas-equivalent until the
+        ammoniated-clay formula/occupancy is grounded.
+      sources:
+        - "De Sanctis et al. 2015"
+        - "Ammannito et al. 2016"
+        - "De Sanctis et al. 2018"
     brine_salts:
       composition_keys: [NaCl, MgSO4]
       reaction_family: volatilization
@@ -1092,13 +1161,15 @@ ceres_regolith:
       partly_grounded: true
       not_speciated: true
       interval_required: true
-      allocated_wt_pct: 0.0
+      allocated_wt_pct: 1.0
       level_range_wt_pct: [0.5, 2.0]
       note: >
-        Carrier key for OD-6 binding; mass remains in carbonaceous_organic until
-        brine NaCl/MgSO4 composition split is grounded (core Stage-0 routing gap).
+        Carrier key for OD-6 binding; brine mass no longer sits in
+        carbonaceous_organic, but raw NaCl/MgSO4/Na-carbonate composition remains
+        declaration-only until the split is grounded.
       sources:
-        - "Neveu & Desch 2015"
+        - "Castillo-Rogez et al. 2020"
+        - "De Sanctis et al. 2018"
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -1106,10 +1177,10 @@ ceres_regolith:
       template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 800]
       final_temp_C: 1050
-      cap_kg_per_tonne: [150, 200]
+      cap_kg_per_tonne: [5, 15]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "MODELED BUCKET (not a cited table); Ceres carbonaceous-organic bucket represents organics plus carbonates; generic C/H/O/N inventory is used for simple oxidative cleanup to avoid tar carryover."
+      source: "De Sanctis et al. 2017 constrains Ceres global organics to <=1 wt%; generic C/H/O/N inventory is a process surrogate for oxidative cleanup."
   anhydrous_silicate_after_degassing:
     note: "Identical to CI (SiO2 32-40, FeO 25-35, MgO 22-26) but slightly Mg-richer"
     composition_wt_pct:
@@ -1131,7 +1202,7 @@ ceres_regolith:
   potential_products:
     H2O_kg_per_tonne: [120, 250]
     NH3_kg_per_tonne: [8, 25]
-    carbonate_salts_kg_per_tonne: [15, 40]   # Mg/Ca/Na carbonates
+    carbonate_salts_kg_per_tonne: [20, 45]   # Mg/Ca carbonates; local Na-carbonate faculae excluded
   key_feature: "Ammonia-rich + brine-derived salts; highest-accessibility water factory in main belt"
   preferred_for: "Water + NH3 propellant/life-support + fertiliser salts + Mg shuttle bootstrapping"
   process_notes: >
@@ -1150,25 +1221,39 @@ comet_nucleus:
     4-10:1 (porous nucleus ~75% void). Post-C0 silicate identical to CI.
     Bulk composition is dominated by volatiles.
   composition_wt_pct:
-    SiO2:  20.0     # diluted by massive volatiles
-    FeO:   20.0
-    MgO:   16.0
-    Al2O3:  1.5
-    CaO:    1.5
-    Na2O:   0.5
-    NiO:    1.2
-    H2O:   30.0     # range 200-400 kg/t
+    SiO2:  12.60    # scaled refractory mineral dust; see carbon_speciation_provenance
+    FeO:   12.60
+    MgO:   10.08
+    Al2O3:  0.95
+    CaO:    0.95
+    Na2O:   0.32
+    NiO:    0.75
+    H2O:   12.50    # Fulle 2016 refractory:H2O central ratio after volatile-C sidecars
     CO_CO2: 10.0    # 50-150 kg/t
-    organics: 7.5   # 50-100 kg/t
+    organics: 33.75 # 45% of refractory dust; nucleus-bulk value after CO/CO2 sidecars
     CH4_NH3_HCN: 2.5
     S:      3.0
   composition_ranges:
-    H2O_kg_per_tonne: [200, 400]
+    H2O_kg_per_tonne: [100, 180]
     CO_CO2_kg_per_tonne: [50, 150]
-    organics_hydrocarbons_kg_per_tonne: [50, 100]
+    organics_hydrocarbons_kg_per_tonne: [320, 400]
+    refractory_dust_organic_wt_pct: [40, 50]
+    nucleus_bulk_refractory_organic_wt_pct: [32, 40]
+    refractory_to_water_mass_ratio: [4, 8]
     CH4_NH3_HCN_kg_per_tonne: [10, 40]
     S_kg_per_tonne: [20, 40]
-  sum_check: 113.70  # volatile-dominated; not meaningful to sum to 100%
+  sum_check: 100.00  # central 67P dust+ice+volatile-C composition closes by construction
+  carbon_speciation_provenance:
+    organics:
+      value_wt_pct: 33.75
+      refractory_dust_interval_wt_pct: [40, 50]
+      nucleus_bulk_interval_wt_pct: [32, 40]
+      source: "Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19."
+      basis: "COSIMA dust is about 45 wt% organic matter; Fulle refractory:H2O ratio near 6 gives a nucleus-bulk organic interval, here normalized with existing 10 wt% CO/CO2 and 2.5 wt% CH4/NH3/HCN sidecars."
+    mineral_rebalance:
+      refractory_mineral_plus_s_wt_pct: 41.25
+      source: "Bardyn A. et al. 2017, MNRAS 469:S712-S722."
+      basis: "Remaining 55 wt% refractory dust is non-organic mineral/sulfur; oxide split preserves prior surrogate relative proportions."
   stage0_profile: "carbonaceous_degas_cleanup"
   stage0_temp_range_C: [20, 1050]
   stage0_formula_inventory:
@@ -1185,10 +1270,10 @@ comet_nucleus:
       template_formula: generic_carbonaceous_organic
       decomposition_temp_range_C: [200, 500]
       final_temp_C: 1050
-      cap_kg_per_tonne: [50, 100]
+      cap_kg_per_tonne: [320, 400]
       offgas_mode: complete_oxidation
       oxygen_source: controlled_stage0_O2
-      source: "MODELED BUCKET (not a cited table); generic carbonaceous organic cleanup bucket; C/H/O/N mass fractions approximate sourcebook-style volatile tables when exact tar-forming organics speciation is unavailable."
+      source: "Bardyn et al. 2017 COSIMA dust organic matter (40-50 wt% refractory dust) + Fulle et al. 2016 refractory:H2O ratio; generic C/H/O/N mass fractions remain a process surrogate."
     CH4_NH3_HCN:
       atoms:
         C: 2
@@ -1327,6 +1412,15 @@ mars_basalt:
   label: "Mars Basalt (General)"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [2.0, 5.0]
+      sources:
+        - "Bandfield et al. 2003"
     sulfate_decomp:
       composition_key: SO3
       reaction_family: sulfate_decomp
@@ -1365,6 +1459,7 @@ mars_basalt:
     Na2O:   3.0
     K2O:    0.50
     SO3:    6.0
+    carbonate_salts: 3.0
     Cl:     0.70
     P2O5:   0.85
     ClO4:   0.50    # perchlorates (polar soil)
@@ -1378,10 +1473,17 @@ mars_basalt:
     Na2O:  [2.5, 3.5]
     K2O:   [0.4, 0.6]
     SO3:   [5, 7]
+    carbonate_salts: [2, 5]
     Cl:    [0.6, 0.8]
     P2O5:  [0.7, 1.0]
     ClO4:  [0.4, 0.6]
-  sum_check: 102.05
+  sum_check: 105.05
+  native_carbonate_provenance:
+    carbonate_salts:
+      value_wt_pct: 3.0
+      interval_wt_pct: [2.0, 5.0]
+      source: "Bandfield J.L., Glotch T.D. & Christensen P.R. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054."
+      basis: "Mars high-albedo dust carries 2-5 wt% magnesite-dominated carbonate; process reductant carbon remains separate."
   environment:
     surface_pressure_mbar: 6    # range 0.7 (Olympus Mons) to 11 (Hellas)
     atmosphere: "96% CO2"
@@ -1403,6 +1505,16 @@ mars_sulfate_rich:
   label: "Mars Sulfate-Rich Soil"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [0.0, 3.0]
+      sources:
+        - "Bandfield et al. 2003"
+        - "Niles et al. 2017"
     sulfate_decomp:
       composition_key: SO3
       reaction_family: sulfate_decomp
@@ -1437,6 +1549,7 @@ mars_sulfate_rich:
     Na2O:   2.75
     K2O:    0.50
     SO3:   11.5     # key delta vs baseline
+    carbonate_salts: 2.0
     Cl:     0.85
     P2O5:   0.85
   composition_ranges:
@@ -1449,9 +1562,16 @@ mars_sulfate_rich:
     Na2O:  [2.0, 3.5]
     K2O:   [0.3, 0.7]
     SO3:   [8, 15]
+    carbonate_salts: [0, 3]
     Cl:    [0.5, 1.2]
     P2O5:  [0.6, 1.1]
-  sum_check: 105.45  # see note; normalise for simulation
+  sum_check: 107.45  # see note; normalise for simulation
+  native_carbonate_provenance:
+    carbonate_salts:
+      value_wt_pct: 2.0
+      interval_wt_pct: [0.0, 3.0]
+      source: "Bandfield J.L. et al. 2003, Science 301:1084-1087; Niles P.B. et al. 2017, JGR Planets 122, DOI 10.1002/2016JE005225."
+      basis: "Sulfate-rich Mars sediments inherit low global-dust carbonate; carbonates are not the major sulfate-rich cement."
   environment:
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"
@@ -1468,6 +1588,18 @@ mars_sulfate_rich:
 mars_phyllosilicate_clay:
   label: "Mars Phyllosilicate Clay"
   stage0_profile: "mars_carbon_cleanup"
+  stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [3.0, 15.0]
+      sources:
+        - "Ehlmann et al. 2008"
+        - "Morris et al. 2010"
+        - "Bandfield et al. 2003"
   stage0_carbon_cleanup:
     carbon_reductant_kg_per_tonne: 0
     reactions: []
@@ -1487,6 +1619,7 @@ mars_phyllosilicate_clay:
     Na2O:   3.0
     K2O:    0.60
     SO3:    5.0
+    carbonate_salts: 8.0
     Cl:     0.80
   composition_ranges:
     SiO2:  [43, 49]
@@ -1498,8 +1631,15 @@ mars_phyllosilicate_clay:
     Na2O:  [2.2, 3.8]
     K2O:   [0.4, 0.8]
     SO3:   [3, 7]
+    carbonate_salts: [3, 15]
     Cl:    [0.6, 1.0]
-  sum_check: 103.75  # see note; normalise for simulation
+  sum_check: 111.75  # see note; normalise for simulation
+  native_carbonate_provenance:
+    carbonate_salts:
+      value_wt_pct: 8.0
+      interval_wt_pct: [3.0, 15.0]
+      source: "Ehlmann B.L. et al. 2008, Science 322:1828, DOI 10.1126/science.1164759; Morris R.V. et al. 2010, Science 328:421, DOI 10.1126/science.1189667; Bandfield J.L. et al. 2003, Science 301:1084."
+      basis: "Clay/regional altered regolith uses the 3-15 wt% modeling interval; Comanche/Nili 16-34 wt% remains an explicit outcrop endmember."
   environment:
     surface_pressure_mbar: 6.0
     atmosphere: "96% CO2"
@@ -1517,6 +1657,16 @@ mars_phyllosilicate_clay:
 
 mars_perchlorate_rich:
   label: "Mars Perchlorate-Rich Soil"
+  stage0_carrier_keys:
+    carbonate:
+      composition_key: carbonate_salts
+      reaction_family: carbonate_decomposition
+      stage0_components_set: STAGE0_CARBONATE_COMPONENTS
+      interval_required: true
+      not_speciated: true
+      level_range_wt_pct: [0.0, 3.0]
+      sources:
+        - "Bandfield et al. 2003"
   stage0_perchlorate_cleanup:
     reactions:
       - perchlorate_to_chloride_o2
@@ -1535,6 +1685,7 @@ mars_perchlorate_rich:
     Na2O:   3.25
     K2O:    0.50
     SO3:    6.0
+    carbonate_salts: 1.5
     Cl:     1.75
     ClO4:   0.95    # key delta
   composition_ranges:
@@ -1547,9 +1698,16 @@ mars_perchlorate_rich:
     Na2O:  [2.5, 4.0]
     K2O:   [0.3, 0.7]
     SO3:   [4, 8]
+    carbonate_salts: [0, 3]
     Cl:    [1.0, 2.5]
     ClO4:  [0.4, 1.5]
-  sum_check: 101.45
+  sum_check: 102.95
+  native_carbonate_provenance:
+    carbonate_salts:
+      value_wt_pct: 1.5
+      interval_wt_pct: [0.0, 3.0]
+      source: "Bandfield J.L. et al. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054."
+      basis: "Phoenix/polar soils have no robust local carbonate detection; aeolian dust carbonate supplies the low 0-3 wt% carrier."
   environment:
     surface_pressure_mbar: 6
     atmosphere: "96% CO2"

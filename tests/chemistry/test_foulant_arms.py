@@ -325,6 +325,8 @@ def test_foulant_diagnostics_golden_neutral_mass_balance(
         (
             "mars_sulfate_rich",
             {
+                REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+                REACTION_FAMILY_SILICATE_DISPLACEMENT,
                 REACTION_FAMILY_SULFATE_DECOMP,
                 REACTION_FAMILY_VOLATILIZATION,
             },
