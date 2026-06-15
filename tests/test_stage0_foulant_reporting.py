@@ -74,6 +74,60 @@ def test_stage0_foulant_partition_mass_closure_raises_on_gap():
         AccountingQueries(sim).stage0_foulant_partition_by_group()
 
 
+def test_stage0_foulant_partition_raises_on_overspeciated_carbon():
+    sim = _sim_with_diagnostics({
+        "reaction_family": "partition_carbon",
+        "carrier": "carbonaceous_organic",
+        "feed_kg": 1.0,
+        "declared_c_mol": 1.0,
+        "labile_mol": 1.0,
+        "refractory_mol": 1.0,
+        "carbonate_mol": 0.0,
+        "labile_extent": 1.0,
+        "refractory_interval": {"low": 1.0, "high": 1.0},
+    })
+
+    with pytest.raises(AccountingError, match="exceeds feed_kg"):
+        AccountingQueries(sim).stage0_foulant_partition_by_group()
+
+
+def test_stage0_foulant_partition_raises_on_unknown_reaction_family():
+    sim = _sim_with_diagnostics({
+        "reaction_family": "mystery_process",
+        "carrier": "NaCl",
+        "feed_kg": 1.0,
+    })
+
+    with pytest.raises(AccountingError, match="unknown Stage-0 foulant reaction_family"):
+        AccountingQueries(sim).stage0_foulant_partition_by_group()
+
+
+def test_stage0_foulant_partition_raises_on_duplicate_non_sulfate_debit():
+    sim = _sim_with_diagnostics(
+        {
+            "reaction_family": "volatilization",
+            "carrier": "NaCl",
+            "feed_kg": 1.0,
+            "source_component": "NaCl",
+            "cumulative_escaped_frac": 0.25,
+            "cumulative_retained_frac": 0.75,
+            "wall_deposit_frac": 0.0,
+        },
+        {
+            "reaction_family": "volatilization",
+            "carrier": "NaCl",
+            "feed_kg": 1.0,
+            "source_component": "NaCl",
+            "cumulative_escaped_frac": 0.25,
+            "cumulative_retained_frac": 0.75,
+            "wall_deposit_frac": 0.0,
+        },
+    )
+
+    with pytest.raises(AccountingError, match="duplicate Stage-0 foulant"):
+        AccountingQueries(sim).stage0_foulant_partition_by_group()
+
+
 def test_stage0_foulant_reporting_read_only_and_golden_neutral(
 ):
     vapor_pressure_data = _load_yaml("vapor_pressures.yaml")
@@ -205,6 +259,46 @@ def test_stage0_foulant_renderer_prints_provenance_and_clear_steps():
     assert "(no species above the noise floor)" not in rendered
 
 
+def test_stage0_foulant_renderer_marks_missing_cleared_as_unknown():
+    partition = {
+        group: {
+            "escaped_kg": 0.0,
+            "retained_kg": 0.0,
+            "wall_deposit_kg": 0.0,
+            "rump_kg": 0.0,
+            "burned_kg": 0.0,
+            "residual_interval": None,
+        }
+        for group in (
+            "trapped_gasses",
+            "refractory_carbon",
+            "other_mineral_contaminant",
+        )
+    }
+    verdicts = {
+        "verdict_a": {
+            "step_resolved": [
+                {
+                    "hour": 3,
+                    "flags": [
+                        {
+                            "property": "liquidus",
+                            "level": "INFO",
+                            "metric": "delta_T_frac_of_T_in_C",
+                            "grounded": True,
+                            "correctable": True,
+                        }
+                    ],
+                }
+            ],
+        }
+    }
+
+    rendered = format_stage0_foulant_report_markdown(partition, verdicts=verdicts)
+
+    assert "liquidus UNKNOWN" in rendered
+
+
 def test_stage0_foulant_partition_splits_carbon_across_three_groups():
     sim = _sim_with_diagnostics({
         "reaction_family": "partition_carbon",
@@ -279,3 +373,75 @@ def test_stage0_foulant_hourly_by_group_reads_snapshot_delta_accounts():
 
     assert hourly["trapped_gasses"]["escaped_kg"] == pytest.approx(0.25)
     assert hourly["trapped_gasses"]["wall_deposit_kg"] == pytest.approx(0.1)
+
+
+def test_stage0_foulant_hourly_empty_by_group_falls_back_to_legacy_flux():
+    registry = SimpleNamespace(
+        alias_to_carrier={"H2O": "H2O", "h2o": "H2O"},
+        carriers={"H2O": SimpleNamespace(group="trapped_gasses")},
+    )
+    sim = SimpleNamespace(
+        atom_ledger=_LedgerStub(),
+        _stage0_foulant_diagnostics=[],
+        _load_foulant_registry_cached=lambda: registry,
+    )
+    snapshot = SimpleNamespace(
+        by_group={},
+        evap_flux=SimpleNamespace(species_kg_hr={"H2O": 0.25}),
+        wall_deposit_by_segment_species_delta={},
+    )
+
+    hourly = AccountingQueries(sim).stage0_foulant_hourly_by_group(snapshot)
+
+    assert hourly["trapped_gasses"]["escaped_kg"] == pytest.approx(0.25)
+
+
+def test_stage0_foulant_hourly_raises_on_multiple_escape_channels():
+    sim = _sim_with_diagnostics()
+    snapshot = SimpleNamespace(
+        by_group={
+            "trapped_gasses": [
+                {
+                    "escaped_kg": 0.25,
+                    "disposition": "escaped",
+                    "amount_kg": 0.25,
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(AccountingError, match="multiple positive mass channels"):
+        AccountingQueries(sim).stage0_foulant_hourly_by_group(snapshot)
+
+
+def test_stage0_foulant_hourly_raises_on_unknown_by_group_positive_mass():
+    sim = _sim_with_diagnostics()
+    snapshot = SimpleNamespace(
+        by_group={
+            "unknown_group": [
+                {
+                    "escaped_kg": 0.25,
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(AccountingError, match="unknown .*group"):
+        AccountingQueries(sim).stage0_foulant_hourly_by_group(snapshot)
+
+
+def test_stage0_foulant_hourly_feed_attribution_must_close():
+    sim = _sim_with_diagnostics()
+    snapshot = SimpleNamespace(
+        by_group={
+            "trapped_gasses": [
+                {
+                    "feed_kg": 1.0,
+                    "escaped_kg": 0.25,
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(AccountingError, match="mass does not close"):
+        AccountingQueries(sim).stage0_foulant_hourly_by_group(snapshot)

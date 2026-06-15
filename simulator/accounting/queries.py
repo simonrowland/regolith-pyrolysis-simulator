@@ -230,14 +230,23 @@ class AccountingQueries:
         diagnostics = _coalesced_stage0_foulant_diagnostics(
             getattr(self.sim, "_stage0_foulant_diagnostics", ()) or ()
         )
+        expected_source_debit_kg = 0.0
 
         for diagnostic in diagnostics:
             if not isinstance(diagnostic, Mapping):
                 continue
-            for row in _stage0_foulant_partition_rows(diagnostic, registry):
+            rows = _stage0_foulant_partition_rows(diagnostic, registry)
+            if rows:
+                expected_source_debit_kg += _stage0_positive_float(
+                    diagnostic.get("feed_kg")
+                )
+            for row in rows:
                 _add_stage0_foulant_partition_row(groups, row)
 
-        return _finalize_stage0_foulant_partition_groups(groups)
+        return _finalize_stage0_foulant_partition_groups(
+            groups,
+            expected_source_debit_kg,
+        )
 
     def stage0_foulant_hourly_by_group(
         self,
@@ -248,17 +257,21 @@ class AccountingQueries:
         registry = _stage0_foulant_registry(self.sim)
 
         by_group = getattr(snapshot, "by_group", None)
-        if isinstance(by_group, Mapping):
+        if isinstance(by_group, Mapping) and by_group:
             for group, events in by_group.items():
                 if group not in STAGE0_FOULANT_GROUPS:
-                    continue
-                for event in events or ():
-                    if isinstance(event, Mapping):
-                        _add_stage0_foulant_hourly_event(
-                            groups,
-                            str(group),
-                            event,
+                    if _stage0_hourly_events_positive_mass_kg(events) > 0.0:
+                        raise AccountingError(
+                            "Stage-0 foulant hourly event has unknown "
+                            f"group {group!r} with positive mass"
                         )
+                    continue
+                for event in _stage0_hourly_event_mappings(events):
+                    _add_stage0_foulant_hourly_event(
+                        groups,
+                        str(group),
+                        event,
+                    )
             return _finalize_stage0_foulant_hourly_groups(groups)
 
         evap = getattr(snapshot, "evap_flux", None)
@@ -581,6 +594,7 @@ class AccountingQueries:
         predicted_outlet_o2_mol = (
             near_melt_o2_mol - 0.5 * plume_extent_mol
         )
+        stoichiometric_o2_deficit_mol = max(0.0, -predicted_outlet_o2_mol)
         observed_outlet_o2_mol = float(
             outlet["free_analyzer_oxygen"]["species_mol"].get(
                 OXYGEN_SPECIES, 0.0
@@ -621,6 +635,7 @@ class AccountingQueries:
                 "plume_extent_mol": plume_extent_mol,
                 "near_melt_o2_mol": near_melt_o2_mol,
                 "predicted_outlet_o2_mol": predicted_outlet_o2_mol,
+                "stoichiometric_o2_deficit_mol": stoichiometric_o2_deficit_mol,
                 "observed_outlet_o2_mol": observed_outlet_o2_mol,
                 "predicted_minus_observed_outlet_o2_mol": (
                     predicted_outlet_o2_mol - observed_outlet_o2_mol
@@ -756,15 +771,26 @@ def _coalesced_stage0_foulant_diagnostics(
 ) -> list[Mapping[str, Any]]:
     coalesced: list[Mapping[str, Any]] = []
     sulfate: dict[tuple[str, float], dict[str, Any]] = {}
+    seen_non_sulfate: set[tuple[str, str, float, str]] = set()
     for diagnostic in diagnostics:
         if not isinstance(diagnostic, Mapping):
             continue
         family = str(diagnostic.get("reaction_family", ""))
-        if family != REACTION_FAMILY_SULFATE_DECOMP:
-            coalesced.append(diagnostic)
-            continue
         carrier = str(diagnostic.get("carrier") or diagnostic.get("species") or "")
         feed_kg = _stage0_positive_float(diagnostic.get("feed_kg"))
+        if family != REACTION_FAMILY_SULFATE_DECOMP:
+            source_component = str(diagnostic.get("source_component") or "")
+            key = (family, carrier, feed_kg, source_component)
+            if feed_kg > 0.0 and key in seen_non_sulfate:
+                raise AccountingError(
+                    "duplicate Stage-0 foulant diagnostic source debit for "
+                    f"reaction_family={family!r}, carrier={carrier!r}, "
+                    f"feed_kg={feed_kg:.15g}, "
+                    f"source_component={source_component!r}"
+                )
+            seen_non_sulfate.add(key)
+            coalesced.append(diagnostic)
+            continue
         key = (carrier, feed_kg)
         row = sulfate.setdefault(
             key,
@@ -862,7 +888,10 @@ def _stage0_foulant_partition_rows(
             rump_kg=feed_kg * rump_frac,
         )]
 
-    return [_stage0_partition_row(group, family, feed_kg, retained_kg=feed_kg)]
+    raise AccountingError(
+        f"unknown Stage-0 foulant reaction_family {family!r} "
+        f"for carrier {carrier!r}"
+    )
 
 
 def _stage0_partition_carbon_rows(
@@ -930,6 +959,14 @@ def _stage0_partition_carbon_rows(
             carbonate_kg,
             rump_kg=carbonate_kg,
         ))
+
+    if assigned_kg > feed_kg + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+        raise AccountingError(
+            "Stage-0 carbon partition source mass exceeds feed_kg: "
+            f"{assigned_kg:.15g} kg assigned vs {feed_kg:.15g} kg feed"
+        )
+    if assigned_kg > feed_kg:
+        assigned_kg = feed_kg
 
     unassigned_kg = feed_kg - assigned_kg
     if unassigned_kg > STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
@@ -1023,10 +1060,13 @@ def _add_stage0_foulant_partition_row(
 
 def _finalize_stage0_foulant_partition_groups(
     groups: dict[str, dict[str, Any]],
+    expected_source_debit_kg: float,
 ) -> dict[str, dict[str, Any]]:
     result: dict[str, dict[str, Any]] = {}
+    total_source_debited_kg = 0.0
     for group, payload in groups.items():
         source_kg = float(payload["_source_kg"])
+        total_source_debited_kg += source_kg
         allocated_kg = sum(float(payload[field]) for field in STAGE0_FOULANT_PARTITION_FIELDS)
         error_kg = allocated_kg - source_kg
         if not math.isclose(
@@ -1062,7 +1102,44 @@ def _finalize_stage0_foulant_partition_groups(
                 "error_pct": error_pct,
             },
         }
+    if not math.isclose(
+        total_source_debited_kg,
+        expected_source_debit_kg,
+        rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+        abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+    ):
+        raise AccountingError(
+            "Stage-0 foulant global source debit does not match feed debit: "
+            f"{total_source_debited_kg:.15g} kg debited vs "
+            f"{expected_source_debit_kg:.15g} kg feed"
+        )
     return result
+
+
+def _stage0_hourly_events_positive_mass_kg(events: Any) -> float:
+    total = 0.0
+    for event in _stage0_hourly_event_mappings(events):
+        total += _stage0_hourly_event_positive_mass_kg(event)
+    return total
+
+
+def _stage0_hourly_event_mappings(
+    events: Any,
+) -> tuple[Mapping[str, Any], ...]:
+    if isinstance(events, Mapping):
+        return (events,)
+    return tuple(event for event in events or () if isinstance(event, Mapping))
+
+
+def _stage0_hourly_event_positive_mass_kg(event: Mapping[str, Any]) -> float:
+    total = sum(
+        _stage0_positive_float(event.get(field))
+        for field in STAGE0_FOULANT_PARTITION_FIELDS
+    )
+    total += _stage0_positive_float(event.get("amount_kg"))
+    total += _stage0_positive_float(event.get("decomposed_kg"))
+    total += _stage0_positive_float(event.get("evolved_kg_hr"))
+    return total
 
 
 def _add_stage0_foulant_hourly_event(
@@ -1071,27 +1148,67 @@ def _add_stage0_foulant_hourly_event(
     event: Mapping[str, Any],
 ) -> None:
     payload = groups[group]
-    for field in STAGE0_FOULANT_PARTITION_FIELDS:
-        amount = _stage0_positive_float(event.get(field))
-        if amount > 0.0:
-            payload[field] += amount
     disposition = str(event.get("disposition", ""))
     amount_kg = _stage0_positive_float(event.get("amount_kg"))
     decomposed_kg = _stage0_positive_float(event.get("decomposed_kg"))
     evolved_kg = _stage0_positive_float(event.get("evolved_kg_hr"))
-    if disposition in {"escaped", "evolved"} and amount_kg > 0.0:
+    explicit_fields = {
+        field: _stage0_positive_float(event.get(field))
+        for field in STAGE0_FOULANT_PARTITION_FIELDS
+    }
+    explicit_total_kg = sum(explicit_fields.values())
+    feed_kg = _stage0_positive_float(event.get("feed_kg"))
+    channel_count = sum((
+        explicit_total_kg > 0.0,
+        disposition != "" and amount_kg > 0.0,
+        decomposed_kg > 0.0,
+        evolved_kg > 0.0,
+    ))
+    if channel_count > 1:
+        raise AccountingError(
+            "Stage-0 foulant hourly event has multiple positive mass "
+            "channels"
+        )
+    if explicit_total_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, explicit_total_kg)
+        for field, amount in explicit_fields.items():
+            payload[field] += amount
+    elif disposition in {"escaped", "evolved"} and amount_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
         payload["escaped_kg"] += amount_kg
     elif disposition == "rump" and amount_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
         payload["rump_kg"] += amount_kg
     elif disposition in {"residual", "carbonate_residual"} and amount_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
         payload["retained_kg"] += amount_kg
-    if decomposed_kg > 0.0:
+    elif decomposed_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, decomposed_kg)
         payload["escaped_kg"] += decomposed_kg
-    if evolved_kg > 0.0:
+    elif evolved_kg > 0.0:
+        _validate_stage0_hourly_feed_closure(feed_kg, evolved_kg)
         payload["escaped_kg"] += evolved_kg
     interval = event.get("residual_interval")
     if isinstance(interval, Mapping):
         payload["_residual_intervals"].append(dict(interval))
+
+
+def _validate_stage0_hourly_feed_closure(
+    feed_kg: float,
+    allocated_kg: float,
+) -> None:
+    if feed_kg <= 0.0:
+        return
+    if not math.isclose(
+        allocated_kg,
+        feed_kg,
+        rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+        abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+    ):
+        raise AccountingError(
+            "Stage-0 foulant hourly event mass does not close: "
+            f"{allocated_kg:.15g} kg allocated vs {feed_kg:.15g} kg feed"
+        )
 
 
 def _finalize_stage0_foulant_hourly_groups(

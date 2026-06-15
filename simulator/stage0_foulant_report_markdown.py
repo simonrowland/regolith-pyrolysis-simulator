@@ -100,7 +100,10 @@ def _format_verdict_a_flag(flag: Mapping[str, Any]) -> str:
 
 
 def _format_step_flag(flag: Mapping[str, Any]) -> str:
-    state = "CLEAR" if bool(flag.get("cleared")) else "ACTIVE"
+    if "cleared" not in flag:
+        state = "UNKNOWN"
+    else:
+        state = "CLEAR" if bool(flag.get("cleared")) else "ACTIVE"
     clear_hour = flag.get("clear_hour")
     return (
         f"{flag.get('property', 'unknown')} {state} "
