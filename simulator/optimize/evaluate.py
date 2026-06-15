@@ -12,6 +12,7 @@ from types import MappingProxyType, SimpleNamespace
 from typing import Any, Mapping
 from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
+from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backends import BackendUnavailableError
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
@@ -72,6 +73,7 @@ from simulator.runner import PyrolysisRun, RunnerError
 
 MASS_BALANCE_ABORT_PCT = 5e-12
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
+NUMERICAL_OVERFLOW = "numerical_overflow"
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
@@ -441,6 +443,19 @@ def evaluate(
         if _is_zero_input_basis_breach_message(str(exc)):
             return _zero_input_basis_result(candidate_id, str(exc))
         raise
+    except VaporPressureNumericalOverflowError as exc:
+        return _numerical_overflow_result(
+            candidate_id,
+            None,
+            None,
+            f"{type(exc).__name__}: {exc}",
+        )
+    except OverflowError as exc:
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+        ) from exc
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
             str(exc),
@@ -465,6 +480,21 @@ def evaluate(
             key,
             str(exc),
         )
+    except VaporPressureNumericalOverflowError as exc:
+        return _numerical_overflow_result(
+            candidate_id,
+            spec,
+            key,
+            f"{type(exc).__name__}: {exc}",
+        )
+    except OverflowError as exc:
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        ) from exc
     except BackendUnavailableError as exc:
         raise BackendUnavailableAbort(
             str(exc),
@@ -482,6 +512,13 @@ def evaluate(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
+        if _is_numerical_overflow_message(str(exc)):
+            return _numerical_overflow_result(
+                candidate_id,
+                spec,
+                key,
+                f"{type(exc).__name__}: {exc}",
+            )
         if _is_non_finite_payload_message(str(exc)):
             return _non_finite_payload_result(
                 candidate_id,
@@ -529,6 +566,15 @@ def evaluate(
                 candidate_id=candidate_id,
                 eval_spec=spec,
                 cache_key_value=key,
+            )
+        if _is_numerical_overflow_message(error_message):
+            return _numerical_overflow_result(
+                candidate_id,
+                spec,
+                key,
+                error_message,
+                run_execution=run_execution,
+                profile=profile,
             )
         if _is_non_finite_payload_message(error_message):
             return _non_finite_payload_result(
@@ -604,13 +650,22 @@ def evaluate(
             ),
         )
 
-    feasibility = _evaluate_physics_constraints(
-        active_constraints,
-        run_execution.trace,
-        spec=spec,
-        profile=profile,
-        run_config=run_config,
-    )
+    try:
+        feasibility = _evaluate_physics_constraints(
+            active_constraints,
+            run_execution.trace,
+            spec=spec,
+            profile=profile,
+            run_config=run_config,
+        )
+    except OverflowError as exc:
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        ) from exc
     if not feasibility.feasible:
         return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
     target_reason = composition_target_infeasible_reason(profile)
@@ -652,6 +707,20 @@ def evaluate(
 
     try:
         objectives = compute_objectives(objective_profile, run_execution)
+        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
+        trace_payload = _composition_target_trace_payload(
+            objective_profile,
+            objectives,
+            run_execution,
+        )
+    except OverflowError as exc:
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        ) from exc
     except ObjectiveComputationError as exc:
         raise EngineBugAbort(
             str(exc),
@@ -661,12 +730,6 @@ def evaluate(
             cache_key_value=key,
         ) from exc
 
-    objectives = _objectives_with_thermal_window_metadata(objectives, spec)
-    trace_payload = _composition_target_trace_payload(
-        objective_profile,
-        objectives,
-        run_execution,
-    )
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -2148,6 +2211,14 @@ def _out_of_domain_result(
         )
         try:
             objectives = compute_objectives(profile, scoring_execution)
+        except OverflowError as exc:
+            raise EngineBugAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         except ObjectiveComputationError as exc:
             raise EngineBugAbort(
                 str(exc),
@@ -2771,6 +2842,66 @@ def _non_finite_payload_result(
             "CALC_BUG: PT-0 payload contained a non-finite derived value",
             error_message,
         ),
+        )
+
+
+def _numerical_overflow_result(
+    candidate_id: str | None,
+    spec: EvalSpec | None,
+    key: str | None,
+    error_message: str,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    run_reference = (
+        replace(
+            _run_reference(run_execution, profile or {}),
+            status="failed",
+            error_message=error_message,
+            reason=NUMERICAL_OVERFLOW,
+        )
+        if run_execution is not None
+        else RunReference(
+            status="failed",
+            error_message=error_message,
+            reason=NUMERICAL_OVERFLOW,
+            trace=_synthetic_not_run_trace(),
+            backend_name=None,
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={
+            NUMERICAL_OVERFLOW: _numerical_overflow_margin(),
+        },
+        failing_gates=(NUMERICAL_OVERFLOW,),
+        run_reference=run_reference,
+        notes=(error_message,),
+    )
+
+
+def _numerical_overflow_margin() -> GateMargin:
+    threshold = ThresholdSpec(
+        id="physics_eval_finite",
+        value=0.0,
+        units="overflow_count",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: OverflowError",
+    )
+    return GateMargin(
+        gate=NUMERICAL_OVERFLOW,
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=1.0,
+        detail="physics evaluation overflowed a numerical operation",
     )
 
 
@@ -3241,6 +3372,10 @@ def _is_non_finite_payload_message(message: str) -> bool:
         "pt0nonfinitepayload" in lowered
         or "non-finite value in pt-0 payload" in lowered
     )
+
+
+def _is_numerical_overflow_message(message: str) -> bool:
+    return message.strip().startswith("VaporPressureNumericalOverflowError:")
 
 
 def _is_inventory_overdraw_message(message: str) -> bool:

@@ -314,10 +314,16 @@ class AlphaMELTSBackend(MeltBackend):
     def _alphamelts_config(self, config: dict) -> dict:
         if not isinstance(config, Mapping):
             return {}
+        top_mode = config.get('mode')
+        top_bridge = config.get('python_bridge')
         nested = config.get('alphamelts')
         if isinstance(nested, Mapping):
             merged = dict(config)
             merged.update(nested)
+            if self._normalize_mode(top_mode) == 'subprocess':
+                merged['mode'] = 'subprocess'
+            if str(top_bridge or '').strip().lower() == 'subprocess':
+                merged['python_bridge'] = 'subprocess'
             return merged
         return dict(config)
 

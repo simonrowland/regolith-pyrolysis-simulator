@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from engines.alphamelts import AlphaMELTSProvider
+from engines.builtin.vapor_pressure import _pow10_pressure_or_raise
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
@@ -114,6 +115,19 @@ class FakeExecutor:
         assert self.execution is not None
         self.config = config
         return self.execution
+
+
+class VaporOverflowExecutor:
+    calls: int = 0
+
+    def execute(self, config: object) -> object:
+        self.calls += 1
+        _pow10_pressure_or_raise(
+            400.0,
+            species="SiO",
+            field="P_reference_Pa",
+        )
+        raise AssertionError("vapor overflow path should raise before return")
 
 
 class _Stage:
@@ -1046,6 +1060,151 @@ def test_pt0_nonfinite_payload_exception_is_candidate_failure() -> None:
     assert result.run_reference is not None
     _assert_synthetic_not_run_reference(result.run_reference)
     assert any("CALC_BUG" in note for note in result.notes)
+
+
+def test_vapor_pressure_overflow_exception_is_bounded_infeasible() -> None:
+    executor = VaporOverflowExecutor()
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=executor,
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.failing_gates == ("numerical_overflow",)
+    assert result.run_reference is not None
+    assert result.run_reference.reason == "numerical_overflow"
+    assert result.run_reference.error_message.startswith(
+        "VaporPressureNumericalOverflowError"
+    )
+    assert "numerical_overflow" in result.feasibility_margins
+    assert result.feasibility_margins["numerical_overflow"].feasible is False
+    assert math.isfinite(result.feasibility_margins["numerical_overflow"].margin)
+    assert executor.calls == 1
+
+
+def test_runner_wrapped_numerical_overflow_is_bounded_infeasible() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            exc=RunnerError(
+                "VaporPressureNumericalOverflowError: "
+                "vapor_pressure_numerical_overflow: species=SiO "
+                "field=P_reference_Pa log_pressure=400.0"
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.failing_gates == ("numerical_overflow",)
+    assert result.run_reference is not None
+    assert result.run_reference.reason == "numerical_overflow"
+    assert "vapor_pressure_numerical_overflow" in result.run_reference.error_message
+
+
+def test_failed_run_numerical_overflow_message_is_bounded_infeasible() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(
+            _execution(
+                status="failed",
+                error_message=(
+                    "VaporPressureNumericalOverflowError: "
+                    "vapor_pressure_numerical_overflow: species=SiO "
+                    "field=P_reference_Pa log_pressure=400.0"
+                ),
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert result.failing_gates == ("numerical_overflow",)
+    assert result.run_reference is not None
+    assert result.run_reference.reason == "numerical_overflow"
+    assert result.run_reference.backend_status == "ok"
+    assert result.run_reference.backend_authoritative is True
+
+
+def test_failed_run_infra_result_too_large_is_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort, match="result too large for cache slot"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                _execution(
+                    status="failed",
+                    error_message="backend failure: result too large for cache slot",
+                    backend_status="ok",
+                    backend_authoritative=True,
+                )
+            ),
+        )
+
+
+def test_executor_generic_overflow_is_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort, match="result too large for cache slot"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                exc=OverflowError("backend failure: result too large for cache slot")
+            ),
+        )
+
+
+def test_failed_run_vapor_overflow_substring_without_prefix_is_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort, match="cache slot"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                _execution(
+                    status="failed",
+                    error_message=(
+                        "backend failure: vapor_pressure_numerical_overflow "
+                        "marker in cache slot"
+                    ),
+                    backend_status="ok",
+                    backend_authoritative=True,
+                )
+            ),
+        )
+
+
+def test_objective_overflow_after_completed_run_is_engine_bug(monkeypatch) -> None:
+    def explode(*args, **kwargs):
+        raise OverflowError(34, "Result too large")
+
+    monkeypatch.setattr(evaluate_module, "compute_objectives", explode)
+
+    with pytest.raises(EngineBugAbort, match="OverflowError"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(_execution()),
+        )
 
 
 def test_pt0_nonfinite_failed_run_is_candidate_failure() -> None:

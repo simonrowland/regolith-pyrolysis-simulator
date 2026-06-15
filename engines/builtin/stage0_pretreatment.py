@@ -30,7 +30,7 @@ covers several reaction families.  The provider receives a
   etc.) with the ``_oxidized_stage0_products`` projection
   (CO2 / H2O / N2 + O2 oxidant or coproduct). Each provider dispatch
   handles ONE species (the caller loops over the legacy specs).
-* ``'sulfate_carbon'`` -- ``2 SO3 + C -> 2 SO2 + CO`` (sulfate-carbon
+* ``'sulfate_carbon'`` -- ``SO3 + C -> SO2 + CO`` (sulfate-carbon
   reductive cleanup; the legacy
   ``_apply_stage0_sulfate_carbon_reaction`` builds the spec with
   ``products_kg = {'SO2': extent*M_SO2, 'CO': extent*M_CO}`` and
@@ -459,7 +459,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         )
 
     # ------------------------------------------------------------------
-    # sulfate_carbon: 2 SO3 + C -> 2 SO2 + CO  (sulfate reductive
+    # sulfate_carbon: SO3 + C -> SO2 + CO  (sulfate reductive
     # cleanup).  Mirrors the legacy spec built by
     # _apply_stage0_sulfate_carbon_reaction line-for-line.
     # ------------------------------------------------------------------
@@ -1372,8 +1372,8 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
           CO2 + 2 H2O``) -- C: -1 + 1 = 0; H: -4 + 4 = 0;
           O: -4 + 4 = 0.  Other organics (NH3 -> N2/H2O, etc.) close
           by the same elemental accounting.
-        * ``sulfate_carbon`` (``2 SO3 + C -> 2 SO2 + CO``) -- S:
-          -2 + 2 = 0; C: -1 + 1 = 0; O: -7 + 7 = 0.
+        * ``sulfate_carbon`` (``SO3 + C -> SO2 + CO``) -- S:
+          -1 + 1 = 0; C: -1 + 1 = 0; O: -3 + 3 = 0.
         * ``boudouard`` (``C + CO2 -> 2 CO``) -- C: -2 + 2 = 0;
           O: -2 + 2 = 0.
         * ``perchlorate`` (``ClO4 -> Cl + 2 O2``) -- Cl:

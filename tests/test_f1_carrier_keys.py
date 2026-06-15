@@ -36,8 +36,8 @@ PRE_SPLIT = {
         "sum_check": 100.25,
     },
     "cm_carbonaceous_chondrite": {
-        "carbonaceous_organic": 3.2,
-        "sum_check": 91.95,
+        "carbonaceous_organic": 4.0393,
+        "sum_check": 92.7893,
     },
     "mars_basalt": {
         "SO3": 6.0,

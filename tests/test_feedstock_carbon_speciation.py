@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 
@@ -30,7 +31,7 @@ def _sim(feedstocks):
     ("key", "organics", "organics_range", "carbonate", "carbonate_range"),
     [
         ("ci_carbonaceous_chondrite", 4.0, [3.0, 5.5], 2.5, [1.5, 4.0]),
-        ("cm_carbonaceous_chondrite", 2.0, [1.5, 3.5], 1.2, [0.8, 2.5]),
+        ("cm_carbonaceous_chondrite", 2.8393, [1.5, 3.5], 1.2, [0.8, 2.5]),
     ],
 )
 def test_carbonaceous_chondrite_carbon_speciation_is_literature_grounded(
@@ -53,6 +54,36 @@ def test_carbonaceous_chondrite_carbon_speciation_is_literature_grounded(
     assert provenance["carbonate_salts"]["interval_wt_pct"] == carbonate_range
     assert "Pearson" in provenance["carbonaceous_organic"]["source"]
     assert "Bland" in provenance["carbonate_salts"]["source"]
+
+
+def _carbon_mass_fraction(species: str, registry) -> float:
+    formula = resolve_species_formula(species, registry)
+    carbon = resolve_species_formula("C", registry)
+    carbon_kg = (
+        formula.atom_moles(1.0).get("C", 0.0)
+        * carbon.molar_mass_kg_per_mol()
+    )
+    return carbon_kg / formula.molar_mass_kg_per_mol()
+
+
+def test_cm_bulk_carbon_matches_murchison_anchor(feedstocks):
+    entry = feedstocks["cm_carbonaceous_chondrite"]
+    composition = entry["composition_wt_pct"]
+    provenance = entry["carbon_speciation_provenance"]
+    registry = _sim(feedstocks)._base_species_formula_registry
+
+    bulk_c_wt_pct = (
+        composition["carbonaceous_organic"]
+        * _carbon_mass_fraction("generic_carbonaceous_organic", registry)
+        + composition["carbonate_salts"]
+        * _carbon_mass_fraction("carbonate_salts", registry)
+    )
+
+    assert bulk_c_wt_pct == pytest.approx(2.25, abs=5e-5)
+    assert provenance["implied_bulk_c_wt_pct"] == pytest.approx(2.25)
+    assert "Murchison bulk C is 2.25 +/- 0.09 wt%" in (
+        provenance["carbonaceous_organic"]["basis"]
+    )
 
 
 def test_ceres_carbon_catchall_is_split_without_moving_nh4_into_carbon(

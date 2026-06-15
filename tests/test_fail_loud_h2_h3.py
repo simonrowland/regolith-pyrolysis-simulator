@@ -226,7 +226,7 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
     }
 
 
-def test_builtin_vapor_pressure_pure_component_row_is_silent() -> None:
+def test_builtin_vapor_pressure_uncertified_pure_component_row_is_silent() -> None:
     provider = BuiltinVaporPressureProvider(
         {
             "metals": {
@@ -254,5 +254,5 @@ def test_builtin_vapor_pressure_pure_component_row_is_silent() -> None:
 
     assert caught == []
     assert result.diagnostic["vapor_pressures_source"] == {
-        "K": "builtin_fallback:pure_component_first_principles"
+        "K": "builtin_fallback:legacy_pure_component_estimate"
     }

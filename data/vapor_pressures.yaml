@@ -53,10 +53,11 @@ metals:
         composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
-      source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 9.407048
-      B: 5088.599272
-      C: 0
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5"
+      A: 7.460770
+      B: 1873.728
+      C: -416.372
+      valid_range_K: [924, 1118]
     evaporation_alpha:
       value: 1.0
       source: "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
@@ -114,10 +115,11 @@ metals:
         composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
-      source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 9.008700
-      B: 4131.679352
-      C: 0
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5"
+      A: 9.457180
+      B: 4691.58
+      C: 24.195
+      valid_range_K: [679.4, 1033]
     evaporation_alpha:
       value: 1.0
       source: "REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi & Fegley 2018 liquids commonly near unity"
@@ -238,12 +240,13 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ca vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
+    source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy dH_vap~182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 10.424827
-      B: 9522.188948
-      C: 0
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
+      A: 7.784730
+      B: 3121.368
+      C: -594.591
+      valid_range_K: [1254, 1712]
     evaporation_alpha:
       value: 0.90
       source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
@@ -266,12 +269,13 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Al2O3"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Al vapor-pressure table/regression): legacy CRC-style pure Al vapor-pressure table regression; legacy dH_vap ~ 332.0 kJ/mol"
+    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 11.216544
-      B: 17341.561880
-      C: 0
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5"
+      A: 10.736230
+      B: 13204.109
+      C: -24.306
+      valid_range_K: [1557, 2329]
     evaporation_alpha:
       value: 0.30
       source: "REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
@@ -295,12 +299,13 @@ metals:
     parent_oxide: "SiO2"
     fit_target: "pure_component_psat"
     consumer_status: "inactive"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named pure-Si vapor-pressure fit): rough legacy dH_vap approximation, inactive and unvalidated"
+    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-017 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy dH_vap~413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 11.110207
-      B: 21598.601920
-      C: 0
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5"
+      A: 14.564360
+      B: 23308.848
+      C: -123.133
+      valid_range_K: [1997, 2560]
     evaporation_alpha:
       value: 1.0
       source: "REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
@@ -323,12 +328,37 @@ metals:
     electrons_per_atom: 4
     parent_oxide: "TiO2"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ti vapor-pressure table/regression): legacy CRC-style pure Ti liquid equation/table; legacy dH_vap ~ 444.3 kJ/mol"
+    source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 11.524374
-      B: 23207.397420
-      C: 0
+      source: "REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
+      source_equation:
+        original_form: "log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted A"
+        solid:
+          range_K: [298, 1941]
+          A_log10_P_atm: 11.925283
+          A_log10_P_Pa: 16.931
+          B: -24991
+          C: -1.3376
+          D: 0
+        liquid:
+          range_K: [1941, 2400]
+          A_log10_P_atm: 6.358283
+          A_log10_P_Pa: 11.364
+          B: -22747
+          C: 0
+          D: 0
+      fit_source_phase: "liquid"
+      fit_range_K: [1941, 2400]
+      source_equation_range_K: [1941, 2400]
+      anchored_extrapolation_range_K: [2400, 3560.15]
+      dense_sample_step_K: 10
+      normal_boiling_anchor_K: 3560.15
+      max_abs_log10_residual_vs_source: 0.001133
+      source_validation_points_Pa_K: [[0.771274, 1982], [7.697327, 2171], [76.927804, 2400], [101325, 3560.15]]
+      A: 11.569399015
+      B: 23642.266967112
+      C: 41.832167668
+      valid_range_K: [1941, 3560.15]
     evaporation_alpha:
       value: 0.80
       source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
@@ -351,7 +381,13 @@ metals:
     electrons_per_atom: 3
     parent_oxide: "Cr2O3"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Cr vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
+    source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine"
+    pure_component_antoine:
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5"
+      A: 11.023710
+      B: 16064.989
+      C: -83.86
+      valid_range_K: [1889, 2755]
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
@@ -371,7 +407,32 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
-    source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Mn vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
+    source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for manganese; runtime pure-component source is pure_component_antoine"
+    pure_component_antoine:
+      source: "REF-032 Alcock-Itkin-Horrigan 1984 manganese solid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1228-1519 K plus exact 2334.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
+      source_equation:
+        original_form: "log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted A"
+        solid:
+          range_K: [298, 1519]
+          A_log10_P_atm: 12.805283
+          A_log10_P_Pa: 17.811
+          B: -15097
+          C: -1.7896
+          D: 0
+        liquid:
+          status: "No manganese liquid equation is exposed in the CRC/CR2 Alcock row used here; the normal-boiling point is retained as an out-of-source anchor."
+      fit_source_phase: "solid"
+      fit_range_K: [1228, 1519]
+      source_equation_range_K: [298, 1519]
+      anchored_extrapolation_range_K: [1519, 2334.15]
+      dense_sample_step_K: 10
+      normal_boiling_anchor_K: 2334.15
+      max_abs_log10_residual_vs_source: 0.012517
+      source_validation_points_Pa_K: [[0.974085, 1228], [10.065015, 1347], [104.435282, 1493], [150.837282, 1519], [101325, 2334.15]]
+      A: 9.340804288
+      B: 8928.339999733
+      C: -274.597652474
+      valid_range_K: [1228, 2334.15]
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"

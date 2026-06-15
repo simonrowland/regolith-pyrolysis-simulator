@@ -7,11 +7,17 @@ salt bucket).  Assertions use published stoichiometry, not simulator parity.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
+from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
 
 
 def _sim(feedstocks):
@@ -25,8 +31,30 @@ def _sim(feedstocks):
     )
 
 
-def _expected_carbonate_decomposition(species: str, feed_kg: float, registry):
-    """Ground-truth MCO3 -> MO + CO2 from formula decomposition."""
+def _na2co3_gate(
+    species_mol: float,
+    melt_sio2_kg: float,
+    temp_c: float,
+    registry,
+) -> float:
+    if species_mol <= 0.0:
+        return 0.0
+    foulant_registry = load_foulant_registry(FOULANT_THERMO)
+    thermal_extent = chi_decomp("Na2CO3", temp_c, 0.0, 0.0, foulant_registry).extent
+    sio2_mol = melt_sio2_kg / resolve_species_formula(
+        "SiO2", registry).molar_mass_kg_per_mol()
+    return thermal_extent * min(1.0, sio2_mol / species_mol)
+
+
+def _expected_carbonate_decomposition(
+    species: str,
+    feed_kg: float,
+    registry,
+    *,
+    melt_sio2_kg: float = 0.0,
+    temp_c: float = 1050.0,
+):
+    """Ground-truth MCO3 -> MO + CO2, with Na2CO3 NIST/SiO2 gate."""
     if species == "carbonate_salts":
         components = (
             ("MgCO3", 1.0),
@@ -50,7 +78,12 @@ def _expected_carbonate_decomposition(species: str, feed_kg: float, registry):
             comp_kg = feed_kg * (moles * molar_mass / total_group_mass)
             comp_formula = resolve_species_formula(comp_id, registry)
             comp_mol = comp_kg / comp_formula.molar_mass_kg_per_mol()
-            atoms = comp_formula.atom_moles(comp_mol)
+            extent = (
+                _na2co3_gate(comp_mol, melt_sio2_kg, temp_c, registry)
+                if comp_id == "Na2CO3"
+                else 1.0
+            )
+            atoms = comp_formula.atom_moles(comp_mol * extent)
             co2_kg += atoms.get("C", 0.0) * resolve_species_formula(
                 "CO2", registry
             ).molar_mass_kg_per_mol()
@@ -71,7 +104,12 @@ def _expected_carbonate_decomposition(species: str, feed_kg: float, registry):
 
     formula = resolve_species_formula(species, registry)
     species_mol = feed_kg / formula.molar_mass_kg_per_mol()
-    atoms = formula.atom_moles(species_mol)
+    extent = (
+        _na2co3_gate(species_mol, melt_sio2_kg, temp_c, registry)
+        if species == "Na2CO3"
+        else 1.0
+    )
+    atoms = formula.atom_moles(species_mol * extent)
     co2_kg = atoms.get("C", 0.0) * resolve_species_formula(
         "CO2", registry
     ).molar_mass_kg_per_mol()
@@ -123,6 +161,39 @@ def _expected_caso4_carbon_cleanup(feed_kg: float, registry):
         "CO": extent_mol * molar["CO"],
         "CaO": extent_mol * molar["CaO"],
         "C": extent_mol * molar["C"],
+    }
+
+
+def _expected_feso4_carbon_cleanup(feed_kg: float, registry):
+    """Ground-truth 2 FeSO4 + C -> Fe2O3 + 2 SO2 + CO."""
+    feed_formula = resolve_species_formula("FeSO4", registry)
+    feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+    molar = {
+        species: resolve_species_formula(species, registry).molar_mass_kg_per_mol()
+        for species in ("SO2", "CO", "Fe2O3", "C")
+    }
+    return {
+        "SO2": feed_mol * molar["SO2"],
+        "CO": 0.5 * feed_mol * molar["CO"],
+        "Fe2O3": 0.5 * feed_mol * molar["Fe2O3"],
+        "C": 0.5 * feed_mol * molar["C"],
+        "extent_mol": feed_mol,
+    }
+
+
+def _expected_feso4_sulfide_carbon_cleanup(feed_kg: float, registry):
+    """Ground-truth FeSO4 + 4C -> FeS + 4CO."""
+    feed_formula = resolve_species_formula("FeSO4", registry)
+    extent_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+    molar = {
+        species: resolve_species_formula(species, registry).molar_mass_kg_per_mol()
+        for species in ("CO", "FeS", "C")
+    }
+    return {
+        "CO": 4.0 * extent_mol * molar["CO"],
+        "FeS": extent_mol * molar["FeS"],
+        "C": 4.0 * extent_mol * molar["C"],
+        "extent_mol": extent_mol,
     }
 
 
@@ -199,6 +270,32 @@ def mars_caso4_feedstock():
     }
 
 
+@pytest.fixture
+def mars_feso4_feedstock():
+    return {
+        "label": "Mars FeSO4 routing test",
+        "stage0_profile": "mars_carbon_cleanup",
+        "stage0_carbon_cleanup": {
+            "carbon_reductant_kg_per_tonne": 60.0,
+            "reactions": [
+                "sulfate_so3_to_so2_co",
+            ],
+        },
+        "composition_wt_pct": {
+            "SiO2": 95.0,
+            "FeSO4": 5.0,
+        },
+    }
+
+
+@pytest.fixture
+def mars_feso4_sulfide_feedstock(mars_feso4_feedstock):
+    feedstock = dict(mars_feso4_feedstock)
+    feedstock["stage0_carbon_cleanup"] = dict(feedstock["stage0_carbon_cleanup"])
+    feedstock["stage0_carbon_cleanup"]["cation_sulfate_product"] = "sulfide"
+    return feedstock
+
+
 def test_carbonate_salts_decompose_to_melt_oxides_and_co2_offgas(
     ceres_carbonate_feedstock,
 ):
@@ -209,7 +306,11 @@ def test_carbonate_salts_decompose_to_melt_oxides_and_co2_offgas(
     carbonate_kg = sim.inventory.raw_components_kg["carbonate_salts"]
     registry = sim.species_formula_registry
     expected_oxides, expected_co2 = _expected_carbonate_decomposition(
-        "carbonate_salts", carbonate_kg, registry
+        "carbonate_salts",
+        carbonate_kg,
+        registry,
+        melt_sio2_kg=sim.inventory.melt_oxide_kg.get("SiO2", 0.0),
+        temp_c=sim.inventory.stage0_temp_range_C[1],
     )
 
     ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
@@ -222,6 +323,56 @@ def test_carbonate_salts_decompose_to_melt_oxides_and_co2_offgas(
     assert "carbonate_salts" not in sim.inventory.salt_phase_kg
     salt_ledger = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
     assert "carbonate_salts" not in salt_ledger
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_na2co3_without_sio2_stays_salt_phase_not_calcined():
+    feedstock = {
+        "label": "Na2CO3 no SiO2 gate test",
+        "composition_wt_pct": {
+            "FeO": 95.0,
+            "Na2CO3": 5.0,
+        },
+        "stage0_temp_range_C": [20.0, 1050.0],
+    }
+    sim = _sim({"na2co3_no_sio2": feedstock})
+    sim.load_batch("na2co3_no_sio2", mass_kg=1000.0)
+
+    assert sim.inventory.salt_phase_kg["Na2CO3"] == pytest.approx(50.0, abs=1e-9)
+    assert sim.inventory.melt_oxide_kg.get("Na2O", 0.0) == pytest.approx(0.0, abs=1e-12)
+
+    ledger_salt = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
+    assert ledger_salt["Na2CO3"] == pytest.approx(50.0, abs=1e-9)
+    ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    assert ledger_offgas.get("CO2", 0.0) == pytest.approx(0.0, abs=1e-12)
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_na2co3_below_nist_silicate_displacement_onset_stays_salt_phase():
+    feedstock = {
+        "label": "Na2CO3 low temperature gate test",
+        "stage0_profile": "carbonaceous_degas_cleanup",
+        "composition_wt_pct": {
+            "FeO": 95.0,
+            "Na2CO3": 5.0,
+        },
+        "anhydrous_silicate_after_degassing": {
+            "mass_per_tonne_kg": 950.0,
+            "composition_wt_pct": {
+                "SiO2": 100.0,
+            },
+        },
+        "stage0_temp_range_C": [20.0, 21.0],
+    }
+    sim = _sim({"na2co3_low_t": feedstock})
+    sim.load_batch("na2co3_low_t", mass_kg=1000.0)
+
+    assert sim.inventory.salt_phase_kg["Na2CO3"] > 49.99
+    assert sim.inventory.melt_oxide_kg.get("Na2O", 0.0) < 0.01
 
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
@@ -251,6 +402,67 @@ def test_caso4_carbothermal_routes_cation_to_melt_not_salt_bucket(
     assert "CaSO4" not in sim.inventory.salt_phase_kg
     salt_ledger = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
     assert "CaSO4" not in salt_ledger
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_feso4_carbothermal_oxide_route_balances_fe2o3_half_stoich(
+    mars_feso4_feedstock,
+):
+    mass_kg = 1000.0
+    feedstock = dict(mars_feso4_feedstock)
+    feedstock["stage0_carbon_cleanup"] = dict(feedstock["stage0_carbon_cleanup"])
+    feso4_feed_kg = feedstock["composition_wt_pct"]["FeSO4"] / 100.0 * mass_kg
+
+    sim = _sim({"mars_feso4": feedstock})
+    registry = sim.species_formula_registry
+    expected = _expected_feso4_carbon_cleanup(feso4_feed_kg, registry)
+    exact_c_kg = expected["C"]
+    feedstock["stage0_carbon_cleanup"]["carbon_reductant_kg_per_tonne"] = (
+        exact_c_kg * 1000.0 / mass_kg
+    )
+
+    sim = _sim({"mars_feso4": feedstock})
+    sim.load_batch("mars_feso4", mass_kg=mass_kg, additives_kg={"C": exact_c_kg})
+
+    ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    assert ledger_offgas.get("SO2", 0.0) == pytest.approx(expected["SO2"], rel=0, abs=1e-9)
+    assert ledger_offgas.get("CO", 0.0) == pytest.approx(expected["CO"], rel=0, abs=1e-9)
+
+    ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    assert ledger_melt.get("Fe2O3", 0.0) == pytest.approx(expected["Fe2O3"], rel=0, abs=1e-9)
+    assert "FeSO4" not in sim.inventory.salt_phase_kg
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_feso4_sulfide_carbothermal_route_balances_fes_and_four_co(
+    mars_feso4_sulfide_feedstock,
+):
+    mass_kg = 1000.0
+    feedstock = dict(mars_feso4_sulfide_feedstock)
+    feedstock["stage0_carbon_cleanup"] = dict(feedstock["stage0_carbon_cleanup"])
+    feso4_feed_kg = feedstock["composition_wt_pct"]["FeSO4"] / 100.0 * mass_kg
+
+    sim = _sim({"mars_feso4_sulfide": feedstock})
+    registry = sim.species_formula_registry
+    expected = _expected_feso4_sulfide_carbon_cleanup(feso4_feed_kg, registry)
+    exact_c_kg = expected["C"]
+    feedstock["stage0_carbon_cleanup"]["carbon_reductant_kg_per_tonne"] = (
+        exact_c_kg * 1000.0 / mass_kg
+    )
+
+    sim = _sim({"mars_feso4_sulfide": feedstock})
+    sim.load_batch(
+        "mars_feso4_sulfide", mass_kg=mass_kg, additives_kg={"C": exact_c_kg})
+
+    ledger_matte = sim.atom_ledger.kg_by_account("terminal.stage0_sulfide_matte")
+    assert ledger_matte.get("FeS", 0.0) == pytest.approx(expected["FeS"], rel=0, abs=1e-9)
+
+    ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    assert ledger_offgas.get("CO", 0.0) == pytest.approx(expected["CO"], rel=0, abs=1e-9)
 
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)

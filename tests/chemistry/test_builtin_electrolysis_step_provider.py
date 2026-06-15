@@ -55,7 +55,10 @@ from simulator.chemistry.kernel import (
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.electrolysis import ElectrolysisModel
 from simulator.state import (
+    FARADAY,
+    GAS_CONSTANT,
     MOLAR_MASS,
+    OXIDE_TO_METAL,
     CampaignPhase,
     DecisionType,
 )
@@ -113,6 +116,44 @@ def test_provider_declares_three_mre_accounts():
     assert "terminal.oxygen_stage0_stored" not in profile.declared_accounts
     assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
+
+
+def test_nernst_voltage_includes_evolved_o2_activity_term():
+    """SiO2 -> Si + O2 includes Q = aO2 / aSiO2 in the Nernst term."""
+
+    T_K = 1575.0 + 273.15
+    pO2_bar = 0.05
+    voltage_at_1_bar = BuiltinElectrolysisStepProvider._nernst_voltage(
+        "SiO2",
+        T_K,
+        1.0,
+        pO2_bar=1.0,
+        gas_constant=GAS_CONSTANT,
+        faraday=FARADAY,
+        decomp_voltages={"SiO2": 1.4},
+        electrons_per_oxide={"SiO2": 4},
+        oxide_to_metal=OXIDE_TO_METAL,
+    )
+    voltage_at_50_mbar = BuiltinElectrolysisStepProvider._nernst_voltage(
+        "SiO2",
+        T_K,
+        1.0,
+        pO2_bar=pO2_bar,
+        gas_constant=GAS_CONSTANT,
+        faraday=FARADAY,
+        decomp_voltages={"SiO2": 1.4},
+        electrons_per_oxide={"SiO2": 4},
+        oxide_to_metal=OXIDE_TO_METAL,
+    )
+
+    expected_shift = (GAS_CONSTANT * T_K) / (4.0 * FARADAY) * math.log(pO2_bar)
+    assert voltage_at_1_bar == pytest.approx(1.4)
+    assert voltage_at_50_mbar - voltage_at_1_bar == pytest.approx(
+        expected_shift, abs=1e-9
+    )
+    assert voltage_at_50_mbar - voltage_at_1_bar == pytest.approx(
+        -0.119276, abs=5e-7
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -540,6 +581,55 @@ def test_provider_matches_legacy_multi_oxide_partition(
     legacy_O2 = float(legacy.get("O2_produced_mol", 0.0))
     provider_O2 = float(diagnostic.get("O2_produced_mol", 0.0))
     assert provider_O2 == pytest.approx(legacy_O2, abs=1e-12, rel=1e-12)
+
+
+def test_low_po2_backpressure_can_cross_c5_mre_decomposition_gate(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger = sim._new_atom_ledger()
+    sio2_mol = 1000.0 / (MOLAR_MASS["SiO2"] / 1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {"SiO2": sio2_mol}, source="test seed"
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": dict(
+                sim.atom_ledger.mol_by_account("process.cleaned_melt")
+            ),
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    provider = BuiltinElectrolysisStepProvider()
+
+    def dispatch_at_pO2(pO2_bar: float):
+        return provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                account_view=view,
+                temperature_C=1575.0,
+                pressure_bar=pO2_bar,
+                control_inputs={
+                    "voltage_V": 1.35,
+                    "current_A": 100.0,
+                    "dt_hr": 1.0,
+                    "pO2_bar": pO2_bar,
+                },
+            )
+        )
+
+    assert dispatch_at_pO2(1.0).transition is None
+    low_pO2_result = dispatch_at_pO2(0.05)
+    assert low_pO2_result.transition is not None
+    assert "SiO2" in low_pO2_result.transition.debits["process.cleaned_melt"]
 
 
 def test_provider_short_circuits_below_voltage(

@@ -280,6 +280,7 @@ def resolve_backend(
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None = None,
     cached_real_live_backend_cls: type | None = None,
     required_intents: Iterable[Any] | None = None,
+    backend_config: Mapping[str, Any] | None = None,
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
@@ -294,6 +295,7 @@ def resolve_backend(
             stub_backend_cls=stub_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
+            backend_config=backend_config,
         )
     elif policy is BackendSelectionPolicy.RUNNER_STRICT:
         backend = _resolve_runner_strict(
@@ -303,6 +305,7 @@ def resolve_backend(
             stub_backend_cls=stub_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
+            backend_config=backend_config,
         )
     else:
         raise ValueError(f"unknown backend selection policy {policy!r}")
@@ -471,6 +474,7 @@ def _resolve_web_autodetect(
     stub_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
+    backend_config: Mapping[str, Any] | None,
 ):
     if name in INELIGIBLE_ACTIVE_BACKENDS:
         backend_label = "VapoRock" if name == "vaporock" else "MAGEMin"
@@ -486,6 +490,7 @@ def _resolve_web_autodetect(
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
+            backend_config=backend_config,
         )
         _log_selection(backend, log_selection, log_message)
         return backend
@@ -506,7 +511,7 @@ def _resolve_web_autodetect(
         return backend
 
     if name == "alphamelts":
-        backend = _try_alphamelts(alphamelts_backend_cls)
+        backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
         if backend is not None:
             _log_selection(backend, log_selection, log_message)
             return backend
@@ -514,7 +519,7 @@ def _resolve_web_autodetect(
             "AlphaMELTS unavailable; run install-dependencies.py"
         )
 
-    backend = _try_alphamelts(alphamelts_backend_cls)
+    backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
     if backend is not None:
         _log_selection(backend, log_selection, log_message)
         return backend
@@ -531,6 +536,7 @@ def _resolve_runner_strict(
     stub_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
+    backend_config: Mapping[str, Any] | None,
 ):
     if name in ("", "stub"):
         return _stub_backend(stub_backend_cls)
@@ -540,7 +546,7 @@ def _resolve_runner_strict(
             "select stub, alphamelts, or cached-real"
         )
     if name == "alphamelts":
-        backend = _try_alphamelts(alphamelts_backend_cls)
+        backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
         if backend is not None:
             return backend
         raise unavailable_error_cls(
@@ -553,13 +559,17 @@ def _resolve_runner_strict(
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
+            backend_config=backend_config,
         )
     raise unavailable_error_cls(f"unknown backend {name!r}")
 
 
-def _try_alphamelts(alphamelts_backend_cls: type):
+def _try_alphamelts(
+    alphamelts_backend_cls: type,
+    backend_config: Mapping[str, Any] | None = None,
+):
     backend = alphamelts_backend_cls()
-    if backend.initialize({}) and backend.is_available():
+    if backend.initialize(dict(backend_config or {})) and backend.is_available():
         return backend
     return None
 
@@ -576,6 +586,7 @@ def _cached_real_backend(
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
     cached_real_live_backend_cls: type | None,
+    backend_config: Mapping[str, Any] | None,
 ) -> CachedRealBackend:
     config = normalize_cached_real_config(
         cached_real_config,
@@ -584,7 +595,7 @@ def _cached_real_backend(
     live_backend = None
     if config.miss_policy == "live-fill":
         live_backend_cls = cached_real_live_backend_cls or alphamelts_backend_cls
-        live_backend = _try_alphamelts(live_backend_cls)
+        live_backend = _try_alphamelts(live_backend_cls, backend_config)
         if live_backend is None:
             raise unavailable_error_cls(
                 "cached-real live-fill requires an available live real backend"

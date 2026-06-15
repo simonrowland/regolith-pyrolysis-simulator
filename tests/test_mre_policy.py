@@ -10,7 +10,7 @@ from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch
-from simulator.state import CampaignPhase
+from simulator.state import Atmosphere, CampaignPhase
 
 
 BASE_PROFILE = {
@@ -173,6 +173,56 @@ def test_tc8_si_and_ti_targets_split_c5_behavior_not_only_cache_key() -> None:
     assert max(ti_voltages) == pytest.approx(1.5)
     assert 1.5 not in si_voltages
     assert ti_voltages != si_voltages
+
+
+def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "SiO2", "decomposition_V": 1.4, "min_hold_hours": 0},
+            ],
+        },
+    }
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        {"x": {"label": "X", "composition_wt_pct": {"SiO2": 100}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.atmosphere = Atmosphere.O2_BACKPRESSURE
+    sim.melt.pO2_mbar = 50.0
+    sim.melt.p_total_mbar = 50.0
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "SiO2"
+    sim.melt.mre_max_voltage_V = 1.4
+    captured: list[dict] = []
+
+    def fake_dispatch(_intent, *, control_inputs):
+        captured.append(dict(control_inputs))
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    assert captured
+    assert captured[0]["pO2_bar"] == pytest.approx(0.05)
 
 
 @pytest.mark.parametrize("c5_enabled", (False, True))

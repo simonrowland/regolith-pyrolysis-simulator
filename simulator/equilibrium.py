@@ -222,7 +222,10 @@ class EquilibriumMixin:
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
+            COEFF_BLOCK_ANTOINE,
             vapor_pressure_source_label,
+            vapor_pressure_antoine_coefficients,
+            vapor_pressure_valid_range_K,
             warn_pseudo_vapor_pressure_fallback,
         )
 
@@ -320,13 +323,18 @@ class EquilibriumMixin:
             # Fe has a slightly lower sublimation pressure. That
             # pure-component rationale applies only to
             # fit_target=pure_component_psat rows.
-            antoine = sp_data.get('antoine', {})
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                sp_data
+            )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
 
             if A > 0 and T_K > 300:
-                valid_range = sp_data.get('valid_range_K')
+                valid_range = vapor_pressure_valid_range_K(
+                    sp_data,
+                    coefficient_block,
+                )
                 if valid_range and len(valid_range) == 2:
                     valid_low = float(valid_range[0])
                     valid_high = float(valid_range[1])
@@ -391,6 +399,8 @@ class EquilibriumMixin:
                 source_label = vapor_pressure_source_label(
                     'builtin_fallback',
                     sp_data,
+                    coefficient_block=coefficient_block,
+                    temperature_K=T_K,
                 )
                 if species in metal_extrapolations:
                     source_label = (
@@ -398,12 +408,13 @@ class EquilibriumMixin:
                         'extrapolated_beyond_valid_range_K'
                     )
                 vapor_pressure_sources[species] = source_label
-                warn_pseudo_vapor_pressure_fallback(
-                    species,
-                    sp_data,
-                    pseudo_warning_seen,
-                    stacklevel=3,
-                )
+                if coefficient_block == COEFF_BLOCK_ANTOINE:
+                    warn_pseudo_vapor_pressure_fallback(
+                        species,
+                        sp_data,
+                        pseudo_warning_seen,
+                        stacklevel=3,
+                    )
 
         # ================================================================
         # OXIDE VAPOR SPECIES (SiO, CrO2)                        [THERMO-8]
@@ -464,6 +475,8 @@ class EquilibriumMixin:
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
                     'builtin_fallback',
                     data,
+                    coefficient_block=COEFF_BLOCK_ANTOINE,
+                    temperature_K=T_K,
                 )
                 warn_pseudo_vapor_pressure_fallback(
                     name,

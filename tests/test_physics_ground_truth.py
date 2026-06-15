@@ -1,31 +1,59 @@
 from __future__ import annotations
 
+import copy
 import math
 from pathlib import Path
 
 import pytest
 import yaml
 
+from engines.builtin.vapor_pressure import (
+    BuiltinVaporPressureProvider,
+    _ELLINGHAM_THERMO,
+    vapor_pressure_antoine_coefficients,
+    vapor_pressure_source_label,
+)
 from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.state import MOLAR_MASS
+from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 
 PA_PER_ATM = 101_325.0
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+ALCOCK_SOURCE_LOG10_PA = {
+    "Ti": {
+        "solid": {
+            "range_K": (298.0, 1941.0),
+            "A": 16.931,
+            "B": -24991.0,
+            "C": -1.3376,
+            "D": 0.0,
+        },
+        "liquid": {
+            "range_K": (1941.0, 2400.0),
+            "A": 11.364,
+            "B": -22747.0,
+            "C": 0.0,
+            "D": 0.0,
+        },
+    },
+    "Mn": {
+        "solid": {
+            "range_K": (298.0, 1519.0),
+            "A": 17.811,
+            "B": -15097.0,
+            "C": -1.7896,
+            "D": 0.0,
+        },
+    },
+}
 
 
 def _vapor_pressure_data() -> dict:
     with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
         return yaml.safe_load(handle)
-
-
-def _antoine_pa(entry: dict, temperature_K: float) -> float:
-    coeff = entry["antoine"]
-    return 10.0 ** (
-        float(coeff["A"])
-        - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
-    )
 
 
 def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
@@ -36,12 +64,55 @@ def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
     )
 
 
-def _antoine_pa(entry: dict, temperature_K: float) -> float:
-    coeff = entry["antoine"]
+def _coefficient_pa(coeff: dict, temperature_K: float) -> float:
     return 10.0 ** (
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
     )
+
+
+def _alcock_source_pa(species: str, phase: str, temperature_K: float) -> float:
+    coeff = ALCOCK_SOURCE_LOG10_PA[species][phase]
+    lo, hi = coeff["range_K"]
+    assert lo <= temperature_K <= hi
+    log10_pa = (
+        coeff["A"]
+        + coeff["B"] / temperature_K
+        + coeff["C"] * math.log10(temperature_K)
+        + coeff["D"] * temperature_K * 1e-3
+    )
+    return 10.0 ** log10_pa
+
+
+def _runtime_recovered_reference_pressure_pa(
+    vapor_data: dict,
+    species: str,
+    temperature_K: float,
+) -> float:
+    row = vapor_data["metals"][species]
+    parent_oxide = row["parent_oxide"]
+    provider = BuiltinVaporPressureProvider(vapor_data)
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {parent_oxide: 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 1e-9},
+        )
+    )
+
+    assert result.status == "ok"
+    emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
+    dH_f, dS_f, n_M, _n_ox = _ELLINGHAM_THERMO[species]
+    dG_f_kJ = dH_f - temperature_K * dS_f
+    k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
+    activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
+    return emitted_pa / activity
 
 
 def _chi_escape_equilibrium(p_sat_pa: float, p_total_pa: float) -> float:
@@ -62,14 +133,13 @@ def _require_certified_pure_component_antoine(entry: dict, temperature_K: float)
 @pytest.mark.parametrize(
     ("species", "temperature_K", "rel_tol"),
     [
-        ("Na", 1156.15, 0.02),  # NIST TN 2273 / CRC: Na normal boiling point 883 C.
-        ("K", 1032.15, 0.02),  # NIST TN 2273 / CRC: K normal boiling point 759 C.
+        # No NIST WebBook Antoine row is exposed for these species in SRD 69
+        # Mask=4; Mg/Fe remain NBP-anchored CC estimates.
         ("Mg", 1364.15, 0.02),  # CRC/NIST element data: Mg normal boiling point 1091 C.
         ("Fe", 3135.15, 0.02),  # CRC/NIST element data: Fe normal boiling point 2862 C.
-        ("Ca", 1757.15, 0.02),  # NIST WebBook / CRC: Ca normal boiling point 1484 C.
-        ("Al", 2792.15, 0.02),  # CRC/CR2: Al normal boiling point 2519 C in local table.
-        ("Si", 3538.15, 0.02),  # CRC/Safarian-Engh pure-Si branch: Si normal boiling point 3265 C.
-        ("Ti", 3560.15, 0.02),  # CRC/CR2: Ti normal boiling point 3287 C in local table.
+        # CRC/CR2 / Alcock-Itkin-Horrigan table converted to pure_component_antoine.
+        ("Ti", 3560.15, 1e-6),
+        ("Mn", 2334.15, 1e-6),
     ],
 )
 def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
@@ -85,16 +155,24 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         rel=rel_tol,
     )
 
-
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_pa", "rel_tol"),
     [
         # NIST Chemistry WebBook SRD 69, sodium Antoine row, Rodebush and Walters 1930.
-        ("Na", 1118.0, 61_691.7, 0.25),
+        ("Na", 1118.0, 61_691.685390, 1e-6),
         # NIST Chemistry WebBook SRD 69, potassium Antoine row, Fiock and Rodebush 1926.
-        ("K", 1033.0, 104_572.6, 0.05),
+        ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
-        ("Ca", 1712.0, 98_023.9, 0.35),
+        ("Ca", 1500.0, 21_740.153809, 1e-6),
+        # NIST Chemistry WebBook SRD 69, aluminum Antoine row, Stull 1947.
+        ("Al", 2200.0, 46_484.884967, 1e-6),
+        # NIST Chemistry WebBook SRD 69, silicon Antoine row, Stull 1947.
+        ("Si", 2200.0, 2_194.210607, 1e-6),
+        # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
+        ("Cr", 2200.0, 2_704.347348, 1e-6),
+        # CRC/CR2 / Alcock-Itkin-Horrigan source equation, not rounded table anchors.
+        ("Ti", 1982.0, _alcock_source_pa("Ti", "liquid", 1982.0), 0.005),
+        ("Mn", 1493.0, _alcock_source_pa("Mn", "solid", 1493.0), 0.03),
     ],
 )
 def test_pure_component_antoine_matches_published_vapor_pressure_points(
@@ -108,6 +186,149 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
     assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
         expected_pa,
         rel=rel_tol,
+    )
+
+
+@pytest.mark.parametrize(
+    ("species", "phase", "temperature_K", "rel_tol"),
+    [
+        ("Ti", "liquid", 1982.0, 0.005),
+        ("Ti", "liquid", 2171.0, 0.005),
+        ("Ti", "liquid", 2400.0, 0.005),
+        ("Mn", "solid", 1228.0, 0.03),
+        ("Mn", "solid", 1347.0, 0.03),
+        ("Mn", "solid", 1493.0, 0.03),
+        ("Mn", "solid", 1519.0, 0.03),
+    ],
+)
+def test_mn_ti_runtime_pure_component_sidecars_match_alcock_source_equation(
+    species: str,
+    phase: str,
+    temperature_K: float,
+    rel_tol: float,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"][species]
+    expected_pa = _alcock_source_pa(species, phase, temperature_K)
+
+    assert "Alcock-Itkin-Horrigan 1984" in row["pure_component_antoine"]["source"]
+    coeff, block = vapor_pressure_antoine_coefficients(row)
+    assert block == "pure_component_antoine"
+    assert _coefficient_pa(dict(coeff), temperature_K) == pytest.approx(
+        expected_pa,
+        rel=rel_tol,
+    )
+    assert _runtime_recovered_reference_pressure_pa(
+        data,
+        species,
+        temperature_K,
+    ) == pytest.approx(expected_pa, rel=rel_tol)
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
+    [
+        ("Na", 1118.0, 61_691.685390, 1e-6),
+        ("K", 1033.0, 104_572.576518, 1e-6),
+        ("Mg", 1364.15, PA_PER_ATM, 0.02),
+        ("Fe", 3135.15, PA_PER_ATM, 0.02),
+        ("Ca", 1500.0, 21_740.153809, 1e-6),
+        ("Al", 2200.0, 46_484.884967, 1e-6),
+        ("Si", 2200.0, 2_194.210607, 1e-6),
+        ("Ti", 3560.15, PA_PER_ATM, 1e-6),
+        ("Cr", 2200.0, 2_704.347348, 1e-6),
+        ("Mn", 2334.15, PA_PER_ATM, 1e-6),
+    ],
+)
+def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(
+    species: str,
+    temperature_K: float,
+    expected_reference_pa: float,
+    rel_tol: float,
+) -> None:
+    data = _vapor_pressure_data()
+    if species == "Si":
+        data = copy.deepcopy(data)
+        data["metals"]["Si"].pop("consumer_status", None)
+    row = data["metals"][species]
+    parent_oxide = row["parent_oxide"]
+    provider = BuiltinVaporPressureProvider(data)
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {parent_oxide: 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 1e-9},
+        )
+    )
+
+    assert result.status == "ok"
+    emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
+    dH_f, dS_f, n_M, n_ox = _ELLINGHAM_THERMO[species]
+    dG_f_kJ = dH_f - temperature_K * dS_f
+    k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
+    activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
+    recovered_reference_pa = emitted_pa / activity
+
+    assert recovered_reference_pa == pytest.approx(expected_reference_pa, rel=rel_tol)
+
+    coeff, block = vapor_pressure_antoine_coefficients(row)
+    assert block == "pure_component_antoine"
+    assert _coefficient_pa(dict(coeff), temperature_K) == pytest.approx(
+        expected_reference_pa,
+        rel=rel_tol,
+    )
+
+
+def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
+    data = _vapor_pressure_data()
+
+    grounded = data["metals"]["Cr"]
+    _, grounded_block = vapor_pressure_antoine_coefficients(grounded)
+    assert (
+        vapor_pressure_source_label(
+            "builtin_fallback",
+            grounded,
+            coefficient_block=grounded_block,
+        )
+        == "builtin_fallback:pure_component_first_principles"
+    )
+
+    label_cases = [
+        ("Fe", 3135.15, "pure_component_first_principles"),
+        ("Na", 1118.0, "pure_component_first_principles"),
+        ("Mn", 1519.0, "pure_component_first_principles"),
+        ("Mn", 1700.0, "pure_component_extrapolated"),
+        ("Mn", 2000.0, "pure_component_extrapolated"),
+        ("Ti", 2400.0, "pure_component_first_principles"),
+        ("Ti", 2500.0, "pure_component_extrapolated"),
+    ]
+    for species, temperature_K, expected_fragment in label_cases:
+        metal = data["metals"][species]
+        _, block = vapor_pressure_antoine_coefficients(metal)
+        assert block == "pure_component_antoine"
+        label = vapor_pressure_source_label(
+            "builtin_fallback",
+            metal,
+            coefficient_block=block,
+            temperature_K=temperature_K,
+        )
+        assert expected_fragment in label
+        if expected_fragment == "pure_component_extrapolated":
+            assert "pure_component_first_principles" not in label
+            assert "extrapolated_beyond_source_equation_range_K" in label
+
+    interval_only = data["foulant_vapor"]["NaF"]
+    _, interval_block = vapor_pressure_antoine_coefficients(interval_only)
+    assert "pure_component_first_principles" not in vapor_pressure_source_label(
+        "builtin_fallback",
+        interval_only,
+        coefficient_block=interval_block,
     )
 
 

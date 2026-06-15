@@ -606,6 +606,7 @@ class ExtractionMixin:
             'voltage_V': float(voltage_V),
             'current_A': float(current_A),
             'dt_hr': 1.0,
+            'pO2_bar': float(self._commanded_pO2_bar()),
         }
         if c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
@@ -957,21 +958,21 @@ class ExtractionMixin:
 
         Reactions:                                               [THERMO-5]
             2Na + FeO → Na₂O + Fe(l)   [cool Fe-cleanup only]
-            2Na + TiO₂ → Na₂O + Ti(l)   [accessibility uncertain]
+            4Na + TiO₂ → 2Na₂O + Ti(l)  [accessibility uncertain]
             6Na + Cr₂O₃ → 3Na₂O + 2Cr(l)
 
         Stoichiometry (TiO₂ reaction):
-            45.98 g Na + 79.87 g TiO₂ → 61.98 g Na₂O + 47.87 g Ti
-            1 kg Na → 1.737 kg TiO₂ reduced
+            91.95 g Na + 79.87 g TiO₂ → 123.96 g Na₂O + 47.87 g Ti
+            1 kg Na → 0.869 kg TiO₂ reduced
                     → 1.348 kg Na₂O dissolved
-                    → 1.041 kg Ti produced
+                    → 0.521 kg Ti produced
 
         Na₂O solubility limit: 8-12 wt% in the silicate melt.
         Activity coefficient γ(Na₂O) ≈ 10⁻² to 10⁻³ in CMAS.    [THERMO-10]
 
         METALLOTHERMIC_STEP intent -- kernel-authoritative since
         ``\\goal BUILTIN-ENGINE-EXTRACTION`` (#7) sixth flip.  The
-        provider bundles the two-reaction (Cr2O3 + TiO2) atom-balanced
+        provider can bundle the two-reaction (Cr2O3 + TiO2) atom-balanced
         path the legacy code recorded as two separate transitions into
         a single :class:`LedgerTransitionProposal` so the kernel
         commits one atom-balanced :class:`LedgerTransition` per

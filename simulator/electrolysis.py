@@ -10,11 +10,11 @@ silicate melt at controlled voltage and temperature.
 Used by both C5 (limited MRE in pyrolysis track) and the
 Standard MRE Baseline (root branch alternative).
 
-Physics:
+    Physics:
     Nernst equation:                                         [NERNST-1]
-        E = E° - (RT / nF) × ln(a_oxide)
+        E = E° + (RT / nF) × ln(a_O2^νO2 / a_oxide)
     Adjusts standard decomposition voltages for actual melt
-    activities (from MELTS equilibrium) and temperature.
+    activities, evolved-O₂ backpressure, and temperature.
 
     Faraday's law:                                           [FARADAY-1]
         m = (I × t × M) / (n × F)
@@ -98,20 +98,27 @@ class ElectrolysisModel:
         self.decomp_voltages = dict(DECOMP_VOLTAGES)
         self.electrode_area_m2 = 0.05  # Default electrode area
 
-    def nernst_voltage(self, oxide: str, T_C: float,
-                        activity: float = 1.0) -> float:
+    def nernst_voltage(
+        self,
+        oxide: str,
+        T_C: float,
+        activity: float = 1.0,
+        pO2_bar: float = 1.0,
+    ) -> float:
         """
         Nernst-adjusted decomposition voltage.
 
-        E = E° - (RT / nF) × ln(a_oxide)                    [NERNST-1]
+        E = E° + (RT / nF) × ln(a_O2^νO2 / a_oxide)        [NERNST-1]
 
         Lower oxide activity (depleted species) → higher voltage
-        needed for reduction.
+        needed for reduction. Lower evolved-O2 activity lowers the
+        decomposition threshold for reactions producing O2.
 
         Args:
             oxide:    Oxide species key (e.g., 'SiO2')
             T_C:      Temperature (°C)
             activity: Oxide activity in the melt (0-1)
+            pO2_bar:  Evolved-O2 activity, referenced to 1 bar
 
         Returns:
             Adjusted decomposition voltage (V)
@@ -123,14 +130,28 @@ class ElectrolysisModel:
         if activity <= 1e-10:
             return E0 + 1.0  # Very high — species essentially depleted
 
-        # Nernst adjustment
+        metal_info = OXIDE_TO_METAL.get(oxide)
+        o2_mol_per_oxide = 0.0
+        if metal_info:
+            _metal, _n_met, n_oxy = metal_info
+            o2_mol_per_oxide = n_oxy / 2.0
+        pO2_activity = max(float(pO2_bar), 1e-30)
+
+        # Nernst adjustment. For MOx -> M + νO2 O2, Q = aO2^νO2 / a_oxide.
         E = E0 - (GAS_CONSTANT * T_K) / (n * FARADAY) * math.log(activity)
+        E += (
+            (GAS_CONSTANT * T_K)
+            / (n * FARADAY)
+            * o2_mol_per_oxide
+            * math.log(pO2_activity)
+        )
         return E
 
     def step_hour(self, melt_state: MeltState,
                    voltage_V: float,
                    current_A: float,
-                   T_C: float) -> Dict:
+                   T_C: float,
+                   pO2_bar: float = 1.0) -> Dict:
         """
         Simulate one hour of electrolysis.
 
@@ -172,7 +193,8 @@ class ElectrolysisModel:
 
             # Crude activity ≈ wt_fraction
             activity = comp.get(oxide, 0.0) / 100.0
-            E_nernst = self.nernst_voltage(oxide, T_C, activity)
+            E_nernst = self.nernst_voltage(
+                oxide, T_C, activity, pO2_bar=pO2_bar)
 
             if E_nernst < voltage_V:
                 overvoltage = voltage_V - E_nernst
@@ -241,8 +263,12 @@ class ElectrolysisModel:
 
         return result
 
-    def get_reduction_sequence(self, melt_state: MeltState,
-                                T_C: float) -> List[Tuple[str, float]]:
+    def get_reduction_sequence(
+        self,
+        melt_state: MeltState,
+        T_C: float,
+        pO2_bar: float = 1.0,
+    ) -> List[Tuple[str, float]]:
         """
         Return oxide species in order of increasing Nernst voltage.
 
@@ -256,7 +282,7 @@ class ElectrolysisModel:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
             activity = comp.get(oxide, 0.0) / 100.0
-            E = self.nernst_voltage(oxide, T_C, activity)
+            E = self.nernst_voltage(oxide, T_C, activity, pO2_bar=pO2_bar)
             sequence.append((oxide, E))
 
         sequence.sort(key=lambda x: x[1])

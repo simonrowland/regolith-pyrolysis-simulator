@@ -45,6 +45,7 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
     require_lab_pipe_length,
 )
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 
 
 @dataclass
@@ -414,16 +415,15 @@ class EquipmentDesigner:
         For volatile-heavy feedstocks (KREEP, highland with high Na₂O + K₂O),
         the C0 ramp must be throttled to stay within this capacity.
         """
-        # Estimate volatile content from feedstock composition
-        comp = feedstock.get('composition_wt_pct', {})
-        volatile_wt_pct = (
-            comp.get('Na2O', 0.4) +
-            comp.get('K2O', 0.1) +
+        # Estimate volatile content from ledger-normalized feedstock composition
+        comp = normalized_feedstock_component_masses_kg(feedstock, mass_kg)
+        volatile_mass_kg = (
+            comp.get('Na2O', mass_kg * 0.4 / 100.0) +
+            comp.get('K2O', mass_kg * 0.1 / 100.0) +
             comp.get('H2O', 0.0) +
             comp.get('S', 0.0) +
             comp.get('Cl', 0.0)
         )
-        volatile_mass_kg = mass_kg * volatile_wt_pct / 100.0
 
         # Design point: release all volatiles over ~10 hours of C0
         # (mare basalt: ~5 kg volatiles over 10 hr ≈ 0.5 kg/hr)

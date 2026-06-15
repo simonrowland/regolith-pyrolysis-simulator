@@ -998,7 +998,7 @@ cm_carbonaceous_chondrite:
     Na2O:   0.75
     NiO:    1.5
     H2O:    9.0     # structural, in phyllosilicates
-    carbonaceous_organic: 2.0  # IOM/organic matter; literature-converged correction
+    carbonaceous_organic: 2.8393  # IOM/organic matter; set so runtime bulk C matches Murchison 2.25 wt%
     carbonate_salts: 1.2  # Murchison-like carbonate mineral mass; carbonate-rich lithologies are not default CM
     S:      3.0     # predominantly sulfides
   composition_ranges:
@@ -1006,19 +1006,19 @@ cm_carbonaceous_chondrite:
     carbonaceous_organic: [1.5, 3.5]
     carbonate_salts: [0.8, 2.5]
     S:     [2, 4]
-  sum_check: 91.95  # approximate; source data incomplete for CM oxides
+  sum_check: 92.7893  # approximate; source data incomplete for CM oxides
   carbon_speciation_provenance:
     carbonaceous_organic:
-      value_wt_pct: 2.0
+      value_wt_pct: 2.8393
       interval_wt_pct: [1.5, 3.5]
       source: "REF-025 REF-027 Pearson V.K. et al. 2006, M&PS 41:1899-1918; Smith J.W. & Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O'D. et al. 2007, GCA 71:4380-4403."
-      basis: "CM bulk carbon is organic-dominated; Murchison bulk C is 2.25 +/- 0.09 wt%."
+      basis: "CM bulk carbon is organic-dominated; Murchison bulk C is 2.25 +/- 0.09 wt%; 2.8393 wt% generic organic template plus 1.2 wt% carbonate_salts gives the runtime central value."
     carbonate_salts:
       value_wt_pct: 1.2
       interval_wt_pct: [0.8, 2.5]
       source: "REF-026 REF-025 Bland P.A. et al. 2004, M&PS 39:3-16; Pearson V.K. et al. 2006, M&PS 41:1899-1918; Zolensky M.E. et al. 2002, M&PS 37:737-761."
       basis: "Murchison modal calcite is about 1.1 wt%; carbonate-rich Tagish-like lithologies are excluded from default CM."
-    implied_bulk_c_wt_pct: [1.5, 2.5]
+    implied_bulk_c_wt_pct: 2.25
   stage0_carrier_keys:
     carbonate:
       composition_key: carbonate_salts

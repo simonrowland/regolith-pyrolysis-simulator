@@ -101,6 +101,7 @@ class SimSessionConfig:
     force_builtin_vapor_pressure: Callable[[PyrolysisSimulator], None] | None = None
     result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
     reduced_real_cache: Mapping[str, Any] | None = None
+    backend_config: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         overrides = _canonical_runtime_campaign_overrides(
@@ -109,6 +110,83 @@ class SimSessionConfig:
         )
         object.__setattr__(self, "runtime_campaign_overrides", overrides)
         object.__setattr__(self, "setpoints_overrides", overrides)
+
+
+def _stage0_verdict_b_requires_subprocess(config: SimSessionConfig) -> bool:
+    feedstock = config.feedstocks.get(config.feedstock_id)
+    if not isinstance(feedstock, Mapping):
+        return False
+    if PyrolysisSimulator._uses_mars_carbon_cleanup(feedstock):
+        return True
+    if PyrolysisSimulator._uses_carbonaceous_degas_cleanup(feedstock):
+        return True
+    return bool(
+        feedstock.get("stage0_verdict_b_subprocess_required")
+        or feedstock.get("spinel_rich")
+    )
+
+
+def _stage0_verdict_b_backend_config(config: SimSessionConfig) -> dict[str, Any]:
+    backend_config = dict(config.backend_config or {})
+    if not _stage0_verdict_b_requires_subprocess(config):
+        return backend_config
+    backend_name = str(config.backend_name or "").strip().lower()
+    if backend_name == "stub":
+        return backend_config
+    backend_config["mode"] = "subprocess"
+    backend_config["python_bridge"] = "subprocess"
+    nested = backend_config.get("alphamelts")
+    if isinstance(nested, Mapping):
+        nested_config = dict(nested)
+        nested_config["mode"] = "subprocess"
+        nested_config["python_bridge"] = "subprocess"
+        backend_config["alphamelts"] = nested_config
+    return backend_config
+
+
+def _backend_transport_route(backend: Any) -> tuple[Any, Any, str]:
+    mode = getattr(backend, "_mode", getattr(backend, "mode", None))
+    bridge = getattr(backend, "_bridge", getattr(backend, "python_bridge", None))
+    route = str(bridge or mode or "").strip().lower()
+    return mode, bridge, route
+
+
+def _assert_stage0_verdict_b_backend_safe(
+    config: SimSessionConfig,
+    backend: Any,
+) -> None:
+    if not _stage0_verdict_b_requires_subprocess(config):
+        return
+    active = str(getattr(backend, "name", type(backend).__name__) or "").lower()
+    if active == "stub" or type(backend).__name__ == "StubBackend":
+        return
+    if active == "cached-real":
+        cached_config = getattr(backend, "config", None)
+        miss_policy = str(getattr(cached_config, "miss_policy", "") or "").lower()
+        if miss_policy != "live-fill":
+            return
+        live_backend = getattr(backend, "_live_backend", None)
+        if live_backend is None:
+            raise config.unavailable_error_cls(
+                "Stage-0 verdict-B cached-real live-fill requires a "
+                "subprocess live backend; got no live backend"
+            )
+        mode, bridge, route = _backend_transport_route(live_backend)
+        if route == "subprocess":
+            return
+        raise config.unavailable_error_cls(
+            "Stage-0 verdict-B cached-real live-fill requires subprocess; "
+            f"got {type(live_backend).__name__} mode={mode!r} bridge={bridge!r}"
+        )
+
+    mode, bridge, route = _backend_transport_route(backend)
+    if route == "subprocess":
+        return
+    raise config.unavailable_error_cls(
+        "Stage-0 verdict-B route for Mars/carbonaceous/spinel-rich "
+        f"feedstocks requires subprocess; got {type(backend).__name__} "
+        f"mode={mode!r} bridge={bridge!r}"
+    )
 
 
 @dataclass(frozen=True)
@@ -160,12 +238,16 @@ class SimSession:
                 "reduced_real_cache is only valid with backend_name='cached-real'"
             )
         if backend is None:
+            backend_config = _stage0_verdict_b_backend_config(config)
             backend = resolve_backend(
                 config.backend_name,
                 config.backend_policy,
                 unavailable_error_cls=config.unavailable_error_cls,
                 cached_real_config=cached_real_config,
+                backend_config=backend_config,
             )
+        else:
+            _assert_stage0_verdict_b_backend_safe(config, backend)
         if config.feedstock_id not in config.feedstocks:
             expected = sorted(config.feedstocks)[:5]
             raise config.unavailable_error_cls(

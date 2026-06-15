@@ -114,6 +114,12 @@ species:
     category: salt
     estimated: false
     source: Stoichiometric magnesium sulfate formula for cation-bearing sulfate Stage 0 routing.
+  - id: FeSO4
+    formula: FeSO4
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.
   - id: CaS
     formula: CaS
     basis: mineral_formula
@@ -132,6 +138,36 @@ species:
     category: oxyanion_equivalent
     estimated: false
     source: Perchlorate anion-equivalent formula; counter-cation not specified by current feedstock keys.
+  - id: MgCO3
+    formula: MgCO3
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Magnesium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate expansion.
+  - id: CaCO3
+    formula: CaCO3
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Calcium carbonate formula for Stage 0 carbonate decomposition and carbonate_salts surrogate expansion.
+  - id: FeCO3
+    formula: FeCO3
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Iron carbonate formula for the Stage 0 carbonate stoichiometry table.
+  - id: Na2CO3
+    formula: Na2CO3
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.
+  - id: K2CO3
+    formula: K2CO3
+    basis: mineral_formula
+    category: salt
+    estimated: false
+    source: Potassium carbonate formula for the Stage 0 carbonate stoichiometry table.
 
   # Elemental-equivalent feedstock species and recovered metals.
   - id: Na

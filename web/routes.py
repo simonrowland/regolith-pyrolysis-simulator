@@ -23,6 +23,7 @@ from simulator.condensation import (
     N2_COLLISION_DIAMETER_M,
 )
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.mre_ladder import (
     filter_steps_up_to_max_v,
     parse_ladder_from_setpoints,
@@ -2211,15 +2212,15 @@ def additive_calc(key):
     )
     if error_response is not None:
         return error_response
-    comp = fs.get('composition_wt_pct', {})
+    comp = normalized_feedstock_component_masses_kg(fs, mass_kg)
 
     # Absolute kg of each oxide in the batch
-    FeO_kg = mass_kg * comp.get('FeO', 0) / 100.0
-    TiO2_kg = mass_kg * comp.get('TiO2', 0) / 100.0
-    Cr2O3_kg = mass_kg * comp.get('Cr2O3', 0) / 100.0
-    Al2O3_kg = mass_kg * comp.get('Al2O3', 0) / 100.0
-    P2O5_kg = mass_kg * comp.get('P2O5', 0) / 100.0
-    SO3_kg = mass_kg * comp.get('SO3', 0) / 100.0
+    FeO_kg = comp.get('FeO', 0.0)
+    TiO2_kg = comp.get('TiO2', 0.0)
+    Cr2O3_kg = comp.get('Cr2O3', 0.0)
+    Al2O3_kg = comp.get('Al2O3', 0.0)
+    P2O5_kg = comp.get('P2O5', 0.0)
+    SO3_kg = comp.get('SO3', 0.0)
 
     MARGIN = 1.2
     SHUTTLE_LOSS = 0.25  # ~25% loss per cycle

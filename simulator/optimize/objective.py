@@ -14,6 +14,7 @@ from typing import Any, Iterable, Mapping, TypeVar
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
@@ -2566,13 +2567,13 @@ def _feedstock_input_target_mol(
         raise ObjectiveComputationError(
             f"composition target unknown feedstock {feedstock_id!r}"
         ) from exc
-    composition = feedstock.get("composition_wt_pct", feedstock)
-    if not isinstance(composition, Mapping):
+    if not isinstance(feedstock, Mapping):
         raise ObjectiveComputationError("composition target feedstock composition unavailable")
     mass_kg = _run_mass_kg(run_execution, profile)
+    composition = normalized_feedstock_component_masses_kg(feedstock, mass_kg)
     total = 0.0
-    for species, wt_pct in composition.items():
-        kg = mass_kg * _finite_float(wt_pct, f"feedstock[{species!r}]") / 100.0
+    for species, kg_value in composition.items():
+        kg = _finite_float(kg_value, f"feedstock[{species!r}]")
         mol = _kg_to_mol(str(species), kg, run_execution)
         total += _target_equivalent_mol(target_species, str(species), mol, run_execution)
     return total

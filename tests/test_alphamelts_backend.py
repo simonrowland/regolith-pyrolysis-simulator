@@ -480,6 +480,22 @@ def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
     assert backend._mode == 'subprocess'
 
 
+def test_alphamelts_config_top_level_subprocess_overrides_nested_thermoengine():
+    backend = AlphaMELTSBackend()
+
+    config = backend._alphamelts_config({
+        'mode': 'subprocess',
+        'python_bridge': 'subprocess',
+        'alphamelts': {
+            'mode': 'thermoengine',
+            'python_bridge': 'pymagemin',
+        },
+    })
+
+    assert config['mode'] == 'subprocess'
+    assert config['python_bridge'] == 'subprocess'
+
+
 def test_normalize_composition_to_melts_basis_drops_and_renormalizes():
     backend = AlphaMELTSBackend()
 
@@ -855,7 +871,7 @@ def test_activities_times_antoine_warns_once_for_pseudo_curvefit():
     ) == {'K': 'alphamelts_python_api:backsolved_vaporock_curve_fit'}
 
 
-def test_activities_times_antoine_pure_component_is_silent_and_labelled():
+def test_activities_times_antoine_uncertified_pure_component_is_silent():
     backend = AlphaMELTSBackend()
     backend._vapor_pressure_table = {
         'K': {
@@ -879,7 +895,7 @@ def test_activities_times_antoine_pure_component_is_silent_and_labelled():
     assert backend._antoine_vapor_pressure_source_by_species(
         'alphamelts_python_api',
         pressures,
-    ) == {'K': 'alphamelts_python_api:pure_component_first_principles'}
+    ) == {'K': 'alphamelts_python_api:legacy_pure_component_estimate'}
 
 
 def test_real_vaporock_path_does_not_warn_for_pseudo_fallback_rows():

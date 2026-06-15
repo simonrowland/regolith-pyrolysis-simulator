@@ -1235,6 +1235,15 @@ def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
     assert transition_imbalance_kg < 1e-6
 
 
+def test_c3_na_ti_prose_uses_balanced_reaction():
+    doc = PyrolysisSimulator._shuttle_inject_Na.__doc__
+
+    assert "4Na + TiO₂ → 2Na₂O + Ti(l)" in doc
+    assert "91.95 g Na + 79.87 g TiO₂" in doc
+    assert "1 kg Na → 0.869 kg TiO₂ reduced" in doc
+    assert "2Na + TiO₂" not in doc
+
+
 def test_c3_alkali_dose_overdraw_fails_loud():
     sim = _sim(
         {

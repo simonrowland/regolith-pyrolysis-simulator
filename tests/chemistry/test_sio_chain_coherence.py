@@ -40,7 +40,15 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # under finite-headspace ON (the holdup-derived O2 partial is the
 # same across liner temperatures since C2A pO2_mbar=0 and no
 # wall-T-dependent O2 source is active in C2A).
-PHASE3BIS_SIO_EVOLVED_KG = 0.00118604428466
+# 2026-06-15 pure-component runtime reroute selects grounded sidecars globally.
+# SiO evolved drops mainly because grounded Na/K sidecars raise alkali vapor
+# pressure (K_Pmax ~0.034 -> ~11089 Pa), increasing finite-headspace pO2
+# (~8.3e-5 -> ~2.1e-4 bar) and suppressing SiO via the 1/sqrt(pO2) law in
+# `engines/builtin/vapor_pressure.py`. It is not caused by the Si sidecar alone.
+# 2026-06-15 Mn/Ti Alcock source-equation refit shifts the coupled
+# fallback state at the 1e-11 kg level while preserving wall-temperature
+# invariance.
+PHASE3BIS_SIO_EVOLVED_KG = 0.000508314500607
 
 
 @lru_cache(maxsize=None)

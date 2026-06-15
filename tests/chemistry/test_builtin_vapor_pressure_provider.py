@@ -119,6 +119,14 @@ class _CaOnlyMelt:
         return {"CaO": 100.0}
 
 
+class _MnOnlyMelt:
+    temperature_C = 2000.0 - 273.15
+    p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"MnO": 100.0}
+
+
 class _SiOnlyMelt:
     temperature_C = 1900.0 - 273.15
     p_total_mbar = 1e-3
@@ -143,6 +151,10 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     vapor_pressure_data,
 ):
     assert vapor_pressure_data["metals"]["Ca"]["valid_range_K"] == [1115, 1757]
+    assert (
+        vapor_pressure_data["metals"]["Ca"]["pure_component_antoine"]["valid_range_K"]
+        == [1254, 1712]
+    )
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
     result = provider.dispatch(_ca_range_extrapolation_request())
@@ -155,7 +167,7 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     assert extrapolation["temperature_K"] == pytest.approx(
         _CA_RANGE_EXTRAPOLATION_T_K
     )
-    assert tuple(extrapolation["valid_range_K"]) == (1115.0, 1757.0)
+    assert tuple(extrapolation["valid_range_K"]) == (1254.0, 1712.0)
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in result.warnings
@@ -215,6 +227,23 @@ def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in result.warnings
+    )
+
+
+def test_legacy_fallback_downgrades_mn_source_extrapolation(
+    vapor_pressure_data,
+):
+    stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnOnlyMelt())
+
+    result = stub._stub_equilibrium()
+
+    assert result.vapor_pressures_Pa["Mn"] > 0.0
+    assert (
+        result.vapor_pressures_source["Mn"]
+        == (
+            "builtin_fallback:pure_component_extrapolated:"
+            "extrapolated_beyond_source_equation_range_K"
+        )
     )
 
 

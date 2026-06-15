@@ -60,9 +60,23 @@ GOLDENS = (
 # 2026-06-14 dense VapoRock pseudo-Antoine refit: fallback SiO residual is
 # now honest against the 217-sample dense IW grid.  The new curve increases
 # vacuum-side C2A SiO vs the stale fallback, while preserving mass closure.
+# 2026-06-15 pure-component vapor correction: builtin metal reference pressure
+# now selects grounded `pure_component_antoine` sidecars where available instead
+# of legacy/pseudo `antoine` rows.  The SiO yield drop is driven by GLOBAL
+# sidecar-first selection, dominated by grounded Na/K sidecars raising alkali
+# vapor pressure (K_Pmax ~0.034 -> ~11089 Pa).  That raises finite-headspace pO2
+# (~8.3e-5 -> ~2.1e-4 bar) and suppresses SiO via the 1/sqrt(pO2) law in
+# `engines/builtin/vapor_pressure.py`.  It is not caused by the Si sidecar alone.
+# Lunar 0.00118604428466 -> 0.000508314373589; mars 0.00202232236423 ->
+# 0.000486760127234.  This is a deliberate physics move, not a retune; mass
+# closure remains covered by `tests/test_mass_balance.py`.
+# 2026-06-15 Mn/Ti Alcock/CRC grounding nudges the coupled fallback state:
+# lunar 0.000508314373589 -> 0.000508314489862; mars unchanged in this gate.
+# 2026-06-15 Mn/Ti Alcock source-equation refit removes sparse-anchor drift:
+# lunar 0.000508314489862 -> 0.000508314500607; mars unchanged in this gate.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.00118604428466,
-    "mars_basalt": 0.00202232236423,
+    "lunar_mare_low_ti": 0.000508314500607,
+    "mars_basalt": 0.000486760127234,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -77,9 +91,9 @@ BASELINE_SIO_EVOLVED_KG = {
 #   1. Absolute ceiling on Stage 4 (regression catch — runaway), and
 #   2. Stage 4 > Stage 3 ordering invariant (forces CHANGELOG update
 #      if defaults change in a way that restores Stage 3 dominance).
-# Both fixtures after the 2026-06-14 dense refit: stage_3 is
-# 1.73e-4 kg (lunar) / 2.94e-4 kg (mars), and stage_4 remains higher at
-# 3.17e-4 kg (lunar) / 5.41e-4 kg (mars).
+# Both fixtures after the 2026-06-15 pure-component vapor correction: stage_3
+# is 7.40e-5 kg (lunar) / 7.08e-5 kg (mars), and stage_4 remains higher at
+# 1.36e-4 kg (lunar) / 1.30e-4 kg (mars).
 # Predecessor history (for legacy reviewers): pre-Phase-A1 values were
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved

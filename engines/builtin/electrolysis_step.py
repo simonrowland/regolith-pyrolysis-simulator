@@ -28,6 +28,8 @@ The provider:
 
   * ``voltage_V`` -- applied cell voltage,
   * ``current_A`` -- total cell current,
+  * ``pO2_bar`` -- evolved-O2 activity/partial pressure at the anode,
+    referenced to 1 bar for the Nernst gas-product term,
   * ``dt_hr`` -- tick duration in hours (always 1.0 in the current
     simulator, passed through explicitly so the provider stays unit-
     correct if the simulator's tick ever changes -- the t_s = 3600 s
@@ -142,17 +144,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
-        # Build the audit once; every return path threads it through.
-        # Anode-fO2 is fixed at log10(1.0) = 0.0 by the pure-O2 evolution
-        # boundary condition (see _build_control_audit docstring).
-        control_audit = self._build_control_audit(request)
-
         controls = unpack_controls(request)
         voltage_V = float(controls.get("voltage_V") or 0.0)
         current_A = float(controls.get("current_A") or 0.0)
         dt_hr = float(controls.get("dt_hr", 1.0))
+        pO2_bar = self._coerce_pO2_bar(controls.get("pO2_bar", 1.0))
         T_C = float(request.temperature_C)
         T_K = T_C + 273.15
+        control_audit = self._build_control_audit(
+            request, applied_anode_fO2_log=math.log10(pO2_bar),
+        )
 
         # Compute the wt% composition view from the cleaned_melt mol
         # account -- mirrors MeltState.composition_wt_pct exactly. The
@@ -166,7 +167,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         )
         if not melt_mol:
             return self._empty_result(
-                diagnostic_skipped="empty melt", request=request,
+                diagnostic_skipped="empty melt",
+                request=request,
+                applied_anode_fO2_log=math.log10(pO2_bar),
             )
 
         registry = request.account_view.species_formula_registry
@@ -234,6 +237,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 faraday=FARADAY,
                 decomp_voltages=DECOMP_VOLTAGES,
                 electrons_per_oxide=ELECTRONS_PER_OXIDE,
+                oxide_to_metal=OXIDE_TO_METAL,
+                pO2_bar=pO2_bar,
             )
             if E_nernst < voltage_V:
                 overvoltage = voltage_V - E_nernst
@@ -416,10 +421,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         faraday: float,
         decomp_voltages: Mapping[str, float],
         electrons_per_oxide: Mapping[str, int],
+        oxide_to_metal: Mapping[str, tuple[str, int, int]],
+        pO2_bar: float = 1.0,
     ) -> float:
         """Nernst-adjusted decomposition voltage.
 
-        Mirrors :meth:`ElectrolysisModel.nernst_voltage` line-for-line.
+        Mirrors :meth:`ElectrolysisModel.nernst_voltage` line-for-line:
+        ``E = E0 + (RT/nF) ln(aO2^νO2 / a_oxide)``.
         Pure function; no provider state. Returns ``E0 + 1.0`` for
         essentially-depleted species (activity < 1e-10), same as legacy.
         """
@@ -428,7 +436,25 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         n = electrons_per_oxide.get(oxide, 2)
         if activity <= 1e-10:
             return E0 + 1.0
-        return E0 - (gas_constant * T_K) / (n * faraday) * math.log(activity)
+        metal_info = oxide_to_metal.get(oxide)
+        o2_mol_per_oxide = 0.0
+        if metal_info:
+            _metal, _n_met, n_oxy = metal_info
+            o2_mol_per_oxide = n_oxy / 2.0
+        pO2_activity = max(float(pO2_bar), 1e-30)
+        term = (gas_constant * T_K) / (n * faraday)
+        return (
+            E0
+            - term * math.log(activity)
+            + term * o2_mol_per_oxide * math.log(pO2_activity)
+        )
+
+    @staticmethod
+    def _coerce_pO2_bar(value: Any) -> float:
+        pO2_bar = float(value)
+        if not math.isfinite(pO2_bar):
+            return 1.0
+        return max(pO2_bar, 1e-30)
 
     @staticmethod
     def _build_atom_balance_proof(
@@ -460,15 +486,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
         The MRE cell holds the cathode at the applied voltage and strips
         anode O2 into ``terminal.oxygen_mre_anode_stored``; the anode
-        gas activity is pure O2 (log10(fO2/bar) = 0.0 by construction).
-        T and P are passed through unchanged -- the provider does not
+        O2 activity is the caller-supplied ``pO2_bar`` relative to the
+        1 bar standard state. T and P are passed through unchanged -- the provider does not
         compute an updated melt temperature or pressure.
 
         When the caller does not pin ``request.fO2_log`` (the standard
         case from :meth:`ExtractionMixin._step_mre`), the kernel's
         :func:`validate_control_audit` ignores the fO2 field per its
         ``requested_value is None`` guard.  Reporting the applied value
-        as ``0.0`` is still useful as a diagnostic / forensic record
+        as ``log10(pO2_bar)`` is still useful as a diagnostic / forensic record
         even when the validator skips it.
         """
 
@@ -483,15 +509,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         }
         applied = dict(requested)
         applied["fO2_log"] = float(applied_anode_fO2_log)
-        # Note documents the deliberate anode-fO2 fixing so a future
+        # Note documents the deliberate anode-fO2 application so a future
         # drift between request.fO2_log and applied is explained even
         # when the validator's None-guard would silently accept it.
         return ControlAudit(
             requested=requested,
             applied=applied,
             notes=(
-                "anode evolves pure O2 -> applied fO2_log=0.0 by "
-                "construction; T/P/V/I passed through unchanged",
+                "anode O2 activity comes from pO2_bar relative to 1 bar; "
+                "T/P/V/I passed through unchanged",
             ),
         )
 
@@ -501,6 +527,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         *,
         diagnostic_skipped: str = "",
         request: "IntentRequest | None" = None,
+        applied_anode_fO2_log: float = 0.0,
     ) -> IntentResult:
         diag: dict[str, Any] = {
             "oxides_reduced_kg": {},
@@ -518,7 +545,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             status="ok",
             transition=None,
             control_audit=(
-                cls._build_control_audit(request) if request is not None else None
+                cls._build_control_audit(
+                    request,
+                    applied_anode_fO2_log=applied_anode_fO2_log,
+                )
+                if request is not None else None
             ),
             diagnostic=diag,
         )

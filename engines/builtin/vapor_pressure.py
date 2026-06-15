@@ -20,9 +20,11 @@ The provider:
   reference terms to compute per-species saturation pressures at the
   request's ``temperature_C`` and the caller-supplied commanded
   ``pO2_bar`` (via ``control_inputs``). Only
-  ``fit_target=pure_component_psat`` rows are pure-component /
-  first-principles; ``pseudo_psat_backsolved_from_vaporock`` rows are
-  backsolved VapoRock curve-fit fallbacks,
+  ``pure_component_antoine`` sidecars are used for pure-component reference
+  pressures when present; legacy ``antoine`` rows are used only when no
+  sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
+  VapoRock curve-fit fallbacks only when their legacy ``antoine`` block is the
+  selected coefficient source,
 - returns an :class:`IntentResult` with ``transition=None``
   (diagnostic; VAPOR_PRESSURE owns no ledger mutation -- that belongs
   to ``EVAPORATION_TRANSITION``) and a ``vapor_pressures_Pa``
@@ -61,13 +63,11 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 
 
 # Vapor-pressure convention contract (`data/vapor_pressures.yaml`):
-# - Metals with `fit_target: pure_component_psat` have raw Antoine evaluated as
-#   `P_sat_pure`, then multiplied by Ellingham `a_M` -- single-counted.
+# - Metals with `pure_component_antoine` sidecars evaluate that block as
+#   `P_sat_pure`, then multiply by Ellingham `a_M` -- single-counted.
 # - Metals with `fit_target: pseudo_psat_backsolved_from_vaporock` have raw
-#   Antoine evaluated as a pseudo-standard term such that
-#   `a_M * 10^(A-B/T) ~= VapoRock_partial_pressure` on the calibration grid.
-#   The convention is single-counted by construction but assumes proximity to
-#   that grid.
+#   legacy Antoine evaluated as a pseudo-standard term only when no
+#   pure-component sidecar is available.
 # - Oxide vapors with `fit_target: standard_reaction_term` use raw Antoine as
 #   a ΔG-equivalent term, consumed with explicit oxide-activity + pO2
 #   exponents -- single-counted via explicit reaction stoichiometry.
@@ -101,6 +101,10 @@ class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math produces a non-finite value."""
 
 
+class VaporPressureNumericalOverflowError(OverflowError):
+    """Typed recipe-physics overflow from vapor-pressure exponentiation."""
+
+
 class VaporPressureFallbackWarning(RuntimeWarning):
     """Pseudo VapoRock curve-fit fallback is being used for vapor pressure."""
 
@@ -112,21 +116,130 @@ class HighUncertaintyVaporPressureFallbackWarning(VaporPressureFallbackWarning):
 FIT_TARGET_PURE_COMPONENT = "pure_component_psat"
 FIT_TARGET_PSEUDO_VAPOROCK = "pseudo_psat_backsolved_from_vaporock"
 FIT_TARGET_STANDARD_REACTION = "standard_reaction_term"
+COEFF_BLOCK_ANTOINE = "antoine"
+COEFF_BLOCK_PURE_COMPONENT = "pure_component_antoine"
 
 
 def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
 
 
+def _is_mapping(value: Any) -> bool:
+    return isinstance(value, Mapping)
+
+
+def _source_text(row: Mapping[str, Any] | None, coefficient_block: str | None) -> str:
+    if coefficient_block:
+        block = (row or {}).get(coefficient_block)
+        if _is_mapping(block) and block.get("source"):
+            return str(block.get("source"))
+    return str((row or {}).get("source", "") or "")
+
+
+def _is_legacy_or_uncertified_source(source: str) -> bool:
+    text = source.lower()
+    return any(
+        token in text
+        for token in (
+            "legacy_derivation_value",
+            "source_class=legacy_derivation",
+            "ungrounded",
+            "interval",
+            "todo replace",
+        )
+    )
+
+
+def _has_grounded_pure_component_source(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+) -> bool:
+    if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+        return False
+    if bool((row or {}).get("interval_required")):
+        return False
+    coeff = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+    if not _is_mapping(coeff):
+        return False
+    source = _source_text(row, coefficient_block)
+    return bool(source) and not _is_legacy_or_uncertified_source(source)
+
+
+def vapor_pressure_antoine_coefficients(
+    row: Mapping[str, Any] | None,
+) -> tuple[Mapping[str, Any], str]:
+    """Return the runtime Antoine block and its provenance key."""
+
+    if not bool((row or {}).get("interval_required")):
+        pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+        if _is_mapping(pure):
+            return pure, COEFF_BLOCK_PURE_COMPONENT
+    antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
+    if _is_mapping(antoine):
+        return antoine, COEFF_BLOCK_ANTOINE
+    return {}, COEFF_BLOCK_ANTOINE
+
+
+def vapor_pressure_valid_range_K(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+) -> Any:
+    block = (row or {}).get(coefficient_block or "")
+    if _is_mapping(block) and block.get("valid_range_K") is not None:
+        return block.get("valid_range_K")
+    return (row or {}).get("valid_range_K")
+
+
+def vapor_pressure_source_equation_range_K(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+) -> Any:
+    block = (row or {}).get(coefficient_block or "")
+    if _is_mapping(block) and block.get("source_equation_range_K") is not None:
+        return block.get("source_equation_range_K")
+    return (row or {}).get("source_equation_range_K")
+
+
+def _is_temperature_in_range(
+    temperature_K: float | None,
+    valid_range: Any,
+) -> bool:
+    if temperature_K is None:
+        return True
+    if not valid_range or len(valid_range) != 2:
+        return True
+    low = float(valid_range[0])
+    high = float(valid_range[1])
+    return low <= float(temperature_K) <= high
+
+
 def vapor_pressure_source_label(
     base_source: str,
     row: Mapping[str, Any] | None,
+    *,
+    coefficient_block: str | None = None,
+    temperature_K: float | None = None,
 ) -> str:
     """Return honest provenance for an Antoine vapor-pressure row."""
 
     target = _fit_target(row)
-    if target == FIT_TARGET_PURE_COMPONENT:
+    if _has_grounded_pure_component_source(row, coefficient_block):
+        source_range = vapor_pressure_source_equation_range_K(
+            row,
+            coefficient_block,
+        )
+        if not _is_temperature_in_range(temperature_K, source_range):
+            return (
+                f"{base_source}:pure_component_extrapolated:"
+                "extrapolated_beyond_source_equation_range_K"
+            )
         return f"{base_source}:pure_component_first_principles"
+    if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
+        return f"{base_source}:pure_component_legacy_derivation"
+    if bool((row or {}).get("interval_required")):
+        return f"{base_source}:interval_required_uncertified"
+    if target == FIT_TARGET_PURE_COMPONENT:
+        return f"{base_source}:legacy_pure_component_estimate"
     if target == FIT_TARGET_PSEUDO_VAPOROCK:
         return f"{base_source}:backsolved_vaporock_curve_fit"
     if target == FIT_TARGET_STANDARD_REACTION:
@@ -237,8 +350,8 @@ def _pow10_pressure_or_raise(
     try:
         pressure = 10.0 ** float(log_pressure)
     except OverflowError as exc:
-        raise VaporPressureComputationError(
-            f"vapor_pressure_nonfinite: species={species} field={field} "
+        raise VaporPressureNumericalOverflowError(
+            f"vapor_pressure_numerical_overflow: species={species} field={field} "
             f"log_pressure={log_pressure!r}"
         ) from exc
     return _require_finite_vapor_value(
@@ -338,13 +451,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if not parent_oxide:
                 continue
 
-            antoine = sp_data.get('antoine', {}) or {}
+            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                sp_data
+            )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
             if not (A > 0 and T_K > 300):
                 continue
-            valid_range = sp_data.get('valid_range_K')
+            valid_range = vapor_pressure_valid_range_K(
+                sp_data,
+                coefficient_block,
+            )
             if valid_range and len(valid_range) == 2:
                 valid_low = float(valid_range[0])
                 valid_high = float(valid_range[1])
@@ -424,6 +542,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 source_label = vapor_pressure_source_label(
                     "builtin_fallback",
                     sp_data,
+                    coefficient_block=coefficient_block,
+                    temperature_K=T_K,
                 )
                 if species in metal_extrapolations:
                     source_label = (
@@ -431,12 +551,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "extrapolated_beyond_valid_range_K"
                     )
                 vapor_pressure_sources[species] = source_label
-                warn_pseudo_vapor_pressure_fallback(
-                    species,
-                    sp_data,
-                    self._pseudo_vapor_pressure_warning_seen,
-                    stacklevel=2,
-                )
+                if coefficient_block == COEFF_BLOCK_ANTOINE:
+                    warn_pseudo_vapor_pressure_fallback(
+                        species,
+                        sp_data,
+                        self._pseudo_vapor_pressure_warning_seen,
+                        stacklevel=2,
+                    )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         for name, data in oxide_vapors_data.items():
@@ -493,6 +614,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
                     "builtin_fallback",
                     data,
+                    coefficient_block=COEFF_BLOCK_ANTOINE,
+                    temperature_K=T_K,
                 )
                 warn_pseudo_vapor_pressure_fallback(
                     name,

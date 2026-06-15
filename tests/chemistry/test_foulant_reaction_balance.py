@@ -11,6 +11,13 @@ import pytest
 import yaml
 
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
+from simulator.core import (
+    STAGE0_CARBONATE_METAL_OXIDE_STOICH,
+    STAGE0_CATION_SULFATE_OXIDE_PRODUCTS,
+    STAGE0_CATION_SULFATE_OXIDE_STOICH,
+    STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS,
+    STAGE0_CATION_SULFATE_SULFIDE_STOICH,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
@@ -62,6 +69,23 @@ def _format_fraction(value: Fraction) -> str:
     return f"{value.numerator}/{value.denominator}"
 
 
+def _format_reaction(
+    left: tuple[tuple[float, str], ...],
+    right: tuple[tuple[float, str], ...],
+) -> str:
+    def term(coefficient: float, species: str) -> str:
+        value = Fraction(str(coefficient))
+        if value == 1:
+            return species
+        return f"{_format_fraction(value)} {species}"
+
+    return (
+        " + ".join(term(coefficient, species) for coefficient, species in left)
+        + " -> "
+        + " + ".join(term(coefficient, species) for coefficient, species in right)
+    )
+
+
 def _assert_reaction_balanced(
     row_key: str, reaction: str, registry: Mapping[str, object]
 ) -> None:
@@ -80,6 +104,54 @@ def test_all_foulant_dg_reactions_are_atom_balanced() -> None:
     registry = _species_registry()
     for row_key, row in payload["foulant_dG"].items():
         _assert_reaction_balanced(row_key, row["reaction"], registry)
+
+
+def test_stage0_cation_sulfate_code_tables_are_atom_balanced() -> None:
+    registry = _species_registry()
+
+    for sulfate, oxide in STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.items():
+        stoich = STAGE0_CATION_SULFATE_OXIDE_STOICH[sulfate]
+        reaction = _format_reaction(
+            ((stoich["feed"], sulfate), (stoich["C"], "C")),
+            (
+                (stoich["oxide"], oxide),
+                (stoich["SO2"], "SO2"),
+                (stoich["CO"], "CO"),
+            ),
+        )
+        _assert_reaction_balanced(
+            f"STAGE0_CATION_SULFATE_OXIDE_PRODUCTS[{sulfate!r}]",
+            reaction,
+            registry,
+        )
+
+    for sulfate, sulfide in STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS.items():
+        stoich = STAGE0_CATION_SULFATE_SULFIDE_STOICH[sulfate]
+        reaction = _format_reaction(
+            ((stoich["feed"], sulfate), (stoich["C"], "C")),
+            ((stoich["sulfide"], sulfide), (stoich["CO"], "CO")),
+        )
+        _assert_reaction_balanced(
+            f"STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS[{sulfate!r}]",
+            reaction,
+            registry,
+        )
+
+
+def test_stage0_carbonate_code_table_is_atom_balanced() -> None:
+    registry = _species_registry()
+
+    for metal, oxide, atoms_per_oxide in STAGE0_CARBONATE_METAL_OXIDE_STOICH:
+        carbonate = f"{metal}CO3" if atoms_per_oxide == 1.0 else f"{metal}2CO3"
+        reaction = _format_reaction(
+            ((1.0, carbonate),),
+            ((1.0, oxide), (1.0, "CO2")),
+        )
+        _assert_reaction_balanced(
+            f"STAGE0_CARBONATE_METAL_OXIDE_STOICH[{metal!r}]",
+            reaction,
+            registry,
+        )
 
 
 def test_foulant_reaction_balance_guard_rejects_unbalanced_oxygen_row() -> None:

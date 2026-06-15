@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.backends import BackendSelectionPolicy
+from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
 from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import StubBackend
 from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
     FOULANT_GROUPS,
@@ -130,6 +131,83 @@ def test_messy_feedstock_produces_nonempty_bakeoff_timeline(feedstock_key):
         for entry in result.disposition_timeline
     )
     assert has_group_event
+
+
+@pytest.mark.parametrize("feedstock_key", ["mars_sulfate_rich", "ci_carbonaceous_chondrite"])
+def test_messy_harness_forces_subprocess_backend_route(monkeypatch, feedstock_key):
+    calls = []
+
+    def fake_resolve_backend(backend_name, policy, **kwargs):
+        calls.append((backend_name, policy, kwargs))
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    monkeypatch.setattr("simulator.session.resolve_backend", fake_resolve_backend)
+    config = _session_config(
+        feedstock_key,
+        backend_name="alphamelts",
+        backend_config={
+            "mode": "thermoengine",
+            "python_bridge": "pymagemin",
+            "alphamelts": {
+                "mode": "thermoengine",
+                "python_bridge": "pymagemin",
+            },
+        },
+    )
+
+    SimSession().start(config)
+
+    assert calls
+    backend_config = calls[0][2]["backend_config"]
+    assert backend_config["mode"] == "subprocess"
+    assert backend_config["python_bridge"] == "subprocess"
+    assert backend_config["alphamelts"]["mode"] == "subprocess"
+    assert backend_config["alphamelts"]["python_bridge"] == "subprocess"
+
+
+def test_messy_harness_rejects_inprocess_backend_override():
+    class UnsafeThermoEngineBackend:
+        name = "alphamelts"
+        _mode = "thermoengine"
+
+    config = _session_config("ci_carbonaceous_chondrite")
+
+    with pytest.raises(RuntimeError, match="requires subprocess"):
+        SimSession().start(config, backend=UnsafeThermoEngineBackend())
+
+
+def test_messy_harness_rejects_cached_real_inprocess_live_fill(tmp_path):
+    class UnsafeLiveBackend:
+        name = "alphamelts"
+        _mode = "thermoengine"
+
+        def is_available(self):
+            return True
+
+    cached = CachedRealBackend(
+        config=CachedRealConfig(
+            db_path=tmp_path / "cached-real.sqlite",
+            authorized_backend_name="alphamelts",
+            authorized_backend_version="test",
+            miss_policy="live-fill",
+        ),
+        live_backend=UnsafeLiveBackend(),
+    )
+    config = _session_config(
+        "ci_carbonaceous_chondrite",
+        backend_name="cached-real",
+        reduced_real_cache={
+            "db_path": str(tmp_path / "cached-real.sqlite"),
+            "authorized_backend_name": "alphamelts",
+            "authorized_backend_version": "test",
+            "miss_policy": "live-fill",
+        },
+    )
+
+    with pytest.raises(RuntimeError, match="cached-real live-fill requires subprocess"):
+        SimSession().start(config, backend=cached)
 
 
 def test_mars_sulfate_diagnostic_splits_land_in_timeline():
