@@ -88,6 +88,11 @@ _SOURCE_MODULE_PATTERNS = (
     "engines/builtin/evaporation_flux.py",
     "engines/builtin/vapor_pressure.py",
     "engines/builtin/stage0_pretreatment.py",
+    "engines/builtin/foulant_disposition.py",
+    # data/foulant_thermo.yaml and data/stage0_carbon_partition.yaml stay
+    # cache-inert while disposition remains diagnostic-only and absent from
+    # cached result payloads; add explicit optional digests if bakeoff reporting
+    # is ever cached.
     "engines/vaporock/*.py",
 )
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"

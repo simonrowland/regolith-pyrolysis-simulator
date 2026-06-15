@@ -419,6 +419,10 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
         "engines/builtin/stage0_pretreatment.py"
         in key["source_module_digest"]["paths"]
     )
+    assert (
+        "engines/builtin/foulant_disposition.py"
+        in key["source_module_digest"]["paths"]
+    )
     assert set(key["data_digests"]) == {
         "setpoints",
         "feedstocks",
@@ -894,6 +898,42 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
         store.quantized_controls(sim, fO2_log=0.0)
 
 
+FOULANT_DISPOSITION_MODULE = "engines/builtin/foulant_disposition.py"
+
+
+def test_foulant_disposition_helper_source_module_digest_coverage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.reduced_real_determinism import _SOURCE_MODULE_PATTERNS
+
+    assert FOULANT_DISPOSITION_MODULE in _SOURCE_MODULE_PATTERNS
+
+    rrd._source_module_digest.cache_clear()
+    before = _freeze_gate_key()
+    assert FOULANT_DISPOSITION_MODULE in before["source_module_digest"]["paths"]
+
+    target = rrd._repo_root() / FOULANT_DISPOSITION_MODULE
+    original_read_bytes = Path.read_bytes
+
+    def changed_read_bytes(path: Path) -> bytes:
+        data = original_read_bytes(path)
+        if path.resolve() == target.resolve():
+            return data + b"\n# foulant-disposition-digest-test\n"
+        return data
+
+    monkeypatch.setattr(Path, "read_bytes", changed_read_bytes)
+    rrd._source_module_digest.cache_clear()
+    try:
+        after = _freeze_gate_key()
+    finally:
+        rrd._source_module_digest.cache_clear()
+
+    assert before["source_module_digest"]["sha256"] != after[
+        "source_module_digest"
+    ]["sha256"]
+    assert _key_hash(before) != _key_hash(after)
+
+
 @pytest.mark.parametrize(
     "module_path",
     [
@@ -901,6 +941,7 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
         "engines/builtin/evaporation_flux.py",
         "engines/builtin/vapor_pressure.py",
         "engines/builtin/stage0_pretreatment.py",
+        "engines/builtin/foulant_disposition.py",
     ],
 )
 def test_pt2_source_module_digest_changes_with_payload_source(
