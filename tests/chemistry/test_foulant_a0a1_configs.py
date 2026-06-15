@@ -69,6 +69,7 @@ def test_load_foulant_registry_parses_all_carrier_blocks() -> None:
         "CaCO3",
         "MgCO3",
         "Na2CO3",
+        "ClO4_pseudo",
         "Mg_ClO4_2",
         "Ca_ClO4_2",
         "FeS",
@@ -79,7 +80,7 @@ def test_load_foulant_registry_parses_all_carrier_blocks() -> None:
     assert registry.alias_to_carrier["halide"] == "NaCl"
     assert registry.alias_to_carrier["oldhamite"] == "CaS"
     assert registry.alias_to_carrier["troilite"] == "FeS"
-    assert registry.alias_to_carrier["perchlorate"] == "Mg_ClO4_2"
+    assert registry.alias_to_carrier["perchlorate"] == "ClO4_pseudo"
 
 
 @pytest.mark.parametrize("dg_key", list(E1_CORRECTED_ANCHORS))

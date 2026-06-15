@@ -4297,18 +4297,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 expanded.append((comp_id, comp_kg))
         return expanded
 
-    @classmethod
     def _expand_chloride_foulant_feed(
-        cls,
+        self,
         component: str,
         feed_kg: float,
         feedstock: Mapping[str, Any],
-    ) -> list[tuple[str, float]]:
-        key = cls._normalized_component_key(component)
+    ) -> list[tuple[str, float, dict[str, Any]]]:
+        key = self._normalized_component_key(component)
         if key in {"nacl", "kcl"}:
-            return [(component, feed_kg)]
+            return [(
+                component,
+                feed_kg,
+                {
+                    "feed_basis": "salt_mass",
+                    "source_feed_kg": feed_kg,
+                },
+            )]
         if key not in {"cl", "halide", "halides", "nacl_kcl_salts"}:
-            return [(component, feed_kg)]
+            return [(
+                component,
+                feed_kg,
+                {
+                    "feed_basis": "as_reported",
+                    "source_feed_kg": feed_kg,
+                },
+            )]
         comp = feedstock.get("composition_wt_pct") or {}
         na = float(comp.get("Na2O", 0.0) or 0.0)
         k = float(comp.get("K2O", 0.0) or 0.0)
@@ -4318,12 +4331,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             total = na + k
             na_frac = na / total
             k_frac = k / total
-        expanded: list[tuple[str, float]] = []
+        cl_molar_mass = resolve_species_formula(
+            "Cl",
+            self.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        expanded: list[tuple[str, float, dict[str, Any]]] = []
         if feed_kg * na_frac > 1e-12:
-            expanded.append(("NaCl", feed_kg * na_frac))
+            cl_kg = feed_kg * na_frac
+            salt_molar_mass = resolve_species_formula(
+                "NaCl",
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            expanded.append((
+                "NaCl",
+                cl_kg * salt_molar_mass / cl_molar_mass,
+                {
+                    "feed_basis": "elemental_Cl",
+                    "source_feed_kg": feed_kg,
+                    "source_cl_kg": cl_kg,
+                    "chloride_split_fraction": na_frac,
+                    "salt_mass_conversion": "M_NaCl/M_Cl",
+                },
+            ))
         if feed_kg * k_frac > 1e-12:
-            expanded.append(("KCl", feed_kg * k_frac))
-        return expanded or [(component, feed_kg)]
+            cl_kg = feed_kg * k_frac
+            salt_molar_mass = resolve_species_formula(
+                "KCl",
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            expanded.append((
+                "KCl",
+                cl_kg * salt_molar_mass / cl_molar_mass,
+                {
+                    "feed_basis": "elemental_Cl",
+                    "source_feed_kg": feed_kg,
+                    "source_cl_kg": cl_kg,
+                    "chloride_split_fraction": k_frac,
+                    "salt_mass_conversion": "M_KCl/M_Cl",
+                },
+            ))
+        return expanded or [(
+            component,
+            feed_kg,
+            {
+                "feed_basis": "elemental_Cl",
+                "source_feed_kg": feed_kg,
+            },
+        )]
 
     def _resolve_foulant_carrier_key(self, component: str) -> str | None:
         registry = self._load_foulant_registry_cached()
@@ -4377,6 +4431,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             REACTION_FAMILY_CARBONATE_DECOMPOSITION,
             REACTION_FAMILY_INERT_TO_RUMP,
             REACTION_FAMILY_PARTITION_CARBON,
+            REACTION_FAMILY_PERCHLORATE,
             REACTION_FAMILY_SILICATE_DISPLACEMENT,
             REACTION_FAMILY_SULFATE_DECOMP,
             REACTION_FAMILY_VOLATILIZATION,
@@ -4397,7 +4452,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for component, feed_kg in (
             carrier_snapshot.get("chloride_salt_phase") or {}
         ).items():
-            for carrier_name, split_kg in self._expand_chloride_foulant_feed(
+            for carrier_name, split_kg, basis in self._expand_chloride_foulant_feed(
                 component, feed_kg, feedstock,
             ):
                 carrier_key = self._resolve_foulant_carrier_key(carrier_name)
@@ -4412,10 +4467,58 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     "carrier": entry.carrier_key,
                     "feed_kg": split_kg,
                     "source_component": component,
+                    **basis,
                     "phase_specs": phase_specs,
                 })
                 if diag is not None:
+                    diag.update({
+                        "source_component": component,
+                        **basis,
+                    })
                     self._stage0_foulant_diagnostics.append(diag)
+
+        for component, feed_kg in (carrier_snapshot.get("salt_phase") or {}).items():
+            key = self._normalized_component_key(component)
+            if key not in {"clo4", "perchlorate", "perchlorates"}:
+                continue
+            carrier_key = self._resolve_foulant_carrier_key(component)
+            if carrier_key is None:
+                continue
+            entry = foulant_registry.carriers.get(carrier_key)
+            if entry is None or entry.reaction_family != "perchlorate":
+                continue
+            molar = {
+                species: resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol()
+                for species in ("ClO4", "Cl", "O2")
+            }
+            extent_mol = feed_kg / molar["ClO4"]
+            diag = self._dispatch_stage0_foulant_diagnostic({
+                **common,
+                "reaction_family": REACTION_FAMILY_PERCHLORATE,
+                "debits": (
+                    ("process.stage0_perchlorate_feed", {"ClO4": feed_kg}),
+                ),
+                "salt_products_kg": {"Cl": extent_mol * molar["Cl"]},
+                "oxygen_products_kg": {"O2": 2.0 * extent_mol * molar["O2"]},
+            })
+            if diag is not None:
+                diag.update({
+                    "carrier": entry.carrier_key,
+                    "feed_kg": feed_kg,
+                    "source_component": component,
+                    "source_basis": "pseudo_ClO4",
+                    "pseudo_species_caveat": (
+                        "diagnostic mirrors legacy ClO4 -> Cl + 2 O2 "
+                        "pseudo-species cleanup; no Mg/Ca cation route"
+                    ),
+                    "stage0_phase": "phase_1_oxidizing",
+                    "phase": 1,
+                    "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
+                })
+                self._stage0_foulant_diagnostics.append(diag)
 
         salt_phase_sulfate_proxy = {
             "so3": "CaSO4",

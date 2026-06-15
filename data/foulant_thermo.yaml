@@ -282,7 +282,7 @@ Na2CO3:
 Mg_ClO4_2:
   carrier:
     species: Mg(ClO4)2
-    aliases: [mg_clo4_2, clo4, perchlorate]
+    aliases: [mg_clo4_2]
     molar_mass_g_mol: 223.21
   group: trapped_gasses
   reaction_family: perchlorate
@@ -296,7 +296,6 @@ Mg_ClO4_2:
   fate:
     on_decompose_offgas: {account: terminal.oxygen_stage0_stored, species: [O2]}
     on_decompose_chloride: {account: terminal.stage0_chloride_salt_phase, species: [MgCl2]}
-    on_decompose_melt: {account: process.cleaned_melt, species: [MgO]}
   warning_flags:
     confidence: well_grounded
 
@@ -317,9 +316,29 @@ Ca_ClO4_2:
   fate:
     on_decompose_offgas: {account: terminal.oxygen_stage0_stored, species: [O2]}
     on_decompose_chloride: {account: terminal.stage0_chloride_salt_phase, species: [CaCl2]}
-    on_decompose_melt: {account: process.cleaned_melt, species: [CaO]}
   warning_flags:
     confidence: well_grounded
+
+ClO4_pseudo:
+  carrier:
+    species: ClO4
+    aliases: [clo4, perchlorate, perchlorates]
+    molar_mass_g_mol: 99.45
+  group: trapped_gasses
+  reaction_family: perchlorate
+  thermo:
+    dG_row: null
+    source: "Legacy diagnostic-only pseudo species; runtime cleanup is ClO4 -> Cl + 2 O2"
+  gating:
+    chi_model: legacy_pseudo
+    o2_dependence: none
+    requires_reagent: null
+  fate:
+    on_decompose_offgas: {account: terminal.oxygen_stage0_stored, species: [O2]}
+    on_decompose_chloride: {account: terminal.stage0_chloride_salt_phase, species: [Cl]}
+  warning_flags:
+    confidence: diagnostic_pseudo_species
+    caveat: "No Mg/Ca cation route; mirrors legacy pseudo ClO4 cleanup only."
 
 FeS:
   carrier:
