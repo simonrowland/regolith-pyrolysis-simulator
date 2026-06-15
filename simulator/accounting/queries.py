@@ -88,6 +88,7 @@ REACTION_FAMILY_SULFATE_DECOMP = "sulfate_decomp"
 REACTION_FAMILY_SILICATE_DISPLACEMENT = "silicate_displacement"
 REACTION_FAMILY_CARBONATE_DECOMPOSITION = "carbonate_decomposition"
 REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
+REACTION_FAMILY_PERCHLORATE = "perchlorate"
 
 
 def _merge_masses(target: dict[str, float], values: Mapping[str, float]) -> None:
@@ -230,16 +231,15 @@ class AccountingQueries:
         diagnostics = _coalesced_stage0_foulant_diagnostics(
             getattr(self.sim, "_stage0_foulant_diagnostics", ()) or ()
         )
-        expected_source_debit_kg = 0.0
+        expected_source_debit_kg = _stage0_authoritative_foulant_source_debit_kg(
+            self.sim,
+            diagnostics,
+        )
 
         for diagnostic in diagnostics:
             if not isinstance(diagnostic, Mapping):
                 continue
             rows = _stage0_foulant_partition_rows(diagnostic, registry)
-            if rows:
-                expected_source_debit_kg += _stage0_positive_float(
-                    diagnostic.get("feed_kg")
-                )
             for row in rows:
                 _add_stage0_foulant_partition_row(groups, row)
 
@@ -729,6 +729,24 @@ def _stage0_positive_float(value: Any) -> float:
     return amount
 
 
+def _stage0_positive_mass_sum(values: Any) -> float:
+    if not isinstance(values, Mapping):
+        return 0.0
+    total = 0.0
+    for species, value in values.items():
+        amount = _stage0_optional_float(value)
+        if amount is None:
+            continue
+        if amount < -STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+            raise AccountingError(
+                f"Stage-0 foulant product mass is negative for {species!r}: "
+                f"{amount:.15g} kg"
+            )
+        if amount > 0.0:
+            total += amount
+    return total
+
+
 def _stage0_optional_float(value: Any) -> float | None:
     try:
         amount = float(value)
@@ -764,6 +782,196 @@ def _stage0_group_for_carrier(
     if reaction_family == REACTION_FAMILY_PARTITION_CARBON:
         return "refractory_carbon"
     return "other_mineral_contaminant"
+
+
+def _stage0_normalized_component_key(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _stage0_raw_inventory_components_kg(sim: Any) -> dict[str, float] | None:
+    inventory = getattr(sim, "inventory", None)
+    raw_components = getattr(inventory, "raw_components_kg", None)
+    if not isinstance(raw_components, Mapping):
+        return None
+    result: dict[str, float] = {}
+    for component, value in raw_components.items():
+        amount = _stage0_positive_float(value)
+        if amount > 0.0:
+            result[str(component)] = amount
+    return result
+
+
+def _stage0_species_element_mass_fraction(
+    species: str,
+    element: str,
+    formula_registry: Mapping[str, Any] | None,
+) -> float:
+    formula = resolve_species_formula(species, formula_registry)
+    element_count = float(getattr(formula, "elements", {}).get(element, 0.0))
+    if element_count <= 0.0:
+        raise AccountingError(
+            f"Stage-0 foulant carrier {species!r} contains no {element}"
+        )
+    element_formula = resolve_species_formula(element, formula_registry)
+    element_mass = element_count * element_formula.molar_mass_kg_per_mol()
+    carrier_mass = formula.molar_mass_kg_per_mol()
+    if carrier_mass <= 0.0:
+        raise AccountingError(
+            f"Stage-0 foulant carrier {species!r} has invalid molar mass"
+        )
+    return element_mass / carrier_mass
+
+
+def _stage0_authoritative_foulant_source_debit_kg(
+    sim: Any,
+    diagnostics: Any,
+) -> float | None:
+    raw_components = _stage0_raw_inventory_components_kg(sim)
+    if raw_components is None:
+        return None
+    raw_key_by_normalized = {
+        _stage0_normalized_component_key(component): component
+        for component in raw_components
+    }
+    consumed_raw_keys: set[str] = set()
+    expected_kg = 0.0
+    chloride_split_totals: dict[str, float] = {}
+    formula_registry = getattr(sim, "species_formula_registry", None)
+
+    def consume_raw_source(*candidates: Any) -> bool:
+        nonlocal expected_kg
+        for candidate in candidates:
+            key = _stage0_normalized_component_key(candidate)
+            if not key:
+                continue
+            raw_key = raw_key_by_normalized.get(key)
+            if raw_key is None:
+                continue
+            if raw_key not in consumed_raw_keys:
+                expected_kg += raw_components[raw_key]
+                consumed_raw_keys.add(raw_key)
+            return True
+        return False
+
+    def raw_component_kg(*candidates: Any) -> tuple[str, float] | None:
+        for candidate in candidates:
+            key = _stage0_normalized_component_key(candidate)
+            if not key:
+                continue
+            raw_key = raw_key_by_normalized.get(key)
+            if raw_key is not None:
+                return raw_key, raw_components[raw_key]
+        return None
+
+    for diagnostic in diagnostics:
+        if not isinstance(diagnostic, Mapping):
+            continue
+        family = str(diagnostic.get("reaction_family", ""))
+        carrier = str(
+            diagnostic.get("carrier")
+            or diagnostic.get("species")
+            or diagnostic.get("source_component")
+            or ""
+        )
+        source_component = diagnostic.get("source_component")
+
+        if (
+            family == REACTION_FAMILY_VOLATILIZATION
+            and _stage0_normalized_component_key(
+                diagnostic.get("feed_basis")
+            ) == "elemental_cl"
+        ):
+            source = raw_component_kg(source_component, "Cl")
+            if source is None:
+                raise AccountingError(
+                    "Stage-0 foulant diagnostic has no raw Cl source "
+                    f"for carrier {carrier!r}"
+                )
+            raw_key, raw_cl_kg = source
+            split = _stage0_fraction(diagnostic.get("chloride_split_fraction"))
+            if split <= 0.0:
+                source_cl_kg = _stage0_positive_float(
+                    diagnostic.get("source_cl_kg")
+                )
+                if raw_cl_kg > 0.0 and source_cl_kg > 0.0:
+                    split = source_cl_kg / raw_cl_kg
+            if split <= 0.0:
+                raise AccountingError(
+                    "Stage-0 foulant chloride diagnostic has no positive "
+                    f"split for carrier {carrier!r}"
+                )
+            if split > 1.0 + STAGE0_FOULANT_CLOSURE_REL_TOL:
+                raise AccountingError(
+                    "Stage-0 foulant chloride split exceeds source inventory: "
+                    f"{split:.15g} for carrier {carrier!r}"
+                )
+            chloride_split_totals[raw_key] = (
+                chloride_split_totals.get(raw_key, 0.0) + split
+            )
+            cl_fraction = _stage0_species_element_mass_fraction(
+                carrier,
+                "Cl",
+                formula_registry,
+            )
+            expected_kg += raw_cl_kg * split / cl_fraction
+            continue
+
+        if family in {
+            REACTION_FAMILY_CARBONATE_DECOMPOSITION,
+            REACTION_FAMILY_SILICATE_DISPLACEMENT,
+        }:
+            matched = consume_raw_source(
+                source_component,
+                carrier,
+                diagnostic.get("species"),
+                "carbonate_salts",
+            )
+        elif family == REACTION_FAMILY_SULFATE_DECOMP:
+            matched = consume_raw_source(
+                source_component,
+                carrier,
+                diagnostic.get("species"),
+                "SO3",
+                "sulfate",
+                "sulfates",
+            )
+        elif family == REACTION_FAMILY_PERCHLORATE:
+            matched = consume_raw_source(source_component, "ClO4", carrier)
+        elif family == REACTION_FAMILY_PARTITION_CARBON:
+            matched = consume_raw_source(
+                source_component,
+                carrier,
+                diagnostic.get("species"),
+                "carbonaceous_organic",
+                "organics",
+                "hydrocarbons",
+            )
+        elif family in {
+            REACTION_FAMILY_VOLATILIZATION,
+            REACTION_FAMILY_INERT_TO_RUMP,
+        }:
+            matched = consume_raw_source(
+                source_component,
+                carrier,
+                diagnostic.get("species"),
+            )
+        else:
+            matched = True
+
+        if not matched:
+            raise AccountingError(
+                "Stage-0 foulant diagnostic has no raw inventory source: "
+                f"reaction_family={family!r}, carrier={carrier!r}"
+            )
+
+    for raw_key, split_total in chloride_split_totals.items():
+        if split_total > 1.0 + STAGE0_FOULANT_CLOSURE_REL_TOL:
+            raise AccountingError(
+                "Stage-0 foulant chloride diagnostics overdraw raw source "
+                f"{raw_key!r}: split total {split_total:.15g}"
+            )
+
+    return expected_kg
 
 
 def _coalesced_stage0_foulant_diagnostics(
@@ -877,6 +1085,42 @@ def _stage0_foulant_partition_rows(
             retained_kg=feed_kg * (1.0 - extent),
             rump_kg=feed_kg * extent,
         )]
+
+    if family == REACTION_FAMILY_PERCHLORATE:
+        escaped_kg = (
+            _stage0_positive_mass_sum(diagnostic.get("salt_products_kg"))
+            + _stage0_positive_mass_sum(diagnostic.get("oxygen_products_kg"))
+        )
+        retained_kg = _stage0_positive_mass_sum(
+            diagnostic.get("retained_products_kg")
+        )
+        allocated_kg = escaped_kg + retained_kg
+        if not math.isclose(
+            allocated_kg,
+            feed_kg,
+            rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+            abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+        ):
+            raise AccountingError(
+                "Stage-0 perchlorate foulant mass does not close: "
+                f"{allocated_kg:.15g} kg products vs {feed_kg:.15g} kg feed"
+            )
+        rows: list[dict[str, Any]] = []
+        if escaped_kg > 0.0:
+            rows.append(_stage0_partition_row(
+                "trapped_gasses",
+                family,
+                escaped_kg,
+                escaped_kg=escaped_kg,
+            ))
+        if retained_kg > 0.0:
+            rows.append(_stage0_partition_row(
+                "other_mineral_contaminant",
+                family,
+                retained_kg,
+                retained_kg=retained_kg,
+            ))
+        return rows
 
     if family == REACTION_FAMILY_INERT_TO_RUMP:
         rump_frac = _stage0_fraction(diagnostic.get("rump_frac", 1.0))
@@ -1060,7 +1304,7 @@ def _add_stage0_foulant_partition_row(
 
 def _finalize_stage0_foulant_partition_groups(
     groups: dict[str, dict[str, Any]],
-    expected_source_debit_kg: float,
+    expected_source_debit_kg: float | None,
 ) -> dict[str, dict[str, Any]]:
     result: dict[str, dict[str, Any]] = {}
     total_source_debited_kg = 0.0
@@ -1102,7 +1346,7 @@ def _finalize_stage0_foulant_partition_groups(
                 "error_pct": error_pct,
             },
         }
-    if not math.isclose(
+    if expected_source_debit_kg is not None and not math.isclose(
         total_source_debited_kg,
         expected_source_debit_kg,
         rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,

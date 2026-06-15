@@ -154,6 +154,63 @@ def test_stage0_foulant_reporting_read_only_and_golden_neutral(
 
     assert sim_on.atom_ledger.mol_by_account() == before
     assert sim_on.atom_ledger.mol_by_account() == sim_off.atom_ledger.mol_by_account()
+    for payload in partition.values():
+        assert payload["closure"]["error_kg"] == pytest.approx(0.0)
+
+
+def test_stage0_foulant_partition_reports_mars_perchlorate():
+    vapor_pressure_data = _load_yaml("vapor_pressures.yaml")
+    feedstocks_data = _load_yaml("feedstocks.yaml")
+    setpoints_data = _load_yaml("setpoints.yaml")
+    sim = _load_batch_sim(
+        "mars_perchlorate_rich",
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+        diagnostics_enabled=True,
+    )
+
+    partition = AccountingQueries(sim).stage0_foulant_partition_by_group()
+
+    perchlorate_diag = next(
+        diagnostic
+        for diagnostic in sim._stage0_foulant_diagnostics
+        if diagnostic["reaction_family"] == "perchlorate"
+    )
+    assert (
+        partition["trapped_gasses"]["reaction_family_totals_kg"]["perchlorate"]
+        == pytest.approx(perchlorate_diag["feed_kg"])
+    )
+    assert (
+        partition["other_mineral_contaminant"][
+            "reaction_family_totals_kg"
+        ].get("perchlorate", 0.0)
+        == pytest.approx(0.0)
+    )
+    for payload in partition.values():
+        assert payload["closure"]["error_kg"] == pytest.approx(0.0)
+
+
+def test_stage0_foulant_partition_raises_on_bogus_diagnostic_not_in_ledger():
+    vapor_pressure_data = _load_yaml("vapor_pressures.yaml")
+    feedstocks_data = _load_yaml("feedstocks.yaml")
+    setpoints_data = _load_yaml("setpoints.yaml")
+    sim = _load_batch_sim(
+        "ci_carbonaceous_chondrite",
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+        diagnostics_enabled=True,
+    )
+    sim._stage0_foulant_diagnostics.append({
+        "reaction_family": "carbonate_decomposition",
+        "species": "CaCO3",
+        "feed_kg": 1000.0,
+        "extent": 1.0,
+    })
+
+    with pytest.raises(AccountingError, match="global source debit"):
+        AccountingQueries(sim).stage0_foulant_partition_by_group()
 
 
 def test_stage0_foulant_renderer_prints_provenance_and_clear_steps():
