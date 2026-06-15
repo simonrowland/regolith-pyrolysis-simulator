@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import filecmp
 import html
 import re
 import sys
-from collections import defaultdict
+import tempfile
+import unicodedata
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,10 +21,13 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 REF_DIR = Path(__file__).resolve().parent
 REGISTRY_PATH = REF_DIR / "references.yaml"
+DOI_MANIFEST_PATH = REF_DIR / "doi_verification.yaml"
 TOKEN_RE = re.compile(r"\bREF-\d{3,}\b")
 REF_ID_RE = re.compile(r"^REF-\d{3,}$")
+REF_KEY_RE = re.compile(r"^  (REF-\d{3,}):\s*$", re.MULTILINE)
 TOPIC_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SUPERSEDED_RE = re.compile(r"^superseded_by:(REF-\d{3,})$")
+DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$", re.I)
 
 ROLES = {
     "DATA",
@@ -49,18 +55,59 @@ class CitationUse:
 
 
 def load_registry(path: Path = REGISTRY_PATH) -> dict[str, dict[str, Any]]:
-    with path.open("r", encoding="utf-8") as fh:
-        data = yaml.safe_load(fh) or {}
+    raw = path.read_text(encoding="utf-8")
+    duplicates = duplicate_ref_ids(raw)
+    if duplicates:
+        raise ValueError(f"duplicate reference IDs in {path}: {', '.join(duplicates)}")
+    data = yaml.safe_load(raw) or {}
     references = data.get("references")
     if not isinstance(references, dict):
         raise ValueError("references.yaml must contain a mapping named 'references'")
     return references
 
 
-def validate_registry(references: dict[str, dict[str, Any]]) -> tuple[list[str], list[str]]:
+def duplicate_ref_ids(raw: str) -> list[str]:
+    counts = Counter(REF_KEY_RE.findall(raw))
+    return sorted(ref_id for ref_id, count in counts.items() if count > 1)
+
+
+def load_doi_manifest(path: Path = DOI_MANIFEST_PATH) -> dict[str, dict[str, str]]:
+    if not path.exists():
+        return {}
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    manifest = data.get("doi_verification")
+    if not isinstance(manifest, dict):
+        raise ValueError("doi_verification.yaml must contain a mapping named 'doi_verification'")
+    return manifest
+
+
+def normalize_title(value: str) -> str:
+    replacements = str.maketrans({
+        "\u2010": "-",
+        "\u2011": "-",
+        "\u2012": "-",
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2015": "-",
+        "\u2018": "'",
+        "\u2019": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+    })
+    value = unicodedata.normalize("NFKD", value).translate(replacements)
+    value = "".join(ch for ch in value if not unicodedata.combining(ch))
+    value = re.sub(r"<[^>]+>", "", value)
+    value = re.sub(r"[^a-z0-9]+", " ", value.lower())
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def validate_registry(
+    references: dict[str, dict[str, Any]], doi_manifest: dict[str, dict[str, str]] | None = None
+) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     required = {"authors", "title", "year", "role", "topic", "status", "doi", "url", "found", "pull_quotes"}
+    doi_manifest = doi_manifest if doi_manifest is not None else load_doi_manifest()
 
     for ref_id, entry in sorted(references.items()):
         if not REF_ID_RE.match(str(ref_id)):
@@ -105,11 +152,14 @@ def validate_registry(references: dict[str, dict[str, Any]]) -> tuple[list[str],
         if not isinstance(doi, str) or not isinstance(url, str):
             errors.append(f"{ref_id}: doi and url must be strings")
         else:
-            if doi and not doi.startswith("10."):
-                errors.append(f"{ref_id}: doi must start with 10.")
+            if doi and not DOI_RE.match(doi):
+                errors.append(f"{ref_id}: doi must look like a DOI beginning with 10.<registrant>/")
             if url and not re.match(r"^https?://", url):
                 errors.append(f"{ref_id}: url must start with http:// or https://")
             if not doi and not url:
+                reason = entry.get("provenance_unavailable_reason")
+                if reason is not None and (not isinstance(reason, str) or not reason.strip()):
+                    errors.append(f"{ref_id}: provenance_unavailable_reason must be a non-empty string")
                 warnings.append(f"{ref_id}: doi and url are both blank; verify this is genuinely unavailable")
 
         status = entry.get("status")
@@ -135,7 +185,44 @@ def validate_registry(references: dict[str, dict[str, Any]]) -> tuple[list[str],
         elif entry.get("needs_quote") is not True:
             errors.append(f"{ref_id}: empty pull_quotes requires needs_quote: true")
 
+    errors.extend(validate_doi_manifest(references, doi_manifest))
     return errors, warnings
+
+
+def validate_doi_manifest(
+    references: dict[str, dict[str, Any]], manifest: dict[str, dict[str, str]]
+) -> list[str]:
+    errors: list[str] = []
+    required = {"doi", "doi_resolved_title", "doi_verified_at"}
+    for ref_id, record in sorted(manifest.items()):
+        if ref_id not in references:
+            errors.append(f"{ref_id}: DOI manifest entry has no matching reference")
+            continue
+        if not isinstance(record, dict):
+            errors.append(f"{ref_id}: DOI manifest entry must be a mapping")
+            continue
+        missing = sorted(required - set(record))
+        if missing:
+            errors.append(f"{ref_id}: DOI manifest missing required fields: {', '.join(missing)}")
+            continue
+        for field in sorted(required):
+            if not isinstance(record.get(field), str) or not record[field].strip():
+                errors.append(f"{ref_id}: DOI manifest {field} must be a non-empty string")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(record.get("doi_verified_at", ""))):
+            errors.append(f"{ref_id}: DOI manifest doi_verified_at must be YYYY-MM-DD")
+
+        expected_doi = str(record.get("doi", "")).strip()
+        actual_doi = str(references[ref_id].get("doi") or "").strip()
+        if expected_doi != actual_doi:
+            errors.append(f"{ref_id}: DOI manifest expects {expected_doi}, registry has {actual_doi or '<blank>'}")
+
+        resolved_title = str(record.get("doi_resolved_title", ""))
+        registry_title = str(references[ref_id].get("title") or "")
+        if normalize_title(resolved_title) != normalize_title(registry_title):
+            errors.append(
+                f"{ref_id}: registry title does not match DOI-resolved title for {expected_doi}"
+            )
+    return errors
 
 
 def scan_files(root: Path = ROOT) -> dict[str, list[CitationUse]]:
@@ -235,10 +322,20 @@ def validate_citations(
         warnings.append(f"{orphan}: defined but never cited")
 
     for ref_id, entry in sorted(references.items()):
+        uses = cited_by.get(ref_id, [])
+        doi = str(entry.get("doi") or "").strip()
+        url = str(entry.get("url") or "").strip()
+        reason = str(entry.get("provenance_unavailable_reason") or "").strip()
+        status = str(entry.get("status", ""))
+        if uses and status in STATUSES and not doi and not url and not reason:
+            use_list = ", ".join(f"{use.file}:{use.line}" for use in uses[:8])
+            errors.append(
+                f"{ref_id}: live cited reference has blank doi and url without provenance_unavailable_reason ({use_list})"
+            )
+
         status = str(entry.get("status", ""))
         match = SUPERSEDED_RE.match(status)
         if match:
-            uses = cited_by.get(ref_id, [])
             if uses:
                 use_list = ", ".join(f"{use.file}:{use.line}" for use in uses)
                 warnings.append(f"{ref_id}: superseded by {match.group(1)}; still cited by {use_list}")
@@ -248,8 +345,12 @@ def validate_citations(
     return errors, warnings
 
 
-def render_html(references: dict[str, dict[str, Any]], cited_by: dict[str, list[CitationUse]]) -> None:
-    topics_dir = REF_DIR / "topics"
+def render_html(
+    references: dict[str, dict[str, Any]],
+    cited_by: dict[str, list[CitationUse]],
+    output_dir: Path = REF_DIR,
+) -> None:
+    topics_dir = output_dir / "topics"
     topics_dir.mkdir(parents=True, exist_ok=True)
 
     by_topic: dict[str, list[str]] = defaultdict(list)
@@ -261,7 +362,7 @@ def render_html(references: dict[str, dict[str, Any]], cited_by: dict[str, list[
         body=render_index_body(references, cited_by, by_topic),
         depth=0,
     )
-    (REF_DIR / "index.html").write_text(index, encoding="utf-8")
+    (output_dir / "index.html").write_text(index, encoding="utf-8")
 
     for topic in sorted(by_topic):
         body = [
@@ -272,6 +373,39 @@ def render_html(references: dict[str, dict[str, Any]], cited_by: dict[str, list[
             body.append(render_entry(ref_id, references[ref_id], cited_by.get(ref_id, []), depth=1))
         page = render_page(title=f"{topic} references", body="\n".join(body), depth=1)
         (topics_dir / f"{topic}.html").write_text(page, encoding="utf-8")
+
+
+def rendered_html_diffs(expected_dir: Path, actual_dir: Path) -> list[str]:
+    expected_files = html_output_files(expected_dir)
+    actual_files = html_output_files(actual_dir)
+    diffs: list[str] = []
+
+    for rel in sorted(expected_files - actual_files):
+        diffs.append(f"missing generated HTML: {rel}")
+    for rel in sorted(actual_files - expected_files):
+        diffs.append(f"unexpected generated HTML: {rel}")
+    for rel in sorted(expected_files & actual_files):
+        if not filecmp.cmp(expected_dir / rel, actual_dir / rel, shallow=False):
+            diffs.append(f"stale generated HTML: {rel}")
+    return diffs
+
+
+def html_output_files(base_dir: Path) -> set[str]:
+    files: set[str] = set()
+    index = base_dir / "index.html"
+    if index.exists():
+        files.add("index.html")
+    topics_dir = base_dir / "topics"
+    if topics_dir.exists():
+        files.update(path.relative_to(base_dir).as_posix() for path in topics_dir.glob("*.html"))
+    return files
+
+
+def check_rendered_html(references: dict[str, dict[str, Any]], cited_by: dict[str, list[CitationUse]]) -> list[str]:
+    with tempfile.TemporaryDirectory(prefix="references-html-") as tmp:
+        tmp_dir = Path(tmp)
+        render_html(references, cited_by, output_dir=tmp_dir)
+        return rendered_html_diffs(REF_DIR, tmp_dir)
 
 
 def render_page(title: str, body: str, depth: int) -> str:
@@ -416,11 +550,12 @@ def escape(value: str) -> str:
 def run(check: bool = False) -> int:
     try:
         references = load_registry()
+        doi_manifest = load_doi_manifest()
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
 
-    errors, warnings = validate_registry(references)
+    errors, warnings = validate_registry(references, doi_manifest)
     cited_by = scan_files()
     citation_errors, citation_warnings = validate_citations(references, cited_by)
     errors.extend(citation_errors)
@@ -433,11 +568,16 @@ def run(check: bool = False) -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    if not check:
+    if check:
+        html_diffs = check_rendered_html(references, cited_by)
+        if html_diffs:
+            for diff in html_diffs:
+                print(f"ERROR: {diff}", file=sys.stderr)
+            return 1
+        print(f"validated {len(references)} references; cited refs={len(cited_by)}; generated HTML current")
+    else:
         render_html(references, cited_by)
         print(f"rendered {len(references)} references across {len({entry['topic'] for entry in references.values()})} topics")
-    else:
-        print(f"validated {len(references)} references; cited refs={len(cited_by)}")
     return 0
 
 

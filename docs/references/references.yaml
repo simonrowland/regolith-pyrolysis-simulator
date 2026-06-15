@@ -151,7 +151,7 @@ references:
     pull_quotes: []
   REF-011:
     authors: "Bardyn, A. et al."
-    title: "Carbon-rich dust in comet 67P/Churyumov-Gerasimenko measured by COSIMA/Rosetta"
+    title: "High-molecular-weight organic matter in the particles of comet 67P/Churyumov-Gerasimenko"
     journal: "Nature"
     year: 2016
     volume: "533"
@@ -276,7 +276,7 @@ references:
     year: 2018
     volume: "84"
     pages: "393-459"
-    doi: ""
+    doi: "10.2138/rmg.2018.84.11"
     url: ""
     role: REVIEW
     topic: volatility
@@ -293,6 +293,7 @@ references:
     pages: "Part I and Part II"
     doi: ""
     url: ""
+    provenance_unavailable_reason: "No verified DOI or stable source URL was identified for NIST-JANAF Thermochemical Tables, 4th Ed. during the 2026-06-15 DOI audit; leave blank rather than inventing a citation identifier."
     role: DATA
     topic: thermochemistry
     status: current
@@ -396,7 +397,7 @@ references:
     year: 2007
     volume: "71"
     pages: "4380-4403"
-    doi: ""
+    doi: "10.1016/j.gca.2007.06.052"
     url: ""
     role: MEASUREMENT
     topic: carbonaceous-chondrites
@@ -456,11 +457,27 @@ references:
     year: 2020
     volume: "10"
     pages: "5473"
-    doi: ""
+    doi: "10.1038/s41598-020-62312-4"
     url: ""
     role: MEASUREMENT
     topic: simulants
     status: current
     found: "2026-06-14 refs-audit-data-yamls"
+    needs_quote: true
+    pull_quotes: []
+  REF-032:
+    authors: "Alcock, C.B., Itkin, V.P. & Horrigan, M.K."
+    title: "Vapour Pressure Equations for the Metallic Elements: 298-2500 K"
+    journal: "Canadian Metallurgical Quarterly"
+    year: 1984
+    volume: "23"
+    pages: "309"
+    doi: "10.1179/cmq.1984.23.3.309"
+    url: "https://doi.org/10.1179/cmq.1984.23.3.309"
+    provenance_note: "DOI verified during the 2026-06-15 Mn/Ti vapor re-review fix; coefficients were cross-checked against the CRC/CR2 vapor-pressure table mirror during the 2026-06-15 Mn/Ti vapor grounding."
+    role: DATA
+    topic: vapor-pressure
+    status: current
+    found: "2026-06-15 ground-mn-ti-vapor"
     needs_quote: true
     pull_quotes: []
