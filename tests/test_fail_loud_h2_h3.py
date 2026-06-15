@@ -1,4 +1,6 @@
+import json
 import math
+import warnings
 from pathlib import Path
 
 import pytest
@@ -6,6 +8,7 @@ import yaml
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
+    HighUncertaintyVaporPressureFallbackWarning,
     VaporPressureComputationError,
 )
 from simulator.accounting import (
@@ -170,3 +173,86 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     assert result.status == "ok"
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-9)
     assert all(math.isfinite(value) for value in pressures.values())
+
+
+def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
+    provider = BuiltinVaporPressureProvider(
+        {
+            "metals": {
+                "K": {
+                    "parent_oxide": "K2O",
+                    "fit_target": "pseudo_psat_backsolved_from_vaporock",
+                    "residual_dex": 1.4,
+                    "confidence_tier": "low",
+                    "antoine": {"A": 5.0, "B": 0.0, "C": 0.0},
+                }
+            },
+            "oxide_vapors": {},
+        }
+    )
+    request = _vapor_request(
+        temperature_c=1600.0,
+        pO2_bar=1.0e-9,
+        accounts={"process.cleaned_melt": {"K2O": 1.0}},
+    )
+
+    with pytest.warns(
+        HighUncertaintyVaporPressureFallbackWarning,
+        match=(
+            "HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved "
+            "VapoRock fallback \\(curve-fit\\), NOT first-principles; "
+            "residual_dex=1.4; confidence_tier=low; "
+            "VapoRock is authoritative when available"
+        ),
+    ):
+        first = provider.dispatch(request)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        second = provider.dispatch(request)
+
+    assert caught == []
+    assert json.dumps(
+        first.diagnostic["vapor_pressures_Pa"],
+        sort_keys=True,
+        separators=(",", ":"),
+    ) == json.dumps(
+        second.diagnostic["vapor_pressures_Pa"],
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    assert first.diagnostic["vapor_pressures_source"] == {
+        "K": "builtin_fallback:backsolved_vaporock_curve_fit"
+    }
+
+
+def test_builtin_vapor_pressure_pure_component_row_is_silent() -> None:
+    provider = BuiltinVaporPressureProvider(
+        {
+            "metals": {
+                "K": {
+                    "parent_oxide": "K2O",
+                    "fit_target": "pure_component_psat",
+                    "residual_dex": 0.01,
+                    "confidence_tier": "high",
+                    "antoine": {"A": 5.0, "B": 0.0, "C": 0.0},
+                }
+            },
+            "oxide_vapors": {},
+        }
+    )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = provider.dispatch(
+            _vapor_request(
+                temperature_c=1600.0,
+                pO2_bar=1.0e-9,
+                accounts={"process.cleaned_melt": {"K2O": 1.0}},
+            )
+        )
+
+    assert caught == []
+    assert result.diagnostic["vapor_pressures_source"] == {
+        "K": "builtin_fallback:pure_component_first_principles"
+    }

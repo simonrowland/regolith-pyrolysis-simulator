@@ -105,9 +105,12 @@ class EquilibriumMixin:
     #
     # The effective metal vapor pressure above the melt is:
     #
-    #   P_metal(g) = a_M(l) × P_sat_pure(T)                     [ELLI-4]
+    #   P_metal(g) = a_M(l) × P_reference(T)                    [ELLI-4]
     #
-    # where P_sat_pure comes from Antoine equation (vapor_pressures.yaml).
+    # where P_reference comes from vapor_pressures.yaml. It is
+    # pure-component / first-principles only when
+    # fit_target=pure_component_psat; pseudo_psat_backsolved_from_vaporock
+    # rows are backsolved VapoRock curve-fit fallback terms.
     #
     # This naturally captures the full Ellingham hierarchy:
     #   Na, K (volatile, weak oxides):   high P_metal → easy pyrolysis
@@ -218,6 +221,10 @@ class EquilibriumMixin:
         metal.  The Antoine equation + √pO₂ correction is used.  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
+        from engines.builtin.vapor_pressure import (
+            vapor_pressure_source_label,
+            warn_pseudo_vapor_pressure_fallback,
+        )
 
         T_K = self.melt.temperature_C + 273.15
         if T_K < 400:
@@ -233,9 +240,22 @@ class EquilibriumMixin:
             )
 
         vapor_pressures = {}
+        vapor_pressure_sources = {}
         activities = {}
         metal_extrapolations = {}
         warnings = []
+        pseudo_warning_seen = getattr(
+            self,
+            '_pseudo_vapor_pressure_warning_seen',
+            None,
+        )
+        if pseudo_warning_seen is None:
+            pseudo_warning_seen = set()
+            setattr(
+                self,
+                '_pseudo_vapor_pressure_warning_seen',
+                pseudo_warning_seen,
+            )
 
         # --- Determine the oxygen partial pressure (bar) ---
         #
@@ -265,8 +285,9 @@ class EquilibriumMixin:
         # ================================================================
         #
         # For each metal, combine the oxide decomposition equilibrium
-        # (how much liquid metal is "freed") with the pure-metal
-        # vaporization (how much of that liquid metal enters the gas).
+        # (how much liquid metal is "freed") with an Antoine reference term.
+        # Only fit_target=pure_component_psat rows are pure-component /
+        # first-principles; pseudo rows are backsolved VapoRock curve-fits.
 
         metals_data = self.vapor_pressures.get('metals', {})
 
@@ -281,7 +302,7 @@ class EquilibriumMixin:
             if not parent_oxide:
                 continue
 
-            # --- Pure-metal P_sat from Antoine ---
+            # --- Antoine reference pressure ---
             #
             # We extrapolate the Clausius-Clapeyron equation beyond its
             # validated range because:
@@ -296,7 +317,9 @@ class EquilibriumMixin:
             # For Fe (mp 1538°C = 1811K), this allows computing meaningful
             # vapor pressures at 1400-1538°C where FeO decomposition in
             # the silicate melt IS physically real, even though pure solid
-            # Fe has a slightly lower sublimation pressure.
+            # Fe has a slightly lower sublimation pressure. That
+            # pure-component rationale applies only to
+            # fit_target=pure_component_psat rows.
             antoine = sp_data.get('antoine', {})
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
@@ -319,7 +342,7 @@ class EquilibriumMixin:
                         )
                 # Antoine: log10(P_Pa) = A - B / (T_K + C)
                 log_P = A - B / (T_K + C)
-                P_sat_pure_Pa = 10.0 ** log_P
+                P_reference_Pa = 10.0 ** log_P
             else:
                 continue
 
@@ -360,11 +383,27 @@ class EquilibriumMixin:
 
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
-            # P_metal = a_M(l) × P_sat_pure(T)
-            P_effective_Pa = a_M_liquid * P_sat_pure_Pa
+            # P_metal = a_M(l) × P_reference(T)
+            P_effective_Pa = a_M_liquid * P_reference_Pa
 
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
+                source_label = vapor_pressure_source_label(
+                    'builtin_fallback',
+                    sp_data,
+                )
+                if species in metal_extrapolations:
+                    source_label = (
+                        f'{source_label}:'
+                        'extrapolated_beyond_valid_range_K'
+                    )
+                vapor_pressure_sources[species] = source_label
+                warn_pseudo_vapor_pressure_fallback(
+                    species,
+                    sp_data,
+                    pseudo_warning_seen,
+                    stacklevel=3,
+                )
 
         # ================================================================
         # OXIDE VAPOR SPECIES (SiO, CrO2)                        [THERMO-8]
@@ -422,6 +461,16 @@ class EquilibriumMixin:
 
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
+                vapor_pressure_sources[name] = vapor_pressure_source_label(
+                    'builtin_fallback',
+                    data,
+                )
+                warn_pseudo_vapor_pressure_fallback(
+                    name,
+                    data,
+                    pseudo_warning_seen,
+                    stacklevel=3,
+                )
 
         return EquilibriumResult(
             temperature_C=self.melt.temperature_C,
@@ -430,10 +479,9 @@ class EquilibriumMixin:
             phase_assemblage_available=False,
             vapor_pressures_Pa=vapor_pressures,
             vapor_pressures_source={
-                species: (
-                    'builtin_fallback:extrapolated_beyond_valid_range_K'
-                    if species in metal_extrapolations
-                    else 'builtin_fallback'
+                species: vapor_pressure_sources.get(
+                    species,
+                    'builtin_fallback',
                 )
                 for species in vapor_pressures
             },

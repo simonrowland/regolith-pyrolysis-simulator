@@ -2,11 +2,15 @@ import math
 import subprocess
 import time
 import types
+import warnings
 from pathlib import Path
 
 import pytest
 import yaml
 
+from engines.builtin.vapor_pressure import (
+    HighUncertaintyVaporPressureFallbackWarning,
+)
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
@@ -808,6 +812,116 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
     ) == {}
 
 
+def test_activities_times_antoine_warns_once_for_pseudo_curvefit():
+    backend = AlphaMELTSBackend()
+    backend._vapor_pressure_table = {
+        'K': {
+            'fit_target': 'pseudo_psat_backsolved_from_vaporock',
+            'residual_dex': 1.4,
+            'confidence_tier': 'low',
+            'antoine': {'A': 5.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    with pytest.warns(
+        HighUncertaintyVaporPressureFallbackWarning,
+        match=(
+            'HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved '
+            'VapoRock fallback \\(curve-fit\\), NOT first-principles; '
+            'residual_dex=1.4; confidence_tier=low; '
+            'VapoRock is authoritative when available'
+        ),
+    ):
+        first = backend._activities_times_antoine(
+            1600.0,
+            {'K2O': 0.5},
+            {'K2O': 1.0},
+        )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        second = backend._activities_times_antoine(
+            1600.0,
+            {'K2O': 0.5},
+            {'K2O': 1.0},
+        )
+
+    assert caught == []
+    assert first == second
+    assert first['K'] == pytest.approx(5.0e4)
+    assert backend._antoine_vapor_pressure_source_by_species(
+        'alphamelts_python_api',
+        first,
+    ) == {'K': 'alphamelts_python_api:backsolved_vaporock_curve_fit'}
+
+
+def test_activities_times_antoine_pure_component_is_silent_and_labelled():
+    backend = AlphaMELTSBackend()
+    backend._vapor_pressure_table = {
+        'K': {
+            'fit_target': 'pure_component_psat',
+            'residual_dex': 0.01,
+            'confidence_tier': 'high',
+            'antoine': {'A': 4.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        pressures = backend._activities_times_antoine(
+            1600.0,
+            {'K2O': 0.5},
+            {'K2O': 1.0},
+        )
+
+    assert caught == []
+    assert pressures == {'K': pytest.approx(5.0e3)}
+    assert backend._antoine_vapor_pressure_source_by_species(
+        'alphamelts_python_api',
+        pressures,
+    ) == {'K': 'alphamelts_python_api:pure_component_first_principles'}
+
+
+def test_real_vaporock_path_does_not_warn_for_pseudo_fallback_rows():
+    class RealVapoRock:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **_kwargs):
+            return EquilibriumResult(
+                status='ok',
+                liquid_fraction=1.0,
+                vapor_pressures_Pa={'K': 12.0},
+                warnings=[],
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._vaporock_helper = RealVapoRock()
+    backend._vapor_pressure_table = {
+        'K': {
+            'fit_target': 'pseudo_psat_backsolved_from_vaporock',
+            'residual_dex': 1.4,
+            'confidence_tier': 'low',
+            'antoine': {'A': 5.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
+            T_C=1600.0,
+            solved_melt_wt_pct={'K2O': 1.0},
+            liquid_fraction=1.0,
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            activities={'K2O': 0.5},
+        )
+
+    assert caught == []
+    assert pressures == {'K': 12.0}
+    assert source == 'vaporock'
+
+
 def test_vaporock_empty_and_antoine_empty_fails_loud_for_volatile_melt():
     class EmptyVapoRock:
         def is_available(self):
@@ -823,7 +937,7 @@ def test_vaporock_empty_and_antoine_empty_fails_loud_for_volatile_melt():
     backend = AlphaMELTSBackend()
     backend._vaporock_helper = EmptyVapoRock()
 
-    with pytest.warns(UserWarning, match='using activity x pure-component Antoine'):
+    with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
         with pytest.raises(
             RuntimeError,
             match='volatile-bearing melt.*silently zero evaporation flux',
@@ -853,7 +967,7 @@ def test_vaporock_empty_volatile_free_melt_returns_physical_zero():
     backend = AlphaMELTSBackend()
     backend._vaporock_helper = EmptyVapoRock()
 
-    with pytest.warns(UserWarning, match='using activity x pure-component Antoine'):
+    with pytest.warns(UserWarning, match='using activity x Antoine fallback rows'):
         pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
             T_C=1600.0,
             solved_melt_wt_pct={'P2O5': 100.0},
@@ -1301,7 +1415,12 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
         activities={'Na2O': 0.2, 'SiO2': 0.4},
     )
 
-    assert source == 'antoine_fallback_from_vaporock'
+    assert source["Na"] == (
+        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+    )
+    assert source["SiO"] == (
+        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+    )
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
     # would zero the evaporation flux.
     assert pressures != {}
@@ -1325,7 +1444,9 @@ def test_vapor_bridge_empty_vaporock_result_falls_back_to_antoine_with_label():
             activities={'Na2O': 0.2},
         )
 
-    assert source == 'antoine_fallback_from_vaporock'
+    assert source["Na"] == (
+        "antoine_fallback_from_vaporock:backsolved_vaporock_curve_fit"
+    )
     assert pressures != {}  # not a silent zero
 
 

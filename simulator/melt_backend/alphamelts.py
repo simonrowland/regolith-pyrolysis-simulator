@@ -148,6 +148,7 @@ class AlphaMELTSBackend(MeltBackend):
         self._timeout_s = 20.0
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
+        self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def initialize(self, config: dict) -> bool:
         """
@@ -244,8 +245,9 @@ class AlphaMELTSBackend(MeltBackend):
         if not self._vaporock_available and not self._vaporock_unavailable_logged:
             warnings.warn(
                 'VapoRock vapor-melt library unavailable; alphaMELTS vapor '
-                'pressures fall back to the activity x pure-component Antoine '
-                'path (vapor_pressures_source reflects the antoine fallback).',
+                'pressures fall back to activity x Antoine rows; '
+                'vapor_pressures_source distinguishes pure-component '
+                'first-principles rows from backsolved VapoRock curve-fit rows.',
                 stacklevel=2,
             )
             self._vaporock_unavailable_logged = True
@@ -1031,7 +1033,12 @@ class AlphaMELTSBackend(MeltBackend):
                     context='ThermoEngine VapoRock fallback unavailable',
                 )
                 vapor_pressure_source = (
-                    'thermoengine' if vapor_pressures else 'no_volatile_species'
+                    self._antoine_vapor_pressure_source_by_species(
+                        'thermoengine',
+                        vapor_pressures,
+                    )
+                    if vapor_pressures
+                    else 'no_volatile_species'
                 )
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
@@ -1043,10 +1050,10 @@ class AlphaMELTSBackend(MeltBackend):
                 liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
                 activity_coefficients=payload.activity_coefficients,
                 vapor_pressures_Pa=vapor_pressures,
-                vapor_pressures_source={
-                    species: vapor_pressure_source
-                    for species in vapor_pressures
-                },
+                vapor_pressures_source=self._vapor_pressure_source_map(
+                    vapor_pressures,
+                    vapor_pressure_source,
+                ),
                 warnings=list(payload.warnings),
                 status=status,
             )
@@ -1109,8 +1116,11 @@ class AlphaMELTSBackend(MeltBackend):
                     )
                 )
             else:
-                # Use activity × pure-component Antoine only when the
+                # Use activity x Antoine fallback rows only when the
                 # chemical-potential convention supplied real activities.
+                # Only pure_component_psat rows are pure-component /
+                # first-principles; pseudo rows are backsolved VapoRock
+                # curve-fit fallbacks.
                 eq.vapor_pressures_Pa = self._activities_times_antoine_or_fail(
                     temperature_C,
                     eq.activity_coefficients,
@@ -1118,14 +1128,17 @@ class AlphaMELTSBackend(MeltBackend):
                     context='PetThermoTools VapoRock fallback unavailable',
                 )
                 source = (
-                    'alphamelts_python_api'
+                    self._antoine_vapor_pressure_source_by_species(
+                        'alphamelts_python_api',
+                        eq.vapor_pressures_Pa,
+                    )
                     if eq.vapor_pressures_Pa
                     else 'no_volatile_species'
                 )
-            eq.vapor_pressures_source = {
-                species: source
-                for species in eq.vapor_pressures_Pa
-            }
+            eq.vapor_pressures_source = self._vapor_pressure_source_map(
+                eq.vapor_pressures_Pa,
+                source,
+            )
 
             return eq
 
@@ -1982,7 +1995,10 @@ class AlphaMELTSBackend(MeltBackend):
             )
             return (
                 pressures,
-                'antoine_fallback_from_vaporock'
+                self._antoine_vapor_pressure_source_by_species(
+                    'antoine_fallback_from_vaporock',
+                    pressures,
+                )
                 if pressures
                 else 'no_volatile_species',
             )
@@ -2005,8 +2021,9 @@ class AlphaMELTSBackend(MeltBackend):
                 f'status={result.status}, empty vapor_pressures_Pa')
             warnings.warn(
                 'VapoRock returned no usable vapor pressures '
-                f'({detail}); using activity x pure-component Antoine '
-                'fallback.',
+                f'({detail}); using activity x Antoine fallback rows '
+                '(pure-component only when fit_target=pure_component_psat; '
+                'pseudo rows are backsolved VapoRock curve-fits).',
                 stacklevel=2,
             )
             pressures = self._activities_times_antoine_or_fail(
@@ -2017,7 +2034,10 @@ class AlphaMELTSBackend(MeltBackend):
             )
             return (
                 pressures,
-                'antoine_fallback_from_vaporock'
+                self._antoine_vapor_pressure_source_by_species(
+                    'antoine_fallback_from_vaporock',
+                    pressures,
+                )
                 if pressures
                 else 'no_volatile_species',
             )
@@ -2059,18 +2079,57 @@ class AlphaMELTSBackend(MeltBackend):
             'evaporation flux'
         )
 
+    def _antoine_vapor_pressure_source_by_species(
+        self,
+        base_source: str,
+        pressures: Mapping[str, float],
+    ) -> Dict[str, str]:
+        from engines.builtin.vapor_pressure import vapor_pressure_source_label
+
+        table = self._load_vapor_pressure_table()
+        return {
+            str(species): vapor_pressure_source_label(
+                base_source,
+                table.get(str(species), {}),
+            )
+            for species in pressures
+        }
+
+    @staticmethod
+    def _vapor_pressure_source_map(
+        pressures: Mapping[str, float],
+        source: str | Mapping[str, str],
+    ) -> Dict[str, str]:
+        if isinstance(source, Mapping):
+            return {
+                str(species): str(
+                    source.get(str(species))
+                    or source.get(species)
+                    or 'unknown_vapor_pressure_source'
+                )
+                for species in pressures
+            }
+        return {
+            str(species): str(source)
+            for species in pressures
+        }
+
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,
                                     _comp_wt: dict) -> Dict[str, float]:
         """
-        Compute vapor pressures as thermodynamic activity × pure-component P(T).
+        Compute vapor pressures as thermodynamic activity x Antoine-row P(T).
 
-        Fallback when VapoRock is not available. Uses Antoine equation
-        parameters from vapor_pressures.yaml. Activities must already be
-        pure-endmember-referenced values from
+        Fallback when VapoRock is not available. Uses Antoine equation rows
+        from vapor_pressures.yaml. Only fit_target=pure_component_psat rows
+        are pure-component / first-principles. Rows with
+        fit_target=pseudo_psat_backsolved_from_vaporock are backsolved
+        VapoRock fallbacks (curve-fits), with residual_dex/confidence_tier
+        metadata. Activities must already be pure-endmember-referenced
+        values from
         ``activity_from_chem_potential(mu, mu0, T_K)``.
 
-        P_i = a_i × P_pure_i(T)
+        P_i = a_i x P_reference_i(T)
 
         If activities are unavailable, no pressure is emitted.
         """
@@ -2081,6 +2140,8 @@ class AlphaMELTSBackend(MeltBackend):
             return {}
         T_K = float(T_C) + 273.15
         pressures: Dict[str, float] = {}
+        from engines.builtin.vapor_pressure import warn_pseudo_vapor_pressure_fallback
+
         for species, spec in table.items():
             raw_activity = self._activity_for_vapor_species(species, activities)
             if raw_activity is None:
@@ -2091,12 +2152,18 @@ class AlphaMELTSBackend(MeltBackend):
             if not all(key in coeffs for key in ('A', 'B', 'C')):
                 continue
             activity_i = float(raw_activity)
-            p_pure_i = 10.0 ** (
+            p_reference_i = 10.0 ** (
                 float(coeffs['A']) - float(coeffs['B']) / (T_K + float(coeffs['C']))
             )
-            p_i = activity_i * p_pure_i
+            p_i = activity_i * p_reference_i
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
+                warn_pseudo_vapor_pressure_fallback(
+                    str(species),
+                    spec,
+                    self._pseudo_vapor_pressure_warning_seen,
+                    stacklevel=3,
+                )
         return pressures
 
     def _melt_has_antoine_vapor_precursor(

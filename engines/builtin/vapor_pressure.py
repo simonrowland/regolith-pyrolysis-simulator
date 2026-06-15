@@ -16,10 +16,13 @@ The provider:
   account it declares),
 - looks up Antoine coefficients from the ``vapor_pressures.yaml``
   payload passed at construction time,
-- combines Ellingham oxide-decomposition equilibrium with pure-metal
-  Antoine vaporization to compute per-species saturation pressures at
-  the request's ``temperature_C`` and the caller-supplied commanded
-  ``pO2_bar`` (via ``control_inputs``),
+- combines Ellingham oxide-decomposition equilibrium with Antoine
+  reference terms to compute per-species saturation pressures at the
+  request's ``temperature_C`` and the caller-supplied commanded
+  ``pO2_bar`` (via ``control_inputs``). Only
+  ``fit_target=pure_component_psat`` rows are pure-component /
+  first-principles; ``pseudo_psat_backsolved_from_vaporock`` rows are
+  backsolved VapoRock curve-fit fallbacks,
 - returns an :class:`IntentResult` with ``transition=None``
   (diagnostic; VAPOR_PRESSURE owns no ledger mutation -- that belongs
   to ``EVAPORATION_TRANSITION``) and a ``vapor_pressures_Pa``
@@ -43,6 +46,7 @@ spec §7).
 from __future__ import annotations
 
 import math
+import warnings as runtime_warnings
 from collections.abc import Mapping
 from typing import Any
 
@@ -67,8 +71,9 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # - Oxide vapors with `fit_target: standard_reaction_term` use raw Antoine as
 #   a ΔG-equivalent term, consumed with explicit oxide-activity + pO2
 #   exponents -- single-counted via explicit reaction stoichiometry.
-# This metadata documents the existing math only; dispatch below does not
-# branch on `fit_target`.
+# Dispatch keeps the existing math, but uses `fit_target` for honest source
+# labels and runtime warnings when pseudo VapoRock curve-fit fallback rows are
+# actually used.
 #
 # Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
 # Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
@@ -94,6 +99,97 @@ _ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
 
 class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math produces a non-finite value."""
+
+
+class VaporPressureFallbackWarning(RuntimeWarning):
+    """Pseudo VapoRock curve-fit fallback is being used for vapor pressure."""
+
+
+class HighUncertaintyVaporPressureFallbackWarning(VaporPressureFallbackWarning):
+    """High-residual or low-confidence pseudo VapoRock fallback was used."""
+
+
+FIT_TARGET_PURE_COMPONENT = "pure_component_psat"
+FIT_TARGET_PSEUDO_VAPOROCK = "pseudo_psat_backsolved_from_vaporock"
+FIT_TARGET_STANDARD_REACTION = "standard_reaction_term"
+
+
+def _fit_target(row: Mapping[str, Any] | None) -> str:
+    return str((row or {}).get("fit_target", "") or "").strip()
+
+
+def vapor_pressure_source_label(
+    base_source: str,
+    row: Mapping[str, Any] | None,
+) -> str:
+    """Return honest provenance for an Antoine vapor-pressure row."""
+
+    target = _fit_target(row)
+    if target == FIT_TARGET_PURE_COMPONENT:
+        return f"{base_source}:pure_component_first_principles"
+    if target == FIT_TARGET_PSEUDO_VAPOROCK:
+        return f"{base_source}:backsolved_vaporock_curve_fit"
+    if target == FIT_TARGET_STANDARD_REACTION:
+        return f"{base_source}:standard_reaction_term"
+    if target:
+        return f"{base_source}:fit_target={target}"
+    return base_source
+
+
+def _metadata_value(row: Mapping[str, Any] | None, field: str) -> str:
+    value = (row or {}).get(field)
+    if value is None or value == "":
+        return "unknown"
+    return str(value)
+
+
+def _is_high_uncertainty(row: Mapping[str, Any] | None) -> bool:
+    residual = (row or {}).get("residual_dex")
+    try:
+        if residual is not None and float(residual) >= 1.0:
+            return True
+    except (TypeError, ValueError):
+        pass
+    tier = str((row or {}).get("confidence_tier", "") or "").lower()
+    tier = tier.replace("-", "_").replace(" ", "_")
+    return tier in {"low", "very_low", "weak", "poor", "experimental"}
+
+
+def warn_pseudo_vapor_pressure_fallback(
+    species: str,
+    row: Mapping[str, Any] | None,
+    seen_species: set[str],
+    *,
+    stacklevel: int = 2,
+) -> bool:
+    """Warn once when a pseudo VapoRock curve-fit row produces pressure."""
+
+    if _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK:
+        return False
+
+    key = str(species)
+    if key in seen_species:
+        return False
+    seen_species.add(key)
+
+    high_uncertainty = _is_high_uncertainty(row)
+    residual = _metadata_value(row, "residual_dex")
+    tier = _metadata_value(row, "confidence_tier")
+    prefix = "HIGH-UNCERTAINTY WARNING" if high_uncertainty else "WARNING"
+    category = (
+        HighUncertaintyVaporPressureFallbackWarning
+        if high_uncertainty
+        else VaporPressureFallbackWarning
+    )
+    runtime_warnings.warn(
+        f"{prefix}: {key} vapor pressure uses a backsolved VapoRock "
+        "fallback (curve-fit), NOT first-principles; "
+        f"residual_dex={residual}; confidence_tier={tier}; "
+        "VapoRock is authoritative when available.",
+        category,
+        stacklevel=stacklevel,
+    )
+    return True
 
 
 def _require_finite_vapor_value(
@@ -179,6 +275,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressure_data: Mapping[str, Any],
     ) -> None:
         self._vapor_pressure_data = dict(vapor_pressure_data or {})
+        self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -223,6 +320,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
 
         vapor_pressures: dict[str, float] = {}
+        vapor_pressure_sources: dict[str, str] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
@@ -261,10 +359,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K"
                     )
             log_P = A - B / (T_K + C)
-            P_sat_pure_Pa = _pow10_pressure_or_raise(
+            P_reference_Pa = _pow10_pressure_or_raise(
                 log_P,
                 species=species,
-                field="P_sat_pure_Pa",
+                field="P_reference_Pa",
             )
 
             a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
@@ -317,12 +415,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             a_M_liquid = min(a_M_liquid, 1.0)
             P_effective_Pa = _require_finite_vapor_value(
-                a_M_liquid * P_sat_pure_Pa,
+                a_M_liquid * P_reference_Pa,
                 species=species,
                 field="P_effective_Pa",
             )
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
+                source_label = vapor_pressure_source_label(
+                    "builtin_fallback",
+                    sp_data,
+                )
+                if species in metal_extrapolations:
+                    source_label = (
+                        f"{source_label}:"
+                        "extrapolated_beyond_valid_range_K"
+                    )
+                vapor_pressure_sources[species] = source_label
+                warn_pseudo_vapor_pressure_fallback(
+                    species,
+                    sp_data,
+                    self._pseudo_vapor_pressure_warning_seen,
+                    stacklevel=2,
+                )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         for name, data in oxide_vapors_data.items():
@@ -376,6 +490,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
+                vapor_pressure_sources[name] = vapor_pressure_source_label(
+                    "builtin_fallback",
+                    data,
+                )
+                warn_pseudo_vapor_pressure_fallback(
+                    name,
+                    data,
+                    self._pseudo_vapor_pressure_warning_seen,
+                    stacklevel=2,
+                )
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -384,6 +508,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "vapor_pressures_Pa": vapor_pressures,
+                "vapor_pressures_source": vapor_pressure_sources,
                 "activities": activities,
                 "pO2_bar": pO2_bar,
                 "extrapolated_beyond_valid_range_K": metal_extrapolations,
