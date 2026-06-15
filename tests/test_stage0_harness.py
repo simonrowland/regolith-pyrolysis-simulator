@@ -18,6 +18,7 @@ from simulator.stage0_harness import (
     run_stage0_harness,
     run_stage0_harness_from_config,
 )
+from simulator.optimize.evalspec import REQUIRED_DATA_DIGEST_KEYS
 from simulator.state import CampaignPhase
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -145,6 +146,78 @@ def test_mars_sulfate_diagnostic_splits_land_in_timeline():
     ]
     assert sulfate_events
     assert any(event.get("source") == "diagnostic" for event in sulfate_events)
+
+
+def test_comet_runtime_emits_uncertain_carbon_partition_interval():
+    result = run_stage0_harness_from_config(_session_config("comet_nucleus"))
+
+    events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["refractory_carbon"]
+        if event.get("reaction_family") == "partition_carbon"
+    ]
+    uncertain = [
+        event
+        for event in events
+        if event.get("disposition") == "uncertain_partition"
+    ]
+
+    assert uncertain
+    event = uncertain[0]
+    assert event["interval_required"] is True
+    assert event["feed_kg"] > 0.0
+    assert event["declared_c_mol"] > 0.0
+    assert event["declared_C_kg"] > 0.0
+    assert event["refractory_fraction_interval"] == [0.0, 1.0]
+    assert event["refractory_C_mol_interval"] == pytest.approx([
+        0.0,
+        event["declared_c_mol"],
+    ])
+    assert "burned_kg" not in event
+    assert "refractory_C_kg" not in event
+
+
+def test_carbon_burned_mass_uses_declared_c_basis_not_carrier_kg():
+    session = SimSession().start(_session_config("ci_carbonaceous_chondrite"))
+    result = run_stage0_harness(session)
+
+    burned_events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["trapped_gasses"]
+        if event.get("reaction_family") == "partition_carbon"
+        and event.get("disposition") == "burned"
+    ]
+    residual_events = [
+        event
+        for entry in result.disposition_timeline
+        for event in entry.by_group["refractory_carbon"]
+        if event.get("reaction_family") == "partition_carbon"
+        and event.get("disposition") == "residual"
+    ]
+
+    assert burned_events
+    assert residual_events
+    burned = burned_events[0]
+    residual = residual_events[0]
+
+    assert burned["mass_basis"] == "declared_C"
+    assert burned["burned_kg"] == pytest.approx(burned["burned_C_kg"])
+    assert burned["burned_kg"] == pytest.approx(burned["labile_C_kg"])
+    assert burned["burned_kg"] < burned["feed_kg"]
+    assert burned["labile_carrier_equivalent_kg"] < burned["feed_kg"]
+
+    assert residual["mass_basis"] == "declared_C"
+    assert residual["refractory_mol"] > 0.0
+    assert residual["refractory_residual_mol"] > 0.0
+    assert residual["refractory_C_kg"] > 0.0
+    assert residual["refractory_residual_C_kg"] > 0.0
+    assert residual["refractory_residual_C_kg"] <= residual["refractory_C_kg"]
+    ledger = session.simulator.atom_ledger.kg_by_account("process.cleaned_melt")
+    for species, kg in result.cleaned_melt_kg.items():
+        assert ledger[species] == pytest.approx(kg, rel=0.0, abs=1e-12)
+    assert "stage0_carbon_partition" not in REQUIRED_DATA_DIGEST_KEYS
 
 
 def test_cleaned_melt_matches_ledger_projection():

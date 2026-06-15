@@ -68,11 +68,12 @@ class FoulantRegistry:
 
 @dataclass(frozen=True)
 class CarbonPartition:
-    labile_mol: float
-    refractory_mol: float
+    labile_mol: float | str
+    refractory_mol: float | str
     carbonate_mol: float | str
-    process_reductant_mol: float
+    process_reductant_mol: float | str
     not_speciated: tuple[str, ...] = ()
+    refractory_fraction_interval: tuple[float, float] | None = None
 
 
 def _resolve_carrier_key(carrier: str, registry: FoulantRegistry | None) -> str:
@@ -339,6 +340,22 @@ def _fraction_from_row(row: Mapping[str, Any] | None, *, key: str) -> float | st
     return float(row[key])
 
 
+def refractory_fraction_interval(
+    source_row: Mapping[str, Any],
+) -> tuple[float, float] | None:
+    refractory_row = source_row.get("f_refractory_organic_C", {}) or {}
+    interval = refractory_row.get("interval")
+    if not isinstance(interval, Sequence) or isinstance(interval, (str, bytes)):
+        return None
+    if len(interval) != 2:
+        return None
+    low = float(interval[0])
+    high = float(interval[1])
+    if not (0.0 <= low <= high <= 1.0):
+        raise ValueError("refractory interval must satisfy 0 <= low <= high <= 1")
+    return low, high
+
+
 def partition_carbon(
     carrier: str,
     declared_mol: float,
@@ -369,6 +386,7 @@ def partition_carbon(
         markers.append("f_carbonate_C")
 
     f_process = _fraction_from_row(process_row, key="value")
+    f_refractory_interval = refractory_fraction_interval(source_row)
 
     if f_refractory == NOT_SPECIFIED:
         refractory_mol = NOT_SPECIFIED
@@ -396,6 +414,7 @@ def partition_carbon(
         carbonate_mol=carbonate_mol,
         process_reductant_mol=process_reductant_mol,
         not_speciated=tuple(markers),
+        refractory_fraction_interval=f_refractory_interval,
     )
 
 

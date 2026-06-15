@@ -19,6 +19,7 @@ from typing import Any, Mapping
 import yaml
 
 from engines.builtin.foulant_disposition import FoulantRegistry, load_foulant_registry
+from engines.builtin.foulant_disposition import refractory_fraction_interval
 from engines.builtin.melt_effect_adjustment import build_harness_verdicts
 from engines.builtin.stage0_pretreatment import (
     REACTION_FAMILY_CARBONATE_DECOMPOSITION,
@@ -33,6 +34,7 @@ from simulator.core import (
     STAGE0_FOULANT_PHASE2_TEMP_C,
     PyrolysisSimulator,
 )
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.state import CampaignPhase, DecisionType
 
@@ -57,6 +59,8 @@ STAGE0_PHASE_RATIFIED_CEILING_C = {
 _DEFAULT_MARGIN_HOURS = 8.0
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_FOULANT_THERMO = _REPO_ROOT / "data" / "foulant_thermo.yaml"
+_DEFAULT_CARBON_PARTITION = _REPO_ROOT / "data" / "stage0_carbon_partition.yaml"
+_CARBON_KG_PER_MOL = float(ATOMIC_WEIGHTS_G_PER_MOL["C"]) / 1000.0
 
 
 class Stage0HarnessError(RuntimeError):
@@ -127,6 +131,89 @@ def _resolve_group(
     return "other_mineral_contaminant"
 
 
+def _positive_float(value: Any) -> float | None:
+    if not isinstance(value, (int, float)):
+        return None
+    parsed = float(value)
+    if parsed <= 0.0:
+        return None
+    return parsed
+
+
+def _carbon_kg(carbon_mol: float) -> float:
+    return float(carbon_mol) * _CARBON_KG_PER_MOL
+
+
+def _carbon_carrier_equivalent_kg(
+    split_mol: float,
+    declared_c_mol: float | None,
+    feed_kg: float,
+) -> float | None:
+    if declared_c_mol is None or declared_c_mol <= 0.0 or feed_kg <= 0.0:
+        return None
+    return feed_kg * float(split_mol) / declared_c_mol
+
+
+def _carbon_partition_interval_event(
+    *,
+    carrier: str,
+    diagnostic: Mapping[str, Any],
+    feed_kg: float,
+    declared_c_mol: float | None,
+) -> dict[str, Any] | None:
+    raw_not_speciated = diagnostic.get("not_speciated", ()) or ()
+    if isinstance(raw_not_speciated, str):
+        not_speciated = (raw_not_speciated,)
+    else:
+        not_speciated = tuple(str(item) for item in raw_not_speciated)
+    if "f_refractory_organic_C" not in not_speciated:
+        return None
+    if feed_kg <= 0.0 or declared_c_mol is None:
+        return None
+
+    with _DEFAULT_CARBON_PARTITION.open(encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    matches: list[tuple[str, Mapping[str, Any], tuple[float, float]]] = []
+    for key, row in (payload.get("phase_partitions", {}) or {}).items():
+        if not isinstance(row, Mapping):
+            continue
+        if str(row.get("carrier") or "") != carrier:
+            continue
+        interval = refractory_fraction_interval(row)
+        if interval is not None:
+            matches.append((str(key), row, interval))
+    if len(matches) != 1:
+        return None
+
+    partition_key, row, interval = matches[0]
+    low, high = interval
+    return {
+        "carrier": carrier,
+        "reaction_family": REACTION_FAMILY_PARTITION_CARBON,
+        "group": "refractory_carbon",
+        "disposition": "uncertain_partition",
+        "interval_required": True,
+        "feed_kg": feed_kg,
+        "declared_c_mol": declared_c_mol,
+        "declared_C_kg": _carbon_kg(declared_c_mol),
+        "refractory_fraction_interval": [low, high],
+        "refractory_C_mol_interval": [
+            declared_c_mol * low,
+            declared_c_mol * high,
+        ],
+        "refractory_C_kg_interval": [
+            _carbon_kg(declared_c_mol * low),
+            _carbon_kg(declared_c_mol * high),
+        ],
+        "partition_key": partition_key,
+        "not_speciated": list(not_speciated),
+        "confidence": row.get("confidence"),
+        "phase": "phase_1_oxidizing",
+        "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
+        "source": "diagnostic",
+    }
+
+
 def _diagnostic_events(
     diagnostic: Mapping[str, Any],
     registry: FoulantRegistry,
@@ -189,40 +276,81 @@ def _diagnostic_events(
 
     if family == REACTION_FAMILY_PARTITION_CARBON:
         feed_kg = float(diagnostic.get("feed_kg", 0.0) or 0.0)
-        labile_mol = diagnostic.get("labile_mol")
-        refractory_mol = diagnostic.get("refractory_mol")
-        if isinstance(labile_mol, (int, float)) and labile_mol > 0.0:
+        declared_c_mol = _positive_float(diagnostic.get("declared_c_mol"))
+        interval_event = _carbon_partition_interval_event(
+            carrier=carrier,
+            diagnostic=diagnostic,
+            feed_kg=feed_kg,
+            declared_c_mol=declared_c_mol,
+        )
+        if interval_event is not None:
+            events.append(interval_event)
+        labile_mol = _positive_float(diagnostic.get("labile_mol"))
+        refractory_mol = _positive_float(diagnostic.get("refractory_mol"))
+        if labile_mol is not None:
+            labile_extent = float(diagnostic.get("labile_extent", 0.0) or 0.0)
+            labile_c_kg = _carbon_kg(labile_mol)
+            carrier_equivalent = _carbon_carrier_equivalent_kg(
+                labile_mol,
+                declared_c_mol,
+                feed_kg,
+            )
             events.append({
                 "carrier": carrier,
                 "reaction_family": family,
                 "group": "trapped_gasses",
                 "disposition": "burned",
-                "labile_mol": float(labile_mol),
-                "burned_kg": feed_kg * float(diagnostic.get("labile_extent", 0.0) or 0.0),
+                "feed_kg": feed_kg,
+                "declared_c_mol": declared_c_mol,
+                "labile_mol": labile_mol,
+                "labile_C_kg": labile_c_kg,
+                "burned_C_kg": labile_c_kg * labile_extent,
+                "burned_kg": labile_c_kg * labile_extent,
+                "labile_carrier_equivalent_kg": carrier_equivalent,
+                "mass_basis": "declared_C",
                 "phase": "phase_1_oxidizing",
                 "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
                 "source": "diagnostic",
             })
-        if isinstance(refractory_mol, (int, float)) and refractory_mol > 0.0:
+        if refractory_mol is not None:
+            residual_mol = _positive_float(diagnostic.get("refractory_residual_mol"))
+            if residual_mol is None:
+                residual_mol = refractory_mol
+            carrier_equivalent = _carbon_carrier_equivalent_kg(
+                refractory_mol,
+                declared_c_mol,
+                feed_kg,
+            )
             events.append({
                 "carrier": carrier,
                 "reaction_family": family,
                 "group": "refractory_carbon",
                 "disposition": "residual",
-                "refractory_mol": float(refractory_mol),
+                "feed_kg": feed_kg,
+                "declared_c_mol": declared_c_mol,
+                "refractory_mol": refractory_mol,
+                "refractory_C_kg": _carbon_kg(refractory_mol),
+                "refractory_residual_mol": residual_mol,
+                "refractory_residual_C_kg": _carbon_kg(residual_mol),
+                "refractory_carrier_equivalent_kg": carrier_equivalent,
                 "residual_interval": diagnostic.get("refractory_interval"),
+                "mass_basis": "declared_C",
                 "phase": "phase_1_oxidizing",
                 "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
                 "source": "diagnostic",
             })
-        carbonate_mol = diagnostic.get("carbonate_mol")
-        if isinstance(carbonate_mol, (int, float)) and carbonate_mol > 0.0:
+        carbonate_mol = _positive_float(diagnostic.get("carbonate_mol"))
+        if carbonate_mol is not None:
             events.append({
                 "carrier": carrier,
                 "reaction_family": family,
                 "group": "other_mineral_contaminant",
                 "disposition": "carbonate_residual",
-                "carbonate_mol": float(carbonate_mol),
+                "feed_kg": feed_kg,
+                "declared_c_mol": declared_c_mol,
+                "carbonate_mol": carbonate_mol,
+                "carbonate_C_kg": _carbon_kg(carbonate_mol),
+                "mass_basis": "declared_C",
                 "source": "diagnostic",
             })
         return events
