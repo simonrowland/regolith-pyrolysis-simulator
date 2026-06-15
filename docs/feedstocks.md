@@ -78,6 +78,11 @@ pre-reduction notes use the Mars carbon-cleanup Stage 0 profile. That profile
 runs to 1050 C, records carbon reagent demand from `kg C/t` process notes, and
 routes sulfate/halide/perchlorate products outside `MeltState`.
 
+Carbon-rich entries such as CI/CM chondrites, Ceres, cometary material, and Mars
+profiles carry `carbon_speciation_provenance` with REF-backed source strings and
+interval bounds for organic carbon, carbonate salts, or process carbon where the
+literature supports only a range.
+
 Simulant entries must also declare explicit Stage 0 buckets for water, organics,
 carbon, sulfur, halides, perchlorates, salts, native metals, sulfides, and
 refractory traces. Use `not_reported` when the source does not report a bucket;

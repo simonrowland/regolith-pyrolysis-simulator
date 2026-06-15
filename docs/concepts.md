@@ -154,9 +154,9 @@ A ~100 % extraction target is an *and* condition with a near-zero wall-deposit t
 
 ## Stage 0 cleanup as simplifier
 
-Stage 0 (C0 and optional C0b) removes everything that is not a clean silicate oxide before the main extraction sequence begins. For lunar feedstocks this means CHNOPS volatiles, nanophase Fe⁰ (magnetically separated), native metals, sulfides, and salts. For Mars feedstocks it also covers perchlorates, halides, and sulfates, via a CO₂-backed carbon cleanup that runs to 1050 °C. For carbonaceous asteroid bodies (CI, CM, Ceres, comets), the Stage 0 degassing cascade removes water, organics, sulfides, and carbonates, leaving a dehydrated anhydrous silicate at roughly 650–800 kg per original tonne.
+Stage 0 (C0 and optional C0b) separates and reports material that should not be handed directly to the silicate melt model before the main extraction sequence begins. For lunar feedstocks this means CHNOPS volatiles, nanophase Fe⁰ (magnetically separated), native metals, sulfides, and salts. For Mars feedstocks it also covers perchlorates, halides, sulfates, and carbon-bearing cleanup under a CO₂ pressure floor to 1050 °C. For carbonaceous asteroid bodies (CI, CM, Ceres, comets), the Stage 0 degassing cascade tracks water, organics, sulfides, carbonates, and residual carbon, leaving a dehydrated anhydrous silicate at roughly 650–800 kg per original tonne.
 
-The result in every case is that the C1–C6 extraction sequence operates on a clean silicate-melt equivalent. Downstream chemistry only needs to know silicate-melt physics; Stage 0 absorbs all feedstock variability into explicit product buckets. The messy feedstock becomes a standard problem by the time C2A starts.
+The result is a cleaned silicate input plus an explicit residual-foulant ledger. Downstream chemistry receives the silicate-melt handoff; Stage 0 keeps contaminant disposition, warning flags, and unresolved residuals visible as diagnostics. The feedstock is simplified for C2A, not asserted to be fully clean.
 
 See [`docs/process-model.md`](process-model.md) for the Stage 0 contract in detail, and [`docs/feedstocks.md`](feedstocks.md) for the feedstock inventory categories.
 

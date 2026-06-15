@@ -9,7 +9,7 @@ The central control variable is overhead oxygen pressure. Hard-vacuum pyrolysis 
 The simulated process is organized as staged campaigns:
 
 - `C0` volatile bakeoff and hot-duct gas handling.
-- `C0b` mild oxidative cleanup for phosphorus and volatile residues.
+- `C0b` mild oxidative conditioning for volatile residues; phosphorus remains tracked as phosphate.
 - `C2A` low-pO2 or sweep-gas pyrolysis for Fe and SiO-bearing flows.
 - `C2B` pO2-managed Fe pyrolysis that preserves more silica-rich glass.
 - `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. Legacy `C3_K` and Cr/Ti targets are refused by the S1b engine gate under the V1c JANAF Ellingham refit and recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
@@ -29,6 +29,7 @@ Each hourly step updates:
 - Turbine load, O2 compression, venting, and accumulator inventory, with
   melt/offgas O2 and MRE anode O2 kept as separate mol bins.
 - Condensed products by species, plus a `stage_purity_report` exposing designated-vs-impurity mass per stage (F1 canonical species → stage registry).
+- Stage 0 foulant disposition by hour and group for chlorides, sulfates, carbonates, perchlorate, carbon, and fluorides. The diagnostic groups are `trapped_gasses`, `refractory_carbon`, and `other_mineral_contaminant`; contaminant-impact flags warn without stopping the run before melt-equilibrium engines are called.
 - Wall deposits per species (`wall_deposit_kg`) — sole-written via `commit_batch` inside the ≤5×10⁻¹² % mass-balance closure; parameterised by pN₂ / Knudsen regime and per-segment wall T.
 - Per-species rump composition + by-class rump composition (F4) on the terminal payload.
 - MRE voltage, current, metal production, and electrical energy.
@@ -74,6 +75,11 @@ Unknown or unsupported cleaned-melt components remain in
 The melt model receives the cleaned oxide inventory, while Stage 0 products,
 drain-tap metal, terminal-slag ceramic components, and unresolved residuals
 remain outside `MeltState`.
+
+The foulant-disposition instrument is golden-neutral: it reports where the
+Stage 0 contaminant inventory is expected to go, and it leaves the cleaned-melt
+ledger unchanged. Its purpose is to expose gas-train and residual-rump hazards
+before melt-equilibrium providers are asked to evaluate the silicate handoff.
 
 The Stage 0 sulfate/sulfide bucketing is refined by an optional sulfur-saturation
 gate backed by PySulfSat: when the `[sulfur]` extra is installed and the cleaned

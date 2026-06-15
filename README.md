@@ -14,7 +14,7 @@ Author: Simon Rowland, simon@simonrowland.com.
 
 The process model uses geologist-standard melt libraries to demonstrates five linked ideas:
 
-- Alkali metals, extracted early and re-injected, are used to shuttle oxygen out of the melt, conditioning the melt for easier processing.
+- Na, extracted early or dosed externally, can strip residual FeO in a narrow cool-window cleanup step, conditioning the melt for easier processing.
 - Overhead pO2 is a key Ellingham process control variable, working alongside temparature and pressure to offer targeted extraction.
 - SiO boiloff (noted in recent literature) can be suppressed or redirected by pressure management instead of accepted as a hard-vacuum mess.
 - Regolith pyrolysis can be used as MRE pretreatment, producing useful material streams while making later electrolysis less hostile.
@@ -28,9 +28,9 @@ This simulator seeks to answer the question: How much useful refining can be don
 
 The simulator tracks a staged refinery path for one-tonne-class feedstock batches:
 
-- Stage 0 bakeoff: water, CO2, sulfur, halides, CHNOPS, perchlorates, and other volatiles.
+- Stage 0 bakeoff: water, CO2, sulfur, halides, CHNOPS, perchlorates, and other volatiles, with diagnostic foulant-disposition reporting by hour and group before melt-equilibrium backends run.
 - Pressure-managed pyrolysis: Na, K, Fe, Mg, SiO, and oxygen-bearing vapor behavior under hard vacuum, CO2 backpressure, N2 sweep, or pO2 control.
-- Na/K oxygen shuttle loop produces a proportion of fully-reduced metals that can be tapped directly, while improving glass as an intermediate product.
+- Na-dominated oxygen shuttle chemistry produces a proportion of reduced Fe that can be tapped directly in the cool FeO window, while K remains primarily a volatile product or recyclable alkali stock.
 - SiO suppression: pO2 shifts the SiO2 -> SiO + 1/2 O2 equilibrium and reduces the driving force for silica boiloff.
 - Gas train behavior: overhead pressure, pipe conductance, turbine load, venting, accumulator flow, and ramp throttling.
 - Condensation train products: staged collection of metals, SiO/silica, alkalis, oxygen, salts, and volatile streams.
@@ -50,11 +50,13 @@ Lunar mare and highland materials show the baseline tradeoff: oxygen and iron ar
 
 ### Asteroid Feedstocks
 
-Asteroid cases cover the range of feedstock types, including S-tyle feedstock very similar to lunar regolith. M-type material can be an Fe-Ni-Co alloy source with silicate byproduct. C-type material change volatile, sulfur, metal, and magnesium opportunities. The simulator is structured to integrate volatile processing, and to extract sulphates and phosphates in C-type feedstocks early to converge the later pipeline stages into a pure basalt problem.
+Asteroid cases cover the range of feedstock types, including S-tyle feedstock very similar to lunar regolith. M-type material can be an Fe-Ni-Co alloy source with silicate byproduct. C-type material change volatile, sulfur, metal, and magnesium opportunities. The simulator is structured to integrate volatile processing, track sulfate and foulant disposition, and retain phosphorus as phosphate rather than treating it as an early volatile cleanup product.
 
 ### Mars Feedstocks
 
 Mars feedstocks benefit from additional reduction as a melt conditioning step. Mars basalt, sulfate-rich soils, phyllosilicates, and perchlorate-bearing material run with a CO2 pressure floor. That changes Stage 0, SiO suppression, sulfur/chlorine handling, salt traps, scrubbers, CO/CO2 behavior, and pump requirements. Mars backpressure is therefore modeled as part of the process, not as an afterthought.
+
+Carbon-rich profiles, including CI/CM chondrites, Ceres, cometary material, and Mars cases, carry literature-converged carbon speciation with interval-bounded provenance rather than treating carbon as a single undifferentiated feedstock term.
 
 ## Materials the Model Tries to Expose
 
@@ -78,6 +80,8 @@ The web app's entry point:
 - `http://localhost:3000/` — detailed simulator with feedstock selection, additives, charts, pressure feedback, product inventory, and process decisions.
 
 Scripting: simulations can also be run from the shell (no web server) — see [`docs/running-from-shell.md`](docs/running-from-shell.md).
+
+Model-bearing citations are tracked in [`docs/references/`](docs/references/): a stable `REF-NNN` registry with DOI/authors, verified pull-quotes where available, generated HTML pages, validation, and an automatic `cited_by` index.
 
 ## Quick Start
 
