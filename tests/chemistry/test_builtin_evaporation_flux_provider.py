@@ -345,12 +345,12 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
     # conductance-ratio derived floor. Under the new trajectory the
     # 1/sqrt(pO2) suppression factor multiplies P_sat too aggressively
     # at 1000 C and ALL species drop below the legacy loop's
-    # 1e-12 kg/hr reporting threshold (empty flux dict). Bumping to
-    # 1200 C lifts species back above the legacy reporting floor while
-    # still keeping the case low-flux (well below recipe operating T
-    # of 1600-1700 C). The provider-vs-legacy parity contract is
-    # unchanged.
-    while sim.melt.temperature_C < 1200.0:
+    # 1e-12 kg/hr reporting threshold (empty flux dict). The 2026-06-14
+    # dense VapoRock pseudo-Antoine refit also drops the 1200 C fixture
+    # below that floor; 1300 C restores species output while staying below
+    # recipe operating T of 1600-1700 C. The provider-vs-legacy parity
+    # contract is unchanged.
+    while sim.melt.temperature_C < 1300.0:
         if sim.paused_for_decision:
             decision = sim.pending_decision
             choice = decision_choice.get(decision.decision_type)

@@ -210,7 +210,7 @@ def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
     assert result.vapor_pressures_Pa["Ca"] > 0.0
     assert (
         result.vapor_pressures_source["Ca"]
-        == "builtin_fallback:extrapolated_beyond_valid_range_K"
+        == "builtin_fallback:pure_component_first_principles:extrapolated_beyond_valid_range_K"
     )
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning

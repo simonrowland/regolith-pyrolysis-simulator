@@ -126,8 +126,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # downstream wall deposit scale by M_SiO=0.04408:
     # 2.0039542334640e-05 -> 8.82956746206e-07 kg after
     # canonical Si/O atomic weights.
+    # 2026-06-14 dense VapoRock pseudo-Antoine refit lifts the fallback
+    # SiO wall-deposit baseline to 1.250623477194e-05 kg while preserving
+    # the threshold structure.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        8.82956746206e-07, rel=1e-9
+        1.250623477194e-05, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

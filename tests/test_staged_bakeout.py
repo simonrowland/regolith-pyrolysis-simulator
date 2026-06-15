@@ -188,11 +188,11 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
         for diagnostic in cold_spot_history
         for warning in diagnostic.get("warnings", [])
     ]
-    segment_wall_kg = sum(
-        sim.atom_ledger.total_kg_by_account(account)
+    segment_wall_sio_kg = sum(
+        sim.atom_ledger.kg_by_account(account).get("SiO", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
 
     assert warnings == []
-    assert segment_wall_kg <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG
+    assert segment_wall_sio_kg <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT

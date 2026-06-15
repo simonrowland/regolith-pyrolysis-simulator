@@ -59,19 +59,45 @@ from tests.chemistry.conftest import _build_sim
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "CrO2": 4.310083854437474e-09,
+            "Fe": 9.128826053280555e-11,
+            "Mg": 9.618559327306743,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "CrO2": 4.310083854437474e-09,
+            "Mg": 9.618559327306743,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Mg": 9.618559327306743,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Mg": 9.61855932730674,
         },
     },
-    "mars_basalt": {},
-    "s_type_asteroid_silicate": {
+    "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "CrO2": 5.104061513837736e-09,
+            "Mg": 8.847647200443356,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "CrO2": 5.104061513837736e-09,
+            "Mg": 8.847647200443356,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Mg": 8.847647200443356,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Mg": 8.847647200443356,
+        },
+    },
+    "s_type_asteroid_silicate": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "Mg": 28.149553862707318,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Mg": 28.149553862707318,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Mg": 28.149553862707318,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Mg": 28.149553862707318,
         },
     },
 }

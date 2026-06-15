@@ -1,13 +1,16 @@
 # Pure-component vapor pressures for Hertz-Knudsen calculations
 # Antoine equation: log10(P_Pa) = A - B / (T_K + C)
-# Sources: legacy pure-component constants plus 2026-05-20 fallback refits
-# to VapoRock over Kress91 IW operating conditions. The builtin provider is
-# a fallback; VapoRock remains authoritative when available.
+# Sources: legacy pure-component constants plus fallback refits to VapoRock
+# over Kress91 IW operating conditions. The builtin provider is a fallback;
+# VapoRock remains authoritative when available.
 #
-# Fitted fallback residuals vs VapoRock on the 1400-1900 K Kress91 IW grid:
-#   SiO max 0.113 dex; Na max 0.121 dex; Mg max 0.203 dex.
-#   Fe max 0.023 dex on the basalt single-reference grid.
-#   K is structural and single-reference fallback-only, max residual 1.469 dex.
+# Dense fallback refit (2026-06-14, scripts/vaporock_pseudo_antoine_refit.py):
+#   current VapoRock import; 7 feedstocks; 31 T points from 1350-1950 K;
+#   Kress91/IW via vaporock.redox_buffer(T, "IW"); 217 samples/species.
+#   Na max 0.379 dex (low); K max 0.691 dex (low);
+#   Mg max 0.282 dex (moderate); SiO max 0.270 dex (moderate).
+#   Fe 0.023 dex did not re-confirm against current VapoRock; dense-grid
+#   refit lowers current residual to 0.418 dex but remains low confidence.
 #
 # VapoRock structural-species note (2026-05-20): K and O2 should be
 # treated as VapoRock-authoritative when VapoRock is available. Antoine
@@ -32,12 +35,23 @@ metals:
     electrons_per_atom: 1
     parent_oxide: "Na2O"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    residual_dex: 0.379
+    confidence_tier: "low"
     backsolve:
-      feedstock_grid: "seven-feedstock lunar/mars grid"
+      feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock partial pressure on the grid"
-      residual_dex: 0.121
+      target: "VapoRock Na(g) partial pressure on the dense grid"
+      residual_dex: 0.379
+      old_metadata_residual_dex: 0.121
+      old_dense_residual_dex: 1.413
+      provenance:
+        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
+        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
+        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
+        n_samples: 217
+        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
+        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.407048
@@ -67,14 +81,14 @@ metals:
           value: 0.13
           regime: "sealed equilibrium chamber; not representative of mbar-sweep pyrolysis"
     antoine:
-      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
-      A: 8.477035
-      B: 11265.231371
-      C: 0
+      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      A: 5.185860
+      B: 11127.434869
+      C: 1000.0
     valid_range_K: [1400, 1900]
     boiling_point_C: 883
     condensation_T_C_at_1mbar: 480
-    notes: "Builtin fallback effective curve; max residual 0.121 dex vs VapoRock on the Kress91 IW fit grid."
+    notes: "Builtin fallback effective curve; max residual 0.379 dex vs current VapoRock on the dense Kress91 IW grid. Low confidence; VapoRock is authoritative when available."
 
   K:
     formula: "K"
@@ -82,12 +96,23 @@ metals:
     electrons_per_atom: 1
     parent_oxide: "K2O"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    residual_dex: 0.691
+    confidence_tier: "low"
     backsolve:
-      feedstock_grid: "lunar_mare_low_ti single-reference calibration"
+      feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock K = 9.55e-02 Pa at 1773.15 K"
-      residual_dex: 1.469
+      target: "VapoRock K(g) partial pressure on the dense grid"
+      residual_dex: 0.691
+      old_metadata_residual_dex: 1.469
+      old_dense_residual_dex: 2.302
+      provenance:
+        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
+        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
+        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
+        n_samples: 217
+        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
+        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.008700
@@ -100,20 +125,20 @@ metals:
       envelope: [0.9, 1.0]
       tier: 2
     antoine:
-      # Structural fallback only: A shifted to match VapoRock for
-      # lunar_mare_low_ti at 1773.15 K, Kress91 IW. Not a broad K fit.
-      A: 3.869571
-      B: 4961
-      C: 0
+      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      A: 8.593440
+      B: 24937.098488
+      C: 1000.0
     valid_range_K: [1400, 1900]
     boiling_point_C: 759
     condensation_T_C_at_1mbar: 420
     notes: |
       VapoRock-authoritative structural species when VapoRock is available;
-      Antoine coefficients are fallback-only approximations, not a refit.
-      Single-reference fallback matches lunar_mare_low_ti at 1773.15 K,
-      Kress91 IW (VapoRock K = 9.55e-02 Pa); broad-grid residual remains
-      structural (max 1.469 dex).
+      Antoine coefficients are fallback-only approximations to dense-grid
+      VapoRock K(g), not a first-principles replacement. The old
+      single-reference residual (1.469 dex) improves to 0.691 dex on the
+      dense Kress91 IW grid, but K remains structurally limited by VapoRock's
+      richer JANAF gas speciation.
 
   Mg:
     formula: "Mg"
@@ -121,12 +146,23 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MgO"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    residual_dex: 0.282
+    confidence_tier: "moderate"
     backsolve:
-      feedstock_grid: "seven-feedstock lunar/mars grid"
+      feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock partial pressure on the grid"
-      residual_dex: 0.203
+      target: "VapoRock Mg(g) partial pressure on the dense grid"
+      residual_dex: 0.282
+      old_metadata_residual_dex: 0.203
+      old_dense_residual_dex: 1.750
+      provenance:
+        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
+        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
+        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
+        n_samples: 217
+        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
+        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.906866
@@ -139,14 +175,14 @@ metals:
       envelope: [0.10, 0.21]
       tier: 2
     antoine:
-      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
-      A: 10.628931
-      B: 6788.644019
-      C: 0
+      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      A: 4.280425
+      B: -941.753849
+      C: -1000.0
     valid_range_K: [1400, 1900]
     boiling_point_C: 1091
     condensation_T_C_at_1mbar: 580
-    notes: "Builtin fallback effective curve; max residual 0.203 dex vs VapoRock on the Kress91 IW fit grid."
+    notes: "Builtin fallback effective curve; max residual 0.282 dex vs current VapoRock on the dense Kress91 IW grid. Moderate confidence; VapoRock is authoritative when available."
 
   Fe:
     formula: "Fe"
@@ -154,12 +190,23 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "FeO"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    residual_dex: 0.418
+    confidence_tier: "low"
     backsolve:
-      feedstock_grid: "lunar_mare_low_ti + mars_basalt basalt grid"
+      feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
       activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock partial pressure on the basalt grid"
-      residual_dex: 0.023
+      target: "VapoRock Fe(g) partial pressure on the dense grid"
+      residual_dex: 0.418
+      old_metadata_residual_dex: 0.023
+      old_dense_residual_dex: 1.693
+      provenance:
+        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
+        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
+        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
+        n_samples: 217
+        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
+        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.670336
@@ -172,18 +219,18 @@ metals:
       envelope: [0.011, 0.020]
       tier: 2
     antoine:
-      # Basalt single-reference fallback fit to VapoRock, 1400-1900 K,
-      # Kress91 IW, lunar_mare_low_ti + mars_basalt only.
-      A: 12.404333
-      B: 19156.973681
-      C: 0
+      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      A: 9.408547
+      B: 23312.312336
+      C: 1000.0
     valid_range_K: [1400, 1900]
     boiling_point_C: 2862
     condensation_T_C_at_1mbar: 1250
     notes: |
-      Basalt single-reference fallback; max residual 0.023 dex vs VapoRock
-      on lunar_mare_low_ti + mars_basalt. Broad-feedstock Fe remains
-      structurally activity-dependent.
+      Prior 0.023 dex basalt-grid residual did not re-confirm against the
+      current VapoRock install. Dense-grid refit lowers current residual from
+      1.693 dex to 0.418 dex, but Fe remains structurally activity-dependent
+      and low confidence; VapoRock is authoritative when available.
 
   Ca:
     formula: "Ca"
@@ -344,12 +391,23 @@ oxide_vapors:
     molar_mass_g_mol: 44.084
     parent_oxide: "SiO2"
     fit_target: "pseudo_psat_backsolved_from_vaporock"
+    residual_dex: 0.270
+    confidence_tier: "moderate"
     backsolve:
-      feedstock_grid: "seven-feedstock lunar/mars grid"
+      feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
       activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
-      target: "VapoRock partial pressure on the grid"
-      residual_dex: 0.113
+      target: "VapoRock SiO(g) partial pressure on the dense grid"
+      residual_dex: 0.270
+      old_metadata_residual_dex: 0.113
+      old_dense_residual_dex: 2.392
+      provenance:
+        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
+        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
+        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
+        n_samples: 217
+        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
+        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     stoich_oxide_per_vapor: 1.362920787587333  # kg SiO2 consumed per kg SiO evaporated
     stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
     evaporation_alpha:
@@ -361,10 +419,10 @@ oxide_vapors:
     antoine:
       # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2O2(g)
       # Effective vapor pressure depends on a(SiO2) and pO2
-      # Fallback fit to VapoRock, 1400-1900 K, Kress91 IW, seven-feedstock grid.
-      A: 22.117682
-      B: 40638.351545
-      C: 0
+      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
+      A: 28.062027
+      B: 79705.252727
+      C: 1000.0
     valid_range_K: [1400, 2200]
     condensation_T_C: [900, 1200]
     condensation_product: "amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)"
@@ -378,8 +436,10 @@ oxide_vapors:
       offgas above ~1400°C. At pO2 = 1 mbar, suppressed >300*.
       Condenses as adhesive, corrosive amorphous silica below ~1200°C.
       See [THERMO-1] in context-thermo.md.
-      Builtin fallback max residual 0.113 dex vs VapoRock on the Kress91 IW
-      fit grid; extrapolation keeps prior runtime coverage to 2200 K.
+      Builtin fallback max residual 0.270 dex vs current VapoRock on the
+      dense Kress91 IW fit grid; extrapolation keeps prior runtime coverage
+      to 2200 K. Moderate confidence; VapoRock is authoritative when
+      available.
 
   CrO2:
     formula: "CrO2"

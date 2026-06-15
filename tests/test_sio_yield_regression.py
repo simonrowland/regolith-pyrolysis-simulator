@@ -57,9 +57,12 @@ GOLDENS = (
 # 2026-06-03 extraction pO2 de-dup: VAPOR_PRESSURE owns commanded pO2 once;
 # EVAPORATION_FLUX no longer reapplies an oxygen factor.  Vacuum-side C2A
 # SiO yield rises by +0.0056% relative, a deliberate physics consequence.
+# 2026-06-14 dense VapoRock pseudo-Antoine refit: fallback SiO residual is
+# now honest against the 217-sample dense IW grid.  The new curve increases
+# vacuum-side C2A SiO vs the stale fallback, while preserving mass closure.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.53292201106e-05,
-    "mars_basalt": 0.000190086109295,
+    "lunar_mare_low_ti": 0.00118604428466,
+    "mars_basalt": 0.00202232236423,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -74,8 +77,9 @@ BASELINE_SIO_EVOLVED_KG = {
 #   1. Absolute ceiling on Stage 4 (regression catch — runaway), and
 #   2. Stage 4 > Stage 3 ordering invariant (forces CHANGELOG update
 #      if defaults change in a way that restores Stage 3 dominance).
-# Both fixtures (2026-05-28): stage_3 ≈ 3.0e-4 kg,
-# stage_4 ≈ 5.1e-4 kg (lunar) / 5.5e-4 kg (mars).
+# Both fixtures after the 2026-06-14 dense refit: stage_3 is
+# 1.73e-4 kg (lunar) / 2.94e-4 kg (mars), and stage_4 remains higher at
+# 3.17e-4 kg (lunar) / 5.41e-4 kg (mars).
 # Predecessor history (for legacy reviewers): pre-Phase-A1 values were
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved

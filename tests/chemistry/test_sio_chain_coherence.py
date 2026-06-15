@@ -40,7 +40,7 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # under finite-headspace ON (the holdup-derived O2 partial is the
 # same across liner temperatures since C2A pO2_mbar=0 and no
 # wall-T-dependent O2 source is active in C2A).
-PHASE3BIS_SIO_EVOLVED_KG = 8.53292201106e-05
+PHASE3BIS_SIO_EVOLVED_KG = 0.00118604428466
 
 
 @lru_cache(maxsize=None)
