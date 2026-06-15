@@ -443,7 +443,7 @@ foulant_vapor:
     fit_target: pure_component_psat
     carrier_is_own_vapor: true
     pure_component_antoine:
-      source: "NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C"
+      source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C"
       A: 10.07184
       B: 8388.497
       C: -82.638
@@ -466,12 +466,12 @@ foulant_vapor:
     fit_target: pure_component_psat
     carrier_is_own_vapor: true
     pure_component_antoine:
-      source: "NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
+      source: "REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
       A: 10.185900
       B: 8774.500
       C: 0
     antoine:
-      source: "NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine"
+      source: "REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine"
       A: 9.78236
       B: 7440.691
       C: -122.709
