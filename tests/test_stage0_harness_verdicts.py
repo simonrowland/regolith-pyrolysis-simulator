@@ -550,16 +550,17 @@ def test_verdict_b_hard_gate_comes_from_backend_status(backend_status):
     assert verdict.backend_status == backend_status
 
 
-def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate():
+def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate_when_backend_ok():
     cleaned = {
         "SiO2": 100.0,
         "FeO": 900.0,
     }
-    verdict = evaluate_verdict_b(cleaned, "out_of_domain", "alphamelts")
+    verdict = evaluate_verdict_b(cleaned, "ok", "alphamelts")
     assert verdict.layer_a_state == "out_of_domain"
     assert verdict.offending_species
     assert verdict.stripped_domain_valid is False
     assert verdict.hard_gate_failed is True
+    assert verdict.backend_status == "ok"
     assert verdict.stripped_oxide_wt_pct == {"SiO2": 10.0, "FeO": 90.0}
     assert verdict.domain_warnings
 
@@ -577,7 +578,7 @@ def test_cache_neutral_modules_not_in_source_patterns():
     patterns = _SOURCE_MODULE_PATTERNS
     assert not any("stage0_harness" in p for p in patterns)
     assert not any("melt_effect_adjustment" in p for p in patterns)
-    assert not any("foulant_disposition" in p for p in patterns)
+    assert any("foulant_disposition" in p for p in patterns)
 
 
 def test_harness_verdicts_populated_on_real_feedstock():

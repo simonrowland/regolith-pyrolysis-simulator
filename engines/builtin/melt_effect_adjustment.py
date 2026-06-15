@@ -1128,7 +1128,9 @@ def evaluate_verdict_b(
     stripped_valid, domain_warnings = gate.validate(domain_oxide_wt_pct)
 
     status = str(backend_status)
-    hard_gate_failed = status in _VERDICT_B_HARD_FAIL_BACKEND_STATUSES
+    hard_gate_failed = (
+        status in _VERDICT_B_HARD_FAIL_BACKEND_STATUSES or not stripped_valid
+    )
     if hard_gate_failed or not stripped_valid:
         layer_a_state = "out_of_domain"
         offending_species = tuple(sorted(stripped.oxide_wt_pct))
