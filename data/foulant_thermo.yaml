@@ -22,7 +22,7 @@ foulant_dG:
       - {T_K: 1573.15, dG_kJ_per_mol: -64.0}
 
   FeSO4_thermal_decomp:
-    reaction: "2 FeSO4 -> Fe2O3 + 2 SO2 + O2"
+    reaction: "2 FeSO4 -> Fe2O3 + 2 SO2 + 1/2 O2"
     source: "REF-012 REF-021 NIST WebBook dagger; E1 sec 1.5; Kanari 2018"
     points:
       - {T_K: 873.15, dG_kJ_per_mol: 30.0}
@@ -70,7 +70,7 @@ foulant_dG:
       - {T_K: 773.15, dG_kJ_per_mol: -35.0}
 
   FeS_roasting:
-    reaction: "FeS + 3/4 O2 -> FeO + SO2"
+    reaction: "FeS + 3/2 O2 -> FeO + SO2"
     source: "REF-020 E2 sec 2.1 JANAF-class; kinetic-onset tier-2 bracket (DeltaG0 << 0 @1200-1400 K)"
     points:
       - {T_K: 673.15, dG_kJ_per_mol: 25.0}
@@ -78,7 +78,7 @@ foulant_dG:
       - {T_K: 1273.15, dG_kJ_per_mol: -120.0}
 
   CaS_roasting:
-    reaction: "CaS + 2 O2 -> CaO + SO2"
+    reaction: "CaS + 3/2 O2 -> CaO + SO2"
     source: "REF-020 E2 §2.1; kinetic-onset tier-2 bracket"
     points:
       - {T_K: 723.15, dG_kJ_per_mol: 20.0}
@@ -86,7 +86,7 @@ foulant_dG:
       - {T_K: 1273.15, dG_kJ_per_mol: -100.0}
 
   NiS_roasting:
-    reaction: "NiS + O2 -> NiO + SO2"
+    reaction: "NiS + 3/2 O2 -> NiO + SO2"
     source: "REF-020 E2 §2.1; kinetic-onset tier-2 bracket"
     points:
       - {T_K: 673.15, dG_kJ_per_mol: 22.0}
