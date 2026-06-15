@@ -15,7 +15,14 @@ def wall_deposit_remobilization_by_segment_species(
     cumulative_deposits_kg: Mapping[tuple[str, str], float] | None = None,
     through_hour: int | None = None,
 ) -> dict[str, dict[str, dict[str, Any]]]:
-    """Tag whether later segment temperatures would re-mobilize wall deposits.
+    """Tag whether later segment wall temperatures exceed species condensation thresholds.
+
+    Each row exposes ``thermal_remobilization_threshold_exceeded`` — a boolean
+    comparing later max segment ``pipe_segment_temperatures_C`` against the
+    ~1 mbar operator-routing condensation setpoint. Pressure, Knudsen number,
+    regime factor, and vapor flux are **not** modeled; ``re_evaporated_kg`` is
+    always ``None``. This is a thermal threshold flag, not a mass-transfer or
+    re-evaporation result.
 
     Read-only diagnostic: does not mutate ledger, scores, or cache keys.
     """
@@ -62,7 +69,7 @@ def wall_deposit_remobilization_by_segment_species(
             species,
             temps=instance_temps,
         )
-        remobilized = (
+        threshold_exceeded = (
             later_max_T_C is not None
             and later_max_T_C > condensation_T_C
         )
@@ -71,7 +78,9 @@ def wall_deposit_remobilization_by_segment_species(
             "deposit_last_hour": last_hour,
             "later_max_T_C": later_max_T_C,
             "condensation_T_C": float(condensation_T_C),
-            "remobilized": bool(remobilized),
+            "thermal_remobilization_threshold_exceeded": bool(threshold_exceeded),
+            "re_evaporated_kg": None,
+            "pressure_and_flux_modeled": False,
         }
     return result
 

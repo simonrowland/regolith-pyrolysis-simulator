@@ -34,7 +34,14 @@ def _sim(
     )
 
 
-def test_remobilized_true_when_later_temperature_exceeds_condensation_threshold() -> None:
+def _assert_threshold_row_semantics(row: dict) -> None:
+    assert row["re_evaporated_kg"] is None
+    assert row["pressure_and_flux_modeled"] is False
+    assert "remobilized" not in row
+    assert "thermal_remobilization_threshold_exceeded" in row
+
+
+def test_threshold_exceeded_true_when_later_temperature_exceeds_condensation_setpoint() -> None:
     segment = "stage_1_to_stage_2"
     species = "Na"
     condensation_T_C = float(CONDENSATION_TEMPS_C[species])
@@ -69,10 +76,11 @@ def test_remobilized_true_when_later_temperature_exceeds_condensation_threshold(
     assert row["deposit_last_hour"] == 1
     assert row["condensation_T_C"] == pytest.approx(condensation_T_C)
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
-    assert row["remobilized"] is True
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    _assert_threshold_row_semantics(row)
 
 
-def test_remobilized_false_when_later_temperature_stays_below_threshold() -> None:
+def test_threshold_exceeded_false_when_later_temperature_stays_below_setpoint() -> None:
     segment = "stage_1_to_stage_2"
     species = "Na"
     condensation_T_C = float(CONDENSATION_TEMPS_C[species])
@@ -100,10 +108,11 @@ def test_remobilized_false_when_later_temperature_stays_below_threshold() -> Non
 
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
     assert row["later_max_T_C"] < condensation_T_C
-    assert row["remobilized"] is False
+    assert row["thermal_remobilization_threshold_exceeded"] is False
+    _assert_threshold_row_semantics(row)
 
 
-def test_no_later_hours_yields_none_temperature_and_not_remobilized() -> None:
+def test_no_later_hours_yields_none_temperature_and_threshold_not_exceeded() -> None:
     segment = "duct_hot"
     species = "Fe"
     condensation_T_C = float(CONDENSATION_TEMPS_C[species])
@@ -123,7 +132,8 @@ def test_no_later_hours_yields_none_temperature_and_not_remobilized() -> None:
 
     assert row["deposit_last_hour"] == 3
     assert row["later_max_T_C"] is None
-    assert row["remobilized"] is False
+    assert row["thermal_remobilization_threshold_exceeded"] is False
+    _assert_threshold_row_semantics(row)
 
 
 def test_missing_segment_temperature_is_graceful() -> None:
@@ -147,7 +157,8 @@ def test_missing_segment_temperature_is_graceful() -> None:
 
     assert row["condensation_T_C"] == pytest.approx(condensation_T_C)
     assert row["later_max_T_C"] is None
-    assert row["remobilized"] is False
+    assert row["thermal_remobilization_threshold_exceeded"] is False
+    _assert_threshold_row_semantics(row)
 
 
 def test_through_hour_limits_later_temperature_window() -> None:
@@ -175,10 +186,68 @@ def test_through_hour_limits_later_temperature_window() -> None:
     row = result[segment][species]
 
     assert row["later_max_T_C"] == pytest.approx(condensation_T_C - 5.0)
-    assert row["remobilized"] is False
+    assert row["thermal_remobilization_threshold_exceeded"] is False
+    _assert_threshold_row_semantics(row)
 
 
-def test_coating_product_summary_surfaces_additive_remobilization_field() -> None:
+def test_pressure_knudsen_invariant_threshold_flag_is_temperature_only() -> None:
+    segment = "stage_1_to_stage_2"
+    species = "Na"
+    condensation_T_C = float(CONDENSATION_TEMPS_C[species])
+    later_T_C = condensation_T_C + 50.0
+    snapshots = (
+        _snapshot(1, wall_delta={(segment, species): 0.01}),
+        _snapshot(2),
+    )
+
+    low_pressure_history = [
+        {
+            "hour": 1,
+            "pipe_segment_temperatures_C": {segment: 400.0},
+            "pressure_mbar": 1e-9,
+            "knudsen_number": 1e9,
+            "regime_factor": 1.0,
+        },
+        {
+            "hour": 2,
+            "pipe_segment_temperatures_C": {segment: later_T_C},
+            "pressure_mbar": 1e-9,
+            "knudsen_number": 1e9,
+            "regime_factor": 1.0,
+        },
+    ]
+    high_pressure_history = [
+        {
+            "hour": 1,
+            "pipe_segment_temperatures_C": {segment: 400.0},
+            "pressure_mbar": 1000.0,
+            "knudsen_number": 1e-6,
+            "regime_factor": 0.0,
+        },
+        {
+            "hour": 2,
+            "pipe_segment_temperatures_C": {segment: later_T_C},
+            "pressure_mbar": 1000.0,
+            "knudsen_number": 1e-6,
+            "regime_factor": 0.0,
+        },
+    ]
+
+    row_low = wall_deposit_remobilization_by_segment_species(
+        _sim(snapshots=snapshots, operating_history=low_pressure_history),
+    )[segment][species]
+    row_high = wall_deposit_remobilization_by_segment_species(
+        _sim(snapshots=snapshots, operating_history=high_pressure_history),
+    )[segment][species]
+
+    assert row_low["thermal_remobilization_threshold_exceeded"] is True
+    assert row_high["thermal_remobilization_threshold_exceeded"] is True
+    assert row_low["later_max_T_C"] == row_high["later_max_T_C"]
+    _assert_threshold_row_semantics(row_low)
+    _assert_threshold_row_semantics(row_high)
+
+
+def test_coating_product_summary_surfaces_threshold_field_not_mass_transfer() -> None:
     segment = "hot_wall"
     species = "SiO"
     condensation_T_C = float(CONDENSATION_TEMPS_C[species])
@@ -210,7 +279,8 @@ def test_coating_product_summary_surfaces_additive_remobilization_field() -> Non
     row = remobilization[segment][species]
     assert row["condensation_T_C"] == pytest.approx(condensation_T_C)
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
-    assert row["remobilized"] is True
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    _assert_threshold_row_semantics(row)
 
 
 def test_campaign_hour_resolution_matches_production_path() -> None:
@@ -239,7 +309,8 @@ def test_campaign_hour_resolution_matches_production_path() -> None:
 
     assert row["deposit_last_hour"] == 1
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
-    assert row["remobilized"] is True
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    _assert_threshold_row_semantics(row)
 
 
 def test_index_fallback_resolution_when_no_explicit_hour() -> None:
@@ -268,4 +339,5 @@ def test_index_fallback_resolution_when_no_explicit_hour() -> None:
 
     assert row["deposit_last_hour"] == 5
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
-    assert row["remobilized"] is True
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    _assert_threshold_row_semantics(row)
