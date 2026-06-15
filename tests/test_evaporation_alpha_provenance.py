@@ -16,7 +16,7 @@ EXPECTED_ALPHA = {
         "value": 0.02,
         "envelope": (0.011, 0.020),
         "source": (
-            "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ "
+            "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ "
             "alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated "
             "Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
         ),
@@ -26,7 +26,7 @@ EXPECTED_ALPHA = {
         "value": 0.20,
         "envelope": (0.10, 0.21),
         "source": (
-            "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at "
+            "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at "
             "1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, "
             "alpha_s=0.20-0.21"
         ),
@@ -36,7 +36,7 @@ EXPECTED_ALPHA = {
         "value": 1.0,
         "envelope": (0.9, 1.0),
         "source": (
-            "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal "
+            "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal "
             "evaporation from ferrobasalt FCMAS melt"
         ),
         "tier": 2,
@@ -45,7 +45,7 @@ EXPECTED_ALPHA = {
         "value": 1.0,
         "envelope": (0.9, 1.0),
         "source": (
-            "ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy "
+            "REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy "
             "to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; "
             "Sossi & Fegley 2018 liquids commonly near unity"
         ),
@@ -64,7 +64,7 @@ EXPECTED_ALPHA = {
         "value": 0.30,
         "envelope": (0.03, 1.00),
         "source": (
-            "Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus "
+            "REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus "
             "Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
         ),
         "tier": 2,
@@ -73,7 +73,7 @@ EXPECTED_ALPHA = {
         "value": 1.0,
         "envelope": (0.84, 1.00),
         "source": (
-            "Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 "
+            "REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 "
             "pure-Si vacuum evaporation; pure elemental Si branch only"
         ),
         "tier": 2,
@@ -91,7 +91,7 @@ EXPECTED_ALPHA = {
         "value": 0.04,
         "envelope": (0.003, 0.048),
         "source": (
-            "SF2004 Table 10 SiO2(liq), Hashimoto 1990, "
+            "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, "
             "alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine "
             "SiO+ 0.003-0.036 cross-check"
         ),

@@ -39,13 +39,13 @@ metals:
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.121
     pure_component_antoine:
-      source: "NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.407048
       B: 5088.599272
       C: 0
     evaporation_alpha:
       value: 1.0
-      source: "Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
+      source: "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
       tier: 2
@@ -63,7 +63,7 @@ metals:
       # conservative value can override via setpoints (see
       # data/setpoints.yaml chemistry_kernel block).
       competing_sources:
-        - source: "Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber"
+        - source: "REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber"
           value: 0.13
           regime: "sealed equilibrium chamber; not representative of mbar-sweep pyrolysis"
     antoine:
@@ -89,13 +89,13 @@ metals:
       target: "VapoRock K = 9.55e-02 Pa at 1773.15 K"
       residual_dex: 1.469
     pure_component_antoine:
-      source: "NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.008700
       B: 4131.679352
       C: 0
     evaporation_alpha:
       value: 1.0
-      source: "ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi & Fegley 2018 liquids commonly near unity"
+      source: "REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi & Fegley 2018 liquids commonly near unity"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
       tier: 2
@@ -128,13 +128,13 @@ metals:
       target: "VapoRock partial pressure on the grid"
       residual_dex: 0.203
     pure_component_antoine:
-      source: "CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 9.906866
       B: 6685.903376
       C: 0
     evaporation_alpha:
       value: 0.20
-      source: "Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
+      source: "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
       T_band_K: [1873, 2373]
       envelope: [0.10, 0.21]
       tier: 2
@@ -161,13 +161,13 @@ metals:
       target: "VapoRock partial pressure on the basalt grid"
       residual_dex: 0.023
     pure_component_antoine:
-      source: "CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.670336
       B: 17759.430841
       C: 0
     evaporation_alpha:
       value: 0.02
-      source: "Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
+      source: "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy"
       T_band_K: [1873, 2373]
       envelope: [0.011, 0.020]
       tier: 2
@@ -193,7 +193,7 @@ metals:
     fit_target: "pure_component_psat"
     source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ca vapor-pressure table or refit): rough legacy dH_vap approximation, unvalidated"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy dH_vap~182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy dH_vap~182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 10.424827
       B: 9522.188948
       C: 0
@@ -221,13 +221,13 @@ metals:
     fit_target: "pure_component_psat"
     source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Al vapor-pressure table/regression): legacy CRC-style pure Al vapor-pressure table regression; legacy dH_vap ~ 332.0 kJ/mol"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.216544
       B: 17341.561880
       C: 0
     evaporation_alpha:
       value: 0.30
-      source: "Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
+      source: "REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
       T_band_K: [1700, 2273]
       envelope: [0.03, 1.00]
       tier: 2
@@ -250,13 +250,13 @@ metals:
     consumer_status: "inactive"
     source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named pure-Si vapor-pressure fit): rough legacy dH_vap approximation, inactive and unvalidated"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy dH_vap~413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-017 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named pure-Si vapor-pressure fit): Safarian & Engh 2013 pure-Si branch plus legacy dH_vap~413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.110207
       B: 21598.601920
       C: 0
     evaporation_alpha:
       value: 1.0
-      source: "Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
+      source: "REF-017 Safarian & Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only"
       T_band_K: [1687, 3538]
       envelope: [0.84, 1.00]
       tier: 2
@@ -278,7 +278,7 @@ metals:
     fit_target: "pure_component_psat"
     source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace with named Ti vapor-pressure table/regression): legacy CRC-style pure Ti liquid equation/table; legacy dH_vap ~ 444.3 kJ/mol"
     pure_component_antoine:
-      source: "LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      source: "REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
       A: 11.524374
       B: 23207.397420
       C: 0
@@ -308,7 +308,7 @@ metals:
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
-      source: "Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found"
+      source: "REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found"
     antoine:
       A: 11.420
       B: 20730
@@ -328,7 +328,7 @@ metals:
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
-      source: "Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted"
+      source: "REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted"
     antoine:
       A: 11.183
       B: 14740
@@ -354,7 +354,7 @@ oxide_vapors:
     stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
     evaporation_alpha:
       value: 0.04
-      source: "SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
+      source: "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
       T_band_K: [1873, 2373]
       envelope: [0.003, 0.048]
       tier: 2
@@ -396,7 +396,7 @@ oxide_vapors:
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"
-      source: "Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted"
+      source: "REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted"
     antoine:
       # Fallback fit to VapoRock JANAF0 CrO2(g) output over 1500-2200 K:
       # log10(P_Pa) = A - B/T_K + 0.5 log10(a_Cr2O3) + 0.25 log10(pO2_bar)
@@ -420,7 +420,7 @@ oxide_vapors:
       F: -99.71476
       G: 328.5921
       H: -75.312
-      source: JANAF coefficients shipped by VapoRock.
+    source: "REF-020 JANAF coefficients shipped by VapoRock."
     condensation_T_C: [1100, 1300]
     condensation_setpoint_C: 1250
     condensation_product: "Cr2O3(s) harvest with O2 coproduct: CrO2 -> 0.5 Cr2O3 + 0.25 O2"
@@ -456,7 +456,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 900
     evaporation_alpha:
       value: 1.0
-      source: "Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
+      source: "REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g)."
 
@@ -480,7 +480,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 880
     evaporation_alpha:
       value: 1.0
-      source: "Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
+      source: "REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T."
 

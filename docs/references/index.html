@@ -21,7 +21,7 @@ ul { padding-left: 1.4rem; }</style>
 <body>
 <h1>Reference Registry</h1>
 <nav><strong>Topics:</strong> 
-<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (2) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (1) | <a href="topics/redox-fo2.html">redox-fo2</a> (1) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (2)
+<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (5) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (1) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermochemistry.html">thermochemistry</a> (2) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (3) | <a href="topics/volatility.html">volatility</a> (1)
 </nav>
 <h2>Master List</h2>
 <section class="entry" id="REF-001">
@@ -40,6 +40,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/foulant_thermo.yaml:105</code> - NaCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
+<li><code>data/foulant_thermo.yaml:124</code> - KCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
 <li><code>data/vapor_pressures.yaml:446</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
 <li><code>data/vapor_pressures.yaml:469</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
 <li><code>data/vapor_pressures.yaml:474</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
@@ -75,7 +77,11 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">OBSERVATION</span><span class="badge status-current">current</span><a class="badge" href="topics/ceres-mineralogy.html">ceres-mineralogy</a></p>
 <p><a href="https://doi.org/10.1038/nature16172">doi:10.1038/nature16172</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1110</code> - ceres_regolith.carbon_speciation_provenance.NH3.source: source: &quot;REF-006 De Sanctis M.C. et al. 2015, Nature 526:108, DOI 10.1038/nature16172; Ammannito E. et al. 2016, Science 353:aaf4279, DOI 10.1126/science.aaf4279.&quot;</li>
+<li><code>data/feedstocks.yaml:1120</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+</ul>
 </section>
 <section class="entry" id="REF-007">
 <h2>REF-007</h2>
@@ -91,7 +97,11 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">OBSERVATION</span><span class="badge status-current">current</span><a class="badge" href="topics/ceres-organics.html">ceres-organics</a></p>
 <p><a href="https://doi.org/10.1126/science.aaj2305">doi:10.1126/science.aaj2305</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1100</code> - ceres_regolith.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis M.C. et al. 2017, Science 355:719-722, DOI 10.1126/science.aaj2305.&quot;</li>
+<li><code>data/feedstocks.yaml:1183</code> - ceres_regolith.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-008 De Sanctis et al. 2017 constrains Ceres global organics to &lt;=1 wt%; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+</ul>
 </section>
 <section class="entry" id="REF-009">
 <h2>REF-009</h2>
@@ -99,7 +109,12 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">REVIEW</span><span class="badge status-current">current</span><a class="badge" href="topics/ceres-mineralogy.html">ceres-mineralogy</a></p>
 <p><a href="https://doi.org/10.1111/maps.13104">doi:10.1111/maps.13104</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1105</code> - ceres_regolith.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-009 De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858, DOI 10.1111/maps.13104; McSween H.Y. et al. 2018, M&amp;PS 53:1793-1804, DOI 10.1111/maps.12947.&quot;</li>
+<li><code>data/feedstocks.yaml:1115</code> - ceres_regolith.carbon_speciation_provenance.brine_salts.source: source: &quot;REF-009 Castillo-Rogez J.C. et al. 2020, Astrobiology 20:269; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+<li><code>data/feedstocks.yaml:1120</code> - ceres_regolith.carbon_speciation_provenance.nh4_phyllosilicate.source: source: &quot;REF-006 REF-009 De Sanctis M.C. et al. 2015, Nature 526:108; Ammannito E. et al. 2016, Science 353:aaf4279; De Sanctis M.C. et al. 2018, M&amp;PS 53:1844-1858.&quot;</li>
+</ul>
 </section>
 <section class="entry" id="REF-010">
 <h2>REF-010</h2>
@@ -115,7 +130,283 @@ ul { padding-left: 1.4rem; }</style>
 <p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/comet-organics.html">comet-organics</a></p>
 <p><a href="https://doi.org/10.1038/nature19320">doi:10.1038/nature19320</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
-<p><strong>Cited by:</strong> none</p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1251</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-012">
+<h2>REF-012</h2>
+<p class="citation">Linstrom, P.J. &amp; Mallard, W.G. (eds.) (2026). NIST Chemistry WebBook, NIST Standard Reference Database Number 69. <em>National Institute of Standards and Technology</em>.</p>
+<p class="meta"><span class="badge">DATA</span><span class="badge status-current">current</span><a class="badge" href="topics/thermochemistry.html">thermochemistry</a></p>
+<p><a href="https://webbook.nist.gov/chemistry/">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/foulant_thermo.yaml:9</code> - foulant_dG.CaSO4_thermal_decomp.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 1.1 (1/2O2 path); C0-corrected&quot;</li>
+<li><code>data/foulant_thermo.yaml:18</code> - foulant_dG.MgSO4_thermal_decomp.source: source: &quot;REF-012 NIST WebBook dagger SO3 path; E1 sec 1.4 C0-6&quot;</li>
+<li><code>data/foulant_thermo.yaml:26</code> - foulant_dG.FeSO4_thermal_decomp.source: source: &quot;REF-012 REF-021 NIST WebBook dagger; E1 sec 1.5; Kanari 2018&quot;</li>
+<li><code>data/foulant_thermo.yaml:34</code> - foulant_dG.CaCO3_calcination.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.1&quot;</li>
+<li><code>data/foulant_thermo.yaml:42</code> - foulant_dG.MgCO3_calcination.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.2&quot;</li>
+<li><code>data/foulant_thermo.yaml:50</code> - foulant_dG.Na2CO3_silicate_displacement.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 @900 degC)&quot;</li>
+<li><code>data/foulant_thermo.yaml:162</code> - CaSO4.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 1.1-1.3 C0-corrected&quot;</li>
+<li><code>data/foulant_thermo.yaml:185</code> - MgSO4.thermo.source: source: &quot;REF-012 NIST WebBook dagger SO3 path; E1 sec 1.4&quot;</li>
+<li><code>data/foulant_thermo.yaml:208</code> - FeSO4.thermo.source: source: &quot;REF-012 REF-021 NIST WebBook dagger; E1 sec 1.5; Kanari 2018&quot;</li>
+<li><code>data/foulant_thermo.yaml:230</code> - CaCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.1&quot;</li>
+<li><code>data/foulant_thermo.yaml:250</code> - MgCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.2&quot;</li>
+<li><code>data/foulant_thermo.yaml:270</code> - Na2CO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)&quot;</li>
+<li><code>data/vapor_pressures.yaml:42</code> - metals.Na.pure_component_antoine.source: source: &quot;REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~97.42 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:92</code> - metals.K.pure_component_antoine.source: source: &quot;REF-012 NIST TN 2273 normal boiling point; CRC/NIST dH_vap~79.1 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:131</code> - metals.Mg.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:164</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:196</code> - metals.Ca.pure_component_antoine.source: source: &quot;REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ca vapor-pressure fit): CRC/NIST normal boiling point; legacy dH_vap~182.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:224</code> - metals.Al.pure_component_antoine.source: source: &quot;REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Al vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~332.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:281</code> - metals.Ti.pure_component_antoine.source: source: &quot;REF-012 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named Ti vapor-pressure fit): legacy CRC-style normal boiling point; legacy dH_vap~444.3 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-013">
+<h2>REF-013</h2>
+<p class="citation">Sossi, P.A., Klemme, S., O&#x27;Neill, H.St.C., Berndt, J. &amp; Moynier, F. (2019). Evaporation of moderately volatile elements from silicate melts: experiments and theory. <em>Geochimica et Cosmochimica Acta</em> <strong>260</strong>: 204-231.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
+<p><a href="https://doi.org/10.1016/j.gca.2019.06.021">doi:10.1016/j.gca.2019.06.021</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:48</code> - metals.Na.evaporation_alpha.source: source: &quot;REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt&quot;</li>
+<li><code>data/vapor_pressures.yaml:98</code> - metals.K.evaporation_alpha.source: source: &quot;REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi &amp; Fegley 2018 liquids commonly near unity&quot;</li>
+<li><code>data/vapor_pressures.yaml:331</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
+<li><code>data/vapor_pressures.yaml:459</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:483</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-014">
+<h2>REF-014</h2>
+<p class="citation">Fedkin, A.V., Grossman, L. &amp; Ghiorso, M.S. (2006). Vapor pressures and evaporation coefficients for melts of ferromagnesian chondrule-like compositions. <em>Geochimica et Cosmochimica Acta</em> <strong>70</strong>: 206-223.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
+<p><a href="https://doi.org/10.1016/j.gca.2005.08.014">doi:10.1016/j.gca.2005.08.014</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:66</code> - metals.Na.evaporation_alpha.competing_sources.source: - source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber&quot;</li>
+<li><code>data/vapor_pressures.yaml:311</code> - metals.Cr.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found&quot;</li>
+<li><code>data/vapor_pressures.yaml:331</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
+<li><code>data/vapor_pressures.yaml:399</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-015">
+<h2>REF-015</h2>
+<p class="citation">Richter, F.M., Davis, A.M., Ebel, D.S. &amp; Hashimoto, A. (2002). Elemental and isotopic fractionation of type B calcium-, aluminum-rich inclusions: Experiments, theoretical considerations, and constraints on their thermal evolution. <em>Geochimica et Cosmochimica Acta</em> <strong>66</strong>: 521-540.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
+<p><a href="https://doi.org/10.1016/S0016-7037(01)00782-7">doi:10.1016/S0016-7037(01)00782-7</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:137</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-016">
+<h2>REF-016</h2>
+<p class="citation">Costa, G.C.C. &amp; Jacobson, N.S. (2015). Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry. <em>NASA Technical Reports Server</em> <strong>NTRS 20150002321</strong>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
+<p><a href="https://ntrs.nasa.gov/citations/20150002321">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:170</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
+<li><code>data/vapor_pressures.yaml:357</code> - oxide_vapors.SiO.evaporation_alpha.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-017">
+<h2>REF-017</h2>
+<p class="citation">Safarian, J. &amp; Engh, T.A. (2013). Vacuum evaporation of pure metals. <em>Metallurgical and Materials Transactions A</em> <strong>44</strong>: 747-753.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
+<p><a href="https://doi.org/10.1007/s11661-012-1464-2">doi:10.1007/s11661-012-1464-2</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:253</code> - metals.Si.pure_component_antoine.source: source: &quot;REF-017 LEGACY_DERIVATION_VALUE (source_class=legacy_derivation; TODO replace dH_vap slope with named pure-Si vapor-pressure fit): Safarian &amp; Engh 2013 pure-Si branch plus legacy dH_vap~413.5 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>data/vapor_pressures.yaml:259</code> - metals.Si.evaporation_alpha.source: source: &quot;REF-017 Safarian &amp; Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-018">
+<h2>REF-018</h2>
+<p class="citation">Schaefer, L. &amp; Fegley, B. (2004). A thermodynamic model of high temperature lava vaporization on Io. <em>Icarus</em> <strong>169</strong>: 216-241.</p>
+<p class="meta"><span class="badge">MODEL</span><span class="badge status-current">current</span><a class="badge" href="topics/vapor-pressure.html">vapor-pressure</a></p>
+<p><a href="https://doi.org/10.1016/j.icarus.2003.08.023">doi:10.1016/j.icarus.2003.08.023</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:137</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
+<li><code>data/vapor_pressures.yaml:230</code> - metals.Al.evaporation_alpha.source: source: &quot;REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar &amp; Young 2007 CAI modeling; conflicting Al proxy coverage&quot;</li>
+<li><code>data/vapor_pressures.yaml:357</code> - oxide_vapors.SiO.evaporation_alpha.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-019">
+<h2>REF-019</h2>
+<p class="citation">Sossi, P.A. &amp; Fegley, B. (2018). Thermodynamics of Element Volatility and its Application to Planetary Processes. <em>Reviews in Mineralogy &amp; Geochemistry</em> <strong>84</strong>: 393-459.</p>
+<p class="meta"><span class="badge">REVIEW</span><span class="badge status-current">current</span><a class="badge" href="topics/volatility.html">volatility</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/vapor_pressures.yaml:98</code> - metals.K.evaporation_alpha.source: source: &quot;REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi &amp; Fegley 2018 liquids commonly near unity&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-020">
+<h2>REF-020</h2>
+<p class="citation">Chase, M.W. (1998). NIST-JANAF Thermochemical Tables, 4th Ed.. <em>Journal of Physical and Chemical Reference Data</em> <strong>Monograph 9</strong>: Part I and Part II.</p>
+<p class="meta"><span class="badge">DATA</span><span class="badge status-current">current</span><a class="badge" href="topics/thermochemistry.html">thermochemistry</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/foulant_thermo.yaml:74</code> - foulant_dG.FeS_roasting.source: source: &quot;REF-020 E2 sec 2.1 JANAF-class; kinetic-onset tier-2 bracket (DeltaG0 &lt;&lt; 0 @1200-1400 K)&quot;</li>
+<li><code>data/foulant_thermo.yaml:82</code> - foulant_dG.CaS_roasting.source: source: &quot;REF-020 E2 §2.1; kinetic-onset tier-2 bracket&quot;</li>
+<li><code>data/foulant_thermo.yaml:90</code> - foulant_dG.NiS_roasting.source: source: &quot;REF-020 E2 §2.1; kinetic-onset tier-2 bracket&quot;</li>
+<li><code>data/foulant_thermo.yaml:352</code> - FeS.thermo.source: source: &quot;REF-020 E2 §2.1; foulant-disposition-spec roasting row&quot;</li>
+<li><code>data/foulant_thermo.yaml:373</code> - CaS.thermo.source: source: &quot;REF-020 E2 §2.1; oldhamite disposition&quot;</li>
+<li><code>data/foulant_thermo.yaml:394</code> - NiS.thermo.source: source: &quot;REF-020 E2 §2.1; native Ni oxidation path&quot;</li>
+<li><code>data/vapor_pressures.yaml:423</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-021">
+<h2>REF-021</h2>
+<p class="citation">Kanari, N. et al. (2018). Thermal behavior of hydrated iron sulfate in various atmospheres. <em>Metals</em> <strong>8</strong>: 1084.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/foulant-thermo.html">foulant-thermo</a></p>
+<p><a href="https://doi.org/10.3390/met8121084">doi:10.3390/met8121084</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/foulant_thermo.yaml:26</code> - foulant_dG.FeSO4_thermal_decomp.source: source: &quot;REF-012 REF-021 NIST WebBook dagger; E1 sec 1.5; Kanari 2018&quot;</li>
+<li><code>data/foulant_thermo.yaml:208</code> - FeSO4.thermo.source: source: &quot;REF-012 REF-021 NIST WebBook dagger; E1 sec 1.5; Kanari 2018&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-022">
+<h2>REF-022</h2>
+<p class="citation">Sutter, B. et al. (2014). Investigation of magnesium perchlorate/iron phase-mineral mixtures. <em>NASA Technical Reports Server</em> <strong>NTRS 20140006489</strong>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/perchlorate.html">perchlorate</a></p>
+<p><a href="https://ntrs.nasa.gov/citations/20140006489">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/foulant_thermo.yaml:58</code> - foulant_dG.Mg_ClO4_2_decomp.source: source: &quot;REF-022 Sutter 2014 NTRS 20140006489; E1 §3.1 C0-2 balanced&quot;</li>
+<li><code>data/foulant_thermo.yaml:291</code> - Mg_ClO4_2.thermo.source: source: &quot;REF-022 Sutter 2014; E1 §3.1 C0-2 balanced MgCl2+4O2&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-023">
+<h2>REF-023</h2>
+<p class="citation">Bruck, A.M. et al. (2014). Thermal decomposition of calcium perchlorate/iron-mineral mixtures. <em>Lunar and Planetary Science Conference</em> <strong>45</strong>: 2057.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/perchlorate.html">perchlorate</a></p>
+<p><a href="https://www.hou.usra.edu/meetings/lpsc2014/pdf/2057.pdf">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/foulant_thermo.yaml:66</code> - foulant_dG.Ca_ClO4_2_decomp.source: source: &quot;REF-023 Bruck 2014 LPSC 2057; E1 §3.2 C0-2 balanced&quot;</li>
+<li><code>data/foulant_thermo.yaml:311</code> - Ca_ClO4_2.thermo.source: source: &quot;REF-023 Bruck 2014 LPSC 2057; E1 §3.2 C0-2 balanced CaCl2+4O2&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-024">
+<h2>REF-024</h2>
+<p class="citation">Sephton, M.A., Love, G.D., Watson, J.S., Verchovsky, A.B., Wright, I.P., Snape, C.E. &amp; Gilmour, I. (2004). Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: New insights into its macromolecular structure. <em>Geochimica et Cosmochimica Acta</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><a href="https://doi.org/10.1016/j.gca.2003.08.019">doi:10.1016/j.gca.2003.08.019</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/stage0_carbon_partition.yaml:15</code> - phase_partitions.ci_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
+<li><code>data/stage0_carbon_partition.yaml:33</code> - phase_partitions.cm_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
+<li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
+<li><code>data/stage0_carbon_partition.yaml:83</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-025">
+<h2>REF-025</h2>
+<p class="citation">Pearson, V.K. et al. (2006). Carbon and nitrogen in carbonaceous chondrites: elemental abundances and stable isotopic compositions. <em>Meteoritics &amp; Planetary Science</em> <strong>41</strong>: 1899-1918.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><a href="https://doi.org/10.1111/j.1945-5100.2006.tb00459.x">doi:10.1111/j.1945-5100.2006.tb00459.x</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:907</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:937</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1014</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:1019</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+<li><code>data/feedstocks.yaml:1043</code> - cm_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-025 Pearson et al. 2006 + Smith &amp; Kaplan 1970 constrain CM organic matter to 2.0 wt% [1.5, 3.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-026">
+<h2>REF-026</h2>
+<p class="citation">Bland, P.A., Cressey, G. &amp; Menzies, O.N. (2004). Modal mineralogy of carbonaceous chondrites by X-ray diffraction and Mossbauer spectroscopy. <em>Meteoritics &amp; Planetary Science</em> <strong>39</strong>: 3-16.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><a href="https://doi.org/10.1111/j.1945-5100.2004.tb00046.x">doi:10.1111/j.1945-5100.2004.tb00046.x</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:912</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
+<li><code>data/feedstocks.yaml:1019</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-026 REF-025 Bland P.A. et al. 2004, M&amp;PS 39:3-16; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Zolensky M.E. et al. 2002, M&amp;PS 37:737-761.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-027">
+<h2>REF-027</h2>
+<p class="citation">Alexander, C.M.O&#x27;D., Fogel, M., Yabuta, H. &amp; Cody, G.D. (2007). The origin and evolution of chondrites recorded in the elemental and isotopic compositions of their macromolecular organic matter. <em>Geochimica et Cosmochimica Acta</em> <strong>71</strong>: 4380-4403.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:907</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:937</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+<li><code>data/feedstocks.yaml:1014</code> - cm_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-025 REF-027 Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Smith J.W. &amp; Kaplan I.R. 1970, Science 167:1367; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-028">
+<h2>REF-028</h2>
+<p class="citation">Yokoyama, T. et al. (2023). Samples returned from the asteroid Ryugu are similar to Ivuna-type carbonaceous meteorites. <em>Science</em> <strong>379</strong>: 786.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a></p>
+<p><a href="https://doi.org/10.1126/science.abn7850">doi:10.1126/science.abn7850</a> | <a href="https://hdl.handle.net/2115/90313">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:907</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama T. et al. 2023, Science abn7850; Pearson V.K. et al. 2006, M&amp;PS 41:1899-1918; Alexander C.M.O&#x27;D. et al. 2007, GCA 71:4380-4403.&quot;</li>
+<li><code>data/feedstocks.yaml:912</code> - ci_carbonaceous_chondrite.carbon_speciation_provenance.carbonate_salts.source: source: &quot;REF-028 REF-026 Yokoyama T. et al. 2023, Science abn7850; Bland P.A. et al. 2004, M&amp;PS 39:3-16; Endress M. &amp; Bischoff A. 1996, GCA 60:3035-3045.&quot;</li>
+<li><code>data/feedstocks.yaml:937</code> - ci_carbonaceous_chondrite.stage0_formula_inventory.carbonaceous_organic.source: source: &quot;REF-028 REF-025 REF-027 Yokoyama et al. 2023 + Pearson et al. 2006 + Alexander et al. 2007 constrain CI organic matter to 4.0 wt% [3.0, 5.5]; generic C/H/O/N inventory is a process surrogate for oxidative cleanup.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-029">
+<h2>REF-029</h2>
+<p class="citation">Bandfield, J.L., Glotch, T.D. &amp; Christensen, P.R. (2003). Spectroscopic identification of carbonate minerals in the Martian dust. <em>Science</em> <strong>301</strong>: 1084-1087.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/mars-carbonates.html">mars-carbonates</a></p>
+<p><a href="https://doi.org/10.1126/science.1088054">doi:10.1126/science.1088054</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1485</code> - mars_basalt.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L., Glotch T.D. &amp; Christensen P.R. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
+<li><code>data/feedstocks.yaml:1573</code> - mars_sulfate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087; Niles P.B. et al. 2017, JGR Planets 122, DOI 10.1002/2016JE005225.&quot;</li>
+<li><code>data/feedstocks.yaml:1641</code> - mars_phyllosilicate_clay.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Ehlmann B.L. et al. 2008, Science 322:1828, DOI 10.1126/science.1164759; Morris R.V. et al. 2010, Science 328:421, DOI 10.1126/science.1189667; Bandfield J.L. et al. 2003, Science 301:1084.&quot;</li>
+<li><code>data/feedstocks.yaml:1709</code> - mars_perchlorate_rich.native_carbonate_provenance.carbonate_salts.source: source: &quot;REF-029 Bandfield J.L. et al. 2003, Science 301:1084-1087, DOI 10.1126/science.1088054.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-030">
+<h2>REF-030</h2>
+<p class="citation">Bardyn, A. et al. (2017). Carbon-rich dust in comet 67P/Churyumov-Gerasimenko measured by COSIMA/Rosetta. <em>Monthly Notices of the Royal Astronomical Society</em> <strong>469</strong>: S712-S722.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/comet-organics.html">comet-organics</a></p>
+<p><a href="https://doi.org/10.1093/mnras/stx2640">doi:10.1093/mnras/stx2640</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:1251</code> - comet_nucleus.carbon_speciation_provenance.organics.source: source: &quot;REF-030 REF-011 Bardyn A. et al. 2017, MNRAS 469:S712-S722; Bardyn A. et al. 2016, Nature 533:73, DOI 10.1038/nature19320; Fulle M. et al. 2016, ApJ 821:19, DOI 10.3847/0004-637X/821/1/19.&quot;</li>
+<li><code>data/feedstocks.yaml:1255</code> - comet_nucleus.carbon_speciation_provenance.mineral_rebalance.source: source: &quot;REF-030 Bardyn A. et al. 2017, MNRAS 469:S712-S722.&quot;</li>
+<li><code>data/feedstocks.yaml:1276</code> - comet_nucleus.stage0_formula_inventory.organics.source: source: &quot;REF-030 Bardyn et al. 2017 COSIMA dust organic matter (40-50 wt% refractory dust) + Fulle et al. 2016 refractory:H2O ratio; generic C/H/O/N mass fractions remain a process surrogate.&quot;</li>
+</ul>
+</section>
+<section class="entry" id="REF-031">
+<h2>REF-031</h2>
+<p class="citation">Engelschion, V.S., Eriksson, S.R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. &amp; Sperl, M. (2020). EAC-1A: A novel large-volume lunar regolith simulant. <em>Scientific Reports</em> <strong>10</strong>: 5473.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/simulants.html">simulants</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/feedstocks.yaml:534</code> - lunar_eac_1a.source: source: &quot;REF-031 Engelschiøn et al. 2020, Scientific Reports, EAC-1A XRF major-oxide table&quot;</li>
+<li><code>data/feedstocks.yaml:556</code> - lunar_eac_1a.composition_basis.source: source: &quot;REF-031 Engelschiøn et al. 2020 XRF major oxides, wt% on post-LOI/ignited basis&quot;</li>
+<li><code>data/feedstocks.yaml:567</code> - lunar_eac_1a.formula_inventory.unreported_loi_residual.source: source: &quot;REF-031 ACCOUNTING SURROGATE only: explicit 1.6 wt% unreported/LOI residual needed to close the Engelschiøn EAC-1A 98.4 wt% oxide table without renormalizing stated oxides; routed to inert terminal slag and not used as chemistry evidence.&quot;</li>
+</ul>
 </section>
 </body>
 </html>

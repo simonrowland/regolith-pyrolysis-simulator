@@ -12,7 +12,7 @@ phase_partitions:
       floor: 0.39
       iom_anchor: 0.56
       certified_point: null
-      source: sephton_2004_murchison_hydropyrolysis
+      source: "REF-024 sephton_2004_murchison_hydropyrolysis"
       regime_caveat: H2_pyrolysis_to_520C_not_O2_bake_to_1050C
     f_carbonate_C:
       value: null
@@ -30,7 +30,7 @@ phase_partitions:
       floor: 0.39
       iom_anchor: 0.56
       certified_point: null
-      source: sephton_2004_murchison_hydropyrolysis
+      source: "REF-024 sephton_2004_murchison_hydropyrolysis"
       regime_caveat: H2_pyrolysis_to_520C_not_O2_bake_to_1050C
     f_carbonate_C:
       value: null
@@ -48,7 +48,7 @@ phase_partitions:
       floor: 0.39
       iom_anchor: 0.56
       certified_point: null
-      source: sephton_2004_murchison_hydropyrolysis
+      source: "REF-024 sephton_2004_murchison_hydropyrolysis"
       regime_caveat: weak_Ceres_analog_carbonate_prose_only
     f_carbonate_C:
       value: null
@@ -80,7 +80,7 @@ burnout_kinetics:
   labile_chon_unlimited_o2:
     law: complete_when_o2_sufficient
     chi_default: 1.0
-    source: sephton_2004_stepped_combustion_temperature_classes
+    source: "REF-024 sephton_2004_stepped_combustion_temperature_classes"
 
   refractory_accessible_char_tga:
     law: apparent_solid_state
