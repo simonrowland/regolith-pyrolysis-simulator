@@ -591,7 +591,7 @@ def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
     }
 
     monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
-    spec, run_config = evaluate_module._build_eval_inputs(
+    spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
         "stub",
@@ -605,6 +605,67 @@ def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
     assert spec.force_builtin_vapor_pressure is False
     assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
     assert b"builtin-vapor-pressure" not in canonical
+
+
+def test_build_eval_inputs_strict_thermal_window_keeps_vaporock_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["profile_id"] = "strict-thermal-window-vapor-provider-profile"
+    profile["run"] = {
+        **profile["run"],
+        "allow_fallback_vapor": False,
+        "force_builtin_vapor_pressure": False,
+    }
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
+    spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    canonical = canonical_evalspec_json(spec)
+
+    assert spec.runtime_campaign_overrides["C2A_continuous"][
+        "thermal_window_low_C"
+    ] == pytest.approx(1050.0)
+    assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert spec.allow_fallback_vapor is False
+    assert spec.force_builtin_vapor_pressure is False
+    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
+    assert b"builtin-vapor-pressure" not in canonical
+
+
+def test_build_eval_inputs_thermal_window_preserves_explicit_force_builtin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["profile_id"] = "force-builtin-thermal-window-vapor-profile"
+    profile["run"] = {
+        **profile["run"],
+        "allow_fallback_vapor": True,
+        "force_builtin_vapor_pressure": True,
+    }
+
+    def fail_probe() -> bool:
+        raise AssertionError("explicit force-builtin must not probe VapoRock")
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", fail_probe)
+    spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    )
+    assert spec.allow_fallback_vapor is True
+    assert spec.force_builtin_vapor_pressure is True
 
 
 def test_build_eval_inputs_force_builtin_short_circuits_vaporock_probe(
@@ -1183,6 +1244,40 @@ def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure(
     assert spec.lab_schedule["window_semantics"]["measured_window_end_h"] == (
         pytest.approx(2.0)
     )
+
+
+def test_build_eval_inputs_strict_lab_schedule_keeps_vaporock_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (1.0, 625.0), (2.0, 1225.0)),
+        pressure_points=((0.0, 13.0), (1.0, 14.0), (2.0, 15.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    profile = _lab_schedule_profile(schedule)
+    profile["run"] = {
+        **profile["run"],
+        "allow_fallback_vapor": False,
+        "force_builtin_vapor_pressure": False,
+    }
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    canonical = canonical_evalspec_json(spec)
+
+    assert spec.lab_schedule["id"] == "test_lab_schedule"
+    assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert spec.allow_fallback_vapor is False
+    assert spec.force_builtin_vapor_pressure is False
+    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
+    assert b"builtin-vapor-pressure" not in canonical
 
 
 def test_lab_schedule_digests_keep_gas_boundary_separate() -> None:

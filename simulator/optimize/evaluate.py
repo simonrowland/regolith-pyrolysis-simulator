@@ -1619,11 +1619,6 @@ def _thermal_scheduled_run_options(
         campaign_overrides[key] = float(value)
     merged["runtime_campaign_overrides"] = runtime_overrides
     merged["hours"] = int(schedule["total_hours"])
-    chemistry_kernel = dict(merged.get("chemistry_kernel", {}) or {})
-    chemistry_kernel.setdefault("allow_fallback_vapor", True)
-    merged["chemistry_kernel"] = chemistry_kernel
-    merged["allow_fallback_vapor"] = True
-    merged["force_builtin_vapor_pressure"] = True
     return MappingProxyType(merged)
 
 
@@ -1707,11 +1702,6 @@ def _lab_scheduled_run_options(
     merged["runtime_campaign_overrides"] = runtime_overrides
     merged["lab_schedule"] = lab_schedule
     merged["hours"] = int(math.ceil(duration_h))
-    chemistry_kernel = dict(merged.get("chemistry_kernel", {}) or {})
-    chemistry_kernel.setdefault("allow_fallback_vapor", True)
-    merged["chemistry_kernel"] = chemistry_kernel
-    merged["allow_fallback_vapor"] = True
-    merged["force_builtin_vapor_pressure"] = True
     return MappingProxyType(merged)
 
 
