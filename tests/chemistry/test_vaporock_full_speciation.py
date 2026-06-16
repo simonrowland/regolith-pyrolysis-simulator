@@ -100,6 +100,56 @@ def test_provider_keeps_evaporation_filter_byte_identical():
     assert "O2" not in diagnostics.vapor_pressures_Pa
 
 
+def test_provider_allowed_species_honors_inactive_consumer_status(
+    vapor_pressure_data,
+):
+    assert (
+        vapor_pressure_data["metals"]["Si"]["consumer_status"].lower()
+        == "inactive"
+    )
+
+    allowed_species = VapoRockProvider._build_allowed_species(
+        vapor_pressure_data
+    )
+
+    assert "Si" not in allowed_species
+    assert {"SiO", "Na", "Fe"} <= allowed_species
+
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={
+            "Si": 1000.0,
+            "SiO": 100.0,
+            "Na": 10.0,
+            "Fe": 1.0,
+        },
+        vaporock_full_speciation_Pa={
+            "Si": 1000.0,
+            "SiO": 100.0,
+            "Na": 10.0,
+            "Fe": 1.0,
+        },
+        warnings=(),
+        status="ok",
+    )
+
+    diagnostics = VapoRockProvider._project_equilibrium(
+        equilibrium,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="test",
+        allowed_species=allowed_species,
+    )
+
+    assert diagnostics.vapor_pressures_Pa == {
+        "SiO": pytest.approx(100.0),
+        "Na": pytest.approx(10.0),
+        "Fe": pytest.approx(1.0),
+    }
+    assert diagnostics.vaporock_full_speciation_Pa["Si"] == pytest.approx(
+        1000.0
+    )
+
+
 def test_vaporock_diagnostic_payload_round_trips_full_speciation():
     diagnostics = VapoRockDiagnostics(
         vapor_pressures_Pa={"Na": 100.0},
@@ -157,4 +207,3 @@ def test_installed_vaporock_full_speciation_has_structural_tail():
     assert "O2" in full
     assert "SiO2_gas" in full
     assert any(species in full for species in ("Si2", "Al2O2", "Na2", "K2"))
-

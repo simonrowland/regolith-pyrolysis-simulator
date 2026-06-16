@@ -73,13 +73,14 @@ class VapoRockProvider(ChemistryProvider):
             kernel handles fallback opt-in at the dispatch layer.
         vapor_pressure_data: Optional ``data/vapor_pressures.yaml``
             payload.  When supplied the provider filters the VapoRock
-            output to species that have ``parent_oxide`` metadata in
-            the YAML (the universe the simulator's downstream
-            ``EVAPORATION_FLUX`` step is wired to consume); without
-            this filter VapoRock's broader ~30-species output (``O2``,
-            ``Si2``, ``Al2O2``, etc.) would crash the downstream
-            stoichiometry validator.  Goal #10 hard-constraint binds
-            this: the authority swap must keep mass balance at 0.000%.
+            output to active species the YAML declares (the universe
+            the simulator's downstream ``EVAPORATION_FLUX`` step is
+            wired to consume); without this filter VapoRock's broader
+            ~30-species output (``O2``, ``Si2``, ``Al2O2``, etc.) would
+            crash the downstream stoichiometry validator.  Rows marked
+            ``consumer_status: inactive`` are excluded from the VapoRock
+            consumer surface. Goal #10 hard-constraint binds this: the
+            authority swap must keep mass balance at 0.000%.
             When omitted, no filtering happens and the full VapoRock
             output is returned -- appropriate for tests that operate
             below the simulator (the vapor-pressure dict alone is
@@ -442,13 +443,15 @@ class VapoRockProvider(ChemistryProvider):
         payload is missing or carries no ``metals`` / ``oxide_vapors``
         sections.
 
-        Otherwise returns the species set the builtin Antoine path
-        actually emits: the intersection of the YAML ``metals``
+        Otherwise returns the active species set the builtin Antoine
+        path actually emits: the intersection of the YAML ``metals``
         section with the
         :data:`engines.builtin.vapor_pressure._ELLINGHAM_THERMO` table
         (the builtin only computes a vapor pressure for metals that
-        also have an Ellingham entry), plus the entire YAML
-        ``oxide_vapors`` section.
+        also have an Ellingham entry), plus the active YAML
+        ``oxide_vapors`` section. Rows explicitly marked
+        ``consumer_status: inactive`` are excluded; missing status is
+        active.
 
         Goal #10 hard constraint binds this: the authority swap must
         not change the species set the downstream
@@ -471,12 +474,23 @@ class VapoRockProvider(ChemistryProvider):
         # any order.
         from engines.builtin.vapor_pressure import _ELLINGHAM_THERMO
 
+        def active_species(section: Mapping[str, Any]) -> frozenset[str]:
+            names: set[str] = set()
+            for species, row in section.items():
+                status = ''
+                if isinstance(row, Mapping):
+                    status = str(row.get('consumer_status') or '').lower()
+                if status == 'inactive':
+                    continue
+                names.add(str(species))
+            return frozenset(names)
+
         metals = dict(vapor_pressure_data.get('metals', {}) or {})
         oxide_vapors = dict(vapor_pressure_data.get('oxide_vapors', {}) or {})
         ellingham_metals = frozenset(_ELLINGHAM_THERMO.keys())
         return (
-            (frozenset(metals.keys()) & ellingham_metals)
-            | frozenset(oxide_vapors.keys())
+            (active_species(metals) & ellingham_metals)
+            | active_species(oxide_vapors)
         )
 
     @staticmethod
