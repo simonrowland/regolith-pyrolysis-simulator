@@ -48,7 +48,7 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # 2026-06-15 Mn/Ti Alcock source-equation refit shifts the coupled
 # fallback state at the 1e-11 kg level while preserving wall-temperature
 # invariance.
-PHASE3BIS_SIO_EVOLVED_KG = 0.000508314500607
+PHASE3BIS_SIO_EVOLVED_KG = 0.0005083144891
 
 
 @lru_cache(maxsize=None)

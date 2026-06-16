@@ -49,6 +49,82 @@ ALCOCK_SOURCE_LOG10_PA = {
         },
     },
 }
+NIST_JANAF_MN_SHOMATE = {
+    "solid": [
+        (
+            (298.0, 980.0),
+            {
+                "A": 27.24190,
+                "B": 5.237640,
+                "C": 7.783160,
+                "D": -2.118501,
+                "E": -0.282113,
+                "F": -9.366891,
+                "G": 61.49640,
+                "H": 0.0,
+            },
+        ),
+        (
+            (980.0, 1361.0),
+            {
+                "A": 52.29870,
+                "B": -28.67560,
+                "C": 21.48670,
+                "D": -4.979850,
+                "E": -2.432060,
+                "F": -21.24330,
+                "G": 90.70820,
+                "H": 0.0,
+            },
+        ),
+        (
+            (1361.0, 1412.0),
+            {
+                "A": 19.06450,
+                "B": 31.41340,
+                "C": -14.99350,
+                "D": 3.214741,
+                "E": 1.867090,
+                "F": -2.757881,
+                "G": 48.78900,
+                "H": 0.0,
+            },
+        ),
+        (
+            (1412.0, 1519.0),
+            {
+                "A": -534.1720,
+                "B": 679.0530,
+                "C": -296.3700,
+                "D": 46.42660,
+                "E": 161.3420,
+                "F": 468.7150,
+                "G": -393.5390,
+                "H": 0.0,
+            },
+        ),
+    ],
+    "liquid": {
+        "A": 46.024,
+        "B": 1.953485e-7,
+        "C": -7.567225e-8,
+        "D": 1.005938e-8,
+        "E": 5.623757e-8,
+        "F": -7.80404,
+        "G": 80.69053,
+        "H": 16.28902,
+    },
+    "gas": {
+        "A": 187.6779,
+        "B": -97.75372,
+        "C": 20.1924,
+        "D": -1.274577,
+        "E": -177.4957,
+        "F": 1.5487,
+        "G": 219.6751,
+        "H": 283.2572,
+    },
+}
 
 
 def _vapor_pressure_data() -> dict:
@@ -57,7 +133,8 @@ def _vapor_pressure_data() -> dict:
 
 
 def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
-    coeff = entry["pure_component_antoine"]
+    coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
+    assert block == "pure_component_antoine"
     return 10.0 ** (
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
@@ -82,6 +159,74 @@ def _alcock_source_pa(species: str, phase: str, temperature_K: float) -> float:
         + coeff["D"] * temperature_K * 1e-3
     )
     return 10.0 ** log10_pa
+
+
+def _shomate_h_increment_kj_mol(coeff: dict, temperature_K: float) -> float:
+    t = temperature_K / 1000.0
+    return (
+        coeff["A"] * t
+        + coeff["B"] * t**2 / 2.0
+        + coeff["C"] * t**3 / 3.0
+        + coeff["D"] * t**4 / 4.0
+        - coeff["E"] / t
+        + coeff["F"]
+        - coeff["H"]
+    )
+
+
+def _shomate_s_j_mol_k(coeff: dict, temperature_K: float) -> float:
+    t = temperature_K / 1000.0
+    return (
+        coeff["A"] * math.log(t)
+        + coeff["B"] * t
+        + coeff["C"] * t**2 / 2.0
+        + coeff["D"] * t**3 / 3.0
+        - coeff["E"] / (2.0 * t**2)
+        + coeff["G"]
+    )
+
+
+def _nist_janaf_mn_liquid_pa(temperature_K: float) -> float:
+    gas = NIST_JANAF_MN_SHOMATE["gas"]
+    liquid = NIST_JANAF_MN_SHOMATE["liquid"]
+    gas_gibbs = (
+        gas["H"]
+        + _shomate_h_increment_kj_mol(gas, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(gas, temperature_K) / 1000.0
+    )
+    liquid_gibbs = (
+        liquid["H"]
+        + _shomate_h_increment_kj_mol(liquid, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(liquid, temperature_K) / 1000.0
+    )
+    delta_g_j_mol = (gas_gibbs - liquid_gibbs) * 1000.0
+    return 100_000.0 * math.exp(
+        -delta_g_j_mol / (GAS_CONSTANT * temperature_K)
+    )
+
+
+def _nist_janaf_mn_solid_pa(temperature_K: float) -> float:
+    gas = NIST_JANAF_MN_SHOMATE["gas"]
+    solid = None
+    for (low, high), coeff in NIST_JANAF_MN_SHOMATE["solid"]:
+        if low <= temperature_K <= high:
+            solid = coeff
+            break
+    assert solid is not None
+    gas_gibbs = (
+        gas["H"]
+        + _shomate_h_increment_kj_mol(gas, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(gas, temperature_K) / 1000.0
+    )
+    solid_gibbs = (
+        solid["H"]
+        + _shomate_h_increment_kj_mol(solid, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(solid, temperature_K) / 1000.0
+    )
+    delta_g_j_mol = (gas_gibbs - solid_gibbs) * 1000.0
+    return 100_000.0 * math.exp(
+        -delta_g_j_mol / (GAS_CONSTANT * temperature_K)
+    )
 
 
 def _runtime_recovered_reference_pressure_pa(
@@ -133,13 +278,13 @@ def _require_certified_pure_component_antoine(entry: dict, temperature_K: float)
 @pytest.mark.parametrize(
     ("species", "temperature_K", "rel_tol"),
     [
-        # No NIST WebBook Antoine row is exposed for these species in SRD 69
-        # Mask=4; Mg/Fe remain NBP-anchored CC estimates.
-        ("Mg", 1364.15, 0.02),  # CRC/NIST element data: Mg normal boiling point 1091 C.
+        # Mg now uses a CRC/Stull source-table fit; it remains within a few
+        # percent of the NIST normal boiling point.
+        ("Mg", 1364.15, 0.03),  # CRC/NIST element data: Mg normal boiling point 1091 C.
         ("Fe", 3135.15, 0.02),  # CRC/NIST element data: Fe normal boiling point 2862 C.
-        # CRC/CR2 / Alcock-Itkin-Horrigan table converted to pure_component_antoine.
+        # CRC/CR2 / Alcock-Itkin-Horrigan and NIST-JANAF derived fits.
         ("Ti", 3560.15, 1e-6),
-        ("Mn", 2334.15, 1e-6),
+        ("Mn", 2334.526, 1e-9),
     ],
 )
 def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
@@ -170,9 +315,14 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         ("Si", 2200.0, 2_194.210607, 1e-6),
         # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
         ("Cr", 2200.0, 2_704.347348, 1e-6),
+        # CRC.b/Stull source-tabulated Mg pressure levels.
+        ("Mg", 701.0, 1.0, 0.07),
+        ("Mg", 971.0, 1_000.0, 0.07),
+        ("Mg", 1361.0, 100_000.0, 0.07),
         # CRC/CR2 / Alcock-Itkin-Horrigan source equation, not rounded table anchors.
         ("Ti", 1982.0, _alcock_source_pa("Ti", "liquid", 1982.0), 0.005),
-        ("Mn", 1493.0, _alcock_source_pa("Mn", "solid", 1493.0), 0.03),
+        # NIST/JANAF/Chase Mn solid-gas Shomate evaluation-derived fit.
+        ("Mn", 1493.0, _nist_janaf_mn_solid_pa(1493.0), 0.005),
     ],
 )
 def test_pure_component_antoine_matches_published_vapor_pressure_points(
@@ -195,13 +345,9 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
         ("Ti", "liquid", 1982.0, 0.005),
         ("Ti", "liquid", 2171.0, 0.005),
         ("Ti", "liquid", 2400.0, 0.005),
-        ("Mn", "solid", 1228.0, 0.03),
-        ("Mn", "solid", 1347.0, 0.03),
-        ("Mn", "solid", 1493.0, 0.03),
-        ("Mn", "solid", 1519.0, 0.03),
     ],
 )
-def test_mn_ti_runtime_pure_component_sidecars_match_alcock_source_equation(
+def test_ti_runtime_pure_component_sidecar_matches_alcock_source_equation(
     species: str,
     phase: str,
     temperature_K: float,
@@ -211,9 +357,9 @@ def test_mn_ti_runtime_pure_component_sidecars_match_alcock_source_equation(
     row = data["metals"][species]
     expected_pa = _alcock_source_pa(species, phase, temperature_K)
 
-    assert "Alcock-Itkin-Horrigan 1984" in row["pure_component_antoine"]["source"]
-    coeff, block = vapor_pressure_antoine_coefficients(row)
+    coeff, block = vapor_pressure_antoine_coefficients(row, temperature_K)
     assert block == "pure_component_antoine"
+    assert "Alcock-Itkin-Horrigan" in coeff["source"]
     assert _coefficient_pa(dict(coeff), temperature_K) == pytest.approx(
         expected_pa,
         rel=rel_tol,
@@ -225,19 +371,94 @@ def test_mn_ti_runtime_pure_component_sidecars_match_alcock_source_equation(
     ) == pytest.approx(expected_pa, rel=rel_tol)
 
 
+@pytest.mark.parametrize("temperature_K", [1228.0, 1347.0, 1493.0, 1519.0])
+def test_mn_solid_runtime_sidecar_matches_nist_janaf_evaluation(
+    temperature_K: float,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"]["Mn"]
+    fit_pa = _pure_component_antoine_pa(row, temperature_K)
+    basis_pa = _nist_janaf_mn_solid_pa(temperature_K)
+    metadata_residual = row["pure_component_antoine"]["segments"][0][
+        "max_abs_log10_residual_vs_source"
+    ]
+
+    assert "REF-020" in row["pure_component_antoine"]["segments"][0]["source"]
+    assert abs(math.log10(fit_pa / basis_pa)) <= metadata_residual + 1e-9
+    assert _runtime_recovered_reference_pressure_pa(
+        data,
+        "Mn",
+        temperature_K,
+    ) == pytest.approx(basis_pa, rel=0.005)
+
+
+def test_mn_solid_liquid_runtime_join_is_continuous_at_melting_point() -> None:
+    row = _vapor_pressure_data()["metals"]["Mn"]
+    pure = row["pure_component_antoine"]
+    solid, liquid = pure["segments"]
+
+    previous = solid["previous_mixed_source_join"]
+    assert previous["solid_alcock_fit_Pa_at_1519"] == pytest.approx(
+        146.555678795071,
+    )
+    assert previous["liquid_nist_fit_Pa_at_1519"] == pytest.approx(
+        135.857037585870,
+    )
+    assert previous["liquid_minus_solid_pct"] == pytest.approx(-7.300052306)
+    assert previous["dex_log10_liquid_over_solid"] == pytest.approx(
+        -0.032920510906,
+    )
+
+    solid_fit_pa = _coefficient_pa(dict(solid), 1519.0)
+    liquid_fit_pa = _coefficient_pa(dict(liquid), 1519.0)
+    assert solid_fit_pa == pytest.approx(liquid_fit_pa, rel=1e-12)
+    assert solid_fit_pa == pytest.approx(solid["join_anchor_Pa"], rel=1e-12)
+
+
+@pytest.mark.parametrize("temperature_K", [1560.0, 1700.0, 1710.0, 2000.0, 2240.0, 2334.526])
+def test_mn_liquid_runtime_sidecar_matches_nist_janaf_evaluation(
+    temperature_K: float,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"]["Mn"]
+    fit_pa = _pure_component_antoine_pa(row, temperature_K)
+    basis_pa = _nist_janaf_mn_liquid_pa(temperature_K)
+    metadata_residual = row["pure_component_antoine"]["segments"][1][
+        "max_abs_log10_residual_vs_source"
+    ]
+
+    assert "REF-020" in row["pure_component_antoine"]["segments"][1]["source"]
+    assert abs(math.log10(fit_pa / basis_pa)) <= metadata_residual + 1e-9
+    if temperature_K == 2334.526:
+        assert fit_pa == pytest.approx(PA_PER_ATM, rel=1e-9)
+
+
+def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
+    text = (DATA_DIR / "vapor_pressures.yaml").read_text()
+
+    assert "REF-020 NIST-JANAF/Chase 1998" in text
+    assert "chosen" in text
+    assert "REF-033 CRC/Stull" in text
+    assert "REF-034 Kaye-Laby/NPL" in text
+    assert "-7.300052%" in text
+    assert "25-32% high-vs-low CRC/Kaye-Laby spread" in text
+    assert "Barin agrees with NIST/JANAF at about 1-4%" in text
+    assert "Kaye-Laby/NPL is the 13-30% low outlier" in text
+
+
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
     [
         ("Na", 1118.0, 61_691.685390, 1e-6),
         ("K", 1033.0, 104_572.576518, 1e-6),
-        ("Mg", 1364.15, PA_PER_ATM, 0.02),
+        ("Mg", 1364.15, PA_PER_ATM, 0.03),
         ("Fe", 3135.15, PA_PER_ATM, 0.02),
         ("Ca", 1500.0, 21_740.153809, 1e-6),
         ("Al", 2200.0, 46_484.884967, 1e-6),
         ("Si", 2200.0, 2_194.210607, 1e-6),
         ("Ti", 3560.15, PA_PER_ATM, 1e-6),
         ("Cr", 2200.0, 2_704.347348, 1e-6),
-        ("Mn", 2334.15, PA_PER_ATM, 1e-6),
+        ("Mn", 2334.526, PA_PER_ATM, 1e-9),
     ],
 )
 def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(
@@ -302,10 +523,11 @@ def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
     label_cases = [
         ("Fe", 3135.15, "pure_component_first_principles"),
         ("Na", 1118.0, "pure_component_first_principles"),
-        ("Mn", 1519.0, "pure_component_first_principles"),
-        ("Mn", 1700.0, "pure_component_extrapolated"),
-        ("Mn", 2000.0, "pure_component_extrapolated"),
-        ("Ti", 2400.0, "pure_component_first_principles"),
+        ("Mn", 1519.0, "pure_component_derived_from_evaluation"),
+        ("Mn", 1700.0, "pure_component_derived_from_evaluation"),
+        ("Mn", 2000.0, "pure_component_derived_from_evaluation"),
+        ("Mn", 2400.0, "pure_component_extrapolated"),
+        ("Ti", 2400.0, "pure_component_source_equation_fit"),
         ("Ti", 2500.0, "pure_component_extrapolated"),
     ]
     for species, temperature_K, expected_fragment in label_cases:
@@ -321,7 +543,7 @@ def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
         assert expected_fragment in label
         if expected_fragment == "pure_component_extrapolated":
             assert "pure_component_first_principles" not in label
-            assert "extrapolated_beyond_source_equation_range_K" in label
+            assert "extrapolated_beyond_source" in label
 
     interval_only = data["foulant_vapor"]["NaF"]
     _, interval_block = vapor_pressure_antoine_coefficients(interval_only)

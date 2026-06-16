@@ -128,9 +128,80 @@ def _is_mapping(value: Any) -> bool:
     return isinstance(value, Mapping)
 
 
-def _source_text(row: Mapping[str, Any] | None, coefficient_block: str | None) -> str:
+def _range_tuple(value: Any) -> tuple[float, float] | None:
+    if not value or len(value) != 2:
+        return None
+    try:
+        return float(value[0]), float(value[1])
+    except (TypeError, ValueError):
+        return None
+
+
+def _selected_temperature_segment(
+    block: Mapping[str, Any],
+    temperature_K: float | None,
+) -> Mapping[str, Any]:
+    segments = block.get("segments")
+    if not isinstance(segments, list):
+        return block
+    candidates = [segment for segment in segments if _is_mapping(segment)]
+    if not candidates:
+        return block
+    if temperature_K is None:
+        default_name = str(block.get("default_segment", "") or "")
+        for segment in candidates:
+            if default_name and str(segment.get("name", "")) == default_name:
+                return segment
+        return block if block.get("A") is not None else candidates[0]
+
+    ranged: list[tuple[float, float, Mapping[str, Any]]] = []
+    for segment in candidates:
+        valid_range = _range_tuple(
+            segment.get("valid_range_K")
+            or segment.get("source_certified_range_K")
+            or segment.get("source_equation_range_K")
+            or segment.get("fit_range_K")
+        )
+        if valid_range is None:
+            continue
+        low, high = valid_range
+        if low <= temperature_K <= high:
+            return segment
+        ranged.append((low, high, segment))
+    if not ranged:
+        return candidates[-1]
+    ranged.sort(key=lambda item: item[0])
+    if temperature_K < ranged[0][0]:
+        return ranged[0][2]
+    return ranged[-1][2]
+
+
+def _coefficient_mapping(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    *,
+    temperature_K: float | None = None,
+) -> Mapping[str, Any]:
+    block = (row or {}).get(coefficient_block or "")
+    if not _is_mapping(block):
+        return {}
+    if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
+        return _selected_temperature_segment(block, temperature_K)
+    return block
+
+
+def _source_text(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    *,
+    temperature_K: float | None = None,
+) -> str:
     if coefficient_block:
-        block = (row or {}).get(coefficient_block)
+        block = _coefficient_mapping(
+            row,
+            coefficient_block,
+            temperature_K=temperature_K,
+        )
         if _is_mapping(block) and block.get("source"):
             return str(block.get("source"))
     return str((row or {}).get("source", "") or "")
@@ -153,6 +224,8 @@ def _is_legacy_or_uncertified_source(source: str) -> bool:
 def _has_grounded_pure_component_source(
     row: Mapping[str, Any] | None,
     coefficient_block: str | None,
+    *,
+    temperature_K: float | None = None,
 ) -> bool:
     if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
         return False
@@ -161,19 +234,23 @@ def _has_grounded_pure_component_source(
     coeff = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
     if not _is_mapping(coeff):
         return False
-    source = _source_text(row, coefficient_block)
+    source = _source_text(row, coefficient_block, temperature_K=temperature_K)
     return bool(source) and not _is_legacy_or_uncertified_source(source)
 
 
 def vapor_pressure_antoine_coefficients(
     row: Mapping[str, Any] | None,
+    temperature_K: float | None = None,
 ) -> tuple[Mapping[str, Any], str]:
     """Return the runtime Antoine block and its provenance key."""
 
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
-            return pure, COEFF_BLOCK_PURE_COMPONENT
+            return (
+                _selected_temperature_segment(pure, temperature_K),
+                COEFF_BLOCK_PURE_COMPONENT,
+            )
     antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
     if _is_mapping(antoine):
         return antoine, COEFF_BLOCK_ANTOINE
@@ -183,8 +260,13 @@ def vapor_pressure_antoine_coefficients(
 def vapor_pressure_valid_range_K(
     row: Mapping[str, Any] | None,
     coefficient_block: str | None,
+    temperature_K: float | None = None,
 ) -> Any:
-    block = (row or {}).get(coefficient_block or "")
+    block = _coefficient_mapping(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    )
     if _is_mapping(block) and block.get("valid_range_K") is not None:
         return block.get("valid_range_K")
     return (row or {}).get("valid_range_K")
@@ -193,11 +275,38 @@ def vapor_pressure_valid_range_K(
 def vapor_pressure_source_equation_range_K(
     row: Mapping[str, Any] | None,
     coefficient_block: str | None,
+    temperature_K: float | None = None,
 ) -> Any:
-    block = (row or {}).get(coefficient_block or "")
+    block = _coefficient_mapping(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    )
     if _is_mapping(block) and block.get("source_equation_range_K") is not None:
         return block.get("source_equation_range_K")
-    return (row or {}).get("source_equation_range_K")
+    if _is_mapping(block) and block.get("source_certified_range_K") is not None:
+        return block.get("source_certified_range_K")
+    return (row or {}).get("source_equation_range_K") or (row or {}).get(
+        "source_certified_range_K"
+    )
+
+
+def _source_range_extrapolation_suffix(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    *,
+    temperature_K: float | None = None,
+) -> str:
+    block = _coefficient_mapping(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    )
+    if _is_mapping(block) and block.get("source_certified_range_K") is not None:
+        return "extrapolated_beyond_source_certified_range_K"
+    if (row or {}).get("source_certified_range_K") is not None:
+        return "extrapolated_beyond_source_certified_range_K"
+    return "extrapolated_beyond_source_equation_range_K"
 
 
 def _is_temperature_in_range(
@@ -223,16 +332,39 @@ def vapor_pressure_source_label(
     """Return honest provenance for an Antoine vapor-pressure row."""
 
     target = _fit_target(row)
-    if _has_grounded_pure_component_source(row, coefficient_block):
+    if _has_grounded_pure_component_source(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    ):
         source_range = vapor_pressure_source_equation_range_K(
             row,
             coefficient_block,
+            temperature_K=temperature_K,
         )
         if not _is_temperature_in_range(temperature_K, source_range):
-            return (
-                f"{base_source}:pure_component_extrapolated:"
-                "extrapolated_beyond_source_equation_range_K"
+            suffix = _source_range_extrapolation_suffix(
+                row,
+                coefficient_block,
+                temperature_K=temperature_K,
             )
+            return f"{base_source}:pure_component_extrapolated:{suffix}"
+        coeff = _coefficient_mapping(
+            row,
+            coefficient_block,
+            temperature_K=temperature_K,
+        )
+        provenance_class = str(
+            coeff.get("provenance_class")
+            or coeff.get("source_certification")
+            or ""
+        ).lower()
+        if provenance_class in {"source_equation_fit", "source-equation-fit"}:
+            return f"{base_source}:pure_component_source_equation_fit"
+        if provenance_class in {"source_tabulated_fit", "source-table-fit"}:
+            return f"{base_source}:pure_component_source_tabulated_fit"
+        if provenance_class in {"derived_from_evaluation", "evaluation_fit"}:
+            return f"{base_source}:pure_component_derived_from_evaluation"
         return f"{base_source}:pure_component_first_principles"
     if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
         return f"{base_source}:pure_component_legacy_derivation"
@@ -452,7 +584,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 continue
 
             antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-                sp_data
+                sp_data,
+                temperature_K=T_K,
             )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
@@ -462,6 +595,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             valid_range = vapor_pressure_valid_range_K(
                 sp_data,
                 coefficient_block,
+                temperature_K=T_K,
             )
             if valid_range and len(valid_range) == 2:
                 valid_low = float(valid_range[0])

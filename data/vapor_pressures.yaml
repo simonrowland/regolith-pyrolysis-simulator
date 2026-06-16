@@ -166,10 +166,21 @@ metals:
         composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
-      source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~128.0 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
-      A: 9.906866
-      B: 6685.903376
-      C: 0
+      source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation"
+      provenance_class: "source_tabulated_fit"
+      source_basis: "crc_stull_mg_pressure_level_table"
+      source_certified_range_K: [701, 1361]
+      fit_range_K: [701, 1361]
+      max_table_residual_fraction: 0.0681
+      source_validation_points_Pa_K: [[1, 701], [10, 773], [100, 861], [1000, 971], [10000, 1132], [100000, 1361]]
+      # REF-033 CRC.b/Stull Mg table: 1,10,100,1000,10000,100000 Pa at
+      # 701,773,861,971,1132,1361 K. REF-034 Kaye-Laby/NPL alternative:
+      # 200,1000,2000,5000,10000,20000,50000,101325 Pa at
+      # 891,979,1025,1085,1140,1205,1295,1375 K.
+      A: 9.4964271591
+      B: 5613.103906
+      C: -110.759803
+      valid_range_K: [701, 1361]
     evaporation_alpha:
       value: 0.20
       source: "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21"
@@ -331,6 +342,7 @@ metals:
     source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for titanium; runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
+      source_certification: "source_equation_fit"
       source_equation:
         original_form: "log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted A"
         solid:
@@ -407,32 +419,89 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MnO"
     fit_target: "pure_component_psat"
-    source: "REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for manganese; runtime pure-component source is pure_component_antoine"
+    source: "REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn->Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-032 Alcock-Itkin-Horrigan 1984 manganese solid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1228-1519 K plus exact 2334.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)"
-      source_equation:
-        original_form: "log10(P/atm)=A+B/T+C*log10(T)+D*T*1e-3; CRC/CR2 mirror stores Pa-converted A"
-        solid:
-          range_K: [298, 1519]
-          A_log10_P_atm: 12.805283
-          A_log10_P_Pa: 17.811
-          B: -15097
-          C: -1.7896
-          D: 0
-        liquid:
-          status: "No manganese liquid equation is exposed in the CRC/CR2 Alcock row used here; the normal-boiling point is retained as an out-of-source anchor."
-      fit_source_phase: "solid"
-      fit_range_K: [1228, 1519]
-      source_equation_range_K: [298, 1519]
-      anchored_extrapolation_range_K: [1519, 2334.15]
-      dense_sample_step_K: 10
-      normal_boiling_anchor_K: 2334.15
-      max_abs_log10_residual_vs_source: 0.012517
-      source_validation_points_Pa_K: [[0.974085, 1228], [10.065015, 1347], [104.435282, 1493], [150.837282, 1519], [101325, 2334.15]]
-      A: 9.340804288
-      B: 8928.339999733
-      C: -274.597652474
-      valid_range_K: [1228, 2334.15]
+      source: "REF-020 NIST-JANAF/Chase 1998 Mn(s/l)->Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators"
+      default_segment: "liquid_nist_janaf_chase_1998"
+      # Mn adjudication (2026-06-15/16): before the solid refit, the Alcock
+      # solid fit gave 146.555679 Pa at 1519 K while the NIST/JANAF liquid fit
+      # gave 135.857038 Pa (-7.300052%, -0.032920511 dex). The discontinuity
+      # was a mixed-source artifact, so runtime now uses REF-020 NIST/JANAF
+      # solid and liquid evaluation-derived fits on both sides of melting.
+      # Liquid-source spread at the Kaye-Laby anchors: REF-034 Kaye-Laby/NPL
+      # Pa=[200,1000,2000,5000,10000,20000,50000,101325] at
+      # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF
+      # Pa=[227,1202,2348,6022,11935,23627,61195,131242]; REF-033 CRC/Stull
+      # Pa=[248,1320,2570,6513,12749,24858,62813,131877]. That is roughly a
+      # 25-32% high-vs-low CRC/Kaye-Laby spread, while NIST/JANAF is +13.5% to
+      # +29.5% vs Kaye-Laby. NIST/JANAF was chosen because both adjudication
+      # lenses ranked it #1; Barin agrees with NIST/JANAF at about 1-4%, and
+      # Kaye-Laby/NPL is the 13-30% low outlier in-band.
+      segments:
+        - name: "solid_nist_janaf_chase_1998"
+          phase: "solid"
+          source: "REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity"
+          provenance_class: "derived_from_evaluation"
+          source_basis: "nist_janaf_chase_1998_mn_solid_gas_delta_g"
+          fit_source_phase: "solid"
+          fit_range_K: [1228, 1519]
+          source_certified_range_K: [1228, 1519]
+          dense_sample_step_K: 1
+          join_anchor_K: 1519
+          join_anchor_Pa: 135.857037585870
+          previous_mixed_source_join:
+            solid_alcock_fit_Pa_at_1519: 146.555678795071
+            liquid_nist_fit_Pa_at_1519: 135.857037585870
+            liquid_minus_solid_pct: -7.300052306
+            dex_log10_liquid_over_solid: -0.032920510906
+          nist_janaf_shomate:
+            solid_valid_ranges_K: [[298, 980], [980, 1361], [1361, 1412], [1412, 1519]]
+            gas_valid_range_K: [2334.526, 6000]
+            pressure_standard_Pa: 100000
+            solid_segments:
+              - range_K: [298, 980]
+                coeffs: {A: 27.24190, B: 5.237640, C: 7.783160, D: -2.118501, E: -0.282113, F: -9.366891, G: 61.49640, H: 0.000000}
+              - range_K: [980, 1361]
+                coeffs: {A: 52.29870, B: -28.67560, C: 21.48670, D: -4.979850, E: -2.432060, F: -21.24330, G: 90.70820, H: 0.000000}
+              - range_K: [1361, 1412]
+                coeffs: {A: 19.06450, B: 31.41340, C: -14.99350, D: 3.214741, E: 1.867090, F: -2.757881, G: 48.78900, H: 0.000000}
+              - range_K: [1412, 1519]
+                coeffs: {A: -534.1720, B: 679.0530, C: -296.3700, D: 46.42660, E: 161.3420, F: 468.7150, G: -393.5390, H: 0.000000}
+            gas: {A: 187.6779, B: -97.75372, C: 20.1924, D: -1.274577, E: -177.4957, F: 1.5487, G: 219.6751, H: 283.2572}
+          max_abs_log10_residual_vs_source: 0.001821246382
+          rms_log10_residual_vs_source: 0.000822869366
+          source_validation_points_Pa_K: [[0.819334481954, 1228], [9.049304759415, 1347], [94.125208869261, 1493], [135.288503868270, 1519]]
+          A: 10.009757269940
+          B: 10422.298996403371
+          C: -195.814921905335
+          valid_range_K: [1228, 1519]
+        - name: "liquid_nist_janaf_chase_1998"
+          phase: "liquid"
+          source: "REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K"
+          provenance_class: "derived_from_evaluation"
+          source_basis: "nist_janaf_chase_1998_mn_liquid_gas_delta_g"
+          fit_source_phase: "liquid"
+          fit_range_K: [1519, 2334.526]
+          source_certified_range_K: [1519, 2334.526]
+          dense_sample_step_K: 1
+          normal_boiling_anchor_K: 2334.526
+          max_abs_log10_residual_vs_source: 0.004586423
+          rms_log10_residual_vs_source: 0.002724018
+          nist_janaf_shomate:
+            liquid_valid_range_K: [1519, 2334.526]
+            gas_valid_range_K: [2334.526, 6000]
+            pressure_standard_Pa: 100000
+            liquid: {A: 46.024, B: 0.0000001953485, C: -0.00000007567225, D: 0.00000001005938, E: 0.00000005623757, F: -7.80404, G: 80.69053, H: 16.28902}
+            gas: {A: 187.6779, B: -97.75372, C: 20.1924, D: -1.274577, E: -177.4957, F: 1.5487, G: 219.6751, H: 283.2572}
+          source_validation_points_Pa_K: [[227.443448, 1560], [1201.584972, 1710], [2348.349189, 1780], [6021.823769, 1890], [11935.014410, 1980], [23627.443367, 2080], [61195.177777, 2240], [101325, 2334.526]]
+          A: 9.790868189660
+          B: 10402.946653439165
+          C: -160.520331526149
+          valid_range_K: [1519, 2334.526]
+      A: 9.790868189660
+      B: 10402.946653439165
+      C: -160.520331526149
+      valid_range_K: [1228, 2334.526]
     evaporation_alpha_policy:
       tier: 3
       policy: "fail_loud_missing_alpha"

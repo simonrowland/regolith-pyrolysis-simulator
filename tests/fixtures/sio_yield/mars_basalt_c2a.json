@@ -3,32 +3,32 @@
   "campaign": "C2A_continuous",
   "alpha_SiO": 0.04,
   "alpha_provenance": "Phase 1 \u03b1 surface (commit fc2d40b); SF2004 Table 10 SiO2(liq) Hashimoto 1990",
-  "sio_evolved_kg": 0.000486760127234,
+  "sio_evolved_kg": 0.000486760127354,
   "sio_to_silica_fume_kg": {
     "stage_1_fe_condenser_impurity": 0.0,
-    "stage_3_sio_zone_product": 7.08250677453e-05,
-    "stage_4_alkali_mg_carryover": 0.000130125122166,
-    "stage_5_dust_filter_carryover": 8.5718361884e-05,
-    "terminal_offgas_escape": 6.21053352271e-05
+    "stage_3_sio_zone_product": 7.08250677727e-05,
+    "stage_4_alkali_mg_carryover": 0.000130125122217,
+    "stage_5_dust_filter_carryover": 8.57183619172e-05,
+    "terminal_offgas_escape": 6.21053352511e-05
   },
   "wall_deposit_kg": {
     "Fe": 0.0,
     "K": 0.0,
-    "Mg": 9.4266754132e-05,
+    "Mg": 9.43638581852e-05,
     "Na": 0.0,
     "SiO": 0.0
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
     "dominant_species": "Mg",
-    "wall_deposit_kg_per_campaign": 9.4266754132e-05,
+    "wall_deposit_kg_per_campaign": 9.43638581852e-05,
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "resinter_threshold_kg / 9.4266754132e-05",
+    "campaigns_to_resinter": "resinter_threshold_kg / 9.43638581852e-05",
     "fast_fouling_campaign_threshold": 10,
     "verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling"
   },
-  "sio_yield_pct_of_feedstock": 4.86760127234e-05,
+  "sio_yield_pct_of_feedstock": 4.86760127354e-05,
   "industrial_benchmark_pct": [
     8,
     15

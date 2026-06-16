@@ -74,9 +74,14 @@ GOLDENS = (
 # lunar 0.000508314373589 -> 0.000508314489862; mars unchanged in this gate.
 # 2026-06-15 Mn/Ti Alcock source-equation refit removes sparse-anchor drift:
 # lunar 0.000508314489862 -> 0.000508314500607; mars unchanged in this gate.
+# 2026-06-15 Mn/Mg vapor upgrade: Mn liquid is rebased to NIST-JANAF/Chase
+# and Mg is rebased from a CC estimate to the CRC/Stull source-table fit.
+# Lunar SiO moves 0.000508314500607 -> 0.0005083144891 and Mars moves
+# 0.000486760127234 -> 0.000486760127354. The visible golden movement is
+# mostly Mg wall-deposit/fouling text; SiO movement is FP-scale.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.000508314500607,
-    "mars_basalt": 0.000486760127234,
+    "lunar_mare_low_ti": 0.0005083144891,
+    "mars_basalt": 0.000486760127354,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

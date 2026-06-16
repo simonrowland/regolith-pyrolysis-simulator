@@ -127,6 +127,14 @@ class _MnOnlyMelt:
         return {"MnO": 100.0}
 
 
+class _MnAboveNbpMelt:
+    temperature_C = 2400.0 - 273.15
+    p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"MnO": 100.0}
+
+
 class _SiOnlyMelt:
     temperature_C = 1900.0 - 273.15
     p_total_mbar = 1e-3
@@ -230,7 +238,7 @@ def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
     )
 
 
-def test_legacy_fallback_downgrades_mn_source_extrapolation(
+def test_legacy_fallback_grounds_mn_liquid_source_band(
     vapor_pressure_data,
 ):
     stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnOnlyMelt())
@@ -240,10 +248,22 @@ def test_legacy_fallback_downgrades_mn_source_extrapolation(
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert (
         result.vapor_pressures_source["Mn"]
-        == (
-            "builtin_fallback:pure_component_extrapolated:"
-            "extrapolated_beyond_source_equation_range_K"
-        )
+        == "builtin_fallback:pure_component_derived_from_evaluation"
+    )
+
+
+def test_legacy_fallback_downgrades_mn_above_nbp_source_extrapolation(
+    vapor_pressure_data,
+):
+    stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnAboveNbpMelt())
+
+    result = stub._stub_equilibrium()
+
+    assert result.vapor_pressures_Pa["Mn"] > 0.0
+    assert result.vapor_pressures_source["Mn"] == (
+        "builtin_fallback:pure_component_extrapolated:"
+        "extrapolated_beyond_source_certified_range_K:"
+        "extrapolated_beyond_valid_range_K"
     )
 
 

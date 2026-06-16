@@ -324,7 +324,8 @@ class EquilibriumMixin:
             # pure-component rationale applies only to
             # fit_target=pure_component_psat rows.
             antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-                sp_data
+                sp_data,
+                temperature_K=T_K,
             )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
@@ -334,6 +335,7 @@ class EquilibriumMixin:
                 valid_range = vapor_pressure_valid_range_K(
                     sp_data,
                     coefficient_block,
+                    temperature_K=T_K,
                 )
                 if valid_range and len(valid_range) == 2:
                     valid_low = float(valid_range[0])

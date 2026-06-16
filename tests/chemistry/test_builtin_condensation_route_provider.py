@@ -59,51 +59,51 @@ from tests.chemistry.conftest import _build_sim
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 5.765103279171706e-12,
-            "Fe": 1.4352989621673002e-08,
-            "Mg": 0.0013803934568436388,
+            "Cr": 5.81184172340107e-12,
+            "Fe": 1.443285407851698e-08,
+            "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 5.765103279171707e-12,
-            "Mg": 0.0013803934568436388,
+            "Cr": 5.81184172340107e-12,
+            "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.0013803934568436388,
+            "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.001380393456843639,
+            "Mg": 0.001357753072500162,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "Fe": 1.1713911382237009e-08,
-            "Mg": 0.0010156830657809266,
+            "Mg": 0.0010008115924345748,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 0.0010156830657809266,
+            "Mg": 0.0010008115924345748,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.0010156830657809266,
+            "Mg": 0.0010008115924345748,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.0010156830657809261,
+            "Mg": 0.0010008115924345744,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 4.558018629656041e-12,
-            "Fe": 7.087320891569394e-09,
-            "Mg": 0.003021082376891546,
+            "Cr": 4.258038549940918e-12,
+            "Fe": 6.766047932577008e-09,
+            "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 4.558018629656041e-12,
-            "Mg": 0.003021082376891546,
+            "Cr": 4.258038549940918e-12,
+            "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.003021082376891546,
+            "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.0030210823768915466,
+            "Mg": 0.002977858833864812,
         },
     },
 }
