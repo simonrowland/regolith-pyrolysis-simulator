@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from enum import Enum
 import hashlib
+from functools import lru_cache
+import importlib
+from importlib import metadata as importlib_metadata
 import inspect
 import math
 import re
@@ -30,6 +33,8 @@ from simulator.lab_schedule import (
 )
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
+    DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
     EvalSpec,
     cache_key,
     current_code_version,
@@ -88,6 +93,21 @@ LAB_OVERLAY_SCOPE_FIELDS = (
     "oxide_vapor_ceiling_digest",
     "sink_channel_evidence_digests",
 )
+_VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES = {
+    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
+        "engines.vaporock.provider",
+        "simulator.melt_backend.vaporock",
+    ),
+    DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID: (
+        "engines.builtin.vapor_pressure",
+    ),
+}
+_VAPOR_PRESSURE_PROVIDER_UPSTREAM_PACKAGES = {
+    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
+        "vaporock",
+        "thermoengine",
+    ),
+}
 _RUN_REFERENCE_CANONICAL_FIELDS = (
     "evidence_class",
     "cache_state",
@@ -1309,6 +1329,18 @@ def _build_eval_inputs(
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
 
+    diagnostic_chemistry_kernel = _diagnostic_chemistry_kernel_run_config(
+        run_options["chemistry_kernel"]
+    )
+    force_builtin_vapor_pressure = bool(run_options["force_builtin_vapor_pressure"])
+    allow_fallback_vapor = (
+        bool(run_options["allow_fallback_vapor"]) or force_builtin_vapor_pressure
+    )
+    vapor_pressure_provider_id = _effective_vapor_pressure_provider_id(
+        force_builtin_vapor_pressure=force_builtin_vapor_pressure,
+        allow_fallback_vapor=allow_fallback_vapor,
+    )
+
     run_config = PyrolysisRun(
         feedstock_id=feedstock_id,
         campaign=str(run_options["campaign"]),
@@ -1323,11 +1355,9 @@ def _build_eval_inputs(
         c5_enabled=bool(run_options["c5_enabled"]),
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
-        chemistry_kernel=_diagnostic_chemistry_kernel_run_config(
-            run_options["chemistry_kernel"]
-        ),
+        chemistry_kernel=diagnostic_chemistry_kernel,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
-        force_builtin_vapor_pressure=bool(run_options["force_builtin_vapor_pressure"]),
+        force_builtin_vapor_pressure=force_builtin_vapor_pressure,
     )._session_config()
 
     data_digests = {
@@ -1360,7 +1390,14 @@ def _build_eval_inputs(
         mre_target_species=str(run_options["mre_target_species"]),
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
-        chemistry_kernel=run_options["chemistry_kernel"],
+        chemistry_kernel=diagnostic_chemistry_kernel,
+        vapor_pressure_provider_id=vapor_pressure_provider_id,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=allow_fallback_vapor,
+        force_builtin_vapor_pressure=force_builtin_vapor_pressure,
+        vapor_pressure_provider_code_fingerprint=(
+            _vapor_pressure_provider_code_fingerprint(vapor_pressure_provider_id)
+        ),
         **run_options["lab_overlay_scope"],
         target_spec_id=str(target_metadata["target_spec_id"]),
         target_spec_digest=str(target_metadata["target_spec_digest"]),
@@ -1437,6 +1474,54 @@ def _lab_overlay_scope_options(merged: Mapping[str, Any]) -> dict[str, Any]:
         for field_name in LAB_OVERLAY_SCOPE_FIELDS
         if field_name in scope
     }
+
+
+def _effective_vapor_pressure_provider_id(
+    *,
+    force_builtin_vapor_pressure: bool,
+    allow_fallback_vapor: bool,
+) -> str:
+    if force_builtin_vapor_pressure:
+        return DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    if _vaporock_available():
+        return DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    if allow_fallback_vapor:
+        return DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    return DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+
+
+@lru_cache(maxsize=1)
+def _vaporock_available() -> bool:
+    try:
+        from simulator.melt_backend.vaporock import vaporock_runtime_available
+
+        return vaporock_runtime_available()
+    except Exception:  # noqa: BLE001 - mirrors provider library-boundary posture
+        return False
+
+
+@lru_cache(maxsize=None)
+def _vapor_pressure_provider_code_fingerprint(provider_id: str) -> str:
+    digest = hashlib.sha256()
+    digest.update(str(provider_id).encode("utf-8"))
+    for module_name in _VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES.get(provider_id, ()):
+        digest.update(module_name.encode("utf-8"))
+        try:
+            module = importlib.import_module(module_name)
+            source = inspect.getsource(module)
+        except Exception as exc:  # noqa: BLE001 - package/version boundary
+            source = f"unavailable:{type(exc).__name__}:{exc}"
+        digest.update(source.encode("utf-8"))
+    for package_name in _VAPOR_PRESSURE_PROVIDER_UPSTREAM_PACKAGES.get(provider_id, ()):
+        digest.update(f"package:{package_name}".encode("utf-8"))
+        try:
+            version = importlib_metadata.version(package_name)
+        except importlib_metadata.PackageNotFoundError:
+            version = "missing"
+        except Exception as exc:  # noqa: BLE001 - package metadata boundary
+            version = f"unavailable:{type(exc).__name__}:{exc}"
+        digest.update(str(version).encode("utf-8"))
+    return digest.hexdigest()
 
 
 def _diagnostic_chemistry_kernel_run_config(

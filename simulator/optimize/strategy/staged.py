@@ -176,6 +176,13 @@ def make_prefix_eval_spec(
         c5_enabled=base_spec.c5_enabled,
         mre_max_voltage_V=base_spec.mre_max_voltage_V,
         mre_target_species=base_spec.mre_target_species,
+        vapor_pressure_provider_id=base_spec.vapor_pressure_provider_id,
+        vapor_pressure_fallback_provider_id=base_spec.vapor_pressure_fallback_provider_id,
+        allow_fallback_vapor=base_spec.allow_fallback_vapor,
+        force_builtin_vapor_pressure=base_spec.force_builtin_vapor_pressure,
+        vapor_pressure_provider_code_fingerprint=(
+            base_spec.vapor_pressure_provider_code_fingerprint
+        ),
         prefix_stage_ids=stage_ids,
         prefix_recipe_ids=recipe_ids,
         topology_id=topology_id,

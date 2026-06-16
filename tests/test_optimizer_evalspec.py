@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import replace
+import importlib.util
 import json
 import math
 from pathlib import Path
@@ -19,6 +20,8 @@ from simulator.lab_schedule import (
     normalize_lab_schedule,
 )
 from simulator.optimize.evalspec import (
+    DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
     EvalSpec,
     cache_key,
     canonical_evalspec_json,
@@ -26,6 +29,8 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+import simulator.optimize.evaluate as evaluate_module
+import simulator.melt_backend.vaporock as vaporock_module
 from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
@@ -34,18 +39,19 @@ from simulator.runner import PyrolysisRun, RunnerError
 
 
 PINNED_EVALSPEC_JSON = (
-    b'{"additives_kg":{"CaO":"1.500000000"},"backend_name":"stub",'
-    b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
-    b'"allow_builtin_fallback":false,"engine":"builtin",'
+    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
+    b'"backend_name":"stub","c5_enabled":false,"campaign":"C0",'
+    b'"chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
     b'"data_digests":{"feedstocks":"feedstock-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
     b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
     b'"feedstock_recipe_digest":"feedstock-recipe-digest","fidelity":"fast",'
-    b'"hours":24,"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000",'
-    b'"mre_target_species":"","profile_id":"oxygen-yield-v1",'
-    b'"recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":{'
-    b'"hold_time_h":"1.000000000"}},"track":"pyrolysis"}'
+    b'"force_builtin_vapor_pressure":false,"hours":24,'
+    b'"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000",'
+    b'"mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id",'
+    b'"runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},'
+    b'"track":"pyrolysis","vapor_pressure_provider_id":"vaporock"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -232,10 +238,61 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
                 "pressure_Pa": 0.001,
             },
         ),
+        ("vapor_pressure_provider_code_fingerprint", "provider-source-sha256:changed"),
     ),
 )
 def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
+
+
+def test_fallback_provider_id_is_not_keyed_when_fallback_disabled() -> None:
+    first = _base_spec(
+        allow_fallback_vapor=False,
+        vapor_pressure_fallback_provider_id="fallback-a",
+    )
+    second = _base_spec(
+        allow_fallback_vapor=False,
+        vapor_pressure_fallback_provider_id="fallback-b",
+    )
+    enabled_first = _base_spec(
+        allow_fallback_vapor=True,
+        vapor_pressure_fallback_provider_id="fallback-a",
+    )
+    enabled_second = _base_spec(
+        allow_fallback_vapor=True,
+        vapor_pressure_fallback_provider_id="fallback-b",
+    )
+
+    assert cache_key(first) == cache_key(second)
+    assert b"vapor_pressure_fallback_provider_id" not in canonical_evalspec_json(first)
+    assert cache_key(enabled_first) != cache_key(enabled_second)
+
+
+def test_provider_code_fingerprint_splits_cache_key() -> None:
+    first = _base_spec(vapor_pressure_provider_code_fingerprint="source-sha256:a")
+    second = _base_spec(vapor_pressure_provider_code_fingerprint="source-sha256:b")
+
+    assert cache_key(first) != cache_key(second)
+    assert b"source-sha256:a" in canonical_evalspec_json(first)
+
+
+def test_nested_vapor_fallback_flag_is_not_dual_keyed() -> None:
+    base = _base_spec()
+    nested_only = _base_spec(
+        chemistry_kernel={
+            "engine": "builtin",
+            "allow_builtin_fallback": False,
+            "pressure_Pa": 0.001,
+            "allow_fallback_vapor": True,
+        },
+        allow_fallback_vapor=False,
+    )
+
+    assert cache_key(nested_only) == cache_key(base)
+    assert b'"allow_fallback_vapor":false' in canonical_evalspec_json(nested_only)
+    assert b'"chemistry_kernel":{"allow_fallback_vapor"' not in canonical_evalspec_json(
+        nested_only
+    )
 
 
 def test_lab_overlay_scope_serializes_deterministically_and_only_when_non_empty() -> None:
@@ -375,6 +432,315 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     assert run_config.c5_enabled is True
     assert run_config.mre_max_voltage_V == pytest.approx(1.4)
     assert run_config.mre_target_species == "SiO2"
+
+
+def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "vapor-provider-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "allow_fallback_vapor": True,
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: True)
+    available_spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
+    unavailable_spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert available_spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert unavailable_spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    )
+    assert available_spec.allow_fallback_vapor is True
+    assert unavailable_spec.allow_fallback_vapor is True
+    assert cache_key(available_spec) != cache_key(unavailable_spec)
+
+
+def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "vapor-provider-init-fail-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "allow_fallback_vapor": True,
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+    init_calls = []
+
+    def fake_find_spec(name: str) -> object | None:
+        if name in {"vaporock", "thermoengine"}:
+            return object()
+        return None
+
+    def fake_initialize(self, config):
+        init_calls.append(dict(config))
+        self._available = False
+        self._last_error = "mock VapoRock init failure"
+        return False
+
+    def clear_probe_caches() -> None:
+        getattr(vaporock_module.vaporock_runtime_available, "cache_clear", lambda: None)()
+        evaluate_module._vaporock_available.cache_clear()
+
+    monkeypatch.setattr(importlib.util, "find_spec", fake_find_spec)
+    monkeypatch.setattr(
+        vaporock_module.VapoRockBackend,
+        "initialize",
+        fake_initialize,
+    )
+    clear_probe_caches()
+    try:
+        spec, _ = evaluate_module._build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile,
+            RecipeSchema(),
+        )
+        assert vaporock_module.vaporock_runtime_available() is False
+    finally:
+        clear_probe_caches()
+
+    assert init_calls == [{}]
+    assert spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    )
+    assert spec.allow_fallback_vapor is True
+    assert b'"vapor_pressure_provider_id":"builtin-vapor-pressure"' in (
+        canonical_evalspec_json(spec)
+    )
+
+
+def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "strict-vapor-provider-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "allow_fallback_vapor": False,
+            "force_builtin_vapor_pressure": False,
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
+    spec, run_config = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    canonical = canonical_evalspec_json(spec)
+
+    assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert spec.allow_fallback_vapor is False
+    assert spec.force_builtin_vapor_pressure is False
+    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
+    assert b"builtin-vapor-pressure" not in canonical
+
+
+def test_build_eval_inputs_force_builtin_short_circuits_vaporock_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "force-builtin-vapor-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "allow_fallback_vapor": True,
+            "force_builtin_vapor_pressure": True,
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    def fail_probe() -> bool:
+        raise AssertionError("force-builtin keying must not probe VapoRock")
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", fail_probe)
+    spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    )
+    assert spec.force_builtin_vapor_pressure is True
+
+
+def test_build_eval_inputs_keys_provider_code_fingerprint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "vapor-code-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "force_builtin_vapor_pressure": True,
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_vapor_pressure_provider_code_fingerprint",
+        lambda provider_id: f"{provider_id}:source-a",
+    )
+    first_spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+    monkeypatch.setattr(
+        evaluate_module,
+        "_vapor_pressure_provider_code_fingerprint",
+        lambda provider_id: f"{provider_id}:source-b",
+    )
+    second_spec, _ = evaluate_module._build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert first_spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    )
+    assert first_spec.vapor_pressure_provider_code_fingerprint.endswith(":source-a")
+    assert second_spec.vapor_pressure_provider_code_fingerprint.endswith(":source-b")
+    assert cache_key(first_spec) != cache_key(second_spec)
+
+
+def test_provider_code_fingerprint_includes_upstream_package_versions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    versions = {
+        "vaporock": "1.0.0",
+        "thermoengine": "1.2.0",
+    }
+
+    def fake_version(package_name: str) -> str:
+        if package_name in versions:
+            return versions[package_name]
+        raise evaluate_module.importlib_metadata.PackageNotFoundError(package_name)
+
+    monkeypatch.setattr(evaluate_module.importlib_metadata, "version", fake_version)
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+    first = evaluate_module._vapor_pressure_provider_code_fingerprint(
+        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    )
+    versions["vaporock"] = "1.0.1"
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+    second = evaluate_module._vapor_pressure_provider_code_fingerprint(
+        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    )
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+
+    assert first != second
 
 
 def test_build_eval_inputs_records_lab_overlay_scope_without_runtime_behavior() -> None:

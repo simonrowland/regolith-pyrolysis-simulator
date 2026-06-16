@@ -113,6 +113,8 @@ _RUN_KEYS = frozenset(
         "chemistry_kernel",
         "lab_overlay_scope",
         "lab_overlay",
+        "allow_fallback_vapor",
+        "force_builtin_vapor_pressure",
         "lab_alpha_digest",
         "geometry_digest",
         "effective_exposed_area_m2",
@@ -497,6 +499,20 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
     if "mre_target_species" in raw and not isinstance(raw["mre_target_species"], str):
         raise ProfileValidationError(
             f"{source}: {where}.mre_target_species must be a string"
+        )
+    if "allow_fallback_vapor" in raw and not isinstance(
+        raw["allow_fallback_vapor"],
+        bool,
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.allow_fallback_vapor must be bool"
+        )
+    if "force_builtin_vapor_pressure" in raw and not isinstance(
+        raw["force_builtin_vapor_pressure"],
+        bool,
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.force_builtin_vapor_pressure must be bool"
         )
     if "chemistry_kernel" in raw:
         try:

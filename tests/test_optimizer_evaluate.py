@@ -33,6 +33,7 @@ from simulator.optimize.evaluate import (
     _composition_target_constraints,
     evaluate,
 )
+from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
 from simulator.optimize.objective import objective_definitions
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
@@ -2560,6 +2561,53 @@ def test_evalspec_cache_key_and_scored_result_are_deterministic() -> None:
     assert first.eval_spec == second.eval_spec
     assert first.objectives == second.objectives
     assert first.feasible == second.feasible
+
+
+def test_strict_vaporock_unavailable_eval_fails_closed_with_vaporock_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = {
+        "profile_id": "strict-vapor-runtime-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": PROFILE["objectives"],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+            "allow_fallback_vapor": False,
+            "force_builtin_vapor_pressure": False,
+        },
+        "fidelities": {"fast": {"backend_name": "stub", "hours": 1}},
+    }
+    executor = FakeExecutor(
+        _execution(
+            status="failed",
+            error_message="VapoRock provider unavailable",
+        )
+    )
+
+    monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
+    with pytest.raises(BackendUnavailableAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=profile,
+            executor=executor,
+        )
+
+    kernel_config = executor.config.setpoints.get("chemistry_kernel", {})
+    assert kernel_config.get("allow_fallback_vapor", False) is False
+    assert executor.config.force_builtin_vapor_pressure is None
+    assert raised.value.eval_spec is not None
+    assert raised.value.eval_spec.vapor_pressure_provider_id == (
+        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    )
+    assert raised.value.eval_spec.allow_fallback_vapor is False
 
 
 def test_composition_target_evalspec_carries_target_digest() -> None:

@@ -319,6 +319,14 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
         },
     }
     base = _spec(RecipePatch({}), profile=profile)
+    base = replace(
+        base,
+        vapor_pressure_provider_id="builtin-vapor-pressure",
+        vapor_pressure_fallback_provider_id="builtin-vapor-pressure",
+        allow_fallback_vapor=True,
+        force_builtin_vapor_pressure=True,
+        vapor_pressure_provider_code_fingerprint="provider-source-sha256:test",
+    )
     prefix = make_prefix_eval_spec(
         base,
         prefix_stage_ids=("C0",),
@@ -346,6 +354,15 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_prefix.eval_spec.c5_enabled is True
     assert loaded_prefix.eval_spec.mre_max_voltage_V == pytest.approx(1.4)
     assert loaded_prefix.eval_spec.mre_target_species == "SiO2"
+    assert loaded_prefix.eval_spec.vapor_pressure_provider_id == "builtin-vapor-pressure"
+    assert loaded_prefix.eval_spec.vapor_pressure_fallback_provider_id == (
+        "builtin-vapor-pressure"
+    )
+    assert loaded_prefix.eval_spec.allow_fallback_vapor is True
+    assert loaded_prefix.eval_spec.force_builtin_vapor_pressure is True
+    assert loaded_prefix.eval_spec.vapor_pressure_provider_code_fingerprint == (
+        "provider-source-sha256:test"
+    )
 
 
 def test_staged_clean_import_boundary_then_touch_loads_evaluate_only() -> None:

@@ -33,7 +33,8 @@ _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
 REQUIRED_DATA_DIGEST_KEYS = frozenset(
     ("feedstocks", "profile", "setpoints", "vapor_pressures")
 )
-# TODO(O-P2b store): optional code-tree fingerprint.
+DEFAULT_VAPOR_PRESSURE_PROVIDER_ID = "vaporock"
+DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID = "builtin-vapor-pressure"
 
 
 @dataclass(frozen=True)
@@ -67,6 +68,11 @@ class EvalSpec:
     target_spec_digest: str = ""
     target_maturity: Mapping[str, Any] = field(default_factory=dict)
     target_provenance: Mapping[str, Any] = field(default_factory=dict)
+    vapor_pressure_provider_id: str = DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    vapor_pressure_fallback_provider_id: str = DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    allow_fallback_vapor: bool = False
+    force_builtin_vapor_pressure: bool = False
+    vapor_pressure_provider_code_fingerprint: str = ""
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -83,6 +89,9 @@ class EvalSpec:
             "geometry_digest",
             "area_basis",
             "oxide_vapor_ceiling_digest",
+            "vapor_pressure_provider_id",
+            "vapor_pressure_fallback_provider_id",
+            "vapor_pressure_provider_code_fingerprint",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -92,6 +101,10 @@ class EvalSpec:
             raise TypeError("mass_kg must be numeric")
         if not isinstance(self.c5_enabled, bool):
             raise TypeError("c5_enabled must be a bool")
+        if not isinstance(self.allow_fallback_vapor, bool):
+            raise TypeError("allow_fallback_vapor must be a bool")
+        if not isinstance(self.force_builtin_vapor_pressure, bool):
+            raise TypeError("force_builtin_vapor_pressure must be a bool")
         if isinstance(self.mre_max_voltage_V, bool) or not isinstance(
             self.mre_max_voltage_V, (int, float, Decimal)
         ):
@@ -182,6 +195,11 @@ class EvalSpec:
                 self.target_spec_digest,
                 _thaw_value(self.target_maturity),
                 _thaw_value(self.target_provenance),
+                self.vapor_pressure_provider_id,
+                self.vapor_pressure_fallback_provider_id,
+                self.allow_fallback_vapor,
+                self.force_builtin_vapor_pressure,
+                self.vapor_pressure_provider_code_fingerprint,
             ),
         )
 
@@ -237,6 +255,11 @@ class PrefixEvalSpec(EvalSpec):
                 self.target_spec_digest,
                 _thaw_value(self.target_maturity),
                 _thaw_value(self.target_provenance),
+                self.vapor_pressure_provider_id,
+                self.vapor_pressure_fallback_provider_id,
+                self.allow_fallback_vapor,
+                self.force_builtin_vapor_pressure,
+                self.vapor_pressure_provider_code_fingerprint,
                 self.prefix_stage_ids,
                 self.prefix_recipe_ids,
                 self.topology_id,
@@ -255,7 +278,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "backend_name": spec.backend_name,
         "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
-        "chemistry_kernel": spec.chemistry_kernel,
+        "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
         "code_version": spec.code_version,
         "data_digests": spec.data_digests,
         "feedstock_id": spec.feedstock_id,
@@ -269,7 +292,18 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "recipe_id": spec.recipe_id,
         "runtime_campaign_overrides": spec.runtime_campaign_overrides,
         "track": spec.track,
+        "vapor_pressure_provider_id": spec.vapor_pressure_provider_id,
+        "allow_fallback_vapor": spec.allow_fallback_vapor,
+        "force_builtin_vapor_pressure": spec.force_builtin_vapor_pressure,
     }
+    if spec.allow_fallback_vapor:
+        payload["vapor_pressure_fallback_provider_id"] = (
+            spec.vapor_pressure_fallback_provider_id
+        )
+    if spec.vapor_pressure_provider_code_fingerprint:
+        payload["vapor_pressure_provider_code_fingerprint"] = (
+            spec.vapor_pressure_provider_code_fingerprint
+        )
     if spec.lab_schedule:
         payload["lab_schedule"] = spec.lab_schedule
     payload.update(lab_overlay_scope_payload(spec))
@@ -296,6 +330,13 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
 
 def cache_key(spec: EvalSpec) -> str:
     return hashlib.sha256(canonical_evalspec_json(spec)).hexdigest()
+
+
+def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any]:
+    payload = dict(kernel)
+    payload.pop("allow_fallback_vapor", None)
+    payload.pop("force_builtin_vapor_pressure", None)
+    return payload
 
 
 def lab_overlay_scope_payload(spec: EvalSpec) -> dict[str, Any]:

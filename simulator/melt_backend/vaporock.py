@@ -91,6 +91,7 @@ conflate gaseous SiO2 with melt SiO2 and break the atom-explicit
 from __future__ import annotations
 
 import importlib
+from functools import lru_cache
 import math
 import re
 import warnings
@@ -147,6 +148,27 @@ _IMPORT_CANDIDATES = (
     'vaporock',
     'VapoRock',
 )
+
+
+@lru_cache(maxsize=1)
+def vaporock_runtime_available() -> bool:
+    """Return the same adapter availability signal runtime fallback uses.
+
+    This pays one adapter initialisation per process and performs no
+    equilibrium solve. Force-builtin optimizer runs short-circuit before this
+    probe, while live VapoRock runs initialise the adapter during execution
+    anyway, so the probe adds no net cost on the VapoRock path.
+    """
+    backend = VapoRockBackend()
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            initialized = backend.initialize({})
+    except Exception:  # noqa: BLE001 - mirrors provider boundary catch
+        return False
+    if not initialized:
+        return False
+    return backend.is_available()
 
 
 class VapoRockBackend(MeltBackend):

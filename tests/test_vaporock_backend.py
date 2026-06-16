@@ -78,6 +78,41 @@ def test_missing_vaporock_import_marks_backend_unavailable(monkeypatch):
     assert "VapoRock" in backend._last_error
 
 
+def test_runtime_probe_uses_backend_initialize_without_equilibrating(monkeypatch):
+    init_calls = []
+    equilibrate_calls = []
+
+    def fake_initialize(self, config):
+        init_calls.append(dict(config))
+        self._available = True
+        return True
+
+    def fake_equilibrate(self, *args, **kwargs):
+        equilibrate_calls.append((args, kwargs))
+        raise AssertionError("runtime availability probe must not solve equilibrium")
+
+    monkeypatch.setattr(
+        vaporock_module.VapoRockBackend,
+        "initialize",
+        fake_initialize,
+    )
+    monkeypatch.setattr(
+        vaporock_module.VapoRockBackend,
+        "equilibrate",
+        fake_equilibrate,
+    )
+
+    vaporock_module.vaporock_runtime_available.cache_clear()
+    try:
+        assert vaporock_module.vaporock_runtime_available() is True
+        assert vaporock_module.vaporock_runtime_available() is True
+    finally:
+        vaporock_module.vaporock_runtime_available.cache_clear()
+
+    assert init_calls == [{}]
+    assert equilibrate_calls == []
+
+
 def test_unavailable_equilibrate_returns_empty_result_with_warning():
     backend = VapoRockBackend()
 

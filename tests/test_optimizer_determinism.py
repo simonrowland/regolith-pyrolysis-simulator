@@ -12,7 +12,13 @@ from simulator.optimize.determinism import (
     pin_seeds,
     pin_worker_env,
 )
-from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
+from simulator.optimize.evalspec import (
+    DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
+    EvalSpec,
+    cache_key,
+    current_code_version,
+)
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
@@ -114,6 +120,44 @@ def _result(
         ),
         notes=notes,
     )
+
+
+def test_evalspec_cache_key_splits_vapor_provider_mode() -> None:
+    live_vaporock = _base_spec(
+        vapor_pressure_provider_id=DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=False,
+        force_builtin_vapor_pressure=False,
+    )
+    forced_builtin = _base_spec(
+        vapor_pressure_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=True,
+        force_builtin_vapor_pressure=True,
+    )
+    identical_forced_builtin = _base_spec(
+        vapor_pressure_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=True,
+        force_builtin_vapor_pressure=True,
+    )
+    provider_only_changed = _base_spec(
+        vapor_pressure_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=False,
+        force_builtin_vapor_pressure=False,
+    )
+    fallback_only_changed = _base_spec(
+        vapor_pressure_provider_id=DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
+        vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
+        allow_fallback_vapor=True,
+        force_builtin_vapor_pressure=False,
+    )
+
+    assert cache_key(live_vaporock) != cache_key(forced_builtin)
+    assert cache_key(live_vaporock) != cache_key(provider_only_changed)
+    assert cache_key(live_vaporock) != cache_key(fallback_only_changed)
+    assert cache_key(forced_builtin) == cache_key(identical_forced_builtin)
 
 
 def test_deterministic_eval_repeats_identical_view() -> None:
