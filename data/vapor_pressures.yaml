@@ -54,6 +54,7 @@ metals:
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 7.460770
       B: 1873.728
       C: -416.372
@@ -116,6 +117,7 @@ metals:
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 9.457180
       B: 4691.58
       C: 24.195
@@ -222,6 +224,7 @@ metals:
         fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
     pure_component_antoine:
       source: "REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm"
+      provenance_class: "derived_from_evaluation"
       A: 10.670336
       B: 17759.430841
       C: 0
@@ -254,6 +257,7 @@ metals:
     source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 7.784730
       B: 3121.368
       C: -594.591
@@ -283,6 +287,7 @@ metals:
     source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 10.736230
       B: 13204.109
       C: -24.306
@@ -313,6 +318,7 @@ metals:
     source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 14.564360
       B: 23308.848
       C: -123.133
@@ -396,6 +402,7 @@ metals:
     source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5"
+      source_certification: "source_equation_fit"
       A: 11.023710
       B: 16064.989
       C: -83.86
@@ -634,6 +641,7 @@ foulant_vapor:
     carrier_is_own_vapor: true
     pure_component_antoine:
       source: "REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C"
+      source_certification: "source_equation_fit"
       A: 10.07184
       B: 8388.497
       C: -82.638
@@ -657,6 +665,7 @@ foulant_vapor:
     carrier_is_own_vapor: true
     pure_component_antoine:
       source: "REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)"
+      provenance_class: "derived_from_evaluation"
       A: 10.185900
       B: 8774.500
       C: 0

@@ -506,7 +506,7 @@ def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pres
     )
 
 
-def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
+def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
     data = _vapor_pressure_data()
 
     grounded = data["metals"]["Cr"]
@@ -517,12 +517,17 @@ def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
             grounded,
             coefficient_block=grounded_block,
         )
-        == "builtin_fallback:pure_component_first_principles"
+        == "builtin_fallback:pure_component_source_equation_fit"
     )
 
     label_cases = [
-        ("Fe", 3135.15, "pure_component_first_principles"),
-        ("Na", 1118.0, "pure_component_first_principles"),
+        ("Na", 1118.0, "pure_component_source_equation_fit"),
+        ("K", 1033.0, "pure_component_source_equation_fit"),
+        ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
+        ("Ca", 1700.0, "pure_component_source_equation_fit"),
+        ("Al", 2300.0, "pure_component_source_equation_fit"),
+        ("Si", 2500.0, "pure_component_source_equation_fit"),
+        ("Cr", 2700.0, "pure_component_source_equation_fit"),
         ("Mn", 1519.0, "pure_component_derived_from_evaluation"),
         ("Mn", 1700.0, "pure_component_derived_from_evaluation"),
         ("Mn", 2000.0, "pure_component_derived_from_evaluation"),
@@ -544,6 +549,35 @@ def test_first_principles_label_requires_grounded_selected_sidecar() -> None:
         if expected_fragment == "pure_component_extrapolated":
             assert "pure_component_first_principles" not in label
             assert "extrapolated_beyond_source" in label
+
+    foulant_label_cases = [
+        ("NaCl", "pure_component_source_equation_fit"),
+        ("KCl", "pure_component_derived_from_evaluation"),
+    ]
+    for species, expected_fragment in foulant_label_cases:
+        foulant = data["foulant_vapor"][species]
+        _, block = vapor_pressure_antoine_coefficients(foulant)
+        assert block == "pure_component_antoine"
+        label = vapor_pressure_source_label(
+            "builtin_fallback",
+            foulant,
+            coefficient_block=block,
+        )
+        assert expected_fragment in label
+        assert "pure_component_unspecified" not in label
+        assert "pure_component_first_principles" not in label
+
+    unannotated = copy.deepcopy(data["metals"]["Na"])
+    unannotated["pure_component_antoine"].pop("provenance_class", None)
+    unannotated["pure_component_antoine"].pop("source_certification", None)
+    _, unannotated_block = vapor_pressure_antoine_coefficients(unannotated)
+    unannotated_label = vapor_pressure_source_label(
+        "builtin_fallback",
+        unannotated,
+        coefficient_block=unannotated_block,
+    )
+    assert unannotated_label == "builtin_fallback:pure_component_unspecified"
+    assert "pure_component_first_principles" not in unannotated_label
 
     interval_only = data["foulant_vapor"]["NaF"]
     _, interval_block = vapor_pressure_antoine_coefficients(interval_only)

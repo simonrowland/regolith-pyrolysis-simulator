@@ -331,6 +331,16 @@ def vapor_pressure_source_label(
 ) -> str:
     """Return honest provenance for an Antoine vapor-pressure row."""
 
+    # Provenance tiers:
+    # - source_equation_fit: source-published empirical Antoine/vapor equation,
+    #   used as published (unit conversion only), not a local re-fit.
+    # - source_tabulated_fit: local fit to source-published tabulated p(T) data.
+    # - derived_from_evaluation: coefficients derived from an evaluated thermo
+    #   dataset (JANAF/NIST Shomate, or dH_vap + Tb Clausius-Clapeyron anchor).
+    # - pure_component_unspecified: grounded sidecar lacking a tier annotation;
+    #   deliberately non-overclaiming.
+    # - pure_component_first_principles: reserved for genuine derivation from
+    #   physical constants/definitions.
     target = _fit_target(row)
     if _has_grounded_pure_component_source(
         row,
@@ -365,7 +375,9 @@ def vapor_pressure_source_label(
             return f"{base_source}:pure_component_source_tabulated_fit"
         if provenance_class in {"derived_from_evaluation", "evaluation_fit"}:
             return f"{base_source}:pure_component_derived_from_evaluation"
-        return f"{base_source}:pure_component_first_principles"
+        if provenance_class in {"pure_component_first_principles", "first_principles"}:
+            return f"{base_source}:pure_component_first_principles"
+        return f"{base_source}:pure_component_unspecified"
     if coefficient_block == COEFF_BLOCK_PURE_COMPONENT:
         return f"{base_source}:pure_component_legacy_derivation"
     if bool((row or {}).get("interval_required")):
