@@ -24,6 +24,8 @@ from __future__ import annotations
 import re
 from typing import Dict, Iterable, List, Mapping, Tuple
 
+from engines.domain_reason import OutOfDomainReason, reason_value
+
 # Canonical MELTS 14-oxide basis. Sourced verbatim from
 # ``simulator.melt_backend.alphamelts.MELTS_OXIDE_BASIS`` so the provider
 # domain matches what the adapter actually feeds AlphaMELTS.
@@ -104,13 +106,24 @@ class AlphaMELTSDomainGate:
         ``(valid, warnings)`` -- ``valid`` is ``True`` iff every check
         passed; ``warnings`` lists the human-readable rejection reasons.
         """
+        valid, warnings, _reason = AlphaMELTSDomainGate.validate_with_reason(
+            composition_wt_pct
+        )
+        return valid, warnings
+
+    @staticmethod
+    def validate_with_reason(
+        composition_wt_pct: Mapping[str, float],
+    ) -> Tuple[bool, List[str], str | None]:
+        """Validate and return the structured out-of-domain reason code."""
         warnings: List[str] = []
+        reason: OutOfDomainReason | None = None
 
         if not composition_wt_pct:
             warnings.append(
                 'AlphaMELTSDomainGate: empty composition; cannot equilibrate.'
             )
-            return False, warnings
+            return False, warnings, OutOfDomainReason.MAJOR_SUM.value
 
         canonical_wt: Dict[str, float] = {}
         non_oxides: List[str] = []
@@ -147,12 +160,14 @@ class AlphaMELTSDomainGate:
                 canonical_wt[oxide] = canonical_wt.get(oxide, 0.0) + wt
 
         if non_oxides:
+            reason = OutOfDomainReason.FORBIDDEN_SPECIES
             warnings.append(
                 'AlphaMELTSDomainGate: non-oxide species present '
                 f'(metal / sulfide / halide -- must route through Stage 0 '
                 f'first): {sorted(non_oxides)}'
             )
         if unrecognised:
+            reason = reason or OutOfDomainReason.FORBIDDEN_SPECIES
             warnings.append(
                 'AlphaMELTSDomainGate: unrecognised species outside MELTS '
                 f'14-oxide basis: {sorted(unrecognised)}'
@@ -160,6 +175,7 @@ class AlphaMELTSDomainGate:
 
         sio2_pct = canonical_wt.get('SiO2', 0.0)
         if sio2_pct < _SIO2_MIN_WT_PCT or sio2_pct > _SIO2_MAX_WT_PCT:
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
                 f'AlphaMELTSDomainGate: SiO2 = {sio2_pct:.3f} wt% outside '
                 f'MELTS calibration range '
@@ -173,13 +189,16 @@ class AlphaMELTSDomainGate:
             canonical_wt.get(oxide, 0.0) for oxide in MELTS_OXIDE_BASIS
         )
         if major_total <= _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
+            reason = reason or OutOfDomainReason.MAJOR_SUM
             warnings.append(
                 f'AlphaMELTSDomainGate: major-oxide sum = {major_total:.3f} '
                 f'wt% <= {_MAJOR_OXIDE_MIN_TOTAL_WT_PCT} wt%; composition '
                 'is dominated by non-MELTS species.'
             )
 
-        return (not warnings), warnings
+        if warnings and reason is None:
+            reason = OutOfDomainReason.MAJOR_SUM
+        return (not warnings), warnings, reason_value(reason)
 
     @staticmethod
     def oxide_basis() -> Tuple[str, ...]:

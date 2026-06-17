@@ -10,6 +10,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     _is_non_oxide_species_name,
@@ -66,6 +67,7 @@ _MAGEMIN_BULK_SUM_DATABASES = frozenset({"ig", "igad"})
 _VERDICT_B_HARD_FAIL_BACKEND_STATUSES = frozenset(
     {"unavailable", "out_of_domain", "not_converged"}
 )
+_BACKEND_STATUS_PRECEDENCE = ("unavailable", "out_of_domain", "not_converged")
 
 # Per-contaminant effect rows sourced from CONTAMINANT-WARNING-DOC + evidence-E5.
 # Intervals are literature-imported, NOT simulator-measured.
@@ -241,8 +243,18 @@ class VerdictAResult:
 
 
 @dataclass(frozen=True)
+class BackendStatusSignal:
+    status: str
+    reason: str | None = None
+
+    def __str__(self) -> str:
+        return self.status
+
+
+@dataclass(frozen=True)
 class VerdictBResult:
     backend_status: str
+    backend_status_reason: str | None
     layer_a_state: str
     offending_species: tuple[str, ...]
     stripped_domain_valid: bool
@@ -1115,7 +1127,7 @@ def _domain_gate_for_engine(engine: str):
 
 def evaluate_verdict_b(
     cleaned_melt_kg: Mapping[str, float],
-    backend_status: str,
+    backend_status: str | BackendStatusSignal,
     engine: str,
 ) -> VerdictBResult:
     """Hard gate on stripped silicate OOD only; contaminant-present never crashes."""
@@ -1125,12 +1137,22 @@ def evaluate_verdict_b(
     # only for the gate input; the returned stripped wt% and provenance keep the
     # honest post-strip sub-100 mass record.
     domain_oxide_wt_pct = _oxide_ratios_for_domain_check(stripped.oxide_wt_pct)
-    stripped_valid, domain_warnings = gate.validate(domain_oxide_wt_pct)
+    if hasattr(gate, "validate_with_reason"):
+        stripped_valid, domain_warnings, stripped_reason = (
+            gate.validate_with_reason(domain_oxide_wt_pct)
+        )
+    else:
+        stripped_valid, domain_warnings = gate.validate(domain_oxide_wt_pct)
+        stripped_reason = None
 
-    status = str(backend_status)
+    status_signal = _backend_status_signal(backend_status)
+    status = status_signal.status
+    status_reason = status_signal.reason
     hard_gate_failed = (
         status in _VERDICT_B_HARD_FAIL_BACKEND_STATUSES or not stripped_valid
     )
+    if not stripped_valid and status_reason is None:
+        status_reason = reason_value(stripped_reason)
     if hard_gate_failed or not stripped_valid:
         layer_a_state = "out_of_domain"
         offending_species = tuple(sorted(stripped.oxide_wt_pct))
@@ -1143,6 +1165,7 @@ def evaluate_verdict_b(
 
     return VerdictBResult(
         backend_status=status,
+        backend_status_reason=status_reason,
         layer_a_state=layer_a_state,
         offending_species=offending_species,
         stripped_domain_valid=stripped_valid,
@@ -1154,17 +1177,89 @@ def evaluate_verdict_b(
     )
 
 
-def aggregate_backend_status(history: Any, latest: str) -> str:
+def _backend_status_reason_from_mapping(value: Mapping[str, Any]) -> str | None:
+    for key in (
+        "backend_status_reason",
+        "out_of_domain_reason",
+        "reason_out_of_domain",
+    ):
+        reason = value.get(key)
+        if reason is not None:
+            return reason_value(reason)
+    nested = value.get("backend_diagnostics")
+    if isinstance(nested, Mapping):
+        return _backend_status_reason_from_mapping(nested)
+    nested = value.get("diagnostics")
+    if isinstance(nested, Mapping):
+        return _backend_status_reason_from_mapping(nested)
+    return None
+
+
+def _default_backend_status_reason(status: str, reason: str | None) -> str | None:
+    if reason is not None:
+        return reason
+    if status == "unavailable":
+        return OutOfDomainReason.BACKEND_UNAVAILABLE.value
+    if status == "not_converged":
+        return OutOfDomainReason.NOT_CONVERGED.value
+    return None
+
+
+def _backend_status_signal(value: Any) -> BackendStatusSignal:
+    if isinstance(value, BackendStatusSignal):
+        return BackendStatusSignal(
+            status=str(value.status),
+            reason=_default_backend_status_reason(
+                str(value.status), reason_value(value.reason)
+            ),
+        )
+    if isinstance(value, Mapping):
+        status = str(
+            value.get("backend_status")
+            or value.get("status")
+            or value.get("runtime_status")
+            or "ok"
+        )
+        reason = _backend_status_reason_from_mapping(value)
+        return BackendStatusSignal(
+            status=status,
+            reason=_default_backend_status_reason(status, reason),
+        )
+    status = str(
+        getattr(
+            value,
+            "backend_status",
+            getattr(value, "status", value),
+        )
+    )
+    reason = reason_value(
+        getattr(value, "backend_status_reason", getattr(value, "reason", None))
+    )
+    return BackendStatusSignal(
+        status=status,
+        reason=_default_backend_status_reason(status, reason),
+    )
+
+
+def aggregate_backend_status(
+    history: Any,
+    latest: str | BackendStatusSignal | Mapping[str, Any],
+) -> BackendStatusSignal:
     """Mirror run_executor._aggregate_backend_status (no new equilibrium)."""
     try:
-        statuses = [str(s) for s in history]
+        statuses = [_backend_status_signal(s) for s in history]
     except TypeError:
         statuses = []
-    statuses.append(str(latest))
-    for status in ("unavailable", "out_of_domain", "not_converged"):
-        if status in statuses:
-            return status
-    return str(latest)
+    latest_signal = _backend_status_signal(latest)
+    statuses.append(latest_signal)
+    for status in _BACKEND_STATUS_PRECEDENCE:
+        matches = [signal for signal in statuses if signal.status == status]
+        if matches:
+            for signal in matches:
+                if signal.reason is not None:
+                    return signal
+            return matches[0]
+    return latest_signal
 
 
 def build_harness_verdicts(
@@ -1221,9 +1316,29 @@ def build_harness_verdicts(
             getattr(sim, "_last_backend_status", "ok"),
         )
     )
+    status_history = list(getattr(sim, "_backend_status_history", ()) or ())
+    last_ood_diag = getattr(sim, "_last_out_of_domain_diagnostics", None)
+    if isinstance(last_ood_diag, Mapping):
+        ood_reason = _backend_status_reason_from_mapping(last_ood_diag)
+        has_out_of_domain_status = any(
+            _backend_status_signal(signal).status == "out_of_domain"
+            for signal in status_history
+        )
+        if ood_reason is not None and has_out_of_domain_status:
+            status_history.append({
+                "backend_status": "out_of_domain",
+                "backend_status_reason": ood_reason,
+            })
+    latest_signal: Mapping[str, Any] = {"backend_status": latest_status}
+    latest_reason = _backend_status_reason_from_mapping(diag)
+    if latest_reason is not None:
+        latest_signal = {
+            "backend_status": latest_status,
+            "backend_status_reason": latest_reason,
+        }
     backend_status = aggregate_backend_status(
-        getattr(sim, "_backend_status_history", ()),
-        latest_status,
+        status_history,
+        latest_signal,
     )
     verdict_b = evaluate_verdict_b(cleaned_melt_kg, backend_status, engine)
 
@@ -1255,6 +1370,7 @@ def build_harness_verdicts(
         },
         "verdict_b": {
             "backend_status": verdict_b.backend_status,
+            "backend_status_reason": verdict_b.backend_status_reason,
             "layer_a_state": verdict_b.layer_a_state,
             "offending_species": list(verdict_b.offending_species),
             "stripped_domain_valid": verdict_b.stripped_domain_valid,

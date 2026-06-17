@@ -582,7 +582,7 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
     result = backend.equilibrate(
         1400.0,
         composition_mol_by_account={
-            "process.cleaned_melt": {"SiO2": 5.0, "MgO": 3.0},
+            "process.cleaned_melt": {"SiO2": 5.0, "MgO": 3.0, "NaCl": 0.25},
             "process.metal_alloy": {"Fe": 2.0},
             "process.sulfide_matte": {"FeS": 1.0},
         },
@@ -591,11 +591,15 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
     )
 
     comp = captured["composition"]
-    assert "Fe" not in comp and "FeS" not in comp
+    assert "Fe" not in comp and "FeS" not in comp and "NaCl" not in comp
     assert "SiO2" in comp
     dropped_warnings = " ".join(result.warnings)
     assert "process.metal_alloy" in dropped_warnings
     assert "process.sulfide_matte" in dropped_warnings
+    assert "dropped_non_basis_melt_mass" in dropped_warnings
+    dropped = result.diagnostics["dropped_non_basis_melt_mass_kg_by_species"]
+    assert "NaCl" in dropped
+    assert dropped["NaCl"] > 0.0
 
 
 # ----------------------------------------------------------------------

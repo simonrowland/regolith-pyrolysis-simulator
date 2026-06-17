@@ -108,7 +108,7 @@ from simulator.melt_backend.base import (
     MeltBackend,
     MeltCompositionError,
     liquid_fraction_from_phase_masses,
-    project_melt_to_oxide_wt_pct,
+    project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
 from simulator.melt_backend.liquidus import (
@@ -311,12 +311,14 @@ class MAGEMinBackend(MeltBackend):
             # overrides any composition_mol passed alongside it.
             composition_mol = melt_mol
 
-        comp_wt = project_melt_to_oxide_wt_pct(
+        projection = project_melt_to_oxide_projection(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
             oxide_basis=self._MAGEMIN_INPUT_BASIS,
             species_formula_registry=species_formula_registry,
         )
+        comp_wt = projection.oxide_wt_pct
+        prior_warnings.extend(projection.warnings)
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
             return EquilibriumResult(
@@ -329,6 +331,7 @@ class MAGEMinBackend(MeltBackend):
                     'MAGEMin received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
+                diagnostics=projection.diagnostics,
             )
 
         try:
@@ -342,6 +345,7 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, message],
+                diagnostics=projection.diagnostics,
             )
 
         try:
@@ -362,6 +366,7 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='not_converged',
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
+                diagnostics=projection.diagnostics,
             )
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
@@ -394,6 +399,7 @@ class MAGEMinBackend(MeltBackend):
             liquid_composition_wt_pct=liquid_composition_wt_pct,
             status='ok',
             warnings=all_warnings,
+            diagnostics=projection.diagnostics,
         )
         return result
 

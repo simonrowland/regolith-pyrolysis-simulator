@@ -101,7 +101,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
-    project_melt_to_oxide_wt_pct,
+    project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
 from simulator.state import OXIDE_SPECIES
@@ -136,7 +136,7 @@ _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
 # ``simulator.state.OXIDE_SPECIES`` 1:1 (SiO2, TiO2, Al2O3, Fe2O3,
 # Cr2O3, FeO, MnO, MgO, NiO, CoO, CaO, Na2O, K2O, P2O5 plus H2O/CO2 the
 # simulator does not pass through this adapter).  ``OXIDE_SPECIES`` is
-# passed directly to ``project_melt_to_oxide_wt_pct`` rather than via a
+# passed directly to ``project_melt_to_oxide_projection`` rather than via a
 # private alias that just rebinds the same list.
 
 # Verified 2026-05-15: the installed VapoRock package exposes the
@@ -391,12 +391,14 @@ class VapoRockBackend(MeltBackend):
             # overrides any composition_mol passed alongside it.
             composition_mol = melt_mol
 
-        comp_wt = project_melt_to_oxide_wt_pct(
+        projection = project_melt_to_oxide_projection(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
             oxide_basis=tuple(OXIDE_SPECIES),
             species_formula_registry=species_formula_registry,
         )
+        comp_wt = projection.oxide_wt_pct
+        prior_warnings.extend(projection.warnings)
         if not comp_wt:
             # No oxide species in VapoRock's basis after the account
             # split; the vapor-melt solver has nothing valid to consume.
@@ -410,6 +412,7 @@ class VapoRockBackend(MeltBackend):
                     'VapoRock received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
+                diagnostics=projection.diagnostics,
             )
 
         temperature_value = (
@@ -440,6 +443,7 @@ class VapoRockBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='not_converged',
                 warnings=[*prior_warnings, message],
+                diagnostics=projection.diagnostics,
             )
 
         # _call_vaporock already returns a finished species -> Pa dict
@@ -459,6 +463,7 @@ class VapoRockBackend(MeltBackend):
             status='ok',
             warnings=list(prior_warnings),
             vapor_pressures_Pa=dict(vaporock_full_speciation_Pa),
+            diagnostics=projection.diagnostics,
         )
         setattr(
             result,

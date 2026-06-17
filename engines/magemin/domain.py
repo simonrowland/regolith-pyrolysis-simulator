@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from typing import Dict, Iterable, List, Mapping, Tuple
 
+from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.state import OXIDE_SPECIES
 
 # Canonical MELTS 14-oxide basis, sourced from
@@ -40,6 +41,8 @@ _FORBIDDEN_SPECIES: Tuple[str, ...] = (
     # Sulfides / elemental sulfur
     'S', 'S2', 'FeS', 'FeS2', 'NiS', 'Ni3S2', 'Cu2S', 'CuS',
     'CaS', 'MgS', 'Na2S', 'K2S',
+    # Elemental carbon residues
+    'C', 'graphite',
     # Perchlorates / chlorates (Mars regolith)
     'NaClO4', 'KClO4', 'Mg(ClO4)2', 'Ca(ClO4)2',
     # Carbonates / nitrates (Stage 0 territory, not melt)
@@ -96,13 +99,24 @@ class MAGEMinDomainGate:
            dominate).
         5. All species in the input map are in the 14-oxide MELTS basis.
         """
+        valid, warnings, _reason = MAGEMinDomainGate.validate_with_reason(
+            composition_wt_pct
+        )
+        return valid, warnings
+
+    @staticmethod
+    def validate_with_reason(
+        composition_wt_pct: Mapping[str, float],
+    ) -> Tuple[bool, List[str], str | None]:
+        """Validate and return the structured out-of-domain reason code."""
         warnings: List[str] = []
+        reason: OutOfDomainReason | None = None
 
         if not composition_wt_pct:
             warnings.append(
                 'MAGEMinDomainGate: empty composition; cannot equilibrate.'
             )
-            return False, warnings
+            return False, warnings, OutOfDomainReason.MAJOR_SUM.value
 
         normalized = {
             str(species).strip(): float(value)
@@ -113,7 +127,7 @@ class MAGEMinDomainGate:
             warnings.append(
                 'MAGEMinDomainGate: no finite-valued species in composition.'
             )
-            return False, warnings
+            return False, warnings, OutOfDomainReason.MAJOR_SUM.value
 
         # Check 2: forbidden non-oxide species.
         forbidden_present = sorted(
@@ -122,6 +136,7 @@ class MAGEMinDomainGate:
             if amount > 0.0 and species in _FORBIDDEN_SET
         )
         if forbidden_present:
+            reason = OutOfDomainReason.FORBIDDEN_SPECIES
             warnings.append(
                 'MAGEMinDomainGate: non-oxide species present '
                 f'(must route through Stage 0 first): {forbidden_present}'
@@ -136,6 +151,7 @@ class MAGEMinDomainGate:
             and species not in _FORBIDDEN_SET
         )
         if unknown:
+            reason = reason or OutOfDomainReason.FORBIDDEN_SPECIES
             warnings.append(
                 'MAGEMinDomainGate: unrecognised species outside MELTS '
                 f'14-oxide basis: {unknown}'
@@ -144,6 +160,7 @@ class MAGEMinDomainGate:
         # Check 3: SiO2 in [30, 80] wt%.
         sio2 = normalized.get('SiO2', 0.0)
         if sio2 < _SIO2_MIN_WT_PCT or sio2 > _SIO2_MAX_WT_PCT:
+            reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
                 f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
                 f'calibration range [{_SIO2_MIN_WT_PCT}, '
@@ -156,13 +173,16 @@ class MAGEMinDomainGate:
             for species in _MELTS_OXIDE_BASIS
         )
         if major_total < _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
+            reason = reason or OutOfDomainReason.MAJOR_SUM
             warnings.append(
                 f'MAGEMinDomainGate: major-oxide total = {major_total:.2f} '
                 f'wt% below {_MAJOR_OXIDE_MIN_TOTAL_WT_PCT} wt%; '
                 'composition is dominated by non-oxide species.'
             )
 
-        return (not warnings), warnings
+        if warnings and reason is None:
+            reason = OutOfDomainReason.MAJOR_SUM
+        return (not warnings), warnings, reason_value(reason)
 
     @staticmethod
     def oxide_basis() -> Tuple[str, ...]:

@@ -36,6 +36,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
+from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -538,7 +539,9 @@ class AlphaMELTSBackend(MeltBackend):
                         fO2_log=fO2_log,
                         composition_mol=composition_mol,
                         composition_mol_by_account=composition_mol_by_account,
+                        reason=OutOfDomainReason.FORBIDDEN_SPECIES.value,
                     ),
+                    reason=OutOfDomainReason.FORBIDDEN_SPECIES,
                 )
             composition_mol = {}
             for species, mol in composition_mol_by_account.get(
@@ -567,6 +570,9 @@ class AlphaMELTSBackend(MeltBackend):
             composition_wt_pct=raw_comp_wt,
             composition_mol=composition_mol,
             composition_mol_by_account=composition_mol_by_account,
+            reason=(
+                OutOfDomainReason.MAJOR_SUM.value if not raw_comp_wt else None
+            ),
         )
         if not raw_comp_wt:
             # No melt oxides supplied - the engine has nothing valid to act on.
@@ -832,6 +838,7 @@ class AlphaMELTSBackend(MeltBackend):
         composition_mol_by_account: Optional[
             Mapping[str, Mapping[str, float]]
         ] = None,
+        reason: str | None = None,
     ) -> dict[str, object]:
         crash_point: dict[str, object] = {
             'temperature_C': float(temperature_C),
@@ -852,10 +859,13 @@ class AlphaMELTSBackend(MeltBackend):
         )
         if by_account:
             crash_point['composition_mol_by_account'] = by_account
-        return {
+        payload: dict[str, object] = {
             'backend_status': 'out_of_domain',
             'out_of_domain_crash_point': crash_point,
         }
+        if reason is not None:
+            payload['backend_status_reason'] = str(reason)
+        return payload
 
     @staticmethod
     def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:
@@ -914,11 +924,15 @@ class AlphaMELTSBackend(MeltBackend):
         sio2_pct = canonical_wt.get('SiO2', 0.0)
         major_pct = sum(canonical_wt.values())
         reasons: List[str] = []
+        reason: OutOfDomainReason | None = None
         if not 30.0 <= sio2_pct <= 80.0:
+            reason = OutOfDomainReason.SILICATE_WINDOW
             reasons.append(f'SiO2 {sio2_pct:.3f} wt% outside [30, 80]')
         if major_pct <= 95.0:
+            reason = reason or OutOfDomainReason.MAJOR_SUM
             reasons.append(f'major oxide sum {major_pct:.3f} wt% <= 95')
         if non_oxides:
+            reason = OutOfDomainReason.FORBIDDEN_SPECIES
             reasons.append(
                 'non-oxide species present: ' + ', '.join(sorted(non_oxides)))
         if not reasons:
@@ -929,20 +943,26 @@ class AlphaMELTSBackend(MeltBackend):
             fO2_log,
             reasons,
             diagnostics=diagnostics,
+            reason=reason,
         )
 
     def _domain_gate_result(self, temperature_C: float, pressure_bar: float,
                             fO2_log: float,
                             reasons: List[str],
                             diagnostics: Optional[Mapping[str, object]] = None,
+                            reason: OutOfDomainReason | str | None = None,
                             ) -> EquilibriumResult:
+        diagnostics_out = dict(diagnostics or {})
+        structured_reason = reason_value(reason)
+        if structured_reason is not None:
+            diagnostics_out['backend_status_reason'] = structured_reason
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             warnings=['DomainGate rejected: ' + '; '.join(reasons)],
             status='out_of_domain',
-            diagnostics=diagnostics,
+            diagnostics=diagnostics_out,
         )
 
     def _is_non_oxide_species_name(self, name: str) -> bool:
@@ -1977,7 +1997,7 @@ class AlphaMELTSBackend(MeltBackend):
         # Composition alphaMELTS actually solved, projected to the
         # VapoRock helper by the canonical oxide names it filters on.
         # wt% are relative masses, so handing them in as composition_kg
-        # is identical to real kg (project_melt_to_oxide_wt_pct
+        # is identical to real kg (project_melt_to_oxide_projection
         # renormalises to 100%); no separate mol path is needed.
         melt_wt = {
             str(oxide): float(value)

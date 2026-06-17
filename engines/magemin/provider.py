@@ -177,7 +177,9 @@ class MAGEMinShadowProvider(ChemistryProvider):
         # Run the domain gate even when the adapter is None so callers
         # see a meaningful rejection (rather than a silent
         # 'unavailable' surface that hides the input issue).
-        valid, gate_warnings = MAGEMinDomainGate.validate(composition_wt_pct)
+        valid, gate_warnings, gate_reason = (
+            MAGEMinDomainGate.validate_with_reason(composition_wt_pct)
+        )
         if not valid:
             return IntentResult(
                 intent=request.intent,
@@ -188,6 +190,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
                     mode='unavailable',
                     engine_version=self._engine_version(),
                     backend_status='out_of_domain',
+                    backend_status_reason=gate_reason,
                     backend_warnings=tuple(gate_warnings),
                 ).as_diagnostic(),
                 warnings=tuple(gate_warnings),

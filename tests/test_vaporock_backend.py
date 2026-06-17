@@ -150,6 +150,8 @@ def test_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
 
     assert result.status == "out_of_domain"
     assert any("empty melt composition" in w for w in result.warnings)
+    assert any("dropped_non_basis_melt_mass" in w for w in result.warnings)
+    assert result.diagnostics["dropped_non_basis_melt_mass_kg"] > 0.0
 
 
 def test_library_exception_marks_status_not_converged(monkeypatch):

@@ -59,6 +59,7 @@ class MAGEMinShadowDiagnostics:
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
     backend_warnings: Tuple[str, ...] = ()
+    backend_status_reason: Optional[str] = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -92,6 +93,10 @@ class MAGEMinShadowDiagnostics:
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
+        if self.backend_status_reason is not None:
+            object.__setattr__(
+                self, 'backend_status_reason', str(self.backend_status_reason)
+            )
         if self.liquidus_T_K is not None:
             object.__setattr__(self, 'liquidus_T_K', float(self.liquidus_T_K))
         if self.liquidus_T_C is not None:

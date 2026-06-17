@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from typing import Any
 import pytest
 
+from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.builtin.melt_effect_adjustment import (
     CertifiedPointRefusedError,
     EFFECT_TABLE_VERSION,
@@ -20,6 +21,12 @@ from engines.builtin.melt_effect_adjustment import (
     melt_effect_adjustment,
     request_certified_point,
     strip_non_oxide_residuals,
+)
+from engines.domain_reason import OutOfDomainReason
+from engines.magemin.domain import MAGEMinDomainGate
+from simulator.melt_backend.base import (
+    project_melt_to_oxide_projection,
+    project_melt_to_oxide_wt_pct,
 )
 from simulator.run_executor import _aggregate_backend_status
 from simulator.stage0_harness import run_stage0_harness_from_config
@@ -497,6 +504,9 @@ def test_verdict_b_reads_backend_status_no_new_equilibrium():
         _last_backend_status="ok",
         _backend_selection_status="ok",
         _last_backend_diagnostics={},
+        _last_out_of_domain_diagnostics={
+            "backend_status_reason": OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        },
         melt=SimpleNamespace(temperature_C=1400.0),
     )
     cleaned = _basalt_oxide_kg()
@@ -508,8 +518,81 @@ def test_verdict_b_reads_backend_status_no_new_equilibrium():
         T_in_C=1400.0,
     )
     assert verdicts["verdict_b"]["backend_status"] == "out_of_domain"
+    assert verdicts["verdict_b"]["backend_status_reason"] == "forbidden_species"
     assert verdicts["verdict_b"]["hard_gate_failed"] is True
     assert verdicts["verdict_b"]["contaminant_present_never_crash"] is True
+
+
+def test_verdict_b_does_not_inject_stale_ood_reason_into_all_ok_history():
+    sim = SimpleNamespace(
+        _backend_status_history=["ok", "ok"],
+        _last_backend_status="ok",
+        _backend_selection_status="ok",
+        _last_backend_diagnostics={},
+        _last_out_of_domain_diagnostics={
+            "backend_status_reason": OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        },
+        melt=SimpleNamespace(temperature_C=1400.0),
+    )
+    verdicts = build_harness_verdicts(
+        cleaned_melt_kg=_basalt_oxide_kg(),
+        sim=sim,
+        engine="alphamelts",
+        timeline=(),
+        T_in_C=1400.0,
+    )
+    verdict_b = verdicts["verdict_b"]
+    assert verdict_b["backend_status"] == "ok"
+    assert verdict_b["backend_status_reason"] is None
+    assert verdict_b["hard_gate_failed"] is False
+
+
+def test_verdict_b_not_converged_crash_reason_stays_distinct_from_forbidden_species():
+    cleaned = _basalt_oxide_kg()
+    crash_sim = SimpleNamespace(
+        _backend_status_history=[{"backend_status": "not_converged"}],
+        _last_backend_status="ok",
+        _backend_selection_status="ok",
+        _last_backend_diagnostics={"backend_warnings": ("terminated by SIGABRT",)},
+        _last_out_of_domain_diagnostics={
+            "backend_status_reason": OutOfDomainReason.FORBIDDEN_SPECIES.value,
+        },
+        melt=SimpleNamespace(temperature_C=1400.0),
+    )
+    crash_verdict = build_harness_verdicts(
+        cleaned_melt_kg=cleaned,
+        sim=crash_sim,
+        engine="alphamelts",
+        timeline=(),
+        T_in_C=1400.0,
+    )["verdict_b"]
+    assert crash_verdict["backend_status"] == "not_converged"
+    assert crash_verdict["backend_status_reason"] == "not_converged"
+    assert crash_verdict["backend_status_reason"] != "forbidden_species"
+    assert crash_verdict["hard_gate_failed"] is True
+
+    forbidden_sim = SimpleNamespace(
+        _backend_status_history=[
+            {
+                "backend_status": "out_of_domain",
+                "backend_status_reason": OutOfDomainReason.FORBIDDEN_SPECIES.value,
+            }
+        ],
+        _last_backend_status="ok",
+        _backend_selection_status="ok",
+        _last_backend_diagnostics={},
+        _last_out_of_domain_diagnostics={},
+        melt=SimpleNamespace(temperature_C=1400.0),
+    )
+    forbidden_verdict = build_harness_verdicts(
+        cleaned_melt_kg=cleaned,
+        sim=forbidden_sim,
+        engine="alphamelts",
+        timeline=(),
+        T_in_C=1400.0,
+    )["verdict_b"]
+    assert forbidden_verdict["backend_status"] == "out_of_domain"
+    assert forbidden_verdict["backend_status_reason"] == "forbidden_species"
 
 
 def test_verdict_b_does_not_hard_fail_stripping_induced_low_oxide_sum():
@@ -528,6 +611,7 @@ def test_verdict_b_does_not_hard_fail_stripping_induced_low_oxide_sum():
     assert verdict.stripped_domain_valid is True
     assert verdict.hard_gate_failed is False
     assert verdict.backend_status == "ok"
+    assert verdict.backend_status_reason is None
     assert sum(verdict.stripped_oxide_wt_pct.values()) < 95.0
     assert verdict.stripped_mass_provenance
     assert sum(p.kg for p in verdict.stripped_mass_provenance) == pytest.approx(900.0)
@@ -548,6 +632,10 @@ def test_verdict_b_hard_gate_comes_from_backend_status(backend_status):
     assert verdict.stripped_domain_valid is True
     assert verdict.hard_gate_failed is True
     assert verdict.backend_status == backend_status
+    if backend_status == "unavailable":
+        assert verdict.backend_status_reason == "backend_unavailable"
+    elif backend_status == "not_converged":
+        assert verdict.backend_status_reason == "not_converged"
 
 
 def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate_when_backend_ok():
@@ -561,15 +649,95 @@ def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate_when_backend_ok():
     assert verdict.stripped_domain_valid is False
     assert verdict.hard_gate_failed is True
     assert verdict.backend_status == "ok"
+    assert verdict.backend_status_reason == "silicate_window"
     assert verdict.stripped_oxide_wt_pct == {"SiO2": 10.0, "FeO": 90.0}
     assert verdict.domain_warnings
 
 
 def test_aggregate_backend_status_matches_run_executor():
     history = ("ok", "out_of_domain", "ok")
-    assert aggregate_backend_status(history, "ok") == "out_of_domain"
-    assert _aggregate_backend_status(history, "ok") == "out_of_domain"
-    assert aggregate_backend_status((), "not_converged") == "not_converged"
+    signal = aggregate_backend_status(history, "ok")
+    assert signal.status == "out_of_domain"
+    assert str(signal) == "out_of_domain"
+    assert _aggregate_backend_status(history, "ok") == signal.status
+    not_converged = aggregate_backend_status((), "not_converged")
+    assert not_converged.status == "not_converged"
+    assert not_converged.reason == "not_converged"
+
+
+def test_aggregate_backend_status_preserves_structured_reason():
+    signal = aggregate_backend_status(
+        (
+            {"backend_status": "ok"},
+            {
+                "backend_status": "out_of_domain",
+                "backend_status_reason": "forbidden_species",
+            },
+            {"backend_status": "ok"},
+        ),
+        "ok",
+    )
+    assert signal.status == "out_of_domain"
+    assert signal.reason == "forbidden_species"
+
+
+@pytest.mark.parametrize("gate", (AlphaMELTSDomainGate, MAGEMinDomainGate))
+@pytest.mark.parametrize("species", ("Cl", "C", "FeS"))
+def test_domain_gate_reason_for_non_oxide_residuals_is_forbidden_species(
+    gate, species
+):
+    composition = _basalt_oxide_kg(100.0)
+    composition[species] = 0.1
+    valid, warnings, reason = gate.validate_with_reason(composition)
+    assert valid is False
+    assert warnings
+    assert reason == "forbidden_species"
+
+
+@pytest.mark.parametrize("gate", (AlphaMELTSDomainGate, MAGEMinDomainGate))
+def test_domain_gate_reason_for_silicate_window_is_distinct(gate):
+    composition = _basalt_oxide_kg(100.0)
+    composition["SiO2"] = 90.0
+    valid, warnings, reason = gate.validate_with_reason(composition)
+    assert valid is False
+    assert any("SiO2" in warning for warning in warnings)
+    assert reason == "silicate_window"
+
+
+@pytest.mark.parametrize("gate", (AlphaMELTSDomainGate, MAGEMinDomainGate))
+def test_domain_gate_reason_for_major_sum_is_distinct(gate):
+    valid, warnings, reason = gate.validate_with_reason({"SiO2": 40.0, "FeO": 1.0})
+    assert valid is False
+    assert any("major" in warning for warning in warnings)
+    assert reason == "major_sum"
+
+
+def test_melt_oxide_projection_records_dropped_mass_without_no_drop_change():
+    oxide_basis = ("SiO2", "FeO")
+    no_drop_input = {"SiO2": 60.0, "FeO": 40.0}
+    legacy = project_melt_to_oxide_wt_pct(
+        composition_kg=no_drop_input,
+        composition_mol=None,
+        oxide_basis=oxide_basis,
+    )
+    projection = project_melt_to_oxide_projection(
+        composition_kg=no_drop_input,
+        composition_mol=None,
+        oxide_basis=oxide_basis,
+    )
+    assert projection.oxide_wt_pct == legacy
+    assert projection.warnings == ()
+    assert projection.diagnostics == {}
+
+    dropped = project_melt_to_oxide_projection(
+        composition_kg={**no_drop_input, "NaCl": 5.0},
+        composition_mol=None,
+        oxide_basis=oxide_basis,
+    )
+    assert dropped.oxide_wt_pct == legacy
+    assert dropped.dropped_mass_kg_by_species == {"NaCl": 5.0}
+    assert dropped.diagnostics["dropped_non_basis_melt_mass_kg"] == pytest.approx(5.0)
+    assert "dropped_non_basis_melt_mass" in dropped.warnings[0]
 
 
 def test_cache_neutral_modules_not_in_source_patterns():

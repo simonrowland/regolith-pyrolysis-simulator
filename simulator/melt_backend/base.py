@@ -145,6 +145,25 @@ def split_cleaned_melt_account(
     return melt_mol, sorted(dropped)
 
 
+@dataclass(frozen=True)
+class MeltOxideProjection:
+    oxide_wt_pct: Dict[str, float]
+    dropped_mass_kg_by_species: Dict[str, float]
+    warnings: tuple[str, ...] = ()
+
+    @property
+    def diagnostics(self) -> Dict[str, Any]:
+        total = sum(self.dropped_mass_kg_by_species.values())
+        if total <= 0.0:
+            return {}
+        return {
+            "dropped_non_basis_melt_mass_kg_by_species": dict(
+                self.dropped_mass_kg_by_species
+            ),
+            "dropped_non_basis_melt_mass_kg": total,
+        }
+
+
 def project_melt_to_oxide_wt_pct(
     *,
     composition_kg: Optional[Dict[str, float]],
@@ -152,6 +171,21 @@ def project_melt_to_oxide_wt_pct(
     oxide_basis: tuple,
     species_formula_registry: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, float]:
+    return project_melt_to_oxide_projection(
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        oxide_basis=oxide_basis,
+        species_formula_registry=species_formula_registry,
+    ).oxide_wt_pct
+
+
+def project_melt_to_oxide_projection(
+    *,
+    composition_kg: Optional[Dict[str, float]],
+    composition_mol: Optional[Dict[str, float]],
+    oxide_basis: tuple,
+    species_formula_registry: Optional[Mapping[str, Any]] = None,
+) -> MeltOxideProjection:
     """
     Project the simulator's mol/kg melt composition to oxide wt% in the
     given oxide basis.
@@ -159,7 +193,7 @@ def project_melt_to_oxide_wt_pct(
     Shared by the silicate-oxide adapters (VapoRock, MAGEMin), whose
     upstream bases are identical to MELTS for the oxides shared with the
     simulator, so this is a straight rename + normalisation.  Any species
-    not in ``oxide_basis`` is dropped.
+    not in ``oxide_basis`` is dropped after being recorded in diagnostics.
 
     ``species_formula_registry`` is the simulator's formula registry
     (threaded through from the layered ABC) used for the mol -> kg
@@ -189,14 +223,37 @@ def project_melt_to_oxide_wt_pct(
         if species in oxide_basis
     }
 
+    dropped = {
+        str(species): float(kg)
+        for species, kg in kg_by_species.items()
+        if species not in oxide_basis and float(kg) > 0.0
+    }
+
     total = sum(filtered.values())
     if total <= 0:
-        return {}
+        oxide_wt_pct: Dict[str, float] = {}
+    else:
+        oxide_wt_pct = {
+            species: kg / total * 100.0
+            for species, kg in filtered.items()
+        }
 
-    return {
-        species: kg / total * 100.0
-        for species, kg in filtered.items()
-    }
+    warnings_out: tuple[str, ...] = ()
+    if dropped:
+        total_dropped = sum(dropped.values())
+        species_text = ", ".join(
+            f"{species}={kg:.12g} kg" for species, kg in sorted(dropped.items())
+        )
+        warnings_out = (
+            "dropped_non_basis_melt_mass: "
+            f"total={total_dropped:.12g} kg; species={species_text}",
+        )
+
+    return MeltOxideProjection(
+        oxide_wt_pct=oxide_wt_pct,
+        dropped_mass_kg_by_species=dict(sorted(dropped.items())),
+        warnings=warnings_out,
+    )
 
 
 @dataclass

@@ -100,6 +100,8 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert sim.melt.composition_kg["NiO"] == pytest.approx(11.009174)
     assert "H2O" not in sim.melt.composition_kg
     assert "Fe" not in sim.melt.composition_kg
+    assert "Cl" not in sim.melt.composition_kg
+    assert "S" not in sim.melt.composition_kg
     assert "SO3" not in sim.melt.composition_kg
 
     inv = sim.inventory

@@ -188,7 +188,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         # Run the domain gate even when the adapter is None so callers
         # see a meaningful rejection (rather than a silent
         # 'unavailable' surface that hides the input issue).
-        valid, gate_warnings = AlphaMELTSDomainGate.validate(composition_wt_pct)
+        valid, gate_warnings, gate_reason = (
+            AlphaMELTSDomainGate.validate_with_reason(composition_wt_pct)
+        )
         if not valid:
             return IntentResult(
                 intent=request.intent,
@@ -200,10 +202,12 @@ class AlphaMELTSProvider(ChemistryProvider):
                     engine_version=self._engine_version(),
                     backend_status='out_of_domain',
                     backend_warnings=tuple(gate_warnings),
+                    backend_status_reason=gate_reason,
                     backend_diagnostics=_out_of_domain_diagnostics(
                         request,
                         composition_wt_pct=composition_wt_pct,
                         composition_mol_by_account=composition_mol_by_account,
+                        reason=gate_reason,
                     ),
                     **redox_diagnostic,
                 ).as_diagnostic(),
@@ -659,6 +663,7 @@ def _out_of_domain_diagnostics(
     *,
     composition_wt_pct: Mapping[str, float],
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
+    reason: str | None = None,
 ) -> dict[str, Any]:
     crash_point: dict[str, Any] = {
         'temperature_C': float(request.temperature_C),
@@ -677,6 +682,7 @@ def _out_of_domain_diagnostics(
         crash_point['composition_mol_by_account'] = by_account
     return {
         'backend_status': 'out_of_domain',
+        'backend_status_reason': reason,
         'out_of_domain_crash_point': crash_point,
     }
 

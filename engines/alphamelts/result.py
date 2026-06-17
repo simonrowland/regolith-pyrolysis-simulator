@@ -41,6 +41,8 @@ caller wants for trace + UI:
 * ``backend_status``       -- ``EquilibriumResult.status`` from the
   adapter (the kernel-level status on the :class:`IntentResult` is a
   separate signal).
+* ``backend_status_reason`` -- structured reason for non-``ok`` statuses,
+  when available.
 * ``backend_warnings``     -- non-fatal warnings the adapter surfaced.
 
 The dataclass is frozen; the provider builds one per dispatch and
@@ -91,6 +93,7 @@ class LiquidusDiagnostics:
     backend_status: str = 'unavailable'
     backend_warnings: Tuple[str, ...] = ()
     backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
+    backend_status_reason: Optional[str] = None
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -142,6 +145,10 @@ class LiquidusDiagnostics:
         object.__setattr__(self, 'fe_redox_policy', str(self.fe_redox_policy))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
+        if self.backend_status_reason is not None:
+            object.__setattr__(
+                self, 'backend_status_reason', str(self.backend_status_reason)
+            )
         if self.liquidus_T_C is not None:
             object.__setattr__(self, 'liquidus_T_C', float(self.liquidus_T_C))
         if self.liquidus_T_K is not None:
