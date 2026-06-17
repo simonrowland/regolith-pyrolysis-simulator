@@ -8,7 +8,9 @@ from typing import Any
 
 from simulator.account_ids import (
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    OXYGEN_CAPTURED_ACCOUNTS,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
+    OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
     OXYGEN_SPECIES,
@@ -33,6 +35,7 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
     *OVERHEAD_VAPOR_ACCOUNTS,
     *OXYGEN_STORED_ACCOUNTS,
     *OXYGEN_VENTED_ACCOUNTS,
+    *OXYGEN_CAPTURED_ACCOUNTS,
 )
 PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
 PLUME_SOURCE_SIO_SPECIES = "SiO"
@@ -315,8 +318,13 @@ class AccountingQueries:
             account: _ledger_o2_kg(self.ledger, account)
             for account in OXYGEN_VENTED_ACCOUNTS
         }
+        captured_by_source = {
+            account: _ledger_o2_kg(self.ledger, account)
+            for account in OXYGEN_CAPTURED_ACCOUNTS
+        }
         stored_kg = sum(stored_by_source.values())
         vented_kg = sum(vented_by_source.values())
+        captured_kg = sum(captured_by_source.values())
         stage0_o2_vented = vented_by_source.get(
             OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0)
         stage0_o2_recovered = stored_by_source.get(OXYGEN_STAGE0_ACCOUNT, 0.0)
@@ -327,7 +335,8 @@ class AccountingQueries:
         return {
             "stored": stored_kg,
             "vented": vented_kg,
-            "total": stored_kg + vented_kg,
+            "captured": captured_kg,
+            "total": stored_kg + vented_kg + captured_kg,
             "stage0_stored": stage0_o2_recovered,
             "melt_offgas_stored": stored_by_source.get(
                 OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
@@ -335,6 +344,8 @@ class AccountingQueries:
                 OXYGEN_MRE_ANODE_ACCOUNT, 0.0),
             "melt_offgas_vented": vented_by_source.get(
                 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0),
+            "melt_offgas_captured": captured_by_source.get(
+                OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT, 0.0),
             "stage0_o2_vented_with_offgas": stage0_o2_vented,
             "stage0_o2_recovered_stored": stage0_o2_recovered,
             "stage0_o2_bound_into_melt_redox": stage0_o2_bound,
@@ -347,7 +358,11 @@ class AccountingQueries:
     ) -> float:
         redox_o2_kg = 0.0
         terminal_o2_accounts = frozenset(
-            (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_VENTED_ACCOUNTS)
+            (
+                *OXYGEN_STORED_ACCOUNTS,
+                *OXYGEN_VENTED_ACCOUNTS,
+                *OXYGEN_CAPTURED_ACCOUNTS,
+            )
         )
         for transition in getattr(self.ledger, "transitions", ()):
             if not str(getattr(transition, "name", "")).startswith("stage0_"):

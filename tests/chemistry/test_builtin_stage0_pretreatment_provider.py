@@ -49,11 +49,19 @@ from engines.builtin.stage0_pretreatment import (
     REACTION_FAMILY_SULFATE_CARBON,
 )
 from simulator.account_ids import (
+    OXYGEN_CAPTURED_ACCOUNTS,
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
 )
-from simulator.accounting.queries import AccountingQueries
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
+from simulator.accounting.queries import (
+    OXYGEN_ACCOUNTING_TOLERANCE_KG,
+    AccountingQueries,
+)
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -540,8 +548,11 @@ def test_o2_shuttle_annotation_reads_perchlorate_bin_without_double_count(
         + partition["melt_offgas_stored"]
         + partition["mre_anode_stored"]
         + partition["melt_offgas_vented"]
+        + partition["melt_offgas_captured"]
     )
 
+    assert partition["captured"] == pytest.approx(0.0)
+    assert partition["melt_offgas_captured"] == pytest.approx(0.0)
     assert partition["stage0_o2_recovered_stored"] == pytest.approx(
         recovered_kg)
     assert partition["stage0_o2_recovered_stored"] == pytest.approx(
@@ -699,6 +710,75 @@ def test_stage0_o2_cross_transition_conservation_keeps_carbothermic_distinct(
         terminal_o2_credit_mol(perchlorate)
         + terminal_o2_credit_mol(sulfate)
     ) == pytest.approx(2.0 * clo4_extent_mol)
+
+
+def test_stage0_o2_aggregate_lifecycle_reconciliation_closes(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "mars_basalt",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"C": 50.0},
+    )
+    registry = sim.species_formula_registry
+
+    def oxygen_atom_kg_as_o2(species_kg: dict[str, float]) -> float:
+        oxygen_atom_mol = 0.0
+        for species, kg in species_kg.items():
+            formula = resolve_species_formula(species, registry)
+            oxygen_atom_mol += (
+                float(kg)
+                / formula.molar_mass_kg_per_mol()
+                * float(formula.elements.get("O", 0.0))
+            )
+        return oxygen_atom_mol * ATOMIC_WEIGHTS_G_PER_MOL["O"] / 1000.0
+
+    produced_kg = 0.0
+    consumed_as_reagent_kg = 0.0
+    for transition in sim.atom_ledger.transitions:
+        if not str(transition.name).startswith("stage0_"):
+            continue
+        for lot in transition.debits:
+            if transition.name == "stage0_perchlorate_cleanup":
+                if lot.account == "process.stage0_perchlorate_feed":
+                    produced_kg += oxygen_atom_kg_as_o2(lot.species_kg)
+            if lot.account == "reservoir.stage0_oxidant":
+                consumed_as_reagent_kg += float(
+                    lot.species_kg.get("O2", 0.0)
+                )
+
+    stored_kg = sum(
+        sim.atom_ledger.kg_by_account(account).get("O2", 0.0)
+        for account in OXYGEN_STORED_ACCOUNTS
+    )
+    vented_kg = sum(
+        sim.atom_ledger.kg_by_account(account).get("O2", 0.0)
+        for account in OXYGEN_VENTED_ACCOUNTS
+    )
+    captured_kg = sum(
+        sim.atom_ledger.kg_by_account(account).get("O2", 0.0)
+        for account in OXYGEN_CAPTURED_ACCOUNTS
+    )
+    partition = AccountingQueries(sim).oxygen_terminal_partition_kg()
+    redox_bound_kg = partition["stage0_o2_bound_into_melt_redox"]
+    closure_kg = (
+        produced_kg
+        - consumed_as_reagent_kg
+        - stored_kg
+        - redox_bound_kg
+        - vented_kg
+        - captured_kg
+    )
+
+    assert produced_kg > 0.0
+    assert redox_bound_kg == pytest.approx(0.0)
+    assert partition["captured"] == pytest.approx(0.0)
+    assert partition["total"] == pytest.approx(
+        stored_kg + vented_kg + captured_kg
+    )
+    assert abs(closure_kg) <= OXYGEN_ACCOUNTING_TOLERANCE_KG
 
 
 def test_sulfate_carbon_matches_legacy_stoich(

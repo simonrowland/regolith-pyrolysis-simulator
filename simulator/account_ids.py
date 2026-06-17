@@ -6,6 +6,7 @@ OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = (
     "terminal.oxygen_melt_offgas_vented_to_vacuum"
 )
+OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT = "terminal.oxygen_melt_offgas_captured"
 OXYGEN_MRE_ANODE_ACCOUNT = "terminal.oxygen_mre_anode_stored"
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 OXYGEN_STORED_ACCOUNTS = (
@@ -14,3 +15,4 @@ OXYGEN_STORED_ACCOUNTS = (
     OXYGEN_MRE_ANODE_ACCOUNT,
 )
 OXYGEN_VENTED_ACCOUNTS = (OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,)
+OXYGEN_CAPTURED_ACCOUNTS = (OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,)

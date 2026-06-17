@@ -40,6 +40,7 @@ TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
     "terminal.oxygen_stage0_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_vented_to_vacuum": frozenset({"O2"}),
+    "terminal.oxygen_melt_offgas_captured": frozenset({"O2"}),
     "terminal.oxygen_mre_anode_stored": frozenset({"O2"}),
     "terminal.chromium_condensed_oxide_stored": frozenset({"Cr2O3"}),
 }
