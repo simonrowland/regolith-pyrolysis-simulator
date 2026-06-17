@@ -6,6 +6,57 @@ import math
 from typing import Any, Mapping, Sequence
 
 _EPS = 1e-12
+WALL_STICKING_ALPHA_GROUNDING_TARGET = (
+    "data/literature/vacuum_pyrolysis_sticking.yaml"
+)
+WALL_STICKING_ALPHA_NOTICE_CODE = (
+    "wall_deposit_sticking_alpha_ungrounded_assumption"
+)
+
+
+def wall_sticking_alpha_provenance_notice(
+    alpha_s_by_species: Mapping[str, float],
+) -> dict[str, Any]:
+    """Return a warning payload for ungrounded wall-deposition alpha_s values."""
+
+    species_alpha = {
+        str(species): float(alpha_s)
+        for species, alpha_s in alpha_s_by_species.items()
+        if _finite_float(alpha_s) is not None
+    }
+    if not species_alpha:
+        return {}
+    species = sorted(species_alpha)
+    return {
+        "severity": "warning",
+        "code": WALL_STICKING_ALPHA_NOTICE_CODE,
+        "source_class": "assumption_ungrounded_fitted_coefficient",
+        "source": (
+            "data/materials.yaml::default_alpha_s_by_species; "
+            "simulator/condensation.py::STICKING_COEFF fallback"
+        ),
+        "usage": [
+            "_stage_alpha_s",
+            "_wall_alpha_s",
+            "_pressure_isolated_capture_budget_kg",
+        ],
+        "species": species,
+        "alpha_s_by_species": {
+            item: species_alpha[item]
+            for item in species
+        },
+        # Reported numbers are the wall-path (_wall_alpha_s) values. The
+        # _pressure_isolated_capture_budget_kg path reads STICKING_COEFF
+        # directly, so its effective alpha_s can differ if data/materials.yaml
+        # wall overrides diverge from STICKING_COEFF — do not equate the two.
+        "alpha_s_source": "_wall_alpha_s",
+        "capture_budget_alpha_s_source": "STICKING_COEFF",
+        "message": (
+            "Wall-deposition sticking alpha_s uses ungrounded fitted "
+            "coefficients pending W2 literature grounding."
+        ),
+        "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
+    }
 
 
 def wall_deposit_remobilization_by_segment_species(
@@ -224,4 +275,7 @@ def _finite_float(value: Any) -> float | None:
     return number
 
 
-__all__ = ["wall_deposit_remobilization_by_segment_species"]
+__all__ = [
+    "wall_deposit_remobilization_by_segment_species",
+    "wall_sticking_alpha_provenance_notice",
+]

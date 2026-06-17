@@ -468,7 +468,10 @@ CONDENSATION_TEMPS_C = {
     'Ti':  1500,   # negligible at process T
 }
 
-# Sticking coefficients (probability of condensation on contact)
+# Sticking coefficients (probability of condensation on contact).
+# Ungrounded fitted/by-feel assumptions pending W2 grounding in
+# data/literature/vacuum_pyrolysis_sticking.yaml. Do not tune these as
+# literature constants.
 STICKING_COEFF = {
     'Fe':  0.9,
     'SiO': 0.7,    # SiO → SiO₂ disproportionation is not instantaneous
@@ -505,6 +508,8 @@ class CondensationRouteResult:
     antoine_extrapolation_warnings: tuple[str, ...] = ()
     cold_spot_warnings: tuple[str, ...] = ()
     knudsen_regime_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    sticking_alpha_provenance_notice: Dict[str, Any] = field(
+        default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -614,6 +619,7 @@ class CondensationModel:
             'findings': [],
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
+        self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.cold_spot_history: list[dict[str, Any]] = []
         self.operating_history: list[dict[str, Any]] = []
 
@@ -1022,6 +1028,7 @@ class CondensationModel:
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
+        wall_sticking_alpha_by_species: dict[str, float] = {}
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
@@ -1091,6 +1098,8 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
+            if self._mixed_temperature_wall_candidate_segments(species):
+                wall_sticking_alpha_by_species[species] = _wall_alpha_s(species)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
@@ -1159,6 +1168,16 @@ class CondensationModel:
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
 
+        from simulator.diagnostics import wall_sticking_alpha_provenance_notice
+
+        sticking_notice = wall_sticking_alpha_provenance_notice(
+            wall_sticking_alpha_by_species)
+        self.last_sticking_alpha_provenance_notice = dict(sticking_notice)
+        if sticking_notice and self.operating_history:
+            self.operating_history[-1][
+                'wall_sticking_alpha_provenance_notice'
+            ] = dict(sticking_notice)
+
         return CondensationRouteResult(
             remaining_by_species=remaining_by_species,
             condensed_by_stage_species=condensed_by_stage_species,
@@ -1173,6 +1192,7 @@ class CondensationModel:
                 antoine_extrapolation_warnings),
             cold_spot_warnings=cold_spot_warnings,
             knudsen_regime_diagnostic=knudsen_diagnostic,
+            sticking_alpha_provenance_notice=sticking_notice,
         )
 
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:

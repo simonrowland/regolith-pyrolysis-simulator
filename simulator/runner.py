@@ -1930,6 +1930,17 @@ def build_sio_yield_report(
                 ) or {}
             ),
         }
+        sticking_notice = dict(
+            getattr(
+                condensation_model,
+                "last_sticking_alpha_provenance_notice",
+                {},
+            ) or {}
+        )
+        if sticking_notice:
+            diagnostics["wall_sticking_alpha_provenance_notice"] = (
+                sticking_notice
+            )
         vapor_pressure_diagnostic = dict(
             getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
         )

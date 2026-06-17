@@ -3,6 +3,8 @@
 # temp_range_C mirrors CondensationTrain.create_default(), and alpha_s values
 # are migrated from simulator/condensation.py STICKING_COEFF at baseline
 # 251481c. Do not tune these as golden fixtures.
+# STICKING_COEFF/default alpha_s values are ungrounded fitted/by-feel
+# assumptions pending W2 grounding in data/literature/vacuum_pyrolysis_sticking.yaml.
 #
 # max_service_T_C is recorded for the liner/surface contract and defaults to
 # the stage high temperature in Chunk A. Chunk C owns pressure coupling and

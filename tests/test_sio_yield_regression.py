@@ -194,6 +194,26 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     assert "not 1-decade fidelity" in actual["verdict"]
 
 
+def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        include_diagnostics=True,
+    )
+
+    assert "wall_deposit_kg" in report
+    notice = diagnostics["wall_sticking_alpha_provenance_notice"]
+    assert notice["severity"] == "warning"
+    assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
+    assert notice["source_class"] == "assumption_ungrounded_fitted_coefficient"
+    assert "Mg" in notice["species"]
+    assert notice["alpha_s_by_species"]["Mg"] == pytest.approx(0.8)
+    assert (
+        notice["grounding_target"]
+        == "data/literature/vacuum_pyrolysis_sticking.yaml"
+    )
+
+
 def test_band_aware_hkl_route_captures_sio_in_stage_3():
     model = CondensationModel(CondensationTrain.create_default())
 
@@ -299,6 +319,44 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
         + route.remaining_by_species["SiO"]
     )
     assert destinations == pytest.approx(1.0)
+
+
+def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    assert route.wall_deposit_by_species["SiO"] == pytest.approx(
+        0.049097820263577854,
+        rel=1e-12,
+    )
+    assert (
+        route.condensed_for_species("SiO")
+        + route.wall_deposit_by_species["SiO"]
+        + route.remaining_by_species["SiO"]
+    ) == pytest.approx(1.0)
+    notice = route.sticking_alpha_provenance_notice
+    assert notice["severity"] == "warning"
+    assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
+    assert notice["source_class"] == "assumption_ungrounded_fitted_coefficient"
+    assert notice["species"] == ["SiO"]
+    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(0.7)
+    # Reported alphas are the wall-path values; the capture-budget path reads
+    # STICKING_COEFF directly and must not be conflated with them.
+    assert notice["alpha_s_source"] == "_wall_alpha_s"
+    assert notice["capture_budget_alpha_s_source"] == "STICKING_COEFF"
+    assert (
+        notice["grounding_target"]
+        == "data/literature/vacuum_pyrolysis_sticking.yaml"
+    )
 
 
 def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
