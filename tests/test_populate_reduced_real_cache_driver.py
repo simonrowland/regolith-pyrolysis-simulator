@@ -24,7 +24,7 @@ def _canonical_bytes(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def _write_magemin_row(db_path, suffix):
+def _write_magemin_row(db_path, suffix, payload=None):
     key = {
         "schema_version": "test",
         "code_version": "test",
@@ -36,11 +36,70 @@ def _write_magemin_row(db_path, suffix):
         },
         "suffix": suffix,
     }
-    payload = {"suffix": suffix}
+    payload = payload or {
+        "suffix": suffix,
+        "last_vapor_pressures_source": {"Na": "vaporock"},
+    }
     key_bytes = _canonical_bytes(key)
     payload_bytes = _canonical_bytes(payload)
     driver.PT1PersistentEquilibriumStore(db_path).put(
         artifact="equilibrium_result",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
+def _strict_vapor_pt1_key(
+    suffix,
+    *,
+    vapor_provider_id="vaporock",
+    fallback_provider_id=None,
+):
+    return {
+        "schema_version": "test",
+        "code_version": "test",
+        "corpus_version": current_corpus_version(),
+        "data_digests": {},
+        "provider": {
+            "resolved_provider_id": driver.MAGEMIN_PROVIDER_ID,
+            "resolved_role": "silicate_liquidus",
+        },
+        "vapor_pressure_provider": {
+            "resolved_provider_id": vapor_provider_id,
+            "resolved_role": "authoritative",
+            "authoritative_provider_id": vapor_provider_id,
+            "fallback_provider_id": fallback_provider_id,
+            "fallback_allowed": fallback_provider_id is not None,
+        },
+        "suffix": suffix,
+    }
+
+
+def _strict_vapor_pt1_payload():
+    return {
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "vaporock"},
+    }
+
+
+def _write_equilibrium_post_record_row(
+    db_path,
+    *,
+    key,
+    payload,
+    strict_vapor_gate=False,
+):
+    key_bytes = _canonical_bytes(key)
+    payload_bytes = _canonical_bytes(payload)
+    driver.PT1PersistentEquilibriumStore(
+        db_path,
+        strict_vapor_gate=strict_vapor_gate,
+    ).put(
+        artifact="equilibrium_post_record",
         key=key,
         key_bytes=key_bytes,
         key_hash=hashlib.sha256(key_bytes).hexdigest(),
@@ -618,6 +677,238 @@ def test_merge_cache_shard_rejects_stub_equilibrium_post_record(tmp_path):
         driver._merge_cache_shard(shard_db, target_db)
 
     assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
+    shard_db = tmp_path / "shard.db"
+    target_db = tmp_path / "target.db"
+    _write_magemin_row(
+        shard_db,
+        "poisoned",
+        payload={
+            "equilibrium_result": {"status": "ok"},
+            "last_vapor_pressures_source": {"Na": "builtin_fallback"},
+        },
+    )
+
+    with pytest.raises(driver.GrindSourceGateError, match="builtin_fallback"):
+        driver._merge_cache_shard(shard_db, target_db)
+
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+@pytest.mark.parametrize("write_path", ("put", "merge"))
+@pytest.mark.parametrize(
+    ("case_name", "key_kwargs", "payload_update", "match"),
+    (
+        (
+            "key_builtin_provider",
+            {"vapor_provider_id": "builtin-vapor-pressure"},
+            {},
+            "resolved_provider_id",
+        ),
+        (
+            "key_fallback_provider",
+            {"fallback_provider_id": "builtin-vapor-pressure"},
+            {},
+            "fallback_provider_id",
+        ),
+        (
+            "payload_builtin_fallback",
+            {},
+            {"last_vapor_pressures_source": {"Na": "builtin_fallback"}},
+            "builtin_fallback",
+        ),
+        (
+            "payload_kernel_fallback",
+            {},
+            {"equilibrium_result": {"status": "ok", "kernel_fallback_used": True}},
+            "kernel_fallback_used",
+        ),
+    ),
+)
+def test_strict_pt1_write_paths_share_vapor_gate(
+    tmp_path,
+    write_path,
+    case_name,
+    key_kwargs,
+    payload_update,
+    match,
+):
+    target_db = tmp_path / f"{write_path}-{case_name}-target.db"
+    key = _strict_vapor_pt1_key(case_name, **key_kwargs)
+    payload = _strict_vapor_pt1_payload()
+    payload.update(payload_update)
+
+    def write_put():
+        _write_equilibrium_post_record_row(
+            target_db,
+            key=key,
+            payload=payload,
+            strict_vapor_gate=True,
+        )
+
+    def write_merge():
+        shard_db = tmp_path / f"{write_path}-{case_name}-shard.db"
+        _write_equilibrium_post_record_row(
+            shard_db,
+            key=key,
+            payload=payload,
+            strict_vapor_gate=False,
+        )
+        driver._merge_cache_shard(shard_db, target_db)
+
+    write = write_put if write_path == "put" else write_merge
+    with pytest.raises(driver.GrindSourceGateError, match=match):
+        write()
+
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+    clean_target_db = tmp_path / f"{write_path}-{case_name}-clean-target.db"
+    clean_key = _strict_vapor_pt1_key(f"{case_name}-clean")
+    clean_payload = _strict_vapor_pt1_payload()
+    if write_path == "put":
+        _write_equilibrium_post_record_row(
+            clean_target_db,
+            key=clean_key,
+            payload=clean_payload,
+            strict_vapor_gate=True,
+        )
+    else:
+        clean_shard_db = tmp_path / f"{write_path}-{case_name}-clean-shard.db"
+        _write_equilibrium_post_record_row(
+            clean_shard_db,
+            key=clean_key,
+            payload=clean_payload,
+            strict_vapor_gate=False,
+        )
+        driver._merge_cache_shard(clean_shard_db, clean_target_db)
+    assert driver._cache_row_summary(clean_target_db)["rows"] == 1
+
+
+def test_merge_cache_shard_rejects_missing_vapor_source_provenance(tmp_path):
+    shard_db = tmp_path / "shard.db"
+    target_db = tmp_path / "target.db"
+    _write_magemin_row(
+        shard_db,
+        "missing-provenance",
+        payload={"equilibrium_result": {"status": "ok"}},
+    )
+
+    with pytest.raises(driver.GrindSourceGateError, match="missing last_vapor"):
+        driver._merge_cache_shard(shard_db, target_db)
+
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+def test_main_preflight_rejects_fallback_enabled_setpoints(tmp_path, monkeypatch):
+    profile = tmp_path / "profile.yaml"
+    profile.write_text(
+        "feedstock: lunar_mare_low_ti\ncampaigns: [C2A_continuous]\n",
+        encoding="utf-8",
+    )
+    bundle = type(
+        "Bundle",
+        (),
+        {"setpoints": {"chemistry_kernel": {"allow_fallback_vapor": True}}},
+    )()
+    monkeypatch.setattr(driver, "load_config_bundle", lambda: bundle)
+
+    with pytest.raises(driver.GrindSourceGateError, match="allow_fallback_vapor"):
+        driver.main(
+            [
+                "--profile",
+                str(profile),
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--hours",
+                "1",
+            ]
+        )
+
+
+def test_run_case_records_all_vaporock_source_report(tmp_path, monkeypatch):
+    session = _FakeSession(source="vaporock")
+    monkeypatch.setattr(driver, "_start_session", lambda **kwargs: session)
+    monkeypatch.setattr(driver, "_apply_pending_decision", lambda session: False)
+
+    result = driver._run_case(
+        feedstock="lunar_mare_low_ti",
+        campaign="C2A_continuous",
+        backend_name="alphamelts",
+        mass_kg=1000.0,
+        additives_kg={},
+        hours=1,
+        wall_cap_s=60.0,
+        db_path=tmp_path / "case.db",
+        mode="capture",
+        disable_live=False,
+        allow_stub_equilibrium=False,
+    )
+
+    source_report = result["rows"][0]["vapor_pressure_source_report"]
+    assert source_report["summary"]["vaporock"]["count"] == 1
+
+
+def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):
+    session = _FakeSession(source="builtin_fallback")
+    monkeypatch.setattr(driver, "_start_session", lambda **kwargs: session)
+    monkeypatch.setattr(driver, "_apply_pending_decision", lambda session: False)
+
+    with pytest.raises(driver.GrindSourceGateError, match="builtin_fallback"):
+        driver._run_case(
+            feedstock="lunar_mare_low_ti",
+            campaign="C2A_continuous",
+            backend_name="alphamelts",
+            mass_kg=1000.0,
+            additives_kg={},
+            hours=1,
+            wall_cap_s=60.0,
+            db_path=tmp_path / "case.db",
+            mode="capture",
+            disable_live=False,
+            allow_stub_equilibrium=False,
+        )
+
+
+class _FakeSnapshot:
+    temperature_C = 1600.0
+    mass_balance_error_pct = 0.0
+
+
+class _FakeStep:
+    snapshot = _FakeSnapshot()
+    backend_error = None
+
+
+class _FakeCampaign:
+    name = "C2A_continuous"
+
+
+class _FakeMelt:
+    campaign = _FakeCampaign()
+    campaign_hour = 1.0
+
+
+class _FakeSimulator:
+    melt = _FakeMelt()
+
+    def __init__(self, *, source):
+        self._last_vapor_pressures_source = {"Na": source}
+
+    def product_ledger(self):
+        return {}
+
+
+class _FakeSession:
+    def __init__(self, *, source):
+        self.simulator = _FakeSimulator(source=source)
+
+    def is_complete(self):
+        return False
+
+    def advance(self):
+        return _FakeStep()
 
 
 def test_full_population_command_documents_authorized_backend():

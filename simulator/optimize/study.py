@@ -726,6 +726,8 @@ def _profile_for_cache_phase(
         cache["cache_tier_ceiling"] = cache_tier_ceiling
         if miss_policy is not None:
             cache["miss_policy"] = miss_policy
+        if miss_policy == "live-fill":
+            cache["strict_vapor_gate"] = True
         fid_opts["reduced_real_cache"] = cache
         if str(run.get("backend_name", "")) == "cached-real":
             run["reduced_real_cache"] = cache
@@ -1579,6 +1581,12 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "rump_terminal",
             "terminal_rump_by_species_kg",
             "composition_target",
+            "vapor_pressure_source_report",
+            "vapor_pressure_provider_id",
+            "vapor_pressure_fallback_provider_id",
+            "allow_fallback_vapor",
+            "force_builtin_vapor_pressure",
+            "kernel_fallback_used",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -1746,6 +1754,12 @@ def _light_backend_status_trace_for_reference(
             "rump_terminal",
             "terminal_rump_by_species_kg",
             "composition_target",
+            "vapor_pressure_source_report",
+            "vapor_pressure_provider_id",
+            "vapor_pressure_fallback_provider_id",
+            "allow_fallback_vapor",
+            "force_builtin_vapor_pressure",
+            "kernel_fallback_used",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])

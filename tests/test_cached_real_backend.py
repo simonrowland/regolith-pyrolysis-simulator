@@ -150,6 +150,23 @@ def _write_corpus_version_config(
     path.write_text("\n".join(lines) + "\n")
 
 
+def test_cached_real_config_threads_strict_vapor_gate_to_store(
+    tmp_path: Path,
+) -> None:
+    normalized = normalize_cached_real_config(
+        {
+            **_cache_config(tmp_path / "cached-real.db", "live-fill"),
+            "strict_vapor_gate": True,
+        }
+    )
+
+    store = build_cached_real_store(normalized)
+
+    assert store.strict_vapor_gate is True
+    assert store.persistent_store is not None
+    assert store.persistent_store.strict_vapor_gate is True
+
+
 def _build_cached_real_sim(
     *,
     backend: CachedRealBackend,

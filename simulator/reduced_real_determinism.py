@@ -28,6 +28,9 @@ from simulator.corpus_version import (
     current_corpus_version,
     interoperable_corpus_versions,
 )
+from simulator.grind_preflight import (
+    assert_strict_vapor_pt1_row,
+)
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
@@ -137,6 +140,7 @@ class PT0DeterminismStore:
         *,
         db_path: str | Path | None = None,
         read_only_base_db_path: str | Path | None = None,
+        strict_vapor_gate: bool = False,
     ) -> None:
         if mode not in {"capture", "replay"}:
             raise ValueError("PT0DeterminismStore mode must be capture or replay")
@@ -151,6 +155,7 @@ class PT0DeterminismStore:
             PT1PersistentEquilibriumStore(
                 self.persistent_path,
                 read_only_base_db_path=self.read_only_base_db_path,
+                strict_vapor_gate=strict_vapor_gate,
             )
             if self.persistent_path is not None
             else None
@@ -167,6 +172,7 @@ class PT0DeterminismStore:
         self.quantize_live_controls: bool = True
         self.cache_tier_ceiling: str = "cached_interpolated"
         self.cached_real_miss_policy: str | None = None
+        self.strict_vapor_gate = bool(strict_vapor_gate)
 
     @property
     def capture_enabled(self) -> bool:
@@ -185,6 +191,7 @@ class PT0DeterminismStore:
             "replay",
             db_path=self.persistent_path,
             read_only_base_db_path=self.read_only_base_db_path,
+            strict_vapor_gate=self.strict_vapor_gate,
         )
         clone.entries = copy.deepcopy(self.entries)
         clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
@@ -869,6 +876,7 @@ class PT1PersistentEquilibriumStore:
         *,
         read_only_base_db_path: Path | None = None,
         shard_busy_timeout_ms: float = DEFAULT_SHARD_BUSY_TIMEOUT_MS,
+        strict_vapor_gate: bool = False,
     ) -> None:
         self.db_path = Path(db_path)
         self.read_only_base_db_path = (
@@ -877,6 +885,7 @@ class PT1PersistentEquilibriumStore:
             else None
         )
         self._shard_busy_timeout_ms = float(shard_busy_timeout_ms)
+        self.strict_vapor_gate = bool(strict_vapor_gate)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             self._initialize(conn)
@@ -897,6 +906,13 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str | None = None,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key)
+        if self.strict_vapor_gate:
+            assert_strict_vapor_pt1_row(
+                artifact=artifact,
+                key=key,
+                payload=payload,
+                key_hash=key_hash,
+            )
         if physics_bucket_key is None:
             physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
         if physics_bucket_bytes is None:

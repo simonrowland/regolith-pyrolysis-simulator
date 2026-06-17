@@ -61,6 +61,11 @@ except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
 from scripts.seed_reduced_real_cache import seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
+from simulator.grind_preflight import (
+    GrindSourceGateError,
+    assert_strict_vapor_config,
+    assert_strict_vapor_result_store,
+)
 from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
@@ -323,6 +328,35 @@ def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path 
             )
         )
     return Manifest(path=path, base_cache=resolved_base, work_dir=resolved_work, jobs=tuple(jobs))
+
+
+def _assert_manifest_strict_vapor_preflight(manifest: Manifest) -> None:
+    cfg = load_config_bundle()
+    setpoints = getattr(cfg, "setpoints", {}) or {}
+    chemistry_kernel = (
+        setpoints.get("chemistry_kernel", {})
+        if isinstance(setpoints, Mapping)
+        else {}
+    )
+    assert_strict_vapor_config(
+        chemistry_kernel,
+        context="epoch_grind:setpoints.chemistry_kernel",
+    )
+    for job in manifest.jobs:
+        profile_path = _resolve_path(job.profile, manifest.path.parent)
+        if not profile_path.exists():
+            continue
+        profile = _load_mapping(profile_path)
+        merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
+        fidelities = profile.get("fidelities", {})
+        if isinstance(fidelities, Mapping):
+            selected = fidelities.get(job.fidelity, {})
+            if isinstance(selected, Mapping):
+                merged.update(selected)
+        assert_strict_vapor_config(
+            merged,
+            context=f"{profile_path}:run+fidelity[{job.fidelity}]",
+        )
 
 
 def duplication_rate(source_rows: int, inserted_rows: int) -> float:
@@ -959,6 +993,7 @@ def _remove_stale_output_dir(path: Path) -> None:
 
 
 def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, dry_run: bool = False) -> int:
+    _assert_manifest_strict_vapor_preflight(manifest)
     journal = load_or_initialize_journal(journal_path, manifest)
     if dry_run:
         print(json.dumps(dry_run_plan(manifest, config, journal), indent=2, sort_keys=True))
@@ -1139,6 +1174,20 @@ def _run_prepared_job(
         out_dir=prepared.out_dir,
         budget=prepared.job.budget,
     )
+    if outcome.kind in {"completed", NO_FEASIBLE_STATUS, STALE_PROFILE_STATUS}:
+        try:
+            assert_strict_vapor_result_store(
+                prepared.out_dir / "cache.sqlite",
+                context=f"{prepared.job.id}:cache.sqlite",
+            )
+        except GrindSourceGateError as exc:
+            return prepared, ChildOutcome(
+                kind="failed",
+                returncode=2,
+                failure_counts={"strict_vapor_source_gate": 1},
+                reason="strict_vapor_source_gate_failed",
+                message=str(exc),
+            )
     return prepared, outcome
 
 
@@ -1180,6 +1229,12 @@ def _record_job_outcome(
         result["timed_out_jobs"].append(prepared.job.id)
         return True
     job_record["returncode"] = outcome.returncode
+    if outcome.failure_counts is not None:
+        job_record["failure_counts"] = dict(sorted(outcome.failure_counts.items()))
+    if outcome.reason:
+        job_record["reason"] = outcome.reason
+    if outcome.message:
+        job_record["message"] = outcome.message
     result["failed_jobs"].append(job_record)
     return True
 

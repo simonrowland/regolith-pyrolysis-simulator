@@ -88,6 +88,7 @@ class CachedRealConfig:
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
     read_only_base_db_path: Path | None = None
+    strict_vapor_gate: bool = False
 
 
 @dataclass(frozen=True)
@@ -246,6 +247,11 @@ def normalize_cached_real_config(
         read_only_base_db_path = Path(str(raw_read_only_base)).expanduser()
         if not read_only_base_db_path.is_absolute():
             read_only_base_db_path = (_REPO_ROOT / read_only_base_db_path).resolve()
+    strict_vapor_gate = value.get("strict_vapor_gate", False)
+    if not isinstance(strict_vapor_gate, bool):
+        raise unavailable_error_cls(
+            "cached-real reduced_real_cache.strict_vapor_gate must be a bool"
+        )
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
@@ -255,6 +261,7 @@ def normalize_cached_real_config(
         miss_policy=miss_policy,
         cache_tier_ceiling=cache_tier_ceiling,
         read_only_base_db_path=read_only_base_db_path,
+        strict_vapor_gate=strict_vapor_gate,
     )
 
 
@@ -268,6 +275,7 @@ def build_cached_real_store(config: CachedRealConfig):
         mode,
         db_path=config.db_path,
         read_only_base_db_path=config.read_only_base_db_path,
+        strict_vapor_gate=config.strict_vapor_gate,
     )
     store.cached_real_miss_policy = config.miss_policy
     store.cache_tier_ceiling = config.cache_tier_ceiling

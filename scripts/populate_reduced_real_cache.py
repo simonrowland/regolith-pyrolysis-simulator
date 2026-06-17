@@ -40,6 +40,13 @@ from simulator.reduced_real_determinism import (
     PT1PersistentEquilibriumStore,
     validate_reduced_real_equilibrium_record_key,
 )
+from simulator.grind_preflight import (
+    GrindSourceGateError,
+    assert_strict_vapor_config,
+    assert_strict_vapor_pt1_row,
+    assert_strict_vapor_source_report,
+    vapor_pressure_source_report_from_sim,
+)
 from simulator.session import SimSession, SimSessionConfig
 
 
@@ -385,7 +392,7 @@ def _run_case(
     disable_live: bool,
     allow_stub_equilibrium: bool,
 ) -> dict[str, Any]:
-    store = PT0DeterminismStore(mode, db_path=db_path)
+    store = PT0DeterminismStore(mode, db_path=db_path, strict_vapor_gate=True)
     timings: list[dict[str, Any]] = []
     session = _start_session(
         feedstock=feedstock,
@@ -426,6 +433,15 @@ def _run_case(
             step_started = time.perf_counter()
             step = session.advance()
             sim = session.simulator
+            vapor_pressure_source_report = vapor_pressure_source_report_from_sim(sim)
+            if int(vapor_pressure_source_report["total_species"]):
+                assert_strict_vapor_source_report(
+                    vapor_pressure_source_report,
+                    context=(
+                        f"{feedstock}/{campaign} hour {hour_index} "
+                        "strict vapor source gate"
+                    ),
+                )
             mass_balance_error_pct = float(step.snapshot.mass_balance_error_pct)
             if math.isfinite(mass_balance_error_pct):
                 max_abs_mass_balance_error_pct = max(
@@ -446,6 +462,7 @@ def _run_case(
                     "cache_events": store.cache_events[event_start:],
                     "magemin_calls": timings[timing_start:],
                     "backend_error": step.backend_error,
+                    "vapor_pressure_source_report": vapor_pressure_source_report,
                 }
             )
             if not _mass_balance_closed(mass_balance_error_pct):
@@ -610,7 +627,24 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                 raise RuntimeError(
                     f"PT-1 cache shard row has invalid key bytes: {key_hash}"
                 ) from exc
+            try:
+                payload = json.loads(payload_bytes.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+                raise RuntimeError(
+                    f"PT-1 cache shard row has invalid payload bytes: {key_hash}"
+                ) from exc
+            if not isinstance(payload, Mapping):
+                raise RuntimeError(
+                    f"PT-1 cache shard row payload must be a mapping: {key_hash}"
+                )
             validate_reduced_real_equilibrium_record_key(artifact, key)
+            assert_strict_vapor_pt1_row(
+                artifact=artifact,
+                key=key,
+                key_hash=key_hash,
+                payload=payload,
+                context=f"PT-1 cache shard {artifact}:{key_hash}",
+            )
             existing = conn.execute(
                 f"""
                 SELECT artifact, key_sha256, payload_sha256, key_bytes, payload_bytes
@@ -801,6 +835,16 @@ def main(argv: list[str]) -> int:
     args = _parse_args(argv)
     profile_path = _resolve_profile(args.profile)
     profile = _load_yaml(profile_path)
+    cfg = load_config_bundle()
+    assert_strict_vapor_config(
+        (cfg.setpoints.get("chemistry_kernel", {}) or {}),
+        context="populate_reduced_real_cache:setpoints.chemistry_kernel",
+    )
+    run_options = dict(_profile_run(profile))
+    assert_strict_vapor_config(
+        run_options,
+        context=f"{profile_path}:run",
+    )
     feedstocks = tuple(args.feedstocks or (profile.get("feedstock"),))
     if not all(feedstocks):
         raise ValueError("feedstock required via --feedstock or profile.feedstock")

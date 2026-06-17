@@ -896,6 +896,22 @@ def _result_blob(scored_result: ScoredResult) -> Any:
 
 def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
     trace: dict[str, Any] = {}
+    source_trace = (
+        run_reference.trace
+        if isinstance(run_reference.trace, Mapping)
+        else {}
+    )
+    for key in (
+        "vapor_pressure_source_report",
+        "vapor_pressure_provider_id",
+        "vapor_pressure_fallback_provider_id",
+        "allow_fallback_vapor",
+        "force_builtin_vapor_pressure",
+        "builtin_fallback",
+        "kernel_fallback_used",
+    ):
+        if key in source_trace:
+            trace[key] = _jsonable(source_trace[key])
     if run_reference.backend_status is not None:
         trace["backend_status"] = run_reference.backend_status
     if run_reference.backend_authoritative is not None:

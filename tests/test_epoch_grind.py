@@ -135,6 +135,62 @@ def _write_stale_profile_status(out_dir: Path) -> None:
     )
 
 
+def test_launch_preflight_rejects_fallback_enabled_profile(tmp_path: Path) -> None:
+    manifest_path = _manifest_file(tmp_path)
+    raw_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    profile_path = Path(raw_manifest["jobs"][0]["profile"])
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile["run"]["allow_fallback_vapor"] = True
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+    manifest = epoch_grind.load_manifest(manifest_path)
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    with pytest.raises(epoch_grind.GrindSourceGateError, match="allow_fallback_vapor"):
+        epoch_grind.run_driver(
+            manifest,
+            config,
+            journal_path=tmp_path / "journal.json",
+            dry_run=True,
+        )
+
+
+def test_launch_preflight_rejects_fallback_enabled_global_setpoints(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest_path = _manifest_file(tmp_path)
+    manifest = epoch_grind.load_manifest(manifest_path)
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    bundle = type(
+        "Bundle",
+        (),
+        {"setpoints": {"chemistry_kernel": {"allow_fallback_vapor": True}}},
+    )()
+    monkeypatch.setattr(epoch_grind, "load_config_bundle", lambda: bundle)
+
+    with pytest.raises(epoch_grind.GrindSourceGateError, match="allow_fallback_vapor"):
+        epoch_grind.run_driver(
+            manifest,
+            config,
+            journal_path=tmp_path / "journal.json",
+            dry_run=True,
+        )
+
+
 def test_duplication_rate_math() -> None:
     summary = {
         "inserted_rows": 12,

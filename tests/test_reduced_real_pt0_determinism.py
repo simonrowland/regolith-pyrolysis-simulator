@@ -17,6 +17,7 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
+from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
@@ -361,6 +362,64 @@ def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
         payload_bytes=payload_bytes,
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
+
+
+def _strict_vapor_key() -> dict:
+    return {
+        "schema_version": rrd.SCHEMA_VERSION,
+        "artifact": "equilibrium_post_record",
+        "intent": ChemistryIntent.SILICATE_EQUILIBRIUM.value,
+        "composition_mol_fraction": [["Na2O", 0.1], ["SiO2", 0.9]],
+        "controls": {"T_K": 1473.15, "log_fO2": -8.0, "pressure_bar": 0.001},
+        "redox": {"fe_redox_policy": "intrinsic", "fe_split": {}},
+        "backend": {
+            "backend_name": "AlphaMELTSBackend",
+            "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
+            "backend_version": "alpha-v1",
+        },
+        "provider": {
+            "resolved_provider_id": "alphamelts-diagnostic",
+            "resolved_role": "authoritative",
+        },
+        "vapor_pressure_provider": {
+            "resolved_provider_id": "vaporock",
+            "resolved_role": "authoritative",
+            "authoritative_provider_id": "vaporock",
+            "fallback_provider_id": None,
+            "fallback_allowed": False,
+        },
+        "sulfur_side": {"S_input_ppm": 0.0, "stage0_inventory_digest": "test"},
+        "model": {"model": "alphamelts-diagnostic", "mode": "AlphaMELTSProvider"},
+        "data_digests": {"vapor_pressures": "test"},
+        "corpus_version": current_corpus_version(),
+    }
+
+
+def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
+    tmp_path: Path,
+) -> None:
+    key = _strict_vapor_key()
+    payload = {
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "builtin_fallback"},
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    db_path = tmp_path / "strict-pt1.sqlite"
+    store = rrd.PT1PersistentEquilibriumStore(db_path, strict_vapor_gate=True)
+
+    with pytest.raises(GrindSourceGateError, match="builtin_fallback"):
+        store.put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        )
+
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
 
 def _lookup_c3a_payload(db_path: Path, key: dict) -> tuple[dict, PT0DeterminismStore]:
