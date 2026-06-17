@@ -21,6 +21,7 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.corpus_version import current_corpus_version
 from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
@@ -188,6 +189,18 @@ def _seed_leaderboard_fixture(
                     str(row["candidate_id"]),
                 ),
             )
+            if "corpus_version" in row:
+                conn.execute(
+                    """
+                    UPDATE results
+                    SET corpus_version = ?
+                    WHERE candidate_id = ?
+                    """,
+                    (
+                        row["corpus_version"],
+                        str(row["candidate_id"]),
+                    ),
+                )
 
 
 def _product_yield_table(status: str = "closed") -> dict[str, object]:
@@ -848,7 +861,9 @@ def test_optimizer_leaderboard_excludes_nonfinite_objective_rows(
     assert payload["excluded_nonfinite"] == 1
 
 
-def test_optimizer_leaderboard_excludes_stale_version_and_digest_rows(client) -> None:
+def test_optimizer_leaderboard_keeps_gui_version_rows_but_excludes_stale_digest(
+    client,
+) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-stale-scope"
     run_dir.mkdir(parents=True)
@@ -905,13 +920,125 @@ def test_optimizer_leaderboard_excludes_stale_version_and_digest_rows(client) ->
     assert leaderboard.status_code == 200
     payload = leaderboard.get_json()
     assert [entry["candidate_id"] for entry in payload["entries"]] == [
-        "candidate-current"
+        "candidate-old-version",
+        "candidate-current",
     ]
-    assert payload["entries"][0]["eval_spec"]["data_digests"] == current_spec.data_digests
-    assert payload["entries"][0]["data_digest_scope"]["data_digests"] == current_spec.data_digests
+    assert {entry["eval_spec"]["code_version"] for entry in payload["entries"]} == {
+        "0.5.5",
+        current_code_version(),
+    }
+    assert {
+        entry["data_digest_scope"]["data_digests"]["profile"]
+        for entry in payload["entries"]
+    } == {current_spec.data_digests["profile"]}
     assert payload["data_digest_scope"]["mode"] == "exact_data_digests"
     assert payload["data_digest_scope"]["data_digests"] == current_spec.data_digests
     assert payload["data_digest_scope"]["narrowed_to_latest"] is True
+
+
+def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy(
+    client,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-corpus-scope"
+    current_corpus = current_corpus_version()
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {
+                "candidate_id": "candidate-accepted",
+                "oxygen": 8.0,
+                "corpus_version": current_corpus,
+            },
+            {
+                "candidate_id": "candidate-legacy",
+                "oxygen": 11.0,
+                "corpus_version": None,
+            },
+            {
+                "candidate_id": "candidate-incompatible",
+                "oxygen": 99.0,
+                "corpus_version": "future-incompatible-corpus",
+            },
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["gui_version"] == current_code_version()
+    assert payload["current_corpus_version"] == current_corpus
+    assert payload["accepted_corpus_versions"] == [current_corpus]
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-legacy",
+        "candidate-accepted",
+    ]
+    entries = {entry["candidate_id"]: entry for entry in payload["entries"]}
+    assert entries["candidate-accepted"]["corpus_version"] == current_corpus
+    assert entries["candidate-accepted"]["corpus_version_badge"]["status"] == "accepted"
+    assert entries["candidate-legacy"]["corpus_version"] is None
+    assert entries["candidate-legacy"]["corpus_version_label"] == "unversioned/legacy"
+    assert entries["candidate-legacy"]["corpus_version_badge"]["status"] == "legacy"
+
+
+def test_optimizer_result_detail_and_yaml_filter_incompatible_corpus(
+    client,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-corpus-detail"
+    run_dir.mkdir(parents=True)
+    current_corpus = current_corpus_version()
+    accepted_spec = _base_spec(recipe_id="recipe-accepted")
+    incompatible_spec = replace(accepted_spec, recipe_id="recipe-incompatible")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        accepted_spec,
+        _scored(accepted_spec, candidate_id="candidate-accepted"),
+        created_at="2026-06-01T00:00:00Z",
+    )
+    store.store(
+        incompatible_spec,
+        _scored(incompatible_spec, candidate_id="candidate-incompatible"),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET corpus_version = ? WHERE candidate_id = ?",
+            (current_corpus, "candidate-accepted"),
+        )
+        conn.execute(
+            "UPDATE results SET corpus_version = ? WHERE candidate_id = ?",
+            ("future-incompatible-corpus", "candidate-incompatible"),
+        )
+
+    accepted_key = cache_key(accepted_spec)
+    incompatible_key = cache_key(incompatible_spec)
+    accepted_detail = client.get(
+        f"/optimizer/runs/run-corpus-detail/results/{accepted_key}"
+    )
+    incompatible_detail = client.get(
+        f"/optimizer/runs/run-corpus-detail/results/{incompatible_key}"
+    )
+    accepted_yaml = client.get(
+        f"/optimizer/runs/run-corpus-detail/results/{accepted_key}/recipe.yaml"
+    )
+    incompatible_yaml = client.get(
+        f"/optimizer/runs/run-corpus-detail/results/{incompatible_key}/recipe.yaml"
+    )
+
+    assert accepted_detail.status_code == 200
+    assert "candidate-accepted" in accepted_detail.get_data(as_text=True)
+    assert accepted_yaml.status_code == 200
+    assert yaml.safe_load(accepted_yaml.get_data(as_text=True))["result"][
+        "candidate_id"
+    ] == "candidate-accepted"
+    assert incompatible_detail.status_code == 404
+    assert incompatible_yaml.status_code == 404
 
 
 def test_optimizer_leaderboard_exposes_multiple_current_digest_scopes(client) -> None:
@@ -1518,6 +1645,9 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     html = response.get_data(as_text=True)
     table = partial.get_data(as_text=True)
     assert 'hx-get="/partials/optimizer-table"' in html
+    assert f"GUI version {current_code_version()}" in html
+    assert f"Current corpus {current_corpus_version()}" in html
+    assert "accepted result corpus versions" in html
     assert "Launch Optimizer Job" in html
     assert "minutes to hours" in html
     assert 'hx-post="/optimizer/jobs"' in html
@@ -1537,6 +1667,7 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "backend-badge" in table
     assert "StubBackend / unavailable" in table
     assert "current" in table
+    assert current_corpus_version() in table
 
 
 def test_optimizer_page_marks_missing_readouts_inconclusive(

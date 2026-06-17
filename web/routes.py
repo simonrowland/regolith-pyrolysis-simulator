@@ -22,6 +22,7 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.mre_ladder import (
@@ -30,8 +31,8 @@ from simulator.mre_ladder import (
     preset_catalog as build_mre_preset_catalog,
 )
 from simulator.optimize import job_runner as optimizer_job_runner
+from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
-from simulator.optimize.result_scope import selector_where
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -171,6 +172,83 @@ def _connect_result_store(cache_path: Path) -> sqlite3.Connection:
     return conn
 
 
+def _row_value(row: sqlite3.Row, key: str, default: Any = None) -> Any:
+    try:
+        return row[key]
+    except (IndexError, KeyError):
+        return default
+
+
+def _table_has_column(conn: sqlite3.Connection, table: str, column: str) -> bool:
+    return any(
+        row['name'] == column
+        for row in conn.execute(f'PRAGMA table_info({table})')
+    )
+
+
+def _optimizer_version_context() -> dict[str, Any]:
+    accepted = tuple(interoperable_corpus_versions())
+    return {
+        'gui_version': current_code_version(),
+        'current_corpus_version': current_corpus_version(),
+        'accepted_corpus_versions': list(accepted),
+    }
+
+
+def _corpus_version_value(raw: Any) -> str | None:
+    if raw in (None, ''):
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def _corpus_version_badge(
+    stored_version: Any,
+    accepted_versions: tuple[str, ...] | None = None,
+) -> dict[str, Any]:
+    accepted = (
+        accepted_versions
+        if accepted_versions is not None
+        else tuple(interoperable_corpus_versions())
+    )
+    stored = _corpus_version_value(stored_version)
+    if stored is None:
+        return {
+            'status': 'legacy',
+            'label': 'unversioned/legacy',
+            'stored_version': None,
+            'accepted_versions': list(accepted),
+        }
+    if stored in accepted:
+        return {
+            'status': 'accepted',
+            'label': stored,
+            'stored_version': stored,
+            'accepted_versions': list(accepted),
+        }
+    return {
+        'status': 'rejected',
+        'label': f'incompatible: {stored}',
+        'stored_version': stored,
+        'accepted_versions': list(accepted),
+    }
+
+
+def _corpus_filter_clause(
+    conn: sqlite3.Connection,
+    accepted_versions: tuple[str, ...],
+) -> tuple[str, tuple[Any, ...]]:
+    if not _table_has_column(conn, 'results', 'corpus_version'):
+        return '1 = 1', ()
+    if not accepted_versions:
+        return 'corpus_version IS NULL', ()
+    placeholders = ', '.join('?' for _ in accepted_versions)
+    return (
+        f'(corpus_version IS NULL OR corpus_version IN ({placeholders}))',
+        accepted_versions,
+    )
+
+
 def _json_value(value: Any, default: Any) -> Any:
     if value in (None, ''):
         return default
@@ -180,6 +258,10 @@ def _json_value(value: Any, default: Any) -> Any:
         return json.loads(value)
     except (TypeError, ValueError):
         return default
+
+
+def _canonical_json(value: Any) -> str:
+    return canonical_json_dumps(normalize_canonical_value(value))
 
 
 def _utc_mtime(path: Path) -> str:
@@ -248,6 +330,7 @@ def _eval_spec_summary(payload: Any) -> dict[str, Any]:
         'profile_id',
         'fidelity',
         'code_version',
+        'corpus_version',
         'data_digests',
         'c5_enabled',
         'mre_max_voltage_V',
@@ -530,6 +613,8 @@ def _result_metadata(
     eval_spec = _json_value(row['eval_spec'], {})
     if not isinstance(eval_spec, dict):
         eval_spec = {}
+    corpus_version = _corpus_version_value(_row_value(row, 'corpus_version'))
+    corpus_badge = _corpus_version_badge(corpus_version)
     product_summary = run_reference.get('product_summary', {})
     if not isinstance(product_summary, dict):
         product_summary = {}
@@ -544,6 +629,9 @@ def _result_metadata(
         'fidelity': row['fidelity'],
         'feasible': bool(row['feasible']),
         'created_at': row['created_at'],
+        'corpus_version': corpus_version,
+        'corpus_version_label': corpus_badge['label'],
+        'corpus_version_badge': corpus_badge,
         'objectives': _objectives_mapping(objectives),
         'objective_items': objectives,
         'selected_objective': selected,
@@ -698,40 +786,42 @@ def _query_result_rows(
     profile_id: str | None,
     fidelity: str | None,
 ) -> tuple[list[sqlite3.Row], dict[str, Any]]:
-    active_code_version = current_code_version()
+    accepted_corpus_versions = tuple(interoperable_corpus_versions())
     with _connect_result_store(cache_path) as conn:
         digest_scopes = _current_selector_data_digest_scopes(
             conn,
             feedstock_id=feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
-            code_version=active_code_version,
+            accepted_corpus_versions=accepted_corpus_versions,
         )
         if not digest_scopes:
             return [], {
                 'mode': 'no_current_data_digests',
-                'code_version': active_code_version,
+                'gui_version': current_code_version(),
+                'accepted_corpus_versions': list(accepted_corpus_versions),
             }
+        corpus_where, corpus_params = _corpus_filter_clause(conn, accepted_corpus_versions)
         if len(digest_scopes) == 1 or profile_id:
             selected = digest_scopes[0]
-            where, params = selector_where(
+            where, params = _selector_where_with_data_digests(
                 feedstock_id,
                 profile_id=profile_id,
                 fidelity=fidelity,
-                code_version=active_code_version,
                 data_digests=selected,
             )
             rows = conn.execute(
                 f"""
                 SELECT *
                 FROM results
-                WHERE {where}
+                WHERE {where} AND {corpus_where}
                 """,
-                params,
+                (*params, *corpus_params),
             ).fetchall()
             return rows, {
                 'mode': 'exact_data_digests',
-                'code_version': active_code_version,
+                'gui_version': current_code_version(),
+                'accepted_corpus_versions': list(accepted_corpus_versions),
                 'data_digests': selected,
                 'available_current_data_digest_count': len(digest_scopes),
                 'narrowed_to_latest': len(digest_scopes) > 1,
@@ -740,19 +830,19 @@ def _query_result_rows(
             feedstock_id,
             profile_id=profile_id,
             fidelity=fidelity,
-            code_version=active_code_version,
         )
         rows = conn.execute(
             f"""
             SELECT *
             FROM results
-            WHERE {where}
+            WHERE {where} AND {corpus_where}
             """,
-            params,
+            (*params, *corpus_params),
         ).fetchall()
         return rows, {
             'mode': 'multiple_current_data_digests',
-            'code_version': active_code_version,
+            'gui_version': current_code_version(),
+            'accepted_corpus_versions': list(accepted_corpus_versions),
             'available_current_data_digest_count': len(digest_scopes),
             'data_digests': digest_scopes,
         }
@@ -763,10 +853,9 @@ def _selector_where_without_data_digests(
     *,
     profile_id: str | None,
     fidelity: str | None,
-    code_version: str,
 ) -> tuple[str, tuple[Any, ...]]:
-    clauses = ['code_version = ?']
-    params: list[Any] = [code_version]
+    clauses: list[str] = []
+    params: list[Any] = []
     for column, value in (
         ('feedstock_id', feedstock_id),
         ('profile_id', profile_id),
@@ -775,7 +864,25 @@ def _selector_where_without_data_digests(
         if value:
             clauses.append(f'{column} = ?')
             params.append(value)
-    return ' AND '.join(clauses), tuple(params)
+    return ' AND '.join(clauses or ['1 = 1']), tuple(params)
+
+
+def _selector_where_with_data_digests(
+    feedstock_id: str | None,
+    *,
+    profile_id: str | None,
+    fidelity: str | None,
+    data_digests: Mapping[str, str],
+) -> tuple[str, tuple[Any, ...]]:
+    where, params = _selector_where_without_data_digests(
+        feedstock_id,
+        profile_id=profile_id,
+        fidelity=fidelity,
+    )
+    return (
+        f'{where} AND data_digests = ?',
+        (*params, _canonical_json(data_digests)),
+    )
 
 
 def _current_selector_data_digest_scopes(
@@ -784,23 +891,23 @@ def _current_selector_data_digest_scopes(
     feedstock_id: str | None,
     profile_id: str | None,
     fidelity: str | None,
-    code_version: str,
+    accepted_corpus_versions: tuple[str, ...],
 ) -> list[Mapping[str, str]]:
     where, params = _selector_where_without_data_digests(
         feedstock_id,
         profile_id=profile_id,
         fidelity=fidelity,
-        code_version=code_version,
     )
+    corpus_where, corpus_params = _corpus_filter_clause(conn, accepted_corpus_versions)
     rows = conn.execute(
         f"""
         SELECT data_digests, MAX(created_at) AS latest_created_at
         FROM results
-        WHERE {where}
+        WHERE {where} AND {corpus_where}
         GROUP BY data_digests
         ORDER BY latest_created_at DESC, data_digests ASC
         """,
-        params,
+        (*params, *corpus_params),
     ).fetchall()
     scopes: list[Mapping[str, str]] = []
     for row in rows:
@@ -1565,6 +1672,7 @@ def _optimizer_table_context() -> dict[str, Any]:
         'entries': entries,
         'filters': filters,
         'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
+        **_optimizer_version_context(),
     }
 
 
@@ -1578,14 +1686,18 @@ def _optimizer_result_row(
             continue
         try:
             with _connect_result_store(run_dir / OPTIMIZER_CACHE_NAME) as conn:
+                corpus_where, corpus_params = _corpus_filter_clause(
+                    conn,
+                    tuple(interoperable_corpus_versions()),
+                )
                 row = conn.execute(
-                    """
+                    f"""
                     SELECT *
                     FROM results
-                    WHERE cache_key = ?
+                    WHERE cache_key = ? AND {corpus_where}
                     LIMIT 1
                     """,
-                    (cache_key,),
+                    (cache_key, *corpus_params),
                 ).fetchone()
         except sqlite3.Error:
             return None
@@ -1813,6 +1925,10 @@ def _result_detail_model(
         'cache_key': row['cache_key'],
         'created_at': row['created_at'],
         'code_version': eval_spec.get('code_version'),
+        'gui_version': current_code_version(),
+        'corpus_version': result.get('corpus_version'),
+        'corpus_version_label': result.get('corpus_version_label'),
+        'accepted_corpus_versions': list(interoperable_corpus_versions()),
         'data_digests': eval_spec.get('data_digests') or {},
         'data_digests_label': _display_value(eval_spec.get('data_digests') or {}),
         'target_thermal_windows': target_thermal_windows,
@@ -2168,6 +2284,7 @@ def optimizer_leaderboard():
         limit=_request_limit(),
     )
     return jsonify({
+        **_optimizer_version_context(),
         'objective_metric': selected_metric,
         'limit': _request_limit(),
         'data_digest_scope': data_digest_scope,

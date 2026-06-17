@@ -192,7 +192,10 @@
         <table class="param-table">
             <tr><td>Run path</td><td>{{ result.provenance.run_path }}</td></tr>
             <tr><td>Cache path</td><td>{{ result.provenance.cache_path }}</td></tr>
+            <tr><td>GUI version</td><td>{{ result.provenance.gui_version }}</td></tr>
             <tr><td>Code version</td><td>{{ result.provenance.code_version }}</td></tr>
+            <tr><td>Corpus version</td><td>{{ result.provenance.corpus_version_label }}</td></tr>
+            <tr><td>Accepted corpus versions</td><td>{{ result.provenance.accepted_corpus_versions|join(', ') }}</td></tr>
             <tr><td>Data digests</td><td>{{ result.provenance.data_digests_label }}</td></tr>
             {% if result.target_thermal_windows %}
             <tr>

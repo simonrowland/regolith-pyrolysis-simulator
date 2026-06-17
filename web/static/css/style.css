@@ -754,12 +754,14 @@ details details {
     text-transform: uppercase;
 }
 
-.version-badge-current {
+.version-badge-current,
+.version-badge-accepted {
     background: #dcfce7;
     color: #064e3b;
 }
 
 .version-badge-stale,
+.version-badge-rejected,
 .optimizer-status-failed,
 .optimizer-job-error {
     background: #fee2e2;
@@ -767,6 +769,7 @@ details details {
 }
 
 .version-badge-unknown,
+.version-badge-legacy,
 .optimizer-status-queued {
     background: #fff7ed;
     color: #9a3412;

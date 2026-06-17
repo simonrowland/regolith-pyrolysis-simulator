@@ -9,6 +9,10 @@
             Stored ResultStore artifacts and CLI-spawned optimizer jobs share
             {{ runs_dir }}.
         </p>
+        <p class="config-hint">
+            GUI version {{ gui_version }}. Current corpus {{ current_corpus_version }};
+            accepted result corpus versions {{ accepted_corpus_versions|join(', ') }}.
+        </p>
         <form id="optimizer-filters"
               class="campaign-controls"
               hx-get="{{ url_for('web.optimizer_table_partial') }}"

@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.corpus_version import current_corpus_version
 from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
@@ -230,8 +231,14 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
 
     loaded = store.lookup(spec)
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT corpus_version FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
     assert loaded == scored
     assert loaded is not None
+    assert row[0] == current_corpus_version()
     assert loaded.run_reference is not None
     assert loaded.run_reference.trace == {
         "backend_status": "ok",
@@ -963,6 +970,7 @@ def test_v2_store_migrates_result_scope_column_before_selector_index(tmp_path) -
             for row in conn.execute("PRAGMA index_info(idx_results_current_selector)")
         ]
     assert "result_scope" in columns
+    assert "corpus_version" in columns
     assert index_columns == [
         "feedstock_id",
         "profile_id",
@@ -971,3 +979,123 @@ def test_v2_store_migrates_result_scope_column_before_selector_index(tmp_path) -
         "data_digests",
         "result_scope",
     ]
+
+
+def test_v3_store_migrates_corpus_version_once_without_rewriting_payloads(
+    tmp_path,
+) -> None:
+    path = tmp_path / "old-v3.sqlite"
+    legacy_payloads = {
+        "data_digests": '{"feedstocks":"legacy-feedstock","profile":"legacy-profile"}',
+        "result_scope": '{"legacy_scope":"kept"}',
+        "objectives": '[{"metric":"oxygen_kg","sense":"maximize","value":1.0,"units":"kg","ordinal":0}]',
+        "feasibility_margins": '{"mass_balance":{"status":"legacy"}}',
+        "failing_gates": '["legacy_gate"]',
+        "result_blob": '{"trace":["byte","unchanged"]}',
+        "run_reference": '{"status":"ok","backend_status":"ok"}',
+        "eval_spec": '{"recipe_id":"legacy-recipe","nested":{"order":["kept"]}}',
+        "notes": '["legacy note"]',
+    }
+    with sqlite3.connect(path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE store_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+            INSERT INTO store_meta(key, value) VALUES ('schema_version', '3');
+            CREATE TABLE results (
+                cache_key TEXT PRIMARY KEY,
+                feedstock_id TEXT NOT NULL,
+                recipe_id TEXT NOT NULL,
+                profile_id TEXT NOT NULL,
+                fidelity TEXT NOT NULL,
+                code_version TEXT NOT NULL,
+                data_digests TEXT NOT NULL,
+                result_scope TEXT NOT NULL DEFAULT '{}',
+                feasible INTEGER NOT NULL CHECK (feasible IN (0, 1)),
+                failure_category TEXT,
+                objectives TEXT NOT NULL,
+                feasibility_margins TEXT NOT NULL,
+                failing_gates TEXT NOT NULL,
+                candidate_id TEXT,
+                result_blob TEXT NOT NULL,
+                run_reference TEXT NOT NULL,
+                eval_spec TEXT NOT NULL,
+                notes TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE objective_values (
+                cache_key TEXT NOT NULL,
+                metric TEXT NOT NULL,
+                sense TEXT NOT NULL CHECK (sense IN ('minimize', 'maximize')),
+                value REAL NOT NULL,
+                units TEXT NOT NULL,
+                ordinal INTEGER NOT NULL,
+                PRIMARY KEY (cache_key, metric),
+                FOREIGN KEY (cache_key) REFERENCES results(cache_key)
+                    ON DELETE CASCADE
+            );
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO results (
+                cache_key, feedstock_id, recipe_id, profile_id, fidelity,
+                code_version, data_digests, result_scope, feasible,
+                failure_category, objectives, feasibility_margins, failing_gates,
+                candidate_id, result_blob, run_reference, eval_spec, notes,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "legacy-cache-key",
+                "lunar_mare_low_ti",
+                "legacy-recipe",
+                "oxygen-yield-v1",
+                "fast",
+                "legacy-code",
+                legacy_payloads["data_digests"],
+                legacy_payloads["result_scope"],
+                1,
+                None,
+                legacy_payloads["objectives"],
+                legacy_payloads["feasibility_margins"],
+                legacy_payloads["failing_gates"],
+                "legacy-candidate",
+                legacy_payloads["result_blob"],
+                legacy_payloads["run_reference"],
+                legacy_payloads["eval_spec"],
+                legacy_payloads["notes"],
+                "2026-06-01T00:00:00Z",
+            ),
+        )
+
+    assert ResultStore(path).schema_version == SCHEMA_VERSION
+    assert ResultStore(path).schema_version == SCHEMA_VERSION
+
+    with sqlite3.connect(path) as conn:
+        columns = [row[1] for row in conn.execute("PRAGMA table_info(results)")]
+        row = conn.execute(
+            """
+            SELECT corpus_version, data_digests, result_scope, objectives,
+                   feasibility_margins, failing_gates, result_blob,
+                   run_reference, eval_spec, notes
+            FROM results
+            WHERE cache_key = 'legacy-cache-key'
+            """
+        ).fetchone()
+
+    assert columns.count("corpus_version") == 1
+    assert row[0] is None
+    assert {
+        "data_digests": row[1],
+        "result_scope": row[2],
+        "objectives": row[3],
+        "feasibility_margins": row[4],
+        "failing_gates": row[5],
+        "result_blob": row[6],
+        "run_reference": row[7],
+        "eval_spec": row[8],
+        "notes": row[9],
+    } == legacy_payloads

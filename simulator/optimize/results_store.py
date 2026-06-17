@@ -18,6 +18,7 @@ import threading
 import time
 from typing import Any, Mapping, Sequence
 
+from simulator.corpus_version import current_corpus_version
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
@@ -29,7 +30,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_json, selector_where
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
@@ -150,23 +151,26 @@ class ResultStore:
         _validate_result_artifact(eval_spec, scored_result)
         objectives = _serialize_objectives(scored_result.objectives)
         result_blob = _result_blob(scored_result)
+        corpus_version = current_corpus_version()
         with self._write_lock:
             def write(conn: sqlite3.Connection) -> None:
                 conn.execute(
                     """
                     INSERT INTO results (
                         cache_key, feedstock_id, recipe_id, profile_id, fidelity,
-                        code_version, data_digests, result_scope, feasible, failure_category,
-                        objectives, feasibility_margins, failing_gates, candidate_id,
+                        code_version, corpus_version, data_digests, result_scope,
+                        feasible, failure_category, objectives, feasibility_margins,
+                        failing_gates, candidate_id,
                         result_blob, run_reference, eval_spec, notes, created_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(cache_key) DO UPDATE SET
                         feedstock_id = excluded.feedstock_id,
                         recipe_id = excluded.recipe_id,
                         profile_id = excluded.profile_id,
                         fidelity = excluded.fidelity,
                         code_version = excluded.code_version,
+                        corpus_version = excluded.corpus_version,
                         data_digests = excluded.data_digests,
                         result_scope = excluded.result_scope,
                         feasible = excluded.feasible,
@@ -188,6 +192,7 @@ class ResultStore:
                         eval_spec.profile_id,
                         eval_spec.fidelity,
                         eval_spec.code_version,
+                        corpus_version,
                         _canonical_json(eval_spec.data_digests),
                         result_scope_json(eval_spec),
                         int(scored_result.feasible),
@@ -438,6 +443,7 @@ class ResultStore:
                 profile_id TEXT NOT NULL,
                 fidelity TEXT NOT NULL,
                 code_version TEXT NOT NULL,
+                corpus_version TEXT,
                 data_digests TEXT NOT NULL,
                 result_scope TEXT NOT NULL DEFAULT '{}',
                 feasible INTEGER NOT NULL CHECK (feasible IN (0, 1)),
@@ -518,6 +524,18 @@ class ResultStore:
                 (str(SCHEMA_VERSION),),
             )
             version = 3
+        if version < 4:
+            if not _column_exists(conn, "results", "corpus_version"):
+                conn.execute("ALTER TABLE results ADD COLUMN corpus_version TEXT")
+            conn.execute(
+                """
+                INSERT INTO store_meta(key, value)
+                VALUES ('schema_version', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (str(SCHEMA_VERSION),),
+            )
+            version = 4
         if version != SCHEMA_VERSION:
             raise ResultStoreSchemaError(f"unsupported result store schema {version}")
         self._refresh_current_selector_index(conn)

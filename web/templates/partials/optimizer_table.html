@@ -13,6 +13,7 @@
                 <th>Cache tier</th>
                 <th>Backend</th>
                 <th>Version</th>
+                <th>Corpus</th>
                 <th>Provenance</th>
                 <th>Completeness</th>
                 <th>Coating</th>
@@ -57,6 +58,12 @@
                     <span class="version-badge version-badge-{{ entry.version_badge.status }}"
                           title="stored {{ entry.version_badge.stored_version or 'unknown' }}; current {{ entry.version_badge.current_version }}">
                         {{ entry.version_badge.label }}
+                    </span>
+                </td>
+                <td>
+                    <span class="version-badge version-badge-{{ entry.corpus_version_badge.status }}"
+                          title="accepted {{ entry.corpus_version_badge.accepted_versions|join(', ') }}">
+                        {{ entry.corpus_version_badge.label }}
                     </span>
                 </td>
                 <td>
