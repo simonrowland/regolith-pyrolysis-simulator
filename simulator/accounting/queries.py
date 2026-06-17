@@ -19,7 +19,10 @@ from simulator.account_ids import (
     OXYGEN_VENTED_ACCOUNTS,
 )
 from simulator.accounting.exceptions import AccountingError
-from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 FREE_ANALYZER_OXYGEN_SPECIES = frozenset({OXYGEN_SPECIES, "O"})
@@ -85,6 +88,20 @@ STAGE0_FOULANT_PARTITION_FIELDS = (
 )
 STAGE0_FOULANT_CLOSURE_TOLERANCE_KG = 1e-9
 STAGE0_FOULANT_CLOSURE_REL_TOL = 1e-9
+ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG = 35.0e-6
+ROBINOT_EXP2_ANALYZER_VISIBLE_O2_KG = 39.229e-6
+ROBINOT_RAW_FAITHFUL_SOURCE_SIDE_O2_KG = 0.881913e-3
+ROBINOT_LITERATURE_ALPHA_TOP_AREA_O2_KG = 0.656204e-3
+ROBINOT_LITERATURE_ALPHA_AREA_FACTOR_BAND = (18.25, 19.04)
+ROBINOT_REPRODUCIBILITY_FLOOR_FRACTION = 0.11
+ROBINOT_O2_NORMALIZATION_NOTE = (
+    "25.20x compares the raw faithful source-side O2 potential "
+    "(0.881913 g O2-equivalent) to Robinot exp. 1 analyzer-visible "
+    "O2 (35 mg). 18.75x compares the literature-alpha/top-area "
+    "forward prediction (0.656204 g O2-equivalent) to the same "
+    "35 mg paper quantity; it is a different normalization, not a "
+    "closure fit."
+)
 REACTION_FAMILY_PARTITION_CARBON = "partition_carbon"
 REACTION_FAMILY_VOLATILIZATION = "volatilization"
 REACTION_FAMILY_SULFATE_DECOMP = "sulfate_decomp"
@@ -518,6 +535,7 @@ class AccountingQueries:
             )
         else:
             closure_error_pct = 0.0
+        terminal_oxygen_partition_kg = self.oxygen_terminal_partition_kg()
 
         return {
             "total_oxygen_atom_mol": total_oxygen_atom_mol,
@@ -558,6 +576,12 @@ class AccountingQueries:
                 ),
                 "error_pct": closure_error_pct,
             },
+            "robinot_o2_error_budget": _robinot_o2_error_budget(
+                free_oxygen_atom_mol=free_oxygen_atom_mol,
+                terminal_oxygen_partition_kg=terminal_oxygen_partition_kg,
+                condensation_oxygen_atom_mol=condensation_oxygen_atom_mol,
+                wall_segment_oxygen_atom_mol=wall_segment_oxygen_atom_mol,
+            ),
         }
 
     def lab_plume_product_partition(self) -> dict[str, Any]:
@@ -692,6 +716,238 @@ class AccountingQueries:
 def _ledger_o2_kg(ledger: Any, account: str) -> float:
     species_kg = ledger.kg_by_account(account)
     return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+
+
+def _ratio_or_none(numerator: float, denominator: float) -> float | None:
+    if denominator <= 0.0:
+        return None
+    return float(numerator) / float(denominator)
+
+
+def _oxygen_atom_mol_to_o2_equivalent_kg(oxygen_atom_mol: float) -> float:
+    return float(oxygen_atom_mol) * ATOMIC_WEIGHTS_G_PER_MOL["O"] / 1000.0
+
+
+def _robinot_o2_error_budget(
+    *,
+    free_oxygen_atom_mol: float,
+    terminal_oxygen_partition_kg: Mapping[str, float],
+    condensation_oxygen_atom_mol: float,
+    wall_segment_oxygen_atom_mol: float,
+) -> dict[str, Any]:
+    model_free_o2_equivalent_kg = _oxygen_atom_mol_to_o2_equivalent_kg(
+        free_oxygen_atom_mol
+    )
+    condensation_o2_equivalent_kg = _oxygen_atom_mol_to_o2_equivalent_kg(
+        condensation_oxygen_atom_mol
+    )
+    wall_o2_equivalent_kg = _oxygen_atom_mol_to_o2_equivalent_kg(
+        wall_segment_oxygen_atom_mol
+    )
+    literature_factor = _ratio_or_none(
+        ROBINOT_LITERATURE_ALPHA_TOP_AREA_O2_KG,
+        ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG,
+    )
+    raw_factor = _ratio_or_none(
+        ROBINOT_RAW_FAITHFUL_SOURCE_SIDE_O2_KG,
+        ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG,
+    )
+    missing_literature_o2_kg = (
+        ROBINOT_LITERATURE_ALPHA_TOP_AREA_O2_KG
+        - ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG
+    )
+
+    return {
+        "schema": "robinot_o2_error_budget.v1",
+        "status": "WARN_ONLY",
+        "golden_neutral": True,
+        "comparison_target": {
+            "paper": "Robinot et al. 2026 exp. 1 analyzer-visible O2",
+            "exp1_analyzer_visible_o2_kg": (
+                ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG
+            ),
+            "exp2_analyzer_visible_o2_kg": (
+                ROBINOT_EXP2_ANALYZER_VISIBLE_O2_KG
+            ),
+            "reproducibility_floor_fraction": (
+                ROBINOT_REPRODUCIBILITY_FLOOR_FRACTION
+            ),
+            "source": (
+                "docs/lab-validation-whitepaper.md section 4.1 and "
+                "section 5 E3"
+            ),
+        },
+        "model_runtime": {
+            "free_analyzer_visible_oxygen_atom_mol": (
+                float(free_oxygen_atom_mol)
+            ),
+            "free_analyzer_visible_o2_equivalent_kg": (
+                model_free_o2_equivalent_kg
+            ),
+            "factor_vs_robinot_exp1": _ratio_or_none(
+                model_free_o2_equivalent_kg,
+                ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG,
+            ),
+            "terminal_oxygen_partition_kg": dict(
+                sorted(terminal_oxygen_partition_kg.items())
+            ),
+            "bound_oxygen_context_kg": {
+                "condensation_train_o2_equivalent": (
+                    condensation_o2_equivalent_kg
+                ),
+                "wall_deposit_o2_equivalent": wall_o2_equivalent_kg,
+            },
+        },
+        "published_normalizations": {
+            "raw_faithful_source_side_potential": {
+                "o2_equivalent_kg": (
+                    ROBINOT_RAW_FAITHFUL_SOURCE_SIDE_O2_KG
+                ),
+                "factor_vs_exp1": raw_factor,
+                "bucket": "source-side O2 potential before sink allocation",
+                "source": (
+                    "docs/lab-validation-whitepaper.md section 5 "
+                    "Raw faithful model row"
+                ),
+            },
+            "literature_alpha_top_area_source_side_potential": {
+                "o2_equivalent_kg": (
+                    ROBINOT_LITERATURE_ALPHA_TOP_AREA_O2_KG
+                ),
+                "factor_vs_exp1": literature_factor,
+                "factor_band_vs_exp1": list(
+                    ROBINOT_LITERATURE_ALPHA_AREA_FACTOR_BAND
+                ),
+                "bucket": (
+                    "source-side/free-O2 potential after literature-alpha "
+                    "and top-area forward prediction"
+                ),
+                "source": (
+                    "docs/lab-validation-whitepaper.md section 4.1 and "
+                    "section 5 Literature-alpha/top-area row"
+                ),
+            },
+            "normalization_note": ROBINOT_O2_NORMALIZATION_NOTE,
+        },
+        "budget_terms": {
+            "plume_oxidation": {
+                "source": (
+                    "docs/lab-validation-whitepaper.md M3 / four-channel "
+                    "allocation"
+                ),
+                "direction": (
+                    "LOWER_SIM_O2: consumes free O2/O into plume products "
+                    "before the analyzer"
+                ),
+                "magnitude": {
+                    "kind": "unquantified",
+                    "reason": (
+                        "requires position-resolved gas sampling near melt, "
+                        "pre-filter, and outlet"
+                    ),
+                },
+            },
+            "deposit_gettering": {
+                "source": (
+                    "docs/lab-validation-whitepaper.md M3 / per-surface "
+                    "deposition rows"
+                ),
+                "direction": (
+                    "LOWER_SIM_O2: binds oxygen into deposits instead of "
+                    "outlet free O2"
+                ),
+                "magnitude": {
+                    "kind": "unquantified",
+                    "runtime_bound_oxygen_context_kg": (
+                        condensation_o2_equivalent_kg
+                        + wall_o2_equivalent_kg
+                    ),
+                    "reason": (
+                        "deposit oxygen fraction and in-run vs post-run "
+                        "oxidation state are not measured"
+                    ),
+                },
+            },
+            "melt_redox_retention": {
+                "source": (
+                    "Stage-0 melt-redox bin (O0 terminal partition) as a "
+                    "PROXY for M3 melt-redox-retention; Robinot "
+                    "residual-glass-redox allocation is unmeasured"
+                ),
+                "direction": (
+                    "LOWER_SIM_O2: retains oxygen in melt redox instead "
+                    "of terminal free O2"
+                ),
+                "magnitude": {
+                    "kind": "runtime_accounted",
+                    "stage0_o2_bound_into_melt_redox_kg": float(
+                        terminal_oxygen_partition_kg.get(
+                            "stage0_o2_bound_into_melt_redox", 0.0
+                        )
+                        or 0.0
+                    ),
+                    "reason": (
+                        "current ledger can expose this bin, but Robinot "
+                        "allocation remains unmeasured"
+                    ),
+                },
+            },
+            "post_run_air_oxidation": {
+                "source": (
+                    "docs/lab-validation-whitepaper.md M3 / E5 oxidation "
+                    "state caveat"
+                ),
+                "direction": (
+                    "NO_IN_RUN_CLOSURE: can raise recovered-deposit oxygen "
+                    "after venting, but cannot lower in-run analyzer O2"
+                ),
+                "magnitude": {
+                    "kind": "unquantified",
+                    "reason": (
+                        "requires air-isolated deposit oxidation-state data"
+                    ),
+                },
+            },
+            "analyzer_flow_baseline": {
+                "source": (
+                    "docs/lab-validation-whitepaper.md E3 O2 ppm x flow "
+                    "integration"
+                ),
+                "direction": (
+                    "RAISE_PAPER_O2 if the trace missed peaks, baseline, "
+                    "or flow; LOWER_PAPER_O2 if ppm/flow was overestimated"
+                ),
+                "magnitude": {
+                    "kind": "quantified_anchor",
+                    "exp1_o2_kg": ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG,
+                    "exp2_o2_kg": ROBINOT_EXP2_ANALYZER_VISIBLE_O2_KG,
+                    "reproducibility_floor_fraction": (
+                        ROBINOT_REPRODUCIBILITY_FLOOR_FRACTION
+                    ),
+                    "status": (
+                        "whitepaper E3 killed as a primary 18.75x-25.20x "
+                        "closure mechanism"
+                    ),
+                },
+            },
+        },
+        "unexplained_residual": {
+            "kind": "explicit_unexplained",
+            "central_missing_free_o2_equivalent_kg": (
+                missing_literature_o2_kg
+            ),
+            "full_prediction_factor_vs_exp1": literature_factor,
+            "residual_factor_vs_exp1": _ratio_or_none(
+                missing_literature_o2_kg, ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG
+            ),
+            "statement": (
+                "Allocation of the missing O2 among plume oxidation, "
+                "deposit gettering, melt-redox retention, and post-run "
+                "air oxidation is not yet measured; this diagnostic does "
+                "not tune or close the gap."
+            ),
+        },
+    }
 
 
 def _empty_stage0_foulant_partition_groups() -> dict[str, dict[str, Any]]:

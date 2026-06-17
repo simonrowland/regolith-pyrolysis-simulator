@@ -45,6 +45,26 @@ def _diagnostic_sim():
     return SimpleNamespace(atom_ledger=ledger)
 
 
+def _terminal_oxygen_sim():
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "terminal.oxygen_melt_offgas_captured",
+        {"O2": 2.0},
+        source="test captured terminal oxygen",
+    )
+    ledger.load_external_mol(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum",
+        {"O2": 1.0},
+        source="test vented terminal oxygen",
+    )
+    ledger.load_external_mol(
+        "terminal.oxygen_melt_offgas_stored",
+        {"O2": 0.5},
+        source="test stored terminal oxygen",
+    )
+    return SimpleNamespace(atom_ledger=ledger)
+
+
 def test_lab_oxygen_atom_partition_closes_with_explicit_residual():
     partition = AccountingQueries(_diagnostic_sim()).lab_oxygen_atom_partition()
 
@@ -88,6 +108,69 @@ def test_lab_oxygen_atom_partition_closes_with_explicit_residual():
     assert partition["residual_unallocated_oxygen_atom_mol"] == pytest.approx(
         20.0
     )
+
+
+def test_lab_oxygen_error_budget_is_warn_only_and_decomposed():
+    partition = AccountingQueries(
+        _terminal_oxygen_sim()
+    ).lab_oxygen_atom_partition()
+    budget = partition["robinot_o2_error_budget"]
+
+    assert budget["schema"] == "robinot_o2_error_budget.v1"
+    assert budget["status"] == "WARN_ONLY"
+    assert budget["golden_neutral"] is True
+    assert budget["comparison_target"]["exp1_analyzer_visible_o2_kg"] == (
+        pytest.approx(35.0e-6)
+    )
+    assert budget["model_runtime"][
+        "free_analyzer_visible_oxygen_atom_mol"
+    ] == pytest.approx(7.0)
+    assert budget["model_runtime"][
+        "free_analyzer_visible_o2_equivalent_kg"
+    ] == pytest.approx(7.0 * 15.999 / 1000.0)
+    assert budget["model_runtime"]["terminal_oxygen_partition_kg"][
+        "captured"
+    ] == pytest.approx(2.0 * 2.0 * 15.999 / 1000.0)
+
+    published = budget["published_normalizations"]
+    assert published["raw_faithful_source_side_potential"][
+        "factor_vs_exp1"
+    ] == pytest.approx(0.881913e-3 / 35.0e-6)
+    assert published["literature_alpha_top_area_source_side_potential"][
+        "factor_vs_exp1"
+    ] == pytest.approx(0.656204e-3 / 35.0e-6)
+    assert published["literature_alpha_top_area_source_side_potential"][
+        "factor_band_vs_exp1"
+    ] == [18.25, 19.04]
+    assert "different normalization" in published["normalization_note"]
+
+    terms = budget["budget_terms"]
+    assert set(terms) == {
+        "plume_oxidation",
+        "deposit_gettering",
+        "melt_redox_retention",
+        "post_run_air_oxidation",
+        "analyzer_flow_baseline",
+    }
+    assert terms["plume_oxidation"]["magnitude"]["kind"] == "unquantified"
+    assert terms["deposit_gettering"]["magnitude"]["kind"] == (
+        "unquantified"
+    )
+    assert terms["melt_redox_retention"]["magnitude"]["kind"] == (
+        "runtime_accounted"
+    )
+    assert terms["post_run_air_oxidation"]["direction"].startswith(
+        "NO_IN_RUN_CLOSURE"
+    )
+    assert terms["analyzer_flow_baseline"]["magnitude"]["kind"] == (
+        "quantified_anchor"
+    )
+    assert budget["unexplained_residual"][
+        "central_missing_free_o2_equivalent_kg"
+    ] == pytest.approx(0.621204e-3)
+    assert "does not tune or close" in budget["unexplained_residual"][
+        "statement"
+    ]
 
 
 def test_lab_oxygen_atom_partition_reports_wall_deposit_by_surface():
@@ -150,6 +233,7 @@ def test_sio_yield_report_lab_oxygen_sidecar_is_explicit_opt_in():
     partition = diagnostics["lab_oxygen_atom_partition"]
     assert partition["closure"]["error_pct"] <= OXYGEN_CLOSURE_MAX_PCT
     assert "residual_unallocated_oxygen_atom_mol" in partition
+    assert partition["robinot_o2_error_budget"]["status"] == "WARN_ONLY"
     plume = diagnostics["lab_plume_product_partition"]
     assert plume["schema"] == "rec_w1_02_qms_oes_position_resolved.v1"
     assert "discriminant" in plume
