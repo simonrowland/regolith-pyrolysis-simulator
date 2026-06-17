@@ -90,7 +90,8 @@ for _ in drive_auto_apply(s, 24):
     pass
 rows = s.per_hour_summaries()   # T_C, P_total_bar, pO2_bar, metal_yields_kg,
                                 # condensation_train_kg, O2_yield_kg_cumulative,
-                                # mass_balance_pct, hour, campaign
+                                # O2_source_side_potential_kg_cumulative,
+                                # O2_metric_label, mass_balance_pct, hour, campaign
 ```
 
 > Note: `s.result_document()` raises unless a `result_document_factory` is configured.

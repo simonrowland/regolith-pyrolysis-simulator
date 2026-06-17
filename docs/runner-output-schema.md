@@ -6,7 +6,7 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.3.0`
+**Schema version:** `1.3.1`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Run the CLI as:
@@ -48,7 +48,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.3.0",
+  "schema_version": "1.3.1",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -72,7 +72,7 @@ schema-shape assertion.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.3.0",
+  "schema_version": "1.3.1",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -165,7 +165,7 @@ schema-shape assertion.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.
-* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.0`
+* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.1`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
 
@@ -266,7 +266,9 @@ schema-shape assertion.
     "P_total_bar": 0.0,                      // overhead total pressure (bar)
     "pO2_bar":     0.0,                      // pO2 in bar
     "mass_balance_pct": 2.6e-13,             // |mass_in - mass_out| / mass_in * 100
-    "O2_yield_kg_cumulative": 0.0,           // all four O2 bins, kg
+    "O2_yield_kg_cumulative": 0.0,           // legacy key; source-side O2 potential, kg
+    "O2_source_side_potential_kg_cumulative": 0.0, // honest alias for the same value
+    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {                     // metal product totals so far
       "Fe": 5.0
     },
@@ -294,6 +296,12 @@ schema-shape assertion.
   `HourSnapshot.mass_balance_error_pct` -- expected to stay below
   `5e-12 %` per the invariant tracked in `tests/test_mass_balance.py`.
   The runner does not enforce this on its own; the golden fixtures do.
+* `O2_yield_kg_cumulative` is retained for serialized compatibility but
+  must be read as source-side emitted O2 potential, not recovered,
+  captured, or analyzer-visible O2. `O2_source_side_potential_kg_cumulative`
+  is the preferred alias with the same numeric value. The downstream
+  sink/recovery model is Phase B; recovered-O2 claims do not belong in
+  this runner output yet.
 * `metal_yields_kg` is sourced from `PyrolysisSimulator.product_ledger`
   filtered to a curated list of metal species (see
   `simulator/runner.py::_METAL_PRODUCT_SPECIES`).  Non-metal products

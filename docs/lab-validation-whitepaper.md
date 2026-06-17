@@ -28,9 +28,10 @@ solar-furnace experiments of Robinot et al. (2026), with secondary anchors
 from Šeško et al. (2024) and Sauerborn (2005). The converged result is a
 split accuracy envelope, not a tuned match: one literature-alpha/top-area
 Robinot variant is order-unity on total non-O2 vapor/capture (`1.1-2.0x`
-after oxidation-state and mass-account bands), while analyzer-visible free
-O2 is still `18.75x` high before any downstream sink is credited. The O2
-miss is therefore treated as a four-channel sink-allocation problem
+after oxidation-state and mass-account bands), while the model's
+source-side/free-O2 potential is still `18.75x` above analyzer-visible O2
+before any downstream sink is credited. The O2 miss is therefore treated as a
+four-channel sink-allocation problem
 (plume oxidation, deposit gettering, melt-redox retention, and post-run air
 oxidation), not as a scalar alpha or area correction. The exp. 1 / exp. 2
 O2 reproducibility floor is about `11%`; daylight below that is not a
@@ -138,14 +139,14 @@ Shallow-pot verdict: shallow pots are a credible throughput lever, but "maximize
 
 ## 4. Results: Model–Experiment Daylight
 
-### 4.1 Oxygen yield
+### 4.1 Source-side O2 potential vs analyzer-visible O2
 
 <!-- SLOT:o2-comparison source=o2-probes-findings.md + attack-alpha-findings.md + design-robinot-reconciliation rev 4 status=refined -->
 
-| Quantity | Experiment (exp. 1 / exp. 2) | Model (faithful) | Model (literature-α forward prediction, band) | Daylight |
+| Quantity | Experiment (exp. 1 / exp. 2) | Model source-side potential (faithful) | Model source-side potential (literature-α forward prediction, band) | Daylight |
 |---|---|---|---|---|
-| O2 yield (mg) | `35` / `39.229` | about `882` (`25.20x` exp. 1) | `656.204` central (`18.25x-19.04x` area band; `18.75x` central) | Faithful raw is `25.20x` high; literature-alpha/top-area is still `18.75x` high. Missing free-O2 equivalent: `0.621204 g`. |
-| O2 yield (% of `3.38 g` sample) | `1.05%` / `1.16%` | about `26.1%` | about `19.4%` central | Above the `~11%` exp. 1 / exp. 2 reproducibility floor by order-of-magnitude; not a run-to-run scatter issue. |
+| Analyzer-visible O2 vs source-side potential (mg O2-equivalent) | `35` / `39.229` analyzer-visible | about `882` source-side (`25.20x` exp. 1) | `656.204` source-side central (`18.25x-19.04x` area band; `18.75x` central) | Faithful raw is `25.20x` high; literature-alpha/top-area is still `18.75x` high. Missing free-O2 equivalent: `0.621204 g`. |
+| Analyzer-visible O2 vs source-side potential (% of `3.38 g` sample) | `1.05%` / `1.16%` analyzer-visible | about `26.1%` source-side | about `19.4%` source-side central | Above the `~11%` exp. 1 / exp. 2 reproducibility floor by order-of-magnitude; not a run-to-run scatter issue. |
 | Free-O2 / captured-vapor ratio | `0.035 g / 1.26 g = 0.028` | high, not sink-corrected | model source chemistry implies a reduced-source floor `>=0.2` before downstream sinks | The measured ratio is below the stoichiometric floor, so free O2 must be consumed or retained after source emission. |
 
 *Experimental reproducibility floor: |1.17 − 1.05| / 1.11 ≈ 11 % — the
@@ -176,8 +177,8 @@ Final count: `2` killed, `4` weakened, `10` survive.
 
 | # | Hypothesis | Disposition | Evidence | What it now means |
 |---|---|---|---|---|
-| M1 | Source-side alpha-area kinetics | killed | Literature alpha plus honest top area predicts O2 `18.75x` and vapor `1.365x`; O2-matching post-hoc area gives vapor `0.093x`. | Alpha remains parameter debt, but alpha-area as the main O2 closure mechanism is killed. |
-| M2 | Pellet/effective area basis | weakened | Honest top-area variants still leave O2 `18.25x-19.04x` high. | Area is a diagnostic and cache seam, not a behavior fix by itself. |
+| M1 | Source-side alpha-area kinetics | killed | Literature alpha plus honest top area predicts source-side O2 potential `18.75x` above analyzer-visible O2 and vapor `1.365x`; O2-matching post-hoc area gives vapor `0.093x`. | Alpha remains parameter debt, but alpha-area as the main O2 closure mechanism is killed. |
+| M2 | Pellet/effective area basis | weakened | Honest top-area variants still leave source-side O2 potential `18.25x-19.04x` above analyzer-visible O2. | Area is a diagnostic and cache seam, not a behavior fix by itself. |
 | M3 | Oxygen sink decomposition | survives | Stoichiometric O2 deficit; SiO is the major oxygen-bearing source vapor; deposit mass/chemistry, upstream filter, and residual melt redox remain open. | Split into plume oxidation, deposit gettering, melt-redox retention, and post-run air oxidation. Post-run air oxidation can explain oxidized recovered deposits only, not low in-run analyzer O2. |
 | M4 | Activity / vapor-pressure chain | weakened | SiO Antoine terms, activity proxy, and pO2 floor remain high-sensitivity, while total vapor is already order-unity. | Standing uncertainty band; do not retune coefficients to hide the oxygen-sink gap. |
 | M5 | Open-system transport survival | weakened | Outlet-only survival did not close O2; instrument recommendations keep QMS/pO2 open. | Transport matters only when tied to an atom-conserved sink channel. |

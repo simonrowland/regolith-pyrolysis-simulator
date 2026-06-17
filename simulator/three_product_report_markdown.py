@@ -24,7 +24,9 @@ from typing import Any, Mapping
 # Display order matches CLAUDE.md § 5 product class enumeration.
 _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
     ('metals_plus_O2',
-     '1. Metals + O₂ (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + terminal O₂)'),
+     '1. Metals + source-side O₂ potential '
+     '(alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co '
+     '+ emitted O₂ potential)'),
     ('pure_silica_glass',
      '2. Pure silica glass (Stage 3 fused-silica baffle capture)'),
     ('industrial_mixed_glass',
@@ -102,7 +104,7 @@ def format_three_product_markdown(
 
     # ----- One-line totals snapshot -----
     totals = [
-        ('Metals + O₂',
+        ('Metals + O₂ potential',
          classification.get('metals_plus_O2', {}).get('class_total_kg', 0.0)),
         ('Silica glass',
          classification.get('pure_silica_glass', {}).get('class_total_kg', 0.0)),
@@ -132,7 +134,10 @@ def format_three_product_markdown(
                 f"- Metals subtotal: "
                 f"{_format_kg(float(bucket.get('metals_total_kg', 0.0)))} kg"
             )
-            lines.append(f"- O₂ subtotal: {_format_kg(o2_kg)} kg")
+            lines.append(
+                "- Source-side O₂ potential subtotal "
+                f"(emitted; not recovered/captured): {_format_kg(o2_kg)} kg"
+            )
             lines.append("")
             lines.append("Per-species:")
             lines.append(_kg_by_species_block(metals_kg))

@@ -21,6 +21,8 @@ PER_HOUR_KEYS = {
     "pO2_bar",
     "mass_balance_pct",
     "O2_yield_kg_cumulative",
+    "O2_source_side_potential_kg_cumulative",
+    "O2_metric_label",
     "metal_yields_kg",
     "condensation_train_kg",
     "vapor_species_kg_hr",

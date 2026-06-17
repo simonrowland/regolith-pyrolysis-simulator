@@ -76,7 +76,7 @@ def test_class_totals_snapshot_line_present():
     pipe-separated format."""
     report = format_three_product_markdown(_empty_classification())
     assert "**Class totals**:" in report
-    assert "Metals + O₂:" in report
+    assert "Metals + O₂ potential:" in report
     assert "Silica glass:" in report
     assert "Mixed glass:" in report
     assert "Rump:" in report
@@ -88,7 +88,7 @@ def test_class_totals_snapshot_line_present():
 
 def test_metals_class_renders_per_species_breakdown():
     """Metals class shows the per-species kg breakdown plus the
-    metals/O2 subtotal split."""
+    metals/source-side O2 potential subtotal split."""
     classification = _empty_classification()
     classification['metals_plus_O2'] = {
         'metals_kg': {'Fe': 5.0, 'Na': 1.0, 'K': 0.5},
@@ -101,7 +101,7 @@ def test_metals_class_renders_per_species_breakdown():
     assert "**Na**" in report
     assert "**K**" in report
     assert "Metals subtotal" in report
-    assert "O₂ subtotal" in report
+    assert "Source-side O₂ potential subtotal" in report
 
 
 def test_silica_glass_class_shows_stage_3_capture():

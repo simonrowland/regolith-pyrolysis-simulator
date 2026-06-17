@@ -43,7 +43,7 @@ This is the preferred default. A single continuous solar-thermal ramp meters dT/
 
 Downstream effects: C3 shuttle scope is halved (0–1 K cycle + 1 Na cycle); C5 MRE scope is reduced 20–40 %; overall batch cycle is 8–20 % shorter than Path B.
 
-Product yields for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8–1.35 kg, Fe 85–130 kg, SiO₂ glass 100–160 kg, O₂ 48–70 kg.
+Product metrics for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8–1.35 kg, Fe 85–130 kg, SiO₂ glass 100–160 kg, source-side O₂ potential 48–70 kg. The O₂ number is emitted/source-side potential, not recovered or analyzer-visible O₂; downstream sink/recovery accounting is Phase B.
 
 Source: `data/setpoints.yaml` lines 79–138.
 
@@ -163,7 +163,7 @@ See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full
 
 ### Metals-extraction mode (the default)
 
-Objective: maximum metals + O₂ yield from a lunar mare feedstock.
+Objective: maximum metals + source-side O₂ potential from a lunar mare feedstock.
 
 Sequence: **C0 → C0b → C2A_continuous → C3 → C4 → C5 (Branch Two) → C6**
 

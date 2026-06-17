@@ -104,6 +104,8 @@ PER_HOUR_KEYS = frozenset({
     "pO2_bar",
     "mass_balance_pct",
     "O2_yield_kg_cumulative",
+    "O2_source_side_potential_kg_cumulative",
+    "O2_metric_label",
     "metal_yields_kg",
     "condensation_train_kg",
     "vapor_species_kg_hr",
@@ -900,6 +902,16 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         assert isinstance(entry["pO2_bar"], (int, float))
         assert isinstance(entry["mass_balance_pct"], (int, float))
         assert isinstance(entry["O2_yield_kg_cumulative"], (int, float))
+        assert isinstance(
+            entry["O2_source_side_potential_kg_cumulative"], (int, float)
+        )
+        assert (
+            entry["O2_source_side_potential_kg_cumulative"]
+            == entry["O2_yield_kg_cumulative"]
+        )
+        assert entry["O2_metric_label"] == (
+            "source-side O2 potential (emitted; not recovered)"
+        )
 
 
 def test_session_per_hour_summary_event_uses_runner_builder():

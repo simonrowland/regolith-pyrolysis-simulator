@@ -82,8 +82,11 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.3.0"
+RUNNER_SCHEMA_VERSION = "1.3.1"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
+O2_SOURCE_SIDE_POTENTIAL_LABEL = (
+    "source-side O2 potential (emitted; not recovered)"
+)
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -1221,15 +1224,19 @@ def build_per_hour_summary(
     * ``P_total_bar``: total pressure above the melt in bar
     * ``pO2_bar``: pO2 partial pressure in bar
     * ``mass_balance_pct``: ledger-based mass balance error, percent
-    * ``O2_yield_kg_cumulative``: cumulative O2 from all bins (kg)
-        * ``metal_yields_kg``: dict of metal product yields (kg) at this
+    * ``O2_yield_kg_cumulative``: legacy serialized key for source-side
+      O2 potential from all bins (kg), not recovered/captured O2
+    * ``O2_source_side_potential_kg_cumulative``: honest alias for the
+      same source-side emitted O2 potential value
+    * ``O2_metric_label``: human-facing label for the O2 metric semantics
+    * ``metal_yields_kg``: dict of metal product yields (kg) at this
       hour, sourced from the simulator's product_ledger projection
-        * ``condensation_train_kg``: dict of cumulative condensation totals
-        * ``vapor_species_kg_hr``: per-species vapor flux from the snapshot
-        * ``wall_deposit_delta_kg``: per-hour wall deposit by segment/species
-        * ``wall_deposit_cumulative_kg``: running wall deposit by segment/species
-        * ``Kn`` / ``regime``: Knudsen-regime observables from the snapshot
-        * ``transport_formula_id``: P0-gated sentinel until molecular transport lands
+    * ``condensation_train_kg``: dict of cumulative condensation totals
+    * ``vapor_species_kg_hr``: per-species vapor flux from the snapshot
+    * ``wall_deposit_delta_kg``: per-hour wall deposit by segment/species
+    * ``wall_deposit_cumulative_kg``: running wall deposit by segment/species
+    * ``Kn`` / ``regime``: Knudsen-regime observables from the snapshot
+    * ``transport_formula_id``: P0-gated sentinel until molecular transport lands
     """
 
     # 0.5.3 Phase C milestone review P1 (codex 2026-05-28): the per-hour
@@ -1282,6 +1289,8 @@ def build_per_hour_summary(
     ):
         mass_balance_pct = 0.0
 
+    o2_source_side_potential_kg = float(snapshot.oxygen_produced_kg)
+
     summary = {
         "hour": int(snapshot.hour),
         "campaign": snapshot.campaign.name,
@@ -1289,7 +1298,9 @@ def build_per_hour_summary(
         "P_total_bar": p_total_bar,
         "pO2_bar": pO2_bar,
         "mass_balance_pct": mass_balance_pct,
-        "O2_yield_kg_cumulative": float(snapshot.oxygen_produced_kg),
+        "O2_yield_kg_cumulative": o2_source_side_potential_kg,
+        "O2_source_side_potential_kg_cumulative": o2_source_side_potential_kg,
+        "O2_metric_label": O2_SOURCE_SIDE_POTENTIAL_LABEL,
         "metal_yields_kg": metal_yields,
         "condensation_train_kg": {
             species: float(kg)

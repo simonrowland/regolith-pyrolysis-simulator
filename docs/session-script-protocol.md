@@ -121,6 +121,8 @@ An `advance` command that completes exactly one ordinary step emits:
     "pO2_bar": 0.0,
     "mass_balance_pct": 2.6e-13,
     "O2_yield_kg_cumulative": 0.0,
+    "O2_source_side_potential_kg_cumulative": 0.0,
+    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {},
     "condensation_train_kg": {}
   },
@@ -145,6 +147,8 @@ An `advance N` command that completes multiple ordinary steps emits:
       "pO2_bar": 0.0,
       "mass_balance_pct": 2.6e-13,
       "O2_yield_kg_cumulative": 0.0,
+      "O2_source_side_potential_kg_cumulative": 0.0,
+      "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {},
       "condensation_train_kg": {}
     }
@@ -158,6 +162,8 @@ An `advance N` command that completes multiple ordinary steps emits:
       "pO2_bar": 0.0,
       "mass_balance_pct": 2.6e-13,
       "O2_yield_kg_cumulative": 0.0,
+      "O2_source_side_potential_kg_cumulative": 0.0,
+      "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {},
       "condensation_train_kg": {}
     }
@@ -219,6 +225,8 @@ Successful non-step command frames have `frame_type` matching the verb.
     "pO2_bar": 0.0,
     "mass_balance_pct": 0.0,
     "O2_yield_kg_cumulative": 0.0,
+    "O2_source_side_potential_kg_cumulative": 0.0,
+    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {},
     "condensation_train_kg": {}
   },
