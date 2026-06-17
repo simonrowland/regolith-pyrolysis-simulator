@@ -143,6 +143,27 @@ class _SiOnlyMelt:
         return {"SiO2": 100.0}
 
 
+def _si_only_transport_redox_request(
+    *,
+    transport_pO2_bar: float,
+    intrinsic_fO2_log: float,
+) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_SiOnlyMelt.temperature_C,
+        pressure_bar=1e-6,
+        fO2_log=-8.0,
+        control_inputs={
+            "pO2_bar": transport_pO2_bar,
+            "intrinsic_fO2_log": intrinsic_fO2_log,
+        },
+    )
+
+
 class _LegacyFallbackStub(EquilibriumMixin):
     def __init__(self, vapor_pressure_data, melt=None):
         self.vapor_pressures = vapor_pressure_data
@@ -302,6 +323,62 @@ def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
     assert "Si" not in kernel_vp
     assert "Si" not in legacy_vp
     assert set(legacy_vp) == set(kernel_vp)
+
+
+def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    reduced_redox = _si_only_transport_redox_request(
+        transport_pO2_bar=1e-6,
+        intrinsic_fO2_log=-12.0,
+    )
+    oxidized_redox = _si_only_transport_redox_request(
+        transport_pO2_bar=1e-6,
+        intrinsic_fO2_log=-4.0,
+    )
+
+    assert provider._resolve_transport_pO2_bar(reduced_redox) == pytest.approx(
+        1e-6
+    )
+    assert provider._resolve_transport_pO2_bar(oxidized_redox) == pytest.approx(
+        1e-6
+    )
+    assert provider._resolve_intrinsic_melt_fO2_log(
+        reduced_redox
+    ) == pytest.approx(-12.0)
+    assert provider._resolve_intrinsic_melt_fO2_log(
+        oxidized_redox
+    ) == pytest.approx(-4.0)
+
+    reduced_result = provider.dispatch(reduced_redox)
+    oxidized_result = provider.dispatch(oxidized_redox)
+    reduced_diag = dict(reduced_result.diagnostic or {})
+    oxidized_diag = dict(oxidized_result.diagnostic or {})
+    reduced_vp = dict(reduced_diag.get("vapor_pressures_Pa") or {})
+    oxidized_vp = dict(oxidized_diag.get("vapor_pressures_Pa") or {})
+
+    assert reduced_diag["pO2_bar"] == pytest.approx(1e-6)
+    assert oxidized_diag["pO2_bar"] == pytest.approx(1e-6)
+    assert reduced_vp["SiO"] == pytest.approx(oxidized_vp["SiO"])
+
+    lower_transport = _si_only_transport_redox_request(
+        transport_pO2_bar=1e-9,
+        intrinsic_fO2_log=-12.0,
+    )
+    assert provider._resolve_intrinsic_melt_fO2_log(
+        lower_transport
+    ) == pytest.approx(
+        provider._resolve_intrinsic_melt_fO2_log(reduced_redox)
+    )
+    lower_transport_result = provider.dispatch(lower_transport)
+    lower_transport_diag = dict(lower_transport_result.diagnostic or {})
+    lower_transport_vp = dict(
+        lower_transport_diag.get("vapor_pressures_Pa") or {}
+    )
+
+    assert lower_transport_diag["pO2_bar"] == pytest.approx(1e-9)
+    assert lower_transport_vp["SiO"] > reduced_vp["SiO"]
 
 
 # ---------------------------------------------------------------------------

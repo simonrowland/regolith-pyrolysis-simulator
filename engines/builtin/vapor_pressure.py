@@ -18,8 +18,10 @@ The provider:
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with Antoine
   reference terms to compute per-species saturation pressures at the
-  request's ``temperature_C`` and the caller-supplied commanded
-  ``pO2_bar`` (via ``control_inputs``). Only
+  request's ``temperature_C`` and the caller-supplied transport/overhead
+  ``pO2_bar`` (via ``control_inputs``). The intrinsic-melt fO2/redox
+  channel resolves separately from the transport pO2 channel so future
+  redox controls cannot alias the SiO transport lever. Only
   ``pure_component_antoine`` sidecars are used for pure-component reference
   pressures when present; legacy ``antoine`` rows are used only when no
   sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
@@ -571,7 +573,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
             )
 
-        pO2_bar = self._resolve_pO2_bar(request)
+        transport_pO2_bar = self._resolve_transport_pO2_bar(request)
+        # The intrinsic-melt fO2/redox channel is resolved on demand via
+        # ``_resolve_intrinsic_melt_fO2_log`` once a consumer (redox-proxy /
+        # §5K knobs) lands. It is deliberately NOT invoked here: with no
+        # consumer it would be dead work, and eagerly parsing
+        # ``control_inputs['intrinsic_fO2_log']`` would introduce a new
+        # throw-path on a key the prior code ignored (golden-neutrality).
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -664,7 +672,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="K_decomp",
             )
             numerator = _require_finite_vapor_value(
-                K_decomp * (a_oxide ** n_ox) / pO2_bar,
+                K_decomp * (a_oxide ** n_ox) / transport_pO2_bar,
                 species=species,
                 field="metal_activity_numerator",
             )
@@ -740,15 +748,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    P_sat
+                    * (transport_pO2_bar / pO2_reference_bar)
+                    ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )
 
             # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
             # 1e-9 bar (lunar hard vacuum).
-            if name == 'SiO' and not pO2_exponent and pO2_bar > 1e-9:
-                suppression = math.sqrt(1e-9 / pO2_bar)
+            if (
+                name == 'SiO'
+                and not pO2_exponent
+                and transport_pO2_bar > 1e-9
+            ):
+                suppression = math.sqrt(1e-9 / transport_pO2_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,
@@ -779,7 +793,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "vapor_pressures_Pa": vapor_pressures,
                 "vapor_pressures_source": vapor_pressure_sources,
                 "activities": activities,
-                "pO2_bar": pO2_bar,
+                "pO2_bar": transport_pO2_bar,
                 "extrapolated_beyond_valid_range_K": metal_extrapolations,
                 "ellingham_extrapolated_beyond_fit_range_K": (
                     ellingham_extrapolations
@@ -792,15 +806,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
     # Helpers
     # ------------------------------------------------------------------
 
-    def _resolve_pO2_bar(self, request: IntentRequest) -> float:
-        """Pick up the commanded pO2 (bar) from the caller.
+    def _resolve_transport_pO2_bar(self, request: IntentRequest) -> float:
+        """Pick up the transport/overhead pO2 (bar) from the caller.
 
-        The kernel's standard ``fO2_log`` channel carries the absolute
-        log10(fO2/bar); the simulator computes the commanded pO2 in
+        The simulator computes the commanded overhead pO2 in
         :meth:`EquilibriumMixin._commanded_pO2_bar` and passes it through
         ``control_inputs['pO2_bar']`` to keep parity with the legacy
-        ``_stub_equilibrium`` (which uses that value directly, not the
-        fO2_log channel). If neither is supplied, fall back to the
+        ``_stub_equilibrium``. If that explicit transport channel is
+        absent, preserve the old fallback to the standard ``fO2_log``
+        channel; if neither is supplied, fall back to the
         numerical vacuum floor.
         """
 
@@ -810,3 +824,30 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if request.fO2_log is not None:
             return max(10.0 ** float(request.fO2_log), 1e-9)
         return 1e-9
+
+    def _resolve_intrinsic_melt_fO2_log(
+        self,
+        request: IntentRequest,
+        *,
+        default_transport_pO2_bar: float | None = None,
+    ) -> float:
+        """Resolve the intrinsic-melt redox fO2 channel independently.
+
+        ``control_inputs['intrinsic_fO2_log']`` is the explicit redox
+        channel used by melt diagnostics. ``control_inputs['pO2_bar']``
+        remains the transport/overhead channel and must not override an
+        explicit or request-level melt fO2 value.
+        """
+
+        controls = request.control_inputs or {}
+        intrinsic_fO2_log = controls.get('intrinsic_fO2_log')
+        if intrinsic_fO2_log is not None:
+            return float(intrinsic_fO2_log)
+        if request.fO2_log is not None:
+            return float(request.fO2_log)
+        transport_pO2_bar = (
+            float(default_transport_pO2_bar)
+            if default_transport_pO2_bar is not None
+            else self._resolve_transport_pO2_bar(request)
+        )
+        return math.log10(max(transport_pO2_bar, 1e-30))
