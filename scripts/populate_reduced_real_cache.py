@@ -515,6 +515,15 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
         ).fetchone()
         if table is None:
             return []
+        columns = {
+            str(row["name"])
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+        corpus_column = (
+            "corpus_version"
+            if "corpus_version" in columns
+            else "NULL AS corpus_version"
+        )
         return [
             dict(row)
             for row in conn.execute(
@@ -529,6 +538,7 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
                     key_bytes,
                     payload_bytes,
                     code_version,
+                    {corpus_column},
                     engine_version,
                     data_digests_json,
                     created_at,
@@ -631,11 +641,12 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     key_bytes,
                     payload_bytes,
                     code_version,
+                    corpus_version,
                     engine_version,
                     data_digests_json,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -647,6 +658,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     sqlite3.Binary(key_bytes),
                     sqlite3.Binary(payload_bytes),
                     str(row["code_version"]),
+                    row.get("corpus_version"),
                     row["engine_version"],
                     str(row["data_digests_json"]),
                     str(row["created_at"]),

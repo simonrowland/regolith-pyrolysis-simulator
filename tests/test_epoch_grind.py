@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import signal
 import sqlite3
 import sys
 import threading
@@ -49,7 +51,6 @@ def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) 
                     "reduced_real_cache": {
                         "db_path": "old.sqlite",
                         "authorized_backend_name": "magemin",
-                        "authorized_backend_version": "test",
                     },
                 },
                 "fidelities": {"fast": {}},
@@ -267,6 +268,122 @@ def test_resume_from_journal_keeps_done_jobs_done(tmp_path: Path) -> None:
     assert loaded["jobs_done"] == ["done"]
     assert loaded["jobs_remaining"] == ["pending"]
     assert [job.id for job in pending] == ["pending"]
+
+
+def test_run_driver_resume_after_sigterm_skips_done_job_and_retries_pending(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest_path = _manifest_file(
+        tmp_path,
+        jobs=[
+            {
+                "id": "job-a",
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "profile.json",
+                "budget": 1,
+                "strategy": "random",
+                "seed": 1,
+                "out": "runs/job-a",
+            },
+            {
+                "id": "job-b",
+                "feedstock": "lunar_mare_low_ti",
+                "profile": "profile.json",
+                "budget": 1,
+                "strategy": "random",
+                "seed": 2,
+                "out": "runs/job-b",
+            },
+        ],
+    )
+    manifest = epoch_grind.load_manifest(manifest_path)
+    journal_path = tmp_path / "journal.json"
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=10,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    monotonic_values = iter([0.0, 1.0, 2.0, 11.0, 20.0, 21.0, 22.0, 40.0, 41.0, 42.0])
+    last_time = 42.0
+
+    def fake_monotonic() -> float:
+        nonlocal last_time
+        try:
+            last_time = next(monotonic_values)
+        except StopIteration:
+            last_time += 1.0
+        return last_time
+
+    attempts: list[tuple[str, str]] = []
+    interrupted = False
+
+    def fake_run_child(
+        command: list[str],
+        *,
+        stdout_path: Path,
+        stderr_path: Path,
+        timeout: float | None,
+        out_dir: Path | None = None,
+        budget: int | None = None,
+    ) -> epoch_grind.ChildOutcome:
+        nonlocal interrupted
+        del command, stdout_path, stderr_path, timeout, budget
+        assert out_dir is not None
+        job_id = out_dir.parent.name
+        epoch_name = out_dir.name
+        attempts.append((job_id, epoch_name))
+        if job_id == "job-b" and epoch_name == "epoch-0002" and not interrupted:
+            interrupted = True
+            raise SystemExit(128 + signal.SIGTERM)
+        return epoch_grind.ChildOutcome(kind="completed", returncode=0)
+
+    def merge_recorder(base: Path, shard_paths: list[Path], **kwargs: object) -> dict[str, object]:
+        seed_rows_by_source = kwargs.get("seed_rows_by_source", {})
+        return {
+            "target": str(base),
+            "inserted_rows": len(shard_paths),
+            "sources": [
+                {
+                    "inserted_rows": 1,
+                    "seed_rows": int(seed_rows_by_source[str(path)]),
+                    "source": str(path),
+                    "source_rows": int(seed_rows_by_source[str(path)]) + 1,
+                }
+                for path in shard_paths
+            ],
+        }
+
+    monkeypatch.setattr(epoch_grind.time, "monotonic", fake_monotonic)
+    monkeypatch.setattr(epoch_grind, "_run_child", fake_run_child)
+    monkeypatch.setattr(epoch_grind, "merge_epoch_shards", merge_recorder)
+
+    with pytest.raises(SystemExit) as exc_info:
+        epoch_grind.run_driver(manifest, config, journal_path=journal_path)
+
+    assert exc_info.value.code == 128 + signal.SIGTERM
+    interrupted_journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    assert interrupted_journal["jobs_done"] == ["job-a"]
+    assert interrupted_journal["jobs_remaining"] == ["job-b"]
+    assert [epoch["completed_jobs"] for epoch in interrupted_journal["epochs"]] == [["job-a"]]
+
+    assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == 0
+    final_journal = json.loads(journal_path.read_text(encoding="utf-8"))
+
+    assert attempts == [
+        ("job-a", "epoch-0001"),
+        ("job-b", "epoch-0002"),
+        ("job-b", "epoch-0002"),
+    ]
+    assert final_journal["decision"] == epoch_grind.DECISION_BATCH_COMPLETE
+    assert final_journal["jobs_done"] == ["job-a", "job-b"]
+    assert final_journal["jobs_remaining"] == []
+    assert [epoch["completed_jobs"] for epoch in final_journal["epochs"]] == [["job-a"], ["job-b"]]
+    epoch_grind.verify_base_cache_integrity(manifest.base_cache)
+    assert payload_count(manifest.base_cache) == 0
 
 
 def test_resume_rejects_journal_from_different_manifest(tmp_path: Path) -> None:
@@ -512,7 +629,7 @@ def test_write_epoch_profile_overlays_cache_db(tmp_path: Path) -> None:
     )
 
 
-def test_timeboxed_child_stays_pending_and_mergeable(
+def test_timeboxed_child_stays_pending_without_merging_partial_shard(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -544,11 +661,220 @@ def test_timeboxed_child_stays_pending_and_mergeable(
     assert result["timed_out_jobs"] == ["job-a"]
     assert result["completed_jobs"] == []
     assert result["failed_jobs"] == []
-    assert result["shard_dbs"] == [
-        str(manifest.work_dir / "epoch-0001" / "shards" / "job-a.sqlite")
-    ]
-    assert result["seed_rows_by_shard"][result["shard_dbs"][0]] == 0
+    assert result["shard_dbs"] == []
+    assert result["seed_rows_by_shard"] == {}
     assert [job.id for job in epoch_grind.pending_jobs(manifest, journal)] == ["job-a"]
+
+
+def test_rerun_epoch_removes_stale_job_output_dir(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    stale_out = manifest.jobs[0].out / "epoch-0001"
+    stale_out.mkdir(parents=True)
+    (stale_out / "cache.sqlite").write_text("stale partial cache", encoding="utf-8")
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"seed_rows": 0},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
+    )
+
+    epoch_grind.run_epoch(manifest, manifest.jobs, config, epoch_index=1)
+
+    assert not (stale_out / "cache.sqlite").exists()
+
+
+def test_seed_job_cache_removes_stale_sqlite_sidecars(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    shard.parent.mkdir(parents=True)
+    for path in (shard, shard.with_name(shard.name + "-wal"), shard.with_name(shard.name + "-shm")):
+        path.write_text("stale", encoding="utf-8")
+
+    epoch_grind.seed_job_cache(shard, base)
+
+    assert shard.exists()
+    assert not shard.with_name(shard.name + "-wal").exists()
+    assert not shard.with_name(shard.name + "-shm").exists()
+
+
+def test_seed_job_cache_retries_transient_oserror_during_sqlite_cleanup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    shard.parent.mkdir(parents=True)
+    shard.write_text("stale", encoding="utf-8")
+    original_unlink = Path.unlink
+    failures = 0
+
+    def flaky_unlink(path: Path, *args: object, **kwargs: object) -> None:
+        nonlocal failures
+        if path == shard and failures == 0:
+            failures += 1
+            raise OSError("transient unlink race")
+        original_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", flaky_unlink)
+
+    with caplog.at_level(logging.WARNING, logger=epoch_grind.__name__):
+        epoch_grind.seed_job_cache(shard, base)
+
+    assert failures == 1
+    assert shard.exists()
+    assert "stale sqlite cleanup retrying" in caplog.text
+
+
+def test_rerun_epoch_retries_transient_oserror_during_stale_output_cleanup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    stale_out = manifest.jobs[0].out / "epoch-0001"
+    stale_out.mkdir(parents=True)
+    stale_marker = stale_out / "cache.sqlite"
+    stale_marker.write_text("stale partial cache", encoding="utf-8")
+    original_rmtree = epoch_grind.shutil.rmtree
+    failures = 0
+
+    def flaky_rmtree(path: Path, *args: object, **kwargs: object) -> None:
+        nonlocal failures
+        if Path(path) == stale_out and failures == 0:
+            failures += 1
+            raise OSError("transient rmtree race")
+        original_rmtree(path, *args, **kwargs)
+
+    monkeypatch.setattr(epoch_grind.shutil, "rmtree", flaky_rmtree)
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"seed_rows": 0},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
+    )
+
+    with caplog.at_level(logging.WARNING, logger=epoch_grind.__name__):
+        epoch_grind.run_epoch(manifest, manifest.jobs, config, epoch_index=1)
+
+    assert failures == 1
+    assert not stale_marker.exists()
+    assert "stale output dir cleanup retrying" in caplog.text
+
+
+def test_terminate_active_children_forwards_to_registered_processes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeProcess:
+        def poll(self) -> None:
+            return None
+
+    process = FakeProcess()
+    terminated: list[object] = []
+    with epoch_grind._ACTIVE_CHILDREN_LOCK:
+        epoch_grind._ACTIVE_CHILDREN.clear()
+    monkeypatch.setattr(
+        epoch_grind,
+        "_terminate_process_group",
+        lambda child: terminated.append(child),
+    )
+
+    epoch_grind._register_child(process)  # type: ignore[arg-type]
+    epoch_grind._terminate_active_children()
+    epoch_grind._unregister_child(process)  # type: ignore[arg-type]
+
+    assert terminated == [process]
+
+
+def test_ioreg_monitor_records_epoch_boundaries_and_eval_interval(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    journal_path = tmp_path / "journal.json"
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+        ioreg_sample_every_evals=4,
+    )
+    counts = iter([40, 43, 45])
+
+    def fake_sample() -> dict[str, object]:
+        return {
+            "timestamp_utc": "2026-06-15T00:00:00Z",
+            "platform": "darwin",
+            "command": epoch_grind.IOREG_IOSURFACE_COMMAND,
+            "status": "ok",
+            "count": next(counts),
+            "returncode": 0,
+        }
+
+    monkeypatch.setattr(epoch_grind, "sample_iosurface_client_count", fake_sample)
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"seed_rows": 0},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "merge_epoch_shards",
+        lambda *args, **kwargs: {"inserted_rows": 0, "sources": []},
+    )
+
+    assert epoch_grind.run_driver(manifest, config, journal_path=journal_path) == 0
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    ioreg = journal["epochs"][0]["ioreg"]
+    samples = ioreg["samples"]
+
+    assert ioreg["enabled"] is True
+    assert ioreg["sample_every_evals"] == 4
+    assert [sample["label"] for sample in samples] == [
+        "epoch_start",
+        "eval_interval",
+        "epoch_end",
+    ]
+    assert [sample["count"] for sample in samples] == [40, 43, 45]
+    assert [sample["delta_from_baseline"] for sample in samples] == [0, 3, 5]
+    assert samples[1]["evals_attempted"] == 8
+    log_path = Path(ioreg["log"])
+    log_rows = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+    assert [row["label"] for row in log_rows] == ["epoch_start", "eval_interval", "epoch_end"]
 
 
 def test_run_child_classifies_child_owned_rc_124_as_failure(tmp_path: Path) -> None:
@@ -928,7 +1254,6 @@ def test_concurrent_jobs_complete_with_isolated_shards(
                     "reduced_real_cache": {
                         "db_path": "old.sqlite",
                         "authorized_backend_name": "magemin",
-                        "authorized_backend_version": "test",
                     },
                 },
                 "fidelities": {"fast": {}},
@@ -1043,7 +1368,6 @@ def test_concurrent_jobs_failure_drains_in_flight_siblings(
                     "reduced_real_cache": {
                         "db_path": "old.sqlite",
                         "authorized_backend_name": "magemin",
-                        "authorized_backend_version": "test",
                     },
                 },
                 "fidelities": {"fast": {}},
@@ -1187,8 +1511,8 @@ def test_concurrent_jobs_failure_drains_in_flight_siblings(
             job["status"] for job in journal["jobs"] if job["id"] == failing_job
         )
         assert timed_out_status == "done"
-        assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job + 2
-        assert payload_count(manifest.base_cache) == len(sibling_ids) * rows_per_job + rows_per_job + 2
+        assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job
+        assert payload_count(manifest.base_cache) == len(job_ids) * rows_per_job
 
 
 def test_failed_epoch_is_journaled_before_return(

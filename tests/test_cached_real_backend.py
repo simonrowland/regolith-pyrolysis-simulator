@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -20,11 +22,13 @@ from simulator.backends import (
 )
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
+from simulator.corpus_version import CorpusVersionConfigError, current_corpus_version
 from simulator.melt_backend.base import EquilibriumResult, StubBackend
 from simulator.reduced_real_determinism import (
     PT0CacheCollision,
     PT0CacheMiss,
     PT0DeterminismStore,
+    PT1_EQUILIBRIUM_TABLE,
     canonical_json_bytes,
     canonical_replay_key,
     equilibrium_payload,
@@ -34,7 +38,7 @@ from simulator.state import CampaignPhase
 
 class _FakeLiveRealBackend:
     name = "fake-live-real"
-    engine_version = "fake-live-real-v1"
+    engine_version = "fake-live-real 1.0.0"
     last_instance: "_FakeLiveRealBackend | None" = None
 
     def __init__(self) -> None:
@@ -80,7 +84,16 @@ class _FakeLiveRealBackend:
 
 class AlphaMELTSBackend(_FakeLiveRealBackend):
     name = "alphamelts"
-    engine_version = "alphamelts-test-v1"
+    engine_version = "alphamelts-test 1.0.0"
+
+
+class _AlphaMELTSClusterIdentityBackend(_FakeLiveRealBackend):
+    name = "alphamelts"
+    engine_version = (
+        "alphamelts2 2.3.1 (server=studio-a) "
+        "(path=/opt/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
+        "(digest=sha256:abc123)"
+    )
 
 
 def _cache_config(
@@ -96,6 +109,45 @@ def _cache_config(
         "authorized_backend_name": name,
         "authorized_backend_version": version,
     }
+
+
+def _restamp_first_pt1_row_corpus(db_path: Path, corpus_version: str) -> None:
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            f"SELECT key_hash, key_bytes FROM {PT1_EQUILIBRIUM_TABLE} LIMIT 1"
+        ).fetchone()
+        key = json.loads(row[1].decode("utf-8"))
+        key["corpus_version"] = corpus_version
+        backend = key.get("backend")
+        if isinstance(backend, dict):
+            backend["corpus_version"] = corpus_version
+        provider = key.get("provider")
+        if isinstance(provider, dict) and "corpus_version" in provider:
+            provider["corpus_version"] = corpus_version
+        key_bytes = canonical_json_bytes(key)
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
+        conn.execute(
+            f"""
+            UPDATE {PT1_EQUILIBRIUM_TABLE}
+            SET key_hash = ?,
+                key_sha256 = ?,
+                key_bytes = ?,
+                corpus_version = ?
+            WHERE key_hash = ?
+            """,
+            (key_hash, key_hash, key_bytes, corpus_version, row[0]),
+        )
+
+
+def _write_corpus_version_config(
+    path: Path,
+    *,
+    corpus_version: str,
+    interoperable_versions: tuple[str, ...],
+) -> None:
+    lines = [f"corpus_version: {corpus_version}", "interoperable_versions:"]
+    lines.extend(f"  - {version}" for version in interoperable_versions)
+    path.write_text("\n".join(lines) + "\n")
 
 
 def _build_cached_real_sim(
@@ -213,6 +265,305 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
     )
 
 
+def test_cached_real_row_outside_interoperable_corpus_misses(tmp_path: Path) -> None:
+    db_path = tmp_path / "cached-real.db"
+    live_config = _cache_config(db_path, "live-fill")
+    live_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=live_config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    live_sim = _build_cached_real_sim(
+        backend=live_backend,
+        cache_config=live_config,
+    )
+    live_sim._get_equilibrium()
+    _restamp_first_pt1_row_corpus(db_path, "analytical-corpus-not-interoperable")
+
+    replay_config = _cache_config(db_path, "fail-loud")
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        replay_sim._get_equilibrium()
+
+
+def test_cached_real_row_inside_interoperable_corpus_hits(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    current = "analytical-corpus-current-test"
+    previous = "analytical-corpus-previous-test"
+    corpus_config = tmp_path / "corpus-version.yaml"
+    _write_corpus_version_config(
+        corpus_config,
+        corpus_version=current,
+        interoperable_versions=(current, previous),
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_VERSION_FILE", str(corpus_config))
+
+    db_path = tmp_path / "cached-real.db"
+    live_config = _cache_config(db_path, "live-fill")
+    live_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=live_config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    live_sim = _build_cached_real_sim(
+        backend=live_backend,
+        cache_config=live_config,
+    )
+    live_result = live_sim._get_equilibrium()
+    _restamp_first_pt1_row_corpus(db_path, previous)
+
+    replay_config = _cache_config(db_path, "fail-loud")
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+
+    replay_result = replay_sim._get_equilibrium()
+
+    assert replay_result.status == live_result.status
+    assert replay_sim._last_reduced_real_cache_state == "cached_exact"
+    assert replay_sim._pt0_store().summary()["misses"] == 0
+
+
+def test_cached_real_replay_ignores_code_version_with_same_corpus(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "cached-real.db"
+    monkeypatch.setattr(
+        "simulator.reduced_real_determinism._code_version",
+        lambda: "public-app-v1",
+    )
+    live_config = _cache_config(db_path, "live-fill")
+    live_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=live_config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    live_sim = _build_cached_real_sim(
+        backend=live_backend,
+        cache_config=live_config,
+    )
+    live_result = live_sim._get_equilibrium()
+    live_key = live_sim._pt0_store().capture_sequence[-1]["key"]
+
+    with sqlite3.connect(db_path) as conn:
+        row_code_version = conn.execute(
+            f"SELECT code_version FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+
+    monkeypatch.setattr(
+        "simulator.reduced_real_determinism._code_version",
+        lambda: "public-app-v2",
+    )
+    replay_config = _cache_config(db_path, "fail-loud")
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+
+    replay_result = replay_sim._get_equilibrium()
+
+    assert "code_version" not in live_key
+    assert row_code_version == "public-app-v1"
+    assert replay_result.status == live_result.status
+    assert replay_sim._last_reduced_real_cache_state == "cached_exact"
+    assert replay_sim._pt0_store().summary()["misses"] == 0
+
+
+def test_cached_real_corpus_version_change_invalidates_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    corpus_config = tmp_path / "corpus-version.yaml"
+    _write_corpus_version_config(
+        corpus_config,
+        corpus_version="analytical-corpus-before",
+        interoperable_versions=("analytical-corpus-before",),
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_VERSION_FILE", str(corpus_config))
+
+    db_path = tmp_path / "cached-real.db"
+    live_config = _cache_config(db_path, "live-fill")
+    live_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=live_config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    live_sim = _build_cached_real_sim(
+        backend=live_backend,
+        cache_config=live_config,
+    )
+    live_sim._get_equilibrium()
+
+    _write_corpus_version_config(
+        corpus_config,
+        corpus_version="analytical-corpus-after",
+        interoperable_versions=("analytical-corpus-after",),
+    )
+    replay_config = _cache_config(db_path, "fail-loud")
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        replay_sim._get_equilibrium()
+
+
+def test_cached_real_cache_key_uses_corpus_not_engine_metadata(tmp_path: Path) -> None:
+    db_path = tmp_path / "cached-real.db"
+    live_config = _cache_config(
+        db_path,
+        "live-fill",
+        version=(
+            "fake-live-real 1.0.0 (server=studio-a) "
+            "(path=/opt/grind/fake-live-real) (digest=sha256:abc123)"
+        ),
+    )
+    live_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=live_config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    live_sim = _build_cached_real_sim(
+        backend=live_backend,
+        cache_config=live_config,
+    )
+
+    live_result = live_sim._get_equilibrium()
+    live_key = live_sim._pt0_store().capture_sequence[-1]["key"]
+
+    replay_config = _cache_config(
+        db_path,
+        "fail-loud",
+        version=(
+            "fake-live-real 1.0.0 (server=mac-studio-b) "
+            "(path=/Volumes/grind/fake-live-real) (digest=sha256:stale)"
+        ),
+    )
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+
+    replay_result = replay_sim._get_equilibrium()
+
+    assert live_key["corpus_version"] == current_corpus_version()
+    assert live_key["backend"]["corpus_version"] == current_corpus_version()
+    assert "engine_version" not in live_key
+    assert "backend_version" not in live_key["backend"]
+    assert live_result.status == replay_result.status
+    assert replay_sim._last_reduced_real_cache_state == "cached_exact"
+    assert replay_sim._pt0_store().summary()["misses"] == 0
+
+
+def test_cached_real_live_fill_accepts_engine_upgrade_with_same_corpus(
+    tmp_path: Path,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "live-fill",
+        name="alphamelts",
+        version=(
+            "alphamelts2 2.3.2 (server=macbook) "
+            "(path=/Users/simon/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
+            "(digest=sha256:stale)"
+        ),
+    )
+
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=config,
+        cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
+    )
+
+    assert isinstance(backend, CachedRealBackend)
+
+
+def test_cached_real_live_fill_accepts_path_only_engine_provenance(
+    tmp_path: Path,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "live-fill",
+        name="alphamelts",
+        version=(
+            "alphamelts2 2.3.2 (server=studio-a) "
+            "(path=/opt/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
+            "(digest=sha256:stale)"
+        ),
+    )
+
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=config,
+        cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
+    )
+
+    assert isinstance(backend, CachedRealBackend)
+
+
+def test_cached_real_missing_corpus_version_fails_loud(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    missing_config = tmp_path / "missing-corpus.yaml"
+    monkeypatch.setenv("REGOLITH_CORPUS_VERSION_FILE", str(missing_config))
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "live-fill",
+        name="alphamelts",
+        version="alphamelts2 (/opt/alphamelts2)",
+    )
+
+    with pytest.raises(CorpusVersionConfigError, match="corpus version config missing"):
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+            cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
+        )
+
+
 def test_cached_real_replays_row_written_by_populate_driver_store(
     tmp_path: Path,
 ) -> None:
@@ -276,7 +627,7 @@ def test_cached_real_authorized_backend_identity_partitions_cache(
         db_path,
         "fail-loud",
         name="other-live-real",
-        version="other-v1",
+        version="other-live-real 1.0.0",
     )
     other_backend = resolve_backend(
         "cached-real",
@@ -297,7 +648,7 @@ def test_cached_real_live_fill_rejects_identity_mismatch(tmp_path: Path) -> None
         tmp_path / "cached-real.db",
         "live-fill",
         name="other-live-real",
-        version="other-v1",
+        version="other-live-real 1.0.0",
     )
 
     with pytest.raises(BackendUnavailableError, match="identity mismatch"):
@@ -376,7 +727,7 @@ def test_cached_real_unwraps_live_alphamelts_for_provider_registration(
         tmp_path / "cached-real.db",
         "live-fill",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     cached_backend = resolve_backend(
         "cached-real",
@@ -411,7 +762,7 @@ def test_cached_real_equilibrium_key_uses_alphamelts_provider_identity(
         tmp_path / "cached-real.db",
         "live-fill",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     live_backend = resolve_backend(
         "cached-real",
@@ -439,7 +790,7 @@ def test_cached_real_equilibrium_key_uses_alphamelts_provider_identity(
         live_config["db_path"],
         "fail-loud",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -471,7 +822,7 @@ def test_cached_real_gate_curve_key_uses_alphamelts_authoritative_provenance(
         tmp_path / "cached-real.db",
         "live-fill",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     live_backend = resolve_backend(
         "cached-real",
@@ -495,7 +846,7 @@ def test_cached_real_gate_curve_key_uses_alphamelts_authoritative_provenance(
         live_config["db_path"],
         "fail-loud",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -530,7 +881,7 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
         db_path,
         "live-fill",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     live_backend = resolve_backend(
         "cached-real",
@@ -556,7 +907,7 @@ def test_cached_real_authoritative_gate_curve_live_fill_replay_hits(
         db_path,
         "fail-loud",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -682,7 +1033,7 @@ def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
     ] == 1
 
 
-def test_cached_real_direct_alphamelts_version_mismatch_misses(
+def test_cached_real_direct_alphamelts_gate_curve_engine_change_hits_same_corpus(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
@@ -701,7 +1052,7 @@ def test_cached_real_direct_alphamelts_version_mismatch_misses(
         db_path,
         "fail-loud",
         name="alphamelts",
-        version="alphamelts-test-v2",
+        version="alphamelts-test 2.0.0",
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -713,13 +1064,13 @@ def test_cached_real_direct_alphamelts_version_mismatch_misses(
         cache_config=replay_config,
     )
 
-    with pytest.raises(PT0CacheMiss):
-        replay_sim._get_equilibrium()
-    with pytest.raises(PT0CacheMiss):
-        replay_sim._pt0_store().replay_gate_curve(
-            replay_sim,
-            fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
-        )
+    replay_curve = replay_sim._pt0_store().replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    )
+
+    assert replay_curve == _authoritative_gate_curve()
+    assert replay_sim._pt0_store().summary()["misses"] == 0
 
 
 def test_cached_real_refuses_authoritative_gate_cache_for_fallback_curve(
@@ -729,7 +1080,7 @@ def test_cached_real_refuses_authoritative_gate_cache_for_fallback_curve(
         tmp_path / "cached-real.db",
         "live-fill",
         name="alphamelts",
-        version="alphamelts-test-v1",
+        version="alphamelts-test 1.0.0",
     )
     backend = resolve_backend(
         "cached-real",

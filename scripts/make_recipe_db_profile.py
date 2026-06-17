@@ -2,9 +2,8 @@
 """Generate a REAL-fidelity optimizer profile from a shipped stub profile.
 
 Flips backend stub->cached-real with live-fill, wiring the alphamelts subprocess
-+ a shared reduced-real equilibrium cache. The `authorized_backend_version` is
-queried from the LOCAL runtime engine (it embeds the binary path, so it is
-machine-specific) — generate on the machine that will run the study.
+and a shared reduced-real equilibrium cache. The local engine identity is
+printed for provenance; cache authority comes from the committed corpus version.
 
 Usage:
   make_recipe_db_profile.py <feedstock_id> [--campaign C2A_continuous]
@@ -342,12 +341,11 @@ def _load_base_profile(feedstock: str) -> dict[str, Any]:
     return profile
 
 
-def _cached_real_config(db_path: str, name: str, version: str) -> dict[str, str]:
+def _cached_real_config(db_path: str, name: str) -> dict[str, str]:
     return {
         "db_path": db_path,
         "miss_policy": "live-fill",
         "authorized_backend_name": name,
-        "authorized_backend_version": version,
     }
 
 
@@ -1052,7 +1050,7 @@ def main(argv: list[str]) -> int:
     profile = _load_base_profile(args.feedstock)
 
     name, version = _runtime_engine_identity()
-    cache = _cached_real_config(args.db, name, version)
+    cache = _cached_real_config(args.db, name)
     target_rows = _resolve_target_rows(args.target)
 
     if not target_rows:

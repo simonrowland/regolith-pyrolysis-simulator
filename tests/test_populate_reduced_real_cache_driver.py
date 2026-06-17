@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 import simulator.reduced_real_determinism as rrd
+from simulator.corpus_version import current_corpus_version
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -27,7 +28,7 @@ def _write_magemin_row(db_path, suffix):
     key = {
         "schema_version": "test",
         "code_version": "test",
-        "engine_version": "test",
+        "corpus_version": current_corpus_version(),
         "data_digests": {},
         "provider": {
             "resolved_provider_id": driver.MAGEMIN_PROVIDER_ID,
@@ -58,12 +59,12 @@ def _write_equilibrium_post_record_row_raw(
     key = {
         "schema_version": rrd.SCHEMA_VERSION,
         "code_version": "test",
-        "engine_version": "test",
+        "corpus_version": current_corpus_version(),
         "data_digests": {},
         "backend": {
             "backend_name": backend_name,
             "backend_class": backend_name,
-            "backend_version": "test",
+            "corpus_version": current_corpus_version(),
         },
         "provider": {
             "resolved_provider_id": provider_id,
@@ -88,11 +89,12 @@ def _write_equilibrium_post_record_row_raw(
                 key_bytes,
                 payload_bytes,
                 code_version,
+                corpus_version,
                 engine_version,
                 data_digests_json,
                 created_at,
                 git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 hashlib.sha256(key_bytes).hexdigest(),
@@ -104,7 +106,8 @@ def _write_equilibrium_post_record_row_raw(
                 sqlite3.Binary(key_bytes),
                 sqlite3.Binary(payload_bytes),
                 key["code_version"],
-                key["engine_version"],
+                key["corpus_version"],
+                "test",
                 _canonical_bytes(key["data_digests"]).decode("utf-8"),
                 "2026-06-04T00:00:00Z",
                 0,

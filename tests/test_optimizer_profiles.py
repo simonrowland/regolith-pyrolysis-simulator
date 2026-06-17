@@ -30,7 +30,6 @@ def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
         "db_path": "data/reduced-real.db",
         "miss_policy": "fail-loud",
         "authorized_backend_name": "AlphaMELTSBackend",
-        "authorized_backend_version": "alpha-v1",
         "cache_tier_ceiling": "cached_exact",
     }
     validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
@@ -47,7 +46,6 @@ def test_reduced_real_cache_rejects_unknown_cache_tier_ceiling() -> None:
         "db_path": "data/reduced-real.db",
         "miss_policy": "fail-loud",
         "authorized_backend_name": "AlphaMELTSBackend",
-        "authorized_backend_version": "alpha-v1",
         "cache_tier_ceiling": "cached_approximate",
     }
     with pytest.raises(ProfileValidationError, match="cache_tier_ceiling"):

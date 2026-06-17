@@ -24,6 +24,10 @@ from pathlib import Path
 from typing import Any
 
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.corpus_version import (
+    current_corpus_version,
+    interoperable_corpus_versions,
+)
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
@@ -260,9 +264,15 @@ class PT0DeterminismStore:
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
+        intent = _equilibrium_payload_intent(sim)
         key = self._equilibrium_key(sim)
         payload = equilibrium_payload(sim, result)
-        self._store("equilibrium_post_record", key, payload)
+        self._store(
+            "equilibrium_post_record",
+            key,
+            payload,
+            engine_version_provenance=_engine_version_provenance(sim, intent),
+        )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
@@ -334,7 +344,16 @@ class PT0DeterminismStore:
             fe_redox_policy="intrinsic",
             provider_role=provider_role,
         )
-        self._store("freeze_gate_curve", key, {"curve": _curve_payload(curve)})
+        self._store(
+            "freeze_gate_curve",
+            key,
+            {"curve": _curve_payload(curve)},
+            engine_version_provenance=_engine_version_provenance(
+                sim,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                provider_role=provider_role,
+            ),
+        )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
     def _mark_uncacheable_capture(self, sim: Any) -> None:
@@ -425,6 +444,8 @@ class PT0DeterminismStore:
         artifact: str,
         key: Mapping[str, Any],
         payload: Mapping[str, Any],
+        *,
+        engine_version_provenance: str | None = None,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key)
         key_bytes = canonical_json_bytes(key)
@@ -459,6 +480,7 @@ class PT0DeterminismStore:
                     payload=payload,
                     payload_bytes=payload_bytes,
                     payload_hash=payload_hash,
+                    engine_version_provenance=engine_version_provenance,
                     physics_bucket_key=physics_bucket_key,
                     physics_bucket_bytes=physics_bucket_bytes,
                     physics_bucket_hash=physics_bucket_hash,
@@ -474,6 +496,7 @@ class PT0DeterminismStore:
                 payload=payload,
                 payload_bytes=payload_bytes,
                 payload_hash=payload_hash,
+                engine_version_provenance=engine_version_provenance,
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
@@ -495,47 +518,10 @@ class PT0DeterminismStore:
         self._record_cache_event(artifact, "live_fill")
 
     def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
-        key_bytes = canonical_json_bytes(key)
-        key_hash = _sha256(key_bytes)
-        self.replay_sequence.append(
-            {"artifact": artifact, "key": copy.deepcopy(dict(key)), "hash": key_hash}
+        return self._lookup_first_available(
+            artifact,
+            tuple(_compatible_replay_keys(key)),
         )
-        entry = self.entries.get(key_hash)
-        if entry is None and self.persistent_store is not None:
-            entry = self.persistent_store.get(
-                artifact=artifact,
-                key=key,
-                key_bytes=key_bytes,
-                key_hash=key_hash,
-            )
-            if entry is not None:
-                self.entries[key_hash] = copy.deepcopy(entry)
-        if entry is None:
-            miss = {
-                "artifact": artifact,
-                "key_hash": key_hash,
-                "sequence_index": len(self.replay_sequence) - 1,
-                "drift_fields": self._drift_fields_for_latest_replay(),
-            }
-            self.misses.append(miss)
-            self.last_cache_state = None
-            raise PT0CacheMiss(f"PT-0 cached replay miss: {miss}")
-        self._verify_entry(artifact, key, key_bytes, key_hash, entry)
-        sequence_index = len(self.replay_sequence) - 1
-        if len(self.capture_sequence) <= sequence_index:
-            self.capture_sequence.append(
-                {
-                    "artifact": artifact,
-                    "key": copy.deepcopy(dict(entry["key"])),
-                    "hash": key_hash,
-                    "persistent": True,
-                }
-            )
-        self.hits += 1
-        self.replay_sequence[-1]["cache_state"] = "cached_exact"
-        self.last_cache_state = "cached_exact"
-        self._record_cache_event(artifact, "cached_exact")
-        return copy.deepcopy(entry["payload"])
 
     def _lookup_first_available(
         self,
@@ -546,7 +532,7 @@ class PT0DeterminismStore:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
 
         checked: list[tuple[Mapping[str, Any], bytes, str]] = []
-        for key in keys:
+        for key in _expand_compatible_replay_keys(keys):
             key_bytes = canonical_json_bytes(key)
             key_hash = _sha256(key_bytes)
             checked.append((key, key_bytes, key_hash))
@@ -601,74 +587,94 @@ class PT0DeterminismStore:
         *,
         physics_bucket_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
-        key_bytes = canonical_json_bytes(key)
-        key_hash = _sha256(key_bytes)
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
         )
-        entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
-        cache_state = "cached_exact"
-        physics_bucket_hash: str | None = None
-        physics_bucket_rung: str | None = None
-        if entry is None and tier_ceiling != "cached_exact":
-            if physics_bucket_key is not None:
-                entry = self._entry_for_physics_bucket(artifact, physics_bucket_key)
+        for candidate_key in _compatible_replay_keys(key):
+            key_bytes = canonical_json_bytes(candidate_key)
+            key_hash = _sha256(key_bytes)
+            entry = self._entry_for_key(artifact, candidate_key, key_bytes, key_hash)
+            cache_state = "cached_exact"
+            candidate_physics_bucket_key = (
+                physics_bucket_key
+                if candidate_key == key and physics_bucket_key is not None
+                else canonical_physics_bucket_key_from_replay_key(candidate_key)
+            )
+            physics_bucket_hash: str | None = None
+            physics_bucket_rung: str | None = None
+            if entry is None and tier_ceiling != "cached_exact":
+                entry = self._entry_for_physics_bucket(
+                    artifact,
+                    candidate_physics_bucket_key,
+                )
                 cache_state = "cached_physics_bucket"
-                physics_bucket_hash = _sha256(canonical_json_bytes(physics_bucket_key))
-            if entry is None:
-                for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
-                    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                        key,
-                        rung_tag,
-                    )
-                    entry = self._entry_for_physics_ladder_bucket(
-                        artifact,
-                        rung_tag,
-                        rung_key,
-                    )
-                    if entry is not None:
-                        cache_state = "cached_physics_bucket"
-                        physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
-                        physics_bucket_rung = rung_tag
-                        break
-            if entry is None:
-                for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
-                    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                        key,
-                        rung_tag,
-                    )
-                    entry = self._entry_for_physics_ladder_bucket(
-                        artifact,
-                        rung_tag,
-                        rung_key,
-                        query_key=key,
-                    )
-                    if entry is not None:
-                        cache_state = "cached_physics_bucket"
-                        physics_bucket_hash = _sha256(canonical_json_bytes(rung_key))
-                        physics_bucket_rung = rung_tag
-                        break
-        if entry is None:
+                physics_bucket_hash = _sha256(
+                    canonical_json_bytes(candidate_physics_bucket_key)
+                )
+                if entry is None:
+                    for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
+                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                            candidate_key,
+                            rung_tag,
+                        )
+                        entry = self._entry_for_physics_ladder_bucket(
+                            artifact,
+                            rung_tag,
+                            rung_key,
+                        )
+                        if entry is not None:
+                            cache_state = "cached_physics_bucket"
+                            candidate_physics_bucket_key = rung_key
+                            physics_bucket_hash = _sha256(
+                                canonical_json_bytes(rung_key)
+                            )
+                            physics_bucket_rung = rung_tag
+                            break
+                if entry is None:
+                    for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
+                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                            candidate_key,
+                            rung_tag,
+                        )
+                        entry = self._entry_for_physics_ladder_bucket(
+                            artifact,
+                            rung_tag,
+                            rung_key,
+                            query_key=candidate_key,
+                        )
+                        if entry is not None:
+                            cache_state = "cached_physics_bucket"
+                            candidate_physics_bucket_key = rung_key
+                            physics_bucket_hash = _sha256(
+                                canonical_json_bytes(rung_key)
+                            )
+                            physics_bucket_rung = rung_tag
+                            break
+            if entry is not None:
+                break
             if tier_ceiling == "cached_interpolated":
-                interpolated = self._lookup_interpolated(artifact, key)
-                if interpolated is None:
-                    return None
-                return interpolated
+                interpolated = self._lookup_interpolated(artifact, candidate_key)
+                if interpolated is not None:
+                    return interpolated
+        else:
             return None
         replay_event = {
             "artifact": artifact,
-            "key": copy.deepcopy(dict(key)),
+            "key": copy.deepcopy(dict(candidate_key)),
             "hash": key_hash,
             "cache_state": cache_state,
         }
-        if cache_state == "cached_physics_bucket" and physics_bucket_key is not None:
+        if (
+            cache_state == "cached_physics_bucket"
+            and candidate_physics_bucket_key is not None
+        ):
             replay_event["physics_bucket_hash"] = physics_bucket_hash
             if physics_bucket_rung is not None:
                 replay_event["physics_bucket_rung"] = physics_bucket_rung
                 if _physics_ladder_coarsens_controls(physics_bucket_rung):
                     replay_event["physics_bucket_error_budget"] = (
                         physics_control_rung_error_budget(
-                            key,
+                            candidate_key,
                             entry["key"],
                             physics_bucket_rung,
                             source_payload=entry.get("payload"),
@@ -885,6 +891,7 @@ class PT1PersistentEquilibriumStore:
         payload: Mapping[str, Any],
         payload_bytes: bytes,
         payload_hash: str,
+        engine_version_provenance: str | None = None,
         physics_bucket_key: Mapping[str, Any] | None = None,
         physics_bucket_bytes: bytes | None = None,
         physics_bucket_hash: str | None = None,
@@ -936,6 +943,7 @@ class PT1PersistentEquilibriumStore:
                     key_bytes,
                     payload_bytes,
                     code_version,
+                    corpus_version,
                     engine_version,
                     data_digests_json,
                     physics_bucket_schema_version,
@@ -952,7 +960,7 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -963,8 +971,9 @@ class PT1PersistentEquilibriumStore:
                     payload_hash,
                     sqlite3.Binary(key_bytes),
                     sqlite3.Binary(payload_bytes),
-                    str(key.get("code_version")),
-                    _none_or_str(key.get("engine_version")),
+                    _code_version(),
+                    str(key.get("corpus_version")),
+                    _none_or_str(engine_version_provenance),
                     canonical_json_bytes(key.get("data_digests", {})).decode("utf-8"),
                     str(physics_bucket_key.get("schema_version")),
                     physics_bucket_hash,
@@ -1228,6 +1237,7 @@ class PT1PersistentEquilibriumStore:
                 key_bytes BLOB NOT NULL,
                 payload_bytes BLOB NOT NULL,
                 code_version TEXT NOT NULL,
+                corpus_version TEXT,
                 engine_version TEXT,
                 data_digests_json TEXT NOT NULL,
                 physics_bucket_schema_version TEXT,
@@ -1303,6 +1313,7 @@ class PT1PersistentEquilibriumStore:
             for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
         }
         columns = {
+            "corpus_version": "TEXT",
             "physics_bucket_schema_version": "TEXT",
             "physics_bucket_sha256": "TEXT",
             "replay_scope_sha256": "TEXT",
@@ -1390,6 +1401,7 @@ class PT1PersistentEquilibriumStore:
                 key_bytes,
                 payload_bytes,
                 code_version,
+                corpus_version,
                 engine_version,
                 data_digests_json
             FROM {{table}}
@@ -1460,13 +1472,14 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
-        if row["code_version"] != str(key.get("code_version")):
+        row_corpus_version = _none_or_str(row["corpus_version"])
+        if row_corpus_version not in interoperable_corpus_versions():
             raise PT1PersistentStoreCorrupt(
-                f"PT-1 row code VERSION drift: {key_hash}"
+                f"PT-1 row corpus version is not interoperable: {key_hash}"
             )
-        if _none_or_str(key.get("engine_version")) != row["engine_version"]:
+        if row_corpus_version != _none_or_str(key.get("corpus_version")):
             raise PT1PersistentStoreCorrupt(
-                f"PT-1 row engine version drift: {key_hash}"
+                f"PT-1 row corpus version drift: {key_hash}"
             )
         data_digests_json = canonical_json_bytes(
             key.get("data_digests", {})
@@ -1640,10 +1653,41 @@ def canonical_replay_key(
             "mode": provider.get("mode"),
         },
         "data_digests": _data_digests(sim),
-        "code_version": _code_version(),
-        "source_module_digest": _source_module_digest(),
-        "engine_version": provider.get("engine_version"),
+        "corpus_version": current_corpus_version(),
     }
+
+
+def _compatible_replay_keys(key: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
+    current = str(key.get("corpus_version") or "").strip()
+    versions = (current,) + tuple(
+        version
+        for version in interoperable_corpus_versions()
+        if version and version != current
+    )
+    result: list[dict[str, Any]] = []
+    for version in versions:
+        candidate = copy.deepcopy(dict(key))
+        candidate["corpus_version"] = version
+        backend = candidate.get("backend")
+        if isinstance(backend, Mapping) and "corpus_version" in backend:
+            backend["corpus_version"] = version
+        result.append(candidate)
+    return tuple(result)
+
+
+def _expand_compatible_replay_keys(
+    keys: tuple[Mapping[str, Any], ...],
+) -> tuple[dict[str, Any], ...]:
+    expanded: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for key in keys:
+        for candidate in _compatible_replay_keys(key):
+            digest = _sha256(canonical_json_bytes(candidate))
+            if digest in seen:
+                continue
+            seen.add(digest)
+            expanded.append(candidate)
+    return tuple(expanded)
 
 
 def canonical_physics_bucket_key(
@@ -1690,7 +1734,7 @@ def canonical_physics_bucket_key_from_replay_key(
         "vapor_pressure_provider": _json_ready(
             key.get("vapor_pressure_provider", {})
         ),
-        "engine_version": key.get("engine_version"),
+        "corpus_version": key.get("corpus_version"),
         "data_digests": _solver_data_digests_from_key(key),
     }
     if sulfur_input_ppm and sulfur_input_ppm > 0.0:
@@ -2195,8 +2239,28 @@ def _provider_identity(
         "fallback_allowed": bool(fallback_allowed),
         "model": _provider_model(resolved),
         "mode": _provider_mode(resolved),
-        "engine_version": _provider_engine_version(resolved),
     }
+
+
+def _engine_version_provenance(
+    sim: Any,
+    intent: ChemistryIntent,
+    *,
+    provider_role: str | None = None,
+) -> str | None:
+    backend = getattr(sim, "backend", None)
+    live_backend = getattr(backend, "_live_backend", None)
+    if live_backend is not None:
+        return _backend_version_for_key(live_backend)
+
+    registry = getattr(sim, "_chem_registry", None)
+    provider = registry.authoritative_for(intent) if registry is not None else None
+    if provider_role == "fallback" and registry is not None:
+        provider = registry.fallback_for(intent)
+    provider_version = _provider_engine_version(provider)
+    if provider_version:
+        return provider_version
+    return _backend_version_for_key(backend)
 
 
 def _cached_real_provider_identity(
@@ -2212,9 +2276,6 @@ def _cached_real_provider_identity(
     authorized_name = str(
         getattr(config, "authorized_backend_name", "")
     ).strip().lower()
-    authorized_version = str(
-        getattr(config, "authorized_backend_version", "")
-    ).strip()
     if authorized_name != "alphamelts":
         return None
     alphamelts_intents = {
@@ -2234,7 +2295,6 @@ def _cached_real_provider_identity(
             "fallback_allowed": bool(fallback_allowed),
             "model": "MAGEMinShadowProvider",
             "mode": "subprocess",
-            "engine_version": "unavailable",
         }
     fallback_provider_id = (
         "magemin-shadow"
@@ -2249,7 +2309,6 @@ def _cached_real_provider_identity(
         "fallback_allowed": bool(fallback_allowed),
         "model": "alphamelts-diagnostic",
         "mode": "AlphaMELTSProvider",
-        "engine_version": authorized_version or "unavailable",
     }
 
 
@@ -2640,40 +2699,32 @@ def _backend_identity_for_key(sim: Any) -> dict[str, str]:
         authorized_name = str(
             getattr(config, "authorized_backend_name", "")
         ).strip()
-        authorized_version = str(
-            getattr(config, "authorized_backend_version", "")
-        ).strip()
-        if not authorized_name or not authorized_version:
+        if not authorized_name:
             raise RuntimeError(
-                "cached-real cache key requires configured authorized "
-                "backend name and version"
+                "cached-real cache key requires configured authorized backend name"
             )
-        return _authorized_backend_identity_for_key(
-            authorized_name,
-            authorized_version,
-        )
+        return _authorized_backend_identity_for_key(authorized_name)
     return {
         "backend_name": _backend_name_for_key(backend),
         "backend_class": _backend_class_for_key(backend),
-        "backend_version": _backend_version_for_key(backend),
+        "corpus_version": current_corpus_version(),
     }
 
 
 def _authorized_backend_identity_for_key(
     authorized_name: str,
-    authorized_version: str,
 ) -> dict[str, str]:
     name = str(authorized_name).strip()
     if name.lower() == _ALPHAMELTS_AUTHORIZED_NAME:
         return {
             "backend_name": _ALPHAMELTS_BACKEND_NAME,
             "backend_class": _ALPHAMELTS_BACKEND_CLASS,
-            "backend_version": str(authorized_version).strip(),
+            "corpus_version": current_corpus_version(),
         }
     return {
         "backend_name": name,
         "backend_class": name,
-        "backend_version": str(authorized_version).strip(),
+        "corpus_version": current_corpus_version(),
     }
 
 

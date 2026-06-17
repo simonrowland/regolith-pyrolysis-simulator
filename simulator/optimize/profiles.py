@@ -139,7 +139,6 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "db_path",
     "miss_policy",
     "authorized_backend_name",
-    "authorized_backend_version",
     "cache_tier_ceiling",
     "read_only_base_db_path",
 })
@@ -647,14 +646,6 @@ def _validate_reduced_real_cache_config(
     ):
         raise ProfileValidationError(
             f"{source}: {where}.authorized_backend_name must be a non-empty string"
-        )
-    authorized_backend_version = raw.get("authorized_backend_version")
-    if (
-        not isinstance(authorized_backend_version, str)
-        or not authorized_backend_version.strip()
-    ):
-        raise ProfileValidationError(
-            f"{source}: {where}.authorized_backend_version must be a non-empty string"
         )
     miss_policy = str(raw.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")

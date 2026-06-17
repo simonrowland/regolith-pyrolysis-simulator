@@ -189,10 +189,13 @@ def test_rekey_migration_round_trip_and_idempotency(
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
     legacy_version = "alphaMELTS subprocess (/Users/me/alphamelts2)"
+    target = "analytical-test-v1"
     key = {
         "schema_version": "test",
         "artifact": "equilibrium_post_record",
         "engine_version": legacy_version,
+        "code_version": "legacy-app-version",
+        "source_module_digest": {"module_set_id": "old"},
         "backend": {
             "backend_name": "AlphaMELTSBackend",
             "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
@@ -202,8 +205,23 @@ def test_rekey_migration_round_trip_and_idempotency(
             "engine_version": legacy_version,
         },
     }
+    other_key = {
+        **key,
+        "engine_version": "vaporock 0.1.0 (/tmp/vaporock)",
+        "backend": {
+            "backend_name": "VapoRockBackend",
+            "backend_class": "engines.vaporock.backend.VapoRockBackend",
+            "backend_version": "vaporock 0.1.0 (/tmp/vaporock)",
+        },
+        "provider": {
+            "engine_version": "vaporock 0.1.0 (/tmp/vaporock)",
+        },
+    }
     key_bytes = canonical_json_bytes(key)
     key_hash = __import__("hashlib").sha256(key_bytes).hexdigest()
+    other_key_bytes = canonical_json_bytes(other_key)
+    other_key_hash = __import__("hashlib").sha256(other_key_bytes).hexdigest()
+    payload_bytes = b'{"payload": true}'
 
     with sqlite3.connect(db_path) as conn:
         conn.execute(
@@ -242,7 +260,7 @@ def test_rekey_migration_round_trip_and_idempotency(
                 key_hash,
                 "payload",
                 key_bytes,
-                b"{}",
+                payload_bytes,
                 "code-v1",
                 legacy_version,
                 "{}",
@@ -250,23 +268,102 @@ def test_rekey_migration_round_trip_and_idempotency(
                 0,
             ),
         )
+        conn.execute(
+            f"""
+            INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
+                key_hash, artifact, store_schema_version,
+                request_schema_version, key_sha256, payload_sha256,
+                key_bytes, payload_bytes, code_version, engine_version,
+                data_digests_json, created_at, git_dirty
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                other_key_hash,
+                "equilibrium_post_record",
+                "pt1",
+                "req",
+                other_key_hash,
+                "payload-2",
+                other_key_bytes,
+                b'{"other": true}',
+                "code-v1",
+                other_key["engine_version"],
+                "{}",
+                "now",
+                0,
+            ),
+        )
 
-    before, updated = rekey_cache(db_path, engine="alphamelts")
-    assert before == 1
-    assert updated == 1
-    expected = cache_version_for("alphamelts")
-    assert expected is not None
+    before_dry_run_bytes = db_path.read_bytes()
+    dry_run = rekey_cache(
+        db_path,
+        engine="alphamelts",
+        target_corpus_version=target,
+        dry_run=True,
+    )
+    assert dry_run.rows_before == 1
+    assert dry_run.rows_updated == 0
+    assert dry_run.backup_path is None
+    assert db_path.read_bytes() == before_dry_run_bytes
 
     with sqlite3.connect(db_path) as conn:
-        row = conn.execute(
-            f"SELECT engine_version, key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        assert "corpus_version" not in {
+            row[1]
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+        unchanged = conn.execute(
+            f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
         ).fetchone()
-    assert row[0] == expected
-    reloaded = json.loads(row[1].decode("utf-8"))
-    assert reloaded["engine_version"] == expected
-    assert reloaded["backend"]["backend_version"] == expected
+    assert json.loads(unchanged[0].decode("utf-8"))["engine_version"] == legacy_version
 
-    before2, updated2 = rekey_cache(db_path, engine="alphamelts")
+    result = rekey_cache(
+        db_path,
+        engine="alphamelts",
+        target_corpus_version=target,
+    )
+    before, updated = result
+    assert before == 1
+    assert updated == 1
+    assert result.backup_path is not None
+    assert result.backup_path.is_file()
+
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute(
+            f"SELECT corpus_version, engine_version, key_bytes, payload_bytes "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchall()
+    rekeyed = [
+        row for row in rows
+        if json.loads(row[2].decode("utf-8"))["backend"]["backend_name"]
+        == "AlphaMELTSBackend"
+    ][0]
+    assert rekeyed[0] == target
+    assert rekeyed[1] == legacy_version
+    assert rekeyed[3] == payload_bytes
+    reloaded = json.loads(rekeyed[2].decode("utf-8"))
+    assert reloaded["corpus_version"] == target
+    assert "engine_version" not in reloaded
+    assert "code_version" not in reloaded
+    assert "source_module_digest" not in reloaded
+    assert reloaded["backend"]["corpus_version"] == target
+    assert "backend_version" not in reloaded["backend"]
+    assert "engine_version" not in reloaded["provider"]
+
+    untouched = [
+        row for row in rows
+        if json.loads(row[2].decode("utf-8"))["backend"]["backend_name"]
+        == "VapoRockBackend"
+    ][0]
+    untouched_key = json.loads(untouched[2].decode("utf-8"))
+    assert untouched_key["engine_version"] == other_key["engine_version"]
+    assert "corpus_version" not in untouched_key
+
+    before2, updated2 = rekey_cache(
+        db_path,
+        engine="alphamelts",
+        target_corpus_version=target,
+    )
     assert before2 == 0
     assert updated2 == 0
 

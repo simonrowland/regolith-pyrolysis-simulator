@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Re-stamp reduced-real cache rows from legacy path identity to config identity."""
+"""Re-stamp reduced-real cache rows to a deliberate corpus version."""
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import shutil
 import sqlite3
 import sys
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -14,15 +18,26 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.engine_local_config import (  # noqa: E402
-    cache_version_for,
-    is_legacy_cache_version,
-    load_config,
-)
+from simulator.corpus_version import current_corpus_version  # noqa: E402
+from simulator.engine_local_config import is_legacy_cache_version  # noqa: E402
 from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
+    _physics_ladder_values_from_replay_key,
+    _replay_scope_hash,
     canonical_json_bytes,
+    canonical_physics_bucket_key_from_replay_key,
 )
+
+
+@dataclass(frozen=True)
+class RekeyResult:
+    rows_before: int
+    rows_updated: int
+    backup_path: Path | None = None
+
+    def __iter__(self):
+        yield self.rows_before
+        yield self.rows_updated
 
 
 def _json_loads(raw: bytes) -> dict[str, Any]:
@@ -32,53 +47,186 @@ def _json_loads(raw: bytes) -> dict[str, Any]:
     return loaded
 
 
-def _replace_engine_version(key: dict[str, Any], new_version: str) -> bool:
+def _dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _row_matches_engine(key: dict[str, Any], engine: str) -> bool:
+    engine_key = str(engine or "").strip().lower()
+    if not engine_key:
+        return True
+    backend = _dict(key.get("backend"))
+    provider = _dict(key.get("provider"))
+    fields = (
+        backend.get("backend_name"),
+        backend.get("backend_class"),
+        provider.get("resolved_provider_id"),
+        provider.get("authoritative_provider_id"),
+        provider.get("fallback_provider_id"),
+        provider.get("model"),
+        key.get("engine_version"),
+    )
+    return any(engine_key in str(value or "").lower() for value in fields)
+
+
+def _engine_version_provenance(
+    key: dict[str, Any],
+    row_engine_version: Any,
+) -> str | None:
+    if row_engine_version not in (None, ""):
+        return str(row_engine_version)
+    provider = _dict(key.get("provider"))
+    backend = _dict(key.get("backend"))
+    for value in (
+        key.get("engine_version"),
+        provider.get("engine_version"),
+        backend.get("backend_version"),
+    ):
+        if value not in (None, ""):
+            return str(value)
+    return None
+
+
+def _replace_cache_identity(key: dict[str, Any], target_corpus_version: str) -> bool:
     changed = False
-    if key.get("engine_version") != new_version:
-        key["engine_version"] = new_version
+    for field in ("engine_version", "source_module_digest", "code_version"):
+        if field in key:
+            key.pop(field, None)
+            changed = True
+    if key.get("corpus_version") != target_corpus_version:
+        key["corpus_version"] = target_corpus_version
         changed = True
 
     backend = key.get("backend")
-    if isinstance(backend, dict) and backend.get("backend_version") != new_version:
-        backend["backend_version"] = new_version
-        changed = True
+    if isinstance(backend, dict):
+        if "backend_version" in backend:
+            backend.pop("backend_version", None)
+            changed = True
+        if backend.get("corpus_version") != target_corpus_version:
+            backend["corpus_version"] = target_corpus_version
+            changed = True
 
-    provider = key.get("provider")
-    if isinstance(provider, dict) and provider.get("engine_version") != new_version:
-        provider["engine_version"] = new_version
-        changed = True
+    for section in ("provider", "vapor_pressure_provider"):
+        provider = key.get(section)
+        if isinstance(provider, dict) and "engine_version" in provider:
+            provider.pop("engine_version", None)
+            changed = True
     return changed
 
 
-def _count_legacy_rows(conn: sqlite3.Connection, engine: str) -> int:
-    target = cache_version_for(engine)
-    if target is None:
-        return 0
+def _needs_rekey(key: dict[str, Any], target_corpus_version: str) -> bool:
+    if key.get("corpus_version") != target_corpus_version:
+        return True
+    if "source_module_digest" in key:
+        return True
+    if "code_version" in key:
+        return True
+    if is_legacy_cache_version(str(key.get("engine_version") or "")):
+        return True
+    if "engine_version" in key:
+        return True
+    backend = _dict(key.get("backend"))
+    provider = _dict(key.get("provider"))
+    vapor_provider = _dict(key.get("vapor_pressure_provider"))
+    return any(
+        "engine_version" in value or "backend_version" in value
+        for value in (backend, provider, vapor_provider)
+    )
+
+
+def _ensure_corpus_column(conn: sqlite3.Connection) -> None:
+    existing = _table_columns(conn)
+    if "corpus_version" not in existing:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} ADD COLUMN corpus_version TEXT"
+        )
+
+
+def _table_columns(conn: sqlite3.Connection) -> set[str]:
+    return {
+        str(row["name"])
+        for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+    }
+
+
+def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
+    try:
+        physics_key = canonical_physics_bucket_key_from_replay_key(key)
+        physics_bytes = canonical_json_bytes(physics_key)
+        ladder_values = _physics_ladder_values_from_replay_key(key)
+    except Exception:  # noqa: BLE001 - old test fixtures may be skeletal
+        return {}
+    return {
+        "physics_bucket_schema_version": str(physics_key.get("schema_version")),
+        "physics_bucket_sha256": hashlib.sha256(physics_bytes).hexdigest(),
+        "replay_scope_sha256": _replay_scope_hash(physics_key),
+        "physics_key_bytes": sqlite3.Binary(physics_bytes),
+        "physics_bucket_h40_sha256": ladder_values["h40"]["sha256"],
+        "physics_bucket_h40_distance": ladder_values["h40"]["distance"],
+        "physics_bucket_h30_sha256": ladder_values["h30"]["sha256"],
+        "physics_bucket_h30_distance": ladder_values["h30"]["distance"],
+        "physics_bucket_h40c_sha256": ladder_values["h40c"]["sha256"],
+        "physics_bucket_h40c_distance": ladder_values["h40c"]["distance"],
+        "physics_bucket_h30c_sha256": ladder_values["h30c"]["sha256"],
+        "physics_bucket_h30c_distance": ladder_values["h30c"]["distance"],
+    }
+
+
+def _count_rows_needing_rekey(
+    conn: sqlite3.Connection,
+    *,
+    engine: str,
+    target_corpus_version: str,
+) -> int:
     count = 0
     for (key_bytes,) in conn.execute(
         f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
     ):
         key = _json_loads(bytes(key_bytes))
-        version = str(key.get("engine_version") or "")
-        if is_legacy_cache_version(version):
+        if not _row_matches_engine(key, engine):
+            continue
+        if _needs_rekey(key, target_corpus_version):
             count += 1
     return count
 
 
-def rekey_cache(db_path: Path, *, engine: str = "alphamelts") -> tuple[int, int]:
-    config = load_config(required=True)
-    new_version = cache_version_for(engine)
-    if new_version is None:
-        raise SystemExit(
-            f"engines.local.toml has no identity for {engine!r}; "
-            "run install-engines.py first"
-        )
+def _backup_db(db_path: Path) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    backup_path = db_path.with_name(f"{db_path.name}.backup-{stamp}")
+    shutil.copy2(db_path, backup_path)
+    return backup_path
+
+
+def rekey_cache(
+    db_path: Path,
+    *,
+    engine: str = "alphamelts",
+    target_corpus_version: str | None = None,
+    dry_run: bool = False,
+) -> RekeyResult:
+    target = (target_corpus_version or current_corpus_version()).strip()
+    if not target:
+        raise SystemExit("target corpus version must be non-empty")
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
-    before = _count_legacy_rows(conn, engine)
-    updated = 0
+    try:
+        before = _count_rows_needing_rekey(
+            conn,
+            engine=engine,
+            target_corpus_version=target,
+        )
+    finally:
+        conn.close()
+    if dry_run or before == 0:
+        return RekeyResult(rows_before=before, rows_updated=0, backup_path=None)
 
+    backup_path = _backup_db(db_path)
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    _ensure_corpus_column(conn)
+    updated = 0
+    table_columns = _table_columns(conn)
     for row in conn.execute(
         f"""
         SELECT key_hash, key_bytes, engine_version
@@ -86,61 +234,93 @@ def rekey_cache(db_path: Path, *, engine: str = "alphamelts") -> tuple[int, int]
         """
     ):
         key = _json_loads(bytes(row["key_bytes"]))
-        current = str(key.get("engine_version") or "")
-        if not is_legacy_cache_version(current):
+        if not _row_matches_engine(key, engine):
             continue
-        if not _replace_engine_version(key, new_version):
+        if not _needs_rekey(key, target):
+            continue
+        provenance = _engine_version_provenance(key, row["engine_version"])
+        if not _replace_cache_identity(key, target):
             continue
         key_bytes = canonical_json_bytes(key)
-        key_hash = __import__("hashlib").sha256(key_bytes).hexdigest()
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
+        physics = _physics_columns(key)
+        assignments = [
+            "key_bytes = ?",
+            "key_sha256 = ?",
+            "key_hash = ?",
+            "corpus_version = ?",
+            "engine_version = ?",
+        ]
+        values: list[Any] = [
+            sqlite3.Binary(key_bytes),
+            key_hash,
+            key_hash,
+            target,
+            provenance,
+        ]
+        for column, value in physics.items():
+            if column not in table_columns:
+                continue
+            assignments.append(f"{column} = ?")
+            values.append(value)
+        values.append(row["key_hash"])
         conn.execute(
             f"""
             UPDATE {PT1_EQUILIBRIUM_TABLE}
-            SET key_bytes = ?,
-                key_sha256 = ?,
-                key_hash = ?,
-                engine_version = ?
+            SET {", ".join(assignments)}
             WHERE key_hash = ?
             """,
-            (
-                key_bytes,
-                key_hash,
-                key_hash,
-                new_version,
-                row["key_hash"],
-            ),
+            tuple(values),
         )
         updated += 1
 
     conn.commit()
-    after = _count_legacy_rows(conn, engine)
     conn.close()
-    return before, updated
+    return RekeyResult(
+        rows_before=before,
+        rows_updated=updated,
+        backup_path=backup_path,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Re-stamp reduced-real cache engine_version fields from legacy "
-            "path-based identity to engines.local.toml digest identity."
+            "Re-stamp reduced-real cache rows to a deliberate corpus_version."
         )
     )
     parser.add_argument("cache_sqlite", type=Path, help="Path to cache SQLite DB")
     parser.add_argument(
         "--engine",
         default="alphamelts",
-        help="Engine identity block to apply (default: alphamelts)",
+        help="Only re-stamp rows for this backend/provider family",
+    )
+    parser.add_argument(
+        "--target-corpus-version",
+        default=None,
+        help="Corpus version to stamp; defaults to data/corpus_version.yaml",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Report rows needing rekey without mutating the database",
     )
     args = parser.parse_args(argv)
 
     if not args.cache_sqlite.is_file():
         raise SystemExit(f"cache database not found: {args.cache_sqlite}")
 
-    before, updated = rekey_cache(args.cache_sqlite, engine=args.engine)
-    after = before - updated
-    print(f"legacy_rows_before={before}")
-    print(f"rows_updated={updated}")
-    print(f"legacy_rows_after={after}")
+    result = rekey_cache(
+        args.cache_sqlite,
+        engine=args.engine,
+        target_corpus_version=args.target_corpus_version,
+        dry_run=args.dry_run,
+    )
+    print(f"rows_needing_rekey_before={result.rows_before}")
+    print(f"rows_updated={result.rows_updated}")
+    print(f"dry_run={int(args.dry_run)}")
+    if result.backup_path is not None:
+        print(f"backup_path={result.backup_path}")
     return 0
 
 

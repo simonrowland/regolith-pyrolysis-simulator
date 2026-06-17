@@ -2671,7 +2671,6 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
         "db_path": str(tmp_path / "pt1-cache.db"),
         "miss_policy": "fail-loud",
         "authorized_backend_name": "alphamelts",
-        "authorized_backend_version": "test-version",
     }
     profile = {
         **PROFILE,
@@ -2704,7 +2703,6 @@ def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> Non
         "db_path": str(tmp_path / "pt1-cache.db"),
         "miss_policy": "fail-loud",
         "authorized_backend_name": "alphamelts",
-        "authorized_backend_version": "test-version",
     }
     profile = {
         **PROFILE,
@@ -2736,7 +2734,6 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
         "db_path": str(tmp_path / "pt1-cache.db"),
         "miss_policy": "fail-loud",
         "authorized_backend_name": "alphamelts",
-        "authorized_backend_version": "test-version",
     }
     profile = {
         **PROFILE,

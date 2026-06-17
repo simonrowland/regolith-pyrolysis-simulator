@@ -8,6 +8,10 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, TypeVar
 
+from simulator.corpus_version import (
+    current_corpus_version,
+    interoperable_corpus_versions,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBackend
@@ -78,7 +82,9 @@ class CachedRealConfig:
 
     db_path: Path
     authorized_backend_name: str
-    authorized_backend_version: str
+    corpus_version: str
+    interoperable_corpus_versions: tuple[str, ...]
+    authorized_backend_version: str = ""
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
     read_only_base_db_path: Path | None = None
@@ -214,13 +220,11 @@ def normalize_cached_real_config(
         raise unavailable_error_cls(
             "cached-real requires reduced_real_cache.authorized_backend_name"
         )
+    corpus_version = current_corpus_version()
+    interoperable_versions = interoperable_corpus_versions()
     authorized_backend_version = str(
         value.get("authorized_backend_version", "")
     ).strip()
-    if not authorized_backend_version:
-        raise unavailable_error_cls(
-            "cached-real requires reduced_real_cache.authorized_backend_version"
-        )
     miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in CACHED_REAL_MISS_POLICIES:
@@ -245,6 +249,8 @@ def normalize_cached_real_config(
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
+        corpus_version=corpus_version,
+        interoperable_corpus_versions=interoperable_versions,
         authorized_backend_version=authorized_backend_version,
         miss_policy=miss_policy,
         cache_tier_ceiling=cache_tier_ceiling,
@@ -601,15 +607,16 @@ def _cached_real_backend(
                 "cached-real live-fill requires an available live real backend"
             )
         live_identity = _live_backend_identity(live_backend)
-        expected_identity = (
-            config.authorized_backend_name,
-            config.authorized_backend_version,
-        )
-        if live_identity != expected_identity:
+        expected_identity = (config.authorized_backend_name, config.corpus_version)
+        if not _backend_identity_matches(
+            live_identity,
+            expected_identity,
+            unavailable_error_cls=unavailable_error_cls,
+        ):
             raise unavailable_error_cls(
                 "cached-real live-fill backend identity mismatch: "
-                f"configured {expected_identity[0]}@{expected_identity[1]}, "
-                f"got {live_identity[0]}@{live_identity[1]}"
+                f"configured {expected_identity[0]} for corpus "
+                f"{expected_identity[1]}, got {live_identity[0]}"
             )
     return CachedRealBackend(config=config, live_backend=live_backend)
 
@@ -631,6 +638,17 @@ def _live_backend_identity(backend: Any) -> tuple[str, str]:
     if not version:
         version = "unavailable"
     return name, version
+
+
+def _backend_identity_matches(
+    live_identity: tuple[str, str],
+    expected_identity: tuple[str, str],
+    *,
+    unavailable_error_cls: type[_E] = BackendUnavailableError,
+) -> bool:
+    live_name, _live_version = live_identity
+    expected_name, _expected_corpus_version = expected_identity
+    return live_name.strip().lower() == expected_name.strip().lower()
 
 
 def _log_selection(

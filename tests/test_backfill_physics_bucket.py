@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import simulator.reduced_real_determinism as rrd
+from simulator.corpus_version import current_corpus_version
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +87,7 @@ def _create_legacy_db(db_path: Path) -> None:
                 key_bytes BLOB NOT NULL,
                 payload_bytes BLOB NOT NULL,
                 code_version TEXT NOT NULL,
+                corpus_version TEXT,
                 engine_version TEXT,
                 data_digests_json TEXT NOT NULL,
                 created_at TEXT NOT NULL,
@@ -106,11 +108,11 @@ def _replay_key(
         "artifact": "equilibrium_result",
         "intent": "silicate_liquidus",
         "code_version": f"test-{label}",
-        "engine_version": "engine-v1",
+        "corpus_version": current_corpus_version(),
         "backend": {
             "backend_name": "AlphaMELTSBackend",
             "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
-            "backend_version": "alphamelts-v1",
+            "corpus_version": current_corpus_version(),
         },
         "provider": {"resolved_provider_id": "magemin-shadow"},
         "data_digests": {
@@ -146,11 +148,12 @@ def _insert_legacy_row(db_path: Path, key: dict) -> None:
                 key_bytes,
                 payload_bytes,
                 code_version,
+                corpus_version,
                 engine_version,
                 data_digests_json,
                 created_at,
                 git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 key_hash,
@@ -162,7 +165,8 @@ def _insert_legacy_row(db_path: Path, key: dict) -> None:
                 sqlite3.Binary(key_bytes),
                 sqlite3.Binary(payload_bytes),
                 key["code_version"],
-                key["engine_version"],
+                key["corpus_version"],
+                "engine-v1",
                 json.dumps(
                     key["data_digests"],
                     sort_keys=True,

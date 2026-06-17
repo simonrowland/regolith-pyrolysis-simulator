@@ -633,10 +633,13 @@ def _extract_latest_backend_status(value: Any) -> str | None:
 
 
 def _serialize_eval_spec(eval_spec: EvalSpec) -> dict[str, Any]:
-    return {
+    payload = {
         field.name: _jsonable(getattr(eval_spec, field.name))
         for field in fields(type(eval_spec))
     }
+    if not eval_spec.allow_fallback_vapor:
+        payload.pop("vapor_pressure_fallback_provider_id", None)
+    return payload
 
 
 def _deserialize_eval_spec(payload: Mapping[str, Any]) -> EvalSpec:

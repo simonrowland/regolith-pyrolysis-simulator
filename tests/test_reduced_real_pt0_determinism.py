@@ -16,6 +16,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.corpus_version import current_corpus_version
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
@@ -334,7 +335,6 @@ def _c3a_ladder_key(
             engine_version="alpha-v1",
         )
     )
-    key["code_version"] = f"test-{label}"
     key["backend"] = {
         "backend_name": "AlphaMELTSBackend",
         "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
@@ -402,27 +402,10 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
     assert "stage0_inventory_digest" in key["sulfur_side"]
     assert "sulfsat_package_version" in key["sulfur_side"]
     assert "sulfsat_calibration_version" in key["sulfur_side"]
-    assert key["code_version"]
-    assert key["engine_version"] is not None
-    assert key["source_module_digest"]["module_set"] == (
-        "equilibrium-vapor-melt-backend-v2"
-    )
-    assert key["source_module_digest"]["sha256"]
-    assert "simulator/melt_backend/base.py" in key["source_module_digest"]["paths"]
-    assert "simulator/evaporation.py" in key["source_module_digest"]["paths"]
-    assert (
-        "engines/builtin/evaporation_flux.py"
-        in key["source_module_digest"]["paths"]
-    )
-    assert "engines/builtin/vapor_pressure.py" in key["source_module_digest"]["paths"]
-    assert (
-        "engines/builtin/stage0_pretreatment.py"
-        in key["source_module_digest"]["paths"]
-    )
-    assert (
-        "engines/builtin/foulant_disposition.py"
-        in key["source_module_digest"]["paths"]
-    )
+    assert "code_version" not in key
+    assert key["corpus_version"] == current_corpus_version()
+    assert "engine_version" not in key
+    assert "source_module_digest" not in key
     assert set(key["data_digests"]) == {
         "setpoints",
         "feedstocks",
@@ -453,9 +436,8 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
 
     assert first["intent"] == ChemistryIntent.SILICATE_EQUILIBRIUM.value
     assert first["provider"]["resolved_provider_id"] == "alphamelts-diagnostic-a"
-    assert first["engine_version"] == "alpha-v1"
     assert _key_hash(different_provider) != _key_hash(first)
-    assert _key_hash(different_version) != _key_hash(first)
+    assert _key_hash(different_version) == _key_hash(first)
 
 
 def test_pt2_physics_bucket_ignores_recipe_setpoints_islands() -> None:
@@ -704,8 +686,6 @@ def test_pt2_control_ladder_hit_records_error_budget(tmp_path: Path) -> None:
     source_key["controls"]["pressure_bar"] = 0.00123454
     query_key["controls"]["pO2_bar"] = 1.23456e-6
     source_key["controls"]["pO2_bar"] = 1.23454e-6
-    query_key["code_version"] = "test-query-control"
-    source_key["code_version"] = "test-source-control"
 
     assert _physics_bucket_hash(query_key) != _physics_bucket_hash(source_key)
     assert _physics_ladder_hash(query_key, "h40") != _physics_ladder_hash(
@@ -740,8 +720,6 @@ def test_pt2_control_ladder_refuses_po2_knee_crossing(tmp_path: Path) -> None:
     source_key = copy.deepcopy(query_key)
     query_key["controls"]["pO2_bar"] = 1.0001e-9
     source_key["controls"]["pO2_bar"] = 9.999e-10
-    query_key["code_version"] = "test-query-knee"
-    source_key["code_version"] = "test-source-knee"
 
     budget = rrd.physics_control_rung_error_budget(query_key, source_key, "h30c")
     assert budget["accepted"] is False
@@ -783,11 +761,14 @@ def test_pt2_ladder_tiebreak_is_insertion_independent(tmp_path: Path) -> None:
     )
     labels = []
     for index, rows in enumerate(
-        ((near_center, far_center), (far_center, near_center))
+        (
+            ((near_center, "test-near-center"), (far_center, "test-far-center")),
+            ((far_center, "test-far-center"), (near_center, "test-near-center")),
+        )
     ):
         db_path = tmp_path / f"ladder-tiebreak-{index}.sqlite"
-        for row in rows:
-            _put_c3a_payload(db_path, row, str(row["code_version"]))
+        for row, label in rows:
+            _put_c3a_payload(db_path, row, label)
         payload, store = _lookup_c3a_payload(db_path, query_key)
         labels.append(payload["label"])
         assert store.replay_sequence[-1]["physics_bucket_rung"] == "h40"
@@ -909,8 +890,9 @@ def test_foulant_disposition_helper_source_module_digest_coverage(
     assert FOULANT_DISPOSITION_MODULE in _SOURCE_MODULE_PATTERNS
 
     rrd._source_module_digest.cache_clear()
-    before = _freeze_gate_key()
-    assert FOULANT_DISPOSITION_MODULE in before["source_module_digest"]["paths"]
+    before_digest = rrd._source_module_digest()
+    before_key_hash = _key_hash(_freeze_gate_key())
+    assert FOULANT_DISPOSITION_MODULE in before_digest["paths"]
 
     target = rrd._repo_root() / FOULANT_DISPOSITION_MODULE
     original_read_bytes = Path.read_bytes
@@ -924,14 +906,13 @@ def test_foulant_disposition_helper_source_module_digest_coverage(
     monkeypatch.setattr(Path, "read_bytes", changed_read_bytes)
     rrd._source_module_digest.cache_clear()
     try:
-        after = _freeze_gate_key()
+        after_digest = rrd._source_module_digest()
+        after_key_hash = _key_hash(_freeze_gate_key())
     finally:
         rrd._source_module_digest.cache_clear()
 
-    assert before["source_module_digest"]["sha256"] != after[
-        "source_module_digest"
-    ]["sha256"]
-    assert _key_hash(before) != _key_hash(after)
+    assert before_digest["sha256"] != after_digest["sha256"]
+    assert after_key_hash == before_key_hash
 
 
 @pytest.mark.parametrize(
@@ -949,7 +930,8 @@ def test_pt2_source_module_digest_changes_with_payload_source(
     module_path: str,
 ) -> None:
     rrd._source_module_digest.cache_clear()
-    before = _freeze_gate_key()
+    before_digest = rrd._source_module_digest()
+    before_key_hash = _key_hash(_freeze_gate_key())
     target = rrd._repo_root() / module_path
     original_read_bytes = Path.read_bytes
 
@@ -962,14 +944,13 @@ def test_pt2_source_module_digest_changes_with_payload_source(
     monkeypatch.setattr(Path, "read_bytes", changed_read_bytes)
     rrd._source_module_digest.cache_clear()
     try:
-        after = _freeze_gate_key()
+        after_digest = rrd._source_module_digest()
+        after_key_hash = _key_hash(_freeze_gate_key())
     finally:
         rrd._source_module_digest.cache_clear()
 
-    assert before["source_module_digest"]["sha256"] != after[
-        "source_module_digest"
-    ]["sha256"]
-    assert _key_hash(before) != _key_hash(after)
+    assert before_digest["sha256"] != after_digest["sha256"]
+    assert after_key_hash == before_key_hash
 
 
 def test_pt2_source_module_digest_cross_process_key_determinism() -> None:

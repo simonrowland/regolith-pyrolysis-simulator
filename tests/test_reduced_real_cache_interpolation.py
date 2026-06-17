@@ -104,12 +104,15 @@ def _put_interpolation_row(
     )
 
 
-def _candidate(key: dict, payload: dict) -> dict:
-    return {
+def _candidate(key: dict, payload: dict, *, label: str | None = None) -> dict:
+    candidate = {
         "key": key,
         "key_hash": hashlib.sha256(canonical_json_bytes(key)).hexdigest(),
         "payload": payload,
     }
+    if label is not None:
+        candidate["label"] = label
+    return candidate
 
 
 def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
@@ -118,9 +121,21 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
     same_comp_near = _interpolation_key("same-near", feo_fraction=0.20, temperature_K=1510.0)
     diff_comp_near = _interpolation_key("diff-near", feo_fraction=0.21, temperature_K=1505.0)
     candidates = [
-        _candidate(same_comp_far, _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)),
-        _candidate(diff_comp_near, _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)),
-        _candidate(same_comp_near, _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)),
+        _candidate(
+            same_comp_far,
+            _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
+            label="same-far",
+        ),
+        _candidate(
+            diff_comp_near,
+            _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
+            label="diff-near",
+        ),
+        _candidate(
+            same_comp_near,
+            _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
+            label="same-near",
+        ),
     ]
     neighbors = rci.greedy_nearest_neighbors(
         query,
@@ -128,10 +143,7 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
         k=2,
         max_distance=10.0,
     )
-    assert [neighbor["key"]["code_version"] for neighbor in neighbors] == [
-        "test-same-near",
-        "test-same-far",
-    ]
+    assert [neighbor["label"] for neighbor in neighbors] == ["same-near", "same-far"]
 
 
 def test_linear_interpolation_brackets_temperature() -> None:

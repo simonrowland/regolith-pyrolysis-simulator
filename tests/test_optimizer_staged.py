@@ -1195,7 +1195,6 @@ def test_staged_strip_trace_preserves_real_backend_provenance(tmp_path) -> None:
         "db_path": str(tmp_path / "pt1-cache.db"),
         "miss_policy": "fail-loud",
         "authorized_backend_name": "alphamelts",
-        "authorized_backend_version": "test-version",
     }
     real_profile = {
         **PROFILE,

@@ -455,7 +455,6 @@ def test_cached_real_all_ok_arm_inherits_cache_authority_and_writes_artifacts(
         "db_path": str(tmp_path / "pt1-cache.db"),
         "miss_policy": "fail-loud",
         "authorized_backend_name": "alphamelts",
-        "authorized_backend_version": "test-version",
     }
 
     result = run_fidelity_correlation(

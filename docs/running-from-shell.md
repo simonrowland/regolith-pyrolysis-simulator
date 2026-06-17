@@ -146,6 +146,12 @@ accepts the alias `C2A` → `C2A_continuous`.
 - `magemin` / `vaporock` are not selectable as the active melt backend from this flag;
   the reduced-real cached path (`cached-real`) is configured in-process via
   `reduced_real_cache`, not the runner flag.
+- Reduced-real cache identity uses the deliberate corpus tag in
+  `data/corpus_version.yaml`. `corpus_version` is the cache-invalidation lever;
+  bump it when the analytical corpus changes. `interoperable_versions` lists
+  older tags that are safe to replay under the current corpus. Engine version,
+  server, path, and digest remain provenance only; they do not invalidate
+  cached-real replay by themselves.
 
 ---
 

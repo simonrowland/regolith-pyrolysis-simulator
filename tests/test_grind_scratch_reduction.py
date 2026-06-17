@@ -13,6 +13,7 @@ import pytest
 from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.backends import build_cached_real_store, normalize_cached_real_config
+from simulator.corpus_version import current_corpus_version
 from simulator.reduced_real_determinism import (
     DEFAULT_SHARD_BUSY_TIMEOUT_MS,
     PT0DeterminismStore,
@@ -32,6 +33,7 @@ def _put_cache_row(
     key = {
         "artifact": artifact,
         "code_version": "test",
+        "corpus_version": current_corpus_version(),
         "data_digests": {"fixture": "v1"},
         "schema_version": "test",
         "tag": tag,
@@ -119,7 +121,7 @@ def test_base_not_written_by_job_store(tmp_path: Path) -> None:
                 "db_path": str(shard),
                 "read_only_base_db_path": str(base),
                 "authorized_backend_name": "magemin",
-                "authorized_backend_version": "test",
+                "authorized_backend_version": "test 1.0.0",
                 "miss_policy": "live-fill",
                 "cache_tier_ceiling": "cached_exact",
             }
@@ -398,7 +400,6 @@ def test_epoch_profile_wires_read_only_base_path(tmp_path: Path) -> None:
                     "reduced_real_cache": {
                         "db_path": "old.sqlite",
                         "authorized_backend_name": "magemin",
-                        "authorized_backend_version": "test",
                     },
                 },
                 "fidelities": {"fast": {}},

@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
+from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.session import SimSession, SimSessionConfig
@@ -190,7 +191,9 @@ def test_messy_harness_rejects_cached_real_inprocess_live_fill(tmp_path):
         config=CachedRealConfig(
             db_path=tmp_path / "cached-real.sqlite",
             authorized_backend_name="alphamelts",
-            authorized_backend_version="test",
+            corpus_version=current_corpus_version(),
+            interoperable_corpus_versions=interoperable_corpus_versions(),
+            authorized_backend_version="test 1.0.0",
             miss_policy="live-fill",
         ),
         live_backend=UnsafeLiveBackend(),
@@ -201,7 +204,9 @@ def test_messy_harness_rejects_cached_real_inprocess_live_fill(tmp_path):
         reduced_real_cache={
             "db_path": str(tmp_path / "cached-real.sqlite"),
             "authorized_backend_name": "alphamelts",
-            "authorized_backend_version": "test",
+            "corpus_version": current_corpus_version(),
+            "interoperable_corpus_versions": interoperable_corpus_versions(),
+            "authorized_backend_version": "test 1.0.0",
             "miss_policy": "live-fill",
         },
     )

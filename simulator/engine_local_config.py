@@ -1,4 +1,4 @@
-"""Per-machine engine paths and portable digest identity (engines.local.toml)."""
+"""Per-machine engine paths, version identity, and provenance."""
 
 from __future__ import annotations
 

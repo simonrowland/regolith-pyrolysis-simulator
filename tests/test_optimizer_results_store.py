@@ -241,6 +241,34 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_strict_eval_spec_storage_omits_inactive_vapor_fallback_provider(tmp_path) -> None:
+    spec = _base_spec(
+        vapor_pressure_provider_id="vaporock",
+        vapor_pressure_fallback_provider_id="builtin-vapor-pressure",
+        allow_fallback_vapor=False,
+        force_builtin_vapor_pressure=False,
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, _scored(spec), created_at="2026-06-15T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute("SELECT eval_spec FROM results").fetchone()
+    payload = json.loads(str(row[0]))
+    loaded = store.lookup(spec)
+
+    assert payload["vapor_pressure_provider_id"] == "vaporock"
+    assert payload["allow_fallback_vapor"] is False
+    assert payload["force_builtin_vapor_pressure"] is False
+    assert "vapor_pressure_fallback_provider_id" not in payload
+    assert loaded is not None
+    assert loaded.eval_spec == spec
+
+
 def test_not_run_backend_labels_round_trip(tmp_path) -> None:
     spec = _base_spec()
     scored = _scored(

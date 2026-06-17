@@ -68,10 +68,14 @@ from simulator.reduced_real_determinism import (
 
 
 _LOGGER = logging.getLogger(__name__)
+_ACTIVE_CHILDREN: set[subprocess.Popen[Any]] = set()
+_ACTIVE_CHILDREN_LOCK = threading.Lock()
+_SIGNAL_FORWARDERS_INSTALLED = False
 
 DEFAULT_TIME_BOX_SECONDS = 2 * 60 * 60
 DEFAULT_DUP_THRESHOLD = 0.02
 DEFAULT_LOW_DUP_EPOCHS = 2
+STALE_CLEANUP_RETRY_SECONDS = 0.05
 JOURNAL_SCHEMA_VERSION = 2
 LEGACY_JOURNAL_SCHEMA_VERSION = 1
 DECISION_CONTINUE = "continue"
@@ -132,6 +136,7 @@ class DriverConfig:
     duplication_expected: bool
     nice: int
     job_concurrency: int = 1
+    ioreg_sample_every_evals: int = 0
 
 
 @dataclass(frozen=True)
@@ -141,6 +146,135 @@ class ChildOutcome:
     failure_counts: Mapping[str, int] | None = None
     reason: str | None = None
     message: str | None = None
+
+
+IOREG_IOSURFACE_COMMAND = "ioreg -c IOSurfaceRootUserClient | grep -c IOSurfaceRootUserClient"
+IOREG_TIMEOUT_SECONDS = 5.0
+
+
+class IOSurfaceMonitor:
+    def __init__(self, sample_every_evals: int, log_path: Path) -> None:
+        self.sample_every_evals = max(0, int(sample_every_evals))
+        self.log_path = log_path
+        self.samples: list[dict[str, Any]] = []
+        self._baseline_count: int | None = None
+        self._previous_count: int | None = None
+        self._evals_since_sample = 0
+        self._total_evals = 0
+        if self.enabled:
+            self.log_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                self.log_path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError as exc:
+                _LOGGER.warning("ioreg sample log reset skipped: %s", exc)
+
+    @property
+    def enabled(self) -> bool:
+        return self.sample_every_evals > 0
+
+    def payload(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "enabled": self.enabled,
+            "sample_every_evals": self.sample_every_evals,
+            "samples": self.samples,
+        }
+        if self.enabled:
+            payload["log"] = str(self.log_path)
+        return payload
+
+    def sample(
+        self,
+        label: str,
+        *,
+        epoch: int,
+        evals_attempted: int | None = None,
+        job_id: str | None = None,
+    ) -> dict[str, Any] | None:
+        if not self.enabled:
+            return None
+        record = sample_iosurface_client_count()
+        record.update(
+            {
+                "label": label,
+                "epoch": epoch,
+                "evals_attempted": self._total_evals if evals_attempted is None else evals_attempted,
+            }
+        )
+        if job_id is not None:
+            record["job_id"] = job_id
+        if record.get("status") == "ok":
+            count = int(record["count"])
+            if self._baseline_count is None:
+                self._baseline_count = count
+            record["baseline_count"] = self._baseline_count
+            record["delta_from_baseline"] = count - self._baseline_count
+            record["delta_from_previous"] = (
+                0 if self._previous_count is None else count - self._previous_count
+            )
+            self._previous_count = count
+        self.samples.append(record)
+        _append_jsonl(self.log_path, record)
+        return record
+
+    def record_budgeted_evals(self, count: int, *, epoch: int, job_id: str) -> None:
+        if not self.enabled:
+            return
+        added = max(0, int(count))
+        self._total_evals += added
+        self._evals_since_sample += added
+        if self._evals_since_sample >= self.sample_every_evals:
+            self.sample(
+                "eval_interval",
+                epoch=epoch,
+                evals_attempted=self._total_evals,
+                job_id=job_id,
+            )
+            self._evals_since_sample = 0
+
+
+def sample_iosurface_client_count() -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "platform": sys.platform,
+        "command": IOREG_IOSURFACE_COMMAND,
+    }
+    if sys.platform != "darwin":
+        return {**record, "status": "skipped", "reason": "not_macos"}
+    try:
+        completed = subprocess.run(
+            ["sh", "-c", IOREG_IOSURFACE_COMMAND],
+            capture_output=True,
+            text=True,
+            timeout=IOREG_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {**record, "status": "skipped", "reason": "timeout"}
+    except OSError as exc:
+        return {**record, "status": "skipped", "reason": "exec_failed", "error": str(exc)}
+
+    stdout = (completed.stdout or "").strip()
+    try:
+        count = int(stdout.splitlines()[-1])
+    except (IndexError, ValueError):
+        return {
+            **record,
+            "status": "skipped",
+            "reason": "parse_failed",
+            "returncode": completed.returncode,
+            "stderr": (completed.stderr or "").strip()[-500:],
+        }
+    return {**record, "status": "ok", "count": count, "returncode": completed.returncode}
+
+
+def _append_jsonl(path: Path, record: Mapping[str, Any]) -> None:
+    try:
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(dict(record), sort_keys=True) + "\n")
+    except OSError as exc:
+        _LOGGER.warning("ioreg sample log write skipped: %s", exc)
 
 
 def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path | None = None) -> Manifest:
@@ -767,8 +901,7 @@ def seed_job_cache(
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
 ) -> Mapping[str, Any]:
     del seed_fn
-    if shard_db.exists():
-        shard_db.unlink()
+    _remove_sqlite_file_set(shard_db)
     shard_db.parent.mkdir(parents=True, exist_ok=True)
     PT1PersistentEquilibriumStore(shard_db)
     return {
@@ -780,6 +913,49 @@ def seed_job_cache(
         "read_only_base": str(base_cache) if base_cache.exists() else None,
         "sources": [],
     }
+
+
+def _remove_sqlite_file_set(path: Path) -> None:
+    for candidate in (path, path.with_name(path.name + "-wal"), path.with_name(path.name + "-shm")):
+        try:
+            candidate.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError as exc:
+            _LOGGER.warning("stale sqlite cleanup retrying %s after OSError: %s", candidate, exc)
+            time.sleep(STALE_CLEANUP_RETRY_SECONDS)
+            try:
+                candidate.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError as retry_exc:
+                _LOGGER.warning(
+                    "stale sqlite cleanup skipped %s after retry OSError: %s",
+                    candidate,
+                    retry_exc,
+                )
+
+
+def _remove_stale_output_dir(path: Path) -> None:
+    if not path.exists():
+        return
+    try:
+        shutil.rmtree(path)
+    except FileNotFoundError:
+        return
+    except OSError as exc:
+        _LOGGER.warning("stale output dir cleanup retrying %s after OSError: %s", path, exc)
+        time.sleep(STALE_CLEANUP_RETRY_SECONDS)
+        try:
+            shutil.rmtree(path)
+        except FileNotFoundError:
+            return
+        except OSError as retry_exc:
+            _LOGGER.warning(
+                "stale output dir cleanup skipped %s after retry OSError: %s",
+                path,
+                retry_exc,
+            )
 
 
 def run_driver(manifest: Manifest, config: DriverConfig, *, journal_path: Path, dry_run: bool = False) -> int:
@@ -919,6 +1095,7 @@ def _prepare_job_run(
         base_cache=manifest.base_cache,
     )
     out_dir = job.out / f"epoch-{epoch_index:04d}"
+    _remove_stale_output_dir(out_dir)
     command = build_optimizer_command(
         job,
         profile=profile_arg,
@@ -1000,8 +1177,6 @@ def _record_job_outcome(
         result["stale_profile_jobs"].append(job_record)
         return False
     if outcome.kind == "timed_out":
-        result["shard_dbs"].append(shard_key)
-        result["seed_rows_by_shard"][shard_key] = prepared.seed_rows
         result["timed_out_jobs"].append(prepared.job.id)
         return True
     job_record["returncode"] = outcome.returncode
@@ -1022,11 +1197,16 @@ def run_epoch(
     log_dir = epoch_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     deadline = None if final_long or config.time_box_seconds is None else time.monotonic() + config.time_box_seconds
+    ioreg_monitor = IOSurfaceMonitor(
+        config.ioreg_sample_every_evals,
+        log_dir / "ioreg_iosurface.jsonl",
+    )
     result: dict[str, Any] = {
         "epoch": epoch_index,
         "mode": "final_long" if final_long else "time_boxed",
         "time_box_seconds": None if final_long else config.time_box_seconds,
         "job_concurrency": config.job_concurrency,
+        "ioreg": ioreg_monitor.payload(),
         "completed_jobs": [],
         "failed_jobs": [],
         "no_feasible_jobs": [],
@@ -1036,12 +1216,14 @@ def run_epoch(
         "shard_dbs": [],
         "seed_rows_by_shard": {},
     }
+    ioreg_monitor.sample("epoch_start", epoch=epoch_index, evals_attempted=0)
     if not jobs:
+        ioreg_monitor.sample("epoch_end", epoch=epoch_index)
         return result
 
     job_concurrency = max(1, int(config.job_concurrency))
     if job_concurrency == 1:
-        return _run_epoch_serial(
+        result = _run_epoch_serial(
             manifest,
             jobs,
             config,
@@ -1050,18 +1232,23 @@ def run_epoch(
             epoch_index=epoch_index,
             deadline=deadline,
             result=result,
+            ioreg_monitor=ioreg_monitor,
         )
-    return _run_epoch_concurrent(
-        manifest,
-        jobs,
-        config,
-        epoch_dir=epoch_dir,
-        log_dir=log_dir,
-        epoch_index=epoch_index,
-        deadline=deadline,
-        result=result,
-        job_concurrency=job_concurrency,
-    )
+    else:
+        result = _run_epoch_concurrent(
+            manifest,
+            jobs,
+            config,
+            epoch_dir=epoch_dir,
+            log_dir=log_dir,
+            epoch_index=epoch_index,
+            deadline=deadline,
+            result=result,
+            job_concurrency=job_concurrency,
+            ioreg_monitor=ioreg_monitor,
+        )
+    ioreg_monitor.sample("epoch_end", epoch=epoch_index)
+    return result
 
 
 def _run_epoch_serial(
@@ -1074,6 +1261,7 @@ def _run_epoch_serial(
     epoch_index: int,
     deadline: float | None,
     result: dict[str, Any],
+    ioreg_monitor: IOSurfaceMonitor,
 ) -> dict[str, Any]:
     for job in jobs:
         if deadline is not None and time.monotonic() >= deadline:
@@ -1088,7 +1276,13 @@ def _run_epoch_serial(
         )
         result["attempted_jobs"].append(prepared.job_record)
         _, outcome = _run_prepared_job(prepared, deadline=deadline)
-        if _record_job_outcome(result, prepared, outcome):
+        stop_after = _record_job_outcome(result, prepared, outcome)
+        ioreg_monitor.record_budgeted_evals(
+            prepared.job.budget,
+            epoch=epoch_index,
+            job_id=prepared.job.id,
+        )
+        if stop_after:
             break
     return result
 
@@ -1104,6 +1298,7 @@ def _run_epoch_concurrent(
     deadline: float | None,
     result: dict[str, Any],
     job_concurrency: int,
+    ioreg_monitor: IOSurfaceMonitor,
 ) -> dict[str, Any]:
     pending = list(jobs)
     stop_launching = threading.Event()
@@ -1143,6 +1338,11 @@ def _run_epoch_concurrent(
             stop_after = False
             with results_lock:
                 stop_after = _record_job_outcome(result, prepared, outcome)
+                ioreg_monitor.record_budgeted_evals(
+                    prepared.job.budget,
+                    epoch=epoch_index,
+                    job_id=prepared.job.id,
+                )
             if stop_after:
                 stop_launching.set()
             if not stop_launching.is_set():
@@ -1267,6 +1467,7 @@ def _run_child(
             stderr=stderr,
             start_new_session=True,
         )
+        _register_child(process)
         try:
             returncode = int(process.wait(timeout=timeout))
             if returncode == 0:
@@ -1293,6 +1494,8 @@ def _run_child(
         except subprocess.TimeoutExpired:
             _terminate_process_group(process)
             return ChildOutcome(kind="timed_out", returncode=None)
+        finally:
+            _unregister_child(process)
 
 
 def _no_feasible_failure_counts(out_dir: Path, stderr_path: Path, budget: int) -> dict[str, int] | None:
@@ -1412,6 +1615,38 @@ def _terminate_process_group(process: subprocess.Popen[Any]) -> None:
         except ProcessLookupError:
             pass
         process.wait()
+
+
+def _register_child(process: subprocess.Popen[Any]) -> None:
+    with _ACTIVE_CHILDREN_LOCK:
+        _ACTIVE_CHILDREN.add(process)
+
+
+def _unregister_child(process: subprocess.Popen[Any]) -> None:
+    with _ACTIVE_CHILDREN_LOCK:
+        _ACTIVE_CHILDREN.discard(process)
+
+
+def _terminate_active_children() -> None:
+    with _ACTIVE_CHILDREN_LOCK:
+        children = list(_ACTIVE_CHILDREN)
+    for process in children:
+        if process.poll() is None:
+            _terminate_process_group(process)
+
+
+def _install_signal_forwarders() -> None:
+    global _SIGNAL_FORWARDERS_INSTALLED
+    if _SIGNAL_FORWARDERS_INSTALLED:
+        return
+
+    def _handler(signum: int, _frame: object) -> None:
+        _terminate_active_children()
+        raise SystemExit(128 + signum)
+
+    signal.signal(signal.SIGTERM, _handler)
+    signal.signal(signal.SIGINT, _handler)
+    _SIGNAL_FORWARDERS_INSTALLED = True
 
 
 def _apply_cache_db(
@@ -1548,10 +1783,20 @@ def _parser() -> argparse.ArgumentParser:
         default=1,
         help="max concurrent optimize jobs per epoch (default 1 = serial)",
     )
+    parser.add_argument(
+        "--ioreg-sample-every-evals",
+        type=int,
+        default=0,
+        help=(
+            "macOS-only IOSurface client count sampling interval by budgeted evals; "
+            "0 disables ioreg monitoring"
+        ),
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    _install_signal_forwarders()
     args = _parser().parse_args(argv)
     try:
         manifest = load_manifest(args.manifest, base_cache=args.base_cache, work_dir=args.work_dir)
@@ -1564,6 +1809,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             duplication_expected=not args.no_duplication_expected,
             nice=args.nice,
             job_concurrency=_positive_int(args.job_concurrency, "job-concurrency"),
+            ioreg_sample_every_evals=_non_negative_int(
+                args.ioreg_sample_every_evals,
+                "ioreg-sample-every-evals",
+            ),
         )
         if not shutil.which("nice"):
             raise RuntimeError("nice command not found")
