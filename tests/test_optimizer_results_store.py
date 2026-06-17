@@ -276,6 +276,34 @@ def test_strict_eval_spec_storage_omits_inactive_vapor_fallback_provider(tmp_pat
     assert loaded.eval_spec == spec
 
 
+def test_result_store_eval_spec_omits_default_stage0_exit_stop(tmp_path) -> None:
+    full_run = _base_spec(stop_at_stage0_exit=False)
+    stage0_run = _base_spec(stop_at_stage0_exit=True)
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=full_run.code_version,
+        current_data_digests=full_run.data_digests,
+    )
+
+    store.store(full_run, _scored(full_run), created_at="2026-06-17T00:00:00Z")
+    store.store(stage0_run, _scored(stage0_run), created_at="2026-06-17T00:00:01Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        rows = dict(
+            conn.execute(
+                "SELECT cache_key, eval_spec FROM results"
+            ).fetchall()
+        )
+
+    full_payload = json.loads(rows[cache_key(full_run)])
+    stage0_payload = json.loads(rows[cache_key(stage0_run)])
+
+    assert "stop_at_stage0_exit" not in full_payload
+    assert stage0_payload["stop_at_stage0_exit"] is True
+    assert store.lookup(full_run).eval_spec == full_run
+    assert store.lookup(stage0_run).eval_spec == stage0_run
+
+
 def test_not_run_backend_labels_round_trip(tmp_path) -> None:
     spec = _base_spec()
     scored = _scored(

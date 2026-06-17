@@ -126,6 +126,7 @@ _FE_TIER_BOUNDS = MappingProxyType(
 )
 _POOL_LEDGER_ACCOUNTS = MappingProxyType(
     {
+        "cleaned_melt_at_stage0_exit": ("process.cleaned_melt",),
         "residual_rump_at_stop": ("process.cleaned_melt",),
         "terminal_rump_earned": ("terminal.slag",),
     }
@@ -461,6 +462,19 @@ def composition_targets_require_terminal_rump(profile: Mapping[str, Any]) -> boo
             str(window.get("pool", "")) if isinstance(window, Mapping) else "",
         }
         if "terminal_rump_earned" in pools:
+            return True
+    return False
+
+
+def composition_targets_require_stage0_exit(profile: Mapping[str, Any]) -> bool:
+    for objective in composition_target_specs(profile):
+        target = objective["target"]
+        window = target.get("composition_window", {})
+        pools = {
+            str(target.get("pool", "")),
+            str(window.get("pool", "")) if isinstance(window, Mapping) else "",
+        }
+        if "cleaned_melt_at_stage0_exit" in pools:
             return True
     return False
 
@@ -1613,6 +1627,7 @@ def _tap_pool_projection(
         captured_flat[species] = captured_flat.get(species, 0.0) + mol
     projection: dict[str, Mapping[str, float]] = {}
     if residual:
+        projection["cleaned_melt_at_stage0_exit"] = MappingProxyType(residual)
         projection["residual_rump_at_stop"] = MappingProxyType(residual)
         projection["terminal_rump_earned"] = MappingProxyType(residual)
     if captured_flat:
@@ -2479,7 +2494,7 @@ def _pool_species_mol(
                 bookkeeping_exclusions=bookkeeping_exclusions,
             )
         )
-    if pool == "residual_rump_at_stop":
+    if pool in ("cleaned_melt_at_stage0_exit", "residual_rump_at_stop"):
         ledger_values = _ledger_mol_by_accounts(
             sim,
             _POOL_LEDGER_ACCOUNTS[pool],

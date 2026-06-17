@@ -13,6 +13,7 @@ from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
+    _at_stage0_exit as _session_at_stage0_exit,
     drive_session,
 )
 from simulator.state import HourSnapshot
@@ -50,9 +51,18 @@ class RunExecutor:
     ) -> RunExecution:
         session = SimSession()
         session.start(config, backend=_backend_from_worker_runtime(config, worker_runtime))
-        return self.execute_session(session, hours=int(config.hours))
+        kwargs: dict[str, Any] = {"hours": int(config.hours)}
+        if bool(config.stop_at_stage0_exit):
+            kwargs["stop_at_stage0_exit"] = True
+        return self.execute_session(session, **kwargs)
 
-    def execute_session(self, session: SimSession, *, hours: int) -> RunExecution:
+    def execute_session(
+        self,
+        session: SimSession,
+        *,
+        hours: int,
+        stop_at_stage0_exit: bool | None = None,
+    ) -> RunExecution:
         sim = session.simulator
         per_hour: list[dict[str, Any]] = []
         operator_decisions: list[dict[str, Any]] = []
@@ -61,6 +71,11 @@ class RunExecutor:
         reason = ""
         refusal_diagnostic: dict[str, Any] = {}
         hours = int(hours)
+        if stop_at_stage0_exit is None:
+            config = getattr(session, "_config", None)
+            stop_at_stage0_exit = bool(
+                getattr(config, "stop_at_stage0_exit", False)
+            )
 
         try:
             for result in drive_session(
@@ -68,6 +83,7 @@ class RunExecutor:
                 hours,
                 DecisionPolicy.AUTO_APPLY,
                 operator_decisions=operator_decisions,
+                stop_at_stage0_exit=bool(stop_at_stage0_exit),
             ):
                 per_hour_summary = dict(result.per_hour_summary)
                 cache_state = getattr(sim, "_last_reduced_real_cache_state", None)
@@ -83,7 +99,9 @@ class RunExecutor:
             #                  decisions consumed iteration slots
             #                  without advancing the hour counter).
             #   * "failed"  -- set in the except blocks below.
-            if sim.melt.hour < hours:
+            if bool(stop_at_stage0_exit) and _session_at_stage0_exit(session):
+                reason = "stage0_exit"
+            elif sim.melt.hour < hours:
                 status = "partial"
         except KnudsenRegimeRefusal as exc:
             status = "refused"

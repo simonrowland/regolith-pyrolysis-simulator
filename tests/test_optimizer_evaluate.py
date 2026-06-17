@@ -318,6 +318,45 @@ def test_stale_melt_profile_refusal_returns_named_verdict() -> None:
     assert "FORCE_PROFILES=1" in result.notes[0]
 
 
+def test_cleaned_melt_stage0_pool_soft_endpoint_sets_stop_partition() -> None:
+    assert forbidden_gates_for_pool("cleaned_melt_at_stage0_exit") == (
+        "delivered_stream_purity",
+    )
+    profile = _composition_eval_profile(
+        "cleaned_melt_at_stage0_exit",
+        target_id="stage0-clean-basalt-explore",
+        oxides={
+            "CaO": {
+                "min": 0.0,
+                "max": 50.0,
+                "strict": False,
+                "weight": 1.0,
+            }
+        },
+    )
+    window = profile["objectives"][0]["target"]["composition_window"]
+    window["exploratory"] = True
+
+    executor = FakeExecutor(execution=_execution())
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.eval_spec is not None
+    assert result.eval_spec.stop_at_stage0_exit is True
+    assert executor.config.stop_at_stage0_exit is True
+    score = result.objectives.as_mapping()[
+        "composition_target:stage0-clean-basalt-explore"
+    ]
+    assert 0.0 < score < 1.0
+
+
 def _execution(
     *,
     status: str = "ok",
@@ -2145,6 +2184,7 @@ def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
     margin = result.feasibility_margins["backend_domain"]
     assert margin.observed == pytest.approx(0.0)
     assert math.isfinite(margin.margin)
+    assert "melts_domain_out_of_domain: backend_status=out_of_domain" in result.notes
     assert "rump_terminal: not_earned reason=missing_crash_point" in result.notes
 
 

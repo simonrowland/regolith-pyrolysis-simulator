@@ -20,6 +20,7 @@ from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_lo
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.state import (
     DecisionPoint,
+    DecisionType,
     HourSnapshot,
     clamp_stir_factor,
     clamp_stir_state,
@@ -95,6 +96,7 @@ class SimSessionConfig:
     track: str = "pyrolysis"
     c4_max_temp: float | None = None
     c5_enabled: bool = False
+    stop_at_stage0_exit: bool = False
     mre_target_species: str = ""
     mre_max_voltage_V: float = 0.0
     unavailable_error_cls: type[Exception] = RuntimeError
@@ -559,6 +561,7 @@ def drive_auto_apply(
     hours: int,
     *,
     operator_decisions: list[dict[str, Any]] | None = None,
+    stop_at_stage0_exit: bool = False,
 ) -> Iterable[StepResult]:
     """AUTO_APPLY driver loop for batch-runner surfaces."""
 
@@ -567,6 +570,7 @@ def drive_auto_apply(
         hours,
         DecisionPolicy.AUTO_APPLY,
         operator_decisions=operator_decisions,
+        stop_at_stage0_exit=stop_at_stage0_exit,
     )
 
 
@@ -576,13 +580,18 @@ def drive_session(
     policy: DecisionPolicy,
     *,
     operator_decisions: list[dict[str, Any]] | None = None,
+    stop_at_stage0_exit: bool = False,
 ) -> Iterable[StepResult]:
     """Drive a session under a policy outside ``advance()``."""
 
     for _ in range(int(hours)):
+        if stop_at_stage0_exit and _at_stage0_exit(session):
+            return
         if session.is_complete():
             return
         decision = session.pending_decision()
+        if stop_at_stage0_exit and _stage0_exit_decision(session):
+            return
         if decision is not None and policy is DecisionPolicy.OPERATOR:
             return
         if decision is not None and policy is DecisionPolicy.AUTO_APPLY:
@@ -594,11 +603,34 @@ def drive_session(
             if operator_decisions is not None:
                 operator_decisions.append(event)
             session.decide(choice)
+            if stop_at_stage0_exit and _at_stage0_exit(session):
+                return
             if session.is_complete():
                 return
         elif decision is not None:
             raise ValueError(f"unsupported decision policy {policy!r}")
-        yield session.advance()
+        result = session.advance()
+        yield result
+        if stop_at_stage0_exit and _at_stage0_exit(session):
+            return
+
+
+def _at_stage0_exit(session: SimSession) -> bool:
+    if _stage0_exit_decision(session):
+        return True
+    return session.simulator.melt.campaign not in (
+        CampaignPhase.C0,
+        CampaignPhase.C0B,
+    )
+
+
+def _stage0_exit_decision(session: SimSession) -> bool:
+    decision = session.pending_decision()
+    return (
+        decision is not None
+        and decision.decision_type is DecisionType.PATH_AB
+        and session.simulator.melt.campaign is CampaignPhase.C0B
+    )
 
 
 def _decision_event(decision: DecisionPoint) -> dict[str, Any]:

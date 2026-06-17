@@ -13,6 +13,9 @@ from simulator.optimize.doe import (
     DoeSpec,
     FidelityCorrelationProtocol,
     FidelityCorrelationResult,
+    PHASE_ORDER_OXIDIZE_FIRST,
+    PHASE_ORDER_VACUUM_FIRST,
+    phase_order_grid,
     sample_recipe_patch_at_index,
     sample_recipe_patches,
 )
@@ -339,6 +342,37 @@ def test_fidelity_correlation_result_copies_input_mappings() -> None:
     assert result.to_dict() == before
     with pytest.raises(TypeError):
         result.spearman_by_objective["oxygen_recovery"] = -1.0
+
+
+def test_phase_order_grid_covers_stage0_order_count_and_dwell_skeletons() -> None:
+    grid = phase_order_grid()
+
+    assert len(grid) == 8
+    assert {
+        (item.order, item.phase_count, item.dwell_h)
+        for item in grid
+    } == {
+        (PHASE_ORDER_VACUUM_FIRST, 2, 0.5),
+        (PHASE_ORDER_VACUUM_FIRST, 2, 1.0),
+        (PHASE_ORDER_VACUUM_FIRST, 3, 0.5),
+        (PHASE_ORDER_VACUUM_FIRST, 3, 1.0),
+        (PHASE_ORDER_OXIDIZE_FIRST, 2, 0.5),
+        (PHASE_ORDER_OXIDIZE_FIRST, 2, 1.0),
+        (PHASE_ORDER_OXIDIZE_FIRST, 3, 0.5),
+        (PHASE_ORDER_OXIDIZE_FIRST, 3, 1.0),
+    }
+    vacuum_first = next(
+        item for item in grid
+        if item.order == PHASE_ORDER_VACUUM_FIRST and item.phase_count == 3
+    )
+    oxidize_first = next(
+        item for item in grid
+        if item.order == PHASE_ORDER_OXIDIZE_FIRST and item.phase_count == 3
+    )
+    assert vacuum_first.sequence == ("vacuum", "oxidize", "vacuum")
+    assert oxidize_first.sequence == ("oxidize", "vacuum", "oxidize")
+    assert vacuum_first.continuous_knob_paths
+    assert "continuous_knob_paths" in vacuum_first.to_dict()
 
 
 # --- anchored (neighborhood) sampling -------------------------------------

@@ -51,6 +51,7 @@ from simulator.optimize.objective import (
     composition_target_infeasible_reason,
     composition_target_specs,
     composition_targets_require_coating,
+    composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
     compute_objectives,
     product_summary,
@@ -1317,6 +1318,7 @@ def _build_eval_inputs(
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
     target_metadata = composition_target_eval_metadata(profile)
+    stop_at_stage0_exit = composition_targets_require_stage0_exit(profile)
     run_options = _thermal_scheduled_run_options(
         _run_options(profile, fidelity),
         profile=profile,
@@ -1359,6 +1361,8 @@ def _build_eval_inputs(
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
     )._session_config()
+    if stop_at_stage0_exit:
+        run_config = replace(run_config, stop_at_stage0_exit=True)
 
     data_digests = {
         "setpoints": bundle.digests["setpoints"],
@@ -1386,6 +1390,7 @@ def _build_eval_inputs(
         track=str(run_options["track"]),
         backend_name=str(run_options["backend_name"]),
         c5_enabled=bool(run_options["c5_enabled"]),
+        stop_at_stage0_exit=stop_at_stage0_exit,
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
         mre_target_species=str(run_options["mre_target_species"]),
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
@@ -2353,7 +2358,10 @@ def _out_of_domain_result(
             profile,
             trace_payload=assessment.trace_payload,
         ),
-        notes=assessment.notes,
+        notes=(
+            *assessment.notes,
+            f"melts_domain_out_of_domain: backend_status={run_execution.backend_status}",
+        ),
     )
 
 

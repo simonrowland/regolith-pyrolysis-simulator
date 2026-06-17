@@ -29,6 +29,89 @@ FIDELITY_CORRELATION_METRICS: tuple[str, ...] = (
     "feasible_infeasible_agreement",
     "top_k_recall",
 )
+PHASE_ORDER_VACUUM_FIRST = "vacuum_first"
+PHASE_ORDER_OXIDIZE_FIRST = "oxidize_first"
+PHASE_ORDER_SKELETONS = (
+    PHASE_ORDER_VACUUM_FIRST,
+    PHASE_ORDER_OXIDIZE_FIRST,
+)
+PHASE_ORDER_PHASE_COUNTS = (2, 3)
+PHASE_ORDER_DWELL_H = (0.5, 1.0)
+PHASE_ORDER_CONTINUOUS_KNOBS: tuple[KeyPath, ...] = (
+    ("campaigns", "C0", "stage0_phase_temperature_C"),
+    ("campaigns", "C0", "stage0_phase_pressure_mbar"),
+    ("campaigns", "C0", "stage0_phase_pO2_mbar"),
+)
+
+
+@dataclass(frozen=True)
+class PhaseOrderSkeleton:
+    """Discrete Stage-0 phase order handed to the continuous optimizer."""
+
+    order: str
+    phase_count: int
+    dwell_h: float
+    sequence: tuple[str, ...]
+    continuous_knob_paths: tuple[KeyPath, ...] = PHASE_ORDER_CONTINUOUS_KNOBS
+
+    def __post_init__(self) -> None:
+        if self.order not in PHASE_ORDER_SKELETONS:
+            raise ValueError(f"unsupported phase order {self.order!r}")
+        _validate_positive_int("phase_count", self.phase_count)
+        if self.phase_count != len(self.sequence):
+            raise ValueError("phase_count must match sequence length")
+        if isinstance(self.dwell_h, bool) or not math.isfinite(float(self.dwell_h)):
+            raise ValueError("dwell_h must be finite")
+        if float(self.dwell_h) <= 0.0:
+            raise ValueError("dwell_h must be positive")
+        if not self.continuous_knob_paths:
+            raise ValueError("continuous_knob_paths must be non-empty")
+        object.__setattr__(self, "dwell_h", float(self.dwell_h))
+        object.__setattr__(
+            self,
+            "continuous_knob_paths",
+            tuple(tuple(str(part) for part in path) for path in self.continuous_knob_paths),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "order": self.order,
+            "phase_count": self.phase_count,
+            "dwell_h": self.dwell_h,
+            "sequence": list(self.sequence),
+            "continuous_knob_paths": [list(path) for path in self.continuous_knob_paths],
+        }
+
+
+def phase_order_grid(
+    *,
+    orders: tuple[str, ...] = PHASE_ORDER_SKELETONS,
+    phase_counts: tuple[int, ...] = PHASE_ORDER_PHASE_COUNTS,
+    dwell_h_values: tuple[float, ...] = PHASE_ORDER_DWELL_H,
+) -> tuple[PhaseOrderSkeleton, ...]:
+    grid: list[PhaseOrderSkeleton] = []
+    for order in orders:
+        for phase_count in phase_counts:
+            for dwell_h in dwell_h_values:
+                grid.append(
+                    PhaseOrderSkeleton(
+                        order=str(order),
+                        phase_count=int(phase_count),
+                        dwell_h=float(dwell_h),
+                        sequence=_phase_order_sequence(str(order), int(phase_count)),
+                    )
+                )
+    return tuple(grid)
+
+
+def _phase_order_sequence(order: str, phase_count: int) -> tuple[str, ...]:
+    if order == PHASE_ORDER_VACUUM_FIRST:
+        phases = ("vacuum", "oxidize")
+    elif order == PHASE_ORDER_OXIDIZE_FIRST:
+        phases = ("oxidize", "vacuum")
+    else:
+        raise ValueError(f"unsupported phase order {order!r}")
+    return tuple(phases[index % len(phases)] for index in range(phase_count))
 
 
 @dataclass(frozen=True)

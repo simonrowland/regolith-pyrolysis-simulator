@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import replace
+from dataclasses import fields, replace
 import importlib.util
 import json
 import math
+import pickle
 from pathlib import Path
 import subprocess
 import sys
@@ -23,6 +24,7 @@ from simulator.optimize.evalspec import (
     DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
     EvalSpec,
+    PrefixEvalSpec,
     cache_key,
     canonical_evalspec_json,
     canonical_feedstock_recipe_json,
@@ -87,6 +89,20 @@ def _base_spec(**overrides: object) -> EvalSpec:
     }
     data.update(overrides)
     return EvalSpec(**data)
+
+
+def _prefix_spec(**overrides: object) -> PrefixEvalSpec:
+    base = _base_spec()
+    data = {
+        field.name: getattr(base, field.name)
+        for field in fields(EvalSpec)
+    }
+    data.update(overrides)
+    return PrefixEvalSpec(
+        **data,
+        prefix_stage_ids=("C0", "C0B"),
+        prefix_recipe_ids=("seed-c0", "seed-c0b"),
+    )
 
 
 def test_canonical_evalspec_json_and_cache_key_are_byte_stable_cross_run() -> None:
@@ -206,6 +222,7 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
         ("track", "mre_baseline"),
         ("backend_name", "magmin"),
         ("c5_enabled", True),
+        ("stop_at_stage0_exit", True),
         ("mre_max_voltage_V", 1.4),
         ("mre_target_species", "SiO2"),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
@@ -243,6 +260,40 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
 )
 def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
+
+
+def test_stage0_exit_stop_partitions_cache_key_without_default_key_churn() -> None:
+    full_run = _base_spec(stop_at_stage0_exit=False)
+    stage0_run = _base_spec(stop_at_stage0_exit=True)
+
+    assert cache_key(stage0_run) != cache_key(full_run)
+    assert b"stop_at_stage0_exit" not in canonical_evalspec_json(full_run)
+    assert b'"stop_at_stage0_exit":true' in canonical_evalspec_json(stage0_run)
+
+
+def test_stage0_exit_stop_survives_evalspec_reduce_paths() -> None:
+    for spec in (
+        _base_spec(stop_at_stage0_exit=True),
+        _prefix_spec(stop_at_stage0_exit=True),
+    ):
+        restored = pickle.loads(pickle.dumps(spec))
+        assert restored.stop_at_stage0_exit is True
+
+
+def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
+    for spec in (
+        _base_spec(stop_at_stage0_exit=False),
+        _prefix_spec(stop_at_stage0_exit=False),
+    ):
+        _, new_args = spec.__reduce__()
+        old_args = new_args[:-1]
+        restored = type(spec)(*old_args)
+
+        assert restored.stop_at_stage0_exit is False
+        for field in fields(type(spec)):
+            if field.name == "stop_at_stage0_exit":
+                continue
+            assert getattr(restored, field.name) == getattr(spec, field.name)
 
 
 def test_fallback_provider_id_is_not_keyed_when_fallback_disabled() -> None:

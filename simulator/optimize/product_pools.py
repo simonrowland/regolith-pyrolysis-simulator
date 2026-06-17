@@ -4,7 +4,13 @@ from __future__ import annotations
 
 
 STREAM_PRODUCT_POOLS = frozenset({"captured_products", "captured_stage_3_silica"})
-MELT_PRODUCT_POOLS = frozenset({"residual_rump_at_stop", "terminal_rump_earned"})
+MELT_PRODUCT_POOLS = frozenset(
+    {
+        "cleaned_melt_at_stage0_exit",
+        "residual_rump_at_stop",
+        "terminal_rump_earned",
+    }
+)
 COMPOSITION_PRODUCT_POOLS = STREAM_PRODUCT_POOLS | MELT_PRODUCT_POOLS
 MELT_POOL_FORBIDDEN_GATES = ("delivered_stream_purity",)
 

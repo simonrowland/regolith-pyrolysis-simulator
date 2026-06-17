@@ -73,6 +73,7 @@ class EvalSpec:
     allow_fallback_vapor: bool = False
     force_builtin_vapor_pressure: bool = False
     vapor_pressure_provider_code_fingerprint: str = ""
+    stop_at_stage0_exit: bool = field(default=False, kw_only=True)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -101,6 +102,8 @@ class EvalSpec:
             raise TypeError("mass_kg must be numeric")
         if not isinstance(self.c5_enabled, bool):
             raise TypeError("c5_enabled must be a bool")
+        if not isinstance(self.stop_at_stage0_exit, bool):
+            raise TypeError("stop_at_stage0_exit must be a bool")
         if not isinstance(self.allow_fallback_vapor, bool):
             raise TypeError("allow_fallback_vapor must be a bool")
         if not isinstance(self.force_builtin_vapor_pressure, bool):
@@ -164,7 +167,7 @@ class EvalSpec:
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
-            type(self),
+            _rebuild_eval_spec,
             (
                 self.recipe_id,
                 self.feedstock_recipe_digest,
@@ -200,6 +203,7 @@ class EvalSpec:
                 self.allow_fallback_vapor,
                 self.force_builtin_vapor_pressure,
                 self.vapor_pressure_provider_code_fingerprint,
+                self.stop_at_stage0_exit,
             ),
         )
 
@@ -224,7 +228,7 @@ class PrefixEvalSpec(EvalSpec):
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
-            type(self),
+            _rebuild_prefix_eval_spec,
             (
                 self.recipe_id,
                 self.feedstock_recipe_digest,
@@ -264,8 +268,29 @@ class PrefixEvalSpec(EvalSpec):
                 self.prefix_recipe_ids,
                 self.topology_id,
                 self.eval_spec_type,
+                self.stop_at_stage0_exit,
             ),
         )
+
+
+_EVALSPEC_REDUCE_ARG_COUNT = 34
+_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 38
+
+
+def _rebuild_eval_spec(*args: Any) -> EvalSpec:
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
+        return EvalSpec(*args)
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 1:
+        return EvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
+    raise TypeError(f"unexpected EvalSpec reduce arity {len(args)}")
+
+
+def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
+        return PrefixEvalSpec(*args)
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
+        return PrefixEvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
+    raise TypeError(f"unexpected PrefixEvalSpec reduce arity {len(args)}")
 
 
 def current_code_version() -> str:
@@ -296,6 +321,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "allow_fallback_vapor": spec.allow_fallback_vapor,
         "force_builtin_vapor_pressure": spec.force_builtin_vapor_pressure,
     }
+    if spec.stop_at_stage0_exit:
+        payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
     if spec.allow_fallback_vapor:
         payload["vapor_pressure_fallback_provider_id"] = (
             spec.vapor_pressure_fallback_provider_id
