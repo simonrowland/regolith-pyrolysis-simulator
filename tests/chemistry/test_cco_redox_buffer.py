@@ -55,7 +55,7 @@ def _referenced_names(path: Path) -> set[str]:
         (1873.15, 1.0, -7.314751221204921),
     ),
 )
-def test_stagno_frost_cco_anchor_values(
+def test_cco_anchor_values(
     temperature_K: float,
     pressure_bar: float,
     expected_log10_fO2: float,
@@ -65,6 +65,22 @@ def test_stagno_frost_cco_anchor_values(
     assert result.formulation == CCO_FORMULATION
     assert result.log10_fO2_bar == pytest.approx(expected_log10_fO2, abs=1e-6)
     assert result.fO2_bar == pytest.approx(10.0**expected_log10_fO2)
+
+
+def test_certified_cco_point_provenance_credits_jakobsson_oskarsson_not_stagno_frost() -> None:
+    """The certified CCO point originates from Jakobsson & Oskarsson 1994 (via
+    LEPR/ThermoEngine); Stagno & Frost 2010 only supplies graphite-saturation
+    context (EMOG/EMOD). The point's formulation/source must NOT name Stagno &
+    Frost as origin (mandate clause: provenance honesty / no over-attribution).
+    """
+    result = cco_buffered_fO2(1723.15, 1.0, reference_buffer="QFM")
+    assert "stagno" not in result.formulation.lower()
+    assert "stagnofrost" not in result.formulation.lower()
+    assert "jakobsson" in result.formulation.lower()
+    # Source string may CITE Stagno & Frost as context, but must credit
+    # Jakobsson & Oskarsson for the point formula.
+    assert "jakobsson" in result.source.lower()
+    assert "inside_cco_reference_range" in result.validity
 
 
 def test_reference_delta_uses_absolute_log10_minus_qfm() -> None:

@@ -23,7 +23,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-CCO_FORMULATION = "StagnoFrost2010_CCO_LEPR_graphite_CO_CO2"
+CCO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
 CCO_SOURCE = (
     "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); "
     "Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context"
@@ -72,8 +72,8 @@ def _require_finite_positive(value: float, label: str) -> float:
 def _validity_for_temperature(temperature_K: float) -> str:
     lo, hi = CCO_TEMPERATURE_RANGE_K
     if lo <= temperature_K <= hi:
-        return "inside_stagno_frost_cco_reference_range"
-    return "outside_stagno_frost_cco_reference_range"
+        return "inside_cco_reference_range"
+    return "outside_cco_reference_range"
 
 
 def qfm_log10_fO2_bar(temperature_K: float) -> float:
