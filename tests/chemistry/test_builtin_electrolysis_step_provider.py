@@ -53,7 +53,11 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.electrolysis import ElectrolysisModel
+from simulator.electrolysis import (
+    DECOMP_VOLTAGES,
+    ElectrolysisModel,
+    min_decomposition_voltage,
+)
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -153,6 +157,13 @@ def test_nernst_voltage_includes_evolved_o2_activity_term():
     )
     assert voltage_at_50_mbar - voltage_at_1_bar == pytest.approx(
         -0.119276, abs=5e-7
+    )
+
+
+def test_min_decomposition_voltage_is_derived_from_runtime_table():
+    assert min_decomposition_voltage() == pytest.approx(min(DECOMP_VOLTAGES.values()))
+    assert min_decomposition_voltage() == pytest.approx(
+        min(ElectrolysisModel().decomp_voltages.values())
     )
 
 

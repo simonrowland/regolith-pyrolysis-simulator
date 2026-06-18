@@ -81,6 +81,11 @@ DECOMP_VOLTAGES = {
     'CaO':   2.5,
 }
 
+
+def min_decomposition_voltage() -> float:
+    return min(DECOMP_VOLTAGES.values())
+
+
 # Electrons transferred per formula unit of oxide reduced
 ELECTRONS_PER_OXIDE = {
     'NiO':   2,   # NiO → Ni + ½ O₂

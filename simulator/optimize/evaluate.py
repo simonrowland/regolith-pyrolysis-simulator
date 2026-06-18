@@ -24,6 +24,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -1450,7 +1451,7 @@ def _run_options_with_mre_voltage_cap(
 ) -> Mapping[str, Any]:
     if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in patch.values:
         return run_options
-    cap = float(patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
+    cap = _canonical_mre_voltage_cap(patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH])
     merged = dict(run_options)
     if cap <= 0.0:
         merged["c5_enabled"] = False
@@ -1461,6 +1462,27 @@ def _run_options_with_mre_voltage_cap(
         merged["mre_max_voltage_V"] = cap
         merged["mre_target_species"] = ""
     return MappingProxyType(merged)
+
+
+def _canonical_mre_voltage_cap(cap: float) -> float:
+    """Canonicalize the C5 MRE voltage cap to its behavioral equivalent.
+
+    A cap below the lowest decomposition voltage reduces NOTHING (no rung is
+    <= cap), so it is behaviorally the no-MRE state: with c5_enabled False the
+    C5 campaign is SKIPPED entirely (campaigns.py C4->C5 gate). Snapping the
+    (0, min_rung) band to 0.0 makes the no-MRE state reachable by a
+    continuously-sampled optimizer (it need not hit exactly 0 — SC-35) and
+    collapses that band to one canonical recipe_id (SC-07 dedup). NOTE: this is
+    a behavior change for caps in (0, min_rung) — previously they ran an EMPTY
+    C5 dwell; now C5 is skipped. Golden-neutral at cap<=0 and cap>=min_rung.
+    Threshold is derived (min_decomposition_voltage) so it tracks ladder changes.
+    """
+    cap = float(cap or 0.0)
+    if cap <= 0.0:
+        return 0.0
+    if cap < min_decomposition_voltage():
+        return 0.0
+    return cap
 
 
 def _run_options_with_c4_hold_temp(
@@ -1510,10 +1532,12 @@ def _evalspec_recipe_id(
 ) -> str:
     values = dict(patch.values)
     if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in values:
-        cap = float(values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
-        if cap == 0.0:
-            # cap=0 is the no-MRE default; drop the no-op knob so the recipe_id is
-            # identical to a cap-absent patch (golden-neutral default).
+        cap = _canonical_mre_voltage_cap(values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH])
+        if cap <= 0.0:
+            # cap<=0 OR a sub-min-rung cap canonicalizes to the no-MRE state
+            # (C5 skipped — see _canonical_mre_voltage_cap; NOT a no-op for the
+            # (0, min_rung) band, which previously ran an empty C5 dwell). Drop
+            # the knob so the recipe_id matches a cap-absent (no-MRE) patch.
             values.pop(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, None)
         else:
             # Coerce to float so an int cap (1) and float cap (1.0) — which run

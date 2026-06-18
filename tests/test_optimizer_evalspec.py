@@ -13,6 +13,7 @@ import sys
 import pytest
 
 from simulator.config import load_config_bundle
+from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
     LabScheduleValidationError,
@@ -677,6 +678,77 @@ def test_build_eval_inputs_mre_cap_zero_is_default_no_mre_cache_neutral() -> Non
     assert cache_key(cap_zero_spec) == cache_key(default_spec)
     # cap=0 must strip to a cap-absent recipe_id (golden-neutral default).
     assert cap_zero_spec.recipe_id == default_spec.recipe_id
+
+
+def test_build_eval_inputs_mre_cap_below_min_rung_is_no_mre_cache_neutral() -> None:
+    profile = _mre_cap_profile()
+    schema = RecipeSchema()
+    min_rung = min_decomposition_voltage()
+    below_min = min_rung / 2.0
+    just_below_min = math.nextafter(min_rung, 0.0)
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    cap_zero_spec, _ = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    below_min_spec, below_min_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: below_min}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    just_below_spec, just_below_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: just_below_min}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    min_spec, min_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: min_rung}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert below_min_spec.c5_enabled is False
+    assert below_min_spec.mre_max_voltage_V == pytest.approx(0.0)
+    assert below_min_run_config.c5_enabled is False
+    assert below_min_run_config.mre_max_voltage_V == pytest.approx(0.0)
+    assert just_below_spec.c5_enabled is False
+    assert just_below_spec.mre_max_voltage_V == pytest.approx(0.0)
+    assert just_below_run_config.c5_enabled is False
+    assert just_below_run_config.mre_max_voltage_V == pytest.approx(0.0)
+    assert {
+        default_spec.recipe_id,
+        cap_zero_spec.recipe_id,
+        below_min_spec.recipe_id,
+        just_below_spec.recipe_id,
+    } == {default_spec.recipe_id}
+    assert {
+        cache_key(default_spec),
+        cache_key(cap_zero_spec),
+        cache_key(below_min_spec),
+        cache_key(just_below_spec),
+    } == {cache_key(default_spec)}
+
+    assert min_spec.c5_enabled is True
+    assert min_spec.mre_max_voltage_V == pytest.approx(min_rung)
+    assert min_run_config.c5_enabled is True
+    assert min_run_config.mre_max_voltage_V == pytest.approx(min_rung)
+    assert min_spec.recipe_id != default_spec.recipe_id
+    assert cache_key(min_spec) != cache_key(default_spec)
 
 
 def test_build_eval_inputs_mre_cap_int_and_float_share_recipe_id() -> None:
