@@ -1346,7 +1346,13 @@ def _build_eval_inputs(
         stage0_redox_oxidant_kg,
         stage0_carbon_reductant_kg,
     ) = schema.redox_cleanup_doses_kg(patch)
-    for digest_key in ("setpoints", "feedstocks", "vapor_pressures"):
+    for digest_key in (
+        "setpoints",
+        "feedstocks",
+        "vapor_pressures",
+        "materials",
+        "species_catalog",
+    ):
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
 
@@ -1387,6 +1393,8 @@ def _build_eval_inputs(
         "setpoints": bundle.digests["setpoints"],
         "feedstocks": bundle.digests["feedstocks"],
         "vapor_pressures": bundle.digests["vapor_pressures"],
+        "materials": bundle.digests["materials"],
+        "species_catalog": bundle.digests["species_catalog"],
         "profile": profile_digest,
         "physics_constraints": physics_constraints_digest(constraints),
     }

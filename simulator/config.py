@@ -19,6 +19,7 @@ class ConfigBundle:
     feedstocks: dict[str, Any]
     vapor_pressures: dict[str, Any]
     materials: dict[str, Any]
+    species_catalog: dict[str, Any]
     source_paths: dict[str, Path]
     digests: dict[str, str]
 
@@ -38,6 +39,7 @@ def load_config_bundle(
     feedstocks_path: Path | None = None,
     vapor_pressures_path: Path | None = None,
     materials_path: Path | None = None,
+    species_catalog_path: Path | None = None,
 ) -> ConfigBundle:
     root = Path(data_dir) if data_dir is not None else DEFAULT_DATA_DIR
     source_paths = {
@@ -49,6 +51,11 @@ def load_config_bundle(
             else root / "vapor_pressures.yaml"
         ),
         "materials": Path(materials_path) if materials_path else root / "materials.yaml",
+        "species_catalog": (
+            Path(species_catalog_path)
+            if species_catalog_path
+            else root / "species_catalog.yaml"
+        ),
     }
     loaded: dict[str, dict[str, Any]] = {}
     digests: dict[str, str] = {}
@@ -59,6 +66,7 @@ def load_config_bundle(
         feedstocks=loaded["feedstocks"],
         vapor_pressures=loaded["vapor_pressures"],
         materials=loaded["materials"],
+        species_catalog=loaded["species_catalog"],
         source_paths=source_paths,
         digests=digests,
     )

@@ -59,8 +59,10 @@ STAGE_COOL_RAMP = (
 )
 DATA_DIGESTS = {
     "feedstocks": "feedstocks-digest",
+    "materials": "materials-digest",
     "profile": "profile-digest",
     "setpoints": "setpoints-digest",
+    "species_catalog": "species-catalog-digest",
     "vapor_pressures": "vapor-pressures-digest",
 }
 

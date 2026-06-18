@@ -30,7 +30,9 @@ def _spec() -> EvalSpec:
         data_digests={
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
+            "species_catalog": "species-catalog-digest",
             "profile": "profile-digest",
         },
         campaign="C2A_continuous",

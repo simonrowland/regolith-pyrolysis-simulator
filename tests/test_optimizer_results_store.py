@@ -33,7 +33,9 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "data_digests": {
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
+            "species_catalog": "species-catalog-digest",
             "profile": "profile-digest",
         },
         "chemistry_kernel": {
@@ -246,6 +248,45 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "status": "ok",
     }
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
+
+
+def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
+    spec = _base_spec()
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    store.store(
+        spec,
+        _scored(spec, candidate_id="stored", oxygen=1.0),
+        created_at="2026-06-18T00:00:00Z",
+    )
+    key = cache_key(spec)
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        payload = json.loads(
+            conn.execute(
+                "SELECT eval_spec FROM results WHERE cache_key = ?",
+                (key,),
+            ).fetchone()[0]
+        )
+        payload["data_digests"].pop("materials")
+        payload["data_digests"].pop("species_catalog")
+        conn.execute(
+            "UPDATE results SET eval_spec = ? WHERE cache_key = ?",
+            (json.dumps(payload), key),
+        )
+
+    loaded = store.fetch(key)
+
+    assert loaded is not None
+    assert loaded.eval_spec is not None
+    assert loaded.eval_spec.data_digests["materials"] == (
+        "legacy-missing-materials-digest"
+    )
+    assert loaded.eval_spec.data_digests["species_catalog"] == (
+        "legacy-missing-species-catalog-digest"
+    )
 
 
 def test_strict_eval_spec_storage_omits_inactive_vapor_fallback_provider(tmp_path) -> None:

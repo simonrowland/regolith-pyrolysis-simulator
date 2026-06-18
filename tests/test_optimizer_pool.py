@@ -27,7 +27,9 @@ from simulator.optimize.results_store import ResultStore
 _DATA_DIGESTS = {
     "setpoints": "setpoints-digest",
     "feedstocks": "feedstocks-digest",
+    "materials": "materials-digest",
     "vapor_pressures": "vapor-digest",
+    "species_catalog": "species-catalog-digest",
     "profile": "profile-digest",
 }
 

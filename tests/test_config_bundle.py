@@ -14,6 +14,7 @@ REQUIRED_CONFIGS = {
     "feedstocks": "feedstocks.yaml",
     "vapor_pressures": "vapor_pressures.yaml",
     "materials": "materials.yaml",
+    "species_catalog": "species_catalog.yaml",
 }
 
 
@@ -24,6 +25,7 @@ def test_load_config_bundle_returns_all_required_data_and_digests() -> None:
     assert bundle.feedstocks
     assert bundle.vapor_pressures
     assert bundle.materials
+    assert bundle.species_catalog
     assert set(bundle.source_paths) == set(REQUIRED_CONFIGS)
     assert set(bundle.digests) == set(REQUIRED_CONFIGS)
 

@@ -31,7 +31,23 @@ from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
 REQUIRED_DATA_DIGEST_KEYS = frozenset(
+    (
+        "feedstocks",
+        "materials",
+        "profile",
+        "setpoints",
+        "species_catalog",
+        "vapor_pressures",
+    )
+)
+_LEGACY_DATA_DIGEST_KEYS = frozenset(
     ("feedstocks", "profile", "setpoints", "vapor_pressures")
+)
+_LEGACY_DATA_DIGEST_SENTINELS = MappingProxyType(
+    {
+        "materials": "legacy-missing-materials-digest",
+        "species_catalog": "legacy-missing-species-catalog-digest",
+    }
 )
 DEFAULT_VAPOR_PRESSURE_PROVIDER_ID = "vaporock"
 DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID = "builtin-vapor-pressure"
@@ -298,6 +314,7 @@ _PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 40
 # reduce tuple is reordered, update this index or old-arity pickles rebuild
 # with the redox defaults in the wrong slots (silent cache corruption).
 _REDOX_REDUCE_INSERT_INDEX = 16
+_DATA_DIGESTS_REDUCE_INDEX = 6
 
 
 def _with_default_redox_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
@@ -308,33 +325,68 @@ def _with_default_redox_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
     )
 
 
+def _with_legacy_data_digest_scope(value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return value
+    if _LEGACY_DATA_DIGEST_KEYS.difference(value):
+        return value
+    missing = REQUIRED_DATA_DIGEST_KEYS.difference(value)
+    tolerated = missing.intersection(_LEGACY_DATA_DIGEST_SENTINELS)
+    if missing.difference(tolerated) or not tolerated:
+        return value
+    patched = dict(value)
+    for key in tolerated:
+        patched[key] = _LEGACY_DATA_DIGEST_SENTINELS[key]
+    return patched
+
+
+def _with_legacy_data_digest_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
+    if len(args) <= _DATA_DIGESTS_REDUCE_INDEX:
+        return args
+    patched = list(args)
+    patched[_DATA_DIGESTS_REDUCE_INDEX] = _with_legacy_data_digest_scope(
+        patched[_DATA_DIGESTS_REDUCE_INDEX]
+    )
+    return tuple(patched)
+
+
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT:
-        return EvalSpec(*_with_default_redox_reduce_args(args))
+        return EvalSpec(
+            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args))
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
-        return EvalSpec(*args)
+        return EvalSpec(*_with_legacy_data_digest_args(args))
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(
-            *_with_default_redox_reduce_args(args[:-1]),
+            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 1:
-        return EvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
+        return EvalSpec(
+            *_with_legacy_data_digest_args(args[:-1]),
+            stop_at_stage0_exit=args[-1],
+        )
     raise TypeError(f"unexpected EvalSpec reduce arity {len(args)}")
 
 
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
-        return PrefixEvalSpec(*_with_default_redox_reduce_args(args))
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args))
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
-        return PrefixEvalSpec(*args)
+        return PrefixEvalSpec(*_with_legacy_data_digest_args(args))
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(
-            *_with_default_redox_reduce_args(args[:-1]),
+            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
-        return PrefixEvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(args[:-1]),
+            stop_at_stage0_exit=args[-1],
+        )
     raise TypeError(f"unexpected PrefixEvalSpec reduce arity {len(args)}")
 
 
