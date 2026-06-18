@@ -31,12 +31,18 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+import simulator.optimize.evalspec as evalspec_module
 import simulator.optimize.evaluate as evaluate_module
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    RecipePatch,
+    RecipeSchema,
+    STAGE0_CARBON_REDUCTANT_KG_PATH,
+    STAGE0_REDOX_OXIDANT_KG_PATH,
+)
 from simulator.runner import PyrolysisRun, RunnerError
 
 
@@ -225,6 +231,8 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
         ("stop_at_stage0_exit", True),
         ("mre_max_voltage_V", 1.4),
         ("mre_target_species", "SiO2"),
+        ("stage0_redox_oxidant_kg", 12.5),
+        ("stage0_carbon_reductant_kg", 7.25),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
         ("lab_alpha_digest", "robinot-lab-alpha-v1"),
         ("geometry_digest", "robinot-geometry-v1"),
@@ -278,6 +286,47 @@ def test_stage0_exit_stop_survives_evalspec_reduce_paths() -> None:
     ):
         restored = pickle.loads(pickle.dumps(spec))
         assert restored.stop_at_stage0_exit is True
+
+
+def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
+    _, args = _base_spec(
+        stage0_redox_oxidant_kg=1.0,
+        stage0_carbon_reductant_kg=2.0,
+        stop_at_stage0_exit=True,
+    ).__reduce__()
+    old_args = args[:16] + args[18:-1]
+    old_args_with_stop = old_args + (True,)
+
+    restored = evalspec_module._rebuild_eval_spec(*old_args)
+    restored_with_stop = evalspec_module._rebuild_eval_spec(*old_args_with_stop)
+
+    assert restored.stage0_redox_oxidant_kg == 0.0
+    assert restored.stage0_carbon_reductant_kg == 0.0
+    assert restored_with_stop.stop_at_stage0_exit is True
+    assert restored_with_stop.stage0_redox_oxidant_kg == 0.0
+    assert restored_with_stop.stage0_carbon_reductant_kg == 0.0
+
+
+def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
+    _, args = _prefix_spec(
+        stage0_redox_oxidant_kg=1.0,
+        stage0_carbon_reductant_kg=2.0,
+        stop_at_stage0_exit=True,
+    ).__reduce__()
+    old_args = args[:16] + args[18:-1]
+    old_args_with_stop = old_args + (True,)
+
+    restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
+    restored_with_stop = evalspec_module._rebuild_prefix_eval_spec(
+        *old_args_with_stop
+    )
+
+    assert restored.stage0_redox_oxidant_kg == 0.0
+    assert restored.stage0_carbon_reductant_kg == 0.0
+    assert restored.prefix_stage_ids == ("C0", "C0B")
+    assert restored_with_stop.stop_at_stage0_exit is True
+    assert restored_with_stop.stage0_redox_oxidant_kg == 0.0
+    assert restored_with_stop.stage0_carbon_reductant_kg == 0.0
 
 
 def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
@@ -439,6 +488,12 @@ def test_mre_policy_fields_split_cache_keys() -> None:
     )
 
     assert len({cache_key(off), cache_key(enabled), cache_key(si_target), cache_key(ti_target)}) == 4
+
+
+def test_stage0_redox_dose_defaults_do_not_churn_canonical_evalspec() -> None:
+    assert canonical_evalspec_json(_base_spec()) == PINNED_EVALSPEC_JSON
+    assert b"stage0_redox_oxidant_kg" not in PINNED_EVALSPEC_JSON
+    assert b"stage0_carbon_reductant_kg" not in PINNED_EVALSPEC_JSON
 
 
 def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> None:
@@ -995,6 +1050,60 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
     assert dict(dosed_spec.additives_kg) == {"K": 4.0, "Na": 12.0}
     assert dict(dosed_config.additives_kg) == {"K": 4.0, "Na": 12.0}
     assert cache_key(dosed_spec) != cache_key(replace(dosed_spec, additives_kg={}))
+
+
+def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effect() -> None:
+    profile = {
+        "profile_id": "redox-dose-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
+    schema = RecipeSchema()
+    patch = RecipePatch(
+        {
+            STAGE0_REDOX_OXIDANT_KG_PATH: 12.5,
+            STAGE0_CARBON_REDUCTANT_KG_PATH: 7.25,
+        }
+    )
+
+    undosed_spec, undosed_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    dosed_spec, dosed_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert dosed_spec.stage0_redox_oxidant_kg == pytest.approx(12.5)
+    assert dosed_spec.stage0_carbon_reductant_kg == pytest.approx(7.25)
+    assert schema.to_setpoints_patch(patch) == {}
+    assert dict(dosed_config.additives_kg) == dict(undosed_config.additives_kg) == {}
+    assert cache_key(dosed_spec) != cache_key(undosed_spec)
 
 
 def test_c2a_profile_window_schedules_measured_temperature_window() -> None:

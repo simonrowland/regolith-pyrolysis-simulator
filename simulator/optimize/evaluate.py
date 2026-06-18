@@ -1327,6 +1327,10 @@ def _build_eval_inputs(
     )
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
+    (
+        stage0_redox_oxidant_kg,
+        stage0_carbon_reductant_kg,
+    ) = schema.redox_cleanup_doses_kg(patch)
     for digest_key in ("setpoints", "feedstocks", "vapor_pressures"):
         if digest_key not in bundle.digests:
             raise EvaluationInputError(f"missing config digest {digest_key!r}")
@@ -1393,6 +1397,8 @@ def _build_eval_inputs(
         stop_at_stage0_exit=stop_at_stage0_exit,
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
         mre_target_species=str(run_options["mre_target_species"]),
+        stage0_redox_oxidant_kg=stage0_redox_oxidant_kg,
+        stage0_carbon_reductant_kg=stage0_carbon_reductant_kg,
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
         chemistry_kernel=diagnostic_chemistry_kernel,

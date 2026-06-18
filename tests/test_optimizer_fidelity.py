@@ -916,7 +916,7 @@ def _midpoint_anchor(schema: RecipeSchema) -> RecipePatch:
     """Build an anchor pinning every sampled numeric knob to its bounds midpoint."""
 
     values: dict[tuple[str, ...], object] = {}
-    for spec in schema.allowlist:
+    for spec in schema.search_allowlist:
         if spec.kind == "categorical":
             assert spec.choices
             values[spec.path] = spec.choices[0]
@@ -931,7 +931,7 @@ def _numeric_bands(schema: RecipeSchema, df: float) -> dict[str, tuple[float, fl
     """Per-knob anchored band [center - df*(hi-lo), center + df*(hi-lo)] about the midpoint."""
 
     bands: dict[str, tuple[float, float]] = {}
-    for spec in schema.allowlist:
+    for spec in schema.search_allowlist:
         if spec.kind == "categorical":
             continue
         low, high = float(spec.low), float(spec.high)

@@ -141,7 +141,7 @@ def test_morris_ask_returns_valid_unique_deterministic_candidates() -> None:
 def test_morris_groups_partition_allowlist_and_residual_group_when_needed() -> None:
     schema = RecipeSchema()
     strategy = MorrisScreenStrategy(schema, seed=17, num_trajectories=1)
-    allowlist = {spec.path for spec in schema.allowlist}
+    allowlist = {spec.path for spec in schema.search_allowlist}
     seen: set[tuple[str, ...]] = set()
 
     for group in strategy.groups:

@@ -51,7 +51,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v4" == schema.allowlist_version
+    assert "allowlist-v5" == schema.allowlist_version
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:

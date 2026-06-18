@@ -55,6 +55,8 @@ class EvalSpec:
     c5_enabled: bool = False
     mre_max_voltage_V: float = 0.0
     mre_target_species: str = ""
+    stage0_redox_oxidant_kg: float = 0.0
+    stage0_carbon_reductant_kg: float = 0.0
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     lab_schedule: Mapping[str, Any] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
@@ -114,6 +116,15 @@ class EvalSpec:
             raise TypeError("mre_max_voltage_V must be numeric")
         if not isinstance(self.mre_target_species, str):
             raise TypeError("mre_target_species must be a string")
+        for field_name in (
+            "stage0_redox_oxidant_kg",
+            "stage0_carbon_reductant_kg",
+        ):
+            value = getattr(self, field_name)
+            if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
+                raise TypeError(f"{field_name} must be numeric")
+            if not math.isfinite(float(value)) or float(value) < 0.0:
+                raise CanonicalizationError(f"{field_name} must be finite and non-negative")
         if not isinstance(self.target_spec_id, str):
             raise TypeError("target_spec_id must be a string")
         if not isinstance(self.target_spec_digest, str):
@@ -185,6 +196,8 @@ class EvalSpec:
                 self.c5_enabled,
                 self.mre_max_voltage_V,
                 self.mre_target_species,
+                self.stage0_redox_oxidant_kg,
+                self.stage0_carbon_reductant_kg,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
@@ -246,6 +259,8 @@ class PrefixEvalSpec(EvalSpec):
                 self.c5_enabled,
                 self.mre_max_voltage_V,
                 self.mre_target_species,
+                self.stage0_redox_oxidant_kg,
+                self.stage0_carbon_reductant_kg,
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
@@ -273,21 +288,51 @@ class PrefixEvalSpec(EvalSpec):
         )
 
 
-_EVALSPEC_REDUCE_ARG_COUNT = 34
-_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 38
+_OLD_EVALSPEC_REDUCE_ARG_COUNT = 34
+_OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 38
+_EVALSPEC_REDUCE_ARG_COUNT = 36
+_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 40
+# Position of (stage0_redox_oxidant_kg, stage0_carbon_reductant_kg) in the
+# __reduce__ tuple: immediately after mre_target_species (index 15) and before
+# runtime_campaign_overrides (index 18). Must track that field order — if the
+# reduce tuple is reordered, update this index or old-arity pickles rebuild
+# with the redox defaults in the wrong slots (silent cache corruption).
+_REDOX_REDUCE_INSERT_INDEX = 16
+
+
+def _with_default_redox_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
+    return (
+        args[:_REDOX_REDUCE_INSERT_INDEX]
+        + (0.0, 0.0)
+        + args[_REDOX_REDUCE_INSERT_INDEX:]
+    )
 
 
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
+    if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT:
+        return EvalSpec(*_with_default_redox_reduce_args(args))
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(*args)
+    if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT + 1:
+        return EvalSpec(
+            *_with_default_redox_reduce_args(args[:-1]),
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
     raise TypeError(f"unexpected EvalSpec reduce arity {len(args)}")
 
 
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
+    if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
+        return PrefixEvalSpec(*_with_default_redox_reduce_args(args))
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(*args)
+    if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
+        return PrefixEvalSpec(
+            *_with_default_redox_reduce_args(args[:-1]),
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(*args[:-1], stop_at_stage0_exit=args[-1])
     raise TypeError(f"unexpected PrefixEvalSpec reduce arity {len(args)}")
@@ -323,6 +368,10 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     }
     if spec.stop_at_stage0_exit:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
+    if spec.stage0_redox_oxidant_kg:
+        payload["stage0_redox_oxidant_kg"] = spec.stage0_redox_oxidant_kg
+    if spec.stage0_carbon_reductant_kg:
+        payload["stage0_carbon_reductant_kg"] = spec.stage0_carbon_reductant_kg
     if spec.allow_fallback_vapor:
         payload["vapor_pressure_fallback_provider_id"] = (
             spec.vapor_pressure_fallback_provider_id

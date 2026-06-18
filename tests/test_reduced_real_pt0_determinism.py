@@ -939,6 +939,7 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
 
 
 FOULANT_DISPOSITION_MODULE = "engines/builtin/foulant_disposition.py"
+RECIPE_SCHEMA_MODULE = "simulator/optimize/recipe.py"
 
 
 def test_foulant_disposition_helper_source_module_digest_coverage(
@@ -974,6 +975,20 @@ def test_foulant_disposition_helper_source_module_digest_coverage(
     assert after_key_hash == before_key_hash
 
 
+def test_recipe_schema_source_module_digest_coverage() -> None:
+    from simulator.reduced_real_determinism import _SOURCE_MODULE_PATTERNS
+
+    rrd._source_module_digest.cache_clear()
+    try:
+        digest = rrd._source_module_digest()
+    finally:
+        rrd._source_module_digest.cache_clear()
+
+    assert RECIPE_SCHEMA_MODULE in _SOURCE_MODULE_PATTERNS
+    assert RECIPE_SCHEMA_MODULE in digest["paths"]
+    assert digest["module_set"] == "equilibrium-vapor-melt-backend-v3"
+
+
 @pytest.mark.parametrize(
     "module_path",
     [
@@ -982,6 +997,7 @@ def test_foulant_disposition_helper_source_module_digest_coverage(
         "engines/builtin/vapor_pressure.py",
         "engines/builtin/stage0_pretreatment.py",
         "engines/builtin/foulant_disposition.py",
+        "simulator/optimize/recipe.py",
     ],
 )
 def test_pt2_source_module_digest_changes_with_payload_source(

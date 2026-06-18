@@ -175,7 +175,7 @@ def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
     for candidate in first:
         assert candidate.patch.validated(schema).canonical_json() == candidate.patch.canonical_json()
         assert all(not schema.is_forbidden(path) for path in candidate.patch.values)
-        for spec in schema.allowlist:
+        for spec in schema.search_allowlist:
             value = candidate.patch.values[spec.path]
             if spec.low is not None:
                 assert float(value) >= float(spec.low)

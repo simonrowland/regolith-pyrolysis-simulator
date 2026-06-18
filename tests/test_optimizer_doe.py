@@ -60,7 +60,7 @@ def _small_schema() -> RecipeSchema:
 
 def _assert_patch_values_match_specs(schema: RecipeSchema, patches: tuple) -> None:
     for patch in patches:
-        assert set(patch.values) == {spec.path for spec in schema.allowlist}
+        assert set(patch.values) == {spec.path for spec in schema.search_allowlist}
         patch.validated(schema)
         for path, value in patch.values.items():
             assert not schema.is_forbidden(path)
@@ -243,7 +243,7 @@ def test_sampler_varies_every_allowlisted_knob_across_samples() -> None:
             sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
         )
 
-        for spec in schema.allowlist:
+        for spec in schema.search_allowlist:
             values = {patch.values[spec.path] for patch in patches}
             assert len(values) > 1, ".".join(spec.path)
             if spec.kind == "int":
@@ -459,7 +459,7 @@ def _assert_within_neighborhood(
 ) -> None:
     for patch in patches:
         patch.validated(schema)
-        for spec in schema.allowlist:
+        for spec in schema.search_allowlist:
             value = patch.values[spec.path]
             center = anchor.values[spec.path]
             if spec.kind == "categorical":

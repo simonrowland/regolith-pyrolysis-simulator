@@ -147,7 +147,7 @@ class DoeSpec:
 
     @property
     def knob_paths(self) -> tuple[KeyPath, ...]:
-        return tuple(spec.path for spec in self.schema.allowlist)
+        return tuple(spec.path for spec in self.schema.search_allowlist)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -166,7 +166,9 @@ class DoeSpec:
         cls, payload: Mapping[str, Any], *, schema: RecipeSchema | None = None
     ) -> "DoeSpec":
         active_schema = schema or RecipeSchema()
-        active_knob_paths = tuple(spec.path for spec in active_schema.allowlist)
+        active_knob_paths = tuple(
+            spec.path for spec in active_schema.search_allowlist
+        )
         expected_paths = tuple(tuple(path) for path in payload.get("knob_paths", ()))
         if expected_paths and expected_paths != active_knob_paths:
             raise ValueError("DOE spec knob paths do not match the active schema")
@@ -354,10 +356,11 @@ def sample_recipe_patches(
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
+    search_allowlist = active_schema.search_allowlist
     specs = tuple(
-        spec for spec in active_schema.allowlist if not active_schema.is_forbidden(spec.path)
+        spec for spec in search_allowlist if not active_schema.is_forbidden(spec.path)
     )
-    if len(specs) != len(active_schema.allowlist):
+    if len(specs) != len(search_allowlist):
         raise ValueError("RecipeSchema allowlist contains forbidden paths")
 
     mapper = _resolve_value_mapper(active_schema, specs, anchor, delta_fraction)
@@ -403,10 +406,11 @@ def sample_recipe_patch_at_index(
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
+    search_allowlist = active_schema.search_allowlist
     specs = tuple(
-        spec for spec in active_schema.allowlist if not active_schema.is_forbidden(spec.path)
+        spec for spec in search_allowlist if not active_schema.is_forbidden(spec.path)
     )
-    if len(specs) != len(active_schema.allowlist):
+    if len(specs) != len(search_allowlist):
         raise ValueError("RecipeSchema allowlist contains forbidden paths")
 
     if anchor is not None and active_sampler == DEPENDENCY_FREE_LHC_SAMPLER:
@@ -697,8 +701,9 @@ def _validate_delta_fraction(delta_fraction: float) -> None:
 
 
 def _sampled_specs(schema: RecipeSchema) -> tuple[Any, ...]:
-    specs = tuple(spec for spec in schema.allowlist if not schema.is_forbidden(spec.path))
-    if len(specs) != len(schema.allowlist):
+    search_allowlist = schema.search_allowlist
+    specs = tuple(spec for spec in search_allowlist if not schema.is_forbidden(spec.path))
+    if len(specs) != len(search_allowlist):
         raise ValueError("RecipeSchema allowlist contains forbidden paths")
     return specs
 

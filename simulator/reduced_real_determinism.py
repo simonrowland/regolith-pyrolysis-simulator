@@ -76,7 +76,7 @@ _TRACE_CUTOFF = 1.0e-12
 _CACHEABLE_EQUILIBRIUM_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_CALIBRATION_STATUSES = frozenset({"in_range"})
-_SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v2"
+_SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v3"
 # Modules that can change the equilibrium_post_record payload: core branch
 # selection/post hooks, cache serialization, kernel dispatch contracts,
 # melt-backend adapters, evaporation curve shaping, AlphaMELTS diagnostics,
@@ -86,6 +86,7 @@ _SOURCE_MODULE_SET_ID = "equilibrium-vapor-melt-backend-v2"
 _SOURCE_MODULE_PATTERNS = (
     "simulator/core.py",
     "simulator/evaporation.py",
+    "simulator/optimize/recipe.py",
     "simulator/reduced_real_determinism.py",
     "simulator/chemistry/kernel/*.py",
     "simulator/melt_backend/*.py",

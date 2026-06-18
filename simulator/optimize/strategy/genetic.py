@@ -71,9 +71,9 @@ class OptunaNSGA2Strategy:
         self._directions = tuple(
             definition.sense for definition in self._objective_definitions
         )
-        self._specs = tuple(self.schema.allowlist)
+        self._specs = tuple(self.schema.search_allowlist)
         if any(self.schema.is_forbidden(spec.path) for spec in self._specs):
-            raise ValueError("RecipeSchema allowlist contains forbidden paths")
+            raise ValueError("RecipeSchema search_allowlist contains forbidden paths")
 
         optuna = _require_optuna()
         sampler = optuna.samplers.NSGAIISampler(

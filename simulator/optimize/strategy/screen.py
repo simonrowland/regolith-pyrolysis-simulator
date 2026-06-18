@@ -107,9 +107,9 @@ class MorrisScreenStrategy:
         self.num_trajectories = num_trajectories
         self.num_levels = num_levels
         self.prune_threshold = float(prune_threshold)
-        self._specs = tuple(self.schema.allowlist)
+        self._specs = tuple(self.schema.search_allowlist)
         if any(self.schema.is_forbidden(spec.path) for spec in self._specs):
-            raise ValueError("RecipeSchema allowlist contains forbidden paths")
+            raise ValueError("RecipeSchema search_allowlist contains forbidden paths")
         self._spec_by_path = {spec.path: spec for spec in self._specs}
         self._groups = _build_groups(self._specs)
         self._plan = self._build_plan()

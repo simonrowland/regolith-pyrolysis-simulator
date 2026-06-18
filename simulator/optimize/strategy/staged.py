@@ -812,7 +812,7 @@ def _stage_specs(
         if not all(isinstance(stage_id, str) for stage_id in stage_filter):
             raise StagedBeamStateError("staged allowlist must contain stage id strings")
     grouped: dict[str, list[KnobSpec]] = {}
-    for spec in schema.allowlist:
+    for spec in schema.search_allowlist:
         if schema.is_forbidden(spec.path):
             continue
         stage_id = _stage_id_for_path(spec.path)

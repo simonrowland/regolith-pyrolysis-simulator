@@ -22,7 +22,14 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v4"
+allowlist_version = "allowlist-v5"
+
+STAGE0_REDOX_OXIDANT_KG_PATH: KeyPath = tuple(
+    "campaigns.C0.stage0_redox_cleanup.oxidant_kg".split(".")
+)
+STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
+    "campaigns.C0.stage0_redox_cleanup.carbon_reductant_kg".split(".")
+)
 
 
 class RecipeValidationError(ValueError):
@@ -38,6 +45,8 @@ class KnobSpec:
     choices: tuple[str, ...] | None = None
     units: str = ""
     bounds_source: str = ""
+    search_enabled: bool = True
+    runtime_enabled: bool = True
 
 
 def _knob(
@@ -49,6 +58,8 @@ def _knob(
     choices: tuple[str, ...] | None = None,
     units: str = "",
     bounds_source: str,
+    search_enabled: bool = True,
+    runtime_enabled: bool = True,
 ) -> KnobSpec:
     return KnobSpec(
         path=tuple(path.split(".")),
@@ -58,6 +69,8 @@ def _knob(
         choices=choices,
         units=units,
         bounds_source=bounds_source,
+        search_enabled=search_enabled,
+        runtime_enabled=runtime_enabled,
     )
 
 
@@ -132,6 +145,30 @@ class RecipeSchema:
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C0.dT_dt_C_per_hr=50"
             ),
+        ),
+        _knob(
+            "campaigns.C0.stage0_redox_cleanup.oxidant_kg",
+            low=0.0,
+            high=250.0,
+            units="kg O2",
+            bounds_source=(
+                "engineering_envelope inert RDX-OPT0 schema placeholder; "
+                "RDX-OPT1 defines live bounds"
+            ),
+            search_enabled=False,
+            runtime_enabled=False,
+        ),
+        _knob(
+            "campaigns.C0.stage0_redox_cleanup.carbon_reductant_kg",
+            low=0.0,
+            high=250.0,
+            units="kg C",
+            bounds_source=(
+                "engineering_envelope inert RDX-OPT0 schema placeholder; "
+                "RDX-OPT1 defines live bounds"
+            ),
+            search_enabled=False,
+            runtime_enabled=False,
         ),
         _knob(
             "campaigns.C0b_p_cleanup.temp_range_C",
@@ -651,6 +688,10 @@ class RecipeSchema:
         )
         self._spec_by_path = {spec.path: spec for spec in self.allowlist}
 
+    @property
+    def search_allowlist(self) -> tuple[KnobSpec, ...]:
+        return tuple(spec for spec in self.allowlist if spec.search_enabled)
+
     def spec_for(self, path: KeyPath) -> KnobSpec:
         normalized = _normalize_key_path(path)
         if self.is_forbidden(normalized):
@@ -676,7 +717,23 @@ class RecipeSchema:
 
     def to_setpoints_patch(self, patch: "RecipePatch") -> dict[str, Any]:
         """Validate then render the optimizer-facing setpoints patch."""
-        return patch.validated(self).to_nested()
+        validated = patch.validated(self)
+        runtime_values = {
+            path: value
+            for path, value in validated.values.items()
+            if self.spec_for(path).runtime_enabled
+        }
+        return RecipePatch(runtime_values).to_nested()
+
+    def redox_cleanup_doses_kg(self, patch: "RecipePatch") -> tuple[float, float]:
+        validated = patch.validated(self)
+        return (
+            float(validated.values.get(STAGE0_REDOX_OXIDANT_KG_PATH, 0.0) or 0.0),
+            float(
+                validated.values.get(STAGE0_CARBON_REDUCTANT_KG_PATH, 0.0)
+                or 0.0
+            ),
+        )
 
 
 MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(

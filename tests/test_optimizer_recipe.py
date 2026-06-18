@@ -15,6 +15,8 @@ from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
+    STAGE0_CARBON_REDUCTANT_KG_PATH,
+    STAGE0_REDOX_OXIDANT_KG_PATH,
 )
 from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
 from simulator.runner import PyrolysisRun
@@ -209,6 +211,31 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
+
+
+def test_redox_cleanup_dose_fields_validate_but_do_not_materialize() -> None:
+    schema = RecipeSchema()
+    oxidant_spec = schema.spec_for(STAGE0_REDOX_OXIDANT_KG_PATH)
+    carbon_spec = schema.spec_for(STAGE0_CARBON_REDUCTANT_KG_PATH)
+    patch = RecipePatch(
+        {
+            STAGE0_REDOX_OXIDANT_KG_PATH: 12.5,
+            STAGE0_CARBON_REDUCTANT_KG_PATH: 7.25,
+        }
+    ).validated(schema)
+
+    assert oxidant_spec.search_enabled is False
+    assert carbon_spec.search_enabled is False
+    assert oxidant_spec.runtime_enabled is False
+    assert carbon_spec.runtime_enabled is False
+    assert STAGE0_REDOX_OXIDANT_KG_PATH not in {
+        spec.path for spec in schema.search_allowlist
+    }
+    assert STAGE0_CARBON_REDUCTANT_KG_PATH not in {
+        spec.path for spec in schema.search_allowlist
+    }
+    assert schema.to_setpoints_patch(patch) == {}
+    assert schema.redox_cleanup_doses_kg(patch) == pytest.approx((12.5, 7.25))
 
 
 def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
