@@ -69,7 +69,12 @@ from simulator.optimize.profiles import (
     physics_constraints_from_profile,
     validate_profile,
 )
-from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    RecipePatch,
+    RecipeSchema,
+    RecipeValidationError,
+)
 from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
@@ -1308,6 +1313,7 @@ def _build_eval_inputs(
     if feedstock_id not in bundle.feedstocks:
         raise EvaluationInputError(f"unknown feedstock_id {feedstock_id!r}")
     _validate_eval_mass_basis(profile, fidelity)
+    patch = patch.validated(schema)
     profile = validate_profile(
         profile,
         expected_feedstock=feedstock_id,
@@ -1325,6 +1331,7 @@ def _build_eval_inputs(
         constraints=constraints,
         setpoints=bundle.setpoints,
     )
+    run_options = _run_options_with_mre_voltage_cap(run_options, patch)
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
     (
@@ -1380,7 +1387,7 @@ def _build_eval_inputs(
         data_digests.update(lab_schedule_digests(lab_schedule))
 
     spec = EvalSpec(
-        recipe_id=patch.recipe_id(),
+        recipe_id=_evalspec_recipe_id(patch),
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,
@@ -1416,6 +1423,41 @@ def _build_eval_inputs(
         target_provenance=target_metadata["target_provenance"],
     )
     return spec, run_config
+
+
+def _run_options_with_mre_voltage_cap(
+    run_options: Mapping[str, Any],
+    patch: RecipePatch,
+) -> Mapping[str, Any]:
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in patch.values:
+        return run_options
+    cap = float(patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
+    merged = dict(run_options)
+    if cap <= 0.0:
+        merged["c5_enabled"] = False
+        merged["mre_max_voltage_V"] = 0.0
+        merged["mre_target_species"] = ""
+    else:
+        merged["c5_enabled"] = True
+        merged["mre_max_voltage_V"] = cap
+        merged["mre_target_species"] = ""
+    return MappingProxyType(merged)
+
+
+def _evalspec_recipe_id(patch: RecipePatch) -> str:
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in patch.values:
+        return patch.recipe_id()
+    cap = float(patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
+    values = dict(patch.values)
+    if cap == 0.0:
+        # cap=0 is the no-MRE default; drop the no-op knob so the recipe_id is
+        # identical to a cap-absent patch (golden-neutral default).
+        values.pop(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, None)
+    else:
+        # Coerce to float so an int cap (1) and float cap (1.0) — which run
+        # identically — share one canonical recipe_id (no cache fragmentation).
+        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = cap
+    return RecipePatch(values).recipe_id()
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:

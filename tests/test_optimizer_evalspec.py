@@ -38,6 +38,7 @@ from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     RecipePatch,
     RecipeSchema,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
@@ -109,6 +110,34 @@ def _prefix_spec(**overrides: object) -> PrefixEvalSpec:
         prefix_stage_ids=("C0", "C0B"),
         prefix_recipe_ids=("seed-c0", "seed-c0b"),
     )
+
+
+def _mre_cap_profile(**run_overrides: object) -> dict[str, object]:
+    run = {
+        "campaign": "C5",
+        "hours": 1,
+        "mass_kg": 1000.0,
+        "backend_name": "stub",
+    }
+    run.update(run_overrides)
+    return {
+        "profile_id": "mre-cap-profile",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": "lunar_mare_low_ti",
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            }
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
+        "run": run,
+        "fidelities": {"stub": {"backend_name": "stub"}},
+    }
 
 
 def test_canonical_evalspec_json_and_cache_key_are_byte_stable_cross_run() -> None:
@@ -538,6 +567,99 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     assert run_config.c5_enabled is True
     assert run_config.mre_max_voltage_V == pytest.approx(1.4)
     assert run_config.mre_target_species == "SiO2"
+
+
+def test_build_eval_inputs_mre_cap_zero_is_default_no_mre_cache_neutral() -> None:
+    profile = _mre_cap_profile()
+    schema = RecipeSchema()
+    default_spec, default_run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    cap_zero_spec, cap_zero_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert default_spec.c5_enabled is False
+    assert default_spec.mre_max_voltage_V == pytest.approx(0.0)
+    assert default_spec.mre_target_species == ""
+    assert default_run_config.c5_enabled is False
+    assert default_run_config.mre_max_voltage_V == pytest.approx(0.0)
+    assert cap_zero_spec.c5_enabled is False
+    assert cap_zero_spec.mre_max_voltage_V == pytest.approx(0.0)
+    assert cap_zero_spec.mre_target_species == ""
+    assert cap_zero_run_config.c5_enabled is False
+    assert cap_zero_run_config.mre_max_voltage_V == pytest.approx(0.0)
+    assert canonical_evalspec_json(cap_zero_spec) == canonical_evalspec_json(default_spec)
+    assert cache_key(cap_zero_spec) == cache_key(default_spec)
+    # cap=0 must strip to a cap-absent recipe_id (golden-neutral default).
+    assert cap_zero_spec.recipe_id == default_spec.recipe_id
+
+
+def test_build_eval_inputs_mre_cap_int_and_float_share_recipe_id() -> None:
+    """An int cap (1) and float cap (1.0) run identically and MUST share one
+    canonical recipe_id / cache key (no float-vs-int cache fragmentation)."""
+    profile = _mre_cap_profile()
+    schema = RecipeSchema()
+    cap_int_spec, _ = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    cap_float_spec, _ = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    assert cap_int_spec.recipe_id == cap_float_spec.recipe_id
+    assert cache_key(cap_int_spec) == cache_key(cap_float_spec)
+
+
+def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() -> None:
+    profile = _mre_cap_profile(c5_enabled=False, mre_target_species="SiO2")
+    schema = RecipeSchema()
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    cap_14_spec, cap_14_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.4}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    cap_16_spec, cap_16_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.6}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert cap_14_spec.c5_enabled is True
+    assert cap_14_spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert cap_14_spec.mre_target_species == ""
+    assert cap_14_run_config.c5_enabled is True
+    assert cap_14_run_config.mre_max_voltage_V == pytest.approx(1.4)
+    assert cap_14_run_config.mre_target_species == ""
+    assert cap_16_run_config.c5_enabled is True
+    assert cap_16_run_config.mre_max_voltage_V == pytest.approx(1.6)
+    assert len({cache_key(default_spec), cache_key(cap_14_spec), cache_key(cap_16_spec)}) == 3
 
 
 def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(

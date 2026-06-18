@@ -22,7 +22,45 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v5"
+allowlist_version = "allowlist-v6"
+
+C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
+    "campaigns.C5.allow_mre_voltage_cap_V".split(".")
+)
+C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_PATH: KeyPath = tuple(
+    "campaigns.C5.allow_mre_voltage_cap_upper_bound_V".split(".")
+)
+DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V = 2.5
+
+
+def _c5_allow_mre_voltage_cap_upper_bound() -> float:
+    path = DEFAULT_DATA_DIR / "setpoints.yaml"
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            loaded = yaml.safe_load(handle) or {}
+    except OSError:
+        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+    if not isinstance(loaded, Mapping):
+        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+    campaigns = loaded.get("campaigns")
+    c5 = campaigns.get("C5") if isinstance(campaigns, Mapping) else None
+    if not isinstance(c5, Mapping):
+        return DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V
+    raw_bound = c5.get(
+        "allow_mre_voltage_cap_upper_bound_V",
+        DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V,
+    )
+    try:
+        bound = float(raw_bound)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "campaigns.C5.allow_mre_voltage_cap_upper_bound_V must be numeric"
+        ) from exc
+    if not math.isfinite(bound) or bound < 0.0:
+        raise ValueError(
+            "campaigns.C5.allow_mre_voltage_cap_upper_bound_V must be finite and non-negative"
+        )
+    return bound
 
 STAGE0_REDOX_OXIDANT_KG_PATH: KeyPath = tuple(
     "campaigns.C0.stage0_redox_cleanup.oxidant_kg".split(".")
@@ -464,14 +502,29 @@ class RecipeSchema:
             ),
         ),
         _knob(
+            "campaigns.C5.allow_mre_voltage_cap_V",
+            low=0.0,
+            high=_c5_allow_mre_voltage_cap_upper_bound(),
+            units="V",
+            bounds_source=(
+                "engineering_envelope owner-settable via setpoints.yaml "
+                "campaigns.C5.allow_mre_voltage_cap_upper_bound_V; "
+                "0 disables C5/MRE, positive enables C5 and sets "
+                "EvalSpec.mre_max_voltage_V"
+            ),
+            runtime_enabled=False,
+        ),
+        _knob(
             "campaigns.C5.branch_two.max_voltage_V",
             low=0.0,
             high=2.5,
             units="V",
             bounds_source=(
-                "engineering_envelope around setpoints.yaml scalar "
-                "campaigns.C5.branch_two.max_voltage_V=1.6"
+                "engineering_envelope branch hardware ceiling, demoted from "
+                "primary optimizer search; user gate is "
+                "campaigns.C5.allow_mre_voltage_cap_V"
             ),
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C5.branch_one.max_voltage_V",
@@ -479,9 +532,11 @@ class RecipeSchema:
             high=2.5,
             units="V",
             bounds_source=(
-                "engineering_envelope around setpoints.yaml scalar "
-                "campaigns.C5.branch_one.max_voltage_V=2.5"
+                "engineering_envelope branch hardware ceiling, demoted from "
+                "primary optimizer search; user gate is "
+                "campaigns.C5.allow_mre_voltage_cap_V"
             ),
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C6.temp_range_C",
@@ -779,6 +834,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C5.pO2_bar",
         "campaigns.C5.pO2_mbar_default",
         "campaigns.C5.p_total_mbar_default",
+        "campaigns.C5.allow_mre_voltage_cap_V",
         "campaigns.C6.temp_range_C",
         "campaigns.C6.default_hold_T_C",
         "campaigns.C6.pO2_mbar",

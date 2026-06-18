@@ -51,7 +51,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v5" == schema.allowlist_version
+    assert "allowlist-v6" == schema.allowlist_version
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
@@ -66,6 +66,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C3.endpoint.hold_time_min"),
         _path("campaigns.C3.alkali_dosing.Na_kg"),
         _path("campaigns.C3.alkali_dosing.K_kg"),
+        _path("campaigns.C5.allow_mre_voltage_cap_V"),
         _path("overhead_headspace.temperature_offset_K"),
         _path(
             "overhead_headspace.pipe_segment_temperatures_C.segments."

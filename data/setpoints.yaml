@@ -448,12 +448,14 @@ campaigns:
     pO2_bar: [0.01, 0.1]                # total pyrolysis suppression
     pO2_mbar_default: 50.0
     p_total_mbar_default: 50.0
+    allow_mre_voltage_cap_V: 0.0         # optimizer/user gate; 0 disables C5/MRE
+    allow_mre_voltage_cap_upper_bound_V: 2.5  # owner search bound; use 1.6 for pyrolysis-limited sweeps
     branch_two:
-      max_voltage_V: 1.6                 # or <=1.4 if retaining Ti for C6
+      max_voltage_V: 1.6                 # branch selectivity default (Si-only), used when allow_mre_voltage_cap_V is unset; a positive cap is the operative MRE voltage and overrides this (may exceed it to reduce more species)
       electrical_kWh_per_t: [600, 1200]
       targets: "Si as liquid metal (permanently removes SiO source)"
     branch_one:
-      max_voltage_V: 2.5
+      max_voltage_V: 2.5                 # branch selectivity default, used when allow_mre_voltage_cap_V is unset; a positive cap is the operative MRE voltage and overrides this
       electrical_kWh_per_t: [2650, 4050]
       targets: ["Si", "Al", "Mg", "Ca"]
     Si_Ti_selectivity: >

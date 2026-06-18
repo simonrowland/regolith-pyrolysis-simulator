@@ -11,6 +11,7 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -236,6 +237,39 @@ def test_redox_cleanup_dose_fields_validate_but_do_not_materialize() -> None:
     }
     assert schema.to_setpoints_patch(patch) == {}
     assert schema.redox_cleanup_doses_kg(patch) == pytest.approx((12.5, 7.25))
+
+
+def test_c5_allow_mre_voltage_cap_is_primary_search_knob() -> None:
+    schema = RecipeSchema()
+    cap_spec = schema.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH)
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    owner_bound = _lookup_setpoint(
+        setpoints,
+        "campaigns.C5.allow_mre_voltage_cap_upper_bound_V",
+    )
+    branch_two = ("campaigns", "C5", "branch_two", "max_voltage_V")
+    branch_one = ("campaigns", "C5", "branch_one", "max_voltage_V")
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert cap_spec.search_enabled is True
+    assert cap_spec.runtime_enabled is False
+    assert cap_spec.low == pytest.approx(0.0)
+    assert cap_spec.high == pytest.approx(owner_bound)
+    assert C5_ALLOW_MRE_VOLTAGE_CAP_PATH in search_paths
+    assert branch_two not in search_paths
+    assert branch_one not in search_paths
+    assert schema.spec_for(branch_two).runtime_enabled is True
+    assert schema.spec_for(branch_one).runtime_enabled is True
+
+
+def test_c5_allow_mre_voltage_cap_rejects_above_owner_bound() -> None:
+    schema = RecipeSchema()
+    cap_spec = schema.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH)
+    assert cap_spec.high is not None
+    too_high = float(cap_spec.high) + 0.01
+
+    with pytest.raises(RecipeValidationError, match="above upper bound"):
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: too_high}).validated(schema)
 
 
 def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:
