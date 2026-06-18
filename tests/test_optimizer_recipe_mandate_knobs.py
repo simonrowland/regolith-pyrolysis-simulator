@@ -21,10 +21,16 @@ def _path(dotted: str) -> tuple[str, ...]:
     return tuple(dotted.split("."))
 
 
+C4_RUNTIME_ONLY_PATHS = {_path("campaigns.C4.hold_temp_C")}
+
+
 def _lookup(root: dict, path: tuple[str, ...]):
     node = root
     for segment in path:
-        node = node[segment]
+        if isinstance(node, list):
+            node = next(item for item in node if item["name"] == segment)
+        else:
+            node = node[segment]
     return node
 
 
@@ -51,7 +57,18 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v6" == schema.allowlist_version
+    assert "allowlist-v7" == schema.allowlist_version
+
+    # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
+    # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
+    # never the stage target_C — see campaigns.py:_get_base_temp_target). It must
+    # stay OUT of both the search allowlist and the mandate-lever set so the
+    # optimizer never tunes a knob that changes nothing (SC-07 inert knob).
+    fe_hot_hold_target = _path(
+        "campaigns.C2A_staged.stages.fe_hot_hold.target_C"
+    )
+    assert fe_hot_hold_target not in MANDATE_LEVER_PATHS
+    assert fe_hot_hold_target not in schema_paths
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
@@ -63,9 +80,12 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_continuous.p_total_mbar_default"),
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
         _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
+        _path("campaigns.C2A_staged.stages.sio_window.target_C"),
+        _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_h"),
         _path("campaigns.C3.endpoint.hold_time_min"),
         _path("campaigns.C3.alkali_dosing.Na_kg"),
         _path("campaigns.C3.alkali_dosing.K_kg"),
+        _path("campaigns.C4.hold_temp_C"),
         _path("campaigns.C5.allow_mre_voltage_cap_V"),
         _path("overhead_headspace.temperature_offset_K"),
         _path(
@@ -82,7 +102,8 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     pair_map = dict(RecipeSchema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
     spec_by_path = {spec.path: spec for spec in schema.allowlist}
     for spec in MANDATE_LEVER_ALLOWLIST:
-        _lookup(setpoints, spec.path)
+        if spec.path not in C4_RUNTIME_ONLY_PATHS:
+            _lookup(setpoints, spec.path)
         values = {spec.path: _sample_value(spec)}
         total_path = pair_map.get(spec.path)
         if total_path is not None:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from functools import lru_cache
 import hashlib
@@ -22,7 +23,7 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v6"
+allowlist_version = "allowlist-v7"
 
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
     "campaigns.C5.allow_mre_voltage_cap_V".split(".")
@@ -67,6 +68,26 @@ STAGE0_REDOX_OXIDANT_KG_PATH: KeyPath = tuple(
 )
 STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
     "campaigns.C0.stage0_redox_cleanup.carbon_reductant_kg".split(".")
+)
+C4_HOLD_TEMP_C_PATH: KeyPath = tuple("campaigns.C4.hold_temp_C".split("."))
+
+C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split("."))
+C2A_STAGED_MAX_HOLD_HR_PATH: KeyPath = tuple(
+    "campaigns.C2A_staged.max_hold_hr".split(".")
+)
+C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
+    "alkali_early_fe",
+    "sio_window",
+    "fe_hot_hold",
+    "cool_for_na_shuttle",
+)
+C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
+    {
+        "alkali_early_fe": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "sio_window": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "fe_hot_hold": ("duration_h", "ramp_rate_C_per_hr"),
+        "cool_for_na_shuttle": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+    }
 )
 
 
@@ -307,6 +328,120 @@ class RecipeSchema:
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
         ),
         _knob(
+            "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
+            "int",
+            low=1,
+            high=6,
+            units="h",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.alkali_early_fe.duration_h=4"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
+            low=1100,
+            high=1320,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.alkali_early_fe.target_C=1250"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
+            low=300,
+            high=900,
+            units="C/hr",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr=600"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.sio_window.duration_h",
+            "int",
+            low=1,
+            high=6,
+            units="h",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.sio_window.duration_h=3"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.sio_window.target_C",
+            low=1450,
+            high=1650,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.sio_window.target_C=1600"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
+            low=100,
+            high=300,
+            units="C/hr",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr=175"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
+            "int",
+            low=1,
+            high=4,
+            units="h",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.fe_hot_hold.duration_h=1"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
+            low=75,
+            high=300,
+            units="C/hr",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr=150"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
+            "int",
+            low=1,
+            high=3,
+            units="h",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h=1"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
+            low=1050,
+            high=1250,
+            units="C",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C=1150"
+            ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr",
+            low=300,
+            high=900,
+            units="C/hr",
+            bounds_source=(
+                "engineering_envelope around setpoints.yaml nominal "
+                "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr=600"
+            ),
+        ),
+        _knob(
             "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
             low=300,
             high=900,
@@ -436,6 +571,14 @@ class RecipeSchema:
             high=1670,
             units="C",
             bounds_source="setpoints:campaigns.C4.temp_range_C",
+        ),
+        _knob(
+            "campaigns.C4.hold_temp_C",
+            low=1580,
+            high=1670,
+            units="C",
+            bounds_source="setpoints:campaigns.C4.temp_range_C",
+            runtime_enabled=False,
         ),
         _knob(
             "campaigns.C4.pO2_mbar",
@@ -778,7 +921,7 @@ class RecipeSchema:
             for path, value in validated.values.items()
             if self.spec_for(path).runtime_enabled
         }
-        return RecipePatch(runtime_values).to_nested()
+        return _setpoints_patch_from_runtime_values(runtime_values)
 
     def redox_cleanup_doses_kg(self, patch: "RecipePatch") -> tuple[float, float]:
         validated = patch.validated(self)
@@ -810,6 +953,17 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.default_hold_T_C",
         "campaigns.C2A_staged.p_total_mbar",
         "campaigns.C2A_staged.p_total_mbar_default",
+        "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
+        "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
+        "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.sio_window.duration_h",
+        "campaigns.C2A_staged.stages.sio_window.target_C",
+        "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
+        "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.na_shuttle_stage.duration_h",
         "campaigns.C2B.temp_range_C",
@@ -826,6 +980,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C3.duration_after_pathA_h",
         "campaigns.C3.duration_after_pathB_h_per_phase",
         "campaigns.C4.temp_range_C",
+        "campaigns.C4.hold_temp_C",
         "campaigns.C4.pO2_mbar",
         "campaigns.C4.pO2_mbar_default",
         "campaigns.C4.p_total_mbar_default",
@@ -858,6 +1013,91 @@ MANDATE_LEVER_ALLOWLIST: tuple[KnobSpec, ...] = tuple(
 )
 
 
+def _is_c2a_staged_stage_field_path(path: KeyPath) -> bool:
+    return (
+        len(path) == len(C2A_STAGED_STAGES_PATH) + 2
+        and path[: len(C2A_STAGED_STAGES_PATH)] == C2A_STAGED_STAGES_PATH
+        and path[-2] in C2A_STAGED_STAGE_NAMES
+        and path[-1] in C2A_STAGED_STAGE_FIELDS_BY_NAME[path[-2]]
+    )
+
+
+def _setpoints_patch_from_runtime_values(
+    runtime_values: Mapping[KeyPath, Any],
+) -> dict[str, Any]:
+    direct_values = {
+        path: value
+        for path, value in runtime_values.items()
+        if not _is_c2a_staged_stage_field_path(path)
+    }
+    stage_values = {
+        path: value
+        for path, value in runtime_values.items()
+        if _is_c2a_staged_stage_field_path(path)
+    }
+    nested = RecipePatch(direct_values).to_nested()
+    if not stage_values:
+        return nested
+
+    stages = _default_c2a_staged_stages()
+    stages_by_name = {
+        str(stage.get("name")): stage
+        for stage in stages
+        if isinstance(stage, dict) and stage.get("name") is not None
+    }
+    for path, value in stage_values.items():
+        stage_name = path[-2]
+        field_name = path[-1]
+        try:
+            stage = stages_by_name[stage_name]
+        except KeyError as exc:
+            raise RecipeValidationError(
+                f"missing default C2A_staged stage: {stage_name}"
+            ) from exc
+        stage[field_name] = _normalize_value(value)
+
+    total_hours = 0
+    for stage in stages:
+        if isinstance(stage, dict):
+            total_hours += max(1, int(float(stage.get("duration_h", 1.0))))
+
+    campaigns = nested.setdefault("campaigns", {})
+    if not isinstance(campaigns, dict):
+        raise RecipeValidationError("recipe path conflicts with campaigns mapping")
+    c2a = campaigns.setdefault("C2A_staged", {})
+    if not isinstance(c2a, dict):
+        raise RecipeValidationError("recipe path conflicts with C2A_staged mapping")
+    c2a["stages"] = stages
+    c2a["max_hold_hr"] = total_hours
+    return nested
+
+
+def _default_c2a_staged_stages() -> list[dict[str, Any]]:
+    node: Any = _default_setpoints()
+    for segment in C2A_STAGED_STAGES_PATH:
+        if not isinstance(node, Mapping) or segment not in node:
+            raise RecipeValidationError(
+                f"missing YAML default for {_format_path(C2A_STAGED_STAGES_PATH)}"
+            )
+        node = node[segment]
+    if not isinstance(node, list):
+        raise RecipeValidationError(
+            f"{_format_path(C2A_STAGED_STAGES_PATH)} must be a YAML list"
+        )
+    stages = copy.deepcopy(node)
+    seen: set[str] = set()
+    for stage in stages:
+        if not isinstance(stage, dict) or not isinstance(stage.get("name"), str):
+            raise RecipeValidationError("C2A_staged stages must be named mappings")
+        seen.add(stage["name"])
+    missing = set(C2A_STAGED_STAGE_NAMES) - seen
+    if missing:
+        raise RecipeValidationError(
+            "missing default C2A_staged stage: " + ", ".join(sorted(missing))
+        )
+    return stages
+
+
 @dataclass(frozen=True)
 class RecipePatch:
     values: Mapping[KeyPath, Any]
@@ -882,6 +1122,11 @@ class RecipePatch:
         flat: dict[KeyPath, Any] = {}
 
         def walk(prefix: KeyPath, node: Any) -> None:
+            if prefix == C2A_STAGED_MAX_HOLD_HR_PATH:
+                return
+            if prefix == C2A_STAGED_STAGES_PATH and isinstance(node, list):
+                _flatten_c2a_staged_stage_list(flat, node)
+                return
             if isinstance(node, Mapping):
                 if not node:
                     raise RecipeValidationError(
@@ -963,6 +1208,27 @@ def _normalize_key_path(path: Any) -> KeyPath:
             "recipe path segments must not contain '.' (the path separator)"
         )
     return path
+
+
+def _flatten_c2a_staged_stage_list(
+    flat: dict[KeyPath, Any],
+    stages: list[Any],
+) -> None:
+    seen: set[str] = set()
+    for stage in stages:
+        if not isinstance(stage, Mapping) or not isinstance(stage.get("name"), str):
+            raise RecipeValidationError("C2A_staged stages must be named mappings")
+        stage_name = str(stage["name"])
+        if stage_name not in C2A_STAGED_STAGE_NAMES:
+            raise RecipeValidationError(f"unknown C2A_staged stage: {stage_name}")
+        if stage_name in seen:
+            raise RecipeValidationError(f"duplicate C2A_staged stage: {stage_name}")
+        seen.add(stage_name)
+        for field_name in C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name]:
+            if field_name in stage:
+                flat[C2A_STAGED_STAGES_PATH + (stage_name, field_name)] = (
+                    _normalize_value(stage[field_name])
+                )
 
 
 def _normalize_value(value: Any) -> Any:

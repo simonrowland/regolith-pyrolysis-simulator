@@ -39,12 +39,16 @@ from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C4_HOLD_TEMP_C_PATH,
     RecipePatch,
     RecipeSchema,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
 )
+from simulator.campaigns import CampaignManager
+from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun, RunnerError
+from simulator.state import MeltState
 
 
 PINNED_EVALSPEC_JSON = (
@@ -64,6 +68,13 @@ PINNED_EVALSPEC_JSON = (
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
+)
+STAGE_SIO_TARGET = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "target_C",
 )
 
 
@@ -660,6 +671,150 @@ def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() ->
     assert cap_16_run_config.c5_enabled is True
     assert cap_16_run_config.mre_max_voltage_V == pytest.approx(1.6)
     assert len({cache_key(default_spec), cache_key(cap_14_spec), cache_key(cap_16_spec)}) == 3
+
+
+def test_build_eval_inputs_c2a_staged_stage_knob_partitions_cache_and_schedule() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    staged_spec, staged_config = _build_eval_inputs(
+        RecipePatch({STAGE_SIO_TARGET: 1585.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert cache_key(staged_spec) != cache_key(default_spec)
+    default_stages = default_config.setpoints["campaigns"]["C2A_staged"]["stages"]
+    staged_cfg = staged_config.setpoints["campaigns"]["C2A_staged"]
+    staged_stages = staged_cfg["stages"]
+    assert default_stages[1]["target_C"] == pytest.approx(1600.0)
+    assert staged_stages[1]["name"] == "sio_window"
+    assert staged_stages[1]["target_C"] == pytest.approx(1585.0)
+    assert staged_cfg["max_hold_hr"] == 9
+
+    target, ramp = CampaignManager(staged_config.setpoints).get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        4,
+        MeltState(),
+    )
+    assert target == pytest.approx(1585.0)
+    assert ramp == pytest.approx(175.0)
+
+
+def test_build_eval_inputs_c4_hold_temp_knob_partitions_cache_and_runtime() -> None:
+    profile = _mre_cap_profile(campaign="C4", hours=1)
+    schema = RecipeSchema()
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    hold_spec, hold_config = _build_eval_inputs(
+        RecipePatch({C4_HOLD_TEMP_C_PATH: 1600.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert cache_key(hold_spec) != cache_key(default_spec)
+    assert hold_spec.recipe_id != default_spec.recipe_id
+    assert hold_config.setpoints["campaigns"]["C4"]["temp_range_C"] == [
+        1580,
+        1670,
+    ]
+    assert hold_config.runtime_campaign_overrides["C4"]["hold_temp_C"] == pytest.approx(
+        1600.0
+    )
+
+    session = _force_builtin_run_from_config(hold_config)._start_session()
+    target, ramp = session.simulator.campaign_mgr.get_temp_target(
+        session.simulator.melt.campaign,
+        0,
+        session.simulator.melt,
+    )
+    assert target == pytest.approx(1600.0)
+    assert ramp == pytest.approx(10.0)
+
+
+def test_build_eval_inputs_c4_default_hold_temp_is_cache_neutral() -> None:
+    profile = _mre_cap_profile(campaign="C4", hours=1)
+    schema = RecipeSchema()
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    explicit_default_spec, explicit_default_config = _build_eval_inputs(
+        RecipePatch({C4_HOLD_TEMP_C_PATH: 1670.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert explicit_default_spec.recipe_id == default_spec.recipe_id
+    assert canonical_evalspec_json(explicit_default_spec) == canonical_evalspec_json(
+        default_spec
+    )
+    assert cache_key(explicit_default_spec) == cache_key(default_spec)
+    assert "C4" not in default_config.runtime_campaign_overrides
+    assert "C4" not in explicit_default_config.runtime_campaign_overrides
+
+
+def test_c4_default_hold_temp_anchor_matches_runtime_fallback() -> None:
+    # The C4 hold_temp_C absence-normalization treats hold_temp_C ==
+    # temp_range_C[-1] as the no-op default (dropped from recipe_id, no runtime
+    # override injected). That is only golden-neutral because the C4 runtime, with
+    # no hold_temp_C override, falls back to c4_max_temp_C — whose default equals
+    # temp_range_C[-1]. The two defaults are coupled BY VALUE, not by shared code,
+    # so pin the invariant here: a change to either side (setpoints temp_range_C
+    # or the c4_max_temp_C / DEFAULT_C4_HOLD_TEMP_C hardcode) is caught in CI
+    # instead of silently making the "default" value de-tune the knob.
+    bundle = load_config_bundle()
+    anchor = evaluate_module._c4_default_hold_temp_C(bundle.setpoints)
+    assert anchor == pytest.approx(evaluate_module.DEFAULT_C4_HOLD_TEMP_C)
+    assert anchor == pytest.approx(CampaignManager(bundle.setpoints).c4_max_temp_C)
+
+
+def test_run_options_with_c4_hold_temp_conflict_raises() -> None:
+    # The conflict guard fires when a pre-existing C4 hold_temp_C runtime override
+    # disagrees with the patched value (_run_options_with_c4_hold_temp).
+    run_options = {"runtime_campaign_overrides": {"C4": {"hold_temp_C": 1600.0}}}
+    with pytest.raises(EvaluationInputError, match="hold_temp_C conflicts"):
+        evaluate_module._run_options_with_c4_hold_temp(
+            run_options,
+            RecipePatch({C4_HOLD_TEMP_C_PATH: 1620.0}),
+            c4_default_hold_temp_C=1670.0,
+        )
+
+
+def test_run_options_with_c4_hold_temp_matching_override_is_idempotent() -> None:
+    # A pre-existing override equal to the patched value must NOT raise; the
+    # value is preserved and the caller's mapping is not mutated.
+    run_options = {"runtime_campaign_overrides": {"C4": {"hold_temp_C": 1600.0}}}
+    merged = evaluate_module._run_options_with_c4_hold_temp(
+        run_options,
+        RecipePatch({C4_HOLD_TEMP_C_PATH: 1600.0}),
+        c4_default_hold_temp_C=1670.0,
+    )
+    assert merged["runtime_campaign_overrides"]["C4"]["hold_temp_C"] == pytest.approx(
+        1600.0
+    )
+    # caller's run_options dict is untouched (deep-copied internally)
+    assert run_options["runtime_campaign_overrides"]["C4"]["hold_temp_C"] == 1600.0
 
 
 def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(

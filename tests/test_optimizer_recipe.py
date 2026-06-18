@@ -12,6 +12,7 @@ from simulator.chemistry.kernel import (
 )
 from simulator.optimize.recipe import (
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C4_HOLD_TEMP_C_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -20,8 +21,11 @@ from simulator.optimize.recipe import (
     STAGE0_REDOX_OXIDANT_KG_PATH,
 )
 from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
+from simulator.campaigns import CampaignManager
+from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
+from simulator.state import MeltState
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
@@ -32,6 +36,27 @@ C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
 PRODUCT_TARGET = ("campaigns", "C0b_p_cleanup", "products", "oxygen_kg")
 OXYGEN_SINK_CHANNEL_MODE = ("chemistry_kernel", OXYGEN_SINK_CHANNEL_MODE_KEY)
 SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
+STAGE_SIO_TARGET = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "target_C",
+)
+STAGE_FE_DURATION = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "fe_hot_hold",
+    "duration_h",
+)
+STAGE_COOL_RAMP = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "cool_for_na_shuttle",
+    "ramp_rate_C_per_hr",
+)
 DATA_DIGESTS = {
     "feedstocks": "feedstocks-digest",
     "profile": "profile-digest",
@@ -45,6 +70,10 @@ def _lookup_setpoint(root: dict, dotted_path: str):
     for segment in dotted_path.split("."):
         node = node[segment]
     return node
+
+
+def _stage_by_name(stages: list[dict], name: str) -> dict:
+    return next(stage for stage in stages if stage["name"] == name)
 
 
 def test_unknown_setpoint_path_is_denied_by_default() -> None:
@@ -131,6 +160,73 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
         20,
         24,
     ]
+
+
+def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
+    schema = RecipeSchema()
+    stage_fields = {
+        "alkali_early_fe": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "sio_window": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "fe_hot_hold": ("duration_h", "ramp_rate_C_per_hr"),
+        "cool_for_na_shuttle": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+    }
+    stage_paths = {
+        (
+            "campaigns",
+            "C2A_staged",
+            "stages",
+            stage,
+            field,
+        )
+        for stage, fields in stage_fields.items()
+        for field in fields
+    }
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert stage_paths <= search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "fe_hot_hold",
+        "target_C",
+    ) not in search_paths
+    patch = RecipePatch(
+        {
+            STAGE_SIO_TARGET: 1585.0,
+            STAGE_FE_DURATION: 2,
+            STAGE_COOL_RAMP: 500.0,
+        }
+    ).validated(schema)
+    nested = schema.to_setpoints_patch(patch)
+    loaded_patch = RecipePatch.from_nested(nested).validated(schema)
+    stages = nested["campaigns"]["C2A_staged"]["stages"]
+
+    assert loaded_patch.values[STAGE_SIO_TARGET] == pytest.approx(1585.0)
+    assert loaded_patch.values[STAGE_FE_DURATION] == 2
+    assert loaded_patch.values[STAGE_COOL_RAMP] == pytest.approx(500.0)
+    assert _stage_by_name(stages, "sio_window")["target_C"] == pytest.approx(1585.0)
+    assert _stage_by_name(stages, "fe_hot_hold")["duration_h"] == 2
+    assert _stage_by_name(stages, "cool_for_na_shuttle")[
+        "ramp_rate_C_per_hr"
+    ] == pytest.approx(500.0)
+    assert nested["campaigns"]["C2A_staged"]["max_hold_hr"] == 10
+
+    config = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C2A_staged",
+        hours=10,
+        setpoints_patch=nested,
+    )._session_config()
+    cfg = config.setpoints["campaigns"]["C2A_staged"]
+    assert cfg["max_hold_hr"] == 10
+    target, ramp = CampaignManager(config.setpoints).get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        4,
+        MeltState(),
+    )
+    assert target == pytest.approx(1585.0)
+    assert ramp == pytest.approx(175.0)
 
 
 @pytest.mark.parametrize("mode", OXYGEN_SINK_CHANNEL_MODE_VALUES)
@@ -260,6 +356,20 @@ def test_c5_allow_mre_voltage_cap_is_primary_search_knob() -> None:
     assert branch_one not in search_paths
     assert schema.spec_for(branch_two).runtime_enabled is True
     assert schema.spec_for(branch_one).runtime_enabled is True
+
+
+def test_c4_hold_temp_is_optimizer_search_knob_not_setpoints_patch() -> None:
+    schema = RecipeSchema()
+    hold_spec = schema.spec_for(C4_HOLD_TEMP_C_PATH)
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert C4_HOLD_TEMP_C_PATH in search_paths
+    assert hold_spec.runtime_enabled is False
+    assert hold_spec.low == pytest.approx(1580.0)
+    assert hold_spec.high == pytest.approx(1670.0)
+    assert schema.to_setpoints_patch(
+        RecipePatch({C4_HOLD_TEMP_C_PATH: 1600.0})
+    ) == {}
 
 
 def test_c5_allow_mre_voltage_cap_rejects_above_owner_bound() -> None:

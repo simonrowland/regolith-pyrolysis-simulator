@@ -71,6 +71,7 @@ from simulator.optimize.profiles import (
 )
 from simulator.optimize.recipe import (
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C4_HOLD_TEMP_C_PATH,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
@@ -99,6 +100,7 @@ LAB_OVERLAY_SCOPE_FIELDS = (
     "oxide_vapor_ceiling_digest",
     "sink_channel_evidence_digests",
 )
+DEFAULT_C4_HOLD_TEMP_C = 1670.0
 _VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES = {
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
         "engines.vaporock.provider",
@@ -1332,6 +1334,12 @@ def _build_eval_inputs(
         setpoints=bundle.setpoints,
     )
     run_options = _run_options_with_mre_voltage_cap(run_options, patch)
+    c4_default_hold_temp_C = _c4_default_hold_temp_C(bundle.setpoints)
+    run_options = _run_options_with_c4_hold_temp(
+        run_options,
+        patch,
+        c4_default_hold_temp_C=c4_default_hold_temp_C,
+    )
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
     (
@@ -1387,7 +1395,10 @@ def _build_eval_inputs(
         data_digests.update(lab_schedule_digests(lab_schedule))
 
     spec = EvalSpec(
-        recipe_id=_evalspec_recipe_id(patch),
+        recipe_id=_evalspec_recipe_id(
+            patch,
+            c4_default_hold_temp_C=c4_default_hold_temp_C,
+        ),
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,
@@ -1444,20 +1455,94 @@ def _run_options_with_mre_voltage_cap(
     return MappingProxyType(merged)
 
 
-def _evalspec_recipe_id(patch: RecipePatch) -> str:
-    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in patch.values:
-        return patch.recipe_id()
-    cap = float(patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
+def _run_options_with_c4_hold_temp(
+    run_options: Mapping[str, Any],
+    patch: RecipePatch,
+    *,
+    c4_default_hold_temp_C: float,
+) -> Mapping[str, Any]:
+    if C4_HOLD_TEMP_C_PATH not in patch.values:
+        return run_options
+    hold_temp = float(patch.values[C4_HOLD_TEMP_C_PATH])
+    if math.isclose(
+        hold_temp,
+        c4_default_hold_temp_C,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    ):
+        return run_options
+    merged = dict(run_options)
+    runtime_overrides = {
+        str(campaign): dict(fields)
+        for campaign, fields in dict(
+            run_options.get("runtime_campaign_overrides", {}) or {}
+        ).items()
+    }
+    c4_overrides = runtime_overrides.setdefault("C4", {})
+    existing = c4_overrides.get("hold_temp_C")
+    if existing is not None and not math.isclose(
+        float(existing),
+        hold_temp,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    ):
+        raise EvaluationInputError(
+            "campaigns.C4.hold_temp_C conflicts with "
+            "runtime_campaign_overrides['C4'].hold_temp_C"
+        )
+    c4_overrides["hold_temp_C"] = hold_temp
+    merged["runtime_campaign_overrides"] = runtime_overrides
+    return MappingProxyType(merged)
+
+
+def _evalspec_recipe_id(
+    patch: RecipePatch,
+    *,
+    c4_default_hold_temp_C: float,
+) -> str:
     values = dict(patch.values)
-    if cap == 0.0:
-        # cap=0 is the no-MRE default; drop the no-op knob so the recipe_id is
-        # identical to a cap-absent patch (golden-neutral default).
-        values.pop(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, None)
-    else:
-        # Coerce to float so an int cap (1) and float cap (1.0) — which run
-        # identically — share one canonical recipe_id (no cache fragmentation).
-        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = cap
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in values:
+        cap = float(values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] or 0.0)
+        if cap == 0.0:
+            # cap=0 is the no-MRE default; drop the no-op knob so the recipe_id is
+            # identical to a cap-absent patch (golden-neutral default).
+            values.pop(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, None)
+        else:
+            # Coerce to float so an int cap (1) and float cap (1.0) — which run
+            # identically — share one canonical recipe_id (no cache fragmentation).
+            values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = cap
+    if C4_HOLD_TEMP_C_PATH in values:
+        hold_temp = float(values[C4_HOLD_TEMP_C_PATH])
+        if math.isclose(
+            hold_temp,
+            c4_default_hold_temp_C,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            values.pop(C4_HOLD_TEMP_C_PATH, None)
+        else:
+            values[C4_HOLD_TEMP_C_PATH] = hold_temp
     return RecipePatch(values).recipe_id()
+
+
+def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
+    # The C4 hold_temp_C absence-normalization anchors on temp_range_C[-1].
+    # This is golden-neutral ONLY because the C4 runtime, with no hold_temp_C
+    # override, falls back to c4_max_temp_C (campaigns.py:_get_base_temp_target),
+    # whose default equals temp_range_C[-1]. That coupling is by value, not by
+    # shared code; it is pinned in CI by
+    # tests/test_optimizer_evalspec.py::test_c4_default_hold_temp_anchor_matches_runtime_fallback.
+    campaigns = setpoints.get("campaigns") if isinstance(setpoints, MappingABC) else None
+    c4 = campaigns.get("C4") if isinstance(campaigns, MappingABC) else None
+    temp_range = c4.get("temp_range_C") if isinstance(c4, MappingABC) else None
+    if isinstance(temp_range, (list, tuple)) and len(temp_range) >= 2:
+        try:
+            value = float(temp_range[-1])
+        except (TypeError, ValueError):
+            value = DEFAULT_C4_HOLD_TEMP_C
+        if math.isfinite(value):
+            return value
+    return DEFAULT_C4_HOLD_TEMP_C
 
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
