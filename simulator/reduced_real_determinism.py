@@ -1640,6 +1640,17 @@ def canonical_replay_key(
         provider_role=provider_role,
     )
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+    # NOTE (cache identity is VERSION-based, NOT source-content-based — deliberate,
+    # see commit 8d09d4f "corpus_version = sole cache lever"): the cache key uses
+    # SCHEMA_VERSION + corpus_version + provider/backend identity, and intentionally
+    # OMITS _source_module_digest(). A source-CONTENT digest in the key would make
+    # the key differ across clusters/checkouts on byte-only differences (line
+    # endings, paths) and break cross-cluster cache sharing. _source_module_digest()
+    # is therefore provenance/coverage only (exercised by tests, which assert a
+    # source byte-change leaves this key UNCHANGED). Tradeoff (accepted by policy):
+    # a covered-module LOGIC change requires a MANUAL corpus_version/SCHEMA_VERSION
+    # bump — there is no auto-tripwire (adding one would force a bump on every
+    # covered edit). Do NOT "fix" this by adding the digest to the key.
     return {
         "schema_version": SCHEMA_VERSION,
         "artifact": str(artifact),
