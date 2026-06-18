@@ -7,6 +7,7 @@ from typing import Any
 
 
 MRE_VOLTAGE_LADDER_FALLBACK = (
+    {'voltage': 0.39, 'species': ('NiO',), 'min_hold_hours': 2},
     {'voltage': 0.6, 'species': ('FeO',), 'min_hold_hours': 3},
     {'voltage': 0.9, 'species': ('Cr2O3',), 'min_hold_hours': 2},
     {'voltage': 1.0, 'species': ('MnO',), 'min_hold_hours': 2},

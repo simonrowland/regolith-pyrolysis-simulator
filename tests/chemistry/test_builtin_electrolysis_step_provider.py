@@ -507,6 +507,88 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     )
 
 
+def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """NiO is not just YAML-visible: provider dispatch creates a
+    balanced Ni metal + MRE-anode O2 proposal and the kernel commits it.
+    """
+
+    sim = _build_sim(
+        "ci_carbonaceous_chondrite",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger = sim._new_atom_ledger()
+    nio_initial_mol = 10.0 / (MOLAR_MASS["NiO"] / 1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {"NiO": nio_initial_mol}, source="test seed"
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim._project_extraction_melt()
+    sim.melt.temperature_C = 1600.0
+
+    provider = BuiltinElectrolysisStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": dict(
+                sim.atom_ledger.mol_by_account("process.cleaned_melt")
+            ),
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.ELECTROLYSIS_STEP,
+        account_view=view,
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={
+            "voltage_V": 0.6,
+            "current_A": 1.0e6,
+            "dt_hr": 1.0,
+            "allowed_oxides": ["NiO"],
+        },
+    )
+
+    result = provider.dispatch(request)
+    assert result.transition is not None
+    diagnostic = dict(result.diagnostic)
+    assert diagnostic["oxides_reduced_mol"]["NiO"] == pytest.approx(
+        nio_initial_mol, rel=1e-12
+    )
+    assert diagnostic["metals_produced_mol"]["Ni"] == pytest.approx(
+        nio_initial_mol, rel=1e-12
+    )
+    assert diagnostic["O2_produced_mol"] == pytest.approx(
+        0.5 * nio_initial_mol, rel=1e-12
+    )
+
+    proposal = result.transition
+    assert proposal.debits == {
+        "process.cleaned_melt": {"NiO": pytest.approx(nio_initial_mol)}
+    }
+    assert proposal.credits["process.metal_phase"]["Ni"] == pytest.approx(
+        nio_initial_mol, rel=1e-12
+    )
+    assert proposal.credits["terminal.oxygen_mre_anode_stored"]["O2"] == (
+        pytest.approx(0.5 * nio_initial_mol, rel=1e-12)
+    )
+
+    sim._chem_kernel.commit_batch(ChemistryIntent.ELECTROLYSIS_STEP, proposal)
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "NiO", 0.0
+    ) == pytest.approx(0.0, abs=1e-12)
+    assert sim.atom_ledger.mol_by_account("process.metal_phase").get(
+        "Ni", 0.0
+    ) == pytest.approx(nio_initial_mol, rel=1e-12)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ).get("O2", 0.0) == pytest.approx(0.5 * nio_initial_mol, rel=1e-12)
+
+
 def test_provider_matches_legacy_multi_oxide_partition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

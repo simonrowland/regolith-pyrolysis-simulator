@@ -65,6 +65,7 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
     sequence = mre_ladder.build_mre_voltage_sequence(setpoints)
 
     assert _species_names(sequence) == [
+        "NiO",
         "Na2O",
         "K2O",
         "FeO",
@@ -77,6 +78,7 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         "CaO",
     ]
     assert [entry["voltage"] for entry in sequence] == [
+        0.39,
         0.5,
         0.5,
         0.6,
@@ -89,6 +91,7 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         2.5,
     ]
     assert [entry["min_hold_hours"] for entry in sequence] == [
+        2,
         2,
         2,
         3,
@@ -107,10 +110,10 @@ def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():
 
     sequence = mre_ladder.parse_ladder_from_setpoints(setpoints)
 
-    assert _species_names(sequence)[:2] == ["Na2O", "K2O"]
-    assert _species_names(sequence)[5:7] == ["SiO2", "TiO2"]
-    assert sequence[5]["voltage"] == pytest.approx(1.4)
-    assert sequence[6]["voltage"] == pytest.approx(1.5)
+    assert _species_names(sequence)[:3] == ["NiO", "Na2O", "K2O"]
+    assert _species_names(sequence)[6:8] == ["SiO2", "TiO2"]
+    assert sequence[6]["voltage"] == pytest.approx(1.4)
+    assert sequence[7]["voltage"] == pytest.approx(1.5)
 
 
 def test_max_voltage_for_target_uses_ladder_ground_truth():

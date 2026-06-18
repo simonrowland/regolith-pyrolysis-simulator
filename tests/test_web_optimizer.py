@@ -418,7 +418,7 @@ def test_mre_preset_catalog_route_returns_shared_ladder(client) -> None:
     by_target = {preset.get("mre_target_species"): preset for preset in presets}
     assert by_target[""]["c5_enabled"] is False
     assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.4)
-    assert by_target["SiO2"]["included_species"] == ["Fe", "Cr", "Mn", "Si"]
+    assert by_target["SiO2"]["included_species"] == ["Ni", "Fe", "Cr", "Mn", "Si"]
     assert by_target["Na2O"]["enabled"] is False
     assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
     assert by_target["K2O"]["enabled"] is False
@@ -433,7 +433,7 @@ def test_mre_preset_catalog_fragment_is_golden(client) -> None:
     assert 'data-c5-enabled="false"' in html
     assert 'value="target:SiO2"' in html
     assert 'data-max-voltage="1.4"' in html
-    assert 'data-included-species="Fe, Cr, Mn, Si"' in html
+    assert 'data-included-species="Ni, Fe, Cr, Mn, Si"' in html
     assert "Na2O" in html
     assert "disabled" in html
     assert "pre-depleted by C3" in html

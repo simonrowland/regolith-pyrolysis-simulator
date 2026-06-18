@@ -55,6 +55,17 @@ from simulator.core import (
 
 # Standard decomposition voltages at ~1600°C (V)
 DECOMP_VOLTAGES = {
+    # NiO source: ΔfG°(NiO, ~1873 K) ≈ -76 kJ/mol
+    # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
+    # Chemical Thermodynamics of Nickel]; E = -ΔfG/(2F) ≈ 0.39 V
+    # standard-state. Runtime Nernst applies melt activity + pO2.
+    # This NiO rung is raw-thermo-derived; legacy rungs (FeO = 0.6, etc.)
+    # are empirically compressed without per-rung provenance (raw
+    # -ΔfG(FeO)/(2F) ≈ 0.75 V, not 0.6), so absolute values mix two
+    # scales. Physically validated property: relative ordering NiO < FeO.
+    # Whole-ladder re-anchoring to one raw-thermo basis is deferred to #32
+    # (MRE-COVERAGE-RECONCILE).
+    'NiO':   0.39,
     'Na2O':  0.5,
     'K2O':   0.5,
     'FeO':   0.6,
@@ -72,6 +83,7 @@ DECOMP_VOLTAGES = {
 
 # Electrons transferred per formula unit of oxide reduced
 ELECTRONS_PER_OXIDE = {
+    'NiO':   2,   # NiO → Ni + ½ O₂
     'Na2O':  2,   # Na₂O → 2 Na + ½ O₂  (2 electrons)
     'K2O':   2,
     'FeO':   2,   # FeO → Fe + ½ O₂
