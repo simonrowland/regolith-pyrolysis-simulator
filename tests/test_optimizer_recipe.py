@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
 from simulator.optimize.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     KnobSpec,
@@ -25,7 +28,7 @@ from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
-from simulator.state import MeltState
+from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, MeltState
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
@@ -76,6 +79,45 @@ def _lookup_setpoint(root: dict, dotted_path: str):
 
 def _stage_by_name(stages: list[dict], name: str) -> dict:
     return next(stage for stage in stages if stage["name"] == name)
+
+
+def _c2a_staged_setpoints(fraction: float | None = None) -> dict:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    setpoints = copy.deepcopy(setpoints)
+    c2a = setpoints["campaigns"]["C2A_staged"]
+    if fraction is None:
+        c2a.pop("depletion_flux_decay_fraction", None)
+    else:
+        c2a["depletion_flux_decay_fraction"] = fraction
+    return setpoints
+
+
+def _configured_c2a_staged_manager(fraction: float | None = None) -> CampaignManager:
+    manager = CampaignManager(_c2a_staged_setpoints(fraction))
+    manager.configure_campaign(
+        MeltState(campaign=CampaignPhase.C2A_STAGED),
+        CampaignPhase.C2A_STAGED,
+    )
+    return manager
+
+
+def _flux(**species_kg_hr: float) -> EvaporationFlux:
+    flux = EvaporationFlux(species_kg_hr=dict(species_kg_hr))
+    flux.update_totals()
+    return flux
+
+
+def _check_c2a_staged_endpoint(
+    manager: CampaignManager,
+    hour: int,
+    flux: EvaporationFlux,
+) -> bool:
+    return manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=hour),
+        flux,
+        CondensationTrain.create_default(),
+        BatchRecord(),
+    )
 
 
 def test_unknown_setpoint_path_is_denied_by_default() -> None:
@@ -164,6 +206,36 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     ]
 
 
+def test_c2a_staged_flux_decay_species_setpoints_are_explicit_ascii() -> None:
+    # The flux_decay_species VALUES must be explicit ASCII species names (proven
+    # by the per-stage checks below). The whole setpoints.yaml is NOT required to
+    # be pure-ASCII — the project standard is latin1-safe (no C1 bytes
+    # 0x80-0x9F), enforced by tests/test_artifact_guards.py; comments
+    # legitimately carry latin1-printable glyphs (e.g. alpha, degree).
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    stages = setpoints["campaigns"]["C2A_staged"]["stages"]
+
+    for stage_name in ("alkali_early_fe", "sio_window", "fe_hot_hold"):
+        for species in _stage_by_name(stages, stage_name)["endpoint"][
+            "flux_decay_species"
+        ]:
+            species.encode("ascii")  # value must be pure-ASCII
+
+    assert _stage_by_name(stages, "alkali_early_fe")["endpoint"][
+        "flux_decay_species"
+    ] == ["Na", "K"]
+    assert _stage_by_name(stages, "sio_window")["endpoint"][
+        "flux_decay_species"
+    ] == ["SiO"]
+    assert _stage_by_name(stages, "fe_hot_hold")["endpoint"][
+        "flux_decay_species"
+    ] == ["Fe"]
+    assert "flux_decay_species" not in _stage_by_name(
+        stages,
+        "cool_for_na_shuttle",
+    )["endpoint"]
+
+
 def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
     schema = RecipeSchema()
     stage_fields = {
@@ -213,6 +285,7 @@ def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
         "ramp_rate_C_per_hr"
     ] == pytest.approx(500.0)
     assert nested["campaigns"]["C2A_staged"]["max_hold_hr"] == 10
+    assert all(path[-1] != "flux_decay_species" for path in loaded_patch.values)
 
     config = PyrolysisRun(
         feedstock_id=FEEDSTOCK,
@@ -229,6 +302,115 @@ def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
     )
     assert target == pytest.approx(1585.0)
     assert ramp == pytest.approx(175.0)
+
+
+def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH)
+
+    assert spec.low == pytest.approx(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+    assert spec.high == pytest.approx(0.50)
+    assert spec.path in {item.path for item in schema.search_allowlist}
+    assert RecipePatch(
+        {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.0}
+    ).validated(schema).values[
+        C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH
+    ] == pytest.approx(
+        0.0
+    )
+    assert RecipePatch(
+        {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.005}
+    ).validated(schema).values[
+        C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH
+    ] == pytest.approx(
+        0.005
+    )
+    with pytest.raises(RecipeValidationError, match="below lower bound"):
+        RecipePatch(
+            {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: -0.01}
+        ).validated(schema)
+
+
+def test_c2a_staged_depletion_flux_decay_golden_neutral_fixed_schedule() -> None:
+    expected_targets = [
+        (1250.0, 600.0),
+        (1250.0, 600.0),
+        (1250.0, 600.0),
+        (1250.0, 600.0),
+        (1600.0, 175.0),
+        (1600.0, 175.0),
+        (1600.0, 175.0),
+        (1750.0, 150.0),
+        (1150.0, 600.0),
+    ]
+
+    for fraction in (None, 0.0):
+        manager = _configured_c2a_staged_manager(fraction)
+        targets = [
+            manager.get_temp_target(
+                CampaignPhase.C2A_STAGED,
+                hour,
+                MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=hour),
+            )
+            for hour in range(9)
+        ]
+        end_hours = [
+            hour
+            for hour in range(9)
+            if _check_c2a_staged_endpoint(
+                manager,
+                hour,
+                _flux(Na=0.01, K=0.01, SiO=0.01, Fe=0.01),
+            )
+        ]
+
+        assert targets == pytest.approx(expected_targets)
+        assert end_hours[0] == 8
+        assert manager._c2a_staged_stage_idx == 0
+
+
+def test_c2a_staged_depletion_flux_decay_advances_stage_early() -> None:
+    manager = _configured_c2a_staged_manager(0.25)
+
+    assert not _check_c2a_staged_endpoint(manager, 0, _flux(Na=10.0, K=8.0))
+    assert manager._c2a_staged_stage_idx == 0
+    assert not _check_c2a_staged_endpoint(manager, 1, _flux(Na=5.0, K=4.0))
+    assert manager._c2a_staged_stage_idx == 0
+    assert not _check_c2a_staged_endpoint(manager, 2, _flux(Na=2.4, K=1.9))
+
+    assert manager._c2a_staged_stage_idx == 1
+    assert manager._c2a_staged_stage_start_hour == 3
+    assert manager._c2a_staged_peak_flux_by_species == {}
+    target, ramp = manager.get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        3,
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=3),
+    )
+    assert target == pytest.approx(1600.0)
+    assert ramp == pytest.approx(175.0)
+
+
+def test_c2a_staged_depletion_flux_decay_times_out_when_flux_never_decays() -> None:
+    manager = _configured_c2a_staged_manager(0.25)
+    ended_hour = None
+    stage_idx_by_hour: dict[int, int] = {}
+
+    for hour in range(9):
+        ended = _check_c2a_staged_endpoint(
+            manager,
+            hour,
+            _flux(Na=100.0, K=100.0, SiO=100.0, Fe=100.0),
+        )
+        stage_idx_by_hour[hour] = manager._c2a_staged_stage_idx
+        if ended:
+            ended_hour = hour
+            break
+
+    assert stage_idx_by_hour[2] == 0
+    assert stage_idx_by_hour[3] == 1
+    assert stage_idx_by_hour[6] == 2
+    assert stage_idx_by_hour[7] == 3
+    assert ended_hour == 8
 
 
 @pytest.mark.parametrize("mode", OXYGEN_SINK_CHANNEL_MODE_VALUES)

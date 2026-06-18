@@ -5,13 +5,17 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.campaigns import CampaignManager
+from simulator.core import CampaignPhase
 from simulator.optimize.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     MANDATE_LEVER_ALLOWLIST,
     MANDATE_LEVER_PATHS,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
 )
+from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, MeltState
 
 
 SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
@@ -80,6 +84,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_continuous.p_total_mbar_default"),
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
         _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
+        _path("campaigns.C2A_staged.depletion_flux_decay_fraction"),
         _path("campaigns.C2A_staged.stages.sio_window.target_C"),
         _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_h"),
         _path("campaigns.C3.endpoint.hold_time_min"),
@@ -113,6 +118,37 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
             )
         patch = RecipePatch(values)
         assert patch.validated(schema).values[spec.path] == _sample_value(spec)
+
+
+def test_c2a_staged_depletion_flux_decay_mandate_knob_is_runtime_live() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.25})
+    nested = schema.to_setpoints_patch(patch)
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    setpoints["campaigns"]["C2A_staged"].update(nested["campaigns"]["C2A_staged"])
+    manager = CampaignManager(setpoints)
+    manager.configure_campaign(
+        MeltState(campaign=CampaignPhase.C2A_STAGED),
+        CampaignPhase.C2A_STAGED,
+    )
+    flux = EvaporationFlux(species_kg_hr={"Na": 10.0, "K": 8.0})
+    flux.update_totals()
+    assert not manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=0),
+        flux,
+        CondensationTrain.create_default(),
+        BatchRecord(),
+    )
+    flux = EvaporationFlux(species_kg_hr={"Na": 2.4, "K": 1.9})
+    flux.update_totals()
+
+    assert not manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=1),
+        flux,
+        CondensationTrain.create_default(),
+        BatchRecord(),
+    )
+    assert manager._c2a_staged_stage_idx == 1
 
 
 def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:

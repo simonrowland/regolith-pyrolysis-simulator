@@ -39,6 +39,8 @@ from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     RecipePatch,
@@ -844,6 +846,84 @@ def test_build_eval_inputs_c2a_staged_stage_knob_partitions_cache_and_schedule()
     )
     assert target == pytest.approx(1585.0)
     assert ramp == pytest.approx(175.0)
+
+
+def test_build_eval_inputs_c2a_staged_depletion_zero_is_cache_neutral() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    zero_spec, zero_config = _build_eval_inputs(
+        RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert zero_spec.recipe_id == default_spec.recipe_id
+    assert canonical_evalspec_json(zero_spec) == canonical_evalspec_json(default_spec)
+    assert cache_key(zero_spec) == cache_key(default_spec)
+    assert "C2A_staged" not in default_config.runtime_campaign_overrides
+    assert "C2A_staged" not in zero_config.runtime_campaign_overrides
+
+
+def test_build_eval_inputs_c2a_staged_depletion_floor_partitions_cache_and_runtime() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    subfloor_spec, subfloor_config = _build_eval_inputs(
+        RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.005}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    floor_spec, floor_config = _build_eval_inputs(
+        RecipePatch(
+            {
+                C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: (
+                    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR
+                )
+            }
+        ),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    quarter_spec, quarter_config = _build_eval_inputs(
+        RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.25}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert subfloor_spec.recipe_id == floor_spec.recipe_id
+    assert cache_key(subfloor_spec) == cache_key(floor_spec)
+    assert subfloor_config.runtime_campaign_overrides["C2A_staged"][
+        "depletion_flux_decay_fraction"
+    ] == pytest.approx(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+    assert floor_config.runtime_campaign_overrides["C2A_staged"][
+        "depletion_flux_decay_fraction"
+    ] == pytest.approx(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+    assert quarter_config.runtime_campaign_overrides["C2A_staged"][
+        "depletion_flux_decay_fraction"
+    ] == pytest.approx(0.25)
+    assert subfloor_spec.recipe_id != default_spec.recipe_id
+    assert quarter_spec.recipe_id != subfloor_spec.recipe_id
 
 
 def test_build_eval_inputs_c4_hold_temp_knob_partitions_cache_and_runtime() -> None:

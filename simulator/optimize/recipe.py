@@ -75,6 +75,10 @@ C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split(".")
 C2A_STAGED_MAX_HOLD_HR_PATH: KeyPath = tuple(
     "campaigns.C2A_staged.max_hold_hr".split(".")
 )
+C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: KeyPath = tuple(
+    "campaigns.C2A_staged.depletion_flux_decay_fraction".split(".")
+)
+C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
     "alkali_early_fe",
     "sio_window",
@@ -326,6 +330,16 @@ class RecipeSchema:
             high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
+        ),
+        _knob(
+            "campaigns.C2A_staged.depletion_flux_decay_fraction",
+            low=C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+            high=0.50,
+            units="fraction",
+            bounds_source=(
+                "engineering_envelope: disabled at 0.0; enabled optimizer "
+                "range floors positive values to 0.01"
+            ),
         ),
         _knob(
             "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
@@ -953,6 +967,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.default_hold_T_C",
         "campaigns.C2A_staged.p_total_mbar",
         "campaigns.C2A_staged.p_total_mbar_default",
+        "campaigns.C2A_staged.depletion_flux_decay_fraction",
         "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
         "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
         "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
@@ -1337,7 +1352,13 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
             for item in numeric_values:
                 _validate_numeric_bounds(spec, item)
             return
-        _validate_numeric_bounds(spec, _coerce_float(spec, value))
+        numeric_value = _coerce_float(spec, value)
+        if (
+            spec.path == C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH
+            and 0.0 <= numeric_value < C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR
+        ):
+            return
+        _validate_numeric_bounds(spec, numeric_value)
         return
     raise RecipeValidationError(f"{_format_path(spec.path)} has unknown kind")
 

@@ -71,6 +71,8 @@ from simulator.optimize.profiles import (
     validate_profile,
 )
 from simulator.optimize.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     RecipePatch,
@@ -1341,6 +1343,10 @@ def _build_eval_inputs(
         patch,
         c4_default_hold_temp_C=c4_default_hold_temp_C,
     )
+    run_options = _run_options_with_c2a_staged_depletion_flux_decay_fraction(
+        run_options,
+        patch,
+    )
     _validate_c5_eval_options(run_options, bundle.setpoints)
     setpoints_patch = schema.to_setpoints_patch(patch)
     (
@@ -1525,6 +1531,58 @@ def _run_options_with_c4_hold_temp(
     return MappingProxyType(merged)
 
 
+def _run_options_with_c2a_staged_depletion_flux_decay_fraction(
+    run_options: Mapping[str, Any],
+    patch: RecipePatch,
+) -> Mapping[str, Any]:
+    if C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH not in patch.values:
+        return run_options
+    fraction = _canonical_c2a_staged_depletion_flux_decay_fraction(
+        patch.values[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH]
+    )
+    runtime_overrides = {
+        str(campaign): dict(fields)
+        for campaign, fields in dict(
+            run_options.get("runtime_campaign_overrides", {}) or {}
+        ).items()
+    }
+    c2a_overrides = runtime_overrides.get("C2A_staged", {})
+    existing = c2a_overrides.get("depletion_flux_decay_fraction")
+    if existing is not None:
+        existing_fraction = _canonical_c2a_staged_depletion_flux_decay_fraction(existing)
+        if not math.isclose(
+            existing_fraction,
+            fraction,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            raise EvaluationInputError(
+                "campaigns.C2A_staged.depletion_flux_decay_fraction conflicts "
+                "with runtime_campaign_overrides['C2A_staged']."
+                "depletion_flux_decay_fraction"
+            )
+        return run_options
+    if fraction <= 0.0:
+        return run_options
+    merged = dict(run_options)
+    c2a_overrides = runtime_overrides.setdefault("C2A_staged", {})
+    c2a_overrides["depletion_flux_decay_fraction"] = fraction
+    merged["runtime_campaign_overrides"] = runtime_overrides
+    return MappingProxyType(merged)
+
+
+def _canonical_c2a_staged_depletion_flux_decay_fraction(value: float) -> float:
+    fraction = float(value or 0.0)
+    if not math.isfinite(fraction) or fraction < 0.0:
+        raise ValueError(
+            "campaigns.C2A_staged.depletion_flux_decay_fraction must be finite "
+            "and non-negative"
+        )
+    if fraction <= 0.0:
+        return 0.0
+    return max(fraction, C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+
+
 def _evalspec_recipe_id(
     patch: RecipePatch,
     *,
@@ -1543,6 +1601,14 @@ def _evalspec_recipe_id(
             # Coerce to float so an int cap (1) and float cap (1.0) — which run
             # identically — share one canonical recipe_id (no cache fragmentation).
             values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = cap
+    if C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH in values:
+        fraction = _canonical_c2a_staged_depletion_flux_decay_fraction(
+            values[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH]
+        )
+        if fraction <= 0.0:
+            values.pop(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH, None)
+        else:
+            values[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH] = fraction
     if C4_HOLD_TEMP_C_PATH in values:
         hold_temp = float(values[C4_HOLD_TEMP_C_PATH])
         if math.isclose(

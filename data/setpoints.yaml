@@ -187,6 +187,7 @@ campaigns:
     pO2_bar: "<1e-8"
     flow_regime: "viscous"
     target_species: ["Na", "K", "SiO", "Fe"]
+    depletion_flux_decay_fraction: 0.0
     operator_knobs:
       hold_temp_C:
         via: "adjust campaign_override C2A_staged hold_temp_C <C>"
@@ -209,6 +210,7 @@ campaigns:
           type: "flux_decay_or_duration"
           threshold_kg_hr: 0.02
           species_monitored: ["Na", "K"]
+          flux_decay_species: ["Na", "K"]
         verification:
           lunar_mare_low_ti_kg_per_1000kg:
             Na: 3.05
@@ -224,6 +226,7 @@ campaigns:
           type: "SiO_pulse_then_flux_decay_or_duration"
           threshold_kg_hr: 0.05
           species_monitored: ["SiO", "Fe", "Mg"]
+          flux_decay_species: ["SiO"]
         verification:
           note: >
             Engine ladder shows Fe/SiO/Mg overlap above ~1600 C; this stage
@@ -237,6 +240,7 @@ campaigns:
           type: "FeO_residual_or_duration"
           FeO_residual_kg_target: [20, 24]
           thermal_Fe_depletion_pct: [86, 88]
+          flux_decay_species: ["Fe"]
         verification:
           lunar_mare_low_ti_kg_per_1000kg:
             Fe_thermal_total: 116.2

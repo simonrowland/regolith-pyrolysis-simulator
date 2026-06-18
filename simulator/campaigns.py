@@ -16,6 +16,7 @@ Each campaign has:
 from __future__ import annotations
 
 import ast
+import math
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
@@ -36,6 +37,8 @@ from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
     DecisionPoint, DecisionType, EvaporationFlux, MeltState,
 )
+
+C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 
 
 class _CampaignOverrideFields(dict):
@@ -131,6 +134,9 @@ class CampaignManager:
             type(self)._refuse_unknown_override_fields)
         self.last_pO2_enforcement: dict[str, object] | None = None
         self.c5_enabled = False
+        self._c2a_staged_stage_idx: int = 0
+        self._c2a_staged_stage_start_hour: int = 0
+        self._c2a_staged_peak_flux_by_species: dict[str, float] = {}
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -405,6 +411,57 @@ class CampaignManager:
                 f'{key}.max_hold_hr must match summed stage duration_h')
         return max_hold_hr
 
+    def _c2a_staged_depletion_flux_decay_fraction(self) -> float:
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        ovr = self._campaign_overrides(CampaignPhase.C2A_STAGED)
+        raw = ovr.get(
+            'depletion_flux_decay_fraction',
+            cfg.get('depletion_flux_decay_fraction', 0.0),
+        )
+        if raw is None:
+            return 0.0
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                'C2A_staged.depletion_flux_decay_fraction must be numeric'
+            ) from exc
+        if not math.isfinite(value) or value < 0.0:
+            raise ValueError(
+                'C2A_staged.depletion_flux_decay_fraction must be finite and non-negative'
+            )
+        if value <= 0.0:
+            return 0.0
+        return max(value, C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+
+    def _c2a_staged_enabled_stages(self) -> list[dict]:
+        stages = self._campaign_config(CampaignPhase.C2A_STAGED).get('stages', [])
+        if not isinstance(stages, list):
+            return []
+        return [stage for stage in stages if isinstance(stage, dict)]
+
+    def _c2a_staged_current_stage(self) -> dict | None:
+        stages = self._c2a_staged_enabled_stages()
+        if not stages:
+            return None
+        idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
+        self._c2a_staged_stage_idx = idx
+        return stages[idx]
+
+    def _c2a_staged_flux_decay_species(self, stage: Mapping) -> tuple[str, ...]:
+        endpoint = stage.get('endpoint', {})
+        if not isinstance(endpoint, Mapping):
+            return ()
+        raw = endpoint.get('flux_decay_species', ())
+        if raw in (None, ''):
+            return ()
+        if isinstance(raw, str):
+            return (raw,)
+        try:
+            return tuple(str(species) for species in raw if str(species))
+        except TypeError as exc:
+            raise ValueError('endpoint.flux_decay_species must be a sequence') from exc
+
     # ------------------------------------------------------------------
     # Campaign configuration
     # ------------------------------------------------------------------
@@ -416,6 +473,11 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        if campaign == CampaignPhase.C2A_STAGED:
+            self._c2a_staged_stage_idx = 0
+            self._c2a_staged_stage_start_hour = 0
+            self._c2a_staged_peak_flux_by_species = {}
+
         if campaign == CampaignPhase.C0:
             ambient_pressure = max(
                 0.0, float(getattr(melt, 'ambient_pressure_mbar', 0.0) or 0.0))
@@ -604,22 +666,39 @@ class CampaignManager:
                 return (1600.0, 7.5)   # peak SiO window — slower
 
         elif campaign == CampaignPhase.C2A_STAGED:
-            cfg = self._campaign_config(campaign)
-            stages = cfg.get('stages', [])
-            if not isinstance(stages, list) or not stages:
-                return (1750.0, 150.0)
-            hour = max(0, int(campaign_hour))
-            elapsed = 0
-            selected = stages[-1]
-            for stage in stages:
-                if not isinstance(stage, dict):
-                    continue
-                duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
-                if hour < elapsed + duration:
-                    selected = stage
-                    break
-                elapsed += duration
+            if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:
+                cfg = self._campaign_config(campaign)
+                stages = cfg.get('stages', [])
+                if not isinstance(stages, list) or not stages:
+                    return (1750.0, 150.0)
+                hour = max(0, int(campaign_hour))
+                elapsed = 0
+                selected = stages[-1]
+                for stage in stages:
+                    if not isinstance(stage, dict):
+                        continue
+                    duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
+                    if hour < elapsed + duration:
+                        selected = stage
+                        break
+                    elapsed += duration
 
+                target = self._float(selected.get('target_C'), 1750.0)
+                if selected.get('name') == 'fe_hot_hold':
+                    ovr = self._campaign_overrides(campaign)
+                    target = self._float(
+                        ovr.get('hold_temp_C'),
+                        self._float(cfg.get('default_hold_T_C'), target),
+                    )
+                    ceiling = self._float(cfg.get('furnace_ceiling_C'), 1800.0)
+                    target = min(target, ceiling)
+                ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
+                return (target, ramp)
+
+            cfg = self._campaign_config(campaign)
+            selected = self._c2a_staged_current_stage()
+            if selected is None:
+                return (1750.0, 150.0)
             target = self._float(selected.get('target_C'), 1750.0)
             if selected.get('name') == 'fe_hot_hold':
                 ovr = self._campaign_overrides(campaign)
@@ -877,6 +956,77 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C2A_STAGED:
             max_hold_hr = self._configured_staged_max_hold_hr(campaign)
+            fraction = self._c2a_staged_depletion_flux_decay_fraction()
+            if fraction <= 0.0:
+                if melt.campaign_hour + 1 >= max_hold_hr:
+                    return True
+                return False
+
+            stages = self._c2a_staged_enabled_stages()
+            if not stages:
+                if melt.campaign_hour + 1 >= max_hold_hr:
+                    return True
+                return False
+            stage_idx = min(
+                max(0, int(self._c2a_staged_stage_idx)),
+                len(stages) - 1,
+            )
+            self._c2a_staged_stage_idx = stage_idx
+            stage = stages[stage_idx]
+            species = self._c2a_staged_flux_decay_species(stage)
+            for species_name in species:
+                raw_current = evap_flux.species_kg_hr.get(species_name, 0.0)
+                current = max(0.0, self._float(raw_current, 0.0))
+                previous = self._c2a_staged_peak_flux_by_species.get(
+                    species_name,
+                    0.0,
+                )
+                if current > previous:
+                    self._c2a_staged_peak_flux_by_species[species_name] = current
+
+            endpoint = stage.get('endpoint', {})
+            if not isinstance(endpoint, Mapping):
+                endpoint = {}
+            stage_elapsed_h = melt.campaign_hour - self._c2a_staged_stage_start_hour + 1
+            duration_h = max(1, int(self._float(stage.get('duration_h'), 1.0)))
+            min_hold_h = self._float(
+                endpoint.get('min_hold_h', endpoint.get('min_hold_hr')),
+                1.0,
+            )
+            # Gate only on flux_decay_species that have actually EVOLVED in this
+            # stage (peak > 0). A listed species that never evolves (e.g. K in a
+            # K-poor feedstock) is intentionally NOT a gate — otherwise the stage
+            # would wait for a flux that never comes and only the duration_h
+            # timeout could end it. For co-evolving listed species (e.g. Na+K),
+            # ALL that have peaked must decay below the fraction before advancing.
+            observed_peaks = {
+                species_name: peak
+                for species_name, peak in self._c2a_staged_peak_flux_by_species.items()
+                if species_name in species and peak > 0.0
+            }
+            flux_depleted = (
+                stage_elapsed_h >= min_hold_h
+                and bool(observed_peaks)
+                and all(
+                    max(
+                        0.0,
+                        self._float(
+                            evap_flux.species_kg_hr.get(species_name, 0.0),
+                            0.0,
+                        ),
+                    ) <= fraction * peak
+                    for species_name, peak in observed_peaks.items()
+                )
+            )
+            stage_timeout = stage_elapsed_h >= duration_h
+            final_stage = stage_idx >= len(stages) - 1
+            if flux_depleted or stage_timeout:
+                if final_stage:
+                    return True
+                self._c2a_staged_stage_idx = stage_idx + 1
+                self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
+                self._c2a_staged_peak_flux_by_species = {}
+                return False
             if melt.campaign_hour + 1 >= max_hold_hr:
                 return True
 
