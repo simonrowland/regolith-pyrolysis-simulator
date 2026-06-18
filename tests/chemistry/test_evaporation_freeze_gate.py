@@ -465,7 +465,12 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         enabled=True,
     )
     sim.start_campaign(CampaignPhase.C2A)
-    sim.melt.temperature_C = 1600.0
+    # Start AT the continuous target so the melt holds a stable super-liquidus
+    # plateau across the 10 steps — that is what makes the freeze-gate liquid-
+    # fraction cache quantize (hold) instead of rebuilding every tick. The C2A
+    # continuous target is now furnace_max_T_C (S2a1b); pin the start there
+    # (was hardcoded 1600, which only plateaued under the old 1600 cap).
+    sim.melt.temperature_C = sim.campaign_mgr.furnace_max_T_C
     original_dispatch = sim._dispatch_only
     gate_calls = 0
 

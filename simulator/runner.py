@@ -1661,7 +1661,10 @@ def _prepare_sio_campaign_start(
         if campaign == CampaignPhase.C2A:
             if ramp_c_per_hr is not None:
                 ramp_rate = float(ramp_c_per_hr)
-            return (float(t_hold_c), ramp_rate)
+            return (
+                sim.campaign_mgr._clamp_to_furnace_max(float(t_hold_c)),
+                ramp_rate,
+            )
         return (target, ramp_rate)
 
     sim.campaign_mgr.get_temp_target = _sio_twindow_temp_target

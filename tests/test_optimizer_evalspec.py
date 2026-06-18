@@ -1832,6 +1832,59 @@ def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
         )
 
 
+def test_c2a_profile_window_uses_setpoints_furnace_ceiling_when_constraint_unset(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["furnace_max_T_C"] = 1400.0
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+
+    with pytest.raises(EvaluationInputError, match="furnace_T_max_C 1400 C"):
+        evaluate_module._build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            _c2a_window_profile(1350.0, 1450.0, 18),
+            RecipeSchema(),
+        )
+
+
+def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bundle = load_config_bundle()
+    setpoints = copy.deepcopy(bundle.setpoints)
+    setpoints["furnace_max_T_C"] = 1400.0
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+    schedule = _lab_schedule(
+        duration_h=2.0,
+        temperature_points=((0.0, 25.0), (1.0, 1450.0), (2.0, 1400.0)),
+        pressure_points=((0.0, 13.0), (1.0, 14.0), (2.0, 15.0)),
+        furnace_ceiling_C=1800.0,
+    )
+
+    with pytest.raises(
+        EvaluationInputError,
+        match="lab_schedule_temperature_exceeds_furnace_T_max_C",
+    ):
+        evaluate_module._build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            _lab_schedule_profile(schedule),
+            RecipeSchema(),
+        )
+
+
 def test_in_window_c2a_run_captures_na_product() -> None:
     _, run_config = _build_eval_inputs(
         RecipePatch({}),

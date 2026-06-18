@@ -9,6 +9,12 @@
 # Source: context-setpoints.yaml v2 + context-core.md + context-thermo.md
 # ============================================================================
 
+# Top-level operator furnace ceiling. Grounding: docs-private/research/
+# 2026-06-18-furnace-max-temp/findings.md recommends default 1800 C and
+# bounds [1300, 2000] from refractory service temperatures plus 1800-2100 C
+# solar vacuum pyrolysis operating evidence.
+furnace_max_T_C: 1800
+
 # ============================================================================
 # 1. CAMPAIGNS
 # ============================================================================
@@ -107,6 +113,8 @@ campaigns:
     label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
     activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
     preferred_default: true
+    # Continuous runtime peak is clamped to top-level furnace_max_T_C;
+    # temp_range_C is the searchable ramp envelope, not the hard peak.
     temp_range_C: [1050, 1600]           # single continuous metered ramp
     dT_dt_C_per_hr:
       early_ramp_1050_1320C: [10, 20]    # Na/K and early Fe regime
@@ -176,7 +184,6 @@ campaigns:
     activation_condition: "Path_A_staged AND sequential_product_collection"
     preferred_default: false
     temp_range_C: [1250, 1750]
-    furnace_ceiling_C: 1800
     default_hold_T_C: 1750
     atmosphere: "recirculating_inert_sweep"
     carrier_gas: "pN2"

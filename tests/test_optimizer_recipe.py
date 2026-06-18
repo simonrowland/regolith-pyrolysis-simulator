@@ -16,6 +16,7 @@ from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
+    FURNACE_MAX_T_C_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -177,6 +178,27 @@ def test_int_kind_rejects_float_and_bool() -> None:
         RecipePatch({hold_time: True}).validated()
 
 
+def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(FURNACE_MAX_T_C_PATH)
+
+    assert spec.low == pytest.approx(1300.0)
+    assert spec.high == pytest.approx(2000.0)
+    assert spec.units == "C"
+    assert spec.runtime_enabled is True
+    assert RecipePatch({FURNACE_MAX_T_C_PATH: 1300.0}).validated(schema)
+    assert RecipePatch({FURNACE_MAX_T_C_PATH: 2000.0}).validated(schema)
+    with pytest.raises(RecipeValidationError, match="below lower bound"):
+        RecipePatch({FURNACE_MAX_T_C_PATH: 1299.0}).validated(schema)
+    with pytest.raises(RecipeValidationError, match="above upper bound"):
+        RecipePatch({FURNACE_MAX_T_C_PATH: 2001.0}).validated(schema)
+
+    nested = schema.to_setpoints_patch(RecipePatch({FURNACE_MAX_T_C_PATH: 1450.0}))
+    assert nested == {"furnace_max_T_C": 1450.0}
+    config = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)._session_config()
+    assert config.setpoints["furnace_max_T_C"] == pytest.approx(1450.0)
+
+
 def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     patch = RecipePatch(
         {
@@ -204,6 +226,71 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
         20,
         24,
     ]
+
+
+def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    manager = CampaignManager(setpoints)
+
+    target, ramp = manager.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
+    )
+    assert target == pytest.approx(1800.0)
+    assert ramp == pytest.approx(15.0)
+
+    setpoints["furnace_max_T_C"] = 1400.0
+    manager = CampaignManager(setpoints)
+    assert manager.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        7,
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=7),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C2B,
+        0,
+        MeltState(campaign=CampaignPhase.C2B),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C3_K,
+        3,
+        MeltState(campaign=CampaignPhase.C3_K),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C4,
+        0,
+        MeltState(campaign=CampaignPhase.C4),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C5,
+        0,
+        MeltState(campaign=CampaignPhase.C5),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C6,
+        0,
+        MeltState(campaign=CampaignPhase.C6),
+    )[0] == pytest.approx(1400.0)
+    assert manager.get_temp_target(
+        CampaignPhase.COMPLETE,
+        0,
+        MeltState(campaign=CampaignPhase.COMPLETE),
+    )[0] is None
+
+
+@pytest.mark.parametrize("value", [1299.0, 2000.1, float("inf"), "nan", "hot"])
+def test_furnace_max_t_c_setpoints_validation_fails_loud(value) -> None:
+    setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["furnace_max_T_C"] = value
+
+    with pytest.raises(ValueError, match="furnace_max_T_C"):
+        CampaignManager(setpoints)
 
 
 def test_c2a_staged_flux_decay_species_setpoints_are_explicit_ascii() -> None:

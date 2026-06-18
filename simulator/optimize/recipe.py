@@ -23,8 +23,9 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v7"
+allowlist_version = "allowlist-v8"
 
+FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
     "campaigns.C5.allow_mre_voltage_cap_V".split(".")
 )
@@ -191,6 +192,17 @@ class RecipeSchema:
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
+        _knob(
+            "furnace_max_T_C",
+            low=1300,
+            high=2000,
+            units="C",
+            bounds_source=(
+                "engineering_envelope service-temperature grounding from "
+                "docs-private/research/2026-06-18-furnace-max-temp/findings.md"
+            ),
+            runtime_enabled=True,
+        ),
         _knob(
             "campaigns.C0.temp_range_C",
             low=20,
@@ -951,6 +963,7 @@ class RecipeSchema:
 MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
     tuple(path.split("."))
     for path in (
+        "furnace_max_T_C",
         "campaigns.C0.temp_range_C",
         "campaigns.C0.dT_dt_C_per_hr",
         "campaigns.C0b_p_cleanup.temp_range_C",

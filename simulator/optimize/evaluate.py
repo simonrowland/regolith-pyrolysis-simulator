@@ -1814,7 +1814,11 @@ def _thermal_scheduled_run_options(
     constraints: PhysicsConstraintSet | None,
     setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any]:
-    lab_schedule = _profile_lab_schedule(run_options, constraints=constraints)
+    lab_schedule = _profile_lab_schedule(
+        run_options,
+        constraints=constraints,
+        setpoints=setpoints,
+    )
     if lab_schedule is not None:
         if _profile_thermal_window_schedule(
             run_options,
@@ -1862,6 +1866,7 @@ def _profile_lab_schedule(
     run_options: Mapping[str, Any],
     *,
     constraints: PhysicsConstraintSet | None,
+    setpoints: Mapping[str, Any],
 ) -> Mapping[str, Any] | None:
     raw = run_options.get("lab_schedule")
     if raw is None:
@@ -1870,7 +1875,7 @@ def _profile_lab_schedule(
         schedule = normalize_lab_schedule(raw)
     except LabScheduleValidationError as exc:
         raise EvaluationInputError(str(exc)) from exc
-    ceiling_C = _furnace_ceiling_C(constraints)
+    ceiling_C = _furnace_ceiling_C(constraints, setpoints)
     scheduled_peak = max(
         float(point["value"])
         for point in schedule["melt_temperature_C"]
@@ -1958,7 +1963,7 @@ def _profile_thermal_window_schedule(
         raise EvaluationInputError(
             f"{campaign}.temp_range_C must be ascending; got {temp_range!r}"
         )
-    ceiling_C = _furnace_ceiling_C(constraints)
+    ceiling_C = _furnace_ceiling_C(constraints, setpoints)
     if high_C > ceiling_C:
         raise EvaluationInputError(
             f"{campaign}.temp_range_C high {high_C:g} C exceeds "
@@ -2052,13 +2057,17 @@ def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) ->
     return numeric
 
 
-def _furnace_ceiling_C(constraints: PhysicsConstraintSet | None) -> float:
+def _furnace_ceiling_C(
+    constraints: PhysicsConstraintSet | None,
+    setpoints: Mapping[str, Any],
+) -> float:
+    hardware_ceiling_C = float(setpoints.get("furnace_max_T_C", 1800.0))
     if constraints is None:
-        return 1800.0
+        return hardware_ceiling_C
     threshold = getattr(constraints, "furnace_T_max_C", None)
     value = getattr(threshold, "value", None)
     if value is None:
-        return 1800.0
+        return hardware_ceiling_C
     return float(value)
 
 

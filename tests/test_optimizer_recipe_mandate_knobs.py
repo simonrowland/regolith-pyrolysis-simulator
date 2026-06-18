@@ -9,6 +9,7 @@ from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    FURNACE_MAX_T_C_PATH,
     MANDATE_LEVER_ALLOWLIST,
     MANDATE_LEVER_PATHS,
     RecipePatch,
@@ -61,7 +62,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v7" == schema.allowlist_version
+    assert "allowlist-v8" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -80,6 +81,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     schema = RecipeSchema()
 
     required_examples = {
+        _path("furnace_max_T_C"),
         _path("campaigns.C0b_p_cleanup.pO2_mbar_default"),
         _path("campaigns.C2A_continuous.p_total_mbar_default"),
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
@@ -149,6 +151,24 @@ def test_c2a_staged_depletion_flux_decay_mandate_knob_is_runtime_live() -> None:
         BatchRecord(),
     )
     assert manager._c2a_staged_stage_idx == 1
+
+
+def test_furnace_max_t_c_mandate_knob_is_runtime_live() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({FURNACE_MAX_T_C_PATH: 1300.0})
+    nested = schema.to_setpoints_patch(patch)
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    setpoints.update(nested)
+    manager = CampaignManager(setpoints)
+
+    target, _ = manager.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
+    )
+
+    assert target == pytest.approx(1300.0)
+    assert patch.validated(schema).recipe_id() != RecipePatch({}).recipe_id(schema)
 
 
 def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:

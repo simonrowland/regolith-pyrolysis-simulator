@@ -124,6 +124,21 @@ class CampaignManager:
     def __init__(self, setpoints: dict):
         self.setpoints = setpoints
         self.campaigns = setpoints.get('campaigns', {})
+        try:
+            self.furnace_max_T_C = self._float(
+                setpoints.get('furnace_max_T_C', 1800.0),
+                1800.0,
+            )
+        except ValueError as exc:
+            raise ValueError('furnace_max_T_C must be numeric') from exc
+        if (
+            not math.isfinite(self.furnace_max_T_C)
+            or self.furnace_max_T_C < 1300.0
+            or self.furnace_max_T_C > 2000.0
+        ):
+            # Grounding: docs-private/research/
+            # 2026-06-18-furnace-max-temp/findings.md
+            raise ValueError('furnace_max_T_C must be finite and within [1300, 2000]')
         # User-configurable overrides
         self.c4_max_temp_C = 1670.0  # Max T for C4 Mg pyrolysis (default)
 
@@ -630,7 +645,13 @@ class CampaignManager:
             target_T is None for isothermal holds or MRE campaigns.
         """
         result = self._get_base_temp_target(campaign, campaign_hour, melt)
-        return self._apply_ramp_override(campaign, result[0], result[1])
+        target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
+        return (self._clamp_to_furnace_max(target_T), ramp_rate)
+
+    def _clamp_to_furnace_max(self, target_T: Optional[float]) -> Optional[float]:
+        if target_T is None:
+            return None
+        return min(target_T, self.furnace_max_T_C)
 
     def _get_base_temp_target(self, campaign: CampaignPhase,
                                campaign_hour: int,
@@ -658,12 +679,12 @@ class CampaignManager:
             return (1250.0, 30.0)
 
         elif campaign == CampaignPhase.C2A:
-            # Continuous ramp 1050 → 1600°C
+            # Continuous ramp 1050 C -> furnace_max_T_C
             # Ramp rate varies: 15°C/hr early, 7.5°C/hr at peak SiO window
             if melt.temperature_C < 1320:
-                return (1600.0, 15.0)  # early ramp
+                return (self.furnace_max_T_C, 15.0)  # early ramp
             else:
-                return (1600.0, 7.5)   # peak SiO window — slower
+                return (self.furnace_max_T_C, 7.5)   # peak SiO window — slower
 
         elif campaign == CampaignPhase.C2A_STAGED:
             if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:
@@ -690,8 +711,6 @@ class CampaignManager:
                         ovr.get('hold_temp_C'),
                         self._float(cfg.get('default_hold_T_C'), target),
                     )
-                    ceiling = self._float(cfg.get('furnace_ceiling_C'), 1800.0)
-                    target = min(target, ceiling)
                 ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
                 return (target, ramp)
 
@@ -706,8 +725,6 @@ class CampaignManager:
                     ovr.get('hold_temp_C'),
                     self._float(cfg.get('default_hold_T_C'), target),
                 )
-                ceiling = self._float(cfg.get('furnace_ceiling_C'), 1800.0)
-                target = min(target, ceiling)
             ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
             return (target, ramp)
 
@@ -739,7 +756,6 @@ class CampaignManager:
                 ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
                 self.c4_max_temp_C,
             )
-            target = min(target, 1900.0)  # safety cap
             return (target, 10.0)
 
         elif campaign == CampaignPhase.C5:
