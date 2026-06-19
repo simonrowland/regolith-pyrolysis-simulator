@@ -577,6 +577,69 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
 
 
+def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> None:
+    diagnostic = {
+        "schema_version": "knob-saturation-v1",
+        "tolerance_fraction": 0.01,
+        "pinned_count": 1,
+        "no_opposing_cost_pinned_count": 1,
+        "red_flag": True,
+        "knobs": [
+            {
+                "key": "campaigns.C0.temp_range_C[1]",
+                "value": 950.0,
+                "low": 20,
+                "high": 950,
+                "pinned": "high",
+                "frac_of_range": 1.0,
+                "kind": "float",
+                "units": "C",
+                "has_opposing_cost": False,
+                "opposing_cost_metrics": [],
+            }
+        ],
+    }
+    base_evaluator = _evaluator()
+
+    def evaluator(*args: Any, **kwargs: Any) -> ScoredResult:
+        scored = base_evaluator(*args, **kwargs)
+        assert scored.run_reference is not None
+        trace = dict(scored.run_reference.trace or {})
+        trace["knob_saturation"] = diagnostic
+        return replace(
+            scored,
+            run_reference=replace(scored.run_reference, trace=trace),
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=evaluator,
+    )
+
+    pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
+    assert pareto_payload["winner_knob_saturation"] == diagnostic
+    pareto_rows = {row["candidate_id"]: row for row in pareto_payload["pareto"]}
+    assert (
+        pareto_rows[result.winner.candidate_id]["trace_summary"]["knob_saturation"]
+        == diagnostic
+    )
+    provenance_rows = {row["candidate_id"]: row for row in _read_provenance(tmp_path)}
+    assert (
+        provenance_rows[result.winner.candidate_id]["trace_summary"]["knob_saturation"]
+        == diagnostic
+    )
+
+    header = (tmp_path / "leaderboard.csv").read_text().splitlines()[0]
+    assert "knob_saturation" not in header
+
+
 def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:
     profile = _closed_loop_best_tap_profile()
     executor = _ClosedLoopTapExecutor()

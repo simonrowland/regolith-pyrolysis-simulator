@@ -1587,6 +1587,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "allow_fallback_vapor",
             "force_builtin_vapor_pressure",
             "kernel_fallback_used",
+            "knob_saturation",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -1760,6 +1761,7 @@ def _light_backend_status_trace_for_reference(
             "allow_fallback_vapor",
             "force_builtin_vapor_pressure",
             "kernel_fallback_used",
+            "knob_saturation",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
@@ -2157,7 +2159,13 @@ def _pareto_payload(
         "profile": profile_id(profile),
         "selection_rule": WINNER_SELECTION_RULE,
         "winner_candidate_id": winner.candidate_id,
+        "winner_knob_saturation": _winner_knob_saturation_payload(winner),
     }
+
+
+def _winner_knob_saturation_payload(winner: StudyRecord) -> Any:
+    payload = winner.trace_summary.get("knob_saturation")
+    return _jsonable_value(payload) if isinstance(payload, Mapping) else None
 
 
 def _definition_payload(definition: ObjectiveDefinition) -> Mapping[str, Any]:

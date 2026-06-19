@@ -42,6 +42,7 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
     canonicalize_fidelity_emission,
@@ -652,6 +653,7 @@ def evaluate(
             run_execution,
             objective_profile,
             patch=validated_patch,
+            schema=active_schema,
             constraints=active_constraints,
         )
 
@@ -751,6 +753,16 @@ def evaluate(
             objectives,
             run_execution,
         )
+        trace_payload = _trace_payload_with_knob_saturation(
+            trace_payload,
+            compute_knob_saturation(
+                validated_patch,
+                active_schema,
+                active_objective_metrics=(
+                    value.metric for value in objectives.values
+                ),
+            ),
+        )
     except OverflowError as exc:
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
@@ -782,6 +794,15 @@ def evaluate(
             trace_payload=trace_payload,
         ),
     )
+
+
+def _trace_payload_with_knob_saturation(
+    trace_payload: Mapping[str, Any] | None,
+    knob_saturation: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    payload = dict(trace_payload) if isinstance(trace_payload, Mapping) else {}
+    payload["knob_saturation"] = knob_saturation
+    return MappingProxyType(payload)
 
 
 def _execute_run(
@@ -2505,6 +2526,7 @@ def _out_of_domain_result(
     profile: Mapping[str, Any],
     *,
     patch: RecipePatch,
+    schema: RecipeSchema,
     constraints: PhysicsConstraintSet | None,
 ) -> ScoredResult:
     assessment = _assess_rump_terminal(run_execution)
@@ -2561,6 +2583,16 @@ def _out_of_domain_result(
             objectives,
             scoring_execution,
             base_trace=assessment.trace_payload,
+        )
+        trace_payload = _trace_payload_with_knob_saturation(
+            trace_payload,
+            compute_knob_saturation(
+                patch,
+                schema,
+                active_objective_metrics=(
+                    value.metric for value in objectives.values
+                ),
+            ),
         )
         margins = dict(feasibility.margins)
         margins["rump_terminal"] = _rump_terminal_margin(assessment)

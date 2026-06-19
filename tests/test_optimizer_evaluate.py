@@ -33,7 +33,7 @@ from simulator.optimize.evaluate import (
     _composition_target_constraints,
     evaluate,
 )
-from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cache_key
 from simulator.optimize.objective import objective_definitions
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
@@ -355,6 +355,30 @@ def test_cleaned_melt_stage0_pool_soft_endpoint_sets_stop_partition() -> None:
         "composition_target:stage0-clean-basalt-explore"
     ]
     assert 0.0 < score < 1.0
+
+
+def test_feasible_evaluate_trace_includes_knob_saturation_without_cache_key_change() -> None:
+    patch = RecipePatch({("campaigns", "C0", "temp_range_C"): [20.0, 950.0]})
+    result = evaluate(
+        patch,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution=_execution()),
+    )
+
+    assert result.feasible
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+    trace = result.run_reference.trace
+    saturation = trace["knob_saturation"]
+    assert saturation["schema_version"] == "knob-saturation-v1"
+    assert saturation["red_flag"] is True
+    assert saturation["pinned_count"] == 2
+    assert {row["key"] for row in saturation["knobs"]} == {
+        "campaigns.C0.temp_range_C[0]",
+        "campaigns.C0.temp_range_C[1]",
+    }
 
 
 def _execution(
@@ -2299,9 +2323,16 @@ def test_out_of_domain_earned_rump_terminal_composition_target_scores_success() 
     assert rump_margin.observed == pytest.approx(0.0)
     assert rump_margin.margin >= 0.0
     assert result.run_reference is not None
-    assert result.run_reference.trace["rump_terminal"]["status"] == "earned"
-    assert result.run_reference.trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
-    assert result.run_reference.trace["composition_target"]["terminal_rump_source"] == "earned_crash"
+    result_trace = result.run_reference.trace
+    assert result_trace["rump_terminal"]["status"] == "earned"
+    assert result_trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+    assert result_trace["composition_target"]["terminal_rump_source"] == "earned_crash"
+    saturation = result_trace["knob_saturation"]
+    assert saturation["schema_version"] == "knob-saturation-v1"
+    assert saturation["red_flag"] is False
+    assert {row["key"] for row in saturation["knobs"]} == {
+        "campaigns.C0b_p_cleanup.pO2_mbar_default"
+    }
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_segment_species"
     ]["hot_wall"]["SiO2"] == pytest.approx(0.25)
