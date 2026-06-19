@@ -729,13 +729,14 @@ class CampaignManager:
                 if selected is None:
                     return (1750.0, 150.0)
 
-                target = self._float(selected.get('target_C'), 1750.0)
                 if selected.get('name') == 'fe_hot_hold':
                     ovr = self._campaign_overrides(campaign)
                     target = self._float(
                         ovr.get('hold_temp_C'),
-                        self._float(cfg.get('default_hold_T_C'), target),
+                        self._float(cfg.get('default_hold_T_C'), 1750.0),
                     )
+                else:
+                    target = self._float(selected.get('target_C'), 1750.0)
                 ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
                 return (target, ramp)
 
@@ -743,13 +744,14 @@ class CampaignManager:
             selected = self._c2a_staged_current_stage()
             if selected is None:
                 return (1750.0, 150.0)
-            target = self._float(selected.get('target_C'), 1750.0)
             if selected.get('name') == 'fe_hot_hold':
                 ovr = self._campaign_overrides(campaign)
                 target = self._float(
                     ovr.get('hold_temp_C'),
-                    self._float(cfg.get('default_hold_T_C'), target),
+                    self._float(cfg.get('default_hold_T_C'), 1750.0),
                 )
+            else:
+                target = self._float(selected.get('target_C'), 1750.0)
             ramp = self._float(selected.get('ramp_rate_C_per_hr'), 150.0)
             return (target, ramp)
 
