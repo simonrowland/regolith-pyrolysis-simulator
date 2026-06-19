@@ -417,7 +417,7 @@ def test_mre_preset_catalog_route_returns_shared_ladder(client) -> None:
 
     by_target = {preset.get("mre_target_species"): preset for preset in presets}
     assert by_target[""]["c5_enabled"] is False
-    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.4)
+    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.45)
     assert by_target["SiO2"]["included_species"] == ["Ni", "Fe", "Cr", "Mn", "Si"]
     assert by_target["Na2O"]["enabled"] is False
     assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
@@ -432,7 +432,7 @@ def test_mre_preset_catalog_fragment_is_golden(client) -> None:
     assert 'value="off"' in html
     assert 'data-c5-enabled="false"' in html
     assert 'value="target:SiO2"' in html
-    assert 'data-max-voltage="1.4"' in html
+    assert 'data-max-voltage="1.45"' in html
     assert 'data-included-species="Ni, Fe, Cr, Mn, Si"' in html
     assert "Na2O" in html
     assert "disabled" in html
@@ -574,7 +574,7 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         spec_a,
         recipe_id="recipe-b",
         c5_enabled=True,
-        mre_max_voltage_V=1.4,
+        mre_max_voltage_V=1.45,
         mre_target_species="SiO2",
     )
     store = ResultStore(run_dir / "cache.sqlite")
@@ -615,7 +615,7 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         == 12.0
     )
     assert run["latest_result"]["eval_spec"]["c5_enabled"] is True
-    assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.4
+    assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.45
     assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
     assert run["latest_result"]["backend"]["backend_requested"] == "stub"
     assert run["latest_result"]["backend"]["backend_active"] == "StubBackend"

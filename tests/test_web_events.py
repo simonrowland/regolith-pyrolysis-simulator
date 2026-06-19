@@ -149,7 +149,7 @@ def test_web_start_payload_exposes_backend_status():
         backend_payload=expected_backend,
         c5_enabled=True,
         mre_target_species="SiO2",
-        mre_max_voltage_V=1.4,
+        mre_max_voltage_V=1.45,
     )
 
     for key, value in expected_backend.items():
@@ -158,7 +158,7 @@ def test_web_start_payload_exposes_backend_status():
     assert payload["backend_authoritative"] is False
     assert payload["c5_enabled"] is True
     assert payload["mre_target_species"] == "SiO2"
-    assert payload["mre_max_voltage_V"] == pytest.approx(1.4)
+    assert payload["mre_max_voltage_V"] == pytest.approx(1.45)
 
 
 def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
@@ -196,7 +196,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
                 "track": "pyrolysis",
                 "c5_enabled": True,
                 "mre_target_species": "SiO2",
-                "mre_max_voltage_V": 1.4,
+                "mre_max_voltage_V": 1.45,
                 "runtime_campaign_overrides": {
                     "C4": {
                         "pO2_mbar": 0.2,
@@ -217,7 +217,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         started = statuses[-1]
         assert started["c5_enabled"] is True
         assert started["mre_target_species"] == "SiO2"
-        assert started["mre_max_voltage_V"] == pytest.approx(1.4)
+        assert started["mre_max_voltage_V"] == pytest.approx(1.45)
         assert started["backend_status"] == "unavailable"
 
         new_sids = set(_simulations) - before
@@ -227,7 +227,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         sim = state["session"].simulator
         assert sim.melt.c5_enabled is True
         assert sim.melt.mre_target_species == "SiO2"
-        assert sim.melt.mre_max_voltage_V == pytest.approx(1.4)
+        assert sim.melt.mre_max_voltage_V == pytest.approx(1.45)
         assert sim.campaign_mgr.overrides["C4"]["pO2_mbar"] == pytest.approx(0.2)
     finally:
         client.disconnect()

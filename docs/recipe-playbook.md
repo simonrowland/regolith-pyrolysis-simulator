@@ -121,7 +121,7 @@ Source: `data/setpoints.yaml` lines 324–363.
 **Branch Two max voltage**: 1.6 V; targets Si as liquid metal.  
 **Electrical energy**: 600–1200 kWh/t (Branch Two).
 
-The MRE voltage sequence proceeds: FeO at 0.6 V (should be pre-depleted), Cr₂O₃/MnO at 0.8–1.0 V, SiO₂ at 1.4 V (primary C5 target; permanently removes the SiO source from the melt), TiO₂ at 1.5 V. To produce Al–Ti alloy in C6 instead of pure Al, stop C5 before the TiO₂ sweep at 1.5–1.6 V and retain TiO₂ for the thermite.
+The MRE voltage sequence proceeds: FeO at 0.75 V (should be pre-depleted), Cr2O3 at 0.95 V, MnO at 1.05 V, SiO2 at 1.45 V (primary C5 target; permanently removes the SiO source from the melt), TiO2 at 1.70 V. To produce Al-Ti alloy in C6 instead of pure Al, stop C5 before the TiO2 sweep and retain TiO2 for the thermite.
 
 Electrode materials: Ir or Pt-alloy anode, Mo or W cathode. Branch Two extends electrode life 5–10× compared to full-scope MRE.
 
@@ -142,7 +142,7 @@ Source: `data/setpoints.yaml` lines 401–442.
 
 ### MRE_BASELINE
 
-Full electrolysis comparison path without pyrolysis pretreatment. Runs the complete MRE voltage sequence from FeO (0.6 V) through CaO (2.5 V). Used to quantify what pyrolysis pretreatment saves in electrical energy, electrode life, and corrosion exposure.
+Full electrolysis comparison path without pyrolysis pretreatment. Runs the complete MRE voltage sequence from NiO (0.39 V) and FeO (0.75 V) through CaO (2.5 V). Used to quantify what pyrolysis pretreatment saves in electrical energy, electrode life, and corrosion exposure.
 
 ## Operator decision points
 

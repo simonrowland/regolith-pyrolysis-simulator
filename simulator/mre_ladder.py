@@ -6,14 +6,16 @@ import math
 from typing import Any
 
 
+# Fallback mirrors the raw-thermo reanchor in electrolysis.DECOMP_VOLTAGES
+# (NIST-JANAF/Chase 1998, Barin, O'Neill 1988, Robie-Hemingway, NEA).
 MRE_VOLTAGE_LADDER_FALLBACK = (
     {'voltage': 0.39, 'species': ('NiO',), 'min_hold_hours': 2},
-    {'voltage': 0.6, 'species': ('FeO',), 'min_hold_hours': 3},
-    {'voltage': 0.9, 'species': ('Cr2O3',), 'min_hold_hours': 2},
-    {'voltage': 1.0, 'species': ('MnO',), 'min_hold_hours': 2},
-    {'voltage': 1.4, 'species': ('SiO2',), 'min_hold_hours': 5},
-    {'voltage': 1.5, 'species': ('TiO2',), 'min_hold_hours': 3},
-    {'voltage': 1.9, 'species': ('Al2O3',), 'min_hold_hours': 8},
+    {'voltage': 0.75, 'species': ('FeO',), 'min_hold_hours': 3},
+    {'voltage': 0.95, 'species': ('Cr2O3',), 'min_hold_hours': 2},
+    {'voltage': 1.05, 'species': ('MnO',), 'min_hold_hours': 2},
+    {'voltage': 1.45, 'species': ('SiO2',), 'min_hold_hours': 5},
+    {'voltage': 1.70, 'species': ('TiO2',), 'min_hold_hours': 3},
+    {'voltage': 1.95, 'species': ('Al2O3',), 'min_hold_hours': 8},
     {'voltage': 2.2, 'species': ('MgO',), 'min_hold_hours': 5},
     {'voltage': 2.5, 'species': ('CaO',), 'min_hold_hours': 10},
 )

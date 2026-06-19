@@ -314,7 +314,7 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
         "run": {
             **PROFILE["run"],
             "c5_enabled": True,
-            "mre_max_voltage_V": 1.4,
+            "mre_max_voltage_V": 1.45,
             "mre_target_species": "SiO2",
         },
     }
@@ -352,7 +352,7 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_prefix.eval_spec.prefix_recipe_ids == (base.recipe_id,)
     assert loaded_prefix.eval_spec.topology_id == "PATH_AB"
     assert loaded_prefix.eval_spec.c5_enabled is True
-    assert loaded_prefix.eval_spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert loaded_prefix.eval_spec.mre_max_voltage_V == pytest.approx(1.45)
     assert loaded_prefix.eval_spec.mre_target_species == "SiO2"
     assert loaded_prefix.eval_spec.vapor_pressure_provider_id == "builtin-vapor-pressure"
     assert loaded_prefix.eval_spec.vapor_pressure_fallback_provider_id == (

@@ -33,14 +33,13 @@ Standard MRE Baseline (root branch alternative).
         densities (approximated here by concentration and
         voltage proximity).
 
-Standard decomposition voltages at ~1600°C (per mol O₂):
-    Na₂O:  <0.5 V   K₂O:   <0.5 V   FeO:    0.6 V
-    Fe₂O₃: 0.75 V   Cr₂O₃: 0.9 V    MnO:    1.0 V
-    SiO₂:  1.4 V
-    TiO₂:  1.5 V    Al₂O₃: 1.9 V    MgO:    2.2 V
-    CaO:   2.5 V
+Standard decomposition voltages at ~1873 K / ~1600 C (per mol O2):
+    NiO:   0.39 V   Na2O:  0.5 V    K2O:    0.5 V
+    FeO:   0.75 V   Fe2O3: 0.90 V   Cr2O3:  0.95 V
+    MnO:   1.05 V   SiO2:  1.45 V   TiO2:   1.70 V
+    Al2O3: 1.95 V   MgO:   2.2 V    CaO:    2.5 V
 
-Source: Ellingham diagram at 1600°C (context-setpoints.yaml §9)
+Source: raw-thermo reanchor, E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
 """
 
 from __future__ import annotations
@@ -53,30 +52,36 @@ from simulator.core import (
 )
 
 
-# Standard decomposition voltages at ~1600°C (V)
+# Standard decomposition voltages at ~1873 K / ~1600 C (V).
+# Raw-thermo rungs use E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
 DECOMP_VOLTAGES = {
-    # NiO source: ΔfG°(NiO, ~1873 K) ≈ -76 kJ/mol
+    # NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol
     # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
-    # Chemical Thermodynamics of Nickel]; E = -ΔfG/(2F) ≈ 0.39 V
+    # Chemical Thermodynamics of Nickel]; E = -DeltaGf/(2F) ~= 0.39 V
     # standard-state. Runtime Nernst applies melt activity + pO2.
-    # This NiO rung is raw-thermo-derived; legacy rungs (FeO = 0.6, etc.)
-    # are empirically compressed without per-rung provenance (raw
-    # -ΔfG(FeO)/(2F) ≈ 0.75 V, not 0.6), so absolute values mix two
-    # scales. Physically validated property: relative ordering NiO < FeO.
-    # Whole-ladder re-anchoring to one raw-thermo basis is deferred to #32
-    # (MRE-COVERAGE-RECONCILE).
     'NiO':   0.39,
+    # Na2O/K2O volatility caveat: condensed-phase DeltaGf at 1873 K is
+    # estimated; Na/K are volatile above their boiling points, so activity
+    # and vapor partitioning can lower the effective threshold. Hold legacy
+    # 0.5 V pending activity/vapor-aware grounding.
     'Na2O':  0.5,
     'K2O':   0.5,
-    'FeO':   0.6,
-    # Simplified sequential ferric reduction: FeO is favored first; Fe2O3
-    # remains explicit until a fO2-coupled ferric/ferrous melt model lands.
-    'Fe2O3': 0.75,
-    'Cr2O3': 0.9,
-    'MnO':   1.0,
-    'SiO2':  1.4,
-    'TiO2':  1.5,
-    'Al2O3': 1.9,
+    # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
+    'FeO':   0.75,
+    # FeO-scale-tied rescale. Simplified sequential ferric reduction:
+    # FeO is favored first; Fe2O3 remains explicit until a fO2-coupled
+    # ferric/ferrous melt model lands.
+    'Fe2O3': 0.90,
+    # NIST-JANAF/Chase 1998 + Barin; modest-confidence upper-range anchor.
+    'Cr2O3': 0.95,
+    # NIST-JANAF/Chase 1998 + Barin; modest-confidence anchor.
+    'MnO':   1.05,
+    # Chase 1998 raw-thermo anchor.
+    'SiO2':  1.45,
+    # Chase 1998 + Barin raw-thermo anchor.
+    'TiO2':  1.70,
+    # NIST-JANAF/Chase 1998 + Barin raw-thermo anchor.
+    'Al2O3': 1.95,
     'MgO':   2.2,
     'CaO':   2.5,
 }

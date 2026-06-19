@@ -81,12 +81,12 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         0.39,
         0.5,
         0.5,
-        0.6,
-        0.9,
-        0.9,
-        1.4,
-        1.5,
-        1.9,
+        0.75,
+        0.95,
+        1.05,
+        1.45,
+        1.70,
+        1.95,
         2.2,
         2.5,
     ]
@@ -112,15 +112,15 @@ def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():
 
     assert _species_names(sequence)[:3] == ["NiO", "Na2O", "K2O"]
     assert _species_names(sequence)[6:8] == ["SiO2", "TiO2"]
-    assert sequence[6]["voltage"] == pytest.approx(1.4)
-    assert sequence[7]["voltage"] == pytest.approx(1.5)
+    assert sequence[6]["voltage"] == pytest.approx(1.45)
+    assert sequence[7]["voltage"] == pytest.approx(1.70)
 
 
 def test_max_voltage_for_target_uses_ladder_ground_truth():
     sequence = mre_ladder.parse_ladder_from_setpoints(_repo_setpoints())
 
-    assert mre_ladder.max_voltage_for_target("SiO2", sequence) == pytest.approx(1.4)
-    assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(1.5)
+    assert mre_ladder.max_voltage_for_target("SiO2", sequence) == pytest.approx(1.45)
+    assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(1.70)
     assert mre_ladder.max_voltage_for_target("CaO", sequence) == pytest.approx(2.5)
     assert mre_ladder.max_voltage_for_target("not-an-oxide", sequence) == pytest.approx(0.0)
 
@@ -149,7 +149,7 @@ def test_preset_catalog_includes_disabled_alkali_targets():
 
     assert by_target[""]["c5_enabled"] is False
     assert by_target["SiO2"]["enabled"] is True
-    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.4)
+    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.45)
     assert by_target["Na2O"]["enabled"] is False
     assert by_target["K2O"]["enabled"] is False
     assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
@@ -211,9 +211,9 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
         "campaigns": {},
         "mre_voltage_sequence": {
             "sequence": [
-                {"species": "FeO", "decomposition_V": 0.6, "min_hold_hours": 0},
-                {"species": "SiO2", "decomposition_V": 1.4, "min_hold_hours": 0},
-                {"species": "TiO2", "decomposition_V": 1.5, "min_hold_hours": 0},
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
+                {"species": "TiO2", "decomposition_V": 1.70, "min_hold_hours": 0},
                 {"species": "CaO", "decomposition_V": 2.5, "min_hold_hours": 0},
             ],
         },
@@ -223,7 +223,7 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
     sim.melt.campaign = CampaignPhase.C5
     sim.melt.c5_enabled = True
     sim.melt.mre_target_species = "SiO2"
-    sim.melt.mre_max_voltage_V = 1.4
+    sim.melt.mre_max_voltage_V = 1.45
     captured: list[dict] = []
 
     def fake_dispatch(_intent, *, control_inputs):
@@ -247,4 +247,4 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
 
     assert captured
     assert captured[0]["allowed_oxides"] == ["FeO", "SiO2"]
-    assert captured[0]["voltage_V"] == pytest.approx(0.6)
+    assert captured[0]["voltage_V"] == pytest.approx(0.75)

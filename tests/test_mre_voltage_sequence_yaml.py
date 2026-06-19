@@ -109,13 +109,13 @@ def test_yaml_parse_canonical_published_shape():
     setpoints = _yaml_sequence(
         {"species": "NiO", "decomposition_V": 0.39,
          "campaign": "C5 carbonaceous trace"},
-        {"species": "FeO", "decomposition_V": 0.6,
+        {"species": "FeO", "decomposition_V": 0.75,
          "campaign": "C5", "note": "should be pre-depleted"},
-        {"species": "Cr2O3", "decomposition_V": [0.8, 1.0],
+        {"species": "Cr2O3", "decomposition_V": 0.95,
          "campaign": "C5 trace"},
-        {"species": "Na2O", "decomposition_V": "<0.5",
+        {"species": "Na2O", "decomposition_V": 0.5,
          "campaign": "C5 opening"},
-        {"species": "SiO2", "decomposition_V": 1.4,
+        {"species": "SiO2", "decomposition_V": 1.45,
          "campaign": "C5 primary"},
     )
     sim = _sim(setpoints)
@@ -128,10 +128,10 @@ def test_yaml_parse_canonical_published_shape():
         entry["species"][0]: entry["voltage"] for entry in seq
     }
     assert species_to_voltage["NiO"] == 0.39
-    assert species_to_voltage["FeO"] == 0.6
-    assert species_to_voltage["Cr2O3"] == pytest.approx(0.9)
+    assert species_to_voltage["FeO"] == 0.75
+    assert species_to_voltage["Cr2O3"] == pytest.approx(0.95)
     assert species_to_voltage["Na2O"] == 0.5
-    assert species_to_voltage["SiO2"] == 1.4
+    assert species_to_voltage["SiO2"] == 1.45
     # Default min_hold_hours when YAML omits the field.
     for entry in seq:
         assert entry["min_hold_hours"] == 3
@@ -141,7 +141,7 @@ def test_yaml_parse_min_hold_hours_passthrough():
     """When YAML carries an explicit ``min_hold_hours``, it overrides
     the default."""
     setpoints = _yaml_sequence(
-        {"species": "Al2O3", "decomposition_V": 1.9,
+        {"species": "Al2O3", "decomposition_V": 1.95,
          "min_hold_hours": 8},
         {"species": "MgO", "decomposition_V": 2.2,
          "min_hold_hours": 5},
@@ -160,7 +160,7 @@ def test_yaml_parse_skips_malformed_entries():
     ``decomposition_V`` is silently dropped (caller may fall back
     on empty result)."""
     setpoints = _yaml_sequence(
-        {"species": "FeO", "decomposition_V": 0.6},  # ok
+        {"species": "FeO", "decomposition_V": 0.75},  # ok
         {"decomposition_V": 1.0},                    # missing species
         {"species": "X", "decomposition_V": "bogus"},  # unparseable V
         {"species": "Y"},                            # missing V
@@ -184,7 +184,7 @@ def test_build_falls_back_to_hardcoded_ladder_when_yaml_missing():
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
     # Documented fallback ladder (sorted ascending in the source).
-    assert voltages == [0.39, 0.6, 0.9, 1.0, 1.4, 1.5, 1.9, 2.2, 2.5]
+    assert voltages == [0.39, 0.75, 0.95, 1.05, 1.45, 1.70, 1.95, 2.2, 2.5]
     # Hold-hour pattern matches the documented fallback values.
     hold_hours = [entry["min_hold_hours"] for entry in seq]
     assert hold_hours == [2, 3, 2, 2, 5, 3, 8, 5, 10]
@@ -210,9 +210,9 @@ def test_build_falls_back_when_yaml_sequence_is_all_malformed():
 def test_build_uses_yaml_when_present_and_valid():
     """One valid YAML entry → YAML-derived sequence (not fallback)."""
     sim = _sim(_yaml_sequence(
-        {"species": "FeO", "decomposition_V": 0.6,
+        {"species": "FeO", "decomposition_V": 0.75,
          "min_hold_hours": 3},
-        {"species": "SiO2", "decomposition_V": 1.4,
+        {"species": "SiO2", "decomposition_V": 1.45,
          "min_hold_hours": 5},
     ))
     seq = sim._build_mre_voltage_sequence()
@@ -239,16 +239,16 @@ def test_build_yaml_path_sorted_by_voltage_ascending():
     without re-sort."""
     sim = _sim(_yaml_sequence(
         {"species": "CaO", "decomposition_V": 2.5},
-        {"species": "FeO", "decomposition_V": 0.6},
-        {"species": "TiO2", "decomposition_V": 1.5},
-        {"species": "Al2O3", "decomposition_V": 1.9},
+        {"species": "FeO", "decomposition_V": 0.75},
+        {"species": "TiO2", "decomposition_V": 1.70},
+        {"species": "Al2O3", "decomposition_V": 1.95},
     ))
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
     assert voltages == sorted(voltages)
     # C5 prefix-filter (mirroring extraction.py step 9).
     c5_seq = [s for s in seq if s["voltage"] <= 1.6]
-    assert [s["species"][0] for s in c5_seq] == ["FeO", "TiO2"]
+    assert [s["species"][0] for s in c5_seq] == ["FeO"]
 
 
 # ---------------------------------------------------------------------------

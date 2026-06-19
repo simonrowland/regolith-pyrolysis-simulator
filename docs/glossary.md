@@ -58,7 +58,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **MELTS** — thermodynamic framework for silicate melt and phase equilibrium; accessed via ThermoEngine or PetThermoTools. The activity convention is `a_i = exp((μ_i − μ_i0) / RT)`. See [`docs/melt-backends.md`](melt-backends.md).
 
-**MRE** — molten regolith electrolysis; applies Nernst + Faraday electrolysis to reduce melt oxides at voltages from 0.6 V (FeO) to 2.5 V (CaO). The `MRE_BASELINE` track models full electrolysis without pyrolysis pretreatment. See [`docs/process-model.md`](process-model.md).
+**MRE** - molten regolith electrolysis; applies Nernst + Faraday electrolysis to reduce melt oxides at voltages from 0.39 V (NiO) / 0.75 V (FeO) to 2.5 V (CaO). The `MRE_BASELINE` track models full electrolysis without pyrolysis pretreatment. See [`docs/process-model.md`](process-model.md).
 
 **MRE_BASELINE** — runner track for full molten regolith electrolysis without pyrolysis pretreatment; the comparison point for quantifying what pretreatment saves. Invoked via `--track=mre_baseline`.
 

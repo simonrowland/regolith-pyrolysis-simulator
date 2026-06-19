@@ -476,7 +476,7 @@ class ExtractionMixin:
                                  which species are physically reducible.
                                  Electrode life 5-10× longer than full MRE.
 
-            MRE_BASELINE:        Stepped holds at each Ellingham threshold (0.6→2.5 V).
+            MRE_BASELINE:        Stepped holds at each Ellingham threshold (0.75->2.5 V).
                                  Each species substantially extracted before advancing.
                                  Higher current (3000 A) for faster throughput.
 
@@ -521,8 +521,9 @@ class ExtractionMixin:
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
             if not seq:
-                # Fallback if sequence not loaded
-                voltage_V = min(0.6 + self.melt.campaign_hour * 0.1, 2.5)
+                # Fallback if sequence not loaded; start at reanchored FeO
+                # rung (0.75 V) consistent with DECOMP_VOLTAGES (MRE #32B).
+                voltage_V = min(0.75 + self.melt.campaign_hour * 0.1, 2.5)
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]

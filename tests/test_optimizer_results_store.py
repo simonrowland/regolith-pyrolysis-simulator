@@ -530,12 +530,12 @@ def test_result_store_mre_policy_collision_misses(tmp_path) -> None:
     enabled = _base_spec(c5_enabled=True, mre_max_voltage_V=0.0, mre_target_species="")
     si_target = _base_spec(
         c5_enabled=True,
-        mre_max_voltage_V=1.4,
+        mre_max_voltage_V=1.45,
         mre_target_species="SiO2",
     )
     ti_target = _base_spec(
         c5_enabled=True,
-        mre_max_voltage_V=1.5,
+        mre_max_voltage_V=1.70,
         mre_target_species="TiO2",
     )
     specs = (off, enabled, si_target, ti_target)

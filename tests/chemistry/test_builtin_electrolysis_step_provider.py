@@ -455,7 +455,7 @@ def test_energy_stays_commanded_when_oxide_does_not_deplete(
         feedstocks_data,
         setpoints_data,
     )
-    voltage_V = 0.65
+    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
     current_A = 100.0
 
     legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
@@ -488,7 +488,7 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
         setpoints_data,
     )
     oxide_kg = 1.0
-    voltage_V = 0.65
+    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
     current_A = 1.0e6
     temperature_C = 1575.0
 
@@ -561,7 +561,7 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     sim._project_extraction_melt()
     sim.melt.temperature_C = 1575.0
 
-    voltage_V = 0.65
+    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
     current_A = 100.0
 
     legacy = sim.electrolysis_model.step_hour(
@@ -693,7 +693,7 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         temperature_C=sim.melt.temperature_C,
         pressure_bar=1e-6,
         control_inputs={
-            "voltage_V": 0.6,
+            "voltage_V": DECOMP_VOLTAGES["NiO"] + 0.10,
             "current_A": 1.0e6,
             "dt_hr": 1.0,
             "allowed_oxides": ["NiO"],
@@ -962,7 +962,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.5)
+    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.70)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -1074,7 +1074,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.5)
+    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.70)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",

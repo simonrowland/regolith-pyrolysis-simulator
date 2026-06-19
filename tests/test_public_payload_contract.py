@@ -56,7 +56,7 @@ def test_socket_start_payload_keeps_existing_kg_shape():
         backend_message="Using StubBackend",
         c5_enabled=True,
         mre_target_species="SiO2",
-        mre_max_voltage_V=1.4,
+        mre_max_voltage_V=1.45,
     )
 
     assert payload["status"] == "started"
@@ -68,7 +68,7 @@ def test_socket_start_payload_keeps_existing_kg_shape():
     assert payload["backend_authoritative"] is False
     assert payload["c5_enabled"] is True
     assert payload["mre_target_species"] == "SiO2"
-    assert payload["mre_max_voltage_V"] == pytest.approx(1.4)
+    assert payload["mre_max_voltage_V"] == pytest.approx(1.45)
 
 
 def test_tick_payload_keeps_existing_kg_keys():

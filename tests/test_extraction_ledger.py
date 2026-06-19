@@ -290,7 +290,7 @@ def test_mre_reduction_records_atom_ledger_transition():
         }
     )
     sim.load_batch("feo", mass_kg=1000.0)
-    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.6)
+    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.75)
 
     feo_removed_kg = 1.0
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)
@@ -361,7 +361,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
         }
     )
     sim.load_batch("feo", mass_kg=1000.0)
-    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.6)
+    _enable_c5_mre(sim, target_species="FeO", max_voltage_V=0.75)
 
     feo_removed_kg = 1.0
     feo_removed_mol = feo_removed_kg / (MOLAR_MASS["FeO"] / 1000.0)

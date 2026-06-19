@@ -335,7 +335,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("backend_name", "magmin"),
         ("c5_enabled", True),
         ("stop_at_stage0_exit", True),
-        ("mre_max_voltage_V", 1.4),
+        ("mre_max_voltage_V", 1.45),
         ("mre_target_species", "SiO2"),
         ("stage0_redox_oxidant_kg", 12.5),
         ("stage0_carbon_reductant_kg", 7.25),
@@ -586,12 +586,12 @@ def test_mre_policy_fields_split_cache_keys() -> None:
     enabled = _base_spec(c5_enabled=True, mre_max_voltage_V=0.0, mre_target_species="")
     si_target = _base_spec(
         c5_enabled=True,
-        mre_max_voltage_V=1.4,
+        mre_max_voltage_V=1.45,
         mre_target_species="SiO2",
     )
     ti_target = _base_spec(
         c5_enabled=True,
-        mre_max_voltage_V=1.5,
+        mre_max_voltage_V=1.70,
         mre_target_species="TiO2",
     )
 
@@ -626,7 +626,7 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
             "mass_kg": 1000.0,
             "backend_name": "stub",
             "c5_enabled": True,
-            "mre_max_voltage_V": 1.4,
+            "mre_max_voltage_V": 1.45,
             "mre_target_species": "SiO2",
         },
         "fidelities": {"stub": {"backend_name": "stub"}},
@@ -641,10 +641,10 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
     )
 
     assert spec.c5_enabled is True
-    assert spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert spec.mre_max_voltage_V == pytest.approx(1.45)
     assert spec.mre_target_species == "SiO2"
     assert run_config.c5_enabled is True
-    assert run_config.mre_max_voltage_V == pytest.approx(1.4)
+    assert run_config.mre_max_voltage_V == pytest.approx(1.45)
     assert run_config.mre_target_species == "SiO2"
 
 
@@ -786,8 +786,8 @@ def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() ->
         profile,
         schema,
     )
-    cap_14_spec, cap_14_run_config = _build_eval_inputs(
-        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.4}),
+    cap_145_spec, cap_145_run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.45}),
         "lunar_mare_low_ti",
         "stub",
         profile,
@@ -801,15 +801,15 @@ def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() ->
         schema,
     )
 
-    assert cap_14_spec.c5_enabled is True
-    assert cap_14_spec.mre_max_voltage_V == pytest.approx(1.4)
-    assert cap_14_spec.mre_target_species == ""
-    assert cap_14_run_config.c5_enabled is True
-    assert cap_14_run_config.mre_max_voltage_V == pytest.approx(1.4)
-    assert cap_14_run_config.mre_target_species == ""
+    assert cap_145_spec.c5_enabled is True
+    assert cap_145_spec.mre_max_voltage_V == pytest.approx(1.45)
+    assert cap_145_spec.mre_target_species == ""
+    assert cap_145_run_config.c5_enabled is True
+    assert cap_145_run_config.mre_max_voltage_V == pytest.approx(1.45)
+    assert cap_145_run_config.mre_target_species == ""
     assert cap_16_run_config.c5_enabled is True
     assert cap_16_run_config.mre_max_voltage_V == pytest.approx(1.6)
-    assert len({cache_key(default_spec), cache_key(cap_14_spec), cache_key(cap_16_spec)}) == 3
+    assert len({cache_key(default_spec), cache_key(cap_145_spec), cache_key(cap_16_spec)}) == 3
 
 
 def test_build_eval_inputs_c2a_staged_stage_knob_partitions_cache_and_schedule() -> None:

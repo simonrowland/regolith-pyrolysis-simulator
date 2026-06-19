@@ -49,7 +49,7 @@ def _profile(
     *,
     c5_enabled: bool,
     target_species: str = "SiO2",
-    max_voltage_V: float = 1.4,
+    max_voltage_V: float = 1.45,
     hours: int = 15,
 ) -> dict:
     profile = deepcopy(BASE_PROFILE)
@@ -69,7 +69,7 @@ def _evaluate_policy(
     *,
     c5_enabled: bool,
     target_species: str = "SiO2",
-    max_voltage_V: float = 1.4,
+    max_voltage_V: float = 1.45,
     hours: int = 15,
 ):
     return evaluate(
@@ -95,9 +95,9 @@ def _captured_c5_voltages(*, target_species: str, max_voltage_V: float) -> list[
         "campaigns": {},
         "mre_voltage_sequence": {
             "sequence": [
-                {"species": "FeO", "decomposition_V": 0.6, "min_hold_hours": 0},
-                {"species": "SiO2", "decomposition_V": 1.4, "min_hold_hours": 0},
-                {"species": "TiO2", "decomposition_V": 1.5, "min_hold_hours": 0},
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
+                {"species": "TiO2", "decomposition_V": 1.70, "min_hold_hours": 0},
             ],
         },
     }
@@ -147,7 +147,7 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
     assert off.eval_spec.mre_max_voltage_V == pytest.approx(0.0)
     assert si_target.eval_spec.c5_enabled is True
     assert si_target.eval_spec.mre_target_species == "SiO2"
-    assert si_target.eval_spec.mre_max_voltage_V == pytest.approx(1.4)
+    assert si_target.eval_spec.mre_max_voltage_V == pytest.approx(1.45)
 
     assert _product_ledger(off) == {}
     assert _product_ledger(si_target) != _product_ledger(off)
@@ -158,20 +158,20 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
     si_trace = si_target.run_reference.trace
     assert max(snapshot.mre_current_A for snapshot in off_trace.snapshots) == pytest.approx(0.0)
     assert max(snapshot.mre_current_A for snapshot in si_trace.snapshots) > 0.0
-    assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= 1.4
+    assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= 1.45
 
 
 def test_tc8_si_and_ti_targets_split_c5_behavior_not_only_cache_key() -> None:
     si_voltages = _captured_c5_voltages(
-        target_species="SiO2", max_voltage_V=1.4
+        target_species="SiO2", max_voltage_V=1.45
     )
     ti_voltages = _captured_c5_voltages(
-        target_species="TiO2", max_voltage_V=1.5
+        target_species="TiO2", max_voltage_V=1.70
     )
 
-    assert max(si_voltages) == pytest.approx(1.4)
-    assert max(ti_voltages) == pytest.approx(1.5)
-    assert 1.5 not in si_voltages
+    assert max(si_voltages) == pytest.approx(1.45)
+    assert max(ti_voltages) == pytest.approx(1.70)
+    assert 1.70 not in si_voltages
     assert ti_voltages != si_voltages
 
 
@@ -180,7 +180,7 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
         "campaigns": {},
         "mre_voltage_sequence": {
             "sequence": [
-                {"species": "SiO2", "decomposition_V": 1.4, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
             ],
         },
     }
@@ -199,7 +199,7 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
     sim.melt.p_total_mbar = 50.0
     sim.melt.c5_enabled = True
     sim.melt.mre_target_species = "SiO2"
-    sim.melt.mre_max_voltage_V = 1.4
+    sim.melt.mre_max_voltage_V = 1.45
     captured: list[dict] = []
 
     def fake_dispatch(_intent, *, control_inputs):
