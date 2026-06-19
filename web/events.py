@@ -17,6 +17,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.session import (
@@ -857,8 +858,21 @@ def register_events(socketio):
 
         # Load data files
         feedstocks = load_visible_feedstocks()
-        setpoints = _load_yaml('setpoints.yaml')
+        setpoints = dict(_load_yaml('setpoints.yaml'))
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
+        furnace_material_id = str(data.get('furnace_material_id') or '').strip()
+        if furnace_material_id:
+            try:
+                setpoints['furnace_max_T_C'] = resolve_furnace_max_T_C(
+                    furnace_material_id,
+                    requested_cap=setpoints.get('furnace_max_T_C'),
+                )
+            except ValueError as exc:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': str(exc),
+                }, room=sid)
+                return
 
         try:
             backend = _get_backend(backend_name)

@@ -135,6 +135,14 @@
                 C4 furnace cap (&deg;C):
                 <input type="number" id="c4-max-temp" min="1000" step="10" value="1670">
             </label>
+            <label>
+                Furnace material:
+                <select id="furnace-material"
+                        aria-label="Furnace material"
+                        data-catalog-url="{{ url_for('web.furnace_material_catalog') }}">
+                    <option value="" selected>Default (1800 C ceiling)</option>
+                </select>
+            </label>
             <div class="chip-row" aria-label="Wall temperature offset display">
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">-50</button>
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">nominal</button>

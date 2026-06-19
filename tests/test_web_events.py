@@ -235,6 +235,147 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
             _clear_simulation_state(sid)
 
 
+def test_furnace_material_catalog_endpoint_returns_enabled_only():
+    app = app_module.create_app()
+    response = app.test_client().get("/api/furnace-material-catalog")
+
+    assert response.status_code == 200
+    materials = response.get_json()["materials"]
+    material_ids = {material["id"] for material in materials}
+    assert "dense_alumina_continuous" in material_ids
+    assert "fused_silica" not in material_ids
+    for material in materials:
+        assert set(material) == {"id", "display_name", "max_service_T_C"}
+
+
+@pytest.mark.parametrize(
+    ("payload_extra", "expected_cap"),
+    [
+        ({"furnace_material_id": "dense_alumina_continuous"}, 1700.0),
+        # Cap-preserving: a material whose max (2200) exceeds the 1800 default
+        # must resolve to min(1800, 2200) = 1800, never raising the ceiling.
+        ({"furnace_material_id": "zirconia_ysz"}, 1800.0),
+        ({}, 1800.0),
+        ({"furnace_material_id": ""}, 1800.0),
+    ],
+)
+def test_web_start_event_resolves_furnace_material_cap(
+    monkeypatch,
+    payload_extra,
+    expected_cap,
+):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "stub",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+    payload.update(payload_extra)
+
+    try:
+        client.emit("start_simulation", payload)
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses
+        assert statuses[-1]["status"] == "started"
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        assert (
+            state["session"].simulator.campaign_mgr.furnace_max_T_C
+            == pytest.approx(expected_cap)
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("material_id", "message"),
+    [
+        ("fused_silica", "not selectable"),
+        ("unknown_material", "unknown furnace material"),
+    ],
+)
+def test_web_start_event_rejects_unselectable_furnace_material_before_session(
+    monkeypatch,
+    material_id,
+    message,
+):
+    backend_called = False
+
+    def fail_if_backend_resolves(_backend_name):
+        nonlocal backend_called
+        backend_called = True
+        raise AssertionError("backend resolution should not run")
+
+    monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "furnace_material_id": material_id,
+            },
+        )
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert message in statuses[-1]["message"]
+        assert set(_simulations) == before
+        assert backend_called is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 @pytest.mark.parametrize(
     ("override", "message_field"),
     [

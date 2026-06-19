@@ -25,6 +25,7 @@ from simulator.condensation import (
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+from simulator.furnace_materials import load_furnace_materials
 from simulator.mre_ladder import (
     filter_steps_up_to_max_v,
     parse_ladder_from_setpoints,
@@ -1350,6 +1351,20 @@ def _mre_preset_catalog_payload() -> list[dict[str, Any]]:
     return presets
 
 
+def _furnace_material_catalog_payload() -> list[dict[str, Any]]:
+    materials = []
+    for material_id, row in load_furnace_materials().items():
+        if not isinstance(row, Mapping) or row.get('enabled') is not True:
+            continue
+        row_id = str(row.get('id') or material_id)
+        materials.append({
+            'id': row_id,
+            'display_name': str(row.get('display_name') or row_id),
+            'max_service_T_C': row.get('max_service_T_C'),
+        })
+    return materials
+
+
 def _knudsen_config_payload() -> dict[str, float]:
     return {
         'boltzmann_constant_j_k': BOLTZMANN_CONSTANT_J_K,
@@ -2239,6 +2254,12 @@ def optimizer_feedstock_profiles():
 def mre_preset_catalog():
     """Return the shared MRE target preset catalog for web forms."""
     return jsonify({'presets': _mre_preset_catalog_payload()})
+
+
+@bp.route('/api/furnace-material-catalog')
+def furnace_material_catalog():
+    """Return selectable furnace material caps for web start forms."""
+    return jsonify({'materials': _furnace_material_catalog_payload()})
 
 
 @bp.route('/api/knudsen-config')

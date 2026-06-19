@@ -61,6 +61,29 @@ function hydrateMrePresetCatalog() {
         .catch(() => updateMreFields());
 }
 
+function optionForFurnaceMaterial(material) {
+    const option = document.createElement('option');
+    option.value = material.id;
+    option.textContent = `${material.display_name} (${material.max_service_T_C} C)`;
+    return option;
+}
+
+function hydrateFurnaceMaterialCatalog() {
+    const select = document.getElementById('furnace-material');
+    if (!select || !select.dataset.catalogUrl) return;
+    const defaultOption = select.querySelector('option[value=""]') || new Option('Default (1800 C ceiling)', '');
+    fetch(select.dataset.catalogUrl)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
+        .then(data => {
+            if (!Array.isArray(data.materials)) return;
+            select.replaceChildren(defaultOption, ...data.materials.map(optionForFurnaceMaterial));
+            select.value = '';
+        })
+        .catch(() => {
+            select.value = '';
+        });
+}
+
 function selectedMrePayload() {
     const enabled = document.getElementById('mre-enabled')?.checked === true;
     const option = selectedMreOption();
@@ -76,6 +99,10 @@ function selectedMrePayload() {
         mre_target_species: option.dataset.targetSpecies || '',
         mre_max_voltage_V: parseFloat(option.dataset.maxVoltage || '0') || 0,
     };
+}
+
+function selectedFurnaceMaterialId() {
+    return (document.getElementById('furnace-material')?.value || '').trim();
 }
 
 function selectedLeverCampaign() {
@@ -162,6 +189,7 @@ function updateLeverWarning() {
 }
 
 hydrateMrePresetCatalog();
+hydrateFurnaceMaterialCatalog();
 document.getElementById('mre-enabled')?.addEventListener('change', updateMreFields);
 document.getElementById('mre-preset')?.addEventListener('change', updateMreFields);
 document.getElementById('lever-pn2-mbar')?.addEventListener('input', () => {
@@ -191,8 +219,9 @@ document.getElementById('btn-start').addEventListener('click', () => {
     const speedMs = parseInt(document.querySelector('input[name="speed"]:checked').value);
     const mass_kg = parseFloat(document.getElementById('batch-mass').value);
     const mrePayload = selectedMrePayload();
+    const furnaceMaterialId = selectedFurnaceMaterialId();
 
-    socket.emit('start_simulation', {
+    const payload = {
         feedstock: feedstock,
         mass_kg: mass_kg,
         backend: document.getElementById('engine-select').value,
@@ -210,7 +239,9 @@ document.getElementById('btn-start').addEventListener('click', () => {
             Ca: parseFloat(document.getElementById('add-ca').value) || 0,
             C: parseFloat(document.getElementById('add-c').value) || 0,
         },
-    });
+    };
+    if (furnaceMaterialId) payload.furnace_material_id = furnaceMaterialId;
+    socket.emit('start_simulation', payload);
 
     // Reset ALL charts — re-initialise temperature & pressure inline,
     // and set lazy-init flags to false so other charts re-create on first tick.
