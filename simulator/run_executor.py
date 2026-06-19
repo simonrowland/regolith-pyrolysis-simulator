@@ -7,6 +7,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from simulator.backends import requires_stage0_subprocess
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.core import BACKEND_FALLBACK_EXCEPTIONS, PyrolysisSimulator
 from simulator.session import (
@@ -158,6 +159,21 @@ def _backend_from_worker_runtime(
     if worker_runtime is None:
         return None
     if getattr(worker_runtime, "backend_name", None) != config.backend_name:
+        return None
+    context_feedstock = getattr(worker_runtime, "feedstock_id", None)
+    if (
+        context_feedstock is not None
+        and context_feedstock != str(config.feedstock_id)
+    ):
+        return None
+    subprocess_required = requires_stage0_subprocess(
+        config.feedstock_id,
+        config.feedstocks,
+    )
+    if (
+        bool(getattr(worker_runtime, "stage0_subprocess_required", False))
+        != subprocess_required
+    ):
         return None
     if config.reduced_real_cache is not None:
         return None

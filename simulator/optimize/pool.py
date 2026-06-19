@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from datetime import UTC, datetime
 import copy
 import errno
-from functools import partial
+from functools import lru_cache, partial
 import inspect
 import logging
 import os
@@ -17,6 +17,8 @@ import pickle
 import tempfile
 from typing import Any
 
+from simulator.backends import requires_stage0_subprocess
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
     EngineBugAbort,
@@ -59,12 +61,20 @@ class _PoolTask:
     profile: Mapping[str, Any]
     candidate_id: str | None
     output_dir: str
+    stage0_subprocess_required: bool | None = None
     constraints: Any = None
     schema: Any = None
 
 
 class _PoolUnavailableError(RuntimeError):
     pass
+
+
+@dataclass(frozen=True)
+class _WarmRuntimeSpec:
+    backend_name: str
+    feedstock_id: str
+    stage0_subprocess_required: bool
 
 
 def evaluate_batch(
@@ -149,8 +159,8 @@ def _evaluate_tasks_in_pool(
     worker_count = max_workers or (os.cpu_count() or 1)
     max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
     task_iter = iter(tasks)
-    warm_backend_name = _warm_backend_name(tasks)
-    initializer = partial(_initialize_worker, warm_backend_name)
+    warm_runtime_spec = _warm_runtime_spec(tasks)
+    initializer = partial(_initialize_worker, warm_runtime_spec)
     try:
         executor = ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
     except BaseException as exc:
@@ -209,9 +219,9 @@ def _evaluate_tasks_serial(
 ) -> tuple[ScoredResult, ...]:
     env_names = _serial_fallback_env_names()
     env_snapshot = {name: os.environ.get(name) for name in env_names}
-    warm_backend_name = _warm_backend_name(tasks)
+    warm_runtime_spec = _warm_runtime_spec(tasks)
     try:
-        _initialize_worker(warm_backend_name)
+        _initialize_worker(warm_runtime_spec)
         results: list[ScoredResult] = []
         for task in tasks:
             try:
@@ -252,13 +262,20 @@ def _submit_until_full(
         futures[future] = task
 
 
-def _initialize_worker(backend_name: str | None = None) -> None:
+def _initialize_worker(warm_runtime: _WarmRuntimeSpec | str | None = None) -> None:
     from simulator.optimize.determinism import pin_worker_env
     pin_worker_env()
-    if backend_name is None or not warm_workers_enabled():
+    if warm_runtime is None or not warm_workers_enabled():
         clear_worker_runtime()
         return
-    warm_worker_runtime(backend_name)
+    if isinstance(warm_runtime, str):
+        warm_worker_runtime(warm_runtime)
+        return
+    warm_worker_runtime(
+        warm_runtime.backend_name,
+        feedstock_id=warm_runtime.feedstock_id,
+        stage0_subprocess_required=warm_runtime.stage0_subprocess_required,
+    )
 
 
 def _evaluate_pool_task(
@@ -279,7 +296,10 @@ def _evaluate_pool_task(
             constraints=task.constraints,
             schema=task.schema,
             output_dir=str(output_dir),
-            worker_runtime=get_worker_runtime(),
+            worker_runtime=get_worker_runtime(
+                feedstock_id=task.feedstock_id,
+                stage0_subprocess_required=task.stage0_subprocess_required,
+            ),
         )
     except EvaluationAbort as exc:
         return {"kind": "abort", "index": task.index, "abort": _abort_payload(exc)}
@@ -365,16 +385,27 @@ def _latest_backend_status(value: Any) -> str | None:
     return _extract_backend_status(value[-1])
 
 
-def _warm_backend_name(tasks: Sequence[_PoolTask]) -> str | None:
+def _warm_runtime_spec(tasks: Sequence[_PoolTask]) -> _WarmRuntimeSpec | None:
     if not warm_workers_enabled():
         return None
     names = {_task_backend_name(task) for task in tasks}
     if len(names) != 1:
         return None
+    feedstocks = {str(task.feedstock_id) for task in tasks}
+    if len(feedstocks) != 1:
+        return None
     name = next(iter(names))
     if name in {"auto", "cached-real"}:
         return None
-    return name
+    feedstock_id = next(iter(feedstocks))
+    subprocess_required = any(
+        bool(task.stage0_subprocess_required) for task in tasks
+    )
+    return _WarmRuntimeSpec(
+        backend_name=name,
+        feedstock_id=feedstock_id,
+        stage0_subprocess_required=subprocess_required,
+    )
 
 
 def _task_backend_name(task: _PoolTask) -> str:
@@ -389,6 +420,15 @@ def _task_backend_name(task: _PoolTask) -> str:
         if isinstance(selected, Mapping):
             merged.update(selected)
     return str(merged.get("backend_name", "stub") or "stub")
+
+
+def _task_stage0_subprocess_required(feedstock_id: str) -> bool:
+    return requires_stage0_subprocess(feedstock_id, _default_feedstocks())
+
+
+@lru_cache(maxsize=1)
+def _default_feedstocks() -> Mapping[str, Any]:
+    return load_config_bundle(DEFAULT_DATA_DIR).feedstocks
 
 
 def _task_from_request(
@@ -415,6 +455,9 @@ def _task_from_request(
         profile=_plain_value_for_process_pool(active_profile),
         candidate_id=normalized.candidate_id,
         output_dir=str(output_dir),
+        stage0_subprocess_required=_task_stage0_subprocess_required(
+            normalized.feedstock_id
+        ),
     )
 
 

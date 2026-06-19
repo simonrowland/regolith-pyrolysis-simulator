@@ -705,6 +705,67 @@ def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
     })
 
 
+def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
+    class FakeMelts:
+        bulk_wt: dict[str, float] | None = None
+
+        def get_oxide_names(self):
+            return ('SiO2', 'Al2O3')
+
+        def set_bulk_composition(self, bulk_wt):
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            assert temperature_C == 1200.0
+            assert pressure_mpa == pytest.approx(0.1)
+            assert initialize is True
+            return [('success', temperature_C, pressure_mpa, 'root')]
+
+        def get_list_of_phases_in_assemblage(self, root):
+            assert root == 'root'
+            return ('Spinel',)
+
+        def get_mass_of_phase(self, root, phase):
+            assert root == 'root'
+            assert phase == 'Spinel'
+            return 1000.0
+
+    class FakeEquilibrate:
+        def __init__(self):
+            self.melts = FakeMelts()
+            self.version = None
+
+        def MELTSmodel(self, *, version):
+            self.version = version
+            return self.melts
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    fake_equilibrate = FakeEquilibrate()
+    transport._equilibrate = fake_equilibrate
+    transport._liq_phase = object()
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError('public equilibrate must not spawn subprocess')
+
+    monkeypatch.setattr('engines.alphamelts.thermoengine.subprocess.run', fail_run)
+
+    result = transport.equilibrate(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 0.0},
+        warnings=('input-warning',),
+    )
+
+    assert fake_equilibrate.version == '1.0.2'
+    assert fake_equilibrate.melts.bulk_wt == {'SiO2': 50.0}
+    assert result.phases_present == ('Spinel',)
+    assert result.phase_masses_kg == {'Spinel': pytest.approx(1.0)}
+    assert result.liquid_fraction == 0.0
+    assert result.liquid_composition_wt_pct == {}
+
+
 def test_thermoengine_transport_equilibrates_live_when_installed():
     backend = AlphaMELTSBackend()
     try:

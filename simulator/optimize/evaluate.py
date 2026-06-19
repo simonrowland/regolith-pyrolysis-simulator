@@ -17,7 +17,7 @@ from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
 from simulator.accounting import OverdraftError, resolve_species_formula
-from simulator.backends import BackendUnavailableError
+from simulator.backends import BackendUnavailableError, requires_stage0_subprocess
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
@@ -497,7 +497,13 @@ def evaluate(
     key = cache_key(spec)
     objective_profile = _objective_profile_for_spec(profile, spec)
     active_executor = executor or RunExecutor()
-    runtime = worker_runtime if worker_runtime is not None else get_worker_runtime()
+    runtime = worker_runtime if worker_runtime is not None else get_worker_runtime(
+        feedstock_id=run_config.feedstock_id,
+        stage0_subprocess_required=requires_stage0_subprocess(
+            run_config.feedstock_id,
+            run_config.feedstocks,
+        ),
+    )
 
     try:
         run_execution = _execute_run(

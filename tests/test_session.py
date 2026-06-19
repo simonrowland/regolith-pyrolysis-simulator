@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+import simulator.session as session_module
 from simulator.backends import BackendSelectionPolicy
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.session import (
@@ -39,6 +40,30 @@ def _config(**overrides) -> SimSessionConfig:
     }
     values.update(overrides)
     return SimSessionConfig(**values)
+
+
+def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
+    calls: list[dict] = []
+
+    def record_resolve(*_args, **kwargs):
+        calls.append(kwargs)
+        raise RuntimeError("stop after resolver inputs")
+
+    monkeypatch.setattr(session_module, "resolve_backend", record_resolve)
+
+    with pytest.raises(RuntimeError, match="stop after resolver inputs"):
+        SimSession().start(
+            _config(
+                backend_name="alphamelts",
+                feedstock_id="spinel-feed",
+                feedstocks={"spinel-feed": {"spinel_rich": True}},
+            )
+        )
+
+    assert calls
+    assert calls[0]["feedstock_id"] == "spinel-feed"
+    assert calls[0]["feedstocks"] == {"spinel-feed": {"spinel_rich": True}}
+    assert calls[0]["stage0_subprocess_required"] is True
 
 
 class _FakeSim:

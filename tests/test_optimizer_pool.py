@@ -87,6 +87,82 @@ def _profile() -> dict[str, object]:
     }
 
 
+def _pool_task(
+    index: int,
+    *,
+    feedstock_id: str,
+    stage0_subprocess_required: bool,
+    backend_name: str = "stub",
+) -> pool_module._PoolTask:
+    profile = _profile()
+    profile["run"] = dict(profile["run"])
+    profile["run"]["backend_name"] = backend_name
+    return pool_module._PoolTask(
+        index=index,
+        patch=_patch(index + 1),
+        feedstock_id=feedstock_id,
+        fidelity="fast",
+        profile=profile,
+        candidate_id=None,
+        output_dir=f"eval-{index:06d}",
+        stage0_subprocess_required=stage0_subprocess_required,
+    )
+
+
+def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
+    assert pool_module._warm_runtime_spec(
+        (
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+            ),
+            _pool_task(
+                1,
+                feedstock_id="mars_basalt",
+                stage0_subprocess_required=True,
+            ),
+        )
+    ) is None
+    assert pool_module._warm_runtime_spec(
+        (
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+                backend_name="stub",
+            ),
+            _pool_task(
+                1,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+                backend_name="alphamelts",
+            ),
+        )
+    ) is None
+
+    spec = pool_module._warm_runtime_spec(
+        (
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+            ),
+            _pool_task(
+                1,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+            ),
+        )
+    )
+
+    assert spec == pool_module._WarmRuntimeSpec(
+        backend_name="stub",
+        feedstock_id="lunar_mare_low_ti",
+        stage0_subprocess_required=True,
+    )
+
+
 def _fake_evaluate(
     patch: RecipePatch,
     feedstock_id: str,

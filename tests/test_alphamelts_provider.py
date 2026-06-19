@@ -453,6 +453,48 @@ def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     )
 
 
+def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(liquidus_C=1290.0),
+    )
+    backend.stage0_subprocess_required = True
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+    )
+    calls: list[str] = []
+
+    def fail_thermoengine(*_args, **_kwargs):
+        raise AssertionError('ThermoEngine route must be skipped')
+
+    def fake_subprocess(*_args, **_kwargs):
+        calls.append('subprocess')
+        return _build_equilibrium_for_basalt(liquidus_C=1290.0)
+
+    monkeypatch.setattr(provider_module, 'thermoengine_available', lambda _backend: True)
+    monkeypatch.setattr(provider_module, 'subprocess_available', lambda _backend: True)
+    monkeypatch.setattr(provider_module, 'python_api_available', lambda _backend: True)
+    monkeypatch.setattr(
+        provider_module,
+        'equilibrate_via_thermoengine',
+        fail_thermoengine,
+    )
+    monkeypatch.setattr(
+        provider_module,
+        'equilibrate_via_subprocess',
+        fake_subprocess,
+    )
+
+    result = provider.dispatch(request)
+
+    diagnostic = dict(result.diagnostic or {})
+    assert result.status == 'ok'
+    assert diagnostic['mode'] == 'subprocess'
+    assert calls == ['subprocess']
+
+
 @pytest.mark.parametrize(
     'intent',
     [

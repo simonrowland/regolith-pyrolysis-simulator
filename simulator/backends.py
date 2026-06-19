@@ -288,6 +288,120 @@ def build_cached_real_store(config: CachedRealConfig):
     return store
 
 
+def requires_stage0_subprocess(
+    feedstock_id: str | None,
+    feedstocks: Mapping[str, Any] | None,
+    *,
+    explicit: bool | None = None,
+) -> bool:
+    """Return True for feedstocks that must isolate AlphaMELTS in a subprocess."""
+
+    if explicit is not None:
+        return bool(explicit)
+    if not feedstock_id or not isinstance(feedstocks, Mapping):
+        return False
+    feedstock = feedstocks.get(feedstock_id)
+    if not isinstance(feedstock, Mapping):
+        return False
+    if PyrolysisSimulator._uses_mars_carbon_cleanup(feedstock):
+        return True
+    if PyrolysisSimulator._uses_carbonaceous_degas_cleanup(feedstock):
+        return True
+    return bool(
+        feedstock.get("stage0_verdict_b_subprocess_required")
+        or feedstock.get("spinel_rich")
+    )
+
+
+def stage0_subprocess_backend_config(
+    backend_name: str,
+    backend_config: Mapping[str, Any] | None,
+    *,
+    subprocess_required: bool,
+) -> dict[str, Any]:
+    copied = copy.deepcopy(dict(backend_config or {}))
+    if not subprocess_required:
+        return copied
+    name = str(backend_name or "").strip().lower()
+    if name == "stub":
+        return copied
+    if name not in ("", "auto", "alphamelts", CACHED_REAL_BACKEND_NAME):
+        return copied
+    copied["mode"] = "subprocess"
+    copied["python_bridge"] = "subprocess"
+    nested = copied.get("alphamelts")
+    if isinstance(nested, Mapping):
+        nested_config = copy.deepcopy(dict(nested))
+        nested_config["mode"] = "subprocess"
+        nested_config["python_bridge"] = "subprocess"
+        copied["alphamelts"] = nested_config
+    return copied
+
+
+def backend_transport_route(backend: Any) -> tuple[Any, Any, str]:
+    mode = getattr(backend, "_mode", getattr(backend, "mode", None))
+    bridge = getattr(backend, "_bridge", getattr(backend, "python_bridge", None))
+    route = str(bridge or mode or "").strip().lower()
+    return mode, bridge, route
+
+
+def assert_stage0_subprocess_backend_safe(
+    backend: Any,
+    *,
+    subprocess_required: bool,
+    unavailable_error_cls: type[_E] = BackendUnavailableError,
+) -> None:
+    if not subprocess_required:
+        return
+    active = str(getattr(backend, "name", type(backend).__name__) or "").lower()
+    if active == "stub" or type(backend).__name__ == "StubBackend":
+        return
+    if active == CACHED_REAL_BACKEND_NAME:
+        cached_config = getattr(backend, "config", None)
+        miss_policy = str(getattr(cached_config, "miss_policy", "") or "").lower()
+        if miss_policy != "live-fill":
+            return
+        live_backend = getattr(backend, "_live_backend", None)
+        if live_backend is None:
+            raise unavailable_error_cls(
+                "Stage-0 subprocess-required cached-real live-fill requires "
+                "a subprocess live backend; got no live backend"
+            )
+        mode, bridge, route = backend_transport_route(live_backend)
+        if route == "subprocess":
+            return
+        raise unavailable_error_cls(
+            "Stage-0 subprocess-required cached-real live-fill requires "
+            "subprocess; got "
+            f"{type(live_backend).__name__} mode={mode!r} bridge={bridge!r}"
+        )
+
+    mode, bridge, route = backend_transport_route(backend)
+    if route == "subprocess":
+        return
+    raise unavailable_error_cls(
+        "Stage-0 route for Mars/carbonaceous/spinel-rich feedstocks "
+        f"requires subprocess; got {type(backend).__name__} "
+        f"mode={mode!r} bridge={bridge!r}"
+    )
+
+
+def _attach_stage0_subprocess_marker(
+    backend: Any,
+    subprocess_required: bool,
+) -> None:
+    try:
+        backend.stage0_subprocess_required = bool(subprocess_required)
+    except Exception:  # noqa: BLE001 - marker is advisory; assertion is binding
+        return
+    live_backend = getattr(backend, "_live_backend", None)
+    if live_backend is not None:
+        try:
+            live_backend.stage0_subprocess_required = bool(subprocess_required)
+        except Exception:  # noqa: BLE001 - cached facade marker still exists
+            pass
+
+
 def resolve_backend(
     backend_name: str,
     policy: BackendSelectionPolicy,
@@ -301,8 +415,22 @@ def resolve_backend(
     cached_real_live_backend_cls: type | None = None,
     required_intents: Iterable[Any] | None = None,
     backend_config: Mapping[str, Any] | None = None,
+    feedstock_id: str | None = None,
+    feedstocks: Mapping[str, Any] | None = None,
+    stage0_subprocess_required: bool | None = None,
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
+
+    subprocess_required = requires_stage0_subprocess(
+        feedstock_id,
+        feedstocks,
+        explicit=stage0_subprocess_required,
+    )
+    effective_backend_config = stage0_subprocess_backend_config(
+        backend_name,
+        backend_config,
+        subprocess_required=subprocess_required,
+    )
 
     if policy is BackendSelectionPolicy.WEB_AUTODETECT:
         name = (backend_name or "").strip().lower()
@@ -315,7 +443,7 @@ def resolve_backend(
             stub_backend_cls=stub_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
-            backend_config=backend_config,
+            backend_config=effective_backend_config,
         )
     elif policy is BackendSelectionPolicy.RUNNER_STRICT:
         backend = _resolve_runner_strict(
@@ -325,18 +453,25 @@ def resolve_backend(
             stub_backend_cls=stub_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
-            backend_config=backend_config,
+            backend_config=effective_backend_config,
         )
     else:
         raise ValueError(f"unknown backend selection policy {policy!r}")
 
-    return _finalize_backend_resolution(
+    resolved = _finalize_backend_resolution(
         backend,
         requested_backend=str(backend_name or ""),
         policy=policy,
         required_intents=required_intents,
         unavailable_error_cls=unavailable_error_cls,
     )
+    _attach_stage0_subprocess_marker(resolved, subprocess_required)
+    assert_stage0_subprocess_backend_safe(
+        resolved,
+        subprocess_required=subprocess_required,
+        unavailable_error_cls=unavailable_error_cls,
+    )
+    return resolved
 
 
 def emit_web_engine_selection_log(

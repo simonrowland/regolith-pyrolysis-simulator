@@ -161,11 +161,26 @@ def test_messy_harness_forces_subprocess_backend_route(monkeypatch, feedstock_ke
     SimSession().start(config)
 
     assert calls
-    backend_config = calls[0][2]["backend_config"]
-    assert backend_config["mode"] == "subprocess"
-    assert backend_config["python_bridge"] == "subprocess"
-    assert backend_config["alphamelts"]["mode"] == "subprocess"
-    assert backend_config["alphamelts"]["python_bridge"] == "subprocess"
+    # BUG-066/067: subprocess forcing now happens INSIDE resolve_backend (the shared
+    # resolution point, so the worker/grind path is covered too, not just SimSession).
+    # SimSession signals the requirement + passes the inputs; resolve_backend forces.
+    # (Previously SimSession pre-forced the config dict before calling resolve_backend.)
+    from simulator.backends import stage0_subprocess_backend_config
+
+    kwargs = calls[0][2]
+    assert kwargs["stage0_subprocess_required"] is True
+    assert kwargs["feedstock_id"] == feedstock_key
+    assert kwargs["feedstocks"] is not None
+    # The shared forcing function must produce a subprocess route for these inputs.
+    forced = stage0_subprocess_backend_config(
+        config.backend_name,
+        config.backend_config,
+        subprocess_required=kwargs["stage0_subprocess_required"],
+    )
+    assert forced["mode"] == "subprocess"
+    assert forced["python_bridge"] == "subprocess"
+    assert forced["alphamelts"]["mode"] == "subprocess"
+    assert forced["alphamelts"]["python_bridge"] == "subprocess"
 
 
 def test_messy_harness_rejects_inprocess_backend_override():

@@ -405,6 +405,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         # Backends without is_available() are treated as unavailable.
         return False
 
+    def _subprocess_required(self) -> bool:
+        return bool(getattr(self._backend, 'stage0_subprocess_required', False))
+
     def _run_backend(
         self,
         request: IntentRequest,
@@ -421,7 +424,18 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
-        if thermoengine_available(self._backend):
+        subprocess_required = self._subprocess_required()
+        if subprocess_required and subprocess_available(self._backend):
+            equilibrium = equilibrate_via_subprocess(
+                self._backend,
+                temperature_C=request.temperature_C,
+                pressure_bar=request.pressure_bar,
+                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+            return 'subprocess', equilibrium
+        if not subprocess_required and thermoengine_available(self._backend):
             equilibrium = equilibrate_via_thermoengine(
                 self._backend,
                 temperature_C=request.temperature_C,
@@ -431,7 +445,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
             return 'thermoengine', equilibrium
-        if python_api_available(self._backend):
+        if not subprocess_required and python_api_available(self._backend):
             equilibrium = equilibrate_via_python_api(
                 self._backend,
                 temperature_C=request.temperature_C,
@@ -467,9 +481,12 @@ class AlphaMELTSProvider(ChemistryProvider):
                 status='unavailable',
                 warnings=('AlphaMELTS backend has no liquidus finder',),
             )
-        if thermoengine_available(self._backend):
+        subprocess_required = self._subprocess_required()
+        if subprocess_required and subprocess_available(self._backend):
+            mode = 'subprocess'
+        elif not subprocess_required and thermoengine_available(self._backend):
             mode = 'thermoengine'
-        elif python_api_available(self._backend):
+        elif not subprocess_required and python_api_available(self._backend):
             mode = 'petthermotools'
         elif subprocess_available(self._backend):
             mode = 'subprocess'
@@ -504,10 +521,11 @@ class AlphaMELTSProvider(ChemistryProvider):
         *,
         composition_mol_by_account: dict,
     ) -> tuple:
-        if thermoengine_available(self._backend):
+        subprocess_required = self._subprocess_required()
+        if not subprocess_required and thermoengine_available(self._backend):
             mode = 'thermoengine'
             equilibrate_transport = equilibrate_via_thermoengine
-        elif python_api_available(self._backend):
+        elif not subprocess_required and python_api_available(self._backend):
             mode = 'petthermotools'
             equilibrate_transport = equilibrate_via_python_api
         elif subprocess_available(self._backend):

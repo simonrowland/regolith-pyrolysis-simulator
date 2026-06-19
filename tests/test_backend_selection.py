@@ -22,7 +22,11 @@ from typing import Optional
 import pytest
 
 import web.events as events
-from simulator.backends import BackendSelectionPolicy, resolve_backend
+from simulator.backends import (
+    BackendSelectionPolicy,
+    assert_stage0_subprocess_backend_safe,
+    resolve_backend,
+)
 from simulator.melt_backend.base import StubBackend
 from web.events import BackendUnavailableError, _get_backend
 
@@ -122,6 +126,65 @@ def test_web_autodetect_policy_preserves_probe_order():
 
     assert isinstance(backend, StubBackend)
     assert calls == ['alphamelts', 'stub']
+
+
+def test_stage0_required_alphamelts_resolution_forces_subprocess_copy():
+    source_config = {
+        "mode": "thermoengine",
+        "python_bridge": "python_api",
+        "alphamelts": {"mode": "thermoengine"},
+    }
+    instances: list[_FakeAlphaMELTS] = []
+
+    class _RoutedAlphaMELTS(_FakeAlphaMELTS):
+        def initialize(self, config):
+            self._mode = str(config.get("mode") or "")
+            return super().initialize(config)
+
+    def make_alphamelts():
+        backend = _RoutedAlphaMELTS(available=True)
+        instances.append(backend)
+        return backend
+
+    backend = resolve_backend(
+        "alphamelts",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        alphamelts_backend_cls=make_alphamelts,
+        backend_config=source_config,
+        feedstock_id="spinel-feed",
+        feedstocks={"spinel-feed": {"spinel_rich": True}},
+    )
+
+    assert backend is instances[0]
+    assert getattr(backend, "_mode") == "subprocess"
+    assert getattr(backend, "stage0_subprocess_required") is True
+    assert instances[0].init_calls == [
+        {
+            "mode": "subprocess",
+            "python_bridge": "subprocess",
+            "alphamelts": {
+                "mode": "subprocess",
+                "python_bridge": "subprocess",
+            },
+        }
+    ]
+    assert source_config == {
+        "mode": "thermoengine",
+        "python_bridge": "python_api",
+        "alphamelts": {"mode": "thermoengine"},
+    }
+
+
+def test_stage0_required_rejects_reused_non_subprocess_backend():
+    backend = _FakeAlphaMELTS(available=True)
+    backend._mode = "thermoengine"
+
+    with pytest.raises(BackendUnavailableError, match="requires subprocess"):
+        assert_stage0_subprocess_backend_safe(
+            backend,
+            subprocess_required=True,
+            unavailable_error_cls=BackendUnavailableError,
+        )
 
 
 # ---------------------------------------------------------------------------
