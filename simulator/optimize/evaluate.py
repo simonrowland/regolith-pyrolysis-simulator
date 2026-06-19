@@ -24,6 +24,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
@@ -1397,6 +1398,7 @@ def _build_eval_inputs(
         run_config = replace(run_config, stop_at_stage0_exit=True)
 
     data_digests = {
+        "corpus_version": current_corpus_version(),
         "setpoints": bundle.digests["setpoints"],
         "feedstocks": bundle.digests["feedstocks"],
         "vapor_pressures": bundle.digests["vapor_pressures"],

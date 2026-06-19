@@ -13,6 +13,7 @@ import sys
 import pytest
 
 from simulator.config import load_config_bundle
+from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
@@ -59,7 +60,8 @@ PINNED_EVALSPEC_JSON = (
     b'"backend_name":"stub","c5_enabled":false,"campaign":"C0",'
     b'"chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
-    b'"data_digests":{"feedstocks":"feedstock-digest",'
+    b'"data_digests":{"corpus_version":"corpus-version-digest",'
+    b'"feedstocks":"feedstock-digest",'
     b'"materials":"materials-digest","profile":"profile-digest",'
     b'"setpoints":"setpoints-digest","species_catalog":"species-catalog-digest",'
     b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
@@ -91,6 +93,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "fidelity": "fast",
         "code_version": current_code_version(),
         "data_digests": {
+            "corpus_version": "corpus-version-digest",
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
             "vapor_pressures": "vapor-digest",
@@ -184,6 +187,7 @@ spec = EvalSpec(
     fidelity="fast",
     code_version="0.5.6",
     data_digests={
+        "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",
         "feedstocks": "feedstock-digest",
         "vapor_pressures": "vapor-digest",
@@ -260,7 +264,7 @@ def test_editing_one_feedstock_composition_changes_only_its_digest() -> None:
     assert changed == {feedstock_id}
 
 
-def test_materials_and_species_catalog_digests_change_evalspec_cache_key() -> None:
+def test_data_corpus_digests_change_evalspec_cache_key() -> None:
     profile = _mre_cap_profile()
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -270,9 +274,14 @@ def test_materials_and_species_catalog_digests_change_evalspec_cache_key() -> No
         RecipeSchema(),
     )
 
+    assert spec.data_digests["corpus_version"] == current_corpus_version()
     assert spec.data_digests["materials"]
     assert spec.data_digests["species_catalog"]
 
+    corpus_changed = replace(
+        spec,
+        data_digests={**spec.data_digests, "corpus_version": "changed-corpus-version"},
+    )
     materials_changed = replace(
         spec,
         data_digests={**spec.data_digests, "materials": "changed-materials"},
@@ -285,6 +294,7 @@ def test_materials_and_species_catalog_digests_change_evalspec_cache_key() -> No
         },
     )
 
+    assert cache_key(corpus_changed) != cache_key(spec)
     assert cache_key(materials_changed) != cache_key(spec)
     assert cache_key(species_catalog_changed) != cache_key(spec)
 
