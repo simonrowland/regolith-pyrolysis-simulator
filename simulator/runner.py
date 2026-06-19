@@ -1243,9 +1243,44 @@ def _evap_plane_selectivity_observables(snapshot: HourSnapshot) -> dict[str, Any
     }
 
 
+def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
+    summary = dict(getattr(snapshot, "fe_redox_split", {}) or {})
+    if not summary:
+        return {}
+    numeric_fields = {
+        "fO2_log",
+        "fe3_over_sigma_fe",
+        "ferric_frac",
+        "ferrous_frac",
+        "native_fe_frac",
+        "fe2o3_over_feo_molar",
+        "fe2o3_equiv_wt_pct",
+        "feo_equiv_wt_pct",
+        "temperature_K",
+        "pressure_bar",
+        "iw_log",
+    }
+    exported: dict[str, Any] = {}
+    for key, value in sorted(summary.items()):
+        if key in numeric_fields:
+            exported[key] = _finite_export_float(
+                value,
+                field=f"fe_redox_split {key}",
+            )
+        elif isinstance(value, bool):
+            exported[key] = bool(value)
+        elif value is None:
+            exported[key] = None
+        else:
+            exported[key] = str(value)
+    return {"fe_redox_split": exported}
+
+
 def build_per_hour_summary(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
+    *,
+    include_fe_redox_split: bool = False,
 ) -> dict:
     """Build the per-hour summary entry for both the CLI runner and the
     SocketIO stream.
@@ -1350,6 +1385,11 @@ def build_per_hour_summary(
         ),
         **_knudsen_regime_observables(snapshot),
         **_evap_plane_selectivity_observables(snapshot),
+        **(
+            _fe_redox_split_observables(snapshot)
+            if include_fe_redox_split
+            else {}
+        ),
     }
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category

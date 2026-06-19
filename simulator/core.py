@@ -226,6 +226,37 @@ STAGE0_TERMINAL_SLAG_COMPONENTS = {
 }
 FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
+KRESS_CARMICHAEL_1991_REFERENCE = (
+    'Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 '
+    'doi:10.1007/BF00307328'
+)
+_FE_REDOX_PYSULFSAT_COLS = {
+    'SiO2': 'SiO2_Liq',
+    'TiO2': 'TiO2_Liq',
+    'Al2O3': 'Al2O3_Liq',
+    'FeO': 'FeO_Liq',
+    'Fe2O3': 'Fe2O3_Liq',
+    'MgO': 'MgO_Liq',
+    'CaO': 'CaO_Liq',
+    'Na2O': 'Na2O_Liq',
+    'K2O': 'K2O_Liq',
+    'MnO': 'MnO_Liq',
+    'P2O5': 'P2O5_Liq',
+    'H2O': 'H2O_Liq',
+    'Cr2O3': 'Cr2O3_Liq',
+    'NiO': 'NiO_Liq',
+}
+_FE_REDOX_MOL_FRACTION_OXIDES = (
+    'SiO2',
+    'TiO2',
+    'Al2O3',
+    'MnO',
+    'MgO',
+    'CaO',
+    'Na2O',
+    'K2O',
+    'P2O5',
+)
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     'process.raw_feedstock',
@@ -1768,6 +1799,243 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
         redox_offset += min(0.15, alkali * 0.01)
         return max(-9.0, min(0.0, log_iw + redox_offset))
+
+    def _compute_fe_redox_split_diagnostic(
+        self,
+        temperature_K: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        T_K = (
+            float(temperature_K)
+            if temperature_K is not None
+            else float(self.melt.temperature_C) + 273.15
+        )
+        comp = self._melt_oxide_wt_pct()
+        fO2_log = self._compute_intrinsic_melt_fO2(T_K)
+        pressure_bar = max(float(self.overhead.pressure_mbar) * 1.0e-3, 1.0e-9)
+        log_iw = -27215.0 / T_K + 6.57 if T_K > 0.0 else -9.0
+        base = {
+            'fO2_log': float(fO2_log),
+            'temperature_K': float(T_K),
+            'pressure_bar': float(pressure_bar),
+            'iw_log': float(log_iw),
+            'native_fe_saturation': bool(fO2_log <= log_iw),
+            'native_fe_threshold': 'IW',
+            'reference': KRESS_CARMICHAEL_1991_REFERENCE,
+            'diagnostic_only': True,
+        }
+        feot_wt = self._feot_equivalent_wt_pct(comp)
+        if T_K <= 0.0 or feot_wt <= 0.0:
+            return {
+                **base,
+                'status': 'no_iron',
+                'fe3_over_sigma_fe': 0.0,
+                'ferric_frac': 0.0,
+                'ferrous_frac': 0.0,
+                'native_fe_frac': 0.0,
+                'fe2o3_over_feo_molar': 0.0,
+                'fe2o3_equiv_wt_pct': 0.0,
+                'feo_equiv_wt_pct': 0.0,
+                'source': 'none:no_iron',
+            }
+
+        split = self._fe_redox_split_from_pysulfsat(
+            comp,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+        if split is None:
+            split = self._fe_redox_split_inline_kress91(
+                comp,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+            )
+        return self._fe_redox_split_payload(
+            base,
+            split,
+        )
+
+    @staticmethod
+    def _feot_equivalent_wt_pct(comp: Mapping[str, float]) -> float:
+        feo = max(0.0, float(comp.get('FeO', 0.0) or 0.0))
+        fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0) or 0.0))
+        return feo + fe2o3 * (2.0 * 71.844 / 159.687)
+
+    def _fe_redox_pysulfsat_row(
+        self,
+        comp: Mapping[str, float],
+    ) -> Dict[str, float]:
+        row = {col: 0.0 for col in _FE_REDOX_PYSULFSAT_COLS.values()}
+        feot_wt = 0.0
+        for oxide, raw in comp.items():
+            if raw is None:
+                continue
+            value = float(raw)
+            if value <= 0.0:
+                continue
+            if oxide == 'FeO':
+                feot_wt += value
+                row['FeO_Liq'] = value
+            elif oxide == 'Fe2O3':
+                feot_wt += value * (2.0 * 71.844 / 159.687)
+                row['Fe2O3_Liq'] = value
+            else:
+                col = _FE_REDOX_PYSULFSAT_COLS.get(oxide)
+                if col is not None:
+                    row[col] = value
+        row['FeOt_Liq'] = feot_wt
+        return row
+
+    def _fe_redox_split_from_pysulfsat(
+        self,
+        comp: Mapping[str, float],
+        *,
+        T_K: float,
+        pressure_bar: float,
+        fO2_log: float,
+    ) -> Dict[str, Any] | None:
+        try:
+            import warnings
+
+            import pandas as pd  # noqa: PLC0415
+            import PySulfSat as ss  # noqa: PLC0415
+
+            df = pd.DataFrame([self._fe_redox_pysulfsat_row(comp)])
+            df['Sample_ID_Liq'] = 'SSO-R Fe-redox diagnostic'
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                fit = ss.convert_fo2_to_fe_partition(
+                    liq_comps=df,
+                    T_K=float(T_K),
+                    P_kbar=max(float(pressure_bar), 1.0e-9) / 1000.0,
+                    model='Kress1991',
+                    fo2=10.0 ** float(fO2_log),
+                )
+            fe3 = float(fit['Fe3Fet_Liq'].iloc[0])
+            fe2o3_wt = float(fit['Fe2O3_Liq'].iloc[0])
+            feo_wt = float(fit['FeO_Liq'].iloc[0])
+            ratio = float(fit['XFe3Fe2'].iloc[0])
+        except Exception:
+            return None
+        if not all(math.isfinite(v) for v in (fe3, fe2o3_wt, feo_wt, ratio)):
+            return None
+        if fe3 < 0.0 or fe3 > 1.0 or ratio < 0.0:
+            return None
+        return {
+            'status': 'ok',
+            'fe3_over_sigma_fe': fe3,
+            'fe2o3_over_feo_molar': ratio,
+            'fe2o3_equiv_wt_pct': fe2o3_wt,
+            'feo_equiv_wt_pct': feo_wt,
+            'source': 'PySulfSat.convert_fo2_to_fe_partition:Kress1991',
+        }
+
+    def _fe_redox_split_inline_kress91(
+        self,
+        comp: Mapping[str, float],
+        *,
+        T_K: float,
+        pressure_bar: float,
+        fO2_log: float,
+    ) -> Dict[str, Any]:
+        feot_wt = self._feot_equivalent_wt_pct(comp)
+        mol_counts: Dict[str, float] = {}
+        for oxide in _FE_REDOX_MOL_FRACTION_OXIDES:
+            wt = max(0.0, float(comp.get(oxide, 0.0) or 0.0))
+            molar_mass = float(MOLAR_MASS.get(oxide, 0.0) or 0.0)
+            if wt > 0.0 and molar_mass > 0.0:
+                mol_counts[oxide] = wt / molar_mass
+            else:
+                mol_counts[oxide] = 0.0
+        mol_counts['FeOt'] = feot_wt / 71.844 if feot_wt > 0.0 else 0.0
+        total_mol = sum(mol_counts.values())
+        if total_mol <= 0.0:
+            return {
+                'status': 'no_iron',
+                'fe3_over_sigma_fe': 0.0,
+                'fe2o3_over_feo_molar': 0.0,
+                'fe2o3_equiv_wt_pct': 0.0,
+                'feo_equiv_wt_pct': 0.0,
+                'source': 'inline:Kress-Carmichael1991:no_iron',
+            }
+        x = {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
+        p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+        to_K = 1673.0  # K&C 1991 T0 (matches the pressure-term T0 + publication)
+        ln_ratio = (
+            0.196 * math.log(10.0 ** float(fO2_log))
+            + 11492.0 / float(T_K)
+            - 6.675
+            - 2.243 * x.get('Al2O3', 0.0)
+            - 1.828 * x.get('FeOt', 0.0)
+            + 3.201 * x.get('CaO', 0.0)
+            + 5.854 * x.get('Na2O', 0.0)
+            + 6.215 * x.get('K2O', 0.0)
+            - 3.36 * (1.0 - (to_K / T_K) - math.log(T_K / to_K))
+            - 0.000000701 * (p_pa / T_K)
+            - 0.000000000154 * (((T_K - 1673.0) * p_pa) / T_K)
+            + 0.0000000000000000385 * ((p_pa ** 2.0) / T_K)
+        )
+        ratio = math.exp(max(-745.0, min(709.0, ln_ratio)))
+        fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
+        x_fe2o3 = ratio * x['FeOt'] / (2.0 * ratio + 1.0)
+        x_feo = max(0.0, x['FeOt'] - 2.0 * x_fe2o3)
+        weighted_total = (
+            x.get('SiO2', 0.0) * 60.0843
+            + x.get('TiO2', 0.0) * 79.8788
+            + x.get('Al2O3', 0.0) * 101.961
+            + x.get('MnO', 0.0) * 70.9375
+            + x.get('MgO', 0.0) * 40.3044
+            + x.get('CaO', 0.0) * 56.0774
+            + x.get('Na2O', 0.0) * 61.9789
+            + x.get('K2O', 0.0) * 94.196
+            + x.get('P2O5', 0.0) * 141.937
+            + x_fe2o3 * 159.687
+            + x_feo * 71.844
+        )
+        if weighted_total <= 0.0:
+            fe2o3_wt = 0.0
+            feo_wt = 0.0
+        else:
+            fe2o3_wt = 100.0 * x_fe2o3 * 159.687 / weighted_total
+            feo_wt = 100.0 * x_feo * 71.844 / weighted_total
+        return {
+            'status': 'ok',
+            'fe3_over_sigma_fe': fe3,
+            'fe2o3_over_feo_molar': ratio,
+            'fe2o3_equiv_wt_pct': fe2o3_wt,
+            'feo_equiv_wt_pct': feo_wt,
+            'source': 'inline:Kress-Carmichael1991',
+        }
+
+    @staticmethod
+    def _fe_redox_split_payload(
+        base: Mapping[str, Any],
+        split: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        fe3 = min(1.0, max(0.0, float(split.get('fe3_over_sigma_fe', 0.0))))
+        # Phase-1 stub: native-Fe0 FRACTION is not computed here -- only the
+        # coarse IW-saturation FLAG (base['native_fe_saturation']) is advisory.
+        # The real native-Fe0 saturation phase (a fraction split off the melt
+        # at low fO2) lands in SSO-R Phase-2 / R-a (see sso-r-fe-redox-design.md).
+        native = 0.0
+        ferrous = max(0.0, 1.0 - fe3 - native)
+        return {
+            **base,
+            'status': str(split.get('status', 'ok')),
+            'fe3_over_sigma_fe': fe3,
+            'ferric_frac': fe3,
+            'ferrous_frac': ferrous,
+            'native_fe_frac': native,
+            'fe2o3_over_feo_molar': float(
+                split.get('fe2o3_over_feo_molar', 0.0),
+            ),
+            'fe2o3_equiv_wt_pct': float(
+                split.get('fe2o3_equiv_wt_pct', 0.0),
+            ),
+            'feo_equiv_wt_pct': float(split.get('feo_equiv_wt_pct', 0.0)),
+            'source': str(split.get('source', 'unknown')),
+        }
 
     def _seed_atom_ledger(
         self,
@@ -5537,6 +5805,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_plane_selectivity = self._evap_plane_selectivity_diagnostic(
             evap_flux,
         )
+        fe_redox_split = self._compute_fe_redox_split_diagnostic()
 
         # --- 9. Endpoint check ---
         campaign_done = self.campaign_mgr.check_endpoint(
@@ -5565,6 +5834,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
         snapshot.evap_plane_selectivity = evap_plane_selectivity
+        snapshot.fe_redox_split = fe_redox_split
         snapshot.energy = energy
         snapshot.energy_cumulative_kWh = self.energy_cumulative_kWh
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()

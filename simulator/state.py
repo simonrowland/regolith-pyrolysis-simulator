@@ -987,6 +987,12 @@ class HourSnapshot:
     # target_species intersected with the evolved-flux species), target/total
     # selectivity. Empty dict means no selectivity diagnostic was computed.
 
+    # --- Fe redox split diagnostic (SSO-R Phase 1) ---
+    fe_redox_split: Dict[str, Any] = field(default_factory=dict)
+    # Per-tick Kress-Carmichael 1991 fO2 -> Fe3+/Fe2+ split. Diagnostic
+    # only: reports read-only fractions and source metadata without mutating
+    # melt fO2, a_FeO, evaporation, or the atom ledger.
+
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
     knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)
     # Per-tick Knudsen-regime visibility surface. Carries the
