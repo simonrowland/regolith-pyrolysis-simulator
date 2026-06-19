@@ -386,7 +386,7 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 51 | Diffusion | LJ params for N2/Ar/CO2/O2/Na/K/Ca from BSL/Svehla-style sources | literature-pinned | `simulator/condensation.py:157-180` | Medium. |
 | 52 | Diffusion | LJ params for Fe/Mg/Mn/Cr/Al/Ti/SiO estimated from rules of thumb | ASSUMED | `simulator/condensation.py:181-188` | Medium/high for metal/SiO wall capture. |
 | 53 | Knudsen | Mean-free-path formula using Boltzmann constant | first-principles | `simulator/condensation.py:2004-2021` | Medium; regime classification. |
-| 54 | Knudsen | N2 collision diameter `3.7e-10 m` | literature-pinned | `simulator/condensation.py:106`, `:2004-2008` | Medium. |
+| 54 | Knudsen | N2 collision diameter `3.798e-10 m` (BSL Table E.1 Lennard-Jones sigma) | literature-pinned | `simulator/condensation.py:114`, `:184` | Medium; single grounded source shared with the Chapman-Enskog LJ table (BUG-013). |
 | 55 | Knudsen | Regime thresholds: viscous `<0.01`, free molecular `>=10` | literature-pinned | `simulator/condensation.py:107-110`, `:2043-2050` | High if near transition; standard convention. |
 | 56 | Knudsen | Smooth regime factor `Kn/(Kn+0.01)` | ASSUMED | `simulator/condensation.py:2034-2040`, `:2206-2209` | Medium/high; arbitrary transition blend. |
 | 57 | Transport | Pipe geometry `d=0.12 m`, `L=1.0 m` | ASSUMED | `simulator/overhead.py:151-155`, `data/setpoints.yaml:1121-1124` | Very high for lab reproduction and deposits. |

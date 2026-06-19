@@ -607,7 +607,7 @@ def _hand_knudsen_number(
     gas_temperature_C: float,
 ) -> float:
     boltzmann_j_k = 1.380649e-23
-    n2_collision_diameter_m = 3.7e-10
+    n2_collision_diameter_m = 3.798e-10  # BUG-013: grounded BSL Table E.1 sigma
     gas_temperature_k = gas_temperature_C + 273.15
     pressure_pa = pressure_mbar * 100.0
     pipe_diameter_m = 0.12
@@ -634,7 +634,7 @@ def _hand_knudsen_number_5_mbar_1600c() -> float:
 
 def test_batch_global_knudsen_summary_feeds_finite_physics_gate() -> None:
     expected_kn = _hand_knudsen_number_10_mbar_1600c()
-    assert expected_kn == pytest.approx(3.5432865412006963e-4)
+    assert expected_kn == pytest.approx(3.3627904232901555e-4)
     trace = _trace(
         snapshots=(
             _snapshot(
@@ -695,7 +695,7 @@ def test_measured_segment_knudsen_margin_keeps_measured_detail() -> None:
 
 def test_repro_profile_missing_trace_knudsen_uses_pressure_band() -> None:
     expected_kn = _hand_knudsen_number_5_mbar_1600c()
-    assert expected_kn == pytest.approx(7.086573082401393e-4)
+    assert expected_kn == pytest.approx(6.725580846580311e-4)
     profile = _knudsen_gate_profile()
     del profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
         "p_total_mbar_default"

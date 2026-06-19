@@ -103,7 +103,15 @@ WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
-N2_COLLISION_DIAMETER_M = 3.7e-10
+# N2 kinetic collision diameter, grounded to the Lennard-Jones sigma for
+# N2 = 3.798 Angstrom (Bird/Stewart/Lightfoot "Transport Phenomena" 2nd
+# ed., Table E.1; equivalently Poling/Prausnitz/O'Connell, the same value
+# carried by simulator/transport_regime.py COLLISION_DIAMETERS_M["N2"]).
+# Single source of truth: the Chapman-Enskog Lennard-Jones table entry
+# below derives its N2 sigma from this constant, so the MFP/Knudsen path
+# and the binary-diffusion path can never diverge (BUG-013). Prior value
+# was an ungrounded rounded 3.7e-10 carryover with no cited source.
+N2_COLLISION_DIAMETER_M = 3.798e-10
 CONTINUUM_BUFFER_KN = 0.01
 VISCOUS_KNUDSEN_MAX = CONTINUUM_BUFFER_KN
 FREE_MOLECULAR_KNUDSEN_MIN = 10.0
@@ -172,7 +180,8 @@ GAS_CONSTANT_J_MOL_K = 8.314462618
 # absolute magnitude.
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
-    'N2':  (3.798, 71.4,   28.014),  # BSL Table E.1 (canonical)
+    # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
+    'N2':  (N2_COLLISION_DIAMETER_M * 1e10, 71.4, 28.014),  # BSL Table E.1
     'Ar':  (3.542, 93.3,   39.948),  # BSL Table E.1
     'CO2': (3.941, 195.2,  44.010),  # BSL Table E.1
     'O2':  (3.467, 106.7,  31.998),  # BSL Table E.1

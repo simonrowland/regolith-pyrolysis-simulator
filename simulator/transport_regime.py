@@ -33,6 +33,9 @@ COLLISION_DIAMETER_SOURCE = "Poling et al., Lennard-Jones sigma"
 
 COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
     {
+        # Must match simulator.condensation.N2_COLLISION_DIAMETER_M (same
+        # grounded BSL/Poling LJ sigma); see BUG-013. A future cleanup may
+        # promote both to a single shared leaf constant.
         "N2": 3.798e-10,
         "Ar": 3.542e-10,
         "O2": 3.467e-10,

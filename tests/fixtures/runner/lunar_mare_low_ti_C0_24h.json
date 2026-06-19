@@ -92,52 +92,52 @@
       "status": "ok",
       "reason": "",
       "regime": "viscous",
-      "knudsen_number": 0.000372680513248925,
-      "mean_free_path_m": 4.4721661589870996e-05,
+      "knudsen_number": 0.0003536960520488031,
+      "mean_free_path_m": 4.2443526245856374e-05,
       "overhead_pressure_mbar": 9.0,
       "gas_temperature_C": 1500.0,
       "pipe_diameter_m": 0.12,
-      "regime_factor": 0.035929045801893135,
+      "regime_factor": 0.034161332365828266,
       "segments": [
         {
           "name": "stage_0_to_stage_1",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_1_to_stage_2",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_2_to_stage_3",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_3_to_stage_4",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_4_to_stage_5",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_5_to_stage_6",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         },
         {
           "name": "stage_6_to_stage_7",
-          "knudsen_number": 0.000372680513248925,
+          "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
           "characteristic_length_m": 0.12
         }
@@ -214,12 +214,12 @@
         "Fe"
       ],
       "designated_species_kg": {
-        "Fe": 1.011977559765343e-10
+        "Fe": 1.0098109732548915e-10
       },
       "impurity_species_kg": {},
-      "designated_kg": 1.011977559765343e-10,
+      "designated_kg": 1.0098109732548915e-10,
       "impurity_kg": 0,
-      "total_kg": 1.011977559765343e-10,
+      "total_kg": 1.0098109732548915e-10,
       "purity_fraction": 1.0,
       "verdict": "PURE",
       "warning": ""
@@ -253,11 +253,11 @@
       ],
       "designated_species_kg": {},
       "impurity_species_kg": {
-        "Fe": 5.927807304318738e-11
+        "Fe": 5.943754955980195e-11
       },
       "designated_kg": 0,
-      "impurity_kg": 5.927807304318738e-11,
-      "total_kg": 5.927807304318738e-11,
+      "impurity_kg": 5.943754955980195e-11,
+      "total_kg": 5.943754955980195e-11,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -271,16 +271,16 @@
         "Na"
       ],
       "designated_species_kg": {
-        "K": 5.2827373573603196e-12,
-        "Na": 7.90936826584706e-07
+        "K": 5.282737357359565e-12,
+        "Na": 7.876328562087467e-07
       },
       "impurity_species_kg": {
-        "Fe": 3.1745928723091695e-12
+        "Fe": 3.227518119010159e-12
       },
-      "designated_kg": 7.909421093220633e-07,
-      "impurity_kg": 3.1745928723091695e-12,
-      "total_kg": 7.909452839149356e-07,
-      "purity_fraction": 0.9999959863306137,
+      "designated_kg": 7.87638138946104e-07,
+      "impurity_kg": 3.227518119010159e-12,
+      "total_kg": 7.87641366464223e-07,
+      "purity_fraction": 0.9999959022998837,
       "verdict": "PURE",
       "warning": "non-designated condensate present"
     },
@@ -290,12 +290,12 @@
       "accepted_species": [],
       "designated_species_kg": {},
       "impurity_species_kg": {
-        "K": 1.4401768245444398e-11,
-        "Na": 1.3723034684614232e-06
+        "K": 1.4401768245444973e-11,
+        "Na": 1.374899210188072e-06
       },
       "designated_kg": 0,
-      "impurity_kg": 1.3723178702296685e-06,
-      "total_kg": 1.3723178702296685e-06,
+      "impurity_kg": 1.3749136119563174e-06,
+      "total_kg": 1.3749136119563174e-06,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -306,11 +306,11 @@
       "accepted_species": [],
       "designated_species_kg": {},
       "impurity_species_kg": {
-        "Na": 6.920194138944166e-08
+        "Na": 6.991017003875213e-08
       },
       "designated_kg": 0,
-      "impurity_kg": 6.920194138944166e-08,
-      "total_kg": 6.920194138944166e-08,
+      "impurity_kg": 6.991017003875213e-08,
+      "total_kg": 6.991017003875213e-08,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -579,7 +579,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 103238.55714947502,
+      "Kn": 97979.55295450207,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -606,7 +606,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 373127.6510518784,
+      "Kn": 354120.41251307225,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -633,7 +633,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 18754.385847949005,
+      "Kn": 17799.03160267702,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -658,7 +658,7 @@
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 18754.385847949005,
+      "Kn": 17799.03160267702,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -685,7 +685,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 1087346.8329248847,
+      "Kn": 1031957.0472320921,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -715,7 +715,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 79323.81368219107,
+      "Kn": 75283.0339538198,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -745,7 +745,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 9272.503521686533,
+      "Kn": 8800.159309747894,
       "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -777,7 +777,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.07937100078733805,
+      "Kn": 0.07532781733316155,
       "regime": "transitional",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -807,7 +807,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.000372680513248925,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -835,7 +835,7 @@
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.000372680513248925,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -863,7 +863,7 @@
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.000372680513248925,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -891,7 +891,7 @@
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.000372680513248925,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -919,7 +919,7 @@
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.000372680513248925,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     }

@@ -45,8 +45,10 @@ def test_pc_extract_na_profile_knudsen_order_matches_hand_literal():
     temperature_K = 1873.15
     pipe_diameter_m = 0.12
 
-    expected_mean_free_path_m = 4.2519438494408356e-5
-    expected_knudsen = 3.5432865412006963e-4
+    # BUG-013: N2 collision diameter grounded to BSL Table E.1 sigma
+    # (3.7e-10 -> 3.798e-10 m); MFP/Kn scale by (3.7/3.798)**2 = 0.94906.
+    expected_mean_free_path_m = 4.035348507948186e-5
+    expected_knudsen = 3.3627904232901555e-4
 
     assert condensation_module._mean_free_path_m(
         pressure_pa, temperature_K
@@ -62,8 +64,10 @@ def test_pressure_band_min_knudsen_order_matches_hand_literal():
     temperature_K = 1873.15
     pipe_diameter_m = 0.12
 
-    expected_mean_free_path_m = 8.503887698881671e-5
-    expected_knudsen = 7.086573082401393e-4
+    # BUG-013: N2 collision diameter grounded to BSL Table E.1 sigma
+    # (3.7e-10 -> 3.798e-10 m); MFP/Kn scale by (3.7/3.798)**2 = 0.94906.
+    expected_mean_free_path_m = 8.070697015896373e-5
+    expected_knudsen = 6.725580846580311e-4
 
     assert condensation_module._mean_free_path_m(
         pressure_pa, temperature_K

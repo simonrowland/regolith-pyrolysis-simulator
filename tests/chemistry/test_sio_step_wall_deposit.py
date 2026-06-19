@@ -136,8 +136,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 2026-06-15 Mn/Ti Alcock/CRC grounding slightly shifts the coupled
     # fallback iteration and updates this trace wall baseline:
     # 5.35761509103e-06 -> 5.35761631701e-06 kg.
+    # 2026-06-19 BUG-013: N2 collision diameter grounded to the BSL Table
+    # E.1 Lennard-Jones sigma (3.7e-10 -> 3.798e-10 m). The MFP/Knudsen
+    # regime_factor drops ~4.9%, but viscous-regime deposition is mass-
+    # transfer-dominated, so the wall baseline moves only -0.0015%:
+    # 5.35761631701e-06 -> 5.357536728e-06 kg.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        5.35761631701e-06, rel=1e-9
+        5.357536728e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

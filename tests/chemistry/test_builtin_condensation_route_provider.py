@@ -56,27 +56,32 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
+# Cr/Fe wall-segment deposits rebased 2026-06-19 (BUG-013): grounding the N2
+# collision diameter to the BSL Table E.1 LJ sigma (3.7e-10 -> 3.798e-10 m)
+# drops the Knudsen regime_factor ~4.9%, shifting these viscous-regime
+# deposits by ~0.002-0.04%. Mg is unchanged (its deposit is mass-transfer-
+# saturated). A bounded correction, not a regression.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 5.81184172340107e-12,
-            "Fe": 1.443285407851698e-08,
+            "Cr": 5.809748227596119e-12,
+            "Fe": 1.443253353926372e-08,
             "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 5.81184172340107e-12,
+            "Cr": 5.809748227596119e-12,
             "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 0.001357753072500162,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.001357753072500162,
+            "Mg": 0.0013577530725001619,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 1.1713911382237009e-08,
+            "Fe": 1.171365114435135e-08,
             "Mg": 0.0010008115924345748,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
@@ -91,19 +96,19 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 4.258038549940918e-12,
-            "Fe": 6.766047932577008e-09,
+            "Cr": 4.256504629924088e-12,
+            "Fe": 6.765897607380145e-09,
             "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 4.258038549940918e-12,
+            "Cr": 4.256504629924088e-12,
             "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 0.002977858833864812,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.002977858833864812,
+            "Mg": 0.0029778588338648117,
         },
     },
 }
