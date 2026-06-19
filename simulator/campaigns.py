@@ -1253,9 +1253,9 @@ class CampaignManager:
             # Seal volatiles train gate valve
             # Decision needed: Path A or B
             if self._is_noninteractive_test_batch(record):
-                record.path = 'A'
-                self._record_auto_decision(record, DecisionType.PATH_AB, 'A')
-                return CampaignPhase.C2A
+                record.path = 'A_staged'
+                self._record_auto_decision(record, DecisionType.PATH_AB, 'A_staged')
+                return CampaignPhase.C2A_STAGED
             return None  # Triggers PATH_AB decision
 
         elif current == CampaignPhase.C2A:
@@ -1329,7 +1329,7 @@ class CampaignManager:
             return DecisionPoint(
                 decision_type=DecisionType.PATH_AB,
                 options=['A', 'A_staged', 'B'],
-                recommendation='A',
+                recommendation='A_staged',
                 context=(
                     'Path A: Continuous pN₂ ramp extracts Na/K/Fe/SiO₂. '
                     'Path A_staged: staged pN₂ ramp separates alkali, '

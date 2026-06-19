@@ -107,7 +107,7 @@ def test_session_script_exercises_every_verb_as_ndjson():
     assert frames[0]["backend"] == "stub"
     assert frames[0]["backend_active"] == "StubBackend"
     assert set(frames[1]["snapshot"]) == PER_HOUR_KEYS
-    assert frames[2]["decision"]["recommendation"] == "A"
+    assert frames[2]["decision"]["recommendation"] == "A_staged"
     assert frames[2]["steps"]
     assert set(frames[2]["steps"][0]) == PER_HOUR_KEYS
     assert frames[3]["choice"] == "A"

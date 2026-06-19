@@ -132,9 +132,9 @@ def test_debug_batches_auto_apply_branching_decisions():
     manager = CampaignManager({"campaigns": {}})
     record = BatchRecord(feedstock_key="debug_pure_feo")
 
-    assert manager.get_next_campaign(CampaignPhase.C0B, record) == CampaignPhase.C2A
-    assert record.path == "A"
-    assert (DecisionType.PATH_AB, "A") in record.decisions
+    assert manager.get_next_campaign(CampaignPhase.C0B, record) == CampaignPhase.C2A_STAGED
+    assert record.path == "A_staged"
+    assert (DecisionType.PATH_AB, "A_staged") in record.decisions
 
     assert manager.get_next_campaign(CampaignPhase.C3_NA, record) == CampaignPhase.C4
     assert record.branch == "two"

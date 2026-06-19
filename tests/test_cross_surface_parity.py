@@ -24,6 +24,13 @@ MASS_BALANCE_TOLERANCE_PCT = 5e-12
 # Adapted from /tmp/ae_parity_harness.py and /tmp/ae_session_recipe.txt.
 # C0/C0B force the first PATH_AB decision early; C2/C3 shortening keeps this
 # suite guard fast while still reaching O2 and vapor-product ledger accounts.
+# NB: the default PATH_AB is now A_staged (S2a4), so the run goes via
+# C2A_STAGED. C2A_staged is NOT in the max_hours overrides below — it cannot be
+# (its max_hold_hr must equal sum(stage duration_h), campaigns.py, so a
+# max_hours=1 override would raise) — so the staged path consumes more of the
+# HOURS horizon and reaches C4 but not C6 here. That shortens the expected
+# campaign/decision sequence vs the old continuous default; C6_PROCEED parity is
+# covered in tests/test_web_events_decision_pause.py.
 SETPOINT_OVERRIDES = {
     "C0": {"max_hours": 1.0, "ramp_rate": 2000.0},
     "C0B": {"max_hours": 1.0, "ramp_rate": 2000.0},
@@ -71,13 +78,12 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert {surface.final_hour for surface in surfaces} == {HOURS}
     assert batch.decisions == cli.decisions == web.decisions
     assert batch.decisions == [
-        ("PATH_AB", "A"),
+        ("PATH_AB", "A_staged"),
         ("BRANCH_ONE_TWO", "two"),
-        ("C6_PROCEED", "yes"),
     ]
 
     campaigns = _campaigns(batch.summaries)
-    assert campaigns == ["C0", "C0B", "C2A", "C3_K", "C3_NA", "C4", "C6"]
+    assert campaigns == ["C0", "C0B", "C2A_STAGED", "C3_NA", "C4"]
     assert _campaign_transition_exercised(batch.summaries)
     assert web.campaign_event_count >= 1
 

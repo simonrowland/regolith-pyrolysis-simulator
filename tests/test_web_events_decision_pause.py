@@ -77,7 +77,7 @@ EXPECTED_DECISIONS = ['PATH_AB', 'BRANCH_ONE_TWO', 'C6_PROCEED']
 # equality is clean for a non-debug feedstock; a ``debug_*`` feedstock would also
 # trip CampaignManager's auto-decision recorder and change what lands here.
 EXPECTED_ROUTING = [
-    ('PATH_AB', 'A'),
+    ('PATH_AB', 'A_staged'),
     ('BRANCH_ONE_TWO', 'two'),
     ('C6_PROCEED', 'yes'),
 ]

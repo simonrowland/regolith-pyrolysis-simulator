@@ -91,7 +91,7 @@ def test_debug_feedstock_stops_on_campaign_leave():
     result = run_stage0_harness(session)
 
     assert result.stop_reason == "campaign_left_stage0"
-    assert session.simulator.melt.campaign == CampaignPhase.C2A
+    assert session.simulator.melt.campaign == CampaignPhase.C2A_STAGED
     assert result.total_hours < 150
 
 
