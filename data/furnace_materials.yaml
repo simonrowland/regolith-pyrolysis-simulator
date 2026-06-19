@@ -1,0 +1,62 @@
+furnace_materials:
+  # Source: data/wall_materials.yaml:602-615, dense_alumina service_temp.continuous_C.
+  dense_alumina_continuous:
+    id: dense_alumina_continuous
+    display_name: "Dense high-purity alumina, continuous service"
+    max_service_T_C: 1700
+    enabled: true
+    source_note: "dense_alumina continuous_C is 1700 C; direct evidence for no-load continuous use."
+
+  # Source: data/wall_materials.yaml:602-615, dense_alumina service_temp.max_operating_C.
+  dense_alumina_max:
+    id: dense_alumina_max
+    display_name: "Dense high-purity alumina, formulation-dependent max"
+    max_service_T_C: 1843
+    enabled: true
+    source_note: "dense_alumina max_operating_C is 1843 C; wall source notes this limit is formulation dependent."
+
+  # Source: data/wall_materials.yaml:1038-1050, bulk_zirconia_ysz service_temp.max_operating_C.
+  zirconia_ysz:
+    id: zirconia_ysz
+    display_name: "Zirconia / YSZ"
+    max_service_T_C: 2200
+    enabled: true
+    source_note: "bulk_zirconia_ysz continuous_C and max_operating_C are 2200 C; unstabilized ZrO2 phase-change behavior remains a caveat."
+
+  # Source: data/wall_materials.yaml:1180-1193, plasma_sprayed_alumina service_temp.max_operating_C.
+  plasma_sprayed_alumina:
+    id: plasma_sprayed_alumina
+    display_name: "Plasma-sprayed alumina"
+    max_service_T_C: 1650
+    enabled: true
+    source_note: "plasma_sprayed_alumina continuous_C and max_operating_C are 1650 C for the cited high-purity alumina coating."
+
+  # Source: data/wall_materials.yaml:454-468, fused_silica service_temp.max_operating_C.
+  # Disabled until Chunk 3 changes the furnace_max_T_C validation floor; 1200 C is below the current [1300, 2000] floor.
+  fused_silica:
+    id: fused_silica
+    display_name: "Fused silica / fused quartz"
+    max_service_T_C: 1200
+    enabled: false
+    not_selectable_reason: "max service 1200 C is below the current furnace_max_T_C validation floor [1300, 2000]; enable with the Chunk 3 floor change"
+    source_note: "fused_silica max_operating_C is 1200 C; normal continuous_C is 1050 C and peak_C is 1250 C."
+
+  # Provisional only; not grounded in data/wall_materials.yaml.
+  sintered_regolith:
+    id: sintered_regolith
+    display_name: "Sintered regolith bootstrap furnace"
+    max_service_T_C: null
+    provisional_range_C: "1100-1200 ungrounded"
+    enabled: false
+    not_selectable_reason: "bootstrap furnace range is ungrounded and needs literature before selection"
+    source_note: "Provisional owner prompt only; no precise cap is certified in wall_materials.yaml."
+
+  # Provisional only; not grounded in data/wall_materials.yaml.
+  graphite_inert:
+    id: graphite_inert
+    display_name: "Graphite, inert atmosphere only"
+    max_service_T_C: null
+    provisional_range_C: "about 2500 ungrounded; inert-atmosphere only"
+    enabled: false
+    not_selectable_reason: "graphite cap is ungrounded and atmosphere-limited; needs literature and atmosphere guard before selection"
+    source_note: "Provisional owner prompt only; no precise cap is certified in wall_materials.yaml."
