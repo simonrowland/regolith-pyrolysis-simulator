@@ -223,6 +223,7 @@ def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
 
     assert first.status == 'out_of_domain'
     assert any('SIGABRT' in warning for warning in first.warnings)
+    assert first.diagnostics.get('backend_status_reason') == 'not_converged'
     assert backend._mode == 'subprocess'
     assert second.status == 'ok'
     assert len(calls) == 2
@@ -1188,6 +1189,7 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
         "AlphaMELTS subprocess failed before phase rows: "
         "Quadratic convergence failure. Aborting.",
     ]
+    assert result.diagnostics.get("backend_status_reason") == "not_converged"
 
 
 def test_alphamelts_stdout_parser_fails_without_stable_assemblage():

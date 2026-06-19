@@ -58,6 +58,7 @@ from engines.alphamelts.thermoengine import (
     equilibrate_via_thermoengine,
     thermoengine_available,
 )
+from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -256,6 +257,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             engine_version=self._engine_version(),
             **redox_diagnostic,
         )
+        diagnostics = _with_backend_status_reason(diagnostics)
 
         backend_status = diagnostics.backend_status
         # Map the adapter's status vocabulary onto the kernel's:
@@ -487,6 +489,12 @@ class AlphaMELTSProvider(ChemistryProvider):
             result = LiquidusSolidusResult(
                 status='not_converged',
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
+                diagnostics={
+                    'backend_status': 'not_converged',
+                    'backend_status_reason': (
+                        OutOfDomainReason.NOT_CONVERGED.value
+                    ),
+                },
             )
         return mode, result
 
@@ -685,6 +693,33 @@ def _out_of_domain_diagnostics(
         'backend_status_reason': reason,
         'out_of_domain_crash_point': crash_point,
     }
+
+
+def _with_backend_status_reason(
+    diagnostics: LiquidusDiagnostics,
+) -> LiquidusDiagnostics:
+    backend_diagnostics = dict(diagnostics.backend_diagnostics or {})
+    structured_reason = reason_value(diagnostics.backend_status_reason)
+    if structured_reason is None:
+        structured_reason = reason_value(
+            backend_diagnostics.get('backend_status_reason')
+        )
+    if (
+        structured_reason is None
+        and diagnostics.backend_status == 'not_converged'
+    ):
+        structured_reason = OutOfDomainReason.NOT_CONVERGED.value
+    if structured_reason is None:
+        return diagnostics
+
+    backend_diagnostics.setdefault(
+        'backend_status_reason',
+        structured_reason,
+    )
+    payload = diagnostics.as_diagnostic()
+    payload['backend_status_reason'] = structured_reason
+    payload['backend_diagnostics'] = backend_diagnostics
+    return LiquidusDiagnostics(**payload)
 
 
 def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:

@@ -453,6 +453,41 @@ def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     )
 
 
+@pytest.mark.parametrize(
+    'intent',
+    [
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ],
+)
+def test_provider_liquidus_exception_surfaces_status_reason(intent):
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    def fail_liquidus(**kwargs):
+        raise RuntimeError('finder exploded')
+
+    backend.find_liquidus_solidus = fail_liquidus
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        intent,
+        composition_mol=_basalt_species_mol(),
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'not_converged'
+    diagnostic = result.diagnostic or {}
+    assert diagnostic.get('backend_status_reason') == 'not_converged'
+    assert (
+        diagnostic.get('backend_diagnostics', {})
+        .get('backend_status_reason')
+        == 'not_converged'
+    )
+
+
 def test_provider_handles_silicate_equilibrium_intent():
     """Both intents share the same provider entry."""
     backend = _FakeAlphaMELTSBackend(

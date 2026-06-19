@@ -601,6 +601,7 @@ class AlphaMELTSBackend(MeltBackend):
             composition_melts_wt_pct=comp_wt,
             composition_mol=composition_mol,
             composition_mol_by_account=composition_mol_by_account,
+            reason=OutOfDomainReason.NOT_CONVERGED.value,
         )
         warnings = list(self._last_normalization_warnings)
 
@@ -865,6 +866,20 @@ class AlphaMELTSBackend(MeltBackend):
         }
         if reason is not None:
             payload['backend_status_reason'] = str(reason)
+        return payload
+
+    @staticmethod
+    def _diagnostics_with_backend_status_reason(
+        diagnostics: Optional[Mapping[str, object]],
+        *,
+        backend_status: str,
+        reason: OutOfDomainReason | str,
+    ) -> dict[str, object]:
+        payload = dict(diagnostics or {})
+        payload.setdefault('backend_status', backend_status)
+        structured_reason = reason_value(reason)
+        if structured_reason is not None:
+            payload.setdefault('backend_status_reason', structured_reason)
         return payload
 
     @staticmethod
@@ -1463,7 +1478,11 @@ class AlphaMELTSBackend(MeltBackend):
                         'composition outside Rhyolite-MELTS calibration domain',
                     ],
                     status='out_of_domain',
-                    diagnostics=diagnostics,
+                    diagnostics=self._diagnostics_with_backend_status_reason(
+                        diagnostics,
+                        backend_status='out_of_domain',
+                        reason=OutOfDomainReason.NOT_CONVERGED,
+                    ),
                 )
             if result.returncode > 0:
                 raise RuntimeError(
@@ -1577,7 +1596,11 @@ class AlphaMELTSBackend(MeltBackend):
                     fO2_log=fO2_log,
                     warnings=result_warnings,
                     status='out_of_domain',
-                    diagnostics=diagnostics,
+                    diagnostics=self._diagnostics_with_backend_status_reason(
+                        diagnostics,
+                        backend_status='out_of_domain',
+                        reason=OutOfDomainReason.NOT_CONVERGED,
+                    ),
                 )
             raise RuntimeError(
                 'AlphaMELTS subprocess produced no parseable phase assemblage'
