@@ -336,6 +336,7 @@ def test_mre_reduction_records_atom_ledger_transition():
     ] == pytest.approx(o2_kg)
     assert sim.train.stages[1].collected_kg["Fe"] == pytest.approx(fe_kg)
     assert sim._mre_metals_this_hr["Fe"] == pytest.approx(fe_kg)
+    assert sim._mre_energy_this_hr == pytest.approx(1.25)
     assert sim._oxygen_stored_kg() == pytest.approx(o2_kg)
 
 

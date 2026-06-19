@@ -55,6 +55,7 @@ from simulator.chemistry.kernel import (
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
+    ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
     min_decomposition_voltage,
 )
@@ -391,6 +392,141 @@ def test_kernel_commit_accepts_terminal_oxygen_credit(
 # ---------------------------------------------------------------------------
 # 5. Unit: deterministic single-oxide + multi-oxide proposals
 # ---------------------------------------------------------------------------
+
+
+def _dispatch_provider_and_legacy_for_pure_oxide(
+    *,
+    sim,
+    oxide: str,
+    oxide_kg: float,
+    voltage_V: float,
+    current_A: float,
+    temperature_C: float,
+):
+    sim.atom_ledger = sim._new_atom_ledger()
+    oxide_mol = oxide_kg / (MOLAR_MASS[oxide] / 1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {oxide: oxide_mol}, source="test seed"
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim._project_extraction_melt()
+    sim.melt.temperature_C = temperature_C
+
+    legacy = sim.electrolysis_model.step_hour(
+        melt_state=sim.melt,
+        voltage_V=voltage_V,
+        current_A=current_A,
+        T_C=temperature_C,
+    )
+
+    provider = BuiltinElectrolysisStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": dict(
+                sim.atom_ledger.mol_by_account("process.cleaned_melt")
+            ),
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=temperature_C,
+            pressure_bar=1e-6,
+            control_inputs={
+                "voltage_V": voltage_V,
+                "current_A": current_A,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+    return legacy, result
+
+
+def test_energy_stays_commanded_when_oxide_does_not_deplete(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    voltage_V = 0.65
+    current_A = 100.0
+
+    legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+        sim=sim,
+        oxide="FeO",
+        oxide_kg=1000.0,
+        voltage_V=voltage_V,
+        current_A=current_A,
+        temperature_C=1575.0,
+    )
+    diagnostic = dict(result.diagnostic)
+    commanded_energy_kWh = voltage_V * current_A / 1000.0
+
+    assert 0.0 < diagnostic["oxides_reduced_kg"]["FeO"] < 1000.0
+    assert legacy["energy_kWh"] == pytest.approx(
+        commanded_energy_kWh, rel=1e-12
+    )
+    assert diagnostic["energy_kWh"] == pytest.approx(
+        commanded_energy_kWh, rel=1e-12
+    )
+
+
+def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    oxide_kg = 1.0
+    voltage_V = 0.65
+    current_A = 1.0e6
+    temperature_C = 1575.0
+
+    legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+        sim=sim,
+        oxide="FeO",
+        oxide_kg=oxide_kg,
+        voltage_V=voltage_V,
+        current_A=current_A,
+        temperature_C=temperature_C,
+    )
+    diagnostic = dict(result.diagnostic)
+    commanded_energy_kWh = voltage_V * current_A / 1000.0
+
+    activity = 1.0
+    e_nernst = ElectrolysisModel().nernst_voltage(
+        "FeO", temperature_C, activity
+    )
+    overvoltage = voltage_V - e_nernst
+    eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0.0, overvoltage)))
+    eta_CE = min(0.95, max(0.10, eta_CE))
+    n_e = ELECTRONS_PER_OXIDE["FeO"]
+    uncapped_moles = current_A * eta_CE * 3600.0 / (n_e * FARADAY)
+    capped_moles = oxide_kg / (MOLAR_MASS["FeO"] / 1000.0)
+    expected_energy_kWh = commanded_energy_kWh * (
+        capped_moles * n_e
+    ) / (uncapped_moles * n_e)
+
+    assert diagnostic["oxides_reduced_kg"]["FeO"] == pytest.approx(
+        oxide_kg, rel=1e-12
+    )
+    assert legacy["energy_kWh"] == pytest.approx(
+        expected_energy_kWh, rel=1e-12
+    )
+    assert diagnostic["energy_kWh"] == pytest.approx(
+        expected_energy_kWh, rel=1e-12
+    )
+    assert diagnostic["energy_kWh"] < commanded_energy_kWh
 
 
 def test_provider_matches_legacy_step_hour_pure_feo(

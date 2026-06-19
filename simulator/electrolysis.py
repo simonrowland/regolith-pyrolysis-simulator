@@ -223,6 +223,10 @@ class ElectrolysisModel:
         # Partition current among reducible species            [SEL-1]
         # Weight by: concentration × exp(overvoltage)
         weights = {}
+        uncapped_charge_mol_e = 0.0
+        capped_charge_mol_e = 0.0
+        any_capped = False
+
         for oxide, E, dV, a in reducible:
             weights[oxide] = a * math.exp(min(dV, 3.0))
 
@@ -243,13 +247,17 @@ class ElectrolysisModel:
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
 
-            moles_reduced = (I_species * eta_CE * t_s) / (n * FARADAY)
-            kg_oxide_reduced = moles_reduced * M_oxide_gmol / 1000.0  # g→kg
+            uncapped_moles_reduced = (I_species * eta_CE * t_s) / (n * FARADAY)
+            uncapped_charge_mol_e += uncapped_moles_reduced * n
+            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0  # g->kg
 
             # Don't reduce more than available
             available = melt_state.composition_kg.get(oxide, 0.0)
+            if available < kg_oxide_reduced:
+                any_capped = True
             kg_oxide_reduced = min(kg_oxide_reduced, available)
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
+            capped_charge_mol_e += moles_reduced * n
 
             if kg_oxide_reduced > 1e-10:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
@@ -275,8 +283,15 @@ class ElectrolysisModel:
                     result['O2_produced_kg'] += O2_kg
                     result['O2_produced_mol'] += O2_mol
 
-        # Energy consumed
-        result['energy_kWh'] = voltage_V * current_A * 1.0 / 1000.0  # V×A×hr/1000
+        # Energy consumed. Final depletion hours are scaled by capped
+        # Faradaic charge; non-depletion hours stay at commanded V*A*hr.
+        # Scale ONLY when a cap actually bound, so non-depletion energy
+        # multiplies by an exact 1.0 and is BIT-identical to V*A*hr/1000
+        # (the capped/uncapped ratio would otherwise carry a kg->mol ULP).
+        cap_ratio = 1.0
+        if any_capped and uncapped_charge_mol_e > 0.0:
+            cap_ratio = capped_charge_mol_e / uncapped_charge_mol_e
+        result['energy_kWh'] = voltage_V * current_A * 1.0 / 1000.0 * cap_ratio
 
         return result
 

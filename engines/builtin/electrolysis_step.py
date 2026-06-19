@@ -283,6 +283,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         metal_mol_total: dict[str, float] = {}
         O2_mol_total = 0.0
         oxide_mol_total: dict[str, float] = {}
+        uncapped_charge_mol_e = 0.0
+        capped_charge_mol_e = 0.0
+        any_capped = False
 
         for oxide, _E, dV, _a in reducible:
             fraction = weights[oxide] / total_weight
@@ -297,15 +300,21 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             n_e = ELECTRONS_PER_OXIDE.get(oxide, 2)
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)
 
-            moles_reduced = (I_species * eta_CE * t_s) / (n_e * FARADAY)
-            kg_oxide_reduced = moles_reduced * M_oxide_gmol / 1000.0
+            uncapped_moles_reduced = (
+                I_species * eta_CE * t_s
+            ) / (n_e * FARADAY)
+            uncapped_charge_mol_e += uncapped_moles_reduced * n_e
+            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0
 
             # Cap at melt availability. Re-derive mol from the capped
             # kg to keep mol-native bookkeeping consistent with the
             # legacy path (which capped kg first then re-derived mol).
             available_kg = composition_kg.get(oxide, 0.0)
+            if available_kg < kg_oxide_reduced:
+                any_capped = True
             kg_oxide_reduced = min(kg_oxide_reduced, available_kg)
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
+            capped_charge_mol_e += moles_reduced * n_e
 
             if kg_oxide_reduced <= 1e-10:
                 continue
@@ -362,8 +371,18 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # energy via simulator/energy.py's EnergyTracker and the
         # _mre_energy_this_hr counter; energy is NOT a ledger account
         # and the proposal must never debit/credit anything energy-shaped.
-        # Mirrors legacy: V * A * dt_hr / 1000  -> kWh.
-        diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
+        # Charge final depletion hours only for oxide actually reduced.
+        # The reference is uncapped Faradaic charge after current efficiency,
+        # so normal non-depletion hours keep the commanded V*A*hr energy.
+        # Scale ONLY when a cap actually bound: otherwise multiply by an exact
+        # 1.0 so non-depletion energy is BIT-identical to V*A*dt/1000 (the
+        # capped/uncapped ratio would otherwise carry a kg->mol round-trip ULP).
+        cap_ratio = 1.0
+        if any_capped and uncapped_charge_mol_e > 0.0:
+            cap_ratio = capped_charge_mol_e / uncapped_charge_mol_e
+        diagnostic["energy_kWh"] = (
+            voltage_V * current_A * dt_hr / 1000.0 * cap_ratio
+        )
 
         # Assemble the proposal in mol-native form.
         if not oxide_mol_total:
