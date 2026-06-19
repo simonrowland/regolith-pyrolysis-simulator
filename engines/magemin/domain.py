@@ -26,6 +26,12 @@ from simulator.state import OXIDE_SPECIES
 # ``engines/magemin/provider.py::MAGEMinShadowProvider.capability_profile``).
 _MELTS_OXIDE_BASIS: Tuple[str, ...] = tuple(OXIDE_SPECIES)
 _MELTS_OXIDE_SET = frozenset(_MELTS_OXIDE_BASIS)
+_TOTAL_IRON_OXIDE_ALIASES: Dict[str, str] = {
+    'feo_total': 'FeO_total',
+    'feot': 'FeO_total',
+    'feototal': 'FeO_total',
+    'feo_tot': 'FeO_total',
+}
 
 # Species that disqualify the composition outright (regardless of amount).
 # These appear in regolith feedstocks but break MAGEMin's solid-solution
@@ -118,11 +124,14 @@ class MAGEMinDomainGate:
             )
             return False, warnings, OutOfDomainReason.MAJOR_SUM.value
 
-        normalized = {
-            str(species).strip(): float(value)
-            for species, value in composition_wt_pct.items()
-            if _is_finite(value)
-        }
+        normalized: Dict[str, float] = {}
+        for species, value in composition_wt_pct.items():
+            if not _is_finite(value):
+                continue
+            normalized_name = _canonical_domain_species(species)
+            normalized[normalized_name] = (
+                normalized.get(normalized_name, 0.0) + float(value)
+            )
         if not normalized:
             warnings.append(
                 'MAGEMinDomainGate: no finite-valued species in composition.'
@@ -149,6 +158,7 @@ class MAGEMinDomainGate:
             if amount > 0.0
             and species not in _MELTS_OXIDE_SET
             and species not in _FORBIDDEN_SET
+            and species != 'FeO_total'
         )
         if unknown:
             reason = reason or OutOfDomainReason.FORBIDDEN_SPECIES
@@ -201,3 +211,11 @@ def _is_finite(value: object) -> bool:
     except (TypeError, ValueError):
         return False
     return numeric == numeric and numeric not in (float('inf'), float('-inf'))
+
+
+def _canonical_domain_species(name: object) -> str:
+    key = str(name).strip()
+    if key in _MELTS_OXIDE_SET:
+        return key
+    alias_key = key[:-4] if key.endswith('_Liq') else key
+    return _TOTAL_IRON_OXIDE_ALIASES.get(alias_key.lower(), key)

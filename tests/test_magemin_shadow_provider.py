@@ -90,6 +90,43 @@ def test_domain_gate_accepts_basalt():
     assert warnings == []
 
 
+@pytest.mark.parametrize('alias', ['FeO_total', 'feot', 'feototal', 'feo_tot'])
+def test_domain_gate_accepts_feo_total_aliases_like_alphamelts(alias):
+    composition = _basalt_wt_pct()
+    composition[alias] = 0.25
+
+    valid, warnings = MAGEMinDomainGate.validate(composition)
+
+    assert valid is True
+    assert warnings == []
+
+
+def test_domain_gate_recognizes_feo_total_without_major_sum_credit():
+    composition = _basalt_wt_pct()
+    composition.pop('FeO')
+    composition.pop('Fe2O3')
+    composition['FeO_total'] = 11.0
+
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(composition)
+
+    assert valid is False
+    assert reason == 'major_sum'
+    joined = ' '.join(warnings)
+    assert 'unrecognised species' not in joined
+    assert 'FeO_total' not in joined
+
+
+def test_domain_gate_does_not_widen_non_total_iron_aliases():
+    composition = _basalt_wt_pct()
+    composition['sio2'] = composition.pop('SiO2')
+
+    valid, warnings, reason = MAGEMinDomainGate.validate_with_reason(composition)
+
+    assert valid is False
+    assert reason == 'forbidden_species'
+    assert any('unrecognised species' in warning for warning in warnings)
+
+
 def test_domain_gate_rejects_halides_and_native_metals():
     valid, warnings = MAGEMinDomainGate.validate(_hostile_regolith_wt_pct())
     assert valid is False
