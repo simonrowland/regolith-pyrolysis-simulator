@@ -108,6 +108,11 @@ ELECTRONS_PER_OXIDE = {
 }
 
 
+def current_efficiency(dV: float) -> float:
+    eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0, dV)))
+    return min(0.95, max(0.10, eta_CE))
+
+
 class ElectrolysisModel:
     """
     Molten Regolith Electrolysis simulator.
@@ -244,8 +249,7 @@ class ElectrolysisModel:
             I_species = current_A * fraction
 
             # Current efficiency                                [CE-1]
-            eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0, dV)))
-            eta_CE = min(0.95, max(0.10, eta_CE))
+            eta_CE = current_efficiency(dV)
 
             # Faraday's law: mass reduced this hour            [FARADAY-1]
             n = ELECTRONS_PER_OXIDE.get(oxide, 2)

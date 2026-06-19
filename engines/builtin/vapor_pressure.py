@@ -77,26 +77,15 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # labels and runtime warnings when pseudo VapoRock curve-fit fallback rows are
 # actually used.
 #
-# Mirrors EquilibriumMixin._ELLINGHAM_THERMO -- the canonical table.
-# Tuple: (dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)
-ELLINGHAM_FIT_RANGE_K = (1100.0, 1700.0)
-_ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
-    # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
-    # Mn updated 0.5.2 (2026-05-27) to a proper high-T linear refit
-    # anchored on Mn(l) above the s→l transition at 1517 K (Mn-008
-    # NIST-JANAF + phase transition data); see the rationale in
-    # simulator/equilibrium.py::_ELLINGHAM_THERMO.
-    'Na': (-1135.130, -0.537417, 4, 2),
-    'K':  (-975.838, -0.520580, 4, 2),
-    'Fe': (-538.946, -0.125272, 2, 2),
-    'Mn': (-794.540, -0.165650, 2, 2),  # Mn-008 high-T (Mn(l) basis, 1517-1700 K)
-    'Cr': (-748.076, -0.168676, 4/3, 2/3),
-    'Mg': (-1342.444, -0.336009, 2, 2),
-    'Ca': (-1285.155, -0.222295, 2, 2),
-    'Al': (-1126.073, -0.218805, 4/3, 2/3),
-    'Ti': (-939.632, -0.177149, 1, 1),
-    'Si': (-910.940, -0.182400, 1, 1),
-}
+# Canonical Ellingham table now lives in the dependency-free leaf
+# ``simulator.chemistry.ellingham_thermo`` so both this provider and the
+# EquilibriumMixin fallback can import it at module level without closing an
+# import cycle. Re-exported here under the legacy ``_ELLINGHAM_THERMO`` name
+# (consumed by metallothermic_step, vaporock/provider, and tests).
+from simulator.chemistry.ellingham_thermo import (  # noqa: E402
+    ELLINGHAM_FIT_RANGE_K,
+    ELLINGHAM_THERMO as _ELLINGHAM_THERMO,
+)
 
 
 class VaporPressureComputationError(RuntimeError):

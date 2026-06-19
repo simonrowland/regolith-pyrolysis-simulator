@@ -130,6 +130,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             DECOMP_VOLTAGES,
             ELECTRONS_PER_OXIDE,
+            current_efficiency,
         )
         from simulator.state import (
             FARADAY,
@@ -293,8 +294,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
             # Current efficiency (CE-1). Same clamp [0.10, 0.95] as
             # legacy. dV >= 0 by construction (reducible filter).
-            eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0.0, dV)))
-            eta_CE = min(0.95, max(0.10, eta_CE))
+            eta_CE = current_efficiency(dV)
 
             # Faraday's law (FARADAY-1). n electrons per formula unit.
             n_e = ELECTRONS_PER_OXIDE.get(oxide, 2)
