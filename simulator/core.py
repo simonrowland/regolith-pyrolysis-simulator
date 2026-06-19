@@ -4859,6 +4859,68 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return value, "set"
 
     _OVERLAP_EVAPORATION_RATE_EPS_KG_HR = 1e-6
+    _EVAP_PLANE_SELECTIVITY_EPS_KG_HR = 1e-12
+
+    def _c2a_staged_selectivity_targets(
+        self,
+        rates: Mapping[str, float],
+    ) -> tuple[str, ...]:
+        if self.melt.campaign != CampaignPhase.C2A_STAGED:
+            return ()
+        stage_getter = getattr(
+            self.campaign_mgr,
+            "_c2a_staged_active_stage",
+            None,
+        )
+        stage = (
+            stage_getter(self.melt.campaign_hour)
+            if callable(stage_getter)
+            else None
+        )
+        if not isinstance(stage, Mapping):
+            return ()
+
+        available_species = set(rates)
+        return tuple(
+            species
+            for species in self._diagnostic_target_species(stage.get("target_species"))
+            if species in available_species
+        )
+
+    def _evap_plane_selectivity_diagnostic(
+        self, evap_flux: EvaporationFlux,
+    ) -> Dict[str, Any]:
+        rates: Dict[str, float] = {}
+        for species, raw_rate in sorted((evap_flux.species_kg_hr or {}).items()):
+            try:
+                rate = float(raw_rate)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(rate) or rate <= self._EVAP_PLANE_SELECTIVITY_EPS_KG_HR:
+                continue
+            rates[str(species)] = rate
+
+        total_flux = sum(rates.values())
+        diagnostic: Dict[str, Any] = {
+            "total_flux_kg_hr": total_flux,
+            "per_species_fraction": {},
+        }
+        if total_flux <= self._EVAP_PLANE_SELECTIVITY_EPS_KG_HR:
+            return diagnostic
+
+        diagnostic["per_species_fraction"] = {
+            species: rate / total_flux
+            for species, rate in rates.items()
+        }
+        target_species = self._c2a_staged_selectivity_targets(rates)
+        if target_species:
+            target_flux = sum(rates.get(species, 0.0) for species in target_species)
+            diagnostic.update({
+                "target_species": list(target_species),
+                "target_flux_kg_hr": target_flux,
+                "target_selectivity": target_flux / total_flux,
+            })
+        return diagnostic
 
     @staticmethod
     def _endpoint_species_monitored(cfg: Mapping[str, Any]) -> tuple[str, ...]:
@@ -5460,6 +5522,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._update_overlap_evaporation_diagnostic(evap_flux)
         self._update_extraction_completeness_diagnostic()
+        evap_plane_selectivity = self._evap_plane_selectivity_diagnostic(
+            evap_flux,
+        )
 
         # --- 9. Endpoint check ---
         campaign_done = self.campaign_mgr.check_endpoint(
@@ -5487,6 +5552,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.campaign_hour += 1
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
+        snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.energy = energy
         snapshot.energy_cumulative_kWh = self.energy_cumulative_kWh
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()

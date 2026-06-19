@@ -1209,6 +1209,40 @@ def _knudsen_regime_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     }
 
 
+def _evap_plane_selectivity_observables(snapshot: HourSnapshot) -> dict[str, Any]:
+    summary = dict(getattr(snapshot, "evap_plane_selectivity", {}) or {})
+    target_species = tuple(str(item) for item in summary.get("target_species", ()) or ())
+    if not target_species:
+        return {}
+    fractions = {
+        str(species): _finite_export_float(
+            fraction,
+            field=f"evap_plane_selectivity fraction {species}",
+        )
+        for species, fraction in sorted(
+            (summary.get("per_species_fraction") or {}).items()
+        )
+    }
+    return {
+        "evap_plane_selectivity": {
+            "total_flux_kg_hr": _finite_export_float(
+                summary.get("total_flux_kg_hr", 0.0),
+                field="evap_plane_selectivity total flux kg/hr",
+            ),
+            "per_species_fraction": fractions,
+            "target_species": list(target_species),
+            "target_flux_kg_hr": _finite_export_float(
+                summary.get("target_flux_kg_hr", 0.0),
+                field="evap_plane_selectivity target flux kg/hr",
+            ),
+            "target_selectivity": _finite_export_float(
+                summary.get("target_selectivity", 0.0),
+                field="evap_plane_selectivity target selectivity",
+            ),
+        },
+    }
+
+
 def build_per_hour_summary(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
@@ -1315,6 +1349,7 @@ def build_per_hour_summary(
             sim, snapshot,
         ),
         **_knudsen_regime_observables(snapshot),
+        **_evap_plane_selectivity_observables(snapshot),
     }
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category

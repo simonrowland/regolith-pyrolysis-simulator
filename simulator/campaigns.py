@@ -463,6 +463,35 @@ class CampaignManager:
         self._c2a_staged_stage_idx = idx
         return stages[idx]
 
+    def _c2a_staged_stage_by_hour(
+        self,
+        campaign_hour: int,
+        stages: list,
+    ) -> dict | None:
+        if not isinstance(stages, list) or not stages:
+            return None
+        hour = max(0, int(campaign_hour))
+        elapsed = 0
+        selected = stages[-1]
+        for stage in stages:
+            if not isinstance(stage, dict):
+                continue
+            duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
+            if hour < elapsed + duration:
+                selected = stage
+                break
+            elapsed += duration
+        return selected if isinstance(selected, dict) else None
+
+    def _c2a_staged_active_stage(self, campaign_hour: int) -> dict | None:
+        stages = self._c2a_staged_enabled_stages()
+        if not stages:
+            return None
+        if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:
+            return self._c2a_staged_stage_by_hour(campaign_hour, stages)
+        idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
+        return stages[idx]
+
     def _c2a_staged_flux_decay_species(self, stage: Mapping) -> tuple[str, ...]:
         endpoint = stage.get('endpoint', {})
         if not isinstance(endpoint, Mapping):
@@ -692,17 +721,9 @@ class CampaignManager:
                 stages = cfg.get('stages', [])
                 if not isinstance(stages, list) or not stages:
                     return (1750.0, 150.0)
-                hour = max(0, int(campaign_hour))
-                elapsed = 0
-                selected = stages[-1]
-                for stage in stages:
-                    if not isinstance(stage, dict):
-                        continue
-                    duration = max(1, int(self._float(stage.get('duration_h'), 1.0)))
-                    if hour < elapsed + duration:
-                        selected = stage
-                        break
-                    elapsed += duration
+                selected = self._c2a_staged_stage_by_hour(campaign_hour, stages)
+                if selected is None:
+                    return (1750.0, 150.0)
 
                 target = self._float(selected.get('target_C'), 1750.0)
                 if selected.get('name') == 'fe_hot_hold':

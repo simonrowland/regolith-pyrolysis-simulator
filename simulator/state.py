@@ -979,6 +979,14 @@ class HourSnapshot:
     shuttle_cycle: int = 0
     # Current inject-bakeout cycle number within the C3 phase
 
+    # --- Evaporation-plane selectivity diagnostic (SSO-1) ---
+    evap_plane_selectivity: Dict[str, Any] = field(default_factory=dict)
+    # Per-tick vapor-flux selectivity surface. Diagnostic only: reports
+    # total evolved-vapor flux, per-species flux fractions, and when the
+    # staged C2A context resolves a staged target species (the stage's
+    # target_species intersected with the evolved-flux species), target/total
+    # selectivity. Empty dict means no selectivity diagnostic was computed.
+
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
     knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)
     # Per-tick Knudsen-regime visibility surface. Carries the
