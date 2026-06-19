@@ -32,6 +32,7 @@ from simulator.lab_schedule import (
     pO2_setpoint_mbar_from_schedule,
     schedule_sample_time_h,
 )
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
@@ -133,12 +134,15 @@ class CampaignManager:
             raise ValueError('furnace_max_T_C must be numeric') from exc
         if (
             not math.isfinite(self.furnace_max_T_C)
-            or self.furnace_max_T_C < 1300.0
-            or self.furnace_max_T_C > 2000.0
+            or self.furnace_max_T_C < FURNACE_MAX_T_BOUNDS_C[0]
+            or self.furnace_max_T_C > FURNACE_MAX_T_BOUNDS_C[1]
         ):
             # Grounding: docs-private/research/
             # 2026-06-18-furnace-max-temp/findings.md
-            raise ValueError('furnace_max_T_C must be finite and within [1300, 2000]')
+            raise ValueError(
+                'furnace_max_T_C must be finite and within '
+                f'[{FURNACE_MAX_T_BOUNDS_C[0]:.0f}, {FURNACE_MAX_T_BOUNDS_C[1]:.0f}]'
+            )
         # User-configurable overrides
         self.c4_max_temp_C = 1670.0  # Max T for C4 Mg pyrolysis (default)
 

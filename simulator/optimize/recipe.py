@@ -18,6 +18,7 @@ from simulator.chemistry.kernel.config import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.canonical import canonical_json_dumps
 
 KeyPath = tuple[str, ...]
@@ -194,8 +195,8 @@ class RecipeSchema:
     ALLOWLIST: tuple[KnobSpec, ...] = (
         _knob(
             "furnace_max_T_C",
-            low=1300,
-            high=2000,
+            low=FURNACE_MAX_T_BOUNDS_C[0],
+            high=FURNACE_MAX_T_BOUNDS_C[1],
             units="C",
             bounds_source=(
                 "engineering_envelope service-temperature grounding from "

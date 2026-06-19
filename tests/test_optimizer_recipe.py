@@ -11,6 +11,7 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
 )
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
@@ -182,12 +183,12 @@ def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
     schema = RecipeSchema()
     spec = schema.spec_for(FURNACE_MAX_T_C_PATH)
 
-    assert spec.low == pytest.approx(1300.0)
-    assert spec.high == pytest.approx(2000.0)
+    assert spec.low == pytest.approx(FURNACE_MAX_T_BOUNDS_C[0])
+    assert spec.high == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
     assert spec.units == "C"
     assert spec.runtime_enabled is True
-    assert RecipePatch({FURNACE_MAX_T_C_PATH: 1300.0}).validated(schema)
-    assert RecipePatch({FURNACE_MAX_T_C_PATH: 2000.0}).validated(schema)
+    assert RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[0]}).validated(schema)
+    assert RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[1]}).validated(schema)
     with pytest.raises(RecipeValidationError, match="below lower bound"):
         RecipePatch({FURNACE_MAX_T_C_PATH: 1299.0}).validated(schema)
     with pytest.raises(RecipeValidationError, match="above upper bound"):
