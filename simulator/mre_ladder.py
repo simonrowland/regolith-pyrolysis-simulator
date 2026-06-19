@@ -5,19 +5,33 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from simulator.electrolysis import DECOMP_VOLTAGES
 
-# Fallback mirrors the raw-thermo reanchor in electrolysis.DECOMP_VOLTAGES
-# (NIST-JANAF/Chase 1998, Barin, O'Neill 1988, Robie-Hemingway, NEA).
-MRE_VOLTAGE_LADDER_FALLBACK = (
-    {'voltage': 0.39, 'species': ('NiO',), 'min_hold_hours': 2},
-    {'voltage': 0.75, 'species': ('FeO',), 'min_hold_hours': 3},
-    {'voltage': 0.95, 'species': ('Cr2O3',), 'min_hold_hours': 2},
-    {'voltage': 1.05, 'species': ('MnO',), 'min_hold_hours': 2},
-    {'voltage': 1.45, 'species': ('SiO2',), 'min_hold_hours': 5},
-    {'voltage': 1.70, 'species': ('TiO2',), 'min_hold_hours': 3},
-    {'voltage': 1.95, 'species': ('Al2O3',), 'min_hold_hours': 8},
-    {'voltage': 2.2, 'species': ('MgO',), 'min_hold_hours': 5},
-    {'voltage': 2.5, 'species': ('CaO',), 'min_hold_hours': 10},
+# Fallback ladder used when the YAML MRE sequence is missing/unusable. Rung
+# voltages are DERIVED from the single-source electrolysis.DECOMP_VOLTAGES
+# raw-thermo reanchor (NIST-JANAF/Chase 1998, Barin, O'Neill 1988,
+# Robie-Hemingway, NEA) -- no second hard-coded copy of the voltage numbers.
+# Na2O/K2O (C3-depleted, DISABLED_PRESET_TARGETS) and Fe2O3 (deferred single-
+# rung; see SSO-R Phase-2) are intentionally absent from the C5 fallback ladder.
+# Each tuple is (species, min_hold_hours); voltage = DECOMP_VOLTAGES[species].
+_FALLBACK_LADDER_RUNGS = (
+    (('NiO',), 2),
+    (('FeO',), 3),
+    (('Cr2O3',), 2),
+    (('MnO',), 2),
+    (('SiO2',), 5),
+    (('TiO2',), 3),
+    (('Al2O3',), 8),
+    (('MgO',), 5),
+    (('CaO',), 10),
+)
+MRE_VOLTAGE_LADDER_FALLBACK = tuple(
+    {
+        'voltage': DECOMP_VOLTAGES[species[0]],
+        'species': species,
+        'min_hold_hours': min_hold_hours,
+    }
+    for species, min_hold_hours in _FALLBACK_LADDER_RUNGS
 )
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3

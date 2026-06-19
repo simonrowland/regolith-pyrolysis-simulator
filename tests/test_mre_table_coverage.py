@@ -105,3 +105,32 @@ def test_decomp_voltage_ordering_matches_raw_thermo_reanchor() -> None:
     assert grouped == sorted(grouped)
     assert len(grouped) == len(set(grouped))
     assert min_decomposition_voltage() == pytest.approx(0.39)
+
+
+def test_fallback_ladder_voltages_are_derived_from_decomp_voltages() -> None:
+    # BUG-011 (SC-09): the C5 fallback ladder must not carry a second hard-coded
+    # copy of the rung voltages -- each rung's voltage is sourced from the single
+    # DECOMP_VOLTAGES table. (Value identity, not a brittle source-string check.)
+    from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
+
+    for rung in MRE_VOLTAGE_LADDER_FALLBACK:
+        species = rung["species"]
+        assert len(species) == 1, f"fallback rung expects a single species: {rung}"
+        assert rung["voltage"] == DECOMP_VOLTAGES[species[0]], (
+            f"fallback voltage for {species[0]} drifted from DECOMP_VOLTAGES"
+        )
+
+
+def test_fallback_ladder_excludes_alkali_and_ferric_rungs() -> None:
+    # Na2O/K2O are pre-depleted by C3 (DISABLED_PRESET_TARGETS); Fe2O3 is a
+    # deferred single-rung pending SSO-R Phase-2 speciation. None belong in the
+    # C5 fallback ladder even though they exist in DECOMP_VOLTAGES.
+    from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
+
+    fallback_species = {
+        sp for rung in MRE_VOLTAGE_LADDER_FALLBACK for sp in rung["species"]
+    }
+    assert fallback_species.isdisjoint({"Na2O", "K2O", "Fe2O3"})
+    assert fallback_species == {
+        "NiO", "FeO", "Cr2O3", "MnO", "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
+    }
