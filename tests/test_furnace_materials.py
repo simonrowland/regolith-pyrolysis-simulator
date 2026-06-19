@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import pytest
+import yaml
 
 from simulator.core import CampaignPhase
 from simulator.furnace_materials import (
@@ -6,6 +9,29 @@ from simulator.furnace_materials import (
     resolve_furnace_max_T_C,
 )
 from simulator.runner import PyrolysisRun
+
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+
+# Dense alumina intentionally has two furnace rows anchored to one wall material:
+# no-load continuous service and formulation-dependent maximum service.
+FURNACE_WALL_SERVICE_TEMP_ANCHORS = {
+    "dense_alumina_continuous": ("dense_alumina", "continuous_C"),
+    "dense_alumina_max": ("dense_alumina", "max_operating_C"),
+    "zirconia_ysz": ("bulk_zirconia_ysz", "max_operating_C"),
+    "plasma_sprayed_alumina": ("plasma_sprayed_alumina", "max_operating_C"),
+    "fused_silica": ("fused_silica", "max_operating_C"),
+}
+
+# Provisional furnace options with no certified wall_materials.yaml service-temp anchor.
+UNANCHORED_FURNACE_MATERIALS = {
+    "sintered_regolith",
+    "graphite_inert",
+}
+
+
+def _load_yaml(path):
+    with path.open() as handle:
+        return yaml.safe_load(handle)
 
 
 def test_catalog_loads_grounded_enabled_materials():
@@ -18,6 +44,30 @@ def test_catalog_loads_grounded_enabled_materials():
     assert catalog["zirconia_ysz"]["enabled"] is True
     assert catalog["plasma_sprayed_alumina"]["max_service_T_C"] == 1650
     assert catalog["plasma_sprayed_alumina"]["enabled"] is True
+
+
+def test_furnace_material_caps_track_wall_material_temperature_anchors():
+    furnace_materials = _load_yaml(DATA_DIR / "furnace_materials.yaml")[
+        "furnace_materials"
+    ]
+    wall_materials = _load_yaml(DATA_DIR / "wall_materials.yaml")["materials"]
+
+    assert set(furnace_materials) == (
+        set(FURNACE_WALL_SERVICE_TEMP_ANCHORS) | UNANCHORED_FURNACE_MATERIALS
+    )
+
+    for furnace_id, (
+        wall_id,
+        service_temp_key,
+    ) in FURNACE_WALL_SERVICE_TEMP_ANCHORS.items():
+        wall_service_temp = wall_materials[wall_id]["service_temp"]
+
+        assert furnace_materials[furnace_id]["max_service_T_C"] == wall_service_temp[
+            service_temp_key
+        ], f"{furnace_id} must track {wall_id}.service_temp.{service_temp_key}"
+
+    for furnace_id in UNANCHORED_FURNACE_MATERIALS:
+        assert furnace_materials[furnace_id]["max_service_T_C"] is None
 
 
 def test_catalog_disabled_materials_are_not_selectable():
