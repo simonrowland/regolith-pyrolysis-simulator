@@ -25,6 +25,16 @@ from simulator.melt_backend.base import LiquidFractionInvalidError, MeltComposit
 from simulator.melt_backend.magemin import MAGEMinBackend
 
 
+def _disable_configured_magemin_path(monkeypatch):
+    import simulator.engine_local_config as engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "configured_magemin_binary_path",
+        lambda: None,
+    )
+
+
 def _make_available_magemin(monkeypatch, fake_module):
     """Force a MAGEMinBackend to initialize() successfully with a fake bridge.
 
@@ -33,6 +43,7 @@ def _make_available_magemin(monkeypatch, fake_module):
     binary discovery and the Python-bridge import so no real MAGEMin
     install is required.
     """
+    _disable_configured_magemin_path(monkeypatch)
     monkeypatch.setattr(
         MAGEMinBackend,
         "_locate_binary",
@@ -42,6 +53,21 @@ def _make_available_magemin(monkeypatch, fake_module):
         MAGEMinBackend,
         "_import_magemin_bridge",
         lambda self, *, requested: ("pymagemin", fake_module),
+    )
+
+
+def _make_absent_magemin(monkeypatch):
+    """Force all MAGEMin availability probes to report absent."""
+    _disable_configured_magemin_path(monkeypatch)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: None),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: (None, None),
     )
 
 
@@ -172,11 +198,7 @@ def test_magemin_liquidus_finder_unavailable_without_backend():
 def test_magemin_absent_binary_marks_backend_unavailable(monkeypatch):
     # No binary anywhere -> initialize() returns False and the backend
     # stays unavailable. The simulator can then route around it.
-    monkeypatch.setattr(
-        MAGEMinBackend,
-        "_locate_binary",
-        staticmethod(lambda explicit: None),
-    )
+    _make_absent_magemin(monkeypatch)
 
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
@@ -191,11 +213,7 @@ def test_magemin_absent_equilibrate_returns_empty_result_with_warning(
     # When MAGEMin is unavailable, equilibrate() must NOT raise: it
     # returns an empty EquilibriumResult carrying an explanatory warning,
     # and -- critically for the shadow posture -- no ledger transition.
-    monkeypatch.setattr(
-        MAGEMinBackend,
-        "_locate_binary",
-        staticmethod(lambda explicit: None),
-    )
+    _make_absent_magemin(monkeypatch)
 
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
@@ -1016,6 +1034,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     fake_binary = tmp_path / "MAGEMin"
     fake_binary.write_text("", encoding="utf-8")
 
+    _disable_configured_magemin_path(monkeypatch)
     monkeypatch.setattr(
         MAGEMinBackend,
         "_locate_binary",
