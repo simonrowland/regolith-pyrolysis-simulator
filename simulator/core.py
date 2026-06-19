@@ -394,6 +394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstocks: dict,
         vapor_pressures: dict,
         *,
+        materials: dict | None = None,
         allow_lab_geometry_temperature_profiles: bool = False,
     ):
         """
@@ -411,6 +412,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                           silent fallback).
             feedstocks:   Feedstock compositions from feedstocks.yaml.
             vapor_pressures: Antoine parameters from vapor_pressures.yaml.
+            materials: Material surface/liner data from materials.yaml.
         """
         self.backend = melt_backend
         self._last_backend_error = ''
@@ -446,6 +448,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.setpoints = copy.deepcopy(setpoints)
         self.feedstocks = copy.deepcopy(feedstocks)
         self.vapor_pressures = copy.deepcopy(vapor_pressures)
+        self.materials = copy.deepcopy(materials) if materials is not None else None
         self.lab_geometry = parse_lab_geometry(
             self.setpoints.get("lab_geometry"),
             allow_temperature_profiles=allow_lab_geometry_temperature_profiles,
@@ -659,6 +662,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.train,
                 vapor_pressure_data=self.vapor_pressures,
                 wall_temperature_C=self.overhead_model.pipe_temperature_C,
+                materials=self.materials,
             )
             self._condensation_model.apply_setpoints_overrides(
                 self.setpoints

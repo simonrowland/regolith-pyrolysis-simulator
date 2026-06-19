@@ -897,6 +897,7 @@ class PyrolysisRun:
             feedstocks=feedstocks,
             setpoints=setpoints,
             vapor_pressures=vapor_pressures,
+            materials=bundle.materials,
             campaign=campaign_name,
             backend_name=self.backend_name,
             reduced_real_cache=self.reduced_real_cache,

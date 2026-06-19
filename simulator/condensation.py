@@ -542,9 +542,13 @@ class CondensationModel:
         vapor_pressure_data: MutableMapping[str, Any] | None = None,
         wall_surface_area_m2: float | None = None,
         wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
+        materials: Mapping[str, Any] | None = None,
     ):
         self.train = train
         self.vapor_pressure_data = copy.deepcopy(vapor_pressure_data)
+        self.materials = copy.deepcopy(
+            materials if materials is not None else MATERIALS_DATA
+        )
         # 0.5.4.1 review-cluster-C (P2 #1, evening-4commits review):
         # per-instance per-species condensation temperatures so each
         # CondensationModel can carry its own setpoints overrides
@@ -1067,7 +1071,7 @@ class CondensationModel:
                     T_cond_C=T_cond,
                     residence_s=self.residence_time_s.get(
                         stage.stage_number, 1.0),
-                    alpha_s=_stage_alpha_s(stage, species),
+                    alpha_s=_stage_alpha_s(stage, species, self.materials),
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings),
@@ -1099,7 +1103,9 @@ class CondensationModel:
                     antoine_extrapolation_warnings),
             )
             if self._mixed_temperature_wall_candidate_segments(species):
-                wall_sticking_alpha_by_species[species] = _wall_alpha_s(species)
+                wall_sticking_alpha_by_species[species] = _wall_alpha_s(
+                    species, self.materials
+                )
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
@@ -1599,8 +1605,15 @@ def _species_condensation_temperature_C(
         return 500.0
 
 
-def _stage_material_config(stage: CondensationStage) -> Mapping[str, Any]:
-    stages = MATERIALS_DATA.get('stages', {}) or {}
+def _materials_source(materials: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
+    return materials if materials is not None else MATERIALS_DATA
+
+
+def _stage_material_config(
+    stage: CondensationStage,
+    materials: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    stages = _materials_source(materials).get('stages', {}) or {}
     if not isinstance(stages, Mapping):
         return {}
     config = stages.get(stage.stage_number, stages.get(str(stage.stage_number), {}))
@@ -1612,8 +1625,12 @@ def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
     return float(lo_C), float(hi_C)
 
 
-def _stage_alpha_s(stage: CondensationStage, species: str) -> float:
-    config = _stage_material_config(stage)
+def _stage_alpha_s(
+    stage: CondensationStage,
+    species: str,
+    materials: Mapping[str, Any] | None = None,
+) -> float:
+    config = _stage_material_config(stage, materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
     value = (
         alpha_by_species.get(species)
@@ -1631,16 +1648,21 @@ def _stage_alpha_s(stage: CondensationStage, species: str) -> float:
     return max(0.0, min(1.0, alpha_s))
 
 
-def _wall_material_config() -> Mapping[str, Any]:
-    surfaces = MATERIALS_DATA.get('wall_surfaces', {}) or {}
+def _wall_material_config(
+    materials: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    surfaces = _materials_source(materials).get('wall_surfaces', {}) or {}
     if not isinstance(surfaces, Mapping):
         return {}
     config = surfaces.get('interstage_duct', {}) or {}
     return config if isinstance(config, Mapping) else {}
 
 
-def _wall_alpha_s(species: str) -> float:
-    config = _wall_material_config()
+def _wall_alpha_s(
+    species: str,
+    materials: Mapping[str, Any] | None = None,
+) -> float:
+    config = _wall_material_config(materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
     value = (
         alpha_by_species.get(species)
@@ -1649,7 +1671,9 @@ def _wall_alpha_s(species: str) -> float:
     )
     if value is None:
         liner_material = config.get('liner_material')
-        material_config = _liner_material_config(str(liner_material or ''))
+        material_config = _liner_material_config(
+            str(liner_material or ''), materials
+        )
         material_alpha = material_config.get('alpha_s_by_species', {}) or {}
         if isinstance(material_alpha, Mapping):
             value = material_alpha.get(species)
@@ -1664,11 +1688,14 @@ def _wall_alpha_s(species: str) -> float:
     return max(0.0, min(1.0, alpha_s))
 
 
-def _liner_material_config(material: str) -> Mapping[str, Any]:
-    materials = MATERIALS_DATA.get('liner_materials', {}) or {}
-    if not isinstance(materials, Mapping):
+def _liner_material_config(
+    material: str,
+    materials: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    liner_materials = _materials_source(materials).get('liner_materials', {}) or {}
+    if not isinstance(liner_materials, Mapping):
         return {}
-    config = materials.get(material, {}) or {}
+    config = liner_materials.get(material, {}) or {}
     return config if isinstance(config, Mapping) else {}
 
 

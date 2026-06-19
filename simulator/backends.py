@@ -99,6 +99,7 @@ class SimulatorBuildConfig:
     setpoints: Mapping[str, Any]
     feedstocks: Mapping[str, Any]
     vapor_pressures: Mapping[str, Any]
+    materials: Mapping[str, Any] | None = None
     allow_lab_geometry_temperature_profiles: bool = False
 
 
@@ -110,6 +111,11 @@ def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
         copy.deepcopy(config.setpoints),
         copy.deepcopy(config.feedstocks),
         copy.deepcopy(config.vapor_pressures),
+        materials=(
+            copy.deepcopy(config.materials)
+            if config.materials is not None
+            else None
+        ),
         allow_lab_geometry_temperature_profiles=(
             config.allow_lab_geometry_temperature_profiles
         ),

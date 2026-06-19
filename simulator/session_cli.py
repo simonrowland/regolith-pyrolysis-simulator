@@ -78,6 +78,7 @@ class SessionScriptRunner:
             feedstocks=bundle.feedstocks,
             setpoints=bundle.setpoints,
             vapor_pressures=bundle.vapor_pressures,
+            materials=bundle.materials,
             campaign=parsed.campaign,
             backend_name=parsed.backend,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,

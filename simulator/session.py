@@ -85,6 +85,7 @@ class SimSessionConfig:
     feedstocks: Mapping[str, Any]
     setpoints: Mapping[str, Any]
     vapor_pressures: Mapping[str, Any]
+    materials: Mapping[str, Any] | None = None
     campaign: str = "C0"
     backend_name: str = "stub"
     backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
@@ -272,6 +273,7 @@ class SimSession:
                 setpoints=config.setpoints,
                 feedstocks=config.feedstocks,
                 vapor_pressures=config.vapor_pressures,
+                materials=config.materials,
                 allow_lab_geometry_temperature_profiles=(
                     _has_runtime_surface_temperature_schedule(
                         config.runtime_campaign_overrides

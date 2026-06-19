@@ -1992,7 +1992,7 @@ def wall_deposit_candidate_for_surface_kg(
         _wall_alpha_s,
     )
 
-    alpha_s = _wall_alpha_s(species)
+    alpha_s = _wall_alpha_s(species, getattr(model, "materials", None))
     if alpha_s <= 0.0:
         return 0.0
 

@@ -339,6 +339,66 @@ def test_simulator_construction_applies_setpoints_overrides():
     )
 
 
+def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
+    from simulator.backends import SimulatorBuildConfig, build_simulator
+    from simulator.config import load_config_bundle
+    from simulator.melt_backend.base import StubBackend
+
+    default_model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    default_route = default_model.route(
+        EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    assert (
+        default_route.sticking_alpha_provenance_notice["alpha_s_by_species"][
+            "SiO"
+        ]
+        == pytest.approx(0.7)
+    )
+
+    materials_path = tmp_path / "materials.yaml"
+    source_path = Path(__file__).resolve().parents[1] / "data" / "materials.yaml"
+    materials_path.write_text(
+        source_path.read_text().replace("  SiO: 0.7\n", "  SiO: 0.23\n", 1)
+    )
+    bundle = load_config_bundle(materials_path=materials_path)
+
+    assert (
+        condensation_module.MATERIALS_DATA["default_alpha_s_by_species"][
+            "SiO"
+        ]
+        == pytest.approx(0.7)
+    )
+    backend = StubBackend()
+    backend.initialize({})
+    sim = build_simulator(
+        SimulatorBuildConfig(
+            backend=backend,
+            setpoints=bundle.setpoints,
+            feedstocks=bundle.feedstocks,
+            vapor_pressures=bundle.vapor_pressures,
+            materials=bundle.materials,
+        )
+    )
+    sim.condensation_model.configure_operating_conditions(
+        wall_temperature_C=900.0
+    )
+    route = sim.condensation_model.route(
+        EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+
+    assert sim.condensation_model.materials["default_alpha_s_by_species"][
+        "SiO"
+    ] == pytest.approx(0.23)
+    assert route.sticking_alpha_provenance_notice["alpha_s_by_species"][
+        "SiO"
+    ] == pytest.approx(0.23)
+
+
 @pytest.mark.parametrize(
     "subpath",
     ["cold_spot_diagnostic", "pressure_isolated_capture_budget"],

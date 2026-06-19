@@ -860,6 +860,7 @@ def register_events(socketio):
         feedstocks = load_visible_feedstocks()
         setpoints = dict(_load_yaml('setpoints.yaml'))
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
+        materials = _load_yaml('materials.yaml')
         furnace_material_id = str(data.get('furnace_material_id') or '').strip()
         if furnace_material_id:
             try:
@@ -908,6 +909,7 @@ def register_events(socketio):
                     feedstocks=feedstocks,
                     setpoints=setpoints,
                     vapor_pressures=vapor_pressures,
+                    materials=materials,
                     backend_name=_backend_name_for_session(backend),
                     backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
                     mass_kg=mass_kg,

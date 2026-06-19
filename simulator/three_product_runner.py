@@ -63,6 +63,7 @@ def _build_session(
         feedstocks=_load_yaml(data_dir, "feedstocks.yaml"),
         setpoints=_load_yaml(data_dir, "setpoints.yaml"),
         vapor_pressures=_load_yaml(data_dir, "vapor_pressures.yaml"),
+        materials=_load_yaml(data_dir, "materials.yaml"),
         campaign=campaign,
         backend_name=backend_name,
         backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
