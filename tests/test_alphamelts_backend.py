@@ -232,9 +232,11 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
+    seen = {}
 
     def fake_run(*args, **kwargs):
-        raise subprocess.TimeoutExpired(cmd=args[0], timeout=20)
+        seen['timeout'] = kwargs['timeout']
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=kwargs['timeout'])
 
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
 
@@ -246,6 +248,35 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
             pressure_bar=1.0,
         )
 
+    assert seen['timeout'] == 20.0
+    assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+    assert backend.initialize({'mode': 'subprocess', 'timeout_s': 37.5}) is True
+    seen = {}
+
+    def fake_run(*args, **kwargs):
+        seen['timeout'] = kwargs['timeout']
+        return types.SimpleNamespace(returncode=-6, stdout='', stderr='')
+
+    monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
+
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert seen['timeout'] == 37.5
     assert backend._mode == 'subprocess'
 
 

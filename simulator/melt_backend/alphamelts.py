@@ -1426,13 +1426,16 @@ class AlphaMELTSBackend(MeltBackend):
             # Run alphaMELTS directly. The alphaMELTS 2 app runner only
             # emits *_tbl.txt for path-style runs; single-point equilibria
             # report the stable phase assemblage on stdout.
+            timeout_s = getattr(self, '_timeout_s', 20.0)
+            if timeout_s is None:
+                timeout_s = 20.0
             try:
                 result = subprocess.run(
                     [str(binary), '1'],
                     cwd=tmpdir,
                     input=menu_input,
                     capture_output=True, text=True,
-                    timeout=20,
+                    timeout=timeout_s,
                     env=env,
                 )
             except subprocess.TimeoutExpired as exc:
