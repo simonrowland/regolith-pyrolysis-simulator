@@ -1747,9 +1747,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         alkali = max(0.0, float(comp.get('Na2O', 0.0))) + max(
             0.0, float(comp.get('K2O', 0.0)))
         # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
-        # matching the Phase 1 contract's Kress91 basalt reference. The
-        # composition term is intentionally small until an explicit Fe3+/Fe2+
-        # policy lands.
+        # matching the Phase 1 contract's Kress91 basalt reference.
+        # The ferric branch below is NOT dead: sulfate-bearing feedstocks
+        # can populate Fe2O3 in cleaned_melt via Stage-0 FeSO4->Fe2O3
+        # (core.py:186-194; data/foulant_thermo.yaml:199-215;
+        # test_stage0_cation_routing.py:433-434). The ferric 0.25
+        # coefficient plus 1e-12 clamp, and the alkali 0.01 / 0.15 cap,
+        # are ungrounded constants in the live intrinsic-fO2 path:
+        # intrinsic fO2 sets melt.fO2_log every tick (core.py:5398) and
+        # feeds evaporation/equilibrium (evaporation.py:255). SSO-R task
+        # #41 grounds/replaces this with explicit Fe3+/Fe2+ policy
+        # (Kress & Carmichael 1991; fO2 as state variable, fO2->split)
+        # in docs-private/research/2026-06-18-staged-selectivity-optimizer/
+        # sso-r-fe-redox-design.md. That replacement is golden-affecting
+        # for sulfate feedstocks, so it is gated/re-baselined there, not a
+        # de-stub.
         log_iw = -27215.0 / T_K + 6.57
         redox_offset = 0.0
         if feo > 0.0 and fe2o3 > 0.0:
