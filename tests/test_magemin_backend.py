@@ -263,7 +263,7 @@ def test_magemin_fake_bridge_receives_oxide_wt_pct_basis(monkeypatch):
 
     # Mol-native input including a non-oxide species (native Fe metal)
     # that the oxide projection must drop.
-    backend.equilibrate(
+    result = backend.equilibrate(
         1400.0,
         composition_mol={
             "SiO2": 5.0,
@@ -288,6 +288,11 @@ def test_magemin_fake_bridge_receives_oxide_wt_pct_basis(monkeypatch):
     assert "SiO2" in comp and comp["SiO2"] > 0.0
     # Oxide wt% basis is normalized to 100.
     assert sum(comp.values()) == pytest.approx(100.0, rel=1e-6)
+    projection = result.diagnostics["input_composition_projection"]
+    assert projection["status"] == "projected"
+    assert projection["reason"] == "input_composition_projected"
+    assert projection["dropped_species"] == ["Fe"]
+    assert projection["renormalization_delta"] > 0.0
 
 
 def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
@@ -322,6 +327,38 @@ def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
     # Temperature is passed through in both C and K.
     assert captured["T_C"] == pytest.approx(1450.0)
     assert captured["T_K"] == pytest.approx(1450.0 + 273.15)
+
+
+def test_magemin_ok_result_records_bulk_projection_drop(monkeypatch):
+    captured = {}
+
+    def minimize(**kwargs):
+        captured.update(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={"SiO2": 50.0, "MgO": 50.0, "MnO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=5000.0,
+    )
+
+    assert result.status == "ok"
+    assert "MnO" not in captured["composition"]
+    projection = result.diagnostics["input_composition_projection"]
+    assert projection["status"] == "projected"
+    assert projection["dropped_bulk_components"] == ["MnO"]
+    assert projection["magemin_database"] == "ig"
+    assert projection["bulk_dropped_wt_pct"] > 0.0
+    assert "dropped_species" not in projection
 
 
 def test_magemin_pressure_conversion_helpers_are_exact():
@@ -397,6 +434,8 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert mp.order == MAGEMinBackend._DB_BULK_ORDERS["mp"]
     assert mp.vector[mp.order.index("MnO")] == pytest.approx(0.4)
     assert "Cr2O3" not in mp.composition_wt_pct
+    assert mp.dropped_components == ("Cr2O3",)
+    assert mp.merged_components == ("FeO->FeOt+O",)
     assert any("Cr2O3" in warning for warning in mp.warnings)
     assert any("FeO->FeOt+O" in warning for warning in mp.warnings)
 
@@ -404,6 +443,7 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert "H2O" not in igad.order
     assert "H2O" not in igad.composition_wt_pct
     assert "MnO" not in igad.composition_wt_pct
+    assert igad.dropped_components == ("H2O", "MnO")
     assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
 
 
@@ -618,6 +658,18 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
     dropped = result.diagnostics["dropped_non_basis_melt_mass_kg_by_species"]
     assert "NaCl" in dropped
     assert dropped["NaCl"] > 0.0
+    projection = result.diagnostics["input_composition_projection"]
+    assert projection["status"] == "projected"
+    assert projection["dropped_species"] == ["NaCl"]
+    assert projection["dropped_accounts"] == [
+        "process.metal_alloy",
+        "process.sulfide_matte",
+    ]
+    assert projection["dropped_account_species"] == {
+        "process.metal_alloy": ["Fe"],
+        "process.sulfide_matte": ["FeS"],
+    }
+    assert projection["renormalization_delta"] > 0.0
 
 
 # ----------------------------------------------------------------------

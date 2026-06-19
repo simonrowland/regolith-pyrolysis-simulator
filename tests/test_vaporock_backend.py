@@ -229,6 +229,12 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert result.status == "ok"
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
+    projection = result.diagnostics["input_composition_projection"]
+    assert projection["status"] == "projected"
+    assert projection["reason"] == "input_composition_projected"
+    assert projection["backend"] == "VapoRock"
+    assert projection["dropped_species"] == ["Fe", "FeS", "NaCl"]
+    assert projection["renormalization_delta"] > 0.0
 
 
 def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):

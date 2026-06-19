@@ -103,6 +103,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import (
+    CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
@@ -125,6 +126,150 @@ class _MAGEMinBulkProjection:
     vector: Tuple[float, ...]
     composition_wt_pct: Dict[str, float]
     warnings: Tuple[str, ...]
+    dropped_components: Tuple[str, ...] = ()
+    merged_components: Tuple[str, ...] = ()
+    source_sum_wt_pct: float = 0.0
+    projected_sum_wt_pct: float = 0.0
+
+
+def _dropped_account_species(
+    composition_mol_by_account: Mapping[str, Mapping[str, float]],
+) -> Dict[str, Tuple[str, ...]]:
+    result: Dict[str, Tuple[str, ...]] = {}
+    for account, species_mol in composition_mol_by_account.items():
+        account_name = str(account)
+        if account_name == CLEANED_MELT_ACCOUNT:
+            continue
+        species = sorted(
+            str(name)
+            for name, mol in (species_mol or {}).items()
+            if float(mol) > 0.0
+        )
+        if species:
+            result[account_name] = tuple(species)
+    return result
+
+
+def _positive_mass_by_species(
+    *,
+    composition_kg: Optional[Dict[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    species_formula_registry: Optional[Mapping[str, Any]],
+) -> Dict[str, float]:
+    if composition_mol is None:
+        return {
+            str(species): float(value)
+            for species, value in (composition_kg or {}).items()
+            if float(value) > 0.0
+        }
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    masses: Dict[str, float] = {}
+    for species, mol in composition_mol.items():
+        value = float(mol)
+        if value <= 0.0:
+            continue
+        mass_kg = value * resolve_species_formula(
+            species, species_formula_registry
+        ).molar_mass_kg_per_mol()
+        masses[str(species)] = masses.get(str(species), 0.0) + mass_kg
+    return masses
+
+
+def _projection_diagnostics(
+    *,
+    backend: str,
+    projection: Any,
+    composition_kg: Optional[Dict[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    oxide_basis: Tuple[str, ...],
+    species_formula_registry: Optional[Mapping[str, Any]],
+    dropped_accounts: List[str],
+    dropped_account_species: Mapping[str, Tuple[str, ...]],
+    bulk_projection: Optional[_MAGEMinBulkProjection] = None,
+) -> Dict[str, Any]:
+    diagnostics = dict(projection.diagnostics)
+    masses = _positive_mass_by_species(
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        species_formula_registry=species_formula_registry,
+    )
+    basis = set(oxide_basis)
+    dropped_species_mass = {
+        species: mass
+        for species, mass in masses.items()
+        if species not in basis and mass > 0.0
+    }
+    retained_mass = sum(
+        mass for species, mass in masses.items()
+        if species in basis and mass > 0.0
+    )
+    dropped_mass = sum(dropped_species_mass.values())
+    input_mass = retained_mass + dropped_mass
+    bulk_dropped = tuple(
+        bulk_projection.dropped_components if bulk_projection is not None else ()
+    )
+    bulk_merged = tuple(
+        bulk_projection.merged_components if bulk_projection is not None else ()
+    )
+    if not (
+        dropped_species_mass
+        or dropped_accounts
+        or dropped_account_species
+        or bulk_dropped
+        or bulk_merged
+    ):
+        return diagnostics
+
+    details: Dict[str, Any] = {
+        'status': 'projected',
+        'reason': 'input_composition_projected',
+        'backend': backend,
+        'projected_species': sorted(str(k) for k in projection.oxide_wt_pct),
+    }
+    if input_mass > 0.0:
+        details['input_melt_mass_kg'] = input_mass
+        details['retained_basis_melt_mass_kg'] = retained_mass
+    if dropped_species_mass:
+        details['dropped_species'] = sorted(dropped_species_mass)
+        details['dropped_species_mass_kg'] = dict(
+            sorted(dropped_species_mass.items())
+        )
+        details['dropped_non_basis_melt_mass_kg'] = dropped_mass
+    if retained_mass > 0.0 and dropped_mass > 0.0:
+        factor = input_mass / retained_mass
+        details['renormalization_factor'] = factor
+        details['renormalization_delta'] = factor - 1.0
+        details['dropped_mass_fraction'] = dropped_mass / input_mass
+    if dropped_accounts:
+        details['dropped_accounts'] = sorted(str(account) for account in dropped_accounts)
+    if dropped_account_species:
+        details['dropped_account_species'] = {
+            str(account): list(species)
+            for account, species in sorted(dropped_account_species.items())
+        }
+    if bulk_projection is not None:
+        details['magemin_database'] = bulk_projection.database
+        details['magemin_bulk_projected_components'] = sorted(
+            str(k) for k in bulk_projection.composition_wt_pct
+        )
+        if bulk_dropped:
+            details['dropped_bulk_components'] = list(bulk_dropped)
+        if bulk_merged:
+            details['merged_bulk_components'] = list(bulk_merged)
+        if bulk_projection.source_sum_wt_pct > 0.0:
+            details['bulk_source_sum_wt_pct'] = bulk_projection.source_sum_wt_pct
+            details['bulk_projected_sum_wt_pct'] = (
+                bulk_projection.projected_sum_wt_pct
+            )
+            details['bulk_dropped_wt_pct'] = max(
+                0.0,
+                bulk_projection.source_sum_wt_pct
+                - bulk_projection.projected_sum_wt_pct,
+            )
+    diagnostics['input_composition_projection'] = details
+    return diagnostics
 
 
 class MAGEMinBackend(MeltBackend):
@@ -299,7 +444,12 @@ class MAGEMinBackend(MeltBackend):
             )
 
         prior_warnings: List[str] = []
+        dropped_accounts: List[str] = []
+        dropped_account_species: Dict[str, Tuple[str, ...]] = {}
         if composition_mol_by_account is not None:
+            dropped_account_species = _dropped_account_species(
+                composition_mol_by_account
+            )
             melt_mol, dropped_accounts = split_cleaned_melt_account(
                 composition_mol_by_account)
             for account in dropped_accounts:
@@ -319,6 +469,16 @@ class MAGEMinBackend(MeltBackend):
         )
         comp_wt = projection.oxide_wt_pct
         prior_warnings.extend(projection.warnings)
+        projection_diagnostics = _projection_diagnostics(
+            backend='MAGEMin',
+            projection=projection,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+            dropped_accounts=dropped_accounts,
+            dropped_account_species=dropped_account_species,
+        )
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
             return EquilibriumResult(
@@ -331,7 +491,7 @@ class MAGEMinBackend(MeltBackend):
                     'MAGEMin received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
-                diagnostics=projection.diagnostics,
+                diagnostics=projection_diagnostics,
             )
 
         try:
@@ -345,8 +505,20 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='out_of_domain',
                 warnings=[*prior_warnings, message],
-                diagnostics=projection.diagnostics,
+                diagnostics=projection_diagnostics,
             )
+
+        result_diagnostics = _projection_diagnostics(
+            backend='MAGEMin',
+            projection=projection,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            oxide_basis=self._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_formula_registry,
+            dropped_accounts=dropped_accounts,
+            dropped_account_species=dropped_account_species,
+            bulk_projection=bulk_projection,
+        )
 
         try:
             raw = self._call_magemin(
@@ -366,7 +538,7 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
                 status='not_converged',
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
-                diagnostics=projection.diagnostics,
+                diagnostics=result_diagnostics,
             )
 
         # ledger_transition is left None: MAGEMin holds no AtomLedger
@@ -399,7 +571,7 @@ class MAGEMinBackend(MeltBackend):
             liquid_composition_wt_pct=liquid_composition_wt_pct,
             status='ok',
             warnings=all_warnings,
-            diagnostics=projection.diagnostics,
+            diagnostics=result_diagnostics,
         )
         return result
 
@@ -1011,6 +1183,10 @@ class MAGEMinBackend(MeltBackend):
                 if component in projected
             },
             warnings=tuple(diagnostics),
+            dropped_components=tuple(dropped),
+            merged_components=tuple(merged),
+            source_sum_wt_pct=sum(float(value) for value in source.values()),
+            projected_sum_wt_pct=sum(float(value) for value in projected.values()),
         )
 
     @staticmethod
