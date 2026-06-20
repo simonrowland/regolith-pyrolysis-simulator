@@ -30,6 +30,8 @@ from simulator.optimize.evaluate import (
     EvaluationAbort,
     EvaluationInputError,
     FailureCategory,
+    MASS_BALANCE_ABORT_PCT,
+    ZERO_INPUT_BASIS_BREACH,
     _composition_target_constraints,
     evaluate,
 )
@@ -2185,18 +2187,20 @@ def test_non_authoritative_backend_status_green_path_requires_authoritative_ok()
 
 
 def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
-    real_profile = {
-        **PROFILE,
-        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
-        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
-    }
+    clean_snapshot = _snapshot(MASS_BALANCE_ABORT_PCT)
 
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "high",
-        profile=real_profile,
-        executor=FakeExecutor(_execution(backend_status="out_of_domain")),
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                snapshots=(clean_snapshot,),
+                trace=_trace(snapshots=(clean_snapshot,)),
+            )
+        ),
     )
 
     assert not result.feasible
@@ -2210,6 +2214,60 @@ def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
     assert math.isfinite(margin.margin)
     assert "melts_domain_out_of_domain: backend_status=out_of_domain" in result.notes
     assert "rump_terminal: not_earned reason=missing_crash_point" in result.notes
+
+
+def test_out_of_domain_terminal_rump_target_mass_balance_category_aborts() -> None:
+    snapshot = _snapshot(
+        mass_balance_error_pct=0.0,
+        mass_in_kg=0.0,
+        mass_out_kg=1.0,
+        mass_balance_error_category=ZERO_INPUT_BASIS_BREACH,
+    )
+    profile = _composition_eval_profile(
+        "terminal_rump_earned",
+        target_id="pc-ceramic-test",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=profile,
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="out_of_domain",
+                    snapshots=(snapshot,),
+                    trace=_trace(snapshots=(snapshot,)),
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ZERO_INPUT_BASIS_BREACH
+    assert ZERO_INPUT_BASIS_BREACH in str(raised.value)
+
+
+def test_out_of_domain_plain_result_mass_balance_pct_aborts_as_engine_bug() -> None:
+    snapshot = _snapshot(-(MASS_BALANCE_ABORT_PCT * 1.1))
+
+    with pytest.raises(EngineBugAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=_real_backend_profile(),
+            executor=FakeExecutor(
+                _execution(
+                    backend_status="out_of_domain",
+                    snapshots=(snapshot,),
+                    trace=_trace(snapshots=(snapshot,)),
+                )
+            ),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
+    assert "mass balance breach" in str(raised.value)
 
 
 def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success() -> None:

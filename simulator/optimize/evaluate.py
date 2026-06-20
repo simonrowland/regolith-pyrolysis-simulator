@@ -2529,15 +2529,15 @@ def _out_of_domain_result(
     schema: RecipeSchema,
     constraints: PhysicsConstraintSet | None,
 ) -> ScoredResult:
+    _abort_on_mass_balance_breach(
+        run_execution,
+        patch=patch,
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        key=key,
+    )
     assessment = _assess_rump_terminal(run_execution)
     if assessment.earned:
-        _abort_on_mass_balance_breach(
-            run_execution,
-            patch=patch,
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            key=key,
-        )
         feasibility = _evaluate_physics_constraints(
             constraints,
             run_execution.trace,
