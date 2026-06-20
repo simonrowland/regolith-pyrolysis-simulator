@@ -771,6 +771,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
+        self.melt.melt_fO2_log = self.melt.fO2_log
         self.melt.campaign = CampaignPhase.IDLE
         self.melt.hour = 0
         self.melt.campaign_hour = 0
@@ -5087,6 +5088,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._configure_overhead_headspace(campaign)
         self._configure_freeze_gate(campaign)
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
+        self.melt.melt_fO2_log = self.melt.fO2_log
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -5680,6 +5682,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp ---
         self._update_temperature()
         self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
+        self.melt.melt_fO2_log = self.melt.fO2_log
 
         # --- 3. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,

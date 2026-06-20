@@ -455,6 +455,8 @@ class MeltState:
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
     p_total_mbar: float = 0.0      # Total pressure above melt
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
+    # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded == intrinsic; INERT in R2.0 (no live consumer until R2.1).
+    melt_fO2_log: float = -9.0
     ambient_pressure_mbar: float = 0.0
     # Site pressure floor for bodies without hard vacuum, e.g. Mars ~6 mbar.
     ambient_atmosphere: str = ''
