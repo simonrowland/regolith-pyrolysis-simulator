@@ -5,6 +5,7 @@ import yaml
 
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.melt_backend.base import StubBackend
 
 
@@ -78,12 +79,29 @@ def test_cm_bulk_carbon_matches_murchison_anchor(feedstocks):
         + composition["carbonate_salts"]
         * _carbon_mass_fraction("carbonate_salts", registry)
     )
+    normalized = normalized_feedstock_component_masses_kg(entry, 1000.0)
+    runtime_bulk_c_wt_pct = (
+        normalized["carbonaceous_organic"]
+        * _carbon_mass_fraction("generic_carbonaceous_organic", registry)
+        + normalized["carbonate_salts"]
+        * _carbon_mass_fraction("carbonate_salts", registry)
+    ) / 10.0
 
     assert bulk_c_wt_pct == pytest.approx(2.25, abs=5e-5)
     assert provenance["implied_bulk_c_wt_pct"] == pytest.approx(2.25)
+    assert runtime_bulk_c_wt_pct == pytest.approx(
+        bulk_c_wt_pct * 100.0 / entry["sum_check"]
+    )
+    assert runtime_bulk_c_wt_pct != pytest.approx(
+        provenance["implied_bulk_c_wt_pct"]
+    )
     assert "Murchison bulk C is 2.25 +/- 0.09 wt%" in (
         provenance["carbonaceous_organic"]["basis"]
     )
+    assert "declared pre-normalized central value" in (
+        provenance["carbonaceous_organic"]["basis"]
+    )
+    assert "runtime ledger-normalizes" in provenance["carbonaceous_organic"]["basis"]
 
 
 def test_ceres_carbon_catchall_is_split_without_moving_nh4_into_carbon(
@@ -109,6 +127,18 @@ def test_ceres_carbon_catchall_is_split_without_moving_nh4_into_carbon(
     assert carriers["brine_salts"]["allocated_wt_pct"] == pytest.approx(1.0)
     assert carriers["nh4_phyllosilicate"]["allocated_wt_pct"] == pytest.approx(8.0)
     assert carriers["nh4_phyllosilicate"]["reaction_family"] == "declaration_only"
+    normalized = normalized_feedstock_component_masses_kg(entry, 1000.0)
+    assert carriers["brine_salts"]["runtime_feedstock_mass_included"] is (
+        any(key in normalized for key in carriers["brine_salts"]["composition_keys"])
+    )
+    assert carriers["nh4_phyllosilicate"][
+        "runtime_feedstock_mass_included"
+    ] is ("nh4_phyllosilicate" in normalized)
+    assert "brine_salts" not in normalized
+    assert "nh4_phyllosilicate" not in normalized
+    assert normalized["NH3"] != pytest.approx(
+        carriers["nh4_phyllosilicate"]["allocated_wt_pct"] * 10.0
+    )
 
 
 def test_comet_nucleus_uses_rosetta_refractory_organic_budget(feedstocks):
