@@ -583,6 +583,7 @@ def _run_c2a_trace_export():
     return payload, execution
 
 
+@pytest.mark.serial  # spawns CLI subprocess; flakes under xdist co-scheduling
 def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
     """Design Section 9 R9.2/R9.5: CLI P6a exports match PhysicsTrace data."""
 

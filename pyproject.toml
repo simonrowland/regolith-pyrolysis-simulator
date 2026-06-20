@@ -101,6 +101,17 @@ norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
 # silently hangs past 5 min. Workers can still override with `-n0` for
 # debugging serial behavior.
 addopts = "-n auto --timeout=300"
+# Two-pass gate: the fast pass runs everything EXCEPT @pytest.mark.serial under
+# xdist (`pytest -m "not serial"`); the serial pass runs the marked tests under
+# `-n0` (`pytest -n0 -m serial`). A test is marked serial only when xdist
+# co-scheduling makes it flake — sqlite busy-lock contention (grind scratch
+# shards) and heavy real-backend / subprocess baselines (north-star c2a, the
+# MAGEMin freeze gate, the vpr p6a CLI) that spuriously SIGALRM under parallel
+# load. The two passes collect the IDENTICAL test set (parity-checked), so
+# coverage is unchanged — only the scheduling differs.
+markers = [
+    "serial: run under -n0 only; flakes under xdist co-scheduling (sqlite lock / heavy real-backend)",
+]
 
 # Explicit package layout. Auto-discovery works for this repo today, but
 # enumerating the simulator subpackages here documents the on-disk tree

@@ -23,6 +23,11 @@ from simulator.reduced_real_determinism import (
     canonical_physics_bucket_key_from_replay_key,
 )
 
+# sqlite busy-lock contention: these shard tests spuriously hit
+# "database is locked" when xdist co-schedules them with other db-touching
+# tests. Run them serially (see pyproject `markers`).
+pytestmark = pytest.mark.serial
+
 
 def _put_cache_row(
     db_path: Path,
