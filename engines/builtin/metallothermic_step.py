@@ -719,7 +719,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             del debits["process.cleaned_melt"]
 
         credits: dict[str, dict[str, float]] = {
-            "process.cleaned_melt": {"Na2O": total_Na2O_added_mol},
+            "process.reagent_inventory": {"Na2O": total_Na2O_added_mol},
             "process.metal_phase": {},
         }
         if total_Fe_produced_mol > 0.0:
@@ -1257,10 +1257,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             candidates = [part.strip() for part in raw_targets.split(",")]
         else:
             candidates = [str(part).strip() for part in raw_targets]
-        targets = tuple(
-            target for target in candidates if target in NA_TARGET_TO_METAL
-        )
-        return targets or NA_STAGE_TARGETS[NA_TARGET_CR_TI]
+        targets: list[str] = []
+        seen: set[str] = set()
+        for target in candidates:
+            if target not in NA_TARGET_TO_METAL or target in seen:
+                continue
+            targets.append(target)
+            seen.add(target)
+        return tuple(targets) or NA_STAGE_TARGETS[NA_TARGET_CR_TI]
 
     @staticmethod
     def _ellingham_fit_diagnostic(

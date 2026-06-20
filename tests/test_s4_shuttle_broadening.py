@@ -133,7 +133,9 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced(liquid_fraction):
     mol_na_used = proposal.debits["process.reagent_inventory"]["Na"]
     mol_feo_reduced = proposal.debits["process.cleaned_melt"]["FeO"]
     assert mol_na_used == pytest.approx(2.0 * mol_feo_reduced)
-    assert proposal.credits["process.cleaned_melt"]["Na2O"] == pytest.approx(
+    # Na2O is credited to reagent_inventory (spent-reductant residue, BUG-070/071),
+    # not cleaned_melt; _atom_check below still verifies conservation independently.
+    assert proposal.credits["process.reagent_inventory"]["Na2O"] == pytest.approx(
         mol_feo_reduced
     )
     assert proposal.credits["process.metal_phase"]["Fe"] == pytest.approx(

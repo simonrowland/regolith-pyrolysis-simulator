@@ -533,8 +533,7 @@ class ExtractionMixin:
                 self._mre_hold_hours += 1
 
                 # Advance to next voltage step when target species depleted
-                if (self._mre_hold_hours >= step_info.get('min_hold_hours', 3)
-                        and idx < len(seq) - 1):
+                if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
                     target_current_low = (
                         self._mre_effective_current_A < 3000.0 * 0.05)
                     if target_current_low:
@@ -582,19 +581,42 @@ class ExtractionMixin:
                 self.melt.mre_current_A = 0.0
                 return 0.0
 
+            sequence_completion_key = (
+                target,
+                float(ladder_cap_V),
+                tuple(
+                    (float(step['voltage']), tuple(step['species']))
+                    for step in seq
+                ),
+            )
+            if getattr(self, '_mre_c5_sequence_complete_key', None) == sequence_completion_key:
+                self._mre_metals_this_hr = {}
+                self._mre_voltage_V = 0.0
+                self._mre_current_A = 0.0
+                self._mre_effective_current_A = 0.0
+                self._mre_energy_this_hr = 0.0
+                self.melt.mre_voltage_V = 0.0
+                self.melt.mre_current_A = 0.0
+                return 0.0
+
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]
                 voltage_V = step_info['voltage']
 
                 self._mre_hold_hours += 1
-                if (self._mre_hold_hours >= step_info.get('min_hold_hours', 3)
-                        and idx < len(seq) - 1):
+                if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
                     c5_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
                     target_current_low = (
                         self._mre_effective_current_A < c5_current_A * 0.05)
-                    if target_current_low:
+                    safety_max_hold = (
+                        self._mre_hold_hours
+                        >= mre_ladder.C5_DEPLETION_SAFETY_MAX_HOLD_HR
+                    )
+                    if target_current_low or safety_max_hold:
                         self._mre_voltage_step_idx += 1
+                        if idx >= len(seq) - 1:
+                            self._mre_c5_sequence_complete_key = sequence_completion_key
                         self._mre_hold_hours = 0
 
             current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
@@ -647,6 +669,31 @@ class ExtractionMixin:
             'terminal.oxygen_mre_anode_stored', 'O2')
 
         proposal = kernel_result.transition
+        if proposal is None and getattr(kernel_result, 'status', '') == 'refused':
+            refusal_record = {
+                'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
+                'hour': int(self.melt.hour),
+                'campaign_hour': int(self.melt.campaign_hour),
+                'campaign': self.melt.campaign.name,
+                'temperature_C': float(self.melt.temperature_C),
+                'voltage_V': float(voltage_V),
+                'current_A': float(current_A),
+                'diagnostic': diagnostic,
+            }
+            self._last_mre_refusal_diagnostic = refusal_record
+            if not hasattr(self, '_mre_refusal_history'):
+                self._mre_refusal_history = []
+            self._mre_refusal_history.append(refusal_record)
+            self._chem_no_op_dispatch_count += 1
+            self._mre_metals_this_hr = {}
+            self._mre_voltage_V = 0.0
+            self._mre_current_A = 0.0
+            self._mre_effective_current_A = 0.0
+            self._mre_energy_this_hr = 0.0
+            self.melt.mre_voltage_V = 0.0
+            self.melt.mre_current_A = 0.0
+            reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
+            raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:
             self._commit_proposal(
                 ChemistryIntent.ELECTROLYSIS_STEP, proposal,
@@ -697,8 +744,9 @@ class ExtractionMixin:
 
         # Calculate effective current from actual Faradaic reduction.   [Step 8]
         total_charge_C = 0.0
+        charge_electrons = result.get('oxide_charge_electrons', {}) or {}
         for oxide, kg_removed in result.get('oxides_reduced_kg', {}).items():
-            n_e = ELECTRONS_PER_OXIDE.get(oxide, 2)
+            n_e = charge_electrons.get(oxide, ELECTRONS_PER_OXIDE.get(oxide, 2))
             M_ox = MOLAR_MASS.get(oxide, 100.0)
             moles_ox = kg_removed * 1000.0 / M_ox
             total_charge_C += moles_ox * n_e * FARADAY

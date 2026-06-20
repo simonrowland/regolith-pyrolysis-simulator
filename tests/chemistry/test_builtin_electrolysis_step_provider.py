@@ -59,6 +59,7 @@ from simulator.electrolysis import (
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
     MRE_FIXED_REDUCIBLE_OXIDES,
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     min_decomposition_voltage,
 )
 from simulator.fe_redox import (
@@ -398,7 +399,7 @@ def test_provider_reports_fresh_kress91_redox_split_from_account_view(
     assert split["fe3_over_sigma_fe"] != pytest.approx(0.999)
 
 
-def test_live_mre_skips_fe2o3_full_reduction_without_terminal_o2_credit(
+def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -435,11 +436,23 @@ def test_live_mre_skips_fe2o3_full_reduction_without_terminal_o2_credit(
     )
     diagnostic = dict(result.diagnostic or {})
 
-    assert result.transition is None
+    assert result.transition is not None
     assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
-    assert diagnostic["oxides_reduced_mol"] == {}
+    assert diagnostic["fe_redox_split"]["consumed_by_behavior"] is True
+    assert diagnostic["oxides_reduced_mol"]["Fe2O3"] == pytest.approx(
+        fe2o3_mol
+    )
+    assert diagnostic["oxides_produced_mol"]["FeO"] == pytest.approx(
+        2.0 * fe2o3_mol
+    )
     assert diagnostic["metals_produced_mol"] == {}
-    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+    assert diagnostic["O2_produced_mol"] == pytest.approx(0.5 * fe2o3_mol)
+    assert result.transition.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
+        fe2o3_mol
+    )
+    assert result.transition.credits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        2.0 * fe2o3_mol
+    )
 
 
 def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
@@ -452,14 +465,24 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
         setpoints_data,
     )
 
+    melt_mol = {
+        "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+        "Fe2O3": 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0),
+    }
+    sim.atom_ledger = sim._new_atom_ledger()
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", melt_mol, source="test seed"
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim._project_extraction_melt()
+    sim.melt.temperature_C = 1575.0
+
     def dispatch(fO2_log):
-        legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
-            sim=sim,
-            oxide="FeO",
-            oxide_kg=1000.0,
-            voltage_V=DECOMP_VOLTAGES["FeO"] + 0.05,
-            current_A=100.0,
-            temperature_C=1575.0,
+        legacy = sim.electrolysis_model.step_hour(
+            melt_state=sim.melt,
+            voltage_V=5.0,
+            current_A=1.0e9,
+            T_C=1575.0,
         )
         view = ProviderAccountView(
             accounts={
@@ -480,17 +503,18 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
                 fO2_log=fO2_log,
                 fe_redox_policy="kress91_live",
                 control_inputs={
-                    "voltage_V": DECOMP_VOLTAGES["FeO"] + 0.05,
-                    "current_A": 100.0,
+                    "voltage_V": 5.0,
+                    "current_A": 1.0e9,
                     "dt_hr": 1.0,
                     "melt_fO2_log": fO2_log,
+                    "allowed_oxides": ["FeO"],
                 },
             )
         )
-        return legacy, result, direct
+        return legacy, direct
 
-    legacy_low, _old_path, direct_low = dispatch(-8.0)
-    legacy_high, _old_path_high, direct_high = dispatch(-3.0)
+    legacy_low, direct_low = dispatch(-8.0)
+    legacy_high, direct_high = dispatch(-3.0)
 
     assert legacy_low["oxides_reduced_mol"] == pytest.approx(
         legacy_high["oxides_reduced_mol"]
@@ -499,6 +523,179 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
     assert direct_high.transition is not None
     assert direct_low.transition.debits == direct_high.transition.debits
     assert direct_low.transition.credits == direct_high.transition.credits
+    assert "Fe2O3" in direct_low.transition.debits["process.cleaned_melt"]
+    assert "FeO" in direct_low.transition.credits["process.cleaned_melt"]
+
+
+def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+                "Cr2O3": 10.0 / (MOLAR_MASS["Cr2O3"] / 1000.0),
+                "MnO": 10.0 / (MOLAR_MASS["MnO"] / 1000.0),
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "voltage_V": 2.0,
+                "current_A": 1000.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert diagnostic["oxides_reduced_mol"] == {}
+    assert diagnostic["metals_produced_mol"] == {}
+    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+    assert diagnostic["current_partition_certified"] is False
+    assert diagnostic["yield_certification"] == "uncertified_current_partition"
+    assert "heuristic" in diagnostic["current_partition_source"]
+    assert diagnostic["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert set(diagnostic["reducible_oxide_targets"]) == {
+        "Cr2O3",
+        "FeO",
+        "MnO",
+        "SiO2",
+    }
+
+    sim.atom_ledger = sim._new_atom_ledger()
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {
+            "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+            "Cr2O3": 10.0 / (MOLAR_MASS["Cr2O3"] / 1000.0),
+            "MnO": 10.0 / (MOLAR_MASS["MnO"] / 1000.0),
+            "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+        },
+        source="test seed",
+    )
+    sim._project_extraction_melt()
+    legacy = sim.electrolysis_model.step_hour(
+        melt_state=sim.melt,
+        voltage_V=2.0,
+        current_A=1000.0,
+        T_C=1600.0,
+        pO2_bar=1e-6,
+    )
+    assert legacy["oxides_reduced_mol"] == {}
+    assert legacy["metals_produced_mol"] == {}
+    assert legacy["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+
+
+def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    sio2_mol = 10.0 / (MOLAR_MASS["SiO2"] / 1000.0)
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "Fe2O3": fe2o3_mol,
+                "SiO2": sio2_mol,
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1e-6,
+            fO2_log=-7.25,
+            fe_redox_policy="kress91_live",
+            control_inputs={
+                "voltage_V": 5.0,
+                "current_A": 1.0e9,
+                "dt_hr": 1.0,
+                "melt_fO2_log": -7.25,
+                "allowed_oxides": ["SiO2"],
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.transition is not None
+    assert set(diagnostic["oxides_reduced_mol"]) == {"Fe2O3", "SiO2"}
+    assert diagnostic["fe_redox_split"]["consumed_by_behavior"] is True
+    assert result.transition.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
+        fe2o3_mol
+    )
+    assert result.transition.credits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        2.0 * fe2o3_mol
+    )
+
+
+def test_powered_no_reducible_mre_hour_records_commanded_energy(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "voltage_V": 1.7,
+                "current_A": 1000.0,
+                "dt_hr": 1.0,
+                "allowed_oxides": ["SiO2"],
+            },
+        )
+    )
+
+    assert result.transition is None
+    assert result.diagnostic["oxides_reduced_mol"] == {}
+    assert result.diagnostic["energy_kWh"] == pytest.approx(1.7)
 
 
 # ---------------------------------------------------------------------------
@@ -969,10 +1166,11 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
 def test_provider_matches_legacy_feo_partition_with_ferric_present(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Verify the provider and legacy ``step_hour`` agree across a
-    ferric-bearing melt. Fe2O3 is intentionally present in cleaned_melt but
-    must not enter fixed MRE full reduction; Fe metal and anode O2 come from
-    the ferrous FeO path only.
+    """Provider and legacy agree across a ferric-bearing melt.
+
+    Fe2O3 remains absent from the fixed full-reduction rung; live redox now
+    converts ferric oxide to ferrous oxide, while Fe metal still comes from
+    the ferrous FeO path.
     """
 
     sim = _build_sim(
@@ -1030,10 +1228,11 @@ def test_provider_matches_legacy_feo_partition_with_ferric_present(
 
     assert "Fe2O3" not in MRE_FIXED_REDUCIBLE_OXIDES
     assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
-    assert "Fe2O3" not in dict(diagnostic.get("oxides_reduced_mol", {}) or {})
-    assert "Fe2O3" not in dict(legacy.get("oxides_reduced_mol", {}) or {})
+    assert "Fe2O3" in dict(diagnostic.get("oxides_reduced_mol", {}) or {})
+    assert "Fe2O3" in dict(legacy.get("oxides_reduced_mol", {}) or {})
+    assert diagnostic["fe_redox_split"]["consumed_by_behavior"] is True
 
-    for key in ("oxides_reduced_mol", "metals_produced_mol"):
+    for key in ("oxides_reduced_mol", "oxides_produced_mol", "metals_produced_mol"):
         leg = dict(legacy.get(key, {}) or {})
         prv = dict(diagnostic.get(key, {}) or {})
         assert set(leg) == set(prv), f"keyset mismatch for {key}"

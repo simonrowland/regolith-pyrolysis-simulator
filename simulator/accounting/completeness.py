@@ -400,6 +400,10 @@ def vapor_contract_completeness(
     product_mol = _contract_target_equivalent_mol(
         contract, product_kg, "product"
     )
+    recovered_reagent_mol = _contract_recovered_reagent_target_equivalent_mol(
+        contract, queries
+    )
+    product_mol += recovered_reagent_mol
     residual_mol = _contract_residual_target_equivalent_mol(
         contract, residual_kg
     )
@@ -418,6 +422,7 @@ def vapor_contract_completeness(
             denom,
             "no target-equivalent mol evidence",
             wall_deposit_target_equiv_mol=wall_mol,
+            reagent_target_equiv_mol=recovered_reagent_mol,
             gross_product_target_equiv_mol=product_mol,
             contract_id=contract.contract_id,
         )
@@ -428,6 +433,7 @@ def vapor_contract_completeness(
         residual_mol,
         denom,
         wall_deposit_target_equiv_mol=wall_mol,
+        reagent_target_equiv_mol=recovered_reagent_mol,
         gross_product_target_equiv_mol=product_mol,
         contract_id=contract.contract_id,
     )
@@ -713,6 +719,46 @@ def _contract_residual_target_equivalent_mol(
         for species in contract.residual_species
     }
     return _contract_target_equivalent_mol(contract, filtered, "residual")
+
+
+def _contract_recovered_reagent_target_equivalent_mol(
+    contract: CompletionContract,
+    queries: Any,
+) -> float:
+    reagent_kg = _species_kg_by_accounts(queries, ("process.reagent_inventory",))
+    element = contract.element
+    reagent_target_mol = _contract_target_equivalent_mol(
+        contract, reagent_kg, "reagent"
+    )
+    if reagent_target_mol <= _EPS:
+        return 0.0
+    process_additive_kg = _process_unspent_additive_reagent_kg(
+        element, queries
+    )
+    additive_mol = _species_mol(element, process_additive_kg)
+    return max(0.0, reagent_target_mol - additive_mol)
+
+
+def _process_unspent_additive_reagent_kg(element: str, queries: Any) -> float:
+    helper = getattr(queries, "unspent_additive_reagents_kg", None)
+    if not callable(helper):
+        return 0.0
+    values = helper()
+    total_key = f"unspent_{element}_reagent"
+    total_unspent_kg = _non_negative_number(
+        values.get(total_key, 0.0),
+        total_key,
+    )
+    ledger = getattr(queries, "ledger", None)
+    reservoir_kg = 0.0
+    if ledger is not None:
+        reservoir_kg = _non_negative_number(
+            ledger.kg_by_account(f"reservoir.reagent.{element}").get(
+                element, 0.0
+            ),
+            f"reservoir.reagent.{element}",
+        )
+    return max(0.0, total_unspent_kg - reservoir_kg)
 
 
 def _contract_target_equivalent_mol(

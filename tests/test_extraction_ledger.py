@@ -16,6 +16,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     FERRIC_TO_FERROUS_REFERENCE_V,
     ElectrolysisModel,
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
 )
 from simulator.melt_backend.base import StubBackend
 from simulator.session_cli import SessionScriptRunner
@@ -410,6 +411,79 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
+def test_mre_refused_partition_fails_loud_without_energy_or_products():
+    sim = _sim(
+        {
+            "mixed": {
+                "label": "Mixed reducible oxides",
+                "composition_wt_pct": {
+                    "FeO": 25.0,
+                    "Cr2O3": 25.0,
+                    "MnO": 25.0,
+                    "SiO2": 25.0,
+                },
+            }
+        }
+    )
+    sim.load_batch("mixed", mass_kg=1000.0)
+    _enable_c5_mre(sim, target_species="", max_voltage_V=2.0)
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.temperature_C = 1600.0
+    sim.melt.hour = 42
+    sim.melt.campaign_hour = 7
+    sim._mre_voltage_sequence = [{
+        "voltage": 2.0,
+        "species": ["FeO", "Cr2O3", "MnO", "SiO2"],
+        "min_hold_hours": 1,
+    }]
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = 0
+    sim._mre_effective_current_A = 1000.0
+
+    no_op_before = sim._chem_no_op_dispatch_count
+    melt_before = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
+    metal_before = dict(sim.atom_ledger.kg_by_account("process.metal_phase"))
+    o2_before = dict(
+        sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
+    )
+
+    with pytest.raises(RuntimeError, match=MRE_MULTI_OXIDE_PARTITION_REFUSAL):
+        sim._step_mre()
+
+    assert sim._chem_no_op_dispatch_count == no_op_before + 1
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
+        melt_before
+    )
+    assert sim.atom_ledger.kg_by_account("process.metal_phase") == pytest.approx(
+        metal_before
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ) == pytest.approx(o2_before)
+    assert sim.product_ledger() == {}
+    assert sim._mre_metals_this_hr == {}
+    assert sim._mre_energy_this_hr == pytest.approx(0.0)
+    assert sim._mre_voltage_V == pytest.approx(0.0)
+    assert sim._mre_current_A == pytest.approx(0.0)
+    assert sim._mre_effective_current_A == pytest.approx(0.0)
+    assert sim.melt.mre_voltage_V == pytest.approx(0.0)
+    assert sim.melt.mre_current_A == pytest.approx(0.0)
+
+    refusal = sim._last_mre_refusal_diagnostic
+    assert refusal["intent"] == ChemistryIntent.ELECTROLYSIS_STEP.name
+    assert refusal["hour"] == 42
+    assert refusal["campaign_hour"] == 7
+    assert refusal["campaign"] == CampaignPhase.C5.name
+    assert refusal["temperature_C"] == pytest.approx(1600.0)
+    assert refusal["voltage_V"] == pytest.approx(2.0)
+    assert refusal["current_A"] == pytest.approx(1000.0)
+    assert refusal["diagnostic"]["reason_refused"] == (
+        MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    )
+    assert refusal["diagnostic"]["energy_kWh"] > 0.0
+    assert sim._mre_refusal_history == [refusal]
+
+
 def test_condensed_species_projection_does_not_double_count_across_stages():
     sim = _sim(
         {
@@ -478,7 +552,8 @@ def test_electrolysis_skips_ferric_full_reduction_with_feo_present():
         / MOLAR_MASS["FeO"]
     )
 
-    assert "Fe2O3" not in result["oxides_reduced_kg"]
+    assert "Fe2O3" in result["oxides_reduced_kg"]
+    assert result["oxides_produced_kg"]["FeO"] > 0.0
     assert result["metals_produced_kg"]["Fe"] == pytest.approx(expected_fe_kg)
     assert result["O2_produced_mol"] > 0.0
 

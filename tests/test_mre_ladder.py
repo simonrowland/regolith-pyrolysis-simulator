@@ -15,7 +15,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
-from simulator.state import CampaignPhase, MeltState
+from simulator.state import CampaignPhase, MeltState, MOLAR_MASS
 
 
 def _repo_setpoints() -> dict:
@@ -265,6 +265,131 @@ def test_step_mre_restricts_reducible_oxides_to_target_rung():
     assert captured[0]["voltage_V"] == pytest.approx(1.45)
 
 
+def test_c5_safety_max_hold_advances_without_low_current():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = ""
+    sim.melt.mre_max_voltage_V = 1.45
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = int(mre_ladder.C5_DEPLETION_SAFETY_MAX_HOLD_HR) - 1
+    sim._mre_effective_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    assert sim._mre_voltage_step_idx == 1
+    assert sim._mre_hold_hours == 0
+
+
+def test_c5_safety_max_hold_stops_after_terminal_rung():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "SiO2"
+    sim.melt.mre_max_voltage_V = 1.45
+    sim._mre_voltage_step_idx = 0
+    sim._mre_hold_hours = int(mre_ladder.C5_DEPLETION_SAFETY_MAX_HOLD_HR) - 1
+    sim._mre_effective_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
+    dispatches = 0
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        nonlocal dispatches
+        dispatches += 1
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+    assert sim._mre_voltage_step_idx == 1
+    assert sim._mre_hold_hours == 0
+
+    sim._step_mre()
+    assert dispatches == 1
+    assert sim._mre_voltage_V == pytest.approx(0.0)
+    assert sim._mre_current_A == pytest.approx(0.0)
+    assert sim._mre_effective_current_A == pytest.approx(0.0)
+
+
+def test_c5_kress91_live_ferric_inventory_becomes_ferrous_behavior():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 5.0, "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim.atom_ledger = sim._new_atom_ledger()
+    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {"Fe2O3": fe2o3_mol}, source="test seed"
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "FeO"
+    sim.melt.mre_max_voltage_V = 5.0
+    sim.melt.temperature_C = 1600.0
+
+    produced_o2_kg = sim._step_mre()
+    cleaned = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    o2 = sim.atom_ledger.mol_by_account("terminal.oxygen_mre_anode_stored")
+
+    converted_fe2o3_mol = fe2o3_mol - cleaned.get("Fe2O3", 0.0)
+    assert produced_o2_kg > 0.0
+    assert converted_fe2o3_mol > 0.0
+    assert cleaned["FeO"] == pytest.approx(2.0 * converted_fe2o3_mol)
+    assert o2["O2"] == pytest.approx(0.5 * converted_fe2o3_mol)
+
+
 def test_c5_sio2_target_step_does_not_reduce_feo():
     setpoints = {
         "campaigns": {},
@@ -287,6 +412,7 @@ def test_c5_sio2_target_step_does_not_reduce_feo():
         accounts={
             "process.cleaned_melt": {
                 "FeO": 10.0,
+                "Fe2O3": 10.0,
                 "SiO2": 10.0,
             },
         },
@@ -317,4 +443,5 @@ def test_c5_sio2_target_step_does_not_reduce_feo():
     sim._step_mre()
 
     assert reductions.get("SiO2", 0.0) > 0.0
+    assert reductions.get("Fe2O3", 0.0) > 0.0
     assert "FeO" not in reductions

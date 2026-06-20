@@ -95,6 +95,11 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
+MRE_CURRENT_PARTITION_SOURCE = (
+    "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
+)
+MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
+
 
 class BuiltinElectrolysisStepProvider(ChemistryProvider):
     """Authoritative ``ELECTROLYSIS_STEP`` provider.
@@ -132,8 +137,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             DECOMP_VOLTAGES,
             ELECTRONS_PER_OXIDE,
+            FERRIC_TO_FERROUS_ELECTRONS,
+            FERRIC_TO_FERROUS_FEO_PER_FE2O3,
+            FERRIC_TO_FERROUS_O2_PER_FE2O3,
+            FERRIC_TO_FERROUS_REFERENCE_V,
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            MRE_CURRENT_PARTITION_CERTIFICATION,
+            MRE_CURRENT_PARTITION_SOURCE,
             MRE_FIXED_REDUCIBLE_OXIDES,
             current_efficiency,
+            uncertified_multi_oxide_partition_targets,
         )
         from simulator.state import (
             FARADAY,
@@ -208,9 +221,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "oxides_reduced_mol": {},
             "metals_produced_kg": {},
             "metals_produced_mol": {},
+            "oxides_produced_kg": {},
+            "oxides_produced_mol": {},
+            "oxide_charge_electrons": {},
             "O2_produced_kg": 0.0,
             "O2_produced_mol": 0.0,
             "energy_kWh": 0.0,
+            "current_partition_source": MRE_CURRENT_PARTITION_SOURCE,
+            "current_partition_certified": False,
+            "yield_certification": MRE_CURRENT_PARTITION_CERTIFICATION,
             "melt_fO2_log": melt_fO2_log,
             "fe_redox_policy": str(request.fe_redox_policy),
             "fe_redox_split": self._compute_fe_redox_split_diagnostic(
@@ -240,7 +259,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # Find all reducible species at this voltage. Mirrors
         # ElectrolysisModel.step_hour line-for-line: same E0 table,
         # same Nernst formula, same 1e-6 kg gate, same activity proxy.
-        reducible: list[tuple[str, float, float, float]] = []
+        reducible: list[tuple[str, float, float, float, str]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if allowed_oxides is not None and oxide not in allowed_oxides:
                 continue
@@ -263,12 +282,50 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
             if E_nernst < voltage_V:
                 overvoltage = voltage_V - E_nernst
-                reducible.append((oxide, E_nernst, overvoltage, activity))
+                reducible.append((
+                    oxide, E_nernst, overvoltage, activity, "oxide_to_metal"
+                ))
+
+        if composition_kg.get("Fe2O3", 0.0) >= 1e-6:
+            activity = composition_kg["Fe2O3"] / total_kg
+            E_ferric = self._ferric_to_ferrous_voltage(
+                T_K,
+                activity,
+                gas_constant=GAS_CONSTANT,
+                faraday=FARADAY,
+                reference_V=FERRIC_TO_FERROUS_REFERENCE_V,
+                electrons=FERRIC_TO_FERROUS_ELECTRONS,
+                o2_per_fe2o3=FERRIC_TO_FERROUS_O2_PER_FE2O3,
+                pO2_bar=pO2_bar,
+            )
+            if E_ferric < voltage_V:
+                reducible.append((
+                    "Fe2O3",
+                    E_ferric,
+                    voltage_V - E_ferric,
+                    activity,
+                    "ferric_to_ferrous",
+                ))
 
         if not reducible:
+            if voltage_V > 0.0 and current_A > 0.0:
+                diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=diagnostic,
+            )
+
+        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
+        if refused_targets:
+            diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
+            diagnostic["reason_refused"] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
+            diagnostic["reducible_oxide_targets"] = refused_targets
+            return IntentResult(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                status="refused",
                 transition=None,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
@@ -278,10 +335,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # weight by concentration * exp(overvoltage), capped at dV=3.0).
         # Mirrors ElectrolysisModel.step_hour. [SEL-1]
         weights: dict[str, float] = {}
-        for oxide, _E, dV, a in reducible:
+        for oxide, _E, dV, a, _mode in reducible:
             weights[oxide] = a * math.exp(min(dV, 3.0))
         total_weight = sum(weights.values())
         if total_weight <= 0.0:
+            if voltage_V > 0.0 and current_A > 0.0:
+                diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status="ok",
@@ -307,8 +366,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         uncapped_charge_mol_e = 0.0
         capped_charge_mol_e = 0.0
         any_capped = False
+        oxide_produced_mol_total: dict[str, float] = {}
 
-        for oxide, _E, dV, _a in reducible:
+        for oxide, _E, dV, _a, mode in reducible:
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
@@ -317,7 +377,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             eta_CE = current_efficiency(dV)
 
             # Faraday's law (FARADAY-1). n electrons per formula unit.
-            n_e = ELECTRONS_PER_OXIDE.get(oxide, 2)
+            n_e = (
+                FERRIC_TO_FERROUS_ELECTRONS
+                if mode == "ferric_to_ferrous"
+                else ELECTRONS_PER_OXIDE.get(oxide, 2)
+            )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)
 
             uncapped_moles_reduced = (
@@ -341,9 +405,37 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
             diagnostic["oxides_reduced_kg"][oxide] = kg_oxide_reduced
             diagnostic["oxides_reduced_mol"][oxide] = moles_reduced
+            diagnostic["oxide_charge_electrons"][oxide] = n_e
             oxide_mol_total[oxide] = (
                 oxide_mol_total.get(oxide, 0.0) + moles_reduced
             )
+
+            if mode == "ferric_to_ferrous":
+                feo_mol = moles_reduced * FERRIC_TO_FERROUS_FEO_PER_FE2O3
+                feo_kg = feo_mol * MOLAR_MASS["FeO"] / 1000.0
+                diagnostic["oxides_produced_kg"]["FeO"] = (
+                    diagnostic["oxides_produced_kg"].get("FeO", 0.0)
+                    + feo_kg
+                )
+                diagnostic["oxides_produced_mol"]["FeO"] = (
+                    diagnostic["oxides_produced_mol"].get("FeO", 0.0)
+                    + feo_mol
+                )
+                oxide_produced_mol_total["FeO"] = (
+                    oxide_produced_mol_total.get("FeO", 0.0) + feo_mol
+                )
+                O2_mol = moles_reduced * FERRIC_TO_FERROUS_O2_PER_FE2O3
+                O2_kg = O2_mol * MOLAR_MASS["O2"] / 1000.0
+                diagnostic["O2_produced_kg"] += O2_kg
+                diagnostic["O2_produced_mol"] += O2_mol
+                O2_mol_total += O2_mol
+                diagnostic["fe_redox_split"] = {
+                    **dict(diagnostic.get("fe_redox_split") or {}),
+                    "diagnostic_only": False,
+                    "consumed_by_behavior": True,
+                    "behavior": "ferric_to_ferrous_mre_conversion",
+                }
+                continue
 
             metal_info = OXIDE_TO_METAL.get(oxide)
             if not metal_info:
@@ -418,6 +510,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
 
         debits_mol["process.cleaned_melt"] = dict(oxide_mol_total)
+        if oxide_produced_mol_total:
+            credits_mol["process.cleaned_melt"] = dict(oxide_produced_mol_total)
         if metal_mol_total:
             credits_mol["process.metal_phase"] = dict(metal_mol_total)
         if O2_mol_total > 0.0:
@@ -486,6 +580,31 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             E0
             - term * math.log(activity)
             + term * o2_mol_per_oxide * math.log(pO2_activity)
+        )
+
+    @staticmethod
+    def _ferric_to_ferrous_voltage(
+        T_K: float,
+        activity: float,
+        *,
+        gas_constant: float,
+        faraday: float,
+        reference_V: float,
+        electrons: int,
+        o2_per_fe2o3: float,
+        pO2_bar: float,
+    ) -> float:
+        activity = max(float(activity), 1.0e-30)
+        pO2_activity = max(float(pO2_bar), 1.0e-30)
+        return (
+            float(reference_V)
+            - (gas_constant * float(T_K))
+            / (int(electrons) * faraday)
+            * math.log(activity)
+            + (gas_constant * float(T_K))
+            / (int(electrons) * faraday)
+            * float(o2_per_fe2o3)
+            * math.log(pO2_activity)
         )
 
     @staticmethod
@@ -698,9 +817,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "oxides_reduced_mol": {},
             "metals_produced_kg": {},
             "metals_produced_mol": {},
+            "oxides_produced_kg": {},
+            "oxides_produced_mol": {},
+            "oxide_charge_electrons": {},
             "O2_produced_kg": 0.0,
             "O2_produced_mol": 0.0,
             "energy_kWh": 0.0,
+            "current_partition_source": MRE_CURRENT_PARTITION_SOURCE,
+            "current_partition_certified": False,
+            "yield_certification": MRE_CURRENT_PARTITION_CERTIFICATION,
             "melt_fO2_log": melt_fO2_log,
             "fe_redox_policy": fe_redox_policy,
             "fe_redox_split": cls._compute_fe_redox_split_diagnostic(

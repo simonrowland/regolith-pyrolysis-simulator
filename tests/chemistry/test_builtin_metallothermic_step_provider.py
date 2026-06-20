@@ -785,6 +785,78 @@ def test_c3_na_draw_uses_true_ledger_availability_not_quantized_view(
     assert debited < quantized_feo_mol
 
 
+def test_c3_na_explicit_duplicate_targets_do_not_double_debit_feo(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    feo_mol = 10.0 / (MOLAR_MASS["FeO"] / 1000.0)
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {"FeO": feo_mol},
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_NA,
+                "target_oxides": ["FeO", "FeO"],
+                "reagent_available_kg": 30.0,
+                "liquid_fraction": 1.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["target_priority"] == ["FeO"]
+    assert result.diagnostic["accepted_targets"] == ["FeO"]
+    na2o_limit_kg = 10.0 * 0.10
+    na_limited_mol = (
+        na2o_limit_kg
+        * (2 * MOLAR_MASS["Na"] / MOLAR_MASS["Na2O"])
+        / MOLAR_MASS["Na"]
+        * 1000.0
+    )
+    assert result.transition.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        min(feo_mol, na_limited_mol / 2.0)
+    )
+
+
+def test_c3_na_shuttle_returns_na2o_to_neutral_reagent_inventory(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider.dispatch(
+        _c3_na_feo_cleanup_request(sim, liquid_fraction=1.0)
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.credits["process.reagent_inventory"]["Na2O"] > 0.0
+    assert "Na2O" not in result.transition.credits.get("process.cleaned_melt", {})
+
+
 def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

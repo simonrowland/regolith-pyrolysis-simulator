@@ -88,6 +88,14 @@ DECOMP_VOLTAGES = {
 }
 
 FERRIC_TO_FERROUS_REFERENCE_V = 0.65
+FERRIC_TO_FERROUS_ELECTRONS = 2
+FERRIC_TO_FERROUS_FEO_PER_FE2O3 = 2.0
+FERRIC_TO_FERROUS_O2_PER_FE2O3 = 0.5
+MRE_CURRENT_PARTITION_SOURCE = (
+    "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
+)
+MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
+MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
@@ -118,6 +126,15 @@ ELECTRONS_PER_OXIDE = {
 def current_efficiency(dV: float) -> float:
     eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0, dV)))
     return min(0.95, max(0.10, eta_CE))
+
+
+def uncertified_multi_oxide_partition_targets(reducible) -> tuple[str, ...]:
+    targets = sorted({
+        str(oxide)
+        for oxide, _E, _dV, _a, mode in reducible
+        if mode == "oxide_to_metal"
+    })
+    return tuple(targets) if len(targets) > 1 else ()
 
 
 class ElectrolysisModel:
@@ -181,6 +198,21 @@ class ElectrolysisModel:
         )
         return E
 
+    def ferric_to_ferrous_voltage(self, T_C: float, activity: float,
+                                  pO2_bar: float = 1.0) -> float:
+        activity = max(float(activity), 1e-30)
+        pO2_activity = max(float(pO2_bar), 1e-30)
+        T_K = float(T_C) + 273.15
+        return (
+            FERRIC_TO_FERROUS_REFERENCE_V
+            - (GAS_CONSTANT * T_K) / (
+                FERRIC_TO_FERROUS_ELECTRONS * FARADAY
+            ) * math.log(activity)
+            + (GAS_CONSTANT * T_K) / (
+                FERRIC_TO_FERROUS_ELECTRONS * FARADAY
+            ) * FERRIC_TO_FERROUS_O2_PER_FE2O3 * math.log(pO2_activity)
+        )
+
     def step_hour(self, melt_state: MeltState,
                    voltage_V: float,
                    current_A: float,
@@ -212,9 +244,15 @@ class ElectrolysisModel:
             'oxides_reduced_mol': {},
             'metals_produced_kg': {},
             'metals_produced_mol': {},
+            'oxides_produced_kg': {},
+            'oxides_produced_mol': {},
+            'oxide_charge_electrons': {},
             'O2_produced_kg': 0.0,
             'O2_produced_mol': 0.0,
             'energy_kWh': 0.0,
+            'current_partition_source': MRE_CURRENT_PARTITION_SOURCE,
+            'current_partition_certified': False,
+            'yield_certification': MRE_CURRENT_PARTITION_CERTIFICATION,
         }
 
         # Find all reducible species at this voltage
@@ -232,9 +270,31 @@ class ElectrolysisModel:
 
             if E_nernst < voltage_V:
                 overvoltage = voltage_V - E_nernst
-                reducible.append((oxide, E_nernst, overvoltage, activity))
+                reducible.append((oxide, E_nernst, overvoltage, activity, "oxide_to_metal"))
+
+        if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
+            activity = comp.get('Fe2O3', 0.0) / 100.0
+            E_ferric = self.ferric_to_ferrous_voltage(
+                T_C, activity, pO2_bar=pO2_bar)
+            if E_ferric < voltage_V:
+                reducible.append((
+                    'Fe2O3',
+                    E_ferric,
+                    voltage_V - E_ferric,
+                    activity,
+                    "ferric_to_ferrous",
+                ))
 
         if not reducible:
+            if voltage_V > 0.0 and current_A > 0.0:
+                result['energy_kWh'] = voltage_V * current_A / 1000.0
+            return result
+
+        refused_targets = uncertified_multi_oxide_partition_targets(reducible)
+        if refused_targets:
+            result['energy_kWh'] = voltage_V * current_A / 1000.0
+            result['reason_refused'] = MRE_MULTI_OXIDE_PARTITION_REFUSAL
+            result['reducible_oxide_targets'] = refused_targets
             return result
 
         # Partition current among reducible species            [SEL-1]
@@ -244,14 +304,16 @@ class ElectrolysisModel:
         capped_charge_mol_e = 0.0
         any_capped = False
 
-        for oxide, E, dV, a in reducible:
+        for oxide, E, dV, a, _mode in reducible:
             weights[oxide] = a * math.exp(min(dV, 3.0))
 
         total_weight = sum(weights.values())
         if total_weight <= 0:
+            if voltage_V > 0.0 and current_A > 0.0:
+                result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
-        for oxide, E, dV, a in reducible:
+        for oxide, E, dV, a, mode in reducible:
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
@@ -259,7 +321,11 @@ class ElectrolysisModel:
             eta_CE = current_efficiency(dV)
 
             # Faraday's law: mass reduced this hour            [FARADAY-1]
-            n = ELECTRONS_PER_OXIDE.get(oxide, 2)
+            n = (
+                FERRIC_TO_FERROUS_ELECTRONS
+                if mode == "ferric_to_ferrous"
+                else ELECTRONS_PER_OXIDE.get(oxide, 2)
+            )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
 
@@ -278,6 +344,22 @@ class ElectrolysisModel:
             if kg_oxide_reduced > 1e-10:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
                 result['oxides_reduced_mol'][oxide] = moles_reduced
+                result['oxide_charge_electrons'][oxide] = n
+
+                if mode == "ferric_to_ferrous":
+                    feo_mol = moles_reduced * FERRIC_TO_FERROUS_FEO_PER_FE2O3
+                    feo_kg = feo_mol * MOLAR_MASS['FeO'] / 1000.0
+                    result['oxides_produced_kg']['FeO'] = (
+                        result['oxides_produced_kg'].get('FeO', 0.0) + feo_kg
+                    )
+                    result['oxides_produced_mol']['FeO'] = (
+                        result['oxides_produced_mol'].get('FeO', 0.0) + feo_mol
+                    )
+                    O2_mol = moles_reduced * FERRIC_TO_FERROUS_O2_PER_FE2O3
+                    O2_kg = O2_mol * MOLAR_MASS['O2'] / 1000.0
+                    result['O2_produced_kg'] += O2_kg
+                    result['O2_produced_mol'] += O2_mol
+                    continue
 
                 # Metal produced
                 metal_info = OXIDE_TO_METAL.get(oxide)
