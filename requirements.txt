@@ -2,7 +2,7 @@ flask>=3.0
 flask-socketio>=5.3
 pyyaml>=6.0
 plotly>=5.18
-numpy>=1.26
+numpy>=1.26,<2  # vaporock imports np.bool8 (removed in numpy 2.0); >=2 breaks the engine stack
 scipy>=1.12
 # Required thermochemistry engines (mirrored from pyproject.toml [project]
 # dependencies). install-dependencies.py runs `pip install -r requirements.txt`

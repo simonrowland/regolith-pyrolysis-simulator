@@ -22,7 +22,12 @@ dependencies = [
     "flask-socketio>=5.3",
     "pyyaml>=6.0",
     "plotly>=5.18",
-    "numpy>=1.26",
+    # Upper bound is load-bearing: the VAPOR_PRESSURE engine (vaporock) imports
+    # np.bool8, removed in numpy 2.0. An unbounded spec lets `uv sync` resolve
+    # numpy>=2 and silently break `import vaporock` -> cascading
+    # ProviderUnavailableError across the suite. Do not relax without making the
+    # native engine stack numpy-2 compatible.
+    "numpy>=1.26,<2",
     "scipy>=1.12",
     "petthermotools>=0.4.5,<0.5",
     # vaporock (VAPOR_PRESSURE authority) is intentionally NOT a pip dependency.
