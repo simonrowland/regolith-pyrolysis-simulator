@@ -72,12 +72,61 @@ FE_REDOX_BUFFERS = {'QFM', 'NNO', 'IW', 'HM'}
 FE_REDOX_BUFFER_ALIASES = {'FMQ': 'QFM'}
 FE3_TO_FEOT_FACTOR = 0.8998
 
+ALPHAMELTS_REASON_TIMEOUT = 'timeout'
+ALPHAMELTS_REASON_SUBPROCESS_DIED = 'subprocess_died'
+ALPHAMELTS_REASON_NONZERO_EXIT = 'nonzero_exit'
+ALPHAMELTS_REASON_NO_CONVERGENCE = 'no_convergence'
+ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT = 'parse_empty_output'
+ALPHAMELTS_REASON_MISSING_BINARY = 'missing_binary'
+
+ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
+    ALPHAMELTS_REASON_TIMEOUT: 'AlphaMELTS subprocess timed out',
+    ALPHAMELTS_REASON_SUBPROCESS_DIED: (
+        'AlphaMELTS subprocess exited before producing a result'
+    ),
+    ALPHAMELTS_REASON_NONZERO_EXIT: (
+        'AlphaMELTS subprocess returned a nonzero exit code'
+    ),
+    ALPHAMELTS_REASON_NO_CONVERGENCE: (
+        'AlphaMELTS reported no convergence before phase rows'
+    ),
+    ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT: (
+        'AlphaMELTS stdout had no parseable phase assemblage'
+    ),
+    ALPHAMELTS_REASON_MISSING_BINARY: (
+        'AlphaMELTS subprocess binary was not available'
+    ),
+}
+
 
 def _signal_name(returncode: int) -> str:
     try:
         return signal.Signals(-int(returncode)).name
     except ValueError:
         return f'signal {-int(returncode)}'
+
+
+def _alphamelts_backend_failure_detail(reason_code: str,
+                                       detail: str | None = None) -> str:
+    message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
+    if detail:
+        return (
+            f'{message} [backend_status_reason={reason_code}]: {detail}'
+        )
+    return f'{message} [backend_status_reason={reason_code}]'
+
+
+def _alphamelts_backend_failure_error(reason_code: str,
+                                      detail: str | None = None
+                                      ) -> RuntimeError:
+    error = RuntimeError(
+        _alphamelts_backend_failure_detail(reason_code, detail)
+    )
+    error.backend_status_reason = reason_code  # type: ignore[attr-defined]
+    error.backend_status_reason_message = (
+        ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
+    )
+    return error
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -874,12 +923,19 @@ class AlphaMELTSBackend(MeltBackend):
         *,
         backend_status: str,
         reason: OutOfDomainReason | str,
+        message: str | None = None,
     ) -> dict[str, object]:
         payload = dict(diagnostics or {})
         payload.setdefault('backend_status', backend_status)
         structured_reason = reason_value(reason)
         if structured_reason is not None:
-            payload.setdefault('backend_status_reason', structured_reason)
+            payload['backend_status_reason'] = structured_reason
+            reason_message = (
+                message
+                or ALPHAMELTS_BACKEND_FAILURE_MESSAGES.get(structured_reason)
+            )
+            if reason_message is not None:
+                payload['backend_status_reason_message'] = reason_message
         return payload
 
     @staticmethod
@@ -1433,7 +1489,10 @@ class AlphaMELTSBackend(MeltBackend):
 
             binary = self._binary_path or self._engine_path
             if binary is None:
-                raise RuntimeError('AlphaMELTS subprocess binary is not configured')
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_MISSING_BINARY,
+                    'subprocess binary is not configured',
+                )
             menu_input = '1\ninput.melts\n3\n2\nx\n'
             env = os.environ.copy()
             env.setdefault('ALPHAMELTS_CALC_MODE', 'MELTS')
@@ -1454,15 +1513,15 @@ class AlphaMELTSBackend(MeltBackend):
                     env=env,
                 )
             except subprocess.TimeoutExpired as exc:
-                raise RuntimeError(
-                    'AlphaMELTS subprocess equilibrium timed out: '
-                    f'{exc}'
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_TIMEOUT,
+                    str(exc),
                 ) from exc
             except FileNotFoundError as exc:
                 self._mode = None
-                raise RuntimeError(
-                    'AlphaMELTS subprocess equilibrium binary not found: '
-                    f'{exc}'
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_MISSING_BINARY,
+                    f'binary not found: {exc}',
                 ) from exc
 
             if result.returncode < 0:
@@ -1481,14 +1540,14 @@ class AlphaMELTSBackend(MeltBackend):
                     diagnostics=self._diagnostics_with_backend_status_reason(
                         diagnostics,
                         backend_status='out_of_domain',
-                        reason=OutOfDomainReason.NOT_CONVERGED,
+                        reason=ALPHAMELTS_REASON_SUBPROCESS_DIED,
                     ),
                 )
             if result.returncode > 0:
-                raise RuntimeError(
-                    'AlphaMELTS subprocess equilibrium failed: '
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_NONZERO_EXIT,
                     f'returncode {result.returncode}: '
-                    f'{result.stderr or result.stdout}'
+                    f'{result.stderr or result.stdout}',
                 )
 
             return self._parse_single_point_stdout(
@@ -1599,11 +1658,12 @@ class AlphaMELTSBackend(MeltBackend):
                     diagnostics=self._diagnostics_with_backend_status_reason(
                         diagnostics,
                         backend_status='out_of_domain',
-                        reason=OutOfDomainReason.NOT_CONVERGED,
+                        reason=ALPHAMELTS_REASON_NO_CONVERGENCE,
                     ),
                 )
-            raise RuntimeError(
-                'AlphaMELTS subprocess produced no parseable phase assemblage'
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
+                'no parseable phase assemblage',
             )
         if stable_verdict is None:
             result_warnings.append(

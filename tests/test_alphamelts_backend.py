@@ -11,8 +11,15 @@ import yaml
 from engines.builtin.vapor_pressure import (
     HighUncertaintyVaporPressureFallbackWarning,
 )
+from engines.domain_reason import OutOfDomainReason
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
+    ALPHAMELTS_REASON_MISSING_BINARY,
+    ALPHAMELTS_REASON_NONZERO_EXIT,
+    ALPHAMELTS_REASON_NO_CONVERGENCE,
+    ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
+    ALPHAMELTS_REASON_SUBPROCESS_DIED,
+    ALPHAMELTS_REASON_TIMEOUT,
     AlphaMELTSBackend,
     activity_from_chem_potential,
 )
@@ -223,7 +230,13 @@ def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
 
     assert first.status == 'out_of_domain'
     assert any('SIGABRT' in warning for warning in first.warnings)
-    assert first.diagnostics.get('backend_status_reason') == 'not_converged'
+    assert (
+        first.diagnostics.get('backend_status_reason')
+        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert 'subprocess exited' in (
+        first.diagnostics.get('backend_status_reason_message') or ''
+    )
     assert backend._mode == 'subprocess'
     assert second.status == 'ok'
     assert len(calls) == 2
@@ -241,7 +254,7 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
 
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
 
-    with pytest.raises(RuntimeError, match='timed out'):
+    with pytest.raises(RuntimeError, match='timed out') as excinfo:
         backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
@@ -249,6 +262,14 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
             pressure_bar=1.0,
         )
 
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_TIMEOUT
+    )
+    assert 'timed out' in getattr(
+        excinfo.value,
+        'backend_status_reason_message',
+    )
     assert seen['timeout'] == 20.0
     assert backend._mode == 'subprocess'
 
@@ -277,6 +298,10 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     )
 
     assert result.status == 'out_of_domain'
+    assert (
+        result.diagnostics.get('backend_status_reason')
+        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
     assert seen['timeout'] == 37.5
     assert backend._mode == 'subprocess'
 
@@ -291,7 +316,7 @@ def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypa
 
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
 
-    with pytest.raises(RuntimeError, match='binary not found'):
+    with pytest.raises(RuntimeError, match='binary not found') as excinfo:
         backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
@@ -299,7 +324,35 @@ def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypa
             pressure_bar=1.0,
         )
 
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_MISSING_BINARY
+    )
+    assert 'binary' in getattr(
+        excinfo.value,
+        'backend_status_reason_message',
+    )
     assert backend._mode is None
+
+
+def test_alphamelts_subprocess_unconfigured_binary_reports_missing_binary():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = None
+    backend._engine_path = None
+
+    with pytest.raises(RuntimeError, match='not configured') as excinfo:
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_MISSING_BINARY
+    )
 
 
 def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
@@ -318,7 +371,7 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
         ),
     )
 
-    with pytest.raises(RuntimeError, match='returncode 2'):
+    with pytest.raises(RuntimeError, match='returncode 2') as excinfo:
         backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
@@ -326,6 +379,10 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
             pressure_bar=1.0,
         )
 
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_NONZERO_EXIT
+    )
     assert backend._mode == 'subprocess'
 
 
@@ -345,13 +402,21 @@ def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
         ),
     )
 
-    with pytest.raises(RuntimeError, match='no parseable phase assemblage'):
+    with pytest.raises(
+        RuntimeError,
+        match='no parseable phase assemblage',
+    ) as excinfo:
         backend.equilibrate(
             temperature_C=1600.0,
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
         )
+
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
+    )
 
     assert backend._mode == 'subprocess'
 
@@ -407,6 +472,10 @@ def test_alphamelts_rejects_metal_and_gas_account_inputs():
         "process.metal_phase=['Fe'], process.overhead_gas=['O2']"
     ]
     assert result.status == 'out_of_domain'
+    assert (
+        result.diagnostics.get('backend_status_reason')
+        == OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
 
 
 def test_alphamelts_capabilities_surface_engine_version(monkeypatch):
@@ -1250,13 +1319,58 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
         "AlphaMELTS subprocess failed before phase rows: "
         "Quadratic convergence failure. Aborting.",
     ]
-    assert result.diagnostics.get("backend_status_reason") == "not_converged"
+    assert (
+        result.diagnostics.get("backend_status_reason")
+        == ALPHAMELTS_REASON_NO_CONVERGENCE
+    )
+    assert 'no convergence' in (
+        result.diagnostics.get("backend_status_reason_message") or ''
+    )
+
+
+def test_alphamelts_stdout_parser_classifies_initial_calculation_failed():
+    # Isolate the second no-phase classifier branch ('Initial calculation
+    # failed') -- the combined-fixture test above is dominated by the
+    # 'Quadratic convergence failure' branch, so this asserts the
+    # Initial-calculation path also maps to NO_CONVERGENCE.
+    backend = AlphaMELTSBackend()
+    output = """
+<> Found the liquidus at T = 1249.41 (C).
+...Checking saturation state of potential solids.
+...Projecting equality constraints.
+Initial calculation failed (1.000000 bars, 1249.414062 C)!
+"""
+
+    result = backend._parse_single_point_stdout(
+        output,
+        temperature_C=1250.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=1000.0,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.phases_present == []
+    assert (
+        "AlphaMELTS subprocess failed before phase rows: "
+        "Initial calculation failed."
+    ) in result.warnings
+    assert (
+        result.diagnostics.get("backend_status_reason")
+        == ALPHAMELTS_REASON_NO_CONVERGENCE
+    )
+    assert 'no convergence' in (
+        result.diagnostics.get("backend_status_reason_message") or ''
+    )
 
 
 def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
     backend = AlphaMELTSBackend()
 
-    with pytest.raises(RuntimeError, match="parseable phase assemblage"):
+    with pytest.raises(
+        RuntimeError,
+        match="parseable phase assemblage",
+    ) as excinfo:
         backend._parse_single_point_stdout(
             "Error in SILMIN file input procedure.",
             temperature_C=1200.0,
@@ -1264,6 +1378,11 @@ def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
             fO2_log=-9.0,
             total_input_kg=1000.0,
         )
+
+    assert (
+        getattr(excinfo.value, 'backend_status_reason')
+        == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
+    )
 
 
 def test_project_local_alphamelts_reports_liquidus_when_installed():
