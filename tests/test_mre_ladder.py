@@ -7,7 +7,10 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator import mre_ladder
+from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import PyrolysisRun
@@ -217,7 +220,7 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     assert captured["fe_redox_policy"] == "kress91_live"
 
 
-def test_step_mre_restricts_reducible_oxides_to_target_prefix():
+def test_step_mre_restricts_reducible_oxides_to_target_rung():
     setpoints = {
         "campaigns": {},
         "mre_voltage_sequence": {
@@ -235,6 +238,7 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
     sim.melt.c5_enabled = True
     sim.melt.mre_target_species = "SiO2"
     sim.melt.mre_max_voltage_V = 1.45
+    sim._mre_voltage_step_idx = 1
     captured: list[dict] = []
 
     def fake_dispatch(_intent, *, control_inputs, **_kwargs):
@@ -257,5 +261,60 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
     sim._step_mre()
 
     assert captured
-    assert captured[0]["allowed_oxides"] == ["FeO", "SiO2"]
-    assert captured[0]["voltage_V"] == pytest.approx(0.75)
+    assert captured[0]["allowed_oxides"] == ["SiO2"]
+    assert captured[0]["voltage_V"] == pytest.approx(1.45)
+
+
+def test_c5_sio2_target_step_does_not_reduce_feo():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 0},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "SiO2"
+    sim.melt.mre_max_voltage_V = 1.45
+    sim._mre_voltage_step_idx = 1
+    provider = BuiltinElectrolysisStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "FeO": 10.0,
+                "SiO2": 10.0,
+            },
+        },
+        species_formula_registry={},
+    )
+    reductions: dict[str, float] = {}
+
+    def dispatch_with_provider(_intent, *, control_inputs, fO2_log, fe_redox_policy):
+        result = provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                account_view=view,
+                temperature_C=1600.0,
+                pressure_bar=1e-9,
+                fO2_log=fO2_log,
+                fe_redox_policy=fe_redox_policy,
+                control_inputs=control_inputs,
+            )
+        )
+        reductions.update(result.diagnostic.get("oxides_reduced_kg", {}))
+        return SimpleNamespace(diagnostic=result.diagnostic, transition=None)
+
+    sim._dispatch_only = dispatch_with_provider
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    assert reductions.get("SiO2", 0.0) > 0.0
+    assert "FeO" not in reductions

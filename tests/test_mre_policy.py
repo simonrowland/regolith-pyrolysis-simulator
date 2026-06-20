@@ -151,8 +151,9 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
 
     assert _product_ledger(off) == {}
     assert _product_ledger(si_target) != _product_ledger(off)
-    assert _product_ledger(si_target)["Na"] > 0.0
-    assert _product_ledger(si_target)["K"] > 0.0
+    assert _product_ledger(si_target)["Si"] > 0.0
+    assert "Na" not in _product_ledger(si_target)
+    assert "K" not in _product_ledger(si_target)
 
     off_trace = off.run_reference.trace
     si_trace = si_target.run_reference.trace

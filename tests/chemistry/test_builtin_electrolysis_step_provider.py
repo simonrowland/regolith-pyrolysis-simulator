@@ -1197,7 +1197,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.70)
+    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.45)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -1309,7 +1309,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="TiO2", max_voltage_V=1.70)
+    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.45)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",

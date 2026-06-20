@@ -457,7 +457,7 @@ class ExtractionMixin:
         - Non-finite / non-coercible voltage → skip entry.
         - Empty / missing ``species`` → skip entry.
 
-        Entries are sorted by voltage ascending so the C5 prefix-filter
+        Entries are sorted by voltage ascending so C5 max-voltage filtering
         (``voltage <= 1.6``) works on the resulting list without
         reordering. Closes CW1 historical-audit item
         (``docs-private/audits/2026-05-27-p3-historical-audit.txt``).
@@ -469,11 +469,11 @@ class ExtractionMixin:
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
 
         Voltage strategy:
-            C5 (limited MRE):    Stepped holds at Ellingham thresholds up to the
-                                 selected EvalSpec target/max voltage.
-                                 ``allowed_oxides`` is an operator stage-targeting
-                                 prefix filter (ladder steps through the EvalSpec
-                                 target); Nernst + the voltage cap already govern
+            C5 (limited MRE):    Stepped holds at the selected EvalSpec
+                                 target/max-voltage rung.
+                                 ``allowed_oxides`` is an operator target-rung
+                                 selectivity filter (the EvalSpec target step);
+                                 Nernst + the voltage cap already govern
                                  which species are physically reducible.
                                  Electrode life 5-10× longer than full MRE.
 
@@ -562,9 +562,16 @@ class ExtractionMixin:
                 self._mre_voltage_sequence,
                 ladder_cap_V,
             )
-            seq = mre_ladder.filter_steps_up_to_max_v(
+            selected_steps = mre_ladder.filter_steps_up_to_max_v(
                 self._mre_voltage_sequence, ladder_cap_V
             )
+            if target:
+                seq = [
+                    step for step in selected_steps
+                    if target in step['species']
+                ]
+            else:
+                seq = selected_steps
             if not seq:
                 self._mre_metals_this_hr = {}
                 self._mre_voltage_V = 0.0
@@ -591,7 +598,7 @@ class ExtractionMixin:
                         self._mre_hold_hours = 0
 
             current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
-            # Operator stage-targeting prefix; not a second Nernst gate.
+            # Operator target-rung selectivity; not a second Nernst gate.
             c5_allowed_oxides = (
                 sorted(allowed_oxides) if allowed_oxides is not None else None
             )

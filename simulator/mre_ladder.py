@@ -185,21 +185,19 @@ def allowed_oxides_for_target(
     ladder: list[dict[str, Any]] | tuple[dict[str, Any], ...],
     max_voltage_V: Any,
 ) -> frozenset[str] | None:
-    """Return the operator stage-targeting oxide prefix through ``target_oxide``.
+    """Return the operator stage-targeting oxide set for ``target_oxide``.
 
-    This is an EvalSpec/recipe selectivity filter (which ladder steps the
+    This is an EvalSpec/recipe selectivity filter (which ladder step the
     operator asked to run), not a Nernst-derived voltage gate — physical
     reducibility is already enforced by the decomposition-voltage cap.
     """
     target = str(target_oxide or '').strip()
     if not target:
         return None
-    allowed: set[str] = set()
     for step in filter_steps_up_to_max_v(ladder, max_voltage_V):
-        allowed.update(step['species'])
         if target in step['species']:
-            break
-    return frozenset(allowed) if allowed else frozenset()
+            return frozenset(step['species'])
+    return frozenset()
 
 
 def filter_steps_up_to_max_v(
