@@ -58,6 +58,7 @@ from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
+    MRE_FIXED_REDUCIBLE_OXIDES,
     min_decomposition_voltage,
 )
 from simulator.fe_redox import (
@@ -211,6 +212,48 @@ def test_provider_rejects_wrong_intent(
     assert result.transition is None
 
 
+def test_empty_melt_result_carries_redox_diagnostics(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=0.02,
+            fO2_log=-7.25,
+            fe_redox_policy="kress91_live",
+            control_inputs={
+                "voltage_V": 1.0,
+                "current_A": 10.0,
+                "dt_hr": 1.0,
+                "melt_fO2_log": -7.25,
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.transition is None
+    assert diagnostic["melt_fO2_log"] == pytest.approx(-7.25)
+    assert diagnostic["fe_redox_policy"] == "kress91_live"
+    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
+    assert diagnostic["fe_redox_split"]["status"] == "unavailable"
+
+
 # ---------------------------------------------------------------------------
 # 3. Kernel account filter scopes the view
 # ---------------------------------------------------------------------------
@@ -346,13 +389,57 @@ def test_provider_reports_fresh_kress91_redox_split_from_account_view(
     assert result.transition is None
     assert diagnostic["melt_fO2_log"] == pytest.approx(fO2_log)
     assert diagnostic["fe_redox_policy"] == "kress91_live"
-    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is False
+    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
     assert split["diagnostic_only"] is True
     assert split["consumed_by_behavior"] is False
     assert split["computed_fresh_from_account_view"] is True
     assert split["fe3_over_sigma_fe"] == pytest.approx(expected["fe3"])
     assert split["fe2o3_over_feo_molar"] == pytest.approx(expected["ratio"])
     assert split["fe3_over_sigma_fe"] != pytest.approx(0.999)
+
+
+def test_live_mre_skips_fe2o3_full_reduction_without_terminal_o2_credit(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    fe2o3_mol = 10.0 / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"Fe2O3": fe2o3_mol},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1e-6,
+            fO2_log=-7.25,
+            fe_redox_policy="kress91_live",
+            control_inputs={
+                "voltage_V": 5.0,
+                "current_A": 1.0e9,
+                "dt_hr": 1.0,
+                "melt_fO2_log": -7.25,
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.transition is None
+    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
+    assert diagnostic["oxides_reduced_mol"] == {}
+    assert diagnostic["metals_produced_mol"] == {}
+    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
 
 
 def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
@@ -879,13 +966,13 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
     ).get("O2", 0.0) == pytest.approx(0.5 * nio_initial_mol, rel=1e-12)
 
 
-def test_provider_matches_legacy_multi_oxide_partition(
+def test_provider_matches_legacy_feo_partition_with_ferric_present(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Verify the provider and legacy ``step_hour`` agree across a
-    multi-oxide partition (FeO + Fe2O3 simultaneously reducible). The
-    selectivity weights, Faraday integration, and metal-accumulation
-    (Fe from BOTH oxides) must match line-for-line.
+    ferric-bearing melt. Fe2O3 is intentionally present in cleaned_melt but
+    must not enter fixed MRE full reduction; Fe metal and anode O2 come from
+    the ferrous FeO path only.
     """
 
     sim = _build_sim(
@@ -940,6 +1027,11 @@ def test_provider_matches_legacy_multi_oxide_partition(
     )
     result = provider.dispatch(request)
     diagnostic = dict(result.diagnostic)
+
+    assert "Fe2O3" not in MRE_FIXED_REDUCIBLE_OXIDES
+    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is True
+    assert "Fe2O3" not in dict(diagnostic.get("oxides_reduced_mol", {}) or {})
+    assert "Fe2O3" not in dict(legacy.get("oxides_reduced_mol", {}) or {})
 
     for key in ("oxides_reduced_mol", "metals_produced_mol"):
         leg = dict(legacy.get(key, {}) or {})

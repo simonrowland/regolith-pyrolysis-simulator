@@ -196,7 +196,7 @@ def test_seed_rows_zero_merge_summary_accounting() -> None:
 
 
 def _filesystem_is_case_insensitive() -> bool:
-    probe = Path(os.environ.get("TMPDIR", "/tmp")) / "case_probe_guard"
+    probe = Path(os.environ.get("TMPDIR", "/tmp")) / f"case_probe_guard_{os.getpid()}"
     try:
         probe.write_text("x", encoding="utf-8")
         alt = probe.parent / probe.name.swapcase()

@@ -11,8 +11,9 @@ from simulator.electrolysis import DECOMP_VOLTAGES
 # voltages are DERIVED from the single-source electrolysis.DECOMP_VOLTAGES
 # raw-thermo reanchor (NIST-JANAF/Chase 1998, Barin, O'Neill 1988,
 # Robie-Hemingway, NEA) -- no second hard-coded copy of the voltage numbers.
-# Na2O/K2O (C3-depleted, DISABLED_PRESET_TARGETS) and Fe2O3 (deferred single-
-# rung; see SSO-R Phase-2) are intentionally absent from the C5 fallback ladder.
+# Na2O/K2O (C3-depleted, DISABLED_PRESET_TARGETS) and Fe2O3 (ferric Fe is
+# represented by fO2-coupled speciation, not a fixed full-reduction rung) are
+# intentionally absent from the C5 fallback ladder.
 # Each tuple is (species, min_hold_hours); voltage = DECOMP_VOLTAGES[species].
 _FALLBACK_LADDER_RUNGS = (
     (('NiO',), 2),

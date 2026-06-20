@@ -1374,6 +1374,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         does NOT need bookkeeping between dispatch and commit.
         """
         kernel = self._require_chem_kernel()
+        control_inputs = dict(control_inputs)
         temperature_C = float(self.melt.temperature_C)
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         store = _pt0_determinism_store_for(self)
@@ -1383,6 +1384,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C = float(controls['temperature_C'])
             pressure_bar = float(controls['pressure_bar'])
             fO2_log = controls['fO2_log']
+            if fO2_log is not None and 'melt_fO2_log' in control_inputs:
+                control_inputs['melt_fO2_log'] = float(fO2_log)
             canonicalizer = getattr(
                 store,
                 'canonical_composition_mol_by_account',

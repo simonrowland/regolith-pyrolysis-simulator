@@ -1191,7 +1191,9 @@ class PT1PersistentEquilibriumStore:
         conn.row_factory = sqlite3.Row
         conn.execute(f"PRAGMA busy_timeout={int(self._shard_busy_timeout_ms)}")
         if self.read_only_base_db_path is not None:
-            conn.execute("PRAGMA main.journal_mode=WAL")
+            journal_mode = str(conn.execute("PRAGMA main.journal_mode").fetchone()[0])
+            if journal_mode.lower() != "wal":
+                conn.execute("PRAGMA main.journal_mode=WAL")
         self._attach_read_only_base(conn)
         return conn
 

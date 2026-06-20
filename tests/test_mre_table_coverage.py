@@ -10,6 +10,8 @@ from simulator.accounting.formulas import load_species_formulas
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
+    FERRIC_TO_FERROUS_REFERENCE_V,
+    MRE_FIXED_REDUCIBLE_OXIDES,
     min_decomposition_voltage,
 )
 from simulator.state import OXIDE_TO_METAL
@@ -71,13 +73,12 @@ def test_mre_off_switch_floor_is_derived_from_ladder() -> None:
     assert min_decomposition_voltage() == DECOMP_VOLTAGES["NiO"]
 
 
-def test_decomp_voltage_ordering_matches_raw_thermo_reanchor() -> None:
+def test_fixed_mre_ladder_excludes_ferric_full_reduction_rung() -> None:
     expected = [
         ("NiO", 0.39),
         ("Na2O", 0.5),
         ("K2O", 0.5),
         ("FeO", 0.75),
-        ("Fe2O3", 0.90),
         ("Cr2O3", 0.95),
         ("MnO", 1.05),
         ("SiO2", 1.45),
@@ -88,11 +89,13 @@ def test_decomp_voltage_ordering_matches_raw_thermo_reanchor() -> None:
     ]
 
     assert [(species, DECOMP_VOLTAGES[species]) for species, _ in expected] == expected
+    assert "Fe2O3" in DECOMP_VOLTAGES
+    assert "Fe2O3" not in MRE_FIXED_REDUCIBLE_OXIDES
+    assert FERRIC_TO_FERROUS_REFERENCE_V < DECOMP_VOLTAGES["FeO"]
     grouped = [
         DECOMP_VOLTAGES["NiO"],
         DECOMP_VOLTAGES["Na2O"],
         DECOMP_VOLTAGES["FeO"],
-        DECOMP_VOLTAGES["Fe2O3"],
         DECOMP_VOLTAGES["Cr2O3"],
         DECOMP_VOLTAGES["MnO"],
         DECOMP_VOLTAGES["SiO2"],
@@ -122,9 +125,10 @@ def test_fallback_ladder_voltages_are_derived_from_decomp_voltages() -> None:
 
 
 def test_fallback_ladder_excludes_alkali_and_ferric_rungs() -> None:
-    # Na2O/K2O are pre-depleted by C3 (DISABLED_PRESET_TARGETS); Fe2O3 is a
-    # deferred single-rung pending SSO-R Phase-2 speciation. None belong in the
-    # C5 fallback ladder even though they exist in DECOMP_VOLTAGES.
+    # Na2O/K2O are pre-depleted by C3 (DISABLED_PRESET_TARGETS); Fe2O3 is
+    # represented by live redox speciation rather than fixed full reduction.
+    # None belong in the C5 fallback ladder even though they exist in
+    # DECOMP_VOLTAGES.
     from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
 
     fallback_species = {

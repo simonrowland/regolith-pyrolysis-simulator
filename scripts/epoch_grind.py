@@ -937,7 +937,10 @@ def seed_job_cache(
     del seed_fn
     _remove_sqlite_file_set(shard_db)
     shard_db.parent.mkdir(parents=True, exist_ok=True)
-    PT1PersistentEquilibriumStore(shard_db)
+    PT1PersistentEquilibriumStore(
+        shard_db,
+        read_only_base_db_path=base_cache if base_cache.exists() else None,
+    )
     return {
         "target": str(shard_db),
         "rows_before": 0,

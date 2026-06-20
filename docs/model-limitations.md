@@ -69,6 +69,25 @@ The model asserts clearance that a real carbothermal/oxidative bake at furnace-s
 
 For file:line anchors and the full per-species verdict table, see the audit linked above.
 
+## SSO-R melt Fe-redox (Phase-2, in progress)
+
+Melt iron redox (ferric/ferrous via Kress-Carmichael 1991, fO2-coupled) is being wired live in
+stages: R2.0 state field -> R2.1b live a_FeO in the Fe vapor-pressure path -> R2.2 retire the Fe2O3
+fixed full-reduction rung from MRE. Interim honesty notes while the arc completes:
+
+- Explicit-ferric Fe undercount (R2.2). Removing the Fe2O3 single-rung full-reduction (which
+  over-reduced Fe2O3 -> Fe metal when only Fe2O3 -> FeO is physical, ferric/ferrous order backwards)
+  means ferric Fe carried as concrete Fe2O3 is not extracted by MRE until the fO2-coupled
+  ferric->ferrous transition lands (R2.3/R2.4). For explicit-Fe2O3 feedstocks this lowers reported
+  Fe yield -- an honest undercount, not over-extraction via wrong physics. Production S-type/mare and
+  named Mars/sulfate feedstocks are unaffected (Stage-0 projects ~no concrete Fe2O3 into the cleaned
+  melt); lunar unaffected.
+- Ungrounded intrinsic-fO2 constants. melt_fO2_log is seeded from the composition->fO2 initializer,
+  which still carries ungrounded redox_offset terms (alkali, ferric). These perturb the fO2 INPUT
+  only; the Kress91 fO2->split mapping is grounded. Grounded mass-transfer relaxation lands in R2.3.
+- One-sided de-confliction (until R2.3). Fe vapor activity responds to melt fO2, but the SiO2<->SiO
+  lever still reads headspace pO2; full Fe/SiO de-confliction requires the SiO-side fO2 coupling (R2.3).
+
 ## Good Uses
 
 - Compare feedstock classes.

@@ -84,9 +84,47 @@ def _persistent_artifact_count(db_path: Path, artifact: str) -> int:
         ).fetchone()[0])
 
 
+class _CaptureDispatchKernel:
+    def __init__(self) -> None:
+        self.kwargs = None
+
+    def dispatch(self, intent, **kwargs):
+        self.kwargs = kwargs
+        return IntentResult(intent=intent, status="ok", transition=None)
+
+
 def test_json_ready_nonfinite_error_names_payload_path() -> None:
     with pytest.raises(PT0NonFinitePayload, match=r"\$\.outer\.inner\[0\]"):
         canonical_json_bytes({"outer": {"inner": [float("inf")]}})
+
+
+def test_dispatch_only_quantizes_mre_melt_fo2_control_with_request() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    raw_fO2_log = -7.123456789
+    expected = store.quantized_controls(sim, fO2_log=raw_fO2_log)["fO2_log"]
+    assert expected != raw_fO2_log
+    kernel = _CaptureDispatchKernel()
+    sim._chem_kernel = kernel
+
+    sim._dispatch_only(
+        ChemistryIntent.ELECTROLYSIS_STEP,
+        control_inputs={
+            "voltage_V": 1.0,
+            "current_A": 10.0,
+            "dt_hr": 1.0,
+            "melt_fO2_log": raw_fO2_log,
+        },
+        fO2_log=raw_fO2_log,
+        fe_redox_policy="kress91_live",
+    )
+
+    assert kernel.kwargs is not None
+    assert kernel.kwargs["fO2_log"] == pytest.approx(expected)
+    assert kernel.kwargs["control_inputs"]["melt_fO2_log"] == pytest.approx(
+        expected
+    )
+    assert kernel.kwargs["fe_redox_policy"] == "kress91_live"
 
 
 class _CountingSilicateEquilibriumProvider(ChemistryProvider):

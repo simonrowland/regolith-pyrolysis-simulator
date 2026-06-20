@@ -13,7 +13,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.core import PyrolysisSimulator
-from simulator.electrolysis import ElectrolysisModel
+from simulator.electrolysis import (
+    FERRIC_TO_FERROUS_REFERENCE_V,
+    ElectrolysisModel,
+)
 from simulator.melt_backend.base import StubBackend
 from simulator.session_cli import SessionScriptRunner
 from simulator.state import (
@@ -455,7 +458,7 @@ def test_condensed_species_projection_delta_cannot_exceed_ledger_total():
     assert sim.train.total_by_species()["Fe"] == pytest.approx(2.0)
 
 
-def test_electrolysis_accumulates_shared_metal_products():
+def test_electrolysis_skips_ferric_full_reduction_with_feo_present():
     melt = MeltState()
     melt.composition_kg = {"FeO": 10.0, "Fe2O3": 10.0}
     melt.update_total_mass()
@@ -467,21 +470,20 @@ def test_electrolysis_accumulates_shared_metal_products():
         T_C=1600.0,
     )
 
-    expected_fe_kg = 0.0
-    for oxide in ("FeO", "Fe2O3"):
-        metal, n_metal, _n_oxygen = OXIDE_TO_METAL[oxide]
-        expected_fe_kg += (
-            result["oxides_reduced_kg"][oxide]
-            * n_metal
-            * MOLAR_MASS[metal]
-            / MOLAR_MASS[oxide]
-        )
+    metal, n_metal, _n_oxygen = OXIDE_TO_METAL["FeO"]
+    expected_fe_kg = (
+        result["oxides_reduced_kg"]["FeO"]
+        * n_metal
+        * MOLAR_MASS[metal]
+        / MOLAR_MASS["FeO"]
+    )
 
+    assert "Fe2O3" not in result["oxides_reduced_kg"]
     assert result["metals_produced_kg"]["Fe"] == pytest.approx(expected_fe_kg)
     assert result["O2_produced_mol"] > 0.0
 
 
-def test_ferric_oxide_reduces_after_wustite_in_mre_sequence():
+def test_ferric_reference_threshold_is_not_fixed_mre_sequence():
     melt = MeltState()
     melt.composition_kg = {"FeO": 10.0, "Fe2O3": 10.0}
     melt.update_total_mass()
@@ -489,7 +491,9 @@ def test_ferric_oxide_reduces_after_wustite_in_mre_sequence():
     sequence = ElectrolysisModel().get_reduction_sequence(melt, T_C=1600.0)
     order = [oxide for oxide, _voltage in sequence]
 
-    assert order.index("FeO") < order.index("Fe2O3")
+    assert "FeO" in order
+    assert "Fe2O3" not in order
+    assert FERRIC_TO_FERROUS_REFERENCE_V < 0.75
 
 
 def test_k_shuttle_draws_from_process_reagent_inventory():

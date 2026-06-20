@@ -35,9 +35,10 @@ Standard MRE Baseline (root branch alternative).
 
 Standard decomposition voltages at ~1873 K / ~1600 C (per mol O2):
     NiO:   0.39 V   Na2O:  0.5 V    K2O:    0.5 V
-    FeO:   0.75 V   Fe2O3: 0.90 V   Cr2O3:  0.95 V
-    MnO:   1.05 V   SiO2:  1.45 V   TiO2:   1.70 V
-    Al2O3: 1.95 V   MgO:   2.2 V    CaO:    2.5 V
+    FeO:   0.75 V   Cr2O3:  0.95 V  MnO:    1.05 V
+    Fe2O3: 0.90 V reference only; not a live MRE full-reduction rung
+    SiO2:  1.45 V   TiO2:  1.70 V   Al2O3:  1.95 V
+    MgO:   2.2 V    CaO:   2.5 V
 
 Source: raw-thermo reanchor, E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
 """
@@ -68,9 +69,9 @@ DECOMP_VOLTAGES = {
     'K2O':   0.5,
     # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
     'FeO':   0.75,
-    # FeO-scale-tied rescale. Simplified sequential ferric reduction:
-    # FeO is favored first; Fe2O3 remains explicit until a fO2-coupled
-    # ferric/ferrous melt model lands.
+    # Reference-only legacy full-reduction threshold. Live MRE fixed
+    # reduction excludes Fe2O3 because ferric Fe is represented by the
+    # fO2-coupled Kress91 split, not by a terminal-O2 full-reduction rung.
     'Fe2O3': 0.90,
     # NIST-JANAF/Chase 1998 + Barin; modest-confidence upper-range anchor.
     'Cr2O3': 0.95,
@@ -85,6 +86,12 @@ DECOMP_VOLTAGES = {
     'MgO':   2.2,
     'CaO':   2.5,
 }
+
+FERRIC_TO_FERROUS_REFERENCE_V = 0.65
+MRE_FIXED_REDUCIBLE_OXIDES = tuple(
+    oxide for oxide in DECOMP_VOLTAGES
+    if oxide != 'Fe2O3'
+)
 
 
 def min_decomposition_voltage() -> float:
@@ -212,7 +219,7 @@ class ElectrolysisModel:
 
         # Find all reducible species at this voltage
         reducible = []
-        for oxide in DECOMP_VOLTAGES:
+        for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if oxide not in melt_state.composition_kg:
                 continue
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
@@ -319,7 +326,7 @@ class ElectrolysisModel:
         comp = melt_state.composition_wt_pct()
         sequence = []
 
-        for oxide in DECOMP_VOLTAGES:
+        for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
             activity = comp.get(oxide, 0.0) / 100.0
@@ -342,7 +349,8 @@ class ElectrolysisModel:
         comp = melt_state.composition_wt_pct()
         total_energy = 0.0
 
-        for oxide, E0 in self.decomp_voltages.items():
+        for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
+            E0 = self.decomp_voltages[oxide]
             if E0 > max_voltage_V:
                 continue
             kg = melt_state.composition_kg.get(oxide, 0.0)

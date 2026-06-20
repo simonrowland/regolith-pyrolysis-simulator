@@ -132,6 +132,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.electrolysis import (
             DECOMP_VOLTAGES,
             ELECTRONS_PER_OXIDE,
+            MRE_FIXED_REDUCIBLE_OXIDES,
             current_efficiency,
         )
         from simulator.state import (
@@ -178,6 +179,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic_skipped="empty melt",
                 request=request,
                 applied_anode_fO2_log=math.log10(pO2_bar),
+                melt_fO2_log=melt_fO2_log,
+                pressure_bar=request.pressure_bar,
             )
 
         registry = request.account_view.species_formula_registry
@@ -217,7 +220,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 pressure_bar=request.pressure_bar,
                 melt_fO2_log=melt_fO2_log,
             ),
-            "fe2o3_fixed_full_reduction_skipped": False,
+            "fe2o3_fixed_full_reduction_skipped": True,
         }
 
         if total_kg <= 0.0 or voltage_V <= 0.0 or current_A <= 0.0:
@@ -238,7 +241,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # ElectrolysisModel.step_hour line-for-line: same E0 table,
         # same Nernst formula, same 1e-6 kg gate, same activity proxy.
         reducible: list[tuple[str, float, float, float]] = []
-        for oxide in DECOMP_VOLTAGES:
+        for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if allowed_oxides is not None and oxide not in allowed_oxides:
                 continue
             if oxide not in composition_kg:
@@ -295,9 +298,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         debits_mol: dict[str, dict[str, float]] = defaultdict(dict)
         credits_mol: dict[str, dict[str, float]] = defaultdict(dict)
 
-        # Accumulators for the metal/O2 sides (multiple oxides may
-        # contribute to the same metal -- e.g. Fe from FeO + Fe2O3 in
-        # sequence -- so additive bookkeeping mirrors legacy exactly).
+        # Accumulators for the metal/O2 sides (multiple fixed oxides may
+        # contribute to the same metal, so additive bookkeeping mirrors legacy
+        # exactly). Fe2O3 is not a fixed MRE oxide in live redox mode.
         metal_mol_total: dict[str, float] = {}
         O2_mol_total = 0.0
         oxide_mol_total: dict[str, float] = {}
@@ -638,12 +641,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         1 bar standard state. T and P are passed through unchanged -- the provider does not
         compute an updated melt temperature or pressure.
 
-        When the caller does not pin ``request.fO2_log`` (the standard
-        case from :meth:`ExtractionMixin._step_mre`), the kernel's
-        :func:`validate_control_audit` ignores the fO2 field per its
-        ``requested_value is None`` guard.  Reporting the applied value
-        as ``log10(pO2_bar)`` is still useful as a diagnostic / forensic record
-        even when the validator skips it.
+        :meth:`ExtractionMixin._step_mre` pins ``request.fO2_log`` to the
+        melt redox state used by Kress91 diagnostics. The electrolysis Nernst
+        term still applies the anode O2 activity from ``pO2_bar``; reporting
+        that applied value as ``log10(pO2_bar)`` records the intentional
+        cathode/anode split for the control audit.
         """
 
         requested = {
@@ -676,7 +678,21 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         diagnostic_skipped: str = "",
         request: "IntentRequest | None" = None,
         applied_anode_fO2_log: float = 0.0,
+        melt_fO2_log: float | None = None,
+        pressure_bar: float | None = None,
     ) -> IntentResult:
+        fe_redox_policy = (
+            str(request.fe_redox_policy) if request is not None else "intrinsic"
+        )
+        T_K = (
+            float(request.temperature_C) + 273.15
+            if request is not None else 0.0
+        )
+        split_pressure_bar = (
+            float(pressure_bar)
+            if pressure_bar is not None
+            else (float(request.pressure_bar) if request is not None else 1.0)
+        )
         diag: dict[str, Any] = {
             "oxides_reduced_kg": {},
             "oxides_reduced_mol": {},
@@ -685,6 +701,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "O2_produced_kg": 0.0,
             "O2_produced_mol": 0.0,
             "energy_kWh": 0.0,
+            "melt_fO2_log": melt_fO2_log,
+            "fe_redox_policy": fe_redox_policy,
+            "fe_redox_split": cls._compute_fe_redox_split_diagnostic(
+                {},
+                total_kg=0.0,
+                T_K=T_K,
+                pressure_bar=split_pressure_bar,
+                melt_fO2_log=melt_fO2_log,
+            ),
+            "fe2o3_fixed_full_reduction_skipped": True,
         }
         if diagnostic_skipped:
             diag["reason_skipped"] = diagnostic_skipped

@@ -1233,11 +1233,12 @@ mre_voltage_sequence:
         cross-confirmed by NEA Chemical Thermodynamics of Nickel;
         E = -DeltaGf/(2F) ~= 0.39 V standard-state, with runtime Nernst
         applying melt activity + pO2. MRE-COVERAGE #32B reanchors FeO,
-        Fe2O3, Cr2O3, MnO, SiO2, TiO2, and Al2O3 to the same
-        raw-thermo basis (NIST-JANAF/Chase 1998, Barin, O'Neill 1988,
-        Robie-Hemingway, NEA), rounded to 0.05 V. Na2O/K2O remain held
-        at legacy 0.5 V pending activity/vapor-aware grounding because
-        Na/K are volatile at 1873 K.
+        Cr2O3, MnO, SiO2, TiO2, and Al2O3 to the same raw-thermo basis
+        (NIST-JANAF/Chase 1998, Barin, O'Neill 1988, Robie-Hemingway,
+        NEA), rounded to 0.05 V. Fe2O3 is not a live MRE full-reduction
+        rung; ferric Fe is represented by fO2-coupled speciation.
+        Na2O/K2O remain held at legacy 0.5 V pending activity/vapor-aware
+        grounding because Na/K are volatile at 1873 K.
 
     - species: "Na2O"
       decomposition_V: 0.5
