@@ -7,6 +7,7 @@ import math
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
 )
+from simulator.fe_redox import kress91_ferrous_feo_activity
 from simulator.state import GAS_CONSTANT, Atmosphere
 
 # Atmosphere modes where a turbine/bleed loop actively holds a commanded pO₂
@@ -249,6 +250,11 @@ class EquilibriumMixin:
         # goal: FINITE-HEADSPACE-PO2-MODEL.  See _commanded_pO2_bar and
         # docs/model-limitations.md.
         pO2_bar = self._commanded_pO2_bar()
+        intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
+        if intrinsic_fO2_value is None:
+            intrinsic_fO2_value = self._compute_intrinsic_melt_fO2()
+        intrinsic_fO2_log = float(intrinsic_fO2_value)
+        pressure_bar = max(float(self.melt.p_total_mbar) / 1000.0, 1e-9)
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
@@ -334,7 +340,15 @@ class EquilibriumMixin:
             # and evaporation slows.  Real activities differ significantly
             # (e.g., γ(Na₂O) ≈ 10⁻² in CMAS melts [THERMO-10]), which
             # is why AlphaMELTS is preferred for quantitative work.
-            a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
+            if parent_oxide == 'FeO':
+                a_oxide = kress91_ferrous_feo_activity(
+                    comp_wt=comp_wt,
+                    fO2_log=intrinsic_fO2_log,
+                    T_K=T_K,
+                    pressure_bar=pressure_bar,
+                )
+            else:
+                a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             if a_oxide <= 1e-10:
                 continue
 

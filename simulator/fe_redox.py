@@ -89,6 +89,28 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
+def kress91_ferrous_feo_activity(
+    *,
+    comp_wt: Mapping[str, float],
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    feot = feot_equivalent_wt_pct(comp_wt)
+    if feot <= 0.0:
+        return 0.0
+    mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
+    if not mol_fractions:
+        return 0.0
+    fe3 = kress91_fe3_over_sigma_fe(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    return (feot / 100.0) * (1.0 - fe3)
+
+
 def kress91_split(
     *,
     fO2_log: float,

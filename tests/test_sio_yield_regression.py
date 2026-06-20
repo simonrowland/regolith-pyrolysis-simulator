@@ -79,9 +79,12 @@ GOLDENS = (
 # Lunar SiO moves 0.000508314500607 -> 0.0005083144891 and Mars moves
 # 0.000486760127234 -> 0.000486760127354. The visible golden movement is
 # mostly Mg wall-deposit/fouling text; SiO movement is FP-scale.
+# 2026-06-19 SSO-R R2.1b wires Kress91 Fe-redox into live a_FeO. The SiO
+# fixture shift is coupled-flow scale: lunar 0.0005083144891 ->
+# 0.000508314464643; Mars 0.000486760127354 -> 0.000486760105302.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.0005083144891,
-    "mars_basalt": 0.000486760127354,
+    "lunar_mare_low_ti": 0.000508314464643,
+    "mars_basalt": 0.000486760105302,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

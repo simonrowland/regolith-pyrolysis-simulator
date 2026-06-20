@@ -3040,10 +3040,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
             pO2_bar = store.quantized_pO2_bar(self)
+        intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+        if intrinsic_fO2_log is None:
+            intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        intrinsic_fO2_log = float(intrinsic_fO2_log)
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
-            control_inputs={'pO2_bar': pO2_bar},
-            fO2_log=self._compute_intrinsic_melt_fO2(),
+            control_inputs={
+                'pO2_bar': pO2_bar,
+                'intrinsic_fO2_log': intrinsic_fO2_log,
+            },
+            fO2_log=intrinsic_fO2_log,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)

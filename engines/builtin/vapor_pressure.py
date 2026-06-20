@@ -563,12 +563,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
-        # The intrinsic-melt fO2/redox channel is resolved on demand via
-        # ``_resolve_intrinsic_melt_fO2_log`` once a consumer (redox-proxy /
-        # §5K knobs) lands. It is deliberately NOT invoked here: with no
-        # consumer it would be dead work, and eagerly parsing
-        # ``control_inputs['intrinsic_fO2_log']`` would introduce a new
-        # throw-path on a key the prior code ignored (golden-neutrality).
+        controls = request.control_inputs or {}
+        intrinsic_fO2_log_supplied = (
+            'intrinsic_fO2_log' in controls
+            and controls.get('intrinsic_fO2_log') is not None
+        )
+        # External callers that omit the explicit intrinsic-melt channel
+        # keep the legacy FeO wt-fraction activity path.
+        intrinsic_fO2_log = (
+            self._resolve_intrinsic_melt_fO2_log(request)
+            if intrinsic_fO2_log_supplied
+            else None
+        )
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -626,7 +632,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="P_reference_Pa",
             )
 
-            a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
+            if parent_oxide == 'FeO' and intrinsic_fO2_log is not None:
+                from simulator.fe_redox import kress91_ferrous_feo_activity
+
+                a_oxide = kress91_ferrous_feo_activity(
+                    comp_wt=comp_wt,
+                    fO2_log=intrinsic_fO2_log,
+                    T_K=T_K,
+                    pressure_bar=request.pressure_bar,
+                )
+            else:
+                a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             if a_oxide <= 1e-10:
                 continue
 

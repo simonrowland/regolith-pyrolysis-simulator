@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 import yaml
 
+from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase, MeltState
@@ -88,36 +89,23 @@ def test_references_registry_carries_sso_r_r20_redox_citations() -> None:
         assert expected in references[ref_id]["coefficient_note"]
 
 
-def test_melt_fO2_log_is_inert_write_only_until_r21() -> None:
-    """R2.0 contract + R2.1 tripwire: ``melt_fO2_log`` is write-only.
+def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 800.0
+    sim.melt.p_total_mbar = 1.0e-3
+    sim.melt.melt_fO2_log = -6.25
+    seen_control_inputs: list[dict[str, Any]] = []
+    original_dispatch_only = sim._dispatch_only
 
-    It is mirrored from the intrinsic value at the three lifecycle sites and
-    consumed by NO physics path (evaporation / equilibrium / vapor-pressure /
-    MRE) until R2.1 wires it into ``a_FeO``. When R2.1 adds the first read,
-    this test SHOULD fail -- update it then, deliberately, so the
-    golden-neutral boundary crossing is explicit and reviewed.
-    """
-    import re
+    def spy_dispatch_only(intent, **kwargs):
+        if intent is ChemistryIntent.VAPOR_PRESSURE:
+            seen_control_inputs.append(dict(kwargs["control_inputs"]))
+        return original_dispatch_only(intent, **kwargs)
 
-    # Match the bare attribute/field token, NOT the pre-existing method name
-    # ``_resolve_intrinsic_melt_fO2_log`` (where it is preceded by a word char).
-    token = re.compile(r"(?<!\w)melt_fO2_log")
-    allowed_write = "self.melt.melt_fO2_log ="   # the 3 mirror assignments
-    allowed_field = "melt_fO2_log:"              # the dataclass field declaration
+    monkeypatch.setattr(sim, "_dispatch_only", spy_dispatch_only)
 
-    offenders: list[str] = []
-    for src_dir in (ROOT / "simulator", ROOT / "engines"):
-        for path in src_dir.rglob("*.py"):
-            for lineno, line in enumerate(path.read_text().splitlines(), 1):
-                if not token.search(line):
-                    continue
-                if allowed_write in line or allowed_field in line:
-                    continue
-                rel = path.relative_to(ROOT)
-                offenders.append(f"{rel}:{lineno}: {line.strip()}")
+    sim._get_equilibrium()
 
-    assert offenders == [], (
-        "melt_fO2_log is read/used outside its write sites -- it must stay "
-        "INERT until R2.1. If this is the R2.1 wiring, update this tripwire "
-        "deliberately:\n" + "\n".join(offenders)
-    )
+    assert seen_control_inputs
+    assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(-6.25)

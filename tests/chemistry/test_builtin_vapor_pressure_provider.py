@@ -24,6 +24,7 @@ import math
 
 import pytest
 
+from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     ELLINGHAM_FIT_RANGE_K,
@@ -39,6 +40,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.fe_redox import kress91_ferrous_feo_activity
 from simulator.state import CampaignPhase, DecisionType
 from tests.chemistry.conftest import _build_sim
 
@@ -161,6 +163,37 @@ def _si_only_transport_redox_request(
             "pO2_bar": transport_pO2_bar,
             "intrinsic_fO2_log": intrinsic_fO2_log,
         },
+    )
+
+
+def _fe_redox_request(
+    *,
+    species_formula_registry,
+    intrinsic_fO2_log: float | None,
+    fO2_log: float | None = -9.0,
+) -> IntentRequest:
+    controls = {"pO2_bar": 1e-9}
+    if intrinsic_fO2_log is not None:
+        controls["intrinsic_fO2_log"] = intrinsic_fO2_log
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "SiO2": 5.0,
+                    "MgO": 1.0,
+                    "CaO": 1.0,
+                    "Al2O3": 1.0,
+                    "FeO": 1.0,
+                    "Fe2O3": 0.5,
+                }
+            },
+            species_formula_registry=species_formula_registry,
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=fO2_log,
+        control_inputs=controls,
     )
 
 
@@ -381,6 +414,81 @@ def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
     assert lower_transport_vp["SiO"] > reduced_vp["SiO"]
 
 
+def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    no_channel = _fe_redox_request(
+        species_formula_registry=sim.species_formula_registry,
+        intrinsic_fO2_log=None,
+        fO2_log=-4.0,
+    )
+    reduced = _fe_redox_request(
+        species_formula_registry=sim.species_formula_registry,
+        intrinsic_fO2_log=-12.0,
+    )
+    oxidized = _fe_redox_request(
+        species_formula_registry=sim.species_formula_registry,
+        intrinsic_fO2_log=-4.0,
+    )
+
+    no_channel_result = provider.dispatch(no_channel)
+    reduced_result = provider.dispatch(reduced)
+    oxidized_result = provider.dispatch(oxidized)
+    comp_wt = composition_wt_pct_from_account_view(
+        reduced.account_view,
+        "process.cleaned_melt",
+    )
+    static_activity = comp_wt["FeO"] / 100.0
+    reduced_activity = reduced_result.diagnostic["activities"]["Fe"]
+    oxidized_activity = oxidized_result.diagnostic["activities"]["Fe"]
+
+    assert no_channel_result.diagnostic["activities"]["Fe"] == pytest.approx(
+        static_activity
+    )
+    assert reduced_activity == pytest.approx(
+        kress91_ferrous_feo_activity(
+            comp_wt=comp_wt,
+            fO2_log=-12.0,
+            T_K=1773.15,
+            pressure_bar=reduced.pressure_bar,
+        )
+    )
+    assert oxidized_activity == pytest.approx(
+        kress91_ferrous_feo_activity(
+            comp_wt=comp_wt,
+            fO2_log=-4.0,
+            T_K=1773.15,
+            pressure_bar=oxidized.pressure_bar,
+        )
+    )
+    assert reduced_activity > static_activity
+    assert oxidized_activity < reduced_activity
+
+
+def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
+    assert kress91_ferrous_feo_activity(
+        comp_wt={},
+        fO2_log=-9.0,
+        T_K=1773.15,
+        pressure_bar=1e-6,
+    ) == 0.0
+    assert kress91_ferrous_feo_activity(
+        comp_wt={"SiO2": 100.0},
+        fO2_log=-9.0,
+        T_K=1773.15,
+        pressure_bar=1e-6,
+    ) == 0.0
+
+
 # ---------------------------------------------------------------------------
 # 2. Kernel filter scopes the account view
 # ---------------------------------------------------------------------------
@@ -471,7 +579,10 @@ def test_provider_matches_legacy_stub_for_known_lunar_composition(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        control_inputs={
+            "pO2_bar": sim._commanded_pO2_bar(),
+            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+        },
     )
     kernel_vp = dict(
         (kernel_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
@@ -564,7 +675,10 @@ def test_shadow_parity_across_short_simulation_run(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=T_C,
             pressure_bar=sim.melt.p_total_mbar / 1000.0,
-            control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+            control_inputs={
+                "pO2_bar": sim._commanded_pO2_bar(),
+                "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+            },
         )
         kernel_vp = dict(
             (kernel_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
@@ -639,7 +753,10 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        control_inputs={
+            "pO2_bar": sim._commanded_pO2_bar(),
+            "intrinsic_fO2_log": sim.melt.melt_fO2_log,
+        },
     )
     kernel_vp = dict(
         (kernel_dispatch.diagnostic or {}).get("vapor_pressures_Pa") or {}
