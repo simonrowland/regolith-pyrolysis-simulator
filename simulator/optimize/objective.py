@@ -1408,6 +1408,7 @@ def _composition_target_score_at(
             evidence=window_evidence,
             pool_projection=pool_projection,
             pool_snapshot_hour=pool_snapshot_hour,
+            tap_provenance=tap_provenance,
         )
         target_trace.update(window_evidence)
         if str(window["mode"]) == "soft_distance":
@@ -1448,11 +1449,30 @@ def _best_tap_score(
     per_hour_summary = _per_hour_summary_by_hour(run_execution)
     curve: list[dict[str, Any]] = []
     candidates: list[dict[str, Any]] = []
+    terminal_rump_exclusions: list[dict[str, Any]] = []
     traces_by_hour: dict[int, dict[str, Any]] = {}
+    target = objective["target"]
 
     for snapshot in snapshots:
         hour = _snapshot_hour(snapshot)
         grade_report = _tap_grade_report(run_execution, snapshot, snapshots)
+        if hour < configured_hours and _target_uses_terminal_rump(target):
+            operator_instruction = _operator_instruction(
+                snapshot,
+                tap_hour=hour,
+                configured_hours=configured_hours,
+                profile=profile,
+            )
+            exclusion = {
+                "hour": hour,
+                "excluded": True,
+                "reason": "terminal_rump_nonterminal_best_tap",
+                "grade_report": grade_report,
+                "operator_instruction": operator_instruction,
+            }
+            curve.append(exclusion)
+            terminal_rump_exclusions.append(exclusion)
+            continue
         try:
             projection = _tap_pool_projection(run_execution, snapshot, snapshots)
             hour_evidence: dict[str, Any] = {}
@@ -1494,6 +1514,16 @@ def _best_tap_score(
         )
 
     if not candidates:
+        if terminal_rump_exclusions:
+            if evidence is not None:
+                evidence["composition_target"] = _terminal_rump_nonterminal_best_tap_trace(
+                    objective,
+                    best_tap,
+                    configured_hours=configured_hours,
+                    curve=curve,
+                    exclusion=terminal_rump_exclusions[0],
+                )
+            return 0.0
         raise ObjectiveComputationError("best_tap found no eligible tap candidates")
 
     for candidate in candidates:
@@ -1525,7 +1555,6 @@ def _best_tap_score(
     )
     tap_hour = int(winner["hour"])
     nonterminal = tap_hour < configured_hours
-    target = objective["target"]
     if nonterminal and _target_uses_captured_pool(target):
         policy = str(best_tap["captured_pool_nonterminal_policy"])
         if policy != "allow_with_note":
@@ -1629,7 +1658,6 @@ def _tap_pool_projection(
     if residual:
         projection["cleaned_melt_at_stage0_exit"] = MappingProxyType(residual)
         projection["residual_rump_at_stop"] = MappingProxyType(residual)
-        projection["terminal_rump_earned"] = MappingProxyType(residual)
     if captured_flat:
         projection["captured_products"] = MappingProxyType(captured_flat)
     if stage3:
@@ -1967,6 +1995,14 @@ def _target_uses_captured_pool(target: Mapping[str, Any]) -> bool:
     return bool(pools & STREAM_PRODUCT_POOLS)
 
 
+def _target_uses_terminal_rump(target: Mapping[str, Any]) -> bool:
+    window = target.get("composition_window", {})
+    pools = {str(target.get("pool", ""))}
+    if isinstance(window, Mapping):
+        pools.add(str(window.get("pool", "")))
+    return "terminal_rump_earned" in pools
+
+
 def _target_captured_pool_note_id(target: Mapping[str, Any]) -> str:
     extraction = target.get("extraction", {})
     if isinstance(extraction, Mapping) and extraction.get("captured_pool"):
@@ -1975,6 +2011,60 @@ def _target_captured_pool_note_id(target: Mapping[str, Any]) -> str:
     if isinstance(window, Mapping) and window.get("pool"):
         return str(window["pool"])
     return str(target.get("pool", ""))
+
+
+def _terminal_rump_nonterminal_best_tap_trace(
+    objective: Mapping[str, Any],
+    best_tap: Mapping[str, Any],
+    *,
+    configured_hours: int,
+    curve: Sequence[Mapping[str, Any]],
+    exclusion: Mapping[str, Any],
+) -> dict[str, Any]:
+    target = objective["target"]
+    window = target.get("composition_window", {})
+    tap_hour = int(exclusion["hour"])
+    operator_instruction = exclusion.get("operator_instruction")
+    if not isinstance(operator_instruction, Mapping):
+        operator_instruction = MappingProxyType({})
+    return {
+        "target_spec_id": str(objective["id"]),
+        "target_spec_digest": target_spec_digest(target),
+        "target_maturity": dict(target.get("maturity", {})),
+        "target_provenance": _target_provenance(target),
+        "rows": [],
+        "resolved_composition": {"oxide_wt_pct": {}, "ratios": {}},
+        "certified_envelope": [],
+        "preference_score": None,
+        "extraction_completeness": {},
+        "certification_tier": "certified",
+        "reached_window": False,
+        "window_mode": str(window.get("mode", "")) if isinstance(window, Mapping) else "",
+        "terminal_rump_source": "tap_truncated",
+        "terminal_rump_nonterminal_reason": str(exclusion["reason"]),
+        "best_tap_enabled": True,
+        "tap_grid": _jsonable_tap_grid(best_tap["tap_grid"]),
+        "tap_hour": tap_hour,
+        "configured_hours": configured_hours,
+        "tap_stability_hours": int(best_tap["tap_stability_hours"]),
+        "pool_snapshot_hour": tap_hour,
+        "tap_provenance": "tap_truncated",
+        "operator_instruction": operator_instruction,
+        "knife_edge": False,
+        "certified": False,
+        "tap_score_curve": sorted(
+            [dict(item) for item in curve],
+            key=lambda item: int(item["hour"]),
+        ),
+        "tap_grade_report": dict(exclusion.get("grade_report", {})),
+        "truncated_recipe": {
+            "provenance": "tap_truncated",
+            "tap_hour": tap_hour,
+            "configured_hours": configured_hours,
+            "operator_instruction": operator_instruction,
+            "tap_grade_report": dict(exclusion.get("grade_report", {})),
+        },
+    }
 
 
 def _operator_instruction(
@@ -2145,6 +2235,7 @@ def _composition_window_score(
     evidence: dict[str, Any] | None = None,
     pool_projection: Mapping[str, Mapping[str, float]] | None = None,
     pool_snapshot_hour: int | None = None,
+    tap_provenance: str | None = None,
 ) -> float:
     pool = str(window["pool"])
     pool_provenance: dict[str, Any] = {}
@@ -2153,6 +2244,7 @@ def _composition_window_score(
         run_execution,
         pool_provenance=pool_provenance,
         pool_projection=pool_projection,
+        tap_provenance=tap_provenance,
     )
     if not species_mol:
         raise ObjectiveComputationError(f"composition target pool {pool!r} is missing or empty")
@@ -2472,18 +2564,21 @@ def _pool_species_mol(
     bookkeeping_exclusions: set[str] | None = None,
     pool_provenance: dict[str, Any] | None = None,
     pool_projection: Mapping[str, Mapping[str, float]] | None = None,
+    tap_provenance: str | None = None,
 ) -> Mapping[str, float]:
     if pool_projection is not None:
         projected = pool_projection.get(pool)
         if projected is None:
-            raise ObjectiveComputationError(
-                f"composition target projected pool {pool!r} is missing"
-            )
-        if not projected:
-            raise ObjectiveComputationError(
-                f"composition target projected pool {pool!r} is empty"
-            )
-        return MappingProxyType(dict(projected))
+            if pool != "terminal_rump_earned":
+                raise ObjectiveComputationError(
+                    f"composition target projected pool {pool!r} is missing"
+                )
+        else:
+            if not projected:
+                raise ObjectiveComputationError(
+                    f"composition target projected pool {pool!r} is empty"
+                )
+            return MappingProxyType(dict(projected))
     sim = getattr(run_execution, "simulator", run_execution)
     if pool == "captured_stage_3_silica":
         return MappingProxyType(_captured_stage_3_silica_mol(run_execution))
@@ -2503,6 +2598,10 @@ def _pool_species_mol(
             return MappingProxyType(ledger_values)
         raise ObjectiveComputationError(f"composition target pool {pool!r} unavailable")
     if pool == "terminal_rump_earned":
+        if tap_provenance == "tap_truncated":
+            raise ObjectiveComputationError(
+                "composition target terminal rump cannot use non-terminal best_tap"
+            )
         trace = getattr(run_execution, "trace", None)
         payload = _carrier_value(trace, "rump_terminal")
         if isinstance(payload, Mapping):
@@ -2525,8 +2624,13 @@ def _pool_species_mol(
                 raise ObjectiveComputationError(completion_problem)
             ledger_values = _ledger_mol_by_accounts(
                 sim,
-                _POOL_LEDGER_ACCOUNTS["residual_rump_at_stop"],
+                _POOL_LEDGER_ACCOUNTS["terminal_rump_earned"],
             )
+            if not ledger_values and tap_provenance is None:
+                ledger_values = _ledger_mol_by_accounts(
+                    sim,
+                    _POOL_LEDGER_ACCOUNTS["residual_rump_at_stop"],
+                )
             if ledger_values:
                 if pool_provenance is not None:
                     pool_provenance[pool] = "completed_run"

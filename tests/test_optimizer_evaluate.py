@@ -149,6 +149,28 @@ class _EvalLedger:
         return dict(balances.get(account, {}))
 
 
+class _TerminalSiO2Ledger:
+    def mol_by_account(self, account: str | None = None):
+        balances = {
+            "process.cleaned_melt": {"SiO2": 1.0},
+            "terminal.slag": {"SiO2": 1.0},
+        }
+        if account is None:
+            return {key: dict(value) for key, value in balances.items()}
+        return dict(balances.get(account, {}))
+
+
+class _MidRunCaOTerminalSiO2Ledger:
+    def mol_by_account(self, account: str | None = None):
+        balances = {
+            "process.cleaned_melt": {"CaO": 1.0},
+            "terminal.slag": {"SiO2": 1.0},
+        }
+        if account is None:
+            return {key: dict(value) for key, value in balances.items()}
+        return dict(balances.get(account, {}))
+
+
 class _Sim:
     def __init__(
         self,
@@ -1826,6 +1848,113 @@ def test_warm_start_terminal_best_tap_uses_extended_configured_hours() -> None:
     assert instruction["tap_hour"] == 26
     assert instruction["configured_hours"] == 26
     assert instruction["provenance"] == "completed_run"
+
+
+def test_terminal_rump_best_tap_does_not_score_mid_run_snapshot_as_terminal() -> None:
+    target_id = "pc-terminal-rump-true-terminal"
+    profile = _best_tap_composition_profile(
+        tap_hour=12,
+        warm_start=False,
+        target_id=target_id,
+    )
+    window = profile["objectives"][0]["target"]["composition_window"]
+    window["oxides"] = {"CaO": {"min": 90.0, "max": 100.0, "weight": 1.0}}
+    execution = _best_tap_execution(12)
+    execution.simulator.atom_ledger = _TerminalSiO2Ledger()
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()[f"composition_target:{target_id}"] == (
+        pytest.approx(0.0)
+    )
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    assert payload["tap_hour"] == 12
+    assert payload["tap_provenance"] == "tap_truncated"
+    assert payload["terminal_rump_source"] == "tap_truncated"
+    assert payload["terminal_rump_nonterminal_reason"] == (
+        "terminal_rump_nonterminal_best_tap"
+    )
+    assert payload["resolved_composition"]["oxide_wt_pct"] == {}
+
+
+def test_terminal_rump_best_tap_rejects_aligned_mid_run_cleaned_melt_as_terminal() -> None:
+    target_id = "pc-terminal-rump-aligned-mid-run"
+    profile = _best_tap_composition_profile(
+        tap_hour=12,
+        warm_start=False,
+        target_id=target_id,
+    )
+    window = profile["objectives"][0]["target"]["composition_window"]
+    window["oxides"] = {"CaO": {"min": 90.0, "max": 100.0, "weight": 1.0}}
+    execution = _best_tap_execution(12)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()[f"composition_target:{target_id}"] == (
+        pytest.approx(0.0)
+    )
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    assert payload["tap_hour"] == 12
+    assert payload["configured_hours"] == 24
+    assert payload["tap_provenance"] == "tap_truncated"
+    assert payload["terminal_rump_source"] == "tap_truncated"
+    assert payload["terminal_rump_nonterminal_reason"] == (
+        "terminal_rump_nonterminal_best_tap"
+    )
+
+
+def test_terminal_rump_completed_best_tap_uses_terminal_slag_not_cleaned_melt() -> None:
+    target_id = "pc-terminal-rump-true-terminal-ledger"
+    profile = _best_tap_composition_profile(
+        tap_hour=24,
+        warm_start=False,
+        target_id=target_id,
+    )
+    window = profile["objectives"][0]["target"]["composition_window"]
+    window["oxides"] = {"CaO": {"min": 90.0, "max": 100.0, "weight": 1.0}}
+    execution = _best_tap_execution(24)
+    execution.simulator.atom_ledger = _MidRunCaOTerminalSiO2Ledger()
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.feasible
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()[f"composition_target:{target_id}"] == (
+        pytest.approx(0.0)
+    )
+    payload = result.objectives.evidence[f"composition_target:{target_id}"][
+        "composition_target"
+    ]
+    assert payload["tap_hour"] == 24
+    assert payload["tap_provenance"] == "completed_run"
+    assert payload["terminal_rump_source"] == "completed_run"
+    assert payload["resolved_composition"]["oxide_wt_pct"]["CaO"] == pytest.approx(0.0)
 
 
 def test_warm_start_mid_window_best_tap_is_absolute_truncated_with_preheat() -> None:
