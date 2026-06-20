@@ -7,7 +7,7 @@ from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.session import drive_auto_apply
-from simulator.state import EvaporationFlux
+from simulator.state import DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
     BackendUnavailableError,
     _clear_simulation_state,
@@ -385,6 +385,14 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
         ({"mass_kg": "inf"}, "mass_kg"),
         ({"speed": "abc"}, "speed"),
         ({"speed": "inf"}, "speed"),
+        (
+            {
+                "runtime_campaign_overrides": {
+                    "C2A": {"pO2_mbar": "bad", "ramp_rate": 10}
+                }
+            },
+            "runtime_campaign_overrides.C2A.pO2_mbar",
+        ),
         ({"c4_max_temp_C": "nan"}, "c4_max_temp_C"),
         ({"c5_enabled": True, "mre_max_voltage_V": "abc"}, "mre_max_voltage_V"),
         ({"additives": {"Na": "abc"}}, "additives.Na"),
@@ -433,6 +441,213 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
         assert message_field in statuses[-1]["message"]
         assert set(_simulations) == before
         assert backend_called is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("bad_payload", "message"),
+    [
+        (None, "make_decision payload must be an object"),
+        ([], "make_decision payload must be an object"),
+        ("bad-payload", "make_decision payload must be an object"),
+        ({}, "make_decision choice is required"),
+        ({"choice": "   "}, "make_decision choice is required"),
+    ],
+)
+def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+
+        client.emit("make_decision", bad_payload)
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert (
+            message in statuses[-1]["message"]
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        state, _ = _current_simulation_state(sid)
+        session = state["session"]
+        decision = DecisionPoint(
+            DecisionType.PATH_AB,
+            options=["A", "A_staged", "B"],
+            recommendation="A_staged",
+            context="choose path",
+        )
+        session.simulator.pending_decision = decision
+        session.simulator.paused_for_decision = True
+
+        client.emit("make_decision", {"choice": "   C2B-by-whitespace-class   "})
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert "is not one of" in statuses[-1]["message"]
+        assert session.simulator.pending_decision is decision
+        assert session.simulator.record.decisions == []
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("bad_speed", "message"),
+    [
+        (-1, "speed must be >= 0"),
+        (1e12, "speed must be <= 3600"),
+    ],
+)
+def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
+    monkeypatch,
+    bad_speed,
+    message,
+):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 1.0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        state, _ = _current_simulation_state(sid)
+        assert state is not None
+        assert state["speed"] == pytest.approx(1.0)
+
+        client.emit("adjust_parameter", {"param": "speed", "value": bad_speed})
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "error"
+        assert message in statuses[-1]["message"]
+        assert state["speed"] == pytest.approx(1.0)
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:

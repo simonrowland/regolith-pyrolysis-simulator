@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import os
+import shlex
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+
+from simulator.session_cli import SessionScriptRunner
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -70,6 +73,39 @@ def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedPr
 
 def _frames(stdout: str) -> list[dict]:
     return [json.loads(line) for line in stdout.splitlines() if line]
+
+
+def test_session_start_carries_c5_mre_fields_into_session():
+    command = (
+        "start feedstock=lunar_mare_low_ti backend=stub "
+        "c5_enabled=true mre_target_species=SiO2 mre_max_voltage_V=1.45"
+    )
+    runner = SessionScriptRunner()
+
+    frame = runner.execute(shlex.split(command), command)
+
+    sim = runner.session.simulator
+    assert frame["frame_type"] == "start"
+    assert sim.melt.c5_enabled is True
+    assert sim.campaign_mgr.c5_enabled is True
+    assert sim.melt.mre_target_species == "SiO2"
+    assert sim.melt.mre_max_voltage_V == 1.45
+
+
+def test_session_start_sanitizes_mre_fields_when_c5_disabled():
+    command = (
+        "start feedstock=lunar_mare_low_ti backend=stub "
+        "c5_enabled=false mre_target_species=SiO2 mre_max_voltage_V=1.45"
+    )
+    runner = SessionScriptRunner()
+
+    runner.execute(shlex.split(command), command)
+
+    sim = runner.session.simulator
+    assert sim.melt.c5_enabled is False
+    assert sim.campaign_mgr.c5_enabled is False
+    assert sim.melt.mre_target_species == ""
+    assert sim.melt.mre_max_voltage_V == 0.0
 
 
 def test_session_script_exercises_every_verb_as_ndjson():

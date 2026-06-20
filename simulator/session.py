@@ -68,6 +68,21 @@ def _has_runtime_surface_temperature_schedule(
     return False
 
 
+def normalize_mre_policy(
+    c5_enabled: bool,
+    mre_target_species: str,
+    mre_max_voltage_V: float,
+) -> tuple[bool, str, float]:
+    enabled = bool(c5_enabled)
+    if not enabled:
+        return False, "", 0.0
+    return (
+        True,
+        str(mre_target_species or "").strip(),
+        float(mre_max_voltage_V or 0.0),
+    )
+
+
 class DecisionPolicy(Enum):
     """Driver-loop decision routing mode.
 
@@ -238,9 +253,14 @@ class SimSession:
         if config.c4_max_temp is not None:
             sim.c4_max_temp_C = float(config.c4_max_temp)
             sim.campaign_mgr.c4_max_temp_C = float(config.c4_max_temp)
-        sim.melt.c5_enabled = bool(config.c5_enabled)
-        sim.melt.mre_target_species = str(config.mre_target_species or "")
-        sim.melt.mre_max_voltage_V = float(config.mre_max_voltage_V or 0.0)
+        c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
+            config.c5_enabled,
+            config.mre_target_species,
+            config.mre_max_voltage_V,
+        )
+        sim.melt.c5_enabled = c5_enabled
+        sim.melt.mre_target_species = mre_target_species
+        sim.melt.mre_max_voltage_V = mre_max_voltage_V
         sim.campaign_mgr.c5_enabled = sim.melt.c5_enabled
 
         campaign_phase = self._campaign_phase(config.campaign, config)

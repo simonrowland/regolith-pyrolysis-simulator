@@ -25,6 +25,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     drive_session,
+    normalize_mre_policy,
 )
 from simulator.state import MOLAR_MASS
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
@@ -238,22 +239,35 @@ def _coerce_additives_kg(value) -> dict[str, float]:
 
 
 def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
-    if not isinstance(value, Mapping):
+    if value is None:
         return {}
+    if not isinstance(value, Mapping):
+        raise InputValidationError('runtime_campaign_overrides must be an object')
     overrides: dict[str, dict[str, float]] = {}
     for campaign, fields in value.items():
-        if not campaign or not isinstance(fields, Mapping):
-            continue
+        campaign_name = str(campaign).strip()
+        if not campaign_name:
+            raise InputValidationError(
+                'runtime_campaign_overrides campaign names must be non-empty'
+            )
+        if not isinstance(fields, Mapping):
+            raise InputValidationError(
+                f'runtime_campaign_overrides.{campaign_name} must be an object'
+            )
         clean_fields: dict[str, float] = {}
         for field_name, field_value in fields.items():
-            if not field_name:
-                continue
-            try:
-                clean_fields[str(field_name)] = float(field_value)
-            except (TypeError, ValueError):
-                continue
+            field_key = str(field_name).strip()
+            if not field_key:
+                raise InputValidationError(
+                    f'runtime_campaign_overrides.{campaign_name} '
+                    'field names must be non-empty'
+                )
+            clean_fields[field_key] = _coerce_bounded_float(
+                field_value,
+                field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',
+            )
         if clean_fields:
-            overrides[str(campaign)] = clean_fields
+            overrides[campaign_name] = clean_fields
     return overrides
 
 
@@ -844,6 +858,9 @@ def register_events(socketio):
                 maximum=_MAX_MRE_VOLTAGE_V,
             )
             additives_kg = _coerce_additives_kg(data.get('additives', {}))
+            runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
+                data.get('runtime_campaign_overrides')
+            )
         except InputValidationError as exc:
             socketio.emit('simulation_status', {
                 'status': 'error',
@@ -894,13 +911,11 @@ def register_events(socketio):
             backend_message = f'Using {backend_type}'
 
         # User-configurable parameters
-        if not c5_enabled:
-            mre_target_species = ''
-            mre_max_voltage_V = 0.0
-        runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
-            data.get('runtime_campaign_overrides')
+        c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
+            c5_enabled,
+            mre_target_species,
+            mre_max_voltage_V,
         )
-
         session = SimSession()
         try:
             session.start(
@@ -1007,15 +1022,50 @@ def register_events(socketio):
         data = {'choice': 'A'}  or  {'choice': 'two'}
         """
         sid = request.sid
+        if not isinstance(data, Mapping):
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': 'make_decision payload must be an object',
+            }, room=sid)
+            return
+        raw_choice = data.get('choice')
+        if not isinstance(raw_choice, str):
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': 'make_decision choice is required',
+            }, room=sid)
+            return
+        choice = raw_choice.strip()
+        if choice == '':
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': 'make_decision choice is required',
+            }, room=sid)
+            return
         state, lock = _current_simulation_state(sid)
         if state and lock:
             resume_loop = False
             with lock:
                 session = state['session']
-                if session.pending_decision():
-                    choice = data.get('choice', '')
-                    session.decide(choice)
-                    resume_loop = True
+                decision = session.pending_decision()
+                if decision is None:
+                    socketio.emit('simulation_status', {
+                        'status': 'error',
+                        'message': 'make_decision no decision is pending',
+                    }, room=sid)
+                    return
+                valid_choices = {str(option) for option in decision.options}
+                if choice not in valid_choices:
+                    socketio.emit('simulation_status', {
+                        'status': 'error',
+                        'message': (
+                            f"make_decision choice {choice!r} is not one of "
+                            f"{sorted(valid_choices)!r}"
+                        ),
+                    }, room=sid)
+                    return
+                session.decide(choice)
+                resume_loop = True
                 session.resume()
             state['paused'] = False
             _emit_if_current(
@@ -1025,7 +1075,7 @@ def register_events(socketio):
                 'simulation_status',
                 {
                     'status': 'decision_applied',
-                    'choice': data.get('choice'),
+                    'choice': choice,
                 },
             )
             if resume_loop:
@@ -1047,6 +1097,14 @@ def register_events(socketio):
         data = {'param': 'speed', 'value': 0.5}
         """
         sid = request.sid
+        if data is None:
+            data = {}
+        elif not isinstance(data, Mapping):
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': 'adjust_parameter payload must be an object',
+            }, room=sid)
+            return
         state, lock = _current_simulation_state(sid)
         if not state:
             return
@@ -1055,7 +1113,28 @@ def register_events(socketio):
         value = data.get('value')
 
         if param == 'speed':
-            state['speed'] = float(value)
+            try:
+                speed = _coerce_bounded_float(
+                    value,
+                    field='speed',
+                    minimum=0.0,
+                    maximum=_MAX_SIM_SPEED_SECONDS,
+                )
+            except InputValidationError as exc:
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    state['run_id'],
+                    'simulation_status',
+                    {'status': 'error', 'message': str(exc)},
+                )
+                return
+            if lock:
+                with lock:
+                    state['speed'] = speed
+            else:
+                state['speed'] = speed
+            value = speed
         elif param == 'stir_factor' and lock:
             with lock:
                 state['session'].adjust('stir_factor', value)

@@ -252,6 +252,45 @@ def test_resume_while_parked_at_decision_does_not_re_emit(client):
     assert completion['mass_balance_error_pct'] == pytest.approx(0.0, abs=1e-3)
 
 
+
+def test_null_make_decision_while_parked_at_path_ab_is_rejected(client):
+    sid = _start_and_get_sid(client)
+
+    first, _ = _wait_for_event(client, 'decision_required')
+    assert first['type'] == 'PATH_AB'
+    _wait_loop_settled(sid)
+
+    client.emit('make_decision', None)
+    received = client.get_received()
+    statuses = [
+        m['args'][0] for m in received
+        if m['name'] == 'simulation_status'
+    ]
+    assert statuses
+    assert statuses[-1]['status'] == 'error'
+    assert 'make_decision payload must be an object' in statuses[-1]['message']
+    applied = [
+        m for m in received
+        if (m['name'] == 'simulation_status'
+            and m['args'][0].get('status') == 'decision_applied')
+    ]
+    assert applied == []
+
+    state, _ = _current_simulation_state(sid)
+    session = state['session']
+    pending = session.pending_decision()
+    assert pending is not None
+    assert pending.decision_type.name == 'PATH_AB'
+    assert session.simulator.record.decisions == []
+
+    client.emit('make_decision', {'choice': first['recommendation']})
+    decisions, counts, completion, _ = _drive_to_completion(client)
+
+    assert [first['type'], *decisions] == EXPECTED_DECISIONS
+    assert counts['decision_required'] == len(EXPECTED_DECISIONS) - 1
+    assert completion['mass_balance_error_pct'] == pytest.approx(0.0, abs=1e-3)
+
+
 def test_pause_resume_around_every_gate_is_ledger_identical(client):
     """(b) pause/resume churn at every gate -> one gate each, correct routing, identical ledger."""
     base_decisions, base_counts, base_completion, _ = _drive_to_completion(

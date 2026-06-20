@@ -13,7 +13,7 @@ from typing import Any, Iterable, Mapping, TextIO
 from simulator.backends import BackendSelectionPolicy
 from simulator.config import load_config_bundle
 from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
-from simulator.session import SimSession, SimSessionConfig
+from simulator.session import SimSession, SimSessionConfig, normalize_mre_policy
 from simulator.state import DecisionPoint
 
 
@@ -73,6 +73,11 @@ class SessionScriptRunner:
             bundle = load_config_bundle(DATA_DIR)
         except FileNotFoundError as exc:
             raise RunnerError(str(exc)) from exc
+        c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
+            parsed.c5_enabled,
+            parsed.mre_target_species,
+            parsed.mre_max_voltage_V,
+        )
         config = SimSessionConfig(
             feedstock_id=parsed.feedstock,
             feedstocks=bundle.feedstocks,
@@ -87,6 +92,9 @@ class SessionScriptRunner:
             runtime_campaign_overrides=runtime_campaign_overrides,
             track=parsed.track,
             c4_max_temp=parsed.c4_max_temp,
+            c5_enabled=c5_enabled,
+            mre_target_species=mre_target_species,
+            mre_max_voltage_V=mre_max_voltage_V,
             unavailable_error_cls=RunnerError,
         )
         self.session.start(config)
@@ -299,6 +307,22 @@ def _start_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--additive", action="append", default=[])
     parser.add_argument("--c4-max-temp", dest="c4_max_temp", type=float, default=None)
+    parser.add_argument(
+        "--c5-enabled",
+        dest="c5_enabled",
+        nargs="?",
+        const=True,
+        default=False,
+        type=_parse_bool_arg,
+    )
+    parser.add_argument("--mre-target-species", default="")
+    parser.add_argument(
+        "--mre-max-voltage-V",
+        "--mre-max-voltage-v",
+        dest="mre_max_voltage_V",
+        type=float,
+        default=0.0,
+    )
     parser.add_argument("--setpoint", action="append", default=[])
     parser.add_argument("--setpoints-overrides", default=None)
     parser.add_argument("--runtime-campaign-overrides", default=None)
@@ -317,6 +341,14 @@ def _normalize_start_args(args: list[str]) -> list[str]:
         "additive": "additive",
         "c4_max_temp": "c4-max-temp",
         "c4-max-temp": "c4-max-temp",
+        "c5_enabled": "c5-enabled",
+        "c5-enabled": "c5-enabled",
+        "mre_target_species": "mre-target-species",
+        "mre-target-species": "mre-target-species",
+        "mre_max_voltage_V": "mre-max-voltage-V",
+        "mre_max_voltage_v": "mre-max-voltage-V",
+        "mre-max-voltage-V": "mre-max-voltage-V",
+        "mre-max-voltage-v": "mre-max-voltage-V",
         "setpoint": "setpoint",
         "setpoints_overrides": "setpoints-overrides",
         "setpoints-overrides": "setpoints-overrides",
@@ -357,6 +389,17 @@ def _parse_kv_pairs(items: list[str]) -> dict[str, float]:
             raise ValueError(f"expected non-empty key in {item!r}")
         parsed[key] = float(value)
     return parsed
+
+
+def _parse_bool_arg(value: bool | str) -> bool:
+    if isinstance(value, bool):
+        return value
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"expected boolean value, got {value!r}")
 
 
 def _parse_setpoint_overrides(
