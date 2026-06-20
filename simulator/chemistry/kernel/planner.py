@@ -615,6 +615,21 @@ class ChemistryKernel:
         except Exception as exc:  # noqa: BLE001
             raise ProposalRejected(str(exc)) from exc
 
+    def _transition_lots_to_proposal_accounts(
+        self,
+        lots: tuple[Any, ...],
+    ) -> dict[str, dict[str, float]]:
+        by_account: dict[str, dict[str, float]] = {}
+        for lot in lots:
+            account_totals = by_account.setdefault(lot.account, {})
+            for species, moles in lot.species_moles_for(
+                self._species_formula_registry
+            ).items():
+                account_totals[species] = (
+                    account_totals.get(species, 0.0) + moles
+                )
+        return by_account
+
     def commit_validated_transition(
         self,
         intent: ChemistryIntent,
@@ -630,18 +645,8 @@ class ChemistryKernel:
         """
 
         proposal = LedgerTransitionProposal(
-            debits={
-                lot.account: lot.species_moles_for(
-                    self._species_formula_registry
-                )
-                for lot in transition.debits
-            },
-            credits={
-                lot.account: lot.species_moles_for(
-                    self._species_formula_registry
-                )
-                for lot in transition.credits
-            },
+            debits=self._transition_lots_to_proposal_accounts(transition.debits),
+            credits=self._transition_lots_to_proposal_accounts(transition.credits),
             reason=transition.name,
         )
         provider = self._registry.authoritative_for(intent)

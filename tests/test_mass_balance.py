@@ -5,6 +5,12 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.account_ids import (
+    OXYGEN_CAPTURED_ACCOUNTS,
+    OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
+    OXYGEN_STORED_ACCOUNTS,
+    OXYGEN_VENTED_ACCOUNTS,
+)
 from simulator.core import (
     FLOW_MASS_ACCOUNTS,
     FLOW_MASS_EXCLUDED_ACCOUNTS,
@@ -68,6 +74,36 @@ def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
     )
 
     assert sim._flow_mass_out_kg() - before == pytest.approx(1.0e-6)
+
+
+def test_flow_mass_out_includes_captured_melt_offgas_oxygen():
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"sample": {"composition_wt_pct": {"SiO2": 100.0}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sample", mass_kg=1.0)
+    before = sim._flow_mass_out_kg()
+
+    sim.atom_ledger.load_external(
+        OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
+        {"O2": 2.0},
+        source="test captured melt offgas oxygen",
+    )
+
+    assert sim._flow_mass_out_kg() - before == pytest.approx(2.0)
+
+
+def test_declared_terminal_oxygen_accounts_have_flow_mass_disposition():
+    declared = set(OXYGEN_STORED_ACCOUNTS)
+    declared.update(OXYGEN_VENTED_ACCOUNTS)
+    declared.update(OXYGEN_CAPTURED_ACCOUNTS)
+    covered = set(FLOW_MASS_ACCOUNTS) | set(FLOW_MASS_EXCLUDED_ACCOUNTS)
+
+    assert declared <= covered
 
 
 def _load_data_yaml(name):

@@ -209,6 +209,50 @@ def test_commit_validated_transition_preserves_original_transition_identity():
     assert ledger.mol_by_account("process.overhead_gas")["O2"] == pytest.approx(0.5)
 
 
+def test_commit_validated_transition_aggregates_duplicate_account_lots():
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"FeO": 1.0, "SiO2": 1.0},
+    )
+    registry = ProviderRegistry()
+    registry.register(
+        _BackendEquilibriumProvider(),
+        [ChemistryIntent.BACKEND_EQUILIBRIUM],
+    )
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    transition = LedgerTransition(
+        name="factsage_equilibrium_phase_update",
+        debits=(
+            ledger.debit_mol("process.cleaned_melt", {"FeO": 1.0}),
+            ledger.debit_mol("process.cleaned_melt", {"SiO2": 1.0}),
+        ),
+        credits=(
+            ledger.credit_mol(
+                "process.overhead_gas",
+                {"FeO": 1.0, "SiO2": 1.0},
+                source="FactSAGE equilibrium",
+                meta={
+                    "amount_basis": "mol",
+                    "species_mol": {"FeO": 1.0, "SiO2": 1.0},
+                },
+            ),
+        ),
+        reason="FactSAGE duplicate account lots projected into AtomLedger",
+    )
+    transition.validate_conservation()
+
+    applied = kernel.commit_validated_transition(
+        ChemistryIntent.BACKEND_EQUILIBRIUM,
+        transition,
+    )
+
+    assert applied == transition
+    assert ledger.mol_by_account("process.cleaned_melt") == {}
+    assert ledger.mol_by_account("process.overhead_gas")["FeO"] == pytest.approx(1.0)
+    assert ledger.mol_by_account("process.overhead_gas")["SiO2"] == pytest.approx(1.0)
+
+
 def test_commit_batch_rejects_unbalanced_proposal():
     ledger = AtomLedger()
     ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
