@@ -158,6 +158,19 @@ def diagnostics_to_equilibrium(
     if fO2_log is None:
         fO2_log = _control_float(controls, 'fO2_log', -9.0)
     status = str(diagnostics.backend_status)
+    backend_diagnostics = dict(diagnostics.backend_diagnostics)
+    requested_point_non_authoritative = (
+        bool(backend_diagnostics.get('operating_point_clamped'))
+        or backend_diagnostics.get('authoritative_for_requested_conditions')
+        is False
+    )
+    if requested_point_non_authoritative:
+        status = 'out_of_domain'
+        backend_diagnostics['backend_status'] = 'out_of_domain'
+        backend_diagnostics.setdefault(
+            'backend_status_reason',
+            'clamped_operating_point',
+        )
     phase_masses_kg = dict(diagnostics.phase_masses_kg)
     liquid_fraction = (
         None if diagnostics.liquid_fraction is None
@@ -181,9 +194,22 @@ def diagnostics_to_equilibrium(
                     f'phase_masses={computed!r}'
                 )
         liquid_fraction = computed
+    temperature_C = _control_float(controls, 'temperature_C', 0.0)
+    pressure_bar = _control_float(controls, 'pressure_bar', 0.0)
+    if requested_point_non_authoritative:
+        temperature_C = _control_float(
+            backend_diagnostics,
+            'solved_temperature_C',
+            temperature_C,
+        )
+        pressure_bar = _control_float(
+            backend_diagnostics,
+            'solved_pressure_bar',
+            pressure_bar,
+        )
     return EquilibriumResult(
-        temperature_C=_control_float(controls, 'temperature_C', 0.0),
-        pressure_bar=_control_float(controls, 'pressure_bar', 0.0),
+        temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
         phases_present=list(diagnostics.phases_present),
         phase_masses_kg=phase_masses_kg,
         liquid_fraction=liquid_fraction,
@@ -192,7 +218,7 @@ def diagnostics_to_equilibrium(
         fO2_log=float(fO2_log),
         warnings=list(diagnostics.backend_warnings),
         status=status,
-        diagnostics=dict(diagnostics.backend_diagnostics),
+        diagnostics=backend_diagnostics,
     )
 
 

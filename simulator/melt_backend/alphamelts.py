@@ -53,6 +53,9 @@ from engines.alphamelts.thermoengine import ThermoEngineTransport
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
+ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
+ALPHAMELTS_THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
+ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
     'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
@@ -876,6 +879,62 @@ class AlphaMELTSBackend(MeltBackend):
             diagnostics=dict(diagnostics or {}),
         )
 
+    @staticmethod
+    def _merge_diagnostics(
+        *diagnostics: Optional[Mapping[str, object]],
+    ) -> dict[str, object]:
+        payload: dict[str, object] = {}
+        for item in diagnostics:
+            payload.update(dict(item or {}))
+        return payload
+
+    @staticmethod
+    def _clamped_operating_point_context(
+        *,
+        requested_temperature_C: float,
+        requested_pressure_bar: float,
+        solved_temperature_C: float,
+        solved_pressure_bar: float,
+        transport: str,
+        warnings: Optional[List[str]] = None,
+    ) -> tuple[dict[str, object], list[str]]:
+        result_warnings = list(warnings or [])
+        requested_T = float(requested_temperature_C)
+        requested_P = float(requested_pressure_bar)
+        solved_T = float(solved_temperature_C)
+        solved_P = float(solved_pressure_bar)
+        temperature_clamped = not math.isclose(
+            requested_T, solved_T, rel_tol=0.0, abs_tol=1.0e-12)
+        pressure_clamped = not math.isclose(
+            requested_P, solved_P, rel_tol=0.0, abs_tol=1.0e-12)
+        if not (temperature_clamped or pressure_clamped):
+            return {}, result_warnings
+
+        diagnostics = {
+            'operating_point_clamped': True,
+            'operating_point_transport': str(transport),
+            'temperature_clamped': temperature_clamped,
+            'pressure_clamped': pressure_clamped,
+            'requested_temperature_C': requested_T,
+            'requested_pressure_bar': requested_P,
+            'solved_temperature_C': solved_T,
+            'solved_pressure_bar': solved_P,
+            'authoritative_for_requested_conditions': False,
+            'authoritative_for_solved_conditions': True,
+        }
+        pieces = []
+        if temperature_clamped:
+            pieces.append(
+                f'T_C requested={requested_T:g} solved={solved_T:g}')
+        if pressure_clamped:
+            pieces.append(
+                f'P_bar requested={requested_P:g} solved={solved_P:g}')
+        result_warnings.append(
+            'AlphaMELTS solved at clamped operating point via '
+            f'{transport}: ' + ', '.join(pieces)
+        )
+        return diagnostics, result_warnings
+
     def _out_of_domain_diagnostics(
         self,
         *,
@@ -1104,11 +1163,23 @@ class AlphaMELTSBackend(MeltBackend):
             self._mode = None
             raise ImportError('ThermoEngine transport not initialized')
         try:
+            solved_pressure_bar = max(
+                float(pressure_bar), ALPHAMELTS_THERMOENGINE_MIN_PRESSURE_BAR)
+            clamp_diagnostics, result_warnings = (
+                self._clamped_operating_point_context(
+                    requested_temperature_C=temperature_C,
+                    requested_pressure_bar=pressure_bar,
+                    solved_temperature_C=temperature_C,
+                    solved_pressure_bar=solved_pressure_bar,
+                    transport='thermoengine',
+                    warnings=warnings,
+                )
+            )
             payload = self._thermoengine_transport.equilibrate(
                 temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
+                pressure_bar=solved_pressure_bar,
                 comp_wt=comp_wt,
-                warnings=tuple(warnings or ()),
+                warnings=tuple(result_warnings),
             )
             status = 'ok' if payload.phases_present else 'not_converged'
             if self._vaporock_available:
@@ -1118,7 +1189,7 @@ class AlphaMELTSBackend(MeltBackend):
                         solved_melt_wt_pct=payload.liquid_composition_wt_pct,
                         liquid_fraction=payload.liquid_fraction,
                         fO2_log=fO2_log,
-                        pressure_bar=pressure_bar,
+                        pressure_bar=solved_pressure_bar,
                         activities=payload.activity_coefficients,
                     )
                 )
@@ -1139,7 +1210,7 @@ class AlphaMELTSBackend(MeltBackend):
                 )
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
+                pressure_bar=solved_pressure_bar,
                 fO2_log=fO2_log,
                 phases_present=list(payload.phases_present),
                 phase_masses_kg=payload.phase_masses_kg,
@@ -1153,6 +1224,7 @@ class AlphaMELTSBackend(MeltBackend):
                 ),
                 warnings=list(payload.warnings),
                 status=status,
+                diagnostics=clamp_diagnostics,
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return eq
@@ -1180,9 +1252,21 @@ class AlphaMELTSBackend(MeltBackend):
         try:
             ptt = self._require_petthermotools_runtime()
             ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
+            solved_pressure_bar = max(
+                float(pressure_bar), ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR)
+            clamp_diagnostics, result_warnings = (
+                self._clamped_operating_point_context(
+                    requested_temperature_C=temperature_C,
+                    requested_pressure_bar=pressure_bar,
+                    solved_temperature_C=temperature_C,
+                    solved_pressure_bar=solved_pressure_bar,
+                    transport='python_api',
+                    warnings=warnings,
+                )
+            )
             results = ptt.equilibrate_MELTS(
                 Model=self._model,
-                P_bar=max(pressure_bar, 1e-6),
+                P_bar=solved_pressure_bar,
                 T_C=temperature_C,
                 comp=ptt_comp,
                 fO2_buffer=self._redox_buffer,
@@ -1192,10 +1276,11 @@ class AlphaMELTSBackend(MeltBackend):
             eq = self._parse_petthermotools_result(
                 results,
                 temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
+                pressure_bar=solved_pressure_bar,
                 fO2_log=fO2_log,
                 comp_wt=comp_wt,
-                warnings=warnings,
+                warnings=result_warnings,
+                diagnostics=clamp_diagnostics,
             )
 
             # Vapor pressures via the real VapoRock helper if available,
@@ -1208,7 +1293,7 @@ class AlphaMELTSBackend(MeltBackend):
                         solved_melt_wt_pct=eq.liquid_composition_wt_pct,
                         liquid_fraction=eq.liquid_fraction,
                         fO2_log=fO2_log,
-                        pressure_bar=pressure_bar,
+                        pressure_bar=solved_pressure_bar,
                         activities=eq.activity_coefficients,
                     )
                 )
@@ -1484,8 +1569,21 @@ class AlphaMELTSBackend(MeltBackend):
             melts_path = Path(tmpdir) / 'input.melts'
             calculation_temperature_C = max(
                 float(temperature_C), ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C)
+            calculation_pressure_bar = max(
+                float(pressure_bar), ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR)
+            clamp_diagnostics, result_warnings = (
+                self._clamped_operating_point_context(
+                    requested_temperature_C=temperature_C,
+                    requested_pressure_bar=pressure_bar,
+                    solved_temperature_C=calculation_temperature_C,
+                    solved_pressure_bar=calculation_pressure_bar,
+                    transport='subprocess',
+                    warnings=warnings,
+                )
+            )
             self._write_melts_file(melts_path, comp_wt,
-                                    calculation_temperature_C, pressure_bar)
+                                    calculation_temperature_C,
+                                    calculation_pressure_bar)
 
             binary = self._binary_path or self._engine_path
             if binary is None:
@@ -1527,18 +1625,19 @@ class AlphaMELTSBackend(MeltBackend):
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
                 return self._emit_equilibrium_result(
-                    temperature_C=temperature_C,
-                    pressure_bar=pressure_bar,
+                    temperature_C=calculation_temperature_C,
+                    pressure_bar=calculation_pressure_bar,
                     fO2_log=fO2_log,
                     warnings=[
-                        *(warnings or []),
+                        *result_warnings,
                         'AlphaMELTS subprocess exited via '
                         f'{signal_name} (returncode {result.returncode}); '
                         'composition outside Rhyolite-MELTS calibration domain',
                     ],
                     status='out_of_domain',
                     diagnostics=self._diagnostics_with_backend_status_reason(
-                        diagnostics,
+                        self._merge_diagnostics(
+                            diagnostics, clamp_diagnostics),
                         backend_status='out_of_domain',
                         reason=ALPHAMELTS_REASON_SUBPROCESS_DIED,
                     ),
@@ -1552,12 +1651,14 @@ class AlphaMELTSBackend(MeltBackend):
 
             return self._parse_single_point_stdout(
                 f'{result.stdout}\n{result.stderr}',
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
+                temperature_C=calculation_temperature_C,
+                pressure_bar=calculation_pressure_bar,
                 fO2_log=fO2_log,
                 total_input_kg=100.0,
-                warnings=warnings,
-                diagnostics=diagnostics,
+                warnings=result_warnings,
+                diagnostics=self._merge_diagnostics(
+                    diagnostics, clamp_diagnostics),
+                success_diagnostics=clamp_diagnostics,
             )
 
     def _write_melts_file(self, path: Path, comp_wt: dict,
@@ -1570,7 +1671,8 @@ class AlphaMELTSBackend(MeltBackend):
                 melts_name = oxide.replace('2O3', '2O3').replace('2O', '2O')
                 lines.append(f'Initial Composition: {melts_name} {wt:.4f}')
         lines.append(f'Initial Temperature: {T_C:.1f}')
-        lines.append(f'Initial Pressure: {max(P_bar, 1):.1f}')
+        pressure_for_file = max(P_bar, ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR)
+        lines.append(f'Initial Pressure: {pressure_for_file:.1f}')
 
         with open(path, 'w') as f:
             f.write('\n'.join(lines) + '\n')
@@ -1589,6 +1691,9 @@ class AlphaMELTSBackend(MeltBackend):
                                    total_input_kg: float,
                                    warnings=None,
                                    diagnostics: Optional[
+                                       Mapping[str, object]
+                                   ] = None,
+                                   success_diagnostics: Optional[
                                        Mapping[str, object]
                                    ] = None,
                                    ) -> EquilibriumResult:
@@ -1679,6 +1784,7 @@ class AlphaMELTSBackend(MeltBackend):
             liquid_composition_wt_pct=liquid_composition_wt_pct,
             warnings=result_warnings,
             status='ok',
+            diagnostics=success_diagnostics,
         )
         if liquidus_C is not None:
             eq.liquidus_T_C = float(liquidus_C)
@@ -1699,7 +1805,10 @@ class AlphaMELTSBackend(MeltBackend):
 
     def _parse_petthermotools_result(self, results, *, temperature_C: float,
                                      pressure_bar: float, fO2_log: float,
-                                     comp_wt: dict, warnings=None
+                                     comp_wt: dict, warnings=None,
+                                     diagnostics: Optional[
+                                         Mapping[str, object]
+                                     ] = None,
                                      ) -> EquilibriumResult:
         run_result = self._select_petthermotools_run(results)
         conditions = self._first_row_mapping(run_result.get('Conditions', {}))
@@ -1761,6 +1870,7 @@ class AlphaMELTSBackend(MeltBackend):
             activity_coefficients=activity_coefficients,
             warnings=result_warnings,
             status='ok',
+            diagnostics=diagnostics,
         )
 
     def _select_petthermotools_run(self, results) -> dict:

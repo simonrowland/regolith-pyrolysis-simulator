@@ -7,6 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 from engines.alphamelts import AlphaMELTSProvider
+from engines.alphamelts.parser import diagnostics_to_equilibrium
+from engines.alphamelts.result import LiquidusDiagnostics
 from engines.builtin.vapor_pressure import _pow10_pressure_or_raise
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
@@ -461,6 +463,35 @@ def _available_real_backend_execution(**kwargs: object) -> SimpleNamespace:
         backend_status="ok",
         backend_authoritative=True,
         **kwargs,
+    )
+
+
+def _clamped_kernel_equilibrium():
+    return diagnostics_to_equilibrium(
+        LiquidusDiagnostics(
+            phases_present=("liq",),
+            phase_masses_kg={"liq": 1.0},
+            liquid_fraction=1.0,
+            fO2_log=-9.0,
+            backend_status="ok",
+            backend_diagnostics={
+                "operating_point_clamped": True,
+                "operating_point_transport": "subprocess",
+                "temperature_clamped": True,
+                "pressure_clamped": True,
+                "requested_temperature_C": 650.0,
+                "requested_pressure_bar": 1.0e-6,
+                "solved_temperature_C": 800.0,
+                "solved_pressure_bar": 1.0,
+                "authoritative_for_requested_conditions": False,
+                "authoritative_for_solved_conditions": True,
+            },
+        ),
+        {
+            "temperature_C": 650.0,
+            "pressure_bar": 1.0e-6,
+            "fO2_log": -9.0,
+        },
     )
 
 
@@ -2313,6 +2344,38 @@ def test_non_authoritative_backend_status_green_path_requires_authoritative_ok()
     assert result.eval_spec.backend_name == "alphamelts"
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "ok"
+
+
+def test_clamped_kernel_success_is_out_of_domain_at_requested_point() -> None:
+    clamped = _clamped_kernel_equilibrium()
+    clean_snapshot = _snapshot(MASS_BALANCE_ABORT_PCT)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status=clamped.status,
+                backend_authoritative=True,
+                backend_diagnostics=clamped.diagnostics,
+                snapshots=(clean_snapshot,),
+                trace=_trace(snapshots=(clean_snapshot,)),
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.objectives is None
+    assert result.failing_gates == ("backend_domain",)
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert (
+        "melts_domain_out_of_domain: backend_status=out_of_domain"
+        in result.notes
+    )
 
 
 def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:

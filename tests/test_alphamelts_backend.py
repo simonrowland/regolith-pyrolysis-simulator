@@ -12,6 +12,8 @@ from engines.builtin.vapor_pressure import (
     HighUncertaintyVaporPressureFallbackWarning,
 )
 from engines.domain_reason import OutOfDomainReason
+from engines.alphamelts.parser import diagnostics_to_equilibrium
+from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_MISSING_BINARY,
@@ -181,6 +183,195 @@ def _melts_domain_composition() -> dict[str, float]:
         'CaO': 10.0,
         'Na2O': 5.0,
     }
+
+
+def _clamped_success_diagnostics() -> LiquidusDiagnostics:
+    return LiquidusDiagnostics(
+        phases_present=('liq',),
+        phase_masses_kg={'liq': 1.0},
+        liquid_fraction=1.0,
+        fO2_log=-9.0,
+        backend_status='ok',
+        backend_diagnostics={
+            'operating_point_clamped': True,
+            'operating_point_transport': 'subprocess',
+            'temperature_clamped': True,
+            'pressure_clamped': True,
+            'requested_temperature_C': 650.0,
+            'requested_pressure_bar': 1.0e-6,
+            'solved_temperature_C': 800.0,
+            'solved_pressure_bar': 1.0,
+            'authoritative_for_requested_conditions': False,
+            'authoritative_for_solved_conditions': True,
+        },
+    )
+
+
+def test_diagnostics_to_equilibrium_clamped_success_is_requested_point_ood():
+    result = diagnostics_to_equilibrium(
+        _clamped_success_diagnostics(),
+        {
+            'temperature_C': 650.0,
+            'pressure_bar': 1.0e-6,
+            'fO2_log': -9.0,
+        },
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.temperature_C == pytest.approx(800.0)
+    assert result.pressure_bar == pytest.approx(1.0)
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'clamped_operating_point'
+    )
+    assert result.diagnostics['requested_temperature_C'] == pytest.approx(650.0)
+    assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1.0e-6)
+    assert result.diagnostics['authoritative_for_requested_conditions'] is False
+
+
+def test_alphamelts_subprocess_clamped_pt_reports_solved_conditions(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    seen = {}
+
+    def fake_run(*args, **kwargs):
+        seen['input_melts'] = (
+            Path(kwargs['cwd']) / 'input.melts'
+        ).read_text()
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout='<> Stable synthetic assemblage achieved.',
+            stderr='',
+        )
+
+    def fake_parse(
+        output,
+        *,
+        temperature_C,
+        pressure_bar,
+        fO2_log,
+        total_input_kg,
+        warnings=None,
+        diagnostics=None,
+        success_diagnostics=None,
+    ):
+        result_diagnostics = (
+            success_diagnostics if success_diagnostics is not None
+            else diagnostics
+        )
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            phases_present=['liquid'],
+            phase_masses_kg={'liquid': 1.0},
+            liquid_fraction=1.0,
+            warnings=list(warnings or []),
+            status='ok',
+            diagnostics=dict(result_diagnostics or {}),
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        fake_run,
+    )
+    monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
+
+    result = backend.equilibrate(
+        temperature_C=650.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1e-6,
+    )
+
+    assert 'Initial Temperature: 800.0' in seen['input_melts']
+    assert 'Initial Pressure: 1.0' in seen['input_melts']
+    assert result.temperature_C == pytest.approx(800.0)
+    assert result.pressure_bar == pytest.approx(1.0)
+    assert result.diagnostics['operating_point_clamped'] is True
+    assert result.diagnostics['temperature_clamped'] is True
+    assert result.diagnostics['pressure_clamped'] is True
+    assert result.diagnostics['requested_temperature_C'] == pytest.approx(650.0)
+    assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-6)
+    assert result.diagnostics['solved_temperature_C'] == pytest.approx(800.0)
+    assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1.0)
+    assert (
+        result.diagnostics['authoritative_for_requested_conditions']
+        is False
+    )
+    assert any('clamped operating point' in warning for warning in result.warnings)
+
+
+def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    seen = {}
+
+    class FakePetThermoTools:
+        def equilibrate_MELTS(self, **kwargs):
+            seen.update(kwargs)
+            return {'ok': True}
+
+    def fake_parse(
+        results,
+        *,
+        temperature_C,
+        pressure_bar,
+        fO2_log,
+        comp_wt,
+        warnings=None,
+        diagnostics=None,
+    ):
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            phases_present=['liquid'],
+            phase_masses_kg={'liquid': 1.0},
+            liquid_fraction=1.0,
+            warnings=list(warnings or []),
+            status='ok',
+            diagnostics=dict(diagnostics or {}),
+        )
+
+    monkeypatch.setattr(
+        backend,
+        '_require_petthermotools_runtime',
+        lambda: FakePetThermoTools(),
+    )
+    monkeypatch.setattr(backend, '_parse_petthermotools_result', fake_parse)
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *args, **kwargs: {},
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1e-9,
+    )
+
+    assert seen['P_bar'] == pytest.approx(1e-6)
+    assert result.temperature_C == pytest.approx(1600.0)
+    assert result.pressure_bar == pytest.approx(1e-6)
+    assert result.diagnostics['operating_point_clamped'] is True
+    assert result.diagnostics['temperature_clamped'] is False
+    assert result.diagnostics['pressure_clamped'] is True
+    assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-9)
+    assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1e-6)
+    assert (
+        result.diagnostics['authoritative_for_requested_conditions']
+        is False
+    )
+    assert any('clamped operating point' in warning for warning in result.warnings)
 
 
 def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
