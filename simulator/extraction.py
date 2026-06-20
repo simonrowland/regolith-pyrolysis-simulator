@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Dict
 
 import simulator.mre_ladder as mre_ladder
@@ -609,11 +610,21 @@ class ExtractionMixin:
             'dt_hr': 1.0,
             'pO2_bar': float(self._commanded_pO2_bar()),
         }
+        melt_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+        try:
+            melt_fO2_log = float(melt_fO2_log)
+        except (TypeError, ValueError):
+            melt_fO2_log = self._compute_intrinsic_melt_fO2()
+        if not math.isfinite(melt_fO2_log):
+            melt_fO2_log = self._compute_intrinsic_melt_fO2()
+        electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
         if c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
             control_inputs=electrolysis_controls,
+            fO2_log=float(melt_fO2_log),
+            fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         result = diagnostic  # legacy variable name -- same shape as step_hour's dict.

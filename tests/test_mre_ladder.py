@@ -182,8 +182,16 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     sim.melt.mre_max_voltage_V = 1.7
     captured: dict = {}
 
-    def fake_dispatch(_intent, *, control_inputs):
+    def fake_dispatch(
+        _intent,
+        *,
+        control_inputs,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    ):
         captured.update(control_inputs)
+        captured["fO2_log"] = fO2_log
+        captured["fe_redox_policy"] = fe_redox_policy
         return SimpleNamespace(
             diagnostic={
                 "energy_kWh": 0.0,
@@ -204,6 +212,9 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     assert captured["voltage_V"] == pytest.approx(1.7)
     assert captured["current_A"] == pytest.approx(mre_ladder.C5_LIMITED_MRE_CURRENT_A)
     assert captured["allowed_oxides"] == ["SiO2"]
+    assert captured["melt_fO2_log"] == pytest.approx(-9.0)
+    assert captured["fO2_log"] == pytest.approx(-9.0)
+    assert captured["fe_redox_policy"] == "kress91_live"
 
 
 def test_step_mre_restricts_reducible_oxides_to_target_prefix():
@@ -226,7 +237,7 @@ def test_step_mre_restricts_reducible_oxides_to_target_prefix():
     sim.melt.mre_max_voltage_V = 1.45
     captured: list[dict] = []
 
-    def fake_dispatch(_intent, *, control_inputs):
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
         captured.append(dict(control_inputs))
         return SimpleNamespace(
             diagnostic={

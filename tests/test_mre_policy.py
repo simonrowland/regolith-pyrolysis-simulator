@@ -116,7 +116,7 @@ def _captured_c5_voltages(*, target_species: str, max_voltage_V: float) -> list[
     sim.melt.mre_max_voltage_V = max_voltage_V
     captured: list[float] = []
 
-    def fake_dispatch(_intent, *, control_inputs):
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
         captured.append(control_inputs["voltage_V"])
         return SimpleNamespace(
             diagnostic={
@@ -202,7 +202,7 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
     sim.melt.mre_max_voltage_V = 1.45
     captured: list[dict] = []
 
-    def fake_dispatch(_intent, *, control_inputs):
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
         captured.append(dict(control_inputs))
         return SimpleNamespace(
             diagnostic={

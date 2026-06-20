@@ -30,6 +30,8 @@ The provider:
   * ``current_A`` -- total cell current,
   * ``pO2_bar`` -- evolved-O2 activity/partial pressure at the anode,
     referenced to 1 bar for the Nernst gas-product term,
+  * ``melt_fO2_log`` -- diagnostic melt oxygen fugacity used only for the
+    inert Kress91 Fe-redox split reported in ``diagnostic``,
   * ``dt_hr`` -- tick duration in hours (always 1.0 in the current
     simulator, passed through explicitly so the provider stays unit-
     correct if the simulator's tick ever changes -- the t_s = 3600 s
@@ -152,6 +154,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         pO2_bar = self._coerce_pO2_bar(controls.get("pO2_bar", 1.0))
         T_C = float(request.temperature_C)
         T_K = T_C + 273.15
+        melt_fO2_log = self._coerce_optional_float(
+            controls.get("melt_fO2_log", request.fO2_log)
+        )
+        if melt_fO2_log is None and request.fO2_log is not None:
+            melt_fO2_log = float(request.fO2_log)
         control_audit = self._build_control_audit(
             request, applied_anode_fO2_log=math.log10(pO2_bar),
         )
@@ -201,6 +208,16 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "O2_produced_kg": 0.0,
             "O2_produced_mol": 0.0,
             "energy_kWh": 0.0,
+            "melt_fO2_log": melt_fO2_log,
+            "fe_redox_policy": str(request.fe_redox_policy),
+            "fe_redox_split": self._compute_fe_redox_split_diagnostic(
+                composition_kg,
+                total_kg=total_kg,
+                T_K=T_K,
+                pressure_bar=request.pressure_bar,
+                melt_fO2_log=melt_fO2_log,
+            ),
+            "fe2o3_fixed_full_reduction_skipped": False,
         }
 
         if total_kg <= 0.0 or voltage_V <= 0.0 or current_A <= 0.0:
@@ -474,6 +491,118 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         if not math.isfinite(pO2_bar):
             return 1.0
         return max(pO2_bar, 1e-30)
+
+    @staticmethod
+    def _coerce_optional_float(value: Any) -> float | None:
+        if value is None:
+            return None
+        try:
+            coerced = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(coerced):
+            return None
+        return coerced
+
+    @staticmethod
+    def _compute_fe_redox_split_diagnostic(
+        composition_kg: Mapping[str, float],
+        *,
+        total_kg: float,
+        T_K: float,
+        pressure_bar: float,
+        melt_fO2_log: float | None,
+    ) -> dict[str, Any]:
+        from simulator.fe_redox import (
+            feot_equivalent_wt_pct,
+            kress91_split,
+            melt_mol_fractions_for_kress91,
+        )
+
+        base: dict[str, Any] = {
+            "diagnostic_only": True,
+            "consumed_by_behavior": False,
+            "computed_fresh_from_account_view": True,
+            "temperature_K": float(T_K),
+            "pressure_bar": max(float(pressure_bar), 1.0e-9),
+            "melt_fO2_log": melt_fO2_log,
+        }
+        if total_kg <= 0.0 or melt_fO2_log is None or T_K <= 0.0:
+            return {
+                **base,
+                "status": "unavailable",
+                "feot_equiv_wt_pct": 0.0,
+                "fe3_over_sigma_fe": 0.0,
+                "ferric_frac": 0.0,
+                "ferrous_frac": 0.0,
+                "fe2o3_over_feo_molar": 0.0,
+                "fe2o3_equiv_wt_pct": 0.0,
+                "feo_equiv_wt_pct": 0.0,
+                "source": "none:missing_melt_fO2_or_composition",
+            }
+
+        comp_wt = {
+            oxide: max(0.0, float(kg)) / total_kg * 100.0
+            for oxide, kg in composition_kg.items()
+            if kg is not None and float(kg) > 0.0
+        }
+        feot_wt = feot_equivalent_wt_pct(comp_wt)
+        mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
+        if feot_wt <= 0.0 or not mol_fractions:
+            return {
+                **base,
+                "status": "no_iron",
+                "feot_equiv_wt_pct": float(feot_wt),
+                "fe3_over_sigma_fe": 0.0,
+                "ferric_frac": 0.0,
+                "ferrous_frac": 0.0,
+                "fe2o3_over_feo_molar": 0.0,
+                "fe2o3_equiv_wt_pct": 0.0,
+                "feo_equiv_wt_pct": 0.0,
+                "source": "inline:Kress-Carmichael1991:no_iron",
+            }
+
+        split = kress91_split(
+            fO2_log=float(melt_fO2_log),
+            mol_fractions=mol_fractions,
+            T_K=float(T_K),
+            pressure_bar=max(float(pressure_bar), 1.0e-9),
+        )
+        ratio = float(split["ratio"])
+        fe3 = min(1.0, max(0.0, float(split["fe3"])))
+        x_fe2o3 = float(split["x_fe2o3"])
+        x_feo = float(split["x_feo"])
+        weighted_total = (
+            mol_fractions.get("SiO2", 0.0) * 60.0843
+            + mol_fractions.get("TiO2", 0.0) * 79.8788
+            + mol_fractions.get("Al2O3", 0.0) * 101.961
+            + mol_fractions.get("MnO", 0.0) * 70.9375
+            + mol_fractions.get("MgO", 0.0) * 40.3044
+            + mol_fractions.get("CaO", 0.0) * 56.0774
+            + mol_fractions.get("Na2O", 0.0) * 61.9789
+            + mol_fractions.get("K2O", 0.0) * 94.196
+            + mol_fractions.get("P2O5", 0.0) * 141.937
+            + x_fe2o3 * 159.687
+            + x_feo * 71.844
+        )
+        if weighted_total <= 0.0:
+            fe2o3_wt = 0.0
+            feo_wt = 0.0
+        else:
+            fe2o3_wt = 100.0 * x_fe2o3 * 159.687 / weighted_total
+            feo_wt = 100.0 * x_feo * 71.844 / weighted_total
+        return {
+            **base,
+            "status": "ok",
+            "feot_equiv_wt_pct": float(feot_wt),
+            "fe3_over_sigma_fe": fe3,
+            "ferric_frac": fe3,
+            "ferrous_frac": max(0.0, 1.0 - fe3),
+            "fe2o3_over_feo_molar": ratio,
+            "fe2o3_equiv_wt_pct": fe2o3_wt,
+            "feo_equiv_wt_pct": feo_wt,
+            "source": "inline:Kress-Carmichael1991",
+        }
 
     @staticmethod
     def _build_atom_balance_proof(

@@ -53,11 +53,16 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
     min_decomposition_voltage,
+)
+from simulator.fe_redox import (
+    kress91_split,
+    melt_mol_fractions_for_kress91,
 )
 from simulator.state import (
     FARADAY,
@@ -269,6 +274,144 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         assert "process.overhead_gas" not in accounts
         assert "process.condensation_train" not in accounts
         assert "terminal.oxygen_melt_offgas_stored" not in accounts
+
+
+def test_provider_reports_fresh_kress91_redox_split_from_account_view(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    melt_mol = {
+        "SiO2": 30.0,
+        "Al2O3": 4.0,
+        "MgO": 8.0,
+        "CaO": 5.0,
+        "FeO": 6.0,
+        "Fe2O3": 2.0,
+    }
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": melt_mol,
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    fO2_log = -7.25
+    request = IntentRequest(
+        intent=ChemistryIntent.ELECTROLYSIS_STEP,
+        account_view=view,
+        temperature_C=1575.0,
+        pressure_bar=0.02,
+        fO2_log=fO2_log,
+        fe_redox_policy="kress91_live",
+        control_inputs={
+            "voltage_V": 0.0,
+            "current_A": 0.0,
+            "dt_hr": 1.0,
+            "melt_fO2_log": fO2_log,
+            "fe_redox_split": {"fe3_over_sigma_fe": 0.999},
+        },
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(request)
+    diagnostic = dict(result.diagnostic or {})
+    split = dict(diagnostic["fe_redox_split"])
+
+    composition_kg = {}
+    total_kg = 0.0
+    for species, mol in melt_mol.items():
+        formula = resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        )
+        kg = mol * formula.molar_mass_kg_per_mol()
+        composition_kg[species] = kg
+        total_kg += kg
+    comp_wt = {
+        species: kg / total_kg * 100.0
+        for species, kg in composition_kg.items()
+    }
+    expected = kress91_split(
+        fO2_log=fO2_log,
+        mol_fractions=melt_mol_fractions_for_kress91(comp_wt),
+        T_K=1575.0 + 273.15,
+        pressure_bar=0.02,
+    )
+
+    assert result.transition is None
+    assert diagnostic["melt_fO2_log"] == pytest.approx(fO2_log)
+    assert diagnostic["fe_redox_policy"] == "kress91_live"
+    assert diagnostic["fe2o3_fixed_full_reduction_skipped"] is False
+    assert split["diagnostic_only"] is True
+    assert split["consumed_by_behavior"] is False
+    assert split["computed_fresh_from_account_view"] is True
+    assert split["fe3_over_sigma_fe"] == pytest.approx(expected["fe3"])
+    assert split["fe2o3_over_feo_molar"] == pytest.approx(expected["ratio"])
+    assert split["fe3_over_sigma_fe"] != pytest.approx(0.999)
+
+
+def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    def dispatch(fO2_log):
+        legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+            sim=sim,
+            oxide="FeO",
+            oxide_kg=1000.0,
+            voltage_V=DECOMP_VOLTAGES["FeO"] + 0.05,
+            current_A=100.0,
+            temperature_C=1575.0,
+        )
+        view = ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": dict(
+                    sim.atom_ledger.mol_by_account("process.cleaned_melt")
+                ),
+                "process.metal_phase": {},
+                "terminal.oxygen_mre_anode_stored": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        )
+        direct = BuiltinElectrolysisStepProvider().dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                account_view=view,
+                temperature_C=1575.0,
+                pressure_bar=1e-6,
+                fO2_log=fO2_log,
+                fe_redox_policy="kress91_live",
+                control_inputs={
+                    "voltage_V": DECOMP_VOLTAGES["FeO"] + 0.05,
+                    "current_A": 100.0,
+                    "dt_hr": 1.0,
+                    "melt_fO2_log": fO2_log,
+                },
+            )
+        )
+        return legacy, result, direct
+
+    legacy_low, _old_path, direct_low = dispatch(-8.0)
+    legacy_high, _old_path_high, direct_high = dispatch(-3.0)
+
+    assert legacy_low["oxides_reduced_mol"] == pytest.approx(
+        legacy_high["oxides_reduced_mol"]
+    )
+    assert direct_low.transition is not None
+    assert direct_high.transition is not None
+    assert direct_low.transition.debits == direct_high.transition.debits
+    assert direct_low.transition.credits == direct_high.transition.credits
 
 
 # ---------------------------------------------------------------------------
