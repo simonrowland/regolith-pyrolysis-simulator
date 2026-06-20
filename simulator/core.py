@@ -69,6 +69,11 @@ from simulator.condensation_routing import (
     target_species_for_stage_number,
 )
 from simulator.feedstock_guard import assert_feedstock_loadable
+from simulator.fe_redox import (
+    feot_equivalent_wt_pct,
+    kress91_split,
+    melt_mol_fractions_for_kress91,
+)
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
@@ -246,17 +251,6 @@ _FE_REDOX_PYSULFSAT_COLS = {
     'Cr2O3': 'Cr2O3_Liq',
     'NiO': 'NiO_Liq',
 }
-_FE_REDOX_MOL_FRACTION_OXIDES = (
-    'SiO2',
-    'TiO2',
-    'Al2O3',
-    'MnO',
-    'MgO',
-    'CaO',
-    'Na2O',
-    'K2O',
-    'P2O5',
-)
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     'process.raw_feedstock',
@@ -1863,9 +1857,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @staticmethod
     def _feot_equivalent_wt_pct(comp: Mapping[str, float]) -> float:
-        feo = max(0.0, float(comp.get('FeO', 0.0) or 0.0))
-        fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0) or 0.0))
-        return feo + fe2o3 * (2.0 * 71.844 / 159.687)
+        return feot_equivalent_wt_pct(comp)
 
     def _fe_redox_pysulfsat_row(
         self,
@@ -1944,18 +1936,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure_bar: float,
         fO2_log: float,
     ) -> Dict[str, Any]:
-        feot_wt = self._feot_equivalent_wt_pct(comp)
-        mol_counts: Dict[str, float] = {}
-        for oxide in _FE_REDOX_MOL_FRACTION_OXIDES:
-            wt = max(0.0, float(comp.get(oxide, 0.0) or 0.0))
-            molar_mass = float(MOLAR_MASS.get(oxide, 0.0) or 0.0)
-            if wt > 0.0 and molar_mass > 0.0:
-                mol_counts[oxide] = wt / molar_mass
-            else:
-                mol_counts[oxide] = 0.0
-        mol_counts['FeOt'] = feot_wt / 71.844 if feot_wt > 0.0 else 0.0
-        total_mol = sum(mol_counts.values())
-        if total_mol <= 0.0:
+        x = melt_mol_fractions_for_kress91(comp)
+        if not x:
             return {
                 'status': 'no_iron',
                 'fe3_over_sigma_fe': 0.0,
@@ -1964,27 +1946,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'feo_equiv_wt_pct': 0.0,
                 'source': 'inline:Kress-Carmichael1991:no_iron',
             }
-        x = {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
-        p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
-        to_K = 1673.0  # K&C 1991 T0 (matches the pressure-term T0 + publication)
-        ln_ratio = (
-            0.196 * math.log(10.0 ** float(fO2_log))
-            + 11492.0 / float(T_K)
-            - 6.675
-            - 2.243 * x.get('Al2O3', 0.0)
-            - 1.828 * x.get('FeOt', 0.0)
-            + 3.201 * x.get('CaO', 0.0)
-            + 5.854 * x.get('Na2O', 0.0)
-            + 6.215 * x.get('K2O', 0.0)
-            - 3.36 * (1.0 - (to_K / T_K) - math.log(T_K / to_K))
-            - 0.000000701 * (p_pa / T_K)
-            - 0.000000000154 * (((T_K - 1673.0) * p_pa) / T_K)
-            + 0.0000000000000000385 * ((p_pa ** 2.0) / T_K)
+        kress_split = kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=x,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
         )
-        ratio = math.exp(max(-745.0, min(709.0, ln_ratio)))
-        fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
-        x_fe2o3 = ratio * x['FeOt'] / (2.0 * ratio + 1.0)
-        x_feo = max(0.0, x['FeOt'] - 2.0 * x_fe2o3)
+        ratio = kress_split['ratio']
+        fe3 = kress_split['fe3']
+        x_fe2o3 = kress_split['x_fe2o3']
+        x_feo = kress_split['x_feo']
         weighted_total = (
             x.get('SiO2', 0.0) * 60.0843
             + x.get('TiO2', 0.0) * 79.8788
