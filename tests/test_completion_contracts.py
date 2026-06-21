@@ -253,7 +253,7 @@ def test_vapor_contract_counts_recovered_feedstock_reagent_not_additive() -> Non
     assert result.completeness_fraction == pytest.approx(1.0)
 
 
-def test_vapor_contract_counts_shuttle_return_na2o_in_reagent_inventory() -> None:
+def test_vapor_contract_excludes_reagent_inventory_na2o_residue() -> None:
     contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
 
     result = vapor_contract_completeness(
@@ -265,11 +265,29 @@ def test_vapor_contract_counts_shuttle_return_na2o_in_reagent_inventory() -> Non
         }),
     )
 
-    reagent_na_mol = 2.0 * _mol("Na2O", 1.0)
-    assert result.product_target_equiv_mol == pytest.approx(reagent_na_mol)
-    assert result.reagent_target_equiv_mol == pytest.approx(reagent_na_mol)
-    assert result.denominator_target_equiv_mol == pytest.approx(reagent_na_mol)
-    assert result.completeness_fraction == pytest.approx(1.0)
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
+
+
+def test_vapor_contract_excludes_spent_reductant_residue_account() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries({
+            "process.spent_reductant_residue": {"Na2O": 1.0},
+            "process.reagent_inventory": {},
+            "process.condensation_train": {},
+            "process.cleaned_melt": {},
+        }),
+    )
+
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
 
 
 def test_vapor_contract_blocks_unsupported_provenance_rule() -> None:

@@ -254,6 +254,7 @@ _FE_REDOX_PYSULFSAT_COLS = {
 }
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
+    'process.spent_reductant_residue',
     'process.raw_feedstock',
     'process.condensation_train',
     WALL_DEPOSIT_ACCOUNT,
@@ -596,6 +597,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_current_A = 0.0
         self._mre_effective_current_A = 0.0
         self._mre_energy_this_hr = 0.0
+        self._mre_uncertified_yield: Dict[str, Any] = {}
         self._mre_voltage_step_idx = 0
         self._mre_hold_hours = 0
         self._mre_voltage_sequence: list = []
@@ -2646,31 +2648,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
-        # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
-        # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides
-        # would drop that mass and the MeltState projection would no longer
-        # mass-close against the ledger account.
-        self.melt.composition_kg = {
+        spent_reductant_residue = self.atom_ledger.kg_by_account(
+            'process.spent_reductant_residue')
+        projected_melt = {
             species: float(kg)
             for species, kg in ledger_melt.items()
         }
+        for species, kg in spent_reductant_residue.items():
+            projected_melt[species] = projected_melt.get(species, 0.0) + float(kg)
+        # Project the *full* cleaned_melt account, not just OXIDE_SPECIES: a
+        # FactSAGE LIQUID/SOLID phase can legitimately carry non-oxide species
+        # (dissolved metallic Fe/Si, a solid mineral). Truncating to oxides
+        # would drop that mass.  Na spent-reductant residue is also
+        # melt-resident, but kept in its own ledger account so vapor/yield
+        # completeness cannot mistake it for feedstock Na.
+        self.melt.composition_kg = projected_melt
         # melt_oxide_kg keeps its oxide-only contract (Stage 0 reload path,
         # feedstock inventory snapshots); the non-oxide remainder stays in
         # melt.composition_kg / total_mass_kg only.
         self.inventory.melt_oxide_kg = {
-            oxide: float(ledger_melt.get(oxide, 0.0))
+            oxide: float(projected_melt.get(oxide, 0.0))
             for oxide in OXIDE_SPECIES
         }
         self.melt.update_total_mass()
 
     def _backend_composition_kg(self) -> Dict[str, float]:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        return {
+        composition = {
             species: kg
             for species, raw_kg in ledger_melt.items()
             if (kg := float(raw_kg)) > 1e-12
         }
+        for species, raw_kg in self.atom_ledger.kg_by_account(
+            'process.spent_reductant_residue'
+        ).items():
+            if (kg := float(raw_kg)) > 1e-12:
+                composition[species] = composition.get(species, 0.0) + kg
+        return composition
 
     def _backend_composition_mol(self) -> Dict[str, float]:
         totals: Dict[str, float] = {}
@@ -6129,6 +6143,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_voltage_V=self._mre_voltage_V,
             mre_current_A=self._mre_current_A,
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
+            mre_uncertified_yield=dict(self._mre_uncertified_yield),
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
             # between ``process.metal_phase`` ledger and the
             # ``train.stages[*].collected_kg`` UI projection. Empty dict

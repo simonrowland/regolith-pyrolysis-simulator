@@ -13,7 +13,7 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
-from simulator.runner import PyrolysisRun
+from simulator.runner import PyrolysisRun, build_per_hour_summary
 from simulator.session import SimSession
 from simulator.state import CampaignPhase, MeltState, MOLAR_MASS
 
@@ -388,6 +388,16 @@ def test_c5_kress91_live_ferric_inventory_becomes_ferrous_behavior():
     assert converted_fe2o3_mol > 0.0
     assert cleaned["FeO"] == pytest.approx(2.0 * converted_fe2o3_mol)
     assert o2["O2"] == pytest.approx(0.5 * converted_fe2o3_mol)
+    marker = sim._mre_uncertified_yield["FeO"]
+    assert marker["certification"] == "uncertified_ferric_to_ferrous_reference"
+    assert marker["reference_V"] == pytest.approx(0.65)
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_uncertified_yield["FeO"]["produced_mol"] > 0.0
+    summary = build_per_hour_summary(sim, snapshot)
+    assert summary["mre_uncertified_yield"]["FeO"]["certification"] == (
+        "uncertified_ferric_to_ferrous_reference"
+    )
 
 
 def test_c5_sio2_target_step_does_not_reduce_feo():

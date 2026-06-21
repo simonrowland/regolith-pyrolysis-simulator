@@ -781,6 +781,10 @@ def _contract_target_equivalent_mol(
                     continue
                 total += _species_mol(reagent_element, kg)
                 continue
+            if species_name != contract.element:
+                continue
+            total += _species_mol(contract.element, kg)
+            continue
         if species_name not in allowed:
             continue
         total += _element_equivalent_mol(

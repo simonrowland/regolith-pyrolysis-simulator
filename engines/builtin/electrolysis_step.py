@@ -435,6 +435,18 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                     "consumed_by_behavior": True,
                     "behavior": "ferric_to_ferrous_mre_conversion",
                 }
+                diagnostic.setdefault("uncertified_yield", {})["FeO"] = {
+                    "source_species": "Fe2O3",
+                    "produced_species": "FeO",
+                    "produced_kg": feo_kg,
+                    "produced_mol": feo_mol,
+                    "certification": "uncertified_ferric_to_ferrous_reference",
+                    "reference_V": FERRIC_TO_FERROUS_REFERENCE_V,
+                    "reason": (
+                        "FERRIC_TO_FERROUS_REFERENCE_V is heuristic and "
+                        "not anchored to grounded yield data"
+                    ),
+                }
                 continue
 
             metal_info = OXIDE_TO_METAL.get(oxide)

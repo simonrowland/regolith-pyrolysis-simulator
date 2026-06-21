@@ -5,6 +5,7 @@ import pytest
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
     REACTION_FAMILY_C3_NA,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -28,6 +29,17 @@ _CROSSOVER_TOL_C = 0.05
 
 def _kg_to_mol(species: str, kg: float) -> float:
     return kg / MOLAR_MASS[species] * 1000.0
+
+
+def _apply_mol_proposal(accounts: dict[str, dict[str, float]], proposal) -> None:
+    for account, species_mol in proposal.debits.items():
+        account_mol = accounts.setdefault(account, {})
+        for species, mol in species_mol.items():
+            account_mol[species] = account_mol.get(species, 0.0) - mol
+    for account, species_mol in proposal.credits.items():
+        account_mol = accounts.setdefault(account, {})
+        for species, mol in species_mol.items():
+            account_mol[species] = account_mol.get(species, 0.0) + mol
 
 
 def _run_script(lines: list[str]):
@@ -133,15 +145,58 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced(liquid_fraction):
     mol_na_used = proposal.debits["process.reagent_inventory"]["Na"]
     mol_feo_reduced = proposal.debits["process.cleaned_melt"]["FeO"]
     assert mol_na_used == pytest.approx(2.0 * mol_feo_reduced)
-    # Na2O is credited to reagent_inventory (spent-reductant residue, BUG-070/071),
-    # not cleaned_melt; _atom_check below still verifies conservation independently.
-    assert proposal.credits["process.reagent_inventory"]["Na2O"] == pytest.approx(
+    # Na2O is melt-resident but provenance-isolated from feedstock recovery.
+    assert proposal.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] == pytest.approx(
         mol_feo_reduced
     )
+    assert "Na2O" not in proposal.credits.get("process.reagent_inventory", {})
     assert proposal.credits["process.metal_phase"]["Fe"] == pytest.approx(
         mol_feo_reduced
     )
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+def test_na_shuttle_spent_residue_fills_solubility_cap_across_ticks():
+    sim = _build_provider_sim()
+    provider = BuiltinMetallothermicStepProvider()
+    accounts = {
+        "process.cleaned_melt": {"FeO": _kg_to_mol("FeO", 100.0)},
+        "process.metal_phase": {},
+        "process.reagent_inventory": {"Na": _kg_to_mol("Na", 100.0)},
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT: {},
+    }
+
+    def dispatch():
+        return provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                account_view=ProviderAccountView(
+                    accounts=accounts,
+                    species_formula_registry=sim.species_formula_registry,
+                ),
+                temperature_C=1150.0,
+                pressure_bar=1e-6,
+                control_inputs={
+                    "reaction_family": REACTION_FAMILY_C3_NA,
+                    "na_target_stage": "feo_cleanup",
+                    "reagent_available_kg": 100.0,
+                    "liquid_fraction": 1.0,
+                    "dt_hr": 1.0,
+                },
+            )
+        )
+
+    first = dispatch()
+    assert first.status == "ok"
+    assert first.transition is not None
+    assert first.transition.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] > 0.0
+    _apply_mol_proposal(accounts, first.transition)
+
+    second = dispatch()
+
+    assert second.transition is None
+    assert second.status == "ok"
+    assert "Na2O above 10 wt% solubility limit" in second.diagnostic["reason_skipped"]
 
 
 def test_na_cr_stage_refuses_cr_ti_with_negative_margins():
@@ -298,8 +353,9 @@ def test_s1c_step_shuttle_recycles_condensed_na_into_reagent_inventory():
     # Mass conservation: total Na atoms across all accounts unchanged
     # after the tick. The recycle is a within-system move (train ->
     # reagent_inventory); inject moves Na out of reagent_inventory and
-    # into cleaned_melt as Na2O, so the Na ATOM count is conserved
-    # across (Na + the Na portion of Na2O). Within FP tolerance.
+    # into the melt-resident spent-reductant residue as Na2O, so the Na
+    # ATOM count is conserved across (Na + the Na portion of Na2O).
+    # Within FP tolerance.
     post_full = sim.atom_ledger.kg_by_account()
     post_total_na_kg = sum(
         balances.get("Na", 0.0)

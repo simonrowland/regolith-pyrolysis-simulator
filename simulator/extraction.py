@@ -505,6 +505,7 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import ELECTRONS_PER_OXIDE
 
+        self._mre_uncertified_yield = {}
         if (
             self.melt.campaign == CampaignPhase.C5
             and not getattr(self.melt, 'c5_enabled', False)
@@ -657,6 +658,8 @@ class ExtractionMixin:
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         result = diagnostic  # legacy variable name -- same shape as step_hour's dict.
+        self._mre_uncertified_yield = dict(
+            result.get('uncertified_yield') or {})
 
         produced_metals = set(result.get('metals_produced_kg', {}) or {})
         produced_metals.update(result.get('metals_produced_mol', {}) or {})
@@ -820,8 +823,8 @@ class ExtractionMixin:
         **Injection** (T ~1200-1350°C):                          [THERMO-5]
             K phase:  2K(g) + FeO(melt) → K₂O(melt) + Fe(l)
                       4K(g) + SiO₂(melt) → 2K₂O(melt) + Si(l)  [conditioning]
-            Na phase: 2Na(g) + TiO₂(melt) → Na₂O(melt) + Ti(l)
-                      6Na(g) + Cr₂O₃(melt) → 3Na₂O(melt) + 2Cr(l)
+            Na phase: 2Na(g) + TiO₂(melt) → Na₂O(melt, spent residue) + Ti(l)
+                      6Na(g) + Cr₂O₃(melt) → 3Na₂O(melt, spent residue) + 2Cr(l)
 
         **Bakeout** (T ~1520-1680°C, pO₂ 0.5-1.5 mbar):        [THERMO-6]
             K₂O(melt) → 2K(g) + ½O₂(g)
@@ -1031,7 +1034,7 @@ class ExtractionMixin:
         Stoichiometry (TiO₂ reaction):
             91.95 g Na + 79.87 g TiO₂ → 123.96 g Na₂O + 47.87 g Ti
             1 kg Na → 0.869 kg TiO₂ reduced
-                    → 1.348 kg Na₂O dissolved
+                    → 1.348 kg melt-resident spent-residue Na₂O
                     → 0.521 kg Ti produced
 
         Na₂O solubility limit: 8-12 wt% in the silicate melt.

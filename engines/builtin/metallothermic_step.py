@@ -101,9 +101,11 @@ ELECTROLYSIS_STEP) -- :meth:`ChemistryKernel.commit_batch` engages
 atom-balance validation at dispatch time AND again at commit time.
 
 Account declaration: ``process.cleaned_melt`` (debit oxides being
-reduced + credit alkali-oxide / MgO / regenerated Al2O3 coproducts),
-``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals + debit Al on
-back-reduction), ``process.reagent_inventory`` (debit K/Na/Mg consumed).
+reduced + credit K2O / MgO / regenerated Al2O3 coproducts),
+``process.spent_reductant_residue`` (credit melt-resident Na2O from the
+spent Na shuttle), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
++ debit Al on back-reduction), ``process.reagent_inventory`` (debit
+K/Na/Mg consumed).
 Every account named in the legacy ``_record_atom_transition`` calls
 inside ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
 ``_step_thermite`` lands in this set.  The hardened kernel account-
@@ -148,6 +150,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 REACTION_FAMILY_C3_K = "c3_k_shuttle"
 REACTION_FAMILY_C3_NA = "c3_na_shuttle"
 REACTION_FAMILY_C6_MG = "c6_mg_thermite"
+SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
@@ -183,15 +186,15 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
     name = "builtin-metallothermic-step"
 
-    # The three accounts the legacy _shuttle_inject_K / _shuttle_inject_Na
-    # / _step_thermite collectively touch on debit or credit side
-    # across the five legacy _record_atom_transition calls. The kernel's
-    # account-filter gate will reject any proposal that names a fourth
-    # account here.
+    # Accounts the legacy _shuttle_inject_K / _shuttle_inject_Na /
+    # _step_thermite collectively touch on debit or credit side.  Na
+    # spent-reductant oxide is melt-resident, but provenance-isolated
+    # from feedstock/recovered reagent accounting.
     DECLARED_ACCOUNTS = frozenset({
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     })
 
     # Legacy constants reproduced verbatim from simulator/extraction.py
@@ -248,16 +251,24 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             or {}
         )
 
-        # Project the melt's kg view from the mol account (the legacy
+        # Project the melt's kg view from the mol accounts (the legacy
         # path reads self.melt.composition_kg, which is the simulator's
-        # projection of process.cleaned_melt).  Same projection the
-        # _common.composition_wt_pct_from_account_view helper produces
-        # internally; the kg dict + total_kg pair is the shape the C3
-        # solubility-limit math reads.
+        # projection of process.cleaned_melt plus melt-resident
+        # spent-reductant residue).  The kg dict + total_kg pair is the
+        # shape the C3 solubility-limit math reads.
         composition_kg, total_kg = composition_kg_from_account_view(
             request.account_view,
             "process.cleaned_melt",
         )
+        spent_residue_kg, spent_residue_total_kg = (
+            composition_kg_from_account_view(
+                request.account_view,
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            )
+        )
+        for species, kg in spent_residue_kg.items():
+            composition_kg[species] = composition_kg.get(species, 0.0) + kg
+        total_kg += spent_residue_total_kg
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
         true_available_mol = self._true_available_mol_by_species(controls)
 
@@ -719,7 +730,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             del debits["process.cleaned_melt"]
 
         credits: dict[str, dict[str, float]] = {
-            "process.reagent_inventory": {"Na2O": total_Na2O_added_mol},
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT: {
+                "Na2O": total_Na2O_added_mol
+            },
             "process.metal_phase": {},
         }
         if total_Fe_produced_mol > 0.0:
@@ -744,6 +757,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         TiO2_removed_kg = (
             total_TiO2_removed_mol * molar_mass["TiO2"] / 1000.0
         )
+        Na2O_added_kg = total_Na2O_added_mol * molar_mass["Na2O"] / 1000.0
         Fe_produced_kg = total_Fe_produced_mol * molar_mass["Fe"] / 1000.0
         Cr_produced_kg = total_Cr_produced_mol * molar_mass["Cr"] / 1000.0
         Ti_produced_kg = total_Ti_produced_mol * molar_mass["Ti"] / 1000.0
@@ -783,6 +797,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "Cr": Cr_produced_kg,
                 "Ti": Ti_produced_kg,
             },
+            "spent_reductant_residue_account": SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            "spent_reductant_residue_kg": {
+                "Na2O": Na2O_added_kg,
+            },
+            "na2o_melt_kg_for_solubility_cap": composition_kg.get("Na2O", 0.0),
+            "na2o_solubility_headroom_kg": Na2O_max_kg,
         }
         diagnostic.update(self._ellingham_fit_diagnostic(fit_extrapolations))
         return IntentResult(

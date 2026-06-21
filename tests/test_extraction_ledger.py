@@ -2,6 +2,7 @@ import shlex
 
 import pytest
 
+from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -624,6 +625,15 @@ def test_na_shuttle_metals_are_reported_from_process_metal_phase():
     sim._shuttle_inject_Na()
 
     sim.atom_ledger.assert_balanced()
+    assert sim.atom_ledger.kg_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT).get(
+        "Na2O", 0.0
+    ) > 0.0
+    assert "Na2O" not in sim.atom_ledger.kg_by_account(
+        "process.reagent_inventory"
+    )
+    assert sim.shuttle_Na_inventory_kg == pytest.approx(
+        sim.atom_ledger.kg_by_account("process.reagent_inventory").get("Na", 0.0)
+    )
     _assert_product_matches_account(sim, "process.metal_phase", "Cr")
     _assert_product_matches_account(sim, "process.metal_phase", "Ti")
 

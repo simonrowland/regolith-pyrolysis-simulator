@@ -40,6 +40,7 @@ from engines.builtin.metallothermic_step import (
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
     REACTION_FAMILY_C6_MG,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.chemistry.kernel import (
     AtomBalanceError,
@@ -78,8 +79,8 @@ def test_provider_declares_only_metallothermic_step_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_three_metallothermic_accounts():
-    """Provider declares exactly the three accounts touched by every
+def test_provider_declares_metallothermic_accounts():
+    """Provider declares exactly the accounts touched by every
     legacy ``_record_atom_transition`` call inside
     ``_shuttle_inject_K``, ``_shuttle_inject_Na``, and
     ``_step_thermite``.  Pinning the set stops a future refactor from
@@ -93,6 +94,7 @@ def test_provider_declares_three_metallothermic_accounts():
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     })
     assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
@@ -187,7 +189,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY
-    the three declared metallothermic accounts. The kernel account
+    the declared metallothermic accounts. The kernel account
     filter is the enforcer (binding spec §7); a process.overhead_gas
     seed must NOT cross the boundary into this provider's view.
     """
@@ -233,6 +235,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
@@ -836,7 +839,7 @@ def test_c3_na_explicit_duplicate_targets_do_not_double_debit_feo(
     )
 
 
-def test_c3_na_shuttle_returns_na2o_to_neutral_reagent_inventory(
+def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -853,7 +856,10 @@ def test_c3_na_shuttle_returns_na2o_to_neutral_reagent_inventory(
 
     assert result.status == "ok"
     assert result.transition is not None
-    assert result.transition.credits["process.reagent_inventory"]["Na2O"] > 0.0
+    assert result.transition.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] > 0.0
+    assert "Na2O" not in result.transition.credits.get(
+        "process.reagent_inventory", {}
+    )
     assert "Na2O" not in result.transition.credits.get("process.cleaned_melt", {})
 
 

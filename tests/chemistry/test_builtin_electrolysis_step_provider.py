@@ -445,6 +445,12 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
     assert diagnostic["oxides_produced_mol"]["FeO"] == pytest.approx(
         2.0 * fe2o3_mol
     )
+    assert diagnostic["uncertified_yield"]["FeO"]["certification"] == (
+        "uncertified_ferric_to_ferrous_reference"
+    )
+    assert diagnostic["uncertified_yield"]["FeO"]["reference_V"] == pytest.approx(
+        0.65
+    )
     assert diagnostic["metals_produced_mol"] == {}
     assert diagnostic["O2_produced_mol"] == pytest.approx(0.5 * fe2o3_mol)
     assert result.transition.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
