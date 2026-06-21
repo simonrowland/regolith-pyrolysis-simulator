@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 import hashlib
 import math
@@ -891,7 +891,13 @@ class RecipeSchema:
         recipe_schema_version: str | None = None,
         allowlist_version: str | None = None,
     ) -> None:
-        self.allowlist = allowlist if allowlist is not None else self.ALLOWLIST
+        # Treat the class allowlist as a template even when passed explicitly, so
+        # source-fingerprinted bounds (notably C5 MRE cap) refresh on use.
+        self.allowlist = (
+            allowlist
+            if allowlist is not None and allowlist != type(self).ALLOWLIST
+            else _default_allowlist_for_source(type(self).ALLOWLIST)
+        )
         # FORBIDDEN_PREFIXES is an INVIOLABLE floor: a caller may ADD deny
         # prefixes but can never remove the class-level set. Otherwise a custom
         # schema (e.g. RecipeSchema(forbidden_prefixes=())) passed to
@@ -1127,6 +1133,40 @@ def _default_c2a_staged_stages() -> list[dict[str, Any]]:
     return stages
 
 
+def _setpoints_source_fingerprint() -> tuple[str, int | None, int | None, str]:
+    path = DEFAULT_DATA_DIR / "setpoints.yaml"
+    try:
+        stat_result = path.stat()
+        contents = path.read_bytes()
+    except OSError:
+        return (str(path), None, None, "missing")
+    digest = hashlib.sha256(contents).hexdigest()
+    return (str(path), stat_result.st_mtime_ns, stat_result.st_size, digest)
+
+
+def _default_allowlist_for_source(
+    template_allowlist: tuple[KnobSpec, ...],
+) -> tuple[KnobSpec, ...]:
+    return _cached_default_allowlist(
+        _setpoints_source_fingerprint(),
+        template_allowlist,
+    )
+
+
+@lru_cache(maxsize=8)
+def _cached_default_allowlist(
+    _source_fingerprint: tuple[str, int | None, int | None, str],
+    template_allowlist: tuple[KnobSpec, ...],
+) -> tuple[KnobSpec, ...]:
+    c5_cap_high = _c5_allow_mre_voltage_cap_upper_bound()
+    return tuple(
+        replace(spec, high=c5_cap_high)
+        if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH
+        else spec
+        for spec in template_allowlist
+    )
+
+
 @dataclass(frozen=True)
 class RecipePatch:
     values: Mapping[KeyPath, Any]
@@ -1208,11 +1248,19 @@ class RecipePatch:
         schema: RecipeSchema | None = None,
         *,
         recipe_schema_version: str | None = None,
+        allowlist_version: str | None = None,
     ) -> str:
         active_schema = schema or RecipeSchema()
         schema_version = recipe_schema_version or active_schema.recipe_schema_version
+        active_allowlist_version = allowlist_version or active_schema.allowlist_version
         canonical = self.canonical_json().encode("utf-8")
-        payload = canonical + b"\n" + schema_version.encode("utf-8")
+        payload = (
+            canonical
+            + b"\n"
+            + schema_version.encode("utf-8")
+            + b"\n"
+            + active_allowlist_version.encode("utf-8")
+        )
         return hashlib.sha256(payload).hexdigest()
 
     def canonical_json(self) -> str:

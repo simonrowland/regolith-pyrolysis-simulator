@@ -1543,8 +1543,10 @@ def _build_eval_inputs(
     spec = EvalSpec(
         recipe_id=_evalspec_recipe_id(
             patch,
+            schema=schema,
             c4_default_hold_temp_C=c4_default_hold_temp_C,
         ),
+        allowlist_version=schema.allowlist_version,
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,
@@ -1717,6 +1719,7 @@ def _canonical_c2a_staged_depletion_flux_decay_fraction(value: float) -> float:
 def _evalspec_recipe_id(
     patch: RecipePatch,
     *,
+    schema: RecipeSchema,
     c4_default_hold_temp_C: float,
 ) -> str:
     values = dict(patch.values)
@@ -1751,7 +1754,7 @@ def _evalspec_recipe_id(
             values.pop(C4_HOLD_TEMP_C_PATH, None)
         else:
             values[C4_HOLD_TEMP_C_PATH] = hold_temp
-    return RecipePatch(values).recipe_id()
+    return RecipePatch(values).recipe_id(schema)
 
 
 def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:

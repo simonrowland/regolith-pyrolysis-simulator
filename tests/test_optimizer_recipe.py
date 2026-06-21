@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -25,6 +27,7 @@ from simulator.optimize.recipe import (
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
 )
+import simulator.optimize.recipe as recipe_module
 from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
@@ -92,6 +95,24 @@ def _c2a_staged_setpoints(fraction: float | None = None) -> dict:
     else:
         c2a["depletion_flux_decay_fraction"] = fraction
     return setpoints
+
+
+def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> None:
+    path = data_dir / "setpoints.yaml"
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "campaigns": {
+                    "C5": {
+                        "allow_mre_voltage_cap_upper_bound_V": high,
+                    }
+                }
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    os.utime(path, ns=(mtime_ns, mtime_ns))
 
 
 def _configured_c2a_staged_manager(fraction: float | None = None) -> CampaignManager:
@@ -576,10 +597,20 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     assert first.recipe_id() == second.recipe_id()
     assert (
         first.recipe_id()
-        == "2b42cde96b21ca9c9cb810d42da04359ffc7d8ca9983f2c32016b79d7bef78b9"
+        == "6e41eca85dcc8aba520d076f6e27a8f7cfde6bdd27fe7aa6412dead4f1d5ddc8"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
+
+
+def test_recipe_id_changes_when_allowlist_version_changes() -> None:
+    patch = RecipePatch({PO2_DEFAULT: 9.0})
+    old_schema = RecipeSchema(allowlist_version="allowlist-old")
+    new_schema = RecipeSchema(allowlist_version="allowlist-new")
+
+    assert patch.validated(old_schema).recipe_id(old_schema) != patch.validated(
+        new_schema
+    ).recipe_id(new_schema)
 
 
 def test_redox_cleanup_dose_fields_validate_but_do_not_materialize() -> None:
@@ -652,6 +683,52 @@ def test_c5_allow_mre_voltage_cap_rejects_above_owner_bound() -> None:
 
     with pytest.raises(RecipeValidationError, match="above upper bound"):
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: too_high}).validated(schema)
+
+
+def test_default_allowlist_rebuilds_c5_mre_bound_when_setpoints_yaml_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    first_mtime_ns = 1_700_000_000_000_000_000
+    monkeypatch.setattr(recipe_module, "DEFAULT_DATA_DIR", tmp_path)
+    _write_c5_mre_cap_bound_yaml(tmp_path, high=1.25, mtime_ns=first_mtime_ns)
+    initial_allowlist = tuple(
+        replace(
+            spec,
+            high=recipe_module._c5_allow_mre_voltage_cap_upper_bound(),
+        )
+        if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH
+        else spec
+        for spec in RecipeSchema.ALLOWLIST
+    )
+    monkeypatch.setattr(RecipeSchema, "ALLOWLIST", initial_allowlist)
+
+    first = RecipeSchema()
+    assert first.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH).high == 1.25
+
+    _write_c5_mre_cap_bound_yaml(
+        tmp_path, high=1.75, mtime_ns=first_mtime_ns + 1_000_000_000
+    )
+    warm = RecipeSchema()
+
+    assert warm.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH).high == 1.75
+
+
+def test_explicit_class_allowlist_rebuilds_c5_mre_bound_when_setpoints_yaml_changes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    first_mtime_ns = 1_700_000_000_000_000_000
+    monkeypatch.setattr(recipe_module, "DEFAULT_DATA_DIR", tmp_path)
+    _write_c5_mre_cap_bound_yaml(tmp_path, high=1.25, mtime_ns=first_mtime_ns)
+
+    first = RecipeSchema(allowlist=RecipeSchema.ALLOWLIST)
+    assert first.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH).high == 1.25
+
+    _write_c5_mre_cap_bound_yaml(
+        tmp_path, high=1.75, mtime_ns=first_mtime_ns + 1_000_000_000
+    )
+    warm = RecipeSchema(allowlist=tuple(RecipeSchema.ALLOWLIST))
+
+    assert warm.spec_for(C5_ALLOW_MRE_VOLTAGE_CAP_PATH).high == 1.75
 
 
 def test_forbidden_floor_cannot_be_neutered_by_custom_schema() -> None:

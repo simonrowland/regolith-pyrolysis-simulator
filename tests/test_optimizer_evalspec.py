@@ -57,20 +57,22 @@ from simulator.state import MeltState
 
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
-    b'"backend_name":"stub","c5_enabled":false,"campaign":"C0",'
-    b'"chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin",'
+    b'"allowlist_version":"allowlist-v8","backend_name":"stub",'
+    b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
+    b'"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
     b'"data_digests":{"corpus_version":"corpus-version-digest",'
-    b'"feedstocks":"feedstock-digest",'
-    b'"materials":"materials-digest","profile":"profile-digest",'
-    b'"setpoints":"setpoints-digest","species_catalog":"species-catalog-digest",'
-    b'"vapor_pressures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti",'
+    b'"feedstocks":"feedstock-digest","materials":"materials-digest",'
+    b'"profile":"profile-digest","setpoints":"setpoints-digest",'
+    b'"species_catalog":"species-catalog-digest","vapor_pressures":"vapor-digest"},'
+    b'"feedstock_id":"lunar_mare_low_ti",'
     b'"feedstock_recipe_digest":"feedstock-recipe-digest","fidelity":"fast",'
     b'"force_builtin_vapor_pressure":false,"hours":24,'
     b'"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000",'
-    b'"mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id",'
-    b'"runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},'
-    b'"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
+    b'"mre_target_species":"","profile_id":"oxygen-yield-v1",'
+    b'"recipe_id":"recipe-id","runtime_campaign_overrides":{'
+    b'"C0":{"hold_time_h":"1.000000000"}},"track":"pyrolysis",'
+    b'"vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -224,6 +226,40 @@ print(json.dumps({
     assert fresh["key"] == cache_key(spec)
 
 
+def test_evalspec_cache_key_changes_when_allowlist_version_changes() -> None:
+    assert cache_key(_base_spec(allowlist_version="allowlist-old")) != cache_key(
+        _base_spec(allowlist_version="allowlist-new")
+    )
+
+
+def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() -> None:
+    profile = _mre_cap_profile(campaign="C0")
+    old_schema = RecipeSchema(allowlist_version="allowlist-old")
+    new_schema = RecipeSchema(allowlist_version="allowlist-new")
+    assert old_schema.recipe_schema_version == new_schema.recipe_schema_version
+    assert old_schema.allowlist == new_schema.allowlist
+
+    old_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        old_schema,
+    )
+    new_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        new_schema,
+    )
+
+    assert old_spec.allowlist_version == "allowlist-old"
+    assert new_spec.allowlist_version == "allowlist-new"
+    assert old_spec.recipe_id != new_spec.recipe_id
+    assert cache_key(old_spec) != cache_key(new_spec)
+
+
 def test_code_version_is_sourced_from_version_file() -> None:
     spec = _base_spec()
 
@@ -337,6 +373,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("profile_id", "other-profile"),
         ("fidelity", "accurate"),
         ("code_version", "0.0.0-determinant-mutant"),
+        ("allowlist_version", "allowlist-v9"),
         ("campaign", "C2A"),
         ("hours", 48),
         ("mass_kg", 500.0),
@@ -412,7 +449,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         stage0_carbon_reductant_kg=2.0,
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[18:-1]
+    old_args = args[:16] + args[18:-2]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -431,7 +468,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         stage0_carbon_reductant_kg=2.0,
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[18:-1]
+    old_args = args[:16] + args[18:-2]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -453,12 +490,13 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-1]
+        old_args = new_args[:-2]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False
+        assert restored.allowlist_version == spec.allowlist_version
         for field in fields(type(spec)):
-            if field.name == "stop_at_stage0_exit":
+            if field.name in {"allowlist_version", "stop_at_stage0_exit"}:
                 continue
             assert getattr(restored, field.name) == getattr(spec, field.name)
 

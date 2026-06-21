@@ -141,6 +141,22 @@ def test_requested_sampler_name_replays_serialized_doe_spec() -> None:
     assert first == second
 
 
+def test_doe_spec_from_dict_rejects_allowlist_version_mismatch() -> None:
+    base = _small_schema()
+    old_schema = RecipeSchema(
+        allowlist=base.allowlist,
+        allowlist_version="allowlist-old",
+    )
+    new_schema = RecipeSchema(
+        allowlist=base.allowlist,
+        allowlist_version="allowlist-new",
+    )
+    payload = DoeSpec(schema=old_schema, n_samples=8, seed=321).to_dict()
+
+    with pytest.raises(ValueError, match="allowlist_version"):
+        DoeSpec.from_dict(payload, schema=new_schema)
+
+
 def test_unknown_sampler_name_raises_without_fallback() -> None:
     with pytest.raises(ValueError, match="unsupported DOE sampler"):
         sample_recipe_patches(

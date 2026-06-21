@@ -166,6 +166,18 @@ class DoeSpec:
         cls, payload: Mapping[str, Any], *, schema: RecipeSchema | None = None
     ) -> "DoeSpec":
         active_schema = schema or RecipeSchema()
+        expected_recipe_schema_version = payload.get("recipe_schema_version")
+        if (
+            expected_recipe_schema_version is not None
+            and expected_recipe_schema_version != active_schema.recipe_schema_version
+        ):
+            raise ValueError("DOE spec recipe_schema_version does not match the active schema")
+        expected_allowlist_version = payload.get("allowlist_version")
+        if (
+            expected_allowlist_version is not None
+            and expected_allowlist_version != active_schema.allowlist_version
+        ):
+            raise ValueError("DOE spec allowlist_version does not match the active schema")
         active_knob_paths = tuple(
             spec.path for spec in active_schema.search_allowlist
         )

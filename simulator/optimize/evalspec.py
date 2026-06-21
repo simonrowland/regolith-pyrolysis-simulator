@@ -27,6 +27,7 @@ from simulator.optimize.canonical import (
     normalize_canonical_value,
 )
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
+from simulator.optimize.recipe import allowlist_version as DEFAULT_ALLOWLIST_VERSION
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
@@ -92,6 +93,7 @@ class EvalSpec:
     allow_fallback_vapor: bool = False
     force_builtin_vapor_pressure: bool = False
     vapor_pressure_provider_code_fingerprint: str = ""
+    allowlist_version: str = field(default=DEFAULT_ALLOWLIST_VERSION, kw_only=True)
     stop_at_stage0_exit: bool = field(default=False, kw_only=True)
 
     def __post_init__(self) -> None:
@@ -112,6 +114,7 @@ class EvalSpec:
             "vapor_pressure_provider_id",
             "vapor_pressure_fallback_provider_id",
             "vapor_pressure_provider_code_fingerprint",
+            "allowlist_version",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -233,6 +236,7 @@ class EvalSpec:
                 self.allow_fallback_vapor,
                 self.force_builtin_vapor_pressure,
                 self.vapor_pressure_provider_code_fingerprint,
+                self.allowlist_version,
                 self.stop_at_stage0_exit,
             ),
         )
@@ -300,6 +304,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.prefix_recipe_ids,
                 self.topology_id,
                 self.eval_spec_type,
+                self.allowlist_version,
                 self.stop_at_stage0_exit,
             ),
         )
@@ -358,6 +363,12 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(*_with_legacy_data_digest_args(args))
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 2:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(args[:-2]),
+            allowlist_version=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(
             *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
@@ -378,6 +389,12 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(*_with_legacy_data_digest_args(args))
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(args[:-2]),
+            allowlist_version=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(
             *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
@@ -398,6 +415,7 @@ def current_code_version() -> str:
 def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     payload = {
         "additives_kg": spec.additives_kg,
+        "allowlist_version": spec.allowlist_version,
         "backend_name": spec.backend_name,
         "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
