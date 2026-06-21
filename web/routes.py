@@ -25,7 +25,10 @@ from simulator.condensation import (
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
-from simulator.furnace_materials import load_furnace_materials
+from simulator.furnace_materials import (
+    load_furnace_materials,
+    resolve_furnace_temperature_caps,
+)
 from simulator.mre_ladder import (
     filter_steps_up_to_max_v,
     parse_ladder_from_setpoints,
@@ -1352,16 +1355,116 @@ def _mre_preset_catalog_payload() -> list[dict[str, Any]]:
     return presets
 
 
+def _required_finite_number(value: Any, field: str) -> float:
+    if isinstance(value, bool):
+        raise ValueError(f'setpoints.yaml {field} must be numeric')
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        raise ValueError(f'setpoints.yaml {field} must be numeric') from None
+    if not math.isfinite(result):
+        raise ValueError(f'setpoints.yaml {field} must be finite')
+    return result
+
+
+def _required_finite_range_high(value: Any, field: str) -> float:
+    if not isinstance(value, (list, tuple)) or len(value) < 2:
+        raise ValueError(
+            f'setpoints.yaml {field} must contain at least two values'
+        )
+    finite_values = [
+        _required_finite_number(item, f'{field}[{index}]')
+        for index, item in enumerate(value)
+    ]
+    return max(finite_values)
+
+
+def _format_compact_number(value: float) -> str:
+    if float(value).is_integer():
+        return str(int(value))
+    return f'{value:g}'
+
+
+def _c4_operator_preset_payload(
+    setpoints: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    if setpoints is None:
+        setpoints = _load_yaml('setpoints.yaml')
+    campaigns = setpoints.get('campaigns', {}) if isinstance(setpoints, Mapping) else {}
+    c4 = campaigns.get('C4', {}) if isinstance(campaigns, Mapping) else {}
+    furnace = setpoints.get('furnace', {}) if isinstance(setpoints, Mapping) else {}
+    stirring = (
+        furnace.get('induction_stirring', {})
+        if isinstance(furnace, Mapping)
+        else {}
+    )
+    stir_band = (
+        stirring.get('rate_acceleration_factor')
+        if isinstance(stirring, Mapping)
+        else None
+    )
+    if not (
+        isinstance(stir_band, (list, tuple))
+        and len(stir_band) >= 2
+    ):
+        raise ValueError(
+            'setpoints.yaml furnace.induction_stirring.rate_acceleration_factor '
+            'must contain at least two values'
+        )
+    stir_low = _required_finite_number(
+        stir_band[0],
+        'furnace.induction_stirring.rate_acceleration_factor[0]',
+    )
+    stir_high = _required_finite_number(
+        stir_band[1],
+        'furnace.induction_stirring.rate_acceleration_factor[1]',
+    )
+    stir_default = (stir_low + stir_high) / 2.0
+    ceiling_T_C = _required_finite_range_high(
+        c4.get('temp_range_C'),
+        'campaigns.C4.temp_range_C',
+    )
+    return {
+        'ceiling_T_C': _format_compact_number(ceiling_T_C),
+        'pO2_mbar': _format_compact_number(
+            _required_finite_number(
+                c4.get('pO2_mbar_default'),
+                'campaigns.C4.pO2_mbar_default',
+            )
+        ),
+        'max_hold_hr': _format_compact_number(
+            _required_finite_number(
+                c4.get('max_hold_hr'),
+                'campaigns.C4.max_hold_hr',
+            )
+        ),
+        'stir_factor_default': _format_compact_number(stir_default),
+        'stir_factor_label': (
+            f'{_format_compact_number(stir_low)}-'
+            f'{_format_compact_number(stir_high)}x'
+        ),
+    }
+
+
 def _furnace_material_catalog_payload() -> list[dict[str, Any]]:
+    setpoints = _load_yaml('setpoints.yaml')
+    requested_cap = setpoints.get('furnace_max_T_C', 1800)
+    catalog = load_furnace_materials()
     materials = []
-    for material_id, row in load_furnace_materials().items():
+    for material_id, row in catalog.items():
         if not isinstance(row, Mapping) or row.get('enabled') is not True:
             continue
         row_id = str(row.get('id') or material_id)
+        caps = resolve_furnace_temperature_caps(
+            row_id,
+            requested_cap=requested_cap,
+            catalog=catalog,
+        )
         materials.append({
             'id': row_id,
             'display_name': str(row.get('display_name') or row_id),
             'max_service_T_C': row.get('max_service_T_C'),
+            **caps,
         })
     return materials
 
@@ -2024,6 +2127,7 @@ def simulator():
         'simulator.html',
         feedstocks=feedstocks,
         mre_presets=_mre_preset_catalog_payload(),
+        c4_operator_presets=_c4_operator_preset_payload(),
         knudsen_config=_knudsen_config_payload(),
         condensation_train_stages=_condensation_train_stage_payload(),
         debug_feedstocks=debug_feedstocks,
@@ -2447,4 +2551,7 @@ def disclosure_section(section):
     campaigns = setpoints.get('campaigns', {})
     data = campaigns.get(section, {})
     return render_template('partials/disclosure.html',
-                           section=section, data=data)
+                           section=section, data=data,
+                           c4_operator_presets=_c4_operator_preset_payload(
+                               setpoints
+                           ))

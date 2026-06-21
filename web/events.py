@@ -62,6 +62,7 @@ _MAX_SIM_SPEED_SECONDS = 3600.0
 _MAX_C4_TEMP_C = 5000.0
 _MAX_MRE_VOLTAGE_V = 100.0
 _MAX_ADDITIVE_KG = 1_000_000_000.0
+_MASS_BALANCE_ERROR_BREACH_PCT = 5e-12
 
 
 class InputValidationError(ValueError):
@@ -220,6 +221,47 @@ def _coerce_bounded_float(
     return numeric
 
 
+def _required_setpoint_float(value, *, field: str) -> float:
+    if isinstance(value, bool):
+        raise InputValidationError(f'setpoints.yaml {field} must be numeric')
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        raise InputValidationError(
+            f'setpoints.yaml {field} must be numeric'
+        ) from None
+    if not math.isfinite(numeric):
+        raise InputValidationError(f'setpoints.yaml {field} must be finite')
+    return numeric
+
+
+def _c4_setpoint_ceiling_T_C(
+    setpoints: Mapping[str, object] | None = None,
+) -> float:
+    if setpoints is None:
+        setpoints = _load_yaml('setpoints.yaml')
+    if not isinstance(setpoints, Mapping):
+        raise InputValidationError('setpoints.yaml must be a mapping')
+    campaigns = setpoints.get('campaigns')
+    if not isinstance(campaigns, Mapping):
+        raise InputValidationError('setpoints.yaml campaigns must be a mapping')
+    c4 = campaigns.get('C4')
+    if not isinstance(c4, Mapping):
+        raise InputValidationError('setpoints.yaml campaigns.C4 must be a mapping')
+    temp_range = c4.get('temp_range_C')
+    if not isinstance(temp_range, (list, tuple)) or len(temp_range) < 2:
+        raise InputValidationError(
+            'setpoints.yaml campaigns.C4.temp_range_C must contain at least two values'
+        )
+    return max(
+        _required_setpoint_float(
+            item,
+            field=f'campaigns.C4.temp_range_C[{index}]',
+        )
+        for index, item in enumerate(temp_range)
+    )
+
+
 def _coerce_additives_kg(value) -> dict[str, float]:
     if value is None:
         return {}
@@ -324,17 +366,22 @@ def _flue_composition_kg_hr(snapshot) -> dict[str, float]:
     return _rounded_positive_species(flue, 6)
 
 
-def _mass_balance_error_fields(snapshot, digits: int) -> dict[str, object]:
+def _mass_balance_error_fields(snapshot) -> dict[str, object]:
     error_pct = getattr(snapshot, 'mass_balance_error_pct', None)
     category = getattr(snapshot, 'mass_balance_error_category', None)
     if error_pct is None:
         return {
             'mass_balance_error_pct': None,
             'mass_balance_error_category': category or 'undefined',
+            'mass_balance_error_breached': bool(category),
         }
+    error_pct = float(error_pct)
     return {
-        'mass_balance_error_pct': round(error_pct, digits),
+        'mass_balance_error_pct': error_pct,
         'mass_balance_error_category': category,
+        'mass_balance_error_breached': (
+            bool(category) or abs(error_pct) > _MASS_BALANCE_ERROR_BREACH_PCT
+        ),
     }
 
 
@@ -503,7 +550,7 @@ def _tick_payload(
         'energy_kWh': round(snapshot.energy.total_kWh, 4),
         'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
         'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
-        **_mass_balance_error_fields(snapshot, 3),
+        **_mass_balance_error_fields(snapshot),
         'ramp_throttled': snapshot.ramp_throttled,
         'nominal_ramp_rate': round(snapshot.nominal_ramp_rate_C_hr, 2),
         'actual_ramp_rate': round(snapshot.actual_ramp_rate_C_hr, 2),
@@ -558,7 +605,7 @@ def _completion_payload(sim):
         'oxygen_vented_kg': sim._oxygen_vented_kg(),
         'mass_in_kg': round(final_snapshot.mass_in_kg, 3),
         'mass_out_kg': round(final_snapshot.mass_out_kg, 3),
-        **_mass_balance_error_fields(final_snapshot, 6),
+        **_mass_balance_error_fields(final_snapshot),
         'residual_inventory_kg': {
             k: round(v, 3)
             for k, v in (
@@ -840,10 +887,15 @@ def register_events(socketio):
                 minimum=0.0,
                 maximum=_MAX_SIM_SPEED_SECONDS,
             )
+            raw_c4_max_temp = data.get('c4_max_temp_C')
             c4_max_temp = _coerce_bounded_float(
-                data.get('c4_max_temp_C'),
+                raw_c4_max_temp,
                 field='c4_max_temp_C',
-                default=1670.0,
+                default=(
+                    _c4_setpoint_ceiling_T_C()
+                    if raw_c4_max_temp is None or raw_c4_max_temp == ''
+                    else None
+                ),
                 minimum=0.0,
                 maximum=_MAX_C4_TEMP_C,
                 exclusive_minimum=True,

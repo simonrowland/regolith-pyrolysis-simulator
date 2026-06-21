@@ -8,10 +8,10 @@
     <div class="campaign-control-inline">
         <label>
             Mg pyrolysis ceiling (&deg;C):
-            <input type="number" id="c4-max-temp" value="1670" min="1400" max="1900" step="10"
+            <input type="number" id="c4-max-temp" value="{{ c4_operator_presets.ceiling_T_C }}" min="1400" max="1900" step="10"
                    class="ctrl-param" data-param="c4_max_temp">
         </label>
-        <div class="config-hint">Higher &rarr; more Mg extracted, but melt freezes as refractories concentrate. Safety cap 1900&deg;C.</div>
+        <div class="config-hint">Higher &rarr; more Mg extracted, but melt freezes as refractories concentrate. Setpoint stir: {{ c4_operator_presets.stir_factor_label }}.</div>
     </div>
     {% endif %}
 
@@ -99,7 +99,11 @@
                 <label>
                     pO&#x2082; target (mbar):
                     <select class="campaign-ctrl" data-field="pO2_mbar">
+                        {% if section == 'C4' %}
+                        <option value="{{ c4_operator_presets.pO2_mbar }}" selected>Setpoint default ({{ c4_operator_presets.pO2_mbar }})</option>
+                        {% else %}
                         <option value="">Default</option>
+                        {% endif %}
                         <option value="0.001">Hard vacuum (0.001)</option>
                         <option value="0.2">Low (0.2)</option>
                         <option value="1.0">Medium (1.0)</option>
@@ -112,7 +116,11 @@
                 <label>
                     Inductive stirring:
                     <select class="campaign-ctrl" data-field="stir_factor">
+                        {% if section == 'C4' %}
+                        <option value="{{ c4_operator_presets.stir_factor_default }}" selected>Setpoint default ({{ c4_operator_presets.stir_factor_label }})</option>
+                        {% else %}
                         <option value="">Default (6&times;)</option>
+                        {% endif %}
                         <option value="8">High (8&times;)</option>
                         <option value="6">Medium (6&times;)</option>
                         <option value="4">Low (4&times;)</option>
@@ -125,6 +133,7 @@
                     Max duration (hrs, 0=default):
                     <input type="number" min="0" max="100" step="1"
                            class="campaign-ctrl" data-field="max_hours"
+                           {% if section == 'C4' %}value="{{ c4_operator_presets.max_hold_hr }}"{% endif %}
                            placeholder="default">
                 </label>
             </div>

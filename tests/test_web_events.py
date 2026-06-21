@@ -1,8 +1,12 @@
+import copy
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 import app as app_module
+from web import events as web_events
+from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
@@ -15,12 +19,56 @@ from web.events import (
     _current_simulation_state,
     _emit_if_current,
     _get_backend,
+    _MASS_BALANCE_ERROR_BREACH_PCT,
     _replace_simulation_state,
     _start_payload,
     _sim_locks,
     _simulations,
     _tick_payload,
 )
+
+
+_DELETE = object()
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _sim_with_mass_balance_snapshot(error_pct, category=None):
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 34.0,
+                },
+                "bulk_additions": {
+                    "metallic_FeNi_wt_pct": 15.0,
+                },
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    snapshot = sim._make_snapshot()
+    snapshot.mass_balance_error_pct = error_pct
+    if category is not None:
+        setattr(snapshot, "mass_balance_error_category", category)
+    return sim, snapshot
+
+
+def _set_nested(mapping, path, value):
+    target = mapping
+    for key in path[:-1]:
+        target = target[key]
+    if value is _DELETE:
+        target.pop(path[-1], None)
+    else:
+        target[path[-1]] = value
 
 
 def test_launcher_defaults_to_localhost_and_debug_off(monkeypatch):
@@ -245,7 +293,124 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
     assert "dense_alumina_continuous" in material_ids
     assert "fused_silica" not in material_ids
     for material in materials:
-        assert set(material) == {"id", "display_name", "max_service_T_C"}
+        assert set(material) == {
+            "id",
+            "display_name",
+            "max_service_T_C",
+            "service_rating_T_C",
+            "requested_ceiling_T_C",
+            "effective_applied_ceiling_T_C",
+        }
+
+    zirconia = next(
+        material
+        for material in materials
+        if material["id"] == "zirconia_ysz"
+    )
+    assert zirconia["service_rating_T_C"] == pytest.approx(2200)
+    assert zirconia["requested_ceiling_T_C"] == pytest.approx(1800)
+    assert zirconia["effective_applied_ceiling_T_C"] == pytest.approx(1800)
+
+
+def test_c4_operator_presets_render_from_server_setpoints(monkeypatch):
+    original_load_yaml = web_routes._load_yaml
+    setpoints = copy.deepcopy(original_load_yaml("setpoints.yaml"))
+    c4 = setpoints["campaigns"]["C4"]
+    c4["temp_range_C"] = [1500, 1715]
+    c4["pO2_mbar_default"] = 0.42
+    c4["p_total_mbar_default"] = 7.5
+    c4["max_hold_hr"] = 12
+    setpoints["furnace"]["induction_stirring"][
+        "rate_acceleration_factor"
+    ] = [3, 9]
+
+    def fake_load_yaml(filename):
+        if filename == "setpoints.yaml":
+            return setpoints
+        return original_load_yaml(filename)
+
+    monkeypatch.setattr(web_routes, "_load_yaml", fake_load_yaml)
+    app = app_module.create_app()
+
+    client = app.test_client()
+    response = client.get("/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'id="lever-po2-mbar"' in html
+    assert 'value="0.42"' in html
+    assert 'id="c4-max-temp"' in html
+    assert 'value="1715"' in html
+    assert "Setpoint stir: 3-9x" in html
+
+    disclosure = client.get("/partials/disclosure/C4")
+    assert disclosure.status_code == 200
+    disclosure_html = disclosure.get_data(as_text=True)
+    assert 'value="1715"' in disclosure_html
+    assert "Setpoint default (0.42)" in disclosure_html
+    assert "Setpoint default (3-9x)" in disclosure_html
+    assert 'data-field="max_hours"\n                           value="12"' in disclosure_html
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "message"),
+    [
+        (
+            ("campaigns", "C4", "temp_range_C"),
+            _DELETE,
+            "campaigns.C4.temp_range_C",
+        ),
+        (
+            ("campaigns", "C4", "pO2_mbar_default"),
+            "bad",
+            "campaigns.C4.pO2_mbar_default",
+        ),
+        (
+            ("campaigns", "C4", "max_hold_hr"),
+            _DELETE,
+            "campaigns.C4.max_hold_hr",
+        ),
+        (
+            ("furnace", "induction_stirring", "rate_acceleration_factor"),
+            ["bad", 8],
+            "furnace.induction_stirring.rate_acceleration_factor",
+        ),
+    ],
+)
+def test_c4_operator_presets_fail_loud_without_magic_defaults(
+    path,
+    value,
+    message,
+):
+    setpoints = copy.deepcopy(web_routes._load_yaml("setpoints.yaml"))
+    _set_nested(setpoints, path, value)
+
+    with pytest.raises(ValueError, match=message):
+        web_routes._c4_operator_preset_payload(setpoints)
+
+
+def test_furnace_material_dropdown_hydrates_honest_labels_at_source():
+    controls = (
+        _REPO_ROOT / "web/static/js/simulator-controls.js"
+    ).read_text()
+    ticks = (_REPO_ROOT / "web/static/js/simulator-ticks.js").read_text()
+
+    assert "furnaceMaterialOptionText(material)" in controls
+    assert "service ${service} C; applied ${applied} C" in controls
+    assert "effective_applied_ceiling_T_C" in controls
+    assert "`${material.display_name} (${material.max_service_T_C} C)`" not in controls
+    assert "hydrateHonestFurnaceMaterialLabels" not in ticks
+    assert "MutationObserver" not in ticks
+    assert ".catch(() => {})" not in ticks
+
+
+def test_c4_start_payload_uses_rendered_setpoint_not_literal_1670():
+    controls = (
+        _REPO_ROOT / "web/static/js/simulator-controls.js"
+    ).read_text()
+
+    assert "c4_max_temp_C: selectedC4MaxTempC()" in controls
+    assert "|| 1670" not in controls
 
 
 @pytest.mark.parametrize(
@@ -314,6 +479,70 @@ def test_web_start_event_resolves_furnace_material_cap(
             state["session"].simulator.campaign_mgr.furnace_max_T_C
             == pytest.approx(expected_cap)
         )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
+    original_load_yaml = web_events._load_yaml
+    setpoints = copy.deepcopy(original_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C4"]["temp_range_C"] = [1500, 1715]
+    captured_tasks = []
+
+    def fake_load_yaml(filename):
+        if filename == "setpoints.yaml":
+            return copy.deepcopy(setpoints)
+        return original_load_yaml(filename)
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr(web_events, "_load_yaml", fake_load_yaml)
+    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+    payload = {
+        "backend": "stub",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+
+    try:
+        client.emit("start_simulation", payload)
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses
+        assert statuses[-1]["status"] == "started"
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        sim = state["session"].simulator
+        assert sim.c4_max_temp_C == pytest.approx(1715)
+        assert sim.campaign_mgr.c4_max_temp_C == pytest.approx(1715)
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -737,6 +966,108 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert "residual_inventory_kg" in payload
 
 
+def test_web_payloads_preserve_full_precision_mass_balance_error(
+    monkeypatch,
+):
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "s_type": {
+                "label": "S type",
+                "composition_wt_pct": {
+                    "SiO2": 51.5,
+                    "FeO": 13.0,
+                    "MgO": 34.0,
+                },
+                "bulk_additions": {
+                    "metallic_FeNi_wt_pct": 15.0,
+                },
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("s_type")
+    snapshot = sim._make_snapshot()
+    snapshot.mass_balance_error_pct = 6.25e-12
+    monkeypatch.setattr(sim, "_make_snapshot", lambda: snapshot)
+
+    tick_payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="stub",
+        backend_authoritative=False,
+    )
+    completion_payload = _completion_payload(sim)
+
+    assert tick_payload["mass_balance_error_pct"] == pytest.approx(6.25e-12)
+    assert tick_payload["mass_balance_error_breached"] is True
+    assert completion_payload["mass_balance_error_pct"] == pytest.approx(6.25e-12)
+    assert completion_payload["mass_balance_error_breached"] is True
+
+
+def test_web_mass_balance_threshold_matches_kernel_abort_invariant():
+    from simulator.optimize.evaluate import MASS_BALANCE_ABORT_PCT
+
+    runner_source = (_REPO_ROOT / "simulator/runner.py").read_text()
+    state_source = (_REPO_ROOT / "simulator/state.py").read_text()
+
+    assert _MASS_BALANCE_ERROR_BREACH_PCT == pytest.approx(
+        MASS_BALANCE_ABORT_PCT
+    )
+    assert MASS_BALANCE_ABORT_PCT == pytest.approx(5e-12)
+    assert "<= 5e-12" in runner_source
+    assert "≤5e-12" in state_source
+
+
+@pytest.mark.parametrize(
+    ("error_pct", "expected_breached"),
+    [
+        (4.99e-12, False),
+        (5.01e-12, True),
+    ],
+)
+def test_web_mass_balance_breach_numeric_boundary(
+    error_pct,
+    expected_breached,
+):
+    sim, snapshot = _sim_with_mass_balance_snapshot(error_pct)
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="stub",
+        backend_authoritative=False,
+    )
+
+    assert payload["mass_balance_error_pct"] == pytest.approx(error_pct)
+    assert payload["mass_balance_error_category"] is None
+    assert payload["mass_balance_error_breached"] is expected_breached
+
+
+def test_web_mass_balance_category_breaches_with_small_numeric_error():
+    sim, snapshot = _sim_with_mass_balance_snapshot(
+        4.99e-12,
+        category="zero_input_basis_breach",
+    )
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="stub",
+        backend_authoritative=False,
+    )
+
+    assert payload["mass_balance_error_pct"] == pytest.approx(4.99e-12)
+    assert payload["mass_balance_error_category"] == "zero_input_basis_breach"
+    assert payload["mass_balance_error_breached"] is True
+
+
 def test_completion_payload_exposes_mass_balance_category_when_pct_none(
     monkeypatch,
 ):
@@ -774,6 +1105,7 @@ def test_completion_payload_exposes_mass_balance_category_when_pct_none(
 
     assert payload["mass_balance_error_pct"] is None
     assert payload["mass_balance_error_category"] == "zero_input_basis_breach"
+    assert payload["mass_balance_error_breached"] is True
 
 
 def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):

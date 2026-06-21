@@ -155,9 +155,13 @@ socket.on('simulation_tick', (data) => {
     const massBalancePct = data.mass_balance_error_pct;
     const massBalanceCategory = data.mass_balance_error_category || 'undefined';
     const massBalanceText = Number.isFinite(massBalancePct)
-        ? massBalancePct.toFixed(3) + '%'
+        ? String(massBalancePct) + '%'
         : massBalanceCategory;
-    setEl('mass-error', massBalanceText);
+    const massBalanceEl = document.getElementById('mass-error');
+    if (massBalanceEl) {
+        massBalanceEl.textContent = massBalanceText;
+        massBalanceEl.dataset.breached = data.mass_balance_error_breached ? 'true' : 'false';
+    }
     updateDebugInventoryComment(data);
 
     // --- O₂ Budget chart ---
@@ -394,6 +398,7 @@ function updateDebugInventoryComment(data) {
             melt_mass_kg: data.melt_mass_kg,
             mass_balance_error_pct: data.mass_balance_error_pct,
             mass_balance_error_category: data.mass_balance_error_category || null,
+            mass_balance_error_breached: Boolean(data.mass_balance_error_breached),
         },
         process_inventory_kg: {
             cleaned_melt_oxide_projection: data.composition_wt_pct || {},

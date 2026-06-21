@@ -104,7 +104,7 @@
             <label>
                 pO2 (mbar):
                 <input type="number" id="lever-po2-mbar" class="recipe-lever"
-                       data-param="pO2_mbar" data-field="pO2_mbar" min="0" step="0.001" value="0.2">
+                       data-param="pO2_mbar" data-field="pO2_mbar" min="0" step="0.001" value="{{ c4_operator_presets.pO2_mbar }}">
             </label>
             <label>
                 Total overhead / pN2 sweep (mbar):
@@ -124,7 +124,7 @@
             <label>
                 Stage duration (h):
                 <input type="number" id="lever-stage-duration" class="recipe-lever"
-                       data-field="max_hours" min="0" step="0.5" value="24">
+                       data-field="max_hours" min="0" step="0.5" value="{{ c4_operator_presets.max_hold_hr }}">
             </label>
             <label>
                 Ramp (&deg;C/h):
@@ -133,8 +133,9 @@
             </label>
             <label>
                 C4 furnace cap (&deg;C):
-                <input type="number" id="c4-max-temp" min="1000" step="10" value="1670">
+                <input type="number" id="c4-max-temp" min="1000" step="10" value="{{ c4_operator_presets.ceiling_T_C }}">
             </label>
+            <div class="config-hint">Setpoint stir: {{ c4_operator_presets.stir_factor_label }}</div>
             <label>
                 Furnace material:
                 <select id="furnace-material"

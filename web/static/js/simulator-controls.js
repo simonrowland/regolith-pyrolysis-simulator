@@ -61,10 +61,34 @@ function hydrateMrePresetCatalog() {
         .catch(() => updateMreFields());
 }
 
+function formatFurnaceTemperature(value) {
+    const numberValue = Number(value);
+    if (!Number.isFinite(numberValue)) return 'n/a';
+    return Number.isInteger(numberValue)
+        ? String(numberValue)
+        : String(numberValue);
+}
+
+function furnaceMaterialOptionText(material) {
+    const name = material.display_name || material.id || 'material';
+    const service = formatFurnaceTemperature(
+        material.service_rating_T_C ?? material.max_service_T_C
+    );
+    const applied = formatFurnaceTemperature(
+        material.effective_applied_ceiling_T_C
+    );
+    return `${name} (service ${service} C; applied ${applied} C)`;
+}
+
 function optionForFurnaceMaterial(material) {
     const option = document.createElement('option');
     option.value = material.id;
-    option.textContent = `${material.display_name} (${material.max_service_T_C} C)`;
+    option.textContent = furnaceMaterialOptionText(material);
+    option.title = `Service rating: ${formatFurnaceTemperature(material.service_rating_T_C)} C; effective applied ceiling: ${formatFurnaceTemperature(material.effective_applied_ceiling_T_C)} C`;
+    option.dataset.serviceRatingTC = String(material.service_rating_T_C ?? '');
+    option.dataset.effectiveAppliedCeilingTC = String(
+        material.effective_applied_ceiling_T_C ?? ''
+    );
     return option;
 }
 
@@ -103,6 +127,16 @@ function selectedMrePayload() {
 
 function selectedFurnaceMaterialId() {
     return (document.getElementById('furnace-material')?.value || '').trim();
+}
+
+function selectedC4MaxTempC() {
+    const input = document.getElementById('c4-max-temp');
+    const selected = parseFloat(input?.value);
+    if (Number.isFinite(selected)) return selected;
+    const renderedDefault = parseFloat(
+        input?.defaultValue || input?.getAttribute('value') || ''
+    );
+    return Number.isFinite(renderedDefault) ? renderedDefault : undefined;
 }
 
 function selectedLeverCampaign() {
@@ -227,7 +261,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
         backend: document.getElementById('engine-select').value,
         track: track,
         speed: speedMs / 1000.0,  // Convert ms to seconds for backend
-        c4_max_temp_C: parseFloat(document.getElementById('c4-max-temp')?.value) || 1670,
+        c4_max_temp_C: selectedC4MaxTempC(),
         c5_enabled: mrePayload.c5_enabled,
         mre_target_species: mrePayload.mre_target_species,
         mre_max_voltage_V: mrePayload.mre_max_voltage_V,

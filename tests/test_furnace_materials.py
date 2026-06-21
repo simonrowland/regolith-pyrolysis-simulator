@@ -83,6 +83,16 @@ def test_resolver_clamps_requested_cap_to_material_max():
     assert resolve_furnace_max_T_C("zirconia_ysz", 1800) == 1800
 
 
+def test_resolver_distinguishes_service_rating_from_applied_ceiling():
+    from simulator.furnace_materials import resolve_furnace_temperature_caps
+
+    caps = resolve_furnace_temperature_caps("zirconia_ysz", 1800)
+
+    assert caps["service_rating_T_C"] == pytest.approx(2200)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(1800)
+    assert caps["requested_ceiling_T_C"] == pytest.approx(1800)
+
+
 def test_resolver_defaults_to_material_max_when_no_request():
     assert resolve_furnace_max_T_C("dense_alumina_continuous") == 1700
 

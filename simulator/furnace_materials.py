@@ -37,6 +37,19 @@ def resolve_furnace_max_T_C(
     *,
     catalog: Mapping[str, Any] | None = None,
 ) -> float:
+    return resolve_furnace_temperature_caps(
+        material_id,
+        requested_cap,
+        catalog=catalog,
+    )["effective_applied_ceiling_T_C"]
+
+
+def resolve_furnace_temperature_caps(
+    material_id: str,
+    requested_cap: float | int | None = None,
+    *,
+    catalog: Mapping[str, Any] | None = None,
+) -> dict[str, float]:
     materials = _catalog_items(catalog or load_furnace_materials())
     material = materials.get(str(material_id))
     if not isinstance(material, Mapping):
@@ -49,9 +62,17 @@ def resolve_furnace_max_T_C(
         material.get("max_service_T_C"),
         f"{material_id}.max_service_T_C",
     )
+    requested_ceiling = material_max
     if requested_cap is None:
-        return material_max
-    return min(_finite_float(requested_cap, "requested_cap"), material_max)
+        effective_ceiling = material_max
+    else:
+        requested_ceiling = _finite_float(requested_cap, "requested_cap")
+        effective_ceiling = min(requested_ceiling, material_max)
+    return {
+        "service_rating_T_C": material_max,
+        "requested_ceiling_T_C": requested_ceiling,
+        "effective_applied_ceiling_T_C": effective_ceiling,
+    }
 
 
 def _catalog_items(catalog: Mapping[str, Any]) -> Mapping[str, Any]:
