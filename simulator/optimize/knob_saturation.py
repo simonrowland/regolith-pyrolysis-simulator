@@ -6,7 +6,15 @@ import math
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
-from simulator.optimize.recipe import KeyPath, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    KeyPath,
+    RecipePatch,
+    RecipeSchema,
+    _default_setpoint_value,
+)
 
 
 SCHEMA_VERSION = "knob-saturation-v1"
@@ -21,7 +29,7 @@ def compute_knob_saturation(
     active_objective_metrics: Iterable[str],
     tolerance_fraction: float = 0.01,
 ) -> Mapping[str, Any]:
-    """Report patched numeric knobs pinned at or near their schema bounds."""
+    """Report numeric knobs pinned at or near their schema bounds."""
 
     active_metrics = frozenset(str(metric) for metric in active_objective_metrics)
     rows: list[dict[str, Any]] = []
@@ -40,8 +48,17 @@ def compute_knob_saturation(
                 units=spec.units,
                 active_metrics=active_metrics,
                 tolerance_fraction=tolerance_fraction,
+                source="patched",
             )
             rows.append(row)
+    if not patch.values:
+        rows.extend(
+            _default_bound_rows(
+                schema,
+                active_metrics=active_metrics,
+                tolerance_fraction=tolerance_fraction,
+            )
+        )
 
     pinned_count = sum(1 for row in rows if row["pinned"] != "none")
     no_cost_pinned_count = sum(
@@ -57,6 +74,49 @@ def compute_knob_saturation(
         "red_flag": no_cost_pinned_count > 0,
         "knobs": rows,
     }
+
+
+def _default_bound_rows(
+    schema: RecipeSchema,
+    *,
+    active_metrics: frozenset[str],
+    tolerance_fraction: float,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for spec in sorted(schema.search_allowlist, key=lambda item: item.path):
+        if spec.kind == "categorical":
+            continue
+        default_value = _effective_default_value(spec.path)
+        if default_value is _MISSING_DEFAULT:
+            continue
+        for key, value in _value_rows(spec.path, default_value):
+            row = _knob_row(
+                key,
+                value,
+                path=spec.path,
+                kind=spec.kind,
+                low=spec.low,
+                high=spec.high,
+                units=spec.units,
+                active_metrics=active_metrics,
+                tolerance_fraction=tolerance_fraction,
+                source="default",
+            )
+            if row["pinned"] != "none":
+                rows.append(row)
+    return rows
+
+
+_MISSING_DEFAULT = object()
+
+
+def _effective_default_value(path: KeyPath) -> Any:
+    if path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
+        return 0.0
+    try:
+        return _default_setpoint_value(path)
+    except Exception:
+        return _MISSING_DEFAULT
 
 
 def _value_rows(path: KeyPath, value: Any) -> tuple[tuple[str, Any], ...]:
@@ -77,11 +137,13 @@ def _knob_row(
     units: str,
     active_metrics: frozenset[str],
     tolerance_fraction: float,
+    source: str,
 ) -> dict[str, Any]:
     cost_metrics = _opposing_cost_metrics(path, active_metrics)
+    applied_value = _applied_trace_value(path, value)
     row: dict[str, Any] = {
         "key": key,
-        "value": value,
+        "value": applied_value,
         "low": low,
         "high": high,
         "pinned": "none",
@@ -90,7 +152,11 @@ def _knob_row(
         "units": units,
         "has_opposing_cost": bool(cost_metrics),
         "opposing_cost_metrics": list(cost_metrics),
+        "source": source,
     }
+    if not _same_trace_value(value, applied_value):
+        row["requested_value"] = value
+        row["applied_value"] = applied_value
 
     if low is None or high is None:
         row["reason"] = "missing_bounds"
@@ -101,7 +167,11 @@ def _knob_row(
         row["reason"] = "degenerate_range"
         return row
 
-    numeric_value = float(value)
+    try:
+        numeric_value = float(applied_value)
+    except (TypeError, ValueError):
+        row["reason"] = "nonfinite_value"
+        return row
     if not math.isfinite(numeric_value):
         row["reason"] = "nonfinite_value"
         return row
@@ -115,6 +185,32 @@ def _knob_row(
     elif numeric_value >= high_f - tolerance:
         row["pinned"] = "high"
     return row
+
+
+def _applied_trace_value(path: KeyPath, value: Any) -> Any:
+    if path != C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH:
+        return value
+    try:
+        fraction = float(value or 0.0)
+    except (TypeError, ValueError):
+        return value
+    if not math.isfinite(fraction) or fraction < 0.0:
+        return value
+    if fraction <= 0.0:
+        return 0.0
+    return max(fraction, C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+
+
+def _same_trace_value(left: Any, right: Any) -> bool:
+    try:
+        return math.isclose(
+            float(left),
+            float(right),
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+    except (TypeError, ValueError):
+        return left == right
 
 
 def _opposing_cost_metrics(
