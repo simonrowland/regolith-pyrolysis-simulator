@@ -91,12 +91,12 @@ conflate gaseous SiO2 with melt SiO2 and break the atom-explicit
 from __future__ import annotations
 
 import importlib
-from functools import lru_cache
 import math
 import re
 import warnings
 from typing import Any, Dict, List, Mapping, Optional
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -128,9 +128,9 @@ _GAS_NAMESPACE_SUFFIX = '_gas'
 # volatiles.
 _OXIDE_COLLIDING_GAS_SPECIES = frozenset(OXIDE_SPECIES)
 
-# VapoRock consumes the same oxide basis as MELTS / alphaMELTS.  The
-# 14-oxide simulator basis is a strict subset; project 1:1 by name and
-# drop any oxide VapoRock does not declare.
+# VapoRock consumes the same oxide basis as MELTS / alphaMELTS plus volatile
+# melt components that upstream declares (H2O/CO2). Project 1:1 by name and
+# drop components VapoRock does not declare.
 #
 # Verified 2026-05-15 against the installed VapoRock package: oxide
 # spellings in ``vaporock/chemistry.py::OXIDE_MOLWT`` match
@@ -149,6 +149,7 @@ _IMPORT_CANDIDATES = (
     'vaporock',
     'VapoRock',
 )
+_VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 
 
 def _dropped_account_species(
@@ -261,7 +262,9 @@ def _projection_diagnostics(
     return diagnostics
 
 
-@lru_cache(maxsize=1)
+_VAPOROCK_RUNTIME_AVAILABLE_CACHE: bool | None = None
+
+
 def vaporock_runtime_available() -> bool:
     """Return the same adapter availability signal runtime fallback uses.
 
@@ -270,6 +273,9 @@ def vaporock_runtime_available() -> bool:
     probe, while live VapoRock runs initialise the adapter during execution
     anyway, so the probe adds no net cost on the VapoRock path.
     """
+    global _VAPOROCK_RUNTIME_AVAILABLE_CACHE
+    if _VAPOROCK_RUNTIME_AVAILABLE_CACHE is True:
+        return True
     backend = VapoRockBackend()
     try:
         with warnings.catch_warnings():
@@ -279,7 +285,20 @@ def vaporock_runtime_available() -> bool:
         return False
     if not initialized:
         return False
-    return backend.is_available()
+    available = backend.is_available()
+    if available:
+        _VAPOROCK_RUNTIME_AVAILABLE_CACHE = True
+    return available
+
+
+def _clear_vaporock_runtime_available_cache() -> None:
+    global _VAPOROCK_RUNTIME_AVAILABLE_CACHE
+    _VAPOROCK_RUNTIME_AVAILABLE_CACHE = None
+
+
+vaporock_runtime_available.cache_clear = (  # type: ignore[attr-defined]
+    _clear_vaporock_runtime_available_cache
+)
 
 
 class VapoRockBackend(MeltBackend):
@@ -466,8 +485,7 @@ class VapoRockBackend(MeltBackend):
         ``process.cleaned_melt`` account is consumed — gas, metal, salt,
         sulfide and halide accounts are filtered out before the library
         is called (binding spec §7).  The melt composition is then
-        projected to oxide wt% in the 14-oxide simulator basis (a strict
-        subset of the MELTS basis VapoRock expects).
+            projected to VapoRock's MELTS-compatible oxide/volatile wt% basis.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -510,7 +528,7 @@ class VapoRockBackend(MeltBackend):
         projection = project_melt_to_oxide_projection(
             composition_kg=composition_kg,
             composition_mol=composition_mol,
-            oxide_basis=tuple(OXIDE_SPECIES),
+            oxide_basis=_VAPOROCK_MELT_BASIS,
             species_formula_registry=species_formula_registry,
         )
         comp_wt = projection.oxide_wt_pct
@@ -520,11 +538,33 @@ class VapoRockBackend(MeltBackend):
             projection=projection,
             composition_kg=composition_kg,
             composition_mol=composition_mol,
-            oxide_basis=tuple(OXIDE_SPECIES),
+            oxide_basis=_VAPOROCK_MELT_BASIS,
             species_formula_registry=species_formula_registry,
             dropped_accounts=dropped_accounts,
             dropped_account_species=dropped_account_species,
         )
+        if (
+            projection.dropped_mass_kg_by_species
+            or dropped_accounts
+            or dropped_account_species
+        ):
+            diagnostics = dict(projection_diagnostics)
+            diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.FORBIDDEN_SPECIES.value
+            )
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                liquid_fraction=None,
+                phase_assemblage_available=False,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    'VapoRock refused projected/dropped non-basis melt input',
+                ],
+                diagnostics=diagnostics,
+            )
         if not comp_wt:
             # No oxide species in VapoRock's basis after the account
             # split; the vapor-melt solver has nothing valid to consume.

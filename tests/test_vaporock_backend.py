@@ -8,6 +8,7 @@ import yaml
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import PyrolysisSimulator
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     StubBackend,
@@ -113,6 +114,33 @@ def test_runtime_probe_uses_backend_initialize_without_equilibrating(monkeypatch
     assert equilibrate_calls == []
 
 
+def test_runtime_probe_does_not_cache_negative_availability(monkeypatch):
+    init_results = [False, True]
+    init_calls = []
+
+    def fake_initialize(self, config):
+        init_calls.append(dict(config))
+        available = init_results.pop(0)
+        self._available = available
+        return available
+
+    monkeypatch.setattr(
+        vaporock_module.VapoRockBackend,
+        "initialize",
+        fake_initialize,
+    )
+
+    vaporock_module.vaporock_runtime_available.cache_clear()
+    try:
+        assert vaporock_module.vaporock_runtime_available() is False
+        assert vaporock_module.vaporock_runtime_available() is True
+        assert vaporock_module.vaporock_runtime_available() is True
+    finally:
+        vaporock_module.vaporock_runtime_available.cache_clear()
+
+    assert init_calls == [{}, {}]
+
+
 def test_unavailable_equilibrate_returns_empty_result_with_warning():
     backend = VapoRockBackend()
 
@@ -149,7 +177,10 @@ def test_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     )
 
     assert result.status == "out_of_domain"
-    assert any("empty melt composition" in w for w in result.warnings)
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
+    assert any("refused projected/dropped non-basis" in w for w in result.warnings)
     assert any("dropped_non_basis_melt_mass" in w for w in result.warnings)
     assert result.diagnostics["dropped_non_basis_melt_mass_kg"] > 0.0
 
@@ -206,13 +237,7 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert backend.initialize({}) is True
     result = backend.equilibrate(
         1550.0,
-        composition_mol={
-            "SiO2": 1.0,
-            "Na2O": 0.25,
-            "Fe": 10.0,
-            "FeS": 2.0,
-            "NaCl": 3.0,
-        },
+        composition_mol={"SiO2": 1.0, "Na2O": 0.25},
         fO2_log=-8.25,
         pressure_bar=2e-6,
     )
@@ -229,6 +254,41 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert result.status == "ok"
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
+    assert "input_composition_projection" not in result.diagnostics
+
+
+def test_vaporock_non_basis_projection_is_out_of_domain(monkeypatch):
+    seen = {}
+
+    def calc_vapor_pressures(**kwargs):
+        seen.update(kwargs)
+        return {"Na": 1e-4, "SiO": 1e-6}
+
+    fake_module = types.SimpleNamespace(
+        calc_vapor_pressures=calc_vapor_pressures
+    )
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({}) is True
+    result = backend.equilibrate(
+        1550.0,
+        composition_mol={
+            "SiO2": 1.0,
+            "Na2O": 0.25,
+            "Fe": 10.0,
+            "FeS": 2.0,
+            "NaCl": 3.0,
+        },
+        fO2_log=-8.25,
+        pressure_bar=2e-6,
+    )
+
+    assert seen == {}
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
     projection = result.diagnostics["input_composition_projection"]
     assert projection["status"] == "projected"
     assert projection["reason"] == "input_composition_projected"

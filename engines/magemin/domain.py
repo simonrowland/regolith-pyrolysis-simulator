@@ -182,11 +182,11 @@ class MAGEMinDomainGate:
             normalized.get(species, 0.0)
             for species in _MELTS_OXIDE_BASIS
         )
-        if major_total < _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
+        if major_total <= _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
             warnings.append(
                 f'MAGEMinDomainGate: major-oxide total = {major_total:.2f} '
-                f'wt% below {_MAJOR_OXIDE_MIN_TOTAL_WT_PCT} wt%; '
+                f'wt% <= {_MAJOR_OXIDE_MIN_TOTAL_WT_PCT} wt%; '
                 'composition is dominated by non-oxide species.'
             )
 

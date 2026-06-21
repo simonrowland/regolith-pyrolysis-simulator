@@ -250,6 +250,44 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_round_trip_preserves_backend_status_reason_from_run_reference(tmp_path) -> None:
+    spec = _base_spec(backend_name="alphamelts")
+    non_jsonable_trace = {
+        "backend_status": "out_of_domain",
+        "per_hour": [object()],
+    }
+    scored = ScoredResult(
+        candidate_id="candidate-ood",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=False,
+        failure_category=FailureCategory.OUT_OF_DOMAIN,
+        feasibility_margins={"backend_domain": _margin("backend_domain", feasible=False)},
+        failing_gates=("backend_domain",),
+        run_reference=RunReference(
+            status="ok",
+            trace=non_jsonable_trace,
+            backend_status="out_of_domain",
+            backend_status_reason="forbidden_species",
+        ),
+        notes=("backend_status_reason=forbidden_species",),
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-06-20T00:00:00Z")
+
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.backend_status == "out_of_domain"
+    assert loaded.run_reference.backend_status_reason == "forbidden_species"
+    assert loaded.run_reference.trace["backend_status_reason"] == "forbidden_species"
+
+
 def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
     spec = _base_spec()
     store = ResultStore(

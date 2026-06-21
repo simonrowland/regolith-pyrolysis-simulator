@@ -7,6 +7,7 @@ import sqlite3
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -285,6 +286,11 @@ def _run_capped_c2a_with_equilibrium_counter(
         return original_equilibrate(*args, **kwargs)
 
     sim.backend.equilibrate = counted_equilibrate
+    sim.backend.find_liquidus_solidus = lambda **_kwargs: SimpleNamespace(
+        status="ok",
+        solidus_T_C=1000.0,
+        liquidus_T_C=1300.0,
+    )
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     snapshots = []
     for _ in range(max_hours):

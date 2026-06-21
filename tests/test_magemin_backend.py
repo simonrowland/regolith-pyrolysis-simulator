@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import sys
 import tempfile
 import types
 import warnings
@@ -20,6 +21,9 @@ from pathlib import Path
 
 import pytest
 
+from engines.alphamelts.domain import AlphaMELTSDomainGate
+from engines.domain_reason import OutOfDomainReason
+from engines.magemin.domain import MAGEMinDomainGate
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.melt_backend.magemin import MAGEMinBackend
@@ -69,6 +73,69 @@ def _make_absent_magemin(monkeypatch):
         "_import_magemin_bridge",
         lambda self, *, requested: (None, None),
     )
+
+
+def _assert_magemin_bulk_drop_projected(
+    result,
+    expected_components,
+    *,
+    min_dropped_wt_pct,
+    exact_components=False,
+):
+    projection = result.diagnostics["input_composition_projection"]
+    dropped = set(projection["dropped_bulk_components"])
+    expected = set(expected_components)
+
+    assert projection["status"] == "projected"
+    assert projection["magemin_database"] == "ig"
+    if exact_components:
+        assert dropped == expected
+    else:
+        assert expected <= dropped
+    assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
+    assert "dropped_species" not in projection
+    assert "backend_status_reason" not in result.diagnostics
+
+    warning_text = " ".join(result.warnings)
+    assert "dropped components outside documented bulk order" in warning_text
+    for component in expected_components:
+        assert component in warning_text
+
+
+
+def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch):
+    _disable_configured_magemin_path(monkeypatch)
+    fake_module = types.SimpleNamespace(minimize=lambda **kwargs: {})
+    monkeypatch.setitem(sys.modules, 'pymagemin', fake_module)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda explicit: Path('/fake/MAGEMin')),
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        assert backend.initialize({}) is True
+
+    assert backend._bridge == 'subprocess'
+    assert backend._magemin_module is None
+
+
+def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
+    boundary = {'SiO2': 50.0, 'MgO': 45.0}
+
+    alpha_valid, _alpha_warnings, alpha_reason = (
+        AlphaMELTSDomainGate.validate_with_reason(boundary)
+    )
+    magemin_valid, _magemin_warnings, magemin_reason = (
+        MAGEMinDomainGate.validate_with_reason(boundary)
+    )
+
+    assert alpha_valid is False
+    assert magemin_valid is False
+    assert alpha_reason == OutOfDomainReason.MAJOR_SUM.value
+    assert magemin_reason == OutOfDomainReason.MAJOR_SUM.value
 
 
 def test_magemin_as_active_backend_fails_closed_with_clear_message(monkeypatch):
@@ -140,6 +207,47 @@ def test_magemin_equilibrate_never_emits_ledger_transition(monkeypatch):
     # is unsafe to route through _get_equilibrium as the active backend.
     assert result.phase_masses_kg
     assert backend.ledger_account_policies() == ()
+
+
+def test_magemin_explicit_pymagemin_runtime_failure_retries_subprocess(monkeypatch):
+    def minimize(**kwargs):
+        raise RuntimeError("pymagemin minimizer crashed")
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"python_bridge": "pymagemin"}) is True
+    assert backend._bridge == "pymagemin"
+
+    fallback_calls = []
+
+    def fake_subprocess(**kwargs):
+        fallback_calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    monkeypatch.setattr(
+        backend,
+        "_call_magemin_subprocess",
+        fake_subprocess,
+    )
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert fallback_calls
+    assert result.status == "ok"
+    assert result.phase_masses_kg == {"liq": 1.0}
+    assert any(
+        "pymagemin bridge failed; retried subprocess" in warning
+        for warning in result.warnings
+    )
 
 
 def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
@@ -245,8 +353,9 @@ def test_magemin_absent_equilibrate_returns_empty_result_with_warning(
 
 def test_magemin_fake_bridge_receives_oxide_wt_pct_basis(monkeypatch):
     # The fake bridge captures what the adapter handed it: the input must
-    # be projected onto the 14-oxide MELTS wt% basis, normalized to 100,
-    # with non-oxide species dropped.
+    # be projected onto the MAGEMin database wt% basis and normalized to 100.
+    # Non-basis species are a fail-closed out_of_domain path covered below;
+    # this bridge-boundary test stays on in-domain oxides.
     captured = {}
 
     def minimize(**kwargs):
@@ -261,8 +370,7 @@ def test_magemin_fake_bridge_receives_oxide_wt_pct_basis(monkeypatch):
         warnings.simplefilter("ignore", UserWarning)
         backend.initialize({})
 
-    # Mol-native input including a non-oxide species (native Fe metal)
-    # that the oxide projection must drop.
+    # Mol-native in-domain oxide input.
     result = backend.equilibrate(
         1400.0,
         composition_mol={
@@ -270,29 +378,22 @@ def test_magemin_fake_bridge_receives_oxide_wt_pct_basis(monkeypatch):
             "Al2O3": 1.0,
             "MgO": 2.0,
             "CaO": 1.5,
-            "Fe": 3.0,  # native metal -- not in the oxide basis
         },
         fO2_log=-8.0,
         pressure_bar=5000.0,
     )
 
+    assert result.status == "ok"
     comp = captured["composition"]
-    # Non-oxide native Fe must not have reached the library.
-    assert "Fe" not in comp
     assert set(comp).issubset(
         {
-            "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MgO", "CaO",
-            "Na2O", "K2O", "Cr2O3", "MnO", "P2O5", "NiO", "CoO",
+            "SiO2", "Al2O3", "CaO", "MgO", "FeOt", "K2O", "Na2O",
+            "TiO2", "O", "Cr2O3", "H2O",
         }
     )
     assert "SiO2" in comp and comp["SiO2"] > 0.0
-    # Oxide wt% basis is normalized to 100.
+    # MAGEMin database wt% basis is normalized to 100.
     assert sum(comp.values()) == pytest.approx(100.0, rel=1e-6)
-    projection = result.diagnostics["input_composition_projection"]
-    assert projection["status"] == "projected"
-    assert projection["reason"] == "input_composition_projected"
-    assert projection["dropped_species"] == ["Fe"]
-    assert projection["renormalization_delta"] > 0.0
 
 
 def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
@@ -329,11 +430,11 @@ def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
     assert captured["T_K"] == pytest.approx(1450.0 + 273.15)
 
 
-def test_magemin_ok_result_records_bulk_projection_drop(monkeypatch):
-    captured = {}
+def test_magemin_bulk_projection_drop_warns_projects_and_runs(monkeypatch):
+    calls = []
 
     def minimize(**kwargs):
-        captured.update(kwargs)
+        calls.append(kwargs)
         return {"phases": {"liq": {"mass_kg": 1.0}}}
 
     fake_module = types.SimpleNamespace(minimize=minimize)
@@ -352,13 +453,16 @@ def test_magemin_ok_result_records_bulk_projection_drop(monkeypatch):
     )
 
     assert result.status == "ok"
-    assert "MnO" not in captured["composition"]
-    projection = result.diagnostics["input_composition_projection"]
-    assert projection["status"] == "projected"
-    assert projection["dropped_bulk_components"] == ["MnO"]
-    assert projection["magemin_database"] == "ig"
-    assert projection["bulk_dropped_wt_pct"] > 0.0
-    assert "dropped_species" not in projection
+    assert len(calls) == 1
+    assert "MnO" not in calls[0]["composition"]
+    assert calls[0]["composition"]["SiO2"] > 0.0
+    assert result.phases_present
+    _assert_magemin_bulk_drop_projected(
+        result,
+        ("MnO",),
+        min_dropped_wt_pct=0.9,
+        exact_components=True,
+    )
 
 
 def test_magemin_pressure_conversion_helpers_are_exact():
@@ -648,9 +752,11 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
         pressure_bar=1000.0,
     )
 
-    comp = captured["composition"]
-    assert "Fe" not in comp and "FeS" not in comp and "NaCl" not in comp
-    assert "SiO2" in comp
+    assert captured == {}
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
     dropped_warnings = " ".join(result.warnings)
     assert "process.metal_alloy" in dropped_warnings
     assert "process.sulfide_matte" in dropped_warnings
@@ -731,7 +837,13 @@ def test_magemin_live_smoke_runs_real_binary():
     )
 
     # No library-boundary error.
+    assert result.status == "ok", result.warnings
     assert not any("failed" in w for w in result.warnings), result.warnings
+    _assert_magemin_bulk_drop_projected(
+        result,
+        ("MnO", "P2O5"),
+        min_dropped_wt_pct=0.5,
+    )
     # MAGEMin reports a phase assemblage including a silicate liquid.
     assert result.phases_present
     assert any(
@@ -809,20 +921,22 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
     if not available:
         pytest.skip("MAGEMin binary present but backend failed to initialize")
 
+    lunar_mare_low_ti_wt_pct = {
+        "SiO2": 44.5,
+        "TiO2": 1.5,
+        "Al2O3": 13.5,
+        "FeO": 16.5,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 0.4,
+        "K2O": 0.10,
+        "Cr2O3": 0.35,
+        "MnO": 0.20,
+        "P2O5": 0.10,
+    }
+
     result = backend.find_liquidus_solidus(
-        composition_kg={
-            "SiO2": 44.5,
-            "TiO2": 1.5,
-            "Al2O3": 13.5,
-            "FeO": 16.5,
-            "MgO": 9.0,
-            "CaO": 11.0,
-            "Na2O": 0.4,
-            "K2O": 0.10,
-            "Cr2O3": 0.35,
-            "MnO": 0.20,
-            "P2O5": 0.10,
-        },
+        composition_kg=lunar_mare_low_ti_wt_pct,
         fO2_log=-9.0,
         pressure_bar=1.0,
         min_T_C=800.0,
@@ -835,6 +949,22 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
     assert 900.0 <= result.solidus_T_C <= 1100.0
     assert 1200.0 <= result.liquidus_T_C <= 1450.0
     assert result.liquidus_T_C >= result.solidus_T_C
+
+    phase_result = backend.equilibrate(
+        1300.0,
+        composition_kg=lunar_mare_low_ti_wt_pct,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert phase_result.status == "ok", phase_result.warnings
+    assert phase_result.phases_present
+    _assert_magemin_bulk_drop_projected(
+        phase_result,
+        ("MnO", "P2O5"),
+        min_dropped_wt_pct=0.25,
+        exact_components=True,
+    )
 
 
 @pytest.mark.skipif(
@@ -1066,7 +1196,10 @@ def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     )
 
     assert result.status == "out_of_domain"
-    assert any("empty melt composition" in w for w in result.warnings)
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
+    assert any("refused projected/dropped non-basis" in w for w in result.warnings)
 
 
 def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):

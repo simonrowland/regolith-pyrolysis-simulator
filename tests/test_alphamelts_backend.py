@@ -12,6 +12,9 @@ from engines.builtin.vapor_pressure import (
     HighUncertaintyVaporPressureFallbackWarning,
 )
 from engines.domain_reason import OutOfDomainReason
+from engines.alphamelts import AlphaMELTSProvider
+from engines.alphamelts.domain import AlphaMELTSDomainGate
+import engines.alphamelts.provider as alphamelts_provider_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.core import CampaignPhase, PyrolysisSimulator
@@ -299,6 +302,12 @@ def test_alphamelts_subprocess_clamped_pt_reports_solved_conditions(
     assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-6)
     assert result.diagnostics['solved_temperature_C'] == pytest.approx(800.0)
     assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1.0)
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'clamped_operating_point'
+    )
     assert (
         result.diagnostics['authoritative_for_requested_conditions']
         is False
@@ -367,6 +376,12 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     assert result.diagnostics['pressure_clamped'] is True
     assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-9)
     assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1e-6)
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert (
+        result.diagnostics['backend_status_reason']
+        == 'clamped_operating_point'
+    )
     assert (
         result.diagnostics['authoritative_for_requested_conditions']
         is False
@@ -724,6 +739,128 @@ def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
     assert backend._mode is None
 
 
+
+def test_alphamelts_provider_production_equilibrium_skips_thermoengine(monkeypatch):
+    provider = AlphaMELTSProvider(backend=types.SimpleNamespace())
+    request = types.SimpleNamespace(
+        account_view=types.SimpleNamespace(species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    monkeypatch.setattr(alphamelts_provider_module, 'thermoengine_available', lambda _backend: True)
+    monkeypatch.setattr(alphamelts_provider_module, 'python_api_available', lambda _backend: False)
+    monkeypatch.setattr(alphamelts_provider_module, 'subprocess_available', lambda _backend: False)
+
+    def fail_thermoengine(*args, **kwargs):
+        raise AssertionError('production equilibrium must not call in-process ThermoEngine')
+
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'equilibrate_via_thermoengine',
+        fail_thermoengine,
+    )
+
+    mode, equilibrium = provider._run_backend(
+        request,
+        composition_mol_by_account={'process.cleaned_melt': {'SiO2': 1.0}},
+    )
+
+    assert mode == 'unavailable'
+    assert equilibrium is None
+
+
+def test_alphamelts_provider_liquidus_skips_thermoengine(monkeypatch):
+    def fail_liquidus(*args, **kwargs):
+        raise AssertionError('liquidus must not call in-process ThermoEngine')
+
+    provider = AlphaMELTSProvider(
+        backend=types.SimpleNamespace(find_liquidus_solidus=fail_liquidus)
+    )
+    request = types.SimpleNamespace(
+        account_view=types.SimpleNamespace(species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'thermoengine_available',
+        lambda _backend: True,
+    )
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'python_api_available',
+        lambda _backend: False,
+    )
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'subprocess_available',
+        lambda _backend: False,
+    )
+
+    mode, result = provider._run_liquidus_finder(
+        request,
+        composition_mol_by_account={'process.cleaned_melt': {'SiO2': 1.0}},
+    )
+
+    assert mode == 'unavailable'
+    assert result.status == 'unavailable'
+
+
+def test_alphamelts_provider_ec_skips_thermoengine(monkeypatch):
+    def fail_transport(*args, **kwargs):
+        raise AssertionError('EC must not call in-process ThermoEngine')
+
+    provider = AlphaMELTSProvider(
+        backend=types.SimpleNamespace(find_liquidus_solidus=fail_transport)
+    )
+    request = types.SimpleNamespace(
+        account_view=types.SimpleNamespace(species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'thermoengine_available',
+        lambda _backend: True,
+    )
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'python_api_available',
+        lambda _backend: False,
+    )
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'subprocess_available',
+        lambda _backend: False,
+    )
+    monkeypatch.setattr(
+        alphamelts_provider_module,
+        'equilibrate_via_thermoengine',
+        fail_transport,
+    )
+
+    mode, result = provider._run_equilibrium_crystallization_path(
+        request,
+        composition_mol_by_account={'process.cleaned_melt': {'SiO2': 1.0}},
+    )
+
+    assert mode == 'unavailable'
+    assert result.status == 'unavailable'
+
+
+def test_alphamelts_domain_gate_contract_is_composition_only():
+    doc = AlphaMELTSDomainGate.__doc__ or ''
+
+    assert 'T / P bounds' not in doc
+    assert 'Composition-only gate' in doc
+
+
 def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
     monkeypatch,
 ):
@@ -831,6 +968,25 @@ def test_normalize_composition_splits_feo_total_with_explicit_ratio():
 
     assert pytest.approx(sum(comp.values())) == 100.0
     assert comp['FeO'] > comp['Fe2O3'] > 0.0
+
+
+
+def test_alphamelts_domain_gate_rejects_unrecognized_oxide_like_species():
+    backend = AlphaMELTSBackend()
+
+    result = backend._domain_gate(
+        {'SiO2': 50.0, 'MgO': 49.0, 'XeO': 1.0},
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    assert result is not None
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        OutOfDomainReason.FORBIDDEN_SPECIES.value
+    )
+    assert 'unrecognised species outside MELTS basis: XeO' in result.warnings[0]
 
 
 def test_domain_gate_rejects_non_silicate_or_non_oxide_inputs():

@@ -282,7 +282,7 @@ class EquilibriumResult:
     # on ``status='ok'``.  Melt-solving backends must leave this True.
     phase_assemblage_available: bool = True
     liquid_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
-    liquid_viscosity_Pa_s: float = 5.0  # Typical basaltic melt
+    liquid_viscosity_Pa_s: Optional[float] = None
 
     # Vapor pressures (Pa) for each volatile species
     vapor_pressures_Pa: Dict[str, float] = field(default_factory=dict)

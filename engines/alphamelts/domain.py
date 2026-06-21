@@ -78,9 +78,9 @@ class AlphaMELTSDomainGate:
     3. **Silicate-network criteria** — SiO2 in [30, 80] wt%; sum of
        major oxides > 95 wt%. Outside this range MELTS extrapolations
        are physically meaningless.
-    4. **T / P bounds** — enforced as ``(valid, warnings)`` rather than
-       raising; the provider surfaces ``status='out_of_domain'`` for
-       any rejection.
+    4. **Composition-only gate** — operating-point checks live at the
+       transport/provider layer where temperature and pressure are available.
+       This validator has no T/P inputs and must not claim to certify them.
 
     Returns ``(valid, warnings)``; never raises. The caller routes the
     rejected composition elsewhere (e.g. Stage 0 cleanup) or surfaces

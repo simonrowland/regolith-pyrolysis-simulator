@@ -20,6 +20,13 @@ def test_ok_equilibrium_result_requires_finite_unit_liquid_fraction(
         EquilibriumResult(status='ok', liquid_fraction=liquid_fraction)
 
 
+
+def test_equilibrium_result_default_viscosity_is_unknown():
+    result = EquilibriumResult(status='ok', liquid_fraction=1.0)
+
+    assert result.liquid_viscosity_Pa_s is None
+
+
 def test_stub_backend_reports_unavailable_with_no_liquid_fraction():
     result = StubBackend().equilibrate(temperature_C=1500.0)
 

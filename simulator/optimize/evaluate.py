@@ -9,6 +9,7 @@ from functools import lru_cache
 import importlib
 from importlib import metadata as importlib_metadata
 import inspect
+import json
 import math
 import re
 from types import MappingProxyType, SimpleNamespace
@@ -132,6 +133,39 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
 )
 
 
+@dataclass(frozen=True)
+class _RunReferenceTraceOverlay(MappingABC):
+    original_trace: Any
+    overrides: Mapping[str, Any]
+
+    def __getitem__(self, key: str) -> Any:
+        if key in self.overrides:
+            return self.overrides[key]
+        if isinstance(self.original_trace, MappingABC):
+            return self.original_trace[key]
+        try:
+            return getattr(self.original_trace, key)
+        except AttributeError as exc:
+            raise KeyError(key) from exc
+
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def __iter__(self) -> Iterable[str]:
+        return iter(self.overrides)
+
+    def __len__(self) -> int:
+        return len(self.overrides)
+
+    def __getattr__(self, name: str) -> Any:
+        if name in self.overrides:
+            return self.overrides[name]
+        return getattr(self.original_trace, name)
+
+
 class FailureCategory(str, Enum):
     INVALID_PATCH = "invalid_patch"
     INFEASIBLE_RECIPE = "infeasible_recipe"
@@ -176,6 +210,7 @@ class RunReference:
     backend_real_active: bool | None = None
     certification_allowed: bool | None = None
     contributors: tuple[Mapping[str, Any], ...] = ()
+    backend_status_reason: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -187,6 +222,14 @@ class RunReference:
             backend_status = _backend_status_from_carrier(self.trace)
             if backend_status is not None:
                 object.__setattr__(self, "backend_status", backend_status)
+        if self.backend_status_reason is None:
+            backend_status_reason = _backend_status_reason_from_carrier(self.trace)
+            if backend_status_reason is not None:
+                object.__setattr__(
+                    self,
+                    "backend_status_reason",
+                    backend_status_reason,
+                )
         if self.backend_authoritative is None:
             backend_authoritative = _backend_authoritative_from_carrier(self.trace)
             if backend_authoritative is not None:
@@ -195,6 +238,15 @@ class RunReference:
                     "backend_authoritative",
                     backend_authoritative,
                 )
+        if self.backend_status_reason is not None:
+            object.__setattr__(
+                self,
+                "trace",
+                _trace_carrying_backend_status_reason(
+                    self.trace,
+                    self.backend_status_reason,
+                ),
+            )
         canonical = canonicalize_fidelity_emission(
             backend_name=self.backend_name or _carrier_value(self.trace, "backend_name"),
             backend_status=self.backend_status,
@@ -224,8 +276,57 @@ class RunReference:
                 self.backend_real_active,
                 self.certification_allowed,
                 self.contributors,
+                self.backend_status_reason,
             ),
         )
+
+
+def _trace_carrying_backend_status_reason(trace: Any, reason: str) -> Any:
+    current = _backend_status_reason_from_carrier(trace)
+    if isinstance(trace, MappingABC):
+        return _RunReferenceTraceOverlay(
+            trace,
+            _run_reference_trace_storage_overrides(trace, reason),
+        )
+    if current == reason:
+        try:
+            _run_reference_trace_jsonable(trace)
+        except (TypeError, ValueError, OverflowError, RecursionError):
+            pass
+        else:
+            return trace
+    return _RunReferenceTraceOverlay(
+        trace,
+        MappingProxyType({"backend_status_reason": reason}),
+    )
+
+
+def _run_reference_trace_storage_overrides(
+    trace: MappingABC[str, Any],
+    reason: str,
+) -> Mapping[str, Any]:
+    payload: dict[str, Any] = {}
+    for key, value in trace.items():
+        try:
+            payload[str(key)] = _run_reference_trace_jsonable(value)
+        except (TypeError, ValueError, OverflowError, RecursionError):
+            continue
+    payload["backend_status_reason"] = reason
+    return MappingProxyType(payload)
+
+
+def _run_reference_trace_jsonable(value: Any) -> Any:
+    if isinstance(value, MappingABC):
+        return {
+            str(key): _run_reference_trace_jsonable(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return [_run_reference_trace_jsonable(item) for item in value]
+    if isinstance(value, list):
+        return [_run_reference_trace_jsonable(item) for item in value]
+    json.dumps(value)
+    return value
 
 
 def _apply_run_reference_canonical_fields(
@@ -1755,14 +1856,30 @@ def _effective_vapor_pressure_provider_id(
     return DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
 
 
-@lru_cache(maxsize=1)
+_VAPOROCK_AVAILABLE_CACHE: bool | None = None
+
+
 def _vaporock_available() -> bool:
+    global _VAPOROCK_AVAILABLE_CACHE
+    if _VAPOROCK_AVAILABLE_CACHE is True:
+        return True
     try:
         from simulator.melt_backend.vaporock import vaporock_runtime_available
 
-        return vaporock_runtime_available()
+        available = vaporock_runtime_available()
     except Exception:  # noqa: BLE001 - mirrors provider library-boundary posture
         return False
+    if available:
+        _VAPOROCK_AVAILABLE_CACHE = True
+    return available
+
+
+def _clear_vaporock_available_cache() -> None:
+    global _VAPOROCK_AVAILABLE_CACHE
+    _VAPOROCK_AVAILABLE_CACHE = None
+
+
+_vaporock_available.cache_clear = _clear_vaporock_available_cache  # type: ignore[attr-defined]
 
 
 @lru_cache(maxsize=None)
@@ -2631,21 +2748,29 @@ def _out_of_domain_result(
         cache_key=key,
         feasible=False,
         failure_category=FailureCategory.OUT_OF_DOMAIN,
-        feasibility_margins={"backend_domain": _out_of_domain_margin()},
+        feasibility_margins={
+            "backend_domain": _out_of_domain_margin(
+                _latest_backend_status_reason(run_execution)
+            )
+        },
         failing_gates=("backend_domain",),
         run_reference=_run_reference(
             run_execution,
             profile,
-            trace_payload=assessment.trace_payload,
+            trace_payload=_trace_payload_with_backend_status_reason(
+                run_execution,
+                assessment.trace_payload,
+            ),
         ),
         notes=(
             *assessment.notes,
-            f"melts_domain_out_of_domain: backend_status={run_execution.backend_status}",
+            _out_of_domain_note(run_execution),
+            *_out_of_domain_reason_notes(run_execution),
         ),
     )
 
 
-def _out_of_domain_margin() -> GateMargin:
+def _out_of_domain_margin(reason: str | None = None) -> GateMargin:
     threshold = ThresholdSpec(
         id="alphamelts_domain",
         value=1.0,
@@ -2659,7 +2784,10 @@ def _out_of_domain_margin() -> GateMargin:
         margin=-1.0,
         threshold=threshold,
         observed=0.0,
-        detail="authoritative backend rejected composition as out of domain",
+        detail=(
+            "authoritative backend rejected composition as out of domain"
+            + (f": {reason}" if reason else "")
+        ),
     )
 
 
@@ -3453,6 +3581,7 @@ def _run_reference(
         product_summary=summary,
         backend_name=_run_reference_backend_name(run_execution),
         backend_status=_latest_backend_status(run_execution),
+        backend_status_reason=_latest_backend_status_reason(run_execution),
         backend_authoritative=_backend_authoritative(run_execution),
     )
 
@@ -3531,6 +3660,7 @@ def _canonical_backend_trace_fields(
     backend_name: str | None,
 ) -> dict[str, Any]:
     backend_status = _latest_backend_status(run_execution)
+    backend_status_reason = _latest_backend_status_reason(run_execution)
     backend_authoritative = _backend_authoritative(run_execution)
     payload = canonicalize_fidelity_emission(
         backend_name=backend_name,
@@ -3539,6 +3669,8 @@ def _canonical_backend_trace_fields(
     )
     if backend_name is not None:
         payload["backend_name"] = backend_name
+    if backend_status_reason is not None:
+        payload["backend_status_reason"] = backend_status_reason
     return payload
 
 
@@ -3585,6 +3717,12 @@ def _latest_backend_status(run_execution: Any) -> str | None:
     return _select_backend_status(_backend_statuses_from_run_execution(run_execution))
 
 
+def _latest_backend_status_reason(run_execution: Any) -> str | None:
+    return _select_backend_status_reason(
+        _backend_status_reasons_from_run_execution(run_execution)
+    )
+
+
 def _backend_authoritative(run_execution: Any) -> bool | None:
     raw = getattr(run_execution, "backend_authoritative", None)
     return bool(raw) if raw is not None else None
@@ -3592,6 +3730,10 @@ def _backend_authoritative(run_execution: Any) -> bool | None:
 
 def _backend_status_from_carrier(carrier: Any) -> str | None:
     return _select_backend_status(_backend_statuses_from_carrier(carrier))
+
+
+def _backend_status_reason_from_carrier(carrier: Any) -> str | None:
+    return _select_backend_status_reason(_backend_status_reasons_from_carrier(carrier))
 
 
 def _has_out_of_domain_backend_signal(
@@ -3640,6 +3782,21 @@ def _backend_statuses_from_run_execution(run_execution: Any) -> tuple[str, ...]:
     )
 
 
+def _backend_status_reasons_from_run_execution(run_execution: Any) -> tuple[str, ...]:
+    sim = getattr(run_execution, "simulator", None)
+    carriers = (
+        run_execution,
+        getattr(run_execution, "trace", None),
+        getattr(sim, "_last_backend_diagnostics", None),
+        getattr(sim, "_last_out_of_domain_diagnostics", None),
+    )
+    return tuple(
+        reason
+        for carrier in carriers
+        for reason in _backend_status_reasons_from_carrier(carrier)
+    )
+
+
 def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
     if carrier is None:
         return ()
@@ -3669,6 +3826,37 @@ def _backend_statuses_from_carrier(carrier: Any) -> tuple[str, ...]:
     return tuple(statuses)
 
 
+def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
+    if carrier is None:
+        return ()
+    reasons: list[str] = []
+    if isinstance(carrier, MappingABC):
+        raw = carrier.get("backend_status_reason")
+        if raw is not None:
+            reasons.append(str(raw))
+        for key in ("per_hour", "hours"):
+            reasons.extend(
+                reason
+                for item in carrier.get(key) or ()
+                for reason in _backend_status_reasons_from_carrier(item)
+            )
+        for key in ("trace", "backend_diagnostics", "diagnostics"):
+            reasons.extend(_backend_status_reasons_from_carrier(carrier.get(key)))
+        return tuple(reasons)
+    raw = getattr(carrier, "backend_status_reason", None)
+    if raw is not None:
+        reasons.append(str(raw))
+    for attr in ("per_hour", "hours"):
+        reasons.extend(
+            reason
+            for item in getattr(carrier, attr, None) or ()
+            for reason in _backend_status_reasons_from_carrier(item)
+        )
+    for attr in ("trace", "backend_diagnostics", "diagnostics"):
+        reasons.extend(_backend_status_reasons_from_carrier(getattr(carrier, attr, None)))
+    return tuple(reasons)
+
+
 def _carrier_has_crash_point(carrier: Mapping[Any, Any]) -> bool:
     return any(
         isinstance(carrier.get(key), MappingABC)
@@ -3684,6 +3872,37 @@ def _select_backend_status(statuses: Iterable[str]) -> str | None:
     if values:
         return values[-1]
     return None
+
+
+def _select_backend_status_reason(reasons: Iterable[str]) -> str | None:
+    values = tuple(str(reason) for reason in reasons if reason is not None)
+    return values[-1] if values else None
+
+
+def _trace_payload_with_backend_status_reason(
+    run_execution: Any,
+    trace_payload: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    reason = _latest_backend_status_reason(run_execution)
+    if reason is None:
+        return trace_payload
+    payload = dict(trace_payload)
+    payload["backend_status_reason"] = reason
+    return payload
+
+
+def _out_of_domain_note(run_execution: Any) -> str:
+    status = getattr(run_execution, "backend_status", None)
+    if status is None:
+        status = _latest_backend_status(run_execution)
+    return f"melts_domain_out_of_domain: backend_status={status}"
+
+
+def _out_of_domain_reason_notes(run_execution: Any) -> tuple[str, ...]:
+    reason = _latest_backend_status_reason(run_execution)
+    if reason is None:
+        return ()
+    return (f"melts_domain_out_of_domain: backend_status_reason={reason}",)
 
 
 def _ordered_failing_gates(values: Any) -> tuple[str, ...]:

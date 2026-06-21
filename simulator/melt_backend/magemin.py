@@ -102,6 +102,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -284,15 +285,9 @@ class MAGEMinBackend(MeltBackend):
                            ``'ig'`` for the igneous database).  Defaults
                            to ``'ig'``.
         python_bridge:     ``'subprocess'``, ``'pymagemin'``, ``'ctypes'``
-                           or ``'julia'``.  Defaults to autodetect — the
-                           adapter prefers the ``pymagemin`` Python
-                           package when present, then ``ctypes`` against
-                           the shared library shipped with the binary,
-                           then the ``julia`` bridge if PyJulia is
-                           installed, and finally falls back to driving
-                           the compiled ``MAGEMin`` binary over a
-                           subprocess.  Subprocess is the supported
-                           default because MAGEMin has no PyPI package.
+                           or ``'julia'``.  Defaults to the compiled
+                           ``MAGEMin`` binary over a subprocess. Optional
+                           Python/Julia bridges are opt-in only.
     """
 
     name = 'magemin'
@@ -317,11 +312,10 @@ class MAGEMinBackend(MeltBackend):
         Detect MAGEMin and stash configuration.
 
         Returns True if the compiled MAGEMin binary is present.  The
-        binary is always usable through the ``subprocess`` bridge; the
-        ``pymagemin`` / ``ctypes`` / ``julia`` bridges are preferred when
-        a caller has them installed but are not required.  A missing
-        binary leaves ``is_available()`` False so the simulator can route
-        around it.
+        binary is always usable through the ``subprocess`` bridge.  The
+        ``pymagemin`` / ``ctypes`` / ``julia`` bridges are opt-in via
+        ``python_bridge``.  A missing binary leaves ``is_available()``
+        False so the simulator can route around it.
         """
         self._available = False
         self._warnings = []
@@ -479,6 +473,26 @@ class MAGEMinBackend(MeltBackend):
             dropped_accounts=dropped_accounts,
             dropped_account_species=dropped_account_species,
         )
+        if (
+            projection.dropped_mass_kg_by_species
+            or dropped_accounts
+            or dropped_account_species
+        ):
+            diagnostics = dict(projection_diagnostics)
+            diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.FORBIDDEN_SPECIES.value
+            )
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    'MAGEMin refused projected/dropped non-basis melt input',
+                ],
+                diagnostics=diagnostics,
+            )
         if not comp_wt:
             # No oxide species in MAGEMin's basis after the account split.
             return EquilibriumResult(
@@ -741,23 +755,23 @@ class MAGEMinBackend(MeltBackend):
             - ``julia`` bridge via ``MAGEMin_C.jl`` for PyJulia /
               juliacall users.
 
-        Autodetect order is ``pymagemin -> julia -> subprocess``.
-        ``ctypes`` is deliberately NOT auto-selected: its struct
-        marshaling is unimplemented (``_call_magemin`` raises for it), so
-        auto-preferring it over the working subprocess path would break a
-        binary that is actually usable.  ``ctypes`` is reachable only via
-        an explicit ``python_bridge="ctypes"`` config.
+        Autodetect order is ``subprocess``. Optional Python/Julia
+        bridges are selected only when explicitly requested. ``ctypes``
+        remains explicit-only: its struct marshaling is unimplemented
+        (``_call_magemin`` raises for it).
         """
         normalised = (str(requested).lower().strip()
                       if requested is not None else None)
 
-        if normalised in (None, 'pymagemin'):
+        if normalised is None and self._binary_path is not None:
+            return 'subprocess', None
+
+        if normalised == 'pymagemin':
             try:
                 import pymagemin  # type: ignore[import-not-found]
                 return 'pymagemin', pymagemin
             except Exception as exc:  # noqa: BLE001
-                if normalised == 'pymagemin':
-                    self._last_error = f'pymagemin import failed: {exc}'
+                self._last_error = f'pymagemin import failed: {exc}'
 
         # ctypes only when explicitly requested — see docstring.
         if normalised == 'ctypes':
@@ -769,7 +783,7 @@ class MAGEMinBackend(MeltBackend):
                 '(libMAGEMin shared library not found)'
             )
 
-        if normalised in (None, 'julia'):
+        if normalised == 'julia':
             try:
                 import julia  # type: ignore[import-not-found]
                 # PyJulia is heavy — only flag as available if the
@@ -778,13 +792,12 @@ class MAGEMinBackend(MeltBackend):
                 JuliaMain.eval('import MAGEMin_C')  # may raise
                 return 'julia', julia
             except Exception as exc:  # noqa: BLE001
-                if normalised == 'julia':
-                    self._last_error = f'julia bridge import failed: {exc}'
+                self._last_error = f'julia bridge import failed: {exc}'
 
         # Subprocess fallback: the binary located in initialize() is
         # itself the bridge.  This is the supported default — MAGEMin
         # ships no PyPI package, so a built binary must always be usable.
-        if normalised in (None, 'subprocess') and self._binary_path is not None:
+        if normalised == 'subprocess' and self._binary_path is not None:
             return 'subprocess', None
 
         warnings.warn(
@@ -936,16 +949,37 @@ class MAGEMinBackend(MeltBackend):
         if self._bridge == 'pymagemin':
             for name in ('minimize', 'run', 'equilibrium'):
                 fn = getattr(module, name, None)
-                if fn is None:
+                if not callable(fn):
                     continue
-                return fn(
-                    composition=bulk_projection.composition_wt_pct,
-                    T_C=temperature_C,
-                    T_K=temperature_K,
-                    P_GPa=pressure_GPa,
-                    P_kbar=pressure_kbar,
-                    log_fO2=fO2_log,
-                    database=self._database,
+                try:
+                    return fn(
+                        composition=bulk_projection.composition_wt_pct,
+                        T_C=temperature_C,
+                        T_K=temperature_K,
+                        P_GPa=pressure_GPa,
+                        P_kbar=pressure_kbar,
+                        log_fO2=fO2_log,
+                        database=self._database,
+                    )
+                except Exception as exc:  # noqa: BLE001 - optional bridge boundary
+                    if self._binary_path is not None:
+                        return self._call_magemin_subprocess_after_bridge_failure(
+                            bulk_projection=bulk_projection,
+                            temperature_C=temperature_C,
+                            pressure_kbar=pressure_kbar,
+                            fO2_log=fO2_log,
+                            bridge='pymagemin',
+                            exc=exc,
+                        )
+                    raise
+            if self._binary_path is not None:
+                return self._call_magemin_subprocess_after_bridge_failure(
+                    bulk_projection=bulk_projection,
+                    temperature_C=temperature_C,
+                    pressure_kbar=pressure_kbar,
+                    fO2_log=fO2_log,
+                    bridge='pymagemin',
+                    exc=RuntimeError('pymagemin exposes no minimize/run/equilibrium entry point'),
                 )
 
         if self._bridge == 'julia':
@@ -982,6 +1016,32 @@ class MAGEMinBackend(MeltBackend):
 
         raise RuntimeError(
             f'MAGEMin bridge {self._bridge!r} has no recognised entry point')
+
+    def _call_magemin_subprocess_after_bridge_failure(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        temperature_C: float,
+        pressure_kbar: float,
+        fO2_log: float,
+        bridge: str,
+        exc: Exception,
+    ) -> Dict[str, Any]:
+        message = f'MAGEMin {bridge} bridge failed; retried subprocess: {exc}'
+        self._last_error = message
+        try:
+            raw = self._call_magemin_subprocess(
+                bulk_projection=bulk_projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        except Exception as subprocess_exc:
+            raise RuntimeError(
+                f'{message}; subprocess retry failed: {subprocess_exc}'
+            ) from subprocess_exc
+        warnings_out = tuple(raw.get('buffer_warnings') or ())
+        return {**raw, 'buffer_warnings': (message, *warnings_out)}
 
     def _call_magemin_subprocess(
         self,

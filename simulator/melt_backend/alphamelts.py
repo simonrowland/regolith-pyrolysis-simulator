@@ -857,11 +857,20 @@ class AlphaMELTSBackend(MeltBackend):
         diagnostics: Optional[Mapping[str, object]] = None,
     ) -> EquilibriumResult:
         phase_masses = dict(phase_masses_kg or {})
+        result_status = str(status)
+        result_diagnostics = dict(diagnostics or {})
         resolved_liquid_fraction = liquid_fraction
-        if str(status) == 'ok':
+        if result_status == 'ok':
             resolved_liquid_fraction = self._resolve_ok_liquid_fraction(
                 liquid_fraction=resolved_liquid_fraction,
                 phase_masses_kg=phase_masses,
+            )
+        if self._requested_operating_point_non_authoritative(result_diagnostics):
+            result_status = 'out_of_domain'
+            result_diagnostics['backend_status'] = 'out_of_domain'
+            result_diagnostics.setdefault(
+                'backend_status_reason',
+                'clamped_operating_point',
             )
         return EquilibriumResult(
             temperature_C=float(temperature_C),
@@ -875,8 +884,8 @@ class AlphaMELTSBackend(MeltBackend):
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
             vapor_pressures_source=dict(vapor_pressures_source or {}),
             warnings=list(warnings or []),
-            status=str(status),
-            diagnostics=dict(diagnostics or {}),
+            status=result_status,
+            diagnostics=result_diagnostics,
         )
 
     @staticmethod
@@ -887,6 +896,33 @@ class AlphaMELTSBackend(MeltBackend):
         for item in diagnostics:
             payload.update(dict(item or {}))
         return payload
+
+    @staticmethod
+    def _requested_operating_point_non_authoritative(
+        diagnostics: Mapping[str, object],
+    ) -> bool:
+        return (
+            bool(diagnostics.get('operating_point_clamped'))
+            or diagnostics.get('authoritative_for_requested_conditions') is False
+        )
+
+    def _fail_closed_on_clamped_operating_point(
+        self,
+        result: EquilibriumResult,
+    ) -> EquilibriumResult:
+        diagnostics = dict(result.diagnostics or {})
+        if (
+            result.status == 'ok'
+            and self._requested_operating_point_non_authoritative(diagnostics)
+        ):
+            result.status = 'out_of_domain'
+            diagnostics['backend_status'] = 'out_of_domain'
+            diagnostics.setdefault(
+                'backend_status_reason',
+                'clamped_operating_point',
+            )
+            result.diagnostics = diagnostics
+        return result
 
     @staticmethod
     def _clamped_operating_point_context(
@@ -1040,6 +1076,7 @@ class AlphaMELTSBackend(MeltBackend):
                      ) -> Optional[EquilibriumResult]:
         canonical_wt: Dict[str, float] = {}
         non_oxides: List[str] = []
+        unrecognised: List[str] = []
         for raw_name, raw_wt in comp_wt.items():
             wt = float(raw_wt)
             if wt <= 0.0:
@@ -1048,6 +1085,8 @@ class AlphaMELTSBackend(MeltBackend):
             if oxide is None:
                 if self._is_non_oxide_species_name(raw_name):
                     non_oxides.append(str(raw_name))
+                else:
+                    unrecognised.append(str(raw_name))
                 continue
             canonical_wt[oxide] = canonical_wt.get(oxide, 0.0) + wt
 
@@ -1065,6 +1104,12 @@ class AlphaMELTSBackend(MeltBackend):
             reason = OutOfDomainReason.FORBIDDEN_SPECIES
             reasons.append(
                 'non-oxide species present: ' + ', '.join(sorted(non_oxides)))
+        if unrecognised:
+            reason = OutOfDomainReason.FORBIDDEN_SPECIES
+            reasons.append(
+                'unrecognised species outside MELTS basis: '
+                + ', '.join(sorted(unrecognised))
+            )
         if not reasons:
             return None
         return self._domain_gate_result(
@@ -1227,7 +1272,7 @@ class AlphaMELTSBackend(MeltBackend):
                 diagnostics=clamp_diagnostics,
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
-            return eq
+            return self._fail_closed_on_clamped_operating_point(eq)
         except ImportError:
             self._mode = None
             raise
@@ -1322,7 +1367,7 @@ class AlphaMELTSBackend(MeltBackend):
                 source,
             )
 
-            return eq
+            return self._fail_closed_on_clamped_operating_point(eq)
 
         except ImportError:
             self._mode = None
@@ -1649,7 +1694,7 @@ class AlphaMELTSBackend(MeltBackend):
                     f'{result.stderr or result.stdout}',
                 )
 
-            return self._parse_single_point_stdout(
+            eq = self._parse_single_point_stdout(
                 f'{result.stdout}\n{result.stderr}',
                 temperature_C=calculation_temperature_C,
                 pressure_bar=calculation_pressure_bar,
@@ -1660,6 +1705,7 @@ class AlphaMELTSBackend(MeltBackend):
                     diagnostics, clamp_diagnostics),
                 success_diagnostics=clamp_diagnostics,
             )
+            return self._fail_closed_on_clamped_operating_point(eq)
 
     def _write_melts_file(self, path: Path, comp_wt: dict,
                            T_C: float, P_bar: float):

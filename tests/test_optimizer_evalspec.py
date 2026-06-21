@@ -1044,6 +1044,41 @@ def test_run_options_with_c4_hold_temp_matching_override_is_idempotent() -> None
     assert run_options["runtime_campaign_overrides"]["C4"]["hold_temp_C"] == 1600.0
 
 
+
+def test_vaporock_eval_provider_probe_does_not_cache_negative(monkeypatch):
+    probes = [False, True]
+
+    def fake_runtime_available():
+        return probes.pop(0)
+
+    monkeypatch.setattr(
+        vaporock_module,
+        "vaporock_runtime_available",
+        fake_runtime_available,
+    )
+    evaluate_module._vaporock_available.cache_clear()
+    try:
+        first = evaluate_module._effective_vapor_pressure_provider_id(
+            force_builtin_vapor_pressure=False,
+            allow_fallback_vapor=True,
+        )
+        second = evaluate_module._effective_vapor_pressure_provider_id(
+            force_builtin_vapor_pressure=False,
+            allow_fallback_vapor=True,
+        )
+        third = evaluate_module._effective_vapor_pressure_provider_id(
+            force_builtin_vapor_pressure=False,
+            allow_fallback_vapor=True,
+        )
+    finally:
+        evaluate_module._vaporock_available.cache_clear()
+
+    assert first == DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    assert second == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert third == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    assert probes == []
+
+
 def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1161,7 +1196,7 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
     finally:
         clear_probe_caches()
 
-    assert init_calls == [{}]
+    assert init_calls == [{}, {}]
     assert spec.vapor_pressure_provider_id == (
         DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
     )

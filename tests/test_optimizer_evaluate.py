@@ -2378,6 +2378,43 @@ def test_clamped_kernel_success_is_out_of_domain_at_requested_point() -> None:
     )
 
 
+
+def test_out_of_domain_result_preserves_backend_status_reason() -> None:
+    clean_snapshot = _snapshot(MASS_BALANCE_ABORT_PCT)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _execution(
+                backend_status="out_of_domain",
+                backend_diagnostics={
+                    "backend_status": "out_of_domain",
+                    "backend_status_reason": "forbidden_species",
+                },
+                snapshots=(clean_snapshot,),
+                trace=_trace(snapshots=(clean_snapshot,)),
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.backend_status_reason == "forbidden_species"
+    assert result.run_reference.trace["backend_status_reason"] == "forbidden_species"
+    assert result.feasibility_margins["backend_domain"].detail.endswith(
+        ": forbidden_species"
+    )
+    assert any(
+        note.endswith("backend_status_reason=forbidden_species")
+        for note in result.notes
+    )
+
+
 def test_real_backend_out_of_domain_status_is_infeasible_result() -> None:
     clean_snapshot = _snapshot(MASS_BALANCE_ABORT_PCT)
 
