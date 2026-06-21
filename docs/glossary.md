@@ -94,7 +94,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **ThermoEngine** — ENKI's Python MELTS API providing first-class melt activities via compiled Objective-C/C dylibs. Required by VapoRock. Installed by `install-engines.py` (macOS arm64 only). See [`docs/melt-backends.md`](melt-backends.md).
 
-**VapoRock** — silicate-melt evaporation speciation package; vapor-pressure authority for the `VAPOR_PRESSURE` kernel intent when installed. Rides ThermoEngine. Not eligible as the active `MeltBackend`; operates as a `ChemistryProvider` at the kernel level. See [`docs/melt-backends.md`](melt-backends.md).
+**VapoRock** — silicate-melt evaporation speciation package. It is diagnostic-only in the current `VAPOR_PRESSURE` kernel wiring: builtin Antoine + Ellingham is authoritative, while VapoRock can report `vaporock_full_speciation_Pa` as a shadow. Rides ThermoEngine. Not eligible as the active `MeltBackend`; operates as a `ChemistryProvider` at the kernel level. See [`docs/melt-backends.md`](melt-backends.md).
 
 **Viscous-flow regime** — gas transport condition where Kn ≪ 0.01 and molecules follow bulk flow toward condensers. Maintained by the 5–15 mbar pN₂ band. Prerequisite for directional vapor transport. See [`docs/concepts.md`](concepts.md).
 

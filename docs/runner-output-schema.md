@@ -19,7 +19,7 @@ python -m simulator.runner \
     --output=runs/lunar_mare_24h.json \
     [--additive=C=30] \
     [--engines=config/engines.yaml] \
-    [--engine=vapor_pressure:vaporock_v1] \
+    [--engine=vapor_pressure:builtin-vapor-pressure] \
     [--backend=stub|alphamelts] \
     [--track=pyrolysis|mre_baseline] \
     [--allow-fallback-vapor] \
@@ -84,18 +84,18 @@ schema-shape assertion.
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
-      "vapor_pressure": "vaporock",
+      "vapor_pressure": "builtin-vapor-pressure",
       "stage0_pretreatment": "builtin-stage0-pretreatment",
       ...
     },
     "requested": {                            // operator overrides (Goal #19 forward-compat)
-      "vapor_pressure": "vaporock_v1"
+      "vapor_pressure": "builtin-vapor-pressure"
     },
     "registry": {                             // ChemistryKernel.registry.capability_summary()
       "vapor_pressure": {
-        "authoritative": "vaporock",
-        "fallback":      "builtin-vapor-pressure",
-        "shadows":       []
+        "authoritative": "builtin-vapor-pressure",
+        "fallback":      null,
+        "shadows":       ["vaporock"]
       },
       ...
     }
@@ -116,7 +116,8 @@ schema-shape assertion.
   byte-stable across machines and clock drift.
 * `engines_used.registry` is sourced from
   `ChemistryKernel.registry.capability_summary()` -- the same surface
-  Goal #10 uses to audit the VapoRock authority swap.
+  used to audit the current builtin-authoritative / VapoRock-shadow
+  `VAPOR_PRESSURE` split.
 * Any extra keys passed via `run_metadata_overrides` are forwarded
   verbatim; the runner does not interpret them.
 * `knudsen_regime_diagnostic` reports the transport-regime check for
@@ -199,23 +200,31 @@ schema-shape assertion.
 ```jsonc
 "vapor_pressure_source_report": {
   "species": {
-    "Na": "thermoengine",
-    "K": "builtin_fallback"
+    "Na": "builtin_authoritative",
+    "K": "builtin_authoritative"
   },
   "summary": {
-    "thermoengine": {"count": 1, "percentage": 50.0},
-    "builtin_fallback": {"count": 1, "percentage": 50.0}
+    "builtin_authoritative": {"count": 2, "percentage": 100.0}
   },
   "total_species": 2
 }
 ```
 
 * Sourced from `EquilibriumResult.vapor_pressures_source` after the
-  post-equilibrium kernel refresh. Values are one of `thermoengine`,
-  `alphamelts_python_api`, `alphamelts_text`, `vaporock`,
-  `builtin_fallback`, or `kernel_diagnostic`.
+  post-equilibrium kernel refresh. Current mainline values are
+  `builtin_authoritative` for the builtin Antoine/Ellingham provider,
+  `thermoengine` when a backend pressure exactly confirms the builtin
+  value, `builtin_fallback` only for an explicit fallback path, and
+  `kernel_diagnostic` as a sentinel. Legacy backend labels such as
+  `alphamelts_python_api`, `alphamelts_text`, and `vaporock` can appear
+  only on older or fallback artifacts; the current VapoRock shadow payload
+  is diagnostic-only.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
+* When VapoRock shadow data exists, `simulator.runner` copies it from
+  `_last_vapor_pressure_diagnostic["vaporock_full_speciation_Pa"]` into
+  the runner diagnostics under the same key. It is not an authoritative
+  source-report value.
 
 ## Shuttle refusal history
 
@@ -336,8 +345,8 @@ schema-shape assertion.
   {                                          // kernel parity warning
     "event": "parity_warning",
     "intent": "vapor_pressure",
-    "authoritative_provider": "vaporock",
-    "shadow_provider": "magemin-shadow",
+    "authoritative_provider": "builtin-vapor-pressure",
+    "shadow_provider": "vaporock",
     "delta": ...
   }
 ]

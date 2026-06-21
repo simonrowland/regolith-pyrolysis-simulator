@@ -83,7 +83,7 @@ The species-specific pO₂ slopes derived from Sense 2 above govern *how strongl
 | Cr, Al | −0.75 | Strongly amplified; combined with low `P_sat` these are still not practically pyrolysable but vacuum helps a lot |
 | Ti | −1.0 | Maximum vacuum amplification, but `P_sat × a_M` still below threshold at any furnace-survivable T |
 
-These are the Sense-2 ladder slopes (theoretical, from stoichiometry). The builtin fallback uses `pO2_exponent` per-species in `data/vapor_pressures.yaml` (currently set only for the SiO₂ ⇌ SiO + ½ O₂ branch, where pO₂ is *the* lever); for the metal/oxide species the authoritative `VapoRockProvider` computes the full `a_M(T, pO₂)` internally and the table above is exposition only.
+These are the Sense-2 ladder slopes (theoretical, from stoichiometry). The builtin authoritative vapor-pressure provider uses `pO2_exponent` per-species in `data/vapor_pressures.yaml` (currently set only for the SiO₂ ⇌ SiO + ½ O₂ branch, where pO₂ is *the* lever) and computes metal activities from the Ellingham table. VapoRock may report a diagnostic shadow gas-speciation surface, but it does not provide the authoritative `a_M(T, pO₂)` surface consumed by evaporation.
 
 pO₂ is controlled actively via Fe-granule oxygen sorbent and precision O₂ micro-bleed, with turbine-speed feedback. Precision in the viscous regime is ±0.1–0.3 mbar (`data/setpoints.yaml` §5).
 

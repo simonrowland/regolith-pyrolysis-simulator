@@ -1,6 +1,6 @@
 # Melt Chemistry Backends
 
-In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools / AlphaMELTS for `SILICATE_EQUILIBRIUM`, MAGEMin for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION` — is the always-on production path; `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. The pure-Antoine × Ellingham fallback is retained as a documented diagnostic path, gated behind `chemistry_kernel.allow_fallback_vapor: true` and the upstream `vaporock` import being unavailable; without both, the kernel re-raises rather than silently downgrading. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
+In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. PetThermoTools / AlphaMELTS remain the live path for `SILICATE_EQUILIBRIUM`; MAGEMin remains the shadow / narrow-gate engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
 
 ## Per-call result status
 
@@ -15,15 +15,15 @@ In 0.5.0 the operational chain — VapoRock for `VAPOR_PRESSURE`, PetThermoTools
 2. **`StubBackend`** is the always-available fallback for `auto` when AlphaMELTS is unavailable (built-in Ellingham/Antoine path inside `simulator/core.py`).
 3. **FactSAGE / ChemApp** is not probed. The adapter was removed/archived; explicit `backend=factsage` is an unknown backend and raises instead of falling through to `auto`.
 
-**`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active `MeltBackend`.** Their honest call sites are now per-intent kernel `ChemistryProvider` registrations (VapoRock authoritative for `VAPOR_PRESSURE` under `\goal VAPOROCK-AUTHORITY-PROMOTION`; MAGEMin shadow for `SILICATE_LIQUIDUS` / `SILICATE_EQUILIBRIUM` under `\goal MAGEMIN-SHADOW-PARITY`), not the active-backend `_get_equilibrium` path. Selecting either as the active `MeltBackend` would still fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and is the canonical home for VapoRock's `VAPOR_PRESSURE` ownership; see the "VapoRock authority promotion (goal #10)" section below.
+**`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active `MeltBackend`.** Their honest call sites are now per-intent kernel `ChemistryProvider` registrations (VapoRock diagnostic shadow for `VAPOR_PRESSURE`; MAGEMin shadow for `SILICATE_LIQUIDUS` / `SILICATE_EQUILIBRIUM` under `\goal MAGEMIN-SHADOW-PARITY`), not the active-backend `_get_equilibrium` path. Selecting either as the active `MeltBackend` would still fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and is the canonical home for the builtin-authoritative / VapoRock-shadow `VAPOR_PRESSURE` split; see the "VapoRock diagnostic shadow" section below.
 
 There is **no silent cross-backend fallback at runtime**. If the selected primary throws inside `_get_equilibrium` after selection, the existing fail-closed path in `simulator/core.py` handles it; `_get_backend` does not re-probe a different primary mid-run.
 
 On every selection `_get_backend` emits one log line of the form
 `engine selection: <BackendClassName> (capabilities: silicate_melt=..., gas_volatiles=...) -- VapoRock/MAGEMin not eligible until kernel`
-so the active-backend choice is visible in the launcher's normal stdout stream. The log line's wording predates the goal-#9 / goal-#10 kernel-provider promotions; the message refers to active-`MeltBackend` eligibility (still gated), not to kernel `ChemistryProvider` registration (which VapoRock and MAGEMin now have via `engines/vaporock` and `engines/magemin`).
+so the active-backend choice is visible in the launcher's normal stdout stream. The log line's wording predates the kernel-provider registrations; the message refers to active-`MeltBackend` eligibility (still gated), not to kernel `ChemistryProvider` registration (which VapoRock and MAGEMin now have via `engines/vaporock` and `engines/magemin`).
 
-The VapoRock wrapper still checks whether the canonical `vaporock` Python package is importable (with legacy `VapoRock` import fallback for older local installs); this controls whether the kernel-registered `VapoRockProvider` reports available at dispatch time -- when it does not, `\goal VAPOROCK-AUTHORITY-PROMOTION` requires the kernel to either raise `ProviderUnavailableError` (default) or delegate to the registered builtin Antoine fallback (opt-in via `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True`).
+The VapoRock wrapper still checks whether the canonical `vaporock` Python package is importable (with legacy `VapoRock` import fallback for older local installs). Importability now controls only the diagnostic shadow: builtin Antoine/Ellingham remains the authoritative `VAPOR_PRESSURE` provider whether or not VapoRock is importable.
 
 ## Local alphaMELTS Path
 
@@ -47,39 +47,32 @@ The adapter receives the cleaned silicate melt only. It projects mol-native simu
 
 The documented upstream path is `vaporock.System().set_melt_comp(...)` followed by `eval_gas_abundances(T, logfO2)`. The adapter also probes legacy helper names used by older forks. System log10(bar) output is converted to Pa.
 
-`EquilibriumResult.vapor_pressures_Pa` is the primary output. VapoRock does not mutate `AtomLedger` directly; it owns the `VAPOR_PRESSURE` intent at the kernel level after `\goal VAPOROCK-AUTHORITY-PROMOTION` (#10), but the intent itself is read-only -- the downstream `EVAPORATION_TRANSITION` provider consumes the vapor-pressure dict and produces the ledger transition.
+The adapter's raw `EquilibriumResult.vapor_pressures_Pa` is projected by `engines/vaporock/provider.py` into a diagnostic payload. The provider deliberately leaves diagnostic `vapor_pressures_Pa` empty and stores every finite positive VapoRock pressure under `vaporock_full_speciation_Pa`. VapoRock does not mutate `AtomLedger`; it is not the `VAPOR_PRESSURE` authority. The downstream `EVAPORATION_TRANSITION` provider consumes the builtin authoritative vapor-pressure dict and produces the ledger transition.
 
 For legacy helper outputs, pressure values with max `< 1e3` are treated as bar and scaled to Pa; larger values are treated as already-Pa. `capabilities()` keeps `vapor_melt_equilibrium=True` as a VapoRock instance-level extension, leaving `DEFAULT_BACKEND_CAPABILITIES` at the canonical five shared keys.
 
 See `docs-private/chemistry-engine-binding-spec-2026-05-14.md` §4 for the VapoRock input/output contract.
 
-### VapoRock authority promotion (goal #10)
+### VapoRock diagnostic shadow
 
-Under `\goal VAPOROCK-AUTHORITY-PROMOTION` (2026-05-15), `engines/vaporock/provider.py::VapoRockProvider` is registered as the **authoritative** `ChemistryProvider` for the `VAPOR_PRESSURE` intent in `simulator/core.py::_build_chemistry_kernel`. The original `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is demoted to the registry's **fallback** slot (a new slot added to `simulator/chemistry/kernel/registry.py` for this goal).
+Current `simulator/core.py::_register_vapor_pressure_pair` registers `BuiltinVaporPressureProvider` in the authoritative slot for `VAPOR_PRESSURE` and `engines/vaporock/provider.py::VapoRockProvider` in the shadow slot. The builtin provider returns the `diagnostic['vapor_pressures_Pa']` surface consumed by evaporation. The VapoRock provider returns `status='non_authoritative'`, `transition=None`, empty diagnostic `vapor_pressures_Pa`, and diagnostic-only `vaporock_full_speciation_Pa`.
 
-The fallback only runs when both of these hold:
+Fallback does not mean "promote VapoRock" or "demote builtin." If an authoritative dispatch has a non-`ok` status and no pressure dict, `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True` permits the simulator to continue on pre-kernel backend vapor pressures with an explicit warning; without that opt-in the simulator raises instead of silently continuing.
 
-1. The authoritative `VapoRockProvider` raised `ProviderUnavailableError` at dispatch time (the upstream `vaporock` library is missing on the host — uncommon in 0.5.0 since `vaporock` is in `[project.dependencies]`, but possible on partially-provisioned dev hosts), and
-2. The simulator was constructed with `setpoints['chemistry_kernel']['allow_fallback_vapor'] = True`. The flag is read at `PyrolysisSimulator.__init__` and threaded into `ChemistryKernel.allow_fallback_intents`.
-
-Otherwise the kernel re-raises `ProviderUnavailableError` -- **silent fallback is forbidden**. The pure-Antoine × Ellingham chain is ~124× off VapoRock at lunar mare 1500 °C IW for K (γ_K lives inside VapoRock and cannot be reproduced by `a_M × P_sat` alone), so the fallback is a diagnostic surface, not an operational substitute.
-
-When the fallback path fires, the kernel tags the result's `diagnostic` map with `kernel_fallback_used = 'builtin-vapor-pressure'` so trace consumers can tell the authoritative slot did not answer.
-
-The authority swap is visible on a single read of `sim._chem_registry.capability_summary()`:
+The current split is visible on a single read of `sim._chem_registry.capability_summary()`:
 
 ```python
 >>> sim._chem_registry.capability_summary()['vapor_pressure']
-{'authoritative': 'vaporock', 'fallback': 'builtin-vapor-pressure', 'shadows': ()}
+{'authoritative': 'builtin-vapor-pressure', 'fallback': None, 'shadows': ('vaporock',)}
 ```
 
-The six other kernel-authoritative builtins (`EVAPORATION_FLUX`, `EVAPORATION_TRANSITION`, `CONDENSATION_ROUTE`, `ELECTROLYSIS_STEP`, `METALLOTHERMIC_STEP`, `STAGE0_PRETREATMENT`) are unchanged by the swap; their `authoritative` slot still names the `builtin-<intent>` provider.
+The six other kernel-authoritative builtins (`EVAPORATION_FLUX`, `EVAPORATION_TRANSITION`, `CONDENSATION_ROUTE`, `ELECTROLYSIS_STEP`, `METALLOTHERMIC_STEP`, `STAGE0_PRETREATMENT`) are unchanged; their `authoritative` slot still names the `builtin-<intent>` provider.
 
-The `VapoRockProvider` filters its output to the species universe `data/vapor_pressures.yaml` declares (the intersection of the YAML's `metals` section with `engines.builtin.vapor_pressure._ELLINGHAM_THERMO` keys, plus the entire `oxide_vapors` section). VapoRock's broader ~30-species output (`O2`, `Si2`, `Al2O2`, ...) is a richer chemistry surface than the downstream `EVAPORATION_FLUX` step is wired for; pinning the filter to the builtin's effective species set keeps the mass balance hard constraint (0.000%) intact across the swap. Future work can widen this set as the downstream stoichiometry validators learn each new species.
+The `VapoRockProvider` no longer exports a filtered authoritative pressure dict. VapoRock's broader gas-speciation output (`O2`, `Si2`, `Al2O2`, ...) stays under `vaporock_full_speciation_Pa` for diagnostics, benchmarks, and cross-engine analysis only. The downstream `EVAPORATION_FLUX` step continues to consume builtin `vapor_pressures_Pa`.
 
-The fallback Antoine convention is schema-bound in `data/vapor_pressures_schema.md`: each YAML row declares whether its raw Antoine term is `pure_component_psat`, `pseudo_psat_backsolved_from_vaporock`, or `standard_reaction_term`. This keeps Ellingham activity, VapoRock back-solve provenance, and oxide-vapor reaction exponents auditable without changing fallback math.
+The Antoine convention is schema-bound in `data/vapor_pressures_schema.md`: each YAML row declares whether its raw Antoine term is `pure_component_psat`, `pseudo_psat_backsolved_from_vaporock`, or `standard_reaction_term`. This keeps Ellingham activity, VapoRock back-solve provenance, and oxide-vapor reaction exponents auditable without making VapoRock authoritative.
 
-Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` binds the five acceptance scenarios (available + no flag, unavailable + no flag, unavailable + flag, available + flag, capability_summary truth). `tests/chemistry/test_kernel_registry.py` covers the registry's new fallback semantics (mutual exclusivity with shadow, authority-capable requirement, idempotent re-registration).
+Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` (historical filename) asserts builtin vapor authority plus VapoRock diagnostics. `tests/chemistry/test_vaporock_full_speciation.py` and `tests/test_vaporock_backend.py` pin the `vaporock_full_speciation_Pa` diagnostic surface.
 
 ## AlphaMELTS Adapter Notes
 
@@ -107,9 +100,9 @@ Do not interpret a MELTS chemical potential as an activity coefficient `gamma`, 
 
 ThermoEngine mode populates the AlphaMELTS activity field from live `mu/mu0`
 API calls. The PetThermoTools fallback still reports activities absent unless
-it exposes a verified live `mu/mu0` pair. VapoRock remains the vapor authority
-and performs its own `mu -> a` conversion internally; the AlphaMELTS activity
-field is diagnostic transport metadata, not ledger authority.
+it exposes a verified live `mu/mu0` pair. VapoRock performs its own
+`mu -> a` conversion internally for diagnostic gas speciation; the AlphaMELTS
+activity field is diagnostic transport metadata, not ledger authority.
 
 ## MAGEMin adapter notes
 

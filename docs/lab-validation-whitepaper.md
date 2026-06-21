@@ -71,11 +71,11 @@ Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
 
 | # | Subsystem | Parameter / value | Where set | Robinot-path sensitivity |
 |---:|---|---|---|---|
-| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium if builtin fallback used. |
-| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low if fallback used. |
-| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high if fallback used. |
-| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Fe.antoine` | High if fallback used. |
-| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high if fallback used. |
+| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
+| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low for builtin authoritative runtime. |
+| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
+| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
+| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
 | 22 | P_sat runtime | CrO2 runtime Antoine `(12.9245114,23732.9593,0)`, JANAF0 fallback fit | `data/vapor_pressures.yaml::oxide_vapors.CrO2.antoine/reaction` | Low/medium. |
 | 39 | Condensation routing | Condensation temps Fe/Mg/Na/K/Ca/Mn/Cr/Al/Ti, operator-tuned against P_sat curves | `simulator/condensation.py:390-432`, `data/setpoints.yaml:820-832` | Medium/high; controls stage assignment. |
 | 66 | Lab overlay | Required closure factor `alpha * area = 0.03969` | `campaign analysis 2026-06`, `:112-126` | Very high; paper-derived diagnostic, not allowed as hidden runtime scalar. |
@@ -349,11 +349,11 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 14 | Alpha | Si `alpha=1.0`, pure elemental only | ASSUMED | `data/vapor_pressures.yaml::metals.Si.evaporation_alpha` | Low in current faithful run; inactive pure-Si branch. |
 | 15 | Alpha | Ti `alpha=0.8`, proxy tag | ASSUMED | `data/vapor_pressures.yaml::metals.Ti.evaporation_alpha` | Low; Ti vapor tiny. |
 | 16 | Alpha | Cr/Mn `fail_loud_missing_alpha` policy | ASSUMED | `data/vapor_pressures.yaml::metals.Cr/Mn.evaporation_alpha_policy` | Low unless fallback enabled; honest no-value state. |
-| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | FITTED | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium if builtin fallback used. |
-| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low if fallback used. |
-| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high if fallback used. |
-| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Fe.antoine` | High if fallback used. |
-| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high if fallback used. |
+| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | FITTED | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
+| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low for builtin authoritative runtime. |
+| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
+| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
+| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
 | 22 | P_sat runtime | CrO2 runtime Antoine `(12.9245114,23732.9593,0)`, JANAF0 fallback fit | FITTED | `data/vapor_pressures.yaml::oxide_vapors.CrO2.antoine/reaction` | Low/medium. |
 | 23 | P_sat runtime | Ca runtime Antoine `(11.238,9520,0)`, legacy rough dH_vap approximation | ASSUMED | `data/vapor_pressures.yaml::metals.Ca` | Medium/high; Ca vapor material and source says TODO replace. |
 | 24 | P_sat runtime | Al runtime Antoine `(11.553,17340,0)`, legacy CRC-style regression/dH | ASSUMED | `data/vapor_pressures.yaml::metals.Al` | Medium. |
@@ -363,7 +363,7 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 28 | P_sat runtime | Mn runtime Antoine `(11.183,14740,0)`, legacy rough dH_vap approximation | ASSUMED | `data/vapor_pressures.yaml::metals.Mn` | Low/medium. |
 | 29 | P_sat sidecar | Pure-component Antoine Na/K/Mg/Fe anchored to normal boiling point and dH_vap | literature-pinned | `data/vapor_pressures.yaml::* .pure_component_antoine`, tested in `tests/test_physics_ground_truth.py:42-85` | Diagnostic/ground-truth anchor, not the pseudo runtime fit. |
 | 30 | P_sat sidecar | Pure-component Ca/Al/Si/Ti marked `LEGACY_DERIVATION_VALUE` despite boiling-point tests | ASSUMED | `data/vapor_pressures.yaml::* .pure_component_antoine` | Medium for Ca/Al; source strings explicitly say TODO replace. |
-| 31 | Activity / Ellingham | `_ELLINGHAM_THERMO` dH/dS/n table, JANAF high-T refit | literature-pinned | `engines/builtin/vapor_pressure.py:73-92` | High if builtin fallback used; sets `a_M`. |
+| 31 | Activity / Ellingham | `_ELLINGHAM_THERMO` dH/dS/n table, JANAF high-T refit | literature-pinned | `engines/builtin/vapor_pressure.py:73-92` | High for builtin authoritative runtime; sets `a_M`. |
 | 32 | Activity / Ellingham | Ellingham fit range `1100-1700 K` | literature-pinned | `engines/builtin/vapor_pressure.py:75`, `:274-285` | Medium; extrapolation warning, not correction. |
 | 33 | Activity | Oxide activity proxy `a_oxide = comp_wt[parent_oxide] / 100` | ASSUMED | `engines/builtin/vapor_pressure.py:270-287`, `:343-351` | High; idealized wt-fraction activity, no activity coefficients. |
 | 34 | Activity | Metal activity equation from Ellingham; clamp `a_M <= 1` | first-principles | `engines/builtin/vapor_pressure.py:289-320` | High; algebraic, but inherits table/activity assumptions. |

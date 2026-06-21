@@ -4,12 +4,13 @@ This doc covers how to *read* a run output document. The full JSON shape is pinn
 
 ## Vapor pressure provenance
 
-`vapor_pressure_source_report` tells you which authority produced the vapor pressure for each species in the final equilibrium. Values:
+`vapor_pressure_source_report` tells you which source label produced the vapor pressure for each species in the final equilibrium. Values:
 
-- `vaporock` — authoritative provider, γ_M corrections applied (default in 0.5.0).
+- `builtin_authoritative` — builtin Antoine + Ellingham `VAPOR_PRESSURE` provider; this is the current authoritative surface consumed by evaporation.
 - `thermoengine` — live MELTS `μ → a` conversion via ThermoEngine transport.
 - `alphamelts_python_api` / `alphamelts_text` — PetThermoTools fallback transports for the AlphaMELTS path.
-- `builtin_fallback` — pure Antoine × Ellingham; ~124× off VapoRock for K at lunar mare 1500 °C IW, so a `builtin_fallback` entry in production is a signal that the host is missing `vaporock` (or that the run was launched with `allow_fallback_vapor: true`).
+- `builtin_fallback` — explicit fallback label, not the default path.
+- `vaporock` — legacy/sentinel label on older or fallback artifacts. Current VapoRock output is diagnostic-only and, when present, lives under `vaporock_full_speciation_Pa`.
 - `kernel_diagnostic` — kernel-recorded sentinel; the species value did not come from any thermochemical authority and should not be treated as a measurement.
 
 The `summary` map gives per-source counts and species-count percentages for the latest vapor surface used by the evaporation path.

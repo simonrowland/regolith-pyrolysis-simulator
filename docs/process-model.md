@@ -23,7 +23,7 @@ The simulated process is organized as staged campaigns:
 Each hourly step updates:
 
 - Melt temperature and composition.
-- Vapor pressures and evaporation fluxes; provenance per species is recorded in `vapor_pressure_source_report` (one of `vaporock`, `thermoengine`, `alphamelts_python_api`, `alphamelts_text`, `builtin_fallback`, `kernel_diagnostic`).
+- Vapor pressures and evaporation fluxes; provenance per species is recorded in `vapor_pressure_source_report` (normally `builtin_authoritative`; `thermoengine`, `builtin_fallback`, `kernel_diagnostic`, or legacy backend labels may appear on confirmed, fallback, or older artifacts). VapoRock shadow speciation is diagnostic-only and lives under `vaporock_full_speciation_Pa`, not as ledger-authoritative provenance.
 - Overhead gas pressure and partial pressures.
 - Pipe transport saturation, ramp throttling, and per-pipe-segment wall temperatures + cold-spot diagnostics (F2). The `knudsen_regime_diagnostic` in `run_metadata` exposes the transport-regime check per segment.
 - Turbine load, O2 compression, venting, and accumulator inventory, with

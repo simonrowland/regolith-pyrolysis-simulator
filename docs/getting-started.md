@@ -12,7 +12,7 @@ Run a default C0 through C2A pyrolysis sequence on a 1-tonne `lunar_mare_low_ti`
 - `git`, `uv` or `pip` available on `PATH`
 - For the full thermochemical engine stack on macOS arm64: Xcode command-line tools (`xcode-select --install`) and [Homebrew](https://brew.sh) — the installer uses `brew` to fetch `nlopt`, `open-mpi`, and `gsl` before compiling MAGEMin and ThermoEngine from source
 
-In 0.5.0 the operational chain (VapoRock for `VAPOR_PRESSURE`, PetThermoTools/ThermoEngine for `SILICATE_EQUILIBRIUM`, MAGEMin for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`) is the production path; the Antoine × Ellingham fallback exists as a documented diagnostic surface but cannot reproduce VapoRock's γ_M corrections and is gated `chemistry_kernel.allow_fallback_vapor: true`. Without the engines installed, the simulator boots but is limited to comparative exploration, not validated melt chemistry. See [`docs/melt-backends.md`](melt-backends.md).
+In the current operational chain, builtin Antoine + Ellingham is the authoritative `VAPOR_PRESSURE` provider, VapoRock is a diagnostic-only shadow, PetThermoTools/ThermoEngine handles `SILICATE_EQUILIBRIUM`, and MAGEMin shadows or narrowly gates `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. Without the optional compiled engines installed, the simulator boots but is limited to comparative exploration, not validated melt chemistry. See [`docs/melt-backends.md`](melt-backends.md).
 
 ## Install
 
@@ -44,7 +44,7 @@ Skip the native compiles (PetThermoTools + VapoRock only, no MAGEMin / ThermoEng
 python3 install-engines.py --skip-compiles
 ```
 
-With the operational chain installed, the active backend selection log line (see `docs/melt-backends.md`) confirms VapoRock is the `VAPOR_PRESSURE` authority and ThermoEngine is the active transport. Without it, the kernel raises `ProviderUnavailableError` unless `chemistry_kernel.allow_fallback_vapor: true` is set in setpoints — silent fallback is forbidden.
+With the operational chain installed, the active backend selection log line (see `docs/melt-backends.md`) confirms the selected `MeltBackend`; `run_metadata.engines_used.registry.vapor_pressure` shows `authoritative: "builtin-vapor-pressure"` with VapoRock, when importable, under `shadows`. Silent fallback to backend vapor pressures is forbidden unless `chemistry_kernel.allow_fallback_vapor: true` is set in setpoints.
 
 ## First run via the web UI
 
