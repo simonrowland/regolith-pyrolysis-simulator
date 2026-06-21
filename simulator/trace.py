@@ -63,6 +63,13 @@ class PhysicsTrace:
     def from_simulator(cls, sim: Any) -> "PhysicsTrace":
         queries = AccountingQueries(sim)
         snapshots = tuple(getattr(sim.record, "snapshots", ()))
+        condensation_totals = dict(
+            queries.condensation_totals_with_terminal_oxygen()
+        )
+        snapshot_condensation = condensed_by_species_from_snapshots(snapshots)
+        snapshot_condensation.pop("O2", None)
+        # Snapshot sums intentionally replace overlapping ledger totals; both are the same ledger-account value.
+        condensation_totals.update(snapshot_condensation)
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -72,8 +79,7 @@ class PhysicsTrace:
                 queries.terminal_rump_by_class()),
             oxygen_terminal_partition_kg=_freeze_mapping(
                 queries.oxygen_terminal_partition_kg()),
-            condensation_totals_kg=_freeze_mapping(
-                queries.condensation_totals_with_terminal_oxygen()),
+            condensation_totals_kg=_freeze_mapping(condensation_totals),
             wall_deposit_by_segment_species_kg=(
                 _freeze_mapping(wall_deposit_by_segment_species_kg(
                     sim.atom_ledger))),
@@ -124,6 +130,21 @@ def wall_deposit_by_segment_species_kg(ledger: Any) -> dict[tuple[str, str], flo
             amount = float(kg)
             if amount > 1e-12:
                 result[(segment, species)] = amount
+    return result
+
+
+def condensed_by_species_from_snapshots(
+    snapshots: tuple[HourSnapshot, ...],
+) -> dict[str, float]:
+    result: dict[str, float] = {}
+    for snapshot in snapshots:
+        for (_stage, species), kg in (
+            snapshot.condensed_by_stage_species_delta.items()
+        ):
+            amount = float(kg)
+            if amount:
+                key = str(species)
+                result[key] = result.get(key, 0.0) + amount
     return result
 
 

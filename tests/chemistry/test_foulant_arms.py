@@ -213,8 +213,19 @@ def test_naf_volatilization_interval_not_certified_point(
         feedstocks_data,
         setpoints_data,
     )
-    with pytest.raises(ValueError, match="certified-point"):
-        chi_escape_salt("NaF", 1200.0, 0.2, foulant_registry)
+    naf_row = vapor_pressure_data["foulant_vapor"]["NaF"]
+    assert naf_row["interval_required"] is True
+    assert naf_row["certified_point"] is None
+    assert "antoine" not in naf_row
+
+    split = chi_escape_salt("NaF", 1200.0, 0.2, foulant_registry)
+    assert split.escaped_frac == 0.0
+    assert split.retained_frac == 1.0
+    assert split.confidence == "interval_only"
+    assert split.status == "uncertified"
+    assert split.warning is not None
+    assert "NaF foulant volatilization uncertified" in split.warning
+
     result = _dispatch(sim, {
         "reaction_family": REACTION_FAMILY_VOLATILIZATION,
         "carrier": "NaF",
@@ -224,8 +235,28 @@ def test_naf_volatilization_interval_not_certified_point(
         ),
         "foulant_registry": foulant_registry,
     })
-    assert result.diagnostic["interval_required"] is True
-    assert 0.0 <= result.diagnostic["phase_splits"][0]["escaped_frac"] <= 1.0
+    assert result.status == "ok"
+    assert result.transition is None
+    assert result.warnings == (
+        "NaF foulant volatilization uncertified - not modeled",
+    )
+    diag = result.diagnostic
+    assert diag["cumulative_escaped_frac"] == 0.0
+    assert diag["cumulative_retained_frac"] == 1.0
+    assert diag["wall_deposit_frac"] == 0.0
+    assert diag["warnings"] == result.warnings
+    assert diag["phase_splits"] == [
+        {
+            "phase": 1,
+            "T_C": 1200.0,
+            "p_overhead_bar": 0.2,
+            "escaped_frac": 0.0,
+            "retained_frac": 1.0,
+            "confidence": "interval_only",
+            "status": "uncertified",
+            "warning": "NaF foulant volatilization uncertified - not modeled",
+        },
+    ]
 
 
 def test_refractory_fluoride_inert_to_rump(

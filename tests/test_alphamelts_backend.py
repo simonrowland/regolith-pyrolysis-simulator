@@ -1354,7 +1354,7 @@ def test_activities_times_antoine_warns_once_for_pseudo_curvefit():
             'HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved '
             'VapoRock fallback \\(curve-fit\\), NOT first-principles; '
             'residual_dex=1.4; confidence_tier=low; '
-            'VapoRock is authoritative when available'
+            'VapoRock is diagnostic-only; builtin remains authoritative'
         ),
     ):
         first = backend._activities_times_antoine(

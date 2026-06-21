@@ -756,6 +756,8 @@ def test_naf_foulant_vapor_certified_point_request_fails_loud() -> None:
     assert data.get("interval_required") is True
     assert data.get("certified_point") is None
     assert "pure_component_antoine" not in data
+    assert "antoine" not in data
+    assert "evaporation_alpha" not in data
     with pytest.raises(ValueError, match="certified-point request refused"):
         _require_certified_pure_component_antoine(data, 1977.15)
 

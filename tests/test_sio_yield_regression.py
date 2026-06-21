@@ -82,6 +82,10 @@ GOLDENS = (
 # 2026-06-19 SSO-R R2.1b wires Kress91 Fe-redox into live a_FeO. The SiO
 # fixture shift is coupled-flow scale: lunar 0.0005083144891 ->
 # 0.000508314464643; Mars 0.000486760127354 -> 0.000486760105302.
+# 2026-06-20 fw-vapor refix: VapoRock is diagnostic-only; the default
+# C2A vapor-pressure dispatch now uses builtin-authoritative pressures.
+# The NIST pure-component ranges remain the authoritative diagnostics; no
+# legacy Ca row-level retuning is accepted without a named source.
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 0.000508314464643,
     "mars_basalt": 0.000486760105302,
@@ -254,7 +258,7 @@ def test_route_destinations_sum_to_evolved_budget():
 
 def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     ca_data = condensation_module.VAPOR_PRESSURE_DATA["metals"]["Ca"]
-    assert ca_data["valid_range_K"] == [1115, 1757]
+    assert ca_data["pure_component_antoine"]["valid_range_K"] == [1254, 1712]
 
     model = CondensationModel(CondensationTrain.create_default())
     melt = MeltState()

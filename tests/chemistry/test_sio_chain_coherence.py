@@ -51,7 +51,11 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # 2026-06-19 SSO-R R2.1b makes Fe activity respond to Kress91 melt redox.
 # SiO remains wall-temperature invariant; coupled fallback flow shifts only
 # at the 2.4e-11 kg level.
-PHASE3BIS_SIO_EVOLVED_KG = 0.000508314464643
+# 2026-06-20 BUG-035/037/083/158: VapoRock becomes diagnostic-only and the
+# builtin Antoine/Ellingham surface is authoritative on the default path. The
+# selected builtin runtime surface keeps the wall-temperature invariance contract
+# with the pure-sidecar baseline.
+PHASE3BIS_SIO_EVOLVED_KG = 0.000508314461235
 
 
 @lru_cache(maxsize=None)

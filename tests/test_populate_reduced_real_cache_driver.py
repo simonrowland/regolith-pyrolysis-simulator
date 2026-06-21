@@ -38,7 +38,7 @@ def _write_magemin_row(db_path, suffix, payload=None):
     }
     payload = payload or {
         "suffix": suffix,
-        "last_vapor_pressures_source": {"Na": "vaporock"},
+        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
     }
     key_bytes = _canonical_bytes(key)
     payload_bytes = _canonical_bytes(payload)
@@ -56,7 +56,7 @@ def _write_magemin_row(db_path, suffix, payload=None):
 def _strict_vapor_pt1_key(
     suffix,
     *,
-    vapor_provider_id="vaporock",
+    vapor_provider_id="builtin-vapor-pressure",
     fallback_provider_id=None,
 ):
     return {
@@ -82,7 +82,7 @@ def _strict_vapor_pt1_key(
 def _strict_vapor_pt1_payload():
     return {
         "equilibrium_result": {"status": "ok"},
-        "last_vapor_pressures_source": {"Na": "vaporock"},
+        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
     }
 
 
@@ -702,8 +702,8 @@ def test_merge_cache_shard_rejects_builtin_fallback_vapor_source(tmp_path):
     ("case_name", "key_kwargs", "payload_update", "match"),
     (
         (
-            "key_builtin_provider",
-            {"vapor_provider_id": "builtin-vapor-pressure"},
+            "key_non_authoritative_provider",
+            {"vapor_provider_id": "vaporock"},
             {},
             "resolved_provider_id",
         ),
@@ -827,8 +827,8 @@ def test_main_preflight_rejects_fallback_enabled_setpoints(tmp_path, monkeypatch
         )
 
 
-def test_run_case_records_all_vaporock_source_report(tmp_path, monkeypatch):
-    session = _FakeSession(source="vaporock")
+def test_run_case_records_all_builtin_authoritative_source_report(tmp_path, monkeypatch):
+    session = _FakeSession(source="builtin_authoritative")
     monkeypatch.setattr(driver, "_start_session", lambda **kwargs: session)
     monkeypatch.setattr(driver, "_apply_pending_decision", lambda session: False)
 
@@ -847,7 +847,7 @@ def test_run_case_records_all_vaporock_source_report(tmp_path, monkeypatch):
     )
 
     source_report = result["rows"][0]["vapor_pressure_source_report"]
-    assert source_report["summary"]["vaporock"]["count"] == 1
+    assert source_report["summary"]["builtin_authoritative"]["count"] == 1
 
 
 def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):

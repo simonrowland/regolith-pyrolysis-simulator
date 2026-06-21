@@ -962,29 +962,32 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         )
 
         phase_splits: list[dict[str, Any]] = []
+        warnings: list[str] = []
         retained_after_phases = 1.0
         for phase_row in phase_specs:
             t_c = float(phase_row["T_C"])
             p_bar = float(phase_row["p_overhead_bar"])
             phase_id = phase_row.get("phase", len(phase_splits) + 1)
-            if interval_required:
-                split = self._chi_escape_interval(carrier, t_c, p_bar)
-                escaped = split["escaped_frac"]
-                confidence = split["confidence"]
-            else:
-                result = chi_escape_salt(carrier, t_c, p_bar, registry)
-                escaped = result.escaped_frac
-                confidence = "partly_grounded"
+            result = chi_escape_salt(carrier, t_c, p_bar, registry)
+            escaped = result.escaped_frac
+            confidence = result.confidence
             retained = 1.0 - escaped
             retained_after_phases *= retained
-            phase_splits.append({
+            phase_split = {
                 "phase": phase_id,
                 "T_C": t_c,
                 "p_overhead_bar": p_bar,
                 "escaped_frac": escaped,
                 "retained_frac": retained,
                 "confidence": confidence,
-            })
+            }
+            if result.status != "ok":
+                phase_split["status"] = result.status
+            if result.warning:
+                phase_split["warning"] = result.warning
+                if result.warning not in warnings:
+                    warnings.append(result.warning)
+            phase_splits.append(phase_split)
 
         cumulative_escaped = 1.0 - retained_after_phases
         return IntentResult(
@@ -1002,7 +1005,9 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "wall_deposit_frac": cumulative_escaped,
                 "interval_required": interval_required,
                 "behavior_change_gate": "instrument_first",
+                "warnings": tuple(warnings),
             },
+            warnings=tuple(warnings),
         )
 
     @staticmethod
@@ -1011,12 +1016,10 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         t_c: float,
         p_overhead_bar: float,
     ) -> dict[str, Any]:
-        """Interval-only vapor escape using the non-certified Antoine row."""
+        """Interval-only vapor escape warning path; no coefficients are used."""
         from pathlib import Path
 
         import yaml
-
-        from engines.builtin.foulant_disposition import PA_PER_BAR
 
         repo_root = Path(__file__).resolve().parents[2]
         vapor_path = repo_root / "data" / "vapor_pressures.yaml"
@@ -1029,22 +1032,14 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             raise ValueError(
                 f"interval escape path refused for certified row {carrier!r}"
             )
-        coeff = entry.get("antoine")
-        if not coeff:
-            raise KeyError(f"antoine row missing for interval carrier {carrier!r}")
-        temperature_k = float(t_c) + 273.15
-        log_p = float(coeff["A"]) - float(coeff["B"]) / (
-            temperature_k + float(coeff.get("C", 0.0))
-        )
-        p_sat_pa = 10.0**log_p
-        p_total_pa = float(p_overhead_bar) * PA_PER_BAR
-        denom = p_sat_pa + p_total_pa
-        escaped = p_sat_pa / denom if denom > 0.0 else 0.0
-        escaped = min(max(escaped, 0.0), 1.0)
+        del t_c, p_overhead_bar
+        warning = f"{carrier} foulant volatilization uncertified - not modeled"
         return {
-            "escaped_frac": escaped,
-            "retained_frac": 1.0 - escaped,
-            "confidence": str(entry.get("confidence", "partly_grounded")),
+            "escaped_frac": 0.0,
+            "retained_frac": 1.0,
+            "confidence": "interval_only",
+            "status": "uncertified",
+            "warning": warning,
         }
 
     def _dispatch_sulfate_decomp_diagnostic(

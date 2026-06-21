@@ -1,55 +1,48 @@
-"""VapoRock kernel-authoritative VAPOR_PRESSURE provider.
+"""VapoRock diagnostic VAPOR_PRESSURE shadow provider.
 
-Promoted under ``\\goal VAPOROCK-AUTHORITY-PROMOTION`` (#10).  The
-provider wraps the :class:`simulator.melt_backend.vaporock.VapoRockBackend`
+The provider wraps the :class:`simulator.melt_backend.vaporock.VapoRockBackend`
 adapter (the library import + species-name normalization stay there) and
-exposes it as a kernel-registered authoritative provider for
+exposes its gas speciation as a kernel-registered diagnostic shadow for
 :attr:`ChemistryIntent.VAPOR_PRESSURE`.
 
 Authority posture
 -----------------
-VapoRock is registered as the **authoritative** provider for
-VAPOR_PRESSURE.  The original
-:class:`engines.builtin.vapor_pressure.BuiltinVaporPressureProvider`
-stays in the registry as the **fallback** -- consulted only when:
+VapoRock is **not** authoritative for VAPOR_PRESSURE. Builtin
+Antoine/Ellingham owns the pressure dict consumed by evaporation; VapoRock
+may run beside it as a diagnostic overlay.
 
-1. The VapoRock library is missing and the provider therefore raises
-   :class:`ProviderUnavailableError` at dispatch time, AND
-2. The caller (the simulator wiring layer) has set
-   ``allow_fallback_vapor=True`` so the kernel's
-   :attr:`ChemistryKernel.allow_fallback_intents` contains
-   ``VAPOR_PRESSURE``.
-
-Otherwise the kernel re-raises the
-:class:`ProviderUnavailableError` -- silent fallback is forbidden by
-the goal spec.
-
-The intent itself is read-only / diagnostic at the kernel level (the
-shape mirrors :class:`BuiltinVaporPressureProvider`):
-:attr:`IntentResult.transition` is always ``None``.  The downstream
-``EVAPORATION_TRANSITION`` writer consumes
-``diagnostic['vapor_pressures_Pa']``.
+The intent itself is read-only / diagnostic at the kernel level:
+:attr:`IntentResult.transition` is always ``None``. Downstream
+``EVAPORATION_TRANSITION`` consumes the builtin authoritative
+``diagnostic['vapor_pressures_Pa']``. VapoRock reports an empty
+``vapor_pressures_Pa`` and keeps every real gas pressure under
+``vaporock_full_speciation_Pa`` for diagnostics only.
 
 This module MUST NOT import :class:`LedgerTransitionProposal` from
-anywhere -- not even for type hints.  The
-``test_writer_purity.py`` AST walk enforces this for every authoritative
-provider; the same constraint applies here.
+anywhere -- not even for type hints. The writer-purity AST walk enforces
+this for every provider that might be registered in the vapor-pressure
+plane.
 """
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping, Optional
 
 from engines.builtin._common import (
-    diagnostic_control_audit,
     reject_wrong_intent,
+    resolve_transport_pO2_bar,
 )
 from engines.vaporock.result import VapoRockDiagnostics
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
 )
-from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
+from simulator.chemistry.kernel.dto import (
+    ControlAudit,
+    IntentRequest,
+    IntentResult,
+)
 from simulator.chemistry.kernel.errors import ProviderUnavailableError
 from simulator.chemistry.kernel.provider import ChemistryProvider
 
@@ -59,7 +52,7 @@ _DECLARED_ACCOUNT = 'process.cleaned_melt'
 
 
 class VapoRockProvider(ChemistryProvider):
-    """Authoritative VAPOR_PRESSURE provider backed by the VapoRock adapter.
+    """Diagnostic VAPOR_PRESSURE provider backed by the VapoRock adapter.
 
     Args:
         backend: Optional pre-initialised
@@ -117,11 +110,9 @@ class VapoRockProvider(ChemistryProvider):
         return CapabilityProfile(
             provider_id=self.PROVIDER_ID,
             intents=_INTENTS,
-            # Authoritative for VAPOR_PRESSURE.  The intent itself is
-            # read-only at the kernel level -- the provider returns
-            # ``IntentResult.transition=None`` so no ledger write is
-            # produced from this surface.  See module docstring.
-            is_authoritative_for=_INTENTS,
+            # Diagnostic-only for VAPOR_PRESSURE. Builtin Antoine/Ellingham
+            # is the authoritative provider consumed by evaporation.
+            is_authoritative_for=frozenset(),
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 
@@ -136,13 +127,12 @@ class VapoRockProvider(ChemistryProvider):
            kernel's fallback opt-in path (``allow_fallback_intents``)
            is the only legitimate way to demote a missing VapoRock to
            the builtin Antoine path.
-        3. Builds the :class:`ControlAudit` with ``applied=requested``
-           and the diagnostic note.
+        3. Builds the :class:`ControlAudit` with separate intrinsic-melt
+           redox and transport-gas fO2 provenance.
         4. Extracts ``process.cleaned_melt`` composition (the kernel
            filter has already restricted the view to this account).
         5. Calls the adapter's :meth:`equilibrate`.
-        6. Projects the adapter's
-           :class:`EquilibriumResult.vapor_pressures_Pa` into a
+        6. Projects the adapter's gas pressures into a diagnostic-only
            :class:`VapoRockDiagnostics`.
         7. Returns the :class:`IntentResult` with ``transition=None``.
 
@@ -159,19 +149,21 @@ class VapoRockProvider(ChemistryProvider):
 
         backend = self._ensure_backend()
         if backend is None or not self._backend_available(backend):
-            # No silent fallback: raise ``ProviderUnavailableError``
-            # and let the kernel decide (via
-            # ``allow_fallback_intents``) whether the registered
-            # fallback may take over.  Goal #10 binds this surface.
+            # As a shadow diagnostic, unavailable VapoRock surfaces as a
+            # shadow error while builtin authority continues.
             last_error = getattr(backend, '_last_error', None) if backend else None
             raise ProviderUnavailableError(
-                'VapoRock authoritative provider unavailable: '
+                'VapoRock diagnostic provider unavailable: '
                 + (str(last_error) if last_error else 'upstream library not importable')
             )
 
-        control_audit = diagnostic_control_audit(request)
-
         pO2_bar = self._resolve_pO2_bar(request)
+        fO2_log_resolved = self._resolve_fO2_log(request)
+        control_audit = self._control_audit(
+            request,
+            pO2_bar=pO2_bar,
+            fO2_log_resolved=fO2_log_resolved,
+        )
         composition_mol_by_account = self._composition_from_view(request)
         # VapoRock's vapor solver equilibrates gas species against the
         # supplied gas fO2/log pO2.  Keep melt-liquidus redox intrinsic in
@@ -194,7 +186,7 @@ class VapoRockProvider(ChemistryProvider):
             request,
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_registry,
-            fO2_log_resolved=self._resolve_fO2_log(request),
+            fO2_log_resolved=fO2_log_resolved,
         )
 
         diagnostics = self._project_equilibrium(
@@ -204,27 +196,9 @@ class VapoRockProvider(ChemistryProvider):
             engine_version=self._engine_version(backend),
             allowed_species=self._allowed_species,
         )
-        # 0.5.2 Phase A3 (2026-05-27): pass through unrecognised backend
-        # statuses verbatim rather than coercing them to 'ok'. The old
-        # whitelist silently sanitised any non-vocabulary status (e.g.,
-        # 'timeout', 'partial', 'no_data', 'failed', '' from a broken
-        # adapter) into 'ok' -- defeating the core-level loud-fail gate
-        # that simulator/core.py::_apply_kernel_vapor_pressures relies
-        # on. Codex challenge r8 P1+P2 flagged this as a hidden silent
-        # downgrade path. The core gate already accepts ANY non-'ok'
-        # status with no pressures as a failure mode (post-0.5.1) so
-        # passing the raw status through is safe and operator-visible.
-        # The retained whitelist behaviour: empty/None status maps to
-        # 'unknown' so the diagnostic carries an explicit signal.
-        raw_status = diagnostics.backend_status
-        if raw_status is None or str(raw_status).strip() == '':
-            kernel_status = 'unknown'
-        else:
-            kernel_status = str(raw_status).strip().lower()
-
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
-            status=kernel_status,
+            status='non_authoritative',
             transition=None,  # diagnostic-only -- mirrors builtin shape
             control_audit=control_audit,
             diagnostic=diagnostics.as_diagnostic(),
@@ -243,29 +217,62 @@ class VapoRockProvider(ChemistryProvider):
         so a parity comparison against the builtin path sees the same
         pO2 input.
         """
-        pO2 = (
-            request.control_inputs.get('pO2_bar')
-            if request.control_inputs
-            else None
-        )
-        if pO2 is not None:
-            return max(float(pO2), 1e-9)
-        if request.fO2_log is not None:
-            return max(10.0 ** float(request.fO2_log), 1e-9)
-        return 1e-9
+        return resolve_transport_pO2_bar(request, floor_bar=1e-9)
 
     @staticmethod
     def _resolve_fO2_log(request: IntentRequest) -> float:
         """Convert commanded vapor pO2 into the adapter's gas fO2_log."""
         controls = request.control_inputs or {}
-        pO2 = controls.get('pO2_bar') if controls else None
-        if pO2 is not None:
-            import math
-            value = max(float(pO2), 1e-30)
-            return float(math.log10(value))
+        if controls.get('pO2_bar') is not None:
+            return float(
+                math.log10(resolve_transport_pO2_bar(request, floor_bar=1e-9))
+            )
         if request.fO2_log is not None:
-            return float(request.fO2_log)
+            return float(
+                math.log10(resolve_transport_pO2_bar(request, floor_bar=1e-9))
+            )
         return -9.0
+
+    @staticmethod
+    def _control_audit(
+        request: IntentRequest,
+        *,
+        pO2_bar: float,
+        fO2_log_resolved: float,
+    ) -> ControlAudit:
+        controls = request.control_inputs or {}
+        requested_transport_pO2 = (
+            float(controls['pO2_bar'])
+            if controls.get('pO2_bar') is not None
+            else None
+        )
+        intrinsic_fO2_log = (
+            float(request.fO2_log) if request.fO2_log is not None else None
+        )
+        requested = {
+            'temperature_C': float(request.temperature_C),
+            'pressure_bar': float(request.pressure_bar),
+            'fO2_log': intrinsic_fO2_log,
+            'intrinsic_fO2_log': intrinsic_fO2_log,
+            'transport_pO2_bar': requested_transport_pO2,
+        }
+        applied = {
+            'temperature_C': float(request.temperature_C),
+            'pressure_bar': float(request.pressure_bar),
+            'fO2_log': float(fO2_log_resolved),
+            'intrinsic_fO2_log': intrinsic_fO2_log,
+            'transport_pO2_bar': float(pO2_bar),
+            'transport_fO2_log': float(fO2_log_resolved),
+        }
+        return ControlAudit(
+            requested=requested,
+            applied=applied,
+            notes=(
+                'VapoRock vapor pressure applies transport gas fO2 from '
+                'transport_pO2_bar; intrinsic_fO2_log is retained as melt '
+                'redox provenance.',
+            ),
+        )
 
     def _composition_from_view(self, request: IntentRequest) -> dict:
         """Extract ``account -> species_mol`` for the cleaned-melt slice."""
@@ -360,14 +367,11 @@ class VapoRockProvider(ChemistryProvider):
         Mirrors the MAGEMin shadow's projection.  Missing or empty
         results surface as ``backend_status='unavailable'``.
 
-        ``allowed_species`` filters the VapoRock vapor-pressure dict
-        to the universe ``data/vapor_pressures.yaml`` declares (the
-        simulator's downstream ``EVAPORATION_FLUX`` step indexes the
-        Antoine + Hertz-Knudsen tables on these species; emitting a
-        broader set crashes the per-species ``parent_oxide``
-        validator).  An empty ``allowed_species`` set disables the
-        filter -- used by adapter-level tests that operate below the
-        simulator.
+        ``allowed_species`` is retained in the signature for callers
+        that share construction code with the builtin provider. VapoRock
+        no longer exports a filtered authoritative pressure dict; every
+        finite positive pressure stays under
+        ``vaporock_full_speciation_Pa``.
         """
         if equilibrium is None:
             return VapoRockDiagnostics(
@@ -393,29 +397,8 @@ class VapoRockProvider(ChemistryProvider):
             pressure = float(value)
             if pressure > 0.0:
                 vaporock_full_speciation_Pa[str(species)] = pressure
+        del allowed_species
         vapor_pressures_Pa: dict[str, float] = {}
-        # Mirror the builtin Antoine path's vanishing-pressure floor
-        # (``P_effective_Pa > 1e-15``): species at sub-femtopascal
-        # pressures are below the per-transition mass-balance
-        # tolerance and only generate numerical noise downstream
-        # (the EVAPORATION_FLUX -> EVAPORATION_TRANSITION pipeline
-        # uses provider ``atom_balance_proof`` checks that fail when
-        # the projected mass loss is below the IEEE-754 floor for
-        # the per-species kg conversion).  Filtering at the
-        # vapor-pressure surface keeps the downstream conservation
-        # numbers tidy and matches the builtin's behaviour for the
-        # tail-end species.
-        _VAPOR_PRESSURE_FLOOR_PA = 1e-15
-        for species, value in raw_vapor.items():
-            if not _is_finite(value):
-                continue
-            pressure = float(value)
-            if pressure <= _VAPOR_PRESSURE_FLOOR_PA:
-                continue
-            name = str(species)
-            if allowed_species and name not in allowed_species:
-                continue
-            vapor_pressures_Pa[name] = pressure
         warnings = tuple(
             str(w) for w in (getattr(equilibrium, 'warnings', ()) or ())
         )

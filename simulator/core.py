@@ -401,10 +401,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             setpoints:    Campaign parameters loaded from setpoints.yaml.
                           May contain a top-level ``chemistry_kernel``
                           block whose ``allow_fallback_vapor`` flag
-                          opts the kernel into demoting a missing
-                          VapoRock to the builtin Antoine fallback (goal
-                          #10 ``VAPOROCK-AUTHORITY-PROMOTION``); the
-                          flag defaults to ``False`` (loud
+                          permits an explicitly registered vapor-pressure
+                          fallback. Builtin Antoine/Ellingham is the
+                          default authority and VapoRock is diagnostic-only;
+                          the flag defaults to ``False`` (loud
                           :class:`ProviderUnavailableError` instead of
                           silent fallback).
             feedstocks:   Feedstock compositions from feedstocks.yaml.
@@ -468,13 +468,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # :meth:`_require_chem_kernel`).
         self._chem_registry: ProviderRegistry = ProviderRegistry()
         self._chem_kernel: Optional[ChemistryKernel] = None
-        # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock is the
-        # authoritative VAPOR_PRESSURE provider; the builtin Antoine
-        # provider is registered as fallback.  The kernel only retries
-        # the fallback when the user opted in via
-        # ``setpoints['chemistry_kernel']['allow_fallback_vapor'] =
-        # True`` -- the default is loud
-        # :class:`ProviderUnavailableError` if VapoRock is missing.
+        # VAPOR_PRESSURE authority is builtin Antoine/Ellingham.
+        # VapoRock is retained as a diagnostic shadow only; it must not
+        # provide the pressure dict consumed by evaporation.
         kernel_config = normalize_chemistry_kernel_config(
             setpoints.get('chemistry_kernel', {}) or {}
         )
@@ -937,12 +933,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # reviewer diff stays stable.  Adding a builtin engine = one new row
     # here; no changes to ``_build_chemistry_kernel`` itself.
     #
-    # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` moved VAPOR_PRESSURE out
-    # of this authoritative-only table: VapoRock is registered
-    # authoritative separately, and the builtin Antoine provider is
-    # registered as the fallback slot.  See
-    # ``_register_vapor_pressure_pair`` for the wiring.  The six
-    # remaining authoritative builtins (EVAPORATION_FLUX,
+    # VAPOR_PRESSURE stays out of this table only because it needs the
+    # simulator-owned vapor_pressures.yaml payload. It is still builtin
+    # authoritative; VapoRock is wired separately as a diagnostic
+    # shadow. See ``_register_vapor_pressure_pair``. The six remaining
+    # authoritative builtins (EVAPORATION_FLUX,
     # EVAPORATION_TRANSITION, CONDENSATION_ROUTE, ELECTROLYSIS_STEP,
     # METALLOTHERMIC_STEP, STAGE0_PRETREATMENT) are unchanged.
     #
@@ -1082,13 +1077,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             self._chem_registry.register_idempotent(provider, list(intents))
 
-        # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock takes the
-        # authoritative VAPOR_PRESSURE slot; the builtin Antoine provider
-        # is demoted to the fallback slot.  The pair is wired separately
-        # from the builtin-registration loop because the authority swap
-        # involves two slots, two providers, and a config-driven fallback
-        # opt-in that the loop's single ``register_idempotent`` call
-        # cannot express.
+        # VAPOR_PRESSURE is wired separately from the builtin-registration
+        # loop because it needs simulator-owned vapor_pressures.yaml and
+        # a VapoRock diagnostic shadow.
         self._register_vapor_pressure_pair()
 
         # Register the AlphaMELTS diagnostic provider when the active
@@ -1136,15 +1127,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return self.lab_geometry.wall_deposit_accounts
 
     def _register_vapor_pressure_pair(self) -> None:
-        """Wire the authoritative + fallback VAPOR_PRESSURE pair.
+        """Wire builtin-authoritative VAPOR_PRESSURE plus VapoRock shadow.
 
-        Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: VapoRock becomes
-        authoritative; the builtin Antoine/Ellingham provider is
-        registered in the registry's fallback slot so the kernel can
-        retry it when (a) VapoRock raises
-        :class:`ProviderUnavailableError` AND (b) the simulator opted
-        into fallback via ``allow_fallback_vapor`` in
-        ``setpoints['chemistry_kernel']``.
+        Builtin Antoine/Ellingham owns the pressure surface consumed by
+        evaporation. VapoRock runs as a diagnostic shadow when available
+        and may return non-authoritative/empty diagnostics without
+        blocking the authoritative builtin result.
 
         Both registrations are idempotent: ``_build_chemistry_kernel``
         is rebuilt per batch but the registry persists for the lifetime
@@ -1159,27 +1147,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.vaporock import VapoRockProvider
 
-        # VapoRockProvider receives the same vapor_pressures.yaml
-        # payload the builtin reads.  The provider uses the payload's
-        # ``metals`` + ``oxide_vapors`` keys to filter its (richer)
-        # output back onto the species universe the downstream
-        # EVAPORATION_FLUX step has parent_oxide + Antoine metadata
-        # for.  Without this filter VapoRock's ~30-species output
-        # crashes the per-species stoichiometry validator and breaks
-        # the mass-balance hard constraint.
+        builtin_provider = BuiltinVaporPressureProvider(self.vapor_pressures)
+        self._chem_registry.register_idempotent(
+            builtin_provider,
+            [ChemistryIntent.VAPOR_PRESSURE],
+        )
+
+        # VapoRockProvider receives the same vapor_pressures.yaml payload
+        # so its diagnostic output is filtered onto the simulator species
+        # universe. It is shadow-only: the builtin result remains the
+        # authoritative pressure dict even when VapoRock reports
+        # non_authoritative or empty diagnostics.
         vaporock_provider = VapoRockProvider(
             vapor_pressure_data=self.vapor_pressures,
         )
         self._chem_registry.register_idempotent(
             vaporock_provider,
             [ChemistryIntent.VAPOR_PRESSURE],
-        )
-
-        builtin_provider = BuiltinVaporPressureProvider(self.vapor_pressures)
-        self._chem_registry.register_idempotent(
-            builtin_provider,
-            [ChemistryIntent.VAPOR_PRESSURE],
-            fallback=True,
+            shadow=True,
         )
 
     def _register_alphamelts_provider_if_available(self) -> None:
@@ -3255,6 +3240,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider = diagnostic.get('kernel_fallback_used')
         if provider == 'builtin-vapor-pressure':
             return 'builtin_fallback'
+        if 'vapor_pressures_source' in diagnostic:
+            return 'builtin_authoritative'
         if 'vaporock_full_speciation_Pa' in diagnostic:
             return 'vaporock'
         return 'kernel_diagnostic'
@@ -6100,14 +6087,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         summary: Dict[str, Any] = {}
         if 'status' in diag:
             summary['status'] = str(diag['status'])
-        # Knudsen number from the model directly (more reliable than
-        # parsing it back out of the diagnostic).
-        kn = getattr(model, 'knudsen_number', None)
+        # Prefer the diagnostic's JSON-safe projection: the model may carry
+        # ``math.inf`` for zero-pressure/free-molecular ticks, while runner
+        # exports require finite values or omission.
+        kn = diag.get('knudsen_number', getattr(model, 'knudsen_number', None))
         if kn is not None:
             try:
-                summary['knudsen_number'] = float(kn)
+                finite_kn = float(kn)
             except (TypeError, ValueError):
-                pass
+                finite_kn = None
+            if finite_kn is not None and math.isfinite(finite_kn):
+                summary['knudsen_number'] = finite_kn
         regime = getattr(model, 'knudsen_regime', None)
         if regime is not None:
             summary['knudsen_regime'] = getattr(

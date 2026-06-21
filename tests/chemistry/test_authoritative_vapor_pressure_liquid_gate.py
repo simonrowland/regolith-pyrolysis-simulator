@@ -20,7 +20,10 @@ def _sim_with_vapor_dispatch(vapor_pressures: dict[str, float]):
             status='ok',
             diagnostic={
                 'vapor_pressures_Pa': dict(vapor_pressures),
-                'kernel_fallback_used': 'builtin-vapor-pressure',
+                'vapor_pressures_source': {
+                    species: 'builtin_authoritative'
+                    for species in vapor_pressures
+                },
             },
         )
 
@@ -81,7 +84,7 @@ def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
 
     assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
     assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
-    assert result.vapor_pressures_source == {'Na': 'builtin_fallback'}
+    assert result.vapor_pressures_source == {'Na': 'builtin_authoritative'}
 
 
 def test_authoritative_vapor_pressure_vapor_only_none_does_not_zero_gate():

@@ -38,6 +38,7 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.evalspec import (
     DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
+    VAPOROCK_DIAGNOSTIC_PROVIDER_ID,
     EvalSpec,
     cache_key,
     current_code_version,
@@ -109,15 +110,15 @@ LAB_OVERLAY_SCOPE_FIELDS = (
 DEFAULT_C4_HOLD_TEMP_C = 1670.0
 _VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES = {
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
+        "engines.builtin.vapor_pressure",
+    ),
+    VAPOROCK_DIAGNOSTIC_PROVIDER_ID: (
         "engines.vaporock.provider",
         "simulator.melt_backend.vaporock",
     ),
-    DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID: (
-        "engines.builtin.vapor_pressure",
-    ),
 }
 _VAPOR_PRESSURE_PROVIDER_UPSTREAM_PACKAGES = {
-    DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
+    VAPOROCK_DIAGNOSTIC_PROVIDER_ID: (
         "vaporock",
         "thermoengine",
     ),
@@ -1847,12 +1848,7 @@ def _effective_vapor_pressure_provider_id(
     force_builtin_vapor_pressure: bool,
     allow_fallback_vapor: bool,
 ) -> str:
-    if force_builtin_vapor_pressure:
-        return DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
-    if _vaporock_available():
-        return DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
-    if allow_fallback_vapor:
-        return DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
+    del force_builtin_vapor_pressure, allow_fallback_vapor
     return DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
 
 

@@ -112,16 +112,16 @@ def test_l5_thermoengine_vapor_sources_survive_c2a_tick(
     fallback_species = {
         species
         for species, source in sources.items()
-        if source == "builtin_fallback"
+        if source == "builtin_authoritative"
     }
     report = _vapor_pressure_source_report(sim)
     assert report["species"] == sources
     if fallback_species:
-        assert report["summary"]["builtin_fallback"]["count"] == len(
+        assert report["summary"]["builtin_authoritative"]["count"] == len(
             fallback_species
         )
     assert report["summary"]["thermoengine"]["count"] == 2
-    assert "builtin_fallback" not in {
+    assert "builtin_authoritative" not in {
         sources["Na"],
         sources["K"],
     }
@@ -168,7 +168,7 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim._refresh_vapor_pressures_from_kernel(result)
 
     assert result.vapor_pressures_Pa["Na"] == pytest.approx(kernel_vp["Na"])
-    assert result.vapor_pressures_source["Na"] == "builtin_fallback"
+    assert result.vapor_pressures_source["Na"] == "builtin_authoritative"
 
 
 def test_kernel_ok_empty_vapor_pressures_zero_backend_surface(

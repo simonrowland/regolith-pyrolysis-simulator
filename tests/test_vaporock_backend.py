@@ -5,8 +5,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+from engines.vaporock import VapoRockProvider
 import simulator.melt_backend.vaporock as vaporock_module
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
@@ -43,6 +46,14 @@ def _expected_wt_pct(composition_mol):
         species: kg / total * 100.0
         for species, kg in kg_by_species.items()
     }
+
+
+def _vaporock_diagnostic_pressures(result):
+    return dict(
+        getattr(result, "vaporock_full_speciation_Pa", {})
+        or result.vapor_pressures_Pa
+        or {}
+    )
 
 
 # §25 calibration grid retired here under \\goal CHEMISTRY-E2E-TEST-REGIME
@@ -247,11 +258,13 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert seen["composition"].keys() == expected.keys()
     assert seen["composition"]["SiO2"] == pytest.approx(expected["SiO2"])
     assert seen["composition"]["Na2O"] == pytest.approx(expected["Na2O"])
-    assert result.vapor_pressures_Pa == {
+    full = getattr(result, "vaporock_full_speciation_Pa", {})
+    assert full == {
         "Na": pytest.approx(10.0),
         "SiO": pytest.approx(0.1),
     }
-    assert result.status == "ok"
+    assert result.vapor_pressures_Pa == {}
+    assert result.status == "non_authoritative"
     assert result.liquid_fraction is None
     assert result.phase_assemblage_available is False
     assert "input_composition_projection" not in result.diagnostics
@@ -327,7 +340,57 @@ def test_fake_vaporock_receives_fo2_temperature_and_pressure(monkeypatch):
     assert seen["P_bar"] is None
     assert seen["P_Pa"] == pytest.approx(1200.0)
     assert seen["log_fO2"] == pytest.approx(-7.5)
-    assert result.vapor_pressures_Pa == {"Na": pytest.approx(2500.0)}
+    assert result.vapor_pressures_Pa == {}
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {
+        "Na": pytest.approx(2500.0)
+    }
+    assert result.status == "non_authoritative"
+
+
+def test_vaporock_control_audit_reports_transport_redox_separately():
+    seen = {}
+
+    class FakeBackend:
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "fake-vaporock"
+
+        def equilibrate(self, **kwargs):
+            seen.update(kwargs)
+            return types.SimpleNamespace(
+                vapor_pressures_Pa={"Na": 2.0},
+                vaporock_full_speciation_Pa={"Na": 2.0},
+                warnings=(),
+                status="ok",
+            )
+
+    provider = VapoRockProvider(backend=FakeBackend(), vapor_pressure_data={})
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-8.0,
+        control_inputs={"pO2_bar": 1e-6, "intrinsic_fO2_log": -8.0},
+    )
+
+    result = provider.dispatch(request)
+
+    assert seen["fO2_log"] == pytest.approx(-6.0)
+    audit = result.control_audit
+    assert audit.requested["fO2_log"] == pytest.approx(-8.0)
+    assert audit.requested["intrinsic_fO2_log"] == pytest.approx(-8.0)
+    assert audit.requested["transport_pO2_bar"] == pytest.approx(1e-6)
+    assert audit.applied["fO2_log"] == pytest.approx(seen["fO2_log"])
+    assert audit.applied["transport_fO2_log"] == pytest.approx(seen["fO2_log"])
+    assert audit.applied["intrinsic_fO2_log"] == pytest.approx(-8.0)
+    assert audit.applied["transport_pO2_bar"] == pytest.approx(1e-6)
+    assert "transport gas fO2" in audit.notes[0]
 
 
 def test_passthrough_pa_values_when_unit_declared_pa(monkeypatch):
@@ -349,7 +412,11 @@ def test_passthrough_pa_values_when_unit_declared_pa(monkeypatch):
         pressure_bar=1e-6,
     )
 
-    assert result.vapor_pressures_Pa == {"Na": pytest.approx(1500.0)}
+    assert result.vapor_pressures_Pa == {}
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {
+        "Na": pytest.approx(1500.0)
+    }
+    assert result.status == "non_authoritative"
 
 
 def test_canonical_system_entrypoint_converts_log10_bar_to_pa(monkeypatch):
@@ -389,10 +456,93 @@ def test_canonical_system_entrypoint_converts_log10_bar_to_pa(monkeypatch):
     # temperature in Kelvin; the adapter converts 1600 C -> 1873.15 K.
     assert system.eval_calls == [(pytest.approx(1873.15), -8.0)]
     # "(g)"-suffixed VapoRock species names are normalized to bare names.
-    assert result.vapor_pressures_Pa == {
+    assert result.vapor_pressures_Pa == {}
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {
         "Na": pytest.approx(1000.0),
         "SiO": pytest.approx(0.1),
     }
+
+
+def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            return {"Na(g)": -2.0}
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({})
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Na2O": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=42.0,
+    )
+
+    assert result.status == "non_authoritative"
+    assert result.vapor_pressures_Pa == {}
+    assert result.pressure_bar == pytest.approx(42.0)
+    assert result.diagnostics["pressure_control_authoritative"] is False
+    assert result.diagnostics["requested_pressure_bar"] == pytest.approx(42.0)
+    assert any("eval_gas_abundances ignores total pressure" in w for w in result.warnings)
+
+
+def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            return {"Na(g)": -2.0}
+
+    fake_module = types.SimpleNamespace(System=FakeSystem)
+    _install_fake_import(monkeypatch, fake_module)
+
+    backend = VapoRockBackend()
+    assert backend.initialize({})
+    provider = VapoRockProvider(backend=backend, vapor_pressure_data={})
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim.melt = types.SimpleNamespace(temperature_C=1600.0, melt_fO2_log=-8.0)
+    sim._allow_fallback_vapor = True
+    sim._commanded_pO2_bar = lambda: 1e-6
+    sim._compute_intrinsic_melt_fO2 = lambda: -8.0
+
+    def dispatch_only(intent, *, control_inputs, fO2_log):
+        request = IntentRequest(
+            intent=intent,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=sim.melt.temperature_C,
+            pressure_bar=1e-6,
+            fO2_log=fO2_log,
+            control_inputs=control_inputs,
+        )
+        return provider.dispatch(request)
+
+    sim._dispatch_only = dispatch_only
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Na2O": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "non_authoritative"
+    assert result.vapor_pressures_Pa == {}
+    assert getattr(result, "vaporock_full_speciation_Pa", {})["Na"] == pytest.approx(1000.0)
+
+    sim._refresh_vapor_pressures_from_kernel(result)
+
+    assert result.vapor_pressures_Pa == {}
+    diagnostic = sim._last_vapor_pressure_diagnostic
+    assert diagnostic["vapor_pressures_Pa"] == {}
+    assert diagnostic["vaporock_full_speciation_Pa"]["Na"] == pytest.approx(1000.0)
 
 
 def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
@@ -492,10 +642,11 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
     )
 
-    if not vaporock_iw.vapor_pressures_Pa:
+    vaporock_iw_pressures = _vaporock_diagnostic_pressures(vaporock_iw)
+    if not vaporock_iw_pressures:
         pytest.skip(
-            "VapoRock returned no vapor pressures at IW; library available "
-            "but produced empty result"
+            "VapoRock returned no diagnostic vapor pressures at IW; "
+            "library available but produced empty result"
         )
 
     # SF2004 Table 9 (back-solved via Hertz-Knudsen): p(SiO) = 0.0131 Pa
@@ -506,7 +657,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     # 2018 Fig 3 graphical readout for lunar basalt 12022 gives
     # p(SiO) ~ 0.04-0.16 Pa at 1900 K; widening to the full literature
     # range gives [0.005, 1.0] Pa as the literature-anchored target.
-    p_sio_iw = vaporock_iw.vapor_pressures_Pa.get("SiO", 0.0)
+    p_sio_iw = vaporock_iw_pressures.get("SiO", 0.0)
     assert 0.005 <= p_sio_iw <= 1.0, (
         f"VapoRock p(SiO) at IW (logfO2={fO2_log_iw}) = {p_sio_iw:.4e} Pa "
         f"is outside the literature-anchored range [0.005, 1.0] Pa "
@@ -521,7 +672,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     # decade above SF2004's number. We allow [1, 200] Pa to span the
     # MELTS-vs-MAGMA Na-activity spread plus the basalt-composition
     # offset between parity-test and Williams tholeiite.
-    p_na_iw = vaporock_iw.vapor_pressures_Pa.get("Na", 0.0)
+    p_na_iw = vaporock_iw_pressures.get("Na", 0.0)
     assert 1.0 <= p_na_iw <= 200.0, (
         f"VapoRock p(Na) at IW (logfO2={fO2_log_iw}) = {p_na_iw:.4e} Pa "
         f"is outside the literature-anchored range [1, 200] Pa "
@@ -542,12 +693,14 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
     )
 
-    if not vaporock_builtin.vapor_pressures_Pa:
+    vaporock_builtin_pressures = _vaporock_diagnostic_pressures(vaporock_builtin)
+    if not vaporock_builtin_pressures:
         pytest.skip(
-            "VapoRock returned no vapor pressures at simulator intrinsic fO2"
+            "VapoRock returned no diagnostic vapor pressures at simulator "
+            "intrinsic fO2"
         )
 
-    p_sio_builtin = vaporock_builtin.vapor_pressures_Pa.get("SiO", 0.0)
+    p_sio_builtin = vaporock_builtin_pressures.get("SiO", 0.0)
     ratio = p_sio_builtin / p_sio_iw if p_sio_iw > 0.0 else float("nan")
     assert 0.8 <= ratio <= 1.25, (
         f"VapoRock p(SiO) simulator-intrinsic / IW ratio = {ratio:.3f}; "
@@ -709,7 +862,7 @@ def test_vaporock_gas_oxide_names_do_not_collide_with_melt_oxides(monkeypatch):
         pressure_bar=1e-6,
     )
 
-    keys = set(result.vapor_pressures_Pa)
+    keys = set(getattr(result, "vaporock_full_speciation_Pa", {}))
     # The whole point: no normalized vapor key is also a melt oxide name.
     assert keys.isdisjoint(OXIDE_SPECIES), (
         f"gas keys collide with melt oxides: {keys & set(OXIDE_SPECIES)}"

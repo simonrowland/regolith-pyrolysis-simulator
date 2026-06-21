@@ -13,6 +13,7 @@ cycle that prevents top-level imports is documented in
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from typing import Any
@@ -309,3 +310,54 @@ def diagnostic_control_audit(
         applied=dict(requested),
         notes=(note,),
     )
+
+
+def resolve_transport_pO2_bar(
+    request: IntentRequest,
+    *,
+    floor_bar: float = 1e-9,
+) -> float:
+    """Resolve vapor-transport pO2 without hiding invalid explicit controls."""
+
+    controls = request.control_inputs or {}
+    if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
+        raw_pO2 = controls.get("pO2_bar")
+        try:
+            pO2_bar = float(raw_pO2)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"pO2_bar must be numeric, got {raw_pO2!r}"
+            ) from exc
+        if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
+            raise ValueError(
+                f"pO2_bar must be finite and > 0, got {raw_pO2!r}"
+            )
+        if pO2_bar < floor_bar:
+            raise ValueError(
+                f"explicit pO2_bar={pO2_bar:g} below transport model floor "
+                f"{floor_bar:g}; request the floor explicitly by using "
+                f"pO2_bar={floor_bar:g}"
+            )
+        return pO2_bar
+
+    if request.fO2_log is not None:
+        try:
+            pO2_bar = 10.0 ** float(request.fO2_log)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"fO2_log must be numeric, got {request.fO2_log!r}"
+            ) from exc
+        if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
+            raise ValueError(
+                f"fO2_log resolved to invalid pO2_bar={pO2_bar!r}"
+            )
+        if pO2_bar < floor_bar:
+            raise ValueError(
+                f"fO2_log={float(request.fO2_log):g} resolves to "
+                f"pO2_bar={pO2_bar:g} below transport model floor "
+                f"{floor_bar:g}; request the floor explicitly by using "
+                f"pO2_bar={floor_bar:g}"
+            )
+        return pO2_bar
+
+    return floor_bar

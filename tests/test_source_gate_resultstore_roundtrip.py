@@ -11,7 +11,7 @@ from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.results_store import ResultStore
 
 
-def _source_report(source: str = "vaporock") -> dict[str, object]:
+def _source_report(source: str = "builtin_authoritative") -> dict[str, object]:
     return {
         "species": {"Na": source, "SiO": source},
         "summary": {source: {"count": 2, "percentage": 100.0}},
@@ -37,7 +37,7 @@ def _spec() -> EvalSpec:
         },
         campaign="C2A_continuous",
         backend_name="cached-real",
-        vapor_pressure_provider_id="vaporock",
+        vapor_pressure_provider_id="builtin-vapor-pressure",
         allow_fallback_vapor=False,
         force_builtin_vapor_pressure=False,
     )
@@ -75,8 +75,8 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
     spec = _spec()
     trace = {
         "backend_status": "ok",
-        "vapor_pressure_source_report": _source_report("vaporock"),
-        "vapor_pressure_provider_id": "vaporock",
+        "vapor_pressure_source_report": _source_report("builtin_authoritative"),
+        "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
         "force_builtin_vapor_pressure": False,
         "warnings": [
@@ -116,7 +116,7 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
     assert loaded is not None
     assert loaded.run_reference is not None
     assert loaded.run_reference.trace["vapor_pressure_source_report"] == _source_report(
-        "vaporock"
+        "builtin_authoritative"
     )
     assert assert_strict_vapor_result_store(db_path) == {
         "rows": 1,
@@ -131,8 +131,8 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
     spec = _spec()
     trace = {
         "backend_status": "ok",
-        "vapor_pressure_source_report": _source_report("vaporock"),
-        "vapor_pressure_provider_id": "vaporock",
+        "vapor_pressure_source_report": _source_report("builtin_authoritative"),
+        "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
         "force_builtin_vapor_pressure": False,
         "non_jsonable": object(),
@@ -169,9 +169,9 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
     assert loaded is not None
     assert loaded.run_reference is not None
     assert loaded.run_reference.trace["vapor_pressure_source_report"] == _source_report(
-        "vaporock"
+        "builtin_authoritative"
     )
-    assert loaded.run_reference.trace["vapor_pressure_provider_id"] == "vaporock"
+    assert loaded.run_reference.trace["vapor_pressure_provider_id"] == "builtin-vapor-pressure"
     assert loaded.run_reference.trace["allow_fallback_vapor"] is False
     assert loaded.run_reference.trace["force_builtin_vapor_pressure"] is False
     assert assert_strict_vapor_result_store(db_path) == {

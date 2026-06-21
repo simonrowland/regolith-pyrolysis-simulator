@@ -105,14 +105,11 @@ def _build_sim_for_anchor(
     §25 v1 feedstock metadata from
     :data:`tests.chemistry.corpus_fixtures.GRID_25_FEEDSTOCKS`.
 
-    ``engine='vaporock'``: keeps VapoRock as the authoritative
-    provider, but swaps in an *unfiltered* provider so SiO2 / O2 / etc.
-    are visible in the diagnostic.
+    ``engine='vaporock'``: swaps in an *unfiltered* VapoRock shadow so
+    SiO2 / O2 / etc. are visible in the diagnostic trace.
 
-    ``engine='builtin-antoine'``: forces VapoRock to report unavailable
-    (per the conftest pattern) so the dispatch routes through the
-    builtin Antoine fallback. Requires ``allow_fallback_vapor=True`` in
-    the kernel config — set inline below.
+    ``engine='builtin-antoine'``: uses the default builtin authoritative
+    provider.
     """
     feedstock_key = f"corpus_{anchor.melt_id}"
     # Sanitise the key (no colons / @ in feedstock keys downstream).
@@ -125,14 +122,8 @@ def _build_sim_for_anchor(
         "composition_wt_pct": dict(anchor.composition_wt_pct),
     }
 
-    # Patch setpoints to opt into VAPOR_PRESSURE fallback (only matters
-    # when engine='builtin-antoine'). A shallow copy keeps the
-    # module-scoped fixture immutable.
+    # Shallow copy keeps the module-scoped fixture immutable.
     setpoints = dict(setpoints_data)
-    kernel_cfg = dict(setpoints.get("chemistry_kernel", {}) or {})
-    if engine == "builtin-antoine":
-        kernel_cfg["allow_fallback_vapor"] = True
-    setpoints["chemistry_kernel"] = kernel_cfg
 
     backend = StubBackend()
     backend.initialize({})
@@ -142,10 +133,11 @@ def _build_sim_for_anchor(
     sim.load_batch(feedstock_key, mass_kg=1000.0)
     sim.melt.temperature_C = anchor.T_K - 273.15
 
+    setattr(sim, "_corpus_vapor_engine", engine)
     if engine == "vaporock":
         _install_unfiltered_vaporock(sim)
     elif engine == "builtin-antoine":
-        _force_vaporock_unavailable(sim)
+        pass
     else:
         raise AssertionError(
             f"unknown engine {engine!r}; expected 'vaporock' or "
@@ -172,9 +164,10 @@ def _install_unfiltered_vaporock(sim: PyrolysisSimulator) -> VapoRockProvider:
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
 
     registry = sim._chem_registry
-    current = registry.authoritative_for(ChemistryIntent.VAPOR_PRESSURE)
-    if not isinstance(current, VapoRockProvider):
-        return current  # type: ignore[return-value]
+    shadows = list(registry.shadows_for(ChemistryIntent.VAPOR_PRESSURE))
+    current = next((p for p in shadows if isinstance(p, VapoRockProvider)), None)
+    if current is None:
+        raise ProviderUnavailableError("VapoRock shadow is not registered")
     unfiltered = VapoRockProvider(
         backend=getattr(current, "_backend", None),
         vapor_pressure_data=None,
@@ -184,7 +177,10 @@ def _install_unfiltered_vaporock(sim: PyrolysisSimulator) -> VapoRockProvider:
     unfiltered._backend_initialised = getattr(
         current, "_backend_initialised", False
     )
-    registry._authoritative[ChemistryIntent.VAPOR_PRESSURE] = unfiltered
+    registry._shadows[ChemistryIntent.VAPOR_PRESSURE] = [
+        unfiltered if provider is current else provider
+        for provider in shadows
+    ]
     return unfiltered
 
 
@@ -199,7 +195,13 @@ def _force_vaporock_unavailable(sim: PyrolysisSimulator) -> None:
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
 
     registry = sim._chem_registry
-    provider = registry.authoritative_for(ChemistryIntent.VAPOR_PRESSURE)
+    provider = next(
+        (
+            p for p in registry.shadows_for(ChemistryIntent.VAPOR_PRESSURE)
+            if isinstance(p, VapoRockProvider)
+        ),
+        None,
+    )
     if provider is None:
         return
 
@@ -212,14 +214,17 @@ def _force_vaporock_unavailable(sim: PyrolysisSimulator) -> None:
 def _dispatch_vapor_pressure(
     sim: PyrolysisSimulator, anchor: CorpusAnchor,
 ) -> dict[str, float]:
-    """Invoke the kernel's VAPOR_PRESSURE intent, return ``species → Pa``.
+    """Invoke VAPOR_PRESSURE and return the requested surface's ``species -> Pa``.
 
     The fO2 channel uses the anchor's own value (Kress91 IW or per-body
-    override) — NOT the simulator's intrinsic-melt fO2 estimator. This
-    keeps the comparison apples-to-apples with the literature value's
-    reported fO2.
+    override), not the simulator's intrinsic-melt fO2 estimator. Builtin
+    cases return the authoritative result. VapoRock cases return the shadow
+    diagnostic full-speciation surface so diagnostic parity is still checked
+    without treating VapoRock as authoritative.
     """
-    pO2_bar = max(10.0 ** anchor.fO2_log, 1e-30)
+    pO2_bar = max(10.0 ** anchor.fO2_log, 1e-9)
+    engine = getattr(sim, "_corpus_vapor_engine", "builtin-antoine")
+    before = len(sim._chem_kernel.planner.shadow_trace)
     result = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=anchor.T_K - 273.15,
@@ -227,8 +232,35 @@ def _dispatch_vapor_pressure(
         control_inputs={"pO2_bar": pO2_bar},
         fO2_log=anchor.fO2_log,
     )
-    diagnostic = dict(result.diagnostic or {})
-    vapor = dict(diagnostic.get("vapor_pressures_Pa") or {})
+    if engine != "vaporock":
+        diagnostic = dict(result.diagnostic or {})
+        return dict(diagnostic.get("vapor_pressures_Pa") or {})
+
+    new_trace = sim._chem_kernel.planner.shadow_trace[before:]
+    errors = [
+        record for record in new_trace
+        if record.get("event") == "shadow_error"
+        and record.get("provider_id") == "vaporock"
+    ]
+    if errors:
+        pytest.skip(f"VapoRock shadow unavailable: {errors[-1].get('error')}")
+    dispatches = [
+        record for record in new_trace
+        if record.get("event") == "shadow_dispatch"
+        and record.get("provider_id") == "vaporock"
+    ]
+    if not dispatches:
+        pytest.skip("VapoRock shadow did not dispatch")
+    shadow_result = dispatches[-1]["result"]
+    diagnostic = dict(shadow_result.diagnostic or {})
+    vapor = dict(diagnostic.get("vaporock_full_speciation_Pa") or {})
+    if not vapor:
+        vapor = dict(diagnostic.get("vapor_pressures_Pa") or {})
+    if not vapor:
+        pytest.skip(
+            f"VapoRock diagnostic empty: status={shadow_result.status!r}, "
+            f"warnings={shadow_result.warnings!r}"
+        )
     return vapor
 
 

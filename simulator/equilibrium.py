@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
 )
 from simulator.fe_redox import kress91_ferrous_feo_activity
@@ -194,6 +195,12 @@ class EquilibriumMixin:
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
+            FIT_TARGET_PSEUDO_VAPOROCK,
+            _is_noncertifying_pseudo_vapor_pressure_runtime,
+            _metadata_value,
+            _pow10_pressure_or_raise,
+            _require_finite_vapor_value,
+            reject_noncertifying_vapor_pressure_row,
             vapor_pressure_source_label,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_valid_range_K,
@@ -217,6 +224,7 @@ class EquilibriumMixin:
         vapor_pressure_sources = {}
         activities = {}
         metal_extrapolations = {}
+        ellingham_extrapolations = {}
         warnings = []
         pseudo_warning_seen = getattr(
             self,
@@ -303,6 +311,26 @@ class EquilibriumMixin:
                 sp_data,
                 temperature_K=T_K,
             )
+            if _is_noncertifying_pseudo_vapor_pressure_runtime(
+                species,
+                sp_data,
+                coefficient_block,
+                temperature_K=T_K,
+            ):
+                warnings.append(
+                    "non_certifying_vapor_pressure_fallback_omitted: "
+                    f"species={species} "
+                    f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
+                    f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
+                    f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
+                )
+                continue
+            if bool(sp_data.get("interval_required")):
+                reject_noncertifying_vapor_pressure_row(
+                    species,
+                    sp_data,
+                    coefficient_block,
+                )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
@@ -326,9 +354,12 @@ class EquilibriumMixin:
                             f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                             f"{T_K:.2f} K"
                         )
-                # Antoine: log10(P_Pa) = A - B / (T_K + C)
                 log_P = A - B / (T_K + C)
-                P_reference_Pa = 10.0 ** log_P
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P,
+                    species=species,
+                    field="P_reference_Pa",
+                )
             else:
                 continue
 
@@ -351,6 +382,19 @@ class EquilibriumMixin:
                 a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             if a_oxide <= 1e-10:
                 continue
+
+            valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
+            if T_K < valid_low or T_K > valid_high:
+                ellingham_extrapolations[species] = {
+                    'temperature_K': T_K,
+                    'fit_range_K': (valid_low, valid_high),
+                    'species': species,
+                }
+                warnings.append(
+                    f"{species} Ellingham JANAF high-T fit extrapolated beyond "
+                    f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
+                    f"{T_K:.2f} K"
+                )
 
             activities[species] = a_oxide
 
@@ -378,12 +422,16 @@ class EquilibriumMixin:
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
             # P_metal = a_M(l) × P_reference(T)
-            P_effective_Pa = a_M_liquid * P_reference_Pa
+            P_effective_Pa = _require_finite_vapor_value(
+                a_M_liquid * P_reference_Pa,
+                species=species,
+                field="P_effective_Pa",
+            )
 
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
                 source_label = vapor_pressure_source_label(
-                    'builtin_fallback',
+                    'builtin_authoritative',
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
@@ -392,6 +440,11 @@ class EquilibriumMixin:
                     source_label = (
                         f'{source_label}:'
                         'extrapolated_beyond_valid_range_K'
+                    )
+                if species in ellingham_extrapolations:
+                    source_label = (
+                        f'{source_label}:'
+                        'extrapolated_beyond_ellingham_fit_range_K'
                     )
                 vapor_pressure_sources[species] = source_label
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
@@ -423,7 +476,11 @@ class EquilibriumMixin:
 
             if A > 0 and valid[0] <= T_K <= valid[1]:
                 log_P = A - B / (T_K + C)
-                P_sat = 10.0 ** log_P
+                P_sat = _pow10_pressure_or_raise(
+                    log_P,
+                    species=name,
+                    field="P_sat",
+                )
             else:
                 continue
 
@@ -435,14 +492,22 @@ class EquilibriumMixin:
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
-                P_sat *= max(a_ox, 0.0) ** activity_exponent
+                P_sat = _require_finite_vapor_value(
+                    P_sat * max(a_ox, 0.0) ** activity_exponent,
+                    species=name,
+                    field="P_sat_activity",
+                )
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                P_sat *= (pO2_bar / pO2_reference_bar) ** pO2_exponent
+                P_sat = _require_finite_vapor_value(
+                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    species=name,
+                    field="P_sat_pO2",
+                )
 
             # SiO suppression by pO₂: p(SiO) ∝ 1/√pO₂         [THERMO-8]
             #
@@ -454,12 +519,16 @@ class EquilibriumMixin:
             #   At 10⁻³ bar:  suppression ≈ 0.001 (1000× suppression)
             if name == 'SiO' and not pO2_exponent and pO2_bar > 1e-9:
                 suppression = math.sqrt(1e-9 / pO2_bar)
-                P_sat *= suppression
+                P_sat = _require_finite_vapor_value(
+                    P_sat * suppression,
+                    species=name,
+                    field="P_sat_suppressed",
+                )
 
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
-                    'builtin_fallback',
+                    'builtin_authoritative',
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
@@ -480,7 +549,7 @@ class EquilibriumMixin:
             vapor_pressures_source={
                 species: vapor_pressure_sources.get(
                     species,
-                    'builtin_fallback',
+                    'builtin_authoritative',
                 )
                 for species in vapor_pressures
             },

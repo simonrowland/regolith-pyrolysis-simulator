@@ -70,7 +70,7 @@ PINNED_EVALSPEC_JSON = (
     b'"mass_kg":"1000.000000000","mre_max_voltage_V":"0.000000000",'
     b'"mre_target_species":"","profile_id":"oxygen-yield-v1","recipe_id":"recipe-id",'
     b'"runtime_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},'
-    b'"track":"pyrolysis","vapor_pressure_provider_id":"vaporock"}'
+    b'"track":"pyrolysis","vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -1046,7 +1046,7 @@ def test_run_options_with_c4_hold_temp_matching_override_is_idempotent() -> None
 
 
 def test_vaporock_eval_provider_probe_does_not_cache_negative(monkeypatch):
-    probes = [False, True]
+    probes = [False, True, False]
 
     def fake_runtime_available():
         return probes.pop(0)
@@ -1058,25 +1058,16 @@ def test_vaporock_eval_provider_probe_does_not_cache_negative(monkeypatch):
     )
     evaluate_module._vaporock_available.cache_clear()
     try:
-        first = evaluate_module._effective_vapor_pressure_provider_id(
-            force_builtin_vapor_pressure=False,
-            allow_fallback_vapor=True,
-        )
-        second = evaluate_module._effective_vapor_pressure_provider_id(
-            force_builtin_vapor_pressure=False,
-            allow_fallback_vapor=True,
-        )
-        third = evaluate_module._effective_vapor_pressure_provider_id(
-            force_builtin_vapor_pressure=False,
-            allow_fallback_vapor=True,
-        )
+        first = evaluate_module._vaporock_available()
+        second = evaluate_module._vaporock_available()
+        third = evaluate_module._vaporock_available()
     finally:
         evaluate_module._vaporock_available.cache_clear()
 
-    assert first == DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
-    assert second == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
-    assert third == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
-    assert probes == []
+    assert first is False
+    assert second is True
+    assert third is True
+    assert probes == [False]
 
 
 def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
@@ -1130,7 +1121,7 @@ def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
     )
     assert available_spec.allow_fallback_vapor is True
     assert unavailable_spec.allow_fallback_vapor is True
-    assert cache_key(available_spec) != cache_key(unavailable_spec)
+    assert cache_key(available_spec) == cache_key(unavailable_spec)
 
 
 def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
@@ -1192,11 +1183,12 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
             profile,
             RecipeSchema(),
         )
+        assert init_calls == []
         assert vaporock_module.vaporock_runtime_available() is False
     finally:
         clear_probe_caches()
 
-    assert init_calls == [{}, {}]
+    assert init_calls == [{}]
     assert spec.vapor_pressure_provider_id == (
         DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID
     )
@@ -1248,8 +1240,8 @@ def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
     assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
     assert spec.allow_fallback_vapor is False
     assert spec.force_builtin_vapor_pressure is False
-    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
-    assert b"builtin-vapor-pressure" not in canonical
+    assert b'"vapor_pressure_provider_id":"builtin-vapor-pressure"' in canonical
+    assert b"vaporock" not in canonical
 
 
 def test_build_eval_inputs_strict_thermal_window_keeps_vaporock_provider(
@@ -1279,8 +1271,8 @@ def test_build_eval_inputs_strict_thermal_window_keeps_vaporock_provider(
     assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
     assert spec.allow_fallback_vapor is False
     assert spec.force_builtin_vapor_pressure is False
-    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
-    assert b"builtin-vapor-pressure" not in canonical
+    assert b'"vapor_pressure_provider_id":"builtin-vapor-pressure"' in canonical
+    assert b"vaporock" not in canonical
 
 
 def test_build_eval_inputs_thermal_window_preserves_explicit_force_builtin(
@@ -1437,12 +1429,12 @@ def test_provider_code_fingerprint_includes_upstream_package_versions(
     monkeypatch.setattr(evaluate_module.importlib_metadata, "version", fake_version)
     evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
     first = evaluate_module._vapor_pressure_provider_code_fingerprint(
-        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+        "vaporock"
     )
     versions["vaporock"] = "1.0.1"
     evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
     second = evaluate_module._vapor_pressure_provider_code_fingerprint(
-        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+        "vaporock"
     )
     evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
 
@@ -2028,8 +2020,8 @@ def test_build_eval_inputs_strict_lab_schedule_keeps_vaporock_provider(
     assert spec.vapor_pressure_provider_id == DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
     assert spec.allow_fallback_vapor is False
     assert spec.force_builtin_vapor_pressure is False
-    assert b'"vapor_pressure_provider_id":"vaporock"' in canonical
-    assert b"builtin-vapor-pressure" not in canonical
+    assert b'"vapor_pressure_provider_id":"builtin-vapor-pressure"' in canonical
+    assert b"vaporock" not in canonical
 
 
 def test_lab_schedule_digests_keep_gas_boundary_separate() -> None:

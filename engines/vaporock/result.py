@@ -1,19 +1,16 @@
 """Frozen diagnostic result for the VapoRock provider.
 
-The :class:`VapoRockProvider` is registered as authoritative for the
-``VAPOR_PRESSURE`` intent but the intent itself is diagnostic-only --
-it owns no ledger transition (the
-:class:`BuiltinEvaporationTransitionProvider` is the writer that
-consumes the vapor-pressure dict).  The provider therefore returns an
-:class:`IntentResult` with ``transition=None`` and attaches an instance
-of this class (projected to a plain dict) on
+The :class:`VapoRockProvider` is registered as a diagnostic shadow for
+the ``VAPOR_PRESSURE`` intent. It owns no ledger transition and does not
+provide the authoritative pressure dict consumed by evaporation. The
+provider returns an :class:`IntentResult` with ``transition=None`` and
+attaches an instance of this class (projected to a plain dict) on
 :attr:`IntentResult.diagnostic`.
 
-Schema (matches the shape downstream evaporation expects from the
-builtin Antoine path so the swap is invisible to consumers):
+Schema:
 
-* ``vapor_pressures_Pa`` -- filtered ``species -> Pa`` map consumed by
-  the evaporation path.
+* ``vapor_pressures_Pa`` -- always empty. VapoRock has no authoritative
+  pressure surface for evaporation.
 * ``vaporock_full_speciation_Pa`` -- unfiltered VapoRock gas speciation
   map for diagnostics, benchmarks, and cross-engine analysis only.
 * ``activities`` -- ``species -> activity`` map (matches the
@@ -57,10 +54,7 @@ class VapoRockDiagnostics:
         object.__setattr__(
             self,
             'vapor_pressures_Pa',
-            {
-                str(k): float(v)
-                for k, v in dict(self.vapor_pressures_Pa or {}).items()
-            },
+            {},
         )
         object.__setattr__(
             self,

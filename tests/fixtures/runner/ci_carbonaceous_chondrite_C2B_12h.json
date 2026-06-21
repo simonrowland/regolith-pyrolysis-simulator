@@ -21,7 +21,7 @@
         "overhead_bleed": "builtin-overhead-bleed",
         "overhead_gas_equilibrium": "builtin-overhead-gas-equilibrium",
         "stage0_pretreatment": "builtin-stage0-pretreatment",
-        "vapor_pressure": "vaporock"
+        "vapor_pressure": "builtin-vapor-pressure"
       },
       "requested": {},
       "registry": {
@@ -66,9 +66,11 @@
           "shadows": []
         },
         "vapor_pressure": {
-          "authoritative": "vaporock",
-          "fallback": "builtin-vapor-pressure",
-          "shadows": []
+          "authoritative": "builtin-vapor-pressure",
+          "fallback": null,
+          "shadows": [
+            "vaporock"
+          ]
         }
       }
     },
@@ -87,24 +89,100 @@
     "degraded_from": [
       "unavailable"
     ],
-    "certification_allowed": false
+    "certification_allowed": false,
+    "knudsen_regime_diagnostic": {
+      "status": "ok",
+      "reason": "",
+      "regime": "viscous",
+      "knudsen_number": 0.001217580945303972,
+      "mean_free_path_m": 0.00014610971343647665,
+      "overhead_pressure_mbar": 2.614417120041672,
+      "gas_temperature_C": 1500.0,
+      "carrier_gas": "N2",
+      "carrier_collision_diameter_m": 3.798e-10,
+      "pipe_diameter_m": 0.12,
+      "regime_factor": 0.10854220274770464,
+      "segments": [
+        {
+          "name": "stage_0_to_stage_1",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_1_to_stage_2",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_2_to_stage_3",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_3_to_stage_4",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_4_to_stage_5",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_5_to_stage_6",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        },
+        {
+          "name": "stage_6_to_stage_7",
+          "knudsen_number": 0.001217580945303972,
+          "regime": "viscous",
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.10854220274770464
+        }
+      ],
+      "warnings": [],
+      "viscous_flow_required": false
+    }
   },
   "final_state": {
     "process.cleaned_melt": {
       "Al2O3": 188.9668814547603,
-      "CaO": 395.1017324199271,
       "FeO": 3218.152293899655,
       "MgO": 4675.098042990033,
       "Na2O": 85.8772944197033,
       "NiO": 206.36185511326167,
       "SiO2": 4617.710834737149
     },
+    "process.condensation_train": {
+      "Ca": 345.5958252055023
+    },
+    "process.overhead_gas": {},
     "process.stage0_volatile_feed": {},
     "reservoir.stage0_oxidant": {},
     "terminal.offgas": {
       "CO2": 2715.8941686884323,
+      "Ca": 49.50590721442467,
       "H2O": 10086.89172750294,
       "N2": 71.21483789633506
+    },
+    "terminal.oxygen_melt_offgas_stored": {
+      "O2": 187.51171948246767
+    },
+    "terminal.oxygen_melt_offgas_vented_to_vacuum": {
+      "O2": 10.039146727495856
     },
     "terminal.stage0_salt_phase": {
       "Na2CO3": 0.00015700766882055032
@@ -202,13 +280,15 @@
       ],
       "designated_species_kg": {},
       "coproduct_species_kg": {},
-      "impurity_species_kg": {},
+      "impurity_species_kg": {
+        "Ca": 11.752009213830291
+      },
       "designated_kg": 0,
-      "impurity_kg": 0,
-      "total_kg": 0,
-      "purity_fraction": 1.0,
-      "verdict": "PURE",
-      "warning": ""
+      "impurity_kg": 11.752009213830291,
+      "total_kg": 11.752009213830291,
+      "purity_fraction": 0.0,
+      "verdict": "CONTAMINATED",
+      "warning": "non-designated condensate present"
     },
     "stage_5": {
       "stage_number": 5,
@@ -216,13 +296,15 @@
       "accepted_species": [],
       "designated_species_kg": {},
       "coproduct_species_kg": {},
-      "impurity_species_kg": {},
+      "impurity_species_kg": {
+        "Ca": 2.098780268755832
+      },
       "designated_kg": 0,
-      "impurity_kg": 0,
-      "total_kg": 0,
-      "purity_fraction": 1.0,
-      "verdict": "PURE",
-      "warning": ""
+      "impurity_kg": 2.098780268755832,
+      "total_kg": 2.098780268755832,
+      "purity_fraction": 0.0,
+      "verdict": "CONTAMINATED",
+      "warning": "non-designated condensate present"
     },
     "stage_6": {
       "stage_number": 6,
@@ -254,9 +336,16 @@
     }
   },
   "vapor_pressure_source_report": {
-    "species": {},
-    "summary": {},
-    "total_species": 0
+    "species": {
+      "Ca": "builtin_authoritative"
+    },
+    "summary": {
+      "builtin_authoritative": {
+        "count": 1,
+        "percentage": 100.0
+      }
+    },
+    "total_species": 1
   },
   "shuttle_refusal_history": [],
   "pO2_enforcement_by_hour": [],
@@ -476,17 +565,24 @@
       "T_C": 265.0,
       "P_total_bar": 0.001,
       "pO2_bar": 0.001,
-      "mass_balance_pct": 0.0,
-      "O2_yield_kg_cumulative": 0.0,
-      "O2_source_side_potential_kg_cumulative": 0.0,
+      "mass_balance_pct": 2.0625897818801802e-14,
+      "O2_yield_kg_cumulative": 6.321232616986412,
+      "O2_source_side_potential_kg_cumulative": 6.321232616986412,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "metal_yields_kg": {},
-      "condensation_train_kg": {},
-      "vapor_species_kg_hr": {},
+      "metal_yields_kg": {
+        "Ca": 15.834887231925835
+      },
+      "condensation_train_kg": {
+        "Ca": 13.850789482586123,
+        "O2": 6.0
+      },
+      "vapor_species_kg_hr": {
+        "Ca": 15.834887231925833
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": null,
-      "regime": "",
+      "Kn": 0.001217580945303972,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     }
   ],

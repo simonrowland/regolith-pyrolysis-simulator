@@ -157,7 +157,7 @@ def test_evalspec_cache_key_splits_vapor_provider_mode() -> None:
     )
 
     assert cache_key(live_vaporock) != cache_key(forced_builtin)
-    assert cache_key(live_vaporock) != cache_key(provider_only_changed)
+    assert cache_key(live_vaporock) == cache_key(provider_only_changed)
     assert cache_key(live_vaporock) != cache_key(fallback_only_changed)
     assert cache_key(forced_builtin) == cache_key(identical_forced_builtin)
 

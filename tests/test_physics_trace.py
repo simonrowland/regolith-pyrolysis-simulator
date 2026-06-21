@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -142,6 +143,32 @@ def test_snapshot_deltas_sum_to_cumulative_trace_totals():
     for key, kg in wall_by_segment_species.items():
         assert trace.wall_deposit_by_segment_species_kg.get(
             key, 0.0) == pytest.approx(kg, abs=1e-9)
+
+
+def test_snapshot_o2_delta_cannot_overwrite_terminal_oxygen_trace_total():
+    sim = _representative_sim()
+    baseline_o2 = AccountingQueries(
+        sim
+    ).condensation_totals_with_terminal_oxygen().get("O2")
+    snapshots = list(sim.record.snapshots)
+    assert snapshots
+    poisoned_delta = dict(snapshots[-1].condensed_by_stage_species_delta)
+    poisoned_delta[(999, "O2")] = 12345.0
+    snapshots[-1] = replace(
+        snapshots[-1],
+        condensed_by_stage_species_delta=poisoned_delta,
+    )
+    sim.record.snapshots = tuple(snapshots)
+
+    trace = PhysicsTrace.from_simulator(sim)
+
+    if baseline_o2 is None:
+        assert "O2" not in trace.condensation_totals_kg
+    else:
+        assert trace.condensation_totals_kg["O2"] == pytest.approx(
+            baseline_o2,
+            abs=1e-12,
+        )
 
 
 def test_wall_deposit_delta_matches_route_projection_before_commit():

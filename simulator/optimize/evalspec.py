@@ -49,8 +49,9 @@ _LEGACY_DATA_DIGEST_SENTINELS = MappingProxyType(
         "species_catalog": "legacy-missing-species-catalog-digest",
     }
 )
-DEFAULT_VAPOR_PRESSURE_PROVIDER_ID = "vaporock"
+DEFAULT_VAPOR_PRESSURE_PROVIDER_ID = "builtin-vapor-pressure"
 DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID = "builtin-vapor-pressure"
+VAPOROCK_DIAGNOSTIC_PROVIDER_ID = "vaporock"
 
 
 @dataclass(frozen=True)

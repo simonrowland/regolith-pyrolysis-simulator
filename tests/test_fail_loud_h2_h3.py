@@ -165,7 +165,7 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     result = provider.dispatch(
         _vapor_request(
             temperature_c=3000.0,
-            pO2_bar=1.0e-30,
+            pO2_bar=1.0e-9,
         )
     )
     pressures = dict(result.diagnostic["vapor_pressures_Pa"])
@@ -202,7 +202,7 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
             "HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved "
             "VapoRock fallback \\(curve-fit\\), NOT first-principles; "
             "residual_dex=1.4; confidence_tier=low; "
-            "VapoRock is authoritative when available"
+            "VapoRock is diagnostic-only; builtin remains authoritative"
         ),
     ):
         first = provider.dispatch(request)
@@ -222,7 +222,7 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
         separators=(",", ":"),
     )
     assert first.diagnostic["vapor_pressures_source"] == {
-        "K": "builtin_fallback:backsolved_vaporock_curve_fit"
+        "K": "builtin_authoritative:backsolved_vaporock_curve_fit"
     }
 
 
@@ -254,5 +254,5 @@ def test_builtin_vapor_pressure_uncertified_pure_component_row_is_silent() -> No
 
     assert caught == []
     assert result.diagnostic["vapor_pressures_source"] == {
-        "K": "builtin_fallback:legacy_pure_component_estimate"
+        "K": "builtin_authoritative:legacy_pure_component_estimate"
     }

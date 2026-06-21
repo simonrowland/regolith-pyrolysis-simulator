@@ -5,8 +5,8 @@ description = "Oxygen Shuttle regolith refinery simulator for lunar and Mars fee
 requires-python = ">=3.10"
 # The full model suite is REQUIRED for the simulator to function with
 # physics-honest activity coefficients and partial pressures:
-#   - vaporock: authoritative VAPOR_PRESSURE provider (γ_M corrections live
-#     here; no fallback Antoine math reproduces VapoRock without it). Installed
+#   - vaporock: diagnostic VAPOR_PRESSURE overlay (γ_M/speciation checks live
+#     here; builtin Antoine/Ellingham remains authoritative). Installed
 #     via install-engines.py, NOT pip: it cannot import without the native
 #     thermoengine build (Cython + GSL + Obj-C/C dylibs + sulfLiq). See the
 #     note in [project.dependencies] below.
@@ -30,7 +30,7 @@ dependencies = [
     "numpy>=1.26,<2",
     "scipy>=1.12",
     "petthermotools>=0.4.5,<0.5",
-    # vaporock (VAPOR_PRESSURE authority) is intentionally NOT a pip dependency.
+    # vaporock (VAPOR_PRESSURE diagnostic overlay) is intentionally NOT a pip dependency.
     # `import vaporock` hard-requires `thermoengine` -- a native build (a Cython
     # extension linking system GSL, Objective-C/C dylibs, and the transitive
     # PyPI dep `sulfLiq`) that pip cannot compile. vaporock + thermoengine are

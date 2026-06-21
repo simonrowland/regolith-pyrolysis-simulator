@@ -343,6 +343,7 @@ class VapoRockBackend(MeltBackend):
         self._vapor_pressure_units: str = 'bar'
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
+        self._last_pressure_authority_warning: Optional[str] = None
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -612,6 +613,19 @@ class VapoRockBackend(MeltBackend):
                 diagnostics=projection_diagnostics,
             )
 
+        pressure_authority_warning = self._last_pressure_authority_warning
+        if pressure_authority_warning:
+            prior_warnings.append(pressure_authority_warning)
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics.update({
+                'pressure_control_authoritative': False,
+                'pressure_control_reason': pressure_authority_warning,
+                'requested_pressure_bar': float(pressure_bar),
+            })
+        else:
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics['pressure_control_authoritative'] = True
+
         # _call_vaporock already returns a finished species -> Pa dict
         # (declared-unit dict path or unambiguous log10(bar) path); do not
         # re-scale here or an already-Pa result is inflated 1e5x.
@@ -626,9 +640,17 @@ class VapoRockBackend(MeltBackend):
             fO2_log=fO2_log,
             liquid_fraction=None,
             phase_assemblage_available=False,
-            status='ok',
+            status=(
+                'non_authoritative'
+                if pressure_authority_warning
+                else 'ok'
+            ),
             warnings=list(prior_warnings),
-            vapor_pressures_Pa=dict(vaporock_full_speciation_Pa),
+            vapor_pressures_Pa=(
+                {}
+                if pressure_authority_warning
+                else dict(vaporock_full_speciation_Pa)
+            ),
             diagnostics=projection_diagnostics,
         )
         setattr(
@@ -699,6 +721,7 @@ class VapoRockBackend(MeltBackend):
         that exposed top-level functions instead of the ``System``
         class — it is a no-op on the current build but harmless.
         """
+        self._last_pressure_authority_warning = None
         module = self._vaporock
         candidate_names = (
             'calc_vapor_pressures',
@@ -712,7 +735,7 @@ class VapoRockBackend(MeltBackend):
             if fn is None:
                 continue
             try:
-                return self._normalize_vapor_pressures(fn(
+                vapor_pressures = self._normalize_vapor_pressures(fn(
                     composition=composition_wt_pct,
                     T_C=temperature if self._temperature_units == 'C' else None,
                     T_K=temperature if self._temperature_units == 'K' else None,
@@ -720,16 +743,30 @@ class VapoRockBackend(MeltBackend):
                     P_Pa=pressure if self._pressure_units == 'Pa' else None,
                     log_fO2=fO2_log,
                 ))
+                self._last_pressure_authority_warning = (
+                    'VapoRock candidate vapor function has unverified total '
+                    'pressure authority; requested pressure_bar is '
+                    'diagnostic-only and this vapor result is '
+                    'non-authoritative for pressure-sensitive transport.'
+                )
+                return vapor_pressures
             except TypeError as exc:
                 # Older builds use positional / shorter signatures.
                 # Fall back to a minimal call before declaring failure.
                 last_attr_error = exc
                 try:
-                    return self._normalize_vapor_pressures(fn(
+                    vapor_pressures = self._normalize_vapor_pressures(fn(
                         composition_wt_pct,
                         temperature,
                         fO2_log,
                     ))
+                    self._last_pressure_authority_warning = (
+                        'VapoRock legacy candidate vapor function did not '
+                        'accept total pressure; requested pressure_bar is '
+                        'diagnostic-only and this vapor result is '
+                        'non-authoritative for pressure-sensitive transport.'
+                    )
+                    return vapor_pressures
                 except Exception as inner_exc:  # noqa: BLE001
                     last_attr_error = inner_exc
                     continue
@@ -751,6 +788,12 @@ class VapoRockBackend(MeltBackend):
                     else temperature + 273.15
                 )
                 logP = eval_gas_abundances(temperature_K, fO2_log)
+                self._last_pressure_authority_warning = (
+                    'VapoRock System.eval_gas_abundances ignores total '
+                    'pressure; requested pressure_bar is diagnostic-only '
+                    'and this vapor result is non-authoritative for '
+                    'pressure-sensitive transport.'
+                )
                 # log10(bar) result is unit-unambiguous; convert directly
                 # without the declared-unit dict path.
                 return self._log10_bar_pressures_to_pa(logP)

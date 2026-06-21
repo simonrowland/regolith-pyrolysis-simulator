@@ -9,6 +9,8 @@ import pytest
 
 import simulator.melt_backend.vaporock as vaporock_module
 from engines.vaporock import VapoRockDiagnostics, VapoRockProvider
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.melt_backend.vaporock import VapoRockBackend
 
 
@@ -23,6 +25,50 @@ def _install_fake_vaporock(monkeypatch, fake_module) -> None:
         "import_module",
         fake_import_module,
     )
+
+
+
+
+def _vaporock_po2_request(pO2_bar):
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": pO2_bar},
+    )
+
+
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
+def test_vaporock_provider_rejects_invalid_explicit_transport_po2(pO2_bar):
+    request = _vaporock_po2_request(pO2_bar)
+
+    with pytest.raises(ValueError, match="pO2_bar"):
+        VapoRockProvider._resolve_pO2_bar(request)
+    with pytest.raises(ValueError, match="pO2_bar"):
+        VapoRockProvider._resolve_fO2_log(request)
+
+
+def test_vaporock_provider_rejects_subfloor_request_level_fo2():
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=-20.0,
+        control_inputs={},
+    )
+
+    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
+        VapoRockProvider._resolve_pO2_bar(request)
+    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
+        VapoRockProvider._resolve_fO2_log(request)
 
 
 def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):
@@ -51,6 +97,8 @@ def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):
         pressure_bar=1e-6,
     )
 
+    assert result.vapor_pressures_Pa == {}
+    assert result.status == "non_authoritative"
     full = getattr(result, "vaporock_full_speciation_Pa", {})
     assert full["O2"] == pytest.approx(1.0e-4)
     assert full["Si2"] == pytest.approx(1.0e-7)
@@ -58,7 +106,7 @@ def test_adapter_attaches_unfiltered_full_speciation(monkeypatch):
     assert full["SiO2_gas"] == pytest.approx(1.0e-9)
 
 
-def test_provider_keeps_evaporation_filter_byte_identical():
+def test_provider_keeps_authoritative_pressure_dict_empty():
     filtered_before = {"Na": 100.0, "K": 10.0, "SiO": 0.25}
     full_speciation = {
         **filtered_before,
@@ -81,23 +129,14 @@ def test_provider_keeps_evaporation_filter_byte_identical():
         allowed_species=frozenset(filtered_before),
     )
 
-    encoded_before = json.dumps(
-        filtered_before,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    encoded_after = json.dumps(
-        diagnostics.vapor_pressures_Pa,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    assert encoded_after == encoded_before
-
+    assert json.dumps(diagnostics.vapor_pressures_Pa, sort_keys=True) == "{}"
     full = diagnostics.vaporock_full_speciation_Pa
+    assert full["Na"] == pytest.approx(filtered_before["Na"])
+    assert full["K"] == pytest.approx(filtered_before["K"])
+    assert full["SiO"] == pytest.approx(filtered_before["SiO"])
     assert full["O2"] == pytest.approx(1.0e-4)
     assert full["Si2"] == pytest.approx(1.0e-7)
     assert full["SiO2_gas"] == pytest.approx(1.0e-9)
-    assert "O2" not in diagnostics.vapor_pressures_Pa
 
 
 def test_provider_allowed_species_honors_inactive_consumer_status(
@@ -140,14 +179,15 @@ def test_provider_allowed_species_honors_inactive_consumer_status(
         allowed_species=allowed_species,
     )
 
-    assert diagnostics.vapor_pressures_Pa == {
-        "SiO": pytest.approx(100.0),
-        "Na": pytest.approx(10.0),
-        "Fe": pytest.approx(1.0),
-    }
+    assert diagnostics.vapor_pressures_Pa == {}
     assert diagnostics.vaporock_full_speciation_Pa["Si"] == pytest.approx(
         1000.0
     )
+    assert diagnostics.vaporock_full_speciation_Pa["SiO"] == pytest.approx(
+        100.0
+    )
+    assert diagnostics.vaporock_full_speciation_Pa["Na"] == pytest.approx(10.0)
+    assert diagnostics.vaporock_full_speciation_Pa["Fe"] == pytest.approx(1.0)
 
 
 def test_vaporock_diagnostic_payload_round_trips_full_speciation():
@@ -166,7 +206,7 @@ def test_vaporock_diagnostic_payload_round_trips_full_speciation():
     )
 
     payload = diagnostics.as_diagnostic()
-    assert payload["vapor_pressures_Pa"] == {"Na": 100.0}
+    assert payload["vapor_pressures_Pa"] == {}
     assert payload["vaporock_full_speciation_Pa"]["O2"] == pytest.approx(1.0e-4)
     assert payload["vaporock_full_speciation_Pa"]["SiO2_gas"] == pytest.approx(
         1.0e-9

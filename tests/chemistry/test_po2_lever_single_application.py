@@ -204,9 +204,13 @@ def test_vaporock_provider_routes_commanded_po2_to_vapor_fO2(vapor_pressure_data
         )
     )
 
-    assert result.status == "ok"
+    assert result.status == "non_authoritative"
     assert backend.fO2_logs == [pytest.approx(-6.0)]
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-6)
+    assert result.diagnostic["vapor_pressures_Pa"] == {}
+    assert result.diagnostic["vaporock_full_speciation_Pa"]["SiO"] == pytest.approx(
+        1000.0
+    )
 
 
 def test_vaporock_provider_vapor_po2_slope_once(vapor_pressure_data):
@@ -226,7 +230,11 @@ def test_vaporock_provider_vapor_po2_slope_once(vapor_pressure_data):
                 fO2_log=0.0,
             )
         )
-        pressures.append(result.diagnostic["vapor_pressures_Pa"]["SiO"])
+        assert result.status == "non_authoritative"
+        assert result.diagnostic["vapor_pressures_Pa"] == {}
+        pressures.append(
+            result.diagnostic["vaporock_full_speciation_Pa"]["SiO"]
+        )
 
     for observed in _slope(_PO2_LEVELS, tuple(pressures)):
         assert observed == pytest.approx(-0.5, abs=1.0e-9)

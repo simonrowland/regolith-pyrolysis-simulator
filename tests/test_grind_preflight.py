@@ -17,7 +17,7 @@ from simulator.grind_preflight import (
 def _eval_spec(**overrides: object) -> dict[str, object]:
     payload: dict[str, object] = {
         "campaign": "C2A_continuous",
-        "vapor_pressure_provider_id": "vaporock",
+        "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
         "force_builtin_vapor_pressure": False,
     }
@@ -25,7 +25,7 @@ def _eval_spec(**overrides: object) -> dict[str, object]:
     return payload
 
 
-def _source_report(source: str = "vaporock") -> dict[str, object]:
+def _source_report(source: str = "builtin_authoritative") -> dict[str, object]:
     return {
         "species": {"Na": source, "SiO": source},
         "summary": {source: {"count": 2, "percentage": 100.0}},
@@ -79,7 +79,7 @@ def test_strict_vapor_config_rejects_fallback_enabled() -> None:
         )
 
 
-def test_strict_vapor_result_store_accepts_all_vaporock_with_sio_warning(
+def test_strict_vapor_result_store_accepts_all_builtin_authoritative_with_sio_warning(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "cache.sqlite"
@@ -87,7 +87,7 @@ def test_strict_vapor_result_store_accepts_all_vaporock_with_sio_warning(
         db_path,
         eval_spec=_eval_spec(),
         result_blob={
-            "vapor_pressure_source_report": _source_report("vaporock"),
+            "vapor_pressure_source_report": _source_report("builtin_authoritative"),
             "warnings": [
                 "WARNING: SiO vapor pressure uses a backsolved VapoRock "
                 "fallback (curve-fit), NOT first-principles"
@@ -124,7 +124,7 @@ def test_strict_vapor_result_store_rejects_kernel_fallback_key(
         db_path,
         eval_spec=_eval_spec(),
         result_blob={
-            "vapor_pressure_source_report": _source_report("vaporock"),
+            "vapor_pressure_source_report": _source_report("builtin_authoritative"),
             "backend_diagnostics": {"kernel_fallback_used": "builtin-vapor-pressure"},
         },
     )
@@ -133,17 +133,17 @@ def test_strict_vapor_result_store_rejects_kernel_fallback_key(
         assert_strict_vapor_result_store(db_path)
 
 
-def test_strict_vapor_result_payload_rejects_nested_builtin_provider_id() -> None:
+def test_strict_vapor_result_payload_rejects_nested_vaporock_provider_id() -> None:
     payload = {
         "result_blob": {
-            "vapor_pressure_source_report": _source_report("vaporock"),
+            "vapor_pressure_source_report": _source_report("builtin_authoritative"),
             "backend_diagnostics": {
-                "vapor_pressure_provider_id": "builtin-vapor-pressure"
+                "vapor_pressure_provider_id": "vaporock"
             },
         }
     }
 
-    with pytest.raises(GrindSourceGateError, match="builtin-vapor-pressure"):
+    with pytest.raises(GrindSourceGateError, match="vaporock"):
         assert_strict_vapor_result_payload(
             payload,
             context="stored-result",

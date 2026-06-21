@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 
-APPROVED_LIVE_VAPOR_SOURCES = frozenset({"vaporock"})
+APPROVED_LIVE_VAPOR_SOURCES = frozenset({"builtin_authoritative"})
 VAPOR_ACTIVE_CAMPAIGN_PREFIXES = ("C2A", "C2B", "C4")
 
 
@@ -304,6 +304,16 @@ def assert_strict_vapor_result_payload(
             f"{context}: fallback provider id {value!r} present at {path}"
         )
 
+    provider_violation = _provider_id_policy_violation_path(
+        payload, approved_sources
+    )
+    if provider_violation is not None:
+        path, value = provider_violation
+        raise GrindSourceGateError(
+            f"{context}: vapor_pressure_provider_id must be one of "
+            f"{sorted(approved_sources)}, got {value!r} at {path}"
+        )
+
     reports = list(_source_reports(payload))
     if not reports:
         if require_source_report:
@@ -437,7 +447,10 @@ def _truthy(value: Any) -> bool:
 
 
 def _source_authority(source: Any) -> str:
-    return str(source or "").split(":", 1)[0]
+    head = str(source or "").split(":", 1)[0]
+    if head == "builtin-vapor-pressure":
+        return "builtin_authoritative"
+    return head
 
 
 def _summary_count(item: Any) -> int:
@@ -502,14 +515,40 @@ def _fallback_provider_id_path(
 
 def _provider_id_key(key: Any) -> bool:
     text = str(key)
-    return text == "vapor_pressure_fallback_provider_id" or text.endswith("_provider_id")
+    return text == "vapor_pressure_fallback_provider_id"
 
 
 def _fallback_provider_value(value: Any) -> bool:
     if not isinstance(value, str):
         return False
     authority = _source_authority(value).strip().lower()
-    return "builtin" in authority or "fallback" in authority
+    return "fallback" in authority
+
+
+def _provider_id_policy_violation_path(
+    payload: Any,
+    approved_sources: frozenset[str],
+    path: str = "$",
+) -> tuple[str, str] | None:
+    if isinstance(payload, Mapping):
+        for key, value in payload.items():
+            child_path = f"{path}.{key}"
+            if str(key) == "vapor_pressure_provider_id" and isinstance(value, str):
+                if _source_authority(value) not in approved_sources:
+                    return child_path, value
+            found = _provider_id_policy_violation_path(
+                value, approved_sources, child_path
+            )
+            if found is not None:
+                return found
+    elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes, bytearray)):
+        for index, value in enumerate(payload):
+            found = _provider_id_policy_violation_path(
+                value, approved_sources, f"{path}[{index}]"
+            )
+            if found is not None:
+                return found
+    return None
 
 
 def _json_mapping(raw: Any, context: str) -> Mapping[str, Any]:

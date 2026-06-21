@@ -27,6 +27,9 @@ _DEFAULT_VAPOR_PRESSURES_PATH = _REPO_ROOT / "data" / "vapor_pressures.yaml"
 class EscapeSplit:
     escaped_frac: float
     retained_frac: float
+    confidence: str = "partly_grounded"
+    status: str = "ok"
+    warning: str | None = None
 
 
 @dataclass(frozen=True)
@@ -93,6 +96,10 @@ def _pure_component_antoine_pa(entry: Mapping[str, Any], temperature_K: float) -
     return 10.0**log_p
 
 
+def _uncertified_foulant_warning(carrier_key: str) -> str:
+    return f"{carrier_key} foulant volatilization uncertified - not modeled"
+
+
 def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
     with yaml_path.open(encoding="utf-8") as handle:
@@ -114,9 +121,12 @@ def chi_escape_salt(
         raise KeyError(f"foulant_vapor row missing for carrier {carrier_key!r}")
 
     if entry.get("interval_required"):
-        raise ValueError(
-            f"certified-point chi_escape refused for interval-only row "
-            f"(carrier={carrier_key!r}, confidence={entry.get('confidence')!r})"
+        return EscapeSplit(
+            escaped_frac=0.0,
+            retained_frac=1.0,
+            confidence="interval_only",
+            status="uncertified",
+            warning=_uncertified_foulant_warning(carrier_key),
         )
 
     temperature_K = float(T_C) + 273.15
@@ -131,7 +141,10 @@ def chi_escape_salt(
     else:
         escaped = p_sat_pa / denom
     escaped = min(max(escaped, 0.0), 1.0)
-    return EscapeSplit(escaped_frac=escaped, retained_frac=1.0 - escaped)
+    return EscapeSplit(
+        escaped_frac=escaped,
+        retained_frac=1.0 - escaped,
+    )
 
 
 def _validate_dg_points(dg_points: Sequence[tuple[float, float]]) -> None:

@@ -396,6 +396,7 @@ def _assert_schema_shape(payload: dict) -> None:
             "alphamelts_text",
             "vaporock",
             "builtin_fallback",
+            "builtin_authoritative",
             "kernel_diagnostic",
         }
     for source, item in source_report["summary"].items():

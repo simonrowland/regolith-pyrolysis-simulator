@@ -273,6 +273,14 @@ def _run_capped_c2a_with_equilibrium_counter(
 ) -> tuple[dict, int]:
     sim = _build_pt0_sim(store)
     sim.backend.is_available = lambda: True
+    freeze_curve = {
+        "source": "unit-test",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log: dict(freeze_curve)
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
@@ -426,9 +434,9 @@ def _strict_vapor_key() -> dict:
             "resolved_role": "authoritative",
         },
         "vapor_pressure_provider": {
-            "resolved_provider_id": "vaporock",
+            "resolved_provider_id": "builtin-vapor-pressure",
             "resolved_role": "authoritative",
-            "authoritative_provider_id": "vaporock",
+            "authoritative_provider_id": "builtin-vapor-pressure",
             "fallback_provider_id": None,
             "fallback_allowed": False,
         },

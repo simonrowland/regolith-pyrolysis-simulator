@@ -24,10 +24,12 @@ import math
 
 import pytest
 
+from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     ELLINGHAM_FIT_RANGE_K,
+    VaporPressureComputationError,
     _ELLINGHAM_THERMO,
 )
 from simulator.equilibrium import EquilibriumMixin
@@ -135,6 +137,15 @@ class _MnAboveNbpMelt:
 
     def composition_wt_pct(self):
         return {"MnO": 100.0}
+
+
+class _FeOnlyHighTMelt:
+    temperature_C = 1600.0
+    p_total_mbar = 1e-3
+    melt_fO2_log = -9.0
+
+    def composition_wt_pct(self):
+        return {"FeO": 100.0}
 
 
 class _SiOnlyMelt:
@@ -275,19 +286,183 @@ def test_ellingham_fit_band_extrapolation_is_diagnostic(
     )
 
 
-def test_legacy_fallback_marks_metal_antoine_range_extrapolation(
+def test_low_confidence_fe_pseudo_vaporock_fallback_is_omitted_outside_range(
+    vapor_pressure_data,
+):
+    data = copy.deepcopy(vapor_pressure_data)
+    assert "pure_component_antoine" in data["metals"]["Fe"]
+    data["metals"]["Fe"].pop("pure_component_antoine")
+    assert data["metals"]["Fe"]["fit_target"] == "pseudo_psat_backsolved_from_vaporock"
+    assert data["metals"]["Fe"]["confidence_tier"] == "low"
+    provider = BuiltinVaporPressureProvider(data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1800.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert "Fe" not in result.diagnostic["vapor_pressures_Pa"]
+    assert any(
+        "non_certifying_vapor_pressure_fallback_omitted: species=Fe"
+        in warning
+        for warning in result.warnings
+    )
+
+
+def test_default_in_range_builtin_provider_keeps_fe_pseudo_fallback_and_legacy_species(
+    vapor_pressure_data, monkeypatch
+):
+    def reject_only_interval_rows(species, row, coefficient_block):
+        if not bool((row or {}).get("interval_required")):
+            raise AssertionError(
+                f"non-interval row was screened for certification: {species}"
+            )
+
+    monkeypatch.setattr(
+        vapor_pressure_module,
+        "reject_noncertifying_vapor_pressure_row",
+        reject_only_interval_rows,
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_FeOnlyHighTMelt.temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    provider_result = provider.dispatch(request)
+    legacy_result = _LegacyFallbackStub(
+        vapor_pressure_data, melt=_FeOnlyHighTMelt()
+    )._stub_equilibrium()
+    provider_vp = dict(
+        (provider_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
+    )
+
+    assert set(provider_vp) == set(legacy_result.vapor_pressures_Pa)
+    assert "Fe" in provider_vp
+    for species, pressure in legacy_result.vapor_pressures_Pa.items():
+        assert provider_vp[species] == pytest.approx(
+            pressure, rel=_VP_TOLERANCE_REL, abs=_VP_TOLERANCE_ABS_PA
+        )
+    assert not any(
+        "non_certifying_vapor_pressure_fallback_omitted" in warning
+        for warning in provider_result.warnings
+    )
+
+
+def test_request_level_fo2_below_transport_floor_is_rejected(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=-20.0,
+        control_inputs={},
+    )
+
+    with pytest.raises(ValueError, match="fO2_log=-20.*transport model floor"):
+        provider.dispatch(request)
+
+
+def test_interval_required_foulant_vapor_row_is_not_certifying(
+    vapor_pressure_data,
+):
+    naf = copy.deepcopy(vapor_pressure_data["foulant_vapor"]["NaF"])
+    assert naf["interval_required"] is True
+    assert naf["certified_point"] is None
+    data = {"metals": {}, "oxide_vapors": {"NaF": naf}}
+    provider = BuiltinVaporPressureProvider(data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"NaF": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    with pytest.raises(
+        VaporPressureComputationError,
+        match="non_certifying_interval_vapor_pressure: species=NaF",
+    ):
+        provider.dispatch(request)
+
+
+@pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
+def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
+    vapor_pressure_data,
+    pO2_bar,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": pO2_bar},
+    )
+
+    with pytest.raises(ValueError, match="pO2_bar"):
+        provider.dispatch(request)
+
+
+def test_builtin_provider_marks_pure_component_range_extrapolation(
     vapor_pressure_data,
 ):
     assert vapor_pressure_data["metals"]["Ca"]["valid_range_K"] == [1115, 1757]
     result = _LegacyFallbackStub(vapor_pressure_data)._stub_equilibrium()
 
     assert result.vapor_pressures_Pa["Ca"] > 0.0
-    assert (
-        result.vapor_pressures_source["Ca"]
-        == "builtin_fallback:pure_component_source_equation_fit:extrapolated_beyond_valid_range_K"
+    assert result.vapor_pressures_source["Ca"] == (
+        "builtin_authoritative:pure_component_source_equation_fit:"
+        "extrapolated_beyond_valid_range_K:"
+        "extrapolated_beyond_ellingham_fit_range_K"
     )
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
+        for warning in result.warnings
+    )
+
+
+def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
+    vapor_pressure_data,
+):
+    result = _LegacyFallbackStub(
+        vapor_pressure_data,
+        melt=_FeOnlyHighTMelt(),
+    )._stub_equilibrium()
+
+    assert result.vapor_pressures_Pa["Fe"] > 0.0
+    assert result.vapor_pressures_source["Fe"].endswith(
+        "extrapolated_beyond_ellingham_fit_range_K"
+    )
+    assert any(
+        "Fe Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
+        in warning
         for warning in result.warnings
     )
 
@@ -300,13 +475,13 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
     result = stub._stub_equilibrium()
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
-    assert (
-        result.vapor_pressures_source["Mn"]
-        == "builtin_fallback:pure_component_derived_from_evaluation"
+    assert result.vapor_pressures_source["Mn"] == (
+        "builtin_authoritative:pure_component_derived_from_evaluation:"
+        "extrapolated_beyond_ellingham_fit_range_K"
     )
 
 
-def test_legacy_fallback_downgrades_mn_above_nbp_source_extrapolation(
+def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(
     vapor_pressure_data,
 ):
     stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnAboveNbpMelt())
@@ -315,9 +490,10 @@ def test_legacy_fallback_downgrades_mn_above_nbp_source_extrapolation(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_fallback:pure_component_extrapolated:"
+        "builtin_authoritative:pure_component_extrapolated:"
         "extrapolated_beyond_source_certified_range_K:"
-        "extrapolated_beyond_valid_range_K"
+        "extrapolated_beyond_valid_range_K:"
+        "extrapolated_beyond_ellingham_fit_range_K"
     )
 
 

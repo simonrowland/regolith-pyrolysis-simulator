@@ -1,14 +1,8 @@
 """Builtin VAPOR_PRESSURE provider (Antoine + Ellingham).
 
-Kernel-registered provider that originally owned the ``VAPOR_PRESSURE``
-intent (goal #7 ``BUILTIN-ENGINE-EXTRACTION``) and was demoted to the
-**fallback** slot under goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``.
-:class:`engines.vaporock.provider.VapoRockProvider` is now the
-authoritative provider; the kernel consults this builtin only when
-VapoRock is unavailable AND the simulator was constructed with
-``allow_fallback_vapor=True`` (the flag is read at
-:meth:`PyrolysisSimulator.__init__` time and threaded into
-:class:`ChemistryKernel.allow_fallback_intents`).
+Kernel-registered authoritative provider for the ``VAPOR_PRESSURE``
+intent. VapoRock may run beside it as a diagnostic shadow, but the
+pressure dict consumed by evaporation comes from this builtin provider.
 
 The provider:
 
@@ -58,6 +52,7 @@ from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
     reject_wrong_intent,
+    resolve_transport_pO2_bar,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
@@ -238,8 +233,26 @@ def vapor_pressure_antoine_coefficients(
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
+            selected = _selected_temperature_segment(pure, temperature_K)
+            use_row_level = False
+            if temperature_K is not None:
+                try:
+                    denominator = float(temperature_K) + float(selected.get("C", 0.0))
+                    projected_log_pressure = float(selected.get("A", 0.0)) - (
+                        float(selected.get("B", 0.0)) / denominator
+                    )
+                    use_row_level = (
+                        not math.isfinite(projected_log_pressure)
+                        or projected_log_pressure > 308.0
+                    )
+                except (TypeError, ValueError, ZeroDivisionError):
+                    use_row_level = True
+            if use_row_level:
+                antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
+                if _is_mapping(antoine):
+                    return antoine, COEFF_BLOCK_ANTOINE
             return (
-                _selected_temperature_segment(pure, temperature_K),
+                selected,
                 COEFF_BLOCK_PURE_COMPONENT,
             )
     antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
@@ -433,11 +446,47 @@ def warn_pseudo_vapor_pressure_fallback(
         f"{prefix}: {key} vapor pressure uses a backsolved VapoRock "
         "fallback (curve-fit), NOT first-principles; "
         f"residual_dex={residual}; confidence_tier={tier}; "
-        "VapoRock is authoritative when available.",
+        "VapoRock is diagnostic-only; builtin remains authoritative.",
         category,
         stacklevel=stacklevel,
     )
     return True
+
+
+def _is_noncertifying_pseudo_vapor_pressure_runtime(
+    species: str,
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    *,
+    temperature_K: float | None,
+) -> bool:
+    if (
+        coefficient_block != COEFF_BLOCK_ANTOINE
+        or str(species) != "Fe"
+        or _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK
+        or not _is_high_uncertainty(row)
+    ):
+        return False
+    valid_range = (row or {}).get("valid_range_K")
+    if temperature_K is None or not valid_range or len(valid_range) != 2:
+        return False
+    return float(temperature_K) > float(valid_range[1])
+
+
+def reject_noncertifying_vapor_pressure_row(
+    species: str,
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+) -> None:
+    """Fail before uncertified vapor rows can become authoritative pressure."""
+
+    if bool((row or {}).get("interval_required")) and not (row or {}).get(
+        "certified_point"
+    ):
+        raise VaporPressureComputationError(
+            "non_certifying_interval_vapor_pressure: "
+            f"species={species} interval_required row lacks certified_point"
+        )
 
 
 def _require_finite_vapor_value(
@@ -497,19 +546,11 @@ def _pow10_pressure_or_raise(
 
 
 class BuiltinVaporPressureProvider(ChemistryProvider):
-    """Fallback ``VAPOR_PRESSURE`` provider (Antoine + Ellingham).
+    """Authoritative ``VAPOR_PRESSURE`` provider (Antoine + Ellingham).
 
-    See module docstring.  Originally registered as authoritative
-    under goal #7 and demoted to the fallback slot under goal #10
-    when VapoRock took over the authoritative role.  The provider
-    still declares VAPOR_PRESSURE in
-    :attr:`CapabilityProfile.is_authoritative_for` so the registry's
-    fallback slot accepts it (an authority-capable provider sitting
-    in the fallback slot can take over the authoritative role
-    cleanly when VapoRock is unavailable and the simulator opted in
-    via ``allow_fallback_vapor=True``).
-
-    ``vapor_pressure_data`` is the parsed
+    See module docstring. The provider declares VAPOR_PRESSURE in
+    :attr:`CapabilityProfile.is_authoritative_for` and owns the pressure
+    surface consumed by evaporation. ``vapor_pressure_data`` is the parsed
     ``data/vapor_pressures.yaml`` payload (keys: ``metals``,
     ``oxide_vapors``).
     """
@@ -602,6 +643,26 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 sp_data,
                 temperature_K=T_K,
             )
+            if _is_noncertifying_pseudo_vapor_pressure_runtime(
+                species,
+                sp_data,
+                coefficient_block,
+                temperature_K=T_K,
+            ):
+                warnings.append(
+                    "non_certifying_vapor_pressure_fallback_omitted: "
+                    f"species={species} "
+                    f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
+                    f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
+                    f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
+                )
+                continue
+            if bool(sp_data.get("interval_required")):
+                reject_noncertifying_vapor_pressure_row(
+                    species,
+                    sp_data,
+                    coefficient_block,
+                )
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
@@ -699,7 +760,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
                 source_label = vapor_pressure_source_label(
-                    "builtin_fallback",
+                    "builtin_authoritative",
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
@@ -720,6 +781,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         for name, data in oxide_vapors_data.items():
+            if bool((data or {}).get("interval_required")):
+                reject_noncertifying_vapor_pressure_row(
+                    name,
+                    data,
+                    COEFF_BLOCK_ANTOINE,
+                )
             antoine = (data or {}).get('antoine', {}) or {}
             A = antoine.get('A', 0)
             B = antoine.get('B', 0)
@@ -777,7 +844,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if P_sat > 1e-15:
                 vapor_pressures[name] = P_sat
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
-                    "builtin_fallback",
+                    "builtin_authoritative",
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
@@ -823,12 +890,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         numerical vacuum floor.
         """
 
-        pO2 = request.control_inputs.get('pO2_bar') if request.control_inputs else None
-        if pO2 is not None:
-            return max(float(pO2), 1e-9)
-        if request.fO2_log is not None:
-            return max(10.0 ** float(request.fO2_log), 1e-9)
-        return 1e-9
+        return resolve_transport_pO2_bar(request, floor_bar=1e-9)
 
     def _resolve_intrinsic_melt_fO2_log(
         self,

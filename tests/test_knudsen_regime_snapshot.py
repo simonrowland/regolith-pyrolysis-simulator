@@ -8,9 +8,9 @@ approaching the boundary BEFORE the F3 refusal fires.
 These tests pin:
 1. The new ``HourSnapshot.knudsen_regime_summary`` field exists +
    defaults to an empty dict.
-2. After a condensation route fires, the summary carries the
-   canonical fields (status, knudsen_number, knudsen_regime,
-   regime_factor, warnings).
+2. After a condensation route fires, the summary carries the canonical fields
+   (status, knudsen_regime, regime_factor, warnings) and only emits
+   knudsen_number when it is finite.
 3. JSON-serialisability invariant: the summary dict round-trips
    cleanly through ``json.dumps`` so the runner output isn't
    broken by tuple values etc.
@@ -79,6 +79,11 @@ def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     # short C2A warmup and the original assertions were vacuous.
     sim.melt.temperature_C = 1500.0
     model = sim.condensation_model
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        campaign_name="C2A",
+    )
     flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
     model.route(flux, sim.melt)
     snap = sim._make_snapshot()
@@ -91,9 +96,12 @@ def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     # Canonical field shapes.
     assert 'status' in summary
     assert isinstance(summary['status'], str)
-    assert 'knudsen_number' in summary
-    assert isinstance(summary['knudsen_number'], float)
-    assert summary['knudsen_number'] >= 0.0
+    if 'knudsen_number' in summary:
+        assert isinstance(summary['knudsen_number'], float)
+        assert summary['knudsen_number'] >= 0.0
+    else:
+        assert summary['status'] == 'unconfigured'
+        assert summary['knudsen_regime'] == 'free_molecular'
     assert 'knudsen_regime' in summary
     assert isinstance(summary['knudsen_regime'], str)
     assert summary['knudsen_regime'] in (

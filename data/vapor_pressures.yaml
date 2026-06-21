@@ -1,8 +1,8 @@
 # Pure-component vapor pressures for Hertz-Knudsen calculations
 # Antoine equation: log10(P_Pa) = A - B / (T_K + C)
-# Sources: legacy pure-component constants plus fallback refits to VapoRock
-# over Kress91 IW operating conditions. The builtin provider is a fallback;
-# VapoRock remains authoritative when available.
+# Sources: legacy pure-component constants plus diagnostic refits against VapoRock
+# over Kress91 IW operating conditions. The builtin Antoine/Ellingham provider
+# is authoritative; VapoRock is diagnostic-only when available.
 #
 # Dense fallback refit (2026-06-14, scripts/vaporock_pseudo_antoine_refit.py):
 #   current VapoRock import; 7 feedstocks; 31 T points from 1350-1950 K;
@@ -12,9 +12,9 @@
 #   Fe 0.023 dex did not re-confirm against current VapoRock; dense-grid
 #   refit lowers current residual to 0.418 dex but remains low confidence.
 #
-# VapoRock structural-species note (2026-05-20): K and O2 should be
-# treated as VapoRock-authoritative when VapoRock is available. Antoine
-# entries here are fallback-only approximations and intentionally narrower
+# VapoRock structural-species note (2026-05-20): K and O2 are
+# structurally limited in the builtin surface. Antoine entries here are
+# diagnostic curve-fit approximations and intentionally narrower
 # than VapoRock's full JANAF gas speciation. O2 is not listed as an
 # evaporating species because it has no single parent oxide; VapoRock may
 # expose it through the read-only vaporock_full_speciation_Pa diagnostic.
@@ -90,7 +90,7 @@ metals:
     valid_range_K: [1400, 1900]
     boiling_point_C: 883
     condensation_T_C_at_1mbar: 480
-    notes: "Builtin fallback effective curve; max residual 0.379 dex vs current VapoRock on the dense Kress91 IW grid. Low confidence; VapoRock is authoritative when available."
+    notes: "Builtin authoritative effective curve; max residual 0.379 dex vs current VapoRock on the dense Kress91 IW grid. Low confidence; VapoRock is diagnostic-only when available."
 
   K:
     formula: "K"
@@ -137,8 +137,8 @@ metals:
     boiling_point_C: 759
     condensation_T_C_at_1mbar: 420
     notes: |
-      VapoRock-authoritative structural species when VapoRock is available;
-      Antoine coefficients are fallback-only approximations to dense-grid
+      Structurally limited species in the builtin authoritative surface;
+      Antoine coefficients are diagnostic approximations to dense-grid
       VapoRock K(g), not a first-principles replacement. The old
       single-reference residual (1.469 dex) improves to 0.691 dex on the
       dense Kress91 IW grid, but K remains structurally limited by VapoRock's
@@ -197,7 +197,7 @@ metals:
     valid_range_K: [1400, 1900]
     boiling_point_C: 1091
     condensation_T_C_at_1mbar: 580
-    notes: "Builtin fallback effective curve; max residual 0.282 dex vs current VapoRock on the dense Kress91 IW grid. Moderate confidence; VapoRock is authoritative when available."
+    notes: "Builtin authoritative effective curve; max residual 0.282 dex vs current VapoRock on the dense Kress91 IW grid. Moderate confidence; VapoRock is diagnostic-only when available."
 
   Fe:
     formula: "Fe"
@@ -246,7 +246,7 @@ metals:
       Prior 0.023 dex basalt-grid residual did not re-confirm against the
       current VapoRock install. Dense-grid refit lowers current residual from
       1.693 dex to 0.418 dex, but Fe remains structurally activity-dependent
-      and low confidence; VapoRock is authoritative when available.
+      and low confidence; VapoRock is diagnostic-only when available.
 
   Ca:
     formula: "Ca"
@@ -575,7 +575,7 @@ oxide_vapors:
       See [THERMO-1] in context-thermo.md.
       Builtin fallback max residual 0.270 dex vs current VapoRock on the
       dense Kress91 IW fit grid; extrapolation keeps prior runtime coverage
-      to 2200 K. Moderate confidence; VapoRock is authoritative when
+      to 2200 K. Moderate confidence; VapoRock is diagnostic-only when
       available.
 
   CrO2:
@@ -691,21 +691,15 @@ foulant_vapor:
     confidence: partly_grounded
     interval_required: true
     certified_point: null
-    antoine:
-      source: "UNGROUNDED CC interval - NIST WebBook fetch failed 2026-06-14; CRC bp 1704 C; DeltaH_vap ~175 kJ/mol alkali-halide analogy pending JANAF/NIST; interval only, NOT certified"
-      A: 9.626700
-      B: 9137.400
-      C: 0
     valid_range_K: [1200, 2000]
     boiling_point_C: 1704
     condensation_T_C_at_1mbar: 1050
-    evaporation_alpha:
-      value: 1.0
-      source: "UNGROUNDED tier-2 salt analogy; no regolith-NaF HK measurement"
-      tier: 2
     notes: |
-      Interval-only Antoine row. NIST SRD 69 Antoine unavailable (fetch failed).
-      Do NOT certify against P_sat(T_bp)=101325 Pa until a named literature row lands.
+      Interval-only identity row. Runtime Antoine coefficients and
+      evaporation_alpha are intentionally absent because no named
+      certified vapor-pressure source or regolith-NaF HK measurement has
+      landed. Stage-0 foulant volatilization must fail loud until a
+      certified row replaces this placeholder.
       CaF2/MgF2 deliberately absent - refractory rump (b129999).
 
 # Condensation temperature reference (at ~1 mbar partial pressure)

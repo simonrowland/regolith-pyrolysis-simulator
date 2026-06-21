@@ -1,24 +1,20 @@
-"""VapoRock kernel-registered VAPOR_PRESSURE provider.
+"""VapoRock kernel-registered VAPOR_PRESSURE diagnostic provider.
 
-Promoted from the today-hook :class:`VapoRockBackend` adapter to a
-kernel-registered authoritative provider under
-``\\goal VAPOROCK-AUTHORITY-PROMOTION`` (#10). The provider:
+The provider wraps the today-hook :class:`VapoRockBackend` adapter as a
+shadow diagnostic beside builtin Antoine/Ellingham authority. The provider:
 
-- declares ``VAPOR_PRESSURE`` as its sole intent, with itself
-  authoritative for it,
+- declares ``VAPOR_PRESSURE`` as its sole intent, diagnostic-only,
 - declares ``process.cleaned_melt`` as its sole accessible account,
 - delegates to :class:`simulator.melt_backend.vaporock.VapoRockBackend`
   for the chemistry (the library import + species-name normalization
   remain owned by the adapter),
 - raises :class:`ProviderUnavailableError` when the upstream VapoRock
-  library is missing -- silent fallback to the builtin Antoine path is
-  forbidden by the goal spec.  The kernel's
-  ``allow_fallback_<intent>`` config flag is the explicit opt-in path
-  for sites that need the builtin to take over.
+  library is missing; shadow dispatch records that without blocking
+  builtin authoritative pressures.
 
 Public exports:
 
-- :class:`VapoRockProvider` -- the kernel-authoritative provider.
+- :class:`VapoRockProvider` -- the kernel diagnostic provider.
 - :class:`VapoRockDiagnostics` -- frozen diagnostic payload.
 """
 
