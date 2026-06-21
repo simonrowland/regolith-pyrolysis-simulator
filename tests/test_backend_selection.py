@@ -25,6 +25,7 @@ import web.events as events
 from simulator.backends import (
     BackendSelectionPolicy,
     assert_stage0_subprocess_backend_safe,
+    backend_resolution_status,
     resolve_backend,
 )
 from simulator.melt_backend.base import StubBackend
@@ -173,6 +174,65 @@ def test_stage0_required_alphamelts_resolution_forces_subprocess_copy():
         "python_bridge": "python_api",
         "alphamelts": {"mode": "thermoengine"},
     }
+
+
+def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
+    source_config = {
+        "mode": "thermoengine",
+        "python_bridge": "python_api",
+        "alphamelts": {"mode": "thermoengine"},
+    }
+    calls: list[str] = []
+    instances: list[_FakeAlphaMELTS] = []
+
+    class _AbsentSubprocessAlphaMELTS(_FakeAlphaMELTS):
+        def initialize(self, config):
+            self.init_calls.append(dict(config or {}))
+            if config.get("mode") == "subprocess":
+                raise RuntimeError("AlphaMELTS subprocess executable missing")
+            return bool(self._init_returns)
+
+    def make_alphamelts():
+        calls.append("alphamelts")
+        backend = _AbsentSubprocessAlphaMELTS(available=True)
+        instances.append(backend)
+        return backend
+
+    def make_stub():
+        calls.append("stub")
+        return StubBackend()
+
+    backend = resolve_backend(
+        "auto",
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=make_alphamelts,
+        stub_backend_cls=make_stub,
+        log_selection=lambda selected: None,
+        backend_config=source_config,
+        feedstock_id="spinel-feed",
+        feedstocks={"spinel-feed": {"spinel_rich": True}},
+    )
+
+    assert isinstance(backend, StubBackend)
+    assert calls == ["alphamelts", "stub"]
+    assert instances[0].init_calls == [
+        {
+            "mode": "subprocess",
+            "python_bridge": "subprocess",
+            "alphamelts": {
+                "mode": "subprocess",
+                "python_bridge": "subprocess",
+            },
+        }
+    ]
+
+    resolution = backend_resolution_status(backend)
+    assert resolution.requested_backend == "auto"
+    assert resolution.active_backend == "StubBackend"
+    assert resolution.backend_status == "unavailable"
+    assert resolution.authoritative is False
+    assert "forced AlphaMELTS backend unavailable" in resolution.message
+    assert "substituted StubBackend" in resolution.message
 
 
 def test_stage0_required_rejects_reused_non_subprocess_backend():

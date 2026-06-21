@@ -345,6 +345,22 @@ def backend_transport_route(backend: Any) -> tuple[Any, Any, str]:
     return mode, bridge, route
 
 
+def _backend_config_requests_subprocess(
+    backend_config: Mapping[str, Any] | None,
+) -> bool:
+    if not isinstance(backend_config, Mapping):
+        return False
+    for key in ("mode", "python_bridge"):
+        if str(backend_config.get(key) or "").strip().lower() == "subprocess":
+            return True
+    nested = backend_config.get("alphamelts")
+    if isinstance(nested, Mapping):
+        for key in ("mode", "python_bridge"):
+            if str(nested.get(key) or "").strip().lower() == "subprocess":
+                return True
+    return False
+
+
 def assert_stage0_subprocess_backend_safe(
     backend: Any,
     *,
@@ -516,11 +532,7 @@ def backend_resolution_status(backend: Any) -> BackendResolutionStatus:
         backend_status=backend_status,
         authoritative=authoritative,
         selection_policy="unknown",
-        message=(
-            "stub backend selected; no authoritative melt result available"
-            if is_stub
-            else "backend selected"
-        ),
+        message=_backend_status_message(backend, is_stub=is_stub),
     )
 
 
@@ -563,11 +575,7 @@ def _make_backend_resolution_status(
         backend_status=backend_status,
         authoritative=backend_status == BACKEND_STATUS_OK and not is_stub,
         selection_policy=policy.value,
-        message=(
-            "stub backend selected; no authoritative melt result available"
-            if is_stub
-            else "backend selected"
-        ),
+        message=_backend_status_message(backend, is_stub=is_stub),
     )
 
 
@@ -581,6 +589,40 @@ def _attach_backend_resolution_status(
         backend.backend_authoritative = resolution.authoritative
     except Exception:  # noqa: BLE001 - status helper still derives fallback
         return
+
+
+def _backend_status_message(backend: Any, *, is_stub: bool) -> str:
+    fallback_message = _backend_selection_fallback_message(backend)
+    if fallback_message:
+        return fallback_message
+    if is_stub:
+        return "stub backend selected; no authoritative melt result available"
+    return "backend selected"
+
+
+def _backend_selection_fallback_message(backend: Any) -> str:
+    try:
+        raw_message = getattr(backend, "_backend_selection_fallback_message", "")
+    except Exception:  # noqa: BLE001 - diagnostic helper must not fail resolver
+        return ""
+    return str(raw_message or "").strip()
+
+
+def _attach_backend_selection_fallback_message(
+    backend: Any,
+    message: str,
+) -> None:
+    try:
+        backend._backend_selection_fallback_message = message
+    except Exception:  # noqa: BLE001 - fallback still status-bearing by type/status
+        return
+
+
+def _forced_alphamelts_unavailable_message(error: Exception | None) -> str:
+    message = "forced AlphaMELTS backend unavailable; substituted StubBackend"
+    if error is None:
+        return f"{message} (probe returned unavailable)"
+    return f"{message} ({type(error).__name__}: {error})"
 
 
 def _normalize_intent_names(required_intents: Iterable[Any] | None) -> set[str]:
@@ -674,11 +716,24 @@ def _resolve_web_autodetect(
             "AlphaMELTS unavailable; run install-dependencies.py"
         )
 
-    backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
+    forced_subprocess_probe = _backend_config_requests_subprocess(backend_config)
+    probe_error: Exception | None = None
+    try:
+        backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
+    except Exception as exc:  # noqa: BLE001 - auto treats probe failure as unavailable
+        if not forced_subprocess_probe:
+            raise
+        backend = None
+        probe_error = exc
     if backend is not None:
         _log_selection(backend, log_selection, log_message)
         return backend
     backend = _stub_backend(stub_backend_cls)
+    if forced_subprocess_probe:
+        _attach_backend_selection_fallback_message(
+            backend,
+            _forced_alphamelts_unavailable_message(probe_error),
+        )
     _log_selection(backend, log_selection, log_message)
     return backend
 
