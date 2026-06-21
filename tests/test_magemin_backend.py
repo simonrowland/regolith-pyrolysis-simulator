@@ -250,6 +250,63 @@ def test_magemin_explicit_pymagemin_runtime_failure_retries_subprocess(monkeypat
     )
 
 
+def test_magemin_explicit_julia_runtime_failure_retries_subprocess(monkeypatch):
+    def single_point_minimization(*args):
+        raise RuntimeError("julia minimizer crashed")
+
+    fake_module = types.SimpleNamespace(
+        Main=types.SimpleNamespace(
+            MAGEMin=types.SimpleNamespace(
+                single_point_minimization=single_point_minimization,
+            ),
+        ),
+    )
+    _disable_configured_magemin_path(monkeypatch)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("julia", fake_module),
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"python_bridge": "julia"}) is True
+    assert backend._bridge == "julia"
+
+    fallback_calls = []
+
+    def fake_subprocess(**kwargs):
+        fallback_calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    monkeypatch.setattr(
+        backend,
+        "_call_magemin_subprocess",
+        fake_subprocess,
+    )
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+
+    assert fallback_calls
+    assert result.status == "ok"
+    assert result.phase_masses_kg == {"liq": 1.0}
+    assert any(
+        "julia bridge failed; retried subprocess" in warning
+        for warning in result.warnings
+    )
+
+
 def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
     def minimize(**kwargs):
         temperature_C = float(kwargs["T_C"])

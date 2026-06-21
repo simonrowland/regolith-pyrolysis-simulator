@@ -32,8 +32,8 @@ subprocess.  This adapter's supported, default path is **subprocess**:
 ``../MAGEMin/MAGEMin`` or ``engines/magemin/{,bin/}MAGEMin``) and
 ``_call_magemin`` invokes it with ``--Verb=0`` single-point arguments,
 parsing the compact ``Phase :`` / ``Mode :`` stdout block.  The optional
-``pymagemin`` / ``julia`` bridges are still probed first if a caller has
-them installed, but the binary is the canonical route.  See
+``pymagemin`` / ``julia`` bridges are opt-in; the binary is the canonical
+route.  See
 ``pyproject.toml`` ``[magemin]`` for the build path.
 
 Intended call site
@@ -987,13 +987,25 @@ class MAGEMinBackend(MeltBackend):
             # The Julia bridge expects a dict of oxide wt% and returns
             # a struct.  This is a thin wrapper — full marshaling is
             # the responsibility of MAGEMin_C.jl.
-            return JuliaMain.MAGEMin.single_point_minimization(
-                bulk_projection.composition_wt_pct,
-                temperature_K,
-                pressure_kbar,
-                self._database,
-                fO2_log,
-            )
+            try:
+                return JuliaMain.MAGEMin.single_point_minimization(
+                    bulk_projection.composition_wt_pct,
+                    temperature_K,
+                    pressure_kbar,
+                    self._database,
+                    fO2_log,
+                )
+            except Exception as exc:  # noqa: BLE001 - optional bridge boundary
+                if self._binary_path is not None:
+                    return self._call_magemin_subprocess_after_bridge_failure(
+                        bulk_projection=bulk_projection,
+                        temperature_C=temperature_C,
+                        pressure_kbar=pressure_kbar,
+                        fO2_log=fO2_log,
+                        bridge='julia',
+                        exc=exc,
+                    )
+                raise
 
         if self._bridge == 'ctypes':
             # ctypes path is intentionally NOT auto-marshaled here —
