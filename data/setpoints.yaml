@@ -846,12 +846,55 @@ condensation_train:
     Ti:   1500
 
   condensation_temperature_sources:
+    Fe: >-
+      Estimated/operator-routing override matching the Fe condenser band;
+      no source-backed 1 mbar condensation-temperature row is declared.
+    SiO: >-
+      Estimated/operator-routing midpoint of the 900-1200 C SiO zone;
+      not a literature-derived pure-component condensation temperature.
     CrO2: >-
       Option A Cr2O3 harvest setpoint. VapoRock JANAF0 has CrO2(g)
       thermochemistry valid from 1100-6000 K; the Sossi-Moon Cr fixture records
       CrO2(g) as the relevant Cr vapor above 1500 K. 1250 C sits inside the
       user-directed 1100-1300 C Cr stage and below the Fe-condenser midpoint so
       the dedicated Cr stage captures the vapor.
+    Mg: >-
+      Estimated/operator-routing override matching the alkali/Mg cyclone band;
+      no source-backed 1 mbar condensation-temperature row is declared.
+    Na: >-
+      Estimated/operator-routing override matching the alkali/Mg cyclone band;
+      no source-backed 1 mbar condensation-temperature row is declared.
+    K: >-
+      Estimated/operator-routing override matching the alkali/Mg cyclone band;
+      no source-backed 1 mbar condensation-temperature row is declared.
+    Ca: >-
+      Estimated/operator-routing override for possible carryover; no
+      source-backed 1 mbar condensation-temperature row is declared.
+    Mn: >-
+      Estimated/operator-routing override for the Cr/Mn oxide harvester branch;
+      no source-backed 1 mbar condensation-temperature row is declared.
+    Cr: >-
+      Estimated/operator-routing override for Cr-bearing vapor capture; no
+      source-backed 1 mbar condensation-temperature row is declared.
+    Al: >-
+      Estimated/operator-routing override for completeness; no source-backed
+      1 mbar condensation-temperature row is declared.
+    Ti: >-
+      Estimated/operator-routing override for completeness; no source-backed
+      1 mbar condensation-temperature row is declared.
+
+  condensation_temperature_estimated:
+    Fe: true
+    SiO: true
+    CrO2: false
+    Mg: true
+    Na: true
+    K: true
+    Ca: true
+    Mn: true
+    Cr: true
+    Al: true
+    Ti: true
 
   stages:
     - stage_number: 2

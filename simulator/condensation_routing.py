@@ -23,7 +23,7 @@ STAGE_NUMBER_BY_KEY.update({
 
 STAGE_TARGET_SPECIES: dict[int, tuple[str, ...]] = {
     1: ('Fe',),
-    2: ('Cr', 'CrO2'),
+    2: ('Cr', 'CrO2', 'Mn'),
     3: ('SiO',),
     4: ('Na', 'K', 'Mg'),
 }
@@ -41,6 +41,10 @@ DESIGNATED_STAGE: dict[str, str] = {
     'Na': 'stage_4_alkali_mg_cyclone',
     'K': 'stage_4_alkali_mg_cyclone',
     'Mg': 'stage_4_alkali_mg_cyclone',
+}
+
+CONDENSATION_COPRODUCT_STAGE: dict[str, str] = {
+    'Si': 'stage_3_sio_zone',
 }
 
 METAL_PHASE_DESTINATIONS: dict[str, str] = {
@@ -109,7 +113,22 @@ def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:
         for species, destination in DESIGNATED_STAGE.items()
         if stage_number_for_destination(destination) == stage_number
     }
+    accepted.update(
+        species
+        for species, destination in CONDENSATION_COPRODUCT_STAGE.items()
+        if stage_number_for_destination(destination) == stage_number
+    )
     return frozenset(accepted)
+
+
+def coproduct_species_for_stage_number(stage_number: int) -> frozenset[str]:
+    """Condensation coproducts accepted in a stage but not primary targets."""
+
+    return frozenset(
+        species
+        for species, destination in CONDENSATION_COPRODUCT_STAGE.items()
+        if stage_number_for_destination(destination) == stage_number
+    )
 
 
 def target_species_for_stage_number(stage_number: int) -> list[str]:

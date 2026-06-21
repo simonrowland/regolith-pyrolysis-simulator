@@ -21,6 +21,72 @@ default_alpha_s_by_species: &default_alpha_s_by_species
   Mn: 0.85
   Cr: 0.9
 
+default_liner_alpha_s_by_species: &default_liner_alpha_s_by_species
+  Fe:
+    value: 0.9
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Fe
+    output_status: uncertainty_only
+  SiO:
+    value: 0.7
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.SiO
+    output_status: uncertainty_only
+  CrO2:
+    value: 0.9
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.CrO2
+    output_status: uncertainty_only
+  Mg:
+    value: 0.8
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Mg
+    output_status: uncertainty_only
+  Na:
+    value: 0.95
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Na
+    output_status: uncertainty_only
+  K:
+    value: 0.95
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.K
+    output_status: uncertainty_only
+  Ca:
+    value: 0.85
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Ca
+    output_status: uncertainty_only
+  Mn:
+    value: 0.85
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Mn
+    output_status: uncertainty_only
+  Cr:
+    value: 0.9
+    status: proxy
+    source_class: legacy_species_default_proxy
+    source: data/materials.yaml::default_alpha_s_by_species.Cr
+    output_status: uncertainty_only
+
+fused_silica_liner_alpha_s_by_species: &fused_silica_liner_alpha_s_by_species
+  <<: *default_liner_alpha_s_by_species
+  SiO:
+    value: 0.0
+    status: uncharacterized
+    source_class: fail_closed_no_direct_sticking_coefficient
+    source: data/wall_materials.yaml::materials.fused_silica.stickiness.SiO
+    output_status: status_bearing
+    basis: "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7."
+
 stages:
   0:
     structural_material: refractory_shell
@@ -79,9 +145,30 @@ wall_surfaces:
     alpha_s_by_species: *default_alpha_s_by_species
 
 liner_materials:
+  fe_condenser_liner:
+    max_service_T_C: 1400
+    alpha_s_by_species: *default_liner_alpha_s_by_species
+  cr_oxide_cartridge_liner:
+    max_service_T_C: 1300
+    alpha_s_by_species: *default_liner_alpha_s_by_species
+  fused_silica_baffles:
+    max_service_T_C: 1200
+    alpha_s_by_species: *fused_silica_liner_alpha_s_by_species
+  alkali_mg_cyclone_liner:
+    max_service_T_C: 700
+    alpha_s_by_species: *default_liner_alpha_s_by_species
+  vortex_dust_filter_liner:
+    max_service_T_C: 350
+    alpha_s_by_species: *default_liner_alpha_s_by_species
+  turbine_compressor_liner:
+    max_service_T_C: 200
+    alpha_s_by_species: *default_liner_alpha_s_by_species
+  turbine_outlet_monitor_liner:
+    max_service_T_C: 50
+    alpha_s_by_species: *default_liner_alpha_s_by_species
   hot_wall_refractory_liner:
     max_service_T_C: 1600
-    alpha_s_by_species: *default_alpha_s_by_species
+    alpha_s_by_species: *default_liner_alpha_s_by_species
     resinter_threshold_kg: null
     resinter_threshold_basis: configurable_parameter_no_sourced_default
     fast_fouling_campaign_threshold: 10

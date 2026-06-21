@@ -56,58 +56,35 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
-# Cr/Fe wall-segment deposits rebased 2026-06-19 (BUG-013 + SSO-R R2.1b):
+# Cr/Fe wall-segment deposits rebased 2026-06-20 (BUG-013 + BUG-153):
 # grounding the N2 collision diameter to the BSL Table E.1 LJ sigma shifted
-# viscous-regime deposits; R2.1b then made Fe activity respond to Kress91 melt
-# redox, lowering oxidized Fe(g). Mg moves only through the coupled batch path.
+# viscous-regime deposits; BUG-153 routes condensation through the shared vapor
+# pressure accessor, so Mg pure-component Antoine precedence no longer uses the
+# legacy fallback row for wall-deposit driving pressure.
+# 2026-06-21 BUG-155: Mars runs now thread CO2 into the production
+# condensation wall-flux path, shifting only the Mars C2A wall baseline.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 5.959569052890747e-12,
-            "Fe": 1.4002968959101222e-08,
-            "Mg": 0.001357752181264281,
+            "Cr": 5.790501280296902e-12,
+            "Fe": 2.223616561224671e-08,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 5.959569052890747e-12,
-            "Mg": 0.001357752181264281,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.001357752181264281,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.0013577521812642808,
+            "Cr": 5.790501280296902e-12,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 1.1374340808778457e-08,
-            "Mg": 0.0010008109311819284,
-        },
-        "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 0.0010008109311819284,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.0010008109311819284,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.0010008109311819284,
+            "Fe": 1.83406144703434e-08,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 4.332709958738508e-12,
-            "Fe": 6.3871367899520875e-09,
-            "Mg": 0.0029778573231465677,
+            "Cr": 4.068412709531221e-12,
+            "Fe": 1.0434155195809926e-08,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 4.332709958738508e-12,
-            "Mg": 0.0029778573231465677,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 0.0029778573231465677,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 0.0029778573231465677,
+            "Cr": 4.068412709531221e-12,
         },
     },
 }

@@ -13,7 +13,7 @@ from simulator.state import (
 )
 
 
-EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.01636594008785928
+EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.01699460928095662
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
     "max_hold_hr": 25,
@@ -145,7 +145,6 @@ def test_cold_wall_segment_attribution_matches_pre_refactor_values():
     assert set(attribution) == {
         "process.wall_deposit_segment_stage_0_to_stage_1",
         "process.wall_deposit_segment_stage_1_to_stage_2",
-        "process.wall_deposit_segment_stage_2_to_stage_3",
     }
     for species_kg in attribution.values():
         assert species_kg == {

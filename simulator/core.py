@@ -1530,6 +1530,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
 
+    @staticmethod
+    def _normalize_condensation_carrier_gas(value: Any) -> str:
+        text = str(value or '').strip()
+        upper = text.upper()
+        if 'CO2' in upper:
+            return 'CO2'
+        if 'AR' in upper:
+            return 'Ar'
+        if 'N2' in upper or 'PN2' in upper:
+            return 'N2'
+        return ''
+
+    def _resolve_condensation_carrier_gas(self) -> str:
+        background = self._normalize_condensation_carrier_gas(
+            getattr(self.melt, 'background_gas_species', ''))
+        if background:
+            return background
+
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        ambient_atmosphere = str(
+            getattr(self.melt, 'ambient_atmosphere', '') or '')
+        if (
+            atmosphere_name == 'CO2_BACKPRESSURE'
+            or self._normalize_condensation_carrier_gas(ambient_atmosphere) == 'CO2'
+        ):
+            return 'CO2'
+
+        campaign_name = str(getattr(self.melt.campaign, 'name', '') or '')
+        campaign_keys = {
+            'C2A': ('C2A_continuous', 'C2A'),
+            'C2A_STAGED': ('C2A_staged', 'C2A_STAGED'),
+        }.get(campaign_name, (campaign_name,))
+        campaigns = self.setpoints.get('campaigns', {}) or {}
+        if isinstance(campaigns, Mapping):
+            for key in campaign_keys:
+                cfg = campaigns.get(key, {}) or {}
+                if not isinstance(cfg, Mapping):
+                    continue
+                carrier = self._normalize_condensation_carrier_gas(
+                    cfg.get('carrier_gas', ''))
+                if carrier == 'Ar':
+                    return carrier
+
+        return 'N2'
+
     def _configure_condensation_operating_conditions(
         self,
         evap_flux: EvaporationFlux,
@@ -1590,6 +1635,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     None,
                 )
             ),
+            carrier_gas=self._resolve_condensation_carrier_gas(),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )

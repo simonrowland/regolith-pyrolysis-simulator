@@ -387,48 +387,14 @@
                     <div class="stage-temp">50–400 &deg;C</div>
                     <div class="stage-mass">— kg</div>
                 </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="0">
-                    <div class="stage-label">Hot Duct</div>
-                    <div class="stage-temp">&gt;1400 &deg;C</div>
-                    <div class="stage-mass">—</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="1">
-                    <div class="stage-label">Fe Condenser</div>
-                    <div class="stage-temp">1100–1400 &deg;C</div>
-                    <div class="stage-mass">— kg</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="2">
-                    <div class="stage-label">SiO Zone</div>
-                    <div class="stage-temp">900–1200 &deg;C</div>
-                    <div class="stage-mass">— kg</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="3">
-                    <div class="stage-label">Alkali/Mg</div>
-                    <div class="stage-temp">350–700 &deg;C</div>
-                    <div class="stage-mass">— kg</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="4">
-                    <div class="stage-label">Vortex Filter</div>
-                    <div class="stage-temp">200–350 &deg;C</div>
-                    <div class="stage-mass">— kg</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="5">
-                    <div class="stage-label">Turbine</div>
-                    <div class="stage-temp">—</div>
-                    <div class="stage-mass">—</div>
-                </div>
-                <div class="train-arrow">&rarr;</div>
-                <div class="train-stage" data-stage="6">
-                    <div class="stage-label">O&#x2082; Store</div>
-                    <div class="stage-temp">~3 bar</div>
-                    <div class="stage-mass">— kg</div>
-                </div>
+                {% for stage in condensation_train_stages %}
+                    <div class="train-arrow">&rarr;</div>
+                    <div class="train-stage" data-stage="{{ stage.stage_number }}">
+                        <div class="stage-label">{{ stage.label }}</div>
+                        <div class="stage-temp">{{ stage.temp_label }}</div>
+                        <div class="stage-mass">— kg</div>
+                    </div>
+                {% endfor %}
             </div>
 
             <!-- Per-species condensation totals -->

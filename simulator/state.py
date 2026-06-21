@@ -683,6 +683,7 @@ class PipeSegment:
     source_class: str = ''
     sensitivity_marker: str = ''
     extraction_note: str = ''
+    liner_material: str = ''
 
     @property
     def surface_area_m2(self) -> float:

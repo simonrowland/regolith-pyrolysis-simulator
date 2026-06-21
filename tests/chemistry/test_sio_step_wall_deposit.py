@@ -141,8 +141,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # regime_factor drops ~4.9%, but viscous-regime deposition is mass-
     # transfer-dominated, so the wall baseline moves only -0.0015%:
     # 5.35761631701e-06 -> 5.357536728e-06 kg.
+    # 2026-06-21 BUG-101: fused-silica SiO alpha_s is now differentiated
+    # from the upstream liner proxies and fail-closes at zero because no
+    # direct sticking coefficient is cited. The 1050 C cold-wall baseline
+    # now excludes that fused-silica segment:
+    # 5.357536728e-06 -> 3.58623058352e-06 kg.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        5.357536728e-06, rel=1e-9
+        3.58623058352e-06, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

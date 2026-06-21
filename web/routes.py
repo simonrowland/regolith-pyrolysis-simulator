@@ -34,6 +34,7 @@ from simulator.mre_ladder import (
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
+from simulator.state import CondensationTrain
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -1374,6 +1375,52 @@ def _knudsen_config_payload() -> dict[str, float]:
     }
 
 
+def _condensation_train_stage_payload() -> list[dict[str, Any]]:
+    stages = []
+    for stage in CondensationTrain.create_default().stages:
+        lo_C, hi_C = stage.temp_range_C
+        stages.append({
+            'stage_number': int(stage.stage_number),
+            'label': stage.label,
+            'temp_label': f"{float(lo_C):g}-{float(hi_C):g} C",
+        })
+    return stages
+
+
+def _condensation_temperature_config_payload() -> dict[str, Any]:
+    setpoints = _load_yaml('setpoints.yaml')
+    train = setpoints.get('condensation_train', {}) or {}
+    temperatures = train.get('condensation_temperatures_C', {}) or {}
+    sources = train.get('condensation_temperature_sources', {}) or {}
+    estimated = train.get('condensation_temperature_estimated', {}) or {}
+    rows = []
+    if isinstance(temperatures, Mapping):
+        for species, raw_temperature in sorted(temperatures.items()):
+            source = sources.get(species) if isinstance(sources, Mapping) else None
+            source_text = str(source or '').strip()
+            is_estimated = (
+                bool(estimated.get(species))
+                if isinstance(estimated, Mapping) and species in estimated
+                else not bool(source_text)
+            )
+            rows.append({
+                'species': str(species),
+                'temperature_C': raw_temperature,
+                'source': (
+                    source_text
+                    if source_text
+                    else 'estimated/operator-routing override; no source row'
+                ),
+                'estimated': is_estimated,
+            })
+    return {
+        'rows': rows,
+        'missing_source_species': [
+            row['species'] for row in rows if row['estimated']
+        ],
+    }
+
+
 def _oxide_target_label(target_oxide: str) -> str:
     token = ''
     for char in target_oxide:
@@ -1978,6 +2025,7 @@ def simulator():
         feedstocks=feedstocks,
         mre_presets=_mre_preset_catalog_payload(),
         knudsen_config=_knudsen_config_payload(),
+        condensation_train_stages=_condensation_train_stage_payload(),
         debug_feedstocks=debug_feedstocks,
         debug_mode=debug_feedstocks_enabled(),
     )
@@ -2219,6 +2267,12 @@ def get_feedstocks():
 def get_setpoints():
     """Return campaign setpoints as JSON."""
     return jsonify(_load_yaml('setpoints.yaml'))
+
+
+@bp.route('/api/condensation-temperature-config')
+def get_condensation_temperature_config():
+    """Return normalized condensation-temperature override provenance."""
+    return jsonify(_condensation_temperature_config_payload())
 
 
 @bp.route('/api/feedstock/<key>')

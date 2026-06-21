@@ -208,7 +208,8 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     notice = diagnostics["wall_sticking_alpha_provenance_notice"]
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
-    assert notice["source_class"] == "assumption_ungrounded_fitted_coefficient"
+    assert notice["source_class"] == "status_bearing_material_alpha"
+    assert "legacy_species_default_proxy" in notice["source_classes"]
     assert "Mg" in notice["species"]
     assert notice["alpha_s_by_species"]["Mg"] == pytest.approx(0.8)
     assert (
@@ -266,7 +267,7 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
 
     extrapolation = route.antoine_extrapolations["Ca"]
     assert extrapolation["temperature_K"] == pytest.approx(780.0 + 273.15)
-    assert tuple(extrapolation["valid_range_K"]) == (1115.0, 1757.0)
+    assert tuple(extrapolation["valid_range_K"]) == (1254.0, 1712.0)
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in route.antoine_extrapolation_warnings
@@ -338,7 +339,7 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     )
 
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.049097820263577854,
+        0.03398921856191324,
         rel=1e-12,
     )
     assert (
@@ -349,9 +350,16 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     notice = route.sticking_alpha_provenance_notice
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
-    assert notice["source_class"] == "assumption_ungrounded_fitted_coefficient"
+    assert notice["source_class"] == "status_bearing_material_alpha"
+    assert "fail_closed_no_direct_sticking_coefficient" in notice["source_classes"]
     assert notice["species"] == ["SiO"]
     assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(0.7)
+    assert (
+        notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
+            "alpha_s"
+        ]
+        == pytest.approx(0.0)
+    )
     # Reported alphas are the wall-path values; the capture-budget path reads
     # STICKING_COEFF directly and must not be conflated with them.
     assert notice["alpha_s_source"] == "_wall_alpha_s"

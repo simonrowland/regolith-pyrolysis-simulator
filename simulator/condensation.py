@@ -83,6 +83,7 @@ from simulator.lab_geometry import (
 from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
+    coproduct_species_for_stage_number,
     designated_stage_number,
     is_designated_for_stage,
 )
@@ -197,7 +198,80 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
+_LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
+    'N2': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'Ar': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'CO2': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'O2': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'Na': {
+        'status': 'sourced',
+        'source': 'Svehla 1962 vapor transport table',
+    },
+    'K': {
+        'status': 'sourced',
+        'source': 'Svehla 1962 vapor transport table',
+    },
+    'Ca': {
+        'status': 'proxy',
+        'source': 'Bird/Stewart/Lightfoot extension; review before certification',
+    },
+    'Fe': {
+        'status': 'proxy',
+        'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Mg': {
+        'status': 'proxy',
+        'source': 'estimated vapor Lennard-Jones row',
+    },
+    'Mn': {
+        'status': 'proxy',
+        'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Cr': {
+        'status': 'proxy',
+        'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Al': {
+        'status': 'proxy',
+        'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'Ti': {
+        'status': 'proxy',
+        'source': 'estimated transition-metal vapor Lennard-Jones row',
+    },
+    'SiO': {
+        'status': 'proxy',
+        'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
+    },
+}
+
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+CAPTURE_BUDGET_REGULARIZER_FLOOR = 0.01
+CAPTURE_BUDGET_REGULARIZER_NOTICE = {
+    'severity': 'warning',
+    'code': 'pressure_isolated_capture_budget_regularizer_unsourced',
+    'source_class': 'assumption_regularizer_not_literature_constant',
+    'floor': CAPTURE_BUDGET_REGULARIZER_FLOOR,
+    'usage': '_pressure_isolated_stage_efficiency',
+    'output_status': 'uncertainty_only',
+    'message': (
+        'Pressure-isolated capture budget uses a legacy numerical floor; '
+        'the value is surfaced as uncertainty-only and must not be treated '
+        'as a sourced condensation constant.'
+    ),
+}
 
 # ``MAX_STIR_FACTOR`` + ``clamp_stir_factor`` are canonical in
 # ``simulator/state.py`` (where ``MeltState.stir_factor`` lives). They
@@ -416,6 +490,44 @@ def _chapman_enskog_d_ab_m2_s(
     return D_AB_cm2_s * 1.0e-4
 
 
+def _carrier_collision_diameter_m(carrier_gas: str) -> float:
+    params = _LENNARD_JONES_PARAMS.get(str(carrier_gas))
+    if params is None:
+        return N2_COLLISION_DIAMETER_M
+    return float(params[0]) * 1.0e-10
+
+
+def _transport_parameter_notice(
+    species: str,
+    carrier_gas: str,
+) -> dict[str, Any]:
+    rows: dict[str, dict[str, str]] = {}
+    for name in (str(species), str(carrier_gas)):
+        provenance = _LENNARD_JONES_PROVENANCE.get(name)
+        if provenance is None:
+            rows[name] = {
+                'status': 'missing_proxy_fallback',
+                'source': 'no Lennard-Jones row; diffusion falls back status-bearing',
+            }
+        else:
+            rows[name] = dict(provenance)
+    if all(row.get('status') == 'sourced' for row in rows.values()):
+        return {}
+    return {
+        'severity': 'warning',
+        'code': 'transport_lennard_jones_proxy_rows',
+        'source_class': 'transport_proxy_not_authoritative',
+        'carrier_gas': str(carrier_gas),
+        'rows': rows,
+        'output_status': 'status_bearing',
+        'message': (
+            'One or more Lennard-Jones transport rows are proxy estimates; '
+            'wall deposition transport diagnostics are status-bearing until '
+            'species-specific data replaces them.'
+        ),
+    }
+
+
 class KnudsenRegime(Enum):
     VISCOUS = 'viscous'
     TRANSITIONAL = 'transitional'
@@ -519,6 +631,8 @@ class CondensationRouteResult:
     knudsen_regime_diagnostic: Dict[str, Any] = field(default_factory=dict)
     sticking_alpha_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
+    transport_parameter_notice: Dict[str, Any] = field(default_factory=dict)
+    capture_budget_regularizer_notice: Dict[str, Any] = field(default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -582,6 +696,7 @@ class CondensationModel:
         self.overhead_pressure_mbar = 0.0
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.gas_temperature_C = float(wall_temperature_C)
+        self.carrier_gas = DEFAULT_CARRIER_GAS
         # Induction-stirring intensity — recipe-controlled per
         # ``setpoints.yaml § induction_stirring``. Constructor default
         # is ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``), NOT the
@@ -633,6 +748,8 @@ class CondensationModel:
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
+        self.last_transport_parameter_notice: dict[str, Any] = {}
+        self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
         self.cold_spot_history: list[dict[str, Any]] = []
         self.operating_history: list[dict[str, Any]] = []
 
@@ -663,6 +780,7 @@ class CondensationModel:
         pipe_segment_temperatures_C: Mapping[str, float] | None = None,
         stir_factor: float | None = None,
         radial_stir_factor: float | None = None,
+        carrier_gas: str | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
     ) -> None:
@@ -696,6 +814,9 @@ class CondensationModel:
             self.gas_temperature_C = float(gas_temperature_C)
         elif wall_temperature_C is not None:
             self.gas_temperature_C = float(wall_temperature_C)
+        if carrier_gas is not None:
+            requested_carrier = str(carrier_gas).strip()
+            self.carrier_gas = requested_carrier or DEFAULT_CARRIER_GAS
         # Track requested vs applied stir for the operating-history audit.
         # Codex + gstack reviewers (Phase B P3): the canonical clamp at
         # ``clamp_stir_factor`` is silent — a downstream auditor reading
@@ -779,6 +900,7 @@ class CondensationModel:
             pressure_pa,
             gas_temperature_K,
             self.pipe_diameter_m,
+            carrier_gas=self.carrier_gas,
         )
         self.regime_factor = _knudsen_regime_factor(self.knudsen_number)
         self.knudsen_regime = classify_knudsen_regime(self.knudsen_number)
@@ -807,6 +929,7 @@ class CondensationModel:
                 pipe_diameter_m,
                 gas_temperature_C,
                 pipe_segment_temperatures_C,
+                carrier_gas,
             )
         )
         if _snapshot_inputs_changed:
@@ -845,6 +968,7 @@ class CondensationModel:
                 "knudsen_number": float(self.knudsen_number),
                 "knudsen_regime": self.knudsen_regime.value,
                 "regime_factor": float(self.regime_factor),
+                "carrier_gas": self.carrier_gas,
                 "knudsen_warnings": tuple(
                     self.last_knudsen_regime_diagnostic.get(
                         "warnings", ())),
@@ -931,6 +1055,7 @@ class CondensationModel:
         length_m = total_length_m / float(len(stages) - 1)
         segments: list[PipeSegment] = []
         for upstream, downstream in zip(stages, stages[1:]):
+            downstream_material = _stage_material_config(downstream, self.materials)
             segments.append(PipeSegment(
                 name=(
                     f'stage_{upstream.stage_number}'
@@ -941,6 +1066,9 @@ class CondensationModel:
                 wall_temperature_C=float(wall_temperature_C),
                 length_m=length_m,
                 inner_diameter_m=diameter_m,
+                liner_material=str(
+                    downstream_material.get('liner_material') or ''
+                ),
             ))
         return segments
 
@@ -969,6 +1097,7 @@ class CondensationModel:
                 source_class=segment.source_class,
                 sensitivity_marker=segment.sensitivity_marker,
                 extraction_note=segment.extraction_note,
+                liner_material=segment.liner_material,
             ))
         self.pipe_segments = updated
 
@@ -1042,6 +1171,9 @@ class CondensationModel:
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
         wall_sticking_alpha_by_species: dict[str, float] = {}
+        wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
+        transport_parameter_notice_by_species: dict[str, Any] = {}
+        used_capture_budget_regularizer = False
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
@@ -1111,10 +1243,33 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
-            if self._mixed_temperature_wall_candidate_segments(species):
-                wall_sticking_alpha_by_species[species] = _wall_alpha_s(
-                    species, self.materials
+            candidate_segments = self._mixed_temperature_wall_candidate_segments(
+                species)
+            if candidate_segments:
+                alpha_records = [
+                    _wall_alpha_record(
+                        species,
+                        self.materials,
+                        segment=segment,
+                    )
+                    for segment in candidate_segments
+                ]
+                wall_sticking_alpha_by_species[species] = max(
+                    float(record.get('alpha_s', 0.0))
+                    for record in alpha_records
                 )
+                wall_sticking_alpha_provenance_by_species[species] = {
+                    str(record.get('segment', '')): dict(record)
+                    for record in alpha_records
+                    if record.get('segment')
+                }
+                transport_notice = _transport_parameter_notice(
+                    species,
+                    self.carrier_gas,
+                )
+                if transport_notice:
+                    transport_parameter_notice_by_species[species] = (
+                        transport_notice)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
@@ -1127,6 +1282,7 @@ class CondensationModel:
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
             elif capture_budget_kg > 0.0:
+                used_capture_budget_regularizer = True
                 wall_deposit_kg = capture_budget_kg * (
                     wall_hkl_kg / hkl_sink_total_kg
                 )
@@ -1186,12 +1342,40 @@ class CondensationModel:
         from simulator.diagnostics import wall_sticking_alpha_provenance_notice
 
         sticking_notice = wall_sticking_alpha_provenance_notice(
-            wall_sticking_alpha_by_species)
+            wall_sticking_alpha_by_species,
+            wall_sticking_alpha_provenance_by_species,
+        )
         self.last_sticking_alpha_provenance_notice = dict(sticking_notice)
         if sticking_notice and self.operating_history:
             self.operating_history[-1][
                 'wall_sticking_alpha_provenance_notice'
             ] = dict(sticking_notice)
+
+        transport_notice: dict[str, Any] = {}
+        if transport_parameter_notice_by_species:
+            transport_notice = {
+                'severity': 'warning',
+                'code': 'transport_lennard_jones_proxy_rows',
+                'species': sorted(transport_parameter_notice_by_species),
+                'by_species': transport_parameter_notice_by_species,
+                'carrier_gas': self.carrier_gas,
+                'output_status': 'status_bearing',
+            }
+        self.last_transport_parameter_notice = dict(transport_notice)
+        if transport_notice and self.operating_history:
+            self.operating_history[-1][
+                'transport_parameter_notice'
+            ] = dict(transport_notice)
+
+        capture_notice = (
+            dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
+            if used_capture_budget_regularizer else {}
+        )
+        self.last_capture_budget_regularizer_notice = dict(capture_notice)
+        if capture_notice and self.operating_history:
+            self.operating_history[-1][
+                'capture_budget_regularizer_notice'
+            ] = dict(capture_notice)
 
         return CondensationRouteResult(
             remaining_by_species=remaining_by_species,
@@ -1208,6 +1392,8 @@ class CondensationModel:
             cold_spot_warnings=cold_spot_warnings,
             knudsen_regime_diagnostic=knudsen_diagnostic,
             sticking_alpha_provenance_notice=sticking_notice,
+            transport_parameter_notice=transport_notice,
+            capture_budget_regularizer_notice=capture_notice,
         )
 
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:
@@ -1217,6 +1403,7 @@ class CondensationModel:
             pipe_diameter_m=self.pipe_diameter_m,
             pipe_segments=self.pipe_segments,
             regime_factor=self.regime_factor,
+            carrier_gas=self.carrier_gas,
         )
         if self._knudsen_policy_configured:
             if not self._viscous_flow_required:
@@ -1494,6 +1681,7 @@ class CondensationModel:
                 regime_factor=self.regime_factor,
                 T_gas_K=T_gas_K,
                 overhead_pressure_pa=overhead_pressure_pa,
+                carrier_gas=self.carrier_gas,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -1641,20 +1829,62 @@ def _stage_alpha_s(
 ) -> float:
     config = _stage_material_config(stage, materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
-    value = (
-        alpha_by_species.get(species)
-        if isinstance(alpha_by_species, Mapping)
-        else None
-    )
+    value = None
+    if isinstance(alpha_by_species, Mapping) and species in alpha_by_species:
+        value = alpha_by_species.get(species)
     if value is None:
         value = STICKING_COEFF.get(species, 0.8)
+    return _coerce_alpha_s(value)
+
+
+def _alpha_entry_value(entry: Any) -> Any:
+    if isinstance(entry, Mapping):
+        for key in ('value', 'alpha_s', 'alpha_s_value'):
+            if key in entry:
+                return entry.get(key)
+        return None
+    return entry
+
+
+def _coerce_alpha_s(entry: Any) -> float:
     try:
-        alpha_s = float(value)
+        alpha_s = float(_alpha_entry_value(entry))
     except (TypeError, ValueError):
         alpha_s = 0.0
     if not math.isfinite(alpha_s):
         return 0.0
     return max(0.0, min(1.0, alpha_s))
+
+
+def _alpha_record(
+    *,
+    species: str,
+    entry: Any,
+    source: str,
+    liner_material: str = '',
+    segment: PipeSegment | None = None,
+    source_class: str = 'assumption_ungrounded_fitted_coefficient',
+    status: str = 'proxy',
+    output_status: str = 'uncertainty_only',
+) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        'species': str(species),
+        'alpha_s': _coerce_alpha_s(entry),
+        'source': source,
+        'source_class': source_class,
+        'status': status,
+        'output_status': output_status,
+    }
+    if liner_material:
+        record['liner_material'] = str(liner_material)
+    if segment is not None:
+        record['segment'] = str(segment.name)
+    if isinstance(entry, Mapping):
+        for key in ('source', 'source_class', 'status', 'output_status', 'basis'):
+            value = entry.get(key)
+            if value not in (None, ''):
+                record[key] = value
+    return record
 
 
 def _wall_material_config(
@@ -1670,31 +1900,75 @@ def _wall_material_config(
 def _wall_alpha_s(
     species: str,
     materials: Mapping[str, Any] | None = None,
+    *,
+    segment: PipeSegment | None = None,
 ) -> float:
+    return float(_wall_alpha_record(
+        species,
+        materials,
+        segment=segment,
+    )['alpha_s'])
+
+
+def _wall_alpha_record(
+    species: str,
+    materials: Mapping[str, Any] | None = None,
+    *,
+    segment: PipeSegment | None = None,
+) -> dict[str, Any]:
     config = _wall_material_config(materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
-    value = (
-        alpha_by_species.get(species)
-        if isinstance(alpha_by_species, Mapping)
-        else None
-    )
-    if value is None:
-        liner_material = config.get('liner_material')
-        material_config = _liner_material_config(
-            str(liner_material or ''), materials
-        )
+    if segment is not None and getattr(segment, 'liner_material', ''):
+        liner_material = str(segment.liner_material)
+        material_config = _liner_material_config(liner_material, materials)
         material_alpha = material_config.get('alpha_s_by_species', {}) or {}
-        if isinstance(material_alpha, Mapping):
-            value = material_alpha.get(species)
-    if value is None:
-        value = STICKING_COEFF.get(species, 0.8)
-    try:
-        alpha_s = float(value)
-    except (TypeError, ValueError):
-        alpha_s = 0.0
-    if not math.isfinite(alpha_s):
-        return 0.0
-    return max(0.0, min(1.0, alpha_s))
+        if isinstance(material_alpha, Mapping) and species in material_alpha:
+            return _alpha_record(
+                species=species,
+                entry=material_alpha.get(species),
+                source=(
+                    'data/materials.yaml::liner_materials.'
+                    f'{liner_material}.alpha_s_by_species.{species}'
+                ),
+                liner_material=liner_material,
+                segment=segment,
+                source_class='material_liner_alpha',
+            )
+    if isinstance(alpha_by_species, Mapping) and species in alpha_by_species:
+        return _alpha_record(
+            species=species,
+            entry=alpha_by_species.get(species),
+            source=(
+                'data/materials.yaml::wall_surfaces.interstage_duct.'
+                f'alpha_s_by_species.{species}'
+            ),
+            liner_material=str(config.get('liner_material') or ''),
+            segment=segment,
+        )
+    liner_material = str(config.get('liner_material') or '')
+    if liner_material:
+        material_config = _liner_material_config(liner_material, materials)
+        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
+        if isinstance(material_alpha, Mapping) and species in material_alpha:
+            return _alpha_record(
+                species=species,
+                entry=material_alpha.get(species),
+                source=(
+                    'data/materials.yaml::liner_materials.'
+                    f'{liner_material}.alpha_s_by_species.{species}'
+                ),
+                liner_material=liner_material,
+                segment=segment,
+                source_class='material_liner_alpha',
+            )
+    return _alpha_record(
+        species=species,
+        entry=STICKING_COEFF.get(species, 0.8),
+        source=(
+            'simulator/condensation.py::STICKING_COEFF.'
+            f'{species}'
+        )
+    )
 
 
 def _liner_material_config(
@@ -1721,11 +1995,18 @@ def _record_antoine_extrapolation(
     species: str,
     T_K: float,
     data: Mapping[str, Any],
+    coefficient_block: str | None = None,
     *,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
     antoine_extrapolation_warnings: list[str] | None,
 ) -> None:
-    valid_range = data.get('valid_range_K')
+    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+
+    valid_range = vapor_pressure_valid_range_K(
+        data,
+        coefficient_block,
+        temperature_K=T_K,
+    )
     if not (isinstance(valid_range, (list, tuple)) and len(valid_range) == 2):
         return
     try:
@@ -1765,7 +2046,12 @@ def _antoine_psat_pa(
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float | None:
     data = _species_vapor_data(species)
-    antoine = data.get('antoine', {}) if isinstance(data, Mapping) else {}
+    from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
+
+    antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+        data,
+        temperature_K=T_K,
+    )
     if not isinstance(antoine, Mapping):
         return None
     try:
@@ -1781,6 +2067,7 @@ def _antoine_psat_pa(
         species,
         T_K,
         data,
+        coefficient_block,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -2097,8 +2384,11 @@ def _series_resistance_deposition_flux_mol_m2_s(
 def _mean_free_path_m(
     pressure_pa: float,
     T_K: float,
-    molecular_diameter_m: float = N2_COLLISION_DIAMETER_M,
+    molecular_diameter_m: float | None = None,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> float:
+    if molecular_diameter_m is None:
+        molecular_diameter_m = _carrier_collision_diameter_m(carrier_gas)
     if pressure_pa <= 0.0:
         return math.inf
     if T_K <= 0.0 or molecular_diameter_m <= 0.0:
@@ -2118,10 +2408,15 @@ def _knudsen_number(
     pressure_pa: float,
     T_K: float,
     characteristic_length_m: float,
+    *,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> float:
     if characteristic_length_m <= 0.0:
         return math.inf
-    return _mean_free_path_m(pressure_pa, T_K) / characteristic_length_m
+    return (
+        _mean_free_path_m(pressure_pa, T_K, carrier_gas=carrier_gas)
+        / characteristic_length_m
+    )
 
 
 def _knudsen_regime_factor(knudsen_number: float) -> float:
@@ -2197,6 +2492,7 @@ def knudsen_regime_diagnostic(
     pipe_diameter_m: float,
     pipe_segments: list[PipeSegment] | None = None,
     regime_factor: float | None = None,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> dict[str, Any]:
     pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
     gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
@@ -2212,7 +2508,8 @@ def knudsen_regime_diagnostic(
             gas_temperature_C=gas_temperature_C,
             regime_factor=regime_factor,
         )
-    mean_free_path_m = _mean_free_path_m(pressure_pa, gas_temperature_K)
+    mean_free_path_m = _mean_free_path_m(
+        pressure_pa, gas_temperature_K, carrier_gas=carrier_gas)
 
     segments: list[dict[str, Any]] = []
     source_segments = list(pipe_segments or ())
@@ -2252,7 +2549,11 @@ def knudsen_regime_diagnostic(
                 segment_name=segment_name,
             )
         knudsen_number = _knudsen_number(
-            pressure_pa, gas_temperature_K, diameter_m)
+            pressure_pa,
+            gas_temperature_K,
+            diameter_m,
+            carrier_gas=carrier_gas,
+        )
         regime = classify_knudsen_regime(knudsen_number)
         if severity[regime] > severity[worst_regime]:
             worst_regime = regime
@@ -2261,10 +2562,15 @@ def knudsen_regime_diagnostic(
             'knudsen_number': _finite_or_none(knudsen_number),
             'regime': regime.value,
             'characteristic_length_m': diameter_m,
+            'regime_factor': _knudsen_regime_factor(knudsen_number),
         })
 
     global_knudsen_number = _knudsen_number(
-        pressure_pa, gas_temperature_K, fallback_diameter_m)
+        pressure_pa,
+        gas_temperature_K,
+        fallback_diameter_m,
+        carrier_gas=carrier_gas,
+    )
     global_regime = classify_knudsen_regime(global_knudsen_number)
     if severity[global_regime] > severity[worst_regime]:
         worst_regime = global_regime
@@ -2295,6 +2601,8 @@ def knudsen_regime_diagnostic(
         'mean_free_path_m': _finite_or_none(mean_free_path_m),
         'overhead_pressure_mbar': max(0.0, float(overhead_pressure_mbar)),
         'gas_temperature_C': float(gas_temperature_C),
+        'carrier_gas': str(carrier_gas),
+        'carrier_collision_diameter_m': _carrier_collision_diameter_m(carrier_gas),
         'pipe_diameter_m': fallback_diameter_m,
         'regime_factor': (
             _knudsen_regime_factor(global_knudsen_number)
@@ -2364,7 +2672,10 @@ def _pressure_isolated_stage_efficiency(
         return 0.0
     delta_T = T_cond_C - T_stage_C
     tau_s = 1.0 / (
-        alpha_s * max(delta_T / max(T_cond_C, 1.0), 0.01)
+        alpha_s * max(
+            delta_T / max(T_cond_C, 1.0),
+            CAPTURE_BUDGET_REGULARIZER_FLOOR,
+        )
     )
     eta = 1.0 - math.exp(-residence_s / tau_s)
     return max(0.0, min(1.0, eta))
@@ -2372,9 +2683,12 @@ def _pressure_isolated_stage_efficiency(
 
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
     chromium_stage = 'CrO2' in stage.target_species
-    if species in {'Cr', 'CrO2'}:
-        return not chromium_stage
-    return chromium_stage
+    designated_stage = designated_stage_number(species)
+    if chromium_stage:
+        return not is_designated_for_stage(species, stage.stage_number)
+    if designated_stage == 2:
+        return True
+    return False
 
 
 def _allocate_total_by_weights(
@@ -2495,18 +2809,25 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         stage_key = STAGE_KEY_BY_NUMBER.get(
             stage_number, f'stage_{stage_number}')
         accepted_species = accepted_species_for_stage_number(stage_number)
+        coproduct_species = coproduct_species_for_stage_number(stage_number)
         designated_species_kg: dict[str, float] = {}
+        coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
         for species, kg in sorted(stage.collected_kg.items()):
             kg = float(kg)
             if abs(kg) <= 1e-12:
                 continue
-            if is_designated_for_stage(species, stage_number):
+            if species in coproduct_species:
+                coproduct_species_kg[species] = kg
+            elif is_designated_for_stage(species, stage_number):
                 designated_species_kg[species] = kg
             else:
                 impurity_species_kg[species] = kg
 
-        designated_kg = sum(designated_species_kg.values())
+        designated_kg = (
+            sum(designated_species_kg.values())
+            + sum(coproduct_species_kg.values())
+        )
         impurity_kg = sum(impurity_species_kg.values())
         total_kg = designated_kg + impurity_kg
         purity_fraction = 1.0 if total_kg <= 1e-12 else designated_kg / total_kg
@@ -2522,6 +2843,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             'label': stage.label,
             'accepted_species': sorted(accepted_species),
             'designated_species_kg': designated_species_kg,
+            'coproduct_species_kg': coproduct_species_kg,
             'impurity_species_kg': impurity_species_kg,
             'designated_kg': designated_kg,
             'impurity_kg': impurity_kg,

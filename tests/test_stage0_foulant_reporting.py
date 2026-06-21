@@ -428,7 +428,7 @@ def test_stage0_foulant_hourly_by_group_reads_snapshot_delta_accounts():
 
     hourly = AccountingQueries(sim).stage0_foulant_hourly_by_group(snapshot)
 
-    assert hourly["trapped_gasses"]["escaped_kg"] == pytest.approx(0.25)
+    assert hourly["trapped_gasses"]["escaped_kg"] == pytest.approx(0.15)
     assert hourly["trapped_gasses"]["wall_deposit_kg"] == pytest.approx(0.1)
 
 

@@ -3494,12 +3494,11 @@ def _campaigns_to_resinter(
             by_species[species] = by_species.get(species, 0.0) + amount
     if not by_species:
         return "infinite"
-    dominant_species = max(by_species, key=by_species.get)
-    dominant_kg = by_species[dominant_species]
+    total_wall_load_kg = sum(by_species.values())
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {dominant_kg:.12g}"
-    return threshold / dominant_kg
+        return f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
+    return threshold / total_wall_load_kg
 
 
 def _wall_resinter_threshold_kg() -> float | None:

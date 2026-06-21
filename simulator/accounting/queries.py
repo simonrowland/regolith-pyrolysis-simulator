@@ -313,6 +313,7 @@ class AccountingQueries:
             "wall_deposit_by_segment_species_delta",
             {},
         ) or {}
+        wall_delta_by_group: dict[str, float] = {}
         if isinstance(wall_delta, Mapping):
             for key, kg in wall_delta.items():
                 if not isinstance(key, tuple) or len(key) != 2:
@@ -323,6 +324,14 @@ class AccountingQueries:
                 species = str(key[1])
                 group = _stage0_group_for_carrier(species, "", registry)
                 groups[group]["wall_deposit_kg"] += amount
+                wall_delta_by_group[group] = (
+                    wall_delta_by_group.get(group, 0.0) + amount
+                )
+        for group, amount in wall_delta_by_group.items():
+            groups[group]["escaped_kg"] = max(
+                0.0,
+                groups[group]["escaped_kg"] - amount,
+            )
 
         return _finalize_stage0_foulant_hourly_groups(groups)
 
@@ -1905,12 +1914,17 @@ def wall_deposit_candidates_by_segment_kg(
     reachable_segments = model._mixed_temperature_wall_candidate_segments(species)
     if not reachable_segments:
         return {}
-    temperatures = {
-        float(segment.wall_temperature_C)
+    transport_signatures = {
+        (
+            float(segment.wall_temperature_C),
+            float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m)),
+            round(_segment_wall_regime_factor(model, segment), 15),
+            round(_wall_alpha_for_segment(model, species, segment), 15),
+        )
         for segment in reachable_segments
     }
-    if len(temperatures) == 1:
-        wall_temperature_C = next(iter(temperatures))
+    if len(transport_signatures) == 1:
+        wall_temperature_C = float(reachable_segments[0].wall_temperature_C)
         conductance_weights = {
             segment.name: _wall_geometry_conductance_weight(segment)
             for segment in reachable_segments
@@ -1926,6 +1940,11 @@ def wall_deposit_candidates_by_segment_kg(
             melt_temperature_C=melt_temperature_C,
             wall_temperature_C=wall_temperature_C,
             surface_area_m2=reachable_surface_m2,
+            pipe_diameter_m=float(
+                getattr(reachable_segments[0], "inner_diameter_m", model.pipe_diameter_m)
+            ),
+            regime_factor=_segment_wall_regime_factor(model, reachable_segments[0]),
+            segment=reachable_segments[0],
         )
         from simulator.condensation import _allocate_total_by_weights
 
@@ -1959,6 +1978,11 @@ def wall_deposit_candidates_by_segment_kg(
             melt_temperature_C=melt_temperature_C,
             wall_temperature_C=segment.wall_temperature_C,
             surface_area_m2=_wall_geometry_conductance_weight(segment),
+            pipe_diameter_m=float(
+                getattr(segment, "inner_diameter_m", model.pipe_diameter_m)
+            ),
+            regime_factor=_segment_wall_regime_factor(model, segment),
+            segment=segment,
         )
         if candidate > 0.0:
             candidates[segment.name] = min(candidate, supply_kg)
@@ -1981,6 +2005,9 @@ def wall_deposit_candidate_for_surface_kg(
     melt_temperature_C: float,
     wall_temperature_C: float,
     surface_area_m2: float,
+    pipe_diameter_m: float | None = None,
+    regime_factor: float | None = None,
+    segment: Any | None = None,
 ) -> float:
     if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
         return 0.0
@@ -1992,7 +2019,11 @@ def wall_deposit_candidate_for_surface_kg(
         _wall_alpha_s,
     )
 
-    alpha_s = _wall_alpha_s(species, getattr(model, "materials", None))
+    alpha_s = _wall_alpha_s(
+        species,
+        getattr(model, "materials", None),
+        segment=segment,
+    )
     if alpha_s <= 0.0:
         return 0.0
 
@@ -2014,12 +2045,21 @@ def wall_deposit_candidate_for_surface_kg(
     overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
     flux = _series_resistance_deposition_flux_mol_m2_s(
         species, P_local_pa, T_wall_K, alpha_s,
-        pipe_diameter_m=model.pipe_diameter_m,
+        pipe_diameter_m=(
+            float(pipe_diameter_m)
+            if pipe_diameter_m is not None
+            else model.pipe_diameter_m
+        ),
         stir_factor=model.stir_factor,
         radial_stir_factor=model.radial_stir_factor,
-        regime_factor=model.regime_factor,
+        regime_factor=(
+            float(regime_factor)
+            if regime_factor is not None
+            else model.regime_factor
+        ),
         T_gas_K=T_gas_K,
         overhead_pressure_pa=overhead_pressure_pa,
+        carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
     )
     if flux <= 0.0:
         return 0.0
@@ -2030,6 +2070,35 @@ def wall_deposit_candidate_for_surface_kg(
     ) * max(0.0, float(surface_area_m2))
     eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
     return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
+
+
+def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
+    from simulator.condensation import _knudsen_number, _knudsen_regime_factor
+
+    try:
+        pressure_pa = float(model.overhead_pressure_mbar) * 100.0
+        gas_temperature_K = max(float(model.gas_temperature_C) + 273.15, 1.0)
+        diameter_m = float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m))
+        carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
+        kn = _knudsen_number(
+            pressure_pa,
+            gas_temperature_K,
+            diameter_m,
+            carrier_gas=carrier_gas,
+        )
+        return _knudsen_regime_factor(kn)
+    except Exception:
+        return float(getattr(model, "regime_factor", 1.0) or 1.0)
+
+
+def _wall_alpha_for_segment(model: Any, species: str, segment: Any) -> float:
+    from simulator.condensation import _wall_alpha_s
+
+    return _wall_alpha_s(
+        species,
+        getattr(model, "materials", None),
+        segment=segment,
+    )
 
 
 def _wall_geometry_conductance_weight(segment: Any) -> float:

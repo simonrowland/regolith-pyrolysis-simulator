@@ -362,7 +362,19 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
     materials_path = tmp_path / "materials.yaml"
     source_path = Path(__file__).resolve().parents[1] / "data" / "materials.yaml"
     materials_path.write_text(
-        source_path.read_text().replace("  SiO: 0.7\n", "  SiO: 0.23\n", 1)
+        source_path.read_text().replace(
+            "  SiO:\n"
+            "    value: 0.7\n"
+            "    status: proxy\n"
+            "    source_class: legacy_species_default_proxy\n"
+            "    source: data/materials.yaml::default_alpha_s_by_species.SiO\n",
+            "  SiO:\n"
+            "    value: 0.23\n"
+            "    status: proxy\n"
+            "    source_class: legacy_species_default_proxy\n"
+            "    source: data/materials.yaml::default_alpha_s_by_species.SiO\n",
+            1,
+        )
     )
     bundle = load_config_bundle(materials_path=materials_path)
 
@@ -391,9 +403,9 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         MeltState(temperature_C=1700.0),
     )
 
-    assert sim.condensation_model.materials["default_alpha_s_by_species"][
+    assert sim.condensation_model.materials["default_liner_alpha_s_by_species"][
         "SiO"
-    ] == pytest.approx(0.23)
+    ]["value"] == pytest.approx(0.23)
     assert route.sticking_alpha_provenance_notice["alpha_s_by_species"][
         "SiO"
     ] == pytest.approx(0.23)

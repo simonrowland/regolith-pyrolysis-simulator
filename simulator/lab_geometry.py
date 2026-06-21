@@ -57,6 +57,7 @@ class LabSurface:
     distance_from_melt_m: float | None = None
     equivalent_diameter_m: float | None = None
     extraction_note: str = ""
+    liner_material: str = ""
 
     @property
     def wall_deposit_account(self) -> str:
@@ -96,6 +97,7 @@ class LabSurface:
             source_class=self.source_class,
             sensitivity_marker=self.sensitivity_marker,
             extraction_note=self.extraction_note,
+            liner_material=self.liner_material,
         )
 
 
@@ -240,6 +242,7 @@ def _parse_lab_surface(
         ),
         extraction_note=_required_extraction_note(
             raw.get("extraction_note"), f"{surface_id}.extraction_note"),
+        liner_material=str(raw.get("liner_material") or "").strip(),
     )
 
 

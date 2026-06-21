@@ -1670,21 +1670,22 @@ def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]
     }
     dominant_species = max(positive, key=positive.get) if positive else "none"
     dominant_kg = positive.get(dominant_species, 0.0) if dominant_species else 0.0
+    total_wall_load_kg = sum(positive.values())
     threshold = cfg.get("resinter_threshold_kg")
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
-    if dominant_kg <= 0.0:
+    if total_wall_load_kg <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         verdict = "slow-fouling"
     elif threshold is None:
         campaigns_to_resinter = (
-            f"resinter_threshold_kg / {dominant_kg:.12g}"
+            f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
         )
         verdict = (
             "threshold-parametric: fast-fouling if campaigns_to_resinter "
             f"< {fast_n}, else slow-fouling"
         )
     else:
-        campaigns_to_resinter = float(threshold) / dominant_kg
+        campaigns_to_resinter = float(threshold) / total_wall_load_kg
         verdict = (
             "fast-fouling"
             if campaigns_to_resinter < fast_n
@@ -1693,11 +1694,14 @@ def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]
     return {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
-        "wall_deposit_kg_per_campaign": _clean_report_float(dominant_kg),
+        "dominant_species_wall_deposit_kg": _clean_report_float(dominant_kg),
+        "wall_deposit_kg_per_campaign": _clean_report_float(total_wall_load_kg),
+        "wall_deposit_basis": "total_wall_load_by_species",
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
         "campaigns_to_resinter": campaigns_to_resinter,
         "fast_fouling_campaign_threshold": fast_n,
+        "output_status": "uncertainty_only",
         "verdict": verdict,
     }
 
@@ -2008,6 +2012,12 @@ def build_sio_yield_report(
             "wall_deposit_regime_factor": float(
                 operating_entry.get("regime_factor", 1.0) or 1.0
             ),
+            "wall_deposit_carrier_gas": str(
+                operating_entry.get("carrier_gas", "")
+            ),
+            "wall_deposit_knudsen_regime_diagnostic": dict(
+                operating_entry.get("knudsen_regime_diagnostic", {}) or {}
+            ),
             "wall_deposit_pipe_segment_temperatures_C": dict(
                 operating_entry.get("pipe_segment_temperatures_C", {}) or {}
             ),
@@ -2028,6 +2038,24 @@ def build_sio_yield_report(
             diagnostics["wall_sticking_alpha_provenance_notice"] = (
                 sticking_notice
             )
+        transport_notice = dict(
+            getattr(
+                condensation_model,
+                "last_transport_parameter_notice",
+                {},
+            ) or {}
+        )
+        if transport_notice:
+            diagnostics["transport_parameter_notice"] = transport_notice
+        capture_notice = dict(
+            getattr(
+                condensation_model,
+                "last_capture_budget_regularizer_notice",
+                {},
+            ) or {}
+        )
+        if capture_notice:
+            diagnostics["capture_budget_regularizer_notice"] = capture_notice
         vapor_pressure_diagnostic = dict(
             getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
         )

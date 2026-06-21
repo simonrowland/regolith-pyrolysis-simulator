@@ -96,6 +96,8 @@
       "mean_free_path_m": 4.2443526245856374e-05,
       "overhead_pressure_mbar": 9.0,
       "gas_temperature_C": 1500.0,
+      "carrier_gas": "N2",
+      "carrier_collision_diameter_m": 3.798e-10,
       "pipe_diameter_m": 0.12,
       "regime_factor": 0.034161332365828266,
       "segments": [
@@ -103,43 +105,50 @@
           "name": "stage_0_to_stage_1",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_1_to_stage_2",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_2_to_stage_3",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_3_to_stage_4",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_4_to_stage_5",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_5_to_stage_6",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         },
         {
           "name": "stage_6_to_stage_7",
           "knudsen_number": 0.0003536960520488031,
           "regime": "viscous",
-          "characteristic_length_m": 0.12
+          "characteristic_length_m": 0.12,
+          "regime_factor": 0.034161332365828266
         }
       ],
       "warnings": [],
@@ -199,6 +208,7 @@
       "label": "Hot Duct (IR)",
       "accepted_species": [],
       "designated_species_kg": {},
+      "coproduct_species_kg": {},
       "impurity_species_kg": {},
       "designated_kg": 0,
       "impurity_kg": 0,
@@ -214,12 +224,13 @@
         "Fe"
       ],
       "designated_species_kg": {
-        "Fe": 1.0098109732548915e-10
+        "Fe": 1.2487745962827666e-10
       },
+      "coproduct_species_kg": {},
       "impurity_species_kg": {},
-      "designated_kg": 1.0098109732548915e-10,
+      "designated_kg": 1.2487745962827666e-10,
       "impurity_kg": 0,
-      "total_kg": 1.0098109732548915e-10,
+      "total_kg": 1.2487745962827666e-10,
       "purity_fraction": 1.0,
       "verdict": "PURE",
       "warning": ""
@@ -236,6 +247,7 @@
       "designated_species_kg": {
         "Cr2O3": 4.6634074990758606e-08
       },
+      "coproduct_species_kg": {},
       "impurity_species_kg": {},
       "designated_kg": 4.6634074990758606e-08,
       "impurity_kg": 0,
@@ -248,16 +260,18 @@
       "stage_number": 3,
       "label": "SiO Zone",
       "accepted_species": [
+        "Si",
         "SiO",
         "SiO2"
       ],
       "designated_species_kg": {},
+      "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Fe": 5.943754955980195e-11
+        "Fe": 3.8293192469290696e-11
       },
       "designated_kg": 0,
-      "impurity_kg": 5.943754955980195e-11,
-      "total_kg": 5.943754955980195e-11,
+      "impurity_kg": 3.8293192469290696e-11,
+      "total_kg": 3.8293192469290696e-11,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -271,16 +285,17 @@
         "Na"
       ],
       "designated_species_kg": {
-        "K": 5.282737357359565e-12,
-        "Na": 7.876328562087467e-07
+        "K": 5.486975712503057e-12,
+        "Na": 1.2739609675717802e-06
       },
+      "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Fe": 3.227518119010159e-12
+        "Fe": 1.219182646972974e-12
       },
-      "designated_kg": 7.87638138946104e-07,
-      "impurity_kg": 3.227518119010159e-12,
-      "total_kg": 7.87641366464223e-07,
-      "purity_fraction": 0.9999959022998837,
+      "designated_kg": 1.2739664545474927e-06,
+      "impurity_kg": 1.219182646972974e-12,
+      "total_kg": 1.2739676737301398e-06,
+      "purity_fraction": 0.9999990430034669,
       "verdict": "PURE",
       "warning": "non-designated condensate present"
     },
@@ -289,13 +304,14 @@
       "label": "Vortex Dust Filter",
       "accepted_species": [],
       "designated_species_kg": {},
+      "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "K": 1.4401768245444973e-11,
-        "Na": 1.374899210188072e-06
+        "K": 1.4226589860138305e-11,
+        "Na": 9.455636422625188e-07
       },
       "designated_kg": 0,
-      "impurity_kg": 1.3749136119563174e-06,
-      "total_kg": 1.3749136119563174e-06,
+      "impurity_kg": 9.45577868852379e-07,
+      "total_kg": 9.45577868852379e-07,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -305,12 +321,13 @@
       "label": "Turbine-Compressor",
       "accepted_species": [],
       "designated_species_kg": {},
+      "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Na": 6.991017003875213e-08
+        "Na": 1.2917683798233907e-08
       },
       "designated_kg": 0,
-      "impurity_kg": 6.991017003875213e-08,
-      "total_kg": 6.991017003875213e-08,
+      "impurity_kg": 1.2917683798233907e-08,
+      "total_kg": 1.2917683798233907e-08,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -320,6 +337,7 @@
       "label": "Turbine Outlet Monitor",
       "accepted_species": [],
       "designated_species_kg": {},
+      "coproduct_species_kg": {},
       "impurity_species_kg": {},
       "designated_kg": 0,
       "impurity_kg": 0,

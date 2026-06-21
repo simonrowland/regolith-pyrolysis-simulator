@@ -14,19 +14,22 @@
   "wall_deposit_kg": {
     "Fe": 0.0,
     "K": 0.0,
-    "Mg": 0.0001036671414572,
+    "Mg": 0.0,
     "Na": 0.0,
     "SiO": 0.0
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
-    "dominant_species": "Mg",
-    "wall_deposit_kg_per_campaign": 0.000103667141457,
+    "dominant_species": "none",
+    "dominant_species_wall_deposit_kg": 0.0,
+    "wall_deposit_kg_per_campaign": 0.0,
+    "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "resinter_threshold_kg / 0.000103667141457",
+    "campaigns_to_resinter": "infinite",
     "fast_fouling_campaign_threshold": 10,
-    "verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling"
+    "output_status": "uncertainty_only",
+    "verdict": "slow-fouling"
   },
   "sio_yield_pct_of_feedstock": 5.08314464643e-05,
   "industrial_benchmark_pct": [
