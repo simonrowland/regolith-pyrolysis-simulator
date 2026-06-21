@@ -15,6 +15,7 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
+    DECOMP_VOLTAGES,
     FERRIC_TO_FERROUS_REFERENCE_V,
     ElectrolysisModel,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
@@ -318,10 +319,16 @@ def test_mre_reduction_records_atom_ledger_transition():
 
     sim.melt.campaign = CampaignPhase.C5
     sim._mre_voltage_sequence = [{
-        "voltage": 0.6,
+        "voltage": DECOMP_VOLTAGES["FeO"],
         "species": ["FeO"],
         "min_hold_hours": 1,
     }]
+    # BUG-048 (SC-09 single-source): the FeO ladder voltage is the canonical
+    # DECOMP_VOLTAGES value (0.75 V), NOT the stale hard-coded 0.6 V the bug
+    # carried. Pin against the literals so this can actually fail on regression
+    # (asserting == DECOMP_VOLTAGES["FeO"] after setting from it is vacuous).
+    assert sim._mre_voltage_sequence[0]["voltage"] == pytest.approx(0.75)
+    assert sim._mre_voltage_sequence[0]["voltage"] != pytest.approx(0.6)
     sim._mre_voltage_step_idx = 0
     sim._mre_hold_hours = 0
     sim._mre_effective_current_A = 100.0
@@ -395,10 +402,16 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
 
     sim.melt.campaign = CampaignPhase.C5
     sim._mre_voltage_sequence = [{
-        "voltage": 0.6,
+        "voltage": DECOMP_VOLTAGES["FeO"],
         "species": ["FeO"],
         "min_hold_hours": 1,
     }]
+    # BUG-048 (SC-09 single-source): the FeO ladder voltage is the canonical
+    # DECOMP_VOLTAGES value (0.75 V), NOT the stale hard-coded 0.6 V the bug
+    # carried. Pin against the literals so this can actually fail on regression
+    # (asserting == DECOMP_VOLTAGES["FeO"] after setting from it is vacuous).
+    assert sim._mre_voltage_sequence[0]["voltage"] == pytest.approx(0.75)
+    assert sim._mre_voltage_sequence[0]["voltage"] != pytest.approx(0.6)
     sim._mre_voltage_step_idx = 0
     sim._mre_hold_hours = 0
     sim._mre_effective_current_A = 100.0

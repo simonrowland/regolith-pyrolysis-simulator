@@ -40,7 +40,9 @@ Standard decomposition voltages at ~1873 K / ~1600 C (per mol O2):
     SiO2:  1.45 V   TiO2:  1.70 V   Al2O3:  1.95 V
     MgO:   2.2 V    CaO:   2.5 V
 
-Source: raw-thermo reanchor, E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
+Source posture: raw-thermo where cited; otherwise legacy/status-marked.
+The MRE ladder is North-Star-optional diagnostic output, not certification
+evidence.
 """
 
 from __future__ import annotations
@@ -88,9 +90,21 @@ DECOMP_VOLTAGES = {
 }
 
 FERRIC_TO_FERROUS_REFERENCE_V = 0.65
+FERRIC_TO_FERROUS_REFERENCE_STATUS = (
+    "uncertified_heuristic_reference_not_raw_thermo"
+)
 FERRIC_TO_FERROUS_ELECTRONS = 2
 FERRIC_TO_FERROUS_FEO_PER_FE2O3 = 2.0
 FERRIC_TO_FERROUS_O2_PER_FE2O3 = 0.5
+MRE_NORTH_STAR_POSTURE = "north_star_optional_diagnostic"
+MRE_OPTIONAL_BANNER = (
+    "MRE is North-Star-optional diagnostic output; uncited MRE heuristics "
+    "are denied certification."
+)
+MRE_CERTIFICATION_EVIDENCE_CLASS = "internal-analytical"
+MRE_CERTIFICATION_DENYLIST_REASON = (
+    "mre_current_partition_uncited_heuristic_denied_certification"
+)
 MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
 )
@@ -250,6 +264,11 @@ class ElectrolysisModel:
             'O2_produced_kg': 0.0,
             'O2_produced_mol': 0.0,
             'energy_kWh': 0.0,
+            'mre_north_star_posture': MRE_NORTH_STAR_POSTURE,
+            'mre_optional_banner': MRE_OPTIONAL_BANNER,
+            'certification_evidence_class': MRE_CERTIFICATION_EVIDENCE_CLASS,
+            'certification_allowed': False,
+            'certification_denylist_reason': MRE_CERTIFICATION_DENYLIST_REASON,
             'current_partition_source': MRE_CURRENT_PARTITION_SOURCE,
             'current_partition_certified': False,
             'yield_certification': MRE_CURRENT_PARTITION_CERTIFICATION,
@@ -300,8 +319,7 @@ class ElectrolysisModel:
         # Partition current among reducible species            [SEL-1]
         # Weight by: concentration × exp(overvoltage)
         weights = {}
-        uncapped_charge_mol_e = 0.0
-        capped_charge_mol_e = 0.0
+        billable_current_A = 0.0
         any_capped = False
 
         for oxide, E, dV, a, _mode in reducible:
@@ -330,7 +348,6 @@ class ElectrolysisModel:
             t_s = 3600.0  # 1 hour in seconds
 
             uncapped_moles_reduced = (I_species * eta_CE * t_s) / (n * FARADAY)
-            uncapped_charge_mol_e += uncapped_moles_reduced * n
             kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0  # g->kg
 
             # Don't reduce more than available
@@ -339,7 +356,10 @@ class ElectrolysisModel:
                 any_capped = True
             kg_oxide_reduced = min(kg_oxide_reduced, available)
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
-            capped_charge_mol_e += moles_reduced * n
+            species_cap_ratio = 0.0
+            if uncapped_moles_reduced > 0.0:
+                species_cap_ratio = min(1.0, moles_reduced / uncapped_moles_reduced)
+            billable_current_A += I_species * species_cap_ratio
 
             if kg_oxide_reduced > 1e-10:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
@@ -381,15 +401,11 @@ class ElectrolysisModel:
                     result['O2_produced_kg'] += O2_kg
                     result['O2_produced_mol'] += O2_mol
 
-        # Energy consumed. Final depletion hours are scaled by capped
-        # Faradaic charge; non-depletion hours stay at commanded V*A*hr.
-        # Scale ONLY when a cap actually bound, so non-depletion energy
-        # multiplies by an exact 1.0 and is BIT-identical to V*A*hr/1000
-        # (the capped/uncapped ratio would otherwise carry a kg->mol ULP).
-        cap_ratio = 1.0
-        if any_capped and uncapped_charge_mol_e > 0.0:
-            cap_ratio = capped_charge_mol_e / uncapped_charge_mol_e
-        result['energy_kWh'] = voltage_V * current_A * 1.0 / 1000.0 * cap_ratio
+        # Energy consumed. Final depletion hours bill each species by its own
+        # capped Faradaic share; uncapped species keep their full current share.
+        # Preserve exact commanded energy when no cap bound.
+        energy_current_A = billable_current_A if any_capped else current_A
+        result['energy_kWh'] = voltage_V * energy_current_A * 1.0 / 1000.0
 
         return result
 

@@ -391,6 +391,9 @@ def test_c5_kress91_live_ferric_inventory_becomes_ferrous_behavior():
     marker = sim._mre_uncertified_yield["FeO"]
     assert marker["certification"] == "uncertified_ferric_to_ferrous_reference"
     assert marker["reference_V"] == pytest.approx(0.65)
+    assert marker["reference_status"] == (
+        "uncertified_heuristic_reference_not_raw_thermo"
+    )
 
     snapshot = sim._make_snapshot()
     assert snapshot.mre_uncertified_yield["FeO"]["produced_mol"] > 0.0

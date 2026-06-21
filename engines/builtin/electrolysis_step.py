@@ -100,6 +100,108 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 
+MRE_DECOMP_VOLTAGE_PROVENANCE = {
+    "NiO": {
+        "standard_voltage_V": 0.39,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -75.258559038,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": (
+            "Hemingway 1990 Am. Mineral. 75:781; Robie & Hemingway; "
+            "NEA Chemical Thermodynamics of Nickel"
+        ),
+        "status": "cited_raw_thermo",
+    },
+    "Na2O": {
+        "standard_voltage_V": 0.5,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -96.485332100,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": None,
+        "status": "legacy_uncited_voltage_pending_activity_vapor_grounding",
+    },
+    "K2O": {
+        "standard_voltage_V": 0.5,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -96.485332100,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": None,
+        "status": "legacy_uncited_voltage_pending_activity_vapor_grounding",
+    },
+    "FeO": {
+        "standard_voltage_V": 0.75,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -144.727998150,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "O'Neill 1988 Fe-O emf; Chase 1998/NIST-JANAF",
+        "status": "cited_raw_thermo",
+    },
+    "Fe2O3": {
+        "standard_voltage_V": 0.90,
+        "electrons_per_formula": 6,
+        "delta_gf_kJ_per_mol_formula": -521.020793340,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": None,
+        "status": "reference_only_uncited_legacy_not_live_full_reduction_rung",
+    },
+    "Cr2O3": {
+        "standard_voltage_V": 0.95,
+        "electrons_per_formula": 6,
+        "delta_gf_kJ_per_mol_formula": -549.966392970,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "Chase 1998/NIST-JANAF; Barin",
+        "status": "cited_raw_thermo_modest_confidence",
+    },
+    "MnO": {
+        "standard_voltage_V": 1.05,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -202.619197410,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "Chase 1998/NIST-JANAF; Barin",
+        "status": "cited_raw_thermo_modest_confidence",
+    },
+    "SiO2": {
+        "standard_voltage_V": 1.45,
+        "electrons_per_formula": 4,
+        "delta_gf_kJ_per_mol_formula": -559.614926180,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "Chase 1998/NIST-JANAF",
+        "status": "cited_raw_thermo",
+    },
+    "TiO2": {
+        "standard_voltage_V": 1.70,
+        "electrons_per_formula": 4,
+        "delta_gf_kJ_per_mol_formula": -656.100258280,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "Chase 1998/NIST-JANAF; Barin",
+        "status": "cited_raw_thermo",
+    },
+    "Al2O3": {
+        "standard_voltage_V": 1.95,
+        "electrons_per_formula": 6,
+        "delta_gf_kJ_per_mol_formula": -1128.878385570,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": "Chase 1998/NIST-JANAF; Barin",
+        "status": "cited_raw_thermo",
+    },
+    "MgO": {
+        "standard_voltage_V": 2.2,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -424.535461240,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": None,
+        "status": "legacy_uncited_voltage_pending_thermo_source",
+    },
+    "CaO": {
+        "standard_voltage_V": 2.5,
+        "electrons_per_formula": 2,
+        "delta_gf_kJ_per_mol_formula": -482.426660500,
+        "delta_gf_relation": "DeltaGf = -E*n*F",
+        "delta_gf_source": None,
+        "status": "legacy_uncited_voltage_pending_thermo_source",
+    },
+}
+
 
 class BuiltinElectrolysisStepProvider(ChemistryProvider):
     """Authoritative ``ELECTROLYSIS_STEP`` provider.
@@ -141,10 +243,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
             FERRIC_TO_FERROUS_REFERENCE_V,
+            FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            MRE_CERTIFICATION_DENYLIST_REASON,
+            MRE_CERTIFICATION_EVIDENCE_CLASS,
             MRE_CURRENT_PARTITION_CERTIFICATION,
             MRE_CURRENT_PARTITION_SOURCE,
             MRE_FIXED_REDUCIBLE_OXIDES,
+            MRE_NORTH_STAR_POSTURE,
+            MRE_OPTIONAL_BANNER,
             current_efficiency,
             uncertified_multi_oxide_partition_targets,
         )
@@ -227,6 +334,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "O2_produced_kg": 0.0,
             "O2_produced_mol": 0.0,
             "energy_kWh": 0.0,
+            "mre_north_star_posture": MRE_NORTH_STAR_POSTURE,
+            "mre_optional_banner": MRE_OPTIONAL_BANNER,
+            "certification_evidence_class": MRE_CERTIFICATION_EVIDENCE_CLASS,
+            "certification_allowed": False,
+            "certification_denylist_reason": MRE_CERTIFICATION_DENYLIST_REASON,
             "current_partition_source": MRE_CURRENT_PARTITION_SOURCE,
             "current_partition_certified": False,
             "yield_certification": MRE_CURRENT_PARTITION_CERTIFICATION,
@@ -363,8 +475,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         metal_mol_total: dict[str, float] = {}
         O2_mol_total = 0.0
         oxide_mol_total: dict[str, float] = {}
-        uncapped_charge_mol_e = 0.0
-        capped_charge_mol_e = 0.0
+        billable_current_A = 0.0
         any_capped = False
         oxide_produced_mol_total: dict[str, float] = {}
 
@@ -387,7 +498,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             uncapped_moles_reduced = (
                 I_species * eta_CE * t_s
             ) / (n_e * FARADAY)
-            uncapped_charge_mol_e += uncapped_moles_reduced * n_e
             kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0
 
             # Cap at melt availability. Re-derive mol from the capped
@@ -398,7 +508,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 any_capped = True
             kg_oxide_reduced = min(kg_oxide_reduced, available_kg)
             moles_reduced = kg_oxide_reduced * 1000.0 / M_oxide_gmol
-            capped_charge_mol_e += moles_reduced * n_e
+            species_cap_ratio = 0.0
+            if uncapped_moles_reduced > 0.0:
+                species_cap_ratio = min(1.0, moles_reduced / uncapped_moles_reduced)
+            billable_current_A += I_species * species_cap_ratio
 
             if kg_oxide_reduced <= 1e-10:
                 continue
@@ -442,6 +555,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                     "produced_mol": feo_mol,
                     "certification": "uncertified_ferric_to_ferrous_reference",
                     "reference_V": FERRIC_TO_FERROUS_REFERENCE_V,
+                    "reference_status": FERRIC_TO_FERROUS_REFERENCE_STATUS,
                     "reason": (
                         "FERRIC_TO_FERROUS_REFERENCE_V is heuristic and "
                         "not anchored to grounded yield data"
@@ -495,17 +609,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # energy via simulator/energy.py's EnergyTracker and the
         # _mre_energy_this_hr counter; energy is NOT a ledger account
         # and the proposal must never debit/credit anything energy-shaped.
-        # Charge final depletion hours only for oxide actually reduced.
-        # The reference is uncapped Faradaic charge after current efficiency,
-        # so normal non-depletion hours keep the commanded V*A*hr energy.
-        # Scale ONLY when a cap actually bound: otherwise multiply by an exact
-        # 1.0 so non-depletion energy is BIT-identical to V*A*dt/1000 (the
-        # capped/uncapped ratio would otherwise carry a kg->mol round-trip ULP).
-        cap_ratio = 1.0
-        if any_capped and uncapped_charge_mol_e > 0.0:
-            cap_ratio = capped_charge_mol_e / uncapped_charge_mol_e
+        # Charge final depletion hours per species: a depleted species is
+        # scaled by its own capped Faradaic share, while uncapped species keep
+        # their full current share. Preserve exact commanded energy when no cap
+        # bound.
+        energy_current_A = billable_current_A if any_capped else current_A
         diagnostic["energy_kWh"] = (
-            voltage_V * current_A * dt_hr / 1000.0 * cap_ratio
+            voltage_V * energy_current_A * dt_hr / 1000.0
         )
 
         # Assemble the proposal in mol-native form.

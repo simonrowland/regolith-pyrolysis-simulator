@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import inspect
 import importlib
 from pathlib import Path
 
 import pytest
 
+from engines.builtin.electrolysis_step import MRE_DECOMP_VOLTAGE_PROVENANCE
 from simulator.accounting.formulas import load_species_formulas
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
@@ -14,7 +14,7 @@ from simulator.electrolysis import (
     MRE_FIXED_REDUCIBLE_OXIDES,
     min_decomposition_voltage,
 )
-from simulator.state import OXIDE_TO_METAL
+from simulator.state import FARADAY, OXIDE_TO_METAL
 
 
 SPECIES_CATALOG = Path(__file__).resolve().parents[1] / "data" / "species_catalog.yaml"
@@ -64,13 +64,13 @@ def test_reverse_table_extras_are_explicitly_classified() -> None:
     )
 
 
-def test_mre_off_switch_floor_is_derived_from_ladder() -> None:
-    source = inspect.getsource(EVALUATE_MODULE._canonical_mre_voltage_cap)
+def test_mre_off_switch_floor_tracks_runtime_ladder(monkeypatch) -> None:
+    for oxide in ("NiO", "Na2O", "K2O", "FeO"):
+        monkeypatch.setitem(DECOMP_VOLTAGES, oxide, 0.80)
 
-    assert "min_decomposition_voltage" in source
-    assert "0.39" not in source
-    assert min_decomposition_voltage() == min(DECOMP_VOLTAGES.values())
-    assert min_decomposition_voltage() == DECOMP_VOLTAGES["NiO"]
+    assert min_decomposition_voltage() == pytest.approx(0.80)
+    assert EVALUATE_MODULE._canonical_mre_voltage_cap(0.79) == pytest.approx(0.0)
+    assert EVALUATE_MODULE._canonical_mre_voltage_cap(0.80) == pytest.approx(0.80)
 
 
 def test_fixed_mre_ladder_excludes_ferric_full_reduction_rung() -> None:
@@ -108,6 +108,36 @@ def test_fixed_mre_ladder_excludes_ferric_full_reduction_rung() -> None:
     assert grouped == sorted(grouped)
     assert len(grouped) == len(set(grouped))
     assert min_decomposition_voltage() == pytest.approx(0.39)
+
+
+def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
+    assert set(MRE_DECOMP_VOLTAGE_PROVENANCE) == set(DECOMP_VOLTAGES)
+
+    uncited = []
+    for oxide, voltage in DECOMP_VOLTAGES.items():
+        row = MRE_DECOMP_VOLTAGE_PROVENANCE[oxide]
+        n_e = ELECTRONS_PER_OXIDE[oxide]
+        expected_delta_gf = -float(voltage) * n_e * FARADAY / 1000.0
+
+        assert row["standard_voltage_V"] == pytest.approx(voltage)
+        assert row["electrons_per_formula"] == n_e
+        assert row["delta_gf_relation"] == "DeltaGf = -E*n*F"
+        assert row["delta_gf_kJ_per_mol_formula"] == pytest.approx(
+            expected_delta_gf,
+            rel=1e-12,
+        )
+        if row.get("delta_gf_source"):
+            assert str(row["status"]).startswith("cited_")
+        else:
+            uncited.append((oxide, row["status"]))
+
+    assert dict(uncited) == {
+        "Na2O": "legacy_uncited_voltage_pending_activity_vapor_grounding",
+        "K2O": "legacy_uncited_voltage_pending_activity_vapor_grounding",
+        "Fe2O3": "reference_only_uncited_legacy_not_live_full_reduction_rung",
+        "MgO": "legacy_uncited_voltage_pending_thermo_source",
+        "CaO": "legacy_uncited_voltage_pending_thermo_source",
+    }
 
 
 def test_fallback_ladder_voltages_are_derived_from_decomp_voltages() -> None:

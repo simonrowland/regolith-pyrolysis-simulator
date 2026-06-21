@@ -58,8 +58,13 @@ from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
+    MRE_CERTIFICATION_DENYLIST_REASON,
+    MRE_CERTIFICATION_EVIDENCE_CLASS,
     MRE_FIXED_REDUCIBLE_OXIDES,
+    MRE_NORTH_STAR_POSTURE,
+    MRE_OPTIONAL_BANNER,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    current_efficiency,
     min_decomposition_voltage,
 )
 from simulator.fe_redox import (
@@ -451,6 +456,9 @@ def test_live_mre_converts_ferric_inventory_to_ferrous_behavior(
     assert diagnostic["uncertified_yield"]["FeO"]["reference_V"] == pytest.approx(
         0.65
     )
+    assert diagnostic["uncertified_yield"]["FeO"]["reference_status"] == (
+        "uncertified_heuristic_reference_not_raw_thermo"
+    )
     assert diagnostic["metals_produced_mol"] == {}
     assert diagnostic["O2_produced_mol"] == pytest.approx(0.5 * fe2o3_mol)
     assert result.transition.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
@@ -576,6 +584,13 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
     assert diagnostic["oxides_reduced_mol"] == {}
     assert diagnostic["metals_produced_mol"] == {}
     assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+    assert diagnostic["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
+    assert diagnostic["mre_optional_banner"] == MRE_OPTIONAL_BANNER
+    assert diagnostic["certification_evidence_class"] == MRE_CERTIFICATION_EVIDENCE_CLASS
+    assert diagnostic["certification_allowed"] is False
+    assert diagnostic["certification_denylist_reason"] == (
+        MRE_CERTIFICATION_DENYLIST_REASON
+    )
     assert diagnostic["current_partition_certified"] is False
     assert diagnostic["yield_certification"] == "uncertified_current_partition"
     assert "heuristic" in diagnostic["current_partition_source"]
@@ -608,6 +623,9 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
     )
     assert legacy["oxides_reduced_mol"] == {}
     assert legacy["metals_produced_mol"] == {}
+    assert legacy["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
+    assert legacy["certification_allowed"] is False
+    assert legacy["certification_denylist_reason"] == MRE_CERTIFICATION_DENYLIST_REASON
     assert legacy["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
 
 
@@ -960,6 +978,119 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
         expected_energy_kWh, rel=1e-12
     )
     assert diagnostic["energy_kWh"] < commanded_energy_kWh
+
+
+def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    fe2o3_kg = 1.0
+    sio2_kg = 1.0
+    fe2o3_mol = fe2o3_kg / (MOLAR_MASS["Fe2O3"] / 1000.0)
+    sio2_mol = sio2_kg / (MOLAR_MASS["SiO2"] / 1000.0)
+    current_A = 3000.0
+    voltage_V = 5.0
+    temperature_C = 1575.0
+    pressure_bar = 1.0e-6
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "Fe2O3": fe2o3_mol,
+                "SiO2": sio2_mol,
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=-7.25,
+            fe_redox_policy="kress91_live",
+            control_inputs={
+                "voltage_V": voltage_V,
+                "current_A": current_A,
+                "dt_hr": 1.0,
+                "pO2_bar": pressure_bar,
+                "melt_fO2_log": -7.25,
+                "allowed_oxides": ["SiO2"],
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic)
+
+    T_K = temperature_C + 273.15
+    total_kg = fe2o3_kg + sio2_kg
+    fe2o3_activity = fe2o3_kg / total_kg
+    sio2_activity = sio2_kg / total_kg
+    e_ferric = BuiltinElectrolysisStepProvider._ferric_to_ferrous_voltage(
+        T_K,
+        fe2o3_activity,
+        gas_constant=GAS_CONSTANT,
+        faraday=FARADAY,
+        reference_V=0.65,
+        electrons=2,
+        o2_per_fe2o3=0.5,
+        pO2_bar=pressure_bar,
+    )
+    e_sio2 = BuiltinElectrolysisStepProvider._nernst_voltage(
+        "SiO2",
+        T_K,
+        sio2_activity,
+        pO2_bar=pressure_bar,
+        gas_constant=GAS_CONSTANT,
+        faraday=FARADAY,
+        decomp_voltages=DECOMP_VOLTAGES,
+        electrons_per_oxide=ELECTRONS_PER_OXIDE,
+        oxide_to_metal=OXIDE_TO_METAL,
+    )
+    fe2o3_weight = fe2o3_activity * math.exp(min(voltage_V - e_ferric, 3.0))
+    sio2_weight = sio2_activity * math.exp(min(voltage_V - e_sio2, 3.0))
+    total_weight = fe2o3_weight + sio2_weight
+    fe2o3_current_A = current_A * fe2o3_weight / total_weight
+    sio2_current_A = current_A * sio2_weight / total_weight
+    fe2o3_eta = current_efficiency(voltage_V - e_ferric)
+    fe2o3_uncapped_mol = (
+        fe2o3_current_A * fe2o3_eta * 3600.0 / (2.0 * FARADAY)
+    )
+    fe2o3_cap_ratio = min(1.0, fe2o3_mol / fe2o3_uncapped_mol)
+    expected_energy_kWh = voltage_V * (
+        sio2_current_A + fe2o3_current_A * fe2o3_cap_ratio
+    ) / 1000.0
+    old_global_ratio_energy_kWh = voltage_V * current_A / 1000.0 * (
+        (
+            diagnostic["oxides_reduced_mol"]["Fe2O3"] * 2.0
+            + diagnostic["oxides_reduced_mol"]["SiO2"] * ELECTRONS_PER_OXIDE["SiO2"]
+        )
+        / (
+            fe2o3_uncapped_mol * 2.0
+            + (
+                sio2_current_A
+                * current_efficiency(voltage_V - e_sio2)
+                * 3600.0
+                / FARADAY
+            )
+        )
+    )
+
+    assert result.transition is not None
+    assert diagnostic["oxides_reduced_mol"]["Fe2O3"] == pytest.approx(
+        fe2o3_mol,
+        rel=1e-12,
+    )
+    assert diagnostic["oxides_reduced_mol"]["SiO2"] > 0.0
+    assert diagnostic["energy_kWh"] == pytest.approx(expected_energy_kWh, rel=1e-12)
+    assert diagnostic["energy_kWh"] > old_global_ratio_energy_kWh + 0.01
 
 
 def test_provider_matches_legacy_step_hour_pure_feo(
