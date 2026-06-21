@@ -142,6 +142,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 
 
 # Reaction-family discriminators (string-literal contract with the
@@ -150,7 +151,6 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 REACTION_FAMILY_C3_K = "c3_k_shuttle"
 REACTION_FAMILY_C3_NA = "c3_na_shuttle"
 REACTION_FAMILY_C6_MG = "c6_mg_thermite"
-SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,

@@ -258,6 +258,7 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+UNSUPPORTED_CARRIER_FALLBACK_REASON = 'unsupported_carrier_lj_parameters'
 CAPTURE_BUDGET_REGULARIZER_FLOOR = 0.01
 CAPTURE_BUDGET_REGULARIZER_NOTICE = {
     'severity': 'warning',
@@ -490,8 +491,53 @@ def _chapman_enskog_d_ab_m2_s(
     return D_AB_cm2_s * 1.0e-4
 
 
+def _canonical_carrier_gas_key(carrier_gas: str) -> str:
+    text = str(carrier_gas or '').strip()
+    if not text:
+        return DEFAULT_CARRIER_GAS
+    upper = text.upper()
+    if 'CO2' in upper:
+        return 'CO2'
+    if 'AR' in upper:
+        return 'Ar'
+    if 'N2' in upper or 'PN2' in upper:
+        return 'N2'
+    return text
+
+
+def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
+    requested = str(carrier_gas or '').strip() or DEFAULT_CARRIER_GAS
+    requested_key = _canonical_carrier_gas_key(requested)
+    params = _LENNARD_JONES_PARAMS.get(requested_key)
+    if params is not None:
+        provenance = _LENNARD_JONES_PROVENANCE.get(requested_key, {})
+        return {
+            'requested_carrier_gas': requested,
+            'applied_carrier_gas': requested_key,
+            'carrier_gas_status': provenance.get('status', 'sourced'),
+            'carrier_gas_reason': '',
+            'carrier_collision_diameter_m': float(params[0]) * 1.0e-10,
+            'carrier_collision_diameter_source': provenance.get('source', ''),
+        }
+    fallback_params = _LENNARD_JONES_PARAMS[DEFAULT_CARRIER_GAS]
+    fallback_provenance = _LENNARD_JONES_PROVENANCE.get(DEFAULT_CARRIER_GAS, {})
+    return {
+        'requested_carrier_gas': requested,
+        'applied_carrier_gas': DEFAULT_CARRIER_GAS,
+        'carrier_gas_status': 'unsupported_carrier_fallback',
+        'carrier_gas_reason': UNSUPPORTED_CARRIER_FALLBACK_REASON,
+        'carrier_collision_diameter_m': float(fallback_params[0]) * 1.0e-10,
+        'carrier_collision_diameter_source': fallback_provenance.get('source', ''),
+        'warning': (
+            f"Unsupported carrier gas {requested!r}; applying "
+            f"{DEFAULT_CARRIER_GAS} collision diameter with status-bearing "
+            "fallback."
+        ),
+    }
+
+
 def _carrier_collision_diameter_m(carrier_gas: str) -> float:
-    params = _LENNARD_JONES_PARAMS.get(str(carrier_gas))
+    params = _LENNARD_JONES_PARAMS.get(_canonical_carrier_gas_key(carrier_gas))
     if params is None:
         return N2_COLLISION_DIAMETER_M
     return float(params[0]) * 1.0e-10
@@ -2410,11 +2456,17 @@ def _knudsen_number(
     characteristic_length_m: float,
     *,
     carrier_gas: str = DEFAULT_CARRIER_GAS,
+    molecular_diameter_m: float | None = None,
 ) -> float:
     if characteristic_length_m <= 0.0:
         return math.inf
     return (
-        _mean_free_path_m(pressure_pa, T_K, carrier_gas=carrier_gas)
+        _mean_free_path_m(
+            pressure_pa,
+            T_K,
+            molecular_diameter_m=molecular_diameter_m,
+            carrier_gas=carrier_gas,
+        )
         / characteristic_length_m
     )
 
@@ -2496,6 +2548,10 @@ def knudsen_regime_diagnostic(
 ) -> dict[str, Any]:
     pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
     gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
+    carrier_diagnostic = _carrier_collision_diameter_diagnostic(carrier_gas)
+    carrier_collision_diameter_m = float(
+        carrier_diagnostic['carrier_collision_diameter_m']
+    )
     try:
         fallback_diameter_m = require_lab_pipe_diameter(
             pipe_diameter_m, 'pipe_diameter_m')
@@ -2509,7 +2565,11 @@ def knudsen_regime_diagnostic(
             regime_factor=regime_factor,
         )
     mean_free_path_m = _mean_free_path_m(
-        pressure_pa, gas_temperature_K, carrier_gas=carrier_gas)
+        pressure_pa,
+        gas_temperature_K,
+        molecular_diameter_m=carrier_collision_diameter_m,
+        carrier_gas=carrier_gas,
+    )
 
     segments: list[dict[str, Any]] = []
     source_segments = list(pipe_segments or ())
@@ -2553,6 +2613,7 @@ def knudsen_regime_diagnostic(
             gas_temperature_K,
             diameter_m,
             carrier_gas=carrier_gas,
+            molecular_diameter_m=carrier_collision_diameter_m,
         )
         regime = classify_knudsen_regime(knudsen_number)
         if severity[regime] > severity[worst_regime]:
@@ -2570,12 +2631,27 @@ def knudsen_regime_diagnostic(
         gas_temperature_K,
         fallback_diameter_m,
         carrier_gas=carrier_gas,
+        molecular_diameter_m=carrier_collision_diameter_m,
     )
     global_regime = classify_knudsen_regime(global_knudsen_number)
     if severity[global_regime] > severity[worst_regime]:
         worst_regime = global_regime
 
     warnings: list[str] = []
+    carrier_warning = carrier_diagnostic.get('warning')
+    if carrier_warning:
+        warnings.append(str(carrier_warning))
+    carrier_status_fields: dict[str, Any] = {}
+    if carrier_diagnostic['carrier_gas_status'] == 'unsupported_carrier_fallback':
+        carrier_status_fields = {
+            'requested_carrier_gas': carrier_diagnostic['requested_carrier_gas'],
+            'applied_carrier_gas': carrier_diagnostic['applied_carrier_gas'],
+            'carrier_gas_status': carrier_diagnostic['carrier_gas_status'],
+            'carrier_gas_reason': carrier_diagnostic['carrier_gas_reason'],
+            'carrier_collision_diameter_source': (
+                carrier_diagnostic['carrier_collision_diameter_source']
+            ),
+        }
     status = 'ok'
     reason = ''
     if worst_regime is KnudsenRegime.FREE_MOLECULAR:
@@ -2602,7 +2678,8 @@ def knudsen_regime_diagnostic(
         'overhead_pressure_mbar': max(0.0, float(overhead_pressure_mbar)),
         'gas_temperature_C': float(gas_temperature_C),
         'carrier_gas': str(carrier_gas),
-        'carrier_collision_diameter_m': _carrier_collision_diameter_m(carrier_gas),
+        'carrier_collision_diameter_m': carrier_collision_diameter_m,
+        **carrier_status_fields,
         'pipe_diameter_m': fallback_diameter_m,
         'regime_factor': (
             _knudsen_regime_factor(global_knudsen_number)

@@ -12,6 +12,7 @@ from simulator.accounting.completeness import (
     TargetExtractionCompleteness,
     aggregate_extraction_completeness,
     completion_contracts_from_setpoints,
+    extraction_completeness_by_target,
     validate_completion_contract_coverage,
     vapor_contract_completeness,
 )
@@ -288,6 +289,22 @@ def test_vapor_contract_excludes_spent_reductant_residue_account() -> None:
     assert result.reagent_target_equiv_mol == pytest.approx(0.0)
     assert result.denominator_target_equiv_mol == pytest.approx(0.0)
     assert result.completeness_fraction is None
+
+
+def test_extraction_completeness_counts_spent_residue_as_residual_basis() -> None:
+    result = extraction_completeness_by_target(
+        ("Na",),
+        {"Na": ("Na2O", "Na")},
+        {"Na": MOLAR_MASS["Na"] / 1000.0},
+        {},
+        process_inventory_residual_kg={"Na2O": MOLAR_MASS["Na2O"] / 1000.0},
+        require_residual_species=True,
+    )["Na"]
+
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.residual_target_equiv_mol == pytest.approx(2.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(3.0)
+    assert result.completeness_fraction == pytest.approx(1.0 / 3.0)
 
 
 def test_vapor_contract_blocks_unsupported_provenance_rule() -> None:

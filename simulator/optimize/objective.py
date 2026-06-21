@@ -12,6 +12,7 @@ from types import MappingProxyType
 from collections.abc import Callable, Mapping as MappingABC, Sequence
 from typing import Any, Iterable, Mapping, TypeVar
 
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
@@ -127,7 +128,10 @@ _FE_TIER_BOUNDS = MappingProxyType(
 _POOL_LEDGER_ACCOUNTS = MappingProxyType(
     {
         "cleaned_melt_at_stage0_exit": ("process.cleaned_melt",),
-        "residual_rump_at_stop": ("process.cleaned_melt",),
+        "residual_rump_at_stop": (
+            "process.cleaned_melt",
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        ),
         "terminal_rump_earned": ("terminal.slag",),
     }
 )

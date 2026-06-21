@@ -124,6 +124,25 @@ def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
     assert exc_info.value.diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
 
 
+def test_unknown_carrier_knudsen_diagnostic_is_status_bearing():
+    diagnostic = condensation_module.knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=0.12,
+        carrier_gas="pHe",
+    )
+
+    assert diagnostic["carrier_gas"] == "pHe"
+    assert diagnostic["requested_carrier_gas"] == "pHe"
+    assert diagnostic["applied_carrier_gas"] == "N2"
+    assert diagnostic["carrier_gas_status"] == "unsupported_carrier_fallback"
+    assert diagnostic["carrier_gas_reason"] == "unsupported_carrier_lj_parameters"
+    assert diagnostic["carrier_collision_diameter_m"] == pytest.approx(
+        condensation_module.N2_COLLISION_DIAMETER_M
+    )
+    assert any("Unsupported carrier gas" in item for item in diagnostic["warnings"])
+
+
 def test_default_setpoint_recipes_are_viscous():
     setpoints = yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text())
     hot_wall_pipe = setpoints["furnace"]["hot_wall_pipe"]

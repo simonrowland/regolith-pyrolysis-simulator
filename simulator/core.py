@@ -54,6 +54,7 @@ from simulator.account_ids import (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting import (
     AccountPolicy,
@@ -254,7 +255,7 @@ _FE_REDOX_PYSULFSAT_COLS = {
 }
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
-    'process.spent_reductant_residue',
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
     WALL_DEPOSIT_ACCOUNT,
@@ -283,6 +284,7 @@ FLOW_MASS_EXCLUDED_ACCOUNTS = (
 )
 BACKEND_REACTIVE_ACCOUNTS = (
     'process.cleaned_melt',
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     'process.metal_phase',
     'process.overhead_gas',
 )
@@ -1930,6 +1932,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure_bar: float,
         fO2_log: float,
     ) -> Dict[str, Any] | None:
+        spent_reductant_residue: Dict[str, float] = {}
         try:
             import warnings
 
@@ -2680,7 +2683,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
         ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
         spent_reductant_residue = self.atom_ledger.kg_by_account(
-            'process.spent_reductant_residue')
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
         projected_melt = {
             species: float(kg)
             for species, kg in ledger_melt.items()
@@ -2702,20 +2705,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for oxide in OXIDE_SPECIES
         }
         self.melt.update_total_mass()
-
-    def _backend_composition_kg(self) -> Dict[str, float]:
-        ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        composition = {
-            species: kg
-            for species, raw_kg in ledger_melt.items()
-            if (kg := float(raw_kg)) > 1e-12
-        }
-        for species, raw_kg in self.atom_ledger.kg_by_account(
-            'process.spent_reductant_residue'
-        ).items():
-            if (kg := float(raw_kg)) > 1e-12:
-                composition[species] = composition.get(species, 0.0) + kg
-        return composition
 
     def _backend_composition_mol(self) -> Dict[str, float]:
         totals: Dict[str, float] = {}
@@ -5328,11 +5317,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             queries = AccountingQueries(self)
             products = queries.product_ledger()
             rump = queries.terminal_rump_by_species()
+            spent_reductant_residue = (
+                queries.spent_reductant_residue_by_species()
+            )
             by_target = extraction_completeness_by_target(
                 target_species,
                 DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
                 products,
                 rump,
+                process_inventory_residual_kg=spent_reductant_residue,
                 require_residual_species=True,
             )
             campaign_key = self.campaign_mgr._campaign_config_key(
@@ -5477,6 +5470,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "aggregate_reason": aggregate.reason,
             "aggregate_policy": aggregate.aggregation,
             "detail_by_target_species": detail,
+            "process_inventory_spent_reductant_kg": spent_reductant_residue,
             "would_be_soft_advance_by_target_species": soft,
             "would_be_soft_advance_aggregate": aggregate_soft,
             "liquid_fraction": liquid_fraction,
@@ -5506,6 +5500,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _terminal_rump_by_class(self) -> Dict[str, float]:
         return AccountingQueries(self).terminal_rump_by_class()
+
+    def _spent_reductant_residue_by_species(self) -> Dict[str, float]:
+        return AccountingQueries(self).spent_reductant_residue_by_species()
+
+    def _terminal_residual_buckets(self) -> Dict[str, Dict[str, float]]:
+        return AccountingQueries(self).terminal_residual_buckets()
 
     def _ledger_total_mass_kg(self) -> float:
         return sum(self.atom_ledger.total_kg_by_account().values())

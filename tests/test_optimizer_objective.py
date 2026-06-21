@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ObjectiveComputationError,
@@ -321,6 +322,29 @@ def test_composition_target_hard_window_passes_or_fails() -> None:
 
     assert compute_objectives(profile, run).as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
     assert compute_objectives(failing, run).as_mapping()["composition_target:pool-test"] == pytest.approx(0.0)
+
+
+def test_residual_rump_pool_includes_spent_reductant_residue_account() -> None:
+    run = SimpleNamespace(
+        simulator=_CompositionSim(
+            cleaned_melt={"CaO": 1.0},
+            stage3_kg={},
+            extra_accounts={
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT: {"Na2O": 1.0},
+            },
+        ),
+        trace=None,
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={"Na2O": {"min": 40.0, "max": 100.0, "strict": True, "weight": 1.0}},
+    )
+
+    objectives = compute_objectives(profile, run)
+    evidence = objectives.evidence["composition_target:pool-test"]["composition_target"]
+
+    assert objectives.as_mapping()["composition_target:pool-test"] == pytest.approx(1.0)
+    assert evidence["resolved_composition"]["oxide_wt_pct"]["Na2O"] > 40.0
 
 
 def test_composition_target_hard_window_miss_zeroes_extraction_branch() -> None:

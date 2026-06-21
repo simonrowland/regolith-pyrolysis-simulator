@@ -2,6 +2,7 @@ import importlib
 
 import pytest
 
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting import AccountingError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.core import PyrolysisSimulator
@@ -226,7 +227,7 @@ def test_backend_result_cannot_credit_terminal_accounts():
         sim._get_equilibrium()
 
 
-def test_backend_composition_uses_empty_ledger_not_stale_melt_kg():
+def test_backend_composition_mol_uses_empty_ledger_not_stale_melt_kg():
     MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
     backend = RecordingStubBackend()
     sim = _sim(backend)
@@ -254,12 +255,12 @@ def test_backend_composition_uses_empty_ledger_not_stale_melt_kg():
     sim.melt.composition_kg["SiO2"] = 600.0
     sim.melt.composition_kg["FeO"] = 400.0
 
-    composition = sim._backend_composition_kg()
+    composition = sim._backend_composition_mol()
 
     assert composition == {}
 
 
-def test_backend_composition_preserves_noncanonical_ledger_species():
+def test_backend_composition_mol_preserves_noncanonical_ledger_species():
     backend = RecordingStubBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
@@ -269,9 +270,29 @@ def test_backend_composition_preserves_noncanonical_ledger_species():
         source="backend adapter noncanonical species",
     )
 
-    composition = sim._backend_composition_kg()
+    composition = sim._backend_composition_mol()
 
-    assert composition["SO3"] == pytest.approx(1.0)
+    assert composition["SO3"] == pytest.approx(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt")["SO3"]
+    )
+
+
+def test_backend_composition_mol_includes_spent_reductant_residue():
+    backend = RecordingStubBackend()
+    sim = _sim(backend)
+    sim.load_batch("oxide", mass_kg=1000.0)
+    before = sim._backend_composition_mol().get("Na2O", 0.0)
+    sim.atom_ledger.load_external(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        {"Na2O": 1.0},
+        source="backend adapter spent reductant residue",
+    )
+
+    composition = sim._backend_composition_mol()
+
+    assert composition["Na2O"] == pytest.approx(
+        before + sim.atom_ledger.mol_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT)["Na2O"]
+    )
 
 
 def test_equilibrium_mixin_backend_path_is_disabled():

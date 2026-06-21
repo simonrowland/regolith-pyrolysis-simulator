@@ -17,6 +17,7 @@ from simulator.account_ids import (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import (
@@ -57,6 +58,9 @@ MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL = {
 TERMINAL_RUMP_ACCOUNTS = (
     "process.cleaned_melt",
     "terminal.slag",
+)
+PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS = (
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "CaO",
@@ -206,6 +210,19 @@ class AccountingQueries:
             species: kg
             for species, kg in sorted(species_kg.items())
             if kg > 0.0
+        }
+
+    def spent_reductant_residue_by_species(self) -> dict[str, float]:
+        return self.species_kg_by_accounts(
+            PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS
+        )
+
+    def terminal_residual_buckets(self) -> dict[str, dict[str, float]]:
+        return {
+            "native_terminal_rump": self.terminal_rump_by_species(),
+            "process_inventory_spent_reductant": (
+                self.spent_reductant_residue_by_species()
+            ),
         }
 
     def terminal_rump_by_class(self) -> dict[str, float]:

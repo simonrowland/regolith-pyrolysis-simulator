@@ -131,6 +131,7 @@ def extraction_completeness_by_target(
     product_ledger_kg: Mapping[str, Any],
     terminal_rump_kg: Mapping[str, Any],
     *,
+    process_inventory_residual_kg: Mapping[str, Any] | None = None,
     require_residual_species: bool = False,
 ) -> dict[str, TargetExtractionCompleteness]:
     residual_map = {
@@ -139,6 +140,9 @@ def extraction_completeness_by_target(
     }
     products = {str(species): kg for species, kg in product_ledger_kg.items()}
     rump = {str(species): kg for species, kg in terminal_rump_kg.items()}
+    for species, kg in (process_inventory_residual_kg or {}).items():
+        key = str(species)
+        rump[key] = float(rump.get(key, 0.0) or 0.0) + float(kg)
     results: dict[str, TargetExtractionCompleteness] = {}
     for raw_target in target_species:
         target = str(raw_target)

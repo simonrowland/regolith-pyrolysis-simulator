@@ -73,6 +73,7 @@ def test_classifier_returns_documented_5_bucket_shape():
         'oxygen',
         'glass',
         'captured_volatiles',
+        'process_inventory_spent_reductant',
     }
     assert canonical_buckets <= result.keys()
     assert set(result.keys()) == canonical_buckets | additive_buckets
@@ -179,6 +180,32 @@ def test_captured_volatiles_include_condensation_train_account():
         'Na': 3.0,
     }
     assert result['captured_volatiles']['class_total_kg'] == pytest.approx(8.0)
+
+
+def test_spent_reductant_residue_surfaces_as_process_inventory_bucket():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=SimpleNamespace(
+            kg_by_account=lambda acct: {
+                'process.cleaned_melt': {'CaO': 1.0},
+                'process.spent_reductant_residue': {'Na2O': 2.5},
+            }.get(acct, {})
+        ),
+        _terminal_rump_by_species=lambda: {'CaO': 1.0},
+    )
+
+    result = classify_products(sim)
+
+    assert result['process_inventory_spent_reductant'] == {
+        'kg_by_species': {'Na2O': 2.5},
+        'class_total_kg': 2.5,
+        'account': 'process.spent_reductant_residue',
+        'disposition': 'process_inventory_spent_reductant',
+    }
+    assert result['refractory_ceramic_rump']['rump_kg_by_species'] == {'CaO': 1.0}
+    assert 'Na2O' not in result['refractory_ceramic_rump']['rump_kg_by_species']
+    assert 'Na2O' not in result['unclassified']['kg_by_species']
 
 
 # ---------------------------------------------------------------------------

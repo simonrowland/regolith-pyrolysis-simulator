@@ -46,6 +46,7 @@ def test_run_returns_classification_dict():
         'oxygen',
         'glass',
         'captured_volatiles',
+        'process_inventory_spent_reductant',
     }
     assert canonical_buckets <= result.keys()
     assert set(result.keys()) == canonical_buckets | additive_buckets

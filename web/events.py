@@ -594,6 +594,7 @@ def _tick_payload(
 def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
     terminal_rump_by_species = sim._terminal_rump_by_species()
+    spent_reductant_by_species = sim._spent_reductant_residue_by_species()
     terminal_rump_composition_wt_pct = oxide_wt_pct_from_kg(
         terminal_rump_by_species
     )
@@ -618,6 +619,13 @@ def _completion_payload(sim):
         'terminal_slag_kg': round(sim._terminal_slag_kg(), 2),
         'terminal_rump_kg': sim._terminal_slag_kg(),
         'terminal_rump_by_species': terminal_rump_by_species,
+        'process_inventory_spent_reductant': {
+            'kg_by_species': spent_reductant_by_species,
+            'class_total_kg': sum(spent_reductant_by_species.values()),
+            'account': 'process.spent_reductant_residue',
+            'disposition': 'process_inventory_spent_reductant',
+        },
+        'terminal_residual_buckets': sim._terminal_residual_buckets(),
         'terminal_rump_composition_wt_pct': terminal_rump_composition_wt_pct,
         'terminal_rump_by_class': sim._terminal_rump_by_class(),
         'ceramic_rump_panel': ceramic_rump_payload(

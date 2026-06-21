@@ -25,8 +25,9 @@ Public contract: the original five canonical buckets
 ``industrial_mixed_glass``, ``refractory_ceramic_rump``,
 ``unclassified``) remain stable. PROD-1 added additive convenience
 views (``ingots_metals``, ``oxygen``, ``glass``,
-``captured_volatiles``) for product-specific UI/report slices without
-removing or reshaping the canonical buckets.
+``captured_volatiles``, ``process_inventory_spent_reductant``) for
+product-specific UI/report slices without removing or reshaping the
+canonical buckets.
 
 E6a scope: the classifier function. E6b (deferred) is the runner CLI
 + markdown report wrapping E6a.
@@ -35,6 +36,8 @@ E6a scope: the classifier function. E6b (deferred) is the runner CLI
 from __future__ import annotations
 
 from typing import Any, Mapping
+
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 
 # Per CLAUDE.md § 4 + § 5: the species that map cleanly to each
 # product class. Some species can land in MORE THAN ONE class
@@ -61,6 +64,11 @@ CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
     'process.condensation_train',
 )
 """Terminal volatile trap accounts that should surface as product output."""
+
+PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS: tuple[str, ...] = (
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
+"""Melt-resident reductant residue from reagent we dosed, not native rump."""
 
 PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')
 """Product class 2: SiO landed on Stage 3 fused-silica baffles is
@@ -149,6 +157,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'kg_by_species': {species: kg, ...},
                 'class_total_kg': float,
             },
+            'process_inventory_spent_reductant': {
+                'kg_by_species': {species: kg, ...},
+                'class_total_kg': float,
+                'account': 'process.spent_reductant_residue',
+                'disposition': 'process_inventory_spent_reductant',
+            },
             'refractory_ceramic_rump': {
                 'rump_kg_by_species': {species: kg, ...},
                 'rump_total_kg': float,
@@ -203,6 +217,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         sum(captured_volatiles_kg_by_species.values())
     )
 
+    # ----- Process inventory: spent reductant residue -----
+    spent_reductant_kg_by_species = _spent_reductant_residue_kg(sim)
+    spent_reductant_total_kg = float(sum(spent_reductant_kg_by_species.values()))
+
     # ----- Class 4: refractory ceramic rump -----
     rump_kg_by_species: dict[str, float] = {}
     rump_method = getattr(sim, '_terminal_rump_by_species', None)
@@ -243,6 +261,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         | {'O2'}
         | set(stage_3_kg_by_species.keys())
         | set(captured_volatiles_kg_by_species.keys())
+        | set(spent_reductant_kg_by_species.keys())
         | set(rump_kg_by_species.keys())
     )
     unclassified: dict[str, float] = {}
@@ -299,6 +318,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'kg_by_species': captured_volatiles_kg_by_species,
             'class_total_kg': captured_volatiles_total_kg,
         },
+        'process_inventory_spent_reductant': {
+            'kg_by_species': spent_reductant_kg_by_species,
+            'class_total_kg': spent_reductant_total_kg,
+            'account': SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            'disposition': 'process_inventory_spent_reductant',
+        },
         'refractory_ceramic_rump': {
             'rump_kg_by_species': rump_kg_by_species,
             'rump_total_kg': rump_total_kg,
@@ -338,6 +363,22 @@ def _ledger_species_kg(
             if amount > 0.0:
                 values[name] = values.get(name, 0.0) + amount
     return dict(sorted(values.items()))
+
+
+def _spent_reductant_residue_kg(sim: Any) -> dict[str, float]:
+    getter = getattr(sim, '_spent_reductant_residue_by_species', None)
+    if callable(getter):
+        try:
+            values = getter() or {}
+        except (TypeError, ValueError):
+            values = {}
+        if isinstance(values, Mapping):
+            return {
+                str(species): float(kg)
+                for species, kg in sorted(values.items())
+                if float(kg) > 0.0
+            }
+    return _ledger_species_kg(sim, PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS)
 
 
 def _oxygen_partition_kg(sim: Any) -> dict[str, float]:
