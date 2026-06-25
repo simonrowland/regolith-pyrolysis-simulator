@@ -266,7 +266,6 @@ class SimSession:
         campaign_phase = self._campaign_phase(config.campaign, config)
         if config.track == "mre_baseline":
             sim.record.track = "mre_baseline"
-        sim.start_campaign(campaign_phase)
 
         for campaign, overrides in config.runtime_campaign_overrides.items():
             if not isinstance(overrides, Mapping):
@@ -279,6 +278,8 @@ class SimSession:
                     target[str(field_name)] = normalize_lab_schedule(value)
                 else:
                     target[str(field_name)] = float(value)
+
+        sim.start_campaign(campaign_phase)
 
         sim.validate_lab_surface_temperature_resolver()
         self._sim = sim

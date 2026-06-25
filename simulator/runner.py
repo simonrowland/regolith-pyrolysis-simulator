@@ -70,6 +70,7 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     normalize_lab_schedule,
 )
+from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.session import (
     SimSession,
     SimSessionConfig,
@@ -2954,8 +2955,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--runtime-campaign-overrides", default=None,
                         help="JSON runtime per-campaign overrides")
     parser.add_argument("--setpoints-overrides", default=None,
-                        help="Deprecated alias for "
-                             "--runtime-campaign-overrides")
+                         help="Deprecated alias for "
+                              "--runtime-campaign-overrides")
+    parser.add_argument("--recipe", default=None,
+                        help="Path to an optimizer setpoints_patch recipe YAML. "
+                             "Recipe setpoints are merged before runtime "
+                             "campaign overrides, so runtime overrides remain "
+                             "the final word for their fields.")
     parser.add_argument("--allow-fallback-vapor", action="store_true",
                         help="Permit builtin vapor-pressure fallback")
     parser.add_argument("--allow-unmeasured-alpha-fallback",
@@ -3058,6 +3064,12 @@ def main(argv: Optional[list[str]] = None) -> int:
             )
         elif not feedstock_id:
             raise RunnerError("--feedstock is required unless --preset is supplied")
+        if args.recipe:
+            try:
+                recipe_patch = load_recipe_patch(Path(args.recipe))
+            except RecipeIOError as exc:
+                raise RunnerError(str(exc)) from exc
+            setpoints_patch = _deep_merge_setpoints(setpoints_patch, recipe_patch)
 
         run = PyrolysisRun(
             feedstock_id=feedstock_id,

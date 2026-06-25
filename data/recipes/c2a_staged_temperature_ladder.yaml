@@ -1,0 +1,76 @@
+campaigns:
+  C2A_staged:
+    stages:
+    - name: alkali_early_fe
+      target_C: 1250
+      ramp_rate_C_per_hr: 600
+      duration_h: 4
+      target_species:
+      - Na
+      - K
+      endpoint:
+        type: flux_decay_or_duration
+        threshold_kg_hr: 0.02
+        species_monitored:
+        - Na
+        - K
+        flux_decay_species:
+        - Na
+        - K
+      verification:
+        lunar_mare_low_ti_kg_per_1000kg:
+          Na: 3.05
+          K: 0.11
+          Fe: 0.0
+          SiO: 0.0
+    - name: sio_window
+      target_C: 1600
+      ramp_rate_C_per_hr: 175
+      duration_h: 3
+      target_species:
+      - SiO
+      - minor_Fe
+      endpoint:
+        type: SiO_pulse_then_flux_decay_or_duration
+        threshold_kg_hr: 0.05
+        species_monitored:
+        - SiO
+        - Fe
+        - Mg
+        flux_decay_species:
+        - SiO
+      verification:
+        note: 'Engine ladder shows Fe/SiO/Mg overlap above ~1600 C; this stage isolates
+          the first SiO pulse but cannot make a pure SiO window.
+
+          '
+    - name: fe_hot_hold
+      ramp_rate_C_per_hr: 150
+      duration_h: 1
+      target_species:
+      - Fe
+      endpoint:
+        type: FeO_residual_or_duration
+        FeO_residual_kg_target:
+        - 20
+        - 24
+        thermal_Fe_depletion_pct:
+        - 86
+        - 88
+        flux_decay_species:
+        - Fe
+      verification:
+        lunar_mare_low_ti_kg_per_1000kg:
+          Fe_thermal_total: 116.2
+          FeO_residual: 20.3
+          thermal_Fe_pct: 88.0
+    - name: cool_for_na_shuttle
+      target_C: 1150
+      ramp_rate_C_per_hr: 600
+      duration_h: 1
+      target_species:
+      - residual_FeO
+      endpoint:
+        type: temperature_gate_for_Na_FeO_cleanup
+        max_temperature_C: 1150
+    max_hold_hr: 9
