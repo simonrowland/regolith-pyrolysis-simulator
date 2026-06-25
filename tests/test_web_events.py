@@ -1,4 +1,8 @@
 import copy
+import json
+import subprocess
+import sys
+import threading
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,6 +14,7 @@ from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
+from simulator.recipe_io import load_recipe_patch, read_recipe_metadata
 from simulator.session import drive_auto_apply
 from simulator.state import DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
@@ -69,6 +74,287 @@ def _set_nested(mapping, path, value):
         target.pop(path[-1], None)
     else:
         target[path[-1]] = value
+
+
+def _install_recipe_endpoint_state(sid: str) -> None:
+    _simulations[sid] = {
+        "running": False,
+        "paused": False,
+        "run_id": "recipe-endpoint-test",
+        "recipe_inputs": {
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000.0,
+            "track": "pyrolysis",
+            "runtime_campaign_overrides": {
+                "C4": {
+                    "pO2_mbar": 0.2,
+                    "hold_temp_C": 1600.0,
+                    "max_hours": 24.0,
+                    "ramp_rate": 10.0,
+                }
+            },
+            "c4_max_temp_C": 1670.0,
+            "furnace_max_T_C": 1800.0,
+            "c5_enabled": False,
+            "mre_target_species": "",
+            "mre_max_voltage_V": 0.0,
+            "additives_kg": {"Na": 0.0, "K": 0.0, "Mg": 0.0},
+            "furnace_material_id": "",
+        },
+        "setpoints_patch": {},
+        "last_recipe_capture": {
+            "tick": {
+                "hour": 1,
+                "campaign": "C4",
+                "pO2_mbar": 0.2,
+                "p_total_mbar": 10.0,
+                "oxygen_kg": 4.5,
+                "energy_cumulative_kWh": 12.25,
+                "mass_balance_error_pct": 0.0,
+                "process_buckets_kg": {
+                    "metal_alloy": {"Fe": 2.0, "Mg": 0.5},
+                    "terminal_slag": {"SiO2": 10.0},
+                },
+            },
+            "per_hour_summary": {
+                "wall_deposit_cumulative_kg": {
+                    "stage_1_to_stage_2": {"SiO": 0.01}
+                },
+            },
+        },
+        "last_completion_payload": {
+            "oxygen_kg": 4.5,
+            "energy_kWh": 12.25,
+            "mass_balance_error_pct": 0.0,
+            "terminal_rump_kg": 10.0,
+            "products": {"glass": 3.0},
+        },
+    }
+    _sim_locks[sid] = threading.Lock()
+
+
+def test_recipe_save_list_load_endpoints_round_trip_without_run(
+    tmp_path,
+    monkeypatch,
+):
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-save-sid"
+    _install_recipe_endpoint_state(sid)
+
+    try:
+        response = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": "<img src=x onerror=alert(1)>"},
+        )
+        assert response.status_code == 200, response.get_json()
+        saved = response.get_json()
+        saved_path = tmp_path / f"{saved['name']}.yaml"
+        assert saved_path.exists()
+
+        metadata = read_recipe_metadata(saved_path)
+        assert metadata["title"] == "<img src=x onerror=alert(1)>"
+        assert metadata["headline_recipe"]["feedstock"] == "lunar_mare_low_ti"
+        assert metadata["headline_results"]["oxygen_kg"] == pytest.approx(4.5)
+        patch = load_recipe_patch(saved_path)
+        assert patch["campaigns"]["C4"]["temp_range_C"] == pytest.approx(
+            [1600.0, 1670.0]
+        )
+
+        output_path = tmp_path / "run.json"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "simulator.runner",
+                "--feedstock",
+                "lunar_mare_low_ti",
+                "--campaign",
+                "C4",
+                "--hours",
+                "1",
+                "--recipe",
+                str(saved_path),
+                "--allow-fallback-vapor",
+                "--started-at-utc",
+                "2026-05-15T00:00:00Z",
+                "--kernel-commit-sha",
+                "recipe-ui-test",
+                "--output",
+                str(output_path),
+            ],
+            cwd=_REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        assert completed.returncode == 0, completed.stderr
+        assert json.loads(output_path.read_text(encoding="utf-8"))["status"] == "ok"
+
+        def reject_run_load(*args, **kwargs):
+            raise AssertionError("list must not load or run recipes")
+
+        monkeypatch.setattr(web_routes, "load_recipe_patch", reject_run_load)
+        listed = client.get("/recipes")
+        assert listed.status_code == 200
+        recipes = listed.get_json()
+        assert recipes == [{
+            "name": saved["name"],
+            "title": "<img src=x onerror=alert(1)>",
+            "summary": (
+                "lunar_mare_low_ti | C4 | O2 4.5 kg | "
+                "energy 12.25 kWh | wall deposit 0.01 kg"
+            ),
+        }]
+        monkeypatch.setattr(web_routes, "load_recipe_patch", load_recipe_patch)
+
+        load_sid = "recipe-load-sid"
+        _simulations[load_sid] = {"running": False, "run_id": "load-test"}
+        _sim_locks[load_sid] = threading.Lock()
+        loaded = client.post(
+            "/recipes/load",
+            json={"sid": load_sid, "name": saved["name"]},
+        )
+        assert loaded.status_code == 200, loaded.get_json()
+        payload = loaded.get_json()
+        assert payload["applied_to_session"] is True
+        assert payload["controls"]["lever_campaign"] == "C4"
+        assert _simulations[load_sid]["setpoints_patch"] == patch
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_save_fails_loud_without_last_recipe_capture(tmp_path):
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-no-capture-sid"
+    _install_recipe_endpoint_state(sid)
+    _simulations[sid].pop("last_recipe_capture")
+
+    try:
+        response = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": "No Capture Recipe"},
+        )
+
+        assert response.status_code == 400
+        assert response.mimetype == "application/json"
+        assert "completed or running tick" in response.get_json()["error"]
+        assert list(tmp_path.glob("*.yaml")) == []
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_save_fails_loud_on_slug_collision(tmp_path):
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-collision-sid"
+    _install_recipe_endpoint_state(sid)
+    existing = tmp_path / "collision-test.yaml"
+    original = "sentinel: do-not-overwrite\n"
+    existing.write_text(original, encoding="utf-8")
+
+    try:
+        response = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": "Collision Test"},
+        )
+
+        assert response.status_code == 409
+        assert response.mimetype == "application/json"
+        assert response.get_json()["error"] == "recipe already exists: collision-test"
+        assert existing.read_text(encoding="utf-8") == original
+        assert sorted(path.name for path in tmp_path.glob("*.yaml")) == [
+            "collision-test.yaml"
+        ]
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_xss_title_is_served_as_literal_json_and_safe_slug(tmp_path):
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-xss-title-sid"
+    _install_recipe_endpoint_state(sid)
+    title = "<img src=x onerror=alert(1)>"
+
+    try:
+        saved_response = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": title},
+        )
+        assert saved_response.status_code == 200, saved_response.get_json()
+        assert saved_response.mimetype == "application/json"
+        saved = saved_response.get_json()
+
+        assert saved["title"] == title
+        assert saved["name"] == "img-src-x-onerror-alert-1"
+        assert "/" not in saved["name"]
+        assert "\\" not in saved["name"]
+        assert ".." not in saved["name"]
+
+        saved_path = tmp_path / f"{saved['name']}.yaml"
+        assert saved_path.exists()
+        assert saved_path.resolve().parent == tmp_path.resolve()
+        assert read_recipe_metadata(saved_path)["title"] == title
+
+        listed_response = client.get("/recipes")
+        assert listed_response.status_code == 200
+        assert listed_response.mimetype == "application/json"
+        recipes = listed_response.get_json()
+        assert recipes[0]["name"] == saved["name"]
+        assert recipes[0]["title"] == title
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_endpoints_fail_loud_on_bad_title_and_metadata(tmp_path):
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-bad-title-sid"
+    _install_recipe_endpoint_state(sid)
+
+    try:
+        bad_title = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": " \n "},
+        )
+        assert bad_title.status_code == 400
+        assert "title" in bad_title.get_json()["error"]
+
+        (tmp_path / "bad.yaml").write_text(
+            "metadata:\n"
+            "  title: 7\n"
+            "  headline_recipe: {}\n"
+            "  headline_results: {}\n"
+            "furnace_max_T_C: 1800\n",
+            encoding="utf-8",
+        )
+        bad_metadata = client.get("/recipes")
+        assert bad_metadata.status_code == 500
+        assert "metadata.title" in bad_metadata.get_json()["error"]
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_ui_uses_text_content_for_loaded_titles() -> None:
+    controls = (
+        _REPO_ROOT / "web/static/js/simulator-controls.js"
+    ).read_text(encoding="utf-8")
+    assert "option.textContent" in controls
+    assert "titleEl.textContent" in controls
+    assert "summaryEl.textContent" in controls
+    assert "innerHTML" not in controls
 
 
 def test_launcher_defaults_to_localhost_and_debug_off(monkeypatch):

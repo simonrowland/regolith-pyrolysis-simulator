@@ -155,6 +155,134 @@ function buildRuntimeCampaignOverrides() {
     return Object.keys(fields).length ? {[campaign]: fields} : {};
 }
 
+let loadedRecipePatch = null;
+let recipeChoices = [];
+let lastRecipeTick = null;
+let lastRecipeSummary = null;
+
+socket.on('simulation_tick', (data) => {
+    lastRecipeTick = data || null;
+});
+
+socket.on('per_hour_summary', (data) => {
+    lastRecipeSummary = data || null;
+});
+
+function setRecipeError(id, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.hidden = !message;
+    el.textContent = message || '';
+}
+
+function showRecipeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = false;
+}
+
+function hideRecipeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+}
+
+function selectedSocketId() {
+    return socket && socket.id ? socket.id : '';
+}
+
+function recipePreviewText() {
+    const overrides = buildRuntimeCampaignOverrides();
+    const campaign = selectedLeverCampaign();
+    const mre = selectedMrePayload();
+    const tick = lastRecipeTick || {};
+    const summary = lastRecipeSummary || {};
+    return [
+        `feedstock: ${document.getElementById('feedstock-select')?.value || 'not selected'}`,
+        `campaign: ${campaign}`,
+        `temperature ladder: ${JSON.stringify(overrides[campaign] || {})}`,
+        `pO2_mbar: ${tick.pO2_mbar ?? document.getElementById('lever-po2-mbar')?.value ?? 'not captured'}`,
+        `p_total_mbar: ${tick.p_total_mbar ?? document.getElementById('lever-pn2-mbar')?.value ?? 'not captured'}`,
+        `furnace_max_T_C: ${selectedC4MaxTempC() ?? 'not captured'}`,
+        `mre_enabled: ${mre.c5_enabled ? 'true' : 'false'}`,
+        `oxygen_kg: ${tick.oxygen_kg ?? 'not captured'}`,
+        `energy_kWh: ${tick.energy_cumulative_kWh ?? tick.energy_kWh ?? 'not captured'}`,
+        `mass_balance_error_pct: ${tick.mass_balance_error_pct ?? 'not captured'}`,
+        `wall_deposit_kg: ${summary.wall_deposit_cumulative_kg ? '[captured]' : 'not captured'}`,
+    ].join('\n');
+}
+
+function updateSaveRecipePreview() {
+    const preview = document.getElementById('recipe-save-preview');
+    if (preview) preview.textContent = recipePreviewText();
+}
+
+function setStatusText(message) {
+    const statusEl = document.getElementById('status-text');
+    if (statusEl) statusEl.textContent = message;
+}
+
+function recipeFetchJson(url, options) {
+    return fetch(url, options).then(response => (
+        response.json().catch(() => ({})).then(payload => {
+            if (!response.ok) {
+                throw new Error(payload.error || `request failed: ${response.status}`);
+            }
+            return payload;
+        })
+    ));
+}
+
+function populateRecipeSelect(recipes) {
+    recipeChoices = Array.isArray(recipes) ? recipes : [];
+    const select = document.getElementById('recipe-load-select');
+    if (!select) return;
+    select.replaceChildren();
+    for (const recipe of recipeChoices) {
+        const option = document.createElement('option');
+        option.value = recipe.name || '';
+        option.textContent = recipe.title || recipe.name || '';
+        select.appendChild(option);
+    }
+    updateSelectedRecipeSummary();
+}
+
+function updateSelectedRecipeSummary() {
+    const select = document.getElementById('recipe-load-select');
+    const titleEl = document.getElementById('recipe-load-selected-title');
+    const summaryEl = document.getElementById('recipe-load-selected-summary');
+    const selected = recipeChoices.find(recipe => recipe.name === select?.value);
+    if (titleEl) titleEl.textContent = selected ? selected.title || selected.name || '' : '';
+    if (summaryEl) summaryEl.textContent = selected ? selected.summary || '' : '';
+    const loadButton = document.getElementById('recipe-load-confirm');
+    if (loadButton) loadButton.disabled = !selected;
+}
+
+function loadRecipeList() {
+    setRecipeError('recipe-load-error', '');
+    return recipeFetchJson('/recipes')
+        .then(populateRecipeSelect)
+        .catch(error => setRecipeError('recipe-load-error', error.message));
+}
+
+function applyLoadedRecipeControls(controls) {
+    if (!controls || typeof controls !== 'object') return;
+    const setValue = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value !== undefined && value !== null) el.value = String(value);
+    };
+    setValue('lever-campaign', controls.lever_campaign);
+    setValue('lever-po2-mbar', controls.pO2_mbar);
+    setValue('lever-pn2-mbar', controls.p_total_mbar);
+    setValue('lever-stage-temp', controls.stage_temp_C);
+    setValue('c4-max-temp', controls.c4_max_temp_C ?? controls.furnace_max_T_C);
+    if (controls.mre_enabled !== undefined) {
+        const mreEnabled = document.getElementById('mre-enabled');
+        if (mreEnabled) mreEnabled.checked = controls.mre_enabled === true;
+        updateMreFields();
+    }
+    updateKnudsenIndicator();
+    updateLeverWarning();
+}
+
 function numericDataAttribute(element, name) {
     const value = parseFloat(element.getAttribute(`data-${name}`) || '');
     return Number.isFinite(value) ? value : null;
@@ -237,6 +365,59 @@ document.getElementById('lever-stage-temp')?.addEventListener('input', () => {
 updateKnudsenIndicator();
 updateLeverWarning();
 
+document.getElementById('btn-save-recipe')?.addEventListener('click', () => {
+    setRecipeError('recipe-save-error', '');
+    updateSaveRecipePreview();
+    showRecipeModal('save-recipe-modal');
+    document.getElementById('recipe-save-title')?.focus();
+});
+
+document.getElementById('recipe-save-cancel')?.addEventListener('click', () => {
+    hideRecipeModal('save-recipe-modal');
+});
+
+document.getElementById('recipe-save-confirm')?.addEventListener('click', () => {
+    const title = document.getElementById('recipe-save-title')?.value || '';
+    const sid = selectedSocketId();
+    setRecipeError('recipe-save-error', '');
+    recipeFetchJson('/recipes/save', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title, sid}),
+    }).then(data => {
+        hideRecipeModal('save-recipe-modal');
+        setStatusText(`Saved recipe: ${data.title || data.name}`);
+    }).catch(error => setRecipeError('recipe-save-error', error.message));
+});
+
+document.getElementById('btn-load-recipe')?.addEventListener('click', () => {
+    setRecipeError('recipe-load-error', '');
+    showRecipeModal('load-recipe-modal');
+    loadRecipeList();
+});
+
+document.getElementById('recipe-load-cancel')?.addEventListener('click', () => {
+    hideRecipeModal('load-recipe-modal');
+});
+
+document.getElementById('recipe-load-select')?.addEventListener('change', updateSelectedRecipeSummary);
+
+document.getElementById('recipe-load-confirm')?.addEventListener('click', () => {
+    const name = document.getElementById('recipe-load-select')?.value || '';
+    const sid = selectedSocketId();
+    setRecipeError('recipe-load-error', '');
+    recipeFetchJson('/recipes/load', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, sid}),
+    }).then(data => {
+        loadedRecipePatch = data.setpoints_patch || null;
+        applyLoadedRecipeControls(data.controls || {});
+        hideRecipeModal('load-recipe-modal');
+        setStatusText(`Loaded recipe: ${data.title || data.name}`);
+    }).catch(error => setRecipeError('recipe-load-error', error.message));
+});
+
 document.getElementById('btn-start').addEventListener('click', () => {
     if (!socket.connected) {
         document.getElementById('status-text').textContent = 'Connection not ready';
@@ -274,6 +455,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
             C: parseFloat(document.getElementById('add-c').value) || 0,
         },
     };
+    if (loadedRecipePatch) payload.setpoints_patch = loadedRecipePatch;
     if (furnaceMaterialId) payload.furnace_material_id = furnaceMaterialId;
     socket.emit('start_simulation', payload);
 

@@ -5,6 +5,7 @@ import math
 import os
 import re
 import sqlite3
+import copy
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,6 +38,14 @@ from simulator.mre_ladder import (
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
+from simulator.recipe_io import (
+    RECIPE_LIBRARY_DIR,
+    RecipeIOError,
+    load_recipe_patch,
+    read_recipe_metadata,
+    recipe_library_path,
+    write_recipe_patch,
+)
 from simulator.state import CondensationTrain
 from web.feedstock_data import (
     debug_feedstocks_enabled,
@@ -65,6 +74,8 @@ DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
+_RECIPE_TITLE_MAX_CHARS = 120
+_RECIPE_SLUG_RE = re.compile(r'[^a-z0-9]+')
 
 
 class _StoredBackendResolutionCarrier:
@@ -2117,6 +2128,423 @@ def _result_yaml_payload(result: Mapping[str, Any]) -> dict[str, Any]:
         'recipe_stages': result.get('recipe_stages') or [],
         'provenance': result.get('provenance') or {},
     }
+
+
+def _recipe_library_dir() -> Path:
+    configured = current_app.config.get('RECIPE_LIBRARY_DIR')
+    if configured:
+        return Path(configured)
+    return RECIPE_LIBRARY_DIR
+
+
+def _recipe_request_payload() -> Mapping[str, Any]:
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        raise BadRequest('recipe request body must be a JSON object')
+    return payload
+
+
+def _validated_recipe_title(value: Any) -> str:
+    if not isinstance(value, str):
+        raise BadRequest('recipe title is required')
+    title = value.strip()
+    if not title:
+        raise BadRequest('recipe title is required')
+    if len(title) > _RECIPE_TITLE_MAX_CHARS:
+        raise BadRequest(
+            f'recipe title must be {_RECIPE_TITLE_MAX_CHARS} characters or fewer'
+        )
+    if any(ord(char) < 32 for char in title):
+        raise BadRequest('recipe title must not contain control characters')
+    return title
+
+
+def _recipe_slug(title: str) -> str:
+    slug = _RECIPE_SLUG_RE.sub('-', title.lower()).strip('-')
+    if not slug:
+        raise BadRequest('recipe title must contain at least one letter or number')
+    return slug[:80].strip('-')
+
+
+def _json_error(message: str, code: int):
+    return jsonify({'error': message}), code
+
+
+def _finite_or_none(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _deep_merge_recipe_patch(
+    base: Mapping[str, Any],
+    patch: Mapping[str, Any],
+) -> dict[str, Any]:
+    merged = copy.deepcopy(dict(base))
+    for key, value in patch.items():
+        current = merged.get(key)
+        if isinstance(current, Mapping) and isinstance(value, Mapping):
+            merged[str(key)] = _deep_merge_recipe_patch(current, value)
+        else:
+            merged[str(key)] = copy.deepcopy(value)
+    return merged
+
+
+def _generated_recipe_patch_from_context(context: Mapping[str, Any]) -> dict[str, Any]:
+    inputs = context.get('recipe_inputs') or {}
+    if not isinstance(inputs, Mapping):
+        inputs = {}
+    overrides = inputs.get('runtime_campaign_overrides') or {}
+    if not isinstance(overrides, Mapping):
+        overrides = {}
+
+    generated: dict[str, Any] = {}
+    furnace_max = _finite_or_none(inputs.get('furnace_max_T_C'))
+    if furnace_max is not None:
+        generated['furnace_max_T_C'] = furnace_max
+
+    campaigns: dict[str, Any] = {}
+    c4_patch: dict[str, Any] = {}
+    c4_overrides = overrides.get('C4') if isinstance(overrides, Mapping) else None
+    if isinstance(c4_overrides, Mapping):
+        hold_temp = _finite_or_none(c4_overrides.get('hold_temp_C'))
+        c4_cap = _finite_or_none(inputs.get('c4_max_temp_C'))
+        if hold_temp is not None and c4_cap is not None and c4_cap >= hold_temp:
+            c4_patch['temp_range_C'] = [hold_temp, c4_cap]
+        elif hold_temp is not None:
+            c4_patch['temp_range_C'] = [hold_temp, hold_temp]
+        pO2_mbar = _finite_or_none(c4_overrides.get('pO2_mbar'))
+        if pO2_mbar is not None:
+            c4_patch['pO2_mbar_default'] = pO2_mbar
+            c4_patch['p_total_mbar_default'] = pO2_mbar
+    if c4_patch:
+        campaigns['C4'] = c4_patch
+
+    if inputs.get('c5_enabled'):
+        cap = _finite_or_none(inputs.get('mre_max_voltage_V'))
+        if cap is not None and cap > 0:
+            campaigns.setdefault('C5', {})['allow_mre_voltage_cap_V'] = cap
+
+    additives = inputs.get('additives_kg') or {}
+    if isinstance(additives, Mapping):
+        alkali: dict[str, float] = {}
+        for species in ('Na', 'K'):
+            amount = _finite_or_none(additives.get(species))
+            if amount is not None and amount > 0:
+                alkali[f'{species}_kg'] = amount
+        if alkali:
+            campaigns.setdefault('C3', {})['alkali_dosing'] = alkali
+
+    if campaigns:
+        generated['campaigns'] = campaigns
+
+    existing = context.get('setpoints_patch') or {}
+    if not isinstance(existing, Mapping):
+        existing = {}
+    return _deep_merge_recipe_patch(existing, generated)
+
+
+def _temperature_ladder_from_inputs(inputs: Mapping[str, Any]) -> list[dict[str, Any]]:
+    overrides = inputs.get('runtime_campaign_overrides') or {}
+    if not isinstance(overrides, Mapping):
+        return []
+    ladder = []
+    for campaign, fields in overrides.items():
+        if not isinstance(fields, Mapping):
+            continue
+        target = (
+            fields.get('target_C')
+            if fields.get('target_C') is not None
+            else fields.get('hold_temp_C')
+        )
+        ladder.append({
+            'stage': str(campaign),
+            'target_C': target,
+            'ramp_rate_C_per_hr': (
+                fields.get('ramp_rate_C_per_hr')
+                if fields.get('ramp_rate_C_per_hr') is not None
+                else fields.get('ramp_rate')
+            ),
+            'duration_h': (
+                fields.get('duration_h')
+                if fields.get('duration_h') is not None
+                else fields.get('max_hours')
+            ),
+        })
+    return ladder
+
+
+def _sum_nested_numbers(value: Any) -> float | None:
+    if isinstance(value, Mapping):
+        total = 0.0
+        found = False
+        for item in value.values():
+            subtotal = _sum_nested_numbers(item)
+            if subtotal is not None:
+                total += subtotal
+                found = True
+        return total if found else None
+    number = _finite_or_none(value)
+    return number
+
+
+def _headline_results_from_context(context: Mapping[str, Any]) -> dict[str, Any]:
+    capture = context.get('last_recipe_capture') or {}
+    tick = capture.get('tick') if isinstance(capture, Mapping) else {}
+    per_hour = capture.get('per_hour_summary') if isinstance(capture, Mapping) else {}
+    completion = context.get('last_completion_payload') or {}
+    if not isinstance(tick, Mapping):
+        tick = {}
+    if not isinstance(per_hour, Mapping):
+        per_hour = {}
+    if not isinstance(completion, Mapping):
+        completion = {}
+    buckets = tick.get('process_buckets_kg') or {}
+    if not isinstance(buckets, Mapping):
+        buckets = {}
+    products = completion.get('products') or {}
+    if not isinstance(products, Mapping):
+        products = {}
+
+    wall_deposit = (
+        per_hour.get('wall_deposit_cumulative_kg')
+        or tick.get('wall_deposit_cumulative_kg')
+        or tick.get('wall_deposit_kg')
+    )
+    glass_kg = (
+        _finite_or_none(products.get('glass'))
+        or _finite_or_none(products.get('pure_silica_glass'))
+        or _finite_or_none(products.get('industrial_mixed_glass'))
+        or _finite_or_none(tick.get('glass_kg'))
+    )
+    terminal_slag = buckets.get('terminal_slag')
+    refractory_rump_kg = (
+        _finite_or_none(completion.get('terminal_rump_kg'))
+        or _finite_or_none(completion.get('terminal_slag_kg'))
+        or _sum_nested_numbers(terminal_slag)
+    )
+    metals = buckets.get('metal_alloy') if isinstance(buckets, Mapping) else {}
+    return {
+        'oxygen_kg': (
+            _finite_or_none(completion.get('oxygen_kg'))
+            or _finite_or_none(tick.get('oxygen_kg'))
+        ),
+        'metals_kg': copy.deepcopy(dict(metals)) if isinstance(metals, Mapping) else {},
+        'glass_kg': glass_kg,
+        'refractory_rump_kg': refractory_rump_kg,
+        'yield_pct': (
+            _finite_or_none(completion.get('yield_pct'))
+            or _finite_or_none(tick.get('yield_pct'))
+            or _finite_or_none(per_hour.get('yield_pct'))
+        ),
+        'mass_balance_error_pct': (
+            _finite_or_none(completion.get('mass_balance_error_pct'))
+            if completion.get('mass_balance_error_pct') is not None
+            else _finite_or_none(tick.get('mass_balance_error_pct'))
+        ),
+        'energy_kWh': (
+            _finite_or_none(completion.get('energy_kWh'))
+            or _finite_or_none(tick.get('energy_cumulative_kWh'))
+            or _finite_or_none(tick.get('energy_kWh'))
+        ),
+        'wall_deposit_kg': _sum_nested_numbers(wall_deposit),
+    }
+
+
+def _metadata_from_context(title: str, context: Mapping[str, Any]) -> dict[str, Any]:
+    inputs = context.get('recipe_inputs') or {}
+    if not isinstance(inputs, Mapping):
+        inputs = {}
+    capture = context.get('last_recipe_capture') or {}
+    tick = capture.get('tick') if isinstance(capture, Mapping) else {}
+    if not isinstance(tick, Mapping):
+        tick = {}
+    campaign = str(
+        tick.get('campaign')
+        or next(iter((inputs.get('runtime_campaign_overrides') or {}) or {}), '')
+    )
+    headline_recipe = {
+        'feedstock': inputs.get('feedstock'),
+        'campaign': campaign,
+        'hours': tick.get('hour'),
+        'temperature_ladder': _temperature_ladder_from_inputs(inputs),
+        'pO2_mbar': tick.get('pO2_mbar'),
+        'p_total_mbar': tick.get('p_total_mbar'),
+        'furnace_max_T_C': inputs.get('furnace_max_T_C'),
+        'mre_enabled': bool(inputs.get('c5_enabled')),
+        'mre_target_species': inputs.get('mre_target_species') or '',
+        'mre_max_voltage_V': inputs.get('mre_max_voltage_V'),
+        'pinned_knobs': {
+            'runtime_campaign_overrides': copy.deepcopy(
+                inputs.get('runtime_campaign_overrides') or {}
+            ),
+            'c4_max_temp_C': inputs.get('c4_max_temp_C'),
+            'additives_kg': copy.deepcopy(inputs.get('additives_kg') or {}),
+            'furnace_material_id': inputs.get('furnace_material_id') or '',
+        },
+    }
+    return {
+        'title': title,
+        'created_utc': datetime.now(timezone.utc)
+        .isoformat()
+        .replace('+00:00', 'Z'),
+        'feedstock': str(inputs.get('feedstock') or ''),
+        'campaign': campaign,
+        'headline_recipe': headline_recipe,
+        'headline_results': _headline_results_from_context(context),
+    }
+
+
+def _recipe_metadata_summary(metadata: Mapping[str, Any]) -> str:
+    recipe = metadata.get('headline_recipe') or {}
+    results = metadata.get('headline_results') or {}
+    if not isinstance(recipe, Mapping):
+        recipe = {}
+    if not isinstance(results, Mapping):
+        results = {}
+    parts = []
+    feedstock = recipe.get('feedstock') or metadata.get('feedstock')
+    campaign = recipe.get('campaign') or metadata.get('campaign')
+    if feedstock:
+        parts.append(str(feedstock))
+    if campaign:
+        parts.append(str(campaign))
+    oxygen = _finite_or_none(results.get('oxygen_kg'))
+    energy = _finite_or_none(results.get('energy_kWh'))
+    wall = _finite_or_none(results.get('wall_deposit_kg'))
+    if oxygen is not None:
+        parts.append(f'O2 {oxygen:g} kg')
+    if energy is not None:
+        parts.append(f'energy {energy:g} kWh')
+    if wall is not None:
+        parts.append(f'wall deposit {wall:g} kg')
+    return ' | '.join(parts) if parts else 'metadata captured'
+
+
+def _recipe_controls_from_patch(patch: Mapping[str, Any]) -> dict[str, Any]:
+    controls: dict[str, Any] = {}
+    furnace_max = _finite_or_none(patch.get('furnace_max_T_C'))
+    if furnace_max is not None:
+        controls['furnace_max_T_C'] = furnace_max
+    campaigns = patch.get('campaigns')
+    if not isinstance(campaigns, Mapping):
+        return controls
+    c4 = campaigns.get('C4')
+    if isinstance(c4, Mapping):
+        controls['lever_campaign'] = 'C4'
+        pO2 = c4.get('pO2_mbar_default')
+        if pO2 is None:
+            pO2 = c4.get('pO2_mbar')
+        if isinstance(pO2, (list, tuple)) and pO2:
+            pO2 = pO2[0]
+        pO2_number = _finite_or_none(pO2)
+        if pO2_number is not None:
+            controls['pO2_mbar'] = pO2_number
+        p_total = _finite_or_none(c4.get('p_total_mbar_default'))
+        if p_total is not None:
+            controls['p_total_mbar'] = p_total
+        hold_temp = _finite_or_none(c4.get('hold_temp_C'))
+        if hold_temp is not None:
+            controls['stage_temp_C'] = hold_temp
+        temp_range = c4.get('temp_range_C')
+        if isinstance(temp_range, (list, tuple)) and temp_range:
+            target = _finite_or_none(temp_range[0])
+            if target is not None and 'stage_temp_C' not in controls:
+                controls['stage_temp_C'] = target
+            cap = _finite_or_none(temp_range[-1])
+            if cap is not None:
+                controls['c4_max_temp_C'] = cap
+    c5 = campaigns.get('C5')
+    if isinstance(c5, Mapping):
+        cap = _finite_or_none(c5.get('allow_mre_voltage_cap_V'))
+        if cap is not None and cap > 0:
+            controls['mre_enabled'] = True
+            controls['mre_max_voltage_V'] = cap
+    return controls
+
+
+@bp.route('/recipes', methods=['GET'])
+def list_recipes():
+    recipes = []
+    try:
+        for recipe_path in sorted(_recipe_library_dir().glob('*.yaml')):
+            metadata = read_recipe_metadata(recipe_path)
+            if not metadata:
+                continue
+            recipes.append({
+                'name': recipe_path.stem,
+                'title': metadata['title'],
+                'summary': _recipe_metadata_summary(metadata),
+            })
+    except RecipeIOError as exc:
+        return _json_error(str(exc), 500)
+    return jsonify(recipes)
+
+
+@bp.route('/recipes/save', methods=['POST'])
+def save_recipe():
+    try:
+        payload = _recipe_request_payload()
+        title = _validated_recipe_title(payload.get('title'))
+        sid = str(payload.get('sid') or '').strip()
+        if not sid:
+            raise BadRequest('recipe save requires a socket session id')
+        from web.events import RecipeStateError, recipe_save_context
+        context = recipe_save_context(sid)
+        metadata = _metadata_from_context(title, context)
+        setpoints_patch = _generated_recipe_patch_from_context(context)
+        name = _recipe_slug(title)
+        destination = recipe_library_path(name, library_dir=_recipe_library_dir())
+        if destination.exists():
+            return _json_error(f'recipe already exists: {name}', 409)
+        write_recipe_patch(destination, setpoints_patch, metadata=metadata)
+    except BadRequest as exc:
+        return _json_error(exc.description, 400)
+    except (RecipeIOError, RecipeStateError, ValueError) as exc:
+        return _json_error(str(exc), 400)
+    return jsonify({
+        'name': destination.stem,
+        'title': metadata['title'],
+        'summary': _recipe_metadata_summary(metadata),
+    })
+
+
+@bp.route('/recipes/load', methods=['POST'])
+def load_recipe():
+    try:
+        payload = _recipe_request_payload()
+        raw_name = str(payload.get('name') or '').strip()
+        if not raw_name:
+            raise BadRequest('recipe name is required')
+        source = recipe_library_path(raw_name, library_dir=_recipe_library_dir())
+        setpoints_patch = load_recipe_patch(source)
+        metadata = read_recipe_metadata(source)
+        sid = str(payload.get('sid') or '').strip()
+        applied_to_session = False
+        if sid:
+            from web.events import apply_loaded_recipe_patch_to_state
+            applied_to_session = apply_loaded_recipe_patch_to_state(
+                sid,
+                setpoints_patch,
+            )
+    except BadRequest as exc:
+        return _json_error(exc.description, 400)
+    except RecipeIOError as exc:
+        return _json_error(str(exc), 400)
+    title = metadata.get('title') or source.stem
+    summary = _recipe_metadata_summary(metadata) if metadata else ''
+    return jsonify({
+        'name': source.stem,
+        'title': title,
+        'summary': summary,
+        'setpoints_patch': setpoints_patch,
+        'controls': _recipe_controls_from_patch(setpoints_patch),
+        'applied_to_session': applied_to_session,
+    })
 
 
 @bp.route('/')

@@ -1,5 +1,6 @@
 """SocketIO event handlers for the simulator interface."""
 
+import copy
 from collections.abc import Mapping
 import math
 import threading
@@ -20,6 +21,8 @@ from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
+from simulator.runner import RunnerError, _deep_merge_setpoints
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -66,6 +69,10 @@ _MASS_BALANCE_ERROR_BREACH_PCT = 5e-12
 
 
 class InputValidationError(ValueError):
+    pass
+
+
+class RecipeStateError(ValueError):
     pass
 
 
@@ -124,6 +131,105 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
             return False
     socketio.emit(event, payload, room=sid)
     return True
+
+
+def recipe_save_context(sid: str) -> dict[str, object]:
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        raise RecipeStateError("recipe save requires an active web session")
+
+    def snapshot_context() -> dict[str, object]:
+        capture = state.get("last_recipe_capture")
+        if not capture:
+            raise RecipeStateError("recipe save requires a completed or running tick")
+        return {
+            "recipe_inputs": copy.deepcopy(state.get("recipe_inputs") or {}),
+            "setpoints_patch": copy.deepcopy(state.get("setpoints_patch") or {}),
+            "last_recipe_capture": copy.deepcopy(capture),
+            "last_completion_payload": copy.deepcopy(
+                state.get("last_completion_payload") or {}
+            ),
+        }
+
+    if lock is None:
+        return snapshot_context()
+    with lock:
+        return snapshot_context()
+
+
+def apply_loaded_recipe_patch_to_state(
+    sid: str,
+    patch: Mapping[str, object],
+) -> bool:
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        return False
+    normalized = normalize_recipe_patch(
+        patch,
+        source="recipes/load setpoints_patch",
+    )
+    if lock is None:
+        state["loaded_setpoints_patch"] = normalized
+        state["setpoints_patch"] = normalized
+        return True
+    with lock:
+        state["loaded_setpoints_patch"] = normalized
+        state["setpoints_patch"] = normalized
+    return True
+
+
+def _record_last_recipe_capture(
+    sid: str,
+    run_id: str,
+    *,
+    tick_data: Mapping[str, object] | None = None,
+    per_hour_summary: Mapping[str, object] | None = None,
+    completion_payload: Mapping[str, object] | None = None,
+) -> None:
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if state is None or state.get("run_id") != run_id:
+            return
+        if tick_data is not None:
+            state["last_recipe_capture"] = {
+                "tick": copy.deepcopy(dict(tick_data)),
+                "per_hour_summary": copy.deepcopy(dict(per_hour_summary or {})),
+            }
+        if completion_payload is not None:
+            state["last_completion_payload"] = copy.deepcopy(
+                dict(completion_payload)
+            )
+
+
+def _recipe_inputs_payload(
+    *,
+    feedstock_key: str,
+    mass_kg: float,
+    track: str,
+    runtime_campaign_overrides: Mapping[str, Mapping[str, object]],
+    c4_max_temp: float,
+    furnace_max_T_C: object,
+    c5_enabled: bool,
+    mre_target_species: str,
+    mre_max_voltage_V: float,
+    additives_kg: Mapping[str, float],
+    furnace_material_id: str,
+) -> dict[str, object]:
+    return {
+        "feedstock": feedstock_key,
+        "mass_kg": mass_kg,
+        "track": track,
+        "runtime_campaign_overrides": copy.deepcopy(
+            dict(runtime_campaign_overrides)
+        ),
+        "c4_max_temp_C": c4_max_temp,
+        "furnace_max_T_C": furnace_max_T_C,
+        "c5_enabled": c5_enabled,
+        "mre_target_species": mre_target_species,
+        "mre_max_voltage_V": mre_max_voltage_V,
+        "additives_kg": copy.deepcopy(dict(additives_kg)),
+        "furnace_material_id": furnace_material_id,
+    }
 
 
 def _clear_simulation_state(sid: str) -> None:
@@ -679,6 +785,11 @@ def _start_background_loop(
                 sim = session.simulator
                 if session.is_complete():
                     completion_payload = _completion_payload(sim)
+                    _record_last_recipe_capture(
+                        sid,
+                        run_id,
+                        completion_payload=completion_payload,
+                    )
                     if not _emit_if_current(
                         socketio,
                         sid,
@@ -787,6 +898,12 @@ def _start_background_loop(
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
                 backend_error=step_result.backend_error,
+            )
+            _record_last_recipe_capture(
+                sid,
+                run_id,
+                tick_data=tick_data,
+                per_hour_summary=step_result.per_hour_summary,
             )
             if not _emit_if_current(
                 socketio, sid, run_id, 'simulation_tick', tick_data
@@ -921,6 +1038,21 @@ def register_events(socketio):
             runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
                 data.get('runtime_campaign_overrides')
             )
+            raw_setpoints_patch = data.get('setpoints_patch')
+            if raw_setpoints_patch in (None, {}, ''):
+                setpoints_patch: dict[str, object] = {}
+            else:
+                if not isinstance(raw_setpoints_patch, Mapping):
+                    raise InputValidationError(
+                        'setpoints_patch must be an object'
+                    )
+                try:
+                    setpoints_patch = normalize_recipe_patch(
+                        raw_setpoints_patch,
+                        source='start_simulation.setpoints_patch',
+                    )
+                except RecipeIOError as exc:
+                    raise InputValidationError(str(exc)) from exc
         except InputValidationError as exc:
             socketio.emit('simulation_status', {
                 'status': 'error',
@@ -946,6 +1078,15 @@ def register_events(socketio):
                     requested_cap=setpoints.get('furnace_max_T_C'),
                 )
             except ValueError as exc:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': str(exc),
+                }, room=sid)
+                return
+        if setpoints_patch:
+            try:
+                setpoints = _deep_merge_setpoints(setpoints, setpoints_patch)
+            except RunnerError as exc:
                 socketio.emit('simulation_status', {
                     'status': 'error',
                     'message': str(exc),
@@ -1013,6 +1154,20 @@ def register_events(socketio):
         state['backend_message'] = backend_message
         state['backend_status'] = resolution_status.backend_status
         state['backend_authoritative'] = resolution_status.authoritative
+        state['recipe_inputs'] = _recipe_inputs_payload(
+            feedstock_key=str(feedstock_key),
+            mass_kg=mass_kg,
+            track=str(track),
+            runtime_campaign_overrides=runtime_campaign_overrides,
+            c4_max_temp=c4_max_temp,
+            furnace_max_T_C=setpoints.get('furnace_max_T_C'),
+            c5_enabled=c5_enabled,
+            mre_target_species=mre_target_species,
+            mre_max_voltage_V=mre_max_voltage_V,
+            additives_kg=additives_kg,
+            furnace_material_id=furnace_material_id,
+        )
+        state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
 
         _emit_if_current(
             socketio,

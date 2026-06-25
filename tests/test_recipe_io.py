@@ -12,6 +12,7 @@ from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.recipe_io import (
     RecipeIOError,
     load_recipe_patch,
+    read_recipe_metadata,
 )
 from simulator.runner import PyrolysisRun
 
@@ -91,6 +92,49 @@ def test_malformed_recipe_fails_loud(tmp_path: Path) -> None:
     )
 
     with pytest.raises(RecipeIOError, match="unknown top-level recipe key"):
+        load_recipe_patch(recipe_path)
+
+
+def test_metadata_recipe_loads_patch_unchanged(tmp_path: Path) -> None:
+    base_patch = load_recipe_patch(RECIPE_DIR / "c2a_staged_temperature_ladder.yaml")
+    recipe_path = tmp_path / "metadata.recipe.yaml"
+    metadata = {
+        "title": "C2A staged capture",
+        "created_utc": "2026-06-23T00:00:00Z",
+        "feedstock": "lunar_mare_low_ti",
+        "campaign": "C2A_staged",
+        "headline_recipe": {
+            "feedstock": "lunar_mare_low_ti",
+            "campaign": "C2A_staged",
+            "temperature_ladder": [],
+        },
+        "headline_results": {
+            "oxygen_kg": 12.5,
+            "energy_kWh": 42.0,
+            "wall_deposit_kg": 0.0,
+        },
+    }
+    recipe_path.write_text(
+        yaml.safe_dump({"metadata": metadata, **base_patch}, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    assert read_recipe_metadata(recipe_path) == metadata
+    assert load_recipe_patch(recipe_path) == base_patch
+
+
+def test_malformed_metadata_fails_loud(tmp_path: Path) -> None:
+    recipe_path = tmp_path / "bad-metadata.recipe.yaml"
+    recipe_path.write_text(
+        "metadata:\n"
+        "  title: 7\n"
+        "  headline_recipe: {}\n"
+        "  headline_results: {}\n"
+        "furnace_max_T_C: 1800\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RecipeIOError, match="metadata.title"):
         load_recipe_patch(recipe_path)
 
 

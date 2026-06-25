@@ -185,6 +185,10 @@
             <button id="btn-pause" class="btn" disabled>Pause</button>
             <button id="btn-resume" class="btn" disabled>Resume</button>
         </div>
+        <div class="control-buttons recipe-buttons">
+            <button id="btn-save-recipe" class="btn" type="button">Save recipe</button>
+            <button id="btn-load-recipe" class="btn" type="button">Load recipe</button>
+        </div>
     </aside>
 
     <!-- Main area: charts + results -->
@@ -522,6 +526,41 @@ Start a simulation to populate process inventory JSON.
         </div>
 
     </section>
+</div>
+
+<div id="save-recipe-modal" class="recipe-modal-backdrop" hidden>
+    <div class="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="save-recipe-title">
+        <h3 id="save-recipe-title">Save recipe</h3>
+        <label>
+            Title
+            <input type="text" id="recipe-save-title" maxlength="120" autocomplete="off">
+        </label>
+        <pre id="recipe-save-preview" class="recipe-preview" aria-live="polite"></pre>
+        <div id="recipe-save-error" class="config-warning" hidden></div>
+        <div class="recipe-modal-actions">
+            <button id="recipe-save-confirm" class="btn btn-primary" type="button">Save</button>
+            <button id="recipe-save-cancel" class="btn" type="button">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="load-recipe-modal" class="recipe-modal-backdrop" hidden>
+    <div class="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="load-recipe-title">
+        <h3 id="load-recipe-title">Load recipe</h3>
+        <label>
+            Recipe
+            <select id="recipe-load-select"></select>
+        </label>
+        <div class="recipe-load-summary">
+            <strong id="recipe-load-selected-title"></strong>
+            <p id="recipe-load-selected-summary"></p>
+        </div>
+        <div id="recipe-load-error" class="config-warning" hidden></div>
+        <div class="recipe-modal-actions">
+            <button id="recipe-load-confirm" class="btn btn-primary" type="button">Load</button>
+            <button id="recipe-load-cancel" class="btn" type="button">Cancel</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 

@@ -18,6 +18,9 @@ from simulator.optimize.recipe import (
 
 RECIPE_LIBRARY_DIR = Path(__file__).resolve().parent.parent / "data" / "recipes"
 _RECIPE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+_METADATA_REQUIRED_KEYS = frozenset({"title", "headline_recipe", "headline_results"})
+_METADATA_OPTIONAL_KEYS = frozenset({"created_utc", "feedstock", "campaign"})
+_METADATA_KEYS = _METADATA_REQUIRED_KEYS | _METADATA_OPTIONAL_KEYS
 
 
 class RecipeIOError(ValueError):
@@ -36,6 +39,16 @@ def load_recipe_patch(
     return normalize_recipe_patch(payload, source=str(recipe_path), schema=schema)
 
 
+def read_recipe_metadata(path: str | Path) -> dict[str, Any]:
+    """Read only the optional UI metadata block from a recipe YAML file."""
+
+    recipe_path = Path(path)
+    payload = _load_recipe_mapping(recipe_path)
+    if "metadata" not in payload:
+        return {}
+    return _validate_recipe_metadata(payload["metadata"], source=str(recipe_path))
+
+
 def normalize_recipe_patch(
     payload: Mapping[str, Any],
     *,
@@ -50,16 +63,21 @@ def normalize_recipe_patch(
         raise RecipeIOError(f"{source} must not be empty")
 
     active_schema = schema or RecipeSchema()
-    _validate_top_level_keys(payload, source=source, schema=active_schema)
+    if "metadata" in payload:
+        _validate_recipe_metadata(payload["metadata"], source=source)
+    recipe_payload = _recipe_payload_without_metadata(payload)
+    if not recipe_payload:
+        raise RecipeIOError(f"{source} produced an empty setpoints_patch")
+    _validate_top_level_keys(recipe_payload, source=source, schema=active_schema)
     try:
-        patch = RecipePatch.from_nested(payload)
+        patch = RecipePatch.from_nested(recipe_payload)
         normalized = active_schema.to_setpoints_patch(patch)
     except RecipeValidationError as exc:
         raise RecipeIOError(f"invalid recipe {source}: {exc}") from exc
 
     if not normalized:
         raise RecipeIOError(f"{source} produced an empty setpoints_patch")
-    _validate_optimizer_shape(payload, normalized, source=source)
+    _validate_optimizer_shape(recipe_payload, normalized, source=source)
     return copy.deepcopy(normalized)
 
 
@@ -81,12 +99,32 @@ def recipe_library_path(
     return library_dir / f"{recipe_name}.yaml"
 
 
-def write_recipe_patch(path: str | Path, payload: Mapping[str, Any]) -> Path:
+def write_recipe_patch(
+    path: str | Path,
+    payload: Mapping[str, Any],
+    *,
+    metadata: Mapping[str, Any] | None = None,
+) -> Path:
     """Validate and write a canonical recipe YAML file."""
 
     recipe_path = Path(path)
+    if metadata is None and "metadata" in payload:
+        metadata = payload["metadata"]
     normalized = normalize_recipe_patch(payload, source=str(recipe_path))
     recipe_path.parent.mkdir(parents=True, exist_ok=True)
+    if metadata is not None:
+        document: dict[str, Any] = {
+            "metadata": _validate_recipe_metadata(
+                metadata,
+                source=str(recipe_path),
+            ),
+        }
+        document.update(normalized)
+        recipe_path.write_text(
+            yaml.safe_dump(document, sort_keys=False),
+            encoding="utf-8",
+        )
+        return recipe_path
     recipe_path.write_text(
         yaml.safe_dump(normalized, sort_keys=True),
         encoding="utf-8",
@@ -125,6 +163,75 @@ def _load_recipe_mapping(path: Path) -> Mapping[str, Any]:
     if not payload:
         raise RecipeIOError(f"recipe file {path} must not be empty")
     return payload
+
+
+def _recipe_payload_without_metadata(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in payload.items()
+        if key != "metadata"
+    }
+
+
+def _validate_recipe_metadata(value: Any, *, source: str) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise RecipeIOError(f"{source} metadata must be a mapping")
+    unknown = {str(key) for key in value if key not in _METADATA_KEYS}
+    if unknown:
+        allowed = ", ".join(sorted(_METADATA_KEYS))
+        raise RecipeIOError(
+            f"{source} metadata has unknown key(s): "
+            f"{', '.join(sorted(unknown))}; allowed: {allowed}"
+        )
+    missing = _METADATA_REQUIRED_KEYS - set(value)
+    if missing:
+        raise RecipeIOError(
+            f"{source} metadata missing required key(s): "
+            f"{', '.join(sorted(missing))}"
+        )
+    metadata = {str(key): _plain_data(item) for key, item in value.items()}
+    title = metadata.get("title")
+    if not isinstance(title, str) or not title.strip():
+        raise RecipeIOError(f"{source} metadata.title must be a non-empty string")
+    for key in ("created_utc", "feedstock", "campaign"):
+        if key in metadata and not isinstance(metadata[key], str):
+            raise RecipeIOError(f"{source} metadata.{key} must be a string")
+    for key in ("headline_recipe", "headline_results"):
+        if not isinstance(metadata.get(key), Mapping):
+            raise RecipeIOError(f"{source} metadata.{key} must be a mapping")
+    _validate_metadata_json_value(metadata, source=source, path=("metadata",))
+    return copy.deepcopy(metadata)
+
+
+def _validate_metadata_json_value(
+    value: Any,
+    *,
+    source: str,
+    path: tuple[str, ...],
+) -> None:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                dotted = ".".join(path)
+                raise RecipeIOError(f"{source} {dotted} keys must be strings")
+            _validate_metadata_json_value(
+                item,
+                source=source,
+                path=(*path, key),
+            )
+        return
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            _validate_metadata_json_value(
+                item,
+                source=source,
+                path=(*path, str(index)),
+            )
+        return
+    dotted = ".".join(path)
+    raise RecipeIOError(f"{source} {dotted} must contain only JSON-like values")
 
 
 def _validate_top_level_keys(
