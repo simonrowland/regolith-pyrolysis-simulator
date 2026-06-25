@@ -211,11 +211,12 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     assert "wall_deposit_kg" in report
     notice = diagnostics["wall_sticking_alpha_provenance_notice"]
     assert notice["severity"] == "warning"
-    assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
+    assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    assert "legacy_species_default_proxy" in notice["source_classes"]
+    assert "cited_hkl_accommodation" in notice["source_classes"]
+    assert "uncertified_na_analogy_default" in notice["source_classes"]
     assert "Mg" in notice["species"]
-    assert notice["alpha_s_by_species"]["Mg"] == pytest.approx(0.8)
+    assert notice["alpha_s_by_species"]["Mg"] == pytest.approx(0.2)
     assert (
         notice["grounding_target"]
         == "data/literature/vacuum_pyrolysis_sticking.yaml"
@@ -232,8 +233,10 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
 
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
     assert route.condensed_by_stage_species[4]["SiO"] < 0.35
+    # D4: grounded SiO alpha_s=0.04 replaces the legacy 0.7, so less
+    # vapor captures in the finite train and more remains in offgas.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.11006692746967289
+        0.8815308874628011
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
@@ -343,7 +346,7 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     )
 
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.03398921856191324,
+        0.000886103302219211,
         rel=1e-12,
     )
     assert (
@@ -353,11 +356,12 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     ) == pytest.approx(1.0)
     notice = route.sticking_alpha_provenance_notice
     assert notice["severity"] == "warning"
-    assert notice["code"] == "wall_deposit_sticking_alpha_ungrounded_assumption"
+    assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
+    assert "cited_hkl_accommodation" in notice["source_classes"]
     assert "fail_closed_no_direct_sticking_coefficient" in notice["source_classes"]
     assert notice["species"] == ["SiO"]
-    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(0.7)
+    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(0.04)
     assert (
         notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
             "alpha_s"
@@ -365,9 +369,13 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
         == pytest.approx(0.0)
     )
     # Reported alphas are the wall-path values; the capture-budget path reads
-    # STICKING_COEFF directly and must not be conflated with them.
+    # the same literature sidecar defaults and must not be conflated with
+    # material-specific wall overrides.
     assert notice["alpha_s_source"] == "_wall_alpha_s"
-    assert notice["capture_budget_alpha_s_source"] == "STICKING_COEFF"
+    assert (
+        notice["capture_budget_alpha_s_source"]
+        == "data/literature/vacuum_pyrolysis_sticking.yaml"
+    )
     assert (
         notice["grounding_target"]
         == "data/literature/vacuum_pyrolysis_sticking.yaml"

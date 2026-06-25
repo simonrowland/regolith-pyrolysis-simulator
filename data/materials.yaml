@@ -1,81 +1,43 @@
-# Minimal liner-material surface data for Chunk A of the SiO wall-deposit
-# campaign. Values intentionally preserve the pre-existing train constants:
-# temp_range_C mirrors CondensationTrain.create_default(), and alpha_s values
-# are migrated from simulator/condensation.py STICKING_COEFF at baseline
-# 251481c. Do not tune these as golden fixtures.
-# STICKING_COEFF/default alpha_s values are ungrounded fitted/by-feel
-# assumptions pending W2 grounding in data/literature/vacuum_pyrolysis_sticking.yaml.
+# Minimal liner-material surface data for the SiO wall-deposit campaign.
+# temp_range_C mirrors CondensationTrain.create_default(). Default alpha_s
+# values are single-sourced from
+# data/literature/vacuum_pyrolysis_sticking.yaml; this file may only add
+# material-specific overrides with explicit provenance/status.
 #
 # max_service_T_C is recorded for the liner/surface contract and defaults to
 # the stage high temperature in Chunk A. Chunk C owns pressure coupling and
 # operational material-temperature sequencing.
 
 default_alpha_s_by_species: &default_alpha_s_by_species
-  Fe: 0.9
-  SiO: 0.7
-  CrO2: 0.9
-  Mg: 0.8
-  Na: 0.95
-  K: 0.95
-  Ca: 0.85
-  Mn: 0.85
-  Cr: 0.9
+  Fe: &alpha_Fe
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value
+  SiO: &alpha_SiO
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value
+  CrO2: &alpha_CrO2
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO2.value
+  Mg: &alpha_Mg
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Mg.value
+  Na: &alpha_Na
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value
+  K: &alpha_K
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.K.value
+  Ca: &alpha_Ca
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Ca.value
+  Mn: &alpha_Mn
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Mn.value
+  Cr: &alpha_Cr
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Cr.value
 
 default_liner_alpha_s_by_species: &default_liner_alpha_s_by_species
-  Fe:
-    value: 0.9
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Fe
-    output_status: uncertainty_only
-  SiO:
-    value: 0.7
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.SiO
-    output_status: uncertainty_only
-  CrO2:
-    value: 0.9
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.CrO2
-    output_status: uncertainty_only
-  Mg:
-    value: 0.8
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Mg
-    output_status: uncertainty_only
-  Na:
-    value: 0.95
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Na
-    output_status: uncertainty_only
-  K:
-    value: 0.95
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.K
-    output_status: uncertainty_only
-  Ca:
-    value: 0.85
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Ca
-    output_status: uncertainty_only
-  Mn:
-    value: 0.85
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Mn
-    output_status: uncertainty_only
-  Cr:
-    value: 0.9
-    status: proxy
-    source_class: legacy_species_default_proxy
-    source: data/materials.yaml::default_alpha_s_by_species.Cr
-    output_status: uncertainty_only
+  Fe: *alpha_Fe
+  SiO: *alpha_SiO
+  CrO2: *alpha_CrO2
+  Mg: *alpha_Mg
+  Na: *alpha_Na
+  K: *alpha_K
+  Ca: *alpha_Ca
+  Mn: *alpha_Mn
+  Cr: *alpha_Cr
 
 fused_silica_liner_alpha_s_by_species: &fused_silica_liner_alpha_s_by_species
   <<: *default_liner_alpha_s_by_species

@@ -10,7 +10,10 @@ WALL_STICKING_ALPHA_GROUNDING_TARGET = (
     "data/literature/vacuum_pyrolysis_sticking.yaml"
 )
 WALL_STICKING_ALPHA_NOTICE_CODE = (
-    "wall_deposit_sticking_alpha_ungrounded_assumption"
+    "wall_deposit_sticking_alpha_provenance"
+)
+WALL_STICKING_ALPHA_UNCERTIFIED_CODE = (
+    "wall_deposit_sticking_alpha_uncertified"
 )
 
 
@@ -18,7 +21,7 @@ def wall_sticking_alpha_provenance_notice(
     alpha_s_by_species: Mapping[str, float],
     alpha_provenance_by_species: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Return a warning payload for ungrounded wall-deposition alpha_s values."""
+    """Return a provenance payload for wall-deposition alpha_s values."""
 
     species_alpha = {
         str(species): float(alpha_s)
@@ -42,7 +45,8 @@ def wall_sticking_alpha_provenance_notice(
     status_bearing = [
         record
         for record in records
-        if str(record.get("status", "proxy")) != "sourced"
+        if str(record.get("citation_status", "")).upper() != "CITED"
+        or str(record.get("status", "proxy")) != "sourced"
         or str(record.get("output_status", "")) in {
             "status_bearing",
             "uncertainty_only",
@@ -53,19 +57,28 @@ def wall_sticking_alpha_provenance_notice(
         for record in records
         if record.get("source_class")
     })
+    has_status_bearing = bool(status_bearing)
     return {
-        "severity": "warning",
-        "code": WALL_STICKING_ALPHA_NOTICE_CODE,
+        "severity": "warning" if has_status_bearing else "info",
+        "code": (
+            WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+            if has_status_bearing
+            else WALL_STICKING_ALPHA_NOTICE_CODE
+        ),
         "source_class": (
             "status_bearing_material_alpha"
-            if provenance
+            if has_status_bearing
+            else "sourced_material_alpha"
+        ) if provenance else (
+            "status_bearing_sticking_alpha"
+            if has_status_bearing
             else "assumption_ungrounded_fitted_coefficient"
         ),
         "source_classes": source_classes,
         "source": (
+            "data/literature/vacuum_pyrolysis_sticking.yaml::species; "
             "data/materials.yaml::liner_materials.*.alpha_s_by_species; "
-            "data/materials.yaml::default_alpha_s_by_species; "
-            "simulator/condensation.py::STICKING_COEFF fallback"
+            "data/materials.yaml::default_alpha_s_by_species"
         ),
         "usage": [
             "_stage_alpha_s",
@@ -78,21 +91,29 @@ def wall_sticking_alpha_provenance_notice(
             for item in species
         },
         # Reported numbers are the wall-path (_wall_alpha_s) values. The
-        # _pressure_isolated_capture_budget_kg path reads STICKING_COEFF
-        # directly, so its effective alpha_s can differ if data/materials.yaml
-        # wall overrides diverge from STICKING_COEFF — do not equate the two.
+        # _pressure_isolated_capture_budget_kg path reads the same literature
+        # sidecar defaults, so material-specific wall overrides can still
+        # differ from the capture-budget alpha_s — do not equate the two.
         "alpha_s_source": "_wall_alpha_s",
         "alpha_s_provenance_by_species": provenance,
-        "capture_budget_alpha_s_source": "STICKING_COEFF",
-        "authoritative_for_deposit_mass": False,
-        "deposit_output_status": "uncertainty_only",
-        "resinter_output_status": "uncertainty_only",
+        "capture_budget_alpha_s_source": WALL_STICKING_ALPHA_GROUNDING_TARGET,
+        "authoritative_for_deposit_mass": not has_status_bearing,
+        "deposit_output_status": (
+            "status_bearing"
+            if has_status_bearing
+            else "sourced_with_surface_proxy"
+        ),
+        "resinter_output_status": (
+            "status_bearing"
+            if has_status_bearing
+            else "sourced_with_surface_proxy"
+        ),
         "status_bearing_alpha_count": len(status_bearing),
         "message": (
-            "Wall-deposition sticking alpha_s values are material-specific "
-            "where configured, but unsourced, proxy, or fail-closed material "
-            "cells remain status-bearing uncertainty diagnostics, not sourced "
-            "material constants."
+            "Wall-deposition sticking alpha_s values are read from the "
+            "literature sidecar where available; UNCERTIFIED or fail-closed "
+            "material cells remain status-bearing for fouling and resinter "
+            "verdicts."
         ),
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
     }

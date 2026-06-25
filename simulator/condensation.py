@@ -65,6 +65,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
 
+import yaml
+
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -259,18 +261,154 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 UNSUPPORTED_CARRIER_FALLBACK_REASON = 'unsupported_carrier_lj_parameters'
-CAPTURE_BUDGET_REGULARIZER_FLOOR = 0.01
+STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
+STICKING_VALUE_REF_PREFIX = (
+    'data/literature/vacuum_pyrolysis_sticking.yaml::species.'
+)
+STICKING_UNKNOWN_REF = (
+    'data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default'
+)
+STICKING_STATUSES = {'CITED', 'UNCERTIFIED'}
+
+
+def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
+    raw = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+    if not isinstance(raw, Mapping):
+        raise ValueError(f'{path}: sticking data must be a mapping')
+    species = raw.get('species')
+    if not isinstance(species, Mapping) or not species:
+        raise ValueError(f'{path}: missing species sticking table')
+    for species_name, entry in species.items():
+        _validate_sticking_entry(path, f'species.{species_name}', entry)
+    _validate_sticking_entry(
+        path,
+        'unknown_species_default',
+        raw.get('unknown_species_default'),
+    )
+    floor = raw.get('capture_budget_regularizer_floor')
+    if not isinstance(floor, Mapping):
+        raise ValueError(f'{path}: missing capture_budget_regularizer_floor')
+    _validate_sticking_value(
+        path,
+        'capture_budget_regularizer_floor.value',
+        floor.get('value'),
+    )
+    if str(floor.get('status', '')).upper() not in STICKING_STATUSES:
+        raise ValueError(f'{path}: regularizer floor must be CITED or UNCERTIFIED')
+    if not floor.get('source') or not floor.get('source_class'):
+        raise ValueError(f'{path}: regularizer floor needs source/source_class')
+    return dict(raw)
+
+
+def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
+    if not isinstance(entry, Mapping):
+        raise ValueError(f'{path}: {name} must be a mapping')
+    _validate_sticking_value(path, f'{name}.value', entry.get('value'))
+    if str(entry.get('status', '')).upper() not in STICKING_STATUSES:
+        raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
+    for key in ('source', 'source_class', 'temperature_range_K', 'uncertainty_flag'):
+        if entry.get(key) in (None, ''):
+            raise ValueError(f'{path}: {name}.{key} is required')
+
+
+def _validate_sticking_value(path: Path, name: str, value: Any) -> None:
+    try:
+        alpha_s = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'{path}: {name} must be numeric') from exc
+    if not math.isfinite(alpha_s) or not 0.0 <= alpha_s <= 1.0:
+        raise ValueError(f'{path}: {name} must be finite and within [0, 1]')
+
+
+STICKING_DATA = _load_sticking_data()
+
+
+def _sticking_species_entries() -> Mapping[str, Any]:
+    entries = STICKING_DATA.get('species', {})
+    return entries if isinstance(entries, Mapping) else {}
+
+
+def _sticking_species_entry(species: str) -> Mapping[str, Any]:
+    entries = _sticking_species_entries()
+    entry = entries.get(species)
+    if isinstance(entry, Mapping):
+        return entry
+    fallback = STICKING_DATA.get('unknown_species_default', {})
+    return fallback if isinstance(fallback, Mapping) else {}
+
+
+def _sticking_alpha_s(species: str) -> float:
+    return _coerce_alpha_s(_sticking_species_entry(species).get('value'))
+
+
+def _sticking_ref_record(species: str, ref: Any) -> Mapping[str, Any] | None:
+    if not isinstance(ref, str):
+        return None
+    if ref == STICKING_UNKNOWN_REF:
+        fallback = STICKING_DATA.get('unknown_species_default')
+        return fallback if isinstance(fallback, Mapping) else None
+    if not ref.startswith(STICKING_VALUE_REF_PREFIX):
+        return None
+    suffix = ref.removeprefix(STICKING_VALUE_REF_PREFIX)
+    if not suffix.endswith('.value'):
+        return None
+    ref_species = suffix[:-len('.value')]
+    if ref_species != species:
+        return None
+    return _sticking_species_entry(species)
+
+
+def _sticking_entry_ref_record(species: str, entry: Any) -> Mapping[str, Any] | None:
+    if isinstance(entry, Mapping):
+        return _sticking_ref_record(species, entry.get('value_ref'))
+    return None
+
+
+def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:
+    status = str(record.get('status', '')).upper()
+    output_status = str(record.get('output_status') or (
+        'sourced_with_surface_proxy'
+        if status == 'CITED'
+        else 'status_bearing'
+    ))
+    return {
+        'source': str(record.get('source', '')),
+        'source_url': record.get('source_url'),
+        'source_class': str(record.get('source_class', '')),
+        'status': 'sourced' if status == 'CITED' else 'UNCERTIFIED',
+        'citation_status': status,
+        'temperature_range_K': record.get('temperature_range_K'),
+        'envelope': record.get('envelope'),
+        'uncertainty_flag': record.get('uncertainty_flag'),
+        'output_status': output_status,
+    }
+
+
+STICKING_COEFF = {
+    str(species): float(entry.get('value'))
+    for species, entry in _sticking_species_entries().items()
+    if isinstance(entry, Mapping)
+}
+
+CAPTURE_BUDGET_REGULARIZER_FLOOR = float(
+    STICKING_DATA['capture_budget_regularizer_floor']['value']
+)
 CAPTURE_BUDGET_REGULARIZER_NOTICE = {
     'severity': 'warning',
-    'code': 'pressure_isolated_capture_budget_regularizer_unsourced',
-    'source_class': 'assumption_regularizer_not_literature_constant',
+    'code': 'pressure_isolated_capture_budget_regularizer_uncertified',
+    'source_class': STICKING_DATA['capture_budget_regularizer_floor']['source_class'],
     'floor': CAPTURE_BUDGET_REGULARIZER_FLOOR,
+    'source': STICKING_DATA['capture_budget_regularizer_floor']['source'],
+    'citation_status': STICKING_DATA['capture_budget_regularizer_floor']['status'],
+    'uncertainty_flag': (
+        STICKING_DATA['capture_budget_regularizer_floor']['uncertainty_flag']
+    ),
     'usage': '_pressure_isolated_stage_efficiency',
     'output_status': 'uncertainty_only',
     'message': (
-        'Pressure-isolated capture budget uses a legacy numerical floor; '
-        'the value is surfaced as uncertainty-only and must not be treated '
-        'as a sourced condensation constant.'
+        'Pressure-isolated capture budget uses a documented numerical '
+        'regularizer floor; the value is surfaced as uncertainty-only and '
+        'must not be treated as a sourced condensation constant.'
     ),
 }
 
@@ -634,23 +772,6 @@ CONDENSATION_TEMPS_C = {
     'Al':  1180,   # negligible at process T, but included for completeness
     'Ti':  1500,   # negligible at process T
 }
-
-# Sticking coefficients (probability of condensation on contact).
-# Ungrounded fitted/by-feel assumptions pending W2 grounding in
-# data/literature/vacuum_pyrolysis_sticking.yaml. Do not tune these as
-# literature constants.
-STICKING_COEFF = {
-    'Fe':  0.9,
-    'SiO': 0.7,    # SiO → SiO₂ disproportionation is not instantaneous
-    'CrO2': 0.9,
-    'Mg':  0.8,
-    'Na':  0.95,
-    'K':   0.95,
-    'Ca':  0.85,
-    'Mn':  0.85,
-    'Cr':  0.9,
-}
-
 
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
 VAPOR_PRESSURE_DATA = _CONFIG_BUNDLE.vapor_pressures
@@ -1879,12 +2000,28 @@ def _stage_alpha_s(
     if isinstance(alpha_by_species, Mapping) and species in alpha_by_species:
         value = alpha_by_species.get(species)
     if value is None:
-        value = STICKING_COEFF.get(species, 0.8)
+        value = _sticking_species_entry(species)
+    else:
+        value = _alpha_entry_with_species(species, value)
     return _coerce_alpha_s(value)
+
+
+def _alpha_entry_with_species(species: str, entry: Any) -> Any:
+    if isinstance(entry, Mapping) and 'value_ref' in entry and 'species' not in entry:
+        enriched = dict(entry)
+        enriched['species'] = species
+        return enriched
+    return entry
 
 
 def _alpha_entry_value(entry: Any) -> Any:
     if isinstance(entry, Mapping):
+        if 'value_ref' in entry:
+            ref_record = _sticking_entry_ref_record(
+                str(entry.get('species', '')),
+                entry,
+            )
+            return None if ref_record is None else ref_record.get('value')
         for key in ('value', 'alpha_s', 'alpha_s_value'):
             if key in entry:
                 return entry.get(key)
@@ -1915,12 +2052,18 @@ def _alpha_record(
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
         'species': str(species),
-        'alpha_s': _coerce_alpha_s(entry),
+        'alpha_s': _coerce_alpha_s(_alpha_entry_with_species(species, entry)),
         'source': source,
         'source_class': source_class,
         'status': status,
         'output_status': output_status,
     }
+    entry = _alpha_entry_with_species(species, entry)
+    ref_record = _sticking_entry_ref_record(species, entry)
+    if ref_record is not None:
+        record.update(_sticking_record_payload(ref_record))
+        record['value_ref'] = entry.get('value_ref')
+        record['material_source'] = source
     if liner_material:
         record['liner_material'] = str(liner_material)
     if segment is not None:
@@ -2009,9 +2152,16 @@ def _wall_alpha_record(
             )
     return _alpha_record(
         species=species,
-        entry=STICKING_COEFF.get(species, 0.8),
+        entry={
+            'species': species,
+            'value_ref': (
+                f'{STICKING_VALUE_REF_PREFIX}{species}.value'
+                if species in STICKING_COEFF
+                else STICKING_UNKNOWN_REF
+            ),
+        },
         source=(
-            'simulator/condensation.py::STICKING_COEFF.'
+            'data/literature/vacuum_pyrolysis_sticking.yaml::species.'
             f'{species}'
         )
     )
@@ -2721,7 +2871,7 @@ def _pressure_isolated_capture_budget_kg(
 
     remaining_kg = max(0.0, rate_kg_hr)
     T_cond_C = _species_condensation_temperature_C(species, temps=temps)
-    alpha_s = STICKING_COEFF.get(species, 0.8)
+    alpha_s = _sticking_alpha_s(species)
     for stage in stages:
         if remaining_kg <= 1e-15:
             break

@@ -298,7 +298,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # source edit to the digested modules (incl. docstring/comment-only changes such
     # as the deb2852 VapoRock-diagnostic doc-drift). Re-pin to current main when that
     # happens — recipe_id (above) is the identity surface and stays stable.
-    assert cache_key(spec) == "db7ded3f57621980147c466d3fbf20c8fefe7395f6d52fce7d5859bcbbf8b48b"
+    assert cache_key(spec) == "c341a0ab6b4d3f09fe233704e8ab9fcd416fc9303477c79b89484b057f3834a3"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

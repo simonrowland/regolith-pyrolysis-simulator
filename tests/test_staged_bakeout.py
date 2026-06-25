@@ -172,9 +172,12 @@ def test_c2a_staged_is_deterministic_and_beats_c2a_continuous():
     # hot-trap instead of the old VapoRock-dominant silica-purity surface.
     # Keep the recipe invariant honest: staged mode must create material
     # Stage 3 silica capture while the continuous warmup path captures none.
+    # D4 grounds SiO alpha_s at 0.04 instead of legacy 0.7, so the absolute
+    # silica capture threshold drops while staged remains nonzero and richer
+    # than continuous.
     staged_fe_mg = sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg"))
     staged_stage3_total = staged_silica + staged_fe_mg
-    assert staged_silica > 0.5
+    assert staged_silica > 0.05
     assert staged_stage3_total > staged_silica
     assert staged_silica / staged_stage3_total > 0.20
 

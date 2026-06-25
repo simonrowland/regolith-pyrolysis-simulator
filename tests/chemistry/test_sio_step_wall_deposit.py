@@ -146,8 +146,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # direct sticking coefficient is cited. The 1050 C cold-wall baseline
     # now excludes that fused-silica segment:
     # 5.357536728e-06 -> 3.58623058352e-06 kg.
+    # 2026-06-23 D4: default SiO alpha_s is read from
+    # data/literature/vacuum_pyrolysis_sticking.yaml (REF-018/REF-016,
+    # 0.04) instead of the legacy by-feel 0.7. This lowers the
+    # pressure-isolated capture budget and the 1050 C wall deposit:
+    # 3.58623058352e-06 -> 4.6778715958e-07 kg.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        3.58623058352e-06, rel=1e-9
+        4.6778715958e-07, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

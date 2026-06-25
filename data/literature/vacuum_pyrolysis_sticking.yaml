@@ -1,0 +1,134 @@
+schema_version: 1
+surface: vacuum_pyrolysis_wall_and_condenser_capture
+usage:
+  - simulator/condensation.py::_stage_alpha_s
+  - simulator/condensation.py::_wall_alpha_s
+  - simulator/condensation.py::_pressure_isolated_capture_budget_kg
+status_values:
+  - CITED
+  - UNCERTIFIED
+notes:
+  - >
+    Values marked CITED are literature-grounded Hertz-Knudsen-Langmuir
+    accommodation coefficients adopted for the simulator alpha_s term.
+    They are not direct measurements on every runtime liner surface; surface
+    mismatch is carried in uncertainty_flag and must stay visible to operator
+    fouling diagnostics.
+  - >
+    Values marked UNCERTIFIED are conservative fouling defaults, not literature
+    constants. They remain status-bearing until direct or closer vacuum
+    deposition data exists.
+
+species:
+  Fe:
+    value: 0.02
+    status: CITED
+    source_class: cited_hkl_accommodation
+    source: "REF-016 Costa & Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture."
+    source_url: "https://ntrs.nasa.gov/citations/20150002321"
+    temperature_range_K: [1700, 1800]
+    envelope: [0.011, 0.020]
+    uncertainty_flag: collector_surface_proxy_not_cold_wall_measurement
+    output_status: sourced_with_surface_proxy
+  SiO:
+    value: 0.04
+    status: CITED
+    source_class: cited_hkl_accommodation
+    source: "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq)/Hashimoto alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+    source_url: "https://doi.org/10.1016/j.icarus.2003.08.023"
+    temperature_range_K: [1873, 2373]
+    envelope: [0.003, 0.048]
+    uncertainty_flag: collector_surface_proxy_not_direct_sio_wall_measurement
+    output_status: sourced_with_surface_proxy
+  CrO2:
+    value: 0.90
+    status: UNCERTIFIED
+    source_class: uncertified_conservative_default
+    source: "REF-014 notes no isolated CrO2 Hertz-Knudsen alpha adopted; retain high-capture default as a fouling-conservative placeholder."
+    source_url: "https://doi.org/10.1016/j.gca.2005.08.014"
+    temperature_range_K: not_applicable_uncertified
+    envelope: [0.0, 1.0]
+    uncertainty_flag: no_direct_sticking_coefficient
+    output_status: status_bearing
+  Mg:
+    value: 0.20
+    status: CITED
+    source_class: cited_hkl_accommodation
+    source: "REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer & Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21."
+    source_url: "https://doi.org/10.1016/S0016-7037(01)00782-7"
+    temperature_range_K: [1873, 2373]
+    envelope: [0.10, 0.21]
+    uncertainty_flag: collector_surface_proxy_not_direct_mg_wall_measurement
+    output_status: sourced_with_surface_proxy
+  Na:
+    value: 1.0
+    status: CITED
+    source_class: cited_hkl_accommodation
+    source: "REF-013 Sossi et al. 2019 GCA 260:204 reports near-ideal Na alpha_e~1 in open-furnace ferrobasalt FCMAS melt; high-capture value adopted for alkali wall fouling."
+    source_url: "https://doi.org/10.1016/j.gca.2019.06.021"
+    temperature_range_K: [1700, 2273]
+    envelope: [0.9, 1.0]
+    uncertainty_flag: source_side_open_furnace_to_wall_capture_proxy
+    output_status: sourced_with_surface_proxy
+  K:
+    value: 1.0
+    status: UNCERTIFIED
+    source_class: uncertified_na_analogy_default
+    source: "REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED."
+    source_url: "https://doi.org/10.2138/rmg.2018.84.11"
+    temperature_range_K: [1700, 2273]
+    envelope: [0.8, 1.0]
+    uncertainty_flag: no_direct_k_sticking_coefficient
+    output_status: status_bearing
+  Ca:
+    value: 0.90
+    status: UNCERTIFIED
+    source_class: uncertified_proxy_default
+    source: "Zhang et al. 2014 CaTiO3 melt Ca activity proxy exists for evaporation alpha, but no direct Ca wall/deposition alpha is cited; high-capture default remains UNCERTIFIED."
+    source_url: "https://doi.org/10.1016/j.gca.2014.05.047"
+    temperature_range_K: [2278, 2278]
+    envelope: [0.0, 1.0]
+    uncertainty_flag: no_direct_ca_sticking_coefficient
+    output_status: status_bearing
+  Mn:
+    value: 0.85
+    status: UNCERTIFIED
+    source_class: uncertified_conservative_default
+    source: "REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default."
+    source_url: "https://doi.org/10.1016/j.gca.2005.08.014"
+    temperature_range_K: not_applicable_uncertified
+    envelope: [0.0, 1.0]
+    uncertainty_flag: no_direct_mn_sticking_coefficient
+    output_status: status_bearing
+  Cr:
+    value: 0.90
+    status: UNCERTIFIED
+    source_class: uncertified_conservative_default
+    source: "REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default."
+    source_url: "https://doi.org/10.1016/j.gca.2005.08.014"
+    temperature_range_K: not_applicable_uncertified
+    envelope: [0.0, 1.0]
+    uncertainty_flag: no_direct_cr_sticking_coefficient
+    output_status: status_bearing
+
+unknown_species_default:
+  value: 0.80
+  status: UNCERTIFIED
+  source_class: uncertified_unknown_species_default
+  source: "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default."
+  source_url: null
+  temperature_range_K: not_applicable_uncertified
+  envelope: [0.0, 1.0]
+  uncertainty_flag: no_species_specific_sticking_coefficient
+  output_status: status_bearing
+
+capture_budget_regularizer_floor:
+  value: 0.01
+  status: UNCERTIFIED
+  source_class: numerical_regularizer_not_literature_constant
+  source: "Legacy pressure-isolated capture-budget floor preventing zero normalized temperature driving-force in the provisional pre-pressure-coupling model; not a physical condensation/sticking constant."
+  source_url: null
+  temperature_range_K: not_applicable_numerical
+  usage: simulator/condensation.py::_pressure_isolated_stage_efficiency
+  uncertainty_flag: numerical_safeguard
+  output_status: uncertainty_only

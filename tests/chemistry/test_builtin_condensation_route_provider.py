@@ -63,28 +63,32 @@ from tests.chemistry.conftest import _build_sim
 # legacy fallback row for wall-deposit driving pressure.
 # 2026-06-21 BUG-155: Mars runs now thread CO2 into the production
 # condensation wall-flux path, shifting only the Mars C2A wall baseline.
+# 2026-06-23 D4 grounds default wall/stage alpha_s in
+# data/literature/vacuum_pyrolysis_sticking.yaml. Fe drops 0.9 -> 0.02,
+# Cr remains 0.9, so Fe wall traces drop while Cr traces only move from
+# coupled routing noise.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 5.790501280296902e-12,
-            "Fe": 2.223616561224671e-08,
+            "Cr": 7.3207490926382e-12,
+            "Fe": 1.541752289024554e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 5.790501280296902e-12,
+            "Cr": 7.3207490926382e-12,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 1.83406144703434e-08,
+            "Fe": 1.798012211068989e-09,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 4.068412709531221e-12,
-            "Fe": 1.0434155195809926e-08,
+            "Cr": 4.400474801850113e-12,
+            "Fe": 2.4860913662230566e-10,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 4.068412709531221e-12,
+            "Cr": 4.400474801850113e-12,
         },
     },
 }

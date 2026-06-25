@@ -356,23 +356,21 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         default_route.sticking_alpha_provenance_notice["alpha_s_by_species"][
             "SiO"
         ]
-        == pytest.approx(0.7)
+        == pytest.approx(0.04)
     )
 
     materials_path = tmp_path / "materials.yaml"
     source_path = Path(__file__).resolve().parents[1] / "data" / "materials.yaml"
     materials_path.write_text(
         source_path.read_text().replace(
-            "  SiO:\n"
-            "    value: 0.7\n"
-            "    status: proxy\n"
-            "    source_class: legacy_species_default_proxy\n"
-            "    source: data/materials.yaml::default_alpha_s_by_species.SiO\n",
-            "  SiO:\n"
+            "  SiO: &alpha_SiO\n"
+            "    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value\n",
+            "  SiO: &alpha_SiO\n"
             "    value: 0.23\n"
-            "    status: proxy\n"
-            "    source_class: legacy_species_default_proxy\n"
-            "    source: data/materials.yaml::default_alpha_s_by_species.SiO\n",
+            "    status: UNCERTIFIED\n"
+            "    source_class: test_material_override\n"
+            "    source: tests/test_condensation_temperature_overrides.py\n"
+            "    output_status: status_bearing\n",
             1,
         )
     )
@@ -381,8 +379,8 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
     assert (
         condensation_module.MATERIALS_DATA["default_alpha_s_by_species"][
             "SiO"
-        ]
-        == pytest.approx(0.7)
+        ]["value_ref"]
+        == "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value"
     )
     backend = StubBackend()
     backend.initialize({})
