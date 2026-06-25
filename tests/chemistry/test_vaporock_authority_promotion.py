@@ -1,9 +1,10 @@
-"""Acceptance tests for builtin vapor authority plus VapoRock diagnostics.
+"""Acceptance tests for builtin vapor pressure plus VapoRock diagnostics.
 
 VAPOR_PRESSURE ledger/runtime authority is builtin Antoine/Ellingham.
 VapoRock is retained as a diagnostic shadow: it may produce full gas
 speciation, fail to import, or return a non-authoritative empty pressure
 surface without blocking the builtin pressure dict consumed by evaporation.
+The filename is historical only; VapoRock is diagnostic-only.
 """
 
 from __future__ import annotations

@@ -405,7 +405,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                           block whose ``allow_fallback_vapor`` flag
                           permits an explicitly registered vapor-pressure
                           fallback. Builtin Antoine/Ellingham is the
-                          default authority and VapoRock is diagnostic-only;
+                          default pressure provider; VapoRock is diagnostic-only;
                           the flag defaults to ``False`` (loud
                           :class:`ProviderUnavailableError` instead of
                           silent fallback).

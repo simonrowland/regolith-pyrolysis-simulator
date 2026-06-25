@@ -24,9 +24,8 @@ License: see upstream VapoRock repository (Wolfe et al.).  Cite:
 
 Intended call sites
 -------------------
-This adapter is intended to shadow / replace the vapor-pressure path in
-``simulator/core.py::_calculate_evaporation`` once the melt-backend
-multiplexer routes vapor-side queries to a capability holder.  See also
+This adapter is intended to support the diagnostic VapoRock shadow beside
+the builtin Antoine/Ellingham ``VAPOR_PRESSURE`` provider.  See also
 ``AlphaMELTSBackend._get_vaporock_pressures`` which is the existing
 in-line user of the same library — that path remains for backward
 compatibility; this adapter exposes VapoRock as a first-class
@@ -47,10 +46,9 @@ installed.
 
 Authority posture
 -----------------
-VapoRock is **not yet wired into any active call site** — nothing
-instantiates ``VapoRockBackend`` outside the test suite.  The
-shadow/multiplexer runner described under "Intended call sites" above is
-still future work (see the chemistry-kernel carve-out goal).
+VapoRock is diagnostic-only in active kernel wiring. Builtin
+Antoine/Ellingham supplies the authoritative ``VAPOR_PRESSURE`` dict
+consumed by evaporation; VapoRock may run beside it as a shadow surface.
 
 If this adapter *were* selected as the active melt backend today, it
 would NOT silently produce a usable equilibrium: ``equilibrate()``
@@ -67,9 +65,11 @@ through ``_get_equilibrium`` as a phase solver.
 
 ``EquilibriumResult.ledger_transition`` is never populated and
 ``ledger_account_policies()`` returns no ledger-authoritative policy:
-VapoRock has no ``AtomLedger`` authority and must not be granted any
-until the ``VAPOROCK-AUTHORITY-PROMOTION`` goal (and even then only for
-``VAPOR_PRESSURE``).  ``equilibrate()`` consumes only the cleaned
+VapoRock has no ``AtomLedger`` policy and must not be granted ledger
+authority. The historical goal name ``VAPOROCK-AUTHORITY-PROMOTION`` remains
+for compatibility only;
+VapoRock is diagnostic-only for ``VAPOR_PRESSURE``. ``equilibrate()``
+consumes only the cleaned
 silicate melt — non-melt ledger accounts (gas, metal, salt, sulfide,
 halide) are filtered out before the library is called.
 
@@ -458,8 +458,9 @@ class VapoRockBackend(MeltBackend):
 
         VapoRock is vapor-side / diagnostic: it returns partial pressures,
         never a ledger-authoritative transition.  The evaporation flux and
-        the melt-debit/gas-credit transition stay with the builtin engine
-        until ``VAPOROCK-AUTHORITY-PROMOTION``.  Returning an empty tuple
+        the melt-debit/gas-credit transition stay with the builtin engine.
+        The ``VAPOROCK-AUTHORITY-PROMOTION`` name is historical only.
+        Returning an empty tuple
         keeps the layered-ABC contract explicit (same posture as
         ``AlphaMELTSBackend.ledger_account_policies``).
         """

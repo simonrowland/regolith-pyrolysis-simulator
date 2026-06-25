@@ -446,7 +446,7 @@ def warn_pseudo_vapor_pressure_fallback(
         f"{prefix}: {key} vapor pressure uses a backsolved VapoRock "
         "fallback (curve-fit), NOT first-principles; "
         f"residual_dex={residual}; confidence_tier={tier}; "
-        "VapoRock is diagnostic-only; builtin remains authoritative.",
+        "builtin remains authoritative; VapoRock is diagnostic-only.",
         category,
         stacklevel=stacklevel,
     )

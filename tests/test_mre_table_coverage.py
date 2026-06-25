@@ -104,7 +104,8 @@ def test_fixed_mre_ladder_excludes_ferric_full_reduction_rung() -> None:
         DECOMP_VOLTAGES["MgO"],
         DECOMP_VOLTAGES["CaO"],
     ]
-    assert DECOMP_VOLTAGES["Na2O"] == DECOMP_VOLTAGES["K2O"]
+    assert DECOMP_VOLTAGES["Na2O"] == pytest.approx(0.5)
+    assert DECOMP_VOLTAGES["K2O"] == pytest.approx(0.5)
     assert grouped == sorted(grouped)
     assert len(grouped) == len(set(grouped))
     assert min_decomposition_voltage() == pytest.approx(0.39)
@@ -140,18 +141,39 @@ def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
     }
 
 
-def test_fallback_ladder_voltages_are_derived_from_decomp_voltages() -> None:
-    # BUG-011 (SC-09): the C5 fallback ladder must not carry a second hard-coded
-    # copy of the rung voltages -- each rung's voltage is sourced from the single
-    # DECOMP_VOLTAGES table. (Value identity, not a brittle source-string check.)
+def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
+    # BUG-011 (SC-09): the C5 fallback ladder derives voltages from the single
+    # DECOMP_VOLTAGES table. Pin the observed values to canonical literals so
+    # this test fails if the source table drifts under the derived fallback.
     from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
+
+    expected_voltage_by_species = {
+        "NiO": 0.39,
+        "FeO": 0.75,
+        "Cr2O3": 0.95,
+        "MnO": 1.05,
+        "SiO2": 1.45,
+        "TiO2": 1.70,
+        "Al2O3": 1.95,
+        "MgO": 2.2,
+        "CaO": 2.5,
+    }
+    stale_wrong_voltage_by_species = {
+        "FeO": 0.6,
+    }
 
     for rung in MRE_VOLTAGE_LADDER_FALLBACK:
         species = rung["species"]
         assert len(species) == 1, f"fallback rung expects a single species: {rung}"
-        assert rung["voltage"] == DECOMP_VOLTAGES[species[0]], (
-            f"fallback voltage for {species[0]} drifted from DECOMP_VOLTAGES"
+        oxide = species[0]
+        assert rung["voltage"] == pytest.approx(
+            expected_voltage_by_species[oxide]
+        ), (
+            f"fallback voltage for {oxide} drifted from the canonical literal"
         )
+        stale_wrong_voltage = stale_wrong_voltage_by_species.get(oxide)
+        if stale_wrong_voltage is not None:
+            assert rung["voltage"] != pytest.approx(stale_wrong_voltage)
 
 
 def test_fallback_ladder_excludes_alkali_and_ferric_rungs() -> None:

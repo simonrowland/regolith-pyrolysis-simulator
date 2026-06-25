@@ -59,19 +59,20 @@ def _build_sim(
     :class:`VapoRockProvider` registered for the build is forced to
     report itself unavailable.  Together these route every
     ``VAPOR_PRESSURE`` dispatch through the registered builtin Antoine
-    fallback -- the call path these chemistry-suite tests were written
-    against under goal #7.  Goal #10
-    ``VAPOROCK-AUTHORITY-PROMOTION`` made VapoRock the authoritative
-    holder of the intent; setting ``builtin_vapor_pressure=False``
-    opts into the new path (used by
-    ``test_vaporock_authority_promotion.py``).
+    provider -- the call path these chemistry-suite tests were written
+    against under goal #7.  The
+    ``VAPOROCK-AUTHORITY-PROMOTION`` name is historical only: builtin
+    Antoine/Ellingham is the authoritative ``VAPOR_PRESSURE`` provider,
+    and VapoRock is a diagnostic-only shadow. Setting
+    ``builtin_vapor_pressure=False`` exercises the non-forced diagnostic
+    wiring used by ``test_vaporock_authority_promotion.py``.
     """
 
     backend = StubBackend()
     backend.initialize({})
     if builtin_vapor_pressure:
-        # Goal #10: ensure the simulator wiring opts into the fallback
-        # path for these tests.  A shallow copy keeps the
+        # Goal #10 historical name only: keep these tests on the builtin
+        # authoritative path. A shallow copy keeps the
         # module-scoped fixture immutable across tests; deepcopy is
         # avoided to keep the simulator's references to the
         # campaign/condensation dicts identical to the un-patched
@@ -91,7 +92,8 @@ def _build_sim(
     if builtin_vapor_pressure:
         # The kernel registry is built lazily by ``load_batch``; force
         # VapoRock's availability probe to fail before the first
-        # dispatch so the fallback fires.  This mirrors the
+        # dispatch so the builtin path is isolated from optional
+        # VapoRock diagnostics. This mirrors the
         # environment-level expectation that VapoRock is optional --
         # the chemistry-suite tests stay green even when the
         # upstream library is installed.

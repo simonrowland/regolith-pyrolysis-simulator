@@ -27,5 +27,5 @@ flip the legacy call site, remove the shadow comparison.
 VAPOR_PRESSURE: **authoritative** (builtin Antoine/Ellingham). Result is
 diagnostic — `transition=None` — because VAPOR_PRESSURE owns no ledger
 mutation (vapor pressures are an input to `EVAPORATION_FLUX`, which is the
-intent that emits the LedgerTransition). VapoRock will demote builtin
-here only after `\goal VAPOROCK-AUTHORITY-PROMOTION` (#10).
+intent that emits the LedgerTransition). VapoRock is a diagnostic-only
+shadow; `\goal VAPOROCK-AUTHORITY-PROMOTION` (#10) is a historical name only.

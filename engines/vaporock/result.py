@@ -9,8 +9,8 @@ attaches an instance of this class (projected to a plain dict) on
 
 Schema:
 
-* ``vapor_pressures_Pa`` -- always empty. VapoRock has no authoritative
-  pressure surface for evaporation.
+* ``vapor_pressures_Pa`` -- always empty. The authoritative pressure surface
+  for evaporation is builtin Antoine/Ellingham.
 * ``vaporock_full_speciation_Pa`` -- unfiltered VapoRock gas speciation
   map for diagnostics, benchmarks, and cross-engine analysis only.
 * ``activities`` -- ``species -> activity`` map (matches the

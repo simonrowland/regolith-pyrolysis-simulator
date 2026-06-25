@@ -5,11 +5,11 @@
 
 This file consumes the corpus-anchored fixture loader from
 :mod:`tests.chemistry.corpus_fixtures` and parametrizes every anchor
-across both VAPOR_PRESSURE providers:
+across both VAPOR_PRESSURE surfaces:
 
-- VapoRock (authoritative under \\goal VAPOROCK-AUTHORITY-PROMOTION).
-- Builtin Antoine (the fallback the kernel routes to when VapoRock is
-  unavailable AND ``allow_fallback_vapor=True``).
+- Builtin Antoine/Ellingham (authoritative ``VAPOR_PRESSURE`` provider).
+- VapoRock (diagnostic-only shadow; ``VAPOROCK-AUTHORITY-PROMOTION`` is a
+  historical goal name only).
 
 Both engines are invoked through the kernel's :meth:`ChemistryKernel.dispatch`
 surface — the test never calls ``backend.equilibrate()`` directly. This
@@ -219,8 +219,8 @@ def _dispatch_vapor_pressure(
     The fO2 channel uses the anchor's own value (Kress91 IW or per-body
     override), not the simulator's intrinsic-melt fO2 estimator. Builtin
     cases return the authoritative result. VapoRock cases return the shadow
-    diagnostic full-speciation surface so diagnostic parity is still checked
-    without treating VapoRock as authoritative.
+    diagnostic full-speciation surface so parity is checked while builtin
+    remains the source consumed by evaporation.
     """
     pO2_bar = max(10.0 ** anchor.fO2_log, 1e-9)
     engine = getattr(sim, "_corpus_vapor_engine", "builtin-antoine")

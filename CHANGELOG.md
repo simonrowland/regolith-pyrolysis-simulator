@@ -486,7 +486,8 @@ way around"). Mass-balance closure under the full default-on stack: **2.19 × 10
 - **`simulator/chemistry/kernel`** — explicit per-intent authority surface:
   - `SILICATE_EQUILIBRIUM` (AlphaMELTS/ThermoEngine), `SILICATE_LIQUIDUS`
     + `SILICATE_SOLIDUS` (MAGEMin liquidus finder), `EQUILIBRIUM_CRYSTALLIZATION`
-    (continuous `liquid_fraction(T)`), `VAPOR_PRESSURE` (VapoRock authoritative),
+    (continuous `liquid_fraction(T)`), `VAPOR_PRESSURE` (builtin
+    Antoine/Ellingham authoritative; VapoRock diagnostic shadow),
     `GATE_LIQUID_FRACTION` (freeze-gate consumer of EC path).
   - L0–L5 commits route legacy callers through the kernel diagnostically before
     flipping authority.
@@ -708,8 +709,9 @@ fully testable headlessly. Cross-surface scientific parity verified **exact**.
 ### Baseline capabilities (already on `main` before 0.1.0)
 - Mol-native atom ledger; `commit_batch` is the sole transition writer (with documented
   seeding/exempt exceptions); per-intent engine authority.
-- VapoRock authoritative for vapor pressure — triply validated (Wolf-2022 adapter 0.008
-  dex, literature 0.08 dex, MAGEMin shadow no-divergence); MAGEMin shadow engine wired;
+- Builtin Antoine/Ellingham authoritative for vapor pressure; VapoRock diagnostic
+  shadow triply benchmarked (Wolf-2022 adapter 0.008 dex, literature 0.08 dex,
+  MAGEMin shadow no-divergence); MAGEMin shadow engine wired;
   AlphaMELTS diagnostic-only.
 - Per-species `wall_deposit_kg` ledger + fouling-rate verdict; band-aware
   Hertz-Knudsen-Langmuir condensation law.

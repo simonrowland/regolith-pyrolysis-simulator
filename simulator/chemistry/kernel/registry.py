@@ -9,7 +9,7 @@ but never committed).  Conflicting
 authoritative or fallback registrations raise :class:`KernelError`.
 
 The fallback slot was added under \\goal VAPOROCK-AUTHORITY-PROMOTION
-(#10), but VAPOR_PRESSURE now uses builtin Antoine/Ellingham as the
+(#10; historical name only), but VAPOR_PRESSURE now uses builtin Antoine/Ellingham as the
 authoritative surface and VapoRock as a diagnostic shadow. The fallback
 slot remains generic: it only runs when ``ChemistryKernel.dispatch``
 receives the matching ``allow_fallback_<intent>`` opt-in -- silent
@@ -337,8 +337,8 @@ class ProviderRegistry:
         ``CapabilityProfile.provider_id`` (a string) for the
         authoritative / fallback slot or ``None`` when no provider is
         registered there, and the shadow slot holds a tuple of
-        provider_ids.  Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` binds
-        this surface: the active authoritative/shadow split for
+        provider_ids.  Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` is a
+        historical name only: the active authoritative/shadow split for
         VAPOR_PRESSURE is auditable from a single read of this dict.
         """
 

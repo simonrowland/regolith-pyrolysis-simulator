@@ -207,7 +207,8 @@ def build_atom_balance_proof(
     false :class:`AtomBalanceError` when the kernel's kg-projected
     re-derivation lands at ULP precision for a large enough flux (the
     canonical example is SiO disproportionation under VapoRock's
-    larger SiO output -- goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``).
+    larger diagnostic SiO output -- goal #10
+    ``VAPOROCK-AUTHORITY-PROMOTION`` is a historical name only).
     Filtering at the helper layer keeps the proof's contract honest
     ("entries the provider made a deliberate non-trivial claim
     about") and matches the docstring's "should be ~0 within atom

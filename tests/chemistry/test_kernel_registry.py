@@ -200,7 +200,8 @@ def test_register_idempotent_rejects_non_intent_value():
 
 
 # ---------------------------------------------------------------------
-# Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: fallback slot semantics
+# Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` is a historical name only:
+# fallback slot semantics with builtin pressure provider plus diagnostics.
 # ---------------------------------------------------------------------
 
 

@@ -552,8 +552,8 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     earlier first-agreeing-species short-circuit comparison with explicit
     SiO + Na assertions against literature anchors. The short-circuit was
     hiding a 3.4-decade SiO divergence between the builtin Antoine and
-    VapoRock; the §13 archive flagged this as the load-bearing question
-    blocking VapoRock authority promotion.
+    VapoRock; the §13 archive flagged this as the load-bearing diagnostic
+    parity question. Builtin remains authoritative.
 
     The Phase 1 investigation (``docs-private/sio-parity-investigation-
     2026-05-16.md``) established three facts that shape this test:

@@ -7,9 +7,8 @@ exposes its gas speciation as a kernel-registered diagnostic shadow for
 
 Authority posture
 -----------------
-VapoRock is **not** authoritative for VAPOR_PRESSURE. Builtin
-Antoine/Ellingham owns the pressure dict consumed by evaporation; VapoRock
-may run beside it as a diagnostic overlay.
+Builtin Antoine/Ellingham owns the authoritative ``VAPOR_PRESSURE`` dict
+consumed by evaporation. VapoRock may run beside it as a diagnostic overlay.
 
 The intent itself is read-only / diagnostic at the kernel level:
 :attr:`IntentResult.transition` is always ``None``. Downstream

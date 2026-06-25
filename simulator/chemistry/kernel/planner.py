@@ -298,7 +298,7 @@ class ChemistryKernel:
         # Set of intents the kernel is allowed to retry against the
         # registered fallback provider when the authoritative provider
         # raises :class:`ProviderUnavailableError`.  Goal #10
-        # ``VAPOROCK-AUTHORITY-PROMOTION`` binds this surface: silent
+        # ``VAPOROCK-AUTHORITY-PROMOTION`` is a historical name only: silent
         # fallback is forbidden, so the kernel only consults the
         # fallback when the caller has explicitly opted in for the
         # intent (typically via a per-intent simulator config flag like
@@ -432,8 +432,8 @@ class ChemistryKernel:
                 role="fallback",
             )
         except ProviderUnavailableError:
-            # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION``: authority swap
-            # without silent fallback.  The kernel only consults the
+            # Goal #10 ``VAPOROCK-AUTHORITY-PROMOTION`` historical name:
+            # fallback without silent downgrade. The kernel only consults the
             # registered fallback when the caller opted in for THIS
             # intent.  Otherwise re-raise -- the contract is loud
             # failure, not a quiet downgrade.
