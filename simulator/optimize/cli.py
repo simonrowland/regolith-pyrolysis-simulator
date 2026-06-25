@@ -41,6 +41,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 source_store=args.source_store,
                 certify_cache_key=args.cache_key,
                 out_dir=args.out,
+                pinned_paths=args.pin,
             )
         else:
             two_phase_certify = None
@@ -58,6 +59,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 out_dir=args.out,
                 seed=args.seed,
                 two_phase_certify=two_phase_certify,
+                pinned_paths=args.pin,
             )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         _write_job_status(
@@ -105,6 +107,13 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--budget", type=_positive_int, required=True, help="evaluation budget")
     parser.add_argument("--out", type=Path, default=None, help="artifact output directory")
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
+    parser.add_argument(
+        "--pin",
+        action="append",
+        default=[],
+        metavar="DOTTED.PATH",
+        help="freeze an optimizer knob at its loaded default; repeatable",
+    )
     parser.add_argument(
         "--two-phase-certify",
         action="store_true",

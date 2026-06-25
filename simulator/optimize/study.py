@@ -301,10 +301,11 @@ def run(
     constraints: Any = None,
     topologies: Sequence[Any] | None = None,
     two_phase_certify: bool | Mapping[str, Any] | None = None,
+    pinned_paths: Sequence[str] | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
-    active_schema = schema or RecipeSchema()
+    base_schema = schema or RecipeSchema()
     config = StudyConfig(
         profile=profile,
         feedstock=feedstock,
@@ -319,12 +320,17 @@ def run(
         resolved_profile = resolve_profile(
             config.profile,
             expected_feedstock=config.feedstock,
-            schema=active_schema,
+            schema=base_schema,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
         resolved_profile = dict(config.profile)
+    active_schema = _schema_with_pinned_paths(
+        base_schema,
+        resolved_profile,
+        cli_pinned_paths=pinned_paths,
+    )
     definitions = objective_definitions(resolved_profile)
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
@@ -561,10 +567,11 @@ def run_certify(
     *,
     evaluator: EvaluateFn = evaluate,
     schema: RecipeSchema | None = None,
+    pinned_paths: Sequence[str] | None = None,
 ) -> StudyResult:
     """Re-evaluate one stored optimizer result with exact live-fill certification."""
 
-    active_schema = schema or RecipeSchema()
+    base_schema = schema or RecipeSchema()
     config = StudyConfig(
         profile=profile,
         feedstock=feedstock,
@@ -579,12 +586,17 @@ def run_certify(
         resolved_profile = resolve_profile(
             config.profile,
             expected_feedstock=config.feedstock,
-            schema=active_schema,
+            schema=base_schema,
         )
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
         resolved_profile = dict(config.profile)
+    active_schema = _schema_with_pinned_paths(
+        base_schema,
+        resolved_profile,
+        cli_pinned_paths=pinned_paths,
+    )
     definitions = objective_definitions(resolved_profile)
     _validate_inputs(config, resolved_profile)
     try:
@@ -911,6 +923,47 @@ def _run_exact_certification(
         winner=winner,
         artifact=artifact,
     )
+
+
+def _schema_with_pinned_paths(
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+    *,
+    cli_pinned_paths: Sequence[str] | None,
+) -> RecipeSchema:
+    pins = _profile_pinned_paths(profile) + _cli_pinned_paths(cli_pinned_paths)
+    return schema.with_pinned_paths(pins)
+
+
+def _profile_pinned_paths(profile: Mapping[str, Any]) -> tuple[str, ...]:
+    raw = profile.get("pinned_paths", ())
+    if raw is None:
+        return ()
+    if isinstance(raw, str) or not isinstance(raw, Sequence):
+        raise ProfileValidationError(
+            "profile.pinned_paths must be a list of dotted paths"
+        )
+    pins: list[str] = []
+    for index, path in enumerate(raw):
+        if not isinstance(path, str):
+            raise ProfileValidationError(
+                f"profile.pinned_paths[{index}] must be a dotted path string"
+            )
+        pins.append(path)
+    return tuple(pins)
+
+
+def _cli_pinned_paths(raw: Sequence[str] | None) -> tuple[str, ...]:
+    if raw is None:
+        return ()
+    if isinstance(raw, str) or not isinstance(raw, Sequence):
+        raise ValueError("--pin must be provided as dotted path strings")
+    pins: list[str] = []
+    for index, path in enumerate(raw):
+        if not isinstance(path, str):
+            raise ValueError(f"--pin entry {index} must be a dotted path string")
+        pins.append(path)
+    return tuple(pins)
 
 
 def resolve_profile(

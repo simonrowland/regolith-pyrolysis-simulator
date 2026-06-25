@@ -9,7 +9,8 @@ import hashlib
 import math
 from fnmatch import fnmatchcase
 from types import MappingProxyType
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, Mapping, Sequence
+import warnings
 
 import yaml
 
@@ -99,6 +100,10 @@ C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyTyp
 
 class RecipeValidationError(ValueError):
     """Raised when a recipe patch attempts an unsafe or unknown mutation."""
+
+
+class RecipePinWarning(UserWarning):
+    """Warns when an optimizer pin names a knob that is already not searched."""
 
 
 @dataclass(frozen=True)
@@ -890,6 +895,7 @@ class RecipeSchema:
         forbidden_prefixes: tuple[str, ...] | None = None,
         recipe_schema_version: str | None = None,
         allowlist_version: str | None = None,
+        pinned_paths: Sequence[str | KeyPath] | None = None,
     ) -> None:
         # Treat the class allowlist as a template even when passed explicitly, so
         # source-fingerprinted bounds (notably C5 MRE cap) refresh on use.
@@ -918,10 +924,30 @@ class RecipeSchema:
             else type(self).allowlist_version
         )
         self._spec_by_path = {spec.path: spec for spec in self.allowlist}
+        if pinned_paths:
+            self.allowlist, resolved_pins = _apply_pinned_paths(self, pinned_paths)
+            self._spec_by_path = {spec.path: spec for spec in self.allowlist}
+            self.pinned_paths = resolved_pins
+        else:
+            self.pinned_paths = ()
 
     @property
     def search_allowlist(self) -> tuple[KnobSpec, ...]:
         return tuple(spec for spec in self.allowlist if spec.search_enabled)
+
+    def with_pinned_paths(
+        self,
+        pinned_paths: Sequence[str | KeyPath] | None,
+    ) -> "RecipeSchema":
+        if not pinned_paths:
+            return self
+        return type(self)(
+            allowlist=self.allowlist,
+            forbidden_prefixes=self.forbidden_prefixes,
+            recipe_schema_version=self.recipe_schema_version,
+            allowlist_version=self.allowlist_version,
+            pinned_paths=pinned_paths,
+        )
 
     def spec_for(self, path: KeyPath) -> KnobSpec:
         normalized = _normalize_key_path(path)
@@ -1165,6 +1191,91 @@ def _cached_default_allowlist(
         else spec
         for spec in template_allowlist
     )
+
+
+def _apply_pinned_paths(
+    schema: RecipeSchema,
+    pinned_paths: Sequence[str | KeyPath],
+) -> tuple[tuple[KnobSpec, ...], tuple[KeyPath, ...]]:
+    pinned: set[KeyPath] = set()
+    resolved: list[KeyPath] = []
+    spec_by_path = dict(schema._spec_by_path)
+
+    for raw_path in pinned_paths:
+        parsed = _coerce_pinned_path(raw_path)
+        path = _resolve_pin_path(parsed, spec_by_path)
+        if schema.is_forbidden(path):
+            raise RecipeValidationError(
+                f"forbidden recipe pin path: {_format_path(path)}"
+            )
+        spec = spec_by_path.get(path)
+        if spec is None:
+            reason = _already_fixed_pin_reason(path)
+            if reason:
+                warnings.warn(
+                    f"WARNING: optimizer pin {_format_path(path)} already fixed; "
+                    f"{reason}",
+                    RecipePinWarning,
+                    stacklevel=3,
+                )
+                continue
+            raise RecipeValidationError(
+                f"pin path matches no optimizer knob: {_format_path(parsed)}"
+            )
+        if not spec.search_enabled:
+            warnings.warn(
+                f"WARNING: optimizer pin {_format_path(path)} already fixed; "
+                "knob is not in optimizer search_allowlist",
+                RecipePinWarning,
+                stacklevel=3,
+            )
+            continue
+        if path not in pinned:
+            resolved.append(path)
+        pinned.add(path)
+
+    if not pinned:
+        return schema.allowlist, ()
+    return (
+        tuple(
+            replace(spec, search_enabled=False) if spec.path in pinned else spec
+            for spec in schema.allowlist
+        ),
+        tuple(resolved),
+    )
+
+
+def _coerce_pinned_path(path: str | KeyPath) -> KeyPath:
+    if isinstance(path, str):
+        return _normalize_key_path(tuple(path.split(".")))
+    return _normalize_key_path(path)
+
+
+def _resolve_pin_path(
+    path: KeyPath,
+    spec_by_path: Mapping[KeyPath, KnobSpec],
+) -> KeyPath:
+    if path in spec_by_path or _already_fixed_pin_reason(path):
+        return path
+    if path[0] != "campaigns":
+        campaign_path = ("campaigns",) + path
+        if campaign_path in spec_by_path or _already_fixed_pin_reason(campaign_path):
+            return campaign_path
+    return path
+
+
+def _already_fixed_pin_reason(path: KeyPath) -> str:
+    if (
+        len(path) == 5
+        and path[:3] == C2A_STAGED_STAGES_PATH
+        and path[3] == "fe_hot_hold"
+        and path[4] == "target_C"
+    ):
+        return (
+            "C2A_staged.stages.fe_hot_hold has no per-stage target_C knob; "
+            "pin ignored"
+        )
+    return ""
 
 
 @dataclass(frozen=True)

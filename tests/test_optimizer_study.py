@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import csv
 from dataclasses import is_dataclass, fields, replace
 import json
@@ -575,6 +576,58 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["pinned_paths"] = ["C2A_staged.stages.alkali_early_fe.target_C"]
+    profile_pin = (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "alkali_early_fe",
+        "target_C",
+    )
+    cli_pin = (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "sio_window",
+        "target_C",
+    )
+    searched_pressure = ("campaigns", "C2A_staged", "p_total_mbar")
+    searched_ramp = (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "sio_window",
+        "ramp_rate_C_per_hr",
+    )
+    observed_paths: list[set[tuple[str, ...]]] = []
+    base_evaluator = _evaluator()
+
+    def evaluator(patch: RecipePatch, *args: Any, **kwargs: Any) -> ScoredResult:
+        observed_paths.append(set(patch.values))
+        return base_evaluator(patch, *args, **kwargs)
+
+    study.run(
+        profile,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        1,
+        tmp_path,
+        seed=7,
+        evaluator=evaluator,
+        pinned_paths=["C2A_staged.stages.sio_window.target_C"],
+    )
+
+    assert observed_paths
+    assert profile_pin not in observed_paths[0]
+    assert cli_pin not in observed_paths[0]
+    assert searched_pressure in observed_paths[0]
+    assert searched_ramp in observed_paths[0]
 
 
 def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> None:
@@ -1915,6 +1968,31 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert bad_budget.returncode != 0
     assert "must be positive" in bad_budget.stderr
 
+    bad_pin = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.optimize",
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            "default",
+            "--strategy",
+            "random",
+            "--fidelity",
+            "stub",
+            "--budget",
+            "1",
+            "--pin",
+            "C2A_staged.stages.sio_window.not_a_knob",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert bad_pin.returncode != 0
+    assert "pin path matches no optimizer knob" in bad_pin.stderr
+
     existing_file = tmp_path / "not-a-directory"
     existing_file.write_text("occupied", encoding="utf-8")
     bad_out = subprocess.run(
@@ -2001,6 +2079,46 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert status["status"] == "SUCCEEDED"
     assert status["success"] is True
     assert status["winner_candidate_id"]
+
+
+def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_run(**kwargs: Any) -> SimpleNamespace:
+        captured.update(kwargs)
+        return SimpleNamespace(
+            out_dir=kwargs["out_dir"],
+            winner=SimpleNamespace(candidate_id="winner"),
+        )
+
+    monkeypatch.setattr(optimizer_cli, "run", fake_run)
+
+    result = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            "default",
+            "--strategy",
+            "random",
+            "--fidelity",
+            "stub",
+            "--budget",
+            "1",
+            "--out",
+            str(tmp_path),
+            "--pin",
+            "C2A_staged.stages.alkali_early_fe.target_C",
+            "--pin",
+            "C2A_staged.stages.sio_window.target_C",
+        ]
+    )
+
+    assert result == 0
+    assert captured["pinned_paths"] == [
+        "C2A_staged.stages.alkali_early_fe.target_C",
+        "C2A_staged.stages.sio_window.target_C",
+    ]
 
 
 def test_cli_writes_failure_job_status_marker_for_no_feasible(

@@ -67,6 +67,23 @@ def test_two_phase_certify_rejects_invalid_top_k() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_profile_pinned_paths_schema_key_validates() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["pinned_paths"] = ["C2A_staged.stages.sio_window.target_C"]
+
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+    assert validated["pinned_paths"] == ["C2A_staged.stages.sio_window.target_C"]
+
+
+def test_profile_pinned_paths_rejects_invalid_entries() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["pinned_paths"] = ["C2A_staged.stages.sio_window.target_C", ""]
+
+    with pytest.raises(ProfileValidationError, match="pinned_paths\\[1\\]"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
     feedstocks = yaml.safe_load((DEFAULT_DATA_DIR / "feedstocks.yaml").read_text())
     blocked_feedstocks = {

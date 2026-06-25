@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import replace
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -22,13 +23,16 @@ from simulator.optimize.recipe import (
     FURNACE_MAX_T_C_PATH,
     KnobSpec,
     RecipePatch,
+    RecipePinWarning,
     RecipeSchema,
     RecipeValidationError,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
 )
 import simulator.optimize.recipe as recipe_module
-from simulator.optimize.evalspec import EvalSpec, canonical_evalspec_json
+from simulator.optimize.canonical import canonical_json_dumps
+from simulator.optimize.evaluate import _build_eval_inputs
+from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun
@@ -177,6 +181,124 @@ def test_forbidden_prefix_wins_over_overlapping_allowlist() -> None:
 
     with pytest.raises(RecipeValidationError, match="forbidden recipe path"):
         RecipePatch({PRODUCT_TARGET: 1.0}).validated(schema)
+
+
+def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
+    target_paths = (
+        ("campaigns", "C2A_staged", "stages", "alkali_early_fe", "target_C"),
+        ("campaigns", "C2A_staged", "stages", "sio_window", "target_C"),
+        ("campaigns", "C2A_staged", "stages", "cool_for_na_shuttle", "target_C"),
+    )
+    schema = RecipeSchema(
+        pinned_paths=[
+            "C2A_staged.stages.alkali_early_fe.target_C",
+            "C2A_staged.stages.sio_window.target_C",
+            "C2A_staged.stages.cool_for_na_shuttle.target_C",
+        ]
+    )
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    for path in target_paths:
+        assert path not in search_paths
+        spec = schema.spec_for(path)
+        assert spec.search_enabled is False
+        assert spec.runtime_enabled is True
+    assert ("campaigns", "C2A_staged", "p_total_mbar") in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "alkali_early_fe",
+        "ramp_rate_C_per_hr",
+    ) in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "sio_window",
+        "duration_h",
+    ) in search_paths
+    assert ("campaigns", "C2B", "pO2_mbar") in search_paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "stages",
+        "fe_hot_hold",
+        "target_C",
+    ) not in {spec.path for spec in schema.allowlist}
+
+
+def test_pin_unknown_or_forbidden_path_fails_loudly() -> None:
+    with pytest.raises(RecipeValidationError, match="pin path matches no optimizer knob"):
+        RecipeSchema(pinned_paths=["C2A_staged.stages.sio_window.not_a_knob"])
+
+    with pytest.raises(RecipeValidationError, match="forbidden recipe pin path"):
+        RecipeSchema(pinned_paths=["mass_balance.gap_pct"])
+
+
+def test_pin_already_fixed_fe_hot_hold_target_warns_without_changing_search() -> None:
+    baseline = RecipeSchema()
+    baseline_paths = tuple(spec.path for spec in baseline.search_allowlist)
+
+    with pytest.warns(RecipePinWarning, match="already fixed.*fe_hot_hold.*target_C"):
+        schema = RecipeSchema(pinned_paths=["C2A_staged.stages.fe_hot_hold.target_C"])
+
+    assert tuple(spec.path for spec in schema.search_allowlist) == baseline_paths
+
+
+def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
+    profile = {
+        "profile_id": "pin-golden-neutral-test",
+        "profile_schema_version": "profile-schema-v1",
+        "feedstock": FEEDSTOCK,
+        "objectives": [
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "test oxygen objective evidence",
+            },
+        ],
+        "constraints": {"gates": ["delivered_stream_purity"]},
+        "run": {
+            "campaign": "C0",
+            "hours": 1,
+            "mass_kg": 1000.0,
+            "backend_name": "stub",
+        },
+        "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+        "seed_recipes": [
+            {
+                "id": "seed",
+                "source_campaign": "C0",
+                "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+            },
+        ],
+    }
+    schema = RecipeSchema()
+    unpinned = schema.with_pinned_paths(())
+    paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
+
+    assert unpinned is schema
+    assert len(paths) == 71
+    assert (
+        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
+        == "46fd1f15195082480da94555bdbe43d58205feba0d23d02d3cda958641776821"
+    )
+    spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        FEEDSTOCK,
+        "stub",
+        profile,
+        unpinned,
+    )
+    assert spec.recipe_id == "1b7fdd61c541f5e7f2d77402044e7eb94ab161dbf0af3f18d0e1b9d28a7277dc"
+    # cache_key includes the source-module digest, so it legitimately moves on any
+    # source edit to the digested modules (incl. docstring/comment-only changes such
+    # as the deb2852 VapoRock-diagnostic doc-drift). Re-pin to current main when that
+    # happens — recipe_id (above) is the identity surface and stays stable.
+    assert cache_key(spec) == "db7ded3f57621980147c466d3fbf20c8fefe7395f6d52fce7d5859bcbbf8b48b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from pathlib import Path
 from types import MappingProxyType
@@ -73,6 +73,7 @@ _TOP_LEVEL_KEYS = frozenset(
         "run",
         "fidelities",
         "seed_recipes",
+        "pinned_paths",
         "early_tap_mode",
         "staged",
         "staged_strategy",
@@ -263,6 +264,7 @@ def validate_profile(
     )
     _validate_thermal_window_caps(profile, source=source)
     _validate_two_phase_certify(profile.get("two_phase_certify"), source=source)
+    _validate_pinned_paths(profile.get("pinned_paths"), source=source)
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
@@ -419,6 +421,29 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
                 )
     if "target_species" in raw:
         _validate_target_species(raw["target_species"], source=source)
+
+
+def _validate_pinned_paths(raw: Any, *, source: str | Path) -> None:
+    if raw is None:
+        return
+    if isinstance(raw, str) or not isinstance(raw, Sequence):
+        raise ProfileValidationError(
+            f"{source}: pinned_paths must be a list of dotted paths"
+        )
+    seen: set[str] = set()
+    for index, path in enumerate(raw):
+        where = f"pinned_paths[{index}]"
+        if not isinstance(path, str) or not path or path.strip() != path:
+            raise ProfileValidationError(
+                f"{source}: {where} must be a non-empty dotted path string"
+            )
+        if any(not segment for segment in path.split(".")):
+            raise ProfileValidationError(
+                f"{source}: {where} must not contain empty path segments"
+            )
+        if path in seen:
+            raise ProfileValidationError(f"{source}: duplicate pinned path {path!r}")
+        seen.add(path)
 
 
 def _validate_pool_scoped_constraints(profile: Mapping[str, Any], *, source: str | Path) -> None:
