@@ -19,6 +19,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.accounting.queries import TERMINAL_RUMP_CLASS_TOLERANCE_PCT
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import (
@@ -228,6 +229,57 @@ def test_rump_reads_terminal_rump_method():
         result['refractory_ceramic_rump']['rump_kg_by_species']
         == {'CaO': 5.0, 'REE_oxides': 0.5}
     )
+
+
+def test_rump_surfaces_nonzero_other_bucket_and_mass_closes():
+    """The terminal rump report must not hide the accounting ``other`` bucket."""
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+        _terminal_rump_by_species=lambda: {
+            'CaO': 4.0,
+            'SiO2': 1.0,
+            'Fe': 0.5,
+            'NaCl': 0.25,
+        },
+        _terminal_rump_by_class=lambda: {
+            'refractory_oxides': 4.0,
+            'silicate_residual': 1.0,
+            'unextracted_metals': 0.5,
+            'other': 0.25,
+        },
+    )
+
+    result = classify_products(sim)
+    bucket = result['refractory_ceramic_rump']
+
+    assert bucket['rump_total_kg'] == pytest.approx(5.75)
+    assert bucket['rump_refractory_oxides_kg'] == pytest.approx(4.0)
+    assert bucket['rump_silicate_residual_kg'] == pytest.approx(1.0)
+    assert bucket['rump_unextracted_metals_kg'] == pytest.approx(0.5)
+    assert bucket['rump_other_kg'] == pytest.approx(0.25)
+
+    surfaced_total_kg = (
+        bucket['rump_refractory_oxides_kg']
+        + bucket['rump_silicate_residual_kg']
+        + bucket['rump_unextracted_metals_kg']
+        + bucket['rump_other_kg']
+    )
+    error_pct = abs(surfaced_total_kg - bucket['rump_total_kg']) / (
+        bucket['rump_total_kg']
+    ) * 100.0
+    assert error_pct <= TERMINAL_RUMP_CLASS_TOLERANCE_PCT
+
+    assert bucket['rump_refractory_oxides_kg'] > 0.0
+    assert bucket['rump_silicate_residual_kg'] > 0.0
+    assert bucket['rump_unextracted_metals_kg'] > 0.0
+    assert bucket['rump_other_kg'] > 0.0
+    assert (
+        bucket['rump_refractory_oxides_kg']
+        != bucket['rump_unextracted_metals_kg']
+    )
+    assert bucket['rump_unextracted_metals_kg'] != bucket['rump_other_kg']
 
 
 def test_rump_zero_when_method_missing():

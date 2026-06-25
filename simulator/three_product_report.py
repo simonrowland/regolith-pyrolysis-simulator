@@ -38,6 +38,12 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting.queries import (
+    TERMINAL_RUMP_CLASS_TOLERANCE_PCT,
+    TERMINAL_RUMP_REFRACTORY_OXIDES,
+    TERMINAL_RUMP_SILICATE_RESIDUAL,
+    TERMINAL_RUMP_UNEXTRACTED_METALS,
+)
 
 # Per CLAUDE.md § 4 + § 5: the species that map cleanly to each
 # product class. Some species can land in MORE THAN ONE class
@@ -69,6 +75,18 @@ PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS: tuple[str, ...] = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 """Melt-resident reductant residue from reagent we dosed, not native rump."""
+
+TERMINAL_RUMP_REPORT_CLASSES: tuple[str, ...] = (
+    'refractory_oxides',
+    'silicate_residual',
+    'unextracted_metals',
+    'other',
+)
+"""Operator-facing terminal-rump split from AccountingQueries.
+
+These distinguish the by-physics refractory floor from the failure-mode
+target residue left unextracted, while keeping unclassified rump mass visible.
+"""
 
 PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')
 """Product class 2: SiO landed on Stage 3 fused-silica baffles is
@@ -166,6 +184,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'refractory_ceramic_rump': {
                 'rump_kg_by_species': {species: kg, ...},
                 'rump_total_kg': float,
+                'rump_refractory_oxides_kg': float,
+                'rump_silicate_residual_kg': float,
+                'rump_unextracted_metals_kg': float,
+                'rump_other_kg': float,
                 'class_total_kg': float,
             },
             'unclassified': {
@@ -234,6 +256,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         except (TypeError, ValueError):
             rump_kg_by_species = {}
     rump_total_kg = float(sum(rump_kg_by_species.values()))
+    rump_by_class_kg = _terminal_rump_by_class_kg(
+        sim,
+        rump_kg_by_species=rump_kg_by_species,
+    )
 
     # ----- Class 3: industrial mixed glass (early-tap option) -----
     # Detected by presence of bulk Si-bearing melt mass left in the
@@ -327,6 +353,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'refractory_ceramic_rump': {
             'rump_kg_by_species': rump_kg_by_species,
             'rump_total_kg': rump_total_kg,
+            'rump_refractory_oxides_kg': rump_by_class_kg['refractory_oxides'],
+            'rump_silicate_residual_kg': rump_by_class_kg['silicate_residual'],
+            'rump_unextracted_metals_kg': (
+                rump_by_class_kg['unextracted_metals']
+            ),
+            'rump_other_kg': rump_by_class_kg['other'],
             'class_total_kg': rump_total_kg,
         },
         'unclassified': {
@@ -334,6 +366,60 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
+
+
+def _terminal_rump_by_class_kg(
+    sim: Any,
+    *,
+    rump_kg_by_species: Mapping[str, float],
+) -> dict[str, float]:
+    values = {key: 0.0 for key in TERMINAL_RUMP_REPORT_CLASSES}
+    class_method = getattr(sim, '_terminal_rump_by_class', None)
+    if callable(class_method):
+        try:
+            raw_values = dict(class_method() or {})
+        except (TypeError, ValueError):
+            raw_values = {}
+        for key in TERMINAL_RUMP_REPORT_CLASSES:
+            try:
+                kg = float(raw_values.get(key, 0.0))
+            except (TypeError, ValueError):
+                kg = 0.0
+            if kg > 0.0:
+                values[key] = kg
+        _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
+        return values
+
+    for species, kg in rump_kg_by_species.items():
+        if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
+            key = 'refractory_oxides'
+        elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
+            key = 'silicate_residual'
+        elif species in TERMINAL_RUMP_UNEXTRACTED_METALS:
+            key = 'unextracted_metals'
+        else:
+            key = 'other'
+        values[key] += float(kg)
+    _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
+    return values
+
+
+def _raise_if_rump_class_total_mismatches_total(
+    values: Mapping[str, float],
+    rump_kg_by_species: Mapping[str, float],
+) -> None:
+    rump_total_kg = float(sum(float(kg) for kg in rump_kg_by_species.values()))
+    class_total_kg = float(sum(float(kg) for kg in values.values()))
+    if rump_total_kg > 0.0:
+        error_pct = abs(class_total_kg - rump_total_kg) / rump_total_kg * 100.0
+    else:
+        error_pct = 0.0 if class_total_kg == 0.0 else float('inf')
+    if error_pct > TERMINAL_RUMP_CLASS_TOLERANCE_PCT:
+        raise ValueError(
+            "terminal rump report class mass does not match rump total: "
+            f"{class_total_kg:.15g} kg vs {rump_total_kg:.15g} kg "
+            f"({error_pct:.15g} pct)"
+        )
 
 
 def _ledger_species_kg(

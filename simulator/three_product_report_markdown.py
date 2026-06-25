@@ -160,9 +160,35 @@ def format_three_product_markdown(
                 lines.append(f"  - *{note}*")
         elif bucket_key == 'refractory_ceramic_rump':
             rump_species = bucket.get('rump_kg_by_species', {}) or {}
+            refractory_oxides_kg = float(
+                bucket.get('rump_refractory_oxides_kg', 0.0)
+            )
+            silicate_residual_kg = float(
+                bucket.get('rump_silicate_residual_kg', 0.0)
+            )
+            unextracted_metals_kg = float(
+                bucket.get('rump_unextracted_metals_kg', 0.0)
+            )
+            other_kg = float(bucket.get('rump_other_kg', 0.0))
             lines.append(
                 f"- Rump total: "
                 f"{_format_kg(float(bucket.get('rump_total_kg', 0.0)))} kg"
+            )
+            lines.append(
+                "- Refractory oxides floor (by physics): "
+                f"{_format_kg(refractory_oxides_kg)} kg"
+            )
+            lines.append(
+                "- Silicate residual: "
+                f"{_format_kg(silicate_residual_kg)} kg"
+            )
+            lines.append(
+                "- Unextracted metals residue (failure-mode 1): "
+                f"{_format_kg(unextracted_metals_kg)} kg"
+            )
+            lines.append(
+                "- Other / unclassified rump: "
+                f"{_format_kg(other_kg)} kg"
             )
             lines.append("")
             lines.append("Per-species:")

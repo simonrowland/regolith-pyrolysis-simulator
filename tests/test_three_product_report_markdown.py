@@ -40,6 +40,10 @@ def _empty_classification() -> dict:
         'refractory_ceramic_rump': {
             'rump_kg_by_species': {},
             'rump_total_kg': 0.0,
+            'rump_refractory_oxides_kg': 0.0,
+            'rump_silicate_residual_kg': 0.0,
+            'rump_unextracted_metals_kg': 0.0,
+            'rump_other_kg': 0.0,
             'class_total_kg': 0.0,
         },
         'unclassified': {
@@ -122,12 +126,20 @@ def test_rump_class_shows_per_species_breakdown():
     classification['refractory_ceramic_rump'] = {
         'rump_kg_by_species': {'CaO': 50.0, 'REE_oxides': 2.5},
         'rump_total_kg': 52.5,
+        'rump_refractory_oxides_kg': 52.5,
+        'rump_silicate_residual_kg': 0.0,
+        'rump_unextracted_metals_kg': 0.0,
+        'rump_other_kg': 0.0,
         'class_total_kg': 52.5,
     }
     report = format_three_product_markdown(classification)
     assert "**CaO**" in report
     assert "**REE_oxides**" in report
     assert "Rump total" in report
+    assert "Refractory oxides floor (by physics)" in report
+    assert "Silicate residual" in report
+    assert "Unextracted metals residue (failure-mode 1)" in report
+    assert "Other / unclassified rump" in report
 
 
 # ---------------------------------------------------------------------------
