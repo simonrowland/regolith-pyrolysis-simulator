@@ -16,6 +16,7 @@ import yaml
 
 import scripts.make_recipe_db_profile as generator
 from simulator.optimize import cli as optimizer_cli
+from simulator.optimize import physics as physics_module
 from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
@@ -1317,6 +1318,43 @@ def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
 
     assert physics_constraints_digest(loose) != physics_constraints_digest(tight)
     assert cache_key(spec_loose) != cache_key(spec_tight)
+
+
+def test_physics_policy_version_change_invalidates_eval_cache_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    profile = dict(PROFILE)
+    profile["constraints"] = {
+        **PROFILE["constraints"],
+        "furnace_T_max_C": 1800.0,
+    }
+    constraints = physics_constraints_from_profile(profile)
+    validated = patch.validated(schema)
+    current_version = physics_module.PHYSICS_GATE_VERSION
+
+    def build_for_version(version: str) -> tuple[str, str, str]:
+        monkeypatch.setattr(physics_module, "PHYSICS_GATE_VERSION", version)
+        spec, _ = _build_eval_inputs(
+            validated,
+            FEEDSTOCK,
+            "stub",
+            profile,
+            schema,
+            constraints=constraints,
+        )
+        return physics_constraints_digest(constraints), spec.recipe_id, cache_key(spec)
+
+    old_digest, old_recipe_id, old_cache_key = build_for_version(
+        "physics-feasibility-v1"
+    )
+    new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
+
+    assert current_version == "physics-feasibility-v2-coating-gate"
+    assert old_digest != new_digest
+    assert old_cache_key != new_cache_key
+    assert old_recipe_id == new_recipe_id
 
 
 def test_stub_smoke_selector_ignores_profile_threshold_overrides() -> None:

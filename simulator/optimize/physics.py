@@ -28,7 +28,10 @@ SourceKind = Literal[
     "code_default",
 ]
 
-PHYSICS_GATE_VERSION = "physics-feasibility-v1"
+# D1: coating gate armed -- fail-closed on grounded
+# campaigns-to-resinter<N when authoritative; bump invalidates pre-D1 cached
+# feasibility verdicts.
+PHYSICS_GATE_VERSION = "physics-feasibility-v2-coating-gate"
 GATE_ORDER: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -420,6 +423,7 @@ class PhysicsConstraintSet:
             worst_margin = math.inf
             worst_observed = math.inf
             worst_detail = "no wall deposit"
+            worst_campaign_detail = "no wall deposit"
             for (campaign, segment, species), kg in sorted(by_campaign.items()):
                 if kg <= _EPS:
                     continue
@@ -450,6 +454,7 @@ class PhysicsConstraintSet:
                         worst_detail = (
                             f"{campaign}/{zone}/{segment}/{species}: "
                             f"deposit={kg:.6g} kg, allowable=unconfigured; "
+                            "absolute kg limit unconfigured; "
                             "campaigns_to_resinter=unreported"
                         )
                     continue
@@ -462,8 +467,15 @@ class PhysicsConstraintSet:
                 margin = min(campaign_margin, absolute_margin)
                 if margin < worst_margin:
                     worst_margin = margin
-                    worst_observed = campaigns_to_resinter
                     worst_detail = (
+                        f"{campaign}/{zone}/{segment}/{species}: "
+                        f"deposit={kg:.6g} kg, "
+                        f"allowable={limit.value:.6g} kg, "
+                        f"campaigns_to_resinter={campaigns_to_resinter:.6g}"
+                    )
+                if campaigns_to_resinter < worst_observed:
+                    worst_observed = campaigns_to_resinter
+                    worst_campaign_detail = (
                         f"{campaign}/{zone}/{segment}/{species}: "
                         f"deposit={kg:.6g} kg, "
                         f"allowable={limit.value:.6g} kg, "
@@ -476,11 +488,32 @@ class PhysicsConstraintSet:
                 if worst_detail == "no wall deposit"
                 else f"reported-only: {worst_detail}"
             )
+            grounded_campaign_ok = (
+                worst_observed >= self.coating_min_campaigns_to_resinter.value
+            )
+            feasible = (not authoritative) or grounded_campaign_ok
             if not authoritative:
-                detail = f"non-authoritative: {detail}"
+                detail = (
+                    "non-authoritative: grounded coating criterion not enforced; "
+                    f"{detail}"
+                )
+            elif not grounded_campaign_ok:
+                detail = (
+                    "fail-closed: grounded coating criterion "
+                    f"campaigns_to_resinter={worst_observed:.6g} < "
+                    f"{self.coating_min_campaigns_to_resinter.value:.6g}; "
+                    f"{worst_campaign_detail}; advisory={detail}"
+                )
+            elif worst_detail != "no wall deposit":
+                detail = (
+                    "grounded coating criterion satisfied: "
+                    f"campaigns_to_resinter={worst_observed:.6g} >= "
+                    f"{self.coating_min_campaigns_to_resinter.value:.6g}; "
+                    f"{detail}"
+                )
             return GateMargin(
                 gate="coating",
-                feasible=True,
+                feasible=feasible,
                 margin=float(worst_margin),
                 threshold=self.coating_min_campaigns_to_resinter,
                 observed=float(worst_observed),

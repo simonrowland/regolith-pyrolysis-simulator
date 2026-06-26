@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.optimize.physics import (
     GATE_ORDER,
     PhysicsConstraintSet,
@@ -46,6 +47,38 @@ def _kn_snapshot(
     )
 
 
+def _alpha_notice(species: str, *, cited: bool) -> dict[str, object]:
+    return {
+        "alpha_s_provenance_by_species": {
+            species: {
+                "hot_wall": {
+                    "segment": "hot_wall",
+                    "species": species,
+                    "alpha_s": 0.02 if cited else 1.0,
+                    "citation_status": "CITED" if cited else "UNCERTIFIED",
+                    "status": "sourced" if cited else "proxy",
+                    "output_status": (
+                        "sourced_with_surface_proxy"
+                        if cited
+                        else "status_bearing"
+                    ),
+                }
+            }
+        }
+    }
+
+
+def _wall_deposit_sticking_authority(
+    species: str,
+    *,
+    cited: bool,
+) -> dict[str, object]:
+    return wall_deposit_sticking_authority_status(
+        {("hot_wall", species): 0.05},
+        _alpha_notice(species, cited=cited),
+    )
+
+
 def _trace(
     *,
     condensed: tuple[dict[tuple[int, str], float], ...],
@@ -53,6 +86,7 @@ def _trace(
     rump: dict[str, float] | None = None,
     wall: tuple[dict[tuple[str, str], float], ...] | None = None,
     wall_zone_by_segment: dict[str, str] | None = None,
+    wall_deposit_sticking_authority: dict[str, object] | None = None,
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
     ) -> PhysicsTrace:
@@ -74,6 +108,7 @@ def _trace(
         condensed_by_stage_species_delta=condensed,
         wall_deposit_by_segment_species_delta=wall_delta,
         wall_zone_by_segment=inferred_zones,
+        wall_deposit_sticking_authority=wall_deposit_sticking_authority or {},
     )
 
 
@@ -260,7 +295,7 @@ def test_clean_zero_wall_deposit_coating_margin_is_feasible_infinity() -> None:
     assert coating.observed == math.inf
 
 
-def test_coating_readout_reports_wall_deposit_margin_without_hard_gate() -> None:
+def test_non_authoritative_coating_readout_reports_negative_margin_without_gate() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "SiO"): ThresholdSpec(
             id="allowable_wall_deposit_kg.hot_wall.SiO",
@@ -278,13 +313,133 @@ def test_coating_readout_reports_wall_deposit_margin_without_hard_gate() -> None
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
+    # D1: missing sticking authority makes this advisory margin non-authoritative.
     assert result.feasible
     assert result.failing_gates == ()
     assert coating.feasible
+    assert coating.authoritative is False
+    assert coating.status == "warning"
     assert coating.margin < 0.0
     assert coating.observed == pytest.approx(0.2)
+    assert "grounded coating criterion not enforced" in coating.detail
     assert "reported-only" in coating.detail
     assert "Hottest/hot_wall/SiO" in coating.detail
+
+
+def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "SiO"): ThresholdSpec(
+            id="allowable_wall_deposit_kg.hot_wall.SiO",
+            value=0.01,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "SiO"): 0.05},),
+        wall_deposit_sticking_authority=_wall_deposit_sticking_authority(
+            "SiO",
+            cited=True,
+        ),
+    )
+
+    result = constraints.evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
+    assert coating.authoritative is True
+    assert coating.status == "available"
+    assert coating.observed == pytest.approx(0.2)
+    assert coating.threshold.value == pytest.approx(10.0)
+    assert (
+        "fail-closed: grounded coating criterion "
+        "campaigns_to_resinter=0.2 < 10"
+    ) in coating.detail
+
+
+def test_non_authoritative_bad_coating_stays_feasible_with_warning() -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "K"): ThresholdSpec(
+            id="allowable_wall_deposit_kg.hot_wall.K",
+            value=0.01,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "K"): 0.05},),
+        wall_deposit_sticking_authority=_wall_deposit_sticking_authority(
+            "K",
+            cited=False,
+        ),
+    )
+
+    result = constraints.evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
+    assert coating.authoritative is False
+    assert coating.status == "warning"
+    assert coating.observed == pytest.approx(0.2)
+    assert "grounded coating criterion not enforced" in coating.detail
+    assert "non-authoritative" in coating.detail
+
+
+def test_authoritative_good_coating_satisfies_grounded_campaign_gate() -> None:
+    constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
+        ("hot_wall", "SiO"): ThresholdSpec(
+            id="allowable_wall_deposit_kg.hot_wall.SiO",
+            value=1.0,
+            units="kg",
+            source="engineering_envelope",
+            source_ref="test profile coating capacity",
+        )
+    })
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "SiO"): 0.05},),
+        wall_deposit_sticking_authority=_wall_deposit_sticking_authority(
+            "SiO",
+            cited=True,
+        ),
+    )
+
+    result = constraints.evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
+    assert coating.authoritative is True
+    assert coating.observed == pytest.approx(20.0)
+    assert "grounded coating criterion satisfied" in coating.detail
+
+
+def test_unconfigured_kg_limit_does_not_fail_authoritative_coating_gate() -> None:
+    trace = _trace(
+        condensed=({(3, "SiO"): 20.0},),
+        wall=({("hot_wall", "SiO"): 0.05},),
+        wall_deposit_sticking_authority=_wall_deposit_sticking_authority(
+            "SiO",
+            cited=True,
+        ),
+    )
+
+    coating = PhysicsConstraintSet().coating(trace)
+
+    assert coating.feasible
+    assert coating.authoritative is True
+    assert coating.margin == pytest.approx(0.0)
+    assert coating.observed == math.inf
+    assert "absolute kg limit unconfigured" in coating.detail
 
 
 def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:
@@ -373,7 +528,7 @@ def test_coating_positive_wall_deposit_requires_real_zone_trace(
         ("cool_wall", "Rest"),
     ),
 )
-def test_coating_readout_uses_declared_wall_zone_buckets(
+def test_non_authoritative_coating_readout_uses_declared_wall_zone_buckets(
     segment: str,
     zone: str,
 ) -> None:
@@ -394,8 +549,12 @@ def test_coating_readout_uses_declared_wall_zone_buckets(
 
     coating = constraints.coating(trace)
 
+    # D1: no authority payload, so the negative coating margin remains advisory.
     assert coating.feasible
+    assert coating.authoritative is False
+    assert coating.status == "warning"
     assert coating.margin < 0.0
+    assert "grounded coating criterion not enforced" in coating.detail
     assert "reported-only" in coating.detail
     assert f"{zone}/{segment}/SiO" in coating.detail
     assert "unbucketed" not in coating.detail

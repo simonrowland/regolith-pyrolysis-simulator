@@ -294,11 +294,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         unpinned,
     )
     assert spec.recipe_id == "1b7fdd61c541f5e7f2d77402044e7eb94ab161dbf0af3f18d0e1b9d28a7277dc"
-    # cache_key includes the source-module digest, so it legitimately moves on any
-    # source edit to the digested modules (incl. docstring/comment-only changes such
-    # as the deb2852 VapoRock-diagnostic doc-drift). Re-pin to current main when that
-    # happens — recipe_id (above) is the identity surface and stays stable.
-    assert cache_key(spec) == "c341a0ab6b4d3f09fe233704e8ab9fcd416fc9303477c79b89484b057f3834a3"
+    # cache_key includes physics_constraints, so policy-version bumps move it.
+    # recipe_id (above) is the identity surface and stays stable.
+    assert cache_key(spec) == "f63ab93293dac2aa0387d359258779c8f15b738c72d1a65c54df0686a7e114d0"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
