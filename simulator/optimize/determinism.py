@@ -160,7 +160,7 @@ def _objective_payload(value: Any) -> dict[str, Any]:
 
 def _margin_payload(margin: Any) -> dict[str, Any]:
     threshold = margin.threshold
-    return {
+    payload = {
         "gate": margin.gate,
         "feasible": margin.feasible,
         "margin": _number_payload(margin.margin),
@@ -175,6 +175,18 @@ def _margin_payload(margin: Any) -> dict[str, Any]:
         "observed": _number_payload(margin.observed),
         "detail": margin.detail,
     }
+    if getattr(margin, "status", "available") != "available":
+        payload["status"] = margin.status
+    if not getattr(margin, "authoritative", True):
+        payload["authoritative"] = False
+    if getattr(margin, "output_status", "authoritative") != "authoritative":
+        payload["output_status"] = margin.output_status
+    if getattr(margin, "status_reason", ""):
+        payload["status_reason"] = margin.status_reason
+    status_payload = getattr(margin, "status_payload", {})
+    if status_payload:
+        payload["status_payload"] = status_payload
+    return payload
 
 
 def _number_payload(value: Any) -> Any:

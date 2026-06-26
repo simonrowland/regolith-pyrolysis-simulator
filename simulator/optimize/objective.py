@@ -24,7 +24,10 @@ from simulator.optimize.physics import (
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.three_product_report import classify_products
-from simulator.diagnostics import wall_deposit_remobilization_by_segment_species
+from simulator.diagnostics import (
+    wall_deposit_remobilization_by_segment_species,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.trace import wall_deposit_kg_by_zone_species
 
 
@@ -1676,12 +1679,14 @@ def _tap_coating_product_summary(
 ) -> Mapping[str, Any]:
     raw_by_segment = _cumulative_wall_deposit_by_segment_species_kg(snapshots, hour)
     if not raw_by_segment:
+        authority = _coating_authority_status(raw_by_segment, run_execution)
         return MappingProxyType(
             {
                 "wall_deposit_kg_by_segment_species": MappingProxyType({}),
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
+                **_coating_authority_summary(authority),
             }
         )
     zone_by_segment = _coating_zone_by_segment(run_execution)
@@ -1701,6 +1706,7 @@ def _tap_coating_product_summary(
         cumulative_deposits_kg=raw_by_segment,
         through_hour=hour,
     )
+    authority = _coating_authority_status(raw_by_segment, run_execution)
     return MappingProxyType(
         {
             "wall_deposit_kg_by_segment_species": by_segment,
@@ -1718,6 +1724,7 @@ def _tap_coating_product_summary(
                 for segment, species_map in remobilization.items()
             }),
             "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+            **_coating_authority_summary(authority),
         }
     )
 
@@ -3230,6 +3237,7 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         sim,
         cumulative_deposits_kg=raw_by_segment,
     )
+    authority = _coating_authority_status(raw_by_segment, run_execution)
     return MappingProxyType({
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
@@ -3244,7 +3252,81 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             for segment, species_map in remobilization.items()
         }),
         "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+        **_coating_authority_summary(authority),
     })
+
+
+def _coating_authority_status(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    run_execution: Any,
+) -> Mapping[str, Any]:
+    trace = getattr(run_execution, "trace", None)
+    trace_status: Any = {}
+    if isinstance(trace, Mapping):
+        trace_status = trace.get("wall_deposit_sticking_authority", {})
+    elif trace is not None:
+        trace_status = getattr(trace, "wall_deposit_sticking_authority", {})
+    return wall_deposit_sticking_authority_status(
+        wall_deposit_by_segment_species,
+        trace_status if isinstance(trace_status, Mapping) else {},
+    )
+
+
+def _coating_authority_summary(authority: Mapping[str, Any]) -> dict[str, Any]:
+    authoritative = _coating_authority_is_authoritative(authority)
+    return {
+        "coating_authoritative": authoritative,
+        "coating_output_status": str(
+            authority.get("output_status", "authoritative")
+        ),
+        "coating_status": "available" if authoritative else "warning",
+        "coating_status_reason": (
+            ""
+            if authoritative
+            else str(authority.get("message", "non-authoritative coating"))
+        ),
+        "wall_deposit_sticking_authority": _plain_payload(authority),
+    }
+
+
+def _coating_authority_is_authoritative(authority: Mapping[str, Any]) -> bool:
+    for key in (
+        "authoritative_for_coating",
+        "authoritative_for_deposit_mass",
+        "authoritative",
+    ):
+        if key in authority:
+            return bool(authority[key])
+    return not _authority_payload_has_deposited_species(authority)
+
+
+def _authority_payload_has_deposited_species(authority: Mapping[str, Any]) -> bool:
+    raw = authority.get("deposited_species")
+    if isinstance(raw, str):
+        return bool(raw)
+    if isinstance(raw, (list, tuple)):
+        return bool(raw)
+    return False
+
+
+def _plain_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: _plain_value(value)
+        for key, value in payload.items()
+    }
+
+
+def _plain_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            key: _plain_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return tuple(_plain_value(item) for item in value)
+    if isinstance(value, list):
+        return [_plain_value(item) for item in value]
+    return value
 
 
 def _product_bins(product_classes: Mapping[str, Any]) -> Mapping[str, Any]:

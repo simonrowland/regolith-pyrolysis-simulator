@@ -24,6 +24,7 @@ from simulator.condensation import (
     N2_COLLISION_DIAMETER_M,
 )
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
+from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.furnace_materials import (
@@ -407,7 +408,18 @@ def _optional_bool(value: Any) -> bool | None:
         return None
     if isinstance(value, bool):
         return value
-    return bool(value)
+    if isinstance(value, int) and not isinstance(value, bool):
+        if value in (0, 1):
+            return bool(value)
+        return False
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {'true', '1'}:
+            return True
+        if normalized in {'false', '0'}:
+            return False
+        return False
+    return False
 
 
 _CERTIFIED_CACHE_TIERS = frozenset({'cached_exact', 'live_fill'})
@@ -634,6 +646,7 @@ def _result_metadata(
     product_summary = run_reference.get('product_summary', {})
     if not isinstance(product_summary, dict):
         product_summary = {}
+    product_summary = coating_summary_with_grounded_authority(product_summary)
 
     metadata = {
         'run_id': run_id,
@@ -670,6 +683,11 @@ def _result_metadata(
         'wall_deposit_kg_by_segment_species',
         'wall_deposit_kg_by_zone_species',
         'campaigns_to_resinter',
+        'coating_status',
+        'coating_authoritative',
+        'coating_output_status',
+        'coating_status_reason',
+        'wall_deposit_sticking_authority',
     ):
         if key in product_summary:
             metadata[key] = product_summary[key]
@@ -1665,12 +1683,37 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
+    result = coating_summary_with_grounded_authority(result)
     wall = (
         result.get('wall_deposit_kg_by_segment_species')
         or result.get('wall_deposit_kg_by_zone_species')
+        or result.get('wall_deposit_kg')
     )
     total_kg = _sum_nested_numbers(wall)
     campaigns = result.get('campaigns_to_resinter')
+    positive_deposit = total_kg is not None and total_kg > 0.0
+    authority = _mapping_value(result.get('wall_deposit_sticking_authority'))
+    authoritative = result.get('coating_authoritative')
+    if authoritative is None and authority:
+        authoritative = authority.get(
+            'authoritative_for_coating',
+            authority.get('authoritative_for_deposit_mass'),
+        )
+    parsed_authoritative = _optional_bool(authoritative)
+    is_authoritative = (
+        not positive_deposit
+        if parsed_authoritative is None
+        else parsed_authoritative
+    )
+    warning_reason = str(
+        result.get('coating_status_reason')
+        or authority.get('message')
+        or (
+            'wall-deposit sticking alpha authority missing'
+            if positive_deposit and parsed_authoritative is None
+            else ''
+        )
+    )
     if total_kg is None and campaigns in (None, ''):
         return {
             'status': 'inconclusive',
@@ -1678,7 +1721,14 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         }
     segment_count = len(wall) if isinstance(wall, Mapping) else None
     return {
-        'status': 'available',
+        'status': 'available' if is_authoritative else 'warning',
+        'authoritative': is_authoritative,
+        'output_status': str(
+            result.get('coating_output_status')
+            or authority.get('output_status')
+            or ('status_bearing' if not is_authoritative else 'authoritative')
+        ),
+        'reason': '' if is_authoritative else warning_reason,
         'total_kg': total_kg,
         'total_label': _format_quantity(total_kg, 'kg'),
         'campaigns_to_resinter': campaigns,

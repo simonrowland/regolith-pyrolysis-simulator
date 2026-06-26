@@ -63,6 +63,7 @@ from simulator.condensation import (
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
@@ -1662,7 +1663,11 @@ def _wall_liner_resinter_config() -> dict[str, Any]:
     }
 
 
-def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]:
+def _wall_fouling_report(
+    wall_deposit_kg: Mapping[str, float],
+    *,
+    alpha_notice: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     cfg = _wall_liner_resinter_config()
     positive = {
         species: float(kg)
@@ -1692,6 +1697,14 @@ def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]
             if campaigns_to_resinter < fast_n
             else "slow-fouling"
         )
+    authority = wall_deposit_sticking_authority_status(
+        positive,
+        alpha_notice or {},
+    )
+    authoritative = bool(authority.get("authoritative_for_resinter", True))
+    nominal_verdict = verdict
+    if not authoritative:
+        verdict = "non-authoritative"
     return {
         "liner_material": cfg["liner_material"],
         "dominant_species": dominant_species,
@@ -1702,7 +1715,14 @@ def _wall_fouling_report(wall_deposit_kg: Mapping[str, float]) -> dict[str, Any]
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
         "campaigns_to_resinter": campaigns_to_resinter,
         "fast_fouling_campaign_threshold": fast_n,
-        "output_status": "uncertainty_only",
+        "output_status": str(authority.get("output_status", "authoritative")),
+        "authoritative": authoritative,
+        "authoritative_for_resinter": authoritative,
+        "verdict_authoritative": authoritative,
+        "status": "available" if authoritative else "warning",
+        "status_reason": "" if authoritative else str(authority.get("message", "")),
+        "sticking_alpha_authority": authority,
+        "nominal_verdict": nominal_verdict,
         "verdict": verdict,
     }
 
@@ -1953,8 +1973,19 @@ def build_sio_yield_report(
     sio_to_silica_fume_kg["terminal_offgas_escape"] = _clean_report_float(
         downstream_sio2_kg + sio_escape_mol * sio_molar_mass_kg_mol
     )
+    condensation_model = sim.condensation_model
+    sticking_notice = dict(
+        getattr(
+            condensation_model,
+            "last_sticking_alpha_provenance_notice",
+            {},
+        ) or {}
+    )
     wall_deposit_kg = _wall_deposit_report_kg(final_state)
-    wall_fouling = _wall_fouling_report(wall_deposit_kg)
+    wall_fouling = _wall_fouling_report(
+        wall_deposit_kg,
+        alpha_notice=sticking_notice,
+    )
 
     report = {
         "feedstock_id": feedstock_id,
@@ -1971,7 +2002,6 @@ def build_sio_yield_report(
     }
 
     if include_diagnostics:
-        condensation_model = sim.condensation_model
         operating_history = list(
             getattr(condensation_model, "operating_history", []) or []
         )
@@ -2028,13 +2058,6 @@ def build_sio_yield_report(
                 ) or {}
             ),
         }
-        sticking_notice = dict(
-            getattr(
-                condensation_model,
-                "last_sticking_alpha_provenance_notice",
-                {},
-            ) or {}
-        )
         if sticking_notice:
             diagnostics["wall_sticking_alpha_provenance_notice"] = (
                 sticking_notice

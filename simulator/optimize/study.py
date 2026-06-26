@@ -19,6 +19,7 @@ import yaml
 
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.optimize.doe import active_sampler_name
 from simulator.optimize.evaluate import (
     EvaluationAbort,
@@ -91,6 +92,11 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "wall_deposit_kg_by_zone_species",
         "wall_deposit_kg",
         "fouling_rate",
+        "coating_status",
+        "coating_authoritative",
+        "coating_output_status",
+        "coating_status_reason",
+        "wall_deposit_sticking_authority",
     }
 )
 _COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
@@ -98,6 +104,10 @@ _COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
         "campaigns_to_resinter": "campaigns_to_resinter",
         "wall_deposit_kg_by_segment_species": "wall_deposit_kg_by_segment_species_json",
         "wall_deposit_kg_by_zone_species": "wall_deposit_kg_by_zone_species_json",
+        "coating_status": "coating_status",
+        "coating_authoritative": "coating_authoritative",
+        "coating_output_status": "coating_output_status",
+        "coating_status_reason": "coating_status_reason",
     }
 )
 DEFAULT_PROFILE_NAME = "default"
@@ -1725,6 +1735,17 @@ def _margin_payload(margin: Any) -> Mapping[str, Any]:
                 "threshold.tolerance",
             ),
         }
+    if str(getattr(margin, "status", "available")) != "available":
+        payload["status"] = str(getattr(margin, "status"))
+    if not bool(getattr(margin, "authoritative", True)):
+        payload["authoritative"] = False
+    if str(getattr(margin, "output_status", "authoritative")) != "authoritative":
+        payload["output_status"] = str(getattr(margin, "output_status"))
+    if str(getattr(margin, "status_reason", "")):
+        payload["status_reason"] = str(getattr(margin, "status_reason"))
+    status_payload = getattr(margin, "status_payload", {})
+    if isinstance(status_payload, Mapping) and status_payload:
+        payload["status_payload"] = _jsonable_value(status_payload)
     return MappingProxyType(payload)
 
 
@@ -1737,6 +1758,7 @@ def _product_summary_mapping(reference: RunReference | None) -> Mapping[str, Any
             summary,
             _tap_truncated_product_summary(reference),
         )
+    summary = coating_summary_with_grounded_authority(summary)
     return MappingProxyType(summary)
 
 
@@ -1842,7 +1864,7 @@ def _coating_leaderboard_row(
     record: StudyRecord,
     fields: Sequence[str],
 ) -> dict[str, Any]:
-    summary = record.product_summary
+    summary = coating_summary_with_grounded_authority(record.product_summary)
     row: dict[str, Any] = {}
     if "campaigns_to_resinter" in fields:
         row["campaigns_to_resinter"] = summary.get("campaigns_to_resinter", "")
@@ -1854,6 +1876,14 @@ def _coating_leaderboard_row(
         row["wall_deposit_kg_by_zone_species_json"] = _json_dump_value(
             summary.get("wall_deposit_kg_by_zone_species", {})
         )
+    for key in (
+        "coating_status",
+        "coating_authoritative",
+        "coating_output_status",
+        "coating_status_reason",
+    ):
+        if key in fields:
+            row[key] = summary.get(key, "")
     return row
 
 

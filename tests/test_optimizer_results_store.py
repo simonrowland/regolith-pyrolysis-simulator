@@ -13,13 +13,19 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.corpus_version import current_corpus_version
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
-from simulator.optimize.results_store import ResultStore, SCHEMA_VERSION
+from simulator.optimize.results_store import (
+    ResultStore,
+    SCHEMA_VERSION,
+    _deserialize_margins,
+)
+from web.routes import _coating_readout
 
 
 def _base_spec(**overrides: object) -> EvalSpec:
@@ -96,6 +102,7 @@ def _scored(
     objectives: ObjectiveVector | None = None,
     margins: Mapping[str, GateMargin] | None = None,
     result_blob: dict[str, object] | None = None,
+    product_summary: Mapping[str, object] | None = None,
 ) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -109,7 +116,7 @@ def _scored(
             status="ok",
             trace=result_blob
             or {"backend_status": "ok", "hours": [{"hour": 1, "oxygen_kg": oxygen}]},
-            product_summary={"oxygen_kg": oxygen},
+            product_summary=product_summary or {"oxygen_kg": oxygen},
         ),
         notes=("stored",),
     )
@@ -823,6 +830,278 @@ def test_best_returns_best_feasible_with_deterministic_tie_break(tmp_path) -> No
     assert loaded_clean is not None
     assert loaded_clean.feasibility_margins["coating"].margin == math.inf
     assert loaded_clean.feasibility_margins["coating"].observed == math.inf
+
+
+def test_deserialize_legacy_coating_margin_defaults_non_authoritative() -> None:
+    margins = _deserialize_margins(
+        {
+            "coating": {
+                "gate": "coating",
+                "feasible": True,
+                "margin": 1.0,
+                "threshold": {
+                    "id": "coating-threshold",
+                    "value": 1.0,
+                    "units": "campaigns",
+                    "source": "profile",
+                    "source_ref": "legacy profile",
+                },
+                "observed": 2.0,
+                "detail": "legacy coating margin",
+            }
+        }
+    )
+
+    assert margins["coating"].authoritative is False
+
+
+def test_fresh_authoritative_coating_margin_round_trips_authoritative(
+    tmp_path,
+) -> None:
+    spec = _base_spec(recipe_id="fresh-authoritative-coating")
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    margins = {"coating": _margin("coating", margin=math.inf, observed=math.inf)}
+
+    store.store(spec, _scored(spec, margins=margins), created_at="t1")
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasibility_margins["coating"].authoritative is True
+
+
+def test_malformed_serialized_authority_strings_fail_closed() -> None:
+    threshold = {
+        "id": "coating-threshold",
+        "value": 1.0,
+        "units": "campaigns",
+        "source": "profile",
+        "source_ref": "profile",
+    }
+
+    for raw in ("False", "0", "bogus"):
+        margins = _deserialize_margins(
+            {
+                "coating": {
+                    "gate": "coating",
+                    "feasible": True,
+                    "margin": 1.0,
+                    "threshold": threshold,
+                    "observed": 2.0,
+                    "detail": "coating margin",
+                    "authoritative": raw,
+                }
+            }
+        )
+        assert margins["coating"].authoritative is False
+
+        readout = _coating_readout(
+            {
+                "wall_deposit_kg_by_segment_species": {
+                    "hot_wall": {"Fe": 0.05},
+                },
+                "campaigns_to_resinter": 20.0,
+                "coating_authoritative": raw,
+            }
+        )
+        assert readout["authoritative"] is False
+        assert readout["status"] == "warning"
+
+
+def _cached_coating_margin(
+    authoritative: bool,
+    status_payload: Mapping[str, object] | None,
+) -> GateMargin:
+    payload = {
+        "gate": "coating",
+        "feasible": True,
+        "margin": 1.0,
+        "threshold": {
+            "id": "coating-threshold",
+            "value": 1.0,
+            "units": "campaigns",
+            "source": "profile",
+            "source_ref": "legacy profile",
+        },
+        "observed": 2.0,
+        "detail": "cached coating margin",
+        "status": "available" if authoritative else "warning",
+        "authoritative": authoritative,
+        "output_status": "authoritative" if authoritative else "status_bearing",
+    }
+    if status_payload is not None:
+        payload["status_payload"] = status_payload
+    return _deserialize_margins({"coating": payload})["coating"]
+
+
+def _wall_sticking_status_payload(species: str, *, cited: bool) -> dict[str, object]:
+    return wall_deposit_sticking_authority_status(
+        {"hot_wall": {species: 0.05}},
+        {
+            "alpha_s_provenance_by_species": {
+                species: {
+                    "hot_wall": {
+                        "segment": "hot_wall",
+                        "species": species,
+                        "alpha_s": 0.02 if cited else 1.0,
+                        "citation_status": "CITED" if cited else "UNCERTIFIED",
+                        "status": "sourced" if cited else "proxy",
+                        "output_status": (
+                            "sourced_with_surface_proxy"
+                            if cited
+                            else "status_bearing"
+                        ),
+                    }
+                }
+            }
+        },
+    )
+
+
+def test_cached_coating_margin_authority_rederives_stale_false_from_status_payload() -> None:
+    margin = _cached_coating_margin(
+        False,
+        _wall_sticking_status_payload("Fe", cited=True),
+    )
+
+    assert margin.authoritative is True
+    assert margin.status == "available"
+    assert margin.output_status == "sourced_with_surface_proxy"
+    assert margin.status_reason == ""
+
+
+def test_cached_coating_margin_authority_rederives_from_status_payload() -> None:
+    wall = {"hot_wall": {"K": 0.05}}
+    margins = _deserialize_margins(
+        {
+            "coating": {
+                "gate": "coating",
+                "feasible": True,
+                "margin": 1.0,
+                "threshold": {
+                    "id": "coating-threshold",
+                    "value": 1.0,
+                    "units": "campaigns",
+                    "source": "profile",
+                    "source_ref": "legacy profile",
+                },
+                "observed": 2.0,
+                "detail": "cached coating margin",
+                "status": "available",
+                "authoritative": True,
+                "output_status": "authoritative",
+                "status_payload": wall_deposit_sticking_authority_status(
+                    wall,
+                    {
+                        "alpha_s_provenance_by_species": {
+                            "K": {
+                                "hot_wall": {
+                                    "segment": "hot_wall",
+                                    "species": "K",
+                                    "alpha_s": 1.0,
+                                    "citation_status": "UNCERTIFIED",
+                                    "status": "proxy",
+                                    "output_status": "status_bearing",
+                                }
+                            }
+                        }
+                    },
+                ),
+            }
+        }
+    )
+
+    assert margins["coating"].authoritative is False
+    assert margins["coating"].status == "warning"
+    assert margins["coating"].output_status == "status_bearing"
+
+
+def test_cached_coating_margin_positive_deposit_without_grounding_fails_closed() -> None:
+    margin = _cached_coating_margin(
+        True,
+        {
+            "authoritative": True,
+            "authoritative_for_deposit_mass": True,
+            "authoritative_for_coating": True,
+            "authoritative_for_resinter": True,
+            "output_status": "authoritative",
+            "deposited_species": ["K"],
+            "uncertified_alpha_species": [],
+        },
+    )
+
+    assert margin.authoritative is False
+    assert margin.status == "warning"
+    assert margin.output_status == "status_bearing"
+    assert "provenance is missing" in margin.status_reason
+
+
+def test_cached_coating_margin_grounded_true_cached_true_stays_true() -> None:
+    margin = _cached_coating_margin(
+        True,
+        _wall_sticking_status_payload("Fe", cited=True),
+    )
+
+    assert margin.authoritative is True
+    assert margin.status == "available"
+    assert margin.output_status == "sourced_with_surface_proxy"
+
+
+def test_cached_coating_margin_zero_deposit_keeps_cached_authority() -> None:
+    margin = _cached_coating_margin(
+        False,
+        wall_deposit_sticking_authority_status({}, {}),
+    )
+
+    assert margin.authoritative is False
+    assert margin.status == "warning"
+    assert margin.output_status == "status_bearing"
+
+
+def test_cached_product_summary_provenance_overrides_stale_true_bool(tmp_path) -> None:
+    spec = _base_spec(recipe_id="cached-stale-coating-authority")
+    wall = {"hot_wall": {"K": 0.05}}
+    summary = {
+        "wall_deposit_kg_by_segment_species": wall,
+        "campaigns_to_resinter": 20.0,
+        "coating_status": "available",
+        "coating_authoritative": True,
+        "coating_output_status": "authoritative",
+        "wall_deposit_sticking_authority": wall_deposit_sticking_authority_status(
+            wall,
+            {
+                "alpha_s_provenance_by_species": {
+                    "K": {
+                        "hot_wall": {
+                            "segment": "hot_wall",
+                            "species": "K",
+                            "alpha_s": 1.0,
+                            "citation_status": "UNCERTIFIED",
+                            "status": "proxy",
+                            "output_status": "status_bearing",
+                        }
+                    }
+                }
+            },
+        ),
+    }
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, _scored(spec, product_summary=summary), created_at="t1")
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.product_summary["coating_status"] == "warning"
+    assert loaded.run_reference.product_summary["coating_authoritative"] is False
+    assert loaded.run_reference.product_summary["coating_output_status"] == "status_bearing"
 
 
 def test_best_defaults_to_profile_primary_and_honors_direction(tmp_path) -> None:

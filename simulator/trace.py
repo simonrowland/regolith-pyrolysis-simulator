@@ -8,6 +8,7 @@ from types import MappingProxyType
 from typing import Any, Mapping
 
 from simulator.accounting.queries import AccountingQueries, stage_purity
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
 
 
@@ -22,6 +23,19 @@ def _freeze_nested_mapping(
         key: _freeze_mapping(inner)
         for key, inner in values.items()
     })
+
+
+def _freeze_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType({
+            key: _freeze_value(item)
+            for key, item in value.items()
+        })
+    if isinstance(value, tuple):
+        return tuple(_freeze_value(item) for item in value)
+    if isinstance(value, list):
+        return tuple(_freeze_value(item) for item in value)
+    return value
 
 
 def _thaw_value(value: Any) -> Any:
@@ -50,6 +64,8 @@ class PhysicsTrace:
     condensation_totals_kg: Mapping[str, float] = field(default_factory=dict)
     wall_deposit_by_segment_species_kg: Mapping[
         tuple[str, str], float] = field(default_factory=dict)
+    wall_deposit_sticking_authority: Mapping[str, Any] = field(
+        default_factory=dict)
     wall_zone_by_segment: Mapping[str, str] = field(default_factory=dict)
     stage_purity_pct: Mapping[int, Mapping[str, float]] = field(
         default_factory=dict)
@@ -70,6 +86,14 @@ class PhysicsTrace:
         snapshot_condensation.pop("O2", None)
         # Snapshot sums intentionally replace overlapping ledger totals; both are the same ledger-account value.
         condensation_totals.update(snapshot_condensation)
+        wall_deposit_by_segment = wall_deposit_by_segment_species_kg(
+            sim.atom_ledger)
+        condensation_model = getattr(sim, "condensation_model", None)
+        sticking_notice = getattr(
+            condensation_model,
+            "last_sticking_alpha_provenance_notice",
+            {},
+        ) or {}
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -81,8 +105,11 @@ class PhysicsTrace:
                 queries.oxygen_terminal_partition_kg()),
             condensation_totals_kg=_freeze_mapping(condensation_totals),
             wall_deposit_by_segment_species_kg=(
-                _freeze_mapping(wall_deposit_by_segment_species_kg(
-                    sim.atom_ledger))),
+                _freeze_mapping(wall_deposit_by_segment)),
+            wall_deposit_sticking_authority=wall_deposit_sticking_authority_status(
+                wall_deposit_by_segment,
+                sticking_notice,
+            ),
             wall_zone_by_segment=_freeze_mapping(wall_zone_by_segment(sim)),
             stage_purity_pct=_freeze_nested_mapping(stage_purity(sim.train)),
             condensed_by_stage_species_delta=tuple(
@@ -111,6 +138,7 @@ class PhysicsTrace:
                 _thaw_value(self.oxygen_terminal_partition_kg),
                 _thaw_value(self.condensation_totals_kg),
                 _thaw_value(self.wall_deposit_by_segment_species_kg),
+                _thaw_value(self.wall_deposit_sticking_authority),
                 _thaw_value(self.wall_zone_by_segment),
                 _thaw_value(self.stage_purity_pct),
                 _thaw_value(self.condensed_by_stage_species_delta),

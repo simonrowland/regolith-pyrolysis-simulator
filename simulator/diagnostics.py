@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from typing import Any, Mapping, Sequence
 
@@ -15,6 +16,52 @@ WALL_STICKING_ALPHA_NOTICE_CODE = (
 WALL_STICKING_ALPHA_UNCERTIFIED_CODE = (
     "wall_deposit_sticking_alpha_uncertified"
 )
+WALL_STICKING_ALPHA_MISSING_CODE = (
+    "wall_deposit_sticking_alpha_provenance_missing"
+)
+_WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS = frozenset({
+    "authoritative",
+    "authoritative_for_deposit_mass",
+    "authoritative_for_coating",
+    "authoritative_for_resinter",
+    "deposited_species",
+    "uncertified_alpha_species",
+})
+
+
+def _status_bearing_alpha_record(record: Mapping[str, Any]) -> bool:
+    citation_status = str(record.get("citation_status", "UNCITED")).upper()
+    status = str(record.get("status", "proxy"))
+    output_status = str(record.get("output_status", "status_bearing"))
+    return (
+        citation_status != "CITED"
+        or status != "sourced"
+        or output_status in {
+            "status_bearing",
+            "uncertainty_only",
+        }
+    )
+
+
+def wall_deposit_sticking_authority_is_payload(value: Any) -> bool:
+    return (
+        isinstance(value, Mapping)
+        and _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS.issubset(value.keys())
+    )
+
+
+def wall_deposit_sticking_authority_matches_deposits(
+    authority: Mapping[str, Any],
+    wall_deposit_kg: Mapping[Any, Any],
+) -> bool:
+    if not wall_deposit_sticking_authority_is_payload(authority):
+        return False
+    deposited_raw = authority.get("deposited_species")
+    if isinstance(deposited_raw, str) or not isinstance(deposited_raw, Sequence):
+        return False
+    deposited_species = {str(species) for species in deposited_raw}
+    expected_species = set(_positive_wall_deposit_species(wall_deposit_kg))
+    return deposited_species == expected_species
 
 
 def wall_sticking_alpha_provenance_notice(
@@ -45,12 +92,7 @@ def wall_sticking_alpha_provenance_notice(
     status_bearing = [
         record
         for record in records
-        if str(record.get("citation_status", "")).upper() != "CITED"
-        or str(record.get("status", "proxy")) != "sourced"
-        or str(record.get("output_status", "")) in {
-            "status_bearing",
-            "uncertainty_only",
-        }
+        if _status_bearing_alpha_record(record)
     ]
     source_classes = sorted({
         str(record.get("source_class", ""))
@@ -117,6 +159,291 @@ def wall_sticking_alpha_provenance_notice(
         ),
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
     }
+
+
+def wall_deposit_sticking_authority_status(
+    wall_deposit_kg: Mapping[Any, Any],
+    alpha_notice: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Return authority status for wall-deposit derived fouling readouts."""
+
+    deposited_species = _positive_wall_deposit_species(wall_deposit_kg)
+    notice = dict(alpha_notice or {})
+    if wall_deposit_sticking_authority_is_payload(alpha_notice):
+        payload_species = _payload_deposited_species(notice)
+        if payload_species == deposited_species:
+            notice = _plain_mapping(notice)
+    if not deposited_species:
+        return _wall_deposit_authority_payload(
+            authoritative=True,
+            code=WALL_STICKING_ALPHA_NOTICE_CODE,
+            deposited_species=(),
+            uncertified_species=(),
+            provenance={},
+        )
+
+    provenance = _alpha_provenance_by_species(notice)
+    status_bearing_species = _status_bearing_alpha_species(provenance)
+    missing_species = tuple(
+        species
+        for species in deposited_species
+        if not _alpha_species_has_provenance_record(provenance.get(species))
+    )
+    if str(notice.get("code", "")) == WALL_STICKING_ALPHA_MISSING_CODE:
+        missing_species = deposited_species
+    if missing_species:
+        return _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_STICKING_ALPHA_MISSING_CODE,
+            deposited_species=deposited_species,
+            uncertified_species=missing_species,
+            provenance=_provenance_subset(provenance, deposited_species),
+            message=(
+                "Wall-deposit sticking alpha authority missing; provenance is "
+                "missing, so coating and fouling readouts are non-authoritative "
+                "until the coefficient status travels with the deposit."
+            ),
+        )
+
+    uncertified_species = tuple(
+        species for species in deposited_species if species in status_bearing_species
+    )
+    if uncertified_species:
+        return _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_STICKING_ALPHA_UNCERTIFIED_CODE,
+            deposited_species=deposited_species,
+            uncertified_species=uncertified_species,
+            provenance=_provenance_subset(provenance, deposited_species),
+        )
+
+    return _wall_deposit_authority_payload(
+        authoritative=True,
+        code=WALL_STICKING_ALPHA_NOTICE_CODE,
+        deposited_species=deposited_species,
+        uncertified_species=(),
+        provenance=_provenance_subset(provenance, deposited_species),
+    )
+
+
+def coating_summary_with_grounded_authority(
+    summary: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return a coating summary where positive deposits trust provenance only."""
+
+    result = dict(summary)
+    wall_deposit = _coating_wall_deposit_payload(result)
+    total_kg = _sum_wall_deposit_kg(wall_deposit)
+    if total_kg is None or total_kg <= _EPS:
+        return result
+
+    authority_input = result.get("wall_deposit_sticking_authority")
+    if isinstance(wall_deposit, Mapping):
+        authority = wall_deposit_sticking_authority_status(
+            wall_deposit,
+            authority_input if isinstance(authority_input, Mapping) else {},
+        )
+    else:
+        authority = _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_STICKING_ALPHA_MISSING_CODE,
+            deposited_species=(),
+            uncertified_species=(),
+            provenance={},
+            message=(
+                "Wall-deposit sticking alpha authority missing; provenance is "
+                "missing, so coating and fouling readouts are non-authoritative "
+                "until the coefficient status travels with the deposit."
+            ),
+        )
+
+    authoritative = bool(authority.get("authoritative_for_coating", False))
+    result["coating_authoritative"] = authoritative
+    result["coating_status"] = "available" if authoritative else "warning"
+    result["coating_output_status"] = str(
+        authority.get("output_status")
+        or ("authoritative" if authoritative else "status_bearing")
+    )
+    result["coating_status_reason"] = (
+        "" if authoritative else str(authority.get("message", "non-authoritative coating"))
+    )
+    result["wall_deposit_sticking_authority"] = _plain_mapping(authority)
+    return result
+
+
+def _coating_wall_deposit_payload(summary: Mapping[str, Any]) -> Any:
+    for key in (
+        "wall_deposit_kg_by_segment_species",
+        "wall_deposit_kg_by_zone_species",
+        "wall_deposit_kg",
+    ):
+        if key in summary:
+            return summary[key]
+    return None
+
+
+def _sum_wall_deposit_kg(value: Any) -> float | None:
+    if isinstance(value, Mapping):
+        total = 0.0
+        found = False
+        for nested in value.values():
+            subtotal = _sum_wall_deposit_kg(nested)
+            if subtotal is not None:
+                total += subtotal
+                found = True
+        return total if found else None
+    if isinstance(value, (list, tuple)):
+        total = 0.0
+        found = False
+        for nested in value:
+            subtotal = _sum_wall_deposit_kg(nested)
+            if subtotal is not None:
+                total += subtotal
+                found = True
+        return total if found else None
+    return _finite_float(value)
+
+
+def _wall_deposit_authority_payload(
+    *,
+    authoritative: bool,
+    code: str,
+    deposited_species: Sequence[str],
+    uncertified_species: Sequence[str],
+    provenance: Mapping[str, Any],
+    message: str | None = None,
+) -> dict[str, Any]:
+    if message is None:
+        if authoritative:
+            message = (
+                "Deposited wall species use cited/sourced sticking alpha_s "
+                "provenance for coating and fouling readouts."
+            )
+        else:
+            message = (
+                "Deposited wall species include UNCERTIFIED or status-bearing "
+                "sticking alpha_s; coating and fouling readouts are "
+                "non-authoritative."
+            )
+    return {
+        "authoritative": authoritative,
+        "authoritative_for_deposit_mass": authoritative,
+        "authoritative_for_coating": authoritative,
+        "authoritative_for_resinter": authoritative,
+        "severity": "info" if authoritative else "warning",
+        "code": code,
+        "output_status": (
+            "sourced_with_surface_proxy" if authoritative else "status_bearing"
+        ),
+        "deposited_species": list(deposited_species),
+        "uncertified_alpha_species": list(uncertified_species),
+        "status_bearing_alpha_count": len(uncertified_species),
+        "alpha_s_provenance_by_species": _plain_mapping(provenance),
+        "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
+        "message": message,
+    }
+
+
+def _payload_deposited_species(payload: Mapping[str, Any]) -> tuple[str, ...]:
+    raw = payload.get("deposited_species")
+    if isinstance(raw, str):
+        return (raw,) if raw else ()
+    if not isinstance(raw, Sequence):
+        return ()
+    return tuple(sorted(str(species) for species in raw))
+
+
+def _provenance_subset(
+    provenance: Mapping[str, Mapping[str, Any]],
+    species: Sequence[str],
+) -> dict[str, Any]:
+    return {
+        item: _plain_mapping(provenance.get(item, {}))
+        for item in species
+        if item in provenance
+    }
+
+
+def _plain_mapping(values: Mapping[Any, Any]) -> dict[Any, Any]:
+    return {
+        key: _plain_value(value)
+        for key, value in values.items()
+    }
+
+
+def _plain_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return _plain_mapping(value)
+    if isinstance(value, (set, frozenset)):
+        return sorted((_plain_value(item) for item in value), key=repr)
+    if isinstance(value, (list, tuple)):
+        return [_plain_value(item) for item in value]
+    if isinstance(value, float):
+        return value if math.isfinite(value) else str(value)
+    try:
+        json.dumps(value, allow_nan=False)
+    except (TypeError, ValueError):
+        return str(value)
+    return value
+
+
+def _positive_wall_deposit_species(
+    wall_deposit_kg: Mapping[Any, Any],
+) -> tuple[str, ...]:
+    species: set[str] = set()
+    for key, value in wall_deposit_kg.items():
+        if isinstance(key, tuple) and len(key) == 2:
+            if _positive_number(value):
+                species.add(str(key[1]))
+            continue
+        if isinstance(value, Mapping):
+            for nested_species, kg in value.items():
+                if _positive_number(kg):
+                    species.add(str(nested_species))
+            continue
+        if _positive_number(value):
+            species.add(str(key))
+    return tuple(sorted(species))
+
+
+def _alpha_provenance_by_species(
+    alpha_notice: Mapping[str, Any],
+) -> dict[str, Mapping[str, Any]]:
+    raw = alpha_notice.get("alpha_s_provenance_by_species")
+    if not isinstance(raw, Mapping):
+        return {}
+    return {
+        str(species): by_segment
+        for species, by_segment in raw.items()
+        if isinstance(by_segment, Mapping)
+    }
+
+
+def _status_bearing_alpha_species(
+    provenance: Mapping[str, Mapping[str, Any]],
+) -> set[str]:
+    result: set[str] = set()
+    for species, by_segment in provenance.items():
+        for record in by_segment.values():
+            if isinstance(record, Mapping) and _status_bearing_alpha_record(record):
+                result.add(str(species))
+                break
+    return result
+
+
+def _alpha_species_has_provenance_record(value: Any) -> bool:
+    if not isinstance(value, Mapping):
+        return False
+    return any(
+        isinstance(record, Mapping)
+        and _finite_float(record.get("alpha_s")) is not None
+        for record in value.values()
+    )
+
+
+def _positive_number(value: Any) -> bool:
+    number = _finite_float(value)
+    return number is not None and number > _EPS
 
 
 def wall_deposit_remobilization_by_segment_species(
@@ -336,6 +663,8 @@ def _finite_float(value: Any) -> float | None:
 
 
 __all__ = [
+    "coating_summary_with_grounded_authority",
+    "wall_deposit_sticking_authority_status",
     "wall_deposit_remobilization_by_segment_species",
     "wall_sticking_alpha_provenance_notice",
 ]

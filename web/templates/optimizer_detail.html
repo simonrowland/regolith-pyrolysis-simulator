@@ -176,9 +176,18 @@
             <tr>
                 <td>Coating</td>
                 <td>
-                    {% if result.coating.status == "available" %}
-                    {{ result.coating.total_label or "deposit inconclusive" }};
-                    campaigns to resinter {{ result.coating.campaigns_to_resinter if result.coating.campaigns_to_resinter is not none else "not declared" }}
+                    {% if result.coating.status in ["available", "warning"] %}
+                    <strong>
+                        {% if result.coating.status == "warning" %}Coating warning{% else %}{{ result.coating.total_label or "deposit inconclusive" }}{% endif %}
+                    </strong><br>
+                    <span class="range">
+                        {% if result.coating.status == "warning" %}{{ result.coating.total_label or "deposit inconclusive" }}; {% endif %}
+                        campaigns to resinter
+                        {{ result.coating.campaigns_to_resinter if result.coating.campaigns_to_resinter is not none else "not declared" }}
+                    </span>
+                    {% if result.coating.status == "warning" and result.coating.reason %}
+                    <br><span class="range">{{ result.coating.reason }}</span>
+                    {% endif %}
                     {% else %}
                     Coating inconclusive: {{ result.coating.reason }}
                     {% endif %}

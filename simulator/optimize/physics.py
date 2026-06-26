@@ -16,6 +16,7 @@ from simulator.accounting.completeness import (
     extraction_completeness_by_target,
 )
 from simulator.condensation_routing import accepted_species_for_stage_number
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.trace import WALL_DEPOSIT_ZONE_NAMES
 
@@ -65,6 +66,18 @@ class GateMargin:
     threshold: ThresholdSpec
     observed: float
     detail: str
+    status: str = "available"
+    authoritative: bool = True
+    output_status: str = "authoritative"
+    status_reason: str = ""
+    status_payload: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "status_payload",
+            _plain_payload(self.status_payload),
+        )
 
 
 @dataclass(frozen=True)
@@ -387,6 +400,8 @@ class PhysicsConstraintSet:
                     amount = _non_negative_number(kg, "wall deposit kg")
                     by_campaign[(campaign, segment, species)] += amount
             has_wall_deposit = any(kg > _EPS for kg in by_campaign.values())
+            authority = _coating_authority_status(trace, by_campaign)
+            authoritative = _authority_is_authoritative(authority)
             zone_by_segment: Mapping[Any, Any] | None = None
             if has_wall_deposit:
                 zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
@@ -456,17 +471,29 @@ class PhysicsConstraintSet:
                     )
             if math.isinf(worst_margin):
                 worst_margin = math.inf
+            detail = (
+                worst_detail
+                if worst_detail == "no wall deposit"
+                else f"reported-only: {worst_detail}"
+            )
+            if not authoritative:
+                detail = f"non-authoritative: {detail}"
             return GateMargin(
                 gate="coating",
                 feasible=True,
                 margin=float(worst_margin),
                 threshold=self.coating_min_campaigns_to_resinter,
                 observed=float(worst_observed),
-                detail=(
-                    worst_detail
-                    if worst_detail == "no wall deposit"
-                    else f"reported-only: {worst_detail}"
+                detail=detail,
+                status="available" if authoritative else "warning",
+                authoritative=authoritative,
+                output_status=str(authority.get("output_status", "authoritative")),
+                status_reason=(
+                    ""
+                    if authoritative
+                    else str(authority.get("message", "non-authoritative coating"))
                 ),
+                status_payload=authority,
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))
@@ -807,6 +834,62 @@ def _residual_species_for_target(
     constraints: PhysicsConstraintSet,
 ) -> tuple[str, ...]:
     return tuple(constraints.residual_species_by_target.get(target, ()))
+
+
+def _coating_authority_status(
+    trace: Any,
+    by_campaign: Mapping[tuple[str, str, str], float],
+) -> dict[str, Any]:
+    by_segment_species: dict[tuple[str, str], float] = defaultdict(float)
+    for (_campaign, segment, species), kg in by_campaign.items():
+        amount = _non_negative_number(kg, "wall deposit kg")
+        if amount > _EPS:
+            by_segment_species[(segment, species)] += amount
+    trace_status = getattr(trace, "wall_deposit_sticking_authority", {}) or {}
+    return wall_deposit_sticking_authority_status(
+        by_segment_species,
+        trace_status if isinstance(trace_status, Mapping) else {},
+    )
+
+
+def _authority_is_authoritative(payload: Mapping[str, Any]) -> bool:
+    for key in (
+        "authoritative_for_coating",
+        "authoritative_for_deposit_mass",
+        "authoritative",
+    ):
+        if key in payload:
+            return bool(payload[key])
+    return not _payload_has_deposited_species(payload)
+
+
+def _payload_has_deposited_species(payload: Mapping[str, Any]) -> bool:
+    raw = payload.get("deposited_species")
+    if isinstance(raw, str):
+        return bool(raw)
+    if isinstance(raw, (list, tuple)):
+        return bool(raw)
+    return False
+
+
+def _plain_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: _plain_value(value)
+        for key, value in payload.items()
+    }
+
+
+def _plain_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            key: _plain_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return tuple(_plain_value(item) for item in value)
+    if isinstance(value, list):
+        return [_plain_value(item) for item in value]
+    return value
 
 
 def _margin(

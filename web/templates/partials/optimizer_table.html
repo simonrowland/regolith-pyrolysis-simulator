@@ -85,12 +85,18 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if entry.coating.status == "available" %}
-                    <strong>{{ entry.coating.total_label or "deposit inconclusive" }}</strong><br>
+                    {% if entry.coating.status in ["available", "warning"] %}
+                    <strong>
+                        {% if entry.coating.status == "warning" %}Coating warning{% else %}{{ entry.coating.total_label or "deposit inconclusive" }}{% endif %}
+                    </strong><br>
                     <span class="range">
+                        {% if entry.coating.status == "warning" %}{{ entry.coating.total_label or "deposit inconclusive" }}; {% endif %}
                         campaigns to resinter:
                         {{ entry.coating.campaigns_to_resinter if entry.coating.campaigns_to_resinter is not none else "not declared" }}
                     </span>
+                    {% if entry.coating.status == "warning" and entry.coating.reason %}
+                    <br><span class="range">{{ entry.coating.reason }}</span>
+                    {% endif %}
                     {% else %}
                     <strong>Coating inconclusive</strong><br>
                     <span class="range">{{ entry.coating.reason }}</span>

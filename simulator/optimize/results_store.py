@@ -19,6 +19,10 @@ import time
 from typing import Any, Mapping, Sequence
 
 from simulator.corpus_version import current_corpus_version
+from simulator.diagnostics import (
+    coating_summary_with_grounded_authority,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -775,8 +779,9 @@ def _objective_payload_sense(item: Mapping[str, Any]) -> str:
 
 
 def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str, Any]]:
-    return {
-        gate: {
+    result: dict[str, dict[str, Any]] = {}
+    for gate, margin in margins.items():
+        payload = {
             "gate": margin.gate,
             "feasible": margin.feasible,
             "margin": _json_number(margin.margin, f"{gate}.margin"),
@@ -791,16 +796,62 @@ def _serialize_margins(margins: Mapping[str, GateMargin]) -> dict[str, dict[str,
             "observed": _json_number(margin.observed, f"{gate}.observed"),
             "detail": margin.detail,
         }
-        for gate, margin in margins.items()
-    }
+        _add_margin_status_fields(payload, margin)
+        result[gate] = payload
+    return result
+
+
+def _add_margin_status_fields(payload: dict[str, Any], margin: GateMargin) -> None:
+    payload["status"] = margin.status
+    payload["authoritative"] = bool(margin.authoritative)
+    payload["output_status"] = margin.output_status
+    if margin.status_reason:
+        payload["status_reason"] = margin.status_reason
+    if margin.status_payload:
+        payload["status_payload"] = _jsonable(margin.status_payload)
 
 
 def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, GateMargin]:
     margins: dict[str, GateMargin] = {}
     for gate, item in payload.items():
         threshold = item["threshold"]
+        gate_name = str(item["gate"])
+        authoritative_default = not (
+            gate_name == "coating" and "authoritative" not in item
+        )
+        authoritative_raw = (
+            item["authoritative"]
+            if "authoritative" in item
+            else authoritative_default
+        )
+        status_value = str(item.get("status", "available"))
+        authoritative_value = _strict_bool(authoritative_raw)
+        output_status = str(item.get("output_status", "authoritative"))
+        status_reason = str(item.get("status_reason", ""))
+        status_payload = (
+            _jsonable(item.get("status_payload", {}))
+            if isinstance(item.get("status_payload", {}), Mapping)
+            else {}
+        )
+        if gate_name == "coating":
+            grounded_authority = _coating_margin_grounded_authority(status_payload)
+            if grounded_authority is not None:
+                authoritative_value = bool(
+                    grounded_authority.get("authoritative_for_coating", False)
+                )
+                status_value = "available" if authoritative_value else "warning"
+                output_status = str(
+                    grounded_authority.get("output_status")
+                    or ("authoritative" if authoritative_value else "status_bearing")
+                )
+                status_reason = (
+                    ""
+                    if authoritative_value
+                    else str(grounded_authority.get("message", "non-authoritative coating"))
+                )
+                status_payload = _jsonable(grounded_authority)
         margins[str(gate)] = GateMargin(
-            gate=str(item["gate"]),
+            gate=gate_name,
             feasible=bool(item["feasible"]),
             margin=_decode_json_number(item["margin"], f"{gate}.margin"),
             threshold=ThresholdSpec(
@@ -813,8 +864,34 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             ),
             observed=_decode_json_number(item["observed"], f"{gate}.observed"),
             detail=str(item["detail"]),
+            status=status_value,
+            authoritative=authoritative_value,
+            output_status=output_status,
+            status_reason=status_reason,
+            status_payload=status_payload,
         )
     return margins
+
+
+def _coating_margin_grounded_authority(
+    status_payload: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    deposited_species = _coating_margin_deposited_species(status_payload)
+    if not deposited_species:
+        return None
+    wall_deposit = {species: 1.0 for species in deposited_species}
+    return wall_deposit_sticking_authority_status(wall_deposit, status_payload)
+
+
+def _coating_margin_deposited_species(
+    status_payload: Mapping[str, Any],
+) -> tuple[str, ...]:
+    raw = status_payload.get("deposited_species")
+    if isinstance(raw, str):
+        return (raw,) if raw else ()
+    if not isinstance(raw, SequenceABC):
+        return ()
+    return tuple(sorted(str(species) for species in raw if str(species)))
 
 
 def _serialize_run_reference(run_reference: RunReference | None) -> dict[str, Any] | None:
@@ -846,12 +923,17 @@ def _deserialize_run_reference(
 ) -> RunReference | None:
     if payload is None:
         return None
+    product_summary = payload.get("product_summary", {})
+    if isinstance(product_summary, Mapping):
+        product_summary = coating_summary_with_grounded_authority(product_summary)
+    else:
+        product_summary = {}
     return RunReference(
         status=str(payload["status"]),
         error_message=str(payload.get("error_message", "")),
         reason=str(payload.get("reason", "")),
         trace=result_blob,
-        product_summary=payload.get("product_summary", {}),
+        product_summary=product_summary,
         backend_name=(
             str(payload["backend_name"])
             if payload.get("backend_name") is not None
@@ -953,12 +1035,36 @@ def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
 def _jsonable(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _jsonable(item) for key, item in value.items()}
+    if isinstance(value, (set, frozenset)):
+        return sorted((_jsonable(item) for item in value), key=repr)
     if isinstance(value, tuple):
         return [_jsonable(item) for item in value]
     if isinstance(value, list):
         return [_jsonable(item) for item in value]
-    json.dumps(value)
+    if isinstance(value, float):
+        return value if math.isfinite(value) else str(value)
+    try:
+        json.dumps(value, allow_nan=False)
+    except (TypeError, ValueError):
+        return str(value)
     return value
+
+
+def _strict_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and not isinstance(value, bool):
+        if value in (0, 1):
+            return bool(value)
+        return False
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1"}:
+            return True
+        if normalized in {"false", "0"}:
+            return False
+        return False
+    return False
 
 
 def _canonical_json(value: Any) -> str:

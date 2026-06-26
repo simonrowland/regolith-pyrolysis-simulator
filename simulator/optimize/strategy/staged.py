@@ -1083,6 +1083,8 @@ def _joint_refine_target_indices(
     uncertain: set[int] = set()
     for member in archive:
         for name, margin in member.scored.feasibility_margins.items():
+            if getattr(margin, "authoritative", True) is False:
+                continue
             margin_value = getattr(margin, "margin", None)
             if not isinstance(margin_value, int | float) or abs(float(margin_value)) > 0.05:
                 continue
