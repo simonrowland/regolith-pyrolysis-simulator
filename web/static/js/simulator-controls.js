@@ -160,6 +160,18 @@ let recipeChoices = [];
 let lastRecipeTick = null;
 let lastRecipeSummary = null;
 
+function clearLoadedRecipeForManualEdit() {
+    if (!loadedRecipePatch) return;
+    loadedRecipePatch = null;
+    setStatusText('Recipe edited from loaded controls');
+}
+
+function handleRecipeDefiningControlEdit(e) {
+    if (e.target?.closest?.('.recipe-defining-control')) {
+        clearLoadedRecipeForManualEdit();
+    }
+}
+
 socket.on('simulation_tick', (data) => {
     lastRecipeTick = data || null;
 });
@@ -446,7 +458,6 @@ document.getElementById('btn-start').addEventListener('click', () => {
         c5_enabled: mrePayload.c5_enabled,
         mre_target_species: mrePayload.mre_target_species,
         mre_max_voltage_V: mrePayload.mre_max_voltage_V,
-        runtime_campaign_overrides: buildRuntimeCampaignOverrides(),
         additives: {
             Na: parseFloat(document.getElementById('add-na').value) || 0,
             K: parseFloat(document.getElementById('add-k').value) || 0,
@@ -455,7 +466,11 @@ document.getElementById('btn-start').addEventListener('click', () => {
             C: parseFloat(document.getElementById('add-c').value) || 0,
         },
     };
-    if (loadedRecipePatch) payload.setpoints_patch = loadedRecipePatch;
+    if (loadedRecipePatch) {
+        payload.setpoints_patch = loadedRecipePatch;
+    } else {
+        payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides();
+    }
     if (furnaceMaterialId) payload.furnace_material_id = furnaceMaterialId;
     socket.emit('start_simulation', payload);
 
@@ -524,7 +539,10 @@ document.getElementById('btn-resume').addEventListener('click', () => {
 
 // --- Event delegation for dynamically loaded controls ---
 // Handles .ctrl-param elements loaded via HTMX disclosure triangles
+document.addEventListener('input', handleRecipeDefiningControlEdit);
 document.addEventListener('change', (e) => {
+    handleRecipeDefiningControlEdit(e);
+
     if (e.target.classList.contains('recipe-lever')) {
         const rawValue = e.target.value;
         const value = parseFloat(rawValue);

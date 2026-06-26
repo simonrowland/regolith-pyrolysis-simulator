@@ -145,6 +145,9 @@ def recipe_save_context(sid: str) -> dict[str, object]:
         return {
             "recipe_inputs": copy.deepcopy(state.get("recipe_inputs") or {}),
             "setpoints_patch": copy.deepcopy(state.get("setpoints_patch") or {}),
+            "resolved_setpoints_patch": copy.deepcopy(
+                state.get("resolved_setpoints_patch") or {}
+            ),
             "last_recipe_capture": copy.deepcopy(capture),
             "last_completion_payload": copy.deepcopy(
                 state.get("last_completion_payload") or {}
@@ -230,6 +233,34 @@ def _recipe_inputs_payload(
         "additives_kg": copy.deepcopy(dict(additives_kg)),
         "furnace_material_id": furnace_material_id,
     }
+
+
+def _resolved_recipe_patch_for_session(
+    *,
+    setpoints_patch: Mapping[str, object],
+    setpoints: Mapping[str, object],
+    runtime_campaign_overrides: Mapping[str, Mapping[str, object]],
+) -> dict[str, object]:
+    if setpoints_patch:
+        return copy.deepcopy(dict(setpoints_patch))
+
+    campaigns = setpoints.get("campaigns") if isinstance(setpoints, Mapping) else {}
+    if not isinstance(campaigns, Mapping):
+        return {}
+    if "C2A_staged" not in runtime_campaign_overrides:
+        return {}
+
+    staged = campaigns.get("C2A_staged")
+    if not isinstance(staged, Mapping):
+        return {}
+    candidate = {"campaigns": {"C2A_staged": copy.deepcopy(dict(staged))}}
+    try:
+        return normalize_recipe_patch(
+            candidate,
+            source="resolved C2A_staged session setpoints_patch",
+        )
+    except RecipeIOError:
+        return {}
 
 
 def _clear_simulation_state(sid: str) -> None:
@@ -1035,9 +1066,6 @@ def register_events(socketio):
                 maximum=_MAX_MRE_VOLTAGE_V,
             )
             additives_kg = _coerce_additives_kg(data.get('additives', {}))
-            runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
-                data.get('runtime_campaign_overrides')
-            )
             raw_setpoints_patch = data.get('setpoints_patch')
             if raw_setpoints_patch in (None, {}, ''):
                 setpoints_patch: dict[str, object] = {}
@@ -1053,6 +1081,12 @@ def register_events(socketio):
                     )
                 except RecipeIOError as exc:
                     raise InputValidationError(str(exc)) from exc
+            if setpoints_patch:
+                runtime_campaign_overrides: dict[str, dict[str, float]] = {}
+            else:
+                runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
+                    data.get('runtime_campaign_overrides')
+                )
         except InputValidationError as exc:
             socketio.emit('simulation_status', {
                 'status': 'error',
@@ -1086,7 +1120,14 @@ def register_events(socketio):
         if setpoints_patch:
             try:
                 setpoints = _deep_merge_setpoints(setpoints, setpoints_patch)
+                c4_max_temp = _c4_setpoint_ceiling_T_C(setpoints)
             except RunnerError as exc:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': str(exc),
+                }, room=sid)
+                return
+            except InputValidationError as exc:
                 socketio.emit('simulation_status', {
                     'status': 'error',
                     'message': str(exc),
@@ -1168,6 +1209,11 @@ def register_events(socketio):
             furnace_material_id=furnace_material_id,
         )
         state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
+        state['resolved_setpoints_patch'] = _resolved_recipe_patch_for_session(
+            setpoints_patch=setpoints_patch,
+            setpoints=setpoints,
+            runtime_campaign_overrides=runtime_campaign_overrides,
+        )
 
         _emit_if_current(
             socketio,

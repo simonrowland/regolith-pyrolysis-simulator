@@ -12,11 +12,11 @@
         <fieldset class="config-group">
             <legend>Process Track</legend>
             <label>
-                <input type="radio" name="track" value="pyrolysis" checked>
+                <input type="radio" name="track" value="pyrolysis" class="recipe-defining-control" checked>
                 Pyrolysis (C0–C6)
             </label>
             <label>
-                <input type="radio" name="track" value="mre_baseline">
+                <input type="radio" name="track" value="mre_baseline" class="recipe-defining-control">
                 Standard MRE Baseline
             </label>
         </fieldset>
@@ -24,7 +24,7 @@
         <!-- Engine selection -->
         <fieldset class="config-group">
             <legend>Thermodynamic Engine</legend>
-            <select id="engine-select" aria-label="Thermodynamic engine">
+            <select id="engine-select" class="recipe-defining-control" aria-label="Thermodynamic engine">
                 <option value="auto" selected>Auto (AlphaMELTS preferred)</option>
                 <option value="alphamelts">AlphaMELTS (strict)</option>
                 <option value="stub">Built-in fallback</option>
@@ -34,7 +34,7 @@
         <!-- Feedstock selection -->
         <fieldset class="config-group">
             <legend>Feedstock</legend>
-            <select id="feedstock-select" aria-label="Feedstock">
+            <select id="feedstock-select" class="recipe-defining-control" aria-label="Feedstock">
                 <option value="">Select feedstock...</option>
                 {% for key, fs in feedstocks.items() %}
                 <option value="{{ key }}">{{ fs.label if fs.label is defined else key }}</option>
@@ -58,20 +58,21 @@
             <legend>Batch Parameters</legend>
             <label>
                 Batch mass (kg):
-                <input type="number" id="batch-mass" value="1000" min="1" step="100">
+                <input type="number" id="batch-mass" class="recipe-defining-control" value="1000" min="1" step="100">
             </label>
         </fieldset>
 
         <fieldset class="config-group" id="mre-config">
             <legend>MRE Policy</legend>
             <label class="toggle-row">
-                <input type="checkbox" id="mre-enabled">
+                <input type="checkbox" id="mre-enabled" class="recipe-defining-control">
                 Enable C5 limited MRE
             </label>
             <div class="mre-config-body" id="mre-fields" hidden>
                 <label>
                     Target species:
                     <select id="mre-preset"
+                            class="recipe-defining-control"
                             aria-label="MRE target species"
                             data-catalog-url="{{ url_for('web.mre_preset_catalog') }}">
                         {% with presets=mre_presets %}
@@ -91,7 +92,7 @@
             <legend>Recipe Levers</legend>
             <label>
                 Stage:
-                <select id="lever-campaign" aria-label="Recipe lever campaign">
+                <select id="lever-campaign" class="recipe-defining-control" aria-label="Recipe lever campaign">
                     <option value="C2A">C2A continuous</option>
                     <option value="C2A_staged">C2A staged</option>
                     <option value="C2B">C2B</option>
@@ -103,7 +104,7 @@
             </label>
             <label>
                 pO2 (mbar):
-                <input type="number" id="lever-po2-mbar" class="recipe-lever"
+                <input type="number" id="lever-po2-mbar" class="recipe-lever recipe-defining-control"
                        data-param="pO2_mbar" data-field="pO2_mbar" min="0" step="0.001" value="{{ c4_operator_presets.pO2_mbar }}">
             </label>
             <label>
@@ -118,27 +119,28 @@
                  data-continuum-buffer-kn="{{ knudsen_config.continuum_buffer_kn }}">Kn: —</div>
             <label>
                 Stage target T (&deg;C):
-                <input type="number" id="lever-stage-temp" class="recipe-lever"
+                <input type="number" id="lever-stage-temp" class="recipe-lever recipe-defining-control"
                        data-field="hold_temp_C" min="20" step="10" value="1600">
             </label>
             <label>
                 Stage duration (h):
-                <input type="number" id="lever-stage-duration" class="recipe-lever"
+                <input type="number" id="lever-stage-duration" class="recipe-lever recipe-defining-control"
                        data-field="max_hours" min="0" step="0.5" value="{{ c4_operator_presets.max_hold_hr }}">
             </label>
             <label>
                 Ramp (&deg;C/h):
-                <input type="number" id="lever-stage-ramp" class="recipe-lever"
+                <input type="number" id="lever-stage-ramp" class="recipe-lever recipe-defining-control"
                        data-field="ramp_rate" min="0" step="1" value="10">
             </label>
             <label>
                 C4 furnace cap (&deg;C):
-                <input type="number" id="c4-max-temp" min="1000" step="10" value="{{ c4_operator_presets.ceiling_T_C }}">
+                <input type="number" id="c4-max-temp" class="recipe-defining-control" min="1000" step="10" value="{{ c4_operator_presets.ceiling_T_C }}">
             </label>
             <div class="config-hint">Setpoint stir: {{ c4_operator_presets.stir_factor_label }}</div>
             <label>
                 Furnace material:
                 <select id="furnace-material"
+                        class="recipe-defining-control"
                         aria-label="Furnace material"
                         data-catalog-url="{{ url_for('web.furnace_material_catalog') }}">
                     <option value="" selected>Default (1800 C ceiling)</option>
@@ -158,11 +160,11 @@
         <fieldset class="config-group">
             <legend>Additives from Inventory (kg)</legend>
             <div class="additive-grid">
-                <label>Na: <input type="number" id="add-na" value="0" min="0" step="0.1"></label>
-                <label>K: <input type="number" id="add-k" value="0" min="0" step="0.1"></label>
-                <label>Mg: <input type="number" id="add-mg" value="0" min="0" step="1"></label>
-                <label>Ca: <input type="number" id="add-ca" value="0" min="0" step="0.1"></label>
-                <label>C: <input type="number" id="add-c" value="0" min="0" step="0.1"></label>
+                <label>Na: <input type="number" id="add-na" class="recipe-defining-control" value="0" min="0" step="0.1"></label>
+                <label>K: <input type="number" id="add-k" class="recipe-defining-control" value="0" min="0" step="0.1"></label>
+                <label>Mg: <input type="number" id="add-mg" class="recipe-defining-control" value="0" min="0" step="1"></label>
+                <label>Ca: <input type="number" id="add-ca" class="recipe-defining-control" value="0" min="0" step="0.1"></label>
+                <label>C: <input type="number" id="add-c" class="recipe-defining-control" value="0" min="0" step="0.1"></label>
             </div>
         </fieldset>
 

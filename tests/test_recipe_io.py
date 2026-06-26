@@ -301,6 +301,52 @@ def test_runner_recipe_runtime_campaign_overrides_win_same_key(
     assert payload["per_hour_summary"][0]["pO2_bar"] == pytest.approx(0.0003)
 
 
+def test_runner_recipe_cli_without_runtime_override_uses_recipe_same_key(
+    tmp_path: Path,
+) -> None:
+    schema = RecipeSchema()
+    recipe = schema.to_setpoints_patch(
+        RecipePatch({
+            ("campaigns", "C4", "pO2_mbar"): 0.1,
+        })
+    )
+    recipe_path = tmp_path / "c4-po2.recipe.yaml"
+    recipe_path.write_text(yaml.safe_dump(recipe, sort_keys=True), encoding="utf-8")
+    output_path = tmp_path / "run.json"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C4",
+            "--hours",
+            "1",
+            "--recipe",
+            str(recipe_path),
+            "--allow-fallback-vapor",
+            "--started-at-utc",
+            "2026-05-15T00:00:00Z",
+            "--kernel-commit-sha",
+            "recipe-test",
+            "--output",
+            str(output_path),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["status"] == "ok"
+    assert payload["per_hour_summary"][0]["pO2_bar"] == pytest.approx(0.0001)
+
+
 def test_runner_malformed_recipe_cli_fails_loud(tmp_path: Path) -> None:
     recipe_path = tmp_path / "bad.recipe.yaml"
     recipe_path.write_text(

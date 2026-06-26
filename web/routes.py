@@ -43,6 +43,7 @@ from simulator.recipe_io import (
     RECIPE_LIBRARY_DIR,
     RecipeIOError,
     load_recipe_patch,
+    normalize_recipe_patch,
     read_recipe_metadata,
     recipe_library_path,
     write_recipe_patch,
@@ -2298,6 +2299,14 @@ def _generated_recipe_patch_from_context(context: Mapping[str, Any]) -> dict[str
     return _deep_merge_recipe_patch(existing, generated)
 
 
+def _canonical_recipe_patch_from_context(context: Mapping[str, Any]) -> dict[str, Any]:
+    for key in ('resolved_setpoints_patch', 'setpoints_patch'):
+        candidate = context.get(key) or {}
+        if isinstance(candidate, Mapping) and candidate:
+            return normalize_recipe_patch(candidate, source=f'{key} recipe save context')
+    return _generated_recipe_patch_from_context(context)
+
+
 def _temperature_ladder_from_inputs(inputs: Mapping[str, Any]) -> list[dict[str, Any]]:
     overrides = inputs.get('runtime_campaign_overrides') or {}
     if not isinstance(overrides, Mapping):
@@ -2325,6 +2334,33 @@ def _temperature_ladder_from_inputs(inputs: Mapping[str, Any]) -> list[dict[str,
                 else fields.get('max_hours')
             ),
         })
+    return ladder
+
+
+def _temperature_ladder_from_patch(patch: Mapping[str, Any]) -> list[dict[str, Any]]:
+    campaigns = patch.get('campaigns')
+    if not isinstance(campaigns, Mapping):
+        return []
+    ladder = []
+    for campaign, config in campaigns.items():
+        if not isinstance(config, Mapping):
+            continue
+        stages = config.get('stages')
+        if not isinstance(stages, list):
+            continue
+        for stage in stages:
+            if not isinstance(stage, Mapping):
+                continue
+            stage_name = stage.get('name')
+            label = str(campaign)
+            if stage_name not in (None, ''):
+                label = f'{label}.{stage_name}'
+            ladder.append({
+                'stage': label,
+                'target_C': stage.get('target_C'),
+                'ramp_rate_C_per_hr': stage.get('ramp_rate_C_per_hr'),
+                'duration_h': stage.get('duration_h'),
+            })
     return ladder
 
 
@@ -2413,6 +2449,17 @@ def _metadata_from_context(title: str, context: Mapping[str, Any]) -> dict[str, 
     tick = capture.get('tick') if isinstance(capture, Mapping) else {}
     if not isinstance(tick, Mapping):
         tick = {}
+    setpoints_patch = (
+        context.get('resolved_setpoints_patch')
+        or context.get('setpoints_patch')
+        or {}
+    )
+    if not isinstance(setpoints_patch, Mapping):
+        setpoints_patch = {}
+    temperature_ladder = (
+        _temperature_ladder_from_patch(setpoints_patch)
+        or _temperature_ladder_from_inputs(inputs)
+    )
     campaign = str(
         tick.get('campaign')
         or next(iter((inputs.get('runtime_campaign_overrides') or {}) or {}), '')
@@ -2421,7 +2468,7 @@ def _metadata_from_context(title: str, context: Mapping[str, Any]) -> dict[str, 
         'feedstock': inputs.get('feedstock'),
         'campaign': campaign,
         'hours': tick.get('hour'),
-        'temperature_ladder': _temperature_ladder_from_inputs(inputs),
+        'temperature_ladder': temperature_ladder,
         'pO2_mbar': tick.get('pO2_mbar'),
         'p_total_mbar': tick.get('p_total_mbar'),
         'furnace_max_T_C': inputs.get('furnace_max_T_C'),
@@ -2546,7 +2593,7 @@ def save_recipe():
         from web.events import RecipeStateError, recipe_save_context
         context = recipe_save_context(sid)
         metadata = _metadata_from_context(title, context)
-        setpoints_patch = _generated_recipe_patch_from_context(context)
+        setpoints_patch = _canonical_recipe_patch_from_context(context)
         name = _recipe_slug(title)
         destination = recipe_library_path(name, library_dir=_recipe_library_dir())
         if destination.exists():

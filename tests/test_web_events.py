@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -14,7 +15,7 @@ from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
-from simulator.recipe_io import load_recipe_patch, read_recipe_metadata
+from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.session import drive_auto_apply
 from simulator.state import DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
@@ -35,6 +36,20 @@ from web.events import (
 
 _DELETE = object()
 _REPO_ROOT = Path(__file__).resolve().parents[1]
+_RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
+
+
+def _tag_with_id(source: str, element_id: str) -> str:
+    match = re.search(
+        r'<(?:input|select)\b(?=[^>]*\bid="' + re.escape(element_id) + r'")[^>]*>',
+        source,
+    )
+    assert match is not None, element_id
+    return match.group(0)
+
+
+def _assert_recipe_defining_marker(source: str, element_id: str) -> None:
+    assert "recipe-defining-control" in _tag_with_id(source, element_id)
 
 
 def _sim_with_mass_balance_snapshot(error_pct, category=None):
@@ -133,6 +148,45 @@ def _install_recipe_endpoint_state(sid: str) -> None:
     _sim_locks[sid] = threading.Lock()
 
 
+def _recipe_metadata(title: str, campaign: str = "C4") -> dict[str, object]:
+    return {
+        "title": title,
+        "feedstock": "lunar_mare_low_ti",
+        "campaign": campaign,
+        "headline_recipe": {
+            "feedstock": "lunar_mare_low_ti",
+            "campaign": campaign,
+            "temperature_ladder": [],
+        },
+        "headline_results": {
+            "oxygen_kg": 0.0,
+            "energy_kWh": 0.0,
+            "wall_deposit_kg": 0.0,
+        },
+    }
+
+
+def _force_socketio_stub(monkeypatch) -> list[tuple[object, tuple, dict]]:
+    captured_tasks: list[tuple[object, tuple, dict]] = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    return captured_tasks
+
+
 def test_recipe_save_list_load_endpoints_round_trip_without_run(
     tmp_path,
     monkeypatch,
@@ -222,6 +276,203 @@ def test_recipe_save_list_load_endpoints_round_trip_without_run(
         assert payload["controls"]["lever_campaign"] == "C4"
         assert _simulations[load_sid]["setpoints_patch"] == patch
     finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_loaded_recipe_start_ignores_stale_runtime_levers(
+    tmp_path,
+    monkeypatch,
+):
+    loaded_patch = {
+        "campaigns": {
+            "C4": {
+                "temp_range_C": [1585.0, 1595.0],
+                "pO2_mbar_default": 0.1,
+                "p_total_mbar_default": 0.1,
+            }
+        }
+    }
+    write_recipe_patch(
+        tmp_path / "loaded-c4.yaml",
+        loaded_patch,
+        metadata=_recipe_metadata("Loaded C4", "C4"),
+    )
+    _force_socketio_stub(monkeypatch)
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    loaded = app.test_client().post("/recipes/load", json={"name": "loaded-c4"})
+    assert loaded.status_code == 200, loaded.get_json()
+
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "c4_max_temp_C": 1670.0,
+                "setpoints_patch": loaded.get_json()["setpoints_patch"],
+                "runtime_campaign_overrides": {
+                    "C4": {
+                        "pO2_mbar": 0.2,
+                        "hold_temp_C": 1600.0,
+                    }
+                },
+            },
+        )
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses
+        assert statuses[-1]["status"] == "started"
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        sim = state["session"].simulator
+        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {}
+        assert sim.campaign_mgr.overrides.get("C4", {}) == {}
+        assert sim.campaign_mgr.c4_max_temp_C == pytest.approx(1595.0)
+        assert sim.setpoints["campaigns"]["C4"]["temp_range_C"] == pytest.approx(
+            [1585.0, 1595.0]
+        )
+    finally:
+        client.disconnect()
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_save_serializes_resolved_staged_ladder(tmp_path):
+    staged_patch = load_recipe_patch(
+        _RECIPE_DIR / "c2a_staged_temperature_ladder.yaml"
+    )
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    client = app.test_client()
+    sid = "recipe-staged-save-sid"
+    _install_recipe_endpoint_state(sid)
+    _simulations[sid]["setpoints_patch"] = {}
+    _simulations[sid]["resolved_setpoints_patch"] = copy.deepcopy(staged_patch)
+    _simulations[sid]["last_recipe_capture"]["tick"]["campaign"] = "C2A_staged"
+
+    try:
+        response = client.post(
+            "/recipes/save",
+            json={"sid": sid, "title": "Resolved Staged Ladder"},
+        )
+        assert response.status_code == 200, response.get_json()
+        saved_path = tmp_path / f"{response.get_json()['name']}.yaml"
+        saved_patch = load_recipe_patch(saved_path)
+        assert saved_patch == staged_patch
+
+        stages = saved_patch["campaigns"]["C2A_staged"]["stages"]
+        assert [
+            (stage.get("target_C"), stage["ramp_rate_C_per_hr"], stage["duration_h"])
+            for stage in stages
+        ] == [
+            (1250, 600, 4),
+            (1600, 175, 3),
+            (None, 150, 1),
+            (1150, 600, 1),
+        ]
+        ladder = read_recipe_metadata(saved_path)["headline_recipe"][
+            "temperature_ladder"
+        ]
+        assert [entry["stage"] for entry in ladder] == [
+            "C2A_staged.alkali_early_fe",
+            "C2A_staged.sio_window",
+            "C2A_staged.fe_hot_hold",
+            "C2A_staged.cool_for_na_shuttle",
+        ]
+    finally:
+        for active_sid in list(_simulations):
+            _clear_simulation_state(active_sid)
+
+
+def test_staged_recipe_save_load_start_is_identity(
+    tmp_path,
+    monkeypatch,
+):
+    staged_patch = load_recipe_patch(
+        _RECIPE_DIR / "c2a_staged_temperature_ladder.yaml"
+    )
+    _force_socketio_stub(monkeypatch)
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+    http_client = app.test_client()
+    save_sid = "recipe-staged-identity-save-sid"
+    _install_recipe_endpoint_state(save_sid)
+    _simulations[save_sid]["setpoints_patch"] = {}
+    _simulations[save_sid]["resolved_setpoints_patch"] = copy.deepcopy(staged_patch)
+    _simulations[save_sid]["last_recipe_capture"]["tick"]["campaign"] = "C2A_staged"
+
+    socket_client = None
+    try:
+        saved = http_client.post(
+            "/recipes/save",
+            json={"sid": save_sid, "title": "Staged Identity"},
+        )
+        assert saved.status_code == 200, saved.get_json()
+        saved_patch = load_recipe_patch(tmp_path / f"{saved.get_json()['name']}.yaml")
+        loaded = http_client.post(
+            "/recipes/load",
+            json={"name": saved.get_json()["name"]},
+        )
+        assert loaded.status_code == 200, loaded.get_json()
+        assert loaded.get_json()["setpoints_patch"] == saved_patch
+
+        socket_client = app_module.socketio.test_client(app)
+        assert socket_client.is_connected()
+        socket_client.get_received()
+        before = set(_simulations)
+        socket_client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "setpoints_patch": loaded.get_json()["setpoints_patch"],
+                "runtime_campaign_overrides": {
+                    "C4": {"hold_temp_C": 1600.0, "pO2_mbar": 0.2}
+                },
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in socket_client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses
+        assert statuses[-1]["status"] == "started"
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {}
+        assert state["resolved_setpoints_patch"] == saved_patch
+        assert (
+            state["session"]
+            .simulator
+            .setpoints["campaigns"]["C2A_staged"]["stages"]
+            == saved_patch["campaigns"]["C2A_staged"]["stages"]
+        )
+    finally:
+        if socket_client is not None:
+            socket_client.disconnect()
         for active_sid in list(_simulations):
             _clear_simulation_state(active_sid)
 
@@ -355,6 +606,67 @@ def test_recipe_ui_uses_text_content_for_loaded_titles() -> None:
     assert "titleEl.textContent" in controls
     assert "summaryEl.textContent" in controls
     assert "innerHTML" not in controls
+    assert "payload.setpoints_patch = loadedRecipePatch" in controls
+    assert (
+        "payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides()"
+        in controls
+    )
+    assert "clearLoadedRecipeForManualEdit" in controls
+
+
+def test_recipe_defining_controls_share_loaded_recipe_clear_marker() -> None:
+    simulator_template = (
+        _REPO_ROOT / "web/templates/simulator.html"
+    ).read_text(encoding="utf-8")
+    disclosure_template = (
+        _REPO_ROOT / "web/templates/partials/disclosure.html"
+    ).read_text(encoding="utf-8")
+
+    for element_id in (
+        "engine-select",
+        "feedstock-select",
+        "batch-mass",
+        "mre-enabled",
+        "mre-preset",
+        "lever-campaign",
+        "lever-po2-mbar",
+        "lever-stage-temp",
+        "lever-stage-duration",
+        "lever-stage-ramp",
+        "c4-max-temp",
+        "furnace-material",
+        "add-na",
+        "add-k",
+        "add-mg",
+        "add-ca",
+        "add-c",
+    ):
+        _assert_recipe_defining_marker(simulator_template, element_id)
+
+    assert 'class="ctrl-param recipe-defining-control"' in disclosure_template
+    assert 'class="campaign-ctrl recipe-defining-control"' in disclosure_template
+
+
+def test_loaded_recipe_manual_edit_contract_clears_before_start_payload() -> None:
+    controls = (
+        _REPO_ROOT / "web/static/js/simulator-controls.js"
+    ).read_text(encoding="utf-8")
+
+    assert "e.target?.closest?.('.recipe-defining-control')" in controls
+    assert "document.addEventListener('input', handleRecipeDefiningControlEdit)" in controls
+    assert "handleRecipeDefiningControlEdit(e);" in controls
+    assert "#additive-controls" not in controls
+    assert "payload.setpoints_patch = loadedRecipePatch" in controls
+    assert (
+        "payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides()"
+        in controls
+    )
+    assert "c5_enabled: mrePayload.c5_enabled" in controls
+    assert "mre_target_species: mrePayload.mre_target_species" in controls
+    assert "mre_max_voltage_V: mrePayload.mre_max_voltage_V" in controls
+    assert "if (furnaceMaterialId) payload.furnace_material_id" in controls
+    for element_id in ("add-na", "add-k", "add-mg", "add-ca", "add-c"):
+        assert f"document.getElementById('{element_id}').value" in controls
 
 
 def test_launcher_defaults_to_localhost_and_debug_off(monkeypatch):

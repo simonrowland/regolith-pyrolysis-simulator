@@ -9,7 +9,7 @@
         <label>
             Mg pyrolysis ceiling (&deg;C):
             <input type="number" id="c4-max-temp" value="{{ c4_operator_presets.ceiling_T_C }}" min="1400" max="1900" step="10"
-                   class="ctrl-param" data-param="c4_max_temp">
+                   class="ctrl-param recipe-defining-control" data-param="c4_max_temp">
         </label>
         <div class="config-hint">Higher &rarr; more Mg extracted, but melt freezes as refractories concentrate. Setpoint stir: {{ c4_operator_presets.stir_factor_label }}.</div>
     </div>
@@ -91,14 +91,14 @@
                 <label>
                     Ramp rate (&deg;C/hr):
                     <input type="number" min="1" max="100" step="1"
-                           class="campaign-ctrl" data-field="ramp_rate"
+                           class="campaign-ctrl recipe-defining-control" data-field="ramp_rate"
                            placeholder="default">
                 </label>
             </div>
             <div class="ctrl-row">
                 <label>
                     pO&#x2082; target (mbar):
-                    <select class="campaign-ctrl" data-field="pO2_mbar">
+                    <select class="campaign-ctrl recipe-defining-control" data-field="pO2_mbar">
                         {% if section == 'C4' %}
                         <option value="{{ c4_operator_presets.pO2_mbar }}" selected>Setpoint default ({{ c4_operator_presets.pO2_mbar }})</option>
                         {% else %}
@@ -115,7 +115,7 @@
             <div class="ctrl-row">
                 <label>
                     Inductive stirring:
-                    <select class="campaign-ctrl" data-field="stir_factor">
+                    <select class="campaign-ctrl recipe-defining-control" data-field="stir_factor">
                         {% if section == 'C4' %}
                         <option value="{{ c4_operator_presets.stir_factor_default }}" selected>Setpoint default ({{ c4_operator_presets.stir_factor_label }})</option>
                         {% else %}
@@ -132,7 +132,7 @@
                 <label>
                     Max duration (hrs, 0=default):
                     <input type="number" min="0" max="100" step="1"
-                           class="campaign-ctrl" data-field="max_hours"
+                           class="campaign-ctrl recipe-defining-control" data-field="max_hours"
                            {% if section == 'C4' %}value="{{ c4_operator_presets.max_hold_hr }}"{% endif %}
                            placeholder="default">
                 </label>

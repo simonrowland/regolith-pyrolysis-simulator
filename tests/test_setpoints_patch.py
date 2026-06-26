@@ -6,10 +6,12 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.core import CampaignPhase
 from simulator.runner import (
     PyrolysisRun,
     RunnerError,
     _canonical_runtime_campaign_overrides,
+    _deep_merge_setpoints,
     _parse_runtime_campaign_overrides_json,
 )
 from simulator.session import SimSession, SimSessionConfig
@@ -102,6 +104,81 @@ def test_setpoints_patch_fallback_and_runtime_override_precedence() -> None:
     assert session.simulator.campaign_mgr.overrides["C2A"] == {
         "p_total_mbar": 9.0,
     }
+
+
+def test_loaded_recipe_patch_without_explicit_override_uses_recipe_config() -> None:
+    setpoints_patch = {
+        "campaigns": {
+            "C4": {
+                "pO2_mbar": 0.1,
+                "p_total_mbar_default": 0.1,
+                "temp_range_C": [1500.0, 1550.0],
+            }
+        }
+    }
+    run = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C4",
+        setpoints_patch=setpoints_patch,
+    )
+
+    config = run._session_config()
+    session = SimSession().start(config)
+    c4_config = session.simulator.campaign_mgr._campaign_config(CampaignPhase.C4)
+
+    assert config.runtime_campaign_overrides == {}
+    assert session.simulator.campaign_mgr.overrides.get("C4", {}) == {}
+    assert c4_config["pO2_mbar"] == pytest.approx(0.1)
+    assert session.simulator.melt.pO2_mbar == pytest.approx(0.1)
+    assert c4_config["p_total_mbar_default"] == pytest.approx(0.1)
+    assert c4_config["temp_range_C"] == pytest.approx([1500.0, 1550.0])
+
+
+def test_session_merged_recipe_patch_has_no_implicit_override_layer() -> None:
+    setpoints_patch = {
+        "campaigns": {
+            "C4": {
+                "pO2_mbar_default": 0.12,
+                "p_total_mbar_default": 0.12,
+            }
+        }
+    }
+    config = _session_config(
+        campaign="C4",
+        setpoints=_deep_merge_setpoints(_load_yaml("setpoints.yaml"), setpoints_patch),
+    )
+
+    session = SimSession().start(config)
+    c4_config = session.simulator.campaign_mgr._campaign_config(CampaignPhase.C4)
+
+    assert config.runtime_campaign_overrides == {}
+    assert session.simulator.campaign_mgr.overrides.get("C4", {}) == {}
+    assert c4_config["pO2_mbar_default"] == pytest.approx(0.12)
+
+
+def test_loaded_recipe_patch_explicit_runtime_override_still_wins() -> None:
+    run = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C4",
+        setpoints_patch={
+            "campaigns": {
+                "C4": {
+                    "pO2_mbar_default": 0.1,
+                    "p_total_mbar_default": 0.1,
+                }
+            }
+        },
+        runtime_campaign_overrides={"C4": {"pO2_mbar": 0.3}},
+    )
+
+    session = SimSession().start(run._session_config())
+
+    assert session.simulator.campaign_mgr._campaign_config(CampaignPhase.C4)[
+        "pO2_mbar_default"
+    ] == pytest.approx(0.1)
+    assert session.simulator.campaign_mgr._campaign_overrides(CampaignPhase.C4)[
+        "pO2_mbar"
+    ] == pytest.approx(0.3)
 
 
 def test_setpoints_patch_rejects_chemistry_kernel() -> None:

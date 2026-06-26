@@ -375,6 +375,26 @@ class CampaignManager:
             raise ValueError(f'Missing numeric campaign setpoint: {label}')
         return self._float(value, 0.0)
 
+    def _scalar_config_float(self,
+                             config: Mapping[str, object],
+                             key: str) -> float | None:
+        if key not in config:
+            return None
+        value = config.get(key)
+        if value is None or isinstance(value, (list, tuple, Mapping)):
+            return None
+        return self._float(value, 0.0)
+
+    def _pressure_config_float(self,
+                               config: Mapping[str, object],
+                               scalar_key: str,
+                               default_key: str,
+                               default: float) -> float:
+        scalar_value = self._scalar_config_float(config, scalar_key)
+        if scalar_value is not None:
+            return scalar_value
+        return self._float(config.get(default_key), default)
+
     def _configured_max_hold_hr(self,
                                 campaign: CampaignPhase,
                                 *path: str) -> float:
@@ -540,50 +560,66 @@ class CampaignManager:
         elif campaign == CampaignPhase.C0B:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 9.0)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 9.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 9.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 9.0)
 
         elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.PN2_SWEEP
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.0)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 10.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 10.0)
 
         elif campaign == CampaignPhase.C2B:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 1.5)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 1.5)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 1.5)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.5)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 1.0)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 1.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 1.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
 
         elif campaign == CampaignPhase.C4:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.2)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 0.2)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
 
         elif campaign == CampaignPhase.C5:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 50.0)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 50.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
 
         elif campaign == CampaignPhase.C6:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 0.2)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 0.2)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
 
         elif campaign == CampaignPhase.MRE_BASELINE:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
-            melt.pO2_mbar = self._float(cfg.get('pO2_mbar_default'), 50.0)
-            melt.p_total_mbar = self._float(cfg.get('p_total_mbar_default'), 50.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
