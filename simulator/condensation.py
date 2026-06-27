@@ -1372,12 +1372,30 @@ class CondensationModel:
             )
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
+            stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
 
             for stage in self.train.stages:
                 if remaining_kg <= 1e-15:
                     break
                 if _cr_stage_isolation_blocks(stage, species):
                     continue
+                stage_alpha_record = _stage_alpha_record(
+                    stage,
+                    species,
+                    self.materials,
+                )
+                # Every EVALUATED stage's alpha influences the final wall
+                # deposit: it sets how much vapor this stage removes versus
+                # passes downstream to the wall sink (the wall_hkl / hkl_sink
+                # split), so its provenance must enter deposit authority even
+                # when this stage itself condenses ~0 -- otherwise an uncertified
+                # low/zero stage alpha drives a positive wall deposit while it
+                # stays authoritative (an F0 fail-open; BUG-096 sibling caught by
+                # the codex repro 2026-06-27). Only stages reached before full
+                # capture (remaining_kg>1e-15) are evaluated, so this never
+                # demotes on a non-influencing stage.
+                stage_alpha_records_by_stage[stage.stage_number] = dict(
+                    stage_alpha_record)
                 # Calculate band-aware H-K-L deposition efficiency [COND-2]
                 eta = self._condensation_efficiency(
                     stage=stage,
@@ -1385,7 +1403,7 @@ class CondensationModel:
                     T_cond_C=T_cond,
                     residence_s=self.residence_time_s.get(
                         stage.stage_number, 1.0),
-                    alpha_s=_stage_alpha_s(stage, species, self.materials),
+                    alpha_s=float(stage_alpha_record.get('alpha_s', 0.0)),
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings),
@@ -1445,6 +1463,7 @@ class CondensationModel:
                         transport_notice)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
             hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
+            capture_budget_alpha_record: dict[str, Any] = {}
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
                 rate_kg_hr,
@@ -1452,6 +1471,7 @@ class CondensationModel:
                 self.residence_time_s,
                 temps=self.condensation_temperatures_C,
                 vapor_pressure_data=self.vapor_pressure_data,
+                alpha_record_out=capture_budget_alpha_record,
             )
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
@@ -1509,6 +1529,19 @@ class CondensationModel:
                             stage_impurity[species] = (
                                 stage_impurity.get(species, 0.0)
                                 + condensed_kg)
+                if wall_deposit_kg > 1e-15:
+                    alpha_provenance = (
+                        wall_sticking_alpha_provenance_by_species
+                        .setdefault(species, {})
+                    )
+                    for stage_number, record in (
+                        stage_alpha_records_by_stage.items()
+                    ):
+                        alpha_provenance[f'stage_{stage_number}'] = dict(
+                            record)
+                    if capture_budget_alpha_record:
+                        alpha_provenance['capture_budget'] = dict(
+                            capture_budget_alpha_record)
 
             remaining_by_species[species] = max(
                 0.0, rate_kg_hr - capture_budget_kg)
@@ -2072,16 +2105,7 @@ def _stage_alpha_s(
     species: str,
     materials: Mapping[str, Any] | None = None,
 ) -> float:
-    config = _stage_material_config(stage, materials)
-    alpha_by_species = config.get('alpha_s_by_species', {}) or {}
-    value = None
-    if isinstance(alpha_by_species, Mapping) and species in alpha_by_species:
-        value = alpha_by_species.get(species)
-    if value is None:
-        value = _sticking_species_entry(species)
-    else:
-        value = _alpha_entry_with_species(species, value)
-    return _coerce_alpha_s(value)
+    return float(_stage_alpha_record(stage, species, materials)['alpha_s'])
 
 
 def _alpha_entry_with_species(species: str, entry: Any) -> Any:
@@ -2177,57 +2201,7 @@ def _wall_alpha_s(
     )['alpha_s'])
 
 
-def _wall_alpha_record(
-    species: str,
-    materials: Mapping[str, Any] | None = None,
-    *,
-    segment: PipeSegment | None = None,
-) -> dict[str, Any]:
-    config = _wall_material_config(materials)
-    alpha_by_species = config.get('alpha_s_by_species', {}) or {}
-    if segment is not None and getattr(segment, 'liner_material', ''):
-        liner_material = str(segment.liner_material)
-        material_config = _liner_material_config(liner_material, materials)
-        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
-        if isinstance(material_alpha, Mapping) and species in material_alpha:
-            return _alpha_record(
-                species=species,
-                entry=material_alpha.get(species),
-                source=(
-                    'data/materials.yaml::liner_materials.'
-                    f'{liner_material}.alpha_s_by_species.{species}'
-                ),
-                liner_material=liner_material,
-                segment=segment,
-                source_class='material_liner_alpha',
-            )
-    if isinstance(alpha_by_species, Mapping) and species in alpha_by_species:
-        return _alpha_record(
-            species=species,
-            entry=alpha_by_species.get(species),
-            source=(
-                'data/materials.yaml::wall_surfaces.interstage_duct.'
-                f'alpha_s_by_species.{species}'
-            ),
-            liner_material=str(config.get('liner_material') or ''),
-            segment=segment,
-        )
-    liner_material = str(config.get('liner_material') or '')
-    if liner_material:
-        material_config = _liner_material_config(liner_material, materials)
-        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
-        if isinstance(material_alpha, Mapping) and species in material_alpha:
-            return _alpha_record(
-                species=species,
-                entry=material_alpha.get(species),
-                source=(
-                    'data/materials.yaml::liner_materials.'
-                    f'{liner_material}.alpha_s_by_species.{species}'
-                ),
-                liner_material=liner_material,
-                segment=segment,
-                source_class='material_liner_alpha',
-            )
+def _sidecar_alpha_record(species: str) -> dict[str, Any]:
     return _alpha_record(
         species=species,
         entry={
@@ -2243,6 +2217,105 @@ def _wall_alpha_record(
             f'{species}'
         )
     )
+
+
+def _stage_alpha_record(
+    stage: CondensationStage,
+    species: str,
+    materials: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    config = _stage_material_config(stage, materials)
+    alpha_by_species = config.get('alpha_s_by_species', {}) or {}
+    entry = (
+        alpha_by_species.get(species)
+        if isinstance(alpha_by_species, Mapping)
+        else None
+    )
+    # An explicit null / absent stage entry falls back to the grounded sidecar
+    # record (matching the pre-record _stage_alpha_s behaviour); only a present
+    # non-None material entry overrides it.
+    if entry is not None:
+        record = _alpha_record(
+            species=species,
+            entry=entry,
+            source=(
+                'data/materials.yaml::stages.'
+                f'{stage.stage_number}.alpha_s_by_species.{species}'
+            ),
+            source_class='material_stage_alpha',
+        )
+        record['stage_number'] = int(stage.stage_number)
+        return record
+    record = _sidecar_alpha_record(species)
+    record['stage_number'] = int(stage.stage_number)
+    return record
+
+
+def _wall_alpha_record(
+    species: str,
+    materials: Mapping[str, Any] | None = None,
+    *,
+    segment: PipeSegment | None = None,
+) -> dict[str, Any]:
+    config = _wall_material_config(materials)
+    alpha_by_species = config.get('alpha_s_by_species', {}) or {}
+    if segment is not None and getattr(segment, 'liner_material', ''):
+        liner_material = str(segment.liner_material)
+        material_config = _liner_material_config(liner_material, materials)
+        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
+        if (
+            isinstance(material_alpha, Mapping)
+            and material_alpha.get(species) is not None
+        ):
+            return _alpha_record(
+                species=species,
+                entry=material_alpha.get(species),
+                source=(
+                    'data/materials.yaml::liner_materials.'
+                    f'{liner_material}.alpha_s_by_species.{species}'
+                ),
+                liner_material=liner_material,
+                segment=segment,
+                source_class='material_liner_alpha',
+            )
+    if (
+        isinstance(alpha_by_species, Mapping)
+        and alpha_by_species.get(species) is not None
+    ):
+        return _alpha_record(
+            species=species,
+            entry=alpha_by_species.get(species),
+            source=(
+                'data/materials.yaml::wall_surfaces.interstage_duct.'
+                f'alpha_s_by_species.{species}'
+            ),
+            liner_material=str(config.get('liner_material') or ''),
+            segment=segment,
+        )
+    liner_material = str(config.get('liner_material') or '')
+    if liner_material:
+        material_config = _liner_material_config(liner_material, materials)
+        material_alpha = material_config.get('alpha_s_by_species', {}) or {}
+        if (
+            isinstance(material_alpha, Mapping)
+            and material_alpha.get(species) is not None
+        ):
+            return _alpha_record(
+                species=species,
+                entry=material_alpha.get(species),
+                source=(
+                    'data/materials.yaml::liner_materials.'
+                    f'{liner_material}.alpha_s_by_species.{species}'
+                ),
+                liner_material=liner_material,
+                segment=segment,
+                source_class='material_liner_alpha',
+            )
+    return _sidecar_alpha_record(species)
+
+
+def _capture_budget_alpha_record(species: str) -> dict[str, Any]:
+    return _sidecar_alpha_record(species)
 
 
 def _liner_material_config(
@@ -2985,6 +3058,7 @@ def _pressure_isolated_capture_budget_kg(
     *,
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    alpha_record_out: MutableMapping[str, Any] | None = None,
 ) -> float:
     """Hold total vapor removal fixed until Chunk C pressure coupling lands."""
 
@@ -2994,6 +3068,10 @@ def _pressure_isolated_capture_budget_kg(
         temps=temps,
         vapor_pressure_data=vapor_pressure_data,
     )
+    alpha_record = _capture_budget_alpha_record(species)
+    if alpha_record_out is not None:
+        alpha_record_out.clear()
+        alpha_record_out.update(alpha_record)
     alpha_s = _sticking_alpha_s(species)
     for stage in stages:
         if remaining_kg <= 1e-15:

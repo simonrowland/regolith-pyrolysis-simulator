@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import copy
 import json
 import pickle
 from types import SimpleNamespace
 
 import pytest
 
+import simulator.condensation as condensation_module
+from simulator.condensation import CondensationModel
+from simulator.core import CondensationTrain, EvaporationFlux, MeltState
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.optimize.objective import _coating_product_summary
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
@@ -123,6 +127,41 @@ def _fake_sim(
     return sim
 
 
+def _materials_with_stage_alpha(
+    stage_number: int,
+    species: str,
+    entry: dict[str, object],
+) -> dict[str, object]:
+    materials = copy.deepcopy(condensation_module.MATERIALS_DATA)
+    stage_config = materials["stages"][stage_number]
+    stage_config["alpha_s_by_species"][species] = dict(entry)
+    return materials
+
+
+def _route_wall_deposit_authority(
+    species: str,
+    *,
+    materials: dict[str, object] | None = None,
+    wall_temperature_C: float = 900.0,
+) -> tuple[object, dict[str, object]]:
+    model = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=wall_temperature_C,
+        materials=materials,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    route = model.route(
+        EvaporationFlux(species_kg_hr={species: 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+    authority = wall_deposit_sticking_authority_status(
+        route.wall_deposit_by_segment_species,
+        route.sticking_alpha_provenance_notice,
+    )
+    return route, authority
+
+
 def _constraints(species: str) -> PhysicsConstraintSet:
     return PhysicsConstraintSet(
         allowable_wall_deposit_kg={
@@ -219,6 +258,172 @@ def test_uncertified_deposited_alpha_status_reaches_all_coating_surfaces() -> No
     assert leaderboard_row["coating_status"] == "warning"
     assert leaderboard_row["coating_authoritative"] is False
     assert leaderboard_row["coating_output_status"] == "status_bearing"
+
+
+def test_uncertified_stage_alpha_driving_wall_deposit_fails_closed() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 1.0,
+                "status": "UNCERTIFIED",
+                "output_status": "status_bearing",
+                "source_class": "test_uncertified_stage_alpha",
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert "Fe" in authority["uncertified_alpha_species"]
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
+    assert provenance["stage_1"]["source_class"] == (
+        "test_uncertified_stage_alpha"
+    )
+
+
+def test_uncertified_non_condensing_stage_alpha_fails_closed() -> None:
+    # Regression for the codex-caught F0 fail-open (2026-06-27): a stage whose
+    # alpha is 0.0 does NOT condense, yet it still drives the final wall deposit
+    # by passing all its vapor downstream to the wall sink, so its (uncertified)
+    # provenance must still demote the deposit. Pre-fold this returned
+    # authoritative=True with no stage_1 provenance key.
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 0.0,
+                "status": "UNCERTIFIED",
+                "output_status": "status_bearing",
+                "source_class": "test_uncertified_noncondensing_stage_alpha",
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert "Fe" in authority["uncertified_alpha_species"]
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
+    assert provenance["stage_1"]["source_class"] == (
+        "test_uncertified_noncondensing_stage_alpha"
+    )
+
+
+def test_null_wall_liner_alpha_falls_back_to_grounded_sidecar() -> None:
+    # D-class sibling (codex round-2 catch): an explicit null wall/liner alpha
+    # entry must fall back to the grounded sidecar coefficient, NOT collapse to
+    # 0.0 -- otherwise a null override silently zeroes the wall deposit. Mirrors
+    # the stage-null fallback.
+    route_default, _ = _route_wall_deposit_authority("Fe")
+    default_dep = route_default.wall_deposit_by_species.get("Fe", 0.0)
+    assert default_dep > 0.0
+
+    materials = copy.deepcopy(condensation_module.MATERIALS_DATA)
+    materials["liner_materials"]["fe_condenser_liner"][
+        "alpha_s_by_species"
+    ]["Fe"] = None
+    route_null, _ = _route_wall_deposit_authority("Fe", materials=materials)
+    null_dep = route_null.wall_deposit_by_species.get("Fe", 0.0)
+
+    # null -> sidecar == the grounded default; pre-fix this collapsed to 0.0.
+    assert null_dep == pytest.approx(default_dep)
+
+
+def test_uncertified_capture_budget_alpha_driving_wall_deposit_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_sticking_alpha_s = condensation_module._sticking_alpha_s
+    original_capture_budget_alpha_record = (
+        condensation_module._capture_budget_alpha_record
+    )
+
+    def fake_sticking_alpha_s(species: str) -> float:
+        if species == "Fe":
+            return 1.0
+        return original_sticking_alpha_s(species)
+
+    def fake_capture_budget_alpha_record(species: str) -> dict[str, object]:
+        if species != "Fe":
+            return original_capture_budget_alpha_record(species)
+        return {
+            "species": "Fe",
+            "alpha_s": 1.0,
+            "source": "test::capture_budget.Fe",
+            "source_class": "test_uncertified_capture_budget_alpha",
+            "status": "UNCERTIFIED",
+            "citation_status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+        }
+
+    monkeypatch.setattr(
+        condensation_module,
+        "_sticking_alpha_s",
+        fake_sticking_alpha_s,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_capture_budget_alpha_record",
+        fake_capture_budget_alpha_record,
+    )
+
+    route, authority = _route_wall_deposit_authority("Fe")
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
+    assert provenance["capture_budget"]["source_class"] == (
+        "test_uncertified_capture_budget_alpha"
+    )
+
+
+def test_grounded_stage_alpha_driving_wall_deposit_stays_authoritative() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value_ref": (
+                    "data/literature/vacuum_pyrolysis_sticking.yaml::"
+                    "species.Fe.value"
+                ),
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is True
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
+    assert provenance["stage_1"]["citation_status"] == "CITED"
+    assert provenance["capture_budget"]["citation_status"] == "CITED"
+
+
+def test_zero_deposit_stage_alpha_status_stays_authoritative() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 1.0,
+                "status": "UNCERTIFIED",
+                "output_status": "status_bearing",
+                "source_class": "test_uncertified_stage_alpha",
+            },
+        ),
+        wall_temperature_C=2000.0,
+    )
+
+    assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
+    assert authority["authoritative_for_deposit_mass"] is True
+    assert authority["deposited_species"] == []
 
 
 def test_missing_output_status_is_status_bearing_for_deposited_alpha() -> None:
