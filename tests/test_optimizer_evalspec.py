@@ -57,7 +57,7 @@ from simulator.state import MeltState
 
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
-    b'"allowlist_version":"allowlist-v8","backend_name":"stub",'
+    b'"allowlist_version":"allowlist-v9","backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
@@ -373,7 +373,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("profile_id", "other-profile"),
         ("fidelity", "accurate"),
         ("code_version", "0.0.0-determinant-mutant"),
-        ("allowlist_version", "allowlist-v9"),
+        ("allowlist_version", "allowlist-mutant"),
         ("campaign", "C2A"),
         ("hours", 48),
         ("mass_kg", 500.0),

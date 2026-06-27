@@ -25,7 +25,7 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v8"
+allowlist_version = "allowlist-v9"
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
@@ -639,6 +639,7 @@ class RecipeSchema:
             high=0.12,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.optional_Ca_harvest.pO2_mbar",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C5.temp_range_C",

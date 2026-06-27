@@ -281,10 +281,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 71
+    assert len(paths) == 70
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "46fd1f15195082480da94555bdbe43d58205feba0d23d02d3cda958641776821"
+        == "58600e0c9946d451f232b5537d9ea528aefb4de9fa25edb51ff53ddf18ef6d0b"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -293,10 +293,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    assert spec.recipe_id == "1b7fdd61c541f5e7f2d77402044e7eb94ab161dbf0af3f18d0e1b9d28a7277dc"
-    # cache_key includes physics_constraints, so policy-version bumps move it.
-    # recipe_id (above) is the identity surface and stays stable.
-    assert cache_key(spec) == "f63ab93293dac2aa0387d359258779c8f15b738c72d1a65c54df0686a7e114d0"
+    assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
+    # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
+    # moves when the live searchable allowlist identity changes.
+    assert cache_key(spec) == "71ef87c49881fad50cfb39d38a865c81efbfb9a8e020fdfc72a7fe4988c925ef"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -717,7 +717,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     assert first.recipe_id() == second.recipe_id()
     assert (
         first.recipe_id()
-        == "6e41eca85dcc8aba520d076f6e27a8f7cfde6bdd27fe7aa6412dead4f1d5ddc8"
+            == "63e50b641639c236c847ac2c9e46f92332839475b5578adfcd7bcdf6cfc14df1"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

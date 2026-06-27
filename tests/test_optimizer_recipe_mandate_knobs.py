@@ -62,7 +62,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v8" == schema.allowlist_version
+    assert "allowlist-v9" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -74,6 +74,12 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
     )
     assert fe_hot_hold_target not in MANDATE_LEVER_PATHS
     assert fe_hot_hold_target not in schema_paths
+
+    optional_ca_harvest_po2 = _path("campaigns.C4.optional_Ca_harvest.pO2_mbar")
+    optional_ca_harvest_spec = schema.spec_for(optional_ca_harvest_po2)
+    searchable_paths = {spec.path for spec in schema.search_allowlist}
+    assert optional_ca_harvest_spec.search_enabled is False
+    assert optional_ca_harvest_po2 not in searchable_paths
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
