@@ -311,7 +311,8 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
 })
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({'SiO2'})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({'Fe', 'Ni', 'Co', 'Mn'})
-TERMINAL_RUMP_CLASS_TOLERANCE_PCT = 5e-12
+# TERMINAL_RUMP_CLASS_TOLERANCE_PCT: single source is simulator/accounting/queries.py
+# (BUG-026 / SC-09 — removed an unused duplicate that previously lived here).
 DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'enabled': False,
     'volume_m3': None,
