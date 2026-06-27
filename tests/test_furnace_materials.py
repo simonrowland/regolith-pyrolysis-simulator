@@ -28,6 +28,16 @@ UNANCHORED_FURNACE_MATERIALS = {
     "graphite_inert",
 }
 
+# Enabled furnace materials with a finite service rating -- the set whose resolved
+# applied ceiling must be admissible to CampaignManager (BUG-076 / BUG-108).
+_ENABLED_FINITE_FURNACE_MATERIALS = sorted(
+    material_id
+    for material_id, row in load_furnace_materials().items()
+    if isinstance(row, dict)
+    and row.get("enabled") is True
+    and row.get("max_service_T_C") is not None
+)
+
 
 def _load_yaml(path):
     with path.open() as handle:
@@ -95,6 +105,82 @@ def test_resolver_distinguishes_service_rating_from_applied_ceiling():
 
 def test_resolver_defaults_to_material_max_when_no_request():
     assert resolve_furnace_max_T_C("dense_alumina_continuous") == 1700
+
+
+def test_resolver_clamps_applied_ceiling_to_runtime_envelope_when_uncapped():
+    # BUG-076: an enabled material rated above the runtime envelope (zirconia_ysz at
+    # 2200 C) must not emit a runtime-inadmissible applied ceiling when no cap is
+    # requested. The raw service rating is preserved; the applied ceiling is clamped
+    # to FURNACE_MAX_T_BOUNDS_C[1] so CampaignManager accepts it.
+    from simulator.furnace_materials import (
+        FURNACE_MAX_T_BOUNDS_C,
+        resolve_furnace_temperature_caps,
+    )
+
+    caps = resolve_furnace_temperature_caps("zirconia_ysz")  # no requested cap
+
+    assert caps["service_rating_T_C"] == pytest.approx(2200)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
+    assert caps["effective_applied_ceiling_T_C"] < caps["service_rating_T_C"]
+    assert resolve_furnace_max_T_C("zirconia_ysz") == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
+
+
+@pytest.mark.parametrize("material_id", _ENABLED_FINITE_FURNACE_MATERIALS)
+def test_resolver_output_is_accepted_by_campaign_manager(material_id):
+    # BUG-108 (follows BUG-076): every enabled material's resolved applied ceiling --
+    # with no requested cap -- must be admissible to CampaignManager, i.e. within the
+    # shared runtime envelope. Guards the resolver/consumer envelope agreement so a
+    # new high-rated material cannot pass the resolver yet be rejected downstream.
+    from simulator.campaigns import CampaignManager
+    from simulator.furnace_materials import (
+        FURNACE_MAX_T_BOUNDS_C,
+        resolve_furnace_temperature_caps,
+    )
+
+    effective = resolve_furnace_temperature_caps(material_id)[
+        "effective_applied_ceiling_T_C"
+    ]
+    lo, hi = FURNACE_MAX_T_BOUNDS_C
+    assert lo <= effective <= hi
+    # End-to-end: CampaignManager must accept the resolved ceiling without raising.
+    CampaignManager({"furnace_max_T_C": effective, "campaigns": {}})
+
+
+def test_resolver_fails_loud_for_sub_floor_requested_cap():
+    # BUG-076 (codex run-the-exploit catch): a requested cap BELOW the runtime envelope
+    # floor must fail loud, not silently leak a runtime-inadmissible ceiling that
+    # CampaignManager later rejects (the cross-layer admissibility disagreement this bug
+    # is about). The floor is fail-loud, NOT clamped up -- silently raising a sub-floor
+    # request would run the furnace hotter than the operator asked.
+    from simulator.furnace_materials import (
+        FURNACE_MAX_T_BOUNDS_C,
+        resolve_furnace_temperature_caps,
+    )
+
+    floor, ceiling = FURNACE_MAX_T_BOUNDS_C
+    with pytest.raises(ValueError, match="below the runtime envelope floor"):
+        resolve_furnace_temperature_caps("zirconia_ysz", floor - 1)
+    with pytest.raises(ValueError, match="below the runtime envelope floor"):
+        resolve_furnace_max_T_C("zirconia_ysz", 1000)
+    # Boundary: exactly the floor and exactly the ceiling stay admissible (no raise).
+    assert resolve_furnace_max_T_C("zirconia_ysz", floor) == pytest.approx(floor)
+    assert resolve_furnace_max_T_C("zirconia_ysz", ceiling) == pytest.approx(ceiling)
+
+
+def test_resolver_clamps_over_envelope_requested_cap():
+    # A requested cap above the envelope max but below the material rating clamps to the
+    # envelope max (zirconia_ysz rated 2200: cap 2100 -> applied 2000), so the resolver
+    # stays runtime-admissible on the capped path too, not only the uncapped path.
+    from simulator.furnace_materials import (
+        FURNACE_MAX_T_BOUNDS_C,
+        resolve_furnace_temperature_caps,
+    )
+
+    caps = resolve_furnace_temperature_caps("zirconia_ysz", 2100)
+
+    assert caps["requested_ceiling_T_C"] == pytest.approx(2100)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
+    assert caps["service_rating_T_C"] == pytest.approx(2200)
 
 
 def test_resolver_fails_loud_for_unknown_material():

@@ -68,6 +68,28 @@ def resolve_furnace_temperature_caps(
     else:
         requested_ceiling = _finite_float(requested_cap, "requested_cap")
         effective_ceiling = min(requested_ceiling, material_max)
+    # BUG-076: the resolver must never emit an effective ceiling the shared runtime
+    # envelope FURNACE_MAX_T_BOUNDS_C rejects -- otherwise a resolver call site and the
+    # CampaignManager envelope guard (simulator/campaigns.py:135-145) disagree on
+    # admissibility, which is the cross-layer trap this bug is about. The two bounds are
+    # handled ASYMMETRICALLY, on purpose:
+    #   * Ceiling: a material rated above the envelope (e.g. zirconia_ysz at 2200 C)
+    #     keeps its raw service_rating_T_C, but the applied ceiling is CLAMPED DOWN to
+    #     the envelope max. Nobody requested the over-max temperature -- it is the
+    #     material's rating, not operator intent -- so clamping down to the highest
+    #     modelable temperature loses no intent and the derating stays visible
+    #     (service_rating_T_C 2200 vs effective_applied_ceiling_T_C 2000).
+    #   * Floor: a resolved ceiling below the envelope floor (a sub-floor *requested*
+    #     cap, or a mis-catalogued enabled material) FAILS LOUD, never clamps up.
+    #     Silently raising a sub-floor request would run the furnace HOTTER than the
+    #     operator asked -- a silent rewrite of intent the mandate forbids.
+    effective_ceiling = min(effective_ceiling, FURNACE_MAX_T_BOUNDS_C[1])
+    if effective_ceiling < FURNACE_MAX_T_BOUNDS_C[0]:
+        raise ValueError(
+            f"{material_id}: resolved applied ceiling {effective_ceiling:.0f} C is below "
+            f"the runtime envelope floor {FURNACE_MAX_T_BOUNDS_C[0]:.0f} C "
+            f"(requested_cap={requested_cap}); not runtime-admissible"
+        )
     return {
         "service_rating_T_C": material_max,
         "requested_ceiling_T_C": requested_ceiling,
