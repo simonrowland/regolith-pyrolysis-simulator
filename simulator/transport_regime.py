@@ -13,12 +13,17 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 
+from simulator.transport_constants import (
+    COLLISION_DIAMETER_SOURCE,
+    COLLISION_DIAMETERS_M,
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    VISCOUS_KNUDSEN_MAX,
+)
+
 
 GAS_CONSTANT_J_MOL_K = 8.31446261815324
 BOLTZMANN_CONSTANT_J_K = 1.380649e-23
 
-VISCOUS_KNUDSEN_MAX = 0.01
-FREE_MOLECULAR_KNUDSEN_MIN = 10.0
 LONG_TUBE_L_OVER_D_MIN = 10.0
 
 FORMULA_FREE_MOLECULAR_APERTURE = "free_molecular_aperture_conductance"
@@ -28,23 +33,6 @@ FORMULA_BESKOK_KARNIADAKIS_CIVAN = (
 )
 FORMULA_SINGLE_SPECIES_MFP = "single_species_hard_sphere_mean_free_path"
 FORMULA_MIXTURE_MFP = "carrier_mixture_hard_sphere_mean_free_path"
-
-COLLISION_DIAMETER_SOURCE = "Poling et al., Lennard-Jones sigma"
-
-COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
-    {
-        # Must match simulator.condensation.N2_COLLISION_DIAMETER_M (same
-        # grounded BSL/Poling LJ sigma); see BUG-013. A future cleanup may
-        # promote both to a single shared leaf constant.
-        "N2": 3.798e-10,
-        "Ar": 3.542e-10,
-        "O2": 3.467e-10,
-        "CO": 3.690e-10,
-        "CO2": 3.941e-10,
-        "H2": 2.827e-10,
-        "H2O": 2.641e-10,
-    }
-)
 
 MOLAR_MASSES_KG_PER_MOL: Mapping[str, float] = MappingProxyType(
     {

@@ -68,6 +68,11 @@ from typing import Any, Dict
 
 import yaml
 
+from simulator.transport_constants import (
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    N2_COLLISION_DIAMETER_M,
+    VISCOUS_KNUDSEN_MAX,
+)
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -107,18 +112,13 @@ WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
-# N2 kinetic collision diameter, grounded to the Lennard-Jones sigma for
-# N2 = 3.798 Angstrom (Bird/Stewart/Lightfoot "Transport Phenomena" 2nd
-# ed., Table E.1; equivalently Poling/Prausnitz/O'Connell, the same value
-# carried by simulator/transport_regime.py COLLISION_DIAMETERS_M["N2"]).
-# Single source of truth: the Chapman-Enskog Lennard-Jones table entry
-# below derives its N2 sigma from this constant, so the MFP/Knudsen path
-# and the binary-diffusion path can never diverge (BUG-013). Prior value
-# was an ungrounded rounded 3.7e-10 carryover with no cited source.
-N2_COLLISION_DIAMETER_M = 3.798e-10
-CONTINUUM_BUFFER_KN = 0.01
-VISCOUS_KNUDSEN_MAX = CONTINUUM_BUFFER_KN
-FREE_MOLECULAR_KNUDSEN_MIN = 10.0
+# N2_COLLISION_DIAMETER_M and the Knudsen flow-regime thresholds
+# (VISCOUS_KNUDSEN_MAX / FREE_MOLECULAR_KNUDSEN_MIN) are single-sourced in
+# simulator/transport_constants.py (shared with simulator/transport_regime.py) so
+# the MFP/Knudsen path and the binary-diffusion path can never diverge
+# (BUG-013 / BUG-023 / BUG-027). The Chapman-Enskog Lennard-Jones table below
+# still derives its N2 sigma from N2_COLLISION_DIAMETER_M.
+CONTINUUM_BUFFER_KN = VISCOUS_KNUDSEN_MAX
 KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
