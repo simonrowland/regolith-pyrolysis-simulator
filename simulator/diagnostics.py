@@ -492,6 +492,7 @@ def wall_deposit_remobilization_by_segment_species(
     history_hours = _operating_history_hours(sim, snapshots)
     condensation_model = getattr(sim, "condensation_model", None)
     instance_temps = getattr(condensation_model, "condensation_temperatures_C", None)
+    vapor_pressure_data = getattr(condensation_model, "vapor_pressure_data", None)
     from simulator.condensation import _species_condensation_temperature_C
 
     result: dict[str, dict[str, dict[str, Any]]] = {}
@@ -506,6 +507,7 @@ def wall_deposit_remobilization_by_segment_species(
         condensation_T_C = _species_condensation_temperature_C(
             species,
             temps=instance_temps,
+            vapor_pressure_data=vapor_pressure_data,
         )
         threshold_exceeded = (
             later_max_T_C is not None

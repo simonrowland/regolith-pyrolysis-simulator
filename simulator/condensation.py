@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import copy
 import math
+import warnings
 from collections.abc import Mapping, MutableMapping
 from dataclasses import dataclass, field
 from enum import Enum
@@ -776,6 +777,8 @@ CONDENSATION_TEMPS_C = {
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
 VAPOR_PRESSURE_DATA = _CONFIG_BUNDLE.vapor_pressures
 MATERIALS_DATA = _CONFIG_BUNDLE.materials
+_ANTOINE_COEFFICIENT_BLOCKS = ('antoine', 'pure_component_antoine')
+_ANTOINE_REQUIRED_KEYS = frozenset(('A', 'B', 'C'))
 
 
 @dataclass(frozen=True)
@@ -1347,6 +1350,7 @@ class CondensationModel:
             evap_flux.species_kg_hr,
             margin_C=self.cold_spot_margin_C,
             temps=self.condensation_temperatures_C,
+            vapor_pressure_data=self.vapor_pressure_data,
         )
         self.last_cold_spot_diagnostic = diagnostic
         self.cold_spot_history.append(diagnostic)
@@ -1362,7 +1366,9 @@ class CondensationModel:
             wall_deposit_account_fractions_by_species[species] = {}
 
             T_cond = _species_condensation_temperature_C(
-                species, temps=self.condensation_temperatures_C
+                species,
+                temps=self.condensation_temperatures_C,
+                vapor_pressure_data=self.vapor_pressure_data,
             )
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
@@ -1445,6 +1451,7 @@ class CondensationModel:
                 self.train.stages,
                 self.residence_time_s,
                 temps=self.condensation_temperatures_C,
+                vapor_pressure_data=self.vapor_pressure_data,
             )
             if hkl_sink_total_kg <= 1e-15:
                 capture_budget_kg = 0.0
@@ -1619,6 +1626,7 @@ class CondensationModel:
                 species,
                 melt_temperature_C,
                 T_cond_C,
+                vapor_pressure_data=self.vapor_pressure_data,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1626,6 +1634,7 @@ class CondensationModel:
             _record_wall_surface_antoine_telemetry(
                 species,
                 self.wall_temperature_C,
+                vapor_pressure_data=self.vapor_pressure_data,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1657,6 +1666,7 @@ class CondensationModel:
                 species,
                 melt_temperature_C,
                 T_cond_C,
+                vapor_pressure_data=self.vapor_pressure_data,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1667,6 +1677,7 @@ class CondensationModel:
                 _record_wall_surface_antoine_telemetry(
                     species,
                     segment.wall_temperature_C,
+                    vapor_pressure_data=self.vapor_pressure_data,
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings),
@@ -1716,6 +1727,7 @@ class CondensationModel:
                 species,
                 melt_temperature_C,
                 T_cond_C,
+                vapor_pressure_data=self.vapor_pressure_data,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1723,6 +1735,7 @@ class CondensationModel:
             _record_wall_surface_antoine_telemetry(
                 species,
                 wall_temperature_C,
+                vapor_pressure_data=self.vapor_pressure_data,
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
@@ -1797,6 +1810,7 @@ class CondensationModel:
         P_local_pa = _local_species_pressure_pa(
             species,
             T_cond_C,
+            vapor_pressure_data=self.vapor_pressure_data,
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
         )
@@ -1805,7 +1819,10 @@ class CondensationModel:
 
         T_ref_K = max(T_cond_C + 273.15, 1.0)
         reference_flux = _hkl_impingement_flux_mol_m2_s(
-            species, P_local_pa, T_ref_K,
+            species,
+            P_local_pa,
+            T_ref_K,
+            vapor_pressure_data=self.vapor_pressure_data,
         )
         if reference_flux <= 0.0:
             return 0.0
@@ -1849,6 +1866,7 @@ class CondensationModel:
                 T_gas_K=T_gas_K,
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=self.carrier_gas,
+                vapor_pressure_data=self.vapor_pressure_data,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -1858,12 +1876,68 @@ class CondensationModel:
         return max(0.0, min(1.0, eta))
 
 
-def _species_vapor_data(species: str) -> Mapping[str, Any]:
+def _species_vapor_data(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    global_data: Mapping[str, Any] = {}
     for family in ('metals', 'oxide_vapors'):
         data = (VAPOR_PRESSURE_DATA.get(family, {}) or {}).get(species, {})
         if data and isinstance(data, Mapping):
-            return data
-    return {}
+            global_data = data
+            break
+    if vapor_pressure_data is not None:
+        for family in ('metals', 'oxide_vapors'):
+            group = vapor_pressure_data.get(family, {}) or {}
+            if not isinstance(group, Mapping):
+                continue
+            data = group.get(species)
+            if data and isinstance(data, Mapping):
+                merged = dict(global_data)
+                for key, value in data.items():
+                    if key in _ANTOINE_COEFFICIENT_BLOCKS:
+                        missing = _missing_required_antoine_keys(value)
+                        if missing:
+                            fallback = global_data.get(key)
+                            if isinstance(fallback, Mapping):
+                                merged[key] = fallback
+                                action = 'falling back to global block'
+                            else:
+                                merged.pop(key, None)
+                                action = 'dropping incomplete block'
+                            warnings.warn(
+                                f"{species} incomplete custom vapor-pressure "
+                                f"{key} block missing required coefficient "
+                                f"keys {', '.join(missing)}; {action}",
+                                RuntimeWarning,
+                                stacklevel=2,
+                            )
+                            continue
+                    merged[key] = value
+                return merged
+    return global_data
+
+
+def _missing_required_antoine_keys(block: Any) -> tuple[str, ...]:
+    """Return coefficient keys missing from the block consumed at runtime."""
+
+    if not isinstance(block, Mapping):
+        return tuple(sorted(_ANTOINE_REQUIRED_KEYS))
+    segments = block.get('segments')
+    candidates: list[Mapping[str, Any]] = []
+    if isinstance(segments, list):
+        candidates.extend(segment for segment in segments
+                          if isinstance(segment, Mapping))
+    if not candidates:
+        candidates.append(block)
+    missing = {
+        key
+        for candidate in candidates
+        for key in _ANTOINE_REQUIRED_KEYS
+        if key not in candidate
+    }
+    return tuple(sorted(missing))
 
 
 def apply_setpoints_condensation_temperature_overrides(
@@ -1948,6 +2022,7 @@ def _species_condensation_temperature_C(
     species: str,
     *,
     temps: Mapping[str, float] | None = None,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
     """0.5.4.1 review-cluster-C (P2 #1): accept an optional
     instance-level ``temps`` mapping so each ``CondensationModel``
@@ -1962,7 +2037,10 @@ def _species_condensation_temperature_C(
     source = temps if temps is not None else CONDENSATION_TEMPS_C
     if species in source:
         return float(source[species])
-    data = _species_vapor_data(species)
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     try:
         return float(data.get('condensation_T_C_at_1mbar', 500.0))
     except (TypeError, ValueError):
@@ -2238,10 +2316,14 @@ def _antoine_psat_pa(
     species: str,
     T_K: float,
     *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float | None:
-    data = _species_vapor_data(species)
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
 
     antoine, coefficient_block = vapor_pressure_antoine_coefficients(
@@ -2275,12 +2357,14 @@ def _local_species_pressure_pa(
     species: str,
     T_cond_C: float,
     *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     P_local_pa = _antoine_psat_pa(
         species,
         T_cond_C + 273.15,
+        vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -2294,6 +2378,7 @@ def _record_wall_surface_antoine_telemetry(
     species: str,
     wall_temperature_C: float,
     *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> None:
@@ -2305,6 +2390,7 @@ def _record_wall_surface_antoine_telemetry(
     _antoine_psat_pa(
         species,
         wall_temperature_C + 273.15,
+        vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -2315,12 +2401,14 @@ def _local_wall_species_pressure_pa(
     melt_temperature_C: float,
     fallback_T_cond_C: float,
     *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     P_source_pa = _antoine_psat_pa(
         species,
         melt_temperature_C + 273.15,
+        vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -2329,13 +2417,21 @@ def _local_wall_species_pressure_pa(
     return _local_species_pressure_pa(
         species,
         fallback_T_cond_C,
+        vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
 
 
-def _molecular_mass_kg_per_molecule(species: str) -> float:
-    data = _species_vapor_data(species)
+def _molecular_mass_kg_per_molecule(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> float:
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     value = data.get('molar_mass_g_mol') if isinstance(data, Mapping) else None
     if value is None:
         value = MOLAR_MASS.get(species)
@@ -2352,10 +2448,15 @@ def _hkl_impingement_flux_mol_m2_s(
     species: str,
     pressure_pa: float,
     T_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
     if pressure_pa <= 0.0 or T_K <= 0.0:
         return 0.0
-    molecule_kg = _molecular_mass_kg_per_molecule(species)
+    molecule_kg = _molecular_mass_kg_per_molecule(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     denominator = math.sqrt(
         2.0 * math.pi * molecule_kg * BOLTZMANN_CONSTANT_J_K * T_K
     )
@@ -2370,8 +2471,14 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     T_surface_K: float,
     alpha_s: float,
     regime_factor: float = 1.0,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
-    P_sat_pa = _antoine_psat_pa(species, T_surface_K)
+    P_sat_pa = _antoine_psat_pa(
+        species,
+        T_surface_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     if P_sat_pa is None:
         return 0.0
     driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
@@ -2381,7 +2488,10 @@ def _hkl_surface_deposition_flux_mol_m2_s(
         alpha_s
         * max(0.0, min(1.0, float(regime_factor)))
         * _hkl_impingement_flux_mol_m2_s(
-            species, driving_pressure_pa, T_surface_K,
+            species,
+            driving_pressure_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
         )
     )
 
@@ -2413,6 +2523,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     carrier_gas: str = DEFAULT_CARRIER_GAS,
     *,
     radial_stir_factor: float | None = None,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -2469,7 +2580,11 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
             and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):
         return 0.0
-    P_sat_pa = _antoine_psat_pa(species, T_surface_K)
+    P_sat_pa = _antoine_psat_pa(
+        species,
+        T_surface_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         return 0.0
     driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
@@ -2480,7 +2595,10 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # per-Pa rate coefficient by calling the unit-pressure impingement-flux
     # helper.
     k_hkl_per_pa = alpha_s * _hkl_impingement_flux_mol_m2_s(
-        species, 1.0, T_surface_K,
+        species,
+        1.0,
+        T_surface_K,
+        vapor_pressure_data=vapor_pressure_data,
     )
     if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
         return 0.0
@@ -2866,11 +2984,16 @@ def _pressure_isolated_capture_budget_kg(
     residence_time_s: Mapping[int, float],
     *,
     temps: Mapping[str, float] | None = None,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
     """Hold total vapor removal fixed until Chunk C pressure coupling lands."""
 
     remaining_kg = max(0.0, rate_kg_hr)
-    T_cond_C = _species_condensation_temperature_C(species, temps=temps)
+    T_cond_C = _species_condensation_temperature_C(
+        species,
+        temps=temps,
+        vapor_pressure_data=vapor_pressure_data,
+    )
     alpha_s = _sticking_alpha_s(species)
     for stage in stages:
         if remaining_kg <= 1e-15:
@@ -2977,6 +3100,7 @@ def cold_spot_diagnostic(
     *,
     margin_C: float = COLD_SPOT_MARGIN_C,
     temps: Mapping[str, float] | None = None,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Flag pipe segments colder than a flowing species' landing threshold."""
 
@@ -2991,6 +3115,7 @@ def cold_spot_diagnostic(
         condensation_T_C = _species_condensation_temperature_C(
             species,
             temps=temps,
+            vapor_pressure_data=vapor_pressure_data,
         )
         threshold_C = condensation_T_C - float(margin_C)
         for segment in pipe_segments:

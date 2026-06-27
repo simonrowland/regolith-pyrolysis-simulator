@@ -24,6 +24,7 @@ These tests pin:
 
 from __future__ import annotations
 
+import copy
 import math
 from pathlib import Path
 
@@ -442,3 +443,70 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert overridden_result.remaining_by_species["SiO"] > (
             default_result.remaining_by_species["SiO"] + 0.05
         )
+
+
+def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback():
+    def route_calcium(vapor_pressure_data=None):
+        model = CondensationModel(
+            CondensationTrain.create_default(),
+            vapor_pressure_data=vapor_pressure_data,
+            wall_temperature_C=900.0,
+        )
+        model.configure_operating_conditions(
+            wall_temperature_C=900.0,
+            pipe_segment_temperatures_C={
+                segment.name: 900.0 for segment in model.pipe_segments
+            },
+        )
+        return model.route(
+            EvaporationFlux(species_kg_hr={"Ca": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+
+    custom_vapor_pressures = {
+        "metals": {
+            "Ca": copy.deepcopy(
+                condensation_module.VAPOR_PRESSURE_DATA["metals"]["Ca"]
+            )
+        },
+        "oxide_vapors": {},
+    }
+    custom_vapor_pressures["metals"]["Ca"]["antoine"]["A"] += 8.0
+
+    default_route = route_calcium()
+    custom_route = route_calcium(custom_vapor_pressures)
+
+    default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
+    default_stage5 = default_route.condensed_by_stage_species[5]["Ca"]
+    custom_stage4 = custom_route.condensed_by_stage_species[4]["Ca"]
+    custom_stage5 = custom_route.condensed_by_stage_species[5]["Ca"]
+
+    assert custom_stage4 > default_stage4
+    assert custom_stage5 < default_stage5 * 0.8
+
+    default_sio_psat = condensation_module._antoine_psat_pa("SiO", 1700.0)
+    fallback_sio_psat = condensation_module._antoine_psat_pa(
+        "SiO",
+        1700.0,
+        vapor_pressure_data=custom_vapor_pressures,
+    )
+    assert fallback_sio_psat == default_sio_psat
+
+
+def test_partial_custom_antoine_block_falls_back_to_global_coefficients():
+    temperature_K = 320.0 + 273.15
+    default_psat = condensation_module._antoine_psat_pa("Ca", temperature_K)
+    custom_vapor_pressures = {
+        "metals": {"Ca": {"antoine": {"A": 99.0}}},
+        "oxide_vapors": {},
+    }
+
+    with pytest.warns(RuntimeWarning, match="incomplete custom vapor-pressure"):
+        fallback_psat = condensation_module._antoine_psat_pa(
+            "Ca",
+            temperature_K,
+            vapor_pressure_data=custom_vapor_pressures,
+        )
+
+    assert fallback_psat == default_psat
+    assert fallback_psat < 1.0

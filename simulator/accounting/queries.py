@@ -2044,15 +2044,22 @@ def wall_deposit_candidate_for_surface_kg(
     if alpha_s <= 0.0:
         return 0.0
 
+    vapor_pressure_data = getattr(model, "vapor_pressure_data", None)
     P_local_pa = _local_wall_species_pressure_pa(
-        species, melt_temperature_C, T_cond_C,
+        species,
+        melt_temperature_C,
+        T_cond_C,
+        vapor_pressure_data=vapor_pressure_data,
     )
     if P_local_pa <= 0.0:
         return 0.0
 
     T_ref_K = max(T_cond_C + 273.15, 1.0)
     reference_flux = _hkl_impingement_flux_mol_m2_s(
-        species, P_local_pa, T_ref_K,
+        species,
+        P_local_pa,
+        T_ref_K,
+        vapor_pressure_data=vapor_pressure_data,
     )
     if reference_flux <= 0.0:
         return 0.0
@@ -2077,6 +2084,7 @@ def wall_deposit_candidate_for_surface_kg(
         T_gas_K=T_gas_K,
         overhead_pressure_pa=overhead_pressure_pa,
         carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
+        vapor_pressure_data=vapor_pressure_data,
     )
     if flux <= 0.0:
         return 0.0
