@@ -722,6 +722,69 @@ def test_powered_no_reducible_mre_hour_records_commanded_energy(
     assert result.diagnostic["energy_kWh"] == pytest.approx(1.7)
 
 
+def test_empty_allowed_oxides_filter_reduces_nothing_not_everything(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """BUG-140: an EMPTY ``allowed_oxides`` list is a real selectivity
+    filter ("operator targeted a rung unreachable within the voltage cap
+    -> reduce NOTHING"), and must NOT be silently widened to "no filter ->
+    reduce everything".  The pre-fix truthy check (``if allowed_oxides_raw:``)
+    collapsed ``[]`` into ``None`` and reduced every reducible oxide.
+
+    Contrast an ABSENT filter (reduces FeO -> proves the conditions are
+    live) against an EMPTY-LIST filter (must reduce nothing) at identical
+    voltage / current / composition.
+    """
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    feo_mol = 10.0 / (MOLAR_MASS["FeO"] / 1000.0)
+
+    def _dispatch(*, set_key, value=None):
+        view = ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"FeO": feo_mol},
+                "process.metal_phase": {},
+                "terminal.oxygen_mre_anode_stored": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        )
+        controls = {
+            "voltage_V": 1.7,
+            "current_A": 1.0e9,
+            "dt_hr": 1.0,
+            "melt_fO2_log": -7.25,
+        }
+        if set_key:
+            controls["allowed_oxides"] = value
+        return BuiltinElectrolysisStepProvider().dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                account_view=view,
+                temperature_C=1600.0,
+                pressure_bar=1e-6,
+                fO2_log=-7.25,
+                fe_redox_policy="kress91_live",
+                control_inputs=controls,
+            )
+        )
+
+    # No filter (key absent -> None): FeO reduces at 1.7 V, proving the
+    # conditions are live and the None path still means reduce-all.
+    unfiltered = _dispatch(set_key=False)
+    assert unfiltered.transition is not None
+    assert "FeO" in dict(unfiltered.diagnostic or {})["oxides_reduced_mol"]
+
+    # Empty filter must reduce NOTHING -- not collapse to None and widen
+    # to reduce-all.
+    empty_filter = _dispatch(set_key=True, value=[])
+    assert empty_filter.transition is None
+    assert dict(empty_filter.diagnostic or {})["oxides_reduced_mol"] == {}
+
+
 # ---------------------------------------------------------------------------
 # 4. Atom-balance gate: malformed proposal must be rejected at commit
 # ---------------------------------------------------------------------------

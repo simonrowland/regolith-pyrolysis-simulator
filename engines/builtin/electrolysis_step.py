@@ -365,7 +365,20 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
 
         allowed_oxides_raw = controls.get("allowed_oxides")
         allowed_oxides: set[str] | None = None
-        if allowed_oxides_raw:
+        # None means "no operator target rung -> reduce every reducible
+        # oxide". An EMPTY list is a real selectivity filter ("operator
+        # targeted a rung unreachable within the voltage cap"), NOT an
+        # absent filter: it must reduce NOTHING in the fixed-oxide MRE
+        # reduction loop below. A truthy `if allowed_oxides_raw:` test
+        # collapses [] into None and silently WIDENS an empty filter to
+        # reduce-all -- a silent fallback the mandate forbids (BUG-140).
+        # (Scope: the Fe2O3 ferric->ferrous conversion further down is a
+        # separate redox path that intentionally ignores this operator
+        # filter, so "reduce nothing" scopes the fixed-oxide loop only.)
+        # The production caller (simulator/extraction.py) early-returns on
+        # the empty-sequence case today, so this is defence-in-depth that
+        # pins the None-vs-empty contract correct-by-construction.
+        if allowed_oxides_raw is not None:
             allowed_oxides = {str(item) for item in allowed_oxides_raw if item}
 
         # Find all reducible species at this voltage. Mirrors
