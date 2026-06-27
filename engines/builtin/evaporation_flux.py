@@ -203,6 +203,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         flux_uncertainty_pct: dict[str, float] = {}
         unmeasured_alpha_fallback_species: list[str] = []
         missing_alpha: dict[str, dict[str, float | str]] = {}
+        missing_molar_mass: dict[str, dict[str, float | str]] = {}
 
         for species, P_sat_Pa in vapor_pressures.items():
             P_sat_Pa = float(P_sat_Pa)
@@ -210,12 +211,20 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 continue
 
             # Molar mass: prefer the per-species value the caller looked
-            # up from vapor_pressures.yaml; fall back to the global
-            # MOLAR_MASS table; final fallback to 50 g/mol mirrors the
-            # legacy default for unknown species.
+            # up from vapor_pressures.yaml; fall back to the grounded global
+            # MOLAR_MASS table. Never guess a molar mass for HK flux.
             M_kg_mol = molar_masses_kg_mol.get(species)
             if M_kg_mol is None or M_kg_mol <= 0.0:
-                M_kg_mol = MOLAR_MASS.get(species, 50.0) / 1000.0
+                molar_mass_g_mol = MOLAR_MASS.get(species)
+                if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+                    missing_molar_mass[species] = {
+                        "policy": "fail_loud_missing_molar_mass",
+                        "data_file": "data/vapor_pressures.yaml",
+                        "control": "molar_mass_kg_mol",
+                        "p_sat_Pa": P_sat_Pa,
+                    }
+                    continue
+                M_kg_mol = molar_mass_g_mol / 1000.0
 
             stoich = stoich_by_species.get(species) or {}
             oxide_per_product_kg = float(stoich.get("oxide_per_product_kg") or 0.0)
@@ -291,22 +300,31 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 flux_kg_hr[species] = rate_kg_hr
 
         if missing_alpha:
+            missing_alpha_warnings = [
+                "missing evaporation_alpha for sampled species: "
+                + ", ".join(sorted(missing_alpha))
+            ]
+            missing_alpha_diagnostic = {
+                "evaporation_flux_kg_hr": {},
+                "alpha_used_by_species": alpha_used_by_species,
+                "flux_uncertainty_pct": flux_uncertainty_pct,
+                "missing_alpha": missing_alpha,
+                "temperature_C": T_C,
+            }
+            if missing_molar_mass:
+                missing_alpha_diagnostic["missing_molar_mass"] = missing_molar_mass
+                missing_alpha_warnings.append(
+                    "missing molar_mass_g_mol for evaporation species in "
+                    "data/vapor_pressures.yaml: "
+                    + ", ".join(sorted(missing_molar_mass))
+                )
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 status="unavailable",
                 transition=None,
                 control_audit=control_audit,
-                diagnostic={
-                    "evaporation_flux_kg_hr": {},
-                    "alpha_used_by_species": alpha_used_by_species,
-                    "flux_uncertainty_pct": flux_uncertainty_pct,
-                    "missing_alpha": missing_alpha,
-                    "temperature_C": T_C,
-                },
-                warnings=(
-                    "missing evaporation_alpha for sampled species: "
-                    + ", ".join(sorted(missing_alpha)),
-                ),
+                diagnostic=missing_alpha_diagnostic,
+                warnings=tuple(missing_alpha_warnings),
             )
 
         diagnostic = {
@@ -319,6 +337,14 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             diagnostic["unmeasured_alpha_fallback_species"] = sorted(
                 unmeasured_alpha_fallback_species
             )
+        warning_messages: list[str] = []
+        if missing_molar_mass:
+            diagnostic["missing_molar_mass"] = missing_molar_mass
+            warning_messages.append(
+                "missing molar_mass_g_mol for evaporation species in "
+                "data/vapor_pressures.yaml: "
+                + ", ".join(sorted(missing_molar_mass))
+            )
 
         return IntentResult(
             intent=ChemistryIntent.EVAPORATION_FLUX,
@@ -326,4 +352,5 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             transition=None,
             control_audit=control_audit,
             diagnostic=diagnostic,
+            warnings=tuple(warning_messages),
         )

@@ -272,6 +272,76 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
     assert flux_kg_hr == pytest.approx(0.5497026611860572, rel=1e-12)
 
 
+def test_provider_skips_species_without_grounded_molar_mass():
+    provider = BuiltinEvaporationFluxProvider()
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"Na2O": 10.0}},
+        species_formula_registry={},
+    )
+    base_controls = {
+        'overhead_partials_Pa': {},
+        'molar_mass_kg_mol': {'Na': 0.023},
+        'stoich_by_species': {
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+            'Unobtainium': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.0,
+                'O2_per_product_kg': 0.0,
+            },
+        },
+        'available_oxide_kg': {'Na': 10.0, 'Unobtainium': 10.0},
+        'melt_surface_area_m2': 0.2,
+        'stir_factor': 1.0,
+        'alpha': {'Na': 0.5, 'Unobtainium': 0.5},
+    }
+
+    normal_request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            **base_controls,
+            'vapor_pressures_Pa': {'Na': 100.0},
+        },
+    )
+    mixed_request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            **base_controls,
+            'vapor_pressures_Pa': {'Na': 100.0, 'Unobtainium': 100.0},
+        },
+    )
+
+    normal_result = provider.dispatch(normal_request)
+    result = provider.dispatch(mixed_request)
+
+    flux_kg_hr = result.diagnostic['evaporation_flux_kg_hr']
+    assert 'Unobtainium' not in flux_kg_hr
+    assert flux_kg_hr['Na'] == pytest.approx(
+        normal_result.diagnostic['evaporation_flux_kg_hr']['Na'], rel=0, abs=0
+    )
+    assert result.diagnostic['missing_molar_mass']['Unobtainium'] == {
+        "policy": "fail_loud_missing_molar_mass",
+        "data_file": "data/vapor_pressures.yaml",
+        "control": "molar_mass_kg_mol",
+        "p_sat_Pa": 100.0,
+    }
+    assert any(
+        "Unobtainium" in warning and "data/vapor_pressures.yaml" in warning
+        for warning in result.warnings
+    )
+
+
 # ---------------------------------------------------------------------------
 # 5. Below 400 K, provider returns empty flux dict
 # ---------------------------------------------------------------------------
