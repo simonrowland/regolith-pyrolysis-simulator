@@ -320,6 +320,34 @@ schema-shape assertion.
   achieved_mbar, p_total_mbar, limited_by_total_pressure, status}`.
   The top-level `pO2_enforcement_by_hour` list repeats those rows for
   artifact consumers that do not scan every hour.
+* Staged / diagnostic / real-backend runs may carry these additional
+  conditionally-emitted keys on a per-hour row.  Each appears only when its
+  backing source is populated, so it is absent on a plain stub-backend run;
+  each is whitelisted in
+  `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
+  * `evap_plane_selectivity` -- emitted by
+    `_evap_plane_selectivity_observables` when
+    `HourSnapshot.evap_plane_selectivity` carries a non-empty
+    `target_species`; nested `{total_flux_kg_hr, per_species_fraction,
+    target_species, target_flux_kg_hr, target_selectivity}`.  Source:
+    `core.py::_evap_plane_selectivity_diagnostic` (SSO-1 per-stage
+    evaporation-plane selectivity map; golden-neutral diagnostic).
+  * `mre_uncertified_yield` -- emitted by
+    `_mre_uncertified_yield_observables` when
+    `HourSnapshot.mre_uncertified_yield` is non-empty; a JSON-safe copy of
+    that uncertified-MRE yield bookkeeping summary.
+  * `fe_redox_split` -- emitted by `_fe_redox_split_observables` when
+    `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
+    native-Fe redox split (numeric fields finite-export-checked; flags
+    serialized as bool / str / null).
+  * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
+    when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
+    categorical mass-balance-error label for that hour.
+  * `reduced_real_cache_state` -- added downstream of `build_per_hour_summary`
+    by `simulator/run_executor.py` (when the simulator's
+    `_last_reduced_real_cache_state` is not `None`) and serialized into
+    `per_hour_summary` via `simulator/runner.py`; the reduced-real backend
+    cache-state label (string).
 * P6a wall-deposit fields are direct projections of
   `HourSnapshot.wall_deposit_by_segment_species_delta` and the running
   sum of those deltas. The report layer does not recompute deposits.

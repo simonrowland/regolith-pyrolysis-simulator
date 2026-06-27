@@ -117,6 +117,20 @@ PER_HOUR_KEYS = frozenset({
 })
 PER_HOUR_OPTIONAL_KEYS = frozenset({
     "pO2_enforcement",
+    # Conditionally-emitted per-hour keys: present on a row only when the
+    # backing source is populated (staged / diagnostic / real-backend runs),
+    # so they are absent on the plain stub-backend smoke SCENARIOS. Whitelisted
+    # so the per_hour_summary issubset gate accepts a legitimate row instead of
+    # flagging key drift (BUG-032 + same-class sweep; see
+    # docs/runner-output-schema.md "Per-hour summary"). The first four come from
+    # HourSnapshot fields via build_per_hour_summary; reduced_real_cache_state is
+    # added downstream by simulator/run_executor.py from the simulator's
+    # _last_reduced_real_cache_state when it is not None.
+    "evap_plane_selectivity",
+    "mre_uncertified_yield",
+    "fe_redox_split",
+    "mass_balance_error_category",
+    "reduced_real_cache_state",
 })
 
 
@@ -1019,3 +1033,69 @@ def test_runner_does_not_apply_ledger_transitions_directly():
             f"call {pattern!r}; only the kernel / melt_backend / "
             f"accounting code may write to the ledger."
         )
+
+
+def test_conditional_per_hour_observables_are_whitelisted() -> None:
+    """Every conditionally-emitted per-hour observable key must live in
+    PER_HOUR_OPTIONAL_KEYS, else the per_hour_summary issubset gate flags a
+    legitimate staged/diagnostic row as key drift.
+
+    Regression guard for BUG-032 (``evap_plane_selectivity``) and its
+    same-class siblings ``mre_uncertified_yield`` / ``fe_redox_split``: the
+    runner already emits these keys, but only on runs where the backing
+    HourSnapshot field is populated -- a path the smoke SCENARIOS happen not
+    to exercise -- so the missing whitelist entries were latent. This test
+    drives the emit helpers directly with populated inputs so the contract is
+    actively verified, not merely tolerated.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.runner import (
+        _evap_plane_selectivity_observables,
+        _fe_redox_split_observables,
+        _mre_uncertified_yield_observables,
+    )
+
+    snapshot = SimpleNamespace(
+        evap_plane_selectivity={
+            "target_species": ["Na", "K"],
+            "per_species_fraction": {"Na": 0.6, "K": 0.3},
+            "total_flux_kg_hr": 1.0,
+            "target_flux_kg_hr": 0.9,
+            "target_selectivity": 0.9,
+        },
+        mre_uncertified_yield={"Al": 1.23},
+        fe_redox_split={"fO2_log": -8.0, "ferric_frac": 0.2, "valid": True},
+    )
+
+    emitted: set[str] = set()
+    emitted |= set(_evap_plane_selectivity_observables(snapshot))
+    emitted |= set(_mre_uncertified_yield_observables(snapshot))
+    emitted |= set(_fe_redox_split_observables(snapshot))
+
+    # All three must actually emit given non-empty inputs (guards against the
+    # helpers silently short-circuiting and making this test a no-op).
+    assert emitted == {
+        "evap_plane_selectivity",
+        "mre_uncertified_yield",
+        "fe_redox_split",
+    }
+    # The contract under test: every emitted conditional key is whitelisted as
+    # optional, and none collides with a required key.
+    assert emitted.issubset(PER_HOUR_OPTIONAL_KEYS)
+    assert emitted.isdisjoint(PER_HOUR_KEYS)
+
+    # mass_balance_error_category is the same conditional-key class but is
+    # added inline by build_per_hour_summary (when the snapshot carries a
+    # non-empty category string), not via a standalone emit helper, so it is
+    # asserted as a whitelist member rather than driven through a helper.
+    assert "mass_balance_error_category" in PER_HOUR_OPTIONAL_KEYS
+    assert "mass_balance_error_category" not in PER_HOUR_KEYS
+
+    # reduced_real_cache_state is added downstream of build_per_hour_summary by
+    # simulator/run_executor.py (when sim._last_reduced_real_cache_state is not
+    # None) and serialized into per_hour_summary via runner.py; same conditional
+    # class, so it is asserted as a whitelist member rather than helper-driven.
+    assert "reduced_real_cache_state" in PER_HOUR_OPTIONAL_KEYS
+    assert "reduced_real_cache_state" not in PER_HOUR_KEYS
