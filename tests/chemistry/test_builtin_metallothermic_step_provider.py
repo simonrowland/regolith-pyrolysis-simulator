@@ -37,6 +37,8 @@ import pytest
 
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
+    NA_STAGE_TARGETS,
+    NA_TARGET_CR_TI,
     REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
     REACTION_FAMILY_C6_MG,
@@ -837,6 +839,79 @@ def test_c3_na_explicit_duplicate_targets_do_not_double_debit_feo(
     assert result.transition.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
         min(feo_mol, na_limited_mol / 2.0)
     )
+
+
+def test_empty_or_all_invalid_na_targets_do_not_widen_to_default_set():
+    """SC-47: an explicitly-provided ``target_oxides`` that normalises to
+    empty (an empty list, an empty string, or every entry unrecognised) must
+    reduce NOTHING -- it must NOT silently widen to the default Cr/Ti
+    Na-target set. Mirrors the BUG-140 empty-filter contract. The None case
+    (no ``target_oxides`` key at all) is the caller's stage-default path,
+    handled separately by ``_resolve_na_target_priority``'s ``is not None``.
+    """
+    normalize = BuiltinMetallothermicStepProvider._normalize_na_targets
+    default = NA_STAGE_TARGETS[NA_TARGET_CR_TI]
+    assert default  # default set is non-empty, so the checks below actually bite
+
+    # Explicit-empty / all-invalid -> reduce nothing (), NOT the default set
+    # (pre-SC-47 this returned `tuple(targets) or default` == the Cr/Ti set).
+    assert normalize([]) == ()
+    assert normalize("") == ()
+    assert normalize(["NotAnOxide", "AlsoBogus"]) == ()
+    assert normalize([]) != tuple(default)
+
+    # Control: a valid (de-duplicated) target list is unchanged.
+    assert normalize(["FeO", "FeO"]) == ("FeO",)
+
+
+def test_empty_na_targets_dispatch_reduces_nothing_not_default_set(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """SC-47 dispatch-level teeth (mirrors BUG-140's end-to-end test): an
+    explicit empty ``target_oxides`` drives the metallothermic step to reduce
+    NOTHING (clean ``status=='ok'``, no transition), and must NOT widen to the
+    default Cr/Ti set. Pre-fix the empty list normalised to the cr_ti default,
+    so the step entered the reduce-Cr/Ti path and returned ``status=='refused'``
+    (margin non-positive at 1150 C) -- this asserts the post-fix ``'ok'``
+    no-op, which also proves the empty-priority dispatch path does not crash.
+    """
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    melt = {
+        "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+        "Cr2O3": 5.0 / (MOLAR_MASS["Cr2O3"] / 1000.0),
+        "TiO2": 5.0 / (MOLAR_MASS["TiO2"] / 1000.0),
+    }
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": dict(melt),
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_NA,
+                "target_oxides": [],
+                "reagent_available_kg": 30.0,
+                "liquid_fraction": 1.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is None
 
 
 def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(

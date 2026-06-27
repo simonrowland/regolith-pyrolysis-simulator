@@ -1284,7 +1284,16 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 continue
             targets.append(target)
             seen.add(target)
-        return tuple(targets) or NA_STAGE_TARGETS[NA_TARGET_CR_TI]
+        # SC-47: an explicitly-provided target_oxides list must NOT silently
+        # widen to the default Cr/Ti set when it normalises to empty (an
+        # empty list, or every entry unrecognised). Mirroring the BUG-140
+        # contract, an explicit-but-empty selectivity filter means "reduce
+        # nothing" (empty priority -> no Na reduction downstream), not "fall
+        # back to the default targets" -- silently reducing the WRONG oxides
+        # is a fallback the mandate forbids. The None case (no target_oxides
+        # provided at all) is handled by the caller via `is not None`, which
+        # selects the stage default set; that path is unchanged.
+        return tuple(targets)
 
     @staticmethod
     def _ellingham_fit_diagnostic(
