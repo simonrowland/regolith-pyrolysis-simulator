@@ -127,3 +127,36 @@ def test_kress91_split_matches_vaporock_fe_redox_helper() -> None:
             diagnostic["fe3_over_sigma_fe"],
             abs=5e-4,
         ), feedstock_id
+
+
+def test_kress91_extreme_reducing_fo2_does_not_underflow_crash() -> None:
+    """BUG-159: at extreme-reducing fO2 the prior ``10.0 ** fO2_log`` underflowed
+    to ``0.0`` and ``math.log(0.0)`` aborted the provider with a domain error.
+
+    The ``a*ln(fO2)`` term is now computed as ``fO2_log * ln(10)`` (algebraically
+    exact, the canonical Kress91 form), so an arbitrarily reducing ``fO2_log``
+    returns a finite, physical ferric fraction instead of raising.
+    """
+    from simulator.fe_redox import kress91_fe3_over_sigma_fe
+
+    mol_fractions = {
+        "Al2O3": 0.08,
+        "FeOt": 0.12,
+        "CaO": 0.10,
+        "Na2O": 0.02,
+        "K2O": 0.005,
+    }
+    kwargs = dict(mol_fractions=mol_fractions, T_K=1873.0, pressure_bar=0.01)
+
+    # Extreme reducing: pre-fix this raised ValueError("math domain error").
+    extreme = kress91_fe3_over_sigma_fe(fO2_log=-350.0, **kwargs)
+    assert isinstance(extreme, float)
+    assert 0.0 <= extreme <= 1.0
+    assert extreme == pytest.approx(0.0, abs=1e-6)  # ferric -> 0 at extreme reducing
+
+    # Normal range stays finite/physical, and a more-oxidising fO2 gives a
+    # strictly higher ferric fraction (monotonic sanity on the fixed term).
+    mild = kress91_fe3_over_sigma_fe(fO2_log=-8.0, **kwargs)
+    oxidising = kress91_fe3_over_sigma_fe(fO2_log=-2.0, **kwargs)
+    assert 0.0 <= mild <= 1.0
+    assert oxidising > mild

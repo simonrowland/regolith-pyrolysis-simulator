@@ -57,7 +57,12 @@ def _kress91_fe2o3_over_feo_molar(
     p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
     to_K = 1673.0
     ln_ratio = (
-        0.196 * math.log(10.0 ** float(fO2_log))
+        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10) directly.
+        # The prior 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and
+        # then math.log(0.0) raises a domain error, aborting the provider (BUG-159).
+        # This form is algebraically exact and is the canonical Kress91 a*ln(fO2)
+        # term (the sibling exp() at the return is already domain-clamped).
+        0.196 * float(fO2_log) * math.log(10.0)
         + 11492.0 / float(T_K)
         - 6.675
         - 2.243 * x.get('Al2O3', 0.0)
