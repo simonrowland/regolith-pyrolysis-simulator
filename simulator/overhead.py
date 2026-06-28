@@ -45,11 +45,13 @@ from typing import Any, Mapping, Optional
 from simulator.core import (
     EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
 )
+# Single-source the pipe-temperature default from condensation (canonical
+# pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
+from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
-DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 
 # 0.5.4 W7 (CW5 historical-audit closure, 2026-05-28): default
 # mean molar mass for the pipe-conductance ideal-gas density when
