@@ -74,7 +74,11 @@ from simulator.transport_constants import (
     N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    AVOGADRO,
+    BOLTZMANN,
+    CELSIUS_TO_KELVIN_OFFSET,
+)
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -106,8 +110,10 @@ from simulator.state import (
 )
 
 
-BOLTZMANN_CONSTANT_J_K = 1.380649e-23
-AVOGADRO_MOL = 6.02214076e23
+# Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
+# to the prior local literals (1.380649e-23 / 6.02214076e23).
+BOLTZMANN_CONSTANT_J_K = BOLTZMANN
+AVOGADRO_MOL = AVOGADRO
 HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'

@@ -19,10 +19,13 @@ from simulator.transport_constants import (
     FREE_MOLECULAR_KNUDSEN_MIN,
     VISCOUS_KNUDSEN_MAX,
 )
+from simulator.physical_constants import BOLTZMANN, GAS_CONSTANT
 
 
-GAS_CONSTANT_J_MOL_K = 8.31446261815324
-BOLTZMANN_CONSTANT_J_K = 1.380649e-23
+# Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
+# to the prior local literals (8.31446261815324 / 1.380649e-23).
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT
+BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 
 LONG_TUBE_L_OVER_D_MIN = 10.0
 

@@ -50,6 +50,7 @@ from simulator.melt_backend.liquidus import (
     find_liquidus_solidus_by_fraction,
 )
 from engines.alphamelts.thermoengine import ThermoEngineTransport
+from simulator.physical_constants import GAS_CONSTANT
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
@@ -137,7 +138,9 @@ PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'oxide_mu', 'standard_chemical_potentials', 'pure_chemical_potentials',
     'reference_chemical_potentials', 'mu0', 'mu0_oxides', 'oxide_mu0',
 }
-GAS_CONSTANT_J_PER_MOL_K = 8.31446261815324
+# Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
+# to the prior local literal (8.31446261815324).
+GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
 ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
     'Na': ('Na', 'Na2O', 'NaAlSi3O8'),
     'K': ('K', 'K2O', 'KAlSi3O8'),
