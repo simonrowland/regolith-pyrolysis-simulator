@@ -44,6 +44,42 @@ TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
     "terminal.oxygen_mre_anode_stored": frozenset({"O2"}),
     "terminal.chromium_condensed_oxide_stored": frozenset({"Cr2O3"}),
 }
+KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
+    "process.cleaned_melt",
+    "process.condensation_train",
+    "process.metal_phase",
+    "process.overhead_gas",
+    "process.raw_feedstock",
+    "process.reagent_inventory",
+    "process.spent_reductant_residue",
+    "process.stage0_carbonate_feed",
+    "process.stage0_perchlorate_feed",
+    "process.stage0_salt_feed",
+    "process.stage0_volatile_feed",
+    "process.wall_deposit",
+    "reservoir.fo2_buffer",
+    "reservoir.stage0_oxidant",
+    "reservoir.stage0_process_gas",
+    "terminal.slag",
+    "terminal.drain_tap_material",
+    "terminal.offgas",
+    "terminal.chromium_condensed_oxide_stored",
+    "terminal.oxygen_stage0_stored",
+    "terminal.oxygen_mre_anode_stored",
+    "terminal.oxygen_melt_offgas_stored",
+    "terminal.oxygen_melt_offgas_captured",
+    "terminal.oxygen_melt_offgas_vented_to_vacuum",
+    "terminal.stage0_chloride_salt_phase",
+    "terminal.stage0_residual_carbonate_carbon",
+    "terminal.stage0_residual_refractory_carbon",
+    "terminal.stage0_salt_phase",
+    "terminal.stage0_sulfide_matte",
+    "vent",
+})
+KNOWN_LEDGER_ACCOUNT_PREFIXES: tuple[str, ...] = (
+    "process.wall_deposit_segment_",
+    "reservoir.reagent.",
+)
 
 
 @dataclass(frozen=True)
@@ -219,6 +255,8 @@ class AtomLedger:
         mass_tolerance_kg: float = DEFAULT_MASS_TOLERANCE_KG,
         atom_tolerance_mol: float = DEFAULT_ATOM_TOLERANCE_MOL,
         relative_tolerance: float = DEFAULT_RELATIVE_TOLERANCE,
+        allowed_accounts: frozenset[str] | None = None,
+        allowed_account_prefixes: tuple[str, ...] = (),
     ) -> None:
         self.registry = dict(registry or {})
         self.mass_tolerance_kg = float(mass_tolerance_kg)
@@ -231,6 +269,12 @@ class AtomLedger:
         self._policies: dict[str, AccountPolicy] = {}
         self._transitions: list[LedgerTransition] = []
         self._external_loads: list[MaterialLot] = []
+        self._allowed_accounts = (
+            None
+            if allowed_accounts is None
+            else frozenset(str(account) for account in allowed_accounts)
+        )
+        self._allowed_account_prefixes = tuple(str(prefix) for prefix in allowed_account_prefixes)
 
         self._load_account_policies(account_policies)
         for account, species_kg in dict(initial_balances or {}).items():
@@ -439,7 +483,9 @@ class AtomLedger:
         account: str,
         policy: AccountPolicy | Mapping[str, Any] | str | None = None,
     ) -> None:
-        self._policies[str(account)] = _coerce_account_policy(account, policy)
+        name = str(account)
+        self._validate_account_known(name)
+        self._policies[name] = _coerce_account_policy(name, policy)
         self.assert_balanced()
 
     def account_policy(self, account: str) -> AccountPolicy:
@@ -615,11 +661,14 @@ class AtomLedger:
             return
         if isinstance(account_policies, Mapping):
             for account, policy in account_policies.items():
-                self._policies[str(account)] = _coerce_account_policy(str(account), policy)
+                name = str(account)
+                self._validate_account_known(name)
+                self._policies[name] = _coerce_account_policy(name, policy)
             return
         for policy in account_policies:
             if not isinstance(policy, AccountPolicy):
                 raise AccountingError("account policy iterables must contain AccountPolicy objects")
+            self._validate_account_known(policy.account)
             self._policies[policy.account] = policy
 
     def _assert_balances_finite(
@@ -648,6 +697,7 @@ class AtomLedger:
         checked = balances if balances is not None else self._balances
         self._assert_balances_finite(checked)
         for account, species_mol in checked.items():
+            self._validate_account_known(account)
             policy = self.account_policy(account)
             species_kg = _species_mol_to_kg(
                 species_mol,
@@ -680,6 +730,28 @@ class AtomLedger:
                         f"reservoir account {account!r} exceeded {species!r} credit: "
                         f"balance={kg:.12g} kg limit={limit:.12g} kg"
                     )
+
+    def _validate_account_known(self, account: str) -> None:
+        """Reject any account outside the allowlist when strict (opt-in).
+
+        Scope: this guards every PUBLIC balance-writer (apply / transfer /
+        move / load_external[_mol] / set_account_policy / __init__ seeding),
+        all of which route through it. Direct mutation of the private
+        ``self._balances`` dict bypasses it by construction; no production
+        path does that (test fakes only). ``allowed_accounts is None`` =
+        permissive (default), preserving legacy behaviour for ad-hoc tests.
+        """
+        if self._allowed_accounts is None:
+            return
+        name = str(account)
+        if name in self._allowed_accounts:
+            return
+        if any(name.startswith(prefix) for prefix in self._allowed_account_prefixes):
+            return
+        raise AccountingError(
+            f"unknown ledger account {name!r}: not in the production allowlist "
+            "(typo? add to KNOWN_LEDGER_ACCOUNTS)"
+        )
 
     def _validate_terminal_debits(self, transition: LedgerTransition) -> None:
         credit_accounts = {lot.account for lot in transition.credits}

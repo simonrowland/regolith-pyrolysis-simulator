@@ -13,6 +13,7 @@ projection boundary, never inside the kernel.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -36,9 +37,32 @@ def _freeze_nested_mol(
     return MappingProxyType(frozen)
 
 
+def _validate_finite_nested_mol(
+    field_name: str,
+    data: Mapping[str, Mapping[str, float]],
+) -> None:
+    for account, species_mol in dict(data or {}).items():
+        for species, value in dict(species_mol or {}).items():
+            amount = float(value)
+            if not math.isfinite(amount):
+                raise ValueError(
+                    f"{field_name} amount for account {str(account)!r} "
+                    f"species {str(species)!r} must be finite"
+                )
+
+
 def _freeze_atom_balance(data: Mapping[str, float]) -> Mapping[str, float]:
     cleaned = {str(element): float(value) for element, value in dict(data or {}).items()}
     return MappingProxyType(cleaned)
+
+
+def _validate_finite_atom_balance(data: Mapping[str, float]) -> None:
+    for element, value in dict(data or {}).items():
+        amount = float(value)
+        if not math.isfinite(amount):
+            raise ValueError(
+                f"atom_balance_proof value for element {str(element)!r} must be finite"
+            )
 
 
 def _freeze_str_any(data: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -92,6 +116,9 @@ class LedgerTransitionProposal:
     atom_balance_proof: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        _validate_finite_nested_mol("debits", self.debits)
+        _validate_finite_nested_mol("credits", self.credits)
+        _validate_finite_atom_balance(self.atom_balance_proof)
         object.__setattr__(self, "debits", _freeze_nested_mol(self.debits))
         object.__setattr__(self, "credits", _freeze_nested_mol(self.credits))
         object.__setattr__(self, "reason", str(self.reason or ""))

@@ -66,6 +66,10 @@ from simulator.accounting import (
     load_species_formulas,
     resolve_species_formula,
 )
+from simulator.accounting.ledger import (
+    KNOWN_LEDGER_ACCOUNTS,
+    KNOWN_LEDGER_ACCOUNT_PREFIXES,
+)
 from simulator.condensation_routing import (
     designated_stage_number,
     target_species_for_stage_number,
@@ -924,6 +928,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._backend_account_policies()
                 + self._reagent_account_policies()
             ),
+            allowed_accounts=KNOWN_LEDGER_ACCOUNTS,
+            allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
         )
 
     # ------------------------------------------------------------------

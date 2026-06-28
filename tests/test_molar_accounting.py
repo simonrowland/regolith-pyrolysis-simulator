@@ -219,23 +219,28 @@ def test_snapshot_mass_balance_uses_explicit_flow_accounts():
     )
     sim.load_batch("oxide", mass_kg=1000.0)
 
+    # Move 1 kg to a real, allowlisted account that is deliberately excluded
+    # from `_flow_mass_out_kg` (FLOW_MASS_EXCLUDED_ACCOUNTS) so the snapshot
+    # mass-balance reports the 1 kg as an unreported flow (0.1% discrepancy).
+    # (Avoids a fake/test-only account so the production ledger allowlist
+    # stays clean — no misrouting sink.)
     sim.atom_ledger.transfer(
-        "move_to_unclassified_process_account",
+        "move_to_flow_mass_excluded_account",
         debits=(
             MaterialLot(
                 "process.cleaned_melt",
                 {"SiO2": 1.0},
-                source="unit-test unclassified debit",
+                source="unit-test flow-excluded debit",
             ),
         ),
         credits=(
             MaterialLot(
-                "process.unclassified_debug",
+                "process.stage0_volatile_feed",
                 {"SiO2": 1.0},
-                source="unit-test unclassified credit",
+                source="unit-test flow-excluded credit",
             ),
         ),
-        reason="balanced ledger move to an unreported flow account",
+        reason="balanced ledger move to a flow-mass-excluded account",
     )
     sim._project_cleaned_melt_from_atom_ledger()
 
