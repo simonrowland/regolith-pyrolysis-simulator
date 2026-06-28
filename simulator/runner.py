@@ -71,6 +71,7 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     normalize_lab_schedule,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.session import (
     SimSession,
@@ -1518,7 +1519,7 @@ def _format_sweep_float(value: float) -> str:
 
 
 def _c_to_display_k(value_c: float) -> int:
-    return int(round(float(value_c) + 273.15))
+    return int(round(float(value_c) + CELSIUS_TO_KELVIN_OFFSET))
 
 
 def _warning_sticker_fires(t_hold_c: float) -> bool:

@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional, Tuple
 
 from engines.magemin.domain import _is_finite
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 # Tolerances match the binding spec §4 MAGEMin entry.
 LIQUIDUS_TOLERANCE_K = 50.0
@@ -204,7 +205,7 @@ def _extract_liquidus_K(result: Any) -> Optional[float]:
         value = _lookup(result, key)
         if value is not None:
             try:
-                return float(value) + 273.15
+                return float(value) + CELSIUS_TO_KELVIN_OFFSET
             except (TypeError, ValueError):
                 continue
 

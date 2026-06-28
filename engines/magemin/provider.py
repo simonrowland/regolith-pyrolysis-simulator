@@ -63,6 +63,7 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 # Intent set: silicate parity shadows plus the freeze-gate scalar fallback.
@@ -574,13 +575,13 @@ class MAGEMinShadowProvider(ChemistryProvider):
         liquidus_T_K = _safe_attr_float(equilibrium, 'liquidus_T_K')
         liquidus_T_C: Optional[float] = None
         if liquidus_T_K is not None:
-            liquidus_T_C = liquidus_T_K - 273.15
+            liquidus_T_C = liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET
         else:
             # Fall back to a structured liquidus_T_C if the adapter ever
             # adds one.
             liquidus_T_C = _safe_attr_float(equilibrium, 'liquidus_T_C')
             if liquidus_T_C is not None:
-                liquidus_T_K = liquidus_T_C + 273.15
+                liquidus_T_K = liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET
         solidus_T_C = _safe_attr_float(equilibrium, 'solidus_T_C')
 
         backend_status = str(getattr(equilibrium, 'status', 'ok') or 'ok')

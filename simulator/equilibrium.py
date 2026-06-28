@@ -9,6 +9,7 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
 )
 from simulator.fe_redox import kress91_ferrous_feo_activity
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import GAS_CONSTANT, Atmosphere
 
 # Atmosphere modes where a turbine/bleed loop actively holds a commanded pO₂
@@ -207,7 +208,7 @@ class EquilibriumMixin:
             warn_pseudo_vapor_pressure_fallback,
         )
 
-        T_K = self.melt.temperature_C + 273.15
+        T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
         if T_K < 400:
             # Builtin path ran and correctly found no significant
             # evaporation below 400 K - a converged 'ok' outcome, not a

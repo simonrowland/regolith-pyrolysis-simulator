@@ -53,6 +53,7 @@ from typing import Dict, List, Tuple
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 # Standard decomposition voltages at ~1873 K / ~1600 C (V).
@@ -190,7 +191,7 @@ class ElectrolysisModel:
         """
         E0 = self.decomp_voltages.get(oxide, 2.5)
         n = ELECTRONS_PER_OXIDE.get(oxide, 2)
-        T_K = T_C + 273.15
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
 
         if activity <= 1e-10:
             return E0 + 1.0  # Very high — species essentially depleted
@@ -216,7 +217,7 @@ class ElectrolysisModel:
                                   pO2_bar: float = 1.0) -> float:
         activity = max(float(activity), 1e-30)
         pO2_activity = max(float(pO2_bar), 1e-30)
-        T_K = float(T_C) + 273.15
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         return (
             FERRIC_TO_FERROUS_REFERENCE_V
             - (GAS_CONSTANT * T_K) / (

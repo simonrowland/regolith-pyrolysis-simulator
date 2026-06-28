@@ -46,6 +46,7 @@ from simulator.lab_geometry import (
     require_lab_pipe_length,
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 @dataclass
@@ -306,7 +307,7 @@ class EquipmentDesigner:
         Concentrator efficiency: ~85%
         Reference: 100 m² → ~136 kW → ~1 tonne batch
         """
-        T_K = peak_T_C + 273.15
+        T_K = peak_T_C + CELSIUS_TO_KELVIN_OFFSET
         dT_dt = 50.0 / 3600.0  # 50 °C/hr → K/s
 
         # Heating power

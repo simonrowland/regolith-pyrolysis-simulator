@@ -143,6 +143,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 # Reaction-family discriminators (string-literal contract with the
@@ -1175,7 +1176,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         root_K = (target_dH - reductant_dH) / entropy_delta
         if root_K <= 0.0:
             return None
-        return root_K - 273.15
+        return root_K - CELSIUS_TO_KELVIN_OFFSET
 
     @staticmethod
     def _refused_result(
@@ -1329,7 +1330,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         target_oxides: tuple[str, ...],
         temperature_C: float,
     ) -> dict[str, dict[str, Any]]:
-        temperature_K = float(temperature_C) + 273.15
+        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
         if valid_low <= temperature_K <= valid_high:
             return {}
@@ -1349,7 +1350,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     @staticmethod
     def _delta_g_kj_per_mol_o2(metal: str, temperature_C: float) -> float:
         dH_f, dS_f, _n_M, _n_ox = _ELLINGHAM_THERMO[metal]
-        return dH_f - (float(temperature_C) + 273.15) * dS_f
+        return dH_f - (float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET) * dS_f
 
     @staticmethod
     def _crossover_temperature_C(reagent_metal: str, target_metal: str) -> float:
@@ -1365,7 +1366,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         dH_target, dS_target, _n_M, _n_ox = _ELLINGHAM_THERMO[target_metal]
         return (
             (dH_reagent - dH_target) / (dS_reagent - dS_target)
-        ) - 273.15
+        ) - CELSIUS_TO_KELVIN_OFFSET
 
     @classmethod
     def _na_thermo_priority(

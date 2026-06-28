@@ -7,6 +7,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.reduced_real_determinism import (
     _composition_items,
     _physics_bucket_consumes_log_fO2,
@@ -289,7 +290,9 @@ def interpolate_equilibrium_payload(
     controls = query_key.get("controls", {})
     if not isinstance(controls, Mapping):
         controls = {}
-    interpolated_result["temperature_C"] = float(controls.get("T_K", 0.0) or 0.0) - 273.15
+    interpolated_result["temperature_C"] = (
+        float(controls.get("T_K", 0.0) or 0.0) - CELSIUS_TO_KELVIN_OFFSET
+    )
     interpolated_result["pressure_bar"] = float(controls.get("pressure_bar", 0.0) or 0.0)
     if controls.get("log_fO2") is not None:
         interpolated_result["fO2_log"] = float(controls.get("log_fO2"))

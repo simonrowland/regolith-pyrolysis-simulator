@@ -69,10 +69,12 @@ from typing import Any, Dict
 import yaml
 
 from simulator.transport_constants import (
+    COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
     N2_COLLISION_DIAMETER_M,
     VISCOUS_KNUDSEN_MAX,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -167,6 +169,11 @@ DEFAULT_SHERWOOD_LAMINAR = 3.66
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
 GAS_CONSTANT_J_MOL_K = 8.314462618
 
+
+def _carrier_collision_diameter_angstrom(species: str) -> float:
+    return round(COLLISION_DIAMETERS_M[species] * 1e10, 3)
+
+
 # Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
 # Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
 # Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
@@ -186,9 +193,9 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
     'N2':  (N2_COLLISION_DIAMETER_M * 1e10, 71.4, 28.014),  # BSL Table E.1
-    'Ar':  (3.542, 93.3,   39.948),  # BSL Table E.1
-    'CO2': (3.941, 195.2,  44.010),  # BSL Table E.1
-    'O2':  (3.467, 106.7,  31.998),  # BSL Table E.1
+    'Ar':  (_carrier_collision_diameter_angstrom('Ar'), 93.3,   39.948),  # BSL Table E.1
+    'CO2': (_carrier_collision_diameter_angstrom('CO2'), 195.2,  44.010),  # BSL Table E.1
+    'O2':  (_carrier_collision_diameter_angstrom('O2'), 106.7,  31.998),  # BSL Table E.1
     'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
     'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
     'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
@@ -1065,7 +1072,10 @@ class CondensationModel:
             self._viscous_flow_required = _campaign_requires_viscous_flow(
                 campaign_name)
         pressure_pa = self.overhead_pressure_mbar * 100.0
-        gas_temperature_K = max(self.gas_temperature_C + 273.15, 1.0)
+        gas_temperature_K = max(
+            self.gas_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        )
         self.knudsen_number = _knudsen_number(
             pressure_pa,
             gas_temperature_K,
@@ -1850,7 +1860,7 @@ class CondensationModel:
         if P_local_pa <= 0.0:
             return 0.0
 
-        T_ref_K = max(T_cond_C + 273.15, 1.0)
+        T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
         reference_flux = _hkl_impingement_flux_mol_m2_s(
             species,
             P_local_pa,
@@ -1873,7 +1883,7 @@ class CondensationModel:
                 T_surface_C = (
                     lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
                 )
-            T_surface_K = max(T_surface_C + 273.15, 1.0)
+            T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
             # series-resistance form as the wall-deposit candidate path so
             # the stage-condensation band integration honors the canonical
@@ -1884,7 +1894,10 @@ class CondensationModel:
             # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
             # amplifies the boundary-layer Sherwood per the operator's
             # induction-stirring power.
-            T_gas_K = max(float(self.gas_temperature_C) + 273.15, 1.0)
+            T_gas_K = max(
+                float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+                1.0,
+            )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_surface_K, alpha_s,
@@ -2436,7 +2449,7 @@ def _local_species_pressure_pa(
 ) -> float:
     P_local_pa = _antoine_psat_pa(
         species,
-        T_cond_C + 273.15,
+        T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -2462,7 +2475,7 @@ def _record_wall_surface_antoine_telemetry(
         return
     _antoine_psat_pa(
         species,
-        wall_temperature_C + 273.15,
+        wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -2480,7 +2493,7 @@ def _local_wall_species_pressure_pa(
 ) -> float:
     P_source_pa = _antoine_psat_pa(
         species,
-        melt_temperature_C + 273.15,
+        melt_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -2888,7 +2901,10 @@ def knudsen_regime_diagnostic(
     carrier_gas: str = DEFAULT_CARRIER_GAS,
 ) -> dict[str, Any]:
     pressure_pa = max(0.0, float(overhead_pressure_mbar)) * 100.0
-    gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
+    gas_temperature_K = max(
+        float(gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        1.0,
+    )
     carrier_diagnostic = _carrier_collision_diameter_diagnostic(carrier_gas)
     carrier_collision_diameter_m = float(
         carrier_diagnostic['carrier_collision_diameter_m']

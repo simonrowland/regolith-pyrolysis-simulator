@@ -24,6 +24,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 FREE_ANALYZER_OXYGEN_SPECIES = frozenset({OXYGEN_SPECIES, "O"})
@@ -2054,7 +2055,7 @@ def wall_deposit_candidate_for_surface_kg(
     if P_local_pa <= 0.0:
         return 0.0
 
-    T_ref_K = max(T_cond_C + 273.15, 1.0)
+    T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     reference_flux = _hkl_impingement_flux_mol_m2_s(
         species,
         P_local_pa,
@@ -2064,8 +2065,8 @@ def wall_deposit_candidate_for_surface_kg(
     if reference_flux <= 0.0:
         return 0.0
 
-    T_wall_K = max(float(wall_temperature_C) + 273.15, 1.0)
-    T_gas_K = max(float(model.gas_temperature_C) + 273.15, 1.0)
+    T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+    T_gas_K = max(float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
     flux = _series_resistance_deposition_flux_mol_m2_s(
         species, P_local_pa, T_wall_K, alpha_s,
@@ -2102,7 +2103,10 @@ def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
 
     try:
         pressure_pa = float(model.overhead_pressure_mbar) * 100.0
-        gas_temperature_K = max(float(model.gas_temperature_C) + 273.15, 1.0)
+        gas_temperature_K = max(
+            float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        )
         diameter_m = float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m))
         carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
         kn = _knudsen_number(

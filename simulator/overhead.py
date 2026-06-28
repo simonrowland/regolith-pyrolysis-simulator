@@ -45,6 +45,7 @@ from typing import Any, Mapping, Optional
 from simulator.core import (
     EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
@@ -706,7 +707,7 @@ class OverheadGasModel:
         return 0.085
 
     def _headspace_temperature_K(self, melt: MeltState) -> float:
-        melt_T_K = float(melt.temperature_C) + 273.15
+        melt_T_K = float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         offset = self._temperature_offset_K
         if offset is not None:
             return max(1.0, melt_T_K + float(offset))
@@ -791,7 +792,7 @@ class OverheadGasModel:
         # complex / NaN / exception downstream. Also guard L, d <= 0
         # (degenerate pipe geometry; conductance is 0). p_mean_Pa
         # < 0 is unphysical; clamp to 0.
-        T_K = T_C + 273.15
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
         if T_K <= 0.0 or L <= 0.0 or d <= 0.0:
             return 0.0
         p_mean_Pa = max(0.0, float(p_mean_Pa))

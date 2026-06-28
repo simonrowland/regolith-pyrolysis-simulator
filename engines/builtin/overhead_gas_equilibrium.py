@@ -16,6 +16,7 @@ from simulator.chemistry.kernel.capabilities import (
 )
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 _OXIDE_MOLAR_MASS_G_MOL = {
@@ -81,7 +82,7 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
             0.0,
             float(
                 controls.get("headspace_temperature_K")
-                or request.temperature_C + 273.15
+                or request.temperature_C + CELSIUS_TO_KELVIN_OFFSET
             ),
         )
         holdup_mol = dict(

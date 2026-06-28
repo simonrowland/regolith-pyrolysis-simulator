@@ -30,13 +30,14 @@ from typing import Any
 
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 CITED = "CITED"
 ASSUMED = "ASSUMED"
 UNCERTIFIED = "UNCERTIFIED"
 
-KELVIN_OFFSET = 273.15
+KELVIN_OFFSET = CELSIUS_TO_KELVIN_OFFSET
 MELT_EMISSIVITY = EquipmentDesigner.MELT_EMISSIVITY
 THERMAL_BUDGET_VIEW_FACTOR = 1.0
 THERMAL_BUDGET_WALL_CONDUCTIVITY_W_M_K = 1.5

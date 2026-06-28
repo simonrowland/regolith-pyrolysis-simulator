@@ -94,6 +94,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
@@ -274,7 +275,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         dt_hr = float(controls.get("dt_hr", 1.0))
         pO2_bar = self._coerce_pO2_bar(controls.get("pO2_bar", 1.0))
         T_C = float(request.temperature_C)
-        T_K = T_C + 273.15
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
         melt_fO2_log = self._coerce_optional_float(
             controls.get("melt_fO2_log", request.fO2_log)
         )
@@ -939,7 +940,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             str(request.fe_redox_policy) if request is not None else "intrinsic"
         )
         T_K = (
-            float(request.temperature_C) + 273.15
+            float(request.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
             if request is not None else 0.0
         )
         split_pressure_bar = (
