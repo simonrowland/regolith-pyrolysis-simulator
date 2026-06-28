@@ -23,7 +23,9 @@ from simulator.state import (
 )
 
 
-_DEFAULT_EVAPORATION_ALPHA = 1.0
+# NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
+# (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
+# duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
