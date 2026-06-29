@@ -63,6 +63,7 @@ from simulator.condensation import (
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
+from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
@@ -1024,6 +1025,14 @@ class PyrolysisRun:
         run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
             pressure_coating_pareto_diagnostic(sim, execution.per_hour)
         )
+        run_metadata["cost_rollup_diagnostic"] = _json_safe(
+            build_cost_rollup_diagnostic(
+                cost_ledger=sim.cost_ledger,
+                per_hour=execution.per_hour,
+                products_kg=sim.product_ledger(),
+            )
+        )
+        sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle

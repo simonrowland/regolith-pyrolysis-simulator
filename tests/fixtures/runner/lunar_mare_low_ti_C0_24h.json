@@ -474,6 +474,111 @@
           "cumulative_wall_deposit_kg": 0.0
         }
       }
+    },
+    "cost_rollup_diagnostic": {
+      "schema_version": "cost-ledger-v1",
+      "policy_id": "mass-allocation-default__reagent-full-cost-v1",
+      "import_context": {
+        "mode": "mature",
+        "import_flag_enabled": false,
+        "available_supplier_species": [],
+        "classifier_scope": "reporting_only_not_optimizer_gate",
+        "all_options_visible": true
+      },
+      "transition_count": 0,
+      "transition_balance_max_abs": 0.0,
+      "product_costs": {
+        "terminal.product:Ca": {
+          "quantity_kg": 80.9228462250333,
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "thermal_flux_h": 20758.504751142584,
+            "furnace_h": 23.859664666121756,
+            "launch_penalty_kg": 0.0,
+            "external_reagent_kg": 0.0
+          },
+          "owner_ratify_money_projection": 20997.101397803803
+        },
+        "terminal.product:K": {
+          "quantity_kg": 0.46522713871032634,
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "thermal_flux_h": 119.34107881503651,
+            "furnace_h": 0.1371697121519916,
+            "launch_penalty_kg": 0.0,
+            "external_reagent_kg": 0.0
+          },
+          "owner_ratify_money_projection": 120.71277593655643
+        },
+        "terminal.product:Na": {
+          "quantity_kg": 0.010736576718279212,
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "thermal_flux_h": 2.7541700423836537,
+            "furnace_h": 0.003165621726253445,
+            "launch_penalty_kg": 0.0,
+            "external_reagent_kg": 0.0
+          },
+          "owner_ratify_money_projection": 2.7858262596461882
+        }
+      },
+      "active_inventory_costs": {},
+      "warnings": [],
+      "owner_ratify_placeholders": [
+        {
+          "name": "electrical_usd_per_kWh",
+          "value": 100.0,
+          "units": "USD/kWh",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "ticket": "COST-PARAM-ELECTRICAL-KWH",
+          "status": "owner-ratify-placeholder"
+        },
+        {
+          "name": "thermal_usd_per_flux_h",
+          "value": 1.0,
+          "units": "USD/(K*h)",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "ticket": "COST-PARAM-THERMAL-FLUX-H",
+          "status": "owner-ratify-placeholder"
+        },
+        {
+          "name": "furnace_usd_per_h",
+          "value": 10.0,
+          "units": "USD/h",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "ticket": "COST-PARAM-FURNACE-HOUR",
+          "status": "owner-ratify-placeholder"
+        },
+        {
+          "name": "launch_usd_per_kg",
+          "value": 10000.0,
+          "units": "USD/kg",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "ticket": "COST-PARAM-LAUNCH-KG",
+          "status": "owner-ratify-placeholder"
+        },
+        {
+          "name": "reagent_usd_per_kg",
+          "value": 100.0,
+          "units": "USD/kg",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "ticket": "COST-PARAM-REAGENT-KG",
+          "status": "owner-ratify-placeholder"
+        }
+      ],
+      "owner_ratify_placeholder_count": 5,
+      "run_input_cost": {
+        "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
+        "physical_cost": {
+          "electrical_kWh": 0.0,
+          "thermal_flux_h": 20880.600000000002,
+          "furnace_h": 24.0,
+          "launch_penalty_kg": 0.0,
+          "external_reagent_kg": 0.0
+        },
+        "allocation_status": "allocated_by_product_mass",
+        "owner_ratify_money_projection": 21120.600000000002
+      }
     }
   },
   "final_state": {

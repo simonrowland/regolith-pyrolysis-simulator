@@ -96,6 +96,14 @@ def test_c7_enabled_run_closes_mass_and_reports_three_products(tmp_path, monkeyp
     assert report["diagnostic"]["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert report["diagnostic"]["c7_al_credit_unused_mol"] > 0.0
     assert document.get("c7_refusal_diagnostic", {}) == {}
+    cost_diag = document["run_metadata"]["cost_rollup_diagnostic"]
+    assert not any("process.c7_al_credit" in row for row in cost_diag["warnings"])
+    product_costs = cost_diag["product_costs"]
+    assert "process.condensation_train:Ca" in product_costs
+    ca_cost = product_costs["process.condensation_train:Ca"]["accumulated_cost"]
+    assert ca_cost["external_reagent_kg"] > 0.0
+    assert ca_cost["thermal_flux_h"] > 0.0
+    assert "process.overhead_gas:Ca" not in product_costs
 
 
 def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch):

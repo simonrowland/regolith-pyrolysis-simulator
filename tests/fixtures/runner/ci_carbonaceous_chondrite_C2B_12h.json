@@ -292,6 +292,144 @@
     "backend_status": "unavailable",
     "campaign": "C2B",
     "certification_allowed": false,
+    "cost_rollup_diagnostic": {
+      "active_inventory_costs": {},
+      "import_context": {
+        "all_options_visible": true,
+        "available_supplier_species": [],
+        "classifier_scope": "reporting_only_not_optimizer_gate",
+        "import_flag_enabled": false,
+        "mode": "mature"
+      },
+      "owner_ratify_placeholder_count": 5,
+      "owner_ratify_placeholders": [
+        {
+          "name": "electrical_usd_per_kWh",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "status": "owner-ratify-placeholder",
+          "ticket": "COST-PARAM-ELECTRICAL-KWH",
+          "units": "USD/kWh",
+          "value": 100.0
+        },
+        {
+          "name": "thermal_usd_per_flux_h",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "status": "owner-ratify-placeholder",
+          "ticket": "COST-PARAM-THERMAL-FLUX-H",
+          "units": "USD/(K*h)",
+          "value": 1.0
+        },
+        {
+          "name": "furnace_usd_per_h",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "status": "owner-ratify-placeholder",
+          "ticket": "COST-PARAM-FURNACE-HOUR",
+          "units": "USD/h",
+          "value": 10.0
+        },
+        {
+          "name": "launch_usd_per_kg",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "status": "owner-ratify-placeholder",
+          "ticket": "COST-PARAM-LAUNCH-KG",
+          "units": "USD/kg",
+          "value": 10000.0
+        },
+        {
+          "name": "reagent_usd_per_kg",
+          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "status": "owner-ratify-placeholder",
+          "ticket": "COST-PARAM-REAGENT-KG",
+          "units": "USD/kg",
+          "value": 100.0
+        }
+      ],
+      "policy_id": "mass-allocation-default__reagent-full-cost-v1",
+      "product_costs": {
+        "terminal.product:CO2": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 3.9955656682381058,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 1530.9009857854303
+          },
+          "owner_ratify_money_projection": 1570.8566424678113,
+          "quantity_kg": 119.52378646980921
+        },
+        "terminal.product:Ca": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 0.5293451090615016,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 202.81857853691434
+          },
+          "owner_ratify_money_projection": 208.11202962752935,
+          "quantity_kg": 15.834887231925833
+        },
+        "terminal.product:H2O": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 6.074570201968152,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 2327.471572884098
+          },
+          "owner_ratify_money_projection": 2388.2172749037795,
+          "quantity_kg": 181.71535447096545
+        },
+        "terminal.product:N2": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 0.06669135544973123,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 25.55279284056452
+          },
+          "owner_ratify_money_projection": 26.219706395061834,
+          "quantity_kg": 1.9950124688279303
+        },
+        "terminal.product:Na2CO3": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 5.562878846066111e-07,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 0.00021314170298702303
+          },
+          "owner_ratify_money_projection": 0.00021870458183308915,
+          "quantity_kg": 1.664085635333379e-05
+        },
+        "terminal.product:S": {
+          "accumulated_cost": {
+            "electrical_kWh": 0.0,
+            "external_reagent_kg": 0.0,
+            "furnace_h": 1.3338271089946245,
+            "launch_penalty_kg": 0.0,
+            "thermal_flux_h": 511.0558568112904
+          },
+          "owner_ratify_money_projection": 524.3941279012366,
+          "quantity_kg": 39.900249376558605
+        }
+      },
+      "run_input_cost": {
+        "allocation_status": "allocated_by_product_mass",
+        "owner_ratify_money_projection": 4717.8,
+        "physical_cost": {
+          "electrical_kWh": 0.0,
+          "external_reagent_kg": 0.0,
+          "furnace_h": 12.0,
+          "launch_penalty_kg": 0.0,
+          "thermal_flux_h": 4597.8
+        },
+        "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h"
+      },
+      "schema_version": "cost-ledger-v1",
+      "transition_balance_max_abs": 0.0,
+      "transition_count": 0,
+      "warnings": []
+    },
     "degradation_reason": "unavailable",
     "degraded_from": [
       "unavailable"

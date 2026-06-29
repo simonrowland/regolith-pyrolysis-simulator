@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import inspect
 import copy
+import logging
 import math
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
@@ -75,6 +76,7 @@ from simulator.condensation_routing import (
     designated_stage_number,
     target_species_for_stage_number,
 )
+from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.fe_redox import (
     feot_equivalent_wt_pct,
@@ -371,6 +373,9 @@ def _pt0_determinism_store_for(owner: Any) -> Any | None:
     return getattr(owner, '_pt0_determinism_store', None)
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -465,6 +470,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._base_species_formula_registry = self._load_species_formula_registry()
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()
+        self.cost_ledger = CostLedger(
+            import_context=CostImportContext.from_config(
+                self.setpoints.get('cost_model')
+            )
+        )
 
         # --- Chemistry-engine kernel ---
         # Per F-B6 (Cluster B cleanup): the kernel facade is built lazily
@@ -1445,7 +1455,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         intent: ChemistryIntent,
         proposal: LedgerTransitionProposal,
-    ) -> None:
+        *,
+        diagnostic: Mapping[str, Any] | None = None,
+        control_inputs: Mapping[str, Any] | None = None,
+    ) -> LedgerTransition:
         """Commit a proposal returned by :meth:`_dispatch_only`.
 
         F-B1: the commit half of the pre/post-interleave split.  The
@@ -1454,7 +1467,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         thin pass-through.
         """
         kernel = self._require_chem_kernel()
-        kernel.commit_batch(intent, proposal)
+        transition = kernel.commit_batch(intent, proposal)
+        self._observe_cost_transition_best_effort(
+            intent=intent,
+            transition=transition,
+            diagnostic=diagnostic,
+            control_inputs=control_inputs,
+            temperature_C=float(self.melt.temperature_C),
+            strict=False,
+        )
+        return transition
+
+    def _record_cost_diagnostic_error(
+        self,
+        context: str,
+        exc: Exception,
+    ) -> None:
+        message = (
+            f"cost_observation_error: {context}: "
+            f"{type(exc).__name__}: {exc}"
+        )
+        try:
+            warnings = getattr(self.cost_ledger, "_warnings", None)
+            if isinstance(warnings, list):
+                warnings.append(message)
+        except Exception:
+            pass
+        _LOGGER.warning("%s", message, exc_info=True)
+
+    def _observe_cost_transition_best_effort(self, **kwargs: Any) -> None:
+        try:
+            self.cost_ledger.observe_transition(**kwargs)
+        except Exception as exc:  # noqa: BLE001 -- cost is diagnostic-only
+            self._record_cost_diagnostic_error("observe_transition", exc)
+
+    def _move_cost_inventory_lots_best_effort(self, **kwargs: Any) -> None:
+        try:
+            self.cost_ledger.move_inventory_lots(**kwargs)
+        except Exception as exc:  # noqa: BLE001 -- cost is diagnostic-only
+            self._record_cost_diagnostic_error("move_inventory_lots", exc)
+
+    def _move_cost_product_lots_best_effort(self, **kwargs: Any) -> None:
+        try:
+            self.cost_ledger.move_product_lots(**kwargs)
+        except Exception as exc:  # noqa: BLE001 -- cost is diagnostic-only
+            self._record_cost_diagnostic_error("move_product_lots", exc)
 
     def _dispatch_and_commit(
         self,
@@ -1481,7 +1538,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # current invariants.
             self._chem_no_op_dispatch_count += 1
             return result
-        self._commit_proposal(intent, proposal)
+        self._commit_proposal(
+            intent,
+            proposal,
+            diagnostic=result.diagnostic,
+            control_inputs=control_inputs,
+        )
         return result
 
     def _resolve_overhead_headspace_config(
@@ -2401,6 +2463,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         self.atom_ledger = self._new_atom_ledger()
         self._chem_kernel = self._build_chemistry_kernel()
+        self.cost_ledger = CostLedger(
+            import_context=CostImportContext.from_config(
+                self.setpoints.get('cost_model')
+            )
+        )
         # Per-batch diagnostic state must start clean -- the planner's
         # shadow trace would otherwise accumulate without bound across
         # campaigns / loop sessions.
@@ -2511,6 +2578,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 account,
                 {species: kg},
                 source=f'batch additive {species}',
+            )
+            self.cost_ledger.seed_external_material(
+                account=account,
+                species=species,
+                quantity_kg=kg,
+                provenance={
+                    'source': f'batch additive {species}',
+                    'source_tag': 'owner-ratify-placeholder:external-reagent-seed',
+                    'ticket': 'COST-PARAM-REAGENT-KG',
+                },
             )
 
         self._record_stage0_oxidation_transitions(label, oxidation_specs)
@@ -5883,6 +5960,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record.oxygen_vented_kg = oxygen_partition['vented']
         self.record.terminal_slag_kg = self._terminal_slag_kg()
         self.record.energy_total_kWh = self.energy_cumulative_kWh
+        self.record.cost_rollup = self.cost_ledger.summary()
         self.record.total_hours = self.melt.hour
         self.record.completed = True
 

@@ -223,7 +223,7 @@ class ExtractionMixin:
         draw_kg = min(requested_kg, available_kg)
         if draw_kg <= self._LEDGER_KG_TOL:
             return 0.0
-        return self._move_ledger_species(
+        moved_kg = self._move_ledger_species(
             f'draw_{species}_reagent_to_process',
             reservoir,
             'process.reagent_inventory',
@@ -231,6 +231,14 @@ class ExtractionMixin:
             draw_kg,
             reason=f'{species} reagent draw from reservoir',
         )
+        self._move_cost_inventory_lots_best_effort(
+            source_account=reservoir,
+            destination_account='process.reagent_inventory',
+            species=species,
+            quantity_kg=moved_kg,
+            reason=f'{species} reagent draw from reservoir',
+        )
+        return moved_kg
 
     def _sync_reagent_counter_from_ledger(self, species: str) -> float:
         return self._process_reagent_inventory_kg(species)
@@ -703,7 +711,10 @@ class ExtractionMixin:
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:
             self._commit_proposal(
-                ChemistryIntent.ELECTROLYSIS_STEP, proposal,
+                ChemistryIntent.ELECTROLYSIS_STEP,
+                proposal,
+                diagnostic=diagnostic,
+                control_inputs=electrolysis_controls,
             )
         else:
             # F-A4: no-op dispatch counter mirrors the
@@ -1000,7 +1011,13 @@ class ExtractionMixin:
             return
 
         self._commit_proposal(
-            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            proposal,
+            diagnostic=diagnostic,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C3_K,
+                'dt_hr': 1.0,
+            },
         )
 
         # Fe produced goes to its canonical product destination.
@@ -1096,7 +1113,13 @@ class ExtractionMixin:
             return
 
         self._commit_proposal(
-            ChemistryIntent.METALLOTHERMIC_STEP, proposal,
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            proposal,
+            diagnostic=diagnostic,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C3_NA,
+                'dt_hr': 1.0,
+            },
         )
 
         # Reduced metals use the canonical recipe product registry.  Cr routes
@@ -1149,12 +1172,19 @@ class ExtractionMixin:
         self._clear_condensed_species_projection(species)
         if recovered_kg <= self._LEDGER_KG_TOL:
             return 0.0
-        self._move_ledger_species(
+        moved_kg = self._move_ledger_species(
             f'recover_{species}_to_reagent_inventory',
             source_account,
             'process.reagent_inventory',
             species,
             recovered_kg,
+            reason=f'recovered {species} condensate transfer',
+        )
+        self._move_cost_inventory_lots_best_effort(
+            source_account=source_account,
+            destination_account='process.reagent_inventory',
+            species=species,
+            quantity_kg=moved_kg,
             reason=f'recovered {species} condensate transfer',
         )
         if species == 'K':
@@ -1252,7 +1282,13 @@ class ExtractionMixin:
             return
 
         self._commit_proposal(
-            ChemistryIntent.METALLOTHERMIC_STEP, primary_proposal,
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            primary_proposal,
+            diagnostic=primary_diag,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_C6_MG,
+                'dt_hr': 1.0,
+            },
         )
 
         Mg_consumed_kg = float(primary_diag.get('reagent_consumed_kg', 0.0))
@@ -1287,7 +1323,14 @@ class ExtractionMixin:
             'process.metal_phase', 'Si')
         if back_proposal is not None:
             self._commit_proposal(
-                ChemistryIntent.METALLOTHERMIC_STEP, back_proposal,
+                ChemistryIntent.METALLOTHERMIC_STEP,
+                back_proposal,
+                diagnostic=back_diag,
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_C6_MG,
+                    'back_reduction': True,
+                    'dt_hr': 1.0,
+                },
             )
             metal_phase_delta = (
                 self._ledger_account_species_kg(
@@ -1401,6 +1444,16 @@ class ExtractionMixin:
             C7_AL_CREDIT_ACCOUNT,
             {'Al': credit_kg},
             source='C7 imported Al credit line',
+        )
+        self.cost_ledger.seed_external_material(
+            account=C7_AL_CREDIT_ACCOUNT,
+            species='Al',
+            quantity_kg=credit_kg,
+            provenance={
+                'source': 'C7 imported Al credit line',
+                'source_tag': 'owner-ratify-placeholder:external-reagent-seed',
+                'ticket': 'COST-PARAM-REAGENT-KG',
+            },
         )
         self._c7_al_credit_input_kg = credit_kg
 
@@ -1776,6 +1829,21 @@ class ExtractionMixin:
             )
             diagnostics.append(dict(capture_result.diagnostic or {}))
             capture_diag = dict(capture_result.diagnostic or {})
+            self._move_cost_product_lots_best_effort(
+                source_account='process.overhead_gas',
+                destination_account='process.condensation_train',
+                species='Ca',
+                quantity_kg=float(capture_diag.get('ca_metal_captured_kg', 0.0)),
+                reason='C7 captured Ca product transfer',
+            )
+            self._move_cost_product_lots_best_effort(
+                source_account='process.overhead_gas',
+                destination_account='process.wall_deposit',
+                species='Ca',
+                quantity_kg=float(
+                    capture_diag.get('ca_uncaptured_wall_deposit_kg', 0.0)),
+                reason='C7 uncaptured Ca wall-deposit transfer',
+            )
             self._step_c7_ca_shuttle_feedback(
                 cfg,
                 common_controls,

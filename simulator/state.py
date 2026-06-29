@@ -1116,6 +1116,7 @@ class BatchRecord:
     # Energy
     energy_total_kWh: float = 0.0
     energy_by_campaign: Dict[str, float] = field(default_factory=dict)
+    cost_rollup: Dict[str, Any] = field(default_factory=dict)
 
     # Status
     completed: bool = False
