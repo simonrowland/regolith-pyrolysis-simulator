@@ -442,6 +442,67 @@
       "legacy_backend_authoritative"
     ],
     "mass_kg": 1000.0,
+    "pressure_coating_pareto_diagnostic": {
+      "by_species": {
+        "Fe": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        },
+        "K": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        },
+        "Na": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        },
+        "SiO": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        }
+      },
+      "current": {
+        "carrier_gas": "N2",
+        "distance_from_no_warning_gate_pressure_factor": 8.2130063209091,
+        "gas_temperature_K": 1773.15,
+        "knudsen_number": 0.001217580945303972,
+        "overhead_pressure_mbar": 2.6144171200416726,
+        "overhead_pressure_pa": 261.44171200416724,
+        "regime": "viscous",
+        "setpoint_band_distance_from_gate_pressure_factor": {
+          "at_15mbar": 47.121438223933005,
+          "at_5mbar": 15.707146074644335
+        },
+        "wall_deposit_cumulative_kg_by_species": {},
+        "wall_deposit_flux_kg_hr_by_species": {}
+      },
+      "gate": {
+        "characteristic_length_source": "knudsen_regime_diagnostic.segments[*].characteristic_length_m",
+        "controlling_characteristic_length_m": 0.12,
+        "controlling_segment": "stage_0_to_stage_1",
+        "hard_refusal_knudsen_threshold": 10.0,
+        "hard_refusal_operator": ">=",
+        "hard_refusal_pressure_mbar": 0.00031832644684392277,
+        "hard_refusal_pressure_pa": 0.03183264468439228,
+        "no_warning_knudsen_threshold": 0.01,
+        "no_warning_operator": "<",
+        "no_warning_pressure_mbar": 0.3183264468439228,
+        "no_warning_pressure_pa": 31.832644684392278
+      },
+      "pressure_range_pa": {
+        "max": 1500.0,
+        "min": 0.001
+      },
+      "schema_version": "pressure-coating-pareto-v1"
+    },
     "runtime_status": "unavailable",
     "schema_version": "1.3.1",
     "started_at_utc": "2026-05-15T00:00:00Z",

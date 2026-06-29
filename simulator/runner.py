@@ -63,7 +63,10 @@ from simulator.condensation import (
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    pressure_coating_pareto_diagnostic,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
@@ -1018,6 +1021,9 @@ class PyrolysisRun:
         if knudsen_diagnostic:
             run_metadata["knudsen_regime_diagnostic"] = _json_safe(
                 knudsen_diagnostic)
+        run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
+            pressure_coating_pareto_diagnostic(sim, execution.per_hour)
+        )
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle

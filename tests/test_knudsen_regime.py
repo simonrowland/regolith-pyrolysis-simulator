@@ -195,6 +195,40 @@ def test_c2a_recipe_viscous_run_has_no_knudsen_warning():
     } == {KnudsenRegime.VISCOUS.value}
 
 
+def test_pressure_coating_pareto_diagnostic_uses_actual_kn_gate_and_length():
+    run = PyrolysisRun(
+        feedstock_id="mars_basalt",
+        campaign="C2A",
+        hours=1,
+        additives_kg={"C": 30.0},
+        force_builtin_vapor_pressure=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "pressure-pareto-test",
+        },
+    )
+    session = run._start_session()
+    session.simulator.melt.temperature_C = 1700.0
+
+    document = run._run_session(session)
+    diagnostic = document["run_metadata"]["pressure_coating_pareto_diagnostic"]
+    gate = diagnostic["gate"]
+
+    assert diagnostic["schema_version"] == "pressure-coating-pareto-v1"
+    assert gate["no_warning_knudsen_threshold"] == pytest.approx(
+        condensation_module.VISCOUS_KNUDSEN_MAX
+    )
+    assert gate["hard_refusal_knudsen_threshold"] == pytest.approx(
+        condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
+    )
+    assert gate["controlling_characteristic_length_m"] == pytest.approx(0.12)
+    assert gate["characteristic_length_source"] == (
+        "knudsen_regime_diagnostic.segments[*].characteristic_length_m"
+    )
+    assert diagnostic["current"]["distance_from_no_warning_gate_pressure_factor"] > 1.0
+    assert set(diagnostic["by_species"]).issuperset({"Na", "K", "SiO", "Fe"})
+
+
 def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     run = PyrolysisRun(
         feedstock_id="mars_basalt",

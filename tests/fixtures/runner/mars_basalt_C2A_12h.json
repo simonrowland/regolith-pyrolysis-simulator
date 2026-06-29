@@ -477,6 +477,193 @@
       "legacy_backend_authoritative"
     ],
     "mass_kg": 1000.0,
+    "pressure_coating_pareto_diagnostic": {
+      "by_species": {
+        "Fe": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        },
+        "K": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        },
+        "Na": {
+          "P_bulk_Pa": 0.0,
+          "P_eq_Pa": 9.159840224563463e+120,
+          "alpha_intrinsic": 1.0,
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_pressure_flux_kg_s_m2": 1.2999398245671745e+115,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "headroom_vs_15mbar_factor": 38.49021252460517,
+          "headroom_vs_5mbar_factor": 12.950787225772995,
+          "headroom_vs_current_pressure_factor": 25.720499977668094,
+          "max_rate_flux_kg_s_m2": 3.343510222874988e+116,
+          "max_rate_no_warning_pressure_mbar": 0.3206545860298594,
+          "max_rate_no_warning_pressure_pa": 32.06545860298594,
+          "status": "ok",
+          "sweep": [
+            {
+              "flux_kg_s_m2": 1.7890007033616183e+117,
+              "knudsen_number": 320.65458602985944,
+              "pressure_mbar": 1e-05,
+              "pressure_pa": 0.001
+            },
+            {
+              "flux_kg_s_m2": 1.78899692475903e+117,
+              "knudsen_number": 116.11493408287525,
+              "pressure_mbar": 2.761527520663252e-05,
+              "pressure_pa": 0.002761527520663252
+            },
+            {
+              "flux_kg_s_m2": 1.7889682513241512e+117,
+              "knudsen_number": 42.04735720141847,
+              "pressure_mbar": 7.626034247380526e-05,
+              "pressure_pa": 0.007626034247380526
+            },
+            {
+              "flux_kg_s_m2": 1.7887527937977238e+117,
+              "knudsen_number": 15.226122820358393,
+              "pressure_mbar": 0.0002105950344766179,
+              "pressure_pa": 0.02105950344766179
+            },
+            {
+              "flux_kg_s_m2": 1.7884320409077662e+117,
+              "knudsen_number": 10.0,
+              "pressure_mbar": 0.00032065458602985943,
+              "pressure_pa": 0.032065458602985944
+            },
+            {
+              "flux_kg_s_m2": 1.7871859809807576e+117,
+              "knudsen_number": 5.513659634542208,
+              "pressure_mbar": 0.0005815639834222067,
+              "pressure_pa": 0.05815639834222067
+            },
+            {
+              "flux_kg_s_m2": 1.7769906813009817e+117,
+              "knudsen_number": 1.9965977500807082,
+              "pressure_mbar": 0.0016060049452469715,
+              "pressure_pa": 0.16060049452469716
+            },
+            {
+              "flux_kg_s_m2": 1.7275081037176867e+117,
+              "knudsen_number": 0.7230048352374105,
+              "pressure_mbar": 0.004435026854620788,
+              "pressure_pa": 0.4435026854620788
+            },
+            {
+              "flux_kg_s_m2": 1.5731565180971798e+117,
+              "knudsen_number": 0.2618133731521756,
+              "pressure_mbar": 0.01224744871391589,
+              "pressure_pa": 1.224744871391589
+            },
+            {
+              "flux_kg_s_m2": 1.2502138851012012e+117,
+              "knudsen_number": 0.09480744667331596,
+              "pressure_mbar": 0.033821666681390465,
+              "pressure_pa": 3.3821666681390465
+            },
+            {
+              "flux_kg_s_m2": 7.968527343093565e+116,
+              "knudsen_number": 0.03433152339200495,
+              "pressure_mbar": 0.09339946333535924,
+              "pressure_pa": 9.339946333535924
+            },
+            {
+              "flux_kg_s_m2": 3.9813605408862866e+116,
+              "knudsen_number": 0.012432077223608246,
+              "pressure_mbar": 0.2579251884157728,
+              "pressure_pa": 25.792518841577277
+            },
+            {
+              "flux_kg_s_m2": 3.343510222874988e+116,
+              "knudsen_number": 0.01,
+              "pressure_mbar": 0.3206545860298594,
+              "pressure_pa": 32.06545860298594
+            },
+            {
+              "flux_kg_s_m2": 1.671620152693811e+116,
+              "knudsen_number": 0.004501884240002927,
+              "pressure_mbar": 0.7122675060824107,
+              "pressure_pa": 71.22675060824108
+            },
+            {
+              "flux_kg_s_m2": 6.424216510111443e+115,
+              "knudsen_number": 0.00163021523642889,
+              "pressure_mbar": 1.9669463201207567,
+              "pressure_pa": 196.69463201207566
+            },
+            {
+              "flux_kg_s_m2": 2.5817042351071622e+115,
+              "knudsen_number": 0.0006413091720597187,
+              "pressure_mbar": 5.0,
+              "pressure_pa": 500.0
+            },
+            {
+              "flux_kg_s_m2": 2.3791266361833497e+115,
+              "knudsen_number": 0.0005903309759655591,
+              "pressure_mbar": 5.431776394680785,
+              "pressure_pa": 543.1776394680785
+            },
+            {
+              "flux_kg_s_m2": 1.2999398245671745e+115,
+              "knudsen_number": 0.0003206545860298594,
+              "pressure_mbar": 10.0,
+              "pressure_pa": 1000.0
+            },
+            {
+              "flux_kg_s_m2": 8.686650458834497e+114,
+              "knudsen_number": 0.0002137697240199063,
+              "pressure_mbar": 15.0,
+              "pressure_pa": 1500.0
+            }
+          ],
+          "transport_length_m": 0.12
+        },
+        "SiO": {
+          "cumulative_wall_deposit_kg": 0.0,
+          "current_wall_deposit_flux_kg_hr": 0.0,
+          "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+          "status": "unavailable"
+        }
+      },
+      "current": {
+        "carrier_gas": "CO2",
+        "distance_from_no_warning_gate_pressure_factor": 31.18620607867682,
+        "gas_temperature_K": 1923.15,
+        "knudsen_number": 0.0003206545860298594,
+        "overhead_pressure_mbar": 10.0,
+        "overhead_pressure_pa": 1000.0,
+        "regime": "viscous",
+        "setpoint_band_distance_from_gate_pressure_factor": {
+          "at_15mbar": 46.77930911801523,
+          "at_5mbar": 15.59310303933841
+        },
+        "wall_deposit_cumulative_kg_by_species": {},
+        "wall_deposit_flux_kg_hr_by_species": {}
+      },
+      "gate": {
+        "characteristic_length_source": "knudsen_regime_diagnostic.segments[*].characteristic_length_m",
+        "controlling_characteristic_length_m": 0.12,
+        "controlling_segment": "stage_0_to_stage_1",
+        "hard_refusal_knudsen_threshold": 10.0,
+        "hard_refusal_operator": ">=",
+        "hard_refusal_pressure_mbar": 0.00032065458602985943,
+        "hard_refusal_pressure_pa": 0.032065458602985944,
+        "no_warning_knudsen_threshold": 0.01,
+        "no_warning_operator": "<",
+        "no_warning_pressure_mbar": 0.3206545860298594,
+        "no_warning_pressure_pa": 32.06545860298594
+      },
+      "pressure_range_pa": {
+        "max": 1500.0,
+        "min": 0.001
+      },
+      "schema_version": "pressure-coating-pareto-v1"
+    },
     "runtime_status": "unavailable",
     "schema_version": "1.3.1",
     "started_at_utc": "2026-05-15T00:00:00Z",

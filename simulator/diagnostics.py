@@ -7,6 +7,11 @@ import math
 from typing import Any, Mapping, Sequence
 
 _EPS = 1e-12
+PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
+_PRESSURE_SWEEP_MIN_PA = 1.0e-3
+_PRESSURE_SWEEP_MAX_PA = 1500.0
+_CURRENT_SETPOINT_LOW_PA = 500.0
+_CURRENT_SETPOINT_HIGH_PA = 1500.0
 WALL_STICKING_ALPHA_GROUNDING_TARGET = (
     "data/literature/vacuum_pyrolysis_sticking.yaml"
 )
@@ -664,8 +669,397 @@ def _finite_float(value: Any) -> float | None:
     return number
 
 
+def pressure_coating_pareto_diagnostic(
+    sim: Any,
+    per_hour: Sequence[Mapping[str, Any]] = (),
+    *,
+    target_species: Sequence[str] = PRESSURE_COATING_PARETO_SPECIES,
+) -> dict[str, Any]:
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+    from simulator.condensation import _knudsen_number
+    from simulator.state import MOLAR_MASS
+    from simulator.transport_constants import (
+        FREE_MOLECULAR_KNUDSEN_MIN,
+        VISCOUS_KNUDSEN_MAX,
+    )
+
+    condensation_model = getattr(sim, "condensation_model", None)
+    latest_evap = dict(getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {})
+    series_by_species = dict(latest_evap.get("evaporation_series_resistance") or {})
+    knudsen_diagnostic = dict(
+        getattr(condensation_model, "last_knudsen_regime_diagnostic", {}) or {}
+    )
+    gas_temperature_C = _first_finite(
+        knudsen_diagnostic.get("gas_temperature_C"),
+        getattr(condensation_model, "gas_temperature_C", None),
+        getattr(getattr(sim, "overhead_model", None), "pipe_temperature_C", None),
+        getattr(getattr(sim, "melt", None), "temperature_C", 0.0),
+    )
+    gas_temperature_K = max(float(gas_temperature_C) + 273.15, 1.0)
+    carrier_gas = str(
+        knudsen_diagnostic.get("carrier_gas")
+        or getattr(condensation_model, "carrier_gas", "N2")
+        or "N2"
+    )
+    lengths = _knudsen_characteristic_lengths(
+        knudsen_diagnostic,
+        fallback_length_m=_first_finite(
+            knudsen_diagnostic.get("pipe_diameter_m"),
+            getattr(condensation_model, "pipe_diameter_m", None),
+            getattr(getattr(sim, "overhead_model", None), "pipe_diameter_m", 0.12),
+        ),
+    )
+    controlling = max(
+        (
+            {
+                "name": name,
+                "characteristic_length_m": length_m,
+                "no_warning_pressure_pa": _pressure_at_kn_threshold(
+                    VISCOUS_KNUDSEN_MAX,
+                    gas_temperature_K,
+                    length_m,
+                    carrier_gas,
+                ),
+                "hard_refusal_pressure_pa": _pressure_at_kn_threshold(
+                    FREE_MOLECULAR_KNUDSEN_MIN,
+                    gas_temperature_K,
+                    length_m,
+                    carrier_gas,
+                ),
+            }
+            for name, length_m in lengths
+        ),
+        key=lambda item: item["no_warning_pressure_pa"],
+    )
+    gate_pressure_pa = float(controlling["no_warning_pressure_pa"])
+    hard_refusal_pressure_pa = float(controlling["hard_refusal_pressure_pa"])
+    pressure_points = _pressure_sweep_points_pa(
+        gate_pressure_pa,
+        hard_refusal_pressure_pa,
+        _first_finite(
+            knudsen_diagnostic.get("overhead_pressure_mbar"),
+            getattr(getattr(sim, "overhead", None), "pressure_mbar", 0.0),
+        )
+        * 100.0,
+    )
+    latest_wall_flux, cumulative_wall = _wall_deposit_fluxes_from_per_hour(per_hour)
+    current_pressure_pa = _first_finite(
+        knudsen_diagnostic.get("overhead_pressure_mbar"),
+        getattr(getattr(sim, "overhead", None), "pressure_mbar", 0.0),
+    ) * 100.0
+
+    by_species: dict[str, Any] = {}
+    for species in target_species:
+        name = str(species)
+        series = dict(series_by_species.get(name) or {})
+        molar_mass = _molar_mass_kg_mol(sim, name, MOLAR_MASS)
+        if not series or molar_mass is None:
+            by_species[name] = {
+                "status": "unavailable",
+                "reason": "species_absent_from_latest_evaporation_series_diagnostic",
+                "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name, 0.0),
+                "cumulative_wall_deposit_kg": cumulative_wall.get(name, 0.0),
+            }
+            continue
+        flux_kwargs = {
+            "species": name,
+            "P_eq_pa": _first_finite(series.get("P_eq_Pa"), 0.0),
+            "P_bulk_pa": _first_finite(series.get("P_bulk_Pa"), 0.0),
+            "T_surface_K": max(
+                _first_finite(
+                    getattr(getattr(sim, "melt", None), "temperature_C", 0.0),
+                    0.0,
+                )
+                + 273.15,
+                1.0,
+            ),
+            "molar_mass_kg_mol": molar_mass,
+            "alpha_i": _first_finite(series.get("alpha_intrinsic"), 0.0),
+            "pipe_diameter_m": _first_finite(
+                series.get("transport_length_m"),
+                controlling["characteristic_length_m"],
+            ),
+            "axial_stir_factor": _first_finite(series.get("axial_stir_applied"), 0.0),
+            "radial_stir_factor": _first_finite(series.get("radial_stir_applied"), 1.0),
+            "cold_skull_envelope": _cold_skull_envelope_for_replay(series),
+            "carrier_gas": carrier_gas,
+            "T_gas_K": gas_temperature_K,
+            "melt_resistance_enabled": bool(
+                series.get("melt_resistance_enabled", True)
+            ),
+            "melt_surface_renewal_base_kg_s_m2_pa": _first_finite(
+                series.get("melt_surface_renewal_base_kg_s_m2_pa"),
+                1.0e-4,
+            ),
+            "melt_surface_renewal_source": str(
+                series.get("melt_surface_renewal_source")
+                or "owner-ratify:melt-side-surface-renewal-v1"
+            ),
+        }
+
+        def flux_at(pressure_pa: float) -> Any:
+            return _series_resistance_evaporation_flux_kg_m2_s(
+                **flux_kwargs,
+                overhead_pressure_pa=float(pressure_pa),
+            )
+
+        gate_flux = flux_at(gate_pressure_pa)
+        current_flux = flux_at(current_pressure_pa)
+        flux_5mbar = flux_at(_CURRENT_SETPOINT_LOW_PA)
+        flux_15mbar = flux_at(_CURRENT_SETPOINT_HIGH_PA)
+        by_species[name] = {
+            "status": "ok",
+            "P_eq_Pa": flux_kwargs["P_eq_pa"],
+            "P_bulk_Pa": flux_kwargs["P_bulk_pa"],
+            "alpha_intrinsic": flux_kwargs["alpha_i"],
+            "transport_length_m": flux_kwargs["pipe_diameter_m"],
+            "max_rate_no_warning_pressure_pa": gate_pressure_pa,
+            "max_rate_no_warning_pressure_mbar": gate_pressure_pa / 100.0,
+            "max_rate_flux_kg_s_m2": gate_flux.flux_kg_s_m2,
+            "current_pressure_flux_kg_s_m2": current_flux.flux_kg_s_m2,
+            "headroom_vs_current_pressure_factor": _ratio_or_none(
+                gate_flux.flux_kg_s_m2,
+                current_flux.flux_kg_s_m2,
+            ),
+            "headroom_vs_5mbar_factor": _ratio_or_none(
+                gate_flux.flux_kg_s_m2,
+                flux_5mbar.flux_kg_s_m2,
+            ),
+            "headroom_vs_15mbar_factor": _ratio_or_none(
+                gate_flux.flux_kg_s_m2,
+                flux_15mbar.flux_kg_s_m2,
+            ),
+            "current_wall_deposit_flux_kg_hr": latest_wall_flux.get(name, 0.0),
+            "cumulative_wall_deposit_kg": cumulative_wall.get(name, 0.0),
+            "sweep": [
+                {
+                    "pressure_pa": pressure_pa,
+                    "pressure_mbar": pressure_pa / 100.0,
+                    "knudsen_number": _knudsen_number(
+                        pressure_pa,
+                        gas_temperature_K,
+                        float(controlling["characteristic_length_m"]),
+                        carrier_gas=carrier_gas,
+                    ),
+                    "flux_kg_s_m2": flux_at(pressure_pa).flux_kg_s_m2,
+                }
+                for pressure_pa in pressure_points
+            ],
+        }
+
+    return {
+        "schema_version": "pressure-coating-pareto-v1",
+        "pressure_range_pa": {
+            "min": _PRESSURE_SWEEP_MIN_PA,
+            "max": _PRESSURE_SWEEP_MAX_PA,
+        },
+        "gate": {
+            "no_warning_knudsen_threshold": VISCOUS_KNUDSEN_MAX,
+            "no_warning_operator": "<",
+            "hard_refusal_knudsen_threshold": FREE_MOLECULAR_KNUDSEN_MIN,
+            "hard_refusal_operator": ">=",
+            "controlling_segment": controlling["name"],
+            "controlling_characteristic_length_m": (
+                controlling["characteristic_length_m"]
+            ),
+            "no_warning_pressure_pa": gate_pressure_pa,
+            "no_warning_pressure_mbar": gate_pressure_pa / 100.0,
+            "hard_refusal_pressure_pa": hard_refusal_pressure_pa,
+            "hard_refusal_pressure_mbar": hard_refusal_pressure_pa / 100.0,
+            "characteristic_length_source": (
+                "knudsen_regime_diagnostic.segments[*].characteristic_length_m"
+            ),
+        },
+        "current": {
+            "overhead_pressure_pa": current_pressure_pa,
+            "overhead_pressure_mbar": current_pressure_pa / 100.0,
+            "gas_temperature_K": gas_temperature_K,
+            "carrier_gas": carrier_gas,
+            "knudsen_number": _finite_float(
+                knudsen_diagnostic.get("knudsen_number")
+            ),
+            "regime": str(knudsen_diagnostic.get("regime") or ""),
+            "distance_from_no_warning_gate_pressure_factor": _ratio_or_none(
+                current_pressure_pa,
+                gate_pressure_pa,
+            ),
+            "setpoint_band_distance_from_gate_pressure_factor": {
+                "at_5mbar": _ratio_or_none(_CURRENT_SETPOINT_LOW_PA, gate_pressure_pa),
+                "at_15mbar": _ratio_or_none(
+                    _CURRENT_SETPOINT_HIGH_PA,
+                    gate_pressure_pa,
+                ),
+            },
+            "wall_deposit_flux_kg_hr_by_species": latest_wall_flux,
+            "wall_deposit_cumulative_kg_by_species": cumulative_wall,
+        },
+        "by_species": by_species,
+    }
+
+
+def _first_finite(*values: Any) -> float:
+    for value in values:
+        parsed = _finite_float(value)
+        if parsed is not None:
+            return parsed
+    return 0.0
+
+
+def _ratio_or_none(numerator: float, denominator: float) -> float | None:
+    if denominator <= 0.0:
+        return None
+    return numerator / denominator
+
+
+def _pressure_at_kn_threshold(
+    threshold: float,
+    gas_temperature_K: float,
+    characteristic_length_m: float,
+    carrier_gas: str,
+) -> float:
+    from simulator.condensation import _knudsen_number
+
+    if threshold <= 0.0 or characteristic_length_m <= 0.0:
+        return math.inf
+    low = 1.0e-12
+    high = 1.0
+    while (
+        _knudsen_number(
+            high,
+            gas_temperature_K,
+            characteristic_length_m,
+            carrier_gas=carrier_gas,
+        )
+        > threshold
+    ):
+        high *= 10.0
+    for _ in range(96):
+        mid = (low + high) / 2.0
+        kn = _knudsen_number(
+            mid,
+            gas_temperature_K,
+            characteristic_length_m,
+            carrier_gas=carrier_gas,
+        )
+        if kn > threshold:
+            low = mid
+        else:
+            high = mid
+    return high
+
+
+def _pressure_sweep_points_pa(
+    gate_pressure_pa: float,
+    hard_refusal_pressure_pa: float,
+    current_pressure_pa: float,
+) -> list[float]:
+    points = {
+        _PRESSURE_SWEEP_MIN_PA,
+        _PRESSURE_SWEEP_MAX_PA,
+        _CURRENT_SETPOINT_LOW_PA,
+        _CURRENT_SETPOINT_HIGH_PA,
+        gate_pressure_pa,
+        hard_refusal_pressure_pa,
+        current_pressure_pa,
+    }
+    for index in range(15):
+        fraction = index / 14.0
+        pressure = _PRESSURE_SWEEP_MIN_PA * (
+            _PRESSURE_SWEEP_MAX_PA / _PRESSURE_SWEEP_MIN_PA
+        ) ** fraction
+        points.add(pressure)
+    return sorted(
+        pressure
+        for pressure in points
+        if math.isfinite(pressure)
+        and _PRESSURE_SWEEP_MIN_PA <= pressure <= _PRESSURE_SWEEP_MAX_PA
+    )
+
+
+def _knudsen_characteristic_lengths(
+    diagnostic: Mapping[str, Any],
+    *,
+    fallback_length_m: float,
+) -> tuple[tuple[str, float], ...]:
+    lengths: list[tuple[str, float]] = []
+    for item in diagnostic.get("segments", ()) or ():
+        if not isinstance(item, Mapping):
+            continue
+        length = _finite_float(item.get("characteristic_length_m"))
+        if length is not None and length > 0.0:
+            lengths.append((str(item.get("name") or "segment"), length))
+    if not lengths and fallback_length_m > 0.0:
+        lengths.append(("pipe_diameter_m", fallback_length_m))
+    if not lengths:
+        lengths.append(("default_pipe_diameter_m", 0.12))
+    return tuple(lengths)
+
+
+def _molar_mass_kg_mol(
+    sim: Any,
+    species: str,
+    molar_mass_table: Mapping[str, float],
+) -> float | None:
+    vapor_pressures = getattr(sim, "vapor_pressures", {}) or {}
+    for section in ("metals", "oxide_vapors"):
+        data = vapor_pressures.get(section, {}) or {}
+        species_data = data.get(species, {}) or {}
+        if isinstance(species_data, Mapping):
+            mass_g_mol = _finite_float(species_data.get("molar_mass_g_mol"))
+            if mass_g_mol is not None and mass_g_mol > 0.0:
+                return mass_g_mol / 1000.0
+    fallback = _finite_float(molar_mass_table.get(species))
+    if fallback is not None and fallback > 0.0:
+        return fallback / 1000.0
+    return None
+
+
+def _cold_skull_envelope_for_replay(series: Mapping[str, Any]) -> dict[str, float] | None:
+    ceiling = _finite_float(series.get("frozen_skull_stir_ceiling"))
+    if ceiling is None:
+        return None
+    return {"frozen_skull_stir_ceiling": ceiling}
+
+
+def _wall_deposit_fluxes_from_per_hour(
+    per_hour: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, float], dict[str, float]]:
+    latest: dict[str, float] = {}
+    cumulative: dict[str, float] = {}
+    rows = [row for row in per_hour if isinstance(row, Mapping)]
+    for row in rows:
+        for species, kg in _flatten_wall_deposit_species_kg(
+            row.get("wall_deposit_delta_kg") or {}
+        ).items():
+            cumulative[species] = cumulative.get(species, 0.0) + kg
+    if rows:
+        latest = _flatten_wall_deposit_species_kg(
+            rows[-1].get("wall_deposit_delta_kg") or {}
+        )
+    return dict(sorted(latest.items())), dict(sorted(cumulative.items()))
+
+
+def _flatten_wall_deposit_species_kg(value: Any) -> dict[str, float]:
+    totals: dict[str, float] = {}
+    if not isinstance(value, Mapping):
+        return totals
+    for species_map in value.values():
+        if not isinstance(species_map, Mapping):
+            continue
+        for species, kg in species_map.items():
+            amount = _finite_float(kg)
+            if amount is None or abs(amount) <= _EPS:
+                continue
+            name = str(species)
+            totals[name] = totals.get(name, 0.0) + amount
+    return totals
+
+
 __all__ = [
     "coating_summary_with_grounded_authority",
+    "pressure_coating_pareto_diagnostic",
     "wall_deposit_sticking_authority_status",
     "wall_deposit_remobilization_by_segment_species",
     "wall_sticking_alpha_provenance_notice",

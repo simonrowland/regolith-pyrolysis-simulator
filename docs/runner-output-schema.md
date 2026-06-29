@@ -106,6 +106,23 @@ schema-shape assertion.
     "reason": "",
     "regime": "viscous" | "transitional" | "free_molecular",
     "segments": [...]
+  },
+  "pressure_coating_pareto_diagnostic": {     // additive pressure/Kn/coating surface
+    "schema_version": "pressure-coating-pareto-v1",
+    "gate": {
+      "no_warning_knudsen_threshold": 0.01,
+      "hard_refusal_knudsen_threshold": 10.0,
+      "controlling_characteristic_length_m": 0.12
+    },
+    "current": {
+      "wall_deposit_flux_kg_hr_by_species": {...}
+    },
+    "by_species": {
+      "Na": {"sweep": [...]},
+      "K":  {"sweep": [...]},
+      "SiO": {"sweep": [...]},
+      "Fe": {"sweep": [...]}
+    }
   }
 }
 ```
@@ -122,6 +139,10 @@ schema-shape assertion.
   verbatim; the runner does not interpret them.
 * `knudsen_regime_diagnostic` reports the transport-regime check for
   the condensation train when a run reaches condensation routing.
+* `pressure_coating_pareto_diagnostic` is diagnostic-only. It replays the
+  latest evaporation series-resistance inputs across the overhead-pressure
+  sweep, reports the actual Kn gate and characteristic length used by the
+  model, and exposes current absolute wall-deposit flux by species.
 
 ## Final state
 
