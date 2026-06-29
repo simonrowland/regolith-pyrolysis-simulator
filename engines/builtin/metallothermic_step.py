@@ -1158,26 +1158,6 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             temperature_C,
         ) - cls._delta_g_kj_per_mol_o2(reductant, temperature_C)
 
-    @classmethod
-    def _crossover_temperature_C(
-        cls,
-        reductant: str,
-        target_metal: str,
-    ) -> float | None:
-        target_dH, target_dS, _target_n_M, _target_n_ox = _ELLINGHAM_THERMO[
-            target_metal
-        ]
-        reductant_dH, reductant_dS, _red_n_M, _red_n_ox = _ELLINGHAM_THERMO[
-            reductant
-        ]
-        entropy_delta = target_dS - reductant_dS
-        if abs(entropy_delta) <= 1e-12:
-            return None
-        root_K = (target_dH - reductant_dH) / entropy_delta
-        if root_K <= 0.0:
-            return None
-        return root_K - CELSIUS_TO_KELVIN_OFFSET
-
     @staticmethod
     def _refused_result(
         reason: str,

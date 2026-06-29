@@ -33,8 +33,11 @@ Covers:
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
+import engines.builtin.metallothermic_step as metallothermic_step_module
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
     NA_STAGE_TARGETS,
@@ -404,6 +407,18 @@ def test_crossover_temperature_C_reports_physical_roots_only():
         269.5,
         abs=0.5,
     )
+
+
+def test_crossover_temperature_C_has_single_runtime_helper():
+    source = Path(metallothermic_step_module.__file__).read_text()
+
+    assert source.count("def _crossover_temperature_C(") == 1
+    assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "Na", "Fe"
+    ) == pytest.approx(1173.4, abs=0.5)
+    assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "K", "Fe"
+    ) == pytest.approx(832.0, abs=0.5)
 
 
 def test_refused_result_has_policy_refusal_shape():

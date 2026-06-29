@@ -262,6 +262,67 @@ def test_instance_apply_setpoints_overrides_isolates_per_model():
     )
 
 
+def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
+    melt = MeltState(temperature_C=1700.0)
+    flux = EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0)
+
+    def _model(threshold_C: float | None = None) -> CondensationModel:
+        model = CondensationModel(
+            CondensationTrain.create_default(),
+            wall_temperature_C=1500.0,
+        )
+        if threshold_C is not None:
+            model.apply_setpoints_overrides({
+                'condensation_train': {
+                    'metals_train': {
+                        'stage_0_hot_duct': {
+                            'temp_range_C': [threshold_C, 1600.0],
+                        },
+                    },
+                },
+            })
+        model.configure_operating_conditions(
+            wall_temperature_C=1500.0,
+            pipe_segment_temperatures_C={
+                segment.name: (
+                    1410.0
+                    if segment.name == 'stage_0_to_stage_1'
+                    else 1800.0
+                )
+                for segment in model.pipe_segments
+            },
+        )
+        return model
+
+    base = _model()
+    custom = _model(1425.0)
+    base_route = base.route(flux, melt)
+    custom_route = custom.route(flux, melt)
+
+    assert not base.last_cold_spot_diagnostic[
+        'has_upstream_hot_wall_violation'
+    ]
+    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] == 1425.0
+    assert custom.last_cold_spot_diagnostic[
+        'has_upstream_hot_wall_violation'
+    ]
+    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_findings'][0][
+        'segment'
+    ] == 'stage_0_to_stage_1'
+    assert base_route.cold_spot_warnings == ()
+    assert custom_route.cold_spot_warnings == ()
+    assert custom_route.remaining_by_species == base_route.remaining_by_species
+    assert (
+        custom_route.condensed_by_stage_species
+        == base_route.condensed_by_stage_species
+    )
+    assert custom_route.wall_deposit_by_species == base_route.wall_deposit_by_species
+    assert (
+        custom_route.wall_deposit_by_segment_species
+        == base_route.wall_deposit_by_segment_species
+    )
+
+
 def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
     """End-to-end: a fresh PyrolysisSimulator built with custom
     setpoints applies the override on the CondensationModel

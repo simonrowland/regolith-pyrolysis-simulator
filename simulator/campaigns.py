@@ -376,6 +376,32 @@ class CampaignManager:
             raise ValueError(f'Missing numeric campaign setpoint: {label}')
         return self._float(value, 0.0)
 
+    def _campaign_rate_band_midpoint(
+        self,
+        campaign: CampaignPhase,
+        band_key: str,
+    ) -> float:
+        campaign_key = self._campaign_config_key(campaign)
+        label = f'{campaign_key}.dT_dt_C_per_hr.{band_key}'
+        rate_bands = self._campaign_config(campaign).get('dT_dt_C_per_hr')
+        if not isinstance(rate_bands, Mapping):
+            raise ValueError(
+                f'Missing campaign rate bands: {campaign_key}.dT_dt_C_per_hr'
+            )
+        band = rate_bands.get(band_key)
+        if (
+            not isinstance(band, (list, tuple))
+            or len(band) != 2
+        ):
+            raise ValueError(
+                f'Malformed campaign rate band {label}: expected [low, high]'
+            )
+        low = self._required_float(band[0], f'{label}[0]')
+        high = self._required_float(band[1], f'{label}[1]')
+        if not math.isfinite(low) or not math.isfinite(high):
+            raise ValueError(f'Malformed campaign rate band {label}: non-finite')
+        return (low + high) / 2.0
+
     def _scalar_config_float(self,
                              config: Mapping[str, object],
                              key: str) -> float | None:
@@ -758,11 +784,14 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C2A:
             # Continuous ramp 1050 C -> furnace_max_T_C
-            # Ramp rate varies: 15°C/hr early, 7.5°C/hr at peak SiO window
+            # Ramp rate varies by YAML band midpoint.
             if melt.temperature_C < 1320:
-                return (self.furnace_max_T_C, 15.0)  # early ramp
+                ramp = self._campaign_rate_band_midpoint(
+                    campaign, 'early_ramp_1050_1320C')
             else:
-                return (self.furnace_max_T_C, 7.5)   # peak SiO window — slower
+                ramp = self._campaign_rate_band_midpoint(
+                    campaign, 'peak_SiO_window_1400_1600C')
+            return (self.furnace_max_T_C, ramp)
 
         elif campaign == CampaignPhase.C2A_STAGED:
             if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:

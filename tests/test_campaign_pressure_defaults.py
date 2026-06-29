@@ -58,6 +58,51 @@ def test_campaign_pressure_default_override_reaches_melt_state():
     assert melt.p_total_mbar == pytest.approx(1.5)
 
 
+def test_c2a_continuous_ramp_rates_use_yaml_midpoints():
+    setpoints = _setpoints()
+    bands = setpoints["campaigns"]["C2A_continuous"]["dT_dt_C_per_hr"]
+    assert (
+        (float(bands["early_ramp_1050_1320C"][0])
+         + float(bands["early_ramp_1050_1320C"][1])) / 2.0
+    ) == 15.0
+    assert (
+        (float(bands["peak_SiO_window_1400_1600C"][0])
+         + float(bands["peak_SiO_window_1400_1600C"][1])) / 2.0
+    ) == 7.5
+
+    manager = CampaignManager(setpoints)
+    _, early_ramp = manager.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
+    )
+    _, peak_ramp = manager.get_temp_target(
+        CampaignPhase.C2A,
+        0,
+        MeltState(campaign=CampaignPhase.C2A, temperature_C=1400.0),
+    )
+
+    assert early_ramp == 15.0
+    assert peak_ramp == 7.5
+
+
+def test_c2a_continuous_ramp_rate_band_malformed_fails_loud():
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2A_continuous"]["dT_dt_C_per_hr"][
+        "early_ramp_1050_1320C"
+    ] = [10]
+
+    with pytest.raises(
+        ValueError,
+        match=r"C2A_continuous\.dT_dt_C_per_hr\.early_ramp_1050_1320C",
+    ):
+        CampaignManager(setpoints).get_temp_target(
+            CampaignPhase.C2A,
+            0,
+            MeltState(campaign=CampaignPhase.C2A, temperature_C=1200.0),
+        )
+
+
 def test_melt_pressure_validator_refuses_partial_pressure_above_total():
     melt = MeltState()
     melt.p_total_mbar = 1.0
