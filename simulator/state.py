@@ -347,6 +347,7 @@ class CampaignPhase(Enum):
     C4 = auto()               # Mg selective pyrolysis
     C5 = auto()               # Limited MRE (electrolysis)
     C6 = auto()               # Mg thermite reduction
+    C7_CA_ALUMINOTHERMIC = auto()  # Aluminothermic Ca recovery
     MRE_BASELINE = auto()     # Standard MRE baseline (root branch alt)
     COMPLETE = auto()         # Batch finished
 
@@ -358,6 +359,7 @@ class DecisionType(Enum):
     TI_RETENTION = auto()     # Retain TiO₂ for C6 Al-Ti alloy vs extract in C5
     CA_HARVEST = auto()       # Optional Ca harvest at end of C4
     C6_PROCEED = auto()       # Proceed with Mg thermite? (needs Mg inventory)
+    C7_PROCEED = auto()       # Proceed with C7 Ca aluminothermy?
 
 class Atmosphere(Enum):
     """Atmosphere above the melt."""

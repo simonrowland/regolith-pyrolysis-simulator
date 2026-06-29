@@ -45,6 +45,7 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -260,6 +261,7 @@ _FE_REDOX_PYSULFSAT_COLS = {
 }
 FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
+    C7_AL_CREDIT_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
@@ -825,6 +827,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._shuttle_reduced_this_hr = 0.0
         self._shuttle_metal_this_hr = 0.0
         self._shuttle_phase = ''
+        self._c7_al_credit_input_kg = 0.0
+        self._c7_al_credit_funded = False
+        self._last_c7_diagnostic = {}
+        self._last_c7_refusal_diagnostic = {}
+        self._c7_product_report = {}
+        self._c7_aluminothermic_applied = False
+        self._c7_ca_shuttle_applied = False
 
     @staticmethod
     def _load_species_formula_registry() -> dict:
@@ -1009,6 +1018,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             False,
             'METALLOTHERMIC_STEP -- AUTHORITATIVE: Na/K shuttle + Mg '
             'thermite (single intent, three reaction families).',
+        ),
+        (
+            'engines.builtin.ca_aluminothermic_step',
+            'BuiltinCaAluminothermicStepProvider',
+            (ChemistryIntent.CA_ALUMINOTHERMIC_STEP,),
+            False,
+            'CA_ALUMINOTHERMIC_STEP -- AUTHORITATIVE: optional C7 Ca '
+            'aluminothermy + dedicated Ca capture.',
         ),
         (
             'engines.builtin.stage0_pretreatment',
@@ -5448,6 +5465,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign == CampaignPhase.C6:
             self._init_thermite_inventory()
 
+        if campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            self._c7_aluminothermic_applied = False
+            self._c7_ca_shuttle_applied = False
+            self._init_c7_al_credit()
+
         # Initialize MRE voltage sequence and reset step tracking      [Step 9c]
         if campaign in (CampaignPhase.MRE_BASELINE, CampaignPhase.C5):
             self._mre_voltage_sequence = self._build_mre_voltage_sequence()
@@ -5981,7 +6003,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if warning:
             self._rump_expectation_warnings.append(str(warning))
 
-        return {
+        summary = {
             'campaign': campaign_name,
             'duration_h': duration_h,
             'start_mass_kg': round(self._campaign_start_mass, 1),
@@ -5994,6 +6016,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'species_extracted': species_extracted,
             'rump_expectation': rump_expectation,
         }
+        if campaign_name == 'C7_CA_ALUMINOTHERMIC':
+            summary['c7_product_report'] = dict(
+                getattr(self, '_c7_product_report', {}) or {})
+        return summary
 
     # ------------------------------------------------------------------
     # THE CORE LOOP
@@ -6111,6 +6137,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._thermite_Al2O3_reduced_this_hr = 0.0
             self._thermite_Al_produced_this_hr = 0.0
             self._thermite_Mg_consumed_this_hr = 0.0
+
+        if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            self._step_c7_ca_aluminothermic()
 
         # --- 7. Overhead gas (with turbine capacity feedback) ---   [LOOP-2]
         # Pass the turbine spec so overhead model can enforce capacity limits,
@@ -6450,7 +6479,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Mass balance check
         mass_in = self.record.batch_mass_kg + sum(
             self.record.additives_kg.values()) + sum(
-            self.inventory.stage0_external_inputs_kg.values())
+            self.inventory.stage0_external_inputs_kg.values()) + float(
+            getattr(self, '_c7_al_credit_input_kg', 0.0) or 0.0)
         mass_out = self._flow_mass_out_kg()
         error_pct = 0.0
         error_category = ''

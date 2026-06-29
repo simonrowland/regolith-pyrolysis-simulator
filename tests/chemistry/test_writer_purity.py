@@ -47,6 +47,7 @@ _EXEMPT_SUBDIRS = (
 _WRITER_EXEMPT_CALLS = (
     # _move_ledger_species: atom-balanced reagent shuttle between accounts.
     ("simulator/extraction.py", "shuttle-reagent-move"),
+    ("simulator/extraction.py", "c7-al-credit-funding"),
 )
 
 _ATOM_LEDGER_WRITER_METHODS = (

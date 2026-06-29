@@ -32,6 +32,7 @@ SESSION_VALID_CAMPAIGNS = (
     "C4",
     "C5",
     "C6",
+    "C7_CA_ALUMINOTHERMIC",
     "MRE_BASELINE",
     "COMPLETE",
 )

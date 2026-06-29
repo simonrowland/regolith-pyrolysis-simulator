@@ -562,6 +562,46 @@ campaigns:
       Mg bootstrapping: 3-6 C4 batches to accumulate 150-300 kg
       inventory before first thermite run.
 
+  # --------------------------------------------------------------------------
+  # C7 -- Aluminothermic Ca Recovery (Optional / Default Off)
+  # --------------------------------------------------------------------------
+  C7:
+    label: "Aluminothermic Ca Recovery (Optional)"
+    enabled: false
+    objective: "ree_enrichment"
+    aluminate_mode: "C3A"
+    al_fraction: 1.0
+    al_credit_limit_kg: 0.0
+    extent_fraction: 1.0
+    allow_partial_extent: true
+    default_hold_T_C: 1200
+    temp_range_C: [1100, 1300]
+    dT_dt_C_per_hr: null
+    atmosphere: "hard_vacuum"
+    pO2_mbar_default: 0.0
+    p_total_mbar_default: 0.05
+    hold_time_h: 1.0
+    hold_time_source: "owner-ratify:c7-single-pass-hold-time-v1"
+    ca_route_surface_area_m2: 0.2
+    ca_route_surface_area_source: "owner-ratify:c7-ca-route-surface-area-v1"
+    ca_condenser_temperature_C: 780
+    active_ca_condensation_route: true
+    dedicated_ca_condenser: true
+    thermo_margin_kJ_per_mol_O2: 1.0
+    ca_shuttle:
+      enabled: false
+      rate_fraction: 0.0
+      targets: ["Al2O3"]
+      reserve_ca_product_fraction: 1.0
+    max_hold_hr: 1
+    endpoint:
+      type: "single_c7_pass"
+    termination_class: "C"
+    notes: >
+      Default-off C7 campaign. Reduces CaO with Al under hard vacuum,
+      captures Ca in a dedicated condenser, and reports calcium-aluminate
+      slag plus REE-enriched residual ceramic separately.
+
 
 # ============================================================================
 # 1a. COMPLETION CONTRACTS
@@ -814,6 +854,16 @@ completion_contracts:
           target_element: "Al"
           provenance_rule: "metallothermic_reduction_extent"
           deferred_reason: "Thermite Al needs Al/Al2O3 plus Mg transport/reagent gate; out of SG-2B vapor-first scope."
+    C7:
+      contracts:
+        - <<: *deferred_completion_contract
+          contract_id: "C7.Ca.aluminothermic.deferred"
+          mechanism: "ca_aluminothermic_reduction"
+          target_species: "Ca"
+          semantic_target_kind: null
+          target_element: "Ca"
+          provenance_rule: "ca_aluminothermic_extent"
+          deferred_reason: "C7 Ca recovery depends on Al credit, hard-vacuum transport, and dedicated Ca condenser gates; out of SG-2B vapor-first scope."
 
 
 # ============================================================================

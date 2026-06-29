@@ -10,6 +10,7 @@ OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT = "terminal.oxygen_melt_offgas_captured"
 OXYGEN_MRE_ANODE_ACCOUNT = "terminal.oxygen_mre_anode_stored"
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
+C7_AL_CREDIT_ACCOUNT = "process.c7_al_credit"
 OXYGEN_STORED_ACCOUNTS = (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,

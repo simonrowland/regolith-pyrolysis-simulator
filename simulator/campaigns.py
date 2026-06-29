@@ -163,6 +163,7 @@ class CampaignManager:
         CampaignPhase.C2A_STAGED: 'C2A_staged',
         CampaignPhase.C3_K: 'C3',
         CampaignPhase.C3_NA: 'C3',
+        CampaignPhase.C7_CA_ALUMINOTHERMIC: 'C7',
         CampaignPhase.MRE_BASELINE: 'mre_baseline',
     }
 
@@ -613,6 +614,14 @@ class CampaignManager:
             melt.p_total_mbar = self._pressure_config_float(
                 cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
 
+        elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            cfg = self._campaign_config(campaign)
+            melt.atmosphere = Atmosphere.HARD_VACUUM
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.05)
+
         elif campaign == CampaignPhase.MRE_BASELINE:
             cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
@@ -828,6 +837,15 @@ class CampaignManager:
         elif campaign == CampaignPhase.C6:
             # Mg/Al crossover is ~1573 C under V1c JANAF constants.
             return (1500.0, 10.0)
+
+        elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            cfg = self._campaign_config(campaign)
+            ovr = self._campaign_overrides(campaign)
+            target = self._float(
+                ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
+                self._float(cfg.get('default_hold_T_C'), 1200.0),
+            )
+            return (target, 10.0)
 
         elif campaign == CampaignPhase.MRE_BASELINE:
             # Standard MRE: heat to melting then hold
@@ -1250,6 +1268,11 @@ class CampaignManager:
             if melt.campaign_hour >= max_hold_hr:
                 return True
 
+        elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            max_hold_hr = self._max_hold_hr(campaign)
+            if melt.campaign_hour >= max_hold_hr:
+                return True
+
         elif campaign == CampaignPhase.MRE_BASELINE:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
             min_voltage_V = self._endpoint_float(
@@ -1285,6 +1308,28 @@ class CampaignManager:
                 return CampaignPhase.C6
             return None
         return CampaignPhase.COMPLETE
+
+    @staticmethod
+    def _truthy_config(value) -> bool:
+        if isinstance(value, str):
+            return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+        return bool(value)
+
+    def _c7_enabled(self, record: BatchRecord) -> bool:
+        if getattr(record, 'branch', '') != 'two':
+            return False
+        cfg = self._campaign_config(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+        ovr = self._campaign_overrides(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+        enabled = self._truthy_config(ovr.get('enabled', cfg.get('enabled', False)))
+        if not enabled:
+            return False
+        c4_cfg = self._campaign_config(CampaignPhase.C4)
+        ca_harvest = c4_cfg.get('optional_Ca_harvest', {})
+        if isinstance(ca_harvest, Mapping) and self._truthy_config(
+            ca_harvest.get('enabled', False)
+        ):
+            raise ValueError('c4_ca_harvest_conflicts_with_c7')
+        return True
 
     def get_next_campaign(self, current: CampaignPhase,
                           record: BatchRecord) -> Optional[CampaignPhase]:
@@ -1376,6 +1421,12 @@ class CampaignManager:
             return self._get_next_after_c5(record)
 
         elif current == CampaignPhase.C6:
+            if self._c7_enabled(record):
+                self._record_auto_decision(record, DecisionType.C7_PROCEED, 'yes')
+                return CampaignPhase.C7_CA_ALUMINOTHERMIC
+            return CampaignPhase.COMPLETE
+
+        elif current == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             return CampaignPhase.COMPLETE
 
         elif current == CampaignPhase.MRE_BASELINE:
@@ -1446,6 +1497,17 @@ class CampaignManager:
                     'Proceed with C6 Mg thermite reduction? '
                     'Requires ~50-60 kg Mg from inventory. '
                     'Produces Al (+ Ti alloy if TiO₂ retained).'
+                ),
+            )
+
+        elif current == CampaignPhase.C6 and self._c7_enabled(record):
+            return DecisionPoint(
+                decision_type=DecisionType.C7_PROCEED,
+                options=['yes', 'no'],
+                recommendation='yes',
+                context=(
+                    'Proceed with default-off C7 aluminothermic Ca recovery? '
+                    'Requires Al budget, hard vacuum, and a dedicated Ca condenser.'
                 ),
             )
 

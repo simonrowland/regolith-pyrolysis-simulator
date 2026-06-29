@@ -6,6 +6,7 @@ import math
 from typing import Dict
 
 import simulator.mre_ladder as mre_ladder
+from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
 from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import product_stage_number
 from simulator.state import (
@@ -129,6 +130,9 @@ class ExtractionMixin:
         elif campaign_name == 'C6':
             targeted.add('Al')
             expected.update({'Ca', 'REE'})
+        elif campaign_name == 'C7_CA_ALUMINOTHERMIC':
+            targeted.add('Ca')
+            expected.add('REE')
         elif campaign_name == 'MRE_BASELINE':
             targeted.update({'Ca', 'Al', 'Mg', 'Si'})
             expected.add('REE')
@@ -1326,6 +1330,649 @@ class ExtractionMixin:
         self._thermite_Al2O3_reduced_this_hr = max(0.0, Al2O3_removed_kg)
         self._thermite_Al_produced_this_hr = max(0.0, Al_produced_kg)
         self._thermite_Mg_consumed_this_hr = Mg_consumed_kg
+
+    def _c7_campaign_config(self) -> dict:
+        cfg = dict(
+            self.campaign_mgr._campaign_config(
+                CampaignPhase.C7_CA_ALUMINOTHERMIC
+            )
+        )
+        ovr = self.campaign_mgr._campaign_overrides(
+            CampaignPhase.C7_CA_ALUMINOTHERMIC
+        )
+        cfg.update(dict(ovr))
+        return cfg
+
+    @staticmethod
+    def _c7_bool(value, default: bool = False) -> bool:
+        if value is None:
+            return bool(default)
+        if isinstance(value, str):
+            return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+        return bool(value)
+
+    @staticmethod
+    def _c7_nested(value) -> dict:
+        return dict(value) if isinstance(value, dict) else {}
+
+    @staticmethod
+    def _c7_float(value, default: float = 0.0) -> float:
+        try:
+            result = float(value)
+        except (TypeError, ValueError):
+            return float(default)
+        return result if math.isfinite(result) else float(default)
+
+    @staticmethod
+    def _c7_clamp(value: float, low: float, high: float) -> float:
+        return max(low, min(high, float(value)))
+
+    def _c7_knob_diag(
+        self,
+        path: str,
+        requested: float,
+        applied: float,
+        reason: str,
+    ) -> dict:
+        return {
+            'path': f'campaigns.C7.{path}',
+            'requested': requested,
+            'applied': applied,
+            'reason': reason,
+            'saturated': not math.isclose(
+                float(requested),
+                float(applied),
+                rel_tol=0.0,
+                abs_tol=1e-15,
+            ),
+        }
+
+    def _init_c7_al_credit(self) -> None:
+        if getattr(self, '_c7_al_credit_funded', False):
+            return
+        cfg = self._c7_campaign_config()
+        credit_kg = max(0.0, self._c7_float(cfg.get('al_credit_limit_kg'), 0.0))
+        self._c7_al_credit_funded = True
+        self._c7_al_credit_input_kg = 0.0
+        if credit_kg <= self._LEDGER_KG_TOL:
+            return
+        # WRITER-EXEMPT: c7-al-credit-funding external input, not a chemistry transition.
+        self.atom_ledger.load_external(
+            C7_AL_CREDIT_ACCOUNT,
+            {'Al': credit_kg},
+            source='C7 imported Al credit line',
+        )
+        self._c7_al_credit_input_kg = credit_kg
+
+    def _c7_residual_ceramic_report(self) -> dict:
+        aluminate_species = {'Ca3Al2O6', 'Ca12Al14O33'}
+        residual_kg = 0.0
+        ree_kg = 0.0
+        for account in ('process.cleaned_melt', 'terminal.slag'):
+            for species, kg in self.atom_ledger.kg_by_account(account).items():
+                amount = max(0.0, float(kg))
+                if account == 'terminal.slag' and species in aluminate_species:
+                    continue
+                residual_kg += amount
+                if species == 'REE_oxides':
+                    ree_kg += amount
+        wt_pct = (ree_kg / residual_kg * 100.0) if residual_kg > 0.0 else 0.0
+        return {
+            'REE_oxides_kg': ree_kg,
+            'REE_oxides_wt_pct': wt_pct,
+            'residual_terminal_ceramic_kg': residual_kg,
+        }
+
+    def _c7_stoich(self, mode: str) -> dict:
+        if str(mode).upper() == 'C12A7':
+            return {
+                'CaO': 33.0,
+                'Al': 14.0,
+                'Ca': 21.0,
+                'aluminate_species': 'Ca12Al14O33',
+            }
+        return {
+            'CaO': 6.0,
+            'Al': 2.0,
+            'Ca': 3.0,
+            'aluminate_species': 'Ca3Al2O6',
+        }
+
+    def _c7_transport_extent_mol(
+        self,
+        cfg: dict,
+        *,
+        ca_per_extent: float,
+    ) -> tuple[float, dict]:
+        from engines.builtin.ca_aluminothermic_step import (
+            C7_MAX_TOTAL_PRESSURE_MBAR,
+            C7_MIN_TOTAL_PRESSURE_MBAR,
+        )
+        from engines.builtin.evaporation_flux import (
+            _series_resistance_evaporation_flux_kg_m2_s,
+        )
+
+        requested_stir = self._c7_float(
+            cfg.get('stir_factor'),
+            getattr(self.melt.stir_state, 'axial', self.melt.stir_factor),
+        )
+        clamped_stir = self._c7_clamp(requested_stir, 0.0, 10.0)
+        cold_skull_safe = self._c7_float(
+            cfg.get('c7_cold_skull_safe_stir_factor'), 6.0)
+        applied_stir = min(clamped_stir, max(0.0, cold_skull_safe))
+        hold_temp_C = self._c7_float(
+            cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0)
+        hold_temp_K = hold_temp_C + 273.15
+        p_total_raw = cfg.get('p_total_mbar')
+        if p_total_raw is None:
+            p_total_raw = cfg.get('p_total_mbar_default')
+        p_total_mbar = self._c7_float(p_total_raw, self.melt.p_total_mbar)
+        active_route = (
+            self._c7_bool(cfg.get('active_ca_condensation_route'), True)
+            and self._c7_bool(cfg.get('dedicated_ca_condenser'), True)
+        )
+        area_m2 = max(
+            0.0,
+            self._c7_float(
+                cfg.get('ca_route_surface_area_m2'),
+                getattr(self.melt, 'melt_surface_area_m2', 0.2),
+            ),
+        )
+        hold_time_h = max(0.0, self._c7_float(cfg.get('hold_time_h'), 1.0))
+        ca_entry = dict(
+            (getattr(self, 'vapor_pressures', {}) or {})
+            .get('metals', {})
+            .get('Ca', {})
+            or {}
+        )
+        antoine = dict(ca_entry.get('pure_component_antoine') or {})
+        alpha_entry = dict(ca_entry.get('evaporation_alpha') or {})
+        ca_alpha = self._c7_float(alpha_entry.get('value'), 0.0)
+        p_sat_pa = 0.0
+        if antoine:
+            try:
+                p_sat_pa = 10.0 ** (
+                    float(antoine.get('A', 0.0))
+                    - float(antoine.get('B', 0.0))
+                    / (hold_temp_K + float(antoine.get('C', 0.0)))
+                )
+            except (OverflowError, TypeError, ValueError, ZeroDivisionError):
+                p_sat_pa = 0.0
+        p_bulk_pa = max(
+            0.0,
+            self._c7_float(
+                getattr(self.overhead, 'composition', {}).get('Ca', 0.0),
+                0.0,
+            )
+            * 100.0,
+        )
+        overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
+        series_config = dict(
+            (getattr(self, 'setpoints', {}) or {})
+            .get('chemistry_kernel', {})
+            .get('evaporation_series_resistance', {})
+            or {}
+        )
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        gas_temperature_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0) or hold_temp_K
+        )
+        if active_route and (
+            C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
+        ):
+            series_flux = _series_resistance_evaporation_flux_kg_m2_s(
+                species='Ca',
+                P_sat_pa=p_sat_pa,
+                P_bulk_pa=p_bulk_pa,
+                T_surface_K=hold_temp_K,
+                molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
+                alpha_i=ca_alpha,
+                knudsen_number=None,
+                pipe_diameter_m=float(
+                    getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+                ),
+                overhead_pressure_pa=overhead_pressure_pa,
+                axial_stir_factor=requested_stir,
+                radial_stir_factor=self._c7_float(
+                    cfg.get('radial_stir_factor'), 1.0),
+                cold_skull_envelope={
+                    'frozen_skull_stir_ceiling': max(0.0, cold_skull_safe)
+                },
+                carrier_gas=carrier_gas,
+                T_gas_K=gas_temperature_K,
+                melt_resistance_enabled=bool(
+                    series_config.get('melt_resistance_enabled', True)
+                ),
+                gas_resistance_enabled=bool(
+                    series_config.get('gas_resistance_enabled', True)
+                ),
+                melt_surface_renewal_base_kg_s_m2_pa=self._c7_float(
+                    series_config.get('melt_surface_renewal_base_kg_s_m2_pa'),
+                    1.0e-4,
+                ),
+                melt_surface_renewal_source=str(
+                    series_config.get(
+                        'melt_surface_renewal_source',
+                        'owner-ratify:melt-side-surface-renewal-v1',
+                    )
+                ),
+            )
+        else:
+            series_flux = _series_resistance_evaporation_flux_kg_m2_s(
+                species='Ca',
+                P_sat_pa=0.0,
+                P_bulk_pa=p_bulk_pa,
+                T_surface_K=hold_temp_K,
+                molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
+                alpha_i=ca_alpha,
+            )
+        hold_time_s = hold_time_h * 3600.0
+        ca_transport_mol = (
+            series_flux.flux_kg_s_m2
+            * area_m2
+            * hold_time_s
+            / max(MOLAR_MASS['Ca'] / 1000.0, 1e-30)
+        )
+        extent_mol = ca_transport_mol / max(ca_per_extent, 1e-30)
+        resistances = {
+            'melt': series_flux.r_melt,
+            'interface': series_flux.r_interface,
+            'gas': series_flux.r_gas,
+        }
+        finite_resistances = {
+            key: value
+            for key, value in resistances.items()
+            if math.isfinite(value)
+        }
+        limiting = (
+            max(finite_resistances, key=finite_resistances.get)
+            if finite_resistances
+            else 'none'
+        )
+        saturation = [
+            self._c7_knob_diag(
+                'stir_factor',
+                requested_stir,
+                clamped_stir,
+                'clamped_to_supported_envelope',
+            ),
+            self._c7_knob_diag(
+                'stir_factor',
+                clamped_stir,
+                applied_stir,
+                'cold_skull_safe_stir_factor',
+            ),
+        ]
+        if getattr(series_flux, 'frozen_skull_stir_clamped', False):
+            saturation.append(
+                self._c7_knob_diag(
+                    'stir_factor',
+                    clamped_stir,
+                    applied_stir,
+                    'series_resistance_frozen_skull_stir_ceiling',
+                )
+            )
+        return extent_mol, {
+            'r_transport': extent_mol,
+            'transport_ca_mol': ca_transport_mol,
+            'c7_ca_flux_kg_s_m2': series_flux.flux_kg_s_m2,
+            'c7_ca_p_sat_pa': p_sat_pa,
+            'c7_ca_p_bulk_pa': p_bulk_pa,
+            'c7_ca_alpha_intrinsic': ca_alpha,
+            'c7_ca_alpha_effective': series_flux.alpha_effective,
+            'c7_ca_route_surface_area_m2': area_m2,
+            'c7_hold_time_s': hold_time_s,
+            'c7_overhead_pressure_pa': overhead_pressure_pa,
+            'c7_knudsen_number': series_flux.knudsen_number,
+            'R_melt': series_flux.r_melt,
+            'R_interface': series_flux.r_interface,
+            'R_gas': series_flux.r_gas,
+            'R_total': series_flux.r_melt + series_flux.r_interface + series_flux.r_gas,
+            'limiting_resistance': limiting,
+            'stir_requested': requested_stir,
+            'stir_applied': applied_stir,
+            'c7_transport_source': 'series_resistance_hkl_ca_evaporation',
+            'c7_transport_refusal': (
+                ''
+                if active_route
+                and C7_MIN_TOTAL_PRESSURE_MBAR
+                <= p_total_mbar
+                <= C7_MAX_TOTAL_PRESSURE_MBAR
+                else 'no_active_route_or_pressure_outside_vacuum_envelope'
+            ),
+            'c7_knob_saturation': saturation,
+        }
+
+    def _step_c7_ca_aluminothermic(self) -> None:
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from engines.builtin.ca_aluminothermic_step import (
+            REACTION_FAMILY_C7_CA_ALUMINOTHERMIC,
+        )
+
+        cfg = self._c7_campaign_config()
+        if not self._c7_bool(cfg.get('enabled'), False):
+            self._last_c7_diagnostic = {'enabled': False}
+            return
+        if getattr(self, '_c7_aluminothermic_applied', False):
+            return
+        self._c7_aluminothermic_applied = True
+
+        self._last_c7_diagnostic = {}
+        self._last_c7_refusal_diagnostic = {}
+        before = self._c7_residual_ceramic_report()
+        mode = str(cfg.get('aluminate_mode') or 'C3A').upper()
+        stoich = self._c7_stoich(mode)
+        al_fraction_raw = self._c7_float(cfg.get('al_fraction'), 1.0)
+        al_fraction = self._c7_clamp(al_fraction_raw, 0.0, 1.0)
+        extent_fraction_raw = self._c7_float(cfg.get('extent_fraction'), 1.0)
+        extent_fraction = self._c7_clamp(extent_fraction_raw, 0.0, 1.0)
+
+        balances = self.atom_ledger.mol_by_account()
+        cleaned_cao = max(
+            0.0, float(balances.get('process.cleaned_melt', {}).get('CaO', 0.0))
+        )
+        slag_cao = max(0.0, float(balances.get('terminal.slag', {}).get('CaO', 0.0)))
+        cao_available = cleaned_cao + slag_cao
+        in_situ_al_available = max(
+            0.0, float(balances.get('process.metal_phase', {}).get('Al', 0.0))
+        )
+        in_situ_al_budget = in_situ_al_available * al_fraction
+        credit_al_available = max(
+            0.0, float(balances.get(C7_AL_CREDIT_ACCOUNT, {}).get('Al', 0.0))
+        )
+        total_al_budget = in_situ_al_budget + credit_al_available
+        if total_al_budget <= 0.0 or cao_available <= 0.0:
+            self._last_c7_refusal_diagnostic = {
+                'reason_refused': 'c7_al_or_cao_budget_empty',
+                'cao_available_mol': cao_available,
+                'al_budget_mol': total_al_budget,
+            }
+            self._c7_product_report = self._build_c7_product_report(
+                before, before, {}
+            )
+            return
+
+        r_stoich_total = min(
+            cao_available / stoich['CaO'],
+            total_al_budget / stoich['Al'],
+        )
+        r_transport, transport_diag = self._c7_transport_extent_mol(
+            cfg, ca_per_extent=stoich['Ca'])
+        objective_extent = min(r_stoich_total, r_transport)
+        objective = str(cfg.get('objective') or 'ree_enrichment')
+        p_total_raw = cfg.get('p_total_mbar')
+        if p_total_raw is None:
+            p_total_raw = cfg.get('p_total_mbar_default')
+        pO2_raw = cfg.get('pO2_mbar')
+        if pO2_raw is None:
+            pO2_raw = cfg.get('pO2_mbar_default')
+        common_controls = {
+            'reaction_family': REACTION_FAMILY_C7_CA_ALUMINOTHERMIC,
+            'campaign': 'C7_CA_ALUMINOTHERMIC',
+            'decision': 'yes',
+            'reductant_species': 'Al',
+            'objective': objective,
+            'aluminate_mode': mode,
+            'extent_fraction': extent_fraction,
+            'allow_partial_extent': self._c7_bool(
+                cfg.get('allow_partial_extent'), True),
+            'hold_temp_C': self._c7_float(
+                cfg.get('hold_temp_C', cfg.get('default_hold_T_C')), 1200.0),
+            'p_total_mbar': self._c7_float(p_total_raw, self.melt.p_total_mbar),
+            'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
+            'active_ca_condensation_route': self._c7_bool(
+                cfg.get('active_ca_condensation_route'), True),
+            'dedicated_ca_condenser': self._c7_bool(
+                cfg.get('dedicated_ca_condenser'), True),
+            'ca_condensation_species': 'Ca',
+            'ca_condenser_temperature_C': self._c7_float(
+                cfg.get('ca_condenser_temperature_C'), 780.0),
+            'thermo_margin_kj_per_mol_o2': self._c7_float(
+                cfg.get('thermo_margin_kJ_per_mol_O2'), 1.0),
+            'transport_extent_mol': r_transport,
+            'objective_extent_mol': objective_extent,
+        }
+        diagnostics: list[dict] = []
+        for source_account, al_budget in (
+            ('process.metal_phase', in_situ_al_budget),
+            (C7_AL_CREDIT_ACCOUNT, credit_al_available),
+        ):
+            if al_budget <= 0.0 or objective_extent <= 0.0:
+                continue
+            source_extent = min(objective_extent, al_budget / stoich['Al'])
+            result = self._dispatch_and_commit(
+                ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+                control_inputs={
+                    **common_controls,
+                    'al_source_account': source_account,
+                    'objective_extent_mol': source_extent,
+                },
+            )
+            diag = dict(result.diagnostic or {})
+            if result.transition is None:
+                self._last_c7_refusal_diagnostic = diag
+                break
+            diagnostics.append(diag)
+            objective_extent = max(0.0, objective_extent - float(diag.get('r_c7', 0.0)))
+
+        ca_overhead_mol = self._ledger_account_species_kg(
+            'process.overhead_gas', 'Ca') / MOLAR_MASS['Ca'] * 1000.0
+        if ca_overhead_mol > 0.0 and not self._last_c7_refusal_diagnostic:
+            capture_fraction = min(
+                1.0,
+                max(0.0, float(transport_diag.get('transport_ca_mol', 0.0)))
+                / max(ca_overhead_mol, 1e-30),
+            )
+            capture_result = self._dispatch_and_commit(
+                ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+                control_inputs={
+                    **common_controls,
+                    'operation': 'ca_capture',
+                    'capture_mol': ca_overhead_mol,
+                    'capture_fraction': capture_fraction,
+                    'route_uncaptured_to_wall': True,
+                },
+            )
+            diagnostics.append(dict(capture_result.diagnostic or {}))
+            capture_diag = dict(capture_result.diagnostic or {})
+            self._step_c7_ca_shuttle_feedback(
+                cfg,
+                common_controls,
+                float(capture_diag.get('captured_ca_mol', 0.0) or 0.0),
+                diagnostics,
+            )
+            self._project_extraction_product(
+                'C7', 'Ca', source_account='process.condensation_train')
+
+        self._project_extraction_melt()
+        after = self._c7_residual_ceramic_report()
+        aggregate = self._aggregate_c7_diagnostics(
+            diagnostics,
+            before,
+            after,
+            {
+                'c7_al_in_situ_available_mol': in_situ_al_available,
+                'c7_al_credit_funded_mol': credit_al_available,
+                'c7_al_credit_input_kg': float(
+                    getattr(self, '_c7_al_credit_input_kg', 0.0) or 0.0),
+                'c7_al_export_remaining_mol': max(
+                    0.0,
+                    float(
+                        self.atom_ledger.mol_by_account()
+                        .get('process.metal_phase', {})
+                        .get('Al', 0.0)
+                    ),
+                ),
+                **transport_diag,
+                'c7_knob_saturation': [
+                    self._c7_knob_diag(
+                        'al_fraction', al_fraction_raw, al_fraction,
+                        'clamped_to_supported_envelope'),
+                    self._c7_knob_diag(
+                        'extent_fraction', extent_fraction_raw, extent_fraction,
+                        'clamped_to_supported_envelope'),
+                    *transport_diag.get('c7_knob_saturation', []),
+                ],
+            },
+        )
+        self._last_c7_diagnostic = aggregate
+        self._c7_product_report = self._build_c7_product_report(
+            before, after, aggregate)
+
+    def _step_c7_ca_shuttle_feedback(
+        self,
+        cfg: dict,
+        common_controls: dict,
+        captured_ca_mol: float,
+        diagnostics: list[dict],
+    ) -> None:
+        ca_shuttle = self._c7_nested(cfg.get('ca_shuttle'))
+        if not self._c7_bool(ca_shuttle.get('enabled'), False):
+            return
+        if getattr(self, '_c7_ca_shuttle_applied', False):
+            diagnostics.append({
+                'operation': 'ca_shuttle_alumina_feedback',
+                'reason_refused': 'c7_ca_shuttle_already_applied',
+            })
+            return
+        self._c7_ca_shuttle_applied = True
+        rate_fraction_raw = self._c7_float(
+            ca_shuttle.get('rate_fraction'), 0.0)
+        reserve_fraction_raw = self._c7_float(
+            ca_shuttle.get('reserve_ca_product_fraction'), 1.0)
+        rate_fraction = self._c7_clamp(rate_fraction_raw, 0.0, 1.0)
+        reserve_fraction = self._c7_clamp(reserve_fraction_raw, 0.0, 1.0)
+        if captured_ca_mol <= 0.0 or rate_fraction <= 0.0:
+            diagnostics.append({
+                'operation': 'ca_shuttle_alumina_feedback',
+                'reason_refused': 'c7_ca_shuttle_no_surplus_extent',
+                'captured_ca_mol': captured_ca_mol,
+                'ca_shuttle_rate_fraction': rate_fraction,
+                'reserved_product_ca_mol': captured_ca_mol * reserve_fraction,
+                'c7_knob_saturation': [
+                    self._c7_knob_diag(
+                        'ca_shuttle.rate_fraction',
+                        rate_fraction_raw,
+                        rate_fraction,
+                        'clamped_to_supported_envelope'),
+                    self._c7_knob_diag(
+                        'ca_shuttle.reserve_ca_product_fraction',
+                        reserve_fraction_raw,
+                        reserve_fraction,
+                        'clamped_to_supported_envelope'),
+                ],
+            })
+            return
+        result = self._dispatch_and_commit(
+            ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+            control_inputs={
+                **common_controls,
+                'operation': 'ca_shuttle_alumina_feedback',
+                'reductant_species': 'Ca',
+                'captured_ca_mol': captured_ca_mol,
+                'ca_shuttle_rate_fraction': rate_fraction_raw,
+                'ca_shuttle_reserve_ca_product_fraction': reserve_fraction_raw,
+                'ca_shuttle_targets': ca_shuttle.get('targets', ['Al2O3']),
+            },
+        )
+        diagnostics.append(dict(result.diagnostic or {}))
+
+    def _aggregate_c7_diagnostics(
+        self,
+        diagnostics: list[dict],
+        before: dict,
+        after: dict,
+        base: dict,
+    ) -> dict:
+        aggregate = dict(base)
+        for key in (
+            'c7_al_in_situ_drawn_mol',
+            'c7_al_credit_drawn_mol',
+            'ca_overhead_mol',
+            'captured_ca_mol',
+            'wall_deposit_ca_mol',
+            'ca_metal_kg',
+            'ca_metal_captured_kg',
+            'calcium_aluminate_slag_kg',
+            'al_spend_kg',
+            'cao_removed_kg',
+            'reserved_product_ca_mol',
+            'shuttle_drawn_ca_mol',
+            'unused_surplus_ca_mol',
+            'al_recovered_mol',
+            'al_recovered_kg',
+            'cao_returned_kg',
+            'ca_shuttle_drawn_kg',
+            'alumina_consumed_kg',
+        ):
+            aggregate[key] = sum(float(d.get(key, 0.0) or 0.0) for d in diagnostics)
+        credit_funded = float(aggregate.get('c7_al_credit_funded_mol', 0.0))
+        credit_drawn = float(aggregate.get('c7_al_credit_drawn_mol', 0.0))
+        aggregate['c7_al_credit_unused_mol'] = max(0.0, credit_funded - credit_drawn)
+        aggregate['c7_al_spend_total_mol'] = (
+            float(aggregate.get('c7_al_in_situ_drawn_mol', 0.0))
+            + credit_drawn
+        )
+        aggregate['REE_oxides_wt_pct_before_C7'] = before['REE_oxides_wt_pct']
+        aggregate['REE_oxides_wt_pct_after_C7'] = after['REE_oxides_wt_pct']
+        aggregate['REE_enrichment_factor'] = (
+            after['REE_oxides_wt_pct'] / before['REE_oxides_wt_pct']
+            if before['REE_oxides_wt_pct'] > 0.0 else 0.0
+        )
+        aggregate['REE_oxides_kg_preserved'] = after['REE_oxides_kg']
+        aggregate['residual_terminal_ceramic_kg'] = (
+            after['residual_terminal_ceramic_kg'])
+        aggregate['raw_diagnostics'] = diagnostics
+        return aggregate
+
+    def _build_c7_product_report(
+        self,
+        before: dict,
+        after: dict,
+        diagnostic: dict,
+    ) -> dict:
+        ca_product_kg = max(
+            0.0,
+            float(diagnostic.get('ca_metal_captured_kg', 0.0))
+            - float(diagnostic.get('ca_shuttle_drawn_kg', 0.0)),
+        )
+        ca_product = {
+            'kg': ca_product_kg,
+            'account': 'process.condensation_train:Ca',
+        }
+        if diagnostic.get('shuttle_drawn_ca_mol', 0.0):
+            ca_product.update({
+                'reserved_product_kg': ca_product_kg,
+                'shuttle_drawn_kg': float(
+                    diagnostic.get('ca_shuttle_drawn_kg', 0.0)),
+                'unused_surplus_ca_mol': float(
+                    diagnostic.get('unused_surplus_ca_mol', 0.0)),
+            })
+        return {
+            'enabled': bool(diagnostic),
+            'products': {
+                'Ca_metal': ca_product,
+                'calcium_aluminate_cement_slag': {
+                    'kg': float(
+                        diagnostic.get('calcium_aluminate_slag_kg', 0.0)),
+                    'label': 'calcium-aluminate refractory (accounting grade)',
+                    'account': 'terminal.slag:{Ca3Al2O6|Ca12Al14O33}',
+                },
+                'residual_REE_enriched_terminal_ceramic': {
+                    'kg': after['residual_terminal_ceramic_kg'],
+                    'REE_oxides_wt_pct_before_C7': before['REE_oxides_wt_pct'],
+                    'REE_oxides_wt_pct_after_C7': after['REE_oxides_wt_pct'],
+                    'REE_enrichment_factor': (
+                        after['REE_oxides_wt_pct'] / before['REE_oxides_wt_pct']
+                        if before['REE_oxides_wt_pct'] > 0.0 else 0.0
+                    ),
+                    'REE_oxides_kg_preserved': after['REE_oxides_kg'],
+                },
+            },
+            'diagnostic': diagnostic,
+            'refusal': dict(getattr(self, '_last_c7_refusal_diagnostic', {}) or {}),
+        }
 
     # ------------------------------------------------------------------
     # Equipment spec helpers

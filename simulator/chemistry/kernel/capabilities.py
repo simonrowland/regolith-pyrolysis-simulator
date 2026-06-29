@@ -33,6 +33,7 @@ class ChemistryIntent(str, Enum):
     CONDENSATION_ROUTE = "condensation_route"
     ELECTROLYSIS_STEP = "electrolysis_step"
     METALLOTHERMIC_STEP = "metallothermic_step"
+    CA_ALUMINOTHERMIC_STEP = "ca_aluminothermic_step"
     STAGE0_PRETREATMENT = "stage0_pretreatment"
     OVERHEAD_GAS_EQUILIBRIUM = "overhead_gas_equilibrium"
     OVERHEAD_BLEED = "overhead_bleed"

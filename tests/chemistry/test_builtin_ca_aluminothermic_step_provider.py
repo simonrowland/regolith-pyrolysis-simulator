@@ -1,0 +1,394 @@
+from __future__ import annotations
+
+import pytest
+
+from engines.builtin.ca_aluminothermic_step import (
+    BuiltinCaAluminothermicStepProvider,
+    REACTION_FAMILY_C7_CA_ALUMINOTHERMIC,
+)
+from engines.builtin.metallothermic_step import (
+    BuiltinMetallothermicStepProvider,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
+from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.chemistry.kernel import (
+    AccountFilterViolation,
+    ChemistryIntent,
+    IntentRequest,
+    LedgerTransitionProposal,
+    ProviderAccountView,
+)
+from simulator.chemistry.kernel.validation import validate_proposal_accounts
+from tests.chemistry.conftest import _atom_check, _build_sim
+
+
+@pytest.fixture(scope="module")
+def formula_registry(vapor_pressure_data, feedstocks_data, setpoints_data):
+    sim = _build_sim(
+        "targeted_super_kreep_ore",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    return sim.species_formula_registry
+
+
+def _controls(**overrides):
+    controls = {
+        "reaction_family": REACTION_FAMILY_C7_CA_ALUMINOTHERMIC,
+        "campaign": "C7_CA_ALUMINOTHERMIC",
+        "decision": "yes",
+        "reductant_species": "Al",
+        "objective": "ree_enrichment",
+        "hold_temp_C": 1200.0,
+        "p_total_mbar": 0.05,
+        "pO2_mbar": 0.0,
+        "active_ca_condensation_route": True,
+        "dedicated_ca_condenser": True,
+        "ca_condensation_species": "Ca",
+        "ca_condenser_temperature_C": 780.0,
+        "thermo_margin_kj_per_mol_o2": 2.0,
+        "aluminate_mode": "C3A",
+        "al_source_account": C7_AL_CREDIT_ACCOUNT,
+        "objective_extent_mol": 1.0,
+        "transport_extent_mol": 1.0,
+        "extent_fraction": 1.0,
+        "allow_partial_extent": False,
+    }
+    controls.update(overrides)
+    return controls
+
+
+def _request(registry, accounts, controls):
+    return IntentRequest(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts=accounts,
+            species_formula_registry=registry,
+        ),
+        temperature_C=1200.0,
+        pressure_bar=5e-5,
+        control_inputs=controls,
+    )
+
+
+def test_provider_declares_only_c7_intent_and_scoped_accounts():
+    provider = BuiltinCaAluminothermicStepProvider()
+    profile = provider.capability_profile()
+
+    assert profile.intents == frozenset(
+        {ChemistryIntent.CA_ALUMINOTHERMIC_STEP}
+    )
+    assert profile.is_authoritative_for == frozenset(
+        {ChemistryIntent.CA_ALUMINOTHERMIC_STEP}
+    )
+    assert profile.declared_accounts == frozenset(
+        {
+            "process.cleaned_melt",
+            "process.metal_phase",
+            C7_AL_CREDIT_ACCOUNT,
+            "process.overhead_gas",
+            "process.condensation_train",
+            "process.wall_deposit",
+            "terminal.slag",
+        }
+    )
+
+
+def test_c3_c6_metallothermic_provider_does_not_gain_c7_write_scope():
+    profile = BuiltinMetallothermicStepProvider().capability_profile()
+
+    assert profile.declared_accounts == frozenset(
+        {
+            "process.cleaned_melt",
+            "process.metal_phase",
+            "process.reagent_inventory",
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        }
+    )
+    assert C7_AL_CREDIT_ACCOUNT not in profile.declared_accounts
+    assert "process.overhead_gas" not in profile.declared_accounts
+    assert "process.condensation_train" not in profile.declared_accounts
+    assert "terminal.slag" not in profile.declared_accounts
+
+
+def test_c7_overhead_proposal_is_rejected_by_c3_c6_account_filter():
+    profile = BuiltinMetallothermicStepProvider().capability_profile()
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"CaO": 1.0}},
+        credits={"process.overhead_gas": {"Ca": 1.0}},
+        reason="c7_overhead_exploit",
+    )
+
+    with pytest.raises(AccountFilterViolation):
+        validate_proposal_accounts(proposal, profile.declared_accounts)
+
+
+def test_formula_registry_contains_c7_aluminates(formula_registry):
+    c3a = resolve_species_formula("Ca3Al2O6", formula_registry)
+    c12a7 = resolve_species_formula("Ca12Al14O33", formula_registry)
+
+    assert dict(c3a.elements) == {"Al": 2.0, "Ca": 3.0, "O": 6.0}
+    assert dict(c12a7.elements) == {"Al": 14.0, "Ca": 12.0, "O": 33.0}
+
+
+def test_c7_c3a_stoichiometry_from_al_credit(formula_registry):
+    accounts = {
+        "process.cleaned_melt": {"CaO": 60.0},
+        "process.metal_phase": {},
+        C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+        "process.overhead_gas": {},
+        "process.condensation_train": {},
+        "process.wall_deposit": {},
+        "terminal.slag": {},
+    }
+
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            accounts,
+            _controls(
+                objective_extent_mol=10.0,
+                transport_extent_mol=10.0,
+            ),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.cleaned_melt": {"CaO": 60.0},
+        C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+    }
+    assert dict(result.transition.credits) == {
+        "process.overhead_gas": {"Ca": 30.0},
+        "terminal.slag": {"Ca3Al2O6": 10.0},
+    }
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+
+
+def test_c7_c12a7_stoichiometry_from_in_situ_al(formula_registry):
+    accounts = {
+        "process.cleaned_melt": {"CaO": 33.0},
+        "process.metal_phase": {"Al": 14.0},
+        C7_AL_CREDIT_ACCOUNT: {},
+        "process.overhead_gas": {},
+        "process.condensation_train": {},
+        "process.wall_deposit": {},
+        "terminal.slag": {},
+    }
+
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            accounts,
+            _controls(
+                aluminate_mode="C12A7",
+                al_source_account="process.metal_phase",
+                objective_extent_mol=1.0,
+                transport_extent_mol=1.0,
+            ),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.cleaned_melt": {"CaO": 33.0},
+        "process.metal_phase": {"Al": 14.0},
+    }
+    assert dict(result.transition.credits) == {
+        "process.overhead_gas": {"Ca": 21.0},
+        "terminal.slag": {"Ca12Al14O33": 1.0},
+    }
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+
+
+@pytest.mark.parametrize("reductant", ["Na", "K", "Si", "Mg"])
+def test_c7_refuses_non_al_reductants(formula_registry, reductant):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+            },
+            _controls(reductant_species=reductant),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "c7_reductant_not_al"
+
+
+def test_c7_refuses_generic_reagent_inventory_al(formula_registry):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                "process.reagent_inventory": {"Al": 20.0},
+            },
+            _controls(al_source_account="process.reagent_inventory"),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "c7_invalid_al_source_account"
+
+
+@pytest.mark.parametrize(
+    ("override", "reason"),
+    (
+        ({"p_total_mbar": 1.0}, "c7_total_pressure_outside_vacuum_envelope"),
+        (
+            {"active_ca_condensation_route": False},
+            "c7_no_active_dedicated_ca_condensation_route",
+        ),
+        (
+            {"thermo_margin_kj_per_mol_o2": -0.5},
+            "c7_vacuum_shifted_thermo_margin_unfavorable",
+        ),
+    ),
+)
+def test_c7_refuses_bad_vacuum_route_or_thermo(formula_registry, override, reason):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+            },
+            _controls(**override),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == reason
+
+
+def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_registry):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                C7_AL_CREDIT_ACCOUNT: {"Al": 2.0},
+            },
+            _controls(
+                objective_extent_mol=10.0,
+                transport_extent_mol=10.0,
+                allow_partial_extent=False,
+            ),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "c7_extent_below_objective"
+    assert result.diagnostic["limiting_cap"] == "stoich"
+
+
+def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.overhead_gas": {"Ca": 5.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+            },
+            _controls(
+                operation="ca_capture",
+                capture_mol=5.0,
+                capture_fraction=0.8,
+                route_uncaptured_to_wall=True,
+            ),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.overhead_gas": {"Ca": 5.0}
+    }
+    assert dict(result.transition.credits) == {
+        "process.condensation_train": {"Ca": 4.0},
+        "process.wall_deposit": {"Ca": 1.0},
+    }
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+
+
+def test_c7_ca_shuttle_consumes_only_surplus_after_product_reservation(
+    formula_registry,
+):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"Al2O3": 2.0},
+                "process.condensation_train": {"Ca": 10.0},
+                "process.metal_phase": {},
+                "terminal.slag": {},
+            },
+            _controls(
+                operation="ca_shuttle_alumina_feedback",
+                reductant_species="Ca",
+                captured_ca_mol=10.0,
+                ca_shuttle_rate_fraction=1.0,
+                ca_shuttle_reserve_ca_product_fraction=0.7,
+                ca_shuttle_targets=["Al2O3"],
+            ),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.condensation_train": {"Ca": 3.0},
+        "process.cleaned_melt": {"Al2O3": 1.0},
+    }
+    assert dict(result.transition.credits) == {
+        "process.cleaned_melt": {"CaO": 3.0},
+        "process.metal_phase": {"Al": 2.0},
+    }
+    assert result.diagnostic["reserved_product_ca_mol"] == pytest.approx(7.0)
+    assert result.diagnostic["shuttle_drawn_ca_mol"] == pytest.approx(3.0)
+    assert result.diagnostic["unused_surplus_ca_mol"] == pytest.approx(0.0)
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+
+
+def test_c7_set_it_to_11_knobs_saturate_without_extra_product(formula_registry):
+    result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"Al2O3": 10.0},
+                "process.condensation_train": {"Ca": 10.0},
+                "process.metal_phase": {},
+                "terminal.slag": {},
+            },
+            _controls(
+                operation="ca_shuttle_alumina_feedback",
+                reductant_species="Ca",
+                captured_ca_mol=10.0,
+                ca_shuttle_rate_fraction=11.0,
+                ca_shuttle_reserve_ca_product_fraction=-2.0,
+                ca_shuttle_targets=["Al2O3"],
+            ),
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits)["process.condensation_train"]["Ca"] == pytest.approx(10.0)
+    saturation = result.diagnostic["c7_knob_saturation"]
+    assert {row["path"] for row in saturation} == {
+        "campaigns.C7.ca_shuttle.rate_fraction",
+        "campaigns.C7.ca_shuttle.reserve_ca_product_fraction",
+    }
+    assert all(row["saturated"] for row in saturation)

@@ -21,7 +21,7 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
-from simulator.corpus_version import current_corpus_version
+from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
@@ -944,6 +944,10 @@ def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-corpus-scope"
     current_corpus = current_corpus_version()
+    accepted_corpus_versions = list(interoperable_corpus_versions())
+    legacy_compatible_corpus = next(
+        version for version in accepted_corpus_versions if version != current_corpus
+    )
     _seed_leaderboard_fixture(
         run_dir,
         [
@@ -951,6 +955,11 @@ def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy
                 "candidate_id": "candidate-accepted",
                 "oxygen": 8.0,
                 "corpus_version": current_corpus,
+            },
+            {
+                "candidate_id": "candidate-alpha-series",
+                "oxygen": 9.0,
+                "corpus_version": legacy_compatible_corpus,
             },
             {
                 "candidate_id": "candidate-legacy",
@@ -975,14 +984,17 @@ def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy
     payload = response.get_json()
     assert payload["gui_version"] == current_code_version()
     assert payload["current_corpus_version"] == current_corpus
-    assert payload["accepted_corpus_versions"] == [current_corpus]
+    assert payload["accepted_corpus_versions"] == accepted_corpus_versions
     assert [entry["candidate_id"] for entry in payload["entries"]] == [
         "candidate-legacy",
+        "candidate-alpha-series",
         "candidate-accepted",
     ]
     entries = {entry["candidate_id"]: entry for entry in payload["entries"]}
     assert entries["candidate-accepted"]["corpus_version"] == current_corpus
     assert entries["candidate-accepted"]["corpus_version_badge"]["status"] == "accepted"
+    assert entries["candidate-alpha-series"]["corpus_version"] == legacy_compatible_corpus
+    assert entries["candidate-alpha-series"]["corpus_version_badge"]["status"] == "accepted"
     assert entries["candidate-legacy"]["corpus_version"] is None
     assert entries["candidate-legacy"]["corpus_version_label"] == "unversioned/legacy"
     assert entries["candidate-legacy"]["corpus_version_badge"]["status"] == "legacy"

@@ -76,6 +76,9 @@ PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
         'Al': 'metal_phase_al',
         'Si': 'metal_phase_si',
     },
+    'C7': {
+        'Ca': 'stage_4_alkali_mg_cyclone',
+    },
     'MRE': {
         'Fe': 'stage_1_fe_condenser',
         'Cr': 'stage_2_cr_oxide_harvest',

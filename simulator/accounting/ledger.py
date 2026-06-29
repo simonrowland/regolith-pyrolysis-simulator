@@ -46,6 +46,7 @@ TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
 }
 KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.cleaned_melt",
+    "process.c7_al_credit",
     "process.condensation_train",
     "process.metal_phase",
     "process.overhead_gas",

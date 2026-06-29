@@ -1034,8 +1034,12 @@ class PyrolysisRun:
             for row in execution.per_hour
             if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
         ]
+        c7_product_report = dict(
+            getattr(sim, "_c7_product_report", {}) or {})
+        c7_refusal_diagnostic = dict(
+            getattr(sim, "_last_c7_refusal_diagnostic", {}) or {})
 
-        return {
+        payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
@@ -1050,6 +1054,11 @@ class PyrolysisRun:
             "reason": execution.reason,
             "error_message": execution.error_message,
         }
+        if c7_product_report:
+            payload["c7_product_report"] = _json_safe(c7_product_report)
+        if c7_refusal_diagnostic:
+            payload["c7_refusal_diagnostic"] = _json_safe(c7_refusal_diagnostic)
+        return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
         """Build the run_metadata.engines_used dict.
@@ -1080,6 +1089,8 @@ class PyrolysisRun:
         except AttributeError:
             capability = {}
         internal_intents = {"backend_equilibrium"}
+        if not getattr(sim, "_c7_product_report", None):
+            internal_intents.add("ca_aluminothermic_step")
         capability = {
             intent: slots
             for intent, slots in capability.items()
