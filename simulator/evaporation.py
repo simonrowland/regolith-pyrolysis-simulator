@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.accounting import AccountingError, resolve_species_formula
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
@@ -752,13 +753,26 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
 
+        cleaned_melt_kg = self.atom_ledger.kg_by_account(
+            'process.cleaned_melt')
+        spent_reductant_residue_kg = self.atom_ledger.kg_by_account(
+            SPENT_REDUCTANT_RESIDUE_ACCOUNT)
+        projection_parity_tolerance_pct = 5.0e-12
+
         for species in vapor_pressures:
             sp_data = metals_data.get(species, {})
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            M_g_mol = sp_data.get('molar_mass_g_mol',
-                                  MOLAR_MASS.get(species, 50.0))
+            M_g_mol = sp_data.get('molar_mass_g_mol')
+            if M_g_mol is None:
+                M_g_mol = MOLAR_MASS.get(species)
+            if M_g_mol is None:
+                raise AccountingError(
+                    f"vapor species {species!r} requires "
+                    "molar_mass_g_mol metadata before evaporation flux "
+                    "can be emitted"
+                )
             molar_masses_kg_mol[species] = M_g_mol / 1000.0
 
             parent_oxide = sp_data.get('parent_oxide', '')
@@ -766,11 +780,29 @@ class EvaporationMixin:
                 raise AccountingError(
                     f"vapor species {species!r} requires parent_oxide "
                     "metadata before evaporation flux can be emitted"
-                )
+            )
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
-            available_oxide_kg[species] = self.melt.composition_kg.get(
-                parent_oxide, 0.0)
+            # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
+            # cleaned_melt + spent_reductant_residue define the projection.
+            ledger_oxide_kg = (
+                float(cleaned_melt_kg.get(parent_oxide, 0.0))
+                + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
+            )
+            projection_oxide_kg = float(self.melt.composition_kg.get(
+                parent_oxide, 0.0))
+            scale_kg = max(abs(ledger_oxide_kg), abs(projection_oxide_kg), 1.0)
+            divergence_pct = (
+                abs(ledger_oxide_kg - projection_oxide_kg) / scale_kg * 100.0
+            )
+            if divergence_pct > projection_parity_tolerance_pct:
+                raise AccountingError(
+                    "cleaned_melt projection stale for parent oxide "
+                    f"{parent_oxide!r}: atom_ledger={ledger_oxide_kg:.17g} kg "
+                    f"melt_projection={projection_oxide_kg:.17g} kg "
+                    f"divergence_pct={divergence_pct:.17g}"
+                )
+            available_oxide_kg[species] = ledger_oxide_kg
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 

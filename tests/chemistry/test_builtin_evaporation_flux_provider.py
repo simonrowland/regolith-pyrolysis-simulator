@@ -36,6 +36,8 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     IntentRequest,
 )
+from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting import AccountingError
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
@@ -86,9 +88,11 @@ def _series_resistance_reference_flux(
         if not sp_data:
             sp_data = oxide_vapors_data.get(species, {})
 
-        M_kg_mol = sp_data.get(
-            'molar_mass_g_mol', MOLAR_MASS.get(species, 50.0)
-        ) / 1000.0
+        M_g_mol = sp_data.get('molar_mass_g_mol')
+        if M_g_mol is None:
+            M_g_mol = MOLAR_MASS.get(species)
+        assert M_g_mol is not None, species
+        M_kg_mol = M_g_mol / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
         alpha = alpha_by_species.get(species, 1.0)
@@ -332,6 +336,105 @@ def test_provider_attaches_numerator_provenance_and_resistance_shares():
     assert diagnostic['limiting_resistance_label'] in {'interface', 'gas', 'melt'}
     assert diagnostic['alpha_eff'] == diagnostic['alpha_effective']
     assert diagnostic['Kn'] == diagnostic['knudsen_number']
+
+
+def test_evaporation_aux_fails_loud_without_molar_mass_metadata(
+    feedstocks_data, setpoints_data
+):
+    vapor_pressure_data = {
+        "metals": {
+            "Mystery": {
+                "parent_oxide": "FeO",
+                "stoich_oxide_per_vapor": 1.0,
+                "stoich_O2_per_vapor": 0.0,
+            },
+        },
+        "oxide_vapors": {},
+    }
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    with pytest.raises(AccountingError, match="Mystery.*molar_mass_g_mol"):
+        sim._build_evaporation_aux_maps({"Mystery": 1.0})
+
+
+def test_evaporation_aux_uses_atom_ledger_for_parent_oxide_availability(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    _, _, available_oxide_kg = sim._build_evaporation_aux_maps({"Na": 1.0})
+
+    assert available_oxide_kg["Na"] == pytest.approx(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt")["Na2O"]
+    )
+
+
+def test_evaporation_aux_includes_spent_reductant_residue_projection_domain(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.raw_feedstock",
+        {"Na2O": 0.375},
+        source="evaporation parity regression seed",
+    )
+    sim.atom_ledger.move(
+        "evaporation_parity_cleaned_melt_seed",
+        "process.raw_feedstock",
+        "process.cleaned_melt",
+        {"Na2O": 0.25},
+        reason="evaporation parity regression seed",
+    )
+    sim.atom_ledger.move(
+        "evaporation_parity_spent_residue_seed",
+        "process.raw_feedstock",
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        {"Na2O": 0.125},
+        reason="evaporation parity regression seed",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+
+    _, _, available_oxide_kg = sim._build_evaporation_aux_maps({"Na": 1.0})
+    cleaned_melt_na2o_kg = sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    )["Na2O"]
+    spent_residue_na2o_kg = sim.atom_ledger.kg_by_account(
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    )["Na2O"]
+
+    assert available_oxide_kg["Na"] == pytest.approx(
+        cleaned_melt_na2o_kg + spent_residue_na2o_kg
+    )
+
+
+def test_evaporation_aux_rejects_stale_melt_projection(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.composition_kg["Na2O"] += 1e-6
+
+    with pytest.raises(AccountingError, match="projection stale.*Na2O"):
+        sim._build_evaporation_aux_maps({"Na": 1.0})
 
 
 # ---------------------------------------------------------------------------
