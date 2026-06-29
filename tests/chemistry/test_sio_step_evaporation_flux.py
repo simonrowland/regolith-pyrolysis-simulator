@@ -5,12 +5,13 @@ Anchors:
 * ``data/vapor_pressures.yaml`` sets SiO Hertz-Knudsen alpha to 0.04.
 * §25-bis convergence documents VapoRock SiO pressure near 3.824e-1 Pa
   at the 1873 K SoF2018 Fig. 3 anchor. With alpha=0.04, unit area, and
-  unit stir factor, the corrected H-K-L mass flux is
-  0.03695795496902614 kg/hr.
+  unit stir factor, the corrected H-K-L mass flux is computed from the
+  shared gas constant used by the series-resistance helper.
 """
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -19,12 +20,23 @@ import yaml
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.evaporation import _load_evaporation_alpha_by_species
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SIO_ANCHOR_PRESSURE_PA = 0.3824
-SIO_ANCHOR_FLUX_KG_HR = 0.03695795496902614
+SIO_ANCHOR_MOLAR_MASS_KG_MOL = 0.04408
+SIO_ANCHOR_T_K = 1600.0 + 273.15
+SIO_ANCHOR_FLUX_KG_HR = (
+    0.04
+    * SIO_ANCHOR_PRESSURE_PA
+    * math.sqrt(
+        SIO_ANCHOR_MOLAR_MASS_KG_MOL
+        / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * SIO_ANCHOR_T_K)
+    )
+    * 3600.0
+)
 
 
 def _load_vapor_pressure_data() -> dict:
@@ -46,7 +58,7 @@ def _sio_flux(alpha: float) -> float:
             "overhead_partials_Pa": {"SiO": 0.0},
             "gas_pO2_bar": 1.0e-9,
             "intrinsic_pO2_bar": 1.0e-9,
-            "molar_mass_kg_mol": {"SiO": 0.04408},
+            "molar_mass_kg_mol": {"SiO": SIO_ANCHOR_MOLAR_MASS_KG_MOL},
             "stoich_by_species": {
                 "SiO": {
                     "parent_oxide": "SiO2",
@@ -58,6 +70,10 @@ def _sio_flux(alpha: float) -> float:
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": {"SiO": alpha},
+            "evaporation_series_resistance": {
+                "gas_resistance_enabled": False,
+                "melt_resistance_enabled": False,
+            },
         },
     )
     result = BuiltinEvaporationFluxProvider().dispatch(request)

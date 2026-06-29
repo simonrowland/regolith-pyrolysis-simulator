@@ -975,10 +975,7 @@ def test_optimizer_leaderboard_filters_by_interoperable_corpus_and_labels_legacy
     payload = response.get_json()
     assert payload["gui_version"] == current_code_version()
     assert payload["current_corpus_version"] == current_corpus
-    assert payload["accepted_corpus_versions"] == [
-        current_corpus,
-        "analytical-corpus-2026-06-28-sso-r-p1",
-    ]
+    assert payload["accepted_corpus_versions"] == [current_corpus]
     assert [entry["candidate_id"] for entry in payload["entries"]] == [
         "candidate-legacy",
         "candidate-accepted",

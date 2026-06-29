@@ -86,9 +86,14 @@ GOLDENS = (
 # C2A vapor-pressure dispatch now uses builtin-authoritative pressures.
 # The NIST pure-component ranges remain the authoritative diagnostics; no
 # legacy Ca row-level retuning is accepted without a named source.
+# 2026-06-28 alpha-series source model removes the final source-side stir
+# multiplier and adds gas/melt resistances, so less SiO reaches the downstream
+# deposition chain. This is a source-rate move, not a deposition retune:
+# lunar 0.000508314464643 -> 8.92476013101e-06; Mars
+# 0.000486760105302 -> 6.94408791991e-06.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 0.000508314464643,
-    "mars_basalt": 0.000486760105302,
+    "lunar_mare_low_ti": 8.92476013101e-06,
+    "mars_basalt": 6.94408791991e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -103,9 +108,9 @@ BASELINE_SIO_EVOLVED_KG = {
 #   1. Absolute ceiling on Stage 4 (regression catch — runaway), and
 #   2. Stage 4 > Stage 3 ordering invariant (forces CHANGELOG update
 #      if defaults change in a way that restores Stage 3 dominance).
-# Both fixtures after the 2026-06-15 pure-component vapor correction: stage_3
-# is 7.40e-5 kg (lunar) / 7.08e-5 kg (mars), and stage_4 remains higher at
-# 1.36e-4 kg (lunar) / 1.30e-4 kg (mars).
+# After the 2026-06-28 alpha-series source model, stage_3 is 1.69e-7 kg
+# (lunar) / 1.32e-7 kg (mars), and stage_4 remains higher at 3.18e-7 kg
+# (lunar) / 2.47e-7 kg (mars).
 # Predecessor history (for legacy reviewers): pre-Phase-A1 values were
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved

@@ -296,7 +296,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
-    assert cache_key(spec) == "454b2a4de81ba39e04b993fa1bf89c70f1c37bda9f67f0eec4ac4df24506f2fb"
+    assert cache_key(spec) == "6092210434ccabd62cf3079dece6b22d3313dff0c83175055557e02c233f1fe5"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

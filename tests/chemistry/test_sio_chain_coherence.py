@@ -17,7 +17,9 @@ MAX_BALANCE_ERR_PCT = 5.0e-12
 # this relative metric rose above the global mass-balance bound. The
 # magnitude-robust closure guard is ``terminal_mol == approx(sio_evaporated_mol)``
 # below; this caps the relative residual well below any physical effect.
-MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
+# 2026-06-28 alpha-series source model shrinks SiO another ~57x, so the same
+# absolute residual (~3.44e-13 mol) reads as a larger relative percentage.
+MAX_CHAIN_CLOSURE_ERR_PCT = 2.0e-7
 # Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
 # C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
 # to the VapoRock-consistent activity-corrected value.
@@ -55,7 +57,10 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 5.0e-8
 # builtin Antoine/Ellingham surface is authoritative on the default path. The
 # selected builtin runtime surface keeps the wall-temperature invariance contract
 # with the pure-sidecar baseline.
-PHASE3BIS_SIO_EVOLVED_KG = 0.000508314461235
+# 2026-06-28 alpha-series source model removes the final stir multiplier and
+# adds gas/melt resistances, lowering the evolved SiO source without changing
+# wall-temperature invariance.
+PHASE3BIS_SIO_EVOLVED_KG = 8.92476013101e-06
 
 
 @lru_cache(maxsize=None)

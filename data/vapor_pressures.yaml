@@ -61,7 +61,7 @@ metals:
       valid_range_K: [924, 1118]
     evaporation_alpha:
       value: 1.0
-      source: "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal evaporation from ferrobasalt FCMAS melt"
+      source: "OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13"
       T_band_K: [1700, 2273]
       envelope: [0.9, 1.0]
       tier: 2
@@ -123,10 +123,10 @@ metals:
       C: 24.195
       valid_range_K: [679.4, 1033]
     evaporation_alpha:
-      value: 1.0
-      source: "REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; Sossi & Fegley 2018 liquids commonly near unity"
+      value: 0.13
+      source: "REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model"
       T_band_K: [1700, 2273]
-      envelope: [0.9, 1.0]
+      envelope: [0.10, 0.16]
       tier: 2
     antoine:
       # Bounded-minimax fallback fit to current VapoRock dense IW grid.
@@ -264,7 +264,7 @@ metals:
       valid_range_K: [1254, 1712]
     evaporation_alpha:
       value: 0.90
-      source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
+      source: "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
       T_band_K: [2278, 2278]
       envelope: [0.48, 1.20]
       tier: 2
@@ -294,7 +294,7 @@ metals:
       valid_range_K: [1557, 2329]
     evaporation_alpha:
       value: 0.30
-      source: "REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
+      source: "OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
       T_band_K: [1700, 2273]
       envelope: [0.03, 1.00]
       tier: 2
@@ -379,7 +379,7 @@ metals:
       valid_range_K: [1941, 3560.15]
     evaporation_alpha:
       value: 0.80
-      source: "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
+      source: "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
       T_band_K: [2278, 2278]
       envelope: [0.39, 1.00]
       tier: 2
@@ -654,7 +654,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 900
     evaporation_alpha:
       value: 1.0
-      source: "REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
+      source: "OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. Volatilizes as NaCl(g)."
 
@@ -679,7 +679,7 @@ foulant_vapor:
     condensation_T_C_at_1mbar: 880
     evaporation_alpha:
       value: 1.0
-      source: "REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
+      source: "OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement"
       tier: 2
     notes: "Pure-component chloride; no parent_oxide. More volatile than NaCl at a given T."
 

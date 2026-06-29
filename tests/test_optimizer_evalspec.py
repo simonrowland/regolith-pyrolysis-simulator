@@ -60,7 +60,7 @@ PINNED_EVALSPEC_JSON = (
     b'"allowlist_version":"allowlist-v9","backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
-    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.6",'
+    b'"pressure_Pa":"0.001000000"},"code_version":"0.5.7",'
     b'"data_digests":{"corpus_version":"corpus-version-digest",'
     b'"feedstocks":"feedstock-digest","materials":"materials-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
@@ -187,7 +187,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.6",
+    code_version="0.5.7",
     data_digests={
         "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",

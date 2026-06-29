@@ -1745,3 +1745,7 @@ chemistry_kernel:
   # which species are using it. V1e-followon (task #36) is the post-0.5.0
   # work to either measure α or refine the placeholder policy.
   allow_unmeasured_alpha_fallback: true
+  evaporation_series_resistance:
+    melt_resistance_enabled: true
+    melt_surface_renewal_base_kg_s_m2_pa: 1.0e-4
+    melt_surface_renewal_source: "owner-ratify:melt-side-surface-renewal-v1"

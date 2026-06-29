@@ -70,28 +70,68 @@ from tests.chemistry.conftest import _build_sim
 # 2026-06-28 SSO-R Phase 1 couples melt fO2 and headspace pO2 through a
 # ledger-visible O2 reservoir exchange. Fe activity shifts through Kress91,
 # moving wall traces without coefficient retuning.
+# 2026-06-28 alpha-series source model replaces the source-side bare alpha
+# multiplier with gas/melt series resistances. Wall-route parity remains
+# ledger-close, but source composition shifts to Na-dominated traces under the
+# current owner-ratified Na apparent-alpha label.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 1.1508824537864851e-11,
-            "Fe": 2.358017153559063e-09,
+            "Fe": 7.302410307849205e-11,
+            "Mg": 1.7840460264748816e-12,
+            "Na": 0.001855201481610591,
+            "SiO": 6.999424915265017e-11,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 1.1508824537864851e-11,
+            "Mg": 1.7840460264748816e-12,
+            "Na": 0.001855201481610591,
+            "SiO": 6.999424915265017e-11,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Mg": 1.7840460264748816e-12,
+            "Na": 0.001855201481610591,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Mg": 1.7840460264748812e-12,
+            "Na": 0.0018552014816105922,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 2.9433629235637e-09,
+            "Fe": 3.136978619372059e-11,
+            "Na": 0.007795747254667113,
+            "SiO": 3.401858260370516e-11,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Na": 0.007795747254667113,
+            "SiO": 3.401858260370516e-11,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Na": 0.007795747254667113,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Na": 0.007795747254667111,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 1.2558979623510879e-11,
-            "Fe": 1.0730682632571887e-09,
+            "Fe": 4.6899817225033605e-11,
+            "Mg": 5.610550561170865e-12,
+            "Na": 0.003576545442385753,
+            "SiO": 6.743301774240768e-11,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 1.2558979623510873e-11,
+            "Mg": 5.610550561170865e-12,
+            "Na": 0.003576545442385753,
+            "SiO": 6.743301774240768e-11,
+        },
+        "process.wall_deposit_segment_stage_2_to_stage_3": {
+            "Mg": 5.610550561170865e-12,
+            "Na": 0.003576545442385753,
+        },
+        "process.wall_deposit_segment_stage_3_to_stage_4": {
+            "Mg": 5.6105505611708634e-12,
+            "Na": 0.003576545442385753,
         },
     },
 }

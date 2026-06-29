@@ -151,8 +151,12 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 0.04) instead of the legacy by-feel 0.7. This lowers the
     # pressure-isolated capture budget and the 1050 C wall deposit:
     # 3.58623058352e-06 -> 4.6778715958e-07 kg.
+    # 2026-06-28 alpha-series source model removes the final stir multiplier
+    # and adds gas/melt resistances upstream of deposition. The same cold-wall
+    # capture physics sees much less SiO source:
+    # 4.6778715958e-07 -> 8.21353261008e-09 kg.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        4.6778715958e-07, rel=1e-9
+        8.21353261008e-09, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == 0.0
     assert _sio_wall_deposit_kg(1500.0) == 0.0

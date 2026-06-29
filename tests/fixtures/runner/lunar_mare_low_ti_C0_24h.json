@@ -167,32 +167,31 @@
     "process.cleaned_melt": {
       "Al2O3": 1362.8900119503458,
       "Cr2O3": 23.703501786991428,
-      "FeO": 2364.0172165784384,
+      "FeO": 2364.017216578621,
+      "K2O": 4.978190190070473,
       "MgO": 2298.5372925927645,
-      "MnO": 29.021115631166,
-      "Na2O": 0.00022410724077293054,
+      "MnO": 29.02111563119382,
+      "Na2O": 66.1982670402728,
       "P2O5": 7.251780856444043,
       "SiO2": 7623.696466756756,
       "TiO2": 193.32675356467954
     },
     "process.condensation_train": {
       "Ca": 1795.2352740431702,
-      "K": 12.334378257771997,
-      "Na": 84.08722017456569
+      "K": 6.715337669261368,
+      "Na": 0.2955676025085046
     },
     "process.overhead_gas": {},
     "reservoir.fo2_buffer": {
-      "O2": 380.04470667936124
+      "O2": 380.04389931094335
     },
     "terminal.offgas": {
-      "Ca": 223.8985705856362,
-      "Fe": 1.8296328807300584e-10,
-      "K": 9.520911760648008,
-      "Mn": 2.7816214520495997e-11,
-      "Na": 48.77588110985747
+      "Ca": 223.89857058563618,
+      "K": 5.183571969017695,
+      "Na": 0.17144781585063132
     },
     "terminal.oxygen_melt_offgas_stored": {
-      "O2": 668.2018134608037
+      "O2": 632.6145042676092
     }
   },
   "final": {
@@ -283,17 +282,17 @@
         "Na"
       ],
       "designated_species_kg": {
-        "K": 0.05930563413217925,
-        "Na": 0.5924710896015585
+        "K": 0.03228791079883844,
+        "Na": 0.0020825428293986623
       },
       "coproduct_species_kg": {},
       "impurity_species_kg": {
         "Ca": 60.862840325660365
       },
-      "designated_kg": 0.6517767237337377,
+      "designated_kg": 0.0343704536282371,
       "impurity_kg": 60.862840325660365,
-      "total_kg": 61.514617049394104,
-      "purity_fraction": 0.010595477221460772,
+      "total_kg": 60.8972107792886,
+      "purity_fraction": 0.0005644011144091125,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
     },
@@ -305,12 +304,12 @@
       "coproduct_species_kg": {},
       "impurity_species_kg": {
         "Ca": 11.086598987441809,
-        "K": 0.3829365456254617,
-        "Na": 1.2862397490589097
+        "K": 0.20848649697867322,
+        "Na": 0.004521148589285861
       },
       "designated_kg": 0,
-      "impurity_kg": 12.75577528212618,
-      "total_kg": 12.75577528212618,
+      "impurity_kg": 11.299606633009768,
+      "total_kg": 11.299606633009768,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -322,12 +321,12 @@
       "designated_species_kg": {},
       "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "K": 0.04001104167820592,
-        "Na": 0.05443495254923881
+        "K": 0.021783879016399294,
+        "Na": 0.00019133956868134898
       },
       "designated_kg": 0,
-      "impurity_kg": 0.09444599422744474,
-      "total_kg": 0.09444599422744474,
+      "impurity_kg": 0.02197521858508064,
+      "total_kg": 0.02197521858508064,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -350,17 +349,18 @@
   "vapor_pressure_source_report": {
     "species": {
       "Fe": "builtin_authoritative",
+      "K": "builtin_authoritative",
       "Mg": "builtin_authoritative",
       "Mn": "builtin_authoritative",
       "Na": "builtin_authoritative"
     },
     "summary": {
       "builtin_authoritative": {
-        "count": 4,
+        "count": 5,
         "percentage": 100.0
       }
     },
-    "total_species": 4
+    "total_species": 5
   },
   "shuttle_refusal_history": [],
   "pO2_enforcement_by_hour": [],
@@ -519,361 +519,351 @@
       "hour": 8,
       "campaign": "C0",
       "T_C": 375.0,
-      "P_total_bar": 483.02550072257554,
-      "pO2_bar": 395.3442541168315,
-      "mass_balance_pct": 2.2737367544323207e-14,
-      "O2_yield_kg_cumulative": 8.782522901937428,
-      "O2_source_side_potential_kg_cumulative": 8.782522901937428,
+      "P_total_bar": 483.0255007225556,
+      "pO2_bar": 395.34425411683134,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 8.782522901937439,
+      "O2_source_side_potential_kg_cumulative": 8.782522901937439,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "K": 1.4409779514187919e-12
+        "Ca": 80.92284622503331
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "O2": 8.782522901937428
+        "O2": 8.782522901937439
       },
-      "vapor_species_kg_hr": {
-        "K": 1.4409779514187919e-12
-      },
+      "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 951468.9244772731,
-      "regime": "free_molecular",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 9,
       "campaign": "C0",
       "T_C": 425.0,
-      "P_total_bar": 485.24282965200297,
-      "pO2_bar": 397.1469518237888,
-      "mass_balance_pct": 2.2737367544323207e-14,
-      "O2_yield_kg_cumulative": 10.363499462638174,
-      "O2_source_side_potential_kg_cumulative": 10.363499462638174,
+      "P_total_bar": 485.2428296519812,
+      "pO2_bar": 397.1469518237885,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 10.363499462638195,
+      "O2_source_side_potential_kg_cumulative": 10.363499462638195,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "K": 1.4409779514187919e-12
+        "Ca": 80.9228462250333
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "O2": 10.363499462638174
+        "O2": 10.363499462638195
       },
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 951468.9244772731,
-      "regime": "free_molecular",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 10,
       "campaign": "C0",
       "T_C": 475.0,
-      "P_total_bar": 486.3978435022837,
-      "pO2_bar": 398.03923043686797,
-      "mass_balance_pct": 2.2737367544323207e-14,
-      "O2_yield_kg_cumulative": 11.767421644546754,
-      "O2_source_side_potential_kg_cumulative": 11.767421644546754,
+      "P_total_bar": 486.3978435022602,
+      "pO2_bar": 398.03923043686746,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 11.767421644546785,
+      "O2_source_side_potential_kg_cumulative": 11.767421644546785,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.92284622503331,
-        "K": 1.4409779514187919e-12
+        "Ca": 80.9228462250333
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "O2": 11.767421644546754
+        "O2": 11.767421644546785
       },
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 951468.9244772731,
-      "regime": "free_molecular",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 11,
       "campaign": "C0",
       "T_C": 525.0,
-      "P_total_bar": 486.1000265572193,
-      "pO2_bar": 397.6058692477861,
-      "mass_balance_pct": 2.2737367544323207e-14,
-      "O2_yield_kg_cumulative": 13.019840533682851,
-      "O2_source_side_potential_kg_cumulative": 13.019840533682851,
+      "P_total_bar": 486.100026556382,
+      "pO2_bar": 397.6058692474487,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 13.019840533681379,
+      "O2_source_side_potential_kg_cumulative": 13.019840533681379,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.4409779514187919e-12
+        "Ca": 80.92284622503331
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "Na": 3.042312306736313e-11,
-        "O2": 13.019840533682851
+        "O2": 13.019840533681379
       },
-      "vapor_species_kg_hr": {
-        "Na": 4.807044962475971e-11
-      },
+      "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 11772.13437193339,
-      "regime": "free_molecular",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 12,
       "campaign": "C0",
       "T_C": 575.0,
-      "P_total_bar": 483.1331487017428,
-      "pO2_bar": 394.60981274818914,
-      "mass_balance_pct": 2.2737367544323207e-14,
-      "O2_yield_kg_cumulative": 14.137465688607275,
-      "O2_source_side_potential_kg_cumulative": 14.137465688607275,
+      "P_total_bar": 483.133148700884,
+      "pO2_bar": 394.60981274785985,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 14.137465688604474,
+      "O2_source_side_potential_kg_cumulative": 14.137465688604474,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.92284622503331,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.4409779514187919e-12
+        "Ca": 80.9228462250333
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "Na": 3.042312306736313e-11,
-        "O2": 14.137465688607275
+        "O2": 14.137465688604474
       },
       "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 11772.13437193339,
-      "regime": "free_molecular",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 13,
       "campaign": "C0",
       "T_C": 625.0,
-      "P_total_bar": 474.88743101987365,
-      "pO2_bar": 386.42256343086837,
-      "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 15.127156744345506,
-      "O2_source_side_potential_kg_cumulative": 15.127156744345506,
+      "P_total_bar": 474.8872036763974,
+      "pO2_bar": 386.4224799919745,
+      "mass_balance_pct": 0.0,
+      "O2_yield_kg_cumulative": 15.127156575450286,
+      "O2_source_side_potential_kg_cumulative": 15.127156575450286,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.833456256410995e-05
+        "Ca": 80.9228462250333
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 3.042312306736313e-11,
-        "O2": 15.127156744345506
+        "O2": 15.127156575450286
       },
-      "vapor_species_kg_hr": {
-        "K": 1.8334561123132e-05
-      },
+      "vapor_species_kg_hr": {},
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.04294738569646159,
-      "regime": "transitional",
+      "Kn": 2.3091297834354704e-08,
+      "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 14,
       "campaign": "C0",
       "T_C": 675.0,
-      "P_total_bar": 457.2980109542224,
-      "pO2_bar": 368.9616681221575,
+      "P_total_bar": 457.2977845167627,
+      "pO2_bar": 368.9615856004514,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 15.98556880079508,
-      "O2_source_side_potential_kg_cumulative": 15.98556880079508,
+      "O2_yield_kg_cumulative": 15.985568479460667,
+      "O2_source_side_potential_kg_cumulative": 15.985568479460667,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
         "Ca": 80.92284622503331,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.833456256410995e-05
+        "K": 1.5931580719327048e-12
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 3.042312306736313e-11,
-        "O2": 15.98556880079508
+        "O2": 15.985568479460667
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 1.5931580719327046e-12
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.04294738569646159,
-      "regime": "transitional",
+      "Kn": 450765.30881757964,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 15,
       "campaign": "C0",
       "T_C": 725.0,
-      "P_total_bar": 426.5024781783388,
-      "pO2_bar": 338.3462131445808,
+      "P_total_bar": 426.50225370677936,
+      "pO2_bar": 338.34613251331945,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 16.702978713867687,
-      "O2_source_side_potential_kg_cumulative": 16.702978713867687,
+      "O2_yield_kg_cumulative": 16.702978255669073,
+      "O2_source_side_potential_kg_cumulative": 16.702978255669073,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.92284622503331,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.833456256410995e-05
+        "Ca": 80.9228462250333,
+        "K": 1.5825767131818337e-11
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 3.042312306736313e-11,
-        "O2": 16.702978713867687
+        "K": 8.032397812701698e-12,
+        "O2": 16.702978255669073
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 1.423260905988563e-11
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.04294738569646159,
-      "regime": "transitional",
+      "Kn": 46236.285644592055,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 16,
       "campaign": "C0",
       "T_C": 775.0,
-      "P_total_bar": 382.201032909637,
-      "pO2_bar": 294.2572339636225,
+      "P_total_bar": 382.200810860156,
+      "pO2_bar": 294.257155624405,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 17.272728929275676,
-      "O2_source_side_potential_kg_cumulative": 17.272728929275676,
+      "O2_yield_kg_cumulative": 17.272728347591602,
+      "O2_source_side_potential_kg_cumulative": 17.272728347591602,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "Na": 4.8070449624759716e-11,
-        "K": 1.833456256410995e-05
+        "Ca": 80.92284622503331,
+        "K": 1.2532390335174353e-10
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 3.042312306736313e-11,
-        "O2": 17.272728929275676
+        "K": 6.982940117077099e-11,
+        "O2": 17.272728347591602
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 1.094981362199252e-10
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.04294738569646159,
-      "regime": "transitional",
+      "Kn": 5530.6192960374965,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 17,
       "campaign": "C0",
       "T_C": 825.0,
-      "P_total_bar": 329.41646081324154,
-      "pO2_bar": 241.6896007586671,
+      "P_total_bar": 329.40184227840894,
+      "pO2_bar": 241.68374434293534,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 17.70044661085035,
-      "O2_source_side_potential_kg_cumulative": 17.70044661085035,
+      "O2_yield_kg_cumulative": 17.700431319750297,
+      "O2_source_side_potential_kg_cumulative": 17.700431319750297,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "Na": 0.0006252431849713448,
-        "K": 1.8334562564109948e-05
+        "Ca": 80.92284622503331,
+        "Na": 6.4163718656083035e-12,
+        "K": 8.712052459573614e-10
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 0.0003957077687414786,
-        "O2": 17.70044661085035
+        "K": 4.907793225570411e-10,
+        "Na": 4.0608330572556724e-12,
+        "O2": 17.700431319750297
       },
       "vapor_species_kg_hr": {
-        "Na": 0.0006252431369008953
+        "K": 7.45881342605618e-10,
+        "Na": 6.4163718656083035e-12
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0005261424105134331,
-      "regime": "viscous",
+      "Kn": 739.2614856802119,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 18,
       "campaign": "C0",
       "T_C": 875.0,
-      "P_total_bar": 275.76635554726874,
-      "pO2_bar": 188.26003271259435,
+      "P_total_bar": 275.7520670722008,
+      "pO2_bar": 188.25443378550966,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 18.004991726705697,
-      "O2_source_side_potential_kg_cumulative": 18.004991726705697,
+      "O2_yield_kg_cumulative": 18.004963553648174,
+      "O2_source_side_potential_kg_cumulative": 18.004963553648174,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.9228462250333,
-        "Na": 0.0006252431849713448,
-        "K": 1.833456256410995e-05
+        "Ca": 80.92284622503331,
+        "Na": 5.514028264695808e-11,
+        "K": 5.468128785731187e-09
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 0.0003957077687414786,
-        "O2": 18.004991726705697
+        "K": 3.085125758313982e-09,
+        "Na": 3.489752265752764e-11,
+        "O2": 18.004963553648174
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 4.596923539773826e-09,
+        "Na": 4.8723910781349775e-11
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0005261424105134331,
-      "regime": "viscous",
+      "Kn": 110.83490109343906,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 19,
       "campaign": "C0",
       "T_C": 925.0,
-      "P_total_bar": 227.3441184713673,
-      "pO2_bar": 140.03742055130027,
-      "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 18.212015963438848,
-      "O2_source_side_potential_kg_cumulative": 18.212015963438848,
+      "P_total_bar": 227.33014369459184,
+      "pO2_bar": 140.03205429483955,
+      "mass_balance_pct": 2.2737367544323207e-14,
+      "O2_yield_kg_cumulative": 18.21197656737425,
+      "O2_source_side_potential_kg_cumulative": 18.21197656737425,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
         "Ca": 80.9228462250333,
-        "Na": 0.0006252431849713448,
-        "K": 1.833456256410995e-05
+        "Na": 3.807687953340746e-10,
+        "K": 3.128624090739528e-08
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 0.0003957077687414786,
-        "O2": 18.212015963438848
+        "K": 1.7655985286708018e-08,
+        "Na": 2.4098330702306304e-10,
+        "O2": 18.21197656737425
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 2.5818112121664086e-08,
+        "Na": 3.2562851268711656e-10
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0005261424105134331,
-      "regime": "viscous",
+      "Kn": 18.293206776894085,
+      "regime": "free_molecular",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
       "hour": 20,
       "campaign": "C0B",
       "T_C": 950.0,
-      "P_total_bar": 179.47230039976594,
-      "pO2_bar": 94.12238905799087,
+      "P_total_bar": 179.45899019049259,
+      "pO2_bar": 94.11741854516832,
       "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 18.343380560381664,
-      "O2_source_side_potential_kg_cumulative": 18.343380560381664,
+      "O2_yield_kg_cumulative": 18.3433314996998,
+      "O2_source_side_potential_kg_cumulative": 18.3433314996998,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
         "Ca": 80.9228462250333,
-        "Na": 0.0006252431849713448,
-        "K": 1.833456256410995e-05
+        "Na": 1.3216071388466567e-09,
+        "K": 1.0043857281419523e-07
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 0.0003957077687414786,
-        "O2": 18.343380560381664
+        "K": 5.668319647576215e-08,
+        "Na": 8.364268889868637e-10,
+        "O2": 18.3433314996998
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 6.915233190679994e-08,
+        "Na": 9.408383435125824e-10
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0005261424105134331,
-      "regime": "viscous",
+      "Kn": 6.583299937285502,
+      "regime": "transitional",
       "transport_formula_id": "not_applicable_until_p0"
     },
     {
@@ -882,25 +872,28 @@
       "T_C": 980.0,
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
-      "mass_balance_pct": 3.410605131648481e-14,
-      "O2_yield_kg_cumulative": 20.14367316620705,
-      "O2_source_side_potential_kg_cumulative": 20.14367316620705,
+      "mass_balance_pct": 2.2737367544323207e-14,
+      "O2_yield_kg_cumulative": 20.143477756909537,
+      "O2_source_side_potential_kg_cumulative": 20.143477756909537,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Ca": 80.92284622503331,
-        "Na": 0.0006252431849713448,
-        "K": 1.833456256410995e-05
+        "Ca": 80.9228462250333,
+        "Na": 4.551369834039092e-09,
+        "K": 3.189714946219223e-07
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 1.0347399274625653e-05,
-        "Na": 0.0003957077687414786,
-        "O2": 20.14367316620705
+        "K": 1.8001570394124887e-07,
+        "Na": 2.8804990522646384e-09,
+        "O2": 20.143477756909537
       },
-      "vapor_species_kg_hr": {},
+      "vapor_species_kg_hr": {
+        "K": 2.1853292180772712e-07,
+        "Na": 3.2297626951924344e-09
+      },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0005261424105134331,
+      "Kn": 0.0003536960520488031,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0"
     },
@@ -910,26 +903,24 @@
       "T_C": 1010.0,
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
-      "mass_balance_pct": 6.821210263296962e-14,
-      "O2_yield_kg_cumulative": 21.015287734342934,
-      "O2_source_side_potential_kg_cumulative": 21.015287734342934,
+      "mass_balance_pct": 3.410605131648481e-14,
+      "O2_yield_kg_cumulative": 20.160343346857953,
+      "O2_source_side_potential_kg_cumulative": 20.160343346857953,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Fe": 1.7490479103142608e-12,
-        "Ca": 80.92284622503331,
-        "Na": 2.00312173500019,
-        "K": 0.854504685727191
+        "Ca": 80.9228462250333,
+        "Na": 0.0013621115238473622,
+        "K": 0.08011594632288038
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 0.48225322143584687,
-        "Na": 1.2677480559997023,
-        "O2": 21.015287734342934
+        "K": 0.0452147002201721,
+        "Na": 0.0008620615543428876,
+        "O2": 20.160343346857953
       },
       "vapor_species_kg_hr": {
-        "Fe": 1.7490479103142608e-12,
-        "K": 0.8544863511646269,
-        "Na": 2.0024964918152186
+        "K": 0.08011562735138578,
+        "Na": 0.0013621069724775283
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
@@ -940,28 +931,27 @@
     {
       "hour": 23,
       "campaign": "C0B",
-      "T_C": 1010.0,
+      "T_C": 1040.0,
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
-      "mass_balance_pct": 1.3642420526593923e-13,
-      "O2_yield_kg_cumulative": 21.32191765725711,
-      "O2_source_side_potential_kg_cumulative": 21.32191765725711,
+      "mass_balance_pct": 3.410605131648481e-14,
+      "O2_yield_kg_cumulative": 20.191831066662633,
+      "O2_source_side_potential_kg_cumulative": 20.191831066662633,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Fe": 3.5137875892183497e-12,
-        "Ca": 80.92284622503331,
-        "Na": 2.88434570926621,
-        "K": 0.854504685727191
+        "Ca": 80.9228462250333,
+        "Na": 0.004365747410741628,
+        "K": 0.22890687321299968
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 0.48225322143584687,
-        "Na": 1.8254625277444625,
-        "O2": 21.32191765725711
+        "K": 0.12918721085917764,
+        "Na": 0.0027630211865046273,
+        "O2": 20.191831066662633
       },
       "vapor_species_kg_hr": {
-        "Fe": 1.7647396789040894e-12,
-        "Na": 0.8812239742660198
+        "K": 0.1487909268901193,
+        "Na": 0.003003635886894266
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
@@ -972,30 +962,27 @@
     {
       "hour": 24,
       "campaign": "C0B",
-      "T_C": 1040.0,
+      "T_C": 1070.0,
       "P_total_bar": 0.009000000000000001,
       "pO2_bar": 0.009000000000000001,
-      "mass_balance_pct": 1.7053025658242404e-13,
-      "O2_yield_kg_cumulative": 21.381121627118794,
-      "O2_source_side_potential_kg_cumulative": 21.381121627118794,
+      "mass_balance_pct": 3.410605131648481e-14,
+      "O2_yield_kg_cumulative": 20.242398907554957,
+      "O2_source_side_potential_kg_cumulative": 20.242398907554957,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
-        "Fe": 1.021758482243701e-11,
-        "Ca": 80.92284622503331,
-        "Mn": 1.528168417240448e-12,
-        "Na": 3.05449204435416,
-        "K": 0.854504685727191
+        "Ca": 80.9228462250333,
+        "Na": 0.010736576718279212,
+        "K": 0.46522713871032634
       },
       "condensation_train_kg": {
         "Ca": 71.94943931310218,
-        "K": 0.48225322143584687,
-        "Na": 1.9331457912098267,
-        "O2": 21.381121627118794
+        "K": 0.2625582867940818,
+        "Na": 0.006795030988313271,
+        "O2": 20.242398907554957
       },
       "vapor_species_kg_hr": {
-        "Fe": 6.703797233218662e-12,
-        "Mn": 1.5281684172404481e-12,
-        "Na": 0.17014633508795027
+        "K": 0.23632026549732663,
+        "Na": 0.0063708293075375845
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},

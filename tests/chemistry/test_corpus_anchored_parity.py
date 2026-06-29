@@ -1373,6 +1373,10 @@ def _cj_flux_alpha_ratio(
                 "melt_surface_area_m2": 1e-6,
                 "stir_factor": 1.0,
                 "alpha": alpha,
+                "evaporation_series_resistance": {
+                    "gas_resistance_enabled": False,
+                    "melt_resistance_enabled": False,
+                },
             },
         )
         flux = dict(

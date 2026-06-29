@@ -91,19 +91,21 @@ def _load_evaporation_alpha_envelope_by_species(
 class EvaporationMixin:
     def _calculate_evaporation(self, equilibrium) -> EvaporationFlux:
         """
-        Calculate evaporation flux using the Hertz-Knudsen-Langmuir equation.
+        Calculate evaporation flux using a series-resistance source.
 
         For each volatile species, the mass flux from the melt surface is:
 
-            J_i = α_i × stir_factor × A_surface × (P_sat_i - P_ambient_i)
-                  × √(M_i / (2π × R × T))                          [HK-1]
+            J_i = (P_sat_i - P_bulk_i) /
+                  (1/(alpha_i*k_HK_i) + R_gas_i(Kn) + R_melt_i(stir))
 
         where:
-            α_i         = evaporation coefficient (~0.1-1.0 for metals)
-            stir_factor = 4-8× acceleration from induction stirring
+            alpha_i     = intrinsic Hertz-Knudsen evaporation coefficient
+            k_HK_i      = sqrt(M_i / (2*pi*R*T))
+            R_gas_i     = gas-side Fuchs-Sutugin/Sherwood resistance
+            R_melt_i    = melt-side surface-renewal resistance
             A_surface   = melt surface area (m²)
             P_sat_i     = saturation vapor pressure from equilibrium (Pa)
-            P_ambient_i = partial pressure above the melt (Pa)
+            P_bulk_i    = partial pressure above the melt (Pa)
             M_i         = molar mass (kg/mol)
             R           = gas constant (J/mol·K)
             T           = temperature (K)
@@ -167,6 +169,18 @@ class EvaporationMixin:
         kernel_config = dict(
             getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
         )
+        series_resistance_config = dict(
+            kernel_config.get('evaporation_series_resistance', {}) or {}
+        )
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = (
+            carrier_resolver()
+            if callable(carrier_resolver)
+            else 'N2'
+        )
+        gas_temperature_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
+        )
         kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
             control_inputs={
@@ -176,32 +190,19 @@ class EvaporationMixin:
                 'stoich_by_species': stoich_by_species,
                 'available_oxide_kg': available_oxide_kg,
                 'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
-                # 0.5.2 Phase B (codex /code-review max-effort, E2):
-                # Route through ``clamp_stir_factor`` for symmetry with
-                # ``simulator/core.py::_configure_condensation_operating_
-                # conditions``. Both consumers now see the same
-                # operator-bounded value, including the fail-closed 0.0
-                # for non-finite / bool / corrupt-state inputs.
-                #
-                # 0.5.3 Phase B (2-axis stirring): Evaporation H-K-L is
-                # driven by the AXIAL axis only (vertical EM stirring
-                # renews the melt surface). The radial axis lives on
-                # ``self.melt.stir_state.radial`` and drives the gas-
-                # side Sherwood enhancement in ``simulator/
-                # condensation.py`` via a separate keyword in
-                # ``CondensationModel.configure_operating_conditions``.
-                # We pass a scalar here (just the clamped axial value)
-                # rather than the full dict so the provider's existing
-                # scalar-stir_factor signature stays the canonical
-                # contract — the kernel provider also accepts a
-                # ``{'axial': ...}`` mapping for forward-compat with
-                # future callers that want to push both axes through
-                # the same control_inputs slot. ``melt.stir_factor`` is
-                # the backward-compat property that aliases
-                # ``stir_state.axial`` (see ``simulator/state.py``).
-                'stir_factor': clamp_stir_factor(
-                    self.melt.stir_state.axial,
+                'stir_factor': {
+                    'axial': clamp_stir_factor(self.melt.stir_state.axial),
+                    'radial': clamp_stir_factor(self.melt.stir_state.radial),
+                },
+                'pipe_diameter_m': float(
+                    getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
                 ),
+                'overhead_pressure_pa': float(
+                    getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
+                ) * 100.0,
+                'gas_temperature_K': gas_temperature_K,
+                'carrier_gas': carrier_gas,
+                'evaporation_series_resistance': series_resistance_config,
                 'alpha': _load_evaporation_alpha_by_species(
                     self.vapor_pressures
                 ),

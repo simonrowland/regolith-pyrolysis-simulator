@@ -24,7 +24,7 @@ EXPECTED_ALPHA_BY_SPECIES = {
     "Fe": 0.02,
     "Mg": 0.20,
     "Na": 1.0,
-    "K": 1.0,
+    "K": 0.13,
     "Ca": 0.90,
     "Al": 0.30,
     "Si": 1.0,
@@ -145,6 +145,10 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": alpha_by_species,
+            "evaporation_series_resistance": {
+                "gas_resistance_enabled": False,
+                "melt_resistance_enabled": False,
+            },
         },
     )
 

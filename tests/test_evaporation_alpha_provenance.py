@@ -36,18 +36,20 @@ EXPECTED_ALPHA = {
         "value": 1.0,
         "envelope": (0.9, 1.0),
         "source": (
+            "OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: "
             "REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal "
-            "evaporation from ferrobasalt FCMAS melt"
+            "open-furnace evaporation from ferrobasalt FCMAS melt; retained "
+            "pending owner ratification against competing Fedkin intrinsic 0.13"
         ),
         "tier": 2,
     },
     ("metals", "K"): {
-        "value": 1.0,
-        "envelope": (0.9, 1.0),
+        "value": 0.13,
+        "envelope": (0.10, 0.16),
         "source": (
-            "REF-013 REF-019 ASSUMPTION (source_class=Na_analogy): K alpha set to 1.0 by analogy "
-            "to Sossi et al. 2019 GCA 260:204 Na alkali near-ideal behavior; "
-            "Sossi & Fegley 2018 liquids commonly near unity"
+            "REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber "
+            "intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy "
+            "for series-resistance intrinsic-alpha model"
         ),
         "tier": 2,
     },
@@ -55,8 +57,8 @@ EXPECTED_ALPHA = {
         "value": 0.90,
         "envelope": (0.48, 1.20),
         "source": (
-            "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at "
-            "2005 C; Ca activity proxy"
+            "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA "
+            "140:365-380 CaTiO3 melt at 2005 C; Ca activity proxy"
         ),
         "tier": 2,
     },
@@ -64,8 +66,9 @@ EXPECTED_ALPHA = {
         "value": 0.30,
         "envelope": (0.03, 1.00),
         "source": (
-            "REF-018 Schaefer & Fegley 2004 Icarus 169:216-241 Table 10 plus "
-            "Shahar & Young 2007 CAI modeling; conflicting Al proxy coverage"
+            "OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer & Fegley "
+            "2004 Icarus 169:216-241 Table 10 plus Shahar & Young 2007 "
+            "CAI modeling; conflicting Al proxy coverage"
         ),
         "tier": 2,
     },
@@ -82,8 +85,8 @@ EXPECTED_ALPHA = {
         "value": 0.80,
         "envelope": (0.39, 1.00),
         "source": (
-            "Zhang et al. 2014 GCA 140:365-380 CaTiO3 melt at "
-            "2005 C; Ti activity proxy"
+            "OWNER-RATIFY proxy_not_intrinsic: Zhang et al. 2014 GCA "
+            "140:365-380 CaTiO3 melt at 2005 C; Ti activity proxy"
         ),
         "tier": 2,
     },
@@ -97,6 +100,15 @@ EXPECTED_ALPHA = {
         ),
         "tier": 2,
     },
+}
+
+EXPECTED_OWNER_RATIFY_ALPHA = {
+    ("metals", "Na"),
+    ("metals", "Ca"),
+    ("metals", "Al"),
+    ("metals", "Ti"),
+    ("foulant_vapor", "NaCl"),
+    ("foulant_vapor", "KCl"),
 }
 
 EXPECTED_MISSING_ALPHA_POLICY = {
@@ -132,6 +144,11 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
     for species, old_label in false_sf2004_labels.items():
         source = data["metals"][species]["evaporation_alpha"]["source"]
         assert old_label not in source
+
+    for section, species in EXPECTED_OWNER_RATIFY_ALPHA:
+        source = data[section][species]["evaporation_alpha"]["source"]
+        assert "OWNER-RATIFY" in source
+        assert "intrinsic" in source
 
 
 def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():

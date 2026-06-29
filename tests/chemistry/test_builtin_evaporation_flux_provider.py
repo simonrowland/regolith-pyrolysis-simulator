@@ -12,8 +12,8 @@ Covers:
   ``process.cleaned_melt`` only (defence in depth).
 * Shadow parity: across a multi-step simulation run on lunar + Mars +
   asteroid feedstocks, the kernel dispatch agrees with the standalone
-  legacy Hertz-Knudsen reference (computed inside the test) species by
-  species within 1e-9 kg/hr (relative + absolute floor).
+  series-resistance reference species by species within 1e-9 kg/hr
+  (relative + absolute floor).
 * Diagnostic only: ``transition`` is always ``None`` -- EVAPORATION_FLUX
   owns no ledger mutation (that belongs to EVAPORATION_TRANSITION, not
   yet migrated).
@@ -28,16 +28,19 @@ import math
 
 import pytest
 
-from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+from engines.builtin.evaporation_flux import (
+    BuiltinEvaporationFluxProvider,
+    _series_resistance_evaporation_flux_kg_m2_s,
+)
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     IntentRequest,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.state import (
-    GAS_CONSTANT,
     MOLAR_MASS,
     CampaignPhase,
     DecisionType,
@@ -49,17 +52,20 @@ _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
 
 
-def _legacy_hertz_knudsen_flux(
+def _series_resistance_reference_flux(
     sim: PyrolysisSimulator,
     vapor_pressures_Pa: dict,
 ) -> dict:
-    """Recompute the legacy per-species flux dict directly.
+    """Re-invoke the series-resistance source outside ``_calculate_evaporation``.
 
-    Mirrors the pre-flip body of ``_calculate_evaporation`` line-for-line
-    so the parity check is anchored against the exact math the flip
-    moved. Anchored separately (NOT delegated to
-    ``_calculate_evaporation``) because that method now dispatches the
-    kernel -- comparing the kernel against itself would be tautological.
+    NOTE (2026-06-29 review): this calls the SAME production helper
+    ``_series_resistance_evaporation_flux_kg_m2_s`` (below), so the parity tests
+    that consume it validate CALLER WIRING -- that ``_calculate_evaporation``
+    feeds the helper the right per-species args and reproduces its result -- NOT
+    that the series-resistance MATH is independently correct. The math's
+    first-principles properties (free-molecular limit, alpha_eff<=alpha_i,
+    double-count guard, stir saturation, Fuchs-Sutugin transition) are pinned
+    independently in ``tests/chemistry/test_evaporation_series_resistance_flux.py``.
     """
 
     T_K = sim.melt.temperature_C + 273.15
@@ -85,17 +91,47 @@ def _legacy_hertz_knudsen_flux(
         ) / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
-        mass_flux_factor = math.sqrt(
-            M_kg_mol / (2 * math.pi * GAS_CONSTANT * T_K)
-        )
         alpha = alpha_by_species.get(species, 1.0)
-        J_kg_s_m2 = alpha * (P_sat_Pa - P_ambient_Pa) * mass_flux_factor
+        kernel_config = dict(sim.setpoints.get("chemistry_kernel", {}) or {})
+        series_config = dict(
+            kernel_config.get("evaporation_series_resistance", {}) or {}
+        )
+        carrier_resolver = getattr(sim, "_resolve_condensation_carrier_gas", None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
+        J_kg_s_m2 = _series_resistance_evaporation_flux_kg_m2_s(
+            species=species,
+            P_sat_pa=P_sat_Pa,
+            P_bulk_pa=P_ambient_Pa,
+            T_surface_K=T_K,
+            molar_mass_kg_mol=M_kg_mol,
+            alpha_i=alpha,
+            pipe_diameter_m=float(getattr(sim.overhead_model, "pipe_diameter_m", 0.12)),
+            overhead_pressure_pa=float(getattr(sim.overhead, "pressure_mbar", 0.0) or 0.0) * 100.0,
+            axial_stir_factor=sim.melt.stir_state.axial,
+            radial_stir_factor=sim.melt.stir_state.radial,
+            carrier_gas=carrier_gas,
+            T_gas_K=float(getattr(sim.overhead, "headspace_temperature_K", 0.0) or T_K),
+            melt_resistance_enabled=bool(
+                series_config.get("melt_resistance_enabled", True)
+            ),
+            melt_surface_renewal_base_kg_s_m2_pa=float(
+                series_config.get("melt_surface_renewal_base_kg_s_m2_pa", 1.0e-4)
+            ),
+            melt_surface_renewal_source=str(
+                series_config.get(
+                    "melt_surface_renewal_source",
+                    "owner-ratify:melt-side-surface-renewal-v1",
+                )
+            ),
+            gas_resistance_enabled=bool(
+                series_config.get("gas_resistance_enabled", True)
+            ),
+        ).flux_kg_s_m2
         if J_kg_s_m2 <= 0:
             continue
         rate_kg_hr = (
             J_kg_s_m2
             * sim.melt.melt_surface_area_m2
-            * sim.melt.stir_factor
             * 3600.0
         )
         if rate_kg_hr > 1e-12:
@@ -263,13 +299,25 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
             'melt_surface_area_m2': 1.0,
             'stir_factor': 1.0,
             'alpha': {'Si': 1.0},
+            'evaporation_series_resistance': {
+                'gas_resistance_enabled': False,
+                'melt_resistance_enabled': False,
+            },
         },
     )
 
     result = provider.dispatch(request)
 
     flux_kg_hr = result.diagnostic['evaporation_flux_kg_hr']['Si']
-    assert flux_kg_hr == pytest.approx(0.5497026611860572, rel=1e-12)
+    expected_kg_hr = (
+        0.27728678068938384
+        * math.sqrt(
+            0.02809
+            / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * (1500.0 + 273.15))
+        )
+        * 3600.0
+    )
+    assert flux_kg_hr == pytest.approx(expected_kg_hr, rel=1e-12)
 
 
 def test_provider_skips_species_without_grounded_molar_mass():
@@ -382,7 +430,7 @@ def test_provider_short_circuits_below_400_k():
 
 
 # ---------------------------------------------------------------------------
-# 5. Provider math matches the legacy Hertz-Knudsen loop on a known case
+# 5. Provider math matches the series-resistance reference on a known case
 # ---------------------------------------------------------------------------
 
 
@@ -390,7 +438,7 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Drive a simulator past the 400 K floor, then assert the kernel
-    dispatch reproduces the standalone legacy Hertz-Knudsen flux loop
+    dispatch reproduces the standalone series-resistance flux reference
     species-by-species within tolerance."""
 
     sim = _build_sim(
@@ -435,14 +483,14 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
     if not vapor_pressures_Pa:
         pytest.skip("simulator did not produce any vapor pressures to test")
 
-    legacy_flux = _legacy_hertz_knudsen_flux(sim, vapor_pressures_Pa)
+    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
 
-    assert legacy_flux, (
-        "legacy Hertz-Knudsen reference returned no flux -- the test "
+    assert reference_flux, (
+        "series-resistance reference returned no flux -- the test "
         "fixture is not exercising the path it claims to cover"
     )
-    for species, legacy_value in legacy_flux.items():
+    for species, legacy_value in reference_flux.items():
         kernel_value = kernel_flux.get(species, 0.0)
         tol = max(
             _FLUX_TOLERANCE_ABS_KG_HR,
@@ -453,9 +501,9 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
             f"kg/hr kernel={kernel_value:.6g} kg/hr (tol={tol:.3g})"
         )
 
-    assert set(kernel_flux) <= set(legacy_flux), (
-        f"kernel emitted species the legacy loop did not: "
-        f"{set(kernel_flux) - set(legacy_flux)}"
+    assert set(kernel_flux) <= set(reference_flux), (
+        f"kernel emitted species the reference did not: "
+        f"{set(kernel_flux) - set(reference_flux)}"
     )
 
 
@@ -480,8 +528,8 @@ def test_shadow_parity_across_short_simulation_run(
     setpoints_data,
 ):
     """Drive the simulator through C0 -> C2A handoff and assert the
-    kernel dispatch and the standalone legacy Hertz-Knudsen reference
-    agree at every evaporation tick.
+    kernel dispatch and the standalone series-resistance reference agree
+    at every evaporation tick.
 
     This is the parity gate that justified flipping the EVAPORATION_FLUX
     intent. Stays in the suite as a regression guard against future
@@ -527,13 +575,13 @@ def test_shadow_parity_across_short_simulation_run(
         if not vapor_pressures_Pa:
             continue
 
-        legacy_flux = _legacy_hertz_knudsen_flux(sim, vapor_pressures_Pa)
+        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
 
-        for species in set(legacy_flux) | set(kernel_flux):
-            legacy_value = float(legacy_flux.get(species, 0.0))
+        for species in set(reference_flux) | set(kernel_flux):
+            legacy_value = float(reference_flux.get(species, 0.0))
             kernel_value = float(kernel_flux.get(species, 0.0))
             delta = abs(legacy_value - kernel_value)
             tol = max(
@@ -567,12 +615,8 @@ def test_shadow_parity_across_short_simulation_run(
 # of who built the request.
 
 
-def _w3_dispatch_with_stir(stir_control) -> float:
-    """Helper: dispatch the provider with a custom ``stir_factor`` control
-    and return the realised stir factor as observed in the H-K-L flux
-    multiplication. We infer the factor by comparing the realised Na flux
-    to the laminar baseline (stir=1.0) — H-K-L is strictly linear in
-    stir_factor when α/M/T/P_sat are held fixed."""
+def _w3_dispatch_with_stir(stir_control) -> dict:
+    """Dispatch with custom stir control and return series diagnostics."""
 
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
@@ -580,50 +624,39 @@ def _w3_dispatch_with_stir(stir_control) -> float:
         species_formula_registry={},
     )
 
-    def _flux_for(stir):
-        request = IntentRequest(
-            intent=ChemistryIntent.EVAPORATION_FLUX,
-            account_view=view,
-            temperature_C=1500.0,
-            pressure_bar=1e-6,
-            fO2_log=None,
-            control_inputs={
-                'vapor_pressures_Pa': {'Na': 100.0},
-                'overhead_partials_Pa': {},
-                'molar_mass_kg_mol': {'Na': 0.023},
-                'stoich_by_species': {
-                    'Na': {
-                        'parent_oxide': 'Na2O',
-                        'oxide_per_product_kg': 1.347,
-                        'O2_per_product_kg': 0.347,
-                    },
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            'vapor_pressures_Pa': {'Na': 100.0},
+            'overhead_partials_Pa': {},
+            'molar_mass_kg_mol': {'Na': 0.023},
+            'stoich_by_species': {
+                'Na': {
+                    'parent_oxide': 'Na2O',
+                    'oxide_per_product_kg': 1.347,
+                    'O2_per_product_kg': 0.347,
                 },
-                'available_oxide_kg': {'Na': 10.0},
-                'melt_surface_area_m2': 0.2,
-                'stir_factor': stir,
-                'alpha': 0.5,
             },
-        )
-        result = provider.dispatch(request)
-        return float(
-            result.diagnostic.get('evaporation_flux_kg_hr', {}).get('Na', 0.0)
-        )
-
-    baseline = _flux_for(1.0)
-    realised = _flux_for(stir_control)
-    if baseline <= 0.0:
-        return 0.0
-    return realised / baseline
+            'available_oxide_kg': {'Na': 10.0},
+            'melt_surface_area_m2': 0.2,
+            'stir_factor': stir_control,
+            'alpha': 0.5,
+        },
+    )
+    result = provider.dispatch(request)
+    return result.diagnostic['evaporation_series_resistance']['Na']
 
 
 def test_provider_clamps_dict_axial_nan_to_zero():
-    """``{"axial": NaN}`` is a degenerate operator-write (or a poisoned
-    upstream computation). W3: clamp_stir_factor maps NaN → 0.0, so
-    H-K-L flux is halted instead of propagating NaN downstream."""
+    """``{"axial": NaN}`` maps to no melt-side stir enhancement."""
 
-    realised_ratio = _w3_dispatch_with_stir({"axial": float("nan")})
-    # Realised stir = 0.0 → realised flux = 0 = ratio 0.0
-    assert realised_ratio == 0.0
+    diagnostic = _w3_dispatch_with_stir({"axial": float("nan")})
+    assert diagnostic["axial_stir_clamped"] is True
+    assert diagnostic["axial_stir_applied"] == 0.0
 
 
 def test_provider_clamps_dict_axial_negative_to_zero():
@@ -632,19 +665,21 @@ def test_provider_clamps_dict_axial_negative_to_zero():
     not silently pass through a negative multiplier — which would
     invert the flux sign and break mass balance."""
 
-    realised_ratio = _w3_dispatch_with_stir({"axial": -5.0})
-    assert realised_ratio == 0.0
+    diagnostic = _w3_dispatch_with_stir({"axial": -5.0})
+    assert diagnostic["axial_stir_clamped"] is True
+    assert diagnostic["axial_stir_applied"] == 0.0
 
 
 def test_provider_clamps_dict_axial_over_max_to_ceiling():
-    """``{"axial": 1000}`` exceeds the ``MAX_STIR_FACTOR=10.0``
-    operator-facing ceiling (melt-flying-out-of-the-pot physical bound).
-    Provider must clamp to MAX so the realised flux ratio is 10.0,
-    not 1000x the laminar baseline."""
+    """``{"axial": 1000}`` saturates at the operator ceiling."""
 
-    realised_ratio = _w3_dispatch_with_stir({"axial": 1000.0})
-    # H-K-L flux is linear in stir; ratio of (stir=10) to (stir=1) is 10.0.
-    assert realised_ratio == pytest.approx(10.0, rel=1e-9)
+    diagnostic = _w3_dispatch_with_stir({"axial": 1000.0})
+    max_diagnostic = _w3_dispatch_with_stir({"axial": 10.0})
+    assert diagnostic["axial_stir_clamped"] is True
+    assert diagnostic["axial_stir_applied"] == pytest.approx(10.0)
+    assert diagnostic["flux_kg_s_m2"] == pytest.approx(
+        max_diagnostic["flux_kg_s_m2"], rel=1e-12
+    )
 
 
 def test_provider_clamps_scalar_legacy_input_too():
@@ -653,12 +688,9 @@ def test_provider_clamps_scalar_legacy_input_too():
     ``float(...)`` with only a TypeError/ValueError fallback. Now
     NaN/inf/over-MAX all funnel through clamp_stir_factor."""
 
-    # NaN → 0.0
-    assert _w3_dispatch_with_stir(float("nan")) == 0.0
-    # Over MAX → MAX
-    assert _w3_dispatch_with_stir(500.0) == pytest.approx(10.0, rel=1e-9)
-    # Negative → 0.0
-    assert _w3_dispatch_with_stir(-3.0) == 0.0
+    assert _w3_dispatch_with_stir(float("nan"))["axial_stir_applied"] == 0.0
+    assert _w3_dispatch_with_stir(500.0)["axial_stir_applied"] == pytest.approx(10.0)
+    assert _w3_dispatch_with_stir(-3.0)["axial_stir_applied"] == 0.0
 
 
 def test_provider_clamps_bool_input_to_zero():
@@ -669,10 +701,8 @@ def test_provider_clamps_bool_input_to_zero():
     direct-provider path must too. Pin both values: True → 0.0
     (halt-evap), False → 0.0 (halt-evap), unambiguous audit trail."""
 
-    # Both bool values must hit halt-evap rather than silently
-    # coerce to the float values 1.0 / 0.0.
-    assert _w3_dispatch_with_stir(True) == 0.0
-    assert _w3_dispatch_with_stir(False) == 0.0
+    assert _w3_dispatch_with_stir(True)["axial_stir_applied"] == 0.0
+    assert _w3_dispatch_with_stir(False)["axial_stir_applied"] == 0.0
 
 
 def test_provider_canonical_path_is_idempotent_under_clamp():
@@ -680,10 +710,9 @@ def test_provider_canonical_path_is_idempotent_under_clamp():
     clamp untouched — the canonical sim path through
     ``simulator/evaporation.py::_pack_controls`` pre-clamps, so this
     second clamp is defense in depth, not a behaviour change. The
-    realised ratio for stir=6 must be exactly 6.0."""
+    applied axial value for stir=6 must stay exactly 6.0."""
 
-    assert _w3_dispatch_with_stir(6.0) == pytest.approx(6.0, rel=1e-9)
-    # Dict form, valid axial: same idempotency.
-    assert _w3_dispatch_with_stir({"axial": 4.0}) == pytest.approx(
-        4.0, rel=1e-9
-    )
+    assert _w3_dispatch_with_stir(6.0)["axial_stir_applied"] == pytest.approx(6.0)
+    assert _w3_dispatch_with_stir({"axial": 4.0})[
+        "axial_stir_applied"
+    ] == pytest.approx(4.0)
