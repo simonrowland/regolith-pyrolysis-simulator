@@ -134,6 +134,9 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     sim.melt.pO2_mbar = 1.0e-6
 
     intrinsic_fO2_log = sim._compute_intrinsic_melt_fO2(1873.15)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = intrinsic_fO2_log
+    sim.melt.fO2_log = intrinsic_fO2_log
+    sim.melt.melt_fO2_log = intrinsic_fO2_log
     equilibrium = sim._stub_equilibrium()
 
     assert -8.10 <= intrinsic_fO2_log <= -7.85

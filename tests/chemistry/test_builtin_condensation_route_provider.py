@@ -67,28 +67,31 @@ from tests.chemistry.conftest import _build_sim
 # data/literature/vacuum_pyrolysis_sticking.yaml. Fe drops 0.9 -> 0.02,
 # Cr remains 0.9, so Fe wall traces drop while Cr traces only move from
 # coupled routing noise.
+# 2026-06-28 SSO-R Phase 1 couples melt fO2 and headspace pO2 through a
+# ledger-visible O2 reservoir exchange. Fe activity shifts through Kress91,
+# moving wall traces without coefficient retuning.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 7.3207490926382e-12,
-            "Fe": 1.541752289024554e-09,
+            "Cr": 1.1508824537864851e-11,
+            "Fe": 2.358017153559063e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 7.3207490926382e-12,
+            "Cr": 1.1508824537864851e-11,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 1.798012211068989e-09,
+            "Fe": 2.9433629235637e-09,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Cr": 4.400474801850113e-12,
-            "Fe": 2.4860913662230566e-10,
+            "Cr": 1.2558979623510879e-11,
+            "Fe": 1.0730682632571887e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Cr": 4.400474801850113e-12,
+            "Cr": 1.2558979623510873e-11,
         },
     },
 }

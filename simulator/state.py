@@ -435,6 +435,25 @@ class ProcessInventory:
 
 
 @dataclass
+class OxygenReservoirState:
+    melt_intrinsic_fO2_log: float = -9.0
+    headspace_ledger_pO2_bar: float = 1e-9
+    headspace_transport_pO2_bar: float = 1e-9
+    headspace_control_floor_pO2_bar: float = 0.0
+    k_O_m_s: float = 0.0
+    k_O_source: str = ""
+    effective_melt_depth_m: float = 0.0
+    tau_hr: float = 0.0
+    melt_redox_capacity_mol_per_ln_fO2: float = 0.0
+    headspace_capacity_mol_per_ln_pO2: float = 0.0
+    exchange_o2_mol: float = 0.0
+    exchange_o2_kg: float = 0.0
+    exchange_direction: str = ""
+    exchange_clamped: bool = False
+    exchange_transition_name: str = ""
+
+
+@dataclass
 class MeltState:
     """
     The state of the molten regolith at a single moment.
@@ -457,6 +476,8 @@ class MeltState:
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
     # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded == intrinsic; INERT in R2.0 (no live consumer until R2.1).
     melt_fO2_log: float = -9.0
+    oxygen_reservoir: OxygenReservoirState = field(
+        default_factory=OxygenReservoirState)
     ambient_pressure_mbar: float = 0.0
     # Site pressure floor for bodies without hard vacuum, e.g. Mars ~6 mbar.
     ambient_atmosphere: str = ''
@@ -999,6 +1020,11 @@ class HourSnapshot:
     # Per-tick Kress-Carmichael 1991 fO2 -> Fe3+/Fe2+ split. Diagnostic
     # only: reports read-only fractions and source metadata without mutating
     # melt fO2, a_FeO, evaporation, or the atom ledger.
+
+    # --- Oxygen reservoir exchange diagnostic (SSO-R Phase 1) ---
+    oxygen_reservoir: Dict[str, Any] = field(default_factory=dict)
+    # Snapshot copy of MeltState.oxygen_reservoir after this tick's
+    # pre-equilibrium O2 exchange.
 
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
     knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)

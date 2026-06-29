@@ -36,8 +36,11 @@ def test_melt_fO2_log_exists_and_defaults_to_intrinsic_seed() -> None:
     melt = MeltState()
 
     assert hasattr(melt, "melt_fO2_log")
+    assert hasattr(melt, "oxygen_reservoir")
     assert melt.fO2_log == pytest.approx(-9.0)
     assert melt.melt_fO2_log == pytest.approx(-9.0)
+    assert melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert melt.oxygen_reservoir.headspace_transport_pO2_bar == pytest.approx(1e-9)
 
 
 def test_load_batch_seeds_melt_fO2_log_from_intrinsic_value() -> None:
@@ -46,6 +49,9 @@ def test_load_batch_seeds_melt_fO2_log_from_intrinsic_value() -> None:
 
     assert sim.melt.fO2_log == pytest.approx(intrinsic)
     assert sim.melt.melt_fO2_log == pytest.approx(intrinsic)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        intrinsic
+    )
 
 
 def test_start_campaign_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
@@ -57,6 +63,9 @@ def test_start_campaign_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
 
     assert sim.melt.fO2_log == pytest.approx(intrinsic)
     assert sim.melt.melt_fO2_log == pytest.approx(intrinsic)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        intrinsic
+    )
 
 
 def test_step_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
@@ -65,10 +74,13 @@ def test_step_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
     sim.melt.melt_fO2_log = 123.0
 
     sim.step()
-    intrinsic = sim._compute_intrinsic_melt_fO2()
 
-    assert sim.melt.fO2_log == pytest.approx(intrinsic)
-    assert sim.melt.melt_fO2_log == pytest.approx(intrinsic)
+    reservoir = sim.melt.oxygen_reservoir
+    assert sim.melt.fO2_log == pytest.approx(reservoir.melt_intrinsic_fO2_log)
+    assert sim.melt.melt_fO2_log == pytest.approx(
+        reservoir.melt_intrinsic_fO2_log
+    )
+    assert reservoir.headspace_transport_pO2_bar >= 1e-9
 
 
 def test_references_registry_carries_sso_r_r20_redox_citations() -> None:
@@ -94,6 +106,8 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
     sim.start_campaign(CampaignPhase.C0)
     sim.melt.temperature_C = 800.0
     sim.melt.p_total_mbar = 1.0e-3
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -6.25
+    sim.melt.fO2_log = -6.25
     sim.melt.melt_fO2_log = -6.25
     seen_control_inputs: list[dict[str, Any]] = []
     original_dispatch_only = sim._dispatch_only

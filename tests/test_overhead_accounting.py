@@ -1,3 +1,4 @@
+import math
 import types
 
 import pytest
@@ -671,50 +672,98 @@ def test_stub_equilibrium_ok_paths_are_vapor_only_without_liquid_fraction():
     assert hot.vapor_pressures_Pa
 
 
-def test_sio_suppression_uses_commanded_po2():
-    """The SiO √pO₂ suppression in _stub_equilibrium references the
-    commanded pO₂ from _commanded_pO2_bar. This is the *commanded*
-    setpoint, NOT the AtomLedger O₂ holdup: overhead.composition['O2'] is
-    itself max(gas O2, setpoint) written by overhead.py."""
+def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
+    """SSO-R Phase 1 couples, but does not force-equalize, melt/headspace O2.
+
+    The old pin asserted independent intrinsic and commanded oxygen signals.
+    That was the bug: Fe-redox and SiO transport could read unrelated values in
+    the same tick. The corrected physical invariant is non-equilibrium with a
+    conserved O2 exchange that reduces the oxygen-potential gap.
+    """
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
-
-    # C2B-style controlled-O₂ atmosphere. overhead.composition['O2'] here
-    # plays the role of the value overhead.py would have written:
-    # max(gas O2, setpoint). 1.5 mbar.
     sim.melt.campaign = CampaignPhase.C2B
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
-    sim.overhead.composition = {"O2": 1.5}
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
 
-    setpoint_bar = sim.melt.pO2_mbar / 1000.0
+    sim.vapor_pressures["metals"]["Fe"] = {
+        "parent_oxide": "FeO",
+        "molar_mass_g_mol": MOLAR_MASS["Fe"],
+        "antoine": {"A": 10.0, "B": 20000.0, "C": 0.0},
+        "valid_range_K": [1400.0, 2200.0],
+    }
+    feo_kg = 0.1
+    headspace_o2_mol = 0.1
+    sim.inventory.melt_oxide_kg["FeO"] = feo_kg
+    sim.melt.composition_kg["FeO"] = feo_kg
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"FeO": feo_kg / (MOLAR_MASS["FeO"] / 1000.0)},
+        source="test FeO redox capacity",
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": headspace_o2_mol},
+        source="test finite headspace O2 holdup",
+    )
 
-    # Spy on the commanded-pO₂ helper: the equilibrium path routes
-    # through it.
-    real_commanded = sim._commanded_pO2_bar
+    before_fO2 = sim._compute_intrinsic_melt_fO2()
+    before_headspace = sim._headspace_transport_pO2_bar_from_ledger(
+        sim._headspace_ledger_pO2_bar_from_o2_mol(headspace_o2_mol)
+    )
+    before_gap = abs(math.log10(before_headspace) - before_fO2)
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_transition_name == "oxygen_reservoir_exchange"
+    assert reservoir.exchange_clamped is False
+    assert reservoir.exchange_direction in {
+        "melt_to_headspace",
+        "headspace_to_melt",
+    }
+    transitions = [
+        t for t in sim.atom_ledger.transitions
+        if t.name == "oxygen_reservoir_exchange"
+    ]
+    assert transitions
+    transitions[-1].validate_conservation(sim.atom_ledger.registry)
+    touched = {
+        lot.account
+        for lot in transitions[-1].debits + transitions[-1].credits
+    }
+    assert touched == {"reservoir.fo2_buffer", "process.overhead_gas"}
+
+    after_gap = abs(
+        math.log10(reservoir.headspace_transport_pO2_bar)
+        - reservoir.melt_intrinsic_fO2_log
+    )
+    assert after_gap < before_gap
+    assert reservoir.headspace_transport_pO2_bar != pytest.approx(
+        10.0 ** reservoir.melt_intrinsic_fO2_log
+    )
+
+    real_transport = sim._headspace_transport_pO2_bar
     calls = []
 
-    def _spy_commanded():
-        value = real_commanded()
+    def _spy_transport():
+        value = real_transport()
         calls.append(value)
         return value
 
-    sim._commanded_pO2_bar = _spy_commanded
+    sim._headspace_transport_pO2_bar = _spy_transport
 
-    # --- Equilibrium path: pO₂ feeding the SiO √pO₂ suppression ---
     equilibrium = sim._stub_equilibrium()
-    assert calls, "_stub_equilibrium must consult _commanded_pO2_bar"
-    intrinsic_pO2_bar = 10.0 ** equilibrium.fO2_log
-    # fO2_log is now the melt-intrinsic Kress91 surface.  The SiO
-    # suppression still consumes the commanded gas pO2 via the helper spy.
-    assert intrinsic_pO2_bar != pytest.approx(calls[0])
-    # SiO vapor pressure was actually emitted (suppression path exercised).
+    assert calls, "_stub_equilibrium must consult _headspace_transport_pO2_bar"
+    assert calls[0] == pytest.approx(reservoir.headspace_transport_pO2_bar)
+    assert equilibrium.fO2_log == pytest.approx(
+        reservoir.melt_intrinsic_fO2_log
+    )
+    assert equilibrium.activity_coefficients["Fe"] > 0.0
     assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
 
-    # The commanded pO₂ under active O₂ control is the setpoint.
-    assert calls[0] == pytest.approx(setpoint_bar)
-
-    sim._commanded_pO2_bar = real_commanded
+    sim._headspace_transport_pO2_bar = real_transport
 
 
 def test_evaporation_flux_does_not_reapply_commanded_po2():

@@ -66,7 +66,9 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
         + split["ferrous_frac"]
         + split["native_fe_frac"]
     ) == pytest.approx(1.0, abs=1e-12)
-    assert split["fO2_log"] == pytest.approx(sim._compute_intrinsic_melt_fO2())
+    assert split["fO2_log"] == pytest.approx(
+        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    )
 
     default_summary = build_per_hour_summary(sim, snapshot)
     assert "fe_redox_split" not in default_summary
@@ -79,6 +81,18 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     assert diagnostic_summary["fe_redox_split"]["fe3_over_sigma_fe"] == pytest.approx(
         split["fe3_over_sigma_fe"],
     )
+
+
+def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
+    sim = _make_sim("lunar_mare_low_ti")
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -5.25
+    sim.melt.fO2_log = -11.0
+    sim.melt.melt_fO2_log = -11.0
+
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["fO2_log"] == pytest.approx(-5.25)
+    assert split["status"] == "ok"
 
 
 def _vaporock_chemistry_or_skip() -> Any:

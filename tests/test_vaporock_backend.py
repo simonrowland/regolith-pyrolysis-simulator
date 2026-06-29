@@ -683,6 +683,9 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     # Regime B: simulator default now uses intrinsic melt fO2. Gas pO2 is
     # consumed by EVAPORATION_FLUX, not by VAPOR_PRESSURE.
     # ------------------------------------------------------------------
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_iw
+    sim.melt.fO2_log = fO2_log_iw
+    sim.melt.melt_fO2_log = fO2_log_iw
     builtin = sim._stub_equilibrium()
     assert builtin.fO2_log == pytest.approx(fO2_log_iw, abs=0.05)
 

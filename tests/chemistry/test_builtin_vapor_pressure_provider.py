@@ -756,7 +756,7 @@ def test_provider_matches_legacy_stub_for_known_lunar_composition(
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
-            "pO2_bar": sim._commanded_pO2_bar(),
+            "pO2_bar": sim._headspace_transport_pO2_bar(),
             "intrinsic_fO2_log": sim.melt.melt_fO2_log,
         },
     )
@@ -852,7 +852,7 @@ def test_shadow_parity_across_short_simulation_run(
             temperature_C=T_C,
             pressure_bar=sim.melt.p_total_mbar / 1000.0,
             control_inputs={
-                "pO2_bar": sim._commanded_pO2_bar(),
+                "pO2_bar": sim._headspace_transport_pO2_bar(),
                 "intrinsic_fO2_log": sim.melt.melt_fO2_log,
             },
         )
@@ -930,7 +930,7 @@ def test_get_equilibrium_returns_kernel_vapor_pressures(
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
         control_inputs={
-            "pO2_bar": sim._commanded_pO2_bar(),
+            "pO2_bar": sim._headspace_transport_pO2_bar(),
             "intrinsic_fO2_log": sim.melt.melt_fO2_log,
         },
     )

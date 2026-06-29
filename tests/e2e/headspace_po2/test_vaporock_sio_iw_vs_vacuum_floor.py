@@ -36,7 +36,7 @@ from .helpers import run_campaign_headspace
 SIO_ANCHOR_CAMPAIGN = CampaignPhase.C2A
 SIO_ANCHOR_START_TEMPERATURE_C = 1550.0
 SIO_ANCHOR_HOUR = 6
-EXPECTED_SIO_DECADE_DRIFT = 0.5008287132915346
+EXPECTED_SIO_DECADE_DRIFT = 0.49088696478866867
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

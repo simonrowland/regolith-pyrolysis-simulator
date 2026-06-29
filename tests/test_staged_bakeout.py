@@ -174,10 +174,14 @@ def test_c2a_staged_is_deterministic_and_beats_c2a_continuous():
     # Stage 3 silica capture while the continuous warmup path captures none.
     # D4 grounds SiO alpha_s at 0.04 instead of legacy 0.7, so the absolute
     # silica capture threshold drops while staged remains nonzero and richer
-    # than continuous.
+    # than continuous. SSO-R Phase 1 (coupled melt<->headspace O2 exchange)
+    # lowers it further: the melt sheds O2 to the headspace, raising transport
+    # pO2 and suppressing SiO release via p(SiO) ~ 1/sqrt(pO2) (staged_silica
+    # ~0.078 -> ~0.048), so this floor moves 0.05 -> 0.04 (still above the
+    # grounded k_O-clamp envelope; verified not test-forcing in 2026-06-28 review).
     staged_fe_mg = sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg"))
     staged_stage3_total = staged_silica + staged_fe_mg
-    assert staged_silica > 0.05
+    assert staged_silica > 0.04
     assert staged_stage3_total > staged_silica
     assert staged_silica / staged_stage3_total > 0.20
 

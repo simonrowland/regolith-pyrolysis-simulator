@@ -90,6 +90,19 @@ class EquilibriumMixin:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
         return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
 
+    def _headspace_transport_pO2_bar(self) -> float:
+        """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
+
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        if reservoir is not None:
+            pO2_bar = float(
+                getattr(reservoir, 'headspace_transport_pO2_bar', 0.0)
+                or 0.0
+            )
+            if pO2_bar > 0.0:
+                return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
+        return self._commanded_pO2_bar()
+
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
     #
     # Standard-state formation enthalpy (ΔH_f) and entropy (ΔS_f)
@@ -240,26 +253,16 @@ class EquilibriumMixin:
                 pseudo_warning_seen,
             )
 
-        # --- Determine the oxygen partial pressure (bar) ---
-        #
-        # pO2_bar is the COMMANDED pO₂ for the hour -- NOT the AtomLedger
-        # O₂ holdup.  overhead.composition['O2'] is itself max(gas O2,
-        # setpoint) written by overhead.py, so this is structurally the
-        # setpoint, floored again at the setpoint only under active O₂
-        # control, then at the numerical vacuum floor.  The same value
-        # feeds the SiO √pO₂ suppression below.
-        #
-        # NOT WIRED: the turbine-control feedback loop -- melt-released O₂
-        # accumulating in a finite headspace and self-suppressing SiO -- is
-        # NOT modelled.  Under HARD_VACUUM / PN2_SWEEP the commanded pO₂ is
-        # the numerical vacuum floor for the whole campaign, no matter how
-        # much O₂ the melt sheds (that O₂ goes to
-        # terminal.oxygen_melt_offgas_stored, and process.overhead_gas is
-        # drained every tick).  A finite-headspace pO₂ model is a separate
-        # goal: FINITE-HEADSPACE-PO2-MODEL.  See _commanded_pO2_bar and
-        # docs/model-limitations.md.
-        pO2_bar = self._commanded_pO2_bar()
-        intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
+        # SSO-R keeps intrinsic melt fO2 and headspace transport pO2 as
+        # coupled but distinct channels: Fe redox reads the melt reservoir;
+        # SiO suppression reads the headspace reservoir.
+        pO2_bar = self._headspace_transport_pO2_bar()
+        reservoir = getattr(self.melt, "oxygen_reservoir", None)
+        intrinsic_fO2_value = getattr(
+            reservoir, "melt_intrinsic_fO2_log", None
+        )
+        if intrinsic_fO2_value is None:
+            intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
         if intrinsic_fO2_value is None:
             intrinsic_fO2_value = self._compute_intrinsic_melt_fO2()
         intrinsic_fO2_log = float(intrinsic_fO2_value)
@@ -555,11 +558,7 @@ class EquilibriumMixin:
                 for species in vapor_pressures
             },
             activity_coefficients=activities,
-            fO2_log=getattr(
-                self,
-                '_compute_intrinsic_melt_fO2',
-                lambda: math.log10(max(pO2_bar, 1e-20)),
-            )(),
+            fO2_log=intrinsic_fO2_log,
             warnings=warnings,
             status='ok',
         )

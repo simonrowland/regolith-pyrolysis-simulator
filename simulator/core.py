@@ -111,6 +111,7 @@ from simulator.state import (
     METAL_SPECIES,
     MOLAR_MASS,
     MeltState,
+    OxygenReservoirState,
     OXIDE_SPECIES,
     OXIDE_TO_METAL,
     OverheadGas,
@@ -301,6 +302,8 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
+OXYGEN_RESERVOIR_FLOOR_BAR = 1e-9
+OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 TERMINAL_RUMP_ACCOUNTS = (
     'process.cleaned_melt',
     'terminal.slag',
@@ -771,8 +774,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or '')
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
-        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
-        self.melt.melt_fO2_log = self.melt.fO2_log
+        base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        self.melt.fO2_log = base_intrinsic_fO2_log
+        self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
         self.melt.hour = 0
         self.melt.campaign_hour = 0
@@ -789,6 +793,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
+        self._refresh_oxygen_reservoir_without_exchange(
+            melt_intrinsic_fO2_log=base_intrinsic_fO2_log,
+        )
 
         # Record
         self.record = BatchRecord(
@@ -916,6 +923,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _reagent_account_policies(self) -> tuple[AccountPolicy, ...]:
         return (
             AccountPolicy.reservoir(
+                FO2_BUFFER_ACCOUNT,
+                credit_limit_kg_by_species={OXYGEN_SPECIES: 1e15},
+            ),
+            AccountPolicy.reservoir(
                 'reservoir.reagent.C',
                 credit_limit_kg_by_species={'C': 1e15},
             ),
@@ -1023,6 +1034,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             False,
             'OVERHEAD_BLEED -- AUTHORITATIVE: pure-move routing from '
             'overhead_gas to terminal offgas / melt-offgas O2 bins.',
+        ),
+        (
+            'engines.builtin.oxygen_reservoir_exchange',
+            'BuiltinOxygenReservoirExchangeProvider',
+            (ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,),
+            False,
+            'OXYGEN_RESERVOIR_EXCHANGE -- AUTHORITATIVE: pure O2 move '
+            'between reservoir.fo2_buffer and process.overhead_gas.',
         ),
         (
             'engines.builtin.backend_equilibrium',
@@ -1774,6 +1793,287 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium = diagnostic
         return diagnostic
 
+    def _oxygen_exchange_config(self) -> Dict[str, Any]:
+        sso_r = self.setpoints.get('sso_r', {}) or {}
+        oxygen_exchange = {}
+        if isinstance(sso_r, Mapping):
+            oxygen_exchange = dict(sso_r.get('oxygen_exchange', {}) or {})
+        return oxygen_exchange
+
+    def _oxygen_exchange_k_m_s(self, T_K: float) -> tuple[float, str]:
+        config = self._oxygen_exchange_config()
+        k_ref = float(config.get('k_O_ref_m_s', 2.0e-5))
+        k_min = float(config.get('k_O_min_m_s', 5.0e-6))
+        k_max = float(config.get('k_O_max_m_s', 5.0e-5))
+        T_ref = float(config.get('T_ref_K', 1773.15))
+        Ea = float(config.get('Ea_J_mol', 150000.0))
+        if min(k_ref, k_min, k_max, T_ref) <= 0.0 or k_min > k_max:
+            raise ValueError(
+                'invalid sso_r.oxygen_exchange k_O config: '
+                f'k_ref={k_ref:g} k_min={k_min:g} '
+                f'k_max={k_max:g} T_ref={T_ref:g}'
+            )
+        if bool(config.get('temperature_dependence_enabled', True)):
+            raw = k_ref * math.exp((-Ea / GAS_CONSTANT) * (1.0 / T_K - 1.0 / T_ref))
+            source = (
+                'findings:baseline_2e-5_arrhenius_Ea_150kJ_'
+                'clamped_5e-6_5e-5'
+            )
+        else:
+            raw = k_ref
+            source = 'findings:baseline_2e-5_clamped_temperature_dependence_disabled'
+        return min(k_max, max(k_min, raw)), source
+
+    def _oxygen_exchange_effective_melt_depth_m(self) -> float:
+        config = self._oxygen_exchange_config()
+        depth = float(config.get('effective_melt_depth_m', 0.2))
+        if not math.isfinite(depth) or depth <= 0.0:
+            raise ValueError(
+                'sso_r.oxygen_exchange.effective_melt_depth_m must be > 0; '
+                f'got {depth!r}'
+            )
+        return depth
+
+    def _headspace_control_floor_pO2_bar(self) -> float:
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        if atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            return max(0.0, float(self.melt.pO2_mbar) / 1000.0)
+        return 0.0
+
+    def _headspace_ledger_pO2_bar_from_o2_mol(self, o2_mol: float) -> float:
+        volume_m3 = self._headspace_volume_m3()
+        T_head_K = self._headspace_temperature_K()
+        if volume_m3 <= 0.0 or T_head_K <= 0.0:
+            return 0.0
+        return max(0.0, float(o2_mol)) * GAS_CONSTANT * T_head_K / (
+            volume_m3 * 1.0e5
+        )
+
+    def _headspace_floor_o2_mol(self) -> float:
+        volume_m3 = self._headspace_volume_m3()
+        T_head_K = self._headspace_temperature_K()
+        if volume_m3 <= 0.0 or T_head_K <= 0.0:
+            return 0.0
+        return (
+            OXYGEN_RESERVOIR_FLOOR_BAR
+            * 1.0e5
+            * volume_m3
+            / (GAS_CONSTANT * T_head_K)
+        )
+
+    def _headspace_transport_pO2_bar_from_ledger(
+        self,
+        ledger_pO2_bar: float,
+    ) -> float:
+        return max(
+            float(ledger_pO2_bar),
+            self._headspace_control_floor_pO2_bar(),
+            OXYGEN_RESERVOIR_FLOOR_BAR,
+        )
+
+    def _cleaned_melt_fe_atom_mol(self) -> float:
+        total_fe_mol = 0.0
+        for species, mol in self.atom_ledger.mol_by_account(
+            'process.cleaned_melt'
+        ).items():
+            if float(mol) <= 0.0:
+                continue
+            formula = resolve_species_formula(species, self.species_formula_registry)
+            total_fe_mol += float(mol) * float(formula.elements.get('Fe', 0.0))
+        return max(0.0, total_fe_mol)
+
+    def _fe3_over_sigma_fe_at_fO2(
+        self,
+        comp: Mapping[str, float],
+        *,
+        fO2_log: float,
+        T_K: float,
+        pressure_bar: float,
+    ) -> float:
+        mol_fractions = melt_mol_fractions_for_kress91(comp)
+        if not mol_fractions:
+            return 0.0
+        return float(kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )['fe3'])
+
+    def _melt_redox_capacity_mol_per_ln_fO2(
+        self,
+        *,
+        fO2_log: float,
+        T_K: float,
+    ) -> float:
+        total_fe_mol = self._cleaned_melt_fe_atom_mol()
+        if total_fe_mol <= 0.0:
+            return 0.0
+        comp = self._melt_oxide_wt_pct()
+        pressure_bar = max(float(self.melt.p_total_mbar) / 1000.0, 1.0e-9)
+        eps_log10 = 0.001
+        eps_ln = math.log(10.0) * eps_log10
+        x_plus = self._fe3_over_sigma_fe_at_fO2(
+            comp,
+            fO2_log=fO2_log + eps_log10,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+        x_minus = self._fe3_over_sigma_fe_at_fO2(
+            comp,
+            fO2_log=fO2_log - eps_log10,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+        derivative = max(0.0, (x_plus - x_minus) / (2.0 * eps_ln))
+        return (total_fe_mol / 4.0) * derivative
+
+    def _sync_oxygen_reservoir_mirror(self) -> None:
+        fO2_log = float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+        self.melt.fO2_log = fO2_log
+        self.melt.melt_fO2_log = fO2_log
+
+    def _refresh_oxygen_reservoir_without_exchange(
+        self,
+        *,
+        melt_intrinsic_fO2_log: Optional[float] = None,
+        exchange_direction: str = 'none:initialized',
+    ) -> OxygenReservoirState:
+        fO2_log = (
+            float(melt_intrinsic_fO2_log)
+            if melt_intrinsic_fO2_log is not None
+            else float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+        )
+        head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+        reservoir = OxygenReservoirState(
+            melt_intrinsic_fO2_log=fO2_log,
+            headspace_ledger_pO2_bar=ledger_pO2,
+            headspace_transport_pO2_bar=(
+                self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
+            ),
+            headspace_control_floor_pO2_bar=self._headspace_control_floor_pO2_bar(),
+            exchange_direction=exchange_direction,
+        )
+        self.melt.oxygen_reservoir = reservoir
+        self._sync_oxygen_reservoir_mirror()
+        return reservoir
+
+    def _apply_oxygen_reservoir_exchange(self) -> OxygenReservoirState:
+        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+        base_fO2_log = self._compute_intrinsic_melt_fO2(T_K)
+        head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+        transport_pO2 = self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
+        control_floor = self._headspace_control_floor_pO2_bar()
+        k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
+        h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
+        tau_s = h_eff_m / k_O
+        alpha = 1.0 - math.exp(-3600.0 / tau_s)
+        C_m = self._melt_redox_capacity_mol_per_ln_fO2(
+            fO2_log=base_fO2_log,
+            T_K=T_K,
+        )
+        n_floor_mol = self._headspace_floor_o2_mol()
+        C_h = max(head_o2_mol, n_floor_mol)
+
+        reservoir = OxygenReservoirState(
+            melt_intrinsic_fO2_log=base_fO2_log,
+            headspace_ledger_pO2_bar=ledger_pO2,
+            headspace_transport_pO2_bar=transport_pO2,
+            headspace_control_floor_pO2_bar=control_floor,
+            k_O_m_s=k_O,
+            k_O_source=k_source,
+            effective_melt_depth_m=h_eff_m,
+            tau_hr=tau_s / 3600.0,
+            melt_redox_capacity_mol_per_ln_fO2=C_m,
+            headspace_capacity_mol_per_ln_pO2=C_h,
+        )
+
+        if C_m <= 0.0:
+            reservoir.exchange_direction = 'none:no_melt_redox_capacity'
+            self.melt.oxygen_reservoir = reservoir
+            self._sync_oxygen_reservoir_mirror()
+            return reservoir
+        if C_h <= 0.0:
+            reservoir.exchange_direction = 'none:no_headspace_capacity'
+            self.melt.oxygen_reservoir = reservoir
+            self._sync_oxygen_reservoir_mirror()
+            return reservoir
+
+        x_m = math.log(max(10.0 ** base_fO2_log, OXYGEN_RESERVOIR_FLOOR_BAR))
+        x_h = math.log(max(transport_pO2, OXYGEN_RESERVOIR_FLOOR_BAR))
+        dn_to_headspace = alpha * ((x_m - x_h) / (1.0 / C_m + 1.0 / C_h))
+        exchange_clamped = False
+        if dn_to_headspace < 0.0:
+            max_absorbable = max(0.0, head_o2_mol - n_floor_mol)
+            if abs(dn_to_headspace) > max_absorbable:
+                dn_to_headspace = -max_absorbable
+                exchange_clamped = True
+
+        if abs(dn_to_headspace) < OXYGEN_RESERVOIR_NOOP_MOL:
+            dn_to_headspace = 0.0
+            reservoir.exchange_direction = (
+                'none:headspace_o2_clamped'
+                if exchange_clamped
+                else 'none:below_threshold'
+            )
+        else:
+            result = self._dispatch_and_commit(
+                ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                control_inputs={
+                    'dn_to_headspace_mol': dn_to_headspace,
+                },
+            )
+            reservoir.exchange_transition_name = (
+                result.transition.reason
+                if result.transition is not None
+                else ''
+            )
+            reservoir.exchange_direction = (
+                'melt_to_headspace'
+                if dn_to_headspace > 0.0
+                else 'headspace_to_melt'
+            )
+
+        x_m_after = x_m - dn_to_headspace / C_m
+        reservoir.melt_intrinsic_fO2_log = x_m_after / math.log(10.0)
+        post_head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        post_ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(
+            post_head_o2_mol
+        )
+        reservoir.headspace_ledger_pO2_bar = post_ledger_pO2
+        reservoir.headspace_transport_pO2_bar = (
+            self._headspace_transport_pO2_bar_from_ledger(post_ledger_pO2)
+        )
+        reservoir.exchange_o2_mol = dn_to_headspace
+        reservoir.exchange_o2_kg = (
+            dn_to_headspace * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        reservoir.exchange_clamped = exchange_clamped
+        self.melt.oxygen_reservoir = reservoir
+        self._sync_oxygen_reservoir_mirror()
+        return reservoir
+
     def _dispatch_overhead_bleed(
         self,
         *,
@@ -1856,7 +2156,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else float(self.melt.temperature_C) + 273.15
         )
         comp = self._melt_oxide_wt_pct()
-        fO2_log = self._compute_intrinsic_melt_fO2(T_K)
+        fO2_log = float(
+            getattr(
+                self.melt.oxygen_reservoir,
+                'melt_intrinsic_fO2_log',
+                getattr(self.melt, 'melt_fO2_log', -9.0),
+            )
+        )
         pressure_bar = max(float(self.overhead.pressure_mbar) * 1.0e-3, 1.0e-9)
         log_iw = -27215.0 / T_K + 6.57 if T_K > 0.0 else -9.0
         base = {
@@ -2735,6 +3041,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     account).items()
                 if (mol := float(raw_mol)) > 0.0
             }
+            if account == 'process.overhead_gas':
+                species_mol.pop(OXYGEN_SPECIES, None)
             if species_mol:
                 composition[account] = species_mol
         return composition
@@ -2819,7 +3127,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._backend_composition_mol_by_account())
             self._validate_backend_account_scope_support(
                 backend_composition_by_account)
-            intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+            intrinsic_fO2_log = float(
+                self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
             temperature_C = float(self.melt.temperature_C)
             pressure_bar = float(self.melt.p_total_mbar) / 1000.0
             canonicalize_pt0_inputs = store is not None and getattr(
@@ -2864,7 +3173,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 }
             else:
                 backend_composition_mol = self._backend_composition_mol()
-            self.melt.fO2_log = intrinsic_fO2_log
+            # Phase 3 owns cache-key identity for this live reservoir control;
+            # Phase 1 only mirrors the material-exchange reservoir state.
+            self._sync_oxygen_reservoir_mirror()
             request_controls = {
                 'temperature_C': temperature_C,
                 'pressure_bar': pressure_bar,
@@ -3082,11 +3393,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
-        pO2_bar = self._commanded_pO2_bar()
+        transport_pO2 = getattr(self, '_headspace_transport_pO2_bar', None)
+        if callable(transport_pO2):
+            pO2_bar = transport_pO2()
+        else:
+            pO2_bar = self._commanded_pO2_bar()
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
             pO2_bar = store.quantized_pO2_bar(self)
-        intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        intrinsic_fO2_log = getattr(
+            reservoir,
+            'melt_intrinsic_fO2_log',
+            None,
+        )
+        if intrinsic_fO2_log is None:
+            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
         if intrinsic_fO2_log is None:
             intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
         intrinsic_fO2_log = float(intrinsic_fO2_log)
@@ -5113,8 +5435,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(campaign)
         self._configure_freeze_gate(campaign)
-        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
-        self.melt.melt_fO2_log = self.melt.fO2_log
+        self._refresh_oxygen_reservoir_without_exchange(
+            melt_intrinsic_fO2_log=self._compute_intrinsic_melt_fO2(),
+            exchange_direction='none:campaign_start',
+        )
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -5718,8 +6042,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 2. Temperature ramp ---
         self._update_temperature()
-        self.melt.fO2_log = self._compute_intrinsic_melt_fO2()
-        self.melt.melt_fO2_log = self.melt.fO2_log
+        self._apply_oxygen_reservoir_exchange()
 
         # --- 3. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,
@@ -6193,6 +6516,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # means all metals in sync. Diagnostic only — the global
             # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
             metal_projection_drift_kg=self._audit_metal_projection_drift(),
+            oxygen_reservoir=dict(vars(self.melt.oxygen_reservoir)),
             # 0.5.4.1 E3: Knudsen-regime warning sticker from the
             # latest condensation pass. Empty dict on ticks that
             # didn't trigger a condensation route.
