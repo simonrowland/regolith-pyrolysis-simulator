@@ -2411,7 +2411,11 @@ class AlphaMELTSBackend(MeltBackend):
             return {}
         T_K = float(T_C) + 273.15
         pressures: Dict[str, float] = {}
-        from engines.builtin.vapor_pressure import warn_pseudo_vapor_pressure_fallback
+        from engines.builtin.vapor_pressure import (
+            COEFF_BLOCK_ANTOINE,
+            vapor_pressure_antoine_coefficients,
+            warn_pseudo_vapor_pressure_fallback,
+        )
 
         for species, spec in table.items():
             raw_activity = self._activity_for_vapor_species(species, activities)
@@ -2419,7 +2423,10 @@ class AlphaMELTSBackend(MeltBackend):
                 continue
             if not self._is_number(raw_activity):
                 continue
-            coeffs = spec.get('antoine') or {}
+            coeffs, coefficient_block = vapor_pressure_antoine_coefficients(
+                spec,
+                temperature_K=T_K,
+            )
             if not all(key in coeffs for key in ('A', 'B', 'C')):
                 continue
             activity_i = float(raw_activity)
@@ -2429,12 +2436,13 @@ class AlphaMELTSBackend(MeltBackend):
             p_i = activity_i * p_reference_i
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
-                warn_pseudo_vapor_pressure_fallback(
-                    str(species),
-                    spec,
-                    self._pseudo_vapor_pressure_warning_seen,
-                    stacklevel=3,
-                )
+                if coefficient_block == COEFF_BLOCK_ANTOINE:
+                    warn_pseudo_vapor_pressure_fallback(
+                        str(species),
+                        spec,
+                        self._pseudo_vapor_pressure_warning_seen,
+                        stacklevel=3,
+                    )
         return pressures
 
     def _melt_has_antoine_vapor_precursor(

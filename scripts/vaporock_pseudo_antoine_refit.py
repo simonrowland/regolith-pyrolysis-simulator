@@ -49,11 +49,16 @@ DEFAULT_FEEDSTOCKS = (
     "mars_basalt",
     "mars_sulfate_rich",
 )
-DEFAULT_SPECIES = ("Na", "K", "Mg", "Fe", "SiO")
+# Mg is intentionally NOT a pseudo-Antoine refit target: as of 2026-06-29 Mg routes
+# through its grounded pure_component_antoine sidecar x MgO-Ellingham activity, and the
+# old VapoRock minimax Mg row (non-monotonic, out-of-range; SC-pseudofit-out-of-range)
+# was removed from data/vapor_pressures.yaml. Re-adding Mg here would index the deleted
+# metals.Mg.antoine row and re-introduce that defect, so it stays excluded (fail-loud via
+# the choices= constraint).
+DEFAULT_SPECIES = ("Na", "K", "Fe", "SiO")
 OLD_METADATA_RESIDUALS = {
     "Na": 0.121,
     "K": 1.469,
-    "Mg": 0.203,
     "Fe": 0.023,
     "SiO": 0.113,
 }

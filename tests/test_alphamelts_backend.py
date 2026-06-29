@@ -1296,8 +1296,9 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     table = _load_data('vapor_pressures.yaml')['metals']
     T_K = 1600.0 + 273.15
     expected_na = 2.0 * 10.0 ** (
-        table['Na']['antoine']['A']
-        - table['Na']['antoine']['B'] / (T_K + table['Na']['antoine']['C'])
+        table['Na']['pure_component_antoine']['A']
+        - table['Na']['pure_component_antoine']['B']
+        / (T_K + table['Na']['pure_component_antoine']['C'])
     )
 
     assert set(pressures) == {'Na', 'K'}

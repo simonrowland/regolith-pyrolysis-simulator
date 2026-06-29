@@ -339,6 +339,55 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
     )
 
 
+def test_mg_runtime_uses_monotonic_pure_sidecar_without_pseudo_fit() -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"]["Mg"]
+
+    assert row["fit_target"] == "pure_component_psat"
+    assert "antoine" not in row
+    assert "backsolve" not in row
+
+    temperatures_K = [1400.0, 1600.0, 1700.0, 1900.0, 2000.0, 2200.0]
+    pure_reference_pa = [
+        _pure_component_antoine_pa(row, temperature_K)
+        for temperature_K in temperatures_K
+    ]
+    recovered_reference_pa = [
+        _runtime_recovered_reference_pressure_pa(data, "Mg", temperature_K)
+        for temperature_K in temperatures_K
+    ]
+
+    assert all(
+        high > low
+        for low, high in zip(pure_reference_pa, pure_reference_pa[1:])
+    )
+    assert recovered_reference_pa == pytest.approx(pure_reference_pa, rel=1e-12)
+
+    provider = BuiltinVaporPressureProvider(data)
+    effective_pressures_pa = []
+    for temperature_K in temperatures_K:
+        result = provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": {"MgO": 1.0}},
+                    species_formula_registry={},
+                ),
+                temperature_C=temperature_K - 273.15,
+                pressure_bar=1e-6,
+                control_inputs={"pO2_bar": 1e-9},
+            )
+        )
+        assert result.status == "ok"
+        assert "pure_component" in result.diagnostic["vapor_pressures_source"]["Mg"]
+        effective_pressures_pa.append(result.diagnostic["vapor_pressures_Pa"]["Mg"])
+
+    assert all(
+        high > low
+        for low, high in zip(effective_pressures_pa, effective_pressures_pa[1:])
+    )
+
+
 @pytest.mark.parametrize(
     ("species", "phase", "temperature_K", "rel_tol"),
     [

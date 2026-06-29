@@ -153,24 +153,8 @@ metals:
     molar_mass_g_mol: 24.305
     electrons_per_atom: 2
     parent_oxide: "MgO"
-    fit_target: "pseudo_psat_backsolved_from_vaporock"
-    residual_dex: 0.282
-    confidence_tier: "moderate"
-    backsolve:
-      feedstock_grid: "dense seven-feedstock lunar/mars grid"
-      fO2_convention: "Kress91 IW"
-      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock Mg(g) partial pressure on the dense grid"
-      residual_dex: 0.282
-      old_metadata_residual_dex: 0.203
-      old_dense_residual_dex: 1.750
-      provenance:
-        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
-        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
-        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
-        n_samples: 217
-        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
-        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
+    fit_target: "pure_component_psat"
+    source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation"
       provenance_class: "source_tabulated_fit"
@@ -193,15 +177,9 @@ metals:
       T_band_K: [1873, 2373]
       envelope: [0.10, 0.21]
       tier: 2
-    antoine:
-      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
-      A: 4.280425
-      B: -941.753849
-      C: -1000.0
-    valid_range_K: [1400, 1900]
     boiling_point_C: 1091
     condensation_T_C_at_1mbar: 580
-    notes: "Builtin authoritative effective curve; max residual 0.282 dex vs current VapoRock on the dense Kress91 IW grid. Moderate confidence; VapoRock is diagnostic-only when available."
+    notes: "Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying outside its fit intent."
 
   Fe:
     formula: "Fe"

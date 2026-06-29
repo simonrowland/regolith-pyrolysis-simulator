@@ -296,10 +296,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
-    # 2026-06-29: moved when numerator-provenance diagnostics were added to
-    # engines/builtin/vapor_pressure.py (source fingerprint feeds the eval cache key
-    # via _build_eval_inputs). Physics goldens unchanged -- source-fingerprint update.
-    assert cache_key(spec) == "43b4904ff6fa8f5aceff05bf2e87004925111db4a09f6a0838acbbe95770e095"
+    # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed and
+    # AlphaMELTS activity-times-Antoine adopted the shared coefficient selector.
+    # This is a source-fingerprint invalidation, not a recipe/schema move.
+    assert cache_key(spec) == "d418bdd2b027da37218770e303f5a6398d3e8f487617b88c168f8172517dabe4"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
