@@ -146,6 +146,10 @@ P2s fixed inline, deferred P3s tracked in `docs-private/`.
 - **`simulator/session.py::SimSession.adjust("campaign_override", …, field="pO2_mbar")`** (W5, post-push P2). Mirror of the Phase C P2 direct-adjust fix on the campaign-override write path: when the operator commands a positive pO₂ via this path on the active campaign, also switch `melt.atmosphere` to `CONTROLLED_O2` so the 1/√pO₂ Ellingham SiO suppression goes live. `pO2_mbar = 0` leaves atmosphere alone (clearing the setpoint, NOT requesting controlled-O₂). Inactive-campaign overrides write to the dict only — no live melt touch.
 - **`simulator/campaigns.py::configure_campaign()`** (milestone-review P1, codex /challenge unique finding). Future-campaign `campaign_override pO2_mbar` was being applied at campaign-transition time without the atmosphere switch — the same class of bug as the active-path fix above, on a different code path. Same fix pattern applied: when the stored override pO2 is positive, switch atmosphere to `CONTROLLED_O2` after the bare pO2 write. This closes the last remaining `melt.pO2_mbar` writer that could leave atmosphere stale in a non-O2-controlled mode.
 
+### Changed — MRE current efficiency
+
+- **`simulator/electrolysis.py::current_efficiency()`** now uses bounded FeO/electronic-loss bands instead of the FeO-independent 0.75-asymptote curve. The replacement remains grounded-heuristic and uncertified; `data/corpus_version.yaml` was bumped so cached MRE rows resweep without a cache-key schema change.
+
 ### Added — `EquilibriumResult.liquidus_T_C` structured field (W6, M3 historical-audit closure)
 
 - **`simulator/melt_backend/base.py::EquilibriumResult.liquidus_T_C`** — new `Optional[float]` field. Populated by backends that compute a liquidus alongside the per-T equilibration; `LiquidusSolidusResult` (in `simulator/melt_backend/liquidus.py`) remains the canonical surface for the dedicated liquidus-finder workflow.

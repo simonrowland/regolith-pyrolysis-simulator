@@ -253,7 +253,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_FIXED_REDUCIBLE_OXIDES,
             MRE_NORTH_STAR_POSTURE,
             MRE_OPTIONAL_BANNER,
-            current_efficiency,
+            CURRENT_EFFICIENCY_MODEL_ID,
+            current_efficiency_diagnostic,
             uncertified_multi_oxide_partition_targets,
         )
         from simulator.state import (
@@ -319,6 +320,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 str(species), 0.0
             ) + mass_kg
             total_kg += mass_kg
+        feo_fraction = 0.0
+        if total_kg > 0.0:
+            feo_fraction = max(0.0, composition_kg.get("FeO", 0.0)) / total_kg
 
         # Result skeleton mirrors ElectrolysisModel.step_hour exactly so
         # the legacy caller's post-processing path can consume the
@@ -343,6 +347,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "current_partition_source": MRE_CURRENT_PARTITION_SOURCE,
             "current_partition_certified": False,
             "yield_certification": MRE_CURRENT_PARTITION_CERTIFICATION,
+            "current_efficiency_model": CURRENT_EFFICIENCY_MODEL_ID,
+            "current_efficiency_feo_fraction": feo_fraction,
+            "current_efficiency_by_oxide": {},
             "melt_fO2_log": melt_fO2_log,
             "fe_redox_policy": str(request.fe_redox_policy),
             "fe_redox_split": self._compute_fe_redox_split_diagnostic(
@@ -497,9 +504,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
-            # Current efficiency (CE-1). Same clamp [0.10, 0.95] as
-            # legacy. dV >= 0 by construction (reducible filter).
-            eta_CE = current_efficiency(dV)
+            # Current efficiency (CE-1). dV >= 0 by construction
+            # (reducible filter); FeO fraction is fixed per tick.
+            ce_diagnostic = current_efficiency_diagnostic(dV, feo_fraction)
+            eta_CE = float(ce_diagnostic["eta"])
+            diagnostic["current_efficiency_by_oxide"][oxide] = ce_diagnostic
 
             # Faraday's law (FARADAY-1). n electrons per formula unit.
             n_e = (

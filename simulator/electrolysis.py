@@ -21,11 +21,10 @@ Standard MRE Baseline (root branch alternative).
     Converts electrical current to mass of metal reduced.
 
     Current efficiency:                                      [CE-1]
-        η_CE = 0.30 + 0.45 × (1 - exp(-0.5 × (V - E_nernst)))
-    Empirical model loosely based on Schreiner (MIT) and
-    Sirk et al. observations.  Efficiency is lower at voltages
-    near the Nernst potential (back-reaction losses) and improves
-    with overvoltage.
+        bounded FeO/electronic-loss band with saturating dV response
+    Grounded heuristic: high-FeO melts stay in the 0.30-0.60 CE
+    loss band, low-FeO melts can reach >=0.85, and post-Fe/low
+    electronic-conduction operation approaches but does not exceed 0.995.
 
     Species selectivity:                                     [SEL-1]
         At overlapping voltage windows, current partitions
@@ -107,7 +106,7 @@ MRE_CERTIFICATION_DENYLIST_REASON = (
     "mre_current_partition_uncited_heuristic_denied_certification"
 )
 MRE_CURRENT_PARTITION_SOURCE = (
-    "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
+    "heuristic:activity_exp_overvoltage_SEL-1_plus_bounded_FeO_CE_v1_not_certified"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
@@ -138,9 +137,106 @@ ELECTRONS_PER_OXIDE = {
 }
 
 
-def current_efficiency(dV: float) -> float:
-    eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0, dV)))
-    return min(0.95, max(0.10, eta_CE))
+CE_PHYSICAL_FLOOR = 0.10
+CE_PHYSICAL_CEILING = 0.995
+FEO_POST_FE_FRACTION = 0.005
+FEO_LOW_FRACTION = 0.020
+FEO_HIGH_FRACTION = 0.100
+CE_POST_FE_FLOOR = 0.90
+CE_POST_FE_CEILING = 0.995
+CE_LOW_FEO_FLOOR = 0.85
+CE_LOW_FEO_CEILING = 0.96
+CE_HIGH_FEO_FLOOR = 0.30
+CE_HIGH_FEO_CEILING = 0.60
+DV_RESPONSE_PER_V = 1.20
+CURRENT_EFFICIENCY_MODEL_ID = "bounded_feo_electronic_loss_v1"
+
+
+def _finite_float(value, default: float) -> float:
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return default
+    return result if math.isfinite(result) else default
+
+
+def _clamp(x: float, lo: float, hi: float) -> float:
+    return min(hi, max(lo, x))
+
+
+def _smoothstep(edge0: float, edge1: float, x: float) -> float:
+    t = _clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def _lerp(a: float, b: float, t: float) -> float:
+    if t <= 0.0:
+        return a
+    if t >= 1.0:
+        return b
+    return a + (b - a) * t
+
+
+def _current_efficiency_terms(
+    dV: float,
+    feo_fraction: float,
+    *,
+    electronic_transference: float | None = None,
+) -> dict[str, float]:
+    feo = _clamp(_finite_float(feo_fraction, 0.0), 0.0, 1.0)
+    if electronic_transference is None:
+        loss = _smoothstep(FEO_LOW_FRACTION, FEO_HIGH_FRACTION, feo)
+    else:
+        loss = _clamp(_finite_float(electronic_transference, 0.0), 0.0, 1.0)
+
+    post_fe = 1.0 - _smoothstep(FEO_POST_FE_FRACTION, FEO_LOW_FRACTION, feo)
+    base_floor = _lerp(CE_LOW_FEO_FLOOR, CE_HIGH_FEO_FLOOR, loss)
+    base_ceiling = _lerp(CE_LOW_FEO_CEILING, CE_HIGH_FEO_CEILING, loss)
+    floor = base_floor + post_fe * (CE_POST_FE_FLOOR - CE_LOW_FEO_FLOOR)
+    ceiling = base_ceiling + post_fe * (CE_POST_FE_CEILING - CE_LOW_FEO_CEILING)
+    overpotential = max(0.0, _finite_float(dV, 0.0))
+    dV_term = 1.0 - math.exp(-DV_RESPONSE_PER_V * overpotential)
+    eta = floor + (ceiling - floor) * dV_term
+    eta = _clamp(eta, CE_PHYSICAL_FLOOR, CE_PHYSICAL_CEILING)
+    return {
+        "eta": eta,
+        "feo_fraction": feo,
+        "electronic_loss_coordinate": loss,
+        "post_fe_coordinate": post_fe,
+        "floor": floor,
+        "ceiling": ceiling,
+        "dV_term": dV_term,
+    }
+
+
+def current_efficiency(
+    dV: float,
+    feo_fraction: float,
+    *,
+    electronic_transference: float | None = None,
+) -> float:
+    return _current_efficiency_terms(
+        dV,
+        feo_fraction,
+        electronic_transference=electronic_transference,
+    )["eta"]
+
+
+def current_efficiency_diagnostic(dV: float, feo_fraction: float) -> dict[str, float | str]:
+    terms = _current_efficiency_terms(dV, feo_fraction)
+    return {
+        "model": CURRENT_EFFICIENCY_MODEL_ID,
+        "source": MRE_CURRENT_PARTITION_SOURCE,
+        "eta": terms["eta"],
+        "feo_fraction": terms["feo_fraction"],
+        "feo_wt_pct": 100.0 * terms["feo_fraction"],
+        "electronic_loss_coordinate": terms["electronic_loss_coordinate"],
+        "post_fe_coordinate": terms["post_fe_coordinate"],
+        "floor": terms["floor"],
+        "ceiling": terms["ceiling"],
+        "dV_term": terms["dV_term"],
+        "saturation": "FeO/electronic-loss ceiling applied before dV response",
+    }
 
 
 def uncertified_multi_oxide_partition_targets(reducible) -> tuple[str, ...]:
@@ -254,6 +350,7 @@ class ElectrolysisModel:
                 energy_kWh:         float
         """
         comp = melt_state.composition_wt_pct()
+        feo_fraction = max(0.0, comp.get('FeO', 0.0)) / 100.0
         result = {
             'oxides_reduced_kg': {},
             'oxides_reduced_mol': {},
@@ -273,6 +370,9 @@ class ElectrolysisModel:
             'current_partition_source': MRE_CURRENT_PARTITION_SOURCE,
             'current_partition_certified': False,
             'yield_certification': MRE_CURRENT_PARTITION_CERTIFICATION,
+            'current_efficiency_model': CURRENT_EFFICIENCY_MODEL_ID,
+            'current_efficiency_feo_fraction': feo_fraction,
+            'current_efficiency_by_oxide': {},
         }
 
         # Find all reducible species at this voltage
@@ -337,7 +437,9 @@ class ElectrolysisModel:
             I_species = current_A * fraction
 
             # Current efficiency                                [CE-1]
-            eta_CE = current_efficiency(dV)
+            ce_diagnostic = current_efficiency_diagnostic(dV, feo_fraction)
+            eta_CE = float(ce_diagnostic['eta'])
+            result['current_efficiency_by_oxide'][oxide] = ce_diagnostic
 
             # Faraday's law: mass reduced this hour            [FARADAY-1]
             n = (

@@ -89,6 +89,121 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.campaign_mgr.c5_enabled = True
 
 
+def test_ce_low_feo_colson_haskin_anchor():
+    # Colson/Haskin NASA NTRS 19910015058: FeO <2 wt%, ~1450 C, >=85% CE.
+    assert current_efficiency(0.0, feo_fraction=0.019) >= 0.85
+    assert current_efficiency(0.5, feo_fraction=0.019) >= 0.85
+
+
+def test_ce_high_feo_loss_band():
+    # Fe-bearing high-loss envelope 0.30-0.60 from findings.md:21.
+    for dV in (0.0, 0.5, 1.0, 3.0, 10.0):
+        eta = current_efficiency(dV, feo_fraction=0.10)
+        assert 0.30 <= eta <= 0.60
+
+
+def test_ce_high_dv_cannot_set_it_to_11():
+    # Anti-exploit guard: overpotential cannot bypass FeO electronic losses.
+    assert current_efficiency(10.0, feo_fraction=0.15) <= 0.60
+    assert current_efficiency(100.0, feo_fraction=0.15) <= 0.60
+    assert current_efficiency(100.0, feo_fraction=0.0) <= 0.995
+
+
+def test_current_ce_formula_is_not_certifying(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1450.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "voltage_V": 5.0,
+                "current_A": 10.0,
+                "dt_hr": 1.0,
+                "allowed_oxides": ["SiO2"],
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.transition is not None
+    assert diagnostic["current_partition_certified"] is False
+    assert diagnostic["yield_certification"] == "uncertified_current_partition"
+    assert "heuristic" in diagnostic["current_partition_source"]
+    assert diagnostic["current_efficiency_model"] == "bounded_feo_electronic_loss_v1"
+    assert diagnostic["current_efficiency_by_oxide"]["SiO2"]["ceiling"] <= 0.995
+
+
+def test_provider_current_efficiency_reads_feo_from_cleaned_melt(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    def dispatch(*, feo_kg: float, sio2_kg: float):
+        view = ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "FeO": feo_kg / (MOLAR_MASS["FeO"] / 1000.0),
+                    "SiO2": sio2_kg / (MOLAR_MASS["SiO2"] / 1000.0),
+                },
+                "process.metal_phase": {},
+                "terminal.oxygen_mre_anode_stored": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        )
+        return BuiltinElectrolysisStepProvider().dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.ELECTROLYSIS_STEP,
+                account_view=view,
+                temperature_C=1450.0,
+                pressure_bar=1e-6,
+                control_inputs={
+                    "voltage_V": 5.0,
+                    "current_A": 10.0,
+                    "dt_hr": 1.0,
+                    "allowed_oxides": ["SiO2"],
+                },
+            )
+        )
+
+    low_feo = dispatch(feo_kg=0.05, sio2_kg=9.95)
+    high_feo = dispatch(feo_kg=1.0, sio2_kg=9.0)
+    low_diag = dict(low_feo.diagnostic or {})
+    high_diag = dict(high_feo.diagnostic or {})
+    low_ce = low_diag["current_efficiency_by_oxide"]["SiO2"]
+    high_ce = high_diag["current_efficiency_by_oxide"]["SiO2"]
+
+    assert low_diag["current_efficiency_feo_fraction"] == pytest.approx(0.005)
+    assert high_diag["current_efficiency_feo_fraction"] == pytest.approx(0.10)
+    assert low_ce["eta"] >= 0.90
+    assert high_ce["eta"] <= 0.60
+    assert low_diag["O2_produced_mol"] > high_diag["O2_produced_mol"]
+
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------
@@ -1022,8 +1137,7 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
         "FeO", temperature_C, activity
     )
     overvoltage = voltage_V - e_nernst
-    eta_CE = 0.30 + 0.45 * (1.0 - math.exp(-0.5 * max(0.0, overvoltage)))
-    eta_CE = min(0.95, max(0.10, eta_CE))
+    eta_CE = current_efficiency(overvoltage, feo_fraction=1.0)
     n_e = ELECTRONS_PER_OXIDE["FeO"]
     uncapped_moles = current_A * eta_CE * 3600.0 / (n_e * FARADAY)
     capped_moles = oxide_kg / (MOLAR_MASS["FeO"] / 1000.0)
@@ -1122,7 +1236,7 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
     total_weight = fe2o3_weight + sio2_weight
     fe2o3_current_A = current_A * fe2o3_weight / total_weight
     sio2_current_A = current_A * sio2_weight / total_weight
-    fe2o3_eta = current_efficiency(voltage_V - e_ferric)
+    fe2o3_eta = current_efficiency(voltage_V - e_ferric, feo_fraction=0.0)
     fe2o3_uncapped_mol = (
         fe2o3_current_A * fe2o3_eta * 3600.0 / (2.0 * FARADAY)
     )
@@ -1139,7 +1253,7 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
             fe2o3_uncapped_mol * 2.0
             + (
                 sio2_current_A
-                * current_efficiency(voltage_V - e_sio2)
+                * current_efficiency(voltage_V - e_sio2, feo_fraction=0.0)
                 * 3600.0
                 / FARADAY
             )
@@ -1153,7 +1267,7 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
     )
     assert diagnostic["oxides_reduced_mol"]["SiO2"] > 0.0
     assert diagnostic["energy_kWh"] == pytest.approx(expected_energy_kWh, rel=1e-12)
-    assert diagnostic["energy_kWh"] > old_global_ratio_energy_kWh + 0.01
+    assert diagnostic["energy_kWh"] > old_global_ratio_energy_kWh
 
 
 def test_provider_matches_legacy_step_hour_pure_feo(
