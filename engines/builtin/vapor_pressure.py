@@ -11,7 +11,7 @@ The provider:
 - looks up Antoine coefficients from the ``vapor_pressures.yaml``
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with Antoine
-  reference terms to compute per-species saturation pressures at the
+  reference terms to compute per-species effective equilibrium pressures at the
   request's ``temperature_C`` and the caller-supplied transport/overhead
   ``pO2_bar`` (via ``control_inputs``). The intrinsic-melt fO2/redox
   channel resolves separately from the transport pO2 channel so future
@@ -397,6 +397,22 @@ def vapor_pressure_source_label(
     return base_source
 
 
+def _runtime_pressure_kind(
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    *,
+    effective_scaled: bool,
+) -> str:
+    if effective_scaled:
+        return "effective_equilibrium"
+    if (
+        _fit_target(row) == FIT_TARGET_PSEUDO_VAPOROCK
+        and coefficient_block == COEFF_BLOCK_ANTOINE
+    ):
+        return "pseudo_vaporock_fit"
+    return "pure_reference"
+
+
 def _metadata_value(row: Mapping[str, Any] | None, field: str) -> str:
     value = (row or {}).get(field)
     if value is None or value == "":
@@ -622,6 +638,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
+        vapor_pressure_provenance: dict[str, dict[str, float | str]] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
@@ -752,13 +769,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="metal_activity",
             )
             a_M_liquid = min(a_M_liquid, 1.0)
-            P_effective_Pa = _require_finite_vapor_value(
+            P_eq_Pa = _require_finite_vapor_value(
                 a_M_liquid * P_reference_Pa,
                 species=species,
-                field="P_effective_Pa",
+                field="P_eq_Pa",
             )
-            if P_effective_Pa > 1e-15:
-                vapor_pressures[species] = P_effective_Pa
+            if P_eq_Pa > 1e-15:
+                vapor_pressures[species] = P_eq_Pa
                 source_label = vapor_pressure_source_label(
                     "builtin_authoritative",
                     sp_data,
@@ -771,6 +788,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "extrapolated_beyond_valid_range_K"
                     )
                 vapor_pressure_sources[species] = source_label
+                vapor_pressure_provenance[species] = {
+                    "pressure_kind": _runtime_pressure_kind(
+                        sp_data,
+                        coefficient_block,
+                        effective_scaled=(a_M_liquid != 1.0),
+                    ),
+                    "P_reference_Antoine_Pa": P_reference_Pa,
+                    "P_eq_Pa": P_eq_Pa,
+                    "pO2_bar": transport_pO2_bar,
+                    "activity_factor": a_M_liquid,
+                    "source_label": source_label,
+                }
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
@@ -795,11 +824,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if not (A > 0 and valid[0] <= T_K <= valid[1]):
                 continue
             log_P = A - B / (T_K + C)
-            P_sat = _pow10_pressure_or_raise(
+            P_reference_Pa = _pow10_pressure_or_raise(
                 log_P,
                 species=name,
-                field="P_sat",
+                field="P_reference_Antoine_Pa",
             )
+            P_eq_Pa = P_reference_Pa
+            activity_factor = 1.0
+            pO2_scaled = False
 
             parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
@@ -808,10 +840,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
-                P_sat = _require_finite_vapor_value(
-                    P_sat * max(a_ox, 0.0) ** activity_exponent,
+                activity_factor = max(a_ox, 0.0) ** activity_exponent
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_Pa * activity_factor,
                     species=name,
-                    field="P_sat_activity",
+                    field="P_eq_activity",
                 )
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
@@ -819,13 +852,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                P_sat = _require_finite_vapor_value(
-                    P_sat
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_Pa
                     * (transport_pO2_bar / pO2_reference_bar)
                     ** pO2_exponent,
                     species=name,
-                    field="P_sat_pO2",
+                    field="P_eq_pO2",
                 )
+                pO2_scaled = True
 
             # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
             # 1e-9 bar (lunar hard vacuum).
@@ -835,20 +869,36 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 and transport_pO2_bar > 1e-9
             ):
                 suppression = math.sqrt(1e-9 / transport_pO2_bar)
-                P_sat = _require_finite_vapor_value(
-                    P_sat * suppression,
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_eq_Pa * suppression,
                     species=name,
-                    field="P_sat_suppressed",
+                    field="P_eq_suppressed",
                 )
+                pO2_scaled = True
 
-            if P_sat > 1e-15:
-                vapor_pressures[name] = P_sat
-                vapor_pressure_sources[name] = vapor_pressure_source_label(
+            if P_eq_Pa > 1e-15:
+                vapor_pressures[name] = P_eq_Pa
+                source_label = vapor_pressure_source_label(
                     "builtin_authoritative",
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
                 )
+                vapor_pressure_sources[name] = source_label
+                vapor_pressure_provenance[name] = {
+                    "pressure_kind": _runtime_pressure_kind(
+                        data,
+                        COEFF_BLOCK_ANTOINE,
+                        effective_scaled=(
+                            activity_factor != 1.0 or pO2_scaled
+                        ),
+                    ),
+                    "P_reference_Antoine_Pa": P_reference_Pa,
+                    "P_eq_Pa": P_eq_Pa,
+                    "pO2_bar": transport_pO2_bar,
+                    "activity_factor": activity_factor,
+                    "source_label": source_label,
+                }
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,
@@ -864,6 +914,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             diagnostic={
                 "vapor_pressures_Pa": vapor_pressures,
                 "vapor_pressures_source": vapor_pressure_sources,
+                "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
                 "activities": activities,
                 "pO2_bar": transport_pO2_bar,
                 "extrapolated_beyond_valid_range_K": metal_extrapolations,

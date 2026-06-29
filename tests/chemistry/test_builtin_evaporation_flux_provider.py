@@ -78,8 +78,8 @@ def _series_resistance_reference_flux(
     )
     metals_data = sim.vapor_pressures.get('metals', {}) or {}
     oxide_vapors_data = sim.vapor_pressures.get('oxide_vapors', {}) or {}
-    for species, P_sat_Pa in vapor_pressures_Pa.items():
-        if P_sat_Pa <= 0:
+    for species, P_eq_Pa in vapor_pressures_Pa.items():
+        if P_eq_Pa <= 0:
             continue
 
         sp_data = metals_data.get(species, {})
@@ -100,7 +100,7 @@ def _series_resistance_reference_flux(
         carrier_gas = carrier_resolver() if callable(carrier_resolver) else "N2"
         J_kg_s_m2 = _series_resistance_evaporation_flux_kg_m2_s(
             species=species,
-            P_sat_pa=P_sat_Pa,
+            P_eq_pa=P_eq_Pa,
             P_bulk_pa=P_ambient_Pa,
             T_surface_K=T_K,
             molar_mass_kg_mol=M_kg_mol,
@@ -264,6 +264,76 @@ def test_provider_emits_no_ledger_transition():
     assert result.transition is None
 
 
+def test_provider_attaches_numerator_provenance_and_resistance_shares():
+    provider = BuiltinEvaporationFluxProvider()
+    view = ProviderAccountView(
+        accounts={"process.cleaned_melt": {"Na2O": 10.0}},
+        species_formula_registry={},
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=view,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            'vapor_pressures_Pa': {'Na': 20.0},
+            'vapor_pressures_source': {
+                'Na': 'builtin_authoritative:backsolved_vaporock_curve_fit',
+            },
+            'vapor_pressure_numerator_provenance': {
+                'Na': {
+                    'pressure_kind': 'effective_equilibrium',
+                    'P_reference_Antoine_Pa': 200.0,
+                    'P_eq_Pa': 20.0,
+                    'pO2_bar': 1e-9,
+                    'activity_factor': 0.1,
+                    'source_label': (
+                        'builtin_authoritative:'
+                        'backsolved_vaporock_curve_fit'
+                    ),
+                },
+            },
+            'overhead_partials_Pa': {'Na': 2.0},
+            'molar_mass_kg_mol': {'Na': 0.02298976928},
+            'stoich_by_species': {
+                'Na': {
+                    'parent_oxide': 'Na2O',
+                    'oxide_per_product_kg': 1.347,
+                    'O2_per_product_kg': 0.347,
+                },
+            },
+            'available_oxide_kg': {'Na': 10.0},
+            'melt_surface_area_m2': 1.0,
+            'stir_factor': {'axial': 3.0, 'radial': 2.0},
+            'alpha': {'Na': 0.13},
+            'pO2_bar': 1e-9,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    diagnostic = result.diagnostic['evaporation_series_resistance']['Na']
+    assert diagnostic['pressure_kind'] == 'effective_equilibrium'
+    assert diagnostic['P_reference_Antoine_Pa'] == pytest.approx(200.0)
+    assert diagnostic['P_eq_Pa'] == pytest.approx(20.0)
+    assert diagnostic['P_bulk_Pa'] == pytest.approx(2.0)
+    assert diagnostic['pO2_bar'] == pytest.approx(1e-9)
+    assert diagnostic['activity_factor'] == pytest.approx(0.1)
+    assert diagnostic['source_label'] == (
+        'builtin_authoritative:backsolved_vaporock_curve_fit'
+    )
+    share_sum = (
+        diagnostic['R_interface_fraction']
+        + diagnostic['R_gas_fraction']
+        + diagnostic['R_melt_fraction']
+    )
+    assert share_sum == pytest.approx(1.0, rel=1e-12)
+    assert diagnostic['limiting_resistance_label'] in {'interface', 'gas', 'melt'}
+    assert diagnostic['alpha_eff'] == diagnostic['alpha_effective']
+    assert diagnostic['Kn'] == diagnostic['knudsen_number']
+
+
 # ---------------------------------------------------------------------------
 # 4. Physics ground-truth anchor, not parity against local code
 # ---------------------------------------------------------------------------
@@ -382,7 +452,7 @@ def test_provider_skips_species_without_grounded_molar_mass():
         "policy": "fail_loud_missing_molar_mass",
         "data_file": "data/vapor_pressures.yaml",
         "control": "molar_mass_kg_mol",
-        "p_sat_Pa": 100.0,
+        "P_eq_Pa": 100.0,
     }
     assert any(
         "Unobtainium" in warning and "data/vapor_pressures.yaml" in warning
@@ -461,7 +531,7 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
     # exposes the real holdup-derived pO2 (vacuum-floor 1e-9 bar) in
     # HARD_VACUUM atmosphere instead of the pre-flip synthetic
     # conductance-ratio derived floor. Under the new trajectory the
-    # 1/sqrt(pO2) suppression factor multiplies P_sat too aggressively
+    # 1/sqrt(pO2) suppression factor multiplies P_eq too aggressively
     # at 1000 C and ALL species drop below the legacy loop's
     # 1e-12 kg/hr reporting threshold (empty flux dict). The 2026-06-14
     # dense VapoRock pseudo-Antoine refit also drops the 1200 C fixture

@@ -19,7 +19,7 @@ from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 _K_BASE = {
     "species": "K",
-    "P_sat_pa": 80.0,
+    "P_eq_pa": 80.0,
     "P_bulk_pa": 5.0,
     "T_surface_K": 1800.0,
     "molar_mass_kg_mol": 0.0390983,
@@ -49,7 +49,7 @@ def test_free_molecular_limit_recovers_intrinsic_alpha_hk():
         melt_resistance_enabled=False,
     )
 
-    delta_p = _K_BASE["P_sat_pa"] - _K_BASE["P_bulk_pa"]
+    delta_p = _K_BASE["P_eq_pa"] - _K_BASE["P_bulk_pa"]
     k_hk = math.sqrt(
         _K_BASE["molar_mass_kg_mol"]
         / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * _K_BASE["T_surface_K"])
@@ -70,7 +70,7 @@ def test_continuum_limit_is_transport_limited_by_gas_resistance():
         melt_resistance_enabled=False,
     )
 
-    delta_p = _K_BASE["P_sat_pa"] - _K_BASE["P_bulk_pa"]
+    delta_p = _K_BASE["P_eq_pa"] - _K_BASE["P_bulk_pa"]
     assert result.r_gas > result.r_interface * 50.0
     assert result.gas_resistance_weight == pytest.approx(1.0, rel=1e-5)
     assert result.flux_kg_s_m2 == pytest.approx(delta_p / result.r_gas, rel=0.02)
@@ -170,7 +170,7 @@ def test_anti_exploit_stir_bounds_and_defensive_clamps():
         )
 
 
-@pytest.mark.parametrize("p_bulk", [_K_BASE["P_sat_pa"], _K_BASE["P_sat_pa"] * 2.0])
+@pytest.mark.parametrize("p_bulk", [_K_BASE["P_eq_pa"], _K_BASE["P_eq_pa"] * 2.0])
 def test_double_count_guard_zeroes_nonpositive_driving_pressure(p_bulk):
     result = _evap(P_bulk_pa=p_bulk)
 

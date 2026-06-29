@@ -296,7 +296,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
-    assert cache_key(spec) == "e971df01b52265a225e636f857e66174ae4abf8aa3cafec344df244465da5c82"
+    # 2026-06-29: moved when numerator-provenance diagnostics were added to
+    # engines/builtin/vapor_pressure.py (source fingerprint feeds the eval cache key
+    # via _build_eval_inputs). Physics goldens unchanged -- source-fingerprint update.
+    assert cache_key(spec) == "43b4904ff6fa8f5aceff05bf2e87004925111db4a09f6a0838acbbe95770e095"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

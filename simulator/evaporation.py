@@ -95,7 +95,7 @@ class EvaporationMixin:
 
         For each volatile species, the mass flux from the melt surface is:
 
-            J_i = (P_sat_i - P_bulk_i) /
+            J_i = (P_eq_i - P_bulk_i) /
                   (1/(alpha_i*k_HK_i) + R_gas_i(Kn) + R_melt_i(stir))
 
         where:
@@ -104,7 +104,7 @@ class EvaporationMixin:
             R_gas_i     = gas-side Fuchs-Sutugin/Sherwood resistance
             R_melt_i    = melt-side surface-renewal resistance
             A_surface   = melt surface area (m²)
-            P_sat_i     = saturation vapor pressure from equilibrium (Pa)
+            P_eq_i      = effective equilibrium pressure from VAPOR_PRESSURE (Pa)
             P_bulk_i    = partial pressure above the melt (Pa)
             M_i         = molar mass (kg/mol)
             R           = gas constant (J/mol·K)
@@ -141,6 +141,9 @@ class EvaporationMixin:
         vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
         if not vapor_pressures:
             return flux
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
 
         # Precompute the auxiliary maps the provider consumes via
         # control_inputs. This keeps the provider stateless: every
@@ -185,6 +188,19 @@ class EvaporationMixin:
             ChemistryIntent.EVAPORATION_FLUX,
             control_inputs={
                 'vapor_pressures_Pa': vapor_pressures,
+                'vapor_pressures_source': dict(
+                    getattr(equilibrium, 'vapor_pressures_source', {}) or {}
+                ),
+                'vapor_pressure_numerator_provenance': dict(
+                    vapor_pressure_diagnostic.get(
+                        'vapor_pressure_numerator_provenance'
+                    )
+                    or {}
+                ),
+                'vapor_pressure_activities': dict(
+                    getattr(equilibrium, 'activity_coefficients', {}) or {}
+                ),
+                'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
                 'overhead_partials_Pa': overhead_partials_Pa,
                 'molar_mass_kg_mol': molar_masses_kg_mol,
                 'stoich_by_species': stoich_by_species,

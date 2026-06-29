@@ -147,7 +147,7 @@ def test_builtin_vapor_pressure_raises_on_nonfinite_pressure_compute() -> None:
 
     with pytest.raises(
         VaporPressureComputationError,
-        match="vapor_pressure_nonfinite: species=SiO field=P_sat",
+        match="vapor_pressure_nonfinite: species=SiO field=P_reference_Antoine_Pa",
     ):
         provider.dispatch(
             _vapor_request(

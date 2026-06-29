@@ -1,8 +1,12 @@
-# Pure-component vapor pressures for Hertz-Knudsen calculations
+# Vapor-pressure reference data for effective P_eq calculations
 # Antoine equation: log10(P_Pa) = A - B / (T_K + C)
-# Sources: legacy pure-component constants plus diagnostic refits against VapoRock
-# over Kress91 IW operating conditions. The builtin Antoine/Ellingham provider
-# is authoritative; VapoRock is diagnostic-only when available.
+# Runtime Antoine rows can be pure references, pseudo VapoRock refits, or
+# reaction terms that are activity/pO2-scaled by the builtin Antoine/Ellingham
+# provider into the effective P_eq consumed by evaporation. Only
+# pure_component_antoine sidecars are pure-component references.
+# Sources: legacy constants plus diagnostic refits against VapoRock over Kress91
+# IW operating conditions. The builtin provider is authoritative; VapoRock is
+# diagnostic-only when available.
 #
 # Dense fallback refit (2026-06-14, scripts/vaporock_pseudo_antoine_refit.py):
 #   current VapoRock import; 7 feedstocks; 31 T points from 1350-1950 K;

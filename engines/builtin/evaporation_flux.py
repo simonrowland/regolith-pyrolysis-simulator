@@ -99,15 +99,39 @@ class SeriesEvaporationFlux:
     transport_length_m: float
 
     def as_diagnostic(self) -> dict[str, float | str | bool]:
+        denominator = self.r_interface + self.r_gas + self.r_melt
+        if math.isfinite(denominator) and denominator > 0.0:
+            r_interface_fraction = self.r_interface / denominator
+            r_gas_fraction = self.r_gas / denominator
+            r_melt_fraction = self.r_melt / denominator
+            limiting_resistance_label = max(
+                (
+                    ("interface", r_interface_fraction),
+                    ("gas", r_gas_fraction),
+                    ("melt", r_melt_fraction),
+                ),
+                key=lambda item: item[1],
+            )[0]
+        else:
+            r_interface_fraction = 0.0
+            r_gas_fraction = 0.0
+            r_melt_fraction = 0.0
+            limiting_resistance_label = "none"
         return {
             "flux_kg_s_m2": self.flux_kg_s_m2,
             "alpha_intrinsic": self.alpha_intrinsic,
             "alpha_effective": self.alpha_effective,
+            "alpha_eff": self.alpha_effective,
             "k_hk_kg_s_m2_pa": self.k_hk_kg_s_m2_pa,
             "r_interface": self.r_interface,
             "r_gas": self.r_gas,
             "r_melt": self.r_melt,
+            "R_interface_fraction": r_interface_fraction,
+            "R_gas_fraction": r_gas_fraction,
+            "R_melt_fraction": r_melt_fraction,
+            "limiting_resistance_label": limiting_resistance_label,
             "knudsen_number": self.knudsen_number,
+            "Kn": self.knudsen_number,
             "gas_resistance_weight": self.gas_resistance_weight,
             "axial_stir_applied": self.axial_stir_applied,
             "radial_stir_applied": self.radial_stir_applied,
@@ -208,6 +232,50 @@ def _fuchs_sutugin_gas_resistance_weight(
     return max(0.0, min(1.0, beta))
 
 
+def _series_pressure_provenance_diagnostic(
+    *,
+    species: str,
+    P_eq_Pa: float,
+    P_bulk_Pa: float,
+    pressure_provenance_by_species: Mapping[str, object],
+    vapor_pressure_sources: Mapping[str, object],
+    vapor_pressure_activities: Mapping[str, object],
+    pO2_bar: object,
+) -> dict[str, float | str | None]:
+    provenance = pressure_provenance_by_species.get(species)
+    provenance_map = provenance if isinstance(provenance, Mapping) else {}
+    source_label = str(
+        provenance_map.get("source_label")
+        or vapor_pressure_sources.get(species)
+        or "control_inputs:vapor_pressures_Pa"
+    )
+    activity_factor = provenance_map.get(
+        "activity_factor", vapor_pressure_activities.get(species, 1.0)
+    )
+    try:
+        activity_factor_value = float(activity_factor)
+    except (TypeError, ValueError):
+        activity_factor_value = 1.0
+    provenance_pO2 = provenance_map.get("pO2_bar", pO2_bar)
+    try:
+        pO2_bar_value = float(provenance_pO2)
+    except (TypeError, ValueError):
+        pO2_bar_value = None
+    return {
+        "pressure_kind": str(
+            provenance_map.get("pressure_kind") or "effective_equilibrium"
+        ),
+        "P_reference_Antoine_Pa": float(
+            provenance_map.get("P_reference_Antoine_Pa", P_eq_Pa)
+        ),
+        "P_eq_Pa": float(provenance_map.get("P_eq_Pa", P_eq_Pa)),
+        "P_bulk_Pa": float(P_bulk_Pa),
+        "pO2_bar": pO2_bar_value,
+        "activity_factor": activity_factor_value,
+        "source_label": source_label,
+    }
+
+
 def _coerce_frozen_skull_stir_ceiling(
     cold_skull_envelope: Mapping[str, float] | None,
 ) -> tuple[float, float | str]:
@@ -279,7 +347,7 @@ def _zero_series_evaporation_flux(
 
 def _series_resistance_evaporation_flux_kg_m2_s(
     species: str,
-    P_sat_pa: float,
+    P_eq_pa: float,
     P_bulk_pa: float,
     T_surface_K: float,
     molar_mass_kg_mol: float,
@@ -302,7 +370,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
-    The sole driving pressure is ``max(0, P_sat_pa - P_bulk_pa)``. External
+    The sole driving pressure is ``max(0, P_eq_pa - P_bulk_pa)``. External
     pressure regime and stirring terms only add or remove resistances; they
     never inflate the intrinsic Hertz-Knudsen alpha.
     """
@@ -318,7 +386,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     from simulator.state import MAX_STIR_FACTOR, clamp_stir_factor
 
     alpha_intrinsic = max(0.0, _finite_float(alpha_i, 0.0))
-    P_sat = _finite_float(P_sat_pa, 0.0)
+    P_eq = _finite_float(P_eq_pa, 0.0)
     P_bulk = _finite_float(P_bulk_pa, 0.0)
     T_surface = _finite_float(T_surface_K, 0.0)
     M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
@@ -338,7 +406,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     frozen_skull_clamped = axial_stir_applied < axial_clamped
 
     if (
-        P_sat <= 0.0
+        P_eq <= 0.0
         or T_surface <= 0.0
         or M_kg_mol <= 0.0
         or alpha_intrinsic <= 0.0
@@ -360,7 +428,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=max(0.0, diameter_m),
         )
 
-    delta_p_pa = max(0.0, P_sat - P_bulk)
+    delta_p_pa = max(0.0, P_eq - P_bulk)
     k_hk_kg_s_m2_pa = math.sqrt(
         M_kg_mol / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_surface)
     )
@@ -568,6 +636,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         controls = unpack_controls(request)
         vapor_pressures = dict(controls.get("vapor_pressures_Pa") or {})
         overhead_partials = dict(controls.get("overhead_partials_Pa") or {})
+        vapor_pressure_sources = dict(controls.get("vapor_pressures_source") or {})
+        pressure_provenance_by_species = dict(
+            controls.get("vapor_pressure_numerator_provenance") or {}
+        )
+        vapor_pressure_activities = dict(
+            controls.get("vapor_pressure_activities")
+            or controls.get("activities")
+            or {}
+        )
+        pO2_bar = controls.get("pO2_bar")
         molar_masses_kg_mol = dict(controls.get("molar_mass_kg_mol") or {})
         stoich_by_species = dict(controls.get("stoich_by_species") or {})
         available_oxide_kg = dict(controls.get("available_oxide_kg") or {})
@@ -630,14 +708,16 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
         flux_uncertainty_pct: dict[str, float] = {}
-        series_flux_diagnostics: dict[str, dict[str, float | str | bool]] = {}
+        series_flux_diagnostics: dict[
+            str, dict[str, float | str | bool | None]
+        ] = {}
         unmeasured_alpha_fallback_species: list[str] = []
         missing_alpha: dict[str, dict[str, float | str]] = {}
         missing_molar_mass: dict[str, dict[str, float | str]] = {}
 
-        for species, P_sat_Pa in vapor_pressures.items():
-            P_sat_Pa = float(P_sat_Pa)
-            if P_sat_Pa <= 0:
+        for species, P_eq_Pa in vapor_pressures.items():
+            P_eq_Pa = float(P_eq_Pa)
+            if P_eq_Pa <= 0:
                 continue
 
             # Molar mass: prefer the per-species value the caller looked
@@ -651,7 +731,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                         "policy": "fail_loud_missing_molar_mass",
                         "data_file": "data/vapor_pressures.yaml",
                         "control": "molar_mass_kg_mol",
-                        "p_sat_Pa": P_sat_Pa,
+                        "P_eq_Pa": P_eq_Pa,
                     }
                     continue
                 M_kg_mol = molar_mass_g_mol / 1000.0
@@ -667,7 +747,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 continue
 
             P_bulk_Pa = float(overhead_partials.get(species, 0.0))
-            delta_p_Pa = max(0.0, P_sat_Pa - P_bulk_Pa)
+            delta_p_Pa = max(0.0, P_eq_Pa - P_bulk_Pa)
             if delta_p_Pa <= 0:
                 continue
             alpha_is_unmeasured = (
@@ -681,7 +761,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             baseline_alpha_1 = _series_resistance_evaporation_flux_kg_m2_s(
                 species=species,
-                P_sat_pa=P_sat_Pa,
+                P_eq_pa=P_eq_Pa,
                 P_bulk_pa=P_bulk_Pa,
                 T_surface_K=T_K,
                 molar_mass_kg_mol=M_kg_mol,
@@ -710,8 +790,8 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 missing_alpha[species] = {
                     "policy": "fail_loud_missing_alpha",
                     "fallback_control": "chemistry_kernel.allow_unmeasured_alpha_fallback",
-                    "p_sat_Pa": P_sat_Pa,
-                    "p_ambient_Pa": P_bulk_Pa,
+                    "P_eq_Pa": P_eq_Pa,
+                    "P_bulk_Pa": P_bulk_Pa,
                     "baseline_alpha_1_rate_kg_hr": baseline_rate_kg_hr,
                 }
                 continue
@@ -729,7 +809,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species=species,
-                P_sat_pa=P_sat_Pa,
+                P_eq_pa=P_eq_Pa,
                 P_bulk_pa=P_bulk_Pa,
                 T_surface_K=T_K,
                 molar_mass_kg_mol=M_kg_mol,
@@ -755,7 +835,21 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
                 flux_kg_hr[species] = rate_kg_hr
-                series_flux_diagnostics[species] = series_flux.as_diagnostic()
+                series_diagnostic = series_flux.as_diagnostic()
+                series_diagnostic.update(
+                    _series_pressure_provenance_diagnostic(
+                        species=species,
+                        P_eq_Pa=P_eq_Pa,
+                        P_bulk_Pa=P_bulk_Pa,
+                        pressure_provenance_by_species=(
+                            pressure_provenance_by_species
+                        ),
+                        vapor_pressure_sources=vapor_pressure_sources,
+                        vapor_pressure_activities=vapor_pressure_activities,
+                        pO2_bar=pO2_bar,
+                    )
+                )
+                series_flux_diagnostics[species] = series_diagnostic
 
         if missing_alpha:
             missing_alpha_warnings = [

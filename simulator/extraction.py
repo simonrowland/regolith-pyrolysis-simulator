@@ -1523,7 +1523,7 @@ class ExtractionMixin:
         ):
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species='Ca',
-                P_sat_pa=p_sat_pa,
+                P_eq_pa=p_sat_pa,
                 P_bulk_pa=p_bulk_pa,
                 T_surface_K=hold_temp_K,
                 molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,
@@ -1561,7 +1561,7 @@ class ExtractionMixin:
         else:
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
                 species='Ca',
-                P_sat_pa=0.0,
+                P_eq_pa=0.0,
                 P_bulk_pa=p_bulk_pa,
                 T_surface_K=hold_temp_K,
                 molar_mass_kg_mol=MOLAR_MASS['Ca'] / 1000.0,

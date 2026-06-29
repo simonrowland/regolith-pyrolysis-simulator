@@ -208,6 +208,73 @@ def _fe_redox_request(
     )
 
 
+_COMPOSITION_SENSITIVITY_BASE_MOL = {
+    "SiO2": 1.0,
+    "Al2O3": 0.2,
+    "CaO": 0.2,
+    "Na2O": 0.05,
+    "K2O": 0.05,
+    "MgO": 0.4,
+    "FeO": 0.3,
+}
+
+
+def _composition_sensitivity_request(
+    account_mol: dict[str, float],
+) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": dict(account_mol)},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=-9.0,
+        control_inputs={
+            "pO2_bar": 1e-3,
+            "intrinsic_fO2_log": -9.0,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "oxide,species",
+    [
+        ("Na2O", "Na"),
+        ("K2O", "K"),
+        ("MgO", "Mg"),
+        ("FeO", "Fe"),
+        ("SiO2", "SiO"),
+    ],
+)
+def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
+    vapor_pressure_data,
+    oxide,
+    species,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    low_account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
+    high_account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
+    low_account[oxide] *= 0.25
+    high_account[oxide] *= 4.0
+
+    low_result = provider.dispatch(_composition_sensitivity_request(low_account))
+    high_result = provider.dispatch(_composition_sensitivity_request(high_account))
+    low_diag = low_result.diagnostic or {}
+    high_diag = high_result.diagnostic or {}
+    low_p_eq = low_diag["vapor_pressures_Pa"][species]
+    high_p_eq = high_diag["vapor_pressures_Pa"][species]
+    low_provenance = low_diag["vapor_pressure_numerator_provenance"][species]
+    high_provenance = high_diag["vapor_pressure_numerator_provenance"][species]
+
+    assert high_p_eq > low_p_eq
+    assert low_provenance["P_eq_Pa"] == pytest.approx(low_p_eq)
+    assert high_provenance["P_eq_Pa"] == pytest.approx(high_p_eq)
+    assert high_provenance["activity_factor"] > low_provenance["activity_factor"]
+    assert high_provenance["pressure_kind"] == "effective_equilibrium"
+
+
 class _LegacyFallbackStub(EquilibriumMixin):
     def __init__(self, vapor_pressure_data, melt=None):
         self.vapor_pressures = vapor_pressure_data
