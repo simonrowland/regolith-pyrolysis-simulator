@@ -8,7 +8,10 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
 )
-from simulator.fe_redox import kress91_ferrous_feo_activity
+from simulator.fe_redox import (
+    floor_vacuum_pressure_bar,
+    kress91_ferrous_feo_activity,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import GAS_CONSTANT, Atmosphere
 
@@ -266,7 +269,13 @@ class EquilibriumMixin:
         if intrinsic_fO2_value is None:
             intrinsic_fO2_value = self._compute_intrinsic_melt_fO2()
         intrinsic_fO2_log = float(intrinsic_fO2_value)
-        pressure_bar = max(float(self.melt.p_total_mbar) / 1000.0, 1e-9)
+        # Vacuum-floor via the shared -inf-safe helper, NOT max(p, 1e-9): max
+        # silently masks a -inf pressure as 1e-9, hiding it from the Kress91
+        # chokepoint validator reached through kress91_ferrous_feo_activity below.
+        # Finite vacuum (<=0) still floors to 1e-9; finite-positive passes through.
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0
+        )
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()

@@ -128,6 +128,23 @@ def test_dispatch_only_quantizes_mre_melt_fo2_control_with_request() -> None:
     assert kernel.kwargs["fe_redox_policy"] == "kress91_live"
 
 
+def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+
+    controls = store.quantized_controls(sim, fO2_log=-7.123456789)
+    key = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-7.123456789,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert controls["fO2_log"] == -7.123
+    assert key["controls"]["log_fO2"] == -7.123
+
+
 class _CountingSilicateEquilibriumProvider(ChemistryProvider):
     name = "alphamelts-write-through-test"
 
@@ -988,6 +1005,95 @@ def test_pt0_quantized_controls_fail_loudly_on_non_finite_melt_controls(
 
     with pytest.raises(PT0InvalidControls, match=message):
         store.quantized_controls(sim, fO2_log=0.0)
+
+
+@pytest.mark.parametrize("fO2_log", [float("nan"), float("inf"), float("-inf")])
+def test_pt0_quantized_controls_fail_loudly_on_non_finite_fo2(
+    fO2_log: float,
+) -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+
+    with pytest.raises(PT0InvalidControls, match="non-finite fO2_log"):
+        store.quantized_controls(sim, fO2_log=fO2_log)
+
+
+@pytest.mark.parametrize("fO2_log", [float("nan"), float("inf"), float("-inf")])
+def test_pt0_cache_key_fails_loudly_on_non_finite_fo2(
+    fO2_log: float,
+) -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+
+    with pytest.raises(PT0InvalidControls, match="cache key"):
+        canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=fO2_log,
+            fe_redox_policy="intrinsic",
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("temperature_C", float("nan"), "non-finite melt temperature"),
+        ("p_total_mbar", float("inf"), "non-finite melt pressure"),
+    ),
+)
+def test_pt0_cache_key_fails_loudly_on_non_finite_melt_controls(
+    field: str,
+    value: float,
+    message: str,
+) -> None:
+    # SC-49 class-completeness: canonical_replay_key() quantizes T_K and
+    # pressure with the same _quantize() that returns None on non-finite input,
+    # so it must refuse them like the fO2_log sibling above (and like
+    # quantized_controls). A None T_K otherwise also flows into the intrinsic
+    # fO2 fallback.
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    setattr(sim.melt, field, value)
+
+    with pytest.raises(PT0InvalidControls, match=message):
+        canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=None,
+            fe_redox_policy="intrinsic",
+        )
+
+
+@pytest.mark.parametrize("bad_pO2", [float("nan"), float("inf"), float("-inf")])
+def test_pt0_cache_key_fails_loudly_on_non_finite_pO2(bad_pO2: float) -> None:
+    # SC-49 class-completeness: the commanded pO2 control is _sigfig-quantized in
+    # the same cache key, and _sigfig returns None on non-finite input — so a
+    # non-finite commanded pO2 must be refused like T_K / pressure / fO2 rather
+    # than encoded as None. (Commanded 0.0 stays valid: _sigfig(0.0)==0.0.)
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim._commanded_pO2_bar = lambda: bad_pO2
+
+    with pytest.raises(PT0InvalidControls, match="commanded pO2"):
+        canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=-7.5,
+            fe_redox_policy="intrinsic",
+        )
+
+
+@pytest.mark.parametrize("bad_pO2", [float("nan"), float("inf"), float("-inf")])
+def test_pt0_quantized_pO2_bar_fails_loudly_on_non_finite(bad_pO2: float) -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim._commanded_pO2_bar = lambda: bad_pO2
+
+    with pytest.raises(PT0InvalidControls, match="commanded pO2"):
+        store.quantized_pO2_bar(sim)
 
 
 FOULANT_DISPOSITION_MODULE = "engines/builtin/foulant_disposition.py"

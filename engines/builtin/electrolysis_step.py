@@ -782,16 +782,18 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
     ) -> dict[str, Any]:
         from simulator.fe_redox import (
             feot_equivalent_wt_pct,
+            floor_vacuum_pressure_bar,
             kress91_split,
             melt_mol_fractions_for_kress91,
         )
+        pressure_control = floor_vacuum_pressure_bar(pressure_bar)
 
         base: dict[str, Any] = {
             "diagnostic_only": True,
             "consumed_by_behavior": False,
             "computed_fresh_from_account_view": True,
             "temperature_K": float(T_K),
-            "pressure_bar": max(float(pressure_bar), 1.0e-9),
+            "pressure_bar": pressure_control,
             "melt_fO2_log": melt_fO2_log,
         }
         if total_kg <= 0.0 or melt_fO2_log is None or T_K <= 0.0:
@@ -833,7 +835,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             fO2_log=float(melt_fO2_log),
             mol_fractions=mol_fractions,
             T_K=float(T_K),
-            pressure_bar=max(float(pressure_bar), 1.0e-9),
+            pressure_bar=pressure_control,
         )
         ratio = float(split["ratio"])
         fe3 = min(1.0, max(0.0, float(split["fe3"])))

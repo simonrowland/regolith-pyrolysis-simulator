@@ -6,6 +6,7 @@ import yaml
 from simulator.accounting import AccountingError
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import PyrolysisSimulator
+from simulator.fe_redox import Kress91InvalidControls
 from simulator.melt_backend.base import StubBackend
 from simulator.state import Atmosphere, CampaignPhase
 
@@ -80,3 +81,37 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
 
     snapshot = sim._make_snapshot()
     assert abs(snapshot.mass_balance_error_pct) <= MASS_BALANCE_LIMIT_PCT
+
+
+def test_stub_equilibrium_feo_activity_refuses_non_finite_pressure():
+    # equilibrium.py vacuum-floors melt pressure before the FeO ferrous-activity
+    # Kress91 call. A non-finite (-inf) pressure must propagate to the Kress91
+    # chokepoint validator and fail loud, NOT be silently masked to 1e-9 by a
+    # max(p, 1e-9) floor (which returns 1e-9 for -inf). Locks the equilibrium
+    # sibling of the floor_vacuum_pressure_bar class-completion.
+    vapor_pressures = _load_yaml("vapor_pressures.yaml")
+    feedstocks = {
+        "feo_regression": {
+            "label": "FeO non-finite-pressure regression feedstock",
+            "composition_wt_pct": {
+                "SiO2": 20.0, "FeO": 45.0, "MgO": 20.0, "Al2O3": 10.0, "CaO": 5.0,
+            },
+        }
+    }
+    setpoints = {
+        "campaigns": {},
+        "chemistry_kernel": {"allow_fallback_vapor": True},
+    }
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+    sim.load_batch("feo_regression", mass_kg=1000.0)
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.temperature_C = 1600.0
+    sim.melt.pO2_mbar = 0.0
+    _force_builtin_vapor_pressure_fallback(sim)
+
+    sim.melt.p_total_mbar = float("-inf")
+    with pytest.raises(Kress91InvalidControls, match="pressure_bar"):
+        sim._stub_equilibrium()

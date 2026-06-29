@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import math
+from types import SimpleNamespace
+
 import pytest
 
+from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
+    Kress91InvalidControls,
+    floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
+    kress91_ferrous_feo_activity,
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
@@ -22,6 +29,31 @@ KRESS91_MOL_FRACTIONS = {
     'P2O5': 0.001,
     'FeOt': 0.184,
 }
+
+
+@pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
+def test_floor_vacuum_pressure_bar_floors_finite_vacuum_pressure(
+    pressure_bar: float,
+) -> None:
+    assert floor_vacuum_pressure_bar(pressure_bar) == 1.0e-9
+
+
+@pytest.mark.parametrize('pressure_bar', [1.0e-12, 1.0e-9, 0.01])
+def test_floor_vacuum_pressure_bar_preserves_finite_positive_pressure(
+    pressure_bar: float,
+) -> None:
+    assert floor_vacuum_pressure_bar(pressure_bar) == pressure_bar
+
+
+@pytest.mark.parametrize('pressure_bar', [float('nan'), float('inf'), float('-inf')])
+def test_floor_vacuum_pressure_bar_preserves_nonfinite_for_validator(
+    pressure_bar: float,
+) -> None:
+    floored = floor_vacuum_pressure_bar(pressure_bar)
+    if math.isnan(pressure_bar):
+        assert math.isnan(floored)
+    else:
+        assert floored == pressure_bar
 
 
 @pytest.mark.parametrize(
@@ -72,6 +104,189 @@ def test_kress91_shared_function_matches_inline_formula_pins(
     ) == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['fe3'] == pytest.approx(expected_fe3, rel=0, abs=1.0e-15)
     assert split['ratio'] == pytest.approx(expected_ratio, rel=0, abs=1.0e-15)
+
+
+def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
+    split = kress91_split(
+        fO2_log=-7.5,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=1873.15,
+        pressure_bar=0.01,
+    )
+
+    assert split == {
+        'fe3': 0.043532751407115045,
+        'ratio': 0.02275705282703544,
+        'x_fe2o3': 0.004005013129454584,
+        'x_feo': 0.17598997374109082,
+    }
+
+
+@pytest.mark.parametrize('fO2_log', [float('nan'), float('inf'), float('-inf')])
+def test_kress91_non_finite_fo2_fails_loudly(fO2_log: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match='fO2_log'):
+        kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=1873.15,
+            pressure_bar=0.01,
+        )
+
+
+@pytest.mark.parametrize('T_K', [0.0, -1.0, float('nan'), float('inf')])
+def test_kress91_invalid_temperature_fails_loudly(T_K: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match='T_K'):
+        kress91_fe3_over_sigma_fe(
+            fO2_log=-7.5,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=T_K,
+            pressure_bar=0.01,
+        )
+
+
+@pytest.mark.parametrize(
+    'pressure_bar',
+    [0.0, -1.0, float('nan'), float('inf'), float('-inf')],
+)
+def test_kress91_invalid_pressure_fails_loudly(pressure_bar: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        kress91_split(
+            fO2_log=-7.5,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=1873.15,
+            pressure_bar=pressure_bar,
+        )
+
+
+# kress91_ferrous_feo_activity serves the evaporation / vapor-pressure path,
+# whose valid-input domain DIFFERS from kress91_split's: it is called at furnace
+# vacuum with pressure_bar == 0.0, so it FLOORS non-positive pressure to 1e-9
+# (Kress91 pressure terms are a negligible high-pressure correction here) rather
+# than refusing it. Non-FINITE pressure (and non-finite fO2/T_K) still raises via
+# the shared chokepoint. These tests lock that domain split so a future "make the
+# siblings identical" fold cannot silently break vacuum evaporation goldens.
+_FERROUS_ACTIVITY_COMP_WT = {
+    'SiO2': 46.0, 'TiO2': 2.5, 'Al2O3': 13.5, 'FeO': 12.0, 'Fe2O3': 1.5,
+    'MnO': 0.2, 'MgO': 9.5, 'CaO': 10.5, 'Na2O': 2.0, 'K2O': 0.4, 'P2O5': 0.2,
+}
+
+
+@pytest.mark.parametrize('pressure_bar', [float('nan'), float('inf'), float('-inf')])
+def test_kress91_ferrous_feo_activity_nonfinite_pressure_fails_loudly(
+    pressure_bar: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        kress91_ferrous_feo_activity(
+            comp_wt=_FERROUS_ACTIVITY_COMP_WT,
+            fO2_log=-7.5,
+            T_K=1873.15,
+            pressure_bar=pressure_bar,
+        )
+
+
+@pytest.mark.parametrize('pressure_bar', [0.0, -1.0])
+def test_kress91_ferrous_feo_activity_vacuum_pressure_is_floored_not_refused(
+    pressure_bar: float,
+) -> None:
+    # The vacuum-evaporation contract: non-positive pressure floors to
+    # 1e-9 and returns the SAME finite activity as an explicit 1e-9 bar request,
+    # never raising. (Production reaches this via vapor_pressure.py with an
+    # unfloored request.pressure_bar == 0.0.)
+    floored = kress91_ferrous_feo_activity(
+        comp_wt=_FERROUS_ACTIVITY_COMP_WT,
+        fO2_log=-7.75,
+        T_K=1873.15,
+        pressure_bar=1.0e-9,
+    )
+    activity = kress91_ferrous_feo_activity(
+        comp_wt=_FERROUS_ACTIVITY_COMP_WT,
+        fO2_log=-7.75,
+        T_K=1873.15,
+        pressure_bar=pressure_bar,
+    )
+    assert activity > 0.0
+    assert activity == floored
+
+
+@pytest.mark.parametrize(
+    ('control', 'fO2_log', 'T_K'),
+    [
+        ('fO2_log', float('nan'), 1873.15),
+        ('fO2_log', float('inf'), 1873.15),
+        ('T_K', -7.5, 0.0),
+        ('T_K', -7.5, float('nan')),
+        ('T_K', -7.5, float('inf')),
+    ],
+)
+def test_kress91_ferrous_feo_activity_invalid_fo2_or_temperature_fails_loudly(
+    control: str, fO2_log: float, T_K: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls, match=control):
+        kress91_ferrous_feo_activity(
+            comp_wt=_FERROUS_ACTIVITY_COMP_WT,
+            fO2_log=fO2_log,
+            T_K=T_K,
+            pressure_bar=0.01,
+        )
+
+
+def test_kress91_ferrous_feo_activity_valid_controls_unchanged() -> None:
+    # Finite-positive controls are unchanged: feot here is ~13.35 wt%, so
+    # a_FeO = (feot/100)*(1-fe3) sits just under 0.1335.
+    activity = kress91_ferrous_feo_activity(
+        comp_wt=_FERROUS_ACTIVITY_COMP_WT,
+        fO2_log=-7.75,
+        T_K=1873.15,
+        pressure_bar=0.01,
+    )
+    assert 0.12 < activity < 0.1335
+
+
+@pytest.mark.parametrize('pressure_bar', [float('nan'), float('inf'), float('-inf')])
+def test_electrolysis_fe_redox_diagnostic_nonfinite_pressure_reaches_validator(
+    pressure_bar: float,
+) -> None:
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        BuiltinElectrolysisStepProvider._compute_fe_redox_split_diagnostic(
+            composition_kg=_FERROUS_ACTIVITY_COMP_WT,
+            total_kg=sum(_FERROUS_ACTIVITY_COMP_WT.values()),
+            T_K=1873.15,
+            pressure_bar=pressure_bar,
+            melt_fO2_log=-7.5,
+        )
+
+
+@pytest.mark.parametrize('pressure_mbar', [float('nan'), float('inf'), float('-inf')])
+def test_core_melt_redox_capacity_nonfinite_pressure_reaches_validator(
+    pressure_mbar: float,
+) -> None:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(p_total_mbar=pressure_mbar)
+    sim._cleaned_melt_fe_atom_mol = lambda: 1.0
+    sim._melt_oxide_wt_pct = lambda: _FERROUS_ACTIVITY_COMP_WT
+
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        sim._melt_redox_capacity_mol_per_ln_fO2(
+            fO2_log=-7.5,
+            T_K=1873.15,
+        )
+
+
+@pytest.mark.parametrize('pressure_mbar', [float('nan'), float('inf'), float('-inf')])
+def test_core_fe_redox_diagnostic_nonfinite_pressure_reaches_validator(
+    pressure_mbar: float,
+) -> None:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(
+        temperature_C=1600.0,
+        oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-7.75),
+    )
+    sim.overhead = SimpleNamespace(pressure_mbar=pressure_mbar)
+    sim._melt_oxide_wt_pct = lambda: _FERROUS_ACTIVITY_COMP_WT
+    sim._fe_redox_split_from_pysulfsat = lambda *args, **kwargs: None
+
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        sim._compute_fe_redox_split_diagnostic(temperature_K=1873.15)
 
 
 def test_kress91_fe3_increases_with_oxygen_fugacity() -> None:

@@ -80,6 +80,7 @@ from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.fe_redox import (
     feot_equivalent_wt_pct,
+    floor_vacuum_pressure_bar,
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
@@ -1993,7 +1994,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if total_fe_mol <= 0.0:
             return 0.0
         comp = self._melt_oxide_wt_pct()
-        pressure_bar = max(float(self.melt.p_total_mbar) / 1000.0, 1.0e-9)
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0
+        )
         eps_log10 = 0.001
         eps_ln = math.log(10.0) * eps_log10
         x_plus = self._fe3_over_sigma_fe_at_fO2(
@@ -2242,7 +2245,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self.melt, 'melt_fO2_log', -9.0),
             )
         )
-        pressure_bar = max(float(self.overhead.pressure_mbar) * 1.0e-3, 1.0e-9)
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.overhead.pressure_mbar) * 1.0e-3
+        )
         log_iw = -27215.0 / T_K + 6.57 if T_K > 0.0 else -9.0
         base = {
             'fO2_log': float(fO2_log),

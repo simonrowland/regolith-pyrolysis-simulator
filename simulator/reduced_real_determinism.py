@@ -232,14 +232,32 @@ class PT0DeterminismStore:
             )
         if fO2_log is None:
             fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
+        quantized_fO2_log = _quantize(fO2_log, _FO2_LOG_QUANTUM, 6)
+        if quantized_fO2_log is None:
+            raise PT0InvalidControls(
+                "non-finite fO2_log passed to PT-0 quantization: "
+                f"{fO2_log!r}"
+            )
         return {
             "temperature_C": None if T_K is None else float(T_K) - 273.15,
             "pressure_bar": pressure_bar,
-            "fO2_log": _quantize(fO2_log, _FO2_LOG_QUANTUM, 6),
+            "fO2_log": quantized_fO2_log,
         }
 
     def quantized_pO2_bar(self, sim: Any) -> float:
-        return _sigfig(float(sim._commanded_pO2_bar()), _COMPOSITION_SIG_FIGS)
+        # _sigfig returns None on non-finite input, so a non-finite commanded
+        # pO2 would otherwise leak a None into the control surface (the same
+        # invalid-control class as T_K / pressure / fO2 above). Commanded 0.0
+        # (controlled-O2 off) is finite and preserved by _sigfig; only NaN/inf
+        # is refused.
+        commanded_pO2_bar = float(sim._commanded_pO2_bar())
+        quantized = _sigfig(commanded_pO2_bar, _COMPOSITION_SIG_FIGS)
+        if quantized is None:
+            raise PT0InvalidControls(
+                "non-finite commanded pO2 passed to PT-0 quantization: "
+                f"{commanded_pO2_bar!r} bar"
+            )
+        return quantized
 
     def canonical_composition_mol_by_account(
         self,
@@ -1626,8 +1644,41 @@ def canonical_replay_key(
         _PRESSURE_BAR_QUANTUM,
         8,
     )
+    # Class-complete the fO2_log guard below: _quantize() returns None for any
+    # non-finite control, so a NaN/inf melt temperature or pressure would
+    # otherwise encode `None` straight into the cache key (and a None T_K would
+    # flow into _compute_intrinsic_melt_fO2). Refuse here — finite controls
+    # quantize to floats, so valid keys stay byte-identical (SC-49: guard every
+    # sibling of a class-cutting invalid-control gate, not just the first).
+    if T_K is None:
+        raise PT0InvalidControls(
+            "non-finite melt temperature passed to PT-0 cache key "
+            f"quantization: {sim.melt.temperature_C!r}"
+        )
+    if pressure_bar is None:
+        raise PT0InvalidControls(
+            "non-finite melt pressure passed to PT-0 cache key "
+            f"quantization: {sim.melt.p_total_mbar!r}"
+        )
     if fO2_log is None:
         fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
+    quantized_fO2_log = _quantize(fO2_log, _FO2_LOG_QUANTUM, 6)
+    if quantized_fO2_log is None:
+        raise PT0InvalidControls(
+            "non-finite fO2_log passed to PT-0 cache key quantization: "
+            f"{fO2_log!r}"
+        )
+    # Same invalid-control class as T_K / pressure / fO2: _sigfig returns None on
+    # non-finite input, so a non-finite commanded pO2 would otherwise encode a
+    # None straight into the cache key. Commanded 0.0 (controlled-O2 off) is
+    # finite and preserved; only NaN/inf is refused.
+    commanded_pO2_bar = float(sim._commanded_pO2_bar())
+    quantized_pO2_bar = _sigfig(commanded_pO2_bar, _COMPOSITION_SIG_FIGS)
+    if quantized_pO2_bar is None:
+        raise PT0InvalidControls(
+            "non-finite commanded pO2 passed to PT-0 cache key quantization: "
+            f"{commanded_pO2_bar!r} bar"
+        )
     sulfur_inventory = {
         "salt_phase": _positive_float_map(
             getattr(sim.inventory, "salt_phase_kg", {}) or {}
@@ -1660,11 +1711,9 @@ def canonical_replay_key(
         "composition_mol_fraction": _composition_mol_fraction(sim),
         "controls": {
             "T_K": T_K,
-            "log_fO2": _quantize(fO2_log, _FO2_LOG_QUANTUM, 6),
+            "log_fO2": quantized_fO2_log,
             "pressure_bar": pressure_bar,
-            "pO2_bar": _sigfig(
-                float(sim._commanded_pO2_bar()), _COMPOSITION_SIG_FIGS
-            ),
+            "pO2_bar": quantized_pO2_bar,
         },
         "redox": {
             "fe_redox_policy": str(fe_redox_policy),
