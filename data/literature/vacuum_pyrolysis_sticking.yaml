@@ -19,6 +19,29 @@ notes:
     constants. They remain status-bearing until direct or closer vacuum
     deposition data exists.
 
+reactivity_class_values:
+  - reactive
+  - physisorbing
+
+# C4b re-evaporation default (2026-06-29): SiO disproportionates on the
+# wall to non-volatile products, so its deposit uses an effective product
+# P_sat ~= 0. The listed metals keep reversible pure-species condensation.
+# Fe/Mg physisorbing-with-reactive-tail is a known approximation recorded in
+# docs/model-limitations.md; CrO2 remains reversible here to avoid widening
+# this SiO-only chunk into the unresolved Cr oxide wall-product decision.
+reactivity_class_by_species:
+  SiO: reactive
+  Na: physisorbing
+  K: physisorbing
+  Fe: physisorbing
+  Mg: physisorbing
+  Ca: physisorbing
+  Mn: physisorbing
+  Cr: physisorbing
+  Al: physisorbing
+  Ti: physisorbing
+  CrO2: physisorbing
+
 species:
   Fe:
     value: 0.02

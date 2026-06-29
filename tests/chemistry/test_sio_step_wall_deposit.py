@@ -7,9 +7,13 @@ from typing import Any
 
 import pytest
 
+from simulator import condensation as condensation_module
 from simulator.condensation import (
     _antoine_psat_pa,
+    _hkl_impingement_flux_mol_m2_s,
     _hkl_surface_deposition_flux_mol_m2_s,
+    _series_resistance_deposition_flux_mol_m2_s,
+    _sticking_reactivity_class,
 )
 from simulator.runner import build_sio_yield_report
 
@@ -155,30 +159,100 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # and adds gas/melt resistances upstream of deposition. The same cold-wall
     # capture physics sees much less SiO source:
     # 4.6778715958e-07 -> 8.21353261008e-09 kg.
+    # 2026-06-29 re-evaporation fix leaves the low-wall point unchanged,
+    # but rejects the old false zero-deposit threshold at hot walls.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
         8.21353261008e-09, rel=1e-9
     )
-    assert _sio_wall_deposit_kg(1400.0) == 0.0
-    assert _sio_wall_deposit_kg(1500.0) == 0.0
-
-
-def test_hk_wall_deposit_driving_force_has_correct_sign():
-    wall_T_K = 1050.0 + 273.15
-    p_sat_wall_pa = _antoine_psat_pa("SiO", wall_T_K)
-    assert p_sat_wall_pa is not None and p_sat_wall_pa > 0.0
-
-    no_deposit = _hkl_surface_deposition_flux_mol_m2_s(
-        "SiO",
-        P_local_pa=0.99 * p_sat_wall_pa,
-        T_surface_K=wall_T_K,
-        alpha_s=0.8,
+    assert _sio_wall_deposit_kg(1400.0) == pytest.approx(
+        8.10457511426e-09, rel=1e-9
     )
-    deposit = _hkl_surface_deposition_flux_mol_m2_s(
-        "SiO",
-        P_local_pa=1.01 * p_sat_wall_pa,
-        T_surface_K=wall_T_K,
-        alpha_s=0.8,
+    assert _sio_wall_deposit_kg(1500.0) == pytest.approx(
+        8.06939512106e-09, rel=1e-9
     )
 
-    assert no_deposit == 0.0
-    assert deposit > 0.0
+
+def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
+    wall_T_K = 1700.0 + 273.15
+    p_local_pa = 1.0
+    alpha_s = 0.04
+
+    sio_psat_pa = _antoine_psat_pa("SiO", wall_T_K)
+    assert sio_psat_pa is not None and sio_psat_pa > p_local_pa
+
+    expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
+        "SiO",
+        p_local_pa,
+        wall_T_K,
+    )
+    hkl_flux = _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO",
+        P_local_pa=p_local_pa,
+        T_surface_K=wall_T_K,
+        alpha_s=alpha_s,
+    )
+    series_flux = _series_resistance_deposition_flux_mol_m2_s(
+        "SiO",
+        P_local_pa=p_local_pa,
+        T_surface_K=wall_T_K,
+        alpha_s=alpha_s,
+        regime_factor=1.0,
+    )
+
+    assert hkl_flux == pytest.approx(expected_hkl)
+    assert series_flux == pytest.approx(expected_hkl)
+    assert hkl_flux > 0.0
+
+
+def test_hot_wall_na_physisorber_reevaporates_against_own_psat():
+    wall_T_K = 1700.0 + 273.15
+    p_local_pa = 1.0
+
+    na_psat_pa = _antoine_psat_pa("Na", wall_T_K)
+    assert na_psat_pa is not None and na_psat_pa > p_local_pa
+
+    assert _hkl_surface_deposition_flux_mol_m2_s(
+        "Na",
+        P_local_pa=p_local_pa,
+        T_surface_K=wall_T_K,
+        alpha_s=1.0,
+    ) == 0.0
+    assert _series_resistance_deposition_flux_mol_m2_s(
+        "Na",
+        P_local_pa=p_local_pa,
+        T_surface_K=wall_T_K,
+        alpha_s=1.0,
+        regime_factor=1.0,
+    ) == 0.0
+
+
+def test_wall_deposition_reactivity_class_fails_loud(monkeypatch):
+    with pytest.raises(ValueError, match="missing reactivity_class.*Unobtanium"):
+        _sticking_reactivity_class("Unobtanium")
+
+    monkeypatch.setitem(
+        condensation_module.STICKING_DATA["reactivity_class_by_species"],
+        "SiO",
+        "chemisorbing",
+    )
+    with pytest.raises(ValueError, match="reactivity_class_by_species.SiO"):
+        _hkl_surface_deposition_flux_mol_m2_s(
+            "SiO",
+            P_local_pa=100.0,
+            T_surface_K=1000.0,
+            alpha_s=1.0,
+        )
+
+
+def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch):
+    monkeypatch.delitem(
+        condensation_module.STICKING_DATA["reactivity_class_by_species"],
+        "SiO",
+    )
+    assert _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO",
+        P_local_pa=1.0,
+        T_surface_K=1700.0 + 273.15,
+        alpha_s=1.0,
+        reactive_product_backstop=False,
+    ) == 0.0

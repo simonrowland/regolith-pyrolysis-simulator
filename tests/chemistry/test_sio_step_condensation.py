@@ -41,12 +41,18 @@ def test_sio_routes_to_stage3_for_c2a_after_band_aware_hk_fix():
     assert _stage3_silica_kg(1400.0) > 0.0
 
 
-def test_cooler_wall_band_monotonically_increases_capture_and_reduces_escape():
+def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():
     capture_1050 = _stage3_silica_kg(1050.0) + _sio_wall_deposit_kg(1050.0)
     capture_1300 = _stage3_silica_kg(1300.0) + _sio_wall_deposit_kg(1300.0)
     capture_1400 = _stage3_silica_kg(1400.0) + _sio_wall_deposit_kg(1400.0)
 
-    assert capture_1050 > capture_1300 > capture_1400
+    # Reactive SiO wall products no longer re-evaporate against SiO's own
+    # Antoine curve, so hot-wall capture is nonzero and the old strict
+    # cooler-wall monotone is no longer the invariant. Keep the capture band
+    # tight enough to catch routing regressions without forcing a false zero.
+    captures = (capture_1050, capture_1300, capture_1400)
+    assert min(captures) > 0.0
+    assert max(captures) - min(captures) <= 0.02 * max(captures)
     # Post-r7 autoreview fix (2026-05-27): equal-temperature wall routing
     # now restricts deposit candidates to reachable (upstream-of-designated-
     # stage) pipe segments. Pre-r7, downstream-of-stage-3 pipe segments

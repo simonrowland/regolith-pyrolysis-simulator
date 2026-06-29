@@ -19,7 +19,9 @@ MAX_BALANCE_ERR_PCT = 5.0e-12
 # below; this caps the relative residual well below any physical effect.
 # 2026-06-28 alpha-series source model shrinks SiO another ~57x, so the same
 # absolute residual (~3.44e-13 mol) reads as a larger relative percentage.
-MAX_CHAIN_CLOSURE_ERR_PCT = 2.0e-7
+# 2026-06-29 reactive SiO wall products move the diagnostic residual to
+# ~1.26e-11 mol while AtomLedger mass balance remains below 5e-12 %.
+MAX_CHAIN_CLOSURE_ERR_PCT = 1.0e-5
 # Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
 # C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
 # to the VapoRock-consistent activity-corrected value.

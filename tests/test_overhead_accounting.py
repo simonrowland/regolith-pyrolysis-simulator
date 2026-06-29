@@ -12,6 +12,7 @@ from simulator.state import (
     CampaignPhase,
     EvaporationFlux,
     MOLAR_MASS,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
 )
 
 
@@ -335,15 +336,20 @@ def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
 
     condensed = sim.atom_ledger.kg_by_account("process.condensation_train")
     overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")["SiO"]
+    wall_total = sum(
+        sum(sim.atom_ledger.kg_by_account(account).values())
+        for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
+    )
     stage_totals = sim.train.total_by_species()
     products = sim.product_ledger()
     condensed_total = sum(condensed.values())
 
     assert overhead > 0.0
+    assert wall_total > 0.0
     assert "SiO" not in stage_totals
     assert stage_totals["Si"] == pytest.approx(condensed["Si"])
     assert stage_totals["SiO2"] == pytest.approx(condensed["SiO2"])
-    assert condensed_total + overhead == pytest.approx(100.0)
+    assert condensed_total + overhead + wall_total == pytest.approx(100.0)
     assert products["SiO"] == pytest.approx(overhead)
     assert products["Si"] == pytest.approx(condensed["Si"])
     assert products["SiO2"] == pytest.approx(condensed["SiO2"])

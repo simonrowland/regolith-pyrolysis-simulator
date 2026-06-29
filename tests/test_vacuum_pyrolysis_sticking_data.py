@@ -45,6 +45,29 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
             assert row["source_url"], species
 
 
+def test_wall_deposit_reactivity_classes_are_explicit():
+    data = _load_sticking_data()
+    classes = data["reactivity_class_by_species"]
+
+    assert set(classes) == {
+        "SiO",
+        "Na",
+        "K",
+        "Fe",
+        "Mg",
+        "Ca",
+        "Mn",
+        "Cr",
+        "Al",
+        "Ti",
+        "CrO2",
+    }
+    assert classes["SiO"] == "reactive"
+    for species in ("Na", "K", "Fe", "Mg", "Ca", "Mn", "Cr", "Al", "Ti"):
+        assert classes[species] == "physisorbing"
+    assert classes["CrO2"] == "physisorbing"
+
+
 def test_material_defaults_reference_sticking_sidecar():
     materials = yaml.safe_load(Path("data/materials.yaml").read_text())
     defaults = materials["default_alpha_s_by_species"]

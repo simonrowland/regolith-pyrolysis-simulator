@@ -3,7 +3,6 @@ import shlex
 import pytest
 
 from simulator.session_cli import SessionScriptRunner
-from simulator.runner import SIO_SLOW_FOULING_WALL_DEPOSIT_KG
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, STOICH_RATIOS
 
 
@@ -11,6 +10,7 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 3.3055757359579566e-05
 
 
 def _run_script(lines: list[str]):
@@ -221,5 +221,11 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
     )
 
     assert warnings == []
-    assert segment_wall_sio_kg <= SIO_SLOW_FOULING_WALL_DEPOSIT_KG
+    # No upstream cold spot is still the routing invariant. The 2026-06-29
+    # reactive SiO wall-product fix increases the expected wall magnitude above
+    # the product slow-fouling threshold; do not retune that threshold here.
+    assert segment_wall_sio_kg == pytest.approx(
+        STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
+        rel=1e-9,
+    )
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT

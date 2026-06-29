@@ -6,51 +6,55 @@
   "sio_evolved_kg": 8.92476013101e-06,
   "sio_to_silica_fume_kg": {
     "stage_1_fe_condenser_impurity": 0.0,
-    "stage_3_sio_zone_product": 1.69066132025e-07,
-    "stage_4_alkali_mg_carryover": 3.17556734326e-07,
-    "stage_5_dust_filter_carryover": 2.12507663174e-07,
-    "terminal_offgas_escape": 7.88883498161e-06
+    "stage_3_sio_zone_product": 1.6778436362e-07,
+    "stage_4_alkali_mg_carryover": 3.15149191183e-07,
+    "stage_5_dust_filter_carryover": 2.10896545453e-07,
+    "terminal_offgas_escape": 7.88867286527e-06
   },
   "wall_deposit_kg": {
     "Fe": 0.0,
     "K": 0.0,
     "Mg": 0.0,
     "Na": 0.0,
-    "SiO": 0.0
+    "SiO": 8.01540151992e-09
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
-    "dominant_species": "none",
-    "dominant_species_wall_deposit_kg": 0.0,
-    "wall_deposit_kg_per_campaign": 0.0,
+    "dominant_species": "SiO",
+    "dominant_species_wall_deposit_kg": 8.01540151992e-09,
+    "wall_deposit_kg_per_campaign": 8.01540151992e-09,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "infinite",
+    "campaigns_to_resinter": "resinter_threshold_kg / 8.01540151992e-09",
     "fast_fouling_campaign_threshold": 10,
-    "output_status": "sourced_with_surface_proxy",
-    "authoritative": true,
-    "authoritative_for_resinter": true,
-    "verdict_authoritative": true,
-    "status": "available",
-    "status_reason": "",
+    "output_status": "status_bearing",
+    "authoritative": false,
+    "authoritative_for_resinter": false,
+    "verdict_authoritative": false,
+    "status": "warning",
+    "status_reason": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit.",
     "sticking_alpha_authority": {
-      "authoritative": true,
-      "authoritative_for_deposit_mass": true,
-      "authoritative_for_coating": true,
-      "authoritative_for_resinter": true,
-      "severity": "info",
-      "code": "wall_deposit_sticking_alpha_provenance",
-      "output_status": "sourced_with_surface_proxy",
-      "deposited_species": [],
-      "uncertified_alpha_species": [],
-      "status_bearing_alpha_count": 0,
+      "authoritative": false,
+      "authoritative_for_deposit_mass": false,
+      "authoritative_for_coating": false,
+      "authoritative_for_resinter": false,
+      "severity": "warning",
+      "code": "wall_deposit_sticking_alpha_provenance_missing",
+      "output_status": "status_bearing",
+      "deposited_species": [
+        "SiO"
+      ],
+      "uncertified_alpha_species": [
+        "SiO"
+      ],
+      "status_bearing_alpha_count": 1,
       "alpha_s_provenance_by_species": {},
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Deposited wall species use cited/sourced sticking alpha_s provenance for coating and fouling readouts."
+      "message": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit."
     },
-    "nominal_verdict": "slow-fouling",
-    "verdict": "slow-fouling"
+    "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
+    "verdict": "non-authoritative"
   },
   "sio_yield_pct_of_feedstock": 8.92476013101e-07,
   "industrial_benchmark_pct": [

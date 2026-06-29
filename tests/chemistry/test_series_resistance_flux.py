@@ -239,10 +239,16 @@ def test_series_flux_zero_alpha_returns_zero():
 
 def test_series_flux_below_saturation_returns_zero():
     """``P_local < P_sat(T_surface)`` means there is no driving force;
-    the helper must return ``0.0`` regardless of regime or stirring."""
-    # At T_surface = 5000 K the SiO P_sat is astronomical and dominates
-    # any realistic P_local.
-    assert _call(P_local_pa=1.0, T_surface_K=5000.0) == 0.0
+    the helper must return ``0.0`` for physisorbers regardless of regime
+    or stirring."""
+    # Na stays on the reversible pure-species P_sat path; SiO is reactive
+    # and has a separate product-P_sat backstop.
+    assert _call(
+        species="Na",
+        P_local_pa=1.0,
+        T_surface_K=5000.0,
+        alpha_s=1.0,
+    ) == 0.0
 
 
 # ---------------------------------------------------------------------------

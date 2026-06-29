@@ -284,6 +284,7 @@ STICKING_UNKNOWN_REF = (
     'data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default'
 )
 STICKING_STATUSES = {'CITED', 'UNCERTIFIED'}
+STICKING_REACTIVITY_CLASSES = {'reactive', 'physisorbing'}
 
 
 def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
@@ -295,6 +296,17 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
         raise ValueError(f'{path}: missing species sticking table')
     for species_name, entry in species.items():
         _validate_sticking_entry(path, f'species.{species_name}', entry)
+    reactivity_classes = raw.get('reactivity_class_by_species')
+    if not isinstance(reactivity_classes, Mapping) or not reactivity_classes:
+        raise ValueError(f'{path}: missing reactivity_class_by_species')
+    for species_name, reactivity_class in reactivity_classes.items():
+        if not isinstance(species_name, str) or not species_name:
+            raise ValueError(f'{path}: reactivity_class species names must be strings')
+        _validate_sticking_reactivity_class(
+            path,
+            f'reactivity_class_by_species.{species_name}',
+            reactivity_class,
+        )
     _validate_sticking_entry(
         path,
         'unknown_species_default',
@@ -326,6 +338,12 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
             raise ValueError(f'{path}: {name}.{key} is required')
 
 
+def _validate_sticking_reactivity_class(path: Path, name: str, value: Any) -> None:
+    if value not in STICKING_REACTIVITY_CLASSES:
+        allowed = ', '.join(sorted(STICKING_REACTIVITY_CLASSES))
+        raise ValueError(f'{path}: {name} must be one of {allowed}')
+
+
 def _validate_sticking_value(path: Path, name: str, value: Any) -> None:
     try:
         alpha_s = float(value)
@@ -354,6 +372,25 @@ def _sticking_species_entry(species: str) -> Mapping[str, Any]:
 
 def _sticking_alpha_s(species: str) -> float:
     return _coerce_alpha_s(_sticking_species_entry(species).get('value'))
+
+
+def _sticking_reactivity_class(species: str) -> str:
+    classes = STICKING_DATA.get('reactivity_class_by_species')
+    if not isinstance(classes, Mapping):
+        raise ValueError(f'{STICKING_DATA_PATH}: missing reactivity_class_by_species')
+    species_name = str(species)
+    if species_name not in classes:
+        raise ValueError(
+            f'{STICKING_DATA_PATH}: missing reactivity_class for '
+            f'species {species_name}'
+        )
+    reactivity_class = classes.get(species_name)
+    _validate_sticking_reactivity_class(
+        STICKING_DATA_PATH,
+        f'reactivity_class_by_species.{species_name}',
+        reactivity_class,
+    )
+    return str(reactivity_class)
 
 
 def _sticking_ref_record(species: str, ref: Any) -> Mapping[str, Any] | None:
@@ -1859,6 +1896,9 @@ class CondensationModel:
             J = alpha_s * max(0, P_local - P_sat(T_surface))
                 / sqrt(2*pi*m*k*T_surface) * regime_factor(Kn)
 
+        Reactive wall products use the product-P_sat floor in the shared
+        driving-pressure helper instead of the vapor species' Antoine P_sat.
+
         Chunk A keeps the existing stage residence-time surrogate for
         geometry and integrates the H-K-L driving force across the actual
         stage T-band. Chunk C replaces the constant regime factor with
@@ -1930,6 +1970,9 @@ class CondensationModel:
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=self.carrier_gas,
                 vapor_pressure_data=self.vapor_pressure_data,
+                # Owner scope for 2026-06-29 re-evap fix is wall deposits
+                # only; keep historical condenser-stage capture unchanged.
+                reactive_product_backstop=False,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -2568,6 +2611,41 @@ def _hkl_impingement_flux_mol_m2_s(
     return pressure_pa / denominator / AVOGADRO_MOL
 
 
+def _wall_deposition_driving_pressure_pa(
+    species: str,
+    P_local_pa: float,
+    T_surface_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    reactive_product_backstop: bool = True,
+) -> float:
+    try:
+        local_pressure_pa = float(P_local_pa)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(local_pressure_pa) or local_pressure_pa <= 0.0:
+        return 0.0
+
+    P_sat_pa = _antoine_psat_pa(
+        species,
+        T_surface_K,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    if P_sat_pa is None or not math.isfinite(P_sat_pa):
+        return 0.0
+    if reactive_product_backstop:
+        reactivity_class = _sticking_reactivity_class(species)
+        if reactivity_class == 'reactive':
+            if P_sat_pa < local_pressure_pa:
+                return max(0.0, local_pressure_pa - P_sat_pa)
+            # Reactive deposits are less-volatile wall products, not the vapor
+            # species. Today SiO uses the disproportionation-product limit
+            # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
+            effective_product_psat_pa = 0.0
+            return max(0.0, local_pressure_pa - effective_product_psat_pa)
+    return max(0.0, local_pressure_pa - P_sat_pa)
+
+
 def _hkl_surface_deposition_flux_mol_m2_s(
     species: str,
     P_local_pa: float,
@@ -2576,15 +2654,15 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     regime_factor: float = 1.0,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    reactive_product_backstop: bool = True,
 ) -> float:
-    P_sat_pa = _antoine_psat_pa(
+    driving_pressure_pa = _wall_deposition_driving_pressure_pa(
         species,
+        P_local_pa,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
+        reactive_product_backstop=reactive_product_backstop,
     )
-    if P_sat_pa is None:
-        return 0.0
-    driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
     return (
@@ -2627,6 +2705,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     *,
     radial_stir_factor: float | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    reactive_product_backstop: bool = True,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -2670,8 +2749,9 @@ def _series_resistance_deposition_flux_mol_m2_s(
     to fly out of the pot") Sh ≈ 11.6. See
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
-    Returns 0 when there is no driving force (``P_local <= P_sat`` at
-    ``T_surface``) or when the pipe geometry is degenerate.
+    Returns 0 when there is no driving force (physisorber
+    ``P_local <= P_sat`` at ``T_surface``; reactive species use the
+    product-P_sat floor) or when the pipe geometry is degenerate.
     """
     # Defensive input validation: any non-finite or non-physical input
     # in this hot path silently propagates through the rate-coefficient
@@ -2683,14 +2763,13 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
             and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):
         return 0.0
-    P_sat_pa = _antoine_psat_pa(
+    driving_pressure_pa = _wall_deposition_driving_pressure_pa(
         species,
+        P_local_pa,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
+        reactive_product_backstop=reactive_product_backstop,
     )
-    if P_sat_pa is None or not math.isfinite(P_sat_pa):
-        return 0.0
-    driving_pressure_pa = max(0.0, P_local_pa - P_sat_pa)
     if driving_pressure_pa <= 0.0:
         return 0.0
 
