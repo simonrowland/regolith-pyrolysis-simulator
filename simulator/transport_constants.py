@@ -17,6 +17,7 @@ literals (golden-neutral by construction).
 
 from __future__ import annotations
 
+import math
 from types import MappingProxyType
 from typing import Mapping
 
@@ -48,3 +49,8 @@ COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
 # they can never diverge. Prior value was an ungrounded rounded 3.7e-10 carryover
 # with no cited source. [BUG-013]
 N2_COLLISION_DIAMETER_M = COLLISION_DIAMETERS_M["N2"]
+
+# Mean-free-path formula metadata for UI/API consumers that display the same
+# hard-sphere kinetic-theory Knudsen number as the live condensation path.
+MEAN_FREE_PATH_FORMULA_ID = "hard_sphere_kinetic_theory"
+MEAN_FREE_PATH_DENOMINATOR_FACTOR = math.sqrt(2.0) * math.pi

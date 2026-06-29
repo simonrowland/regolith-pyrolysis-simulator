@@ -23,6 +23,11 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
+from simulator.transport_constants import (
+    MEAN_FREE_PATH_DENOMINATOR_FACTOR,
+    MEAN_FREE_PATH_FORMULA_ID,
+)
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
@@ -1409,10 +1414,31 @@ def _required_finite_range_high(value: Any, field: str) -> float:
     return max(finite_values)
 
 
+def _required_finite_range_pair(value: Any, field: str) -> tuple[float, float]:
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise ValueError(f'setpoints.yaml {field} must contain exactly two values')
+    low = _required_finite_number(value[0], f'{field}[0]')
+    high = _required_finite_number(value[1], f'{field}[1]')
+    if low > high:
+        raise ValueError(f'setpoints.yaml {field} must be ordered low-to-high')
+    return low, high
+
+
 def _format_compact_number(value: float) -> str:
     if float(value).is_integer():
         return str(int(value))
     return f'{value:g}'
+
+
+def _option_payload(
+    value: str,
+    label: str,
+    label_html: str | None = None,
+) -> dict[str, str]:
+    payload = {'value': value, 'label': label}
+    if label_html is not None:
+        payload['label_html'] = label_html
+    return payload
 
 
 def _c4_operator_preset_payload(
@@ -1473,6 +1499,19 @@ def _c4_operator_preset_payload(
             f'{_format_compact_number(stir_low)}-'
             f'{_format_compact_number(stir_high)}x'
         ),
+        'pO2_options': [
+            _option_payload('0.001', 'Hard vacuum (0.001)'),
+            _option_payload('0.2', 'Low (0.2)'),
+            _option_payload('1.0', 'Medium (1.0)'),
+            _option_payload('5.0', 'High (5.0)'),
+            _option_payload('50.0', 'MRE backpressure (50)'),
+        ],
+        'stir_factor_options': [
+            _option_payload('8', 'High (8x)', 'High (8&times;)'),
+            _option_payload('6', 'Medium (6x)', 'Medium (6&times;)'),
+            _option_payload('4', 'Low (4x)', 'Low (4&times;)'),
+            _option_payload('1', 'Off (1x)', 'Off (1&times;)'),
+        ],
     }
 
 
@@ -1499,12 +1538,48 @@ def _furnace_material_catalog_payload() -> list[dict[str, Any]]:
     return materials
 
 
-def _knudsen_config_payload() -> dict[str, float]:
+def _knudsen_config_payload(
+    setpoints: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    if setpoints is None:
+        setpoints = _load_yaml('setpoints.yaml')
+    campaigns = setpoints.get('campaigns', {}) if isinstance(setpoints, Mapping) else {}
+    c2a = (
+        campaigns.get('C2A_continuous', {})
+        if isinstance(campaigns, Mapping)
+        else {}
+    )
+    pressure_band = (
+        c2a.get('p_total_mbar')
+        if isinstance(c2a, Mapping)
+        else None
+    )
+    pressure_low, pressure_high = _required_finite_range_pair(
+        pressure_band,
+        'campaigns.C2A_continuous.p_total_mbar',
+    )
     return {
         'boltzmann_constant_j_k': BOLTZMANN_CONSTANT_J_K,
         'characteristic_length_m': DEFAULT_PIPE_DIAMETER_M,
         'n2_collision_diameter_m': N2_COLLISION_DIAMETER_M,
         'continuum_buffer_kn': CONTINUUM_BUFFER_KN,
+        'mean_free_path_formula_id': MEAN_FREE_PATH_FORMULA_ID,
+        'mean_free_path_denominator_factor': MEAN_FREE_PATH_DENOMINATOR_FACTOR,
+        'temperature_k_offset': CELSIUS_TO_KELVIN_OFFSET,
+        'pressure_pa_per_mbar': PA_PER_MBAR,
+        'default_pressure_band_mbar': {
+            'role': 'default',
+            'source_campaign': 'C2A_continuous',
+            'min': pressure_low,
+            'max': pressure_high,
+            'label': 'viscous-flow band',
+            'warning_message': (
+                'pN2 sweep outside '
+                f'{_format_compact_number(pressure_low)}-'
+                f'{_format_compact_number(pressure_high)} mbar '
+                'viscous-flow band'
+            ),
+        },
     }
 
 

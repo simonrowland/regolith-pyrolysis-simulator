@@ -950,6 +950,32 @@ def test_c4_operator_presets_render_from_server_setpoints(monkeypatch):
     assert 'data-field="max_hours"\n                           value="12"' in disclosure_html
 
 
+def test_c4_disclosure_option_lists_are_server_sourced_byte_identical():
+    app = app_module.create_app()
+    client = app.test_client()
+
+    response = client.get("/partials/disclosure/C4")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    option_tags = re.findall(r"<option[^>]*>[^<]*</option>", html)
+    assert option_tags[0:6] == [
+        '<option value="0.2" selected>Setpoint default (0.2)</option>',
+        '<option value="0.001">Hard vacuum (0.001)</option>',
+        '<option value="0.2">Low (0.2)</option>',
+        '<option value="1.0">Medium (1.0)</option>',
+        '<option value="5.0">High (5.0)</option>',
+        '<option value="50.0">MRE backpressure (50)</option>',
+    ]
+    assert option_tags[6:11] == [
+        '<option value="6" selected>Setpoint default (4-8x)</option>',
+        '<option value="8">High (8&times;)</option>',
+        '<option value="6">Medium (6&times;)</option>',
+        '<option value="4">Low (4&times;)</option>',
+        '<option value="1">Off (1&times;)</option>',
+    ]
+
+
 @pytest.mark.parametrize(
     ("path", "value", "message"),
     [

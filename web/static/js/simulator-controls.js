@@ -296,16 +296,34 @@ function applyLoadedRecipeControls(controls) {
 }
 
 function numericDataAttribute(element, name) {
-    const value = parseFloat(element.getAttribute(`data-${name}`) || '');
+    const value = parseFloat(element?.getAttribute(`data-${name}`) || '');
     return Number.isFinite(value) ? value : null;
 }
 
 function knudsenDisplayConfig(indicator) {
+    const pressureBandMinMbar = numericDataAttribute(indicator, 'default-pressure-band-min-mbar');
+    const pressureBandMaxMbar = numericDataAttribute(indicator, 'default-pressure-band-max-mbar');
     const config = {
         boltzmannConstantJK: numericDataAttribute(indicator, 'boltzmann-constant-j-k'),
         characteristicLengthM: numericDataAttribute(indicator, 'characteristic-length-m'),
         n2CollisionDiameterM: numericDataAttribute(indicator, 'n2-collision-diameter-m'),
         continuumBufferKn: numericDataAttribute(indicator, 'continuum-buffer-kn'),
+        meanFreePathFormulaId: indicator?.getAttribute('data-mean-free-path-formula-id') || '',
+        meanFreePathDenominatorFactor: numericDataAttribute(
+            indicator,
+            'mean-free-path-denominator-factor',
+        ),
+        temperatureKOffset: numericDataAttribute(indicator, 'temperature-k-offset'),
+        pressurePaPerMbar: numericDataAttribute(indicator, 'pressure-pa-per-mbar'),
+        defaultPressureBand: {
+            role: indicator?.getAttribute('data-default-pressure-band-role') || '',
+            minMbar: pressureBandMinMbar,
+            maxMbar: pressureBandMaxMbar,
+            label: indicator?.getAttribute('data-default-pressure-band-label') || '',
+            warningMessage: (
+                indicator?.getAttribute('data-default-pressure-band-warning-message') || ''
+            ),
+        },
     };
     if (
         config.boltzmannConstantJK === null
@@ -315,6 +333,18 @@ function knudsenDisplayConfig(indicator) {
         || config.n2CollisionDiameterM <= 0
         || config.continuumBufferKn === null
         || config.continuumBufferKn <= 0
+        || !config.meanFreePathFormulaId
+        || config.meanFreePathDenominatorFactor === null
+        || config.meanFreePathDenominatorFactor <= 0
+        || config.temperatureKOffset === null
+        || config.pressurePaPerMbar === null
+        || config.pressurePaPerMbar <= 0
+        || config.defaultPressureBand.role !== 'default'
+        || config.defaultPressureBand.minMbar === null
+        || config.defaultPressureBand.maxMbar === null
+        || config.defaultPressureBand.minMbar > config.defaultPressureBand.maxMbar
+        || !config.defaultPressureBand.label
+        || !config.defaultPressureBand.warningMessage
     ) {
         return null;
     }
@@ -335,9 +365,14 @@ function updateKnudsenIndicator() {
         indicator.classList.remove('config-warning');
         return;
     }
-    const pressurePa = pressureMbar * 100;
-    const meanFreePathM = config.boltzmannConstantJK * (tempC + 273.15)
-        / (Math.SQRT2 * Math.PI * config.n2CollisionDiameterM ** 2 * pressurePa);
+    const pressurePa = pressureMbar * config.pressurePaPerMbar;
+    const meanFreePathM = config.boltzmannConstantJK
+        * (tempC + config.temperatureKOffset)
+        / (
+            config.meanFreePathDenominatorFactor
+            * config.n2CollisionDiameterM ** 2
+            * pressurePa
+        );
     const kn = meanFreePathM / config.characteristicLengthM;
     indicator.textContent = `Kn: ${kn.toExponential(2)}`
         + (kn >= config.continuumBufferKn
@@ -352,8 +387,15 @@ function updateLeverWarning() {
     const messages = [];
     const pressureMbar = parseFloat(document.getElementById('lever-pn2-mbar')?.value || '0');
     const tempC = parseFloat(document.getElementById('lever-stage-temp')?.value || '0');
-    if (Number.isFinite(pressureMbar) && (pressureMbar < 5 || pressureMbar > 15)) {
-        messages.push('pN2 sweep outside 5-15 mbar viscous-flow band');
+    const band = knudsenDisplayConfig(
+        document.getElementById('knudsen-indicator'),
+    )?.defaultPressureBand;
+    if (
+        band
+        && Number.isFinite(pressureMbar)
+        && (pressureMbar < band.minMbar || pressureMbar > band.maxMbar)
+    ) {
+        messages.push(band.warningMessage);
     }
     if (Number.isFinite(tempC) && (tempC < 20 || tempC > 1900)) {
         messages.push('stage temperature outside characterized operator band');

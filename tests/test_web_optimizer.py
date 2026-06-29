@@ -21,6 +21,11 @@ from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
+from simulator.transport_constants import (
+    MEAN_FREE_PATH_DENOMINATOR_FACTOR,
+    MEAN_FREE_PATH_FORMULA_ID,
+)
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import StubBackend
@@ -468,6 +473,21 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
     assert payload["characteristic_length_m"] == DEFAULT_PIPE_DIAMETER_M
     assert payload["n2_collision_diameter_m"] == N2_COLLISION_DIAMETER_M
     assert payload["continuum_buffer_kn"] == CONTINUUM_BUFFER_KN
+    assert payload["mean_free_path_formula_id"] == MEAN_FREE_PATH_FORMULA_ID
+    assert (
+        payload["mean_free_path_denominator_factor"]
+        == pytest.approx(MEAN_FREE_PATH_DENOMINATOR_FACTOR)
+    )
+    assert payload["temperature_k_offset"] == CELSIUS_TO_KELVIN_OFFSET
+    assert payload["pressure_pa_per_mbar"] == PA_PER_MBAR
+    assert payload["default_pressure_band_mbar"] == {
+        "role": "default",
+        "source_campaign": "C2A_continuous",
+        "min": 5.0,
+        "max": 15.0,
+        "label": "viscous-flow band",
+        "warning_message": "pN2 sweep outside 5-15 mbar viscous-flow band",
+    }
 
     html = client.get("/").get_data(as_text=True)
     assert (
@@ -475,6 +495,20 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
         in html
     )
     assert f'data-continuum-buffer-kn="{CONTINUUM_BUFFER_KN}"' in html
+    assert f'data-mean-free-path-formula-id="{MEAN_FREE_PATH_FORMULA_ID}"' in html
+    assert (
+        f'data-mean-free-path-denominator-factor="{MEAN_FREE_PATH_DENOMINATOR_FACTOR}"'
+        in html
+    )
+    assert f'data-temperature-k-offset="{CELSIUS_TO_KELVIN_OFFSET}"' in html
+    assert f'data-pressure-pa-per-mbar="{PA_PER_MBAR}"' in html
+    assert 'data-default-pressure-band-role="default"' in html
+    assert 'data-default-pressure-band-min-mbar="5.0"' in html
+    assert 'data-default-pressure-band-max-mbar="15.0"' in html
+    assert (
+        'data-default-pressure-band-warning-message="pN2 sweep outside '
+        '5-15 mbar viscous-flow band"'
+    ) in html
 
 
 def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:

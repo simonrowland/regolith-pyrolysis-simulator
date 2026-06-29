@@ -116,7 +116,16 @@
                  data-boltzmann-constant-j-k="{{ knudsen_config.boltzmann_constant_j_k }}"
                  data-characteristic-length-m="{{ knudsen_config.characteristic_length_m }}"
                  data-n2-collision-diameter-m="{{ knudsen_config.n2_collision_diameter_m }}"
-                 data-continuum-buffer-kn="{{ knudsen_config.continuum_buffer_kn }}">Kn: —</div>
+                 data-continuum-buffer-kn="{{ knudsen_config.continuum_buffer_kn }}"
+                 data-mean-free-path-formula-id="{{ knudsen_config.mean_free_path_formula_id }}"
+                 data-mean-free-path-denominator-factor="{{ knudsen_config.mean_free_path_denominator_factor }}"
+                 data-temperature-k-offset="{{ knudsen_config.temperature_k_offset }}"
+                 data-pressure-pa-per-mbar="{{ knudsen_config.pressure_pa_per_mbar }}"
+                 data-default-pressure-band-role="{{ knudsen_config.default_pressure_band_mbar.role }}"
+                 data-default-pressure-band-min-mbar="{{ knudsen_config.default_pressure_band_mbar.min }}"
+                 data-default-pressure-band-max-mbar="{{ knudsen_config.default_pressure_band_mbar.max }}"
+                 data-default-pressure-band-label="{{ knudsen_config.default_pressure_band_mbar.label }}"
+                 data-default-pressure-band-warning-message="{{ knudsen_config.default_pressure_band_mbar.warning_message }}">Kn: —</div>
             <label>
                 Stage target T (&deg;C):
                 <input type="number" id="lever-stage-temp" class="recipe-lever recipe-defining-control"

@@ -104,11 +104,9 @@
                         {% else %}
                         <option value="">Default</option>
                         {% endif %}
-                        <option value="0.001">Hard vacuum (0.001)</option>
-                        <option value="0.2">Low (0.2)</option>
-                        <option value="1.0">Medium (1.0)</option>
-                        <option value="5.0">High (5.0)</option>
-                        <option value="50.0">MRE backpressure (50)</option>
+                        {% for option in c4_operator_presets.pO2_options %}
+                        <option value="{{ option.value }}">{{ option.label }}</option>
+                        {% endfor %}
                     </select>
                 </label>
             </div>
@@ -121,10 +119,9 @@
                         {% else %}
                         <option value="">Default (6&times;)</option>
                         {% endif %}
-                        <option value="8">High (8&times;)</option>
-                        <option value="6">Medium (6&times;)</option>
-                        <option value="4">Low (4&times;)</option>
-                        <option value="1">Off (1&times;)</option>
+                        {% for option in c4_operator_presets.stir_factor_options %}
+                        <option value="{{ option.value }}">{{ option.label_html|default(option.label)|safe }}</option>
+                        {% endfor %}
                     </select>
                 </label>
             </div>
