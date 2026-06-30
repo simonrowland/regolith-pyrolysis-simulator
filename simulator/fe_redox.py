@@ -106,8 +106,8 @@ FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
 }
 
 # Redox v3 Step C authority switch: Kress & Carmichael 1991 ferric split above
-# IW+1; Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 central
-# stoichiometric-FeO(l) band at/below IW; Ban-ya1993 ISIJ Int. 33:2-11 carries
+# IW(pure-FeO)+1; Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 central
+# stoichiometric-FeO(l) band at/below IW(pure-FeO); Ban-ya1993 ISIJ Int. 33:2-11 carries
 # the regular-solution composition-transfer diagnostic.
 CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10 = 1.0
 
@@ -566,11 +566,14 @@ def _calphad_feo_activity_components(
         if delta_log10_kress91 is not None
         else None
     )
-    pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-    delta_iw = float(fO2_log) - pure_iw
-    calphad_weight = _calphad_authority_weight(delta_iw)
+    pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+    delta_iw_pure_feo = float(fO2_log) - pure_feo_iw
+    calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
-    authoritative = calphad_weight * central + kress91_weight * kress91_activity
+    authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
+    # Pure-liquid-FeO standard state: metal saturation is a_FeO = 1, so values
+    # above unity are unphysical supersaturation and must not feed vapor pressure.
+    authoritative = min(authoritative_unclamped, 1.0)
     if authoritative > 0.0:
         ratio_current = central / authoritative
         delta_log10_current = (
@@ -585,11 +588,11 @@ def _calphad_feo_activity_components(
         else None
     )
     if calphad_weight >= 1.0:
-        regime = 'calphad_metal_saturated_below_iw'
+        regime = 'calphad_metal_saturated_below_iw_pure_feo'
     elif calphad_weight <= 0.0:
-        regime = 'kress91_ferric_limb_above_iw_plus_1'
+        regime = 'kress91_ferric_limb_above_iw_pure_feo_plus_1'
     else:
-        regime = 'iw_to_iw_plus_1_smooth_blend'
+        regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
 
     return {
         'status': 'ok',
@@ -599,8 +602,13 @@ def _calphad_feo_activity_components(
         'standard_state': 'stoichiometric_FeO_l',
         'a_FeO_current': authoritative,
         'a_FeO_authoritative': authoritative,
+        'a_FeO_authoritative_unclamped': authoritative_unclamped,
         'a_FeO_kress91': kress91_activity,
         'a_FeO_calphad': activity,
+        'a_FeO_pure_feo_ceiling': 1.0,
+        'a_FeO_authoritative_clamped_to_pure_feo_ceiling': (
+            authoritative_unclamped > 1.0
+        ),
         'current_within_calphad_band': low <= authoritative <= high,
         'comparison': {
             'status': (
@@ -619,7 +627,8 @@ def _calphad_feo_activity_components(
         },
         'authority': {
             'regime': regime,
-            'relative_to_iw_log10': delta_iw,
+            'iw_basis': 'IW(pure-FeO)',
+            'relative_to_iw_pure_feo_log10': delta_iw_pure_feo,
             'calphad_weight': calphad_weight,
             'kress91_weight': kress91_weight,
             'blend_width_log10': CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10,
@@ -650,7 +659,7 @@ def _calphad_feo_activity_components(
             },
         },
         'metal_saturation_tie_point': {
-            'pure_iw_log10_fO2_bar': pure_iw,
+            'iw_pure_feo_log10_fO2_bar': pure_feo_iw,
             'central_melt_metal_saturation_log10_fO2_bar': (
                 feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
             ),
@@ -660,18 +669,19 @@ def _calphad_feo_activity_components(
             'kress91_melt_metal_saturation_log10_fO2_bar': (
                 feo_iw_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
             ),
-            'central_delta_iw_at_aFe_equal_1': (
+            'central_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
                 2.0 * math.log10(max(central, 1.0e-300))
             ),
-            'current_delta_iw_at_aFe_equal_1': (
+            'current_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
                 2.0 * math.log10(max(authoritative, 1.0e-300))
             ),
-            'kress91_delta_iw_at_aFe_equal_1': (
+            'kress91_melt_saturation_offset_from_iw_pure_feo_log10_fO2': (
                 2.0 * math.log10(max(kress91_activity, 1.0e-300))
             ),
-            'delta_iw_convention': (
-                'Fe + 0.5 O2 = FeO(l), a_Fe=1; '
-                'DeltaIW_melt=2*log10(a_FeO)'
+            'iw_basis_note': (
+                'IW axis is pure FeO(l), a_FeO=1. A melt with a_FeO<1 reaches '
+                'a_Fe=1 at log10(fO2) lower by 2*log10(a_FeO_melt); the '
+                'self-consistent melt-a_FeO saturation anchor is deferred.'
             ),
             'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
         },

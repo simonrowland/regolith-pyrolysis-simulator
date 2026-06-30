@@ -29,6 +29,13 @@ _BASALTIC_FE_MELT_WT = {
     "Na2O": 4.0,
     "K2O": 3.0,
 }
+_FEO_RICH_MELT_WT = {
+    "SiO2": 30.0,
+    "Al2O3": 5.0,
+    "CaO": 5.0,
+    "MgO": 10.0,
+    "FeO": 50.0,
+}
 _T_K = 1673.15
 
 
@@ -57,7 +64,9 @@ def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():
     assert diagnostic["standard_state"] == "stoichiometric_FeO_l"
     assert band["low"] <= current <= band["high"]
     assert diagnostic["current_within_calphad_band"] is True
-    assert diagnostic["authority"]["regime"] == "iw_to_iw_plus_1_smooth_blend"
+    assert diagnostic["authority"]["regime"] == (
+        "iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend"
+    )
     assert diagnostic["authority"]["calphad_weight"] == pytest.approx(0.5)
     assert diagnostic["gamma_FeO"]["central"] == pytest.approx(3.298, rel=1e-3)
     assert diagnostic["gamma_FeO"]["banya_quadratic"]["status"] == (
@@ -103,7 +112,9 @@ def test_calphad_feo_activity_central_diverges_below_iw_and_carries_tiepoint():
 
     assert current == pytest.approx(central)
     assert central / kress91 > 2.5
-    assert diagnostic["authority"]["regime"] == "calphad_metal_saturated_below_iw"
+    assert diagnostic["authority"]["regime"] == (
+        "calphad_metal_saturated_below_iw_pure_feo"
+    )
     assert diagnostic["comparison"]["central_over_current"] == pytest.approx(1.0)
     assert diagnostic["comparison"][
         "delta_iw_log10_shift_central_minus_kress91"
@@ -111,20 +122,26 @@ def test_calphad_feo_activity_central_diverges_below_iw_and_carries_tiepoint():
     assert diagnostic["comparison"][
         "delta_iw_log10_shift_central_minus_current"
     ] == pytest.approx(0.0)
-    assert tiepoint["pure_iw_log10_fO2_bar"] == pytest.approx(
+    assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(
         feo_iw_log10_fO2_bar(_T_K, a_feo=1.0)
     )
     assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
         pytest.approx(
-            tiepoint["pure_iw_log10_fO2_bar"]
-            + tiepoint["central_delta_iw_at_aFe_equal_1"]
+            tiepoint["iw_pure_feo_log10_fO2_bar"]
+            + tiepoint[
+                "central_melt_saturation_offset_from_iw_pure_feo_log10_fO2"
+            ]
         )
     )
     assert tiepoint["current_melt_metal_saturation_log10_fO2_bar"] == (
         pytest.approx(tiepoint["central_melt_metal_saturation_log10_fO2_bar"])
     )
-    assert tiepoint["current_delta_iw_at_aFe_equal_1"] == pytest.approx(
-        tiepoint["central_delta_iw_at_aFe_equal_1"]
+    assert tiepoint[
+        "current_melt_saturation_offset_from_iw_pure_feo_log10_fO2"
+    ] == pytest.approx(
+        tiepoint[
+            "central_melt_saturation_offset_from_iw_pure_feo_log10_fO2"
+        ]
     )
 
 
@@ -213,7 +230,9 @@ def test_feo_activity_uses_kress91_authority_above_iw_plus_one():
     )
 
     assert activity == pytest.approx(split["x_feo"], rel=0, abs=1e-15)
-    assert diagnostic["authority"]["regime"] == "kress91_ferric_limb_above_iw_plus_1"
+    assert diagnostic["authority"]["regime"] == (
+        "kress91_ferric_limb_above_iw_pure_feo_plus_1"
+    )
     assert diagnostic["authority"]["calphad_weight"] == 0.0
     assert diagnostic["a_FeO_current"] == pytest.approx(diagnostic["a_FeO_kress91"])
     assert diagnostic["comparison"]["central_over_current"] == pytest.approx(
@@ -241,7 +260,9 @@ def test_feo_activity_uses_central_calphad_authority_below_iw():
         pressure_bar=1e-6,
     ) == pytest.approx(expected, rel=0, abs=1e-15)
     assert diagnostic["a_FeO_current"] == pytest.approx(expected, rel=0, abs=1e-15)
-    assert diagnostic["authority"]["regime"] == "calphad_metal_saturated_below_iw"
+    assert diagnostic["authority"]["regime"] == (
+        "calphad_metal_saturated_below_iw_pure_feo"
+    )
     assert diagnostic["authority"]["central_band_is_authoritative"] is True
     assert diagnostic["authority"]["low_high_band_is_diagnostic"] is True
 
@@ -273,7 +294,7 @@ def test_feo_activity_blend_is_continuous_at_iw_boundaries():
         assert abs(above - at_boundary) < 1e-8
 
 
-def test_feo_activity_iw_tiepoint_uses_holzheid_delta_g():
+def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
     iw = feo_iw_log10_fO2_bar(_T_K)
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
         comp_wt=_BASALTIC_FE_MELT_WT,
@@ -283,10 +304,62 @@ def test_feo_activity_iw_tiepoint_uses_holzheid_delta_g():
     )
     central = diagnostic["a_FeO_calphad"]["central"]
     tiepoint = diagnostic["metal_saturation_tie_point"]
+    offset = tiepoint[
+        "central_melt_saturation_offset_from_iw_pure_feo_log10_fO2"
+    ]
 
-    assert diagnostic["authority"]["relative_to_iw_log10"] == pytest.approx(0.0)
-    assert diagnostic["a_FeO_current"] == pytest.approx(central)
-    assert tiepoint["pure_iw_log10_fO2_bar"] == pytest.approx(iw)
-    assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
-        pytest.approx(iw + 2.0 * math.log10(central))
+    assert diagnostic["authority"]["iw_basis"] == "IW(pure-FeO)"
+    assert diagnostic["authority"]["relative_to_iw_pure_feo_log10"] == (
+        pytest.approx(0.0)
     )
+    assert diagnostic["a_FeO_current"] == pytest.approx(central)
+    assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(iw)
+    assert offset == pytest.approx(2.0 * math.log10(central))
+    assert offset < 0.0
+    assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
+        pytest.approx(iw + offset)
+    )
+
+
+def test_feo_rich_authoritative_activity_clamps_at_pure_feo_ceiling(
+    vapor_pressure_data,
+):
+    fO2_log = feo_iw_log10_fO2_bar(_T_K) - 0.25
+    diagnostic = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=_FEO_RICH_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    )
+
+    assert diagnostic["a_FeO_calphad"]["central"] > 1.0
+    assert diagnostic["a_FeO_authoritative_unclamped"] > 1.0
+    assert diagnostic["a_FeO_authoritative_clamped_to_pure_feo_ceiling"] is True
+    assert diagnostic["a_FeO_current"] == pytest.approx(1.0)
+    assert kress91_ferrous_feo_activity(
+        comp_wt=_FEO_RICH_MELT_WT,
+        fO2_log=fO2_log,
+        T_K=_T_K,
+        pressure_bar=1e-6,
+    ) == pytest.approx(1.0)
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": _moles_from_wt_pct(_FEO_RICH_MELT_WT)
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=_T_K - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=fO2_log,
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "intrinsic_fO2_log": fO2_log,
+        },
+    )
+
+    result = provider.dispatch(request)
+    assert result.diagnostic["activities"]["Fe"] == pytest.approx(1.0)
