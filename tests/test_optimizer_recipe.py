@@ -303,8 +303,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # diagnostic-only a_FeO_calphad metadata to the builtin vapor-pressure
     # provider. This is still source-fingerprint invalidation, not an
     # authoritative vapor/yield/ledger move.
+    # 2026-06-30: moved when per-stage materials.yaml alpha_s overrides gained
+    # explicit certification/status stamping; source-fingerprint only.
     # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "2ec2d09ad50492c0fe1d0418a3c88e410a1439a119f2d6d8d0bcb2fb829a8c9f"
+    assert cache_key(spec) == "f07696c922c1db0001649eb82ded354fbd1201f8f87bf711530c45e0322d7be6"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

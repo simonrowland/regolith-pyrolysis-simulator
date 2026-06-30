@@ -285,6 +285,58 @@ def test_uncertified_stage_alpha_driving_wall_deposit_fails_closed() -> None:
     )
 
 
+def test_stage_alpha_without_certification_status_fails_closed() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 1.0,
+                "source_class": "test_missing_stage_alpha_certification",
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]["stage_1"]
+    assert provenance["citation_status"] == "UNCERTIFIED"
+    assert provenance["status"] == "UNCERTIFIED"
+    assert provenance["output_status"] == "status_bearing"
+    assert "CITED/UNCERTIFIED" in provenance["certification_status_reason"]
+
+
+def test_internal_analytical_stage_alpha_cannot_certify_wall_deposit() -> None:
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 1.0,
+                "status": "CITED",
+                "source_class": "internal-analytical",
+                "source": "test::internal_analytical_alpha",
+                "output_status": "sourced_with_surface_proxy",
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]["stage_1"]
+    assert provenance["citation_status"] == "UNCERTIFIED"
+    assert provenance["status"] == "UNCERTIFIED"
+    assert provenance["output_status"] == "status_bearing"
+    assert provenance["certification_status_reason"] == (
+        "materials.yaml per-stage alpha_s source_class "
+        "internal-analytical cannot certify"
+    )
+
+
 def test_uncertified_non_condensing_stage_alpha_fails_closed() -> None:
     # Regression for the codex-caught F0 fail-open (2026-06-27): a stage whose
     # alpha is 0.0 does NOT condense, yet it still drives the final wall deposit

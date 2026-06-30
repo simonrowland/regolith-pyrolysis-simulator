@@ -593,6 +593,52 @@ def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _stage_material_alpha_certification_payload(entry: Any) -> dict[str, Any]:
+    if isinstance(entry, Mapping):
+        raw_status = str(
+            entry.get('citation_status')
+            or entry.get('status')
+            or ''
+        ).upper()
+        source_class = str(entry.get('source_class') or '')
+        entry_output_status = entry.get('output_status')
+    else:
+        raw_status = ''
+        source_class = ''
+        entry_output_status = None
+
+    denied = source_class == 'internal-analytical'
+    cited = raw_status == 'CITED' and not denied
+    output_status = (
+        str(entry_output_status)
+        if entry_output_status not in (None, '')
+        else (
+            'sourced_with_surface_proxy'
+            if cited
+            else 'status_bearing'
+        )
+    )
+    if not cited:
+        output_status = 'status_bearing'
+
+    payload = {
+        'citation_status': 'CITED' if cited else 'UNCERTIFIED',
+        'status': 'sourced' if cited else 'UNCERTIFIED',
+        'output_status': output_status,
+    }
+    if denied:
+        payload['certification_status_reason'] = (
+            'materials.yaml per-stage alpha_s source_class '
+            'internal-analytical cannot certify'
+        )
+    elif raw_status not in {'CITED', 'UNCERTIFIED'}:
+        payload['certification_status_reason'] = (
+            'materials.yaml per-stage alpha_s override lacks '
+            'CITED/UNCERTIFIED certification status'
+        )
+    return payload
+
+
 def _cold_wall_condensation_record_payload(
     species: str,
     evaluation: Mapping[str, Any],
@@ -2666,6 +2712,11 @@ def _alpha_record(
             value = entry.get(key)
             if value not in (None, ''):
                 record[key] = value
+    if (
+        source.startswith('data/materials.yaml::stages.')
+        and ref_record is None
+    ):
+        record.update(_stage_material_alpha_certification_payload(entry))
     spec = _alpha_s_spec_from_entry(species, entry)
     if isinstance(spec, Mapping):
         record['alpha_s_coefficient_spec'] = dict(spec)
