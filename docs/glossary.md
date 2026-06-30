@@ -50,7 +50,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Knudsen-regime refusal** — whole-run halt emitted by F3's `KnudsenRegimeRefusal` when any pipe segment Kn ≥ 10 under a campaign that requires viscous flow. Reported on `run_metadata.knudsen_regime_diagnostic` (`status`, `regime`, per-segment array) and escalates the runner's top-level `status` to `"refused"`. The band-integration HKL flux also applies `regime_factor = Kn / (Kn + 0.01)` so under-pressure runs report a physics-honest attenuated yield rather than a free-molecular ceiling.
 
-**Kress91** — the fO₂-coupled Fe³⁺/Fe²⁺ melt redox model (Kress & Carmichael 1991). Not yet implemented; Fe²⁺/Fe³⁺ partitioning is a diagnostic estimate only in current builds. See [`docs/model-limitations.md`](model-limitations.md).
+**Kress91** — the fO₂-coupled Fe³⁺/Fe²⁺ melt redox model (Kress & Carmichael 1991). Now live as the Fe vapor-pressure path's `a_FeO` authority above the oxidized limb of the redox switch; the intrinsic fO₂ source that feeds it remains an ungrounded composition heuristic / diagnostic input. See [`docs/model-limitations.md`](model-limitations.md).
 
 **Liquidus** — temperature above which a melt is fully liquid; the upper boundary of the mush region. Below the liquidus, crystallisation begins on cooling. Relevant to the freeze-gate and to the C6 self-terminating criterion (liquidus > 1700 °C when residual SiO₂ + Al₂O₃ < 15–20 wt%).
 

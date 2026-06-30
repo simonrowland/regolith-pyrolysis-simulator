@@ -84,7 +84,7 @@ Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` (historica
 - Gas, metal, salt, sulfide, halide, and low-major-oxide material is rejected before the engine.
 - `FeO_total` requires `QFM`, `NNO`, `IW`, `HM`, or configured `Fe3Fet`; no silent split.
 - `fO2_offset` is buffer-relative, and parsed results fill diagnostics only; AlphaMELTS emits no ledger transition.
-- Silicate requests carry `fe_redox_policy='intrinsic'` by default. Today that means the simulator derives intrinsic `fO2_log` from the cleaned melt composition and surfaces the applied `Fe3Fet` split on `LiquidusDiagnostics`; it does not run a Kress91 ferric/ferrous glass model.
+- Silicate requests carry `fe_redox_policy='intrinsic'` by default. The simulator derives intrinsic `fO2_log` from the cleaned melt composition and surfaces the applied `Fe3Fet` split on `LiquidusDiagnostics`; the Fe vapor-pressure authority now consumes a Kress91 ferric/ferrous split, while the intrinsic fO2 source remains a diagnostic heuristic rather than a grounded redox state.
 
 ### MELTS activity convention
 

@@ -187,7 +187,7 @@ Sequence: **C0 → C0b → C2B (Path B) → partial C3 → early melt tap**
 - Tap the melt before the SiO release window.
 - The result is a Ca–Mg–Al–Si glass with controlled alkali content.
 
-Honest note: the Kress91 ferric/ferrous glass model is not yet implemented; Fe²⁺/Fe³⁺ partitioning in the preserved glass is a diagnostic estimate only. See `docs/model-limitations.md`.
+Honest note: Kress91 ferric/ferrous splitting is now live for Fe `a_FeO`, but the intrinsic fO₂ source remains an ungrounded composition heuristic / diagnostic input and the pure-FeO IW anchor is still conservative. See `docs/model-limitations.md`.
 
 ### Ceramic-bootstrap mode
 
