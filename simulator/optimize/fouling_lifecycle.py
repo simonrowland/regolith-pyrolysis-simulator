@@ -28,6 +28,7 @@ class FoulingRunArtifact:
     result_document: Mapping[str, Any] | None = None
     simulator: Any | None = None
     snapshots: Sequence[Any] = ()
+    c4b_binding_substrate_state: Mapping[str, Any] | None = None
     campaigns_to_resinter_total: CampaignsToResinterTotal | Mapping[str, Any] | None = None
     mass_balance_error_pct: float | None = None
 
@@ -88,7 +89,7 @@ class FoulingLifecycleHarness:
         rho_deposit_kg_m3: float | Mapping[str, float] | None = None,
         thickness_limit_m: float | None = None,
         resinter_threshold_kg: float | None = None,
-        export_includes_carried: bool = False,
+        export_includes_carried: bool = True,
         closure_limit_pct: float = MASS_BALANCE_CLOSURE_LIMIT_PCT,
     ) -> None:
         self._run_campaign = run_campaign
@@ -138,6 +139,7 @@ class FoulingLifecycleHarness:
                     "rho_deposit_kg_m3": self._rho_deposit_kg_m3,
                     "segment_area_m2": self._segment_area_m2,
                 },
+                c4b_binding_substrate_state=artifact.c4b_binding_substrate_state,
             )
             cumulative, per_run_net = merge_run_snapshot(
                 carried,
@@ -196,6 +198,11 @@ def _coerce_run_artifact(raw: Any) -> FoulingRunArtifact:
         simulator=getattr(raw, "simulator", None),
         snapshots=tuple(getattr(raw, "snapshots", ()) or ()),
         result_document=getattr(raw, "result_document", None),
+        c4b_binding_substrate_state=getattr(
+            raw,
+            "c4b_binding_substrate_state",
+            None,
+        ),
     )
 
 
@@ -252,11 +259,11 @@ def _find_fouling_report(document: Mapping[str, Any] | None) -> Mapping[str, Any
 def _authoritative_for_resinter(snapshot: FoulingTerminalSnapshot) -> bool:
     authority = snapshot.wall_deposit_sticking_authority
     if not isinstance(authority, Mapping):
-        return True
+        return False
     for key in ("authoritative_for_resinter", "authoritative", "authoritative_for_coating"):
         if key in authority:
             return bool(authority[key])
-    return True
+    return False
 
 
 def _mass_balance_error_pct(artifact: FoulingRunArtifact) -> float | None:

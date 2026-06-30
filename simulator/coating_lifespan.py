@@ -3,19 +3,13 @@
 Phase A is an overlay. It reads completed run exports and never writes a
 ledger, seeds a simulator, or changes per-run output.
 
-Merge semantics are explicit because Phase A and the deferred seeded simulator
-path differ. In Phase A, each constituent run starts with empty authoritative
-wall state, so the trace terminal export is already that campaign's net deposit
-(deposit minus any remobilized material already accounted by the run). The
-projection state is updated as:
+The terminal trace export is the cumulative wall state for that completed run.
+The projection layer derives each campaign's net increment as:
 
-    cumulative_projection(N) = cumulative_projection(N - 1) + per_run_net(N)
+    per_run_net(N) = terminal_export(N) - carried_projection(N - 1)
 
-If a future seeded path exports terminal wall state that already includes the
-carried wall inventory, callers must set ``export_includes_carried=True``; then
-``per_run_net(N)`` is ``terminal_export(N) - carried_projection(N - 1)`` and
-the post-merge cumulative snapshot is still the projection state, not the raw
-trace object.
+This stays a projection-layer diff, not a ledger delta. Remobilization has
+already been folded into the per-run terminal net by the simulator.
 """
 
 from __future__ import annotations
@@ -43,7 +37,12 @@ Limiter = Callable[["FoulingTerminalSnapshot", int], "LimiterEvaluation"]
 
 @dataclass(frozen=True)
 class FoulingTerminalSnapshot:
-    """Immutable terminal wall-deposit export for one completed run."""
+    """Immutable terminal wall-deposit export for one completed run.
+
+    ``c4b_binding_substrate_state`` is an optional deferred seam for the
+    condensation export. Phase A does not harvest live condensation-model state;
+    callers may pass an already-exported read-only payload when one exists.
+    """
 
     wall_deposit_by_segment_species_kg: NestedDeposit
     wall_deposit_sticking_authority: Mapping[str, Any] | None = None
@@ -86,11 +85,16 @@ class FoulingTerminalSnapshot:
         threshold_params: Mapping[str, Any] | None = None,
         c4b_binding_substrate_state: Mapping[str, Any] | None = None,
     ) -> "FoulingTerminalSnapshot":
-        """Harvest the existing read-only trace deposit and sticking authority."""
+        """Harvest existing read-only trace deposit and sticking authority."""
+
+        if not hasattr(trace, "wall_deposit_by_segment_species_kg"):
+            raise FoulingProjectionError(
+                "trace missing wall_deposit_by_segment_species_kg export"
+            )
 
         return cls(
             wall_deposit_by_segment_species_kg=_coerce_nested_deposit(
-                getattr(trace, "wall_deposit_by_segment_species_kg", {})
+                getattr(trace, "wall_deposit_by_segment_species_kg")
             ),
             wall_deposit_sticking_authority=getattr(
                 trace,
@@ -173,7 +177,7 @@ def merge_run_snapshot(
     carried_projection: FoulingTerminalSnapshot | None,
     run_export: FoulingTerminalSnapshot,
     *,
-    export_includes_carried: bool = False,
+    export_includes_carried: bool = True,
 ) -> tuple[FoulingTerminalSnapshot, NestedDeposit]:
     """Return ``(post_merge_snapshot, per_run_net_deposit)``."""
 
@@ -204,7 +208,7 @@ def merge_run_snapshot(
 def merge_snapshot_sequence(
     run_exports: Sequence[FoulingTerminalSnapshot],
     *,
-    export_includes_carried: bool = False,
+    export_includes_carried: bool = True,
 ) -> FoulingMergeResult:
     carried: FoulingTerminalSnapshot | None = None
     trajectory: list[FoulingTerminalSnapshot] = []

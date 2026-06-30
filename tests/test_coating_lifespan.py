@@ -11,6 +11,7 @@ from simulator.coating_lifespan import (
     GROUNDING_PROVISIONAL,
     GROUNDING_UNGROUNDED,
     THICKNESS_PROXY_LIMITER,
+    FoulingProjectionError,
     FoulingTerminalSnapshot,
     campaigns_to_resinter_total,
     merge_run_snapshot,
@@ -29,24 +30,35 @@ def _trace(deposit, authority=None):
 def test_snapshot_is_frozen_and_deep_copied_after_export() -> None:
     deposit = {("duct_a", "SiO"): 0.25}
     authority = {"deposited_species": ["SiO"], "authoritative_for_resinter": True}
+    c4b_state = {"hot_wall": {"available_sio2_mol": [1.0]}}
 
     snapshot = FoulingTerminalSnapshot.from_trace(
         _trace(deposit, authority),
         threshold_params={"thickness_limit_m": None},
+        c4b_binding_substrate_state=c4b_state,
     )
 
     deposit[("duct_a", "SiO")] = 9.0
     authority["deposited_species"].append("Na")
+    c4b_state["hot_wall"]["available_sio2_mol"].append(2.0)
 
     assert snapshot.wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.25)
     assert tuple(snapshot.wall_deposit_sticking_authority["deposited_species"]) == ("SiO",)
+    assert tuple(
+        snapshot.c4b_binding_substrate_state["hot_wall"]["available_sio2_mol"]
+    ) == (1.0,)
     with pytest.raises(FrozenInstanceError):
         snapshot.grounding_status = "mutated"  # type: ignore[misc]
     with pytest.raises(TypeError):
         snapshot.wall_deposit_by_segment_species_kg["duct_a"]["SiO"] = 1.0  # type: ignore[index]
 
 
-def test_incremental_merge_uses_phase_a_net_export_not_gross_rederived() -> None:
+def test_from_trace_requires_existing_wall_deposit_export() -> None:
+    with pytest.raises(FoulingProjectionError, match="wall_deposit_by_segment_species_kg"):
+        FoulingTerminalSnapshot.from_trace(SimpleNamespace())
+
+
+def test_incremental_merge_diffs_terminal_export_from_carried_projection() -> None:
     first = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.7}))
     second = FoulingTerminalSnapshot.from_trace(
         _trace({("duct_a", "SiO"): 0.4, ("duct_b", "Na"): 0.2})
@@ -55,8 +67,9 @@ def test_incremental_merge_uses_phase_a_net_export_not_gross_rederived() -> None
     merged = merge_snapshot_sequence((first, second))
 
     assert merged.per_run_net_deposit_by_segment_species_kg[0]["duct_a"]["SiO"] == pytest.approx(0.7)
-    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_a"]["SiO"] == pytest.approx(0.4)
-    assert merged.trajectory[-1].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(1.1)
+    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_a"]["SiO"] == pytest.approx(-0.3)
+    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_b"]["Na"] == pytest.approx(0.2)
+    assert merged.trajectory[-1].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.4)
     assert merged.trajectory[-1].wall_deposit_by_segment_species_kg["duct_b"]["Na"] == pytest.approx(0.2)
 
 
@@ -77,8 +90,8 @@ def test_seeded_export_mode_diffs_terminal_export_from_carried_projection() -> N
 def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> None:
     snapshots = merge_snapshot_sequence((
         FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
-        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
-        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20})),
+        FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.30})),
     )).trajectory
 
     ungrounded = project_lifecycle(
