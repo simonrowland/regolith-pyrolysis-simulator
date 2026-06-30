@@ -337,6 +337,44 @@ def test_internal_analytical_stage_alpha_cannot_certify_wall_deposit() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "source_class_variant",
+    (
+        " internal-analytical",
+        "internal-analytical ",
+        " INTERNAL-ANALYTICAL ",
+        "Internal-Analytical",
+    ),
+)
+def test_internal_analytical_stage_alpha_variants_cannot_certify(
+    source_class_variant: str,
+) -> None:
+    # F0 fail-open caught by cert-gate review 2026-06-30: source_class was
+    # compared raw (unlike the .upper()-normalized status), so whitespace/case
+    # variants of 'internal-analytical' with citation_status CITED certified as
+    # authoritative wall-deposit alpha. They must all be denied.
+    route, authority = _route_wall_deposit_authority(
+        "Fe",
+        materials=_materials_with_stage_alpha(
+            1,
+            "Fe",
+            {
+                "value": 1.0,
+                "status": "CITED",
+                "source_class": source_class_variant,
+                "source": "test::internal_analytical_variant",
+                "output_status": "sourced_with_surface_proxy",
+            },
+        ),
+    )
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    provenance = authority["alpha_s_provenance_by_species"]["Fe"]["stage_1"]
+    assert provenance["citation_status"] == "UNCERTIFIED"
+
+
 def test_uncertified_non_condensing_stage_alpha_fails_closed() -> None:
     # Regression for the codex-caught F0 fail-open (2026-06-27): a stage whose
     # alpha is 0.0 does NOT condense, yet it still drives the final wall deposit

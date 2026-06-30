@@ -607,7 +607,11 @@ def _stage_material_alpha_certification_payload(entry: Any) -> dict[str, Any]:
         source_class = ''
         entry_output_status = None
 
-    denied = source_class == 'internal-analytical'
+    # Normalize before the deny check: status is already .upper()-normalized
+    # above, but source_class was compared raw — whitespace/case variants of
+    # 'internal-analytical' (e.g. ' INTERNAL-ANALYTICAL ') slipped the gate and
+    # certified as authoritative (F0 fail-open caught by cert-gate review 2026-06-30).
+    denied = source_class.strip().lower() == 'internal-analytical'
     cited = raw_status == 'CITED' and not denied
     output_status = (
         str(entry_output_status)
