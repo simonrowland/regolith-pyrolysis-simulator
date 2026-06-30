@@ -10,7 +10,7 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 5.220279165449543e-06
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 5.2204082246853e-06
 
 
 def _run_script(lines: list[str]):
@@ -199,13 +199,14 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # grounded k_O-clamp envelope; verified not test-forcing in 2026-06-28 review).
     # Alpha-series source resistance lowers staged_silica again to ~0.00103 kg.
     # Grounded alpha_s(T) then lowers the cold/staged surface capture to
-    # ~1.4e-4 kg and makes Stage 3 Fe/Mg-heavy; keep the silica fraction nonzero
-    # and above the continuous warmup path without preserving the fixed-alpha mix.
+    # ~1.4e-4 kg and makes Stage 3 Fe/Mg-heavy; redox v3 Step C pushes the
+    # fixed-alpha mix slightly further Fe/Mg-rich. Keep the silica fraction
+    # nonzero and above the continuous warmup path without preserving the old mix.
     staged_fe_mg = sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg"))
     staged_stage3_total = staged_silica + staged_fe_mg
     assert staged_silica > 1e-4
     assert staged_stage3_total > staged_silica
-    assert staged_silica / staged_stage3_total > 0.03
+    assert staged_silica / staged_stage3_total > 0.02
 
 
 def test_c2a_staged_pipework_has_no_upstream_cold_spot():
@@ -227,7 +228,8 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
     # No upstream cold spot is still the routing invariant. The 2026-06-29
     # reactive SiO wall-product fix keeps the expected wall magnitude nonzero;
     # grounded alpha_s(T) lowers it from the old fixed-alpha wall anchor. Redox
-    # v3 C-PRE then nudges the coupled wall trace through mole-fraction a_FeO.
+    # v3 C-PRE then normalizes a_FeO to mole fraction; Step C promotes the
+    # CALPHAD IW-blend authority and nudges the coupled wall trace again.
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         rel=1e-9,

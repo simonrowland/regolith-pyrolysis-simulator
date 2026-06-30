@@ -105,6 +105,12 @@ FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
     ),
 }
 
+# Redox v3 Step C authority switch: Kress & Carmichael 1991 ferric split above
+# IW+1; Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 central
+# stoichiometric-FeO(l) band at/below IW; Ban-ya1993 ISIJ Int. 33:2-11 carries
+# the regular-solution composition-transfer diagnostic.
+CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10 = 1.0
+
 
 def _validate_kress91_controls(
     *,
@@ -427,7 +433,7 @@ def kress91_fe3_over_sigma_fe(
     return 2.0 * ratio / (2.0 * ratio + 1.0)
 
 
-def kress91_ferrous_feo_activity(
+def _kress91_ferrous_feo_activity_raw(
     *,
     comp_wt: Mapping[str, float],
     fO2_log: float,
@@ -467,14 +473,38 @@ def kress91_ferrous_feo_activity(
     return max(0.0, float(split['x_feo']))
 
 
-def calphad_ferrous_feo_activity_diagnostic(
+def _calphad_authority_weight(delta_iw_log10: float) -> float:
+    if delta_iw_log10 <= 0.0:
+        return 1.0
+    if delta_iw_log10 >= CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10:
+        return 0.0
+    return 1.0 - delta_iw_log10 / CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10
+
+
+def kress91_ferrous_feo_activity(
+    *,
+    comp_wt: Mapping[str, float],
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    components = _calphad_feo_activity_components(
+        comp_wt=comp_wt,
+        fO2_log=fO2_log,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    return max(0.0, float(components.get('a_FeO_authoritative', 0.0) or 0.0))
+
+
+def _calphad_feo_activity_components(
     *,
     comp_wt: Mapping[str, float],
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
 ) -> dict[str, object]:
-    current = kress91_ferrous_feo_activity(
+    kress91_activity = _kress91_ferrous_feo_activity_raw(
         comp_wt=comp_wt,
         fO2_log=fO2_log,
         T_K=T_K,
@@ -485,10 +515,12 @@ def calphad_ferrous_feo_activity_diagnostic(
         return {
             'status': 'unavailable',
             'reason': 'no_FeOt_melt_component',
-            'diagnostic_only': True,
+            'diagnostic_only': False,
             'consumed_by_behavior': False,
             'authority_unchanged': True,
-            'a_FeO_current': current,
+            'a_FeO_current': kress91_activity,
+            'a_FeO_kress91': kress91_activity,
+            'a_FeO_authoritative': kress91_activity,
             'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
         }
 
@@ -521,31 +553,78 @@ def calphad_ferrous_feo_activity_diagnostic(
     central = float(activity['central'])
     low = float(activity['low'])
     high = float(activity['high'])
-    if current > 0.0:
-        ratio = central / current
-        delta_log10 = math.log10(ratio) if ratio > 0.0 else None
+    if kress91_activity > 0.0:
+        ratio_kress91 = central / kress91_activity
+        delta_log10_kress91 = (
+            math.log10(ratio_kress91) if ratio_kress91 > 0.0 else None
+        )
     else:
-        ratio = None
-        delta_log10 = None
-    delta_iw_shift = 2.0 * delta_log10 if delta_log10 is not None else None
+        ratio_kress91 = None
+        delta_log10_kress91 = None
+    delta_iw_shift_kress91 = (
+        2.0 * delta_log10_kress91
+        if delta_log10_kress91 is not None
+        else None
+    )
     pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+    delta_iw = float(fO2_log) - pure_iw
+    calphad_weight = _calphad_authority_weight(delta_iw)
+    kress91_weight = 1.0 - calphad_weight
+    authoritative = calphad_weight * central + kress91_weight * kress91_activity
+    if authoritative > 0.0:
+        ratio_current = central / authoritative
+        delta_log10_current = (
+            math.log10(ratio_current) if ratio_current > 0.0 else None
+        )
+    else:
+        ratio_current = None
+        delta_log10_current = None
+    delta_iw_shift_current = (
+        2.0 * delta_log10_current
+        if delta_log10_current is not None
+        else None
+    )
+    if calphad_weight >= 1.0:
+        regime = 'calphad_metal_saturated_below_iw'
+    elif calphad_weight <= 0.0:
+        regime = 'kress91_ferric_limb_above_iw_plus_1'
+    else:
+        regime = 'iw_to_iw_plus_1_smooth_blend'
 
     return {
         'status': 'ok',
-        'diagnostic_only': True,
-        'consumed_by_behavior': False,
-        'authority_unchanged': True,
+        'diagnostic_only': False,
+        'consumed_by_behavior': True,
+        'authority_unchanged': False,
         'standard_state': 'stoichiometric_FeO_l',
-        'a_FeO_current': current,
+        'a_FeO_current': authoritative,
+        'a_FeO_authoritative': authoritative,
+        'a_FeO_kress91': kress91_activity,
         'a_FeO_calphad': activity,
-        'current_within_calphad_band': low <= current <= high,
+        'current_within_calphad_band': low <= authoritative <= high,
         'comparison': {
             'status': (
-                'ok' if ratio is not None else 'not_comparable_current_zero'
+                'ok' if ratio_current is not None else 'not_comparable_current_zero'
             ),
-            'central_over_current': ratio,
-            'log10_central_over_current': delta_log10,
-            'delta_iw_log10_shift_central_minus_current': delta_iw_shift,
+            'central_over_kress91': ratio_kress91,
+            'central_over_current': ratio_current,
+            'log10_central_over_kress91': delta_log10_kress91,
+            'log10_central_over_current': delta_log10_current,
+            'delta_iw_log10_shift_central_minus_kress91': (
+                delta_iw_shift_kress91
+            ),
+            'delta_iw_log10_shift_central_minus_current': (
+                delta_iw_shift_current
+            ),
+        },
+        'authority': {
+            'regime': regime,
+            'relative_to_iw_log10': delta_iw,
+            'calphad_weight': calphad_weight,
+            'kress91_weight': kress91_weight,
+            'blend_width_log10': CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10,
+            'central_band_is_authoritative': True,
+            'low_high_band_is_diagnostic': True,
         },
         'x_FeO_ferrous': x_feo_ferrous,
         'kress91_split': {
@@ -576,13 +655,19 @@ def calphad_ferrous_feo_activity_diagnostic(
                 feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
             ),
             'current_melt_metal_saturation_log10_fO2_bar': (
-                feo_iw_log10_fO2_bar(T_K, a_feo=max(current, 1.0e-300))
+                feo_iw_log10_fO2_bar(T_K, a_feo=max(authoritative, 1.0e-300))
+            ),
+            'kress91_melt_metal_saturation_log10_fO2_bar': (
+                feo_iw_log10_fO2_bar(T_K, a_feo=max(kress91_activity, 1.0e-300))
             ),
             'central_delta_iw_at_aFe_equal_1': (
                 2.0 * math.log10(max(central, 1.0e-300))
             ),
             'current_delta_iw_at_aFe_equal_1': (
-                2.0 * math.log10(max(current, 1.0e-300))
+                2.0 * math.log10(max(authoritative, 1.0e-300))
+            ),
+            'kress91_delta_iw_at_aFe_equal_1': (
+                2.0 * math.log10(max(kress91_activity, 1.0e-300))
             ),
             'delta_iw_convention': (
                 'Fe + 0.5 O2 = FeO(l), a_Fe=1; '
@@ -593,6 +678,21 @@ def calphad_ferrous_feo_activity_diagnostic(
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
     }
+
+
+def calphad_ferrous_feo_activity_diagnostic(
+    *,
+    comp_wt: Mapping[str, float],
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> dict[str, object]:
+    return _calphad_feo_activity_components(
+        comp_wt=comp_wt,
+        fO2_log=fO2_log,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
 
 
 def kress91_split(

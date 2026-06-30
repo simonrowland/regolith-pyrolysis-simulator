@@ -10,6 +10,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
     Kress91InvalidControls,
     floor_vacuum_pressure_bar,
+    feo_iw_log10_fO2_bar,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
     kress91_split,
@@ -230,23 +231,24 @@ def test_kress91_ferrous_feo_activity_invalid_fo2_or_temperature_fails_loudly(
         )
 
 
-def test_kress91_ferrous_feo_activity_valid_controls_unchanged() -> None:
+def test_kress91_ferrous_feo_activity_above_iw_plus_one_uses_kress91_limb() -> None:
     # Kress & Carmichael 1991 and Holzheid et al. 1997 Eq. (4) share an oxide
-    # mole-fraction X_FeO convention; do not regress this to FeOt mass fraction.
+    # mole-fraction X_FeO convention; the oxidized/ferric limb remains Kress91.
+    fO2_log = feo_iw_log10_fO2_bar(1873.15) + 1.25
     activity = kress91_ferrous_feo_activity(
         comp_wt=_FERROUS_ACTIVITY_COMP_WT,
-        fO2_log=-7.75,
+        fO2_log=fO2_log,
         T_K=1873.15,
         pressure_bar=0.01,
     )
     split = kress91_split(
-        fO2_log=-7.75,
+        fO2_log=fO2_log,
         mol_fractions=melt_mol_fractions_for_kress91(_FERROUS_ACTIVITY_COMP_WT),
         T_K=1873.15,
         pressure_bar=0.01,
     )
     assert activity == pytest.approx(split['x_feo'], rel=0, abs=1.0e-15)
-    assert activity == pytest.approx(0.11313084119172583, rel=0, abs=1.0e-15)
+    assert activity == pytest.approx(0.11129231084988625, rel=0, abs=1.0e-15)
 
 
 @pytest.mark.parametrize('pressure_bar', [float('nan'), float('inf'), float('-inf')])
