@@ -447,6 +447,23 @@ def test_furnace_max_t_c_setpoints_validation_fails_loud(value) -> None:
         CampaignManager(setpoints)
 
 
+@pytest.mark.parametrize("stages", [None, [], "bad", [None]])
+def test_c2a_staged_empty_or_malformed_stages_fail_loud(stages) -> None:
+    setpoints = _c2a_staged_setpoints()
+    if stages is None:
+        setpoints["campaigns"]["C2A_staged"].pop("stages", None)
+    else:
+        setpoints["campaigns"]["C2A_staged"]["stages"] = stages
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(ValueError, match="C2A_staged.stages"):
+        manager.get_temp_target(
+            CampaignPhase.C2A_STAGED,
+            0,
+            MeltState(campaign=CampaignPhase.C2A_STAGED),
+        )
+
+
 def test_c2a_staged_flux_decay_species_setpoints_are_explicit_ascii() -> None:
     # The flux_decay_species VALUES must be explicit ASCII species names (proven
     # by the per-stage checks below). The whole setpoints.yaml is NOT required to

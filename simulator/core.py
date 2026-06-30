@@ -1624,16 +1624,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(1.0, melt_T_K)
 
     @staticmethod
-    def _normalize_condensation_carrier_gas(value: Any) -> str:
-        text = str(value or '').strip()
-        upper = text.upper()
-        if 'CO2' in upper:
-            return 'CO2'
-        if 'AR' in upper:
-            return 'Ar'
-        if 'N2' in upper or 'PN2' in upper:
+    def _normalize_condensation_carrier_gas(
+        value: Any,
+        *,
+        allow_unset: bool = True,
+    ) -> str:
+        if value is None:
+            return '' if allow_unset else 'N2'
+        text = str(value).strip()
+        if not text:
+            if allow_unset:
+                return ''
+            raise ValueError(
+                'condensation carrier_gas must be non-empty when provided'
+            )
+        upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
+        if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
             return 'N2'
-        return ''
+        if upper in {'AR', 'PAR'}:
+            return 'Ar'
+        if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
+            return 'CO2'
+        if upper.endswith('%CO2'):
+            try:
+                co2_percent = float(upper[:-4])
+            except ValueError:
+                co2_percent = 0.0
+            if 0.0 < co2_percent <= 100.0:
+                return 'CO2'
+        raise ValueError(
+            f'Unsupported condensation carrier_gas {value!r}; supported '
+            'carrier gases: N2/pN2, Ar/pAr, CO2/pCO2'
+        )
 
     def _resolve_condensation_carrier_gas(self) -> str:
         background = self._normalize_condensation_carrier_gas(
@@ -1661,9 +1683,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cfg = campaigns.get(key, {}) or {}
                 if not isinstance(cfg, Mapping):
                     continue
+                if 'carrier_gas' not in cfg or cfg.get('carrier_gas') is None:
+                    continue
                 carrier = self._normalize_condensation_carrier_gas(
-                    cfg.get('carrier_gas', ''))
-                if carrier == 'Ar':
+                    cfg.get('carrier_gas'),
+                    allow_unset=False,
+                )
+                if carrier:
                     return carrier
 
         return 'N2'

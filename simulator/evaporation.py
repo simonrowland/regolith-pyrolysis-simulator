@@ -144,7 +144,20 @@ class EvaporationMixin:
 
         vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
         if not vapor_pressures:
-            return flux
+            if self.melt.temperature_C < 1050.0:
+                return flux
+            zero_reason = (
+                dict(getattr(self, '_last_vapor_pressure_diagnostic', {}) or {})
+                .get('vapor_pressure_zero_reason')
+            )
+            liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+            if zero_reason == 'no_liquid_phase' or liquid_fraction == 0.0:
+                return flux
+            raise RuntimeError(
+                'EVAPORATION_FLUX received empty vapor_pressures_Pa at '
+                f'{self.melt.temperature_C:.1f} C; refusing silent-zero '
+                'evaporation for active pyrolysis melt'
+            )
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
         )

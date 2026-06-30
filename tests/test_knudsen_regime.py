@@ -10,7 +10,9 @@ from simulator.condensation import (
     KnudsenRegime,
     KnudsenRegimeRefusal,
 )
+from simulator.core import PyrolysisSimulator
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.state import CampaignPhase
 from simulator.runner import PyrolysisRun
 
 
@@ -124,23 +126,47 @@ def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
     assert exc_info.value.diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
 
 
-def test_unknown_carrier_knudsen_diagnostic_is_status_bearing():
-    diagnostic = condensation_module.knudsen_regime_diagnostic(
-        overhead_pressure_mbar=10.0,
-        gas_temperature_C=1500.0,
-        pipe_diameter_m=0.12,
-        carrier_gas="pHe",
-    )
+def test_unknown_carrier_knudsen_diagnostic_fails_loud():
+    with pytest.raises(ValueError, match="Unsupported condensation carrier_gas"):
+        condensation_module.knudsen_regime_diagnostic(
+            overhead_pressure_mbar=10.0,
+            gas_temperature_C=1500.0,
+            pipe_diameter_m=0.12,
+            carrier_gas="pHe",
+        )
 
-    assert diagnostic["carrier_gas"] == "pHe"
-    assert diagnostic["requested_carrier_gas"] == "pHe"
-    assert diagnostic["applied_carrier_gas"] == "N2"
-    assert diagnostic["carrier_gas_status"] == "unsupported_carrier_fallback"
-    assert diagnostic["carrier_gas_reason"] == "unsupported_carrier_lj_parameters"
-    assert diagnostic["carrier_collision_diameter_m"] == pytest.approx(
-        condensation_module.N2_COLLISION_DIAMETER_M
-    )
-    assert any("Unsupported carrier gas" in item for item in diagnostic["warnings"])
+
+def test_blank_carrier_knudsen_diagnostic_fails_loud():
+    with pytest.raises(ValueError, match="carrier_gas must be non-empty"):
+        condensation_module.knudsen_regime_diagnostic(
+            overhead_pressure_mbar=10.0,
+            gas_temperature_C=1500.0,
+            pipe_diameter_m=0.12,
+            carrier_gas="",
+        )
+
+
+def test_blank_explicit_carrier_gas_fails_loud():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    with pytest.raises(ValueError, match="carrier_gas must be non-empty"):
+        model.configure_operating_conditions(carrier_gas="")
+
+
+@pytest.mark.parametrize("carrier_gas", ["pHe", "badCO2"])
+def test_invalid_campaign_carrier_gas_fails_before_defaulting_to_n2(carrier_gas):
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = MeltState(campaign=CampaignPhase.C2A)
+    sim.setpoints = {
+        "campaigns": {
+            "C2A_continuous": {
+                "carrier_gas": carrier_gas,
+            },
+        },
+    }
+
+    with pytest.raises(ValueError, match="Unsupported condensation carrier_gas"):
+        sim._resolve_condensation_carrier_gas()
 
 
 def test_default_setpoint_recipes_are_viscous():

@@ -275,7 +275,7 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
-UNSUPPORTED_CARRIER_FALLBACK_REASON = 'unsupported_carrier_lj_parameters'
+SUPPORTED_CARRIER_GAS_LABELS = 'N2/pN2, Ar/pAr, CO2/pCO2'
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
     DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
@@ -1183,7 +1183,8 @@ def _chapman_enskog_d_ab_m2_s(
     on the flux callers).
     """
     species_params = _LENNARD_JONES_PARAMS.get(species)
-    carrier_params = _LENNARD_JONES_PARAMS.get(carrier)
+    carrier_key = _canonical_carrier_gas_key(carrier)
+    carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
     if species_params is None or carrier_params is None:
         return 0.0
     if T_K <= 0.0 or pressure_pa <= 0.0:
@@ -1207,23 +1208,45 @@ def _chapman_enskog_d_ab_m2_s(
     return D_AB_cm2_s * 1.0e-4
 
 
-def _canonical_carrier_gas_key(carrier_gas: str) -> str:
-    text = str(carrier_gas or '').strip()
-    if not text:
+def _unsupported_carrier_gas_error(carrier_gas: Any) -> ValueError:
+    return ValueError(
+        f'Unsupported condensation carrier_gas {carrier_gas!r}; '
+        f'supported carrier gases: {SUPPORTED_CARRIER_GAS_LABELS}'
+    )
+
+
+def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
+    if carrier_gas is None:
         return DEFAULT_CARRIER_GAS
-    upper = text.upper()
-    if 'CO2' in upper:
-        return 'CO2'
-    if 'AR' in upper:
-        return 'Ar'
-    if 'N2' in upper or 'PN2' in upper:
+    text = str(carrier_gas).strip()
+    if not text:
+        raise ValueError(
+            'condensation carrier_gas must be non-empty when provided'
+        )
+    upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
+    if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
         return 'N2'
-    return text
+    if upper in {'AR', 'PAR'}:
+        return 'Ar'
+    if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
+        return 'CO2'
+    if upper.endswith('%CO2'):
+        try:
+            co2_percent = float(upper[:-4])
+        except ValueError:
+            co2_percent = 0.0
+        if 0.0 < co2_percent <= 100.0:
+            return 'CO2'
+    raise _unsupported_carrier_gas_error(carrier_gas)
 
 
 def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
-    requested = str(carrier_gas or '').strip() or DEFAULT_CARRIER_GAS
-    requested_key = _canonical_carrier_gas_key(requested)
+    requested_key = _canonical_carrier_gas_key(carrier_gas)
+    requested = (
+        DEFAULT_CARRIER_GAS
+        if carrier_gas is None
+        else str(carrier_gas).strip()
+    )
     params = _LENNARD_JONES_PARAMS.get(requested_key)
     if params is not None:
         provenance = _LENNARD_JONES_PROVENANCE.get(requested_key, {})
@@ -1235,21 +1258,7 @@ def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
             'carrier_collision_diameter_m': float(params[0]) * 1.0e-10,
             'carrier_collision_diameter_source': provenance.get('source', ''),
         }
-    fallback_params = _LENNARD_JONES_PARAMS[DEFAULT_CARRIER_GAS]
-    fallback_provenance = _LENNARD_JONES_PROVENANCE.get(DEFAULT_CARRIER_GAS, {})
-    return {
-        'requested_carrier_gas': requested,
-        'applied_carrier_gas': DEFAULT_CARRIER_GAS,
-        'carrier_gas_status': 'unsupported_carrier_fallback',
-        'carrier_gas_reason': UNSUPPORTED_CARRIER_FALLBACK_REASON,
-        'carrier_collision_diameter_m': float(fallback_params[0]) * 1.0e-10,
-        'carrier_collision_diameter_source': fallback_provenance.get('source', ''),
-        'warning': (
-            f"Unsupported carrier gas {requested!r}; applying "
-            f"{DEFAULT_CARRIER_GAS} collision diameter with status-bearing "
-            "fallback."
-        ),
-    }
+    raise _unsupported_carrier_gas_error(carrier_gas)
 
 
 def _carrier_collision_diameter_m(carrier_gas: str) -> float:
@@ -1583,8 +1592,7 @@ class CondensationModel:
         elif wall_temperature_C is not None:
             self.gas_temperature_C = float(wall_temperature_C)
         if carrier_gas is not None:
-            requested_carrier = str(carrier_gas).strip()
-            self.carrier_gas = requested_carrier or DEFAULT_CARRIER_GAS
+            self.carrier_gas = _canonical_carrier_gas_key(carrier_gas)
         # Track requested vs applied stir for the operating-history audit.
         # Codex + gstack reviewers (Phase B P3): the canonical clamp at
         # ``clamp_stir_factor`` is silent — a downstream auditor reading

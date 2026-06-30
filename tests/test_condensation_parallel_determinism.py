@@ -124,8 +124,8 @@ def _multi_tick_trace(
 ) -> list[dict]:
     session = _start_session(feedstocks, setpoints, vapor_pressures)
     trace = []
+    session.advance()
     for tick in range(MULTI_TICK_COUNT):
-        session.advance()
         _route_cold_wall_sio_tick(session)
         snapshot = session.snapshot()
         trace.append(

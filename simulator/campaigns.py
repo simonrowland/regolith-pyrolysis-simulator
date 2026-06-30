@@ -501,15 +501,19 @@ class CampaignManager:
         return max(value, C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
 
     def _c2a_staged_enabled_stages(self) -> list[dict]:
-        stages = self._campaign_config(CampaignPhase.C2A_STAGED).get('stages', [])
-        if not isinstance(stages, list):
-            return []
-        return [stage for stage in stages if isinstance(stage, dict)]
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        stages = cfg.get('stages')
+        if not isinstance(stages, list) or not stages:
+            raise ValueError('C2A_staged.stages must be a non-empty list')
+        enabled: list[dict] = []
+        for idx, stage in enumerate(stages):
+            if not isinstance(stage, dict):
+                raise ValueError(f'C2A_staged.stages[{idx}] must be a mapping')
+            enabled.append(stage)
+        return enabled
 
     def _c2a_staged_current_stage(self) -> dict | None:
         stages = self._c2a_staged_enabled_stages()
-        if not stages:
-            return None
         idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
         self._c2a_staged_stage_idx = idx
         return stages[idx]
@@ -536,8 +540,6 @@ class CampaignManager:
 
     def _c2a_staged_active_stage(self, campaign_hour: int) -> dict | None:
         stages = self._c2a_staged_enabled_stages()
-        if not stages:
-            return None
         if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:
             return self._c2a_staged_stage_by_hour(campaign_hour, stages)
         idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
@@ -796,12 +798,10 @@ class CampaignManager:
         elif campaign == CampaignPhase.C2A_STAGED:
             if self._c2a_staged_depletion_flux_decay_fraction() <= 0.0:
                 cfg = self._campaign_config(campaign)
-                stages = cfg.get('stages', [])
-                if not isinstance(stages, list) or not stages:
-                    return (1750.0, 150.0)
+                stages = self._c2a_staged_enabled_stages()
                 selected = self._c2a_staged_stage_by_hour(campaign_hour, stages)
                 if selected is None:
-                    return (1750.0, 150.0)
+                    raise ValueError('C2A_staged.stages did not select a stage')
 
                 if selected.get('name') == 'fe_hot_hold':
                     ovr = self._campaign_overrides(campaign)
@@ -817,7 +817,7 @@ class CampaignManager:
             cfg = self._campaign_config(campaign)
             selected = self._c2a_staged_current_stage()
             if selected is None:
-                return (1750.0, 150.0)
+                raise ValueError('C2A_staged.stages did not select a stage')
             if selected.get('name') == 'fe_hot_hold':
                 ovr = self._campaign_overrides(campaign)
                 target = self._float(

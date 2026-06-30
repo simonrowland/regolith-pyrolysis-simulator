@@ -68,6 +68,40 @@ def test_authoritative_vapor_pressure_no_liquid_gate_zeroes_evaporation():
     assert flux.total_kg_hr == 0.0
 
 
+def test_active_liquid_empty_vapor_pressures_fail_loud():
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(temperature_C=1600.0),
+    )
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+        status='ok',
+    )
+
+    with pytest.raises(RuntimeError, match='empty vapor_pressures_Pa'):
+        PyrolysisSimulator._calculate_evaporation(sim, result)
+
+
+def test_subthreshold_empty_vapor_pressures_remain_physical_zero():
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(temperature_C=500.0),
+    )
+    result = EquilibriumResult(
+        temperature_C=500.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+        status='ok',
+    )
+
+    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert flux.species_kg_hr == {}
+    assert flux.total_kg_hr == 0.0
+
+
 def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
     sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
     result = EquilibriumResult(
