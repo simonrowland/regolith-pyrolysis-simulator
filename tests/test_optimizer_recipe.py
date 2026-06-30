@@ -299,8 +299,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
     # AlphaMELTS activity-times-Antoine adopted the shared coefficient selector,
     # and SiO alpha_s became a cited temperature-dependent YAML spec.
+    # Later 2026-06-29: moved again when redox v3 Step B added
+    # diagnostic-only a_FeO_calphad metadata to the builtin vapor-pressure
+    # provider. This is still source-fingerprint invalidation, not an
+    # authoritative vapor/yield/ledger move.
     # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "2a991e218614fee4941398eac5aa7ee6a0ec718be35d2519b1139de931f60a27"
+    assert cache_key(spec) == "2ec2d09ad50492c0fe1d0418a3c88e410a1439a119f2d6d8d0bcb2fb829a8c9f"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

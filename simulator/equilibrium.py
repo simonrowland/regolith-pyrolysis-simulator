@@ -9,6 +9,7 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
 )
 from simulator.fe_redox import (
+    calphad_ferrous_feo_activity_diagnostic,
     floor_vacuum_pressure_bar,
     kress91_ferrous_feo_activity,
 )
@@ -279,6 +280,12 @@ class EquilibriumMixin:
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
+        feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
+            comp_wt=comp_wt,
+            fO2_log=intrinsic_fO2_log,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
 
         # ================================================================
         # METAL SPECIES: Ellingham equilibrium + Antoine               [ELLI]
@@ -570,4 +577,7 @@ class EquilibriumMixin:
             fO2_log=intrinsic_fO2_log,
             warnings=warnings,
             status='ok',
+            diagnostics={
+                'a_FeO_calphad': feo_activity_diagnostic,
+            },
         )

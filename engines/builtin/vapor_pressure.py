@@ -635,6 +635,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
+        feo_activity_diagnostic = None
+        if intrinsic_fO2_log is not None:
+            from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=comp_wt,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=request.pressure_bar,
+            )
 
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
@@ -906,22 +916,26 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     stacklevel=2,
                 )
 
+        diagnostic = {
+            "vapor_pressures_Pa": vapor_pressures,
+            "vapor_pressures_source": vapor_pressure_sources,
+            "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
+            "activities": activities,
+            "pO2_bar": transport_pO2_bar,
+            "extrapolated_beyond_valid_range_K": metal_extrapolations,
+            "ellingham_extrapolated_beyond_fit_range_K": (
+                ellingham_extrapolations
+            ),
+        }
+        if feo_activity_diagnostic is not None:
+            diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,
             status="ok",
             transition=None,
             control_audit=control_audit,
-            diagnostic={
-                "vapor_pressures_Pa": vapor_pressures,
-                "vapor_pressures_source": vapor_pressure_sources,
-                "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
-                "activities": activities,
-                "pO2_bar": transport_pO2_bar,
-                "extrapolated_beyond_valid_range_K": metal_extrapolations,
-                "ellingham_extrapolated_beyond_fit_range_K": (
-                    ellingham_extrapolations
-                ),
-            },
+            diagnostic=diagnostic,
             warnings=tuple(warnings),
         )
 

@@ -20,6 +20,91 @@ KRESS91_MOL_FRACTION_OXIDES = (
     'P2O5',
 )
 
+# Holzheid, Palme & Chakraborty 1997, DOI 10.1016/S0009-2541(97)00030-2:
+# gamma_FeO(wustite(l)) = 1.70 +/- 0.22; stoich-FeO(l) multipliers below.
+HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL = 1.70
+HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA = 0.22
+HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C = (
+    (1300.0, 2.02),
+    (1400.0, 1.94),
+    (1600.0, 1.66),
+)
+
+# Holzheid et al. 1997, DOI 10.1016/S0009-2541(97)00030-2:
+# Delta G("FeO"_l) = -244118 + 115.559*T - 8.474*T*ln(T) J/mol.
+HOLZHEID_FEO_LIQUID_DG_A_J_MOL = -244118.0
+HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K = 115.559
+HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K = -8.474
+
+# Ban-ya 1993, ISIJ Int. 33:2-11, DOI not present in local OCR:
+# clean OCR alpha_ij values in J from docs-private/.../ocr-extracted-params.md.
+BAN_YA_ALPHA_J: dict[frozenset[str], float] = {
+    frozenset(('Fe2', 'Fe3')): -18660.0,
+    frozenset(('Fe2', 'Mn')): 7110.0,
+    frozenset(('Fe2', 'Ca')): -31380.0,
+    frozenset(('Fe2', 'Mg')): 33470.0,
+    frozenset(('Fe2', 'Si')): -41840.0,
+    frozenset(('Fe2', 'P')): -31380.0,
+    frozenset(('Fe2', 'Al')): -41000.0,
+    frozenset(('Fe3', 'Mn')): -56480.0,
+    frozenset(('Fe3', 'Ca')): -95810.0,
+    frozenset(('Fe3', 'Mg')): -2930.0,
+    frozenset(('Fe3', 'Si')): 32640.0,
+    frozenset(('Fe3', 'P')): 14640.0,
+    frozenset(('Fe3', 'Al')): -161080.0,
+    frozenset(('Mn', 'Ca')): -92050.0,
+    frozenset(('Mn', 'Mg')): 61920.0,
+    frozenset(('Mn', 'Si')): -75310.0,
+    frozenset(('Mn', 'P')): -84940.0,
+    frozenset(('Mn', 'Al')): -83680.0,
+    frozenset(('Ca', 'Mg')): -100420.0,
+    frozenset(('Ca', 'Si')): -133890.0,
+    frozenset(('Ca', 'P')): -251040.0,
+    frozenset(('Ca', 'Al')): -154810.0,
+    frozenset(('Mg', 'Si')): -66940.0,
+    frozenset(('Mg', 'P')): -37660.0,
+    frozenset(('Mg', 'Al')): -71130.0,
+    frozenset(('Si', 'P')): 83680.0,
+    frozenset(('Si', 'Al')): -127610.0,
+    frozenset(('P', 'Al')): -261500.0,
+    frozenset(('Ti', 'Ca')): -167360.0,
+    frozenset(('Ti', 'Mn')): -66940.0,
+    frozenset(('Ti', 'Fe2')): -37660.0,
+    frozenset(('Ti', 'Fe3')): 1260.0,
+    frozenset(('Ti', 'Si')): 104600.0,
+}
+
+FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
+    'holzheid_gamma': (
+        'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
+        'gamma_FeO_wustite=1.70+-0.22'
+    ),
+    'holzheid_stoich_conversion': (
+        'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
+        'gamma_stoich/gamma_wustite=2.02@1300C,1.94@1400C,1.66@1600C'
+    ),
+    'holzheid_dg_feo_l': (
+        'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
+        'DeltaG=-244118+115.559*T-8.474*T*ln(T) J/mol'
+    ),
+    'banya_quadratic_alpha': (
+        'Ban-ya1993 ISIJ Int. 33:2-11 DOI:not_in_local_ocr '
+        'clean alpha_ij values from local OCR'
+    ),
+    'oneill_eggins_subregular': (
+        'ONeillEggins2002 Chem.Geol.186:151-181 DOI:not_in_local_artifacts '
+        'ln_gamma=sum_jk a_jk Xj Xk form from StepA'
+    ),
+    'li_coexistence': (
+        'Li2018 Metals 8:714 DOI 10.3390/met8090714 '
+        'coexistence-theory N_FeO form tracked, not solved in StepB'
+    ),
+    'wood_wade_low_bound': (
+        'WoodWade2013 DOI 10.1007/s00410-013-0911-8 '
+        'low-side gamma_FeO near unity from StepA grounding'
+    ),
+}
+
 
 def _validate_kress91_controls(
     *,
@@ -65,6 +150,205 @@ def feot_equivalent_wt_pct(comp_wt: Mapping[str, float]) -> float:
     feo = max(0.0, float(comp_wt.get('FeO', 0.0) or 0.0))
     fe2o3 = max(0.0, float(comp_wt.get('Fe2O3', 0.0) or 0.0))
     return feo + fe2o3 * (2.0 * 71.844 / 159.687)
+
+
+def _linear_interpolate_or_clamp(
+    points: tuple[tuple[float, float], ...],
+    x: float,
+) -> tuple[float, str]:
+    if x <= points[0][0]:
+        return points[0][1], 'clamped_below_verified_range'
+    if x >= points[-1][0]:
+        return points[-1][1], 'clamped_above_verified_range'
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        if x0 <= x <= x1:
+            frac = (x - x0) / (x1 - x0)
+            return y0 + frac * (y1 - y0), 'interpolated_verified_range'
+    return points[-1][1], 'clamped_above_verified_range'
+
+
+def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
+    T_C = float(T_K) - 273.15
+    multiplier, status = _linear_interpolate_or_clamp(
+        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
+        T_C,
+    )
+    central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
+    sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+    return {
+        'basis': 'stoichiometric_FeO_l',
+        'temperature_C': T_C,
+        'conversion_multiplier': multiplier,
+        'conversion_status': status,
+        'central': central,
+        'measurement_low': max(0.0, central - sigma),
+        'measurement_high': central + sigma,
+        'measurement_sigma': sigma,
+        'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_gamma'],
+        'conversion_source': (
+            FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_stoich_conversion']
+        ),
+    }
+
+
+def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
+    T = float(T_K)
+    if T <= 0.0 or not math.isfinite(T):
+        raise Kress91InvalidControls(
+            f'FeO liquid DeltaG invalid control T_K: expected finite positive '
+            f'value, got {T_K!r}'
+        )
+    return (
+        HOLZHEID_FEO_LIQUID_DG_A_J_MOL
+        + HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K * T
+        + HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K * T * math.log(T)
+    )
+
+
+def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
+    activity = max(float(a_feo), 1.0e-300)
+    R = 8.31446261815324
+    ln_fO2 = 2.0 * (
+        math.log(activity)
+        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
+    )
+    return ln_fO2 / math.log(10.0)
+
+
+def _alpha_j(cation_a: str, cation_b: str) -> float | None:
+    if cation_a == cation_b:
+        return 0.0
+    return BAN_YA_ALPHA_J.get(frozenset((cation_a, cation_b)))
+
+
+def _melt_cation_fractions(
+    comp_wt: Mapping[str, float],
+    *,
+    fe3_over_sigma_fe: float,
+) -> dict[str, float]:
+    from simulator.state import MOLAR_MASS
+
+    cation_mol: dict[str, float] = {}
+
+    def add(oxide: str, cation: str, count: float) -> None:
+        wt = max(0.0, float(comp_wt.get(oxide, 0.0) or 0.0))
+        mm = float(MOLAR_MASS.get(oxide, 0.0) or 0.0)
+        if wt > 0.0 and mm > 0.0:
+            cation_mol[cation] = cation_mol.get(cation, 0.0) + wt / mm * count
+
+    fe_total = feot_equivalent_wt_pct(comp_wt) / 71.844
+    if fe_total > 0.0:
+        fe3 = max(0.0, min(1.0, float(fe3_over_sigma_fe)))
+        cation_mol['Fe2'] = fe_total * (1.0 - fe3)
+        cation_mol['Fe3'] = fe_total * fe3
+
+    add('MnO', 'Mn', 1.0)
+    add('CaO', 'Ca', 1.0)
+    add('MgO', 'Mg', 1.0)
+    add('SiO2', 'Si', 1.0)
+    add('P2O5', 'P', 2.0)
+    add('Al2O3', 'Al', 2.0)
+    add('TiO2', 'Ti', 1.0)
+
+    total = sum(max(0.0, value) for value in cation_mol.values())
+    if total <= 0.0:
+        return {}
+    return {
+        cation: mol / total
+        for cation, mol in cation_mol.items()
+        if mol > 0.0
+    }
+
+
+def ban_ya_quadratic_gamma_feo(
+    cation_fractions: Mapping[str, float],
+    *,
+    T_K: float,
+) -> dict[str, object]:
+    candidate = {
+        cation: max(0.0, float(value))
+        for cation, value in cation_fractions.items()
+        if cation != 'Fe2' and float(value) > 0.0
+    }
+    missing: list[str] = []
+    active = [
+        cation for cation in candidate
+        if _alpha_j('Fe2', cation) is not None
+    ]
+    for cation in sorted(set(candidate) - set(active)):
+        missing.append(f'Fe2-{cation}')
+
+    changed = True
+    while changed:
+        changed = False
+        for index, cation_a in enumerate(tuple(active)):
+            for cation_b in tuple(active)[index + 1:]:
+                if _alpha_j(cation_a, cation_b) is None:
+                    drop = min(
+                        (cation_a, cation_b),
+                        key=lambda c: candidate.get(c, 0.0),
+                    )
+                    active.remove(drop)
+                    missing.append(f'{cation_a}-{cation_b}')
+                    changed = True
+                    break
+            if changed:
+                break
+
+    if not active:
+        return {
+            'status': 'unavailable',
+            'gamma': 1.0,
+            'rt_ln_gamma_J_mol': 0.0,
+            'active_cations': [],
+            'excluded_or_missing_pairs': missing,
+            'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['banya_quadratic_alpha'],
+        }
+
+    rt_ln_gamma = 0.0
+    for cation in active:
+        rt_ln_gamma += (
+            _alpha_j('Fe2', cation) or 0.0
+        ) * candidate[cation] ** 2
+    for index, cation_a in enumerate(active):
+        for cation_b in active[index + 1:]:
+            alpha_fe_a = _alpha_j('Fe2', cation_a) or 0.0
+            alpha_fe_b = _alpha_j('Fe2', cation_b) or 0.0
+            alpha_ab = _alpha_j(cation_a, cation_b)
+            if alpha_ab is None:
+                continue
+            rt_ln_gamma += (
+                alpha_fe_a + alpha_fe_b - alpha_ab
+            ) * candidate[cation_a] * candidate[cation_b]
+
+    R = 8.31446261815324
+    ln_gamma = rt_ln_gamma / (R * float(T_K))
+    gamma = math.exp(max(-745.0, min(709.0, ln_gamma)))
+    return {
+        'status': 'ok' if not missing else 'ok_with_ocr_gaps',
+        'gamma': gamma,
+        'ln_gamma': ln_gamma,
+        'rt_ln_gamma_J_mol': rt_ln_gamma,
+        'active_cations': active,
+        'excluded_or_missing_pairs': missing,
+        'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['banya_quadratic_alpha'],
+    }
+
+
+def _oneill_eggins_subregular_shape(
+    cation_fractions: Mapping[str, float],
+) -> dict[str, object]:
+    return {
+        'status': 'not_digitized_stepB',
+        'reason': (
+            'subregular form retained from StepA, but exact coefficient table '
+            'not carried into StepB runtime without OCR line-level provenance'
+        ),
+        'active_cations_seen': sorted(
+            cation for cation in cation_fractions if cation in {'Ca', 'Mg', 'Al', 'Si'}
+        ),
+        'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['oneill_eggins_subregular'],
+    }
 
 
 def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, float]:
@@ -179,6 +463,134 @@ def kress91_ferrous_feo_activity(
         pressure_bar=pressure_control,
     )
     return (feot / 100.0) * (1.0 - fe3)
+
+
+def calphad_ferrous_feo_activity_diagnostic(
+    *,
+    comp_wt: Mapping[str, float],
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> dict[str, object]:
+    current = kress91_ferrous_feo_activity(
+        comp_wt=comp_wt,
+        fO2_log=fO2_log,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
+    if not mol_fractions or mol_fractions.get('FeOt', 0.0) <= 0.0:
+        return {
+            'status': 'unavailable',
+            'reason': 'no_FeOt_melt_component',
+            'diagnostic_only': True,
+            'consumed_by_behavior': False,
+            'authority_unchanged': True,
+            'a_FeO_current': current,
+            'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
+        }
+
+    pressure_control = floor_vacuum_pressure_bar(pressure_bar)
+    split = kress91_split(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_control,
+    )
+    x_feo_ferrous = max(0.0, float(split.get('x_feo', 0.0) or 0.0))
+    cation_fractions = _melt_cation_fractions(
+        comp_wt,
+        fe3_over_sigma_fe=float(split.get('fe3', 0.0) or 0.0),
+    )
+    holzheid = holzheid_stoich_feo_gamma_band(T_K)
+    banya = ban_ya_quadratic_gamma_feo(cation_fractions, T_K=T_K)
+    gamma_banya = float(banya.get('gamma', 1.0) or 1.0)
+    gamma_central = float(holzheid['central'])
+    gamma_measurement_low = float(holzheid['measurement_low'])
+    gamma_measurement_high = float(holzheid['measurement_high'])
+    gamma_low = max(0.0, min(1.0, gamma_banya, gamma_measurement_low))
+    gamma_high = max(gamma_measurement_high, gamma_central, gamma_banya)
+
+    activity = {
+        'low': x_feo_ferrous * gamma_low,
+        'central': x_feo_ferrous * gamma_central,
+        'high': x_feo_ferrous * gamma_high,
+    }
+    central = float(activity['central'])
+    low = float(activity['low'])
+    high = float(activity['high'])
+    if current > 0.0:
+        ratio = central / current
+        delta_log10 = math.log10(ratio) if ratio > 0.0 else None
+    else:
+        ratio = None
+        delta_log10 = None
+    delta_iw_shift = 2.0 * delta_log10 if delta_log10 is not None else None
+    pure_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+
+    return {
+        'status': 'ok',
+        'diagnostic_only': True,
+        'consumed_by_behavior': False,
+        'authority_unchanged': True,
+        'standard_state': 'stoichiometric_FeO_l',
+        'a_FeO_current': current,
+        'a_FeO_calphad': activity,
+        'current_within_calphad_band': low <= current <= high,
+        'comparison': {
+            'status': (
+                'ok' if ratio is not None else 'not_comparable_current_zero'
+            ),
+            'central_over_current': ratio,
+            'log10_central_over_current': delta_log10,
+            'delta_iw_log10_shift_central_minus_current': delta_iw_shift,
+        },
+        'x_FeO_ferrous': x_feo_ferrous,
+        'kress91_split': {
+            'fe3_over_sigma_fe': split['fe3'],
+            'fe2o3_over_feo_molar': split['ratio'],
+            'x_fe2o3': split['x_fe2o3'],
+            'x_feo': split['x_feo'],
+        },
+        'gamma_FeO': {
+            'low': gamma_low,
+            'central': gamma_central,
+            'high': gamma_high,
+            'measurement_low': gamma_measurement_low,
+            'measurement_high': gamma_measurement_high,
+            'holzheid': holzheid,
+            'banya_quadratic': banya,
+            'oneill_eggins_subregular': _oneill_eggins_subregular_shape(
+                cation_fractions
+            ),
+            'li_coexistence': {
+                'status': 'not_solved_stepB',
+                'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['li_coexistence'],
+            },
+        },
+        'metal_saturation_tie_point': {
+            'pure_iw_log10_fO2_bar': pure_iw,
+            'central_melt_metal_saturation_log10_fO2_bar': (
+                feo_iw_log10_fO2_bar(T_K, a_feo=max(central, 1.0e-300))
+            ),
+            'current_melt_metal_saturation_log10_fO2_bar': (
+                feo_iw_log10_fO2_bar(T_K, a_feo=max(current, 1.0e-300))
+            ),
+            'central_delta_iw_at_aFe_equal_1': (
+                2.0 * math.log10(max(central, 1.0e-300))
+            ),
+            'current_delta_iw_at_aFe_equal_1': (
+                2.0 * math.log10(max(current, 1.0e-300))
+            ),
+            'delta_iw_convention': (
+                'Fe + 0.5 O2 = FeO(l), a_Fe=1; '
+                'DeltaIW_melt=2*log10(a_FeO)'
+            ),
+            'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_dg_feo_l'],
+        },
+        'cation_fractions': cation_fractions,
+        'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
+    }
 
 
 def kress91_split(
