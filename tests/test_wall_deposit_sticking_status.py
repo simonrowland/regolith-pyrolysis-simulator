@@ -343,14 +343,17 @@ def test_uncertified_capture_budget_alpha_driving_wall_deposit_fails_closed(
         condensation_module._capture_budget_alpha_record
     )
 
-    def fake_sticking_alpha_s(species: str) -> float:
+    def fake_sticking_alpha_s(species: str, T_K: float) -> float:
         if species == "Fe":
             return 1.0
-        return original_sticking_alpha_s(species)
+        return original_sticking_alpha_s(species, T_K)
 
-    def fake_capture_budget_alpha_record(species: str) -> dict[str, object]:
+    def fake_capture_budget_alpha_record(
+        species: str,
+        T_K: float | None = None,
+    ) -> dict[str, object]:
         if species != "Fe":
-            return original_capture_budget_alpha_record(species)
+            return original_capture_budget_alpha_record(species, T_K=T_K)
         return {
             "species": "Fe",
             "alpha_s": 1.0,

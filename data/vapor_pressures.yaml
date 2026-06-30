@@ -530,10 +530,21 @@ oxide_vapors:
     stoich_oxide_per_vapor: 1.362920787587333  # kg SiO2 consumed per kg SiO evaporated
     stoich_O2_per_vapor: 0.36292078758733326   # kg O2 freed per kg SiO evaporated
     evaporation_alpha:
-      value: 0.04
-      source: "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check"
-      T_band_K: [1873, 2373]
-      envelope: [0.003, 0.048]
+      value:
+        form: arrhenius
+        # alpha_s_SiO(T)=0.52*exp(-3685/T): Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803 -- Arrhenius compilation of the SiO evaporation coeff (reaction-rate-limited; cross-checks Gunther 1958, Rocabois 1996, Ferguson&Nuth 2008/2012). Mid-range ~0.04 was the prior fixed pin.
+        A: 0.52
+        B: 3685.0
+        valid_range_K: [1000, 1800]
+        uncertainty_envelope: [0.003, 0.067]
+        cite: "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803"
+        status: CITED
+        prior_scalar:
+          value: 0.04
+          source: "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+      source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient; microscopic reversibility applies the same alpha_s(T) bound to condensation/sticking."
+      T_band_K: [1000, 1800]
+      envelope: [0.003, 0.067]
       tier: 2
     antoine:
       # SiO vapor from SiO2 decomposition: SiO2(melt) -> SiO(g) + 1/2O2(g)

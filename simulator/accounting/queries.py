@@ -2041,6 +2041,7 @@ def wall_deposit_candidate_for_surface_kg(
         species,
         getattr(model, "materials", None),
         segment=segment,
+        T_K=max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0),
     )
     if alpha_s <= 0.0:
         return 0.0
@@ -2127,6 +2128,11 @@ def _wall_alpha_for_segment(model: Any, species: str, segment: Any) -> float:
         species,
         getattr(model, "materials", None),
         segment=segment,
+        T_K=max(
+            float(getattr(segment, "wall_temperature_C", 0.0))
+            + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        ),
     )
 
 

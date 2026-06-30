@@ -75,27 +75,28 @@ from tests.chemistry.conftest import _build_sim
 # ledger-close, but source composition shifts to Na-dominated traces under the
 # current owner-ratified Na apparent-alpha label.
 # 2026-06-29 reactive SiO wall products stop re-evaporating against SiO's own
-# Antoine curve; only SiO wall-deposit magnitudes move, account composition
-# remains the existing staged SiO-equivalent kg pending C4b owner decision.
+# Antoine curve, then SiO alpha_s(T) replaces the old fixed 0.04 pin; only SiO
+# wall-deposit magnitudes move, account composition remains the existing staged
+# SiO-equivalent kg pending C4b owner decision.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 7.302410307849205e-11,
-            "Mg": 1.7840460264748816e-12,
+            "Fe": 7.30241030784923e-11,
+            "Mg": 1.7840460264748846e-12,
             "Na": 0.001855201481610591,
-            "SiO": 7.399451594395997e-08,
+            "SiO": 1.0932972094562808e-08,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 1.7840460264748816e-12,
+            "Mg": 1.7840460264748846e-12,
             "Na": 0.001855201481610591,
-            "SiO": 7.399451594395997e-08,
+            "SiO": 1.0932972094562808e-08,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 1.7840460264748816e-12,
+            "Mg": 1.7840460264748846e-12,
             "Na": 0.001855201481610591,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 1.7840460264748812e-12,
+            "Mg": 1.784046026474885e-12,
             "Na": 0.0018552014816105922,
         },
     },
@@ -103,11 +104,11 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "Fe": 3.136978619372059e-11,
             "Na": 0.007795747254667113,
-            "SiO": 5.747991030153624e-08,
+            "SiO": 7.835561869049892e-09,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "Na": 0.007795747254667113,
-            "SiO": 5.747991030153624e-08,
+            "SiO": 7.835561869049892e-09,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Na": 0.007795747254667113,
@@ -119,21 +120,21 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "Fe": 4.6899817225033605e-11,
-            "Mg": 5.610550561170865e-12,
+            "Mg": 5.61055056117087e-12,
             "Na": 0.003576545442385753,
-            "SiO": 7.162619585814752e-08,
+            "SiO": 1.0583049872608416e-08,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 5.610550561170865e-12,
+            "Mg": 5.61055056117087e-12,
             "Na": 0.003576545442385753,
-            "SiO": 7.162619585814752e-08,
+            "SiO": 1.0583049872608416e-08,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 5.610550561170865e-12,
+            "Mg": 5.61055056117087e-12,
             "Na": 0.003576545442385753,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 5.6105505611708634e-12,
+            "Mg": 5.610550561170869e-12,
             "Na": 0.003576545442385753,
         },
     },

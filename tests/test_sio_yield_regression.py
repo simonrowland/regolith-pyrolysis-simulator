@@ -91,9 +91,14 @@ GOLDENS = (
 # deposition chain. This is a source-rate move, not a deposition retune:
 # lunar 0.000508314464643 -> 8.92476013101e-06; Mars
 # 0.000486760105302 -> 6.94408791991e-06.
+# 2026-06-29 SiO alpha_s(T) grounds Wetzel/Gail 2013 Arrhenius instead of the
+# fixed 0.04 pin. Source alpha at the C2A SiO release T is 0.0320984652281;
+# colder wall/stage alphas reduce deposits while source depletion shifts
+# slightly: lunar 8.92476013101e-06 -> 9.11967185718e-06; Mars
+# 6.94408791991e-06 -> 7.06398603045e-06.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.92476013101e-06,
-    "mars_basalt": 6.94408791991e-06,
+    "lunar_mare_low_ti": 9.11967185718e-06,
+    "mars_basalt": 7.06398603045e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -197,10 +202,11 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
         f"stage_4={stage_4:.3e} for {feedstock}. Update CHANGELOG."
     )
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
-    assert actual["alpha_SiO"] == pytest.approx(0.04)
+    assert actual["alpha_SiO"] == pytest.approx(0.0320984652281)
     assert actual["alpha_provenance"] == (
-        "Phase 1 \u03b1 surface (commit fc2d40b); "
-        "SF2004 Table 10 SiO2(liq) Hashimoto 1990"
+        "Wetzel & Gail 2013 A&A 553 A92 DOI "
+        "10.1051/0004-6361/201220803; "
+        "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited"
     )
     assert "order-of-magnitude regime check" in actual["verdict"]
     assert "not 1-decade fidelity" in actual["verdict"]
@@ -238,10 +244,10 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
 
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
     assert route.condensed_by_stage_species[4]["SiO"] < 0.35
-    # D4: grounded SiO alpha_s=0.04 replaces the legacy 0.7, so less
-    # vapor captures in the finite train and more remains in offgas.
+    # Wetzel/Gail alpha_s(T) evaluates below the prior fixed 0.04 pin in the
+    # colder downstream stages, so more vapor remains in offgas.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.8815308874628011
+        0.9913958881010284
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
@@ -351,7 +357,7 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     )
 
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.000886103302219211,
+        0.00016629976155468562,
         rel=1e-12,
     )
     assert (
@@ -366,7 +372,9 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     assert "cited_hkl_accommodation" in notice["source_classes"]
     assert "fail_closed_no_direct_sticking_coefficient" in notice["source_classes"]
     assert notice["species"] == ["SiO"]
-    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(0.04)
+    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
+        0.022481955557451427
+    )
     assert (
         notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
             "alpha_s"
@@ -412,7 +420,7 @@ def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
     })
 
 
-def test_intentional_pipe_cold_spot_flags_and_increases_wall_deposit():
+def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit():
     train = CondensationTrain.create_default()
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -452,7 +460,7 @@ def test_intentional_pipe_cold_spot_flags_and_increases_wall_deposit():
         f["species"] == "SiO"
         for f in cold.last_cold_spot_diagnostic["findings"]
     )
-    assert cold_route.wall_deposit_by_species["SiO"] > (
+    assert cold_route.wall_deposit_by_species["SiO"] < (
         hot_route.wall_deposit_by_species.get("SiO", 0.0)
     )
 

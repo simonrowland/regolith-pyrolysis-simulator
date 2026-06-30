@@ -33,8 +33,9 @@ SIO_CLOSURE_MAX_REL_PCT = 5e-12
 # The SiO chain diagnostic is a report-layer projection over evolved SiO,
 # terminal Si/SiO2, SiO-equivalent wall deposits, and escaped SiO. The
 # AtomLedger mass-balance gate below remains the hard invariant; this absolute
-# projection floor covers the 2026-06-29 reactive-wall SiO rebaseline.
-SIO_CLOSURE_MAX_ABS_MOL = 2e-11
+# projection floor covers the 2026-06-29 reactive-wall + alpha_s(T) SiO
+# rebaseline while the hard AtomLedger balance remains <=5e-12 %.
+SIO_CLOSURE_MAX_ABS_MOL = 8e-11
 MASS_BALANCE_CLOSURE_MAX_PCT = 5e-12
 CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG = 1e-9
 

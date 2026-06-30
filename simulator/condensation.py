@@ -330,7 +330,7 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
 def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
     if not isinstance(entry, Mapping):
         raise ValueError(f'{path}: {name} must be a mapping')
-    _validate_sticking_value(path, f'{name}.value', entry.get('value'))
+    _validate_sticking_spec(path, f'{name}.value', entry.get('value'))
     if str(entry.get('status', '')).upper() not in STICKING_STATUSES:
         raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
     for key in ('source', 'source_class', 'temperature_range_K', 'uncertainty_flag'):
@@ -353,6 +353,54 @@ def _validate_sticking_value(path: Path, name: str, value: Any) -> None:
         raise ValueError(f'{path}: {name} must be finite and within [0, 1]')
 
 
+def _validate_sticking_spec(path: Path, name: str, value: Any) -> None:
+    if not isinstance(value, Mapping):
+        _validate_sticking_value(path, name, value)
+        return
+    if value.get('form') != 'arrhenius':
+        raise ValueError(f'{path}: {name}.form must be arrhenius')
+    for key in ('A', 'B'):
+        try:
+            coeff = float(value.get(key))
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'{path}: {name}.{key} must be numeric') from exc
+        if not math.isfinite(coeff) or coeff <= 0.0:
+            raise ValueError(f'{path}: {name}.{key} must be finite and > 0')
+    _validate_range_pair(path, f'{name}.valid_range_K',
+                         value.get('valid_range_K'))
+    _validate_range_pair(path, f'{name}.uncertainty_envelope',
+                         value.get('uncertainty_envelope'),
+                         lower_bound=0.0,
+                         upper_bound=1.0)
+    if str(value.get('status', '')).upper() not in STICKING_STATUSES:
+        raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
+    if not value.get('cite'):
+        raise ValueError(f'{path}: {name}.cite is required')
+
+
+def _validate_range_pair(
+    path: Path,
+    name: str,
+    value: Any,
+    *,
+    lower_bound: float | None = None,
+    upper_bound: float | None = None,
+) -> None:
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        raise ValueError(f'{path}: {name} must be a two-value range')
+    try:
+        low = float(value[0])
+        high = float(value[1])
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'{path}: {name} must be numeric') from exc
+    if not (math.isfinite(low) and math.isfinite(high) and low <= high):
+        raise ValueError(f'{path}: {name} must be finite and ascending')
+    if lower_bound is not None and low < lower_bound:
+        raise ValueError(f'{path}: {name} lower bound below {lower_bound}')
+    if upper_bound is not None and high > upper_bound:
+        raise ValueError(f'{path}: {name} upper bound above {upper_bound}')
+
+
 STICKING_DATA = _load_sticking_data()
 
 
@@ -370,8 +418,12 @@ def _sticking_species_entry(species: str) -> Mapping[str, Any]:
     return fallback if isinstance(fallback, Mapping) else {}
 
 
-def _sticking_alpha_s(species: str) -> float:
-    return _coerce_alpha_s(_sticking_species_entry(species).get('value'))
+def _sticking_alpha_s(species: str, T_K: float) -> float:
+    return alpha_s(
+        species,
+        T_K,
+        {'coefficient_spec': _sticking_species_entry(species).get('value')},
+    )
 
 
 def _sticking_reactivity_class(species: str) -> str:
@@ -436,8 +488,173 @@ def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
+    if isinstance(entry, Mapping):
+        if 'value_ref' in entry:
+            ref_record = _sticking_entry_ref_record(
+                str(entry.get('species', species)),
+                entry,
+            )
+            return None if ref_record is None else ref_record.get('value')
+        for key in ('value', 'alpha_s', 'alpha_s_value'):
+            if key in entry:
+                return entry.get(key)
+        return None
+    return entry
+
+
+def _alpha_s_evaluation(
+    species: str,
+    T_K: float,
+    spec: Any,
+) -> tuple[float, dict[str, Any]]:
+    try:
+        T_K = float(T_K)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'alpha_s({species}): T_K must be numeric') from exc
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError(f'alpha_s({species}): T_K must be finite and > 0')
+
+    if isinstance(spec, Mapping):
+        if spec.get('form') != 'arrhenius':
+            raise ValueError(f'alpha_s({species}): malformed coefficient spec')
+        required_fields = (
+            'A',
+            'B',
+            'valid_range_K',
+            'uncertainty_envelope',
+            'cite',
+            'status',
+        )
+        missing_fields = [field for field in required_fields if field not in spec]
+        if missing_fields:
+            raise ValueError(
+                f'alpha_s({species}): malformed arrhenius coefficient spec; '
+                f"missing {', '.join(missing_fields)}"
+            )
+        try:
+            A = float(spec['A'])
+            B = float(spec['B'])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(
+                f'alpha_s({species}): malformed arrhenius coefficient spec'
+            ) from exc
+        cite = str(spec.get('cite') or '').strip()
+        status = str(spec.get('status') or '').upper()
+        if not cite or status not in {'CITED', 'UNCERTIFIED'}:
+            raise ValueError(
+                f'alpha_s({species}): malformed arrhenius coefficient metadata'
+            )
+        valid_range = spec.get('valid_range_K')
+        if not isinstance(valid_range, (list, tuple)) or len(valid_range) != 2:
+            raise ValueError(f'alpha_s({species}): malformed valid_range_K')
+        try:
+            valid_low = float(valid_range[0])
+            valid_high = float(valid_range[1])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'alpha_s({species}): malformed valid_range_K') from exc
+        if (
+            not math.isfinite(valid_low)
+            or not math.isfinite(valid_high)
+            or valid_low <= 0.0
+            or valid_high < valid_low
+        ):
+            raise ValueError(f'alpha_s({species}): malformed valid_range_K')
+        envelope = spec.get('uncertainty_envelope')
+        if not isinstance(envelope, (list, tuple)) or len(envelope) != 2:
+            raise ValueError(
+                f'alpha_s({species}): malformed uncertainty_envelope'
+            )
+        try:
+            envelope_low = float(envelope[0])
+            envelope_high = float(envelope[1])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f'alpha_s({species}): malformed uncertainty_envelope'
+            ) from exc
+        if (
+            not math.isfinite(envelope_low)
+            or not math.isfinite(envelope_high)
+            or not 0.0 <= envelope_low <= envelope_high <= 1.0
+        ):
+            raise ValueError(
+                f'alpha_s({species}): malformed uncertainty_envelope'
+            )
+        value = A * math.exp(-B / T_K)
+        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+            raise ValueError(f'alpha_s({species}): evaluated value outside [0, 1]')
+        extrapolated = not (valid_low <= T_K <= valid_high)
+        return value, {
+            'species': str(species),
+            'alpha_s': value,
+            'alpha_s_form': 'arrhenius',
+            'alpha_s_temperature_K': T_K,
+            'alpha_s_A': A,
+            'alpha_s_B': B,
+            'alpha_s_valid_range_K': (
+                [valid_low, valid_high]
+                if valid_low is not None and valid_high is not None
+                else None
+            ),
+            'alpha_s_extrapolated': extrapolated,
+            'alpha_s_uncertainty_envelope': [envelope_low, envelope_high],
+            'alpha_s_cite': cite,
+            'alpha_s_status': status,
+        }
+
+    try:
+        value = float(spec)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'alpha_s({species}): scalar coefficient required') from exc
+    if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+        raise ValueError(f'alpha_s({species}): scalar outside [0, 1]')
+    return value, {
+        'species': str(species),
+        'alpha_s': value,
+        'alpha_s_form': 'scalar',
+        'alpha_s_temperature_K': T_K,
+        'alpha_s_extrapolated': False,
+    }
+
+
+def alpha_s(
+    species: str,
+    T_K: float,
+    context: MutableMapping[str, Any] | Mapping[str, Any] | None = None,
+) -> float:
+    species_name = str(species)
+    spec = None
+    if isinstance(context, Mapping):
+        if 'coefficient_spec' in context:
+            spec = context.get('coefficient_spec')
+        elif 'entry' in context:
+            spec = _alpha_s_spec_from_entry(species_name, context.get('entry'))
+    if spec is None:
+        spec = _sticking_species_entry(species_name).get('value')
+    value, evaluation = _alpha_s_evaluation(species_name, T_K, spec)
+    if isinstance(context, MutableMapping):
+        context['alpha_s_evaluation'] = dict(evaluation)
+    return value
+
+
+def _nominal_sticking_value(value: Any) -> float:
+    if isinstance(value, Mapping):
+        prior = value.get('prior_scalar')
+        if isinstance(prior, Mapping) and 'value' in prior:
+            value = prior.get('value')
+        else:
+            return 0.0
+    try:
+        alpha_value = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(alpha_value):
+        return 0.0
+    return max(0.0, min(1.0, alpha_value))
+
+
 STICKING_COEFF = {
-    str(species): float(entry.get('value'))
+    str(species): _nominal_sticking_value(entry.get('value'))
     for species, entry in _sticking_species_entries().items()
     if isinstance(entry, Mapping)
 }
@@ -1467,7 +1684,8 @@ class CondensationModel:
                     T_cond_C=T_cond,
                     residence_s=self.residence_time_s.get(
                         stage.stage_number, 1.0),
-                    alpha_s=float(stage_alpha_record.get('alpha_s', 0.0)),
+                    alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
+                    alpha_record=stage_alpha_record,
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings),
@@ -1884,7 +2102,8 @@ class CondensationModel:
         species: str,
         T_cond_C: float,
         residence_s: float,
-        alpha_s: float,
+        alpha_s_value: float,
+        alpha_record: MutableMapping[str, Any] | None = None,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
     ) -> float:
@@ -1904,7 +2123,7 @@ class CondensationModel:
         stage T-band. Chunk C replaces the constant regime factor with
         pressure/Knudsen coupling.
         """
-        if residence_s <= 0.0 or alpha_s <= 0.0:
+        if residence_s <= 0.0 or alpha_s_value <= 0.0:
             return 0.0
 
         P_local_pa = _local_species_pressure_pa(
@@ -1933,6 +2152,12 @@ class CondensationModel:
 
         band_flux_fraction = 0.0
         width_C = hi_C - lo_C
+        spec = (
+            alpha_record.get('alpha_s_coefficient_spec')
+            if isinstance(alpha_record, Mapping)
+            else None
+        )
+        sample_extrapolated = False
         for sample in range(HKL_BAND_SAMPLES):
             if width_C <= 0.0:
                 T_surface_C = lo_C
@@ -1941,6 +2166,14 @@ class CondensationModel:
                     lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
                 )
             T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+            sample_alpha_s = alpha_s_value
+            if isinstance(spec, Mapping):
+                alpha_context: dict[str, Any] = {'coefficient_spec': spec}
+                sample_alpha_s = alpha_s(species, T_surface_K, alpha_context)
+                sample_eval = alpha_context.get('alpha_s_evaluation', {})
+                sample_extrapolated = sample_extrapolated or bool(
+                    sample_eval.get('alpha_s_extrapolated')
+                )
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
             # series-resistance form as the wall-deposit candidate path so
             # the stage-condensation band integration honors the canonical
@@ -1957,7 +2190,7 @@ class CondensationModel:
             )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, alpha_s,
+                species, P_local_pa, T_surface_K, sample_alpha_s,
                 pipe_diameter_m=self.pipe_diameter_m,
                 # 0.5.3 Phase B: pass both axes (see twin call above
                 # in ``_wall_deposit_candidate_for_surface_kg`` for the
@@ -1976,6 +2209,12 @@ class CondensationModel:
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
+        if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
+            alpha_record['alpha_s_sample_temperature_range_K'] = [
+                max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
+                max(hi_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
+            ]
+            alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
 
         rate_s_inv = max(0.0, band_flux_fraction)
         eta = 1.0 - math.exp(-residence_s * rate_s_inv)
@@ -2173,12 +2412,22 @@ def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
     return float(lo_C), float(hi_C)
 
 
+def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
+    lo_C, hi_C = _stage_temp_band_C(stage)
+    return max(((lo_C + hi_C) / 2.0) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+
+
 def _stage_alpha_s(
     stage: CondensationStage,
     species: str,
     materials: Mapping[str, Any] | None = None,
 ) -> float:
-    return float(_stage_alpha_record(stage, species, materials)['alpha_s'])
+    return float(_stage_alpha_record(
+        stage,
+        species,
+        materials,
+        T_K=_stage_midpoint_temperature_K(stage),
+    )['alpha_s'])
 
 
 def _alpha_entry_with_species(species: str, entry: Any) -> Any:
@@ -2190,28 +2439,44 @@ def _alpha_entry_with_species(species: str, entry: Any) -> Any:
 
 
 def _alpha_entry_value(entry: Any) -> Any:
-    if isinstance(entry, Mapping):
-        if 'value_ref' in entry:
-            ref_record = _sticking_entry_ref_record(
-                str(entry.get('species', '')),
-                entry,
-            )
-            return None if ref_record is None else ref_record.get('value')
-        for key in ('value', 'alpha_s', 'alpha_s_value'):
-            if key in entry:
-                return entry.get(key)
-        return None
-    return entry
+    species = str(entry.get('species', '')) if isinstance(entry, Mapping) else ''
+    return _alpha_s_spec_from_entry(species, entry)
 
 
-def _coerce_alpha_s(entry: Any) -> float:
+def _coerce_alpha_s(
+    entry: Any,
+    *,
+    species: str = '',
+    T_K: float | None = None,
+    evaluation_out: MutableMapping[str, Any] | None = None,
+) -> float:
+    spec = _alpha_s_spec_from_entry(species, entry)
+    if isinstance(spec, Mapping):
+        if T_K is None:
+            raise ValueError(f'alpha_s({species}): T_K required for T-form')
+        context: dict[str, Any] = {'coefficient_spec': spec}
+        value = alpha_s(species, T_K, context)
+        if evaluation_out is not None:
+            evaluation_out.clear()
+            evaluation_out.update(context.get('alpha_s_evaluation', {}))
+        return value
     try:
-        alpha_s = float(_alpha_entry_value(entry))
+        alpha_value = float(spec)
     except (TypeError, ValueError):
-        alpha_s = 0.0
-    if not math.isfinite(alpha_s):
+        alpha_value = 0.0
+    if not math.isfinite(alpha_value):
         return 0.0
-    return max(0.0, min(1.0, alpha_s))
+    value = max(0.0, min(1.0, alpha_value))
+    if evaluation_out is not None:
+        evaluation_out.clear()
+        evaluation_out.update({
+            'species': str(species),
+            'alpha_s': value,
+            'alpha_s_form': 'scalar',
+            'alpha_s_temperature_K': T_K,
+            'alpha_s_extrapolated': False,
+        })
+    return value
 
 
 def _alpha_record(
@@ -2219,20 +2484,29 @@ def _alpha_record(
     species: str,
     entry: Any,
     source: str,
+    T_K: float | None = None,
     liner_material: str = '',
     segment: PipeSegment | None = None,
     source_class: str = 'assumption_ungrounded_fitted_coefficient',
     status: str = 'proxy',
     output_status: str = 'uncertainty_only',
 ) -> dict[str, Any]:
+    evaluation: dict[str, Any] = {}
     record: dict[str, Any] = {
         'species': str(species),
-        'alpha_s': _coerce_alpha_s(_alpha_entry_with_species(species, entry)),
+        'alpha_s': _coerce_alpha_s(
+            _alpha_entry_with_species(species, entry),
+            species=species,
+            T_K=T_K,
+            evaluation_out=evaluation,
+        ),
         'source': source,
         'source_class': source_class,
         'status': status,
         'output_status': output_status,
     }
+    if evaluation:
+        record.update(evaluation)
     entry = _alpha_entry_with_species(species, entry)
     ref_record = _sticking_entry_ref_record(species, entry)
     if ref_record is not None:
@@ -2248,6 +2522,9 @@ def _alpha_record(
             value = entry.get(key)
             if value not in (None, ''):
                 record[key] = value
+    spec = _alpha_s_spec_from_entry(species, entry)
+    if isinstance(spec, Mapping):
+        record['alpha_s_coefficient_spec'] = dict(spec)
     return record
 
 
@@ -2266,15 +2543,17 @@ def _wall_alpha_s(
     materials: Mapping[str, Any] | None = None,
     *,
     segment: PipeSegment | None = None,
+    T_K: float | None = None,
 ) -> float:
     return float(_wall_alpha_record(
         species,
         materials,
         segment=segment,
+        T_K=T_K,
     )['alpha_s'])
 
 
-def _sidecar_alpha_record(species: str) -> dict[str, Any]:
+def _sidecar_alpha_record(species: str, T_K: float | None = None) -> dict[str, Any]:
     return _alpha_record(
         species=species,
         entry={
@@ -2288,7 +2567,8 @@ def _sidecar_alpha_record(species: str) -> dict[str, Any]:
         source=(
             'data/literature/vacuum_pyrolysis_sticking.yaml::species.'
             f'{species}'
-        )
+        ),
+        T_K=T_K,
     )
 
 
@@ -2296,7 +2576,11 @@ def _stage_alpha_record(
     stage: CondensationStage,
     species: str,
     materials: Mapping[str, Any] | None = None,
+    *,
+    T_K: float | None = None,
 ) -> dict[str, Any]:
+    if T_K is None:
+        T_K = _stage_midpoint_temperature_K(stage)
     config = _stage_material_config(stage, materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
     entry = (
@@ -2315,11 +2599,12 @@ def _stage_alpha_record(
                 'data/materials.yaml::stages.'
                 f'{stage.stage_number}.alpha_s_by_species.{species}'
             ),
+            T_K=T_K,
             source_class='material_stage_alpha',
         )
         record['stage_number'] = int(stage.stage_number)
         return record
-    record = _sidecar_alpha_record(species)
+    record = _sidecar_alpha_record(species, T_K=T_K)
     record['stage_number'] = int(stage.stage_number)
     return record
 
@@ -2329,7 +2614,13 @@ def _wall_alpha_record(
     materials: Mapping[str, Any] | None = None,
     *,
     segment: PipeSegment | None = None,
+    T_K: float | None = None,
 ) -> dict[str, Any]:
+    if T_K is None and segment is not None:
+        T_K = max(
+            float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            1.0,
+        )
     config = _wall_material_config(materials)
     alpha_by_species = config.get('alpha_s_by_species', {}) or {}
     if segment is not None and getattr(segment, 'liner_material', ''):
@@ -2347,6 +2638,7 @@ def _wall_alpha_record(
                     'data/materials.yaml::liner_materials.'
                     f'{liner_material}.alpha_s_by_species.{species}'
                 ),
+                T_K=T_K,
                 liner_material=liner_material,
                 segment=segment,
                 source_class='material_liner_alpha',
@@ -2362,6 +2654,7 @@ def _wall_alpha_record(
                 'data/materials.yaml::wall_surfaces.interstage_duct.'
                 f'alpha_s_by_species.{species}'
             ),
+            T_K=T_K,
             liner_material=str(config.get('liner_material') or ''),
             segment=segment,
         )
@@ -2380,15 +2673,19 @@ def _wall_alpha_record(
                     'data/materials.yaml::liner_materials.'
                     f'{liner_material}.alpha_s_by_species.{species}'
                 ),
+                T_K=T_K,
                 liner_material=liner_material,
                 segment=segment,
                 source_class='material_liner_alpha',
             )
-    return _sidecar_alpha_record(species)
+    return _sidecar_alpha_record(species, T_K=T_K)
 
 
-def _capture_budget_alpha_record(species: str) -> dict[str, Any]:
-    return _sidecar_alpha_record(species)
+def _capture_budget_alpha_record(
+    species: str,
+    T_K: float | None = None,
+) -> dict[str, Any]:
+    return _sidecar_alpha_record(species, T_K=T_K)
 
 
 def _liner_material_config(
@@ -3208,23 +3505,41 @@ def _pressure_isolated_capture_budget_kg(
         temps=temps,
         vapor_pressure_data=vapor_pressure_data,
     )
-    alpha_record = _capture_budget_alpha_record(species)
-    if alpha_record_out is not None:
-        alpha_record_out.clear()
-        alpha_record_out.update(alpha_record)
-    alpha_s = _sticking_alpha_s(species)
+    alpha_record = _capture_budget_alpha_record(
+        species,
+        T_K=max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
+    )
+    stage_alpha_evaluations: dict[str, Any] = {}
     for stage in stages:
         if remaining_kg <= 1e-15:
             break
         if _cr_stage_isolation_blocks(stage, species):
             continue
+        T_stage_K = _stage_midpoint_temperature_K(stage)
+        alpha_context: dict[str, Any] = {
+            'coefficient_spec': _sticking_species_entry(species).get('value'),
+        }
+        stage_alpha_s = alpha_s(species, T_stage_K, alpha_context)
+        stage_alpha_evaluations[str(stage.stage_number)] = dict(
+            alpha_context.get('alpha_s_evaluation', {})
+        )
         eta = _pressure_isolated_stage_efficiency(
             stage,
             T_cond_C,
             float(residence_time_s.get(stage.stage_number, 1.0)),
-            alpha_s,
+            stage_alpha_s,
         )
         remaining_kg -= remaining_kg * eta
+    if stage_alpha_evaluations:
+        alpha_record['alpha_s_stage_evaluations'] = stage_alpha_evaluations
+        alpha_record['alpha_s_stage_extrapolated'] = any(
+            bool(record.get('alpha_s_extrapolated'))
+            for record in stage_alpha_evaluations.values()
+            if isinstance(record, Mapping)
+        )
+    if alpha_record_out is not None:
+        alpha_record_out.clear()
+        alpha_record_out.update(alpha_record)
     return max(0.0, min(rate_kg_hr, rate_kg_hr - remaining_kg))
 
 

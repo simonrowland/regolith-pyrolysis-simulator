@@ -4,7 +4,7 @@ Date: 2026-05-19
 
 Scope: Phase 3 Stage 3 SiO setpoint characterization for `data/setpoints.yaml` C2A_continuous operator review. Engine-only outputs stay inside the [1323, 2400 K] authority band and the recipe [1050, 1600 C] envelope.
 
-Caveat: alpha_SiO = 0.04 from the Phase 1 alpha surface (commit `fc2d40b`). Stage 3 is post-Cr v2 (commit `bb52c62`) and reports `stage_3_sio_zone_product`.
+Caveat: historical pre-alpha_s(T) sweep. These numbers used alpha_SiO = 0.04 from the Phase 1 alpha surface (commit `fc2d40b`); current runtime uses Wetzel/Gail alpha_s_SiO(T)=0.52*exp(-3685/T_K). Stage 3 is post-Cr v2 (commit `bb52c62`) and reports `stage_3_sio_zone_product`.
 
 ## Recommendation
 

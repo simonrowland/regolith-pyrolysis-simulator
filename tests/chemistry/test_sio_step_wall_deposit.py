@@ -159,16 +159,17 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # and adds gas/melt resistances upstream of deposition. The same cold-wall
     # capture physics sees much less SiO source:
     # 4.6778715958e-07 -> 8.21353261008e-09 kg.
-    # 2026-06-29 re-evaporation fix leaves the low-wall point unchanged,
-    # but rejects the old false zero-deposit threshold at hot walls.
+    # 2026-06-29 grounded alpha_s(T) replaces the prior mid-range 0.04 pin.
+    # Cold-wall extrapolation lowers low-T wall capture; hot-wall capture remains
+    # nonzero after the reactive-product re-evaporation fix.
     assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        8.21353261008e-09, rel=1e-9
+        1.029821621822e-09, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1400.0) == pytest.approx(
-        8.10457511426e-09, rel=1e-9
+        1.121560821002e-09, rel=1e-9
     )
     assert _sio_wall_deposit_kg(1500.0) == pytest.approx(
-        8.06939512106e-09, rel=1e-9
+        1.142280283894e-09, rel=1e-9
     )
 
 

@@ -52,7 +52,7 @@ def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():
     # tight enough to catch routing regressions without forcing a false zero.
     captures = (capture_1050, capture_1300, capture_1400)
     assert min(captures) > 0.0
-    assert max(captures) - min(captures) <= 0.02 * max(captures)
+    assert max(captures) - min(captures) <= 0.04 * max(captures)
     # Post-r7 autoreview fix (2026-05-27): equal-temperature wall routing
     # now restricts deposit candidates to reachable (upstream-of-designated-
     # stage) pipe segments. Pre-r7, downstream-of-stage-3 pipe segments

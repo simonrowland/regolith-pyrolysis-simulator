@@ -2,11 +2,12 @@
 
 Anchors:
 
-* ``data/vapor_pressures.yaml`` sets SiO Hertz-Knudsen alpha to 0.04.
+* ``data/vapor_pressures.yaml`` sets SiO Hertz-Knudsen alpha to the
+  Wetzel/Gail Arrhenius form.
 * §25-bis convergence documents VapoRock SiO pressure near 3.824e-1 Pa
-  at the 1873 K SoF2018 Fig. 3 anchor. With alpha=0.04, unit area, and
-  unit stir factor, the corrected H-K-L mass flux is computed from the
-  shared gas constant used by the series-resistance helper.
+  at the 1873 K SoF2018 Fig. 3 anchor. With alpha evaluated at source T,
+  unit area, and unit stir factor, the corrected H-K-L mass flux is computed
+  from the shared gas constant used by the series-resistance helper.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import yaml
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
-from simulator.condensation import GAS_CONSTANT_J_MOL_K
+from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.evaporation import _load_evaporation_alpha_by_species
 
 
@@ -28,8 +29,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SIO_ANCHOR_PRESSURE_PA = 0.3824
 SIO_ANCHOR_MOLAR_MASS_KG_MOL = 0.04408
 SIO_ANCHOR_T_K = 1600.0 + 273.15
+SIO_ANCHOR_ALPHA = 0.52 * math.exp(-3685.0 / SIO_ANCHOR_T_K)
 SIO_ANCHOR_FLUX_KG_HR = (
-    0.04
+    SIO_ANCHOR_ALPHA
     * SIO_ANCHOR_PRESSURE_PA
     * math.sqrt(
         SIO_ANCHOR_MOLAR_MASS_KG_MOL
@@ -43,7 +45,7 @@ def _load_vapor_pressure_data() -> dict:
     return yaml.safe_load((REPO_ROOT / "data" / "vapor_pressures.yaml").read_text())
 
 
-def _sio_flux(alpha: float) -> float:
+def _sio_flux(alpha) -> float:
     view = ProviderAccountView(
         accounts={"process.cleaned_melt": {"SiO2": 1000.0}},
         species_formula_registry={},
@@ -85,15 +87,30 @@ def test_sio_evaporation_alpha_surface_is_live_from_yaml():
         _load_vapor_pressure_data()
     )
 
-    assert alpha_by_species["SiO"] == pytest.approx(0.04)
+    assert alpha_s(
+        "SiO",
+        SIO_ANCHOR_T_K,
+        {"coefficient_spec": alpha_by_species["SiO"]},
+    ) == pytest.approx(SIO_ANCHOR_ALPHA)
 
 
 def test_hertz_knudsen_flux_scales_linearly_with_alpha():
-    full_alpha_flux = _sio_flux(0.04)
-    half_alpha_flux = _sio_flux(0.02)
+    full_alpha_flux = _sio_flux(SIO_ANCHOR_ALPHA)
+    half_alpha_flux = _sio_flux(SIO_ANCHOR_ALPHA / 2.0)
 
     assert half_alpha_flux / full_alpha_flux == pytest.approx(0.5)
 
 
 def test_sio_flux_matches_25bis_pressure_anchor_with_alpha_surface():
-    assert _sio_flux(0.04) == pytest.approx(SIO_ANCHOR_FLUX_KG_HR, rel=1e-12)
+    spec = _load_evaporation_alpha_by_species(_load_vapor_pressure_data())["SiO"]
+
+    assert _sio_flux(spec) == pytest.approx(SIO_ANCHOR_FLUX_KG_HR, rel=1e-12)
+
+
+@pytest.mark.parametrize("missing_field", ["valid_range_K", "uncertainty_envelope"])
+def test_sio_flux_arrhenius_metadata_is_required(missing_field):
+    spec = dict(_load_evaporation_alpha_by_species(_load_vapor_pressure_data())["SiO"])
+    spec.pop(missing_field)
+
+    with pytest.raises(ValueError, match="malformed"):
+        _sio_flux(spec)

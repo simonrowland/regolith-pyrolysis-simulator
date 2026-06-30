@@ -296,10 +296,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
-    # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed and
-    # AlphaMELTS activity-times-Antoine adopted the shared coefficient selector.
+    # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
+    # AlphaMELTS activity-times-Antoine adopted the shared coefficient selector,
+    # and SiO alpha_s became a cited temperature-dependent YAML spec.
     # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "d418bdd2b027da37218770e303f5a6398d3e8f487617b88c168f8172517dabe4"
+    assert cache_key(spec) == "2a991e218614fee4941398eac5aa7ee6a0ec718be35d2519b1139de931f60a27"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

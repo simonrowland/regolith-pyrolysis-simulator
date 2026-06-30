@@ -358,12 +358,11 @@ def alpha_envelope_anchors(
                     f"evaporation_alpha for {species!r} must be a mapping"
                 )
 
-            value = _coerce_float(alpha_data.get("value"))
+            value_raw = alpha_data.get("value")
             envelope_raw = alpha_data.get("envelope") or ()
             t_band_raw = alpha_data.get("T_band_K") or ()
             if (
-                value is None
-                or not isinstance(envelope_raw, list)
+                not isinstance(envelope_raw, list)
                 or not isinstance(t_band_raw, list)
                 or len(envelope_raw) != 2
                 or len(t_band_raw) != 2
@@ -379,6 +378,22 @@ def alpha_envelope_anchors(
                 raise ValueError(
                     f"evaporation_alpha for {species!r} has non-numeric "
                     "T_band_K or envelope"
+                )
+            value = _coerce_float(value_raw)
+            if (
+                value is None
+                and isinstance(value_raw, Mapping)
+                and value_raw.get("form") == "arrhenius"
+            ):
+                A = _coerce_float(value_raw.get("A"))
+                B = _coerce_float(value_raw.get("B"))
+                if A is not None and B is not None:
+                    T_mid = (float(t_band[0]) + float(t_band[1])) / 2.0
+                    value = A * math.exp(-B / T_mid)
+            if value is None:
+                raise ValueError(
+                    f"evaporation_alpha for {species!r} needs value, "
+                    "two-entry T_band_K, and two-entry envelope"
                 )
 
             anchors.append(

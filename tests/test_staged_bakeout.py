@@ -10,7 +10,7 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 3.3055757359579566e-05
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 5.220293262374288e-06
 
 
 def _run_script(lines: list[str]):
@@ -189,20 +189,23 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # hot-trap instead of the old VapoRock-dominant silica-purity surface.
     # Keep the recipe invariant honest: staged mode must create material
     # Stage 3 silica capture while the continuous warmup path captures none.
-    # D4 grounds SiO alpha_s at 0.04 instead of legacy 0.7, so the absolute
-    # silica capture threshold drops while staged remains nonzero and richer
-    # than continuous. SSO-R Phase 1 (coupled melt<->headspace O2 exchange)
+    # D4 first grounded SiO alpha_s below the legacy 0.7; the current
+    # Wetzel/Gail alpha_s(T) keeps the capture threshold grounded while staged
+    # remains nonzero and richer than continuous. SSO-R Phase 1 (coupled
+    # melt<->headspace O2 exchange)
     # lowers it further: the melt sheds O2 to the headspace, raising transport
     # pO2 and suppressing SiO release via p(SiO) ~ 1/sqrt(pO2) (staged_silica
     # ~0.078 -> ~0.048), so this floor moves 0.05 -> 0.04 (still above the
     # grounded k_O-clamp envelope; verified not test-forcing in 2026-06-28 review).
-    # Alpha-series source resistance lowers staged_silica again to ~0.00103 kg;
-    # keep the invariant nonzero and above the continuous warmup path.
+    # Alpha-series source resistance lowers staged_silica again to ~0.00103 kg.
+    # Grounded alpha_s(T) then lowers the cold/staged surface capture to
+    # ~1.4e-4 kg and makes Stage 3 Fe/Mg-heavy; keep the silica fraction nonzero
+    # and above the continuous warmup path without preserving the fixed-alpha mix.
     staged_fe_mg = sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg"))
     staged_stage3_total = staged_silica + staged_fe_mg
-    assert staged_silica > 0.001
+    assert staged_silica > 1e-4
     assert staged_stage3_total > staged_silica
-    assert staged_silica / staged_stage3_total > 0.20
+    assert staged_silica / staged_stage3_total > 0.03
 
 
 def test_c2a_staged_pipework_has_no_upstream_cold_spot():
@@ -222,8 +225,8 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
 
     assert warnings == []
     # No upstream cold spot is still the routing invariant. The 2026-06-29
-    # reactive SiO wall-product fix increases the expected wall magnitude above
-    # the product slow-fouling threshold; do not retune that threshold here.
+    # reactive SiO wall-product fix keeps the expected wall magnitude nonzero;
+    # grounded alpha_s(T) lowers it from the old fixed-alpha wall anchor.
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         rel=1e-9,

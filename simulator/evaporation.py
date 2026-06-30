@@ -49,10 +49,10 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
 ))
 
 
-def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, float]:
-    """Load per-species Hertz-Knudsen alpha values from vapor pressure data."""
+def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
+    """Load per-species Hertz-Knudsen alpha specs from vapor pressure data."""
 
-    alpha_by_species: dict[str, float] = {}
+    alpha_by_species: dict[str, Any] = {}
     for group_name in _EVAPORATION_ALPHA_GROUPS:
         group = vapor_pressure_data.get(group_name, {}) or {}
         for species, species_data in group.items():
@@ -61,7 +61,10 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, f
             alpha_data = species_data.get("evaporation_alpha") or {}
             if not isinstance(alpha_data, dict) or "value" not in alpha_data:
                 continue
-            alpha_by_species[species] = float(alpha_data["value"])
+            value = alpha_data["value"]
+            alpha_by_species[species] = (
+                dict(value) if isinstance(value, dict) else float(value)
+            )
     return alpha_by_species
 
 

@@ -54,6 +54,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from collections.abc import Mapping
+from typing import Any
 
 from engines.builtin._common import (
     diagnostic_control_audit,
@@ -150,15 +151,29 @@ class SeriesEvaporationFlux:
         }
 
 
-def _coerce_alpha_by_species(alpha_control) -> dict[str, float]:
+def _coerce_alpha_by_species(alpha_control) -> dict[str, Any]:
     if isinstance(alpha_control, Mapping):
-        return {
-            str(species): float(value)
-            for species, value in alpha_control.items()
-        }
+        coerced: dict[str, Any] = {}
+        for species, value in alpha_control.items():
+            coerced[str(species)] = (
+                dict(value) if isinstance(value, Mapping) else float(value)
+            )
+        return coerced
     if alpha_control is None:
         return {}
     return {"*": float(alpha_control)}
+
+
+def _evaluate_alpha_control(
+    species: str,
+    T_K: float,
+    alpha_spec: Any,
+) -> tuple[float, dict[str, Any]]:
+    from simulator.condensation import alpha_s
+
+    context: dict[str, Any] = {'coefficient_spec': alpha_spec}
+    value = alpha_s(species, T_K, context)
+    return value, dict(context.get('alpha_s_evaluation', {}))
 
 
 def _coerce_alpha_envelope_by_species(alpha_envelope_control) -> dict[str, tuple[float, float]]:
@@ -707,6 +722,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
         flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
+        alpha_evaluations_by_species: dict[str, dict[str, Any]] = {}
         flux_uncertainty_pct: dict[str, float] = {}
         series_flux_diagnostics: dict[
             str, dict[str, float | str | bool | None]
@@ -754,10 +770,17 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species not in alpha_by_species
                 and "*" not in alpha_by_species
             )
-            alpha = alpha_by_species.get(
+            alpha_spec = alpha_by_species.get(
                 species,
                 alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
             )
+            alpha, alpha_evaluation = _evaluate_alpha_control(
+                species,
+                T_K,
+                alpha_spec,
+            )
+            if alpha_evaluation:
+                alpha_evaluations_by_species[species] = alpha_evaluation
 
             baseline_alpha_1 = _series_resistance_evaporation_flux_kg_m2_s(
                 species=species,
@@ -859,6 +882,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             missing_alpha_diagnostic = {
                 "evaporation_flux_kg_hr": {},
                 "alpha_used_by_species": alpha_used_by_species,
+                "alpha_s_evaluation_by_species": alpha_evaluations_by_species,
                 "flux_uncertainty_pct": flux_uncertainty_pct,
                 "missing_alpha": missing_alpha,
                 "temperature_C": T_C,
@@ -883,6 +907,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         diagnostic = {
             "evaporation_flux_kg_hr": flux_kg_hr,
             "alpha_used_by_species": alpha_used_by_species,
+            "alpha_s_evaluation_by_species": alpha_evaluations_by_species,
             "flux_uncertainty_pct": flux_uncertainty_pct,
             "evaporation_series_resistance": series_flux_diagnostics,
             "temperature_C": T_C,

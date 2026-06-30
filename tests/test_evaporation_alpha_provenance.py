@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -91,12 +92,19 @@ EXPECTED_ALPHA = {
         "tier": 2,
     },
     ("oxide_vapors", "SiO"): {
-        "value": 0.04,
-        "envelope": (0.003, 0.048),
+        "value": {
+            "form": "arrhenius",
+            "A": 0.52,
+            "B": 3685.0,
+            "valid_range_K": (1000, 1800),
+            "prior_scalar": 0.04,
+        },
+        "envelope": (0.003, 0.067),
         "source": (
-            "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, "
-            "alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine "
-            "SiO+ 0.003-0.036 cross-check"
+            "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation "
+            "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited "
+            "SiO evaporation coefficient; microscopic reversibility applies "
+            "the same alpha_s(T) bound to condensation/sticking."
         ),
         "tier": 2,
     },
@@ -129,9 +137,24 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
         alpha = data[section][species]["evaporation_alpha"]
         envelope = tuple(alpha["envelope"])
 
-        assert alpha["value"] == pytest.approx(expected["value"])
+        if isinstance(expected["value"], dict):
+            value = alpha["value"]
+            assert value["form"] == expected["value"]["form"]
+            assert value["A"] == pytest.approx(expected["value"]["A"])
+            assert value["B"] == pytest.approx(expected["value"]["B"])
+            assert tuple(value["valid_range_K"]) == pytest.approx(
+                expected["value"]["valid_range_K"]
+            )
+            assert value["prior_scalar"]["value"] == pytest.approx(
+                expected["value"]["prior_scalar"]
+            )
+            t_mid = sum(alpha["T_band_K"]) / 2.0
+            evaluated = value["A"] * math.exp(-value["B"] / t_mid)
+            assert envelope[0] <= evaluated <= envelope[1]
+        else:
+            assert alpha["value"] == pytest.approx(expected["value"])
+            assert envelope[0] <= alpha["value"] <= envelope[1]
         assert envelope == pytest.approx(expected["envelope"])
-        assert envelope[0] <= alpha["value"] <= envelope[1]
         assert alpha["source"] == expected["source"]
         assert alpha["tier"] == expected["tier"]
 

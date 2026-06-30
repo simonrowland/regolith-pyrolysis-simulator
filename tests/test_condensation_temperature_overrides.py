@@ -418,7 +418,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         default_route.sticking_alpha_provenance_notice["alpha_s_by_species"][
             "SiO"
         ]
-        == pytest.approx(0.04)
+        == pytest.approx(0.022481955557451427)
     )
 
     materials_path = tmp_path / "materials.yaml"
@@ -501,8 +501,10 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
         assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
     else:
+        # T-dependent alpha_s(T) narrows the cold-stage contrast versus the old
+        # fixed 0.04 pin, but the instance override still reaches the budget path.
         assert overridden_result.remaining_by_species["SiO"] > (
-            default_result.remaining_by_species["SiO"] + 0.05
+            default_result.remaining_by_species["SiO"] + 0.03
         )
 
 

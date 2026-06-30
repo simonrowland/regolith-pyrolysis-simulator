@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -34,7 +35,17 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
 
     for species, row in data["species"].items():
         assert row["status"] in {"CITED", "UNCERTIFIED"}, species
-        assert 0.0 <= float(row["value"]) <= 1.0, species
+        value = row["value"]
+        if isinstance(value, dict):
+            assert value["form"] == "arrhenius", species
+            assert value["status"] in {"CITED", "UNCERTIFIED"}, species
+            assert value["valid_range_K"] == [1000, 1800], species
+            assert value["uncertainty_envelope"] == pytest.approx(
+                [0.003, 0.067]
+            )
+            assert value["cite"], species
+        else:
+            assert 0.0 <= float(value) <= 1.0, species
         assert row["source"], species
         assert row["source_class"], species
         assert row["temperature_range_K"], species
@@ -43,6 +54,58 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
             assert row["output_status"] == "status_bearing", species
         else:
             assert row["source_url"], species
+
+
+def test_sio_sticking_alpha_s_uses_grounded_arrhenius_form():
+    expected = {
+        1000.0: 0.52 * math.exp(-3685.0 / 1000.0),
+        1500.0: 0.52 * math.exp(-3685.0 / 1500.0),
+        1800.0: 0.52 * math.exp(-3685.0 / 1800.0),
+    }
+
+    values = []
+    for T_K, expected_alpha in expected.items():
+        context: dict[str, object] = {}
+        value = condensation.alpha_s("SiO", T_K, context)
+        values.append(value)
+        assert value == pytest.approx(expected_alpha, rel=1e-12)
+        evaluation = context["alpha_s_evaluation"]
+        assert evaluation["alpha_s_form"] == "arrhenius"
+        assert evaluation["alpha_s_extrapolated"] is False
+        assert evaluation["alpha_s_valid_range_K"] == [1000.0, 1800.0]
+
+    assert values == sorted(values)
+
+
+def test_sio_sticking_alpha_s_records_cold_wall_extrapolation():
+    context: dict[str, object] = {}
+
+    value = condensation.alpha_s("SiO", 900.0, context)
+
+    assert value == pytest.approx(0.52 * math.exp(-3685.0 / 900.0))
+    assert context["alpha_s_evaluation"]["alpha_s_extrapolated"] is True
+
+
+def test_non_sio_sticking_alpha_s_keeps_scalar_value():
+    assert condensation.alpha_s("Fe", 1500.0, {}) == pytest.approx(0.02)
+
+
+def test_malformed_sticking_coefficient_spec_fails_loud():
+    with pytest.raises(ValueError, match="malformed"):
+        condensation.alpha_s(
+            "SiO",
+            1500.0,
+            {"coefficient_spec": {"form": "arrhenius", "A": 0.52}},
+        )
+
+
+@pytest.mark.parametrize("missing_field", ["valid_range_K", "uncertainty_envelope", "cite", "status"])
+def test_arrhenius_sticking_coefficient_metadata_is_required(missing_field):
+    spec = dict(_load_sticking_data()["species"]["SiO"]["value"])
+    spec.pop(missing_field)
+
+    with pytest.raises(ValueError, match="malformed"):
+        condensation.alpha_s("SiO", 1500.0, {"coefficient_spec": spec})
 
 
 def test_wall_deposit_reactivity_classes_are_explicit():
@@ -111,7 +174,7 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     )
     legacy = route_sio()
 
-    assert grounded == pytest.approx(0.000886103302219211, rel=1e-12)
+    assert grounded == pytest.approx(0.00016629976155468562, rel=1e-12)
     assert legacy == pytest.approx(0.03398921856191324, rel=1e-12)
     assert grounded < legacy
 

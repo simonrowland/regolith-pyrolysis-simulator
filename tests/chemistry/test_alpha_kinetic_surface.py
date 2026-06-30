@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -10,6 +11,7 @@ import yaml
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.condensation import alpha_s
 from simulator.evaporation import (
     _load_evaporation_alpha_envelope_by_species,
     _load_evaporation_alpha_by_species,
@@ -20,7 +22,6 @@ from tests.chemistry.corpus_fixtures import alpha_envelope_anchors
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 EXPECTED_ALPHA_BY_SPECIES = {
-    "SiO": 0.04,
     "Fe": 0.02,
     "Mg": 0.20,
     "Na": 1.0,
@@ -30,6 +31,8 @@ EXPECTED_ALPHA_BY_SPECIES = {
     "Si": 1.0,
     "Ti": 0.80,
 }
+SIO_ALPHA_FORM_T_K = 1500.0 + 273.15
+SIO_ALPHA_AT_1500C = 0.52 * math.exp(-3685.0 / SIO_ALPHA_FORM_T_K)
 
 
 def _vapor_pressure_data() -> dict:
@@ -44,6 +47,11 @@ def test_alpha_surface_loads_expected_species_values():
     assert set(EXPECTED_ALPHA_BY_SPECIES) <= set(alpha_by_species)
     for species, expected_alpha in EXPECTED_ALPHA_BY_SPECIES.items():
         assert alpha_by_species[species] == pytest.approx(expected_alpha)
+    assert alpha_s(
+        "SiO",
+        SIO_ALPHA_FORM_T_K,
+        {"coefficient_spec": alpha_by_species["SiO"]},
+    ) == pytest.approx(SIO_ALPHA_AT_1500C)
 
 
 def test_alpha_surface_sources_and_envelopes_are_present():
@@ -52,7 +60,7 @@ def test_alpha_surface_sources_and_envelopes_are_present():
         for anchor in alpha_envelope_anchors()
     }
 
-    assert set(EXPECTED_ALPHA_BY_SPECIES) <= set(anchors)
+    assert set(EXPECTED_ALPHA_BY_SPECIES) | {"SiO"} <= set(anchors)
     for species in EXPECTED_ALPHA_BY_SPECIES:
         anchor = anchors[species]
         assert anchor.source.strip()
@@ -67,7 +75,7 @@ def test_sio_alpha_stays_inside_literature_envelope():
     }
     sio = anchors["SiO"]
 
-    assert sio.envelope == pytest.approx((0.003, 0.048))
+    assert sio.envelope == pytest.approx((0.003, 0.067))
     assert sio.envelope[0] <= sio.value <= sio.envelope[1]
 
 
@@ -75,7 +83,7 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
     alpha_by_species = _load_evaporation_alpha_by_species(
         _vapor_pressure_data()
     )
-    species = tuple(EXPECTED_ALPHA_BY_SPECIES)
+    species = ("SiO", *EXPECTED_ALPHA_BY_SPECIES)
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -114,6 +122,14 @@ def test_evaporation_flux_diagnostic_traces_alpha_by_species():
     for name, expected_alpha in EXPECTED_ALPHA_BY_SPECIES.items():
         assert alpha_used[name] == pytest.approx(expected_alpha)
         assert uncertainty[name] >= 0.0
+    assert alpha_used["SiO"] == pytest.approx(SIO_ALPHA_AT_1500C)
+    assert (
+        result.diagnostic["alpha_s_evaluation_by_species"]["SiO"][
+            "alpha_s_form"
+        ]
+        == "arrhenius"
+    )
+    assert uncertainty["SiO"] >= 0.0
 
 
 def test_new_proxy_species_flux_scales_with_yaml_alpha():

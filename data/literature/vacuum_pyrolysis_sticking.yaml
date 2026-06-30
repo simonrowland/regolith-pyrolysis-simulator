@@ -4,6 +4,7 @@ usage:
   - simulator/condensation.py::_stage_alpha_s
   - simulator/condensation.py::_wall_alpha_s
   - simulator/condensation.py::_pressure_isolated_capture_budget_kg
+  - engines/builtin/evaporation_flux.py::BuiltinEvaporationFluxProvider
 status_values:
   - CITED
   - UNCERTIFIED
@@ -54,14 +55,25 @@ species:
     uncertainty_flag: collector_surface_proxy_not_cold_wall_measurement
     output_status: sourced_with_surface_proxy
   SiO:
-    value: 0.04
+    value:
+      form: arrhenius
+      # alpha_s_SiO(T)=0.52*exp(-3685/T): Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803 -- Arrhenius compilation of the SiO evaporation coeff (reaction-rate-limited; cross-checks Gunther 1958, Rocabois 1996, Ferguson&Nuth 2008/2012). Mid-range ~0.04 was the prior fixed pin.
+      A: 0.52
+      B: 3685.0
+      valid_range_K: [1000, 1800]
+      uncertainty_envelope: [0.003, 0.067]
+      cite: "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803"
+      status: CITED
+      prior_scalar:
+        value: 0.04
+        source: "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
     status: CITED
     source_class: cited_hkl_accommodation
-    source: "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq)/Hashimoto alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
-    source_url: "https://doi.org/10.1016/j.icarus.2003.08.023"
-    temperature_range_K: [1873, 2373]
-    envelope: [0.003, 0.048]
-    uncertainty_flag: collector_surface_proxy_not_direct_sio_wall_measurement
+    source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient; microscopic reversibility applies the same alpha_s(T) bound to condensation/sticking."
+    source_url: "https://doi.org/10.1051/0004-6361/201220803"
+    temperature_range_K: [1000, 1800]
+    envelope: [0.003, 0.067]
+    uncertainty_flag: high_T_evaporation_alpha_extrapolated_to_cold_wall_capture_when_outside_1000_1800K
     output_status: sourced_with_surface_proxy
   CrO2:
     value: 0.90

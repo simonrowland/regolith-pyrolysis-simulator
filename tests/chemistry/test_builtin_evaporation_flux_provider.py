@@ -39,7 +39,7 @@ from simulator.chemistry.kernel import (
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting import AccountingError
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import GAS_CONSTANT_J_MOL_K
+from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.state import (
@@ -95,7 +95,14 @@ def _series_resistance_reference_flux(
         M_kg_mol = M_g_mol / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
         P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
-        alpha = alpha_by_species.get(species, 1.0)
+        alpha = alpha_s(
+            species,
+            T_K,
+            {
+                "coefficient_spec": alpha_by_species.get(species, 1.0),
+                "allow_unmeasured_alpha_fallback": True,
+            },
+        )
         kernel_config = dict(sim.setpoints.get("chemistry_kernel", {}) or {})
         series_config = dict(
             kernel_config.get("evaporation_series_resistance", {}) or {}

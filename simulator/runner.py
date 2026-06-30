@@ -106,8 +106,8 @@ SIO_YIELD_CAMPAIGN_ALIASES: dict[str, str] = {
     SIO_YIELD_CAMPAIGN: "C2A",
 }
 SIO_ALPHA_PROVENANCE = (
-    "Phase 1 α surface (commit fc2d40b); "
-    "SF2004 Table 10 SiO2(liq) Hashimoto 1990"
+    "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; "
+    "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited"
 )
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
@@ -1889,6 +1889,7 @@ def build_sio_yield_report(
         )
     mass_kg = _positive_mass_kg(mass_kg)
 
+    from simulator.condensation import alpha_s
     from simulator.evaporation import _load_evaporation_alpha_by_species
 
     try:
@@ -1904,7 +1905,7 @@ def build_sio_yield_report(
         bundle.vapor_pressures
     )
     try:
-        sio_alpha_value = alpha_by_species["SiO"]
+        sio_alpha_spec = alpha_by_species["SiO"]
     except KeyError as exc:
         raise RunnerError(
             "SiO evaporation alpha missing from data/vapor_pressures.yaml"
@@ -1946,6 +1947,11 @@ def build_sio_yield_report(
         sim,
         liner_temperature_c=liner_temperature_c,
         pO2_mbar=pO2_mbar,
+    )
+    sio_alpha_value = alpha_s(
+        "SiO",
+        max(float(sim.melt.temperature_C) + 273.15, 1.0),
+        {"coefficient_spec": sio_alpha_spec},
     )
     initial_balances = sim.atom_ledger.mol_by_account()
     initial_sio2_mol = float(
@@ -2271,8 +2277,8 @@ def build_sio_tsweep_report_markdown(
         "outputs stay inside the [1323, 2400 K] authority band and the "
         "recipe [1050, 1600 C] envelope.",
         "",
-        "Caveat: alpha_SiO = 0.04 from the Phase 1 alpha surface "
-        "(commit `fc2d40b`). Stage 3 is post-Cr v2 "
+        "Caveat: alpha_SiO uses Wetzel/Gail 2013 alpha_s(T), replacing "
+        "the old Phase 1 fixed 0.04 alpha surface. Stage 3 is post-Cr v2 "
         "(commit `bb52c62`) and reports `stage_3_sio_zone_product`.",
         "",
         "## Recommendation",
@@ -2337,7 +2343,7 @@ def build_sio_tsweep_convergence_markdown(
         "Commit chain: Phase 1 alpha surface `fc2d40b`; Phase 2 goldens "
         "refresh landed in controller baseline `a2ab138`.",
         "",
-        "Caveat: alpha_SiO = 0.04. Stage 3 is post-Cr v2 "
+        "Caveat: alpha_SiO uses Wetzel/Gail 2013 alpha_s(T). Stage 3 is post-Cr v2 "
         "(commit `bb52c62`). Reports are engine-only in [1323, 2400 K] "
         "and recipe-only in [1050, 1600 C].",
         "",
