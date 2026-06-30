@@ -456,13 +456,15 @@ def kress91_ferrous_feo_activity(
     # premise and broke every vacuum evaporation golden — see test
     # test_kress91_ferrous_feo_activity_vacuum_pressure_is_floored_not_refused.)
     pressure_control = floor_vacuum_pressure_bar(pressure_bar)
-    fe3 = kress91_fe3_over_sigma_fe(
+    split = kress91_split(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,
         T_K=T_K,
         pressure_bar=pressure_control,
     )
-    return (feot / 100.0) * (1.0 - fe3)
+    # Kress & Carmichael 1991 uses oxide mole fractions; Holzheid et al. 1997
+    # Eq. (4) defines gamma_FeO on the X_FeO mole-fraction basis.
+    return max(0.0, float(split['x_feo']))
 
 
 def calphad_ferrous_feo_activity_diagnostic(

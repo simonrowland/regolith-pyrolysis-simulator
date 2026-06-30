@@ -231,15 +231,22 @@ def test_kress91_ferrous_feo_activity_invalid_fo2_or_temperature_fails_loudly(
 
 
 def test_kress91_ferrous_feo_activity_valid_controls_unchanged() -> None:
-    # Finite-positive controls are unchanged: feot here is ~13.35 wt%, so
-    # a_FeO = (feot/100)*(1-fe3) sits just under 0.1335.
+    # Kress & Carmichael 1991 and Holzheid et al. 1997 Eq. (4) share an oxide
+    # mole-fraction X_FeO convention; do not regress this to FeOt mass fraction.
     activity = kress91_ferrous_feo_activity(
         comp_wt=_FERROUS_ACTIVITY_COMP_WT,
         fO2_log=-7.75,
         T_K=1873.15,
         pressure_bar=0.01,
     )
-    assert 0.12 < activity < 0.1335
+    split = kress91_split(
+        fO2_log=-7.75,
+        mol_fractions=melt_mol_fractions_for_kress91(_FERROUS_ACTIVITY_COMP_WT),
+        T_K=1873.15,
+        pressure_bar=0.01,
+    )
+    assert activity == pytest.approx(split['x_feo'], rel=0, abs=1.0e-15)
+    assert activity == pytest.approx(0.11313084119172583, rel=0, abs=1.0e-15)
 
 
 @pytest.mark.parametrize('pressure_bar', [float('nan'), float('inf'), float('-inf')])
@@ -392,9 +399,9 @@ def test_kress91_no_iron_and_empty_basis() -> None:
     assert empty['fe3_over_sigma_fe'] == 0.0
     assert empty['feo_equiv_wt_pct'] == 0.0
     assert empty['fe2o3_equiv_wt_pct'] == 0.0
-    # Silicate-but-no-iron: HAS a mol basis (status 'ok') but zero FeO equiv,
-    # so the R2.1b formula a_FeO = (feot/100)*(1-fe3) collapses to 0 -- the
-    # no-iron guard is satisfied by feot=0, not by the fe3 value.
+    # Silicate-but-no-iron: HAS a mol basis (status 'ok') but zero FeO equiv, so
+    # the R2.1b formula's mole-fraction X_FeO term collapses to 0 -- the no-iron
+    # guard is satisfied by feot=0, not by the fe3 value.
     no_fe = sim._fe_redox_split_inline_kress91(
         {'SiO2': 100.0}, fO2_log=-7.75, T_K=1873.15, pressure_bar=0.01,
     )
