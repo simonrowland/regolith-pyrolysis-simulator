@@ -6117,13 +6117,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         1. Check if paused for a decision
         2. Update temperature (ramp toward campaign target)
         3. Calculate thermodynamic equilibrium (via melt backend)
-        4. Calculate evaporation flux (Hertz-Knudsen-Langmuir)
-        5. Route evaporated species through condensation train
-        6. Update melt composition (subtract evaporated mass)
-        7. Update overhead gas & turbine pressure
-        8. Calculate energy consumption this hour
-        9. Check campaign endpoint criteria
-        10. Record snapshot
+        4. Apply C3 alkali-shuttle reduction before evaporation
+        5. Calculate evaporation flux (Hertz-Knudsen-Langmuir)
+        6. Route evaporated species through condensation train
+        7. Update melt composition (subtract evaporated mass)
+        8. Update overhead gas & turbine pressure
+        9. Calculate energy consumption this hour
+        10. Check campaign endpoint criteria
+        11. Record snapshot
 
         Returns:
             HourSnapshot with full system state at this hour
@@ -6157,8 +6158,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Query the melt backend for phase assemblage, activities,
         # and vapor pressures at the current T and composition.
         equilibrium = self._get_equilibrium()
+        c3_shuttle_campaign = self.melt.campaign in (
+            CampaignPhase.C3_K, CampaignPhase.C3_NA,
+        )
 
-        # --- 4. Evaporation flux ---
+        # --- 4. Alkali shuttle injection (C3 only) ---         [THERMO-5]
+        # During C3, the shuttle cycle alternates between injection
+        # (alkali reduces target oxides) and bakeout (alkali oxide
+        # evaporates, alkali recovered).  Injection modifies the melt
+        # composition directly; bakeout uses normal evaporation.
+        if c3_shuttle_campaign:
+            self._step_shuttle()
+            equilibrium = self._get_equilibrium()
+        else:
+            self._shuttle_injected_this_hr = 0.0
+            self._shuttle_reduced_this_hr = 0.0
+            self._shuttle_metal_this_hr = 0.0
+            self._shuttle_phase = ''
+
+        # --- 4b. Evaporation flux ---
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
@@ -6171,19 +6189,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                                    CampaignPhase.C4):
             evap_flux = self._calculate_evaporation(equilibrium)
             evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
-
-        # --- 4b. Alkali shuttle injection (C3 only) ---        [THERMO-5]
-        # During C3, the shuttle cycle alternates between injection
-        # (alkali reduces target oxides) and bakeout (alkali oxide
-        # evaporates, alkali recovered).  Injection modifies the melt
-        # composition directly; bakeout uses normal evaporation.
-        if self.melt.campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            self._step_shuttle()
-        else:
-            self._shuttle_injected_this_hr = 0.0
-            self._shuttle_reduced_this_hr = 0.0
-            self._shuttle_metal_this_hr = 0.0
-            self._shuttle_phase = ''
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.

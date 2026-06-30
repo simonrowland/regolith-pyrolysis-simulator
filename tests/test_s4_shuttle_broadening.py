@@ -1,4 +1,5 @@
 import shlex
+from types import SimpleNamespace
 
 import pytest
 
@@ -10,7 +11,7 @@ from engines.builtin.metallothermic_step import (
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.session_cli import SessionScriptRunner
-from simulator.state import MOLAR_MASS, STOICH_RATIOS
+from simulator.state import CampaignPhase, EvaporationFlux, MOLAR_MASS, STOICH_RATIOS
 from tests.chemistry.conftest import (
     _atom_check,
     _build_sim,
@@ -72,6 +73,89 @@ def _build_provider_sim():
         _load_yaml("feedstocks.yaml"),
         _load_yaml("setpoints.yaml"),
     )
+
+
+def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
+    monkeypatch,
+):
+    sim = _build_provider_sim()
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.campaign_hour = 1
+    sim.record.path = "A_staged"
+
+    calls: list[str] = []
+    shuttle_state = {"injected": False}
+
+    def fake_step_shuttle():
+        calls.append("shuttle")
+        shuttle_state["injected"] = True
+        sim._shuttle_phase = "inject"
+        sim._shuttle_injected_this_hr = 1.0
+        sim._shuttle_reduced_this_hr = 2.0
+        sim._shuttle_metal_this_hr = 3.0
+
+    def fake_get_equilibrium():
+        calls.append(
+            "equilibrium_post_shuttle"
+            if shuttle_state["injected"]
+            else "equilibrium_pre_shuttle"
+        )
+        return {"saw_injection": shuttle_state["injected"]}
+
+    def fake_calculate_evaporation(equilibrium):
+        calls.append("evaporation")
+        assert equilibrium == {"saw_injection": True}
+        return EvaporationFlux()
+
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        "apply_lab_schedule_controls",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(sim, "validate_lab_surface_temperature_resolver", lambda: None)
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", lambda: None)
+    monkeypatch.setattr(sim, "_step_shuttle", fake_step_shuttle)
+    monkeypatch.setattr(sim, "_get_equilibrium", fake_get_equilibrium)
+    monkeypatch.setattr(sim, "_calculate_evaporation", fake_calculate_evaporation)
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        lambda flux: flux,
+    )
+    monkeypatch.setattr(sim, "_update_melt_composition", lambda flux: None)
+    monkeypatch.setattr(sim, "_get_turbine_spec", lambda: None)
+    monkeypatch.setattr(sim, "_overhead_headspace_enabled", lambda: False)
+    monkeypatch.setattr(sim, "_ledger_o2_kg", lambda account: 0.0)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "update",
+        lambda *args, **kwargs: sim.overhead,
+    )
+    monkeypatch.setattr(sim, "_dispatch_overhead_bleed", lambda *args, **kwargs: None)
+    monkeypatch.setattr(sim, "_sync_oxygen_kg_counters", lambda: None)
+    monkeypatch.setattr(
+        sim.energy_tracker,
+        "calculate_hour",
+        lambda *args, **kwargs: SimpleNamespace(total_kWh=0.0),
+    )
+    monkeypatch.setattr(sim, "_update_overlap_evaporation_diagnostic", lambda flux: None)
+    monkeypatch.setattr(sim, "_update_extraction_completeness_diagnostic", lambda: None)
+    monkeypatch.setattr(sim, "_evap_plane_selectivity_diagnostic", lambda flux: {})
+    monkeypatch.setattr(sim, "_compute_fe_redox_split_diagnostic", lambda: {})
+    monkeypatch.setattr(sim.campaign_mgr, "check_endpoint", lambda *args: False)
+    monkeypatch.setattr(sim, "_make_snapshot", lambda: SimpleNamespace())
+    monkeypatch.setattr(sim, "_oxygen_total_kg", lambda: 0.0)
+    monkeypatch.setattr(sim, "is_complete", lambda: False)
+
+    sim.step()
+
+    assert calls == [
+        "equilibrium_pre_shuttle",
+        "shuttle",
+        "equilibrium_post_shuttle",
+        "evaporation",
+    ]
 
 
 def _fe_element_kg(oxides_kg: dict[str, float]) -> float:
@@ -286,8 +370,6 @@ def test_s1c_step_shuttle_recycles_condensed_na_into_reagent_inventory():
     ``process.reagent_inventory`` (via the canonical
     ``_transfer_condensed_species`` helper).
     """
-    from simulator.state import CampaignPhase
-
     sim = _build_provider_sim()
     # Seed the condensation train with 5 kg of recovered Na, as if the
     # previous bakeout tick had condensed it back onto the train.
