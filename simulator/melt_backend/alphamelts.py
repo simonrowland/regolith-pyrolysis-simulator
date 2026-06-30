@@ -1272,7 +1272,11 @@ class AlphaMELTSBackend(MeltBackend):
                 ),
                 warnings=list(payload.warnings),
                 status=status,
-                diagnostics=clamp_diagnostics,
+                diagnostics=self._vapor_pressure_zero_diagnostics(
+                    clamp_diagnostics,
+                    vapor_pressures,
+                    vapor_pressure_source,
+                ),
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return self._fail_closed_on_clamped_operating_point(eq)
@@ -1366,6 +1370,11 @@ class AlphaMELTSBackend(MeltBackend):
                     else 'no_volatile_species'
                 )
             eq.vapor_pressures_source = self._vapor_pressure_source_map(
+                eq.vapor_pressures_Pa,
+                source,
+            )
+            eq.diagnostics = self._vapor_pressure_zero_diagnostics(
+                eq.diagnostics,
                 eq.vapor_pressures_Pa,
                 source,
             )
@@ -2384,6 +2393,17 @@ class AlphaMELTSBackend(MeltBackend):
             str(species): str(source)
             for species in pressures
         }
+
+    @staticmethod
+    def _vapor_pressure_zero_diagnostics(
+        diagnostics: Optional[Mapping[str, object]],
+        pressures: Mapping[str, float],
+        source: str | Mapping[str, str],
+    ) -> dict[str, object]:
+        payload = dict(diagnostics or {})
+        if not pressures and source == 'no_volatile_species':
+            payload.setdefault('vapor_pressure_zero_reason', 'no_volatile_species')
+        return payload
 
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,

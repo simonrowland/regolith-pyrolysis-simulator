@@ -146,12 +146,22 @@ class EvaporationMixin:
         if not vapor_pressures:
             if self.melt.temperature_C < 1050.0:
                 return flux
+            vapor_pressure_diagnostic = dict(
+                getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+            )
+            equilibrium_diagnostic = dict(
+                getattr(equilibrium, 'diagnostics', {}) or {}
+            )
             zero_reason = (
-                dict(getattr(self, '_last_vapor_pressure_diagnostic', {}) or {})
-                .get('vapor_pressure_zero_reason')
+                vapor_pressure_diagnostic.get('vapor_pressure_zero_reason')
+                or equilibrium_diagnostic.get('vapor_pressure_zero_reason')
             )
             liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-            if zero_reason == 'no_liquid_phase' or liquid_fraction == 0.0:
+            if (
+                zero_reason
+                in {'no_liquid_phase', 'kernel_ok_empty', 'no_volatile_species'}
+                or liquid_fraction == 0.0
+            ):
                 return flux
             raise RuntimeError(
                 'EVAPORATION_FLUX received empty vapor_pressures_Pa at '

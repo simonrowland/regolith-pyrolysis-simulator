@@ -84,6 +84,50 @@ def test_active_liquid_empty_vapor_pressures_fail_loud():
         PyrolysisSimulator._calculate_evaporation(sim, result)
 
 
+def test_kernel_ok_empty_allows_active_liquid_zero_evaporation():
+    sim, calls = _sim_with_vapor_dispatch({})
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        phases_present=['liq'],
+        phase_masses_kg={'liq': 1.0},
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={'Na': 3.0},
+        vapor_pressures_source={'Na': 'backend_pre_kernel'},
+        status='ok',
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert result.vapor_pressures_Pa == {}
+    assert sim._last_vapor_pressure_diagnostic['vapor_pressure_zero_reason'] == (
+        'kernel_ok_empty'
+    )
+    assert flux.species_kg_hr == {}
+    assert flux.total_kg_hr == 0.0
+
+
+def test_no_volatile_species_allows_active_liquid_zero_evaporation():
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(temperature_C=1600.0),
+    )
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+        status='ok',
+        diagnostics={'vapor_pressure_zero_reason': 'no_volatile_species'},
+    )
+
+    flux = PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert flux.species_kg_hr == {}
+    assert flux.total_kg_hr == 0.0
+
+
 def test_subthreshold_empty_vapor_pressures_remain_physical_zero():
     sim = types.SimpleNamespace(
         melt=types.SimpleNamespace(temperature_C=500.0),
