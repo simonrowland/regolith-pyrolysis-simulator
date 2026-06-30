@@ -61,6 +61,7 @@ import copy
 import math
 import warnings
 from collections.abc import Mapping, MutableMapping
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -797,6 +798,144 @@ def _cold_wall_condensation_record_payload(
     return payload
 
 
+_ANTOINE_TELEMETRY_CONTEXT: ContextVar[
+    tuple[MutableMapping[str, Dict[str, Any]] | None, list[str] | None] | None
+] = ContextVar('condensation_antoine_telemetry_context', default=None)
+
+
+def _valid_temperature_range_K(value: Any) -> list[float] | None:
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        return None
+    try:
+        low = float(value[0])
+        high = float(value[1])
+    except (TypeError, ValueError):
+        return None
+    if not (math.isfinite(low) and math.isfinite(high) and low <= high):
+        return None
+    return [low, high]
+
+
+def _scalar_alpha_s_spec(value: Any, temperature_range_K: Any = None) -> Any:
+    if isinstance(value, Mapping):
+        return value
+    valid_range = _valid_temperature_range_K(temperature_range_K)
+    if valid_range is None:
+        return value
+    return {
+        'form': 'scalar',
+        'value': value,
+        'temperature_range_K': valid_range,
+    }
+
+
+def _alpha_s_extrapolation_warning(
+    species: str,
+    form: str,
+    T_K: float,
+    valid_low: float,
+    valid_high: float,
+) -> str:
+    return (
+        f'{species} alpha_s {form} coefficient extrapolated beyond '
+        f'valid_range_K [{valid_low:g}, {valid_high:g}] at {T_K:.2f} K'
+    )
+
+
+def _alpha_s_scalar_evaluation(
+    species: str,
+    T_K: float,
+    spec: Mapping[str, Any],
+) -> tuple[float, dict[str, Any]]:
+    try:
+        value = float(spec.get('value'))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'alpha_s({species}): scalar coefficient required') from exc
+    if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+        raise ValueError(f'alpha_s({species}): scalar outside [0, 1]')
+
+    valid_range = _valid_temperature_range_K(spec.get('temperature_range_K'))
+    extrapolated = False
+    result: dict[str, Any] = {
+        'species': str(species),
+        'alpha_s': value,
+        'alpha_s_form': 'scalar',
+        'alpha_s_temperature_K': T_K,
+        'alpha_s_extrapolated': False,
+    }
+    if valid_range is not None:
+        valid_low, valid_high = valid_range
+        extrapolated = not (valid_low <= T_K <= valid_high)
+        result.update({
+            'alpha_s_valid_range_K': [valid_low, valid_high],
+            'alpha_s_temperature_range_K': [valid_low, valid_high],
+            'alpha_s_extrapolated': extrapolated,
+        })
+        if extrapolated:
+            result['alpha_s_extrapolation_warning'] = (
+                _alpha_s_extrapolation_warning(
+                    species,
+                    'scalar',
+                    T_K,
+                    valid_low,
+                    valid_high,
+                )
+            )
+            result[
+                'alpha_s_temperature_below_valid_range'
+                if T_K < valid_low
+                else 'alpha_s_temperature_above_valid_range'
+            ] = True
+    return value, result
+
+
+def _alpha_s_extrapolation_warnings_from_provenance(
+    provenance_by_species: Mapping[str, Any],
+) -> list[str]:
+    warnings_out: list[str] = []
+    for by_record in provenance_by_species.values():
+        if not isinstance(by_record, Mapping):
+            continue
+        for record in by_record.values():
+            if not isinstance(record, Mapping):
+                continue
+            warning = record.get('alpha_s_extrapolation_warning')
+            if warning is not None:
+                text = str(warning)
+                if text and text not in warnings_out:
+                    warnings_out.append(text)
+    return warnings_out
+
+
+def _with_antoine_telemetry_context(
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+) -> Any:
+    if antoine_extrapolations is None and antoine_extrapolation_warnings is None:
+        return None
+    return _ANTOINE_TELEMETRY_CONTEXT.set((
+        antoine_extrapolations,
+        antoine_extrapolation_warnings,
+    ))
+
+
+def _reset_antoine_telemetry_context(token: Any) -> None:
+    if token is not None:
+        _ANTOINE_TELEMETRY_CONTEXT.reset(token)
+
+
+def _resolve_antoine_telemetry(
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+) -> tuple[MutableMapping[str, Dict[str, Any]] | None, list[str] | None]:
+    if antoine_extrapolations is not None or antoine_extrapolation_warnings is not None:
+        return antoine_extrapolations, antoine_extrapolation_warnings
+    context = _ANTOINE_TELEMETRY_CONTEXT.get()
+    if context is None:
+        return None, None
+    return context
+
+
 def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
     if isinstance(entry, Mapping):
         if 'value_ref' in entry:
@@ -804,10 +943,18 @@ def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
                 str(entry.get('species', species)),
                 entry,
             )
-            return None if ref_record is None else ref_record.get('value')
+            if ref_record is None:
+                return None
+            return _scalar_alpha_s_spec(
+                ref_record.get('value'),
+                ref_record.get('temperature_range_K'),
+            )
         for key in ('value', 'alpha_s', 'alpha_s_value'):
             if key in entry:
-                return entry.get(key)
+                return _scalar_alpha_s_spec(
+                    entry.get(key),
+                    entry.get('temperature_range_K'),
+                )
         return None
     return entry
 
@@ -825,7 +972,10 @@ def _alpha_s_evaluation(
         raise ValueError(f'alpha_s({species}): T_K must be finite and > 0')
 
     if isinstance(spec, Mapping):
-        if spec.get('form') != 'arrhenius':
+        form = spec.get('form')
+        if form == 'scalar':
+            return _alpha_s_scalar_evaluation(species, T_K, spec)
+        if form != 'arrhenius':
             raise ValueError(f'alpha_s({species}): malformed coefficient spec')
         required_fields = (
             'A',
@@ -893,7 +1043,7 @@ def _alpha_s_evaluation(
         if not math.isfinite(value) or not 0.0 <= value <= 1.0:
             raise ValueError(f'alpha_s({species}): evaluated value outside [0, 1]')
         extrapolated = not (valid_low <= T_K <= valid_high)
-        return value, {
+        result = {
             'species': str(species),
             'alpha_s': value,
             'alpha_s_form': 'arrhenius',
@@ -910,6 +1060,18 @@ def _alpha_s_evaluation(
             'alpha_s_cite': cite,
             'alpha_s_status': status,
         }
+        if T_K > valid_high:
+            result['alpha_s_temperature_above_valid_range'] = True
+            result['alpha_s_extrapolation_warning'] = (
+                _alpha_s_extrapolation_warning(
+                    species,
+                    'arrhenius',
+                    T_K,
+                    valid_low,
+                    valid_high,
+                )
+            )
+        return value, result
 
     try:
         value = float(spec)
@@ -939,7 +1101,10 @@ def alpha_s(
         elif 'entry' in context:
             spec = _alpha_s_spec_from_entry(species_name, context.get('entry'))
     if spec is None:
-        spec = _sticking_species_entry(species_name).get('value')
+        spec = _alpha_s_spec_from_entry(
+            species_name,
+            _sticking_species_entry(species_name),
+        )
     value, evaluation = _alpha_s_evaluation(species_name, T_K, spec)
     if isinstance(context, MutableMapping):
         context['alpha_s_evaluation'] = dict(evaluation)
@@ -2167,6 +2332,16 @@ class CondensationModel:
             wall_sticking_alpha_by_species,
             wall_sticking_alpha_provenance_by_species,
         )
+        alpha_extrapolation_warnings = (
+            _alpha_s_extrapolation_warnings_from_provenance(
+                wall_sticking_alpha_provenance_by_species,
+            )
+        )
+        if sticking_notice and alpha_extrapolation_warnings:
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['alpha_s_extrapolation_warnings'] = (
+                alpha_extrapolation_warnings
+            )
         self.last_sticking_alpha_provenance_notice = dict(sticking_notice)
         if sticking_notice and self.operating_history:
             self.operating_history[-1][
@@ -2293,13 +2468,20 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
-        return query_wall_deposit_candidate_kg(
-            self,
-            species=species,
-            rate_kg_hr=rate_kg_hr,
-            T_cond_C=T_cond_C,
-            melt_temperature_C=melt_temperature_C,
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
         )
+        try:
+            return query_wall_deposit_candidate_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
 
     def _wall_deposit_candidates_by_segment_kg(
         self,
@@ -2336,14 +2518,21 @@ class CondensationModel:
                     antoine_extrapolation_warnings=(
                         antoine_extrapolation_warnings),
                 )
-        return query_wall_deposit_candidates_by_segment_kg(
-            self,
-            species=species,
-            rate_kg_hr=rate_kg_hr,
-            T_cond_C=T_cond_C,
-            melt_temperature_C=melt_temperature_C,
-            supply_by_segment_kg=supply_by_segment_kg,
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
         )
+        try:
+            return query_wall_deposit_candidates_by_segment_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                supply_by_segment_kg=supply_by_segment_kg,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
 
     def _mixed_temperature_wall_candidate_segments(
         self,
@@ -2394,15 +2583,22 @@ class CondensationModel:
                 antoine_extrapolation_warnings=(
                     antoine_extrapolation_warnings),
             )
-        return query_wall_deposit_candidate_for_surface_kg(
-            self,
-            species=species,
-            rate_kg_hr=rate_kg_hr,
-            T_cond_C=T_cond_C,
-            melt_temperature_C=melt_temperature_C,
-            wall_temperature_C=wall_temperature_C,
-            surface_area_m2=surface_area_m2,
+        token = _with_antoine_telemetry_context(
+            antoine_extrapolations,
+            antoine_extrapolation_warnings,
         )
+        try:
+            return query_wall_deposit_candidate_for_surface_kg(
+                self,
+                species=species,
+                rate_kg_hr=rate_kg_hr,
+                T_cond_C=T_cond_C,
+                melt_temperature_C=melt_temperature_C,
+                wall_temperature_C=wall_temperature_C,
+                surface_area_m2=surface_area_m2,
+            )
+        finally:
+            _reset_antoine_telemetry_context(token)
 
     def _segment_supply_by_name(
         self,
@@ -2549,6 +2745,8 @@ class CondensationModel:
                 # Owner scope for 2026-06-29 re-evap fix is wall deposits
                 # only; keep historical condenser-stage capture unchanged.
                 reactive_product_backstop=False,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
             band_flux_fraction += flux / reference_flux
         band_flux_fraction /= HKL_BAND_SAMPLES
@@ -3265,6 +3463,8 @@ def _wall_deposition_driving_pressure_pa(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -3273,10 +3473,19 @@ def _wall_deposition_driving_pressure_pa(
     if not math.isfinite(local_pressure_pa) or local_pressure_pa <= 0.0:
         return 0.0
 
+    (
+        antoine_extrapolations,
+        antoine_extrapolation_warnings,
+    ) = _resolve_antoine_telemetry(
+        antoine_extrapolations,
+        antoine_extrapolation_warnings,
+    )
     P_sat_pa = _antoine_psat_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         return 0.0
@@ -3307,6 +3516,8 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     driving_pressure_pa = _wall_deposition_driving_pressure_pa(
         species,
@@ -3314,6 +3525,8 @@ def _hkl_surface_deposition_flux_mol_m2_s(
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         reactive_product_backstop=reactive_product_backstop,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
@@ -3358,6 +3571,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
     radial_stir_factor: float | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -3421,6 +3636,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         reactive_product_backstop=reactive_product_backstop,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
