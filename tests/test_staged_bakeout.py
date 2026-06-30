@@ -10,7 +10,7 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 5.2204082246853e-06
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00029403068124880024
 
 
 def _run_script(lines: list[str]):
@@ -226,10 +226,9 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
 
     assert warnings == []
     # No upstream cold spot is still the routing invariant. The 2026-06-29
-    # reactive SiO wall-product fix keeps the expected wall magnitude nonzero;
-    # grounded alpha_s(T) lowers it from the old fixed-alpha wall anchor. Redox
-    # v3 C-PRE then normalizes a_FeO to mole fraction; Step C promotes the
-    # CALPHAD IW-blend authority and nudges the coupled wall trace again.
+    # reactive SiO wall-product fix keeps the expected wall magnitude nonzero.
+    # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
+    # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         rel=1e-9,

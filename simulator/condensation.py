@@ -331,6 +331,13 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
     if not isinstance(entry, Mapping):
         raise ValueError(f'{path}: {name} must be a mapping')
     _validate_sticking_spec(path, f'{name}.value', entry.get('value'))
+    cold_wall = entry.get('cold_wall_condensation')
+    if cold_wall is not None:
+        _validate_cold_wall_condensation_spec(
+            path,
+            f'{name}.cold_wall_condensation',
+            cold_wall,
+        )
     if str(entry.get('status', '')).upper() not in STICKING_STATUSES:
         raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
     for key in ('source', 'source_class', 'temperature_range_K', 'uncertainty_flag'):
@@ -378,6 +385,28 @@ def _validate_sticking_spec(path: Path, name: str, value: Any) -> None:
         raise ValueError(f'{path}: {name}.cite is required')
 
 
+def _validate_cold_wall_condensation_spec(
+    path: Path,
+    name: str,
+    value: Any,
+) -> None:
+    if not isinstance(value, Mapping):
+        raise ValueError(f'{path}: {name} must be a mapping')
+    _validate_sticking_value(path, f'{name}.value', value.get('value'))
+    if str(value.get('status', '')).upper() not in STICKING_STATUSES:
+        raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
+    for key in ('source', 'source_url', 'source_class', 'uncertainty_flag'):
+        if value.get(key) in (None, ''):
+            raise ValueError(f'{path}: {name}.{key} is required')
+    _validate_range_pair(
+        path,
+        f'{name}.uncertainty_envelope',
+        value.get('uncertainty_envelope'),
+        lower_bound=0.0,
+        upper_bound=1.0,
+    )
+
+
 def _validate_range_pair(
     path: Path,
     name: str,
@@ -418,12 +447,88 @@ def _sticking_species_entry(species: str) -> Mapping[str, Any]:
     return fallback if isinstance(fallback, Mapping) else {}
 
 
-def _sticking_alpha_s(species: str, T_K: float) -> float:
-    return alpha_s(
-        species,
-        T_K,
-        {'coefficient_spec': _sticking_species_entry(species).get('value')},
+def _cold_wall_condensation_spec(species: str) -> Mapping[str, Any] | None:
+    if str(species) != 'SiO':
+        return None
+    block = _sticking_species_entry(species).get('cold_wall_condensation')
+    return block if isinstance(block, Mapping) else None
+
+
+def _sio_cold_wall_condensation_override(
+    species: str,
+    T_K: float,
+    spec: Any,
+    evaluation: Mapping[str, Any],
+) -> tuple[float, dict[str, Any]] | None:
+    if str(species) != 'SiO' or not isinstance(spec, Mapping):
+        return None
+    valid_range = spec.get('valid_range_K')
+    if not isinstance(valid_range, (list, tuple)) or len(valid_range) != 2:
+        return None
+    try:
+        valid_low = float(valid_range[0])
+        T_value = float(T_K)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(valid_low) or not math.isfinite(T_value):
+        return None
+    if T_value >= valid_low:
+        return None
+    block = _cold_wall_condensation_spec(species)
+    if block is None:
+        return None
+    value = float(block.get('value'))
+    envelope = block.get('uncertainty_envelope')
+    override = dict(evaluation)
+    override.update({
+        'alpha_s': value,
+        'alpha_s_form': 'cold_wall_condensation',
+        'alpha_s_raw_arrhenius': evaluation.get('alpha_s'),
+        'alpha_s_extrapolated': True,
+        'alpha_s_temperature_below_valid_range': True,
+        'alpha_s_condensation_regime': 'cold_wall_high_supersaturation',
+        'alpha_s_cold_wall_condensation': True,
+        'alpha_s_cold_wall_validity_floor_K': valid_low,
+        'alpha_s_cold_wall_source': str(block.get('source', '')),
+        'alpha_s_cold_wall_source_url': block.get('source_url'),
+        'alpha_s_cold_wall_source_class': str(block.get('source_class', '')),
+        'alpha_s_cold_wall_uncertainty_envelope': (
+            list(envelope) if isinstance(envelope, (list, tuple)) else None
+        ),
+        'alpha_s_cold_wall_uncertainty_flag': block.get('uncertainty_flag'),
+        'alpha_s_cold_wall_status': str(block.get('status', '')).upper(),
+    })
+    return value, override
+
+
+def _condensation_alpha_s(
+    species: str,
+    T_K: float,
+    context: MutableMapping[str, Any],
+) -> float:
+    species_name = str(species)
+    spec = (
+        context.get('coefficient_spec')
+        if 'coefficient_spec' in context
+        else _sticking_species_entry(species_name).get('value')
     )
+    value = alpha_s(species_name, T_K, context)
+    evaluation = dict(context.get('alpha_s_evaluation', {}))
+    override = _sio_cold_wall_condensation_override(
+        species_name,
+        T_K,
+        spec,
+        evaluation,
+    )
+    if override is not None:
+        value, evaluation = override
+        context['alpha_s_evaluation'] = dict(evaluation)
+    return value
+
+
+def _sticking_alpha_s(species: str, T_K: float) -> float:
+    context = {'coefficient_spec': _sticking_species_entry(species).get('value')}
+    return _condensation_alpha_s(species, T_K, context)
 
 
 def _sticking_reactivity_class(species: str) -> str:
@@ -486,6 +591,39 @@ def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:
         'uncertainty_flag': record.get('uncertainty_flag'),
         'output_status': output_status,
     }
+
+
+def _cold_wall_condensation_record_payload(
+    species: str,
+    evaluation: Mapping[str, Any],
+) -> dict[str, Any]:
+    block = _cold_wall_condensation_spec(species)
+    if block is None:
+        return {}
+    status = str(block.get('status', '')).upper()
+    output_status = str(block.get('output_status') or (
+        'sourced_with_surface_proxy'
+        if status == 'CITED'
+        else 'status_bearing'
+    ))
+    payload = {
+        'source': str(block.get('source', '')),
+        'source_url': block.get('source_url'),
+        'source_class': str(block.get('source_class', '')),
+        'status': 'sourced' if status == 'CITED' else 'UNCERTIFIED',
+        'citation_status': status,
+        'envelope': block.get('uncertainty_envelope'),
+        'uncertainty_flag': block.get('uncertainty_flag'),
+        'output_status': output_status,
+        'cold_wall_condensation': True,
+        'cold_wall_condensation_temperature_rule': (
+            'T_K < alpha_s_valid_range_K[0]'
+        ),
+    }
+    floor = evaluation.get('alpha_s_cold_wall_validity_floor_K')
+    if floor is not None:
+        payload['cold_wall_condensation_validity_floor_K'] = floor
+    return payload
 
 
 def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
@@ -2169,7 +2307,11 @@ class CondensationModel:
             sample_alpha_s = alpha_s_value
             if isinstance(spec, Mapping):
                 alpha_context: dict[str, Any] = {'coefficient_spec': spec}
-                sample_alpha_s = alpha_s(species, T_surface_K, alpha_context)
+                sample_alpha_s = _condensation_alpha_s(
+                    species,
+                    T_surface_K,
+                    alpha_context,
+                )
                 sample_eval = alpha_context.get('alpha_s_evaluation', {})
                 sample_extrapolated = sample_extrapolated or bool(
                     sample_eval.get('alpha_s_extrapolated')
@@ -2455,7 +2597,7 @@ def _coerce_alpha_s(
         if T_K is None:
             raise ValueError(f'alpha_s({species}): T_K required for T-form')
         context: dict[str, Any] = {'coefficient_spec': spec}
-        value = alpha_s(species, T_K, context)
+        value = _condensation_alpha_s(species, T_K, context)
         if evaluation_out is not None:
             evaluation_out.clear()
             evaluation_out.update(context.get('alpha_s_evaluation', {}))
@@ -2513,6 +2655,8 @@ def _alpha_record(
         record.update(_sticking_record_payload(ref_record))
         record['value_ref'] = entry.get('value_ref')
         record['material_source'] = source
+    if record.get('alpha_s_cold_wall_condensation') is True:
+        record.update(_cold_wall_condensation_record_payload(species, record))
     if liner_material:
         record['liner_material'] = str(liner_material)
     if segment is not None:
@@ -3519,7 +3663,7 @@ def _pressure_isolated_capture_budget_kg(
         alpha_context: dict[str, Any] = {
             'coefficient_spec': _sticking_species_entry(species).get('value'),
         }
-        stage_alpha_s = alpha_s(species, T_stage_K, alpha_context)
+        stage_alpha_s = _condensation_alpha_s(species, T_stage_K, alpha_context)
         stage_alpha_evaluations[str(stage.stage_number)] = dict(
             alpha_context.get('alpha_s_evaluation', {})
         )

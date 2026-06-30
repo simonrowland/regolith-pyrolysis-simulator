@@ -307,11 +307,11 @@ def test_surface_temperature_profile_key_is_required() -> None:
 def test_declared_surface_temperature_schedule_moves_runtime_deposits() -> None:
     rows = _surface_temperature_rows(dynamic_lab_schedule())
 
-    assert _surface_sio_delta(rows[0], "condenser") > (
-        _surface_sio_delta(rows[0], "holder")
+    assert _surface_sio_delta(rows[0], "holder") > (
+        _surface_sio_delta(rows[0], "condenser")
     )
-    assert _surface_sio_delta(rows[1], "holder") > (
-        _surface_sio_delta(rows[1], "condenser")
+    assert _surface_sio_delta(rows[1], "condenser") > (
+        _surface_sio_delta(rows[1], "holder")
     )
 
 
@@ -325,11 +325,11 @@ def test_surface_temperature_schedule_is_behavioral_cache_determinant() -> None:
 
     base_rows = _surface_temperature_rows(base_schedule)
     mutant_rows = _surface_temperature_rows(mutant_schedule)
-    assert _surface_sio_delta(base_rows[0], "condenser") > (
-        _surface_sio_delta(base_rows[0], "holder")
+    assert _surface_sio_delta(base_rows[0], "holder") > (
+        _surface_sio_delta(base_rows[0], "condenser")
     )
-    assert _surface_sio_delta(mutant_rows[0], "holder") > (
-        _surface_sio_delta(mutant_rows[0], "condenser")
+    assert _surface_sio_delta(mutant_rows[0], "condenser") > (
+        _surface_sio_delta(mutant_rows[0], "holder")
     )
 
 

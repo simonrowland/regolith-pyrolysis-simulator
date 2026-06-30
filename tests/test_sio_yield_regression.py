@@ -92,10 +92,10 @@ GOLDENS = (
 # lunar 0.000508314464643 -> 8.92476013101e-06; Mars
 # 0.000486760105302 -> 6.94408791991e-06.
 # 2026-06-29 SiO alpha_s(T) grounds Wetzel/Gail 2013 Arrhenius instead of the
-# fixed 0.04 pin. Source alpha at the C2A SiO release T is 0.0320984652281;
-# colder wall/stage alphas reduce deposits while source depletion shifts
-# slightly: lunar 8.92476013101e-06 -> 9.11967185718e-06; Mars
-# 6.94408791991e-06 -> 7.06398603045e-06.
+# fixed 0.04 pin. Source alpha at the C2A SiO release T is 0.0320984652281.
+# 2026-06-30 cold-wall condensation now uses the Pound 1972 unity gate below
+# the evaporation-Arrhenius validity floor; evolved SiO is unchanged here, but
+# more of it deposits in the cold wall/stage train instead of terminal offgas.
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 9.11967185718e-06,
     "mars_basalt": 7.06398603045e-06,
@@ -243,11 +243,12 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3():
     )
 
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert route.condensed_by_stage_species[4]["SiO"] < 0.35
-    # Wetzel/Gail alpha_s(T) evaluates below the prior fixed 0.04 pin in the
-    # colder downstream stages, so more vapor remains in offgas.
+    assert route.condensed_by_stage_species[4]["SiO"] < 0.95
+    # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
+    # Wetzel/Gail evaporation-Arrhenius validity floor, so less vapor remains
+    # in offgas once it reaches cold stages.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.9913958881010284
+        0.04275021936015011
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
@@ -343,7 +344,7 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
     assert destinations == pytest.approx(1.0)
 
 
-def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
+def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
@@ -357,7 +358,7 @@ def test_wall_deposit_sticking_alpha_notice_is_golden_neutral():
     )
 
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.00016629976155468562,
+        0.0012296595884093348,
         rel=1e-12,
     )
     assert (
@@ -483,7 +484,7 @@ def test_cached_condensation_model_uses_updated_liner_temperature():
     hot_route = model.route(flux, melt)
 
     assert cold_route.wall_deposit_by_species["SiO"] > 0.0
-    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) < (
+    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) > (
         cold_route.wall_deposit_by_species["SiO"]
     )
 

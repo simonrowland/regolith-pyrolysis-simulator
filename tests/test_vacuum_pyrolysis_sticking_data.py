@@ -8,7 +8,13 @@ import yaml
 
 from simulator import condensation
 from simulator.condensation import CondensationModel
-from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.state import (
+    CondensationStage,
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+    PipeSegment,
+)
 
 
 DATA_PATH = Path("data/literature/vacuum_pyrolysis_sticking.yaml")
@@ -84,6 +90,131 @@ def test_sio_sticking_alpha_s_records_cold_wall_extrapolation():
 
     assert value == pytest.approx(0.52 * math.exp(-3685.0 / 900.0))
     assert context["alpha_s_evaluation"]["alpha_s_extrapolated"] is True
+
+
+def test_sio_sticking_data_carries_cited_cold_wall_condensation_gate():
+    data = _load_sticking_data()
+    block = data["species"]["SiO"]["cold_wall_condensation"]
+
+    assert block["value"] == pytest.approx(1.0)
+    assert block["status"] == "CITED"
+    assert block["uncertainty_envelope"] == pytest.approx([0.016, 1.0])
+    assert "Pound 1972" in block["source"]
+    assert "no_direct_cold_wall_SiO_measurement" in block["uncertainty_flag"]
+    assert "rarely active" in block["uncertainty_flag"]
+
+
+def test_sio_cold_wall_stage_alpha_uses_unity_condensation_gate():
+    data = _load_sticking_data()
+    valid_floor_K = data["species"]["SiO"]["value"]["valid_range_K"][0]
+    stage = CondensationStage(
+        stage_number=1,
+        label="cold SiO guard",
+        temp_range_C=(500.0, 600.0),
+        target_species=["SiO"],
+    )
+    T_stage_K = condensation._stage_midpoint_temperature_K(stage)
+
+    record = condensation._stage_alpha_record(stage, "SiO")
+
+    assert T_stage_K < valid_floor_K
+    assert record["alpha_s"] == pytest.approx(1.0)
+    assert record["alpha_s_form"] == "cold_wall_condensation"
+    assert record["alpha_s_raw_arrhenius"] == pytest.approx(
+        0.52 * math.exp(-3685.0 / T_stage_K)
+    )
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_temperature_below_valid_range"] is True
+    assert record["alpha_s_condensation_regime"] == "cold_wall_high_supersaturation"
+    assert record["alpha_s_cold_wall_validity_floor_K"] == pytest.approx(
+        valid_floor_K
+    )
+    assert record["citation_status"] == "CITED"
+    assert record["status"] == "sourced"
+    assert record["source_class"] == "cited_high_supersaturation_condensation_limit"
+    assert "Pound 1972" in record["source"]
+    assert record["cold_wall_condensation"] is True
+
+
+def test_sio_cold_wall_wall_alpha_uses_unity_condensation_gate():
+    segment = PipeSegment(
+        name="cold_spot",
+        upstream_stage="stage_0",
+        downstream_stage="stage_1",
+        wall_temperature_C=500.0,
+        length_m=1.0,
+        inner_diameter_m=0.05,
+    )
+
+    record = condensation._wall_alpha_record("SiO", segment=segment)
+
+    assert record["alpha_s"] == pytest.approx(1.0)
+    assert record["alpha_s_form"] == "cold_wall_condensation"
+    assert record["alpha_s_cold_wall_condensation"] is True
+    assert record["segment"] == "cold_spot"
+
+
+def test_sio_pressure_isolated_stage_eval_uses_cold_wall_gate():
+    stage = CondensationStage(
+        stage_number=1,
+        label="cold pressure stage",
+        temp_range_C=(500.0, 600.0),
+        target_species=["SiO"],
+    )
+    alpha_record: dict[str, object] = {}
+
+    captured = condensation._pressure_isolated_capture_budget_kg(
+        "SiO",
+        1.0,
+        [stage],
+        {1: 1.0},
+        temps={"SiO": 1000.0},
+        alpha_record_out=alpha_record,
+    )
+
+    assert captured > 0.0
+    stage_eval = alpha_record["alpha_s_stage_evaluations"]["1"]
+    assert stage_eval["alpha_s"] == pytest.approx(1.0)
+    assert stage_eval["alpha_s_form"] == "cold_wall_condensation"
+    assert stage_eval["alpha_s_cold_wall_condensation"] is True
+
+
+def test_sio_stage_band_flux_uses_cold_wall_gate(monkeypatch):
+    valid_floor_K = _load_sticking_data()["species"]["SiO"]["value"][
+        "valid_range_K"
+    ][0]
+    captured_below_floor_alphas: list[float] = []
+    original_flux = condensation._series_resistance_deposition_flux_mol_m2_s
+
+    def capture_flux(species, P_local_pa, T_surface_K, alpha_s, *args, **kwargs):
+        if species == "SiO" and T_surface_K < valid_floor_K:
+            captured_below_floor_alphas.append(float(alpha_s))
+        return original_flux(
+            species,
+            P_local_pa,
+            T_surface_K,
+            alpha_s,
+            *args,
+            **kwargs,
+        )
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        capture_flux,
+    )
+
+    model = CondensationModel(CondensationTrain.create_default())
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(),
+    )
+
+    assert route.condensed_for_species("SiO") > 0.0
+    assert captured_below_floor_alphas
+    assert captured_below_floor_alphas == pytest.approx(
+        [1.0] * len(captured_below_floor_alphas)
+    )
 
 
 def test_non_sio_sticking_alpha_s_keeps_scalar_value():
@@ -174,7 +305,7 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     )
     legacy = route_sio()
 
-    assert grounded == pytest.approx(0.00016629976155468562, rel=1e-12)
+    assert grounded == pytest.approx(0.0012296595884093348, rel=1e-12)
     assert legacy == pytest.approx(0.03398921856191324, rel=1e-12)
     assert grounded < legacy
 

@@ -67,13 +67,21 @@ species:
       prior_scalar:
         value: 0.04
         source: "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+    cold_wall_condensation:
+      value: 1.0
+      status: CITED
+      source_class: cited_high_supersaturation_condensation_limit
+      source: "Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -> unity; evaporation alpha_e != condensation alpha_c off-equilibrium."
+      source_url: "https://doi.org/10.1063/1.3253096"
+      uncertainty_envelope: [0.016, 1.0]
+      uncertainty_flag: "no_direct_cold_wall_SiO_measurement; rarely active - SiO does not evolve from melt below ~1000C, guard for cold-spot faults + initial-fouled-wall Story-2"
     status: CITED
     source_class: cited_hkl_accommodation
-    source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient; microscopic reversibility applies the same alpha_s(T) bound to condensation/sticking."
+    source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. Cold-wall condensation below the valid_range_K floor uses the cited high-supersaturation condensation limit in cold_wall_condensation, not this evaporation Arrhenius."
     source_url: "https://doi.org/10.1051/0004-6361/201220803"
     temperature_range_K: [1000, 1800]
     envelope: [0.003, 0.067]
-    uncertainty_flag: high_T_evaporation_alpha_extrapolated_to_cold_wall_capture_when_outside_1000_1800K
+    uncertainty_flag: high_T_evaporation_alpha_for_hot_source_only_cold_wall_subfloor_uses_pound_1972_unity_condensation_gate
     output_status: sourced_with_surface_proxy
   CrO2:
     value: 0.90

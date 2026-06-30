@@ -84,18 +84,21 @@ from tests.chemistry.conftest import _build_sim
 # 2026-06-30 redox v3 Step C promotes the Holzheid-centered CALPHAD a_FeO
 # authority in the IW blend/metal-saturated regime. Fe/Na/Mg stay fixed here;
 # SiO segment-wall traces move through the coupled condensation route.
+# 2026-06-30 SiO cold-wall condensation replaces subfloor Wetzel/Gail
+# evaporation-Arrhenius extrapolation with the Pound 1972 unity
+# high-supersaturation gate. Only SiO segment-wall traces move.
 EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "Fe": 6.456031211878827e-11,
             "Mg": 1.7840460264748115e-12,
             "Na": 0.0018552014816105894,
-            "SiO": 1.0932972455999534e-08,
+            "SiO": 6.259710707208184e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "Mg": 1.7840460264748115e-12,
             "Na": 0.0018552014816105894,
-            "SiO": 1.0932972455999536e-08,
+            "SiO": 6.259710707208184e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 1.7840460264748115e-12,
@@ -110,11 +113,11 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "Fe": 2.7391394481620463e-11,
             "Na": 0.007795747254667054,
-            "SiO": 7.835561989809888e-09,
+            "SiO": 4.822824794501821e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "Na": 0.007795747254667054,
-            "SiO": 7.835561989809888e-09,
+            "SiO": 4.822824794501821e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Na": 0.007795747254667054,
@@ -128,12 +131,12 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
             "Fe": 3.4909299895563435e-11,
             "Mg": 5.6105505611705185e-12,
             "Na": 0.0035765454423857413,
-            "SiO": 1.0583049522651013e-08,
+            "SiO": 6.059359715754741e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "Mg": 5.6105505611705185e-12,
             "Na": 0.0035765454423857413,
-            "SiO": 1.0583049522651013e-08,
+            "SiO": 6.059359715754741e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 5.6105505611705185e-12,
