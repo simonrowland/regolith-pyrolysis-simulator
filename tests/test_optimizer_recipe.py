@@ -305,8 +305,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # authoritative vapor/yield/ledger move.
     # 2026-06-30: moved when per-stage materials.yaml alpha_s overrides gained
     # explicit certification/status stamping; source-fingerprint only.
+    # 2026-07-01: moved when C4b added FeSi to species_catalog and the
+    # grounded wall_reactivity_matrix source surface.
     # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "f07696c922c1db0001649eb82ded354fbd1201f8f87bf711530c45e0322d7be6"
+    assert cache_key(spec) == "85fe39fc43da8903a6468e259c2c52b76acc29f033129b7d1930376f79bed585"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

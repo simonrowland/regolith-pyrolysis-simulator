@@ -220,7 +220,10 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
         for warning in diagnostic.get("warnings", [])
     ]
     segment_wall_sio_kg = sum(
-        sim.atom_ledger.kg_by_account(account).get("SiO", 0.0)
+        sum(
+            sim.atom_ledger.kg_by_account(account).get(species, 0.0)
+            for species in ("SiO", "Si", "SiO2", "FeSi")
+        )
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
 
@@ -229,6 +232,7 @@ def test_c2a_staged_pipework_has_no_upstream_cold_spot():
     # reactive SiO wall-product fix keeps the expected wall magnitude nonzero.
     # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
     # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
+    # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         rel=1e-9,

@@ -1,0 +1,103 @@
+version: 1
+source_scope: dry_high_temperature_regolith_pyrolysis_wall_foulants
+
+reactions:
+  SiO_disproportionation:
+    vapor_species: SiO
+    mechanism: disproportionation
+    authoritative_ledger: true
+    substrate_debits: {}
+    product_credits:
+      SiO2: 0.5
+      Si: 0.5
+    source_refs:
+      - docs-private/research/2026-06-29-sio-fouling-grounding/CROSS-SPECIES-GROUNDING-SYNTHESIS.md
+    status: GROUNDED_STOICHIOMETRY
+
+  Mg_silica_reduction:
+    vapor_species: Mg
+    mechanism: magnesiothermic_reduction_of_silica
+    authoritative_ledger: true
+    substrate_debits:
+      SiO2: 0.5
+    product_credits:
+      MgO: 1.0
+      Si: 0.5
+    source_refs:
+      - docs-private/research/2026-06-29-sio-fouling-grounding/CROSS-SPECIES-GROUNDING-SYNTHESIS.md
+    status: GROUNDED_STOICHIOMETRY_RATE_GAP
+
+  Fe_silicide:
+    vapor_species: Fe
+    mechanism: free_silicon_silicide_tail
+    authoritative_ledger: true
+    substrate_debits:
+      Si: 1.0
+    product_credits:
+      FeSi: 1.0
+    source_refs:
+      - docs-private/research/2026-07-01-c4b-design/CONFIRMED-DECISIONS.md
+    deferred_products:
+      - FeSi2
+      - fayalite_branch
+    status: OWNER_CONFIRMED_PRODUCT_RATE_GAP
+
+alkali_activity_depression:
+  Na:
+    ledger_species: Na
+    diagnostic_equivalent: Na2O
+    authoritative_ledger: false
+    ledger_credit_species: Na
+    mechanism: silica_fouled_wall_activity_depression
+    saturation:
+      unit: mol_Na2O_per_mol_SiO2
+      nominal_cold_wall: 0.5
+      temperature_band:
+        - {T_K: 1473, ratio: 0.24, meaning: liquidus_SiO2_saturated}
+        - {regime: cold_wall_disilicate, ratio: 0.5}
+      primary_anchor:
+        compound: Na2O.2SiO2
+        ratio: 0.5
+        citation: Kracek 1930 J.Phys.Chem. 34(7):1583
+        doi: 10.1021/j150313a018
+      rejected_analogs:
+        - {regime: low_temperature_hydrated_ASR_gel, ratio_range: [0.16, 0.20]}
+    ledger_forbidden:
+      - SiO2_debit
+      - Na2O_credit
+      - sodium_silicate_credit
+      - wall_oxidant
+    status: GROUNDED_SATURATION_ACTIVITY_RATE_GAP
+
+  K:
+    ledger_species: K
+    diagnostic_equivalent: K2O
+    authoritative_ledger: false
+    ledger_credit_species: K
+    mechanism: silica_fouled_wall_activity_depression
+    saturation:
+      unit: mol_K2O_per_mol_SiO2
+      nominal_cold_wall: 0.5
+      conservative_cold_wall: 0.25
+      primary_anchor:
+        compound: K2O.2SiO2
+        ratio: 0.5
+        citation: "Kracek, Bowen & Morey 1929/1937 J.Phys.Chem. (K2O-SiO2 disilicate/tetrasilicate compounds); Tsaplin & Zaitsev 2000 computed K2O-SiO2 phase diagram"
+        doi: 10.1111/jace.20093
+        source_refs:
+          - "Kracek/Bowen/Morey 1929,1937 J.Phys.Chem. (classic K2O-SiO2 invariants; no clean DOI)"
+          - "Tsaplin & Zaitsev 2000 Molten Slags Fluxes & Salts proc. (computed K2O-SiO2 diagram, SiO2-saturation x)"
+          - "DOI 10.1111/jace.20093 modern K2O-SiO2 thermodynamic optimization"
+      conservative_anchor:
+        compound: K2O.4SiO2
+        ratio: 0.25
+        source: same K2O-SiO2 compound family
+      temperature_band_status: K_TBAND_PROXY_FROM_NA_GAP
+      rejected_analogs:
+        - {regime: low_temperature_hydrated_ASR_gel, ratio_range: [0.16, 0.20]}
+    ledger_forbidden:
+      - SiO2_debit
+      - K2O_credit
+      - potassium_silicate_credit
+      - wall_oxidant
+    status: GROUNDED_KO2SIO2_DISILICATE_ANCHOR_TBAND_AND_RATE_GAP

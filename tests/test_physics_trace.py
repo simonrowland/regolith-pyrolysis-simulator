@@ -18,7 +18,7 @@ from simulator.accounting.queries import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import StubBackend
-from simulator.state import EvaporationFlux
+from simulator.state import EvaporationFlux, MOLAR_MASS
 from simulator.trace import PhysicsTrace
 
 
@@ -204,6 +204,17 @@ def test_wall_deposit_delta_matches_route_projection_before_commit():
         for species, kg in species_kg.items()
         if kg > 1e-12
     }
+    expected_committed_delta = {}
+    for (segment, species), kg in route_projection.items():
+        if species == "SiO":
+            expected_committed_delta[(segment, "Si")] = (
+                kg * 0.5 * MOLAR_MASS["Si"] / MOLAR_MASS["SiO"]
+            )
+            expected_committed_delta[(segment, "SiO2")] = (
+                kg * 0.5 * MOLAR_MASS["SiO2"] / MOLAR_MASS["SiO"]
+            )
+        else:
+            expected_committed_delta[(segment, species)] = kg
     committed_delta = {
         key: kg
         for key, kg in sim._last_wall_deposit_by_segment_species_delta.items()
@@ -211,8 +222,8 @@ def test_wall_deposit_delta_matches_route_projection_before_commit():
     }
 
     assert route_projection
-    assert committed_delta.keys() == route_projection.keys()
-    for key, kg in route_projection.items():
+    assert committed_delta.keys() == expected_committed_delta.keys()
+    for key, kg in expected_committed_delta.items():
         assert committed_delta[key] == pytest.approx(kg, abs=1e-12)
 
 

@@ -1977,7 +1977,12 @@ def build_sio_yield_report(
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
     si_terminal_mol = float(condensation_train.get("Si", 0.0))
     sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
-    sio_wall_mol = float(wall_deposit.get("SiO", 0.0))
+    sio_wall_mol = (
+        float(wall_deposit.get("SiO", 0.0))
+        + float(wall_deposit.get("Si", 0.0))
+        + float(wall_deposit.get("SiO2", 0.0))
+        + float(wall_deposit.get("FeSi", 0.0))
+    )
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
     terminal_mol = (
         si_terminal_mol

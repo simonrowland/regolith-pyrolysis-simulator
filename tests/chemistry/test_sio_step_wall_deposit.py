@@ -30,9 +30,11 @@ def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[
     )
 
 
-def _sio_wall_deposit_kg(liner_temperature_c: float) -> float:
+def _sio_wall_product_deposit_kg(liner_temperature_c: float) -> float:
     report, _ = _report_at_wall_T(liner_temperature_c)
-    return float(report["wall_deposit_kg"].get("SiO", 0.0))
+    wall = report["wall_deposit_kg"]
+    assert float(wall.get("SiO", 0.0)) == pytest.approx(0.0)
+    return float(wall.get("Si", 0.0)) + float(wall.get("SiO2", 0.0))
 
 
 def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
@@ -162,14 +164,17 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 2026-06-30 cold-wall SiO condensation uses the Pound 1972 unity
     # high-supersaturation gate below the evaporation-Arrhenius validity floor.
     # Hot-wall capture remains on the Wetzel/Gail Arrhenius.
-    assert _sio_wall_deposit_kg(1050.0) == pytest.approx(
-        6.36938050708e-08, rel=1e-9
+    # 2026-07-01 C4b stores wall SiO as physical products instead of a SiO
+    # proxy. The 1050 C case drops because same-run Mg consumes some SiO2 into
+    # MgO; the hot-wall cases retain the same Si+SiO2 mass to rounding.
+    assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
+        5.988620840997e-08, rel=1e-9
     )
-    assert _sio_wall_deposit_kg(1400.0) == pytest.approx(
-        6.61306011132e-08, rel=1e-9
+    assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
+        6.61294555268e-08, rel=1e-9
     )
-    assert _sio_wall_deposit_kg(1500.0) == pytest.approx(
-        6.65597619194e-08, rel=1e-9
+    assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
+        6.6558616333e-08, rel=1e-9
     )
 
 

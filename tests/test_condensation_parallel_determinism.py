@@ -14,6 +14,18 @@ from simulator.state import (
 
 
 EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.0006148297942046674
+EXPECTED_COLD_WALL_SIO_SEGMENT_SI_KG = (
+    EXPECTED_COLD_WALL_SIO_SEGMENT_KG
+    * 0.5
+    * MOLAR_MASS["Si"]
+    / MOLAR_MASS["SiO"]
+)
+EXPECTED_COLD_WALL_SIO_SEGMENT_SIO2_KG = (
+    EXPECTED_COLD_WALL_SIO_SEGMENT_KG
+    * 0.5
+    * MOLAR_MASS["SiO2"]
+    / MOLAR_MASS["SiO"]
+)
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
     "max_hold_hr": 25,
@@ -148,7 +160,8 @@ def test_cold_wall_segment_attribution_matches_pre_refactor_values():
     }
     for species_kg in attribution.values():
         assert species_kg == {
-            "SiO": pytest.approx(EXPECTED_COLD_WALL_SIO_SEGMENT_KG)
+            "Si": pytest.approx(EXPECTED_COLD_WALL_SIO_SEGMENT_SI_KG),
+            "SiO2": pytest.approx(EXPECTED_COLD_WALL_SIO_SEGMENT_SIO2_KG),
         }
     assert session.simulator.atom_ledger.kg_by_account(
         "process.wall_deposit"

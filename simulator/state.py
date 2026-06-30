@@ -69,6 +69,7 @@ MOLAR_MASS = {
     'Na': _AW['Na'], 'K': _AW['K'], 'Fe': _AW['Fe'], 'Mg': _AW['Mg'],
     'Si': _AW['Si'], 'Ti': _AW['Ti'], 'Al': _AW['Al'], 'Ca': _AW['Ca'],
     'Cr': _AW['Cr'], 'Mn': _AW['Mn'], 'Ni': _AW['Ni'], 'Co': _AW['Co'],
+    'FeSi': _AW['Fe'] + _AW['Si'],
     # Gases
     'O2': 2 * _AW['O'], 'O': _AW['O'], 'SiO': _AW['Si'] + _AW['O'],
     'CrO2': _AW['Cr'] + 2 * _AW['O'],

@@ -16,17 +16,19 @@
     "K": 0.0,
     "Mg": 0.0,
     "Na": 0.0,
-    "SiO": 6.70879076102e-08
+    "Si": 2.1369010085e-08,
+    "SiO": 0.0,
+    "SiO2": 4.57177519388e-08
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
-    "dominant_species": "SiO",
-    "dominant_species_wall_deposit_kg": 6.70879076102e-08,
-    "wall_deposit_kg_per_campaign": 6.70879076102e-08,
+    "dominant_species": "SiO2",
+    "dominant_species_wall_deposit_kg": 4.57177519388e-08,
+    "wall_deposit_kg_per_campaign": 6.70867620238e-08,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "resinter_threshold_kg / 6.70879076102e-08",
+    "campaigns_to_resinter": "resinter_threshold_kg / 6.70867620238e-08",
     "fast_fouling_campaign_threshold": 10,
     "output_status": "status_bearing",
     "authoritative": false,
@@ -43,12 +45,14 @@
       "code": "wall_deposit_sticking_alpha_provenance_missing",
       "output_status": "status_bearing",
       "deposited_species": [
-        "SiO"
+        "Si",
+        "SiO2"
       ],
       "uncertified_alpha_species": [
-        "SiO"
+        "Si",
+        "SiO2"
       ],
-      "status_bearing_alpha_count": 1,
+      "status_bearing_alpha_count": 2,
       "alpha_s_provenance_by_species": {},
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
       "message": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit."

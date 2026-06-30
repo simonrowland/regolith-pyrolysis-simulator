@@ -248,10 +248,10 @@ def _surface_temperature_rows(schedule: dict) -> list[dict]:
 
 
 def _surface_sio_delta(row: dict, surface_id: str) -> float:
-    return float(
-        row.get("wall_deposit_delta_kg", {})
-        .get(surface_id, {})
-        .get("SiO", 0.0)
+    species_kg = row.get("wall_deposit_delta_kg", {}).get(surface_id, {})
+    return sum(
+        float(species_kg.get(species, 0.0))
+        for species in ("SiO", "Si", "SiO2", "FeSi")
     )
 
 

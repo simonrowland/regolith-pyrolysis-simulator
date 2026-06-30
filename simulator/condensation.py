@@ -277,6 +277,9 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 UNSUPPORTED_CARRIER_FALLBACK_REASON = 'unsupported_carrier_lj_parameters'
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
+WALL_REACTIVITY_MATRIX_PATH = (
+    DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
+)
 STICKING_VALUE_REF_PREFIX = (
     'data/literature/vacuum_pyrolysis_sticking.yaml::species.'
 )
@@ -285,6 +288,7 @@ STICKING_UNKNOWN_REF = (
 )
 STICKING_STATUSES = {'CITED', 'UNCERTIFIED'}
 STICKING_REACTIVITY_CLASSES = {'reactive', 'physisorbing'}
+C4B_WALL_ROUTE_ORDER = ('SiO', 'Mg', 'Fe', 'Na', 'K')
 
 
 def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
@@ -430,7 +434,124 @@ def _validate_range_pair(
         raise ValueError(f'{path}: {name} upper bound above {upper_bound}')
 
 
+def _validate_wall_reaction(
+    path: Path,
+    name: str,
+    entry: Any,
+    *,
+    species: str,
+    status: str,
+) -> None:
+    if not isinstance(entry, Mapping):
+        raise ValueError(f'{path}: reactions.{name} must be a mapping')
+    if entry.get('vapor_species') != species:
+        raise ValueError(
+            f'{path}: reactions.{name}.vapor_species must be {species!r}'
+        )
+    if entry.get('status') != status:
+        raise ValueError(f'{path}: reactions.{name} missing status {status!r}')
+    refs = entry.get('source_refs')
+    if not isinstance(refs, list) or not refs:
+        raise ValueError(f'{path}: reactions.{name} missing source_refs')
+
+
+def _validate_alkali_activity_entry(path: Path, species: str, entry: Any) -> None:
+    if not isinstance(entry, Mapping):
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} must be a mapping'
+        )
+    if entry.get('ledger_species') != species:
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species}.ledger_species '
+            f'must be {species!r}'
+        )
+    if entry.get('authoritative_ledger') is not False:
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} must be diagnostic-only'
+        )
+    if entry.get('ledger_credit_species') != species:
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species}.ledger_credit_species '
+            f'must be {species!r}'
+        )
+    saturation = entry.get('saturation')
+    if not isinstance(saturation, Mapping):
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} missing saturation'
+        )
+    nominal = saturation.get('nominal_cold_wall')
+    if not isinstance(nominal, (int, float)) or float(nominal) <= 0.0:
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} missing numeric '
+            'nominal_cold_wall saturation'
+        )
+    anchor = saturation.get('primary_anchor')
+    if not isinstance(anchor, Mapping) or not anchor.get('citation'):
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} missing cited '
+            'primary_anchor'
+        )
+    if not entry.get('status'):
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} missing status'
+        )
+    forbidden = entry.get('ledger_forbidden')
+    if not isinstance(forbidden, list) or not forbidden:
+        raise ValueError(
+            f'{path}: alkali_activity_depression.{species} missing ledger_forbidden'
+        )
+
+
+def _load_wall_reactivity_matrix(
+    path: Path = WALL_REACTIVITY_MATRIX_PATH,
+) -> dict[str, Any]:
+    raw = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+    if not isinstance(raw, Mapping):
+        raise ValueError(f'{path}: wall reactivity matrix must be a mapping')
+    if raw.get('version') != 1:
+        raise ValueError(f'{path}: unsupported wall reactivity matrix version')
+    reactions = raw.get('reactions')
+    if not isinstance(reactions, Mapping):
+        raise ValueError(f'{path}: missing reactions table')
+    _validate_wall_reaction(
+        path,
+        'SiO_disproportionation',
+        reactions.get('SiO_disproportionation'),
+        species='SiO',
+        status='GROUNDED_STOICHIOMETRY',
+    )
+    _validate_wall_reaction(
+        path,
+        'Mg_silica_reduction',
+        reactions.get('Mg_silica_reduction'),
+        species='Mg',
+        status='GROUNDED_STOICHIOMETRY_RATE_GAP',
+    )
+    _validate_wall_reaction(
+        path,
+        'Fe_silicide',
+        reactions.get('Fe_silicide'),
+        species='Fe',
+        status='OWNER_CONFIRMED_PRODUCT_RATE_GAP',
+    )
+    alkali = raw.get('alkali_activity_depression')
+    if not isinstance(alkali, Mapping):
+        raise ValueError(f'{path}: missing alkali_activity_depression')
+    for species in ('Na', 'K'):
+        _validate_alkali_activity_entry(path, species, alkali.get(species))
+    return dict(raw)
+
+
+def _wall_route_species_order(species_names: Any) -> tuple[str, ...]:
+    names = tuple(str(species) for species in species_names)
+    present = set(names)
+    ordered = [species for species in C4B_WALL_ROUTE_ORDER if species in present]
+    ordered.extend(species for species in names if species not in C4B_WALL_ROUTE_ORDER)
+    return tuple(ordered)
+
+
 STICKING_DATA = _load_sticking_data()
+WALL_REACTIVITY_MATRIX = _load_wall_reactivity_matrix()
 
 
 def _sticking_species_entries() -> Mapping[str, Any]:
@@ -1250,6 +1371,19 @@ class CondensationRouteResult:
         default_factory=dict)
     wall_deposit_account_fractions_by_species: Dict[
         str, Dict[str, float]] = field(default_factory=dict)
+    wall_route_species_order: tuple[str, ...] = ()
+    wall_reaction_products_by_segment_species_mol: Dict[
+        str, Dict[str, Dict[str, float]]
+    ] = field(default_factory=dict)
+    wall_reaction_substrate_debits_by_segment_species_mol: Dict[
+        str, Dict[str, Dict[str, float]]
+    ] = field(default_factory=dict)
+    wall_reaction_diagnostics_by_segment_species: Dict[
+        str, Dict[str, Dict[str, Any]]
+    ] = field(default_factory=dict)
+    wall_alkali_binding_diagnostic_state_by_segment: Dict[
+        str, Dict[str, Any]
+    ] = field(default_factory=dict)
     impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
     antoine_extrapolations: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     antoine_extrapolation_warnings: tuple[str, ...] = ()
@@ -1381,6 +1515,9 @@ class CondensationModel:
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
+        self.wall_alkali_binding_diagnostic_state_by_account: dict[
+            str, dict[str, Any]
+        ] = {}
         self.cold_spot_history: list[dict[str, Any]] = []
         self.operating_history: list[dict[str, Any]] = []
 
@@ -2062,6 +2199,12 @@ class CondensationModel:
             wall_deposit_fraction_by_species=wall_deposit_fraction_by_species,
             wall_deposit_account_fractions_by_species=(
                 wall_deposit_account_fractions_by_species),
+            wall_route_species_order=_wall_route_species_order(
+                evap_flux.species_kg_hr.keys()
+            ),
+            wall_alkali_binding_diagnostic_state_by_segment=copy.deepcopy(
+                self.wall_alkali_binding_diagnostic_state_by_account
+            ),
             impurity_by_stage_species=impurity_by_stage_species,
             antoine_extrapolations=dict(antoine_extrapolations),
             antoine_extrapolation_warnings=tuple(
@@ -3132,6 +3275,11 @@ def _wall_deposition_driving_pressure_pa(
     if reactive_product_backstop:
         reactivity_class = _sticking_reactivity_class(species)
         if reactivity_class == 'reactive':
+            if species != 'SiO':
+                raise ValueError(
+                    'reactive wall-product backstop is C4b-authorized only '
+                    f'for SiO, got {species!r}'
+                )
             if P_sat_pa < local_pressure_pa:
                 return max(0.0, local_pressure_pa - P_sat_pa)
             # Reactive deposits are less-volatile wall products, not the vapor

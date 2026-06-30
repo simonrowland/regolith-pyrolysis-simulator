@@ -46,7 +46,12 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import CondensationRouteResult
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.condensation import (
+    C4B_WALL_ROUTE_ORDER,
+    CondensationRouteResult,
+    _wall_route_species_order,
+)
 from simulator.state import (
     CampaignPhase,
     DecisionType,
@@ -87,18 +92,20 @@ from tests.chemistry.conftest import _build_sim
 # 2026-06-30 SiO cold-wall condensation replaces subfloor Wetzel/Gail
 # evaporation-Arrhenius extrapolation with the Pound 1972 unity
 # high-supersaturation gate. Only SiO segment-wall traces move.
-EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
+EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 6.456031211878827e-11,
-            "Mg": 1.7840460264748115e-12,
+            "FeSi": 9.702832833968842e-11,
+            "MgO": 2.9584114812195352e-12,
             "Na": 0.0018552014816105894,
-            "SiO": 6.259710707208184e-07,
+            "Si": 1.993651411013487e-07,
+            "SiO2": 4.26572287237794e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 1.7840460264748115e-12,
+            "MgO": 2.9584114812195352e-12,
             "Na": 0.0018552014816105894,
-            "SiO": 6.259710707208184e-07,
+            "Si": 1.9939760911756958e-07,
+            "SiO2": 4.26572287237794e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 1.7840460264748115e-12,
@@ -111,13 +118,17 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 2.7391394481620463e-11,
+            "FeSi": 4.116679629048985e-11,
+            "MgO": 1.0736171850990425e-12,
             "Na": 0.007795747254667054,
-            "SiO": 4.822824794501821e-07,
+            "Si": 1.536122956824662e-07,
+            "SiO2": 3.28656408365907e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "MgO": 1.0736171850990425e-12,
             "Na": 0.007795747254667054,
-            "SiO": 4.822824794501821e-07,
+            "Si": 1.5362607108427506e-07,
+            "SiO2": 3.28656408365907e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Na": 0.007795747254667054,
@@ -128,15 +139,17 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 3.4909299895563435e-11,
-            "Mg": 5.6105505611705185e-12,
+            "FeSi": 5.246553031130163e-11,
+            "MgO": 9.303749426760607e-12,
             "Na": 0.0035765454423857413,
-            "SiO": 6.059359715754741e-07,
+            "Si": 1.930002911031523e-07,
+            "SiO2": 4.129144310430405e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Mg": 5.6105505611705185e-12,
+            "MgO": 9.303749426760607e-12,
             "Na": 0.0035765454423857413,
-            "SiO": 6.059359715754741e-07,
+            "Si": 1.9301784733356802e-07,
+            "SiO2": 4.129144310430405e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 5.6105505611705185e-12,
@@ -148,6 +161,13 @@ EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG = {
         },
     },
 }
+
+
+def _assert_atom_proof_closed(proposal) -> None:
+    for element, net in dict(proposal.atom_balance_proof).items():
+        assert abs(net) < 1e-9, (
+            f"atom_balance_proof[{element!r}] = {net} is not zero"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -688,8 +708,11 @@ def test_provider_splits_baffle_product_from_wall_deposit(
     assert proposal.credits["process.condensation_train"]["SiO2"] == pytest.approx(
         0.5 * baffle_mol, rel=1e-12
     )
-    assert proposal.credits["process.wall_deposit"]["SiO"] == pytest.approx(
-        wall_mol, rel=1e-12
+    assert proposal.credits["process.wall_deposit"]["SiO2"] == pytest.approx(
+        0.5 * wall_mol, rel=1e-12
+    )
+    assert proposal.credits["process.wall_deposit"]["Si"] == pytest.approx(
+        0.5 * wall_mol, rel=1e-12
     )
     assert result.diagnostic["credited_condensed_kg"] == pytest.approx(
         condensed_kg * (1.0 - wall_fraction), rel=1e-12
@@ -760,15 +783,261 @@ def test_provider_routes_wall_deposit_to_segment_accounts(
     proposal = result.transition
     wall_mol = condensed_kg * wall_fraction / mw_sio
     assert "process.wall_deposit" not in proposal.credits
-    assert proposal.credits[first_account]["SiO"] == pytest.approx(
-        wall_mol * 0.75, rel=1e-12
+    assert proposal.credits[first_account]["SiO2"] == pytest.approx(
+        0.5 * wall_mol * 0.75, rel=1e-12
     )
-    assert proposal.credits[second_account]["SiO"] == pytest.approx(
-        wall_mol * 0.25, rel=1e-12
+    assert proposal.credits[first_account]["Si"] == pytest.approx(
+        0.5 * wall_mol * 0.75, rel=1e-12
+    )
+    assert proposal.credits[second_account]["SiO2"] == pytest.approx(
+        0.5 * wall_mol * 0.25, rel=1e-12
+    )
+    assert proposal.credits[second_account]["Si"] == pytest.approx(
+        0.5 * wall_mol * 0.25, rel=1e-12
     )
     assert result.diagnostic["credited_wall_deposit_accounts_kg"][
         first_account
     ] == pytest.approx(condensed_kg * wall_fraction * 0.75)
+
+
+def test_c4b_mg_wall_reaction_consumes_sio2_and_caps_residual_mg(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    mw_mg = resolve_species_formula(
+        "Mg", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Mg": 2.0},
+                "process.wall_deposit": {"SiO2": 0.25},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Mg",
+            "condensed_kg": mw_mg,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {},
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    proposal = result.transition
+    assert proposal is not None
+    assert proposal.debits["process.overhead_gas"]["Mg"] == pytest.approx(1.0)
+    assert proposal.debits["process.wall_deposit"]["SiO2"] == pytest.approx(0.25)
+    wall_credit = proposal.credits["process.wall_deposit"]
+    assert wall_credit["MgO"] == pytest.approx(0.5)
+    assert wall_credit["Si"] == pytest.approx(0.25)
+    assert wall_credit["Mg"] == pytest.approx(0.5)
+    _assert_atom_proof_closed(proposal)
+
+
+def test_c4b_fe_wall_reaction_forms_fesi_only_against_free_si(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    mw_fe = resolve_species_formula(
+        "Fe", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {"Fe": 2.0},
+                "process.wall_deposit": {"Si": 0.4},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Fe",
+            "condensed_kg": mw_fe,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {},
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    proposal = result.transition
+    assert proposal is not None
+    assert proposal.debits["process.overhead_gas"]["Fe"] == pytest.approx(1.0)
+    assert proposal.debits["process.wall_deposit"]["Si"] == pytest.approx(0.4)
+    wall_credit = proposal.credits["process.wall_deposit"]
+    assert wall_credit["FeSi"] == pytest.approx(0.4)
+    assert wall_credit["Fe"] == pytest.approx(0.6)
+    assert "FeSi2" not in wall_credit
+    _assert_atom_proof_closed(proposal)
+
+
+@pytest.mark.parametrize("species,equivalent", [("Na", "Na2O"), ("K", "K2O")])
+def test_c4b_alkali_wall_reaction_credits_elemental_only(
+    species, equivalent, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    mw = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: 3.0},
+                "process.wall_deposit": {"SiO2": 10.0},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": 2.0 * mw,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {},
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    proposal = result.transition
+    assert proposal is not None
+    assert set(proposal.debits) == {"process.overhead_gas"}
+    assert proposal.debits["process.overhead_gas"][species] == pytest.approx(2.0)
+    assert set(proposal.credits) == {"process.wall_deposit"}
+    assert set(proposal.credits["process.wall_deposit"]) == {species}
+    assert proposal.credits["process.wall_deposit"][species] == pytest.approx(2.0)
+    forbidden = {"SiO2", equivalent, "Na2O", "K2O", "Na2SiO3", "K2SiO3"}
+    assert forbidden.isdisjoint(proposal.credits["process.wall_deposit"])
+    diagnostic = result.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]
+    assert diagnostic["authoritative"] is False
+    assert diagnostic["new_bound_equiv_mol"] == pytest.approx(1.0)
+    state = result.diagnostic["wall_alkali_binding_diagnostic_state_by_account"][
+        "process.wall_deposit"
+    ]
+    assert state["authoritative"] is False
+    assert state["bound_alkali_equiv_mol"][equivalent] == pytest.approx(1.0)
+    _assert_atom_proof_closed(proposal)
+
+
+def test_c4b_alkali_diagnostic_saturation_does_not_change_ledger_mol(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    mw_na = resolve_species_formula(
+        "Na", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+
+    def _proposal_with_state(state):
+        request = IntentRequest(
+            intent=ChemistryIntent.CONDENSATION_ROUTE,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.overhead_gas": {"Na": 3.0},
+                    "process.wall_deposit": {"SiO2": 1.0, "Na": 50.0},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=1100.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "species": "Na",
+                "condensed_kg": 1.0 * mw_na,
+                "sp_data": {},
+                "wall_deposit_fraction": 1.0,
+                "wall_deposit_account_fractions": {},
+                "wall_alkali_binding_diagnostic_state_by_account": state,
+                "dt_hr": 1.0,
+            },
+        )
+        return provider.dispatch(request)
+
+    open_capacity = _proposal_with_state({})
+    saturated = _proposal_with_state({
+        "process.wall_deposit": {
+            "bound_alkali_equiv_mol": {"Na2O": 99.0},
+            "authoritative": False,
+        }
+    })
+
+    assert open_capacity.status == saturated.status == "ok"
+    assert open_capacity.transition is not None
+    assert saturated.transition is not None
+    assert open_capacity.transition.debits == saturated.transition.debits
+    assert open_capacity.transition.credits == saturated.transition.credits
+    open_diag = open_capacity.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]
+    sat_diag = saturated.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]
+    assert open_diag["new_bound_equiv_mol"] > 0.0
+    assert sat_diag["new_bound_equiv_mol"] == pytest.approx(0.0)
+
+
+def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions():
+    assert _wall_route_species_order(("K", "Fe", "SiO", "Na", "Mg")) == (
+        C4B_WALL_ROUTE_ORDER
+    )
+    assert _wall_route_species_order(("Ti", "K", "SiO", "Ca")) == (
+        "SiO",
+        "K",
+        "Ti",
+        "Ca",
+    )
+
+
+def test_fesi_species_catalog_lookup(feedstocks_data, vapor_pressure_data, setpoints_data):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    formula = resolve_species_formula("FeSi", sim.species_formula_registry)
+    assert formula.atom_moles(1.0) == {"Fe": 1.0, "Si": 1.0}
 
 
 def test_provider_skips_below_numerical_floor(
@@ -832,9 +1101,9 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
     * the AtomLedger holds a non-trivial number of condensation-route
       transitions (so we know the kernel-committed CONDENSATION_ROUTE
       path actually fired across the campaign),
-    * each condensation-route transition strictly debits overhead_gas
-      and credits only declared condensation destinations (no cleaned_melt
-      touch),
+    * each condensation-route transition debits only overhead_gas plus C4b
+      wall-substrate accounts and credits only declared condensation
+      destinations (no cleaned_melt touch),
     * each transition closes mass within a tight 1 mg per-transition
       tolerance,
     * the cumulative per-transition mass imbalance stays within a tight
@@ -900,11 +1169,16 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
             "terminal.chromium_condensed_oxide_stored",
             *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
         }
+        allowed_debit_accounts = {
+            "process.overhead_gas",
+            "process.wall_deposit",
+            *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+        }
         for lot in trans.debits:
-            assert lot.account == "process.overhead_gas", (
+            assert lot.account in allowed_debit_accounts, (
                 f"condense transition {trans.name} debits unexpected "
-                f"account {lot.account!r}; expected only "
-                "process.overhead_gas"
+                f"account {lot.account!r}; expected one of "
+                f"{sorted(allowed_debit_accounts)}"
             )
         for lot in trans.credits:
             assert lot.account in allowed_credit_accounts, (
@@ -1064,7 +1338,7 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
         if species_kg:
             wall_segment_deposits_kg[account] = dict(sorted(species_kg.items()))
     assert wall_segment_deposits_kg == (
-        EXPECTED_PRE_FLIP_WALL_SEGMENT_DEPOSITS_KG[feedstock_key]
+        EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG[feedstock_key]
     )
 
     # Final assertion: end-of-batch closure stays tight (same bound as

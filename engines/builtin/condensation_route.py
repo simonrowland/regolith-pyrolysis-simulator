@@ -88,7 +88,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.condensation import (
+    C4B_WALL_ROUTE_ORDER,
     WALL_DEPOSIT_ACCOUNT,
+    WALL_REACTIVITY_MATRIX,
+    WALL_REACTIVITY_MATRIX_PATH,
 )
 from simulator.state import (
     declared_wall_deposit_accounts,
@@ -212,8 +215,27 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         wall_deposit_mol = self._wall_deposit_mol(
             species, wall_deposit_kg, registry, resolve_species_formula,
         )
+        wall_deposit_mol_by_account = self._wall_deposit_mol_by_account(
+            wall_deposit_mol,
+            wall_account_fractions,
+        )
 
-        if not condensed_product_mol and wall_deposit_mol <= 0.0:
+        alkali_refusal = self._alkali_forbidden_control_refusal(
+            species,
+            controls,
+            control_audit,
+        )
+        if alkali_refusal is not None:
+            return alkali_refusal
+
+        wall_plan = self._wall_reaction_plan(
+            species,
+            wall_deposit_mol_by_account,
+            request.account_view.accounts,
+            controls,
+        )
+
+        if not condensed_product_mol and not wall_plan["product_mol_by_account"]:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
@@ -236,14 +258,20 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         debits: dict[str, dict[str, float]] = {
             "process.overhead_gas": {species: vapor_mol},
         }
+        for account, species_mol in wall_plan[
+            "substrate_debit_mol_by_account"
+        ].items():
+            account_debits = debits.setdefault(account, {})
+            for debit_species, mol in species_mol.items():
+                account_debits[debit_species] = (
+                    account_debits.get(debit_species, 0.0) + mol
+                )
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
-        if wall_deposit_mol > 0.0:
-            for account, account_mol in self._wall_deposit_mol_by_account(
-                wall_deposit_mol, wall_account_fractions,
-            ).items():
-                species_mol = credits.setdefault(account, {})
-                species_mol[species] = (
-                    species_mol.get(species, 0.0) + account_mol
+        for account, product_mol in wall_plan["product_mol_by_account"].items():
+            species_mol = credits.setdefault(account, {})
+            for product_species, mol in product_mol.items():
+                species_mol[product_species] = (
+                    species_mol.get(product_species, 0.0) + mol
                 )
 
         # Atom-balance proof: element-by-element net (credit - debit).
@@ -263,6 +291,21 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             atom_balance_proof=atom_proof,
         )
 
+        product_kg_by_account = self._species_kg_by_account(
+            wall_plan["product_mol_by_account"],
+            registry,
+            resolve_species_formula,
+        )
+        substrate_kg_by_account = self._species_kg_by_account(
+            wall_plan["substrate_debit_mol_by_account"],
+            registry,
+            resolve_species_formula,
+        )
+        wall_delta_kg_by_account = self._wall_delta_kg_by_account(
+            product_kg_by_account,
+            substrate_kg_by_account,
+        )
+
         return IntentResult(
             intent=ChemistryIntent.CONDENSATION_ROUTE,
             status="ok",
@@ -277,6 +320,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         wall_account_fractions.items()
                     )
                 },
+                "wall_deposit_accounts_kg_by_species": product_kg_by_account,
+                "wall_substrate_debit_accounts_kg_by_species": (
+                    substrate_kg_by_account
+                ),
+                "wall_deposit_accounts_kg_delta_by_species": (
+                    wall_delta_kg_by_account
+                ),
+                "wall_reaction_products_by_account_species_mol": (
+                    wall_plan["product_mol_by_account"]
+                ),
+                "wall_reaction_substrate_debits_by_account_species_mol": (
+                    wall_plan["substrate_debit_mol_by_account"]
+                ),
+                "wall_reaction_diagnostics_by_account": (
+                    wall_plan["diagnostics_by_account"]
+                ),
+                "wall_alkali_binding_diagnostic_state_by_account": (
+                    wall_plan["alkali_state_by_account"]
+                ),
             },
         )
 
@@ -284,6 +346,265 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     # Helpers (mirror legacy _condensed_products_for_vapor /
     # _condensation_product_mol_ratios exactly).
     # ------------------------------------------------------------------
+
+    def _wall_reaction_plan(
+        self,
+        species: str,
+        wall_deposit_mol_by_account: Mapping[str, float],
+        account_view: Mapping[str, Mapping[str, float]],
+        controls: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        product_mol_by_account: dict[str, dict[str, float]] = {}
+        substrate_debit_mol_by_account: dict[str, dict[str, float]] = {}
+        diagnostics_by_account: dict[str, dict[str, Any]] = {}
+        alkali_state_by_account = self._copy_alkali_state(
+            controls.get("wall_alkali_binding_diagnostic_state_by_account")
+        )
+
+        for account, arrival_mol in wall_deposit_mol_by_account.items():
+            if arrival_mol <= 0.0:
+                continue
+            account_state = dict(account_view.get(account, {}) or {})
+            products: dict[str, float] = {}
+            debits: dict[str, float] = {}
+            diagnostic: dict[str, Any] = {
+                "route_order": C4B_WALL_ROUTE_ORDER,
+                "source": str(WALL_REACTIVITY_MATRIX_PATH),
+            }
+
+            if species == "SiO":
+                reaction = self._matrix_reaction("SiO_disproportionation")
+                for product, ratio in dict(reaction["product_credits"]).items():
+                    products[str(product)] = arrival_mol * float(ratio)
+                diagnostic.update({
+                    "mechanism": reaction.get("mechanism"),
+                    "status": reaction.get("status"),
+                })
+            elif species == "Mg":
+                reaction = self._matrix_reaction("Mg_silica_reduction")
+                available_sio2_mol = max(
+                    0.0, float(account_state.get("SiO2", 0.0))
+                )
+                reactive_mg_mol = min(arrival_mol, 2.0 * available_sio2_mol)
+                residual_mg_mol = max(0.0, arrival_mol - reactive_mg_mol)
+                if reactive_mg_mol > 0.0:
+                    debits["SiO2"] = 0.5 * reactive_mg_mol
+                    products["MgO"] = reactive_mg_mol
+                    products["Si"] = 0.5 * reactive_mg_mol
+                if residual_mg_mol > 0.0:
+                    products["Mg"] = residual_mg_mol
+                diagnostic.update({
+                    "mechanism": reaction.get("mechanism"),
+                    "status": reaction.get("status"),
+                    "available_sio2_mol": available_sio2_mol,
+                    "reactive_mol": reactive_mg_mol,
+                    "residual_physisorbing_mol": residual_mg_mol,
+                    "gaps": (
+                        "Mg_passivation",
+                        "MgO_vs_Mg2Si_competition",
+                    ),
+                })
+            elif species == "Fe":
+                reaction = self._matrix_reaction("Fe_silicide")
+                available_si_mol = max(0.0, float(account_state.get("Si", 0.0)))
+                silicide_mol = min(arrival_mol, available_si_mol)
+                residual_fe_mol = max(0.0, arrival_mol - silicide_mol)
+                if silicide_mol > 0.0:
+                    debits["Si"] = silicide_mol
+                    products["FeSi"] = silicide_mol
+                if residual_fe_mol > 0.0:
+                    products["Fe"] = residual_fe_mol
+                diagnostic.update({
+                    "mechanism": reaction.get("mechanism"),
+                    "status": reaction.get("status"),
+                    "available_si_mol": available_si_mol,
+                    "reactive_mol": silicide_mol,
+                    "residual_physisorbing_mol": residual_fe_mol,
+                    "deferred_products": tuple(
+                        reaction.get("deferred_products") or ()
+                    ),
+                })
+            elif species in {"Na", "K"}:
+                products[species] = arrival_mol
+                diagnostic, alkali_state_by_account[account] = (
+                    self._alkali_diagnostic_update(
+                        species,
+                        account,
+                        arrival_mol,
+                        account_state,
+                        alkali_state_by_account.get(account),
+                    )
+                )
+            else:
+                products[species] = arrival_mol
+                diagnostic.update({
+                    "mechanism": "physisorbing_non_reactive_c4b",
+                    "status": "NON_REACTIVE_C4B",
+                })
+
+            if products:
+                product_mol_by_account[account] = products
+            if debits:
+                substrate_debit_mol_by_account[account] = debits
+            diagnostics_by_account[account] = diagnostic
+
+        return {
+            "product_mol_by_account": product_mol_by_account,
+            "substrate_debit_mol_by_account": substrate_debit_mol_by_account,
+            "diagnostics_by_account": diagnostics_by_account,
+            "alkali_state_by_account": alkali_state_by_account,
+        }
+
+    @staticmethod
+    def _matrix_reaction(name: str) -> Mapping[str, Any]:
+        reactions = WALL_REACTIVITY_MATRIX.get("reactions")
+        if not isinstance(reactions, Mapping) or name not in reactions:
+            raise ValueError(f"wall reactivity matrix missing reaction {name!r}")
+        entry = reactions[name]
+        if not isinstance(entry, Mapping) or not entry.get("status"):
+            raise ValueError(f"wall reactivity matrix reaction {name!r} lacks status")
+        if not entry.get("source_refs"):
+            raise ValueError(f"wall reactivity matrix reaction {name!r} lacks sources")
+        return entry
+
+    @staticmethod
+    def _alkali_entry(species: str) -> Mapping[str, Any]:
+        alkali = WALL_REACTIVITY_MATRIX.get("alkali_activity_depression")
+        if not isinstance(alkali, Mapping) or species not in alkali:
+            raise ValueError(
+                f"wall reactivity matrix missing alkali entry for {species!r}"
+            )
+        entry = alkali[species]
+        if not isinstance(entry, Mapping) or not entry.get("status"):
+            raise ValueError(f"wall reactivity alkali entry {species!r} lacks status")
+        saturation = entry.get("saturation")
+        if not isinstance(saturation, Mapping):
+            raise ValueError(
+                f"wall reactivity alkali entry {species!r} lacks saturation"
+            )
+        anchor = saturation.get("primary_anchor")
+        if not isinstance(anchor, Mapping) or not anchor.get("citation"):
+            raise ValueError(
+                f"wall reactivity alkali entry {species!r} lacks cited source"
+            )
+        return entry
+
+    @classmethod
+    def _alkali_diagnostic_update(
+        cls,
+        species: str,
+        account: str,
+        arrival_mol: float,
+        account_state: Mapping[str, float],
+        prior_state: Mapping[str, Any] | None,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        entry = cls._alkali_entry(species)
+        saturation = entry["saturation"]
+        ratio = float(saturation["nominal_cold_wall"])
+        equivalent = str(entry["diagnostic_equivalent"])
+        prior = dict(prior_state or {})
+        prior_bound = dict(prior.get("bound_alkali_equiv_mol") or {})
+        previous_equiv_mol = max(0.0, float(prior_bound.get(equivalent, 0.0)))
+        sio2_basis_mol = max(0.0, float(account_state.get("SiO2", 0.0)))
+        capacity_equiv_mol = max(
+            0.0, ratio * sio2_basis_mol - previous_equiv_mol
+        )
+        arriving_equiv_mol = 0.5 * arrival_mol
+        new_bound_equiv_mol = min(arriving_equiv_mol, capacity_equiv_mol)
+        activity_depressed_mol = 2.0 * new_bound_equiv_mol
+        physisorbing_mol = max(0.0, arrival_mol - activity_depressed_mol)
+        prior_bound[equivalent] = previous_equiv_mol + new_bound_equiv_mol
+        source = (
+            f"{WALL_REACTIVITY_MATRIX_PATH}::"
+            f"alkali_activity_depression.{species}.saturation"
+        )
+        updated_state = {
+            "account": account,
+            "segment_name": cls._segment_name(account),
+            "state_epoch": "transient_c4b",
+            "bound_alkali_equiv_mol": prior_bound,
+            "capacity_basis_mol": {"SiO2": sio2_basis_mol},
+            "saturation_ratio_source": {species: source},
+            "authoritative": False,
+        }
+        diagnostic = {
+            "mechanism": entry.get("mechanism"),
+            "status": entry.get("status"),
+            "authoritative": False,
+            "ledger_credit_species": species,
+            "diagnostic_equivalent": equivalent,
+            "saturation_ratio": ratio,
+            "saturation_ratio_source": source,
+            "capacity_equiv_mol_before": capacity_equiv_mol,
+            "new_bound_equiv_mol": new_bound_equiv_mol,
+            "activity_depressed_mol": activity_depressed_mol,
+            "physisorbing_mol": physisorbing_mol,
+            "retention_tier": (
+                "activity_depression_capacity"
+                if new_bound_equiv_mol > 0.0
+                else "physisorbing_only_saturation_full_or_clean_wall"
+            ),
+            "rate_law_status": "GAP_NOT_AUTHORITY",
+            "ledger_forbidden": tuple(entry.get("ledger_forbidden") or ()),
+        }
+        return diagnostic, updated_state
+
+    @staticmethod
+    def _copy_alkali_state(value: Any) -> dict[str, dict[str, Any]]:
+        if not isinstance(value, Mapping):
+            return {}
+        copied: dict[str, dict[str, Any]] = {}
+        for account, state in value.items():
+            if isinstance(state, Mapping):
+                copied[str(account)] = dict(state)
+        return copied
+
+    @staticmethod
+    def _segment_name(account: str) -> str:
+        prefix = "process.wall_deposit_segment_"
+        if account.startswith(prefix):
+            return account[len(prefix):]
+        return account
+
+    @staticmethod
+    def _alkali_forbidden_control_refusal(
+        species: str,
+        controls: Mapping[str, Any],
+        control_audit: Any,
+    ) -> IntentResult | None:
+        if species not in {"Na", "K"}:
+            return None
+        substrate_debits = controls.get("wall_substrate_debit_mol_by_account")
+        if isinstance(substrate_debits, Mapping) and any(substrate_debits.values()):
+            reason = "alkali_activity_depression_forbids_wall_substrate_debits"
+        else:
+            reason = ""
+        product_map = controls.get("wall_product_mol_by_account")
+        if not reason and isinstance(product_map, Mapping):
+            for species_mol in product_map.values():
+                if not isinstance(species_mol, Mapping):
+                    continue
+                forbidden_products = set(species_mol) - {species}
+                if forbidden_products:
+                    reason = (
+                        "alkali_activity_depression_forbids_non_elemental_products"
+                    )
+                    break
+        if not reason and controls.get("wall_oxidant_source"):
+            reason = "alkali_activity_depression_forbids_wall_oxidant"
+        if not reason:
+            return None
+        return IntentResult(
+            intent=ChemistryIntent.CONDENSATION_ROUTE,
+            status="refused",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reason": reason,
+                "reason_refused": reason,
+                "species": species,
+            },
+        )
 
     def _condensed_product_mol(
         self,
@@ -431,6 +752,44 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             running_mol += account_mol
         credited[items[-1][0]] = max(0.0, wall_deposit_mol - running_mol)
         return credited
+
+    @staticmethod
+    def _species_kg_by_account(
+        species_mol_by_account: Mapping[str, Mapping[str, float]],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+    ) -> dict[str, dict[str, float]]:
+        result: dict[str, dict[str, float]] = {}
+        for account, species_mol in species_mol_by_account.items():
+            account_kg: dict[str, float] = {}
+            for species, mol in species_mol.items():
+                if mol == 0.0:
+                    continue
+                formula = resolve_species_formula(species, registry)
+                account_kg[species] = (
+                    account_kg.get(species, 0.0)
+                    + float(mol) * formula.molar_mass_kg_per_mol()
+                )
+            if account_kg:
+                result[account] = account_kg
+        return result
+
+    @staticmethod
+    def _wall_delta_kg_by_account(
+        product_kg_by_account: Mapping[str, Mapping[str, float]],
+        substrate_kg_by_account: Mapping[str, Mapping[str, float]],
+    ) -> dict[str, dict[str, float]]:
+        result: dict[str, dict[str, float]] = {}
+        accounts = set(product_kg_by_account) | set(substrate_kg_by_account)
+        for account in accounts:
+            species_delta: dict[str, float] = {}
+            for species, kg in dict(product_kg_by_account.get(account, {})).items():
+                species_delta[species] = species_delta.get(species, 0.0) + float(kg)
+            for species, kg in dict(substrate_kg_by_account.get(account, {})).items():
+                species_delta[species] = species_delta.get(species, 0.0) - float(kg)
+            if species_delta:
+                result[account] = species_delta
+        return result
 
     @staticmethod
     def _wall_deposit_mol(

@@ -977,7 +977,15 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {})
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
-        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+        species_order = tuple(
+            getattr(route_result, 'wall_route_species_order', ()) or (
+                evap_flux.species_kg_hr.keys()
+            )
+        )
+        for species in species_order:
+            if species not in evap_flux.species_kg_hr:
+                continue
+            rate_kg_hr = evap_flux.species_kg_hr[species]
             sp_data = metals_data.get(species, {})
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
@@ -1066,6 +1074,13 @@ class EvaporationMixin:
                     route_result
                     .wall_deposit_account_fractions_by_species
                     .get(species, {})),
+                'wall_alkali_binding_diagnostic_state_by_account': dict(
+                    getattr(
+                        self.condensation_model,
+                        'wall_alkali_binding_diagnostic_state_by_account',
+                        {},
+                    )
+                ),
                 'dt_hr': 1.0,
             },
         )
@@ -1074,6 +1089,7 @@ class EvaporationMixin:
 
         diagnostic = dict(kernel_result.diagnostic or {})
         self._record_wall_deposit_delta(species, diagnostic)
+        self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
     def _record_wall_deposit_delta(
@@ -1084,6 +1100,27 @@ class EvaporationMixin:
         # Delta provenance is the committed, post-validation kernel credit.
         # CondensationRouteResult is only the pre-commit projection; Phase-O
         # coating gates need the deposition that actually landed in the ledger.
+        accounts_by_species = (
+            diagnostic.get('wall_deposit_accounts_kg_delta_by_species') or {}
+        )
+        if isinstance(accounts_by_species, Mapping):
+            for account, species_kg in accounts_by_species.items():
+                if not isinstance(species_kg, Mapping):
+                    continue
+                account_name = str(account)
+                if account_name.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
+                    segment = account_name[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
+                else:
+                    segment = account_name
+                for product_species, kg in species_kg.items():
+                    amount = float(kg)
+                    if abs(amount) <= 1e-12:
+                        continue
+                    key = (segment, str(product_species))
+                    deltas = self._last_wall_deposit_by_segment_species_delta
+                    deltas[key] = deltas.get(key, 0.0) + amount
+            return
+
         accounts_kg = diagnostic.get('credited_wall_deposit_accounts_kg') or {}
         if not isinstance(accounts_kg, Mapping):
             return
@@ -1099,6 +1136,21 @@ class EvaporationMixin:
             key = (segment, species)
             deltas = self._last_wall_deposit_by_segment_species_delta
             deltas[key] = deltas.get(key, 0.0) + amount
+
+    def _record_wall_alkali_binding_diagnostic_state(
+        self,
+        diagnostic: Mapping[str, Any],
+    ) -> None:
+        updated = diagnostic.get(
+            'wall_alkali_binding_diagnostic_state_by_account'
+        )
+        if not isinstance(updated, Mapping):
+            return
+        self.condensation_model.wall_alkali_binding_diagnostic_state_by_account = {
+            str(account): dict(state)
+            for account, state in updated.items()
+            if isinstance(state, Mapping)
+        }
 
     def _credit_evaporation_transition(
         self,
