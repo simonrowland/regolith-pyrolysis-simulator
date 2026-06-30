@@ -68,6 +68,7 @@ provider must declare every account the proposal touches
 from __future__ import annotations
 
 import math
+import warnings
 from collections.abc import Iterable, Mapping
 from typing import Any
 
@@ -524,6 +525,10 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             f"{WALL_REACTIVITY_MATRIX_PATH}::"
             f"alkali_activity_depression.{species}.saturation"
         )
+        ratio_extrapolated = bool(ratio_context.get("extrapolated"))
+        if ratio_extrapolated:
+            warning = str(ratio_context["warning"])
+            warnings.warn(warning, RuntimeWarning, stacklevel=2)
         updated_state = {
             "account": account,
             "segment_name": cls._segment_name(account),
@@ -532,6 +537,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "capacity_basis_mol": {"SiO2": sio2_basis_mol},
             "saturation_ratio_source": {species: source},
             "saturation_ratio_context": {species: ratio_context},
+            "saturation_ratio_extrapolated": {species: ratio_extrapolated},
             "authoritative": False,
         }
         diagnostic = {
@@ -543,6 +549,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "saturation_ratio": ratio,
             "saturation_ratio_source": source,
             "saturation_ratio_context": ratio_context,
+            "saturation_ratio_extrapolated": ratio_extrapolated,
             "wall_temperature_K": (
                 float(wall_temperature_K)
                 if wall_temperature_K is not None else None
@@ -599,22 +606,44 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         low, high = anchors
         temperature_K = float(wall_temperature_K)
-        if temperature_K <= low["T_K"]:
+        lo = low["T_K"]
+        hi = high["T_K"]
+        out_of_band: str | None = None
+        if temperature_K <= lo:
             ratio = low["ratio"]
             mode = "clamped_low_temperature_cold_wall"
-        elif temperature_K >= high["T_K"]:
+            if temperature_K < lo:
+                out_of_band = "below"
+        elif temperature_K >= hi:
             ratio = high["ratio"]
             mode = "clamped_high_temperature_liquidus"
+            if temperature_K > hi:
+                out_of_band = "above"
         else:
-            span = high["T_K"] - low["T_K"]
-            fraction = (temperature_K - low["T_K"]) / span
+            span = hi - lo
+            fraction = (temperature_K - lo) / span
             ratio = low["ratio"] + fraction * (high["ratio"] - low["ratio"])
             mode = "linear_temperature_band"
-        return ratio, {
+        ratio_context: dict[str, Any] = {
             "mode": mode,
             "wall_temperature_K": temperature_K,
             "anchors": anchors,
+            "validated_band_K": [lo, hi],
+            "extrapolated": out_of_band is not None,
         }
+        if out_of_band is not None:
+            reason = f"wall_T_{out_of_band}_validated_disilicate_band"
+            ratio_context.update({
+                "out_of_band": out_of_band,
+                "reason": reason,
+                "warning": (
+                    f"{species} alkali saturation_ratio extrapolated beyond "
+                    f"validated_disilicate_band_K [{lo:g}, {hi:g}] at "
+                    f"{temperature_K:.2f} K; using clamped endpoint ratio "
+                    f"{ratio:g}"
+                ),
+            })
+        return ratio, ratio_context
 
     @staticmethod
     def _na_temperature_band_anchors(

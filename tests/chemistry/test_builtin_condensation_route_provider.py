@@ -33,6 +33,7 @@ Covers:
 from __future__ import annotations
 
 import math
+import warnings
 
 import pytest
 
@@ -948,30 +949,41 @@ def test_c4b_na_saturation_ratio_interpolates_from_wall_temperature():
     )
     assert ratio == pytest.approx(0.5)
     assert context["mode"] == "clamped_low_temperature_cold_wall"
+    assert context["extrapolated"] is True
+    assert context["out_of_band"] == "below"
+    assert context["validated_band_K"] == [1062.0, 1473.0]
+    assert context["reason"] == "wall_T_below_validated_disilicate_band"
 
     ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
         "Na", na_saturation, 1062.0
     )
     assert ratio == pytest.approx(0.5)
     assert context["mode"] == "clamped_low_temperature_cold_wall"
+    assert context["extrapolated"] is False
 
     ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
         "Na", na_saturation, (1062.0 + 1473.0) / 2.0
     )
     assert ratio == pytest.approx((0.5 + 0.24) / 2.0)
     assert context["mode"] == "linear_temperature_band"
+    assert context["extrapolated"] is False
 
     ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
         "Na", na_saturation, 1473.0
     )
     assert ratio == pytest.approx(0.24)
     assert context["mode"] == "clamped_high_temperature_liquidus"
+    assert context["extrapolated"] is False
 
     ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
         "Na", na_saturation, 1800.0
     )
     assert ratio == pytest.approx(0.24)
     assert context["mode"] == "clamped_high_temperature_liquidus"
+    assert context["extrapolated"] is True
+    assert context["out_of_band"] == "above"
+    assert context["validated_band_K"] == [1062.0, 1473.0]
+    assert context["reason"] == "wall_T_above_validated_disilicate_band"
 
     k_saturation = BuiltinCondensationRouteProvider._alkali_entry("K")[
         "saturation"
@@ -1102,21 +1114,25 @@ def test_c4b_na_interpolated_saturation_is_ledger_byte_invariant(
         setpoints_data,
     )
     provider = BuiltinCondensationRouteProvider()
-    cold = provider.dispatch(_alkali_route_request(
-        sim,
-        species="Na",
-        arrival_mol=2.0,
-        wall_sio2_mol=2.0,
-        wall_temperature_K=1062.0,
-    ))
-    hot = provider.dispatch(_alkali_route_request(
-        sim,
-        species="Na",
-        arrival_mol=2.0,
-        wall_sio2_mol=2.0,
-        wall_temperature_K=1473.0,
-    ))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        cold = provider.dispatch(_alkali_route_request(
+            sim,
+            species="Na",
+            arrival_mol=2.0,
+            wall_sio2_mol=2.0,
+            wall_temperature_K=1200.0,
+        ))
+    with pytest.warns(RuntimeWarning, match="validated_disilicate_band_K"):
+        hot = provider.dispatch(_alkali_route_request(
+            sim,
+            species="Na",
+            arrival_mol=2.0,
+            wall_sio2_mol=2.0,
+            wall_temperature_K=1773.15,
+        ))
 
+    assert caught == []
     assert cold.status == hot.status == "ok"
     assert cold.transition is not None
     assert hot.transition is not None
@@ -1142,8 +1158,20 @@ def test_c4b_na_interpolated_saturation_is_ledger_byte_invariant(
     hot_diag = hot.diagnostic["wall_reaction_diagnostics_by_account"][
         "process.wall_deposit"
     ]
-    assert cold_diag["saturation_ratio"] == pytest.approx(0.5)
+    assert cold_diag["saturation_ratio_extrapolated"] is False
+    assert cold_diag["saturation_ratio_context"]["extrapolated"] is False
     assert hot_diag["saturation_ratio"] == pytest.approx(0.24)
+    assert hot_diag["saturation_ratio_extrapolated"] is True
+    hot_context = hot_diag["saturation_ratio_context"]
+    assert hot_context["extrapolated"] is True
+    assert hot_context["out_of_band"] == "above"
+    assert hot_context["validated_band_K"] == [1062.0, 1473.0]
+    assert hot_context["reason"] == "wall_T_above_validated_disilicate_band"
+    hot_state = hot.diagnostic["wall_alkali_binding_diagnostic_state_by_account"][
+        "process.wall_deposit"
+    ]
+    assert hot_state["saturation_ratio_extrapolated"]["Na"] is True
+    assert hot_state["saturation_ratio_context"]["Na"]["extrapolated"] is True
     assert cold_diag["new_bound_equiv_mol"] != pytest.approx(
         hot_diag["new_bound_equiv_mol"]
     )
