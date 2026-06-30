@@ -12,7 +12,7 @@ In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressu
 (see `\goal BACKEND-DEFAULT-SWITCH`, 2026-05-14) is:
 
 1. **AlphaMELTS** is probed first. If `is_available()` (PetThermoTools or the project-local `alphamelts` binary at `engines/alphamelts/run_alphamelts.command`, or `alphamelts` on `PATH`) — selected as the active backend.
-2. **`StubBackend`** is the always-available fallback for `auto` when AlphaMELTS is unavailable (built-in Ellingham/Antoine path inside `simulator/core.py`).
+2. **`StubBackend`** is the always-available fallback for `auto` when AlphaMELTS is unavailable (built-in Ellingham/Antoine path inside `simulator/core.py`). This is the **`internal-analytical`** model in trust-architecture vocabulary (legacy name `stub`). An explicit `backend=internal-analytical` request (alias `stub`) pins it deterministically without probing AlphaMELTS.
 3. **FactSAGE / ChemApp** is not probed. The adapter was removed/archived; explicit `backend=factsage` is an unknown backend and raises instead of falling through to `auto`.
 
 **`VapoRockBackend` and `MAGEMinBackend` are explicitly refused as the active `MeltBackend`.** Their honest call sites are now per-intent kernel `ChemistryProvider` registrations (VapoRock diagnostic shadow for `VAPOR_PRESSURE`; MAGEMin shadow for `SILICATE_LIQUIDUS` / `SILICATE_EQUILIBRIUM` under `\goal MAGEMIN-SHADOW-PARITY`), not the active-backend `_get_equilibrium` path. Selecting either as the active `MeltBackend` would still fail closed inside `simulator/core.py::_get_equilibrium` because their populated `phase_masses_kg` (MAGEMin) or vapor-only (VapoRock) returns leave `EquilibriumResult.ledger_transition=None`, which trips the "backend returned post-equilibrium phase material without an AtomLedger transition" reject. `_get_backend('vaporock')` and `_get_backend('magemin')` raise `BackendUnavailableError`. The kernel itself was carved out in `\goal CHEMISTRY-KERNEL-CARVE-OUT` and is the canonical home for the builtin-authoritative / VapoRock-shadow `VAPOR_PRESSURE` split; see the "VapoRock diagnostic shadow" section below.
@@ -122,4 +122,4 @@ See `docs-private/chemistry-engine-binding-spec-2026-05-14.md` §4 for the MAGEM
 
 FactSAGE / ChemApp support is archived/removed in this checkout. There is no live `simulator/melt_backend/factsage.py`, no `factsage_doctor`, and no supported `FACTSAGE_CONFIG` path.
 
-`backend=factsage` is an explicit unknown backend and raises a backend-selection error. Use `alphamelts`, `stub`, or the web/API `auto` path.
+`backend=factsage` is an explicit unknown backend and raises a backend-selection error. Use `alphamelts`, `internal-analytical` (the builtin analytical model; legacy alias `stub`, still accepted), or the web/API `auto` path.

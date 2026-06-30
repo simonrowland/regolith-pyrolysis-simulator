@@ -147,7 +147,7 @@ is the right tool — not a second RAM-resident model.
 |----------|----------------|-----|
 | Fidelity DOE, Book full job, high `@ hours:1` | **1** | Serial; one warm backend amortizes init across N evals in sequence |
 | Staged high eval | **1** | Study forces serial when staged (`study.py:608`) |
-| Stub / cached-real study `parallel>1` | **min(parallel, cpu)** | Embarrassingly parallel **different** evals; each worker holds one backend for **its** queue |
+| Internal-analytical (`stub`) / cached-real study `parallel>1` | **min(parallel, cpu)** | Embarrassingly parallel **different** evals; each worker holds one backend for **its** queue |
 | PT-1 precompute grind | **shard workers → merge** | Fill B-layer on miss; warm model only on cache miss path |
 
 **Do not** plan to fill 256 GB with many ThermoEngine instances for serial high-tier jobs. RAM headroom
@@ -176,7 +176,7 @@ Read-heavy `cached-real` evals remain safe; write contention is the risk during 
 1. **Mol-native ledger** — fresh `AtomLedger` per eval task.
 2. **Mass balance** ≤5e-12% — warm path must not skip commits or reuse ledger state.
 3. **Chemistry kernel authority** — AlphaMELTS/ThermoEngine diagnostic for silicate equilibrium; `commit_batch` sole writer.
-4. **Fail-loud backends** — explicit `alphamelts` failure → `BackendUnavailableAbort`, not silent stub.
+4. **Fail-loud backends** — explicit `alphamelts` failure → `BackendUnavailableAbort`, not silent `internal-analytical` (`stub`) fallback.
 5. **Determinism** — warm eval must match cold eval for same `EvalSpec` (pool determinism tests extended).
 
 ---

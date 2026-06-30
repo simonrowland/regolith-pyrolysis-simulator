@@ -18,6 +18,7 @@ from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
 from simulator.accounting import OverdraftError, resolve_species_formula
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import BackendUnavailableError, requires_stage0_subprocess
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
@@ -219,6 +220,14 @@ class RunReference:
             "product_summary",
             MappingProxyType(dict(self.product_summary)),
         )
+        # Fold the `internal-analytical` display alias onto the stable `stub`
+        # token before it reaches the fidelity-vocabulary translator below
+        # (which fail-loud rejects an unknown `internal-analytical` token) and
+        # so the stored/serialized field stays the byte-stable legacy token.
+        if self.backend_name is not None:
+            object.__setattr__(
+                self, "backend_name", canonical_backend_name(self.backend_name)
+            )
         if self.backend_status is None:
             backend_status = _backend_status_from_carrier(self.trace)
             if backend_status is not None:
@@ -249,7 +258,9 @@ class RunReference:
                 ),
             )
         canonical = canonicalize_fidelity_emission(
-            backend_name=self.backend_name or _carrier_value(self.trace, "backend_name"),
+            backend_name=canonical_backend_name(
+                self.backend_name or _carrier_value(self.trace, "backend_name")
+            ),
             backend_status=self.backend_status,
             backend_authoritative=self.backend_authoritative,
             evidence_class=self.evidence_class or _carrier_value(self.trace, "evidence_class"),
@@ -1786,7 +1797,11 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             selected = dict(raw_selected)
     merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     merged.update(selected)
-    backend_name = str(merged.get("backend_name", "stub"))
+    # Fold the `internal-analytical` display alias onto the stable `stub` token
+    # at this single run-config read so EvalSpec, session config, resolver, and
+    # the fidelity-vocabulary backend-token translator all see the legacy token
+    # (the vocabulary fail-loud rejects an unknown `internal-analytical` token).
+    backend_name = canonical_backend_name(str(merged.get("backend_name", "stub")))
     raw_cache_config = (
         merged.get("reduced_real_cache")
         if backend_name == "cached-real"

@@ -405,6 +405,65 @@ def test_web_autodetect_stub_bypasses_primary_probes():
     assert calls == ['stub']  # primaries never probed
 
 
+# ---------------------------------------------------------------------------
+# `internal-analytical` display alias (alias-preserving stub rebrand)
+# ---------------------------------------------------------------------------
+#
+# Trust-architecture vocabulary names the analytical model `internal-analytical`
+# (design-fidelity-surface-2026-06-10.md §STUB REBRAND; AGENTS.md C3). The
+# rebrand is alias-preserving: the new name is accepted on input but folds onto
+# the stable `stub` serialization token, so caches/goldens do not move and the
+# denylist (StubBackend is never authoritative) is unchanged.
+
+
+@pytest.mark.parametrize(
+    'name',
+    ['internal-analytical', 'INTERNAL-ANALYTICAL', 'internal_analytical',
+     ' internal-analytical '],
+)
+def test_internal_analytical_alias_pins_stub_backend(monkeypatch, name):
+    """``backend='internal-analytical'`` resolves exactly like ``'stub'``.
+
+    Even when AlphaMELTS is available the alias deterministically pins
+    StubBackend (it folds onto ``stub`` before the autodetect branch).
+    """
+    _install_fakes(monkeypatch, alphamelts_available=True)
+
+    backend = _get_backend(name)
+
+    assert isinstance(backend, StubBackend)
+
+
+def test_internal_analytical_alias_runner_strict_resolves_like_stub():
+    backend = resolve_backend(
+        'internal-analytical',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        stub_backend_cls=StubBackend,
+    )
+    assert isinstance(backend, StubBackend)
+
+
+def test_internal_analytical_alias_serializes_stable_stub_token_and_denylists():
+    """The alias keeps the stable `stub` token and stays non-authoritative.
+
+    requested_backend must serialize as ``stub`` (not ``internal-analytical``)
+    so existing caches/goldens are byte-stable, and the resolution must remain
+    non-authoritative so the certification denylist is preserved.
+    """
+    backend = resolve_backend(
+        'internal-analytical',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        stub_backend_cls=StubBackend,
+        log_selection=lambda selected: None,
+    )
+    resolution = backend_resolution_status(backend)
+
+    assert resolution.requested_backend == 'stub'
+    assert resolution.active_backend == 'StubBackend'
+    assert resolution.backend_status == 'unavailable'
+    assert resolution.authoritative is False
+
+
 @pytest.mark.parametrize('name', ['something-else', 'factsage', 'FactSAGE'])
 def test_unknown_backend_name_fails_loud(monkeypatch, name):
     _install_fakes(monkeypatch,

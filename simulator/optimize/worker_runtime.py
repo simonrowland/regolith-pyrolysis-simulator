@@ -7,6 +7,7 @@ import os
 import threading
 from typing import Any, Mapping
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import (
     BackendSelectionPolicy,
     requires_stage0_subprocess,
@@ -47,7 +48,7 @@ def warm_worker_runtime(
     if not warm_workers_enabled():
         clear_worker_runtime()
         return None
-    normalized = str(backend_name or "stub").strip() or "stub"
+    normalized = canonical_backend_name(str(backend_name or "stub").strip() or "stub")
     if feedstock_id is None and normalized != "stub":
         clear_worker_runtime()
         return None

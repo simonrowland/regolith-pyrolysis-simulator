@@ -8,6 +8,12 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, TypeVar
 
+from simulator.backend_names import (  # noqa: F401 - re-exported for callers
+    ANALYTICAL_BACKEND_ALIASES,
+    ANALYTICAL_BACKEND_DISPLAY_NAME,
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.corpus_version import (
     current_corpus_version,
     interoperable_corpus_versions,
@@ -437,6 +443,12 @@ def resolve_backend(
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
+    # Alias-preserving rebrand: fold `internal-analytical` onto the stable
+    # `stub` token before any name-keyed branch or serialization (requested
+    # backend, stage-0 subprocess config). Existing `stub` callers are
+    # byte-unchanged. See canonical_backend_name + the module naming note.
+    backend_name = canonical_backend_name(backend_name)
+
     subprocess_required = requires_stage0_subprocess(
         feedstock_id,
         feedstocks,
@@ -596,6 +608,9 @@ def _backend_status_message(backend: Any, *, is_stub: bool) -> str:
     if fallback_message:
         return fallback_message
     if is_stub:
+        # Serialized via BackendResolutionStatus.as_payload() -> keep this
+        # message byte-identical (golden-neutral). The `internal-analytical`
+        # display wording lives in non-serialized UI/docs only.
         return "stub backend selected; no authoritative melt result available"
     return "backend selected"
 
@@ -694,8 +709,8 @@ def _resolve_web_autodetect(
 
     if name not in ("", "auto", "stub", "alphamelts"):
         raise unavailable_error_cls(
-            f"unknown backend {name!r}; select auto, stub, alphamelts, "
-            "or cached-real"
+            f"unknown backend {name!r}; select auto, internal-analytical, "
+            "alphamelts, or cached-real (internal-analytical legacy alias: stub)"
         )
 
     # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
@@ -753,15 +768,16 @@ def _resolve_runner_strict(
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
-            "select stub, alphamelts, or cached-real"
+            "select internal-analytical, alphamelts, or cached-real "
+            "(internal-analytical legacy alias: stub)"
         )
     if name == "alphamelts":
         backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
         if backend is not None:
             return backend
         raise unavailable_error_cls(
-            "AlphaMELTS unavailable; rerun with --backend=stub or "
-            "install via install-dependencies.py"
+            "AlphaMELTS unavailable; rerun with --backend=internal-analytical "
+            "(legacy alias: stub) or install via install-dependencies.py"
         )
     if name == CACHED_REAL_BACKEND_NAME:
         return _cached_real_backend(

@@ -90,7 +90,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Stage purity report** — per-stage breakdown of designated vs impurity species mass on the condensation train, sourced from `simulator.condensation.stage_purity_report()` (canonical registry in `simulator/condensation_routing.py`). Verdict thresholds: `PURE` ≥95 % designated, `MIXED` 80–95 %, `CONTAMINATED` <80 %. Exposed verbatim on the runner output's top-level `stage_purity_report` field. See [`docs/runner-output-schema.md`](runner-output-schema.md).
 
-**StubBackend** — the always-available fallback melt backend using the builtin Ellingham/Antoine path for `auto` when AlphaMELTS is unavailable. See [`docs/melt-backends.md`](melt-backends.md).
+**StubBackend** (`internal-analytical`) — the always-available fallback melt backend using the builtin Ellingham/Antoine path for `auto` when AlphaMELTS is unavailable. In trust-architecture vocabulary it is the **`internal-analytical`** evidence class (legacy name `stub`); it is denylisted from certification gates and never holds ledger authority. The `internal-analytical` and legacy `stub` backend names are interchangeable on input and serialize as the stable `stub` token. See [`docs/melt-backends.md`](melt-backends.md).
 
 **ThermoEngine** — ENKI's Python MELTS API providing first-class melt activities via compiled Objective-C/C dylibs. Required by VapoRock. Installed by `install-engines.py` (macOS arm64 only). See [`docs/melt-backends.md`](melt-backends.md).
 

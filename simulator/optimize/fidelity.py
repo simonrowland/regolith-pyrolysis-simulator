@@ -22,6 +22,7 @@ from simulator.optimize.doe import (
     FidelityCorrelationResult,
     sample_recipe_patches,
 )
+from simulator.backend_names import canonical_backend_name
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import ObjectiveValue
 from simulator.fidelity_vocabulary import (
@@ -509,7 +510,14 @@ def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
 
 
 def _task_backend_name(task: _FidelityTask) -> str:
-    return str(_task_run_options(task).get("backend_name", "stub") or "stub")
+    # Read raw from the profile (not the EvalSpec), so fold the
+    # `internal-analytical` display alias onto the stable `stub` token here too,
+    # to stay consistent with the canonicalized EvalSpec.backend_name (otherwise
+    # a new `internal-analytical` profile would spuriously read as a `mixed:`
+    # backend against the canonicalized spec name).
+    return canonical_backend_name(
+        str(_task_run_options(task).get("backend_name", "stub") or "stub")
+    )
 
 
 def _task_run_options(task: _FidelityTask) -> dict[str, Any]:

@@ -2,7 +2,7 @@
 
 The recipe optimizer searches recipe settings for one feedstock/profile pair against the profile objectives. Use it when you want a ranked set of candidate recipes instead of one manually tuned run.
 
-It is an operator tool for recipe search. It is not a chemistry-authority switch. Backend authority still follows the simulator backend rules, and current checked-in optimizer profiles keep every fidelity choice on the stub backend.
+It is an operator tool for recipe search. It is not a chemistry-authority switch. Backend authority still follows the simulator backend rules, and current checked-in optimizer profiles keep every fidelity choice on the `internal-analytical` backend (the builtin analytical model; legacy name `stub`).
 
 Engineers who need runtime internals should read [Eval runtime architecture](architecture-eval-runtime-2026-06.md). This guide stays operator-facing.
 
@@ -14,7 +14,7 @@ Use the optimizer when you need to:
 - Search for better objective tradeoffs, such as more stored oxygen, more metal product, lower energy, or shorter duration.
 - Produce auditable artifacts: `leaderboard.csv`, `pareto.json`, `winner.recipe.yaml`, `provenance.jsonl`, and the optimizer cache database.
 
-Do not treat a stub-backed result as a real process prediction. Stub-backed studies are useful for UI, cache, profile, and workflow checks.
+Do not treat an `internal-analytical`-backed (legacy `stub`) result as a real process prediction. Internal-analytical-backed studies are useful for UI, cache, profile, and workflow checks.
 
 ## Run From The Web
 
@@ -123,10 +123,10 @@ Operator meaning:
 
 | Flag | Honest interpretation |
 | --- | --- |
-| `stub` | Fast smoke-path evaluation. Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
-| `fast` | Fast tier label. The study still checks the EvalSpec cache before running a fresh evaluation. In the checked-in profiles, this tier is also stub-backed. |
-| `high` | High tier label. Intended for real-backend work when a profile/backend config points there. In the checked-in profiles, this tier is also stub-backed. |
-| `auto` | Valid fidelity label. In the checked-in profiles, this tier is also stub-backed. |
+| `stub` | Fast smoke-path evaluation on the `internal-analytical` model (this fidelity-tier value keeps its serialized name `stub`). Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
+| `fast` | Fast tier label. The study still checks the EvalSpec cache before running a fresh evaluation. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
+| `high` | High tier label. Intended for real-backend work when a profile/backend config points there. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
+| `auto` | Valid fidelity label. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
 
 There is no literal CLI flag named `cached-real` or `real-alphamelts` in the current code. Cached reuse is controlled by the EvalSpec cache, and every fidelity can hit that cache. A cached result is only as honest as the backend that originally produced it.
 
@@ -187,7 +187,7 @@ The backend badge displays active backend and backend status, for example:
 StubBackend / unavailable
 ```
 
-Stub or diagnostic-stub results are not authoritative. A real-backend result should show a non-stub active backend and a backend status that is not `unavailable`.
+Internal-analytical results — active backend `StubBackend`, or backend status `diagnostic_stub` — are not authoritative. A real-backend result should show a non-analytical active backend and a backend status that is not `unavailable`.
 
 ### Stale Version Badge
 
@@ -221,7 +221,7 @@ If no feasible Pareto winner exists, the study writes empty artifacts and raises
 no feasible candidates; winner.recipe.yaml not written
 ```
 
-If a requested real backend is unavailable, do not reinterpret that as a successful stub run. Fix backend configuration or choose an explicitly stub-backed study.
+If a requested real backend is unavailable, do not reinterpret that as a successful `internal-analytical` (`stub`) run. Fix backend configuration or choose an explicitly `internal-analytical`-backed (legacy `stub`) study.
 
 ## Related Docs
 

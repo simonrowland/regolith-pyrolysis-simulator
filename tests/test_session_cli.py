@@ -92,6 +92,26 @@ def test_session_start_carries_c5_mre_fields_into_session():
     assert sim.melt.mre_max_voltage_V == 1.45
 
 
+def test_session_start_accepts_internal_analytical_backend_alias():
+    """`--backend internal-analytical` (any case) is accepted, serializes stable `stub`.
+
+    The CLI `type=` normalizer folds the display alias (any case / underscore
+    form) onto the stable `stub` token before `choices` validation, matching the
+    resolver's tolerance; SimSessionConfig folds again, so the start frame's
+    `backend` field stays byte-stable and it still resolves to the
+    non-authoritative StubBackend.
+    """
+    for alias in ("internal-analytical", "INTERNAL-ANALYTICAL", "internal_analytical"):
+        command = f"start feedstock=lunar_mare_low_ti backend={alias}"
+        runner = SessionScriptRunner()
+
+        frame = runner.execute(shlex.split(command), command)
+
+        assert frame["frame_type"] == "start", alias
+        assert frame["backend"] == "stub", alias
+        assert frame["backend_active"] == "StubBackend", alias
+
+
 def test_session_start_sanitizes_mre_fields_when_c5_disabled():
     command = (
         "start feedstock=lunar_mare_low_ti backend=stub "

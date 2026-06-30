@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Iterable, Mapping
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import (
     BackendSelectionPolicy,
     CACHED_REAL_BACKEND_NAME,
@@ -124,6 +125,12 @@ class SimSessionConfig:
     backend_config: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
+        # Fold the `internal-analytical` display alias onto the stable `stub`
+        # token so session config, serialized metadata, and the fidelity-
+        # vocabulary backend-token translator all see the legacy token.
+        object.__setattr__(
+            self, "backend_name", canonical_backend_name(self.backend_name)
+        )
         overrides = _canonical_runtime_campaign_overrides(
             runtime_campaign_overrides=self.runtime_campaign_overrides,
             setpoints_overrides=self.setpoints_overrides,

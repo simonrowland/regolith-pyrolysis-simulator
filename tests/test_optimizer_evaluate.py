@@ -3132,6 +3132,27 @@ def test_run_reference_derives_real_engine_canonical_class() -> None:
     assert reference.certification_allowed is True
 
 
+def test_run_reference_folds_internal_analytical_alias_to_stub() -> None:
+    """Constructing a RunReference with the display alias must not trip the
+    fidelity-vocabulary fail-loud (which rejects an unknown `internal-analytical`
+    backend token) and must fold to the stable `stub` token / same evidence
+    class as the legacy `stub` reference (alias-preserving rebrand)."""
+    aliased = evaluate_module.RunReference(
+        status="ok",
+        trace={"backend_status": "unavailable"},
+        backend_name="internal-analytical",
+    )
+    legacy = evaluate_module.RunReference(
+        status="ok",
+        trace={"backend_status": "unavailable"},
+        backend_name="stub",
+    )
+
+    assert aliased.backend_name == "stub"
+    assert aliased.evidence_class == legacy.evidence_class
+    assert aliased.certification_allowed == legacy.certification_allowed
+
+
 def test_run_reference_migrates_legacy_no_compared_results_status() -> None:
     reference = evaluate_module.RunReference(
         status="ok",

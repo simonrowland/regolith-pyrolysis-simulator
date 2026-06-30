@@ -464,11 +464,15 @@ class MeltBackend(ABC):
 
 class StubBackend(MeltBackend):
     """
-    Minimal stub backend for development and testing.
+    The builtin analytical melt backend (``internal-analytical``).
 
-    Returns empty equilibrium results.  The simulator's
-    _stub_equilibrium() method handles Antoine-equation
-    vapor pressures independently of this class.
+    Named ``internal-analytical`` in trust-architecture vocabulary; ``stub`` is
+    the legacy backend name and the stable serialization token (the class name
+    ``StubBackend`` is kept as the denylist hinge — ``backend_resolution_status``
+    keys non-authoritative status off it). Returns empty equilibrium results;
+    the simulator's ``_stub_equilibrium()`` method handles Ellingham/Antoine
+    vapor pressures independently of this class. Denylisted from certification
+    gates: it never holds ledger authority and never certifies.
     """
 
     def initialize(self, config: dict) -> bool:

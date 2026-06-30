@@ -288,7 +288,9 @@ def _get_backend(backend_name: str):
       "backend returned post-equilibrium phase material without an
       AtomLedger transition" reject).  Promotion is blocked on
       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
-    * ``'stub'`` — deterministic ``StubBackend`` selection.
+    * ``'internal-analytical'`` (legacy alias ``'stub'``) — deterministic
+      ``StubBackend`` selection. Both names fold onto the stable ``stub``
+      serialization token via ``canonical_backend_name``.
     * ``'auto'`` / unset — autodetect chain: probe
       AlphaMELTS first, falling back to ``StubBackend`` as the
       always-available primary fallback.  No silent cross-backend

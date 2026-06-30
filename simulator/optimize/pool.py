@@ -17,6 +17,7 @@ import pickle
 import tempfile
 from typing import Any
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import (
@@ -419,7 +420,9 @@ def _task_backend_name(task: _PoolTask) -> str:
         selected = fidelities.get(task.fidelity, {})
         if isinstance(selected, Mapping):
             merged.update(selected)
-    return str(merged.get("backend_name", "stub") or "stub")
+    # Fold the `internal-analytical` display alias onto the stable `stub` token
+    # (read raw from the profile; mirrors EvalSpec.backend_name canonicalization).
+    return canonical_backend_name(str(merged.get("backend_name", "stub") or "stub"))
 
 
 def _task_stage0_subprocess_required(feedstock_id: str) -> bool:

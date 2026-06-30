@@ -20,6 +20,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
+from simulator.backend_names import canonical_backend_name
 from simulator.optimize.canonical import (
     FLOAT_QUANTUM,
     CanonicalizationError,
@@ -118,6 +119,14 @@ class EvalSpec:
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
+        # Alias-preserving rebrand: fold the `internal-analytical` display name
+        # onto the stable `stub` token so a config authored with the new name
+        # produces the SAME cache key as the legacy `stub` spec and still trips
+        # the C3 stub-as-real denylist (`spec.backend_name == "stub"`). Existing
+        # `stub`/`alphamelts`/`cached-real`/`auto` specs are byte-unchanged.
+        object.__setattr__(
+            self, "backend_name", canonical_backend_name(self.backend_name)
+        )
         if not isinstance(self.hours, int):
             raise TypeError("hours must be an int")
         if not isinstance(self.mass_kg, (int, float, Decimal)):

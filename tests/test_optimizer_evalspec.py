@@ -232,6 +232,21 @@ def test_evalspec_cache_key_changes_when_allowlist_version_changes() -> None:
     )
 
 
+@pytest.mark.parametrize("alias", ["internal-analytical", "internal_analytical"])
+def test_internal_analytical_backend_name_folds_to_stable_stub_cache_key(
+    alias: str,
+) -> None:
+    """The `internal-analytical` display alias is byte-identical to `stub`.
+
+    Alias-preserving rebrand: a config authored with the new name folds onto
+    the stable `stub` serialization token, so it shares the legacy cache key
+    (caches/goldens do not move) and the canonicalized field is `stub`.
+    """
+    aliased = _base_spec(backend_name=alias)
+    assert aliased.backend_name == "stub"
+    assert cache_key(aliased) == cache_key(_base_spec(backend_name="stub"))
+
+
 def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() -> None:
     profile = _mre_cap_profile(campaign="C0")
     old_schema = RecipeSchema(allowlist_version="allowlist-old")

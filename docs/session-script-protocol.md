@@ -33,7 +33,7 @@ quoting via `shlex`, so quoted strings may contain spaces.
 
 ```text
 start --feedstock=<id> [--campaign=<phase>] [--mass-kg=<kg>]
-      [--backend=stub|alphamelts] [--track=pyrolysis|mre_baseline]
+      [--backend=internal-analytical|alphamelts] [--track=pyrolysis|mre_baseline]
       [--additive=SPECIES=KG ...] [--c4-max-temp=<C>]
       [--setpoint=CAMPAIGN.FIELD=VALUE ...]
 advance [N]
@@ -55,9 +55,11 @@ Campaign aliases include `C2A_continuous` -> `C2A` and
 `C2A_staged` -> `C2A_STAGED`; `C2A_staged.hold_temp_C` is the staged hot-hold
 operator knob.
 
-The default backend is `stub`. Backend resolution uses
-`BackendSelectionPolicy.RUNNER_STRICT`, matching the deterministic runner path.
-`factsage` is archived/removed and is rejected as an unknown backend.
+The default backend is `internal-analytical` (legacy alias `stub`; both names
+resolve identically and frames serialize the stable `stub` token in `backend`).
+Backend resolution uses `BackendSelectionPolicy.RUNNER_STRICT`, matching the
+deterministic runner path. `factsage` is archived/removed and is rejected as an
+unknown backend.
 
 ## Frames
 
@@ -268,7 +270,7 @@ first error frame terminates execution and the process exits non-zero.
 For the same script, same repository data files, and same explicit backend,
 stdout is byte-identical across runs. Determinism is enforced by:
 
-* defaulting to the deterministic `stub` backend
+* defaulting to the deterministic `internal-analytical` (`stub`) backend
 * using `RUNNER_STRICT` backend semantics
 * omitting wall-clock fields and live git metadata from frames
 * serializing compact JSON with sorted keys

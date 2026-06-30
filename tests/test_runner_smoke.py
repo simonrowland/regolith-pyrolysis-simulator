@@ -189,6 +189,20 @@ def _run_scenario(scenario: dict) -> dict:
     return run.run()
 
 
+@pytest.mark.parametrize("alias", ["internal-analytical", "internal_analytical"])
+def test_pyrolysis_run_folds_internal_analytical_alias_to_stable_stub_token(alias):
+    """A `--backend internal-analytical` run serializes the stable `stub` token.
+
+    The display alias folds onto `stub` in PyrolysisRun.__post_init__, so the
+    serialized run metadata (`"backend"`) stays the byte-stable legacy token and
+    the fidelity-vocabulary backend-token translator never sees an unknown
+    `internal-analytical` token. The runner CLI `--backend` choices accept the
+    alias.
+    """
+    run = PyrolysisRun(feedstock_id="lunar_mare_low_ti", backend_name=alias)
+    assert run.backend_name == "stub"
+
+
 def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
     schema = RecipeSchema()
     na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")

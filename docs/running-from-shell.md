@@ -35,7 +35,7 @@ stdout. Convention is to drop outputs under `runs/`.
 | `--campaign` | `C0` | campaign / recipe phase (see §4) |
 | `--hours` | `24` | simulated hours to advance |
 | `--mass-kg` | `1000.0` | batch mass |
-| `--backend` | `stub` | `stub` or `alphamelts` (see §5) |
+| `--backend` | `stub` | `internal-analytical` (legacy alias `stub`) or `alphamelts` (see §5) |
 | `--track` | `pyrolysis` | or `mre_baseline` |
 | `--additive` | *(none)* | repeatable, e.g. `--additive=C=30` |
 | `--engine` / `--engines` | *(none)* | per-intent engine override / config YAML |
@@ -130,13 +130,15 @@ accepts the alias `C2A` → `C2A_continuous`.
 
 ## 5. Backend selection (fidelity)
 
-- **`--backend stub`** (default): fast, deterministic, and *physically grounded for the
-  extraction side* — `_stub_equilibrium` uses first-principles **Ellingham oxide-stability
-  + Antoine vapor-pressure** thermodynamics (the real pO₂ / temperature / composition
-  levers, including the `SiO₂ ⇌ SiO + ½O₂` pathway). What it does **not** include is a
-  silicate-**melt solution model** — no liquidus, melt/solid phase fractions, or non-ideal
-  melt activities (`liquid_fraction` is left unsolved). So the extraction sequence and
-  product ledger are meaningful under stub; the melt-phase numbers are idealized.
+- **`--backend internal-analytical`** (legacy alias `stub`; default): fast, deterministic, and
+  *physically grounded for the extraction side* — `_stub_equilibrium` uses first-principles
+  **Ellingham oxide-stability + Antoine vapor-pressure** thermodynamics (the real pO₂ /
+  temperature / composition levers, including the `SiO₂ ⇌ SiO + ½O₂` pathway). What it does
+  **not** include is a silicate-**melt solution model** — no liquidus, melt/solid phase
+  fractions, or non-ideal melt activities (`liquid_fraction` is left unsolved). So the
+  extraction sequence and product ledger are meaningful under `internal-analytical`; the
+  melt-phase numbers are idealized. (Both names resolve to the same backend; runs serialize
+  the stable `stub` token in `backend_name`.)
 - **`--backend alphamelts`**: adds the real MELTS-family **melt solution model** on top of
   that vapor physics (liquidus, phase fractions, non-ideal activities; the diagnostic
   authority). Accurate but slow (~6+ min per equilibrium, and the liquidus search is a
@@ -162,7 +164,7 @@ accepts the alias `C2A` → `C2A_continuous`.
 |---|---|
 | `python -m simulator.optimize.cli --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {stub,fast,high,auto} --budget N` | Phase-O recipe optimizer |
 | `python scripts/populate_reduced_real_cache.py --profile <p> --feedstock <id> --campaign <c> --db <path>` | build the reduced-real equilibrium cache from real trajectories |
-| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-stub` to use stub) |
+| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-stub` to fall back to the `internal-analytical` model) |
 | `python scripts/vaporock_antoine_shadow_matrix.py` | record alphaMELTS/VapoRock vs Antoine shadow vapor pressures |
 
 ---
@@ -174,7 +176,7 @@ accepts the alias `C2A` → `C2A_continuous`.
 - **Always `./.venv/bin/python`**, not a bare `python`.
 - **Run from the repo root** so `data/` and `engines/` resolve; `--output` is relative to
   the current directory.
-- **The default backend is `stub`** — fast, with real Ellingham/Antoine *extraction*
+- **The default backend is `internal-analytical`** (legacy alias `stub`) — fast, with real Ellingham/Antoine *extraction*
   thermodynamics but **without the silicate-melt solution model**. Pass
   `--backend alphamelts` for the full melt-phase equilibrium (slow). Each run records its
   `backend_name` + a `vapor_pressure_source_report`, so the fidelity used is never hidden.

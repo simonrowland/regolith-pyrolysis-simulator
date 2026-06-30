@@ -20,7 +20,7 @@ python -m simulator.runner \
     [--additive=C=30] \
     [--engines=config/engines.yaml] \
     [--engine=vapor_pressure:builtin-vapor-pressure] \
-    [--backend=stub|alphamelts] \
+    [--backend=internal-analytical|alphamelts] \
     [--track=pyrolysis|mre_baseline] \
     [--allow-fallback-vapor] \
     [--allow-unmeasured-alpha-fallback] \
@@ -80,7 +80,7 @@ schema-shape assertion.
   "mass_kg":         1000.0,
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
-  "backend":         "stub",                 // melt backend name
+  "backend":         "stub",                 // melt backend name (the internal-analytical model; serialized as the stable `stub` token even when invoked as --backend=internal-analytical)
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
@@ -343,7 +343,7 @@ schema-shape assertion.
   artifact consumers that do not scan every hour.
 * Staged / diagnostic / real-backend runs may carry these additional
   conditionally-emitted keys on a per-hour row.  Each appears only when its
-  backing source is populated, so it is absent on a plain stub-backend run;
+  backing source is populated, so it is absent on a plain internal-analytical (`stub`) backend run;
   each is whitelisted in
   `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
   * `evap_plane_selectivity` -- emitted by

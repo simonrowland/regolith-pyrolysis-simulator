@@ -10,6 +10,7 @@ import shlex
 import sys
 from typing import Any, Iterable, Mapping, TextIO
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import BackendSelectionPolicy
 from simulator.config import load_config_bundle
 from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
@@ -105,7 +106,9 @@ class SessionScriptRunner:
             "feedstock_id": parsed.feedstock,
             "campaign": parsed.campaign,
             "mass_kg": float(parsed.mass_kg),
-            "backend": parsed.backend,
+            # Emit the canonicalized config token (folds the internal-analytical
+            # alias onto the stable `stub`), not the raw CLI arg.
+            "backend": config.backend_name,
             "backend_active": type(self.session.simulator.backend).__name__,
             "track": parsed.track,
         }
@@ -298,7 +301,10 @@ def _start_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--backend",
         default="stub",
-        choices=("stub", "alphamelts"),
+        # type folds the internal-analytical alias (any case / whitespace) onto
+        # `stub` BEFORE choices validation, matching resolver tolerance.
+        type=canonical_backend_name,
+        choices=("stub", "internal-analytical", "internal_analytical", "alphamelts"),
     )
     parser.add_argument(
         "--track",

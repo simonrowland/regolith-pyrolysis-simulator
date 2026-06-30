@@ -44,6 +44,7 @@ from typing import Any, Mapping, Optional
 
 import yaml
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import (
     BackendSelectionPolicy,
 )
@@ -737,6 +738,10 @@ class PyrolysisRun:
     reduced_real_cache: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
+        # Fold the `internal-analytical` display alias onto the stable `stub`
+        # token so the serialized run metadata (`"backend"`) and the fidelity-
+        # vocabulary backend-token translator both see the legacy token.
+        self.backend_name = canonical_backend_name(self.backend_name)
         overrides = _canonical_runtime_campaign_overrides(
             runtime_campaign_overrides=self.runtime_campaign_overrides,
             setpoints_overrides=self.setpoints_overrides,
@@ -2996,8 +3001,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mass-kg", type=float, default=None,
                         help="Batch mass in kg (default: 1000)")
     parser.add_argument("--backend", default="stub",
-                        choices=("stub", "alphamelts"),
-                        help="Melt backend selection (default: stub)")
+                        # type folds the internal-analytical alias (any case /
+                        # whitespace) onto `stub` before choices validation.
+                        type=canonical_backend_name,
+                        choices=("stub", "internal-analytical",
+                                 "internal_analytical", "alphamelts"),
+                        help="Melt backend selection (default: internal-analytical, "
+                             "legacy alias: stub)")
     parser.add_argument("--track", default="pyrolysis",
                         choices=("pyrolysis", "mre_baseline"),
                         help="Process track tag (default: pyrolysis)")
@@ -3171,7 +3181,9 @@ def main(argv: Optional[list[str]] = None) -> int:
             mass_kg=mass_kg,
             additives_kg=additives,
             track=args.track,
-            backend_name=args.backend,
+            # Failure envelope: fold the alias so even the error path serializes
+            # the stable `stub` token (the success path folds in PyrolysisRun).
+            backend_name=canonical_backend_name(args.backend),
             engines=merged,
             metadata_overrides=metadata_overrides,
         )
