@@ -29,6 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.backend_names import canonical_backend_name
 from simulator.backends import BackendSelectionPolicy
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
@@ -810,7 +811,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--profile", type=Path, default=DEFAULT_PROFILE)
     parser.add_argument("--feedstock", action="append", dest="feedstocks")
     parser.add_argument("--campaign", action="append", dest="campaigns")
-    parser.add_argument("--backend", default="alphamelts")
+    parser.add_argument("--backend", default="alphamelts", type=canonical_backend_name)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--hours", type=int, default=1)
     parser.add_argument("--mass-kg", type=float, default=1000.0)

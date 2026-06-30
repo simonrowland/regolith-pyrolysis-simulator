@@ -13,6 +13,7 @@ non-authoritative, but the harness plumbing must still execute end to end.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -62,6 +63,84 @@ def test_worker_payload_stub_path_runs_and_returns_rows():
     # C2B targets Fe (CAMPAIGN_TARGETS); every row carries the case identity.
     assert {row["target"] for row in payload["rows"]} == {"Fe"}
     assert all(row["campaign"] == "C2B" for row in payload["rows"])
+
+
+@pytest.mark.parametrize(
+    "backend",
+    ("stub", "internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
+)
+def test_stub_equivalent_backend_requires_allow_stub(backend, tmp_path):
+    with pytest.raises(SystemExit) as exc:
+        cal.main(
+            [
+                "--backend",
+                backend,
+                "--output-dir",
+                str(tmp_path / "out"),
+                "--review-dir",
+                str(tmp_path / "review"),
+            ]
+        )
+
+    assert str(exc.value) == (
+        "stub backend requires --allow-stub; not authoritative for CAL"
+    )
+
+
+@pytest.mark.parametrize(
+    "backend",
+    ("internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
+)
+def test_backend_alias_variants_parse_to_stable_stub_token(backend):
+    assert cal._parse_args(["--backend", backend]).backend == "stub"
+
+
+def test_internal_analytical_run_metadata_is_stub_non_authoritative(
+    tmp_path,
+    monkeypatch,
+):
+    def fake_run_worker_case(case, *, backend, **kwargs):
+        assert backend == "stub"
+        return {
+            "case": {"feedstock": case.feedstock, "campaign": case.campaign},
+            "backend": {"name": "StubBackend"},
+            "stop_reason": "complete",
+            "elapsed_s": 0.0,
+            "rows": [
+                {
+                    "feedstock": case.feedstock,
+                    "campaign": case.campaign,
+                    "target": "Fe",
+                    "campaign_hour": hour,
+                    "hour_index": hour - 1,
+                    "completeness": completeness,
+                }
+                for hour, completeness in ((1, 0.2), (2, 0.8), (3, 0.9))
+            ],
+        }
+
+    monkeypatch.setattr(cal, "_run_worker_case", fake_run_worker_case)
+
+    rc = cal.main(
+        [
+            "--backend",
+            "internal-analytical",
+            "--allow-stub",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C2B",
+            "--output-dir",
+            str(tmp_path / "out"),
+            "--review-dir",
+            str(tmp_path / "review"),
+        ]
+    )
+
+    assert rc == 0
+    payload = json.loads((tmp_path / "out" / "raw_curves.json").read_text())
+    assert payload["metadata"]["backend"] == "stub"
+    assert payload["metadata"]["backend_fidelity"] == "stub-non-authoritative"
 
 
 def test_worker_payload_requires_exactly_one_feedstock():

@@ -3,6 +3,7 @@ import importlib.util
 import json
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -218,6 +219,42 @@ def _patch_common(monkeypatch, emitted):
     monkeypatch.setattr(driver, "_magemin_status", lambda: {"available": True})
     monkeypatch.setattr(driver, "_full_population_command", lambda args, profile_path: "full")
     monkeypatch.setattr(driver, "_emit", lambda result, json_out: emitted.append(result))
+
+
+@pytest.mark.parametrize(
+    "backend",
+    ("stub", "internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
+)
+def test_stub_equivalent_backend_cannot_populate_reduced_real_cache(
+    tmp_path,
+    monkeypatch,
+    backend,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    monkeypatch.setattr(
+        driver,
+        "load_config_bundle",
+        lambda: SimpleNamespace(setpoints={"chemistry_kernel": {}}),
+    )
+
+    with pytest.raises(RuntimeError) as exc:
+        driver.main(
+            [
+                "--profile",
+                "unused",
+                "--db",
+                str(tmp_path / "target.db"),
+                "--backend",
+                backend,
+            ]
+        )
+
+    assert str(exc.value) == (
+        "stub backend cannot populate the PT-1 reduced-real cache; "
+        "use --backend alphamelts --require-magemin"
+    )
+    assert emitted == []
 
 
 def test_multi_feedstock_run_resolves_additives_per_feedstock_in_replay(

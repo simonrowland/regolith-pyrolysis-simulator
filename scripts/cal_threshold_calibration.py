@@ -23,6 +23,11 @@ from typing import Any, Iterable
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.backend_names import canonical_backend_name
+
 DEFAULT_OUTPUT_DIR = (
     REPO_ROOT / "docs-private" / "research" / "2026-06-03-cal-calibration"
 )
@@ -665,7 +670,7 @@ def _worker_result(
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--backend", default="alphamelts")
+    parser.add_argument("--backend", default="alphamelts", type=canonical_backend_name)
     parser.add_argument("--allow-stub", action="store_true")
     parser.add_argument("--feedstock", action="append", dest="feedstocks")
     parser.add_argument("--include-optional-feedstocks", action="store_true")
