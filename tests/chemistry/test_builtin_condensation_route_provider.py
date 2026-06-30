@@ -170,6 +170,45 @@ def _assert_atom_proof_closed(proposal) -> None:
         )
 
 
+def _alkali_route_request(
+    sim,
+    *,
+    species: str = "Na",
+    arrival_mol: float = 1.0,
+    wall_sio2_mol: float = 2.0,
+    wall_temperature_K: float = 1062.0,
+    state: dict | None = None,
+) -> IntentRequest:
+    mw = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    return IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: arrival_mol},
+                "process.wall_deposit": {"SiO2": wall_sio2_mol},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": arrival_mol * mw,
+            "sp_data": {},
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {},
+            "wall_temperature_K": wall_temperature_K,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": wall_temperature_K,
+            },
+            "wall_alkali_binding_diagnostic_state_by_account": state or {},
+            "dt_hr": 1.0,
+        },
+    )
+
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------
@@ -830,6 +869,10 @@ def test_c4b_mg_wall_reaction_consumes_sio2_and_caps_residual_mg(
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
             "wall_deposit_account_fractions": {},
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1062.0,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -896,6 +939,50 @@ def test_c4b_fe_wall_reaction_forms_fesi_only_against_free_si(
     _assert_atom_proof_closed(proposal)
 
 
+def test_c4b_na_saturation_ratio_interpolates_from_wall_temperature():
+    na_saturation = BuiltinCondensationRouteProvider._alkali_entry("Na")[
+        "saturation"
+    ]
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "Na", na_saturation, 900.0
+    )
+    assert ratio == pytest.approx(0.5)
+    assert context["mode"] == "clamped_low_temperature_cold_wall"
+
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "Na", na_saturation, 1062.0
+    )
+    assert ratio == pytest.approx(0.5)
+    assert context["mode"] == "clamped_low_temperature_cold_wall"
+
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "Na", na_saturation, (1062.0 + 1473.0) / 2.0
+    )
+    assert ratio == pytest.approx((0.5 + 0.24) / 2.0)
+    assert context["mode"] == "linear_temperature_band"
+
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "Na", na_saturation, 1473.0
+    )
+    assert ratio == pytest.approx(0.24)
+    assert context["mode"] == "clamped_high_temperature_liquidus"
+
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "Na", na_saturation, 1800.0
+    )
+    assert ratio == pytest.approx(0.24)
+    assert context["mode"] == "clamped_high_temperature_liquidus"
+
+    k_saturation = BuiltinCondensationRouteProvider._alkali_entry("K")[
+        "saturation"
+    ]
+    ratio, context = BuiltinCondensationRouteProvider._alkali_saturation_ratio(
+        "K", k_saturation, None
+    )
+    assert ratio == pytest.approx(0.5)
+    assert context["mode"] == "fixed_nominal_cold_wall"
+
+
 @pytest.mark.parametrize("species,equivalent", [("Na", "Na2O"), ("K", "K2O")])
 def test_c4b_alkali_wall_reaction_credits_elemental_only(
     species, equivalent, vapor_pressure_data, feedstocks_data, setpoints_data
@@ -927,6 +1014,10 @@ def test_c4b_alkali_wall_reaction_credits_elemental_only(
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
             "wall_deposit_account_fractions": {},
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1062.0,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -966,31 +1057,15 @@ def test_c4b_alkali_diagnostic_saturation_does_not_change_ledger_mol(
         setpoints_data,
     )
     provider = BuiltinCondensationRouteProvider()
-    mw_na = resolve_species_formula(
-        "Na", sim.species_formula_registry
-    ).molar_mass_kg_per_mol()
 
     def _proposal_with_state(state):
-        request = IntentRequest(
-            intent=ChemistryIntent.CONDENSATION_ROUTE,
-            account_view=ProviderAccountView(
-                accounts={
-                    "process.overhead_gas": {"Na": 3.0},
-                    "process.wall_deposit": {"SiO2": 1.0, "Na": 50.0},
-                },
-                species_formula_registry=sim.species_formula_registry,
-            ),
-            temperature_C=1100.0,
-            pressure_bar=1e-6,
-            control_inputs={
-                "species": "Na",
-                "condensed_kg": 1.0 * mw_na,
-                "sp_data": {},
-                "wall_deposit_fraction": 1.0,
-                "wall_deposit_account_fractions": {},
-                "wall_alkali_binding_diagnostic_state_by_account": state,
-                "dt_hr": 1.0,
-            },
+        request = _alkali_route_request(
+            sim,
+            species="Na",
+            arrival_mol=1.0,
+            wall_sio2_mol=1.0,
+            wall_temperature_K=1062.0,
+            state=state,
         )
         return provider.dispatch(request)
 
@@ -1017,7 +1092,66 @@ def test_c4b_alkali_diagnostic_saturation_does_not_change_ledger_mol(
     assert sat_diag["new_bound_equiv_mol"] == pytest.approx(0.0)
 
 
-def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions():
+def test_c4b_na_interpolated_saturation_is_ledger_byte_invariant(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    cold = provider.dispatch(_alkali_route_request(
+        sim,
+        species="Na",
+        arrival_mol=2.0,
+        wall_sio2_mol=2.0,
+        wall_temperature_K=1062.0,
+    ))
+    hot = provider.dispatch(_alkali_route_request(
+        sim,
+        species="Na",
+        arrival_mol=2.0,
+        wall_sio2_mol=2.0,
+        wall_temperature_K=1473.0,
+    ))
+
+    assert cold.status == hot.status == "ok"
+    assert cold.transition is not None
+    assert hot.transition is not None
+    assert cold.transition.debits == hot.transition.debits
+    assert cold.transition.credits == hot.transition.credits
+    assert cold.transition.atom_balance_proof == hot.transition.atom_balance_proof
+    authoritative_diagnostic_keys = (
+        "credited_condensed_kg",
+        "credited_wall_deposit_kg",
+        "credited_wall_deposit_accounts_kg",
+        "wall_deposit_accounts_kg_by_species",
+        "wall_substrate_debit_accounts_kg_by_species",
+        "wall_deposit_accounts_kg_delta_by_species",
+        "wall_reaction_products_by_account_species_mol",
+        "wall_reaction_substrate_debits_by_account_species_mol",
+    )
+    for key in authoritative_diagnostic_keys:
+        assert cold.diagnostic[key] == hot.diagnostic[key]
+
+    cold_diag = cold.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]
+    hot_diag = hot.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]
+    assert cold_diag["saturation_ratio"] == pytest.approx(0.5)
+    assert hot_diag["saturation_ratio"] == pytest.approx(0.24)
+    assert cold_diag["new_bound_equiv_mol"] != pytest.approx(
+        hot_diag["new_bound_equiv_mol"]
+    )
+
+
+def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
     assert _wall_route_species_order(("K", "Fe", "SiO", "Na", "Mg")) == (
         C4B_WALL_ROUTE_ORDER
     )
@@ -1027,6 +1161,89 @@ def test_c4b_route_order_is_deterministic_for_cross_species_wall_reactions():
         "Ti",
         "Ca",
     )
+
+    rates = {"SiO": 2e-9, "Mg": 1e-9, "Fe": 1e-9, "Na": 1e-9, "K": 1e-9}
+    first_account, second_account = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[:2]
+
+    def _committed_result(species_order, account_order):
+        sim = _build_sim(
+            "lunar_mare_low_ti",
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+        )
+        segment_by_account = {
+            segment.wall_deposit_account: segment
+            for segment in sim.condensation_model.pipe_segments
+        }
+        ordered_segments = [
+            segment_by_account[account] for account in account_order
+        ]
+        ordered_segments.extend(
+            segment
+            for segment in sim.condensation_model.pipe_segments
+            if segment.wall_deposit_account not in account_order
+        )
+        sim.condensation_model.pipe_segments = ordered_segments
+
+        def _route(evap_flux, melt):
+            account_fractions = {account_order[0]: 0.5, account_order[1]: 0.5}
+            return CondensationRouteResult(
+                remaining_by_species={
+                    species: 0.0 for species in evap_flux.species_kg_hr
+                },
+                condensed_by_stage_species={},
+                wall_deposit_by_species=dict(evap_flux.species_kg_hr),
+                wall_deposit_fraction_by_species={
+                    species: 1.0 for species in evap_flux.species_kg_hr
+                },
+                wall_deposit_account_fractions_by_species={
+                    species: dict(account_fractions)
+                    for species in evap_flux.species_kg_hr
+                },
+                wall_route_species_order=_wall_route_species_order(
+                    evap_flux.species_kg_hr.keys()
+                ),
+            )
+
+        sim.condensation_model.route = _route
+        before_count = len(sim.atom_ledger.transitions)
+        sim._route_to_condensation(EvaporationFlux(
+            species_kg_hr={species: rates[species] for species in species_order},
+            total_kg_hr=sum(rates.values()),
+        ))
+
+        def _lots(lots):
+            return tuple(
+                (
+                    lot.account,
+                    dict(sorted(lot.species_kg.items())),
+                    dict(sorted((lot.meta.get("species_mol") or {}).items())),
+                )
+                for lot in sorted(lots, key=lambda item: item.account)
+            )
+
+        transitions = tuple(
+            (
+                transition.name,
+                transition.reason,
+                _lots(transition.debits),
+                _lots(transition.credits),
+            )
+            for transition in sim.atom_ledger.transitions[before_count:]
+        )
+        return sim.atom_ledger.mol_by_account(), transitions
+
+    canonical = _committed_result(
+        ("SiO", "Mg", "Fe", "Na", "K"),
+        (first_account, second_account),
+    )
+    shuffled = _committed_result(
+        ("K", "Fe", "SiO", "Na", "Mg"),
+        (second_account, first_account),
+    )
+
+    assert shuffled == canonical
 
 
 def test_fesi_species_catalog_lookup(feedstocks_data, vapor_pressure_data, setpoints_data):

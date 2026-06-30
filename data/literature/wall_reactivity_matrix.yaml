@@ -54,7 +54,7 @@ alkali_activity_depression:
       nominal_cold_wall: 0.5
       temperature_band:
         - {T_K: 1473, ratio: 0.24, meaning: liquidus_SiO2_saturated}
-        - {regime: cold_wall_disilicate, ratio: 0.5}
+        - {T_K: 1062, regime: cold_wall_disilicate, ratio: 0.5, meaning: solid_disilicate_quartz_limit, citation: "Kracek 1930 DOI 10.1021/j150313a018; docs-private/research/2026-07-01-c4b-design/REVISION-1.md cold-wall 789C/1062K anchor"}
       primary_anchor:
         compound: Na2O.2SiO2
         ratio: 0.5

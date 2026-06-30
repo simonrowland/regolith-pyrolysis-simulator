@@ -1097,6 +1097,14 @@ class EvaporationMixin:
                     route_result
                     .wall_deposit_account_fractions_by_species
                     .get(species, {})),
+                'wall_temperature_K': float(
+                    self.condensation_model.wall_temperature_C) + 273.15,
+                'wall_deposit_account_temperatures_K': {
+                    segment.wall_deposit_account: (
+                        float(segment.wall_temperature_C) + 273.15
+                    )
+                    for segment in self.condensation_model.pipe_segments
+                },
                 'wall_alkali_binding_diagnostic_state_by_account': dict(
                     getattr(
                         self.condensation_model,

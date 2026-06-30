@@ -433,6 +433,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         arrival_mol,
                         account_state,
                         alkali_state_by_account.get(account),
+                        self._wall_temperature_K(controls, account),
                     )
                 )
             else:
@@ -497,10 +498,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         arrival_mol: float,
         account_state: Mapping[str, float],
         prior_state: Mapping[str, Any] | None,
+        wall_temperature_K: float | None,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         entry = cls._alkali_entry(species)
         saturation = entry["saturation"]
-        ratio = float(saturation["nominal_cold_wall"])
+        ratio, ratio_context = cls._alkali_saturation_ratio(
+            species,
+            saturation,
+            wall_temperature_K,
+        )
         equivalent = str(entry["diagnostic_equivalent"])
         prior = dict(prior_state or {})
         prior_bound = dict(prior.get("bound_alkali_equiv_mol") or {})
@@ -525,6 +531,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "bound_alkali_equiv_mol": prior_bound,
             "capacity_basis_mol": {"SiO2": sio2_basis_mol},
             "saturation_ratio_source": {species: source},
+            "saturation_ratio_context": {species: ratio_context},
             "authoritative": False,
         }
         diagnostic = {
@@ -535,6 +542,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "diagnostic_equivalent": equivalent,
             "saturation_ratio": ratio,
             "saturation_ratio_source": source,
+            "saturation_ratio_context": ratio_context,
+            "wall_temperature_K": (
+                float(wall_temperature_K)
+                if wall_temperature_K is not None else None
+            ),
             "capacity_equiv_mol_before": capacity_equiv_mol,
             "new_bound_equiv_mol": new_bound_equiv_mol,
             "activity_depressed_mol": activity_depressed_mol,
@@ -548,6 +560,86 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "ledger_forbidden": tuple(entry.get("ledger_forbidden") or ()),
         }
         return diagnostic, updated_state
+
+    @staticmethod
+    def _wall_temperature_K(
+        controls: Mapping[str, Any],
+        account: str,
+    ) -> float | None:
+        account_temperatures = controls.get("wall_deposit_account_temperatures_K")
+        if isinstance(account_temperatures, Mapping) and account in account_temperatures:
+            value = account_temperatures[account]
+        else:
+            value = controls.get("wall_temperature_K")
+        try:
+            temperature_K = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(temperature_K):
+            return None
+        return temperature_K
+
+    @classmethod
+    def _alkali_saturation_ratio(
+        cls,
+        species: str,
+        saturation: Mapping[str, Any],
+        wall_temperature_K: float | None,
+    ) -> tuple[float, dict[str, Any]]:
+        if species != "Na":
+            return float(saturation["nominal_cold_wall"]), {
+                "mode": "fixed_nominal_cold_wall",
+                "proxy_gap": saturation.get("temperature_band_status"),
+            }
+
+        anchors = cls._na_temperature_band_anchors(saturation)
+        if wall_temperature_K is None:
+            raise ValueError(
+                "Na alkali saturation interpolation requires wall_temperature_K"
+            )
+        low, high = anchors
+        temperature_K = float(wall_temperature_K)
+        if temperature_K <= low["T_K"]:
+            ratio = low["ratio"]
+            mode = "clamped_low_temperature_cold_wall"
+        elif temperature_K >= high["T_K"]:
+            ratio = high["ratio"]
+            mode = "clamped_high_temperature_liquidus"
+        else:
+            span = high["T_K"] - low["T_K"]
+            fraction = (temperature_K - low["T_K"]) / span
+            ratio = low["ratio"] + fraction * (high["ratio"] - low["ratio"])
+            mode = "linear_temperature_band"
+        return ratio, {
+            "mode": mode,
+            "wall_temperature_K": temperature_K,
+            "anchors": anchors,
+        }
+
+    @staticmethod
+    def _na_temperature_band_anchors(
+        saturation: Mapping[str, Any],
+    ) -> tuple[dict[str, float], dict[str, float]]:
+        band = saturation.get("temperature_band")
+        if not isinstance(band, Iterable):
+            raise ValueError("Na saturation temperature_band is missing")
+        anchors: list[dict[str, float]] = []
+        for entry in band:
+            if not isinstance(entry, Mapping):
+                continue
+            if "T_K" not in entry or "ratio" not in entry:
+                continue
+            temperature_K = float(entry["T_K"])
+            ratio = float(entry["ratio"])
+            if not math.isfinite(temperature_K) or not math.isfinite(ratio):
+                raise ValueError("Na saturation temperature_band has non-finite values")
+            anchors.append({"T_K": temperature_K, "ratio": ratio})
+        if len(anchors) != 2:
+            raise ValueError(
+                "Na saturation temperature_band requires exactly two T_K anchors"
+            )
+        anchors.sort(key=lambda anchor: anchor["T_K"])
+        return anchors[0], anchors[1]
 
     @staticmethod
     def _copy_alkali_state(value: Any) -> dict[str, dict[str, Any]]:

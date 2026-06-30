@@ -521,6 +521,11 @@ def test_provider_routes_configured_lab_surface_accounts() -> None:
                 holder_account: 0.25,
                 condenser_account: 0.75,
             },
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {
+                holder_account: 1062.0,
+                condenser_account: 1062.0,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -564,6 +569,8 @@ def test_provider_wall_deposit_authority_is_instance_scoped_poison_pair() -> Non
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
             "wall_deposit_account_fractions": {holder_account: 1.0},
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {holder_account: 1062.0},
             "dt_hr": 1.0,
         },
     )
@@ -624,6 +631,8 @@ def test_simulator_wall_deposit_authority_does_not_cross_instances() -> None:
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
             "wall_deposit_account_fractions": {holder_account: 1.0},
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {holder_account: 1062.0},
             "dt_hr": 1.0,
         },
     )
