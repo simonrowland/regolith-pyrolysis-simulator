@@ -542,7 +542,7 @@ oxide_vapors:
         prior_scalar:
           value: 0.04
           source: "REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
-      source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient; microscopic reversibility applies the same alpha_s(T) bound to condensation/sticking."
+      source: "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited SiO evaporation coefficient. HOT evaporation interface uses alpha_s(T) at source T; microscopic reversibility applies there. COLD-WALL condensation below valid_range_K floor uses the grounded Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation coefficient; alpha_e != alpha_c off-equilibrium at high supersaturation."
       T_band_K: [1000, 1800]
       envelope: [0.003, 0.067]
       tier: 2

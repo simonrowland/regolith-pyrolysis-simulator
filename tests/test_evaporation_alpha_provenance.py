@@ -103,8 +103,12 @@ EXPECTED_ALPHA = {
         "source": (
             "Wetzel & Gail 2013 A&A 553 A92 Arrhenius compilation "
             "alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited "
-            "SiO evaporation coefficient; microscopic reversibility applies "
-            "the same alpha_s(T) bound to condensation/sticking."
+            "SiO evaporation coefficient. HOT evaporation interface uses "
+            "alpha_s(T) at source T; microscopic reversibility applies there. "
+            "COLD-WALL condensation below valid_range_K floor uses the grounded "
+            "Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096 unity condensation "
+            "coefficient; alpha_e != alpha_c off-equilibrium at high "
+            "supersaturation."
         ),
         "tier": 2,
     },
