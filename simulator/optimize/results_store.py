@@ -640,6 +640,8 @@ def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) 
 
 
 def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
+    if not scored_result.feasible:
+        return
     reasons: list[str] = []
     backend_status = _artifact_backend_status(scored_result)
     backend_authoritative = _artifact_backend_authoritative(scored_result)
@@ -648,7 +650,7 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
     closure_rejection = _mass_balance_closure_rejection(scored_result)
     if closure_rejection is not None:
         reasons.append(closure_rejection)
-    if scored_result.feasible and _has_out_of_domain_provenance(scored_result):
+    if _has_out_of_domain_provenance(scored_result):
         reasons.append("out_of_domain_provenance")
     if reasons:
         raise ResultStoreWriteRejected(reasons)

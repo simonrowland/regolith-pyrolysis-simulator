@@ -623,6 +623,41 @@ def test_store_rejects_inadmissible_cache_writes_reason_coded_and_unwritten(
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 0
 
 
+@pytest.mark.parametrize(
+    "result_blob",
+    (
+        {"backend_authoritative": False},
+        {"snapshots": [{"mass_balance_error_pct": 1.0e-8}]},
+    ),
+)
+def test_store_accepts_non_feasible_provenance_rows_with_poison_truth_markers(
+    tmp_path,
+    result_blob: Mapping[str, object],
+) -> None:
+    spec = _base_spec()
+    trace = _admissible_trace(result_blob)
+    scored = replace(
+        _infeasible(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=trace,
+            product_summary={"oxygen_kg": 0.0},
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    store.store(spec, scored, created_at="2026-01-01T00:00:00Z")
+
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.feasible is False
+    assert loaded.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.trace == trace
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
+
+
 def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
     tmp_path,
 ) -> None:

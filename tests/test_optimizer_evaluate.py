@@ -43,7 +43,7 @@ from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
-from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
+from simulator.optimize.results_store import ResultStore
 from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
@@ -2845,23 +2845,28 @@ def test_out_of_domain_crash_provenance_round_trips_results_store(tmp_path) -> N
         executor=FakeExecutor(
             _execution(
                 backend_status="out_of_domain",
-                backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+                backend_diagnostics=_crash_diagnostics(temperature_C=1300.0),
                 freeze_curve=_kernel_curve(),
             )
         ),
     )
     assert result.eval_spec is not None
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
     store = ResultStore(
         tmp_path / "results.sqlite",
         current_code_version=result.eval_spec.code_version,
         current_data_digests=result.eval_spec.data_digests,
     )
 
-    with pytest.raises(ResultStoreWriteRejected) as exc_info:
-        store.store(result.eval_spec, result, created_at="2026-06-09T00:00:00Z")
+    store.store(result.eval_spec, result, created_at="2026-06-09T00:00:00Z")
 
-    assert "out_of_domain_provenance" in exc_info.value.reasons
-    assert store.lookup(result.eval_spec) is None
+    loaded = store.lookup(result.eval_spec)
+    assert loaded is not None
+    assert loaded.feasible is False
+    assert loaded.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.backend_status == "out_of_domain"
 
 
 def test_real_backend_ok_but_non_authoritative_aborts_as_backend_unavailable() -> None:
