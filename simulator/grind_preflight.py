@@ -18,6 +18,60 @@ class GrindSourceGateError(RuntimeError):
     """Strict grind source-policy violation."""
 
 
+def assert_grind_feedstock_stage0_route_coverage(
+    feedstock_ids: Sequence[str],
+    feedstocks: Mapping[str, Any] | None,
+    *,
+    backend_name: str,
+    context: str,
+) -> None:
+    violations = grind_feedstock_stage0_route_coverage_violations(
+        feedstock_ids,
+        feedstocks,
+        backend_name=backend_name,
+    )
+    if violations:
+        raise GrindSourceGateError(
+            f"{context}: grind_stage0_route_coverage requires every grind "
+            "feedstock to be subprocess-routed or explicitly out_of_domain; "
+            + "; ".join(violations)
+        )
+
+
+def grind_feedstock_stage0_route_coverage_violations(
+    feedstock_ids: Sequence[str],
+    feedstocks: Mapping[str, Any] | None,
+    *,
+    backend_name: str,
+) -> list[str]:
+    from simulator.backends import (
+        real_backend_feedstock_domain_reason,
+        requires_stage0_subprocess,
+    )
+
+    violations: list[str] = []
+    seen: set[str] = set()
+    for raw_id in feedstock_ids:
+        feedstock_id = str(raw_id or "").strip()
+        if not feedstock_id or feedstock_id in seen:
+            continue
+        seen.add(feedstock_id)
+        if requires_stage0_subprocess(feedstock_id, feedstocks):
+            continue
+        out_of_domain_reason = real_backend_feedstock_domain_reason(
+            backend_name,
+            feedstock_id,
+            feedstocks,
+        )
+        if out_of_domain_reason is not None:
+            continue
+        if not isinstance(feedstocks, Mapping) or feedstock_id not in feedstocks:
+            violations.append(f"{feedstock_id}: missing feedstock catalog entry")
+        else:
+            violations.append(f"{feedstock_id}: neither subprocess-routed nor out_of_domain")
+    return violations
+
+
 def assert_strict_vapor_config(
     config: Mapping[str, Any] | None,
     *,

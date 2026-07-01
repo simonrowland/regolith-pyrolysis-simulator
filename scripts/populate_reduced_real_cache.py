@@ -43,6 +43,7 @@ from simulator.reduced_real_determinism import (
 )
 from simulator.grind_preflight import (
     GrindSourceGateError,
+    assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
     assert_strict_vapor_pt1_row,
     assert_strict_vapor_source_report,
@@ -871,6 +872,12 @@ def main(argv: list[str]) -> int:
         }
         _emit(result, args.json_out)
         return 2
+    assert_grind_feedstock_stage0_route_coverage(
+        [str(feedstock) for feedstock in feedstocks],
+        getattr(cfg, "feedstocks", {}) or {},
+        backend_name=str(args.backend),
+        context="populate_reduced_real_cache",
+    )
 
     args.db.parent.mkdir(parents=True, exist_ok=True)
     live_results = []

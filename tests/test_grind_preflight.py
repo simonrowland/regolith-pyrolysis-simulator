@@ -8,6 +8,7 @@ import pytest
 
 from simulator.grind_preflight import (
     GrindSourceGateError,
+    assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
     assert_strict_vapor_result_payload,
     assert_strict_vapor_result_store,
@@ -31,6 +32,43 @@ def _source_report(source: str = "builtin_authoritative") -> dict[str, object]:
         "summary": {source: {"count": 2, "percentage": 100.0}},
         "total_species": 2,
     }
+
+
+def test_stage0_route_coverage_accepts_subprocess_or_out_of_domain() -> None:
+    feedstocks = {
+        "covered": {"stage0_verdict_b_subprocess_required": True},
+        "metallic_ood": {"composition_wt_pct": {"Fe": 100.0}},
+    }
+
+    assert_grind_feedstock_stage0_route_coverage(
+        ["covered", "metallic_ood"],
+        feedstocks,
+        backend_name="alphamelts",
+        context="test-grind",
+    )
+
+
+def test_stage0_route_coverage_rejects_uncovered_grind_feedstock() -> None:
+    feedstocks = {
+        "interwindow": {
+            "composition_wt_pct": {
+                "SiO2": 42.0,
+                "Al2O3": 12.0,
+                "FeO": 12.0,
+                "MgO": 18.0,
+                "TiO2": 0.3,
+                "CaO": 10.0,
+            }
+        }
+    }
+
+    with pytest.raises(GrindSourceGateError, match="interwindow"):
+        assert_grind_feedstock_stage0_route_coverage(
+            ["interwindow"],
+            feedstocks,
+            backend_name="alphamelts",
+            context="test-grind",
+        )
 
 
 def _write_result_store(

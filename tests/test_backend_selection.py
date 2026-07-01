@@ -35,6 +35,10 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.config import load_config_bundle
+from simulator.grind_preflight import (
+    GrindSourceGateError,
+    assert_grind_feedstock_stage0_route_coverage,
+)
 from simulator.melt_backend.base import StubBackend
 from web.events import BackendUnavailableError, _get_backend
 
@@ -293,6 +297,52 @@ def test_spinel_composition_route_predicate_separates_hang_from_safe_catalog():
         perchlorate_composition_only,
     )
     assert requires_stage0_subprocess("mars_perchlorate_rich", feedstocks)
+
+
+def test_catalog_has_no_clean_total_spinel_former_ceiling() -> None:
+    feedstocks = load_config_bundle().feedstocks
+    oxides = ("Cr2O3", "Al2O3", "FeO", "MgO", "TiO2")
+
+    def total(feedstock_id: str) -> float:
+        composition = feedstocks[feedstock_id]["composition_wt_pct"]
+        return sum(float(composition.get(oxide, 0.0) or 0.0) for oxide in oxides)
+
+    hang_floor = min(total(feedstock_id) for feedstock_id in SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS)
+    overlapping_safe = {
+        feedstock_id
+        for feedstock_id in NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS
+        if total(feedstock_id) >= hang_floor
+    }
+
+    assert hang_floor == pytest.approx(38.9)
+    assert {"mars_global_mgs1", "lunar_spa_kreep_influenced"} <= overlapping_safe
+
+
+def test_interwindow_spinel_case_is_launch_preflight_not_predicate() -> None:
+    synthetic_feedstocks = {
+        "interwindow_spinel_rich": {
+            "composition_wt_pct": {
+                "SiO2": 42.0,
+                "Al2O3": 12.0,
+                "FeO": 12.0,
+                "MgO": 18.0,
+                "TiO2": 0.3,
+                "CaO": 10.0,
+            }
+        }
+    }
+
+    assert not requires_stage0_subprocess(
+        "interwindow_spinel_rich",
+        synthetic_feedstocks,
+    )
+    with pytest.raises(GrindSourceGateError, match="interwindow_spinel_rich"):
+        assert_grind_feedstock_stage0_route_coverage(
+            ["interwindow_spinel_rich"],
+            synthetic_feedstocks,
+            backend_name="alphamelts",
+            context="test-grind",
+        )
 
 
 def test_real_grind_feedstock_resolution_forces_subprocess_from_data():

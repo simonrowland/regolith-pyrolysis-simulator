@@ -191,6 +191,119 @@ def test_launch_preflight_rejects_fallback_enabled_global_setpoints(
         )
 
 
+def test_launch_preflight_rejects_uncovered_feedstock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = tmp_path / "profile.json"
+    job = {
+        "id": "gap",
+        "feedstock": "interwindow",
+        "profile": str(profile),
+        "budget": 8,
+        "strategy": "random",
+        "seed": 3,
+        "out": "runs/gap",
+    }
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=[job]))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    bundle = type(
+        "Bundle",
+        (),
+        {
+            "setpoints": {"chemistry_kernel": {}},
+            "feedstocks": {
+                "interwindow": {
+                    "composition_wt_pct": {
+                        "SiO2": 42.0,
+                        "Al2O3": 12.0,
+                        "FeO": 12.0,
+                        "MgO": 18.0,
+                        "TiO2": 0.3,
+                        "CaO": 10.0,
+                    }
+                }
+            },
+        },
+    )()
+    monkeypatch.setattr(epoch_grind, "load_config_bundle", lambda *args, **kwargs: bundle)
+
+    with pytest.raises(epoch_grind.GrindSourceGateError, match="interwindow"):
+        epoch_grind.run_driver(
+            manifest,
+            config,
+            journal_path=tmp_path / "journal.json",
+            dry_run=True,
+        )
+
+
+def test_launch_preflight_accepts_covered_or_out_of_domain_feedstocks(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    profile = tmp_path / "profile.json"
+    jobs = [
+        {
+            "id": "covered",
+            "feedstock": "covered",
+            "profile": str(profile),
+            "budget": 8,
+            "strategy": "random",
+            "seed": 3,
+            "out": "runs/covered",
+        },
+        {
+            "id": "metallic",
+            "feedstock": "metallic_ood",
+            "profile": str(profile),
+            "budget": 8,
+            "strategy": "random",
+            "seed": 4,
+            "out": "runs/metallic",
+        },
+    ]
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path, jobs=jobs))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    bundle = type(
+        "Bundle",
+        (),
+        {
+            "setpoints": {"chemistry_kernel": {}},
+            "feedstocks": {
+                "covered": {"stage0_verdict_b_subprocess_required": True},
+                "metallic_ood": {"composition_wt_pct": {"Fe": 100.0}},
+            },
+            "digests": {},
+        },
+    )()
+    monkeypatch.setattr(epoch_grind, "load_config_bundle", lambda *args, **kwargs: bundle)
+
+    rc = epoch_grind.run_driver(
+        manifest,
+        config,
+        journal_path=tmp_path / "journal.json",
+        dry_run=True,
+    )
+
+    assert rc == 0
+    assert '"id": "covered"' in capsys.readouterr().out
+
+
 def test_duplication_rate_math() -> None:
     summary = {
         "inserted_rows": 12,

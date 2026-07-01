@@ -44,6 +44,12 @@ STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
     "e_type_enstatite_aubrite",
     "mars_perchlorate_rich",
 )
+# Stage-0 route guarantee is a triad: this md5-locked ID list is the
+# authoritative catalog overlay, the composition predicate below is a best-effort
+# renamed/new-feedstock robustness layer, and grind launch preflight fails loud
+# for any grind feedstock that is neither subprocess-routed nor out_of_domain.
+# Do not turn knife-edge predicate margins into ungrounded cushions; s_type,
+# v_type, and MGS-1 are governed by the ID list / fail-loud launch assertion.
 _SPINEL_ROUTE_FORMER_OXIDES = ("Cr2O3", "Al2O3", "FeO", "MgO", "TiO2")
 _SPINEL_ROUTE_MAFIC_OXIDES = ("Cr2O3", "FeO", "MgO", "TiO2")
 _SPINEL_ROUTE_MARE_HED_FORMER_MIN_WT_PCT = 38.5
@@ -347,6 +353,9 @@ def is_spinel_rich_stage0_subprocess_feedstock(feedstock: Mapping[str, Any]) -> 
     # Pre-grind catalog separation at 0efc9ce: mare/HED hang entries start at
     # 38.90 wt% spinel-formers and TiO2 0.65 wt%, while the nearest clean
     # MGS-1/Mars/highland/KREEP rows miss spinel-formers, TiO2, or Al2O3 band.
+    # A single total-spinel-former ceiling is not clean: safe MGS-1 (40.50)
+    # and lunar SPA KREEP (42.80) overlap hang entries, so launch preflight
+    # remains the authoritative catch for the inter-window gap.
     mare_or_hed_spinel_class = (
         spinel_former_wt_pct >= _SPINEL_ROUTE_MARE_HED_FORMER_MIN_WT_PCT
         and mafic_wt_pct >= _SPINEL_ROUTE_MARE_HED_MAFIC_MIN_WT_PCT

@@ -214,8 +214,16 @@ def _result(*, status="complete", marker="same", row_mass=0.0, trace_mass=None, 
 
 
 def _patch_common(monkeypatch, emitted):
+    real_cfg = driver.load_config_bundle()
+    feedstocks = dict(real_cfg.feedstocks)
+    feedstocks["fake_feedstock"] = {"stage0_verdict_b_subprocess_required": True}
+    cfg = SimpleNamespace(
+        setpoints=real_cfg.setpoints,
+        feedstocks=feedstocks,
+    )
     monkeypatch.setattr(driver, "_resolve_profile", lambda path: REPO_ROOT / "dummy-profile.yaml")
     monkeypatch.setattr(driver, "_load_yaml", lambda path: {"feedstock": "fake_feedstock"})
+    monkeypatch.setattr(driver, "load_config_bundle", lambda: cfg)
     monkeypatch.setattr(driver, "_magemin_status", lambda: {"available": True})
     monkeypatch.setattr(driver, "_full_population_command", lambda args, profile_path: "full")
     monkeypatch.setattr(driver, "_emit", lambda result, json_out: emitted.append(result))
@@ -865,6 +873,51 @@ def test_main_preflight_rejects_fallback_enabled_setpoints(tmp_path, monkeypatch
     monkeypatch.setattr(driver, "load_config_bundle", lambda: bundle)
 
     with pytest.raises(driver.GrindSourceGateError, match="allow_fallback_vapor"):
+        driver.main(
+            [
+                "--profile",
+                str(profile),
+                "--db",
+                str(tmp_path / "cache.db"),
+                "--hours",
+                "1",
+            ]
+        )
+
+
+def test_main_preflight_rejects_uncovered_feedstock_before_case_run(
+    tmp_path,
+    monkeypatch,
+):
+    profile = tmp_path / "profile.yaml"
+    profile.write_text(
+        "feedstock: interwindow\ncampaigns: [C2A_continuous]\n",
+        encoding="utf-8",
+    )
+    bundle = SimpleNamespace(
+        setpoints={"chemistry_kernel": {}},
+        feedstocks={
+            "interwindow": {
+                "composition_wt_pct": {
+                    "SiO2": 42.0,
+                    "Al2O3": 12.0,
+                    "FeO": 12.0,
+                    "MgO": 18.0,
+                    "TiO2": 0.3,
+                    "CaO": 10.0,
+                }
+            }
+        },
+    )
+    monkeypatch.setattr(driver, "load_config_bundle", lambda: bundle)
+    monkeypatch.setattr(driver, "_magemin_status", lambda: {"available": True})
+
+    def fail_run_case(**kwargs):
+        raise AssertionError("preflight must run before cache population cases")
+
+    monkeypatch.setattr(driver, "_run_case", fail_run_case)
+
+    with pytest.raises(driver.GrindSourceGateError, match="interwindow"):
         driver.main(
             [
                 "--profile",

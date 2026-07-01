@@ -172,11 +172,17 @@ def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> N
 
 
 @pytest.mark.parametrize(
-    "manifest_path",
-    [MOON_MANIFEST, MARS_MANIFEST],
+    ("manifest_path", "feedstock"),
+    [
+        (MOON_MANIFEST, "lunar_highland"),
+        (MARS_MANIFEST, "mars_global_mgs1"),
+    ],
     ids=["moon", "mars-stype"],
 )
-def test_epoch_grind_dry_run_materializes_commands(manifest_path: Path) -> None:
+def test_epoch_grind_dry_run_fails_loud_for_uncovered_feedstock(
+    manifest_path: Path,
+    feedstock: str,
+) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         base_cache = tmp_path / "base.sqlite"
@@ -189,6 +195,37 @@ def test_epoch_grind_dry_run_materializes_commands(manifest_path: Path) -> None:
                 str(EPOCH_GRIND),
                 "--manifest",
                 str(manifest_path),
+                "--base-cache",
+                str(base_cache),
+                "--work-dir",
+                str(work_dir),
+                "--journal",
+                str(journal),
+                "--dry-run",
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 2
+        assert "grind_stage0_route_coverage" in proc.stderr
+        assert feedstock in proc.stderr
+
+
+def test_epoch_grind_dry_run_materializes_commands_for_stype_manifest() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        base_cache = tmp_path / "base.sqlite"
+        work_dir = tmp_path / "work"
+        journal = tmp_path / "journal.json"
+        work_dir.mkdir()
+        proc = subprocess.run(
+            [
+                sys.executable,
+                str(EPOCH_GRIND),
+                "--manifest",
+                str(STYPE_MANIFEST),
                 "--base-cache",
                 str(base_cache),
                 "--work-dir",

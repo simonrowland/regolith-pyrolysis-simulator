@@ -63,6 +63,7 @@ from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.grind_preflight import (
     GrindSourceGateError,
+    assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
     assert_strict_vapor_result_store,
 )
@@ -332,6 +333,7 @@ def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path 
 
 def _assert_manifest_strict_vapor_preflight(manifest: Manifest) -> None:
     cfg = load_config_bundle()
+    feedstocks = getattr(cfg, "feedstocks", {}) or {}
     setpoints = getattr(cfg, "setpoints", {}) or {}
     chemistry_kernel = (
         setpoints.get("chemistry_kernel", {})
@@ -344,18 +346,36 @@ def _assert_manifest_strict_vapor_preflight(manifest: Manifest) -> None:
     )
     for job in manifest.jobs:
         profile_path = _resolve_path(job.profile, manifest.path.parent)
+        backend_name = "cached-real"
         if not profile_path.exists():
+            assert_grind_feedstock_stage0_route_coverage(
+                [job.feedstock],
+                feedstocks,
+                backend_name=backend_name,
+                context=f"{manifest.path}:job {job.id}",
+            )
             continue
         profile = _load_mapping(profile_path)
-        merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
+        merged = dict(
+            profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {}
+        )
         fidelities = profile.get("fidelities", {})
         if isinstance(fidelities, Mapping):
             selected = fidelities.get(job.fidelity, {})
             if isinstance(selected, Mapping):
                 merged.update(selected)
+        raw_backend_name = merged.get("backend_name", merged.get("backend"))
+        if raw_backend_name not in (None, ""):
+            backend_name = str(raw_backend_name)
         assert_strict_vapor_config(
             merged,
             context=f"{profile_path}:run+fidelity[{job.fidelity}]",
+        )
+        assert_grind_feedstock_stage0_route_coverage(
+            [job.feedstock],
+            feedstocks,
+            backend_name=backend_name,
+            context=f"{manifest.path}:job {job.id}",
         )
 
 
