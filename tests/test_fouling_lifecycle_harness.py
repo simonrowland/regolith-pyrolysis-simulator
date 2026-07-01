@@ -42,10 +42,11 @@ def _artifact(
 
 
 def test_harness_runs_n_iterations_without_ledger_reuse_or_closure_breach() -> None:
-    ledgers = [object(), object()]
+    ledgers = [object(), object(), object()]
     deposits = [
         {("duct_a", "SiO"): 0.1},
-        {("duct_a", "SiO"): 0.3, ("duct_b", "Si"): 0.05},
+        {("duct_a", "SiO"): 0.2, ("duct_b", "Si"): 0.05},
+        {("duct_a", "SiO"): 0.15},
     ]
 
     def run_campaign(index: int) -> FoulingRunArtifact:
@@ -56,19 +57,22 @@ def test_harness_runs_n_iterations_without_ledger_reuse_or_closure_breach() -> N
         segment_area_m2={"duct_a": 1.0, "duct_b": 2.0},
         rho_deposit_kg_m3={"SiO": 1000.0, "Si": 2000.0},
         thickness_limit_m=0.00050,
-    ).run((0, 1))
+    ).run((0, 1, 2))
 
-    assert len(result.run_records) == 2
-    assert result.run_records[0].atom_ledger is not result.run_records[1].atom_ledger
+    assert len(result.run_records) == 3
+    assert len({record.atom_ledger for record in result.run_records}) == 3
     assert result.run_records[0].mass_balance_error_pct == pytest.approx(0.0)
-    assert result.fouling_state_trajectory[-1]["duct_a"]["SiO"] == pytest.approx(0.3)
+    assert result.run_records[0].per_run_net_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.1)
+    assert result.run_records[1].per_run_net_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.2)
+    assert result.run_records[1].per_run_net_deposit_by_segment_species_kg["duct_b"]["Si"] == pytest.approx(0.05)
+    assert result.run_records[2].per_run_net_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.15)
+    assert result.fouling_state_trajectory[0]["duct_a"]["SiO"] == pytest.approx(0.1)
+    assert result.fouling_state_trajectory[1]["duct_a"]["SiO"] == pytest.approx(0.3)
+    assert result.fouling_state_trajectory[-1]["duct_a"]["SiO"] == pytest.approx(0.45)
     assert result.fouling_state_trajectory[-1]["duct_b"]["Si"] == pytest.approx(0.05)
-    assert (
-        result.run_records[1].per_run_net_deposit_by_segment_species_kg["duct_a"]["SiO"]
-        == pytest.approx(0.2)
-    )
     assert result.lifecycle_projection.service_life_authoritative is False
     assert result.lifecycle_projection.service_life_campaigns == pytest.approx(10 / 3)
+    assert result.lifecycle_projection.cascade_knee_provisional is None
 
 
 def test_harness_rejects_warm_worker_reused_atom_ledger() -> None:
@@ -139,6 +143,29 @@ def test_harness_derived_total_fails_closed_when_runner_authority_absent() -> No
             {("duct_a", "SiO"): 0.3},
             ledger=object(),
             authority={},
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={"duct_a": 1.0},
+        resinter_threshold_kg=None,
+    ).run((0,))
+
+    assert result.campaigns_to_resinter_total.to_dict() == {
+        "value": "resinter_threshold_kg / 0.3",
+        "authoritative_for_resinter": False,
+    }
+
+
+def test_harness_derived_total_fails_closed_for_keyless_partial_authority_payload() -> None:
+    def run_campaign(_index: int) -> FoulingRunArtifact:
+        return _artifact(
+            {("duct_a", "SiO"): 0.3},
+            ledger=object(),
+            authority={
+                "code": "wall_deposit_sticking_alpha_certified",
+                "deposited_species": ("SiO",),
+            },
         )
 
     result = FoulingLifecycleHarness(
@@ -263,6 +290,27 @@ def test_projection_result_is_deterministic_for_same_run_order() -> None:
     assert first.fouling_state_trajectory[-1]["duct_a"]["SiO"] == pytest.approx(
         second.fouling_state_trajectory[-1]["duct_a"]["SiO"]
     )
+
+
+def test_final_cumulative_deposit_is_order_independent_under_accumulation() -> None:
+    deposits = {
+        "low": {("duct_a", "SiO"): 0.1},
+        "high": {("duct_a", "SiO"): 0.2},
+    }
+
+    def run_campaign(name: str) -> FoulingRunArtifact:
+        return _artifact(deposits[name], ledger=object())
+
+    kwargs = {
+        "segment_area_m2": {"duct_a": 1.0},
+        "rho_deposit_kg_m3": 1000.0,
+        "thickness_limit_m": 0.001,
+    }
+    low_high = FoulingLifecycleHarness(run_campaign, **kwargs).run(("low", "high"))
+    high_low = FoulingLifecycleHarness(run_campaign, **kwargs).run(("high", "low"))
+
+    assert low_high.fouling_state_trajectory[-1]["duct_a"]["SiO"] == pytest.approx(0.3)
+    assert high_low.fouling_state_trajectory[-1]["duct_a"]["SiO"] == pytest.approx(0.3)
 
 
 def test_import_isolation_from_runner_core_and_optimizer_boundaries() -> None:

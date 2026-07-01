@@ -58,19 +58,29 @@ def test_from_trace_requires_existing_wall_deposit_export() -> None:
         FoulingTerminalSnapshot.from_trace(SimpleNamespace())
 
 
-def test_incremental_merge_diffs_terminal_export_from_carried_projection() -> None:
-    first = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.7}))
-    second = FoulingTerminalSnapshot.from_trace(
-        _trace({("duct_a", "SiO"): 0.4, ("duct_b", "Na"): 0.2})
-    )
+def test_independent_run_exports_accumulate_by_default() -> None:
+    first = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.10}))
+    second = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.20}))
+    third = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.15}))
 
-    merged = merge_snapshot_sequence((first, second))
+    merged = merge_snapshot_sequence((first, second, third))
 
-    assert merged.per_run_net_deposit_by_segment_species_kg[0]["duct_a"]["SiO"] == pytest.approx(0.7)
-    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_a"]["SiO"] == pytest.approx(-0.3)
-    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_b"]["Na"] == pytest.approx(0.2)
-    assert merged.trajectory[-1].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.4)
-    assert merged.trajectory[-1].wall_deposit_by_segment_species_kg["duct_b"]["Na"] == pytest.approx(0.2)
+    assert merged.per_run_net_deposit_by_segment_species_kg[0]["duct_a"]["SiO"] == pytest.approx(0.10)
+    assert merged.per_run_net_deposit_by_segment_species_kg[1]["duct_a"]["SiO"] == pytest.approx(0.20)
+    assert merged.per_run_net_deposit_by_segment_species_kg[2]["duct_a"]["SiO"] == pytest.approx(0.15)
+    assert merged.trajectory[0].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.10)
+    assert merged.trajectory[1].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.30)
+    assert merged.trajectory[2].wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(0.45)
+
+
+def test_default_merge_treats_terminal_export_as_per_run_net() -> None:
+    carried = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 1.0}))
+    independent_terminal = FoulingTerminalSnapshot.from_trace(_trace({("duct_a", "SiO"): 0.25}))
+
+    post_merge, per_run_net = merge_run_snapshot(carried, independent_terminal)
+
+    assert per_run_net["duct_a"]["SiO"] == pytest.approx(0.25)
+    assert post_merge.wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(1.25)
 
 
 def test_seeded_export_mode_diffs_terminal_export_from_carried_projection() -> None:
@@ -119,11 +129,11 @@ def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> 
 
     assert placeholder.end_condition_stack == (THICKNESS_PROXY_LIMITER,)
     assert placeholder.limiter_fired == THICKNESS_PROXY_LIMITER
-    assert placeholder.service_life_campaigns == pytest.approx(3.0)
-    assert placeholder.worst_segment_campaigns_provisional == pytest.approx(2.5)
+    assert placeholder.service_life_campaigns == pytest.approx(2.0)
+    assert placeholder.worst_segment_campaigns_provisional == pytest.approx(1.25)
     assert placeholder.service_life_authoritative is False
     assert placeholder.grounding_status == GROUNDING_PROVISIONAL
-    assert moved.service_life_campaigns == pytest.approx(5.0)
+    assert moved.service_life_campaigns == pytest.approx(3.0)
 
 
 def test_campaigns_to_resinter_total_mirrors_runner_null_threshold_string_basis() -> None:

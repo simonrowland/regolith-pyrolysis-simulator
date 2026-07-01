@@ -89,7 +89,7 @@ class FoulingLifecycleHarness:
         rho_deposit_kg_m3: float | Mapping[str, float] | None = None,
         thickness_limit_m: float | None = None,
         resinter_threshold_kg: float | None = None,
-        export_includes_carried: bool = True,
+        export_includes_carried: bool = False,
         closure_limit_pct: float = MASS_BALANCE_CLOSURE_LIMIT_PCT,
     ) -> None:
         self._run_campaign = run_campaign

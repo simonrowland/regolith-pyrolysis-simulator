@@ -3,13 +3,16 @@
 Phase A is an overlay. It reads completed run exports and never writes a
 ledger, seeds a simulator, or changes per-run output.
 
-The terminal trace export is the cumulative wall state for that completed run.
-The projection layer derives each campaign's net increment as:
+Phase A campaigns are independent runs. Each constituent run starts with an
+empty wall state, so its terminal export is already that run's net deposit.
+The projection layer accumulates those exports:
 
-    per_run_net(N) = terminal_export(N) - carried_projection(N - 1)
+    cumulative(N) = cumulative(N - 1) + terminal_export(N)
 
-This stays a projection-layer diff, not a ledger delta. Remobilization has
-already been folded into the per-run terminal net by the simulator.
+Remobilization has already been folded into each per-run terminal net by the
+simulator. ``export_includes_carried=True`` remains an optional non-default
+path for a future warm-state exporter where a terminal export includes prior
+carried wall state and the per-run net must be ``export - carried``.
 """
 
 from __future__ import annotations
@@ -177,7 +180,7 @@ def merge_run_snapshot(
     carried_projection: FoulingTerminalSnapshot | None,
     run_export: FoulingTerminalSnapshot,
     *,
-    export_includes_carried: bool = True,
+    export_includes_carried: bool = False,
 ) -> tuple[FoulingTerminalSnapshot, NestedDeposit]:
     """Return ``(post_merge_snapshot, per_run_net_deposit)``."""
 
@@ -208,7 +211,7 @@ def merge_run_snapshot(
 def merge_snapshot_sequence(
     run_exports: Sequence[FoulingTerminalSnapshot],
     *,
-    export_includes_carried: bool = True,
+    export_includes_carried: bool = False,
 ) -> FoulingMergeResult:
     carried: FoulingTerminalSnapshot | None = None
     trajectory: list[FoulingTerminalSnapshot] = []
