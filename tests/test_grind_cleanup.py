@@ -38,6 +38,21 @@ def test_cleanup_denylist_vetoes_protected_repo_even_when_allowlisted(tmp_path: 
     ]
 
 
+def test_cleanup_denylist_vetoes_home_even_when_allowlisted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    home = _mkdir(tmp_path / "grind-c6-home")
+    monkeypatch.setattr(grind_cleanup.Path, "home", classmethod(lambda cls: home))
+
+    plan = grind_cleanup.build_cleanup_plan([tmp_path])
+
+    assert plan.candidates == ()
+    assert [(refusal.path, refusal.reason) for refusal in plan.refusals] == [
+        (home, f"protected path: {home.resolve(strict=False)}")
+    ]
+
+
 @pytest.mark.parametrize("protected_name", [".git", ".venv", "docs-private"])
 def test_cleanup_denylist_vetoes_allowlisted_dir_containing_protected_paths(
     tmp_path: Path,
@@ -53,6 +68,22 @@ def test_cleanup_denylist_vetoes_allowlisted_dir_containing_protected_paths(
         (candidate, f"contains protected path: {candidate / protected_name}")
     ]
     assert candidate.exists()
+
+
+def test_cleanup_denylist_vetoes_nested_symlink_to_protected_target(tmp_path: Path) -> None:
+    repo_root = _mkdir(tmp_path / "repo")
+    protected = _mkdir(repo_root / "docs-private")
+    candidate = _mkdir(tmp_path / "grind-c6-output")
+    link = candidate / "docs-link"
+    link.symlink_to(protected, target_is_directory=True)
+
+    plan = grind_cleanup.build_cleanup_plan([tmp_path], repo_root=repo_root)
+
+    assert plan.candidates == ()
+    assert [(refusal.path, refusal.reason) for refusal in plan.refusals] == [
+        (candidate, f"contains symlink to protected path: {link}")
+    ]
+    assert protected.exists()
 
 
 def test_cleanup_denylist_vetoes_symlinked_allowlist_candidate(tmp_path: Path) -> None:
@@ -85,6 +116,21 @@ def test_cleanup_yes_deletes_allowlisted_temp_fixture(tmp_path: Path) -> None:
 
     assert exit_code == 0
     assert not candidate.exists()
+
+
+def test_delete_candidate_rechecks_denylist_before_rmtree(tmp_path: Path) -> None:
+    candidate_path = _mkdir(tmp_path / "grind-c6-race")
+    protected_target = _mkdir(tmp_path / "target")
+    plan = grind_cleanup.build_cleanup_plan([tmp_path])
+    candidate = plan.candidates[0]
+    candidate_path.rmdir()
+    candidate_path.symlink_to(protected_target, target_is_directory=True)
+
+    with pytest.raises(RuntimeError, match="refusing to delete .*: symlink"):
+        grind_cleanup.delete_candidate(candidate)
+
+    assert candidate_path.is_symlink()
+    assert protected_target.exists()
 
 
 def test_cleanup_refusal_returns_nonzero_and_does_not_delete(tmp_path: Path) -> None:

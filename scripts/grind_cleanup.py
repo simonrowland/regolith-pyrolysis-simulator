@@ -70,6 +70,14 @@ def protected_paths(repo_root: Path | None = None) -> tuple[Path, ...]:
     )
 
 
+def _matched_protected_path(resolved_path: Path, *, repo_root: Path | None = None) -> Path | None:
+    for protected in protected_paths(repo_root):
+        protected_resolved = protected.resolve(strict=False)
+        if resolved_path == protected_resolved or _is_relative_to(resolved_path, protected_resolved):
+            return protected
+    return None
+
+
 def denylist_reason(path: Path, *, repo_root: Path | None = None) -> str | None:
     raw_name = path.name
     if raw_name.startswith("."):
@@ -82,22 +90,34 @@ def denylist_reason(path: Path, *, repo_root: Path | None = None) -> str | None:
         return "not a directory"
 
     resolved = path.resolve(strict=False)
-    for protected in protected_paths(repo_root):
-        protected_resolved = protected.resolve(strict=False)
-        if resolved == protected_resolved or _is_relative_to(resolved, protected_resolved):
-            return f"protected path: {protected}"
-    nested_reason = nested_protected_reason(path)
+    home = Path.home().resolve(strict=False)
+    if resolved == home:
+        return f"protected path: {home}"
+    matched_protected = _matched_protected_path(resolved, repo_root=repo_root)
+    if matched_protected is not None:
+        return f"protected path: {matched_protected}"
+    nested_reason = nested_protected_reason(path, repo_root=repo_root)
     if nested_reason is not None:
         return nested_reason
     return None
 
 
-def nested_protected_reason(path: Path) -> str | None:
+def nested_protected_reason(path: Path, *, repo_root: Path | None = None) -> str | None:
     for root, dirnames, filenames in os.walk(path, topdown=True, followlinks=False):
         protected_names = PROTECTED_REPO_NAMES.intersection(dirnames).union(filenames)
         if protected_names:
             protected = sorted(protected_names)[0]
             return f"contains protected path: {Path(root) / protected}"
+        for name in sorted((*dirnames, *filenames)):
+            nested_path = Path(root) / name
+            if not nested_path.is_symlink():
+                continue
+            matched_protected = _matched_protected_path(
+                nested_path.resolve(strict=False),
+                repo_root=repo_root,
+            )
+            if matched_protected is not None:
+                return f"contains symlink to protected path: {nested_path}"
         dirnames[:] = [
             dirname
             for dirname in dirnames
