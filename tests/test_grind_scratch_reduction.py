@@ -12,6 +12,7 @@ import pytest
 
 from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count, seed_cache
+from simulator import reduced_real_determinism as rrd
 from simulator.backends import build_cached_real_store, normalize_cached_real_config
 from simulator.corpus_version import current_corpus_version
 from simulator.reduced_real_determinism import (
@@ -56,6 +57,75 @@ def _put_cache_row(
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
     return key
+
+
+def test_pt1_store_captures_git_dirty_once_per_epoch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class GitDirtyProbe:
+        def __init__(self) -> None:
+            self.current = 1
+            self.calls: list[int] = []
+            self.cache_clear_count = 0
+
+        def __call__(self) -> int:
+            self.calls.append(self.current)
+            return self.current
+
+        def cache_clear(self) -> None:
+            self.cache_clear_count += 1
+
+    probe = GitDirtyProbe()
+    monkeypatch.setattr(rrd, "_git_dirty", probe)
+    db_path = tmp_path / "cache.sqlite"
+    store = PT1PersistentEquilibriumStore(db_path)
+
+    def put_row(tag: str) -> None:
+        key = {
+            "artifact": "freeze_gate_curve",
+            "code_version": "test",
+            "corpus_version": current_corpus_version(),
+            "data_digests": {"fixture": "v1"},
+            "schema_version": "test",
+            "tag": tag,
+        }
+        payload = {"curve": {"status": "in_range", "tag": tag}}
+        key_bytes = canonical_json_bytes(key)
+        payload_bytes = canonical_json_bytes(payload)
+        store.put(
+            artifact="freeze_gate_curve",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=hashlib.sha256(key_bytes).hexdigest(),
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        )
+
+    put_row("epoch-start")
+    probe.current = 0
+    probe.cache_clear()
+    put_row("after-mid-epoch-dirty-change")
+
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute(
+            f"""
+            SELECT key_bytes, git_dirty
+            FROM {rrd.PT1_EQUILIBRIUM_TABLE}
+            """
+        ).fetchall()
+
+    git_dirty_by_tag = {
+        json.loads(row[0])["tag"]: row[1]
+        for row in rows
+    }
+    assert git_dirty_by_tag == {
+        "epoch-start": 1,
+        "after-mid-epoch-dirty-change": 1,
+    }
+    assert probe.calls == [1]
+    assert probe.cache_clear_count == 1
 
 
 def _db_bytes(path: Path) -> int:

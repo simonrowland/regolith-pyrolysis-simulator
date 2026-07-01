@@ -906,6 +906,9 @@ class PT1PersistentEquilibriumStore:
         self._shard_busy_timeout_ms = float(shard_busy_timeout_ms)
         self.strict_vapor_gate = bool(strict_vapor_gate)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        # Epoch provenance is captured when the store opens. Rows written later
+        # intentionally keep this value even if the worktree changes mid-epoch.
+        self._epoch_git_dirty = _git_dirty()
         with self._connect() as conn:
             self._initialize(conn)
 
@@ -1023,7 +1026,7 @@ class PT1PersistentEquilibriumStore:
                     ladder_values["h30c"]["sha256"],
                     ladder_values["h30c"]["distance"],
                     datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                    _git_dirty(),
+                    self._epoch_git_dirty,
                 ),
             )
 
