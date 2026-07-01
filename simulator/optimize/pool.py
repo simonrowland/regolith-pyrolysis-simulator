@@ -56,6 +56,7 @@ DEFAULT_EVAL_TIMEOUT_SECONDS = 45 * 60
 _INFLIGHT_PER_WORKER = 1
 _POOL_POLL_SECONDS = 0.1
 _WORKER_TERMINATE_GRACE_SECONDS = 5.0
+_DESCENDANT_SNAPSHOT_SECONDS = 0.25
 _LOGGER = logging.getLogger(__name__)
 _POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
 _ORIGINAL_POPEN = subprocess.Popen
@@ -1029,39 +1030,76 @@ def _terminate_pool_process(process: Any, *, extra_pids: Sequence[int] = ()) -> 
     pid = getattr(process, "pid", None)
     pid_int = int(pid) if pid is not None else None
     if pid_int is not None and os.name != "nt":
-        descendant_pids = _merge_pids(
-            (*_process_tree_pids(pid_int), *tuple(extra_pids)),
-            exclude={pid_int, os.getpid()},
+        _stop_process_group_or_process(pid_int)
+        descendant_pids = _snapshot_descendant_pids(
+            pid_int,
+            extra_pids=extra_pids,
         )
-        _signal_pids(descendant_pids, signal.SIGTERM)
-        time.sleep(min(_WORKER_TERMINATE_GRACE_SECONDS, 0.25))
+        _signal_pids(descendant_pids, signal.SIGKILL)
         try:
-            os.killpg(pid_int, signal.SIGTERM)
+            os.killpg(pid_int, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        except OSError:
+            pass
+        else:
+            process.join(_WORKER_TERMINATE_GRACE_SECONDS)
+            _signal_pids(descendant_pids, signal.SIGKILL)
+            if not process.is_alive():
+                return
+        _signal_pids(
+            _merge_pids(
+                (*descendant_pids, *_process_tree_pids(pid_int), *tuple(extra_pids)),
+                exclude={pid_int, os.getpid()},
+            ),
+            signal.SIGKILL,
+        )
+        try:
+            os.kill(pid_int, signal.SIGKILL)
         except ProcessLookupError:
             return
         except OSError:
             pass
         else:
-            process.join(_WORKER_TERMINATE_GRACE_SECONDS)
-            remaining = _living_pids(descendant_pids)
-            if not process.is_alive() and not remaining:
-                return
-            _signal_pids(remaining, signal.SIGKILL)
-            try:
-                os.killpg(pid_int, signal.SIGKILL)
-            except ProcessLookupError:
-                return
-            except OSError:
-                pass
-            else:
-                process.join()
-                return
+            process.join()
+            return
     process.terminate()
     process.join(_WORKER_TERMINATE_GRACE_SECONDS)
     if process.is_alive():
         process.kill()
         process.join()
     _signal_pids(tuple(extra_pids), signal.SIGKILL)
+
+
+def _stop_process_group_or_process(pid: int) -> None:
+    try:
+        os.killpg(pid, signal.SIGSTOP)
+        return
+    except ProcessLookupError:
+        pass
+    except OSError:
+        pass
+    try:
+        os.kill(pid, signal.SIGSTOP)
+    except OSError:
+        return
+
+
+def _snapshot_descendant_pids(
+    root_pid: int,
+    *,
+    extra_pids: Sequence[int] = (),
+) -> tuple[int, ...]:
+    deadline = time.monotonic() + _DESCENDANT_SNAPSHOT_SECONDS
+    captured: tuple[int, ...] = ()
+    while True:
+        captured = _merge_pids(
+            (*captured, *_process_tree_pids(root_pid), *tuple(extra_pids)),
+            exclude={root_pid, os.getpid()},
+        )
+        if captured or time.monotonic() >= deadline:
+            return captured
+        time.sleep(0.02)
 
 
 def _merge_pids(
