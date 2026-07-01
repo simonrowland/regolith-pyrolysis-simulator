@@ -22,6 +22,7 @@ from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
+    ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
 )
@@ -93,6 +94,14 @@ def _objectives(oxygen: float = 10.0, energy: float = 2.0) -> ObjectiveVector:
     )
 
 
+def _admissible_trace(payload: Mapping[str, object] | None = None) -> dict[str, object]:
+    data = dict(payload or {})
+    data.setdefault("backend_status", "ok")
+    data.setdefault("backend_authoritative", True)
+    data.setdefault("snapshots", [{"mass_balance_error_pct": 0.0}])
+    return data
+
+
 def _scored(
     spec: EvalSpec,
     *,
@@ -114,8 +123,9 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace=result_blob
-            or {"backend_status": "ok", "hours": [{"hour": 1, "oxygen_kg": oxygen}]},
+            trace=_admissible_trace(
+                result_blob or {"hours": [{"hour": 1, "oxygen_kg": oxygen}]}
+            ),
             product_summary=product_summary or {"oxygen_kg": oxygen},
         ),
         notes=("stored",),
@@ -202,7 +212,7 @@ def _infeasible(spec: EvalSpec) -> ScoredResult:
         failing_gates=("delivered_stream_purity",),
         run_reference=RunReference(
             status="ok",
-            trace={"backend_status": "ok", "hours": [{"hour": 1, "oxygen_kg": 0.0}]},
+            trace=_admissible_trace({"hours": [{"hour": 1, "oxygen_kg": 0.0}]}),
             product_summary={"oxygen_kg": 0.0},
         ),
     )
@@ -251,26 +261,32 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference is not None
     assert loaded.run_reference.trace == {
         "backend_status": "ok",
+        "backend_authoritative": True,
         "hours": [{"hour": 1}],
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
         "status": "ok",
     }
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
-def test_round_trip_preserves_backend_status_reason_from_run_reference(tmp_path) -> None:
+def test_store_rejects_feasible_out_of_domain_backend_status_reason_from_cache_write(
+    tmp_path,
+) -> None:
     spec = _base_spec(backend_name="alphamelts")
     non_jsonable_trace = {
         "backend_status": "out_of_domain",
+        "backend_authoritative": True,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
         "per_hour": [object()],
     }
     scored = ScoredResult(
         candidate_id="candidate-ood",
         eval_spec=spec,
         cache_key=cache_key(spec),
-        feasible=False,
-        failure_category=FailureCategory.OUT_OF_DOMAIN,
-        feasibility_margins={"backend_domain": _margin("backend_domain", feasible=False)},
-        failing_gates=("backend_domain",),
+        feasible=True,
+        objectives=_objectives(),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        failing_gates=(),
         run_reference=RunReference(
             status="ok",
             trace=non_jsonable_trace,
@@ -285,14 +301,11 @@ def test_round_trip_preserves_backend_status_reason_from_run_reference(tmp_path)
         current_data_digests=spec.data_digests,
     )
 
-    store.store(spec, scored, created_at="2026-06-20T00:00:00Z")
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-20T00:00:00Z")
 
-    loaded = store.lookup(spec)
-    assert loaded is not None
-    assert loaded.run_reference is not None
-    assert loaded.run_reference.backend_status == "out_of_domain"
-    assert loaded.run_reference.backend_status_reason == "forbidden_species"
-    assert loaded.run_reference.trace["backend_status_reason"] == "forbidden_species"
+    assert "out_of_domain_provenance" in exc_info.value.reasons
+    assert store.lookup(spec) is None
 
 
 def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
@@ -390,14 +403,14 @@ def test_result_store_eval_spec_omits_default_stage0_exit_stop(tmp_path) -> None
     assert store.lookup(stage0_run).eval_spec == stage0_run
 
 
-def test_not_run_backend_labels_round_trip(tmp_path) -> None:
+def test_ok_backend_without_authority_rejected_from_cache_write(tmp_path) -> None:
     spec = _base_spec()
     scored = _scored(
         spec,
         result_blob={
-            "backend_status": "not_run",
+            "backend_status": "ok",
             "backend_authoritative": False,
-            "execution_status": "not_run",
+            "execution_status": "completed",
         },
     )
     store = ResultStore(
@@ -406,18 +419,11 @@ def test_not_run_backend_labels_round_trip(tmp_path) -> None:
         current_data_digests=spec.data_digests,
     )
 
-    store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
 
-    loaded = store.lookup(spec)
-    assert loaded is not None
-    assert loaded.run_reference is not None
-    assert loaded.run_reference.backend_status == "not_run"
-    assert loaded.run_reference.backend_authoritative is False
-    assert loaded.run_reference.trace == {
-        "backend_status": "not_run",
-        "backend_authoritative": False,
-        "execution_status": "not_run",
-    }
+    assert "backend_not_authoritative" in exc_info.value.reasons
+    assert store.lookup(spec) is None
 
 
 def test_lookup_rejects_poisoned_run_reference_canonical_fields(tmp_path) -> None:
@@ -441,6 +447,7 @@ def test_lookup_rejects_poisoned_run_reference_canonical_fields(tmp_path) -> Non
                 "backend_name": "stub",
                 "backend_status": "ok",
                 "backend_authoritative": True,
+                "label_source": "legacy_backend_alias:stub",
                 "certification_allowed": True,
             }
         )
@@ -549,6 +556,84 @@ def test_store_result_artifact_missing_required_fields_raise_named(
         store.store(spec, bad_result(spec), created_at="2026-01-01T00:00:00Z")
 
     assert store.lookup(spec) is None
+
+
+@pytest.mark.parametrize(
+    ("bad_result", "expected_reason"),
+    (
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {"snapshots": [{"mass_balance_error_pct": 1.0e-8}]}
+                ),
+            ),
+            "mass_balance_closure_breach",
+        ),
+        (
+            lambda spec: ScoredResult(
+                candidate_id="candidate-ood",
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=True,
+                objectives=_objectives(),
+                feasibility_margins={
+                    "delivered_stream_purity": _margin()
+                },
+                failing_gates=(),
+                run_reference=RunReference(
+                    status="ok",
+                    trace=_admissible_trace(
+                        {
+                            "backend_status": "out_of_domain",
+                            "backend_status_reason": "forbidden_species",
+                        }
+                    ),
+                    backend_status="out_of_domain",
+                    backend_authoritative=True,
+                    backend_status_reason="forbidden_species",
+                ),
+                notes=("backend_status=out_of_domain",),
+            ),
+            "out_of_domain_provenance",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace({"backend_authoritative": False}),
+            ),
+            "backend_not_authoritative",
+        ),
+    ),
+)
+def test_store_rejects_inadmissible_cache_writes_reason_coded_and_unwritten(
+    tmp_path,
+    bad_result,
+    expected_reason: str,
+) -> None:
+    spec = _base_spec()
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, bad_result(spec), created_at="2026-01-01T00:00:00Z")
+
+    assert any(reason.startswith(expected_reason) for reason in exc_info.value.reasons)
+    assert store.lookup(spec) is None
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 0
+
+
+def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
+    tmp_path,
+) -> None:
+    spec = _base_spec()
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    store.store(spec, _scored(spec), created_at="2026-01-01T00:00:00Z")
+
+    assert store.lookup(spec) is not None
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
 
 
 def test_store_rejects_nan_margin_numbers(tmp_path) -> None:

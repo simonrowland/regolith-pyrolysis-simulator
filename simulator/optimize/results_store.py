@@ -30,7 +30,12 @@ from simulator.optimize.evalspec import (
     _with_legacy_data_digest_scope,
     cache_key,
 )
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    MASS_BALANCE_ABORT_PCT,
+    RunReference,
+    ScoredResult,
+)
 from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
@@ -49,6 +54,7 @@ __all__ = [
     "SCHEMA_VERSION",
     "ResultStore",
     "ResultStoreSchemaError",
+    "ResultStoreWriteRejected",
     "ResultsStore",
     "selector_where",
 ]
@@ -56,6 +62,16 @@ __all__ = [
 
 class ResultStoreSchemaError(RuntimeError):
     """Raised when an optimizer result-store schema is unsupported."""
+
+
+class ResultStoreWriteRejected(ValueError):
+    """Raised when a result is not admissible for authoritative cache writes."""
+
+    def __init__(self, reasons: Sequence[str]) -> None:
+        self.reasons = tuple(dict.fromkeys(str(reason) for reason in reasons))
+        super().__init__(
+            "result store write rejected: " + ", ".join(self.reasons)
+        )
 
 
 class ResultStore:
@@ -158,6 +174,7 @@ class ResultStore:
         if scored_result.eval_spec is not None and scored_result.eval_spec != eval_spec:
             raise ValueError("scored_result.eval_spec does not match eval_spec")
         _validate_result_artifact(eval_spec, scored_result)
+        _assert_cache_write_admissible(scored_result)
         objectives = _serialize_objectives(scored_result.objectives)
         result_blob = _result_blob(scored_result)
         corpus_version = current_corpus_version()
@@ -622,12 +639,226 @@ def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) 
         raise ValueError("result artifact missing backend_status")
 
 
+def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
+    reasons: list[str] = []
+    backend_status = _artifact_backend_status(scored_result)
+    backend_authoritative = _artifact_backend_authoritative(scored_result)
+    if backend_status == "ok" and backend_authoritative is False:
+        reasons.append("backend_not_authoritative")
+    closure_rejection = _mass_balance_closure_rejection(scored_result)
+    if closure_rejection is not None:
+        reasons.append(closure_rejection)
+    if scored_result.feasible and _has_out_of_domain_provenance(scored_result):
+        reasons.append("out_of_domain_provenance")
+    if reasons:
+        raise ResultStoreWriteRejected(reasons)
+
+
 def _artifact_backend_status(scored_result: ScoredResult) -> str | None:
+    for carrier in _admission_carriers(scored_result):
+        status = _extract_backend_status(carrier)
+        if status is not None:
+            return status
+    return None
+
+
+def _artifact_backend_authoritative(scored_result: ScoredResult) -> bool | None:
+    for carrier in _admission_carriers(scored_result):
+        raw = _carrier_value(carrier, "backend_authoritative")
+        if raw is not None:
+            return _strict_bool(raw)
+    return None
+
+
+def _admission_carriers(scored_result: ScoredResult) -> tuple[Any, ...]:
+    carriers: list[Any] = []
     run_reference = getattr(scored_result, "run_reference", None)
-    if run_reference is None:
+    if run_reference is not None:
+        carriers.extend(
+            (
+                run_reference,
+                getattr(run_reference, "trace", None),
+                getattr(run_reference, "product_summary", None),
+            )
+        )
+    if hasattr(scored_result, "result_blob"):
+        carriers.append(getattr(scored_result, "result_blob"))
+    return tuple(carrier for carrier in carriers if carrier is not None)
+
+
+def _carrier_value(carrier: Any, key: str) -> Any:
+    if carrier is None:
         return None
-    raw = getattr(run_reference, "backend_status", None)
-    return str(raw) if raw is not None else None
+    if isinstance(carrier, Mapping):
+        return carrier.get(key)
+    return getattr(carrier, key, None)
+
+
+def _has_carrier_key(carrier: Any, key: str) -> bool:
+    if carrier is None:
+        return False
+    if isinstance(carrier, Mapping):
+        return key in carrier
+    return hasattr(carrier, key)
+
+
+def _mass_balance_closure_rejection(scored_result: ScoredResult) -> str | None:
+    for payload in _iter_mass_balance_payloads(scored_result):
+        rejection = _mass_balance_payload_rejection(payload)
+        if rejection is not None:
+            return rejection
+    return None
+
+
+def _iter_mass_balance_payloads(scored_result: ScoredResult) -> tuple[Any, ...]:
+    payloads: list[Any] = []
+    for carrier in _admission_carriers(scored_result):
+        payloads.extend(_mass_balance_payloads_from_carrier(carrier))
+    return tuple(payloads)
+
+
+def _mass_balance_payloads_from_carrier(carrier: Any) -> tuple[Any, ...]:
+    payloads: list[Any] = []
+    if _has_carrier_key(carrier, "mass_balance_error_pct") or _has_carrier_key(
+        carrier, "mass_balance_error_category"
+    ):
+        payloads.append(carrier)
+
+    mass_closure = _carrier_value(carrier, "mass_closure")
+    if mass_closure is not None:
+        payloads.append(mass_closure)
+    product_yield_table = _carrier_value(carrier, "product_yield_table")
+    if product_yield_table is not None:
+        nested = _carrier_value(product_yield_table, "mass_closure")
+        if nested is not None:
+            payloads.append(nested)
+
+    payloads.extend(_mass_balance_snapshot_payloads(_carrier_value(carrier, "snapshots")))
+    record = _carrier_value(carrier, "record")
+    if record is not None:
+        payloads.extend(
+            _mass_balance_snapshot_payloads(_carrier_value(record, "snapshots"))
+        )
+    return tuple(payloads)
+
+
+def _mass_balance_snapshot_payloads(snapshots: Any) -> tuple[Any, ...]:
+    if not isinstance(snapshots, SequenceABC) or isinstance(snapshots, (str, bytes)):
+        return ()
+    return tuple(snapshots)
+
+
+def _mass_balance_payload_rejection(payload: Any) -> str | None:
+    category = str(_carrier_value(payload, "mass_balance_error_category") or "")
+    if category:
+        return f"mass_balance_closure_breach:{category}"
+    status = str(_carrier_value(payload, "status") or "")
+    if status and status != "closed":
+        if status == "open":
+            return "mass_balance_closure_breach:open"
+        return None
+    raw = _first_present(
+        payload,
+        (
+            "mass_balance_error_pct",
+            "balance_error_pct",
+            "closure_pct",
+        ),
+    )
+    if raw is None:
+        return None
+    try:
+        closure_pct = float(raw)
+    except (TypeError, ValueError):
+        return "mass_balance_closure_nonfinite"
+    if not math.isfinite(closure_pct):
+        return "mass_balance_closure_nonfinite"
+    if abs(closure_pct) > MASS_BALANCE_ABORT_PCT:
+        return (
+            "mass_balance_closure_breach:"
+            f"{closure_pct:.12g}%>{MASS_BALANCE_ABORT_PCT:.12g}%"
+        )
+    return None
+
+
+def _first_present(carrier: Any, keys: Sequence[str]) -> Any:
+    for key in keys:
+        if _has_carrier_key(carrier, key):
+            return _carrier_value(carrier, key)
+    return None
+
+
+def _has_out_of_domain_provenance(scored_result: ScoredResult) -> bool:
+    if scored_result.failure_category is FailureCategory.OUT_OF_DOMAIN:
+        return True
+    for carrier in _admission_carriers(scored_result):
+        if _extract_backend_status(carrier) == "out_of_domain":
+            return True
+        if _extract_backend_status_reason(carrier) is not None:
+            return True
+        if _contains_out_of_domain_marker(carrier):
+            return True
+    return False
+
+
+def _extract_backend_status_reason(carrier: Any) -> str | None:
+    if carrier is None:
+        return None
+    raw = _carrier_value(carrier, "backend_status_reason")
+    if raw is not None:
+        return str(raw)
+    for key in ("per_hour", "hours"):
+        nested = _carrier_value(carrier, key)
+        if isinstance(nested, SequenceABC) and not isinstance(nested, (str, bytes)):
+            for item in reversed(tuple(nested)):
+                reason = _extract_backend_status_reason(item)
+                if reason is not None:
+                    return reason
+    for key in ("trace", "backend_diagnostics", "diagnostics"):
+        reason = _extract_backend_status_reason(_carrier_value(carrier, key))
+        if reason is not None:
+            return reason
+    return None
+
+
+def _contains_out_of_domain_marker(
+    carrier: Any,
+    *,
+    depth: int = 0,
+    seen: set[int] | None = None,
+) -> bool:
+    if carrier is None or depth > 6:
+        return False
+    if seen is None:
+        seen = set()
+    marker = id(carrier)
+    if marker in seen:
+        return False
+    seen.add(marker)
+    if isinstance(carrier, Mapping):
+        if carrier.get("out_of_domain_crash_point") is not None:
+            return True
+        if carrier.get("backend_status_reason") not in (None, ""):
+            return True
+        values = carrier.values()
+    elif isinstance(carrier, SequenceABC) and not isinstance(carrier, (str, bytes)):
+        values = carrier
+    else:
+        values = (
+            getattr(carrier, attr)
+            for attr in (
+                "trace",
+                "backend_diagnostics",
+                "diagnostics",
+                "out_of_domain_crash_point",
+                "backend_status_reason",
+            )
+            if hasattr(carrier, attr)
+        )
+    return any(
+        _contains_out_of_domain_marker(value, depth=depth + 1, seen=seen)
+        for value in values
+    )
 
 
 def _extract_backend_status(carrier: Any) -> str | None:
@@ -642,12 +873,20 @@ def _extract_backend_status(carrier: Any) -> str | None:
             status = _extract_latest_backend_status(nested)
             if status is not None:
                 return status
+        for key in ("trace", "backend_diagnostics", "diagnostics"):
+            status = _extract_backend_status(carrier.get(key))
+            if status is not None:
+                return status
         return None
     raw = getattr(carrier, "backend_status", None)
     if raw is not None:
         return str(raw)
     for attr in ("per_hour", "hours"):
         status = _extract_latest_backend_status(getattr(carrier, attr, None))
+        if status is not None:
+            return status
+    for attr in ("trace", "backend_diagnostics", "diagnostics"):
+        status = _extract_backend_status(getattr(carrier, attr, None))
         if status is not None:
             return status
     return None

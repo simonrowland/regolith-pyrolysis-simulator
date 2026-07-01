@@ -69,12 +69,28 @@ def _margin() -> GateMargin:
     )
 
 
+def _product_summary() -> dict[str, object]:
+    return {
+        "oxygen_kg": 10.0,
+        "product_yield_table": {
+            "mass_closure": {
+                "kind": "mass_closure",
+                "status": "closed",
+                "balance_error_pct": 0.0,
+                "tolerance_pct": 5e-12,
+            }
+        },
+    }
+
+
 def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
     tmp_path: Path,
 ) -> None:
     spec = _spec()
     trace = {
         "backend_status": "ok",
+        "backend_authoritative": True,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
         "vapor_pressure_source_report": _source_report("builtin_authoritative"),
         "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
@@ -95,7 +111,7 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
         run_reference=RunReference(
             status="ok",
             trace=trace,
-            product_summary={"oxygen_kg": 10.0},
+            product_summary=_product_summary(),
         ),
         notes=("stored",),
     )
@@ -131,6 +147,8 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
     spec = _spec()
     trace = {
         "backend_status": "ok",
+        "backend_authoritative": True,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
         "vapor_pressure_source_report": _source_report("builtin_authoritative"),
         "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
@@ -148,7 +166,7 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
         run_reference=RunReference(
             status="ok",
             trace=trace,
-            product_summary={"oxygen_kg": 10.0},
+            product_summary=_product_summary(),
         ),
         notes=("stored",),
     )

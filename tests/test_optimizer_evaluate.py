@@ -43,7 +43,7 @@ from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
@@ -2857,17 +2857,11 @@ def test_out_of_domain_crash_provenance_round_trips_results_store(tmp_path) -> N
         current_data_digests=result.eval_spec.data_digests,
     )
 
-    store.store(result.eval_spec, result, created_at="2026-06-09T00:00:00Z")
-    loaded = store.lookup(result.eval_spec)
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(result.eval_spec, result, created_at="2026-06-09T00:00:00Z")
 
-    assert loaded is not None
-    assert loaded.feasible
-    assert loaded.run_reference is not None
-    trace = loaded.run_reference.trace
-    assert trace["rump_terminal"]["status"] == "earned"
-    assert trace["out_of_domain_crash_point"]["composition_mol"]["CaO"] == pytest.approx(
-        1.0
-    )
+    assert "out_of_domain_provenance" in exc_info.value.reasons
+    assert store.lookup(result.eval_spec) is None
 
 
 def test_real_backend_ok_but_non_authoritative_aborts_as_backend_unavailable() -> None:
