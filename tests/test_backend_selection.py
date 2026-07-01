@@ -17,6 +17,8 @@ Policy under test:
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Optional
 
 import pytest
@@ -24,10 +26,14 @@ import pytest
 import web.events as events
 from simulator.backends import (
     BackendSelectionPolicy,
+    STAGE0_SUBPROCESS_FEEDSTOCK_IDS,
+    assert_real_backend_feedstock_supported,
     assert_stage0_subprocess_backend_safe,
     backend_resolution_status,
+    requires_stage0_subprocess,
     resolve_backend,
 )
+from simulator.config import load_config_bundle
 from simulator.melt_backend.base import StubBackend
 from web.events import BackendUnavailableError, _get_backend
 
@@ -174,6 +180,74 @@ def test_stage0_required_alphamelts_resolution_forces_subprocess_copy():
         "python_bridge": "python_api",
         "alphamelts": {"mode": "thermoengine"},
     }
+
+
+def test_pregrind_route_feedstocks_require_subprocess_from_real_data():
+    feedstocks = load_config_bundle().feedstocks
+    route_digest = hashlib.md5(
+        json.dumps(
+            STAGE0_SUBPROCESS_FEEDSTOCK_IDS,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode()
+    ).hexdigest()
+
+    assert route_digest == "ab8ef3c424307024995a6a7791b47ea2"
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
+        if not requires_stage0_subprocess(feedstock_id, feedstocks)
+    } == set()
+
+
+def test_real_grind_feedstock_resolution_forces_subprocess_from_data():
+    feedstocks = load_config_bundle().feedstocks
+    source_config = {"mode": "thermoengine", "python_bridge": "python_api"}
+    instances: list[_FakeAlphaMELTS] = []
+
+    class _RoutedAlphaMELTS(_FakeAlphaMELTS):
+        def initialize(self, config):
+            self._mode = str(config.get("mode") or "")
+            self._bridge = str(config.get("python_bridge") or "")
+            return super().initialize(config)
+
+    def make_alphamelts():
+        backend = _RoutedAlphaMELTS(available=True)
+        instances.append(backend)
+        return backend
+
+    backend = resolve_backend(
+        "alphamelts",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        alphamelts_backend_cls=make_alphamelts,
+        backend_config=source_config,
+        feedstock_id="lunar_mare_low_ti",
+        feedstocks=feedstocks,
+    )
+
+    assert backend is instances[0]
+    assert backend._mode == "subprocess"
+    assert backend._bridge == "subprocess"
+    assert backend.stage0_subprocess_required is True
+    assert source_config == {"mode": "thermoengine", "python_bridge": "python_api"}
+
+
+def test_real_backend_rejects_metallic_feedstock_before_solver_call():
+    feedstocks = load_config_bundle().feedstocks
+
+    with pytest.raises(
+        BackendUnavailableError,
+        match=(
+            "real_backend_out_of_domain: non_silicate_feedstock: "
+            "feedstock 'm_type_metallic_phase'"
+        ),
+    ):
+        assert_real_backend_feedstock_supported(
+            "alphamelts",
+            "m_type_metallic_phase",
+            feedstocks,
+            unavailable_error_cls=BackendUnavailableError,
+        )
 
 
 def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():

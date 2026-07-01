@@ -66,6 +66,27 @@ def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
     assert calls[0]["stage0_subprocess_required"] is True
 
 
+def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):
+    def fail_resolve(*_args, **_kwargs):
+        raise AssertionError("backend resolver must not run for non-silicate feedstock")
+
+    monkeypatch.setattr(session_module, "resolve_backend", fail_resolve)
+
+    with pytest.raises(
+        RuntimeError,
+        match=(
+            "real_backend_out_of_domain: non_silicate_feedstock: "
+            "feedstock 'm_type_metallic_phase'"
+        ),
+    ):
+        SimSession().start(
+            _config(
+                backend_name="alphamelts",
+                feedstock_id="m_type_metallic_phase",
+            )
+        )
+
+
 class _FakeSim:
     def __init__(
         self,

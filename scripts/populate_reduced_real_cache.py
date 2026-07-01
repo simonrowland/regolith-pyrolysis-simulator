@@ -345,6 +345,12 @@ def _known_chemistry_case_gap(exc: RuntimeError | ValueError) -> dict[str, Any] 
                 "reason": "gate_liquidus_unavailable",
                 "detail": detail,
             }
+        if detail.startswith("real_backend_out_of_domain:"):
+            reason = detail.split(":", 2)[1].strip()
+            return {
+                "reason": reason or "real_backend_out_of_domain",
+                "detail": detail,
+            }
         diagnostic_keys = _diagnostic_keys_from_vapor_pressure_refusal(detail)
         if (
             "Authoritative VAPOR_PRESSURE dispatch returned" in detail

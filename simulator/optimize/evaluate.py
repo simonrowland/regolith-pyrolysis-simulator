@@ -19,7 +19,11 @@ from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backend_names import canonical_backend_name
-from simulator.backends import BackendUnavailableError, requires_stage0_subprocess
+from simulator.backends import (
+    BackendUnavailableError,
+    real_backend_feedstock_domain_reason,
+    requires_stage0_subprocess,
+)
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
@@ -610,6 +614,18 @@ def evaluate(
         ) from exc
     key = cache_key(spec)
     objective_profile = _objective_profile_for_spec(profile, spec)
+    domain_reason = real_backend_feedstock_domain_reason(
+        run_config.backend_name,
+        run_config.feedstock_id,
+        run_config.feedstocks,
+    )
+    if domain_reason is not None:
+        return _preflight_out_of_domain_result(
+            candidate_id,
+            spec,
+            key,
+            domain_reason,
+        )
     active_executor = executor or RunExecutor()
     runtime = worker_runtime if worker_runtime is not None else get_worker_runtime(
         feedstock_id=run_config.feedstock_id,
@@ -2780,6 +2796,40 @@ def _out_of_domain_result(
             *assessment.notes,
             _out_of_domain_note(run_execution),
             *_out_of_domain_reason_notes(run_execution),
+        ),
+    )
+
+
+def _preflight_out_of_domain_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    reason: str,
+) -> ScoredResult:
+    trace = {
+        "backend_status": "out_of_domain",
+        "backend_status_reason": reason,
+        "backend_status_reason_message": "backend cannot solve this composition",
+    }
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.OUT_OF_DOMAIN,
+        feasibility_margins={"backend_domain": _out_of_domain_margin(reason)},
+        failing_gates=("backend_domain",),
+        run_reference=RunReference(
+            status="failed",
+            reason=reason,
+            trace=trace,
+            backend_status="out_of_domain",
+            backend_status_reason=reason,
+        ),
+        notes=(
+            "backend_status=out_of_domain",
+            f"backend_status_reason={reason}",
+            "backend cannot solve this composition",
         ),
     )
 

@@ -353,6 +353,31 @@ def _mappingproxy_profile_evaluate(
     )
 
 
+def _runtime_probe_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    worker_runtime: object | None = None,
+    **kwargs: object,
+) -> ScoredResult:
+    assert worker_runtime is not None
+    assert getattr(worker_runtime, "feedstock_id", None) == "lunar_mare_low_ti"
+    assert getattr(worker_runtime, "stage0_subprocess_required", None) is True
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
+
 def _spec(
     patch: RecipePatch,
     feedstock_id: str,
@@ -439,6 +464,32 @@ def test_process_pool_matches_serial_deterministic_view(tmp_path: Path) -> None:
     serial_views = {result.candidate_id: deterministic_result_view(result) for result in serial}
     pooled_views = {result.candidate_id: deterministic_result_view(result) for result in pooled}
     assert pooled_views == serial_views
+
+
+@pytest.mark.timeout(15)
+def test_spinel_feedstock_pool_warm_path_returns_with_subprocess_route(
+    tmp_path: Path,
+) -> None:
+    profile = _profile()
+    requests = [
+        PoolEvaluationRequest(
+            _patch(1),
+            "lunar_mare_low_ti",
+            "fast",
+            candidate_id="spinel-route",
+        )
+    ]
+
+    results = evaluate_batch(
+        requests,
+        profile=profile,
+        max_workers=1,
+        output_root=tmp_path,
+        evaluate_fn=_runtime_probe_evaluate,
+    )
+
+    assert len(results) == 1
+    assert results[0].candidate_id == "spinel-route"
 
 
 def test_pool_preserves_input_order_under_reversed_completion(tmp_path: Path) -> None:

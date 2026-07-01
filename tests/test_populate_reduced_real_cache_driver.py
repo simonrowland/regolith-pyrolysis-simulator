@@ -485,6 +485,19 @@ def test_known_chemistry_edges_are_isolated_per_case(
     assert "CASE-GAP: m_type_metallic_phase/C2A_continuous" in capsys.readouterr().out
 
 
+def test_real_backend_out_of_domain_case_gap_is_classified():
+    gap = driver._known_chemistry_case_gap(
+        RuntimeError(
+            "real_backend_out_of_domain: non_silicate_feedstock: "
+            "feedstock 'm_type_metallic_phase' has no MELTS oxide-basis "
+            "composition; backend cannot solve this composition"
+        )
+    )
+
+    assert gap is not None
+    assert gap["reason"] == "non_silicate_feedstock"
+
+
 def test_gate_liquidus_unavailable_is_isolated_per_case(
     tmp_path,
     monkeypatch,

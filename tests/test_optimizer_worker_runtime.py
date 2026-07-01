@@ -87,7 +87,11 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
         return _stub_backend()
 
     monkeypatch.setattr(worker_runtime_module, "resolve_backend", resolve_once)
-    context = warm_worker_runtime("stub")
+    context = warm_worker_runtime(
+        "stub",
+        feedstock_id="lunar_mare_low_ti",
+        stage0_subprocess_required=True,
+    )
     assert context is not None
     assert resolve_calls == ["stub"]
 
@@ -225,7 +229,7 @@ def test_backend_from_worker_runtime_rejects_subprocess_mismatch(
     context = warm_worker_runtime(
         "stub",
         feedstock_id="lunar_mare_low_ti",
-        stage0_subprocess_required=True,
+        stage0_subprocess_required=False,
     )
 
     assert context is not None
@@ -241,7 +245,11 @@ def test_evaluate_uses_thread_local_worker_runtime(
         "resolve_backend",
         lambda *_args, **_kwargs: _stub_backend(),
     )
-    context = warm_worker_runtime("stub")
+    context = warm_worker_runtime(
+        "stub",
+        feedstock_id="lunar_mare_low_ti",
+        stage0_subprocess_required=True,
+    )
     assert context is not None
 
     class RecordingExecutor:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -19,12 +20,30 @@ from simulator.corpus_version import (
     interoperable_corpus_versions,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.melt_backend.alphamelts import (
+    AlphaMELTSBackend,
+    MELTS_MAJOR_OXIDES,
+    MELTS_OXIDE_ALIASES,
+)
 from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBackend
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
 CACHED_REAL_BACKEND_NAME = "cached-real"
+REAL_MELT_BACKEND_NAMES = ("alphamelts", CACHED_REAL_BACKEND_NAME)
+# Pre-grind sweep: these feedstocks can wedge in-process ThermoEngine;
+# tests guard this overlay by content digest, not grep.
+STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
+    "lunar_mare_low_ti",
+    "lunar_mare_high_ti",
+    "lunar_mare_lms1",
+    "lunar_eac_1a",
+    "s_type_asteroid_silicate",
+    "m_type_silicate_phase",
+    "v_type_vesta_hed",
+    "e_type_enstatite_aubrite",
+    "mars_perchlorate_rich",
+)
 CACHED_REAL_MISS_POLICIES = ("fail-loud", "live-fill")
 CACHE_TIER_CEILINGS = (
     "cached_interpolated",
@@ -304,6 +323,8 @@ def requires_stage0_subprocess(
 
     if explicit is not None:
         return bool(explicit)
+    if feedstock_id and str(feedstock_id) in STAGE0_SUBPROCESS_FEEDSTOCK_IDS:
+        return True
     if not feedstock_id or not isinstance(feedstocks, Mapping):
         return False
     feedstock = feedstocks.get(feedstock_id)
@@ -317,6 +338,67 @@ def requires_stage0_subprocess(
         feedstock.get("stage0_verdict_b_subprocess_required")
         or feedstock.get("spinel_rich")
     )
+
+
+def real_backend_feedstock_domain_reason(
+    backend_name: str,
+    feedstock_id: str | None,
+    feedstocks: Mapping[str, Any] | None,
+) -> str | None:
+    """Return a fail-loud reason when a real melt backend has no melt basis."""
+
+    name = canonical_backend_name(str(backend_name or "").strip().lower())
+    if name not in REAL_MELT_BACKEND_NAMES:
+        return None
+    if not feedstock_id or not isinstance(feedstocks, Mapping):
+        return None
+    feedstock = feedstocks.get(feedstock_id)
+    if not isinstance(feedstock, Mapping):
+        return None
+    composition = feedstock.get("composition_wt_pct")
+    if not isinstance(composition, Mapping):
+        return None
+    if _melts_major_oxide_sum(composition) <= 0.0:
+        return "non_silicate_feedstock"
+    return None
+
+
+def assert_real_backend_feedstock_supported(
+    backend_name: str,
+    feedstock_id: str | None,
+    feedstocks: Mapping[str, Any] | None,
+    *,
+    unavailable_error_cls: type[_E] = BackendUnavailableError,
+) -> None:
+    reason = real_backend_feedstock_domain_reason(
+        backend_name,
+        feedstock_id,
+        feedstocks,
+    )
+    if reason is None:
+        return
+    raise unavailable_error_cls(
+        "real_backend_out_of_domain: "
+        f"{reason}: feedstock {feedstock_id!r} has no MELTS oxide-basis "
+        "composition; backend cannot solve this composition"
+    )
+
+
+def _melts_major_oxide_sum(composition: Mapping[str, Any]) -> float:
+    total = 0.0
+    for raw_name, raw_value in composition.items():
+        oxide = MELTS_OXIDE_ALIASES.get(str(raw_name).strip().lower())
+        if oxide == "FeO_total":
+            oxide = "FeO"
+        if oxide not in MELTS_MAJOR_OXIDES:
+            continue
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value) and value > 0.0:
+            total += value
+    return total
 
 
 def stage0_subprocess_backend_config(

@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+import simulator.optimize.fidelity as fidelity_module
+import simulator.optimize.worker_runtime as worker_runtime_module
 from simulator.optimize.doe import (
     DEPENDENCY_FREE_LHC_SAMPLER,
     DoeSpec,
@@ -113,6 +115,72 @@ def _result(
         ),
         run_reference=run_reference,
     )
+
+
+def _warm_task(*, feedstock_id: str = FEEDSTOCK_ID) -> fidelity_module._FidelityTask:
+    return fidelity_module._FidelityTask(
+        index=0,
+        tier="high",
+        fn=_perfect_high,
+        patch=RecipePatch({}),
+        feedstock_id=feedstock_id,
+        fidelity="high",
+        profile={
+            "run": {"backend_name": "alphamelts"},
+            "fidelities": {"high": {"backend_name": "alphamelts"}},
+        },
+        candidate_id="fidelity-doe-000000-high",
+        kwargs={},
+    )
+
+
+def test_fidelity_warm_runtime_spec_carries_feedstock_subprocess_route() -> None:
+    spec = fidelity_module._warm_runtime_spec((_warm_task(),))
+
+    assert spec == fidelity_module._FidelityWarmRuntimeSpec(
+        backend_name="alphamelts",
+        feedstock_id=FEEDSTOCK_ID,
+        stage0_subprocess_required=True,
+    )
+
+
+def test_fidelity_task_requests_matching_feedstock_worker_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict[str, object]] = []
+    runtime = object()
+
+    def fake_get_worker_runtime(**kwargs: object) -> object:
+        calls.append(dict(kwargs))
+        return runtime
+
+    def fake_eval(
+        patch: RecipePatch,
+        feedstock_id: str,
+        fidelity: str,
+        *,
+        profile: dict[str, object],
+        candidate_id: str | None = None,
+        worker_runtime: object | None = None,
+    ) -> ScoredResult:
+        del patch, feedstock_id, fidelity, profile
+        assert worker_runtime is runtime
+        return _result(candidate_id, oxygen_kg=1.0, energy_kwh=2.0)
+
+    task = _warm_task()
+    task = fidelity_module._FidelityTask(
+        **{**task.__dict__, "fn": fake_eval}
+    )
+    monkeypatch.setattr(worker_runtime_module, "get_worker_runtime", fake_get_worker_runtime)
+
+    fidelity_module._call_evaluate_fn(task)
+
+    assert calls == [
+        {
+            "feedstock_id": FEEDSTOCK_ID,
+            "stage0_subprocess_required": True,
+        }
+    ]
 
 
 def _perfect_fast(

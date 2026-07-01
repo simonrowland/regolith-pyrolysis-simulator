@@ -8,6 +8,7 @@ import multiprocessing as mp
 import os
 import time
 from dataclasses import dataclass, replace
+from functools import lru_cache
 import inspect
 from pathlib import Path
 from queue import Empty
@@ -23,6 +24,8 @@ from simulator.optimize.doe import (
     sample_recipe_patches,
 )
 from simulator.backend_names import canonical_backend_name
+from simulator.backends import requires_stage0_subprocess
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import ObjectiveValue
 from simulator.fidelity_vocabulary import (
@@ -49,6 +52,14 @@ class _FidelityTask:
     profile: Mapping[str, Any]
     candidate_id: str
     kwargs: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class _FidelityWarmRuntimeSpec:
+    backend_name: str
+    feedstock_id: str
+    stage0_subprocess_required: bool
+
 
 DEFAULT_THRESHOLD_PROFILE: Mapping[str, Mapping[str, Any]] = {
     "spearman_min": {
@@ -289,12 +300,15 @@ def _run_eval_batch(
     max_workers: int,
 ) -> Mapping[tuple[str, int], EvalOutcome]:
     worker_count = min(max_workers, len(tasks), os.cpu_count() or 1)
-    warm_backend_name = _warm_backend_name(tasks)
+    warm_runtime_spec = _warm_runtime_spec(tasks)
     ctx = mp.get_context(_start_method())
     task_queue: mp.Queue[Any] = ctx.Queue()
     result_queue: mp.Queue[Any] = ctx.Queue()
     workers = [
-        ctx.Process(target=_fidelity_worker_loop, args=(task_queue, result_queue, warm_backend_name))
+        ctx.Process(
+            target=_fidelity_worker_loop,
+            args=(task_queue, result_queue, warm_runtime_spec),
+        )
         for _ in range(worker_count)
     ]
     outcomes: dict[tuple[str, int], EvalOutcome] = {}
@@ -379,9 +393,9 @@ def _run_eval_batch(
 def _fidelity_worker_loop(
     task_queue: Any,
     result_queue: Any,
-    warm_backend_name: str | None,
+    warm_runtime_spec: _FidelityWarmRuntimeSpec | str | None,
 ) -> None:
-    _initialize_fidelity_worker(warm_backend_name)
+    _initialize_fidelity_worker(warm_runtime_spec)
     while True:
         task = task_queue.get()
         if task is None:
@@ -449,7 +463,10 @@ def _call_evaluate_fn(task: _FidelityTask) -> ScoredResult:
     call_kwargs: dict[str, Any] = {
         "profile": dict(task.profile),
         "candidate_id": task.candidate_id,
-        "worker_runtime": get_worker_runtime(),
+        "worker_runtime": get_worker_runtime(
+            feedstock_id=task.feedstock_id,
+            stage0_subprocess_required=_task_stage0_subprocess_required(task),
+        ),
     }
     call_kwargs.update(dict(task.kwargs))
     signature = inspect.signature(task.fn)
@@ -475,18 +492,27 @@ def _payload_outcome(payload: Mapping[str, Any]) -> EvalOutcome:
     return None, payload["drop"]
 
 
-def _initialize_fidelity_worker(backend_name: str | None) -> None:
+def _initialize_fidelity_worker(
+    warm_runtime: _FidelityWarmRuntimeSpec | str | None,
+) -> None:
     from simulator.optimize.determinism import pin_worker_env
     from simulator.optimize.worker_runtime import clear_worker_runtime, warm_worker_runtime
 
     pin_worker_env()
-    if backend_name is None:
+    if warm_runtime is None:
         clear_worker_runtime()
         return
-    warm_worker_runtime(backend_name)
+    if isinstance(warm_runtime, str):
+        warm_worker_runtime(warm_runtime)
+        return
+    warm_worker_runtime(
+        warm_runtime.backend_name,
+        feedstock_id=warm_runtime.feedstock_id,
+        stage0_subprocess_required=warm_runtime.stage0_subprocess_required,
+    )
 
 
-def _warm_backend_name(tasks: Sequence[_FidelityTask]) -> str | None:
+def _warm_runtime_spec(tasks: Sequence[_FidelityTask]) -> _FidelityWarmRuntimeSpec | None:
     from simulator.optimize.worker_runtime import warm_workers_enabled
 
     if not warm_workers_enabled():
@@ -494,10 +520,28 @@ def _warm_backend_name(tasks: Sequence[_FidelityTask]) -> str | None:
     names = {_task_backend_name(task) for task in tasks}
     if len(names) != 1:
         return None
+    feedstocks = {str(task.feedstock_id) for task in tasks}
+    if len(feedstocks) != 1:
+        return None
     name = next(iter(names))
     if name in {"auto", "cached-real"}:
         return None
-    return name
+    feedstock_id = next(iter(feedstocks))
+    subprocess_required = any(_task_stage0_subprocess_required(task) for task in tasks)
+    return _FidelityWarmRuntimeSpec(
+        backend_name=name,
+        feedstock_id=feedstock_id,
+        stage0_subprocess_required=subprocess_required,
+    )
+
+
+def _task_stage0_subprocess_required(task: _FidelityTask) -> bool:
+    return requires_stage0_subprocess(task.feedstock_id, _default_feedstocks())
+
+
+@lru_cache(maxsize=1)
+def _default_feedstocks() -> Mapping[str, Any]:
+    return load_config_bundle(DEFAULT_DATA_DIR).feedstocks
 
 
 def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:

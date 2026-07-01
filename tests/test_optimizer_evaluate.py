@@ -2260,6 +2260,34 @@ def test_backend_unavailable_green_path_accepts_available_real_backend() -> None
     assert result.run_reference.backend_status == "ok"
 
 
+def test_metallic_real_backend_eval_fails_out_of_domain_before_executor() -> None:
+    real_profile = {
+        **PROFILE,
+        "feedstock": "m_type_metallic_phase",
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+
+    class RejectExecutor:
+        def execute(self, *_args, **_kwargs):
+            raise AssertionError("executor must not run for non-silicate feedstock")
+
+    result = evaluate(
+        _valid_patch(),
+        "m_type_metallic_phase",
+        "high",
+        profile=real_profile,
+        executor=RejectExecutor(),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.OUT_OF_DOMAIN
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "out_of_domain"
+    assert result.run_reference.backend_status_reason == "non_silicate_feedstock"
+    assert "backend_status_reason=non_silicate_feedstock" in result.notes
+
+
 def test_backend_unavailable_poison_pair_fires_named_gate() -> None:
     with pytest.raises(BackendUnavailableAbort) as raised:
         _backend_availability_fixture(available=False)

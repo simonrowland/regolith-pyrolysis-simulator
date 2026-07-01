@@ -11,6 +11,7 @@ from simulator.backends import (
     BackendSelectionPolicy,
     CACHED_REAL_BACKEND_NAME,
     SimulatorBuildConfig,
+    assert_real_backend_feedstock_supported,
     assert_stage0_subprocess_backend_safe,
     build_simulator,
     build_cached_real_store,
@@ -191,6 +192,22 @@ class SimSession:
             config.feedstock_id,
             config.feedstocks,
         )
+        if config.feedstock_id in config.feedstocks:
+            try:
+                assert_feedstock_loadable(
+                    config.feedstock_id,
+                    config.feedstocks[config.feedstock_id],
+                )
+            except BlockedFeedstockError as exc:
+                raise config.unavailable_error_cls(
+                    f"BlockedFeedstockError: {exc}"
+                ) from exc
+            assert_real_backend_feedstock_supported(
+                config.backend_name,
+                config.feedstock_id,
+                config.feedstocks,
+                unavailable_error_cls=config.unavailable_error_cls,
+            )
         if backend is None:
             backend = resolve_backend(
                 config.backend_name,
@@ -214,15 +231,6 @@ class SimSession:
                 f"unknown feedstock {config.feedstock_id!r}; expected one of "
                 f"{expected}..."
             )
-        try:
-            assert_feedstock_loadable(
-                config.feedstock_id,
-                config.feedstocks[config.feedstock_id],
-            )
-        except BlockedFeedstockError as exc:
-            raise config.unavailable_error_cls(
-                f"BlockedFeedstockError: {exc}"
-            ) from exc
 
         sim = build_simulator(
             SimulatorBuildConfig(
