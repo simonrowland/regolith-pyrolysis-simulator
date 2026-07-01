@@ -138,6 +138,46 @@ def _materials_with_stage_alpha(
     return materials
 
 
+def _materials_with_wall_alpha(
+    species: str,
+    entry: dict[str, object],
+) -> dict[str, object]:
+    materials = copy.deepcopy(condensation_module.MATERIALS_DATA)
+    materials["wall_surfaces"]["interstage_duct"]["alpha_s_by_species"][
+        species
+    ] = dict(entry)
+    for liner_config in materials["liner_materials"].values():
+        alpha_by_species = liner_config.get("alpha_s_by_species")
+        if isinstance(alpha_by_species, dict):
+            alpha_by_species[species] = None
+    return materials
+
+
+def _materials_with_liner_alpha(
+    liner_material: str,
+    species: str,
+    entry: dict[str, object],
+) -> dict[str, object]:
+    materials = copy.deepcopy(condensation_module.MATERIALS_DATA)
+    materials["liner_materials"][liner_material]["alpha_s_by_species"][
+        species
+    ] = dict(entry)
+    return materials
+
+
+def _analytical_value_ref_entry(source_class: str) -> dict[str, object]:
+    return {
+        "value_ref": (
+            "data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value"
+        ),
+        "citation_status": "CITED",
+        "status": "sourced",
+        "source_class": source_class,
+        "source": "test::analytical_value_ref_alpha",
+        "output_status": "sourced_with_surface_proxy",
+    }
+
+
 def _route_wall_deposit_authority(
     species: str,
     *,
@@ -496,6 +536,50 @@ def test_grounded_stage_alpha_driving_wall_deposit_stays_authoritative() -> None
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
     assert provenance["capture_budget"]["citation_status"] == "CITED"
+
+
+@pytest.mark.parametrize(
+    ("materials_case", "provenance_key", "reason_label"),
+    (
+        ("stage", "stage_1", "materials.yaml per-stage alpha_s"),
+        ("wall", "stage_0_to_stage_1", "materials.yaml wall alpha_s"),
+        ("liner", "stage_0_to_stage_1", "materials.yaml liner alpha_s"),
+    ),
+)
+@pytest.mark.parametrize(
+    "source_class_variant",
+    ("stub", "internal_analytical", "internal-analytical"),
+)
+def test_analytical_value_ref_material_alpha_cannot_certify_wall_deposit(
+    materials_case: str,
+    provenance_key: str,
+    reason_label: str,
+    source_class_variant: str,
+) -> None:
+    entry = _analytical_value_ref_entry(source_class_variant)
+    if materials_case == "stage":
+        materials = _materials_with_stage_alpha(1, "Fe", entry)
+    elif materials_case == "wall":
+        materials = _materials_with_wall_alpha("Fe", entry)
+    else:
+        materials = _materials_with_liner_alpha(
+            "fe_condenser_liner",
+            "Fe",
+            entry,
+        )
+
+    route, authority = _route_wall_deposit_authority("Fe", materials=materials)
+
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    record = authority["alpha_s_provenance_by_species"]["Fe"][provenance_key]
+    assert record["citation_status"] == "UNCERTIFIED"
+    assert record["status"] == "UNCERTIFIED"
+    assert record["output_status"] == "status_bearing"
+    assert record["source_class"] == source_class_variant
+    assert reason_label in record["certification_status_reason"]
+    assert "cannot certify" in record["certification_status_reason"]
 
 
 def test_zero_deposit_stage_alpha_status_stays_authoritative() -> None:

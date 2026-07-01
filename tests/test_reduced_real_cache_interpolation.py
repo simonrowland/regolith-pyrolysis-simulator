@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -307,6 +308,50 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(0.705)
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+
+
+def test_lookup_optional_accepts_fully_liquid_single_phase_rows(tmp_path: Path) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    db_path = tmp_path / "fully-liquid-interpolation.sqlite"
+    _put_interpolation_row(db_path, low, liquid_fraction=1.0, sio_pa=7.0)
+    _put_interpolation_row(db_path, high, liquid_fraction=1.0, sio_pa=7.05)
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    payload = store._lookup_optional(
+        str(query["artifact"]),
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+
+    assert payload is not None
+    assert store.last_cache_state == "cached_interpolated"
+    assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(1.0)
+    assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+
+
+def test_cached_interpolated_replay_demotes_backend_authority() -> None:
+    store = PT0DeterminismStore("capture")
+    store.last_cache_state = "cached_interpolated"
+    sim = SimpleNamespace(
+        _backend_authoritative=True,
+        _last_backend_diagnostics={},
+        _last_vapor_pressures_source={},
+        _last_vapor_pressure_diagnostic={},
+        _last_sulfur_saturation_result=None,
+        _backend_status_history=[],
+        melt=SimpleNamespace(fO2_log=-9.0),
+    )
+
+    result = store._equilibrium_from_payload(
+        sim,
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+
+    assert sim._backend_authoritative is False
+    assert sim._last_backend_diagnostics["reduced_real_cache_state"] == "cached_interpolated"
+    assert result.diagnostics["reduced_real_cache_authoritative"] is False
 
 
 def test_additive_exact_and_rung_paths_remain_intact(tmp_path: Path) -> None:

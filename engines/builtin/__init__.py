@@ -21,6 +21,9 @@ Public exports:
   debit overhead_gas / credit condensation_train; the second
   ledger-mutating intent in the migration, owns SiO disproportionation
   on deposition).
+- :class:`BuiltinNativeFeSaturationProvider` -- authoritative provider
+  for ``ChemistryIntent.NATIVE_FE_SATURATION`` (mol-native
+  FeO -> Fe + 0.5 O2 split).
 
 Package-init cycle convention (binding for every provider in this
 package): the providers must NOT top-level-import
@@ -51,6 +54,9 @@ from engines.builtin.evaporation_transition import (
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
 )
+from engines.builtin.native_fe_saturation import (
+    BuiltinNativeFeSaturationProvider,
+)
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from engines.builtin.overhead_gas_equilibrium import (
     BuiltinOverheadGasEquilibriumProvider,
@@ -67,6 +73,7 @@ __all__ = [
     "BuiltinEvaporationFluxProvider",
     "BuiltinEvaporationTransitionProvider",
     "BuiltinMetallothermicStepProvider",
+    "BuiltinNativeFeSaturationProvider",
     "BuiltinOverheadBleedProvider",
     "BuiltinOverheadGasEquilibriumProvider",
     "BuiltinStage0PretreatmentProvider",

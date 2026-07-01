@@ -34,7 +34,10 @@ SIO_CLOSURE_MAX_REL_PCT = 5e-12
 # terminal Si/SiO2, SiO-equivalent wall deposits, and escaped SiO. The
 # AtomLedger mass-balance gate below remains the hard invariant; this absolute
 # projection floor covers the 2026-06-29 reactive-wall + alpha_s(T) SiO
-# rebaseline while the hard AtomLedger balance remains <=5e-12 %.
+# rebaseline while the hard AtomLedger balance remains <=5e-12 %. The 2026-07-01
+# pre-0.6 SiO Antoine refit leaves the destination-split gap at ~3.9e-11..4.1e-11
+# mol (well under this floor); the wall-terminal Si-atom sum is the honest
+# closure (a transient de-double-count that inflated the gap was reverted).
 SIO_CLOSURE_MAX_ABS_MOL = 8e-11
 MASS_BALANCE_CLOSURE_MAX_PCT = 5e-12
 CUMULATIVE_TRANSITION_IMBALANCE_MAX_KG = 1e-9

@@ -13,6 +13,7 @@ from engines.builtin._common import (
     unpack_controls,
 )
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -23,6 +24,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 REACTION_FAMILY_C7_CA_ALUMINOTHERMIC = "c7_ca_aluminothermic"
@@ -365,19 +367,49 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 "c7_no_active_dedicated_ca_condensation_route",
                 control_audit=control_audit,
             )
-        thermo_margin = _finite_float(
+        configured_thermo_margin = _finite_float(
             controls.get("thermo_margin_kj_per_mol_o2"), float("nan")
         )
-        thermo_ok = bool(controls.get("thermo_margin_favorable") or False)
-        if not thermo_ok and not (
-            math.isfinite(thermo_margin) and thermo_margin > 0.0
+        computed_thermo_margin = self._computed_thermo_margin_kj_per_mol_o2(
+            hold_temp_C
+        )
+        if not (
+            math.isfinite(computed_thermo_margin)
+            and computed_thermo_margin > 0.0
         ):
             return self._refused(
                 "c7_vacuum_shifted_thermo_margin_unfavorable",
                 control_audit=control_audit,
-                thermo_margin_kj_per_mol_o2=thermo_margin,
+                thermo_margin_kj_per_mol_o2=computed_thermo_margin,
+                computed_thermo_margin_kj_per_mol_o2=computed_thermo_margin,
+                configured_thermo_margin_kj_per_mol_o2=configured_thermo_margin,
+                configured_thermo_margin_favorable=bool(
+                    controls.get("thermo_margin_favorable") or False
+                ),
+                thermo_margin_source="builtin_janaf_ellingham_al_ca",
             )
         return None
+
+    @classmethod
+    def _computed_thermo_margin_kj_per_mol_o2(
+        cls,
+        hold_temp_C: float,
+    ) -> float:
+        return cls._ellingham_delta_g_kj_per_mol_o2(
+            "Ca", hold_temp_C
+        ) - cls._ellingham_delta_g_kj_per_mol_o2("Al", hold_temp_C)
+
+    @staticmethod
+    def _ellingham_delta_g_kj_per_mol_o2(
+        metal: str,
+        temperature_C: float,
+    ) -> float:
+        # ELLINGHAM_THERMO is the existing JANAF high-T refit table; keep the
+        # C7 gate on computed table values, not caller-provided scalar signs.
+        dH_f, dS_f, _n_M, _n_ox = ELLINGHAM_THERMO[metal]
+        return dH_f - (
+            (float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET) * dS_f
+        )
 
     def _dispatch_capture(
         self,

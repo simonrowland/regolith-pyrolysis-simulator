@@ -1,0 +1,209 @@
+from __future__ import annotations
+
+import pytest
+
+from engines.builtin.native_fe_saturation import BuiltinNativeFeSaturationProvider
+from simulator.chemistry.kernel import (
+    AccountFilterViolation,
+    ChemistryIntent,
+    IntentRequest,
+    LedgerTransitionProposal,
+    ProviderAccountView,
+)
+from simulator.chemistry.kernel.validation import (
+    validate_atom_balance,
+    validate_proposal_accounts,
+)
+from tests.chemistry.conftest import _atom_check, _build_sim
+
+
+DECLARED_ACCOUNTS = frozenset({
+    "process.cleaned_melt",
+    "terminal.drain_tap_material",
+    "process.overhead_gas",
+})
+PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
+    "lunar_mare_low_ti": {
+        "native_fe_mol": 1610.7768609700126,
+        "tap_Fe_kg": 89.9538338009,
+    },
+    "mars_basalt": {
+        "native_fe_mol": 1683.715115709812,
+    },
+}
+
+
+def _request(registry, accounts, native_fe_mol: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.NATIVE_FE_SATURATION,
+        account_view=ProviderAccountView(
+            accounts=accounts,
+            species_formula_registry=registry,
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-5,
+        control_inputs={"native_fe_mol": native_fe_mol},
+    )
+
+
+@pytest.fixture(scope="module")
+def formula_registry(vapor_pressure_data, feedstocks_data, setpoints_data):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    return sim.species_formula_registry
+
+
+def test_provider_declares_only_native_fe_intent_and_scoped_accounts():
+    profile = BuiltinNativeFeSaturationProvider().capability_profile()
+
+    assert profile.intents == frozenset({ChemistryIntent.NATIVE_FE_SATURATION})
+    assert profile.is_authoritative_for == frozenset(
+        {ChemistryIntent.NATIVE_FE_SATURATION}
+    )
+    assert profile.declared_accounts == DECLARED_ACCOUNTS
+
+
+def test_provider_emits_only_declared_accounts(formula_registry):
+    result = BuiltinNativeFeSaturationProvider().dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {"FeO": 3.0}},
+            native_fe_mol=1.25,
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.accounts_touched() == DECLARED_ACCOUNTS
+    validate_proposal_accounts(
+        result.transition,
+        BuiltinNativeFeSaturationProvider().capability_profile().declared_accounts,
+    )
+
+
+def test_native_fe_intent_authority_is_registered(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+
+    summary = sim._chem_registry.capability_summary()
+    assert summary[ChemistryIntent.NATIVE_FE_SATURATION.value][
+        "authoritative"
+    ] == "builtin-native-fe-saturation"
+
+
+def test_account_filter_rejects_wider_native_fe_proposal():
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"FeO": 1.0}},
+        credits={"process.metal_phase": {"Fe": 1.0}},
+        reason="native_fe_saturation_bad_account",
+    )
+
+    with pytest.raises(AccountFilterViolation):
+        validate_proposal_accounts(proposal, DECLARED_ACCOUNTS)
+
+
+def test_native_fe_proposal_balances_atoms(formula_registry):
+    result = BuiltinNativeFeSaturationProvider().dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {"FeO": 3.0}},
+            native_fe_mol=1.25,
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.cleaned_melt": {"FeO": 1.25},
+    }
+    assert dict(result.transition.credits) == {
+        "terminal.drain_tap_material": {"Fe": 1.25},
+        "process.overhead_gas": {"O2": 0.625},
+    }
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+    validate_atom_balance(result.transition, formula_registry)
+
+
+def _native_fe_saturating_sim(
+    feedstock_id: str,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    additives = {"C": 30.0} if feedstock_id == "mars_basalt" else None
+    sim = _build_sim(
+        feedstock_id,
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg=additives,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+    return sim
+
+
+@pytest.mark.parametrize("feedstock_id", ["lunar_mare_low_ti", "mars_basalt"])
+def test_kernel_native_fe_split_matches_pinned_migration_golden(
+    feedstock_id,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _native_fe_saturating_sim(
+        feedstock_id,
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    before = {
+        account: dict(sim.atom_ledger.mol_by_account(account))
+        for account in DECLARED_ACCOUNTS
+    }
+    golden = PINNED_NATIVE_FE_MIGRATION_GOLDENS[feedstock_id]
+    expected_native_fe_mol = golden["native_fe_mol"]
+
+    sim._apply_native_fe_saturation_split()
+
+    after = {
+        account: dict(sim.atom_ledger.mol_by_account(account))
+        for account in DECLARED_ACCOUNTS
+    }
+    feo_debit_mol = (
+        before["process.cleaned_melt"].get("FeO", 0.0)
+        - after["process.cleaned_melt"].get("FeO", 0.0)
+    )
+    tap_fe_credit_mol = (
+        after["terminal.drain_tap_material"].get("Fe", 0.0)
+        - before["terminal.drain_tap_material"].get("Fe", 0.0)
+    )
+    overhead_o2_credit_mol = (
+        after["process.overhead_gas"].get("O2", 0.0)
+        - before["process.overhead_gas"].get("O2", 0.0)
+    )
+
+    assert feo_debit_mol == pytest.approx(expected_native_fe_mol, abs=1e-9)
+    assert tap_fe_credit_mol == pytest.approx(expected_native_fe_mol, abs=1e-9)
+    assert overhead_o2_credit_mol == pytest.approx(
+        0.5 * expected_native_fe_mol,
+        abs=1e-9,
+    )
+    if feedstock_id == "lunar_mare_low_ti":
+        tap_kg = sim.atom_ledger.kg_by_account(
+            "terminal.drain_tap_material"
+        )["Fe"]
+        assert tap_kg == pytest.approx(golden["tap_Fe_kg"], abs=1e-9)

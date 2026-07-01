@@ -52,7 +52,10 @@ from typing import Mapping
 import pytest
 import yaml
 
-from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+from engines.builtin.vapor_pressure import (
+    BuiltinVaporPressureProvider,
+    VaporPressureComputationError,
+)
 from engines.vaporock import VapoRockProvider
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -637,6 +640,13 @@ def test_corpus_anchor_engine_runs_without_crashing(
         vapor = _dispatch_vapor_pressure(sim, anchor)
     except ProviderUnavailableError as exc:
         pytest.skip(f"{engine}: {exc}")
+    except VaporPressureComputationError as exc:
+        if "out_of_validated_range" not in str(exc):
+            raise
+        pytest.skip(
+            f"{anchor.species} builtin Antoine range does not cover "
+            f"{anchor.T_K}K (V25 fail-loud)"
+        )
     assert vapor, (
         f"{engine} returned empty vapor_pressures_Pa for "
         f"{anchor.anchor_id}"

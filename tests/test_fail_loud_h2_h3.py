@@ -164,7 +164,7 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
 
     result = provider.dispatch(
         _vapor_request(
-            temperature_c=3000.0,
+            temperature_c=2000.0,
             pO2_bar=1.0e-9,
         )
     )
@@ -173,6 +173,14 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
     assert result.status == "ok"
     assert result.diagnostic["pO2_bar"] == pytest.approx(1.0e-9)
     assert all(math.isfinite(value) for value in pressures.values())
+
+    with pytest.raises(VaporPressureComputationError, match="out_of_validated_range"):
+        provider.dispatch(
+            _vapor_request(
+                temperature_c=3000.0,
+                pO2_bar=1.0e-9,
+            )
+        )
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:

@@ -2411,6 +2411,56 @@ def _two_phase_evaluate_patch(
     )
 
 
+def _two_phase_exact_flip_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    index = _sequence(candidate_id)
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    fid_opts = profile.get("fidelities", {}).get(fidelity, {})
+    tier_ceiling = fid_opts.get("cache_tier_ceiling", "cached_interpolated")
+    if tier_ceiling != "cached_interpolated" and index == 4:
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=False,
+            failure_category=FailureCategory.INFEASIBLE_RECIPE,
+            feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+            failing_gates=("delivered_stream_purity",),
+            run_reference=RunReference(
+                status="ok",
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "per_hour_summary": [{"reduced_real_cache_state": "cached_exact"}],
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "mass_closure": {
+                        "status": "closed",
+                        "mass_balance_error_pct": 0.0,
+                    }
+                },
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+    return _two_phase_evaluate_patch(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+
+
 def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -> None:
     out = tmp_path / "two-phase"
     result = study.run(
@@ -2463,6 +2513,34 @@ def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -
         certification["aggregate_disagreement"]["max"]
         == pytest.approx(abs(explore_winner.objectives["oxygen_kg"] - result.winner.objectives["oxygen_kg"]))
     )
+
+
+def test_two_phase_certification_filters_exact_infeasible_before_objective(tmp_path) -> None:
+    out = tmp_path / "two-phase-exact-flip"
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_exact_flip_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    assert result.winner.candidate_id == "random-7-000003"
+    assert all(record.feasible for record in result.leaderboard)
+    certification = json.loads((out / "two_phase_certification.json").read_text())
+    flipped = next(
+        row
+        for row in certification["candidates"]
+        if row["candidate_id"] == "random-7-000004"
+    )
+    assert flipped["certified_objective"] is None
+    assert flipped["disagreement"] is None
+    assert certification["aggregate_disagreement"]["max"] > 0.0
 
 
 def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:

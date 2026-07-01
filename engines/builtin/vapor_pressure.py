@@ -651,6 +651,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressure_provenance: dict[str, dict[str, float | str]] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
+        oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         warnings: list[str] = []
 
@@ -831,8 +832,59 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             B = antoine.get('B', 0)
             C = antoine.get('C', 0)
             valid = data.get('valid_range_K', [0, 9999])
-            if not (A > 0 and valid[0] <= T_K <= valid[1]):
+            if not A > 0:
                 continue
+
+            parent_oxide = data.get('parent_oxide', '')
+            activity_factor = 1.0
+            if parent_oxide:
+                a_ox = comp_wt.get(parent_oxide, 0.0) / 100.0
+                if a_ox <= 1e-10:
+                    continue
+                activities[name] = a_ox
+                activity_exponent = float(
+                    data.get('oxide_activity_exponent', 1.0)
+                )
+                activity_factor = max(a_ox, 0.0) ** activity_exponent
+
+            valid_range = _range_tuple(valid)
+            if valid_range is not None:
+                valid_low, valid_high = valid_range
+                if T_K < valid_low:
+                    continue
+                if T_K > valid_high:
+                    extrapolation_allowed_range = _range_tuple(
+                        data.get("extrapolation_allowed_range_K")
+                    )
+                    if extrapolation_allowed_range is None:
+                        raise VaporPressureComputationError(
+                            "oxide_vapor_pressure_out_of_validated_range: "
+                            f"species={name} temperature_K={T_K:.2f} "
+                            f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
+                            "extrapolation_allowed_range_K=absent"
+                        )
+                    allowed_low, allowed_high = extrapolation_allowed_range
+                    if T_K < allowed_low or T_K > allowed_high:
+                        raise VaporPressureComputationError(
+                            "oxide_vapor_pressure_out_of_validated_range: "
+                            f"species={name} temperature_K={T_K:.2f} "
+                            f"valid_range_K=[{valid_low:g}, {valid_high:g}] "
+                            "extrapolation_allowed_range_K="
+                            f"[{allowed_low:g}, {allowed_high:g}]"
+                        )
+                    oxide_vapor_extrapolations[name] = {
+                        "temperature_K": T_K,
+                        "valid_range_K": (valid_low, valid_high),
+                        "extrapolation_allowed_range_K": (
+                            allowed_low,
+                            allowed_high,
+                        ),
+                    }
+                    warnings.append(
+                        f"{name} oxide-vapor Antoine fit extrapolated beyond "
+                        f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                        f"{T_K:.2f} K"
+                    )
             log_P = A - B / (T_K + C)
             P_reference_Pa = _pow10_pressure_or_raise(
                 log_P,
@@ -840,17 +892,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="P_reference_Antoine_Pa",
             )
             P_eq_Pa = P_reference_Pa
-            activity_factor = 1.0
             pO2_scaled = False
 
-            parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
-                a_ox = comp_wt.get(parent_oxide, 0.0) / 100.0
-                activities[name] = a_ox
-                activity_exponent = float(
-                    data.get('oxide_activity_exponent', 1.0)
-                )
-                activity_factor = max(a_ox, 0.0) ** activity_exponent
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * activity_factor,
                     species=name,
@@ -894,6 +938,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
                 )
+                if name in oxide_vapor_extrapolations:
+                    source_label = (
+                        f"{source_label}:"
+                        "extrapolated_beyond_valid_range_K"
+                    )
                 vapor_pressure_sources[name] = source_label
                 vapor_pressure_provenance[name] = {
                     "pressure_kind": _runtime_pressure_kind(
@@ -922,7 +971,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
             "activities": activities,
             "pO2_bar": transport_pO2_bar,
-            "extrapolated_beyond_valid_range_K": metal_extrapolations,
+            "extrapolated_beyond_valid_range_K": {
+                **metal_extrapolations,
+                **oxide_vapor_extrapolations,
+            },
             "ellingham_extrapolated_beyond_fit_range_K": (
                 ellingham_extrapolations
             ),

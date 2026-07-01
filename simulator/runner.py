@@ -92,6 +92,7 @@ from simulator.state import (
 # Public schema version pinned by docs/runner-output-schema.md.
 RUNNER_SCHEMA_VERSION = "1.3.1"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
+RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
     "source-side O2 potential (emitted; not recovered)"
 )
@@ -125,7 +126,7 @@ SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
 SIO_TSWEEP_DEFAULT_T_LOW_GRID_C: tuple[float, ...] = (1050.0, 1100.0, 1150.0)
 SIO_TSWEEP_DEFAULT_T_HOLD_GRID_C: tuple[float, ...] = (1400.0, 1500.0, 1600.0)
 SIO_TSWEEP_DEFAULT_RAMP_GRID_C_PER_HR: tuple[float, ...] = (5.0, 10.0, 15.0)
-SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT = 5.0e-12
+SIO_TSWEEP_MASS_BALANCE_LIMIT_PCT = RUNNER_MASS_BALANCE_LIMIT_PCT
 SIO_TSWEEP_GAP_A_BAND = "1200-1673K low-T extrapolation"
 SIO_TSWEEP_WARNING_TEXT = (
     "Recipe T_hold in Gap A (1200-1673K low-T extrapolation); promote "
@@ -1058,6 +1059,8 @@ class PyrolysisRun:
             getattr(sim, "_c7_product_report", {}) or {})
         c7_refusal_diagnostic = dict(
             getattr(sim, "_last_c7_refusal_diagnostic", {}) or {})
+        status, reason, error_message = _status_with_mass_balance_invariant(
+            execution)
 
         payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
@@ -1070,9 +1073,9 @@ class PyrolysisRun:
             "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
             "per_hour_summary": list(execution.per_hour),
             "shadow_trace": list(execution.shadow_trace),
-            "status": execution.status,
-            "reason": execution.reason,
-            "error_message": execution.error_message,
+            "status": status,
+            "reason": reason,
+            "error_message": error_message,
         }
         if c7_product_report:
             payload["c7_product_report"] = _json_safe(c7_product_report)
@@ -1181,6 +1184,60 @@ def _positive_mass_kg(value: Any, *, field: str = "mass_kg") -> float:
             f"{ZERO_INPUT_BASIS_BREACH}: {field} must be > 0 kg; got {mass_kg:.12g}"
         )
     return mass_kg
+
+
+def _latest_execution_mass_balance_pct(execution: RunExecution) -> float | None:
+    snapshots = tuple(getattr(execution, "snapshots", ()) or ())
+    if snapshots:
+        raw = getattr(snapshots[-1], "mass_balance_error_pct", None)
+        if raw is not None:
+            return _coerce_mass_balance_pct(
+                raw, source="execution.snapshots[-1]",
+            )
+    per_hour = tuple(getattr(execution, "per_hour", ()) or ())
+    if per_hour:
+        return _latest_mass_balance_pct({"per_hour_summary": per_hour})
+    return None
+
+
+def _coerce_mass_balance_pct(value: Any, *, source: str) -> float:
+    try:
+        pct = float(value)
+    except (TypeError, ValueError) as exc:
+        raise EngineBugAbort(
+            f"mass_balance_key_non_numeric_in_snapshot: source={source} "
+            "key=mass_balance_error_pct"
+        ) from exc
+    if not math.isfinite(pct):
+        raise EngineBugAbort(
+            f"mass_balance_key_nonfinite_in_snapshot: source={source} "
+            "key=mass_balance_error_pct"
+        )
+    return pct
+
+
+def _status_with_mass_balance_invariant(
+    execution: RunExecution,
+) -> tuple[str, str, str]:
+    status = str(execution.status)
+    reason = str(execution.reason)
+    error_message = str(execution.error_message)
+    if status not in {"ok", "partial"}:
+        return status, reason, error_message
+
+    mass_balance_pct = _latest_execution_mass_balance_pct(execution)
+    if (
+        mass_balance_pct is None
+        or abs(mass_balance_pct) <= RUNNER_MASS_BALANCE_LIMIT_PCT
+    ):
+        return status, reason, error_message
+
+    reason = "mass_balance_closure_breach"
+    error_message = (
+        f"{reason}: {mass_balance_pct:.12g}% > "
+        f"{RUNNER_MASS_BALANCE_LIMIT_PCT:.12g}%"
+    )
+    return "failed", reason, error_message
 
 
 def _nested_species_kg_from_segment_species(
@@ -1658,6 +1715,25 @@ def _wall_deposit_mol_by_species(
     return wall_deposit_mol
 
 
+def _sio_wall_terminal_mol(wall_deposit: Mapping[str, float]) -> float:
+    # SiO-equivalent (Si-atom) count of every Si-bearing wall deposit. SiO is
+    # the only Si vapor species reaching the wall, so every wall Si atom -- as
+    # direct SiO, as the disproportionation pair Si + SiO2 (2 SiO -> Si + SiO2,
+    # which carry DIFFERENT Si atoms and are therefore both summed, not paired),
+    # or as further-reduced FeSi -- descends from exactly one evaporated SiO.
+    # Summing them is Si-atom conservation, required for the
+    # evaporated -> (terminal + wall + escape) chain closure
+    # (test_sio_chain_coherence). A prior de-double-count
+    # 2*min(SiO2, Si+FeSi) coincided with the sum only for balanced
+    # disproportionation and silently dropped unpaired wall Si, breaking closure.
+    return (
+        float(wall_deposit.get("SiO", 0.0))
+        + float(wall_deposit.get("Si", 0.0))
+        + float(wall_deposit.get("SiO2", 0.0))
+        + float(wall_deposit.get("FeSi", 0.0))
+    )
+
+
 def _final_summary_report(
     final_state: Mapping[str, Mapping[str, float]],
     execution: RunExecution,
@@ -1982,12 +2058,7 @@ def build_sio_yield_report(
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
     si_terminal_mol = float(condensation_train.get("Si", 0.0))
     sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
-    sio_wall_mol = (
-        float(wall_deposit.get("SiO", 0.0))
-        + float(wall_deposit.get("Si", 0.0))
-        + float(wall_deposit.get("SiO2", 0.0))
-        + float(wall_deposit.get("FeSi", 0.0))
-    )
+    sio_wall_mol = _sio_wall_terminal_mol(wall_deposit)
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
     terminal_mol = (
         si_terminal_mol

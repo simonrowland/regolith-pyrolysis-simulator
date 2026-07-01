@@ -6,7 +6,7 @@ from simulator.campaigns import CampaignManager
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.melt_backend.base import StubBackend
-from simulator.state import BatchRecord, CampaignPhase, DecisionType
+from simulator.state import BatchRecord, CampaignPhase, DecisionType, MeltState
 from web.feedstock_data import (
     DATA_DIR,
     get_visible_feedstock,
@@ -142,6 +142,36 @@ def test_debug_batches_auto_apply_branching_decisions():
 
     assert manager.get_next_campaign(CampaignPhase.C5, record) == CampaignPhase.C6
     assert (DecisionType.C6_PROCEED, "yes") in record.decisions
+
+
+def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
+    manager = CampaignManager({"campaigns": {}})
+    record = BatchRecord(path="A_staged")
+
+    assert manager.get_next_campaign(
+        CampaignPhase.C2A_STAGED,
+        record,
+    ) == CampaignPhase.C3_NA
+    staged_melt = MeltState(campaign=CampaignPhase.C3_NA)
+    manager.configure_campaign(staged_melt, CampaignPhase.C3_NA)
+
+    assert manager.get_temp_target(
+        CampaignPhase.C3_NA, 0, staged_melt
+    ) == (1150.0, 600.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C3_NA, 3, staged_melt
+    ) == (1150.0, 600.0)
+    assert "C3_NA" not in manager.overrides
+
+    default_melt = MeltState(campaign=CampaignPhase.C3_NA)
+    manager.configure_campaign(default_melt, CampaignPhase.C3_NA)
+
+    assert manager.get_temp_target(
+        CampaignPhase.C3_NA, 0, default_melt
+    ) == (1275.0, 50.0)
+    assert manager.get_temp_target(
+        CampaignPhase.C3_NA, 3, default_melt
+    ) == (1600.0, 50.0)
 
 
 def test_debug_batches_skip_c5_by_default_after_c4():

@@ -18,6 +18,7 @@
         "evaporation_flux": "builtin-evaporation-flux",
         "evaporation_transition": "builtin-evaporation-transition",
         "metallothermic_step": "builtin-metallothermic-step",
+        "native_fe_saturation": "builtin-native-fe-saturation",
         "overhead_bleed": "builtin-overhead-bleed",
         "overhead_gas_equilibrium": "builtin-overhead-gas-equilibrium",
         "oxygen_reservoir_exchange": "builtin-oxygen-reservoir-exchange",
@@ -48,6 +49,11 @@
         },
         "metallothermic_step": {
           "authoritative": "builtin-metallothermic-step",
+          "fallback": null,
+          "shadows": []
+        },
+        "native_fe_saturation": {
+          "authoritative": "builtin-native-fe-saturation",
           "fallback": null,
           "shadows": []
         },

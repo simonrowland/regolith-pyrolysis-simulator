@@ -52,9 +52,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:302</code> - metals.Si.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5&quot;</li>
 <li><code>data/vapor_pressures.yaml:384</code> - metals.Cr.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine&quot;</li>
 <li><code>data/vapor_pressures.yaml:386</code> - metals.Cr.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:636</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
-<li><code>data/vapor_pressures.yaml:660</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
-<li><code>data/vapor_pressures.yaml:666</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
+<li><code>data/vapor_pressures.yaml:638</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
+<li><code>data/vapor_pressures.yaml:662</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
+<li><code>data/vapor_pressures.yaml:668</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-003">
@@ -168,6 +168,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - species.id.source: source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:164</code> - species.id.source: source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:208</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
+<li><code>simulator/core.py:4683</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -183,8 +184,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/vapor_pressures.yaml:68</code> - metals.Na.evaporation_alpha.source: source: &quot;OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13&quot;</li>
 <li><code>data/vapor_pressures.yaml:497</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:650</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
-<li><code>data/vapor_pressures.yaml:675</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:652</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:677</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-014">
@@ -202,7 +203,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:131</code> - metals.K.evaporation_alpha.source: source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model&quot;</li>
 <li><code>data/vapor_pressures.yaml:395</code> - metals.Cr.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found&quot;</li>
 <li><code>data/vapor_pressures.yaml:497</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:589</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
+<li><code>data/vapor_pressures.yaml:591</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-015">
@@ -287,7 +288,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:422</code> - metals.Mn.pure_component_antoine.default_segment: # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF</li>
 <li><code>data/vapor_pressures.yaml:432</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity&quot;</li>
 <li><code>data/vapor_pressures.yaml:469</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K&quot;</li>
-<li><code>data/vapor_pressures.yaml:613</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
+<li><code>data/vapor_pressures.yaml:615</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">

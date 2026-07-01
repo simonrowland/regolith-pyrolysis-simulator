@@ -31,7 +31,8 @@ def _sim(feedstocks):
     )
 
 
-def _na2co3_gate(
+def _carbonate_decomposition_extent(
+    species: str,
     species_mol: float,
     melt_sio2_kg: float,
     temp_c: float,
@@ -40,7 +41,10 @@ def _na2co3_gate(
     if species_mol <= 0.0:
         return 0.0
     foulant_registry = load_foulant_registry(FOULANT_THERMO)
-    thermal_extent = chi_decomp("Na2CO3", temp_c, 0.0, 0.0, foulant_registry).extent
+    thermal_extent = chi_decomp(species, temp_c, 0.0, 0.0, foulant_registry).extent
+    thermal_extent = max(0.0, min(1.0, thermal_extent))
+    if species != "Na2CO3":
+        return thermal_extent
     sio2_mol = melt_sio2_kg / resolve_species_formula(
         "SiO2", registry).molar_mass_kg_per_mol()
     return thermal_extent * min(1.0, sio2_mol / species_mol)
@@ -78,10 +82,8 @@ def _expected_carbonate_decomposition(
             comp_kg = feed_kg * (moles * molar_mass / total_group_mass)
             comp_formula = resolve_species_formula(comp_id, registry)
             comp_mol = comp_kg / comp_formula.molar_mass_kg_per_mol()
-            extent = (
-                _na2co3_gate(comp_mol, melt_sio2_kg, temp_c, registry)
-                if comp_id == "Na2CO3"
-                else 1.0
+            extent = _carbonate_decomposition_extent(
+                comp_id, comp_mol, melt_sio2_kg, temp_c, registry
             )
             atoms = comp_formula.atom_moles(comp_mol * extent)
             co2_kg += atoms.get("C", 0.0) * resolve_species_formula(
@@ -104,10 +106,8 @@ def _expected_carbonate_decomposition(
 
     formula = resolve_species_formula(species, registry)
     species_mol = feed_kg / formula.molar_mass_kg_per_mol()
-    extent = (
-        _na2co3_gate(species_mol, melt_sio2_kg, temp_c, registry)
-        if species == "Na2CO3"
-        else 1.0
+    extent = _carbonate_decomposition_extent(
+        species, species_mol, melt_sio2_kg, temp_c, registry
     )
     atoms = formula.atom_moles(species_mol * extent)
     co2_kg = atoms.get("C", 0.0) * resolve_species_formula(

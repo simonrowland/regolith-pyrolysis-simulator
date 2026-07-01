@@ -156,6 +156,19 @@ class _SiOnlyMelt:
         return {"SiO2": 100.0}
 
 
+def _si_only_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+
 def _si_only_transport_redox_request(
     *,
     transport_pO2_bar: float,
@@ -312,6 +325,64 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in result.warnings
     )
+
+
+def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
+    vapor_pressure_data,
+):
+    sio_data = vapor_pressure_data["oxide_vapors"]["SiO"]
+    assert sio_data["valid_range_K"] == [1400, 2200]
+    assert sio_data["extrapolation_allowed_range_K"] == [1400, 2273.15]
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    in_range = provider.dispatch(_si_only_vapor_request_at_T_K(2199.15))
+    just_above = provider.dispatch(_si_only_vapor_request_at_T_K(2200.15))
+    process_cap = provider.dispatch(_si_only_vapor_request_at_T_K(2273.15))
+
+    assert in_range.status == "ok"
+    assert just_above.status == "ok"
+    assert process_cap.status == "ok"
+    assert in_range.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+    assert just_above.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+    assert process_cap.diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+    assert "SiO" not in in_range.diagnostic["extrapolated_beyond_valid_range_K"]
+
+    for result, temperature_K in (
+        (just_above, 2200.15),
+        (process_cap, 2273.15),
+    ):
+        extrapolation = result.diagnostic[
+            "extrapolated_beyond_valid_range_K"
+        ]["SiO"]
+        assert extrapolation["temperature_K"] == pytest.approx(temperature_K)
+        assert tuple(extrapolation["valid_range_K"]) == (1400.0, 2200.0)
+        assert tuple(extrapolation["extrapolation_allowed_range_K"]) == (
+            1400.0,
+            2273.15,
+        )
+        assert result.diagnostic["vapor_pressures_source"]["SiO"].endswith(
+            ":extrapolated_beyond_valid_range_K"
+        )
+        assert any(
+            "SiO oxide-vapor Antoine fit extrapolated beyond valid_range_K"
+            in warning
+            for warning in result.warnings
+        )
+
+
+def test_sio_oxide_vapor_extrapolation_fails_loud_beyond_process_bound(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    with pytest.raises(
+        VaporPressureComputationError,
+        match=(
+            "oxide_vapor_pressure_out_of_validated_range: "
+            "species=SiO .*extrapolation_allowed_range_K=\\[1400, 2273.15\\]"
+        ),
+    ):
+        provider.dispatch(_si_only_vapor_request_at_T_K(2273.16))
 
 
 def test_ellingham_fit_band_extrapolation_is_diagnostic(

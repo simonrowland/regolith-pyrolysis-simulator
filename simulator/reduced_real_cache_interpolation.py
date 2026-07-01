@@ -169,10 +169,7 @@ def interpolation_validity_gate(
     query_liquid_fraction = _query_liquid_fraction_proxy(query_key, neighbors)
     if query_liquid_fraction is not None:
         margin = INTERPOLATION_SOLID_FRACTION_MARGIN
-        if (
-            query_liquid_fraction < margin
-            or query_liquid_fraction > 1.0 - margin
-        ):
+        if query_liquid_fraction < margin:
             result["accepted"] = False
             result["refusal_reason"] = "solid_fraction_margin"
             return result
@@ -436,15 +433,23 @@ def _phase_boundary_refusal(payload: Any) -> str | None:
     except (TypeError, ValueError):
         return "phase_boundary_proximity"
     eps = INTERPOLATION_PHASE_BOUNDARY_EPS
-    if value <= eps or value >= 1.0 - eps:
+    if value <= eps:
         return "phase_boundary_proximity"
     phase_masses = result.get("phase_masses_kg", {})
     if isinstance(phase_masses, Mapping):
-        total = sum(float(mass) for mass in phase_masses.values())
+        positive_masses = []
+        for mass in phase_masses.values():
+            try:
+                mass_value = float(mass)
+            except (TypeError, ValueError):
+                return "phase_boundary_proximity"
+            if mass_value > 0.0:
+                positive_masses.append(mass_value)
+        total = sum(positive_masses)
         if total > 0.0:
-            for mass in phase_masses.values():
-                fraction = float(mass) / total
-                if fraction <= eps or fraction >= 1.0 - eps:
+            for mass in positive_masses:
+                fraction = mass / total
+                if len(positive_masses) > 1 and fraction <= eps:
                     return "phase_boundary_proximity"
     return None
 

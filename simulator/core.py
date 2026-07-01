@@ -79,6 +79,8 @@ from simulator.condensation_routing import (
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.fe_redox import (
+    calphad_ferrous_feo_activity_diagnostic,
+    feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     kress91_split,
@@ -1037,6 +1039,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             False,
             'CA_ALUMINOTHERMIC_STEP -- AUTHORITATIVE: optional C7 Ca '
             'aluminothermy + dedicated Ca capture.',
+        ),
+        (
+            'engines.builtin.native_fe_saturation',
+            'BuiltinNativeFeSaturationProvider',
+            (ChemistryIntent.NATIVE_FE_SATURATION,),
+            False,
+            'NATIVE_FE_SATURATION -- AUTHORITATIVE: FeO -> Fe + 0.5 O2 '
+            'pre-storm native-metal exsolution.',
         ),
         (
             'engines.builtin.stage0_pretreatment',
@@ -2316,6 +2326,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return self._fe_redox_split_payload(
             base,
             split,
+            comp=comp,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
         )
 
     @staticmethod
@@ -2448,20 +2462,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source': 'inline:Kress-Carmichael1991',
         }
 
-    @staticmethod
     def _fe_redox_split_payload(
+        self,
         base: Mapping[str, Any],
         split: Mapping[str, Any],
+        *,
+        comp: Mapping[str, float],
+        T_K: float,
+        pressure_bar: float,
+        fO2_log: float,
     ) -> Dict[str, Any]:
         fe3 = min(1.0, max(0.0, float(split.get('fe3_over_sigma_fe', 0.0))))
-        # Phase-1 stub: native-Fe0 FRACTION is not computed here -- only the
-        # coarse IW-saturation FLAG (base['native_fe_saturation']) is advisory.
-        # The real native-Fe0 saturation phase (a fraction split off the melt
-        # at low fO2) lands in SSO-R Phase-2 / R-a (see sso-r-fe-redox-design.md).
-        native = 0.0
+        native_state = self._native_fe_saturation_state(
+            comp,
+            fe3_over_sigma_fe=fe3,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+        native = min(1.0, max(0.0, float(
+            native_state.get('native_fe_frac', 0.0) or 0.0,
+        )))
         ferrous = max(0.0, 1.0 - fe3 - native)
         return {
             **base,
+            **native_state,
             'status': str(split.get('status', 'ok')),
             'fe3_over_sigma_fe': fe3,
             'ferric_frac': fe3,
@@ -2476,6 +2501,103 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'feo_equiv_wt_pct': float(split.get('feo_equiv_wt_pct', 0.0)),
             'source': str(split.get('source', 'unknown')),
         }
+
+    def _native_fe_saturation_state(
+        self,
+        comp: Mapping[str, float],
+        *,
+        fe3_over_sigma_fe: float,
+        T_K: float,
+        pressure_bar: float,
+        fO2_log: float,
+    ) -> Dict[str, Any]:
+        fe3 = min(1.0, max(0.0, float(fe3_over_sigma_fe)))
+        ferrous_available = max(0.0, 1.0 - fe3)
+        if ferrous_available <= 0.0 or self._feot_equivalent_wt_pct(comp) <= 0.0:
+            return {
+                'native_fe_saturation': False,
+                'native_fe_threshold': 'FeO_activity_saturation',
+                'native_fe_frac': 0.0,
+            }
+        try:
+            activity = calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=comp,
+                fO2_log=fO2_log,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
+            pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+        except Exception as exc:
+            raise AccountingError(
+                'native Fe saturation split requires grounded FeO activity; '
+                'CALPHAD/Holzheid FeO activity diagnostic failed'
+            ) from exc
+        if a_feo <= 0.0 or not math.isfinite(a_feo):
+            return {
+                'native_fe_saturation': False,
+                'native_fe_threshold': 'FeO_activity_saturation',
+                'native_fe_frac': 0.0,
+                'native_fe_activity_source': 'unavailable:no_positive_a_FeO',
+            }
+        # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
+        # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
+        # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
+        saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
+        if saturation_log10 > 300.0:
+            a_feo_saturation = float('inf')
+        elif saturation_log10 < -300.0:
+            a_feo_saturation = 0.0
+        else:
+            a_feo_saturation = 10.0 ** saturation_log10
+        if a_feo_saturation >= a_feo:
+            native = 0.0
+        else:
+            native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
+        native = min(ferrous_available, max(0.0, native))
+        return {
+            'native_fe_saturation': native > 0.0,
+            'native_fe_threshold': 'FeO_activity_saturation',
+            'native_fe_frac': native,
+            'native_fe_activity': a_feo,
+            'native_fe_saturation_activity': a_feo_saturation,
+            'native_fe_pure_feo_iw_log': pure_feo_iw,
+            'native_fe_activity_source': (
+                'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
+                'FeO(l)=Fe+0.5O2 saturation'
+            ),
+        }
+
+    def _apply_native_fe_saturation_split(self) -> Dict[str, Any]:
+        split = self._compute_fe_redox_split_diagnostic()
+        native_frac = max(0.0, float(split.get('native_fe_frac', 0.0) or 0.0))
+        if native_frac <= 1.0e-12:
+            return split
+        cleaned_melt_mol = self.atom_ledger.mol_by_account(
+            'process.cleaned_melt')
+        feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
+        total_fe_mol = self._cleaned_melt_fe_atom_mol()
+        native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
+        if native_fe_mol <= 1.0e-12:
+            return split
+
+        self._dispatch_and_commit(
+            ChemistryIntent.NATIVE_FE_SATURATION,
+            control_inputs={
+                'native_fe_mol': native_fe_mol,
+                'native_fe_frac': native_frac,
+                'source': 'native Fe saturation FeO split',
+            },
+        )
+        self._project_cleaned_melt_from_atom_ledger()
+        self._project_drain_tap_from_atom_ledger()
+        self._refresh_oxygen_reservoir_without_exchange(
+            melt_intrinsic_fO2_log=float(
+                self.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+            ),
+            exchange_direction='none:native_fe_saturation_split',
+        )
+        return split
 
     def _seed_atom_ledger(
         self,
@@ -3143,6 +3265,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for oxide in OXIDE_SPECIES
         }
         self.melt.update_total_mass()
+
+    def _project_drain_tap_from_atom_ledger(self) -> None:
+        self.inventory.metal_alloy_kg = {
+            species: float(kg)
+            for species, kg in self.atom_ledger.kg_by_account(
+                'terminal.drain_tap_material').items()
+        }
 
     def _backend_composition_mol(self) -> Dict[str, float]:
         totals: Dict[str, float] = {}
@@ -4544,8 +4673,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt: Mapping[str, float],
         stage0_final_temp_c: float,
     ) -> float:
-        if species != 'Na2CO3':
-            return 1.0
         if species_mol <= 1e-12:
             return 0.0
 
@@ -4553,7 +4680,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         registry = self._load_foulant_registry_cached()
         thermal_extent = chi_decomp(
-            'Na2CO3', stage0_final_temp_c, 0.0, 0.0, registry).extent
+            # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give
+            # CaCO3 onset ~=814 C and MgCO3 onset ~=422 C (350-540 C band).
+            species, stage0_final_temp_c, 0.0, 0.0, registry).extent
+        if species != 'Na2CO3':
+            return max(0.0, min(1.0, thermal_extent))
         sio2_mol_available = (
             float(melt.get('SiO2', 0.0))
             / resolve_species_formula(
@@ -6179,6 +6310,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp ---
         self._update_temperature()
         self._apply_oxygen_reservoir_exchange()
+        self._apply_native_fe_saturation_split()
 
         # --- 3. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,

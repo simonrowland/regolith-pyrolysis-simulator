@@ -55,7 +55,19 @@ def test_c7_enabled_routes_after_c6_with_explicit_proceed_decision():
     assert (DecisionType.C7_PROCEED, "yes") in record.decisions
 
 
-def test_c7_enabled_run_closes_mass_and_reports_three_products(tmp_path, monkeypatch):
+def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
+    tmp_path, monkeypatch
+):
+    # V23 (pre-0.6): C7 no longer treats the configured thermo_margin scalar
+    # SIGN as thermodynamic proof -- the COMPUTED JANAF-Ellingham Al/Ca margin
+    # governs. Under the modeled hard-vacuum hold that margin is
+    # -153.94 kJ/mol O2 (unfavorable), so C7 correctly REFUSES and yields zero
+    # Ca metal even though the config default scalar (+1.0) is what the old
+    # sign-reading bug would have proceeded on. No 1100-1300 C reduction
+    # setpoint has a positive computed margin, so the honest integration
+    # contract here is the refusal path; the favorable-margin transition is
+    # covered synthetically at the provider unit level
+    # (tests/chemistry/test_builtin_ca_aluminothermic_step_provider.py).
     monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
     run = PyrolysisRun(
         feedstock_id="targeted_super_kreep_ore",
@@ -81,29 +93,32 @@ def test_c7_enabled_run_closes_mass_and_reports_three_products(tmp_path, monkeyp
     )
     assert worst <= MASS_BALANCE_HARD_GATE_PCT
     assert report["enabled"] is True
+
+    # Refusal => zero aluminothermic products; the feedstock stays as un-C7-
+    # enriched rump (REE fraction unchanged, no CaO removed).
     products = report["products"]
-    assert products["Ca_metal"]["kg"] == pytest.approx(
-        3.5439464361060806, rel=0.0, abs=1e-12
-    )
-    assert products["calcium_aluminate_cement_slag"]["kg"] == pytest.approx(
-        7.9639927508176855, rel=0.0, abs=1e-12
-    )
+    assert products["Ca_metal"]["kg"] == 0.0
+    assert products["calcium_aluminate_cement_slag"]["kg"] == 0.0
     ree = products["residual_REE_enriched_terminal_ceramic"]
-    assert ree["REE_oxides_wt_pct_after_C7"] > ree["REE_oxides_wt_pct_before_C7"]
-    assert ree["REE_enrichment_factor"] == pytest.approx(
-        1.0100166944908182, rel=0.0, abs=1e-12
+    assert ree["REE_enrichment_factor"] == pytest.approx(1.0, rel=0.0, abs=1e-12)
+    assert ree["REE_oxides_wt_pct_after_C7"] == pytest.approx(
+        ree["REE_oxides_wt_pct_before_C7"], rel=0.0, abs=1e-12
     )
+
+    # The refusal is reported honestly: computed margin < 0 drives it, NOT the
+    # nominally-positive configured scalar. This is the V23 contract.
+    refusal = document["c7_refusal_diagnostic"]
+    assert refusal["reason_refused"] == "c7_vacuum_shifted_thermo_margin_unfavorable"
+    assert refusal["computed_thermo_margin_kj_per_mol_o2"] == pytest.approx(
+        -153.94070649999992, rel=0.0, abs=1e-9
+    )
+    assert refusal["computed_thermo_margin_kj_per_mol_o2"] < 0.0
+    assert refusal["configured_thermo_margin_kj_per_mol_o2"] == pytest.approx(1.0)
+    assert refusal["thermo_margin_source"] == "builtin_janaf_ellingham_al_ca"
+
+    # Al credit was imported but stays undrawn because the reduction refused.
     assert report["diagnostic"]["c7_al_credit_input_kg"] == pytest.approx(20.0)
     assert report["diagnostic"]["c7_al_credit_unused_mol"] > 0.0
-    assert document.get("c7_refusal_diagnostic", {}) == {}
-    cost_diag = document["run_metadata"]["cost_rollup_diagnostic"]
-    assert not any("process.c7_al_credit" in row for row in cost_diag["warnings"])
-    product_costs = cost_diag["product_costs"]
-    assert "process.condensation_train:Ca" in product_costs
-    ca_cost = product_costs["process.condensation_train:Ca"]["accumulated_cost"]
-    assert ca_cost["external_reagent_kg"] > 0.0
-    assert ca_cost["thermal_flux_h"] > 0.0
-    assert "process.overhead_gas:Ca" not in product_costs
 
 
 def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch):

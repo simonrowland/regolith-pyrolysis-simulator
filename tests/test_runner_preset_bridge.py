@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+from dataclasses import replace
 import hashlib
 import json
 import subprocess
@@ -9,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator import runner as runner_module
 from simulator.runner import PyrolysisRun
 
 
@@ -234,8 +237,9 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         "remediation",
     )
 
-    assert returncode == 0, payload
-    assert payload["status"] in {"ok", "partial"}
+    assert returncode == 1, payload
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "mass_balance_closure_breach"
     metadata = payload["run_metadata"]
     preset = metadata["preset"]
     assert preset == {
@@ -271,6 +275,63 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         enforcement[0]["achieved_mbar"] * 1.0e-3)
 
 
+def test_preset_bridge_mass_balance_breach_marks_status_failed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+):
+    preset_path = _write_bridge_preset(
+        tmp_path,
+        feedstock_id="lunar_mare_low_ti",
+    )
+    preset = runner_module._load_preset_run_spec(preset_path, "faithful")
+    breached_pct = runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT * 2.0
+    original_execute = runner_module.RunExecutor.execute
+
+    def execute_with_breach(self, config, *, worker_runtime=None):
+        execution = original_execute(
+            self,
+            config,
+            worker_runtime=worker_runtime,
+        )
+        assert execution.snapshots
+        execution.snapshots[-1].mass_balance_error_pct = breached_pct
+        per_hour = list(execution.per_hour)
+        assert per_hour
+        per_hour[-1] = {**per_hour[-1], "mass_balance_pct": breached_pct}
+        return replace(execution, per_hour=tuple(per_hour))
+
+    monkeypatch.setattr(
+        runner_module.RunExecutor,
+        "execute",
+        execute_with_breach,
+    )
+
+    payload = PyrolysisRun(
+        feedstock_id=preset.feedstock_id,
+        campaign="C0",
+        hours=preset.hours,
+        mass_kg=preset.mass_kg,
+        setpoints_patch={"lab_geometry": copy.deepcopy(preset.lab_geometry)},
+        lab_schedule=copy.deepcopy(preset.lab_schedule),
+        run_metadata_overrides={
+            runner_module.PRESET_PROVENANCE_METADATA_KEY: dict(
+                preset.provenance
+            ),
+        },
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    ).run()
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "mass_balance_closure_breach"
+    assert payload["error_message"] == (
+        "mass_balance_closure_breach: "
+        f"{breached_pct:.12g}% > "
+        f"{runner_module.RUNNER_MASS_BALANCE_LIMIT_PCT:.12g}%"
+    )
+    assert payload["run_metadata"]["preset"]["leg"] == "faithful"
+
+
 def test_preset_bridge_records_exposed_area_result_scope(tmp_path: Path):
     preset_path = _write_bridge_preset(
         tmp_path,
@@ -280,7 +341,9 @@ def test_preset_bridge_records_exposed_area_result_scope(tmp_path: Path):
 
     returncode, payload = _run_preset_cli(tmp_path, preset_path)
 
-    assert returncode == 0, payload
+    assert returncode == 1, payload
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "mass_balance_closure_breach"
     metadata = payload["run_metadata"]
     assert metadata["effective_exposed_area_m2"] == pytest.approx(0.000123)
     assert metadata["area_basis"] == "gram_lab_exposed_melt"

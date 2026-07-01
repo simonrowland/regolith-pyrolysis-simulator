@@ -156,6 +156,8 @@ class CampaignManager:
         self._c2a_staged_stage_idx: int = 0
         self._c2a_staged_stage_start_hour: int = 0
         self._c2a_staged_peak_flux_by_species: dict[str, float] = {}
+        self._pending_c3_na_scoped_overrides: dict | None = None
+        self._active_c3_na_scoped_overrides: dict | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -353,6 +355,11 @@ class CampaignManager:
 
     def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
         merged: dict = {}
+        if (
+            campaign == CampaignPhase.C3_NA
+            and self._active_c3_na_scoped_overrides
+        ):
+            merged.update(self._active_c3_na_scoped_overrides)
         for key in (self._campaign_config_key(campaign), campaign.name):
             ovr = self.overrides.get(key, {})
             if isinstance(ovr, dict):
@@ -518,6 +525,21 @@ class CampaignManager:
         self._c2a_staged_stage_idx = idx
         return stages[idx]
 
+    def _c2a_staged_c3_na_scoped_overrides(self) -> dict:
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        na_stage = cfg.get('na_shuttle_stage', {})
+        if not isinstance(na_stage, dict):
+            na_stage = cfg.get('k_shuttle_stage', {})
+        if not isinstance(na_stage, dict):
+            return {}
+        target = self._float(na_stage.get('target_C'), 1150.0)
+        return {
+            'inject_target_C': target,
+            'bakeout_target_C': target,
+            'ramp_rate': self._float(na_stage.get('ramp_rate_C_per_hr'), 600.0),
+            'staged_duration_h': self._float(na_stage.get('duration_h'), 3.0),
+        }
+
     def _c2a_staged_stage_by_hour(
         self,
         campaign_hour: int,
@@ -570,6 +592,15 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        if campaign == CampaignPhase.C3_NA:
+            self._active_c3_na_scoped_overrides = (
+                self._pending_c3_na_scoped_overrides
+            )
+            self._pending_c3_na_scoped_overrides = None
+        else:
+            self._pending_c3_na_scoped_overrides = None
+            self._active_c3_na_scoped_overrides = None
+
         if campaign == CampaignPhase.C2A_STAGED:
             self._c2a_staged_stage_idx = 0
             self._c2a_staged_stage_start_hour = 0
@@ -1402,23 +1433,8 @@ class CampaignManager:
         elif current == CampaignPhase.C2A_STAGED:
             # Staged Path A cools before handing residual FeO to the V1c
             # Na-only cleanup window. K/FeO is refused at this temperature.
-            cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
-            na_stage = cfg.get('na_shuttle_stage', {})
-            if not isinstance(na_stage, dict):
-                na_stage = cfg.get('k_shuttle_stage', {})
-            if isinstance(na_stage, dict):
-                c3 = self.overrides.setdefault('C3_NA', {})
-                target = self._float(na_stage.get('target_C'), 1150.0)
-                c3.setdefault('inject_target_C', target)
-                c3.setdefault('bakeout_target_C', target)
-                c3.setdefault(
-                    'ramp_rate',
-                    self._float(na_stage.get('ramp_rate_C_per_hr'), 600.0),
-                )
-                c3.setdefault(
-                    'staged_duration_h',
-                    self._float(na_stage.get('duration_h'), 3.0),
-                )
+            scoped = self._c2a_staged_c3_na_scoped_overrides()
+            self._pending_c3_na_scoped_overrides = scoped or None
             record.path = 'A_staged'
             return CampaignPhase.C3_NA
 

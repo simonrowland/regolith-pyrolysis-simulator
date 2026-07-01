@@ -932,8 +932,14 @@ def _run_exact_certification(
         certified_records.append(certified)
         cache_state = _cache_state_from_scored(scored)
         explore_objective = _objective_value(explore_record, primary_metric)
-        certified_objective = _objective_value(certified, primary_metric)
-        disagreement = abs(explore_objective - certified_objective)
+        certified_objective = (
+            _objective_value(certified, primary_metric) if certified.feasible else None
+        )
+        disagreement = (
+            abs(explore_objective - certified_objective)
+            if certified_objective is not None
+            else None
+        )
         certification_rows.append(
             {
                 "candidate_id": explore_record.candidate_id,
@@ -978,7 +984,11 @@ def _run_exact_certification(
     )
     pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
     winner = pareto_ranked[0]
-    disagreements = [float(row["disagreement"]) for row in certification_rows]
+    disagreements = [
+        float(row["disagreement"])
+        for row in certification_rows
+        if row["disagreement"] is not None
+    ]
     strategy_name = (
         config.strategy
         if isinstance(config.strategy, str)

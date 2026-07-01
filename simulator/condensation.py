@@ -695,45 +695,92 @@ def _sticking_entry_ref_record(species: str, entry: Any) -> Mapping[str, Any] | 
     return None
 
 
+def _alpha_certification_source_class_token(value: Any) -> str:
+    return str(value or '').strip().lower().replace('_', '-')
+
+
+def _alpha_source_class_cannot_certify(value: Any) -> bool:
+    return _alpha_certification_source_class_token(value) in {
+        'internal-analytical',
+        'stub',
+    }
+
+
 def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:
     status = str(record.get('status', '')).upper()
+    denied = _alpha_source_class_cannot_certify(record.get('source_class'))
+    cited = status == 'CITED' and not denied
     output_status = str(record.get('output_status') or (
         'sourced_with_surface_proxy'
-        if status == 'CITED'
+        if cited
         else 'status_bearing'
     ))
-    return {
+    if not cited:
+        output_status = 'status_bearing'
+    payload = {
         'source': str(record.get('source', '')),
         'source_url': record.get('source_url'),
         'source_class': str(record.get('source_class', '')),
-        'status': 'sourced' if status == 'CITED' else 'UNCERTIFIED',
-        'citation_status': status,
+        'status': 'sourced' if cited else 'UNCERTIFIED',
+        'citation_status': 'CITED' if cited else 'UNCERTIFIED',
         'temperature_range_K': record.get('temperature_range_K'),
         'envelope': record.get('envelope'),
         'uncertainty_flag': record.get('uncertainty_flag'),
         'output_status': output_status,
     }
+    if denied:
+        payload['certification_status_reason'] = (
+            'sticking alpha_s source_class '
+            f'{_alpha_certification_source_class_token(record.get("source_class"))} '
+            'cannot certify'
+        )
+    return payload
 
 
-def _stage_material_alpha_certification_payload(entry: Any) -> dict[str, Any]:
+def _material_alpha_source_label(source: str) -> str | None:
+    if source.startswith('data/materials.yaml::stages.'):
+        return 'materials.yaml per-stage alpha_s'
+    if source.startswith('data/materials.yaml::wall_surfaces.'):
+        return 'materials.yaml wall alpha_s'
+    if source.startswith('data/materials.yaml::liner_materials.'):
+        return 'materials.yaml liner alpha_s'
+    return None
+
+
+def _material_alpha_certification_payload(
+    entry: Any,
+    record: Mapping[str, Any],
+    *,
+    source: str,
+) -> dict[str, Any]:
+    label = _material_alpha_source_label(source)
+    if label is None:
+        return {}
     if isinstance(entry, Mapping):
-        raw_status = str(
+        raw_status_value = (
             entry.get('citation_status')
             or entry.get('status')
-            or ''
-        ).upper()
-        source_class = str(entry.get('source_class') or '')
+        )
+        source_class_value = entry.get('source_class')
         entry_output_status = entry.get('output_status')
     else:
-        raw_status = ''
-        source_class = ''
+        raw_status_value = None
+        source_class_value = None
         entry_output_status = None
 
-    # Normalize before the deny check: status is already .upper()-normalized
-    # above, but source_class was compared raw — whitespace/case variants of
-    # 'internal-analytical' (e.g. ' INTERNAL-ANALYTICAL ') slipped the gate and
-    # certified as authoritative (F0 fail-open caught by cert-gate review 2026-06-30).
-    denied = source_class.strip().lower() == 'internal-analytical'
+    if raw_status_value in (None, ''):
+        raw_status_value = (
+            record.get('citation_status')
+            or record.get('status')
+            or ''
+        )
+    if source_class_value in (None, ''):
+        source_class_value = record.get('source_class') or ''
+    if entry_output_status in (None, ''):
+        entry_output_status = record.get('output_status')
+
+    raw_status = str(raw_status_value or '').upper()
+    denied = _alpha_source_class_cannot_certify(source_class_value)
     cited = raw_status == 'CITED' and not denied
     output_status = (
         str(entry_output_status)
@@ -754,12 +801,13 @@ def _stage_material_alpha_certification_payload(entry: Any) -> dict[str, Any]:
     }
     if denied:
         payload['certification_status_reason'] = (
-            'materials.yaml per-stage alpha_s source_class '
-            'internal-analytical cannot certify'
+            f'{label} source_class '
+            f'{_alpha_certification_source_class_token(source_class_value)} '
+            'cannot certify'
         )
     elif raw_status not in {'CITED', 'UNCERTIFIED'}:
         payload['certification_status_reason'] = (
-            'materials.yaml per-stage alpha_s override lacks '
+            f'{label} override lacks '
             'CITED/UNCERTIFIED certification status'
         )
     return payload
@@ -3065,11 +3113,11 @@ def _alpha_record(
             value = entry.get(key)
             if value not in (None, ''):
                 record[key] = value
-    if (
-        source.startswith('data/materials.yaml::stages.')
-        and ref_record is None
-    ):
-        record.update(_stage_material_alpha_certification_payload(entry))
+    record.update(_material_alpha_certification_payload(
+        entry,
+        record,
+        source=source,
+    ))
     spec = _alpha_s_spec_from_entry(species, entry)
     if isinstance(spec, Mapping):
         record['alpha_s_coefficient_spec'] = dict(spec)

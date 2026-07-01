@@ -60,6 +60,21 @@ def _controls(**overrides):
     return controls
 
 
+class _ThermoStubbedCaProvider(BuiltinCaAluminothermicStepProvider):
+    def __init__(self, margin_kj_per_mol_o2: float = 2.0):
+        self._margin_kj_per_mol_o2 = margin_kj_per_mol_o2
+
+    def _computed_thermo_margin_kj_per_mol_o2(
+        self,
+        hold_temp_C: float,
+    ) -> float:
+        return self._margin_kj_per_mol_o2
+
+
+def _provider(margin_kj_per_mol_o2: float = 2.0):
+    return _ThermoStubbedCaProvider(margin_kj_per_mol_o2)
+
+
 def _request(registry, accounts, controls):
     return IntentRequest(
         intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
@@ -144,7 +159,7 @@ def test_c7_c3a_stoichiometry_from_al_credit(formula_registry):
         "terminal.slag": {},
     }
 
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             accounts,
@@ -179,7 +194,7 @@ def test_c7_c12a7_stoichiometry_from_in_situ_al(formula_registry):
         "terminal.slag": {},
     }
 
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             accounts,
@@ -207,7 +222,7 @@ def test_c7_c12a7_stoichiometry_from_in_situ_al(formula_registry):
 
 @pytest.mark.parametrize("reductant", ["Na", "K", "Si", "Mg"])
 def test_c7_refuses_non_al_reductants(formula_registry, reductant):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -224,7 +239,7 @@ def test_c7_refuses_non_al_reductants(formula_registry, reductant):
 
 
 def test_c7_refuses_generic_reagent_inventory_al(formula_registry):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -248,14 +263,10 @@ def test_c7_refuses_generic_reagent_inventory_al(formula_registry):
             {"active_ca_condensation_route": False},
             "c7_no_active_dedicated_ca_condensation_route",
         ),
-        (
-            {"thermo_margin_kj_per_mol_o2": -0.5},
-            "c7_vacuum_shifted_thermo_margin_unfavorable",
-        ),
     ),
 )
 def test_c7_refuses_bad_vacuum_route_or_thermo(formula_registry, override, reason):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -271,8 +282,36 @@ def test_c7_refuses_bad_vacuum_route_or_thermo(formula_registry, override, reaso
     assert result.diagnostic["reason_refused"] == reason
 
 
-def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_registry):
+def test_c7_ignores_configured_thermo_scalar_and_uses_computed_margin(
+    formula_registry,
+):
     result = BuiltinCaAluminothermicStepProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+            },
+            _controls(
+                thermo_margin_kj_per_mol_o2=999.0,
+                thermo_margin_favorable=True,
+            ),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert (
+        result.diagnostic["reason_refused"]
+        == "c7_vacuum_shifted_thermo_margin_unfavorable"
+    )
+    assert result.diagnostic["computed_thermo_margin_kj_per_mol_o2"] < 0.0
+    assert result.diagnostic["configured_thermo_margin_kj_per_mol_o2"] == 999.0
+    assert result.diagnostic["configured_thermo_margin_favorable"] is True
+
+
+def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_registry):
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -294,7 +333,7 @@ def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_regist
 
 
 def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -326,7 +365,7 @@ def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
 def test_c7_ca_shuttle_consumes_only_surplus_after_product_reservation(
     formula_registry,
 ):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {
@@ -363,7 +402,7 @@ def test_c7_ca_shuttle_consumes_only_surplus_after_product_reservation(
 
 
 def test_c7_set_it_to_11_knobs_saturate_without_extra_product(formula_registry):
-    result = BuiltinCaAluminothermicStepProvider().dispatch(
+    result = _provider().dispatch(
         _request(
             formula_registry,
             {

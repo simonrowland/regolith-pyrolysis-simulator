@@ -152,6 +152,39 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert sim.record.products_kg["metallic_FeNi"] == pytest.approx(137.614679)
 
 
+def test_stage0_carbonate_decomposition_is_temperature_gated():
+    sim = _sim(
+        {
+            "carbonate_low": {
+                "label": "Low-temperature carbonate cleanup",
+                "composition_wt_pct": {
+                    "SiO2": 80.0,
+                    "CaCO3": 10.0,
+                    "MgCO3": 10.0,
+                },
+                "stage0_profile": "carbonaceous_degas_cleanup",
+                "stage0_temp_range_C": [20.0, 400.0],
+                "anhydrous_silicate_after_degassing": {
+                    "mass_per_tonne_kg": [800.0, 800.0],
+                    "composition_wt_pct": {
+                        "SiO2": 100.0,
+                    },
+                },
+            },
+        },
+    )
+
+    sim.load_batch("carbonate_low", mass_kg=1000.0)
+
+    assert sim.inventory.salt_phase_kg["CaCO3"] > 90.0
+    assert 0.0 < sim.inventory.salt_phase_kg["MgCO3"] < 100.0
+    assert sim.inventory.gas_volatiles_kg["CO2"] > 0.0
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(
+        0.0,
+        abs=5e-12,
+    )
+
+
 def test_stage0_keeps_cr2o3_in_cleaned_silicate_melt():
     sim = _sim(
         {

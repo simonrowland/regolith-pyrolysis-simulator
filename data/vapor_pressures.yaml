@@ -554,6 +554,8 @@ oxide_vapors:
       B: 79705.252727
       C: 1000.0
     valid_range_K: [1400, 2200]
+    extrapolation_allowed_range_K: [1400, 2273.15]
+    extrapolation_basis: "Runtime process envelope only: 2273.15 K = 2000 C upper furnace bound from data/setpoints.yaml; not source validation. Provider must flag extrapolated_beyond_valid_range_K above valid_range_K."
     condensation_T_C: [900, 1200]
     condensation_product: "amorphous SiO2 (disproportionation: 2SiO -> Si + SiO2)"
     condensation_products_mol_per_mol_vapor:

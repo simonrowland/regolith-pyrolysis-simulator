@@ -34,6 +34,7 @@ class ChemistryIntent(str, Enum):
     ELECTROLYSIS_STEP = "electrolysis_step"
     METALLOTHERMIC_STEP = "metallothermic_step"
     CA_ALUMINOTHERMIC_STEP = "ca_aluminothermic_step"
+    NATIVE_FE_SATURATION = "native_fe_saturation"
     STAGE0_PRETREATMENT = "stage0_pretreatment"
     OVERHEAD_GAS_EQUILIBRIUM = "overhead_gas_equilibrium"
     OVERHEAD_BLEED = "overhead_bleed"

@@ -8,7 +8,7 @@ import pytest
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
-from simulator.runner import build_sio_yield_report
+from simulator.runner import _sio_wall_terminal_mol, build_sio_yield_report
 from simulator.state import (
     CampaignPhase,
     CondensationStage,
@@ -96,9 +96,16 @@ GOLDENS = (
 # 2026-06-30 cold-wall condensation now uses the Pound 1972 unity gate below
 # the evaporation-Arrhenius validity floor; evolved SiO is unchanged here, but
 # more of it deposits in the cold wall/stage train instead of terminal offgas.
+# 2026-07-01 pre-0.6 SiO vapor rebaseline (V25): the oxide-Antoine valid range
+# is extended past 2200 K (previously the SiO row silently vanished above the
+# range, zeroing SiO vapor in the hotter part of the C2A band); SiO that was
+# wrongly zeroed now evolves. Lunar stays within the old valid band (FP-identical
+# to <1e-12); mars 7.06398603045e-06 -> 7.06523011228e-06 (+0.018%). Direction
+# is physics-honest (SiO no longer wrongly zeroed), not a retune; mass closure
+# remains covered by tests/test_mass_balance.py.
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 9.11967185718e-06,
-    "mars_basalt": 7.06398603045e-06,
+    "mars_basalt": 7.06523011228e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -269,6 +276,22 @@ def test_route_destinations_sum_to_evolved_budget():
         + route.remaining_by_species["SiO"]
     )
     assert destinations == pytest.approx(1.0)
+
+
+def test_sio_wall_terminal_mol_sums_all_wall_si_atoms():
+    # SiO is the only Si vapor species, so every Si atom on the wall -- direct
+    # SiO, the disproportionation pair Si + SiO2, and further-reduced FeSi --
+    # descends from one evaporated SiO. The SiO-equivalent is their Si-atom SUM
+    # (Si-atom conservation for the evaporated -> destinations chain closure),
+    # NOT a disproportionation-paired 2*min() that drops unpaired wall Si.
+    wall_deposit = {
+        "SiO": 0.25,
+        "Si": 0.5,
+        "SiO2": 0.5,
+        "FeSi": 2.0,
+    }
+
+    assert _sio_wall_terminal_mol(wall_deposit) == pytest.approx(3.25)
 
 
 def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
