@@ -805,15 +805,6 @@ def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
 
 
 @pytest.mark.timeout(10)
-@pytest.mark.xfail(
-    strict=False,
-    reason=(
-        "reaping a deliberately session-detached (start_new_session) grandchild "
-        "spawned inside a ProcessPoolExecutor worker is not reliably achievable "
-        "on POSIX; the grind's real subprocess backends use subprocess.run() "
-        "normal same-session children which are reaped by the normal-child test"
-    ),
-)
 def test_process_pool_timeout_kills_worker_process_group(
     tmp_path: Path,
     spawnable_process_pool: None,
@@ -863,10 +854,10 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
         max_workers=1,
         output_root=tmp_path,
         evaluate_fn=_normal_child_then_hang_evaluate,
-        per_eval_timeout_seconds=0.2,
+        per_eval_timeout_seconds=0.75,
     )
 
-    time.sleep(1.2)
+    time.sleep(1.3)
     assert [result.candidate_id for result in results] == [
         "spawns-normal-child",
         "fast-after-timeout",
