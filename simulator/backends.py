@@ -44,6 +44,16 @@ STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
     "e_type_enstatite_aubrite",
     "mars_perchlorate_rich",
 )
+_SPINEL_ROUTE_FORMER_OXIDES = ("Cr2O3", "Al2O3", "FeO", "MgO", "TiO2")
+_SPINEL_ROUTE_MAFIC_OXIDES = ("Cr2O3", "FeO", "MgO", "TiO2")
+_SPINEL_ROUTE_MARE_HED_FORMER_MIN_WT_PCT = 38.5
+_SPINEL_ROUTE_MARE_HED_MAFIC_MIN_WT_PCT = 25.0
+_SPINEL_ROUTE_MARE_HED_AL2O3_MIN_WT_PCT = 10.0
+_SPINEL_ROUTE_MARE_HED_AL2O3_MAX_WT_PCT = 14.5
+_SPINEL_ROUTE_MARE_HED_TIO2_MIN_WT_PCT = 0.6
+_SPINEL_ROUTE_ULTRAMAFIC_FORMER_MIN_WT_PCT = 40.0
+_SPINEL_ROUTE_ULTRAMAFIC_AL2O3_MAX_WT_PCT = 3.0
+_SPINEL_ROUTE_ULTRAMAFIC_MGO_MIN_WT_PCT = 34.0
 CACHED_REAL_MISS_POLICIES = ("fail-loud", "live-fill")
 CACHE_TIER_CEILINGS = (
     "cached_interpolated",
@@ -313,6 +323,60 @@ def build_cached_real_store(config: CachedRealConfig):
     return store
 
 
+def is_spinel_rich_stage0_subprocess_feedstock(feedstock: Mapping[str, Any]) -> bool:
+    """Return True when composition alone matches the spinel hang route class."""
+
+    if not isinstance(feedstock, Mapping):
+        return False
+    composition = feedstock.get("composition_wt_pct")
+    if not isinstance(composition, Mapping):
+        return False
+
+    spinel_former_wt_pct = sum(
+        _oxide_wt_pct(composition, oxide)
+        for oxide in _SPINEL_ROUTE_FORMER_OXIDES
+    )
+    mafic_wt_pct = sum(
+        _oxide_wt_pct(composition, oxide)
+        for oxide in _SPINEL_ROUTE_MAFIC_OXIDES
+    )
+    al2o3_wt_pct = _oxide_wt_pct(composition, "Al2O3")
+    tio2_wt_pct = _oxide_wt_pct(composition, "TiO2")
+    mgo_wt_pct = _oxide_wt_pct(composition, "MgO")
+
+    # Pre-grind catalog separation at 0efc9ce: mare/HED hang entries start at
+    # 38.90 wt% spinel-formers and TiO2 0.65 wt%, while the nearest clean
+    # MGS-1/Mars/highland/KREEP rows miss spinel-formers, TiO2, or Al2O3 band.
+    mare_or_hed_spinel_class = (
+        spinel_former_wt_pct >= _SPINEL_ROUTE_MARE_HED_FORMER_MIN_WT_PCT
+        and mafic_wt_pct >= _SPINEL_ROUTE_MARE_HED_MAFIC_MIN_WT_PCT
+        and al2o3_wt_pct >= _SPINEL_ROUTE_MARE_HED_AL2O3_MIN_WT_PCT
+        and al2o3_wt_pct <= _SPINEL_ROUTE_MARE_HED_AL2O3_MAX_WT_PCT
+        and tio2_wt_pct >= _SPINEL_ROUTE_MARE_HED_TIO2_MIN_WT_PCT
+    )
+
+    # Ultramafic chondrite/enstatite hang entries have MgO >= 34 wt% and
+    # Al2O3 <= 3 wt%; the nearest clean volatile-rich rows stay below 20 wt% MgO.
+    ultramafic_spinel_class = (
+        spinel_former_wt_pct >= _SPINEL_ROUTE_ULTRAMAFIC_FORMER_MIN_WT_PCT
+        and al2o3_wt_pct <= _SPINEL_ROUTE_ULTRAMAFIC_AL2O3_MAX_WT_PCT
+        and mgo_wt_pct >= _SPINEL_ROUTE_ULTRAMAFIC_MGO_MIN_WT_PCT
+    )
+
+    return mare_or_hed_spinel_class or ultramafic_spinel_class
+
+
+def _oxide_wt_pct(composition: Mapping[str, Any], oxide: str) -> float:
+    value = composition.get(oxide, 0.0)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(number) or number <= 0.0:
+        return 0.0
+    return number
+
+
 def requires_stage0_subprocess(
     feedstock_id: str | None,
     feedstocks: Mapping[str, Any] | None,
@@ -333,6 +397,8 @@ def requires_stage0_subprocess(
     if PyrolysisSimulator._uses_mars_carbon_cleanup(feedstock):
         return True
     if PyrolysisSimulator._uses_carbonaceous_degas_cleanup(feedstock):
+        return True
+    if is_spinel_rich_stage0_subprocess_feedstock(feedstock):
         return True
     return bool(
         feedstock.get("stage0_verdict_b_subprocess_required")

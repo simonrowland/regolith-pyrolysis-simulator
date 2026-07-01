@@ -30,12 +30,32 @@ from simulator.backends import (
     assert_real_backend_feedstock_supported,
     assert_stage0_subprocess_backend_safe,
     backend_resolution_status,
+    is_spinel_rich_stage0_subprocess_feedstock,
     requires_stage0_subprocess,
     resolve_backend,
 )
 from simulator.config import load_config_bundle
 from simulator.melt_backend.base import StubBackend
 from web.events import BackendUnavailableError, _get_backend
+
+SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS = (
+    "lunar_mare_low_ti",
+    "lunar_mare_high_ti",
+    "lunar_mare_lms1",
+    "lunar_eac_1a",
+    "s_type_asteroid_silicate",
+    "m_type_silicate_phase",
+    "v_type_vesta_hed",
+    "e_type_enstatite_aubrite",
+)
+NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS = (
+    "lunar_highland",
+    "lunar_highlands_lhs1",
+    "lunar_pkt_kreep_average",
+    "lunar_spa_kreep_influenced",
+    "mars_global_mgs1",
+    "targeted_super_kreep_ore",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -198,6 +218,81 @@ def test_pregrind_route_feedstocks_require_subprocess_from_real_data():
         for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
         if not requires_stage0_subprocess(feedstock_id, feedstocks)
     } == set()
+
+
+def test_spinel_composition_route_predicate_separates_hang_from_safe_catalog():
+    feedstocks = load_config_bundle().feedstocks
+
+    assert {
+        feedstock_id
+        for feedstock_id in SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS
+        if not is_spinel_rich_stage0_subprocess_feedstock(feedstocks[feedstock_id])
+    } == set()
+    assert {
+        feedstock_id
+        for feedstock_id in NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS
+        if is_spinel_rich_stage0_subprocess_feedstock(feedstocks[feedstock_id])
+    } == set()
+
+    renamed_feedstocks = {
+        f"renamed_{feedstock_id}": {
+            "composition_wt_pct": dict(feedstocks[feedstock_id]["composition_wt_pct"])
+        }
+        for feedstock_id in SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS
+    }
+    assert {
+        feedstock_id
+        for feedstock_id in SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS
+        if not requires_stage0_subprocess(
+            f"renamed_{feedstock_id}",
+            renamed_feedstocks,
+        )
+    } == set()
+
+    safe_clones = {
+        f"safe_{feedstock_id}": {
+            "composition_wt_pct": dict(feedstocks[feedstock_id]["composition_wt_pct"])
+        }
+        for feedstock_id in NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS
+    }
+    assert {
+        feedstock_id
+        for feedstock_id in NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS
+        if requires_stage0_subprocess(
+            f"safe_{feedstock_id}",
+            safe_clones,
+        )
+    } == set()
+
+    synthetic_feedstocks = {
+        "new_spinel_rich_mare": {
+            "composition_wt_pct": {
+                "SiO2": 45.0,
+                "Al2O3": 13.0,
+                "FeO": 13.0,
+                "MgO": 12.0,
+                "TiO2": 1.0,
+                "CaO": 10.0,
+            }
+        }
+    }
+    assert requires_stage0_subprocess(
+        "new_spinel_rich_mare",
+        synthetic_feedstocks,
+    )
+
+    perchlorate_composition_only = {
+        "perchlorate_composition_only": {
+            "composition_wt_pct": dict(
+                feedstocks["mars_perchlorate_rich"]["composition_wt_pct"]
+            )
+        }
+    }
+    assert not requires_stage0_subprocess(
+        "perchlorate_composition_only",
+        perchlorate_composition_only,
+    )
+    assert requires_stage0_subprocess("mars_perchlorate_rich", feedstocks)
 
 
 def test_real_grind_feedstock_resolution_forces_subprocess_from_data():
