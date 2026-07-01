@@ -115,7 +115,9 @@ LAB_OVERLAY_SCOPE_FIELDS = (
 DEFAULT_C4_HOLD_TEMP_C = 1670.0
 _VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES = {
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID: (
+        "engines.builtin._common",
         "engines.builtin.vapor_pressure",
+        "simulator.chemistry.ellingham_thermo",
     ),
     VAPOROCK_DIAGNOSTIC_PROVIDER_ID: (
         "engines.vaporock.provider",
@@ -1515,6 +1517,7 @@ def _build_eval_inputs(
         "setpoints",
         "feedstocks",
         "vapor_pressures",
+        "foulant_thermo",
         "materials",
         "species_catalog",
     ):
@@ -1559,6 +1562,7 @@ def _build_eval_inputs(
         "setpoints": bundle.digests["setpoints"],
         "feedstocks": bundle.digests["feedstocks"],
         "vapor_pressures": bundle.digests["vapor_pressures"],
+        "foulant_thermo": bundle.digests["foulant_thermo"],
         "materials": bundle.digests["materials"],
         "species_catalog": bundle.digests["species_catalog"],
         "profile": profile_digest,
@@ -3924,7 +3928,7 @@ def _backend_status_reasons_from_carrier(carrier: Any) -> tuple[str, ...]:
 
 def _carrier_has_crash_point(carrier: Mapping[Any, Any]) -> bool:
     return any(
-        isinstance(carrier.get(key), MappingABC)
+        isinstance(carrier.get(key), MappingABC) and bool(carrier.get(key))
         for key in ("out_of_domain_crash_point", "crash_point")
     )
 

@@ -2374,6 +2374,26 @@ def test_non_authoritative_backend_status_green_path_requires_authoritative_ok()
     assert result.run_reference.backend_status == "ok"
 
 
+def test_empty_crash_point_placeholder_does_not_mark_backend_out_of_domain() -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "high",
+        profile=_real_backend_profile(),
+        executor=FakeExecutor(
+            _available_real_backend_execution(
+                backend_diagnostics={"backend_status": "ok", "crash_point": {}},
+            )
+        ),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.run_reference is not None
+    assert result.run_reference.backend_status == "ok"
+    assert "melts_domain_out_of_domain" not in result.notes
+
+
 def test_clamped_kernel_success_is_out_of_domain_at_requested_point() -> None:
     clamped = _clamped_kernel_equilibrium()
     clean_snapshot = _snapshot(MASS_BALANCE_ABORT_PCT)

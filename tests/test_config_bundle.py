@@ -12,6 +12,7 @@ from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 REQUIRED_CONFIGS = {
     "setpoints": "setpoints.yaml",
     "feedstocks": "feedstocks.yaml",
+    "foulant_thermo": "foulant_thermo.yaml",
     "vapor_pressures": "vapor_pressures.yaml",
     "materials": "materials.yaml",
     "species_catalog": "species_catalog.yaml",
@@ -23,6 +24,7 @@ def test_load_config_bundle_returns_all_required_data_and_digests() -> None:
 
     assert bundle.setpoints
     assert bundle.feedstocks
+    assert bundle.foulant_thermo
     assert bundle.vapor_pressures
     assert bundle.materials
     assert bundle.species_catalog

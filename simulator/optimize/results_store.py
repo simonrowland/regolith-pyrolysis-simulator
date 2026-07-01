@@ -48,6 +48,10 @@ SCHEMA_VERSION = 4
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
+NON_AUTHORITATIVE_BACKEND_STATUSES = frozenset({"diagnostic_stub", "unavailable"})
+APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
+    {"cached_interpolated", "cached_physics_bucket"}
+)
 
 __all__ = [
     "DEFAULT_BUSY_TIMEOUT_MS",
@@ -275,6 +279,8 @@ class ResultStore:
             ).fetchone()
         if row is None:
             return None
+        if row["corpus_version"] != current_corpus_version():
+            return None
         return _row_to_scored_result(row)
 
     def query(
@@ -299,10 +305,10 @@ class ResultStore:
             rows = conn.execute(
                 f"""
                 SELECT * FROM results
-                WHERE {where}
+                WHERE {where} AND corpus_version = ?
                 ORDER BY created_at DESC, cache_key ASC
                 """,
-                params,
+                (*params, current_corpus_version()),
             ).fetchall()
         return [_row_to_scored_result(row) for row in rows]
 
@@ -341,12 +347,13 @@ class ResultStore:
                 SELECT ov.sense
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
-                WHERE {where} AND r.feasible = 1 AND ov.metric = ?
+                WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
+                    AND ov.metric = ?
                 GROUP BY ov.sense
                 ORDER BY ov.sense ASC
                 LIMIT 2
                 """,
-                (*params, metric),
+                (*params, current_corpus_version(), metric),
             ).fetchall()
             if not objective:
                 return None
@@ -359,11 +366,12 @@ class ResultStore:
                 SELECT r.*
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
-                WHERE {where} AND r.feasible = 1 AND ov.metric = ?
+                WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
+                    AND ov.metric = ?
                 ORDER BY ov.value {value_order}, r.cache_key ASC
                 LIMIT 1
                 """,
-                (*params, metric),
+                (*params, current_corpus_version(), metric),
             ).fetchone()
         return _row_to_scored_result(row) if row is not None else None
 
@@ -391,11 +399,11 @@ class ResultStore:
                 SELECT ov.metric
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
-                WHERE {where} AND r.feasible = 1
+                WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
                 ORDER BY ov.ordinal ASC, ov.metric ASC, r.cache_key ASC
                 LIMIT 1
                 """,
-                params,
+                (*params, current_corpus_version()),
             ).fetchone()
         return str(row["metric"]) if row is not None else None
 
@@ -647,6 +655,15 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
     backend_authoritative = _artifact_backend_authoritative(scored_result)
     if backend_authoritative is not True:
         reasons.append("non_authoritative_backend")
+    contradiction = _backend_authority_contradiction(
+        backend_status,
+        backend_authoritative,
+    )
+    if contradiction is not None:
+        reasons.append(contradiction)
+    approximate_cache = _approximate_reduced_real_cache_state(scored_result)
+    if approximate_cache is not None:
+        reasons.append(f"approximate_reduced_real_cache_state:{approximate_cache}")
     closure_rejection = _mass_balance_closure_rejection(scored_result)
     if closure_rejection is not None:
         reasons.append(closure_rejection)
@@ -670,6 +687,47 @@ def _artifact_backend_authoritative(scored_result: ScoredResult) -> bool | None:
         if raw is not None:
             return _strict_bool(raw)
     return None
+
+
+def _backend_authority_contradiction(
+    backend_status: str | None,
+    backend_authoritative: bool | None,
+) -> str | None:
+    status = str(backend_status or "").strip()
+    if (
+        backend_authoritative is True
+        and status.lower() in NON_AUTHORITATIVE_BACKEND_STATUSES
+    ):
+        return f"backend_authority_contradicts_status:{status}"
+    return None
+
+
+def _approximate_reduced_real_cache_state(scored_result: ScoredResult) -> str | None:
+    for carrier in _admission_carriers(scored_result):
+        for state in _cache_states_from_carrier(carrier):
+            normalized = str(state).strip()
+            if normalized in APPROXIMATE_REDUCED_REAL_CACHE_STATES:
+                return normalized
+    return None
+
+
+def _cache_states_from_carrier(carrier: Any) -> tuple[Any, ...]:
+    states: list[Any] = []
+    for key in ("cache_state", "reduced_real_cache_state"):
+        state = _carrier_value(carrier, key)
+        if state is not None:
+            states.append(state)
+    for key in ("per_hour", "per_hour_summary"):
+        per_hour = _carrier_value(carrier, key)
+        if not isinstance(per_hour, SequenceABC) or isinstance(per_hour, (str, bytes)):
+            continue
+        for entry in per_hour:
+            if entry is None:
+                continue
+            state = _carrier_value(entry, "reduced_real_cache_state")
+            if state is not None:
+                states.append(state)
+    return tuple(states)
 
 
 def _admission_carriers(scored_result: ScoredResult) -> tuple[Any, ...]:
@@ -761,7 +819,7 @@ def _mass_balance_payload_rejection(payload: Any) -> str | None:
     if status and status != "closed":
         if status == "open":
             return "mass_balance_closure_breach:open"
-        return None
+        return f"mass_balance_closure_not_closed:{status}"
     raw = _first_present(
         payload,
         (

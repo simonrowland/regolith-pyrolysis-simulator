@@ -40,6 +40,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "data_digests": {
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
             "species_catalog": "species-catalog-digest",
@@ -330,6 +331,7 @@ def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
         )
         payload["data_digests"].pop("materials")
         payload["data_digests"].pop("species_catalog")
+        payload["data_digests"].pop("foulant_thermo")
         conn.execute(
             "UPDATE results SET eval_spec = ? WHERE cache_key = ?",
             (json.dumps(payload), key),
@@ -344,6 +346,9 @@ def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
     )
     assert loaded.eval_spec.data_digests["species_catalog"] == (
         "legacy-missing-species-catalog-digest"
+    )
+    assert loaded.eval_spec.data_digests["foulant_thermo"] == (
+        "legacy-missing-foulant-thermo-digest"
     )
 
 
@@ -575,6 +580,19 @@ def test_store_result_artifact_missing_required_fields_raise_named(
             "mass_balance_closure_breach",
         ),
         (
+            lambda spec: _scored(
+                spec,
+                product_summary={
+                    "oxygen_kg": 10.0,
+                    "mass_closure": {
+                        "status": "pending",
+                        "mass_balance_error_pct": 0.0,
+                    },
+                },
+            ),
+            "mass_balance_closure_not_closed:pending",
+        ),
+        (
             lambda spec: ScoredResult(
                 candidate_id="candidate-ood",
                 eval_spec=spec,
@@ -619,6 +637,46 @@ def test_store_result_artifact_missing_required_fields_raise_named(
                 ),
             ),
             "non_authoritative_backend",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {
+                        "backend_status": "diagnostic_stub",
+                        "backend_authoritative": True,
+                    }
+                ),
+            ),
+            "backend_authority_contradicts_status:diagnostic_stub",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {
+                        "backend_status": "unavailable",
+                        "backend_authoritative": True,
+                    }
+                ),
+            ),
+            "backend_authority_contradicts_status:unavailable",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace({"cache_state": "cached_interpolated"}),
+            ),
+            "approximate_reduced_real_cache_state:cached_interpolated",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {"reduced_real_cache_state": "cached_physics_bucket"}
+                ),
+            ),
+            "approximate_reduced_real_cache_state:cached_physics_bucket",
         ),
         (
             lambda spec: _scored(
@@ -908,6 +966,40 @@ def test_idempotent_upsert_latest_wins(tmp_path) -> None:
     assert loaded.candidate_id == "new"
     assert loaded.objectives is not None
     assert loaded.objectives.as_mapping()["oxygen_kg"] == 2.0
+
+
+def test_lookup_fetch_and_selectors_miss_stale_corpus_rows(tmp_path) -> None:
+    spec = _base_spec()
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    key = cache_key(spec)
+    store.store(spec, _scored(spec), created_at="2026-01-01T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET corpus_version = ? WHERE cache_key = ?",
+            (f"{current_corpus_version()}-stale", key),
+        )
+
+    assert store.fetch(key) is None
+    assert store.lookup(spec) is None
+    assert store.query(
+        spec.feedstock_id,
+        profile_id=spec.profile_id,
+        fidelity=spec.fidelity,
+        code_version=spec.code_version,
+        data_digests=spec.data_digests,
+    ) == []
+    assert store.best(
+        spec.feedstock_id,
+        profile_id=spec.profile_id,
+        fidelity=spec.fidelity,
+        code_version=spec.code_version,
+        data_digests=spec.data_digests,
+    ) is None
 
 
 def test_query_exact_selector_and_version_scoped(tmp_path) -> None:

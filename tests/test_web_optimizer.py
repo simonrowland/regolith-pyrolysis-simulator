@@ -55,6 +55,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "data_digests": {
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
             "species_catalog": "species-catalog-digest",
@@ -1143,6 +1144,7 @@ def test_optimizer_leaderboard_exposes_multiple_current_digest_scopes(client) ->
         data_digests={
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
             "species_catalog": "species-catalog-digest",
@@ -1199,6 +1201,7 @@ def test_optimizer_leaderboard_excludes_infeasible_rows_on_multi_digest_path(
         data_digests={
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
             "species_catalog": "species-catalog-digest",

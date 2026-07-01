@@ -35,6 +35,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "data_digests": {
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "vapor_pressures": "vapor-digest",
             "species_catalog": "species-catalog-digest",

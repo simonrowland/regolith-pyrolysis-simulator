@@ -71,6 +71,7 @@ STAGE_COOL_RAMP = (
 )
 DATA_DIGESTS = {
     "feedstocks": "feedstocks-digest",
+    "foulant_thermo": "foulant-thermo-digest",
     "materials": "materials-digest",
     "profile": "profile-digest",
     "setpoints": "setpoints-digest",
@@ -308,7 +309,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-01: moved when C4b added FeSi to species_catalog and the
     # grounded wall_reactivity_matrix source surface.
     # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "85fe39fc43da8903a6468e259c2c52b76acc29f033129b7d1930376f79bed585"
+    assert cache_key(spec) == "c071375593cbce4b3880b133e50e459bc799b1af39e76a30f2f22b8fdad1618b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

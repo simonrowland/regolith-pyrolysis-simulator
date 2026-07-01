@@ -62,7 +62,8 @@ PINNED_EVALSPEC_JSON = (
     b'"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.7",'
     b'"data_digests":{"corpus_version":"corpus-version-digest",'
-    b'"feedstocks":"feedstock-digest","materials":"materials-digest",'
+    b'"feedstocks":"feedstock-digest","foulant_thermo":"foulant-thermo-digest",'
+    b'"materials":"materials-digest",'
     b'"profile":"profile-digest","setpoints":"setpoints-digest",'
     b'"species_catalog":"species-catalog-digest","vapor_pressures":"vapor-digest"},'
     b'"feedstock_id":"lunar_mare_low_ti",'
@@ -98,6 +99,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
             "corpus_version": "corpus-version-digest",
             "setpoints": "setpoints-digest",
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "vapor_pressures": "vapor-digest",
             "materials": "materials-digest",
             "species_catalog": "species-catalog-digest",
@@ -192,6 +194,7 @@ spec = EvalSpec(
         "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",
         "feedstocks": "feedstock-digest",
+        "foulant_thermo": "foulant-thermo-digest",
         "vapor_pressures": "vapor-digest",
         "materials": "materials-digest",
         "species_catalog": "species-catalog-digest",
@@ -326,6 +329,9 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
     )
 
     assert spec.data_digests["corpus_version"] == current_corpus_version()
+    assert spec.data_digests["foulant_thermo"] == load_config_bundle().digests[
+        "foulant_thermo"
+    ]
     assert spec.data_digests["materials"]
     assert spec.data_digests["species_catalog"]
 
@@ -337,6 +343,10 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
         spec,
         data_digests={**spec.data_digests, "materials": "changed-materials"},
     )
+    foulant_thermo_changed = replace(
+        spec,
+        data_digests={**spec.data_digests, "foulant_thermo": "changed-foulant-thermo"},
+    )
     species_catalog_changed = replace(
         spec,
         data_digests={
@@ -347,6 +357,7 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
 
     assert cache_key(corpus_changed) != cache_key(spec)
     assert cache_key(materials_changed) != cache_key(spec)
+    assert cache_key(foulant_thermo_changed) != cache_key(spec)
     assert cache_key(species_catalog_changed) != cache_key(spec)
 
 
@@ -357,18 +368,22 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
     legacy_args[6] = {
         key: value
         for key, value in spec.data_digests.items()
-        if key not in {"materials", "species_catalog"}
+        if key not in {"foulant_thermo", "materials", "species_catalog"}
     }
 
     restored = rebuild(*legacy_args)
 
+    assert (
+        restored.data_digests["foulant_thermo"]
+        == "legacy-missing-foulant-thermo-digest"
+    )
     assert restored.data_digests["materials"] == "legacy-missing-materials-digest"
     assert (
         restored.data_digests["species_catalog"]
         == "legacy-missing-species-catalog-digest"
     )
 
-    # A FULL 6-key payload must round-trip UNCHANGED: fresh specs never acquire
+    # A full current payload must round-trip UNCHANGED: fresh specs never acquire
     # sentinels — the legacy scope only patches a 4-key legacy map. Without this
     # the determinant could be silently defeated for live specs.
     restored_full = rebuild(*args)
@@ -419,6 +434,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
             {
                 "setpoints": "changed",
                 "feedstocks": "feedstock-digest",
+                "foulant_thermo": "foulant-thermo-digest",
                 "materials": "materials-digest",
                 "vapor_pressures": "vapor-digest",
                 "species_catalog": "species-catalog-digest",
@@ -1488,6 +1504,41 @@ def test_provider_code_fingerprint_includes_upstream_package_versions(
     evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
     second = evaluate_module._vapor_pressure_provider_code_fingerprint(
         "vaporock"
+    )
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+
+    assert first != second
+
+
+@pytest.mark.parametrize(
+    "dependency_module",
+    (
+        "engines.builtin._common",
+        "simulator.chemistry.ellingham_thermo",
+    ),
+)
+def test_builtin_provider_code_fingerprint_includes_runtime_dependency_source(
+    monkeypatch: pytest.MonkeyPatch,
+    dependency_module: str,
+) -> None:
+    source_by_module = {
+        "engines.builtin._common": "common-source-a",
+        "engines.builtin.vapor_pressure": "vapor-source",
+        "simulator.chemistry.ellingham_thermo": "ellingham-source-a",
+    }
+
+    def fake_getsource(module: object) -> str:
+        return source_by_module.get(module.__name__, f"source:{module.__name__}")
+
+    monkeypatch.setattr(evaluate_module.inspect, "getsource", fake_getsource)
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+    first = evaluate_module._vapor_pressure_provider_code_fingerprint(
+        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
+    )
+    source_by_module[dependency_module] = f"{dependency_module}:source-b"
+    evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
+    second = evaluate_module._vapor_pressure_provider_code_fingerprint(
+        DEFAULT_VAPOR_PRESSURE_PROVIDER_ID
     )
     evaluate_module._vapor_pressure_provider_code_fingerprint.cache_clear()
 
@@ -2661,6 +2712,7 @@ def test_missing_required_data_digest_raises() -> None:
         _base_spec(
             data_digests={
                 "feedstocks": "feedstock-digest",
+                "foulant_thermo": "foulant-thermo-digest",
                 "materials": "materials-digest",
                 "vapor_pressures": "vapor-digest",
                 "species_catalog": "species-catalog-digest",
@@ -2669,13 +2721,14 @@ def test_missing_required_data_digest_raises() -> None:
         )
 
 
-@pytest.mark.parametrize("missing_key", ("materials", "species_catalog"))
+@pytest.mark.parametrize("missing_key", ("foulant_thermo", "materials", "species_catalog"))
 def test_missing_new_required_data_digest_raises(missing_key: str) -> None:
     # Each newly-required cache-determinant key must be enforced on direct
     # construction (the legacy sentinel scope applies ONLY at deserialize/reduce).
     digests = {
         "setpoints": "setpoint-digest",
         "feedstocks": "feedstock-digest",
+        "foulant_thermo": "foulant-thermo-digest",
         "materials": "materials-digest",
         "vapor_pressures": "vapor-digest",
         "species_catalog": "species-catalog-digest",
@@ -2694,6 +2747,7 @@ def test_empty_required_data_digest_raises() -> None:
             data_digests={
                 "setpoints": "",
                 "feedstocks": "feedstock-digest",
+                "foulant_thermo": "foulant-thermo-digest",
                 "materials": "materials-digest",
                 "vapor_pressures": "vapor-digest",
                 "species_catalog": "species-catalog-digest",

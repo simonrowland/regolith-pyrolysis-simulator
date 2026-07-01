@@ -69,6 +69,9 @@ CACHE_STATES = (
     "cached_interpolated",
     "live_fill",
 )
+APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
+    {"cached_interpolated", "cached_physics_bucket"}
+)
 _CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -446,6 +449,7 @@ class PT0DeterminismStore:
         result = equilibrium_from_payload(payload)
         sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
+        self._apply_equilibrium_cache_authority(sim, result)
         history = getattr(sim, "_backend_status_history", None)
         if isinstance(history, list):
             history.append(str(sim._last_backend_status))
@@ -460,6 +464,24 @@ class PT0DeterminismStore:
         if getattr(result, "fO2_log", None) is not None:
             sim.melt.fO2_log = float(result.fO2_log)
         return result
+
+    def _apply_equilibrium_cache_authority(
+        self,
+        sim: Any,
+        result: EquilibriumResult,
+    ) -> None:
+        cache_state = str(self.last_cache_state or "")
+        if cache_state not in APPROXIMATE_REDUCED_REAL_CACHE_STATES:
+            return
+        sim._backend_authoritative = False
+        diagnostic = {
+            "reduced_real_cache_state": cache_state,
+            "reduced_real_cache_authoritative": False,
+        }
+        result.diagnostics = {**dict(result.diagnostics or {}), **diagnostic}
+        existing = getattr(sim, "_last_backend_diagnostics", None)
+        if isinstance(existing, Mapping):
+            sim._last_backend_diagnostics = {**dict(existing), **diagnostic}
 
     def capture_gate_curve(
         self,

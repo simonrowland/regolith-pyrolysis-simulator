@@ -18,6 +18,7 @@ class ConfigBundle:
     setpoints: dict[str, Any]
     feedstocks: dict[str, Any]
     vapor_pressures: dict[str, Any]
+    foulant_thermo: dict[str, Any]
     materials: dict[str, Any]
     species_catalog: dict[str, Any]
     source_paths: dict[str, Path]
@@ -38,6 +39,7 @@ def load_config_bundle(
     setpoints_path: Path | None = None,
     feedstocks_path: Path | None = None,
     vapor_pressures_path: Path | None = None,
+    foulant_thermo_path: Path | None = None,
     materials_path: Path | None = None,
     species_catalog_path: Path | None = None,
 ) -> ConfigBundle:
@@ -49,6 +51,11 @@ def load_config_bundle(
             Path(vapor_pressures_path)
             if vapor_pressures_path
             else root / "vapor_pressures.yaml"
+        ),
+        "foulant_thermo": (
+            Path(foulant_thermo_path)
+            if foulant_thermo_path
+            else root / "foulant_thermo.yaml"
         ),
         "materials": Path(materials_path) if materials_path else root / "materials.yaml",
         "species_catalog": (
@@ -65,6 +72,7 @@ def load_config_bundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],
         vapor_pressures=loaded["vapor_pressures"],
+        foulant_thermo=loaded["foulant_thermo"],
         materials=loaded["materials"],
         species_catalog=loaded["species_catalog"],
         source_paths=source_paths,

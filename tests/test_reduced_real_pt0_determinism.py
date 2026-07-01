@@ -151,7 +151,7 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     key_hash = _key_hash(key)
     fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
 
-    assert key_hash == "7e675032a1bc99cbabfcbb5b5050f87d09ac022e9fd9e809800b9e18919d516d"
+    assert key_hash == "ded18ff94bf17d981de86d915557f2d47170ac1addc79c6ba1ccc5a2aae85763"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -1028,6 +1028,9 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 
     assert payload is not None
     assert replay_sim._last_reduced_real_cache_state == "cached_physics_bucket"
+    assert replay_sim._backend_authoritative is False
+    assert payload.diagnostics["reduced_real_cache_authoritative"] is False
+    assert payload.diagnostics["reduced_real_cache_state"] == "cached_physics_bucket"
     counts = replay_store.summary()["cache_state_counts_by_artifact"][
         "equilibrium_post_record"
     ]

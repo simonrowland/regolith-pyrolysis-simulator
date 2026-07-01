@@ -208,6 +208,7 @@ def _surface_temperature_evalspec(schedule: dict) -> EvalSpec:
         code_version=current_code_version(),
         data_digests={
             "feedstocks": "feedstock-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "profile": "profile-digest",
             "setpoints": "setpoints-digest",

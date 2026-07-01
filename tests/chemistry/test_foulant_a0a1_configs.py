@@ -52,8 +52,8 @@ def _load_carbon_partition() -> dict:
         return yaml.safe_load(handle) or {}
 
 
-def test_foulant_yaml_not_in_required_digest_keys() -> None:
-    assert "foulant_thermo" not in REQUIRED_DATA_DIGEST_KEYS
+def test_foulant_thermo_in_digest_but_carbon_partition_excluded() -> None:
+    assert "foulant_thermo" in REQUIRED_DATA_DIGEST_KEYS
     assert "stage0_carbon_partition" not in REQUIRED_DATA_DIGEST_KEYS
 
 

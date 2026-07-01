@@ -65,6 +65,7 @@ def _eval_spec(candidate_id: str | None, backend_name: str) -> EvalSpec:
         code_version="test",
         data_digests={
             "feedstocks": "feedstocks-digest",
+            "foulant_thermo": "foulant-thermo-digest",
             "materials": "materials-digest",
             "profile": "profile-digest",
             "setpoints": "setpoints-digest",

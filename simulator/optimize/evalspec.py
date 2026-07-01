@@ -35,6 +35,7 @@ _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
 REQUIRED_DATA_DIGEST_KEYS = frozenset(
     (
         "feedstocks",
+        "foulant_thermo",
         "materials",
         "profile",
         "setpoints",
@@ -47,6 +48,7 @@ _LEGACY_DATA_DIGEST_KEYS = frozenset(
 )
 _LEGACY_DATA_DIGEST_SENTINELS = MappingProxyType(
     {
+        "foulant_thermo": "legacy-missing-foulant-thermo-digest",
         "materials": "legacy-missing-materials-digest",
         "species_catalog": "legacy-missing-species-catalog-digest",
     }
