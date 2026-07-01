@@ -7,7 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from simulator.backends import real_backend_feedstock_domain_reason, requires_stage0_subprocess
+from simulator.backends import (
+    STAGE0_SUBPROCESS_FEEDSTOCK_IDS,
+    real_backend_feedstock_domain_reason,
+    requires_stage0_subprocess,
+)
 from simulator.config import load_config_bundle
 from simulator.grind_preflight import (
     GrindSourceGateError,
@@ -108,6 +112,49 @@ def test_stage0_route_coverage_accepts_super_kreep_as_explicit_ood() -> None:
         feedstocks,
         backend_name="alphamelts",
         context="test-grind",
+    )
+
+
+def test_stage0_route_required_feedstocks_are_not_preflight_ood() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    assert requires_stage0_subprocess("mars_perchlorate_rich", feedstocks)
+    assert (
+        real_backend_feedstock_domain_reason(
+            "alphamelts",
+            "mars_perchlorate_rich",
+            feedstocks,
+        )
+        is None
+    )
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
+        if real_backend_feedstock_domain_reason("alphamelts", feedstock_id, feedstocks)
+        is not None
+    } == set()
+
+
+def test_stage0_preflight_ood_preserves_non_routed_rejections() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    assert not requires_stage0_subprocess("m_type_metallic_phase", feedstocks)
+    assert (
+        real_backend_feedstock_domain_reason(
+            "alphamelts",
+            "m_type_metallic_phase",
+            feedstocks,
+        )
+        == "non_silicate_feedstock"
+    )
+    assert not requires_stage0_subprocess("targeted_super_kreep_ore", feedstocks)
+    assert (
+        real_backend_feedstock_domain_reason(
+            "alphamelts",
+            "targeted_super_kreep_ore",
+            feedstocks,
+        )
+        == "unsupported_melts_species"
     )
 
 

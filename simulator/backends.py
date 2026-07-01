@@ -438,6 +438,7 @@ def real_backend_feedstock_domain_reason(
     if not (
         PyrolysisSimulator._uses_mars_carbon_cleanup(feedstock)
         or PyrolysisSimulator._uses_carbonaceous_degas_cleanup(feedstock)
+        or requires_stage0_subprocess(feedstock_id, feedstocks)
     ):
         unsupported_species = [
             species

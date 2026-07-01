@@ -31,6 +31,7 @@ from simulator.backends import (
     assert_stage0_subprocess_backend_safe,
     backend_resolution_status,
     is_spinel_rich_stage0_subprocess_feedstock,
+    real_backend_feedstock_domain_reason,
     requires_stage0_subprocess,
     resolve_backend,
 )
@@ -221,6 +222,21 @@ def test_pregrind_route_feedstocks_require_subprocess_from_real_data():
         feedstock_id
         for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
         if not requires_stage0_subprocess(feedstock_id, feedstocks)
+    } == set()
+    assert requires_stage0_subprocess("mars_perchlorate_rich", feedstocks)
+    assert (
+        real_backend_feedstock_domain_reason(
+            "alphamelts",
+            "mars_perchlorate_rich",
+            feedstocks,
+        )
+        is None
+    )
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
+        if real_backend_feedstock_domain_reason("alphamelts", feedstock_id, feedstocks)
+        is not None
     } == set()
 
 
