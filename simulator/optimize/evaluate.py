@@ -179,6 +179,7 @@ class FailureCategory(str, Enum):
     PHYSICS_REFUSED = "physics_refused"
     NON_FINITE_PAYLOAD = "non_finite_payload"
     INVALID_RECIPE = "invalid_recipe"
+    TIMEOUT = "timeout"
     ENGINE_BUG = "engine_bug"
     BACKEND_UNAVAILABLE = "backend_unavailable"
     STALE_PROFILE = "stale_profile"

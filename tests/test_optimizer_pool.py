@@ -282,6 +282,43 @@ def _slow_or_abort_evaluate(
     )
 
 
+def _grandchild_then_hang_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    survivor = out / "grandchild-survived.txt"
+    subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import pathlib, sys, time; "
+                "time.sleep(1.0); "
+                "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
+            ),
+            str(survivor),
+        ]
+    )
+    time.sleep(5.0)
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
+
 def _hard_crash_evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -507,6 +544,150 @@ def test_pool_preserves_input_order_under_reversed_completion(tmp_path: Path) ->
     )
 
     assert [result.candidate_id for result in results] == ["slow", "fast"]
+
+
+@pytest.mark.timeout(10)
+def test_process_pool_timeout_records_failure_and_continues(
+    tmp_path: Path,
+    spawnable_process_pool: None,
+) -> None:
+    requests = [
+        PoolEvaluationRequest(_patch(50), "lunar_mare_low_ti", "fast", candidate_id="slow"),
+        PoolEvaluationRequest(_patch(2), "lunar_mare_low_ti", "fast", candidate_id="fast"),
+    ]
+
+    results = evaluate_batch(
+        requests,
+        profile=_profile(),
+        max_workers=1,
+        output_root=tmp_path,
+        evaluate_fn=_slow_or_abort_evaluate,
+        per_eval_timeout_seconds=0.2,
+    )
+
+    assert [result.candidate_id for result in results] == ["slow", "fast"]
+    assert results[0].failure_category is FailureCategory.TIMEOUT
+    assert results[0].run_reference is not None
+    assert results[0].run_reference.reason == "optimizer_eval_timeout"
+    assert results[0].run_reference.backend_status == "unavailable"
+    assert results[1].feasible is True
+    assert results[1].failure_category is None
+
+
+def test_process_pool_timeout_records_failure_with_fake_executor(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class FakeExecutor:
+        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+            self.max_workers = max_workers
+            self.initializer = initializer
+            self._processes: dict[int, object] = {}
+            self.shutdown_calls: list[dict[str, object]] = []
+
+        def submit(self, fn: object, task: object, evaluate_fn: object) -> Future[object]:
+            future: Future[object] = Future()
+            if getattr(task, "candidate_id", None) == "slow":
+                return future
+            future.set_result(fn(task, evaluate_fn))
+            return future
+
+        def shutdown(self, *, wait: bool, cancel_futures: bool) -> None:
+            self.shutdown_calls.append({"wait": wait, "cancel_futures": cancel_futures})
+
+    def fake_wait(
+        futures: object, *, return_when: object, timeout: object = None
+    ) -> tuple[set[Future[object]], set[Future[object]]]:
+        del return_when
+        done = {future for future in futures if future.done()}
+        if not done and timeout:
+            time.sleep(float(timeout))
+        return done, set()
+
+    monkeypatch.setattr(pool_module, "ProcessPoolExecutor", FakeExecutor)
+    monkeypatch.setattr(pool_module, "wait", fake_wait)
+
+    results = evaluate_batch(
+        [
+            PoolEvaluationRequest(_patch(50), "lunar_mare_low_ti", "fast", candidate_id="slow"),
+            PoolEvaluationRequest(_patch(2), "lunar_mare_low_ti", "fast", candidate_id="fast-a"),
+            PoolEvaluationRequest(_patch(3), "lunar_mare_low_ti", "fast", candidate_id="fast-b"),
+        ],
+        profile=_profile(),
+        max_workers=1,
+        output_root=tmp_path,
+        evaluate_fn=_slow_or_abort_evaluate,
+        per_eval_timeout_seconds=0.01,
+    )
+
+    assert [result.candidate_id for result in results] == ["slow", "fast-a", "fast-b"]
+    assert results[0].failure_category is FailureCategory.TIMEOUT
+    assert [result.feasible for result in results[1:]] == [True, True]
+
+
+@pytest.mark.timeout(10)
+def test_process_pool_timeout_kills_worker_process_group(
+    tmp_path: Path,
+    spawnable_process_pool: None,
+) -> None:
+    results = evaluate_batch(
+        [
+            PoolEvaluationRequest(
+                _patch(1),
+                "lunar_mare_low_ti",
+                "fast",
+                candidate_id="spawns-child",
+            )
+        ],
+        profile=_profile(),
+        max_workers=1,
+        output_root=tmp_path,
+        evaluate_fn=_grandchild_then_hang_evaluate,
+        per_eval_timeout_seconds=0.2,
+    )
+
+    time.sleep(1.2)
+    assert results[0].failure_category is FailureCategory.TIMEOUT
+    assert not (tmp_path / "eval-000000" / "grandchild-survived.txt").exists()
+
+
+@pytest.mark.timeout(10)
+def test_pool_process_termination_kills_child_process_group(tmp_path: Path) -> None:
+    survivor = tmp_path / "pool-grandchild-survived.txt"
+    script = (
+        "import subprocess, sys, time; "
+        "subprocess.Popen([sys.executable, '-c', "
+        "\"import pathlib, sys, time; time.sleep(1.0); "
+        "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')\", "
+        f"{str(survivor)!r}]); "
+        "time.sleep(5.0)"
+    )
+    popen = subprocess.Popen([sys.executable, "-c", script], start_new_session=True)
+
+    class ProcessAdapter:
+        pid = popen.pid
+
+        def is_alive(self) -> bool:
+            return popen.poll() is None
+
+        def join(self, timeout: float | None = None) -> None:
+            try:
+                popen.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                return
+
+        def terminate(self) -> None:
+            popen.terminate()
+
+        def kill(self) -> None:
+            popen.kill()
+
+    time.sleep(0.1)
+    pool_module._terminate_pool_process(ProcessAdapter())
+    time.sleep(1.2)
+
+    assert popen.poll() is not None
+    assert not survivor.exists()
 
 
 def test_hashseed_result_view_rejects_or_normalizes_unordered_fields() -> None:
@@ -862,8 +1043,9 @@ def test_worker_abort_survives_teardown_error(
         return executor
 
     def fake_wait(
-        futures: object, *, return_when: object
+        futures: object, *, return_when: object, timeout: object = None
     ) -> tuple[set[Future[object]], set[Future[object]]]:
+        del timeout
         return set(futures), set()
 
     monkeypatch.setattr(pool_module, "ProcessPoolExecutor", executor_factory)
@@ -1044,7 +1226,10 @@ def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_
         assert max_workers == 2
         return fake_executor
 
-    def fake_wait(futures: object, *, return_when: object) -> tuple[set[Future[object]], set[Future[object]]]:
+    def fake_wait(
+        futures: object, *, return_when: object, timeout: object = None
+    ) -> tuple[set[Future[object]], set[Future[object]]]:
+        del timeout
         future = next(iter(futures))
         owner = future._owner
         if not future.done():

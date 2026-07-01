@@ -79,6 +79,12 @@ _ACTIVE_CHILDREN_LOCK = threading.Lock()
 _SIGNAL_FORWARDERS_INSTALLED = False
 
 DEFAULT_TIME_BOX_SECONDS = 2 * 60 * 60
+# Final-long children are bounded above the normal 2 h epoch box; this is a
+# supervisor backstop, not an eval-numerics knob.
+DEFAULT_FINAL_LONG_TIMEOUT_SECONDS = 6 * 60 * 60
+# Matches simulator.optimize.pool.DEFAULT_EVAL_TIMEOUT_SECONDS; live
+# AlphaMELTS notes cite ~7 min evals and a prior 900 s cap as too tight.
+DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS = 45 * 60
 DEFAULT_DUP_THRESHOLD = 0.02
 DEFAULT_LOW_DUP_EPOCHS = 2
 STALE_CLEANUP_RETRY_SECONDS = 0.05
@@ -143,6 +149,8 @@ class DriverConfig:
     nice: int
     job_concurrency: int = 1
     ioreg_sample_every_evals: int = 0
+    final_long_timeout_seconds: int = DEFAULT_FINAL_LONG_TIMEOUT_SECONDS
+    optimizer_eval_timeout_seconds: float = DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS
 
 
 @dataclass(frozen=True)
@@ -152,6 +160,7 @@ class ChildOutcome:
     failure_counts: Mapping[str, int] | None = None
     reason: str | None = None
     message: str | None = None
+    timeout_seconds: float | None = None
 
 
 IOREG_IOSURFACE_COMMAND = "ioreg -c IOSurfaceRootUserClient | grep -c IOSurfaceRootUserClient"
@@ -729,6 +738,7 @@ def build_optimizer_command(
     out_dir: Path,
     python: str,
     nice: int,
+    per_eval_timeout_seconds: float,
 ) -> list[str]:
     return [
         "nice",
@@ -753,6 +763,8 @@ def build_optimizer_command(
         str(job.seed),
         "--out",
         str(out_dir),
+        "--per-eval-timeout-seconds",
+        f"{float(per_eval_timeout_seconds):g}",
     ]
 
 
@@ -781,6 +793,7 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
                 out_dir=out_dir,
                 python=config.python,
                 nice=config.nice,
+                per_eval_timeout_seconds=config.optimizer_eval_timeout_seconds,
             ),
         }
         if profile_overlay is not None:
@@ -795,6 +808,8 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
         "journal_epoch": int(journal.get("epoch", 0)),
         "next_epoch": next_epoch,
         "time_box_seconds": config.time_box_seconds,
+        "final_long_timeout_seconds": config.final_long_timeout_seconds,
+        "optimizer_eval_timeout_seconds": config.optimizer_eval_timeout_seconds,
         "dup_threshold": config.dup_threshold,
         "low_dup_epochs": config.low_dup_epochs,
         "duplication_expected": config.duplication_expected,
@@ -1160,6 +1175,7 @@ def _prepare_job_run(
         out_dir=out_dir,
         python=config.python,
         nice=config.nice,
+        per_eval_timeout_seconds=config.optimizer_eval_timeout_seconds,
     )
     stdout_path = log_dir / f"{job.id}.stdout.log"
     stderr_path = log_dir / f"{job.id}.stderr.log"
@@ -1249,7 +1265,13 @@ def _record_job_outcome(
         result["stale_profile_jobs"].append(job_record)
         return False
     if outcome.kind == "timed_out":
-        result["timed_out_jobs"].append(prepared.job.id)
+        job_record["returncode"] = outcome.returncode
+        job_record["failure_counts"] = {"epoch_child_timeout": 1}
+        job_record["reason"] = outcome.reason or "epoch_child_timeout"
+        job_record["message"] = outcome.message or "optimizer child timed out"
+        if outcome.timeout_seconds is not None:
+            job_record["timeout_seconds"] = outcome.timeout_seconds
+        result["timed_out_jobs"].append(job_record)
         return True
     job_record["returncode"] = outcome.returncode
     if outcome.failure_counts is not None:
@@ -1274,7 +1296,16 @@ def run_epoch(
     epoch_dir = manifest.work_dir / f"epoch-{epoch_index:04d}"
     log_dir = epoch_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
-    deadline = None if final_long or config.time_box_seconds is None else time.monotonic() + config.time_box_seconds
+    wall_timeout_seconds = (
+        config.final_long_timeout_seconds
+        if final_long
+        else config.time_box_seconds
+    )
+    deadline = (
+        None
+        if wall_timeout_seconds is None
+        else time.monotonic() + wall_timeout_seconds
+    )
     ioreg_monitor = IOSurfaceMonitor(
         config.ioreg_sample_every_evals,
         log_dir / "ioreg_iosurface.jsonl",
@@ -1283,6 +1314,8 @@ def run_epoch(
         "epoch": epoch_index,
         "mode": "final_long" if final_long else "time_boxed",
         "time_box_seconds": None if final_long else config.time_box_seconds,
+        "wall_timeout_seconds": wall_timeout_seconds,
+        "optimizer_eval_timeout_seconds": config.optimizer_eval_timeout_seconds,
         "job_concurrency": config.job_concurrency,
         "ioreg": ioreg_monitor.payload(),
         "completed_jobs": [],
@@ -1571,7 +1604,14 @@ def _run_child(
             return ChildOutcome(kind="failed", returncode=returncode)
         except subprocess.TimeoutExpired:
             _terminate_process_group(process)
-            return ChildOutcome(kind="timed_out", returncode=None)
+            return ChildOutcome(
+                kind="timed_out",
+                returncode=None,
+                failure_counts={"epoch_child_timeout": 1},
+                reason="epoch_child_timeout",
+                message=f"optimizer child exceeded wall-clock timeout ({timeout:.3f}s)",
+                timeout_seconds=timeout,
+            )
         finally:
             _unregister_child(process)
 
@@ -1831,6 +1871,16 @@ def _non_negative_int(value: Any, label: str) -> int:
     return parsed
 
 
+def _positive_float(value: Any) -> float:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as exc:
+        raise argparse.ArgumentTypeError("must be positive") from exc
+    if parsed <= 0.0:
+        raise argparse.ArgumentTypeError("must be positive")
+    return parsed
+
+
 def _default_job_id(item: Mapping[str, Any], index: int) -> str:
     feedstock = str(item.get("feedstock", "job")).replace("/", "-")
     strategy = str(item.get("strategy", "strategy")).replace("/", "-")
@@ -1846,6 +1896,24 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--journal", type=Path, default=None)
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument("--time-box-seconds", type=int, default=DEFAULT_TIME_BOX_SECONDS)
+    parser.add_argument(
+        "--final-long-timeout-seconds",
+        type=_positive_int,
+        default=DEFAULT_FINAL_LONG_TIMEOUT_SECONDS,
+        help=(
+            "wall-clock cap for final_long optimizer children "
+            f"(default {DEFAULT_FINAL_LONG_TIMEOUT_SECONDS}s)"
+        ),
+    )
+    parser.add_argument(
+        "--per-eval-timeout-seconds",
+        type=_positive_float,
+        default=DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS,
+        help=(
+            "per-candidate optimizer process-pool timeout forwarded to child "
+            f"(default {DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS:g}s)"
+        ),
+    )
     parser.add_argument("--dup-threshold", type=float, default=DEFAULT_DUP_THRESHOLD)
     parser.add_argument("--low-dup-epochs", type=int, default=DEFAULT_LOW_DUP_EPOCHS)
     parser.add_argument("--nice", type=int, default=15)
@@ -1891,6 +1959,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.ioreg_sample_every_evals,
                 "ioreg-sample-every-evals",
             ),
+            final_long_timeout_seconds=args.final_long_timeout_seconds,
+            optimizer_eval_timeout_seconds=args.per_eval_timeout_seconds,
         )
         if not shutil.which("nice"):
             raise RuntimeError("nice command not found")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, wait
 from dataclasses import dataclass, fields, is_dataclass, replace
@@ -14,7 +15,9 @@ import logging
 import os
 from pathlib import Path
 import pickle
+import signal
 import tempfile
+import time
 from typing import Any
 
 from simulator.backend_names import canonical_backend_name
@@ -25,9 +28,11 @@ from simulator.optimize.evaluate import (
     EngineBugAbort,
     EvaluationAbort,
     FailureCategory,
+    RunReference,
     ScoredResult,
     evaluate,
 )
+from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.worker_runtime import (
@@ -38,7 +43,13 @@ from simulator.optimize.worker_runtime import (
 )
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
+EVAL_TIMEOUT_ENV = "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS"
+# Grounded on repo notes: live AlphaMELTS high eval ~=7 min, prior 900 s
+# cap could be tight for precompute; 45 min is >6x observed and configurable.
+DEFAULT_EVAL_TIMEOUT_SECONDS = 45 * 60
 _INFLIGHT_PER_WORKER = 2
+_POOL_POLL_SECONDS = 0.1
+_WORKER_TERMINATE_GRACE_SECONDS = 5.0
 _LOGGER = logging.getLogger(__name__)
 _POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
 
@@ -89,6 +100,7 @@ def evaluate_batch(
     constraints: Any = None,
     schema: Any = None,
     created_at: str | None = None,
+    per_eval_timeout_seconds: float | None = None,
 ) -> tuple[ScoredResult, ...]:
     """Evaluate requests in worker processes; parent owns result-store writes.
 
@@ -113,6 +125,7 @@ def evaluate_batch(
         )
         for index, request in enumerate(requests)
     )
+    timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     for task in tasks:
         _assert_picklable(task, _task_label(task))
     if results_store is not None:
@@ -123,6 +136,7 @@ def evaluate_batch(
             tasks,
             evaluate_fn,
             max_workers=max_workers,
+            per_eval_timeout_seconds=timeout_seconds,
         )
     except _PoolUnavailableError as exc:
         _LOGGER.warning(
@@ -155,28 +169,46 @@ def _evaluate_tasks_in_pool(
     evaluate_fn: Callable[..., ScoredResult],
     *,
     max_workers: int | None,
+    per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult, ...]:
     results: list[ScoredResult | None] = [None] * len(tasks)
     worker_count = max_workers or (os.cpu_count() or 1)
     max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
-    task_iter = iter(tasks)
+    task_queue = deque(tasks)
     warm_runtime_spec = _warm_runtime_spec(tasks)
     initializer = partial(_initialize_worker, warm_runtime_spec)
-    try:
-        executor = ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
-    except BaseException as exc:
-        if _is_pool_unavailable(exc):
-            raise _PoolUnavailableError("could not create process pool") from exc
-        raise
+    executor = _create_executor(max_workers, initializer)
     futures: dict[Future[Any], _PoolTask] = {}
+    started_at: dict[Future[Any], float] = {}
     pending_abort: BaseException | None = None
     executor_closed = False
     try:
-        _submit_until_full(executor, futures, task_iter, evaluate_fn, max_inflight)
-        while futures:
-            done, _ = wait(futures, return_when=FIRST_COMPLETED)
+        _submit_until_full(
+            executor,
+            futures,
+            started_at,
+            task_queue,
+            evaluate_fn,
+            max_inflight,
+        )
+        while futures or task_queue:
+            if not futures:
+                executor = _create_executor(max_workers, initializer)
+                executor_closed = False
+                _submit_until_full(
+                    executor,
+                    futures,
+                    started_at,
+                    task_queue,
+                    evaluate_fn,
+                    max_inflight,
+                )
+                continue
+            wait_timeout = _pool_wait_timeout(futures, started_at, per_eval_timeout_seconds)
+            done, _ = wait(futures, timeout=wait_timeout, return_when=FIRST_COMPLETED)
             for future in done:
                 task = futures.pop(future)
+                started_at.pop(future, None)
                 try:
                     outcome = future.result()
                 except BaseException as exc:
@@ -198,7 +230,46 @@ def _evaluate_tasks_in_pool(
                     )
                     raise abort
                 results[int(outcome["index"])] = outcome["result"]
-                _submit_until_full(executor, futures, task_iter, evaluate_fn, max_inflight)
+                _submit_until_full(
+                    executor,
+                    futures,
+                    started_at,
+                    task_queue,
+                    evaluate_fn,
+                    max_inflight,
+                )
+            expired = _expired_futures(futures, started_at, per_eval_timeout_seconds)
+            if expired:
+                expired_tasks = [futures.pop(future) for future in expired]
+                for future, task in zip(expired, expired_tasks):
+                    start = started_at.pop(future, time.monotonic())
+                    results[task.index] = _timeout_result(
+                        task,
+                        timeout_seconds=per_eval_timeout_seconds or 0.0,
+                        elapsed_seconds=max(0.0, time.monotonic() - start),
+                    )
+                requeue = sorted(
+                    (task for future, task in futures.items() if future not in expired),
+                    key=lambda item: item.index,
+                )
+                task_queue.extendleft(reversed(requeue))
+                futures.clear()
+                started_at.clear()
+                executor_closed = _best_effort_abort_executor(
+                    executor,
+                    {},
+                    RuntimeError("process-pool worker timed out"),
+                )
+                executor = _create_executor(max_workers, initializer)
+                executor_closed = False
+                _submit_until_full(
+                    executor,
+                    futures,
+                    started_at,
+                    task_queue,
+                    evaluate_fn,
+                    max_inflight,
+                )
     finally:
         if not executor_closed:
             try:
@@ -245,14 +316,15 @@ def _evaluate_tasks_serial(
 def _submit_until_full(
     executor: ProcessPoolExecutor,
     futures: dict[Future[Any], _PoolTask],
-    task_iter: Any,
+    started_at: dict[Future[Any], float],
+    task_queue: deque[_PoolTask],
     evaluate_fn: Callable[..., ScoredResult],
     max_inflight: int,
 ) -> None:
     while len(futures) < max_inflight:
         try:
-            task = next(task_iter)
-        except StopIteration:
+            task = task_queue.popleft()
+        except IndexError:
             return
         try:
             future = executor.submit(_evaluate_pool_task, task, evaluate_fn)
@@ -261,10 +333,12 @@ def _submit_until_full(
                 raise _PoolUnavailableError("could not submit process-pool task") from exc
             raise
         futures[future] = task
+        started_at[future] = time.monotonic()
 
 
 def _initialize_worker(warm_runtime: _WarmRuntimeSpec | str | None = None) -> None:
     from simulator.optimize.determinism import pin_worker_env
+    _isolate_worker_process_group()
     pin_worker_env()
     if warm_runtime is None or not warm_workers_enabled():
         clear_worker_runtime()
@@ -592,7 +666,7 @@ def _abort_executor(
     if processes is not None:
         for process in list(processes.values()):
             if process.is_alive():
-                process.terminate()
+                _terminate_pool_process(process)
     executor.shutdown(wait=False, cancel_futures=True)
 
 
@@ -617,6 +691,160 @@ def _attach_teardown_error(abort: BaseException, teardown_error: BaseException) 
         )
     if abort.__cause__ is None and abort.__context__ is None:
         abort.__context__ = teardown_error
+
+
+def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> float | None:
+    raw = value if value is not None else os.environ.get(EVAL_TIMEOUT_ENV)
+    if raw is None:
+        return float(DEFAULT_EVAL_TIMEOUT_SECONDS)
+    seconds = float(raw)
+    if seconds <= 0.0:
+        raise ValueError("per-eval timeout seconds must be positive")
+    return seconds
+
+
+def _create_executor(
+    max_workers: int | None,
+    initializer: Any,
+) -> ProcessPoolExecutor:
+    try:
+        return ProcessPoolExecutor(max_workers=max_workers, initializer=initializer)
+    except BaseException as exc:
+        if _is_pool_unavailable(exc):
+            raise _PoolUnavailableError("could not create process pool") from exc
+        raise
+
+
+def _pool_wait_timeout(
+    futures: Mapping[Future[Any], _PoolTask],
+    started_at: Mapping[Future[Any], float],
+    timeout_seconds: float | None,
+) -> float | None:
+    if timeout_seconds is None:
+        return None
+    if not futures:
+        return _POOL_POLL_SECONDS
+    now = time.monotonic()
+    remaining = [
+        max(0.0, timeout_seconds - (now - started_at.get(future, now)))
+        for future in futures
+    ]
+    return min(_POOL_POLL_SECONDS, min(remaining, default=_POOL_POLL_SECONDS))
+
+
+def _expired_futures(
+    futures: Mapping[Future[Any], _PoolTask],
+    started_at: Mapping[Future[Any], float],
+    timeout_seconds: float | None,
+) -> tuple[Future[Any], ...]:
+    if timeout_seconds is None:
+        return ()
+    now = time.monotonic()
+    return tuple(
+        future
+        for future in futures
+        if now - started_at.get(future, now) >= timeout_seconds
+    )
+
+
+def _timeout_result(
+    task: _PoolTask,
+    *,
+    timeout_seconds: float,
+    elapsed_seconds: float,
+) -> ScoredResult:
+    threshold = ThresholdSpec(
+        id="optimizer_eval_wall_timeout_seconds",
+        value=float(timeout_seconds),
+        units="s",
+        source="code_default",
+        source_ref=(
+            "simulator.optimize.pool.DEFAULT_EVAL_TIMEOUT_SECONDS; "
+            f"override with {EVAL_TIMEOUT_ENV}"
+        ),
+    )
+    margin = GateMargin(
+        gate="optimizer_eval_wall_timeout",
+        feasible=False,
+        margin=float(timeout_seconds) - float(elapsed_seconds),
+        threshold=threshold,
+        observed=float(elapsed_seconds),
+        detail="optimizer eval exceeded wall-clock timeout",
+        status_reason="optimizer_eval_timeout",
+        status_payload={
+            "timeout_seconds": float(timeout_seconds),
+            "elapsed_seconds": float(elapsed_seconds),
+        },
+    )
+    backend_name = _task_backend_name(task)
+    message = (
+        f"optimizer eval timed out after {elapsed_seconds:.3f}s "
+        f"(limit {timeout_seconds:.3f}s)"
+    )
+    return ScoredResult(
+        candidate_id=task.candidate_id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.TIMEOUT,
+        feasibility_margins={"optimizer_eval_wall_timeout": margin},
+        failing_gates=("optimizer_eval_wall_timeout",),
+        run_reference=RunReference(
+            status="timeout",
+            error_message=message,
+            reason="optimizer_eval_timeout",
+            trace={
+                "backend_name": backend_name,
+                "backend_status": "unavailable",
+                "backend_status_reason": "optimizer_eval_timeout",
+                "elapsed_seconds": float(elapsed_seconds),
+                "timeout_seconds": float(timeout_seconds),
+            },
+            backend_name=backend_name,
+            backend_status="unavailable",
+            backend_authoritative=False,
+            backend_status_reason="optimizer_eval_timeout",
+        ),
+        notes=("optimizer_eval_timeout", message),
+    )
+
+
+def _isolate_worker_process_group() -> None:
+    if os.name == "nt" or not hasattr(os, "setsid"):
+        return
+    try:
+        os.setsid()
+    except OSError:
+        return
+
+
+def _terminate_pool_process(process: Any) -> None:
+    pid = getattr(process, "pid", None)
+    if pid is not None and os.name != "nt":
+        try:
+            os.killpg(int(pid), signal.SIGTERM)
+        except ProcessLookupError:
+            return
+        except OSError:
+            pass
+        else:
+            process.join(_WORKER_TERMINATE_GRACE_SECONDS)
+            if not process.is_alive():
+                return
+            try:
+                os.killpg(int(pid), signal.SIGKILL)
+            except ProcessLookupError:
+                return
+            except OSError:
+                pass
+            else:
+                process.join()
+                return
+    process.terminate()
+    process.join(_WORKER_TERMINATE_GRACE_SECONDS)
+    if process.is_alive():
+        process.kill()
+        process.join()
 
 
 def _task_label(task: _PoolTask) -> str:

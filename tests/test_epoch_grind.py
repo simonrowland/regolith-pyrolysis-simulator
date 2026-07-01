@@ -729,6 +729,7 @@ def test_dry_run_plan_prints_optimizer_commands(
     command = payload["jobs"][0]["command"]
     profile_arg = command[command.index("--profile") + 1]
     assert profile_arg.endswith("epoch-0001/profiles/job-a.profile.json")
+    assert command[command.index("--per-eval-timeout-seconds") + 1] == "2700"
     assert not Path(profile_arg).exists()
     assert payload["jobs"][0]["would_write_profile"]["path"] == profile_arg
     assert payload["jobs"][0]["would_write_profile"]["content"]["run"][
@@ -827,7 +828,9 @@ def test_timeboxed_child_stays_pending_without_merging_partial_shard(
     journal = epoch_grind.initialize_journal(manifest)
     epoch_grind._apply_epoch_result(journal, result)
 
-    assert result["timed_out_jobs"] == ["job-a"]
+    assert result["timed_out_jobs"][0]["id"] == "job-a"
+    assert result["timed_out_jobs"][0]["reason"] == "epoch_child_timeout"
+    assert result["timed_out_jobs"][0]["failure_counts"] == {"epoch_child_timeout": 1}
     assert result["completed_jobs"] == []
     assert result["failed_jobs"] == []
     assert result["shard_dbs"] == []
@@ -1674,7 +1677,8 @@ def test_concurrent_jobs_failure_drains_in_flight_siblings(
         assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job
         assert payload_count(manifest.base_cache) == len(sibling_ids) * rows_per_job
     else:
-        assert epoch1["timed_out_jobs"] == [failing_job]
+        assert epoch1["timed_out_jobs"][0]["id"] == failing_job
+        assert epoch1["timed_out_jobs"][0]["reason"] == "epoch_child_timeout"
         assert epoch1["failed_jobs"] == []
         timed_out_status = next(
             job["status"] for job in journal["jobs"] if job["id"] == failing_job
@@ -1682,6 +1686,61 @@ def test_concurrent_jobs_failure_drains_in_flight_siblings(
         assert timed_out_status == "done"
         assert int(epoch1["merge"]["inserted_rows"]) == len(sibling_ids) * rows_per_job
         assert payload_count(manifest.base_cache) == len(job_ids) * rows_per_job
+
+
+def test_final_long_epoch_uses_configured_wall_cap(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+        final_long_timeout_seconds=123,
+    )
+    captured: list[float | None] = []
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"seed_rows": 0},
+    )
+
+    def fake_run_child(
+        command: list[str],
+        *,
+        stdout_path: Path,
+        stderr_path: Path,
+        timeout: float | None,
+        out_dir: Path | None = None,
+        budget: int | None = None,
+    ) -> epoch_grind.ChildOutcome:
+        del command, stdout_path, stderr_path, out_dir, budget
+        captured.append(timeout)
+        return epoch_grind.ChildOutcome(
+            kind="timed_out",
+            reason="epoch_child_timeout",
+            timeout_seconds=timeout,
+        )
+
+    monkeypatch.setattr(epoch_grind, "_run_child", fake_run_child)
+
+    result = epoch_grind.run_epoch(
+        manifest,
+        manifest.jobs,
+        config,
+        epoch_index=1,
+        final_long=True,
+    )
+
+    assert result["mode"] == "final_long"
+    assert result["wall_timeout_seconds"] == 123
+    assert captured and 0 < captured[0] <= 123
+    assert result["timed_out_jobs"][0]["reason"] == "epoch_child_timeout"
 
 
 def test_failed_epoch_is_journaled_before_return(

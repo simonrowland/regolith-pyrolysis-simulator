@@ -41,7 +41,12 @@ from simulator.optimize.objective import (
     objective_scores,
     pareto_front,
 )
-from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
+from simulator.optimize.pool import (
+    DEFAULT_EVAL_TIMEOUT_SECONDS,
+    PoolEvaluationRequest,
+    evaluate_batch,
+    resolve_eval_timeout_seconds,
+)
 from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
 from simulator.optimize.profiles import (
     ProfileValidationError,
@@ -229,6 +234,7 @@ class StudyConfig:
     budget: int = 1
     out_dir: str | Path | None = None
     seed: int = 0
+    per_eval_timeout_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -312,6 +318,7 @@ def run(
     topologies: Sequence[Any] | None = None,
     two_phase_certify: bool | Mapping[str, Any] | None = None,
     pinned_paths: Sequence[str] | None = None,
+    per_eval_timeout_seconds: float | None = None,
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
@@ -325,6 +332,7 @@ def run(
         budget=budget,
         out_dir=out_dir,
         seed=seed,
+        per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
     try:
         resolved_profile = resolve_profile(
@@ -428,6 +436,7 @@ def run(
                 store=store,
                 definitions=definitions,
                 prefix_replay_cache=prefix_replay_cache,
+                per_eval_timeout_seconds=config.per_eval_timeout_seconds,
             )
             tell_batch: list[tuple[Candidate, ScoredResult]] = []
             for candidate, scored, cache_hit in results:
@@ -864,6 +873,7 @@ def _run_exact_certification(
             definitions=definitions,
             prefix_replay_cache={},
             skip_store_lookup=True,
+            per_eval_timeout_seconds=config.per_eval_timeout_seconds,
         )
         _, scored, _ = results[0]
         _assert_honest_result(scored, definitions)
@@ -1148,6 +1158,7 @@ def _evaluate_candidates(
     definitions: Sequence[ObjectiveDefinition],
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
+    per_eval_timeout_seconds: float | None = None,
 ) -> tuple[tuple[Candidate, ScoredResult, bool], ...]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
@@ -1219,6 +1230,7 @@ def _evaluate_candidates(
                 evaluate_fn=evaluator,
                 schema=schema,
                 constraints=constraints,
+                per_eval_timeout_seconds=per_eval_timeout_seconds,
             )
             for (index, candidate), scored in zip(misses, batch):
                 results[index] = (candidate, _with_candidate_id(scored, candidate.id), False)
@@ -1562,6 +1574,12 @@ def _assert_honest_result(
             raise StudyAbort("stale_profile result cannot be feasible")
         if not scored.notes:
             raise StudyAbort("stale_profile result missing refusal message")
+        return
+    if scored.failure_category is FailureCategory.TIMEOUT:
+        if scored.feasible:
+            raise StudyAbort("timeout result cannot be feasible")
+        if not scored.notes:
+            raise StudyAbort("timeout result missing reason-coded note")
         return
     _assert_result_artifact_floor(scored)
     if scored.failure_category in {

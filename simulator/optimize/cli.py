@@ -11,6 +11,7 @@ from typing import Sequence
 
 from simulator.optimize.profiles import ProfileValidationError, load_profile
 from simulator.optimize.study import (
+    DEFAULT_EVAL_TIMEOUT_SECONDS,
     DEFAULT_PROFILE_NAME,
     DEFAULT_PROFILES,
     STRATEGY_CLASS_NAMES,
@@ -60,6 +61,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 seed=args.seed,
                 two_phase_certify=two_phase_certify,
                 pinned_paths=args.pin,
+                per_eval_timeout_seconds=args.per_eval_timeout_seconds,
             )
     except (OSError, ProfileValidationError, StudyError, TypeError, ValueError) as exc:
         _write_job_status(
@@ -107,6 +109,16 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--budget", type=_positive_int, required=True, help="evaluation budget")
     parser.add_argument("--out", type=Path, default=None, help="artifact output directory")
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
+    parser.add_argument(
+        "--per-eval-timeout-seconds",
+        type=_positive_float,
+        default=None,
+        help=(
+            "per-candidate wall-clock timeout for process-pool evals "
+            f"(default {DEFAULT_EVAL_TIMEOUT_SECONDS:g}s; env "
+            "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS)"
+        ),
+    )
     parser.add_argument(
         "--pin",
         action="append",
@@ -201,6 +213,13 @@ def _non_negative_int(value: str) -> int:
     parsed = int(value)
     if parsed < 0:
         raise argparse.ArgumentTypeError("must be non-negative")
+    return parsed
+
+
+def _positive_float(value: str) -> float:
+    parsed = float(value)
+    if parsed <= 0.0:
+        raise argparse.ArgumentTypeError("must be positive")
     return parsed
 
 
