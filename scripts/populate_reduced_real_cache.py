@@ -35,6 +35,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import (
+    ControlQuantization,
     PT0DeterminismStore,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
@@ -165,6 +166,52 @@ def _parse_additive_arg(raw: str) -> tuple[str, float]:
             f"--additive {raw!r} must be finite and non-negative"
         )
     return species, kg
+
+
+def _parse_control_quantization_arg(raw: str) -> ControlQuantization:
+    text = str(raw).strip()
+    if not text:
+        raise argparse.ArgumentTypeError("control quantization must be non-empty")
+    if text.startswith("{"):
+        try:
+            value = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON dict is invalid"
+            ) from exc
+        if not isinstance(value, Mapping):
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON must be an object"
+            )
+        expected = {
+            "t_k_quantum",
+            "pressure_bar_quantum",
+            "log_fo2_quantum",
+            "composition_sig_figs",
+        }
+        keys = set(value)
+        if keys != expected:
+            missing = ", ".join(sorted(expected - keys)) or "none"
+            extra = ", ".join(sorted(str(key) for key in keys - expected)) or "none"
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON must contain exactly "
+                f"{', '.join(sorted(expected))}; missing={missing}; extra={extra}"
+            )
+        try:
+            return ControlQuantization(
+                t_k_quantum=float(value["t_k_quantum"]),
+                pressure_bar_quantum=float(value["pressure_bar_quantum"]),
+                log_fo2_quantum=float(value["log_fo2_quantum"]),
+                composition_sig_figs=int(value["composition_sig_figs"]),
+            )
+        except (TypeError, ValueError) as exc:
+            raise argparse.ArgumentTypeError(
+                f"--control-quantization JSON values are invalid: {exc}"
+            ) from exc
+    try:
+        return ControlQuantization.from_name(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
 
 
 def _cli_additives(entries: list[tuple[str, float]] | None) -> dict[str, float]:
@@ -399,8 +446,14 @@ def _run_case(
     mode: str,
     disable_live: bool,
     allow_stub_equilibrium: bool,
+    control_quantization: ControlQuantization | None = None,
 ) -> dict[str, Any]:
-    store = PT0DeterminismStore(mode, db_path=db_path, strict_vapor_gate=True)
+    store = PT0DeterminismStore(
+        mode,
+        db_path=db_path,
+        strict_vapor_gate=True,
+        control_quantization=control_quantization,
+    )
     timings: list[dict[str, Any]] = []
     session = _start_session(
         feedstock=feedstock,
@@ -835,6 +888,12 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--include-kreep", action="store_true")
     parser.add_argument("--require-magemin", action="store_true")
     parser.add_argument("--allow-stub-equilibrium", action="store_true")
+    parser.add_argument(
+        "--control-quantization",
+        type=_parse_control_quantization_arg,
+        default=None,
+        metavar="TIER|JSON",
+    )
     parser.add_argument("--json-out", type=Path)
     return parser.parse_args(argv)
 
@@ -926,6 +985,7 @@ def main(argv: list[str]) -> int:
                         mode="capture",
                         disable_live=False,
                         allow_stub_equilibrium=args.allow_stub_equilibrium,
+                        control_quantization=args.control_quantization,
                     )
                 except (RuntimeError, ValueError) as exc:
                     gap = _known_chemistry_case_gap(exc)
@@ -1057,6 +1117,7 @@ def main(argv: list[str]) -> int:
                         mode="replay",
                         disable_live=True,
                         allow_stub_equilibrium=args.allow_stub_equilibrium,
+                        control_quantization=args.control_quantization,
                     )
                 )
 

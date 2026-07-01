@@ -23,6 +23,7 @@ from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
+    ControlQuantization,
     PT0CacheMiss,
     PT0DeterminismStore,
     PT0InvalidControls,
@@ -143,6 +144,54 @@ def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
 
     assert controls["fO2_log"] == -7.123
     assert key["controls"]["log_fO2"] == -7.123
+
+
+def test_control_quantization_default_production_key_is_byte_identical() -> None:
+    key = _freeze_gate_key()
+    key_hash = _key_hash(key)
+    fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
+
+    assert key_hash == "7e675032a1bc99cbabfcbb5b5050f87d09ac022e9fd9e809800b9e18919d516d"
+    assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
+    assert _key_hash(fine_key) == key_hash
+
+
+def test_control_quantization_tiers_produce_distinct_key_hashes() -> None:
+    hashes = {
+        name: _key_hash(
+            _freeze_gate_key(control_quantization=ControlQuantization.from_name(name))
+        )
+        for name in ("xx_coarse", "coarse", "fine")
+    }
+
+    assert len(set(hashes.values())) == 3
+    assert ControlQuantization.from_name("XX-COARSE") == (
+        ControlQuantization.from_name("xx_coarse")
+    )
+
+
+def test_control_quantization_is_session_scoped_not_module_global() -> None:
+    coarse = PT0DeterminismStore(
+        "capture",
+        control_quantization=ControlQuantization.from_name("coarse"),
+    )
+    fine = PT0DeterminismStore(
+        "capture",
+        control_quantization=ControlQuantization.from_name("fine"),
+    )
+    coarse_sim = _build_pt0_sim(coarse)
+    fine_sim = _build_pt0_sim(fine)
+
+    assert coarse.quantized_controls(coarse_sim, fO2_log=-7.123456789) == {
+        "temperature_C": pytest.approx(24.85),
+        "pressure_bar": 0.0,
+        "fO2_log": -7.12,
+    }
+    assert fine.quantized_controls(fine_sim, fO2_log=-7.123456789) == {
+        "temperature_C": pytest.approx(25.0),
+        "pressure_bar": 0.0,
+        "fO2_log": -7.123,
+    }
 
 
 class _CountingSilicateEquilibriumProvider(ChemistryProvider):
@@ -355,8 +404,14 @@ def _disable_live_providers(sim) -> None:
         provider.dispatch = disabled
 
 
-def _freeze_gate_key() -> dict:
-    store = PT0DeterminismStore("capture")
+def _freeze_gate_key(
+    *,
+    control_quantization: ControlQuantization | None = None,
+) -> dict:
+    store = PT0DeterminismStore(
+        "capture",
+        control_quantization=control_quantization,
+    )
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     return canonical_replay_key(
@@ -365,6 +420,7 @@ def _freeze_gate_key() -> dict:
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
         fO2_log=sim._compute_intrinsic_melt_fO2(),
         fe_redox_policy="intrinsic",
+        control_quantization=control_quantization,
     )
 
 
@@ -977,6 +1033,61 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     ]
     assert counts["cached_physics_bucket"] == 1
     assert counts["cached_exact"] == 0
+
+
+def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
+    tmp_path: Path,
+) -> None:
+    class NonStubBackend:
+        def get_engine_version(self) -> str:
+            return "non-stub-test"
+
+    db_path = tmp_path / "control-quantization.sqlite"
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic-cache-c1",
+        engine_version="alpha-v1",
+    )
+    capture_store = PT0DeterminismStore(
+        "capture",
+        db_path=db_path,
+        control_quantization=ControlQuantization.from_name("coarse"),
+    )
+    capture_sim = _build_pt0_sim(capture_store)
+    capture_sim.backend = NonStubBackend()
+    capture_sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    capture_store.capture_equilibrium(
+        capture_sim,
+        EquilibriumResult(
+            temperature_C=float(capture_sim.melt.temperature_C),
+            pressure_bar=float(capture_sim.melt.p_total_mbar) / 1000.0,
+            phases_present=["liquid"],
+            phase_masses_kg={"liquid": 1.0},
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={"SiO2": 45.0, "FeO": 10.0},
+            vapor_pressures_Pa={"SiO": 1.0},
+            vapor_pressures_source={"SiO": "test"},
+            fO2_log=capture_sim._compute_intrinsic_melt_fO2(),
+        ),
+    )
+
+    replay_store = PT0DeterminismStore(
+        "capture",
+        db_path=db_path,
+        control_quantization=ControlQuantization.from_name("fine"),
+    )
+    replay_sim = _build_pt0_sim(replay_store)
+    replay_sim.backend = NonStubBackend()
+    replay_sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+
+    assert replay_store.cached_equilibrium(replay_sim) is not None
+    assert replay_sim._last_reduced_real_cache_state == "cached_physics_bucket"
+    assert replay_store.replay_sequence[-1]["cache_state"] == "cached_physics_bucket"
 
 
 @pytest.mark.parametrize(

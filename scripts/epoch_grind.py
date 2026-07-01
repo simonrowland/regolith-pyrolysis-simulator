@@ -68,6 +68,7 @@ from simulator.grind_preflight import (
     assert_strict_vapor_result_store,
 )
 from simulator.reduced_real_determinism import (
+    ControlQuantization,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
 )
@@ -151,6 +152,7 @@ class DriverConfig:
     ioreg_sample_every_evals: int = 0
     final_long_timeout_seconds: int = DEFAULT_FINAL_LONG_TIMEOUT_SECONDS
     optimizer_eval_timeout_seconds: float = DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS
+    control_quantization: str | Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -1167,6 +1169,7 @@ def _prepare_job_run(
         shard_db,
         epoch_dir,
         base_cache=manifest.base_cache,
+        control_quantization=config.control_quantization,
     )
     out_dir = job.out / f"epoch-{epoch_index:04d}"
     _remove_stale_output_dir(out_dir)
@@ -1476,6 +1479,7 @@ def write_epoch_profile(
     epoch_dir: Path,
     *,
     base_cache: Path | None = None,
+    control_quantization: str | Mapping[str, Any] | None = None,
 ) -> str:
     profile_arg, profile = plan_epoch_profile(
         job,
@@ -1483,6 +1487,7 @@ def write_epoch_profile(
         shard_db,
         epoch_dir,
         base_cache=base_cache,
+        control_quantization=control_quantization,
     )
     if profile is None:
         return profile_arg
@@ -1499,6 +1504,7 @@ def plan_epoch_profile(
     epoch_dir: Path,
     *,
     base_cache: Path | None = None,
+    control_quantization: str | Mapping[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any] | None]:
     profile_path = _resolve_path(job.profile, manifest_dir)
     if not profile_path.exists():
@@ -1510,6 +1516,7 @@ def plan_epoch_profile(
         shard_db,
         job.reduced_real_cache,
         base_cache=base_cache,
+        control_quantization=control_quantization,
     )
     if not changed:
         return str(profile_path), None
@@ -1826,6 +1833,7 @@ def _apply_cache_db(
     job_cache_config: Mapping[str, Any] | None,
     *,
     base_cache: Path | None = None,
+    control_quantization: str | Mapping[str, Any] | None = None,
 ) -> bool:
     changed = False
     run = profile.get("run")
@@ -1836,6 +1844,7 @@ def _apply_cache_db(
                 shard_db,
                 job_cache_config,
                 base_cache=base_cache,
+                control_quantization=control_quantization,
             )
             or changed
         )
@@ -1851,6 +1860,7 @@ def _apply_cache_db(
                         shard_db,
                         job_cache_config,
                         base_cache=base_cache,
+                        control_quantization=control_quantization,
                     )
                     or changed
                 )
@@ -1863,6 +1873,7 @@ def _apply_cache_to_run(
     job_cache_config: Mapping[str, Any] | None,
     *,
     base_cache: Path | None = None,
+    control_quantization: str | Mapping[str, Any] | None = None,
 ) -> bool:
     cache_config = run_options.get("reduced_real_cache")
     if not isinstance(cache_config, Mapping):
@@ -1871,6 +1882,8 @@ def _apply_cache_to_run(
         return False
     updated = dict(cache_config)
     updated["db_path"] = str(shard_db)
+    if control_quantization is not None:
+        updated["control_quantization"] = control_quantization
     if base_cache is not None and base_cache.exists():
         updated["read_only_base_db_path"] = str(base_cache)
     run_options["reduced_real_cache"] = updated
@@ -1934,6 +1947,59 @@ def _positive_float(value: Any) -> float:
     return parsed
 
 
+def _parse_control_quantization_arg(raw: str) -> str | dict[str, float | int]:
+    text = str(raw).strip()
+    if not text:
+        raise argparse.ArgumentTypeError("control quantization must be non-empty")
+    if text.startswith("{"):
+        try:
+            value = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON dict is invalid"
+            ) from exc
+        if not isinstance(value, Mapping):
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON must be an object"
+            )
+        expected = {
+            "t_k_quantum",
+            "pressure_bar_quantum",
+            "log_fo2_quantum",
+            "composition_sig_figs",
+        }
+        keys = set(value)
+        if keys != expected:
+            missing = ", ".join(sorted(expected - keys)) or "none"
+            extra = ", ".join(sorted(str(key) for key in keys - expected)) or "none"
+            raise argparse.ArgumentTypeError(
+                "--control-quantization JSON must contain exactly "
+                f"{', '.join(sorted(expected))}; missing={missing}; extra={extra}"
+            )
+        try:
+            parsed = ControlQuantization(
+                t_k_quantum=float(value["t_k_quantum"]),
+                pressure_bar_quantum=float(value["pressure_bar_quantum"]),
+                log_fo2_quantum=float(value["log_fo2_quantum"]),
+                composition_sig_figs=int(value["composition_sig_figs"]),
+            )
+        except (TypeError, ValueError) as exc:
+            raise argparse.ArgumentTypeError(
+                f"--control-quantization JSON values are invalid: {exc}"
+            ) from exc
+        return {
+            "t_k_quantum": parsed.t_k_quantum,
+            "pressure_bar_quantum": parsed.pressure_bar_quantum,
+            "log_fo2_quantum": parsed.log_fo2_quantum,
+            "composition_sig_figs": parsed.composition_sig_figs,
+        }
+    try:
+        ControlQuantization.from_name(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+    return text.strip().lower().replace("-", "_")
+
+
 def _default_job_id(item: Mapping[str, Any], index: int) -> str:
     feedstock = str(item.get("feedstock", "job")).replace("/", "-")
     strategy = str(item.get("strategy", "strategy")).replace("/", "-")
@@ -1991,6 +2057,13 @@ def _parser() -> argparse.ArgumentParser:
             "0 disables ioreg monitoring"
         ),
     )
+    parser.add_argument(
+        "--control-quantization",
+        type=_parse_control_quantization_arg,
+        default=None,
+        metavar="TIER|JSON",
+        help="control quantization tier or JSON dict for cached-real overlays",
+    )
     return parser
 
 
@@ -2014,6 +2087,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             ),
             final_long_timeout_seconds=args.final_long_timeout_seconds,
             optimizer_eval_timeout_seconds=args.per_eval_timeout_seconds,
+            control_quantization=args.control_quantization,
         )
         if not shutil.which("nice"):
             raise RuntimeError("nice command not found")

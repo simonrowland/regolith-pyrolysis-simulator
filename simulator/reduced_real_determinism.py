@@ -19,9 +19,11 @@ from collections import Counter
 from collections.abc import Mapping
 from datetime import datetime
 from datetime import timezone
+from decimal import Decimal
+from decimal import InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.corpus_version import (
@@ -112,6 +114,93 @@ _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
 _STUB_BACKEND_NAME = "StubBackend"
 
 
+@dataclasses.dataclass(frozen=True)
+class ControlQuantization:
+    """Session-scoped reduced-real control/key quantization."""
+
+    t_k_quantum: float
+    pressure_bar_quantum: float
+    log_fo2_quantum: float
+    composition_sig_figs: int
+
+    PRODUCTION: ClassVar["ControlQuantization"]
+
+    def __post_init__(self) -> None:
+        for name in (
+            "t_k_quantum",
+            "pressure_bar_quantum",
+            "log_fo2_quantum",
+        ):
+            value = float(getattr(self, name))
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f"{name} must be a positive finite quantum")
+            object.__setattr__(self, name, value)
+        sig_figs = self.composition_sig_figs
+        if not isinstance(sig_figs, int) or sig_figs < 1:
+            raise ValueError("composition_sig_figs must be an int >= 1")
+
+    @classmethod
+    def from_name(cls, name: str) -> "ControlQuantization":
+        normalized = _normalize_control_quantization_name(name)
+        try:
+            return _CONTROL_QUANTIZATION_PRESETS[normalized]
+        except KeyError as exc:
+            choices = ", ".join(sorted(_CONTROL_QUANTIZATION_PRESETS))
+            raise ValueError(
+                f"unknown control quantization tier {name!r}; "
+                f"expected one of {choices}"
+            ) from exc
+
+    @property
+    def t_k_decimals(self) -> int:
+        return _quantize_decimals(self.t_k_quantum)
+
+    @property
+    def pressure_bar_decimals(self) -> int:
+        return _quantize_decimals(self.pressure_bar_quantum)
+
+    @property
+    def log_fo2_decimals(self) -> int:
+        return _quantize_decimals(self.log_fo2_quantum)
+
+
+def _normalize_control_quantization_name(name: str) -> str:
+    normalized = str(name).strip().lower().replace("-", "_")
+    if not normalized:
+        raise ValueError("control quantization tier name must be non-empty")
+    return normalized
+
+
+_PRODUCTION_QUANTIZATION = ControlQuantization(
+    t_k_quantum=_T_K_QUANTUM,
+    pressure_bar_quantum=_PRESSURE_BAR_QUANTUM,
+    log_fo2_quantum=_FO2_LOG_QUANTUM,
+    composition_sig_figs=_COMPOSITION_SIG_FIGS,
+)
+_CONTROL_QUANTIZATION_PRESETS: dict[str, ControlQuantization] = {
+    "xx_coarse": ControlQuantization(
+        t_k_quantum=10.0,
+        pressure_bar_quantum=0.01,
+        log_fo2_quantum=0.1,
+        composition_sig_figs=2,
+    ),
+    "coarse": ControlQuantization(
+        t_k_quantum=1.0,
+        pressure_bar_quantum=0.001,
+        log_fo2_quantum=0.01,
+        composition_sig_figs=3,
+    ),
+    "medium": ControlQuantization(
+        t_k_quantum=0.1,
+        pressure_bar_quantum=0.0001,
+        log_fo2_quantum=0.005,
+        composition_sig_figs=4,
+    ),
+    "fine": _PRODUCTION_QUANTIZATION,
+}
+ControlQuantization.PRODUCTION = _PRODUCTION_QUANTIZATION
+
+
 class PT0CacheMiss(RuntimeError):
     """Replay requested a key that the write-through run did not capture."""
 
@@ -142,6 +231,7 @@ class PT0DeterminismStore:
         db_path: str | Path | None = None,
         read_only_base_db_path: str | Path | None = None,
         strict_vapor_gate: bool = False,
+        control_quantization: ControlQuantization | None = None,
     ) -> None:
         if mode not in {"capture", "replay"}:
             raise ValueError("PT0DeterminismStore mode must be capture or replay")
@@ -157,6 +247,7 @@ class PT0DeterminismStore:
                 self.persistent_path,
                 read_only_base_db_path=self.read_only_base_db_path,
                 strict_vapor_gate=strict_vapor_gate,
+                control_quantization=control_quantization,
             )
             if self.persistent_path is not None
             else None
@@ -174,6 +265,13 @@ class PT0DeterminismStore:
         self.cache_tier_ceiling: str = "cached_interpolated"
         self.cached_real_miss_policy: str | None = None
         self.strict_vapor_gate = bool(strict_vapor_gate)
+        self._control_quantization = (
+            control_quantization or _PRODUCTION_QUANTIZATION
+        )
+
+    @property
+    def control_quantization(self) -> ControlQuantization:
+        return self._control_quantization
 
     @property
     def capture_enabled(self) -> bool:
@@ -193,6 +291,7 @@ class PT0DeterminismStore:
             db_path=self.persistent_path,
             read_only_base_db_path=self.read_only_base_db_path,
             strict_vapor_gate=self.strict_vapor_gate,
+            control_quantization=self._control_quantization,
         )
         clone.entries = copy.deepcopy(self.entries)
         clone.physics_bucket_entries = copy.deepcopy(self.physics_bucket_entries)
@@ -211,8 +310,8 @@ class PT0DeterminismStore:
         melt_temperature_C = float(sim.melt.temperature_C)
         T_K = _quantize(
             melt_temperature_C + 273.15,
-            _T_K_QUANTUM,
-            2,
+            self._control_quantization.t_k_quantum,
+            self._control_quantization.t_k_decimals,
         )
         if T_K is None:
             raise PT0InvalidControls(
@@ -222,8 +321,8 @@ class PT0DeterminismStore:
         melt_pressure_mbar = float(sim.melt.p_total_mbar)
         pressure_bar = _quantize(
             melt_pressure_mbar / 1000.0,
-            _PRESSURE_BAR_QUANTUM,
-            8,
+            self._control_quantization.pressure_bar_quantum,
+            self._control_quantization.pressure_bar_decimals,
         )
         if pressure_bar is None:
             raise PT0InvalidControls(
@@ -232,7 +331,11 @@ class PT0DeterminismStore:
             )
         if fO2_log is None:
             fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
-        quantized_fO2_log = _quantize(fO2_log, _FO2_LOG_QUANTUM, 6)
+        quantized_fO2_log = _quantize(
+            fO2_log,
+            self._control_quantization.log_fo2_quantum,
+            self._control_quantization.log_fo2_decimals,
+        )
         if quantized_fO2_log is None:
             raise PT0InvalidControls(
                 "non-finite fO2_log passed to PT-0 quantization: "
@@ -251,7 +354,10 @@ class PT0DeterminismStore:
         # (controlled-O2 off) is finite and preserved by _sigfig; only NaN/inf
         # is refused.
         commanded_pO2_bar = float(sim._commanded_pO2_bar())
-        quantized = _sigfig(commanded_pO2_bar, _COMPOSITION_SIG_FIGS)
+        quantized = _sigfig(
+            commanded_pO2_bar,
+            self._control_quantization.composition_sig_figs,
+        )
         if quantized is None:
             raise PT0InvalidControls(
                 "non-finite commanded pO2 passed to PT-0 quantization: "
@@ -266,7 +372,10 @@ class PT0DeterminismStore:
     ) -> dict[str, dict[str, float]]:
         if composition_by_account is None:
             composition_by_account = sim.atom_ledger.mol_by_account()
-        return canonicalized_composition_mol_by_account(composition_by_account)
+        return canonicalized_composition_mol_by_account(
+            composition_by_account,
+            sig_figs=self._control_quantization.composition_sig_figs,
+        )
 
     def canonical_composition_mol(
         self,
@@ -326,6 +435,7 @@ class PT0DeterminismStore:
             intent=intent,
             fO2_log=sim._compute_intrinsic_melt_fO2(),
             fe_redox_policy="intrinsic",
+            control_quantization=self._control_quantization,
         )
 
     def _equilibrium_from_payload(
@@ -369,6 +479,7 @@ class PT0DeterminismStore:
             fO2_log=fO2_log,
             fe_redox_policy="intrinsic",
             provider_role=provider_role,
+            control_quantization=self._control_quantization,
         )
         self._store(
             "freeze_gate_curve",
@@ -395,6 +506,7 @@ class PT0DeterminismStore:
                 fO2_log=fO2_log,
                 fe_redox_policy="intrinsic",
                 provider_role=provider_role,
+                control_quantization=self._control_quantization,
             )
             for provider_role in _gate_provider_roles_for_replay(sim)
         )
@@ -896,6 +1008,7 @@ class PT1PersistentEquilibriumStore:
         read_only_base_db_path: Path | None = None,
         shard_busy_timeout_ms: float = DEFAULT_SHARD_BUSY_TIMEOUT_MS,
         strict_vapor_gate: bool = False,
+        control_quantization: ControlQuantization | None = None,
     ) -> None:
         self.db_path = Path(db_path)
         self.read_only_base_db_path = (
@@ -905,12 +1018,19 @@ class PT1PersistentEquilibriumStore:
         )
         self._shard_busy_timeout_ms = float(shard_busy_timeout_ms)
         self.strict_vapor_gate = bool(strict_vapor_gate)
+        self._control_quantization = (
+            control_quantization or _PRODUCTION_QUANTIZATION
+        )
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         # Epoch provenance is captured when the store opens. Rows written later
         # intentionally keep this value even if the worktree changes mid-epoch.
         self._epoch_git_dirty = _git_dirty()
         with self._connect() as conn:
             self._initialize(conn)
+
+    @property
+    def control_quantization(self) -> ControlQuantization:
+        return self._control_quantization
 
     def put(
         self,
@@ -1635,17 +1755,23 @@ def canonical_replay_key(
     fO2_log: float | None,
     fe_redox_policy: str,
     provider_role: str | None = None,
+    control_quantization: ControlQuantization | None = None,
 ) -> dict[str, Any]:
+    quantization = control_quantization or _PRODUCTION_QUANTIZATION
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
         if provider_role is None:
             provider_role = _gate_provider_role_for_key(sim)
         else:
             _register_gate_providers_for_key(sim)
-    T_K = _quantize(float(sim.melt.temperature_C) + 273.15, _T_K_QUANTUM, 2)
+    T_K = _quantize(
+        float(sim.melt.temperature_C) + 273.15,
+        quantization.t_k_quantum,
+        quantization.t_k_decimals,
+    )
     pressure_bar = _quantize(
         float(sim.melt.p_total_mbar) / 1000.0,
-        _PRESSURE_BAR_QUANTUM,
-        8,
+        quantization.pressure_bar_quantum,
+        quantization.pressure_bar_decimals,
     )
     # Class-complete the fO2_log guard below: _quantize() returns None for any
     # non-finite control, so a NaN/inf melt temperature or pressure would
@@ -1665,7 +1791,11 @@ def canonical_replay_key(
         )
     if fO2_log is None:
         fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
-    quantized_fO2_log = _quantize(fO2_log, _FO2_LOG_QUANTUM, 6)
+    quantized_fO2_log = _quantize(
+        fO2_log,
+        quantization.log_fo2_quantum,
+        quantization.log_fo2_decimals,
+    )
     if quantized_fO2_log is None:
         raise PT0InvalidControls(
             "non-finite fO2_log passed to PT-0 cache key quantization: "
@@ -1676,7 +1806,10 @@ def canonical_replay_key(
     # None straight into the cache key. Commanded 0.0 (controlled-O2 off) is
     # finite and preserved; only NaN/inf is refused.
     commanded_pO2_bar = float(sim._commanded_pO2_bar())
-    quantized_pO2_bar = _sigfig(commanded_pO2_bar, _COMPOSITION_SIG_FIGS)
+    quantized_pO2_bar = _sigfig(
+        commanded_pO2_bar,
+        quantization.composition_sig_figs,
+    )
     if quantized_pO2_bar is None:
         raise PT0InvalidControls(
             "non-finite commanded pO2 passed to PT-0 cache key quantization: "
@@ -1711,7 +1844,10 @@ def canonical_replay_key(
         "schema_version": SCHEMA_VERSION,
         "artifact": str(artifact),
         "intent": intent.value,
-        "composition_mol_fraction": _composition_mol_fraction(sim),
+        "composition_mol_fraction": _composition_mol_fraction(
+            sim,
+            sig_figs=quantization.composition_sig_figs,
+        ),
         "controls": {
             "T_K": T_K,
             "log_fO2": quantized_fO2_log,
@@ -1720,7 +1856,10 @@ def canonical_replay_key(
         },
         "redox": {
             "fe_redox_policy": str(fe_redox_policy),
-            "fe_split": _fe_split(sim),
+            "fe_split": _fe_split(
+                sim,
+                sig_figs=quantization.composition_sig_figs,
+            ),
         },
         "backend": _backend_identity_for_key(sim),
         "provider": provider,
@@ -1780,6 +1919,7 @@ def canonical_physics_bucket_key(
     fO2_log: float | None,
     fe_redox_policy: str,
     provider_role: str | None = None,
+    control_quantization: ControlQuantization | None = None,
 ) -> dict[str, Any]:
     return canonical_physics_bucket_key_from_replay_key(
         canonical_replay_key(
@@ -1789,6 +1929,7 @@ def canonical_physics_bucket_key(
             fO2_log=fO2_log,
             fe_redox_policy=fe_redox_policy,
             provider_role=provider_role,
+            control_quantization=control_quantization,
         )
     )
 
@@ -2217,14 +2358,21 @@ def _register_gate_providers_for_key(sim: Any) -> None:
         register_gate()
 
 
-def _composition_mol_fraction(sim: Any) -> list[tuple[str, float]]:
+def _composition_mol_fraction(
+    sim: Any,
+    *,
+    sig_figs: int | None = None,
+) -> list[tuple[str, float]]:
     cleaned = sim.atom_ledger.mol_by_account(_CLEANED_MELT_ACCOUNT)
-    return _composition_mol_fraction_from_mol(cleaned)
+    return _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
 
 
 def _composition_mol_fraction_from_mol(
     cleaned: Mapping[str, float],
+    *,
+    sig_figs: int | None = None,
 ) -> list[tuple[str, float]]:
+    composition_sig_figs = sig_figs or _COMPOSITION_SIG_FIGS
     positive = {
         str(species): float(mol)
         for species, mol in dict(cleaned or {}).items()
@@ -2238,12 +2386,14 @@ def _composition_mol_fraction_from_mol(
         fraction = mol / total
         if fraction <= _TRACE_CUTOFF:
             continue
-        result.append((species, _sigfig(fraction, _COMPOSITION_SIG_FIGS)))
+        result.append((species, _sigfig(fraction, composition_sig_figs)))
     return result
 
 
 def canonicalized_composition_mol_by_account(
     composition_by_account: Mapping[str, Mapping[str, float]],
+    *,
+    sig_figs: int | None = None,
 ) -> dict[str, dict[str, float]]:
     canonical = {
         str(account): {
@@ -2254,7 +2404,7 @@ def canonicalized_composition_mol_by_account(
         for account, species_mol in dict(composition_by_account or {}).items()
     }
     cleaned = canonical.get(_CLEANED_MELT_ACCOUNT, {})
-    fractions = _composition_mol_fraction_from_mol(cleaned)
+    fractions = _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
     total_mol = sum(
         float(mol)
         for mol in cleaned.values()
@@ -2272,8 +2422,8 @@ def canonicalized_composition_mol_by_account(
     return canonical
 
 
-def _fe_split(sim: Any) -> dict[str, float]:
-    fractions = dict(_composition_mol_fraction(sim))
+def _fe_split(sim: Any, *, sig_figs: int | None = None) -> dict[str, float]:
+    fractions = dict(_composition_mol_fraction(sim, sig_figs=sig_figs))
     return {
         "FeO": fractions.get("FeO", 0.0),
         "Fe2O3": fractions.get("Fe2O3", 0.0),
@@ -2884,6 +3034,16 @@ def _digest(value: Any) -> str:
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _quantize_decimals(quantum: float) -> int:
+    try:
+        decimal = Decimal(str(float(quantum))).normalize()
+    except (InvalidOperation, ValueError) as exc:
+        raise ValueError(f"invalid quantization quantum: {quantum!r}") from exc
+    if not decimal.is_finite() or decimal <= 0:
+        raise ValueError(f"quantization quantum must be positive finite: {quantum!r}")
+    return max(0, -decimal.as_tuple().exponent)
 
 
 def _quantize(value: float | None, quantum: float, digits: int) -> float | None:

@@ -25,6 +25,36 @@ def _canonical_bytes(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
+def test_control_quantization_cli_parse_tier_json_and_bad() -> None:
+    tier_args = driver._parse_args(["--control-quantization", "XX-COARSE"])
+    assert tier_args.control_quantization == rrd.ControlQuantization.from_name(
+        "xx_coarse"
+    )
+
+    json_args = driver._parse_args(
+        [
+            "--control-quantization",
+            json.dumps(
+                {
+                    "t_k_quantum": 2.0,
+                    "pressure_bar_quantum": 0.002,
+                    "log_fo2_quantum": 0.02,
+                    "composition_sig_figs": 3,
+                }
+            ),
+        ]
+    )
+    assert json_args.control_quantization == rrd.ControlQuantization(
+        t_k_quantum=2.0,
+        pressure_bar_quantum=0.002,
+        log_fo2_quantum=0.02,
+        composition_sig_figs=3,
+    )
+
+    with pytest.raises(SystemExit):
+        driver._parse_args(["--control-quantization", "bad-tier"])
+
+
 def _write_magemin_row(db_path, suffix, payload=None):
     key = {
         "schema_version": "test",

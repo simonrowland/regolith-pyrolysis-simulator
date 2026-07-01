@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import copy
+import json
 import math
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Mapping, TypeVar
 
 from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_ALIASES,
@@ -87,6 +88,9 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 _E = TypeVar("_E", bound=Exception)
 
+if TYPE_CHECKING:
+    from simulator.reduced_real_determinism import ControlQuantization
+
 
 class BackendUnavailableError(RuntimeError):
     """Requested backend is required for this run but is unavailable."""
@@ -134,6 +138,7 @@ class CachedRealConfig:
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
     read_only_base_db_path: Path | None = None
     strict_vapor_gate: bool = False
+    control_quantization: ControlQuantization | None = None
 
 
 @dataclass(frozen=True)
@@ -303,6 +308,10 @@ def normalize_cached_real_config(
         raise unavailable_error_cls(
             "cached-real reduced_real_cache.strict_vapor_gate must be a bool"
         )
+    control_quantization = _parse_control_quantization_config(
+        value.get("control_quantization"),
+        unavailable_error_cls=unavailable_error_cls,
+    )
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
@@ -313,6 +322,69 @@ def normalize_cached_real_config(
         cache_tier_ceiling=cache_tier_ceiling,
         read_only_base_db_path=read_only_base_db_path,
         strict_vapor_gate=strict_vapor_gate,
+        control_quantization=control_quantization,
+    )
+
+
+def _parse_control_quantization_config(
+    value: Any,
+    *,
+    unavailable_error_cls: type[_E],
+) -> "ControlQuantization | None":
+    from simulator.reduced_real_determinism import ControlQuantization
+
+    if value in (None, ""):
+        return None
+    if isinstance(value, ControlQuantization):
+        return value
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        if stripped.startswith("{"):
+            try:
+                value = json.loads(stripped)
+            except json.JSONDecodeError as exc:
+                raise unavailable_error_cls(
+                    "cached-real reduced_real_cache.control_quantization "
+                    "JSON dict is invalid"
+                ) from exc
+        else:
+            try:
+                return ControlQuantization.from_name(stripped)
+            except ValueError as exc:
+                raise unavailable_error_cls(str(exc)) from exc
+    if isinstance(value, Mapping):
+        expected = {
+            "t_k_quantum",
+            "pressure_bar_quantum",
+            "log_fo2_quantum",
+            "composition_sig_figs",
+        }
+        keys = set(value)
+        if keys != expected:
+            missing = ", ".join(sorted(expected - keys)) or "none"
+            extra = ", ".join(sorted(str(key) for key in keys - expected)) or "none"
+            raise unavailable_error_cls(
+                "cached-real reduced_real_cache.control_quantization "
+                f"must contain exactly {', '.join(sorted(expected))}; "
+                f"missing={missing}; extra={extra}"
+            )
+        try:
+            return ControlQuantization(
+                t_k_quantum=float(value["t_k_quantum"]),
+                pressure_bar_quantum=float(value["pressure_bar_quantum"]),
+                log_fo2_quantum=float(value["log_fo2_quantum"]),
+                composition_sig_figs=int(value["composition_sig_figs"]),
+            )
+        except (TypeError, ValueError) as exc:
+            raise unavailable_error_cls(
+                "cached-real reduced_real_cache.control_quantization "
+                "values are invalid"
+            ) from exc
+    raise unavailable_error_cls(
+        "cached-real reduced_real_cache.control_quantization must be a "
+        "tier name string or JSON dict"
     )
 
 
@@ -327,6 +399,7 @@ def build_cached_real_store(config: CachedRealConfig):
         db_path=config.db_path,
         read_only_base_db_path=config.read_only_base_db_path,
         strict_vapor_gate=config.strict_vapor_gate,
+        control_quantization=config.control_quantization,
     )
     store.cached_real_miss_policy = config.miss_policy
     store.cache_tier_ceiling = config.cache_tier_ceiling

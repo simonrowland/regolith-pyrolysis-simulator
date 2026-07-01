@@ -83,6 +83,57 @@ def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) 
     return manifest
 
 
+def test_control_quantization_cli_parse_and_epoch_profile_overlay(
+    tmp_path: Path,
+) -> None:
+    manifest_path = _manifest_file(tmp_path)
+    manifest = epoch_grind.load_manifest(manifest_path)
+    args = epoch_grind._parser().parse_args(
+        [
+            "--manifest",
+            str(manifest_path),
+            "--control-quantization",
+            "XX-COARSE",
+        ]
+    )
+
+    profile_arg, profile = epoch_grind.plan_epoch_profile(
+        manifest.jobs[0],
+        manifest.path.parent,
+        tmp_path / "epoch" / "job-a.sqlite",
+        tmp_path / "epoch",
+        base_cache=manifest.base_cache,
+        control_quantization=args.control_quantization,
+    )
+
+    assert profile_arg == str(tmp_path / "epoch" / "profiles" / "job-a.profile.json")
+    assert profile is not None
+    assert profile["run"]["reduced_real_cache"]["control_quantization"] == (
+        "xx_coarse"
+    )
+
+    json_value = {
+        "t_k_quantum": 2.0,
+        "pressure_bar_quantum": 0.002,
+        "log_fo2_quantum": 0.02,
+        "composition_sig_figs": 3,
+    }
+    json_args = epoch_grind._parser().parse_args(
+        [
+            "--manifest",
+            str(manifest_path),
+            "--control-quantization",
+            json.dumps(json_value),
+        ]
+    )
+    assert json_args.control_quantization == json_value
+
+    with pytest.raises(SystemExit):
+        epoch_grind._parser().parse_args(
+            ["--manifest", str(manifest_path), "--control-quantization", "bad-tier"]
+        )
+
+
 def _write_no_feasible_artifacts(
     out_dir: Path,
     *,

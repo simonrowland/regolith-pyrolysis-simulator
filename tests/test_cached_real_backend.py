@@ -25,6 +25,7 @@ from simulator.config import load_config_bundle
 from simulator.corpus_version import CorpusVersionConfigError, current_corpus_version
 from simulator.melt_backend.base import EquilibriumResult, StubBackend
 from simulator.reduced_real_determinism import (
+    ControlQuantization,
     PT0CacheCollision,
     PT0CacheMiss,
     PT0DeterminismStore,
@@ -165,6 +166,63 @@ def test_cached_real_config_threads_strict_vapor_gate_to_store(
     assert store.strict_vapor_gate is True
     assert store.persistent_store is not None
     assert store.persistent_store.strict_vapor_gate is True
+
+
+def test_cached_real_config_threads_control_quantization_to_store(
+    tmp_path: Path,
+) -> None:
+    normalized = normalize_cached_real_config(
+        {
+            **_cache_config(tmp_path / "cached-real.db", "live-fill"),
+            "control_quantization": "xx-coarse",
+        }
+    )
+
+    store = build_cached_real_store(normalized)
+
+    assert normalized.control_quantization == ControlQuantization.from_name(
+        "xx_coarse"
+    )
+    assert store.control_quantization == ControlQuantization.from_name("xx_coarse")
+    assert store.persistent_store is not None
+    assert store.persistent_store.control_quantization == (
+        ControlQuantization.from_name("xx_coarse")
+    )
+
+
+def test_cached_real_config_parses_control_quantization_json_dict(
+    tmp_path: Path,
+) -> None:
+    normalized = normalize_cached_real_config(
+        {
+            **_cache_config(tmp_path / "cached-real.db", "live-fill"),
+            "control_quantization": {
+                "t_k_quantum": 2.0,
+                "pressure_bar_quantum": 0.002,
+                "log_fo2_quantum": 0.02,
+                "composition_sig_figs": 3,
+            },
+        }
+    )
+
+    assert normalized.control_quantization == ControlQuantization(
+        t_k_quantum=2.0,
+        pressure_bar_quantum=0.002,
+        log_fo2_quantum=0.02,
+        composition_sig_figs=3,
+    )
+
+
+def test_cached_real_config_rejects_bad_control_quantization(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(BackendUnavailableError, match="unknown control quantization"):
+        normalize_cached_real_config(
+            {
+                **_cache_config(tmp_path / "cached-real.db", "live-fill"),
+                "control_quantization": "bad-tier",
+            }
+        )
 
 
 def _build_cached_real_sim(
