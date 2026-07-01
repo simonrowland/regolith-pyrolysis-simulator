@@ -17,6 +17,7 @@ from simulator.grind_preflight import (
     GrindSourceGateError,
     STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS,
     assert_grind_feedstock_stage0_route_coverage,
+    grind_feedstock_stage0_route_coverage_violations,
     assert_strict_vapor_config,
     assert_strict_vapor_result_payload,
     assert_strict_vapor_result_store,
@@ -77,7 +78,8 @@ def test_stage0_inprocess_safe_feedstock_ids_are_grounded() -> None:
         ).encode()
     ).hexdigest()
 
-    assert safe_digest == "444e63dc61549125f2c7cd9b1810727a"
+    assert safe_digest == "36551a152768632fa5639b5a9d53d04f"
+    assert "lunar_highlands_nuw_lht_5m" in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
     assert {
         feedstock_id
         for feedstock_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
@@ -94,6 +96,16 @@ def test_stage0_inprocess_safe_feedstock_ids_are_grounded() -> None:
         if real_backend_feedstock_domain_reason("alphamelts", feedstock_id, feedstocks)
         is not None
     } == set()
+
+
+def test_full_catalog_feedstocks_have_stage0_route_coverage() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    assert grind_feedstock_stage0_route_coverage_violations(
+        sorted(feedstocks),
+        feedstocks,
+        backend_name="alphamelts",
+    ) == []
 
 
 def test_stage0_route_coverage_accepts_super_kreep_as_explicit_ood() -> None:

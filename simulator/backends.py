@@ -36,6 +36,7 @@ REAL_MELT_BACKEND_NAMES = ("alphamelts", CACHED_REAL_BACKEND_NAME)
 STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
     "lunar_mare_low_ti",
     "lunar_mare_high_ti",
+    "lunar_mare_oprl2n",
     "lunar_mare_lms1",
     "lunar_eac_1a",
     "s_type_asteroid_silicate",
@@ -48,6 +49,9 @@ STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
 # authoritative catalog overlay, the composition predicate below is a best-effort
 # renamed/new-feedstock robustness layer, and grind launch preflight fails loud
 # for any grind feedstock that is neither subprocess-routed nor out_of_domain.
+# lunar_mare_oprl2n is below the mare/HED predicate but its 2026-07-01
+# composition-preserving unblocked clone smoke hit the 300 s in-process timeout,
+# so the explicit route overlay covers this predicate-missed mare hang class.
 # Do not turn knife-edge predicate margins into ungrounded cushions; s_type,
 # v_type, and MGS-1 are governed by the ID list / fail-loud launch assertion.
 _SPINEL_ROUTE_FORMER_OXIDES = ("Cr2O3", "Al2O3", "FeO", "MgO", "TiO2")

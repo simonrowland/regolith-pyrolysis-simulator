@@ -217,7 +217,8 @@ def test_pregrind_route_feedstocks_require_subprocess_from_real_data():
         ).encode()
     ).hexdigest()
 
-    assert route_digest == "ab8ef3c424307024995a6a7791b47ea2"
+    assert route_digest == "9db09102b455449a1ba5b5a5b1e5a2d0"
+    assert "lunar_mare_oprl2n" in STAGE0_SUBPROCESS_FEEDSTOCK_IDS
     assert {
         feedstock_id
         for feedstock_id in STAGE0_SUBPROCESS_FEEDSTOCK_IDS

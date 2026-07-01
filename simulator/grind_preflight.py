@@ -16,14 +16,19 @@ STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS = frozenset(
     {
         "lunar_highland",
         "lunar_highlands_lhs1",
+        "lunar_highlands_nuw_lht_5m",
         "lunar_pkt_kreep_average",
         "lunar_spa_kreep_influenced",
         "mars_global_mgs1",
     }
 )
-# Grounding: 2026-06-30 C6 grind manifest/catalog sweep. These IDs are present
-# in the launch manifests, are not spinel-routed, are not real-backend OOD, and
-# are the known fast in-process class that fix2 accidentally failed loud on.
+# Grounding: 2026-06-30/2026-07-01 C6 grind manifest/catalog sweep. These IDs
+# are present in the catalog/manifests, are not spinel-routed, are not
+# real-backend OOD, and are the known fast in-process class that fix2
+# accidentally failed loud on. lunar_highlands_nuw_lht_5m is provenance-blocked
+# for quantitative runs, so its 2026-07-01 smoke used an unblocked clone with
+# the same oxide vector; stage-0 reached c0b_path_ab_pause in 30 h under a 300 s
+# process timeout.
 # targeted_super_kreep_ore is manifest-covered but explicit OOD
 # (unsupported_melts_species), not safe in-process.
 
