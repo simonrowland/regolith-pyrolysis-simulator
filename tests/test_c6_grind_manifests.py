@@ -12,6 +12,9 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.config import load_config_bundle
+from simulator.grind_preflight import grind_feedstock_stage0_route_coverage_violations
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GRIND_DIR = REPO_ROOT / "docs-private" / "grind"
 MOON_MANIFEST = GRIND_DIR / "manifest-c6-moon-studio1.json"
@@ -39,6 +42,10 @@ MIN_SEEDS_PER_CELL = 3
 
 def _load_manifest(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _manifest_feedstocks(manifest: dict) -> set[str]:
+    return {str(job["feedstock"]) for job in manifest.get("jobs", [])}
 
 
 def _optimize_profile_feedstocks() -> set[str]:
@@ -171,6 +178,28 @@ def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> N
             assert "pc-glass-retain-na-k-c3" not in job["id"]
 
 
+def test_c6_manifest_feedstocks_have_stage0_route_coverage() -> None:
+    feedstocks = load_config_bundle().feedstocks
+    manifest_paths = sorted(GRIND_DIR.glob("manifest-c6-*.json"))
+    assert {path.name for path in manifest_paths} >= {
+        "manifest-c6-kreep-studio3.json",
+        "manifest-c6-mare-studio1.json",
+        "manifest-c6-mars-stype-studio2.json",
+        "manifest-c6-moon-studio1.json",
+        "manifest-c6-stype-studio2.json",
+    }
+
+    violations = {
+        path.name: grind_feedstock_stage0_route_coverage_violations(
+            sorted(_manifest_feedstocks(_load_manifest(path))),
+            feedstocks,
+            backend_name="alphamelts",
+        )
+        for path in manifest_paths
+    }
+    assert violations == {path.name: [] for path in manifest_paths}
+
+
 @pytest.mark.parametrize(
     ("manifest_path", "feedstock"),
     [
@@ -179,7 +208,7 @@ def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> N
     ],
     ids=["moon", "mars-stype"],
 )
-def test_epoch_grind_dry_run_fails_loud_for_uncovered_feedstock(
+def test_epoch_grind_dry_run_materializes_safe_manifest_feedstocks(
     manifest_path: Path,
     feedstock: str,
 ) -> None:
@@ -208,9 +237,15 @@ def test_epoch_grind_dry_run_fails_loud_for_uncovered_feedstock(
             text=True,
             check=False,
         )
-        assert proc.returncode == 2
-        assert "grind_stage0_route_coverage" in proc.stderr
-        assert feedstock in proc.stderr
+        assert proc.returncode == 0, proc.stderr or proc.stdout
+        payload = json.loads(proc.stdout)
+        jobs = payload.get("jobs", [])
+        assert jobs, "dry-run produced no jobs"
+        assert any(
+            str(job.get("id", "")).startswith(f"{feedstock}__")
+            or f"--feedstock {feedstock}" in " ".join(job.get("command", []))
+            for job in jobs
+        )
 
 
 def test_epoch_grind_dry_run_materializes_commands_for_stype_manifest() -> None:

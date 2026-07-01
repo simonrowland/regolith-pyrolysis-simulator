@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from pathlib import Path
 
 import pytest
 
+from simulator.backends import real_backend_feedstock_domain_reason, requires_stage0_subprocess
+from simulator.config import load_config_bundle
 from simulator.grind_preflight import (
     GrindSourceGateError,
+    STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS,
     assert_grind_feedstock_stage0_route_coverage,
     assert_strict_vapor_config,
     assert_strict_vapor_result_payload,
@@ -48,6 +52,65 @@ def test_stage0_route_coverage_accepts_subprocess_or_out_of_domain() -> None:
     )
 
 
+def test_stage0_route_coverage_accepts_known_safe_inprocess_feedstocks() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    assert_grind_feedstock_stage0_route_coverage(
+        sorted(STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS),
+        feedstocks,
+        backend_name="alphamelts",
+        context="test-grind",
+    )
+
+
+def test_stage0_inprocess_safe_feedstock_ids_are_grounded() -> None:
+    feedstocks = load_config_bundle().feedstocks
+    safe_digest = hashlib.md5(
+        json.dumps(
+            sorted(STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS),
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode()
+    ).hexdigest()
+
+    assert safe_digest == "444e63dc61549125f2c7cd9b1810727a"
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
+        if feedstock_id not in feedstocks
+    } == set()
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
+        if requires_stage0_subprocess(feedstock_id, feedstocks)
+    } == set()
+    assert {
+        feedstock_id
+        for feedstock_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
+        if real_backend_feedstock_domain_reason("alphamelts", feedstock_id, feedstocks)
+        is not None
+    } == set()
+
+
+def test_stage0_route_coverage_accepts_super_kreep_as_explicit_ood() -> None:
+    feedstocks = load_config_bundle().feedstocks
+
+    assert (
+        real_backend_feedstock_domain_reason(
+            "alphamelts",
+            "targeted_super_kreep_ore",
+            feedstocks,
+        )
+        == "unsupported_melts_species"
+    )
+    assert_grind_feedstock_stage0_route_coverage(
+        ["targeted_super_kreep_ore"],
+        feedstocks,
+        backend_name="alphamelts",
+        context="test-grind",
+    )
+
+
 def test_stage0_route_coverage_rejects_uncovered_grind_feedstock() -> None:
     feedstocks = {
         "interwindow": {
@@ -65,6 +128,29 @@ def test_stage0_route_coverage_rejects_uncovered_grind_feedstock() -> None:
     with pytest.raises(GrindSourceGateError, match="interwindow"):
         assert_grind_feedstock_stage0_route_coverage(
             ["interwindow"],
+            feedstocks,
+            backend_name="alphamelts",
+            context="test-grind",
+        )
+
+
+def test_stage0_route_coverage_rejects_unlisted_normal_silicate() -> None:
+    feedstocks = {
+        "new_normal_silicate": {
+            "composition_wt_pct": {
+                "SiO2": 50.0,
+                "Al2O3": 14.0,
+                "FeO": 7.0,
+                "MgO": 5.0,
+                "TiO2": 0.2,
+                "CaO": 10.0,
+            }
+        }
+    }
+
+    with pytest.raises(GrindSourceGateError, match="new_normal_silicate"):
+        assert_grind_feedstock_stage0_route_coverage(
+            ["new_normal_silicate"],
             feedstocks,
             backend_name="alphamelts",
             context="test-grind",

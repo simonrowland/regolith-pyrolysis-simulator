@@ -12,6 +12,20 @@ from typing import Any
 
 APPROVED_LIVE_VAPOR_SOURCES = frozenset({"builtin_authoritative"})
 VAPOR_ACTIVE_CAMPAIGN_PREFIXES = ("C2A", "C2B", "C4")
+STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS = frozenset(
+    {
+        "lunar_highland",
+        "lunar_highlands_lhs1",
+        "lunar_pkt_kreep_average",
+        "lunar_spa_kreep_influenced",
+        "mars_global_mgs1",
+    }
+)
+# Grounding: 2026-06-30 C6 grind manifest/catalog sweep. These IDs are present
+# in the launch manifests, are not spinel-routed, are not real-backend OOD, and
+# are the known fast in-process class that fix2 accidentally failed loud on.
+# targeted_super_kreep_ore is manifest-covered but explicit OOD
+# (unsupported_melts_species), not safe in-process.
 
 
 class GrindSourceGateError(RuntimeError):
@@ -33,7 +47,8 @@ def assert_grind_feedstock_stage0_route_coverage(
     if violations:
         raise GrindSourceGateError(
             f"{context}: grind_stage0_route_coverage requires every grind "
-            "feedstock to be subprocess-routed or explicitly out_of_domain; "
+            "feedstock to be subprocess-routed, explicitly out_of_domain, "
+            "or confirmed safe in-process; "
             + "; ".join(violations)
         )
 
@@ -65,11 +80,28 @@ def grind_feedstock_stage0_route_coverage_violations(
         )
         if out_of_domain_reason is not None:
             continue
+        if is_stage0_inprocess_safe_feedstock(feedstock_id, feedstocks):
+            continue
         if not isinstance(feedstocks, Mapping) or feedstock_id not in feedstocks:
             violations.append(f"{feedstock_id}: missing feedstock catalog entry")
         else:
-            violations.append(f"{feedstock_id}: neither subprocess-routed nor out_of_domain")
+            violations.append(
+                f"{feedstock_id}: neither subprocess-routed nor out_of_domain "
+                "nor confirmed safe in-process"
+            )
     return violations
+
+
+def is_stage0_inprocess_safe_feedstock(
+    feedstock_id: str | None,
+    feedstocks: Mapping[str, Any] | None,
+) -> bool:
+    normalized_id = str(feedstock_id or "").strip()
+    return (
+        normalized_id in STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
+        and isinstance(feedstocks, Mapping)
+        and normalized_id in feedstocks
+    )
 
 
 def assert_strict_vapor_config(

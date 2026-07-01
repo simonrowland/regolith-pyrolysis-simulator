@@ -435,6 +435,19 @@ def real_backend_feedstock_domain_reason(
         return None
     if _melts_major_oxide_sum(composition) <= 0.0:
         return "non_silicate_feedstock"
+    if not (
+        PyrolysisSimulator._uses_mars_carbon_cleanup(feedstock)
+        or PyrolysisSimulator._uses_carbonaceous_degas_cleanup(feedstock)
+    ):
+        unsupported_species = [
+            species
+            for species in sorted(composition)
+            if species not in MELTS_MAJOR_OXIDES
+            and species not in MELTS_OXIDE_ALIASES
+            and _oxide_wt_pct(composition, species) > 0.0
+        ]
+        if unsupported_species:
+            return "unsupported_melts_species"
     return None
 
 
