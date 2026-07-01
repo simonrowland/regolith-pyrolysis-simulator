@@ -13,6 +13,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GRIND_DIR = REPO_ROOT / "docs-private" / "grind"
 MOON_EXTRA = frozenset({"targeted_super_kreep_ore"})
+S_TYPE_FEEDSTOCK = "s_type_asteroid_silicate"
 C6_TARGETS = frozenset(
     {
         "pc-extract-na",
@@ -161,6 +162,20 @@ def build_manifest(
     }
 
 
+def filter_manifest_by_feedstock(
+    manifest: dict[str, object],
+    *,
+    feedstock: str,
+) -> dict[str, object]:
+    filtered = dict(manifest)
+    filtered["jobs"] = [
+        job
+        for job in manifest["jobs"]
+        if isinstance(job, dict) and job.get("feedstock") == feedstock
+    ]
+    return filtered
+
+
 def write_manifest(path: Path, payload: dict[str, object]) -> None:
     path.write_text(f"{json.dumps(payload, indent=2)}\n", encoding="utf-8")
 
@@ -252,13 +267,22 @@ def main(argv: list[str] | None = None) -> int:
         budget=args.budget,
         parallel=args.parallel,
     )
+    stype_manifest = filter_manifest_by_feedstock(
+        mars_manifest,
+        feedstock=S_TYPE_FEEDSTOCK,
+    )
+    if not stype_manifest["jobs"]:
+        print(f"error: mars manifest has no jobs for {S_TYPE_FEEDSTOCK}", file=sys.stderr)
+        return 2
 
     out_dir = args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     moon_path = out_dir / "manifest-c6-moon-studio1.json"
     mars_path = out_dir / "manifest-c6-mars-stype-studio2.json"
+    stype_path = out_dir / "manifest-c6-stype-studio2.json"
     write_manifest(moon_path, moon_manifest)
     write_manifest(mars_path, mars_manifest)
+    write_manifest(stype_path, stype_manifest)
 
     moon_feedstocks = {cell["feedstock"] for cell in moon_cells}
     mars_feedstocks = {cell["feedstock"] for cell in mars_cells}
@@ -274,6 +298,10 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"wrote {mars_path.name}: cells={len(mars_cells)} jobs={len(mars_manifest['jobs'])} "
         f"feedstocks={len(mars_ready)} skipped_no_optimize_profile={mars_skipped}"
+    )
+    print(
+        f"wrote {stype_path.name}: jobs={len(stype_manifest['jobs'])} "
+        f"feedstock={S_TYPE_FEEDSTOCK}"
     )
     return 0
 
