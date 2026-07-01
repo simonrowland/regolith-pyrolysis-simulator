@@ -403,12 +403,16 @@ def test_result_store_eval_spec_omits_default_stage0_exit_stop(tmp_path) -> None
     assert store.lookup(stage0_run).eval_spec == stage0_run
 
 
-def test_ok_backend_without_authority_rejected_from_cache_write(tmp_path) -> None:
+@pytest.mark.parametrize("backend_status", ("unavailable", "diagnostic_stub", "ok"))
+def test_feasible_backend_without_authority_rejected_from_cache_write(
+    tmp_path,
+    backend_status: str,
+) -> None:
     spec = _base_spec()
     scored = _scored(
         spec,
         result_blob={
-            "backend_status": "ok",
+            "backend_status": backend_status,
             "backend_authoritative": False,
             "execution_status": "completed",
         },
@@ -422,7 +426,7 @@ def test_ok_backend_without_authority_rejected_from_cache_write(tmp_path) -> Non
     with pytest.raises(ResultStoreWriteRejected) as exc_info:
         store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
 
-    assert "backend_not_authoritative" in exc_info.value.reasons
+    assert "non_authoritative_backend" in exc_info.value.reasons
     assert store.lookup(spec) is None
 
 
@@ -602,7 +606,44 @@ def test_store_result_artifact_missing_required_fields_raise_named(
                 spec,
                 result_blob=_admissible_trace({"backend_authoritative": False}),
             ),
-            "backend_not_authoritative",
+            "non_authoritative_backend",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {
+                        "backend_status": "unavailable",
+                        "backend_authoritative": False,
+                    }
+                ),
+            ),
+            "non_authoritative_backend",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {
+                        "backend_status": "diagnostic_stub",
+                        "backend_authoritative": False,
+                    }
+                ),
+            ),
+            "non_authoritative_backend",
+        ),
+        (
+            lambda spec: _scored(
+                spec,
+                result_blob=_admissible_trace(
+                    {
+                        "backend_status": "ok",
+                        "backend_authoritative": True,
+                        "snapshots": [],
+                    }
+                ),
+            ),
+            "no_mass_balance_proof",
         ),
     ),
 )
@@ -628,6 +669,11 @@ def test_store_rejects_inadmissible_cache_writes_reason_coded_and_unwritten(
     (
         {"backend_authoritative": False},
         {"snapshots": [{"mass_balance_error_pct": 1.0e-8}]},
+        {
+            "backend_status": "unavailable",
+            "backend_authoritative": False,
+            "snapshots": [],
+        },
     ),
 )
 def test_store_accepts_non_feasible_provenance_rows_with_poison_truth_markers(

@@ -39,7 +39,7 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.worker_runtime import (
     clear_worker_runtime,
     get_worker_runtime,
@@ -174,11 +174,19 @@ def evaluate_batch(
         for task, result in zip(tasks, completed):
             stored_result = _ensure_pool_backend_provenance(result, task)
             if result.eval_spec is not None:
-                results_store.store(
-                    result.eval_spec,
-                    stored_result,
-                    created_at=timestamp,
-                )
+                try:
+                    results_store.store(
+                        result.eval_spec,
+                        stored_result,
+                        created_at=timestamp,
+                    )
+                except ResultStoreWriteRejected as exc:
+                    _LOGGER.warning(
+                        "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                        result.candidate_id,
+                        result.cache_key,
+                        ",".join(exc.reasons),
+                    )
             stored_results.append(stored_result)
         completed = tuple(stored_results)
     return completed
@@ -1203,19 +1211,75 @@ def _read_pid_log(path: Path) -> tuple[int, ...]:
         return ()
     pids: list[int] = []
     for line in lines:
+        parts = line.strip().split("\t")
+        if not parts or not parts[0]:
+            continue
         try:
-            pids.append(int(line.strip()))
+            pid = int(parts[0])
         except ValueError:
             continue
+        # Grind-infra sweep Finding 5 (shared-studio wrong-kill guard): a tracked
+        # child PID recorded here can exit and have its number recycled by the OS
+        # for an UNRELATED process before the timeout reaper SIGKILLs it. When a
+        # start-time was recorded at spawn, verify the live process's start time
+        # still matches; drop the entry if the process is gone (already dead) or
+        # its start time differs (recycled → not ours). Legacy bare-PID lines
+        # (no recorded start time) fall back to the prior unverified behavior.
+        if len(parts) >= 2 and parts[1]:
+            try:
+                recorded_create_time = float(parts[1])
+            except ValueError:
+                recorded_create_time = None
+            if recorded_create_time is not None:
+                current_create_time = _process_create_time(pid)
+                if current_create_time is None or (
+                    abs(current_create_time - recorded_create_time)
+                    > _PID_RECYCLE_CREATE_TIME_TOLERANCE_S
+                ):
+                    continue
+        pids.append(pid)
     return tuple(pids)
+
+
+# Tolerance (seconds) when comparing a tracked child's recorded start time
+# against its live start time to detect PID recycling. psutil.create_time() is
+# deterministic per-process, so the same process compares equal; a recycled PID
+# (original exited, number reused) differs by far more than this. Small non-zero
+# value only absorbs float round-trip through the on-disk log.
+_PID_RECYCLE_CREATE_TIME_TOLERANCE_S = 1.0
+
+
+def _process_create_time(pid: int) -> float | None:
+    """Best-effort process start time (epoch seconds) for PID-recycle guards.
+
+    Returns ``None`` when the process is gone or start time is unavailable
+    (e.g. psutil absent) — callers treat ``None`` as "cannot confirm identity".
+    Used by the timeout reaper to avoid SIGKILLing an unrelated process that
+    inherited a recycled PID on a shared machine (grind-infra sweep Finding 5).
+    """
+    try:
+        import psutil  # type: ignore[import-not-found]
+
+        return float(psutil.Process(int(pid)).create_time())
+    except Exception:
+        return None
 
 
 def _append_child_pid(path: str, pid: int) -> None:
     try:
         log_path = Path(path)
         log_path.parent.mkdir(parents=True, exist_ok=True)
+        # Record the child's start time alongside its PID so the reaper can
+        # verify identity before SIGKILL (guards against PID recycling on shared
+        # machines — grind-infra sweep Finding 5). Falls back to a bare PID line
+        # when the start time is unavailable.
+        create_time = _process_create_time(int(pid))
+        if create_time is not None:
+            record = f"{int(pid)}\t{create_time:.6f}\n"
+        else:
+            record = f"{int(pid)}\n"
         with log_path.open("a", encoding="utf-8") as handle:
-            handle.write(f"{int(pid)}\n")
+            handle.write(record)
     except OSError:
         return
 

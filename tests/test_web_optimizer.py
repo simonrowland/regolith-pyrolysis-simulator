@@ -30,7 +30,12 @@ from simulator.corpus_version import current_corpus_version, interoperable_corpu
 from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import StubBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
-from simulator.optimize.evaluate import RunReference, ScoredResult, _build_eval_inputs
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+    _build_eval_inputs,
+)
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
@@ -104,30 +109,62 @@ def _objectives(oxygen: float = 10.0, energy: float = 2.0) -> ObjectiveVector:
     )
 
 
+def _closed_mass_closure() -> dict[str, object]:
+    return {"status": "closed", "mass_balance_error_pct": 0.0}
+
+
+def _product_summary_with_mass_proof(
+    product_summary: Mapping[str, object] | None,
+    *,
+    oxygen: float,
+) -> Mapping[str, object]:
+    payload = dict(product_summary or {})
+    payload.setdefault("oxygen_kg", oxygen)
+    payload.setdefault("mass_closure", _closed_mass_closure())
+    return payload
+
+
 def _scored(
     spec: EvalSpec,
     *,
     candidate_id: str = "candidate-a",
     oxygen: float = 10.0,
     energy: float = 2.0,
+    feasible: bool = True,
+    failure_category: FailureCategory | None = None,
     objectives: ObjectiveVector | None = None,
     margins: Mapping[str, GateMargin] | None = None,
     product_summary: Mapping[str, object] | None = None,
     trace: Mapping[str, object] | None = None,
+    backend_status: str | None = "ok",
+    backend_authoritative: bool | None = True,
 ) -> ScoredResult:
+    result_objectives = objectives or _objectives(oxygen, energy)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
         cache_key=cache_key(spec),
-        feasible=True,
-        objectives=objectives or _objectives(oxygen, energy),
-        feasibility_margins=margins or {"delivered_stream_purity": _margin()},
+        feasible=feasible,
+        failure_category=(
+            None
+            if feasible
+            else failure_category or FailureCategory.BACKEND_UNAVAILABLE
+        ),
+        objectives=result_objectives if feasible else None,
+        feasibility_margins=margins or {
+            "delivered_stream_purity": _margin(feasible=feasible)
+        },
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
             trace=trace
             or {"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]},
-            product_summary=product_summary or {"oxygen_kg": oxygen},
+            product_summary=_product_summary_with_mass_proof(
+                product_summary,
+                oxygen=oxygen,
+            ),
+            backend_status=backend_status,
+            backend_authoritative=backend_authoritative,
         ),
         notes=("stored",),
     )
@@ -693,11 +730,14 @@ def test_optimizer_reader_renders_not_run_backend_labels(client, tmp_path) -> No
         _scored(
             spec,
             candidate_id="candidate-not-run",
+            feasible=False,
             trace={
                 "backend_status": "not_run",
                 "backend_authoritative": False,
                 "execution_status": "not_run",
             },
+            backend_status="not_run",
+            backend_authoritative=False,
         ),
         created_at="2026-06-02T00:00:00Z",
     )
@@ -729,11 +769,14 @@ def test_optimizer_reader_replays_legacy_no_compared_results_status(client, tmp_
         _scored(
             spec,
             candidate_id="candidate-legacy-no-compared",
+            feasible=False,
             trace={
                 "backend_status": "no_compared_results",
                 "backend_authoritative": False,
                 "execution_status": "no_compared_results",
             },
+            backend_status="no_compared_results",
+            backend_authoritative=False,
         ),
         created_at="2026-06-02T00:00:00Z",
     )

@@ -174,12 +174,14 @@ def _evaluator(
     infeasible: set[int] | None = None,
     engine_bug: set[int] | None = None,
     out_of_domain: set[int] | None = None,
+    earned_rump_ood: set[int] | None = None,
     non_finite_payload: set[int] | None = None,
     invalid_recipe: set[int] | None = None,
 ):
     bad = infeasible or set()
     aborts = engine_bug or set()
     domain_rejects = out_of_domain or set()
+    earned_rump_domain = earned_rump_ood or set()
     non_finite = non_finite_payload or set()
     invalid = invalid_recipe or set()
 
@@ -252,6 +254,43 @@ def _evaluator(
                     },
                     backend_status="out_of_domain",
                 ),
+            )
+        if index in earned_rump_domain:
+            objectives = ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+                )
+            )
+            return ScoredResult(
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=True,
+                objectives=objectives,
+                feasibility_margins={"delivered_stream_purity": _margin()},
+                run_reference=RunReference(
+                    status="ok",
+                    trace={
+                        "backend_status": "out_of_domain",
+                        "backend_authoritative": True,
+                        "backend_status_reason": "earned_terminal_rump_out_of_domain",
+                        "rump_terminal": {"status": "earned"},
+                        "terminal_rump_by_species_kg": {"CaO": 2.0},
+                        "snapshots": [{"mass_balance_error_pct": 0.0}],
+                    },
+                    product_summary={
+                        "oxygen_kg": 10.0 + index,
+                        "mass_closure": {
+                            "status": "closed",
+                            "mass_balance_error_pct": 0.0,
+                        },
+                    },
+                    backend_status="out_of_domain",
+                    backend_authoritative=True,
+                    backend_status_reason="earned_terminal_rump_out_of_domain",
+                ),
+                notes=("backend_status=out_of_domain",),
             )
         if index in non_finite:
             return ScoredResult(
@@ -334,7 +373,20 @@ def _evaluator(
             feasibility_margins={"delivered_stream_purity": _margin()},
             run_reference=RunReference(
                 status="ok",
-                trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "oxygen_kg": 10.0 + index,
+                    "mass_closure": {
+                        "status": "closed",
+                        "mass_balance_error_pct": 0.0,
+                    },
+                },
+                backend_status="ok",
+                backend_authoritative=True,
             ),
         )
 
@@ -1168,7 +1220,13 @@ def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path
         feasibility_margins={"delivered_stream_purity": _margin()},
         run_reference=RunReference(
             status="ok",
-            trace={},
+            trace={"snapshots": [{"mass_balance_error_pct": 0.0}]},
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
             backend_status="ok",
             backend_authoritative=True,
         ),
@@ -1226,7 +1284,19 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
             },
             run_reference=RunReference(
                 status="ok",
-                trace={"backend_status": "diagnostic_stub", "snapshots": [index]},
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "mass_closure": {
+                        "status": "closed",
+                        "mass_balance_error_pct": 0.0,
+                    }
+                },
+                backend_status="ok",
+                backend_authoritative=True,
             ),
         )
 
@@ -1293,7 +1363,19 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
         feasibility_margins={"delivered_stream_purity": _margin()},
         run_reference=RunReference(
             status="ok",
-            trace={"backend_status": "diagnostic_stub"},
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
+            backend_status="ok",
+            backend_authoritative=True,
         ),
     )
     store.store(spec_loose, scored, created_at="t1")
@@ -1460,6 +1542,37 @@ def test_out_of_domain_candidate_is_stored_and_study_continues(tmp_path) -> None
     stored_trace = stored["random-7-000001"].run_reference.trace
     assert stored_trace["out_of_domain_crash_point"]["fO2_log"] == pytest.approx(-9.0)
     assert "snapshots" not in stored_trace
+
+
+def test_feasible_earned_rump_ood_cache_rejection_warns_and_study_continues(
+    tmp_path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level("WARNING", logger="simulator.optimize.study")
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(earned_rump_ood={1}),
+    )
+
+    assert result.winner.candidate_id == "random-7-000002"
+    provenance = _read_provenance(tmp_path)
+    logged = {row["candidate_id"]: row for row in provenance}
+    stored = {row.candidate_id for row in _stored_rows(tmp_path)}
+
+    assert logged["random-7-000001"]["feasible"] is True
+    assert logged["random-7-000001"]["status"] == "ok"
+    assert "random-7-000001" not in stored
+    assert {"random-7-000000", "random-7-000002"} <= stored
+    assert "result_store_write_rejected" in caplog.text
+    assert "out_of_domain_provenance" in caplog.text
 
 
 @pytest.mark.timeout(25)
@@ -2281,10 +2394,19 @@ def _two_phase_evaluate_patch(
         run_reference=RunReference(
             status="ok",
             trace={
-                "backend_status": "diagnostic_stub",
+                "backend_status": "ok",
+                "backend_authoritative": True,
                 "per_hour_summary": [{"reduced_real_cache_state": cache_state}],
-                "snapshots": ["heavy"],
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
             },
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
+            backend_status="ok",
+            backend_authoritative=True,
         ),
     )
 

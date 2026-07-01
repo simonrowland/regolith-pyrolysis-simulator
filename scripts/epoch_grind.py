@@ -1146,6 +1146,7 @@ class _PreparedJobRun:
     stdout_path: Path
     stderr_path: Path
     job_record: dict[str, Any]
+    strict_vapor_gate: bool
 
 
 def _prepare_job_run(
@@ -1196,6 +1197,12 @@ def _prepare_job_run(
         stdout_path=stdout_path,
         stderr_path=stderr_path,
         job_record=job_record,
+        strict_vapor_gate=_strict_vapor_gate_for_epoch_profile(
+            profile_arg,
+            job.fidelity,
+            manifest.path.parent,
+            job.reduced_real_cache,
+        ),
     )
 
 
@@ -1218,6 +1225,7 @@ def _run_prepared_job(
             assert_strict_vapor_result_store(
                 prepared.out_dir / "cache.sqlite",
                 context=f"{prepared.job.id}:cache.sqlite",
+                strict_vapor_gate=prepared.strict_vapor_gate,
             )
         except GrindSourceGateError as exc:
             return prepared, ChildOutcome(
@@ -1508,6 +1516,51 @@ def plan_epoch_profile(
 
     out = epoch_dir / "profiles" / f"{job.id}.profile.json"
     return str(out), profile
+
+
+def _strict_vapor_gate_for_epoch_profile(
+    profile_arg: str,
+    fidelity: str,
+    manifest_dir: Path,
+    job_cache_config: Mapping[str, Any] | None,
+) -> bool:
+    profile_path = _resolve_path(profile_arg, manifest_dir)
+    if profile_path.exists():
+        profile = _load_mapping(profile_path)
+        if _strict_vapor_gate_from_profile(profile, fidelity):
+            return True
+    return _strict_vapor_gate_from_cache_config(job_cache_config)
+
+
+def _strict_vapor_gate_from_profile(
+    profile: Mapping[str, Any],
+    fidelity: str,
+) -> bool:
+    run = profile.get("run")
+    if isinstance(run, Mapping) and _strict_vapor_gate_from_options(run):
+        return True
+    fidelities = profile.get("fidelities")
+    if isinstance(fidelities, Mapping):
+        options = fidelities.get(fidelity)
+        if isinstance(options, Mapping) and _strict_vapor_gate_from_options(options):
+            return True
+    return False
+
+
+def _strict_vapor_gate_from_options(options: Mapping[str, Any]) -> bool:
+    cache = options.get("reduced_real_cache")
+    if isinstance(cache, Mapping):
+        return _strict_vapor_gate_from_cache_config(cache)
+    return options.get("strict_vapor_gate") is True
+
+
+def _strict_vapor_gate_from_cache_config(
+    cache_config: Mapping[str, Any] | None,
+) -> bool:
+    return (
+        isinstance(cache_config, Mapping)
+        and cache_config.get("strict_vapor_gate") is True
+    )
 
 
 def _apply_epoch_result(journal: dict[str, Any], epoch_result: Mapping[str, Any]) -> None:

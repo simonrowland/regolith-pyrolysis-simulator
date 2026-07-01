@@ -9,6 +9,7 @@ import copy
 import csv
 import inspect
 import json
+import logging
 import math
 from pathlib import Path
 import tempfile
@@ -55,7 +56,7 @@ from simulator.optimize.profiles import (
     validate_profile,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.strategy import (
     Candidate,
     MorrisScreenStrategy,
@@ -73,6 +74,7 @@ from simulator.optimize.strategy.staged import (
 )
 
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
+_LOGGER = logging.getLogger(__name__)
 STRATEGY_CLASS_NAMES = {
     "random": "RandomStrategy",
     "screen": "MorrisScreenStrategy",
@@ -444,11 +446,19 @@ def run(
                 _assert_honest_result(scored, definitions)
                 light_scored = _strip_heavy_result(scored)
                 if scored.eval_spec is not None:
-                    store.store(
-                        scored.eval_spec,
-                        light_scored,
-                        created_at=datetime.now(UTC).isoformat(),
-                    )
+                    try:
+                        store.store(
+                            scored.eval_spec,
+                            light_scored,
+                            created_at=datetime.now(UTC).isoformat(),
+                        )
+                    except ResultStoreWriteRejected as exc:
+                        _LOGGER.warning(
+                            "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                            scored.candidate_id,
+                            scored.cache_key,
+                            ",".join(exc.reasons),
+                        )
                 record = _to_record(candidate, scored, cache_hit=cache_hit)
                 records.append(record)
                 provenance.write(
@@ -672,11 +682,38 @@ def run_certify(
             f"failure_counts={dict({category: 1})}"
         )
     record = _to_record(candidate, scored, cache_hit=False)
-    store.store(
-        scored.eval_spec,
-        _strip_heavy_result(scored),
-        created_at=datetime.now(UTC).isoformat(),
-    )
+    # Grind-infra sweep Q2 (completeness): the certify store sink must degrade
+    # like the main loop — an inadmissible-but-recordable row (e.g. feasible+OOD)
+    # is rejected by the admission gate; skip the cache write and keep the
+    # certified result flowing rather than aborting the certification.
+    try:
+        store.store(
+            scored.eval_spec,
+            _strip_heavy_result(scored),
+            created_at=datetime.now(UTC).isoformat(),
+        )
+    except ResultStoreWriteRejected as exc:
+        _LOGGER.warning(
+            "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+            scored.candidate_id,
+            scored.cache_key,
+            ",".join(exc.reasons),
+        )
+    # Grind-infra sweep Finding 4: run_certify() previously labelled the
+    # provenance artifact but never wrote it (unlike run() at the loop sink),
+    # so certified/cached results pointed at a non-existent audit trail. Emit
+    # the certification record in the same JSONL format run() uses.
+    provenance_path = out / "provenance.jsonl"
+    with provenance_path.open("w", encoding="utf-8") as provenance:
+        provenance.write(
+            json.dumps(
+                _record_payload(record, active_schema, resolved_profile),
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            )
+            + "\n"
+        )
     artifacts = _write_artifacts(
         out,
         profile=resolved_profile,
@@ -689,7 +726,7 @@ def run_certify(
         schema=active_schema,
         failure_counts=MappingProxyType({}),
     )
-    artifacts["provenance"] = out / "provenance.jsonl"
+    artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
     artifacts["certify_source_store"] = str(Path(source_store))
     artifacts["certify_cache_key"] = certify_cache_key
@@ -910,11 +947,23 @@ def _run_exact_certification(
         if scored.eval_spec is not None:
             replay_code_version = scored.eval_spec.code_version
             replay_data_digests = scored.eval_spec.data_digests
-            store.store(
-                scored.eval_spec,
-                _strip_heavy_result(scored),
-                created_at=datetime.now(UTC).isoformat(),
-            )
+            # Grind-infra sweep Q2 (completeness): two-phase certification store
+            # sink degrades like the main loop — skip the cache write for an
+            # inadmissible row, keep certifying the rest (the record was already
+            # appended for the leaderboard).
+            try:
+                store.store(
+                    scored.eval_spec,
+                    _strip_heavy_result(scored),
+                    created_at=datetime.now(UTC).isoformat(),
+                )
+            except ResultStoreWriteRejected as exc:
+                _LOGGER.warning(
+                    "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                    scored.candidate_id,
+                    scored.cache_key,
+                    ",".join(exc.reasons),
+                )
 
     certified_feasible = tuple(record for record in certified_records if record.feasible)
     if not certified_feasible:
@@ -1362,11 +1411,21 @@ def _ensure_staged_prefix_replay(
         return fresh
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
-    store.store(
-        prefix_spec,
-        light_fresh,
-        created_at=datetime.now(UTC).isoformat(),
-    )
+    # Grind-infra sweep Q2 (completeness): unlike the main/certify sinks, the
+    # staged prefix REQUIRES the row to be cached (it is read back immediately
+    # for replay-equality), so an admission rejection cannot be silently skipped
+    # — surface it loudly with the reason instead of a bare ResultStoreWriteRejected.
+    try:
+        store.store(
+            prefix_spec,
+            light_fresh,
+            created_at=datetime.now(UTC).isoformat(),
+        )
+    except ResultStoreWriteRejected as exc:
+        raise StagedBeamStateError(
+            f"staged prefix cache write rejected: {prefix_key} "
+            f"reasons={','.join(exc.reasons)}"
+        ) from exc
     cached = store.lookup(prefix_spec)
     if cached is None:
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")

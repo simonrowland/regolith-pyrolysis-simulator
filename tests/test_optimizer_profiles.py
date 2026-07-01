@@ -39,6 +39,28 @@ def test_reduced_real_cache_accepts_cache_tier_ceiling() -> None:
     )
 
 
+def test_reduced_real_cache_accepts_authorized_backend_version() -> None:
+    """Grind-infra sweep Finding 3: every generated real grind profile carries
+    ``authorized_backend_version`` (the cached-real version-authority key that
+    backends.py consumes), but the validator allowlist omitted it — so all real
+    profiles failed load with "unknown run.reduced_real_cache key". The key must
+    validate."""
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"]["backend_name"] = "cached-real"
+    profile["run"]["reduced_real_cache"] = {
+        "db_path": "data/reduced-real.db",
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "AlphaMELTSBackend",
+        "authorized_backend_version": "alphaMELTS subprocess 2.3.1",
+        "cache_tier_ceiling": "cached_exact",
+    }
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+    assert (
+        validated["run"]["reduced_real_cache"]["authorized_backend_version"]
+        == "alphaMELTS subprocess 2.3.1"
+    )
+
+
 def test_reduced_real_cache_rejects_unknown_cache_tier_ceiling() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"]["backend_name"] = "cached-real"

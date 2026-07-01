@@ -156,6 +156,10 @@ def _objectives(oxygen: float = 10.0, energy: float = 2.0) -> ObjectiveVector:
     )
 
 
+def _closed_mass_closure() -> dict[str, object]:
+    return {"status": "closed", "mass_balance_error_pct": 0.0}
+
+
 def _spec(
     patch: RecipePatch,
     feedstock: str = FEEDSTOCK,
@@ -196,10 +200,20 @@ def _scored(
         feasibility_margins={"delivered_stream_purity": margin or _margin()},
         run_reference=RunReference(
             status="ok",
-            trace={"backend_status": "diagnostic_stub", "heavy": "trace"}
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+                "heavy": "trace",
+            }
             if trace is None
             else trace,
-            product_summary={"oxygen_kg": oxygen_value},
+            product_summary={
+                "oxygen_kg": oxygen_value,
+                "mass_closure": _closed_mass_closure(),
+            },
+            backend_status="ok",
+            backend_authoritative=True,
         ),
     )
 
@@ -257,8 +271,10 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
                 status=fresh.run_reference.status,
                 error_message=fresh.run_reference.error_message,
                 reason=fresh.run_reference.reason,
-                trace={"backend_status": "diagnostic_stub"},
+                trace={"backend_status": "ok", "backend_authoritative": True},
                 product_summary=fresh.run_reference.product_summary,
+                backend_status="ok",
+                backend_authoritative=True,
             ),
     )
     assert_prefix_replay_equal(cached, fresh)
@@ -1197,7 +1213,9 @@ def test_staged_result_honesty_and_light_results(tmp_path) -> None:
     )
     candidate = strategy.ask(1)[0]
     strategy.tell([(candidate, _scored(candidate.patch, candidate_id=candidate.id, trace={"large": "trace"}))])
-    assert strategy.results[0][1].run_reference.trace == {"backend_status": "diagnostic_stub"}
+    stored_reference = strategy.results[0][1].run_reference
+    assert stored_reference.trace == {"backend_status": "ok"}
+    assert stored_reference.backend_authoritative is True
 
 
 def test_staged_strip_trace_preserves_real_backend_provenance(tmp_path) -> None:

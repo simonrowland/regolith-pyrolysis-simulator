@@ -248,6 +248,50 @@ def _write_result_store(
         )
 
 
+def _write_pt1_store(
+    db_path: Path,
+    *,
+    source: str = "vaporock",
+) -> None:
+    key = {
+        "schema_version": "pt1-test-key",
+        "corpus_version": "test-corpus",
+        "data_digests": {},
+        "vapor_pressure_provider": {
+            "resolved_provider_id": source,
+            "authoritative_provider_id": source,
+        },
+    }
+    payload = {
+        "equilibrium_result": {},
+        "last_vapor_pressures_source": {"Na": source, "SiO": source},
+    }
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            """
+            CREATE TABLE reduced_real_equilibrium_payloads (
+                key_hash TEXT PRIMARY KEY,
+                artifact TEXT NOT NULL,
+                key_bytes BLOB NOT NULL,
+                payload_bytes BLOB NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO reduced_real_equilibrium_payloads
+                (key_hash, artifact, key_bytes, payload_bytes)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                "pt1-row-1",
+                "equilibrium_post_record",
+                json.dumps(key, sort_keys=True).encode("utf-8"),
+                json.dumps(payload, sort_keys=True).encode("utf-8"),
+            ),
+        )
+
+
 def test_strict_vapor_config_rejects_fallback_enabled() -> None:
     with pytest.raises(GrindSourceGateError, match="allow_fallback_vapor"):
         assert_strict_vapor_config(
@@ -314,6 +358,43 @@ def test_strict_vapor_result_store_rejects_kernel_fallback_key(
 
     with pytest.raises(GrindSourceGateError, match="kernel_fallback_used"):
         assert_strict_vapor_result_store(db_path)
+
+
+def test_strict_vapor_result_store_pt1_strict_off_is_explicit_noop(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cache.sqlite"
+    _write_pt1_store(db_path, source="vaporock")
+
+    summary = assert_strict_vapor_result_store(db_path, strict_vapor_gate=False)
+
+    assert summary == {
+        "rows": 1,
+        "vapor_active_rows": 0,
+        "source_reports": 0,
+        "pt1_noop_rows": 1,
+    }
+
+
+def test_strict_vapor_result_store_rejects_unrecognized_schema(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cache.sqlite"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("CREATE TABLE unrelated (id TEXT PRIMARY KEY)")
+
+    with pytest.raises(GrindSourceGateError, match="unrecognized cache schema"):
+        assert_strict_vapor_result_store(db_path)
+
+
+def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cache.sqlite"
+    _write_pt1_store(db_path, source="vaporock")
+
+    with pytest.raises(GrindSourceGateError, match="vaporock"):
+        assert_strict_vapor_result_store(db_path, strict_vapor_gate=True)
 
 
 def test_strict_vapor_result_payload_rejects_nested_vaporock_provider_id() -> None:

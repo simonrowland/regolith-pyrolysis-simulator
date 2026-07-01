@@ -870,6 +870,59 @@ def test_rerun_epoch_removes_stale_job_output_dir(
     assert not (stale_out / "cache.sqlite").exists()
 
 
+def test_epoch_child_cache_gate_receives_profile_strict_vapor_flag(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest_path = _manifest_file(tmp_path)
+    manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    profile_path = Path(str(manifest_payload["jobs"][0]["profile"]))
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile["run"]["reduced_real_cache"]["strict_vapor_gate"] = True
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+    manifest = epoch_grind.load_manifest(manifest_path)
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+    calls: list[dict[str, object]] = []
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "seed_job_cache",
+        lambda *args, **kwargs: {"seed_rows": 0},
+    )
+    monkeypatch.setattr(
+        epoch_grind,
+        "_run_child",
+        lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
+    )
+
+    def record_cache_gate(db_path: Path, **kwargs: object) -> dict[str, int]:
+        calls.append({"db_path": db_path, **kwargs})
+        return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
+
+    monkeypatch.setattr(
+        epoch_grind,
+        "assert_strict_vapor_result_store",
+        record_cache_gate,
+    )
+
+    epoch_grind.run_epoch(manifest, manifest.jobs, config, epoch_index=1)
+
+    assert calls == [
+        {
+            "db_path": manifest.jobs[0].out / "epoch-0001" / "cache.sqlite",
+            "context": "job-a:cache.sqlite",
+            "strict_vapor_gate": True,
+        }
+    ]
+
+
 def test_seed_job_cache_removes_stale_sqlite_sidecars(tmp_path: Path) -> None:
     base = tmp_path / "base.sqlite"
     shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"

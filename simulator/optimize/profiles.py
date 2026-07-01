@@ -140,6 +140,12 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "db_path",
     "miss_policy",
     "authorized_backend_name",
+    # Provenance/version-authority key consumed by the cached-real runtime
+    # (backends.py cached-real config). Added to the generated real profiles +
+    # runtime by 7c490d4/8d09d4f but omitted from this validator allowlist —
+    # every real grind profile carries it, so its omission fails load_profile()
+    # with "unknown run.reduced_real_cache key" (grind-infra sweep Finding 3).
+    "authorized_backend_version",
     "cache_tier_ceiling",
     "read_only_base_db_path",
 })

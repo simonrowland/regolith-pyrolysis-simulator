@@ -67,6 +67,10 @@ def _margin() -> GateMargin:
     )
 
 
+def _closed_mass_closure() -> dict[str, object]:
+    return {"status": "closed", "mass_balance_error_pct": 0.0}
+
+
 def _scored(spec: EvalSpec, *, candidate_id: str = "candidate-certify") -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate_id,
@@ -83,6 +87,8 @@ def _scored(spec: EvalSpec, *, candidate_id: str = "candidate-certify") -> Score
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
+            trace={"snapshots": [{"mass_balance_error_pct": 0.0}]},
+            product_summary={"mass_closure": _closed_mass_closure()},
             backend_name="alphamelts",
             backend_status="ok",
             backend_authoritative=True,

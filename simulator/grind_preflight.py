@@ -12,6 +12,7 @@ from typing import Any
 
 APPROVED_LIVE_VAPOR_SOURCES = frozenset({"builtin_authoritative"})
 VAPOR_ACTIVE_CAMPAIGN_PREFIXES = ("C2A", "C2B", "C4")
+_PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS = frozenset(
     {
         "lunar_highland",
@@ -437,6 +438,7 @@ def assert_strict_vapor_result_store(
     *,
     context: str | None = None,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
+    strict_vapor_gate: bool = False,
 ) -> dict[str, int]:
     if not db_path.exists():
         return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
@@ -444,11 +446,19 @@ def assert_strict_vapor_result_store(
     context = context or str(db_path)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
-        table = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'results'"
-        ).fetchone()
-        if table is None:
-            return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
+        table = _sqlite_table_exists(conn, "results")
+        if not table:
+            if _sqlite_table_exists(conn, _PT1_EQUILIBRIUM_TABLE):
+                return _strict_vapor_pt1_store_summary(
+                    conn,
+                    context=context,
+                    approved_sources=approved_sources,
+                    strict_vapor_gate=strict_vapor_gate,
+                )
+            raise GrindSourceGateError(
+                f"{context}: unrecognized cache schema; expected results table "
+                f"or {_PT1_EQUILIBRIUM_TABLE} table"
+            )
         columns = {
             str(row["name"])
             for row in conn.execute("PRAGMA table_info(results)").fetchall()
@@ -491,6 +501,61 @@ def assert_strict_vapor_result_store(
             vapor_active_rows += 1
     return {
         "rows": checked_rows,
+        "vapor_active_rows": vapor_active_rows,
+        "source_reports": source_reports,
+    }
+
+
+def _sqlite_table_exists(conn: sqlite3.Connection, name: str) -> bool:
+    return (
+        conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+            (name,),
+        ).fetchone()
+        is not None
+    )
+
+
+def _strict_vapor_pt1_store_summary(
+    conn: sqlite3.Connection,
+    *,
+    context: str,
+    approved_sources: frozenset[str],
+    strict_vapor_gate: bool,
+) -> dict[str, int]:
+    rows = conn.execute(
+        f"""
+        SELECT key_hash, artifact, key_bytes, payload_bytes
+        FROM {_PT1_EQUILIBRIUM_TABLE}
+        """
+    ).fetchall()
+    if not strict_vapor_gate:
+        return {
+            "rows": len(rows),
+            "vapor_active_rows": 0,
+            "source_reports": 0,
+            "pt1_noop_rows": len(rows),
+        }
+
+    vapor_active_rows = 0
+    source_reports = 0
+    for row in rows:
+        row_context = f"{context}:{row['key_hash']}"
+        key = _json_mapping(row["key_bytes"], f"{row_context}.key")
+        payload = _json_mapping(row["payload_bytes"], f"{row_context}.payload")
+        row_summary = assert_strict_vapor_pt1_row(
+            artifact=str(row["artifact"]),
+            key=key,
+            payload=payload,
+            key_hash=str(row["key_hash"]),
+            context=row_context,
+            approved_sources=approved_sources,
+        )
+        source_reports += int(row_summary["source_reports"])
+        if row_summary["vapor_active"]:
+            vapor_active_rows += 1
+    return {
+        "rows": len(rows),
         "vapor_active_rows": vapor_active_rows,
         "source_reports": source_reports,
     }
@@ -654,6 +719,8 @@ def _json_value(raw: Any, context: str) -> Any:
         return None
     if isinstance(raw, (dict, list)):
         return raw
+    if isinstance(raw, (bytes, bytearray, memoryview)):
+        raw = bytes(raw).decode("utf-8")
     try:
         return json.loads(str(raw))
     except json.JSONDecodeError as exc:

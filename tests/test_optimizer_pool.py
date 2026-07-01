@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from concurrent.futures import Future, ProcessPoolExecutor
+from dataclasses import replace
 import json
 import os
 import pickle
@@ -43,6 +44,50 @@ def _restore_thread_env() -> object:
             os.environ.pop(name, None)
         else:
             os.environ[name] = value
+
+
+def test_read_pid_log_drops_recycled_and_dead_pids(tmp_path: Path) -> None:
+    """Grind-infra sweep Finding 5: a tracked child PID that exited and had its
+    number recycled by the OS must NOT be returned for SIGKILL — otherwise the
+    timeout reaper can kill an unrelated process on a shared studio. The PID log
+    records each child's start time; _read_pid_log verifies it against the live
+    process and drops recycled/dead entries."""
+    proc = subprocess.Popen(["sleep", "30"])
+    try:
+        create_time = pool_module._process_create_time(proc.pid)
+        if create_time is None:
+            pytest.skip("psutil create_time unavailable; identity guard inactive")
+        # writer records "pid<TAB>start_time"
+        written = tmp_path / ".child-pids-written"
+        pool_module._append_child_pid(str(written), proc.pid)
+        line = written.read_text(encoding="utf-8").strip()
+        assert "\t" in line and line.split("\t")[0] == str(proc.pid)
+
+        dead_pid = 999_999
+        mixed = tmp_path / ".child-pids"
+        mixed.write_text(
+            f"{proc.pid}\t{create_time:.6f}\n"   # genuine live child -> keep
+            f"{dead_pid}\t{create_time:.6f}\n",  # dead pid -> drop
+            encoding="utf-8",
+        )
+        got = pool_module._read_pid_log(mixed)
+        assert proc.pid in got
+        assert dead_pid not in got
+
+        # Recorded start time no longer matching the live PID (recycled) -> drop.
+        recycled = tmp_path / ".child-pids-recycled"
+        recycled.write_text(
+            f"{proc.pid}\t{create_time + 500.0:.6f}\n", encoding="utf-8"
+        )
+        assert pool_module._read_pid_log(recycled) == ()
+
+        # Legacy bare-PID lines still resolve (unverified backward-compat path).
+        legacy = tmp_path / ".child-pids-legacy"
+        legacy.write_text(f"{proc.pid}\n", encoding="utf-8")
+        assert proc.pid in pool_module._read_pid_log(legacy)
+    finally:
+        proc.kill()
+        proc.wait()
 
 
 def _process_pool_probe() -> int:
@@ -197,10 +242,64 @@ def _fake_evaluate(
                 "cwd": os.getcwd(),
                 "output_dir": str(out),
                 "thread_env": {name: os.environ.get(name) for name in THREAD_ENV_VARS},
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
             },
-            product_summary={"oxygen_kg": float(value)},
+            product_summary={
+                "oxygen_kg": float(value),
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_status="ok",
+            backend_authoritative=True,
         ),
         notes=("fake",),
+    )
+
+
+def _store_rejected_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    result = _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+    value = int(patch.to_nested()["test"]["value"])
+    if value != 13:
+        return result
+    assert result.run_reference is not None
+    rejected_reference = RunReference(
+        status="ok",
+        trace={
+            "backend_status": "out_of_domain",
+            "backend_authoritative": True,
+            "backend_status_reason": "earned_terminal_rump_out_of_domain",
+            "snapshots": [{"mass_balance_error_pct": 0.0}],
+        },
+        product_summary=result.run_reference.product_summary,
+        backend_status="out_of_domain",
+        backend_authoritative=True,
+        backend_status_reason="earned_terminal_rump_out_of_domain",
+    )
+    return replace(
+        result,
+        run_reference=rejected_reference,
+        notes=("backend_status=out_of_domain",),
     )
 
 
@@ -1316,6 +1415,38 @@ def test_parent_process_is_single_result_store_writer(tmp_path: Path) -> None:
         for result in persisted
         if result is not None
     } == {result.candidate_id: deterministic_result_view(result) for result in results}
+
+
+def test_pool_store_rejection_warns_and_continues(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version="pool-test-code",
+        current_data_digests=_DATA_DIGESTS,
+    )
+    requests = [
+        PoolEvaluationRequest(_patch(13), "lunar_mare_low_ti", "fast", candidate_id="reject"),
+        PoolEvaluationRequest(_patch(14), "lunar_mare_low_ti", "fast", candidate_id="store"),
+    ]
+    caplog.set_level("WARNING", logger="simulator.optimize.pool")
+
+    results = evaluate_batch(
+        requests,
+        profile=_profile(),
+        max_workers=2,
+        output_root=tmp_path / "pool",
+        results_store=store,
+        evaluate_fn=_store_rejected_evaluate,
+        created_at="2026-05-31T00:00:00+00:00",
+    )
+
+    assert [result.candidate_id for result in results] == ["reject", "store"]
+    assert store.lookup(results[0].eval_spec) is None
+    assert store.lookup(results[1].eval_spec) is not None
+    assert "result_store_write_rejected" in caplog.text
+    assert "out_of_domain_provenance" in caplog.text
 
 
 def test_pool_duplicate_cache_key_policy(tmp_path: Path) -> None:

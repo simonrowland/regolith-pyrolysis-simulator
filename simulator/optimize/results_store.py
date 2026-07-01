@@ -645,8 +645,8 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
     reasons: list[str] = []
     backend_status = _artifact_backend_status(scored_result)
     backend_authoritative = _artifact_backend_authoritative(scored_result)
-    if backend_status == "ok" and backend_authoritative is False:
-        reasons.append("backend_not_authoritative")
+    if backend_authoritative is not True:
+        reasons.append("non_authoritative_backend")
     closure_rejection = _mass_balance_closure_rejection(scored_result)
     if closure_rejection is not None:
         reasons.append(closure_rejection)
@@ -705,7 +705,10 @@ def _has_carrier_key(carrier: Any, key: str) -> bool:
 
 
 def _mass_balance_closure_rejection(scored_result: ScoredResult) -> str | None:
-    for payload in _iter_mass_balance_payloads(scored_result):
+    payloads = _iter_mass_balance_payloads(scored_result)
+    if not payloads:
+        return "no_mass_balance_proof"
+    for payload in payloads:
         rejection = _mass_balance_payload_rejection(payload)
         if rejection is not None:
             return rejection
