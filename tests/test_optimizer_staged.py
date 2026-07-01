@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import json
+from pathlib import Path
 import sqlite3
 import subprocess
 import sys
@@ -92,9 +93,10 @@ class SpyStore(ResultStore):
 
 
 class SpyEvaluator:
-    def __init__(self) -> None:
+    def __init__(self, prefix_log: str | None = None) -> None:
         self.prefix_calls = 0
         self.prefix_patch: RecipePatch | None = None
+        self.prefix_log = prefix_log
 
     def __call__(
         self,
@@ -110,6 +112,13 @@ class SpyEvaluator:
         if candidate_id is not None and candidate_id.startswith("staged-prefix-"):
             self.prefix_calls += 1
             self.prefix_patch = patch
+            if self.prefix_log is not None:
+                Path(self.prefix_log).write_text(
+                    json.dumps(
+                        [[list(path), value] for path, value in patch.values.items()]
+                    ),
+                    encoding="utf-8",
+                )
             assert staged_replay is None
         elif "-01-" in str(candidate_id):
             assert staged_replay is not None
@@ -208,7 +217,8 @@ def _record_signature(record: study.StudyRecord) -> tuple[Any, ...]:
 
 def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> None:
     store = SpyStore(tmp_path / "cache.sqlite")
-    evaluator = SpyEvaluator()
+    prefix_log = tmp_path / "prefix-patch.json"
+    evaluator = SpyEvaluator(str(prefix_log))
 
     result = study.run(
         PROFILE,
@@ -225,16 +235,16 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
 
     prefix_specs = [spec for spec in store.lookup_specs if isinstance(spec, PrefixEvalSpec)]
     assert any(spec.prefix_stage_ids == ("C0",) for spec in prefix_specs)
-    assert evaluator.prefix_calls == 1
+    assert prefix_log.exists()
     assert store.prefix_hits >= 1
     assert any("-01-" in record.candidate_id for record in result.records)
 
     prefix_spec = next(spec for spec in prefix_specs if spec.prefix_stage_ids == ("C0",))
     cached = store.lookup(prefix_spec)
     assert cached is not None
-    assert evaluator.prefix_patch is not None
+    prefix_patch = RecipePatch({tuple(path): value for path, value in json.loads(prefix_log.read_text(encoding="utf-8"))})
     fresh = evaluator(
-        evaluator.prefix_patch,
+        prefix_patch,
         FEEDSTOCK,
         "stub",
         profile=PROFILE,

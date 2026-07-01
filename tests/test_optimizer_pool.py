@@ -252,7 +252,7 @@ def _slow_or_abort_evaluate(
 ) -> ScoredResult:
     value = int(patch.to_nested()["test"]["value"])
     if value == 50:
-        time.sleep(5.0)
+        time.sleep(20.0)
     if value == 99:
         raise EngineBugAbort(
             f"abort for candidate {candidate_id}",
@@ -305,7 +305,8 @@ def _grandchild_then_hang_evaluate(
                 "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
             ),
             str(survivor),
-        ]
+        ],
+        start_new_session=True,
     )
     time.sleep(5.0)
     return _fake_evaluate(
@@ -625,6 +626,108 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
     assert [result.feasible for result in results[1:]] == [True, True]
 
 
+def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    captured_extra_pids: list[tuple[int, ...]] = []
+
+    class FakeExecutor:
+        def __init__(self, *, max_workers: int | None, initializer: object) -> None:
+            self.max_workers = max_workers
+            self.initializer = initializer
+            self._processes: dict[int, object] = {}
+
+        def submit(self, fn: object, task: object, evaluate_fn: object) -> Future[object]:
+            log_path = Path(task.output_dir) / ".child-pids"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            if task.candidate_id == "slow":
+                log_path.write_text("1111\n", encoding="utf-8")
+                return Future()
+            if task.candidate_id == "requeued":
+                log_path.write_text("2222\n", encoding="utf-8")
+                return Future()
+            future: Future[object] = Future()
+            future.set_result(fn(task, evaluate_fn))
+            return future
+
+        def shutdown(self, *, wait: bool, cancel_futures: bool) -> None:
+            return None
+
+    def fake_wait(
+        futures: object, *, return_when: object, timeout: object = None
+    ) -> tuple[set[Future[object]], set[Future[object]]]:
+        del return_when
+        if timeout:
+            time.sleep(float(timeout))
+        return set(), set()
+
+    def fake_abort_executor(
+        executor: object,
+        futures: object,
+        abort: BaseException,
+        *,
+        extra_pids: tuple[int, ...] = (),
+    ) -> bool:
+        del executor, futures, abort
+        captured_extra_pids.append(tuple(extra_pids))
+        raise RuntimeError("stop after first abort")
+
+    monkeypatch.setattr(pool_module, "ProcessPoolExecutor", FakeExecutor)
+    monkeypatch.setattr(pool_module, "wait", fake_wait)
+    monkeypatch.setattr(pool_module, "_best_effort_abort_executor", fake_abort_executor)
+
+    with pytest.raises(RuntimeError, match="stop after first abort"):
+        evaluate_batch(
+            [
+                PoolEvaluationRequest(
+                    _patch(50), "lunar_mare_low_ti", "fast", candidate_id="slow"
+                ),
+                PoolEvaluationRequest(
+                    _patch(51), "lunar_mare_low_ti", "fast", candidate_id="requeued"
+                ),
+            ],
+            profile=_profile(),
+            max_workers=2,
+            output_root=tmp_path,
+            evaluate_fn=_slow_or_abort_evaluate,
+            per_eval_timeout_seconds=0.01,
+        )
+
+    assert captured_extra_pids
+    assert {1111, 2222}.issubset(set(captured_extra_pids[0]))
+
+
+@pytest.mark.timeout(20)
+def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def unavailable_executor(*, max_workers: int | None, initializer: object) -> object:
+        raise PermissionError("sandbox denies process pool")
+
+    monkeypatch.setattr(pool_module, "ProcessPoolExecutor", unavailable_executor)
+
+    results = evaluate_batch(
+        [
+            PoolEvaluationRequest(_patch(50), "lunar_mare_low_ti", "fast", candidate_id="slow"),
+            PoolEvaluationRequest(_patch(2), "lunar_mare_low_ti", "fast", candidate_id="fast"),
+        ],
+        profile=_profile(),
+        max_workers=2,
+        output_root=tmp_path / "pool",
+        evaluate_fn=_slow_or_abort_evaluate,
+        per_eval_timeout_seconds=5.0,
+    )
+
+    assert [result.candidate_id for result in results] == ["slow", "fast"]
+    assert results[0].failure_category is FailureCategory.TIMEOUT
+    assert results[0].run_reference is not None
+    assert results[0].run_reference.reason == "optimizer_eval_timeout"
+    assert results[1].feasible is True
+    assert not (tmp_path / "pool" / "eval-000000" / "artifact.txt").exists()
+
+
 @pytest.mark.timeout(10)
 def test_process_pool_timeout_kills_worker_process_group(
     tmp_path: Path,
@@ -654,12 +757,14 @@ def test_process_pool_timeout_kills_worker_process_group(
 @pytest.mark.timeout(10)
 def test_pool_process_termination_kills_child_process_group(tmp_path: Path) -> None:
     survivor = tmp_path / "pool-grandchild-survived.txt"
+    child_pid_log = tmp_path / "pool-grandchild.pid"
     script = (
         "import subprocess, sys, time; "
-        "subprocess.Popen([sys.executable, '-c', "
+        "child = subprocess.Popen([sys.executable, '-c', "
         "\"import pathlib, sys, time; time.sleep(1.0); "
         "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')\", "
-        f"{str(survivor)!r}]); "
+        f"{str(survivor)!r}], start_new_session=True); "
+        f"open({str(child_pid_log)!r}, 'w', encoding='utf-8').write(str(child.pid)); "
         "time.sleep(5.0)"
     )
     popen = subprocess.Popen([sys.executable, "-c", script], start_new_session=True)
@@ -682,8 +787,11 @@ def test_pool_process_termination_kills_child_process_group(tmp_path: Path) -> N
         def kill(self) -> None:
             popen.kill()
 
-    time.sleep(0.1)
-    pool_module._terminate_pool_process(ProcessAdapter())
+    deadline = time.monotonic() + 2.0
+    while not child_pid_log.exists() and time.monotonic() < deadline:
+        time.sleep(0.05)
+    child_pid = int(child_pid_log.read_text(encoding="utf-8"))
+    pool_module._terminate_pool_process(ProcessAdapter(), extra_pids=(child_pid,))
     time.sleep(1.2)
 
     assert popen.poll() is not None

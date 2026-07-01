@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 import subprocess
 import sys
+import time
 from types import SimpleNamespace
 from typing import Any, Mapping
 
@@ -340,6 +341,20 @@ def _evaluator(
     return evaluate_patch
 
 
+def _slow_first_then_ok_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    if _sequence(candidate_id) == 0:
+        time.sleep(20.0)
+    return _evaluator()(patch, feedstock, fidelity, profile=profile, candidate_id=candidate_id, **kwargs)
+
+
 class _SingleCandidateStrategy:
     name = "single"
     seed = 0
@@ -604,11 +619,12 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
         "sio_window",
         "ramp_rate_C_per_hr",
     )
-    observed_paths: list[set[tuple[str, ...]]] = []
+    observed_log = tmp_path / "observed-paths.jsonl"
     base_evaluator = _evaluator()
 
     def evaluator(patch: RecipePatch, *args: Any, **kwargs: Any) -> ScoredResult:
-        observed_paths.append(set(patch.values))
+        with observed_log.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps([list(path) for path in patch.values]) + "\n")
         return base_evaluator(patch, *args, **kwargs)
 
     study.run(
@@ -624,6 +640,10 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
         pinned_paths=["C2A_staged.stages.sio_window.target_C"],
     )
 
+    observed_paths = [
+        {tuple(path) for path in json.loads(line)}
+        for line in observed_log.read_text(encoding="utf-8").splitlines()
+    ]
     assert observed_paths
     assert profile_pin not in observed_paths[0]
     assert cli_pin not in observed_paths[0]
@@ -1442,6 +1462,32 @@ def test_out_of_domain_candidate_is_stored_and_study_continues(tmp_path) -> None
     assert "snapshots" not in stored_trace
 
 
+@pytest.mark.timeout(25)
+def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        2,
+        tmp_path,
+        seed=7,
+        evaluator=_slow_first_then_ok_evaluator,
+        per_eval_timeout_seconds=2.0,
+    )
+
+    provenance = _read_provenance(tmp_path)
+    assert result.winner.candidate_id == "random-7-000001"
+    assert [row["candidate_id"] for row in provenance] == [
+        "random-7-000000",
+        "random-7-000001",
+    ]
+    assert provenance[0]["failure_category"] == "timeout"
+    assert provenance[0]["status"] == "timeout"
+    assert provenance[1]["status"] == "ok"
+
+
 def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:
     with pytest.raises(study.StudyNoFeasibleError):
         study.run(
@@ -1764,7 +1810,7 @@ def test_infeasible_nonfinite_margin_aborts_without_pareto(tmp_path) -> None:
 
 
 def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> None:
-    produced: list[ScoredResult] = []
+    produced_status = tmp_path / "produced-status.txt"
 
     def unmarked_infeasible(
         patch: RecipePatch,
@@ -1784,7 +1830,7 @@ def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> Non
             feasibility_margins={},
             run_reference=RunReference(status="ok"),
         )
-        produced.append(result)
+        produced_status.write_text(study._status(result), encoding="utf-8")
         return result
 
     with pytest.raises(study.StudyAbort, match="eval_spec/cache_key"):
@@ -1799,7 +1845,7 @@ def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> Non
             evaluator=unmarked_infeasible,
         )
 
-    assert produced and study._status(produced[0]) == "ok"
+    assert produced_status.read_text(encoding="utf-8") == "ok"
     assert not (tmp_path / "pareto.json").exists()
     assert not _read_provenance(tmp_path)
     assert not _stored_rows(tmp_path)

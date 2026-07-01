@@ -45,6 +45,7 @@ from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
     evaluate_batch,
+    evaluate_request_supervised,
     resolve_eval_timeout_seconds,
 )
 from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
@@ -587,6 +588,7 @@ def run_certify(
     evaluator: EvaluateFn = evaluate,
     schema: RecipeSchema | None = None,
     pinned_paths: Sequence[str] | None = None,
+    per_eval_timeout_seconds: float | None = None,
 ) -> StudyResult:
     """Re-evaluate one stored optimizer result with exact live-fill certification."""
 
@@ -600,6 +602,7 @@ def run_certify(
         budget=1,
         out_dir=out_dir,
         seed=0,
+        per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
     try:
         resolved_profile = resolve_profile(
@@ -646,7 +649,7 @@ def run_certify(
     )
     patch = RecipePatch.from_nested(dict(stored.eval_spec.runtime_campaign_overrides))
     candidate = Candidate(id=stored.candidate_id, patch=patch)
-    scored = _evaluate_one(
+    scored = _evaluate_one_supervised(
         candidate,
         profile=certify_profile,
         feedstock=config.feedstock,
@@ -655,8 +658,19 @@ def run_certify(
         evaluator=evaluator,
         schema=active_schema,
         constraints=active_constraints,
+        per_eval_timeout_seconds=config.per_eval_timeout_seconds,
     )
     _assert_honest_result(scored, definitions)
+    if scored.eval_spec is None:
+        category = (
+            scored.failure_category.value
+            if scored.failure_category is not None
+            else "missing_eval_spec"
+        )
+        raise StudyNoFeasibleError(
+            "certification candidate failed; "
+            f"failure_counts={dict({category: 1})}"
+        )
     record = _to_record(candidate, scored, cache_hit=False)
     store.store(
         scored.eval_spec,
@@ -1188,52 +1202,89 @@ def _evaluate_candidates(
                 store=store,
                 definitions=definitions,
                 prefix_replay_cache=prefix_replay_cache,
+                per_eval_timeout_seconds=per_eval_timeout_seconds,
             )
             if prefix is not None:
+                if prefix.eval_spec is None:
+                    results[index] = (
+                        candidate,
+                        replace(prefix, candidate_id=candidate.id),
+                        False,
+                    )
+                    continue
                 staged_prefixes[candidate.id] = prefix
             misses.append((index, candidate))
         else:
             results[index] = (candidate, cached, True)
 
     if misses:
-        if parallel == 1 or any(_is_staged_candidate(candidate) for _, candidate in misses):
-            for index, candidate in misses:
-                scored = _evaluate_one(
-                    candidate,
-                    profile=profile,
-                    feedstock=feedstock,
-                    fidelity=fidelity,
-                    out_dir=out_dir,
-                    evaluator=evaluator,
-                    schema=schema,
-                    constraints=constraints,
-                    staged_prefix=staged_prefixes.get(candidate.id),
+        requests: list[PoolEvaluationRequest] = []
+        for _, candidate in misses:
+            call_patch = candidate.patch
+            evaluator_kwargs: dict[str, Any] = {}
+            staged_prefix = staged_prefixes.get(candidate.id)
+            if staged_prefix is not None:
+                stage_patch = _stage_patch_from_metadata(candidate, schema)
+                if stage_patch is None:
+                    raise StagedReplayViolation(
+                        f"staged candidate {candidate.id!r} missing stage patch for replay"
+                    )
+                if not _evaluator_accepts_staged_replay(evaluator):
+                    raise StagedReplayViolation(
+                        f"evaluator {evaluator!r} does not support explicit staged replay"
+                    )
+                evaluator_kwargs["staged_replay"] = StagedReplay(
+                    prefix_result=staged_prefix,
+                    stage_id=(
+                        candidate.metadata.get("stage_id")
+                        if isinstance(candidate.metadata.get("stage_id"), str)
+                        else None
+                    ),
+                    stage_patch=stage_patch,
                 )
-                results[index] = (candidate, scored, False)
-        else:
-            requests = [
+                call_patch = stage_patch
+            requests.append(
                 PoolEvaluationRequest(
-                    candidate.patch,
+                    call_patch,
                     feedstock,
                     fidelity,
                     profile=profile,
                     candidate_id=candidate.id,
                     output_dir=out_dir / "worker-output" / candidate.id,
+                    evaluator_kwargs=evaluator_kwargs,
                 )
-                for _, candidate in misses
-            ]
-            batch = evaluate_batch(
-                requests,
-                profile=profile,
-                max_workers=parallel,
-                output_root=out_dir / "worker-output",
-                evaluate_fn=evaluator,
-                schema=schema,
-                constraints=constraints,
-                per_eval_timeout_seconds=per_eval_timeout_seconds,
             )
-            for (index, candidate), scored in zip(misses, batch):
-                results[index] = (candidate, _with_candidate_id(scored, candidate.id), False)
+        batch = evaluate_batch(
+            requests,
+            profile=profile,
+            max_workers=parallel,
+            output_root=out_dir / "worker-output",
+            evaluate_fn=evaluator,
+            schema=schema,
+            constraints=constraints,
+            per_eval_timeout_seconds=per_eval_timeout_seconds,
+        )
+        for (index, candidate), scored in zip(misses, batch):
+            scored = _with_candidate_id(scored, candidate.id)
+            staged_prefix = staged_prefixes.get(candidate.id)
+            if staged_prefix is not None and scored.eval_spec is not None:
+                try:
+                    spec, _ = _build_eval_inputs(
+                        candidate.patch.validated(schema),
+                        feedstock,
+                        fidelity,
+                        profile,
+                        schema,
+                        constraints=constraints,
+                    )
+                except ProfileValidationError as exc:
+                    if _is_stale_profile_refusal(exc):
+                        scored = _stale_profile_result(candidate.id, str(exc))
+                    else:
+                        raise
+                else:
+                    scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
+            results[index] = (candidate, scored, False)
 
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(candidates):
@@ -1254,6 +1305,7 @@ def _ensure_staged_prefix_replay(
     store: ResultStore,
     definitions: Sequence[ObjectiveDefinition],
     prefix_replay_cache: dict[str, ScoredResult],
+    per_eval_timeout_seconds: float | None,
 ) -> ScoredResult | None:
     if not _is_staged_candidate(candidate):
         return None
@@ -1304,7 +1356,10 @@ def _ensure_staged_prefix_replay(
         evaluator=evaluator,
         schema=schema,
         constraints=constraints,
+        per_eval_timeout_seconds=per_eval_timeout_seconds,
     )
+    if fresh.eval_spec is None:
+        return fresh
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
     store.store(
@@ -1333,22 +1388,30 @@ def _evaluate_prefix_one(
     evaluator: EvaluateFn,
     schema: RecipeSchema,
     constraints: Any,
+    per_eval_timeout_seconds: float | None,
 ) -> ScoredResult:
     prefix_id = f"staged-prefix-{prefix_key[:16]}"
-    scored = _call_evaluator(
-        evaluator,
-        prefix_patch,
-        feedstock,
-        fidelity,
+    scored = evaluate_request_supervised(
+        PoolEvaluationRequest(
+            prefix_patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=prefix_id,
+            output_dir=out_dir / "evals" / candidate.id / "prefix",
+        ),
         profile=profile,
-        candidate_id=prefix_id,
+        output_root=out_dir / "evals" / candidate.id / "prefix",
+        evaluate_fn=evaluator,
         schema=schema,
         constraints=constraints,
-        output_dir=out_dir / "evals" / candidate.id / "prefix",
+        per_eval_timeout_seconds=per_eval_timeout_seconds,
     )
     if not isinstance(scored, ScoredResult):
         raise TypeError("evaluator must return ScoredResult")
     scored = _with_candidate_id(scored, prefix_id)
+    if scored.eval_spec is None:
+        return scored
     return replace(scored, eval_spec=prefix_spec, cache_key=prefix_key)
 
 
@@ -1450,6 +1513,80 @@ def _lookup_cached(
     ):
         return None
     return replace(cached, candidate_id=candidate.id)
+
+
+def _evaluate_one_supervised(
+    candidate: Candidate,
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    out_dir: Path,
+    evaluator: EvaluateFn,
+    schema: RecipeSchema,
+    constraints: Any,
+    staged_prefix: ScoredResult | None = None,
+    per_eval_timeout_seconds: float | None,
+) -> ScoredResult:
+    stage_patch = _stage_patch_from_metadata(candidate, schema)
+    call_patch = candidate.patch
+    evaluator_kwargs: dict[str, Any] = {}
+    if staged_prefix is not None:
+        if stage_patch is None:
+            raise StagedReplayViolation(
+                f"staged candidate {candidate.id!r} missing stage patch for replay"
+            )
+        if not _evaluator_accepts_staged_replay(evaluator):
+            raise StagedReplayViolation(
+                f"evaluator {evaluator!r} does not support explicit staged replay"
+            )
+        evaluator_kwargs["staged_replay"] = StagedReplay(
+            prefix_result=staged_prefix,
+            stage_id=(
+                candidate.metadata.get("stage_id")
+                if isinstance(candidate.metadata.get("stage_id"), str)
+                else None
+            ),
+            stage_patch=stage_patch,
+        )
+        call_patch = stage_patch
+
+    scored = evaluate_request_supervised(
+        PoolEvaluationRequest(
+            call_patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate.id,
+            output_dir=out_dir / "evals" / candidate.id,
+            evaluator_kwargs=evaluator_kwargs,
+        ),
+        profile=profile,
+        output_root=out_dir / "evals" / candidate.id,
+        evaluate_fn=evaluator,
+        schema=schema,
+        constraints=constraints,
+        per_eval_timeout_seconds=per_eval_timeout_seconds,
+    )
+    if not isinstance(scored, ScoredResult):
+        raise TypeError("evaluator must return ScoredResult")
+    scored = _with_candidate_id(scored, candidate.id)
+    if staged_prefix is not None and scored.eval_spec is not None:
+        try:
+            spec, _ = _build_eval_inputs(
+                candidate.patch.validated(schema),
+                feedstock,
+                fidelity,
+                profile,
+                schema,
+                constraints=constraints,
+            )
+        except ProfileValidationError as exc:
+            if _is_stale_profile_refusal(exc):
+                return _stale_profile_result(candidate.id, str(exc))
+            raise
+        scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
+    return scored
 
 
 def _evaluate_one(

@@ -43,6 +43,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 certify_cache_key=args.cache_key,
                 out_dir=args.out,
                 pinned_paths=args.pin,
+                per_eval_timeout_seconds=args.per_eval_timeout_seconds,
             )
         else:
             two_phase_certify = None
@@ -114,7 +115,7 @@ def _parser() -> argparse.ArgumentParser:
         type=_positive_float,
         default=None,
         help=(
-            "per-candidate wall-clock timeout for process-pool evals "
+            "per-candidate wall-clock timeout for optimizer evals "
             f"(default {DEFAULT_EVAL_TIMEOUT_SECONDS:g}s; env "
             "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS)"
         ),

@@ -11,11 +11,13 @@ import copy
 import errno
 from functools import lru_cache, partial
 import inspect
+import multiprocessing as mp
 import logging
 import os
 from pathlib import Path
 import pickle
 import signal
+import subprocess
 import tempfile
 import time
 from typing import Any
@@ -31,8 +33,11 @@ from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
     evaluate,
+    _is_stale_profile_refusal,
+    _stale_profile_result,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.worker_runtime import (
@@ -44,14 +49,17 @@ from simulator.optimize.worker_runtime import (
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
 EVAL_TIMEOUT_ENV = "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS"
+_CHILD_PID_LOG_ENV = "REGOLITH_OPTIMIZER_CHILD_PID_LOG"
 # Grounded on repo notes: live AlphaMELTS high eval ~=7 min, prior 900 s
 # cap could be tight for precompute; 45 min is >6x observed and configurable.
 DEFAULT_EVAL_TIMEOUT_SECONDS = 45 * 60
-_INFLIGHT_PER_WORKER = 2
+_INFLIGHT_PER_WORKER = 1
 _POOL_POLL_SECONDS = 0.1
 _WORKER_TERMINATE_GRACE_SECONDS = 5.0
 _LOGGER = logging.getLogger(__name__)
 _POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
+_ORIGINAL_POPEN = subprocess.Popen
+_CHILD_PID_TRACKING_INSTALLED = False
 
 
 @dataclass(frozen=True)
@@ -62,6 +70,7 @@ class PoolEvaluationRequest:
     profile: Mapping[str, Any] | None = None
     candidate_id: str | None = None
     output_dir: str | Path | None = None
+    evaluator_kwargs: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -76,6 +85,8 @@ class _PoolTask:
     stage0_subprocess_required: bool | None = None
     constraints: Any = None
     schema: Any = None
+    evaluator_kwargs: Mapping[str, Any] | None = None
+    child_pid_log: str | None = None
 
 
 class _PoolUnavailableError(RuntimeError):
@@ -109,10 +120,6 @@ def evaluate_batch(
     """
     if not requests:
         return ()
-    _assert_picklable(evaluate_fn, "evaluate_fn")
-    _assert_picklable(constraints, "constraints")
-    _assert_picklable(schema, "schema")
-
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-pool-")
     )
@@ -126,25 +133,40 @@ def evaluate_batch(
         for index, request in enumerate(requests)
     )
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
-    for task in tasks:
-        _assert_picklable(task, _task_label(task))
     if results_store is not None:
         results_store.initialize()
 
-    try:
-        completed = _evaluate_tasks_in_pool(
+    use_serial_supervisor = not _is_picklable(evaluate_fn)
+    if use_serial_supervisor:
+        completed = _evaluate_tasks_serial(
             tasks,
             evaluate_fn,
-            max_workers=max_workers,
             per_eval_timeout_seconds=timeout_seconds,
         )
-    except _PoolUnavailableError as exc:
-        _LOGGER.warning(
-            "process pool unavailable; falling back to serial optimizer "
-            "evaluation: %s",
-            exc.__cause__ or exc,
-        )
-        completed = _evaluate_tasks_serial(tasks, evaluate_fn)
+    else:
+        _assert_picklable(evaluate_fn, "evaluate_fn")
+        _assert_picklable(constraints, "constraints")
+        _assert_picklable(schema, "schema")
+        for task in tasks:
+            _assert_picklable(task, _task_label(task))
+        try:
+            completed = _evaluate_tasks_in_pool(
+                tasks,
+                evaluate_fn,
+                max_workers=max_workers,
+                per_eval_timeout_seconds=timeout_seconds,
+            )
+        except _PoolUnavailableError as exc:
+            _LOGGER.warning(
+                "process pool unavailable; falling back to serial optimizer "
+                "evaluation: %s",
+                exc.__cause__ or exc,
+            )
+            completed = _evaluate_tasks_serial(
+                tasks,
+                evaluate_fn,
+                per_eval_timeout_seconds=timeout_seconds,
+            )
     if results_store is not None:
         timestamp = created_at or datetime.now(UTC).isoformat()
         stored_results: list[ScoredResult] = []
@@ -162,6 +184,41 @@ def evaluate_batch(
 
 
 evaluate_in_process_pool = evaluate_batch
+
+
+def evaluate_request_supervised(
+    request: PoolEvaluationRequest | tuple[Any, ...],
+    *,
+    profile: Mapping[str, Any] | None = None,
+    output_root: str | Path | None = None,
+    evaluate_fn: Callable[..., ScoredResult] = evaluate,
+    constraints: Any = None,
+    schema: Any = None,
+    per_eval_timeout_seconds: float | None = None,
+) -> ScoredResult:
+    """Evaluate one request in a killable child process with a wall deadline."""
+
+    root = Path(output_root) if output_root is not None else Path(
+        tempfile.mkdtemp(prefix="regolith-optimizer-supervised-")
+    )
+    root.mkdir(parents=True, exist_ok=True)
+    task = replace(
+        _task_from_request(0, request, profile=profile, output_root=root),
+        constraints=constraints,
+        schema=schema,
+    )
+    timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
+    outcome = _evaluate_task_supervised(
+        task,
+        evaluate_fn,
+        warm_runtime_spec=_warm_runtime_spec((task,)),
+        per_eval_timeout_seconds=timeout_seconds,
+    )
+    if outcome["kind"] == "abort":
+        abort_payload = dict(outcome["abort"])
+        abort_payload.setdefault("candidate_id", task.candidate_id)
+        raise _rebuild_abort(abort_payload)
+    return outcome["result"]
 
 
 def _evaluate_tasks_in_pool(
@@ -217,7 +274,12 @@ def _evaluate_tasks_in_pool(
                     )
                     pending_abort = abort
                     executor_closed = _best_effort_abort_executor(
-                        executor, futures, abort
+                        executor,
+                        futures,
+                        abort,
+                        extra_pids=_tracked_child_pids_for_tasks(
+                            (task, *tuple(futures.values()))
+                        ),
                     )
                     raise abort from exc
                 if outcome["kind"] == "abort":
@@ -226,7 +288,12 @@ def _evaluate_tasks_in_pool(
                     abort = _rebuild_abort(abort_payload)
                     pending_abort = abort
                     executor_closed = _best_effort_abort_executor(
-                        executor, futures, abort
+                        executor,
+                        futures,
+                        abort,
+                        extra_pids=_tracked_child_pids_for_tasks(
+                            (task, *tuple(futures.values()))
+                        ),
                     )
                     raise abort
                 results[int(outcome["index"])] = outcome["result"]
@@ -252,6 +319,7 @@ def _evaluate_tasks_in_pool(
                     (task for future, task in futures.items() if future not in expired),
                     key=lambda item: item.index,
                 )
+                abort_tasks = (*expired_tasks, *tuple(requeue))
                 task_queue.extendleft(reversed(requeue))
                 futures.clear()
                 started_at.clear()
@@ -259,6 +327,7 @@ def _evaluate_tasks_in_pool(
                     executor,
                     {},
                     RuntimeError("process-pool worker timed out"),
+                    extra_pids=_tracked_child_pids_for_tasks(abort_tasks),
                 )
                 executor = _create_executor(max_workers, initializer)
                 executor_closed = False
@@ -288,16 +357,22 @@ def _evaluate_tasks_in_pool(
 def _evaluate_tasks_serial(
     tasks: Sequence[_PoolTask],
     evaluate_fn: Callable[..., ScoredResult],
+    *,
+    per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult, ...]:
     env_names = _serial_fallback_env_names()
     env_snapshot = {name: os.environ.get(name) for name in env_names}
     warm_runtime_spec = _warm_runtime_spec(tasks)
     try:
-        _initialize_worker(warm_runtime_spec)
         results: list[ScoredResult] = []
         for task in tasks:
             try:
-                outcome = _evaluate_pool_task(task, evaluate_fn)
+                outcome = _evaluate_task_supervised(
+                    task,
+                    evaluate_fn,
+                    warm_runtime_spec=warm_runtime_spec,
+                    per_eval_timeout_seconds=per_eval_timeout_seconds,
+                )
             except BaseException as exc:
                 raise RuntimeError(
                     f"process-pool evaluation failed for {_task_label(task)}"
@@ -311,6 +386,100 @@ def _evaluate_tasks_serial(
     finally:
         clear_worker_runtime()
         _restore_env(env_snapshot)
+
+
+def _evaluate_task_supervised(
+    task: _PoolTask,
+    evaluate_fn: Callable[..., ScoredResult],
+    *,
+    warm_runtime_spec: _WarmRuntimeSpec | None,
+    per_eval_timeout_seconds: float | None,
+) -> dict[str, Any]:
+    output_dir = Path(task.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    result_path = output_dir / ".supervised-result.pickle"
+    child_pid_log = _child_pid_log_path(task)
+    for path in (result_path, child_pid_log):
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+    ctx = _supervised_process_context(task, evaluate_fn, warm_runtime_spec)
+    process = ctx.Process(
+        target=_supervised_pool_task_main,
+        args=(task, evaluate_fn, warm_runtime_spec, str(result_path), str(child_pid_log)),
+    )
+    start = time.monotonic()
+    process.start()
+    process.join(per_eval_timeout_seconds)
+    elapsed = max(0.0, time.monotonic() - start)
+    if process.is_alive():
+        _terminate_pool_process(
+            process,
+            extra_pids=_read_pid_log(child_pid_log),
+        )
+        return {
+            "kind": "result",
+            "index": task.index,
+            "result": _timeout_result(
+                task,
+                timeout_seconds=per_eval_timeout_seconds or 0.0,
+                elapsed_seconds=elapsed,
+            ),
+        }
+    if result_path.exists():
+        with result_path.open("rb") as handle:
+            outcome = pickle.load(handle)
+        if outcome.get("kind") == "exception":
+            raise RuntimeError(
+                f"{outcome.get('exc_type', 'Exception')}: "
+                f"{outcome.get('message', '<missing message>')}"
+            )
+        return outcome
+    raise RuntimeError(
+        f"ChildProcessExit: child exited without result (exitcode={process.exitcode})"
+    )
+
+
+def _supervised_process_context(
+    task: _PoolTask,
+    evaluate_fn: Callable[..., ScoredResult],
+    warm_runtime_spec: _WarmRuntimeSpec | None,
+) -> mp.context.BaseContext:
+    try:
+        pickle.dumps((task, evaluate_fn, warm_runtime_spec))
+    except Exception:
+        if os.name != "nt":
+            return mp.get_context("fork")
+    return mp.get_context("spawn")
+
+
+def _supervised_pool_task_main(
+    task: _PoolTask,
+    evaluate_fn: Callable[..., ScoredResult],
+    warm_runtime_spec: _WarmRuntimeSpec | None,
+    result_path: str,
+    child_pid_log: str,
+) -> None:
+    try:
+        _initialize_worker(warm_runtime_spec)
+        outcome = _evaluate_pool_task(
+            replace(task, child_pid_log=child_pid_log),
+            evaluate_fn,
+        )
+    except BaseException as exc:
+        outcome = {
+            "kind": "exception",
+            "index": task.index,
+            "exc_type": type(exc).__name__,
+            "message": str(exc),
+        }
+    finally:
+        clear_worker_runtime()
+    path = Path(result_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("wb") as handle:
+        pickle.dump(outcome, handle)
 
 
 def _submit_until_full(
@@ -359,8 +528,14 @@ def _evaluate_pool_task(
 ) -> dict[str, Any]:
     output_dir = Path(task.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    child_pid_log = task.child_pid_log or str(_child_pid_log_path(task))
+    previous_output = os.environ.get(_WORKER_OUTPUT_ENV)
+    previous_pid_log = os.environ.get(_CHILD_PID_LOG_ENV)
     os.environ[_WORKER_OUTPUT_ENV] = str(output_dir)
+    os.environ[_CHILD_PID_LOG_ENV] = child_pid_log
+    _install_child_pid_tracking()
     try:
+        evaluator_kwargs = dict(task.evaluator_kwargs or {})
         result = _call_evaluate_fn(
             evaluate_fn,
             copy.deepcopy(task.patch),
@@ -375,9 +550,27 @@ def _evaluate_pool_task(
                 feedstock_id=task.feedstock_id,
                 stage0_subprocess_required=task.stage0_subprocess_required,
             ),
+            **evaluator_kwargs,
         )
     except EvaluationAbort as exc:
         return {"kind": "abort", "index": task.index, "abort": _abort_payload(exc)}
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        return {
+            "kind": "result",
+            "index": task.index,
+            "result": _stale_profile_result(task.candidate_id, str(exc)),
+        }
+    finally:
+        if previous_output is None:
+            os.environ.pop(_WORKER_OUTPUT_ENV, None)
+        else:
+            os.environ[_WORKER_OUTPUT_ENV] = previous_output
+        if previous_pid_log is None:
+            os.environ.pop(_CHILD_PID_LOG_ENV, None)
+        else:
+            os.environ[_CHILD_PID_LOG_ENV] = previous_pid_log
     return {"kind": "result", "index": task.index, "result": result}
 
 
@@ -535,6 +728,7 @@ def _task_from_request(
         stage0_subprocess_required=_task_stage0_subprocess_required(
             normalized.feedstock_id
         ),
+        evaluator_kwargs=_plain_value_for_process_pool(normalized.evaluator_kwargs or {}),
     )
 
 
@@ -611,6 +805,14 @@ def _assert_picklable(value: Any, label: str) -> None:
         ) from exc
 
 
+def _is_picklable(value: Any) -> bool:
+    try:
+        pickle.dumps(value)
+    except Exception:
+        return False
+    return True
+
+
 def _first_unpicklable_path(value: Any, path: str = "") -> str:
     for child_path, child in _picklable_children(value, path):
         try:
@@ -657,16 +859,19 @@ def _cancel_pending(futures: Mapping[Future[Any], _PoolTask]) -> None:
 def _abort_executor(
     executor: ProcessPoolExecutor,
     futures: Mapping[Future[Any], _PoolTask],
+    *,
+    extra_pids: Sequence[int] = (),
 ) -> None:
     _cancel_pending(futures)
     # Fail-fast path must not wait for long-running workers; Python 3.12 lacks
     # public terminate_workers(), so terminate live child processes before the
     # nonblocking shutdown.
+    tracked_pids = tuple(extra_pids)
     processes = getattr(executor, "_processes", None)
     if processes is not None:
         for process in list(processes.values()):
             if process.is_alive():
-                _terminate_pool_process(process)
+                _terminate_pool_process(process, extra_pids=tracked_pids)
     executor.shutdown(wait=False, cancel_futures=True)
 
 
@@ -674,9 +879,11 @@ def _best_effort_abort_executor(
     executor: ProcessPoolExecutor,
     futures: Mapping[Future[Any], _PoolTask],
     abort: BaseException,
+    *,
+    extra_pids: Sequence[int] = (),
 ) -> bool:
     try:
-        _abort_executor(executor, futures)
+        _abort_executor(executor, futures, extra_pids=extra_pids)
     except BaseException as exc:
         _attach_teardown_error(abort, exc)
         return False
@@ -818,21 +1025,30 @@ def _isolate_worker_process_group() -> None:
         return
 
 
-def _terminate_pool_process(process: Any) -> None:
+def _terminate_pool_process(process: Any, *, extra_pids: Sequence[int] = ()) -> None:
     pid = getattr(process, "pid", None)
-    if pid is not None and os.name != "nt":
+    pid_int = int(pid) if pid is not None else None
+    if pid_int is not None and os.name != "nt":
+        descendant_pids = _merge_pids(
+            (*_process_tree_pids(pid_int), *tuple(extra_pids)),
+            exclude={pid_int, os.getpid()},
+        )
+        _signal_pids(descendant_pids, signal.SIGTERM)
+        time.sleep(min(_WORKER_TERMINATE_GRACE_SECONDS, 0.25))
         try:
-            os.killpg(int(pid), signal.SIGTERM)
+            os.killpg(pid_int, signal.SIGTERM)
         except ProcessLookupError:
             return
         except OSError:
             pass
         else:
             process.join(_WORKER_TERMINATE_GRACE_SECONDS)
-            if not process.is_alive():
+            remaining = _living_pids(descendant_pids)
+            if not process.is_alive() and not remaining:
                 return
+            _signal_pids(remaining, signal.SIGKILL)
             try:
-                os.killpg(int(pid), signal.SIGKILL)
+                os.killpg(pid_int, signal.SIGKILL)
             except ProcessLookupError:
                 return
             except OSError:
@@ -845,6 +1061,141 @@ def _terminate_pool_process(process: Any) -> None:
     if process.is_alive():
         process.kill()
         process.join()
+    _signal_pids(tuple(extra_pids), signal.SIGKILL)
+
+
+def _merge_pids(
+    pids: Sequence[int],
+    *,
+    exclude: set[int] | None = None,
+) -> tuple[int, ...]:
+    excluded = exclude or set()
+    merged: list[int] = []
+    seen: set[int] = set()
+    for raw_pid in pids:
+        try:
+            pid = int(raw_pid)
+        except (TypeError, ValueError):
+            continue
+        if pid <= 0 or pid in excluded or pid in seen:
+            continue
+        seen.add(pid)
+        merged.append(pid)
+    return tuple(merged)
+
+
+def _process_tree_pids(root_pid: int) -> tuple[int, ...]:
+    try:
+        import psutil  # type: ignore[import-not-found]
+
+        root = psutil.Process(root_pid)
+        return tuple(int(child.pid) for child in root.children(recursive=True))
+    except Exception:
+        return _process_tree_pids_via_pgrep(root_pid)
+
+
+def _process_tree_pids_via_pgrep(root_pid: int) -> tuple[int, ...]:
+    found: list[int] = []
+    pending = [root_pid]
+    while pending:
+        parent = pending.pop()
+        try:
+            completed = subprocess.run(
+                ["pgrep", "-P", str(parent)],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=1.0,
+            )
+        except Exception:
+            continue
+        for line in completed.stdout.splitlines():
+            try:
+                child = int(line.strip())
+            except ValueError:
+                continue
+            if child not in found:
+                found.append(child)
+                pending.append(child)
+    return tuple(found)
+
+
+def _signal_pids(pids: Sequence[int], sig: signal.Signals) -> None:
+    for pid in pids:
+        try:
+            os.kill(int(pid), sig)
+        except ProcessLookupError:
+            continue
+        except OSError:
+            continue
+
+
+def _living_pids(pids: Sequence[int]) -> tuple[int, ...]:
+    living: list[int] = []
+    for pid in pids:
+        try:
+            os.kill(int(pid), 0)
+        except ProcessLookupError:
+            continue
+        except OSError:
+            continue
+        living.append(int(pid))
+    return tuple(living)
+
+
+def _child_pid_log_path(task: _PoolTask) -> Path:
+    return Path(task.output_dir) / ".child-pids"
+
+
+def _tracked_child_pids_for_tasks(tasks: Sequence[_PoolTask]) -> tuple[int, ...]:
+    pids: list[int] = []
+    for task in tasks:
+        pids.extend(_read_pid_log(_child_pid_log_path(task)))
+        if task.child_pid_log is not None:
+            pids.extend(_read_pid_log(Path(task.child_pid_log)))
+    return _merge_pids(tuple(pids), exclude={os.getpid()})
+
+
+def _read_pid_log(path: Path) -> tuple[int, ...]:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return ()
+    except OSError:
+        return ()
+    pids: list[int] = []
+    for line in lines:
+        try:
+            pids.append(int(line.strip()))
+        except ValueError:
+            continue
+    return tuple(pids)
+
+
+def _append_child_pid(path: str, pid: int) -> None:
+    try:
+        log_path = Path(path)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with log_path.open("a", encoding="utf-8") as handle:
+            handle.write(f"{int(pid)}\n")
+    except OSError:
+        return
+
+
+def _install_child_pid_tracking() -> None:
+    global _CHILD_PID_TRACKING_INSTALLED
+    if _CHILD_PID_TRACKING_INSTALLED:
+        return
+
+    def _tracked_popen(*args: Any, **kwargs: Any) -> subprocess.Popen[Any]:
+        process = _ORIGINAL_POPEN(*args, **kwargs)
+        log_path = os.environ.get(_CHILD_PID_LOG_ENV)
+        if log_path:
+            _append_child_pid(log_path, int(process.pid))
+        return process
+
+    subprocess.Popen = _tracked_popen  # type: ignore[assignment]
+    _CHILD_PID_TRACKING_INSTALLED = True
 
 
 def _task_label(task: _PoolTask) -> str:
