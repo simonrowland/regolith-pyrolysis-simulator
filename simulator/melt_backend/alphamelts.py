@@ -86,6 +86,17 @@ ALPHAMELTS_REASON_NO_CONVERGENCE = 'no_convergence'
 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT = 'parse_empty_output'
 ALPHAMELTS_REASON_MISSING_BINARY = 'missing_binary'
 
+ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
+ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
+ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
+    ALPHAMELTS_REASON_TIMEOUT: OutOfDomainReason.NOT_CONVERGED.value,
+    ALPHAMELTS_REASON_SUBPROCESS_DIED: 'out_of_domain',
+    ALPHAMELTS_REASON_NONZERO_EXIT: OutOfDomainReason.NOT_CONVERGED.value,
+    ALPHAMELTS_REASON_NO_CONVERGENCE: 'out_of_domain',
+    ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT: OutOfDomainReason.NOT_CONVERGED.value,
+    ALPHAMELTS_REASON_MISSING_BINARY: OutOfDomainReason.BACKEND_UNAVAILABLE.value,
+}
+
 ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_TIMEOUT: 'AlphaMELTS subprocess timed out',
     ALPHAMELTS_REASON_SUBPROCESS_DIED: (
@@ -104,6 +115,36 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
         'AlphaMELTS subprocess binary was not available'
     ),
 }
+
+
+def _alphamelts_backend_failure_category(reason_code: str,
+                                         backend_status: str | None = None
+                                         ) -> str | None:
+    return (
+        ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON.get(reason_code)
+        or backend_status
+    )
+
+
+def _annotate_alphamelts_backend_failure(
+    payload: dict[str, object],
+    *,
+    reason_code: str | None,
+    backend_status: str | None = None,
+    message: str | None = None,
+) -> dict[str, object]:
+    if reason_code is None:
+        return payload
+    payload[ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY] = str(reason_code)
+    category = _alphamelts_backend_failure_category(
+        str(reason_code),
+        backend_status,
+    )
+    if category is not None:
+        payload[ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY] = category
+    if message is not None:
+        payload.setdefault('backend_status_reason_message', message)
+    return payload
 
 
 def _signal_name(returncode: int) -> str:
@@ -130,6 +171,10 @@ def _alphamelts_backend_failure_error(reason_code: str,
         _alphamelts_backend_failure_detail(reason_code, detail)
     )
     error.backend_status_reason = reason_code  # type: ignore[attr-defined]
+    error.backend_failure_reason_code = reason_code  # type: ignore[attr-defined]
+    error.backend_failure_category = _alphamelts_backend_failure_category(
+        reason_code
+    )  # type: ignore[attr-defined]
     error.backend_status_reason_message = (
         ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
     )
@@ -1015,7 +1060,13 @@ class AlphaMELTSBackend(MeltBackend):
             'out_of_domain_crash_point': crash_point,
         }
         if reason is not None:
-            payload['backend_status_reason'] = str(reason)
+            reason_code = str(reason)
+            payload['backend_status_reason'] = reason_code
+            _annotate_alphamelts_backend_failure(
+                payload,
+                reason_code=reason_code,
+                backend_status='out_of_domain',
+            )
         return payload
 
     @staticmethod
@@ -1035,8 +1086,12 @@ class AlphaMELTSBackend(MeltBackend):
                 message
                 or ALPHAMELTS_BACKEND_FAILURE_MESSAGES.get(structured_reason)
             )
-            if reason_message is not None:
-                payload['backend_status_reason_message'] = reason_message
+            _annotate_alphamelts_backend_failure(
+                payload,
+                reason_code=structured_reason,
+                backend_status=backend_status,
+                message=reason_message,
+            )
         return payload
 
     @staticmethod
@@ -1140,6 +1195,11 @@ class AlphaMELTSBackend(MeltBackend):
         structured_reason = reason_value(reason)
         if structured_reason is not None:
             diagnostics_out['backend_status_reason'] = structured_reason
+            _annotate_alphamelts_backend_failure(
+                diagnostics_out,
+                reason_code=structured_reason,
+                backend_status='out_of_domain',
+            )
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,

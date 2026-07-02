@@ -440,6 +440,11 @@ def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
         first.diagnostics.get('backend_status_reason')
         == ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
+    assert (
+        first.diagnostics.get('backend_failure_reason_code')
+        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert first.diagnostics.get('backend_failure_category') == 'out_of_domain'
     assert 'subprocess exited' in (
         first.diagnostics.get('backend_status_reason_message') or ''
     )
@@ -472,6 +477,11 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_TIMEOUT
     )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_TIMEOUT
+    )
+    assert getattr(excinfo.value, 'backend_failure_category') == 'not_converged'
     assert 'timed out' in getattr(
         excinfo.value,
         'backend_status_reason_message',
@@ -534,6 +544,14 @@ def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypa
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_MISSING_BINARY
     )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_MISSING_BINARY
+    )
+    assert (
+        getattr(excinfo.value, 'backend_failure_category')
+        == OutOfDomainReason.BACKEND_UNAVAILABLE.value
+    )
     assert 'binary' in getattr(
         excinfo.value,
         'backend_status_reason_message',
@@ -558,6 +576,14 @@ def test_alphamelts_subprocess_unconfigured_binary_reports_missing_binary():
     assert (
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_MISSING_BINARY
+    )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_MISSING_BINARY
+    )
+    assert (
+        getattr(excinfo.value, 'backend_failure_category')
+        == OutOfDomainReason.BACKEND_UNAVAILABLE.value
     )
 
 
@@ -589,6 +615,11 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_NONZERO_EXIT
     )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_NONZERO_EXIT
+    )
+    assert getattr(excinfo.value, 'backend_failure_category') == 'not_converged'
     assert backend._mode == 'subprocess'
 
 
@@ -623,6 +654,11 @@ def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
     )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
+    )
+    assert getattr(excinfo.value, 'backend_failure_category') == 'not_converged'
 
     assert backend._mode == 'subprocess'
 
@@ -1004,6 +1040,10 @@ def test_alphamelts_domain_gate_rejects_exact_major_oxide_boundary():
     assert result.diagnostics['backend_status_reason'] == (
         OutOfDomainReason.MAJOR_SUM.value
     )
+    assert result.diagnostics['backend_failure_reason_code'] == (
+        OutOfDomainReason.MAJOR_SUM.value
+    )
+    assert result.diagnostics['backend_failure_category'] == 'out_of_domain'
     assert result.warnings == [
         'DomainGate rejected: major oxide sum 95.000 wt% <= 95'
     ]
@@ -1691,6 +1731,11 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
         result.diagnostics.get("backend_status_reason")
         == ALPHAMELTS_REASON_NO_CONVERGENCE
     )
+    assert (
+        result.diagnostics.get("backend_failure_reason_code")
+        == ALPHAMELTS_REASON_NO_CONVERGENCE
+    )
+    assert result.diagnostics.get("backend_failure_category") == "out_of_domain"
     assert 'no convergence' in (
         result.diagnostics.get("backend_status_reason_message") or ''
     )
@@ -1727,6 +1772,11 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
         result.diagnostics.get("backend_status_reason")
         == ALPHAMELTS_REASON_NO_CONVERGENCE
     )
+    assert (
+        result.diagnostics.get("backend_failure_reason_code")
+        == ALPHAMELTS_REASON_NO_CONVERGENCE
+    )
+    assert result.diagnostics.get("backend_failure_category") == "out_of_domain"
     assert 'no convergence' in (
         result.diagnostics.get("backend_status_reason_message") or ''
     )
@@ -1751,6 +1801,11 @@ def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
         getattr(excinfo.value, 'backend_status_reason')
         == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
     )
+    assert (
+        getattr(excinfo.value, 'backend_failure_reason_code')
+        == ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT
+    )
+    assert getattr(excinfo.value, 'backend_failure_category') == 'not_converged'
 
 
 def test_project_local_alphamelts_reports_liquidus_when_installed():
