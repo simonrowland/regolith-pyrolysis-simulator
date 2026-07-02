@@ -150,12 +150,19 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
 
     sim.step()
 
+    # 2026-07-02 SSO-R ch2e ratified tick order: reduction producers
+    # (shuttle) run FIRST so the native split and equilibrium see the
+    # dosed fO2; the old pre-shuttle equilibrium call is gone (the
+    # shuttle derives from committed transitions, not a pre-equilibrium).
+    # The INVARIANT this test guards — equilibrium refreshed after the
+    # shuttle and before evaporation — is unchanged.
     assert calls == [
-        "equilibrium_pre_shuttle",
         "shuttle",
         "equilibrium_post_shuttle",
         "evaporation",
     ]
+    assert calls.index("equilibrium_post_shuttle") > calls.index("shuttle")
+    assert calls.index("evaporation") > calls.index("equilibrium_post_shuttle")
 
 
 def _fe_element_kg(oxides_kg: dict[str, float]) -> float:

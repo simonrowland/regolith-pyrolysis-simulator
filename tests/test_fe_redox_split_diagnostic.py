@@ -72,7 +72,16 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     )
 
     default_summary = build_per_hour_summary(sim, snapshot)
-    assert "fe_redox_split" not in default_summary
+    assert default_summary["fe_redox_split"]["fe3_over_sigma_fe"] == pytest.approx(
+        split["fe3_over_sigma_fe"],
+    )
+
+    omitted_summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+    assert "fe_redox_split" not in omitted_summary
 
     diagnostic_summary = build_per_hour_summary(
         sim,

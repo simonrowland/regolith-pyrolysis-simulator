@@ -35,6 +35,10 @@ PER_HOUR_KEYS = {
     "regime",
     "transport_formula_id",
 }
+PER_HOUR_DIAGNOSTIC_KEYS = {
+    "fe_redox_split",
+    "stage_3_capture",
+}
 
 
 def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedProcess:
@@ -165,7 +169,13 @@ def test_session_script_exercises_every_verb_as_ndjson():
     assert set(frames[1]["snapshot"]) == PER_HOUR_KEYS
     assert frames[2]["decision"]["recommendation"] == "A_staged"
     assert frames[2]["steps"]
-    assert set(frames[2]["steps"][0]) == PER_HOUR_KEYS
+    assert set(frames[2]["steps"][0]) == PER_HOUR_KEYS | PER_HOUR_DIAGNOSTIC_KEYS
+    assert frames[2]["steps"][0]["fe_redox_split"]
+    assert set(frames[2]["steps"][0]["stage_3_capture"]) == {
+        "Fe_kg",
+        "total_kg",
+        "Fe_wt_pct",
+    }
     assert frames[3]["choice"] == "A"
     assert frames[5]["campaign"] == "C2A"
     assert frames[5]["field"] == "stir_factor"

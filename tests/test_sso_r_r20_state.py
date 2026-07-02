@@ -28,7 +28,7 @@ from simulator.fe_redox import (
 )
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import build_per_hour_summary
-from simulator.state import Atmosphere, CampaignPhase, MeltState
+from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
 
 
@@ -101,6 +101,125 @@ def _transition_account_o2_equiv_mol(
         account=account,
         species=species,
     )
+
+
+def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
+    monkeypatch,
+) -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim.start_campaign(CampaignPhase.C3_NA)
+    sim.melt.campaign_hour = 1
+    order: list[str] = []
+
+    def fake_exchange():
+        order.append("passive_exchange")
+        return sim.melt.oxygen_reservoir
+
+    def fake_native_split(*, sample_time_h=None):
+        order.append("native_split")
+        return {}
+
+    def fake_equilibrium():
+        order.append("equilibrium")
+        return SimpleNamespace()
+
+    def fake_evaporation(_equilibrium):
+        order.append("evaporation")
+        flux = EvaporationFlux(species_kg_hr={"SiO": 1.0e-6})
+        flux.update_totals()
+        return flux
+
+    def fake_evaporative_source(_transition, *, exchange_direction):
+        order.append("evaporative_redox_source_terms")
+        return None
+
+    def fake_route(_evap_flux):
+        order.append("condensation_route")
+        sim._apply_evaporative_redox_source_terms(
+            object(),
+            exchange_direction="redox_source:evaporative_loss",
+        )
+
+    monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", fake_exchange)
+    monkeypatch.setattr(sim, "_step_shuttle", lambda: order.append("c3_source"))
+    monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
+    monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
+    monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
+    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(sim, "_configure_condensation_operating_conditions", lambda flux: None)
+    monkeypatch.setattr(sim, "_apply_lab_surface_temperatures", lambda *, sample_time_h: None)
+    monkeypatch.setattr(sim, "_route_to_condensation", fake_route)
+    monkeypatch.setattr(
+        sim,
+        "_apply_evaporative_redox_source_terms",
+        fake_evaporative_source,
+    )
+
+    sim.step()
+
+    assert order.count("passive_exchange") == 1
+    assert order.index("passive_exchange") < order.index("evaporation")
+    assert order.index("c3_source") < order.index("native_split")
+    assert order.index("native_split") < order.index("evaporation")
+    assert order.index("passive_exchange") < order.index(
+        "evaporative_redox_source_terms"
+    )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "producer_attr", "producer_marker", "producer_result"),
+    [
+        (CampaignPhase.C5, "_step_mre", "mre_source", 0.0),
+        (CampaignPhase.MRE_BASELINE, "_step_mre", "mre_source", 0.0),
+        (CampaignPhase.C6, "_step_thermite", "c6_source", None),
+        (
+            CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            "_step_c7_ca_aluminothermic",
+            "c7_source",
+            None,
+        ),
+    ],
+)
+def test_step_orders_source_producers_before_native_split(
+    monkeypatch,
+    campaign,
+    producer_attr,
+    producer_marker,
+    producer_result,
+) -> None:
+    sim = _make_sim()
+    sim.melt.campaign = campaign
+    sim.melt.campaign_hour = 1
+    if campaign == CampaignPhase.C5:
+        sim.melt.c5_enabled = True
+    order: list[str] = []
+
+    def fake_native_split(*, sample_time_h=None):
+        order.append("native_split")
+        return {}
+
+    def fake_producer():
+        order.append(producer_marker)
+        return producer_result
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_oxygen_reservoir_exchange",
+        lambda: order.append("passive_exchange") or sim.melt.oxygen_reservoir,
+    )
+    monkeypatch.setattr(sim, producer_attr, fake_producer)
+    monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
+    monkeypatch.setattr(
+        sim,
+        "_get_equilibrium",
+        lambda: order.append("equilibrium") or SimpleNamespace(),
+    )
+
+    sim.step()
+
+    assert order.index("passive_exchange") < order.index(producer_marker)
+    assert order.index(producer_marker) < order.index("native_split")
+    assert order.index("native_split") < order.index("equilibrium")
 
 
 def _make_custom_feedstock_sim(
@@ -1292,5 +1411,14 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])
     assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
     assert "stage_3_fe_wt_pct" not in partition
-    assert summary["stage_3_capture"]["Fe_wt_pct"] >= 0.0
+    stage_3_capture = summary["stage_3_capture"]
+    stage_3_non_fe_kg = stage_3_capture["total_kg"] - stage_3_capture["Fe_kg"]
+    assert snapshot.evap_flux.species_kg_hr["SiO"] > 1.0e-7
+    assert sim.train.stages[3].collected_kg.get("SiO2", 0.0) > 1.0e-8
+    assert stage_3_capture["Fe_kg"] > 0.0
+    assert stage_3_non_fe_kg > 1.0e-8
+    assert stage_3_capture["Fe_wt_pct"] == pytest.approx(
+        100.0 * stage_3_capture["Fe_kg"] / stage_3_capture["total_kg"]
+    )
+    assert stage_3_capture["Fe_wt_pct"] < 100.0
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12

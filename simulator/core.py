@@ -7412,11 +7412,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         1. Check if paused for a decision
         2. Update temperature (ramp toward campaign target)
-        3. Calculate thermodynamic equilibrium (via melt backend)
-        4. Apply C3 alkali-shuttle reduction before evaporation
-        5. Calculate evaporation flux (Hertz-Knudsen-Langmuir)
-        6. Route evaporated species through condensation train
-        7. Update melt composition (subtract evaporated mass)
+        3. Apply passive oxygen-reservoir exchange from carried-in headspace
+        4. Commit C3/MRE/C6/C7 source-producing reactions
+        5. Apply native-Fe split from the post-source redox state
+        6. Refresh thermodynamic equilibrium (via melt backend)
+        7. Calculate evaporation flux and route it through condensation
         8. Update overhead gas & turbine pressure
         9. Calculate energy consumption this hour
         10. Check campaign endpoint criteria
@@ -7449,32 +7449,59 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self.validate_lab_surface_temperature_resolver()
 
-        # --- 2. Temperature ramp ---
+        # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
         self._apply_oxygen_reservoir_exchange()
-        self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
 
-        # --- 3. Thermodynamic equilibrium ---
-        # Query the melt backend for phase assemblage, activities,
-        # and vapor pressures at the current T and composition.
-        equilibrium = self._get_equilibrium()
         c3_shuttle_campaign = self.melt.campaign in (
             CampaignPhase.C3_K, CampaignPhase.C3_NA,
         )
+        mre_O2_kg = 0.0
+        mre_energy_kWh = 0.0
 
-        # --- 4. Alkali shuttle injection (C3 only) ---         [THERMO-5]
+        # --- 3. Source-producing reactions before native Fe split ---
+        # Alkali shuttle injection (C3 only) ---                 [THERMO-5]
         # During C3, the shuttle cycle alternates between injection
         # (alkali reduces target oxides) and bakeout (alkali oxide
         # evaporates, alkali recovered).  Injection modifies the melt
         # composition directly; bakeout uses normal evaporation.
         if c3_shuttle_campaign:
             self._step_shuttle()
-            equilibrium = self._get_equilibrium()
         else:
             self._shuttle_injected_this_hr = 0.0
             self._shuttle_reduced_this_hr = 0.0
             self._shuttle_metal_this_hr = 0.0
             self._shuttle_phase = ''
+
+        if self.melt.campaign in (CampaignPhase.C5,
+                                   CampaignPhase.MRE_BASELINE):
+            mre_O2_kg = self._step_mre()
+            self._mre_anode_O2_kg_this_hr = mre_O2_kg
+            mre_energy_kWh = self._mre_energy_this_hr
+        else:
+            self._mre_voltage_V = 0.0
+            self._mre_current_A = 0.0
+            self._mre_effective_current_A = 0.0
+            self._mre_metals_this_hr = {}
+            self._mre_energy_this_hr = 0.0
+            self._mre_anode_O2_kg_this_hr = 0.0
+
+        if self.melt.campaign == CampaignPhase.C6:
+            self._step_thermite()
+        else:
+            self._thermite_Al2O3_reduced_this_hr = 0.0
+            self._thermite_Al_produced_this_hr = 0.0
+            self._thermite_Mg_consumed_this_hr = 0.0
+
+        if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
+            self._step_c7_ca_aluminothermic()
+
+        self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
+
+        # --- 4. Thermodynamic equilibrium ---
+        # Query the melt backend for phase assemblage, activities,
+        # and vapor pressures at the post-source, post-native composition.
+        equilibrium = self._get_equilibrium()
 
         # --- 4b. Evaporation flux ---
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
@@ -7501,33 +7528,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
-
-        # --- 6b. MRE step (C5 / MRE baseline) ---
-        mre_O2_kg = 0.0
-        mre_energy_kWh = 0.0
-        if self.melt.campaign in (CampaignPhase.C5,
-                                   CampaignPhase.MRE_BASELINE):
-            mre_O2_kg = self._step_mre()
-            self._mre_anode_O2_kg_this_hr = mre_O2_kg
-            mre_energy_kWh = self._mre_energy_this_hr
-        else:
-            self._mre_voltage_V = 0.0
-            self._mre_current_A = 0.0
-            self._mre_effective_current_A = 0.0
-            self._mre_metals_this_hr = {}
-            self._mre_energy_this_hr = 0.0
-            self._mre_anode_O2_kg_this_hr = 0.0
-
-        # --- 6c. Mg thermite step (C6) ---                      [THERMO-7]
-        if self.melt.campaign == CampaignPhase.C6:
-            self._step_thermite()
-        else:
-            self._thermite_Al2O3_reduced_this_hr = 0.0
-            self._thermite_Al_produced_this_hr = 0.0
-            self._thermite_Mg_consumed_this_hr = 0.0
-
-        if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
-            self._step_c7_ca_aluminothermic()
 
         # --- 7. Overhead gas (with turbine capacity feedback) ---   [LOOP-2]
         # Pass the turbine spec so overhead model can enforce capacity limits,

@@ -1388,7 +1388,7 @@ def build_per_hour_summary(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
     *,
-    include_fe_redox_split: bool = False,
+    include_fe_redox_split: bool = True,
 ) -> dict:
     """Build the per-hour summary entry for both the CLI runner and the
     SocketIO stream.
@@ -1467,6 +1467,11 @@ def build_per_hour_summary(
         mass_balance_pct = 0.0
 
     o2_source_side_potential_kg = float(snapshot.oxygen_produced_kg)
+    fe_redox_split_observables = (
+        _fe_redox_split_observables(snapshot)
+        if include_fe_redox_split
+        else {}
+    )
 
     summary = {
         "hour": int(snapshot.hour),
@@ -1495,13 +1500,9 @@ def build_per_hour_summary(
         **_evap_plane_selectivity_observables(snapshot),
         **_redox_source_breakdown_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
-        **(
-            _fe_redox_split_observables(snapshot)
-            if include_fe_redox_split
-            else {}
-        ),
+        **fe_redox_split_observables,
     }
-    if include_fe_redox_split:
+    if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {
             "Fe_kg": _finite_export_float(

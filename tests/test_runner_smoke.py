@@ -122,13 +122,14 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     # so they are absent on the plain stub-backend smoke SCENARIOS. Whitelisted
     # so the per_hour_summary issubset gate accepts a legitimate row instead of
     # flagging key drift (BUG-032 + same-class sweep; see
-    # docs/runner-output-schema.md "Per-hour summary"). The first four come from
+    # docs/runner-output-schema.md "Per-hour summary"). Most come from
     # HourSnapshot fields via build_per_hour_summary; reduced_real_cache_state is
     # added downstream by simulator/run_executor.py from the simulator's
     # _last_reduced_real_cache_state when it is not None.
     "evap_plane_selectivity",
     "mre_uncertified_yield",
     "fe_redox_split",
+    "stage_3_capture",
     "redox_source_breakdown",
     "mass_balance_error_category",
     "reduced_real_cache_state",

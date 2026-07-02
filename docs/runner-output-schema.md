@@ -387,6 +387,9 @@ schema-shape assertion.
     `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
     native-Fe redox split (numeric fields finite-export-checked; flags
     serialized as bool / str / null).
+  * `stage_3_capture` -- emitted with `fe_redox_split`; stage-3 Fe kg,
+    total kg, and Fe wt% so pN2/native-Fe recipe reports expose condenser
+    contamination instead of requiring raw ledger inspection.
   * `redox_source_breakdown` -- emitted by
     `_redox_source_breakdown_observables` when
     `HourSnapshot.redox_source_breakdown` is non-empty; per-label
